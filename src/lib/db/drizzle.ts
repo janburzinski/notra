@@ -1,11 +1,20 @@
-import { config } from "dotenv";
+import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/neon-http";
 
-config({ path: ".env.local" });
-
 const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not defined in environment variables.");
-}
 
-export const db = drizzle(databaseUrl);
+if (!databaseUrl) {
+  throw new Error("[ENV]: DATABASE_URL is not defined");
+}
+const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
+const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+export const db = drizzle(databaseUrl, {
+  cache:
+    upstashUrl && upstashToken
+      ? upstashCache({
+          url: upstashUrl,
+          token: upstashToken,
+        })
+      : undefined,
+});
