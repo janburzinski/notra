@@ -44,13 +44,11 @@ export default function AuthLayout({
         </div>
       </div>
 
-      <section className="flex h-full w-full flex-col items-center justify-between p-4">
+      <section className="flex h-full flex-col items-center justify-between p-4">
         <div className="self-start">
           <h1 className="sr-only font-semibold uppercase">Notra</h1>
         </div>
-        <div className="flex w-full flex-1 items-center justify-center">
-          <div className="w-full max-w-md">{children}</div>
-        </div>
+        <div className="w-full max-w-md">{children}</div>
         <div>
           <p className="px-8 text-center text-muted-foreground text-xs">
             By continuing, you agree to our{" "}

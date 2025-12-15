@@ -1,6 +1,6 @@
 "use client";
 
-import { EyeIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
+import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { AnyFieldApi } from "@tanstack/react-form";
 import { useForm } from "@tanstack/react-form";
@@ -185,7 +185,7 @@ export default function SignUp() {
                           icon={ViewOffSlashIcon}
                         />
                       ) : (
-                        <HugeiconsIcon className="size-4" icon={EyeIcon} />
+                        <HugeiconsIcon className="size-4" icon={ViewIcon} />
                       )}
                     </button>
                   </div>

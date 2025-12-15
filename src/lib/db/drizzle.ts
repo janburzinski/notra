@@ -1,5 +1,8 @@
+/** biome-ignore-all lint/performance/noNamespaceImport: Required for drizzle-kit */
+
 import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/neon-http";
+import * as schema from "./schema";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -17,4 +20,5 @@ export const db = drizzle(databaseUrl, {
           token: upstashToken,
         })
       : undefined,
+  schema,
 });

@@ -8,9 +8,11 @@
     "start": "next start",
     "lint": "ultracite check",
     "format": "ultracite fix",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "auth:generate": "bunx @better-auth/cli generate --config src/lib/auth/server.ts --output src/lib/db/schemas/auth.ts -y"
+    "auth:generate": "bunx @better-auth/cli generate --config src/lib/auth/server.ts --output src/lib/db/schema.ts -y"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
@@ -20,7 +22,7 @@
     "@tanstack/react-form": "^1.27.3",
     "@toolwind/corner-shape": "^0.0.8-3",
     "@upstash/redis": "^1.35.8",
-    "better-auth": "^1.4.6",
+    "better-auth": "^1.4.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",

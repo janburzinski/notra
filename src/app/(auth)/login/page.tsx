@@ -1,6 +1,6 @@
 "use client";
 
-import { EyeIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
+import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -104,7 +104,7 @@ export default function Login() {
                   {showPassword ? (
                     <HugeiconsIcon className="size-4" icon={ViewOffSlashIcon} />
                   ) : (
-                    <HugeiconsIcon className="size-4" icon={EyeIcon} />
+                    <HugeiconsIcon className="size-4" icon={ViewIcon} />
                   )}
                 </button>
               </div>
