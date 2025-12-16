@@ -63,13 +63,11 @@ function OrganizationItem({
 function OrganizationTrigger({
   activeOrganization,
   isSwitching,
-  isLoading,
 }: {
   activeOrganization: NonNullable<
     ReturnType<typeof useOrganizationsContext>["activeOrganization"]
   >;
   isSwitching: boolean;
-  isLoading: boolean;
 }) {
   return (
     <SidebarMenuButton
@@ -77,7 +75,7 @@ function OrganizationTrigger({
         "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
         isSwitching ? "cursor-not-allowed opacity-70" : ""
       )}
-      disabled={isLoading || isSwitching}
+      disabled={isSwitching}
       size="lg"
     >
       <Avatar className="size-8">
@@ -165,7 +163,7 @@ export function OrgSelector() {
     return { ownedOrganizations: owned, sharedOrganizations: shared };
   }, [organizations]);
 
-  const showSkeleton = !activeOrganization && isLoading;
+  const showSkeleton = isLoading && activeOrganization === null;
 
   return (
     <SidebarMenu>
@@ -181,7 +179,6 @@ export function OrgSelector() {
               activeOrganization !== null && !showSkeleton ? (
                 <OrganizationTrigger
                   activeOrganization={activeOrganization}
-                  isLoading={isLoading}
                   isSwitching={isSwitching}
                 />
               ) : (
@@ -206,7 +203,7 @@ export function OrgSelector() {
                 {ownedOrganizations.map((org) => (
                   <OrganizationItem
                     isActive={activeOrganization?.id === org.id}
-                    isDisabled={isLoading || isSwitching}
+                    isDisabled={isSwitching}
                     key={org.id}
                     onSelect={handleSelectOrganization}
                     org={org}
@@ -224,7 +221,7 @@ export function OrgSelector() {
                 {sharedOrganizations.map((org) => (
                   <OrganizationItem
                     isActive={activeOrganization?.id === org.id}
-                    isDisabled={isLoading || isSwitching}
+                    isDisabled={isSwitching}
                     key={org.id}
                     onSelect={handleSelectOrganization}
                     org={org}
