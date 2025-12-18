@@ -33,9 +33,9 @@ export default function Login() {
             {lastMethod === "google" && (
               <Badge
                 className="-right-2 -top-4 absolute z-10"
-                variant="secondary"
+                variant="default"
               >
-                Last used
+                Last Used
               </Badge>
             )}
             <Button
@@ -52,9 +52,9 @@ export default function Login() {
             {lastMethod === "github" && (
               <Badge
                 className="-right-2 -top-4 absolute z-10"
-                variant="secondary"
+                variant="default"
               >
-                Last used
+                Last Used
               </Badge>
             )}
             <Button
@@ -110,9 +110,19 @@ export default function Login() {
               </div>
             </div>
           </div>
-          <Button className="mt-4 w-full" type="submit">
-            Continue
-          </Button>
+          <div className="relative">
+            {lastMethod === "email" && (
+              <Badge
+                className="-right-2 -top-4 absolute z-10"
+                variant="default"
+              >
+                Last Used
+              </Badge>
+            )}
+            <Button className="mt-4 w-full" type="submit">
+              Continue
+            </Button>
+          </div>
         </form>
       </div>
 
