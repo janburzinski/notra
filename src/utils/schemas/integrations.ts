@@ -19,6 +19,15 @@ export const INTEGRATION_TYPES = [
 ] as const;
 export type IntegrationType = (typeof INTEGRATION_TYPES)[number];
 
+export const OUTPUT_CONTENT_TYPES = [
+  "changelog",
+  "blog_post",
+  "twitter_post",
+  "linkedin_post",
+  "investor_update",
+] as const;
+export type OutputContentType = (typeof OUTPUT_CONTENT_TYPES)[number];
+
 const GITHUB_URL_PATTERNS = [
   /^https?:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?$/i,
   /^git@github\.com:([^/]+)\/([^/]+?)(?:\.git)?$/i,
@@ -68,7 +77,7 @@ export const addRepositoryRequestSchema = z.object({
   outputs: z
     .array(
       z.object({
-        type: z.enum(["changelog", "blog_post", "twitter_post", "linkedin_post", "investor_update"]),
+        type: z.enum(OUTPUT_CONTENT_TYPES),
         enabled: z.boolean(),
       })
     )
@@ -109,13 +118,7 @@ export const updateRepositoryBodySchema = z.object({
 export type UpdateRepositoryBody = z.infer<typeof updateRepositoryBodySchema>;
 
 export const configureOutputBodySchema = z.object({
-  outputType: z.enum([
-    "changelog",
-    "blog_post",
-    "twitter_post",
-    "linkedin_post",
-    "investor_update",
-  ]),
+  outputType: z.enum(OUTPUT_CONTENT_TYPES),
   enabled: z.boolean(),
   config: z.record(z.string(), z.unknown()).optional(),
 });

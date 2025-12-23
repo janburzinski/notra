@@ -8,16 +8,10 @@ import {
   members,
   repositoryOutputs,
 } from "@/lib/db/schema";
+import type { OutputContentType } from "@/utils/schemas/integrations";
 import { createOctokit } from "../octokit";
 
 const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 16);
-
-export type OutputType =
-  | "changelog"
-  | "blog_post"
-  | "twitter_post"
-  | "linkedin_post"
-  | "investor_update";
 
 type CreateGitHubIntegrationParams = {
   organizationId: string;
@@ -33,7 +27,7 @@ type AddRepositoryParams = {
   owner: string;
   repo: string;
   outputs?: Array<{
-    type: OutputType;
+    type: OutputContentType;
     enabled?: boolean;
     config?: Record<string, unknown>;
   }>;
@@ -41,7 +35,7 @@ type AddRepositoryParams = {
 
 type ConfigureOutputParams = {
   repositoryId: string;
-  outputType: OutputType;
+  outputType: OutputContentType;
   enabled: boolean;
   config?: Record<string, unknown>;
 };
