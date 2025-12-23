@@ -13,7 +13,7 @@ export async function validateWorkspaceAccess(slug: string) {
   });
 
   if (!session?.user) {
-    redirect("/sign-in");
+    redirect("/login");
   }
 
   const workspace = await db.query.organizations.findFirst({
@@ -50,7 +50,7 @@ export async function requireAuth() {
   });
 
   if (!session?.user) {
-    redirect("/sign-in");
+    redirect("/login");
   }
 
   return {

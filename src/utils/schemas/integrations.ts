@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GITHUB_URL_PATTERNS } from "@/constants/regex";
 
 export const INTEGRATION_CATEGORIES = ["input", "output"] as const;
 export type IntegrationCategory = (typeof INTEGRATION_CATEGORIES)[number];
@@ -28,12 +29,6 @@ export const OUTPUT_CONTENT_TYPES = [
 ] as const;
 export type OutputContentType = (typeof OUTPUT_CONTENT_TYPES)[number];
 
-const GITHUB_URL_PATTERNS = [
-  /^https?:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?$/i,
-  /^git@github\.com:([^/]+)\/([^/]+?)(?:\.git)?$/i,
-  /^([^/]+)\/([^/]+)$/,
-] as const;
-
 function isValidGitHubUrl(url: string): boolean {
   const trimmed = url.trim();
   return GITHUB_URL_PATTERNS.some((pattern) => pattern.test(trimmed));
@@ -47,7 +42,7 @@ export const addGitHubIntegrationFormSchema = z.object({
       (value) => isValidGitHubUrl(value),
       "Invalid GitHub repository URL or format. Use: https://github.com/owner/repo, git@github.com:owner/repo, or owner/repo"
     ),
-  token: z.string(),
+  token: z.string().min(1, "Token is required"),
 });
 export type AddGitHubIntegrationFormValues = z.infer<
   typeof addGitHubIntegrationFormSchema

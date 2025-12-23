@@ -52,6 +52,17 @@ export function RepositoryList({ integrationId }: RepositoryListProps) {
         throw new Error("Failed to update repository");
       }
 
+      if (response.status === 204) {
+        return null;
+      }
+
+      const contentType = response.headers.get("content-type");
+      const contentLength = response.headers.get("content-length");
+
+      if (contentLength === "0" || !contentType?.includes("application/json")) {
+        return null;
+      }
+
       return response.json();
     },
     onSuccess: (_, variables) => {
@@ -78,6 +89,17 @@ export function RepositoryList({ integrationId }: RepositoryListProps) {
 
       if (!response.ok) {
         throw new Error("Failed to delete repository");
+      }
+
+      if (response.status === 204) {
+        return null;
+      }
+
+      const contentType = response.headers.get("content-type");
+      const contentLength = response.headers.get("content-length");
+
+      if (contentLength === "0" || !contentType?.includes("application/json")) {
+        return null;
       }
 
       return response.json();

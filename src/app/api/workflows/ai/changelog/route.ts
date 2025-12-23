@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server";
 import { githubChangelogAgent } from "@/lib/agents/changelog";
+import { getServerSession } from "@/lib/auth/session";
 import { generateChangelogBodySchema } from "@/utils/schemas/workflows";
 
 export async function POST(request: Request) {
   try {
+    const { session, user } = await getServerSession({
+      headers: request.headers,
+    });
+
+    if (!(user && session?.activeOrganizationId)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const validationResult = generateChangelogBodySchema.safeParse(body);
 

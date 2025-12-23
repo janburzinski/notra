@@ -76,6 +76,7 @@ export async function POST(
       owner,
       repo,
       outputs,
+      userId: user.id,
     });
 
     return NextResponse.json(repository);

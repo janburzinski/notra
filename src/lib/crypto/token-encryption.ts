@@ -10,7 +10,13 @@ function getEncryptionKey(): Buffer {
       "INTEGRATION_ENCRYPTION_KEY environment variable is not set"
     );
   }
-  return Buffer.from(key, "base64");
+  const decodedKey = Buffer.from(key, "base64");
+  if (decodedKey.length !== 32) {
+    throw new Error(
+      `INTEGRATION_ENCRYPTION_KEY must be a base64-encoded 32-byte key, but decoded length is ${decodedKey.length} bytes (expected 32 bytes). Please supply a valid base64-encoded 32-byte key.`
+    );
+  }
+  return decodedKey;
 }
 
 export function encryptToken(token: string): string {

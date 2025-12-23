@@ -212,12 +212,23 @@ export async function getDecryptedToken(
   return decryptToken(integration.encryptedToken);
 }
 
-export async function addRepository(params: AddRepositoryParams) {
-  const { integrationId, owner, repo, outputs = [] } = params;
+export async function addRepository(
+  params: AddRepositoryParams & { userId: string }
+) {
+  const { integrationId, owner, repo, outputs = [], userId } = params;
 
   const integration = await getGitHubIntegrationById(integrationId);
   if (!integration) {
     throw new Error("Integration not found");
+  }
+
+  const hasAccess = await validateUserOrgAccess(
+    userId,
+    integration.organizationId
+  );
+
+  if (!hasAccess) {
+    throw new Error("User does not have access to this integration");
   }
 
   const [repository] = await db
@@ -334,9 +345,7 @@ export async function listAvailableRepositories(
   const token = await getDecryptedToken(integrationId, userId);
 
   if (!token) {
-    throw new Error(
-      "No access token available for this integration. Cannot list repositories."
-    );
+    return [];
   }
 
   const octokit = createOctokit(token);

@@ -131,6 +131,7 @@ function IntegrationCard({
 }) {
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = activeOrganization?.id;
+  const organizationSlug = activeOrganization?.slug;
   const isActive = activeCount > 0;
   const [dialogOpen, setDialogOpen] = useState(false);
   const showManageButton = integration.available && isActive;
@@ -138,7 +139,7 @@ function IntegrationCard({
   const showComingSoon = !integration.available;
   const showDialog = integration.available && integration.id === "github";
 
-  if (!organizationId) {
+  if (!(organizationId && organizationSlug)) {
     return null;
   }
 
@@ -164,7 +165,7 @@ function IntegrationCard({
               ) : null}
               {showManageButton ? (
                 <Link
-                  href={`/${organizationId}/integrations/${integration.href}`}
+                  href={`/${organizationSlug}/integrations/${integration.href}`}
                 >
                   <Button size="sm" variant="outline">
                     Manage

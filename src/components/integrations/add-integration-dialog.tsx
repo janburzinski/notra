@@ -145,7 +145,7 @@ export function AddIntegrationDialog({
                 validators={{
                   onChange: addGitHubIntegrationFormSchema.shape.repoUrl,
                   onChangeAsyncDebounceMs: 300,
-                  onChangeAsync: async ({ value }) => {
+                  onChangeAsync: ({ value }) => {
                     if (!value.trim()) {
                       setRepoInfo(null);
                       return;
@@ -156,7 +156,7 @@ export function AddIntegrationDialog({
                     } else {
                       setRepoInfo(null);
                     }
-                    await Promise.resolve();
+                    Promise.resolve();
                   },
                 }}
               >
