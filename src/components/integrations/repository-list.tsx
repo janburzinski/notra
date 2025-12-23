@@ -3,17 +3,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Repository, RepositoryListProps } from "@/types/integrations";
+import { getOutputTypeLabel } from "@/utils/output-types";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
 export function RepositoryList({ integrationId }: RepositoryListProps) {
@@ -34,72 +27,22 @@ export function RepositoryList({ integrationId }: RepositoryListProps) {
     },
   });
 
-  const toggleMutation = useMutation({
+  const toggleOutputMutation = useMutation({
     mutationFn: async ({
-      repositoryId,
+      outputId,
       enabled,
     }: {
-      repositoryId: string;
+      outputId: string;
       enabled: boolean;
     }) => {
-      const response = await fetch(`/api/repositories/${repositoryId}`, {
+      const response = await fetch(`/api/outputs/${outputId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: !enabled }),
+        body: JSON.stringify({ enabled }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update repository");
-      }
-
-      if (response.status === 204) {
-        return null;
-      }
-
-      const contentType = response.headers.get("content-type");
-      const contentLength = response.headers.get("content-length");
-
-      if (contentLength === "0" || !contentType?.includes("application/json")) {
-        return null;
-      }
-
-      return response.json();
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.INTEGRATIONS.detail(integrationId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.INTEGRATIONS.repositories(integrationId),
-      });
-      toast.success(
-        variables.enabled ? "Repository disabled" : "Repository enabled"
-      );
-    },
-    onError: () => {
-      toast.error("Failed to update repository");
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (repositoryId: string) => {
-      const response = await fetch(`/api/repositories/${repositoryId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete repository");
-      }
-
-      if (response.status === 204) {
-        return null;
-      }
-
-      const contentType = response.headers.get("content-type");
-      const contentLength = response.headers.get("content-length");
-
-      if (contentLength === "0" || !contentType?.includes("application/json")) {
-        return null;
+        throw new Error("Failed to update output");
       }
 
       return response.json();
@@ -108,27 +51,12 @@ export function RepositoryList({ integrationId }: RepositoryListProps) {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.INTEGRATIONS.detail(integrationId),
       });
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.INTEGRATIONS.repositories(integrationId),
-      });
-      toast.success("Repository removed");
+      toast.success("Content output updated");
     },
     onError: () => {
-      toast.error("Failed to remove repository");
+      toast.error("Failed to update content output");
     },
   });
-
-  const handleToggleRepository = (repositoryId: string, enabled: boolean) => {
-    toggleMutation.mutate({ repositoryId, enabled });
-  };
-
-  const handleDeleteRepository = (repositoryId: string) => {
-    // biome-ignore lint: Using browser confirm for simple deletion confirmation
-    if (!window.confirm("Are you sure you want to remove this repository?")) {
-      return;
-    }
-    deleteMutation.mutate(repositoryId);
-  };
 
   const repositories = integration?.repositories || [];
 
@@ -151,60 +79,44 @@ export function RepositoryList({ integrationId }: RepositoryListProps) {
     );
   }
 
+  const repository = repositories[0];
+
+  if (!repository) {
+    return (
+      <div className="text-center text-muted-foreground text-sm">
+        No repository configured for this integration
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      {repositories.map((repo) => (
-        <Card key={repo.id}>
-          <CardHeader>
-            <CardTitle className="text-base">
-              {repo.owner}/{repo.repo}
-            </CardTitle>
-            <CardDescription>
-              {repo.outputs?.length ?? 0} output
-              {(repo.outputs?.length ?? 0) !== 1 ? "s" : ""} configured
-            </CardDescription>
-            <CardAction>
-              <div className="flex items-center gap-2">
-                <Badge variant={repo.enabled ? "default" : "secondary"}>
-                  {repo.enabled ? "Enabled" : "Disabled"}
-                </Badge>
-                <Button
-                  disabled={
-                    toggleMutation.isPending || deleteMutation.isPending
-                  }
-                  onClick={() => handleToggleRepository(repo.id, repo.enabled)}
-                  size="sm"
-                  variant="ghost"
-                >
-                  {repo.enabled ? "Disable" : "Enable"}
-                </Button>
-                <Button
-                  disabled={
-                    toggleMutation.isPending || deleteMutation.isPending
-                  }
-                  onClick={() => handleDeleteRepository(repo.id)}
-                  size="sm"
-                  variant="ghost"
-                >
-                  Remove
-                </Button>
-              </div>
-            </CardAction>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {repo.outputs?.map((output) => (
-                <Badge
-                  key={output.id}
-                  variant={output.enabled ? "default" : "secondary"}
-                >
-                  {output.outputType}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="space-y-3">
+      <p className="text-muted-foreground text-sm">
+        Click to enable or disable content types for automatic generation
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {repository.outputs?.map((output) => (
+          <button
+            className="transition-all hover:scale-105"
+            disabled={toggleOutputMutation.isPending}
+            key={output.id}
+            onClick={() => {
+              toggleOutputMutation.mutate({
+                outputId: output.id,
+                enabled: !output.enabled,
+              });
+            }}
+            type="button"
+          >
+            <Badge
+              className="cursor-pointer"
+              variant={output.enabled ? "default" : "secondary"}
+            >
+              {getOutputTypeLabel(output.outputType)}
+            </Badge>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

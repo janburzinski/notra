@@ -6,6 +6,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import type React from "react";
 import { isValidElement, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogAction,
@@ -225,107 +226,108 @@ export function AddRepositoryDialog({
     },
   });
 
-  const triggerElement =
-    trigger && isValidElement(trigger) ? (
-      <DialogTrigger render={trigger as React.ReactElement} />
-    ) : null;
-
   return (
-    <>
-      {triggerElement}
-      <Dialog onOpenChange={setOpen} open={open}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Repository</DialogTitle>
-            <DialogDescription>
-              {availableRepos.length > 0
-                ? "Select a repository from your GitHub account to enable integrations."
-                : "Enter a repository in the format owner/repo (e.g., facebook/react) or paste a GitHub URL. For private repositories, ensure your integration has a valid access token."}
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              form.handleSubmit();
-            }}
-          >
-            <div className="space-y-4 py-4">
-              <form.Field
-                name="repository"
-                validators={{
-                  onChange: addRepositoryFormSchema.shape.repository,
-                }}
-              >
-                {(field) => {
-                  if (loadingRepos) {
-                    return (
-                      <Field>
-                        <FieldLabel>Repository</FieldLabel>
-                        <Skeleton className="h-10 w-full" />
-                      </Field>
-                    );
-                  }
-
-                  if (availableRepos.length > 0) {
-                    return (
-                      <Field>
-                        <FieldLabel>Repository</FieldLabel>
-                        <RepositorySelector
-                          availableRepos={availableRepos}
-                          field={field}
-                          mutation={mutation}
-                        />
-                      </Field>
-                    );
-                  }
-
+    <Dialog onOpenChange={setOpen} open={open}>
+      {trigger !== undefined && isValidElement(trigger) ? (
+        <DialogTrigger render={trigger as React.ReactElement} />
+      ) : (
+        <DialogTrigger>
+          <Button size="sm" variant="outline">
+            Add Repository
+          </Button>
+        </DialogTrigger>
+      )}
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Repository</DialogTitle>
+          <DialogDescription>
+            {availableRepos.length > 0
+              ? "Select a repository from your GitHub account to enable integrations."
+              : "Enter a repository in the format owner/repo (e.g., facebook/react) or paste a GitHub URL. For private repositories, ensure your integration has a valid access token."}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <div className="space-y-4 py-4">
+            <form.Field
+              name="repository"
+              validators={{
+                onChange: addRepositoryFormSchema.shape.repository,
+              }}
+            >
+              {(field) => {
+                if (loadingRepos) {
                   return (
                     <Field>
                       <FieldLabel>Repository</FieldLabel>
-                      <Input
-                        disabled={mutation.isPending}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="facebook/react or https://github.com/facebook/react"
-                        value={field.state.value}
-                      />
-                      {field.state.meta.errors.length > 0 ? (
-                        <p className="mt-1 text-destructive text-sm">
-                          {typeof field.state.meta.errors[0] === "string"
-                            ? field.state.meta.errors[0]
-                            : String(field.state.meta.errors[0])}
-                        </p>
-                      ) : null}
-                      <p className="mt-1 text-muted-foreground text-xs">
-                        No access token available. Enter the repository as
-                        owner/repo or paste a GitHub URL.
-                      </p>
+                      <Skeleton className="h-10 w-full" />
                     </Field>
                   );
-                }}
-              </form.Field>
-            </div>
-            <DialogFooter>
-              <DialogCancel disabled={mutation.isPending}>Cancel</DialogCancel>
-              <form.Subscribe selector={(state) => [state.canSubmit]}>
-                {([canSubmit]) => (
-                  <DialogAction
-                    disabled={!canSubmit || mutation.isPending || loadingRepos}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      form.handleSubmit();
-                    }}
-                    type="button"
-                  >
-                    {mutation.isPending ? "Adding..." : "Add Repository"}
-                  </DialogAction>
-                )}
-              </form.Subscribe>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
+                }
+
+                if (availableRepos.length > 0) {
+                  return (
+                    <Field>
+                      <FieldLabel>Repository</FieldLabel>
+                      <RepositorySelector
+                        availableRepos={availableRepos}
+                        field={field}
+                        mutation={mutation}
+                      />
+                    </Field>
+                  );
+                }
+
+                return (
+                  <Field>
+                    <FieldLabel>Repository</FieldLabel>
+                    <Input
+                      disabled={mutation.isPending}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="facebook/react or https://github.com/facebook/react"
+                      value={field.state.value}
+                    />
+                    {field.state.meta.errors.length > 0 ? (
+                      <p className="mt-1 text-destructive text-sm">
+                        {typeof field.state.meta.errors[0] === "string"
+                          ? field.state.meta.errors[0]
+                          : String(field.state.meta.errors[0])}
+                      </p>
+                    ) : null}
+                    <p className="mt-1 text-muted-foreground text-xs">
+                      No access token available. Enter the repository as
+                      owner/repo or paste a GitHub URL.
+                    </p>
+                  </Field>
+                );
+              }}
+            </form.Field>
+          </div>
+          <DialogFooter>
+            <DialogCancel disabled={mutation.isPending}>Cancel</DialogCancel>
+            <form.Subscribe selector={(state) => [state.canSubmit]}>
+              {([canSubmit]) => (
+                <DialogAction
+                  disabled={!canSubmit || mutation.isPending || loadingRepos}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                  }}
+                  type="button"
+                >
+                  {mutation.isPending ? "Adding..." : "Add Repository"}
+                </DialogAction>
+              )}
+            </form.Subscribe>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

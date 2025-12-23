@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,9 +24,11 @@ import { QUERY_KEYS } from "@/utils/query-keys";
 
 export function IntegrationCard({
   integration,
+  organizationSlug,
   onUpdate,
 }: IntegrationCardProps) {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const toggleMutation = useMutation({
     mutationFn: async (enabled: boolean) => {
@@ -91,8 +94,15 @@ export function IntegrationCard({
 
   const isLoading = toggleMutation.isPending || deleteMutation.isPending;
 
+  const handleCardClick = () => {
+    router.push(`/${organizationSlug}/integrations/github/${integration.id}`);
+  };
+
   return (
-    <Card>
+    <Card
+      className="cursor-pointer transition-colors hover:bg-accent/50"
+      onClick={handleCardClick}
+    >
       <CardHeader>
         <CardTitle>{integration.displayName}</CardTitle>
         <CardDescription>
@@ -108,7 +118,10 @@ export function IntegrationCard({
           )}
         </CardDescription>
         <CardAction>
-          <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Badge variant={integration.enabled ? "default" : "secondary"}>
               {integration.enabled ? "Enabled" : "Disabled"}
             </Badge>

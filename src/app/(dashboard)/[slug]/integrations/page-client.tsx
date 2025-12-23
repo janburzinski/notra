@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -22,6 +21,11 @@ import { Linear } from "@/components/ui/svgs/linear";
 import { Marble } from "@/components/ui/svgs/marble";
 import { Slack } from "@/components/ui/svgs/slack";
 import { Webflow } from "@/components/ui/svgs/webflow";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
 const AddIntegrationDialog = dynamic(
@@ -144,53 +148,88 @@ function IntegrationCard({
     return null;
   }
 
+  const cardContent = (
+    <Card
+      className={
+        integration.available
+          ? "cursor-pointer transition-colors hover:bg-accent/50"
+          : ""
+      }
+    >
+      <CardHeader>
+        <div className="flex items-start gap-4">
+          <div className="flex size-10 shrink-0 items-center justify-center text-muted-foreground [&_svg]:size-8">
+            {integration.icon}
+          </div>
+          <div className="flex-1 space-y-1">
+            <CardTitle className="text-base">{integration.name}</CardTitle>
+            <CardDescription className="text-sm">
+              {integration.description}
+            </CardDescription>
+          </div>
+        </div>
+        <CardAction>
+          <div className="flex items-center gap-2">
+            {isActive ? (
+              <Badge variant="default">{activeCount} active</Badge>
+            ) : null}
+            {showManageButton ? (
+              <Button
+                onClick={(e) => e.stopPropagation()}
+                size="sm"
+                variant="outline"
+              >
+                Manage
+              </Button>
+            ) : null}
+            {showConnectButton ? (
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDialogOpen(true);
+                }}
+                size="sm"
+                variant="outline"
+              >
+                Connect
+              </Button>
+            ) : null}
+            {showComingSoon ? (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      disabled
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      size="sm"
+                      variant="outline"
+                    >
+                      Coming Soon
+                    </Button>
+                  }
+                />
+                <TooltipContent>Coming soon</TooltipContent>
+              </Tooltip>
+            ) : null}
+          </div>
+        </CardAction>
+      </CardHeader>
+    </Card>
+  );
+
   return (
     <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-start gap-4">
-            <div className="flex size-10 shrink-0 items-center justify-center text-muted-foreground [&_svg]:size-8">
-              {integration.icon}
-            </div>
-            <div className="flex-1 space-y-1">
-              <CardTitle className="text-base">{integration.name}</CardTitle>
-              <CardDescription className="text-sm">
-                {integration.description}
-              </CardDescription>
-            </div>
-          </div>
-          <CardAction>
-            <div className="flex items-center gap-2">
-              {isActive ? (
-                <Badge variant="default">{activeCount} active</Badge>
-              ) : null}
-              {showManageButton ? (
-                <Link
-                  href={`/${organizationSlug}/integrations/${integration.href}`}
-                >
-                  <Button size="sm" variant="outline">
-                    Manage
-                  </Button>
-                </Link>
-              ) : null}
-              {showConnectButton ? (
-                <Button
-                  onClick={() => setDialogOpen(true)}
-                  size="sm"
-                  variant="outline"
-                >
-                  Connect
-                </Button>
-              ) : null}
-              {showComingSoon ? (
-                <Button disabled size="sm" variant="outline">
-                  Coming Soon
-                </Button>
-              ) : null}
-            </div>
-          </CardAction>
-        </CardHeader>
-      </Card>
+      {integration.available ? (
+        <Link href={`/${organizationSlug}/integrations/${integration.href}`}>
+          {cardContent}
+        </Link>
+      ) : (
+        cardContent
+      )}
       {showDialog ? (
         <AddIntegrationDialog
           onOpenChange={setDialogOpen}
@@ -268,53 +307,97 @@ export default function PageClient({
         </div>
 
         <div className="space-y-8">
-          <section>
-            <h2 className="mb-4 font-semibold text-lg">Input Sources</h2>
-            <p className="mb-4 text-muted-foreground text-sm">
-              Connect services to pull data and updates from
-            </p>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {INPUT_SOURCES.map((integration) => (
-                <IntegrationCard
-                  activeCount={
-                    integrationsByType?.[integration.id]?.length || 0
-                  }
-                  integration={integration}
-                  key={integration.id}
-                />
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 className="mb-4 font-semibold text-lg">Output Sources</h2>
-            <p className="mb-4 text-muted-foreground text-sm">
-              Connect services to publish and sync content to
-            </p>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {OUTPUT_SOURCES.map((integration) => (
-                <IntegrationCard
-                  activeCount={
-                    integrationsByType?.[integration.id]?.length || 0
-                  }
-                  integration={integration}
-                  key={integration.id}
-                />
-              ))}
-            </div>
-          </section>
-
           {isLoading ? (
-            <section>
-              <h2 className="mb-4 font-semibold text-lg">
-                Active Integrations
-              </h2>
-              <div className="space-y-4">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </div>
-            </section>
-          ) : null}
+            <>
+              <section>
+                <h2 className="mb-4 font-semibold text-lg">Input Sources</h2>
+                <p className="mb-4 text-muted-foreground text-sm">
+                  Connect services to pull data and updates from
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i}>
+                      <CardHeader>
+                        <div className="flex items-start gap-4">
+                          <Skeleton className="size-10 shrink-0 rounded-md" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-4 w-full" />
+                          </div>
+                        </div>
+                        <CardAction>
+                          <Skeleton className="h-9 w-28 rounded-md" />
+                        </CardAction>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="mb-4 font-semibold text-lg">Output Sources</h2>
+                <p className="mb-4 text-muted-foreground text-sm">
+                  Connect services to publish and sync content to
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i}>
+                      <CardHeader>
+                        <div className="flex items-start gap-4">
+                          <Skeleton className="size-10 shrink-0 rounded-md" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-4 w-full" />
+                          </div>
+                        </div>
+                        <CardAction>
+                          <Skeleton className="h-9 w-28 rounded-md" />
+                        </CardAction>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            </>
+          ) : (
+            <>
+              <section>
+                <h2 className="mb-4 font-semibold text-lg">Input Sources</h2>
+                <p className="mb-4 text-muted-foreground text-sm">
+                  Connect services to pull data and updates from
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {INPUT_SOURCES.map((integration) => (
+                    <IntegrationCard
+                      activeCount={
+                        integrationsByType?.[integration.id]?.length || 0
+                      }
+                      integration={integration}
+                      key={integration.id}
+                    />
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="mb-4 font-semibold text-lg">Output Sources</h2>
+                <p className="mb-4 text-muted-foreground text-sm">
+                  Connect services to publish and sync content to
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {OUTPUT_SOURCES.map((integration) => (
+                    <IntegrationCard
+                      activeCount={
+                        integrationsByType?.[integration.id]?.length || 0
+                      }
+                      integration={integration}
+                      key={integration.id}
+                    />
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
 
           {!isLoading && integrations && integrations.length > 0 ? (
             <section>
@@ -328,44 +411,41 @@ export default function PageClient({
                   );
 
                   return (
-                    <Card key={integration.id}>
-                      <CardHeader>
-                        <div className="flex items-start gap-4">
-                          <div className="flex size-10 shrink-0 items-center justify-center text-muted-foreground [&_svg]:size-8">
-                            {config?.icon}
+                    <Link
+                      href={`/${organizationSlug}/integrations/${integration.type}/${integration.id}`}
+                      key={integration.id}
+                    >
+                      <Card className="cursor-pointer transition-colors hover:bg-accent/50">
+                        <CardHeader>
+                          <div className="flex items-start gap-4">
+                            <div className="flex size-10 shrink-0 items-center justify-center text-muted-foreground [&_svg]:size-8">
+                              {config?.icon}
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <CardTitle className="text-base">
+                                {integration.displayName}
+                              </CardTitle>
+                              <CardDescription className="text-sm">
+                                {config?.name} •{" "}
+                                {integration.repositories.length}{" "}
+                                {integration.repositories.length === 1
+                                  ? "repository"
+                                  : "repositories"}
+                              </CardDescription>
+                            </div>
                           </div>
-                          <div className="flex-1 space-y-1">
-                            <CardTitle className="text-base">
-                              {integration.displayName}
-                            </CardTitle>
-                            <CardDescription className="text-sm">
-                              {config?.name} • {integration.repositories.length}{" "}
-                              {integration.repositories.length === 1
-                                ? "repository"
-                                : "repositories"}
-                            </CardDescription>
-                          </div>
-                        </div>
-                        <CardAction>
-                          <Badge
-                            variant={
-                              integration.enabled ? "default" : "secondary"
-                            }
-                          >
-                            {integration.enabled ? "Enabled" : "Disabled"}
-                          </Badge>
-                        </CardAction>
-                      </CardHeader>
-                      <CardContent>
-                        <Link
-                          href={`/${organizationSlug}/integrations/${integration.type}`}
-                        >
-                          <Button size="sm" variant="ghost">
-                            View Details
-                          </Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
+                          <CardAction>
+                            <Badge
+                              variant={
+                                integration.enabled ? "default" : "secondary"
+                              }
+                            >
+                              {integration.enabled ? "Enabled" : "Disabled"}
+                            </Badge>
+                          </CardAction>
+                        </CardHeader>
+                      </Card>
+                    </Link>
                   );
                 })}
               </div>

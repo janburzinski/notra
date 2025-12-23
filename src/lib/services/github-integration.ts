@@ -140,7 +140,12 @@ export async function createGitHubIntegration(
     },
   ]);
 
-  return integration;
+  const fullIntegration = await getGitHubIntegrationById(integration.id);
+  if (!fullIntegration) {
+    throw new Error("Failed to retrieve created integration");
+  }
+
+  return fullIntegration;
 }
 
 export function getGitHubIntegrationsByOrganization(organizationId: string) {
@@ -267,6 +272,19 @@ export function getRepositoryById(repositoryId: string) {
   });
 }
 
+export function getOutputById(outputId: string) {
+  return db.query.repositoryOutputs.findFirst({
+    where: eq(repositoryOutputs.id, outputId),
+    with: {
+      repository: {
+        with: {
+          integration: true,
+        },
+      },
+    },
+  });
+}
+
 export async function configureOutput(params: ConfigureOutputParams) {
   const { repositoryId, outputType, enabled, config } = params;
 
@@ -316,11 +334,34 @@ export async function toggleGitHubIntegration(
   return updated;
 }
 
+export async function updateGitHubIntegration(
+  integrationId: string,
+  data: { enabled?: boolean; displayName?: string }
+) {
+  const [updated] = await db
+    .update(githubIntegrations)
+    .set(data)
+    .where(eq(githubIntegrations.id, integrationId))
+    .returning();
+
+  return updated;
+}
+
 export async function toggleRepository(repositoryId: string, enabled: boolean) {
   const [updated] = await db
     .update(githubRepositories)
     .set({ enabled })
     .where(eq(githubRepositories.id, repositoryId))
+    .returning();
+
+  return updated;
+}
+
+export async function toggleOutput(outputId: string, enabled: boolean) {
+  const [updated] = await db
+    .update(repositoryOutputs)
+    .set({ enabled })
+    .where(eq(repositoryOutputs.id, outputId))
     .returning();
 
   return updated;

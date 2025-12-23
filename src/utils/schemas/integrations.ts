@@ -1,4 +1,5 @@
-import { z } from "zod";
+// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+import * as z from "zod";
 import { GITHUB_URL_PATTERNS } from "@/constants/regex";
 
 export const INTEGRATION_CATEGORIES = ["input", "output"] as const;
@@ -102,15 +103,34 @@ export const repositoryIdParamSchema = z.object({
 });
 export type RepositoryIdParam = z.infer<typeof repositoryIdParamSchema>;
 
+export const outputIdParamSchema = z.object({
+  outputId: z.string().min(1, "Output ID is required"),
+});
+export type OutputIdParam = z.infer<typeof outputIdParamSchema>;
+
 export const updateIntegrationBodySchema = z.object({
   enabled: z.boolean(),
+  displayName: z.string().optional(),
 });
 export type UpdateIntegrationBody = z.infer<typeof updateIntegrationBodySchema>;
+
+export const editGitHubIntegrationFormSchema = z.object({
+  displayName: z.string().min(1, "Display name is required"),
+  enabled: z.boolean(),
+});
+export type EditGitHubIntegrationFormValues = z.infer<
+  typeof editGitHubIntegrationFormSchema
+>;
 
 export const updateRepositoryBodySchema = z.object({
   enabled: z.boolean(),
 });
 export type UpdateRepositoryBody = z.infer<typeof updateRepositoryBodySchema>;
+
+export const updateOutputBodySchema = z.object({
+  enabled: z.boolean(),
+});
+export type UpdateOutputBody = z.infer<typeof updateOutputBodySchema>;
 
 export const configureOutputBodySchema = z.object({
   outputType: z.enum(OUTPUT_CONTENT_TYPES),

@@ -57,6 +57,7 @@ export type IntegrationUIConfig = {
 
 export type AddIntegrationDialogProps = {
   organizationId?: string;
+  organizationSlug?: string;
   onSuccess?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -73,6 +74,7 @@ export type AddRepositoryDialogProps = {
 
 export type IntegrationCardProps = {
   integration: GitHubIntegration;
+  organizationSlug: string;
   onUpdate?: () => void;
 };
 

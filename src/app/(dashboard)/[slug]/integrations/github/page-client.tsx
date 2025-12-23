@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AddIntegrationDialog } from "@/components/integrations/add-integration-dialog";
 import { IntegrationCard } from "@/components/integrations/integration-card";
+import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { GitHubIntegration } from "@/types/integrations";
 import { QUERY_KEYS } from "@/utils/query-keys";
@@ -11,16 +12,23 @@ type PageClientProps = {
   organizationId: string;
 };
 
-export default function PageClient({ organizationId }: PageClientProps) {
+export default function PageClient({ organizationId: slug }: PageClientProps) {
+  const { getOrganization } = useOrganizationsContext();
+  const organization = getOrganization(slug);
+
   const {
     data: integrations,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: QUERY_KEYS.INTEGRATIONS.all(organizationId),
+    queryKey: QUERY_KEYS.INTEGRATIONS.all(organization?.id ?? ""),
     queryFn: async () => {
+      if (!organization?.id) {
+        throw new Error("Organization not found");
+      }
+
       const response = await fetch(
-        `/api/integrations?organizationId=${organizationId}`
+        `/api/integrations?organizationId=${organization.id}`
       );
 
       if (!response.ok) {
@@ -29,6 +37,7 @@ export default function PageClient({ organizationId }: PageClientProps) {
 
       return response.json() as Promise<GitHubIntegration[]>;
     },
+    enabled: !!organization?.id,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
@@ -47,7 +56,8 @@ export default function PageClient({ organizationId }: PageClientProps) {
           </div>
           <AddIntegrationDialog
             onSuccess={() => refetch()}
-            organizationId={organizationId}
+            organizationId={organization?.id ?? ""}
+            organizationSlug={slug}
           />
         </div>
 
@@ -75,6 +85,7 @@ export default function PageClient({ organizationId }: PageClientProps) {
                   integration={integration}
                   key={integration.id}
                   onUpdate={() => refetch()}
+                  organizationSlug={slug}
                 />
               ))}
             </div>

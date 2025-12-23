@@ -3,7 +3,7 @@ import { getServerSession } from "@/lib/auth/session";
 import {
   deleteGitHubIntegration,
   getGitHubIntegrationById,
-  toggleGitHubIntegration,
+  updateGitHubIntegration,
   validateUserOrgAccess,
 } from "@/lib/services/github-integration";
 import {
@@ -124,8 +124,11 @@ export async function PATCH(
       );
     }
 
-    const { enabled } = bodyValidation.data;
-    const updated = await toggleGitHubIntegration(integrationId, enabled);
+    const { enabled, displayName } = bodyValidation.data;
+    const updated = await updateGitHubIntegration(integrationId, {
+      enabled,
+      displayName,
+    });
 
     return NextResponse.json(updated);
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { isValidElement, useState } from "react";
 import { toast } from "sonner";
@@ -34,13 +35,16 @@ import {
 
 export function AddIntegrationDialog({
   organizationId: propOrganizationId,
+  organizationSlug: propOrganizationSlug,
   onSuccess,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   trigger,
 }: AddIntegrationDialogProps) {
+  const router = useRouter();
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = propOrganizationId ?? activeOrganization?.id;
+  const organizationSlug = propOrganizationSlug ?? activeOrganization?.slug;
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen ?? internalOpen;
   const setOpen = controlledOnOpenChange ?? setInternalOpen;
@@ -76,7 +80,7 @@ export function AddIntegrationDialog({
 
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (integration) => {
       if (organizationId) {
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.INTEGRATIONS.all(organizationId),
@@ -86,6 +90,12 @@ export function AddIntegrationDialog({
       setOpen(false);
       form.reset();
       onSuccess?.();
+
+      if (organizationSlug && integration?.id) {
+        router.push(
+          `/${organizationSlug}/integrations/github/${integration.id}`
+        );
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message);
