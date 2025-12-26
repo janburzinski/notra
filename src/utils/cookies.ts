@@ -6,8 +6,14 @@ export const setLastVisitedOrganization = (
   organizationSlug: string,
   maxAge: number = 30 * 86_400
 ) => {
+  const isSecure =
+    typeof window !== "undefined" &&
+    (window.location.protocol === "https:" ||
+      process.env.NODE_ENV === "production");
+  const secureFlag = isSecure ? "; Secure" : "";
+
   // biome-ignore lint/suspicious/noDocumentCookie: Client-side cookie needed for cross-tab persistence
-  document.cookie = `${LAST_VISITED_ORGANIZATION_COOKIE}=${organizationSlug}; max-age=${maxAge}; path=/`;
+  document.cookie = `${LAST_VISITED_ORGANIZATION_COOKIE}=${organizationSlug}; max-age=${maxAge}; path=/; SameSite=Lax${secureFlag}`;
 };
 
 export const getLastVisitedOrganization = (

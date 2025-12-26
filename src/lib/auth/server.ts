@@ -8,6 +8,7 @@ import {
 } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
+import { cookies } from "next/headers";
 import { db } from "@/lib/db/drizzle";
 import { members, organizations } from "@/lib/db/schema";
 import { redis } from "@/lib/redis";
@@ -19,18 +20,33 @@ async function getActiveOrganizationId(
   userId: string,
   cookieHeader?: string | null
 ): Promise<string | undefined> {
-  if (cookieHeader) {
-    const parsedCookies = Object.fromEntries(
-      cookieHeader.split(";").map((c) => {
-        const [key, ...v] = c.trim().split("=");
-        return [key, v.join("=")];
-      })
-    );
-    const lastVisitedSlug = parsedCookies[LAST_VISITED_ORGANIZATION_COOKIE];
+  try {
+    let lastVisitedSlug: string | undefined;
 
-    if (lastVisitedSlug) {
+    try {
+      const cookieStore = await cookies();
+      lastVisitedSlug = cookieStore.get(
+        LAST_VISITED_ORGANIZATION_COOKIE
+      )?.value;
+    } catch {
+      if (cookieHeader) {
+        const parsedCookies = Object.fromEntries(
+          cookieHeader.split(";").map((c) => {
+            const [key, ...v] = c.trim().split("=");
+            return [key, v.join("=")];
+          })
+        );
+        lastVisitedSlug = parsedCookies[LAST_VISITED_ORGANIZATION_COOKIE];
+      }
+    }
+
+    if (
+      lastVisitedSlug &&
+      typeof lastVisitedSlug === "string" &&
+      lastVisitedSlug.trim()
+    ) {
       const org = await db.query.organizations.findFirst({
-        where: eq(organizations.slug, lastVisitedSlug),
+        where: eq(organizations.slug, lastVisitedSlug.trim()),
         columns: { id: true },
         with: {
           members: {
@@ -44,19 +60,22 @@ async function getActiveOrganizationId(
         return org.id;
       }
     }
+
+    const membership = await db.query.members.findFirst({
+      where: eq(members.userId, userId),
+      columns: { organizationId: true, role: true },
+      orderBy: (m, { desc }) => [desc(m.createdAt)],
+    });
+
+    if (membership) {
+      return membership.organizationId;
+    }
+
+    return;
+  } catch (error) {
+    console.error("Error getting active organization ID:", error);
+    return;
   }
-
-  const membership = await db.query.members.findFirst({
-    where: eq(members.userId, userId),
-    columns: { organizationId: true, role: true },
-    orderBy: (m, { desc }) => [desc(m.createdAt)],
-  });
-
-  if (membership) {
-    return membership.organizationId;
-  }
-
-  return;
 }
 
 export const auth = betterAuth({
