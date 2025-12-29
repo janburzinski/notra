@@ -128,7 +128,7 @@ Biome's linter will catch most issues automatically. Focus your attention on:
 
 ## Protected Files
 
-**NEVER modify files in `src/components/ui/*`**. These are auto-generated UI components from shadcn/ui. If a UI component needs to be added or regenerated, use the shadcn CLI (`bunx shadcn@latest add <component>`) instead of manually editing these files.
+**NEVER modify files in `src/components/ui/*`**. These are auto-generated UI components from shadcn/ui. If a UI component needs to be added or regenerated, use the shadcn CLI (`bunx --bun shadcn@latest add <component>`) instead of manually editing these files.
 
 ---
 
