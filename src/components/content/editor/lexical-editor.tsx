@@ -1,0 +1,84 @@
+"use client";
+
+import { CodeNode } from "@lexical/code";
+import { LinkNode } from "@lexical/link";
+import { ListItemNode, ListNode } from "@lexical/list";
+import { $convertFromMarkdownString, TRANSFORMERS } from "@lexical/markdown";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { type RefObject, useCallback, useMemo } from "react";
+import { editorTheme } from "./editor-theme";
+import {
+  type EditorRefHandle,
+  EditorRefPlugin,
+} from "./plugins/editor-ref-plugin";
+import { MarkdownSyncPlugin } from "./plugins/markdown-sync-plugin";
+import { SelectionPlugin } from "./plugins/selection-plugin";
+
+interface LexicalEditorProps {
+  initialMarkdown: string;
+  onChange: (markdown: string) => void;
+  onSelectionChange: (selectedText: string | null) => void;
+  editable?: boolean;
+  editorRef?: RefObject<EditorRefHandle | null>;
+}
+
+export function LexicalEditor({
+  initialMarkdown,
+  onChange,
+  onSelectionChange,
+  editable = true,
+  editorRef,
+}: LexicalEditorProps) {
+  const onError = useCallback((error: Error) => {
+    console.error("Lexical error:", error);
+  }, []);
+
+  const initialConfig = useMemo(
+    () => ({
+      namespace: "ContentEditor",
+      nodes: [
+        HeadingNode,
+        QuoteNode,
+        ListNode,
+        ListItemNode,
+        CodeNode,
+        LinkNode,
+      ],
+      theme: editorTheme,
+      editable,
+      onError,
+      editorState: () => {
+        $convertFromMarkdownString(initialMarkdown, TRANSFORMERS);
+      },
+    }),
+    [initialMarkdown, editable, onError]
+  );
+
+  return (
+    <LexicalComposer initialConfig={initialConfig}>
+      <div className="relative">
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable
+              className={`min-h-[500px] outline-none ${
+                editable ? "" : "cursor-default"
+              }`}
+            />
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <HistoryPlugin />
+        {editable && <MarkdownShortcutPlugin transformers={TRANSFORMERS} />}
+        <MarkdownSyncPlugin onChange={onChange} />
+        <SelectionPlugin onSelectionChange={onSelectionChange} />
+        {editorRef && <EditorRefPlugin editorRef={editorRef} />}
+      </div>
+    </LexicalComposer>
+  );
+}

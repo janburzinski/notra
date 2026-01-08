@@ -2,15 +2,40 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-interface TextSelection {
+interface Selection {
   text: string;
 }
 
+function getTextareaSelection(target: HTMLTextAreaElement): string | null {
+  const start = target.selectionStart;
+  const end = target.selectionEnd;
+  if (start === end) {
+    return null;
+  }
+  const text = target.value.substring(start, end).trim();
+  return text || null;
+}
+
+function getDomSelection(container: HTMLElement): string | null {
+  const activeSelection = window.getSelection();
+  if (!activeSelection || activeSelection.isCollapsed) {
+    return null;
+  }
+
+  const range = activeSelection.getRangeAt(0);
+  if (!container.contains(range.commonAncestorContainer)) {
+    return null;
+  }
+
+  const text = activeSelection.toString().trim();
+  return text || null;
+}
+
 export function useTextSelection(
-  containerRef: React.RefObject<HTMLElement | null>
+  containerRef: React.RefObject<HTMLDivElement | null>
 ) {
-  const [selection, setSelection] = useState<TextSelection | null>(null);
-  const lastValidSelection = useRef<TextSelection | null>(null);
+  const [selection, setSelection] = useState<Selection | null>(null);
+  const lastValidSelection = useRef<Selection | null>(null);
 
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
@@ -20,52 +45,27 @@ export function useTextSelection(
       }
 
       const target = event.target as HTMLElement;
-
-      // Check if click is within our container
       if (!container.contains(target)) {
         return;
       }
 
-      // Handle textarea selection
+      let text: string | null = null;
+
       if (target instanceof HTMLTextAreaElement) {
-        const start = target.selectionStart;
-        const end = target.selectionEnd;
-        if (start !== end) {
-          const text = target.value.substring(start, end).trim();
-          if (text) {
-            const newSelection = { text };
-            lastValidSelection.current = newSelection;
-            setSelection(newSelection);
-          }
-        }
-        return;
+        text = getTextareaSelection(target);
+      } else {
+        text = getDomSelection(container);
       }
 
-      // Handle regular text selection
-      const activeSelection = window.getSelection();
-      if (!activeSelection || activeSelection.isCollapsed) {
-        return;
+      if (text) {
+        const newSelection = { text };
+        lastValidSelection.current = newSelection;
+        setSelection(newSelection);
       }
-
-      const range = activeSelection.getRangeAt(0);
-      if (!container.contains(range.commonAncestorContainer)) {
-        return;
-      }
-
-      const text = activeSelection.toString().trim();
-      if (!text) {
-        return;
-      }
-
-      const newSelection = { text };
-      lastValidSelection.current = newSelection;
-      setSelection(newSelection);
     };
 
     document.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
+    return () => document.removeEventListener("mouseup", handleMouseUp);
   }, [containerRef]);
 
   const clearSelection = useCallback(() => {

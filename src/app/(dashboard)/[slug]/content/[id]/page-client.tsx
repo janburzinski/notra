@@ -3,17 +3,16 @@
 import { marked } from "marked";
 import Link from "next/link";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { AiEditInput } from "@/components/content/ai-edit-input";
 import { CONTENT_TYPE_LABELS } from "@/components/content/content-card";
 import { DiffView } from "@/components/content/diff-view";
-import { EditBar } from "@/components/content/edit-bar";
 import { TitleCard } from "@/components/title-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useContent } from "@/hooks/use-content";
-import { useTextSelection } from "@/hooks/use-text-selection";
 
 const VIEW_OPTIONS = ["rendered", "markdown", "diff"] as const;
 type ViewOption = (typeof VIEW_OPTIONS)[number];
@@ -55,10 +54,11 @@ export default function PageClient({
   const [editedMarkdown, setEditedMarkdown] = useState("");
   const [originalMarkdown, setOriginalMarkdown] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [selectedText, setSelectedText] = useState<string | null>(null);
 
-  const contentRef = useRef<HTMLDivElement>(null);
-  const { selection, clearSelection } = useTextSelection(contentRef);
+  const saveToastIdRef = useRef<string | number | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const renderedRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (data?.content) {
@@ -74,6 +74,95 @@ export default function PageClient({
 
   const renderedHtml = editedMarkdown ? marked.parse(editedMarkdown) : "";
 
+  const handleSave = useCallback(() => {
+    // TODO: Implement save to database
+    setOriginalMarkdown(editedMarkdown);
+  }, [editedMarkdown]);
+
+  const handleDiscard = useCallback(() => {
+    setEditedMarkdown(originalMarkdown);
+  }, [originalMarkdown]);
+
+  // Persistent save toast
+  useEffect(() => {
+    if (hasChanges && !saveToastIdRef.current) {
+      saveToastIdRef.current = toast.custom(
+        (t) => (
+          <div className="flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 shadow-lg">
+            <span className="text-muted-foreground text-sm">
+              Unsaved changes
+            </span>
+            <Button
+              onClick={() => {
+                handleDiscard();
+                toast.dismiss(t);
+              }}
+              size="sm"
+              variant="ghost"
+            >
+              Discard
+            </Button>
+            <Button
+              onClick={() => {
+                handleSave();
+                toast.dismiss(t);
+              }}
+              size="sm"
+            >
+              Save
+            </Button>
+          </div>
+        ),
+        { duration: Number.POSITIVE_INFINITY, position: "bottom-right" }
+      );
+    } else if (!hasChanges && saveToastIdRef.current) {
+      toast.dismiss(saveToastIdRef.current);
+      saveToastIdRef.current = null;
+    }
+  }, [hasChanges, handleSave, handleDiscard]);
+
+  // Cleanup toast on unmount
+  useEffect(() => {
+    return () => {
+      if (saveToastIdRef.current) {
+        toast.dismiss(saveToastIdRef.current);
+      }
+    };
+  }, []);
+
+  const clearSelection = useCallback(() => {
+    setSelectedText(null);
+  }, []);
+
+  // Handle selection in rendered view
+  const handleRenderedMouseUp = useCallback(() => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) {
+      return;
+    }
+    const text = selection.toString().trim();
+    if (text) {
+      setSelectedText(text);
+    }
+  }, []);
+
+  // Handle textarea selection
+  const handleTextareaSelect = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    if (start !== end) {
+      const text = textarea.value.substring(start, end).trim();
+      if (text) {
+        setSelectedText(text);
+      }
+    }
+  }, []);
+
   const handleAiEdit = async (instruction: string) => {
     setIsEditing(true);
     try {
@@ -85,7 +174,7 @@ export default function PageClient({
           body: JSON.stringify({
             instruction,
             currentMarkdown: editedMarkdown,
-            selectedText: selection?.text,
+            selectedText,
           }),
         }
       );
@@ -94,28 +183,17 @@ export default function PageClient({
         throw new Error("Failed to edit content");
       }
 
-      const data = await response.json();
-      if (data.markdown) {
-        setEditedMarkdown(data.markdown);
+      const responseData = await response.json();
+      if (responseData.markdown) {
+        setEditedMarkdown(responseData.markdown);
       }
 
       clearSelection();
-    } catch (error) {
-      console.error("Error editing content:", error);
+    } catch (err) {
+      console.error("Error editing content:", err);
     } finally {
       setIsEditing(false);
     }
-  };
-
-  const handleSave = () => {
-    setIsSaving(true);
-    // TODO: Implement save to database
-    setOriginalMarkdown(editedMarkdown);
-    setIsSaving(false);
-  };
-
-  const handleDiscard = () => {
-    setEditedMarkdown(originalMarkdown);
   };
 
   if (isLoading) {
@@ -214,48 +292,44 @@ export default function PageClient({
             }
             heading={title}
           >
-            <div className="selection:bg-primary/30" ref={contentRef}>
-              <TabsContent className="mt-0" value="rendered">
-                <div
-                  className="prose prose-neutral dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      typeof renderedHtml === "string" ? renderedHtml : "",
-                  }}
-                />
-              </TabsContent>
-              <TabsContent className="mt-0" value="markdown">
-                <textarea
-                  className="min-h-[500px] w-full resize-none whitespace-pre-wrap rounded-lg border-0 bg-transparent font-mono text-sm focus:outline-none focus:ring-0"
-                  onChange={(e) => setEditedMarkdown(e.target.value)}
-                  value={editedMarkdown}
-                />
-              </TabsContent>
-              <TabsContent className="mt-0 select-none" value="diff">
-                <DiffView
-                  currentMarkdown={editedMarkdown}
-                  originalMarkdown={originalMarkdown}
-                />
-              </TabsContent>
-            </div>
+            <TabsContent className="mt-0" value="rendered">
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: selection handler */}
+              <div
+                className="prose prose-neutral dark:prose-invert max-w-none selection:bg-primary/30"
+                dangerouslySetInnerHTML={{
+                  __html: typeof renderedHtml === "string" ? renderedHtml : "",
+                }}
+                onMouseUp={handleRenderedMouseUp}
+                ref={renderedRef}
+              />
+            </TabsContent>
+            <TabsContent className="mt-0" value="markdown">
+              <textarea
+                className="min-h-[500px] w-full resize-none whitespace-pre-wrap rounded-lg border-0 bg-transparent font-mono text-sm selection:bg-primary/30 focus:outline-none focus:ring-0"
+                onChange={(e) => setEditedMarkdown(e.target.value)}
+                onMouseUp={handleTextareaSelect}
+                onSelect={handleTextareaSelect}
+                ref={textareaRef}
+                value={editedMarkdown}
+              />
+            </TabsContent>
+            <TabsContent className="mt-0" value="diff">
+              <DiffView
+                currentMarkdown={editedMarkdown}
+                originalMarkdown={originalMarkdown}
+              />
+            </TabsContent>
           </TitleCard>
         </Tabs>
 
         <div className="h-32" />
       </div>
 
-      <EditBar
-        hasChanges={hasChanges}
-        isSaving={isSaving}
-        onDiscard={handleDiscard}
-        onSave={handleSave}
-      />
-
       <AiEditInput
         isLoading={isEditing}
         onClearSelection={clearSelection}
         onSubmit={handleAiEdit}
-        selectedText={selection?.text ?? null}
+        selectedText={selectedText}
       />
     </div>
   );
