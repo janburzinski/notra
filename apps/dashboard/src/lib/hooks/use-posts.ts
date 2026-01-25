@@ -19,11 +19,11 @@ export function usePosts(organizationId: string) {
       }
 
       const res = await fetch(
-        `/api/organizations/${organizationId}/posts?${params.toString()}`
+        `/api/organizations/${organizationId}/content?${params.toString()}`
       );
 
       if (!res.ok) {
-        throw new Error("Failed to fetch posts");
+        throw new Error("Failed to fetch content");
       }
 
       return res.json();
