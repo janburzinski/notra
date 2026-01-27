@@ -80,7 +80,7 @@ function getStepperValue(status: string, currentStep: number): string {
 function getModalTitle(
   isLoadingSettings: boolean,
   isAnalyzing: boolean,
-  status: string
+  status: string,
 ): string {
   if (isLoadingSettings) {
     return "Loading...";
@@ -98,7 +98,7 @@ function getModalDescription(
   isLoadingSettings: boolean,
   isAnalyzing: boolean,
   status: string,
-  error?: string
+  error?: string,
 ): string {
   if (isLoadingSettings) {
     return "Checking your brand settings";
@@ -122,6 +122,9 @@ interface ModalContentProps {
   isPending: boolean;
 }
 
+const sanitizeBrandUrlInput = (value: string) =>
+  value.trim().replace(/^https?:\/\//i, "");
+
 type StepIconState = "pending" | "active" | "completed";
 
 const STEP_ICONS: Record<StepIconState, () => React.ReactNode> = {
@@ -134,7 +137,7 @@ const STEP_ICONS: Record<StepIconState, () => React.ReactNode> = {
 
 function getStepIconState(
   currentStep: number,
-  stepNumber: number
+  stepNumber: number,
 ): StepIconState {
   if (currentStep < stepNumber) {
     return "pending";
@@ -173,7 +176,7 @@ function ModalContent({
             const stepNumber = index + 1;
             const iconState = getStepIconState(
               progress.currentStep,
-              stepNumber
+              stepNumber,
             );
             return (
               <StepperItem
@@ -210,7 +213,7 @@ function ModalContent({
             className="h-10 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-muted-foreground"
             disabled={isPending}
             id="brand-url-input"
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={(e) => setUrl(sanitizeBrandUrlInput(e.target.value))}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !isPending) {
                 handleAnalyze();
@@ -278,7 +281,7 @@ function BrandForm({
       lastSavedData.current = JSON.stringify(values);
       toast.success("Changes saved");
     },
-    { wait: AUTO_SAVE_DELAY }
+    { wait: AUTO_SAVE_DELAY },
   );
 
   const form = useForm({
@@ -301,7 +304,7 @@ function BrandForm({
 
         debouncedSave(currentValues).catch((error) => {
           toast.error(
-            error instanceof Error ? error.message : "Failed to save changes"
+            error instanceof Error ? error.message : "Failed to save changes",
           );
         });
       },
@@ -443,7 +446,7 @@ function BrandForm({
                           onValueChange={(value) => {
                             if (value) {
                               toneProfileField.handleChange(
-                                value as ToneProfile
+                                value as ToneProfile,
                               );
                             }
                           }}
@@ -616,7 +619,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
       toast.success("Analysis started");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to start analysis"
+        error instanceof Error ? error.message : "Failed to start analysis",
       );
     }
   };
@@ -713,7 +716,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                     {getModalTitle(
                       false,
                       isAnalyzing,
-                      effectiveProgress.status
+                      effectiveProgress.status,
                     )}
                   </CardTitle>
                   <CardDescription>
@@ -721,7 +724,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                       false,
                       isAnalyzing,
                       effectiveProgress.status,
-                      progress.error
+                      progress.error,
                     )}
                   </CardDescription>
                 </CardHeader>
