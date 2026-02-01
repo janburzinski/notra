@@ -279,17 +279,20 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: "Schedule not found" }, { status: 404 });
     }
 
-    const oldQstashScheduleId = existing.qstashScheduleId ?? null;
-    let newQstashScheduleId: string | null = null;
+    const existingScheduleId = existing.qstashScheduleId ?? null;
+    let qstashScheduleId: string | null = null;
 
     if (sourceConfig.cron) {
       const cronExpression = buildCronExpression(sourceConfig.cron);
       if (cronExpression) {
-        newQstashScheduleId = await createQstashSchedule({
+        qstashScheduleId = await createQstashSchedule({
           triggerId,
           cron: cronExpression,
+          scheduleId: existingScheduleId ?? undefined,
         });
       }
+    } else if (existingScheduleId) {
+      await deleteQstashSchedule(existingScheduleId).catch(() => {});
     }
 
     try {
@@ -303,7 +306,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
           outputConfig: outputConfig ?? null,
           dedupeHash,
           enabled,
-          qstashScheduleId: newQstashScheduleId,
+          qstashScheduleId,
           updatedAt: new Date(),
         })
         .where(
@@ -314,14 +317,10 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         )
         .returning();
 
-      if (oldQstashScheduleId) {
-        await deleteQstashSchedule(oldQstashScheduleId).catch(() => {});
-      }
-
       return NextResponse.json({ trigger });
     } catch (dbError) {
-      if (newQstashScheduleId) {
-        await deleteQstashSchedule(newQstashScheduleId).catch(() => {});
+      if (qstashScheduleId && qstashScheduleId !== existingScheduleId) {
+        await deleteQstashSchedule(qstashScheduleId).catch(() => {});
       }
       throw dbError;
     }

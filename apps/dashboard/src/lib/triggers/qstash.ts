@@ -47,12 +47,12 @@ export function buildCronExpression(config?: TriggerSourceConfig["cron"]) {
   const minute = config.minute ?? 0;
   const hour = config.hour ?? 0;
 
-  if (config.cadence === "weekly") {
+  if (config.frequency === "weekly") {
     const dayOfWeek = config.dayOfWeek ?? 1;
     return `${minute} ${hour} * * ${dayOfWeek}`;
   }
 
-  if (config.cadence === "monthly") {
+  if (config.frequency === "monthly") {
     const dayOfMonth = config.dayOfMonth ?? 1;
     return `${minute} ${hour} ${dayOfMonth} * *`;
   }
@@ -63,9 +63,11 @@ export function buildCronExpression(config?: TriggerSourceConfig["cron"]) {
 export async function createQstashSchedule({
   triggerId,
   cron,
+  scheduleId,
 }: {
   triggerId: string;
   cron: string;
+  scheduleId?: string;
 }) {
   const client = getQStashClient();
   const appUrl = getAppUrl();
@@ -73,6 +75,7 @@ export async function createQstashSchedule({
   const destination = `${appUrl}/api/workflows/schedule`;
 
   const result = await client.schedules.create({
+    ...(scheduleId && { scheduleId }),
     destination,
     cron,
     body: JSON.stringify({ triggerId }),
