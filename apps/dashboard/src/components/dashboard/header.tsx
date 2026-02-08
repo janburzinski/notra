@@ -9,6 +9,7 @@ import {
 } from "@notra/ui/components/ui/breadcrumb";
 import { Separator } from "@notra/ui/components/ui/separator";
 import { SidebarTrigger } from "@notra/ui/components/ui/sidebar";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useId } from "react";
 
@@ -30,10 +31,14 @@ export function SiteHeader() {
 
     const item = (
       <BreadcrumbItem className="hover:underline" key={`${id}-item-${segment}`}>
-        <BreadcrumbLink href={href}>
-          {segment.charAt(0).toUpperCase() +
-            segment.slice(1).replace(/-/g, " ")}
-        </BreadcrumbLink>
+        <BreadcrumbLink
+          render={
+            <Link href={href}>
+              {segment.charAt(0).toUpperCase() +
+                segment.slice(1).replace(/-/g, " ")}
+            </Link>
+          }
+        />
       </BreadcrumbItem>
     );
 

@@ -8,7 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
 import { Input } from "@notra/ui/components/ui/input";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -45,6 +45,11 @@ const WebhookSetupDialog = dynamic(
 
 interface PageClientProps {
   integrationId: string;
+}
+
+interface IntegrationsResponse {
+  integrations: Array<GitHubIntegration & { type: string }>;
+  count: number;
 }
 
 function buildWebhookUrl(
@@ -146,26 +151,41 @@ function formatFrequency(cron?: Trigger["sourceConfig"]["cron"]) {
 function SchedulesSection({
   organizationId,
   slug,
+  repositoryIds,
 }: {
   organizationId: string;
   slug: string;
+  repositoryIds: string[];
 }) {
+  const normalizedRepositoryIds = [...repositoryIds].sort();
+  const repositoryQueryString = normalizedRepositoryIds
+    .map((repositoryId) => `repositoryId=${encodeURIComponent(repositoryId)}`)
+    .join("&");
+  const hasRepositories = normalizedRepositoryIds.length > 0;
+
   const { data, isPending, isError } = useQuery({
-    queryKey: QUERY_KEYS.AUTOMATION.schedules(organizationId),
+    queryKey: [
+      ...QUERY_KEYS.AUTOMATION.schedules(organizationId),
+      "repositoryIds",
+      ...normalizedRepositoryIds,
+    ],
     queryFn: async () => {
       const response = await fetch(
-        `/api/organizations/${organizationId}/automation/schedules`
+        repositoryQueryString
+          ? `/api/organizations/${organizationId}/automation/schedules?${repositoryQueryString}`
+          : `/api/organizations/${organizationId}/automation/schedules`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch schedules");
       }
       return response.json() as Promise<{ triggers: Trigger[] }>;
     },
-    enabled: !!organizationId,
+    enabled: !!organizationId && hasRepositories,
   });
 
   const schedules = data?.triggers ?? [];
   const displaySchedules = schedules.slice(0, 5);
+  const isLoadingSchedules = isPending && hasRepositories;
 
   return (
     <div className="space-y-4">
@@ -185,7 +205,7 @@ function SchedulesSection({
           </Link>
         )}
       </div>
-      {isPending ? (
+      {isLoadingSchedules ? (
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
             <div
@@ -240,11 +260,15 @@ function SchedulesSection({
 
 export default function PageClient({ integrationId }: PageClientProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = activeOrganization?.id;
 
-  const { data: integration, isPending } = useQuery({
-    queryKey: QUERY_KEYS.INTEGRATIONS.detail(integrationId),
+  const { data: integration, isLoading: isLoadingIntegration } = useQuery({
+    queryKey: QUERY_KEYS.INTEGRATIONS.detail(
+      organizationId ?? "",
+      integrationId
+    ),
     queryFn: async () => {
       if (!organizationId) {
         throw new Error("Organization ID is required");
@@ -260,9 +284,28 @@ export default function PageClient({ integrationId }: PageClientProps) {
       return response.json() as Promise<GitHubIntegration>;
     },
     enabled: !!organizationId,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    initialData: () => {
+      if (!organizationId) {
+        return undefined;
+      }
+
+      const cachedIntegrations = queryClient.getQueryData<IntegrationsResponse>(
+        QUERY_KEYS.INTEGRATIONS.all(organizationId)
+      );
+
+      return cachedIntegrations?.integrations.find(
+        (cachedIntegration) => cachedIntegration.id === integrationId
+      );
+    },
   });
 
-  if (isPending) {
+  if (!organizationId) {
+    return null;
+  }
+
+  if (organizationId && isLoadingIntegration && !integration) {
     return <GitHubIntegrationDetailSkeleton />;
   }
 
@@ -351,6 +394,7 @@ export default function PageClient({ integrationId }: PageClientProps) {
 
           <SchedulesSection
             organizationId={organizationId ?? ""}
+            repositoryIds={integration.repositories.map((repo) => repo.id)}
             slug={activeOrganization?.slug ?? ""}
           />
 
