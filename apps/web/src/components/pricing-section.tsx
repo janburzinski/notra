@@ -58,7 +58,7 @@ function PricingCard({
       <Button
         className={`w-full border-transparent px-4 py-[10px] shadow-[0px_2px_4px_rgba(55,50,47,0.12)] ${
           isFeatured
-            ? "bg-primary-foreground text-primary hover:bg-muted"
+            ? "bg-white [a]:hover:bg-white/90"
             : "bg-primary hover:bg-primary-hover"
         }`}
         nativeButton={false}

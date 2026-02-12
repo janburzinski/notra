@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@notra/ui/components/ui/button";
+import Link from "next/link";
 
 export default function CTASection() {
   return (
@@ -36,7 +37,11 @@ export default function CTASection() {
           </div>
           <div className="flex w-full max-w-[497px] flex-col items-center justify-center gap-12">
             <div className="flex items-center justify-start gap-4">
-              <Button className="h-10 border-transparent bg-primary px-12 py-[6px] transition-colors hover:bg-primary-hover">
+              <Button
+                className="h-10 border-transparent bg-primary px-12 py-[6px] transition-colors hover:bg-primary-hover"
+                nativeButton={false}
+                render={<Link href="https://app.usenotra.com/signup" />}
+              >
                 <span className="flex flex-col justify-center font-medium font-sans text-[13px] text-primary-foreground leading-5">
                   Start for free
                 </span>

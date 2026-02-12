@@ -10,7 +10,7 @@ export const PRICING_PLANS = {
     name: "Free",
     description: "For solo devs and small teams getting started.",
     pricing: { monthly: 0, annually: 0 },
-    cta: { label: "Start for free", href: "/sign-up" },
+    cta: { label: "Start for free", href: "https://app.usenotra.com/signup" },
     features: [
       "2 team members",
       "15 AI Credits per month",
@@ -23,7 +23,7 @@ export const PRICING_PLANS = {
     name: "Pro",
     description: "More power for growing teams.",
     pricing: { monthly: 50, annually: 500 },
-    cta: { label: "Get started", href: "/sign-up" },
+    cta: { label: "Get started", href: "https://app.usenotra.com/signup" },
     features: [
       "5 team members",
       "Unlimited workflows",
