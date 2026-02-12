@@ -181,8 +181,8 @@ export default function PricingSection() {
       >
         <div className="-translate-x-1/2 absolute top-[63px] left-1/2 z-0 h-0 w-full max-w-[1060px] transform border-primary/12 border-t" />
 
-        <div className="relative z-20 flex items-center justify-center rounded-lg border border-primary/6 bg-background p-3">
-          <TabsList className="relative h-auto gap-[2px] rounded-[99px] border-[0.5px] border-primary/8 bg-primary/10 p-[2px] shadow-[0px_1px_0px_white]">
+        <div className="relative z-20 flex items-center justify-center overflow-hidden rounded-lg border border-primary/6 bg-background p-3">
+          <TabsList className="relative h-auto gap-[2px] overflow-hidden rounded-[99px] border-[0.5px] border-primary/8 bg-primary/10 p-[2px]">
             <div
               className={`absolute top-[2px] h-[calc(100%-4px)] w-[calc(50%-1px)] rounded-[99px] bg-white shadow-[0px_2px_4px_rgba(0,0,0,0.08)] transition-all duration-300 ease-in-out ${
                 billingPeriod === "monthly" ? "left-[2px]" : "right-[2px]"
@@ -190,7 +190,7 @@ export default function PricingSection() {
             />
 
             <TabsTrigger
-              className="relative z-10 h-auto cursor-pointer rounded-[99px] border-transparent bg-transparent px-4 py-1 shadow-none transition-colors duration-300 hover:bg-transparent data-active:border-transparent data-active:bg-transparent data-active:shadow-none"
+              className="relative z-10 h-auto cursor-pointer rounded-[99px] border-transparent bg-transparent! px-4 py-1 shadow-none! transition-colors duration-300 hover:bg-transparent data-active:border-transparent data-active:bg-transparent! data-active:shadow-none!"
               value="monthly"
             >
               <span
@@ -205,7 +205,7 @@ export default function PricingSection() {
             </TabsTrigger>
 
             <TabsTrigger
-              className="relative z-10 h-auto cursor-pointer rounded-[99px] border-transparent bg-transparent px-4 py-1 shadow-none transition-colors duration-300 hover:bg-transparent data-active:border-transparent data-active:bg-transparent data-active:shadow-none"
+              className="relative z-10 h-auto cursor-pointer rounded-[99px] border-transparent bg-transparent! px-4 py-1 shadow-none! transition-colors duration-300 hover:bg-transparent data-active:border-transparent data-active:bg-transparent! data-active:shadow-none!"
               value="annually"
             >
               <span
@@ -240,52 +240,80 @@ export default function PricingSection() {
             </div>
           </div>
 
-          <div className="grid flex-1 grid-cols-1 grid-rows-[auto_auto_auto_1fr] gap-x-6 py-12 md:grid-cols-3 md:py-0">
-            <PricingCard
-              cta={free.cta}
-              description={free.description}
-              features={free.features}
-              name={free.name}
-              price={
-                <AnimatedPrice
-                  billingPeriod={billingPeriod}
-                  pricing={free.pricing}
-                  variant="default"
-                />
-              }
-            />
+          <div className="flex flex-1 flex-col py-12 md:flex-row md:py-0">
+            <div className="grid flex-1 grid-cols-1 grid-rows-[auto_auto_auto_1fr]">
+              <PricingCard
+                cta={free.cta}
+                description={free.description}
+                features={free.features}
+                name={free.name}
+                price={
+                  <AnimatedPrice
+                    billingPeriod={billingPeriod}
+                    pricing={free.pricing}
+                    variant="default"
+                  />
+                }
+              />
+            </div>
 
-            <PricingCard
-              cta={pro.cta}
-              description={pro.description}
-              features={pro.features}
-              name={pro.name}
-              price={
-                <AnimatedPrice
-                  billingPeriod={billingPeriod}
-                  pricing={pro.pricing}
-                  variant="featured"
-                />
-              }
-              variant="featured"
-            />
+            <div className="relative hidden w-6 self-stretch overflow-hidden md:block lg:w-8">
+              <div className="-top-30 -left-12.5 absolute flex w-35 flex-col items-start justify-start">
+                {Array.from({ length: 200 }).map((_, i) => (
+                  <div
+                    className="-rotate-45 h-4 origin-top-left self-stretch outline outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
+                    key={i}
+                  />
+                ))}
+              </div>
+            </div>
 
-            <PricingCard
-              cta={enterprise.cta}
-              description={enterprise.description}
-              features={enterprise.features}
-              name={enterprise.name}
-              price={
-                <div className="flex flex-col items-start justify-start gap-1">
-                  <div className="flex h-[60px] items-center font-medium font-serif text-5xl text-primary leading-[60px]">
-                    Contact us
+            <div className="grid flex-1 grid-cols-1 grid-rows-[auto_auto_auto_1fr]">
+              <PricingCard
+                cta={pro.cta}
+                description={pro.description}
+                features={pro.features}
+                name={pro.name}
+                price={
+                  <AnimatedPrice
+                    billingPeriod={billingPeriod}
+                    pricing={pro.pricing}
+                    variant="featured"
+                  />
+                }
+                variant="featured"
+              />
+            </div>
+
+            <div className="relative hidden w-6 self-stretch overflow-hidden md:block lg:w-8">
+              <div className="-top-30 -left-12.5 absolute flex w-35 flex-col items-start justify-start">
+                {Array.from({ length: 200 }).map((_, i) => (
+                  <div
+                    className="-rotate-45 h-4 origin-top-left self-stretch outline outline-[rgba(3,7,18,0.08)] outline-offset-[-0.25px]"
+                    key={i}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="grid flex-1 grid-cols-1 grid-rows-[auto_auto_auto_1fr]">
+              <PricingCard
+                cta={enterprise.cta}
+                description={enterprise.description}
+                features={enterprise.features}
+                name={enterprise.name}
+                price={
+                  <div className="flex flex-col items-start justify-start gap-1">
+                    <div className="flex h-[60px] items-center font-medium font-serif text-5xl text-primary leading-[60px]">
+                      Contact us
+                    </div>
+                    <div className="font-medium font-sans text-muted-foreground text-sm">
+                      for custom pricing.
+                    </div>
                   </div>
-                  <div className="font-medium font-sans text-muted-foreground text-sm">
-                    for custom pricing.
-                  </div>
-                </div>
-              }
-            />
+                }
+              />
+            </div>
           </div>
 
           <div className="relative hidden w-12 self-stretch overflow-hidden md:block">
