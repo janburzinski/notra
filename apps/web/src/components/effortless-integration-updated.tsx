@@ -259,26 +259,6 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({
           <NotraMark className="h-8 w-8 shrink-0" strokeWidth={42} />
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes orbitSpin {
-          from {
-            transform: translate(-50%, -50%) rotate(0deg);
-          }
-          to {
-            transform: translate(-50%, -50%) rotate(360deg);
-          }
-        }
-
-        @keyframes iconSpin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -220,17 +220,6 @@ export default function DocumentationSection() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes progressBar {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(0%);
-          }
-        }
-      `}</style>
     </div>
   );
 }

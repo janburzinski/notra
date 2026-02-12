@@ -3,6 +3,7 @@
 import { Button } from "@notra/ui/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ActivityFeed } from "../components/activity-feed";
 import CTASection from "../components/cta-section";
 import DocumentationSection from "../components/documentation-section";
@@ -17,6 +18,12 @@ import YourWorkInSync from "../components/your-work-in-sync";
 import { SOCIAL_PROOF_LOGOS } from "../utils/constants";
 
 export default function LandingPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(document.cookie.includes("better-auth.session_token"));
+  }, []);
+
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-start overflow-x-hidden bg-background">
       <div className="relative flex w-full flex-col items-center justify-start">
@@ -63,16 +70,35 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="flex h-6 items-start justify-start gap-2 sm:h-7 sm:gap-3 md:h-8">
-                  <Link href="https://app.usenotra.com">
-                    <Button
-                      className="overflow-hidden rounded-lg border-transparent bg-white px-2 py-1 shadow-[0px_1px_2px_rgba(55,50,47,0.12)] hover:bg-muted sm:px-3 sm:py-[6px] md:px-[14px]"
-                      variant="ghost"
-                    >
-                      <span className="flex flex-col justify-center font-medium font-sans text-primary text-xs leading-5 md:text-[13px]">
-                        Log in
-                      </span>
-                    </Button>
-                  </Link>
+                  {isLoggedIn ? (
+                    <Link href="https://app.usenotra.com">
+                      <Button className="overflow-hidden rounded-lg border-transparent bg-primary px-2 py-1 shadow-[0px_1px_2px_rgba(55,50,47,0.12)] hover:bg-primary-hover sm:px-3 sm:py-[6px] md:px-[14px]">
+                        <span className="flex flex-col justify-center font-medium font-sans text-primary-foreground text-xs leading-5 md:text-[13px]">
+                          Dashboard
+                        </span>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <>
+                      <Link href="https://app.usenotra.com/login">
+                        <Button
+                          className="overflow-hidden rounded-lg border-transparent bg-white px-2 py-1 shadow-[0px_1px_2px_rgba(55,50,47,0.12)] hover:bg-muted sm:px-3 sm:py-[6px] md:px-[14px]"
+                          variant="ghost"
+                        >
+                          <span className="flex flex-col justify-center font-medium font-sans text-primary text-xs leading-5 md:text-[13px]">
+                            Log in
+                          </span>
+                        </Button>
+                      </Link>
+                      <Link href="https://app.usenotra.com/signup">
+                        <Button className="overflow-hidden rounded-lg border-transparent bg-primary px-2 py-1 shadow-[0px_1px_2px_rgba(55,50,47,0.12)] hover:bg-primary-hover sm:px-3 sm:py-[6px] md:px-[14px]">
+                          <span className="flex flex-col justify-center font-medium font-sans text-primary-foreground text-xs leading-5 md:text-[13px]">
+                            Sign up
+                          </span>
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
