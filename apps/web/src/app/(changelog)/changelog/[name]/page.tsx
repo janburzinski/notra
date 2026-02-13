@@ -73,7 +73,7 @@ export default async function CompanyChangelogPage({ params }: PageProps) {
           {company.name} Changelog<span className="text-primary">.</span>
         </h1>
         <p className="text-center font-normal font-sans text-base text-muted-foreground leading-7">
-          AI-generated changelog entries from GitHub activity,
+          Changelog entries generated from GitHub activity,
           <br className="hidden sm:block" />
           powered by Notra.
         </p>
