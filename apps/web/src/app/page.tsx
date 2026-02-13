@@ -16,7 +16,7 @@ import { SOCIAL_PROOF_LOGOS } from "../utils/constants";
 export default function LandingPage() {
   return (
     <div className="flex w-full flex-col items-center justify-start overflow-hidden border-border/70 border-b">
-      <div className="flex w-full flex-col items-center justify-start pt-28 sm:pt-20 md:pt-24 lg:pt-54">
+      <main className="flex w-full flex-col items-center justify-start pt-28 sm:pt-20 md:pt-24 lg:pt-54">
         <div className="flex w-full max-w-234.25 flex-col items-center justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           <div className="flex flex-col items-center justify-center gap-4 self-stretch rounded-[3px] sm:gap-5 md:gap-6 lg:gap-8">
             <div className="flex w-full max-w-[46.8rem] flex-col justify-center px-2 text-center font-normal font-serif text-[2rem] text-foreground leading-[1.1] sm:px-4 sm:text-[2.625rem] sm:leading-[1.15] md:px-0 md:text-[3.25rem] md:leading-[1.2] lg:text-[5rem] lg:leading-24">
@@ -356,7 +356,7 @@ export default function LandingPage() {
         <section className="w-full" id="cta">
           <CTASection />
         </section>
-      </div>
+      </main>
     </div>
   );
 }
