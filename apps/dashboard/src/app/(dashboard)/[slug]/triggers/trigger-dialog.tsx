@@ -45,7 +45,10 @@ import type {
   OutputContentType,
   WebhookEventType,
 } from "@/utils/schemas/integrations";
-import { LOOKBACK_WINDOWS } from "@/utils/schemas/integrations";
+import {
+  LOOKBACK_WINDOWS,
+  MAX_SCHEDULE_NAME_LENGTH,
+} from "@/utils/schemas/integrations";
 import { SchedulePicker } from "./trigger-schedule-picker";
 
 const EVENT_OPTIONS: Array<{ value: WebhookEventType; label: string }> = [
@@ -67,6 +70,7 @@ const OUTPUT_OPTIONS: Array<{
 ];
 
 interface TriggerFormValues {
+  name: string;
   sourceType: Trigger["sourceType"];
   eventType: WebhookEventType;
   outputType: OutputContentType;
@@ -82,6 +86,17 @@ const LOOKBACK_WINDOW_LABELS: Record<LookbackWindow, string> = {
   last_14_days: "Last 14 days",
   last_30_days: "Last 30 days",
 };
+
+function RequiredLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span>
+      {children}
+      <span aria-hidden="true" className="ml-0.5 text-destructive">
+        *
+      </span>
+    </span>
+  );
+}
 
 interface TriggerDialogProps {
   organizationId: string;
@@ -139,6 +154,7 @@ export function AddTriggerDialog({
   const getDefaultValues = useCallback((): TriggerFormValues => {
     if (editTrigger) {
       return {
+        name: editTrigger.name ?? "Untitled Schedule",
         sourceType: editTrigger.sourceType,
         eventType:
           (editTrigger.sourceConfig.eventTypes?.[0] as WebhookEventType) ??
@@ -154,6 +170,7 @@ export function AddTriggerDialog({
       };
     }
     return {
+      name: "",
       sourceType: defaultSourceType,
       eventType: "release",
       outputType: "changelog",
@@ -216,6 +233,7 @@ export function AddTriggerDialog({
         method: isEditMode ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name: value.name,
           sourceType: value.sourceType,
           sourceConfig:
             value.sourceType === "cron"
@@ -325,7 +343,9 @@ export function AddTriggerDialog({
                 {(field) =>
                   isScheduleContext ? null : (
                     <div className="space-y-2">
-                      <Label htmlFor={field.name}>Source</Label>
+                      <Label htmlFor={field.name}>
+                        <RequiredLabel>Source</RequiredLabel>
+                      </Label>
                       {isSourceLocked ? (
                         <Input
                           disabled
@@ -369,6 +389,26 @@ export function AddTriggerDialog({
                 {(sourceType) =>
                   sourceType === "cron" ? (
                     <>
+                      <form.Field name="name">
+                        {(field) => (
+                          <div className="space-y-2">
+                            <Label htmlFor={field.name}>
+                              <RequiredLabel>Name</RequiredLabel>
+                            </Label>
+                            <Input
+                              id={field.name}
+                              maxLength={MAX_SCHEDULE_NAME_LENGTH}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              placeholder="Weekly changelog"
+                              value={field.state.value}
+                            />
+                          </div>
+                        )}
+                      </form.Field>
+
                       <form.Field name="schedule">
                         {(field) => (
                           <SchedulePicker
@@ -415,7 +455,9 @@ export function AddTriggerDialog({
                     <form.Field name="eventType">
                       {(field) => (
                         <div className="space-y-2">
-                          <Label htmlFor={field.name}>Event</Label>
+                          <Label htmlFor={field.name}>
+                            <RequiredLabel>Event</RequiredLabel>
+                          </Label>
                           <Select
                             onValueChange={(value) => {
                               if (value) {
@@ -454,7 +496,9 @@ export function AddTriggerDialog({
               <form.Field name="repositoryIds">
                 {(field) => (
                   <div className="space-y-2">
-                    <Label htmlFor={field.name}>Targets</Label>
+                    <Label htmlFor={field.name}>
+                      <RequiredLabel>Targets</RequiredLabel>
+                    </Label>
                     {isLoadingRepos ? (
                       <Skeleton className="h-10 w-full" />
                     ) : repositories.length === 0 ? (
@@ -517,7 +561,9 @@ export function AddTriggerDialog({
               <form.Field name="outputType">
                 {(field) => (
                   <div className="space-y-2">
-                    <Label htmlFor={field.name}>Output</Label>
+                    <Label htmlFor={field.name}>
+                      <RequiredLabel>Output</RequiredLabel>
+                    </Label>
                     <Select
                       onValueChange={(value) => {
                         if (value) {
@@ -565,6 +611,8 @@ export function AddTriggerDialog({
               selector={(state) => ({
                 canSubmit:
                   state.values.repositoryIds.length > 0 &&
+                  (state.values.sourceType !== "cron" ||
+                    state.values.name.trim().length > 0) &&
                   (state.values.sourceType !== "cron" ||
                     state.values.schedule?.frequency),
                 isSubmitting: mutation.isPending,
