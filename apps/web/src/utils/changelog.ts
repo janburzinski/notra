@@ -35,6 +35,15 @@ export const CHANGELOG_COMPANIES = [
     url: "https://langfuse.com",
     accentColor: "#E11312",
   },
+  {
+    slug: "autumn",
+    name: "Autumn",
+    domain: "useautumn.com",
+    description:
+      "Autumn is the easiest and most flexible way to set up your app's pricing model. With 3 functions, you can integrate Stripe payments, track usage limits, control feature entitlements, credits, add-ons & much more.",
+    url: "https://useautumn.com",
+    accentColor: "#9c5bff",
+  },
 ] as const;
 
 export function getCompany(slug: string) {

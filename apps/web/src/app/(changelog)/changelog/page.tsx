@@ -4,6 +4,7 @@ import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { Langfuse } from "@notra/ui/components/ui/svgs/langfuse";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { changelog } from "@/../.source/server";
@@ -14,6 +15,15 @@ const COMPANY_ICONS: Record<string, ReactNode> = {
   "cal-com": <Cal className="size-5" />,
   databuddy: <Databuddy className="size-5 rounded" />,
   langfuse: <Langfuse className="size-5" />,
+  autumn: (
+    <Image
+      alt="Autumn"
+      className="h-5 w-auto rounded"
+      height="85"
+      src="/logos/brands/autumn.avif"
+      width="53"
+    />
+  ),
 };
 
 const title = "Example Changelogs | Notra";
