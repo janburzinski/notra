@@ -160,44 +160,16 @@ function isRepositoryAllowed(
   );
 }
 
-function getConfiguredDefaultBranch(
-  owner: string,
-  repo: string,
-  allowedRepositories?: Array<{
-    owner: string;
-    repo: string;
-    defaultBranch?: string | null;
-  }>
-) {
-  if (!allowedRepositories?.length) {
-    return undefined;
-  }
-
-  const normalizedOwner = owner.toLowerCase();
-  const normalizedRepo = repo.toLowerCase();
-
-  const matchedRepo = allowedRepositories.find(
-    (allowedRepo) =>
-      allowedRepo.owner.toLowerCase() === normalizedOwner &&
-      allowedRepo.repo.toLowerCase() === normalizedRepo
-  );
-
-  const branch = matchedRepo?.defaultBranch?.trim();
-  return branch ? branch : undefined;
-}
-
 function getNextPageFromLinkHeader(
   linkHeader?: string | number
 ): number | undefined {
   if (typeof linkHeader !== "string" || !linkHeader.trim()) {
     return undefined;
   }
-
   const nextMatch = linkHeader.match(/<([^>]+)>\s*;\s*rel="next"/i);
   if (!nextMatch?.[1]) {
     return undefined;
   }
-
   try {
     const url = new URL(nextMatch[1]);
     const pageValue = url.searchParams.get("page");
@@ -386,12 +358,15 @@ Use this for activity summaries, changelog generation, or understanding recent c
           .min(1)
           .default(1)
           .describe("The page number to retrieve (starts at 1)"),
+        branch: z
+          .string()
+          .describe("The branch to retrieve commits from. If not provided, the default branch will be used.").optional(),
         days: z
           .number()
           .default(7)
           .describe("How many days of commit history to retrieve"),
       }),
-      execute: async ({ owner, repo, days, page }) => {
+      execute: async ({ owner, repo, days, page, branch }) => {
         assertRepositoryAccess(owner, repo, config);
 
         const token = await getTokenForRepository(owner, repo, {
@@ -401,19 +376,15 @@ Use this for activity summaries, changelog generation, or understanding recent c
         const since = getISODateFromDaysAgo(days);
         // TODO: We need an actual todo date in the future to allow for more flexible timeframes
         const until = new Date().toISOString();
-        const sha = getConfiguredDefaultBranch(
-          owner,
-          repo,
-          config?.allowedRepositories
-        );
+
         const response = await withGitHubRateLimitHandling(() =>
           octokit.request("GET /repos/{owner}/{repo}/commits", {
             owner,
             repo,
             since,
             page,
+            ...(branch ? { sha: branch } : {}),
             until,
-            ...(sha ? { sha } : {}),
             per_page: 100,
             headers: {
               "X-GitHub-Api-Version": "2022-11-28",
@@ -445,12 +416,7 @@ Use this for activity summaries, changelog generation, or understanding recent c
           days: number;
           page?: number;
         };
-        const sha = getConfiguredDefaultBranch(
-          owner,
-          repo,
-          config?.allowedRepositories
-        );
-        return `get_commits_by_timeframe:${owner.toLowerCase()}/${repo.toLowerCase()}:days=${String(days)}:page=${String(page ?? 1)}:sha=${encodeURIComponent(sha ?? "default")}`;
+        return `get_commits_by_timeframe:${owner.toLowerCase()}/${repo.toLowerCase()}:days=${String(days)}:page=${String(page ?? 1)}`;
       },
     }
   );
