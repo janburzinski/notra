@@ -3,6 +3,7 @@ import { TitleCard } from "@notra/ui/components/ui/title-card";
 import Link from "next/link";
 import { memo } from "react";
 import { cn } from "@/lib/utils";
+import { formatSnakeCaseLabel } from "@/utils/format";
 
 const CONTENT_TYPES = [
   "changelog",
@@ -14,13 +15,13 @@ const CONTENT_TYPES = [
 
 type ContentType = (typeof CONTENT_TYPES)[number];
 
-const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
-  changelog: "Changelog",
-  blog_post: "Blog Post",
-  twitter_post: "Tweet",
-  linkedin_post: "LinkedIn Post",
-  investor_update: "Investor Update",
-};
+function getContentTypeLabel(contentType: ContentType): string {
+  if (contentType === "twitter_post") {
+    return "tweet";
+  }
+
+  return formatSnakeCaseLabel(contentType);
+}
 
 interface ContentCardProps {
   title: string;
@@ -40,7 +41,9 @@ const ContentCard = memo(function ContentCard({
   const cardContent = (
     <TitleCard
       action={
-        <Badge variant="secondary">{CONTENT_TYPE_LABELS[contentType]}</Badge>
+        <Badge className="capitalize" variant="secondary">
+          {getContentTypeLabel(contentType)}
+        </Badge>
       }
       className={cn(
         "h-full transition-colors",
@@ -67,5 +70,5 @@ const ContentCard = memo(function ContentCard({
   return cardContent;
 });
 
-export { ContentCard, CONTENT_TYPES, CONTENT_TYPE_LABELS };
+export { ContentCard, CONTENT_TYPES, getContentTypeLabel };
 export type { ContentCardProps, ContentType };

@@ -378,7 +378,7 @@ function EventTable({
               <TableCell className="text-muted-foreground">
                 {formatEventList(trigger.sourceConfig.eventTypes)}
               </TableCell>
-              <TableCell className="text-muted-foreground">
+              <TableCell className="text-muted-foreground capitalize">
                 {getOutputTypeLabel(trigger.outputType)}
               </TableCell>
               <TableCell className="text-muted-foreground">

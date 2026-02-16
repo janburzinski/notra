@@ -47,6 +47,7 @@ import {
 } from "@/schemas/integrations";
 import type { GitHubIntegration } from "@/types/integrations";
 import type { Trigger } from "@/types/lib/triggers/triggers";
+import { formatSnakeCaseLabel } from "@/utils/format";
 import { QUERY_KEYS } from "@/utils/query-keys";
 import { SchedulePicker } from "./trigger-schedule-picker";
 
@@ -77,14 +78,6 @@ interface TriggerFormValues {
   schedule: Trigger["sourceConfig"]["cron"];
   lookbackWindow: LookbackWindow;
 }
-
-const LOOKBACK_WINDOW_LABELS: Record<LookbackWindow, string> = {
-  current_day: "Current day",
-  yesterday: "Yesterday",
-  last_7_days: "Last 7 days",
-  last_14_days: "Last 14 days",
-  last_30_days: "Last 30 days",
-};
 
 function RequiredLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -431,13 +424,17 @@ export function AddTriggerDialog({
                             >
                               <SelectTrigger className="w-full" id={field.name}>
                                 <SelectValue placeholder="Lookback window">
-                                  {LOOKBACK_WINDOW_LABELS[field.state.value]}
+                                  <span className="capitalize">
+                                    {formatSnakeCaseLabel(field.state.value)}
+                                  </span>
                                 </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
                                 {LOOKBACK_WINDOWS.map((window) => (
                                   <SelectItem key={window} value={window}>
-                                    {LOOKBACK_WINDOW_LABELS[window]}
+                                    <span className="capitalize">
+                                      {formatSnakeCaseLabel(window)}
+                                    </span>
                                   </SelectItem>
                                 ))}
                               </SelectContent>

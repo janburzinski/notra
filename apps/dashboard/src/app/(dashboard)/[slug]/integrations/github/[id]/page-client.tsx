@@ -238,7 +238,7 @@ function SchedulesSection({
               key={schedule.id}
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="truncate font-medium text-sm">
+                <span className="truncate font-medium text-sm capitalize">
                   {getOutputTypeLabel(schedule.outputType)}
                 </span>
                 <span className="shrink-0 text-muted-foreground text-xs">

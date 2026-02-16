@@ -116,7 +116,7 @@ export function RepositoryList({
             type="button"
           >
             <Badge
-              className="cursor-pointer"
+              className="cursor-pointer capitalize"
               variant={output.enabled ? "default" : "secondary"}
             >
               {getOutputTypeLabel(output.outputType)}

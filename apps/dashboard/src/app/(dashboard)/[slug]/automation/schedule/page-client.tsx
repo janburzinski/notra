@@ -641,7 +641,7 @@ function ScheduleTable({
                 <TableCell className="text-muted-foreground">
                   {formatFrequency(trigger.sourceConfig.cron)}
                 </TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="text-muted-foreground capitalize">
                   {getOutputTypeLabel(trigger.outputType)}
                 </TableCell>
                 <TableCell className="text-muted-foreground">

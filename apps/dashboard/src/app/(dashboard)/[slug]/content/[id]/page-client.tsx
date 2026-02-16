@@ -27,11 +27,12 @@ import ChatInput, {
   type ContextItem,
   type TextSelection,
 } from "@/components/chat-input";
-import { CONTENT_TYPE_LABELS } from "@/components/content/content-card";
+import { getContentTypeLabel } from "@/components/content/content-card";
 import { DiffView } from "@/components/content/diff-view";
 import { LexicalEditor } from "@/components/content/editor/lexical-editor";
 import type { EditorRefHandle } from "@/components/content/editor/plugins/editor-ref-plugin";
 import { sourceMetadataSchema } from "@/schemas/content";
+import { formatSnakeCaseLabel } from "@/utils/format";
 import { useContent } from "../../../../../lib/hooks/use-content";
 import { ContentDetailSkeleton } from "./skeleton";
 
@@ -65,22 +66,8 @@ function extractTitleFromMarkdown(markdown: string): string {
   return match?.[1] ?? "Untitled";
 }
 
-const LOOKBACK_LABELS: Record<string, string> = {
-  current_day: "Current day",
-  yesterday: "Yesterday",
-  last_7_days: "Last 7 days",
-  last_14_days: "Last 14 days",
-  last_30_days: "Last 30 days",
-};
-
-const TRIGGER_TYPE_LABELS: Record<string, string> = {
-  cron: "Scheduled",
-  github_webhook: "Webhook",
-  manual: "Manual",
-};
-
 function formatLookbackWindow(window: string): string {
-  return LOOKBACK_LABELS[window] ?? window;
+  return formatSnakeCaseLabel(window);
 }
 
 function formatDateRange(start: string, end: string): string {
@@ -93,7 +80,7 @@ function formatDateRange(start: string, end: string): string {
 }
 
 function formatTriggerType(type: string): string {
-  return TRIGGER_TYPE_LABELS[type] ?? type;
+  return formatSnakeCaseLabel(type);
 }
 
 function formatRepos(repos: { owner: string; repo: string }[]): string {
@@ -551,8 +538,8 @@ export default function PageClient({
               >
                 {formatDate(new Date(content.date))}
               </time>
-              <Badge variant="secondary">
-                {CONTENT_TYPE_LABELS[content.contentType]}
+              <Badge className="capitalize" variant="secondary">
+                {getContentTypeLabel(content.contentType)}
               </Badge>
             </div>
             {content.sourceMetadata &&
@@ -568,7 +555,9 @@ export default function PageClient({
                 const needsTooltip = meta.repositories.length > 1;
                 return (
                   <p className="text-muted-foreground text-xs">
-                    {formatTriggerType(meta.triggerSourceType)}
+                    <span className="capitalize">
+                      {formatTriggerType(meta.triggerSourceType)}
+                    </span>
                     {" \u00B7 "}
                     {needsTooltip ? (
                       <Tooltip>
@@ -593,7 +582,10 @@ export default function PageClient({
                       repoLabel
                     )}
                     {" \u00B7 "}
-                    {formatLookbackWindow(meta.lookbackWindow)} (
+                    <span className="capitalize">
+                      {formatLookbackWindow(meta.lookbackWindow)}
+                    </span>{" "}
+                    (
                     {formatDateRange(
                       meta.lookbackRange.start,
                       meta.lookbackRange.end
