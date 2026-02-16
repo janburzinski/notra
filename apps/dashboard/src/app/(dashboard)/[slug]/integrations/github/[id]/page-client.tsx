@@ -406,17 +406,6 @@ export default function PageClient({ integrationId }: PageClientProps) {
         />
 
         <div className="space-y-6">
-          <div className="rounded-lg border p-6">
-            <div className="flex items-start">
-              <div className="space-y-1">
-                <h2 className="font-semibold text-lg">Integration Details</h2>
-                <p className="text-muted-foreground text-sm">
-                  Metadata and configuration for this GitHub integration.
-                </p>
-              </div>
-            </div>
-          </div>
-
           <SchedulesSection
             organizationId={organizationId ?? ""}
             repositoryIds={integration.repositories.map((repo) => repo.id)}
