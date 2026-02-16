@@ -44,6 +44,7 @@ interface RepositoryData {
   id: string;
   owner: string;
   repo: string;
+  defaultBranch: string | null;
 }
 
 interface GeneratedContent {
@@ -209,6 +210,7 @@ export const { POST } = serve<SchedulePayload>(
             id: githubIntegrations.id,
             owner: githubIntegrations.owner,
             repo: githubIntegrations.repo,
+            defaultBranch: githubIntegrations.defaultBranch,
           })
           .from(githubIntegrations)
           .where(inArray(githubIntegrations.id, repositoryIds));
@@ -295,7 +297,10 @@ export const { POST } = serve<SchedulePayload>(
             const lookbackRange = resolveLookbackRange(lookbackWindow);
             const todayUtc = formatUtcTodayContext(lookbackRange.end);
             const repoList = repositories
-              .map((r) => `${r.owner}/${r.repo}`)
+              .map(
+                (r) =>
+                  `${r.owner}/${r.repo} (branch: ${r.defaultBranch ?? "No branch Provided"})`
+              )
               .join(", ");
 
             try {

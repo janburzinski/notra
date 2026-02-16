@@ -54,6 +54,10 @@ interface ProbeResult {
   description?: string;
 }
 
+function getRepoKey(owner: string, repo: string) {
+  return `${owner.toLowerCase()}/${repo.toLowerCase()}`;
+}
+
 export function AddIntegrationDialog({
   organizationId: propOrganizationId,
   organizationSlug: propOrganizationSlug,
@@ -73,6 +77,9 @@ export function AddIntegrationDialog({
   const [createdIntegration, setCreatedIntegration] =
     useState<GitHubIntegration | null>(null);
   const [showWebhookDialog, setShowWebhookDialog] = useState(false);
+  const [initializedBranchRepos, setInitializedBranchRepos] = useState<
+    Set<string>
+  >(new Set());
 
   const [probeStatus, setProbeStatus] = useState<ProbeStatus>("idle");
   const [tokenOpen, setTokenOpen] = useState(false);
@@ -145,6 +152,12 @@ export function AddIntegrationDialog({
       abortControllerRef.current?.abort();
     };
   }, []);
+
+  useEffect(() => {
+    if (open) {
+      setInitializedBranchRepos(new Set());
+    }
+  }, [open]);
 
   const mutation = useMutation({
     mutationFn: async (values: AddGitHubIntegrationFormValues) => {
@@ -295,9 +308,19 @@ export function AddIntegrationDialog({
                           const isSameRepo =
                             latestParsed?.owner === parsed.owner &&
                             latestParsed?.repo === parsed.repo;
+                          const repoKey = getRepoKey(parsed.owner, parsed.repo);
 
-                          if (isSameRepo && result?.defaultBranch) {
+                          if (
+                            isSameRepo &&
+                            result?.defaultBranch &&
+                            !initializedBranchRepos.has(repoKey)
+                          ) {
                             form.setFieldValue("branch", result.defaultBranch);
+                            setInitializedBranchRepos((prev) => {
+                              const next = new Set(prev);
+                              next.add(repoKey);
+                              return next;
+                            });
                           }
                         })
                         .catch(() => {
@@ -409,11 +432,23 @@ export function AddIntegrationDialog({
                               ) {
                                 probeRepo(repoInfo.owner, repoInfo.repo, token)
                                   .then((result) => {
-                                    if (result?.defaultBranch) {
+                                    const repoKey = getRepoKey(
+                                      repoInfo.owner,
+                                      repoInfo.repo
+                                    );
+                                    if (
+                                      result?.defaultBranch &&
+                                      !initializedBranchRepos.has(repoKey)
+                                    ) {
                                       form.setFieldValue(
                                         "branch",
                                         result.defaultBranch
                                       );
+                                      setInitializedBranchRepos((prev) => {
+                                        const next = new Set(prev);
+                                        next.add(repoKey);
+                                        return next;
+                                      });
                                     }
                                   })
                                   .catch(() => {
