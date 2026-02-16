@@ -353,7 +353,7 @@ export default function PageClient({ integrationId }: PageClientProps) {
                 <TooltipTrigger
                   render={
                     <h1 className="font-bold text-3xl tracking-tight">
-                      <span className="cursor-help underline decoration-dotted underline-offset-4">
+                      <span className="cursor-help">
                         {integration.displayName}
                       </span>
                     </h1>
