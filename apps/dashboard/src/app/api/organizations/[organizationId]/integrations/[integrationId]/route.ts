@@ -2,8 +2,11 @@ import { type NextRequest, NextResponse } from "next/server";
 import { withOrganizationAuth } from "@/lib/auth/organization";
 import {
   deleteGitHubIntegration,
+  GitHubBranchNotFoundError,
   getGitHubIntegrationById,
   updateGitHubIntegration,
+  updateRepository,
+  validateRepositoryBranchExists,
 } from "@/lib/services/github-integration";
 import {
   integrationIdParamSchema,
@@ -115,11 +118,64 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    const { enabled, displayName } = bodyValidation.data;
-    const updated = await updateGitHubIntegration(integrationId, {
+    const { enabled, displayName, branch } = bodyValidation.data;
+    const normalizedBranch = branch !== undefined ? branch || null : undefined;
+
+    if (normalizedBranch !== undefined) {
+      if (integration.repositories.length !== 1) {
+        return NextResponse.json(
+          {
+            error:
+              "Branch can only be edited for integrations with a single repository",
+          },
+          { status: 400 }
+        );
+      }
+
+      const repository = integration.repositories[0];
+
+      if (!repository) {
+        return NextResponse.json(
+          { error: "Repository not found" },
+          { status: 404 }
+        );
+      }
+
+      if (normalizedBranch) {
+        try {
+          await validateRepositoryBranchExists({
+            owner: repository.owner,
+            repo: repository.repo,
+            branch: normalizedBranch,
+            encryptedToken: integration.encryptedToken,
+          });
+        } catch (error) {
+          if (error instanceof GitHubBranchNotFoundError) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
+          }
+
+          throw error;
+        }
+      }
+
+      await updateRepository(repository.id, {
+        defaultBranch: normalizedBranch,
+      });
+    }
+
+    await updateGitHubIntegration(integrationId, {
       enabled,
       displayName,
     });
+
+    const updated = await getGitHubIntegrationById(integrationId);
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: "Integration not found" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(updated);
   } catch (error) {

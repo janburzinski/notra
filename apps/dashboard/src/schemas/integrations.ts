@@ -43,6 +43,7 @@ export const addGitHubIntegrationFormSchema = z.object({
       (value) => isValidGitHubUrl(value),
       "Invalid GitHub repository URL or format. Use: https://github.com/owner/repo, git@github.com:owner/repo, or owner/repo"
     ),
+  branch: z.string().optional().nullable(),
   token: z.string().optional().nullable(),
 });
 export type AddGitHubIntegrationFormValues = z.infer<
@@ -53,6 +54,7 @@ export const createGitHubIntegrationRequestSchema = z.object({
   organizationId: z.string().min(1, "Organization ID is required"),
   owner: z.string().min(1, "Repository owner is required"),
   repo: z.string().min(1, "Repository name is required"),
+  branch: z.string().optional().nullable(),
   token: z.string().optional().nullable(),
 });
 export type CreateGitHubIntegrationRequest = z.infer<
@@ -116,21 +118,31 @@ export type OutputIdParam = z.infer<typeof outputIdParamSchema>;
 
 export const updateIntegrationBodySchema = z.object({
   enabled: z.boolean(),
-  displayName: z.string().optional(),
+  displayName: z.string().trim().min(1).optional(),
+  branch: z.string().trim().min(1).nullable().optional(),
 });
 export type UpdateIntegrationBody = z.infer<typeof updateIntegrationBodySchema>;
 
 export const editGitHubIntegrationFormSchema = z.object({
   displayName: z.string().min(1, "Display name is required"),
   enabled: z.boolean(),
+  branch: z.string().optional().nullable(),
 });
 export type EditGitHubIntegrationFormValues = z.infer<
   typeof editGitHubIntegrationFormSchema
 >;
 
-export const updateRepositoryBodySchema = z.object({
-  enabled: z.boolean(),
-});
+export const updateRepositoryBodySchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    defaultBranch: z.string().trim().min(1).optional().nullable(),
+  })
+  .refine(
+    (value) => value.enabled !== undefined || value.defaultBranch !== undefined,
+    {
+      message: "At least one field must be provided",
+    }
+  );
 export type UpdateRepositoryBody = z.infer<typeof updateRepositoryBodySchema>;
 
 export const updateOutputBodySchema = z.object({

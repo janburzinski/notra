@@ -10,6 +10,7 @@ export interface CreateGitHubIntegrationParams {
   displayName: string;
   owner: string;
   repo: string;
+  defaultBranch: string | null;
 }
 
 export interface AddRepositoryParams {
@@ -48,6 +49,7 @@ export interface IntegrationWithRepositories {
     id: string;
     owner: string;
     repo: string;
+    defaultBranch: string | null;
     enabled: boolean;
   }>;
 }
