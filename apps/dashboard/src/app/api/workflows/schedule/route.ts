@@ -15,10 +15,12 @@ import { customAlphabet } from "nanoid";
 import { z } from "zod";
 import { generateChangelog } from "@/lib/ai/agents/changelog";
 import { isGitHubRateLimitError } from "@/lib/ai/tools/github";
+import { autumn } from "@/lib/billing/autumn";
 import { trackScheduledContentCreated } from "@/lib/databuddy";
 import { getBaseUrl, triggerScheduleNow } from "@/lib/triggers/qstash";
 import { getValidToneProfile } from "@/schemas/brand";
 import type { LookbackWindow } from "@/schemas/integrations";
+import { FEATURES } from "@/utils/constants";
 
 const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 16);
 
@@ -252,141 +254,228 @@ export const { POST } = serve<SchedulePayload>(
       }
     );
 
-    // Step 3: Generate content based on output type
-    const contentResult = await context.run<ContentGenerationResult>(
-      "generate-content",
-      async () => {
-        if (trigger.outputType === "changelog") {
-          const lookbackRange = resolveLookbackRange(lookbackWindow);
-          const todayUtc = formatUtcTodayContext(lookbackRange.end);
-          const repoList = repositories
-            .map((r) => `${r.owner}/${r.repo}`)
-            .join(", ");
-
-          try {
-            const { output } = await generateChangelog({
-              organizationId: trigger.organizationId,
-              repositories: repositories.map((repository) => ({
-                owner: repository.owner,
-                repo: repository.repo,
-              })),
-              tone: getValidToneProfile(brand?.toneProfile, "Conversational"),
-              promptInput: {
-                sourceTargets: repoList,
-                todayUtc,
-                lookbackLabel: lookbackRange.label,
-                lookbackStartIso: lookbackRange.start.toISOString(),
-                lookbackEndIso: lookbackRange.end.toISOString(),
-                companyName: brand?.companyName ?? undefined,
-                companyDescription: brand?.companyDescription ?? undefined,
-                audience: brand?.audience ?? undefined,
-                customInstructions: brand?.customInstructions ?? null,
-              },
-            });
-
-            return {
-              status: "ok",
-              content: {
-                title: output.title,
-                markdown: output.markdown,
-              },
-            };
-          } catch (error) {
-            if (isGitHubRateLimitError(error)) {
-              return {
-                status: "rate_limited",
-                retryAfterSeconds: error.retryAfterSeconds,
-              };
-            }
-
-            throw error;
-          }
-        }
-
-        // For other output types, log and return placeholder
-        console.log(
-          `[Schedule] Output type ${trigger.outputType} not fully implemented yet`
-        );
-
-        return {
-          status: "ok",
-          content: {
-            title: `${trigger.outputType} - ${new Date().toLocaleDateString()}`,
-            markdown: `*Automated ${trigger.outputType} generation is coming soon.*\n\nRepositories: ${repositories.map((r) => `${r.owner}/${r.repo}`).join(", ")}`,
-          },
-        };
+    const aiCreditReservation = await context.run<{
+      canceled: boolean;
+      reserved: boolean;
+    }>("reserve-ai-credit", async () => {
+      if (!autumn) {
+        return { canceled: false, reserved: false };
       }
-    );
 
-    if (contentResult.status === "rate_limited") {
-      const delayedWorkflowRunId = await context.run<string>(
-        "reschedule-after-github-rate-limit",
-        async () =>
-          triggerScheduleNow(triggerId, {
-            delay: GITHUB_RATE_LIMIT_RETRY_DELAY,
-          })
-      );
+      const { data, error } = await autumn.check({
+        customer_id: trigger.organizationId,
+        feature_id: FEATURES.AI_CREDITS,
+        required_balance: 1,
+        send_event: true,
+      });
 
-      console.warn(
-        `[Schedule] GitHub API rate limit hit for trigger ${triggerId}. Delayed workflow ${delayedWorkflowRunId} by ${GITHUB_RATE_LIMIT_RETRY_DELAY}.`,
-        {
-          retryAfterSeconds: contentResult.retryAfterSeconds,
-        }
-      );
+      if (error) {
+        throw new Error(`Autumn check failed: ${String(error)}`);
+      }
 
-      await context.cancel();
+      if (!data?.allowed) {
+        console.warn(
+          `[Schedule] AI credit limit reached for org ${trigger.organizationId}, canceling trigger ${triggerId}`,
+          {
+            balance: data?.balance ?? 0,
+          }
+        );
+        await context.cancel();
+        return { canceled: true, reserved: false };
+      }
+
+      return { canceled: false, reserved: true };
+    });
+
+    if (aiCreditReservation.canceled) {
       return;
     }
 
-    const content = contentResult.content;
+    // Step 3: Generate content based on output type
+    try {
+      const contentResult = await context.run<ContentGenerationResult>(
+        "generate-content",
+        async () => {
+          if (trigger.outputType === "changelog") {
+            const lookbackRange = resolveLookbackRange(lookbackWindow);
+            const todayUtc = formatUtcTodayContext(lookbackRange.end);
+            const repoList = repositories
+              .map((r) => `${r.owner}/${r.repo}`)
+              .join(", ");
 
-    const postId = await context.run<string>("save-post", async () => {
-      const id = nanoid();
-      const lookbackRange = resolveLookbackRange(lookbackWindow);
+            try {
+              const { output } = await generateChangelog({
+                organizationId: trigger.organizationId,
+                repositories: repositories.map((repository) => ({
+                  owner: repository.owner,
+                  repo: repository.repo,
+                })),
+                tone: getValidToneProfile(brand?.toneProfile, "Conversational"),
+                promptInput: {
+                  sourceTargets: repoList,
+                  todayUtc,
+                  lookbackLabel: lookbackRange.label,
+                  lookbackStartIso: lookbackRange.start.toISOString(),
+                  lookbackEndIso: lookbackRange.end.toISOString(),
+                  companyName: brand?.companyName ?? undefined,
+                  companyDescription: brand?.companyDescription ?? undefined,
+                  audience: brand?.audience ?? undefined,
+                  customInstructions: brand?.customInstructions ?? null,
+                },
+              });
 
-      const sourceMetadata: PostSourceMetadata = {
-        triggerId: trigger.id,
-        triggerSourceType: trigger.sourceType,
-        repositories: repositories.map((r) => ({
-          owner: r.owner,
-          repo: r.repo,
-        })),
-        lookbackWindow,
-        lookbackRange: {
-          start: lookbackRange.start.toISOString(),
-          end: lookbackRange.end.toISOString(),
-        },
-      };
+              return {
+                status: "ok",
+                content: {
+                  title: output.title,
+                  markdown: output.markdown,
+                },
+              };
+            } catch (error) {
+              if (isGitHubRateLimitError(error)) {
+                return {
+                  status: "rate_limited",
+                  retryAfterSeconds: error.retryAfterSeconds,
+                };
+              }
 
-      await db.insert(posts).values({
-        id,
-        organizationId: trigger.organizationId,
-        title: content.title,
-        content: content.markdown,
-        markdown: content.markdown,
-        contentType: trigger.outputType,
-        sourceMetadata,
+              throw error;
+            }
+          }
+
+          // For other output types, log and return placeholder
+          console.log(
+            `[Schedule] Output type ${trigger.outputType} not fully implemented yet`
+          );
+
+          return {
+            status: "ok",
+            content: {
+              title: `${trigger.outputType} - ${new Date().toLocaleDateString()}`,
+              markdown: `*Automated ${trigger.outputType} generation is coming soon.*\n\nRepositories: ${repositories.map((r) => `${r.owner}/${r.repo}`).join(", ")}`,
+            },
+          };
+        }
+      );
+
+      if (contentResult.status === "rate_limited") {
+        const autumnClient = autumn;
+        if (aiCreditReservation.reserved && autumnClient) {
+          await context.run("refund-ai-credit-after-rate-limit", async () => {
+            const { error } = await autumnClient.track({
+              customer_id: trigger.organizationId,
+              feature_id: FEATURES.AI_CREDITS,
+              value: -1,
+            });
+
+            if (error) {
+              console.error(
+                "[Schedule] Failed to refund AI credit after rate limit",
+                {
+                  triggerId,
+                  organizationId: trigger.organizationId,
+                  error,
+                }
+              );
+            }
+          });
+        }
+
+        const delayedWorkflowRunId = await context.run<string>(
+          "reschedule-after-github-rate-limit",
+          async () =>
+            triggerScheduleNow(triggerId, {
+              delay: GITHUB_RATE_LIMIT_RETRY_DELAY,
+            })
+        );
+
+        console.warn(
+          `[Schedule] GitHub API rate limit hit for trigger ${triggerId}. Delayed workflow ${delayedWorkflowRunId} by ${GITHUB_RATE_LIMIT_RETRY_DELAY}.`,
+          {
+            retryAfterSeconds: contentResult.retryAfterSeconds,
+          }
+        );
+
+        await context.cancel();
+        return;
+      }
+
+      const content = contentResult.content;
+
+      const postId = await context.run<string>("save-post", async () => {
+        const id = nanoid();
+        const lookbackRange = resolveLookbackRange(lookbackWindow);
+
+        const sourceMetadata: PostSourceMetadata = {
+          triggerId: trigger.id,
+          triggerSourceType: trigger.sourceType,
+          repositories: repositories.map((r) => ({
+            owner: r.owner,
+            repo: r.repo,
+          })),
+          lookbackWindow,
+          lookbackRange: {
+            start: lookbackRange.start.toISOString(),
+            end: lookbackRange.end.toISOString(),
+          },
+        };
+
+        await db.insert(posts).values({
+          id,
+          organizationId: trigger.organizationId,
+          title: content.title,
+          content: content.markdown,
+          markdown: content.markdown,
+          contentType: trigger.outputType,
+          sourceMetadata,
+        });
+
+        return id;
       });
 
-      return id;
-    });
-
-    await context.run("track-content-created", async () => {
-      await trackScheduledContentCreated({
-        triggerId: trigger.id,
-        organizationId: trigger.organizationId,
-        postId,
-        outputType: trigger.outputType,
-        lookbackWindow,
-        repositoryCount: repositories.length,
+      await context.run("track-content-created", async () => {
+        await trackScheduledContentCreated({
+          triggerId: trigger.id,
+          organizationId: trigger.organizationId,
+          postId,
+          outputType: trigger.outputType,
+          lookbackWindow,
+          repositoryCount: repositories.length,
+        });
       });
-    });
 
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[Schedule] Created post ${postId} for trigger ${triggerId}`);
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `[Schedule] Created post ${postId} for trigger ${triggerId}`
+        );
+      }
+
+      return { success: true, triggerId, postId };
+    } catch (error) {
+      const autumnClient = autumn;
+      if (aiCreditReservation.reserved && autumnClient) {
+        await context.run("refund-ai-credit-after-failure", async () => {
+          const { error: refundError } = await autumnClient.track({
+            customer_id: trigger.organizationId,
+            feature_id: FEATURES.AI_CREDITS,
+            value: -1,
+          });
+
+          if (refundError) {
+            console.error(
+              "[Schedule] Failed to refund AI credit after failure",
+              {
+                triggerId,
+                organizationId: trigger.organizationId,
+                error: refundError,
+              }
+            );
+          }
+        });
+      }
+
+      throw error;
     }
-
-    return { success: true, triggerId, postId };
   },
   {
     baseUrl: getBaseUrl(),
