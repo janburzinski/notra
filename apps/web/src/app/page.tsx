@@ -24,7 +24,7 @@ export default function LandingPage() {
               <br />
               into publish-ready content
             </div>
-            <div className="flex w-full max-w-[31.63rem] flex-col justify-center px-2 text-center font-medium font-sans text-foreground/80 text-sm leading-[1.4] sm:px-4 sm:text-lg sm:leading-[1.45] md:px-0 md:text-xl md:leading-normal lg:text-lg lg:leading-7">
+            <div className="flex w-full max-w-[31.63rem] flex-col justify-center text-balance px-2 text-center font-medium font-sans text-foreground/80 text-sm leading-[1.4] sm:px-4 sm:text-lg sm:leading-[1.45] md:px-0 md:text-xl md:leading-normal lg:text-lg lg:leading-7">
               Notra connects to GitHub, Linear
               <br className="hidden sm:block" />
               and Slack to turn shipped work into ready-to-publish content.
