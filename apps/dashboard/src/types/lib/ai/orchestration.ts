@@ -55,8 +55,7 @@ export interface ToolSet {
 }
 
 export interface RepoContext {
-  owner: string;
-  repo: string;
+  integrationId: string;
 }
 
 export interface OrchestrateInput {

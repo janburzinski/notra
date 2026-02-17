@@ -44,6 +44,12 @@ export async function generateChangelog(
     promptInput,
   } = options;
 
+  if (!repositories || repositories.length === 0) {
+    throw new Error(
+      "At least one repository must be provided to generate a changelog."
+    );
+  }
+
   const model = wrapLanguageModel({
     model: withSupermemory(
       gateway("anthropic/claude-haiku-4.5"),
@@ -59,6 +65,10 @@ export async function generateChangelog(
   const instructions = promptFactory();
   const prompt = getChangelogUserPrompt(promptInput);
 
+  const allowedIntegrationIds = Array.from(
+    new Set(repositories.map((repo) => repo.integrationId))
+  );
+
   const agent = new ToolLoopAgent({
     model,
     output: Output.object({
@@ -67,15 +77,15 @@ export async function generateChangelog(
     tools: {
       getPullRequests: createGetPullRequestsTool({
         organizationId,
-        allowedRepositories: repositories,
+        allowedIntegrationIds,
       }),
       getReleaseByTag: createGetReleaseByTagTool({
         organizationId,
-        allowedRepositories: repositories,
+        allowedIntegrationIds,
       }),
       getCommitsByTimeframe: createGetCommitsByTimeframeTool({
         organizationId,
-        allowedRepositories: repositories,
+        allowedIntegrationIds,
       }),
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),

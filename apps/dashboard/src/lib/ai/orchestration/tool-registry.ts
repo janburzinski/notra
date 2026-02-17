@@ -47,27 +47,25 @@ export function buildToolSet(params: BuildToolSetParams): ToolSet {
   );
 
   if (hasGitHub) {
-    const allowedRepositories = validatedIntegrations.flatMap((integration) =>
-      integration.type === "github"
-        ? integration.repositories.map((repository) => ({
-            owner: repository.owner,
-            repo: repository.repo,
-            defaultBranch: repository.defaultBranch,
-          }))
-        : []
+    const allowedIntegrationIds = Array.from(
+      new Set(
+        validatedIntegrations
+          .filter((integration) => integration.type === "github")
+          .map((integration) => integration.id)
+      )
     );
 
     tools.getPullRequests = createGetPullRequestsTool({
       organizationId,
-      allowedRepositories,
+      allowedIntegrationIds,
     });
     tools.getReleaseByTag = createGetReleaseByTagTool({
       organizationId,
-      allowedRepositories,
+      allowedIntegrationIds,
     });
     tools.getCommitsByTimeframe = createGetCommitsByTimeframeTool({
       organizationId,
-      allowedRepositories,
+      allowedIntegrationIds,
     });
 
     const repos = getGitHubRepoList(validatedIntegrations);
@@ -94,13 +92,11 @@ function getGitHubRepoList(integrations: ValidatedIntegration[]): string {
 export function getRepoContextFromIntegrations(
   integrations: ValidatedIntegration[]
 ): RepoContext[] {
-  const repos: RepoContext[] = [];
-  for (const integration of integrations) {
-    if (integration.type === "github") {
-      for (const repo of integration.repositories) {
-        repos.push({ owner: repo.owner, repo: repo.repo });
-      }
-    }
-  }
-  return repos;
+  return Array.from(
+    new Set(
+      integrations
+        .filter((integration) => integration.type === "github")
+        .map((integration) => integration.id)
+    )
+  ).map((integrationId) => ({ integrationId }));
 }

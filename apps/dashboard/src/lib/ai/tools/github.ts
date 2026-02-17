@@ -1,7 +1,7 @@
 import { type Tool, tool } from "ai";
 import z from "zod";
 import { createOctokit } from "@/lib/octokit";
-import { getTokenForRepository } from "@/lib/services/github-integration";
+import { getGitHubToolRepositoryContextByIntegrationId } from "@/lib/services/github-integration";
 import type {
   ErrorWithStatus,
   GitHubToolsAccessConfig,
@@ -137,27 +137,36 @@ async function withGitHubRateLimitHandling<T>(operation: () => Promise<T>) {
   }
 }
 
-function isRepositoryAllowed(
-  owner: string,
-  repo: string,
-  allowedRepositories?: Array<{
-    owner: string;
-    repo: string;
-    defaultBranch?: string | null;
-  }>
-) {
-  if (!allowedRepositories?.length) {
-    return true;
-  }
+function createIntegrationContextResolver(config?: GitHubToolsAccessConfig) {
+  const cache = new Map<
+    string,
+    Promise<
+      Awaited<ReturnType<typeof getGitHubToolRepositoryContextByIntegrationId>>
+    >
+  >();
 
-  const normalizedOwner = owner.toLowerCase();
-  const normalizedRepo = repo.toLowerCase();
+  return async (integrationId: string) => {
+    if (
+      config?.allowedIntegrationIds !== undefined &&
+      !config.allowedIntegrationIds.includes(integrationId)
+    ) {
+      throw new Error(
+        `Repository access denied. Integration ID ${integrationId} is not in the allowed list.`
+      );
+    }
 
-  return allowedRepositories.some(
-    (allowedRepo) =>
-      allowedRepo.owner.toLowerCase() === normalizedOwner &&
-      allowedRepo.repo.toLowerCase() === normalizedRepo
-  );
+    let cached = cache.get(integrationId);
+    if (!cached) {
+      cached = getGitHubToolRepositoryContextByIntegrationId(integrationId, {
+        organizationId: config?.organizationId,
+      });
+      cache.set(integrationId, cached);
+      cached.catch(() => {
+        cache.delete(integrationId);
+      });
+    }
+    return cached;
+  };
 }
 
 function getNextPageFromLinkHeader(
@@ -183,18 +192,6 @@ function getNextPageFromLinkHeader(
   }
 }
 
-function assertRepositoryAccess(
-  owner: string,
-  repo: string,
-  config?: GitHubToolsAccessConfig
-) {
-  if (!isRepositoryAllowed(owner, repo, config?.allowedRepositories)) {
-    throw new Error(
-      `Repository access denied for ${owner}/${repo}. This repository is not available in your current integration context.`
-    );
-  }
-}
-
 export function createGetPullRequestsTool(
   config?: GitHubToolsAccessConfig
 ): Tool {
@@ -202,6 +199,7 @@ export function createGetPullRequestsTool(
     organizationId: config?.organizationId,
     namespace: "github",
   });
+  const resolveIntegrationContext = createIntegrationContextResolver(config);
 
   return cached(
     tool({
@@ -211,29 +209,24 @@ export function createGetPullRequestsTool(
           "Gets the full details of a specific pull request from a GitHub repository including title, description, status, author, reviewers, and merge info.",
         whenToUse:
           "When user asks about a specific PR, wants to see PR details, needs to check PR status, or references a pull request by number.",
-        usageNotes: `Requires the repository owner, repo name, and PR number.
+        usageNotes: `Requires integrationId and PR number.
 Returns comprehensive PR data including diff stats, labels, and review state.`,
       }),
       inputSchema: z.object({
-        repo: z
+        integrationId: z
           .string()
-          .describe("The name of the repository to get the pull requests for"),
-        owner: z.string().describe("The owner of the repository"),
+          .describe("The integration ID for the configured repository"),
         pull_number: z
           .number()
           .describe("The number of the pull request to get the details for"),
       }),
-      execute: async ({ repo, owner, pull_number }) => {
-        assertRepositoryAccess(owner, repo, config);
-
-        const token = await getTokenForRepository(owner, repo, {
-          organizationId: config?.organizationId,
-        });
-        const octokit = createOctokit(token);
+      execute: async ({ integrationId, pull_number }) => {
+        const resolved = await resolveIntegrationContext(integrationId);
+        const octokit = createOctokit(resolved.token);
         const pullRequest = await withGitHubRateLimitHandling(() =>
           octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
-            owner,
-            repo,
+            owner: resolved.owner,
+            repo: resolved.repo,
             pull_number,
             headers: {
               "X-GitHub-Api-Version": "2022-11-28",
@@ -248,12 +241,11 @@ Returns comprehensive PR data including diff stats, labels, and review state.`,
       // mostly re-request the same PR within a short time window.
       ttl: 10 * 60 * 1000,
       keyGenerator: (params: unknown) => {
-        const { owner, repo, pull_number } = params as {
-          owner: string;
-          repo: string;
+        const { integrationId, pull_number } = params as {
+          integrationId: string;
           pull_number: number;
         };
-        return `get_pull_requests:${owner.toLowerCase()}/${repo.toLowerCase()}#${String(pull_number)}`;
+        return `get_pull_requests:integration=${integrationId}#${String(pull_number)}`;
       },
     }
   );
@@ -266,6 +258,7 @@ export function createGetReleaseByTagTool(
     organizationId: config?.organizationId,
     namespace: "github",
   });
+  const resolveIntegrationContext = createIntegrationContextResolver(config);
 
   return cached(
     tool({
@@ -279,10 +272,9 @@ export function createGetReleaseByTagTool(
 Returns release body (changelog), assets list, author, and timestamps.`,
       }),
       inputSchema: z.object({
-        repo: z
+        integrationId: z
           .string()
-          .describe("The name of the repository to get the releases for"),
-        owner: z.string().describe("The owner of the repository"),
+          .describe("The integration ID for the configured repository"),
         tag: z
           .string()
           .default("latest")
@@ -290,17 +282,13 @@ Returns release body (changelog), assets list, author, and timestamps.`,
             "The tag of the release to get the details for. Use 'latest' if you don't know the tag"
           ),
       }),
-      execute: async ({ repo, owner, tag }) => {
-        assertRepositoryAccess(owner, repo, config);
-
-        const token = await getTokenForRepository(owner, repo, {
-          organizationId: config?.organizationId,
-        });
-        const octokit = createOctokit(token);
+      execute: async ({ integrationId, tag }) => {
+        const resolved = await resolveIntegrationContext(integrationId);
+        const octokit = createOctokit(resolved.token);
         const releases = await withGitHubRateLimitHandling(() =>
           octokit.request("GET /repos/{owner}/{repo}/releases/tags/{tag}", {
-            owner,
-            repo,
+            owner: resolved.owner,
+            repo: resolved.repo,
             tag,
             headers: {
               "X-GitHub-Api-Version": "2022-11-28",
@@ -313,12 +301,11 @@ Returns release body (changelog), assets list, author, and timestamps.`,
     {
       ttl: 30 * 60 * 1000,
       keyGenerator: (params: unknown) => {
-        const { owner, repo, tag } = params as {
-          owner: string;
-          repo: string;
+        const { integrationId, tag } = params as {
+          integrationId: string;
           tag?: string;
         };
-        return `get_release_by_tag:${owner.toLowerCase()}/${repo.toLowerCase()}@${String(tag ?? "latest").toLowerCase()}`;
+        return `get_release_by_tag:integration=${integrationId}@${String(tag ?? "latest").toLowerCase()}`;
       },
     }
   );
@@ -337,6 +324,7 @@ export function createGetCommitsByTimeframeTool(
     organizationId: config?.organizationId,
     namespace: "github",
   });
+  const resolveIntegrationContext = createIntegrationContextResolver(config);
 
   return cached(
     tool({
@@ -350,43 +338,34 @@ export function createGetCommitsByTimeframeTool(
 Use this for activity summaries, changelog generation, or understanding recent changes.`,
       }),
       inputSchema: z.object({
-        owner: z.string().describe("The owner of the repository"),
-        repo: z.string().describe("The name of the repository"),
+        integrationId: z
+          .string()
+          .describe("The integration ID for the configured repository"),
         page: z
           .number()
           .int()
           .min(1)
           .default(1)
           .describe("The page number to retrieve (starts at 1)"),
-        branch: z
-          .string()
-          .describe(
-            "The branch to retrieve commits from. If not provided, the default branch will be used."
-          )
-          .optional(),
         days: z
           .number()
           .default(7)
           .describe("How many days of commit history to retrieve"),
       }),
-      execute: async ({ owner, repo, days, page, branch }) => {
-        assertRepositoryAccess(owner, repo, config);
+      execute: async ({ integrationId, days, page }) => {
+        const resolved = await resolveIntegrationContext(integrationId);
 
-        const token = await getTokenForRepository(owner, repo, {
-          organizationId: config?.organizationId,
-        });
-        const octokit = createOctokit(token);
+        const octokit = createOctokit(resolved.token);
         const since = getISODateFromDaysAgo(days);
         // TODO: We need an actual todo date in the future to allow for more flexible timeframes
         const until = new Date().toISOString();
-
         const response = await withGitHubRateLimitHandling(() =>
           octokit.request("GET /repos/{owner}/{repo}/commits", {
-            owner,
-            repo,
+            owner: resolved.owner,
+            repo: resolved.repo,
             since,
             page,
-            ...(branch ? { sha: branch } : {}),
+            ...(resolved.defaultBranch ? { sha: resolved.defaultBranch } : {}),
             until,
             per_page: 100,
             headers: {
@@ -413,13 +392,13 @@ Use this for activity summaries, changelog generation, or understanding recent c
       // still eliminating duplicate calls within a single agent run.
       ttl: 2 * 60 * 1000,
       keyGenerator: (params: unknown) => {
-        const { owner, repo, days, page } = params as {
-          owner: string;
-          repo: string;
+        const { integrationId, days, page } = params as {
+          integrationId: string;
           days: number;
           page?: number;
         };
-        return `get_commits_by_timeframe:${owner.toLowerCase()}/${repo.toLowerCase()}:days=${String(days)}:page=${String(page ?? 1)}`;
+
+        return `get_commits_by_timeframe:integration=${integrationId}:days=${String(days)}:page=${String(page ?? 1)}`;
       },
     }
   );

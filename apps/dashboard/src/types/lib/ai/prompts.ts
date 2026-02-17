@@ -20,7 +20,9 @@ export interface TextSelection {
 
 export interface ContentEditorChatPromptParams {
   selection?: TextSelection;
-  repoContext?: { owner: string; repo: string }[];
+  repoContext?: Array<{
+    integrationId: string;
+  }>;
   toolDescriptions?: string[];
   hasGitHubEnabled?: boolean;
 }

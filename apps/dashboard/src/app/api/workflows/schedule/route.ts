@@ -8,6 +8,7 @@ import {
   posts,
 } from "@notra/db/schema";
 import type { WorkflowContext } from "@upstash/workflow";
+import { WorkflowAbort } from "@upstash/workflow";
 import { serve } from "@upstash/workflow/nextjs";
 import { eq, inArray } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
@@ -297,18 +298,17 @@ export const { POST } = serve<SchedulePayload>(
             const lookbackRange = resolveLookbackRange(lookbackWindow);
             const todayUtc = formatUtcTodayContext(lookbackRange.end);
             const repoList = repositories
-              .map(
-                (r) =>
-                  `${r.owner}/${r.repo} (branch: ${r.defaultBranch ?? "No branch Provided"})`
-              )
+              .map((r) => `integrationId: ${r.id}`)
               .join(", ");
 
             try {
               const { output } = await generateChangelog({
                 organizationId: trigger.organizationId,
                 repositories: repositories.map((repository) => ({
+                  integrationId: repository.id,
                   owner: repository.owner,
                   repo: repository.repo,
+                  defaultBranch: repository.defaultBranch,
                 })),
                 tone: getValidToneProfile(brand?.toneProfile, "Conversational"),
                 promptInput: {
@@ -432,16 +432,24 @@ export const { POST } = serve<SchedulePayload>(
 
         return id;
       });
-
       await context.run("track-content-created", async () => {
-        await trackScheduledContentCreated({
-          triggerId: trigger.id,
-          organizationId: trigger.organizationId,
-          postId,
-          outputType: trigger.outputType,
-          lookbackWindow,
-          repositoryCount: repositories.length,
-        });
+        try {
+          await trackScheduledContentCreated({
+            triggerId: trigger.id,
+            organizationId: trigger.organizationId,
+            postId,
+            outputType: trigger.outputType,
+            lookbackWindow,
+            repositoryCount: repositories.length,
+          });
+        } catch (trackingError) {
+          console.error("[Schedule] Failed to track content creation", {
+            triggerId,
+            organizationId: trigger.organizationId,
+            postId,
+            error: trackingError,
+          });
+        }
       });
 
       if (process.env.NODE_ENV === "development") {
@@ -452,6 +460,10 @@ export const { POST } = serve<SchedulePayload>(
 
       return { success: true, triggerId, postId };
     } catch (error) {
+      if (error instanceof WorkflowAbort) {
+        throw error;
+      }
+
       const autumnClient = autumn;
       if (aiCreditReservation.reserved && autumnClient) {
         await context.run("refund-ai-credit-after-failure", async () => {
