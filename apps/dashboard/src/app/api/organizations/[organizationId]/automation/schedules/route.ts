@@ -172,6 +172,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
               id: githubIntegrations.id,
               owner: githubIntegrations.owner,
               repo: githubIntegrations.repo,
+              defaultBranch: githubIntegrations.defaultBranch,
             })
             .from(githubIntegrations)
             .where(inArray(githubIntegrations.id, allRepositoryIds))
@@ -182,7 +183,9 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         .filter((repository) => repository.owner && repository.repo)
         .map((repository) => [
           repository.id,
-          `${repository.owner}/${repository.repo}`,
+          repository.defaultBranch?.trim()
+            ? `${repository.owner}/${repository.repo} · ${repository.defaultBranch.trim()}`
+            : `${repository.owner}/${repository.repo}`,
         ])
     );
 
