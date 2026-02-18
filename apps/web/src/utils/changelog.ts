@@ -53,6 +53,15 @@ export const CHANGELOG_COMPANIES = [
     url: "https://marblecms.com",
     accentColor: "#202027",
   },
+  {
+    slug: "neon",
+    name: "Neon",
+    domain: "neon.tech",
+    description:
+      "Serverless Postgres built for developers, with instant branching, autoscaling, and modern workflows for database-backed applications.",
+    url: "https://neon.tech",
+    accentColor: "#37C38F",
+  },
 ] as const;
 
 export function getCompany(slug: string) {

@@ -3,6 +3,7 @@ import { Cal } from "@notra/ui/components/ui/svgs/cal";
 import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { Langfuse } from "@notra/ui/components/ui/svgs/langfuse";
 import { Marble } from "@notra/ui/components/ui/svgs/marble";
+import { Neon } from "@notra/ui/components/ui/svgs/neon";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -26,6 +27,7 @@ const COMPANY_ICONS: Record<string, ReactNode> = {
     />
   ),
   marble: <Marble className="size-5 rounded" />,
+  neon: <Neon className="size-5 rounded" />,
 };
 
 const title = "Example Changelogs | Notra";
