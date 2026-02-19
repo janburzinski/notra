@@ -9,11 +9,11 @@ import {
   organizationNotificationSettings,
   organizations,
 } from "@notra/db/schema";
+import { getResend } from "@notra/email";
 import type { WorkflowContext } from "@upstash/workflow";
 import { WorkflowAbort } from "@upstash/workflow";
 import { serve } from "@upstash/workflow/nextjs";
 import { and, eq, inArray } from "drizzle-orm";
-import { Resend } from "resend";
 import { z } from "zod";
 import { generateChangelog } from "@/lib/ai/agents/changelog";
 import { isGitHubRateLimitError } from "@/lib/ai/tools/github";
@@ -544,12 +544,11 @@ export const { POST } = serve<SchedulePayload>(
           failureNotificationData.ownerEmails.length > 0
         ) {
           await context.run("send-failure-notification-emails", async () => {
-            const resendApiKey = process.env.RESEND_API_KEY;
-            if (!resendApiKey) {
+            const resend = getResend();
+            if (!resend) {
               return;
             }
 
-            const resend = new Resend(resendApiKey);
             const scheduleName = trigger.name.trim() || trigger.outputType;
 
             await Promise.allSettled(
@@ -657,15 +656,13 @@ export const { POST } = serve<SchedulePayload>(
 
       if (notificationData.enabled && notificationData.ownerEmails.length > 0) {
         await context.run("send-notification-emails", async () => {
-          const resendApiKey = process.env.RESEND_API_KEY;
-          if (!resendApiKey) {
+          const resend = getResend();
+          if (!resend) {
             console.warn(
               "[Schedule] Resend API key not configured, skipping notification emails"
             );
             return;
           }
-
-          const resend = new Resend(resendApiKey);
           const baseUrl =
             process.env.BETTER_AUTH_URL ?? "https://app.usenotra.com";
           const contentLink = `${baseUrl}/${notificationData.organizationSlug}/content/${postId}`;

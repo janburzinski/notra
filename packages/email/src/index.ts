@@ -6,3 +6,4 @@ export * from "./emails/verify";
 export * from "./emails/welcome";
 export * from "./utils/config";
 export * from "./utils/dev";
+export * from "./utils/resend";

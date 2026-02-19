@@ -1,8 +1,7 @@
 "use server";
 
-import { EMAIL_CONFIG, sendDevEmail } from "@notra/email";
+import { EMAIL_CONFIG, getResend, sendDevEmail } from "@notra/email";
 import { headers } from "next/headers";
-import { Resend } from "resend";
 import type {
   SendInviteEmailProps,
   SendResetPasswordProps,
@@ -17,9 +16,8 @@ import {
   sendWelcomeEmail,
 } from "./send";
 
-const resendApiKey = process.env.RESEND_API_KEY;
 const isDevelopment = process.env.NODE_ENV === "development";
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const resend = getResend();
 
 export async function sendInviteEmailAction({
   inviteeEmail,
