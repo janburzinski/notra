@@ -1,4 +1,3 @@
-import { db } from "@notra/db/drizzle";
 import { and, count, eq } from "@notra/db/operators";
 import { posts } from "@notra/db/schema";
 import type { UnkeyContext } from "@unkey/hono";
@@ -14,6 +13,16 @@ import {
 } from "../utils/unkey";
 
 export const contentRoutes = new Hono<{ Variables: { unkey: UnkeyContext } }>();
+
+let dbPromise: Promise<typeof import("@notra/db/drizzle").db> | null = null;
+
+const getDb = async () => {
+  if (!dbPromise) {
+    dbPromise = import("@notra/db/drizzle").then((module) => module.db);
+  }
+
+  return dbPromise;
+};
 
 contentRoutes.use("*", async (c, next) => {
   const keyInfo = c.get("unkey");
@@ -56,6 +65,7 @@ contentRoutes.get("/:organizationId/posts", async (c) => {
 
   const { limit, page, sort } = queryValidation.data;
   const offset = (page - 1) * limit;
+  const db = await getDb();
 
   const [countResult] = await db
     .select({ totalItems: count(posts.id) })
@@ -117,6 +127,7 @@ contentRoutes.get("/:organizationId/posts/:postId", async (c) => {
   ) {
     return c.json({ error: "Forbidden: organization access denied" }, 403);
   }
+  const db = await getDb();
 
   const post = await db.query.posts.findFirst({
     where: and(
