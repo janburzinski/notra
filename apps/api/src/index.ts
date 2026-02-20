@@ -1,7 +1,7 @@
 import { type UnkeyContext, unkey } from "@unkey/hono";
 import { Hono } from "hono";
 import { trimTrailingSlash } from "hono/trailing-slash";
-import { contentRoutes } from "./routes/content";
+import { contentRoutes } from "./routes/content.js";
 
 const app = new Hono<{ Variables: { unkey: UnkeyContext } }>({ strict: true });
 
