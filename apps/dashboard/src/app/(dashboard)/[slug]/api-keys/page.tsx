@@ -184,7 +184,7 @@ function ApiKeysTableContent({
           className="h-24 text-center text-muted-foreground"
           colSpan={6}
         >
-          Loading...
+          Loading…
         </TableCell>
       </TableRow>
     );
@@ -207,7 +207,7 @@ function ApiKeysTableContent({
     <TableRow key={apiKey.keyId}>
       <TableCell className="font-medium">{apiKey.name}</TableCell>
       <TableCell className="font-mono text-muted-foreground text-sm">
-        {apiKey.start}...
+        {apiKey.start}…
       </TableCell>
       <TableCell>{formatPermissionLabel(apiKey)}</TableCell>
       <TableCell className="text-muted-foreground text-sm">
@@ -727,7 +727,7 @@ export default function ApiKeysPage() {
                         }}
                         type="button"
                       >
-                        {mutation.isPending ? "Creating..." : "Create Key"}
+                        {mutation.isPending ? "Creating…" : "Create Key"}
                       </Button>
                     )}
                   </form.Subscribe>
@@ -852,7 +852,7 @@ export default function ApiKeysPage() {
                 render={<Button variant="outline">Cancel</Button>}
               />
               <Button disabled={editMutation.isPending} type="submit">
-                {editMutation.isPending ? "Saving..." : "Save Changes"}
+                {editMutation.isPending ? "Saving…" : "Save Changes"}
               </Button>
             </ResponsiveDialogFooter>
           </form>
@@ -888,7 +888,7 @@ export default function ApiKeysPage() {
                 deleteMutation.mutate(deletingKey.keyId);
               }}
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete API Key"}
+              {deleteMutation.isPending ? "Deleting…" : "Delete API Key"}
             </ResponsiveAlertDialogAction>
           </ResponsiveAlertDialogFooter>
         </ResponsiveAlertDialogContent>
