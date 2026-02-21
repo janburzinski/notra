@@ -46,7 +46,6 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "https://usenotra.com/changelog" },
   openGraph: {
     title,
     description,
