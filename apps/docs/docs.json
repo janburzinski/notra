@@ -60,6 +60,7 @@
         "pages": [
           "GET /v1/{organizationId}/posts",
           "GET /v1/{organizationId}/posts/{postId}",
+          "api/authentication",
           "api/pagination",
           "api/types"
         ]
