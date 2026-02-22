@@ -49,16 +49,13 @@ API keys are powered by [Unkey](https://unkey.com/).
 
 Include your API key in the `Authorization` header using the `Bearer` scheme:
 
-<Tabs>
-<Tab title="cURL">
-```bash
+<CodeGroup>
+```bash cURL
 curl -H "Authorization: Bearer YOUR_API_KEY" \
   "https://api.usenotra.com/v1/YOUR_ORGANIZATION_ID/posts/"
 ```
-</Tab>
 
-<Tab title="JavaScript">
-```javascript
+```typescript TypeScript
 const response = await fetch(
   "https://api.usenotra.com/v1/YOUR_ORGANIZATION_ID/posts/",
   {
@@ -70,8 +67,7 @@ const response = await fetch(
 const data = await response.json();
 console.log(data);
 ```
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ## Available Endpoints
 
