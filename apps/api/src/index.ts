@@ -54,7 +54,7 @@ app.doc31("/openapi.json", (_c) => ({
     {
       url: "https://api.usenotra.com",
       description: "Production",
-    }
+    },
   ],
   security: [{ BearerAuth: [] }],
   tags: [
