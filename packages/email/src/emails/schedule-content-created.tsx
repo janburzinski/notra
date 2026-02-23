@@ -25,6 +25,13 @@ interface ScheduledContentCreatedEmailProps {
   organizationSlug: string;
 }
 
+const CONTENT_TYPE_MAP: Record<string, string> = {
+  changelog: "Changelog",
+  linkedin_post: "LinkedIn Post",
+  twitter_post: "Twitter Post",
+  investor_update: "Investor Update",
+};
+
 export const ScheduledContentCreatedEmail = ({
   organizationName = "Acme Inc",
   scheduleName = "Weekly Product Updates",
@@ -59,7 +66,7 @@ export const ScheduledContentCreatedEmail = ({
             <Text className="text-center text-[#737373] text-base leading-relaxed">
               Your <strong>{scheduleName}</strong> schedule in{" "}
               <strong>{organizationName}</strong> just created a new{" "}
-              <strong>{contentType}</strong> draft.
+              <strong>{CONTENT_TYPE_MAP[contentType]}</strong> draft.
             </Text>
 
             <Section className="mt-8">

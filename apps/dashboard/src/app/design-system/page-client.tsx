@@ -378,7 +378,7 @@ export default function DesignSystemClientPage() {
           <h1 className="font-semibold text-3xl tracking-tight">
             Notra UI Preview
           </h1>
-          <SidebarProvider className="!min-h-0 w-auto" defaultOpen={false}>
+          <SidebarProvider className="min-h-0! w-auto" defaultOpen={false}>
             <ThemeToggle />
           </SidebarProvider>
         </div>
