@@ -54,7 +54,9 @@ const nextConfig: NextConfig = {
     remotePatterns: process.env.CLOUDFLARE_PUBLIC_URL
       ? [
           {
-            protocol: new URL(process.env.CLOUDFLARE_PUBLIC_URL).protocol.replace(":", "") as "https" | "http",
+            protocol: new URL(
+              process.env.CLOUDFLARE_PUBLIC_URL
+            ).protocol.replace(":", "") as "https" | "http",
             hostname: new URL(process.env.CLOUDFLARE_PUBLIC_URL).hostname,
           },
         ]
