@@ -21,7 +21,7 @@ export function getFormalLinkedInPrompt(): string {
     - Focus on outcomes, metrics, and strategic alignment.
     - Keep the post between 150-300 words for optimal engagement.
     - Use line breaks strategically to improve readability.
-    - Do not use hashtags excessively (max 3-4 relevant ones at the end).
+    - Do not use hashtags unless absolutely necessary.
     - Do not include PR numbers or GitHub links - this is an executive communication.
     - Do not include individual author attributions.
     - Open with a clear statement of significance.
@@ -101,7 +101,7 @@ export function getFormalLinkedInPrompt(): string {
     - Frame updates in terms of organizational outcomes and strategic value
     - Use strategic line breaks for readability
     - Close with forward-looking strategic implications
-    - Include 3-4 relevant professional hashtags at the end
+    - Do not include hashtags unless absolutely necessary
     - Be between 150-300 words total
 
     CRITICAL: You MUST call createPost to save the post. Do not return the content as text output.

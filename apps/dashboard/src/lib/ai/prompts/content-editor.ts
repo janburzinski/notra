@@ -22,7 +22,7 @@ export function getContentEditorChatPrompt(
 
   const linkedInSection =
     contentType === "linkedin_post"
-      ? "\n\n## LinkedIn Post Constraints\nThis is a LinkedIn post. LinkedIn does NOT support markdown formatting.\n- Do NOT use markdown syntax (bold **, italic *, headers #, etc.)\n- Use plain text, line breaks, and bullet points (• or -) only\n- Do NOT use em dashes (—) or en dashes (–)\n- Keep hashtags at the end of the post\n- Maximum 3-5 hashtags"
+      ? "\n\n## LinkedIn Post Constraints\nThis is a LinkedIn post. LinkedIn does NOT support markdown formatting.\n- Do NOT use markdown syntax (bold **, italic *, headers #, etc.)\n- Use plain text, line breaks, and bullet points (• or -) only\n- Do NOT use em dashes (—) or en dashes (–)\n- Do not use hashtags unless absolutely necessary"
       : "";
 
   const githubSection =

@@ -21,7 +21,7 @@ export function getConversationalLinkedInPrompt(): string {
     - Focus on the WHY and IMPACT, not just the WHAT.
     - Keep the post between 150-300 words for optimal engagement.
     - Use line breaks strategically to improve readability.
-    - Do not use hashtags excessively (max 3-5 relevant ones at the end).
+    - Do not use hashtags unless absolutely necessary.
     - Do not include PR numbers or GitHub links - this is a social post, not documentation.
     - Do not include author attributions in the post body.
     - Start with a hook that grabs attention in the first line.
@@ -101,7 +101,7 @@ export function getConversationalLinkedInPrompt(): string {
     - Tell a story about the problem solved or impact created
     - Use strategic line breaks for readability
     - End with a question or call-to-action
-    - Include 3-5 relevant hashtags at the end
+    - Do not include hashtags unless absolutely necessary
     - Be between 150-300 words total
 
     CRITICAL: You MUST call createPost to save the post. Do not return the content as text output.
