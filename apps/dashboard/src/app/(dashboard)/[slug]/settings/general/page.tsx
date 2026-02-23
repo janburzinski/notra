@@ -1,5 +1,7 @@
 "use client";
 
+import { Upload01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Avatar,
   AvatarFallback,
@@ -319,12 +321,14 @@ export default function GeneralSettingsPage({ params }: PageProps) {
               />
               <button
                 aria-label="Upload organization logo"
-                className="group relative cursor-pointer disabled:cursor-not-allowed"
+                className="group group/logo relative cursor-pointer disabled:cursor-not-allowed"
                 disabled={isUploadingLogo}
                 onClick={() => logoInputRef.current?.click()}
+                onMouseEnter={(e) => e.stopPropagation()}
+                onMouseLeave={(e) => e.stopPropagation()}
                 type="button"
               >
-                <Avatar className="size-16 rounded-lg ring-2 ring-transparent transition-shadow after:rounded-lg group-hover:ring-muted-foreground/20 group-focus-visible:ring-ring">
+                <Avatar className="size-16 rounded-lg ring-2 ring-transparent transition-shadow after:rounded-lg group-hover/logo:ring-muted-foreground/20 group-focus-visible:ring-ring">
                   <AvatarImage
                     alt={organization.name}
                     className="rounded-lg"
@@ -338,6 +342,9 @@ export default function GeneralSettingsPage({ params }: PageProps) {
                       <Loader2Icon className="size-6 animate-spin" />
                     </span>
                   )}
+                  <span className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/80 opacity-0 transition-opacity group-hover/logo:opacity-100">
+                    <HugeiconsIcon className="size-6" icon={Upload01Icon} />
+                  </span>
                 </Avatar>
               </button>
               <div className="space-y-1">
