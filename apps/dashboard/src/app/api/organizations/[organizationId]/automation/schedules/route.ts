@@ -258,7 +258,6 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    // Verify all target integrations exist
     if (enabled === true && normalized.targets.repositoryIds.length > 0) {
       const targetIntegrations = await db.query.githubIntegrations.findMany({
         where: and(
@@ -302,7 +301,6 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
         const errorMessage =
           qstashError instanceof Error ? qstashError.message : "Unknown error";
 
-        // Check for invalid destination URL (common when APP_URL is not configured or unreachable)
         if (
           errorMessage.includes("invalid destination") ||
           errorMessage.includes("unable to resolve host")
@@ -461,7 +459,6 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    // If trying to enable, verify all target integrations exist
     if (enabled === true) {
       const targetIntegrations = await db.query.githubIntegrations.findMany({
         where: and(

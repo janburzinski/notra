@@ -39,7 +39,6 @@ export function IntegrationCard({
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Fetch affected schedules when delete dialog opens
   const { data: affectedSchedulesData, isLoading: isLoadingSchedules } =
     useQuery<IntegrationWithAffectedSchedules>({
       queryKey: [

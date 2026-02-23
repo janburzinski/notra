@@ -61,7 +61,6 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    // Check if caller wants to know about affected schedules
     const { searchParams } = new URL(request.url);
     const checkSchedules = searchParams.get("checkSchedules") === "true";
 
@@ -259,7 +258,6 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    // Find all schedules that use this integration
     const allSchedules = await db.query.contentTriggers.findMany({
       where: and(
         eq(contentTriggers.organizationId, organizationId),
@@ -273,7 +271,6 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
       return parsed.data.repositoryIds.includes(integrationId);
     });
 
-    // Disable affected schedules and delete their qstash schedules
     for (const schedule of affectedSchedules) {
       if (schedule.qstashScheduleId) {
         await deleteQstashSchedule(schedule.qstashScheduleId).catch((err) => {

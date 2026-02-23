@@ -243,7 +243,6 @@ export const getSchedulesQuerySchema = z.object({
 });
 export type GetSchedulesQuery = z.infer<typeof getSchedulesQuerySchema>;
 
-// Affected schedule info (returned when checking integration dependencies)
 export const affectedScheduleSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -251,7 +250,6 @@ export const affectedScheduleSchema = z.object({
 });
 export type AffectedSchedule = z.infer<typeof affectedScheduleSchema>;
 
-// Response schema for GET integration with checkSchedules=true
 export const integrationWithAffectedSchedulesSchema = z.object({
   affectedSchedules: z.array(affectedScheduleSchema).optional(),
 });
@@ -259,7 +257,6 @@ export type IntegrationWithAffectedSchedules = z.infer<
   typeof integrationWithAffectedSchedulesSchema
 >;
 
-// Response schema for DELETE integration
 export const deleteIntegrationResponseSchema = z.object({
   success: z.boolean(),
   disabledSchedules: z
