@@ -64,6 +64,18 @@
           "api/pagination",
           "api/types"
         ]
+      },
+      {
+        "group": "SDK",
+        "icon": "code",
+        "openapi": {
+          "source": "https://spec.speakeasy.com/notra/notra/notra-api-with-code-samples",
+          "directory": "sdk-reference"
+        },
+        "pages": [
+          "GET /v1/{organizationId}/posts",
+          "GET /v1/{organizationId}/posts/{postId}"
+        ]
       }
     ],
     "global": {
