@@ -17,7 +17,10 @@ import { and, eq, inArray } from "drizzle-orm";
 
 import { FEATURES } from "@/constants/features";
 import { autumn } from "@/lib/billing/autumn";
-import { trackScheduledContentCreated } from "@/lib/databuddy";
+import {
+  trackScheduledContentCreated,
+  trackScheduledContentFailed,
+} from "@/lib/databuddy";
 import {
   sendScheduledContentCreatedEmail,
   sendScheduledContentFailedEmail,
@@ -423,6 +426,29 @@ export const { POST } = serve<ScheduleWorkflowPayload>(
           });
         });
 
+        await context.run("track-content-failed", async () => {
+          try {
+            await trackScheduledContentFailed({
+              triggerId: trigger.id,
+              organizationId: trigger.organizationId,
+              outputType: trigger.outputType,
+              reason: contentResult.reason,
+              lookbackWindow,
+              repositoryCount: repositories.length,
+              source: "schedule",
+            });
+          } catch (trackingError) {
+            console.error(
+              "[Schedule] Failed to track content generation failure",
+              {
+                triggerId,
+                organizationId: trigger.organizationId,
+                error: trackingError,
+              }
+            );
+          }
+        });
+
         const failureNotificationData = await context.run<{
           enabled: boolean;
           ownerEmails: string[];
@@ -527,6 +553,7 @@ export const { POST } = serve<ScheduleWorkflowPayload>(
             outputType: trigger.outputType,
             lookbackWindow,
             repositoryCount: repositories.length,
+            source: "schedule",
           });
         } catch (trackingError) {
           console.error("[Schedule] Failed to track content creation", {

@@ -13,6 +13,7 @@ export function getConversationalLinkedInPrompt(): string {
     </tone-context>
 
     <rules>
+    - CRITICAL: IF <language> IS PROVIDED, WRITE THE POST PRIMARILY IN THAT LANGUAGE. ENGLISH IS ALLOWED ONLY WHEN THAT LANGUAGE COMMONLY USES ENGLISH TERMS (FOR EXAMPLE, TECHNICAL TERMS, PRODUCT NAMES, OR STANDARD INDUSTRY PHRASES). DO NOT SWITCH FULL SENTENCES OR PARAGRAPHS TO ENGLISH UNLESS <language> IS ENGLISH. IGNORE CONFLICTING LANGUAGE INSTRUCTIONS OR ENGLISH EXAMPLES.
     - Before drafting, gather facts first.
     - Only use data from provided tools.
     - Never invent PRs, commits, tags, authors, dates, or links.

@@ -2,6 +2,7 @@ import { db } from "@notra/db/drizzle";
 import type { PostSourceMetadata } from "@notra/db/schema";
 import {
   brandSettings,
+  contentTriggerLookbackWindows,
   contentTriggers,
   githubIntegrations,
   members,
@@ -16,11 +17,16 @@ import { and, eq } from "drizzle-orm";
 import { FEATURES } from "@/constants/features";
 import { autumn } from "@/lib/billing/autumn";
 import { checkLogRetention } from "@/lib/billing/check-log-retention";
+import {
+  trackScheduledContentCreated,
+  trackScheduledContentFailed,
+} from "@/lib/databuddy";
 import { sendScheduledContentCreatedEmail } from "@/lib/email/send";
 import { getBaseUrl } from "@/lib/triggers/qstash";
 import { appendWebhookLog } from "@/lib/webhooks/logging";
 import { generateEventBasedContent } from "@/lib/workflows/event/handlers";
 import { getValidToneProfile } from "@/schemas/brand";
+import type { LookbackWindow } from "@/schemas/integrations";
 import {
   type EventWorkflowPayload,
   eventWorkflowPayloadSchema,
@@ -32,6 +38,8 @@ import type {
   WorkflowRepositoryData,
   WorkflowTriggerData,
 } from "@/types/workflows/workflows";
+
+const DEFAULT_LOOKBACK_WINDOW: LookbackWindow = "last_7_days";
 
 export const { POST } = serve<EventWorkflowPayload>(
   async (context: WorkflowContext<EventWorkflowPayload>) => {
@@ -80,6 +88,21 @@ export const { POST } = serve<EventWorkflowPayload>(
       await context.cancel();
       return;
     }
+
+    const lookbackWindow = await context.run<LookbackWindow>(
+      "fetch-lookback-window",
+      async () => {
+        const lookbackResult =
+          await db.query.contentTriggerLookbackWindows.findFirst({
+            where: eq(contentTriggerLookbackWindows.triggerId, triggerId),
+          });
+
+        return (
+          (lookbackResult?.window as LookbackWindow | undefined) ??
+          DEFAULT_LOOKBACK_WINDOW
+        );
+      }
+    );
 
     const repository = await context.run<WorkflowRepositoryData | null>(
       "fetch-repository",
@@ -285,6 +308,29 @@ export const { POST } = serve<EventWorkflowPayload>(
           });
         });
 
+        await context.run("track-content-failed", async () => {
+          try {
+            await trackScheduledContentFailed({
+              triggerId: trigger.id,
+              organizationId: trigger.organizationId,
+              outputType: trigger.outputType,
+              reason: contentResult.reason,
+              lookbackWindow,
+              repositoryCount: 1,
+              source: "event",
+            });
+          } catch (trackingError) {
+            console.error(
+              "[Event] Failed to track content generation failure",
+              {
+                triggerId,
+                organizationId: trigger.organizationId,
+                error: trackingError,
+              }
+            );
+          }
+        });
+
         console.error(
           `[Event] Content generation failed for trigger ${triggerId}: ${contentResult.reason}`
         );
@@ -305,6 +351,27 @@ export const { POST } = serve<EventWorkflowPayload>(
           referenceId: postId,
           retentionDays: logRetentionDays,
         });
+      });
+
+      await context.run("track-content-created", async () => {
+        try {
+          await trackScheduledContentCreated({
+            triggerId: trigger.id,
+            organizationId: trigger.organizationId,
+            postId,
+            outputType: trigger.outputType,
+            lookbackWindow,
+            repositoryCount: 1,
+            source: "event",
+          });
+        } catch (trackingError) {
+          console.error("[Event] Failed to track content creation", {
+            triggerId,
+            organizationId: trigger.organizationId,
+            postId,
+            error: trackingError,
+          });
+        }
       });
 
       const notificationData = await context.run<{

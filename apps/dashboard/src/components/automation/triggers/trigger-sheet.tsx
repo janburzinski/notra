@@ -158,7 +158,11 @@ export function AddTriggerDialog({
           minute: 0,
         },
         lookbackWindow: editTrigger.lookbackWindow ?? "last_7_days",
-        brandVoiceId: editTrigger.outputConfig?.brandVoiceId ?? "",
+        brandVoiceId:
+          editTrigger.outputConfig?.brandVoiceId &&
+          editTrigger.outputConfig.brandVoiceId !== "__default__"
+            ? editTrigger.outputConfig.brandVoiceId
+            : "",
       };
     }
     return {
@@ -478,47 +482,64 @@ export function AddTriggerDialog({
 
                       {brandVoices.length > 1 && (
                         <form.Field name="brandVoiceId">
-                          {(field) => (
-                            <div className="space-y-2">
-                              <Label htmlFor={field.name}>Brand Voice</Label>
-                              <Select
-                                onValueChange={(value) => {
-                                  const nextValue =
-                                    value && value !== "__default__"
-                                      ? value
-                                      : "";
-                                  field.handleChange(nextValue);
-                                }}
-                                value={field.state.value || "__default__"}
-                              >
-                                <SelectTrigger
-                                  className="w-full"
-                                  id={field.name}
+                          {(field) => {
+                            const defaultVoiceName = brandVoices.find(
+                              (voice) => voice.isDefault
+                            )?.name;
+                            const selectedVoiceName =
+                              brandVoices.find(
+                                (voice) => voice.id === field.state.value
+                              )?.name ??
+                              (defaultVoiceName
+                                ? `Default Voice (${defaultVoiceName})`
+                                : "Default Voice");
+
+                            return (
+                              <div className="space-y-2">
+                                <Label htmlFor={field.name}>Brand Voice</Label>
+                                <Select
+                                  onValueChange={(value) => {
+                                    const nextValue =
+                                      value && value !== "__default__"
+                                        ? value
+                                        : "";
+                                    field.handleChange(nextValue);
+                                  }}
+                                  value={field.state.value || "__default__"}
                                 >
-                                  <SelectValue placeholder="Default voice" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__default__">
-                                    Default voice
-                                  </SelectItem>
-                                  {brandVoices
-                                    .filter((v) => !v.isDefault)
-                                    .map((voice) => (
-                                      <SelectItem
-                                        key={voice.id}
-                                        value={voice.id}
-                                      >
-                                        {voice.name}
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
-                              <p className="text-muted-foreground text-xs">
-                                Choose which brand voice to use for generated
-                                content.
-                              </p>
-                            </div>
-                          )}
+                                  <SelectTrigger
+                                    className="w-full"
+                                    id={field.name}
+                                  >
+                                    <SelectValue placeholder="Default Voice">
+                                      {selectedVoiceName}
+                                    </SelectValue>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="__default__">
+                                      {defaultVoiceName
+                                        ? `Default Voice (${defaultVoiceName})`
+                                        : "Default Voice"}
+                                    </SelectItem>
+                                    {brandVoices
+                                      .filter((v) => !v.isDefault)
+                                      .map((voice) => (
+                                        <SelectItem
+                                          key={voice.id}
+                                          value={voice.id}
+                                        >
+                                          {voice.name}
+                                        </SelectItem>
+                                      ))}
+                                  </SelectContent>
+                                </Select>
+                                <p className="text-muted-foreground text-xs">
+                                  Choose which brand voice to use for generated
+                                  content.
+                                </p>
+                              </div>
+                            );
+                          }}
                         </form.Field>
                       )}
                     </>

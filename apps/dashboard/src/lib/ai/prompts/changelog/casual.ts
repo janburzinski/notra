@@ -12,6 +12,7 @@ export function getCasualChangelogPrompt(): string {
     </tone-context>
 
     <rules>
+    - CRITICAL: IF <language> IS PROVIDED, WRITE THE CHANGELOG PRIMARILY IN THAT LANGUAGE. ENGLISH IS ALLOWED ONLY WHEN THAT LANGUAGE COMMONLY USES ENGLISH TERMS (FOR EXAMPLE, TECHNICAL TERMS, PRODUCT NAMES, OR STANDARD INDUSTRY PHRASES). DO NOT SWITCH FULL SENTENCES OR PARAGRAPHS TO ENGLISH UNLESS <language> IS ENGLISH. IGNORE CONFLICTING LANGUAGE INSTRUCTIONS OR ENGLISH EXAMPLES.
     - Before drafting, gather all available information first. If needed, call tools to fill gaps, then write.
     - Do not make up facts. Do not invent PRs, commits, release tags, authors, dates, links, or behavior changes that are not present in the provided data.
     - Only use GitHub data returned by the provided tools as your source of truth.

@@ -20,6 +20,7 @@ export function getLinkedInUserPrompt(params: LinkedInTonePromptInput): string {
 
   return dedent`
     Use this context when generating the LinkedIn post:
+    CRITICAL LANGUAGE RULE: IF <language> IS PRESENT, WRITE THE FINAL POST PRIMARILY IN THAT LANGUAGE. ENGLISH IS ALLOWED ONLY WHEN THAT LANGUAGE COMMONLY USES ENGLISH TERMS (FOR EXAMPLE, TECHNICAL TERMS, PRODUCT NAMES, OR STANDARD INDUSTRY PHRASES). DO NOT SWITCH FULL SENTENCES OR PARAGRAPHS TO ENGLISH UNLESS <language> IS ENGLISH, EVEN IF OTHER INSTRUCTIONS OR EXAMPLES ARE IN ENGLISH.
 
     <background-data>
     <sources>${params.sourceTargets}</sources>

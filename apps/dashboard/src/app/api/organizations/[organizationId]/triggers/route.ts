@@ -10,6 +10,7 @@ import {
   buildCronExpression,
   createQstashSchedule,
   deleteQstashSchedule,
+  normalizeCronConfig,
 } from "@/lib/triggers/qstash";
 import { triggerIdQuerySchema } from "@/schemas/api-params";
 import { configureTriggerBodySchema } from "@/schemas/integrations";
@@ -34,11 +35,13 @@ function normalizeTriggerConfig({
   const repositoryIds = targets.repositoryIds
     ? [...targets.repositoryIds].sort()
     : [];
+  const cron = normalizeCronConfig(sourceConfig.cron);
 
   return {
     sourceConfig: {
       ...sourceConfig,
       eventTypes,
+      cron,
     },
     targets: {
       repositoryIds,
@@ -284,6 +287,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         newQstashScheduleId = await createQstashSchedule({
           triggerId,
           cron: cronExpression,
+          scheduleId: oldQstashScheduleId ?? undefined,
         });
       }
     }
@@ -310,7 +314,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         )
         .returning();
 
-      if (oldQstashScheduleId) {
+      if (oldQstashScheduleId && oldQstashScheduleId !== newQstashScheduleId) {
         await deleteQstashSchedule(oldQstashScheduleId).catch((error) => {
           console.error("Error deleting schedule:", error);
         });
@@ -318,7 +322,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
       return NextResponse.json({ trigger });
     } catch (dbError) {
-      if (newQstashScheduleId) {
+      if (newQstashScheduleId && newQstashScheduleId !== oldQstashScheduleId) {
         await deleteQstashSchedule(newQstashScheduleId).catch((error) => {
           console.error("Error deleting schedule:", error);
         });
