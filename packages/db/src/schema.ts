@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -100,7 +100,6 @@ export const organizations = pgTable(
     name: text("name").notNull(),
     slug: text("slug").notNull().unique(),
     logo: text("logo"),
-    websiteUrl: text("website_url"),
     createdAt: timestamp("created_at").notNull(),
     metadata: text("metadata"),
     onboardingCompleted: boolean("onboarding_completed")
@@ -259,12 +258,16 @@ export const brandSettings = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull().default("Default"),
+    isDefault: boolean("is_default").notNull().default(true),
+    websiteUrl: text("website_url").notNull(),
     companyName: text("company_name"),
     companyDescription: text("company_description"),
     toneProfile: text("tone_profile"),
     customTone: text("custom_tone"),
     customInstructions: text("custom_instructions"),
     audience: text("audience"),
+    language: text("language").default("English"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -272,7 +275,14 @@ export const brandSettings = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex("brandSettings_organizationId_uidx").on(table.organizationId),
+    uniqueIndex("brandSettings_org_name_uidx").on(
+      table.organizationId,
+      table.name
+    ),
+    uniqueIndex("brandSettings_org_default_uidx")
+      .on(table.organizationId)
+      .where(sql`${table.isDefault} = true`),
+    index("brandSettings_organizationId_idx").on(table.organizationId),
   ]
 );
 
@@ -368,7 +378,7 @@ export const organizationsRelations = relations(
     members: many(members),
     invitations: many(invitations),
     githubIntegrations: many(githubIntegrations),
-    brandSettings: one(brandSettings),
+    brandSettings: many(brandSettings),
     notificationSettings: one(organizationNotificationSettings),
     posts: many(posts),
   })
