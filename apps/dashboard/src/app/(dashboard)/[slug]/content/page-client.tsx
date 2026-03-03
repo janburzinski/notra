@@ -4,6 +4,8 @@ import {
   ArrowDown01Icon,
   ArrowUp01Icon,
   ArrowUpDownIcon,
+  LayoutGridIcon,
+  ListViewIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
@@ -23,7 +25,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { LayoutGrid, List } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -219,7 +220,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                       size="icon-sm"
                       variant="outline"
                     >
-                      <LayoutGrid className="size-4" />
+                      <HugeiconsIcon className="size-4" icon={LayoutGridIcon} />
                     </Button>
                   }
                 />
@@ -238,7 +239,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                       size="icon-sm"
                       variant="outline"
                     >
-                      <List className="size-4" />
+                      <HugeiconsIcon className="size-4" icon={ListViewIcon} />
                     </Button>
                   }
                 />
