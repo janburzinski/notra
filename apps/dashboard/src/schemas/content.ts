@@ -137,6 +137,7 @@ export type ContentDataPointSettings = z.infer<
 export const createOnDemandContentSchema = z.object({
   contentType: onDemandContentTypeSchema,
   lookbackWindow: z.enum(LOOKBACK_WINDOWS).default("last_7_days"),
+  repositoryIds: z.array(z.string().min(1)).optional(),
   dataPoints: contentDataPointSettingsSchema.optional(),
 });
 

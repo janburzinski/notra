@@ -11,6 +11,17 @@ import {
   ResponsiveDialogTrigger,
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Button } from "@notra/ui/components/ui/button";
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  useComboboxAnchor,
+} from "@notra/ui/components/ui/combobox";
 import { Label } from "@notra/ui/components/ui/label";
 import {
   Select,
@@ -19,12 +30,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useForm } from "@tanstack/react-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type {
   ContentDataPointSettings,
@@ -35,6 +47,7 @@ import {
   LOOKBACK_WINDOWS,
   SUPPORTED_SCHEDULE_OUTPUT_TYPES,
 } from "@/schemas/integrations";
+import type { GitHubIntegration } from "@/types/integrations";
 import { formatSnakeCaseLabel } from "@/utils/format";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
@@ -47,6 +60,10 @@ interface FormValues {
   contentType: OnDemandContentType;
   lookbackWindow: LookbackWindow;
   dataPoints: ContentDataPointSettings;
+}
+
+interface SubmitValues extends FormValues {
+  repositoryIds: string[];
 }
 
 const DEFAULT_CONTENT_TYPE: OnDemandContentType =
@@ -65,13 +82,63 @@ export function CreateContentDialog({
 }: CreateContentDialogProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"details" | "advanced">("details");
+  const [selectedRepositoryIds, setSelectedRepositoryIds] = useState<string[]>(
+    []
+  );
+  const [hasInitializedRepoSelection, setHasInitializedRepoSelection] =
+    useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
+  const comboboxAnchor = useComboboxAnchor();
+
+  const { data: integrationsResponse, isLoading: isLoadingRepos } = useQuery<{
+    integrations: Array<GitHubIntegration & { type: string }>;
+  }>({
+    queryKey: QUERY_KEYS.INTEGRATIONS.all(organizationId),
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/organizations/${organizationId}/integrations`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch integrations");
+      }
+
+      return response.json();
+    },
+    enabled: !!organizationId,
+  });
+
+  const repositories = useMemo(
+    () =>
+      integrationsResponse?.integrations
+        .filter((integration) => integration.type === "github")
+        .flatMap((integration) => integration.repositories) ?? [],
+    [integrationsResponse]
+  );
+
+  const repositoryOptions = useMemo(
+    () =>
+      repositories.map((repo) => ({
+        value: repo.id,
+        label: `${repo.owner}/${repo.repo}`,
+      })),
+    [repositories]
+  );
+
+  useEffect(() => {
+    if (!open || hasInitializedRepoSelection || repositories.length === 0) {
+      return;
+    }
+
+    setSelectedRepositoryIds(repositories.map((repository) => repository.id));
+    setHasInitializedRepoSelection(true);
+  }, [open, hasInitializedRepoSelection, repositories]);
 
   const mutation = useMutation<
     { postId: string; title: string },
     Error,
-    FormValues
+    SubmitValues
   >({
     mutationFn: async (value) => {
       const response = await fetch(
@@ -97,6 +164,8 @@ export function CreateContentDialog({
       toast.success("Content generated");
       setOpen(false);
       setStep("details");
+      setSelectedRepositoryIds([]);
+      setHasInitializedRepoSelection(false);
       form.reset();
       router.push(`/${organizationSlug}/content/${data.postId}`);
     },
@@ -112,7 +181,10 @@ export function CreateContentDialog({
       dataPoints: DEFAULT_DATA_POINTS,
     },
     onSubmit: ({ value }) => {
-      mutation.mutate(value);
+      mutation.mutate({
+        ...value,
+        repositoryIds: selectedRepositoryIds,
+      });
     },
   });
 
@@ -122,8 +194,12 @@ export function CreateContentDialog({
     <ResponsiveDialog
       onOpenChange={(nextOpen) => {
         setOpen(nextOpen);
-        if (!nextOpen) {
+        if (nextOpen) {
+          setHasInitializedRepoSelection(false);
+        } else {
           setStep("details");
+          setSelectedRepositoryIds([]);
+          setHasInitializedRepoSelection(false);
           form.reset();
         }
       }}
@@ -202,6 +278,60 @@ export function CreateContentDialog({
                     </div>
                   )}
                 </form.Field>
+
+                <div className="space-y-2">
+                  <Label>Repositories</Label>
+                  {isLoadingRepos && <Skeleton className="h-10 w-full" />}
+                  {!isLoadingRepos && repositories.length === 0 && (
+                    <div className="rounded-md border border-dashed p-3 text-muted-foreground text-xs">
+                      Add a GitHub repository first to scope content.
+                    </div>
+                  )}
+                  {!isLoadingRepos && repositories.length > 0 && (
+                    <div ref={comboboxAnchor}>
+                      <Combobox
+                        items={repositoryOptions.map((repo) => repo.value)}
+                        multiple
+                        onValueChange={(value) =>
+                          setSelectedRepositoryIds(
+                            Array.isArray(value) ? value : []
+                          )
+                        }
+                        value={selectedRepositoryIds}
+                      >
+                        <ComboboxChips>
+                          {selectedRepositoryIds.map((repoId) => {
+                            const repo = repositoryOptions.find(
+                              (option) => option.value === repoId
+                            );
+                            if (!repo) {
+                              return null;
+                            }
+                            return (
+                              <ComboboxChip key={repo.value}>
+                                {repo.label}
+                              </ComboboxChip>
+                            );
+                          })}
+                          <ComboboxChipsInput placeholder="All repositories" />
+                        </ComboboxChips>
+                        <ComboboxContent anchor={comboboxAnchor.current}>
+                          <ComboboxEmpty>No repositories found.</ComboboxEmpty>
+                          <ComboboxList>
+                            {repositoryOptions.map((repo) => (
+                              <ComboboxItem key={repo.value} value={repo.value}>
+                                {repo.label}
+                              </ComboboxItem>
+                            ))}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
+                    </div>
+                  )}
+                  <p className="text-muted-foreground text-xs">
+                    Optional. Leave empty to use all connected repositories.
+                  </p>
+                </div>
               </>
             ) : (
               <>

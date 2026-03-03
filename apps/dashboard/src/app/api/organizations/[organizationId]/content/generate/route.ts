@@ -107,7 +107,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    const { contentType, lookbackWindow } = bodyValidation.data;
+    const { contentType, lookbackWindow, repositoryIds } = bodyValidation.data;
     const dataPoints = contentDataPointSettingsSchema.parse(
       bodyValidation.data.dataPoints ?? {}
     );
@@ -144,6 +144,20 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     if (validRepositories.length === 0) {
       return NextResponse.json(
         { error: "No active GitHub repositories connected" },
+        { status: 400 }
+      );
+    }
+
+    const targetRepositories =
+      repositoryIds && repositoryIds.length > 0
+        ? validRepositories.filter((repository) =>
+            repositoryIds.includes(repository.id)
+          )
+        : validRepositories;
+
+    if (targetRepositories.length === 0) {
+      return NextResponse.json(
+        { error: "No valid target repositories selected" },
         { status: 400 }
       );
     }
@@ -185,7 +199,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     const sourceMetadata: PostSourceMetadata = {
       triggerId: "manual_on_demand",
       triggerSourceType: "manual",
-      repositories: validRepositories.map((repository) => ({
+      repositories: targetRepositories.map((repository) => ({
         owner: repository.owner,
         repo: repository.repo,
       })),
@@ -195,7 +209,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
         end: lookback.end.toISOString(),
       },
     };
-    const sourceTargets = validRepositories
+    const sourceTargets = targetRepositories
       .map(
         (repository) =>
           `${repository.owner}/${repository.repo} (integrationId: ${repository.id})`
@@ -204,7 +218,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
 
     const result = await generateScheduledContent(contentType, {
       organizationId,
-      repositories: validRepositories.map((repository) => ({
+      repositories: targetRepositories.map((repository) => ({
         integrationId: repository.id,
         owner: repository.owner,
         repo: repository.repo,
