@@ -5,6 +5,12 @@ import type {
   LinkedInTonePromptInput,
 } from "./prompts";
 
+export interface AgentDataPointSettings {
+  includePullRequests?: boolean;
+  includeCommits?: boolean;
+  includeLinearIssues?: boolean;
+}
+
 export interface ChangelogAgentResult {
   postId: string;
   title: string;
@@ -21,6 +27,7 @@ export interface ChangelogAgentOptions {
   tone?: ToneProfile;
   promptInput: ChangelogTonePromptInput;
   sourceMetadata?: PostSourceMetadata;
+  dataPointSettings?: AgentDataPointSettings;
 }
 
 export interface LinkedInAgentResult {
@@ -39,6 +46,7 @@ export interface LinkedInAgentOptions {
   tone?: ToneProfile;
   promptInput: LinkedInTonePromptInput;
   sourceMetadata?: PostSourceMetadata;
+  dataPointSettings?: AgentDataPointSettings;
 }
 
 export interface ChatAgentContext {

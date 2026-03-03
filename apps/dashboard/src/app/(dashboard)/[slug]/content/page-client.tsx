@@ -23,7 +23,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { LayoutGrid, List, Plus } from "lucide-react";
+import { LayoutGrid, List } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -31,6 +31,7 @@ import {
   getContentTypeLabel,
 } from "@/components/content/content-card";
 import { ContentRowActions } from "@/components/content/content-row-actions";
+import { CreateContentDialog } from "@/components/content/create-content-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -244,17 +245,10 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                 <TooltipContent>Table view</TooltipContent>
               </Tooltip>
             </ButtonGroup>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button disabled size="sm">
-                    <Plus className="size-4" />
-                    Create Content
-                  </Button>
-                }
-              />
-              <TooltipContent>Coming Soon</TooltipContent>
-            </Tooltip>
+            <CreateContentDialog
+              organizationId={organizationId}
+              organizationSlug={organizationSlug}
+            />
           </div>
         </div>
         {isPending && <ContentPageSkeleton />}

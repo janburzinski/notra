@@ -15,6 +15,7 @@ export async function handleLinkedIn(
       tone: ctx.tone,
       promptInput: ctx.promptInput,
       sourceMetadata: ctx.sourceMetadata,
+      dataPointSettings: ctx.dataPointSettings,
     });
 
     return { status: "ok", postId, title };

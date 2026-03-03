@@ -1,5 +1,9 @@
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
+import {
+  LOOKBACK_WINDOWS,
+  SUPPORTED_SCHEDULE_OUTPUT_TYPES,
+} from "./integrations";
 
 export const contentTypeSchema = z.enum([
   "changelog",
@@ -114,3 +118,28 @@ export const updateContentSchema = z
   );
 
 export type UpdateContentInput = z.infer<typeof updateContentSchema>;
+
+export const onDemandContentTypeSchema = z.enum(
+  SUPPORTED_SCHEDULE_OUTPUT_TYPES
+);
+export type OnDemandContentType = z.infer<typeof onDemandContentTypeSchema>;
+
+export const contentDataPointSettingsSchema = z.object({
+  includePullRequests: z.boolean().default(true),
+  includeCommits: z.boolean().default(true),
+  includeLinearIssues: z.boolean().default(true),
+});
+
+export type ContentDataPointSettings = z.infer<
+  typeof contentDataPointSettingsSchema
+>;
+
+export const createOnDemandContentSchema = z.object({
+  contentType: onDemandContentTypeSchema,
+  lookbackWindow: z.enum(LOOKBACK_WINDOWS).default("last_7_days"),
+  dataPoints: contentDataPointSettingsSchema.optional(),
+});
+
+export type CreateOnDemandContentInput = z.infer<
+  typeof createOnDemandContentSchema
+>;

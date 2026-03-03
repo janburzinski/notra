@@ -1,5 +1,6 @@
 import type { PostSourceMetadata } from "@notra/db/schema";
 import type { ToneProfile } from "@/schemas/brand";
+import type { AgentDataPointSettings } from "@/types/ai/agents";
 
 export interface ContentGenerationContext {
   organizationId: string;
@@ -22,6 +23,7 @@ export interface ContentGenerationContext {
     customInstructions?: string | null;
   };
   sourceMetadata: PostSourceMetadata;
+  dataPointSettings?: AgentDataPointSettings;
 }
 
 export type ContentGenerationResult =

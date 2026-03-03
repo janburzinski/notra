@@ -40,6 +40,7 @@ export async function generateChangelog(
     tone = "Conversational",
     promptInput,
     sourceMetadata,
+    dataPointSettings,
   } = options;
 
   if (!repositories || repositories.length === 0) {
@@ -70,6 +71,8 @@ export async function generateChangelog(
     contentType: "changelog",
     sourceMetadata,
   } as const;
+  const includePullRequests = dataPointSettings?.includePullRequests !== false;
+  const includeCommits = dataPointSettings?.includeCommits !== false;
 
   const agent = new ToolLoopAgent({
     model,
@@ -79,18 +82,26 @@ export async function generateChangelog(
       },
     },
     tools: {
-      getPullRequests: createGetPullRequestsTool({
-        organizationId,
-        allowedIntegrationIds,
-      }),
+      ...(includePullRequests
+        ? {
+            getPullRequests: createGetPullRequestsTool({
+              organizationId,
+              allowedIntegrationIds,
+            }),
+          }
+        : {}),
       getReleaseByTag: createGetReleaseByTagTool({
         organizationId,
         allowedIntegrationIds,
       }),
-      getCommitsByTimeframe: createGetCommitsByTimeframeTool({
-        organizationId,
-        allowedIntegrationIds,
-      }),
+      ...(includeCommits
+        ? {
+            getCommitsByTimeframe: createGetCommitsByTimeframeTool({
+              organizationId,
+              allowedIntegrationIds,
+            }),
+          }
+        : {}),
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),
