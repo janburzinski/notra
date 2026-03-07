@@ -3,8 +3,7 @@ import { githubIntegrations } from "@notra/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
-import * as z from "zod";
+import { z } from "zod";
 import { withOrganizationAuth } from "@/lib/auth/organization";
 import { createOctokit } from "@/lib/octokit";
 import { getTokenForIntegrationId } from "@/lib/services/github-integration";
