@@ -12,6 +12,7 @@ import { getValidToneProfile } from "@/schemas/brand";
 import {
   contentDataPointSettingsSchema,
   createOnDemandContentSchema,
+  type SelectedItems,
 } from "@/schemas/content";
 import { formatUtcTodayContext, resolveLookbackRange } from "@/utils/lookback";
 
@@ -19,9 +20,56 @@ interface RouteContext {
   params: Promise<{ organizationId: string }>;
 }
 
+function buildSelectedItemsInstructions(
+  selectedItems: SelectedItems
+): string | null {
+  if (!selectedItems) {
+    return null;
+  }
+
+  const parts: string[] = [];
+
+  if (selectedItems.commitShas && selectedItems.commitShas.length > 0) {
+    parts.push(
+      `Focus ONLY on these specific commits (by SHA): ${selectedItems.commitShas.join(", ")}`
+    );
+  }
+
+  if (
+    selectedItems.pullRequestNumbers &&
+    selectedItems.pullRequestNumbers.length > 0
+  ) {
+    const prList = selectedItems.pullRequestNumbers
+      .map((pr) => `#${pr.number} (repo: ${pr.repositoryId})`)
+      .join(", ");
+    parts.push(`Focus ONLY on these specific pull requests: ${prList}`);
+  }
+
+  if (
+    selectedItems.releaseTagNames &&
+    selectedItems.releaseTagNames.length > 0
+  ) {
+    const releaseList = selectedItems.releaseTagNames
+      .map((release) =>
+        typeof release === "string"
+          ? release
+          : `${release.tagName} (repo: ${release.repositoryId})`
+      )
+      .join(", ");
+    parts.push(`Focus ONLY on these specific releases: ${releaseList}`);
+  }
+
+  if (parts.length === 0) {
+    return null;
+  }
+
+  return `Selected items filter (IMPORTANT — only include content about these specific items, ignore all others):\n${parts.join("\n")}`;
+}
+
 function buildDataPointRestrictionInstructions(dataPoints: {
   includePullRequests: boolean;
   includeCommits: boolean;
+  includeReleases: boolean;
   includeLinearIssues: boolean;
 }) {
   const restrictions: string[] = [];
@@ -35,6 +83,12 @@ function buildDataPointRestrictionInstructions(dataPoints: {
   if (!dataPoints.includeCommits) {
     restrictions.push(
       "- Exclude commit data entirely. Do not mention commit hashes, commit counts, or commit-level changes."
+    );
+  }
+
+  if (!dataPoints.includeReleases) {
+    restrictions.push(
+      "- Exclude release data entirely. Do not mention release tags, release names, or release-based summaries."
     );
   }
 
@@ -107,7 +161,8 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    const { contentType, lookbackWindow, repositoryIds } = bodyValidation.data;
+    const { contentType, lookbackWindow, repositoryIds, selectedItems } =
+      bodyValidation.data;
     const dataPoints = contentDataPointSettingsSchema.parse(
       bodyValidation.data.dataPoints ?? {}
     );
@@ -189,9 +244,12 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
 
     const restrictionInstructions =
       buildDataPointRestrictionInstructions(dataPoints);
+    const selectedItemsInstructions =
+      buildSelectedItemsInstructions(selectedItems);
     const customInstructions = [
       brand?.customInstructions?.trim() || "",
       restrictionInstructions || "",
+      selectedItemsInstructions || "",
     ]
       .filter((value) => value.length > 0)
       .join("\n\n");
