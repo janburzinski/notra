@@ -127,6 +127,7 @@ export type OnDemandContentType = z.infer<typeof onDemandContentTypeSchema>;
 export const contentDataPointSettingsSchema = z.object({
   includePullRequests: z.boolean().default(true),
   includeCommits: z.boolean().default(true),
+  includeReleases: z.boolean().default(true),
   includeLinearIssues: z.boolean().default(true),
 });
 
@@ -134,11 +135,37 @@ export type ContentDataPointSettings = z.infer<
   typeof contentDataPointSettingsSchema
 >;
 
+export const selectedItemsSchema = z.object({
+  commitShas: z.array(z.string()).optional(),
+  pullRequestNumbers: z
+    .array(
+      z.object({
+        repositoryId: z.string(),
+        number: z.number(),
+      })
+    )
+    .optional(),
+  releaseTagNames: z
+    .array(
+      z.union([
+        z.string(),
+        z.object({
+          repositoryId: z.string(),
+          tagName: z.string(),
+        }),
+      ])
+    )
+    .optional(),
+});
+
+export type SelectedItems = z.infer<typeof selectedItemsSchema> | undefined;
+
 export const createOnDemandContentSchema = z.object({
   contentType: onDemandContentTypeSchema,
   lookbackWindow: z.enum(LOOKBACK_WINDOWS).default("last_7_days"),
   repositoryIds: z.array(z.string().min(1)).optional(),
   dataPoints: contentDataPointSettingsSchema.optional(),
+  selectedItems: selectedItemsSchema.optional(),
 });
 
 export type CreateOnDemandContentInput = z.infer<
