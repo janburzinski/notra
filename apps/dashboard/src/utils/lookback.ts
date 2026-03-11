@@ -40,6 +40,15 @@ export function resolveLookbackRange(window: LookbackWindow): LookbackRange {
     };
   }
 
+  if (window === "last_7_days") {
+    return {
+      start: new Date(now.getTime() - 7 * DAY_IN_MS),
+      end: now,
+      label: "last 7 days (rolling)",
+    };
+  }
+
+  const _exhaustive: never = window;
   return {
     start: new Date(now.getTime() - 7 * DAY_IN_MS),
     end: now,

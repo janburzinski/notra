@@ -55,6 +55,11 @@ export interface PreviewResponse {
   failures?: PreviewFailure[];
 }
 
+export interface PrSelection {
+  repositoryId: string;
+  number: number;
+}
+
 export interface ReleaseSelection {
   repositoryId: string;
   tagName: string;

@@ -60,6 +60,20 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     );
   }
 
+  if (
+    !dataPoints.includePullRequests &&
+    !dataPoints.includeCommits &&
+    !dataPoints.includeReleases
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "At least one data source (Pull Requests, Commits, or Releases) must be enabled.",
+      },
+      { status: 400 }
+    );
+  }
+
   let aiCreditReserved = false;
 
   if (autumn) {

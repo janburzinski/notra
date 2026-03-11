@@ -67,6 +67,7 @@ import type {
   CommitPreview,
   EventType,
   PreviewResponse,
+  PrSelection,
   PullRequestPreview,
   ReleasePreview,
   ReleaseSelection,
@@ -76,6 +77,8 @@ import type { GitHubIntegration } from "@/types/integrations";
 import {
   formatEventDate,
   getPageNumbers,
+  prSelectionFromKey,
+  prSelectionToKey,
   releaseSelectionFromKey,
   releaseSelectionToKey,
 } from "@/utils/content-preview";
@@ -244,7 +247,12 @@ export function CreateContentDialog({
         commitKeys.add(commit.sha);
       }
       for (const pr of repo.pullRequests) {
-        prKeys.add(`${repo.repositoryId}:${pr.number}`);
+        prKeys.add(
+          prSelectionToKey({
+            repositoryId: repo.repositoryId,
+            number: pr.number,
+          })
+        );
       }
       for (const rel of repo.releases) {
         relKeys.add(
@@ -353,13 +361,11 @@ export function CreateContentDialog({
               ? Array.from(selectedCommitKeys)
               : [],
             pullRequestNumbers: value.dataPoints.includePullRequests
-              ? Array.from(selectedPrKeys).map((key) => {
-                  const [repositoryId, num] = key.split(":");
-                  return {
-                    repositoryId: repositoryId ?? "",
-                    number: Number(num),
-                  };
-                })
+              ? Array.from(selectedPrKeys)
+                  .map((key) => prSelectionFromKey(key))
+                  .filter(
+                    (selection): selection is PrSelection => selection !== null
+                  )
               : [],
             releaseTagNames: value.dataPoints.includeReleases
               ? Array.from(selectedReleaseKeys)
@@ -392,7 +398,14 @@ export function CreateContentDialog({
       if (dataPoints.includePullRequests) {
         total += repo.pullRequests.length;
         for (const pr of repo.pullRequests) {
-          if (selectedPrKeys.has(`${repo.repositoryId}:${pr.number}`)) {
+          if (
+            selectedPrKeys.has(
+              prSelectionToKey({
+                repositoryId: repo.repositoryId,
+                number: pr.number,
+              })
+            )
+          ) {
             selected++;
           }
         }
@@ -539,7 +552,12 @@ export function CreateContentDialog({
         }
         if (dataPoints.includePullRequests) {
           for (const pr of repo.pullRequests) {
-            prKeys.add(`${repo.repositoryId}:${pr.number}`);
+            prKeys.add(
+              prSelectionToKey({
+                repositoryId: repo.repositoryId,
+                number: pr.number,
+              })
+            );
           }
         }
         if (dataPoints.includeReleases) {
@@ -1106,14 +1124,17 @@ function RepoSection({
           })}
         {showPrs &&
           repo.pullRequests.map((pr) => {
-            const key = `${repo.repositoryId}:${pr.number}`;
+            const prKey = prSelectionToKey({
+              repositoryId: repo.repositoryId,
+              number: pr.number,
+            });
             return (
               <EventRow
-                key={key}
+                key={prKey}
                 label={`#${pr.number} ${pr.title}`}
                 meta={`${pr.authorLogin} · ${pr.mergedAt ? formatEventDate(pr.mergedAt) : ""}`}
-                onToggle={() => onTogglePr(key)}
-                selected={selectedPrKeys.has(key)}
+                onToggle={() => onTogglePr(prKey)}
+                selected={selectedPrKeys.has(prKey)}
                 type="PR"
               />
             );

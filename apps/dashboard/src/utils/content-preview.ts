@@ -1,4 +1,25 @@
-import type { ReleaseSelection } from "@/types/content/preview";
+import type { PrSelection, ReleaseSelection } from "@/types/content/preview";
+
+export function prSelectionToKey(selection: PrSelection): string {
+  return JSON.stringify([selection.repositoryId, selection.number]);
+}
+
+export function prSelectionFromKey(key: string): PrSelection | null {
+  try {
+    const parsed = JSON.parse(key);
+    if (
+      Array.isArray(parsed) &&
+      parsed.length === 2 &&
+      typeof parsed[0] === "string" &&
+      typeof parsed[1] === "number"
+    ) {
+      return { repositoryId: parsed[0], number: parsed[1] };
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 export function releaseSelectionToKey(selection: ReleaseSelection): string {
   return JSON.stringify([selection.repositoryId, selection.tagName]);

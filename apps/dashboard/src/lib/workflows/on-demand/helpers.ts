@@ -87,12 +87,12 @@ export function buildSelectionFilters(
 
   const hasPullRequestSelection =
     dataPoints.includePullRequests &&
-    Object.hasOwn(selectedItems, "pullRequestNumbers");
+    (selectedItems.pullRequestNumbers?.length ?? 0) > 0;
   const hasReleaseSelection =
     dataPoints.includeReleases &&
-    Object.hasOwn(selectedItems, "releaseTagNames");
+    (selectedItems.releaseTagNames?.length ?? 0) > 0;
   const hasCommitSelection =
-    dataPoints.includeCommits && Object.hasOwn(selectedItems, "commitShas");
+    dataPoints.includeCommits && (selectedItems.commitShas?.length ?? 0) > 0;
 
   if (!hasPullRequestSelection && !hasReleaseSelection && !hasCommitSelection) {
     return undefined;
