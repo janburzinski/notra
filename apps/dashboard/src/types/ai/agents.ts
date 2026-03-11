@@ -5,10 +5,12 @@ import type {
   LinkedInTonePromptInput,
   TwitterTonePromptInput,
 } from "./prompts";
+import type { GitHubSelectionFilters } from "./tools";
 
 export interface AgentDataPointSettings {
   includePullRequests?: boolean;
   includeCommits?: boolean;
+  includeReleases?: boolean;
   includeLinearIssues?: boolean;
 }
 
@@ -29,6 +31,11 @@ export interface ChangelogAgentOptions {
   promptInput: ChangelogTonePromptInput;
   sourceMetadata?: PostSourceMetadata;
   dataPointSettings?: AgentDataPointSettings;
+  selectionFilters?: GitHubSelectionFilters;
+  commitWindow?: {
+    since: string;
+    until: string;
+  };
 }
 
 export interface LinkedInAgentResult {
@@ -48,6 +55,11 @@ export interface LinkedInAgentOptions {
   promptInput: LinkedInTonePromptInput;
   sourceMetadata?: PostSourceMetadata;
   dataPointSettings?: AgentDataPointSettings;
+  selectionFilters?: GitHubSelectionFilters;
+  commitWindow?: {
+    since: string;
+    until: string;
+  };
 }
 
 export interface TwitterAgentResult {

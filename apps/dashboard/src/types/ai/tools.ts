@@ -6,6 +6,21 @@ export interface EditMarkdownContext {
 export interface GitHubToolsAccessConfig {
   organizationId?: string;
   allowedIntegrationIds?: string[];
+  allowedPullRequestNumbersByIntegrationId?: Record<string, number[]>;
+  allowedReleaseTagsByIntegrationId?: Record<string, string[]>;
+  allowedReleaseTagsGlobal?: string[];
+  allowedCommitShas?: string[];
+  enforcedCommitWindow?: {
+    since: string;
+    until: string;
+  };
+}
+
+export interface GitHubSelectionFilters {
+  allowedPullRequestNumbersByIntegrationId?: Record<string, number[]>;
+  allowedReleaseTagsByIntegrationId?: Record<string, string[]>;
+  allowedReleaseTagsGlobal?: string[];
+  allowedCommitShas?: string[];
 }
 
 export interface ErrorWithStatus {
