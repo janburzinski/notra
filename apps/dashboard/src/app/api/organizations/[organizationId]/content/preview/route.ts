@@ -13,6 +13,8 @@ import { resolveLookbackRange } from "@/utils/lookback";
 const MAX_COMMITS = 50;
 const MAX_PULL_REQUESTS = 30;
 const MAX_RELEASES = 20;
+const PULL_REQUESTS_PAGE_SIZE = 100;
+const MAX_PAGINATION_PAGES = 10;
 
 const previewRequestSchema = z.object({
   repositoryIds: z.array(z.string().min(1)).min(1),
@@ -83,6 +85,82 @@ function formatFailureMessage(error: unknown): string {
     return error.message;
   }
   return "Unknown error";
+}
+
+async function fetchMergedPullRequestsPreview(params: {
+  octokit: ReturnType<typeof createOctokit>;
+  owner: string;
+  repo: string;
+  start: Date;
+  end: Date;
+}): Promise<PullRequestPreview[]> {
+  const { octokit, owner, repo, start, end } = params;
+  const mergedPullRequests: PullRequestPreview[] = [];
+  let page = 1;
+
+  while (page <= MAX_PAGINATION_PAGES) {
+    const response = await octokit.request("GET /repos/{owner}/{repo}/pulls", {
+      owner,
+      repo,
+      state: "closed",
+      sort: "updated",
+      direction: "desc",
+      per_page: PULL_REQUESTS_PAGE_SIZE,
+      page,
+      headers: { "X-GitHub-Api-Version": "2022-11-28" },
+    });
+
+    const pullRequests = response.data;
+    if (pullRequests.length === 0) {
+      break;
+    }
+
+    for (const pr of pullRequests) {
+      if (!pr.merged_at) {
+        continue;
+      }
+
+      const mergedAt = new Date(pr.merged_at);
+      if (mergedAt < start || mergedAt > end) {
+        continue;
+      }
+
+      mergedPullRequests.push({
+        number: pr.number,
+        title: pr.title,
+        state: pr.state,
+        merged: true,
+        authorLogin: pr.user?.login ?? "Unknown",
+        mergedAt: pr.merged_at,
+        htmlUrl: pr.html_url,
+      });
+    }
+
+    if (pullRequests.length < PULL_REQUESTS_PAGE_SIZE) {
+      break;
+    }
+
+    const oldestUpdatedAt = pullRequests.at(-1)?.updated_at;
+    // A merged PR cannot have merged inside the window if its last update
+    // happened before the window started.
+    if (!oldestUpdatedAt || new Date(oldestUpdatedAt) < start) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return mergedPullRequests
+    .sort((left, right) => {
+      const leftMergedAt = left.mergedAt
+        ? new Date(left.mergedAt).getTime()
+        : 0;
+      const rightMergedAt = right.mergedAt
+        ? new Date(right.mergedAt).getTime()
+        : 0;
+      return rightMergedAt - leftMergedAt;
+    })
+    .slice(0, MAX_PULL_REQUESTS);
 }
 
 export async function POST(request: NextRequest, { params }: RouteContext) {
@@ -207,16 +285,14 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
               })
             : Promise.resolve({ data: [] }),
           includePullRequests
-            ? octokit.request("GET /repos/{owner}/{repo}/pulls", {
+            ? fetchMergedPullRequestsPreview({
+                octokit,
                 owner: repo.owner,
                 repo: repo.repo,
-                state: "closed",
-                sort: "updated",
-                direction: "desc",
-                per_page: 100,
-                headers: { "X-GitHub-Api-Version": "2022-11-28" },
+                start: lookback.start,
+                end: lookback.end,
               })
-            : Promise.resolve({ data: [] }),
+            : Promise.resolve([]),
           includeReleases
             ? octokit.request("GET /repos/{owner}/{repo}/releases", {
                 owner: repo.owner,
@@ -251,28 +327,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       }
 
       const pullRequests: PullRequestPreview[] =
-        pullsResult.status === "fulfilled"
-          ? pullsResult.value.data
-              .filter((pr) => {
-                if (!pr.merged_at) {
-                  return false;
-                }
-                const mergedDate = new Date(pr.merged_at);
-                return (
-                  mergedDate >= lookback.start && mergedDate <= lookback.end
-                );
-              })
-              .slice(0, MAX_PULL_REQUESTS)
-              .map((pr) => ({
-                number: pr.number,
-                title: pr.title,
-                state: pr.state,
-                merged: !!pr.merged_at,
-                authorLogin: pr.user?.login ?? "Unknown",
-                mergedAt: pr.merged_at ?? null,
-                htmlUrl: pr.html_url,
-              }))
-          : [];
+        pullsResult.status === "fulfilled" ? pullsResult.value : [];
 
       if (pullsResult.status === "rejected") {
         repoFailures.push({
