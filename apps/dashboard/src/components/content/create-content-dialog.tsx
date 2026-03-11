@@ -21,6 +21,15 @@ import {
   useComboboxAnchor,
 } from "@notra/ui/components/ui/combobox";
 import { Label } from "@notra/ui/components/ui/label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@notra/ui/components/ui/pagination";
 import { ScrollArea } from "@notra/ui/components/ui/scroll-area";
 import {
   Select,
@@ -38,6 +47,12 @@ import { useStore } from "@tanstack/react-store";
 import { Check, Loader2, Plus, RotateCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+  DEFAULT_CONTENT_TYPE,
+  DEFAULT_DATA_POINTS,
+  EVENT_BADGE,
+  EVENTS_PER_PAGE,
+} from "@/constants/content-preview";
 import type {
   ContentDataPointSettings,
   OnDemandContentType,
@@ -48,119 +63,38 @@ import {
   LOOKBACK_WINDOWS,
   SUPPORTED_SCHEDULE_OUTPUT_TYPES,
 } from "@/schemas/integrations";
+import type {
+  CommitPreview,
+  EventType,
+  PreviewResponse,
+  PullRequestPreview,
+  ReleasePreview,
+  ReleaseSelection,
+  RepositoryPreview,
+} from "@/types/content/preview";
 import type { GitHubIntegration } from "@/types/integrations";
+import {
+  formatEventDate,
+  getPageNumbers,
+  releaseSelectionFromKey,
+  releaseSelectionToKey,
+} from "@/utils/content-preview";
 import { formatSnakeCaseLabel } from "@/utils/format";
 import { getOutputTypeLabel, OutputTypeIcon } from "@/utils/output-types";
 import { QUERY_KEYS } from "@/utils/query-keys";
-
-// ─── Types ───────────────────────────────────────────────
 
 interface CreateContentDialogProps {
   organizationId: string;
 }
 
-interface CommitPreview {
-  sha: string;
-  message: string;
-  authorName: string;
-  authoredAt: string;
-}
-
-interface PullRequestPreview {
-  number: number;
-  title: string;
-  authorLogin: string;
-  mergedAt: string | null;
-}
-
-interface ReleasePreview {
-  tagName: string;
-  name: string;
-  publishedAt: string;
-  authorLogin: string;
-  prerelease: boolean;
-}
-
-interface RepositoryPreview {
-  repositoryId: string;
-  owner: string;
-  repo: string;
-  commits: CommitPreview[];
-  pullRequests: PullRequestPreview[];
-  releases: ReleasePreview[];
-}
-
-interface PreviewFailure {
-  repositoryId: string;
-  owner: string | null;
-  repo: string | null;
-  stage:
-    | "repository_lookup"
-    | "repository_metadata"
-    | "token"
-    | "commits"
-    | "pull_requests"
-    | "releases";
-  message: string;
-}
-
-interface PreviewResponse {
-  repositories: Array<{
-    repositoryId: string;
-    owner: string;
-    repo: string;
-    commits?: CommitPreview[];
-    pullRequests?: PullRequestPreview[];
-    releases?: ReleasePreview[];
-  }>;
-  failures?: PreviewFailure[];
-}
-
 type Step = "configure" | "review";
-interface ReleaseSelection {
-  repositoryId: string;
-  tagName: string;
-}
-
-// ─── Constants ───────────────────────────────────────────
-
-const DEFAULT_CONTENT_TYPE: OnDemandContentType = "changelog";
-
-const DEFAULT_DATA_POINTS: ContentDataPointSettings = {
-  includePullRequests: true,
-  includeCommits: true,
-  includeReleases: true,
-  includeLinearIssues: false,
-};
-
-function releaseSelectionToKey(selection: ReleaseSelection): string {
-  return JSON.stringify([selection.repositoryId, selection.tagName]);
-}
-
-function releaseSelectionFromKey(key: string): ReleaseSelection | null {
-  try {
-    const parsed = JSON.parse(key);
-    if (
-      Array.isArray(parsed) &&
-      parsed.length === 2 &&
-      typeof parsed[0] === "string" &&
-      typeof parsed[1] === "string"
-    ) {
-      return { repositoryId: parsed[0], tagName: parsed[1] };
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
-// ─── Main Component ──────────────────────────────────────
 
 export function CreateContentDialog({
   organizationId,
 }: CreateContentDialogProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("configure");
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedCommitKeys, setSelectedCommitKeys] = useState<Set<string>>(
     new Set()
   );
@@ -183,8 +117,6 @@ export function CreateContentDialog({
       dataPoints: DEFAULT_DATA_POINTS,
     },
   });
-
-  // ─── Integrations ──────────────────────────────────────
 
   const { data: integrationsResponse, isLoading: isLoadingRepos } = useQuery<{
     integrations: Array<GitHubIntegration & { type: string }>;
@@ -227,8 +159,6 @@ export function CreateContentDialog({
       }
     }
   }, [open, repositories, form]);
-
-  // ─── Preview ───────────────────────────────────────────
 
   const repositoryIds = useStore(form.store, (s) => s.values.repositoryIds);
   const lookbackWindow = useStore(form.store, (s) => s.values.lookbackWindow);
@@ -305,6 +235,7 @@ export function CreateContentDialog({
     }
     lastInitializedParamsRef.current = previewParamsKey;
     selectionsTouchedRef.current = false;
+    setCurrentPage(1);
     const commitKeys = new Set<string>();
     const prKeys = new Set<string>();
     const relKeys = new Set<string>();
@@ -349,8 +280,6 @@ export function CreateContentDialog({
     );
   }, [previewParamsKey, previewFailures]);
 
-  // ─── Mutation ──────────────────────────────────────────
-
   const mutation = useMutation<
     { success: boolean; runId: string },
     Error,
@@ -389,14 +318,13 @@ export function CreateContentDialog({
     },
   });
 
-  // ─── Handlers ──────────────────────────────────────────
-
   const handleOpenChange = useCallback(
     (next: boolean) => {
       setOpen(next);
       if (!next) {
         form.reset();
         setStep("configure");
+        setCurrentPage(1);
         setSelectedCommitKeys(new Set());
         setSelectedPrKeys(new Set());
         setSelectedReleaseKeys(new Set());
@@ -413,6 +341,7 @@ export function CreateContentDialog({
 
   const handleBack = useCallback(() => {
     setStep("configure");
+    setCurrentPage(1);
   }, []);
 
   const handleCreate = useCallback(() => {
@@ -444,8 +373,6 @@ export function CreateContentDialog({
         : undefined;
     mutation.mutate({ ...value, selectedItems });
   }, [form, mutation, selectedCommitKeys, selectedPrKeys, selectedReleaseKeys]);
-
-  // ─── Event counts ──────────────────────────────────────
 
   const eventCounts = useMemo(() => {
     if (!previewData) {
@@ -494,6 +421,101 @@ export function CreateContentDialog({
     selectedPrKeys,
     selectedReleaseKeys,
   ]);
+
+  const { paginatedRepos, totalPages } = useMemo(() => {
+    if (!previewData) {
+      return { paginatedRepos: [], totalPages: 1 };
+    }
+
+    type FlatEvent =
+      | {
+          type: "release";
+          repositoryId: string;
+          owner: string;
+          repo: string;
+          data: ReleasePreview;
+        }
+      | {
+          type: "pr";
+          repositoryId: string;
+          owner: string;
+          repo: string;
+          data: PullRequestPreview;
+        }
+      | {
+          type: "commit";
+          repositoryId: string;
+          owner: string;
+          repo: string;
+          data: CommitPreview;
+        };
+
+    const flatEvents: FlatEvent[] = [];
+    for (const repo of previewData) {
+      if (dataPoints.includeReleases) {
+        for (const release of repo.releases) {
+          flatEvents.push({
+            type: "release",
+            repositoryId: repo.repositoryId,
+            owner: repo.owner,
+            repo: repo.repo,
+            data: release,
+          });
+        }
+      }
+      if (dataPoints.includePullRequests) {
+        for (const pr of repo.pullRequests) {
+          flatEvents.push({
+            type: "pr",
+            repositoryId: repo.repositoryId,
+            owner: repo.owner,
+            repo: repo.repo,
+            data: pr,
+          });
+        }
+      }
+      if (dataPoints.includeCommits) {
+        for (const commit of repo.commits) {
+          flatEvents.push({
+            type: "commit",
+            repositoryId: repo.repositoryId,
+            owner: repo.owner,
+            repo: repo.repo,
+            data: commit,
+          });
+        }
+      }
+    }
+
+    const pages = Math.max(1, Math.ceil(flatEvents.length / EVENTS_PER_PAGE));
+    const start = (currentPage - 1) * EVENTS_PER_PAGE;
+    const pageSlice = flatEvents.slice(start, start + EVENTS_PER_PAGE);
+
+    const repoMap = new Map<string, RepositoryPreview>();
+    for (const event of pageSlice) {
+      let repo = repoMap.get(event.repositoryId);
+      if (!repo) {
+        repo = {
+          repositoryId: event.repositoryId,
+          owner: event.owner,
+          repo: event.repo,
+          commits: [],
+          pullRequests: [],
+          releases: [],
+        };
+        repoMap.set(event.repositoryId, repo);
+      }
+      if (event.type === "release") {
+        repo.releases.push(event.data);
+      } else if (event.type === "pr") {
+        repo.pullRequests.push(event.data);
+      } else {
+        repo.commits.push(event.data);
+      }
+    }
+
+    return { paginatedRepos: Array.from(repoMap.values()), totalPages: pages };
+  }, [previewData, dataPoints, currentPage]);
 
   const handleToggleAll = useCallback(() => {
     if (!previewData) {
@@ -546,8 +568,6 @@ export function CreateContentDialog({
     dataPoints.includePullRequests ||
     dataPoints.includeCommits ||
     dataPoints.includeReleases;
-
-  // ─── Render ────────────────────────────────────────────
 
   return (
     <ResponsiveDialog onOpenChange={handleOpenChange} open={open}>
@@ -821,6 +841,8 @@ export function CreateContentDialog({
                     <div className="flex shrink-0 items-center justify-between border-b px-4 py-2">
                       <span className="text-muted-foreground text-xs">
                         {eventCounts.selected} / {eventCounts.total} selected
+                        {totalPages > 1 &&
+                          ` · Page ${currentPage} of ${totalPages}`}
                       </span>
                       <Button
                         onClick={handleToggleAll}
@@ -841,7 +863,7 @@ export function CreateContentDialog({
                           No events found for the selected timeframe.
                         </div>
                       ) : (
-                        previewData.map((repo) => (
+                        paginatedRepos.map((repo) => (
                           <RepoSection
                             dataPoints={dataPoints}
                             key={repo.repositoryId}
@@ -887,6 +909,58 @@ export function CreateContentDialog({
                             selectedReleaseKeys={selectedReleaseKeys}
                           />
                         ))
+                      )}
+                      {totalPages > 1 && (
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious
+                                className={cn(
+                                  currentPage === 1 &&
+                                    "pointer-events-none opacity-50"
+                                )}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCurrentPage((p) => Math.max(1, p - 1));
+                                }}
+                              />
+                            </PaginationItem>
+                            {getPageNumbers(currentPage, totalPages).map(
+                              (page, i) =>
+                                page === "ellipsis" ? (
+                                  <PaginationItem key={`ellipsis-${i}`}>
+                                    <PaginationEllipsis />
+                                  </PaginationItem>
+                                ) : (
+                                  <PaginationItem key={page}>
+                                    <PaginationLink
+                                      isActive={page === currentPage}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        setCurrentPage(page);
+                                      }}
+                                    >
+                                      {page}
+                                    </PaginationLink>
+                                  </PaginationItem>
+                                )
+                            )}
+                            <PaginationItem>
+                              <PaginationNext
+                                className={cn(
+                                  currentPage === totalPages &&
+                                    "pointer-events-none opacity-50"
+                                )}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setCurrentPage((p) =>
+                                    Math.min(totalPages, p + 1)
+                                  );
+                                }}
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
                       )}
                     </div>
                   </div>
@@ -948,8 +1022,6 @@ export function CreateContentDialog({
     </ResponsiveDialog>
   );
 }
-
-// ─── Subcomponents ─────────────────────────────────────────
 
 function DataPointToggle({
   label,
@@ -1025,7 +1097,7 @@ function RepoSection({
               <EventRow
                 key={releaseKey}
                 label={release.name || release.tagName}
-                meta={`${release.authorLogin} · ${formatDate(release.publishedAt)}${release.prerelease ? " · pre-release" : ""}`}
+                meta={`${release.authorLogin} · ${formatEventDate(release.publishedAt)}${release.prerelease ? " · pre-release" : ""}`}
                 onToggle={() => onToggleRelease(releaseKey)}
                 selected={selectedReleaseKeys.has(releaseKey)}
                 type="Release"
@@ -1039,7 +1111,7 @@ function RepoSection({
               <EventRow
                 key={key}
                 label={`#${pr.number} ${pr.title}`}
-                meta={`${pr.authorLogin} · ${pr.mergedAt ? formatDate(pr.mergedAt) : ""}`}
+                meta={`${pr.authorLogin} · ${pr.mergedAt ? formatEventDate(pr.mergedAt) : ""}`}
                 onToggle={() => onTogglePr(key)}
                 selected={selectedPrKeys.has(key)}
                 type="PR"
@@ -1051,7 +1123,7 @@ function RepoSection({
             <EventRow
               key={commit.sha}
               label={commit.message}
-              meta={`${commit.authorName} · ${commit.authoredAt ? formatDate(commit.authoredAt) : ""} · ${commit.sha.slice(0, 7)}`}
+              meta={`${commit.authorName} · ${commit.authoredAt ? formatEventDate(commit.authoredAt) : ""} · ${commit.sha.slice(0, 7)}`}
               onToggle={() => onToggleCommit(commit.sha)}
               selected={selectedCommitKeys.has(commit.sha)}
               type="Commit"
@@ -1061,16 +1133,6 @@ function RepoSection({
     </div>
   );
 }
-
-type EventType = "Commit" | "PR" | "Release";
-
-const EVENT_BADGE: Record<EventType, string> = {
-  Release:
-    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  PR: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Commit:
-    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-};
 
 function EventRow({
   label,
@@ -1118,15 +1180,4 @@ function EventRow({
       </span>
     </button>
   );
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  } catch {
-    return "";
-  }
 }

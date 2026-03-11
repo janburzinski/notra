@@ -4,18 +4,16 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import {
+  GITHUB_API_MAX_PAGES,
+  GITHUB_API_MAX_RESULTS,
+  GITHUB_API_PAGE_SIZE,
+} from "@/constants/content-preview";
 import { withOrganizationAuth } from "@/lib/auth/organization";
 import { createOctokit } from "@/lib/octokit";
 import { getTokenForIntegrationId } from "@/lib/services/github-integration";
 import { LOOKBACK_WINDOWS } from "@/schemas/integrations";
 import { resolveLookbackRange } from "@/utils/lookback";
-
-const MAX_COMMITS = 50;
-const MAX_PULL_REQUESTS = 30;
-const MAX_RELEASES = 20;
-const PULL_REQUESTS_PAGE_SIZE = 100;
-const RELEASES_PAGE_SIZE = 100;
-const MAX_PAGINATION_PAGES = 10;
 
 const previewRequestSchema = z.object({
   repositoryIds: z.array(z.string().min(1)).min(1),
@@ -99,13 +97,13 @@ async function fetchReleasesPreview(params: {
   const results: ReleasePreview[] = [];
   let page = 1;
 
-  while (page <= MAX_PAGINATION_PAGES) {
+  while (page <= GITHUB_API_MAX_PAGES) {
     const response = await octokit.request(
       "GET /repos/{owner}/{repo}/releases",
       {
         owner,
         repo,
-        per_page: RELEASES_PAGE_SIZE,
+        per_page: GITHUB_API_PAGE_SIZE,
         page,
         headers: { "X-GitHub-Api-Version": "2022-11-28" },
       }
@@ -138,14 +136,14 @@ async function fetchReleasesPreview(params: {
       break;
     }
 
-    if (releases.length < RELEASES_PAGE_SIZE) {
+    if (releases.length < GITHUB_API_PAGE_SIZE) {
       break;
     }
 
     page += 1;
   }
 
-  return results.slice(0, MAX_RELEASES);
+  return results.slice(0, GITHUB_API_MAX_RESULTS);
 }
 
 async function fetchMergedPullRequestsPreview(params: {
@@ -159,14 +157,14 @@ async function fetchMergedPullRequestsPreview(params: {
   const mergedPullRequests: PullRequestPreview[] = [];
   let page = 1;
 
-  while (page <= MAX_PAGINATION_PAGES) {
+  while (page <= GITHUB_API_MAX_PAGES) {
     const response = await octokit.request("GET /repos/{owner}/{repo}/pulls", {
       owner,
       repo,
       state: "closed",
       sort: "updated",
       direction: "desc",
-      per_page: PULL_REQUESTS_PAGE_SIZE,
+      per_page: GITHUB_API_PAGE_SIZE,
       page,
       headers: { "X-GitHub-Api-Version": "2022-11-28" },
     });
@@ -197,7 +195,7 @@ async function fetchMergedPullRequestsPreview(params: {
       });
     }
 
-    if (pullRequests.length < PULL_REQUESTS_PAGE_SIZE) {
+    if (pullRequests.length < GITHUB_API_PAGE_SIZE) {
       break;
     }
 
@@ -221,7 +219,57 @@ async function fetchMergedPullRequestsPreview(params: {
         : 0;
       return rightMergedAt - leftMergedAt;
     })
-    .slice(0, MAX_PULL_REQUESTS);
+    .slice(0, GITHUB_API_MAX_RESULTS);
+}
+
+async function fetchCommitsPreview(params: {
+  octokit: ReturnType<typeof createOctokit>;
+  owner: string;
+  repo: string;
+  start: Date;
+  end: Date;
+}): Promise<CommitPreview[]> {
+  const { octokit, owner, repo, start, end } = params;
+  const results: CommitPreview[] = [];
+  let page = 1;
+
+  while (page <= GITHUB_API_MAX_PAGES) {
+    const response = await octokit.request(
+      "GET /repos/{owner}/{repo}/commits",
+      {
+        owner,
+        repo,
+        since: start.toISOString(),
+        until: end.toISOString(),
+        per_page: GITHUB_API_PAGE_SIZE,
+        page,
+        headers: { "X-GitHub-Api-Version": "2022-11-28" },
+      }
+    );
+
+    const commits = response.data;
+    if (commits.length === 0) {
+      break;
+    }
+
+    for (const c of commits) {
+      results.push({
+        sha: c.sha,
+        message: c.commit.message.split("\n")[0] ?? "",
+        authorName: c.commit.author?.name ?? "Unknown",
+        authoredAt: c.commit.author?.date ?? "",
+        htmlUrl: c.html_url,
+      });
+    }
+
+    if (commits.length < GITHUB_API_PAGE_SIZE) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return results.slice(0, GITHUB_API_MAX_RESULTS);
 }
 
 export async function POST(request: NextRequest, { params }: RouteContext) {
@@ -336,15 +384,14 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       const [commitsResult, pullsResult, releasesResult] =
         await Promise.allSettled([
           includeCommits
-            ? octokit.request("GET /repos/{owner}/{repo}/commits", {
+            ? fetchCommitsPreview({
+                octokit,
                 owner: repo.owner,
                 repo: repo.repo,
-                since: lookback.start.toISOString(),
-                until: lookback.end.toISOString(),
-                per_page: MAX_COMMITS,
-                headers: { "X-GitHub-Api-Version": "2022-11-28" },
+                start: lookback.start,
+                end: lookback.end,
               })
-            : Promise.resolve({ data: [] }),
+            : Promise.resolve([]),
           includePullRequests
             ? fetchMergedPullRequestsPreview({
                 octokit,
@@ -368,15 +415,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       const repoFailures: RepositoryPreviewFailure[] = [];
 
       const commits: CommitPreview[] =
-        commitsResult.status === "fulfilled"
-          ? commitsResult.value.data.map((c) => ({
-              sha: c.sha,
-              message: c.commit.message.split("\n")[0] ?? "",
-              authorName: c.commit.author?.name ?? "Unknown",
-              authoredAt: c.commit.author?.date ?? "",
-              htmlUrl: c.html_url,
-            }))
-          : [];
+        commitsResult.status === "fulfilled" ? commitsResult.value : [];
 
       if (commitsResult.status === "rejected") {
         repoFailures.push({
