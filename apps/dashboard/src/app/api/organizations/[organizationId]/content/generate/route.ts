@@ -10,7 +10,6 @@ import { autumn } from "@/lib/billing/autumn";
 import { generateScheduledContent } from "@/lib/workflows/schedule/handlers";
 import { getValidToneProfile } from "@/schemas/brand";
 import {
-  contentDataPointSettingsSchema,
   createOnDemandContentSchema,
   type SelectedItems,
 } from "@/schemas/content";
@@ -89,65 +88,80 @@ function hasSelectedItemsOutsideTargets(
 
 function buildSelectionFilters(
   selectedItems: SelectedItems,
-  targetRepositoryIds: Set<string>
+  targetRepositoryIds: Set<string>,
+  dataPoints: {
+    includePullRequests: boolean;
+    includeCommits: boolean;
+    includeReleases: boolean;
+  }
 ): GitHubSelectionFilters | undefined {
   if (!selectedItems) {
     return undefined;
   }
 
+  const hasPullRequestSelection =
+    dataPoints.includePullRequests &&
+    Object.hasOwn(selectedItems, "pullRequestNumbers");
+  const hasReleaseSelection =
+    dataPoints.includeReleases &&
+    Object.hasOwn(selectedItems, "releaseTagNames");
+  const hasCommitSelection =
+    dataPoints.includeCommits && Object.hasOwn(selectedItems, "commitShas");
+
+  if (!hasPullRequestSelection && !hasReleaseSelection && !hasCommitSelection) {
+    return undefined;
+  }
+
   const pullRequestByIntegrationId: Record<string, number[]> = {};
-  for (const item of selectedItems.pullRequestNumbers ?? []) {
-    if (!targetRepositoryIds.has(item.repositoryId)) {
-      continue;
+  if (hasPullRequestSelection) {
+    for (const repositoryId of targetRepositoryIds) {
+      pullRequestByIntegrationId[repositoryId] = [];
     }
-    (pullRequestByIntegrationId[item.repositoryId] ??= []).push(item.number);
+    for (const item of selectedItems.pullRequestNumbers ?? []) {
+      if (!targetRepositoryIds.has(item.repositoryId)) {
+        continue;
+      }
+      pullRequestByIntegrationId[item.repositoryId]?.push(item.number);
+    }
   }
 
   const releaseTagsByIntegrationId: Record<string, string[]> = {};
   const globalReleaseTags: string[] = [];
-  for (const item of selectedItems.releaseTagNames ?? []) {
-    if (typeof item === "string") {
-      globalReleaseTags.push(item);
-      continue;
+  if (hasReleaseSelection) {
+    for (const repositoryId of targetRepositoryIds) {
+      releaseTagsByIntegrationId[repositoryId] = [];
     }
+    for (const item of selectedItems.releaseTagNames ?? []) {
+      if (typeof item === "string") {
+        globalReleaseTags.push(item);
+        continue;
+      }
 
-    if (!targetRepositoryIds.has(item.repositoryId)) {
-      continue;
+      if (!targetRepositoryIds.has(item.repositoryId)) {
+        continue;
+      }
+
+      releaseTagsByIntegrationId[item.repositoryId]?.push(item.tagName);
     }
-
-    (releaseTagsByIntegrationId[item.repositoryId] ??= []).push(item.tagName);
   }
 
   const commitShas =
-    selectedItems.commitShas
+    (hasCommitSelection ? selectedItems.commitShas : undefined)
       ?.map((sha) => sha.trim())
       .filter((sha) => sha.length > 0) ?? [];
 
-  const hasPullRequests = Object.keys(pullRequestByIntegrationId).length > 0;
-  const hasReleaseTags = Object.keys(releaseTagsByIntegrationId).length > 0;
-  const hasGlobalReleaseTags = globalReleaseTags.length > 0;
-  const hasCommitShas = commitShas.length > 0;
-
-  if (
-    !hasPullRequests &&
-    !hasReleaseTags &&
-    !hasGlobalReleaseTags &&
-    !hasCommitShas
-  ) {
-    return undefined;
-  }
-
   return {
-    allowedPullRequestNumbersByIntegrationId: hasPullRequests
+    allowedPullRequestNumbersByIntegrationId: hasPullRequestSelection
       ? pullRequestByIntegrationId
       : undefined,
-    allowedReleaseTagsByIntegrationId: hasReleaseTags
+    allowedReleaseTagsByIntegrationId: hasReleaseSelection
       ? releaseTagsByIntegrationId
       : undefined,
-    allowedReleaseTagsGlobal: hasGlobalReleaseTags
-      ? globalReleaseTags
-      : undefined,
-    allowedCommitShas: hasCommitShas ? commitShas : undefined,
+    allowedReleaseTagsGlobal:
+      hasReleaseSelection && globalReleaseTags.length > 0
+        ? globalReleaseTags
+        : undefined,
+    allowedCommitShas: hasCommitSelection ? commitShas : undefined,
   };
 }
 
@@ -298,10 +312,8 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       repositoryIds,
       selectedItems,
       brandVoiceId,
+      dataPoints,
     } = bodyValidation.data;
-    const dataPoints = contentDataPointSettingsSchema.parse(
-      bodyValidation.data.dataPoints ?? {}
-    );
 
     if (dataPoints.includeLinearIssues) {
       return NextResponse.json(
@@ -383,7 +395,8 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     }
     const selectionFilters = buildSelectionFilters(
       selectedItems,
-      targetRepositoryIds
+      targetRepositoryIds,
+      dataPoints
     );
 
     if (autumn) {
