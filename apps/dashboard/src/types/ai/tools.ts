@@ -1,3 +1,8 @@
+export interface CommitWindow {
+  since: string;
+  until: string;
+}
+
 export interface EditMarkdownContext {
   currentMarkdown: string;
   onUpdate: (markdown: string) => void;
@@ -10,10 +15,7 @@ export interface GitHubToolsAccessConfig {
   allowedReleaseTagsByIntegrationId?: Record<string, string[]>;
   allowedReleaseTagsGlobal?: string[];
   allowedCommitShas?: string[];
-  enforcedCommitWindow?: {
-    since: string;
-    until: string;
-  };
+  enforcedCommitWindow?: CommitWindow;
 }
 
 export interface GitHubSelectionFilters {
