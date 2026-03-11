@@ -172,6 +172,7 @@ export function CreateContentDialog({
   );
   const lastInitializedParamsRef = useRef("");
   const previewWarningKeyRef = useRef<string>("");
+  const selectionsTouchedRef = useRef(false);
 
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -282,7 +283,7 @@ export function CreateContentDialog({
       }
       return res.json();
     },
-    enabled: open && repositoryIds.length > 0,
+    enabled: open && step === "review" && repositoryIds.length > 0,
     staleTime: 60_000,
   });
 
@@ -306,6 +307,7 @@ export function CreateContentDialog({
       return;
     }
     lastInitializedParamsRef.current = previewParamsKey;
+    selectionsTouchedRef.current = false;
     const commitKeys = new Set<string>();
     const prKeys = new Set<string>();
     const relKeys = new Set<string>();
@@ -421,6 +423,7 @@ export function CreateContentDialog({
         setSelectedPrKeys(new Set());
         setSelectedReleaseKeys(new Set());
         lastInitializedParamsRef.current = "";
+        selectionsTouchedRef.current = false;
       }
     },
     [form]
@@ -436,24 +439,31 @@ export function CreateContentDialog({
 
   const handleCreate = useCallback(() => {
     const value = form.state.values;
-    const selectedItems: SelectedItems = {
-      commitShas: value.dataPoints.includeCommits
-        ? Array.from(selectedCommitKeys)
-        : [],
-      pullRequestNumbers: value.dataPoints.includePullRequests
-        ? Array.from(selectedPrKeys).map((key) => {
-            const [repositoryId, num] = key.split(":");
-            return { repositoryId: repositoryId ?? "", number: Number(num) };
-          })
-        : [],
-      releaseTagNames: value.dataPoints.includeReleases
-        ? Array.from(selectedReleaseKeys)
-            .map((key) => releaseSelectionFromKey(key))
-            .filter(
-              (selection): selection is ReleaseSelection => selection !== null
-            )
-        : [],
-    };
+    const selectedItems: SelectedItems | undefined =
+      selectionsTouchedRef.current
+        ? {
+            commitShas: value.dataPoints.includeCommits
+              ? Array.from(selectedCommitKeys)
+              : [],
+            pullRequestNumbers: value.dataPoints.includePullRequests
+              ? Array.from(selectedPrKeys).map((key) => {
+                  const [repositoryId, num] = key.split(":");
+                  return {
+                    repositoryId: repositoryId ?? "",
+                    number: Number(num),
+                  };
+                })
+              : [],
+            releaseTagNames: value.dataPoints.includeReleases
+              ? Array.from(selectedReleaseKeys)
+                  .map((key) => releaseSelectionFromKey(key))
+                  .filter(
+                    (selection): selection is ReleaseSelection =>
+                      selection !== null
+                  )
+              : [],
+          }
+        : undefined;
     mutation.mutate({ ...value, selectedItems });
   }, [form, mutation, selectedCommitKeys, selectedPrKeys, selectedReleaseKeys]);
 
@@ -511,6 +521,7 @@ export function CreateContentDialog({
     if (!previewData) {
       return;
     }
+    selectionsTouchedRef.current = true;
     const allSelected = eventCounts.selected === eventCounts.total;
     if (allSelected) {
       setSelectedCommitKeys(new Set());
@@ -849,6 +860,7 @@ export function CreateContentDialog({
                             dataPoints={dataPoints}
                             key={repo.repositoryId}
                             onToggleCommit={(sha) => {
+                              selectionsTouchedRef.current = true;
                               setSelectedCommitKeys((prev) => {
                                 const next = new Set(prev);
                                 if (next.has(sha)) {
@@ -860,6 +872,7 @@ export function CreateContentDialog({
                               });
                             }}
                             onTogglePr={(key) => {
+                              selectionsTouchedRef.current = true;
                               setSelectedPrKeys((prev) => {
                                 const next = new Set(prev);
                                 if (next.has(key)) {
@@ -871,6 +884,7 @@ export function CreateContentDialog({
                               });
                             }}
                             onToggleRelease={(tag) => {
+                              selectionsTouchedRef.current = true;
                               setSelectedReleaseKeys((prev) => {
                                 const next = new Set(prev);
                                 if (next.has(tag)) {
