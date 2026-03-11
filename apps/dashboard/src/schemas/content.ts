@@ -169,7 +169,7 @@ export const createOnDemandContentSchema = z.object({
   lookbackWindow: z.enum(LOOKBACK_WINDOWS).default("last_7_days"),
   brandVoiceId: z.string().min(1).optional(),
   repositoryIds: z.array(z.string().min(1)).optional(),
-  dataPoints: contentDataPointSettingsSchema.optional(),
+  dataPoints: contentDataPointSettingsSchema.prefault({}),
   selectedItems: selectedItemsSchema.optional(),
 });
 
