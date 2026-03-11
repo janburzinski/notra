@@ -403,7 +403,16 @@ export function CreateContentDialog({
     },
     onError: (err) => {
       abortControllerRef.current = null;
-      if (err.name !== "AbortError") {
+      if (err.name === "AbortError") {
+        toast.info(
+          "Generation may still complete in the background. Check your content list shortly."
+        );
+        setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: QUERY_KEYS.POSTS.list(organizationId),
+          });
+        }, 15_000);
+      } else {
         toast.error(err.message);
       }
     },
