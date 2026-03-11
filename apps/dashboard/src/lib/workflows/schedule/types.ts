@@ -1,6 +1,7 @@
 import type { PostSourceMetadata } from "@notra/db/schema";
 import type { ToneProfile } from "@/schemas/brand";
 import type { AgentDataPointSettings } from "@/types/ai/agents";
+import type { GitHubSelectionFilters } from "@/types/ai/tools";
 
 export interface ContentGenerationContext {
   organizationId: string;
@@ -21,9 +22,15 @@ export interface ContentGenerationContext {
     companyDescription?: string;
     audience?: string;
     customInstructions?: string | null;
+    language?: string;
   };
   sourceMetadata: PostSourceMetadata;
   dataPointSettings?: AgentDataPointSettings;
+  selectionFilters?: GitHubSelectionFilters;
+  commitWindow?: {
+    since: string;
+    until: string;
+  };
 }
 
 export type ContentGenerationResult =

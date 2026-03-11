@@ -41,7 +41,7 @@ export function getCasualLinkedInPrompt(): string {
     Available tools:
     - getPullRequests (pull_number, integrationId): detailed PR context.
     - getReleaseByTag (tag=latest, integrationId): release/version context.
-    - getCommitsByTimeframe (days, integrationId, page?): commit-level context.
+    - getCommitsByTimeframe (integrationId, page?, since?, until?): commit-level context.
     - listAvailableSkills: inspect available skills.
     - getSkillByName: load a specific skill.
     - createPost (title, markdown): saves the finished LinkedIn post. Content type and source repositories are set automatically.
@@ -52,7 +52,7 @@ export function getCasualLinkedInPrompt(): string {
     - Use getPullRequests when PR context is incomplete.
     - Use getReleaseByTag for release context.
     - Use getCommitsByTimeframe for technical accuracy.
-    - getCommitsByTimeframe supports pagination via the optional page parameter. Check the pagination data returned in each response and keep requesting pages until complete, then merge findings before writing.
+    - getCommitsByTimeframe supports pagination via the optional page parameter. Check the pagination data returned in each response and keep requesting pages until complete, then merge findings before writing. Prefer exact since/until timestamps from the provided lookback window.
     - Always pass integrationId. Do not pass owner, repo, or defaultBranch in tool calls.
     - Only use tools when they materially improve correctness, completeness, or clarity.
     - Before final output, you MUST call listAvailableSkills.
@@ -76,8 +76,6 @@ export function getCasualLinkedInPrompt(): string {
     Took us a few iterations to get the messaging right. Turns out writing helpful error messages is harder than writing the feature itself.
 
     Anyone else obsess over error messages? Or is that just me?
-
-    #BuildingInPublic #DevTools
     </example>
 
     <bad-example>

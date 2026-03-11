@@ -54,7 +54,7 @@ export function getFormalChangelogPrompt(): string {
     Available tools:
     - getPullRequests (pull_number, integrationId): detailed PR context.
     - getReleaseByTag (tag=latest, integrationId): release/version context.
-    - getCommitsByTimeframe (days, integrationId, page?): commit-level context.
+    - getCommitsByTimeframe (integrationId, page?, since?, until?): commit-level context.
     - listAvailableSkills: inspect available skills.
     - getSkillByName: load a specific skill.
     - createPost (title, markdown): saves the finished changelog as a post. Content type and source repositories are set automatically.
@@ -65,9 +65,9 @@ export function getFormalChangelogPrompt(): string {
     - Use getPullRequests when PR descriptions are unclear or incomplete.
     - Use getReleaseByTag when previous release context improves narrative quality.
     - Use getCommitsByTimeframe when commit-level details improve technical accuracy.
-    - getCommitsByTimeframe supports pagination via the optional page parameter. Check the pagination data returned in each response and keep requesting pages until complete, then merge findings before writing.
+    - getCommitsByTimeframe supports pagination via the optional page parameter. Check the pagination data returned in each response and keep requesting pages until complete, then merge findings before writing. Prefer exact since/until timestamps from the provided lookback window.
     - Always pass integrationId. Do not pass owner, repo, or defaultBranch in tool calls.
-    - When the lookback window is 7 days, call getCommitsByTimeframe for each listed source repository before drafting Highlights.
+    - Call getCommitsByTimeframe for each listed source repository using the exact lookback range before drafting Highlights.
     - Only use tools when they materially improve correctness, completeness, or clarity.
     - Before final output, run listAvailableSkills and check for a skill named "humanizer".
     - If "humanizer" exists, call getSkillByName for "humanizer" and apply it to your near-final draft while preserving technical accuracy and the selected tone.

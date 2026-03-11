@@ -6,11 +6,7 @@ import { getConversationalChangelogPrompt } from "@/lib/ai/prompts/changelog/con
 import { getFormalChangelogPrompt } from "@/lib/ai/prompts/changelog/formal";
 import { getProfessionalChangelogPrompt } from "@/lib/ai/prompts/changelog/professional";
 import { getChangelogUserPrompt } from "@/lib/ai/prompts/changelog/user";
-import {
-  createGetCommitsByTimeframeTool,
-  createGetPullRequestsTool,
-  createGetReleaseByTagTool,
-} from "@/lib/ai/tools/github";
+import { buildGitHubDataTools } from "@/lib/ai/tools/github";
 import {
   createCreatePostTool,
   createUpdatePostTool,
@@ -41,6 +37,8 @@ export async function generateChangelog(
     promptInput,
     sourceMetadata,
     dataPointSettings,
+    selectionFilters,
+    commitWindow,
   } = options;
 
   if (!repositories || repositories.length === 0) {
@@ -75,8 +73,6 @@ export async function generateChangelog(
     contentType: "changelog",
     sourceMetadata,
   } as const;
-  const includePullRequests = dataPointSettings?.includePullRequests !== false;
-  const includeCommits = dataPointSettings?.includeCommits !== false;
 
   const agent = new ToolLoopAgent({
     model,
@@ -86,26 +82,13 @@ export async function generateChangelog(
       },
     },
     tools: {
-      ...(includePullRequests
-        ? {
-            getPullRequests: createGetPullRequestsTool({
-              organizationId,
-              allowedIntegrationIds,
-            }),
-          }
-        : {}),
-      getReleaseByTag: createGetReleaseByTagTool({
+      ...buildGitHubDataTools({
         organizationId,
         allowedIntegrationIds,
+        dataPointSettings,
+        selectionFilters,
+        commitWindow,
       }),
-      ...(includeCommits
-        ? {
-            getCommitsByTimeframe: createGetCommitsByTimeframeTool({
-              organizationId,
-              allowedIntegrationIds,
-            }),
-          }
-        : {}),
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),

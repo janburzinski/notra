@@ -16,6 +16,8 @@ export async function handleChangelog(
       promptInput: ctx.promptInput,
       sourceMetadata: ctx.sourceMetadata,
       dataPointSettings: ctx.dataPointSettings,
+      selectionFilters: ctx.selectionFilters,
+      commitWindow: ctx.commitWindow,
     });
 
     return { status: "ok", postId, title };
