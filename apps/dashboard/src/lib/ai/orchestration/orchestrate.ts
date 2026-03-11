@@ -51,7 +51,11 @@ export async function orchestrateChat(
 
   const modelWithMemory = withSupermemory(
     gateway(routingDecision.model),
-    organizationId
+    organizationId,
+    {
+      mode: "full",
+      addMemory: "always",
+    }
   );
 
   const { tools, descriptions } = buildToolSet({

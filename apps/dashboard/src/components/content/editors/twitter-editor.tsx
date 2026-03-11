@@ -10,7 +10,7 @@ import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef } from "react";
 import { DiffView } from "@/components/content/diff-view";
-import { LinkedInPost } from "@/components/linkedin-post";
+import { TwitterPost } from "@/components/twitter-post";
 import type { ContentEditorProps } from "./types";
 
 const VIEW_OPTIONS = ["preview", "raw", "diff"] as const;
@@ -22,7 +22,7 @@ function isViewOption(value: string): value is ViewOption {
   return VIEW_OPTIONS_SET.has(value);
 }
 
-export function LinkedInEditor({
+export function TwitterEditor({
   content,
   state,
   actions,
@@ -88,23 +88,24 @@ export function LinkedInEditor({
         }
       >
         <TabsContent className="mt-0 flex justify-center py-4" value="preview">
-          <LinkedInPost
+          <TwitterPost
             author={{
               name: organization?.name ?? "Your Name",
               avatar: organization?.logo ?? undefined,
+              handle: (organization?.name ?? "yourname")
+                .toLowerCase()
+                .replace(/\s+/g, ""),
             }}
             className="w-full max-w-lg"
             content={currentMarkdown}
-            defaultExpanded
             onContentChange={(value) => actions.setEditedMarkdown(value)}
             onSelectionChange={actions.onSelectionChange}
             timestamp="Just now"
-            truncate={false}
           />
         </TabsContent>
         <TabsContent className="mt-0" value="raw">
           <textarea
-            aria-label="LinkedIn post content editor"
+            aria-label="Twitter post content editor"
             className="field-sizing-content w-full resize-none whitespace-pre-wrap rounded-lg border-0 bg-transparent font-mono text-sm selection:bg-primary/30 focus:outline-none focus:ring-0"
             onChange={(e) => {
               actions.setEditedMarkdown(e.target.value);

@@ -41,6 +41,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
               {databuddyClientID && (
                 <Databuddy
                   clientId={process.env.NEXT_PUBLIC_DATABUDDY_CLIENT_ID}
+                  trackAttributes={true}
+                  trackErrors={true}
+                  trackHashChanges={true}
+                  trackScrollDepth={true}
                 />
               )}
             </NuqsAdapter>

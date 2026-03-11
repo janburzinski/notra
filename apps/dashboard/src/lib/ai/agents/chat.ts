@@ -10,12 +10,17 @@ export async function createChatAgent(
   context: ChatAgentContext,
   instruction: string
 ) {
+  const { organizationId } = context;
   const decision = await routeMessage(instruction, false);
   const model = selectModel(decision);
 
   const modelWithMemory = withSupermemory(
     gateway(model),
-    context.organizationId
+    context.organizationId,
+    {
+      mode: "full",
+      addMemory: "always",
+    }
   );
 
   const { getMarkdown, editMarkdown } = createMarkdownTools({

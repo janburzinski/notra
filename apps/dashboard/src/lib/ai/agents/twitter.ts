@@ -1,11 +1,11 @@
 import { withSupermemory } from "@supermemory/tools/ai-sdk";
 import { stepCountIs, ToolLoopAgent } from "ai";
 import { gateway } from "@/lib/ai/gateway";
-import { getCasualChangelogPrompt } from "@/lib/ai/prompts/changelog/casual";
-import { getConversationalChangelogPrompt } from "@/lib/ai/prompts/changelog/conversational";
-import { getFormalChangelogPrompt } from "@/lib/ai/prompts/changelog/formal";
-import { getProfessionalChangelogPrompt } from "@/lib/ai/prompts/changelog/professional";
-import { getChangelogUserPrompt } from "@/lib/ai/prompts/changelog/user";
+import { getCasualTwitterPrompt } from "@/lib/ai/prompts/twitter/casual";
+import { getConversationalTwitterPrompt } from "@/lib/ai/prompts/twitter/conversational";
+import { getFormalTwitterPrompt } from "@/lib/ai/prompts/twitter/formal";
+import { getProfessionalTwitterPrompt } from "@/lib/ai/prompts/twitter/professional";
+import { getTwitterUserPrompt } from "@/lib/ai/prompts/twitter/user";
 import {
   createGetCommitsByTimeframeTool,
   createGetPullRequestsTool,
@@ -20,32 +20,31 @@ import {
 import { getSkillByName, listAvailableSkills } from "@/lib/ai/tools/skills";
 import { getValidToneProfile, type ToneProfile } from "@/schemas/brand";
 import type {
-  ChangelogAgentOptions,
-  ChangelogAgentResult,
+  TwitterAgentOptions,
+  TwitterAgentResult,
 } from "@/types/ai/agents";
 
-const changelogPromptByTone: Record<ToneProfile, () => string> = {
-  Conversational: getConversationalChangelogPrompt,
-  Professional: getProfessionalChangelogPrompt,
-  Casual: getCasualChangelogPrompt,
-  Formal: getFormalChangelogPrompt,
+const twitterPromptByTone: Record<ToneProfile, () => string> = {
+  Conversational: getConversationalTwitterPrompt,
+  Professional: getProfessionalTwitterPrompt,
+  Casual: getCasualTwitterPrompt,
+  Formal: getFormalTwitterPrompt,
 };
 
-export async function generateChangelog(
-  options: ChangelogAgentOptions
-): Promise<ChangelogAgentResult> {
+export async function generateTwitterPost(
+  options: TwitterAgentOptions
+): Promise<TwitterAgentResult> {
   const {
     organizationId,
     repositories,
     tone = "Conversational",
     promptInput,
     sourceMetadata,
-    dataPointSettings,
   } = options;
 
   if (!repositories || repositories.length === 0) {
     throw new Error(
-      "At least one repository must be provided to generate a changelog."
+      "At least one repository must be provided to generate a Twitter post."
     );
   }
 
@@ -61,9 +60,9 @@ export async function generateChangelog(
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
   const promptFactory =
-    changelogPromptByTone[resolvedTone] ?? changelogPromptByTone.Conversational;
+    twitterPromptByTone[resolvedTone] ?? twitterPromptByTone.Conversational;
   const instructions = promptFactory();
-  const prompt = getChangelogUserPrompt(promptInput);
+  const prompt = getTwitterUserPrompt(promptInput);
 
   const allowedIntegrationIds = Array.from(
     new Set(repositories.map((repo) => repo.integrationId))
@@ -72,11 +71,9 @@ export async function generateChangelog(
   const postToolsResult: PostToolsResult = {};
   const postToolsConfig = {
     organizationId,
-    contentType: "changelog",
+    contentType: "twitter_post",
     sourceMetadata,
   } as const;
-  const includePullRequests = dataPointSettings?.includePullRequests !== false;
-  const includeCommits = dataPointSettings?.includeCommits !== false;
 
   const agent = new ToolLoopAgent({
     model,
@@ -86,26 +83,18 @@ export async function generateChangelog(
       },
     },
     tools: {
-      ...(includePullRequests
-        ? {
-            getPullRequests: createGetPullRequestsTool({
-              organizationId,
-              allowedIntegrationIds,
-            }),
-          }
-        : {}),
+      getPullRequests: createGetPullRequestsTool({
+        organizationId,
+        allowedIntegrationIds,
+      }),
       getReleaseByTag: createGetReleaseByTagTool({
         organizationId,
         allowedIntegrationIds,
       }),
-      ...(includeCommits
-        ? {
-            getCommitsByTimeframe: createGetCommitsByTimeframeTool({
-              organizationId,
-              allowedIntegrationIds,
-            }),
-          }
-        : {}),
+      getCommitsByTimeframe: createGetCommitsByTimeframeTool({
+        organizationId,
+        allowedIntegrationIds,
+      }),
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),
@@ -120,7 +109,7 @@ export async function generateChangelog(
 
   if (!postToolsResult.postId) {
     throw new Error(
-      "Changelog agent completed without creating a post. No createPost tool call was made."
+      "Twitter agent completed without creating a post. No createPost tool call was made."
     );
   }
 

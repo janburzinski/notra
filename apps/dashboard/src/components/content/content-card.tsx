@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { PostStatus } from "@/schemas/content";
 import { formatSnakeCaseLabel } from "@/utils/format";
+import { OutputTypeIcon } from "@/utils/output-types";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
 const CONTENT_TYPES = [
@@ -198,7 +199,11 @@ const ContentCard = memo(function ContentCard({
         >
           {status}
         </Badge>
-        <Badge className="capitalize" variant="secondary">
+        <Badge
+          className="flex items-center gap-1 capitalize"
+          variant="secondary"
+        >
+          <OutputTypeIcon className="size-3" outputType={contentType} />
           {getContentTypeLabel(contentType)}
         </Badge>
       </div>

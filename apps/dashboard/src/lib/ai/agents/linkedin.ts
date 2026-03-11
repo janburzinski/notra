@@ -51,7 +51,11 @@ export async function generateLinkedInPost(
 
   const model = withSupermemory(
     gateway("anthropic/claude-haiku-4.5"),
-    organizationId
+    organizationId,
+    {
+      mode: "full",
+      addMemory: "always",
+    }
   );
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");

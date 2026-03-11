@@ -57,6 +57,8 @@ interface RepositoryData {
 }
 
 type BrandSettingsData = {
+  id: string;
+  name: string;
   toneProfile: string | null;
   companyName: string | null;
   companyDescription: string | null;
@@ -199,6 +201,8 @@ export const { POST } = serve<ScheduleWorkflowPayload>(
         }
 
         return {
+          id: result.id,
+          name: result.name,
           toneProfile: result.toneProfile,
           companyName: result.companyName,
           companyDescription: result.companyDescription,
@@ -269,6 +273,8 @@ export const { POST } = serve<ScheduleWorkflowPayload>(
               start: lookbackRange.start.toISOString(),
               end: lookbackRange.end.toISOString(),
             },
+            brandVoiceName: brand?.name,
+            brandVoiceId: brand?.id,
           };
 
           const promptInput = {
