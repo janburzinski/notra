@@ -5,6 +5,7 @@ import { createOctokit } from "@/lib/octokit";
 import { getGitHubToolRepositoryContextByIntegrationId } from "@/lib/services/github-integration";
 import type { AgentDataPointSettings } from "@/types/ai/agents";
 import type {
+  CommitWindow,
   ErrorWithStatus,
   GitHubSelectionFilters,
   GitHubToolsAccessConfig,
@@ -180,21 +181,14 @@ function createAllowedNumberLookup(
     return undefined;
   }
 
-  const entries: Array<[string, Set<number>]> = [];
-  for (const [integrationId, numbers] of Object.entries(values)) {
-    const allowedNumbers = new Set(
-      (numbers ?? []).map((value) => Number(value)).filter(Number.isFinite)
-    );
-    if (allowedNumbers.size > 0) {
-      entries.push([integrationId, allowedNumbers]);
-    }
-  }
-
-  if (entries.length === 0) {
-    return undefined;
-  }
-
-  return new Map(entries);
+  return new Map(
+    Object.entries(values).map(([integrationId, numbers]) => [
+      integrationId,
+      new Set(
+        (numbers ?? []).map((value) => Number(value)).filter(Number.isFinite)
+      ),
+    ])
+  );
 }
 
 function createAllowedStringLookup(
@@ -204,24 +198,17 @@ function createAllowedStringLookup(
     return undefined;
   }
 
-  const entries: Array<[string, Set<string>]> = [];
-  for (const [integrationId, tags] of Object.entries(values)) {
-    const allowedTags = new Set(
-      (tags ?? [])
-        .map((value) => value.trim())
-        .filter((value) => value.length > 0)
-        .map((value) => value.toLowerCase())
-    );
-    if (allowedTags.size > 0) {
-      entries.push([integrationId, allowedTags]);
-    }
-  }
-
-  if (entries.length === 0) {
-    return undefined;
-  }
-
-  return new Map(entries);
+  return new Map(
+    Object.entries(values).map(([integrationId, tags]) => [
+      integrationId,
+      new Set(
+        (tags ?? [])
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0)
+          .map((value) => value.toLowerCase())
+      ),
+    ])
+  );
 }
 
 function getNextPageFromLinkHeader(
@@ -369,13 +356,17 @@ export function createGetReleaseByTagTool(
   const allowedReleaseTagsByIntegrationId = createAllowedStringLookup(
     config?.allowedReleaseTagsByIntegrationId
   );
-  const allowedReleaseTagsGlobal = config?.allowedReleaseTagsGlobal?.length
-    ? new Set(
-        config.allowedReleaseTagsGlobal
-          .map((value) => value.trim().toLowerCase())
-          .filter((value) => value.length > 0)
-      )
-    : undefined;
+  const hasReleaseSelectionFilter =
+    config?.allowedReleaseTagsByIntegrationId !== undefined ||
+    config?.allowedReleaseTagsGlobal !== undefined;
+  const allowedReleaseTagsGlobal =
+    config?.allowedReleaseTagsGlobal !== undefined
+      ? new Set(
+          config.allowedReleaseTagsGlobal
+            .map((value) => value.trim().toLowerCase())
+            .filter((value) => value.length > 0)
+        )
+      : undefined;
 
   return cached(
     tool({
@@ -404,11 +395,8 @@ Returns release body (changelog), assets list, author, and timestamps.`,
         const isLatestRequest = normalizedTag === "latest";
         const allowedTagsForIntegration =
           allowedReleaseTagsByIntegrationId?.get(integrationId);
-        const hasSelectionFilter =
-          (allowedTagsForIntegration?.size ?? 0) > 0 ||
-          (allowedReleaseTagsGlobal?.size ?? 0) > 0;
 
-        if (hasSelectionFilter && !isLatestRequest) {
+        if (hasReleaseSelectionFilter && !isLatestRequest) {
           const isAllowedForIntegration =
             allowedTagsForIntegration?.has(normalizedTag) ?? false;
           const isAllowedGlobally =
@@ -438,7 +426,7 @@ Returns release body (changelog), assets list, author, and timestamps.`,
           })
         );
 
-        if (isLatestRequest && hasSelectionFilter) {
+        if (isLatestRequest && hasReleaseSelectionFilter) {
           const resolvedTag = releases.data.tag_name.trim().toLowerCase();
           const isAllowedForIntegration =
             allowedTagsForIntegration?.has(resolvedTag) ?? false;
@@ -508,13 +496,14 @@ export function createGetCommitsByTimeframeTool(
     namespace: "github",
   });
   const resolveIntegrationContext = createIntegrationContextResolver(config);
-  const allowedCommitShas = config?.allowedCommitShas?.length
-    ? new Set(
-        config.allowedCommitShas
-          .map((value) => value.trim().toLowerCase())
-          .filter((value) => value.length > 0)
-      )
-    : undefined;
+  const allowedCommitShas =
+    config?.allowedCommitShas !== undefined
+      ? new Set(
+          config.allowedCommitShas
+            .map((value) => value.trim().toLowerCase())
+            .filter((value) => value.length > 0)
+        )
+      : undefined;
 
   return cached(
     tool({
@@ -640,7 +629,7 @@ interface BuildGitHubDataToolsOptions {
   allowedIntegrationIds: string[];
   dataPointSettings?: AgentDataPointSettings;
   selectionFilters?: GitHubSelectionFilters;
-  commitWindow?: { since: string; until: string };
+  commitWindow?: CommitWindow;
 }
 
 export function buildGitHubDataTools(
