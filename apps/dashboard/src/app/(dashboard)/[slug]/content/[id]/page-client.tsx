@@ -11,7 +11,6 @@ import { Button } from "@notra/ui/components/ui/button";
 import { useSidebar } from "@notra/ui/components/ui/sidebar";
 import { Linkedin } from "@notra/ui/components/ui/svgs/linkedin";
 import { XTwitter } from "@notra/ui/components/ui/svgs/twitter";
-
 import {
   Tooltip,
   TooltipContent,
@@ -32,6 +31,7 @@ import ChatInput, {
 import { getContentTypeLabel } from "@/components/content/content-card";
 import type { EditorRefHandle } from "@/components/content/editor/plugins/editor-ref-plugin";
 import { ContentEditorSwitch } from "@/components/content/editors";
+import { RecommendationsSection } from "@/components/content/recommendations-section";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { LINKEDIN_BRAND_PRIMARY } from "@/constants/linkedin";
 import { TWITTER_BRAND_COLOR } from "@/constants/twitter";
@@ -189,7 +189,7 @@ export default function PageClient({
 
     setIsSaving(true);
     try {
-      const body: Record<string, string> = {};
+      const body: Record<string, string | null> = {};
       if (hasTitleChanges) {
         body.title = title.trim();
       }
@@ -731,6 +731,8 @@ export default function PageClient({
             hasTitleChanges,
           }}
         />
+
+        <RecommendationsSection value={content.recommendations} />
 
         <div className="h-24" />
       </div>

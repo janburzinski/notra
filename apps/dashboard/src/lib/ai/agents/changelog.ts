@@ -1,17 +1,17 @@
-import { withSupermemory } from "@supermemory/tools/ai-sdk";
 import { stepCountIs, ToolLoopAgent } from "ai";
-import { gateway } from "@/lib/ai/gateway";
+import { createModel } from "@/lib/ai/model";
 import { getCasualChangelogPrompt } from "@/lib/ai/prompts/changelog/casual";
 import { getConversationalChangelogPrompt } from "@/lib/ai/prompts/changelog/conversational";
 import { getFormalChangelogPrompt } from "@/lib/ai/prompts/changelog/formal";
 import { getProfessionalChangelogPrompt } from "@/lib/ai/prompts/changelog/professional";
 import { getChangelogUserPrompt } from "@/lib/ai/prompts/changelog/user";
+import { createGetBrandReferencesTool } from "@/lib/ai/tools/brand-references";
 import { buildGitHubDataTools } from "@/lib/ai/tools/github";
 import {
   createCreatePostTool,
+  createFailTool,
   createUpdatePostTool,
   createViewPostTool,
-  type PostToolsResult,
 } from "@/lib/ai/tools/post";
 import { getSkillByName, listAvailableSkills } from "@/lib/ai/tools/skills";
 import { getValidToneProfile, type ToneProfile } from "@/schemas/brand";
@@ -19,6 +19,7 @@ import type {
   ChangelogAgentOptions,
   ChangelogAgentResult,
 } from "@/types/ai/agents";
+import type { PostToolsResult } from "@/types/ai/post-tools";
 
 const changelogPromptByTone: Record<ToneProfile, () => string> = {
   Conversational: getConversationalChangelogPrompt,
@@ -32,6 +33,7 @@ export async function generateChangelog(
 ): Promise<ChangelogAgentResult> {
   const {
     organizationId,
+    voiceId,
     repositories,
     tone = "Conversational",
     promptInput,
@@ -47,14 +49,7 @@ export async function generateChangelog(
     );
   }
 
-  const model = withSupermemory(
-    gateway("anthropic/claude-haiku-4.5"),
-    organizationId,
-    {
-      mode: "full",
-      addMemory: "always",
-    }
-  );
+  const model = createModel(organizationId, "anthropic/claude-haiku-4.5");
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
@@ -82,6 +77,11 @@ export async function generateChangelog(
       },
     },
     tools: {
+      getBrandReferences: createGetBrandReferencesTool({
+        organizationId,
+        voiceId,
+        agentType: "changelog",
+      }),
       ...buildGitHubDataTools({
         organizationId,
         allowedIntegrationIds,
@@ -92,8 +92,9 @@ export async function generateChangelog(
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),
-      updatePost: createUpdatePostTool(postToolsConfig),
+      updatePost: createUpdatePostTool(postToolsConfig, postToolsResult),
       viewPost: createViewPostTool(postToolsConfig),
+      fail: createFailTool(postToolsResult),
     },
     instructions,
     stopWhen: stepCountIs(35),
@@ -101,14 +102,25 @@ export async function generateChangelog(
 
   await agent.generate({ prompt });
 
-  if (!postToolsResult.postId) {
+  if (postToolsResult.failReason) {
+    throw new Error(postToolsResult.failReason);
+  }
+
+  if (!postToolsResult.posts?.length) {
     throw new Error(
       "Changelog agent completed without creating a post. No createPost tool call was made."
     );
   }
 
+  const primaryPost = postToolsResult.posts[0];
+
+  if (!primaryPost) {
+    throw new Error("Changelog agent did not return a primary post.");
+  }
+
   return {
-    postId: postToolsResult.postId,
-    title: postToolsResult.title ?? "",
+    postId: primaryPost.postId,
+    title: primaryPost.title,
+    posts: postToolsResult.posts,
   };
 }

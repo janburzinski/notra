@@ -15,7 +15,12 @@ export const getPostsParamsSchema = z.object({
 });
 
 export const postStatusSchema = z.enum(["draft", "published"]);
-export const postContentTypeSchema = z.enum(["changelog", "linkedin_post"]);
+export const postContentTypeSchema = z.enum([
+  "changelog",
+  "linkedin_post",
+  "twitter_post",
+  "blog_post",
+]);
 export type PostStatus = z.infer<typeof postStatusSchema>;
 export type PostContentType = z.infer<typeof postContentTypeSchema>;
 
@@ -159,6 +164,7 @@ export const postResponseSchema = z.object({
   title: z.string(),
   content: z.string(),
   markdown: z.string(),
+  recommendations: z.string().nullable(),
   contentType: z.string(),
   sourceMetadata: z.unknown().nullable(),
   status: postStatusSchema,

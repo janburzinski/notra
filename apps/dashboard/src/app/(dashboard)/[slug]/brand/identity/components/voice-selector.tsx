@@ -37,6 +37,7 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AffectedTriggersWarning } from "@/components/affected-triggers-warning";
 import { getBrandFaviconUrl } from "@/utils/brand";
 import { truncateText } from "@/utils/format";
 import { useUpdateBrandSettings } from "../../../../../../lib/hooks/use-brand-analysis";
@@ -49,17 +50,21 @@ export function VoiceSelector({
   activeVoiceId,
   onSelect,
   organizationId,
-  isDefault,
   onReanalyze,
   isReanalyzing,
   onDelete,
   isDeleting,
   onSetDefault,
   isSettingDefault,
+  affectedSchedules,
+  affectedEvents,
+  isLoadingAffected,
+  isDeleteDialogOpen,
+  onRequestDelete,
+  onDeleteDialogChange,
 }: VoiceSelectorProps) {
   const updateMutation = useUpdateBrandSettings(organizationId);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [identityName, setIdentityName] = useState("");
 
   const activeVoice = voices.find((v) => v.id === activeVoiceId);
@@ -125,7 +130,7 @@ export function VoiceSelector({
                           </span>
                         }
                       />
-                      <TooltipContent className="space-y-1">
+                      <TooltipContent className="max-w-64 space-y-1">
                         {voice.toneProfile && (
                           <p>Tone Profile: {voice.toneProfile}</p>
                         )}
@@ -143,78 +148,83 @@ export function VoiceSelector({
                       {truncateText(voice.name, IDENTITY_NAME_MAX_LENGTH)}
                     </span>
                   )}
-                  {isActive && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        className="ml-auto flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md hover:bg-accent"
-                        disabled={
-                          isDeleting || isSettingDefault || isReanalyzing
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      className={`ml-auto flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-md hover:bg-accent ${
+                        isActive
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100"
+                      }`}
+                      disabled={isDeleting || isSettingDefault || isReanalyzing}
+                      nativeButton={false}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isActive) {
+                          onSelect(voice.id);
                         }
-                        onClick={(e) => e.stopPropagation()}
+                      }}
+                      render={<span />}
+                    >
+                      <HugeiconsIcon
+                        className="size-3.5 text-muted-foreground"
+                        icon={MoreVerticalIcon}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-64">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelect(voice.id);
+                          setIdentityName(voice.name);
+                          setEditDialogOpen(true);
+                        }}
+                      >
+                        <HugeiconsIcon className="size-4" icon={Edit02Icon} />
+                        Edit identity name
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={!voice.websiteUrl?.trim() || isReanalyzing}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelect(voice.id);
+                          if (voice.websiteUrl) {
+                            onReanalyze(voice.websiteUrl);
+                          }
+                        }}
                       >
                         <HugeiconsIcon
-                          className="size-3.5 text-muted-foreground"
-                          icon={MoreVerticalIcon}
+                          className="size-4"
+                          icon={Refresh01Icon}
                         />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-64">
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIdentityName(activeVoice?.name ?? "");
-                            setEditDialogOpen(true);
-                          }}
-                        >
-                          <HugeiconsIcon className="size-4" icon={Edit02Icon} />
-                          Edit identity name
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          disabled={
-                            !activeVoice?.websiteUrl?.trim() || isReanalyzing
-                          }
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (activeVoice?.websiteUrl) {
-                              onReanalyze(activeVoice.websiteUrl);
-                            }
-                          }}
-                        >
-                          <HugeiconsIcon
-                            className="size-4"
-                            icon={Refresh01Icon}
-                          />
-                          Re-analyze
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          disabled={isDefault}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSetDefault();
-                          }}
-                        >
-                          <HugeiconsIcon className="size-4" icon={StarIcon} />
-                          {isDefault
-                            ? "Already default identity"
-                            : "Set as default identity"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          disabled={isDefault}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteDialogOpen(true);
-                          }}
-                          variant="destructive"
-                        >
-                          <HugeiconsIcon
-                            className="size-4"
-                            icon={Delete02Icon}
-                          />
-                          Delete identity
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                        Re-analyze
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        disabled={voice.isDefault}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelect(voice.id);
+                          onSetDefault();
+                        }}
+                      >
+                        <HugeiconsIcon className="size-4" icon={StarIcon} />
+                        {voice.isDefault
+                          ? "Already default identity"
+                          : "Set as default identity"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={voice.isDefault}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRequestDelete(voice.id);
+                        }}
+                        variant="destructive"
+                      >
+                        <HugeiconsIcon className="size-4" icon={Delete02Icon} />
+                        Delete identity
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 {voice.websiteUrl && (
                   <p className="truncate text-muted-foreground text-xs italic">
@@ -285,7 +295,7 @@ export function VoiceSelector({
       </ResponsiveDialog>
 
       <ResponsiveDialog
-        onOpenChange={setDeleteDialogOpen}
+        onOpenChange={onDeleteDialogChange}
         open={isDeleteDialogOpen}
       >
         <ResponsiveDialogContent className="sm:max-w-md">
@@ -296,6 +306,14 @@ export function VoiceSelector({
               This action cannot be undone.
             </ResponsiveDialogDescription>
           </ResponsiveDialogHeader>
+
+          <AffectedTriggersWarning
+            events={affectedEvents}
+            isLoading={isLoadingAffected}
+            resourceLabel="identity"
+            schedules={affectedSchedules}
+          />
+
           <ResponsiveDialogFooter>
             <ResponsiveDialogClose
               disabled={isDeleting}
@@ -313,7 +331,7 @@ export function VoiceSelector({
               disabled={isDeleting}
               onClick={() => {
                 onDelete();
-                setDeleteDialogOpen(false);
+                onDeleteDialogChange(false);
               }}
               variant="destructive"
             >

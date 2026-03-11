@@ -1,7 +1,7 @@
 import { SUPPORTED_LANGUAGES } from "@/constants/languages";
 import type { ToneProfile } from "@/schemas/brand";
 
-export const AUTO_SAVE_DELAY = 1500;
+export const AUTO_SAVE_DELAY = 2500;
 
 export const ANALYSIS_STEPS = [
   { value: "scraping", label: "Scraping" },

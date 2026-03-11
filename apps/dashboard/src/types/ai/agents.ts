@@ -1,6 +1,8 @@
 import type { PostSourceMetadata } from "@notra/db/schema";
 import type { ToneProfile } from "@/schemas/brand";
+import type { PostSummary } from "@/types/posts";
 import type {
+  BlogPostTonePromptInput,
   ChangelogTonePromptInput,
   LinkedInTonePromptInput,
   TwitterTonePromptInput,
@@ -17,10 +19,12 @@ export interface AgentDataPointSettings {
 export interface ChangelogAgentResult {
   postId: string;
   title: string;
+  posts: PostSummary[];
 }
 
 export interface ChangelogAgentOptions {
   organizationId: string;
+  voiceId?: string;
   repositories: Array<{
     integrationId: string;
     owner: string;
@@ -41,10 +45,12 @@ export interface ChangelogAgentOptions {
 export interface LinkedInAgentResult {
   postId: string;
   title: string;
+  posts: PostSummary[];
 }
 
 export interface LinkedInAgentOptions {
   organizationId: string;
+  voiceId?: string;
   repositories: Array<{
     integrationId: string;
     owner: string;
@@ -65,10 +71,12 @@ export interface LinkedInAgentOptions {
 export interface TwitterAgentResult {
   postId: string;
   title: string;
+  posts: PostSummary[];
 }
 
 export interface TwitterAgentOptions {
   organizationId: string;
+  voiceId?: string;
   repositories: Array<{
     integrationId: string;
     owner: string;
@@ -77,6 +85,25 @@ export interface TwitterAgentOptions {
   }>;
   tone?: ToneProfile;
   promptInput: TwitterTonePromptInput;
+  sourceMetadata?: PostSourceMetadata;
+}
+
+export interface BlogPostAgentResult {
+  postId: string;
+  title: string;
+  posts: PostSummary[];
+}
+
+export interface BlogPostAgentOptions {
+  organizationId: string;
+  repositories: Array<{
+    integrationId: string;
+    owner: string;
+    repo: string;
+    defaultBranch?: string | null;
+  }>;
+  tone?: ToneProfile;
+  promptInput: BlogPostTonePromptInput;
   sourceMetadata?: PostSourceMetadata;
 }
 

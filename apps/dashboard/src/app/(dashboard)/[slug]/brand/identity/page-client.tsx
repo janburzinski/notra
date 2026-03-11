@@ -10,23 +10,34 @@ import {
   CardHeader,
   CardTitle,
 } from "@notra/ui/components/ui/card";
-import { useRef, useState } from "react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@notra/ui/components/ui/tabs";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { getValidLanguage, type ToneProfile } from "@/schemas/brand";
+import { formatRelativeTime } from "@/utils/format";
 import {
   useAnalyzeBrand,
   useBrandAnalysisProgress,
   useBrandSettings,
+  useBrandVoiceAffectedTriggers,
   useDeleteBrandVoice,
   useSetDefaultBrandVoice,
 } from "../../../../../lib/hooks/use-brand-analysis";
+import { useReferences } from "../../../../../lib/hooks/use-brand-references";
 import { AddIdentityDialog } from "./components/add-identity-dialog";
 import { BrandForm } from "./components/brand-form";
 import { ModalContent } from "./components/modal-content";
+import { ReferencesList } from "./components/references-list";
 import { VoiceSelector } from "./components/voice-selector";
 import { BrandIdentityPageSkeleton } from "./skeleton";
 import type {
@@ -38,6 +49,8 @@ import {
   getModalTitle,
   sanitizeBrandUrlInput,
 } from "./utils/brand-identity";
+
+const TAB_VALUES = ["identity", "references"] as const;
 
 export default function PageClient({ organizationSlug }: PageClientProps) {
   const { getOrganization, activeOrganization } = useOrganizationsContext();
@@ -71,16 +84,75 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     progress.status === "failed" ? progress.error : undefined;
 
   const voices = data?.voices ?? [];
-  const [activeVoiceId, setActiveVoiceId] = useState<string | null>(null);
+  const [activeVoiceId, setActiveVoiceId] = useQueryState(
+    "voice",
+    parseAsString
+  );
   const [addIdentityOpen, setAddIdentityOpen] = useState(false);
+  const [addReferenceOpen, setAddReferenceOpen] = useState(false);
+  const [deleteTargetVoiceId, setDeleteTargetVoiceId] = useState<string | null>(
+    null
+  );
+  const [activeTab, setActiveTab] = useQueryState(
+    "view",
+    parseAsStringLiteral(TAB_VALUES).withDefault("identity")
+  );
 
   const selectedVoice =
     voices.find((v) => v.id === activeVoiceId) ??
     voices.find((v) => v.isDefault) ??
     voices[0];
 
+  const deleteTargetVoice = deleteTargetVoiceId
+    ? voices.find((v) => v.id === deleteTargetVoiceId)
+    : null;
+
+  const { data: affectedData, isLoading: isLoadingAffected } =
+    useBrandVoiceAffectedTriggers(
+      organizationId,
+      deleteTargetVoiceId ?? "",
+      !!deleteTargetVoiceId &&
+        !!deleteTargetVoice &&
+        !deleteTargetVoice.isDefault
+    );
+
+  const { data: referencesData } = useReferences(
+    organizationId,
+    selectedVoice?.id ?? ""
+  );
+  const referenceCount = referencesData?.references.length ?? 0;
+  const selectedVoiceId = selectedVoice?.id;
+  const selectedVoiceUpdatedAt = selectedVoice?.updatedAt;
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSavedAtMs, setLastSavedAtMs] = useState<number | null>(null);
+  const [relativeTimeNow, setRelativeTimeNow] = useState(() => Date.now());
   const [url, setUrl] = useState("");
   const effectiveUrl = url.trim();
+
+  useEffect(() => {
+    if (!selectedVoiceId || !selectedVoiceUpdatedAt) {
+      setLastSavedAtMs(null);
+      return;
+    }
+
+    setLastSavedAtMs(new Date(selectedVoiceUpdatedAt).getTime());
+  }, [selectedVoiceId, selectedVoiceUpdatedAt]);
+
+  useEffect(() => {
+    if (activeTab !== "identity" || isSaving || !lastSavedAtMs) {
+      return;
+    }
+
+    setRelativeTimeNow(Date.now());
+    const interval = window.setInterval(() => {
+      setRelativeTimeNow(Date.now());
+    }, 10_000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [activeTab, isSaving, lastSavedAtMs]);
 
   const triggerAnalysis = async (rawUrl: string, voiceId?: string) => {
     let urlToAnalyze = rawUrl.trim();
@@ -119,14 +191,30 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     triggerAnalysis(voiceUrl, selectedVoice?.id);
 
   const handleDeleteVoice = async () => {
-    if (!selectedVoice || selectedVoice.isDefault) {
+    if (!deleteTargetVoice || deleteTargetVoice.isDefault) {
       return;
     }
 
     try {
-      await deleteVoiceMutation.mutateAsync(selectedVoice.id);
-      setActiveVoiceId(null);
-      toast.success("Brand identity deleted");
+      const result = await deleteVoiceMutation.mutateAsync(
+        deleteTargetVoice.id
+      );
+      if (activeVoiceId === deleteTargetVoice.id) {
+        setActiveVoiceId(null);
+      }
+      setDeleteTargetVoiceId(null);
+
+      const disabledCount =
+        (result.disabledSchedules?.length ?? 0) +
+        (result.disabledEvents?.length ?? 0);
+
+      if (disabledCount > 0) {
+        toast.success(
+          `Brand identity deleted. ${disabledCount} ${disabledCount === 1 ? "trigger was" : "triggers were"} disabled.`
+        );
+      } else {
+        toast.success("Brand identity deleted");
+      }
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -254,6 +342,16 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     audience: selectedVoice.audience ?? "",
     language: getValidLanguage(selectedVoice.language),
   };
+  let saveStatusText = "Saved just now";
+
+  if (isSaving) {
+    saveStatusText = "Saving...";
+  } else if (lastSavedAtMs) {
+    saveStatusText = formatRelativeTime(
+      new Date(lastSavedAtMs),
+      relativeTimeNow
+    );
+  }
 
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -261,26 +359,44 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <h1 className="font-bold text-3xl tracking-tight">
-              Brand Identity
+              {activeTab === "identity" ? "Brand Identity" : "References"}
             </h1>
             <p className="text-muted-foreground">
-              Configure your brand identity and tone
+              {activeTab === "identity"
+                ? "Configure your brand identity and tone"
+                : "Real posts the AI can learn your writing style from"}
             </p>
           </div>
-          <Button onClick={() => setAddIdentityOpen(true)} size="sm">
-            <HugeiconsIcon className="size-4" icon={Add01Icon} />
-            Add Identity
-          </Button>
+          {activeTab === "identity" ? (
+            <Button onClick={() => setAddIdentityOpen(true)} size="sm">
+              <HugeiconsIcon className="size-4" icon={Add01Icon} />
+              Add Identity
+            </Button>
+          ) : (
+            <Button onClick={() => setAddReferenceOpen(true)} size="sm">
+              <HugeiconsIcon className="size-4" icon={Add01Icon} />
+              Add Reference
+            </Button>
+          )}
         </div>
 
         <VoiceSelector
           activeVoiceId={selectedVoice.id}
-          isDefault={selectedVoice.isDefault}
+          affectedEvents={affectedData?.affectedEvents ?? []}
+          affectedSchedules={affectedData?.affectedSchedules ?? []}
+          isDeleteDialogOpen={!!deleteTargetVoiceId}
           isDeleting={deleteVoiceMutation.isPending}
+          isLoadingAffected={isLoadingAffected}
           isReanalyzing={analyzeMutation.isPending}
           isSettingDefault={setDefaultMutation.isPending}
           onDelete={handleDeleteVoice}
+          onDeleteDialogChange={(open) => {
+            if (!open) {
+              setDeleteTargetVoiceId(null);
+            }
+          }}
           onReanalyze={handleReanalyze}
+          onRequestDelete={setDeleteTargetVoiceId}
           onSelect={setActiveVoiceId}
           onSetDefault={handleSetDefault}
           organizationId={organizationId}
@@ -295,12 +411,52 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
           startPolling={startPolling}
         />
 
-        <BrandForm
-          initialData={initialData}
-          key={selectedVoice.id}
-          organizationId={organizationId}
-          voiceId={selectedVoice.id}
-        />
+        <Tabs
+          onValueChange={(v) => {
+            setActiveTab(v as "identity" | "references");
+          }}
+          value={activeTab}
+        >
+          <div className="flex items-center justify-between">
+            <TabsList variant="line">
+              <TabsTrigger value="identity">Identity</TabsTrigger>
+              <TabsTrigger value="references">
+                References
+                {referenceCount > 0 && (
+                  <span className="text-muted-foreground">
+                    ({referenceCount})
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+            {activeTab === "identity" && (
+              <span className="text-muted-foreground text-xs">
+                {saveStatusText}
+              </span>
+            )}
+          </div>
+
+          <TabsContent className="mt-6" value="identity">
+            <BrandForm
+              initialData={initialData}
+              key={selectedVoice.id}
+              onSavedAtChange={(savedAt) => setLastSavedAtMs(savedAt.getTime())}
+              onSavingChange={setIsSaving}
+              organizationId={organizationId}
+              voiceId={selectedVoice.id}
+            />
+          </TabsContent>
+
+          <TabsContent className="mt-6" value="references">
+            <ReferencesList
+              dialogOpen={addReferenceOpen}
+              key={`refs-${selectedVoice.id}`}
+              onDialogOpenChange={setAddReferenceOpen}
+              organizationId={organizationId}
+              voiceId={selectedVoice.id}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </PageContainer>
   );

@@ -1,5 +1,6 @@
 import type { SupportedLanguage } from "@/constants/languages";
 import type { ToneProfile } from "@/schemas/brand";
+import type { AffectedTrigger } from "@/schemas/integrations";
 import type { BrandSettings } from "@/types/hooks/brand-analysis";
 
 export interface PageClientProps {
@@ -22,13 +23,18 @@ export interface VoiceSelectorProps {
   activeVoiceId: string;
   onSelect: (id: string) => void;
   organizationId: string;
-  isDefault: boolean;
   onReanalyze: (url: string) => void;
   isReanalyzing: boolean;
   onDelete: () => void;
   isDeleting: boolean;
   onSetDefault: () => void;
   isSettingDefault: boolean;
+  affectedSchedules: AffectedTrigger[];
+  affectedEvents: AffectedTrigger[];
+  isLoadingAffected: boolean;
+  isDeleteDialogOpen: boolean;
+  onRequestDelete: (voiceId: string) => void;
+  onDeleteDialogChange: (open: boolean) => void;
 }
 
 export interface AddIdentityDialogProps {
@@ -56,6 +62,8 @@ export interface BrandFormProps {
   organizationId: string;
   voiceId: string;
   initialData: BrandFormInitialData;
+  onSavingChange?: (isSaving: boolean) => void;
+  onSavedAtChange?: (savedAt: Date) => void;
 }
 
 export type StepIconState = "pending" | "active" | "completed";

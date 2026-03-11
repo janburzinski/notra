@@ -110,14 +110,27 @@
           {
             "schema": {
               "anyOf": [
-                { "type": "string", "enum": ["changelog", "linkedin_post"] },
+                {
+                  "type": "string",
+                  "enum": [
+                    "changelog",
+                    "linkedin_post",
+                    "twitter_post",
+                    "blog_post"
+                  ]
+                },
                 {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": ["changelog", "linkedin_post"]
+                    "enum": [
+                      "changelog",
+                      "linkedin_post",
+                      "twitter_post",
+                      "blog_post"
+                    ]
                   },
-                  "maxItems": 2
+                  "maxItems": 4
                 }
               ],
               "description": "Filter by content type. Repeat the query param to pass multiple values."
@@ -145,6 +158,7 @@
                           "title": { "type": "string" },
                           "content": { "type": "string" },
                           "markdown": { "type": "string" },
+                          "recommendations": { "type": ["string", "null"] },
                           "contentType": { "type": "string" },
                           "sourceMetadata": {},
                           "status": {
@@ -159,6 +173,7 @@
                           "title",
                           "content",
                           "markdown",
+                          "recommendations",
                           "contentType",
                           "status",
                           "createdAt",
@@ -278,14 +293,27 @@
           {
             "schema": {
               "anyOf": [
-                { "type": "string", "enum": ["changelog", "linkedin_post"] },
+                {
+                  "type": "string",
+                  "enum": [
+                    "changelog",
+                    "linkedin_post",
+                    "twitter_post",
+                    "blog_post"
+                  ]
+                },
                 {
                   "type": "array",
                   "items": {
                     "type": "string",
-                    "enum": ["changelog", "linkedin_post"]
+                    "enum": [
+                      "changelog",
+                      "linkedin_post",
+                      "twitter_post",
+                      "blog_post"
+                    ]
                   },
-                  "maxItems": 2
+                  "maxItems": 4
                 }
               ],
               "description": "Filter by content type. Repeat the query param to pass multiple values."
@@ -311,6 +339,7 @@
                         "title": { "type": "string" },
                         "content": { "type": "string" },
                         "markdown": { "type": "string" },
+                        "recommendations": { "type": ["string", "null"] },
                         "contentType": { "type": "string" },
                         "sourceMetadata": {},
                         "status": {
@@ -325,6 +354,7 @@
                         "title",
                         "content",
                         "markdown",
+                        "recommendations",
                         "contentType",
                         "status",
                         "createdAt",

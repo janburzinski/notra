@@ -6,6 +6,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
+  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@notra/ui/components/ui/breadcrumb";
 import { Button } from "@notra/ui/components/ui/button";
@@ -17,8 +18,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId } from "react";
 
 const NON_ORG_PATHS: string[] = [];
-const SEGMENT_LABELS: Record<string, string> = {
-  billing: "Billing & Usage",
+
+const SEGMENT_CONFIG: Record<string, { label?: string; href?: null }> = {
+  billing: { label: "Billing & Usage" },
+  automation: { href: null },
 };
 
 export function SiteHeader() {
@@ -48,18 +51,29 @@ export function SiteHeader() {
       ? `/${segments.slice(0, index + 1).join("/")}`
       : `/${segments.slice(0, index + 2).join("/")}`;
     const isLast = index === breadcrumbSegments.length - 1;
+    const config = SEGMENT_CONFIG[segment];
+    const label =
+      config?.label ??
+      segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
+    const isClickable = config?.href !== null;
+    const content = (() => {
+      if (isClickable) {
+        return <BreadcrumbLink render={<Link href={href}>{label}</Link>} />;
+      }
+
+      if (isLast) {
+        return <BreadcrumbPage>{label}</BreadcrumbPage>;
+      }
+
+      return <span>{label}</span>;
+    })();
 
     const item = (
-      <BreadcrumbItem className="hover:underline" key={`${id}-item-${segment}`}>
-        <BreadcrumbLink
-          render={
-            <Link href={href}>
-              {SEGMENT_LABELS[segment] ??
-                segment.charAt(0).toUpperCase() +
-                  segment.slice(1).replace(/-/g, " ")}
-            </Link>
-          }
-        />
+      <BreadcrumbItem
+        className={isClickable ? "hover:underline" : undefined}
+        key={`${id}-item-${segment}`}
+      >
+        {content}
       </BreadcrumbItem>
     );
 

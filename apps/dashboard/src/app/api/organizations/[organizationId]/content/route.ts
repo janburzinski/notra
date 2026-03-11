@@ -145,6 +145,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         title: post.title,
         content: post.content,
         markdown: post.markdown,
+        recommendations: post.recommendations,
         contentType: post.contentType,
         status: post.status,
         createdAt: post.createdAt.toISOString(),

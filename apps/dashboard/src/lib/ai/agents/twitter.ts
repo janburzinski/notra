@@ -1,11 +1,11 @@
-import { withSupermemory } from "@supermemory/tools/ai-sdk";
 import { stepCountIs, ToolLoopAgent } from "ai";
-import { gateway } from "@/lib/ai/gateway";
+import { createModel } from "@/lib/ai/model";
 import { getCasualTwitterPrompt } from "@/lib/ai/prompts/twitter/casual";
 import { getConversationalTwitterPrompt } from "@/lib/ai/prompts/twitter/conversational";
 import { getFormalTwitterPrompt } from "@/lib/ai/prompts/twitter/formal";
 import { getProfessionalTwitterPrompt } from "@/lib/ai/prompts/twitter/professional";
 import { getTwitterUserPrompt } from "@/lib/ai/prompts/twitter/user";
+import { createGetBrandReferencesTool } from "@/lib/ai/tools/brand-references";
 import {
   createGetCommitsByTimeframeTool,
   createGetPullRequestsTool,
@@ -13,9 +13,9 @@ import {
 } from "@/lib/ai/tools/github";
 import {
   createCreatePostTool,
+  createFailTool,
   createUpdatePostTool,
   createViewPostTool,
-  type PostToolsResult,
 } from "@/lib/ai/tools/post";
 import { getSkillByName, listAvailableSkills } from "@/lib/ai/tools/skills";
 import { getValidToneProfile, type ToneProfile } from "@/schemas/brand";
@@ -23,6 +23,7 @@ import type {
   TwitterAgentOptions,
   TwitterAgentResult,
 } from "@/types/ai/agents";
+import type { PostToolsResult } from "@/types/ai/post-tools";
 
 const twitterPromptByTone: Record<ToneProfile, () => string> = {
   Conversational: getConversationalTwitterPrompt,
@@ -36,6 +37,7 @@ export async function generateTwitterPost(
 ): Promise<TwitterAgentResult> {
   const {
     organizationId,
+    voiceId,
     repositories,
     tone = "Conversational",
     promptInput,
@@ -48,14 +50,7 @@ export async function generateTwitterPost(
     );
   }
 
-  const model = withSupermemory(
-    gateway("anthropic/claude-haiku-4.5"),
-    organizationId,
-    {
-      mode: "full",
-      addMemory: "always",
-    }
-  );
+  const model = createModel(organizationId, "anthropic/claude-haiku-4.5");
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
@@ -83,6 +78,11 @@ export async function generateTwitterPost(
       },
     },
     tools: {
+      getBrandReferences: createGetBrandReferencesTool({
+        organizationId,
+        voiceId,
+        agentType: "twitter",
+      }),
       getPullRequests: createGetPullRequestsTool({
         organizationId,
         allowedIntegrationIds,
@@ -98,8 +98,9 @@ export async function generateTwitterPost(
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),
-      updatePost: createUpdatePostTool(postToolsConfig),
+      updatePost: createUpdatePostTool(postToolsConfig, postToolsResult),
       viewPost: createViewPostTool(postToolsConfig),
+      fail: createFailTool(postToolsResult),
     },
     instructions,
     stopWhen: stepCountIs(35),
@@ -107,14 +108,25 @@ export async function generateTwitterPost(
 
   await agent.generate({ prompt });
 
-  if (!postToolsResult.postId) {
+  if (postToolsResult.failReason) {
+    throw new Error(postToolsResult.failReason);
+  }
+
+  if (!postToolsResult.posts?.length) {
     throw new Error(
       "Twitter agent completed without creating a post. No createPost tool call was made."
     );
   }
 
+  const primaryPost = postToolsResult.posts[0];
+
+  if (!primaryPost) {
+    throw new Error("Twitter agent did not return a primary post.");
+  }
+
   return {
-    postId: postToolsResult.postId,
-    title: postToolsResult.title ?? "",
+    postId: primaryPost.postId,
+    title: primaryPost.title,
+    posts: postToolsResult.posts,
   };
 }

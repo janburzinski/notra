@@ -1,17 +1,17 @@
-import { withSupermemory } from "@supermemory/tools/ai-sdk";
 import { stepCountIs, ToolLoopAgent } from "ai";
-import { gateway } from "@/lib/ai/gateway";
+import { createModel } from "@/lib/ai/model";
 import { getCasualLinkedInPrompt } from "@/lib/ai/prompts/linkedin/casual";
 import { getConversationalLinkedInPrompt } from "@/lib/ai/prompts/linkedin/conversational";
 import { getFormalLinkedInPrompt } from "@/lib/ai/prompts/linkedin/formal";
 import { getProfessionalLinkedInPrompt } from "@/lib/ai/prompts/linkedin/professional";
 import { getLinkedInUserPrompt } from "@/lib/ai/prompts/linkedin/user";
+import { createGetBrandReferencesTool } from "@/lib/ai/tools/brand-references";
 import { buildGitHubDataTools } from "@/lib/ai/tools/github";
 import {
   createCreatePostTool,
+  createFailTool,
   createUpdatePostTool,
   createViewPostTool,
-  type PostToolsResult,
 } from "@/lib/ai/tools/post";
 import { getSkillByName, listAvailableSkills } from "@/lib/ai/tools/skills";
 import { getValidToneProfile, type ToneProfile } from "@/schemas/brand";
@@ -19,6 +19,7 @@ import type {
   LinkedInAgentOptions,
   LinkedInAgentResult,
 } from "@/types/ai/agents";
+import type { PostToolsResult } from "@/types/ai/post-tools";
 
 const linkedInPromptByTone: Record<ToneProfile, () => string> = {
   Conversational: getConversationalLinkedInPrompt,
@@ -32,6 +33,7 @@ export async function generateLinkedInPost(
 ): Promise<LinkedInAgentResult> {
   const {
     organizationId,
+    voiceId,
     repositories,
     tone = "Conversational",
     promptInput,
@@ -47,14 +49,7 @@ export async function generateLinkedInPost(
     );
   }
 
-  const model = withSupermemory(
-    gateway("anthropic/claude-haiku-4.5"),
-    organizationId,
-    {
-      mode: "full",
-      addMemory: "always",
-    }
-  );
+  const model = createModel(organizationId, "anthropic/claude-haiku-4.5");
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
@@ -82,6 +77,11 @@ export async function generateLinkedInPost(
       },
     },
     tools: {
+      getBrandReferences: createGetBrandReferencesTool({
+        organizationId,
+        voiceId,
+        agentType: "linkedin",
+      }),
       ...buildGitHubDataTools({
         organizationId,
         allowedIntegrationIds,
@@ -92,8 +92,9 @@ export async function generateLinkedInPost(
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),
-      updatePost: createUpdatePostTool(postToolsConfig),
+      updatePost: createUpdatePostTool(postToolsConfig, postToolsResult),
       viewPost: createViewPostTool(postToolsConfig),
+      fail: createFailTool(postToolsResult),
     },
     instructions,
     stopWhen: stepCountIs(35),
@@ -101,14 +102,25 @@ export async function generateLinkedInPost(
 
   await agent.generate({ prompt });
 
-  if (!postToolsResult.postId) {
+  if (postToolsResult.failReason) {
+    throw new Error(postToolsResult.failReason);
+  }
+
+  if (!postToolsResult.posts?.length) {
     throw new Error(
       "LinkedIn agent completed without creating a post. No createPost tool call was made."
     );
   }
 
+  const primaryPost = postToolsResult.posts[0];
+
+  if (!primaryPost) {
+    throw new Error("LinkedIn agent did not return a primary post.");
+  }
+
   return {
-    postId: postToolsResult.postId,
-    title: postToolsResult.title ?? "",
+    postId: primaryPost.postId,
+    title: primaryPost.title,
+    posts: postToolsResult.posts,
   };
 }

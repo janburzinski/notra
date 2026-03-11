@@ -222,7 +222,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
             <h1 className="font-bold text-3xl tracking-tight">Events</h1>
             <p className="text-muted-foreground">
               React to GitHub activity and trigger content generation
-              automatically.
+              automatically
             </p>
           </div>
           <AddTriggerDialog
@@ -419,10 +419,10 @@ function EventTable({
                     <span className="flex size-8 items-center justify-center rounded-lg border bg-muted/50">
                       <Github className="size-4" />
                     </span>
-                    <span className="text-sm">GitHub webhook</span>
+                    <span className="text-sm">GitHub Webhook</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="text-muted-foreground capitalize">
                   {formatEventList(trigger.sourceConfig.eventTypes)}
                 </TableCell>
                 <TableCell className="text-muted-foreground">

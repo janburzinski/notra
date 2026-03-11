@@ -366,7 +366,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
           <div className="space-y-1">
             <h1 className="font-bold text-3xl tracking-tight">Schedules</h1>
             <p className="text-muted-foreground">
-              Configure cron schedules that run daily, weekly, or monthly.
+              Configure cron schedules that run daily, weekly, or monthly
             </p>
           </div>
           <AddTriggerDialog

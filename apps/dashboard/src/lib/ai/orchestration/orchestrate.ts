@@ -1,11 +1,10 @@
-import { withSupermemory } from "@supermemory/tools/ai-sdk";
 import {
   convertToModelMessages,
   stepCountIs,
   streamText,
   type UIMessage,
 } from "ai";
-import { gateway } from "@/lib/ai/gateway";
+import { createModel } from "@/lib/ai/model";
 import { getContentEditorChatPrompt } from "@/lib/ai/prompts/content-editor";
 import type {
   OrchestrateInput,
@@ -49,14 +48,7 @@ export async function orchestrateChat(
     hasGitHub,
   });
 
-  const modelWithMemory = withSupermemory(
-    gateway(routingDecision.model),
-    organizationId,
-    {
-      mode: "full",
-      addMemory: "always",
-    }
-  );
+  const modelWithMemory = createModel(organizationId, routingDecision.model);
 
   const { tools, descriptions } = buildToolSet({
     organizationId,

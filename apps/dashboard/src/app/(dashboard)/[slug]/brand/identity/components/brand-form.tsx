@@ -18,8 +18,8 @@ import {
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useForm } from "@tanstack/react-form";
-import { useAsyncDebouncedCallback } from "@tanstack/react-pacer";
-import { useRef } from "react";
+import { useAsyncDebouncer } from "@tanstack/react-pacer";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import type { ToneProfile } from "@/schemas/brand";
 import { useUpdateBrandSettings } from "../../../../../../lib/hooks/use-brand-analysis";
@@ -35,11 +35,13 @@ export function BrandForm({
   organizationId,
   voiceId,
   initialData,
+  onSavingChange,
+  onSavedAtChange,
 }: BrandFormProps) {
   const updateMutation = useUpdateBrandSettings(organizationId);
   const lastSavedData = useRef<string>(JSON.stringify(initialData));
 
-  const debouncedSave = useAsyncDebouncedCallback(
+  const debouncer = useAsyncDebouncer(
     async (values: typeof initialData) => {
       const { useCustomTone: _, websiteUrl: rawUrl, ...valuesToSave } = values;
       const trimmedUrl = rawUrl.trim();
@@ -53,9 +55,18 @@ export function BrandForm({
         ...(websiteUrl !== undefined && { websiteUrl }),
       });
       lastSavedData.current = JSON.stringify(values);
-      toast.success("Changes saved");
+      onSavedAtChange?.(new Date());
+      onSavingChange?.(false);
     },
-    { wait: AUTO_SAVE_DELAY }
+    {
+      wait: AUTO_SAVE_DELAY,
+      onError: (error) => {
+        onSavingChange?.(false);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to save changes"
+        );
+      },
+    }
   );
 
   const form = useForm({
@@ -67,21 +78,28 @@ export function BrandForm({
         const currentData = JSON.stringify(currentValues);
 
         if (currentData === lastSavedData.current) {
+          debouncer.cancel();
+          onSavingChange?.(false);
           return;
         }
 
         if (currentValues.useCustomTone && !currentValues.customTone.trim()) {
+          debouncer.cancel();
+          onSavingChange?.(false);
           return;
         }
 
-        debouncedSave(currentValues).catch((error) => {
-          toast.error(
-            error instanceof Error ? error.message : "Failed to save changes"
-          );
-        });
+        onSavingChange?.(true);
+        debouncer.maybeExecute(currentValues);
       },
     },
   });
+
+  useEffect(() => {
+    return () => {
+      onSavingChange?.(false);
+    };
+  }, [onSavingChange]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -132,7 +150,7 @@ export function BrandForm({
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Description</Label>
                 <Textarea
-                  className="min-h-[7.5rem]"
+                  className="min-h-30"
                   id={field.name}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -303,7 +321,7 @@ export function BrandForm({
                     value={field.state.value}
                   >
                     <ComboboxInput
-                      className="[&_[data-slot=input-group-control]]:pl-9"
+                      className="**:data-[slot=input-group-control]:pl-9"
                       placeholder="Select language..."
                     />
                     <ComboboxContent>
@@ -335,7 +353,7 @@ export function BrandForm({
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Custom Instructions</Label>
                 <Textarea
-                  className="min-h-[6.25rem]"
+                  className="min-h-25"
                   id={field.name}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -354,7 +372,7 @@ export function BrandForm({
             <div className="space-y-2">
               <Label htmlFor={field.name}>Who are you writing for?</Label>
               <Textarea
-                className="min-h-[7.5rem]"
+                className="min-h-30"
                 id={field.name}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}

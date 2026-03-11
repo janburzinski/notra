@@ -1,12 +1,15 @@
 "use client";
 
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useId } from "react";
 import { ContentCard } from "@/components/content/content-card";
+import { ContentSkeletonCard } from "@/components/content/content-skeleton-card";
 import { ContentActivityCard } from "@/components/dashboard/content-activity-card";
 import { EmptyState } from "@/components/empty-state";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { authClient } from "@/lib/auth/client";
+import { useActiveGenerations } from "@/lib/hooks/use-active-generations";
 import { useTodayPosts } from "@/lib/hooks/use-posts";
 import type { ContentType, PostStatus } from "@/schemas/content";
 
@@ -54,18 +57,22 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   const skeletonId = useId();
   const { data: session } = authClient.useSession();
   const { data, isPending } = useTodayPosts(organizationId);
+  const { data: activeGenerations } = useActiveGenerations(organizationId);
   const greeting = getGreeting(new Date());
   const userName = session?.user?.name?.trim();
   const greetingText = userName ? `${greeting}, ${userName}!` : `${greeting}!`;
   const posts = data?.pages.flatMap((page) => page.posts) ?? [];
-  const previewPosts = posts.slice(0, 3);
+  const visibleGenerations = activeGenerations?.slice(0, 3) ?? [];
+  const hasActiveGenerations = visibleGenerations.length > 0;
+  const maxPreviewPosts = Math.max(0, 3 - visibleGenerations.length);
+  const previewPosts = posts.slice(0, maxPreviewPosts);
   const todayContent = (() => {
-    if (isPending) {
+    if (isPending && !hasActiveGenerations) {
       return (
         <div className="grid auto-rows-[1fr] justify-items-center gap-3 sm:grid-cols-2 sm:justify-items-stretch lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div
-              className="h-[170px] w-full max-w-[340px] rounded-lg border border-border/60 bg-muted/30 sm:h-[140px] sm:max-w-none"
+            <Skeleton
+              className="h-[10.625rem] w-full max-w-[21.25rem] rounded-lg sm:h-[8.75rem] sm:max-w-none"
               key={`${skeletonId}-${index + 1}`}
             />
           ))}
@@ -73,9 +80,20 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
       );
     }
 
-    if (previewPosts.length > 0) {
+    if (hasActiveGenerations || previewPosts.length > 0) {
       return (
         <div className="grid auto-rows-[1fr] justify-items-center gap-3 sm:grid-cols-2 sm:justify-items-stretch lg:grid-cols-3">
+          {visibleGenerations.map((gen) => (
+            <div
+              className="w-full max-w-[340px] sm:max-w-none"
+              key={`gen-${gen.runId}`}
+            >
+              <ContentSkeletonCard
+                className="min-h-35"
+                outputType={gen.outputType}
+              />
+            </div>
+          ))}
           {previewPosts.map((post) => (
             <div className="w-full max-w-[340px] sm:max-w-none" key={post.id}>
               <ContentCard

@@ -510,7 +510,7 @@ export default function ApiKeysPage() {
           <div className="space-y-1">
             <h1 className="font-bold text-3xl tracking-tight">API Keys</h1>
             <p className="text-muted-foreground">
-              Manage API keys for programmatic access to your organization.
+              Manage API keys for programmatic access to your organization
             </p>
           </div>
           <div className="flex items-center gap-2">

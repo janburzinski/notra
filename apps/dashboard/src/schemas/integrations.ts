@@ -217,6 +217,7 @@ export type ConfigureTriggerBody = z.infer<typeof configureTriggerBodySchema>;
 
 export const SUPPORTED_SCHEDULE_OUTPUT_TYPES = [
   "changelog",
+  "blog_post",
   "linkedin_post",
   "twitter_post",
 ] as const;
@@ -245,21 +246,20 @@ export const getSchedulesQuerySchema = z.object({
 });
 export type GetSchedulesQuery = z.infer<typeof getSchedulesQuerySchema>;
 
-export const affectedScheduleSchema = z.object({
+export const affectedTriggerSchema = z.object({
   id: z.string(),
   name: z.string(),
   enabled: z.boolean(),
 });
-export type AffectedSchedule = z.infer<typeof affectedScheduleSchema>;
+export type AffectedTrigger = z.infer<typeof affectedTriggerSchema>;
 
-export const integrationWithAffectedSchedulesSchema = z.object({
-  affectedSchedules: z.array(affectedScheduleSchema).optional(),
+export const affectedTriggersDataSchema = z.object({
+  affectedSchedules: z.array(affectedTriggerSchema).optional(),
+  affectedEvents: z.array(affectedTriggerSchema).optional(),
 });
-export type IntegrationWithAffectedSchedules = z.infer<
-  typeof integrationWithAffectedSchedulesSchema
->;
+export type AffectedTriggersData = z.infer<typeof affectedTriggersDataSchema>;
 
-export const deleteIntegrationResponseSchema = z.object({
+export const deleteResourceResponseSchema = z.object({
   success: z.boolean(),
   disabledSchedules: z
     .array(
@@ -269,7 +269,15 @@ export const deleteIntegrationResponseSchema = z.object({
       })
     )
     .optional(),
+  disabledEvents: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+      })
+    )
+    .optional(),
 });
-export type DeleteIntegrationResponse = z.infer<
-  typeof deleteIntegrationResponseSchema
+export type DeleteResourceResponse = z.infer<
+  typeof deleteResourceResponseSchema
 >;
