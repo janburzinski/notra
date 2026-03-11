@@ -36,7 +36,6 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@tanstack/react-store";
 import { Check, Loader2, Plus, RotateCw } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type {
@@ -51,13 +50,13 @@ import {
 } from "@/schemas/integrations";
 import type { GitHubIntegration } from "@/types/integrations";
 import { formatSnakeCaseLabel } from "@/utils/format";
+import { getOutputTypeLabel, OutputTypeIcon } from "@/utils/output-types";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
 // ─── Types ───────────────────────────────────────────────
 
 interface CreateContentDialogProps {
   organizationId: string;
-  organizationSlug: string;
 }
 
 interface CommitPreview {
@@ -159,7 +158,6 @@ function releaseSelectionFromKey(key: string): ReleaseSelection | null {
 
 export function CreateContentDialog({
   organizationId,
-  organizationSlug,
 }: CreateContentDialogProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("configure");
@@ -175,7 +173,6 @@ export function CreateContentDialog({
   const selectionsTouchedRef = useRef(false);
 
   const queryClient = useQueryClient();
-  const router = useRouter();
   const comboboxAnchor = useComboboxAnchor();
 
   const form = useForm({
@@ -354,10 +351,8 @@ export function CreateContentDialog({
 
   // ─── Mutation ──────────────────────────────────────────
 
-  const abortControllerRef = useRef<AbortController | null>(null);
-
   const mutation = useMutation<
-    { postId: string; title: string },
+    { success: boolean; runId: string },
     Error,
     {
       contentType: OnDemandContentType;
@@ -368,53 +363,29 @@ export function CreateContentDialog({
     }
   >({
     mutationFn: async (value) => {
-      abortControllerRef.current?.abort();
-      const controller = new AbortController();
-      abortControllerRef.current = controller;
-
       const res = await fetch(
         `/api/organizations/${organizationId}/content/generate`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(value),
-          signal: controller.signal,
         }
       );
       const payload = await res.json();
       if (!res.ok) {
-        if (res.status === 429 && payload?.retryAfterSeconds) {
-          throw new Error(
-            `Rate limit reached. Please retry in ${String(payload.retryAfterSeconds)} seconds.`
-          );
-        }
         throw new Error(payload?.error || "Failed to create content");
       }
       return payload;
     },
-    onSuccess: (data) => {
-      abortControllerRef.current = null;
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.POSTS.list(organizationId),
-      });
-      toast.success("Content generated");
+    onSuccess: () => {
       setOpen(false);
-      router.push(`/${organizationSlug}/content/${data.postId}`);
+      toast.success("Content generation started");
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ACTIVE_GENERATIONS.list(organizationId),
+      });
     },
     onError: (err) => {
-      abortControllerRef.current = null;
-      if (err.name === "AbortError") {
-        toast.info(
-          "Generation may still complete in the background. Check your content list shortly."
-        );
-        setTimeout(() => {
-          queryClient.invalidateQueries({
-            queryKey: QUERY_KEYS.POSTS.list(organizationId),
-          });
-        }, 15_000);
-      } else {
-        toast.error(err.message);
-      }
+      toast.error(err.message);
     },
   });
 
@@ -424,8 +395,6 @@ export function CreateContentDialog({
     (next: boolean) => {
       setOpen(next);
       if (!next) {
-        abortControllerRef.current?.abort();
-        abortControllerRef.current = null;
         form.reset();
         setStep("configure");
         setSelectedCommitKeys(new Set());
@@ -624,16 +593,24 @@ export function CreateContentDialog({
                       >
                         <SelectTrigger className="w-full" id={field.name}>
                           <SelectValue placeholder="Select content type">
-                            <span className="capitalize">
-                              {formatSnakeCaseLabel(field.state.value)}
+                            <span className="flex items-center gap-2">
+                              <OutputTypeIcon
+                                className="size-4"
+                                outputType={field.state.value}
+                              />
+                              {getOutputTypeLabel(field.state.value)}
                             </span>
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {SUPPORTED_SCHEDULE_OUTPUT_TYPES.map((type) => (
                             <SelectItem key={type} value={type}>
-                              <span className="capitalize">
-                                {formatSnakeCaseLabel(type)}
+                              <span className="flex items-center gap-2">
+                                <OutputTypeIcon
+                                  className="size-4"
+                                  outputType={type}
+                                />
+                                {getOutputTypeLabel(type)}
                               </span>
                             </SelectItem>
                           ))}

@@ -249,10 +249,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                 <TooltipContent>Table view</TooltipContent>
               </Tooltip>
             </ButtonGroup>
-            <CreateContentDialog
-              organizationId={organizationId}
-              organizationSlug={organizationSlug}
-            />
+            <CreateContentDialog organizationId={organizationId} />
           </div>
         </div>
         {isPending && <ContentPageSkeleton />}
