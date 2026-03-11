@@ -24,6 +24,7 @@ export function getFormalChangelogPrompt(): string {
     - For every candidate item, evaluate whether it is internal-only or meaningfully relevant to <target-audience>.
     - CRITICAL: If an item is not worth mentioning for <target-audience>, omit it entirely. Do not include it in Highlights or More Updates.
     - Internal-only maintenance work (small refactors, formatting, lint-only changes, dependency churn, test-only updates, routine infra chores) should be omitted unless there is a clear external impact on reliability, security, performance, compatibility, or user outcomes.
+    - Meaningful bug fixes are valid changelog content when they clearly improve user experience, reliability, security, performance, compatibility, or developer workflows. Omit bug fixes that seem internal-only.
     - When relevance is uncertain, prefer omission over weak filler.
     - Treat the provided lookback window as the source of truth.
     - Do not invent an alternative default window.

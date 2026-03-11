@@ -30,6 +30,7 @@ export function getProfessionalLinkedInPrompt(): string {
     - Structure: Hook, Insight/Story, Lesson, Takeaway.
     - Keep one core idea, max two supporting updates.
     - Emphasize practical impact and decision quality.
+    - Meaningful bug fixes can be the core of the post when they clearly improve user experience, reliability, security, performance, or developer workflows. Skip bug fixes that feel internal-only.
     - Treat lookback window as source of truth.
     - If no meaningful data is available from GitHub (no commits, no PRs, no releases in the lookback window), do NOT call createPost. Instead, call the fail tool with a concise reason explaining why no post could be generated.
 

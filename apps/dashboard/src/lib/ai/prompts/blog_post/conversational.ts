@@ -30,6 +30,7 @@ export function getConversationalBlogPostPrompt(): string {
     - When <target-audience> is non-developer-oriented, do not reference PR numbers or links. Focus on outcomes and user-facing impact.
     - Keep author attribution natural. Mention contributors inline when relevant (e.g., "built by [@author](https://github.com/author/)") rather than appending attribution to every item.
     - Internal-only maintenance work (small refactors, formatting, lint-only changes, dependency churn, test-only updates, routine infra chores) should be omitted unless there is a clear external impact.
+    - Meaningful bug fixes can absolutely drive the post when they clearly improve user experience, reliability, security, performance, or developer workflows. Skip bug fixes that read as internal-only maintenance.
     - Treat the provided lookback window as the source of truth.
     - Target 400 to 800 words for the body (excluding title). Shorter is fine if there is less to cover.
     - Do not include YAML frontmatter or metadata key-value blocks.
