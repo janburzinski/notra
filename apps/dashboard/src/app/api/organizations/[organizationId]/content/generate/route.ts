@@ -16,6 +16,8 @@ import {
 import type { GitHubSelectionFilters } from "@/types/ai/tools";
 import { formatUtcTodayContext, resolveLookbackRange } from "@/utils/lookback";
 
+export const maxDuration = 300;
+
 interface RouteContext {
   params: Promise<{ organizationId: string }>;
 }
