@@ -1,7 +1,7 @@
 import { db } from "@notra/db/drizzle";
 import type { PostSourceMetadata } from "@notra/db/schema";
 import { brandSettings, githubIntegrations } from "@notra/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { FEATURES } from "@/constants/features";
@@ -14,10 +14,141 @@ import {
   createOnDemandContentSchema,
   type SelectedItems,
 } from "@/schemas/content";
+import type { GitHubSelectionFilters } from "@/types/ai/tools";
 import { formatUtcTodayContext, resolveLookbackRange } from "@/utils/lookback";
 
 interface RouteContext {
   params: Promise<{ organizationId: string }>;
+}
+
+async function resolveBrandVoiceForManualGeneration(
+  organizationId: string,
+  brandVoiceId?: string
+) {
+  if (brandVoiceId) {
+    const explicitVoice = await db.query.brandSettings.findFirst({
+      where: and(
+        eq(brandSettings.id, brandVoiceId),
+        eq(brandSettings.organizationId, organizationId)
+      ),
+    });
+
+    if (!explicitVoice) {
+      return { brand: null, invalidRequestedVoice: true } as const;
+    }
+
+    return { brand: explicitVoice, invalidRequestedVoice: false } as const;
+  }
+
+  const defaultVoice = await db.query.brandSettings.findFirst({
+    where: and(
+      eq(brandSettings.organizationId, organizationId),
+      eq(brandSettings.isDefault, true)
+    ),
+  });
+
+  if (defaultVoice) {
+    return { brand: defaultVoice, invalidRequestedVoice: false } as const;
+  }
+
+  const latestVoice = await db.query.brandSettings.findFirst({
+    where: eq(brandSettings.organizationId, organizationId),
+    orderBy: [desc(brandSettings.updatedAt)],
+  });
+
+  return { brand: latestVoice ?? null, invalidRequestedVoice: false } as const;
+}
+
+function hasSelectedItemsOutsideTargets(
+  selectedItems: SelectedItems,
+  targetRepositoryIds: Set<string>
+) {
+  if (!selectedItems) {
+    return false;
+  }
+
+  if (
+    selectedItems.pullRequestNumbers?.some(
+      (item) => !targetRepositoryIds.has(item.repositoryId)
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    selectedItems.releaseTagNames?.some(
+      (item) =>
+        typeof item !== "string" && !targetRepositoryIds.has(item.repositoryId)
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function buildSelectionFilters(
+  selectedItems: SelectedItems,
+  targetRepositoryIds: Set<string>
+): GitHubSelectionFilters | undefined {
+  if (!selectedItems) {
+    return undefined;
+  }
+
+  const pullRequestByIntegrationId: Record<string, number[]> = {};
+  for (const item of selectedItems.pullRequestNumbers ?? []) {
+    if (!targetRepositoryIds.has(item.repositoryId)) {
+      continue;
+    }
+    (pullRequestByIntegrationId[item.repositoryId] ??= []).push(item.number);
+  }
+
+  const releaseTagsByIntegrationId: Record<string, string[]> = {};
+  const globalReleaseTags: string[] = [];
+  for (const item of selectedItems.releaseTagNames ?? []) {
+    if (typeof item === "string") {
+      globalReleaseTags.push(item);
+      continue;
+    }
+
+    if (!targetRepositoryIds.has(item.repositoryId)) {
+      continue;
+    }
+
+    (releaseTagsByIntegrationId[item.repositoryId] ??= []).push(item.tagName);
+  }
+
+  const commitShas =
+    selectedItems.commitShas
+      ?.map((sha) => sha.trim())
+      .filter((sha) => sha.length > 0) ?? [];
+
+  const hasPullRequests = Object.keys(pullRequestByIntegrationId).length > 0;
+  const hasReleaseTags = Object.keys(releaseTagsByIntegrationId).length > 0;
+  const hasGlobalReleaseTags = globalReleaseTags.length > 0;
+  const hasCommitShas = commitShas.length > 0;
+
+  if (
+    !hasPullRequests &&
+    !hasReleaseTags &&
+    !hasGlobalReleaseTags &&
+    !hasCommitShas
+  ) {
+    return undefined;
+  }
+
+  return {
+    allowedPullRequestNumbersByIntegrationId: hasPullRequests
+      ? pullRequestByIntegrationId
+      : undefined,
+    allowedReleaseTagsByIntegrationId: hasReleaseTags
+      ? releaseTagsByIntegrationId
+      : undefined,
+    allowedReleaseTagsGlobal: hasGlobalReleaseTags
+      ? globalReleaseTags
+      : undefined,
+    allowedCommitShas: hasCommitShas ? commitShas : undefined,
+  };
 }
 
 function buildSelectedItemsInstructions(
@@ -161,13 +292,28 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    const { contentType, lookbackWindow, repositoryIds, selectedItems } =
-      bodyValidation.data;
+    const {
+      contentType,
+      lookbackWindow,
+      repositoryIds,
+      selectedItems,
+      brandVoiceId,
+    } = bodyValidation.data;
     const dataPoints = contentDataPointSettingsSchema.parse(
       bodyValidation.data.dataPoints ?? {}
     );
 
-    const [repositories, brand] = await Promise.all([
+    if (dataPoints.includeLinearIssues) {
+      return NextResponse.json(
+        {
+          error:
+            "Linear Issues are not supported in manual content generation yet.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const [repositories, brandResult] = await Promise.all([
       db
         .select({
           id: githubIntegrations.id,
@@ -182,10 +328,16 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
             eq(githubIntegrations.enabled, true)
           )
         ),
-      db.query.brandSettings.findFirst({
-        where: eq(brandSettings.organizationId, organizationId),
-      }),
+      resolveBrandVoiceForManualGeneration(organizationId, brandVoiceId),
     ]);
+    const brand = brandResult.brand;
+
+    if (brandResult.invalidRequestedVoice) {
+      return NextResponse.json(
+        { error: "Requested brand voice was not found for this organization." },
+        { status: 400 }
+      );
+    }
 
     const validRepositories = repositories.filter(
       (
@@ -216,6 +368,23 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
         { status: 400 }
       );
     }
+
+    const targetRepositoryIds = new Set(
+      targetRepositories.map((repository) => repository.id)
+    );
+    if (hasSelectedItemsOutsideTargets(selectedItems, targetRepositoryIds)) {
+      return NextResponse.json(
+        {
+          error:
+            "Selected items must belong to repositories included in this generation request.",
+        },
+        { status: 400 }
+      );
+    }
+    const selectionFilters = buildSelectionFilters(
+      selectedItems,
+      targetRepositoryIds
+    );
 
     if (autumn) {
       const { data, error } = await autumn.check({
@@ -293,9 +462,15 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
         companyDescription: brand?.companyDescription ?? undefined,
         audience: brand?.audience ?? undefined,
         customInstructions: customInstructions || null,
+        language: brand?.language ?? undefined,
       },
       sourceMetadata,
       dataPointSettings: dataPoints,
+      selectionFilters,
+      commitWindow: {
+        since: lookback.start.toISOString(),
+        until: lookback.end.toISOString(),
+      },
     });
 
     if (result.status === "rate_limited") {

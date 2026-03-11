@@ -17,6 +17,9 @@ const MAX_RELEASES = 20;
 const previewRequestSchema = z.object({
   repositoryIds: z.array(z.string().min(1)).min(1),
   lookbackWindow: z.enum(LOOKBACK_WINDOWS),
+  includeCommits: z.boolean().default(true),
+  includePullRequests: z.boolean().default(true),
+  includeReleases: z.boolean().default(true),
 });
 
 interface CommitPreview {
@@ -24,7 +27,7 @@ interface CommitPreview {
   message: string;
   authorName: string;
   authoredAt: string;
-  url: string;
+  htmlUrl: string;
 }
 
 interface PullRequestPreview {
@@ -55,8 +58,31 @@ interface RepositoryPreview {
   releases: ReleasePreview[];
 }
 
+type PreviewFailureStage =
+  | "repository_lookup"
+  | "repository_metadata"
+  | "token"
+  | "commits"
+  | "pull_requests"
+  | "releases";
+
+interface RepositoryPreviewFailure {
+  repositoryId: string;
+  owner: string | null;
+  repo: string | null;
+  stage: PreviewFailureStage;
+  message: string;
+}
+
 interface RouteContext {
   params: Promise<{ organizationId: string }>;
+}
+
+function formatFailureMessage(error: unknown): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return "Unknown error";
 }
 
 export async function POST(request: NextRequest, { params }: RouteContext) {
@@ -85,7 +111,13 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     );
   }
 
-  const { repositoryIds, lookbackWindow } = validation.data;
+  const {
+    repositoryIds,
+    lookbackWindow,
+    includeCommits,
+    includePullRequests,
+    includeReleases,
+  } = validation.data;
   const lookback = resolveLookbackRange(lookbackWindow);
 
   const repositories = await db
@@ -103,42 +135,99 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       )
     );
 
-  const validRepos = repositories.filter(
-    (r): r is typeof r & { owner: string; repo: string } =>
-      Boolean(r.owner && r.repo)
+  const failures: RepositoryPreviewFailure[] = [];
+  const repoById = new Map(
+    repositories.map((repository) => [repository.id, repository])
   );
 
-  const results: RepositoryPreview[] = await Promise.all(
-    validRepos.map(async (repo) => {
-      const token = await getTokenForIntegrationId(repo.id);
-      const octokit = createOctokit(token ?? undefined);
+  for (const repositoryId of repositoryIds) {
+    if (!repoById.has(repositoryId)) {
+      failures.push({
+        repositoryId,
+        owner: null,
+        repo: null,
+        stage: "repository_lookup",
+        message: "Repository was not found or is not enabled",
+      });
+    }
+  }
 
+  const validRepos = repositories.filter(
+    (
+      repo
+    ): repo is (typeof repositories)[number] & {
+      owner: string;
+      repo: string;
+    } => {
+      if (repo.owner && repo.repo) {
+        return true;
+      }
+      failures.push({
+        repositoryId: repo.id,
+        owner: repo.owner,
+        repo: repo.repo,
+        stage: "repository_metadata",
+        message: "Repository is missing owner or name",
+      });
+      return false;
+    }
+  );
+
+  const repositoryResults = await Promise.all(
+    validRepos.map(async (repo) => {
+      let token: string | null = null;
+      try {
+        token = await getTokenForIntegrationId(repo.id);
+      } catch (error) {
+        return {
+          repository: null,
+          failures: [
+            {
+              repositoryId: repo.id,
+              owner: repo.owner,
+              repo: repo.repo,
+              stage: "token" as const,
+              message: formatFailureMessage(error),
+            },
+          ],
+        };
+      }
+
+      const octokit = createOctokit(token ?? undefined);
       const [commitsResult, pullsResult, releasesResult] =
         await Promise.allSettled([
-          octokit.request("GET /repos/{owner}/{repo}/commits", {
-            owner: repo.owner,
-            repo: repo.repo,
-            since: lookback.start.toISOString(),
-            until: lookback.end.toISOString(),
-            per_page: MAX_COMMITS,
-            headers: { "X-GitHub-Api-Version": "2022-11-28" },
-          }),
-          octokit.request("GET /repos/{owner}/{repo}/pulls", {
-            owner: repo.owner,
-            repo: repo.repo,
-            state: "closed",
-            sort: "updated",
-            direction: "desc",
-            per_page: 100,
-            headers: { "X-GitHub-Api-Version": "2022-11-28" },
-          }),
-          octokit.request("GET /repos/{owner}/{repo}/releases", {
-            owner: repo.owner,
-            repo: repo.repo,
-            per_page: 100,
-            headers: { "X-GitHub-Api-Version": "2022-11-28" },
-          }),
+          includeCommits
+            ? octokit.request("GET /repos/{owner}/{repo}/commits", {
+                owner: repo.owner,
+                repo: repo.repo,
+                since: lookback.start.toISOString(),
+                until: lookback.end.toISOString(),
+                per_page: MAX_COMMITS,
+                headers: { "X-GitHub-Api-Version": "2022-11-28" },
+              })
+            : Promise.resolve({ data: [] }),
+          includePullRequests
+            ? octokit.request("GET /repos/{owner}/{repo}/pulls", {
+                owner: repo.owner,
+                repo: repo.repo,
+                state: "closed",
+                sort: "updated",
+                direction: "desc",
+                per_page: 100,
+                headers: { "X-GitHub-Api-Version": "2022-11-28" },
+              })
+            : Promise.resolve({ data: [] }),
+          includeReleases
+            ? octokit.request("GET /repos/{owner}/{repo}/releases", {
+                owner: repo.owner,
+                repo: repo.repo,
+                per_page: 100,
+                headers: { "X-GitHub-Api-Version": "2022-11-28" },
+              })
+            : Promise.resolve({ data: [] }),
         ]);
+
+      const repoFailures: RepositoryPreviewFailure[] = [];
 
       const commits: CommitPreview[] =
         commitsResult.status === "fulfilled"
@@ -147,9 +236,19 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
               message: c.commit.message.split("\n")[0] ?? "",
               authorName: c.commit.author?.name ?? "Unknown",
               authoredAt: c.commit.author?.date ?? "",
-              url: c.html_url,
+              htmlUrl: c.html_url,
             }))
           : [];
+
+      if (commitsResult.status === "rejected") {
+        repoFailures.push({
+          repositoryId: repo.id,
+          owner: repo.owner,
+          repo: repo.repo,
+          stage: "commits",
+          message: formatFailureMessage(commitsResult.reason),
+        });
+      }
 
       const pullRequests: PullRequestPreview[] =
         pullsResult.status === "fulfilled"
@@ -175,6 +274,16 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
               }))
           : [];
 
+      if (pullsResult.status === "rejected") {
+        repoFailures.push({
+          repositoryId: repo.id,
+          owner: repo.owner,
+          repo: repo.repo,
+          stage: "pull_requests",
+          message: formatFailureMessage(pullsResult.reason),
+        });
+      }
+
       const releases: ReleasePreview[] =
         releasesResult.status === "fulfilled"
           ? releasesResult.value.data
@@ -199,16 +308,38 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
               }))
           : [];
 
+      if (releasesResult.status === "rejected") {
+        repoFailures.push({
+          repositoryId: repo.id,
+          owner: repo.owner,
+          repo: repo.repo,
+          stage: "releases",
+          message: formatFailureMessage(releasesResult.reason),
+        });
+      }
+
       return {
-        repositoryId: repo.id,
-        owner: repo.owner,
-        repo: repo.repo,
-        commits,
-        pullRequests,
-        releases,
+        repository: {
+          repositoryId: repo.id,
+          owner: repo.owner,
+          repo: repo.repo,
+          commits,
+          pullRequests,
+          releases,
+        } satisfies RepositoryPreview,
+        failures: repoFailures,
       };
     })
   );
 
-  return NextResponse.json({ repositories: results });
+  const results = repositoryResults
+    .map((result) => {
+      failures.push(...result.failures);
+      return result.repository;
+    })
+    .filter(
+      (repository): repository is RepositoryPreview => repository !== null
+    );
+
+  return NextResponse.json({ repositories: results, failures });
 }

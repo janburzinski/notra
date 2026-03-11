@@ -35,7 +35,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@tanstack/react-store";
-import { Check, Plus } from "lucide-react";
+import { Check, Loader2, Plus, RotateCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -60,6 +60,13 @@ interface CreateContentDialogProps {
   organizationSlug: string;
 }
 
+interface CommitPreview {
+  sha: string;
+  message: string;
+  authorName: string;
+  authoredAt: string;
+}
+
 interface PullRequestPreview {
   number: number;
   title: string;
@@ -79,8 +86,23 @@ interface RepositoryPreview {
   repositoryId: string;
   owner: string;
   repo: string;
+  commits: CommitPreview[];
   pullRequests: PullRequestPreview[];
   releases: ReleasePreview[];
+}
+
+interface PreviewFailure {
+  repositoryId: string;
+  owner: string | null;
+  repo: string | null;
+  stage:
+    | "repository_lookup"
+    | "repository_metadata"
+    | "token"
+    | "commits"
+    | "pull_requests"
+    | "releases";
+  message: string;
 }
 
 interface PreviewResponse {
@@ -88,13 +110,14 @@ interface PreviewResponse {
     repositoryId: string;
     owner: string;
     repo: string;
-    commits?: unknown[];
+    commits?: CommitPreview[];
     pullRequests?: PullRequestPreview[];
     releases?: ReleasePreview[];
   }>;
+  failures?: PreviewFailure[];
 }
 
-type Step = "configure" | "nitpick";
+type Step = "configure" | "review";
 interface ReleaseSelection {
   repositoryId: string;
   tagName: string;
@@ -102,9 +125,7 @@ interface ReleaseSelection {
 
 // ─── Constants ───────────────────────────────────────────
 
-const DEFAULT_CONTENT_TYPE: OnDemandContentType =
-  SUPPORTED_SCHEDULE_OUTPUT_TYPES.find((v) => v !== "linkedin_post") ??
-  "changelog";
+const DEFAULT_CONTENT_TYPE: OnDemandContentType = "changelog";
 
 const DEFAULT_DATA_POINTS: ContentDataPointSettings = {
   includePullRequests: true,
@@ -142,12 +163,15 @@ export function CreateContentDialog({
 }: CreateContentDialogProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("configure");
+  const [selectedCommitKeys, setSelectedCommitKeys] = useState<Set<string>>(
+    new Set()
+  );
   const [selectedPrKeys, setSelectedPrKeys] = useState<Set<string>>(new Set());
   const [selectedReleaseKeys, setSelectedReleaseKeys] = useState<Set<string>>(
     new Set()
   );
-  const [previewLoaded, setPreviewLoaded] = useState(false);
-  const previewParamsRef = useRef<string>("");
+  const lastInitializedParamsRef = useRef("");
+  const previewWarningKeyRef = useRef<string>("");
 
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -212,17 +236,31 @@ export function CreateContentDialog({
   const lookbackWindow = useStore(form.store, (s) => s.values.lookbackWindow);
   const dataPoints = useStore(form.store, (s) => s.values.dataPoints);
 
+  const previewParamsKey = useMemo(
+    () =>
+      JSON.stringify({
+        repositoryIds,
+        lookbackWindow,
+        includeCommits: dataPoints.includeCommits,
+        includePullRequests: dataPoints.includePullRequests,
+        includeReleases: dataPoints.includeReleases,
+      }),
+    [repositoryIds, lookbackWindow, dataPoints]
+  );
+
   const {
-    data: previewData,
+    data: previewResponse,
     isFetching: isLoadingPreview,
     isError: isPreviewError,
-    refetch: fetchPreview,
-  } = useQuery<PreviewResponse, Error, RepositoryPreview[]>({
+  } = useQuery<PreviewResponse, Error>({
     queryKey: [
       "content-preview",
       organizationId,
       repositoryIds,
       lookbackWindow,
+      dataPoints.includeCommits,
+      dataPoints.includePullRequests,
+      dataPoints.includeReleases,
     ],
     queryFn: async () => {
       const res = await fetch(
@@ -230,7 +268,13 @@ export function CreateContentDialog({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ repositoryIds, lookbackWindow }),
+          body: JSON.stringify({
+            repositoryIds,
+            lookbackWindow,
+            includeCommits: dataPoints.includeCommits,
+            includePullRequests: dataPoints.includePullRequests,
+            includeReleases: dataPoints.includeReleases,
+          }),
         }
       );
       if (!res.ok) {
@@ -238,41 +282,77 @@ export function CreateContentDialog({
       }
       return res.json();
     },
-    select: (data) =>
-      data.repositories.map((r) => ({
+    enabled: open && repositoryIds.length > 0,
+    staleTime: 60_000,
+  });
+
+  const previewData = useMemo(
+    () =>
+      previewResponse?.repositories.map((r) => ({
         repositoryId: r.repositoryId,
         owner: r.owner,
         repo: r.repo,
+        commits: r.commits ?? [],
         pullRequests: r.pullRequests ?? [],
         releases: r.releases ?? [],
       })),
-    enabled: false,
-  });
+    [previewResponse]
+  );
+
+  const previewFailures = previewResponse?.failures ?? [];
 
   useEffect(() => {
-    if (previewData && !previewLoaded) {
-      const prKeys = new Set<string>();
-      const relKeys = new Set<string>();
-      for (const repo of previewData) {
-        for (const pr of repo.pullRequests) {
-          prKeys.add(`${repo.repositoryId}:${pr.number}`);
-        }
-        for (const rel of repo.releases) {
-          relKeys.add(
-            releaseSelectionToKey({
-              repositoryId: repo.repositoryId,
-              tagName: rel.tagName,
-            })
-          );
-        }
-      }
-      setSelectedPrKeys(prKeys);
-      setSelectedReleaseKeys(relKeys);
-      setPreviewLoaded(true);
+    if (!previewData || lastInitializedParamsRef.current === previewParamsKey) {
+      return;
     }
-  }, [previewData, previewLoaded]);
+    lastInitializedParamsRef.current = previewParamsKey;
+    const commitKeys = new Set<string>();
+    const prKeys = new Set<string>();
+    const relKeys = new Set<string>();
+    for (const repo of previewData) {
+      for (const commit of repo.commits) {
+        commitKeys.add(commit.sha);
+      }
+      for (const pr of repo.pullRequests) {
+        prKeys.add(`${repo.repositoryId}:${pr.number}`);
+      }
+      for (const rel of repo.releases) {
+        relKeys.add(
+          releaseSelectionToKey({
+            repositoryId: repo.repositoryId,
+            tagName: rel.tagName,
+          })
+        );
+      }
+    }
+    setSelectedCommitKeys(commitKeys);
+    setSelectedPrKeys(prKeys);
+    setSelectedReleaseKeys(relKeys);
+  }, [previewData, previewParamsKey]);
+
+  useEffect(() => {
+    if (!previewFailures.length) {
+      return;
+    }
+
+    const warningKey = `${previewParamsKey}:${previewFailures
+      .map((failure) => `${failure.repositoryId}:${failure.stage}`)
+      .sort()
+      .join("|")}`;
+
+    if (previewWarningKeyRef.current === warningKey) {
+      return;
+    }
+
+    previewWarningKeyRef.current = warningKey;
+    toast.warning(
+      `${previewFailures.length} repository preview ${previewFailures.length === 1 ? "issue was" : "issues were"} detected. Review warnings before generating content.`
+    );
+  }, [previewParamsKey, previewFailures]);
 
   // ─── Mutation ──────────────────────────────────────────
+
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const mutation = useMutation<
     { postId: string; title: string },
@@ -286,21 +366,32 @@ export function CreateContentDialog({
     }
   >({
     mutationFn: async (value) => {
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       const res = await fetch(
         `/api/organizations/${organizationId}/content/generate`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(value),
+          signal: controller.signal,
         }
       );
       const payload = await res.json();
       if (!res.ok) {
+        if (res.status === 429 && payload?.retryAfterSeconds) {
+          throw new Error(
+            `Rate limit reached. Please retry in ${String(payload.retryAfterSeconds)} seconds.`
+          );
+        }
         throw new Error(payload?.error || "Failed to create content");
       }
       return payload;
     },
     onSuccess: (data) => {
+      abortControllerRef.current = null;
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.POSTS.list(organizationId),
       });
@@ -309,7 +400,10 @@ export function CreateContentDialog({
       router.push(`/${organizationSlug}/content/${data.postId}`);
     },
     onError: (err) => {
-      toast.error(err.message);
+      abortControllerRef.current = null;
+      if (err.name !== "AbortError") {
+        toast.error(err.message);
+      }
     },
   });
 
@@ -319,40 +413,33 @@ export function CreateContentDialog({
     (next: boolean) => {
       setOpen(next);
       if (!next) {
+        abortControllerRef.current?.abort();
+        abortControllerRef.current = null;
         form.reset();
         setStep("configure");
+        setSelectedCommitKeys(new Set());
         setSelectedPrKeys(new Set());
         setSelectedReleaseKeys(new Set());
-        setPreviewLoaded(false);
+        lastInitializedParamsRef.current = "";
       }
     },
     [form]
   );
 
-  const handleDirectCreate = useCallback(() => {
-    mutation.mutate(form.state.values);
-  }, [form, mutation]);
+  const handleContinue = useCallback(() => {
+    setStep("review");
+  }, []);
 
-  const handleGoToNitpick = useCallback(() => {
-    const paramsKey = JSON.stringify({ repositoryIds, lookbackWindow });
-    if (previewLoaded && previewParamsRef.current === paramsKey) {
-      // Same params – keep existing selections
-      setStep("nitpick");
-      return;
-    }
-    previewParamsRef.current = paramsKey;
-    setPreviewLoaded(false);
-    fetchPreview();
-    setStep("nitpick");
-  }, [fetchPreview, previewLoaded, repositoryIds, lookbackWindow]);
-
-  const handleBackToConfigure = () => {
+  const handleBack = useCallback(() => {
     setStep("configure");
-  };
+  }, []);
 
-  const handleNitpickSubmit = useCallback(() => {
+  const handleCreate = useCallback(() => {
     const value = form.state.values;
     const selectedItems: SelectedItems = {
+      commitShas: value.dataPoints.includeCommits
+        ? Array.from(selectedCommitKeys)
+        : [],
       pullRequestNumbers: value.dataPoints.includePullRequests
         ? Array.from(selectedPrKeys).map((key) => {
             const [repositoryId, num] = key.split(":");
@@ -368,7 +455,7 @@ export function CreateContentDialog({
         : [],
     };
     mutation.mutate({ ...value, selectedItems });
-  }, [form, mutation, selectedPrKeys, selectedReleaseKeys]);
+  }, [form, mutation, selectedCommitKeys, selectedPrKeys, selectedReleaseKeys]);
 
   // ─── Event counts ──────────────────────────────────────
 
@@ -379,6 +466,14 @@ export function CreateContentDialog({
     let total = 0;
     let selected = 0;
     for (const repo of previewData) {
+      if (dataPoints.includeCommits) {
+        total += repo.commits.length;
+        for (const commit of repo.commits) {
+          if (selectedCommitKeys.has(commit.sha)) {
+            selected++;
+          }
+        }
+      }
       if (dataPoints.includePullRequests) {
         total += repo.pullRequests.length;
         for (const pr of repo.pullRequests) {
@@ -404,10 +499,64 @@ export function CreateContentDialog({
       }
     }
     return { total, selected };
-  }, [previewData, dataPoints, selectedPrKeys, selectedReleaseKeys]);
+  }, [
+    previewData,
+    dataPoints,
+    selectedCommitKeys,
+    selectedPrKeys,
+    selectedReleaseKeys,
+  ]);
+
+  const handleToggleAll = useCallback(() => {
+    if (!previewData) {
+      return;
+    }
+    const allSelected = eventCounts.selected === eventCounts.total;
+    if (allSelected) {
+      setSelectedCommitKeys(new Set());
+      setSelectedPrKeys(new Set());
+      setSelectedReleaseKeys(new Set());
+    } else {
+      const commitKeys = new Set<string>();
+      const prKeys = new Set<string>();
+      const relKeys = new Set<string>();
+      for (const repo of previewData) {
+        if (dataPoints.includeCommits) {
+          for (const c of repo.commits) {
+            commitKeys.add(c.sha);
+          }
+        }
+        if (dataPoints.includePullRequests) {
+          for (const pr of repo.pullRequests) {
+            prKeys.add(`${repo.repositoryId}:${pr.number}`);
+          }
+        }
+        if (dataPoints.includeReleases) {
+          for (const rel of repo.releases) {
+            relKeys.add(
+              releaseSelectionToKey({
+                repositoryId: repo.repositoryId,
+                tagName: rel.tagName,
+              })
+            );
+          }
+        }
+      }
+      setSelectedCommitKeys(commitKeys);
+      setSelectedPrKeys(prKeys);
+      setSelectedReleaseKeys(relKeys);
+    }
+  }, [previewData, dataPoints, eventCounts]);
 
   const hasSelectableEvents =
-    dataPoints.includePullRequests || dataPoints.includeReleases;
+    dataPoints.includeCommits ||
+    dataPoints.includePullRequests ||
+    dataPoints.includeReleases;
+
+  const hasAnyGitHubDataPointActive =
+    dataPoints.includePullRequests ||
+    dataPoints.includeCommits ||
+    dataPoints.includeReleases;
 
   // ─── Render ────────────────────────────────────────────
 
@@ -424,12 +573,12 @@ export function CreateContentDialog({
       <ResponsiveDialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-xl">
         <ResponsiveDialogHeader className="shrink-0 space-y-1 border-b p-4">
           <ResponsiveDialogTitle>
-            {step === "configure" ? "Create Content" : "Customize"}
+            {step === "configure" ? "Create Content" : "Review Events"}
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             {step === "configure"
               ? "Configure content type, timeframe, and sources."
-              : "Fine-tune data sources and pick specific events."}
+              : "Select the events to include in your content."}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
@@ -567,17 +716,9 @@ export function CreateContentDialog({
                     </div>
                   )}
                 </form.Field>
-              </div>
-            </ScrollArea>
-          )}
 
-          {/* ── Step 2: Nitpick ── */}
-          {step === "nitpick" && (
-            <ScrollArea className="min-h-0 flex-1">
-              <div className="space-y-5 p-4">
-                {/* Data Sources */}
                 <div className="space-y-3">
-                  <h3 className="font-medium text-sm">Data Sources</h3>
+                  <Label>Data Sources</Label>
                   <form.Field name="dataPoints.includePullRequests">
                     {(field) => (
                       <DataPointToggle
@@ -611,119 +752,169 @@ export function CreateContentDialog({
                       />
                     )}
                   </form.Field>
-                  <form.Field name="dataPoints.includeLinearIssues">
-                    {(field) => (
-                      <DataPointToggle
-                        checked={field.state.value}
-                        description="Include linked Linear issues."
-                        disabled={mutation.isPending}
-                        label="Linear Issues"
-                        onCheckedChange={field.handleChange}
-                      />
-                    )}
-                  </form.Field>
                 </div>
+              </div>
+            </ScrollArea>
+          )}
 
-                {/* Events */}
-                {(dataPoints.includePullRequests ||
-                  dataPoints.includeReleases) && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-sm">Events</h3>
-                      {!isLoadingPreview && eventCounts.total > 0 && (
-                        <span className="text-muted-foreground text-xs">
-                          {eventCounts.selected} / {eventCounts.total} selected
-                        </span>
+          {/* ── Step 2: Review Events ── */}
+          {step === "review" && (
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {isLoadingPreview && (
+                <div className="space-y-2 p-4">
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              )}
+              {!isLoadingPreview && isPreviewError && (
+                <div className="p-4">
+                  <div className="flex flex-col items-center gap-3 rounded-md border border-destructive/50 bg-destructive/10 p-4 text-center text-sm">
+                    <p>Failed to load events.</p>
+                    <Button
+                      onClick={() =>
+                        queryClient.invalidateQueries({
+                          queryKey: ["content-preview", organizationId],
+                        })
+                      }
+                      size="sm"
+                      type="button"
+                      variant="outline"
+                    >
+                      <RotateCw className="size-3.5" />
+                      Retry
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {!isLoadingPreview &&
+                !isPreviewError &&
+                previewFailures.length > 0 && (
+                  <div className="shrink-0 px-4 pt-4">
+                    <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-900 text-xs dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+                      <p className="font-medium text-sm">
+                        Partial preview ({previewFailures.length} warning
+                        {previewFailures.length === 1 ? "" : "s"})
+                      </p>
+                      {previewFailures.slice(0, 3).map((failure) => (
+                        <p
+                          className="mt-1"
+                          key={`${failure.repositoryId}:${failure.stage}`}
+                        >
+                          {(failure.owner && failure.repo
+                            ? `${failure.owner}/${failure.repo}`
+                            : failure.repositoryId) +
+                            ": " +
+                            failure.message}
+                        </p>
+                      ))}
+                      {previewFailures.length > 3 && (
+                        <p className="mt-1">
+                          +{previewFailures.length - 3} more warnings
+                        </p>
                       )}
                     </div>
-                    {isLoadingPreview && (
-                      <div className="space-y-2">
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-6 w-40" />
-                        <Skeleton className="h-8 w-full" />
-                      </div>
-                    )}
-                    {!isLoadingPreview && isPreviewError && (
-                      <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-center text-sm">
-                        Failed to load events. Please try again.
-                      </div>
-                    )}
-                    {!isLoadingPreview &&
-                      !isPreviewError &&
-                      previewData &&
-                      (eventCounts.total === 0 ? (
+                  </div>
+                )}
+              {!isLoadingPreview && !isPreviewError && previewData && (
+                <>
+                  {eventCounts.total > 0 && (
+                    <div className="flex shrink-0 items-center justify-between border-b px-4 py-2">
+                      <span className="text-muted-foreground text-xs">
+                        {eventCounts.selected} / {eventCounts.total} selected
+                      </span>
+                      <Button
+                        onClick={handleToggleAll}
+                        size="sm"
+                        type="button"
+                        variant="ghost"
+                      >
+                        {eventCounts.selected === eventCounts.total
+                          ? "Deselect all"
+                          : "Select all"}
+                      </Button>
+                    </div>
+                  )}
+                  <div className="min-h-0 flex-1 overflow-y-auto">
+                    <div className="space-y-3 p-4">
+                      {eventCounts.total === 0 ? (
                         <div className="rounded-md border border-dashed p-4 text-center text-muted-foreground text-xs">
                           No events found for the selected timeframe.
                         </div>
                       ) : (
-                        <div className="space-y-3">
-                          {previewData.map((repo) => (
-                            <RepoSection
-                              dataPoints={dataPoints}
-                              key={repo.repositoryId}
-                              onTogglePr={(key) => {
-                                setSelectedPrKeys((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(key)) {
-                                    next.delete(key);
-                                  } else {
-                                    next.add(key);
-                                  }
-                                  return next;
-                                });
-                              }}
-                              onToggleRelease={(tag) => {
-                                setSelectedReleaseKeys((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(tag)) {
-                                    next.delete(tag);
-                                  } else {
-                                    next.add(tag);
-                                  }
-                                  return next;
-                                });
-                              }}
-                              repo={repo}
-                              selectedPrKeys={selectedPrKeys}
-                              selectedReleaseKeys={selectedReleaseKeys}
-                            />
-                          ))}
-                        </div>
-                      ))}
+                        previewData.map((repo) => (
+                          <RepoSection
+                            dataPoints={dataPoints}
+                            key={repo.repositoryId}
+                            onToggleCommit={(sha) => {
+                              setSelectedCommitKeys((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(sha)) {
+                                  next.delete(sha);
+                                } else {
+                                  next.add(sha);
+                                }
+                                return next;
+                              });
+                            }}
+                            onTogglePr={(key) => {
+                              setSelectedPrKeys((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(key)) {
+                                  next.delete(key);
+                                } else {
+                                  next.add(key);
+                                }
+                                return next;
+                              });
+                            }}
+                            onToggleRelease={(tag) => {
+                              setSelectedReleaseKeys((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(tag)) {
+                                  next.delete(tag);
+                                } else {
+                                  next.add(tag);
+                                }
+                                return next;
+                              });
+                            }}
+                            repo={repo}
+                            selectedCommitKeys={selectedCommitKeys}
+                            selectedPrKeys={selectedPrKeys}
+                            selectedReleaseKeys={selectedReleaseKeys}
+                          />
+                        ))
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            </ScrollArea>
+                </>
+              )}
+            </div>
           )}
 
           {/* ── Footer ── */}
           <div className="shrink-0 rounded-b-xl border-t bg-muted/50 p-4">
             {step === "configure" && (
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex items-center justify-end">
                 <Button
-                  disabled={mutation.isPending || repositoryIds.length === 0}
-                  onClick={handleGoToNitpick}
-                  type="button"
-                  variant="outline"
-                >
-                  Customize
-                </Button>
-                <Button
-                  disabled={mutation.isPending || repositoryIds.length === 0}
-                  onClick={handleDirectCreate}
+                  disabled={
+                    repositoryIds.length === 0 || !hasAnyGitHubDataPointActive
+                  }
+                  onClick={handleContinue}
                   type="button"
                 >
-                  {mutation.isPending ? "Creating..." : "Create content"}
+                  Continue
                 </Button>
               </div>
             )}
-            {step === "nitpick" && (
+            {step === "review" && (
               <div className="flex items-center justify-between">
                 <Button
                   disabled={mutation.isPending}
-                  onClick={handleBackToConfigure}
+                  onClick={handleBack}
                   type="button"
                   variant="outline"
                 >
@@ -732,14 +923,22 @@ export function CreateContentDialog({
                 <Button
                   disabled={
                     mutation.isPending ||
+                    isLoadingPreview ||
                     (hasSelectableEvents &&
                       eventCounts.total > 0 &&
                       eventCounts.selected === 0)
                   }
-                  onClick={handleNitpickSubmit}
+                  onClick={handleCreate}
                   type="button"
                 >
-                  {mutation.isPending ? "Creating..." : "Create content"}
+                  {mutation.isPending ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    "Create content"
+                  )}
                 </Button>
               </div>
             )}
@@ -783,23 +982,28 @@ function DataPointToggle({
 function RepoSection({
   repo,
   dataPoints,
+  selectedCommitKeys,
   selectedPrKeys,
   selectedReleaseKeys,
+  onToggleCommit,
   onTogglePr,
   onToggleRelease,
 }: {
   repo: RepositoryPreview;
   dataPoints: ContentDataPointSettings;
+  selectedCommitKeys: Set<string>;
   selectedPrKeys: Set<string>;
   selectedReleaseKeys: Set<string>;
+  onToggleCommit: (sha: string) => void;
   onTogglePr: (key: string) => void;
   onToggleRelease: (key: string) => void;
 }) {
+  const showCommits = dataPoints.includeCommits && repo.commits.length > 0;
   const showPrs =
     dataPoints.includePullRequests && repo.pullRequests.length > 0;
   const showReleases = dataPoints.includeReleases && repo.releases.length > 0;
 
-  if (!showPrs && !showReleases) {
+  if (!showCommits && !showPrs && !showReleases) {
     return null;
   }
 
@@ -842,17 +1046,30 @@ function RepoSection({
               />
             );
           })}
+        {showCommits &&
+          repo.commits.map((commit) => (
+            <EventRow
+              key={commit.sha}
+              label={commit.message}
+              meta={`${commit.authorName} · ${commit.authoredAt ? formatDate(commit.authoredAt) : ""} · ${commit.sha.slice(0, 7)}`}
+              onToggle={() => onToggleCommit(commit.sha)}
+              selected={selectedCommitKeys.has(commit.sha)}
+              type="Commit"
+            />
+          ))}
       </div>
     </div>
   );
 }
 
-type EventType = "PR" | "Release";
+type EventType = "Commit" | "PR" | "Release";
 
 const EVENT_BADGE: Record<EventType, string> = {
   Release:
     "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   PR: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  Commit:
+    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
 };
 
 function EventRow({

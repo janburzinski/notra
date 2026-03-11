@@ -308,6 +308,10 @@ export const { POST } = serve<ScheduleWorkflowPayload>(
             tone,
             promptInput,
             sourceMetadata,
+            commitWindow: {
+              since: lookbackRange.start.toISOString(),
+              until: lookbackRange.end.toISOString(),
+            },
           });
         }
       );
