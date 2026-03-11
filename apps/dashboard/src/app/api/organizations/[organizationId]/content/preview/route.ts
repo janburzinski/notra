@@ -14,6 +14,7 @@ const MAX_COMMITS = 50;
 const MAX_PULL_REQUESTS = 30;
 const MAX_RELEASES = 20;
 const PULL_REQUESTS_PAGE_SIZE = 100;
+const RELEASES_PAGE_SIZE = 100;
 const MAX_PAGINATION_PAGES = 10;
 
 const previewRequestSchema = z.object({
@@ -85,6 +86,66 @@ function formatFailureMessage(error: unknown): string {
     return error.message;
   }
   return "Unknown error";
+}
+
+async function fetchReleasesPreview(params: {
+  octokit: ReturnType<typeof createOctokit>;
+  owner: string;
+  repo: string;
+  start: Date;
+  end: Date;
+}): Promise<ReleasePreview[]> {
+  const { octokit, owner, repo, start, end } = params;
+  const results: ReleasePreview[] = [];
+  let page = 1;
+
+  while (page <= MAX_PAGINATION_PAGES) {
+    const response = await octokit.request(
+      "GET /repos/{owner}/{repo}/releases",
+      {
+        owner,
+        repo,
+        per_page: RELEASES_PAGE_SIZE,
+        page,
+        headers: { "X-GitHub-Api-Version": "2022-11-28" },
+      }
+    );
+
+    const releases = response.data;
+    if (releases.length === 0) {
+      break;
+    }
+
+    for (const release of releases) {
+      if (!release.published_at) {
+        continue;
+      }
+      const publishedDate = new Date(release.published_at);
+      if (publishedDate >= start && publishedDate <= end) {
+        results.push({
+          tagName: release.tag_name,
+          name: release.name ?? release.tag_name,
+          publishedAt: release.published_at,
+          authorLogin: release.author?.login ?? "Unknown",
+          htmlUrl: release.html_url,
+          prerelease: release.prerelease,
+        });
+      }
+    }
+
+    const oldest = releases.at(-1);
+    if (!oldest?.published_at || new Date(oldest.published_at) < start) {
+      break;
+    }
+
+    if (releases.length < RELEASES_PAGE_SIZE) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return results.slice(0, MAX_RELEASES);
 }
 
 async function fetchMergedPullRequestsPreview(params: {
@@ -294,13 +355,14 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
               })
             : Promise.resolve([]),
           includeReleases
-            ? octokit.request("GET /repos/{owner}/{repo}/releases", {
+            ? fetchReleasesPreview({
+                octokit,
                 owner: repo.owner,
                 repo: repo.repo,
-                per_page: 100,
-                headers: { "X-GitHub-Api-Version": "2022-11-28" },
+                start: lookback.start,
+                end: lookback.end,
               })
-            : Promise.resolve({ data: [] }),
+            : Promise.resolve([]),
         ]);
 
       const repoFailures: RepositoryPreviewFailure[] = [];
@@ -340,28 +402,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
       }
 
       const releases: ReleasePreview[] =
-        releasesResult.status === "fulfilled"
-          ? releasesResult.value.data
-              .filter((release) => {
-                if (!release.published_at) {
-                  return false;
-                }
-                const publishedDate = new Date(release.published_at);
-                return (
-                  publishedDate >= lookback.start &&
-                  publishedDate <= lookback.end
-                );
-              })
-              .slice(0, MAX_RELEASES)
-              .map((release) => ({
-                tagName: release.tag_name,
-                name: release.name ?? release.tag_name,
-                publishedAt: release.published_at ?? "",
-                authorLogin: release.author?.login ?? "Unknown",
-                htmlUrl: release.html_url,
-                prerelease: release.prerelease,
-              }))
-          : [];
+        releasesResult.status === "fulfilled" ? releasesResult.value : [];
 
       if (releasesResult.status === "rejected") {
         repoFailures.push({
