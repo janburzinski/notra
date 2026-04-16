@@ -47,7 +47,7 @@ export const Reasoning = memo(
     className,
     isStreaming = false,
     open,
-    defaultOpen = true,
+    defaultOpen,
     onOpenChange,
     duration: durationProp,
     children,
@@ -55,7 +55,7 @@ export const Reasoning = memo(
   }: ReasoningProps) => {
     const [isOpen, setIsOpen] = useControllableState({
       prop: open,
-      defaultProp: defaultOpen,
+      defaultProp: defaultOpen ?? isStreaming,
       onChange: onOpenChange,
     });
     const [duration, setDuration] = useControllableState({
@@ -65,6 +65,13 @@ export const Reasoning = memo(
 
     const [hasAutoClosed, setHasAutoClosed] = useState(false);
     const [startTime, setStartTime] = useState<number | null>(null);
+    const [wasStreaming, setWasStreaming] = useState(isStreaming);
+
+    useEffect(() => {
+      if (isStreaming && !wasStreaming) {
+        setWasStreaming(true);
+      }
+    }, [isStreaming, wasStreaming]);
 
     // Track duration when streaming starts and ends
     useEffect(() => {
@@ -78,10 +85,9 @@ export const Reasoning = memo(
       }
     }, [isStreaming, startTime, setDuration]);
 
-    // Auto-open when streaming starts, auto-close when streaming ends (once only)
+    // Auto-close only after a streaming session ends in this mount (once only)
     useEffect(() => {
-      if (defaultOpen && !isStreaming && isOpen && !hasAutoClosed) {
-        // Add a small delay before closing to allow user to see the content
+      if (wasStreaming && !isStreaming && isOpen && !hasAutoClosed) {
         const timer = setTimeout(() => {
           setIsOpen(false);
           setHasAutoClosed(true);
@@ -89,7 +95,7 @@ export const Reasoning = memo(
 
         return () => clearTimeout(timer);
       }
-    }, [isStreaming, isOpen, defaultOpen, setIsOpen, hasAutoClosed]);
+    }, [isStreaming, wasStreaming, isOpen, setIsOpen, hasAutoClosed]);
 
     const handleOpenChange = (newOpen: boolean) => {
       setIsOpen(newOpen);
@@ -116,6 +122,7 @@ export type ReasoningTriggerProps = ComponentProps<
   typeof CollapsibleTrigger
 > & {
   getThinkingMessage?: (isStreaming: boolean, duration?: number) => ReactNode;
+  icon?: ReactNode;
 };
 
 const defaultGetThinkingMessage = (isStreaming: boolean, duration?: number) => {
@@ -133,6 +140,7 @@ export const ReasoningTrigger = memo(
     className,
     children,
     getThinkingMessage = defaultGetThinkingMessage,
+    icon,
     ...props
   }: ReasoningTriggerProps) => {
     const { isStreaming, isOpen, duration } = useReasoning();
@@ -147,7 +155,7 @@ export const ReasoningTrigger = memo(
       >
         {children ?? (
           <>
-            <HugeiconsIcon className="size-4" icon={Brain01Icon} />
+            {icon ?? <HugeiconsIcon className="size-4" icon={Brain01Icon} />}
             {getThinkingMessage(isStreaming, duration)}
             <HugeiconsIcon
               className={cn(
