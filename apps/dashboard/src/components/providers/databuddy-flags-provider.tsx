@@ -15,11 +15,11 @@ export function DatabuddyFlagsProvider({ children }: { children: ReactNode }) {
 
   return (
     <FlagsProvider
+      cacheTtl={5 * 60 * 1000}
       clientId={DATABUDDY_DASHBOARD_CLIENT_ID}
       disabled={!DATABUDDY_DASHBOARD_CLIENT_ID}
       isPending={isPending}
       skipStorage
-      cacheTtl={5 * 60 * 1000}
       staleTime={5 * 60 * 1000}
       user={
         session?.user
@@ -40,5 +40,11 @@ export function DatabuddyFlagsProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAiChatExperiment() {
-  return useFlag(AI_CHAT_EXPERIMENT_FLAG_KEY);
+  const flag = useFlag(AI_CHAT_EXPERIMENT_FLAG_KEY);
+
+  if (process.env.NODE_ENV === "development") {
+    return { ...flag, on: true, loading: false };
+  }
+
+  return flag;
 }
