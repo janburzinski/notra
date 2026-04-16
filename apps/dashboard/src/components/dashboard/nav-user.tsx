@@ -43,11 +43,17 @@ export function NavUser() {
   const { isMobile, state } = useSidebar();
   const { setTheme, resolvedTheme } = useTheme();
   const isCollapsed = state === "collapsed";
-  const dropdownSide = isMobile ? "bottom" : isCollapsed ? "right" : "top";
+  let dropdownSide: "bottom" | "right" | "top" = "top";
+  if (isMobile) {
+    dropdownSide = "bottom";
+  } else if (isCollapsed) {
+    dropdownSide = "right";
+  }
   const isDark = resolvedTheme === "dark";
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(false);
   const { activeOrganization } = useOrganizationsContext();
 
   const { data: session, isPending } = authClient.useSession();
@@ -57,11 +63,19 @@ export function NavUser() {
   useHotkey("M", toggleTheme);
 
   useEffect(() => {
-    if (!(user || isPending || isRedirecting)) {
+    setHasHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!(hasHydrated && (user || isPending || isRedirecting))) {
+      return;
+    }
+
+    if (!user && !isPending && !isRedirecting) {
       setIsRedirecting(true);
       router.push("/login");
     }
-  }, [user, isPending, isRedirecting, router]);
+  }, [hasHydrated, user, isPending, isRedirecting, router]);
 
   async function handleSignOut() {
     setIsSigningOut(true);
@@ -80,7 +94,7 @@ export function NavUser() {
     }
   }
 
-  if (!user && isPending) {
+  if (!hasHydrated || (!user && isPending)) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
