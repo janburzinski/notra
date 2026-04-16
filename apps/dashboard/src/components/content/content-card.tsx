@@ -142,20 +142,32 @@ const ContentCard = memo(function ContentCard({
   const cardContent = (
     <div
       className={cn(
-        "group relative flex flex-col rounded-lg border border-border/80 bg-muted/80 p-2",
-        "h-full transition-colors",
-        href && "cursor-pointer hover:bg-muted/80",
+        "group relative flex flex-col rounded-2xl p-2",
+        // Shadow as border — layered for natural depth
+        "shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_2px_-1px_rgba(0,0,0,0.06),0px_2px_4px_0px_rgba(0,0,0,0.04)]",
+        "dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08)]",
+        // Hover: elevated shadow + scale on press
+        "transition-[box-shadow,transform] duration-150 ease-out",
+        href && [
+          "cursor-pointer",
+          "hover:shadow-[0px_0px_0px_1px_rgba(0,0,0,0.08),0px_2px_4px_-1px_rgba(0,0,0,0.08),0px_4px_8px_0px_rgba(0,0,0,0.06)]",
+          "dark:hover:shadow-[0_0_0_1px_rgba(255,255,255,0.13)]",
+          "active:scale-[0.96]",
+        ],
+        "h-full bg-card",
         className
       )}
     >
-      <div className="flex items-start justify-between gap-4 py-1.5 pr-2 pl-2">
-        <p className="min-w-0 truncate font-medium text-lg">{title}</p>
-        <div className="flex shrink-0 items-center gap-2">
+      <div className="flex items-start justify-between gap-3 px-2 py-2">
+        <p className="min-w-0 truncate font-semibold text-base text-foreground" style={{ textWrap: "balance" }}>
+          {title}
+        </p>
+        <div className="flex shrink-0 items-center">
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
                 <Button
-                  className="size-7 p-0"
+                  className="size-7 p-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-visible:opacity-100"
                   onClick={(e) => e.preventDefault()}
                   variant="ghost"
                 >
@@ -194,10 +206,13 @@ const ContentCard = memo(function ContentCard({
           </DropdownMenu>
         </div>
       </div>
-      <div className="flex-1 rounded-[0.75rem] border border-border/80 bg-background px-4 py-3">
-        <p className="line-clamp-3 text-muted-foreground text-sm">{preview}</p>
+      {/* Concentric radius: outer = 16px (rounded-2xl), padding = 8px, inner = 8px (rounded-lg) → 8 + 8 = 16 ✓ */}
+      <div className="flex-1 rounded-lg bg-muted/50 px-4 py-3">
+        <p className="line-clamp-3 text-muted-foreground text-sm leading-relaxed" style={{ textWrap: "pretty" }}>
+          {preview}
+        </p>
       </div>
-      <div className="flex items-center gap-2 px-2 py-1.5">
+      <div className="flex items-center gap-2 px-2 pt-2 pb-1">
         <Badge
           className="capitalize"
           variant={status === "published" ? "default" : "outline"}
@@ -205,7 +220,7 @@ const ContentCard = memo(function ContentCard({
           {status}
         </Badge>
         <Badge
-          className="flex items-center gap-1 capitalize"
+          className="flex items-center gap-1.5 capitalize"
           variant="secondary"
         >
           <OutputTypeIcon className="size-3" outputType={contentType} />
@@ -219,7 +234,7 @@ const ContentCard = memo(function ContentCard({
     <>
       {href ? (
         <Link
-          className="block h-full w-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="block h-full w-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           href={href}
         >
           {cardContent}

@@ -26,6 +26,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import type { Variants } from "motion/react";
+import * as motion from "motion/react-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -51,6 +53,28 @@ type ViewMode = "grid" | "table";
 interface PageClientProps {
   organizationSlug: string;
 }
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 12, filter: "blur(4px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+const staggerContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { type: "spring", duration: 0.5, bounce: 0 },
+  },
+};
 
 function formatDateHeading(dateString: string): string {
   const date = new Date(dateString);
@@ -201,15 +225,26 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
 
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full space-y-6 px-4 lg:px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <h1 className="font-bold text-3xl tracking-tight">Content</h1>
-            <p className="text-muted-foreground">
+      <div className="w-full space-y-8 px-4 lg:px-6">
+        {/* Header — staggered enter */}
+        <motion.div
+          animate="visible"
+          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          initial="hidden"
+          variants={staggerContainer}
+        >
+          <motion.div className="space-y-1" variants={fadeUp}>
+            <h1
+              className="font-bold text-3xl tracking-tight"
+              style={{ textWrap: "balance" }}
+            >
+              Content
+            </h1>
+            <p className="text-muted-foreground" style={{ textWrap: "pretty" }}>
               View and manage your generated content
             </p>
-          </div>
-          <div className="flex items-center gap-2">
+          </motion.div>
+          <motion.div className="flex items-center gap-2" variants={fadeUp}>
             <ButtonGroup>
               <Tooltip>
                 <TooltipTrigger
@@ -251,18 +286,30 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
               </Tooltip>
             </ButtonGroup>
             <CreateContentDialog organizationId={organizationId} />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Loading skeleton */}
         {isPending && <ContentPageSkeleton />}
+
+        {/* Empty state */}
         {!isPending &&
           allPosts.length === 0 &&
           !(activeGenerations && activeGenerations.length > 0) && (
-            <EmptyState
-              className="p-8"
-              description="Generate your first piece of content to get started."
-              title="No content yet"
-            />
+            <motion.div
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+              transition={{ type: "spring", duration: 0.5, bounce: 0 }}
+            >
+              <EmptyState
+                className="p-8"
+                description="Generate your first piece of content to get started."
+                title="No content yet"
+              />
+            </motion.div>
           )}
+
+        {/* Grid view — staggered cards per date group */}
         {!isPending &&
           (allPosts.length > 0 ||
             (activeGenerations && activeGenerations.length > 0)) &&
@@ -275,56 +322,87 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
             const todayExists = entries.some(([key]) => key === todayKey);
 
             return (
-              <>
+              <motion.div
+                animate="visible"
+                className="space-y-10"
+                initial="hidden"
+                variants={staggerContainer}
+              >
                 {hasActiveGens && !todayExists && (
-                  <section className="space-y-4" key="today-generating">
-                    <h2 className="font-semibold text-lg">
+                  <motion.section
+                    className="space-y-4"
+                    key="today-generating"
+                    variants={fadeUp}
+                  >
+                    <h2
+                      className="font-semibold text-lg text-foreground"
+                      style={{ textWrap: "balance" }}
+                    >
                       {formatDateHeading(todayKey)}
                     </h2>
-                    <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <motion.div
+                      className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                      variants={staggerContainer}
+                    >
                       {activeGenerations.map((gen) => (
-                        <ContentSkeletonCard
-                          key={`gen-${gen.runId}`}
-                          outputType={gen.outputType}
-                        />
+                        <motion.div key={`gen-${gen.runId}`} variants={cardVariants}>
+                          <ContentSkeletonCard outputType={gen.outputType} />
+                        </motion.div>
                       ))}
-                    </div>
-                  </section>
+                    </motion.div>
+                  </motion.section>
                 )}
                 {entries.map(([dateKey, posts]) => (
-                  <section className="space-y-4" key={dateKey}>
-                    <h2 className="font-semibold text-lg">
+                  <motion.section
+                    className="space-y-4"
+                    key={dateKey}
+                    variants={fadeUp}
+                  >
+                    <h2
+                      className="font-semibold text-lg text-foreground"
+                      style={{ textWrap: "balance" }}
+                    >
                       {formatDateHeading(dateKey)}
                     </h2>
-                    <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <motion.div
+                      className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                      variants={staggerContainer}
+                    >
                       {hasActiveGens &&
                         dateKey === todayKey &&
                         activeGenerations.map((gen) => (
-                          <ContentSkeletonCard
-                            key={`gen-${gen.runId}`}
-                            outputType={gen.outputType}
-                          />
+                          <motion.div key={`gen-${gen.runId}`} variants={cardVariants}>
+                            <ContentSkeletonCard outputType={gen.outputType} />
+                          </motion.div>
                         ))}
                       {posts.map((post) => (
-                        <ContentCard
-                          contentType={post.contentType as ContentType}
-                          href={`/${organizationSlug}/content/${post.id}`}
-                          id={post.id}
-                          key={post.id}
-                          organizationId={organizationId}
-                          preview={previewsByPostId.get(post.id) ?? ""}
-                          status={post.status as PostStatus}
-                          title={post.title}
-                        />
+                        <motion.div key={post.id} variants={cardVariants}>
+                          <ContentCard
+                            contentType={post.contentType as ContentType}
+                            href={`/${organizationSlug}/content/${post.id}`}
+                            id={post.id}
+                            organizationId={organizationId}
+                            preview={previewsByPostId.get(post.id) ?? ""}
+                            status={post.status as PostStatus}
+                            title={post.title}
+                          />
+                        </motion.div>
                       ))}
-                    </div>
-                  </section>
+                    </motion.div>
+                  </motion.section>
                 ))}
-              </>
+              </motion.div>
             );
           })()}
+
+        {/* Table view — with stagger animation */}
         {!isPending && allPosts.length > 0 && viewMode === "table" && (
-          <div className="overflow-x-auto rounded-lg border">
+          <motion.div
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            className="overflow-x-auto rounded-xl shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06),0px_1px_2px_-1px_rgba(0,0,0,0.06),0px_2px_4px_0px_rgba(0,0,0,0.04)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08)]"
+            initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0 }}
+          >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -377,7 +455,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                   const href = `/${organizationSlug}/content/${post.id}`;
                   return (
                     <TableRow
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer transition-colors duration-150 hover:bg-muted/50"
                       key={post.id}
                       onClick={() => router.push(href)}
                       onMouseEnter={() => router.prefetch(href)}
@@ -422,8 +500,10 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                 })}
               </TableBody>
             </Table>
-          </div>
+          </motion.div>
         )}
+
+        {/* Infinite scroll sentinel */}
         <div className="h-10" ref={loadMoreRef}>
           {isFetchingNextPage && (
             <div className="flex items-center justify-center">
