@@ -35,7 +35,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useCustomer } from "autumn-js/react";
 import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useMemo, useRef, useState } from "react";
+import {
+  type Ref,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { FEATURES } from "@/constants/features";
 import { INPUT_SOURCES } from "@/lib/integrations/catalog";
@@ -139,7 +146,7 @@ function getSubmitTooltipText(isLoading: boolean, isStopping: boolean): string {
     return "Stopping...";
   }
   if (isLoading) {
-    return "Stop generating";
+    return "Stop generating. Your draft stays in the input.";
   }
   return "Enter to send. Shift+Enter for a new line.";
 }
@@ -157,9 +164,15 @@ function contextItemsEqual(a: ContextItem, b: ContextItem): boolean {
   return false;
 }
 
+export interface ChatInputHandle {
+  insertQuote: (text: string) => void;
+}
+
 interface ChatInputAdvancedProps {
+  ref?: Ref<ChatInputHandle>;
   onSend?: (value: string) => void;
   onStop?: () => void;
+  onStopAndSend?: (value: string) => void;
   isLoading?: boolean;
   isStopping?: boolean;
   organizationSlug?: string;
@@ -183,8 +196,10 @@ const THINKING_LABELS: Record<ThinkingLevel, string> = {
 };
 
 export function ChatInputAdvanced({
+  ref,
   onSend,
   onStop,
+  onStopAndSend,
   isLoading = false,
   isStopping = false,
   organizationSlug,
@@ -558,7 +573,13 @@ export function ChatInputAdvanced({
 
   const handleSend = useCallback(() => {
     const editor = editorRef.current;
-    if (!editor || readEditorText().trim().length === 0 || isLoading) {
+    if (!editor) {
+      return;
+    }
+    if (readEditorText().trim().length === 0) {
+      if (isLoading && !isStopping) {
+        onStop?.();
+      }
       return;
     }
     const outbound = serializeEditorWithReferences(editor).trim();
@@ -581,7 +602,11 @@ export function ChatInputAdvanced({
       }
     }
 
-    onSend?.(outbound);
+    if (isLoading) {
+      onStopAndSend?.(outbound);
+    } else {
+      onSend?.(outbound);
+    }
     editor.innerHTML = "";
     setIsEmpty(true);
     for (const item of contextRef.current) {
@@ -589,14 +614,82 @@ export function ChatInputAdvanced({
     }
   }, [
     onSend,
+    onStopAndSend,
+    onStop,
     readEditorText,
     isLoading,
+    isStopping,
     check,
     customer,
     isUsageBlocked,
     clearError,
     onRemoveContext,
   ]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      insertQuote: (text: string) => {
+        const editor = editorRef.current;
+        if (!editor) {
+          return;
+        }
+        const quoteLines = text
+          .split("\n")
+          .map((line) => `> ${line}`)
+          .join("\n");
+
+        const sel = window.getSelection();
+        let range: Range;
+        if (
+          sel &&
+          sel.rangeCount > 0 &&
+          editor.contains(sel.getRangeAt(0).startContainer)
+        ) {
+          range = sel.getRangeAt(0);
+        } else {
+          range = document.createRange();
+          range.selectNodeContents(editor);
+          range.collapse(false);
+        }
+        range.deleteContents();
+
+        const fragment = document.createDocumentFragment();
+        const existingText = (editor.innerText ?? "").replace(/\u00A0/g, " ");
+        const needsLeadingBreak =
+          existingText.length > 0 && !existingText.endsWith("\n");
+
+        if (needsLeadingBreak) {
+          fragment.append(document.createElement("br"));
+        }
+
+        const lines = quoteLines.split("\n");
+        lines.forEach((line, index) => {
+          if (line) {
+            fragment.append(document.createTextNode(line));
+          }
+          if (index < lines.length - 1) {
+            fragment.append(document.createElement("br"));
+          }
+        });
+        fragment.append(document.createElement("br"));
+        fragment.append(document.createElement("br"));
+
+        range.insertNode(fragment);
+
+        const after = document.createRange();
+        after.selectNodeContents(editor);
+        after.collapse(false);
+        sel?.removeAllRanges();
+        sel?.addRange(after);
+
+        editor.dispatchEvent(new Event("input", { bubbles: true }));
+        editor.focus();
+        editor.scrollTop = editor.scrollHeight;
+      },
+    }),
+    []
+  );
 
   const handlePaste = useCallback(
     (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -839,17 +932,13 @@ export function ChatInputAdvanced({
                 <div className="relative flex flex-1 cursor-text transition-colors [--lh:1lh]">
                   {/* biome-ignore lint/a11y/useSemanticElements: rich mention editor requires a contentEditable host instead of a native textarea. */}
                   <div
-                    aria-disabled={isLoading || isUsageBlocked}
+                    aria-disabled={isUsageBlocked}
                     aria-label="Send a message"
                     aria-multiline="true"
-                    className="wrap-break-word relative max-h-50 min-h-12 w-full overflow-y-auto whitespace-pre-wrap rounded-t-[12px] px-3 py-2 text-foreground text-sm leading-6 caret-foreground outline-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[empty=true]:before:pointer-events-none data-[empty=true]:before:absolute data-[empty=true]:before:top-2 data-[empty=true]:before:left-3 data-[empty=true]:before:text-muted-foreground data-[empty=true]:before:content-[attr(data-placeholder)]"
-                    contentEditable={!(isLoading || isUsageBlocked)}
-                    data-empty={isEmpty ? "true" : "false"}
-                    data-placeholder={
-                      isLoading
-                        ? "AI is working..."
-                        : "Send a message... (type @ to add context)"
-                    }
+                    className="wrap-break-word relative max-h-50 min-h-12 w-full overflow-y-auto whitespace-pre-wrap rounded-t-[12px] px-3 py-2 text-foreground text-sm leading-6 caret-foreground outline-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[show-placeholder=true]:before:pointer-events-none data-[show-placeholder=true]:before:absolute data-[show-placeholder=true]:before:top-2 data-[show-placeholder=true]:before:left-3 data-[show-placeholder=true]:before:text-muted-foreground data-[show-placeholder=true]:before:content-[attr(data-placeholder)]"
+                    contentEditable={!isUsageBlocked}
+                    data-placeholder="Send a message... (type @ to add context)"
+                    data-show-placeholder={isEmpty ? "true" : "false"}
                     onBlur={() => {
                       setIsFocused(false);
                       setTimeout(() => {
@@ -872,7 +961,7 @@ export function ChatInputAdvanced({
                     ref={editorRef}
                     role="textbox"
                     suppressContentEditableWarning
-                    tabIndex={isLoading || isUsageBlocked ? -1 : 0}
+                    tabIndex={isUsageBlocked ? -1 : 0}
                   />
                 </div>
               </div>
@@ -1291,9 +1380,11 @@ export function ChatInputAdvanced({
                     <Button
                       className="group/button ml-auto h-7 shrink-0 rounded-lg bg-muted px-1.5 transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={
-                        isLoading ? !onStop || isStopping : isUsageBlocked
+                        isLoading
+                          ? (!onStop && !onStopAndSend) || isStopping
+                          : isUsageBlocked
                       }
-                      onClick={isLoading ? onStop : handleSend}
+                      onClick={handleSend}
                       size="sm"
                       tabIndex={0}
                       type="button"
