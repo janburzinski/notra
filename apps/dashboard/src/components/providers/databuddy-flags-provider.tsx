@@ -43,7 +43,13 @@ export function useAiChatExperiment() {
   const flag = useFlag(AI_CHAT_EXPERIMENT_FLAG_KEY);
 
   if (process.env.NODE_ENV === "development") {
-    return { ...flag, on: true, loading: false };
+    return {
+      ...(flag ?? {}),
+      on: true,
+      loading: false,
+      value: true,
+      enabled: true,
+    } as typeof flag;
   }
 
   return flag;
