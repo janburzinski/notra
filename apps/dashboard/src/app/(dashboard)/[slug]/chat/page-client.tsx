@@ -94,6 +94,7 @@ function StandaloneChatPageClient({
   const queryClient = useQueryClient();
   const router = useRouter();
   const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const stableChatId = useMemo(
     () => initialChatId || nanoid(16),
@@ -242,6 +243,10 @@ function StandaloneChatPageClient({
   });
 
   const [isStopping, setIsStopping] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const handleModelChange = useCallback((model: string) => {
     const nextModel = parseStoredChatModel(model);
@@ -685,10 +690,10 @@ function StandaloneChatPageClient({
   }
 
   if (!hasMessages) {
-    const now = new Date();
-    const greeting = getGreeting(now);
+    const now = isHydrated ? new Date() : null;
+    const greeting = now ? getGreeting(now) : "Welcome";
     const userName = session?.user?.name?.split(" ")[0];
-    const dateStr = formatLongDate(now);
+    const dateStr = now ? formatLongDate(now) : "\u00A0";
 
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-4">
