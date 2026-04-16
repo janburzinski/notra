@@ -40,5 +40,17 @@ export function DatabuddyFlagsProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAiChatExperiment() {
-  return useFlag(AI_CHAT_EXPERIMENT_FLAG_KEY);
+  const flag = useFlag(AI_CHAT_EXPERIMENT_FLAG_KEY);
+
+  if (process.env.NEXT_PUBLIC_FORCE_AI_CHAT === "1") {
+    return {
+      ...(flag ?? {}),
+      on: true,
+      loading: false,
+      value: true,
+      enabled: true,
+    } as typeof flag;
+  }
+
+  return flag;
 }
