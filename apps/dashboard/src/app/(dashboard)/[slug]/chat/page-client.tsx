@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { X } from "@hugeicons/core-free-icons";
+import { Brain01Icon, X } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ContentType } from "@notra/ai/schemas/content";
 import {
@@ -13,6 +13,7 @@ import {
   Reasoning,
   ReasoningContent,
   ReasoningTrigger,
+  useReasoning,
 } from "@notra/ui/components/ai-elements/reasoning";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -28,9 +29,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BrailleLoader } from "@/components/braille-loader";
 import {
   ChatInputAdvanced,
+  type ChatInputHandle,
   type ThinkingLevel,
 } from "@/components/chat/chat-input";
 import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
+import { QuoteSelectionTooltip } from "@/components/chat/quote-selection";
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { authClient } from "@/lib/auth/client";
@@ -89,6 +92,22 @@ function getCreateToolContentType(
   return CREATE_TOOL_TYPES[type];
 }
 
+function ChatReasoningTrigger() {
+  const { isStreaming } = useReasoning();
+
+  return (
+    <ReasoningTrigger
+      icon={
+        isStreaming ? (
+          <BrailleLoader className="text-sm" variant="shimmer" />
+        ) : (
+          <HugeiconsIcon className="size-4" icon={Brain01Icon} />
+        )
+      }
+    />
+  );
+}
+
 function StandaloneChatPageClient({
   organizationSlug,
   chatId: initialChatId,
@@ -102,7 +121,6 @@ function StandaloneChatPageClient({
   const organizationId = organization?.id ?? "";
   const { data: session } = authClient.useSession();
   const queryClient = useQueryClient();
-  const router = useRouter();
   const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
 
   const stableChatId = useMemo(
@@ -113,6 +131,9 @@ function StandaloneChatPageClient({
   const [context, setContext] = useState<ContextItem[]>([]);
   const [hasCustomizedContext, setHasCustomizedContext] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
+  const [queuedMessageAfterStop, setQueuedMessageAfterStop] = useState<
+    string | null
+  >(null);
   const [selectedModel, setSelectedModel] = useState(
     DEFAULT_CHAT_PREFERENCES.model
   );
@@ -120,6 +141,12 @@ function StandaloneChatPageClient({
     DEFAULT_CHAT_PREFERENCES.thinkingLevel
   );
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const chatInputRef = useRef<ChatInputHandle | null>(null);
+  const hasHydratedHistoryRef = useRef(false);
+
+  const handleQuote = useCallback((text: string) => {
+    chatInputRef.current?.insertQuote(text);
+  }, []);
 
   const contextRef = useRef(context);
   const hasCustomizedContextRef = useRef(hasCustomizedContext);
@@ -332,6 +359,18 @@ function StandaloneChatPageClient({
     }
   }, [organizationId, stableChatId, stop]);
 
+  const handleStopAndSend = useCallback(
+    async (text: string) => {
+      if (!text.trim()) {
+        return;
+      }
+
+      setQueuedMessageAfterStop(text);
+      await handleStop();
+    },
+    [handleStop]
+  );
+
   const chatHistoryQuery = useQuery({
     queryKey: ["chat-history", organizationId, initialChatId],
     queryFn: async () => {
@@ -355,14 +394,22 @@ function StandaloneChatPageClient({
   });
 
   useEffect(() => {
-    if (!chatHistoryQuery.data) {
+    if (!initialChatId) {
+      hasHydratedHistoryRef.current = false;
       return;
     }
+
+    if (!chatHistoryQuery.data || hasHydratedHistoryRef.current) {
+      return;
+    }
+
+    hasHydratedHistoryRef.current = true;
+
     if (chatHistoryQuery.data.messages?.length) {
       setMessages(chatHistoryQuery.data.messages);
     }
     setWasStoppedByUser(Boolean(chatHistoryQuery.data.lastResponseStopped));
-  }, [chatHistoryQuery.data, setMessages]);
+  }, [chatHistoryQuery.data, initialChatId, setMessages]);
 
   useEffect(() => {
     setPendingMessageId(null);
@@ -428,7 +475,11 @@ function StandaloneChatPageClient({
       setWasStoppedByUser(false);
       await sendMessage({ text });
       if (isFirstMessage) {
-        router.replace(`/${organizationSlug}/chat/${stableChatId}`);
+        window.history.replaceState(
+          window.history.state,
+          "",
+          `/${organizationSlug}/chat/${stableChatId}`
+        );
         queryClient.invalidateQueries({
           queryKey: ["chat-sessions", organizationId],
         });
@@ -439,14 +490,37 @@ function StandaloneChatPageClient({
       organizationId,
       organizationSlug,
       queryClient,
-      router,
       sendMessage,
       stableChatId,
     ]
   );
 
+  useEffect(() => {
+    if (isLoading || !queuedMessageAfterStop) {
+      return;
+    }
+
+    const nextMessage = queuedMessageAfterStop;
+    setQueuedMessageAfterStop(null);
+    void handleSend(nextMessage);
+  }, [handleSend, isLoading, queuedMessageAfterStop]);
+
   const messageCount = messages.length;
   const lastPartCount = messages.at(-1)?.parts?.length ?? 0;
+  const streamingAssistantMessageId = useMemo(() => {
+    if (!isLoading) {
+      return null;
+    }
+
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      if (message?.role === "assistant") {
+        return message.id;
+      }
+    }
+
+    return null;
+  }, [isLoading, messages]);
   const hasScrolledRef = useRef(false);
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on new messages and new parts
   useEffect(() => {
@@ -478,7 +552,9 @@ function StandaloneChatPageClient({
   function renderPart(
     part: { type: string; [key: string]: unknown },
     messageId: string,
-    index: number
+    index: number,
+    isStreamingMessage: boolean,
+    isAssistant: boolean
   ) {
     if (part.type === "text") {
       const text = part.text as string;
@@ -494,9 +570,18 @@ function StandaloneChatPageClient({
         return (
           <div
             className="wrap-break-word size-full whitespace-pre-wrap"
+            data-ai-quotable={isAssistant ? "true" : undefined}
             key={`${messageId}-text-${index}`}
           >
             {renderTextWithIntegrationReferences(text)}
+          </div>
+        );
+      }
+
+      if (isAssistant) {
+        return (
+          <div data-ai-quotable="true" key={`${messageId}-text-${index}`}>
+            <MessageResponse>{text}</MessageResponse>
           </div>
         );
       }
@@ -515,10 +600,10 @@ function StandaloneChatPageClient({
       }
       return (
         <Reasoning
-          isStreaming={isLoading}
+          isStreaming={isStreamingMessage}
           key={`${messageId}-reasoning-${index}`}
         >
-          <ReasoningTrigger />
+          <ChatReasoningTrigger />
           <ReasoningContent>{text}</ReasoningContent>
         </Reasoning>
       );
@@ -662,10 +747,10 @@ function StandaloneChatPageClient({
   if (isLoadingHistory) {
     return (
       <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
-          <div className="relative flex min-h-full flex-col">
-            <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
-              <div className="mx-auto mt-auto flex w-full max-w-2xl flex-col gap-6">
+        <div className="scrollbar-stable flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="relative flex min-h-full min-w-0 flex-col">
+            <div className="flex min-w-0 flex-1 flex-col px-4 pt-6 pb-28">
+              <div className="mx-auto flex w-full min-w-0 max-w-2xl flex-col gap-6">
                 <div className="flex justify-end">
                   <Skeleton className="h-10 w-48 rounded-2xl" />
                 </div>
@@ -725,6 +810,7 @@ function StandaloneChatPageClient({
               onRemoveContext={handleRemoveContext}
               onSend={handleSend}
               onStop={handleStop}
+              onStopAndSend={handleStopAndSend}
               onThinkingLevelChange={handleThinkingLevelChange}
               organizationId={organizationId}
               organizationSlug={organizationSlug}
@@ -751,15 +837,24 @@ function StandaloneChatPageClient({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
-        <div className="relative flex min-h-full flex-col">
-          <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
-            <div className="mx-auto mt-auto flex w-full max-w-2xl flex-col gap-4">
+      <div
+        className="scrollbar-stable flex-1 overflow-y-auto overflow-x-hidden"
+        ref={scrollContainerRef}
+      >
+        <div className="relative flex min-h-full min-w-0 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col px-4 pt-6 pb-28">
+            <div className="mx-auto flex w-full min-w-0 max-w-2xl flex-col gap-4">
               {messages.map((message) => (
                 <Message from={message.role} key={message.id}>
                   <MessageContent>
                     {message.parts.map((part, index) =>
-                      renderPart(part, message.id, index)
+                      renderPart(
+                        part,
+                        message.id,
+                        index,
+                        message.id === streamingAssistantMessageId,
+                        message.role === "assistant"
+                      )
                     )}
                   </MessageContent>
                 </Message>
@@ -799,15 +894,18 @@ function StandaloneChatPageClient({
                 onRemoveContext={handleRemoveContext}
                 onSend={handleSend}
                 onStop={handleStop}
+                onStopAndSend={handleStopAndSend}
                 onThinkingLevelChange={handleThinkingLevelChange}
                 organizationId={organizationId}
                 organizationSlug={organizationSlug}
+                ref={chatInputRef}
                 thinkingLevel={thinkingLevel}
               />
             </div>
           </div>
         </div>
       </div>
+      <QuoteSelectionTooltip onQuote={handleQuote} />
     </div>
   );
 }
