@@ -15,10 +15,6 @@ export async function isAiChatExperimentEnabled({
   email,
   organizationId,
 }: AiChatExperimentContext): Promise<boolean> {
-  if (process.env.NEXT_PUBLIC_FORCE_AI_CHAT === "1") {
-    return true;
-  }
-
   if (!DATABUDDY_DASHBOARD_CLIENT_ID) {
     return false;
   }

@@ -7,8 +7,6 @@ import type { GatewayArgs, GatewayResult } from "@notra/ai/types/gateway";
 import type { SupermemoryOptions } from "@notra/ai/types/model";
 import { withSupermemory } from "@supermemory/tools/ai-sdk";
 
-let hasWarnedAboutMissingSupermemoryKey = false;
-
 export function createModel(
   organizationId: string | undefined,
   modelId: GatewayArgs[0],
@@ -17,18 +15,7 @@ export function createModel(
 ): GatewayResult {
   const base = gateway(modelId);
 
-  if (!organizationId || !process.env.SUPERMEMORY_API_KEY) {
-    if (
-      organizationId &&
-      !process.env.SUPERMEMORY_API_KEY &&
-      !hasWarnedAboutMissingSupermemoryKey
-    ) {
-      hasWarnedAboutMissingSupermemoryKey = true;
-      console.warn(
-        "[Supermemory] SUPERMEMORY_API_KEY not configured - falling back to base model without memory"
-      );
-    }
-
+  if (!organizationId) {
     return wrapModelWithObservability(base, log);
   }
 
