@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Add01Icon,
   ArrowDown01Icon,
   Delete02Icon,
   PencilEdit02Icon,
@@ -28,7 +27,6 @@ import {
 import { Input } from "@notra/ui/components/ui/input";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
