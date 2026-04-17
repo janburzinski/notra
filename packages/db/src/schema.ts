@@ -20,6 +20,13 @@ export const lookbackWindowEnum = pgEnum("lookback_window", [
 
 export const postStatusEnum = pgEnum("post_status", ["draft", "published"]);
 
+export const chatVisibilityEnum = pgEnum("chat_visibility", [
+  "private",
+  "link",
+  "password",
+  "organization",
+]);
+
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -485,6 +492,63 @@ export interface PostSourceMetadata {
   selectedLinearIssues?: Array<{ integrationId: string; issueId: string }>;
 }
 
+export const chatShares = pgTable(
+  "chat_shares",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    chatId: text("chat_id").notNull(),
+    ownerUserId: text("owner_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    visibility: chatVisibilityEnum("visibility").notNull().default("private"),
+    shareToken: text("share_token"),
+    passwordHash: text("password_hash"),
+    allowFork: boolean("allow_fork").notNull().default(false),
+    expiresAt: timestamp("expires_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("chatShares_org_chat_uidx").on(
+      table.organizationId,
+      table.chatId
+    ),
+    uniqueIndex("chatShares_shareToken_uidx")
+      .on(table.shareToken)
+      .where(sql`${table.shareToken} IS NOT NULL`),
+    index("chatShares_expiresAt_idx").on(table.expiresAt),
+    index("chatShares_ownerUserId_idx").on(table.ownerUserId),
+  ]
+);
+
+export const chatShareInvitees = pgTable(
+  "chat_share_invitees",
+  {
+    id: text("id").primaryKey(),
+    shareId: text("share_id")
+      .notNull()
+      .references(() => chatShares.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    email: text("email").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("chatShareInvitees_shareId_idx").on(table.shareId),
+    uniqueIndex("chatShareInvitees_share_email_uidx").on(
+      table.shareId,
+      table.email
+    ),
+  ]
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
@@ -654,3 +718,29 @@ export const postsRelations = relations(posts, ({ one }) => ({
     references: [organizations.id],
   }),
 }));
+
+export const chatSharesRelations = relations(chatShares, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [chatShares.organizationId],
+    references: [organizations.id],
+  }),
+  owner: one(users, {
+    fields: [chatShares.ownerUserId],
+    references: [users.id],
+  }),
+  invitees: many(chatShareInvitees),
+}));
+
+export const chatShareInviteesRelations = relations(
+  chatShareInvitees,
+  ({ one }) => ({
+    share: one(chatShares, {
+      fields: [chatShareInvitees.shareId],
+      references: [chatShares.id],
+    }),
+    user: one(users, {
+      fields: [chatShareInvitees.userId],
+      references: [users.id],
+    }),
+  })
+);

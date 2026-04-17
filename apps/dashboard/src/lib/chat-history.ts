@@ -369,6 +369,19 @@ export async function loadChatHistory(
   );
 }
 
+export async function getChatSession(
+  organizationId: string,
+  chatId: string
+): Promise<ChatSessionSummary | null> {
+  if (!redis) {
+    return null;
+  }
+  const raw = await redis.get<ChatSessionSummary | string>(
+    sessionMetaKey(organizationId, chatId)
+  );
+  return parseChatSessionSummary(raw);
+}
+
 export async function listChatSessions(
   organizationId: string
 ): Promise<ChatSessionSummary[]> {

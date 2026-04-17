@@ -32,6 +32,7 @@ import {
   type ThinkingLevel,
 } from "@/components/chat/chat-input";
 import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
+import { ShareChatPopover } from "@/components/chat/share-chat-popover";
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { authClient } from "@/lib/auth/client";
@@ -884,6 +885,19 @@ function StandaloneChatPageClient({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
+      {initialChatId && session?.user && organizationId && (
+        <div className="sticky top-0 z-20 flex items-center justify-end gap-2 border-b bg-background/80 px-4 py-2 backdrop-blur">
+          <ShareChatPopover
+            chatId={initialChatId}
+            organizationId={organizationId}
+            owner={{
+              name: session.user.name ?? session.user.email ?? "You",
+              email: session.user.email ?? "",
+              image: session.user.image ?? null,
+            }}
+          />
+        </div>
+      )}
       <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
         <div className="relative flex min-h-full flex-col">
           <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
