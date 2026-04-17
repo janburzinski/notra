@@ -489,6 +489,8 @@ async function createDirectStandaloneChatResponse({
               : undefined;
 
           return {
+            model: routingDecision.model,
+            thinkingLevel: enableThinking === false ? "off" : thinkingLevel,
             inputTokens: usageSnapshot.inputTokens,
             outputTokens: usageSnapshot.outputTokens,
             totalTokens: usageSnapshot.totalTokens,
