@@ -134,95 +134,113 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
   return (
     <>
       <div className="flex min-w-0 items-center gap-1">
-        {isEditing ? (
-          <Input
-            className="h-7 w-56"
-            disabled={isRenaming}
-            maxLength={CHAT_TITLE_MAX_LENGTH}
-            onBlur={submitRename}
-            onChange={(event) => setDraftTitle(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                submitRename();
-                return;
-              }
-              if (event.key === "Escape") {
-                event.preventDefault();
-                setIsEditing(false);
-              }
-            }}
-            ref={inputRef}
-            value={draftTitle}
-          />
-        ) : (
-          <DropdownMenu onOpenChange={setIsMenuOpen} open={isMenuOpen}>
-            <DropdownMenuTrigger
-              className={cn(
-                "flex min-w-0 max-w-[40ch] cursor-pointer items-center gap-1 rounded-md px-1.5 py-0.5 text-foreground text-sm no-underline outline-hidden transition-colors hover:bg-accent hover:no-underline focus-visible:bg-accent",
-                (isRenaming || isPinning) && "opacity-70"
-              )}
-              onDoubleClick={(event) => {
-                event.preventDefault();
-                startEditing();
-              }}
+        <AnimatePresence initial={false} mode="wait">
+          {isEditing ? (
+            <motion.div
+              animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+              exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98 }}
+              initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98 }}
+              key="editing"
+              transition={{ duration: 0.18, ease: "easeOut" }}
             >
-              <span className="relative block min-w-0 truncate">
-                <AnimatePresence initial={false} mode="popLayout">
-                  <motion.span
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    className="block truncate"
-                    exit={{ opacity: 0, y: -4, filter: "blur(4px)" }}
-                    initial={{
-                      opacity: 0,
-                      y: hasTitle ? 4 : 0,
-                      filter: hasTitle ? "blur(4px)" : "blur(0px)",
-                    }}
-                    key={hasTitle ? "title" : "fallback"}
-                    transition={{ duration: 0.25, ease: "easeOut" }}
-                  >
-                    {displayTitle}
-                  </motion.span>
-                </AnimatePresence>
-              </span>
-              <HugeiconsIcon
-                className={cn(
-                  "size-3.5 shrink-0 text-muted-foreground transition-transform duration-200",
-                  isMenuOpen && "rotate-180"
-                )}
-                icon={ArrowDown01Icon}
+              <Input
+                className="h-7 w-56"
+                disabled={isRenaming}
+                maxLength={CHAT_TITLE_MAX_LENGTH}
+                onBlur={submitRename}
+                onChange={(event) => setDraftTitle(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    submitRename();
+                    return;
+                  }
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    setIsEditing(false);
+                  }
+                }}
+                ref={inputRef}
+                value={draftTitle}
               />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="w-44"
-              showBackdrop={false}
-              sideOffset={6}
+            </motion.div>
+          ) : (
+            <motion.div
+              animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+              exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98 }}
+              initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98 }}
+              key="display"
+              transition={{ duration: 0.18, ease: "easeOut" }}
             >
-              <DropdownMenuItem
-                disabled={!session || isPinning}
-                onClick={handleTogglePin}
-              >
-                <HugeiconsIcon
-                  icon={session?.pinnedAt ? PinOffIcon : PinIcon}
-                />
-                {session?.pinnedAt ? "Unpin" : "Pin"}
-              </DropdownMenuItem>
-              <DropdownMenuItem disabled={!session} onClick={startEditing}>
-                <HugeiconsIcon icon={PencilEdit02Icon} />
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                disabled={!session}
-                onClick={() => setDeleteOpen(true)}
-                variant="destructive"
-              >
-                <HugeiconsIcon icon={Delete02Icon} />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+              <DropdownMenu onOpenChange={setIsMenuOpen} open={isMenuOpen}>
+                <DropdownMenuTrigger
+                  className={cn(
+                    "flex min-w-0 max-w-[40ch] cursor-pointer items-center gap-1 rounded-md px-1.5 py-0.5 text-foreground text-sm no-underline outline-hidden transition-colors hover:bg-accent hover:no-underline focus-visible:bg-accent",
+                    (isRenaming || isPinning) && "opacity-70"
+                  )}
+                  onDoubleClick={(event) => {
+                    event.preventDefault();
+                    startEditing();
+                  }}
+                >
+                  <span className="relative block min-w-0 truncate">
+                    <AnimatePresence initial={false} mode="popLayout">
+                      <motion.span
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        className="block truncate"
+                        exit={{ opacity: 0, y: -4, filter: "blur(4px)" }}
+                        initial={{
+                          opacity: 0,
+                          y: hasTitle ? 4 : 0,
+                          filter: hasTitle ? "blur(4px)" : "blur(0px)",
+                        }}
+                        key={hasTitle ? "title" : "fallback"}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                      >
+                        {displayTitle}
+                      </motion.span>
+                    </AnimatePresence>
+                  </span>
+                  <HugeiconsIcon
+                    className={cn(
+                      "size-3.5 shrink-0 text-muted-foreground transition-transform duration-200",
+                      isMenuOpen && "rotate-180"
+                    )}
+                    icon={ArrowDown01Icon}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-44"
+                  showBackdrop={false}
+                  sideOffset={6}
+                >
+                  <DropdownMenuItem
+                    disabled={!session || isPinning}
+                    onClick={handleTogglePin}
+                  >
+                    <HugeiconsIcon
+                      icon={session?.pinnedAt ? PinOffIcon : PinIcon}
+                    />
+                    {session?.pinnedAt ? "Unpin" : "Pin"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled={!session} onClick={startEditing}>
+                    <HugeiconsIcon icon={PencilEdit02Icon} />
+                    Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    disabled={!session}
+                    onClick={() => setDeleteOpen(true)}
+                    variant="destructive"
+                  >
+                    <HugeiconsIcon icon={Delete02Icon} />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <ResponsiveAlertDialog
