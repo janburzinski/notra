@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { z } from "zod";
+// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+import * as z from "zod";
 import { CHAT_TITLE_MAX_LENGTH } from "@/constants/chat";
 import { isAiChatExperimentEnabled } from "@/lib/ai-chat-experiment";
 import { withOrganizationAuth } from "@/lib/auth/organization";

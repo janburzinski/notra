@@ -4,7 +4,8 @@ import type { StandaloneChatContextItem } from "@notra/ai/types/standalone-chat"
 import { serve } from "@upstash/workflow/nextjs";
 import type { UIMessageChunk } from "ai";
 import { nanoid } from "nanoid";
-import { z } from "zod";
+// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+import * as z from "zod";
 import { FEATURES } from "@/constants/features";
 import { isAiChatExperimentEnabled } from "@/lib/ai-chat-experiment";
 import { autumn } from "@/lib/billing/autumn";

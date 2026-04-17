@@ -1,6 +1,7 @@
 "use client";
 
-import { z } from "zod";
+// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+import * as z from "zod";
 
 const CHAT_PREFERENCES_STORAGE_VERSION = "v1";
 
