@@ -5,9 +5,10 @@ import {
   members,
   users,
 } from "@notra/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import type { ChatVisibility } from "@/schemas/chat-share";
+import { normalizeUrl } from "@/utils/url";
 import { hashSharePassword } from "./share-password";
 
 export type ChatShareRow = typeof chatShares.$inferSelect;
@@ -41,10 +42,6 @@ export async function getChatShareByToken(
   return share ?? null;
 }
 
-function needsToken(visibility: ChatVisibility): boolean {
-  return visibility === "link" || visibility === "password";
-}
-
 function generateShareToken() {
   return nanoid(24);
 }
@@ -68,15 +65,11 @@ export async function upsertChatShare(
     input.chatId
   );
 
-  const previousVisibility = existing?.visibility ?? null;
-  const targetsToken = needsToken(input.visibility);
   const visibilityChanged =
-    previousVisibility !== null && previousVisibility !== input.visibility;
+    existing !== null && existing.visibility !== input.visibility;
 
   let shareToken: string | null = existing?.shareToken ?? null;
-  if (!targetsToken) {
-    shareToken = null;
-  } else if (!shareToken || visibilityChanged) {
+  if (!shareToken || visibilityChanged) {
     shareToken = generateShareToken();
   }
 
@@ -92,7 +85,7 @@ export async function upsertChatShare(
   const values = {
     organizationId: input.organizationId,
     chatId: input.chatId,
-    ownerUserId: input.ownerUserId,
+    ownerUserId: existing?.ownerUserId ?? input.ownerUserId,
     visibility: input.visibility,
     shareToken,
     passwordHash,
@@ -103,23 +96,31 @@ export async function upsertChatShare(
         : input.expiresAt,
   };
 
-  let shareId: string;
-  if (existing) {
-    shareId = existing.id;
-    await db
-      .update(chatShares)
-      .set({ ...values, updatedAt: new Date() })
-      .where(eq(chatShares.id, existing.id));
-  } else {
-    shareId = nanoid(24);
-    await db.insert(chatShares).values({ id: shareId, ...values });
+  const [shareRow] = existing
+    ? await db
+        .update(chatShares)
+        .set({ ...values, updatedAt: new Date() })
+        .where(eq(chatShares.id, existing.id))
+        .returning()
+    : await db
+        .insert(chatShares)
+        .values({ id: nanoid(24), ...values })
+        .returning();
+
+  if (!shareRow) {
+    throw new Error("Failed to upsert chat share");
   }
 
+  const shareId = shareRow.id;
+  let invitees: ChatShareInviteeRow[] = [];
+
   if (input.visibility === "private") {
-    const emails = (input.inviteEmails ?? []).map((email) =>
-      email.trim().toLowerCase()
+    const uniqueEmails = Array.from(
+      new Set(
+        (input.inviteEmails ?? []).map((email) => email.trim().toLowerCase())
+      )
     );
-    const uniqueEmails = Array.from(new Set(emails));
+
     await db
       .delete(chatShareInvitees)
       .where(eq(chatShareInvitees.shareId, shareId));
@@ -133,14 +134,17 @@ export async function upsertChatShare(
         matchingUsers.map((row) => [row.email.toLowerCase(), row.id])
       );
 
-      await db.insert(chatShareInvitees).values(
-        uniqueEmails.map((email) => ({
-          id: nanoid(24),
-          shareId,
-          email,
-          userId: userIdByEmail.get(email) ?? null,
-        }))
-      );
+      invitees = await db
+        .insert(chatShareInvitees)
+        .values(
+          uniqueEmails.map((email) => ({
+            id: nanoid(24),
+            shareId,
+            email,
+            userId: userIdByEmail.get(email) ?? null,
+          }))
+        )
+        .returning();
     }
   } else {
     await db
@@ -148,14 +152,7 @@ export async function upsertChatShare(
       .where(eq(chatShareInvitees.shareId, shareId));
   }
 
-  const updated = await getChatShareForOwner(
-    input.organizationId,
-    input.chatId
-  );
-  if (!updated) {
-    throw new Error("Failed to load chat share after upsert");
-  }
-  return updated;
+  return { ...shareRow, invitees };
 }
 
 export async function deleteChatShare(
@@ -205,8 +202,34 @@ export function isEmailInvited(
   );
 }
 
-const TRAILING_SLASH_REGEX = /\/$/;
+export async function getActiveShareVisibilityByChatId(
+  organizationId: string,
+  chatIds: string[]
+): Promise<Map<string, ChatVisibility>> {
+  const result = new Map<string, ChatVisibility>();
+  if (chatIds.length === 0) {
+    return result;
+  }
+  const rows = await db
+    .select({
+      chatId: chatShares.chatId,
+      visibility: chatShares.visibility,
+      expiresAt: chatShares.expiresAt,
+    })
+    .from(chatShares)
+    .where(
+      and(
+        eq(chatShares.organizationId, organizationId),
+        inArray(chatShares.chatId, chatIds),
+        sql`(${chatShares.expiresAt} IS NULL OR ${chatShares.expiresAt} > now())`
+      )
+    );
+  for (const row of rows) {
+    result.set(row.chatId, row.visibility);
+  }
+  return result;
+}
 
 export function buildShareUrl(origin: string, token: string): string {
-  return `${origin.replace(TRAILING_SLASH_REGEX, "")}/shared/${token}`;
+  return `${normalizeUrl(origin)}/shared/${token}`;
 }

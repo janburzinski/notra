@@ -1,5 +1,5 @@
 import { db } from "@notra/db/drizzle";
-import { organizations } from "@notra/db/schema";
+import { members, organizations } from "@notra/db/schema";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -16,6 +16,7 @@ import {
   isUserOrganizationMember,
 } from "@/lib/chat-shares";
 import { getShareAccessCookieName } from "@/lib/share-cookies";
+import { getClientIp, ratelimit } from "@/utils/ratelimit";
 
 interface RouteContext {
   params: Promise<{ token: string }>;
@@ -47,6 +48,17 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     );
   }
 
+  const ip = getClientIp(request);
+  const { success: allowed } = await ratelimit.shareFork.limit(
+    `${user.id}:${ip}`
+  );
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many forks, try again later" },
+      { status: 429 }
+    );
+  }
+
   if (share.visibility === "private" && !isEmailInvited(share, user.email)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -66,21 +78,28 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     }
   }
 
-  const targetOrganizationId = session.activeOrganizationId;
+  let targetOrganizationId = session.activeOrganizationId ?? null;
+  if (targetOrganizationId) {
+    const isMemberOfTarget = await isUserOrganizationMember(
+      user.id,
+      targetOrganizationId
+    );
+    if (!isMemberOfTarget) {
+      targetOrganizationId = null;
+    }
+  }
+  if (!targetOrganizationId) {
+    const fallback = await db
+      .select({ organizationId: members.organizationId })
+      .from(members)
+      .where(eq(members.userId, user.id))
+      .limit(1);
+    targetOrganizationId = fallback[0]?.organizationId ?? null;
+  }
   if (!targetOrganizationId) {
     return NextResponse.json(
-      { error: "No active organization" },
+      { error: "No organization available to fork into" },
       { status: 400 }
-    );
-  }
-  const isMemberOfTarget = await isUserOrganizationMember(
-    user.id,
-    targetOrganizationId
-  );
-  if (!isMemberOfTarget) {
-    return NextResponse.json(
-      { error: "Not a member of target organization" },
-      { status: 403 }
     );
   }
 

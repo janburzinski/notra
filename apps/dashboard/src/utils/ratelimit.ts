@@ -23,6 +23,24 @@ export const ratelimit = {
     prefix: "ratelimit:import-tweets",
     limiter: Ratelimit.slidingWindow(20, "1m"),
   }),
+  shareUnlock: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:share-unlock",
+    limiter: Ratelimit.slidingWindow(5, "1m"),
+  }),
+  shareWrite: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:chat-share-write",
+    limiter: Ratelimit.slidingWindow(30, "1m"),
+  }),
+  shareFork: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:chat-share-fork",
+    limiter: Ratelimit.slidingWindow(10, "1m"),
+  }),
 };
 
 export function getClientIp(request: NextRequest): string {

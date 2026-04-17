@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { isAiChatExperimentEnabled } from "@/lib/ai-chat-experiment";
 import { withOrganizationAuth } from "@/lib/auth/organization";
 import { listChatSessions } from "@/lib/chat-history";
+import { getActiveShareVisibilityByChatId } from "@/lib/chat-shares";
 
 interface RouteContext {
   params: Promise<{ organizationId: string }>;
@@ -30,5 +31,13 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
   }
 
   const sessions = await listChatSessions(organizationId);
-  return NextResponse.json({ sessions });
+  const shareVisibilityByChatId = await getActiveShareVisibilityByChatId(
+    organizationId,
+    sessions.map((session) => session.chatId)
+  );
+  const sessionsWithShare = sessions.map((session) => ({
+    ...session,
+    shareVisibility: shareVisibilityByChatId.get(session.chatId) ?? null,
+  }));
+  return NextResponse.json({ sessions: sessionsWithShare });
 }

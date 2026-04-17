@@ -394,6 +394,30 @@ export function ChatHistoryNav() {
                             }}
                           >
                             <span className="truncate">{session.title}</span>
+                            {session.shareVisibility && (
+                              <span
+                                aria-label={`Shared (${session.shareVisibility})`}
+                                className="ml-auto flex shrink-0 items-center text-muted-foreground"
+                                title={`Shared (${session.shareVisibility})`}
+                              >
+                                <svg
+                                  aria-hidden="true"
+                                  className="size-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle cx="18" cy="5" r="3" />
+                                  <circle cx="6" cy="12" r="3" />
+                                  <circle cx="18" cy="19" r="3" />
+                                  <path d="M8.59 13.51l6.83 3.98" />
+                                  <path d="M15.41 6.51l-6.82 3.98" />
+                                </svg>
+                              </span>
+                            )}
                           </Link>
                         )
                       }

@@ -12,6 +12,7 @@ import type {
 } from "@/types/email/actions";
 import { getServerSession } from "../auth/session";
 import {
+  sendChatShareInviteEmail,
   sendInviteEmail,
   sendResetPassword,
   sendVerificationEmail,
@@ -171,6 +172,69 @@ export async function sendResetPasswordAction({
   } catch (error) {
     console.error(
       `Unexpected error sending reset email to ${userEmail}:`,
+      error
+    );
+    return { success: false, error: "Failed to send email" };
+  }
+}
+
+interface SendChatShareInviteProps {
+  inviteeEmail: string;
+  inviterName: string;
+  chatTitle: string;
+  organizationName: string;
+  shareLink: string;
+}
+
+export async function sendChatShareInviteEmailAction({
+  inviteeEmail,
+  inviterName,
+  chatTitle,
+  organizationName,
+  shareLink,
+}: SendChatShareInviteProps) {
+  if (!resend && isDevelopment) {
+    return sendDevEmail({
+      from: EMAIL_CONFIG.from,
+      to: inviteeEmail,
+      subject: `${inviterName} shared a chat with you`,
+      text: "This is a mock chat share invite email",
+      _mockContext: {
+        type: "invite",
+        data: {
+          inviteeEmail,
+          inviterName,
+          inviterEmail: "",
+          workspaceName: organizationName,
+          inviteLink: shareLink,
+        },
+      },
+    });
+  }
+
+  if (!resend) {
+    throw new Error("Resend API key not set");
+  }
+
+  try {
+    const { error } = await sendChatShareInviteEmail(resend, {
+      inviteeEmail,
+      inviterName,
+      chatTitle,
+      organizationName,
+      shareLink,
+    });
+    if (error) {
+      console.error(
+        `Failed to send chat share invite to ${inviteeEmail}:`,
+        error
+      );
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error(
+      `Unexpected error sending chat share invite to ${inviteeEmail}:`,
       error
     );
     return { success: false, error: "Failed to send email" };

@@ -117,6 +117,10 @@ export const chatSessionSummarySchema = z.object({
   updatedAt: z.string().min(1),
   createdAt: z.string().min(1),
   pinnedAt: z.string().min(1).nullable(),
+  shareVisibility: z
+    .enum(["private", "link", "password", "organization"])
+    .nullable()
+    .optional(),
 });
 
 export const chatSessionResponseSchema = z.object({

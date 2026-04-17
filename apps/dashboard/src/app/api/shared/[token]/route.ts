@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth/session";
-import { loadChatHistory } from "@/lib/chat-history";
+import { isChatDeleted, loadChatHistory } from "@/lib/chat-history";
 import {
   getChatShareByToken,
   isEmailInvited,
@@ -25,6 +25,12 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
   }
   if (isShareExpired(share)) {
     return NextResponse.json({ error: "Share link expired" }, { status: 410 });
+  }
+  if (await isChatDeleted(share.organizationId, share.chatId)) {
+    return NextResponse.json(
+      { error: "The chat has been deleted" },
+      { status: 410 }
+    );
   }
 
   const { user } = await getServerSession({ headers: request.headers });

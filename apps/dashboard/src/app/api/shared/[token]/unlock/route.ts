@@ -1,5 +1,3 @@
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getChatShareByToken, isShareExpired } from "@/lib/chat-shares";
@@ -9,14 +7,7 @@ import {
 } from "@/lib/share-cookies";
 import { verifySharePassword } from "@/lib/share-password";
 import { unlockShareSchema } from "@/schemas/chat-share";
-import { getClientIp } from "@/utils/ratelimit";
-
-const unlockRatelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  analytics: true,
-  prefix: "ratelimit:share-unlock",
-  limiter: Ratelimit.slidingWindow(5, "1m"),
-});
+import { getClientIp, ratelimit } from "@/utils/ratelimit";
 
 interface RouteContext {
   params: Promise<{ token: string }>;
@@ -25,7 +16,9 @@ interface RouteContext {
 export async function POST(request: NextRequest, { params }: RouteContext) {
   const { token } = await params;
   const ip = getClientIp(request);
-  const { success: allowed } = await unlockRatelimit.limit(`${ip}:${token}`);
+  const { success: allowed } = await ratelimit.shareUnlock.limit(
+    `${ip}:${token}`
+  );
   if (!allowed) {
     return NextResponse.json(
       { error: "Too many attempts, try again later" },

@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { ChatShareInviteEmail } from "@notra/email/emails/chat-share-invite";
 import { InviteUserEmail } from "@notra/email/emails/invite";
 import { ResetPasswordEmail } from "@notra/email/emails/reset";
 import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-content-created";
@@ -127,6 +128,42 @@ export async function sendInviteEmail(
       tags: [{ name: "category", value: "invite" }],
     },
     `notra:invite:${inviteeEmail}:${inviteLink}`
+  );
+}
+
+export async function sendChatShareInviteEmail(
+  resend: Resend,
+  {
+    inviteeEmail,
+    inviterName,
+    chatTitle,
+    organizationName,
+    shareLink,
+  }: {
+    inviteeEmail: string;
+    inviterName: string;
+    chatTitle: string;
+    organizationName: string;
+    shareLink: string;
+  }
+) {
+  return sendWithRetry(
+    resend,
+    {
+      from: EMAIL_CONFIG.from,
+      replyTo: EMAIL_CONFIG.replyTo,
+      to: inviteeEmail,
+      subject: `${inviterName} shared a chat with you`,
+      react: ChatShareInviteEmail({
+        inviteeEmail,
+        inviterName,
+        chatTitle,
+        organizationName,
+        shareLink,
+      }),
+      tags: [{ name: "category", value: "chat-share-invite" }],
+    },
+    `notra:chat-share-invite:${inviteeEmail}:${shareLink}`
   );
 }
 

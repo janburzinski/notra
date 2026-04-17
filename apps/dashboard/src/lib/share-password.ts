@@ -31,8 +31,5 @@ export async function verifySharePassword(
   const salt = Buffer.from(saltHex, "hex");
   const expected = Buffer.from(keyHex, "hex");
   const derived = await scrypt(password, salt, expected.length);
-  if (derived.length !== expected.length) {
-    return false;
-  }
   return timingSafeEqual(derived, expected);
 }

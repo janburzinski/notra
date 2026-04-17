@@ -3,6 +3,7 @@ import { organizations, users } from "@notra/db/schema";
 import { buttonVariants } from "@notra/ui/components/ui/button";
 import { eq } from "drizzle-orm";
 import { ClockIcon, LockIcon, SearchXIcon, ShieldOffIcon } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies, headers as nextHeaders } from "next/headers";
 import Link from "next/link";
 import {
@@ -11,7 +12,11 @@ import {
 } from "@/components/shared-chat/share-password-gate";
 import { SharedChatView } from "@/components/shared-chat/shared-chat-view";
 import { getServerSession } from "@/lib/auth/session";
-import { getChatSession, loadChatHistory } from "@/lib/chat-history";
+import {
+  getChatSession,
+  isChatDeleted,
+  loadChatHistory,
+} from "@/lib/chat-history";
 import {
   getChatShareByToken,
   isEmailInvited,
@@ -27,9 +32,37 @@ interface PageProps {
 
 export const dynamic = "force-dynamic";
 
-export default async function SharedChatPage({ params }: PageProps) {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { token } = await params;
   const share = await getChatShareByToken(token);
+  if (!share || isShareExpired(share)) {
+    return { title: "Shared chat" };
+  }
+  const session = await getChatSession(share.organizationId, share.chatId);
+  const title = session?.title ?? "Shared chat";
+  const isPublic = share.visibility === "link" && !share.passwordHash;
+  return {
+    title,
+    description: isPublic ? "A chat shared via Notra" : undefined,
+    robots: isPublic ? undefined : { index: false, follow: false },
+    openGraph: isPublic
+      ? {
+          title,
+          description: "A chat shared via Notra",
+          type: "article",
+        }
+      : undefined,
+  };
+}
+
+export default async function SharedChatPage({ params }: PageProps) {
+  const { token } = await params;
+  const [share, headersList] = await Promise.all([
+    getChatShareByToken(token),
+    nextHeaders(),
+  ]);
 
   if (!share) {
     return (
@@ -51,8 +84,20 @@ export default async function SharedChatPage({ params }: PageProps) {
     );
   }
 
-  const headersList = await nextHeaders();
+  if (await isChatDeleted(share.organizationId, share.chatId)) {
+    return (
+      <GateShell
+        description="The owner deleted this chat, so it can no longer be viewed."
+        icon={<SearchXIcon className="size-5" />}
+        title="Chat no longer available"
+      />
+    );
+  }
+
   const { user } = await getServerSession({ headers: headersList });
+  const isViewerOrgMember = user
+    ? await isUserOrganizationMember(user.id, share.organizationId)
+    : false;
 
   if (share.visibility === "private") {
     if (!user) {
@@ -71,11 +116,7 @@ export default async function SharedChatPage({ params }: PageProps) {
     if (!user) {
       return <LoginGate token={token} />;
     }
-    const isMember = await isUserOrganizationMember(
-      user.id,
-      share.organizationId
-    );
-    if (!isMember) {
+    if (!isViewerOrgMember) {
       return (
         <GateShell
           description="This chat is only shared with members of its organization."
@@ -102,13 +143,18 @@ export default async function SharedChatPage({ params }: PageProps) {
     }),
     db.query.organizations.findFirst({
       where: eq(organizations.id, share.organizationId),
-      columns: { name: true },
+      columns: { name: true, slug: true },
     }),
   ]);
 
   const title = session?.title
     ? normalizeChatTitle(session.title)
     : normalizeChatTitle("Shared chat");
+
+  const workspaceUrl =
+    isViewerOrgMember && organization?.slug
+      ? `/${organization.slug}/chat/${share.chatId}`
+      : null;
 
   return (
     <SharedChatView
@@ -119,6 +165,7 @@ export default async function SharedChatPage({ params }: PageProps) {
       ownerName={owner?.name ?? null}
       shareToken={token}
       title={title}
+      workspaceUrl={workspaceUrl}
     />
   );
 }
