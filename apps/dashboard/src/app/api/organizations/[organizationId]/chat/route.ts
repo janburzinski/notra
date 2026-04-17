@@ -1,12 +1,11 @@
 import { orchestrateStandaloneChat } from "@notra/ai/orchestration/orchestrate-standalone";
 import type { StandaloneChatContextItem } from "@notra/ai/schemas/standalone-chat";
-import { standaloneChatContextSchema } from "@notra/ai/schemas/standalone-chat";
+import type { UIMessage } from "ai";
+import { isTextUIPart } from "ai";
 import type { CheckResponse } from "autumn-js";
 import { nanoid } from "nanoid";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
-import * as z from "zod";
 import { FEATURES } from "@/constants/features";
 import { isAiChatExperimentEnabled } from "@/lib/ai-chat-experiment";
 import { withOrganizationAuth } from "@/lib/auth/organization";
@@ -40,16 +39,8 @@ import {
   getLinearToolContextByIntegrationId,
 } from "@/lib/services/linear-integration";
 import { getBaseUrl } from "@/lib/triggers/qstash";
+import { standaloneChatRequestSchema } from "@/schemas/chat";
 import { startChatAbortPolling } from "@/utils/chat-abort-polling.server";
-
-const triggerStandaloneChatSchema = z.object({
-  chatId: z.string().optional(),
-  messages: z.array(z.any()),
-  context: z.array(standaloneChatContextSchema).optional(),
-  model: z.string().optional(),
-  enableThinking: z.boolean().optional(),
-  thinkingLevel: z.enum(["off", "low", "medium", "high"]).optional(),
-});
 
 interface RouteContext {
   params: Promise<{ organizationId: string }>;
@@ -129,7 +120,7 @@ export const POST = withEvlog(async function POST(
     }
 
     const body = await request.json();
-    const parseResult = triggerStandaloneChatSchema.safeParse(body);
+    const parseResult = standaloneChatRequestSchema.safeParse(body);
 
     if (!parseResult.success) {
       return NextResponse.json(
@@ -173,9 +164,7 @@ export const POST = withEvlog(async function POST(
     await clearLastResponseStopped(organizationId, chatId);
 
     if (messages.length === 1 && latestMessage.role === "user") {
-      const textPart = latestMessage.parts?.find(
-        (p: { type: string }) => p.type === "text"
-      );
+      const textPart = latestMessage.parts?.find(isTextUIPart);
       const userText = textPart?.text?.trim();
       if (userText) {
         await generateAndSetChatTitle(organizationId, chatId, userText);
@@ -338,7 +327,7 @@ async function createDirectStandaloneChatResponse({
 }: {
   organizationId: string;
   chatId: string;
-  messages: unknown[];
+  messages: UIMessage[];
   context: StandaloneChatContextItem[];
   useMarkup: boolean;
   requestId: string;
@@ -349,12 +338,11 @@ async function createDirectStandaloneChatResponse({
   abortSignal?: AbortSignal;
 }) {
   const autumnClient = autumn;
-  const latestMessage = messages.at(-1) as { id?: string } | undefined;
+  const streamId = messages.at(-1)?.id;
 
-  if (!latestMessage?.id) {
+  if (!streamId) {
     throw new Error("Latest message must include an id");
   }
-  const streamId = latestMessage.id;
 
   const redisAbortController = new AbortController();
   const stopAbortPolling = startChatAbortPolling({

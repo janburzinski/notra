@@ -1,8 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
-import * as z from "zod";
-import { CHAT_TITLE_MAX_LENGTH } from "@/constants/chat";
 import { isAiChatExperimentEnabled } from "@/lib/ai-chat-experiment";
 import { withOrganizationAuth } from "@/lib/auth/organization";
 import {
@@ -13,24 +10,11 @@ import {
   renameChatSession,
   setChatSessionPinned,
 } from "@/lib/chat-history";
+import { updateChatSessionSchema } from "@/schemas/chat";
 
 interface RouteContext {
   params: Promise<{ organizationId: string; chatId: string }>;
 }
-
-const updateChatSessionSchema = z
-  .object({
-    title: z.string().trim().min(1).max(CHAT_TITLE_MAX_LENGTH).optional(),
-    pinned: z.boolean().optional(),
-  })
-  .refine(
-    (value) =>
-      Number(value.title !== undefined) + Number(value.pinned !== undefined) ===
-      1,
-    {
-      message: "Provide exactly one update operation",
-    }
-  );
 
 export async function GET(request: NextRequest, { params }: RouteContext) {
   const { organizationId, chatId } = await params;

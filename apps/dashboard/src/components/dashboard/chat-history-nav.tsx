@@ -1,6 +1,12 @@
 "use client";
 
-import { Add01Icon } from "@hugeicons/core-free-icons";
+import {
+  Add01Icon,
+  Delete02Icon,
+  PencilEdit02Icon,
+  PinIcon,
+  PinOffIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveAlertDialog,
@@ -29,7 +35,6 @@ import {
   SidebarMenuItem,
 } from "@notra/ui/components/ui/sidebar";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PencilLine, Pin, PinOff, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
@@ -39,40 +44,12 @@ import { useAiChatExperiment } from "@/components/providers/databuddy-flags-prov
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { CHAT_TITLE_MAX_LENGTH } from "@/constants/chat";
 import { cn } from "@/lib/utils";
-
-interface ChatSessionSummary {
-  chatId: string;
-  title: string;
-  updatedAt: string;
-  createdAt: string;
-  pinnedAt: string | null;
-}
-
-function normalizeTitle(title: string) {
-  return title.replace(/\s+/g, " ").trim();
-}
-
-function sortSessions(sessions: ChatSessionSummary[]) {
-  return [...sessions].sort((left, right) => {
-    if (left.pinnedAt && !right.pinnedAt) {
-      return -1;
-    }
-    if (!left.pinnedAt && right.pinnedAt) {
-      return 1;
-    }
-
-    const leftPinnedAt = left.pinnedAt ? Date.parse(left.pinnedAt) : Number.NaN;
-    const rightPinnedAt = right.pinnedAt
-      ? Date.parse(right.pinnedAt)
-      : Number.NaN;
-
-    if (Number.isFinite(leftPinnedAt) || Number.isFinite(rightPinnedAt)) {
-      return rightPinnedAt - leftPinnedAt;
-    }
-
-    return Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
-  });
-}
+import {
+  chatSessionResponseSchema,
+  chatSessionsListResponseSchema,
+} from "@/schemas/chat";
+import type { ChatSessionSummary } from "@/types/chat";
+import { normalizeChatTitle, sortChatSessions } from "@/utils/chat";
 
 export function ChatHistoryNav() {
   const { activeOrganization } = useOrganizationsContext();
@@ -107,10 +84,10 @@ export function ChatHistoryNav() {
       if (!response.ok) {
         return [];
       }
-      const data = (await response.json()) as {
-        sessions?: ChatSessionSummary[];
-      };
-      return data.sessions ?? [];
+      const parsed = chatSessionsListResponseSchema.safeParse(
+        await response.json()
+      );
+      return parsed.success ? (parsed.data.sessions ?? []) : [];
     },
     enabled: Boolean(organizationId) && aiChatExperiment.on,
     refetchOnWindowFocus: true,
@@ -147,7 +124,7 @@ export function ChatHistoryNav() {
     queryClient.setQueryData<ChatSessionSummary[]>(
       chatSessionsQueryKey,
       (current = []) =>
-        sortSessions(
+        sortChatSessions(
           current.map((item) => (item.chatId === chatId ? updater(item) : item))
         )
     );
@@ -158,7 +135,7 @@ export function ChatHistoryNav() {
       return;
     }
 
-    const nextTitle = normalizeTitle(draftTitle);
+    const nextTitle = normalizeChatTitle(draftTitle);
 
     if (!nextTitle) {
       toast.error("Title can't be empty");
@@ -202,12 +179,10 @@ export function ChatHistoryNav() {
         throw new Error("Failed to rename chat");
       }
 
-      const data = (await response.json()) as { session?: ChatSessionSummary };
-      if (data.session) {
-        replaceSessionInCache(
-          session.chatId,
-          () => data.session as ChatSessionSummary
-        );
+      const parsed = chatSessionResponseSchema.safeParse(await response.json());
+      if (parsed.success && parsed.data.session) {
+        const updated = parsed.data.session;
+        replaceSessionInCache(session.chatId, () => updated);
       }
     } catch {
       queryClient.setQueryData(chatSessionsQueryKey, previousSessions);
@@ -335,12 +310,10 @@ export function ChatHistoryNav() {
         throw new Error("Failed to update pin state");
       }
 
-      const data = (await response.json()) as { session?: ChatSessionSummary };
-      if (data.session) {
-        replaceSessionInCache(
-          session.chatId,
-          () => data.session as ChatSessionSummary
-        );
+      const parsed = chatSessionResponseSchema.safeParse(await response.json());
+      if (parsed.success && parsed.data.session) {
+        const updated = parsed.data.session;
+        replaceSessionInCache(session.chatId, () => updated);
       }
     } catch {
       queryClient.setQueryData(chatSessionsQueryKey, previousSessions);
@@ -435,25 +408,29 @@ export function ChatHistoryNav() {
                         }}
                         showOnHover
                       >
-                        {session.pinnedAt ? <PinOff /> : <Pin />}
+                        <HugeiconsIcon
+                          icon={session.pinnedAt ? PinOffIcon : PinIcon}
+                        />
                       </SidebarMenuAction>
                     )}
                   </ContextMenuTrigger>
 
                   <ContextMenuContent>
                     <ContextMenuItem onClick={() => togglePinned(session)}>
-                      {session.pinnedAt ? <PinOff /> : <Pin />}
+                      <HugeiconsIcon
+                        icon={session.pinnedAt ? PinOffIcon : PinIcon}
+                      />
                       {session.pinnedAt ? "Unpin" : "Pin"}
                     </ContextMenuItem>
                     <ContextMenuItem onClick={() => startEditing(session)}>
-                      <PencilLine />
+                      <HugeiconsIcon icon={PencilEdit02Icon} />
                       Rename
                     </ContextMenuItem>
                     <ContextMenuItem
                       onClick={() => setDeleteCandidate(session)}
                       variant="destructive"
                     >
-                      <Trash2 />
+                      <HugeiconsIcon icon={Delete02Icon} />
                       Delete
                     </ContextMenuItem>
                   </ContextMenuContent>

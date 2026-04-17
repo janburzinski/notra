@@ -5,8 +5,9 @@ import { nanoid } from "nanoid";
 import {
   CHAT_ABORT_FLAG_TTL_SECONDS,
   CHAT_DELETION_TOMBSTONE_TTL_SECONDS,
-  CHAT_TITLE_MAX_LENGTH,
 } from "@/constants/chat";
+import type { ChatSessionSummary } from "@/types/chat";
+import { normalizeChatTitle, sortChatSessions } from "@/utils/chat";
 import { redis } from "./redis";
 
 function historyKey(organizationId: string, chatId: string) {
@@ -61,19 +62,7 @@ export function generateChatId() {
   return nanoid(16);
 }
 
-export interface ChatSessionSummary {
-  chatId: string;
-  title: string;
-  updatedAt: string;
-  createdAt: string;
-  pinnedAt: string | null;
-}
-
 const CHAT_SESSION_WRITE_MAX_ATTEMPTS = 3;
-
-export function normalizeChatTitle(title: string) {
-  return title.replace(/\s+/g, " ").trim().slice(0, CHAT_TITLE_MAX_LENGTH);
-}
 
 const WRITE_CHAT_HISTORY_SCRIPT = `
 local deleted = redis.call("GET", KEYS[1])
@@ -218,25 +207,6 @@ async function getChatSessionSnapshot(
     expectedVersion,
     session: parseChatSessionSummary(raw),
   };
-}
-
-function compareChatSessions(
-  left: Pick<ChatSessionSummary, "pinnedAt" | "updatedAt">,
-  right: Pick<ChatSessionSummary, "pinnedAt" | "updatedAt">
-) {
-  const leftPinned = left.pinnedAt ? Date.parse(left.pinnedAt) : Number.NaN;
-  const rightPinned = right.pinnedAt ? Date.parse(right.pinnedAt) : Number.NaN;
-
-  if (Number.isFinite(leftPinned) || Number.isFinite(rightPinned)) {
-    if (!Number.isFinite(leftPinned)) {
-      return 1;
-    }
-    if (!Number.isFinite(rightPinned)) {
-      return -1;
-    }
-  }
-
-  return Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
 }
 
 async function writeChatHistory(
@@ -435,9 +405,11 @@ export async function listChatSessions(
     })
   );
 
-  return sessions
-    .filter((session): session is ChatSessionSummary => session !== null)
-    .sort(compareChatSessions);
+  return sortChatSessions(
+    sessions.filter(
+      (session): session is ChatSessionSummary => session !== null
+    )
+  );
 }
 
 export async function getActiveChatStream(

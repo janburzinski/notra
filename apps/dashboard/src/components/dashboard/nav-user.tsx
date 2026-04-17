@@ -67,14 +67,13 @@ export function NavUser() {
   }, []);
 
   useEffect(() => {
-    if (!(hasHydrated && (user || isPending || isRedirecting))) {
+    // Wait for hydration and auth resolution before redirecting unauthenticated users.
+    if (!hasHydrated || isPending || user || isRedirecting) {
       return;
     }
 
-    if (!user && !isPending && !isRedirecting) {
-      setIsRedirecting(true);
-      router.push("/login");
-    }
+    setIsRedirecting(true);
+    router.push("/login");
   }, [hasHydrated, user, isPending, isRedirecting, router]);
 
   async function handleSignOut() {

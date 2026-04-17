@@ -34,6 +34,10 @@ import { renderTextWithIntegrationReferences } from "@/components/chat/integrati
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { authClient } from "@/lib/auth/client";
+import {
+  chatErrorPayloadSchema,
+  chatTransportRequestInputSchema,
+} from "@/schemas/chat";
 import type { ContextItem } from "@/types/chat";
 import {
   CHAT_PREFERENCES_STORAGE_KEY,
@@ -249,11 +253,14 @@ function StandaloneChatPageClient({
             return fetch(input, init);
           }
 
-          const body = JSON.parse(String(init?.body)) as {
-            chatId: string;
-            messages: Array<{ id?: string }>;
-          };
-          const latestMessageId = body.messages.at(-1)?.id;
+          const parsedRequestBody = chatTransportRequestInputSchema.safeParse(
+            init?.body
+          );
+          const requestBody = parsedRequestBody.success
+            ? parsedRequestBody.data
+            : null;
+
+          const latestMessageId = requestBody?.messages.at(-1)?.id;
 
           if (latestMessageId) {
             setPendingMessageId(latestMessageId);
@@ -269,8 +276,12 @@ function StandaloneChatPageClient({
             return triggerResponse;
           }
 
+          if (!requestBody) {
+            return triggerResponse;
+          }
+
           return fetch(
-            `/api/organizations/${organizationIdRef.current}/chat/${body.chatId}/stream`,
+            `/api/organizations/${organizationIdRef.current}/chat/${requestBody.chatId}/stream`,
             {
               method: "GET",
               headers: init?.headers,
@@ -287,11 +298,13 @@ function StandaloneChatPageClient({
     const errorMessage = err.message || String(err);
 
     try {
-      const errorData = JSON.parse(errorMessage);
-      if (typeof errorData.error === "string" && errorData.error.length > 0) {
-        setChatError(errorData.error);
+      const parsed = chatErrorPayloadSchema.safeParse(JSON.parse(errorMessage));
+
+      if (parsed.success && parsed.data.error) {
+        setChatError(parsed.data.error);
       }
-      if (errorData.code === "USAGE_LIMIT_REACHED") {
+
+      if (parsed.success && parsed.data.code === "USAGE_LIMIT_REACHED") {
         setChatError(
           "You've used all your chat messages this month. Upgrade for more."
         );
