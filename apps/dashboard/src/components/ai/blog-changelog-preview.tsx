@@ -15,14 +15,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
-import { Loader2Icon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { CHAT_PREVIEW_SAVE_TIMEOUT_MS } from "@/constants/chat";
 import { getOutputTypeLabel, OutputTypeIcon } from "@/utils/output-types";
 
 type IncomingState = "draft" | "finished";
-type EffectiveState = "draft" | "loading" | "finished";
-type UserAction = "none" | "saving" | "save-failed";
+type UserAction = "none" | "approved" | "save-failed";
 
 interface BlogChangelogPreviewProps {
   state: IncomingState;
@@ -46,39 +45,24 @@ export function BlogChangelogPreview({
 }: BlogChangelogPreviewProps) {
   const [userAction, setUserAction] = useState<UserAction>("none");
 
-  const effectiveState: EffectiveState = (() => {
-    if (incomingState === "finished") {
-      return "finished";
-    }
-    if (userAction === "saving") {
-      return "loading";
-    }
-    if (userAction === "save-failed") {
-      return "finished";
-    }
-    return "draft";
-  })();
+  const isFinished = incomingState === "finished" || userAction !== "none";
 
   useEffect(() => {
-    if (userAction !== "saving") {
+    if (userAction !== "approved" || incomingState === "finished") {
       return;
     }
     const timer = window.setTimeout(() => {
       setUserAction("save-failed");
+      toast.error("Saving draft is taking longer than expected.");
     }, CHAT_PREVIEW_SAVE_TIMEOUT_MS);
     return () => window.clearTimeout(timer);
-  }, [userAction]);
+  }, [userAction, incomingState]);
 
   const handleApprove = useCallback(() => {
-    setUserAction("saving");
+    setUserAction("approved");
     onApprove?.();
   }, [onApprove]);
 
-  const handleDeny = useCallback(() => {
-    onDeny?.();
-  }, [onDeny]);
-
-  const isFinished = effectiveState === "finished";
   const showDraftBadge = isFinished && userAction !== "save-failed";
 
   return (
@@ -124,31 +108,16 @@ export function BlogChangelogPreview({
 
           {!isFinished && (
             <div className="flex items-center justify-end gap-2 px-3 pb-2">
-              {effectiveState === "draft" && (
-                <Button onClick={handleDeny} size="sm" variant="ghost">
-                  <HugeiconsIcon className="size-4" icon={Cancel01Icon} />
-                  Discard
-                </Button>
-              )}
-              <Button
-                disabled={effectiveState === "loading"}
-                onClick={handleApprove}
-                size="sm"
-              >
-                {effectiveState === "loading" ? (
-                  <>
-                    <Loader2Icon className="size-4 animate-spin" />
-                    Saving
-                  </>
-                ) : (
-                  <>
-                    <HugeiconsIcon
-                      className="size-4"
-                      icon={CheckmarkSquare01Icon}
-                    />
-                    Save as draft
-                  </>
-                )}
+              <Button onClick={onDeny} size="sm" variant="ghost">
+                <HugeiconsIcon className="size-4" icon={Cancel01Icon} />
+                Discard
+              </Button>
+              <Button onClick={handleApprove} size="sm">
+                <HugeiconsIcon
+                  className="size-4"
+                  icon={CheckmarkSquare01Icon}
+                />
+                Save as draft
               </Button>
             </div>
           )}
