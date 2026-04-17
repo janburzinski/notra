@@ -25,20 +25,18 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { Input } from "@notra/ui/components/ui/input";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { CHAT_TITLE_MAX_LENGTH } from "@/constants/chat";
-import { cn } from "@/lib/utils";
 import {
-  chatSessionResponseSchema,
-  chatSessionsListResponseSchema,
-} from "@/schemas/chat";
-import type { ChatSessionSummary } from "@/types/chat";
-import { normalizeChatTitle, sortChatSessions } from "@/utils/chat";
+  useChatSessionMutations,
+  useChatSessions,
+} from "@/lib/hooks/use-chat-sessions";
+import { cn } from "@/lib/utils";
+import { normalizeChatTitle } from "@/utils/chat";
 
 interface ChatTopbarTitleProps {
   chatId: string;
@@ -54,32 +52,10 @@ function formatChatIdFallback(chatId: string) {
 export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
   const { activeOrganization } = useOrganizationsContext();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const slug = activeOrganization?.slug;
-  const organizationId = activeOrganization?.id;
 
-  const chatSessionsQueryKey = useMemo(
-    () => ["chat-sessions", organizationId] as const,
-    [organizationId]
-  );
-
-  const { data: sessions = [] } = useQuery({
-    queryKey: chatSessionsQueryKey,
-    queryFn: async () => {
-      const response = await fetch(
-        `/api/organizations/${organizationId}/chat/sessions`
-      );
-      if (!response.ok) {
-        return [];
-      }
-      const parsed = chatSessionsListResponseSchema.safeParse(
-        await response.json()
-      );
-      return parsed.success ? (parsed.data.sessions ?? []) : [];
-    },
-    enabled: Boolean(organizationId),
-    refetchOnWindowFocus: true,
-  });
+  const { sessions } = useChatSessions();
+  const { renameChat, togglePinned, deleteChat } = useChatSessionMutations();
 
   const session = sessions.find((item) => item.chatId === chatId);
   const title = session?.title ?? null;
@@ -92,7 +68,6 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const renameInFlightRef = useRef(false);
 
   useEffect(() => {
     if (isEditing) {
@@ -100,18 +75,6 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
       inputRef.current?.select();
     }
   }, [isEditing]);
-
-  function replaceSessionInCache(
-    updater: (session: ChatSessionSummary) => ChatSessionSummary
-  ) {
-    queryClient.setQueryData<ChatSessionSummary[]>(
-      chatSessionsQueryKey,
-      (current = []) =>
-        sortChatSessions(
-          current.map((item) => (item.chatId === chatId ? updater(item) : item))
-        )
-    );
-  }
 
   function startEditing() {
     if (!session) {
@@ -122,7 +85,7 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
   }
 
   async function submitRename() {
-    if (!(organizationId && session)) {
+    if (!session) {
       return;
     }
 
@@ -140,125 +103,35 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
       return;
     }
 
-    if (renameInFlightRef.current) {
-      return;
-    }
-
-    renameInFlightRef.current = true;
     setIsRenaming(true);
-    const previousSessions =
-      queryClient.getQueryData<ChatSessionSummary[]>(chatSessionsQueryKey) ??
-      [];
-
-    replaceSessionInCache((item) => ({ ...item, title: nextTitle }));
     setIsEditing(false);
-
-    try {
-      const response = await fetch(
-        `/api/organizations/${organizationId}/chat/${chatId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: nextTitle }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to rename chat");
-      }
-
-      const parsed = chatSessionResponseSchema.safeParse(await response.json());
-      if (parsed.success && parsed.data.session) {
-        const updated = parsed.data.session;
-        replaceSessionInCache(() => updated);
-      }
-    } catch {
-      queryClient.setQueryData(chatSessionsQueryKey, previousSessions);
+    const ok = await renameChat(chatId, nextTitle);
+    if (!ok) {
       setDraftTitle(session.title);
       setIsEditing(true);
-      toast.error("Failed to rename chat");
-    } finally {
-      renameInFlightRef.current = false;
-      setIsRenaming(false);
     }
+    setIsRenaming(false);
   }
 
-  async function togglePinned() {
-    if (!(organizationId && session) || isPinning) {
+  async function handleTogglePin() {
+    if (!session || isPinning) {
       return;
     }
-
-    const nextPinned = !session.pinnedAt;
     setIsPinning(true);
-    const previousSessions =
-      queryClient.getQueryData<ChatSessionSummary[]>(chatSessionsQueryKey) ??
-      [];
-    const nextPinnedAt = nextPinned ? new Date().toISOString() : null;
-
-    replaceSessionInCache((item) => ({ ...item, pinnedAt: nextPinnedAt }));
-
-    try {
-      const response = await fetch(
-        `/api/organizations/${organizationId}/chat/${chatId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ pinned: nextPinned }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update pin state");
-      }
-
-      const parsed = chatSessionResponseSchema.safeParse(await response.json());
-      if (parsed.success && parsed.data.session) {
-        const updated = parsed.data.session;
-        replaceSessionInCache(() => updated);
-      }
-    } catch {
-      queryClient.setQueryData(chatSessionsQueryKey, previousSessions);
-      toast.error("Failed to update chat pin");
-    } finally {
-      setIsPinning(false);
-    }
+    await togglePinned(session);
+    setIsPinning(false);
   }
 
   async function handleDelete() {
-    if (!(organizationId && session)) {
+    if (!session) {
       return;
     }
-
     setIsDeleting(true);
-
-    try {
-      const response = await fetch(
-        `/api/organizations/${organizationId}/chat/${chatId}`,
-        { method: "DELETE" }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete chat");
-      }
-
-      queryClient.setQueryData<ChatSessionSummary[]>(
-        chatSessionsQueryKey,
-        (current = []) => current.filter((item) => item.chatId !== chatId)
-      );
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: chatSessionsQueryKey }),
-        queryClient.invalidateQueries({
-          queryKey: ["chat-history", organizationId, chatId],
-        }),
-      ]);
-
-      toast.success("Chat deleted");
+    const ok = await deleteChat(chatId);
+    setIsDeleting(false);
+    if (ok) {
       setDeleteOpen(false);
       router.replace(`/${slug}/chat`);
-    } catch {
-      toast.error("Failed to delete chat");
-    } finally {
-      setIsDeleting(false);
     }
   }
 
@@ -335,7 +208,7 @@ export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {
             >
               <DropdownMenuItem
                 disabled={!session || isPinning}
-                onClick={togglePinned}
+                onClick={handleTogglePin}
               >
                 <HugeiconsIcon
                   icon={session?.pinnedAt ? PinOffIcon : PinIcon}
