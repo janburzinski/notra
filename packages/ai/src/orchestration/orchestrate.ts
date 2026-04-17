@@ -33,7 +33,10 @@ export interface OrchestrateDeps {
   integrationFetchers?: IntegrationFetchers;
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;
-  onUsage?: (usage: LanguageModelUsage, modelId: string) => void;
+  onUsage?: (
+    usage: LanguageModelUsage,
+    modelId: string
+  ) => void | Promise<void>;
   log?: AILogTarget;
 }
 
@@ -115,11 +118,13 @@ export async function orchestrateChat(
   const stream = streamText({
     model: modelWithMemory,
     system: systemPrompt,
-    messages: await convertToModelMessages(messages),
+    messages: await convertToModelMessages(messages, {
+      ignoreIncompleteToolCalls: true,
+    }),
     tools,
     stopWhen: stepCountIs(maxSteps),
-    onFinish({ totalUsage }) {
-      deps?.onUsage?.(totalUsage, routingDecision.model);
+    async onFinish({ totalUsage }) {
+      await deps?.onUsage?.(totalUsage, routingDecision.model);
     },
     onError({ error }) {
       console.error("[Chat Stream Error]", {

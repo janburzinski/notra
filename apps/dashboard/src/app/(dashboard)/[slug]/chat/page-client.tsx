@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { X } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, X } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ContentType } from "@notra/ai/schemas/content";
 import {
@@ -10,17 +10,16 @@ import {
   MessageResponse,
 } from "@notra/ui/components/ai-elements/message";
 import {
-  Reasoning,
-  ReasoningContent,
-  ReasoningTrigger,
-} from "@notra/ui/components/ai-elements/reasoning";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@notra/ui/components/ui/collapsible";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DefaultChatTransport,
   lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
-import { useCustomer } from "autumn-js/react";
 import { Loader2Icon } from "lucide-react";
 import { nanoid } from "nanoid";
 import dynamic from "next/dynamic";
@@ -54,14 +53,103 @@ const ContentPreviewCard = dynamic(
   { ssr: false }
 );
 
+const BRAILLE_THINKING_LABEL = "\u2820\u281d\u2815\u281e\u2817\u2801";
+const THINKING_LABEL = "Thinking";
+const REASONING_AUTO_CLOSE_DELAY_MS = 1000;
+const REASONING_CONTENT_CLASSNAME =
+  "mt-4 outline-none text-sm text-muted-foreground data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:animate-in data-[state=open]:slide-in-from-top-2";
+
+function formatReasoningDurationLabel(durationSeconds: number | null): string {
+  if (!durationSeconds || durationSeconds <= 1) {
+    return "Thought for a moment";
+  }
+
+  return `Thought for ${durationSeconds} seconds`;
+}
+
+function ChatReasoningBlock({
+  children,
+  isStreaming,
+}: {
+  children: string;
+  isStreaming: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(isStreaming);
+  const [statusLabel, setStatusLabel] = useState(
+    isStreaming ? THINKING_LABEL : formatReasoningDurationLabel(null)
+  );
+  const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (isStreaming) {
+      startTimeRef.current = Date.now();
+      setDurationSeconds(null);
+      setStatusLabel(THINKING_LABEL);
+      setIsOpen(true);
+
+      return;
+    }
+
+    const startedAt = startTimeRef.current;
+    const nextDurationSeconds = startedAt
+      ? Math.max(1, Math.ceil((Date.now() - startedAt) / 1000))
+      : null;
+
+    setDurationSeconds(nextDurationSeconds);
+    setStatusLabel(formatReasoningDurationLabel(nextDurationSeconds));
+
+    const closeTimer = window.setTimeout(() => {
+      setIsOpen(false);
+    }, REASONING_AUTO_CLOSE_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(closeTimer);
+    };
+  }, [isStreaming]);
+
+  useEffect(() => {
+    if (isStreaming || durationSeconds !== null) {
+      return;
+    }
+
+    setStatusLabel(formatReasoningDurationLabel(null));
+  }, [durationSeconds, isStreaming]);
+
+  return (
+    <Collapsible onOpenChange={setIsOpen} open={isOpen}>
+      <CollapsibleTrigger className="flex w-full items-center gap-2 text-muted-foreground text-sm transition-colors hover:text-foreground">
+        {isStreaming ? (
+          <BrailleLoader className="text-xs tracking-tight" variant="shimmer" />
+        ) : (
+          <span className="font-mono text-xs tracking-tight">
+            {BRAILLE_THINKING_LABEL}
+          </span>
+        )}
+        <span>{statusLabel}</span>
+        <HugeiconsIcon
+          className={`size-4 transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`}
+          icon={ArrowDown01Icon}
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent className={REASONING_CONTENT_CLASSNAME}>
+        <MessageResponse className="text-muted-foreground text-sm [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+          {children}
+        </MessageResponse>
+        <div className="h-3" />
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 interface PageClientProps {
   organizationSlug: string;
   chatId?: string;
 }
 
 const TOOL_STATUS_LABELS: Record<string, string> = {
-  update_post: "Updating post...",
-  view_post: "Viewing post...",
+  updatePost: "Updating post...",
+  viewPost: "Viewing post...",
   getPullRequests: "Fetching pull requests...",
   getReleaseByTag: "Fetching release...",
   getCommitsByTimeframe: "Fetching commits...",
@@ -72,10 +160,22 @@ const TOOL_STATUS_LABELS: Record<string, string> = {
   getSkillByName: "Loading skill...",
 };
 
-const CREATE_TOOL_PREFIX = "tool-create_";
+const CREATE_TOOL_TYPES = {
+  "tool-createBlogPost": "blog_post",
+  "tool-createChangelog": "changelog",
+  "tool-createInvestorUpdate": "investor_update",
+  "tool-createLinkedInPost": "linkedin_post",
+  "tool-createTwitterPost": "twitter_post",
+} satisfies Record<string, ContentType>;
 
 function isCreateTool(type: string): boolean {
-  return type.startsWith(CREATE_TOOL_PREFIX);
+  return type in CREATE_TOOL_TYPES;
+}
+
+function getCreateToolContentType(
+  type: keyof typeof CREATE_TOOL_TYPES
+): ContentType {
+  return CREATE_TOOL_TYPES[type];
 }
 
 function StandaloneChatPageClient({
@@ -90,7 +190,6 @@ function StandaloneChatPageClient({
       : orgFromList;
   const organizationId = organization?.id ?? "";
   const { data: session } = authClient.useSession();
-  const { refetch: refetchCustomer } = useCustomer();
   const queryClient = useQueryClient();
   const router = useRouter();
   const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
@@ -219,11 +318,11 @@ function StandaloneChatPageClient({
 
   const handleFinish = useCallback(() => {
     setPendingMessageId(null);
-    refetchCustomer();
+    queryClient.invalidateQueries({ queryKey: ["autumn", "customer"] });
     queryClient.invalidateQueries({
       queryKey: ["chat-sessions", organizationId],
     });
-  }, [organizationId, queryClient, refetchCustomer]);
+  }, [organizationId, queryClient]);
 
   const {
     messages,
@@ -470,6 +569,36 @@ function StandaloneChatPageClient({
     [organization?.name, organization?.logo]
   );
 
+  const activeReasoningPartKey = useMemo(() => {
+    if (!isLoading) {
+      return null;
+    }
+
+    for (
+      let messageIndex = messages.length - 1;
+      messageIndex >= 0;
+      messageIndex--
+    ) {
+      const message = messages[messageIndex];
+      if (!message || message.role !== "assistant") {
+        continue;
+      }
+
+      for (
+        let partIndex = message.parts.length - 1;
+        partIndex >= 0;
+        partIndex--
+      ) {
+        const part = message.parts[partIndex];
+        if (part?.type === "reasoning") {
+          return `${message.id}-reasoning-${partIndex}`;
+        }
+      }
+    }
+
+    return null;
+  }, [isLoading, messages]);
+
   function renderPart(
     part: { type: string; [key: string]: unknown },
     messageId: string,
@@ -508,14 +637,14 @@ function StandaloneChatPageClient({
       if (!text) {
         return null;
       }
+      const reasoningKey = `${messageId}-reasoning-${index}`;
       return (
-        <Reasoning
-          isStreaming={isLoading}
-          key={`${messageId}-reasoning-${index}`}
+        <ChatReasoningBlock
+          isStreaming={activeReasoningPartKey === reasoningKey}
+          key={reasoningKey}
         >
-          <ReasoningTrigger />
-          <ReasoningContent>{text}</ReasoningContent>
-        </Reasoning>
+          {text}
+        </ChatReasoningBlock>
       );
     }
 
@@ -531,7 +660,9 @@ function StandaloneChatPageClient({
       const toolName = toolPart.type.replace("tool-", "");
 
       if (isCreateTool(toolPart.type)) {
-        const contentType = toolName.replace("create_", "") as ContentType;
+        const contentType = getCreateToolContentType(
+          toolPart.type as keyof typeof CREATE_TOOL_TYPES
+        );
         const title = toolPart.input?.title ?? "Untitled";
         const markdown = toolPart.input?.markdown ?? "";
 
@@ -741,6 +872,8 @@ function StandaloneChatPageClient({
             p.type === "reasoning" ||
             p.type.startsWith("tool-")
         )));
+  const thinkingIndicatorLabel =
+    lastMessage?.role === "user" ? "Getting Started" : "Thinking";
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -769,7 +902,7 @@ function StandaloneChatPageClient({
                     <div className="flex items-center gap-2">
                       <BrailleLoader className="text-sm" variant="shimmer" />
                       <span className="animate-pulse text-muted-foreground text-sm">
-                        {isStopping ? "Stopping" : "Thinking"}
+                        {isStopping ? "Stopping" : thinkingIndicatorLabel}
                       </span>
                     </div>
                   </MessageContent>

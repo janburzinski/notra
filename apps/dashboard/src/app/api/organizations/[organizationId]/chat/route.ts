@@ -408,7 +408,7 @@ async function createDirectStandaloneChatResponse({
         },
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
-        onUsage(usage, modelId) {
+        async onUsage(usage, modelId) {
           if (!autumnClient) {
             return;
           }
@@ -425,8 +425,8 @@ async function createDirectStandaloneChatResponse({
             useMarkup
           );
 
-          autumnClient
-            .track({
+          try {
+            await autumnClient.track({
               customerId: organizationId,
               featureId: FEATURES.AI_CREDITS,
               value: costCents,
@@ -442,14 +442,14 @@ async function createDirectStandaloneChatResponse({
                 total_tokens: usage.totalTokens ?? 0,
                 cost_cents: costCents,
               },
-            })
-            .catch((trackError) => {
-              console.error("[Autumn] Track error after standalone chat:", {
-                requestId,
-                customerId: organizationId,
-                error: trackError,
-              });
             });
+          } catch (trackError) {
+            console.error("[Autumn] Track error after standalone chat:", {
+              requestId,
+              customerId: organizationId,
+              error: trackError,
+            });
+          }
         },
         log,
       }
