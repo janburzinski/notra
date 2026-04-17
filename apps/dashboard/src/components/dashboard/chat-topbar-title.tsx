@@ -36,17 +36,10 @@ import {
   useChatSessions,
 } from "@/lib/hooks/use-chat-sessions";
 import { cn } from "@/lib/utils";
-import { normalizeChatTitle } from "@/utils/chat";
+import { formatChatIdFallback, normalizeChatTitle } from "@/utils/chat";
 
 interface ChatTopbarTitleProps {
   chatId: string;
-}
-
-function formatChatIdFallback(chatId: string) {
-  if (chatId.length <= 10) {
-    return chatId;
-  }
-  return `${chatId.slice(0, 6)}…${chatId.slice(-3)}`;
 }
 
 export function ChatTopbarTitle({ chatId }: ChatTopbarTitleProps) {

@@ -9,19 +9,12 @@ import {
   chatSessionsListResponseSchema,
 } from "@/schemas/chat";
 import type { ChatSessionSummary } from "@/types/chat";
-import { sortChatSessions } from "@/utils/chat";
-
-function chatSessionsQueryKey(organizationId: string | undefined) {
-  return ["chat-sessions", organizationId] as const;
-}
-
-function chatSessionPath(organizationId: string, chatId: string) {
-  return `/api/organizations/${organizationId}/chat/${chatId}`;
-}
-
-function chatSessionsPath(organizationId: string) {
-  return `/api/organizations/${organizationId}/chat/sessions`;
-}
+import {
+  chatSessionPath,
+  chatSessionsPath,
+  chatSessionsQueryKey,
+  sortChatSessions,
+} from "@/utils/chat";
 
 export function useChatSessions({
   enabled = true,
