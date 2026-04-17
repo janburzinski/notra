@@ -1250,10 +1250,8 @@ export function ChatInputAdvanced({
                           <span className="text-foreground">
                             {integration.name}
                           </span>
-                          <span className="ml-auto text-emerald-600 text-xs dark:text-emerald-400">
-                            {process.env.NODE_ENV === "development"
-                              ? 3
-                              : "Setup"}
+                          <span className="ml-auto text-muted-foreground text-xs">
+                            Setup
                           </span>
                           <HugeiconsIcon
                             className="size-4 text-muted-foreground"
