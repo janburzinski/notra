@@ -49,6 +49,11 @@ import {
   readStoredChatPreferences,
   writeStoredChatPreferences,
 } from "@/utils/chat-preferences";
+import {
+  consumeIntentionalNewChat,
+  readLastActiveChatId,
+  writeLastActiveChatId,
+} from "@/utils/chat-session-storage";
 import { formatLongDate, getGreeting } from "@/utils/dashboard-greeting";
 
 const BlogChangelogPreview = dynamic(
@@ -201,6 +206,9 @@ function StandaloneChatPageClient({
   const router = useRouter();
   const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [hasResolvedInitialRestore, setHasResolvedInitialRestore] = useState(
+    Boolean(initialChatId)
+  );
 
   const stableChatId = useMemo(
     () => initialChatId || nanoid(16),
@@ -363,6 +371,25 @@ function StandaloneChatPageClient({
     setIsHydrated(true);
   }, []);
 
+  useEffect(() => {
+    if (!isHydrated || initialChatId || !organizationSlug) {
+      return;
+    }
+
+    if (consumeIntentionalNewChat(organizationSlug)) {
+      setHasResolvedInitialRestore(true);
+      return;
+    }
+
+    const lastActiveChatId = readLastActiveChatId(organizationSlug);
+    if (!lastActiveChatId) {
+      setHasResolvedInitialRestore(true);
+      return;
+    }
+
+    router.replace(`/${organizationSlug}/chat/${lastActiveChatId}`);
+  }, [initialChatId, isHydrated, organizationSlug, router]);
+
   const handleModelChange = useCallback((model: string) => {
     const nextModel = parseStoredChatModel(model);
     if (!nextModel) {
@@ -458,6 +485,8 @@ function StandaloneChatPageClient({
       return {
         messages: data?.messages ?? null,
         lastResponseStopped: Boolean(data?.lastResponseStopped),
+        activeStreamId:
+          typeof data?.activeStreamId === "string" ? data.activeStreamId : null,
       };
     },
     enabled: Boolean(initialChatId) && Boolean(organizationId),
@@ -471,8 +500,20 @@ function StandaloneChatPageClient({
     if (chatHistoryQuery.data.messages?.length) {
       setMessages(chatHistoryQuery.data.messages);
     }
+    setPendingMessageId(
+      chatHistoryQuery.data.lastResponseStopped
+        ? null
+        : chatHistoryQuery.data.activeStreamId
+    );
     setWasStoppedByUser(Boolean(chatHistoryQuery.data.lastResponseStopped));
+    setHasResolvedInitialRestore(true);
   }, [chatHistoryQuery.data, setMessages]);
+
+  useEffect(() => {
+    if (chatHistoryQuery.isFetched && !chatHistoryQuery.data) {
+      setHasResolvedInitialRestore(true);
+    }
+  }, [chatHistoryQuery.data, chatHistoryQuery.isFetched]);
 
   useEffect(() => {
     setPendingMessageId(null);
@@ -559,6 +600,7 @@ function StandaloneChatPageClient({
       }
       await sendMessage({ text });
       if (isFirstMessage) {
+        writeLastActiveChatId(organizationSlug, stableChatId);
         router.replace(`/${organizationSlug}/chat/${stableChatId}`);
         queryClient.invalidateQueries({
           queryKey: ["chat-sessions", organizationId],
@@ -576,6 +618,12 @@ function StandaloneChatPageClient({
       stableChatId,
     ]
   );
+
+  useEffect(() => {
+    if (initialChatId && hasMessages) {
+      writeLastActiveChatId(organizationSlug, stableChatId);
+    }
+  }, [hasMessages, initialChatId, organizationSlug, stableChatId]);
 
   const messageCount = messages.length;
   const lastPartCount = messages.at(-1)?.parts?.length ?? 0;
@@ -831,6 +879,35 @@ function StandaloneChatPageClient({
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-5/6" />
                   <Skeleton className="h-4 w-3/6" />
+                </div>
+              </div>
+            </div>
+            <div className="sticky bottom-0 z-10 px-4 pt-2 pb-4">
+              <div className="pointer-events-none absolute inset-x-0 bottom-full h-8 bg-linear-to-t from-background to-transparent" />
+              <div className="mx-auto w-full max-w-2xl">
+                <Skeleton className="h-24 w-full rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!initialChatId && !hasResolvedInitialRestore) {
+    return (
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+          <div className="relative flex min-h-full flex-col">
+            <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
+              <div className="mx-auto mt-auto flex w-full max-w-2xl flex-col gap-6">
+                <div className="flex justify-end">
+                  <Skeleton className="h-10 w-48 rounded-2xl" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/6" />
                 </div>
               </div>
             </div>

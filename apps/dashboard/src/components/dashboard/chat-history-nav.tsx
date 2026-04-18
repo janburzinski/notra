@@ -56,6 +56,10 @@ import {
 } from "@/schemas/chat";
 import type { ChatSessionSummary } from "@/types/chat";
 import { normalizeChatTitle, sortChatSessions } from "@/utils/chat";
+import {
+  clearLastActiveChatId,
+  markIntentionalNewChat,
+} from "@/utils/chat-session-storage";
 
 export function ChatHistoryNav() {
   const { activeOrganization } = useOrganizationsContext();
@@ -229,6 +233,7 @@ export function ChatHistoryNav() {
           queryKey: ["chat-history", organizationId, deleteCandidate.chatId],
         }),
       ]);
+      clearLastActiveChatId(slug, deleteCandidate.chatId);
 
       if (deleteCandidate.chatId === currentChatId) {
         router.replace(`/${slug}/chat`);
@@ -486,7 +491,10 @@ export function ChatHistoryNav() {
               <SidebarMenuButton
                 className="cursor-pointer"
                 render={
-                  <Link href={`/${slug}/chat`}>
+                  <Link
+                    href={`/${slug}/chat`}
+                    onClick={() => markIntentionalNewChat(slug)}
+                  >
                     <HugeiconsIcon icon={Add01Icon} />
                     <span>New chat</span>
                   </Link>

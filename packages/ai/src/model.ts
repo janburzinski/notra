@@ -7,6 +7,12 @@ import type { GatewayArgs, GatewayResult } from "@notra/ai/types/gateway";
 import type { SupermemoryOptions } from "@notra/ai/types/model";
 import { withSupermemory } from "@supermemory/tools/ai-sdk";
 
+function shouldBypassSupermemory() {
+  return (
+    process.env.NODE_ENV === "development" && !process.env.SUPERMEMORY_API_KEY
+  );
+}
+
 export function createModel(
   organizationId: string | undefined,
   modelId: GatewayArgs[0],
@@ -15,7 +21,7 @@ export function createModel(
 ): GatewayResult {
   const base = gateway(modelId);
 
-  if (!organizationId) {
+  if (!organizationId || shouldBypassSupermemory()) {
     return wrapModelWithObservability(base, log);
   }
 

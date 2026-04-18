@@ -348,19 +348,15 @@ async function createDirectStandaloneChatResponse({
   }
 
   const redisAbortController = new AbortController();
+  const combinedAbortSignal = abortSignal
+    ? AbortSignal.any([abortSignal, redisAbortController.signal])
+    : redisAbortController.signal;
   const stopAbortPolling = startChatAbortPolling({
     organizationId,
     chatId,
     streamId,
     onAbort: () => redisAbortController.abort(),
   });
-
-  const onRequestAbort = () => redisAbortController.abort();
-  abortSignal?.addEventListener("abort", onRequestAbort, { once: true });
-
-  const combinedAbortSignal = abortSignal
-    ? AbortSignal.any([abortSignal, redisAbortController.signal])
-    : redisAbortController.signal;
 
   let cleanedUp = false;
   const cleanup = async () => {
@@ -369,7 +365,6 @@ async function createDirectStandaloneChatResponse({
     }
     cleanedUp = true;
     stopAbortPolling();
-    abortSignal?.removeEventListener("abort", onRequestAbort);
     await Promise.allSettled([
       clearChatAbortFlag(organizationId, chatId, streamId),
       clearActiveChatStream(organizationId, chatId),
@@ -488,6 +483,9 @@ async function createDirectStandaloneChatResponse({
       },
       onFinish: async ({ messages: responseMessages }) => {
         try {
+          if (redisAbortController.signal.aborted) {
+            return;
+          }
           await replaceChatHistory(organizationId, chatId, responseMessages);
         } finally {
           await cleanup();
@@ -500,7 +498,7 @@ async function createDirectStandaloneChatResponse({
           error,
         });
         if (
-          combinedAbortSignal.aborted ||
+          redisAbortController.signal.aborted ||
           (error instanceof Error && error.name === "AbortError")
         ) {
           return "Generation stopped.";

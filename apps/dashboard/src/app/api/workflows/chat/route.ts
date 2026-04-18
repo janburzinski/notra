@@ -226,6 +226,9 @@ export const { POST } = serve<ChatWorkflowPayload>(async (context) => {
       },
       onFinish: async ({ messages: responseMessages }) => {
         try {
+          if (abortController.signal.aborted) {
+            return;
+          }
           await replaceChatHistory(organizationId, chatId, responseMessages);
         } finally {
           await clearActiveChatStream(organizationId, chatId);
