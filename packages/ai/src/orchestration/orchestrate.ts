@@ -46,7 +46,7 @@ export async function orchestrateChat(
 ): Promise<OrchestrateResult> {
   const {
     organizationId,
-    messages: fullMessages,
+    messages,
     currentMarkdown,
     contentType,
     selection,
@@ -54,8 +54,6 @@ export async function orchestrateChat(
     maxSteps = 1,
     log: inputLog,
   } = input;
-
-  const messages = fullMessages;
 
   const log = deps?.log ?? inputLog;
 

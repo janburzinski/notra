@@ -126,9 +126,7 @@ export async function orchestrateStandaloneChat(
         thinkingLevel
       );
 
-  const messagesForModel = isTrivial
-    ? trimTrivialHistory(messages)
-    : messages;
+  const messagesForModel = isTrivial ? trimTrivialHistory(messages) : messages;
 
   let firstChunkFired = false;
   const stream = streamText({
@@ -278,21 +276,20 @@ async function validateStandaloneIntegrations(
     return [];
   }
 
-  const githubFromOrganization =
+  const [githubFromOrganization, linearFromOrganization] = await Promise.all([
     fetchers.listGitHubIntegrationsByOrganization !== undefined
-      ? await getEnabledGitHubIntegrations(
+      ? getEnabledGitHubIntegrations(
           organizationId,
           fetchers.listGitHubIntegrationsByOrganization
         )
-      : [];
-
-  const linearFromOrganization =
+      : Promise.resolve<ValidatedIntegration[]>([]),
     fetchers.listLinearIntegrationsByOrganization !== undefined
-      ? await getEnabledLinearIntegrations(
+      ? getEnabledLinearIntegrations(
           organizationId,
           fetchers.listLinearIntegrationsByOrganization
         )
-      : [];
+      : Promise.resolve<ValidatedIntegration[]>([]),
+  ]);
 
   if (githubFromOrganization.length > 0 || linearFromOrganization.length > 0) {
     return [...githubFromOrganization, ...linearFromOrganization];

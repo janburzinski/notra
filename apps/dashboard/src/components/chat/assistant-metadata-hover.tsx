@@ -26,19 +26,14 @@ const MODEL_LABELS = {
 } satisfies Record<ChatModel, string>;
 
 const MODEL_CONTEXT_WINDOWS = {
-  "anthropic/claude-opus-4-7": 1_000_000,
-  "anthropic/claude-sonnet-4-6": 1_000_000,
-  "anthropic/claude-haiku-4-5": 200_000,
+  "anthropic/claude-opus-4.7": 1_000_000,
+  "anthropic/claude-sonnet-4.6": 1_000_000,
+  "anthropic/claude-haiku-4.5": 200_000,
   "openai/gpt-5.4": 1_100_000,
 } satisfies Record<ChatModel, number>;
 
 function getModelContextWindow(model: string): number | null {
-  for (const [key, value] of Object.entries(MODEL_CONTEXT_WINDOWS)) {
-    if (key === model) {
-      return value;
-    }
-  }
-  return null;
+  return MODEL_CONTEXT_WINDOWS[model as ChatModel] ?? null;
 }
 
 function formatContextWindow(tokens: number): string {
@@ -60,12 +55,7 @@ const THINKING_LEVEL_LABELS: Record<ThinkingLevel, string | null> = {
 };
 
 function getModelLabel(model: string): string {
-  for (const [key, label] of Object.entries(MODEL_LABELS)) {
-    if (key === model) {
-      return label;
-    }
-  }
-  return model;
+  return MODEL_LABELS[model as ChatModel] ?? model;
 }
 
 function formatDuration(ms: number): string {
