@@ -1,5 +1,5 @@
-import { formatCurrentDate } from "@notra/ai/prompts/current-date";
 import type { StandaloneChatPromptParams } from "@notra/ai/types/prompts";
+import { formatCurrentDate } from "@notra/ai/utils/current-date";
 import dedent from "dedent";
 
 export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
