@@ -44,6 +44,7 @@ export const standaloneChatRequestSchema = z.object({
   model: chatModelSchema.optional(),
   enableThinking: z.boolean().optional(),
   thinkingLevel: thinkingLevelSchema.optional(),
+  timezone: z.string().min(1).max(100).optional(),
 });
 
 export const updateChatSessionSchema = z
@@ -71,6 +72,7 @@ export const chatWorkflowPayloadSchema = z.object({
   model: chatModelSchema.optional(),
   enableThinking: z.boolean().optional(),
   thinkingLevel: thinkingLevelSchema.optional(),
+  timezone: z.string().min(1).max(100).optional(),
 });
 
 export const chatTransportRequestBodySchema = z.object({

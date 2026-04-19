@@ -49,6 +49,7 @@ export async function orchestrateStandaloneChat(
     enableThinking = true,
     thinkingLevel = "medium",
     abortSignal,
+    timezone,
   } = input;
 
   const log = deps?.log ?? inputLog;
@@ -101,6 +102,7 @@ export async function orchestrateStandaloneChat(
     toolDescriptions: descriptions,
     hasGitHubEnabled: hasGitHub,
     hasLinearEnabled: hasLinear,
+    timezone,
   });
 
   const providerOptions = getThinkingProviderOptions(

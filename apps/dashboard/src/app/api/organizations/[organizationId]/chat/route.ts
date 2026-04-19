@@ -187,6 +187,7 @@ export const POST = withEvlog(async function POST(
         model: parseResult.data.model,
         enableThinking: parseResult.data.enableThinking,
         thinkingLevel: parseResult.data.thinkingLevel,
+        timezone: parseResult.data.timezone,
         abortSignal: request.signal,
       });
     }
@@ -204,6 +205,7 @@ export const POST = withEvlog(async function POST(
         model: parseResult.data.model,
         enableThinking: parseResult.data.enableThinking,
         thinkingLevel: parseResult.data.thinkingLevel,
+        timezone: parseResult.data.timezone,
       },
     });
 
@@ -326,6 +328,7 @@ async function createDirectStandaloneChatResponse({
   model,
   enableThinking,
   thinkingLevel,
+  timezone,
   abortSignal,
 }: {
   organizationId: string;
@@ -338,6 +341,7 @@ async function createDirectStandaloneChatResponse({
   model?: string;
   enableThinking?: boolean;
   thinkingLevel?: "off" | "low" | "medium" | "high";
+  timezone?: string;
   abortSignal?: AbortSignal;
 }) {
   const autumnClient = autumn;
@@ -394,6 +398,7 @@ async function createDirectStandaloneChatResponse({
         requestedModel: model,
         enableThinking,
         thinkingLevel,
+        timezone,
         abortSignal: combinedAbortSignal,
       },
       {

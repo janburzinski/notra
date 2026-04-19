@@ -255,6 +255,7 @@ function StandaloneChatPageClient({
             model: selectedModelRef.current,
             enableThinking: thinkingLevelRef.current !== "off",
             thinkingLevel: thinkingLevelRef.current,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         }),
         prepareReconnectToStreamRequest: ({ id }) => ({

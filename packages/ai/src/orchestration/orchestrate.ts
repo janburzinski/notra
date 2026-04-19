@@ -54,6 +54,7 @@ export async function orchestrateChat(
     context = [],
     maxSteps = 1,
     log: inputLog,
+    timezone,
   } = input;
 
   const log = deps?.log ?? inputLog;
@@ -114,6 +115,7 @@ export async function orchestrateChat(
     toolDescriptions: descriptions,
     hasGitHubEnabled: hasGitHub,
     hasLinearEnabled: hasLinear,
+    timezone,
   });
 
   const stream = streamText({
