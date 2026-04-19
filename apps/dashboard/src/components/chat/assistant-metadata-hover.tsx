@@ -5,6 +5,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@notra/ui/components/ui/tooltip";
 import type { ReactNode } from "react";
 import { useShowAgentStats } from "@/lib/hooks/use-privacy-preferences";
 import type {
@@ -19,6 +24,33 @@ const MODEL_LABELS = {
   "anthropic/claude-haiku-4-5": "Claude Haiku 4.5",
   "openai/gpt-5.4": "GPT-5.4",
 } satisfies Record<ChatModel, string>;
+
+const MODEL_CONTEXT_WINDOWS = {
+  "anthropic/claude-opus-4-7": 1_000_000,
+  "anthropic/claude-sonnet-4-6": 1_000_000,
+  "anthropic/claude-haiku-4-5": 200_000,
+  "openai/gpt-5.4": 1_100_000,
+} satisfies Record<ChatModel, number>;
+
+function getModelContextWindow(model: string): number | null {
+  for (const [key, value] of Object.entries(MODEL_CONTEXT_WINDOWS)) {
+    if (key === model) {
+      return value;
+    }
+  }
+  return null;
+}
+
+function formatContextWindow(tokens: number): string {
+  if (tokens >= 1_000_000) {
+    const millions = tokens / 1_000_000;
+    return `${Number.isInteger(millions) ? millions : millions.toFixed(1)}M`;
+  }
+  if (tokens >= 1000) {
+    return `${Math.round(tokens / 1000)}K`;
+  }
+  return String(tokens);
+}
 
 const THINKING_LEVEL_LABELS: Record<ThinkingLevel, string | null> = {
   off: null,
@@ -108,11 +140,49 @@ export function AssistantMetadataHover({
   }
 
   if (typeof metadata.totalTokens === "number") {
+    const contextWindow = metadata.model
+      ? getModelContextWindow(metadata.model)
+      : null;
+    const hasBreakdown =
+      typeof metadata.inputTokens === "number" ||
+      typeof metadata.outputTokens === "number" ||
+      contextWindow !== null;
+
     items.push(
-      <div className="flex items-center gap-1" key="tokens">
-        <HugeiconsIcon className="size-3" icon={CpuIcon} />
-        <span>{formatTokens(metadata.totalTokens)} tokens</span>
-      </div>
+      <Tooltip key="tokens">
+        <TooltipTrigger
+          render={
+            <div className="flex cursor-default items-center gap-1">
+              <HugeiconsIcon className="size-3" icon={CpuIcon} />
+              <span>{formatTokens(metadata.totalTokens)} tokens</span>
+            </div>
+          }
+        />
+        {hasBreakdown ? (
+          <TooltipContent>
+            <div className="flex flex-col gap-0.5 text-xs">
+              {typeof metadata.inputTokens === "number" ? (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Input</span>
+                  <span>{metadata.inputTokens.toLocaleString()}</span>
+                </div>
+              ) : null}
+              {typeof metadata.outputTokens === "number" ? (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Output</span>
+                  <span>{metadata.outputTokens.toLocaleString()}</span>
+                </div>
+              ) : null}
+              {contextWindow !== null ? (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Context</span>
+                  <span>{formatContextWindow(contextWindow)}</span>
+                </div>
+              ) : null}
+            </div>
+          </TooltipContent>
+        ) : null}
+      </Tooltip>
     );
   }
 
