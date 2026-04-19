@@ -42,8 +42,20 @@ export function getContentEditorChatPrompt(
       ? `\n\n## Linear Integration\nSource of truth identifiers for Linear context:\n${linearContext.map((c) => `- integrationId: ${c.integrationId}`).join("\n")}\n\nWhen working with Linear data, call Linear tools (getLinearIssues, getLinearProjects, getLinearCycles) using integrationId.`
       : "";
 
+  const now = new Date();
+  const currentDate = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+
   return dedent`
     You are a content editor assistant. Help users edit their markdown documents.
+
+    ## Current Date
+    Today is ${currentDate} (UTC). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
 
     ## Workflow
     1. If the user asks for edits, ALWAYS call getMarkdown first

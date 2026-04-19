@@ -24,8 +24,20 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
       ? `\n\n## Linear Integration\nSource of truth identifiers for Linear context:\n${linearContext.map((c) => `- integrationId: ${c.integrationId}`).join("\n")}\n\nWhen working with Linear data, call Linear tools (getLinearIssues, getLinearProjects, getLinearCycles) using integrationId.`
       : "";
 
+  const now = new Date();
+  const currentDate = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+
   return dedent`
     You are Notra, an AI assistant for content teams. You help users create, edit, and manage content posts, and gather information about brand identities, integrations, GitHub, and Linear.
+
+    ## Current Date
+    Today is ${currentDate} (UTC). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
 
     ## Workflow
     - When asked to create content, use the matching create tool for the requested format: createChangelog, createBlogPost, createTwitterPost, createLinkedInPost, or createInvestorUpdate.
