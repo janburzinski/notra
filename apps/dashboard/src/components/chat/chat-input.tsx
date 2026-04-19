@@ -40,8 +40,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useCustomer } from "autumn-js/react";
 import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
+import type { Ref } from "react";
 import {
-  type Ref,
   useCallback,
   useImperativeHandle,
   useMemo,
@@ -121,18 +121,30 @@ export type ThinkingLevel = (typeof THINKING_LEVELS)[number];
 function SubmitButtonContent({
   isLoading,
   isStopping,
+  isEmpty,
 }: {
   isLoading: boolean;
   isStopping: boolean;
+  isEmpty: boolean;
 }) {
   if (isLoading && isStopping) {
     return <Loader2Icon className="size-4 animate-spin" />;
   }
-  if (isLoading) {
+  if (isLoading && isEmpty) {
     return (
       <>
         <HugeiconsIcon className="size-3.5" icon={StopIcon} />
         <div className="px-0.5 text-sm leading-0">Stop</div>
+      </>
+    );
+  }
+  if (isLoading) {
+    return (
+      <>
+        <div className="px-0.5 text-sm leading-0">Queue</div>
+        <div className="hidden h-4 items-center rounded border border-border bg-background px-1 text-[10px] text-muted-foreground shadow-xs sm:inline-flex">
+          ↵
+        </div>
       </>
     );
   }
@@ -146,14 +158,43 @@ function SubmitButtonContent({
   );
 }
 
-function getSubmitTooltipText(isLoading: boolean, isStopping: boolean): string {
+function getSubmitTooltipText(
+  isLoading: boolean,
+  isStopping: boolean,
+  isEmpty: boolean
+): string {
   if (isLoading && isStopping) {
     return "Stopping...";
   }
-  if (isLoading) {
+  if (isLoading && isEmpty) {
     return "Stop generating";
   }
+  if (isLoading) {
+    return "Enter to queue this message. It will send once the AI finishes.";
+  }
   return "Enter to send. Shift+Enter for a new line.";
+}
+
+function computeSubmitDisabled({
+  isEmpty,
+  isLoading,
+  isStopping,
+  isUsageBlocked,
+  hasStopHandler,
+}: {
+  isEmpty: boolean;
+  isLoading: boolean;
+  isStopping: boolean;
+  isUsageBlocked: boolean;
+  hasStopHandler: boolean;
+}): boolean {
+  if (!isEmpty) {
+    return isUsageBlocked;
+  }
+  if (isLoading) {
+    return !hasStopHandler || isStopping;
+  }
+  return true;
 }
 
 function contextItemsEqual(a: ContextItem, b: ContextItem): boolean {
@@ -185,6 +226,7 @@ interface ChatInputAdvancedProps {
   onModelChange?: (model: string) => void;
   thinkingLevel?: ThinkingLevel;
   onThinkingLevelChange?: (level: ThinkingLevel) => void;
+  connectedTop?: boolean;
   ref?: Ref<ChatInputHandle>;
 }
 
@@ -211,6 +253,7 @@ export function ChatInputAdvanced({
   onModelChange,
   thinkingLevel = "medium",
   onThinkingLevelChange,
+  connectedTop = false,
   ref,
 }: ChatInputAdvancedProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -597,7 +640,7 @@ export function ChatInputAdvanced({
 
   const handleSend = useCallback(() => {
     const editor = editorRef.current;
-    if (!editor || readEditorText().trim().length === 0 || isLoading) {
+    if (!editor || readEditorText().trim().length === 0) {
       return;
     }
     const outbound = serializeEditorWithReferences(editor).trim();
@@ -629,13 +672,37 @@ export function ChatInputAdvanced({
   }, [
     onSend,
     readEditorText,
-    isLoading,
     check,
     customer,
     isUsageBlocked,
     clearError,
     onRemoveContext,
   ]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      setText: (text: string) => {
+        const editor = editorRef.current;
+        if (!editor) {
+          return;
+        }
+        editor.textContent = text;
+        setIsEmpty(text.trim().length === 0);
+        editor.focus();
+        const range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      },
+      focus: () => {
+        editorRef.current?.focus();
+      },
+    }),
+    []
+  );
 
   const handlePaste = useCallback(
     (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -848,7 +915,7 @@ export function ChatInputAdvanced({
 
   return (
     <Card
-      className="w-full gap-0 overflow-visible rounded-[14px] border-0 bg-background py-0 shadow-none ring-0 transition-shadow duration-200 ease-out-expo"
+      className={`w-full gap-0 overflow-visible rounded-[14px] border-0 bg-background py-0 shadow-none ring-0 transition-shadow duration-200 ease-out-expo ${connectedTop ? "rounded-t-none" : ""}`}
       data-focused={isFocused ? "true" : "false"}
     >
       <CardHeader className="sr-only">
@@ -856,10 +923,12 @@ export function ChatInputAdvanced({
       </CardHeader>
       <CardContent className="p-0">
         <div
-          className="rounded-[14px] border border-border bg-background shadow-sm"
+          className={`rounded-[14px] border border-border bg-background shadow-sm ${connectedTop ? "rounded-t-none border-t-0" : ""}`}
           tabIndex={-1}
         >
-          <div className="rounded-[13px] p-0.5">
+          <div
+            className={`p-0.5 ${connectedTop ? "rounded-b-[13px]" : "rounded-[13px]"}`}
+          >
             {usageLimitError && (
               <div className="mx-2 mt-2 mb-1 flex w-fit max-w-full flex-wrap items-center gap-1 rounded-md bg-destructive/10 px-2 py-1 text-destructive text-xs">
                 <span>{usageLimitError}</span>
@@ -878,15 +947,15 @@ export function ChatInputAdvanced({
                 <div className="relative flex flex-1 cursor-text transition-colors [--lh:1lh]">
                   {/* biome-ignore lint/a11y/useSemanticElements: rich mention editor requires a contentEditable host instead of a native textarea. */}
                   <div
-                    aria-disabled={isLoading || isUsageBlocked}
+                    aria-disabled={isUsageBlocked}
                     aria-label="Send a message"
                     aria-multiline="true"
                     className="wrap-break-word relative max-h-50 min-h-12 w-full overflow-y-auto whitespace-pre-wrap rounded-t-[12px] px-3 py-2 text-foreground text-sm leading-6 caret-foreground outline-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[empty=true]:before:pointer-events-none data-[empty=true]:before:absolute data-[empty=true]:before:top-2 data-[empty=true]:before:left-3 data-[empty=true]:before:text-muted-foreground data-[empty=true]:before:content-[attr(data-placeholder)]"
-                    contentEditable={!(isLoading || isUsageBlocked)}
+                    contentEditable={!isUsageBlocked}
                     data-empty={isEmpty ? "true" : "false"}
                     data-placeholder={
                       isLoading
-                        ? "AI is working..."
+                        ? "Queue a message while AI is working..."
                         : "Send a message... (type @ to add context)"
                     }
                     onBlur={() => {
@@ -911,7 +980,7 @@ export function ChatInputAdvanced({
                     ref={editorRef}
                     role="textbox"
                     suppressContentEditableWarning
-                    tabIndex={isLoading || isUsageBlocked ? -1 : 0}
+                    tabIndex={isUsageBlocked ? -1 : 0}
                   />
                 </div>
               </div>
@@ -1339,12 +1408,14 @@ export function ChatInputAdvanced({
                   render={
                     <Button
                       className="group/button ml-auto h-7 shrink-0 rounded-lg bg-muted px-1.5 transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      disabled={
-                        isLoading
-                          ? !onStop || isStopping
-                          : isUsageBlocked || isEmpty
-                      }
-                      onClick={isLoading ? onStop : handleSend}
+                      disabled={computeSubmitDisabled({
+                        isEmpty,
+                        isLoading,
+                        isStopping,
+                        isUsageBlocked,
+                        hasStopHandler: Boolean(onStop),
+                      })}
+                      onClick={isEmpty && isLoading ? onStop : handleSend}
                       size="sm"
                       tabIndex={0}
                       type="button"
@@ -1354,13 +1425,14 @@ export function ChatInputAdvanced({
                 >
                   <div className="flex items-center gap-1 text-foreground text-sm">
                     <SubmitButtonContent
+                      isEmpty={isEmpty}
                       isLoading={isLoading}
                       isStopping={isStopping}
                     />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {getSubmitTooltipText(isLoading, isStopping)}
+                  {getSubmitTooltipText(isLoading, isStopping, isEmpty)}
                 </TooltipContent>
               </Tooltip>
             </CardFooter>
