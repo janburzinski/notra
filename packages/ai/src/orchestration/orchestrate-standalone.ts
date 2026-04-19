@@ -21,11 +21,13 @@ import {
   smoothStream,
   stepCountIs,
   streamText,
+  type UIMessage,
 } from "ai";
 import {
   hasEnabledGitHubIntegration,
   hasEnabledLinearIntegration,
 } from "./integration-validator";
+import { isTrivialMessage } from "./router";
 import {
   buildStandaloneToolSet,
   getLinearContextFromIntegrations,
@@ -33,6 +35,9 @@ import {
 } from "./standalone-tool-registry";
 
 const DEFAULT_STANDALONE_CHAT_MODEL = "anthropic/claude-sonnet-4-6";
+const TRIVIAL_HISTORY_LIMIT = 6;
+const MINIMAL_STANDALONE_PROMPT =
+  "You are Notra, an AI assistant for content teams. Reply briefly and warmly. If the user asks what you can do, mention: creating and editing posts (changelogs, blog posts, Twitter, LinkedIn, investor updates), viewing brand identities, and reviewing GitHub/Linear activity. Do not call tools on this turn.";
 
 export async function orchestrateStandaloneChat(
   input: StandaloneChatInput,
@@ -60,63 +65,80 @@ export async function orchestrateStandaloneChat(
 
   const hasGitHub = hasEnabledGitHubIntegration(validatedIntegrations);
   const hasLinear = hasEnabledLinearIntegration(validatedIntegrations);
+
+  const lastUserMessage = getLastUserMessage(messages);
+  const isTrivial = isTrivialMessage(lastUserMessage);
+
   const selectedModel = requestedModel ?? DEFAULT_STANDALONE_CHAT_MODEL;
+
   const routingDecision = {
     model: selectedModel,
-    complexity: "complex" as const,
-    requiresTools: true,
+    complexity: (isTrivial ? "simple" : "complex") as "simple" | "complex",
+    requiresTools: !isTrivial,
     reasoning: requestedModel
       ? "User selected model explicitly"
-      : `Using standalone chat default model: ${DEFAULT_STANDALONE_CHAT_MODEL}`,
+      : isTrivial
+        ? "Trivial greeting/acknowledgement — minimal prompt, no tools, no thinking"
+        : `Using standalone chat default model: ${DEFAULT_STANDALONE_CHAT_MODEL}`,
   };
 
   const modelWithMemory = createModel(
     organizationId,
     routingDecision.model,
-    undefined,
+    { disableMemory: isTrivial },
     log
   );
 
   const postResult: PostToolsResult = {};
 
-  const { tools, descriptions } = buildStandaloneToolSet(
-    {
-      organizationId,
-      validatedIntegrations,
-      postResult,
-    },
-    {
-      resolveContext: deps?.resolveContext,
-      resolveLinearContext: deps?.resolveLinearContext,
-    }
-  );
+  const { tools, descriptions } = isTrivial
+    ? { tools: {}, descriptions: [] as string[] }
+    : buildStandaloneToolSet(
+        {
+          organizationId,
+          validatedIntegrations,
+          postResult,
+        },
+        {
+          resolveContext: deps?.resolveContext,
+          resolveLinearContext: deps?.resolveLinearContext,
+        }
+      );
 
   const repoContext = getRepoContextFromIntegrations(validatedIntegrations);
   const linearContext = getLinearContextFromIntegrations(validatedIntegrations);
 
-  const systemPrompt = getStandaloneChatPrompt({
-    repoContext,
-    linearContext,
-    toolDescriptions: descriptions,
-    hasGitHubEnabled: hasGitHub,
-    hasLinearEnabled: hasLinear,
-  });
+  const systemPrompt = isTrivial
+    ? MINIMAL_STANDALONE_PROMPT
+    : getStandaloneChatPrompt({
+        repoContext,
+        linearContext,
+        toolDescriptions: descriptions,
+        hasGitHubEnabled: hasGitHub,
+        hasLinearEnabled: hasLinear,
+      });
 
-  const providerOptions = getThinkingProviderOptions(
-    routingDecision.model,
-    enableThinking,
-    thinkingLevel
-  );
+  const providerOptions = isTrivial
+    ? undefined
+    : getThinkingProviderOptions(
+        routingDecision.model,
+        enableThinking,
+        thinkingLevel
+      );
+
+  const messagesForModel = isTrivial
+    ? trimTrivialHistory(messages)
+    : messages;
 
   let firstChunkFired = false;
   const stream = streamText({
     model: modelWithMemory,
     system: systemPrompt,
-    messages: await convertToModelMessages(messages, {
+    messages: await convertToModelMessages(messagesForModel, {
       ignoreIncompleteToolCalls: true,
     }),
     tools,
-    stopWhen: stepCountIs(maxSteps),
+    stopWhen: stepCountIs(isTrivial ? 1 : maxSteps),
     experimental_transform: smoothStream(),
     providerOptions,
     abortSignal,
@@ -149,6 +171,39 @@ export async function orchestrateStandaloneChat(
   });
 
   return { stream, routingDecision };
+}
+
+function getLastUserMessage(messages: UIMessage[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    if (!message || message.role !== "user") {
+      continue;
+    }
+    const parts = message.parts;
+    if (!Array.isArray(parts)) {
+      continue;
+    }
+    for (const part of parts) {
+      if (part.type === "text") {
+        return part.text;
+      }
+    }
+  }
+  return "";
+}
+
+function trimTrivialHistory(messages: UIMessage[]): UIMessage[] {
+  const recent = messages.slice(-TRIVIAL_HISTORY_LIMIT);
+  return recent.map((message) => {
+    if (!Array.isArray(message.parts)) {
+      return message;
+    }
+    const textParts = message.parts.filter((part) => part.type === "text");
+    if (textParts.length === message.parts.length) {
+      return message;
+    }
+    return { ...message, parts: textParts };
+  });
 }
 
 type StreamProviderOptions = NonNullable<

@@ -24,28 +24,29 @@ const TRIVIAL_MESSAGE_PATTERNS = [
   /^(bye|cya|tschüss|ciao)\b[\s!.?]*$/i,
 ];
 
+export function isTrivialMessage(userMessage: string): boolean {
+  const trimmed = userMessage.trim();
+  if (!trimmed || trimmed.length > 40) {
+    return false;
+  }
+  return TRIVIAL_MESSAGE_PATTERNS.some((pattern) => pattern.test(trimmed));
+}
+
 function matchTrivialFastPath(
   userMessage: string,
   hasIntegrationContext: boolean
 ): RoutingDecision | undefined {
-  const trimmed = userMessage.trim();
-  if (!trimmed) {
-    return undefined;
-  }
   if (hasIntegrationContext) {
     return undefined;
   }
-  if (trimmed.length > 40) {
+  if (!isTrivialMessage(userMessage)) {
     return undefined;
   }
-  if (TRIVIAL_MESSAGE_PATTERNS.some((pattern) => pattern.test(trimmed))) {
-    return {
-      complexity: "simple",
-      requiresTools: false,
-      reasoning: "Trivial greeting/acknowledgement — skipped router call",
-    };
-  }
-  return undefined;
+  return {
+    complexity: "simple",
+    requiresTools: false,
+    reasoning: "Trivial greeting/acknowledgement — skipped router call",
+  };
 }
 
 export async function routeMessage(

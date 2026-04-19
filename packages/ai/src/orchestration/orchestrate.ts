@@ -102,20 +102,26 @@ export async function orchestrateChat(
   const repoContext = getRepoContextFromIntegrations(validatedIntegrations);
   const linearContext = getLinearContextFromIntegrations(validatedIntegrations);
 
-  const systemPrompt = getContentEditorChatPrompt({
-    selection,
-    contentType,
-    repoContext,
-    linearContext,
-    toolDescriptions: descriptions,
-    hasGitHubEnabled: hasGitHub,
-    hasLinearEnabled: hasLinear,
-  });
+  const systemPrompt = isSimpleNoTools
+    ? MINIMAL_CHAT_PROMPT
+    : getContentEditorChatPrompt({
+        selection,
+        contentType,
+        repoContext,
+        linearContext,
+        toolDescriptions: descriptions,
+        hasGitHubEnabled: hasGitHub,
+        hasLinearEnabled: hasLinear,
+      });
+
+  const messagesForModel = isSimpleNoTools
+    ? trimMessagesForSimpleChat(messages)
+    : messages;
 
   const stream = streamText({
     model: modelWithMemory,
     system: systemPrompt,
-    messages: await convertToModelMessages(messages, {
+    messages: await convertToModelMessages(messagesForModel, {
       ignoreIncompleteToolCalls: true,
     }),
     tools,
@@ -133,6 +139,25 @@ export async function orchestrateChat(
   });
 
   return { stream, routingDecision };
+}
+
+const MINIMAL_CHAT_PROMPT =
+  "You are a concise writing assistant inside a content editor. Reply briefly and directly. If the user asks for edits, let them know they can ask you to modify the document and you'll use editing tools on the next turn.";
+
+const SIMPLE_CHAT_HISTORY_LIMIT = 6;
+
+function trimMessagesForSimpleChat(messages: UIMessage[]): UIMessage[] {
+  const recent = messages.slice(-SIMPLE_CHAT_HISTORY_LIMIT);
+  return recent.map((message) => {
+    if (!Array.isArray(message.parts)) {
+      return message;
+    }
+    const textParts = message.parts.filter((part) => part.type === "text");
+    if (textParts.length === message.parts.length) {
+      return message;
+    }
+    return { ...message, parts: textParts };
+  });
 }
 
 function getLastUserMessage(messages: UIMessage[]): string {
