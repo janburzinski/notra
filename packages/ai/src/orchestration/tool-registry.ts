@@ -26,12 +26,22 @@ import type { Tool } from "ai";
 export interface BuildToolSetDeps {
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;
+  /**
+   * When true, returns an empty tool set. The router signals this for simple
+   * messages that don't need tools — skipping them saves ~800+ tokens of
+   * schema/description overhead per request.
+   */
+  skipTools?: boolean;
 }
 
 export function buildToolSet(
   params: BuildToolSetParams,
   deps?: BuildToolSetDeps
 ): ToolSet {
+  if (deps?.skipTools) {
+    return { tools: {}, descriptions: [] };
+  }
+
   const {
     organizationId,
     currentMarkdown,

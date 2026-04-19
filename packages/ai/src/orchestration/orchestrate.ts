@@ -46,7 +46,7 @@ export async function orchestrateChat(
 ): Promise<OrchestrateResult> {
   const {
     organizationId,
-    messages,
+    messages: fullMessages,
     currentMarkdown,
     contentType,
     selection,
@@ -54,6 +54,8 @@ export async function orchestrateChat(
     maxSteps = 1,
     log: inputLog,
   } = input;
+
+  const messages = fullMessages;
 
   const log = deps?.log ?? inputLog;
 
@@ -65,28 +67,22 @@ export async function orchestrateChat(
 
   const hasGitHub = hasEnabledGitHubIntegration(validatedIntegrations);
   const hasLinear = hasEnabledLinearIntegration(validatedIntegrations);
-  const hasDataSources = hasGitHub || hasLinear;
+  const hasIntegrationContext = hasGitHub || hasLinear;
 
   const lastUserMessage = getLastUserMessage(messages);
   const routingDecision = await routeAndSelectModel(
     lastUserMessage,
-    hasDataSources,
+    hasIntegrationContext,
     log
   );
 
-  console.log("[Chat Routing]", {
-    model: routingDecision.model,
-    complexity: routingDecision.complexity,
-    requiresTools: routingDecision.requiresTools,
-    reasoning: routingDecision.reasoning,
-    hasGitHub,
-    hasLinear,
-  });
+  const isSimpleNoTools =
+    routingDecision.complexity === "simple" && !routingDecision.requiresTools;
 
   const modelWithMemory = createModel(
     organizationId,
     routingDecision.model,
-    undefined,
+    { disableMemory: isSimpleNoTools },
     log
   );
 
@@ -99,6 +95,7 @@ export async function orchestrateChat(
     {
       resolveContext: deps?.resolveContext,
       resolveLinearContext: deps?.resolveLinearContext,
+      skipTools: !routingDecision.requiresTools,
     }
   );
 
