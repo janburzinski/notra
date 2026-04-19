@@ -1084,7 +1084,8 @@ export function ChatInputAdvanced({
     if (isLoading) {
       const hasText = readEditorText().trim().length > 0;
       const hasAttachments =
-        attachmentsRef.current.length > 0 || pendingUploadsRef.current.length > 0;
+        attachmentsRef.current.length > 0 ||
+        pendingUploadsRef.current.length > 0;
       if (!hasText || hasAttachments) {
         return;
       }
