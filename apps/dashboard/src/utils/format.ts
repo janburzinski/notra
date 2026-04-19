@@ -59,6 +59,16 @@ export function formatRelativeTime(date: Date, now = Date.now()): string {
   return "Saved over an hour ago";
 }
 
+export function formatBytes(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
 export function truncateText(value: string, maxLength: number): string {
   if (maxLength <= 0) {
     return "";

@@ -76,6 +76,7 @@ import {
 import {
   getAllowedChatMimeTypes,
   isAllowedChatMimeType,
+  isImageMimeType,
 } from "@/lib/upload/mime";
 import type {
   ChatAttachment,
@@ -1350,7 +1351,7 @@ export function ChatInputAdvanced({
               {(attachments.length > 0 || pendingUploads.length > 0) && (
                 <div className="flex flex-wrap items-center gap-1.5 px-2 pt-2">
                   {attachments.map((attachment) => {
-                    const isImage = attachment.mediaType.startsWith("image/");
+                    const isImage = isImageMimeType(attachment.mediaType);
                     const openAttachment = () => {
                       setPreviewAttachment(attachment);
                     };

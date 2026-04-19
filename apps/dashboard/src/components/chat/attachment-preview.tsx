@@ -12,29 +12,13 @@ import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { MIME_DISPLAY_LABELS } from "@/constants/upload";
+import {
+  isImageMimeType,
+  isPdfMimeType,
+  isTextMimeType,
+} from "@/lib/upload/mime";
 import type { ChatAttachment } from "@/types/chat";
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-  if (bytes < 1024 * 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
-  }
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
-function isTextLike(mediaType: string): boolean {
-  return mediaType === "text/plain" || mediaType === "text/markdown";
-}
-
-function isPdf(mediaType: string): boolean {
-  return mediaType === "application/pdf";
-}
-
-function isImage(mediaType: string): boolean {
-  return mediaType.startsWith("image/");
-}
+import { formatBytes } from "@/utils/format";
 
 function TextPreview({ url }: { url: string }) {
   const [content, setContent] = useState<string | null>(null);
@@ -138,7 +122,7 @@ export function AttachmentPreviewDialog({
           </Button>
         </div>
         <div className="min-h-0 flex-1 overflow-hidden rounded-md border border-border">
-          {isImage(attachment.mediaType) && (
+          {isImageMimeType(attachment.mediaType) && (
             <div className="relative flex h-full w-full items-center justify-center bg-muted/20">
               <Image
                 alt={attachment.filename}
@@ -150,14 +134,14 @@ export function AttachmentPreviewDialog({
               />
             </div>
           )}
-          {isPdf(attachment.mediaType) && (
+          {isPdfMimeType(attachment.mediaType) && (
             <iframe
               className="h-full w-full"
               src={attachment.url}
               title={attachment.filename}
             />
           )}
-          {isTextLike(attachment.mediaType) && (
+          {isTextMimeType(attachment.mediaType) && (
             <TextPreview url={attachment.url} />
           )}
         </div>

@@ -44,6 +44,7 @@ import { renderTextWithIntegrationReferences } from "@/components/chat/integrati
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { authClient } from "@/lib/auth/client";
+import { isImageMimeType } from "@/lib/upload/mime";
 import { cn } from "@/lib/utils";
 import {
   chatErrorPayloadSchema,
@@ -796,7 +797,7 @@ function StandaloneChatPageClient({
         return null;
       }
       const fileKey = `${messageId}-file-${index}`;
-      if (mediaType.startsWith("image/")) {
+      if (isImageMimeType(mediaType)) {
         return (
           <Image
             alt={filename ?? "attachment"}

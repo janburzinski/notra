@@ -35,3 +35,15 @@ export function isAllowedChatMimeType(fileType: string, model?: string) {
     fileType
   );
 }
+
+export function isImageMimeType(mediaType: string): boolean {
+  return mediaType.startsWith("image/");
+}
+
+export function isPdfMimeType(mediaType: string): boolean {
+  return mediaType === "application/pdf";
+}
+
+export function isTextMimeType(mediaType: string): boolean {
+  return mediaType === "text/plain" || mediaType === "text/markdown";
+}
