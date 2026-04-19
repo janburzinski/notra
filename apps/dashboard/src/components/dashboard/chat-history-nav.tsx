@@ -42,6 +42,7 @@ import {
   useSidebar,
 } from "@notra/ui/components/ui/sidebar";
 import { useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -104,7 +105,10 @@ export function ChatHistoryNav() {
     });
   }
 
-  const { sessions } = useChatSessions({ enabled: aiChatExperiment.on });
+  const { sessions, isLoading } = useChatSessions({
+    enabled: aiChatExperiment.on,
+  });
+  const shouldReduceMotion = useReducedMotion();
   const { renameChat, togglePinned, deleteChat } = useChatSessionMutations();
 
   const currentChatId = pathname.split("/").filter(Boolean)[2];
@@ -354,8 +358,20 @@ export function ChatHistoryNav() {
 
       {!isCollapsed && (
         <div className="flex-1 overflow-y-auto">
-          {renderSessions("Pinned", pinnedSessions)}
-          {renderSessions("Recents", recentSessions)}
+          <AnimatePresence initial={false}>
+            {!isLoading && (
+              <motion.div
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+                key="chat-sessions"
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                {renderSessions("Pinned", pinnedSessions)}
+                {renderSessions("Recents", recentSessions)}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 
