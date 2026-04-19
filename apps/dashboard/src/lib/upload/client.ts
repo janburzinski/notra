@@ -1,6 +1,6 @@
-import axios from "axios";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
+  DeleteChatUploadProps,
   UploadFileProps,
   UploadFileResponse,
   UploadPresignedResponse,
@@ -19,37 +19,28 @@ async function getPresignedUrl(
 }
 
 async function uploadToR2(presignedUrl: string, file: File) {
-  const response = await axios.put(presignedUrl, file, {
-    headers: {
-      "Content-Type": file.type,
-    },
+  const response = await fetch(presignedUrl, {
+    method: "PUT",
+    body: file,
+    headers: { "Content-Type": file.type },
   });
 
-  if (response.status < 200 || response.status >= 300) {
-    throw new Error(`Upload failed with status ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`R2 upload failed (${response.status})`);
   }
-
-  return response.data;
 }
 
 export async function uploadFile({
   file,
   type,
 }: UploadFileProps): Promise<UploadFileResponse> {
-  try {
-    const response = await getPresignedUrl(file, type);
+  const { url, key, publicUrl } = await getPresignedUrl(file, type);
+  await uploadToR2(url, file);
+  return { url: publicUrl, key };
+}
 
-    const { url: presignedUrl, key, publicUrl } = response;
-
-    await uploadToR2(presignedUrl, file);
-
-    return { url: publicUrl, key };
-  } catch (error) {
-    console.error("Upload failed:", error);
-
-    if (axios.isAxiosError(error) && error.response?.data?.error) {
-      throw new Error(error.response.data.error);
-    }
-    throw new Error("An unexpected error occurred during upload.");
-  }
+export async function deleteChatUpload({
+  key,
+}: DeleteChatUploadProps): Promise<void> {
+  await dashboardOrpc.upload.deleteChatUpload.call({ key });
 }

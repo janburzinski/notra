@@ -1,9 +1,4 @@
-export type UploadType = "avatar" | "logo" | "content";
-
-/** Error shape returned by the upload API */
-export interface UploadApiError {
-  error: string;
-}
+export type UploadType = "avatar" | "logo" | "content" | "chat";
 
 /** Response from the upload presign procedure */
 export interface UploadPresignedResponse {
@@ -23,4 +18,8 @@ export interface UploadFileResponse {
 export interface UploadFileProps {
   file: File;
   type: UploadType;
+}
+
+export interface DeleteChatUploadProps {
+  key: string;
 }

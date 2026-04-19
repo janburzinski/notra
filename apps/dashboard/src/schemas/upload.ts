@@ -1,10 +1,13 @@
 import z from "zod";
 import {
+  ALLOWED_CHAT_MIME_TYPES,
   ALLOWED_MIME_TYPES,
   ALLOWED_RASTER_MIME_TYPES,
+  type AllowedChatMimeType,
   type AllowedMimeType,
   type AllowedRasterMimeType,
   MAX_AVATAR_FILE_SIZE,
+  MAX_CHAT_FILE_SIZE,
   MAX_CONTENT_FILE_SIZE,
   MAX_LOGO_FILE_SIZE,
 } from "@/constants/upload";
@@ -46,16 +49,34 @@ export const uploadMediaSchema = z.object({
     }),
 });
 
+export const uploadChatSchema = z.object({
+  type: z.literal("chat"),
+  fileType: z.coerce.string().nonempty(),
+  fileSize: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(MAX_CHAT_FILE_SIZE, {
+      message: `Chat attachment must be less than ${MAX_CHAT_FILE_SIZE / 1024 / 1024}MB`,
+    }),
+});
+
 export const uploadSchema = z.union([
   uploadAvatarSchema,
   uploadLogoSchema,
   uploadMediaSchema,
+  uploadChatSchema,
 ]);
+
+export const deleteChatUploadSchema = z.object({
+  key: z.string().min(1),
+});
 
 const maxSizeByType = {
   avatar: MAX_AVATAR_FILE_SIZE,
   logo: MAX_LOGO_FILE_SIZE,
   content: MAX_CONTENT_FILE_SIZE,
+  chat: MAX_CHAT_FILE_SIZE,
 };
 
 export const DeleteSchema = z.object({
@@ -93,6 +114,13 @@ export function validateUpload({
       if (!ALLOWED_MIME_TYPES.includes(fileType as AllowedMimeType)) {
         throw new Error(
           `File type ${fileType} is not allowed. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`
+        );
+      }
+      break;
+    case "chat":
+      if (!ALLOWED_CHAT_MIME_TYPES.includes(fileType as AllowedChatMimeType)) {
+        throw new Error(
+          `File type ${fileType} is not allowed in chat. Allowed types: ${ALLOWED_CHAT_MIME_TYPES.join(", ")}`
         );
       }
       break;
