@@ -43,6 +43,7 @@ import Link from "next/link";
 import type { Ref } from "react";
 import {
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -54,6 +55,7 @@ import { INPUT_SOURCES } from "@/lib/integrations/catalog";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { ChatInputHandle, ContextItem } from "@/types/chat";
 import type { GitHubRepository } from "@/types/integrations";
+import type { QueuedMessage } from "./chat-queue";
 import {
   buildIntegrationReferenceElement,
   INTEGRATION_REFERENCE_SELECTOR,
@@ -227,6 +229,8 @@ interface ChatInputAdvancedProps {
   thinkingLevel?: ThinkingLevel;
   onThinkingLevelChange?: (level: ThinkingLevel) => void;
   connectedTop?: boolean;
+  queuedMessages?: QueuedMessage[];
+  onUpdateQueued?: (id: string, text: string) => void;
   ref?: Ref<ChatInputHandle>;
 }
 
@@ -254,8 +258,11 @@ export function ChatInputAdvanced({
   thinkingLevel = "medium",
   onThinkingLevelChange,
   connectedTop = false,
+  queuedMessages,
+  onUpdateQueued,
   ref,
 }: ChatInputAdvancedProps) {
+  const [editingQueuedId, setEditingQueuedId] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isEmpty, setIsEmpty] = useState(true);
   const [internalError, setInternalError] = useState<string | null>(null);
@@ -638,6 +645,42 @@ export function ChatInputAdvanced({
     [onRemoveContext, readEditorText]
   );
 
+  const loadTextIntoEditor = useCallback((text: string) => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+    editor.textContent = text;
+    setIsEmpty(text.trim().length === 0);
+    editor.focus();
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  }, []);
+
+  const clearEditor = useCallback(() => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+    editor.innerHTML = "";
+    setIsEmpty(true);
+  }, []);
+
+  useEffect(() => {
+    if (!editingQueuedId) {
+      return;
+    }
+    const stillExists = queuedMessages?.some((m) => m.id === editingQueuedId);
+    if (!stillExists) {
+      setEditingQueuedId(null);
+      clearEditor();
+    }
+  }, [editingQueuedId, queuedMessages, clearEditor]);
+
   const handleSend = useCallback(() => {
     const editor = editorRef.current;
     if (!editor || readEditorText().trim().length === 0) {
@@ -652,6 +695,17 @@ export function ChatInputAdvanced({
       setInternalError(limitMessage);
       return;
     }
+
+    if (editingQueuedId && onUpdateQueued) {
+      onUpdateQueued(editingQueuedId, outbound);
+      setEditingQueuedId(null);
+      clearEditor();
+      for (const item of contextRef.current) {
+        onRemoveContext?.(item);
+      }
+      return;
+    }
+
     if (customer) {
       const result = check({
         featureId: FEATURES.AI_CREDITS,
@@ -677,6 +731,9 @@ export function ChatInputAdvanced({
     isUsageBlocked,
     clearError,
     onRemoveContext,
+    editingQueuedId,
+    onUpdateQueued,
+    clearEditor,
   ]);
 
   useImperativeHandle(
@@ -839,6 +896,67 @@ export function ChatInputAdvanced({
         }
       }
 
+      const queue = queuedMessages ?? [];
+      if (event.key === "ArrowUp" && !event.shiftKey && queue.length > 0) {
+        const canStartEditing = editingQueuedId === null && isEmpty;
+        if (canStartEditing || editingQueuedId !== null) {
+          const editor = editorRef.current;
+          if (editingQueuedId && editor && onUpdateQueued) {
+            const currentText = serializeEditorWithReferences(editor).trim();
+            if (currentText) {
+              onUpdateQueued(editingQueuedId, currentText);
+            }
+          }
+          let targetIndex: number;
+          if (editingQueuedId === null) {
+            targetIndex = queue.length - 1;
+          } else {
+            const currentIndex = queue.findIndex(
+              (m) => m.id === editingQueuedId
+            );
+            targetIndex = currentIndex <= 0 ? 0 : currentIndex - 1;
+          }
+          const target = queue[targetIndex];
+          if (target) {
+            event.preventDefault();
+            setEditingQueuedId(target.id);
+            loadTextIntoEditor(target.text);
+            return;
+          }
+        }
+      }
+
+      if (event.key === "ArrowDown" && !event.shiftKey && editingQueuedId) {
+        const editor = editorRef.current;
+        if (editor && onUpdateQueued) {
+          const currentText = serializeEditorWithReferences(editor).trim();
+          if (currentText) {
+            onUpdateQueued(editingQueuedId, currentText);
+          }
+        }
+        const currentIndex = queue.findIndex((m) => m.id === editingQueuedId);
+        const nextIndex = currentIndex + 1;
+        event.preventDefault();
+        if (currentIndex === -1 || nextIndex >= queue.length) {
+          setEditingQueuedId(null);
+          clearEditor();
+        } else {
+          const target = queue[nextIndex];
+          if (target) {
+            setEditingQueuedId(target.id);
+            loadTextIntoEditor(target.text);
+          }
+        }
+        return;
+      }
+
+      if (event.key === "Escape" && editingQueuedId) {
+        event.preventDefault();
+        setEditingQueuedId(null);
+        clearEditor();
+        return;
+      }
+
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         handleSend();
@@ -907,6 +1025,12 @@ export function ChatInputAdvanced({
       mentionIndex,
       insertMention,
       handleSend,
+      queuedMessages,
+      editingQueuedId,
+      isEmpty,
+      onUpdateQueued,
+      loadTextIntoEditor,
+      clearEditor,
     ]
   );
 

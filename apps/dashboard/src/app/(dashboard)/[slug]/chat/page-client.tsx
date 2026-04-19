@@ -794,6 +794,12 @@ function StandaloneChatPageClient({
     chatInputRef.current?.setText(message.text);
   }, []);
 
+  const handleUpdateQueued = useCallback((id: string, text: string) => {
+    setQueuedMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, text } : m))
+    );
+  }, []);
+
   const queuedMessagesRef = useRef(queuedMessages);
   queuedMessagesRef.current = queuedMessages;
 
@@ -1173,8 +1179,10 @@ function StandaloneChatPageClient({
               onSend={handleSend}
               onStop={handleStop}
               onThinkingLevelChange={handleThinkingLevelChange}
+              onUpdateQueued={handleUpdateQueued}
               organizationId={organizationId}
               organizationSlug={organizationSlug}
+              queuedMessages={queuedMessages}
               ref={chatInputRef}
               thinkingLevel={thinkingLevel}
             />
@@ -1277,8 +1285,10 @@ function StandaloneChatPageClient({
                 onSend={handleSend}
                 onStop={handleStop}
                 onThinkingLevelChange={handleThinkingLevelChange}
+                onUpdateQueued={handleUpdateQueued}
                 organizationId={organizationId}
                 organizationSlug={organizationSlug}
+                queuedMessages={queuedMessages}
                 ref={chatInputRef}
                 thinkingLevel={thinkingLevel}
               />
