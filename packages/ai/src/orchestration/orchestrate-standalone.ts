@@ -34,7 +34,7 @@ import {
   getRepoContextFromIntegrations,
 } from "./standalone-tool-registry";
 
-const DEFAULT_STANDALONE_CHAT_MODEL = "anthropic/claude-sonnet-4-6";
+const DEFAULT_STANDALONE_CHAT_MODEL = "anthropic/claude-sonnet-4.6";
 const TRIVIAL_HISTORY_LIMIT = 6;
 const MINIMAL_STANDALONE_PROMPT =
   "You are Notra, an AI assistant for content teams. Reply briefly and warmly. If the user asks what you can do, mention: creating and editing posts (changelogs, blog posts, Twitter, LinkedIn, investor updates), viewing brand identities, and reviewing GitHub/Linear activity. Do not call tools on this turn.";
@@ -220,14 +220,23 @@ function getThinkingProviderOptions(
   }
 
   if (modelId.startsWith("anthropic/")) {
+    if (usesAdaptiveThinking(modelId)) {
+      return {
+        anthropic: {
+          thinking: { type: "adaptive" },
+          output_config: { effort: thinkingLevel },
+        },
+      } satisfies StreamProviderOptions;
+    }
+
     return {
       anthropic: {
         thinking: {
-          type: "enabled" as const,
+          type: "enabled",
           budgetTokens: getAnthropicThinkingBudget(thinkingLevel),
         },
       },
-    } as StreamProviderOptions;
+    } satisfies StreamProviderOptions;
   }
 
   if (modelId.startsWith("openai/")) {
@@ -235,10 +244,14 @@ function getThinkingProviderOptions(
       openai: {
         reasoningEffort: thinkingLevel,
       },
-    } as StreamProviderOptions;
+    } satisfies StreamProviderOptions;
   }
 
   return undefined;
+}
+
+function usesAdaptiveThinking(modelId: string): boolean {
+  return modelId === "anthropic/claude-opus-4.7";
 }
 
 function getAnthropicThinkingBudget(
