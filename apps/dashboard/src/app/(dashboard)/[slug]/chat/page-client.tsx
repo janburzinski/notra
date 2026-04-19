@@ -21,10 +21,16 @@ import {
   isToolUIPart,
   lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
-import { nanoid } from "nanoid";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ChatToolBlock } from "@/components/ai/chat-tool-block";
 import { BrailleLoader } from "@/components/braille-loader";
 import { AssistantMetadataHover } from "@/components/chat/assistant-metadata-hover";
@@ -32,6 +38,7 @@ import {
   ChatInputAdvanced,
   type ThinkingLevel,
 } from "@/components/chat/chat-input";
+import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -41,7 +48,7 @@ import {
   chatErrorPayloadSchema,
   chatTransportRequestInputSchema,
 } from "@/schemas/chat";
-import type { ChatUIMessage, ContextItem } from "@/types/chat";
+import type { ChatInputHandle, ChatUIMessage, ContextItem } from "@/types/chat";
 import {
   CHAT_PREFERENCES_STORAGE_KEY,
   DEFAULT_CHAT_PREFERENCES,
@@ -202,7 +209,9 @@ function StandaloneChatPageClient({
   const [pendingMessageId, setPendingMessageId] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const [generatedChatId, setGeneratedChatId] = useState(() => nanoid(16));
+  const [generatedChatId, setGeneratedChatId] = useState(() =>
+    crypto.randomUUID()
+  );
   const stableChatId = initialChatId ?? generatedChatId;
 
   const [context, setContext] = useState<ContextItem[]>([]);
@@ -215,6 +224,11 @@ function StandaloneChatPageClient({
     DEFAULT_CHAT_PREFERENCES.thinkingLevel
   );
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const chatInputRef = useRef<ChatInputHandle | null>(null);
+
+  const handleSuggestionSelect = useCallback((text: string) => {
+    chatInputRef.current?.setText(text);
+  }, []);
 
   const contextRef = useRef(context);
   const hasCustomizedContextRef = useRef(hasCustomizedContext);
@@ -380,6 +394,10 @@ function StandaloneChatPageClient({
   }, []);
 
   useEffect(() => {
+    if (initialChatId) {
+      return;
+    }
+
     function syncChatPreferencesFromStorage() {
       const storedPreferences = readStoredChatPreferences();
       if (!storedPreferences) {
@@ -414,14 +432,18 @@ function StandaloneChatPageClient({
         syncChatPreferencesFromStorage
       );
     };
-  }, []);
+  }, [initialChatId]);
 
   useEffect(() => {
+    if (initialChatId) {
+      return;
+    }
+
     writeStoredChatPreferences({
       model: selectedModel,
       thinkingLevel,
     });
-  }, [selectedModel, thinkingLevel]);
+  }, [initialChatId, selectedModel, thinkingLevel]);
 
   const handleStop = useCallback(async () => {
     setIsStopping(true);
@@ -440,7 +462,11 @@ function StandaloneChatPageClient({
     }
   }, [organizationId, stableChatId, stop]);
 
-  const chatHistoryQuery = useQuery({
+  const chatHistoryQuery = useQuery<{
+    messages: ChatUIMessage[] | null;
+    lastResponseStopped: boolean;
+    activeStreamId: string | null;
+  } | null>({
     queryKey: ["chat-history", organizationId, initialChatId],
     queryFn: async () => {
       if (!initialChatId) {
@@ -464,12 +490,45 @@ function StandaloneChatPageClient({
     staleTime: 1000 * 60 * 5,
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!chatHistoryQuery.data) {
       return;
     }
-    if (chatHistoryQuery.data.messages?.length) {
-      setMessages(chatHistoryQuery.data.messages);
+    const historyMessages = chatHistoryQuery.data.messages;
+    if (historyMessages?.length) {
+      setMessages(historyMessages);
+
+      let modelRestored = false;
+      let thinkingLevelRestored = false;
+
+      for (let index = historyMessages.length - 1; index >= 0; index -= 1) {
+        if (modelRestored && thinkingLevelRestored) {
+          break;
+        }
+
+        const metadata = historyMessages[index]?.metadata;
+        if (!metadata) {
+          continue;
+        }
+
+        if (!modelRestored && metadata.model) {
+          const parsedModel = parseStoredChatModel(metadata.model);
+          if (parsedModel) {
+            setSelectedModel(parsedModel);
+            modelRestored = true;
+          }
+        }
+
+        if (!thinkingLevelRestored && metadata.thinkingLevel) {
+          const parsedThinkingLevel = parseStoredThinkingLevel(
+            metadata.thinkingLevel
+          );
+          if (parsedThinkingLevel) {
+            setThinkingLevel(parsedThinkingLevel);
+            thinkingLevelRestored = true;
+          }
+        }
+      }
     }
     setWasStoppedByUser(Boolean(chatHistoryQuery.data.lastResponseStopped));
     if (chatHistoryQuery.data.activeStreamId) {
@@ -493,7 +552,11 @@ function StandaloneChatPageClient({
     setHasCustomizedContext(false);
   }, [initialChatId, setMessages]);
 
-  const isLoadingHistory = chatHistoryQuery.isLoading && messages.length === 0;
+  const pendingHistoryMessages = chatHistoryQuery.data?.messages?.length ?? 0;
+  const isLoadingHistory =
+    Boolean(initialChatId) &&
+    messages.length === 0 &&
+    (chatHistoryQuery.isLoading || pendingHistoryMessages > 0);
   const isLoading = status === "streaming" || status === "submitted";
   const hasMessages = messages.length > 0;
 
@@ -582,7 +645,7 @@ function StandaloneChatPageClient({
     setWasStoppedByUser(false);
     setPendingMessageId(null);
     setChatError(null);
-    setGeneratedChatId(nanoid(16));
+    setGeneratedChatId(crypto.randomUUID());
   }, [pathname, organizationSlug, initialChatId, setMessages]);
 
   const handleSend = useCallback(
@@ -667,36 +730,6 @@ function StandaloneChatPageClient({
     [organization?.name, organization?.logo]
   );
 
-  const activeReasoningPartKey = useMemo(() => {
-    if (!isLoading) {
-      return null;
-    }
-
-    for (
-      let messageIndex = messages.length - 1;
-      messageIndex >= 0;
-      messageIndex--
-    ) {
-      const message = messages[messageIndex];
-      if (!message || message.role !== "assistant") {
-        continue;
-      }
-
-      for (
-        let partIndex = message.parts.length - 1;
-        partIndex >= 0;
-        partIndex--
-      ) {
-        const part = message.parts[partIndex];
-        if (part?.type === "reasoning") {
-          return `${message.id}-reasoning-${partIndex}`;
-        }
-      }
-    }
-
-    return null;
-  }, [isLoading, messages]);
-
   function renderPart(
     part: { type: string; [key: string]: unknown },
     messageId: string,
@@ -736,9 +769,10 @@ function StandaloneChatPageClient({
         return null;
       }
       const reasoningKey = `${messageId}-reasoning-${index}`;
+      const reasoningState = part.state as "streaming" | "done" | undefined;
       return (
         <ChatReasoningBlock
-          isStreaming={activeReasoningPartKey === reasoningKey}
+          isStreaming={isLoading && reasoningState === "streaming"}
           key={reasoningKey}
         >
           {text}
@@ -894,10 +928,26 @@ function StandaloneChatPageClient({
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 z-10 px-4 pt-2 pb-4">
-              <div className="pointer-events-none absolute inset-x-0 bottom-full h-8 bg-linear-to-t from-background to-transparent" />
+            <div className="sticky bottom-0 z-10 bg-background px-4 pb-4">
+              <div className="-inset-x-4 pointer-events-none absolute bottom-full h-12 bg-linear-to-t from-background to-transparent" />
               <div className="mx-auto w-full max-w-2xl">
-                <Skeleton className="h-24 w-full rounded-xl" />
+                <ChatInputAdvanced
+                  context={context}
+                  error={chatError}
+                  isLoading={isLoading}
+                  isStopping={isStopping}
+                  model={selectedModel}
+                  onAddContext={handleAddContext}
+                  onClearError={handleClearError}
+                  onModelChange={handleModelChange}
+                  onRemoveContext={handleRemoveContext}
+                  onSend={handleSend}
+                  onStop={handleStop}
+                  onThinkingLevelChange={handleThinkingLevelChange}
+                  organizationId={organizationId}
+                  organizationSlug={organizationSlug}
+                  thinkingLevel={thinkingLevel}
+                />
               </div>
             </div>
           </div>
@@ -938,9 +988,14 @@ function StandaloneChatPageClient({
               onThinkingLevelChange={handleThinkingLevelChange}
               organizationId={organizationId}
               organizationSlug={organizationSlug}
+              ref={chatInputRef}
               thinkingLevel={thinkingLevel}
             />
           </div>
+          <ChatSuggestions
+            disabled={isLoading}
+            onSelect={handleSuggestionSelect}
+          />
         </div>
       </div>
     );

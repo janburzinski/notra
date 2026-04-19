@@ -40,10 +40,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@notra/ui/components/ui/sidebar";
+import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
@@ -61,6 +61,7 @@ export function ChatHistoryNav() {
   const { activeOrganization } = useOrganizationsContext();
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const aiChatExperiment = useAiChatExperiment();
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
@@ -70,9 +71,36 @@ export function ChatHistoryNav() {
     useState<ChatSessionSummary | null>(null);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
   const editInputRef = useRef<HTMLInputElement | null>(null);
-  const pendingNavigationRef = useRef<number | null>(null);
 
   const slug = activeOrganization?.slug;
+  const organizationId = activeOrganization?.id;
+
+  function prefetchChatHistory(chatId: string) {
+    if (!organizationId) {
+      return;
+    }
+    queryClient.prefetchQuery({
+      queryKey: ["chat-history", organizationId, chatId],
+      queryFn: async () => {
+        const res = await fetch(
+          `/api/organizations/${organizationId}/chat/${encodeURIComponent(chatId)}`
+        );
+        if (!res.ok) {
+          return null;
+        }
+        const data = await res.json();
+        return {
+          messages: data?.messages ?? null,
+          lastResponseStopped: Boolean(data?.lastResponseStopped),
+          activeStreamId:
+            typeof data?.activeStreamId === "string"
+              ? data.activeStreamId
+              : null,
+        };
+      },
+      staleTime: 1000 * 60 * 5,
+    });
+  }
 
   const { sessions, isLoading } = useChatSessions({
     enabled: aiChatExperiment.on,
@@ -94,15 +122,6 @@ export function ChatHistoryNav() {
     editInputRef.current?.focus();
     editInputRef.current?.select();
   }, [editingChatId]);
-
-  useEffect(
-    () => () => {
-      if (pendingNavigationRef.current !== null) {
-        window.clearTimeout(pendingNavigationRef.current);
-      }
-    },
-    []
-  );
 
   async function submitRename(session: ChatSessionSummary) {
     const nextTitle = normalizeChatTitle(draftTitle);
@@ -153,42 +172,8 @@ export function ChatHistoryNav() {
   }
 
   function startEditing(session: ChatSessionSummary) {
-    if (pendingNavigationRef.current !== null) {
-      window.clearTimeout(pendingNavigationRef.current);
-      pendingNavigationRef.current = null;
-    }
     setDraftTitle(session.title);
     setEditingChatId(session.chatId);
-  }
-
-  function handleSessionClick(
-    event: MouseEvent<HTMLAnchorElement>,
-    session: ChatSessionSummary
-  ) {
-    if (
-      event.button !== 0 ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey ||
-      event.shiftKey
-    ) {
-      return;
-    }
-
-    event.preventDefault();
-
-    if (event.detail > 1) {
-      return;
-    }
-
-    if (pendingNavigationRef.current !== null) {
-      window.clearTimeout(pendingNavigationRef.current);
-    }
-
-    pendingNavigationRef.current = window.setTimeout(() => {
-      pendingNavigationRef.current = null;
-      router.push(`/${slug}/chat/${session.chatId}`);
-    }, 200);
   }
 
   async function handleTogglePinned(session: ChatSessionSummary) {
@@ -256,13 +241,10 @@ export function ChatHistoryNav() {
                         ) : (
                           <Link
                             href={`/${slug}/chat/${session.chatId}`}
-                            onClick={(event) =>
-                              handleSessionClick(event, session)
+                            onFocus={() => prefetchChatHistory(session.chatId)}
+                            onMouseEnter={() =>
+                              prefetchChatHistory(session.chatId)
                             }
-                            onDoubleClick={(event) => {
-                              event.preventDefault();
-                              startEditing(session);
-                            }}
                           >
                             <span className="truncate">{session.title}</span>
                           </Link>
