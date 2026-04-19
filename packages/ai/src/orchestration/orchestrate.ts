@@ -17,6 +17,7 @@ import {
   streamText,
   type UIMessage,
 } from "ai";
+import { addAnthropicPromptCaching } from "../utils/prompt-caching";
 import {
   hasEnabledGitHubIntegration,
   hasEnabledLinearIntegration,
@@ -53,6 +54,7 @@ export async function orchestrateChat(
     context = [],
     maxSteps = 1,
     log: inputLog,
+    timezone,
   } = input;
 
   const log = deps?.log ?? inputLog;
@@ -110,6 +112,7 @@ export async function orchestrateChat(
         toolDescriptions: descriptions,
         hasGitHubEnabled: hasGitHub,
         hasLinearEnabled: hasLinear,
+        timezone,
       });
 
   const messagesForModel = isSimpleNoTools
@@ -124,6 +127,9 @@ export async function orchestrateChat(
     }),
     tools,
     stopWhen: stepCountIs(maxSteps),
+    prepareStep: ({ messages: stepMessages }) => ({
+      messages: addAnthropicPromptCaching(stepMessages, routingDecision.model),
+    }),
     async onFinish({ totalUsage }) {
       await deps?.onUsage?.(totalUsage, routingDecision.model);
     },

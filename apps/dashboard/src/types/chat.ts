@@ -47,4 +47,6 @@ export interface BuildChatFinishMetadataInput {
   finishedAt: number;
   partUsage: LanguageModelUsage | undefined;
   usageSnapshot: ChatUsageSnapshot;
+  model?: ChatModel | string;
+  thinkingLevel?: ThinkingLevel;
 }

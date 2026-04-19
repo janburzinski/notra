@@ -24,14 +24,13 @@ export function createModel(
     return wrapModelWithObservability(base, log);
   }
 
-  const supermemoryDisabled =
-    process.env.NODE_ENV === "development" && !process.env.SUPERMEMORY_API_KEY;
-
-  if (supermemoryDisabled) {
+  const supermemoryApiKey = process.env.SUPERMEMORY_API_KEY?.trim();
+  if (!supermemoryApiKey) {
     return wrapModelWithObservability(base, log);
   }
 
   const model = withSupermemory(base, organizationId, {
+    apiKey: supermemoryApiKey,
     mode: "full",
     addMemory: "always",
     ...options?.supermemory,

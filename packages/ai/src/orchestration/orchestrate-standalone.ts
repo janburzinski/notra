@@ -23,6 +23,7 @@ import {
   streamText,
   type UIMessage,
 } from "ai";
+import { addAnthropicPromptCaching } from "../utils/prompt-caching";
 import {
   hasEnabledGitHubIntegration,
   hasEnabledLinearIntegration,
@@ -53,6 +54,7 @@ export async function orchestrateStandaloneChat(
     enableThinking = true,
     thinkingLevel = "medium",
     abortSignal,
+    timezone,
   } = input;
 
   const log = deps?.log ?? inputLog;
@@ -116,6 +118,7 @@ export async function orchestrateStandaloneChat(
         toolDescriptions: descriptions,
         hasGitHubEnabled: hasGitHub,
         hasLinearEnabled: hasLinear,
+        timezone,
       });
 
   const providerOptions = isTrivial
@@ -139,6 +142,9 @@ export async function orchestrateStandaloneChat(
     stopWhen: stepCountIs(isTrivial ? 1 : maxSteps),
     experimental_transform: smoothStream(),
     providerOptions,
+    prepareStep: ({ messages: stepMessages }) => ({
+      messages: addAnthropicPromptCaching(stepMessages, routingDecision.model),
+    }),
     abortSignal,
     onChunk({ chunk }) {
       if (firstChunkFired) {

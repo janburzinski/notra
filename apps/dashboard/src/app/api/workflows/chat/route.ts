@@ -55,6 +55,7 @@ export const { POST } = serve<ChatWorkflowPayload>(async (context) => {
     model,
     enableThinking,
     thinkingLevel,
+    timezone,
   } = parseResult.data;
 
   const aiChatEnabled = await isAiChatExperimentEnabled({
@@ -153,6 +154,7 @@ export const { POST } = serve<ChatWorkflowPayload>(async (context) => {
         requestedModel: model,
         enableThinking,
         thinkingLevel,
+        timezone,
       },
       {
         integrationFetchers: {
@@ -246,6 +248,8 @@ export const { POST } = serve<ChatWorkflowPayload>(async (context) => {
             finishedAt: Date.now(),
             partUsage: part.totalUsage,
             usageSnapshot,
+            model: routingDecision.model,
+            thinkingLevel: enableThinking === false ? "off" : thinkingLevel,
           });
         }
 
