@@ -1,14 +1,5 @@
+import { ANTHROPIC_PROMPT_CACHING_OPTIONS } from "@notra/ai/constants/prompt-caching";
 import type { ModelMessage } from "ai";
-
-type MessageProviderOptions = NonNullable<ModelMessage["providerOptions"]>;
-
-const ANTHROPIC_PROMPT_CACHING_OPTIONS = {
-  anthropic: {
-    cacheControl: {
-      type: "ephemeral",
-    },
-  },
-} satisfies MessageProviderOptions;
 
 export function addAnthropicPromptCaching(
   messages: ModelMessage[],

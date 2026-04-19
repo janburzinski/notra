@@ -1,3 +1,4 @@
+import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
 import { createModel } from "@notra/ai/model";
 import { getCasualChangelogPrompt } from "@notra/ai/prompts/changelog/casual";
 import { getConversationalChangelogPrompt } from "@notra/ai/prompts/changelog/conversational";
@@ -32,7 +33,6 @@ const changelogPromptByTone: Record<ToneProfile, () => string> = {
   Casual: getCasualChangelogPrompt,
   Formal: getFormalChangelogPrompt,
 };
-const CHANGELOG_MODEL = "anthropic/claude-haiku-4.5";
 
 export async function generateChangelog(
   options: ChangelogAgentOptions
@@ -63,7 +63,12 @@ export async function generateChangelog(
     );
   }
 
-  const model = createModel(organizationId, CHANGELOG_MODEL, undefined, log);
+  const model = createModel(
+    organizationId,
+    AGENT_DEFAULT_MODEL,
+    undefined,
+    log
+  );
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
@@ -91,7 +96,7 @@ export async function generateChangelog(
   const agent = new ToolLoopAgent({
     model,
     prepareStep: ({ messages }) => ({
-      messages: addAnthropicPromptCaching(messages, CHANGELOG_MODEL),
+      messages: addAnthropicPromptCaching(messages, AGENT_DEFAULT_MODEL),
     }),
     providerOptions: {
       anthropic: {

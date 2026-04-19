@@ -1,3 +1,4 @@
+import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
 import { createModel } from "@notra/ai/model";
 import { getCasualBlogPostPrompt } from "@notra/ai/prompts/blog_post/casual";
 import { getConversationalBlogPostPrompt } from "@notra/ai/prompts/blog_post/conversational";
@@ -32,7 +33,6 @@ const blogPostPromptByTone: Record<ToneProfile, () => string> = {
   Casual: getCasualBlogPostPrompt,
   Formal: getFormalBlogPostPrompt,
 };
-const BLOG_POST_MODEL = "anthropic/claude-haiku-4.5";
 
 export async function generateBlogPost(
   options: BlogPostAgentOptions
@@ -63,7 +63,12 @@ export async function generateBlogPost(
     );
   }
 
-  const model = createModel(organizationId, BLOG_POST_MODEL, undefined, log);
+  const model = createModel(
+    organizationId,
+    AGENT_DEFAULT_MODEL,
+    undefined,
+    log
+  );
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
@@ -91,7 +96,7 @@ export async function generateBlogPost(
   const agent = new ToolLoopAgent({
     model,
     prepareStep: ({ messages }) => ({
-      messages: addAnthropicPromptCaching(messages, BLOG_POST_MODEL),
+      messages: addAnthropicPromptCaching(messages, AGENT_DEFAULT_MODEL),
     }),
     providerOptions: {
       anthropic: {
