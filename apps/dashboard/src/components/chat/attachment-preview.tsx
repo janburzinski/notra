@@ -1,8 +1,5 @@
 "use client";
 
-import { ArrowRight01Icon, Download04Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@notra/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -73,8 +70,12 @@ function TextPreview({ url }: { url: string }) {
   );
 }
 
+type PreviewAttachment =
+  | ChatAttachment
+  | (Omit<ChatAttachment, "size" | "key"> & { size?: number; key?: string });
+
 interface AttachmentPreviewDialogProps {
-  attachment: ChatAttachment | null;
+  attachment: PreviewAttachment | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -94,32 +95,15 @@ export function AttachmentPreviewDialog({
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="flex h-[80vh] max-w-3xl flex-col gap-3 p-4 sm:max-w-3xl">
-        <div className="flex items-start justify-between gap-3 pr-8">
-          <div className="min-w-0 flex-1">
-            <DialogTitle className="truncate text-sm">
-              {attachment.filename}
-            </DialogTitle>
-            <p className="mt-1 text-muted-foreground text-xs">
-              {typeLabel} · {formatBytes(attachment.size)}
-            </p>
-          </div>
-          <Button
-            className="shrink-0"
-            render={
-              <a
-                download={attachment.filename}
-                href={attachment.url}
-                rel="noopener noreferrer"
-                target="_blank"
-              />
-            }
-            size="sm"
-            variant="outline"
-          >
-            <HugeiconsIcon className="size-3.5" icon={Download04Icon} />
-            Open
-            <HugeiconsIcon className="size-3" icon={ArrowRight01Icon} />
-          </Button>
+        <div className="min-w-0 pr-8">
+          <DialogTitle className="truncate text-sm">
+            {attachment.filename}
+          </DialogTitle>
+          <p className="mt-1 text-muted-foreground text-xs">
+            {typeof attachment.size === "number"
+              ? `${typeLabel} · ${formatBytes(attachment.size)}`
+              : typeLabel}
+          </p>
         </div>
         <div className="min-h-0 flex-1 overflow-hidden rounded-md border border-border">
           {isImageMimeType(attachment.mediaType) && (

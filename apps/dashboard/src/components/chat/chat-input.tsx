@@ -472,6 +472,7 @@ export function ChatInputAdvanced({
   );
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
 
@@ -508,27 +509,28 @@ export function ChatInputAdvanced({
       }
     }
     function onDrop(event: DragEvent) {
-      if (!dragEventHasFiles(event)) {
+      const files = event.dataTransfer?.files;
+      const hasFiles = (files && files.length > 0) || dragEventHasFiles(event);
+      if (!hasFiles) {
         return;
       }
       event.preventDefault();
       dragCounterRef.current = 0;
       setIsDraggingFile(false);
-      const files = event.dataTransfer?.files;
       if (files && files.length > 0) {
         handleFilesSelected(files).catch(() => undefined);
       }
     }
 
-    window.addEventListener("dragenter", onDragEnter);
-    window.addEventListener("dragleave", onDragLeave);
-    window.addEventListener("dragover", onDragOver);
-    window.addEventListener("drop", onDrop);
+    document.addEventListener("dragenter", onDragEnter);
+    document.addEventListener("dragleave", onDragLeave);
+    document.addEventListener("dragover", onDragOver);
+    document.addEventListener("drop", onDrop);
     return () => {
-      window.removeEventListener("dragenter", onDragEnter);
-      window.removeEventListener("dragleave", onDragLeave);
-      window.removeEventListener("dragover", onDragOver);
-      window.removeEventListener("drop", onDrop);
+      document.removeEventListener("dragenter", onDragEnter);
+      document.removeEventListener("dragleave", onDragLeave);
+      document.removeEventListener("dragover", onDragOver);
+      document.removeEventListener("drop", onDrop);
     };
   }, [handleFilesSelected]);
   const { check, data: customer } = useCustomer();

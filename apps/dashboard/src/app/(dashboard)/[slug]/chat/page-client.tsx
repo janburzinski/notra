@@ -35,6 +35,7 @@ import {
 import { ChatToolBlock } from "@/components/ai/chat-tool-block";
 import { BrailleLoader } from "@/components/braille-loader";
 import { AssistantMetadataHover } from "@/components/chat/assistant-metadata-hover";
+import { AttachmentPreviewDialog } from "@/components/chat/attachment-preview";
 import {
   ChatInputAdvanced,
   type ThinkingLevel,
@@ -225,6 +226,11 @@ function StandaloneChatPageClient({
   const [context, setContext] = useState<ContextItem[]>([]);
   const [hasCustomizedContext, setHasCustomizedContext] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
+  const [previewAttachment, setPreviewAttachment] = useState<{
+    url: string;
+    filename: string;
+    mediaType: string;
+  } | null>(null);
   const [selectedModel, setSelectedModel] = useState(
     DEFAULT_CHAT_PREFERENCES.model
   );
@@ -799,14 +805,26 @@ function StandaloneChatPageClient({
       const fileKey = `${messageId}-file-${index}`;
       if (isImageMimeType(mediaType)) {
         return (
-          <Image
-            alt={filename ?? "attachment"}
-            className="my-1 h-auto max-h-72 w-auto max-w-full rounded-lg border border-border object-cover"
-            height={400}
+          <button
+            className="my-1 block overflow-hidden rounded-lg border border-border transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             key={fileKey}
-            src={url}
-            width={600}
-          />
+            onClick={() =>
+              setPreviewAttachment({
+                url,
+                filename: filename ?? "attachment",
+                mediaType,
+              })
+            }
+            type="button"
+          >
+            <Image
+              alt={filename ?? "attachment"}
+              className="h-auto max-h-72 w-auto max-w-full object-cover"
+              height={400}
+              src={url}
+              width={600}
+            />
+          </button>
         );
       }
       return (
@@ -1082,78 +1100,89 @@ function StandaloneChatPageClient({
       : messages;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
-        <div className="relative flex min-h-full flex-col">
-          <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
+    <>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
+          <div className="relative flex min-h-full flex-col">
+            <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
+              <div
+                className={cn(
+                  "mx-auto mt-auto flex w-full max-w-2xl flex-col gap-4",
+                  isFirstMessageTransition && "chat-messages-fade-in"
+                )}
+              >
+                {visibleMessages.map((message) => (
+                  <Message from={message.role} key={message.id}>
+                    <MessageContent>
+                      {message.parts.map((part, index) =>
+                        renderPart(part, message.id, index)
+                      )}
+                    </MessageContent>
+                    {message.role === "assistant" && (
+                      <AssistantMetadataHover metadata={message.metadata} />
+                    )}
+                  </Message>
+                ))}
+                {wasStoppedByUser && !isLoading && (
+                  <div className="flex w-fit items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-destructive text-xs">
+                    <HugeiconsIcon className="size-3.5" icon={X} />
+                    <span>Response stopped by user</span>
+                  </div>
+                )}
+                {showThinkingIndicator && (
+                  <Message from="assistant">
+                    <MessageContent>
+                      <div className="flex items-center gap-2">
+                        <BrailleLoader className="text-sm" variant="shimmer" />
+                        <span className="animate-pulse text-muted-foreground text-sm">
+                          {isStopping ? "Stopping" : thinkingIndicatorLabel}
+                        </span>
+                      </div>
+                    </MessageContent>
+                  </Message>
+                )}
+              </div>
+            </div>
             <div
               className={cn(
-                "mx-auto mt-auto flex w-full max-w-2xl flex-col gap-4",
-                isFirstMessageTransition && "chat-messages-fade-in"
+                "sticky bottom-0 z-10 bg-background px-4 pb-4",
+                isFirstMessageTransition && "chat-input-slide-down"
               )}
             >
-              {visibleMessages.map((message) => (
-                <Message from={message.role} key={message.id}>
-                  <MessageContent>
-                    {message.parts.map((part, index) =>
-                      renderPart(part, message.id, index)
-                    )}
-                  </MessageContent>
-                  {message.role === "assistant" && (
-                    <AssistantMetadataHover metadata={message.metadata} />
-                  )}
-                </Message>
-              ))}
-              {wasStoppedByUser && !isLoading && (
-                <div className="flex w-fit items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-destructive text-xs">
-                  <HugeiconsIcon className="size-3.5" icon={X} />
-                  <span>Response stopped by user</span>
-                </div>
-              )}
-              {showThinkingIndicator && (
-                <Message from="assistant">
-                  <MessageContent>
-                    <div className="flex items-center gap-2">
-                      <BrailleLoader className="text-sm" variant="shimmer" />
-                      <span className="animate-pulse text-muted-foreground text-sm">
-                        {isStopping ? "Stopping" : thinkingIndicatorLabel}
-                      </span>
-                    </div>
-                  </MessageContent>
-                </Message>
-              )}
-            </div>
-          </div>
-          <div
-            className={cn(
-              "sticky bottom-0 z-10 bg-background px-4 pb-4",
-              isFirstMessageTransition && "chat-input-slide-down"
-            )}
-          >
-            <div className="-inset-x-4 pointer-events-none absolute bottom-full h-12 bg-linear-to-t from-background to-transparent" />
-            <div className="mx-auto w-full max-w-2xl">
-              <ChatInputAdvanced
-                context={context}
-                error={chatError}
-                isLoading={isLoading}
-                isStopping={isStopping}
-                model={selectedModel}
-                onAddContext={handleAddContext}
-                onClearError={handleClearError}
-                onModelChange={handleModelChange}
-                onRemoveContext={handleRemoveContext}
-                onSend={handleSend}
-                onStop={handleStop}
-                onThinkingLevelChange={handleThinkingLevelChange}
-                organizationId={organizationId}
-                organizationSlug={organizationSlug}
-                thinkingLevel={thinkingLevel}
-              />
+              <div className="-inset-x-4 pointer-events-none absolute bottom-full h-12 bg-linear-to-t from-background to-transparent" />
+              <div className="mx-auto w-full max-w-2xl">
+                <ChatInputAdvanced
+                  context={context}
+                  error={chatError}
+                  isLoading={isLoading}
+                  isStopping={isStopping}
+                  model={selectedModel}
+                  onAddContext={handleAddContext}
+                  onClearError={handleClearError}
+                  onModelChange={handleModelChange}
+                  onRemoveContext={handleRemoveContext}
+                  onSend={handleSend}
+                  onStop={handleStop}
+                  onThinkingLevelChange={handleThinkingLevelChange}
+                  organizationId={organizationId}
+                  organizationSlug={organizationSlug}
+                  thinkingLevel={thinkingLevel}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <AttachmentPreviewDialog
+        attachment={previewAttachment}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPreviewAttachment(null);
+          }
+        }}
+        open={previewAttachment !== null}
+      />
+    </>
   );
 }
 
