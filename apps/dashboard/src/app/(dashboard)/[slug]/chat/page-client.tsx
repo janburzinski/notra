@@ -903,7 +903,10 @@ function StandaloneChatPageClient({
     isDrainingRef.current = true;
 
     stopActiveResponse().catch((error) => {
-      console.error("[Chat] Failed to stop active response for queue drain:", error);
+      console.error(
+        "[Chat] Failed to stop active response for queue drain:",
+        error
+      );
       isDrainingRef.current = false;
     });
   }, [
