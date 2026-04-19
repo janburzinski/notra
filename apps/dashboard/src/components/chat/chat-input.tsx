@@ -85,6 +85,7 @@ import type {
 } from "@/types/chat";
 import type { GitHubRepository } from "@/types/integrations";
 import { AttachmentPreviewDialog } from "./attachment-preview";
+import type { QueuedMessage } from "./chat-queue";
 import {
   buildIntegrationReferenceElement,
   INTEGRATION_REFERENCE_SELECTOR,
@@ -150,18 +151,30 @@ const THINKING_LEVELS = ["off", "low", "medium", "high"] as const;
 export type ThinkingLevel = (typeof THINKING_LEVELS)[number];
 
 function SubmitButtonContent({
+  isEmpty,
   isLoading,
-  isStopping,
   isQueued,
+  isStopping,
+  canQueue,
 }: {
+  isEmpty: boolean;
   isLoading: boolean;
-  isStopping: boolean;
   isQueued: boolean;
+  isStopping: boolean;
+  canQueue: boolean;
 }) {
   if (isLoading && isStopping) {
     return <Loader2Icon className="size-4 animate-spin" />;
   }
-  if (isLoading) {
+  if (isQueued) {
+    return (
+      <>
+        <Loader2Icon className="size-3.5 animate-spin" />
+        <div className="px-0.5 text-sm leading-0">Sending…</div>
+      </>
+    );
+  }
+  if (isLoading && isEmpty) {
     return (
       <>
         <HugeiconsIcon className="size-3.5" icon={StopIcon} />
@@ -169,11 +182,13 @@ function SubmitButtonContent({
       </>
     );
   }
-  if (isQueued) {
+  if (canQueue) {
     return (
       <>
-        <Loader2Icon className="size-3.5 animate-spin" />
-        <div className="px-0.5 text-sm leading-0">Sending…</div>
+        <div className="px-0.5 text-sm leading-0">Queue</div>
+        <div className="hidden h-4 items-center rounded border border-border bg-background px-1 text-[10px] text-muted-foreground shadow-xs sm:inline-flex">
+          ↵
+        </div>
       </>
     );
   }
@@ -187,19 +202,30 @@ function SubmitButtonContent({
   );
 }
 
-function getSubmitTooltipText(
-  isLoading: boolean,
-  isStopping: boolean,
-  isQueued: boolean
-): string {
+function getSubmitTooltipText({
+  canQueue,
+  isEmpty,
+  isLoading,
+  isQueued,
+  isStopping,
+}: {
+  canQueue: boolean;
+  isEmpty: boolean;
+  isLoading: boolean;
+  isQueued: boolean;
+  isStopping: boolean;
+}): string {
   if (isLoading && isStopping) {
     return "Stopping...";
   }
-  if (isLoading) {
-    return "Stop generating";
-  }
   if (isQueued) {
     return "Will send once uploads finish. Click to cancel.";
+  }
+  if (isLoading && isEmpty) {
+    return "Stop generating";
+  }
+  if (canQueue) {
+    return "Enter to queue this message. It will send once the AI finishes.";
   }
   return "Enter to send. Shift+Enter for a new line.";
 }
@@ -233,6 +259,9 @@ interface ChatInputAdvancedProps {
   onModelChange?: (model: string) => void;
   thinkingLevel?: ThinkingLevel;
   onThinkingLevelChange?: (level: ThinkingLevel) => void;
+  connectedTop?: boolean;
+  queuedMessages?: QueuedMessage[];
+  onUpdateQueued?: (id: string, text: string) => void;
   ref?: Ref<ChatInputHandle>;
 }
 
@@ -270,6 +299,7 @@ export function ChatInputAdvanced({
   onModelChange,
   thinkingLevel = "medium",
   onThinkingLevelChange,
+  connectedTop = false,
   ref,
 }: ChatInputAdvancedProps) {
   const currentModel =
@@ -1048,7 +1078,33 @@ export function ChatInputAdvanced({
 
   const handleSend = useCallback(() => {
     const editor = editorRef.current;
-    if (!editor || isLoading) {
+    if (!editor) {
+      return;
+    }
+    if (isLoading) {
+      const hasText = readEditorText().trim().length > 0;
+      const hasAttachments =
+        attachmentsRef.current.length > 0 || pendingUploadsRef.current.length > 0;
+      if (!hasText || hasAttachments) {
+        return;
+      }
+      clearError();
+      if (isUsageBlocked) {
+        setInternalError(limitMessage);
+        return;
+      }
+      if (customer) {
+        const result = check({
+          featureId: FEATURES.AI_CREDITS,
+          requiredBalance: 1,
+        });
+        if (result?.allowed === false) {
+          setInternalError(limitMessage);
+          return;
+        }
+      }
+      onSend?.(serializeEditorWithReferences(editor).trim(), []);
+      clearComposer();
       return;
     }
     if (isUploading) {
@@ -1079,12 +1135,16 @@ export function ChatInputAdvanced({
     }
     performSend();
   }, [
+    check,
+    clearComposer,
+    clearError,
+    customer,
     isLoading,
     isUploading,
     readEditorText,
     hasUnsupportedAttachmentsForModel,
     isUsageBlocked,
-    clearError,
+    onSend,
     performSend,
   ]);
 
@@ -1327,7 +1387,7 @@ export function ChatInputAdvanced({
           document.body
         )}
       <Card
-        className="w-full gap-0 overflow-visible rounded-[14px] border-0 bg-background py-0 shadow-none ring-0 transition-shadow duration-200 ease-out-expo"
+        className={`w-full gap-0 overflow-visible rounded-[14px] border-0 bg-background py-0 shadow-none ring-0 transition-shadow duration-200 ease-out-expo ${connectedTop ? "rounded-t-none" : ""}`}
         data-focused={isFocused ? "true" : "false"}
       >
         <CardHeader className="sr-only">
@@ -1335,12 +1395,12 @@ export function ChatInputAdvanced({
         </CardHeader>
         <CardContent className="p-0">
           <div
-            className="rounded-[14px] border border-border bg-background shadow-sm"
+            className={`rounded-[14px] border border-border bg-background shadow-sm ${connectedTop ? "rounded-t-none border-t-0" : ""}`}
             tabIndex={-1}
           >
             <section
               aria-label="Chat input drop area"
-              className="rounded-[13px] p-0.5"
+              className={`p-0.5 ${connectedTop ? "rounded-b-[13px]" : "rounded-[13px]"}`}
             >
               <input
                 accept={allowedChatMimeTypes.join(",")}
@@ -1432,17 +1492,15 @@ export function ChatInputAdvanced({
                   <div className="relative flex flex-1 cursor-text transition-colors [--lh:1lh]">
                     {/* biome-ignore lint/a11y/useSemanticElements: rich mention editor requires a contentEditable host instead of a native textarea. */}
                     <div
-                      aria-disabled={isLoading || isUsageBlocked || isQueued}
+                      aria-disabled={isUsageBlocked || isQueued}
                       aria-label="Send a message"
                       aria-multiline="true"
                       className="wrap-break-word relative max-h-50 min-h-12 w-full overflow-y-auto whitespace-pre-wrap rounded-t-[12px] px-3 py-2 text-foreground text-sm leading-6 caret-foreground outline-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[empty=true]:before:pointer-events-none data-[empty=true]:before:absolute data-[empty=true]:before:top-2 data-[empty=true]:before:left-3 data-[empty=true]:before:text-muted-foreground data-[empty=true]:before:content-[attr(data-placeholder)]"
-                      contentEditable={
-                        !(isLoading || isUsageBlocked || isQueued)
-                      }
+                      contentEditable={!(isUsageBlocked || isQueued)}
                       data-empty={isEmpty ? "true" : "false"}
                       data-placeholder={
                         isLoading
-                          ? "AI is working..."
+                          ? "Queue a message while AI is working..."
                           : "Send a message... (type @ to add context)"
                       }
                       onBlur={() => {
@@ -1948,10 +2006,17 @@ export function ChatInputAdvanced({
                     !isEmpty ||
                     attachments.length > 0 ||
                     pendingUploads.length > 0;
+                  const canQueue =
+                    isLoading &&
+                    !isEmpty &&
+                    attachments.length === 0 &&
+                    pendingUploads.length === 0;
                   let submitDisabled: boolean;
-                  if (isLoading) {
+                  if (isQueued) {
+                    submitDisabled = false;
+                  } else if (isLoading && isEmpty) {
                     submitDisabled = !onStop || isStopping;
-                  } else if (isQueued) {
+                  } else if (canQueue) {
                     submitDisabled = false;
                   } else {
                     submitDisabled =
@@ -1960,10 +2025,10 @@ export function ChatInputAdvanced({
                       !hasAnyContent;
                   }
                   let submitOnClick: (() => void) | undefined;
-                  if (isLoading) {
-                    submitOnClick = onStop;
-                  } else if (isQueued) {
+                  if (isQueued) {
                     submitOnClick = () => setPendingSend(null);
+                  } else if (isLoading && isEmpty) {
+                    submitOnClick = onStop;
                   } else {
                     submitOnClick = handleSend;
                   }
@@ -1984,6 +2049,8 @@ export function ChatInputAdvanced({
                       >
                         <div className="flex items-center gap-1 text-foreground text-sm">
                           <SubmitButtonContent
+                            canQueue={canQueue}
+                            isEmpty={isEmpty}
                             isLoading={isLoading}
                             isQueued={isQueued}
                             isStopping={isStopping}
@@ -1991,7 +2058,13 @@ export function ChatInputAdvanced({
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {getSubmitTooltipText(isLoading, isStopping, isQueued)}
+                        {getSubmitTooltipText({
+                          canQueue,
+                          isEmpty,
+                          isLoading,
+                          isQueued,
+                          isStopping,
+                        })}
                       </TooltipContent>
                     </Tooltip>
                   );

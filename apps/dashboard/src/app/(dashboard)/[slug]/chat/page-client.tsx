@@ -21,6 +21,7 @@ import {
   isToolUIPart,
   lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
+import { nanoid } from "nanoid";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -40,6 +41,7 @@ import {
   ChatInputAdvanced,
   type ThinkingLevel,
 } from "@/components/chat/chat-input";
+import { ChatQueue, type QueuedMessage } from "@/components/chat/chat-queue";
 import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
@@ -202,6 +204,28 @@ function getCreateToolContentType(
   return CREATE_TOOL_TYPES[type];
 }
 
+function hasPendingApproval(messages: readonly ChatUIMessage[]): boolean {
+  for (const message of messages) {
+    if (message.role !== "assistant") {
+      continue;
+    }
+    for (const part of message.parts) {
+      if (isToolUIPart(part) && part.state === "approval-requested") {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isTerminalToolState(state: string): boolean {
+  return (
+    state === "output-available" ||
+    state === "output-error" ||
+    state === "output-denied"
+  );
+}
+
 function StandaloneChatPageClient({
   organizationSlug,
   chatId: initialChatId,
@@ -231,6 +255,7 @@ function StandaloneChatPageClient({
     filename: string;
     mediaType: string;
   } | null>(null);
+  const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
   const [selectedModel, setSelectedModel] = useState(
     DEFAULT_CHAT_PREFERENCES.model
   );
@@ -269,6 +294,7 @@ function StandaloneChatPageClient({
             model: selectedModelRef.current,
             enableThinking: thinkingLevelRef.current !== "off",
             thinkingLevel: thinkingLevelRef.current,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         }),
         prepareReconnectToStreamRequest: ({ id }) => ({
@@ -357,6 +383,12 @@ function StandaloneChatPageClient({
   }, []);
 
   const [wasStoppedByUser, setWasStoppedByUser] = useState(false);
+  const wasStoppedByUserRef = useRef(wasStoppedByUser);
+  wasStoppedByUserRef.current = wasStoppedByUser;
+
+  const drainQueueRef = useRef<() => void>(() => {
+    // Populated after dispatchMessage is defined below.
+  });
 
   const handleFinish = useCallback(() => {
     setPendingMessageId(null);
@@ -364,6 +396,8 @@ function StandaloneChatPageClient({
     queryClient.invalidateQueries({
       queryKey: ["chat-sessions", organizationId],
     });
+    isDrainingRef.current = false;
+    drainQueueRef.current();
   }, [organizationId, queryClient]);
 
   const {
@@ -459,9 +493,7 @@ function StandaloneChatPageClient({
     });
   }, [initialChatId, selectedModel, thinkingLevel]);
 
-  const handleStop = useCallback(async () => {
-    setIsStopping(true);
-    setWasStoppedByUser(true);
+  const stopActiveResponse = useCallback(async () => {
     try {
       if (organizationId && stableChatId) {
         await fetch(
@@ -475,6 +507,12 @@ function StandaloneChatPageClient({
       stop();
     }
   }, [organizationId, stableChatId, stop]);
+
+  const handleStop = useCallback(async () => {
+    setIsStopping(true);
+    setWasStoppedByUser(true);
+    await stopActiveResponse();
+  }, [stopActiveResponse]);
 
   const chatHistoryQuery = useQuery<{
     messages: ChatUIMessage[] | null;
@@ -555,6 +593,7 @@ function StandaloneChatPageClient({
   useEffect(() => {
     setPendingMessageId(null);
     setChatError(null);
+    setQueuedMessages([]);
 
     if (initialChatId) {
       return;
@@ -565,6 +604,56 @@ function StandaloneChatPageClient({
     setContext([]);
     setHasCustomizedContext(false);
   }, [initialChatId, setMessages]);
+
+  const queueStorageKey = `chat-queue:${stableChatId}`;
+  const loadedQueueKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (loadedQueueKeyRef.current === queueStorageKey) {
+      return;
+    }
+    loadedQueueKeyRef.current = queueStorageKey;
+    try {
+      const raw = window.localStorage.getItem(queueStorageKey);
+      if (!raw) {
+        setQueuedMessages([]);
+        return;
+      }
+      const parsed: unknown = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        setQueuedMessages([]);
+        return;
+      }
+      const restored = parsed.filter(
+        (m): m is QueuedMessage =>
+          typeof m === "object" &&
+          m !== null &&
+          typeof (m as { id?: unknown }).id === "string" &&
+          typeof (m as { text?: unknown }).text === "string"
+      );
+      setQueuedMessages(restored);
+    } catch {
+      setQueuedMessages([]);
+    }
+  }, [queueStorageKey]);
+
+  useEffect(() => {
+    if (loadedQueueKeyRef.current !== queueStorageKey) {
+      return;
+    }
+    try {
+      if (queuedMessages.length === 0) {
+        window.localStorage.removeItem(queueStorageKey);
+      } else {
+        window.localStorage.setItem(
+          queueStorageKey,
+          JSON.stringify(queuedMessages)
+        );
+      }
+    } catch {
+      // noop
+    }
+  }, [queueStorageKey, queuedMessages]);
 
   const pendingHistoryMessages = chatHistoryQuery.data?.messages?.length ?? 0;
   const isLoadingHistory =
@@ -662,7 +751,7 @@ function StandaloneChatPageClient({
     setGeneratedChatId(crypto.randomUUID());
   }, [pathname, organizationSlug, initialChatId, setMessages]);
 
-  const handleSend = useCallback(
+  const dispatchMessage = useCallback(
     async (text: string, attachments: ChatAttachment[] = []) => {
       const isFirstMessage = !initialChatId && !hasUpdatedUrlRef.current;
       if (messagesRef.current.length === 0) {
@@ -688,7 +777,6 @@ function StandaloneChatPageClient({
         }
       }
       if (isFirstMessage) {
-        hasUpdatedUrlRef.current = true;
         window.history.replaceState(
           null,
           "",
@@ -729,6 +817,141 @@ function StandaloneChatPageClient({
       triggerFirstMessageTransition,
     ]
   );
+
+  const handleSend = useCallback(
+    async (text: string, attachments: ChatAttachment[] = []) => {
+      if (isLoading) {
+        if (attachments.length > 0) {
+          return;
+        }
+        setQueuedMessages((prev) => [...prev, { id: nanoid(10), text }]);
+        return;
+      }
+      await dispatchMessage(text, attachments);
+    },
+    [dispatchMessage, isLoading]
+  );
+
+  const handleRemoveQueued = useCallback((id: string) => {
+    setQueuedMessages((prev) => prev.filter((m) => m.id !== id));
+  }, []);
+
+  const handleEditQueued = useCallback((message: QueuedMessage) => {
+    setQueuedMessages((prev) => prev.filter((m) => m.id !== message.id));
+    chatInputRef.current?.setText(message.text);
+  }, []);
+
+  const handleUpdateQueued = useCallback((id: string, text: string) => {
+    setQueuedMessages((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, text } : m))
+    );
+  }, []);
+
+  const queuedMessagesRef = useRef(queuedMessages);
+  queuedMessagesRef.current = queuedMessages;
+
+  const isDrainingRef = useRef(false);
+  const seenToolOutputsRef = useRef<Set<string>>(new Set());
+  const prevIsLoadingRef = useRef(false);
+
+  drainQueueRef.current = () => {
+    if (isDrainingRef.current) {
+      return;
+    }
+    if (wasStoppedByUserRef.current) {
+      return;
+    }
+    if (hasPendingApproval(messagesRef.current)) {
+      return;
+    }
+    const queue = queuedMessagesRef.current;
+    const next = queue[0];
+    if (!next) {
+      return;
+    }
+
+    isDrainingRef.current = true;
+    setQueuedMessages(queue.slice(1));
+    dispatchMessage(next.text).catch((error) => {
+      console.error("[Chat] Failed to drain queued message:", error);
+      isDrainingRef.current = false;
+      setQueuedMessages((prev) => [next, ...prev]);
+    });
+  };
+
+  useEffect(() => {
+    if (isLoading && !prevIsLoadingRef.current) {
+      const snapshot = new Set<string>();
+      for (const message of messagesRef.current) {
+        if (message.role !== "assistant") {
+          continue;
+        }
+        for (const part of message.parts) {
+          if (isToolUIPart(part) && isTerminalToolState(part.state)) {
+            snapshot.add(part.toolCallId);
+          }
+        }
+      }
+      seenToolOutputsRef.current = snapshot;
+      isDrainingRef.current = false;
+    }
+    prevIsLoadingRef.current = isLoading;
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      return;
+    }
+    if (isDrainingRef.current) {
+      return;
+    }
+    if (wasStoppedByUser) {
+      return;
+    }
+    if (queuedMessages.length === 0) {
+      return;
+    }
+    if (hasPendingApproval(messages)) {
+      return;
+    }
+
+    let hasNewToolOutput = false;
+    for (const message of messages) {
+      if (message.role !== "assistant") {
+        continue;
+      }
+      for (const part of message.parts) {
+        if (
+          isToolUIPart(part) &&
+          isTerminalToolState(part.state) &&
+          !seenToolOutputsRef.current.has(part.toolCallId)
+        ) {
+          seenToolOutputsRef.current.add(part.toolCallId);
+          hasNewToolOutput = true;
+        }
+      }
+    }
+
+    if (!hasNewToolOutput) {
+      return;
+    }
+
+    isDrainingRef.current = true;
+
+    stopActiveResponse().catch((error) => {
+      console.error(
+        "[Chat] Failed to stop active response for queue drain:",
+        error
+      );
+      isDrainingRef.current = false;
+    });
+  }, [
+    isLoading,
+    messages,
+    queuedMessages.length,
+    wasStoppedByUser,
+    stopActiveResponse,
+  ]);
 
   const messageCount = messages.length;
   const lastPartCount = messages.at(-1)?.parts?.length ?? 0;
@@ -1065,8 +1288,10 @@ function StandaloneChatPageClient({
               onSend={handleSend}
               onStop={handleStop}
               onThinkingLevelChange={handleThinkingLevelChange}
+              onUpdateQueued={handleUpdateQueued}
               organizationId={organizationId}
               organizationSlug={organizationSlug}
+              queuedMessages={queuedMessages}
               ref={chatInputRef}
               thinkingLevel={thinkingLevel}
             />
@@ -1151,7 +1376,13 @@ function StandaloneChatPageClient({
             >
               <div className="-inset-x-4 pointer-events-none absolute bottom-full h-12 bg-linear-to-t from-background to-transparent" />
               <div className="mx-auto w-full max-w-2xl">
+                <ChatQueue
+                  messages={queuedMessages}
+                  onEdit={handleEditQueued}
+                  onRemove={handleRemoveQueued}
+                />
                 <ChatInputAdvanced
+                  connectedTop={queuedMessages.length > 0}
                   context={context}
                   error={chatError}
                   isLoading={isLoading}
@@ -1164,8 +1395,11 @@ function StandaloneChatPageClient({
                   onSend={handleSend}
                   onStop={handleStop}
                   onThinkingLevelChange={handleThinkingLevelChange}
+                  onUpdateQueued={handleUpdateQueued}
                   organizationId={organizationId}
                   organizationSlug={organizationSlug}
+                  queuedMessages={queuedMessages}
+                  ref={chatInputRef}
                   thinkingLevel={thinkingLevel}
                 />
               </div>
