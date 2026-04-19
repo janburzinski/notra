@@ -1,7 +1,6 @@
 import { orchestrateStandaloneChat } from "@notra/ai/orchestration/orchestrate-standalone";
 import type { StandaloneChatContextItem } from "@notra/ai/schemas/standalone-chat";
 import type { UIMessage } from "ai";
-import { isTextUIPart } from "ai";
 import type { CheckResponse } from "autumn-js";
 import { nanoid } from "nanoid";
 import type { NextRequest } from "next/server";
@@ -166,11 +165,7 @@ export const POST = withEvlog(async function POST(
     await clearLastResponseStopped(organizationId, chatId);
 
     if (messages.length === 1 && latestMessage.role === "user") {
-      const textPart = latestMessage.parts?.find(isTextUIPart);
-      const userText = textPart?.text?.trim();
-      if (userText) {
-        await generateAndSetChatTitle(organizationId, chatId, userText);
-      }
+      await generateAndSetChatTitle(organizationId, chatId, latestMessage);
     }
 
     const canUseWorkflowStreaming = canUseUpstashWorkflowStreaming();

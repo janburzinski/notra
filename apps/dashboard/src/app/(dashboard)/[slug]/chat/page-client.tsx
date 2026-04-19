@@ -22,6 +22,7 @@ import {
   lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   useCallback,
@@ -48,7 +49,13 @@ import {
   chatErrorPayloadSchema,
   chatTransportRequestInputSchema,
 } from "@/schemas/chat";
-import type { ChatInputHandle, ChatUIMessage, ContextItem } from "@/types/chat";
+import type {
+  ChatAttachment,
+  ChatInputHandle,
+  ChatMessagePart,
+  ChatUIMessage,
+  ContextItem,
+} from "@/types/chat";
 import {
   CHAT_PREFERENCES_STORAGE_KEY,
   DEFAULT_CHAT_PREFERENCES,
@@ -649,7 +656,7 @@ function StandaloneChatPageClient({
   }, [pathname, organizationSlug, initialChatId, setMessages]);
 
   const handleSend = useCallback(
-    async (text: string) => {
+    async (text: string, attachments: ChatAttachment[] = []) => {
       const isFirstMessage = !initialChatId && !hasUpdatedUrlRef.current;
       if (messagesRef.current.length === 0) {
         triggerFirstMessageTransition();
@@ -681,7 +688,23 @@ function StandaloneChatPageClient({
           `/${organizationSlug}/chat/${stableChatId}`
         );
       }
-      await sendMessage({ text });
+      if (attachments.length > 0) {
+        const parts: ChatMessagePart[] = [];
+        if (text.length > 0) {
+          parts.push({ type: "text", text });
+        }
+        for (const attachment of attachments) {
+          parts.push({
+            type: "file",
+            url: attachment.url,
+            mediaType: attachment.mediaType,
+            filename: attachment.filename,
+          });
+        }
+        await sendMessage({ role: "user", parts });
+      } else {
+        await sendMessage({ text });
+      }
       if (isFirstMessage) {
         queryClient.invalidateQueries({
           queryKey: ["chat-sessions", organizationId],
@@ -760,6 +783,43 @@ function StandaloneChatPageClient({
         <MessageResponse key={`${messageId}-text-${index}`}>
           {text}
         </MessageResponse>
+      );
+    }
+
+    if (part.type === "file") {
+      const url = typeof part.url === "string" ? part.url : "";
+      const mediaType =
+        typeof part.mediaType === "string" ? part.mediaType : "";
+      const filename =
+        typeof part.filename === "string" ? part.filename : undefined;
+      if (!url) {
+        return null;
+      }
+      const fileKey = `${messageId}-file-${index}`;
+      if (mediaType.startsWith("image/")) {
+        return (
+          <Image
+            alt={filename ?? "attachment"}
+            className="my-1 h-auto max-h-72 w-auto max-w-full rounded-lg border border-border object-cover"
+            height={400}
+            key={fileKey}
+            src={url}
+            width={600}
+          />
+        );
+      }
+      return (
+        <a
+          className="my-1 inline-flex max-w-full items-center gap-2 rounded-md border border-border bg-muted/40 px-2.5 py-1.5 text-foreground text-xs no-underline transition-colors hover:bg-accent"
+          href={url}
+          key={fileKey}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <span className="truncate">
+            {filename ?? mediaType ?? "Attachment"}
+          </span>
+        </a>
       );
     }
 

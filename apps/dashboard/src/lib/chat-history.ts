@@ -598,6 +598,7 @@ function getFirstUserMessage(messages: UIMessage[]): string | null {
       continue;
     }
 
+    const fileNames: string[] = [];
     for (const part of message.parts) {
       if (part.type === "text") {
         const normalized = part.text.replace(/\s+/g, " ").trim();
@@ -605,6 +606,21 @@ function getFirstUserMessage(messages: UIMessage[]): string | null {
           return normalized;
         }
       }
+      if (part.type === "file") {
+        const filename =
+          typeof part.filename === "string" ? part.filename.trim() : "";
+        if (filename) {
+          fileNames.push(filename);
+        }
+      }
+    }
+
+    if (fileNames.length === 1) {
+      return fileNames[0] ?? null;
+    }
+
+    if (fileNames.length > 1) {
+      return `${fileNames[0]} +${fileNames.length - 1} more`;
     }
   }
 
@@ -625,9 +641,13 @@ function getChatTitle(messages: UIMessage[]) {
 export async function generateAndSetChatTitle(
   organizationId: string,
   chatId: string,
-  userMessage: string
+  firstUserMessage: UIMessage
 ) {
   try {
+    const userMessage = getFirstUserMessage([firstUserMessage]);
+    if (!userMessage) {
+      return;
+    }
     const fallbackTitle = getFallbackTitle(userMessage);
 
     const { text } = await generateText({
