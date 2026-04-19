@@ -26,6 +26,7 @@ import type {
   PostToolsConfig,
   PostToolsResult,
 } from "@notra/ai/types/post-tools";
+import { addAnthropicPromptCaching } from "@notra/ai/utils/prompt-caching";
 import { stepCountIs, ToolLoopAgent } from "ai";
 
 const twitterPromptByTone: Record<ToneProfile, () => string> = {
@@ -34,6 +35,7 @@ const twitterPromptByTone: Record<ToneProfile, () => string> = {
   Casual: getCasualTwitterPrompt,
   Formal: getFormalTwitterPrompt,
 };
+const TWITTER_MODEL = "anthropic/claude-haiku-4.5";
 
 export async function generateTwitterPost(
   options: TwitterAgentOptions
@@ -64,12 +66,7 @@ export async function generateTwitterPost(
     );
   }
 
-  const model = createModel(
-    organizationId,
-    "anthropic/claude-haiku-4.5",
-    undefined,
-    log
-  );
+  const model = createModel(organizationId, TWITTER_MODEL, undefined, log);
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
@@ -96,6 +93,9 @@ export async function generateTwitterPost(
 
   const agent = new ToolLoopAgent({
     model,
+    prepareStep: ({ messages }) => ({
+      messages: addAnthropicPromptCaching(messages, TWITTER_MODEL),
+    }),
     providerOptions: {
       anthropic: {
         thinking: { type: "enabled", budgetTokens: 4096 },

@@ -23,6 +23,7 @@ import type {
   PostToolsConfig,
   PostToolsResult,
 } from "@notra/ai/types/post-tools";
+import { addAnthropicPromptCaching } from "@notra/ai/utils/prompt-caching";
 import { stepCountIs, ToolLoopAgent } from "ai";
 
 const linkedInPromptByTone: Record<ToneProfile, () => string> = {
@@ -31,6 +32,7 @@ const linkedInPromptByTone: Record<ToneProfile, () => string> = {
   Casual: getCasualLinkedInPrompt,
   Formal: getFormalLinkedInPrompt,
 };
+const LINKEDIN_MODEL = "anthropic/claude-haiku-4.5";
 
 export async function generateLinkedInPost(
   options: LinkedInAgentOptions
@@ -61,12 +63,7 @@ export async function generateLinkedInPost(
     );
   }
 
-  const model = createModel(
-    organizationId,
-    "anthropic/claude-haiku-4.5",
-    undefined,
-    log
-  );
+  const model = createModel(organizationId, LINKEDIN_MODEL, undefined, log);
 
   const resolvedTone = getValidToneProfile(tone, "Conversational");
 
@@ -93,6 +90,9 @@ export async function generateLinkedInPost(
 
   const agent = new ToolLoopAgent({
     model,
+    prepareStep: ({ messages }) => ({
+      messages: addAnthropicPromptCaching(messages, LINKEDIN_MODEL),
+    }),
     providerOptions: {
       anthropic: {
         thinking: { type: "enabled", budgetTokens: 4096 },

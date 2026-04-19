@@ -22,6 +22,7 @@ import {
   stepCountIs,
   streamText,
 } from "ai";
+import { addAnthropicPromptCaching } from "../utils/prompt-caching";
 import {
   hasEnabledGitHubIntegration,
   hasEnabledLinearIntegration,
@@ -119,6 +120,9 @@ export async function orchestrateStandaloneChat(
     stopWhen: stepCountIs(maxSteps),
     experimental_transform: smoothStream(),
     providerOptions,
+    prepareStep: ({ messages: stepMessages }) => ({
+      messages: addAnthropicPromptCaching(stepMessages, routingDecision.model),
+    }),
     abortSignal,
     onChunk({ chunk }) {
       if (firstChunkFired) {
