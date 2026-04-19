@@ -39,6 +39,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@notra/ui/components/ui/sidebar";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
@@ -62,6 +63,8 @@ export function ChatHistoryNav() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const aiChatExperiment = useAiChatExperiment();
+  const { state: sidebarState, isMobile } = useSidebar();
+  const isCollapsed = sidebarState === "collapsed" && !isMobile;
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
@@ -349,10 +352,12 @@ export function ChatHistoryNav() {
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <div className="flex-1 overflow-y-auto">
-        {renderSessions("Pinned", pinnedSessions)}
-        {renderSessions("Recents", recentSessions)}
-      </div>
+      {!isCollapsed && (
+        <div className="flex-1 overflow-y-auto">
+          {renderSessions("Pinned", pinnedSessions)}
+          {renderSessions("Recents", recentSessions)}
+        </div>
+      )}
 
       <ResponsiveAlertDialog
         onOpenChange={(open) => {
