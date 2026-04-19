@@ -209,6 +209,14 @@ function hasPendingApproval(messages: readonly ChatUIMessage[]): boolean {
   return false;
 }
 
+function isTerminalToolState(state: string): boolean {
+  return (
+    state === "output-available" ||
+    state === "output-error" ||
+    state === "output-denied"
+  );
+}
+
 function StandaloneChatPageClient({
   organizationSlug,
   chatId: initialChatId,
@@ -358,6 +366,8 @@ function StandaloneChatPageClient({
   }, []);
 
   const [wasStoppedByUser, setWasStoppedByUser] = useState(false);
+  const wasStoppedByUserRef = useRef(wasStoppedByUser);
+  wasStoppedByUserRef.current = wasStoppedByUser;
 
   const drainQueueRef = useRef<() => void>(() => {
     // Populated after dispatchMessage is defined below.
@@ -369,6 +379,7 @@ function StandaloneChatPageClient({
     queryClient.invalidateQueries({
       queryKey: ["chat-sessions", organizationId],
     });
+    isDrainingRef.current = false;
     drainQueueRef.current();
   }, [organizationId, queryClient]);
 
@@ -808,6 +819,9 @@ function StandaloneChatPageClient({
   const prevIsLoadingRef = useRef(false);
 
   drainQueueRef.current = () => {
+    if (isDrainingRef.current) {
+      return;
+    }
     if (wasStoppedByUserRef.current) {
       return;
     }
@@ -819,8 +833,14 @@ function StandaloneChatPageClient({
     if (!next) {
       return;
     }
+
+    isDrainingRef.current = true;
     setQueuedMessages(queue.slice(1));
-    dispatchMessage(next.text);
+    dispatchMessage(next.text).catch((error) => {
+      console.error("[Chat] Failed to drain queued message:", error);
+      isDrainingRef.current = false;
+      setQueuedMessages((prev) => [next, ...prev]);
+    });
   };
 
   useEffect(() => {
@@ -831,7 +851,7 @@ function StandaloneChatPageClient({
           continue;
         }
         for (const part of message.parts) {
-          if (isToolUIPart(part) && part.state === "output-available") {
+          if (isToolUIPart(part) && isTerminalToolState(part.state)) {
             snapshot.add(part.toolCallId);
           }
         }
@@ -867,7 +887,7 @@ function StandaloneChatPageClient({
       for (const part of message.parts) {
         if (
           isToolUIPart(part) &&
-          part.state === "output-available" &&
+          isTerminalToolState(part.state) &&
           !seenToolOutputsRef.current.has(part.toolCallId)
         ) {
           seenToolOutputsRef.current.add(part.toolCallId);
@@ -880,25 +900,11 @@ function StandaloneChatPageClient({
       return;
     }
 
-    const next = queuedMessagesRef.current[0];
-    if (!next) {
-      return;
-    }
-
     isDrainingRef.current = true;
-    setQueuedMessages((prev) => prev.slice(1));
 
-    const drainQueuedMessage = async () => {
-      try {
-        await stopActiveResponse();
-      } catch {
-        // Stream already closed; proceed to dispatch.
-      }
-      await dispatchMessage(next.text);
-    };
-
-    drainQueuedMessage().catch((error) => {
-      console.error("[Chat] Failed to drain queued message:", error);
+    stopActiveResponse().catch((error) => {
+      console.error("[Chat] Failed to stop active response for queue drain:", error);
+      isDrainingRef.current = false;
     });
   }, [
     isLoading,
@@ -906,7 +912,6 @@ function StandaloneChatPageClient({
     queuedMessages.length,
     wasStoppedByUser,
     stopActiveResponse,
-    dispatchMessage,
   ]);
 
   const messageCount = messages.length;
