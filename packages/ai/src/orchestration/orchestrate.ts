@@ -70,10 +70,12 @@ export async function orchestrateChat(
   const hasIntegrationContext = hasGitHub || hasLinear;
 
   const lastUserMessage = getLastUserMessage(messages);
+  const hasAttachments = lastUserMessageHasNonTextParts(messages);
   const routingDecision = await routeAndSelectModel(
     lastUserMessage,
     hasIntegrationContext,
-    log
+    log,
+    hasAttachments
   );
 
   const isSimpleNoTools =
@@ -152,8 +154,10 @@ const SIMPLE_CHAT_HISTORY_LIMIT = 6;
 
 function trimMessagesForSimpleChat(messages: UIMessage[]): UIMessage[] {
   const recent = messages.slice(-SIMPLE_CHAT_HISTORY_LIMIT);
-  return recent.map((message) => {
-    if (!Array.isArray(message.parts)) {
+  // Keep the latest message intact so user-submitted attachments still reach
+  // the model; only historical turns get stripped to text.
+  return recent.map((message, index) => {
+    if (!Array.isArray(message.parts) || index === recent.length - 1) {
       return message;
     }
     const textParts = message.parts.filter((part) => part.type === "text");
@@ -162,6 +166,20 @@ function trimMessagesForSimpleChat(messages: UIMessage[]): UIMessage[] {
     }
     return { ...message, parts: textParts };
   });
+}
+
+function lastUserMessageHasNonTextParts(messages: UIMessage[]): boolean {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    if (!message || message.role !== "user") {
+      continue;
+    }
+    if (!Array.isArray(message.parts)) {
+      return false;
+    }
+    return message.parts.some((part) => part.type !== "text");
+  }
+  return false;
 }
 
 function getLastUserMessage(messages: UIMessage[]): string {

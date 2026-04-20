@@ -1,6 +1,11 @@
 import { ANTHROPIC_PROMPT_CACHING_OPTIONS } from "@notra/ai/constants/prompt-caching";
 import type { ModelMessage } from "ai";
 
+// Put the cache breakpoint on the latest user message. The actual "last
+// message" flips between user/assistant/tool across multi-step generations,
+// so caching there invalidates the prefix every step. The last user turn is
+// a stable anchor — everything before it (system, tools, prior turns) gets
+// reused from cache on subsequent steps within the same request.
 export function addAnthropicPromptCaching(
   messages: ModelMessage[],
   modelId: string
@@ -9,8 +14,19 @@ export function addAnthropicPromptCaching(
     return messages;
   }
 
+  let lastUserIndex = -1;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i]?.role === "user") {
+      lastUserIndex = i;
+      break;
+    }
+  }
+  if (lastUserIndex === -1) {
+    return messages;
+  }
+
   return messages.map((message, index) => {
-    if (index !== messages.length - 1) {
+    if (index !== lastUserIndex) {
       return message;
     }
 

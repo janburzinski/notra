@@ -69,7 +69,12 @@ export async function orchestrateStandaloneChat(
   const hasLinear = hasEnabledLinearIntegration(validatedIntegrations);
 
   const lastUserMessage = getLastUserMessage(messages);
-  const isTrivial = isTrivialMessage(lastUserMessage);
+  // Never short-circuit when the user attached files — the fast path strips
+  // tools and trims history, which would drop image/file parts and force a
+  // blind reply to "ok" + image.
+  const hasNonTextPartsOnLatestTurn = lastUserMessageHasNonTextParts(messages);
+  const isTrivial =
+    !hasNonTextPartsOnLatestTurn && isTrivialMessage(lastUserMessage);
 
   const selectedModel = requestedModel ?? DEFAULT_STANDALONE_CHAT_MODEL;
 
@@ -177,6 +182,20 @@ export async function orchestrateStandaloneChat(
   return { stream, routingDecision };
 }
 
+function lastUserMessageHasNonTextParts(messages: UIMessage[]): boolean {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    if (!message || message.role !== "user") {
+      continue;
+    }
+    if (!Array.isArray(message.parts)) {
+      return false;
+    }
+    return message.parts.some((part) => part.type !== "text");
+  }
+  return false;
+}
+
 function getLastUserMessage(messages: UIMessage[]): string {
   for (let i = messages.length - 1; i >= 0; i--) {
     const message = messages[i];
@@ -198,8 +217,10 @@ function getLastUserMessage(messages: UIMessage[]): string {
 
 function trimTrivialHistory(messages: UIMessage[]): UIMessage[] {
   const recent = messages.slice(-TRIVIAL_HISTORY_LIMIT);
-  return recent.map((message) => {
-    if (!Array.isArray(message.parts)) {
+  // Keep the latest message intact so user-submitted attachments still reach
+  // the model; only historical turns get stripped to text.
+  return recent.map((message, index) => {
+    if (!Array.isArray(message.parts) || index === recent.length - 1) {
       return message;
     }
     const textParts = message.parts.filter((part) => part.type === "text");
