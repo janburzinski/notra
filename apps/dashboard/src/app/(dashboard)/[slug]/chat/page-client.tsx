@@ -87,7 +87,7 @@ const BRAILLE_THINKING_LABEL = "\u2820\u281d\u2815\u281e\u2817\u2801";
 const THINKING_LABEL = "Thinking";
 const REASONING_AUTO_CLOSE_DELAY_MS = 1000;
 const REASONING_CONTENT_CLASSNAME =
-  "mt-4 outline-none text-sm text-muted-foreground data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:animate-in data-[state=open]:slide-in-from-top-2";
+  "h-[var(--collapsible-panel-height)] overflow-hidden text-sm text-muted-foreground outline-none transition-[height,opacity] duration-300 ease-out data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0";
 
 function formatReasoningDurationLabel(durationSeconds: number | null): string {
   if (!durationSeconds || durationSeconds <= 1) {
@@ -163,10 +163,12 @@ function ChatReasoningBlock({
         />
       </CollapsibleTrigger>
       <CollapsibleContent className={REASONING_CONTENT_CLASSNAME}>
-        <MessageResponse className="text-muted-foreground text-sm [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-          {children}
-        </MessageResponse>
-        <div className="h-3" />
+        <div className="pt-4">
+          <MessageResponse className="text-muted-foreground text-sm [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+            {children}
+          </MessageResponse>
+          <div className="h-3" />
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );
@@ -396,7 +398,7 @@ function StandaloneChatPageClient({
   } = useChat<ChatUIMessage>({
     id: stableChatId,
     resume: Boolean(initialChatId && pendingMessageId),
-    experimental_throttle: 50,
+    experimental_throttle: 90,
     transport,
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onFinish: handleFinish,
@@ -407,6 +409,32 @@ function StandaloneChatPageClient({
 
   useEffect(() => {
     setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    const idle =
+      typeof window !== "undefined" &&
+      "requestIdleCallback" in window &&
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback
+        : (cb: () => void) => window.setTimeout(cb, 1);
+    const handle = idle(() => {
+      void import("@/components/ai/blog-changelog-preview");
+      void import("@/components/ai/twitter-preview");
+      void import("@/components/ai/linkedin-preview");
+    });
+    return () => {
+      if (
+        typeof window !== "undefined" &&
+        "cancelIdleCallback" in window &&
+        typeof window.cancelIdleCallback === "function" &&
+        typeof handle === "number"
+      ) {
+        window.cancelIdleCallback(handle);
+      } else if (typeof handle === "number") {
+        window.clearTimeout(handle);
+      }
+    };
   }, []);
 
   const handleModelChange = useCallback((model: string) => {
@@ -940,6 +968,37 @@ function StandaloneChatPageClient({
     }
   }, [messageCount, lastPartCount]);
 
+  useEffect(() => {
+    function handleGlobalKeydown(event: KeyboardEvent) {
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+      if (event.key.length !== 1) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        const tagName = target.tagName;
+        if (
+          tagName === "INPUT" ||
+          tagName === "TEXTAREA" ||
+          tagName === "SELECT" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+      }
+
+      chatInputRef.current?.focus();
+    }
+
+    window.addEventListener("keydown", handleGlobalKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeydown);
+    };
+  }, []);
+
   const handleClearError = useCallback(() => setChatError(null), []);
 
   const contentAuthor = useMemo(
@@ -1129,7 +1188,7 @@ function StandaloneChatPageClient({
         <div className="flex-1 overflow-y-auto">
           <div className="relative flex min-h-full flex-col">
             <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
-              <div className="mx-auto mt-auto flex w-full max-w-2xl flex-col gap-6">
+              <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
                 <div className="flex justify-end">
                   <Skeleton className="h-10 w-48 rounded-2xl" />
                 </div>
@@ -1249,7 +1308,7 @@ function StandaloneChatPageClient({
           <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
             <div
               className={cn(
-                "mx-auto mt-auto flex w-full max-w-2xl flex-col gap-4",
+                "mx-auto flex w-full max-w-2xl flex-col gap-4",
                 isFirstMessageTransition && "chat-messages-fade-in"
               )}
             >
