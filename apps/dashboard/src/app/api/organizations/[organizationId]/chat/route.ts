@@ -486,6 +486,7 @@ async function createDirectStandaloneChatResponse({
             model: routingDecision.model,
             requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
+            requestedThinkingLevel: thinkingLevel,
             createdAt: streamStartedAt,
           };
         }
@@ -500,6 +501,7 @@ async function createDirectStandaloneChatResponse({
             model: routingDecision.model,
             requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
+            requestedThinkingLevel: thinkingLevel,
           });
         }
 

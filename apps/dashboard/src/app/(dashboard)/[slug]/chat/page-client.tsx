@@ -560,13 +560,20 @@ function StandaloneChatPageClient({
           }
         }
 
-        if (!thinkingLevelRestored && metadata.thinkingLevel) {
-          const parsedThinkingLevel = parseStoredThinkingLevel(
-            metadata.thinkingLevel
-          );
-          if (parsedThinkingLevel) {
-            setThinkingLevel(parsedThinkingLevel);
-            thinkingLevelRestored = true;
+        if (!thinkingLevelRestored) {
+          const thinkingLevelToRestore =
+            metadata.requestedThinkingLevel ??
+            (metadata.requestedModel && metadata.requestedModel !== "auto"
+              ? metadata.thinkingLevel
+              : undefined);
+
+          if (thinkingLevelToRestore) {
+            const parsedThinkingLevel =
+              parseStoredThinkingLevel(thinkingLevelToRestore);
+            if (parsedThinkingLevel) {
+              setThinkingLevel(parsedThinkingLevel);
+              thinkingLevelRestored = true;
+            }
           }
         }
       }

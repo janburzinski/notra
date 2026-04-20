@@ -106,16 +106,19 @@ export async function orchestrateStandaloneChat(
     thinkingLevel: autoThinkingLevel,
   };
 
+  const isSimpleNoTools =
+    routingDecision.complexity === "simple" && !routingDecision.requiresTools;
+
   const modelWithMemory = createModel(
     organizationId,
     routingDecision.model,
-    { disableMemory: isTrivial },
+    { disableMemory: isSimpleNoTools },
     log
   );
 
   const postResult: PostToolsResult = {};
 
-  const { tools, descriptions } = isTrivial
+  const { tools, descriptions } = isSimpleNoTools
     ? { tools: {}, descriptions: [] as string[] }
     : buildStandaloneToolSet(
         {
@@ -132,7 +135,7 @@ export async function orchestrateStandaloneChat(
   const repoContext = getRepoContextFromIntegrations(validatedIntegrations);
   const linearContext = getLinearContextFromIntegrations(validatedIntegrations);
 
-  const systemPrompt = isTrivial
+  const systemPrompt = isSimpleNoTools
     ? MINIMAL_STANDALONE_PROMPT
     : getStandaloneChatPrompt({
         repoContext,
@@ -147,7 +150,7 @@ export async function orchestrateStandaloneChat(
   const effectiveEnableThinking =
     enableThinking && (autoThinkingLevel ? autoThinkingLevel !== "off" : true);
 
-  const providerOptions = isTrivial
+  const providerOptions = isSimpleNoTools
     ? undefined
     : getThinkingProviderOptions(
         routingDecision.model,
@@ -155,7 +158,9 @@ export async function orchestrateStandaloneChat(
         effectiveThinkingLevel
       );
 
-  const messagesForModel = isTrivial ? trimTrivialHistory(messages) : messages;
+  const messagesForModel = isSimpleNoTools
+    ? trimTrivialHistory(messages)
+    : messages;
 
   let firstChunkFired = false;
   const stream = streamText({
@@ -165,7 +170,7 @@ export async function orchestrateStandaloneChat(
       ignoreIncompleteToolCalls: true,
     }),
     tools,
-    stopWhen: stepCountIs(isTrivial ? 1 : maxSteps),
+    stopWhen: stepCountIs(isSimpleNoTools ? 1 : maxSteps),
     experimental_transform: smoothStream(),
     providerOptions,
     prepareStep: ({ messages: stepMessages }) => ({

@@ -243,6 +243,7 @@ export const { POST } = serve<ChatWorkflowPayload>(async (context) => {
             model: routingDecision.model,
             requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
+            requestedThinkingLevel: thinkingLevel,
             createdAt: streamStartedAt,
           };
         }
@@ -257,6 +258,7 @@ export const { POST } = serve<ChatWorkflowPayload>(async (context) => {
             model: routingDecision.model,
             requestedModel: model ?? "auto",
             thinkingLevel: effectiveThinkingLevel,
+            requestedThinkingLevel: thinkingLevel,
           });
         }
 

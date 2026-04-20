@@ -50,4 +50,5 @@ export interface BuildChatFinishMetadataInput {
   model?: ChatModel | string;
   requestedModel?: ChatModel | string;
   thinkingLevel?: ThinkingLevel;
+  requestedThinkingLevel?: ThinkingLevel;
 }
