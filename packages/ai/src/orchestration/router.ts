@@ -17,6 +17,19 @@ const MODELS = {
   complex: "anthropic/claude-haiku-4.5",
 } as const;
 
+const AUTO_POOL = {
+  trivial: "anthropic/claude-haiku-4.5",
+  everyday: "anthropic/claude-sonnet-4.6",
+  deep: "anthropic/claude-opus-4.7",
+} as const;
+
+export type AutoThinkingLevel = "off" | "low" | "medium" | "high";
+
+export interface AutoSelection {
+  model: string;
+  thinkingLevel: AutoThinkingLevel;
+}
+
 const TRIVIAL_MESSAGE_PATTERNS = [
   /^(hi|hello|hey|yo|sup|hallo|moin|servus)\b[\s!.?]*$/i,
   /^(thanks?|thank you|thx|danke|ty)\b[\s!.?]*$/i,
@@ -45,8 +58,22 @@ function matchTrivialFastPath(
   return {
     complexity: "simple",
     requiresTools: false,
+    reasoningHeavy: false,
     reasoning: "Trivial greeting/acknowledgement — skipped router call",
   };
+}
+
+export function selectAutoModel(decision: RoutingDecision): AutoSelection {
+  if (decision.complexity === "simple" && !decision.requiresTools) {
+    return { model: AUTO_POOL.trivial, thinkingLevel: "off" };
+  }
+  if (decision.reasoningHeavy) {
+    return { model: AUTO_POOL.deep, thinkingLevel: "high" };
+  }
+  if (decision.complexity === "complex") {
+    return { model: AUTO_POOL.everyday, thinkingLevel: "medium" };
+  }
+  return { model: AUTO_POOL.everyday, thinkingLevel: "low" };
 }
 
 export async function routeMessage(

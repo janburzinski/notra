@@ -63,6 +63,7 @@ export type ContextItem = GitHubContextItem | LinearContextItem;
 export interface RoutingDecision {
   complexity: "simple" | "complex";
   requiresTools: boolean;
+  reasoningHeavy: boolean;
   reasoning: string;
 }
 
@@ -71,6 +72,7 @@ export interface RoutingResult {
   complexity: "simple" | "complex";
   requiresTools: boolean;
   reasoning: string;
+  thinkingLevel?: "off" | "low" | "medium" | "high";
 }
 
 export interface ToolSet {

@@ -29,6 +29,7 @@ import {
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Linear } from "@notra/ui/components/ui/svgs/linear";
+import { Notra } from "@notra/ui/components/ui/svgs/notra";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import {
@@ -67,6 +68,13 @@ import {
 } from "./integration-reference";
 
 const AVAILABLE_MODELS = [
+  {
+    id: "auto",
+    label: "Auto",
+    description: "Picks the best model for your message",
+    pricing: "Varies by selected model",
+    provider: "auto",
+  },
   {
     id: "anthropic/claude-opus-4.7",
     label: "Opus 4.7",
@@ -113,6 +121,9 @@ function ModelIcon({
         <OpenaiDark className={`${className ?? ""} hidden dark:block`} />
       </>
     );
+  }
+  if (provider === "auto") {
+    return <Notra className={className} />;
   }
   return <ClaudeAiIcon className={className} />;
 }

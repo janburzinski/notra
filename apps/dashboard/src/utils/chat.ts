@@ -11,6 +11,7 @@ export function buildChatFinishMetadata({
   partUsage,
   usageSnapshot,
   model,
+  requestedModel,
   thinkingLevel,
 }: BuildChatFinishMetadataInput) {
   const ttftMs =
@@ -30,6 +31,7 @@ export function buildChatFinishMetadata({
 
   return {
     model,
+    requestedModel,
     thinkingLevel,
     inputTokens,
     outputTokens,

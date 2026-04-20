@@ -549,11 +549,14 @@ function StandaloneChatPageClient({
           continue;
         }
 
-        if (!modelRestored && metadata.model) {
-          const parsedModel = parseStoredChatModel(metadata.model);
-          if (parsedModel) {
-            setSelectedModel(parsedModel);
-            modelRestored = true;
+        if (!modelRestored) {
+          const modelToRestore = metadata.requestedModel ?? metadata.model;
+          if (modelToRestore) {
+            const parsedModel = parseStoredChatModel(modelToRestore);
+            if (parsedModel) {
+              setSelectedModel(parsedModel);
+              modelRestored = true;
+            }
           }
         }
 
