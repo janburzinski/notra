@@ -5,7 +5,11 @@ import type {
   ResolveIntegrationContext,
   ResolveLinearIntegrationContext,
 } from "./agents";
-import type { IntegrationFetchers, OrchestrateResult } from "./orchestration";
+import type {
+  IntegrationFetchers,
+  OrchestrateResult,
+  ValidatedIntegration,
+} from "./orchestration";
 
 export interface StandaloneChatInput {
   organizationId: string;
@@ -21,6 +25,7 @@ export interface StandaloneChatInput {
 }
 
 export interface StandaloneChatDeps {
+  preValidatedIntegrations?: ValidatedIntegration[];
   integrationFetchers?: IntegrationFetchers;
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;

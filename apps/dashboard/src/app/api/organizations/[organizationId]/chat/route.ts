@@ -1,5 +1,6 @@
 import { orchestrateStandaloneChat } from "@notra/ai/orchestration/orchestrate-standalone";
 import type { StandaloneChatContextItem } from "@notra/ai/schemas/standalone-chat";
+import type { ValidatedIntegration } from "@notra/ai/types/orchestration";
 import type { UIMessage } from "ai";
 import { isTextUIPart } from "ai";
 import type { CheckResponse } from "autumn-js";
@@ -25,19 +26,12 @@ import {
   replaceChatHistory,
   setActiveChatStream,
 } from "@/lib/chat-history";
+import { getStandaloneChatIntegrations } from "@/lib/chat-integrations-cache";
 import { useLogger, withEvlog } from "@/lib/evlog";
 import { getWorkflowClient } from "@/lib/qstash";
 import { realtime } from "@/lib/realtime";
-import {
-  getGitHubIntegrationById,
-  getGitHubIntegrationsByOrganization,
-  getGitHubToolRepositoryContextByIntegrationId,
-} from "@/lib/services/github-integration";
-import {
-  getLinearIntegrationById,
-  getLinearIntegrationsByOrganization,
-  getLinearToolContextByIntegrationId,
-} from "@/lib/services/linear-integration";
+import { getGitHubToolRepositoryContextByIntegrationId } from "@/lib/services/github-integration";
+import { getLinearToolContextByIntegrationId } from "@/lib/services/linear-integration";
 import { getBaseUrl } from "@/lib/triggers/qstash";
 import { standaloneChatRequestSchema } from "@/schemas/chat";
 import type { ChatUsageSnapshot } from "@/types/chat";
@@ -135,9 +129,11 @@ export const POST = withEvlog(async function POST(
     const chatId = parseResult.data.chatId ?? generateChatId();
     cleanupOrganizationId = organizationId;
     cleanupChatId = chatId;
+    const validatedIntegrations =
+      await getStandaloneChatIntegrations(organizationId);
     const context =
       parseResult.data.context ??
-      (await loadDefaultStandaloneChatContext(organizationId));
+      deriveContextFromValidatedIntegrations(validatedIntegrations);
 
     if (!messages.length) {
       return NextResponse.json(
@@ -183,6 +179,7 @@ export const POST = withEvlog(async function POST(
         chatId,
         messages,
         context,
+        validatedIntegrations,
         useMarkup,
         requestId,
         log,
@@ -274,49 +271,37 @@ function canUseUpstashWorkflowStreaming() {
   }
 }
 
-async function loadDefaultStandaloneChatContext(
-  organizationId: string
-): Promise<StandaloneChatContextItem[]> {
-  const [githubIntegrations, linearIntegrations] = await Promise.all([
-    getGitHubIntegrationsByOrganization(organizationId),
-    getLinearIntegrationsByOrganization(organizationId),
-  ]);
-
-  const githubContext = githubIntegrations.flatMap((integration) => {
-    if (!integration.enabled) {
-      return [];
-    }
-
-    return integration.repositories
-      .filter(
-        (repository) =>
+function deriveContextFromValidatedIntegrations(
+  validatedIntegrations: ValidatedIntegration[]
+): StandaloneChatContextItem[] {
+  const items: StandaloneChatContextItem[] = [];
+  for (const integration of validatedIntegrations) {
+    if (integration.type === "github") {
+      for (const repository of integration.repositories) {
+        if (
           repository.enabled &&
           typeof repository.owner === "string" &&
           repository.owner.length > 0 &&
           typeof repository.repo === "string" &&
           repository.repo.length > 0
-      )
-      .map(
-        (repository): StandaloneChatContextItem => ({
-          type: "github-repo",
-          integrationId: integration.id,
-          owner: repository.owner,
-          repo: repository.repo,
-        })
-      );
-  });
-
-  const linearContext = linearIntegrations
-    .filter((integration) => integration.enabled)
-    .map(
-      (integration): StandaloneChatContextItem => ({
+        ) {
+          items.push({
+            type: "github-repo",
+            integrationId: integration.id,
+            owner: repository.owner,
+            repo: repository.repo,
+          });
+        }
+      }
+    } else if (integration.type === "linear") {
+      items.push({
         type: "linear-team",
         integrationId: integration.id,
         teamName: integration.linearTeamName ?? undefined,
-      })
-    );
-
-  return [...githubContext, ...linearContext];
+      });
+    }
+  }
+  return items;
 }
 
 async function createDirectStandaloneChatResponse({
@@ -324,6 +309,7 @@ async function createDirectStandaloneChatResponse({
   chatId,
   messages,
   context,
+  validatedIntegrations,
   useMarkup,
   requestId,
   log,
@@ -337,6 +323,7 @@ async function createDirectStandaloneChatResponse({
   chatId: string;
   messages: UIMessage[];
   context: StandaloneChatContextItem[];
+  validatedIntegrations: ValidatedIntegration[];
   useMarkup: boolean;
   requestId: string;
   log: ReturnType<typeof useLogger>;
@@ -404,14 +391,7 @@ async function createDirectStandaloneChatResponse({
         abortSignal: combinedAbortSignal,
       },
       {
-        integrationFetchers: {
-          getGitHubIntegrationById,
-          getLinearIntegrationById,
-          listGitHubIntegrationsByOrganization:
-            getGitHubIntegrationsByOrganization,
-          listLinearIntegrationsByOrganization:
-            getLinearIntegrationsByOrganization,
-        },
+        preValidatedIntegrations: validatedIntegrations,
         resolveContext: getGitHubToolRepositoryContextByIntegrationId,
         resolveLinearContext: getLinearToolContextByIntegrationId,
         onFirstChunk() {

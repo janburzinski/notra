@@ -18,12 +18,18 @@ import type {
 } from "@notra/ai/types/standalone-chat";
 import {
   convertToModelMessages,
+  isToolUIPart,
+  type ModelMessage,
   smoothStream,
   stepCountIs,
   streamText,
   type UIMessage,
 } from "ai";
-import { addAnthropicPromptCaching } from "../utils/prompt-caching";
+import {
+  addAnthropicPromptCaching,
+  isAnthropicModel,
+  withCacheControl,
+} from "../utils/prompt-caching";
 import {
   hasEnabledGitHubIntegration,
   hasEnabledLinearIntegration,
@@ -59,11 +65,13 @@ export async function orchestrateStandaloneChat(
 
   const log = deps?.log ?? inputLog;
 
-  const validatedIntegrations = await validateStandaloneIntegrations(
-    organizationId,
-    context,
-    deps?.integrationFetchers
-  );
+  const validatedIntegrations =
+    deps?.preValidatedIntegrations ??
+    (await validateStandaloneIntegrations(
+      organizationId,
+      context,
+      deps?.integrationFetchers
+    ));
 
   const hasGitHub = hasEnabledGitHubIntegration(validatedIntegrations);
   const hasLinear = hasEnabledLinearIntegration(validatedIntegrations);
@@ -129,22 +137,36 @@ export async function orchestrateStandaloneChat(
         thinkingLevel
       );
 
-  const messagesForModel = isTrivial ? trimTrivialHistory(messages) : messages;
+  const messagesForModel = stripIncompleteToolParts(
+    isTrivial ? trimTrivialHistory(messages) : messages
+  );
+
+  const convertedMessages = await convertToModelMessages(messagesForModel, {
+    ignoreIncompleteToolCalls: true,
+  });
+
+  const useAnthropicCaching = isAnthropicModel(routingDecision.model);
+  const systemMessage: ModelMessage = {
+    role: "system",
+    content: systemPrompt,
+  };
+  const messagesWithSystem: ModelMessage[] = [
+    useAnthropicCaching ? withCacheControl(systemMessage) : systemMessage,
+    ...convertedMessages,
+  ];
+  const cachedMessages = addAnthropicPromptCaching(
+    messagesWithSystem,
+    routingDecision.model
+  );
 
   let firstChunkFired = false;
   const stream = streamText({
     model: modelWithMemory,
-    system: systemPrompt,
-    messages: await convertToModelMessages(messagesForModel, {
-      ignoreIncompleteToolCalls: true,
-    }),
+    messages: cachedMessages,
     tools,
     stopWhen: stepCountIs(isTrivial ? 1 : maxSteps),
     experimental_transform: smoothStream(),
     providerOptions,
-    prepareStep: ({ messages: stepMessages }) => ({
-      messages: addAnthropicPromptCaching(stepMessages, routingDecision.model),
-    }),
     abortSignal,
     onChunk({ chunk }) {
       if (firstChunkFired) {
@@ -194,6 +216,48 @@ function getLastUserMessage(messages: UIMessage[]): string {
     }
   }
   return "";
+}
+
+const TERMINAL_TOOL_STATES = new Set([
+  "output-available",
+  "output-error",
+  "output-denied",
+]);
+
+const STRIP_TAIL_SCAN_DEPTH = 2;
+
+function stripIncompleteToolParts(messages: UIMessage[]): UIMessage[] {
+  const scanFrom = Math.max(0, messages.length - STRIP_TAIL_SCAN_DEPTH);
+  let hasIncomplete = false;
+  for (let index = scanFrom; index < messages.length; index += 1) {
+    const message = messages[index];
+    if (!(message && Array.isArray(message.parts))) {
+      continue;
+    }
+    if (
+      message.parts.some(
+        (part) => isToolUIPart(part) && !TERMINAL_TOOL_STATES.has(part.state)
+      )
+    ) {
+      hasIncomplete = true;
+      break;
+    }
+  }
+  if (!hasIncomplete) {
+    return messages;
+  }
+  return messages.map((message, index) => {
+    if (index < scanFrom || !Array.isArray(message.parts)) {
+      return message;
+    }
+    const filtered = message.parts.filter(
+      (part) => !isToolUIPart(part) || TERMINAL_TOOL_STATES.has(part.state)
+    );
+    if (filtered.length === message.parts.length) {
+      return message;
+    }
+    return { ...message, parts: filtered };
+  });
 }
 
 function trimTrivialHistory(messages: UIMessage[]): UIMessage[] {
