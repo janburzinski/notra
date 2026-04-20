@@ -568,8 +568,9 @@ function StandaloneChatPageClient({
               : undefined);
 
           if (thinkingLevelToRestore) {
-            const parsedThinkingLevel =
-              parseStoredThinkingLevel(thinkingLevelToRestore);
+            const parsedThinkingLevel = parseStoredThinkingLevel(
+              thinkingLevelToRestore
+            );
             if (parsedThinkingLevel) {
               setThinkingLevel(parsedThinkingLevel);
               thinkingLevelRestored = true;

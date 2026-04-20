@@ -6,6 +6,7 @@ import {
 import { ROUTING_PROMPT } from "@notra/ai/prompts/router";
 import { routingDecisionSchema } from "@notra/ai/schemas/orchestration";
 import type {
+  AutoSelection,
   RoutingDecision,
   RoutingResult,
 } from "@notra/ai/types/orchestration";
@@ -22,13 +23,6 @@ const AUTO_POOL = {
   everyday: "anthropic/claude-sonnet-4.6",
   deep: "anthropic/claude-opus-4.7",
 } as const;
-
-export type AutoThinkingLevel = "off" | "low" | "medium" | "high";
-
-export interface AutoSelection {
-  model: string;
-  thinkingLevel: AutoThinkingLevel;
-}
 
 const TRIVIAL_MESSAGE_PATTERNS = [
   /^(hi|hello|hey|yo|sup|hallo|moin|servus)\b[\s!.?]*$/i,

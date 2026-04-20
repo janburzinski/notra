@@ -67,12 +67,19 @@ export interface RoutingDecision {
   reasoning: string;
 }
 
+export type AutoThinkingLevel = "off" | "low" | "medium" | "high";
+
+export interface AutoSelection {
+  model: string;
+  thinkingLevel: AutoThinkingLevel;
+}
+
 export interface RoutingResult {
   model: string;
   complexity: "simple" | "complex";
   requiresTools: boolean;
   reasoning: string;
-  thinkingLevel?: "off" | "low" | "medium" | "high";
+  thinkingLevel?: AutoThinkingLevel;
 }
 
 export interface ToolSet {

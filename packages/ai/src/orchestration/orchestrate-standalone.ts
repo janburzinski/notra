@@ -6,6 +6,7 @@ import {
   createViewPostTool,
 } from "@notra/ai/tools/post";
 import type {
+  AutoThinkingLevel,
   IntegrationFetchers,
   ValidatedIntegration,
 } from "@notra/ai/types/orchestration";
@@ -72,7 +73,7 @@ export async function orchestrateStandaloneChat(
   const isAuto = requestedModel === undefined || requestedModel === "auto";
 
   let selectedModel: string;
-  let autoThinkingLevel: "off" | "low" | "medium" | "high" | undefined;
+  let autoThinkingLevel: AutoThinkingLevel | undefined;
   let decisionReasoning: string;
   let decisionComplexity: "simple" | "complex" = isTrivial
     ? "simple"
