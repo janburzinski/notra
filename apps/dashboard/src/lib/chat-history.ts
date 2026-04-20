@@ -699,6 +699,15 @@ function getChatTitle(messages: UIMessage[]) {
   return text ? getFallbackTitle(text) : null;
 }
 
+function firstUserMessageHasText(message: UIMessage): boolean {
+  if (message.role !== "user" || !Array.isArray(message.parts)) {
+    return false;
+  }
+  return message.parts.some(
+    (part) => part.type === "text" && part.text.trim().length > 0
+  );
+}
+
 export async function generateAndSetChatTitle(
   organizationId: string,
   chatId: string,
@@ -710,6 +719,21 @@ export async function generateAndSetChatTitle(
       return;
     }
     const fallbackTitle = getFallbackTitle(userMessage);
+
+    // Skip the LLM call when the only thing we have is a filename — the
+    // generated title won't be meaningfully better than the filename itself.
+    if (!firstUserMessageHasText(firstUserMessage)) {
+      await updateExistingChatSessionMetadata(
+        organizationId,
+        chatId,
+        (session) => ({
+          ...session,
+          title: normalizeChatTitle(fallbackTitle),
+          updatedAt: new Date().toISOString(),
+        })
+      );
+      return;
+    }
 
     const { text } = await generateText({
       model: gateway("openai/gpt-5.4"),

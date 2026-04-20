@@ -22,10 +22,10 @@ function TextPreview({ url }: { url: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
     setContent(null);
     setError(null);
-    fetch(url)
+    fetch(url, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
           throw new Error(`Failed to load (${response.status})`);
@@ -33,17 +33,18 @@ function TextPreview({ url }: { url: string }) {
         return response.text();
       })
       .then((text) => {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setContent(text);
         }
       })
       .catch((err: unknown) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load file");
+        if (controller.signal.aborted) {
+          return;
         }
+        setError(err instanceof Error ? err.message : "Failed to load file");
       });
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [url]);
 
@@ -121,6 +122,8 @@ export function AttachmentPreviewDialog({
           {isPdfMimeType(attachment.mediaType) && (
             <iframe
               className="h-full w-full"
+              referrerPolicy="no-referrer"
+              sandbox=""
               src={attachment.url}
               title={attachment.filename}
             />

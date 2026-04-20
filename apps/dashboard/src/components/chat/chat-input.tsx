@@ -332,6 +332,7 @@ export function ChatInputAdvanced({
   pendingUploadsRef.current = pendingUploads;
   const completedUploadsRef = useRef(new Map<string, ChatAttachment>());
   const isMountedRef = useRef(true);
+  const submittedKeysRef = useRef<Set<string>>(new Set());
 
   const allowedChatMimeTypes = useMemo(
     () => getAllowedChatMimeTypes(model),
@@ -435,7 +436,7 @@ export function ChatInputAdvanced({
       }
 
       const placeholders = accepted.map((file) => ({
-        id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
+        id: crypto.randomUUID(),
         filename: file.name,
       }));
       updatePendingUploads([...pendingUploadsRef.current, ...placeholders]);
@@ -472,9 +473,10 @@ export function ChatInputAdvanced({
             const message =
               err instanceof Error ? err.message : "Upload failed";
             toast.error(`Failed to upload ${file.name}: ${message}`);
-            if (isMountedRef.current) {
-              setPendingSend(null);
-            }
+            // Do NOT null pendingSend here. The drain effect (keyed on
+            // isUploading reaching 0) surfaces a user-facing "Some attachments
+            // failed to upload" error when it detects missing completions.
+            // Nulling here would silently drop the queued message.
             return false;
           } finally {
             updatePendingUploads(
@@ -506,7 +508,12 @@ export function ChatInputAdvanced({
     return () => {
       isMountedRef.current = false;
 
+      // Never GC attachments that were already submitted — the chat history
+      // references those URLs and needs them to persist server-side.
       for (const attachment of attachmentsRef.current) {
+        if (submittedKeysRef.current.has(attachment.key)) {
+          continue;
+        }
         cleanupChatUpload(attachment.key).catch(() => undefined);
       }
     };
@@ -1010,6 +1017,7 @@ export function ChatInputAdvanced({
     setAttachments([]);
     attachmentsRef.current = [];
     setPendingSend(null);
+    completedUploadsRef.current.clear();
     for (const item of contextRef.current) {
       onRemoveContext?.(item);
     }
@@ -1046,6 +1054,9 @@ export function ChatInputAdvanced({
         }
       }
 
+      for (const attachment of snapshotAttachments) {
+        submittedKeysRef.current.add(attachment.key);
+      }
       onSend?.(value, snapshotAttachments);
       clearComposer();
       return true;
@@ -1161,6 +1172,9 @@ export function ChatInputAdvanced({
 
     if (resolvedAttachments.length !== pendingSend.pendingUploadIds.length) {
       setPendingSend(null);
+      setInternalError(
+        "Some attachments failed to upload. Please remove or retry them before sending."
+      );
       return;
     }
 
