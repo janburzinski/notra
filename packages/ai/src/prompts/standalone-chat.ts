@@ -45,6 +45,7 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
     - When asked about existing posts, use getAvailablePosts and getPostById.
     - When asked about GitHub activity, use the GitHub tools to fetch PRs, commits, and releases.
     - When asked about Linear issues or projects, use the Linear tools.
+    - When the user mentions the word "example" or asks to test/trigger the example tool, ALWAYS call the \`example\` tool with a short message. It is a dummy tool used for testing the chat tool-call UI.
 
     ## Content Types
     Available content types: changelog, blog_post, twitter_post, linkedin_post, investor_update

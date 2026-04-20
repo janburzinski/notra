@@ -1,4 +1,5 @@
 import { createMarkdownTools } from "@notra/ai/tools/edit-markdown";
+import { exampleTool } from "@notra/ai/tools/example";
 import {
   createGetCommitsByTimeframeTool,
   createGetPullRequestsTool,
@@ -58,11 +59,13 @@ export function buildToolSet(
     editMarkdown,
     listAvailableSkills: listAvailableSkills(),
     getSkillByName: getSkillByName(),
+    example: exampleTool(),
   };
 
   const descriptions: string[] = [
     "**Markdown Editing**: View and edit the document using getMarkdown and editMarkdown",
     "**Skills**: Access knowledge and writing guidelines using listAvailableSkills and getSkillByName",
+    "**Example (testing)**: A dummy tool triggered when the user says 'example' — echoes a message for UI testing",
   ];
 
   const hasGitHub = validatedIntegrations.some(

@@ -1,6 +1,7 @@
 import { createModel } from "@notra/ai/model";
 import { routeMessage, selectModel } from "@notra/ai/orchestration/router";
 import { createMarkdownTools } from "@notra/ai/tools/edit-markdown";
+import { exampleTool } from "@notra/ai/tools/example";
 import { getSkillByName, listAvailableSkills } from "@notra/ai/tools/skills";
 import type { ChatAgentContext } from "@notra/ai/types/agents";
 import { addAnthropicPromptCaching } from "@notra/ai/utils/prompt-caching";
@@ -44,6 +45,7 @@ export async function createChatAgent(
       editMarkdown,
       listAvailableSkills: listAvailableSkills(),
       getSkillByName: getSkillByName(),
+      example: exampleTool(),
     },
     instructions: `You are a content editor assistant. Help users edit their markdown documents.${brandContext}
 
@@ -67,6 +69,7 @@ export async function createChatAgent(
 - IMPORTANT: Do NOT output the content of your edits in text. Only use the editMarkdown tool. Keep text responses brief - just explain what you're doing, not the actual content.
 - When you are completely done with all edits, end with a final short message (1 sentence max) summarizing what you changed. This must be your last text output.
 - Never use em dashes (—) or en dashes (–) in any content. Use hyphens (-) or rewrite the sentence instead.
+- If the user mentions the word "example" (or explicitly asks to test/trigger the example tool), ALWAYS call the \`example\` tool with a short message. This is a dummy tool used for testing the UI.
 ${selectionContext}`,
     stopWhen: stepCountIs(15),
   });
