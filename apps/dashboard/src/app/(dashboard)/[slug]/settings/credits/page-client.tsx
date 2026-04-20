@@ -53,6 +53,7 @@ import {
   formatDollars,
   formatFullDate,
   formatShortDate,
+  formatSnakeCaseLabel,
   isCreditRange,
   usageBarColor,
 } from "@/utils/format";
@@ -64,6 +65,35 @@ const chartConfig = {
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
+
+function getCreditEventLabel(event: ListEventsRow) {
+  const properties =
+    typeof event.properties === "object" && event.properties !== null
+      ? event.properties
+      : null;
+
+  const outputType =
+    properties &&
+    "output_type" in properties &&
+    typeof properties.output_type === "string"
+      ? properties.output_type
+      : undefined;
+
+  if (outputType) {
+    return getOutputTypeLabel(outputType);
+  }
+
+  const source =
+    properties && "source" in properties && typeof properties.source === "string"
+      ? properties.source
+      : undefined;
+
+  if (source === "standalone_chat" || source === "chat") {
+    return "AI Chat";
+  }
+
+  return source ? formatSnakeCaseLabel(source) : "—";
+}
 
 function renderEventRows(events: ListEventsRow[] | undefined) {
   if (!events?.length) {
@@ -80,20 +110,12 @@ function renderEventRows(events: ListEventsRow[] | undefined) {
   }
 
   return events.map((event) => {
-    const outputType =
-      "output_type" in event.properties &&
-      typeof event.properties.output_type === "string"
-        ? event.properties.output_type
-        : undefined;
-
     return (
       <TableRow key={event.id}>
         <TableCell className="text-muted-foreground text-sm">
           {formatFullDate(event.timestamp)}
         </TableCell>
-        <TableCell className="text-sm">
-          {outputType ? getOutputTypeLabel(outputType) : "—"}
-        </TableCell>
+        <TableCell className="text-sm">{getCreditEventLabel(event)}</TableCell>
         <TableCell className="text-right font-medium text-sm tabular-nums">
           {formatDollars(event.value)}
         </TableCell>
