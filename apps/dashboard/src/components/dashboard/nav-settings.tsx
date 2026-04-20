@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Attachment02Icon,
   CreditCardIcon,
   Notification03Icon,
   Settings01Icon,
@@ -30,6 +31,11 @@ const accountItems: NavSettingsItem[] = [
     label: "Account",
     url: "settings/account",
     icon: UserCircleIcon,
+  },
+  {
+    label: "Attachments",
+    url: "settings/attachments",
+    icon: Attachment02Icon,
   },
 ];
 

@@ -1,10 +1,15 @@
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { db } from "@notra/db/drizzle";
-import { members } from "@notra/db/schema";
+import { chatAttachments, members } from "@notra/db/schema";
 import { ORPCError } from "@orpc/server";
 import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import {
+  ALLOWED_CHAT_MIME_TYPES,
+  type AllowedChatMimeType,
+  MAX_CHAT_FILE_SIZE,
+} from "@/constants/upload";
 import { assertAuthenticated } from "@/lib/auth/organization";
 import { validateUpload } from "@/schemas/upload";
 import type {
@@ -167,9 +172,18 @@ export async function deleteChatUpload({
     headers,
     type: "chat",
   });
-  const expectedPrefix = `user/${userId}/chat/`;
 
-  if (!key.startsWith(expectedPrefix)) {
+  // Delete DB row first, scoped by user. R2 only gets touched if the caller
+  // actually owned the row — avoids orphaned DB rows on R2 failure.
+  const deleted = await db
+    .delete(chatAttachments)
+    .where(
+      and(eq(chatAttachments.userId, userId), eq(chatAttachments.key, key))
+    )
+    .returning({ key: chatAttachments.key });
+
+  const expectedPrefix = `user/${userId}/chat/`;
+  if (deleted.length === 0 && !key.startsWith(expectedPrefix)) {
     throw new ORPCError("FORBIDDEN", {
       message: "You do not have access to this chat upload",
     });
@@ -182,6 +196,58 @@ export async function deleteChatUpload({
       Key: key,
     })
   );
+
+  return { success: true };
+}
+
+export async function recordChatAttachment({
+  key,
+  filename,
+  mediaType,
+  size,
+  headers,
+}: {
+  key: string;
+  filename: string;
+  mediaType: string;
+  size: number;
+  headers: Headers;
+}) {
+  const { userId } = await assertUploadAccess({
+    headers,
+    type: "chat",
+  });
+  const expectedPrefix = `user/${userId}/chat/`;
+
+  if (!key.startsWith(expectedPrefix)) {
+    throw new ORPCError("FORBIDDEN", {
+      message: "You do not have access to this chat upload",
+    });
+  }
+
+  if (!ALLOWED_CHAT_MIME_TYPES.includes(mediaType as AllowedChatMimeType)) {
+    throw new ORPCError("BAD_REQUEST", {
+      message: `Media type ${mediaType} is not allowed in chat`,
+    });
+  }
+
+  if (size > MAX_CHAT_FILE_SIZE) {
+    throw new ORPCError("BAD_REQUEST", {
+      message: `Attachment exceeds maximum size of ${MAX_CHAT_FILE_SIZE / 1024 / 1024}MB`,
+    });
+  }
+
+  await db
+    .insert(chatAttachments)
+    .values({
+      id: nanoid(),
+      userId,
+      key,
+      filename,
+      mediaType,
+      size,
+    })
+    .onConflictDoNothing({ target: chatAttachments.key });
 
   return { success: true };
 }

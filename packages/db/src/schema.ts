@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -37,7 +38,29 @@ export const users = pgTable("users", {
   banExpires: timestamp("ban_expires"),
   hidePersonalData: boolean("hide_personal_data").default(false).notNull(),
   showAgentStats: boolean("show_agent_stats").default(false).notNull(),
+  chatAttachmentRetentionDays: integer("chat_attachment_retention_days"),
 });
+
+export const chatAttachments = pgTable(
+  "chat_attachments",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    key: text("key").notNull().unique(),
+    filename: text("filename").notNull(),
+    mediaType: text("media_type").notNull(),
+    size: integer("size").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("chatAttachments_userId_createdAt_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+  ]
+);
 
 export const sessions = pgTable(
   "sessions",
@@ -494,7 +517,18 @@ export const usersRelations = relations(users, ({ many }) => ({
   invitations: many(invitations),
   githubIntegrations: many(githubIntegrations),
   linearIntegrations: many(linearIntegrations),
+  chatAttachments: many(chatAttachments),
 }));
+
+export const chatAttachmentsRelations = relations(
+  chatAttachments,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [chatAttachments.userId],
+      references: [users.id],
+    }),
+  })
+);
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   users: one(users, {

@@ -2,7 +2,11 @@ import { db } from "@notra/db/drizzle";
 import { members, organizations } from "@notra/db/schema";
 import { and, count, eq, ne } from "drizzle-orm";
 import { authorizedProcedure } from "@/lib/orpc/base";
-import { deleteOrganizationFiles, deleteUserFiles } from "@/lib/upload/cleanup";
+import {
+  deleteOrganizationChatFiles,
+  deleteOrganizationFiles,
+  deleteUserFiles,
+} from "@/lib/upload/cleanup";
 import {
   deleteWithTransfersSchema,
   organizationMembershipActionSchema,
@@ -187,12 +191,20 @@ export const userRouter = {
         });
 
         if (shouldCleanupDeletedOrganization) {
-          await deleteOrganizationFiles(input.organizationId).catch((error) => {
-            console.error(
-              `[Delete Org] Failed to cleanup R2 files for ${input.organizationId}:`,
-              error
-            );
-          });
+          await Promise.all([
+            deleteOrganizationFiles(input.organizationId).catch((error) => {
+              console.error(
+                `[Delete Org] Failed to cleanup R2 files for ${input.organizationId}:`,
+                error
+              );
+            }),
+            deleteOrganizationChatFiles(input.organizationId).catch((error) => {
+              console.error(
+                `[Delete Org] Failed to cleanup chat files for ${input.organizationId}:`,
+                error
+              );
+            }),
+          ]);
         }
 
         return result;
@@ -278,14 +290,20 @@ export const userRouter = {
       }
 
       await Promise.all(
-        organizationsToCleanup.map(async (orgId) => {
-          await deleteOrganizationFiles(orgId).catch((error) => {
+        organizationsToCleanup.flatMap((orgId) => [
+          deleteOrganizationFiles(orgId).catch((error) => {
             console.error(
               `[Delete Org] Failed to cleanup R2 files for ${orgId}:`,
               error
             );
-          });
-        })
+          }),
+          deleteOrganizationChatFiles(orgId).catch((error) => {
+            console.error(
+              `[Delete Org] Failed to cleanup chat files for ${orgId}:`,
+              error
+            );
+          }),
+        ])
       );
 
       await deleteUserFiles(context.user.id).catch((error) => {

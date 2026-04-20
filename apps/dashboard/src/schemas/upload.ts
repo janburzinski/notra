@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import z from "zod";
 import {
   ALLOWED_CHAT_MIME_TYPES,
@@ -69,7 +70,26 @@ export const uploadSchema = z.union([
 ]);
 
 export const deleteChatUploadSchema = z.object({
-  key: z.string().min(1),
+  key: z
+    .string()
+    .min(1)
+    .max(512)
+    .refine((value) => !value.includes("..") && !value.startsWith("/"), {
+      message: "Invalid object key",
+    }),
+});
+
+export const recordChatAttachmentSchema = z.object({
+  key: z
+    .string()
+    .min(1)
+    .max(512)
+    .refine((value) => !value.includes("..") && !value.startsWith("/"), {
+      message: "Invalid object key",
+    }),
+  filename: z.string().min(1).max(512),
+  mediaType: z.enum(ALLOWED_CHAT_MIME_TYPES),
+  size: z.coerce.number().int().positive().max(MAX_CHAT_FILE_SIZE),
 });
 
 const maxSizeByType = {
@@ -94,9 +114,9 @@ export function validateUpload({
 }) {
   const maxSize = maxSizeByType[type];
   if (fileSize > maxSize) {
-    throw new Error(
-      `File size exceeds the maximum limit of ${maxSize / 1024 / 1024}MB for ${type}.`
-    );
+    throw new ORPCError("BAD_REQUEST", {
+      message: `File size exceeds the maximum limit of ${maxSize / 1024 / 1024}MB for ${type}.`,
+    });
   }
 
   switch (type) {
@@ -105,26 +125,28 @@ export function validateUpload({
       if (
         !ALLOWED_RASTER_MIME_TYPES.includes(fileType as AllowedRasterMimeType)
       ) {
-        throw new Error(
-          `File type ${fileType} is not allowed for ${type}. Allowed raster types: ${ALLOWED_RASTER_MIME_TYPES.join(", ")}`
-        );
+        throw new ORPCError("BAD_REQUEST", {
+          message: `File type ${fileType} is not allowed for ${type}. Allowed raster types: ${ALLOWED_RASTER_MIME_TYPES.join(", ")}`,
+        });
       }
       break;
     case "content":
       if (!ALLOWED_MIME_TYPES.includes(fileType as AllowedMimeType)) {
-        throw new Error(
-          `File type ${fileType} is not allowed. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`
-        );
+        throw new ORPCError("BAD_REQUEST", {
+          message: `File type ${fileType} is not allowed. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`,
+        });
       }
       break;
     case "chat":
       if (!ALLOWED_CHAT_MIME_TYPES.includes(fileType as AllowedChatMimeType)) {
-        throw new Error(
-          `File type ${fileType} is not allowed in chat. Allowed types: ${ALLOWED_CHAT_MIME_TYPES.join(", ")}`
-        );
+        throw new ORPCError("BAD_REQUEST", {
+          message: `File type ${fileType} is not allowed in chat. Allowed types: ${ALLOWED_CHAT_MIME_TYPES.join(", ")}`,
+        });
       }
       break;
     default:
-      throw new Error("Invalid upload type.");
+      throw new ORPCError("BAD_REQUEST", {
+        message: "Invalid upload type.",
+      });
   }
 }

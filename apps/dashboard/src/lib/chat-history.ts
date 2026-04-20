@@ -553,6 +553,67 @@ export async function setChatSessionPinned(
   );
 }
 
+function collectFileUrlsFromMessages(messages: UIMessage[]): string[] {
+  const urls: string[] = [];
+  for (const message of messages) {
+    if (!Array.isArray(message.parts)) {
+      continue;
+    }
+    for (const part of message.parts) {
+      if (
+        part.type === "file" &&
+        typeof (part as { url?: unknown }).url === "string"
+      ) {
+        urls.push((part as { url: string }).url);
+      }
+    }
+  }
+  return urls;
+}
+
+export async function purgeOrganizationChatData(
+  organizationId: string
+): Promise<{ fileUrls: string[] }> {
+  if (!redis) {
+    return { fileUrls: [] };
+  }
+  const redisClient = redis;
+
+  const chatIds = await redisClient.zrange<string[]>(
+    sessionsKey(organizationId),
+    0,
+    -1
+  );
+
+  const fileUrls: string[] = [];
+
+  for (const chatId of chatIds) {
+    const raw = await redisClient.zrange<string[]>(
+      historyKey(organizationId, chatId),
+      0,
+      -1
+    );
+    const messages = raw.map((entry) =>
+      typeof entry === "string" ? JSON.parse(entry) : entry
+    ) as UIMessage[];
+
+    fileUrls.push(...collectFileUrlsFromMessages(messages));
+
+    await redisClient.del(
+      historyKey(organizationId, chatId),
+      sessionMetaKey(organizationId, chatId),
+      activeStreamKey(organizationId, chatId),
+      lastStoppedKey(organizationId, chatId),
+      chatStateVersionKey(organizationId, chatId),
+      deletedChatKey(organizationId, chatId)
+    );
+  }
+
+  await redisClient.del(sessionsKey(organizationId));
+
+  return { fileUrls };
+}
+
 export async function deleteChatSession(
   organizationId: string,
   chatId: string

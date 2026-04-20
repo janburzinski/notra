@@ -64,9 +64,9 @@ export function formatBytes(bytes: number): string {
     return `${bytes} B`;
   }
   if (bytes < 1024 * 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1024).toFixed(1)} KiB`;
   }
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MiB`;
 }
 
 export function truncateText(value: string, maxLength: number): string {

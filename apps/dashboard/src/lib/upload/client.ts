@@ -1,3 +1,7 @@
+import {
+  ALLOWED_CHAT_MIME_TYPES,
+  type AllowedChatMimeType,
+} from "@/constants/upload";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   DeleteChatUploadProps,
@@ -36,6 +40,23 @@ export async function uploadFile({
 }: UploadFileProps): Promise<UploadFileResponse> {
   const { url, key, publicUrl } = await getPresignedUrl(file, type);
   await uploadToR2(url, file);
+
+  if (
+    type === "chat" &&
+    ALLOWED_CHAT_MIME_TYPES.includes(file.type as AllowedChatMimeType)
+  ) {
+    try {
+      await dashboardOrpc.upload.recordChatAttachment.call({
+        key,
+        filename: file.name,
+        mediaType: file.type as AllowedChatMimeType,
+        size: file.size,
+      });
+    } catch {
+      // Best-effort; attachment will still work in the active chat.
+    }
+  }
+
   return { url: publicUrl, key };
 }
 
