@@ -21,7 +21,7 @@ import {
   isToolUIPart,
   lastAssistantMessageIsCompleteWithApprovalResponses,
 } from "ai";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { nanoid } from "nanoid";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
@@ -1464,67 +1464,35 @@ function StandaloneChatPageClient({
                       key={branchFadeKey}
                     >
                       {isUser ? (
-                        <AnimatePresence initial={false} mode="wait">
-                          {isEditing ? (
-                            <motion.div
-                              animate={{
-                                opacity: 1,
-                                filter: "blur(0px)",
-                                y: 0,
-                              }}
-                              className="ml-auto w-full"
-                              exit={{
-                                opacity: 0,
-                                filter: "blur(4px)",
-                                y: -2,
-                              }}
-                              initial={{
-                                opacity: 0,
-                                filter: "blur(4px)",
-                                y: 4,
-                              }}
-                              key="editor"
-                              transition={{ duration: 0.2, ease: "easeOut" }}
-                            >
-                              <UserMessageEditor
-                                initialText={toDisplayText(
-                                  extractUserMessageText(message)
-                                )}
-                                onCancel={handleCancelEditMessage}
-                                onSubmit={(text) =>
-                                  handleEditMessage(message.id, text)
-                                }
-                              />
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              animate={{
-                                opacity: 1,
-                                filter: "blur(0px)",
-                                y: 0,
-                              }}
-                              className="ml-auto flex w-fit max-w-full"
-                              exit={{
-                                opacity: 0,
-                                filter: "blur(4px)",
-                                y: -2,
-                              }}
-                              initial={{
-                                opacity: 0,
-                                filter: "blur(4px)",
-                                y: 4,
-                              }}
-                              key="content"
-                              transition={{ duration: 0.2, ease: "easeOut" }}
-                            >
-                              <MessageContent>
-                                {message.parts.map((part, index) =>
-                                  renderPart(part, message.id, index)
-                                )}
-                              </MessageContent>
-                            </motion.div>
+                        <motion.div
+                          className={cn(
+                            "ml-auto overflow-hidden",
+                            isEditing ? "w-full" : "flex w-fit max-w-full"
                           )}
-                        </AnimatePresence>
+                          layout
+                          transition={{
+                            duration: 0.25,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                        >
+                          {isEditing ? (
+                            <UserMessageEditor
+                              initialText={toDisplayText(
+                                extractUserMessageText(message)
+                              )}
+                              onCancel={handleCancelEditMessage}
+                              onSubmit={(text) =>
+                                handleEditMessage(message.id, text)
+                              }
+                            />
+                          ) : (
+                            <MessageContent>
+                              {message.parts.map((part, index) =>
+                                renderPart(part, message.id, index)
+                              )}
+                            </MessageContent>
+                          )}
+                        </motion.div>
                       ) : (
                         <MessageContent>
                           {message.parts.map((part, index) =>
@@ -1532,13 +1500,14 @@ function StandaloneChatPageClient({
                           )}
                         </MessageContent>
                       )}
-                      {isUser && !isEditing && (
+                      {isUser && (
                         <UserMessageActions
                           branchIndex={branchTotal > 1 ? branchIdx : undefined}
                           branchTotal={
                             branchTotal > 1 ? branchTotal : undefined
                           }
                           canInteract={!isLoading}
+                          isEditing={isEditing}
                           messageText={toDisplayText(
                             extractUserMessageText(message)
                           )}

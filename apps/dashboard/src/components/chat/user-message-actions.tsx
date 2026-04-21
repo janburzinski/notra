@@ -2,11 +2,11 @@
 
 import {
   ArrowLeft01Icon,
+  ArrowReloadHorizontalIcon,
   ArrowRight01Icon,
   CheckmarkCircle02Icon,
   Copy01Icon,
   Edit02Icon,
-  RefreshIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@notra/ui/components/ui/button";
@@ -24,6 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { cn } from "@notra/ui/lib/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AVAILABLE_MODELS, ModelIcon } from "@/components/chat/chat-input";
 
@@ -36,6 +37,7 @@ interface UserMessageActionsProps {
   branchTotal?: number;
   onPreviousBranch?: () => void;
   onNextBranch?: () => void;
+  isEditing?: boolean;
 }
 
 export function UserMessageActions({
@@ -47,6 +49,7 @@ export function UserMessageActions({
   branchTotal,
   onPreviousBranch,
   onNextBranch,
+  isEditing,
 }: UserMessageActionsProps) {
   const [copied, setCopied] = useState(false);
   const [retryOpen, setRetryOpen] = useState(false);
@@ -68,7 +71,11 @@ export function UserMessageActions({
 
   return (
     <div
-      className="mt-1.5 ml-auto flex items-center gap-1 text-muted-foreground opacity-0 transition-opacity duration-150 focus-within:opacity-100 group-hover:opacity-100 data-[force-visible=true]:opacity-100"
+      className={cn(
+        "mt-0.5 ml-auto flex items-center gap-1 text-muted-foreground opacity-0 transition-opacity duration-150 focus-within:opacity-100 group-hover:opacity-100 data-[force-visible=true]:opacity-100",
+        isEditing &&
+          "pointer-events-none opacity-40 line-through group-hover:opacity-40 focus-within:opacity-40"
+      )}
       data-force-visible={retryOpen || undefined}
     >
       {hasBranches && (
@@ -120,13 +127,13 @@ export function UserMessageActions({
                 />
               }
             >
-              <HugeiconsIcon icon={RefreshIcon} size={12} />
+              <HugeiconsIcon icon={ArrowReloadHorizontalIcon} size={12} />
             </TooltipTrigger>
             <TooltipContent>Retry</TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="end" className="w-64">
             <DropdownMenuItem onClick={() => onRetry()}>
-              <HugeiconsIcon icon={RefreshIcon} size={12} />
+              <HugeiconsIcon icon={ArrowReloadHorizontalIcon} size={12} />
               <span className="text-sm">Retry with same</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -174,7 +181,10 @@ export function UserMessageActions({
             render={
               <Button
                 aria-label="Copy message"
-                className="size-5"
+                className={cn(
+                  "size-5",
+                  copied && "text-emerald-500 hover:text-emerald-500"
+                )}
                 onClick={handleCopy}
                 size="icon-sm"
                 type="button"
@@ -227,12 +237,18 @@ export function UserMessageEditor({
     el.setSelectionRange(el.value.length, el.value.length);
   }, []);
 
+  const trimmedValue = value.trim();
+  const isUnchanged = trimmedValue === initialText.trim();
+
   const handleSubmit = () => {
-    const trimmed = value.trim();
-    if (!trimmed) {
+    if (!trimmedValue) {
       return;
     }
-    onSubmit(trimmed);
+    if (isUnchanged) {
+      onCancel();
+      return;
+    }
+    onSubmit(trimmedValue);
   };
 
   return (
@@ -261,7 +277,7 @@ export function UserMessageEditor({
           Cancel
         </Button>
         <Button
-          disabled={value.trim().length === 0}
+          disabled={trimmedValue.length === 0 || isUnchanged}
           onClick={handleSubmit}
           size="sm"
           type="button"
