@@ -74,7 +74,7 @@ export function UserMessageActions({
       className={cn(
         "mt-0.5 ml-auto flex items-center gap-1 text-muted-foreground opacity-0 transition-opacity duration-150 focus-within:opacity-100 group-hover:opacity-100 data-[force-visible=true]:opacity-100",
         isEditing &&
-          "pointer-events-none opacity-40 line-through group-hover:opacity-40 focus-within:opacity-40"
+          "pointer-events-none line-through opacity-40 focus-within:opacity-40 group-hover:opacity-40"
       )}
       data-force-visible={retryOpen || undefined}
     >
