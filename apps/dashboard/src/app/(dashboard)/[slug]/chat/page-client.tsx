@@ -419,9 +419,9 @@ function StandaloneChatPageClient({
         ? window.requestIdleCallback
         : (cb: () => void) => window.setTimeout(cb, 1);
     const handle = idle(() => {
-      void import("@/components/ai/blog-changelog-preview");
-      void import("@/components/ai/twitter-preview");
-      void import("@/components/ai/linkedin-preview");
+      import("@/components/ai/blog-changelog-preview");
+      import("@/components/ai/twitter-preview");
+      import("@/components/ai/linkedin-preview");
     });
     return () => {
       if (
