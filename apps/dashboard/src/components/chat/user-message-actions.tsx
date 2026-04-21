@@ -108,7 +108,7 @@ export function UserMessageActions({
         </div>
       )}
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-1">
         <DropdownMenu onOpenChange={setRetryOpen} open={retryOpen}>
           <Tooltip>
             <TooltipTrigger
