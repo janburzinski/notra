@@ -29,7 +29,6 @@ import {
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Linear } from "@notra/ui/components/ui/svgs/linear";
-import { Moonshot } from "@notra/ui/components/ui/svgs/moonshot";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import {
@@ -96,14 +95,6 @@ export const AVAILABLE_MODELS = [
     pricing: "$2.50 input / $15 output per 1M",
     provider: "openai",
   },
-  {
-    id: "moonshotai/kimi-k2.6",
-    label: "Kimi K2.6",
-    description: "Agentic coding specialist",
-    pricing: "$0.95 input / $4 output per 1M",
-    provider: "moonshotai",
-    beta: true,
-  },
 ] as const;
 
 export type ModelProvider = (typeof AVAILABLE_MODELS)[number]["provider"];
@@ -122,9 +113,6 @@ export function ModelIcon({
         <OpenaiDark className={`${className ?? ""} hidden dark:block`} />
       </>
     );
-  }
-  if (provider === "moonshotai") {
-    return <Moonshot className={className} />;
   }
   return <ClaudeAiIcon className={className} />;
 }

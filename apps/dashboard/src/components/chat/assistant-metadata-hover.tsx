@@ -3,7 +3,6 @@
 import { Clock01Icon, CpuIcon, FlashIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
-import { Moonshot } from "@notra/ui/components/ui/svgs/moonshot";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import {
@@ -24,7 +23,6 @@ const MODEL_LABELS = {
   "anthropic/claude-sonnet-4.6": "Claude Sonnet 4.6",
   "anthropic/claude-haiku-4.5": "Claude Haiku 4.5",
   "openai/gpt-5.4": "GPT-5.4",
-  "moonshotai/kimi-k2.6": "Kimi K2.6",
 } satisfies Record<ChatModel, string>;
 
 const MODEL_CONTEXT_WINDOWS = {
@@ -32,7 +30,6 @@ const MODEL_CONTEXT_WINDOWS = {
   "anthropic/claude-sonnet-4.6": 1_000_000,
   "anthropic/claude-haiku-4.5": 200_000,
   "openai/gpt-5.4": 1_100_000,
-  "moonshotai/kimi-k2.6": 262_144,
 } satisfies Record<ChatModel, number>;
 
 function getModelContextWindow(model: string): number | null {
@@ -87,9 +84,6 @@ function ModelBadgeIcon({ model }: { model: string }) {
         <OpenaiDark className="hidden size-3 dark:block" />
       </>
     );
-  }
-  if (model.startsWith("moonshotai/")) {
-    return <Moonshot className="size-3" />;
   }
   return <ClaudeAiIcon className="size-3" />;
 }
