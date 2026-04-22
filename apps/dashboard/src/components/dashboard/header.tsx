@@ -22,6 +22,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef } from "react";
 import { CreditBalanceButton } from "@/components/billing/credit-balance-button";
 import { ChatTopbarTitle } from "@/components/dashboard/chat-topbar-title";
+import { useFeedback } from "@/components/dashboard/feedback-context";
 import { FeedbackPopover } from "@/components/dashboard/feedback-popover";
 
 const NON_ORG_PATHS: string[] = [];
@@ -40,6 +41,7 @@ export function SiteHeader() {
   const isInSettings = segments[1] === "settings";
   const preSettingsPathsRef = useRef<Record<string, string>>({});
   const activeSettingsShortcutSlugRef = useRef<string | null>(null);
+  const { openFeedback } = useFeedback();
 
   useEffect(() => {
     const activeSlug = activeSettingsShortcutSlugRef.current;
@@ -88,6 +90,10 @@ export function SiteHeader() {
       '[data-cal-namespace="15min"]'
     );
     btn?.click();
+  });
+
+  useHotkey("F", () => {
+    openFeedback();
   });
 
   const isNonOrgPath = NON_ORG_PATHS.some((path) => pathname.startsWith(path));
@@ -171,6 +177,9 @@ export function SiteHeader() {
               <Button className="gap-1.5" size="sm" variant="outline">
                 <HugeiconsIcon icon={Message01Icon} size={16} />
                 Feedback
+                <kbd className="pointer-events-none ml-1 hidden select-none rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-muted-foreground text-xs sm:inline-block">
+                  F
+                </kbd>
               </Button>
             }
           />
