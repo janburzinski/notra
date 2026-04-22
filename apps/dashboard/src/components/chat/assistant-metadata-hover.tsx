@@ -131,7 +131,7 @@ export function AssistantMetadataHover({
     );
   }
 
-  if (typeof metadata.totalTokens === "number") {
+  if (typeof metadata.outputTokens === "number") {
     const contextWindow = metadata.model
       ? getModelContextWindow(metadata.model)
       : null;
@@ -146,7 +146,7 @@ export function AssistantMetadataHover({
           render={
             <div className="flex cursor-default items-center gap-1">
               <HugeiconsIcon className="size-3" icon={CpuIcon} />
-              <span>{formatTokens(metadata.totalTokens)} tokens</span>
+              <span>{formatTokens(metadata.outputTokens)} tokens</span>
             </div>
           }
         />
