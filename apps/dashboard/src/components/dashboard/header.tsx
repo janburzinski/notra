@@ -2,7 +2,7 @@ import { getCalApi } from "@calcom/embed-react";
 import {
   ArrowRight01Icon,
   Calendar03Icon,
-  SearchIcon,
+  Message01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -21,8 +21,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef } from "react";
 import { CreditBalanceButton } from "@/components/billing/credit-balance-button";
-import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import { ChatTopbarTitle } from "@/components/dashboard/chat-topbar-title";
+import { FeedbackPopover } from "@/components/dashboard/feedback-popover";
 
 const NON_ORG_PATHS: string[] = [];
 
@@ -36,7 +36,6 @@ export function SiteHeader() {
   const router = useRouter();
   const id = useId();
   const segments = pathname.split("/").filter(Boolean);
-  const { setOpen: setCommandPaletteOpen } = useCommandPalette();
   const slug = segments[0];
   const isInSettings = segments[1] === "settings";
   const preSettingsPathsRef = useRef<Record<string, string>>({});
@@ -164,22 +163,17 @@ export function SiteHeader() {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <div className="pointer-events-none hidden w-full max-w-sm shrink-0 px-4 lg:block">
-          <Button
-            className="pointer-events-auto flex h-8 w-full items-center gap-2 border-dashed pr-1.5 pl-2 text-muted-foreground hover:text-foreground"
-            onClick={() => setCommandPaletteOpen(true)}
-            size="sm"
-            variant="outline"
-          >
-            <HugeiconsIcon icon={SearchIcon} size={14} strokeWidth={2} />
-            <span className="text-xs">Search</span>
-            <kbd className="pointer-events-none ml-auto select-none rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-              ⌘K
-            </kbd>
-          </Button>
-        </div>
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
           <CreditBalanceButton />
+          <FeedbackPopover
+            sharedState
+            trigger={
+              <Button className="gap-1.5" size="sm" variant="outline">
+                <HugeiconsIcon icon={Message01Icon} size={16} />
+                Feedback
+              </Button>
+            }
+          />
           <Button
             className="gap-1.5"
             data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'

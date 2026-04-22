@@ -30,6 +30,7 @@ import { Command as CommandPrimitive } from "cmdk";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useFeedback } from "@/components/dashboard/feedback-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
@@ -117,6 +118,7 @@ export function CommandPalette() {
     | { status: "ready"; result: AiResult }
     | { status: "error" }
   >({ status: "idle" });
+  const { openFeedback: triggerFeedback } = useFeedback();
   const abortRef = useRef<AbortController | null>(null);
 
   const slug = activeOrganization?.slug ?? "";
@@ -326,6 +328,11 @@ export function CommandPalette() {
     },
     [router, handleOpenChange]
   );
+
+  const openFeedback = useCallback(() => {
+    handleOpenChange(false);
+    triggerFeedback();
+  }, [handleOpenChange, triggerFeedback]);
 
   const openChatWithQuery = useCallback(
     (text: string) => {
@@ -614,6 +621,30 @@ export function CommandPalette() {
                   </CommandPrimitive.Group>
                 );
               })}
+
+              <CommandPrimitive.Group
+                className="px-1 pb-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-[10.5px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
+                heading="Actions"
+              >
+                <CommandPrimitive.Item
+                  className="group/item relative flex cursor-default select-none items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] outline-none transition-colors data-[selected=true]:bg-muted data-[selected=true]:text-foreground"
+                  keywords={["feedback", "bug", "report", "idea", "feature"]}
+                  onSelect={openFeedback}
+                  value="__action_feedback"
+                >
+                  <HugeiconsIcon
+                    className="size-4 shrink-0 text-muted-foreground transition-colors group-data-[selected=true]/item:text-foreground"
+                    icon={Message01Icon}
+                    strokeWidth={2}
+                  />
+                  <span className="flex-1 truncate">Send feedback</span>
+                  <HugeiconsIcon
+                    className="size-3 text-muted-foreground opacity-0 transition-opacity group-data-[selected=true]/item:opacity-60"
+                    icon={ArrowRight01Icon}
+                    strokeWidth={2}
+                  />
+                </CommandPrimitive.Item>
+              </CommandPrimitive.Group>
 
               {hasQuery ? (
                 <CommandPrimitive.Group

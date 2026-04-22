@@ -9,6 +9,7 @@ import {
   NoteIcon,
   Notification03Icon,
   PlugIcon,
+  SearchIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
@@ -23,6 +24,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { memo } from "react";
+import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import type { NavMainCategory, NavMainItem } from "@/types/components/nav";
@@ -165,6 +167,7 @@ export function NavMain() {
   const { activeOrganization } = useOrganizationsContext();
   const pathname = usePathname();
   const aiChatExperiment = useAiChatExperiment();
+  const { setOpen: setCommandPaletteOpen } = useCommandPalette();
 
   if (!activeOrganization?.slug) {
     return null;
@@ -177,6 +180,24 @@ export function NavMain() {
 
   return (
     <>
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => setCommandPaletteOpen(true)}
+                tooltip="Search"
+              >
+                <HugeiconsIcon icon={SearchIcon} />
+                <span>Search</span>
+                <kbd className="pointer-events-none ml-auto select-none rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground group-data-[collapsible=icon]:hidden">
+                  ⌘K
+                </kbd>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
       <NavGroup items={rootItems} pathname={pathname} slug={slug} />
       {categories.map((category) => (
         <NavGroup
