@@ -12,30 +12,9 @@ import {
 } from "@react-email/components";
 
 import { EmailFooter } from "../components/footer";
+import type { FeedbackEmailProps } from "../types/feedback";
 import { EMAIL_CONFIG } from "../utils/config";
-
-export type FeedbackSentiment = "sad_crying" | "sad" | "happy" | "excited";
-
-interface FeedbackEmailProps {
-  message: string;
-  sentiment?: FeedbackSentiment;
-  userName: string;
-  userEmail: string;
-  organizationName?: string;
-  organizationSlug?: string;
-  pageUrl?: string;
-  userAgent?: string;
-}
-
-export const FEEDBACK_SENTIMENT_META: Record<
-  FeedbackSentiment,
-  { emoji: string; label: string }
-> = {
-  sad_crying: { emoji: "😭", label: "Very unhappy" },
-  sad: { emoji: "🙁", label: "Unhappy" },
-  happy: { emoji: "🙂", label: "Happy" },
-  excited: { emoji: "🤩", label: "Excited" },
-};
+import { FEEDBACK_SENTIMENT_META } from "../utils/feedback";
 
 export const FeedbackEmail = ({
   message = "The new editor feels a lot snappier, but I'd love to see dark mode fixes on the mobile nav.",

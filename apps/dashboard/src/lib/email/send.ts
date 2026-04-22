@@ -1,9 +1,5 @@
 import { createHash } from "node:crypto";
-import {
-  FEEDBACK_SENTIMENT_META,
-  FeedbackEmail,
-  type FeedbackSentiment,
-} from "@notra/email/emails/feedback";
+import { FeedbackEmail } from "@notra/email/emails/feedback";
 import { InviteUserEmail } from "@notra/email/emails/invite";
 import { ResetPasswordEmail } from "@notra/email/emails/reset";
 import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-content-created";
@@ -11,9 +7,11 @@ import { ScheduledContentFailedEmail } from "@notra/email/emails/schedule-conten
 import { VerifyUserEmail } from "@notra/email/emails/verify";
 import { WelcomeEmail } from "@notra/email/emails/welcome";
 import { EMAIL_CONFIG } from "@notra/email/utils/config";
+import { FEEDBACK_SENTIMENT_META } from "@notra/email/utils/feedback";
 import type { Resend } from "resend";
 import type {
   EmailResult,
+  SendFeedbackEmailProps,
   SendInviteEmailProps,
   SendScheduledContentCreatedEmailProps,
   SendScheduledContentFailedEmailProps,
@@ -262,18 +260,6 @@ export async function sendScheduledContentFailedEmail(
     },
     `notra:schedule-content-failed:${recipientEmail}:${scheduleName}:${Date.now()}`
   );
-}
-
-export interface SendFeedbackEmailProps {
-  to: string;
-  message: string;
-  sentiment?: FeedbackSentiment;
-  userName: string;
-  userEmail: string;
-  organizationName?: string;
-  organizationSlug?: string;
-  pageUrl?: string;
-  userAgent?: string;
 }
 
 export async function sendFeedbackEmail(

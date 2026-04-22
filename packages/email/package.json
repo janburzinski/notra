@@ -9,8 +9,10 @@
     "./emails/schedule-content-failed": "./src/emails/schedule-content-failed.tsx",
     "./emails/verify": "./src/emails/verify.tsx",
     "./emails/welcome": "./src/emails/welcome.tsx",
+    "./types/feedback": "./src/types/feedback.ts",
     "./utils/config": "./src/utils/config.ts",
     "./utils/dev": "./src/utils/dev.ts",
+    "./utils/feedback": "./src/utils/feedback.ts",
     "./utils/resend": "./src/utils/resend.ts"
   },
   "scripts": {

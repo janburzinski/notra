@@ -4,29 +4,13 @@ import { EMAIL_CONFIG } from "@notra/email/utils/config";
 import { sendDevEmail } from "@notra/email/utils/dev";
 import { getResend } from "@notra/email/utils/resend";
 import { eq } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
-import * as z from "zod";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { sendFeedbackEmail } from "@/lib/email/send";
 import { authorizedProcedure } from "@/lib/orpc/base";
 import { internalServerError } from "@/lib/orpc/utils/errors";
+import { submitFeedbackInputSchema } from "@/schemas/feedback";
 
-const MAX_MESSAGE_LENGTH = 4000;
 const isDevelopment = process.env.NODE_ENV === "development";
-
-const feedbackSentimentSchema = z.enum([
-  "sad_crying",
-  "sad",
-  "happy",
-  "excited",
-]);
-
-const submitFeedbackInputSchema = z.object({
-  message: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),
-  sentiment: feedbackSentimentSchema.optional(),
-  organizationId: z.string().min(1).optional(),
-  pageUrl: z.string().url().optional(),
-});
 
 export const feedbackRouter = {
   submit: authorizedProcedure

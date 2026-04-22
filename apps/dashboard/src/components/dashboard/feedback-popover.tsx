@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  CryingIcon,
-  LaughingIcon,
-  Sad01Icon,
-  SentIcon,
-  SmileIcon,
-} from "@hugeicons/core-free-icons";
-import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { SentIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@notra/ui/components/ui/button";
 import {
   Popover,
@@ -17,36 +11,26 @@ import {
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { cn } from "@notra/ui/lib/utils";
 import { usePathname } from "next/navigation";
-import { cloneElement, type ReactElement, useState } from "react";
-
+import { cloneElement, useState } from "react";
 import { toast } from "sonner";
 import { useFeedback } from "@/components/dashboard/feedback-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { FEEDBACK_MAX_MESSAGE_LENGTH } from "@/constants/feedback";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
-
-type Sentiment = "sad_crying" | "sad" | "happy" | "excited";
-
-const SENTIMENTS: { value: Sentiment; icon: IconSvgElement; label: string }[] =
-  [
-    { value: "sad_crying", icon: CryingIcon, label: "Very unhappy" },
-    { value: "sad", icon: Sad01Icon, label: "Unhappy" },
-    { value: "happy", icon: SmileIcon, label: "Happy" },
-    { value: "excited", icon: LaughingIcon, label: "Excited" },
-  ];
-
-const MAX_MESSAGE_LENGTH = 4000;
-
-interface FeedbackFormProps {
-  onSubmitted?: () => void;
-  autoFocus?: boolean;
-}
+import type {
+  FeedbackFormProps,
+  FeedbackPopoverProps,
+  FeedbackSentiment,
+} from "@/types/dashboard/feedback";
+import { FEEDBACK_SENTIMENT_OPTIONS } from "@/utils/feedback";
+import { getFeedbackPageUrl } from "@/utils/feedback-page-url";
 
 function FeedbackForm({ onSubmitted, autoFocus = true }: FeedbackFormProps) {
   const pathname = usePathname();
   const { activeOrganization } = useOrganizationsContext();
 
   const [message, setMessage] = useState("");
-  const [sentiment, setSentiment] = useState<Sentiment | null>(null);
+  const [sentiment, setSentiment] = useState<FeedbackSentiment | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const trimmed = message.trim();
@@ -59,16 +43,11 @@ function FeedbackForm({ onSubmitted, autoFocus = true }: FeedbackFormProps) {
 
     setIsSubmitting(true);
     try {
-      const pageUrl =
-        typeof window === "undefined"
-          ? undefined
-          : `${window.location.origin}${pathname}`;
-
       await dashboardOrpcClient.feedback.submit({
         message: trimmed,
         sentiment: sentiment ?? undefined,
         organizationId: activeOrganization?.id,
-        pageUrl,
+        pageUrl: getFeedbackPageUrl(pathname),
       });
 
       toast.success("Thanks for the feedback!");
@@ -101,7 +80,7 @@ function FeedbackForm({ onSubmitted, autoFocus = true }: FeedbackFormProps) {
           autoFocus={autoFocus}
           className="min-h-28 resize-none"
           disabled={isSubmitting}
-          maxLength={MAX_MESSAGE_LENGTH}
+          maxLength={FEEDBACK_MAX_MESSAGE_LENGTH}
           onChange={(event) => setMessage(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Your feedback..."
@@ -111,7 +90,7 @@ function FeedbackForm({ onSubmitted, autoFocus = true }: FeedbackFormProps) {
 
       <div className="flex items-center justify-between gap-2 border-border border-t border-dashed p-2.5">
         <div className="flex items-center gap-0.5">
-          {SENTIMENTS.map((option) => {
+          {FEEDBACK_SENTIMENT_OPTIONS.map((option) => {
             const isActive = sentiment === option.value;
             return (
               <button
@@ -164,16 +143,6 @@ function FeedbackForm({ onSubmitted, autoFocus = true }: FeedbackFormProps) {
       </div>
     </>
   );
-}
-
-type PopoverSide = "top" | "right" | "bottom" | "left";
-type PopoverAlign = "start" | "center" | "end";
-
-interface FeedbackPopoverProps {
-  trigger?: ReactElement;
-  side?: PopoverSide;
-  align?: PopoverAlign;
-  sharedState?: boolean;
 }
 
 export function FeedbackPopover({

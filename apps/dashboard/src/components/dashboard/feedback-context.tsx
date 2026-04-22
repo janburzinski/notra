@@ -7,12 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-
-interface FeedbackContextValue {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  openFeedback: () => void;
-}
+import type { FeedbackContextValue } from "@/types/dashboard/feedback";
 
 const FeedbackContext = createContext<FeedbackContextValue | null>(null);
 
