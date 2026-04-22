@@ -1,4 +1,9 @@
 import { createHash } from "node:crypto";
+import {
+  FEEDBACK_SENTIMENT_META,
+  FeedbackEmail,
+  type FeedbackSentiment,
+} from "@notra/email/emails/feedback";
 import { InviteUserEmail } from "@notra/email/emails/invite";
 import { ResetPasswordEmail } from "@notra/email/emails/reset";
 import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-content-created";
@@ -256,6 +261,64 @@ export async function sendScheduledContentFailedEmail(
       tags: [{ name: "category", value: "schedule-content-failed" }],
     },
     `notra:schedule-content-failed:${recipientEmail}:${scheduleName}:${Date.now()}`
+  );
+}
+
+export interface SendFeedbackEmailProps {
+  to: string;
+  message: string;
+  sentiment?: FeedbackSentiment;
+  userName: string;
+  userEmail: string;
+  organizationName?: string;
+  organizationSlug?: string;
+  pageUrl?: string;
+  userAgent?: string;
+}
+
+export async function sendFeedbackEmail(
+  resend: Resend,
+  {
+    to,
+    message,
+    sentiment,
+    userName,
+    userEmail,
+    organizationName,
+    organizationSlug,
+    pageUrl,
+    userAgent,
+  }: SendFeedbackEmailProps
+) {
+  const idempotencyKey = createHash("sha256")
+    .update(`${userEmail}:${message}:${sentiment ?? ""}:${Date.now()}`)
+    .digest("hex")
+    .slice(0, 32);
+
+  const subjectPrefix = sentiment
+    ? `${FEEDBACK_SENTIMENT_META[sentiment].emoji} `
+    : "";
+
+  return sendWithRetry(
+    resend,
+    {
+      from: EMAIL_CONFIG.from,
+      replyTo: userEmail,
+      to,
+      subject: `${subjectPrefix}New feedback from ${userName}`,
+      react: FeedbackEmail({
+        message,
+        sentiment,
+        userName,
+        userEmail,
+        organizationName,
+        organizationSlug,
+        pageUrl,
+        userAgent,
+      }),
+      tags: [{ name: "category", value: "feedback" }],
+    },
+    `notra:feedback:${idempotencyKey}`
   );
 }
 

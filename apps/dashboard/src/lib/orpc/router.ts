@@ -2,6 +2,7 @@ import { apiKeysRouter } from "./routers/api-keys";
 import { automationRouter } from "./routers/automation";
 import { brandRouter } from "./routers/brand";
 import { contentRouter } from "./routers/content";
+import { feedbackRouter } from "./routers/feedback";
 import { githubRouter } from "./routers/github";
 import { integrationsRouter } from "./routers/integrations";
 import { logsRouter } from "./routers/logs";
@@ -17,6 +18,7 @@ export const dashboardRouter = {
   automation: automationRouter,
   brand: brandRouter,
   content: contentRouter,
+  feedback: feedbackRouter,
   github: githubRouter,
   integrations: integrationsRouter,
   logs: logsRouter,

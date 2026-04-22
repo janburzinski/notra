@@ -2,6 +2,7 @@
   "name": "@notra/email",
   "version": "0.0.0",
   "exports": {
+    "./emails/feedback": "./src/emails/feedback.tsx",
     "./emails/invite": "./src/emails/invite.tsx",
     "./emails/reset": "./src/emails/reset.tsx",
     "./emails/schedule-content-created": "./src/emails/schedule-content-created.tsx",
