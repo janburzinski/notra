@@ -22,6 +22,7 @@ import {
   scheduleTargetsSchema,
 } from "../schemas/schedules";
 import { getOrganizationId } from "../utils/auth";
+import { logError } from "../utils/logging";
 import { errorResponse } from "../utils/openapi-responses";
 import { getOrganizationResponse } from "../utils/organizations";
 import {
@@ -596,7 +597,7 @@ schedulesRoutes.openapi(createScheduleRoute, async (c) => {
       await deleteQstashSchedule(env, qstashScheduleId).catch(() => null);
     }
 
-    console.error("Failed to create schedule:", error);
+    logError("Failed to create schedule", error);
     return c.json({ error: "Failed to create schedule" }, 500);
   }
 });
@@ -743,7 +744,7 @@ schedulesRoutes.openapi(patchScheduleRoute, async (c) => {
       await deleteQstashSchedule(env, qstashScheduleId).catch(() => null);
     }
 
-    console.error("Failed to update schedule:", error);
+    logError("Failed to update schedule", error);
     return c.json({ error: "Failed to update schedule" }, 500);
   }
 });

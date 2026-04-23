@@ -7,6 +7,7 @@ import {
   contentTriggers,
 } from "@notra/db/schema";
 import { deleteBrandReferenceMemory } from "@notra/db/utils/supermemory";
+import { assertPublicHttpUrl } from "@notra/utils/url";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
@@ -155,10 +156,13 @@ function normalizeBrandVoiceWebsiteUrl(rawUrl: string) {
   const websiteUrl = trimmed.startsWith("https://")
     ? trimmed
     : `https://${trimmed}`;
-  const parsed = z.url().safeParse(websiteUrl);
 
-  if (!parsed.success) {
-    throw badRequest("Invalid website URL");
+  try {
+    assertPublicHttpUrl(websiteUrl);
+  } catch (error) {
+    throw badRequest(
+      error instanceof Error ? error.message : "Invalid website URL"
+    );
   }
 
   return websiteUrl;
@@ -368,10 +372,18 @@ export const brandRouter = {
             ...updates
           } = input;
 
+          const normalizedWebsiteUrl =
+            updates.websiteUrl === undefined
+              ? undefined
+              : normalizeBrandVoiceWebsiteUrl(updates.websiteUrl);
+
           await db
             .update(brandSettings)
             .set({
               ...updates,
+              ...(normalizedWebsiteUrl !== undefined
+                ? { websiteUrl: normalizedWebsiteUrl }
+                : {}),
               updatedAt: new Date(),
             })
             .where(eq(brandSettings.id, input.voiceId));

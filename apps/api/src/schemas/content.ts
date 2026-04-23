@@ -1,11 +1,25 @@
 import { z } from "@hono/zod-openapi";
 import { supportedLanguageSchema } from "@notra/ai/schemas/language";
+import {
+  BRAND_AUDIENCE_MAX_LENGTH,
+  BRAND_AUDIENCE_MIN_LENGTH,
+  BRAND_COMPANY_DESCRIPTION_MAX_LENGTH,
+  BRAND_COMPANY_DESCRIPTION_MIN_LENGTH,
+  BRAND_COMPANY_NAME_MAX_LENGTH,
+  BRAND_CUSTOM_INSTRUCTIONS_MAX_LENGTH,
+  BRAND_CUSTOM_TONE_MAX_LENGTH,
+  BRAND_NAME_MAX_LENGTH,
+  POST_MARKDOWN_MAX_LENGTH,
+  POST_TITLE_MAX_LENGTH,
+} from "@notra/ai/schemas/limits";
 import { POST_SLUG_MAX_LENGTH, POST_SLUG_REGEX } from "@notra/ai/schemas/post";
 import { toneProfileSchema } from "@notra/ai/schemas/tone";
 import {
   LOOKBACK_WINDOWS,
   SUPPORTED_CONTENT_GENERATION_TYPES,
 } from "@notra/content-generation/schemas";
+import { assertPublicHttpUrl } from "@notra/utils/url";
+import { resourceIdSchema } from "./ids";
 
 const HTTP_PROTOCOL_REGEX = /^https?:\/\//i;
 export const getPostsParamsSchema = z.object({});
@@ -209,45 +223,33 @@ export const getPostsOpenApiQuerySchema = z.object({
 });
 
 export const getPostParamsSchema = z.object({
-  postId: z
-    .string()
-    .trim()
-    .min(1, "postId is required")
-    .openapi({
-      param: {
-        in: "path",
-        name: "postId",
-      },
-      example: "post_123",
-    }),
+  postId: resourceIdSchema("postId").openapi({
+    param: {
+      in: "path",
+      name: "postId",
+    },
+    example: "post_123",
+  }),
 });
 
 export const getBrandIdentityParamsSchema = z.object({
-  brandIdentityId: z
-    .string()
-    .trim()
-    .min(1, "brandIdentityId is required")
-    .openapi({
-      param: {
-        in: "path",
-        name: "brandIdentityId",
-      },
-      example: "51c2f3aa-efdd-4e28-8e69-23fa2dfd3561",
-    }),
+  brandIdentityId: resourceIdSchema("brandIdentityId").openapi({
+    param: {
+      in: "path",
+      name: "brandIdentityId",
+    },
+    example: "51c2f3aa-efdd-4e28-8e69-23fa2dfd3561",
+  }),
 });
 
 export const getIntegrationParamsSchema = z.object({
-  integrationId: z
-    .string()
-    .trim()
-    .min(1, "integrationId is required")
-    .openapi({
-      param: {
-        in: "path",
-        name: "integrationId",
-      },
-      example: "51c2f3aa-efdd-4e28-8e69-23fa2dfd3561",
-    }),
+  integrationId: resourceIdSchema("integrationId").openapi({
+    param: {
+      in: "path",
+      name: "integrationId",
+    },
+    example: "51c2f3aa-efdd-4e28-8e69-23fa2dfd3561",
+  }),
 });
 
 export const errorResponseSchema = z
@@ -270,7 +272,17 @@ const websiteUrlSchema = z
   .transform((value) =>
     HTTP_PROTOCOL_REGEX.test(value) ? value : `https://${value}`
   )
-  .pipe(z.string().url("Invalid website URL"));
+  .pipe(z.string().url("Invalid website URL"))
+  .superRefine((value, ctx) => {
+    try {
+      assertPublicHttpUrl(value);
+    } catch (error) {
+      ctx.addIssue({
+        code: "custom",
+        message: error instanceof Error ? error.message : "Invalid website URL",
+      });
+    }
+  });
 
 const brandIdentityResponseSchema = z.object({
   id: z.string(),
@@ -378,9 +390,15 @@ export const getPostResponseSchema = z.object({
 
 export const patchPostRequestSchema = z
   .object({
-    title: z.string().trim().min(1).max(120).optional().openapi({
-      example: "Ship notes for week 11",
-    }),
+    title: z
+      .string()
+      .trim()
+      .min(1)
+      .max(POST_TITLE_MAX_LENGTH)
+      .optional()
+      .openapi({
+        example: "Ship notes for week 11",
+      }),
     slug: z
       .string()
       .trim()
@@ -395,9 +413,14 @@ export const patchPostRequestSchema = z
       .openapi({
         example: "ship-notes-week-11",
       }),
-    markdown: z.string().min(1).optional().openapi({
-      example: "# Ship notes\n\nWe shipped a faster editor.",
-    }),
+    markdown: z
+      .string()
+      .min(1)
+      .max(POST_MARKDOWN_MAX_LENGTH)
+      .optional()
+      .openapi({
+        example: "# Ship notes\n\nWe shipped a faster editor.",
+      }),
     status: postStatusSchema.optional().openapi({
       example: "published",
     }),
@@ -419,7 +442,7 @@ export const patchPostResponseSchema = z.object({
 });
 
 export const createBrandIdentityRequestSchema = z.object({
-  name: z.string().trim().min(1).max(120).optional().openapi({
+  name: z.string().trim().min(1).max(BRAND_NAME_MAX_LENGTH).optional().openapi({
     example: "Notra",
   }),
   websiteUrl: websiteUrlSchema.openapi({
@@ -448,17 +471,13 @@ export const createBrandIdentityResponseSchema = z.object({
 });
 
 export const getBrandAnalysisJobParamsSchema = z.object({
-  jobId: z
-    .string()
-    .trim()
-    .min(1, "jobId is required")
-    .openapi({
-      param: {
-        in: "path",
-        name: "jobId",
-      },
-      example: "brand_job_123",
-    }),
+  jobId: resourceIdSchema("jobId").openapi({
+    param: {
+      in: "path",
+      name: "jobId",
+    },
+    example: "brand_job_123",
+  }),
 });
 
 export const getBrandAnalysisJobResponseSchema = z.object({
@@ -468,19 +487,33 @@ export const getBrandAnalysisJobResponseSchema = z.object({
 
 export const patchBrandIdentityRequestSchema = z
   .object({
-    name: z.string().trim().min(1).max(120).optional().openapi({
-      example: "Notra",
-    }),
+    name: z
+      .string()
+      .trim()
+      .min(1)
+      .max(BRAND_NAME_MAX_LENGTH)
+      .optional()
+      .openapi({
+        example: "Notra",
+      }),
     websiteUrl: websiteUrlSchema.optional().openapi({
       example: "https://usenotra.com",
     }),
-    companyName: z.string().trim().min(1).optional().nullable().openapi({
-      example: "Notra",
-    }),
+    companyName: z
+      .string()
+      .trim()
+      .min(1)
+      .max(BRAND_COMPANY_NAME_MAX_LENGTH)
+      .optional()
+      .nullable()
+      .openapi({
+        example: "Notra",
+      }),
     companyDescription: z
       .string()
       .trim()
-      .min(10)
+      .min(BRAND_COMPANY_DESCRIPTION_MIN_LENGTH)
+      .max(BRAND_COMPANY_DESCRIPTION_MAX_LENGTH)
       .optional()
       .nullable()
       .openapi({
@@ -491,17 +524,36 @@ export const patchBrandIdentityRequestSchema = z
       description:
         "Set a preset tone profile. When provided without customTone, any saved custom tone is cleared.",
     }),
-    customTone: z.string().trim().optional().nullable().openapi({
-      example: "Clear, direct, and technically confident",
-      description:
-        "Provide a custom tone override. Send an empty string or null to clear it.",
-    }),
-    customInstructions: z.string().trim().optional().nullable().openapi({
-      example: "Avoid hype. Prioritize concrete examples.",
-    }),
-    audience: z.string().trim().min(10).optional().nullable().openapi({
-      example: "Engineering leaders and developer tooling teams.",
-    }),
+    customTone: z
+      .string()
+      .trim()
+      .max(BRAND_CUSTOM_TONE_MAX_LENGTH)
+      .optional()
+      .nullable()
+      .openapi({
+        example: "Clear, direct, and technically confident",
+        description:
+          "Provide a custom tone override. Send an empty string or null to clear it.",
+      }),
+    customInstructions: z
+      .string()
+      .trim()
+      .max(BRAND_CUSTOM_INSTRUCTIONS_MAX_LENGTH)
+      .optional()
+      .nullable()
+      .openapi({
+        example: "Avoid hype. Prioritize concrete examples.",
+      }),
+    audience: z
+      .string()
+      .trim()
+      .min(BRAND_AUDIENCE_MIN_LENGTH)
+      .max(BRAND_AUDIENCE_MAX_LENGTH)
+      .optional()
+      .nullable()
+      .openapi({
+        example: "Engineering leaders and developer tooling teams.",
+      }),
     language: supportedLanguageSchema.optional().nullable().openapi({
       example: "English",
     }),
@@ -782,17 +834,13 @@ export const createPostGenerationResponseSchema = z.object({
 });
 
 export const getPostGenerationParamsSchema = z.object({
-  jobId: z
-    .string()
-    .trim()
-    .min(1, "jobId is required")
-    .openapi({
-      param: {
-        in: "path",
-        name: "jobId",
-      },
-      example: "job_123",
-    }),
+  jobId: resourceIdSchema("jobId").openapi({
+    param: {
+      in: "path",
+      name: "jobId",
+    },
+    example: "job_123",
+  }),
 });
 
 export const getPostGenerationResponseSchema = z.object({

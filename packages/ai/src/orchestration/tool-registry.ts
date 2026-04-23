@@ -54,19 +54,26 @@ export function buildToolSet(
       }),
   });
 
+  const isDev = process.env.NODE_ENV === "development";
+
   const tools: Record<string, Tool> = {
     getMarkdown,
     editMarkdown,
-    listAvailableSkills: listAvailableSkills(),
-    getSkillByName: getSkillByName(),
-    example: exampleTool(),
+    listAvailableSkills: listAvailableSkills({ organizationId }),
+    getSkillByName: getSkillByName({ organizationId }),
   };
 
   const descriptions: string[] = [
     "**Markdown Editing**: View and edit the document using getMarkdown and editMarkdown",
     "**Skills**: Access knowledge and writing guidelines using listAvailableSkills and getSkillByName",
-    "**Example (testing)**: A dummy tool triggered when the user says 'example' — echoes a message for UI testing",
   ];
+
+  if (isDev) {
+    tools.example = exampleTool();
+    descriptions.push(
+      "**Example (testing)**: A dummy tool triggered when the user says 'example' — echoes a message for UI testing"
+    );
+  }
 
   const hasGitHub = validatedIntegrations.some(
     (i) => i.type === "github" && i.repositories.length > 0

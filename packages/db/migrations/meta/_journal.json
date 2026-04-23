@@ -204,6 +204,13 @@
       "when": 1776461491141,
       "tag": "0028_previous_tinkerer",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1776890973194,
+      "tag": "0029_spicy_network",
+      "breakpoints": true
     }
   ]
 }

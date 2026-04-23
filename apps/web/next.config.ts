@@ -1,6 +1,7 @@
 import path from "node:path";
 import { createMDX } from "fumadocs-mdx/next";
 import type { NextConfig } from "next";
+import { HOMEPAGE_LINK_HEADER } from "./src/utils/urls";
 
 const SHOWCASE_COMPANY_SLUGS = [
   "autumn",
@@ -84,25 +85,6 @@ const nextConfig: NextConfig = {
       {
         source: "/blog.md",
         destination: "/blog/markdown",
-      },
-      {
-        source: "/blog/engineers-are-great-marketing",
-        destination: "/blog/engineers-are-great-for-marketing",
-      },
-      {
-        source: "/blog/engineers-are-great-marketing",
-        destination: "/blog/engineers-are-great-for-marketing/markdown",
-        has: [
-          {
-            type: "header",
-            key: "accept",
-            value: ".*text/markdown.*",
-          },
-        ],
-      },
-      {
-        source: "/blog/engineers-are-great-marketing.md",
-        destination: "/blog/engineers-are-great-for-marketing/markdown",
       },
       {
         source: "/blog/markdown",
@@ -313,6 +295,15 @@ const nextConfig: NextConfig = {
   ],
   headers: async () => [
     {
+      source: "/",
+      headers: [
+        {
+          key: "Link",
+          value: HOMEPAGE_LINK_HEADER,
+        },
+      ],
+    },
+    {
       source: "/(.*)",
       headers: [
         {
@@ -346,7 +337,7 @@ const nextConfig: NextConfig = {
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' databuddy.cc *.databuddy.cc",
             "style-src 'self' 'unsafe-inline'",
             "font-src 'self'",
-            "img-src 'self' data: blob: databuddy.cc *.databuddy.cc",
+            "img-src 'self' data: blob: databuddy.cc *.databuddy.cc avatars.githubusercontent.com",
             "connect-src 'self' databuddy.cc *.databuddy.cc",
             "frame-src 'none'",
             "frame-ancestors 'none'",
@@ -361,6 +352,12 @@ const nextConfig: NextConfig = {
   ],
   images: {
     formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+    ],
   },
 };
 

@@ -5,13 +5,16 @@ import {
   CorporateIcon,
   Home01Icon,
   Key01Icon,
+  MagicWand01Icon,
   Message01Icon,
   NoteIcon,
   Notification03Icon,
   PlugIcon,
+  SearchIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
+import { Kbd, KbdGroup } from "@notra/ui/components/ui/kbd";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -20,9 +23,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@notra/ui/components/ui/sidebar";
+import { useIsApplePlatform } from "@notra/ui/hooks/use-is-apple-platform";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { memo } from "react";
+import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import type { NavMainCategory, NavMainItem } from "@/types/components/nav";
@@ -57,6 +62,12 @@ const navMainItems: NavMainItem[] = [
     link: "/brand/identity",
     icon: CorporateIcon,
     label: "Identity & References",
+    category: "workspace",
+  },
+  {
+    link: "/skills",
+    icon: MagicWand01Icon,
+    label: "Skills",
     category: "workspace",
   },
   {
@@ -137,7 +148,7 @@ const NavGroup = memo(function NavGroup({
                       <span>{item.label}</span>
                       {item.badge && (
                         <Badge
-                          className="ml-auto h-[1.125rem] px-[0.375rem] text-[0.625rem]"
+                          className="ml-auto h-[1.125rem] px-[0.375rem] text-[0.625rem] text-muted-foreground"
                           variant="secondary"
                         >
                           {item.badge}
@@ -165,6 +176,8 @@ export function NavMain() {
   const { activeOrganization } = useOrganizationsContext();
   const pathname = usePathname();
   const aiChatExperiment = useAiChatExperiment();
+  const { setOpen: setCommandPaletteOpen } = useCommandPalette();
+  const isApplePlatform = useIsApplePlatform();
 
   if (!activeOrganization?.slug) {
     return null;
@@ -177,6 +190,26 @@ export function NavMain() {
 
   return (
     <>
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="cursor-help border border-sidebar-border/60"
+                onClick={() => setCommandPaletteOpen(true)}
+                tooltip="Search"
+              >
+                <HugeiconsIcon icon={SearchIcon} />
+                <span>Search</span>
+                <KbdGroup className="ml-auto group-data-[collapsible=icon]:hidden">
+                  <Kbd>{isApplePlatform ? "⌘" : "Ctrl"}</Kbd>
+                  <Kbd>K</Kbd>
+                </KbdGroup>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
       <NavGroup items={rootItems} pathname={pathname} slug={slug} />
       {categories.map((category) => (
         <NavGroup

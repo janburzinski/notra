@@ -27,9 +27,10 @@ import {
   triggerBrandAnalysisWorkflow,
 } from "../utils/brand-analysis";
 import { selectBrandIdentityColumns } from "../utils/brand-identities";
-import { errorResponse } from "../utils/openapi-responses";
+import { errorResponse, rateLimitResponse } from "../utils/openapi-responses";
 import { getOrganizationResponse } from "../utils/organizations";
 import { isConstraintViolation, isPgUniqueViolation } from "../utils/pg-errors";
+import { enforceRatelimit, RATE_LIMITS, ratelimit } from "../utils/ratelimit";
 import { getRedis } from "../utils/redis";
 import {
   deleteQstashSchedulesForTriggers,
@@ -90,6 +91,10 @@ const createBrandIdentityRoute = createRoute({
     403: errorResponse("Forbidden"),
     404: errorResponse("Organization not found"),
     409: errorResponse("Brand identity name already exists"),
+    429: rateLimitResponse(
+      RATE_LIMITS.brandGeneration.requests,
+      RATE_LIMITS.brandGeneration.window
+    ),
     503: errorResponse("Authentication service unavailable"),
   },
 });
@@ -284,6 +289,11 @@ brandIdentitiesRoutes.openapi(createBrandIdentityRoute, async (c) => {
       { error: "Forbidden: API key must be scoped to an organization" },
       403
     );
+  }
+
+  const rateLimited = await enforceRatelimit(c, ratelimit.brandGeneration);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   const body = c.req.valid("json");

@@ -23,6 +23,12 @@ export const ratelimit = {
     prefix: "ratelimit:import-tweets",
     limiter: Ratelimit.slidingWindow(20, "1m"),
   }),
+  commandPaletteNavigate: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:cmdk-navigate",
+    limiter: Ratelimit.slidingWindow(15, "1m"),
+  }),
 };
 
 export function getClientIp(request: NextRequest): string {

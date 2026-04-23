@@ -95,16 +95,18 @@ export function buildStandaloneToolSet(
     "**Organization Data**: Inspect brand identities, brand references, available integrations, and existing posts using listBrandIdentities, getBrandIdentity, getAvailableBrandReferences, getAvailableIntegrations, getAvailablePosts, and getPostById"
   );
 
-  tools.listAvailableSkills = listAvailableSkills();
-  tools.getSkillByName = getSkillByName();
+  tools.listAvailableSkills = listAvailableSkills({ organizationId });
+  tools.getSkillByName = getSkillByName({ organizationId });
   descriptions.push(
     "**Skills**: Access knowledge and writing guidelines using listAvailableSkills and getSkillByName"
   );
 
-  tools.example = exampleTool();
-  descriptions.push(
-    "**Example (testing)**: A dummy tool triggered when the user says 'example' — echoes a message for UI testing"
-  );
+  if (process.env.NODE_ENV === "development") {
+    tools.example = exampleTool();
+    descriptions.push(
+      "**Example (testing)**: A dummy tool triggered when the user says 'example' — echoes a message for UI testing"
+    );
+  }
 
   const hasGitHub = validatedIntegrations.some(
     (i) => i.type === "github" && i.repositories.length > 0

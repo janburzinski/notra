@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { FeedbackEmail } from "@notra/email/emails/feedback";
 import { InviteUserEmail } from "@notra/email/emails/invite";
 import { ResetPasswordEmail } from "@notra/email/emails/reset";
 import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-content-created";
@@ -6,9 +7,11 @@ import { ScheduledContentFailedEmail } from "@notra/email/emails/schedule-conten
 import { VerifyUserEmail } from "@notra/email/emails/verify";
 import { WelcomeEmail } from "@notra/email/emails/welcome";
 import { EMAIL_CONFIG } from "@notra/email/utils/config";
+import { FEEDBACK_SENTIMENT_META } from "@notra/email/utils/feedback";
 import type { Resend } from "resend";
 import type {
   EmailResult,
+  SendFeedbackEmailProps,
   SendInviteEmailProps,
   SendScheduledContentCreatedEmailProps,
   SendScheduledContentFailedEmailProps,
@@ -256,6 +259,52 @@ export async function sendScheduledContentFailedEmail(
       tags: [{ name: "category", value: "schedule-content-failed" }],
     },
     `notra:schedule-content-failed:${recipientEmail}:${scheduleName}:${Date.now()}`
+  );
+}
+
+export async function sendFeedbackEmail(
+  resend: Resend,
+  {
+    to,
+    message,
+    sentiment,
+    userName,
+    userEmail,
+    organizationName,
+    organizationSlug,
+    pageUrl,
+    userAgent,
+  }: SendFeedbackEmailProps
+) {
+  const idempotencyKey = createHash("sha256")
+    .update(`${userEmail}:${message}:${sentiment ?? ""}:${Date.now()}`)
+    .digest("hex")
+    .slice(0, 32);
+
+  const subjectPrefix = sentiment
+    ? `${FEEDBACK_SENTIMENT_META[sentiment].emoji} `
+    : "";
+
+  return sendWithRetry(
+    resend,
+    {
+      from: EMAIL_CONFIG.from,
+      replyTo: userEmail,
+      to,
+      subject: `${subjectPrefix}New feedback from ${userName}`,
+      react: FeedbackEmail({
+        message,
+        sentiment,
+        userName,
+        userEmail,
+        organizationName,
+        organizationSlug,
+        pageUrl,
+        userAgent,
+      }),
+      tags: [{ name: "category", value: "feedback" }],
+    },
+    `notra:feedback:${idempotencyKey}`
   );
 }
 

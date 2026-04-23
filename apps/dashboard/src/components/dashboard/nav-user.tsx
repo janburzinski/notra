@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
+import { Kbd } from "@notra/ui/components/ui/kbd";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -233,9 +234,7 @@ export function NavUser() {
               >
                 <HugeiconsIcon icon={isDark ? Sun03Icon : Moon02Icon} />
                 {isDark ? "Light Mode" : "Dark Mode"}
-                <kbd className="ml-auto rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-muted-foreground text-xs">
-                  M
-                </kbd>
+                <Kbd className="ml-auto">M</Kbd>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

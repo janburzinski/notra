@@ -1,7 +1,12 @@
 import { contentTypeSchema } from "@notra/ai/schemas/content";
+import {
+  POST_MARKDOWN_MAX_LENGTH,
+  POST_TITLE_MAX_LENGTH,
+} from "@notra/ai/schemas/limits";
 import { POST_SLUG_MAX_LENGTH } from "@notra/ai/schemas/post";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
+import { UI_MESSAGES_MAX, uiMessageSchema } from "./chat";
 import {
   LOOKBACK_WINDOWS,
   SUPPORTED_SCHEDULE_OUTPUT_TYPES,
@@ -103,11 +108,11 @@ export const textSelectionSchema = z.object({
 export type TextSelection = z.infer<typeof textSelectionSchema>;
 
 export const chatRequestSchema = z.object({
-  messages: z.array(z.any()), // UIMessage from ai sdk
-  currentMarkdown: z.string(),
-  contentType: z.string().optional(),
+  messages: z.array(uiMessageSchema).min(1).max(UI_MESSAGES_MAX),
+  currentMarkdown: z.string().max(POST_MARKDOWN_MAX_LENGTH),
+  contentType: z.string().max(100).optional(),
   selection: textSelectionSchema.optional(),
-  context: z.array(contextItemSchema).optional(),
+  context: z.array(contextItemSchema).max(50).optional(),
   timezone: z.string().min(1).max(100).optional(),
 });
 
@@ -117,9 +122,9 @@ const slugFieldSchema = z.string().slugify().min(1).max(POST_SLUG_MAX_LENGTH);
 
 export const updateContentSchema = z
   .object({
-    title: z.string().trim().min(1).max(120).optional(),
+    title: z.string().trim().min(1).max(POST_TITLE_MAX_LENGTH).optional(),
     slug: slugFieldSchema.nullable().optional(),
-    markdown: z.string().min(1).optional(),
+    markdown: z.string().min(1).max(POST_MARKDOWN_MAX_LENGTH).optional(),
     status: postStatusSchema.optional(),
   })
   .refine(

@@ -29,6 +29,7 @@ import {
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Linear } from "@notra/ui/components/ui/svgs/linear";
+import { Notra } from "@notra/ui/components/ui/svgs/notra";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import {
@@ -54,6 +55,10 @@ import { FEATURES } from "@/constants/features";
 import { INPUT_SOURCES } from "@/lib/integrations/catalog";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { ChatInputHandle, ContextItem } from "@/types/chat";
+import type {
+  ChatModelOption,
+  ChatModelProvider,
+} from "@/types/components/chat-input";
 import type { GitHubRepository } from "@/types/integrations";
 import type { QueuedMessage } from "./chat-queue";
 import {
@@ -66,7 +71,14 @@ import {
   serializeFragmentWithReferences,
 } from "./integration-reference";
 
-const AVAILABLE_MODELS = [
+export const AVAILABLE_MODELS: readonly ChatModelOption[] = [
+  {
+    id: "auto",
+    label: "Auto",
+    description: "Picks the best model for your message",
+    pricing: "Varies by selected model",
+    provider: "auto",
+  },
   {
     id: "anthropic/claude-opus-4.7",
     label: "Opus 4.7",
@@ -97,9 +109,9 @@ const AVAILABLE_MODELS = [
   },
 ] as const;
 
-type ModelProvider = (typeof AVAILABLE_MODELS)[number]["provider"];
+export type ModelProvider = ChatModelProvider;
 
-function ModelIcon({
+export function ModelIcon({
   provider,
   className,
 }: {
@@ -113,6 +125,9 @@ function ModelIcon({
         <OpenaiDark className={`${className ?? ""} hidden dark:block`} />
       </>
     );
+  }
+  if (provider === "auto") {
+    return <Notra className={className} />;
   }
   return <ClaudeAiIcon className={className} />;
 }
@@ -215,6 +230,7 @@ function contextItemsEqual(a: ContextItem, b: ContextItem): boolean {
 interface ChatInputAdvancedProps {
   onSend?: (value: string) => void;
   onStop?: () => void;
+  initialValue?: string;
   isLoading?: boolean;
   isStopping?: boolean;
   organizationSlug?: string;
@@ -244,6 +260,7 @@ const THINKING_LABELS: Record<ThinkingLevel, string> = {
 export function ChatInputAdvanced({
   onSend,
   onStop,
+  initialValue,
   isLoading = false,
   isStopping = false,
   organizationSlug,
@@ -271,6 +288,7 @@ export function ChatInputAdvanced({
   const mentionAnchorRef = useRef<{ node: Node; offset: number } | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
   const mentionListRef = useRef<HTMLDivElement | null>(null);
+  const lastInitialValueRef = useRef<string | undefined>(undefined);
   const contextRef = useRef(context);
   contextRef.current = context;
   const { check, data: customer } = useCustomer();
@@ -542,6 +560,36 @@ export function ChatInputAdvanced({
     setMentionQuery(null);
     syncContextFromDOM();
   }, [readEditorText, syncContextFromDOM]);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || initialValue === lastInitialValueRef.current) {
+      return;
+    }
+
+    lastInitialValueRef.current = initialValue;
+    editor.replaceChildren();
+
+    if (initialValue) {
+      editor.append(document.createTextNode(initialValue));
+    }
+
+    setIsEmpty(!(initialValue?.trim().length ?? 0));
+    setMentionQuery(null);
+    mentionAnchorRef.current = null;
+
+    if (!initialValue) {
+      return;
+    }
+
+    editor.focus();
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }, [initialValue]);
 
   const insertMention = useCallback(
     (item: MentionItem) => {
@@ -1035,7 +1083,7 @@ export function ChatInputAdvanced({
   );
 
   const currentModel =
-    AVAILABLE_MODELS.find((m) => m.id === model) ?? AVAILABLE_MODELS[0];
+    AVAILABLE_MODELS.find((m) => m.id === model) ?? AVAILABLE_MODELS[0]!;
 
   return (
     <Card
@@ -1258,6 +1306,11 @@ export function ChatInputAdvanced({
                       provider={currentModel.provider}
                     />
                     {currentModel.label}
+                    {currentModel.beta && (
+                      <span className="rounded-sm bg-primary/10 px-1 py-px font-medium text-[0.625rem] text-primary uppercase leading-none tracking-wide">
+                        Beta
+                      </span>
+                    )}
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
@@ -1274,7 +1327,14 @@ export function ChatInputAdvanced({
                         provider={m.provider}
                       />
                       <div className="flex min-w-0 flex-col">
-                        <span className="text-sm">{m.label}</span>
+                        <span className="flex items-center gap-1.5 text-sm">
+                          {m.label}
+                          {m.beta && (
+                            <span className="rounded-sm bg-primary/10 px-1 py-px font-medium text-[0.625rem] text-primary uppercase leading-none tracking-wide">
+                              Beta
+                            </span>
+                          )}
+                        </span>
                         <span className="text-muted-foreground text-xs">
                           {m.description}
                         </span>

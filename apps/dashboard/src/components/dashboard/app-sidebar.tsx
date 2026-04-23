@@ -11,9 +11,9 @@ import {
   SidebarMenuButton,
 } from "@notra/ui/components/ui/sidebar";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type * as React from "react";
+import { useRef } from "react";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { ChatHistoryNav } from "./chat-history-nav";
 import { NavMain } from "./nav-main";
@@ -47,6 +47,7 @@ export function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const router = useRouter();
   const { activeOrganization } = useOrganizationsContext();
   const shouldReduceMotion = useReducedMotion();
   const pathnameSegments = pathname.split("/").filter(Boolean);
@@ -56,6 +57,19 @@ export function DashboardSidebar({
   const isSettingsRoute = section === "settings";
   const isChatRoute = section === "chat";
   const isSubpage = isSettingsRoute || isChatRoute;
+
+  const hasVisitedMainRef = useRef(false);
+  if (!isSubpage) {
+    hasVisitedMainRef.current = true;
+  }
+
+  function handleBack() {
+    if (hasVisitedMainRef.current) {
+      router.back();
+      return;
+    }
+    router.push(`/${slug}`);
+  }
 
   const mainVariants = createMainVariants(shouldReduceMotion);
   const subpageVariants = createSubpageVariants(shouldReduceMotion);
@@ -80,15 +94,13 @@ export function DashboardSidebar({
             >
               <SidebarMenu>
                 <SidebarMenuButton
-                  className="[&>*]:group-data-[collapsible=icon]:-translate-x-px transition-colors duration-200 hover:bg-sidebar-accent"
-                  render={
-                    <Link href={`/${slug}`}>
-                      <HugeiconsIcon icon={ArrowLeft01Icon} />
-                      <span>Back</span>
-                    </Link>
-                  }
+                  className="[&>*]:group-data-[collapsible=icon]:-translate-x-px cursor-pointer transition-colors duration-200 hover:bg-sidebar-accent"
+                  onClick={handleBack}
                   tooltip="Back"
-                />
+                >
+                  <HugeiconsIcon icon={ArrowLeft01Icon} />
+                  <span>Back</span>
+                </SidebarMenuButton>
               </SidebarMenu>
             </motion.div>
           )}
@@ -119,6 +131,9 @@ export function DashboardSidebar({
               variants={subpageVariants}
             >
               <ChatHistoryNav />
+              <div className="mt-auto">
+                <NavSecondary />
+              </div>
             </motion.div>
           ) : (
             <motion.div

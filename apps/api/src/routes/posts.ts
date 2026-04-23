@@ -43,9 +43,10 @@ import {
   extractTitleFromMarkdown,
   renderMarkdownToHtml,
 } from "../utils/markdown";
-import { errorResponse } from "../utils/openapi-responses";
+import { errorResponse, rateLimitResponse } from "../utils/openapi-responses";
 import { getOrganizationResponse } from "../utils/organizations";
 import { isConstraintViolation, isPgUniqueViolation } from "../utils/pg-errors";
+import { enforceRatelimit, RATE_LIMITS, ratelimit } from "../utils/ratelimit";
 import { getRedis } from "../utils/redis";
 
 export const postsRoutes = new OpenAPIHono();
@@ -168,6 +169,10 @@ const patchPostRoute = createRoute({
     403: errorResponse("Forbidden"),
     404: errorResponse("Post not found"),
     409: errorResponse("Post slug already exists"),
+    429: rateLimitResponse(
+      RATE_LIMITS.postUpdate.requests,
+      RATE_LIMITS.postUpdate.window
+    ),
     503: errorResponse("Authentication service unavailable"),
   },
 });
@@ -201,6 +206,10 @@ const createPostGenerationRoute = createRoute({
     401: errorResponse("Missing or invalid API key"),
     403: errorResponse("Forbidden"),
     404: errorResponse("Organization not found"),
+    429: rateLimitResponse(
+      RATE_LIMITS.postGeneration.requests,
+      RATE_LIMITS.postGeneration.window
+    ),
     503: {
       description: "Content generation is unavailable",
       content: {
@@ -401,6 +410,11 @@ postsRoutes.openapi(patchPostRoute, async (c) => {
     );
   }
 
+  const rateLimited = await enforceRatelimit(c, ratelimit.postUpdate);
+  if (rateLimited) {
+    return rateLimited;
+  }
+
   const { postId } = c.req.valid("param");
   const body = c.req.valid("json");
   const db = c.get("db");
@@ -524,6 +538,11 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
       { error: "Forbidden: API key must be scoped to an organization" },
       403
     );
+  }
+
+  const rateLimited = await enforceRatelimit(c, ratelimit.postGeneration);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   const runtimeEnv = c.env ?? {};

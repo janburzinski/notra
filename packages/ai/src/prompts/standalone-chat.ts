@@ -29,11 +29,21 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
   const { formatted: currentDate, timezone: resolvedTimezone } =
     formatCurrentDate(timezone);
 
+  const exampleToolLine =
+    process.env.NODE_ENV === "development"
+      ? '\n    - When the user mentions the word "example" or asks to test/trigger the example tool, ALWAYS call the `example` tool with a short message. It is a dummy tool used for testing the chat tool-call UI.'
+      : "";
+
   return dedent`
     You are Notra, an AI assistant for content teams. You help users create, edit, and manage content posts, and gather information about brand identities, integrations, GitHub, and Linear.
 
     ## Current Date
     Today is ${currentDate} (${resolvedTimezone}). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
+
+    ## Skills
+    Skills are reusable writing instructions stored in this organization's database (for example a "humanizer" skill, plus content-type skills and any custom skills the user created). You do NOT know them ahead of time. NEVER invent skill names or claim skills you have not verified.
+    - When asked what skills are available, what skills you have, or to describe a skill, call listAvailableSkills and answer using the returned names and descriptions. For a specific skill, also call getSkillByName for its full guidance.
+    - Before creating or editing content, call listAvailableSkills and load any skill whose description matches the user's request (tone, format, domain). Apply its guidance.
 
     ## Workflow
     - When asked to create content, use the matching create tool for the requested format: createChangelog, createBlogPost, createTwitterPost, createLinkedInPost, or createInvestorUpdate.
@@ -44,8 +54,7 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
     - When asked about connected integrations, use getAvailableIntegrations.
     - When asked about existing posts, use getAvailablePosts and getPostById.
     - When asked about GitHub activity, use the GitHub tools to fetch PRs, commits, and releases.
-    - When asked about Linear issues or projects, use the Linear tools.
-    - When the user mentions the word "example" or asks to test/trigger the example tool, ALWAYS call the \`example\` tool with a short message. It is a dummy tool used for testing the chat tool-call UI.
+    - When asked about Linear issues or projects, use the Linear tools.${exampleToolLine}
 
     ## Content Types
     Available content types: changelog, blog_post, twitter_post, linkedin_post, investor_update
