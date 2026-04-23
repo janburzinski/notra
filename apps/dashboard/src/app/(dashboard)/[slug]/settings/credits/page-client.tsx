@@ -84,7 +84,9 @@ function getCreditEventLabel(event: ListEventsRow) {
   }
 
   const source =
-    properties && "source" in properties && typeof properties.source === "string"
+    properties &&
+    "source" in properties &&
+    typeof properties.source === "string"
       ? properties.source
       : undefined;
 
