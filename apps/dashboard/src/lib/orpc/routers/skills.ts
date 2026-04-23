@@ -65,8 +65,10 @@ interface SkillsShSkill {
   files?: SkillsShFile[] | null;
 }
 
+const SKILL_MD_REGEX = /(^|\/)SKILL\.md$/i;
+
 function pickPrimarySkillFile(files: SkillsShFile[]): SkillsShFile | null {
-  const named = files.find((f) => /(^|\/)SKILL\.md$/i.test(f.path));
+  const named = files.find((f) => SKILL_MD_REGEX.test(f.path));
   if (named) {
     return named;
   }
