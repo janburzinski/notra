@@ -1,7 +1,8 @@
 import crypto from "node:crypto";
 
 const ALGORITHM = "aes-256-gcm";
-const IV_LENGTH = 16;
+const IV_LENGTH = 12;
+const CURRENT_VERSION = "v1";
 
 export function decodeIntegrationEncryptionKey(
   key: string | undefined,
@@ -29,20 +30,20 @@ export function encryptIntegrationSecret(value: string, key: Buffer) {
   let encrypted = cipher.update(value, "utf8", "hex");
   encrypted += cipher.final("hex");
 
-  return `${iv.toString("hex")}:${cipher.getAuthTag().toString("hex")}:${encrypted}`;
+  return `${CURRENT_VERSION}:${iv.toString("hex")}:${cipher.getAuthTag().toString("hex")}:${encrypted}`;
 }
 
 export function decryptIntegrationSecret(encryptedValue: string, key: Buffer) {
   const parts = encryptedValue.split(":");
-
-  if (parts.length !== 3) {
-    throw new Error("Invalid encrypted token format");
-  }
-
-  const [ivHex, authTagHex, encrypted] = parts;
+  const [version, ivHex, authTagHex, encrypted] =
+    parts.length === 4 ? parts : [undefined, ...parts];
 
   if (!(ivHex && authTagHex && encrypted)) {
     throw new Error("Invalid encrypted token format");
+  }
+
+  if (version !== undefined && version !== CURRENT_VERSION) {
+    throw new Error(`Unsupported encrypted token version: ${version}`);
   }
 
   const decipher = crypto.createDecipheriv(

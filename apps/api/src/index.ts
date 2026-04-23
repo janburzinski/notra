@@ -8,6 +8,7 @@ import { integrationsRoutes } from "./routes/integrations";
 import { legacyRedirectRoutes } from "./routes/legacy-redirects";
 import { postsRoutes } from "./routes/posts";
 import { schedulesRoutes } from "./routes/schedules";
+import { assertRequiredEnv } from "./utils/env";
 
 const FRAMER_PLUGIN_ID = "8d4wmwtko6960jsu3ojmalvqm";
 
@@ -17,19 +18,21 @@ const FRAMER_PLUGIN_ORIGIN_PATTERN = new RegExp(
 
 const LOCAL_DEV_ORIGIN_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
 function getAllowedOrigin(origin: string | undefined): string | null {
   if (!origin) {
     return null;
   }
 
-  if (
-    FRAMER_PLUGIN_ORIGIN_PATTERN.test(origin) ||
-    LOCAL_DEV_ORIGIN_PATTERN.test(origin)
-  ) {
-    return origin;
-  }
+  const allowedPatterns = [
+    FRAMER_PLUGIN_ORIGIN_PATTERN,
+    ...(IS_PRODUCTION ? [] : [LOCAL_DEV_ORIGIN_PATTERN]),
+  ];
 
-  return null;
+  return allowedPatterns.some((pattern) => pattern.test(origin))
+    ? origin
+    : null;
 }
 
 interface Bindings {
@@ -53,13 +56,16 @@ interface AppEnv {
   };
 }
 
+assertRequiredEnv();
+
 const app = new OpenAPIHono<AppEnv>({ strict: true });
 
 app.use("/v1/*", async (c, next) => {
   const origin = c.req.header("origin");
   const allowedOrigin = getAllowedOrigin(origin);
 
-  c.header("Vary", "Origin");
+  c.header("Vary", "Origin, Authorization");
+  c.header("Cache-Control", "private, no-store");
   c.header("X-Content-Type-Options", "nosniff");
   c.header(
     "Strict-Transport-Security",
@@ -77,7 +83,7 @@ app.use("/v1/*", async (c, next) => {
   }
 
   if (c.req.method === "OPTIONS") {
-    return c.body(null, 204);
+    return c.body(null, allowedOrigin ? 204 : 403);
   }
 
   await next();

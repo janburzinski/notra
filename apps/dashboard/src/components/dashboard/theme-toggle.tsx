@@ -2,6 +2,7 @@
 
 import { Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Kbd } from "@notra/ui/components/ui/kbd";
 import { SidebarMenuButton, useSidebar } from "@notra/ui/components/ui/sidebar";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -46,9 +47,12 @@ export function ThemeToggle() {
         icon={isDark ? Sun03Icon : Moon02Icon}
       />
       {!isCollapsed && (
-        <span className="flex-1 text-left text-sm">
-          {isDark ? "Light Mode" : "Dark Mode"}
-        </span>
+        <>
+          <span className="flex-1 text-left text-sm">
+            {isDark ? "Light Mode" : "Dark Mode"}
+          </span>
+          <Kbd className="ml-auto">M</Kbd>
+        </>
       )}
     </SidebarMenuButton>
   );

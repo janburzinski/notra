@@ -1,6 +1,7 @@
 import type { createDb } from "@notra/db/drizzle-http";
 import { contentTriggers } from "@notra/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
+import { logError } from "./logging";
 import { deleteQstashSchedule } from "./qstash";
 
 type DbClient = ReturnType<typeof createDb>;
@@ -112,8 +113,8 @@ export async function deleteQstashSchedulesForTriggers(
 
     await deleteQstashSchedule(runtimeEnv, trigger.qstashScheduleId).catch(
       (error) => {
-        console.error(
-          `Failed to delete qstash schedule ${trigger.qstashScheduleId}:`,
+        logError(
+          `Failed to delete qstash schedule ${trigger.qstashScheduleId}`,
           error
         );
       }

@@ -1,5 +1,6 @@
 import {
   ALLOWED_CHAT_MIME_TYPES,
+  SVG_MIME_TYPE,
   type AllowedChatMimeType,
 } from "@/constants/upload";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -34,10 +35,23 @@ async function uploadToR2(presignedUrl: string, file: File) {
   }
 }
 
+async function uploadSvgThroughServer(file: File): Promise<UploadFileResponse> {
+  const svg = await file.text();
+  const { key, publicUrl } = await dashboardOrpc.upload.uploadSvg.call({
+    type: "content",
+    svg,
+  });
+  return { url: publicUrl, key };
+}
+
 export async function uploadFile({
   file,
   type,
 }: UploadFileProps): Promise<UploadFileResponse> {
+  if (type === "content" && file.type === SVG_MIME_TYPE) {
+    return uploadSvgThroughServer(file);
+  }
+
   const { url, key, publicUrl } = await getPresignedUrl(file, type);
   await uploadToR2(url, file);
 

@@ -197,7 +197,14 @@ export const { POST } = serve<ContentGenerationWorkflowPayload>(
         });
       });
       await context.run("refund-no-sources", async () => {
-        await refundReservedAiCredit(organizationId, aiCreditReserved);
+        await refundReservedAiCredit(organizationId, aiCreditReserved, {
+          source: "manual",
+          output_type: contentType,
+          trigger_id: "manual_on_demand",
+          trigger_name: contentType,
+          refund_reason: "no_sources",
+          run_id: runId,
+        });
       });
       await context.run("track-content-failed-no-sources", async () => {
         try {
@@ -443,7 +450,14 @@ export const { POST } = serve<ContentGenerationWorkflowPayload>(
         });
 
         await context.run("refund-failed", async () => {
-          await refundReservedAiCredit(organizationId, aiCreditReserved);
+          await refundReservedAiCredit(organizationId, aiCreditReserved, {
+            source: "manual",
+            output_type: contentType,
+            trigger_id: "manual_on_demand",
+            trigger_name: contentType,
+            refund_reason: contentResult.status,
+            run_id: runId,
+          });
         });
 
         await context.run("track-content-failed", async () => {
@@ -515,7 +529,14 @@ export const { POST } = serve<ContentGenerationWorkflowPayload>(
         });
 
         await context.run("refund-no-posts", async () => {
-          await refundReservedAiCredit(organizationId, aiCreditReserved);
+          await refundReservedAiCredit(organizationId, aiCreditReserved, {
+            source: "manual",
+            output_type: contentType,
+            trigger_id: "manual_on_demand",
+            trigger_name: contentType,
+            refund_reason: "no_posts",
+            run_id: runId,
+          });
         });
 
         await context.run("track-content-failed-no-posts", async () => {
@@ -597,11 +618,11 @@ export const { POST } = serve<ContentGenerationWorkflowPayload>(
             properties: {
               source: "manual",
               output_type: contentType,
-              input_tokens: contentResult.usage!.inputTokens,
-              output_tokens: contentResult.usage!.outputTokens,
-              cache_read_tokens: contentResult.usage!.cacheReadTokens,
-              cache_write_tokens: contentResult.usage!.cacheWriteTokens,
-              total_tokens: contentResult.usage!.totalTokens,
+              input_tokens: contentResult.usage?.inputTokens,
+              output_tokens: contentResult.usage?.outputTokens,
+              cache_read_tokens: contentResult.usage?.cacheReadTokens,
+              cache_write_tokens: contentResult.usage?.cacheWriteTokens,
+              total_tokens: contentResult.usage?.totalTokens,
               cost_cents: costCents,
             },
           });
@@ -703,7 +724,14 @@ export const { POST } = serve<ContentGenerationWorkflowPayload>(
       });
 
       await context.run("refund-error", async () => {
-        await refundReservedAiCredit(organizationId, aiCreditReserved);
+        await refundReservedAiCredit(organizationId, aiCreditReserved, {
+          source: "manual",
+          output_type: contentType,
+          trigger_id: "manual_on_demand",
+          trigger_name: contentType,
+          refund_reason: "workflow_error",
+          run_id: runId,
+        });
       });
 
       await context.run("track-content-failed-error", async () => {
@@ -763,7 +791,15 @@ export const { POST } = serve<ContentGenerationWorkflowPayload>(
         );
         await refundReservedAiCredit(
           payload.organizationId,
-          payload.aiCreditReserved
+          payload.aiCreditReserved,
+          {
+            source: "manual",
+            output_type: payload.contentType,
+            trigger_id: "manual_on_demand",
+            trigger_name: payload.contentType,
+            refund_reason: "workflow_infrastructure_failure",
+            run_id: payload.runId,
+          }
         );
         await trackScheduledContentFailed({
           triggerId: "manual_on_demand",

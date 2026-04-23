@@ -11,6 +11,8 @@ import {
   MAX_CHAT_FILE_SIZE,
   MAX_CONTENT_FILE_SIZE,
   MAX_LOGO_FILE_SIZE,
+  MAX_SVG_CONTENT_SIZE,
+  SVG_MIME_TYPE,
 } from "@/constants/upload";
 import type { UploadType } from "@/types/upload/client";
 
@@ -92,6 +94,21 @@ export const recordChatAttachmentSchema = z.object({
   size: z.coerce.number().int().positive().max(MAX_CHAT_FILE_SIZE),
 });
 
+export const uploadSvgSchema = z.object({
+  type: z.literal("content"),
+  svg: z
+    .string()
+    .min(1)
+    .refine(
+      (value) => Buffer.byteLength(value, "utf8") <= MAX_SVG_CONTENT_SIZE,
+      {
+        message: `SVG content must be less than ${MAX_SVG_CONTENT_SIZE / 1024 / 1024}MB`,
+      }
+    ),
+});
+
+export type UploadSvgInput = z.infer<typeof uploadSvgSchema>;
+
 const maxSizeByType = {
   avatar: MAX_AVATAR_FILE_SIZE,
   logo: MAX_LOGO_FILE_SIZE,
@@ -131,6 +148,11 @@ export function validateUpload({
       }
       break;
     case "content":
+      if (fileType === SVG_MIME_TYPE) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "SVG uploads must use the dedicated SVG upload endpoint",
+        });
+      }
       if (!ALLOWED_MIME_TYPES.includes(fileType as AllowedMimeType)) {
         throw new ORPCError("BAD_REQUEST", {
           message: `File type ${fileType} is not allowed. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`,

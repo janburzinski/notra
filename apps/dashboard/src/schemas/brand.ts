@@ -3,6 +3,14 @@ import {
   type SupportedLanguage,
 } from "@notra/ai/constants/languages";
 import { supportedLanguageSchema } from "@notra/ai/schemas/language";
+import {
+  brandAudienceSchema,
+  brandCompanyDescriptionSchema,
+  brandCompanyNameSchema,
+  brandCustomInstructionsSchema,
+  brandCustomToneSchema,
+  brandNameSchema,
+} from "@notra/ai/schemas/limits";
 import { toneProfileSchema } from "@notra/ai/schemas/tone";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
@@ -13,12 +21,12 @@ export function getValidLanguage(value: unknown): SupportedLanguage {
 }
 
 export const brandSettingsSchema = z.object({
-  companyName: z.string().min(1, "Company name is required"),
-  companyDescription: z.string().min(10, "Please provide a description"),
+  companyName: brandCompanyNameSchema,
+  companyDescription: brandCompanyDescriptionSchema,
   toneProfile: toneProfileSchema,
-  customTone: z.string().nullable().optional(),
-  customInstructions: z.string().nullable().optional(),
-  audience: z.string().min(10, "Please describe your target audience"),
+  customTone: brandCustomToneSchema.nullable().optional(),
+  customInstructions: brandCustomInstructionsSchema.nullable().optional(),
+  audience: brandAudienceSchema,
   language: supportedLanguageSchema.default(DEFAULT_LANGUAGE),
 });
 
@@ -33,7 +41,7 @@ export type AnalyzeBrandInput = z.infer<typeof analyzeBrandSchema>;
 export const updateBrandSettingsSchema = brandSettingsSchema
   .extend({
     id: z.string().optional(),
-    name: z.string().min(1).optional(),
+    name: brandNameSchema.optional(),
     websiteUrl: z.url().optional(),
   })
   .partial();

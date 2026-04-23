@@ -2,6 +2,8 @@ import { Autumn } from "autumn-js";
 import type { Context, Next } from "hono";
 import { getOrganizationId } from "../utils/auth";
 
+// DELETE and GET are intentionally unrestricted so lapsed/unsubscribed orgs
+// retain read access and data-deletion rights (GDPR / data portability).
 const RESTRICTED_METHODS = new Set(["POST", "PUT", "PATCH"]);
 
 const PAID_OR_LEGACY_PLAN_IDS = new Set([
@@ -20,12 +22,18 @@ export function subscriptionMiddleware() {
 
     const secretKey = c.env.AUTUMN_SECRET_KEY as string | undefined;
     if (!secretKey) {
-      return next();
+      console.error(
+        "AUTUMN_SECRET_KEY is not configured — rejecting write request"
+      );
+      return c.json({ error: "Billing service unavailable" }, 503);
     }
 
     const orgId = getOrganizationId(c);
     if (!orgId) {
-      return next();
+      return c.json(
+        { error: "Forbidden: API key must be scoped to an organization" },
+        403
+      );
     }
 
     const autumn = new Autumn({ secretKey });

@@ -471,10 +471,17 @@ async function createDirectStandaloneChatResponse({
       sendReasoning: enableThinking !== false,
       headers: { "X-Chat-Id": chatId },
       messageMetadata: ({ part }) => {
+        const effectiveThinkingLevel =
+          enableThinking === false
+            ? "off"
+            : (routingDecision.thinkingLevel ?? thinkingLevel);
+
         if (part.type === "start") {
           return {
             model: routingDecision.model,
-            thinkingLevel: enableThinking === false ? "off" : thinkingLevel,
+            requestedModel: model ?? "auto",
+            thinkingLevel: effectiveThinkingLevel,
+            requestedThinkingLevel: thinkingLevel,
             createdAt: streamStartedAt,
           };
         }
@@ -487,7 +494,9 @@ async function createDirectStandaloneChatResponse({
             partUsage: part.totalUsage,
             usageSnapshot,
             model: routingDecision.model,
-            thinkingLevel: enableThinking === false ? "off" : thinkingLevel,
+            requestedModel: model ?? "auto",
+            thinkingLevel: effectiveThinkingLevel,
+            requestedThinkingLevel: thinkingLevel,
           });
         }
 
@@ -522,8 +531,14 @@ async function createDirectStandaloneChatResponse({
     });
   };
 
-  if (log.fork) {
-    log.fork("standalone_chat_stream", async () => {
+  const fork = (
+    log as typeof log & {
+      fork?: (label: string, callback: () => Promise<void>) => void;
+    }
+  ).fork;
+
+  if (fork) {
+    fork("standalone_chat_stream", async () => {
       try {
         // biome-ignore lint/correctness/useHookAtTopLevel: useLogger is an async-context accessor, not a React hook
         const response = await runStream(useLogger());

@@ -1,5 +1,9 @@
 import { getCalApi } from "@calcom/embed-react";
-import { ArrowRight01Icon, Calendar03Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowRight01Icon,
+  Calendar03Icon,
+  Message01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Breadcrumb,
@@ -10,14 +14,17 @@ import {
   BreadcrumbSeparator,
 } from "@notra/ui/components/ui/breadcrumb";
 import { Button } from "@notra/ui/components/ui/button";
+import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Separator } from "@notra/ui/components/ui/separator";
 import { SidebarTrigger } from "@notra/ui/components/ui/sidebar";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useId } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useId, useRef } from "react";
 import { CreditBalanceButton } from "@/components/billing/credit-balance-button";
 import { ChatTopbarTitle } from "@/components/dashboard/chat-topbar-title";
+import { useFeedback } from "@/components/dashboard/feedback-context";
+import { FeedbackPopover } from "@/components/dashboard/feedback-popover";
 
 const NON_ORG_PATHS: string[] = [];
 
@@ -28,8 +35,49 @@ const SEGMENT_CONFIG: Record<string, { label?: string; href?: null }> = {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const id = useId();
   const segments = pathname.split("/").filter(Boolean);
+  const slug = segments[0];
+  const isInSettings = segments[1] === "settings";
+  const preSettingsPathsRef = useRef<Record<string, string>>({});
+  const activeSettingsShortcutSlugRef = useRef<string | null>(null);
+  const { openFeedback } = useFeedback();
+
+  useEffect(() => {
+    const activeSlug = activeSettingsShortcutSlugRef.current;
+    if (!activeSlug) {
+      return;
+    }
+
+    if (activeSlug !== slug || !isInSettings) {
+      delete preSettingsPathsRef.current[activeSlug];
+      activeSettingsShortcutSlugRef.current = null;
+    }
+  }, [isInSettings, slug]);
+
+  useHotkey("Mod+,", (event) => {
+    event.preventDefault();
+    if (!slug) {
+      return;
+    }
+
+    if (isInSettings) {
+      const returnPath =
+        activeSettingsShortcutSlugRef.current === slug
+          ? preSettingsPathsRef.current[slug]
+          : null;
+
+      delete preSettingsPathsRef.current[slug];
+      activeSettingsShortcutSlugRef.current = null;
+      router.push(returnPath ?? `/${slug}`);
+      return;
+    }
+
+    preSettingsPathsRef.current[slug] = pathname;
+    activeSettingsShortcutSlugRef.current = slug;
+    router.push(`/${slug}/settings/account`);
+  });
 
   useEffect(() => {
     (async () => {
@@ -43,6 +91,10 @@ export function SiteHeader() {
       '[data-cal-namespace="15min"]'
     );
     btn?.click();
+  });
+
+  useHotkey("F", () => {
+    openFeedback();
   });
 
   const isNonOrgPath = NON_ORG_PATHS.some((path) => pathname.startsWith(path));
@@ -104,18 +156,32 @@ export function SiteHeader() {
   });
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-dashed transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+    <header className="relative flex h-12 shrink-0 items-center gap-2 border-b border-dashed transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
-        <SidebarTrigger className="-ml-1" />
-        <Separator
-          className="mx-2 border-border border-l border-dashed bg-transparent"
-          orientation="vertical"
-        />
-        <Breadcrumb>
-          <BreadcrumbList>{breadcrumbs}</BreadcrumbList>
-        </Breadcrumb>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-1 lg:gap-2">
+          <SidebarTrigger className="-ml-1" />
+          <Separator
+            className="mx-2 border-border border-l border-dashed bg-transparent"
+            orientation="vertical"
+          />
+          <Breadcrumb className="min-w-0">
+            <BreadcrumbList className="flex-nowrap">
+              {breadcrumbs}
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
           <CreditBalanceButton />
+          <FeedbackPopover
+            sharedState
+            trigger={
+              <Button className="gap-1.5" size="sm" variant="outline">
+                <HugeiconsIcon icon={Message01Icon} size={16} />
+                Feedback
+                <Kbd className="ml-1 hidden sm:inline-flex">F</Kbd>
+              </Button>
+            }
+          />
           <Button
             className="gap-1.5"
             data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
@@ -126,9 +192,7 @@ export function SiteHeader() {
           >
             <HugeiconsIcon icon={Calendar03Icon} size={16} />
             Book a Call
-            <kbd className="pointer-events-none ml-1 hidden select-none rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-muted-foreground text-xs sm:inline-block">
-              C
-            </kbd>
+            <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
           </Button>
         </div>
       </div>

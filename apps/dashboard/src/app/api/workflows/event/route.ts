@@ -309,6 +309,15 @@ export const { POST } = serve<EventWorkflowPayload>(
                 customerId: trigger.organizationId,
                 featureId: FEATURES.AI_CREDITS,
                 value: 0,
+                properties: {
+                  source: "workflow_event",
+                  output_type: trigger.outputType,
+                  trigger_name: trigger.name.trim() || `${eventType} event`,
+                  trigger_id: triggerId,
+                  run_id: runId,
+                  event_type: eventType,
+                  refund_reason: "unsupported_output_type",
+                },
               });
             } catch (error) {
               console.error("[Event] Failed to refund AI credit:", error);
@@ -344,6 +353,15 @@ export const { POST } = serve<EventWorkflowPayload>(
                 customerId: trigger.organizationId,
                 featureId: FEATURES.AI_CREDITS,
                 value: 0,
+                properties: {
+                  source: "workflow_event",
+                  output_type: trigger.outputType,
+                  trigger_name: trigger.name.trim() || `${eventType} event`,
+                  trigger_id: triggerId,
+                  run_id: runId,
+                  event_type: eventType,
+                  refund_reason: "generation_failed",
+                },
               });
             } catch (error) {
               console.error("[Event] Failed to refund AI credit:", error);
@@ -504,11 +522,11 @@ export const { POST } = serve<EventWorkflowPayload>(
               source: "workflow_event",
               output_type: trigger.outputType,
               trigger_name: trigger.name,
-              input_tokens: contentResult.usage!.inputTokens,
-              output_tokens: contentResult.usage!.outputTokens,
-              cache_read_tokens: contentResult.usage!.cacheReadTokens,
-              cache_write_tokens: contentResult.usage!.cacheWriteTokens,
-              total_tokens: contentResult.usage!.totalTokens,
+              input_tokens: contentResult.usage?.inputTokens,
+              output_tokens: contentResult.usage?.outputTokens,
+              cache_read_tokens: contentResult.usage?.cacheReadTokens,
+              cache_write_tokens: contentResult.usage?.cacheWriteTokens,
+              total_tokens: contentResult.usage?.totalTokens,
               cost_cents: costCents,
             },
           });
@@ -639,6 +657,15 @@ export const { POST } = serve<EventWorkflowPayload>(
               customerId: trigger.organizationId,
               featureId: FEATURES.AI_CREDITS,
               value: 0,
+              properties: {
+                source: "workflow_event",
+                output_type: trigger.outputType,
+                trigger_name: trigger.name.trim() || `${eventType} event`,
+                trigger_id: triggerId,
+                run_id: runId,
+                event_type: eventType,
+                refund_reason: "workflow_error",
+              },
             });
           } catch (refundError) {
             console.error("[Event] Failed to refund AI credit:", refundError);

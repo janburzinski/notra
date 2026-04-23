@@ -69,6 +69,14 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(1)} MiB`;
 }
 
+export function truncateSnippet(text: string, max: number): string {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (normalized.length <= max) {
+    return normalized;
+  }
+  return `${normalized.slice(0, max - 1)}…`;
+}
+
 export function truncateText(value: string, maxLength: number): string {
   if (maxLength <= 0) {
     return "";

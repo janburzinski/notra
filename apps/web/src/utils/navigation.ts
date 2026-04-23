@@ -50,6 +50,10 @@ export const FOOTER_PRODUCT_LINKS = [
     label: "Changelog",
   },
   {
+    href: "/contributors",
+    label: "Contributors",
+  },
+  {
     href: "https://docs.usenotra.com",
     label: "Docs",
     rel: "noreferrer",

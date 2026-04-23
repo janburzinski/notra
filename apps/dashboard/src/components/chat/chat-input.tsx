@@ -33,6 +33,7 @@ import {
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Linear } from "@notra/ui/components/ui/svgs/linear";
+import { Notra } from "@notra/ui/components/ui/svgs/notra";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import {
@@ -96,7 +97,14 @@ import {
   serializeFragmentWithReferences,
 } from "./integration-reference";
 
-const AVAILABLE_MODELS = [
+export const AVAILABLE_MODELS = [
+  {
+    id: "auto",
+    label: "Auto",
+    description: "Picks the best model for your message",
+    pricing: "Varies by selected model",
+    provider: "auto",
+  },
   {
     id: "anthropic/claude-opus-4.7",
     label: "Opus 4.7",
@@ -129,7 +137,7 @@ const AVAILABLE_MODELS = [
 
 type ModelProvider = (typeof AVAILABLE_MODELS)[number]["provider"];
 
-function ModelIcon({
+export function ModelIcon({
   provider,
   className,
 }: {
@@ -143,6 +151,9 @@ function ModelIcon({
         <OpenaiDark className={`${className ?? ""} hidden dark:block`} />
       </>
     );
+  }
+  if (provider === "auto") {
+    return <Notra className={className} />;
   }
   return <ClaudeAiIcon className={className} />;
 }
@@ -246,6 +257,7 @@ function contextItemsEqual(a: ContextItem, b: ContextItem): boolean {
 interface ChatInputAdvancedProps {
   onSend?: (value: string, attachments: ChatAttachment[]) => void;
   onStop?: () => void;
+  initialValue?: string;
   isLoading?: boolean;
   isStopping?: boolean;
   organizationSlug?: string;
@@ -286,6 +298,7 @@ interface QueuedSendSnapshot {
 export function ChatInputAdvanced({
   onSend,
   onStop,
+  initialValue,
   isLoading = false,
   isStopping = false,
   organizationSlug,
@@ -295,7 +308,7 @@ export function ChatInputAdvanced({
   onRemoveContext,
   error: externalError,
   onClearError,
-  model = "anthropic/claude-sonnet-4.6",
+  model = "auto",
   onModelChange,
   thinkingLevel = "medium",
   onThinkingLevelChange,
@@ -314,6 +327,7 @@ export function ChatInputAdvanced({
   const editorRef = useRef<HTMLDivElement | null>(null);
   const mentionListRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const lastInitialValueRef = useRef<string | undefined>(undefined);
   const contextRef = useRef(context);
   contextRef.current = context;
 
@@ -839,6 +853,36 @@ export function ChatInputAdvanced({
     setMentionQuery(null);
     syncContextFromDOM();
   }, [readEditorText, syncContextFromDOM]);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || initialValue === lastInitialValueRef.current) {
+      return;
+    }
+
+    lastInitialValueRef.current = initialValue;
+    editor.replaceChildren();
+
+    if (initialValue) {
+      editor.append(document.createTextNode(initialValue));
+    }
+
+    setIsEmpty(!(initialValue?.trim().length ?? 0));
+    setMentionQuery(null);
+    mentionAnchorRef.current = null;
+
+    if (!initialValue) {
+      return;
+    }
+
+    editor.focus();
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }, [initialValue]);
 
   const insertMention = useCallback(
     (item: MentionItem) => {

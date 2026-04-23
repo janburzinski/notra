@@ -1,6 +1,20 @@
+import type { FeedbackSentiment } from "@notra/email/types/feedback";
+
 export interface EmailResult {
   data: { id: string } | null;
   error: { name: string; message: string } | null;
+}
+
+export interface SendFeedbackEmailProps {
+  to: string;
+  message: string;
+  sentiment?: FeedbackSentiment;
+  userName: string;
+  userEmail: string;
+  organizationName?: string;
+  organizationSlug?: string;
+  pageUrl?: string;
+  userAgent?: string;
 }
 
 export interface SendInviteEmailProps {
