@@ -1545,7 +1545,8 @@ function StandaloneChatPageClient({
                     const branchTotal = branches?.tails.length ?? 0;
                     const branchIdx = branches?.active ?? 0;
                     const isDownstreamOfBranchSwitch =
-                      branchPointIndex !== -1 && messageIndex > branchPointIndex;
+                      branchPointIndex !== -1 &&
+                      messageIndex > branchPointIndex;
                     const branchFadeKey = isDownstreamOfBranchSwitch
                       ? `${message.id}-${branchSwitchSignal?.tick}`
                       : message.id;
@@ -1596,7 +1597,9 @@ function StandaloneChatPageClient({
                         )}
                         {isUser && (
                           <UserMessageActions
-                            branchIndex={branchTotal > 1 ? branchIdx : undefined}
+                            branchIndex={
+                              branchTotal > 1 ? branchIdx : undefined
+                            }
                             branchTotal={
                               branchTotal > 1 ? branchTotal : undefined
                             }

@@ -5,13 +5,13 @@ import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { SVG_MIME_TYPE } from "@/constants/upload";
 import { authorizedProcedure } from "@/lib/orpc/base";
+import { getR2Config } from "@/lib/upload/r2";
+import { SvgSanitizationError, sanitizeSvg } from "@/lib/upload/sanitize-svg";
 import {
   createPresignedUpload,
   deleteChatUpload,
   recordChatAttachment,
 } from "@/lib/upload/server";
-import { getR2Config } from "@/lib/upload/r2";
-import { SvgSanitizationError, sanitizeSvg } from "@/lib/upload/sanitize-svg";
 import {
   deleteChatUploadSchema,
   recordChatAttachmentSchema,

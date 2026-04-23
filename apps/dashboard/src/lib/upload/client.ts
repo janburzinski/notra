@@ -1,7 +1,7 @@
 import {
   ALLOWED_CHAT_MIME_TYPES,
-  SVG_MIME_TYPE,
   type AllowedChatMimeType,
+  SVG_MIME_TYPE,
 } from "@/constants/upload";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
