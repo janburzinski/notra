@@ -123,7 +123,7 @@ export function AttachmentPreviewDialog({
             <iframe
               className="h-full w-full"
               referrerPolicy="no-referrer"
-              sandbox=""
+              sandbox="allow-scripts"
               src={attachment.url}
               title={attachment.filename}
             />

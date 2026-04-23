@@ -66,8 +66,8 @@ export async function uploadFile({
         mediaType: file.type as AllowedChatMimeType,
         size: file.size,
       });
-    } catch {
-      // Best-effort; attachment will still work in the active chat.
+    } catch (error) {
+      console.error("Failed to record chat attachment", { key, error });
     }
   }
 

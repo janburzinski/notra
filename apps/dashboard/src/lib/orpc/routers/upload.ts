@@ -17,7 +17,6 @@ import {
   recordChatAttachmentSchema,
   uploadSchema,
   uploadSvgSchema,
-  validateUpload,
 } from "@/schemas/upload";
 import { badRequest, forbidden, unauthorized } from "../utils/errors";
 
@@ -27,12 +26,6 @@ export const uploadRouter = {
   createPresignedUpload: authorizedProcedure
     .input(uploadSchema)
     .handler(async ({ context, input }) => {
-      validateUpload({
-        fileSize: input.fileSize,
-        fileType: input.fileType,
-        type: input.type,
-      });
-
       return createPresignedUpload({
         fileSize: input.fileSize,
         fileType: input.fileType,
