@@ -195,7 +195,7 @@ export function NavMain() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
-                className="cursor-help"
+                className="cursor-help border border-sidebar-border/60"
                 onClick={() => setCommandPaletteOpen(true)}
                 tooltip="Search"
               >
