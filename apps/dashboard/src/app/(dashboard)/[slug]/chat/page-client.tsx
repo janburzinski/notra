@@ -722,6 +722,40 @@ function StandaloneChatPageClient({
     }
   }, [isLoading]);
 
+  useEffect(() => {
+    function isEditableTarget(target: EventTarget | null): boolean {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+      const tag = target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+        return true;
+      }
+      return target.isContentEditable;
+    }
+
+    function handleAutoFocus(event: KeyboardEvent) {
+      if (event.defaultPrevented) {
+        return;
+      }
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+      if (event.key.length !== 1) {
+        return;
+      }
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+      chatInputRef.current?.focus();
+    }
+
+    window.addEventListener("keydown", handleAutoFocus);
+    return () => {
+      window.removeEventListener("keydown", handleAutoFocus);
+    };
+  }, []);
+
   const handleAddContext = useCallback((item: ContextItem) => {
     setHasCustomizedContext(true);
     setContext((prev) => {
