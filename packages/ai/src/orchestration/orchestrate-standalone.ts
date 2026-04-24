@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { createModel } from "@notra/ai/model";
 import { getStandaloneChatPrompt } from "@notra/ai/prompts/standalone-chat";
 import {
@@ -45,26 +43,6 @@ const TRIVIAL_HISTORY_LIMIT = 6;
 const MINIMAL_STANDALONE_PROMPT =
   "You are Notra, an AI assistant for content teams. Reply briefly and warmly. Do not call tools on this turn.";
 
-const CHAT_DEBUG_LOG_PATH = path.join(process.cwd(), ".chat-debug.log");
-
-function debugLogChatPrompt(entry: {
-  organizationId: string;
-  routingDecision: unknown;
-  systemPrompt: string;
-  modelMessages: unknown;
-  toolNames: string[];
-}): void {
-  try {
-    const line = `${JSON.stringify({
-      timestamp: new Date().toISOString(),
-      ...entry,
-    })}\n`;
-    fs.appendFile(CHAT_DEBUG_LOG_PATH, line, () => undefined);
-  } catch {
-    // Best-effort debug log; never let logging break chat.
-  }
-}
-
 export async function orchestrateStandaloneChat(
   input: StandaloneChatInput,
   deps?: StandaloneChatDeps
@@ -96,7 +74,12 @@ export async function orchestrateStandaloneChat(
   const hasLinear = hasEnabledLinearIntegration(validatedIntegrations);
 
   const lastUserMessage = getLastUserMessage(messages);
-  const isTrivial = isTrivialMessage(lastUserMessage);
+  // Never short-circuit when the user attached files — the fast path strips
+  // tools and trims history, which would drop image/file parts and force a
+  // blind reply to "ok" + image.
+  const hasNonTextPartsOnLatestTurn = lastUserMessageHasNonTextParts(messages);
+  const isTrivial =
+    !hasNonTextPartsOnLatestTurn && isTrivialMessage(lastUserMessage);
   const mentionsSkills = SKILLS_MENTION_REGEX.test(lastUserMessage);
   const isAuto = requestedModel === undefined || requestedModel === "auto";
 
@@ -200,14 +183,6 @@ export async function orchestrateStandaloneChat(
     ignoreIncompleteToolCalls: true,
   });
 
-  debugLogChatPrompt({
-    organizationId,
-    routingDecision,
-    systemPrompt,
-    modelMessages,
-    toolNames: Object.keys(tools ?? {}),
-  });
-
   let firstChunkFired = false;
   const stream = streamText({
     model: modelWithMemory,
@@ -250,6 +225,20 @@ export async function orchestrateStandaloneChat(
   });
 
   return { stream, routingDecision };
+}
+
+function lastUserMessageHasNonTextParts(messages: UIMessage[]): boolean {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i];
+    if (!message || message.role !== "user") {
+      continue;
+    }
+    if (!Array.isArray(message.parts)) {
+      return false;
+    }
+    return message.parts.some((part) => part.type !== "text");
+  }
+  return false;
 }
 
 function getLastUserMessage(messages: UIMessage[]): string {
@@ -315,8 +304,10 @@ function stripIncompleteToolParts(messages: UIMessage[]): UIMessage[] {
 
 function trimTrivialHistory(messages: UIMessage[]): UIMessage[] {
   const recent = messages.slice(-TRIVIAL_HISTORY_LIMIT);
-  return recent.map((message) => {
-    if (!Array.isArray(message.parts)) {
+  // Keep the latest message intact so user-submitted attachments still reach
+  // the model; only historical turns get stripped to text.
+  return recent.map((message, index) => {
+    if (!Array.isArray(message.parts) || index === recent.length - 1) {
       return message;
     }
     const textParts = message.parts.filter((part) => part.type === "text");

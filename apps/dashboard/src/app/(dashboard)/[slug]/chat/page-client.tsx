@@ -24,7 +24,8 @@ import {
 import { motion } from "motion/react";
 import { nanoid } from "nanoid";
 import dynamic from "next/dynamic";
-import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import {
   useCallback,
@@ -37,6 +38,7 @@ import {
 import { ChatToolBlock } from "@/components/ai/chat-tool-block";
 import { BrailleLoader } from "@/components/braille-loader";
 import { AssistantMetadataHover } from "@/components/chat/assistant-metadata-hover";
+import { AttachmentPreviewDialog } from "@/components/chat/attachment-preview";
 import {
   ChatInputAdvanced,
   type ThinkingLevel,
@@ -55,12 +57,20 @@ import {
 import { useAiChatExperiment } from "@/components/providers/databuddy-flags-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { authClient } from "@/lib/auth/client";
+import { isImageMimeType } from "@/lib/upload/mime";
 import { cn } from "@/lib/utils";
 import {
   chatErrorPayloadSchema,
   chatTransportRequestInputSchema,
 } from "@/schemas/chat";
-import type { ChatInputHandle, ChatUIMessage, ContextItem } from "@/types/chat";
+import type {
+  ChatAttachment,
+  ChatImageAttachmentProps,
+  ChatInputHandle,
+  ChatMessagePart,
+  ChatUIMessage,
+  ContextItem,
+} from "@/types/chat";
 import {
   CHAT_PREFERENCES_STORAGE_KEY,
   DEFAULT_CHAT_PREFERENCES,
@@ -229,10 +239,48 @@ function isTerminalToolState(state: string): boolean {
   );
 }
 
+function ChatImageAttachment({
+  url,
+  filename,
+  mediaType,
+  onClick,
+}: ChatImageAttachmentProps) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div className="my-1 inline-flex max-w-full items-center gap-2 rounded-md border border-border bg-muted/40 px-2.5 py-1.5 text-muted-foreground text-xs">
+        <span className="truncate">
+          {filename ?? mediaType ?? "Attachment"} is unavailable
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      className="my-1 block w-fit overflow-hidden rounded-lg border border-border transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      onClick={onClick}
+      type="button"
+    >
+      <Image
+        alt={filename ?? "attachment"}
+        className="block h-auto max-h-72 w-auto max-w-full"
+        height={480}
+        onError={() => setHasError(true)}
+        src={url}
+        unoptimized
+        width={640}
+      />
+    </button>
+  );
+}
+
 function StandaloneChatPageClient({
   organizationSlug,
   chatId: initialChatId,
 }: PageClientProps) {
+  const router = useRouter();
   const [initialQuery, setInitialQuery] = useQueryState(
     "q",
     parseAsString.withOptions({ history: "replace" })
@@ -257,6 +305,11 @@ function StandaloneChatPageClient({
   const [context, setContext] = useState<ContextItem[]>([]);
   const [hasCustomizedContext, setHasCustomizedContext] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
+  const [previewAttachment, setPreviewAttachment] = useState<{
+    url: string;
+    filename: string;
+    mediaType: string;
+  } | null>(null);
   const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
   const [selectedModel, setSelectedModel] = useState(
     DEFAULT_CHAT_PREFERENCES.model
@@ -633,7 +686,15 @@ function StandaloneChatPageClient({
     }
   }, [chatHistoryQuery.data, setMessages]);
 
+  const hasUpdatedUrlRef = useRef(false);
+  const hasRunInitialChatIdEffectRef = useRef(false);
+
   useEffect(() => {
+    if (!hasRunInitialChatIdEffectRef.current) {
+      hasRunInitialChatIdEffectRef.current = true;
+      return;
+    }
+
     setPendingMessageId(null);
     setChatError(null);
     setQueuedMessages([]);
@@ -642,10 +703,12 @@ function StandaloneChatPageClient({
       return;
     }
 
+    hasUpdatedUrlRef.current = false;
     setWasStoppedByUser(false);
     setMessages([]);
     setContext([]);
     setHasCustomizedContext(false);
+    setGeneratedChatId(crypto.randomUUID());
   }, [initialChatId, setMessages]);
 
   const queueStorageKey = `chat-queue:${stableChatId}`;
@@ -702,8 +765,12 @@ function StandaloneChatPageClient({
   const isLoadingHistory =
     Boolean(initialChatId) &&
     messages.length === 0 &&
-    (chatHistoryQuery.isLoading || pendingHistoryMessages > 0);
+    (chatHistoryQuery.isLoading ||
+      chatHistoryQuery.isPending ||
+      pendingHistoryMessages > 0);
   const isLoading = status === "streaming" || status === "submitted";
+  const isPendingAutoSubmit =
+    !initialChatId && Boolean(initialQuery?.trim()) && messages.length === 0;
   const hasMessages = messages.length > 0;
 
   const [isFirstMessageTransition, setIsFirstMessageTransition] =
@@ -735,6 +802,40 @@ function StandaloneChatPageClient({
       setIsStopping(false);
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    function isEditableTarget(target: EventTarget | null): boolean {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+      const tag = target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
+        return true;
+      }
+      return target.isContentEditable;
+    }
+
+    function handleAutoFocus(event: KeyboardEvent) {
+      if (event.defaultPrevented) {
+        return;
+      }
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+      if (event.key.length !== 1) {
+        return;
+      }
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+      chatInputRef.current?.focus();
+    }
+
+    window.addEventListener("keydown", handleAutoFocus);
+    return () => {
+      window.removeEventListener("keydown", handleAutoFocus);
+    };
+  }, []);
 
   const handleAddContext = useCallback((item: ContextItem) => {
     setHasCustomizedContext(true);
@@ -907,29 +1008,8 @@ function StandaloneChatPageClient({
     [messageBranches, setMessages]
   );
 
-  const hasUpdatedUrlRef = useRef(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (initialChatId) {
-      return;
-    }
-    if (pathname !== `/${organizationSlug}/chat`) {
-      return;
-    }
-
-    hasUpdatedUrlRef.current = false;
-    setMessages([]);
-    setContext([]);
-    setHasCustomizedContext(false);
-    setWasStoppedByUser(false);
-    setPendingMessageId(null);
-    setChatError(null);
-    setGeneratedChatId(crypto.randomUUID());
-  }, [pathname, organizationSlug, initialChatId, setMessages]);
-
   const dispatchMessage = useCallback(
-    async (text: string) => {
+    async (text: string, attachments: ChatAttachment[] = []) => {
       const isFirstMessage = !initialChatId && !hasUpdatedUrlRef.current;
       if (messagesRef.current.length === 0) {
         triggerFirstMessageTransition();
@@ -954,14 +1034,34 @@ function StandaloneChatPageClient({
         }
       }
       if (isFirstMessage) {
+        hasUpdatedUrlRef.current = true;
         window.history.replaceState(
           null,
           "",
           `/${organizationSlug}/chat/${stableChatId}`
         );
       }
-      await sendMessage({ text });
+      if (attachments.length > 0) {
+        const parts: ChatMessagePart[] = [];
+        if (text.length > 0) {
+          parts.push({ type: "text", text });
+        }
+        for (const attachment of attachments) {
+          parts.push({
+            type: "file",
+            url: attachment.url,
+            mediaType: attachment.mediaType,
+            filename: attachment.filename,
+          });
+        }
+        await sendMessage({ role: "user", parts });
+      } else {
+        await sendMessage({ text });
+      }
       if (isFirstMessage) {
+        router.replace(`/${organizationSlug}/chat/${stableChatId}`, {
+          scroll: false,
+        });
         queryClient.invalidateQueries({
           queryKey: ["chat-sessions", organizationId],
         });
@@ -973,6 +1073,7 @@ function StandaloneChatPageClient({
       organizationId,
       organizationSlug,
       queryClient,
+      router,
       sendMessage,
       stableChatId,
       triggerFirstMessageTransition,
@@ -980,44 +1081,92 @@ function StandaloneChatPageClient({
   );
 
   const handleSend = useCallback(
-    async (text: string) => {
+    async (text: string, attachments: ChatAttachment[] = []) => {
       if (isLoading) {
+        if (attachments.length > 0) {
+          return;
+        }
         setQueuedMessages((prev) => [...prev, { id: nanoid(10), text }]);
         return;
       }
-      await dispatchMessage(text);
+      await dispatchMessage(text, attachments);
     },
     [dispatchMessage, isLoading]
   );
 
-  const autoSubmittedRef = useRef(false);
+  const autoSubmittedQueryRef = useRef<string | null>(null);
+  const pendingInitialQueryResetRef = useRef<string | null>(null);
   useEffect(() => {
-    if (autoSubmittedRef.current) {
-      return;
-    }
     if (initialChatId) {
       return;
     }
     const trimmedInitialQuery = initialQuery?.trim();
     if (!trimmedInitialQuery) {
+      autoSubmittedQueryRef.current = null;
+      pendingInitialQueryResetRef.current = null;
+      return;
+    }
+    if (autoSubmittedQueryRef.current === trimmedInitialQuery) {
       return;
     }
     if (!organizationId) {
       return;
     }
     if (messagesRef.current.length > 0) {
+      if (pendingInitialQueryResetRef.current === trimmedInitialQuery) {
+        return;
+      }
+      pendingInitialQueryResetRef.current = trimmedInitialQuery;
+      setPendingMessageId(null);
+      setChatError(null);
+      setQueuedMessages([]);
+      hasUpdatedUrlRef.current = false;
+      setWasStoppedByUser(false);
+      setMessages([]);
+      setContext([]);
+      setHasCustomizedContext(false);
+      setGeneratedChatId(crypto.randomUUID());
       return;
     }
 
-    autoSubmittedRef.current = true;
-    setInitialQuery(null);
-    handleSend(trimmedInitialQuery);
+    const queryToSubmit = trimmedInitialQuery;
+    let cancelled = false;
+    let attempts = 0;
+
+    function submitWhenComposerIsReady() {
+      if (cancelled) {
+        return;
+      }
+
+      const chatInput = chatInputRef.current;
+      if (!chatInput) {
+        attempts += 1;
+        if (attempts < 10) {
+          window.requestAnimationFrame(submitWhenComposerIsReady);
+        }
+        return;
+      }
+
+      autoSubmittedQueryRef.current = queryToSubmit;
+      pendingInitialQueryResetRef.current = null;
+      chatInput.setText(queryToSubmit);
+      window.requestAnimationFrame(() => {
+        chatInput.submit();
+        setInitialQuery(null);
+      });
+    }
+
+    submitWhenComposerIsReady();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
-    handleSend,
     initialChatId,
     initialQuery,
     organizationId,
     setInitialQuery,
+    setMessages,
   ]);
 
   const handleRemoveQueued = useCallback((id: string) => {
@@ -1235,6 +1384,48 @@ function StandaloneChatPageClient({
       );
     }
 
+    if (part.type === "file") {
+      const url = typeof part.url === "string" ? part.url : "";
+      const mediaType =
+        typeof part.mediaType === "string" ? part.mediaType : "";
+      const filename =
+        typeof part.filename === "string" ? part.filename : undefined;
+      if (!url) {
+        return null;
+      }
+      const fileKey = `${messageId}-file-${index}`;
+      if (isImageMimeType(mediaType)) {
+        return (
+          <ChatImageAttachment
+            filename={filename}
+            key={fileKey}
+            mediaType={mediaType}
+            onClick={() =>
+              setPreviewAttachment({
+                url,
+                filename: filename ?? "attachment",
+                mediaType,
+              })
+            }
+            url={url}
+          />
+        );
+      }
+      return (
+        <a
+          className="my-1 inline-flex max-w-full items-center gap-2 rounded-md border border-border bg-muted/40 px-2.5 py-1.5 text-foreground text-xs no-underline transition-colors hover:bg-accent"
+          href={url}
+          key={fileKey}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <span className="truncate">
+            {filename ?? mediaType ?? "Attachment"}
+          </span>
+        </a>
+      );
+    }
+
     if (part.type === "reasoning") {
       const text = part.text as string;
       if (!text) {
@@ -1428,7 +1619,7 @@ function StandaloneChatPageClient({
     );
   }
 
-  if (!hasMessages) {
+  if (!(hasMessages || isPendingAutoSubmit || isLoading)) {
     const now = isHydrated ? new Date() : null;
     const greeting = now ? getGreeting(now) : "Welcome";
     const userName = session?.user?.name?.split(" ")[0];
@@ -1496,170 +1687,184 @@ function StandaloneChatPageClient({
       : messages;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
-        <div className="relative flex min-h-full flex-col">
-          <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
+    <>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
+          <div className="relative flex min-h-full flex-col">
+            <div className="flex flex-1 flex-col px-4 pt-6 pb-28">
+              <div
+                className={cn(
+                  "mx-auto flex w-full max-w-2xl flex-col gap-4",
+                  isFirstMessageTransition && "chat-messages-fade-in"
+                )}
+              >
+                {(() => {
+                  const branchPointIndex = branchSwitchSignal
+                    ? visibleMessages.findIndex(
+                        (m) => m.id === branchSwitchSignal.userMessageId
+                      )
+                    : -1;
+                  return visibleMessages.map((message, messageIndex) => {
+                    const isUser = message.role === "user";
+                    const isEditing = isUser && editingMessageId === message.id;
+                    const branches = isUser
+                      ? messageBranches[message.id]
+                      : undefined;
+                    const branchTotal = branches?.tails.length ?? 0;
+                    const branchIdx = branches?.active ?? 0;
+                    const isDownstreamOfBranchSwitch =
+                      branchPointIndex !== -1 &&
+                      messageIndex > branchPointIndex;
+                    const branchFadeKey = isDownstreamOfBranchSwitch
+                      ? `${message.id}-${branchSwitchSignal?.tick}`
+                      : message.id;
+                    return (
+                      <Message
+                        className={cn(
+                          isDownstreamOfBranchSwitch && "chat-branch-fade-in"
+                        )}
+                        from={message.role}
+                        key={branchFadeKey}
+                      >
+                        {isUser ? (
+                          <motion.div
+                            className={cn(
+                              "ml-auto overflow-hidden",
+                              isEditing ? "w-full" : "flex w-fit max-w-full"
+                            )}
+                            layout
+                            transition={{
+                              duration: 0.25,
+                              ease: [0.22, 1, 0.36, 1],
+                            }}
+                          >
+                            {isEditing ? (
+                              <UserMessageEditor
+                                initialText={toDisplayText(
+                                  extractUserMessageText(message)
+                                )}
+                                onCancel={handleCancelEditMessage}
+                                onSubmit={(text) =>
+                                  handleEditMessage(message.id, text)
+                                }
+                              />
+                            ) : (
+                              <MessageContent>
+                                {message.parts.map((part, index) =>
+                                  renderPart(part, message.id, index)
+                                )}
+                              </MessageContent>
+                            )}
+                          </motion.div>
+                        ) : (
+                          <MessageContent>
+                            {message.parts.map((part, index) =>
+                              renderPart(part, message.id, index)
+                            )}
+                          </MessageContent>
+                        )}
+                        {isUser && (
+                          <UserMessageActions
+                            branchIndex={
+                              branchTotal > 1 ? branchIdx : undefined
+                            }
+                            branchTotal={
+                              branchTotal > 1 ? branchTotal : undefined
+                            }
+                            canInteract={!isLoading}
+                            isEditing={isEditing}
+                            messageText={toDisplayText(
+                              extractUserMessageText(message)
+                            )}
+                            onEdit={() => handleStartEditMessage(message.id)}
+                            onNextBranch={() =>
+                              handleSwitchBranch(message.id, "next")
+                            }
+                            onPreviousBranch={() =>
+                              handleSwitchBranch(message.id, "prev")
+                            }
+                            onRetry={(model) =>
+                              handleRetryMessage(message.id, model)
+                            }
+                          />
+                        )}
+                        {message.role === "assistant" && (
+                          <AssistantMetadataHover metadata={message.metadata} />
+                        )}
+                      </Message>
+                    );
+                  });
+                })()}
+                {wasStoppedByUser && !isLoading && (
+                  <div className="flex w-fit items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-destructive text-xs">
+                    <HugeiconsIcon className="size-3.5" icon={X} />
+                    <span>Response stopped by user</span>
+                  </div>
+                )}
+                {showThinkingIndicator && (
+                  <Message from="assistant">
+                    <MessageContent>
+                      <div className="flex items-center gap-2">
+                        <BrailleLoader className="text-sm" variant="shimmer" />
+                        <span className="animate-pulse text-muted-foreground text-sm">
+                          {isStopping ? "Stopping" : thinkingIndicatorLabel}
+                        </span>
+                      </div>
+                    </MessageContent>
+                  </Message>
+                )}
+              </div>
+            </div>
             <div
               className={cn(
-                "mx-auto flex w-full max-w-2xl flex-col gap-4",
-                isFirstMessageTransition && "chat-messages-fade-in"
+                "sticky bottom-0 z-10 bg-background px-4 pb-4",
+                isFirstMessageTransition && "chat-input-slide-down"
               )}
             >
-              {(() => {
-                const branchPointIndex = branchSwitchSignal
-                  ? visibleMessages.findIndex(
-                      (m) => m.id === branchSwitchSignal.userMessageId
-                    )
-                  : -1;
-                return visibleMessages.map((message, messageIndex) => {
-                  const isUser = message.role === "user";
-                  const isEditing = isUser && editingMessageId === message.id;
-                  const branches = isUser
-                    ? messageBranches[message.id]
-                    : undefined;
-                  const branchTotal = branches?.tails.length ?? 0;
-                  const branchIdx = branches?.active ?? 0;
-                  const isDownstreamOfBranchSwitch =
-                    branchPointIndex !== -1 && messageIndex > branchPointIndex;
-                  const branchFadeKey = isDownstreamOfBranchSwitch
-                    ? `${message.id}-${branchSwitchSignal?.tick}`
-                    : message.id;
-                  return (
-                    <Message
-                      className={cn(
-                        isDownstreamOfBranchSwitch && "chat-branch-fade-in"
-                      )}
-                      from={message.role}
-                      key={branchFadeKey}
-                    >
-                      {isUser ? (
-                        <motion.div
-                          className={cn(
-                            "ml-auto overflow-hidden",
-                            isEditing ? "w-full" : "flex w-fit max-w-full"
-                          )}
-                          layout
-                          transition={{
-                            duration: 0.25,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                        >
-                          {isEditing ? (
-                            <UserMessageEditor
-                              initialText={toDisplayText(
-                                extractUserMessageText(message)
-                              )}
-                              onCancel={handleCancelEditMessage}
-                              onSubmit={(text) =>
-                                handleEditMessage(message.id, text)
-                              }
-                            />
-                          ) : (
-                            <MessageContent>
-                              {message.parts.map((part, index) =>
-                                renderPart(part, message.id, index)
-                              )}
-                            </MessageContent>
-                          )}
-                        </motion.div>
-                      ) : (
-                        <MessageContent>
-                          {message.parts.map((part, index) =>
-                            renderPart(part, message.id, index)
-                          )}
-                        </MessageContent>
-                      )}
-                      {isUser && (
-                        <UserMessageActions
-                          branchIndex={branchTotal > 1 ? branchIdx : undefined}
-                          branchTotal={
-                            branchTotal > 1 ? branchTotal : undefined
-                          }
-                          canInteract={!isLoading}
-                          isEditing={isEditing}
-                          messageText={toDisplayText(
-                            extractUserMessageText(message)
-                          )}
-                          onEdit={() => handleStartEditMessage(message.id)}
-                          onNextBranch={() =>
-                            handleSwitchBranch(message.id, "next")
-                          }
-                          onPreviousBranch={() =>
-                            handleSwitchBranch(message.id, "prev")
-                          }
-                          onRetry={(model) =>
-                            handleRetryMessage(message.id, model)
-                          }
-                        />
-                      )}
-                      {message.role === "assistant" && (
-                        <AssistantMetadataHover metadata={message.metadata} />
-                      )}
-                    </Message>
-                  );
-                });
-              })()}
-              {wasStoppedByUser && !isLoading && (
-                <div className="flex w-fit items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-destructive text-xs">
-                  <HugeiconsIcon className="size-3.5" icon={X} />
-                  <span>Response stopped by user</span>
-                </div>
-              )}
-              {showThinkingIndicator && (
-                <Message from="assistant">
-                  <MessageContent>
-                    <div className="flex items-center gap-2">
-                      <BrailleLoader className="text-sm" variant="shimmer" />
-                      <span className="animate-pulse text-muted-foreground text-sm">
-                        {isStopping ? "Stopping" : thinkingIndicatorLabel}
-                      </span>
-                    </div>
-                  </MessageContent>
-                </Message>
-              )}
-            </div>
-          </div>
-          <div
-            className={cn(
-              "sticky bottom-0 z-10 bg-background px-4 pb-4",
-              isFirstMessageTransition && "chat-input-slide-down"
-            )}
-          >
-            <div className="-inset-x-4 pointer-events-none absolute bottom-full h-12 bg-linear-to-t from-background to-transparent" />
-            <div className="mx-auto w-full max-w-2xl">
-              <ChatQueue
-                messages={queuedMessages}
-                onEdit={handleEditQueued}
-                onRemove={handleRemoveQueued}
-              />
-              <ChatInputAdvanced
-                connectedTop={queuedMessages.length > 0}
-                context={context}
-                error={chatError}
-                initialValue={initialQuery ?? undefined}
-                isLoading={isLoading}
-                isStopping={isStopping}
-                model={selectedModel}
-                onAddContext={handleAddContext}
-                onClearError={handleClearError}
-                onModelChange={handleModelChange}
-                onRemoveContext={handleRemoveContext}
-                onSend={handleSend}
-                onStop={handleStop}
-                onThinkingLevelChange={handleThinkingLevelChange}
-                onUpdateQueued={handleUpdateQueued}
-                organizationId={organizationId}
-                organizationSlug={organizationSlug}
-                queuedMessages={queuedMessages}
-                ref={chatInputRef}
-                thinkingLevel={thinkingLevel}
-              />
+              <div className="-inset-x-4 pointer-events-none absolute bottom-full h-12 bg-linear-to-t from-background to-transparent" />
+              <div className="mx-auto w-full max-w-2xl">
+                <ChatQueue
+                  messages={queuedMessages}
+                  onEdit={handleEditQueued}
+                  onRemove={handleRemoveQueued}
+                />
+                <ChatInputAdvanced
+                  connectedTop={queuedMessages.length > 0}
+                  context={context}
+                  error={chatError}
+                  initialValue={initialQuery ?? undefined}
+                  isLoading={isLoading}
+                  isStopping={isStopping}
+                  model={selectedModel}
+                  onAddContext={handleAddContext}
+                  onClearError={handleClearError}
+                  onModelChange={handleModelChange}
+                  onRemoveContext={handleRemoveContext}
+                  onSend={handleSend}
+                  onStop={handleStop}
+                  onThinkingLevelChange={handleThinkingLevelChange}
+                  onUpdateQueued={handleUpdateQueued}
+                  organizationId={organizationId}
+                  organizationSlug={organizationSlug}
+                  queuedMessages={queuedMessages}
+                  ref={chatInputRef}
+                  thinkingLevel={thinkingLevel}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <AttachmentPreviewDialog
+        attachment={previewAttachment}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPreviewAttachment(null);
+          }
+        }}
+        open={previewAttachment !== null}
+      />
+    </>
   );
 }
 
@@ -1682,5 +1887,11 @@ export default function PageClient(props: PageClientProps) {
     return null;
   }
 
-  return <StandaloneChatPageClient {...props} />;
+  return (
+    <StandaloneChatPageClient
+      chatId={props.chatId}
+      key={props.chatId ?? "__new"}
+      organizationSlug={props.organizationSlug}
+    />
+  );
 }

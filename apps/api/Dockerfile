@@ -19,6 +19,7 @@ COPY packages/db/package.json ./packages/db/package.json
 COPY packages/email/package.json ./packages/email/package.json
 COPY packages/typescript-config/package.json ./packages/typescript-config/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
+COPY packages/utils/package.json ./packages/utils/package.json
 
 # Install all workspace deps (frozen lockfile for reproducibility)
 RUN bun install --frozen-lockfile
@@ -31,6 +32,7 @@ COPY packages/ai ./packages/ai
 COPY packages/content-generation ./packages/content-generation
 COPY packages/typescript-config ./packages/typescript-config
 COPY packages/db ./packages/db
+COPY packages/utils ./packages/utils
 COPY apps/api ./apps/api
 
 WORKDIR /app/apps/api

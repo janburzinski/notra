@@ -41,9 +41,10 @@ export function isTrivialMessage(userMessage: string): boolean {
 
 function matchTrivialFastPath(
   userMessage: string,
-  hasIntegrationContext: boolean
+  hasIntegrationContext: boolean,
+  hasAttachments: boolean
 ): RoutingDecision | undefined {
-  if (hasIntegrationContext) {
+  if (hasIntegrationContext || hasAttachments) {
     return undefined;
   }
   if (!isTrivialMessage(userMessage)) {
@@ -73,9 +74,14 @@ export function selectAutoModel(decision: RoutingDecision): AutoSelection {
 export async function routeMessage(
   userMessage: string,
   hasIntegrationContext: boolean,
-  log?: AILogTarget
+  log?: AILogTarget,
+  hasAttachments = false
 ): Promise<RoutingDecision> {
-  const fastPath = matchTrivialFastPath(userMessage, hasIntegrationContext);
+  const fastPath = matchTrivialFastPath(
+    userMessage,
+    hasIntegrationContext,
+    hasAttachments
+  );
   if (fastPath) {
     return fastPath;
   }
@@ -108,9 +114,15 @@ export function selectModel(decision: RoutingDecision): string {
 export async function routeAndSelectModel(
   userMessage: string,
   hasIntegrationContext: boolean,
-  log?: AILogTarget
+  log?: AILogTarget,
+  hasAttachments = false
 ): Promise<RoutingResult> {
-  const decision = await routeMessage(userMessage, hasIntegrationContext, log);
+  const decision = await routeMessage(
+    userMessage,
+    hasIntegrationContext,
+    log,
+    hasAttachments
+  );
   const model = selectModel(decision);
 
   return {

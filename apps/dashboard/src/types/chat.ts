@@ -36,10 +36,35 @@ export interface ChatUsageSnapshot {
   totalTokens?: number;
 }
 
+export interface ChatImageAttachmentProps {
+  url: string;
+  filename: string | undefined;
+  mediaType: string;
+  onClick: () => void;
+}
+
 export interface ChatInputHandle {
   setText: (text: string) => void;
+  submit: () => void;
   focus: () => void;
 }
+
+export interface ChatAttachment {
+  url: string;
+  key: string;
+  filename: string;
+  mediaType: string;
+  size: number;
+}
+
+export type ChatMessagePart =
+  | { type: "text"; text: string }
+  | {
+      type: "file";
+      url: string;
+      mediaType: string;
+      filename?: string;
+    };
 
 export interface BuildChatFinishMetadataInput {
   streamStartedAt: number;

@@ -553,6 +553,67 @@ export async function setChatSessionPinned(
   );
 }
 
+function collectFileUrlsFromMessages(messages: UIMessage[]): string[] {
+  const urls: string[] = [];
+  for (const message of messages) {
+    if (!Array.isArray(message.parts)) {
+      continue;
+    }
+    for (const part of message.parts) {
+      if (
+        part.type === "file" &&
+        typeof (part as { url?: unknown }).url === "string"
+      ) {
+        urls.push((part as { url: string }).url);
+      }
+    }
+  }
+  return urls;
+}
+
+export async function purgeOrganizationChatData(
+  organizationId: string
+): Promise<{ fileUrls: string[] }> {
+  if (!redis) {
+    return { fileUrls: [] };
+  }
+  const redisClient = redis;
+
+  const chatIds = await redisClient.zrange<string[]>(
+    sessionsKey(organizationId),
+    0,
+    -1
+  );
+
+  const fileUrls: string[] = [];
+
+  for (const chatId of chatIds) {
+    const raw = await redisClient.zrange<string[]>(
+      historyKey(organizationId, chatId),
+      0,
+      -1
+    );
+    const messages = raw.map((entry) =>
+      typeof entry === "string" ? JSON.parse(entry) : entry
+    ) as UIMessage[];
+
+    fileUrls.push(...collectFileUrlsFromMessages(messages));
+
+    await redisClient.del(
+      historyKey(organizationId, chatId),
+      sessionMetaKey(organizationId, chatId),
+      activeStreamKey(organizationId, chatId),
+      lastStoppedKey(organizationId, chatId),
+      chatStateVersionKey(organizationId, chatId),
+      deletedChatKey(organizationId, chatId)
+    );
+  }
+
+  await redisClient.del(sessionsKey(organizationId));
+
+  return { fileUrls };
+}
+
 export async function deleteChatSession(
   organizationId: string,
   chatId: string
@@ -598,6 +659,7 @@ function getFirstUserMessage(messages: UIMessage[]): string | null {
       continue;
     }
 
+    const fileNames: string[] = [];
     for (const part of message.parts) {
       if (part.type === "text") {
         const normalized = part.text.replace(/\s+/g, " ").trim();
@@ -605,6 +667,21 @@ function getFirstUserMessage(messages: UIMessage[]): string | null {
           return normalized;
         }
       }
+      if (part.type === "file") {
+        const filename =
+          typeof part.filename === "string" ? part.filename.trim() : "";
+        if (filename) {
+          fileNames.push(filename);
+        }
+      }
+    }
+
+    if (fileNames.length === 1) {
+      return fileNames[0] ?? null;
+    }
+
+    if (fileNames.length > 1) {
+      return `${fileNames[0]} +${fileNames.length - 1} more`;
     }
   }
 
@@ -622,13 +699,41 @@ function getChatTitle(messages: UIMessage[]) {
   return text ? getFallbackTitle(text) : null;
 }
 
+function firstUserMessageHasText(message: UIMessage): boolean {
+  if (message.role !== "user" || !Array.isArray(message.parts)) {
+    return false;
+  }
+  return message.parts.some(
+    (part) => part.type === "text" && part.text.trim().length > 0
+  );
+}
+
 export async function generateAndSetChatTitle(
   organizationId: string,
   chatId: string,
-  userMessage: string
+  firstUserMessage: UIMessage
 ) {
   try {
+    const userMessage = getFirstUserMessage([firstUserMessage]);
+    if (!userMessage) {
+      return;
+    }
     const fallbackTitle = getFallbackTitle(userMessage);
+
+    // Skip the LLM call when the only thing we have is a filename — the
+    // generated title won't be meaningfully better than the filename itself.
+    if (!firstUserMessageHasText(firstUserMessage)) {
+      await updateExistingChatSessionMetadata(
+        organizationId,
+        chatId,
+        (session) => ({
+          ...session,
+          title: normalizeChatTitle(fallbackTitle),
+          updatedAt: new Date().toISOString(),
+        })
+      );
+      return;
+    }
 
     const { text } = await generateText({
       model: gateway("openai/gpt-5.4-nano"),

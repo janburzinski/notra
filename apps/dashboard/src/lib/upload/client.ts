@@ -1,7 +1,11 @@
-import axios from "axios";
-import { SVG_MIME_TYPE } from "@/constants/upload";
+import {
+  ALLOWED_CHAT_MIME_TYPES,
+  type AllowedChatMimeType,
+  SVG_MIME_TYPE,
+} from "@/constants/upload";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
+  DeleteChatUploadProps,
   UploadFileProps,
   UploadFileResponse,
   UploadPresignedResponse,
@@ -20,17 +24,15 @@ async function getPresignedUrl(
 }
 
 async function uploadToR2(presignedUrl: string, file: File) {
-  const response = await axios.put(presignedUrl, file, {
-    headers: {
-      "Content-Type": file.type,
-    },
+  const response = await fetch(presignedUrl, {
+    method: "PUT",
+    body: file,
+    headers: { "Content-Type": file.type },
   });
 
-  if (response.status < 200 || response.status >= 300) {
-    throw new Error(`Upload failed with status ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`R2 upload failed (${response.status})`);
   }
-
-  return response.data;
 }
 
 async function uploadSvgThroughServer(file: File): Promise<UploadFileResponse> {
@@ -46,24 +48,34 @@ export async function uploadFile({
   file,
   type,
 }: UploadFileProps): Promise<UploadFileResponse> {
-  try {
-    if (type === "content" && file.type === SVG_MIME_TYPE) {
-      return await uploadSvgThroughServer(file);
-    }
-
-    const response = await getPresignedUrl(file, type);
-
-    const { url: presignedUrl, key, publicUrl } = response;
-
-    await uploadToR2(presignedUrl, file);
-
-    return { url: publicUrl, key };
-  } catch (error) {
-    console.error("Upload failed:", error);
-
-    if (axios.isAxiosError(error) && error.response?.data?.error) {
-      throw new Error(error.response.data.error);
-    }
-    throw new Error("An unexpected error occurred during upload.");
+  if (type === "content" && file.type === SVG_MIME_TYPE) {
+    return uploadSvgThroughServer(file);
   }
+
+  const { url, key, publicUrl } = await getPresignedUrl(file, type);
+  await uploadToR2(url, file);
+
+  if (
+    type === "chat" &&
+    ALLOWED_CHAT_MIME_TYPES.includes(file.type as AllowedChatMimeType)
+  ) {
+    try {
+      await dashboardOrpc.upload.recordChatAttachment.call({
+        key,
+        filename: file.name,
+        mediaType: file.type as AllowedChatMimeType,
+        size: file.size,
+      });
+    } catch (error) {
+      console.error("Failed to record chat attachment", { key, error });
+    }
+  }
+
+  return { url: publicUrl, key };
+}
+
+export async function deleteChatUpload({
+  key,
+}: DeleteChatUploadProps): Promise<void> {
+  await dashboardOrpc.upload.deleteChatUpload.call({ key });
 }

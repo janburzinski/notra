@@ -3,10 +3,13 @@ import { Discord } from "@notra/ui/components/ui/svgs/discord";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Linkedin } from "@notra/ui/components/ui/svgs/linkedin";
 import { XTwitter } from "@notra/ui/components/ui/svgs/twitter";
+import { cn } from "@notra/ui/lib/utils";
 import Link from "next/link";
+import { AI_SUMMARY_LINKS } from "@/utils/ai-summary-links";
 import {
-  FOOTER_EXTENSION_LINKS,
+  FOOTER_INTEGRATION_LINKS,
   FOOTER_PRODUCT_LINKS,
+  FOOTER_TOOL_LINKS,
 } from "@/utils/navigation";
 import { SOCIAL_LINKS } from "../utils/constants";
 import { NotraMark } from "./notra-mark";
@@ -22,7 +25,7 @@ export default function FooterSection() {
             <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-transparent p-1 dark:bg-[#f3eeea]">
               <NotraMark className="h-6 w-6 shrink-0" />
             </div>
-            <div className="text-center font-sans font-semibold text-foreground text-xl leading-4">
+            <div className="font-sans font-semibold text-foreground text-xl leading-4">
               Notra
             </div>
           </div>
@@ -30,7 +33,7 @@ export default function FooterSection() {
             Ship more. Write less. Reach more.
           </div>
           <div className="font-normal font-sans text-foreground/60 text-xs leading-5">
-            {`© ${year} Notra. All rights reserved.`}
+            {`© ${year} Notra, Inc. All rights reserved.`}
           </div>
 
           <div className="flex items-start justify-start gap-2 text-foreground">
@@ -69,9 +72,9 @@ export default function FooterSection() {
           </div>
         </div>
 
-        <div className="flex flex-col flex-wrap items-start justify-start gap-6 self-stretch p-4 sm:flex-row sm:justify-between md:gap-8 md:p-8">
+        <div className="grid grid-cols-2 gap-6 self-stretch p-4 sm:flex sm:flex-row sm:flex-wrap sm:items-start sm:justify-between md:gap-8 md:p-8">
           <div className="flex min-w-30 flex-1 flex-col items-start justify-start gap-3">
-            <div className="self-stretch font-medium font-sans text-foreground/50 text-sm leading-5">
+            <div className="font-medium font-sans text-foreground/50 text-sm leading-5">
               Product
             </div>
             <div className="flex flex-col items-start justify-end gap-2">
@@ -90,11 +93,30 @@ export default function FooterSection() {
           </div>
 
           <div className="flex min-w-30 flex-1 flex-col items-start justify-start gap-3">
-            <div className="self-stretch font-medium font-sans text-foreground/50 text-sm leading-5">
-              Extensions
+            <div className="font-medium font-sans text-foreground/50 text-sm leading-5">
+              Tools
             </div>
             <div className="flex flex-col items-start justify-end gap-2">
-              {FOOTER_EXTENSION_LINKS.map((link) => (
+              {FOOTER_TOOL_LINKS.map((link) => (
+                <Link
+                  className="font-normal font-sans text-foreground text-sm leading-5 transition-colors hover:text-primary"
+                  href={link.href}
+                  key={link.href}
+                  rel={link.rel}
+                  target={link.target}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex min-w-30 flex-1 flex-col items-start justify-start gap-3">
+            <div className="font-medium font-sans text-foreground/50 text-sm leading-5">
+              Integrations
+            </div>
+            <div className="flex flex-col items-start justify-end gap-2">
+              {FOOTER_INTEGRATION_LINKS.map((link) => (
                 <Link
                   className="font-normal font-sans text-foreground text-sm leading-5 transition-colors hover:text-primary"
                   href={link.href}
@@ -133,6 +155,31 @@ export default function FooterSection() {
               </Link>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-start gap-4 self-stretch border-foreground/10 border-t px-4 py-6 md:px-8">
+        <div className="font-medium font-sans text-foreground/50 text-xs uppercase tracking-wider">
+          Summarize with AI
+        </div>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          {AI_SUMMARY_LINKS.map(({ name, Icon, href, iconClassName }) => (
+            <Link
+              aria-label={`Summarize Notra with ${name}`}
+              className="flex items-center gap-2 text-foreground transition-colors hover:text-primary"
+              href={href}
+              key={name}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <Icon
+                className={cn("size-5 shrink-0 grayscale", iconClassName)}
+              />
+              <span className="font-normal font-sans text-sm leading-5">
+                {name}
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

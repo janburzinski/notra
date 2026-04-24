@@ -1,4 +1,5 @@
 import { apiKeysRouter } from "./routers/api-keys";
+import { attachmentsRouter } from "./routers/attachments";
 import { automationRouter } from "./routers/automation";
 import { brandRouter } from "./routers/brand";
 import { contentRouter } from "./routers/content";
@@ -16,6 +17,7 @@ import { userRouter } from "./routers/user";
 
 export const dashboardRouter = {
   apiKeys: apiKeysRouter,
+  attachments: attachmentsRouter,
   automation: automationRouter,
   brand: brandRouter,
   content: contentRouter,

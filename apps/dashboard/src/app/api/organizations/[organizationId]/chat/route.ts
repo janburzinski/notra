@@ -2,7 +2,6 @@ import { orchestrateStandaloneChat } from "@notra/ai/orchestration/orchestrate-s
 import type { StandaloneChatContextItem } from "@notra/ai/schemas/standalone-chat";
 import type { ValidatedIntegration } from "@notra/ai/types/orchestration";
 import type { UIMessage } from "ai";
-import { isTextUIPart } from "ai";
 import type { CheckResponse } from "autumn-js";
 import { nanoid } from "nanoid";
 import type { NextRequest } from "next/server";
@@ -164,11 +163,7 @@ export const POST = withEvlog(async function POST(
     ]);
 
     if (messages.length === 1 && latestMessage.role === "user") {
-      const textPart = latestMessage.parts?.find(isTextUIPart);
-      const userText = textPart?.text?.trim();
-      if (userText) {
-        await generateAndSetChatTitle(organizationId, chatId, userText);
-      }
+      await generateAndSetChatTitle(organizationId, chatId, latestMessage);
     }
 
     const canUseWorkflowStreaming = canUseUpstashWorkflowStreaming();
@@ -516,8 +511,14 @@ async function createDirectStandaloneChatResponse({
     });
   };
 
-  if (log.fork) {
-    log.fork("standalone_chat_stream", async () => {
+  const fork = (
+    log as typeof log & {
+      fork?: (label: string, callback: () => Promise<void>) => void;
+    }
+  ).fork;
+
+  if (fork) {
+    fork("standalone_chat_stream", async () => {
       try {
         // biome-ignore lint/correctness/useHookAtTopLevel: useLogger is an async-context accessor, not a React hook
         const response = await runStream(useLogger());

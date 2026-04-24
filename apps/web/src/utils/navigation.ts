@@ -17,7 +17,7 @@ export const MARKETING_NAV_LINKS = [
   },
 ] as const;
 
-export const FOOTER_EXTENSION_LINKS = [
+export const FOOTER_TOOL_LINKS = [
   {
     href: "https://www.framer.com/marketplace/plugins/notra/",
     label: "Framer",
@@ -27,6 +27,27 @@ export const FOOTER_EXTENSION_LINKS = [
   {
     href: "https://www.raycast.com/dominikdev/notra",
     label: "Raycast",
+    rel: "noreferrer",
+    target: "_blank",
+  },
+  {
+    href: "https://docs.usenotra.com/integrations/mcp",
+    label: "MCP Server",
+    rel: "noreferrer",
+    target: "_blank",
+  },
+] as const;
+
+export const FOOTER_INTEGRATION_LINKS = [
+  {
+    href: "https://github.com",
+    label: "GitHub",
+    rel: "noreferrer",
+    target: "_blank",
+  },
+  {
+    href: "https://linear.app",
+    label: "Linear",
     rel: "noreferrer",
     target: "_blank",
   },
