@@ -253,13 +253,7 @@ export async function POST(request: NextRequest) {
     .where(and(eq(organizations.slug, slug), eq(members.userId, user.id)))
     .limit(1);
 
-  if (membership.length === 0) {
-    log.set({ feature: "command_palette", forbiddenSlug: true });
-    log.emit();
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const member = membership[0];
+  const [member] = membership;
   if (!member) {
     log.set({ feature: "command_palette", forbiddenSlug: true });
     log.emit();

@@ -12,8 +12,6 @@ import {
 interface AiChatExperimentFlag {
   on: boolean;
   loading: boolean;
-  value?: unknown;
-  enabled?: boolean;
 }
 
 export function DatabuddyFlagsProvider({ children }: { children: ReactNode }) {
@@ -50,17 +48,10 @@ export function useAiChatExperiment(): AiChatExperimentFlag {
   const flag = useFlag(AI_CHAT_EXPERIMENT_FLAG_KEY);
 
   if (process.env.NODE_ENV === "development") {
-    return {
-      ...(flag ?? {}),
-      on: true,
-      loading: false,
-      value: true,
-      enabled: true,
-    };
+    return { on: true, loading: false };
   }
 
   return {
-    ...(flag ?? {}),
     on: Boolean(flag?.on),
     loading: Boolean(flag?.loading),
   };
