@@ -38,6 +38,7 @@ export interface ChatUsageSnapshot {
 
 export interface ChatInputHandle {
   setText: (text: string) => void;
+  submit: () => void;
   focus: () => void;
 }
 

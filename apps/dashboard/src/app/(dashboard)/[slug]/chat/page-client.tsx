@@ -25,7 +25,7 @@ import { motion } from "motion/react";
 import { nanoid } from "nanoid";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import {
   useCallback,
@@ -240,6 +240,7 @@ function StandaloneChatPageClient({
   organizationSlug,
   chatId: initialChatId,
 }: PageClientProps) {
+  const router = useRouter();
   const [initialQuery, setInitialQuery] = useQueryState(
     "q",
     parseAsString.withOptions({ history: "replace" })
@@ -619,7 +620,15 @@ function StandaloneChatPageClient({
     }
   }, [chatHistoryQuery.data, setMessages]);
 
+  const hasUpdatedUrlRef = useRef(false);
+  const hasRunInitialChatIdEffectRef = useRef(false);
+
   useEffect(() => {
+    if (!hasRunInitialChatIdEffectRef.current) {
+      hasRunInitialChatIdEffectRef.current = true;
+      return;
+    }
+
     setPendingMessageId(null);
     setChatError(null);
     setQueuedMessages([]);
@@ -628,10 +637,12 @@ function StandaloneChatPageClient({
       return;
     }
 
+    hasUpdatedUrlRef.current = false;
     setWasStoppedByUser(false);
     setMessages([]);
     setContext([]);
     setHasCustomizedContext(false);
+    setGeneratedChatId(crypto.randomUUID());
   }, [initialChatId, setMessages]);
 
   const queueStorageKey = `chat-queue:${stableChatId}`;
@@ -688,8 +699,14 @@ function StandaloneChatPageClient({
   const isLoadingHistory =
     Boolean(initialChatId) &&
     messages.length === 0 &&
-    (chatHistoryQuery.isLoading || pendingHistoryMessages > 0);
+    (chatHistoryQuery.isLoading ||
+      chatHistoryQuery.isPending ||
+      pendingHistoryMessages > 0);
   const isLoading = status === "streaming" || status === "submitted";
+  const isPendingAutoSubmit =
+    !initialChatId &&
+    Boolean(initialQuery?.trim()) &&
+    messages.length === 0;
   const hasMessages = messages.length > 0;
 
   const [isFirstMessageTransition, setIsFirstMessageTransition] =
@@ -893,27 +910,6 @@ function StandaloneChatPageClient({
     [messageBranches, setMessages]
   );
 
-  const hasUpdatedUrlRef = useRef(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (initialChatId) {
-      return;
-    }
-    if (pathname !== `/${organizationSlug}/chat`) {
-      return;
-    }
-
-    hasUpdatedUrlRef.current = false;
-    setMessages([]);
-    setContext([]);
-    setHasCustomizedContext(false);
-    setWasStoppedByUser(false);
-    setPendingMessageId(null);
-    setChatError(null);
-    setGeneratedChatId(crypto.randomUUID());
-  }, [pathname, organizationSlug, initialChatId, setMessages]);
-
   const dispatchMessage = useCallback(
     async (text: string, attachments: ChatAttachment[] = []) => {
       const isFirstMessage = !initialChatId && !hasUpdatedUrlRef.current;
@@ -940,6 +936,7 @@ function StandaloneChatPageClient({
         }
       }
       if (isFirstMessage) {
+        hasUpdatedUrlRef.current = true;
         window.history.replaceState(
           null,
           "",
@@ -964,6 +961,9 @@ function StandaloneChatPageClient({
         await sendMessage({ text });
       }
       if (isFirstMessage) {
+        router.replace(`/${organizationSlug}/chat/${stableChatId}`, {
+          scroll: false,
+        });
         queryClient.invalidateQueries({
           queryKey: ["chat-sessions", organizationId],
         });
@@ -975,6 +975,7 @@ function StandaloneChatPageClient({
       organizationId,
       organizationSlug,
       queryClient,
+      router,
       sendMessage,
       stableChatId,
       triggerFirstMessageTransition,
@@ -995,34 +996,79 @@ function StandaloneChatPageClient({
     [dispatchMessage, isLoading]
   );
 
-  const autoSubmittedRef = useRef(false);
+  const autoSubmittedQueryRef = useRef<string | null>(null);
+  const pendingInitialQueryResetRef = useRef<string | null>(null);
   useEffect(() => {
-    if (autoSubmittedRef.current) {
-      return;
-    }
     if (initialChatId) {
       return;
     }
     const trimmedInitialQuery = initialQuery?.trim();
     if (!trimmedInitialQuery) {
+      autoSubmittedQueryRef.current = null;
+      pendingInitialQueryResetRef.current = null;
+      return;
+    }
+    if (autoSubmittedQueryRef.current === trimmedInitialQuery) {
       return;
     }
     if (!organizationId) {
       return;
     }
     if (messagesRef.current.length > 0) {
+      if (pendingInitialQueryResetRef.current === trimmedInitialQuery) {
+        return;
+      }
+      pendingInitialQueryResetRef.current = trimmedInitialQuery;
+      setPendingMessageId(null);
+      setChatError(null);
+      setQueuedMessages([]);
+      hasUpdatedUrlRef.current = false;
+      setWasStoppedByUser(false);
+      setMessages([]);
+      setContext([]);
+      setHasCustomizedContext(false);
+      setGeneratedChatId(crypto.randomUUID());
       return;
     }
 
-    autoSubmittedRef.current = true;
-    setInitialQuery(null);
-    handleSend(trimmedInitialQuery);
+    const queryToSubmit = trimmedInitialQuery;
+    let cancelled = false;
+    let attempts = 0;
+
+    function submitWhenComposerIsReady() {
+      if (cancelled) {
+        return;
+      }
+
+      const chatInput = chatInputRef.current;
+      if (!chatInput) {
+        attempts += 1;
+        if (attempts < 10) {
+          window.requestAnimationFrame(submitWhenComposerIsReady);
+        }
+        return;
+      }
+
+      autoSubmittedQueryRef.current = queryToSubmit;
+      pendingInitialQueryResetRef.current = null;
+      chatInput.setText(queryToSubmit);
+      window.requestAnimationFrame(() => {
+        chatInput.submit();
+        setInitialQuery(null);
+      });
+    }
+
+    submitWhenComposerIsReady();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
-    handleSend,
     initialChatId,
     initialQuery,
     organizationId,
     setInitialQuery,
+    setMessages,
   ]);
 
   const handleRemoveQueued = useCallback((id: string) => {
@@ -1452,7 +1498,7 @@ function StandaloneChatPageClient({
     );
   }
 
-  if (!hasMessages) {
+  if (!(hasMessages || isPendingAutoSubmit || isLoading)) {
     const now = isHydrated ? new Date() : null;
     const greeting = now ? getGreeting(now) : "Welcome";
     const userName = session?.user?.name?.split(" ")[0];
@@ -1720,5 +1766,11 @@ export default function PageClient(props: PageClientProps) {
     return null;
   }
 
-  return <StandaloneChatPageClient {...props} />;
+  return (
+    <StandaloneChatPageClient
+      chatId={props.chatId}
+      key={props.chatId ?? "__new"}
+      organizationSlug={props.organizationSlug}
+    />
+  );
 }
