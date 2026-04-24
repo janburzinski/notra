@@ -259,7 +259,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const organizationId = membership[0]!.organizationId;
+  const member = membership[0];
+  if (!member) {
+    log.set({ feature: "command_palette", forbiddenSlug: true });
+    log.emit();
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const organizationId = member.organizationId;
   const routes = commandRoutesForAI(slug);
 
   const entities = await fetchEntityContext(organizationId, query, slug);

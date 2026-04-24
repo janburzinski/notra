@@ -9,6 +9,13 @@ import {
   DATABUDDY_DASHBOARD_CLIENT_ID,
 } from "@/lib/databuddy-config";
 
+interface AiChatExperimentFlag {
+  on: boolean;
+  loading: boolean;
+  value?: unknown;
+  enabled?: boolean;
+}
+
 export function DatabuddyFlagsProvider({ children }: { children: ReactNode }) {
   const { activeOrganization } = useOrganizationsContext();
   const { data: session, isPending } = authClient.useSession();
@@ -39,7 +46,7 @@ export function DatabuddyFlagsProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAiChatExperiment() {
+export function useAiChatExperiment(): AiChatExperimentFlag {
   const flag = useFlag(AI_CHAT_EXPERIMENT_FLAG_KEY);
 
   if (process.env.NODE_ENV === "development") {
@@ -49,8 +56,12 @@ export function useAiChatExperiment() {
       loading: false,
       value: true,
       enabled: true,
-    } as typeof flag;
+    };
   }
 
-  return flag;
+  return {
+    ...(flag ?? {}),
+    on: Boolean(flag?.on),
+    loading: Boolean(flag?.loading),
+  };
 }

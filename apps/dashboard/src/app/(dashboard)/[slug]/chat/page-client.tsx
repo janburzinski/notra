@@ -704,9 +704,7 @@ function StandaloneChatPageClient({
       pendingHistoryMessages > 0);
   const isLoading = status === "streaming" || status === "submitted";
   const isPendingAutoSubmit =
-    !initialChatId &&
-    Boolean(initialQuery?.trim()) &&
-    messages.length === 0;
+    !initialChatId && Boolean(initialQuery?.trim()) && messages.length === 0;
   const hasMessages = messages.length > 0;
 
   const [isFirstMessageTransition, setIsFirstMessageTransition] =
