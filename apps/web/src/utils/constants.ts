@@ -1,5 +1,5 @@
-import { Consent } from "@notra/ui/components/ui/svgs/consent";
 import { DatabuddyWordmark } from "@notra/ui/components/ui/svgs/databuddyWordmark";
+import { Inth } from "@notra/ui/components/ui/svgs/inth";
 import { StackAuth } from "@notra/ui/components/ui/svgs/stack-auth";
 import { Stagewise } from "@notra/ui/components/ui/svgs/stagewise";
 import type { ComponentType, SVGProps } from "react";
@@ -10,6 +10,31 @@ export const SOCIAL_LINKS = {
   github: "/github",
   discord: "/discord",
 } as const;
+
+export const NOTRA_LOGO_PATH = "/notra-mark.svg";
+
+export const OG_EXCLUDED_CONTRIBUTOR = "mezotv";
+export const OG_MAX_CONTRIBUTORS = 6;
+export const OG_MAX_LOGIN_LENGTH = 12;
+
+export const BLOG_HEADING_REGEX = /<h([2-3])[^>]*>([\s\S]*?)<\/h\1>/gi;
+export const BLOG_PARAGRAPH_REGEX = /<p[^>]*>([\s\S]*?)<\/p>/gi;
+export const BLOG_TAG_REGEX = /<[^>]+>/g;
+export const BLOG_WHITESPACE_REGEX = /\s+/g;
+export const BLOG_FAQ_HEADING_REGEX =
+  /^(frequently asked questions|faqs?|q\s*&\s*a)$/i;
+export const BLOG_NUMBERED_HEADING_PREFIX_REGEX = /^\d+\.\s*/;
+export const JSON_LD_SCRIPT_CLOSE_REGEX = /<\/(script)/gi;
+export const HTML_ENTITY_REGEX = /&(amp|lt|gt|quot|#39|nbsp);/g;
+
+export const HTML_ENTITY_MAP: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  "#39": "'",
+  nbsp: " ",
+};
 
 export const PRICING_PLANS = {
   basic: {
@@ -154,10 +179,10 @@ export const SOCIAL_PROOF_LOGOS: {
   className?: string;
 }[] = [
   {
-    name: "Consent",
-    Component: Consent,
-    href: "https://consent.io?utm_source=notra",
-    className: "h-6",
+    name: "inth",
+    Component: Inth,
+    href: "https://inth.com?utm_source=notra",
+    className: "h-8",
   },
   {
     name: "Databuddy",

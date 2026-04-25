@@ -72,3 +72,7 @@ export interface IssueTypeBadge {
   type: string;
   className: string;
 }
+
+export interface OgContributor extends GitHubUser {
+  displayLogin: string;
+}

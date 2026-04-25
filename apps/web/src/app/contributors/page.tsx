@@ -7,7 +7,7 @@ import { ContributorsContent } from "@/components/contributors/contributors-cont
 import { ContributorsPageSkeleton } from "@/components/contributors/skeleton";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import { GITHUB_REPO_URL } from "@/utils/github";
-import { DEFAULT_SOCIAL_IMAGE, TWITTER_HANDLE } from "@/utils/metadata";
+import { TWITTER_HANDLE } from "@/utils/metadata";
 import { SITE_URL } from "@/utils/urls";
 
 const title = "Contributors & Community";
@@ -27,13 +27,11 @@ export const metadata: Metadata = {
     url,
     type: "website",
     siteName: "Notra",
-    images: [DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: [DEFAULT_SOCIAL_IMAGE.url],
     site: TWITTER_HANDLE,
     creator: TWITTER_HANDLE,
   },

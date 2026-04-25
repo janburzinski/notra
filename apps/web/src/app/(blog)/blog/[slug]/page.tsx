@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChangelogHtmlArticle } from "@/components/changelog-html-article";
-import { NotraMark } from "@/components/notra-mark";
 import { formatBlogDate, getNotraBlogPostBySlug } from "@/utils/blog";
+import {
+  buildBlogArticleJsonLd,
+  buildBlogFaqJsonLd,
+} from "@/utils/blog-jsonld";
+import { buildBreadcrumbJsonLd, serializeJsonLd } from "@/utils/jsonld";
 import { DEFAULT_SOCIAL_IMAGE, TWITTER_HANDLE } from "@/utils/metadata";
 import { SITE_URL } from "@/utils/urls";
 import type { BlogEntryPageProps } from "~types/blog";
@@ -53,8 +57,36 @@ export default async function BlogEntryPage({ params }: BlogEntryPageProps) {
     notFound();
   }
 
+  const url = `${SITE_URL}/blog/${slug}`;
+  const imageUrl = `${SITE_URL}${DEFAULT_SOCIAL_IMAGE.url}`;
+  const articleJsonLd = buildBlogArticleJsonLd({ post, url, imageUrl });
+  const faqJsonLd = buildBlogFaqJsonLd(post);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", url: SITE_URL },
+    { name: "Blog", url: `${SITE_URL}/blog` },
+    { name: post.title, url },
+  ]);
+
   return (
     <>
+      <script
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD payload is server-built and script-close-escaped
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
+        type="application/ld+json"
+      />
+      <script
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD payload is server-built and script-close-escaped
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+        type="application/ld+json"
+      />
+      {faqJsonLd ? (
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD payload is server-built and script-close-escaped
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
+          type="application/ld+json"
+        />
+      ) : null}
+
       <Link
         className="mb-6 inline-flex items-center gap-1 font-sans text-foreground/50 text-sm transition-colors hover:text-foreground"
         href="/blog"
@@ -68,15 +100,6 @@ export default async function BlogEntryPage({ params }: BlogEntryPageProps) {
       <time className="mt-2 block font-sans text-foreground/40 text-sm">
         {formatBlogDate(post.createdAt)}
       </time>
-
-      <div className="mt-4 flex items-center gap-1.5">
-        <span className="text-primary">
-          <NotraMark className="size-3.5 shrink-0" />
-        </span>
-        <p className="font-sans text-muted-foreground text-xs">
-          Published by the Notra team.
-        </p>
-      </div>
 
       <ChangelogHtmlArticle html={post.content} />
     </>

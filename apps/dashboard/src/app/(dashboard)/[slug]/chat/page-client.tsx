@@ -267,6 +267,7 @@ function ChatImageAttachment({
         alt={filename ?? "attachment"}
         className="block h-auto max-h-72 w-auto max-w-full"
         height={480}
+        loading="eager"
         onError={() => setHasError(true)}
         src={url}
         unoptimized
