@@ -32,7 +32,7 @@ export async function getStandaloneChatIntegrations(
 
   const fresh = await loadStandaloneChatIntegrations(organizationId);
 
-  if (redis && fresh.length > 0) {
+  if (redis) {
     try {
       await redis.set(cacheKey(organizationId), fresh, {
         ex: CHAT_INTEGRATIONS_CACHE_TTL_SECONDS,

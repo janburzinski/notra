@@ -35,7 +35,7 @@ export function withCacheControl(message: ModelMessage): ModelMessage {
 }
 
 export function isAnthropicModel(modelId: string): boolean {
-  return modelId.startsWith("anthropic/") || modelId.includes("claude");
+  return modelId.startsWith("anthropic/");
 }
 
 function findStableBoundaryIndex(
