@@ -398,6 +398,7 @@ function StandaloneChatPageClient({
   >({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const chatInputRef = useRef<ChatInputHandle | null>(null);
+  const [isInputEmpty, setIsInputEmpty] = useState(true);
 
   const handleSuggestionSelect = useCallback((text: string) => {
     chatInputRef.current?.setText(text);
@@ -1836,6 +1837,7 @@ function StandaloneChatPageClient({
               model={selectedModel}
               onAddContext={handleAddContext}
               onClearError={handleClearError}
+              onEmptyChange={setIsInputEmpty}
               onModelChange={handleModelChange}
               onRemoveContext={handleRemoveContext}
               onSend={handleSend}
@@ -1851,6 +1853,7 @@ function StandaloneChatPageClient({
           </div>
           <ChatSuggestions
             disabled={isLoading}
+            hidden={!isInputEmpty}
             onSelect={handleSuggestionSelect}
           />
         </div>
