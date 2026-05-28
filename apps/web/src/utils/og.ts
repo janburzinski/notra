@@ -1,6 +1,18 @@
 const GOOGLE_FONT_URL_REGEX =
   /src: url\((.+)\) format\('(opentype|truetype)'\)/;
 
+export function splitTitleForDot(title: string) {
+  const words = title.split(" ");
+  const lastWord = words.at(-1) ?? title;
+  const leading: { word: string; key: string }[] = [];
+  let cursor = 0;
+  for (const word of words.slice(0, -1)) {
+    leading.push({ word, key: `word-${cursor}` });
+    cursor += word.length + 1;
+  }
+  return { leading, lastWord };
+}
+
 export async function loadGoogleFont(family: string, text: string) {
   const url = `https://fonts.googleapis.com/css2?family=${family.replace(
     / /g,

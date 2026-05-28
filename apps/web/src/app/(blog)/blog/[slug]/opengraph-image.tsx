@@ -3,7 +3,12 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getNotraBlogPostBySlug } from "@/utils/blog";
 import { OG_BLOG_TITLE_MAX_LENGTH } from "@/utils/constants";
-import { loadGoogleFont, loadImageAsDataUrl, truncate } from "@/utils/og";
+import {
+  loadGoogleFont,
+  loadImageAsDataUrl,
+  splitTitleForDot,
+  truncate,
+} from "@/utils/og";
 import type { BlogEntryPageProps } from "~types/blog";
 
 export const alt = "Notra blog post";
@@ -15,6 +20,7 @@ export default async function Image({ params }: BlogEntryPageProps) {
   const post = await getNotraBlogPostBySlug(slug);
 
   const title = truncate(post?.title ?? "Notra Blog", OG_BLOG_TITLE_MAX_LENGTH);
+  const { leading, lastWord } = splitTitleForDot(title);
   const author = post?.authors[0] ?? null;
 
   const eyebrow = "BLOG";
@@ -78,6 +84,8 @@ export default async function Image({ params }: BlogEntryPageProps) {
         <div
           style={{
             display: "flex",
+            flexWrap: "wrap",
+            columnGap: "1rem",
             color: "#1a1a1a",
             fontFamily: "Inter",
             fontWeight: 600,
@@ -87,8 +95,13 @@ export default async function Image({ params }: BlogEntryPageProps) {
             maxWidth: "44rem",
           }}
         >
-          <span>{title}</span>
-          <span style={{ color: "#7c3aed" }}>.</span>
+          {leading.map((token) => (
+            <span key={token.key}>{token.word}</span>
+          ))}
+          <div style={{ display: "flex" }}>
+            <span>{lastWord}</span>
+            <span style={{ color: "#7c3aed" }}>.</span>
+          </div>
         </div>
       </div>
 
