@@ -44,7 +44,7 @@ export async function generateMetadata({
   const description = author.bio ?? `Articles written by ${author.name}.`;
 
   return {
-    title: { absolute: `${author.name} — Notra Blog` },
+    title: { absolute: `${author.name} - Notra Blog` },
     description,
     alternates: { canonical: url },
     openGraph: {
