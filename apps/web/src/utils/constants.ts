@@ -48,7 +48,6 @@ export const OG_EXCLUDED_CONTRIBUTOR = "mezotv";
 export const OG_MAX_CONTRIBUTORS = 6;
 export const OG_MAX_LOGIN_LENGTH = 12;
 export const OG_BLOG_TITLE_MAX_LENGTH = 80;
-export const OG_BLOG_DESCRIPTION_MAX_LENGTH = 140;
 
 export const BLOG_HEADING_REGEX = /<h([2-3])[^>]*>([\s\S]*?)<\/h\1>/gi;
 export const BLOG_PARAGRAPH_REGEX = /<p[^>]*>([\s\S]*?)<\/p>/gi;

@@ -2,10 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getNotraBlogPostBySlug } from "@/utils/blog";
-import {
-  OG_BLOG_DESCRIPTION_MAX_LENGTH,
-  OG_BLOG_TITLE_MAX_LENGTH,
-} from "@/utils/constants";
+import { OG_BLOG_TITLE_MAX_LENGTH } from "@/utils/constants";
 import { loadGoogleFont, loadImageAsDataUrl, truncate } from "@/utils/og";
 import type { BlogEntryPageProps } from "~types/blog";
 
@@ -18,21 +15,16 @@ export default async function Image({ params }: BlogEntryPageProps) {
   const post = await getNotraBlogPostBySlug(slug);
 
   const title = truncate(post?.title ?? "Notra Blog", OG_BLOG_TITLE_MAX_LENGTH);
-  const description = truncate(
-    post?.excerpt ?? "Insights, guides, and stories from the Notra team.",
-    OG_BLOG_DESCRIPTION_MAX_LENGTH
-  );
   const author = post?.authors[0] ?? null;
 
   const eyebrow = "BLOG";
   const domain = "usenotra.com";
-  const uiText = `${eyebrow} ${domain} ${description} ${author?.name ?? ""} ${author?.role ?? ""}`;
+  const uiText = `${eyebrow} ${domain} ${author?.name ?? ""} ${author?.role ?? ""}`;
 
-  const [serifFont, sansFont, sansBoldFont, logoSvg, authorImageDataUrl] =
+  const [sansFont, sansBoldFont, logoSvg, authorImageDataUrl] =
     await Promise.all([
-      loadGoogleFont("Instrument Serif", title),
       loadGoogleFont("Inter", uiText),
-      loadGoogleFont("Inter:wght@600", uiText),
+      loadGoogleFont("Inter:wght@600", `${uiText} ${title}`),
       Promise.resolve(
         readFileSync(join(process.cwd(), "public/notra-mark.svg"), "utf-8")
       ),
@@ -87,26 +79,15 @@ export default async function Image({ params }: BlogEntryPageProps) {
           style={{
             display: "flex",
             color: "#1a1a1a",
-            fontFamily: "Instrument Serif",
+            fontFamily: "Inter",
+            fontWeight: 600,
             fontSize: "4rem",
             lineHeight: 1.05,
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.02em",
             maxWidth: "44rem",
           }}
         >
           {title}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            color: "#525252",
-            fontSize: "1.625rem",
-            lineHeight: 1.4,
-            marginTop: "1.5rem",
-            maxWidth: "40rem",
-          }}
-        >
-          {description}
         </div>
       </div>
 
@@ -174,12 +155,6 @@ export default async function Image({ params }: BlogEntryPageProps) {
     {
       ...size,
       fonts: [
-        {
-          name: "Instrument Serif",
-          data: serifFont,
-          style: "normal",
-          weight: 400,
-        },
         { name: "Inter", data: sansFont, style: "normal", weight: 400 },
         { name: "Inter", data: sansBoldFont, style: "normal", weight: 600 },
       ],
