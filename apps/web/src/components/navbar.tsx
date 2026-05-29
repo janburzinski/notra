@@ -24,7 +24,10 @@ import {
   useScroll,
 } from "motion/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getNavbarVariantForPath } from "@/lib/navigation/navbar-variant";
+import type { NavbarProps } from "@/types/navbar";
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
 import {
   MARKETING_NAV,
@@ -222,7 +225,12 @@ function MegaPanel({
   );
 }
 
-export function Navbar() {
+export function Navbar({ variant }: NavbarProps = {}) {
+  const pathname = usePathname();
+  const resolvedVariant = variant ?? getNavbarVariantForPath(pathname);
+  const tracksScroll = resolvedVariant === "island";
+  const isStatic = resolvedVariant === "static";
+
   const [isOpen, setIsOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
   const [panelSizes, setPanelSizes] = useState<Map<string, PanelSize>>(
@@ -353,22 +361,23 @@ export function Navbar() {
     : ENTER_EXIT_TRANSITION;
   const contentTransition = reduceMotion ? { duration: 0 } : SWAP_TRANSITION;
   const shellTransition = reduceMotion ? { duration: 0 } : SHELL_TRANSITION;
-  const mutedNavClass = scrolled
+  const chrome = resolvedVariant === "pinned" || (tracksScroll && scrolled);
+  const mutedNavClass = chrome
     ? "text-neutral-500 dark:text-neutral-400"
     : "text-neutral-700 dark:text-neutral-200";
 
   return (
     <LazyMotion features={domAnimation} strict>
       <m.div
-        animate={{ maxWidth: scrolled ? "64rem" : "80rem" }}
-        className="sticky top-4 z-50 mx-auto w-full"
+        animate={{ maxWidth: chrome ? "64rem" : "80rem" }}
+        className={`z-50 mx-auto w-full ${isStatic ? "" : "sticky top-4"}`}
         initial={false}
         transition={shellTransition}
       >
         <m.header
-          animate={{ borderRadius: scrolled ? "1rem" : "0rem" }}
+          animate={{ borderRadius: chrome ? "1rem" : "0rem" }}
           className={`transition-[background-color,box-shadow] duration-300 ease-out ${
-            scrolled ? ISLAND_CHROME : "bg-transparent"
+            chrome ? ISLAND_CHROME : "bg-transparent"
           }`}
           initial={false}
           transition={shellTransition}
