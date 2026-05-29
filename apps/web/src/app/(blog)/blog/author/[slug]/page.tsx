@@ -38,13 +38,16 @@ export async function generateMetadata({
 
   const url = `${SITE_URL}/blog/author/${slug}`;
   const description = author.bio ?? `Articles written by ${author.name}.`;
+  const socialTitle = author.role
+    ? `${author.name} - ${author.role}`
+    : author.name;
 
   return {
-    title: { absolute: `${author.name} - Notra Blog` },
+    title: { absolute: socialTitle },
     description,
     alternates: { canonical: url },
     openGraph: {
-      title: author.name,
+      title: socialTitle,
       description,
       url,
       type: "profile",
@@ -52,7 +55,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: author.name,
+      title: socialTitle,
       description,
       site: TWITTER_HANDLE,
       creator: TWITTER_HANDLE,
