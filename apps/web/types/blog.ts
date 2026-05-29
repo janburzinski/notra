@@ -58,12 +58,32 @@ interface BlogPageHeaderProps {
   description: ReactNode;
 }
 
-export interface BlogTimelineItem {
+interface BlogTimelineItem {
   id: string;
   title: string;
   description: string;
   href: string;
   date: string;
+}
+
+interface BlogCardAuthor {
+  name: string;
+  image: string | null;
+  slug: string;
+  href: string;
+}
+
+export interface BlogCardItem {
+  id: string;
+  title: string;
+  description: string;
+  href: string;
+  date: string;
+  author: BlogCardAuthor | null;
+}
+
+export interface BlogPostCardProps {
+  item: BlogCardItem;
 }
 
 interface BlogTimelineProps {

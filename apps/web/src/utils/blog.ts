@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { getAuthorHref } from "@/utils/authors";
 import {
   BLOG_INDEX_PATH,
   MARBLE_BLOG_CATEGORY_SLUG,
@@ -11,11 +12,7 @@ import {
   listMarblePublishedPosts,
   type MarblePublishedPost,
 } from "@/utils/marble";
-import type {
-  BlogTimelineItem,
-  NotraBlogAuthor,
-  NotraBlogPost,
-} from "~types/blog";
+import type { BlogCardItem, NotraBlogAuthor, NotraBlogPost } from "~types/blog";
 
 const BLOG_CONTENT_TYPE = "blog_post";
 const FALLBACK_EXCERPT_MAX_LENGTH = 160;
@@ -162,14 +159,24 @@ export async function getNotraBlogPostBySlug(slug: string) {
   return posts.find((post) => post.slug === slug) ?? null;
 }
 
-export function buildBlogTimelineItems(
-  posts: NotraBlogPost[]
-): BlogTimelineItem[] {
-  return posts.map((post) => ({
-    id: post.id,
-    title: post.title,
-    description: post.excerpt,
-    href: getBlogPostHref(post.slug),
-    date: post.createdAt,
-  }));
+export function buildBlogCardItems(posts: NotraBlogPost[]): BlogCardItem[] {
+  return posts.map((post) => {
+    const [primaryAuthor] = post.authors;
+
+    return {
+      id: post.id,
+      title: post.title,
+      description: post.excerpt,
+      href: getBlogPostHref(post.slug),
+      date: post.createdAt,
+      author: primaryAuthor
+        ? {
+            name: primaryAuthor.name,
+            image: primaryAuthor.image,
+            slug: primaryAuthor.slug,
+            href: getAuthorHref(primaryAuthor.slug),
+          }
+        : null,
+    };
+  });
 }

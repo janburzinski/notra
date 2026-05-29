@@ -6,19 +6,15 @@ import {
 } from "@notra/ui/components/ui/avatar";
 import { buttonVariants } from "@notra/ui/components/ui/button";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BlogPostCard } from "@/components/blog-post-card";
 import { resolveSocialLink } from "@/utils/author-socials";
 import {
   filterPostsByAuthorSlug,
   getNotraAuthorBySlug,
   listNotraAuthors,
 } from "@/utils/authors";
-import {
-  buildBlogTimelineItems,
-  formatBlogDate,
-  listNotraBlogPosts,
-} from "@/utils/blog";
+import { buildBlogCardItems, listNotraBlogPosts } from "@/utils/blog";
 import { DEFAULT_SOCIAL_IMAGE, TWITTER_HANDLE } from "@/utils/metadata";
 import { SITE_URL } from "@/utils/urls";
 import type { BlogAuthorPageProps } from "~types/blog";
@@ -75,7 +71,7 @@ export default async function BlogAuthorPage({ params }: BlogAuthorPageProps) {
 
   const posts = await listNotraBlogPosts();
   const authorPosts = filterPostsByAuthorSlug(posts, slug);
-  const timelineItems = buildBlogTimelineItems(authorPosts);
+  const cardItems = buildBlogCardItems(authorPosts);
   const socials = author.socials
     .map(resolveSocialLink)
     .filter((social) => social !== null);
@@ -131,28 +127,10 @@ export default async function BlogAuthorPage({ params }: BlogAuthorPageProps) {
           {authorPosts.length} {postLabel}
         </h2>
 
-        {timelineItems.length > 0 ? (
-          <div className="mt-2 divide-y divide-border">
-            {timelineItems.map((item) => (
-              <Link
-                className="group block py-8 first:pt-6"
-                href={item.href}
-                key={item.id}
-              >
-                <article>
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="font-sans font-semibold text-foreground text-xl tracking-tight sm:text-2xl">
-                      {item.title}
-                    </h3>
-                    <time className="shrink-0 pt-1 font-mono text-muted-foreground text-sm">
-                      {formatBlogDate(item.date)}
-                    </time>
-                  </div>
-                  <p className="mt-3 line-clamp-3 font-sans text-base text-muted-foreground leading-7">
-                    {item.description}
-                  </p>
-                </article>
-              </Link>
+        {cardItems.length > 0 ? (
+          <div className="mt-6 grid w-full grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2">
+            {cardItems.map((item) => (
+              <BlogPostCard item={item} key={item.id} />
             ))}
           </div>
         ) : (
