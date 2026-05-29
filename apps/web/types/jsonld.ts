@@ -25,6 +25,15 @@ export interface OfferLike {
   availability?: string;
   category?: string;
   itemCondition?: string;
+  hasMerchantReturnPolicy?: MerchantReturnPolicyLike;
+}
+
+interface MerchantReturnPolicyLike {
+  "@type": "MerchantReturnPolicy";
+  applicableCountry: string | readonly string[];
+  merchantReturnDays?: number;
+  refundType?: string;
+  returnPolicyCategory: string;
 }
 
 export interface ProductJsonLdInput {

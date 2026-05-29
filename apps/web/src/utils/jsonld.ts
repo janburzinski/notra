@@ -3,6 +3,7 @@ import { SITE_URL } from "@/utils/urls";
 import type {
   ArticleJsonLdInput,
   BreadcrumbItem,
+  OfferLike,
   ProductJsonLdInput,
 } from "~types/jsonld";
 
@@ -15,6 +16,49 @@ const NOTRA_PUBLISHER = {
     url: `${SITE_URL}${NOTRA_LOGO_PATH}`,
   },
 } as const;
+
+function withMerchantReturnPolicy(offer: OfferLike): OfferLike {
+  return {
+    ...offer,
+    hasMerchantReturnPolicy: offer.hasMerchantReturnPolicy ?? {
+      "@type": "MerchantReturnPolicy",
+      applicableCountry: [
+        "US",
+        "AT",
+        "BE",
+        "BG",
+        "HR",
+        "CY",
+        "CZ",
+        "DK",
+        "EE",
+        "FI",
+        "FR",
+        "DE",
+        "GR",
+        "HU",
+        "IE",
+        "IT",
+        "LV",
+        "LT",
+        "LU",
+        "MT",
+        "NL",
+        "PL",
+        "PT",
+        "RO",
+        "SK",
+        "SI",
+        "ES",
+        "SE",
+      ],
+      returnPolicyCategory:
+        "https://schema.org/MerchantReturnFiniteReturnWindow",
+      merchantReturnDays: 14,
+      refundType: "https://schema.org/FullRefund",
+    },
+  };
+}
 
 export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]) {
   return {
@@ -70,6 +114,10 @@ export function buildProductJsonLd({
   url,
   offers,
 }: ProductJsonLdInput) {
+  const offersWithReturnPolicy = Array.isArray(offers)
+    ? offers.map(withMerchantReturnPolicy)
+    : withMerchantReturnPolicy(offers);
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -81,7 +129,7 @@ export function buildProductJsonLd({
       "@type": "Brand",
       name: "Notra",
     },
-    offers,
+    offers: offersWithReturnPolicy,
   };
 }
 
