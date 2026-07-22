@@ -149,28 +149,37 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
 
         <div className="flex flex-1 flex-col px-6 pt-4.5">
           <div className="flex flex-col items-start gap-3.25">
-            <div className="flex items-baseline gap-4">
-              <span
-                className={cn(
-                  "font-display font-normal text-[2.625rem] leading-13 tracking-[-0.01em]",
-                  isFeatured ? "text-white" : "text-[#1E1E1E] dark:text-white"
-                )}
+            <AnimatePresence initial={false} mode="wait">
+              <m.div
+                animate={{ y: 0, opacity: 1 }}
+                className="flex items-baseline gap-2"
+                exit={{ y: "0.75rem", opacity: 0 }}
+                initial={{ y: "0.75rem", opacity: 0 }}
+                key={plan.price[billingPeriod]}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
               >
-                {plan.price}
-              </span>
-              {plan.priceSuffix ? (
                 <span
                   className={cn(
-                    "font-normal font-sans text-sm leading-[1.125rem] tracking-[-0.015em]",
-                    isFeatured
-                      ? "text-white/70"
-                      : "text-[#1E1E1EB3] dark:text-white/60"
+                    "font-display font-normal text-[2.625rem] leading-13 tracking-[-0.01em]",
+                    isFeatured ? "text-white" : "text-[#1E1E1E] dark:text-white"
                   )}
                 >
-                  {plan.priceSuffix}
+                  {plan.price[billingPeriod]}
                 </span>
-              ) : null}
-            </div>
+                {plan.priceSuffix ? (
+                  <span
+                    className={cn(
+                      "font-normal font-sans text-sm leading-[1.125rem] tracking-[-0.015em]",
+                      isFeatured
+                        ? "text-white/70"
+                        : "text-[#1E1E1EB3] dark:text-white/60"
+                    )}
+                  >
+                    {plan.priceSuffix[billingPeriod]}
+                  </span>
+                ) : null}
+              </m.div>
+            </AnimatePresence>
 
             <CtaButton
               className="w-full"

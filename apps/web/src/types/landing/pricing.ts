@@ -38,8 +38,8 @@ export interface PricingPlan {
   id: string;
   name: string;
   description: string;
-  price: string;
-  priceSuffix?: string;
+  price: Record<BillingPeriod, string>;
+  priceSuffix?: Record<BillingPeriod, string>;
   variant: "default" | "featured";
   hasAnnualBadge?: boolean;
   cta: PricingCta;

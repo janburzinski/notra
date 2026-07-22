@@ -27,8 +27,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     id: "basic",
     name: "Basic",
     description: "For small teams publishing their first regular updates.",
-    price: "$20",
-    priceSuffix: "/monthly",
+    price: { monthly: "$20", yearly: "$200" },
+    priceSuffix: { monthly: "/monthly", yearly: "/yearly" },
     variant: "default",
     hasAnnualBadge: true,
     cta: {
@@ -56,8 +56,8 @@ export const PRICING_PLANS: PricingPlan[] = [
     name: "Pro",
     description:
       "For teams shipping every week who want every release covered.",
-    price: "$50",
-    priceSuffix: "/monthly",
+    price: { monthly: "$50", yearly: "$500" },
+    priceSuffix: { monthly: "/monthly", yearly: "/yearly" },
     variant: "featured",
     hasAnnualBadge: true,
     cta: {
@@ -84,7 +84,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     id: "enterprise",
     name: "Enterprise",
     description: "For large teams with custom needs.",
-    price: "$Custom",
+    price: { monthly: "Custom", yearly: "Custom" },
     variant: "default",
     cta: {
       label: "Contact Us",
