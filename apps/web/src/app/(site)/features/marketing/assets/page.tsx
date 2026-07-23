@@ -121,7 +121,7 @@ export default function MarketingAssetsPage() {
       </MarketingHeroWash>
 
       <div className="flex w-full flex-col items-center overflow-hidden">
-        <section className="w-full px-6 pt-12 md:px-12 md:pt-16 lg:px-16">
+        <section className="w-full px-6 pt-12 pb-8 md:px-12 md:pt-16 md:pb-10 lg:px-16">
           <div className="mx-auto w-full max-w-4xl">
             <HeroVideoCarousel videos={ASSET_HERO.videos} />
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { CarouselProgress } from "@notra/ui/components/ui/carousel-progress";
 import { cn } from "@notra/ui/lib/utils";
 import { useEffect, useState } from "react";
 import type { AssetHeroVideo } from "@/lib/marketing-assets/types/hero";
@@ -22,7 +23,6 @@ export function HeroVideoCarousel({
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const activeVideo = videos[activeIndex] ?? videos[0];
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: activeIndex intentionally restarts slide progress.
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updatePreference = () => {
@@ -37,6 +37,7 @@ export function HeroVideoCarousel({
     };
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: activeIndex intentionally restarts slide progress.
   useEffect(() => {
     if (prefersReducedMotion || videos.length < 2) {
       setProgress(100);
@@ -75,37 +76,16 @@ export function HeroVideoCarousel({
       </div>
 
       {videos.length > 1 ? (
-        <div className="mt-4 flex items-center justify-center gap-2">
-          {videos.map((video, index) => {
-            const isActive = index === activeIndex;
-
-            return (
-              <button
-                aria-current={isActive ? "true" : undefined}
-                aria-label={`Go to slide ${index + 1}`}
-                className={cn(
-                  "relative h-2 cursor-pointer rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                  isActive
-                    ? "w-12 bg-foreground/15"
-                    : "w-2 bg-foreground/20 hover:bg-foreground/40"
-                )}
-                key={video.src}
-                onClick={() => {
-                  setActiveIndex(index);
-                  setProgress(0);
-                }}
-                type="button"
-              >
-                {isActive ? (
-                  <span
-                    className="absolute inset-y-0 left-0 rounded-full bg-foreground/60"
-                    style={{ width: `${progress}%` }}
-                  />
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
+        <CarouselProgress
+          activeIndex={activeIndex}
+          className="mt-4"
+          labels={videos.map((_, index) => `Go to slide ${index + 1}`)}
+          onSelect={(index) => {
+            setActiveIndex(index);
+            setProgress(0);
+          }}
+          progress={progress}
+        />
       ) : null}
     </div>
   );
