@@ -26,6 +26,7 @@ import {
   startGitHubInstall,
 } from "@/lib/integrations/github/install";
 import { dashboardOrpc } from "@/lib/orpc/query";
+import { GitHubIntegrationSkeleton } from "./skeleton";
 
 interface PageClientProps {
   organizationSlug: string;
@@ -123,7 +124,8 @@ function useResumeGitHubInstall(params: {
 }
 
 export default function PageClient({ organizationSlug }: PageClientProps) {
-  const { getOrganization } = useOrganizationsContext();
+  const { getOrganization, isLoading: isLoadingOrganizations } =
+    useOrganizationsContext();
   const organization = getOrganization(organizationSlug);
   const organizationId = organization?.id ?? "";
   const pathname = usePathname();
@@ -160,7 +162,9 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     legacyQuery.data?.integrations.filter((i) => i.type === "github") ?? [];
   const data = githubAppQuery.data;
   const isConnected = Boolean(data?.account);
-  const isLoading = !!organizationId && githubAppQuery.isLoading && !data;
+  const isLoading =
+    isLoadingOrganizations ||
+    (!!organizationId && githubAppQuery.isLoading && !data);
   const selectedRepositoryIds = data?.selectedRepositoryIds ?? [];
   const repositories = data?.repositories ? [...data.repositories] : [];
 
@@ -312,12 +316,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   );
 
   if (isLoading) {
-    githubAppContent = (
-      <EmptyState
-        description="Loading your GitHub App installation."
-        title="Loading GitHub"
-      />
-    );
+    githubAppContent = <GitHubIntegrationSkeleton />;
   } else if (isConnected && data?.account) {
     githubAppContent = (
       <GitHubAccountCard
