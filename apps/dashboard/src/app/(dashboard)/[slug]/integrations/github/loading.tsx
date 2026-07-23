@@ -3,7 +3,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Button } from "@/components/button";
 import { PageContainer } from "@/components/layout/container";
-import { GitHubIntegrationSkeleton } from "./skeleton";
+import {
+  GitHubIntegrationSkeleton,
+  GitHubLegacyIntegrationsSkeleton,
+} from "./skeleton";
 
 export default function Loading() {
   return (
@@ -24,6 +27,7 @@ export default function Loading() {
           </Button>
         </div>
         <GitHubIntegrationSkeleton />
+        <GitHubLegacyIntegrationsSkeleton />
       </div>
     </PageContainer>
   );

@@ -50,3 +50,37 @@ export function GitHubIntegrationSkeleton() {
     </Card>
   );
 }
+
+export function GitHubLegacyIntegrationsSkeleton() {
+  return (
+    <section className="space-y-3">
+      <div className="space-y-0.5">
+        <h2 className="font-semibold text-lg">
+          Personal access token (Legacy)
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          Legacy integrations connected with a personal access token.
+        </p>
+      </div>
+      <Card
+        aria-busy="true"
+        aria-label="Loading personal access token integrations"
+        role="status"
+      >
+        <CardHeader>
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-4 w-36" />
+          </div>
+          <CardAction className="flex items-center gap-2">
+            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="size-8" />
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-4 w-36" />
+        </CardContent>
+      </Card>
+    </section>
+  );
+}

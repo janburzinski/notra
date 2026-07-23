@@ -26,7 +26,11 @@ import {
   startGitHubInstall,
 } from "@/lib/integrations/github/install";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import { GitHubIntegrationSkeleton } from "./skeleton";
+import type { GitHubIntegration } from "@/types/integrations";
+import {
+  GitHubIntegrationSkeleton,
+  GitHubLegacyIntegrationsSkeleton,
+} from "./skeleton";
 
 interface PageClientProps {
   organizationSlug: string;
@@ -123,6 +127,52 @@ function useResumeGitHubInstall(params: {
   ]);
 }
 
+function LegacyGitHubIntegrationsSection({
+  integrations,
+  isLoading,
+  onUpdate,
+  organizationId,
+  organizationSlug,
+}: {
+  integrations: GitHubIntegration[];
+  isLoading: boolean;
+  onUpdate: () => void;
+  organizationId: string;
+  organizationSlug: string;
+}) {
+  if (isLoading) {
+    return <GitHubLegacyIntegrationsSkeleton />;
+  }
+
+  if (integrations.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="space-y-3">
+      <div className="space-y-0.5">
+        <h2 className="font-semibold text-lg">
+          Personal access token (Legacy)
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          Legacy integrations connected with a personal access token.
+        </p>
+      </div>
+      <div className="grid gap-4">
+        {integrations.map((integration) => (
+          <IntegrationCard
+            integration={integration}
+            key={integration.id}
+            onUpdate={onUpdate}
+            organizationId={organizationId}
+            organizationSlug={organizationSlug}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function PageClient({ organizationSlug }: PageClientProps) {
   const { getOrganization, isLoading: isLoadingOrganizations } =
     useOrganizationsContext();
@@ -159,12 +209,19 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     })
   );
   const legacyIntegrations =
-    legacyQuery.data?.integrations.filter((i) => i.type === "github") ?? [];
+    legacyQuery.data?.integrations.filter(
+      (integration) =>
+        integration.type === "github" &&
+        integration.connectionMethod === "personal-access-token"
+    ) ?? [];
   const data = githubAppQuery.data;
   const isConnected = Boolean(data?.account);
   const isLoading =
     isLoadingOrganizations ||
     (!!organizationId && githubAppQuery.isLoading && !data);
+  const isLoadingLegacyIntegrations =
+    isLoadingOrganizations ||
+    (!!organizationId && legacyQuery.isLoading && !legacyQuery.data);
   const selectedRepositoryIds = data?.selectedRepositoryIds ?? [];
   const repositories = data?.repositories ? [...data.repositories] : [];
 
@@ -352,29 +409,13 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
 
         {githubAppContent}
 
-        {legacyIntegrations.length > 0 ? (
-          <section className="space-y-3">
-            <div className="space-y-0.5">
-              <h2 className="font-semibold text-lg">
-                Personal access token (Legacy)
-              </h2>
-              <p className="text-muted-foreground text-sm">
-                Legacy integrations connected with a personal access token.
-              </p>
-            </div>
-            <div className="grid gap-4">
-              {legacyIntegrations.map((integration) => (
-                <IntegrationCard
-                  integration={integration}
-                  key={integration.id}
-                  onUpdate={() => legacyQuery.refetch()}
-                  organizationId={organizationId}
-                  organizationSlug={organizationSlug}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        <LegacyGitHubIntegrationsSection
+          integrations={legacyIntegrations}
+          isLoading={isLoadingLegacyIntegrations}
+          onUpdate={() => legacyQuery.refetch()}
+          organizationId={organizationId}
+          organizationSlug={organizationSlug}
+        />
 
         <p className="text-muted-foreground text-xs">
           Still using a personal access token?{" "}
