@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { validateOrganizationAccess } from "@/lib/auth/actions";
 import type { CollectionPageProps } from "@/types/content/collection";
+import Loading from "../../loading";
 import PageClient from "./page-client";
 
 export const metadata: Metadata = {
@@ -14,7 +15,7 @@ async function Page({ params }: CollectionPageProps) {
   const { organization } = await validateOrganizationAccess(slug);
 
   return (
-    <Suspense>
+    <Suspense fallback={<Loading />}>
       <PageClient
         collectionId={id}
         organizationId={organization.id}

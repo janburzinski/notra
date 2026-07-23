@@ -19,12 +19,10 @@ export type Organization = NonNullable<
   ReturnType<typeof authClient.useListOrganizations>["data"]
 >[number];
 
-export interface InitialActiveOrganization {
-  id: string;
-  logo: string | null;
-  name: string;
-  slug: string;
-}
+export type InitialActiveOrganization = Pick<
+  Organization,
+  "id" | "logo" | "name" | "slug" | "createdAt"
+>;
 
 interface OrganizationsContextValue {
   organizations: Organization[];
@@ -113,7 +111,7 @@ export function OrganizationsProvider({
       return null;
     }
 
-    return initialActiveOrganization as Organization;
+    return initialActiveOrganization;
   }, [initialActiveOrganization, slugFromPath]);
   const activeOrganizationForPath =
     !slugFromPath || activeOrganization?.slug === slugFromPath
@@ -246,8 +244,12 @@ export function OrganizationsProvider({
   ]);
 
   const getOrganization = useCallback(
-    (slug: string) => organizations.find((org) => org.slug === slug),
-    [organizations]
+    (slug: string) =>
+      organizations.find((org) => org.slug === slug) ??
+      (resolvedActiveOrganization?.slug === slug
+        ? resolvedActiveOrganization
+        : undefined),
+    [organizations, resolvedActiveOrganization]
   );
 
   const contextValue = useMemo<OrganizationsContextValue>(

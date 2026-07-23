@@ -28,6 +28,7 @@ export default async function OrganizationLayout({
   return (
     <DashboardClientWrapper
       initialActiveOrganization={{
+        createdAt: organization.createdAt,
         id: organization.id,
         logo: organization.logo,
         name: organization.name,
