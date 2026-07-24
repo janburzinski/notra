@@ -31,6 +31,7 @@ export default async function OrganizationLayout({
         createdAt: organization.createdAt,
         id: organization.id,
         logo: organization.logo,
+        metadata: organization.metadata ?? undefined,
         name: organization.name,
         slug: organization.slug,
       }}

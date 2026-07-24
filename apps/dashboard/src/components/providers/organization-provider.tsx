@@ -19,10 +19,7 @@ export type Organization = NonNullable<
   ReturnType<typeof authClient.useListOrganizations>["data"]
 >[number];
 
-export type InitialActiveOrganization = Pick<
-  Organization,
-  "id" | "logo" | "name" | "slug" | "createdAt"
->;
+export type InitialActiveOrganization = Organization;
 
 interface OrganizationsContextValue {
   organizations: Organization[];
