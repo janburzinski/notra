@@ -1974,14 +1974,14 @@ export function ChatInputAdvanced({
                       if (isGitHub && isAvailable && enabledRepos.length > 0) {
                         return (
                           <DropdownMenuSub key={integration.id}>
-                            <DropdownMenuSubTrigger>
+                            <DropdownMenuSubTrigger className="grid grid-cols-[1rem_3.5rem_1fr_1rem]">
                               <span className="size-4 shrink-0 text-foreground [&_svg]:size-4">
                                 {integration.icon}
                               </span>
                               <span className="text-foreground">
                                 {integration.name}
                               </span>
-                              <span className="ml-auto text-emerald-600 text-xs dark:text-emerald-400">
+                              <span className="justify-self-center text-emerald-600 text-xs dark:text-emerald-400">
                                 {enabledRepos.length}
                               </span>
                             </DropdownMenuSubTrigger>
@@ -2048,14 +2048,14 @@ export function ChatInputAdvanced({
                       ) {
                         return (
                           <DropdownMenuSub key={integration.id}>
-                            <DropdownMenuSubTrigger>
+                            <DropdownMenuSubTrigger className="grid grid-cols-[1rem_3.5rem_1fr_1rem]">
                               <span className="size-4 shrink-0 text-foreground [&_svg]:size-4">
                                 {integration.icon}
                               </span>
                               <span className="text-foreground">
                                 {integration.name}
                               </span>
-                              <span className="ml-auto text-emerald-600 text-xs dark:text-emerald-400">
+                              <span className="justify-self-center text-emerald-600 text-xs dark:text-emerald-400">
                                 {enabledLinearIntegrations.length}
                               </span>
                             </DropdownMenuSubTrigger>
@@ -2122,6 +2122,7 @@ export function ChatInputAdvanced({
                       ) {
                         return (
                           <DropdownMenuItem
+                            className="grid grid-cols-[1rem_3.5rem_1fr_1rem]"
                             key={integration.id}
                             render={
                               <Link
@@ -2135,7 +2136,7 @@ export function ChatInputAdvanced({
                             <span className="text-foreground">
                               {integration.name}
                             </span>
-                            <span className="ml-auto text-emerald-600 text-xs dark:text-emerald-400">
+                            <span className="justify-self-center text-emerald-600 text-xs dark:text-emerald-400">
                               {enabledGranolaIntegrations.length}
                             </span>
                             <HugeiconsIcon
@@ -2154,6 +2155,7 @@ export function ChatInputAdvanced({
                       ) {
                         return (
                           <DropdownMenuItem
+                            className="grid grid-cols-[1rem_3.5rem_1fr_1rem]"
                             key={integration.id}
                             render={
                               <Link
@@ -2167,7 +2169,7 @@ export function ChatInputAdvanced({
                             <span className="text-foreground">
                               {integration.name}
                             </span>
-                            <span className="ml-auto text-muted-foreground text-xs">
+                            <span className="justify-self-center text-muted-foreground text-xs">
                               Setup
                             </span>
                             <HugeiconsIcon
