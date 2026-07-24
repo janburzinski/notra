@@ -122,6 +122,13 @@ export const AVAILABLE_MODELS = [
     provider: "auto",
   },
   {
+    id: "anthropic/claude-opus-5",
+    label: "Claude Opus 5",
+    description: "Most advanced reasoning",
+    pricing: "$5 input / $25 output per 1M",
+    provider: "anthropic",
+  },
+  {
     id: "anthropic/claude-opus-4.8",
     label: "Claude Opus 4.8",
     description: "Deepest reasoning",
