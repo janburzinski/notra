@@ -83,7 +83,8 @@ export function OrganizationsProvider({
     ],
   });
 
-  const organizations = organizationsData ?? [];
+  const organizations =
+    organizationsData ?? FALLBACK_ORGANIZATIONS_CONTEXT.organizations;
   const isLoading = isLoadingOrgs || isLoadingActive;
   const slugFromPath = useMemo(() => {
     const segments = pathname.split("/").filter(Boolean);
