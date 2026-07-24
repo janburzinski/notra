@@ -1978,7 +1978,7 @@ export function ChatInputAdvanced({
                               <span className="size-4 shrink-0 text-foreground [&_svg]:size-4">
                                 {integration.icon}
                               </span>
-                              <span className="text-foreground">
+                              <span className="truncate text-foreground">
                                 {integration.name}
                               </span>
                               <span className="justify-self-center text-emerald-600 text-xs dark:text-emerald-400">
@@ -2052,7 +2052,7 @@ export function ChatInputAdvanced({
                               <span className="size-4 shrink-0 text-foreground [&_svg]:size-4">
                                 {integration.icon}
                               </span>
-                              <span className="text-foreground">
+                              <span className="truncate text-foreground">
                                 {integration.name}
                               </span>
                               <span className="justify-self-center text-emerald-600 text-xs dark:text-emerald-400">
@@ -2133,7 +2133,7 @@ export function ChatInputAdvanced({
                             <span className="size-4 shrink-0 text-foreground [&_svg]:size-4">
                               {integration.icon}
                             </span>
-                            <span className="text-foreground">
+                            <span className="truncate text-foreground">
                               {integration.name}
                             </span>
                             <span className="justify-self-center text-emerald-600 text-xs dark:text-emerald-400">
@@ -2166,7 +2166,7 @@ export function ChatInputAdvanced({
                             <span className="size-4 shrink-0 text-foreground [&_svg]:size-4">
                               {integration.icon}
                             </span>
-                            <span className="text-foreground">
+                            <span className="truncate text-foreground">
                               {integration.name}
                             </span>
                             <span className="justify-self-center text-muted-foreground text-xs">
