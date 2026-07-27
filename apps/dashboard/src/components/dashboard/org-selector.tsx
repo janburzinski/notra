@@ -150,7 +150,7 @@ function OrgSelectorTrigger({
               className="rounded-lg"
               src={activeOrganization?.logo || undefined}
             />
-            <AvatarFallback className="border bg-sidebar-accent">
+            <AvatarFallback className="rounded-lg bg-sidebar-accent">
               {activeOrganization?.name.charAt(0)}
             </AvatarFallback>
           </Avatar>
