@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/button";
+import { IntegrationCardDither } from "@/components/integrations/integration-card-dither";
 import { MCP_ACCENT_COLOR } from "@/lib/integrations/mcp";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { McpIntegrationCardProps } from "@/types/integrations/mcp";
@@ -61,6 +62,7 @@ export function McpIntegrationCard({
           }
           className="h-full cursor-pointer transition-colors hover:bg-muted/80"
           heading="MCP"
+          hoverBackground={<IntegrationCardDither color={MCP_ACCENT_COLOR} />}
           icon={<HugeiconsIcon icon={CpuIcon} />}
         >
           <p className="line-clamp-2 text-muted-foreground text-sm">

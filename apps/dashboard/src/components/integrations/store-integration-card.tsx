@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { Button } from "@/components/button";
+import { IntegrationCardDither } from "@/components/integrations/integration-card-dither";
 import { StoreIntegrationLogo } from "@/components/integrations/store-integration-logo";
 import { MCP_ACCENT_COLOR } from "@/lib/integrations/mcp";
 import type { StoreIntegrationCardProps } from "@/types/integrations/mcp";
@@ -50,6 +51,11 @@ export function StoreIntegrationCard({
           : "h-full"
       }
       heading={integration.name}
+      hoverBackground={
+        <IntegrationCardDither
+          color={integration.brandColor ?? MCP_ACCENT_COLOR}
+        />
+      }
       icon={<StoreIntegrationLogo integration={integration} />}
       onClick={() => {
         if (integration.connected) {

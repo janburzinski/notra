@@ -18,6 +18,7 @@ import { memo, useState } from "react";
 import { Button } from "@/components/button";
 import { AddGranolaIntegrationDialog } from "@/components/integrations/add-granola-integration-dialog";
 import { AddLinearIntegrationDialog } from "@/components/integrations/add-linear-integration-dialog";
+import { IntegrationCardDither } from "@/components/integrations/integration-card-dither";
 import { McpIntegrationCard } from "@/components/integrations/mcp-integration-card";
 import { StoreIntegrationsSection } from "@/components/integrations/store-integrations-section";
 import { PageContainer } from "@/components/layout/container";
@@ -116,6 +117,9 @@ const IntegrationCard = memo(function IntegrationCard({
       }
       disabled={!integration.available}
       heading={integration.name}
+      hoverBackground={
+        <IntegrationCardDither color={integration.accentColor} />
+      }
       icon={integration.icon}
     >
       <p className="line-clamp-2 text-muted-foreground text-sm">
