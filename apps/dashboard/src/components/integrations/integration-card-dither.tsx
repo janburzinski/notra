@@ -1,8 +1,10 @@
 "use client";
 
+import { cn } from "@notra/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import type { HTMLAttributes } from "react";
+import { useEffect, useState } from "react";
 
 const HEX_COLOR_PATTERN = /^#[\da-f]{6}$/i;
 const FADE_OUT_DURATION = 300;
@@ -13,74 +15,63 @@ const Dithering = dynamic(
   { ssr: false }
 );
 
-export function IntegrationCardDither({ color }: { color: string }) {
+interface IntegrationCardDitherProps {
+  active: boolean;
+  color: string;
+}
+
+type DitherInteractionProps = Pick<
+  HTMLAttributes<HTMLElement>,
+  "onBlur" | "onFocus" | "onPointerEnter" | "onPointerLeave"
+>;
+
+export function useIntegrationCardDither(enabled = true): {
+  active: boolean;
+  interactionProps: DitherInteractionProps;
+} {
+  const [pointerActive, setPointerActive] = useState(false);
+  const [focusActive, setFocusActive] = useState(false);
+
+  return {
+    active: enabled && (pointerActive || focusActive),
+    interactionProps: {
+      onBlur: (event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setFocusActive(false);
+        }
+      },
+      onFocus: () => setFocusActive(true),
+      onPointerEnter: () => setPointerActive(true),
+      onPointerLeave: () => setPointerActive(false),
+    },
+  };
+}
+
+export function IntegrationCardDither({
+  active,
+  color,
+}: IntegrationCardDitherProps) {
   const shouldReduceMotion = useReducedMotion();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const pointerActiveRef = useRef(false);
-  const focusActiveRef = useRef(false);
-  const [shouldRender, setShouldRender] = useState(false);
+  const [shouldRender, setShouldRender] = useState(active);
   const colorFront = HEX_COLOR_PATTERN.test(color) ? `${color}26` : color;
 
   useEffect(() => {
-    const card = containerRef.current?.closest<HTMLElement>(
-      '[data-slot="title-card"]'
-    );
-    if (!card) {
+    if (active) {
+      setShouldRender(true);
       return;
     }
 
-    const show = () => {
-      clearTimeout(hideTimeoutRef.current);
-      setShouldRender(true);
-    };
-    const hide = () => {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = setTimeout(
-        () => setShouldRender(false),
-        FADE_OUT_DURATION
-      );
-    };
-    const hideIfInactive = () => {
-      if (!(pointerActiveRef.current || focusActiveRef.current)) {
-        hide();
-      }
-    };
-    const handlePointerEnter = () => {
-      pointerActiveRef.current = true;
-      show();
-    };
-    const handlePointerLeave = () => {
-      pointerActiveRef.current = false;
-      hideIfInactive();
-    };
-    const handleFocusIn = () => {
-      focusActiveRef.current = true;
-      show();
-    };
-    const handleFocusOut = (event: FocusEvent) => {
-      if (!card.contains(event.relatedTarget as Node | null)) {
-        focusActiveRef.current = false;
-        hideIfInactive();
-      }
-    };
-
-    card.addEventListener("pointerenter", handlePointerEnter);
-    card.addEventListener("pointerleave", handlePointerLeave);
-    card.addEventListener("focusin", handleFocusIn);
-    card.addEventListener("focusout", handleFocusOut);
-
-    return () => {
-      clearTimeout(hideTimeoutRef.current);
-      card.removeEventListener("pointerenter", handlePointerEnter);
-      card.removeEventListener("pointerleave", handlePointerLeave);
-      card.removeEventListener("focusin", handleFocusIn);
-      card.removeEventListener("focusout", handleFocusOut);
-    };
-  }, []);
+    const timeout = setTimeout(() => setShouldRender(false), FADE_OUT_DURATION);
+    return () => clearTimeout(timeout);
+  }, [active]);
 
   return (
-    <div className="h-full w-full" ref={containerRef}>
+    <div
+      className={cn(
+        "h-full w-full opacity-0 transition-opacity duration-300",
+        active && "opacity-100"
+      )}
+    >
       {shouldRender ? (
         <Dithering
           className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 h-[200%] w-[200%]"

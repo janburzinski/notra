@@ -42,7 +42,6 @@ function TitleCard({
         disabled && "cursor-not-allowed",
         className
       )}
-      data-slot="title-card"
       {...props}
     >
       {accentColor && (
@@ -56,10 +55,8 @@ function TitleCard({
       )}
       {hoverBackground && (
         <div
-          className={cn(
-            "pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-300",
-            !disabled && "group-hover:opacity-100 group-focus-within:opacity-100"
-          )}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
         >
           {hoverBackground}
         </div>
