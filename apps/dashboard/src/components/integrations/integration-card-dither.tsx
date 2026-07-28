@@ -3,8 +3,11 @@
 import { cn } from "@notra/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
-import type { HTMLAttributes } from "react";
 import { useEffect, useState } from "react";
+import type {
+  IntegrationCardDitherInteraction,
+  IntegrationCardDitherProps,
+} from "@/types/integrations";
 
 const HEX_COLOR_PATTERN = /^#[\da-f]{6}$/i;
 const FADE_OUT_DURATION = 300;
@@ -15,20 +18,9 @@ const Dithering = dynamic(
   { ssr: false }
 );
 
-interface IntegrationCardDitherProps {
-  active: boolean;
-  color: string;
-}
-
-type DitherInteractionProps = Pick<
-  HTMLAttributes<HTMLElement>,
-  "onBlur" | "onFocus" | "onPointerEnter" | "onPointerLeave"
->;
-
-export function useIntegrationCardDither(enabled = true): {
-  active: boolean;
-  interactionProps: DitherInteractionProps;
-} {
+export function useIntegrationCardDither(
+  enabled = true
+): IntegrationCardDitherInteraction {
   const [pointerActive, setPointerActive] = useState(false);
   const [focusActive, setFocusActive] = useState(false);
 
