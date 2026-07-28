@@ -7,7 +7,10 @@ import {
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
-import { GITHUB_URL_PATTERNS } from "@/constants/github";
+import {
+  GITHUB_PATH_INVALID_CHARACTERS_REGEX,
+  GITHUB_URL_PATTERNS,
+} from "@/constants/github";
 import { organizationIdInputSchema } from "@/schemas/auth/organization";
 
 export const INTEGRATION_CATEGORIES = ["input", "output"] as const;
@@ -244,8 +247,6 @@ export const updateRepositoryBodySchema = z
   );
 export type UpdateRepositoryBody = z.infer<typeof updateRepositoryBodySchema>;
 
-const GITHUB_DIRECTORY_INVALID_CHARACTERS_REGEX = /[?#]/;
-
 export const repositoryContentDirectorySchema = z
   .string()
   .trim()
@@ -260,7 +261,7 @@ export const repositoryContentDirectorySchema = z
     "Use forward slashes in directories"
   )
   .refine(
-    (directory) => !GITHUB_DIRECTORY_INVALID_CHARACTERS_REGEX.test(directory),
+    (directory) => !GITHUB_PATH_INVALID_CHARACTERS_REGEX.test(directory),
     "Directory contains invalid characters"
   )
   .refine(
