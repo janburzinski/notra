@@ -4,13 +4,14 @@ import { cn } from "@notra/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import {
+  INTEGRATION_CARD_DITHER_FADE_OUT_DURATION,
+  INTEGRATION_CARD_DITHER_HEX_COLOR_PATTERN,
+} from "@/lib/integrations/constants";
 import type {
   IntegrationCardDitherInteraction,
   IntegrationCardDitherProps,
 } from "@/types/integrations";
-
-const HEX_COLOR_PATTERN = /^#[\da-f]{6}$/i;
-const FADE_OUT_DURATION = 300;
 
 const Dithering = dynamic(
   () =>
@@ -45,7 +46,9 @@ export function IntegrationCardDither({
 }: IntegrationCardDitherProps) {
   const shouldReduceMotion = useReducedMotion();
   const [shouldRender, setShouldRender] = useState(active);
-  const colorFront = HEX_COLOR_PATTERN.test(color) ? `${color}26` : color;
+  const colorFront = INTEGRATION_CARD_DITHER_HEX_COLOR_PATTERN.test(color)
+    ? `${color}26`
+    : color;
 
   useEffect(() => {
     if (active) {
@@ -53,7 +56,10 @@ export function IntegrationCardDither({
       return;
     }
 
-    const timeout = setTimeout(() => setShouldRender(false), FADE_OUT_DURATION);
+    const timeout = setTimeout(
+      () => setShouldRender(false),
+      INTEGRATION_CARD_DITHER_FADE_OUT_DURATION
+    );
     return () => clearTimeout(timeout);
   }, [active]);
 
