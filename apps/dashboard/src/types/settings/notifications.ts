@@ -7,6 +7,11 @@ export interface NotificationSettings {
   marketingEmails: boolean;
 }
 
+export interface UpdateNotificationSettingsVariables {
+  organizationId: string;
+  updates: Partial<NotificationSettings>;
+}
+
 export type NotificationToggleKey = keyof NotificationSettings;
 
 export interface NotificationToggleConfig {

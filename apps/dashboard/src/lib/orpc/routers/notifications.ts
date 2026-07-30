@@ -38,11 +38,11 @@ export const notificationsRouter = {
         });
 
       return {
-        settings: settings ?? {
-          scheduledContentCreation: false,
-          scheduledContentFailed: false,
-          scheduledContentSkipped: false,
-          marketingEmails: true,
+        settings: {
+          scheduledContentCreation: settings?.scheduledContentCreation ?? false,
+          scheduledContentFailed: settings?.scheduledContentFailed ?? false,
+          scheduledContentSkipped: settings?.scheduledContentSkipped ?? false,
+          marketingEmails: settings?.marketingEmails ?? true,
         },
       };
     }),

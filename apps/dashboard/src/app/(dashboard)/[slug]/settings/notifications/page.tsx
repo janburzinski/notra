@@ -3,7 +3,7 @@
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { use, useMemo } from "react";
+import { use, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -15,7 +15,10 @@ import {
 import { authClient } from "@/lib/auth/client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { NOTIFICATION_TOGGLE_GROUPS } from "@/lib/settings/notification-toggles";
-import type { NotificationSettings } from "@/types/settings/notifications";
+import type {
+  NotificationSettings,
+  UpdateNotificationSettingsVariables,
+} from "@/types/settings/notifications";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -30,6 +33,7 @@ interface MemberRow {
 export default function NotificationsSettingsPage({ params }: PageProps) {
   const { slug } = use(params);
   const queryClient = useQueryClient();
+  const updateInFlightRef = useRef(false);
   const { getOrganization, activeOrganization } = useOrganizationsContext();
   const organization =
     activeOrganization?.slug === slug
@@ -66,35 +70,68 @@ export default function NotificationsSettingsPage({ params }: PageProps) {
     [members]
   );
 
+  const settingsQueryKey = dashboardOrpc.notifications.get.queryKey({
+    input: { organizationId: organization?.id ?? "" },
+  });
+
   const { data: settings, isPending: isLoadingSettings } = useQuery({
     ...dashboardOrpc.notifications.get.queryOptions({
       input: { organizationId: organization?.id ?? "" },
-      select: (data) => data.settings as NotificationSettings,
+      select: (data) => data.settings,
     }),
     enabled: !!organization?.id,
   });
 
   const { mutate: updateSettings, isPending: isUpdating } = useMutation({
-    mutationFn: async (data: Partial<NotificationSettings>) => {
+    mutationFn: async ({
+      organizationId,
+      updates,
+    }: UpdateNotificationSettingsVariables) => {
       return dashboardOrpc.notifications.update.call({
-        organizationId: organization?.id ?? "",
-        ...data,
+        organizationId,
+        ...updates,
       });
+    },
+    onMutate: async ({ organizationId, updates }) => {
+      const queryKey = dashboardOrpc.notifications.get.queryKey({
+        input: { organizationId },
+      });
+
+      await queryClient.cancelQueries({ queryKey });
+
+      const previousData = queryClient.getQueryData(queryKey);
+
+      queryClient.setQueryData(queryKey, (current) =>
+        current ? { settings: { ...current.settings, ...updates } } : current
+      );
+
+      return { previousData, queryKey };
     },
     onSuccess: () => {
       toast.success("Notification settings updated");
-      queryClient.invalidateQueries({
-        queryKey: dashboardOrpc.notifications.get.queryKey({
-          input: { organizationId: organization?.id ?? "" },
-        }),
-      });
     },
-    onError: (error) => {
+    onError: (error, _updates, context) => {
+      if (context?.previousData !== undefined) {
+        queryClient.setQueryData(context.queryKey, context.previousData);
+      }
       toast.error(
         error instanceof Error
           ? error.message
           : "Failed to update notification settings"
       );
+    },
+    onSettled: async (_data, _error, variables, context) => {
+      const queryKey =
+        context?.queryKey ??
+        dashboardOrpc.notifications.get.queryKey({
+          input: { organizationId: variables.organizationId },
+        });
+
+      try {
+        await queryClient.invalidateQueries({ queryKey });
+      } finally {
+        updateInFlightRef.current = false;
+      }
     },
   });
 
@@ -143,9 +180,16 @@ export default function NotificationsSettingsPage({ params }: PageProps) {
                     config={toggle}
                     disabled={controlsDisabled}
                     key={toggle.key}
-                    onCheckedChange={(checked) =>
-                      updateSettings({ [toggle.key]: checked })
-                    }
+                    onCheckedChange={(checked) => {
+                      if (updateInFlightRef.current) {
+                        return;
+                      }
+                      updateInFlightRef.current = true;
+                      updateSettings({
+                        organizationId: organization.id,
+                        updates: { [toggle.key]: checked },
+                      });
+                    }}
                   />
                 )
               )}
