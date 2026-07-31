@@ -16,6 +16,7 @@ import {
   type RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table";
+import { EmptyState } from "@/components/empty-state";
 
 interface AttachmentsDataTableProps<TData extends { key: string }> {
   columns: ColumnDef<TData, unknown>[];
@@ -124,8 +125,8 @@ export function AttachmentsDataTable<TData extends { key: string }>({
             ))
           ) : (
             <TableRow>
-              <TableCell className="h-24 text-center" colSpan={columns.length}>
-                {emptyMessage}
+              <TableCell colSpan={columns.length}>
+                <EmptyState title={emptyMessage} variant="table" />
               </TableCell>
             </TableRow>
           )}

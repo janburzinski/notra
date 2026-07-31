@@ -76,9 +76,9 @@ export default function PageClient({
 
         {!isPending && collections.length === 0 && (
           <EmptyState
-            className="p-8"
             description="Generate your first piece of content to get started."
             title="No content yet"
+            variant="section"
           />
         )}
 

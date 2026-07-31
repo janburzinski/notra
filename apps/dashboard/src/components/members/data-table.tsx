@@ -15,6 +15,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { EmptyState } from "@/components/empty-state";
 
 interface DataTableProps<TData> {
   // biome-ignore lint/suspicious/noExplicitAny: TanStack Table columns have varying value types
@@ -109,8 +110,8 @@ export function DataTable<TData>({
             ))
           ) : (
             <TableRow>
-              <TableCell className="h-24 text-center" colSpan={columns.length}>
-                {emptyMessage}
+              <TableCell colSpan={columns.length}>
+                <EmptyState title={emptyMessage} variant="table" />
               </TableCell>
             </TableRow>
           )}

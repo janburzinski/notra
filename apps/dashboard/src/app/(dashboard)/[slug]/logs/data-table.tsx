@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { Button } from "@/components/button";
+import { EmptyState } from "@/components/empty-state";
 import type { DataTableProps } from "@/types/logs/data-table";
 
 export function DataTable<TData>({
@@ -63,16 +65,16 @@ export function DataTable<TData>({
             ))}
           </TableHeader>
           <TableBody>
-            {isLoading && (
-              <TableRow>
-                <TableCell
-                  className="h-24 text-center"
-                  colSpan={columns.length}
-                >
-                  Loading…
-                </TableCell>
-              </TableRow>
-            )}
+            {isLoading &&
+              [1, 2, 3].map((row) => (
+                <TableRow key={row}>
+                  {table.getVisibleLeafColumns().map((column) => (
+                    <TableCell key={`${row}-${column.id}`}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
             {!isLoading &&
               table.getRowModel().rows?.length > 0 &&
               table.getRowModel().rows.map((row) => (
@@ -92,33 +94,19 @@ export function DataTable<TData>({
               ))}
             {!(isLoading || table.getRowModel().rows?.length) && (
               <TableRow>
-                <TableCell
-                  className="h-32 text-center"
-                  colSpan={columns.length}
-                >
-                  {emptyState ? (
-                    <div className="flex flex-col items-center justify-center gap-2 py-2">
-                      <p className="font-medium text-sm">{emptyState.title}</p>
-                      {emptyState.description && (
-                        <p className="text-muted-foreground text-sm">
-                          {emptyState.description}
-                        </p>
-                      )}
-                      {emptyState.actionLabel && emptyState.onActionClick && (
-                        <Button
-                          className="mt-2"
-                          onClick={emptyState.onActionClick}
-                          size="sm"
-                          type="button"
-                          variant="outline"
-                        >
-                          {emptyState.actionLabel}
-                        </Button>
-                      )}
-                    </div>
-                  ) : (
-                    "No results."
-                  )}
+                <TableCell colSpan={columns.length}>
+                  <EmptyState
+                    actionLabel={
+                      emptyState?.onActionClick
+                        ? emptyState.actionLabel
+                        : undefined
+                    }
+                    actionVariant="outline"
+                    description={emptyState?.description}
+                    onActionClick={emptyState?.onActionClick}
+                    title={emptyState?.title ?? "No results."}
+                    variant="table"
+                  />
                 </TableCell>
               </TableRow>
             )}

@@ -113,9 +113,9 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
 
     return (
       <EmptyState
-        className="p-6"
         description="You have no new posts today. Create one now or review your existing drafts on the content page."
         title="No content created today"
+        variant="section"
       />
     );
   })();

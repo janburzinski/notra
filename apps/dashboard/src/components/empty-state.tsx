@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils";
 
 interface EmptyStateProps extends React.ComponentProps<"div"> {
   title: string;
-  description: string;
+  description?: string;
+  variant?: "page" | "section" | "table";
   action?: React.ReactNode;
   actionLabel?: string;
   actionVariant?: React.ComponentProps<typeof Button>["variant"];
@@ -15,6 +16,7 @@ interface EmptyStateProps extends React.ComponentProps<"div"> {
 function EmptyState({
   title,
   description,
+  variant = "page",
   action,
   actionLabel,
   actionVariant = "default",
@@ -35,15 +37,31 @@ function EmptyState({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-dashed p-12 text-center",
+        "flex flex-col items-center justify-center rounded-2xl border border-dashed text-center",
+        variant === "page" && "p-12",
+        variant === "section" && "min-h-35 p-6",
+        variant === "table" && "min-h-24 border-0 p-4",
         className
       )}
       {...props}
     >
-      <h3 className="font-semibold text-lg">{title}</h3>
-      <p className="mt-1 text-muted-foreground text-sm">{description}</p>
+      <h3
+        className={cn(
+          "font-semibold",
+          variant === "table" ? "text-sm" : "text-lg"
+        )}
+      >
+        {title}
+      </h3>
+      {description ? (
+        <p className="mt-1 max-w-xl text-muted-foreground text-sm">
+          {description}
+        </p>
+      ) : null}
       {renderedAction ? (
-        <div className="mt-4 flex justify-center">{renderedAction}</div>
+        <div className={cn(variant === "table" ? "mt-3" : "mt-4")}>
+          {renderedAction}
+        </div>
       ) : null}
     </div>
   );

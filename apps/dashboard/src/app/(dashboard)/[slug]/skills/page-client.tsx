@@ -35,6 +35,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/button";
+import { EmptyState } from "@/components/empty-state";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -173,7 +174,13 @@ export default function PageClient({ slug }: PageClientProps) {
 
         {isLoadingSkills && <SkillsPageSkeleton />}
         {!isLoadingSkills && skills.length === 0 && (
-          <p className="text-muted-foreground">No skills yet.</p>
+          <EmptyState
+            actionLabel="Create Skill"
+            description="Create a reusable set of instructions for your agents."
+            onActionClick={() => setDialogOpen(true)}
+            title="No skills yet"
+            variant="section"
+          />
         )}
         {!isLoadingSkills && skills.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
