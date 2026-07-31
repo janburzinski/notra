@@ -16,5 +16,6 @@ export interface DataTableProps<TData> {
   totalPages: number;
   onPageChange: (page: number) => void;
   isLoading?: boolean;
+  isPaginationDisabled?: boolean;
   emptyState?: DataTableEmptyState;
 }

@@ -104,7 +104,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     }
   };
 
-  const { data, isPending } = useQuery<LogsResponse>({
+  const { data, isPending, isPlaceholderData } = useQuery<LogsResponse>({
     ...dashboardOrpc.logs.webhooks.list.queryOptions({
       input: {
         organizationId: organizationId ?? "",
@@ -273,6 +273,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                       "Activity from your integrations and automations will show up here.",
                   }
             }
+            isPaginationDisabled={isPlaceholderData}
             onPageChange={setPage}
             page={page}
             totalPages={data?.pagination.totalPages ?? 1}

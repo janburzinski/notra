@@ -27,6 +27,7 @@ export function DataTable<TData>({
   totalPages,
   onPageChange,
   isLoading,
+  isPaginationDisabled,
   emptyState,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -46,7 +47,7 @@ export function DataTable<TData>({
   return (
     <div>
       <div className="overflow-hidden rounded-lg border border-border/80 border-b-border/40 bg-muted/80 shadow-2xs">
-        <Table aria-busy={isLoading} className="table-fixed">
+        <Table aria-busy={isLoading} className="min-w-[48rem] table-fixed">
           <colgroup>
             <col className="w-[40%]" />
             <col className="w-[24%]" />
@@ -143,7 +144,7 @@ export function DataTable<TData>({
           </span>
           <div className="flex items-center space-x-2">
             <Button
-              disabled={page <= 1}
+              disabled={isPaginationDisabled || page <= 1}
               onClick={() => onPageChange(page - 1)}
               size="sm"
               variant="outline"
@@ -151,7 +152,7 @@ export function DataTable<TData>({
               Previous
             </Button>
             <Button
-              disabled={page >= totalPages}
+              disabled={isPaginationDisabled || page >= totalPages}
               onClick={() => onPageChange(page + 1)}
               size="sm"
               variant="outline"
