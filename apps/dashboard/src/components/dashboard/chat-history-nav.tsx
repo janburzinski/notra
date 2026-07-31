@@ -343,7 +343,11 @@ export function ChatHistoryNav() {
               <SidebarMenuButton
                 className="cursor-pointer"
                 render={
-                  <Link href={`/${slug}/chat`} replace={isOnChatRoute}>
+                  <Link
+                    href={`/${slug}/chat`}
+                    prefetch={true}
+                    replace={isOnChatRoute}
+                  >
                     <HugeiconsIcon icon={Add01Icon} />
                     <span>New chat</span>
                   </Link>
