@@ -15,10 +15,6 @@ import {
 import { authClient } from "@/lib/auth/client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { NOTIFICATION_TOGGLE_GROUPS } from "@/lib/settings/notification-toggles";
-import type {
-  NotificationSettings,
-  UpdateNotificationSettingsVariables,
-} from "@/types/settings/notifications";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -70,10 +66,6 @@ export default function NotificationsSettingsPage({ params }: PageProps) {
     [members]
   );
 
-  const settingsQueryKey = dashboardOrpc.notifications.get.queryKey({
-    input: { organizationId: organization?.id ?? "" },
-  });
-
   const { data: settings, isPending: isLoadingSettings } = useQuery({
     ...dashboardOrpc.notifications.get.queryOptions({
       input: { organizationId: organization?.id ?? "" },
@@ -82,58 +74,51 @@ export default function NotificationsSettingsPage({ params }: PageProps) {
     enabled: !!organization?.id,
   });
 
-  const { mutate: updateSettings, isPending: isUpdating } = useMutation({
-    mutationFn: async ({
-      organizationId,
-      updates,
-    }: UpdateNotificationSettingsVariables) => {
-      return dashboardOrpc.notifications.update.call({
-        organizationId,
-        ...updates,
-      });
-    },
-    onMutate: async ({ organizationId, updates }) => {
-      const queryKey = dashboardOrpc.notifications.get.queryKey({
-        input: { organizationId },
-      });
-
-      await queryClient.cancelQueries({ queryKey });
-
-      const previousData = queryClient.getQueryData(queryKey);
-
-      queryClient.setQueryData(queryKey, (current) =>
-        current ? { settings: { ...current.settings, ...updates } } : current
-      );
-
-      return { previousData, queryKey };
-    },
-    onSuccess: () => {
-      toast.success("Notification settings updated");
-    },
-    onError: (error, _updates, context) => {
-      if (context?.previousData !== undefined) {
-        queryClient.setQueryData(context.queryKey, context.previousData);
-      }
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to update notification settings"
-      );
-    },
-    onSettled: async (_data, _error, variables, context) => {
-      const queryKey =
-        context?.queryKey ??
-        dashboardOrpc.notifications.get.queryKey({
-          input: { organizationId: variables.organizationId },
+  const { mutate: updateSettings, isPending: isUpdating } = useMutation(
+    dashboardOrpc.notifications.update.mutationOptions({
+      onMutate: async ({ organizationId, ...updates }) => {
+        const queryKey = dashboardOrpc.notifications.get.queryKey({
+          input: { organizationId },
         });
 
-      try {
-        await queryClient.invalidateQueries({ queryKey });
-      } finally {
-        updateInFlightRef.current = false;
-      }
-    },
-  });
+        await queryClient.cancelQueries({ queryKey });
+
+        const previousData = queryClient.getQueryData(queryKey);
+
+        queryClient.setQueryData(queryKey, (current) =>
+          current ? { settings: { ...current.settings, ...updates } } : current
+        );
+
+        return { previousData, queryKey };
+      },
+      onSuccess: () => {
+        toast.success("Notification settings updated");
+      },
+      onError: (error, _updates, context) => {
+        if (context?.previousData !== undefined) {
+          queryClient.setQueryData(context.queryKey, context.previousData);
+        }
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to update notification settings"
+        );
+      },
+      onSettled: async (_data, _error, variables, context) => {
+        const queryKey =
+          context?.queryKey ??
+          dashboardOrpc.notifications.get.queryKey({
+            input: { organizationId: variables.organizationId },
+          });
+
+        try {
+          await queryClient.invalidateQueries({ queryKey });
+        } finally {
+          updateInFlightRef.current = false;
+        }
+      },
+    })
+  );
 
   if (!organization) {
     return (
@@ -187,7 +172,7 @@ export default function NotificationsSettingsPage({ params }: PageProps) {
                       updateInFlightRef.current = true;
                       updateSettings({
                         organizationId: organization.id,
-                        updates: { [toggle.key]: checked },
+                        [toggle.key]: checked,
                       });
                     }}
                   />
