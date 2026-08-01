@@ -71,6 +71,7 @@ import {
   UserMessageEditor,
 } from "@/components/chat/user-message-actions";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { MAX_VISIBLE_CHAT_IMAGES } from "@/constants/chat-images";
 import { TOOL_TIMER_THRESHOLD_SECONDS } from "@/constants/chat-tool-timer";
 import { INTEGRATION_REFERENCE_TOKEN_SPLIT_REGEX } from "@/constants/integration-reference";
 import { localStorageKeys } from "@/constants/storage";
@@ -327,7 +328,10 @@ function UserImageGrid({ children }: UserImageGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const imageItems = Children.toArray(children) as ReactElement[];
-  const hiddenImageCount = Math.max(imageItems.length - 6, 0);
+  const hiddenImageCount = Math.max(
+    imageItems.length - MAX_VISIBLE_CHAT_IMAGES,
+    0
+  );
   const visibleImageCount = isExpanded
     ? imageItems.length
     : imageItems.length - hiddenImageCount;
@@ -339,7 +343,9 @@ function UserImageGrid({ children }: UserImageGridProps) {
 
     const animationFrame = requestAnimationFrame(() => {
       gridRef.current
-        ?.querySelector<HTMLButtonElement>('[data-image-index="6"] button')
+        ?.querySelector<HTMLButtonElement>(
+          `[data-image-index="${MAX_VISIBLE_CHAT_IMAGES}"] button`
+        )
         ?.focus();
     });
 
@@ -358,7 +364,10 @@ function UserImageGrid({ children }: UserImageGridProps) {
       }
     >
       {imageItems.slice(0, visibleImageCount).map((imageItem, index) => {
-        const isCovered = !isExpanded && hiddenImageCount > 0 && index === 5;
+        const isCovered =
+          !isExpanded &&
+          hiddenImageCount > 0 &&
+          index === MAX_VISIBLE_CHAT_IMAGES - 1;
 
         return (
           <m.div
@@ -367,7 +376,7 @@ function UserImageGrid({ children }: UserImageGridProps) {
             data-image-index={index}
             inert={isCovered ? true : undefined}
             initial={
-              reduceMotion || index < 6
+              reduceMotion || index < MAX_VISIBLE_CHAT_IMAGES
                 ? false
                 : { opacity: 0, scale: 0.96, y: 8 }
             }
