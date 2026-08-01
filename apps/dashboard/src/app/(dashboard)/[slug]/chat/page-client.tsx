@@ -296,13 +296,13 @@ function ChatImageAttachment({
 
   return (
     <button
-      className="block w-fit overflow-hidden rounded-lg border border-border transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="my-1 block w-fit overflow-hidden rounded-lg border border-border transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       onClick={onClick}
       type="button"
     >
       <Image
         alt={filename ?? "attachment"}
-        className="block h-auto max-h-48 w-auto max-w-56 object-cover"
+        className="block h-auto max-h-72 w-auto max-w-full"
         height={480}
         loading="eager"
         onError={() => setHasError(true)}
@@ -2045,7 +2045,7 @@ function StandaloneChatPageClient({
                                   ) : (
                                     <>
                                       {userImageParts.length > 0 && (
-                                        <div className="flex w-[28rem] max-w-full flex-wrap justify-end gap-1.5 [&>button]:aspect-square [&>button]:w-[calc((100%_-_0.75rem)/3)] [&_img]:size-full [&_img]:object-cover">
+                                        <div className="flex w-[28rem] max-w-full flex-wrap justify-end gap-1.5 [&>button]:m-0 [&>button]:aspect-square [&>button]:w-[calc((100%_-_0.75rem)/3)] [&_img]:size-full [&_img]:object-cover">
                                           {userImageParts.map((part, index) =>
                                             renderPart(part, message.id, index)
                                           )}
