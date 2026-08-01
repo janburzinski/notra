@@ -2045,7 +2045,7 @@ function StandaloneChatPageClient({
                                   ) : (
                                     <>
                                       {userImageParts.length > 0 && (
-                                        <div className="flex w-[28rem] max-w-full flex-wrap justify-end gap-1.5 [&>button]:m-0 [&>button]:aspect-square [&>button]:w-[calc((100%_-_0.75rem)/3)] [&_img]:size-full [&_img]:object-cover">
+                                        <div className="flex w-[28rem] max-w-full flex-wrap justify-end gap-1.5 [&>*]:m-0 [&>*]:aspect-square [&>*]:w-[calc((100%_-_0.75rem)/3)] [&_img]:size-full [&_img]:object-cover">
                                           {userImageParts.map((part, index) =>
                                             renderPart(part, message.id, index)
                                           )}
