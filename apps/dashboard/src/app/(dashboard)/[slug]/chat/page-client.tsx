@@ -325,7 +325,6 @@ function ChatImageAttachment({
 function UserImageGrid({ children }: UserImageGridProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
-  const shouldFocusExpandedImageRef = useRef(false);
   const reduceMotion = useReducedMotion();
   const imageItems = Children.toArray(children) as ReactElement[];
   const hiddenImageCount = Math.max(imageItems.length - 6, 0);
@@ -334,11 +333,10 @@ function UserImageGrid({ children }: UserImageGridProps) {
     : imageItems.length - hiddenImageCount;
 
   useEffect(() => {
-    if (!(isExpanded && shouldFocusExpandedImageRef.current)) {
+    if (!isExpanded) {
       return;
     }
 
-    shouldFocusExpandedImageRef.current = false;
     const animationFrame = requestAnimationFrame(() => {
       gridRef.current
         ?.querySelector<HTMLButtonElement>('[data-image-index="6"] button')
@@ -391,10 +389,7 @@ function UserImageGrid({ children }: UserImageGridProps) {
           aria-label={`Show ${hiddenImageCount} more ${hiddenImageCount === 1 ? "image" : "images"}`}
           className="absolute right-0 bottom-0 z-10 flex aspect-square w-[calc((100%_-_0.75rem)/3)] items-center justify-center rounded-lg border border-white/15 bg-black/60 font-medium text-white text-xl backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset motion-reduce:transition-none"
           initial={reduceMotion ? false : { opacity: 0 }}
-          onClick={(event) => {
-            shouldFocusExpandedImageRef.current = event.detail === 0;
-            setIsExpanded(true);
-          }}
+          onClick={() => setIsExpanded(true)}
           transition={
             reduceMotion ? { duration: 0 } : { delay: 0.1, duration: 0.2 }
           }
