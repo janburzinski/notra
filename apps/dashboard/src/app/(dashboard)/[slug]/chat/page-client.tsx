@@ -2053,19 +2053,25 @@ function StandaloneChatPageClient({
                                           )}
                                         </div>
                                       )}
-                                      {userContentParts.length > 0 && (
+                                      {(userContentParts.length > 0 ||
+                                        userFileParts.length > 0) && (
                                         <MessageContent>
                                           {userContentParts.map((part, index) =>
                                             renderPart(part, message.id, index)
                                           )}
-                                        </MessageContent>
-                                      )}
-                                      {userFileParts.length > 0 && (
-                                        <div className="flex max-w-full flex-wrap justify-end gap-2">
-                                          {userFileParts.map((part, index) =>
-                                            renderPart(part, message.id, index)
+                                          {userFileParts.length > 0 && (
+                                            <div className="flex max-w-full flex-wrap justify-end gap-2">
+                                              {userFileParts.map(
+                                                (part, index) =>
+                                                  renderPart(
+                                                    part,
+                                                    message.id,
+                                                    index
+                                                  )
+                                              )}
+                                            </div>
                                           )}
-                                        </div>
+                                        </MessageContent>
                                       )}
                                     </>
                                   )}
