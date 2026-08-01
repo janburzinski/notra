@@ -1984,6 +1984,7 @@ function StandaloneChatPageClient({
                           ? message.parts.filter(
                               (part) =>
                                 part.type === "file" &&
+                                typeof part.mediaType === "string" &&
                                 isImageMimeType(part.mediaType)
                             )
                           : [];
@@ -1991,7 +1992,8 @@ function StandaloneChatPageClient({
                           ? message.parts.filter(
                               (part) =>
                                 part.type === "file" &&
-                                !isImageMimeType(part.mediaType)
+                                (typeof part.mediaType !== "string" ||
+                                  !isImageMimeType(part.mediaType))
                             )
                           : [];
                         const branches = isUser
