@@ -799,12 +799,12 @@ export async function generateAndSetChatTitle(
     }
 
     const { text } = await generateText({
-      model: gateway("openai/gpt-5.4-nano"),
+      model: gateway("openai/gpt-5.6-luna"),
       system: `Generate a short, descriptive title (max 50 chars) for a chat conversation based on the user's first message. Return ONLY the title text, nothing else. No quotes, no prefix. Be specific and concise.`,
       prompt: userMessage,
       maxOutputTokens: 30,
       providerOptions: withGatewayAutomaticCaching(undefined, {
-        modelId: "openai/gpt-5.4-nano",
+        modelId: "openai/gpt-5.6-luna",
       }),
       experimental_telemetry: buildExperimentalTelemetry({
         chatId,
