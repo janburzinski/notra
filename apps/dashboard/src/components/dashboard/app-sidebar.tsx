@@ -115,7 +115,7 @@ export function DashboardSidebar({
             {isSubpage && (
               <m.div
                 animate="animate"
-                className="p-2"
+                className="sticky top-0 z-10 bg-sidebar p-2"
                 exit="exit"
                 initial="initial"
                 key="back-button"
