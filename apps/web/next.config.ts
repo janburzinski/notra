@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     turbopackFileSystemCacheForDev: false,
-    viewTransition: true,
   },
   transpilePackages: ["@notra/ui", "@notra/email", "@notra/kiwi"],
   serverExternalPackages: ["@remotion/bundler", "@remotion/renderer"],
@@ -128,7 +127,7 @@ const nextConfig: NextConfig = {
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' databuddy.cc *.databuddy.cc",
             "style-src 'self' 'unsafe-inline'",
             "font-src 'self'",
-            "img-src 'self' data: blob: databuddy.cc *.databuddy.cc avatars.githubusercontent.com cdn.contentport.io images.marblecms.com media.marblecms.com *.r2.dev cdn.usenotra.com pbs.twimg.com abs.twimg.com",
+            "img-src 'self' data: blob: databuddy.cc *.databuddy.cc avatars.githubusercontent.com cdn.contentport.io images.marblecms.com media.marblecms.com media.brand.dev *.r2.dev cdn.usenotra.com pbs.twimg.com abs.twimg.com",
             "connect-src 'self' databuddy.cc *.databuddy.cc *.inth.app *.c15t.com *.c15t.dev",
             "frame-src 'none'",
             "frame-ancestors 'none'",
@@ -162,6 +161,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "media.marblecms.com",
+      },
+      {
+        protocol: "https",
+        hostname: "media.brand.dev",
       },
       {
         protocol: "https",

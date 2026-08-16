@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     turbopackFileSystemCacheForDev: false,
-    useCache: true,
     optimizePackageImports: ["@hugeicons/core-free-icons", "lucide-react"],
     staleTimes: {
       dynamic: 30,
@@ -65,6 +64,11 @@ const nextConfig: NextConfig = {
         destination: "/:slug/automation/schedules",
         permanent: true,
       },
+      {
+        source: "/:slug/logs",
+        destination: "/:slug/settings/logs",
+        permanent: true,
+      },
     ];
   },
   async headers() {
@@ -112,7 +116,15 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "logos.context.dev",
+      },
+      {
+        protocol: "https",
         hostname: "pbs.twimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "media.brand.dev",
       },
       {
         protocol: "https",

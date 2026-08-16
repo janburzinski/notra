@@ -1,6 +1,12 @@
+import type { ReactNode } from "react";
+
 export interface StandaloneChatPageClientProps {
   organizationSlug: string;
   chatId?: string;
+}
+
+export interface UserImageGridProps {
+  children: ReactNode;
 }
 
 export type CreateToolContentType =

@@ -1,3 +1,4 @@
+import { analyticsRouter } from "./routers/analytics";
 import { apiKeysRouter } from "./routers/api-keys";
 import { attachmentsRouter } from "./routers/attachments";
 import { automationRouter } from "./routers/automation";
@@ -6,6 +7,7 @@ import { contentRouter } from "./routers/content";
 import { feedbackRouter } from "./routers/feedback";
 import { githubRouter } from "./routers/github";
 import { integrationsRouter } from "./routers/integrations";
+import { irisRouter } from "./routers/iris";
 import { logsRouter } from "./routers/logs";
 import { notificationsRouter } from "./routers/notifications";
 import { onboardingRouter } from "./routers/onboarding";
@@ -16,6 +18,7 @@ import { uploadRouter } from "./routers/upload";
 import { userRouter } from "./routers/user";
 
 export const dashboardRouter = {
+  analytics: analyticsRouter,
   apiKeys: apiKeysRouter,
   attachments: attachmentsRouter,
   automation: automationRouter,
@@ -23,6 +26,7 @@ export const dashboardRouter = {
   content: contentRouter,
   feedback: feedbackRouter,
   github: githubRouter,
+  iris: irisRouter,
   integrations: integrationsRouter,
   logs: logsRouter,
   notifications: notificationsRouter,

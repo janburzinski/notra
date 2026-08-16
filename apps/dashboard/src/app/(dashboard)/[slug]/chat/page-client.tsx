@@ -3,7 +3,10 @@
 import { useChat } from "@ai-sdk/react";
 import { ArrowReloadHorizontalIcon, X } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { chatTransportRequestInputSchema } from "@notra/ai/schemas/chat";
+import {
+  chatTransportRequestInputSchema,
+  externalChannelIdSchema,
+} from "@notra/ai/schemas/chat";
 import type { ContentType } from "@notra/ai/schemas/content";
 import type {
   ChatAttachment,
@@ -12,6 +15,8 @@ import type {
   ChatMessagePart,
   ChatUIMessage,
   ContextItem,
+  ExternalChannelId,
+  MirrorChatStatus,
 } from "@notra/ai/types/chat";
 import {
   Message,
@@ -27,7 +32,7 @@ import {
   MessageScrollerViewport,
 } from "@notra/ui/components/ui/message-scroller";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DefaultChatTransport,
   type DynamicToolUIPart,
@@ -35,13 +40,15 @@ import {
   isToolUIPart,
   type ToolUIPart,
 } from "ai";
-import { LazyMotion, m } from "motion/react";
+import { LazyMotion, m, useReducedMotion } from "motion/react";
 import { nanoid } from "nanoid";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import {
+  Children,
+  type ReactElement,
   type ReactNode,
   useCallback,
   useEffect,
@@ -64,17 +71,25 @@ import {
 import { ChatQueue, type QueuedMessage } from "@/components/chat/chat-queue";
 import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
+import { SlackRelayFooterNotice } from "@/components/chat/slack-relay-footer-notice";
 import {
   UserMessageActions,
   UserMessageEditor,
 } from "@/components/chat/user-message-actions";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { MAX_VISIBLE_CHAT_IMAGES } from "@/constants/chat-images";
 import { TOOL_TIMER_THRESHOLD_SECONDS } from "@/constants/chat-tool-timer";
 import { INTEGRATION_REFERENCE_TOKEN_SPLIT_REGEX } from "@/constants/integration-reference";
+import { MIRROR_WORKING_TIMEOUT_MS } from "@/constants/slack-mirror";
 import { localStorageKeys } from "@/constants/storage";
 import { authClient } from "@/lib/auth/client";
 import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
+import {
+  relaySlackApproval,
+  relaySlackMirrorMessage,
+} from "@/lib/chat/slack-relay";
 import { useElapsedSeconds } from "@/lib/hooks/use-elapsed-seconds";
+import { useSlackMirrorStream } from "@/lib/hooks/use-slack-mirror-stream";
 import { getMcpIconUrls } from "@/lib/integrations/mcp";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { isImageMimeType } from "@/lib/upload/mime";
@@ -82,7 +97,9 @@ import { cn } from "@/lib/utils";
 import type {
   CreateToolContentType,
   StandaloneChatPageClientProps,
+  UserImageGridProps,
 } from "@/types/components/chat-page";
+import type { PublishedSocialPost } from "@/types/content/post-social";
 import { handleStandaloneChatError } from "@/utils/chat-error";
 import {
   CHAT_PREFERENCES_STORAGE_KEY,
@@ -100,6 +117,7 @@ import {
   parseReferenceValue,
 } from "@/utils/integration-reference";
 import { getOutputTypeLabel } from "@/utils/output-types";
+import { buildPublishedChatMessage } from "@/utils/social-publish";
 
 const BlogChangelogPreview = dynamic(
   () =>
@@ -129,6 +147,14 @@ const loadMotionFeatures = () =>
 const emptySubscribe = () => () => {
   // no external store to subscribe to; used to detect hydration
 };
+
+function SlackMirrorNotice() {
+  return (
+    <div className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-center text-muted-foreground text-sm">
+      Mirrored from a Slack thread.
+    </div>
+  );
+}
 
 function CreateToolPendingIndicator({
   toolCallId,
@@ -281,6 +307,7 @@ function ChatImageAttachment({
   onClick,
 }: ChatImageAttachmentProps) {
   const [hasError, setHasError] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   if (hasError) {
     return (
@@ -294,21 +321,113 @@ function ChatImageAttachment({
 
   return (
     <button
-      className="my-1 block w-fit overflow-hidden rounded-lg border border-border transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="my-1 block w-fit overflow-hidden rounded-lg border border-border bg-muted/40 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       onClick={onClick}
       type="button"
     >
       <Image
         alt={filename ?? "attachment"}
-        className="block h-auto max-h-72 w-auto max-w-full"
+        className={cn(
+          "block h-auto max-h-72 w-auto max-w-full transition-opacity duration-300 motion-reduce:transition-none",
+          hasLoaded ? "opacity-100" : "opacity-0"
+        )}
         height={480}
         loading="eager"
         onError={() => setHasError(true)}
+        onLoad={() => setHasLoaded(true)}
         src={url}
         unoptimized
         width={640}
       />
     </button>
+  );
+}
+
+function UserImageGrid({ children }: UserImageGridProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const imageItems = Children.toArray(children) as ReactElement[];
+  const hiddenImageCount = Math.max(
+    imageItems.length - MAX_VISIBLE_CHAT_IMAGES,
+    0
+  );
+  const visibleImageCount = isExpanded
+    ? imageItems.length
+    : imageItems.length - hiddenImageCount;
+
+  useEffect(() => {
+    if (!isExpanded) {
+      return;
+    }
+
+    const animationFrame = requestAnimationFrame(() => {
+      gridRef.current
+        ?.querySelector<HTMLButtonElement>(
+          `[data-image-index="${MAX_VISIBLE_CHAT_IMAGES}"] button`
+        )
+        ?.focus();
+    });
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isExpanded]);
+
+  return (
+    <m.div
+      className="relative flex w-[28rem] max-w-full flex-wrap justify-end gap-1.5"
+      layout={!reduceMotion}
+      ref={gridRef}
+      transition={
+        reduceMotion
+          ? { duration: 0 }
+          : { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+      }
+    >
+      {imageItems.slice(0, visibleImageCount).map((imageItem, index) => {
+        const isCovered =
+          !isExpanded &&
+          hiddenImageCount > 0 &&
+          index === MAX_VISIBLE_CHAT_IMAGES - 1;
+
+        return (
+          <m.div
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="aspect-square w-[calc((100%_-_0.75rem)/3)] [&>*]:m-0 [&>*]:size-full [&_img]:size-full [&_img]:object-cover"
+            data-image-index={index}
+            inert={isCovered ? true : undefined}
+            initial={
+              reduceMotion || index < MAX_VISIBLE_CHAT_IMAGES
+                ? false
+                : { opacity: 0, scale: 0.96, y: 8 }
+            }
+            key={imageItem.key}
+            layout={!reduceMotion}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+            }
+          >
+            {imageItem}
+          </m.div>
+        );
+      })}
+      {!isExpanded && hiddenImageCount > 0 && (
+        <m.button
+          animate={{ opacity: 1 }}
+          aria-label={`Show ${hiddenImageCount} more ${hiddenImageCount === 1 ? "image" : "images"}`}
+          className="absolute right-0 bottom-0 z-10 flex aspect-square w-[calc((100%_-_0.75rem)/3)] items-center justify-center rounded-lg border border-white/15 bg-black/60 font-medium text-white text-xl backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset motion-reduce:transition-none"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          onClick={() => setIsExpanded(true)}
+          transition={
+            reduceMotion ? { duration: 0 } : { delay: 0.1, duration: 0.2 }
+          }
+          type="button"
+        >
+          +{hiddenImageCount}
+        </m.button>
+      )}
+    </m.div>
   );
 }
 
@@ -643,6 +762,8 @@ function StandaloneChatPageClient({
     messages: ChatUIMessage[] | null;
     lastResponseStopped: boolean;
     activeStreamId: string | null;
+    externalChannelId: ExternalChannelId | null;
+    slackThreadUrl: string | null;
   } | null>({
     queryKey: ["chat-history", organizationId, initialChatId],
     queryFn: async () => {
@@ -653,19 +774,130 @@ function StandaloneChatPageClient({
         `/api/organizations/${organizationId}/chat/${encodeURIComponent(initialChatId)}`
       );
       if (!res.ok) {
-        return null;
+        throw new Error("Failed to load chat history");
       }
       const data = await res.json();
+      const externalChannelId = externalChannelIdSchema.safeParse(
+        data?.externalChannelId
+      );
       return {
         messages: data?.messages ?? null,
         lastResponseStopped: Boolean(data?.lastResponseStopped),
         activeStreamId:
           typeof data?.activeStreamId === "string" ? data.activeStreamId : null,
+        externalChannelId: externalChannelId.success
+          ? externalChannelId.data
+          : null,
+        slackThreadUrl:
+          typeof data?.slackThreadUrl === "string" ? data.slackThreadUrl : null,
       };
     },
     enabled: Boolean(initialChatId) && Boolean(organizationId),
     staleTime: 1000 * 60 * 5,
   });
+
+  const isSlackMirrored =
+    chatHistoryData?.externalChannelId?.source === "slack";
+
+  const appendMirroredMessage = useCallback(
+    (message: ChatUIMessage | null) => {
+      if (!message) {
+        return;
+      }
+      setMessages((prev) =>
+        prev.some((item) => item.id === message.id)
+          ? prev.map((item) => (item.id === message.id ? message : item))
+          : [...prev, message]
+      );
+    },
+    [setMessages]
+  );
+
+  const [isMirrorWorking, setIsMirrorWorking] = useState(false);
+
+  const handleMirrorStatus = useCallback((status: MirrorChatStatus) => {
+    setIsMirrorWorking(status === "working");
+  }, []);
+
+  useSlackMirrorStream(
+    organizationId,
+    initialChatId ?? null,
+    isSlackMirrored,
+    appendMirroredMessage,
+    handleMirrorStatus
+  );
+
+  useEffect(() => {
+    if (!isMirrorWorking) {
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setIsMirrorWorking(false);
+    }, MIRROR_WORKING_TIMEOUT_MS);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isMirrorWorking]);
+
+  const relayApprovalMutation = useMutation({
+    mutationFn: (input: { requestId: string; approved: boolean }) => {
+      if (!initialChatId) {
+        return Promise.resolve();
+      }
+      return relaySlackApproval(
+        organizationId,
+        initialChatId,
+        input.requestId,
+        input.approved
+      );
+    },
+  });
+  const relayMessageMutation = useMutation({
+    mutationFn: (input: { text: string; tempId: string }) => {
+      if (!initialChatId) {
+        return Promise.resolve(null);
+      }
+      return relaySlackMirrorMessage(organizationId, initialChatId, input.text);
+    },
+    onSuccess: (message, input) => {
+      setMessages((prev) => {
+        const withoutTemp = prev.filter((item) => item.id !== input.tempId);
+        if (!message || withoutTemp.some((item) => item.id === message.id)) {
+          return withoutTemp;
+        }
+        return [...withoutTemp, message];
+      });
+    },
+    onError: (_error, input) => {
+      setMessages((prev) => prev.filter((item) => item.id !== input.tempId));
+      setIsMirrorWorking(false);
+      setChatError("Sending to Slack failed. Try again.");
+    },
+  });
+  const relayMessage = useCallback(
+    async (text: string) => {
+      const tempId = `relay-pending-${nanoid(10)}`;
+      setMessages((prev) => [
+        ...prev,
+        { id: tempId, role: "user", parts: [{ type: "text", text }] },
+      ]);
+      setIsMirrorWorking(true);
+      try {
+        await relayMessageMutation.mutateAsync({ text, tempId });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [relayMessageMutation, setMessages]
+  );
+
+  const relayApproval = useCallback(
+    (requestId: string, approved: boolean) => {
+      relayApprovalMutation.mutate({ requestId, approved });
+    },
+    [relayApprovalMutation]
+  );
 
   useLayoutEffect(() => {
     if (!chatHistoryData) {
@@ -765,6 +997,9 @@ function StandaloneChatPageClient({
   const loadedQueueKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (isSlackMirrored) {
+      return;
+    }
     if (loadedQueueKeyRef.current === queueStorageKey) {
       return;
     }
@@ -791,7 +1026,7 @@ function StandaloneChatPageClient({
     } catch {
       setQueuedMessages([]);
     }
-  }, [queueStorageKey]);
+  }, [isSlackMirrored, queueStorageKey]);
 
   useEffect(() => {
     if (loadedQueueKeyRef.current !== queueStorageKey) {
@@ -860,6 +1095,9 @@ function StandaloneChatPageClient({
     }
 
     function handleAutoFocus(event: KeyboardEvent) {
+      if (isSlackMirrored) {
+        return;
+      }
       if (event.defaultPrevented) {
         return;
       }
@@ -879,7 +1117,7 @@ function StandaloneChatPageClient({
     return () => {
       window.removeEventListener("keydown", handleAutoFocus);
     };
-  }, []);
+  }, [isSlackMirrored]);
 
   const handleAddContext = useCallback((item: ContextItem) => {
     setHasCustomizedContext(true);
@@ -969,6 +1207,10 @@ function StandaloneChatPageClient({
       attachments: ChatMessagePart[],
       modelOverride?: string
     ) => {
+      if (isSlackMirrored) {
+        return;
+      }
+
       const current = messagesRef.current;
       const index = current.findIndex((m) => m.id === userMessageId);
       if (index === -1) {
@@ -1018,7 +1260,7 @@ function StandaloneChatPageClient({
         await sendMessage({ text, messageId: userMessageId });
       }
     },
-    [sendMessage, setMessages]
+    [isSlackMirrored, sendMessage, setMessages]
   );
 
   const handleEditMessage = useCallback(
@@ -1095,6 +1337,10 @@ function StandaloneChatPageClient({
 
   const dispatchMessage = useCallback(
     async (text: string, attachments: ChatAttachment[] = []) => {
+      if (isSlackMirrored) {
+        return;
+      }
+
       if (text.trim().length === 0 && attachments.length === 0) {
         return;
       }
@@ -1155,6 +1401,8 @@ function StandaloneChatPageClient({
             messages: messagesRef.current,
             lastResponseStopped: wasStoppedByUserRef.current,
             activeStreamId: null,
+            externalChannelId: null,
+            slackThreadUrl: null,
           }
         );
         router.replace(`/${organizationSlug}/chat/${stableChatId}`, {
@@ -1168,6 +1416,7 @@ function StandaloneChatPageClient({
     [
       addToolApprovalResponse,
       initialChatId,
+      isSlackMirrored,
       organizationId,
       organizationSlug,
       queryClient,
@@ -1180,6 +1429,13 @@ function StandaloneChatPageClient({
 
   const handleSend = useCallback(
     async (text: string, attachments: ChatAttachment[] = []) => {
+      if (isSlackMirrored) {
+        const trimmed = text.trim();
+        if (trimmed.length > 0) {
+          relayMessage(trimmed);
+        }
+        return;
+      }
       if (isLoading) {
         if (attachments.length > 0) {
           return;
@@ -1189,7 +1445,7 @@ function StandaloneChatPageClient({
       }
       await dispatchMessage(text, attachments);
     },
-    [dispatchMessage, isLoading]
+    [dispatchMessage, isLoading, isSlackMirrored, relayMessage]
   );
 
   const autoSubmittedQueryRef = useRef<string | null>(null);
@@ -1293,6 +1549,9 @@ function StandaloneChatPageClient({
 
   useEffect(() => {
     drainQueueRef.current = () => {
+      if (isSlackMirrored) {
+        return;
+      }
       if (isDrainingRef.current) {
         return;
       }
@@ -1316,7 +1575,7 @@ function StandaloneChatPageClient({
         setQueuedMessages((prev) => [next, ...prev]);
       });
     };
-  }, [dispatchMessage]);
+  }, [dispatchMessage, isSlackMirrored]);
 
   useEffect(() => {
     if (isLoading && !prevIsLoadingRef.current) {
@@ -1338,6 +1597,9 @@ function StandaloneChatPageClient({
   }, [isLoading]);
 
   useEffect(() => {
+    if (isSlackMirrored) {
+      return;
+    }
     if (!isLoading) {
       return;
     }
@@ -1388,12 +1650,16 @@ function StandaloneChatPageClient({
     isLoading,
     messages,
     queuedMessages.length,
+    isSlackMirrored,
     wasStoppedByUser,
     stopActiveResponse,
   ]);
 
   useEffect(() => {
     function handleGlobalKeydown(event: KeyboardEvent) {
+      if (isSlackMirrored) {
+        return;
+      }
       if (event.metaKey || event.ctrlKey || event.altKey) {
         return;
       }
@@ -1421,7 +1687,7 @@ function StandaloneChatPageClient({
     return () => {
       window.removeEventListener("keydown", handleGlobalKeydown);
     };
-  }, []);
+  }, [isSlackMirrored]);
 
   const handleClearError = useCallback(() => setChatError(null), []);
 
@@ -1603,78 +1869,101 @@ function StandaloneChatPageClient({
             ? "published"
             : "draft";
 
-        const approvalId = toolPart.approval?.id;
+        const approvalId =
+          toolPart.state === "approval-requested"
+            ? toolPart.approval.id
+            : undefined;
         const handleApprove = approvalId
           ? () =>
-              addToolApprovalResponse({
-                id: approvalId,
-                approved: true,
-              })
+              isSlackMirrored
+                ? relayApproval(approvalId, true)
+                : addToolApprovalResponse({
+                    id: approvalId,
+                    approved: true,
+                  })
           : undefined;
         const handleDeny = approvalId
           ? () =>
-              addToolApprovalResponse({
-                id: approvalId,
-                approved: false,
-                reason: "discard",
-              })
+              isSlackMirrored
+                ? relayApproval(approvalId, false)
+                : addToolApprovalResponse({
+                    id: approvalId,
+                    approved: false,
+                    reason: "discard",
+                  })
           : undefined;
-        const handlePersist = approvalId
-          ? async (
-              status: "draft" | "published",
-              payload: { title: string; markdown: string }
-            ) => {
-              const response = await fetch(
-                `/api/organizations/${organizationId}/chat/posts`,
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    ...payload,
-                    chatId: stableChatId,
-                    contentType,
-                    status,
-                  }),
-                }
-              );
-              if (!response.ok) {
-                throw new Error("Failed to save post");
-              }
-              try {
-                await addToolApprovalResponse({
-                  id: approvalId,
-                  approved: false,
-                  reason:
-                    status === "published"
-                      ? "manual-published"
-                      : "manual-draft",
-                });
-              } catch (error) {
-                console.error(
-                  "[Chat] Failed to mark persisted post approval:",
-                  error
+        const handlePersist =
+          approvalId && !isSlackMirrored
+            ? async (
+                status: "draft" | "published",
+                payload: { title: string; markdown: string }
+              ) => {
+                const response = await fetch(
+                  `/api/organizations/${organizationId}/chat/posts`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      ...payload,
+                      chatId: stableChatId,
+                      contentType,
+                      status,
+                    }),
+                  }
                 );
+                if (!response.ok) {
+                  throw new Error("Failed to save post");
+                }
+                try {
+                  await addToolApprovalResponse({
+                    id: approvalId,
+                    approved: false,
+                    reason:
+                      status === "published"
+                        ? "manual-published"
+                        : "manual-draft",
+                  });
+                } catch (error) {
+                  console.error(
+                    "[Chat] Failed to mark persisted post approval:",
+                    error
+                  );
+                }
+                queryClient.invalidateQueries({
+                  queryKey: ["chat-sessions", organizationId],
+                });
               }
-              queryClient.invalidateQueries({
-                queryKey: ["chat-sessions", organizationId],
-              });
-            }
-          : undefined;
+            : undefined;
         const handleRegenerate = approvalId
           ? async (
               instructions: string,
               payload: { title: string; markdown: string }
             ) => {
+              const regeneratePrompt = `Regenerate the ${getOutputTypeLabel(contentType)} with these changes: ${instructions}\n\nCurrent title: ${payload.title}\n\nCurrent draft:\n${payload.markdown}`;
+              if (isSlackMirrored) {
+                const sent = await relayMessage(regeneratePrompt);
+                if (sent) {
+                  await relayApprovalMutation.mutateAsync({
+                    requestId: approvalId,
+                    approved: false,
+                  });
+                }
+                return;
+              }
               await addToolApprovalResponse({
                 id: approvalId,
                 approved: false,
                 reason: "discard",
               });
               sendMessage({
-                text: `Regenerate the ${getOutputTypeLabel(contentType)} with these changes: ${instructions}\n\nCurrent title: ${payload.title}\n\nCurrent draft:\n${payload.markdown}`,
+                text: regeneratePrompt,
               });
             }
           : undefined;
+
+        const handlePublished = (published: PublishedSocialPost) => {
+          sendMessage({ text: buildPublishedChatMessage(published) });
+        };
 
         if (contentType === "twitter_post") {
           return (
@@ -1687,11 +1976,13 @@ function StandaloneChatPageClient({
                 onApprove={handleApprove}
                 onDeny={handleDeny}
                 onPersist={handlePersist}
+                onPublished={handlePublished}
                 onRegenerate={handleRegenerate}
                 organization={{
                   name: organization?.name ?? "Your Name",
                   logo: organization?.logo ?? null,
                 }}
+                organizationId={organizationId}
                 persistedStatus={persistedStatus}
                 state={previewState}
                 title={title}
@@ -1711,11 +2002,13 @@ function StandaloneChatPageClient({
                 onApprove={handleApprove}
                 onDeny={handleDeny}
                 onPersist={handlePersist}
+                onPublished={handlePublished}
                 onRegenerate={handleRegenerate}
                 organization={{
                   name: organization?.name ?? "Your Name",
                   logo: organization?.logo ?? null,
                 }}
+                organizationId={organizationId}
                 persistedStatus={persistedStatus}
                 state={previewState}
                 title={title}
@@ -1757,17 +2050,21 @@ function StandaloneChatPageClient({
             : undefined;
         const handleApprove = approvalId
           ? () =>
-              addToolApprovalResponse({
-                id: approvalId,
-                approved: true,
-              })
+              isSlackMirrored
+                ? relayApproval(approvalId, true)
+                : addToolApprovalResponse({
+                    id: approvalId,
+                    approved: true,
+                  })
           : undefined;
         const handleDeny = approvalId
           ? () =>
-              addToolApprovalResponse({
-                id: approvalId,
-                approved: false,
-              })
+              isSlackMirrored
+                ? relayApproval(approvalId, false)
+                : addToolApprovalResponse({
+                    id: approvalId,
+                    approved: false,
+                  })
           : undefined;
         const output =
           toolPart.state === "output-error"
@@ -1836,23 +2133,7 @@ function StandaloneChatPageClient({
             <div className="sticky bottom-0 z-10 bg-background px-4 pb-4">
               <div className="-inset-x-4 pointer-events-none absolute bottom-full h-12 bg-linear-to-t from-background to-transparent" />
               <div className="mx-auto w-full max-w-2xl">
-                <ChatInputAdvanced
-                  context={context}
-                  error={chatError}
-                  isLoading={isLoading}
-                  isStopping={isStopping}
-                  model={selectedModel}
-                  onAddContext={handleAddContext}
-                  onClearError={handleClearError}
-                  onModelChange={handleModelChange}
-                  onRemoveContext={handleRemoveContext}
-                  onSend={handleSend}
-                  onStop={handleStop}
-                  onThinkingLevelChange={handleThinkingLevelChange}
-                  organizationId={organizationId}
-                  organizationSlug={organizationSlug}
-                  thinkingLevel={thinkingLevel}
-                />
+                <Skeleton className="h-28 w-full rounded-2xl" />
               </div>
             </div>
           </div>
@@ -1862,6 +2143,16 @@ function StandaloneChatPageClient({
   }
 
   if (!(hasMessages || isPendingAutoSubmit || isLoading)) {
+    if (isSlackMirrored) {
+      return (
+        <div className="flex flex-1 items-center justify-center px-4">
+          <div className="w-full max-w-2xl">
+            <SlackMirrorNotice />
+          </div>
+        </div>
+      );
+    }
+
     const now = isHydrated ? new Date() : null;
     const greeting = now ? getGreeting(now) : "Welcome";
     const userName = session?.user?.name?.split(" ")[0];
@@ -1931,7 +2222,7 @@ function StandaloneChatPageClient({
         (isTerminalToolState(lastPart.state) ||
           lastPart.state === "approval-responded")));
   const showThinkingIndicator =
-    isLoading &&
+    (isLoading || isMirrorWorking) &&
     lastMessage != null &&
     (lastMessage.role === "user" ||
       lastAssistantHasNoVisibleContent ||
@@ -1950,147 +2241,201 @@ function StandaloneChatPageClient({
           <MessageScrollerProvider autoScroll>
             <MessageScroller className="min-h-0 flex-1">
               <MessageScrollerViewport className="min-w-0 overflow-x-hidden">
-                <MessageScrollerContent className="px-4 pt-6 pb-6">
-                  <div
-                    className={cn(
-                      "mx-auto flex w-full min-w-0 max-w-2xl flex-col gap-4",
-                      isFirstMessageTransition && "chat-messages-fade-in"
-                    )}
-                  >
-                    {(() => {
-                      const branchPointIndex = branchSwitchSignal
-                        ? visibleMessages.findIndex(
-                            (m) => m.id === branchSwitchSignal.userMessageId
+                <MessageScrollerContent
+                  className={cn(
+                    "gap-4 px-4 pt-6 pb-6",
+                    isFirstMessageTransition && "chat-messages-fade-in"
+                  )}
+                >
+                  {(() => {
+                    const branchPointIndex = branchSwitchSignal
+                      ? visibleMessages.findIndex(
+                          (m) => m.id === branchSwitchSignal.userMessageId
+                        )
+                      : -1;
+                    const lastUserMessageId = [...visibleMessages]
+                      .reverse()
+                      .find((m) => m.role === "user")?.id;
+                    return visibleMessages.map((message, messageIndex) => {
+                      const isUser = message.role === "user";
+                      const isEditing =
+                        isUser && editingMessageId === message.id;
+                      const userContentParts = isUser
+                        ? message.parts.filter((part) => part.type !== "file")
+                        : message.parts;
+                      const userImageParts = isUser
+                        ? message.parts.filter(
+                            (part) =>
+                              part.type === "file" &&
+                              typeof part.mediaType === "string" &&
+                              isImageMimeType(part.mediaType)
                           )
-                        : -1;
-                      return visibleMessages.map((message, messageIndex) => {
-                        const isUser = message.role === "user";
-                        const isEditing =
-                          isUser && editingMessageId === message.id;
-                        const branches = isUser
-                          ? messageBranches[message.id]
-                          : undefined;
-                        const branchTotal = branches?.tails.length ?? 0;
-                        const branchIdx = branches?.active ?? 0;
-                        const isDownstreamOfBranchSwitch =
-                          branchPointIndex !== -1 &&
-                          messageIndex > branchPointIndex;
-                        const branchFadeKey = isDownstreamOfBranchSwitch
-                          ? `${message.id}-${branchSwitchSignal?.tick}`
-                          : message.id;
-                        return (
-                          <MessageScrollerItem
-                            key={branchFadeKey}
-                            messageId={message.id}
-                            scrollAnchor={isUser}
+                        : [];
+                      const userFileParts = isUser
+                        ? message.parts.filter(
+                            (part) =>
+                              part.type === "file" &&
+                              (typeof part.mediaType !== "string" ||
+                                !isImageMimeType(part.mediaType))
+                          )
+                        : [];
+                      const branches = isUser
+                        ? messageBranches[message.id]
+                        : undefined;
+                      const branchTotal = branches?.tails.length ?? 0;
+                      const branchIdx = branches?.active ?? 0;
+                      const isDownstreamOfBranchSwitch =
+                        branchPointIndex !== -1 &&
+                        messageIndex > branchPointIndex;
+                      const branchFadeKey = isDownstreamOfBranchSwitch
+                        ? `${message.id}-${branchSwitchSignal?.tick}`
+                        : message.id;
+                      return (
+                        <MessageScrollerItem
+                          className="mx-auto w-full max-w-2xl"
+                          key={branchFadeKey}
+                          messageId={message.id}
+                          scrollAnchor={
+                            isUser && message.id === lastUserMessageId
+                          }
+                        >
+                          <Message
+                            className={cn(
+                              isDownstreamOfBranchSwitch &&
+                                "chat-branch-fade-in"
+                            )}
+                            from={message.role}
                           >
-                            <Message
-                              className={cn(
-                                isDownstreamOfBranchSwitch &&
-                                  "chat-branch-fade-in"
-                              )}
-                              from={message.role}
-                            >
-                              {isUser ? (
-                                <m.div
-                                  className={cn(
-                                    "ml-auto overflow-hidden",
-                                    isEditing
-                                      ? "w-full"
-                                      : "flex w-fit max-w-full"
-                                  )}
-                                  layout
-                                  transition={{
-                                    duration: 0.25,
-                                    ease: [0.22, 1, 0.36, 1],
-                                  }}
-                                >
-                                  {isEditing ? (
-                                    <UserMessageEditor
-                                      initialText={toDisplayText(
-                                        getUserMessageText(message)
-                                      )}
-                                      onCancel={handleCancelEditMessage}
-                                      onSubmit={(text) =>
-                                        handleEditMessage(message.id, text)
-                                      }
-                                    />
-                                  ) : (
-                                    <MessageContent>
-                                      {message.parts.map((part, index) =>
-                                        renderPart(part, message.id, index)
-                                      )}
-                                    </MessageContent>
-                                  )}
-                                </m.div>
-                              ) : (
-                                <MessageContent>
-                                  {message.parts.map((part, index) =>
-                                    renderPart(part, message.id, index)
-                                  )}
-                                </MessageContent>
-                              )}
-                              {isUser && (
-                                <UserMessageActions
-                                  branchIndex={
-                                    branchTotal > 1 ? branchIdx : undefined
-                                  }
-                                  branchTotal={
-                                    branchTotal > 1 ? branchTotal : undefined
-                                  }
-                                  canInteract={!isLoading}
-                                  isEditing={isEditing}
-                                  messageText={toDisplayText(
-                                    getUserMessageText(message)
-                                  )}
-                                  onEdit={() =>
-                                    handleStartEditMessage(message.id)
-                                  }
-                                  onNextBranch={() =>
-                                    handleSwitchBranch(message.id, "next")
-                                  }
-                                  onPreviousBranch={() =>
-                                    handleSwitchBranch(message.id, "prev")
-                                  }
-                                  onRetry={(model) =>
-                                    handleRetryMessage(message.id, model)
-                                  }
-                                />
-                              )}
-                              {message.role === "assistant" && (
-                                <AssistantMetadataHover
-                                  metadata={message.metadata}
-                                />
-                              )}
-                            </Message>
-                          </MessageScrollerItem>
-                        );
-                      });
-                    })()}
-                    {wasStoppedByUser && !isLoading && (
+                            {isUser ? (
+                              <m.div
+                                className={cn(
+                                  "ml-auto overflow-hidden",
+                                  isEditing
+                                    ? "w-full"
+                                    : "flex w-fit max-w-full flex-col items-end gap-2"
+                                )}
+                                layout
+                                transition={{
+                                  duration: 0.25,
+                                  ease: [0.22, 1, 0.36, 1],
+                                }}
+                              >
+                                {isEditing ? (
+                                  <UserMessageEditor
+                                    initialText={toDisplayText(
+                                      getUserMessageText(message)
+                                    )}
+                                    onCancel={handleCancelEditMessage}
+                                    onSubmit={(text) =>
+                                      handleEditMessage(message.id, text)
+                                    }
+                                  />
+                                ) : (
+                                  <>
+                                    {userImageParts.length > 0 && (
+                                      <UserImageGrid>
+                                        {userImageParts.map((part, index) =>
+                                          renderPart(part, message.id, index)
+                                        )}
+                                      </UserImageGrid>
+                                    )}
+                                    {(userContentParts.length > 0 ||
+                                      userFileParts.length > 0) && (
+                                      <MessageContent>
+                                        {userContentParts.map((part, index) =>
+                                          renderPart(part, message.id, index)
+                                        )}
+                                        {userFileParts.length > 0 && (
+                                          <div className="flex max-w-full flex-wrap justify-end gap-2">
+                                            {userFileParts.map((part, index) =>
+                                              renderPart(
+                                                part,
+                                                message.id,
+                                                index
+                                              )
+                                            )}
+                                          </div>
+                                        )}
+                                      </MessageContent>
+                                    )}
+                                  </>
+                                )}
+                              </m.div>
+                            ) : (
+                              <MessageContent>
+                                {message.parts.map((part, index) =>
+                                  renderPart(part, message.id, index)
+                                )}
+                              </MessageContent>
+                            )}
+                            {isUser && !isSlackMirrored && (
+                              <UserMessageActions
+                                branchIndex={
+                                  branchTotal > 1 ? branchIdx : undefined
+                                }
+                                branchTotal={
+                                  branchTotal > 1 ? branchTotal : undefined
+                                }
+                                canInteract={!isLoading}
+                                isEditing={isEditing}
+                                messageText={toDisplayText(
+                                  getUserMessageText(message)
+                                )}
+                                onEdit={() =>
+                                  handleStartEditMessage(message.id)
+                                }
+                                onNextBranch={() =>
+                                  handleSwitchBranch(message.id, "next")
+                                }
+                                onPreviousBranch={() =>
+                                  handleSwitchBranch(message.id, "prev")
+                                }
+                                onRetry={(model) =>
+                                  handleRetryMessage(message.id, model)
+                                }
+                              />
+                            )}
+                            {message.role === "assistant" && (
+                              <AssistantMetadataHover
+                                metadata={message.metadata}
+                              />
+                            )}
+                          </Message>
+                        </MessageScrollerItem>
+                      );
+                    });
+                  })()}
+                  {wasStoppedByUser && !isLoading && (
+                    <div className="mx-auto w-full max-w-2xl">
                       <div className="flex w-fit items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-destructive text-xs">
                         <HugeiconsIcon className="size-3.5" icon={X} />
                         <span>Response stopped by user</span>
                       </div>
-                    )}
-                    {chatError && !isLoading && (
+                    </div>
+                  )}
+                  {chatError && !isLoading && (
+                    <div className="mx-auto w-full max-w-2xl">
                       <div className="flex w-fit flex-wrap items-center gap-2 rounded-md bg-destructive/10 px-2.5 py-1.5 text-destructive text-xs">
                         <HugeiconsIcon className="size-3.5 shrink-0" icon={X} />
                         <span>{chatError}</span>
-                        <button
-                          className="inline-flex items-center gap-1 rounded font-medium underline-offset-2 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                          onClick={handleRetryAfterError}
-                          type="button"
-                        >
-                          <HugeiconsIcon
-                            className="size-3.5"
-                            icon={ArrowReloadHorizontalIcon}
-                          />
-                          <span>Retry</span>
-                        </button>
+                        {!isSlackMirrored && (
+                          <button
+                            className="inline-flex items-center gap-1 rounded font-medium underline-offset-2 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            onClick={handleRetryAfterError}
+                            type="button"
+                          >
+                            <HugeiconsIcon
+                              className="size-3.5"
+                              icon={ArrowReloadHorizontalIcon}
+                            />
+                            <span>Retry</span>
+                          </button>
+                        )}
                       </div>
-                    )}
-                    {showThinkingIndicator && (
+                    </div>
+                  )}
+                  {showThinkingIndicator && (
+                    <div className="mx-auto w-full max-w-2xl">
                       <Message from="assistant">
                         <MessageContent>
                           <BrailleLoader
@@ -2101,8 +2446,8 @@ function StandaloneChatPageClient({
                           />
                         </MessageContent>
                       </Message>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </MessageScrollerContent>
               </MessageScrollerViewport>
               <MessageScrollerButton />
@@ -2120,6 +2465,13 @@ function StandaloneChatPageClient({
                 onEdit={handleEditQueued}
                 onRemove={handleRemoveQueued}
               />
+              {isSlackMirrored && (
+                <div className="mb-2 flex justify-center">
+                  <SlackRelayFooterNotice
+                    threadUrl={chatHistoryData?.slackThreadUrl ?? null}
+                  />
+                </div>
+              )}
               <ChatInputAdvanced
                 connectedTop={queuedMessages.length > 0}
                 context={context}

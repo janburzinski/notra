@@ -1,12 +1,22 @@
+import { acquireClaim, releaseClaim } from "@notra/ai/autonomy/claims";
 import type { BrandGuidelinesWorkflowPayload } from "@notra/ai/types/brand-guidelines";
 import type { OnboardingAgentWorkflowPayload } from "@notra/ai/types/onboarding-agent";
 import { contentGenerationWorkflowPayloadSchema } from "@notra/content-generation/schemas";
 import { start } from "workflow/api";
+import {
+  IRIS_START_CLAIM_SCOPE,
+  IRIS_START_CLAIM_TTL_SECONDS,
+} from "@/constants/iris";
+import { socialAnalyticsSyncPayloadSchema } from "@/schemas/analytics";
 import { brandGuidelinesWorkflowPayloadSchema } from "@/schemas/brand-guidelines";
 import {
   eventWorkflowPayloadSchema,
   scheduleWorkflowPayloadSchema,
 } from "@/schemas/workflows";
+import {
+  type IrisWorkflowPayload,
+  irisWorkflowPayloadSchema,
+} from "@/schemas/workflows/iris";
 import { onboardingAgentWorkflowPayloadSchema } from "@/schemas/workflows/onboarding-agent-payload";
 import type { BrandAnalysisPayload } from "@/types/brand-analysis";
 import {
@@ -15,9 +25,11 @@ import {
 } from "@/workflows/brand-analysis";
 import { brandGuidelinesWorkflow } from "@/workflows/brand-guidelines";
 import { eventContentWorkflow } from "@/workflows/event-content";
+import { irisControllerRun } from "@/workflows/iris-controller";
 import { onDemandContentWorkflow } from "@/workflows/on-demand-content";
 import { onboardingAgentWorkflow } from "@/workflows/onboarding-agent";
 import { scheduleContentWorkflow } from "@/workflows/schedule-content";
+import { socialAnalyticsSyncWorkflow } from "@/workflows/social-analytics-sync";
 
 export async function startBrandAnalysisRun(
   payload: BrandAnalysisPayload
@@ -43,6 +55,34 @@ export async function startOnboardingAgentRun(
   return { runId: run.runId };
 }
 
+export async function startIrisRun(
+  payload: IrisWorkflowPayload
+): Promise<{ runId: string | null }> {
+  const parsed = irisWorkflowPayloadSchema.parse(payload);
+  const dispatchToken = crypto.randomUUID();
+  const dispatch = await acquireClaim({
+    scope: IRIS_START_CLAIM_SCOPE,
+    claimKey: parsed.executionId,
+    ownerToken: dispatchToken,
+    ttlSeconds: IRIS_START_CLAIM_TTL_SECONDS,
+    organizationId: parsed.organizationId,
+  });
+  if (!dispatch.claimed) {
+    return { runId: null };
+  }
+  try {
+    const run = await start(irisControllerRun, [parsed]);
+    return { runId: run.runId };
+  } catch (error) {
+    await releaseClaim({
+      scope: IRIS_START_CLAIM_SCOPE,
+      claimKey: parsed.executionId,
+      ownerToken: dispatchToken,
+    });
+    throw error;
+  }
+}
+
 export async function startScheduleRun(payload: {
   triggerId: string;
   manual?: boolean;
@@ -65,6 +105,14 @@ export async function startEventRun(payload: {
 }): Promise<{ runId: string }> {
   const parsed = eventWorkflowPayloadSchema.parse(payload);
   const run = await start(eventContentWorkflow, [parsed]);
+  return { runId: run.runId };
+}
+
+export async function startSocialAnalyticsSyncRun(payload: {
+  organizationId?: string;
+}): Promise<{ runId: string }> {
+  const parsed = socialAnalyticsSyncPayloadSchema.parse(payload);
+  const run = await start(socialAnalyticsSyncWorkflow, [parsed]);
   return { runId: run.runId };
 }
 

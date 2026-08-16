@@ -10,6 +10,11 @@
   --sidebar: hsl(233 7% 8%);
 }
 
+@theme inline {
+  --font-sans: var(--font-noto-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 @layer base {
   html,
   body,
@@ -108,6 +113,12 @@
     .page-container-compact {
       max-width: 72rem;
     }
+  }
+}
+
+@keyframes logs-table-content-fade {
+  from {
+    opacity: 0.72;
   }
 }
 

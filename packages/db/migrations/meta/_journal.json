@@ -414,6 +414,34 @@
       "when": 1785281381365,
       "tag": "0058_same_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1785441254484,
+      "tag": "0059_romantic_joystick",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1785519823345,
+      "tag": "0060_complete_nightcrawler",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1785580721087,
+      "tag": "0061_lazy_dreadnoughts",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1786380248232,
+      "tag": "0062_light_johnny_storm",
+      "breakpoints": true
     }
   ]
 }

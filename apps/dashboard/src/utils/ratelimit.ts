@@ -65,6 +65,12 @@ export const ratelimit = {
     prefix: "ratelimit:onboarding-brand-analysis",
     limiter: Ratelimit.slidingWindow(2, "10m"),
   }),
+  companyLogo: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:company-logo",
+    limiter: Ratelimit.slidingWindow(20, "1m"),
+  }),
   onboardingAgent: new Ratelimit({
     redis,
     analytics: true,
@@ -88,6 +94,24 @@ export const ratelimit = {
     analytics: true,
     prefix: "ratelimit:chat-stop",
     limiter: Ratelimit.slidingWindow(30, "1m"),
+  }),
+  chatRelay: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:chat-relay",
+    limiter: Ratelimit.slidingWindow(20, "1m"),
+  }),
+  geoIngest: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:geo-ingest",
+    limiter: Ratelimit.slidingWindow(1000, "1m"),
+  }),
+  slackOAuth: new Ratelimit({
+    redis,
+    analytics: true,
+    prefix: "ratelimit:slack-oauth",
+    limiter: Ratelimit.slidingWindow(10, "10m"),
   }),
 };
 
