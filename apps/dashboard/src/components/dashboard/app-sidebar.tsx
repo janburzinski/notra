@@ -109,10 +109,13 @@ export function DashboardSidebar({
               Notra
             </span>
           </div>
+        </SidebarHeader>
+        <SidebarContent>
           <AnimatePresence initial={false} mode="popLayout">
             {isSubpage && (
               <m.div
                 animate="animate"
+                className="p-2"
                 exit="exit"
                 initial="initial"
                 key="back-button"
@@ -132,8 +135,6 @@ export function DashboardSidebar({
               </m.div>
             )}
           </AnimatePresence>
-        </SidebarHeader>
-        <SidebarContent>
           <AnimatePresence initial={false} mode="popLayout">
             {isSettingsRoute && (
               <m.div
