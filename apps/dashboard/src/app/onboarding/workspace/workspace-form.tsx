@@ -19,7 +19,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
-import { Button } from "@/components/button";
 import { OrgLogoField } from "@/components/onboarding/org-logo-field";
 import { OnboardingProgress } from "@/components/onboarding/progress";
 import { COMPANY_LOGO_DEBOUNCE_MS } from "@/constants/company-logo";
@@ -300,33 +299,16 @@ export function WorkspaceForm({ existingOrg }: WorkspaceFormProps) {
           }}
         >
           {(field) => (
-            <>
+            <div className="space-y-5">
               <div className="grid gap-2">
-                <div className="flex items-center justify-between gap-3">
-                  <Label htmlFor="heard-about-notra">
-                    Where did you hear about Notra?{" "}
-                    {field.state.value !== "other" ? (
-                      <span className="text-muted-foreground text-xs">
-                        (optional)
-                      </span>
-                    ) : null}
-                  </Label>
-                  {field.state.value && !isAttributionLocked ? (
-                    <Button
-                      className="h-auto px-0 text-muted-foreground"
-                      disabled={isSubmitting}
-                      onClick={() => {
-                        field.handleChange("");
-                        form.setFieldValue("heardAboutNotraOther", "");
-                      }}
-                      size="sm"
-                      type="button"
-                      variant="ghost"
-                    >
-                      Clear
-                    </Button>
+                <Label htmlFor="heard-about-notra">
+                  Where did you hear about Notra?{" "}
+                  {field.state.value !== "other" ? (
+                    <span className="text-muted-foreground text-xs">
+                      (optional)
+                    </span>
                   ) : null}
-                </div>
+                </Label>
                 <Select
                   onValueChange={(value) => {
                     if (!isHeardAboutNotraSource(value)) {
@@ -367,45 +349,54 @@ export function WorkspaceForm({ existingOrg }: WorkspaceFormProps) {
                 ) : null}
               </div>
 
-              {field.state.value === "other" ? (
-                <form.Field
-                  name="heardAboutNotraOther"
-                  validators={{
-                    onChange:
-                      onboardingWorkspaceFormFieldsSchema.shape
-                        .heardAboutNotraOther,
-                  }}
-                >
-                  {(otherField) => (
-                    <div className="grid gap-2">
-                      <Label htmlFor="heard-about-notra-other">
-                        Tell us where{" "}
-                        <span className="text-destructive">*</span>
-                      </Label>
-                      <Textarea
-                        aria-invalid={otherField.state.meta.errors.length > 0}
-                        disabled={isSubmitting || isAttributionLocked}
-                        id="heard-about-notra-other"
-                        onBlur={otherField.handleBlur}
-                        onChange={(e) =>
-                          otherField.handleChange(e.target.value)
-                        }
-                        placeholder="Podcast, community, friend, etc."
-                        rows={3}
-                        value={otherField.state.value}
-                      />
-                      {otherField.state.meta.errors.length > 0 ? (
-                        <p className="text-destructive text-sm">
-                          {getValidationMessage(
-                            otherField.state.meta.errors[0]
-                          )}
-                        </p>
-                      ) : null}
-                    </div>
-                  )}
-                </form.Field>
-              ) : null}
-            </>
+              <div
+                aria-hidden={field.state.value !== "other"}
+                className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none ${field.state.value === "other" ? "grid-rows-[1fr] opacity-100" : "pointer-events-none grid-rows-[0fr] opacity-0"}`}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <form.Field
+                    name="heardAboutNotraOther"
+                    validators={{
+                      onChange:
+                        onboardingWorkspaceFormFieldsSchema.shape
+                          .heardAboutNotraOther,
+                    }}
+                  >
+                    {(otherField) => (
+                      <div className="grid gap-2">
+                        <Label htmlFor="heard-about-notra-other">
+                          Tell us where
+                        </Label>
+                        <Textarea
+                          aria-invalid={otherField.state.meta.errors.length > 0}
+                          className="resize-none focus-visible:ring-inset"
+                          disabled={
+                            isSubmitting ||
+                            isAttributionLocked ||
+                            field.state.value !== "other"
+                          }
+                          id="heard-about-notra-other"
+                          onBlur={otherField.handleBlur}
+                          onChange={(e) =>
+                            otherField.handleChange(e.target.value)
+                          }
+                          placeholder="Podcast, community, friend, etc."
+                          rows={3}
+                          value={otherField.state.value}
+                        />
+                        {otherField.state.meta.errors.length > 0 ? (
+                          <p className="text-destructive text-sm">
+                            {getValidationMessage(
+                              otherField.state.meta.errors[0]
+                            )}
+                          </p>
+                        ) : null}
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+              </div>
+            </div>
           )}
         </form.Field>
 
