@@ -299,7 +299,7 @@ export function WorkspaceForm({ existingOrg }: WorkspaceFormProps) {
           }}
         >
           {(field) => (
-            <div className="space-y-5">
+            <div>
               <div className="grid gap-2">
                 <Label htmlFor="heard-about-notra">
                   Where did you hear about Notra?{" "}
@@ -363,7 +363,7 @@ export function WorkspaceForm({ existingOrg }: WorkspaceFormProps) {
                     }}
                   >
                     {(otherField) => (
-                      <div className="grid gap-2">
+                      <div className="grid gap-2 pt-5">
                         <Label htmlFor="heard-about-notra-other">
                           Tell us where
                         </Label>
