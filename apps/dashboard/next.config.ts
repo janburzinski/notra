@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 import { withWorkflow } from "workflow/next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: process.env.APP_URL
+    ? [new URL(process.env.APP_URL).hostname]
+    : [],
   reactCompiler: true,
   cacheComponents: true,
   partialPrefetching: true,

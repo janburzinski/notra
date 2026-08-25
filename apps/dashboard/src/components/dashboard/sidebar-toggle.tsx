@@ -15,12 +15,13 @@ export function SidebarToggle({
   onClick,
   ...props
 }: ComponentProps<typeof Button>) {
-  const { open, toggleSidebar } = useSidebar();
+  const { isMobile, open, openMobile, toggleSidebar } = useSidebar();
+  const isOpen = isMobile ? openMobile : open;
 
   return (
     <Button
-      aria-expanded={open}
-      aria-label={open ? "Hide sidebar" : "Show sidebar"}
+      aria-expanded={isOpen}
+      aria-label={isOpen ? "Hide sidebar" : "Show sidebar"}
       className={cn("cursor-pointer", className)}
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
@@ -33,7 +34,7 @@ export function SidebarToggle({
       {...props}
     >
       <HugeiconsIcon
-        icon={open ? SidebarLeft01Icon : SidebarRight01Icon}
+        icon={isOpen ? SidebarLeft01Icon : SidebarRight01Icon}
         strokeWidth={1.8}
       />
     </Button>

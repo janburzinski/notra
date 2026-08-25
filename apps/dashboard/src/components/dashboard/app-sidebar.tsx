@@ -9,6 +9,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
+  useSidebar,
 } from "@notra/ui/components/ui/sidebar";
 import { Notra } from "@notra/ui/components/ui/svgs/notra";
 import { cn } from "@notra/ui/lib/utils";
@@ -60,6 +61,7 @@ export function DashboardSidebar({
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
+  const { isMobile, setOpenMobile } = useSidebar();
   const { activeOrganization } = useOrganizationsContext();
   const shouldReduceMotion = useReducedMotion();
   const pathnameSegments = pathname.split("/").filter(Boolean);
@@ -77,11 +79,19 @@ export function DashboardSidebar({
     drilldownCategory !== null;
 
   const hasVisitedMainRef = useRef(false);
+  const previousPathnameRef = useRef(pathname);
   useEffect(() => {
     if (!isSubpage) {
       hasVisitedMainRef.current = true;
     }
   }, [isSubpage]);
+
+  useEffect(() => {
+    if (previousPathnameRef.current !== pathname && isMobile) {
+      setOpenMobile(false);
+    }
+    previousPathnameRef.current = pathname;
+  }, [isMobile, pathname, setOpenMobile]);
 
   function handleBack() {
     if (hasVisitedMainRef.current) {

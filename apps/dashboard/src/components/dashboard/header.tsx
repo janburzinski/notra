@@ -310,7 +310,7 @@ export function SiteHeader() {
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 bg-muted transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-      <div className="grid h-full w-full min-w-0 grid-cols-[minmax(8rem,1fr)_minmax(2rem,20rem)_minmax(2.5rem,1fr)] items-center gap-2 px-4 lg:gap-2">
+      <div className="grid h-full w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 md:grid-cols-[minmax(8rem,1fr)_minmax(2rem,20rem)_minmax(2.5rem,1fr)] lg:gap-2">
         <div className="flex h-full min-w-0 items-center gap-2 overflow-hidden">
           <SidebarToggle className="-mx-1.5" />
           <Breadcrumb className="min-w-0">
