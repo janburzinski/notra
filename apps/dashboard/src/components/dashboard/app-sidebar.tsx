@@ -20,7 +20,7 @@ import {
   m,
   useReducedMotion,
 } from "motion/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type * as React from "react";
 import { useEffect, useRef } from "react";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -61,9 +61,11 @@ export function DashboardSidebar({
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isMobile, setOpenMobile } = useSidebar();
   const { activeOrganization } = useOrganizationsContext();
   const shouldReduceMotion = useReducedMotion();
+  const navigationKey = `${pathname}?${searchParams.toString()}`;
   const pathnameSegments = pathname.split("/").filter(Boolean);
   const slug = pathnameSegments[0] ?? activeOrganization?.slug ?? "";
 
@@ -79,7 +81,7 @@ export function DashboardSidebar({
     drilldownCategory !== null;
 
   const hasVisitedMainRef = useRef(false);
-  const previousPathnameRef = useRef(pathname);
+  const previousNavigationKeyRef = useRef(navigationKey);
   useEffect(() => {
     if (!isSubpage) {
       hasVisitedMainRef.current = true;
@@ -87,11 +89,11 @@ export function DashboardSidebar({
   }, [isSubpage]);
 
   useEffect(() => {
-    if (previousPathnameRef.current !== pathname && isMobile) {
+    if (previousNavigationKeyRef.current !== navigationKey && isMobile) {
       setOpenMobile(false);
     }
-    previousPathnameRef.current = pathname;
-  }, [isMobile, pathname, setOpenMobile]);
+    previousNavigationKeyRef.current = navigationKey;
+  }, [isMobile, navigationKey, setOpenMobile]);
 
   function handleBack() {
     if (hasVisitedMainRef.current) {
