@@ -15,14 +15,13 @@
     "email:dev": "dotenv -- bun run --filter=@notra/email dev",
     "devtools:api": "cd apps/api && bunx @ai-sdk/devtools",
     "devtools:dashboard": "cd apps/dashboard && bunx @ai-sdk/devtools",
-    "check": "ultracite check",
-    "format": "ultracite fix",
-    "format:unsafe": "ultracite fix --unsafe",
+    "check": "ultracite check --threads=4 --report-unused-disable-directives",
+    "format": "ultracite fix --threads=4",
+    "format:unsafe": "ultracite fix --unsafe --threads=4",
     "commitlint": "commitlint",
     "prepare": "husky && ./scripts/prepare-effect.sh"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.2",
     "@commitlint/cli": "^21.0.0",
     "@commitlint/config-conventional": "^21.0.0",
     "dotenv-cli": "^11.0.0",
@@ -31,8 +30,10 @@
     "husky": "^9.1.7",
     "knip": "^6.12.2",
     "openlogs": "^0.0.1",
+    "oxfmt": "0.64.0",
+    "oxlint": "1.79.0",
     "turbo": "^2.9.18",
-    "ultracite": "7.1.4"
+    "ultracite": "7.10.6"
   },
   "engines": {
     "node": "24.11.1"
