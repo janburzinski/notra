@@ -17,7 +17,7 @@ export async function validateOrganizationAccess(slug: string) {
     if (await isSessionBanned()) {
       redirect("/auth/banned");
     }
-    redirect("/login");
+    redirect(`/login?returnTo=${encodeURIComponent(`/${slug}`)}`);
   }
 
   const organization = await retryTransientDbError(() =>
@@ -32,12 +32,6 @@ export async function validateOrganizationAccess(slug: string) {
   );
 
   if (!organization || organization.members.length === 0) {
-    const fallbackOrganization = await getLastActiveOrganizationForUser(
-      session.user.id
-    );
-    if (fallbackOrganization && fallbackOrganization.slug !== slug) {
-      redirect(`/${fallbackOrganization.slug}`);
-    }
     notFound();
   }
 
