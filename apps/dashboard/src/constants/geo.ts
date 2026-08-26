@@ -258,6 +258,7 @@ export const GEO_BRAND_LABELS: Record<string, string> = {
   openai: "ChatGPT",
   claude: "Claude",
   gemini: "Gemini",
+  amazon: "Amazon",
   perplexity: "Perplexity",
   cursor: "Cursor",
   copilot: "Copilot",
