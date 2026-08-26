@@ -47,6 +47,10 @@ const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
     patterns: ["applebot", "apple"],
   },
   {
+    key: "amazon",
+    patterns: ["amazonbot", "amzn-"],
+  },
+  {
     key: "duckduckgo",
     patterns: ["duckassist", "duckduckgo"],
   },
@@ -173,8 +177,6 @@ const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
   {
     key: "agent",
     patterns: [
-      "amazonbot",
-      "amzn-",
       "ai2bot",
       "omgili",
       "yiyanbot",

@@ -5,6 +5,7 @@ import {
   Robot01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Amazon } from "@notra/ui/components/ui/svgs/amazon";
 import { Apple } from "@notra/ui/components/ui/svgs/apple";
 import { AppleDark } from "@notra/ui/components/ui/svgs/appleDark";
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
@@ -168,6 +169,7 @@ export function EngineIcon({ engine, className }: EngineIconProps) {
 const SIMPLE_ICONS: Partial<
   Record<EngineIconKey, ComponentType<SVGProps<SVGSVGElement>>>
 > = {
+  amazon: Amazon,
   exa: Exa,
   commoncrawl: CommonCrawl,
   youcom: YouCom,

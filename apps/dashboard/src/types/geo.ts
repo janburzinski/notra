@@ -1090,6 +1090,7 @@ export type EngineIconKey =
   | "claude"
   | "gemini"
   | "google"
+  | "amazon"
   | "perplexity"
   | "mistral"
   | "deepseek"
