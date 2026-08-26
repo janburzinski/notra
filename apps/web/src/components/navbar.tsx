@@ -384,14 +384,15 @@ export function Navbar({ variant }: NavbarProps = {}) {
     "text-[#1E1E1EA6] hover:text-[#1E1E1E] dark:text-neutral-400 dark:hover:text-white";
   let positionClass = "w-full sticky top-4";
   if (isLanding) {
-    positionClass = "fixed inset-x-4 sm:inset-x-6";
+    positionClass =
+      "fixed inset-x-4 [--navbar-top:1.5rem] sm:inset-x-6 sm:[--navbar-top:2.5rem]";
   } else if (isStatic) {
     positionClass = "w-full";
   }
   const shellAnimate = isLanding
     ? {
         maxWidth: chrome ? "64rem" : "80.9375rem",
-        top: chrome ? "1rem" : "2.5rem",
+        top: chrome ? "1rem" : "var(--navbar-top)",
       }
     : { maxWidth: chrome ? "64rem" : "80rem" };
   const rowHeightClass = isLandingTop ? "h-11 lg:h-[2.4375rem]" : "h-16";
@@ -669,7 +670,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
           {isOpen && (
             <m.div
               animate={{ opacity: 1, y: 0 }}
-              className={`absolute top-[calc(100%+0.5rem)] z-40 rounded-2xl bg-white p-3 shadow-[0_0.125rem_2.0625rem_#1E1E1E1A,0_0.0625rem_0.125rem_#28282814] ring-1 ring-[#1E1E1E14] lg:hidden dark:bg-neutral-950 dark:shadow-black/50 dark:ring-white/10 ${isLandingTop ? "inset-x-6" : "inset-x-4"}`}
+              className={`absolute top-[calc(100%+0.5rem)] z-40 max-h-[calc(100dvh-6.5rem)] overflow-y-auto overscroll-contain rounded-2xl bg-white p-3 pb-[max(1.75rem,env(safe-area-inset-bottom))] shadow-[0_0.125rem_2.0625rem_#1E1E1E1A,0_0.0625rem_0.125rem_#28282814] ring-1 ring-[#1E1E1E14] lg:hidden dark:bg-neutral-950 dark:shadow-black/50 dark:ring-white/10 ${isLandingTop ? "inset-x-6" : "inset-x-4"}`}
               exit={{ opacity: 0, y: -6 }}
               id="mobile-navigation"
               initial={{ opacity: 0, y: -6 }}

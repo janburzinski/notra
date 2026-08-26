@@ -157,22 +157,19 @@ export default function LandingPage() {
         </p>
         <LogoMarquee />
         <FounderQuote />
-        <section className="content-defer" id="features">
+        <section id="features">
           <FeaturesSection />
         </section>
-        <section className="content-defer" id="testimonials">
+        <section id="testimonials">
           <TestimonialsSection />
         </section>
-        <div className="content-defer">
+        <div>
           <LandingPricingSection />
         </div>
-        <section className="content-defer" id="faq">
+        <section id="faq">
           <FaqSection />
         </section>
-        <section
-          className="px-6 pt-27.5 pb-27.5 content-defer lg:px-20"
-          id="cta"
-        >
+        <section className="px-6 pt-27.5 pb-27.5 lg:px-20" id="cta">
           <CtaBanner />
         </section>
       </main>

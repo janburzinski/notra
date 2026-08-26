@@ -108,7 +108,7 @@ function ViewDocs() {
 export function FeaturesCardPublish() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
-      <div className="absolute top-21.5 left-51 grid h-88 w-164.5 gap-4 overflow-clip rounded-2xl bg-white p-4 [box-shadow:#1E1E1E1A_0rem_0.125rem_1.25rem,#1717171A_0rem_0rem_0rem_0.0625rem]">
+      <div className="absolute top-42 left-51 grid h-88 w-164.5 gap-4 overflow-clip rounded-2xl bg-white p-4 [box-shadow:#1E1E1E1A_0rem_0.125rem_1.25rem,#1717171A_0rem_0rem_0rem_0.0625rem] lg:top-21.5">
         <div>
           <div className="flex flex-col gap-2">
             <div className="font-medium font-sans text-[#171717] text-[1.125rem] leading-[133.333%]">
@@ -215,10 +215,10 @@ export function FeaturesCardPublish() {
           </svg>
         </div>
       </div>
-      <div className="-left-65.75 absolute top-31.5 flex w-110.25 flex-col gap-4 rounded-2xl border border-[#1717171A] bg-white p-4 [box-shadow:#1717170D_0rem_0.1875rem_0.9375rem_-0.125rem]">
+      <div className="-left-65.75 absolute top-51.5 flex w-110.25 flex-col gap-4 rounded-2xl border border-[#1717171A] bg-white p-4 [box-shadow:#1717170D_0rem_0.1875rem_0.9375rem_-0.125rem] lg:top-31.5">
         <div className="flex grow basis-[0%] flex-col gap-4">
           <div className="flex items-center justify-end self-stretch">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white [box-shadow:#0000000D_0rem_0rem_0rem_0.0625rem,#0000001A_0rem_0.25rem_0.625rem,#0000001A_0rem_0.0625rem_0.125rem_-0.0625rem]">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white [box-shadow:#0000000A_0rem_0.125rem_0.375rem,#0000000D_0rem_0rem_0rem_0.0625rem]">
               <svg
                 className="size-5 shrink-0 overflow-clip"
                 fill="none"
@@ -269,10 +269,10 @@ export function FeaturesCardPublish() {
           </div>
         </div>
       </div>
-      <div className="-left-42 absolute top-78 flex w-86.5 flex-col items-end justify-center gap-4 rounded-2xl border border-[#1717171A] bg-white p-4 [box-shadow:#1717170D_0rem_0.1875rem_0.9375rem_-0.125rem]">
+      <div className="-left-42 absolute top-98 flex w-86.5 flex-col items-end justify-center gap-4 rounded-2xl border border-[#1717171A] bg-white p-4 [box-shadow:#1717170D_0rem_0.1875rem_0.9375rem_-0.125rem] lg:top-78">
         <div className="flex grow basis-[0%] flex-col gap-4 self-stretch">
           <div className="flex items-start justify-end self-stretch">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white [box-shadow:#0000000D_0rem_0rem_0rem_0.0625rem,#0000001A_0rem_0.25rem_0.625rem,#0000001A_0rem_0.0625rem_0.125rem_-0.0625rem]">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white [box-shadow:#0000000A_0rem_0.125rem_0.375rem,#0000000D_0rem_0rem_0rem_0.0625rem]">
               <svg
                 className="size-5 shrink-0 overflow-clip"
                 fill="none"

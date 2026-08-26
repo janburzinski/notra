@@ -16,7 +16,7 @@ import {
 
 export function HeroCollageEventsPanel() {
   return (
-    <div className="relative z-10 h-[52rem] w-[28.125rem] shrink-0 overflow-hidden rounded-3xl border border-black/5 bg-background py-5 pr-8 pl-12 transition-transform duration-300 ease-out dark:border-white/10 lg:[transform:perspective(87.5rem)_rotateY(8deg)] lg:motion-safe:hover:[transform:perspective(87.5rem)_rotateY(3deg)_scale(1.03)]">
+    <div className="relative z-10 h-[52rem] w-[28.125rem] shrink-0 translate-x-28 overflow-hidden rounded-3xl border border-black/5 bg-background py-5 pr-8 pl-12 transition-transform duration-300 ease-out dark:border-white/10 lg:[transform:perspective(87.5rem)_rotateY(8deg)] lg:motion-safe:hover:[transform:perspective(87.5rem)_rotateY(3deg)_scale(1.03)]">
       <div className="mb-6 space-y-1">
         <h3 className="font-bold font-sans text-[1.375rem] text-foreground leading-[1.2] tracking-[-0.0375rem]">
           {HERO_COLLAGE_EVENTS.heading}
@@ -35,9 +35,9 @@ export function HeroCollageEventsPanel() {
         </span>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-lg border border-border/80 border-b-border/40 bg-muted/80 shadow-2xs">
+      <div className="mt-4 overflow-hidden rounded-lg border border-transparent bg-transparent shadow-none lg:border-border/80 lg:border-b-border/40 lg:bg-muted/80 lg:shadow-2xs">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-transparent lg:bg-muted/80">
             <TableRow>
               <TableHead>{HERO_COLLAGE_EVENTS.typeHeader}</TableHead>
               <TableHead>{HERO_COLLAGE_EVENTS.eventsHeader}</TableHead>

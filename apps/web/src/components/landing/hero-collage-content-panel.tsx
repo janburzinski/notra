@@ -16,7 +16,7 @@ const HEADER_CLASS = "text-muted-foreground text-xs uppercase tracking-wider";
 
 export function HeroCollageContentPanel() {
   return (
-    <div className="relative z-10 h-[51.4375rem] w-[28.125rem] shrink-0 overflow-hidden rounded-3xl border border-black/5 bg-background py-5 pr-12 pl-8 transition-transform duration-300 ease-out dark:border-white/10 lg:[transform:perspective(87.5rem)_rotateY(-8deg)] lg:motion-safe:hover:[transform:perspective(87.5rem)_rotateY(-3deg)_scale(1.03)]">
+    <div className="-translate-x-28 relative z-10 h-[51.4375rem] w-[28.125rem] shrink-0 overflow-hidden rounded-3xl border border-black/5 bg-background py-5 pr-12 pl-8 transition-transform duration-300 ease-out dark:border-white/10 lg:[transform:perspective(87.5rem)_rotateY(-8deg)] lg:motion-safe:hover:[transform:perspective(87.5rem)_rotateY(-3deg)_scale(1.03)]">
       <div className="mb-6 space-y-1">
         <h3 className="font-bold font-sans text-[1.375rem] text-foreground leading-[1.2] tracking-[-0.0375rem]">
           {HERO_COLLAGE_CONTENT.heading}
@@ -26,9 +26,9 @@ export function HeroCollageContentPanel() {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border/80 border-b-border/40 bg-muted/80 shadow-2xs">
+      <div className="overflow-hidden rounded-lg border border-transparent bg-transparent shadow-none lg:border-border/80 lg:border-b-border/40 lg:bg-muted/80 lg:shadow-2xs">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-transparent lg:bg-muted/80">
             <TableRow>
               <TableHead className={`${HEADER_CLASS} w-[14.5rem]`}>
                 {HERO_COLLAGE_CONTENT.nameHeader}

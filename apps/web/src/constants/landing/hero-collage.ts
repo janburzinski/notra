@@ -110,6 +110,20 @@ export const HERO_COLLAGE_PROFILE = {
     "Add any specific instructions for AI-generated content",
 };
 
+export const HERO_COLLAGE_TONE_OPTIONS = [
+  { label: "Professional", value: "Professional" },
+  { label: "Friendly", value: "Friendly" },
+  { label: "Casual", value: "Casual" },
+  { label: "Bold", value: "Bold" },
+];
+
+export const HERO_COLLAGE_LANGUAGE_OPTIONS = [
+  { flag: "🇺🇸", label: "English", value: "English" },
+  { flag: "🇩🇪", label: "German", value: "German" },
+  { flag: "🇪🇸", label: "Spanish", value: "Spanish" },
+  { flag: "🇫🇷", label: "French", value: "French" },
+];
+
 export const HERO_COLLAGE_EVENTS = {
   heading: "Events",
   subhead:

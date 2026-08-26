@@ -1,17 +1,35 @@
-import { ArrowDown01Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+"use client";
+
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@notra/ui/components/ui/select";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
-import { HERO_COLLAGE_PROFILE } from "@/constants/landing/hero-collage";
+import { useState } from "react";
+import {
+  HERO_COLLAGE_LANGUAGE_OPTIONS,
+  HERO_COLLAGE_PROFILE,
+  HERO_COLLAGE_TONE_OPTIONS,
+} from "@/constants/landing/hero-collage";
 
 function FieldValue({ value }: { value: string }) {
   return <Input defaultValue={value} />;
 }
 
 export function HeroCollageProfilePanel() {
+  const [isCustomTone, setIsCustomTone] = useState(false);
+  const [toneProfile, setToneProfile] = useState(
+    HERO_COLLAGE_PROFILE.toneProfileValue
+  );
+  const [language, setLanguage] = useState(HERO_COLLAGE_PROFILE.languageValue);
+
   return (
-    <div className="-mx-26 relative z-20 w-[30rem] shrink-0 self-center rounded-3xl border border-black/5 bg-background px-12 py-5 shadow-[0_0.125rem_4.4375rem_rgba(0,0,0,0.1)] transition-transform duration-300 ease-out lg:motion-safe:hover:scale-[1.02] dark:border-white/10">
+    <div className="-mx-26 relative z-20 w-[30rem] shrink-0 self-center rounded-3xl border border-black/5 bg-background px-12 py-5 shadow-none transition-transform duration-300 ease-out lg:shadow-[0_0.125rem_4.4375rem_rgba(0,0,0,0.1)] lg:motion-safe:hover:scale-[1.02] dark:border-white/10">
       <div className="mb-6 space-y-1">
         <h3 className="font-bold font-sans text-[1.375rem] text-foreground leading-[1.2] tracking-[-0.046875rem]">
           {HERO_COLLAGE_PROFILE.heading}
@@ -62,64 +80,141 @@ export function HeroCollageProfilePanel() {
 
         <TitleCard heading={HERO_COLLAGE_PROFILE.sectionTone}>
           <div className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <svg
-                    aria-hidden="true"
-                    className="size-3"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M5 13l4 4L19 7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+            <div aria-label="Tone mode" className="space-y-3" role="radiogroup">
+              <label className="flex w-fit cursor-pointer items-center gap-2 text-left">
+                <input
+                  checked={!isCustomTone}
+                  className="sr-only"
+                  name="hero-tone-mode"
+                  onChange={() => setIsCustomTone(false)}
+                  type="radio"
+                  value="profile"
+                />
+                <span
+                  className={
+                    isCustomTone
+                      ? "size-5 rounded-full border-2 border-muted-foreground/30"
+                      : "flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                  }
+                >
+                  {isCustomTone ? null : (
+                    <svg
+                      aria-hidden="true"
+                      className="size-3"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M5 13l4 4L19 7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
                 </span>
                 <span className="text-sm">
                   {HERO_COLLAGE_PROFILE.toneProfileLabel}
                 </span>
-              </div>
-              <div className="flex h-8 w-fit items-center justify-between gap-1.5 whitespace-nowrap rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm">
-                {HERO_COLLAGE_PROFILE.toneProfileValue}
-                <HugeiconsIcon
-                  className="size-4 text-muted-foreground"
-                  icon={UnfoldMoreIcon}
-                />
-              </div>
-            </div>
+              </label>
+              <Select
+                disabled={isCustomTone}
+                onValueChange={(value) => {
+                  if (value) {
+                    setToneProfile(value);
+                  }
+                }}
+                value={toneProfile}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent
+                  align="start"
+                  alignItemWithTrigger={false}
+                  className="min-w-30"
+                >
+                  {HERO_COLLAGE_TONE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <div className="space-y-3 pt-4">
-              <div className="flex items-center gap-2">
-                <span className="size-5 rounded-full border-2 border-muted-foreground/30" />
+              <label className="flex w-fit cursor-pointer items-center gap-2 pt-4 text-left">
+                <input
+                  checked={isCustomTone}
+                  className="sr-only"
+                  name="hero-tone-mode"
+                  onChange={() => setIsCustomTone(true)}
+                  type="radio"
+                  value="custom"
+                />
+                <span
+                  className={
+                    isCustomTone
+                      ? "flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                      : "size-5 rounded-full border-2 border-muted-foreground/30"
+                  }
+                >
+                  {isCustomTone ? (
+                    <svg
+                      aria-hidden="true"
+                      className="size-3"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M5 13l4 4L19 7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  ) : null}
+                </span>
                 <span className="text-sm">
                   {HERO_COLLAGE_PROFILE.customToneLabel}
                 </span>
-              </div>
+              </label>
               <Input
-                className="opacity-50"
+                className="transition-[color,background-color,border-color,box-shadow,opacity] duration-200 ease-out motion-reduce:transition-none"
+                disabled={!isCustomTone}
                 placeholder={HERO_COLLAGE_PROFILE.customTonePlaceholder}
               />
             </div>
 
             <div className="space-y-2 pt-4">
               <Label>{HERO_COLLAGE_PROFILE.languageLabel}</Label>
-              <div className="flex h-8 items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent px-3 text-sm">
-                <span className="flex items-center gap-2">
-                  <span className="text-base leading-none">
-                    {HERO_COLLAGE_PROFILE.languageFlag}
-                  </span>
-                  {HERO_COLLAGE_PROFILE.languageValue}
-                </span>
-                <HugeiconsIcon
-                  className="size-4 text-muted-foreground"
-                  icon={ArrowDown01Icon}
-                />
-              </div>
+              <Select
+                onValueChange={(value) => {
+                  if (value) {
+                    setLanguage(value);
+                  }
+                }}
+                value={language}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent
+                  align="start"
+                  alignItemWithTrigger={false}
+                  className="min-w-0"
+                >
+                  {HERO_COLLAGE_LANGUAGE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="text-base leading-none">
+                        {option.flag}
+                      </span>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2 pt-4">

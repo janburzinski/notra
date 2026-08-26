@@ -90,7 +90,7 @@ export function FeaturesSection() {
             <FeaturesCardAssets />
           </FeaturesCard>
           <FeaturesCard
-            containerClassName="h-98.25 w-full lg:w-110.25"
+            containerClassName="h-120 w-full lg:h-98.25 lg:w-110.25"
             copy={FEATURES_PUBLISH_COPY}
             shaderClassName="-top-4.5 -left-px"
             shaderColorFront="#FFEA0040"
