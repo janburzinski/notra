@@ -1,7 +1,7 @@
-const { defineConfig } = require("oxlint");
-const core = require("ultracite/oxlint/core").default;
-const next = require("ultracite/oxlint/next").default;
-const react = require("ultracite/oxlint/react").default;
+import { defineConfig } from "oxlint";
+import core from "ultracite/oxlint/core";
+import next from "ultracite/oxlint/next";
+import react from "ultracite/oxlint/react";
 
 // Keep Ultracite's provider metadata and deliberate opt-outs, then layer the
 // repository's existing policy on top. Enabling every rule from the newer Oxc
@@ -28,7 +28,7 @@ const reactProvider = {
   ),
 };
 
-module.exports = defineConfig({
+export default defineConfig({
   extends: [coreProvider, reactProvider, nextProvider],
   categories: {
     correctness: "error",

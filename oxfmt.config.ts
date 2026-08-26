@@ -1,7 +1,7 @@
-const { defineConfig } = require("oxfmt");
-const ultracite = require("ultracite/oxfmt").default;
+import { defineConfig } from "oxfmt";
+import ultracite from "ultracite/oxfmt";
 
-module.exports = defineConfig({
+export default defineConfig({
   ...ultracite,
   // Keep this migration mechanical. Oxfmt's sorting differs from the previous
   // Biome output and would otherwise rewrite unrelated source files.
