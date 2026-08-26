@@ -36,8 +36,5 @@
   },
   "[vue]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[svelte]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
   }
 }

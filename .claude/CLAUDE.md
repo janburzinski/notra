@@ -7,7 +7,7 @@ This project uses **Ultracite with its Oxlint and Oxfmt provider** for automated
 - **Format code**: `bun run format`
 - **Check for issues**: `bun run check`
 
-Ultracite provides the shared presets while Oxlint and Oxfmt perform the checks. Most formatting issues are automatically fixable.
+Ultracite provides the Oxc integration while Oxlint and Oxfmt perform the checks. The migration uses a compatibility profile so adopting the provider does not rewrite existing source or introduce unrelated lint failures.
 
 ---
 

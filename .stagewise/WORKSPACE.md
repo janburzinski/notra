@@ -112,8 +112,8 @@ consumedBy: dashboard auth/workflow emails
 - typing: strict TypeScript, Zod for runtime validation, schema-driven API  
 - errors: Zod validation errors in API responses, try-catch for async  
 - patterns: server/client split (app router), action functions in lib/email/actions.ts  
-- lint: Ultracite's Oxlint presets with project-specific compatibility rules in `oxlint.config.ts`
-- formatting: Ultracite's Oxfmt preset configured in `oxfmt.config.ts`
+- lint: Ultracite's Oxlint provider with the existing project policy preserved in `oxlint.config.ts`
+- formatting: Ultracite's Oxfmt preset with temporary no-churn exclusions in `oxfmt.config.ts`
 
 ---
 
@@ -188,8 +188,8 @@ integrate external service → `apps/dashboard/src/lib/` (new module)
 `packages/typescript-config/base.json` → TypeScript base config | extended by all apps/packages | tsconfig root  
 
 `turbo.json` → Workspace tasks (build, dev, check-types), global env vars, task dependencies | orchestration  
-`oxlint.config.ts` → Ultracite Oxlint presets, compatibility rules, and file exclusions | code quality
-`oxfmt.config.ts` → Ultracite Oxfmt preset and compatibility exclusions | formatting
+`oxlint.config.ts` → Ultracite Oxlint provider, compatibility rules, and file exclusions | code quality
+`oxfmt.config.ts` → Ultracite Oxfmt preset and temporary compatibility exclusions | formatting
 `.github/workflows/code-quality.yml` → CI: bun install, `bun check` | automated code quality
 
 ---

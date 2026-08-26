@@ -3,6 +3,8 @@ const ultracite = require("ultracite/oxfmt").default;
 
 module.exports = defineConfig({
   ...ultracite,
+  // Keep this migration mechanical. Oxfmt's sorting differs from the previous
+  // Biome output and would otherwise rewrite unrelated source files.
   sortImports: false,
   sortPackageJson: false,
   sortTailwindcss: false,
@@ -14,6 +16,9 @@ module.exports = defineConfig({
     "packages/db/migrations/**",
     ".temp/**",
     "**/*.{astro,md,mdx,yaml,yml}",
+    // Temporary compatibility exclusions for files where Oxfmt's output
+    // differs from the checked-in Biome formatting. Remove these in a
+    // dedicated formatter-only change so feature PRs do not conflict.
     "apps/agent/agent/lib/utils/slack-post-x.ts",
     "apps/console/src/types/store.ts",
     "apps/dashboard/src/components/affected-triggers-warning.tsx",
