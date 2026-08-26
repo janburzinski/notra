@@ -57,6 +57,7 @@ export const ZDR_ADDON_BY_TIER: Record<string, string> = {
 export const ZDR_ADDON_PREFIX = "zdr_";
 export const ANNUAL_ADDON_SUFFIX = "_annual";
 export const ZDR_ADDON_ANCHOR = "zdr";
+export const ZDR_CHECKOUT_SUCCESS_PARAM = "zdrCheckout";
 export const PLANS_ANCHOR = "plans";
 export const ZDR_ADDON_TITLE = "Zero data retention";
 export const ZDR_ADDON_DESCRIPTION =

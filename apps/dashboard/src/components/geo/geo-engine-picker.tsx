@@ -23,7 +23,7 @@ import {
 import { useCustomer } from "autumn-js/react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ZdrConsentDialog } from "@/components/billing/zdr-consent-dialog";
 import { EngineIcon } from "@/components/geo/engine-icon";
@@ -33,7 +33,11 @@ import {
 } from "@/components/geo/provider-wordmark";
 import { Checkbox } from "@/components/motion/checkbox";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { ZDR_ADDON_ADD_SUCCESS, ZDR_ADDON_ANCHOR } from "@/constants/billing";
+import {
+  ZDR_ADDON_ADD_SUCCESS,
+  ZDR_ADDON_ANCHOR,
+  ZDR_CHECKOUT_SUCCESS_PARAM,
+} from "@/constants/billing";
 import { GEO_PICKER_VISIBLE_MODELS } from "@/constants/geo-model-catalog";
 import { cn } from "@/lib/utils";
 import type {
@@ -166,6 +170,7 @@ export function GeoEnginePicker({
   const { attach, data: customer, refetch } = useCustomer();
   const [addonLoading, setAddonLoading] = useState(false);
   const [consentOpen, setConsentOpen] = useState(false);
+  const checkoutReturnHandled = useRef(false);
   const [expanded, setExpanded] = useState<Set<string>>(() =>
     partiallySelectedProviders(catalog, selected)
   );
@@ -271,17 +276,36 @@ export function GeoEnginePicker({
     setPendingApproval(null);
   };
 
-  const handleZdrChange = (next: boolean) => {
-    onEnforceZdrChange(next);
-    if (next) {
-      onChange(
-        applyGeoZdrEngineFallback(catalog, selected, {
-          enforceZdr: true,
-          nonZdrApprovedEngines: nonZdrApproved,
-        })
-      );
+  const handleZdrChange = useCallback(
+    (next: boolean) => {
+      onEnforceZdrChange(next);
+      if (next) {
+        onChange(
+          applyGeoZdrEngineFallback(catalog, selected, {
+            enforceZdr: true,
+            nonZdrApprovedEngines: nonZdrApproved,
+          })
+        );
+      }
+    },
+    [catalog, nonZdrApproved, onChange, onEnforceZdrChange, selected]
+  );
+
+  useEffect(() => {
+    if (checkoutReturnHandled.current || !canEnforceZdr) {
+      return;
     }
-  };
+
+    const returnUrl = new URL(window.location.href);
+    if (returnUrl.searchParams.get(ZDR_CHECKOUT_SUCCESS_PARAM) !== "true") {
+      return;
+    }
+
+    checkoutReturnHandled.current = true;
+    handleZdrChange(true);
+    returnUrl.searchParams.delete(ZDR_CHECKOUT_SUCCESS_PARAM);
+    window.history.replaceState(null, "", returnUrl);
+  }, [canEnforceZdr, handleZdrChange]);
 
   const handleAddZdr = async () => {
     const activeSubscription = findActivePlanSubscription(
@@ -295,13 +319,14 @@ export function GeoEnginePicker({
 
     setAddonLoading(true);
     const successUrl = activeOrganization?.slug
-      ? `${window.location.origin}/${activeOrganization.slug}/geo/settings`
+      ? new URL(window.location.href)
       : undefined;
+    successUrl?.searchParams.set(ZDR_CHECKOUT_SUCCESS_PARAM, "true");
     try {
       const result = await attach({
         planId: addonPlanId,
         redirectMode: "if_required",
-        successUrl,
+        successUrl: successUrl?.toString(),
       });
       if (result.paymentUrl) {
         window.location.assign(result.paymentUrl);
