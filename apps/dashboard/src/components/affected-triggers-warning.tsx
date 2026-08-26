@@ -67,7 +67,8 @@ export function AffectedTriggersWarning({
             return `These schedules use this ${resourceLabel} and will be disabled.`;
           }
           return `These events use this ${resourceLabel} and will be disabled.`;
-        })()} You&apos;ll need to edit them before re-enabling.
+        })()}{" "}
+        You&apos;ll need to edit them before re-enabling.
       </p>
     </div>
   );

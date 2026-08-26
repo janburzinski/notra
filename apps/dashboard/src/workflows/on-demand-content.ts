@@ -102,8 +102,8 @@ export async function onDemandContentWorkflow(
 
   const hasLinearSources = Boolean(
     dataPoints.includeLinearData &&
-      linearIntegrationIds &&
-      linearIntegrationIds.length > 0
+    linearIntegrationIds &&
+    linearIntegrationIds.length > 0
   );
 
   if (repositories.length === 0 && !hasLinearSources) {

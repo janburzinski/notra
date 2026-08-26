@@ -242,13 +242,11 @@ export async function pollIrisSourcesStep(input: {
   "use step";
   return await Effect.runPromise(
     pollIrisSources({ organizationId: input.organizationId }).pipe(
-      Effect.map(
-        (result): IrisPollSummary => ({
-          recordedCount: result.recordedCount,
-          deduplicatedCount: result.deduplicatedCount,
-          sources: result.sources.map((source) => source.source),
-        })
-      ),
+      Effect.map((result): IrisPollSummary => ({
+        recordedCount: result.recordedCount,
+        deduplicatedCount: result.deduplicatedCount,
+        sources: result.sources.map((source) => source.source),
+      })),
       Effect.catch((error) =>
         Effect.annotateLogs(Effect.logWarning("iris.poll.failed"), {
           organizationId: input.organizationId,
