@@ -20,9 +20,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { useCustomer } from "autumn-js/react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useId, useState } from "react";
+import { toast } from "sonner";
+import { ZdrConsentDialog } from "@/components/billing/zdr-consent-dialog";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import {
   hasProviderWordmark,
@@ -30,7 +33,7 @@ import {
 } from "@/components/geo/provider-wordmark";
 import { Checkbox } from "@/components/motion/checkbox";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { ZDR_ADDON_ANCHOR } from "@/constants/billing";
+import { ZDR_ADDON_ADD_SUCCESS, ZDR_ADDON_ANCHOR } from "@/constants/billing";
 import { GEO_PICKER_VISIBLE_MODELS } from "@/constants/geo-model-catalog";
 import { cn } from "@/lib/utils";
 import type {
@@ -38,6 +41,10 @@ import type {
   GeoModelCatalog,
   GeoModelCatalogEntry,
 } from "@/types/geo";
+import {
+  findActivePlanSubscription,
+  zdrAddonPlanId,
+} from "@/utils/billing-plans";
 import {
   applyGeoZdrEngineFallback,
   sortKnownEngines,
@@ -156,6 +163,9 @@ export function GeoEnginePicker({
   const id = useId();
   const reduceMotion = useReducedMotion();
   const { activeOrganization } = useOrganizationsContext();
+  const { attach, data: customer, refetch } = useCustomer();
+  const [addonLoading, setAddonLoading] = useState(false);
+  const [consentOpen, setConsentOpen] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(() =>
     partiallySelectedProviders(catalog, selected)
   );
@@ -271,6 +281,43 @@ export function GeoEnginePicker({
         })
       );
     }
+  };
+
+  const handleAddZdr = async () => {
+    const activeSubscription = findActivePlanSubscription(
+      customer?.subscriptions
+    );
+    const addonPlanId = zdrAddonPlanId(activeSubscription?.planId);
+    if (!addonPlanId) {
+      toast.error("Choose a plan before adding zero data retention.");
+      return;
+    }
+
+    setAddonLoading(true);
+    const successUrl = activeOrganization?.slug
+      ? `${window.location.origin}/${activeOrganization.slug}/geo/settings`
+      : undefined;
+    try {
+      const result = await attach({
+        planId: addonPlanId,
+        redirectMode: "if_required",
+        successUrl,
+      });
+      if (result.paymentUrl) {
+        window.location.assign(result.paymentUrl);
+        return;
+      }
+      await refetch();
+      handleZdrChange(true);
+      toast.success(ZDR_ADDON_ADD_SUCCESS);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not add zero data retention. Please try again."
+      );
+    }
+    setAddonLoading(false);
   };
 
   const hiddenProviders = catalog.providers.filter(
@@ -584,17 +631,14 @@ export function GeoEnginePicker({
             />
           ) : (
             <Tooltip>
-              <TooltipTrigger
-                aria-disabled="true"
-                className="inline-flex cursor-not-allowed"
-                type="button"
-              >
+              <TooltipTrigger render={<span className="inline-flex" />}>
                 <Switch
-                  aria-hidden="true"
+                  aria-label="Add zero data retention"
                   checked={false}
-                  disabled
+                  className="cursor-pointer disabled:cursor-not-allowed"
+                  disabled={disabled || planLoading || addonLoading}
                   id={`${id}-zdr`}
-                  tabIndex={-1}
+                  onCheckedChange={() => setConsentOpen(true)}
                 />
               </TooltipTrigger>
               <TooltipContent side="top">
@@ -606,6 +650,12 @@ export function GeoEnginePicker({
           )}
         </div>
       </div>
+
+      <ZdrConsentDialog
+        onConfirm={handleAddZdr}
+        onOpenChange={setConsentOpen}
+        open={consentOpen}
+      />
 
       <AlertDialog
         onOpenChange={(open) => {
