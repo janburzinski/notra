@@ -6,7 +6,6 @@ import {
   enum as enumType,
   number,
   object,
-  record,
   string,
 } from "zod";
 import {
@@ -44,7 +43,6 @@ const geoWindowFields = {
   from: string().regex(GEO_DAY_STRING_REGEX).optional(),
   to: string().regex(GEO_DAY_STRING_REGEX).optional(),
 };
-const MAX_MODEL_USAGE_LIMIT = 50;
 const MAX_AI_TRAFFIC_LOG_LIMIT = 200;
 const MAX_AI_TRAFFIC_PAGES_LIMIT = 100;
 const MAX_AI_TRAFFIC_JOURNEYS_LIMIT = 100;
@@ -273,46 +271,6 @@ export const geoWebsiteDiscoverySchema = object({
   )
     .min(GEO_DISCOVERY_MIN_PROMPTS)
     .max(GEO_DISCOVERY_MAX_PROMPTS),
-});
-
-export const geoModelUsageInputSchema = geoOrganizationInputSchema.extend({
-  ...geoWindowFields,
-  limit: number().int().min(1).max(MAX_MODEL_USAGE_LIMIT).optional(),
-});
-
-export const openRouterRankingsResponseSchema = object({
-  meta: object({
-    as_of: string().min(1),
-    start_date: string().min(1),
-    end_date: string().min(1),
-  }),
-  data: array(
-    object({
-      date: string().min(1),
-      model_permaslug: string().min(1),
-      total_tokens: string().min(1),
-    })
-  ),
-});
-
-export const openRouterRankingsChartSchema = object({
-  data: object({
-    data: array(
-      object({
-        x: string().min(1),
-        ys: record(string(), number()),
-      })
-    ),
-  }),
-});
-
-export const openRouterModelsResponseSchema = object({
-  data: array(
-    object({
-      id: string().min(1),
-      canonical_slug: string().min(1).nullable().optional(),
-    })
-  ),
 });
 
 export const geoJudgeResultSchema = object({

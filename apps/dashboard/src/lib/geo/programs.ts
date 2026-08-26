@@ -7,8 +7,6 @@ import {
   queryGeoTrafficOverview,
   queryGeoTrafficPages,
   queryGeoTrafficTimeseries,
-  queryModelUsageLatest,
-  queryModelUsageTrend,
 } from "@notra/analytics/tinybird/client";
 import { db } from "@notra/db/drizzle";
 import {
@@ -37,15 +35,11 @@ import {
   GEO_COMPETITOR_DETAIL_DAYS,
   GEO_COMPETITOR_SHARE_LIMIT,
   GEO_JOURNEY_DETAIL_LIMIT,
-  GEO_MODEL_USAGE_ATTRIBUTION,
-  GEO_MODEL_USAGE_DEFAULT_LIMIT,
-  GEO_MODEL_USAGE_SOURCE,
-  GEO_MODEL_USAGE_TREND_WEEKS,
 } from "@/constants/geo";
 import { GEO_MODEL_CATALOG_STATIC } from "@/constants/geo-model-catalog";
 import { hasZdrEntitlement } from "@/lib/billing/subscription";
 import { competitorKey } from "@/lib/geo/domain";
-import { geoDb, geoQuery, geoSkip } from "@/lib/geo/effect";
+import { geoDb, geoQuery } from "@/lib/geo/effect";
 import {
   GeoPromptCreateFailedError,
   GeoPromptNotFoundError,
@@ -57,12 +51,10 @@ import {
   toGeoCompetitor,
   toGeoSettings,
   toGeoTrafficLogEntry,
-  toModelUsageRow,
   toNullableNumber,
   toTrackedPrompt,
 } from "@/lib/geo/mappers";
 import { loadGeoModelCatalog } from "@/lib/geo/model-catalog";
-import { loadModelUsageRows } from "@/lib/geo/model-usage";
 import {
   ensureGeoProject,
   geoCheckScope,
@@ -85,7 +77,6 @@ import type {
   GeoCompetitorUpsertInput,
   GeoJourneyDetailResponse,
   GeoLanguageShareResponse,
-  GeoModelUsageResponse,
   GeoOverviewResponse,
   GeoPromptResultsResponse,
   GeoScopeInput,
@@ -630,96 +621,6 @@ export const loadGeoCompetitorDetail = Effect.fn("geo.competitorDetail")(
     return response;
   }
 );
-
-export const loadGeoModelUsage = Effect.fn("geo.modelUsage")(function* (
-  input: GeoScopeInput,
-  _window: GeoWindowInput,
-  limit: number | undefined
-) {
-  yield* resolveGeoScope(input);
-  const resolvedLimit = limit ?? GEO_MODEL_USAGE_DEFAULT_LIMIT;
-  const liveRows = yield* loadModelUsageRows().pipe(
-    geoSkip("model usage source unavailable")
-  );
-
-  if (!liveRows || liveRows.length === 0) {
-    const [usage, trend] = yield* Effect.all(
-      [
-        geoQuery("model usage fallback query failed", () =>
-          queryModelUsageLatest({
-            source: GEO_MODEL_USAGE_SOURCE,
-            limit: resolvedLimit,
-          })
-        ),
-        geoQuery("model usage trend fallback query failed", () =>
-          queryModelUsageTrend({
-            source: GEO_MODEL_USAGE_SOURCE,
-            weeks: GEO_MODEL_USAGE_TREND_WEEKS,
-          })
-        ),
-      ],
-      { concurrency: "unbounded" }
-    );
-    const rows = usage?.data ?? [];
-
-    const fallback: GeoModelUsageResponse = {
-      configured: isTinybirdConfigured(),
-      source: GEO_MODEL_USAGE_SOURCE,
-      attribution: GEO_MODEL_USAGE_ATTRIBUTION,
-      capturedAt: rows[0]?.captured_at ?? null,
-      models: rows.map((row) =>
-        toModelUsageRow(row.model, row.rank, Number(row.share), row.raw_tokens)
-      ),
-      points: (trend?.data ?? []).map((row) => ({
-        week: String(row.week).slice(0, 10),
-        model: row.model,
-        share: Number(row.avg_share),
-        tokens: row.peak_tokens === null ? null : Number(row.peak_tokens),
-      })),
-    };
-    return fallback;
-  }
-
-  const rows = liveRows;
-  const capturedAt = rows.reduce<string | null>(
-    (latest, row) =>
-      latest === null || row.captured_at > latest ? row.captured_at : latest,
-    null
-  );
-  const latestRows = rows
-    .filter((row) => row.captured_at === capturedAt)
-    .sort((left, right) => Number(left.rank) - Number(right.rank))
-    .slice(0, resolvedLimit);
-  const featuredModels = new Set(latestRows.map((row) => row.model));
-  const visibleWeeks = new Set(
-    [...new Set(rows.map((row) => row.captured_at))]
-      .sort()
-      .slice(-GEO_MODEL_USAGE_TREND_WEEKS)
-  );
-  const points = rows.reduce<GeoModelUsageResponse["points"]>((result, row) => {
-    if (visibleWeeks.has(row.captured_at) && featuredModels.has(row.model)) {
-      result.push({
-        week: row.captured_at.slice(0, 10),
-        model: row.model,
-        share: Number(row.share),
-        tokens: row.raw_tokens === null ? null : Number(row.raw_tokens),
-      });
-    }
-    return result;
-  }, []);
-
-  const response: GeoModelUsageResponse = {
-    configured: rows.length > 0,
-    source: GEO_MODEL_USAGE_SOURCE,
-    attribution: GEO_MODEL_USAGE_ATTRIBUTION,
-    capturedAt,
-    models: latestRows.map((row) =>
-      toModelUsageRow(row.model, row.rank, Number(row.share), row.raw_tokens)
-    ),
-    points,
-  };
-  return response;
-});
 
 export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
   input: GeoScopeInput,

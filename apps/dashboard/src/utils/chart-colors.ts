@@ -5,7 +5,6 @@ import {
   CHART_PRIMARY_COLOR,
   CHART_SEARCH_FILL_CLASS,
   CHART_SECONDARY_COLOR,
-  MODEL_USAGE_SERIES_COLORS,
 } from "@/constants/charts";
 import type { ChartColorPair, ChartSeriesColors } from "@/types/charts";
 
@@ -30,11 +29,4 @@ export function accountSeriesColorPair(index: number): ChartColorPair {
 
 export function accountSeriesColors(index: number): ChartSeriesColors {
   return seriesColors(accountSeriesColorPair(index));
-}
-
-export function modelUsageSeriesColors(index: number): ChartSeriesColors {
-  return seriesColors(
-    MODEL_USAGE_SERIES_COLORS[index % MODEL_USAGE_SERIES_COLORS.length] ??
-      CHART_MUTED_COLOR
-  );
 }

@@ -203,23 +203,6 @@ export const socialPostSources = defineDatasource("social_post_sources", {
   }),
 });
 
-export const modelUsageShare = defineDatasource("model_usage_share", {
-  description:
-    "Industry-wide AI model usage snapshots. Intentionally has no organization_id: model usage share is global market data, identical for every organization",
-  schema: {
-    captured_at: t.dateTime(),
-    source: t.string().lowCardinality(),
-    model: t.string(),
-    rank: t.uint64(),
-    share: t.float64(),
-    raw_tokens: t.uint64().nullable(),
-  },
-  engine: engine.mergeTree({
-    sortingKey: ["source", "captured_at", "model"],
-    partitionKey: "toYYYYMM(captured_at)",
-  }),
-});
-
 export const aiTrafficEvents = defineDatasource("ai_traffic_events", {
   description:
     "Append-only log of AI agent requests to an organization's site, one row per detected hit",
@@ -336,6 +319,5 @@ export type SocialAccountStatsRow = InferRow<typeof socialAccountStats>;
 export type SocialPostRow = InferRow<typeof socialPosts>;
 export type SocialPostStatsRow = InferRow<typeof socialPostStats>;
 export type SocialPostSourceRow = InferRow<typeof socialPostSources>;
-export type ModelUsageShareRow = InferRow<typeof modelUsageShare>;
 export type AiTrafficEventRow = InferRow<typeof aiTrafficEvents>;
 export type GeoTrafficEventRow = InferRow<typeof geoTrafficEvents>;

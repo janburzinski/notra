@@ -13,10 +13,6 @@ import type {
   geoTrafficTimeseries,
 } from "../tinybird/pipes/geo-traffic";
 import type {
-  modelUsageLatest,
-  modelUsageTrend,
-} from "../tinybird/pipes/model-usage";
-import type {
   accountLeaderboard,
   engagementTimeseries,
   followerGrowth,
@@ -43,10 +39,6 @@ export type TopPostsParams = InferParams<typeof topPosts>;
 export type TopPostsRow = InferOutputRow<typeof topPosts>;
 export type FollowerGrowthParams = InferParams<typeof followerGrowth>;
 export type FollowerGrowthRow = InferOutputRow<typeof followerGrowth>;
-export type ModelUsageLatestParams = InferParams<typeof modelUsageLatest>;
-export type ModelUsageLatestRow = InferOutputRow<typeof modelUsageLatest>;
-export type ModelUsageTrendParams = InferParams<typeof modelUsageTrend>;
-export type ModelUsageTrendRow = InferOutputRow<typeof modelUsageTrend>;
 
 export type NotraAdoptionRow = InferOutputRow<typeof notraAdoption>;
 export type PostMetricsLookupRow = InferOutputRow<typeof postMetricsLookup>;

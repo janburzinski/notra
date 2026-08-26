@@ -35,7 +35,6 @@ import type {
   GeoJourneyDetailResponse,
   GeoLanguageShareResponse,
   GeoModelCatalog,
-  GeoModelUsageResponse,
   GeoOnboardingBrandInput,
   GeoOnboardingBrandResult,
   GeoOverviewResponse,
@@ -134,9 +133,6 @@ async function invalidateGeoScanResultQueries(queryClient: QueryClient) {
     }),
     queryClient.invalidateQueries({
       queryKey: dashboardOrpc.geo.languageShare.key(),
-    }),
-    queryClient.invalidateQueries({
-      queryKey: dashboardOrpc.geo.modelUsage.key(),
     }),
   ]);
 }
@@ -382,18 +378,6 @@ export function useGeoLanguageShare(
     enabled: !!organizationId,
     placeholderData: keepPreviousData,
     meta: { errorMessage: "Failed to load language performance" },
-  });
-}
-
-export function useModelUsage(organizationId: string, range?: GeoRangeQuery) {
-  const { projectId } = useGeoProjectScope();
-  return useQuery<GeoModelUsageResponse>({
-    ...dashboardOrpc.geo.modelUsage.queryOptions({
-      input: { organizationId, projectId, ...toGeoWindowInput(range) },
-    }),
-    enabled: !!organizationId,
-    placeholderData: keepPreviousData,
-    meta: { errorMessage: "Failed to load model usage share" },
   });
 }
 

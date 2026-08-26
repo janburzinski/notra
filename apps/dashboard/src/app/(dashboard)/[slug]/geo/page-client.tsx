@@ -28,7 +28,6 @@ import {
   useGeoTimeseries,
   useGeoTrafficJourneys,
   useIsGeoScanning,
-  useModelUsage,
 } from "@/lib/hooks/use-geo";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useGeoRange } from "@/lib/hooks/use-geo-range";
@@ -78,7 +77,6 @@ function GeoPageContent({ organizationSlug }: GeoPageContentProps) {
     organizationId,
     geoRange.query
   );
-  const { data: modelUsage } = useModelUsage(organizationId, geoRange.query);
   const { data: trafficJourneys } = useGeoTrafficJourneys(
     organizationId,
     geoRange.query
@@ -163,7 +161,6 @@ function GeoPageContent({ organizationSlug }: GeoPageContentProps) {
           isScanning={isScanning}
           journeys={trafficJourneys?.journeys ?? []}
           languagePoints={languageShare?.points ?? []}
-          modelUsage={modelUsage}
           onActiveTabChange={setActiveTab}
           organizationId={organizationId}
           organizationSlug={organizationSlug}

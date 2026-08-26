@@ -24,10 +24,6 @@ import type {
   GeoTrafficPagesParams,
   GeoTrafficPagesRow,
   GeoTrafficTimeseriesRow,
-  ModelUsageLatestParams,
-  ModelUsageLatestRow,
-  ModelUsageTrendParams,
-  ModelUsageTrendRow,
   NotraAdoptionRow,
   PostingPerformanceParams,
   PostingPerformanceRow,
@@ -42,8 +38,6 @@ import {
   aiTrafficEvents,
   type GeoTrafficEventRow,
   geoTrafficEvents,
-  type ModelUsageShareRow,
-  modelUsageShare,
   type SocialAccountRow,
   type SocialAccountStatsRow,
   type SocialPostRow,
@@ -68,7 +62,6 @@ import {
   geoTrafficPages,
   geoTrafficTimeseries,
 } from "./pipes/geo-traffic";
-import { modelUsageLatest, modelUsageTrend } from "./pipes/model-usage";
 import {
   accountLeaderboard,
   engagementTimeseries,
@@ -98,7 +91,6 @@ function createTinybirdClient() {
       socialPosts,
       socialPostStats,
       socialPostSources,
-      modelUsageShare,
       aiTrafficEvents,
       geoTrafficEvents,
     },
@@ -111,8 +103,6 @@ function createTinybirdClient() {
       notraAdoption,
       postMetricsLookup,
       accountLeaderboard,
-      modelUsageLatest,
-      modelUsageTrend,
       aiTrafficOverview,
       aiTrafficTimeseries,
       aiTrafficLog,
@@ -230,14 +220,6 @@ export function ingestSocialPostSources(
     "social",
     rows.map((row) => row.organization_id),
     (client, batch) => client.socialPostSources.ingestBatch(batch)
-  );
-}
-
-export function ingestModelUsageShare(
-  rows: ModelUsageShareRow[]
-): Promise<IngestResult | null> {
-  return ingestRows(rows, "model", [null], (client, batch) =>
-    client.modelUsageShare.ingestBatch(batch)
   );
 }
 
@@ -364,26 +346,6 @@ export function queryPostMetricsLookup(params: {
         organization_id: params.organization_id,
         post_ids: [params.post_ids.join(",")],
       })
-  );
-}
-
-export function queryModelUsageLatest(
-  params: ModelUsageLatestParams
-): Promise<QueryResult<ModelUsageLatestRow> | null> {
-  return cachedPipeQuery(
-    "model",
-    "model_usage_latest",
-    params,
-    null,
-    (client) => client.modelUsageLatest.query(params)
-  );
-}
-
-export function queryModelUsageTrend(
-  params: ModelUsageTrendParams
-): Promise<QueryResult<ModelUsageTrendRow> | null> {
-  return cachedPipeQuery("model", "model_usage_trend", params, null, (client) =>
-    client.modelUsageTrend.query(params)
   );
 }
 

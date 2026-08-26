@@ -12,7 +12,6 @@ import { EngineRateTable } from "@/components/geo/engine-rate-table";
 import { JourneysCard } from "@/components/geo/journeys-card";
 import { LanguagePerformanceCard } from "@/components/geo/language-performance-card";
 import { MentionTrendCard } from "@/components/geo/mention-trend-card";
-import { ModelUsageCard } from "@/components/geo/model-usage-card";
 import { PromptFunnelCard } from "@/components/geo/prompt-funnel-card";
 import { PromptResultsPreview } from "@/components/geo/prompt-results-preview";
 import { ShareOfVoiceCard } from "@/components/geo/share-of-voice-card";
@@ -67,7 +66,6 @@ export function GeoTabs({
   promptResults,
   promptCount,
   isScanning,
-  modelUsage,
   journeys,
   organizationId,
 }: GeoTabsProps) {
@@ -140,9 +138,6 @@ export function GeoTabs({
             />
           </TabSection>
         </InstrumentGrid>
-        <TabSection active={revealActive} order={4}>
-          <ModelUsageCard usage={modelUsage} />
-        </TabSection>
       </TabsContent>
 
       <TabsContent className="mt-6 flex flex-col gap-6" value="prompts">

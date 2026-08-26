@@ -6,7 +6,7 @@ import type { GeoContentBriefStatus } from "@notra/db/types/geo-writer";
 import type { GeoRequestPayload } from "@usenotra/geo";
 import type { LanguageModel, ToolSet } from "ai";
 import type { ReactNode } from "react";
-import type { ChartColorPair, ChartConfig } from "@/types/charts";
+import type { ChartColorPair } from "@/types/charts";
 
 export interface GeoProject {
   id: string;
@@ -549,52 +549,6 @@ export interface GeoBrandSearchResponse {
   results: GeoBrandSearchResult[];
 }
 
-export interface GeoModelUsageRow {
-  model: string;
-  label: string;
-  rank: number;
-  share: number;
-  rawTokens: number | null;
-  scanned: boolean;
-  mentionRate: number | null;
-  checks: number;
-}
-
-export interface GeoModelUsagePoint {
-  week: string;
-  model: string;
-  share: number;
-  tokens: number | null;
-}
-
-export interface GeoModelUsageResponse {
-  configured: boolean;
-  source: string;
-  attribution: string;
-  capturedAt: string | null;
-  models: GeoModelUsageRow[];
-  points: GeoModelUsagePoint[];
-}
-
-export interface ModelUsageChartRow {
-  week: string;
-  rawWeek: string;
-  [key: string]: string | number;
-}
-
-export interface ModelUsageChartSeries {
-  key: string;
-  model: string;
-  label: string;
-}
-
-export interface ModelUsageChart {
-  rows: ModelUsageChartRow[];
-  series: ModelUsageChartSeries[];
-  metric: "tokens" | "share";
-  incompleteTail: boolean;
-}
-
 export interface GeoJudgeResult {
   mentioned: boolean;
   position: number | null;
@@ -925,17 +879,6 @@ export interface GeoLanguageShareResponse {
   points: GeoLanguageSharePoint[];
 }
 
-export interface ModelUsageCardProps {
-  usage: GeoModelUsageResponse | undefined;
-}
-
-export interface ModelUsageLegendProps {
-  series: ModelUsageChartSeries[];
-  config: ChartConfig;
-  hoveredKey: string | null;
-  onHoverKeyChange: (key: string | null) => void;
-}
-
 export interface LanguagePerformanceCardProps {
   points: GeoLanguageSharePoint[];
   organizationId: string;
@@ -1005,7 +948,6 @@ export interface GeoTabsProps {
   promptResults: GeoPromptResult[];
   promptCount: number;
   isScanning: boolean;
-  modelUsage: GeoModelUsageResponse | undefined;
   journeys: GeoJourney[];
   organizationId: string;
 }

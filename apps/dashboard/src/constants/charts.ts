@@ -36,19 +36,6 @@ export const ACCOUNT_SERIES_COLORS: readonly ChartColorPair[] = [
   { light: "#6B6B75", dark: "#9A9AA4" },
 ];
 
-export const MODEL_USAGE_SERIES_COLORS: readonly ChartColorPair[] = [
-  { light: "#E85D8A", dark: "#F0719C" },
-  { light: "#358FF3", dark: "#5AA6F6" },
-  { light: "#1FA85B", dark: "#3ED187" },
-  { light: "#E07B1A", dark: "#FF9F45" },
-  { light: "#DB3FA3", dark: "#F062BE" },
-  { light: "#DC4343", dark: "#F06A6A" },
-  SERIES_GOLD,
-  { light: "#3A6FF0", dark: "#5B8AF5" },
-  { light: "#2E9E5B", dark: "#4BC87A" },
-  { light: "#D4348B", dark: "#E85BA6" },
-];
-
 export const CHART_OTHER_SLICE_LABEL = "Other";
 
 export const CHART_PERCENT_SCALE = 100;

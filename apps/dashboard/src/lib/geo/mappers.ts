@@ -3,7 +3,6 @@ import type {
   GeoCompetitor,
   GeoCompetitorRow,
   GeoModelCatalog,
-  GeoModelUsageRow,
   GeoProject,
   GeoProjectRow,
   GeoPromptRow,
@@ -17,7 +16,6 @@ import type {
 import { toGeoVisitorType } from "@/utils/ai-traffic";
 import { resolveTrackedEngines } from "@/utils/geo-engines";
 import { trackedGeoLanguages } from "@/utils/geo-language-rows";
-import { formatModelLabel } from "@/utils/geo-model-display";
 import { isGeoScanRunning } from "@/utils/geo-scan";
 
 export function toGeoProject(row: GeoProjectRow): GeoProject {
@@ -111,22 +109,4 @@ export function toNullableNumber(value: number | bigint | null): number | null {
     return null;
   }
   return Number(value);
-}
-
-export function toModelUsageRow(
-  model: string,
-  rank: number | bigint,
-  share: number,
-  rawTokens: number | bigint | null
-): GeoModelUsageRow {
-  return {
-    model,
-    label: formatModelLabel(model),
-    rank: Number(rank),
-    share,
-    rawTokens: rawTokens === null ? null : Number(rawTokens),
-    scanned: false,
-    mentionRate: null,
-    checks: 0,
-  };
 }

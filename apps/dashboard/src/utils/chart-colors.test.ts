@@ -4,7 +4,6 @@ import {
   ACCOUNT_SERIES_COLORS,
   CHART_PRIMARY_COLOR,
   CHART_SECONDARY_COLOR,
-  MODEL_USAGE_SERIES_COLORS,
   RIVAL_SWATCHES,
 } from "@/constants/charts";
 
@@ -16,11 +15,8 @@ const MODE_HEXES = new Set([
 ]);
 
 describe("chart series colors", () => {
-  test("model and account series skip Search and Memory hues", () => {
-    for (const pair of [
-      ...ACCOUNT_SERIES_COLORS,
-      ...MODEL_USAGE_SERIES_COLORS,
-    ]) {
+  test("account series skip Search and Memory hues", () => {
+    for (const pair of ACCOUNT_SERIES_COLORS) {
       assert.equal(MODE_HEXES.has(pair.light), false, pair.light);
       assert.equal(MODE_HEXES.has(pair.dark), false, pair.dark);
     }

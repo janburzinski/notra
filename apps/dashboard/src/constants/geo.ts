@@ -277,25 +277,6 @@ export const GEO_BRAND_LABELS: Record<string, string> = {
 export const GEO_SEARCH_LABEL = "Search";
 export const GEO_WITHOUT_SEARCH_LABEL = "Without search";
 
-export const GEO_MODEL_USAGE_SOURCE = "openrouter";
-export const GEO_MODEL_USAGE_ATTRIBUTION =
-  "Source: OpenRouter (openrouter.ai/rankings)";
-export const GEO_MODEL_USAGE_API_KEY_ENV = "OPENROUTER_API_KEY";
-export const GEO_MODEL_USAGE_ENDPOINT =
-  "https://openrouter.ai/api/frontend/v1/rankings/model-rankings-chart";
-export const GEO_MODEL_USAGE_PERIOD = "week";
-export const GEO_MODEL_USAGE_OTHER_KEY = "other";
-export const GEO_MODEL_USAGE_CACHE_KEY = "openrouter:model-rankings-chart";
-export const GEO_MODEL_USAGE_SLUGS_CACHE_KEY = "openrouter:models";
-export const GEO_MODEL_USAGE_OTHERS_LABEL = "Others";
-export const GEO_MODEL_USAGE_MODELS_ENDPOINT =
-  "https://openrouter.ai/api/v1/models";
-export const GEO_MODEL_USAGE_INGEST_LIMIT = 40;
-export const GEO_MODEL_USAGE_FETCH_TIMEOUT_MS = 20_000;
-export const GEO_MODEL_USAGE_DEFAULT_LIMIT = 8;
-export const GEO_MODEL_USAGE_TREND_WEEKS = 16;
-export const GEO_MODEL_USAGE_CHART_HEIGHT_CLASS = "h-80";
-
 export const GEO_MAX_PROMPTS = 8;
 export const GEO_MAX_SEQUENCES = 10;
 export const GEO_COMPETITOR_SHARE_LIMIT = 50;

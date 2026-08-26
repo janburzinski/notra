@@ -64,9 +64,6 @@ export function GeoPageSkeleton() {
                 <Skeleton className="h-64 w-full rounded-xl" />
               </GeoSectionSkeleton>
             </div>
-            <GeoSectionSkeleton eyebrow="Where AI usage actually happens">
-              <Skeleton className="h-40 w-full rounded-xl" />
-            </GeoSectionSkeleton>
           </div>
         </Tabs>
       </div>

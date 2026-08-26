@@ -48,7 +48,6 @@ import {
   loadGeoCompetitors,
   loadGeoJourneyDetail,
   loadGeoLanguageShare,
-  loadGeoModelUsage,
   loadGeoOverview,
   loadGeoPromptResults,
   loadGeoSettings,
@@ -102,7 +101,6 @@ import {
   geoGenerateFromWebsiteInputSchema,
   geoJourneyDetailInputSchema,
   geoModelCatalogInputSchema,
-  geoModelUsageInputSchema,
   geoOnboardingBrandInputSchema,
   geoOrganizationInputSchema,
   geoProjectCreateInputSchema,
@@ -368,13 +366,6 @@ export const geoRouter = {
     .handler(
       geoHandler((input) =>
         loadGeoCompetitorDetail(input, input.brand, geoWindow(input))
-      )
-    ),
-  modelUsage: authorizedProcedure
-    .input(geoModelUsageInputSchema)
-    .handler(
-      geoHandler((input) =>
-        loadGeoModelUsage(input, geoWindow(input), input.limit)
       )
     ),
   aiTraffic: authorizedProcedure
