@@ -52,7 +52,9 @@ export function LogoStack({
       {visible.map((item) => (
         <Tooltip key={item.key}>
           <TooltipTrigger
+            aria-label={item.label}
             render={<span className="inline-flex shrink-0 cursor-default" />}
+            role="img"
           >
             {item.renderIcon("size-4")}
           </TooltipTrigger>
@@ -64,6 +66,7 @@ export function LogoStack({
       {hidden.length > 0 ? (
         <Tooltip>
           <TooltipTrigger
+            aria-label={`Additional: ${hidden.map((item) => item.label).join(", ")}`}
             render={
               <span className="cursor-default text-muted-foreground text-xs" />
             }

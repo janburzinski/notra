@@ -26,11 +26,15 @@ export function MentionTrendAgentsPicker({
   const preview = visible.slice(0, GEO_MENTION_TREND_AGENT_ICON_LIMIT);
   const count = visible.length;
   const label = `${count} ${count === 1 ? "agent" : "agents"}`;
+  const accessibleLabel =
+    visible.length > 0
+      ? `Mention trend agents: ${visible.map((entry) => entry.label).join(", ")}`
+      : "Mention trend agents: none selected";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="Mention trend agents"
+        aria-label={accessibleLabel}
         className={cn(
           GEO_FILTER_TRIGGER_CLASS,
           disabled && "pointer-events-none opacity-50"
