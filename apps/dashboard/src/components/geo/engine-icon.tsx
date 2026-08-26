@@ -49,6 +49,7 @@ import { TikTokDark } from "@notra/ui/components/ui/svgs/tikTokDark";
 import { Timpi } from "@notra/ui/components/ui/svgs/timpi";
 import { Xiaomi } from "@notra/ui/components/ui/svgs/xiaomi";
 import { YouCom } from "@notra/ui/components/ui/svgs/youCom";
+import { Zai } from "@notra/ui/components/ui/svgs/zai";
 import type { ComponentType, SVGProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ModelProviderLogo } from "@/components/geo/model-provider-logo";
@@ -181,6 +182,7 @@ const SIMPLE_ICONS: Partial<
   timpi: Timpi,
   huawei: Huawei,
   kagi: Kagi,
+  zai: Zai,
 };
 
 function themedIcon(

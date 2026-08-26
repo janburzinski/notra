@@ -83,6 +83,11 @@ const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
     patterns: ["kimi", "moonshot"],
   },
   {
+    key: "zai",
+    patterns: ["chatglm", "zhipu", "glm-", "zai/", "z.ai/", "z-ai/"],
+    exact: ["glm", "zai", "z.ai", "z-ai"],
+  },
+  {
     key: "exa",
     patterns: ["exabot", "exasearchbot"],
     exact: ["exa"],

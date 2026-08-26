@@ -1052,6 +1052,7 @@ export type EngineIconKey =
   | "cohere"
   | "opencode"
   | "kimi"
+  | "zai"
   | "exa"
   | "commoncrawl"
   | "youcom"
