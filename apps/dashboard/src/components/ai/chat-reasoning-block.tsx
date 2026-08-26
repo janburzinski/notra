@@ -79,7 +79,7 @@ export function ChatReasoningBlock({
 
   return (
     <Collapsible onOpenChange={handleOpenChange} open={reasoningState.isOpen}>
-      <CollapsibleTrigger className="flex w-full items-center gap-2 text-muted-foreground text-sm transition-colors hover:text-foreground">
+      <CollapsibleTrigger className="text-muted-foreground hover:text-foreground flex w-full items-center gap-2 text-sm transition-colors">
         {isStreaming ? (
           <BrailleLoader className="text-sm" label={statusLabel} />
         ) : (

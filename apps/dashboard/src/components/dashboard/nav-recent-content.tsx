@@ -65,7 +65,7 @@ export function NavRecentContent({
                         <span className="min-w-0 flex-1 truncate">
                           {post.title}
                         </span>
-                        <span className="ml-auto shrink-0 text-[0.625rem] text-muted-foreground">
+                        <span className="text-muted-foreground ml-auto shrink-0 text-[0.625rem]">
                           {POST_STATUS_LABELS[post.status]}
                         </span>
                       </Link>

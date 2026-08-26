@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import { CHAT_TITLE_MAX_LENGTH } from "../constants/chat";
 import { standaloneChatContextSchema } from "./standalone-chat";

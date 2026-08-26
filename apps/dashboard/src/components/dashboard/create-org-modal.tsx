@@ -15,7 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 import { Button } from "@/components/button";
 import { authClient } from "@/lib/auth/client";
@@ -196,7 +196,7 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps) {
                       {field.state.meta.errors[0]}
                     </p>
                   ) : null}
-                  <p className="break-all text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-xs break-all">
                     Used in URLs: app.usenotra.com/
                     {field.state.value || "your-slug"}
                   </p>
@@ -222,10 +222,10 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps) {
                 <div className="grid min-w-0 gap-2">
                   <Label htmlFor="website">Website (optional)</Label>
                   <div
-                    className={`flex w-full min-w-0 flex-row items-center rounded-md border transition-colors focus-within:border-ring focus-within:ring-ring/50 ${field.state.meta.errors.length > 0 ? "border-destructive" : "border-border"}`}
+                    className={`focus-within:border-ring focus-within:ring-ring/50 flex w-full min-w-0 flex-row items-center rounded-md border transition-colors ${field.state.meta.errors.length > 0 ? "border-destructive" : "border-border"}`}
                   >
                     <label
-                      className="border-border border-r px-2.5 py-1.5 text-muted-foreground text-sm transition-colors"
+                      className="border-border text-muted-foreground border-r px-2.5 py-1.5 text-sm transition-colors"
                       htmlFor="website"
                     >
                       https://

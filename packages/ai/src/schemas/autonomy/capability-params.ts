@@ -11,7 +11,7 @@ import {
   IRIS_MAX_BLOG_POST_IMAGES,
   IRIS_MIN_IMAGES_PER_POST,
 } from "@notra/ai/constants/autonomy-capabilities";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 export const IRIS_TOPIC_MAX_LENGTH = 300;

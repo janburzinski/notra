@@ -21,7 +21,7 @@ export function DesignSystemWriteDialogDemo() {
           Open write dialog
         </Button>
         <span
-          className="font-mono text-muted-foreground text-xs"
+          className="text-muted-foreground font-mono text-xs"
           data-testid="write-dialog-state"
         >
           open={String(open)} · events={events.join(",") || "none"}

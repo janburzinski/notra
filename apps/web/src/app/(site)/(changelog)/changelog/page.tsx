@@ -83,7 +83,7 @@ export default async function ChangelogHubPage() {
         <ShowcaseOverviewGrid companies={companies} />
       </div>
 
-      <p className="mt-8 text-center font-sans text-muted-foreground text-xs">
+      <p className="text-muted-foreground mt-8 text-center font-sans text-xs">
         Notra is not affiliated with any of the companies listed above. These
         changelogs are generated for demonstration purposes only.
       </p>

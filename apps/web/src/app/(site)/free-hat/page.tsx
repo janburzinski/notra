@@ -43,7 +43,7 @@ export default function MerchPage() {
       <MerchSpecs />
       <MerchClaim />
       <MerchTweets />
-      <section className="w-full px-6 pt-27.5 content-defer lg:px-20">
+      <section className="content-defer w-full px-6 pt-27.5 lg:px-20">
         <MerchCtaBanner />
       </section>
     </>

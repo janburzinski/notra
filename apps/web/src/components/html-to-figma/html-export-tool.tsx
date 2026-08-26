@@ -75,7 +75,7 @@ export default function HtmlExportTool({ target }: HtmlExportToolProps) {
         />
 
         <Button
-          className="gap-2 border border-border bg-white text-neutral-900 shadow-sm hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
+          className="border-border gap-2 border bg-white text-neutral-900 shadow-sm hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
           disabled={isEmpty || pending}
           onClick={handleCopy}
           size="lg"
@@ -103,7 +103,7 @@ export default function HtmlExportTool({ target }: HtmlExportToolProps) {
         />
       )}
 
-      <p className="font-mono text-muted-foreground text-xs">
+      <p className="text-muted-foreground font-mono text-xs">
         Runs in your browser. Nothing is uploaded. Not affiliated with{" "}
         {copy.productName}.
       </p>

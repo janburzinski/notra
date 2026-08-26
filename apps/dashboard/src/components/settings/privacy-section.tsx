@@ -19,7 +19,7 @@ export function PrivacySection() {
         <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
           <div className="min-w-0 space-y-1">
             <Label
-              className="cursor-pointer font-medium text-sm"
+              className="cursor-pointer text-sm font-medium"
               htmlFor="hide-personal-data"
             >
               Hide personal data

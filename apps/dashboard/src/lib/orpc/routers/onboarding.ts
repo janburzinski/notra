@@ -16,18 +16,18 @@ import {
   SELF_SERVE_AGENT_ERROR_MESSAGES,
 } from "@/constants/onboarding-agent";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
-import { pickCompanyLogoUrl } from "@/lib/onboarding/company-logo";
 import {
   getOnboardingAgentState,
   startSelfServeOnboardingAgent,
 } from "@/lib/onboarding-agent";
+import { pickCompanyLogoUrl } from "@/lib/onboarding/company-logo";
 import { authorizedProcedure } from "@/lib/orpc/base";
 import { organizationIdSchema } from "@/schemas/auth/organization";
-import { companyLogoInputSchema } from "@/schemas/onboarding/company-logo";
 import {
   dismissSuggestionInputSchema,
   listSuggestionsInputSchema,
 } from "@/schemas/onboarding-agent";
+import { companyLogoInputSchema } from "@/schemas/onboarding/company-logo";
 import { ratelimit } from "@/utils/ratelimit";
 
 const onboardingInputSchema = z.object({

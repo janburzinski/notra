@@ -148,7 +148,7 @@ export function AddGranolaIntegrationDialog({
               Create a key in the Granola app under Settings, then Connectors,
               then API keys.{" "}
               <a
-                className="underline underline-offset-2 hover:text-foreground"
+                className="hover:text-foreground underline underline-offset-2"
                 href={GRANOLA_API_KEYS_DOCS_URL}
                 rel="noopener noreferrer"
                 target="_blank"

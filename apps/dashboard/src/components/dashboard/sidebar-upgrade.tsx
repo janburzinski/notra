@@ -101,9 +101,9 @@ export function SidebarUpgrade() {
 
   return (
     <SidebarGroup className="px-3 pb-2 group-data-[collapsible=icon]:hidden">
-      <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
-        <div className="border-b bg-muted/50 px-3 py-3">
-          <p className="font-semibold text-sm">{heading}</p>
+      <div className="bg-card ring-foreground/10 overflow-hidden rounded-xl ring-1">
+        <div className="bg-muted/50 border-b px-3 py-3">
+          <p className="text-sm font-semibold">{heading}</p>
         </div>
         <div className="space-y-3 p-3">
           <p className="text-muted-foreground text-xs">{description}</p>

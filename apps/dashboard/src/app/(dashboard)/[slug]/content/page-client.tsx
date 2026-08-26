@@ -71,7 +71,7 @@ export default function PageClient({
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <h1 className="font-bold text-3xl tracking-tight">Content</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Content</h1>
             <p className="text-muted-foreground text-sm">
               Every batch of generated content, organized into collections.
             </p>
@@ -104,7 +104,7 @@ export default function PageClient({
         )}
 
         {!isPending && collections.length > 0 && (
-          <div className="overflow-hidden rounded-lg border border-border/80 border-b-border/40 bg-muted/80 shadow-2xs">
+          <div className="border-border/80 border-b-border/40 bg-muted/80 overflow-hidden rounded-lg border shadow-2xs">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -124,7 +124,7 @@ export default function PageClient({
                   const href = `/${organizationSlug}/collection/${collection.id}`;
                   return (
                     <TableRow
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="hover:bg-muted/50 cursor-pointer"
                       key={collection.id}
                       onClick={() => router.push(href)}
                       onMouseEnter={() => router.prefetch(href)}
@@ -139,7 +139,7 @@ export default function PageClient({
                           contentTypes={collection.contentTypes}
                         />
                       </TableCell>
-                      <TableCell className="whitespace-nowrap text-muted-foreground text-sm">
+                      <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
                         {formatRelativeDate(collection.createdAt)}
                       </TableCell>
                     </TableRow>

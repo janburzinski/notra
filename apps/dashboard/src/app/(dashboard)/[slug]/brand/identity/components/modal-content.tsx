@@ -16,7 +16,7 @@ export function ModalContent({
   if (isPendingSettings) {
     return (
       <div className="flex justify-center py-4">
-        <Loader2Icon className="size-8 animate-spin text-primary" />
+        <Loader2Icon className="text-primary size-8 animate-spin" />
       </div>
     );
   }
@@ -29,14 +29,14 @@ export function ModalContent({
     <div className="space-y-4">
       <div className="flex gap-3">
         <div
-          className={`flex w-full flex-row items-center overflow-hidden rounded-lg border bg-background transition-all focus-within:ring-2 focus-within:ring-ring/20 ${progress.status === "failed" ? "border-destructive" : "border-input"}`}
+          className={`bg-background focus-within:ring-ring/20 flex w-full flex-row items-center overflow-hidden rounded-lg border transition-all focus-within:ring-2 ${progress.status === "failed" ? "border-destructive" : "border-input"}`}
         >
-          <span className="flex h-10 items-center border-input border-r bg-muted/50 px-3 text-muted-foreground text-sm">
+          <span className="border-input bg-muted/50 text-muted-foreground flex h-10 items-center border-r px-3 text-sm">
             https://
           </span>
           <input
             aria-label="Website URL"
-            className="h-10 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-muted-foreground"
+            className="placeholder:text-muted-foreground h-10 flex-1 bg-transparent px-3 text-sm outline-none"
             disabled={isPending}
             id="brand-url-input"
             onChange={(e) => setUrl(e.target.value)}
@@ -66,7 +66,7 @@ export function ModalContent({
         </Button>
       </div>
       {(inlineError || progress.status === "failed") && (
-        <p className="text-center text-destructive text-sm">
+        <p className="text-destructive text-center text-sm">
           {inlineError ?? "Try again with a different URL"}
         </p>
       )}

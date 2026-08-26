@@ -71,7 +71,7 @@ export function SelectRepositoriesDialog({
             repositories granted to the GitHub App appear here.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4">
+        <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4">
           <div className="space-y-3 py-4">
             <Field>
               <FieldLabel>Repositories</FieldLabel>
@@ -88,7 +88,7 @@ export function SelectRepositoriesDialog({
             </Field>
             {onAddAccount ? (
               <button
-                className="inline-flex items-center gap-1 text-muted-foreground text-xs underline-offset-4 hover:text-foreground hover:underline"
+                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline"
                 onClick={onAddAccount}
                 type="button"
               >
@@ -98,7 +98,7 @@ export function SelectRepositoriesDialog({
             ) : null}
           </div>
         </div>
-        <ResponsiveDialogFooter className="mx-0 mb-0 shrink-0 rounded-b-xl border-t bg-muted/50 p-4">
+        <ResponsiveDialogFooter className="bg-muted/50 mx-0 mb-0 shrink-0 rounded-b-xl border-t p-4">
           <ResponsiveDialogClose
             disabled={isSaving}
             render={<Button variant="outline" />}

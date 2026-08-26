@@ -53,10 +53,10 @@ export function GuidelinesTypographySection({
     <section className="space-y-3">
       <div className="flex items-center gap-2">
         <HugeiconsIcon
-          className="size-4 text-muted-foreground"
+          className="text-muted-foreground size-4"
           icon={TextFontIcon}
         />
-        <h2 className="font-semibold text-sm">Typography</h2>
+        <h2 className="text-sm font-semibold">Typography</h2>
         <span className="text-muted-foreground text-xs tabular-nums">
           {fonts.length}
         </span>
@@ -87,7 +87,7 @@ export function GuidelinesTypographySection({
                   {font.family}
                 </p>
                 {meta ? (
-                  <p className="mt-2 truncate text-muted-foreground text-xs">
+                  <p className="text-muted-foreground mt-2 truncate text-xs">
                     {meta}
                   </p>
                 ) : null}

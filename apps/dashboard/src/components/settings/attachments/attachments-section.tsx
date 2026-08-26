@@ -171,7 +171,7 @@ export function AttachmentsSection() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
           {LOADING_SKELETON_KEYS.map((skeletonKey) => (
             <div
-              className="overflow-hidden rounded-lg border border-border/80"
+              className="border-border/80 overflow-hidden rounded-lg border"
               key={skeletonKey}
             >
               <Skeleton className="aspect-square w-full rounded-none" />

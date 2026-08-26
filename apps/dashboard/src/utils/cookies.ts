@@ -25,7 +25,7 @@ export const setLastVisitedOrganization = async (
     });
   } else if (typeof document !== "undefined") {
     const secureFlag = isSecure ? "; Secure" : "";
-    // biome-ignore lint/suspicious/noDocumentCookie: Fallback for browsers without Cookie Store API support
+    // oxlint-disable-next-line unicorn/no-document-cookie -- Fallback for browsers without Cookie Store API support
     document.cookie = `${LAST_VISITED_ORGANIZATION_COOKIE}=${organizationSlug}; max-age=${maxAge}; path=/; SameSite=Lax${secureFlag}`;
   }
 };

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import type { BlogEntryPageProps } from "~types/blog";
 import { getNotraBlogPostBySlug } from "@/utils/blog";
 import { OG_BLOG_TITLE_MAX_LENGTH } from "@/utils/constants";
 import {
@@ -9,7 +10,6 @@ import {
   splitTitleForDot,
   truncate,
 } from "@/utils/og";
-import type { BlogEntryPageProps } from "~types/blog";
 
 export const alt = "Notra blog post";
 export const size = { width: 1200, height: 630 };
@@ -59,7 +59,7 @@ export default async function Image({ params }: BlogEntryPageProps) {
           justifyContent: "space-between",
         }}
       >
-        {/* biome-ignore lint/performance/noImgElement: next/og JSX requires native img */}
+        {/* oxlint-disable-next-line nextjs/no-img-element -- next/og JSX requires native img */}
         <img alt="" height={56} src={logoDataUrl} width={56} />
         <div
           style={{
@@ -119,7 +119,7 @@ export default async function Image({ params }: BlogEntryPageProps) {
             gap: "1rem",
           }}
         >
-          {/* biome-ignore lint/performance/noImgElement: next/og JSX requires native img */}
+          {/* oxlint-disable-next-line nextjs/no-img-element -- next/og JSX requires native img */}
           <img
             alt=""
             height={64}

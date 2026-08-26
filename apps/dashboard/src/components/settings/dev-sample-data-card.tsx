@@ -78,7 +78,7 @@ export function DevSampleDataCard({ organizationId }: DevSampleDataCardProps) {
     <TitleCard heading="Developer">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-medium text-sm">GEO sample data</p>
+          <p className="text-sm font-medium">GEO sample data</p>
           <p className="text-muted-foreground text-xs">
             Reset replaces the complete demo project with 30 days of prompts,
             conversations, competitors, scans, and traffic. Clear removes only

@@ -297,7 +297,7 @@ function WriteDialogForm({
     const heading = (
       <>
         <HugeiconsIcon
-          className="size-4 text-muted-foreground"
+          className="text-muted-foreground size-4"
           icon={meta.icon}
           strokeWidth={1.8}
         />
@@ -309,13 +309,13 @@ function WriteDialogForm({
       <div className="space-y-1">
         {htmlFor ? (
           <Label
-            className="flex items-center gap-2 font-semibold text-base"
+            className="flex items-center gap-2 text-base font-semibold"
             htmlFor={htmlFor}
           >
             {heading}
           </Label>
         ) : (
-          <h3 className="flex items-center gap-2 font-semibold text-base">
+          <h3 className="flex items-center gap-2 text-base font-semibold">
             {heading}
           </h3>
         )}
@@ -363,7 +363,7 @@ function WriteDialogForm({
                   strokeWidth={1.8}
                 />
               </Button>
-              <ResponsiveDialogTitle className="font-semibold text-base tracking-tight max-md:sr-only">
+              <ResponsiveDialogTitle className="text-base font-semibold tracking-tight max-md:sr-only">
                 Write article
               </ResponsiveDialogTitle>
               <ResponsiveDialogDescription className="sr-only">
@@ -376,7 +376,7 @@ function WriteDialogForm({
                     className={cn(
                       "shrink-0 cursor-pointer rounded-md px-2.5 py-1 text-sm transition-colors",
                       activeSection === item.id
-                        ? "bg-background font-medium text-foreground"
+                        ? "bg-background text-foreground font-medium"
                         : "text-muted-foreground hover:bg-background/60"
                     )}
                     key={item.id}
@@ -390,9 +390,9 @@ function WriteDialogForm({
             </div>
           </div>
 
-          <div className="-mt-5 relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-background">
+          <div className="border-border bg-background relative -mt-5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border">
             <div
-              className="scrollbar-floating min-h-0 flex-1 divide-y divide-border overflow-y-auto scroll-smooth"
+              className="scrollbar-floating divide-border min-h-0 flex-1 divide-y overflow-y-auto scroll-smooth"
               ref={scrollRef}
             >
               <section
@@ -500,7 +500,7 @@ function WriteDialogForm({
                   voices.length > 0 ? `${fieldId}-brand` : undefined
                 )}
                 {voices.length === 0 ? (
-                  <p className="rounded-lg border border-border border-dashed px-3 py-2.5 text-muted-foreground text-sm">
+                  <p className="border-border text-muted-foreground rounded-lg border border-dashed px-3 py-2.5 text-sm">
                     No brand identities yet. The writer will use your GEO
                     project brand.
                   </p>
@@ -566,7 +566,7 @@ function WriteDialogForm({
                   )}
                   {competitors.length > 0 ? (
                     <button
-                      className="shrink-0 cursor-pointer text-muted-foreground text-xs transition-colors hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer text-xs transition-colors"
                       onClick={() => {
                         setCompetitorsTouched(true);
                         setCompetitorIds(
@@ -582,7 +582,7 @@ function WriteDialogForm({
                   ) : null}
                 </div>
                 {competitors.length === 0 ? (
-                  <p className="rounded-lg border border-border border-dashed px-3 py-2.5 text-muted-foreground text-sm">
+                  <p className="border-border text-muted-foreground rounded-lg border border-dashed px-3 py-2.5 text-sm">
                     No competitors tracked yet. Add them in GEO settings to
                     mention alternatives.
                   </p>

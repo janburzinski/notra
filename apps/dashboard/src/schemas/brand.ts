@@ -12,7 +12,7 @@ import {
   brandNameSchema,
 } from "@notra/ai/schemas/limits";
 import { toneProfileSchema } from "@notra/ai/schemas/tone";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 export function getValidLanguage(value: unknown): SupportedLanguage {

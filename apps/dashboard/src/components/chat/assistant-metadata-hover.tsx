@@ -198,7 +198,7 @@ export function AssistantMetadataHover({
   }
 
   return (
-    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-xs opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+    <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs opacity-0 transition-opacity duration-150 group-hover:opacity-100">
       {items}
     </div>
   );

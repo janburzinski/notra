@@ -17,7 +17,7 @@ export function EventTypeCard({
     <button
       aria-pressed={selected}
       className={cn(
-        "group relative flex flex-col gap-3 rounded-xl border bg-card p-4 text-left transition-colors",
+        "group bg-card relative flex flex-col gap-3 rounded-xl border p-4 text-left transition-colors",
         "hover:border-foreground/30",
         selected ? "border-foreground bg-muted/50" : "border-border"
       )}
@@ -34,7 +34,7 @@ export function EventTypeCard({
             "flex size-5 shrink-0 items-center justify-center rounded-full transition-colors",
             selected
               ? "bg-foreground text-background"
-              : "border border-muted-foreground/30 group-hover:border-muted-foreground/50"
+              : "border-muted-foreground/30 group-hover:border-muted-foreground/50 border"
           )}
         >
           {selected && (
@@ -47,7 +47,7 @@ export function EventTypeCard({
         </div>
       </div>
       <div className="space-y-1">
-        <p className="font-medium text-sm">{meta.label}</p>
+        <p className="text-sm font-medium">{meta.label}</p>
         <p className="text-muted-foreground text-xs leading-relaxed">
           {meta.description}
         </p>

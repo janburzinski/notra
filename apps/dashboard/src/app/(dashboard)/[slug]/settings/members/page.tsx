@@ -105,7 +105,7 @@ function MembersPageContent({ params }: PageProps) {
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <h1 className="font-bold text-3xl tracking-tight">Members</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Members</h1>
             <p className="text-muted-foreground">
               Manage who has access to this organization
             </p>

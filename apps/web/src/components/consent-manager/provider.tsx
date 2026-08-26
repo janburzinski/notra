@@ -7,7 +7,6 @@ import {
   type ConsentManagerOptions,
   ConsentManagerProvider,
 } from "@c15t/nextjs";
-
 import { consentTheme } from "@/lib/consent-manager/theme";
 import type { ConsentManagerProviderProps } from "@/types/consent-manager";
 

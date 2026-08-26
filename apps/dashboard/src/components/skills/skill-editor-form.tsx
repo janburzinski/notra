@@ -96,7 +96,7 @@ export function SkillEditorForm({
             />
           </TabsContent>
           <TabsContent value="diff">
-            <div className="min-h-48 overflow-auto rounded-lg border border-border/80 bg-muted/20">
+            <div className="border-border/80 bg-muted/20 min-h-48 overflow-auto rounded-lg border">
               <DiffView
                 currentMarkdown={content}
                 originalMarkdown={originalContent}

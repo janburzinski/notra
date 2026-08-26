@@ -22,7 +22,7 @@ import { db } from "@notra/db/drizzle";
 import { posts } from "@notra/db/schema";
 import { type Tool, tool } from "ai";
 import { and, eq, or } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 const CREATE_POST_TOOL_NAMES = {

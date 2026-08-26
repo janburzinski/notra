@@ -527,7 +527,7 @@ const CodeBlockFallback = ({ children, ...props }: CodeBlockFallbackProps) => (
           ?.toString()
           .split("\n")
           .map((line, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: Lines are static content
+            // oxlint-disable-next-line react/no-array-index-key -- Lines are static content
             <span className="line" key={i}>
               {line}
             </span>
@@ -619,7 +619,7 @@ export const CodeBlockContent = ({
 
   return (
     <div
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: "Kinda how Shiki works"
+      // oxlint-disable-next-line react/no-danger -- "Kinda how Shiki works"
       dangerouslySetInnerHTML={{ __html: html }}
       {...props}
     />

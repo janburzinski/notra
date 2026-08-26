@@ -7,7 +7,7 @@ langs: TypeScript, JavaScript
 runtimes: Node.js 24.11.1, Bun  
 pkgManager: Bun 1.4.0  
 deliverables: web (Next.js marketing), dashboard (Next.js app), api (Hono/Workers), docs (Mint), shared libs  
-rootConfigs: `turbo.json`, `package.json`, `biome.jsonc`  
+rootConfigs: `turbo.json`, `package.json`, `.oxlintrc.json`, `.oxfmtrc.jsonc`
 
 ---
 
@@ -112,8 +112,8 @@ consumedBy: dashboard auth/workflow emails
 - typing: strict TypeScript, Zod for runtime validation, schema-driven API  
 - errors: Zod validation errors in API responses, try-catch for async  
 - patterns: server/client split (app router), action functions in lib/email/actions.ts  
-- lint: Biome (core, next, astro presets), UltraCite for formatting  
-- formatting: auto via UltraCite, Biome rules strict except where documented (console off, etc.)  
+- lint: Oxlint with project-specific rules in `.oxlintrc.json`
+- formatting: Oxfmt configured in `.oxfmtrc.jsonc`
 
 ---
 
@@ -142,9 +142,9 @@ workspaceScripts:
 - `db:push` → drizzle-kit push (sync schema)  
 - `db:drop` → drizzle-kit drop  
 - `db:seed` → run both seed scripts  
-- `format` → UltraCite fix  
+- `format` → Oxlint fix + Oxfmt write
 
-ci: `.github/workflows/code-quality.yml` → bun install, ultracite check on push/PR  
+ci: `.github/workflows/code-quality.yml` → bun install, `bun check` on push/PR
 
 envFiles: `.env`, `.env.example`  
 
@@ -188,8 +188,9 @@ integrate external service → `apps/dashboard/src/lib/` (new module)
 `packages/typescript-config/base.json` → TypeScript base config | extended by all apps/packages | tsconfig root  
 
 `turbo.json` → Workspace tasks (build, dev, check-types), global env vars, task dependencies | orchestration  
-`biome.jsonc` → Lint rules (Biome), UltraCite presets, file exclusions | code quality  
-`.github/workflows/code-quality.yml` → CI: bun install, ultracite check | automated code quality  
+`.oxlintrc.json` → Oxlint rules and file exclusions | code quality
+`.oxfmtrc.jsonc` → Oxfmt style, sorting, and file exclusions | formatting
+`.github/workflows/code-quality.yml` → CI: bun install, `bun check` | automated code quality
 
 ---
 
@@ -200,4 +201,4 @@ integrate external service → `apps/dashboard/src/lib/` (new module)
 - Better-Auth handles user sessions; Unkey handles API key auth  
 - TanStack Query is de facto state manager for async data in dashboard  
 - Drizzle ORM with PostgreSQL (Neon) is sole data layer; Upstash Redis for query caching  
-- Biome + UltraCite enforce code quality; no Jest/Vitest configured yet  
+- Oxlint + Oxfmt enforce code quality; no Jest/Vitest configured yet

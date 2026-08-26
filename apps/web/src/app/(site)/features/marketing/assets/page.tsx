@@ -64,7 +64,7 @@ const breadcrumbJsonLd = buildBreadcrumbJsonLd([
 
 function PasteReadyLogos() {
   return (
-    <div className="flex flex-wrap items-center gap-2 font-sans text-[#1E1E1E99] text-sm dark:text-white/60">
+    <div className="flex flex-wrap items-center gap-2 font-sans text-sm text-[#1E1E1E99] dark:text-white/60">
       <span>Paste-ready for</span>
       <span className="inline-flex h-8 items-center gap-2 rounded-full border border-[#1E1E1E1A] bg-[#C8B2EE40] px-3 text-[#1E1E1E] dark:border-white/10 dark:bg-white/[0.06] dark:text-white">
         <Paper aria-hidden="true" className="size-4" />
@@ -83,12 +83,12 @@ export default function MarketingAssetsPage() {
   return (
     <div className="flex w-full flex-col items-center justify-start antialiased [font-synthesis:none]">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
+        // oxlint-disable-next-line react/no-danger -- server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(assetsJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
+        // oxlint-disable-next-line react/no-danger -- server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />
@@ -131,7 +131,7 @@ export default function MarketingAssetsPage() {
           const Heading = "h2";
           return (
             <section
-              className="w-full scroll-mt-24 border-[#1E1E1E14] border-t dark:border-white/10"
+              className="w-full scroll-mt-24 border-t border-[#1E1E1E14] dark:border-white/10"
               id={section.id}
               key={section.id}
             >
@@ -139,7 +139,7 @@ export default function MarketingAssetsPage() {
                 <div
                   className={`flex flex-col gap-6 ${section.mediaSide === "left" ? "lg:order-2" : ""}`}
                 >
-                  <Heading className="text-balance font-display font-medium text-[2rem] text-black leading-[1.12] tracking-[-0.02em] md:text-[2.75rem] dark:text-white">
+                  <Heading className="font-display text-[2rem] leading-[1.12] font-medium tracking-[-0.02em] text-balance text-black md:text-[2.75rem] dark:text-white">
                     {section.headingPre}
                     <span className="text-primary">
                       {section.headingAccent}
@@ -149,7 +149,7 @@ export default function MarketingAssetsPage() {
                   <div className="flex flex-col gap-4">
                     {section.paragraphs.map((paragraph) => (
                       <p
-                        className="font-medium font-sans text-[#1E1E1EBF] text-base leading-7 dark:text-white/70"
+                        className="font-sans text-base leading-7 font-medium text-[#1E1E1EBF] dark:text-white/70"
                         key={paragraph}
                       >
                         {paragraph}

@@ -1,4 +1,4 @@
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 export const CAPABILITY_NAME_PATTERN = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/;

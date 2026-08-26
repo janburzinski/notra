@@ -79,7 +79,7 @@ export function GeoRangePicker({ control }: GeoRangePickerProps) {
             }
           >
             <div className="flex w-max" ref={contentRef}>
-              <div className="flex min-w-44 flex-col gap-1 border-border border-r p-2">
+              <div className="border-border flex min-w-44 flex-col gap-1 border-r p-2">
                 {GEO_RANGE_PRESETS.map((preset) => (
                   <Button
                     className="justify-start"

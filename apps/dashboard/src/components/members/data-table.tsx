@@ -17,7 +17,7 @@ import {
 } from "@tanstack/react-table";
 
 interface DataTableProps<TData> {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack Table columns have varying value types
+  // oxlint-disable-next-line typescript/no-explicit-any -- TanStack Table columns have varying value types
   columns: ColumnDef<TData, any>[];
   data: TData[];
   isLoading?: boolean;
@@ -38,7 +38,7 @@ export function DataTable<TData>({
 
   if (isLoading) {
     return (
-      <div className="overflow-hidden rounded-lg border border-border/80 border-b-border/40 bg-muted/80 shadow-2xs">
+      <div className="border-border/80 border-b-border/40 bg-muted/80 overflow-hidden rounded-lg border shadow-2xs">
         <Table>
           <TableHeader>
             <TableRow>
@@ -75,7 +75,7 @@ export function DataTable<TData>({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border/80 border-b-border/40 bg-muted/80 shadow-2xs">
+    <div className="border-border/80 border-b-border/40 bg-muted/80 overflow-hidden rounded-lg border shadow-2xs">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

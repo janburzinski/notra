@@ -28,10 +28,10 @@ export default function AuthPublicLayout({
         </div>
         <div className="w-full max-w-md">{children}</div>
         <div>
-          <p className="px-8 text-center text-muted-foreground text-xs">
+          <p className="text-muted-foreground px-8 text-center text-xs">
             By continuing, you agree to our{" "}
             <Link
-              className="underline underline-offset-4 hover:text-primary"
+              className="hover:text-primary underline underline-offset-4"
               href="https://usenotra.com/terms"
               rel="noopener noreferrer"
               target="_blank"
@@ -40,7 +40,7 @@ export default function AuthPublicLayout({
             </Link>{" "}
             and{" "}
             <Link
-              className="underline underline-offset-4 hover:text-primary"
+              className="hover:text-primary underline underline-offset-4"
               href="https://usenotra.com/privacy"
               rel="noopener noreferrer"
               target="_blank"

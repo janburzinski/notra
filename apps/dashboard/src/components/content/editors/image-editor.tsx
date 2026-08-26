@@ -37,7 +37,7 @@ export function ImageEditor({ content, imageExportRef }: ContentEditorProps) {
           />
         </div>
       ) : (
-        <div className="px-4 py-12 text-center text-muted-foreground text-sm">
+        <div className="text-muted-foreground px-4 py-12 text-center text-sm">
           Image data is unavailable.
         </div>
       )}

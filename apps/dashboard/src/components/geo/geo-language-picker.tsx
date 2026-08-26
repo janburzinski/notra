@@ -50,7 +50,7 @@ export function GeoLanguagePicker({
     <div className="w-full min-w-0 space-y-2">
       {labeled ? (
         <div className="space-y-1">
-          <p className="font-medium text-sm">Languages</p>
+          <p className="text-sm font-medium">Languages</p>
           <p className="text-muted-foreground text-xs">
             {DEFAULT_LANGUAGE} is on by default. Scan up to {GEO_MAX_LANGUAGES}{" "}
             languages.
@@ -92,7 +92,7 @@ export function GeoLanguagePicker({
               <LanguageLabel language={language} />
               <button
                 aria-label={`Remove ${language}`}
-                className="cursor-pointer rounded-sm p-0.5 hover:bg-background disabled:cursor-not-allowed disabled:opacity-50"
+                className="hover:bg-background cursor-pointer rounded-sm p-0.5 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={disabled || lastLanguage}
                 onClick={() =>
                   onChange(selected.filter((item) => item !== language))

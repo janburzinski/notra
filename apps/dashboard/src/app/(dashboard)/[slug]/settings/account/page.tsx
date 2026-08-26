@@ -60,7 +60,7 @@ export default function SettingsAccountPage() {
     >
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="space-y-1">
-          <h1 className="font-bold text-3xl tracking-tight">Account</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Account</h1>
           <p className="text-muted-foreground">
             Manage your profile and account settings
           </p>

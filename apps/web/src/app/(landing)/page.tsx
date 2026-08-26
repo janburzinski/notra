@@ -113,29 +113,29 @@ function LandingPageJsonLd() {
   return (
     <>
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
+        // oxlint-disable-next-line react/no-danger -- SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(softwareJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
+        // oxlint-disable-next-line react/no-danger -- SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(organizationJsonLd),
         }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
+        // oxlint-disable-next-line react/no-danger -- SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(serviceJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
+        // oxlint-disable-next-line react/no-danger -- SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
+        // oxlint-disable-next-line react/no-danger -- SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(speakableJsonLd) }}
         type="application/ld+json"
       />
@@ -145,7 +145,7 @@ function LandingPageJsonLd() {
 
 export default function LandingPage() {
   return (
-    <div className="flex w-full flex-col items-stretch justify-start overflow-x-clip bg-white dark:bg-background">
+    <div className="dark:bg-background flex w-full flex-col items-stretch justify-start overflow-x-clip bg-white">
       <LandingPageJsonLd />
       <main className="flex w-full flex-col items-stretch justify-start">
         <HeroSection />
@@ -170,7 +170,7 @@ export default function LandingPage() {
           <FaqSection />
         </section>
         <section
-          className="px-6 pt-27.5 pb-27.5 content-defer lg:px-20"
+          className="content-defer px-6 pt-27.5 pb-27.5 lg:px-20"
           id="cta"
         >
           <CtaBanner />

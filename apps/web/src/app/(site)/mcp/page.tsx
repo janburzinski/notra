@@ -49,7 +49,7 @@ export default async function McpPage() {
   return (
     <div className="flex w-full flex-col items-center gap-8 pb-14 antialiased [font-synthesis:none]">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
+        // oxlint-disable-next-line react/no-danger -- server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />
@@ -57,7 +57,7 @@ export default async function McpPage() {
       <div className="flex w-[min(100%-3rem,62.5rem)] flex-col gap-14 pt-6">
         <McpTerminalDemo toolCount={tools.length} />
         <section className="flex w-full flex-col items-center gap-4">
-          <h2 className="font-sans font-semibold text-[#1E1E1E] text-[1.0625rem] leading-[1.29] tracking-[-0.01em] dark:text-white">
+          <h2 className="font-sans text-[1.0625rem] leading-[1.29] font-semibold tracking-[-0.01em] text-[#1E1E1E] dark:text-white">
             Connect from any client
           </h2>
           <McpCommandTabs className="max-w-[45rem]" />

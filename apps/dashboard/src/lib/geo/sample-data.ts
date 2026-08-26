@@ -437,7 +437,9 @@ export const seedGeoSampleData = Effect.fn("geo.sampleData")(function* (
   );
   if (!identity) {
     return yield* Effect.fail(
-      new GeoBrandIdentityMissingError({ organizationId: input.organizationId })
+      new GeoBrandIdentityMissingError({
+        organizationId: input.organizationId,
+      })
     );
   }
 

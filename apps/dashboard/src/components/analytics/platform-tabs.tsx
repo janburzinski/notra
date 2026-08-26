@@ -35,7 +35,7 @@ function PlatformTab({
     <>
       {isActive && (
         <m.span
-          className="absolute inset-0 rounded-xl bg-background shadow-sm ring-1 ring-border"
+          className="bg-background ring-border absolute inset-0 rounded-xl shadow-sm ring-1"
           layoutId={layoutId}
           transition={SPRING}
         />
@@ -104,7 +104,7 @@ export function PlatformTabs({
       <menu
         aria-label={label}
         className={cn(
-          "m-0 flex list-none items-center gap-1 rounded-2xl border bg-muted/50 p-1",
+          "bg-muted/50 m-0 flex list-none items-center gap-1 rounded-2xl border p-1",
           className
         )}
       >

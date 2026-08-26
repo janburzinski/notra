@@ -110,7 +110,7 @@ const requestSlack = Effect.fn("requestSlack")(function* (
 export function hasSlackConnectConfigured(): boolean {
   return Boolean(
     process.env.SLACK_BOT_TOKEN?.trim() &&
-      process.env.SLACK_FOUNDER_MEMBER_ID?.trim()
+    process.env.SLACK_FOUNDER_MEMBER_ID?.trim()
   );
 }
 

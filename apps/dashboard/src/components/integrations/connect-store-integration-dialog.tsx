@@ -33,7 +33,7 @@ export function ConnectStoreIntegrationDialog({
                 Connect {integration.name}
               </ResponsiveDialogTitle>
               {integration.author ? (
-                <span className="truncate text-muted-foreground text-xs">
+                <span className="text-muted-foreground truncate text-xs">
                   By {integration.author}
                 </span>
               ) : null}

@@ -51,7 +51,7 @@ export function PermissionOption({
   const disabled = rowDisabled || (optionDisabled ?? false);
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: a single-select segmented control is the radiogroup/radio ARIA pattern; native radios can't hold custom pill content.
+    // a single-select segmented control is the radiogroup/radio ARIA pattern; native radios can't hold custom pill content.
     <button
       aria-checked={active}
       aria-label={ariaLabel}

@@ -3,7 +3,7 @@
 import { Effect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import type React from "react";
 import { useEffect, useRef } from "react";
-// biome-ignore lint/performance/noNamespaceImport: THREE.js recommended import pattern
+// THREE.js recommended import pattern
 import * as THREE from "three";
 
 type PixelBlastVariant = "square" | "circle" | "triangle" | "diamond";

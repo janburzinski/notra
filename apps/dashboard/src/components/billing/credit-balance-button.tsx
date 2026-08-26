@@ -26,7 +26,7 @@ export function CreditBalanceMenuItem({
       <HugeiconsIcon icon={Wallet01Icon} />
       Credits
       {balance !== null ? (
-        <span className="ml-auto text-muted-foreground tabular-nums">
+        <span className="text-muted-foreground ml-auto tabular-nums">
           {formatDollars(balance)}
         </span>
       ) : null}

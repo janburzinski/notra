@@ -113,7 +113,7 @@ export function TableBodyRow<T>({
       {columns.map((column) => (
         <td
           className={cn(
-            "max-w-0 overflow-hidden px-4 text-foreground",
+            "text-foreground max-w-0 overflow-hidden px-4",
             cellBorder,
             alignText(column.align)
           )}

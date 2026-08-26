@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 import { authClient } from "@/lib/auth/client";
 import { createOrganizationSchema } from "@/schemas/organization";

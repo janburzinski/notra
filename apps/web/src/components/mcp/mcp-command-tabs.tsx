@@ -14,7 +14,7 @@ function clientIcon(client: McpClient) {
   if (!client.iconSrc) {
     return (
       <HugeiconsIcon
-        className="size-4 shrink-0 text-foreground"
+        className="text-foreground size-4 shrink-0"
         icon={CommandLineIcon}
       />
     );

@@ -82,7 +82,9 @@ export const chatSessions = pgTable(
       onDelete: "cascade",
     }),
     title: text("title").notNull(),
-    messages: jsonb("messages").notNull().default(sql`'[]'::jsonb`),
+    messages: jsonb("messages")
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     pinnedAt: timestamp("pinned_at"),
     deletedAt: timestamp("deleted_at"),
     externalChannelSource: text("external_channel_source"),
@@ -1392,7 +1394,10 @@ export const geoSettings = pgTable(
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
     companyName: text("company_name").notNull(),
-    aliases: text("aliases").array().notNull().default(sql`ARRAY[]::text[]`),
+    aliases: text("aliases")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
     competitors: text("competitors")
       .array()
       .notNull()
@@ -1460,7 +1465,10 @@ export const geoPromptSequences = pgTable(
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    steps: text("steps").array().notNull().default(sql`ARRAY[]::text[]`),
+    steps: text("steps")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
     enabled: boolean("enabled").notNull().default(true),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -1486,7 +1494,10 @@ export const geoCompetitors = pgTable(
       .references(() => projects.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     domain: text("domain"),
-    synonyms: text("synonyms").array().notNull().default(sql`ARRAY[]::text[]`),
+    synonyms: text("synonyms")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
     kind: text("kind", { enum: ["direct", "indirect"] })
       .notNull()
       .default("direct"),
@@ -1777,7 +1788,9 @@ export const postCollections = pgTable(
     nameSource: postCollectionNameSourceEnum("name_source")
       .default("generated")
       .notNull(),
-    contentTypes: jsonb("content_types").default(sql`'[]'::jsonb`).notNull(),
+    contentTypes: jsonb("content_types")
+      .default(sql`'[]'::jsonb`)
+      .notNull(),
     sourceMetadata: jsonb("source_metadata"),
     expectedPostCount: integer("expected_post_count"),
     completedPostCount: integer("completed_post_count").default(0).notNull(),

@@ -132,7 +132,7 @@ export function IntegrationCard({
   return (
     <>
       <Card
-        className="cursor-pointer transition-colors hover:bg-accent/50"
+        className="hover:bg-accent/50 cursor-pointer transition-colors"
         onClick={handleCardClick}
       >
         <CardHeader>
@@ -151,8 +151,6 @@ export function IntegrationCard({
             )}
           </CardDescription>
           <CardAction>
-            {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: Event propagation barrier */}
-            {/* biome-ignore lint/a11y/noStaticElementInteractions: Event propagation barrier */}
             <div
               className="flex items-center gap-2"
               data-no-card-click

@@ -53,7 +53,7 @@ export function ConnectAccountsButtons({
               className={cn(
                 CONNECT_X_CLASS,
                 SPLIT_SEGMENT_CLASS,
-                "border-white/20 border-l px-2.5! dark:border-black/15"
+                "border-l border-white/20 px-2.5! dark:border-black/15"
               )}
             />
           }

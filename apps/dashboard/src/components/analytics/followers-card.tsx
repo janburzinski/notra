@@ -38,7 +38,7 @@ function DeltaBadge({ series }: { series: number[] }) {
   const last = series.at(-1);
   if (first === undefined || last === undefined || series.length < 2) {
     return (
-      <span className="whitespace-nowrap font-mono text-[0.6875rem] text-muted-foreground">
+      <span className="text-muted-foreground font-mono text-[0.6875rem] whitespace-nowrap">
         tracking started
       </span>
     );
@@ -46,7 +46,7 @@ function DeltaBadge({ series }: { series: number[] }) {
   const delta = last - first;
   if (delta === 0) {
     return (
-      <span className="font-mono text-[0.6875rem] text-muted-foreground">
+      <span className="text-muted-foreground font-mono text-[0.6875rem]">
         ±0
       </span>
     );
@@ -87,7 +87,7 @@ export function FollowersCard({
           seed="Followers"
         />
       ) : (
-        <div className="flex h-56 flex-col justify-center divide-y divide-border">
+        <div className="divide-border flex h-56 flex-col justify-center divide-y">
           {visible.map((account) => {
             const key = accountSeriesKey(
               account.provider,
@@ -112,11 +112,11 @@ export function FollowersCard({
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
-                  <p className="truncate font-mono text-[0.6875rem] text-muted-foreground">
+                  <p className="text-muted-foreground truncate font-mono text-[0.6875rem]">
                     @{account.username}
                   </p>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-xl tabular-nums tracking-tight">
+                    <span className="font-mono text-xl tracking-tight tabular-nums">
                       {formatMetric(account.followersCount)}
                     </span>
                     <DeltaBadge series={series} />

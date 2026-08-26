@@ -72,7 +72,7 @@ export function IntegrationCardDither({
     >
       {shouldRender ? (
         <Dithering
-          className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 h-[200%] w-[200%]"
+          className="absolute top-0 left-0 h-[200%] w-[200%] -translate-x-1/2 -translate-y-1/2"
           colorBack="#00000000"
           colorFront={colorFront}
           scale={0.74}

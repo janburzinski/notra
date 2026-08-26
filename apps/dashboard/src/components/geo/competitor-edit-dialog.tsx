@@ -20,7 +20,7 @@ export function CompetitorEditDialog({
     <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
       <ResponsiveDialogContent className="sm:max-w-lg">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle className="font-semibold text-xl">
+          <ResponsiveDialogTitle className="text-xl font-semibold">
             {competitor ? `Edit ${competitor.name}` : "Add competitor"}
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>

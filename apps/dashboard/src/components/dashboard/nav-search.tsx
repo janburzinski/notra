@@ -18,7 +18,7 @@ export function NavSearch({ isApplePlatform, onOpen }: NavSearchProps) {
     <>
       <SidebarGroup className="py-0 group-data-[collapsible=icon]:hidden">
         <button
-          className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-md border bg-background px-2 text-muted-foreground text-xs transition-colors hover:bg-muted/60 hover:text-foreground"
+          className="bg-background text-muted-foreground hover:bg-muted/60 hover:text-foreground flex h-8 w-full cursor-pointer items-center gap-2 rounded-md border px-2 text-xs transition-colors"
           onClick={onOpen}
           type="button"
         >

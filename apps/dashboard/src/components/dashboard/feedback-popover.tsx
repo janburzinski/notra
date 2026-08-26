@@ -98,7 +98,7 @@ export function FeedbackForm({
                 aria-label={option.label}
                 aria-pressed={isActive}
                 className={cn(
-                  "flex size-7 cursor-pointer items-center justify-center rounded-md text-base leading-none outline-none transition-colors hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  "hover:bg-muted focus-visible:ring-ring/50 flex size-7 cursor-pointer items-center justify-center rounded-md text-base leading-none transition-colors outline-none focus-visible:ring-[3px]",
                   isActive
                     ? "bg-muted opacity-100"
                     : "opacity-60 hover:opacity-100"

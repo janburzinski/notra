@@ -22,7 +22,7 @@ import {
 import { deleteBrandReferenceMemory } from "@notra/db/utils/supermemory";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import { normalizeTwitterProfileImageUrl } from "@/constants/twitter";
 import { assertOrganizationAccess } from "@/lib/auth/organization";

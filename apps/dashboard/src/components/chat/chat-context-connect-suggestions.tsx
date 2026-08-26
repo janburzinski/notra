@@ -46,12 +46,12 @@ export function ChatContextConnectSuggestions({
             {SUGGESTION_ICONS[integration.id]}
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-sm">{integration.name}</span>
-              <span className="truncate text-muted-foreground text-xs">
+              <span className="text-muted-foreground truncate text-xs">
                 {integration.description}
               </span>
             </span>
             <span
-              className="ml-auto text-muted-foreground text-xs"
+              className="text-muted-foreground ml-auto text-xs"
               data-slot="command-shortcut"
             >
               Connect

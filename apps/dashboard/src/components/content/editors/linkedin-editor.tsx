@@ -122,7 +122,7 @@ export function LinkedInEditor({
         <TabsContent className="mt-0" value="raw">
           <textarea
             aria-label="LinkedIn post content editor"
-            className="field-sizing-content w-full resize-none whitespace-pre-wrap rounded-lg border-0 bg-transparent font-mono text-sm selection:bg-primary/30 focus:outline-none focus:ring-0"
+            className="selection:bg-primary/30 field-sizing-content w-full resize-none rounded-lg border-0 bg-transparent font-mono text-sm whitespace-pre-wrap focus:ring-0 focus:outline-none"
             onChange={(e) => {
               actions.setEditedMarkdown(e.target.value);
             }}

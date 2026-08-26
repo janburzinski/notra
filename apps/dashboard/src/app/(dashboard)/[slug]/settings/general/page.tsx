@@ -169,7 +169,7 @@ function GeneralSettingsPageContent({ params }: GeneralSettingsPageProps) {
     >
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="space-y-1">
-          <h1 className="font-bold text-3xl tracking-tight">General</h1>
+          <h1 className="text-3xl font-bold tracking-tight">General</h1>
           <p className="text-muted-foreground">
             Manage your organization settings
           </p>
@@ -187,7 +187,7 @@ function GeneralSettingsPageContent({ params }: GeneralSettingsPageProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-sm">Delete Organization</p>
+                <p className="text-sm font-medium">Delete Organization</p>
                 <p className="text-muted-foreground text-xs">
                   Permanently delete this organization and all its data
                 </p>
@@ -330,7 +330,7 @@ function ConnectedAccountsGroup({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <HugeiconsIcon className="size-4" icon={icon} />
-          <p className="font-medium text-sm">{label}</p>
+          <p className="text-sm font-medium">{label}</p>
         </div>
         {accounts.length > 0 && (
           <Button disabled={isConnecting} onClick={onConnect} size="sm">
@@ -346,7 +346,7 @@ function ConnectedAccountsGroup({
 
       {accounts.length === 0 && (
         <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed py-8">
-          <div className="flex size-10 items-center justify-center rounded-full bg-muted">
+          <div className="bg-muted flex size-10 items-center justify-center rounded-full">
             <HugeiconsIcon className="size-5" icon={icon} />
           </div>
           <div className="text-center">
@@ -398,7 +398,7 @@ function ConnectedAccountsGroup({
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-1 truncate font-medium text-sm">
+              <p className="flex items-center gap-1 truncate text-sm font-medium">
                 {account.displayName}
                 <XVerificationBadge
                   className="size-4 shrink-0"
@@ -406,7 +406,7 @@ function ConnectedAccountsGroup({
                   verifiedType={account.verifiedType}
                 />
               </p>
-              <p className="truncate text-muted-foreground text-xs">
+              <p className="text-muted-foreground truncate text-xs">
                 @{account.username}
               </p>
             </div>

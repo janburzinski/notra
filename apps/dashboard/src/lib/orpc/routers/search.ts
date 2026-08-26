@@ -8,7 +8,7 @@ import {
   posts,
 } from "@notra/db/schema";
 import { and, desc, eq, ilike, or } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { baseProcedure } from "@/lib/orpc/base";

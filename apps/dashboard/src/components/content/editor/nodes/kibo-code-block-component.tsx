@@ -90,7 +90,6 @@ export default function KiboCodeBlockComponent({
   }
 
   // Auto-resize textarea when content changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: localCode triggers resize
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -195,22 +194,20 @@ export default function KiboCodeBlockComponent({
   const CopyButtonIcon = isCopied ? CheckIcon : CopyIcon;
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Interactive editor element
-    // biome-ignore lint/a11y/noNoninteractiveElementInteractions: Interactive editor element
-    // biome-ignore lint/a11y/useKeyWithClickEvents: Click focuses textarea
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- Click focuses the interactive editor textarea.
     <div
       className={cn(
-        "relative my-4 overflow-hidden rounded-lg border bg-secondary/50",
-        isSelected && "ring-2 ring-primary ring-offset-2"
+        "bg-secondary/50 relative my-4 overflow-hidden rounded-lg border",
+        isSelected && "ring-primary ring-2 ring-offset-2"
       )}
       onClick={() => textareaRef.current?.focus()}
       ref={blockRef}
     >
-      <div className="flex items-center justify-between border-b bg-secondary px-1 py-1">
+      <div className="bg-secondary flex items-center justify-between border-b px-1 py-1">
         <Select onValueChange={handleLanguageChange} value={normalizedLanguage}>
           <SelectTrigger
             aria-label="Select code language"
-            className="h-7 w-fit gap-1 border-none bg-transparent text-muted-foreground text-xs shadow-none"
+            className="text-muted-foreground h-7 w-fit gap-1 border-none bg-transparent text-xs shadow-none"
             size="sm"
           >
             <SelectValue />
@@ -238,7 +235,7 @@ export default function KiboCodeBlockComponent({
       </div>
       <div className="flex">
         <div
-          className="min-w-[3ch] select-none border-r bg-secondary/50 py-4 pr-2 pl-4 text-right font-mono text-muted-foreground/50 text-sm tabular-nums leading-relaxed"
+          className="bg-secondary/50 text-muted-foreground/50 min-w-[3ch] border-r py-4 pr-2 pl-4 text-right font-mono text-sm leading-relaxed tabular-nums select-none"
           ref={lineNumbersRef}
         >
           {Array.from({ length: lineCount }, (_, i) => (

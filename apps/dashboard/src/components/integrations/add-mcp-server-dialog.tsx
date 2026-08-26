@@ -341,7 +341,7 @@ function McpDialogLogo({
 
   if (lightLogo && darkLogo) {
     return (
-      <div className="size-9 shrink-0 overflow-hidden rounded-lg bg-muted">
+      <div className="bg-muted size-9 shrink-0 overflow-hidden rounded-lg">
         <Image
           alt={`${name} logo`}
           className="size-9 object-contain dark:hidden"
@@ -361,9 +361,9 @@ function McpDialogLogo({
   }
 
   return (
-    <Avatar className="size-9 shrink-0 rounded-lg bg-muted after:hidden">
+    <Avatar className="bg-muted size-9 shrink-0 rounded-lg after:hidden">
       <AvatarImage className="rounded-lg" src={getMcpFaviconUrl(url)} />
-      <AvatarFallback className="rounded-lg bg-transparent text-foreground">
+      <AvatarFallback className="text-foreground rounded-lg bg-transparent">
         <HugeiconsIcon className="size-5" icon={CpuIcon} />
       </AvatarFallback>
     </Avatar>

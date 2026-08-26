@@ -17,7 +17,7 @@ export function HomePageSkeleton() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-lg">Today&apos;s Content</h2>
+              <h2 className="text-lg font-semibold">Today&apos;s Content</h2>
               <p className="text-muted-foreground text-sm">
                 Latest items created today
               </p>
@@ -36,7 +36,7 @@ export function HomePageSkeleton() {
 
         <section className="space-y-4">
           <div>
-            <h2 className="font-semibold text-lg">Content Activity</h2>
+            <h2 className="text-lg font-semibold">Content Activity</h2>
             <p className="text-muted-foreground text-sm">
               Your content creation over the year
             </p>

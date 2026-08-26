@@ -138,7 +138,7 @@ export function NavBrandIdentity({ slug }: { slug: string }) {
                 <HugeiconsIcon icon={Comment01Icon} />
                 <SidebarLabel>References</SidebarLabel>
                 {referenceCount > 0 ? (
-                  <span className="ml-auto text-muted-foreground text-xs tabular-nums group-data-[collapsible=icon]:hidden">
+                  <span className="text-muted-foreground ml-auto text-xs tabular-nums group-data-[collapsible=icon]:hidden">
                     {referenceCount}
                   </span>
                 ) : null}
@@ -155,7 +155,7 @@ export function NavBrandIdentity({ slug }: { slug: string }) {
                 <HugeiconsIcon icon={GlobalIcon} />
                 <SidebarLabel>Sitemap</SidebarLabel>
                 {sitemapCount > 0 ? (
-                  <span className="ml-auto text-muted-foreground text-xs tabular-nums group-data-[collapsible=icon]:hidden">
+                  <span className="text-muted-foreground ml-auto text-xs tabular-nums group-data-[collapsible=icon]:hidden">
                     {sitemapCount}
                   </span>
                 ) : null}

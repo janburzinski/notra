@@ -21,28 +21,28 @@ export function IntegrationIcon({ type }: { type: IntegrationType }) {
     case "webhook":
       return (
         <HugeiconsIcon
-          className="size-4 text-muted-foreground"
+          className="text-muted-foreground size-4"
           icon={Link04Icon}
         />
       );
     case "manual":
       return (
         <HugeiconsIcon
-          className="size-4 text-muted-foreground"
+          className="text-muted-foreground size-4"
           icon={PlayCircleIcon}
         />
       );
     case "schedule":
       return (
         <HugeiconsIcon
-          className="size-4 text-muted-foreground"
+          className="text-muted-foreground size-4"
           icon={Calendar03Icon}
         />
       );
     case "events":
       return (
         <HugeiconsIcon
-          className="size-4 text-muted-foreground"
+          className="text-muted-foreground size-4"
           icon={Notification03Icon}
         />
       );

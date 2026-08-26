@@ -2,7 +2,7 @@ import {
   type IrisOutboxArtifact,
   irisOutboxArtifactSchema,
 } from "@notra/ai/schemas/autonomy/outbox";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 
 const artifactListSchema = z.array(irisOutboxArtifactSchema);

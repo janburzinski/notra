@@ -1,5 +1,5 @@
 import { MCP_STORE_CATEGORIES } from "@notra/ai/constants/mcp-store-categories";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 export const setStoreListingCategoryRequestSchema = z.object({

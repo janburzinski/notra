@@ -114,7 +114,7 @@ export function DashboardSidebar({
             {isSubpage && (
               <m.div
                 animate="animate"
-                className="sticky top-0 z-10 bg-sidebar p-2"
+                className="bg-sidebar sticky top-0 z-10 p-2"
                 exit="exit"
                 initial="initial"
                 key="back-button"
@@ -123,7 +123,7 @@ export function DashboardSidebar({
               >
                 <SidebarMenu>
                   <SidebarMenuButton
-                    className="[&>*]:group-data-[collapsible=icon]:-translate-x-px cursor-pointer transition-colors duration-200 hover:bg-sidebar-accent"
+                    className="hover:bg-sidebar-accent cursor-pointer transition-colors duration-200 [&>*]:group-data-[collapsible=icon]:-translate-x-px"
                     onClick={handleBack}
                     tooltip="Back"
                   >

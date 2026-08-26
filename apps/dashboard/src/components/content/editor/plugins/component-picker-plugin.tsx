@@ -95,7 +95,7 @@ function ComponentPickerMenuItem({
       role="option"
       tabIndex={-1}
     >
-      <span className="flex size-5 items-center justify-center text-muted-foreground">
+      <span className="text-muted-foreground flex size-5 items-center justify-center">
         {option.icon}
       </span>
       <span>{option.title}</span>
@@ -247,7 +247,7 @@ export function ComponentPickerPlugin() {
       ) =>
         anchorElementRef.current && options.length > 0
           ? createPortal(
-              <div className="min-w-[180px] overflow-hidden rounded-lg border bg-popover p-1 shadow-lg">
+              <div className="bg-popover min-w-[180px] overflow-hidden rounded-lg border p-1 shadow-lg">
                 <div className="max-h-[200px] overflow-y-auto" role="listbox">
                   {options.map((option, index) => (
                     <ComponentPickerMenuItem

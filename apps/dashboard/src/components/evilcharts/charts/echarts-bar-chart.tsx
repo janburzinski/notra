@@ -1738,7 +1738,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     !isLoading && bars.some((bar) => bar.variant === "stripped");
 
   // Refresh the handlers' snapshot of the latest callbacks/flags every render.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally runs after every render to snapshot the latest values.
+  // oxlint-disable-next-line react/exhaustive-deps -- intentionally runs after every render to snapshot the latest values.
   useLayoutEffect(() => {
     live.handlers = {
       onBrushChange: brushSlot.onChange,

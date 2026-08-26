@@ -112,7 +112,7 @@ export function GuidelinesPanel({
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between gap-3">
-          <p className="flex items-center gap-2 text-muted-foreground text-sm">
+          <p className="text-muted-foreground flex items-center gap-2 text-sm">
             <Loader2Icon className="size-4 animate-spin" />
             Generating guidelines…
           </p>
@@ -129,14 +129,14 @@ export function GuidelinesPanel({
   return (
     <div className="space-y-6">
       {isGenerating ? (
-        <p className="flex items-center justify-end gap-2 text-muted-foreground text-xs">
+        <p className="text-muted-foreground flex items-center justify-end gap-2 text-xs">
           <Loader2Icon className="size-3 animate-spin" />
           Updating guidelines…
         </p>
       ) : null}
 
       {guideline.lastGeneratedAt && !isGenerating ? (
-        <p className="text-right text-muted-foreground text-xs">
+        <p className="text-muted-foreground text-right text-xs">
           Updated {formatRelativeTime(new Date(guideline.lastGeneratedAt))}
         </p>
       ) : null}

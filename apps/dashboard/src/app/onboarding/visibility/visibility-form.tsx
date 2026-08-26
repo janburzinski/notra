@@ -172,9 +172,9 @@ export function VisibilityForm({
         <div className="mt-2 space-y-5">
           <div className="grid gap-2">
             <Label htmlFor={`${id}-website`}>Website</Label>
-            <div className="flex h-11 w-full flex-row items-center overflow-hidden rounded-xl border border-input transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50">
+            <div className="border-input focus-within:border-ring focus-within:ring-ring/50 flex h-11 w-full flex-row items-center overflow-hidden rounded-xl border transition-colors focus-within:ring-[3px]">
               <label
-                className="flex h-full items-center border-input border-r bg-muted/30 px-3.5 text-muted-foreground text-sm"
+                className="border-input bg-muted/30 text-muted-foreground flex h-full items-center border-r px-3.5 text-sm"
                 htmlFor={`${id}-website`}
               >
                 https://
@@ -196,7 +196,7 @@ export function VisibilityForm({
                 value={websiteInput}
               />
               {isAnalyzing ? (
-                <span className="flex h-full items-center px-3.5 text-muted-foreground">
+                <span className="text-muted-foreground flex h-full items-center px-3.5">
                   <Loader2Icon className="size-4 animate-spin" />
                 </span>
               ) : null}

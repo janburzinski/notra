@@ -40,7 +40,7 @@ function SelectionChip({
         <Composer.Chip
           icon={
             <HugeiconsIcon
-              className="size-3.5 shrink-0 text-muted-foreground"
+              className="text-muted-foreground size-3.5 shrink-0"
               icon={TextSelectionIcon}
             />
           }
@@ -56,7 +56,7 @@ function SelectionChip({
             From line {selection.startLine}, character {selection.startChar} to
             line {selection.endLine}, character {selection.endChar}
           </p>
-          <p className="line-clamp-3 whitespace-pre-wrap break-all text-xs opacity-80">
+          <p className="line-clamp-3 text-xs break-all whitespace-pre-wrap opacity-80">
             "{previewText}"
           </p>
         </div>

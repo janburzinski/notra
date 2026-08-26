@@ -42,10 +42,10 @@ export function MentionTrendAgentsPicker({
         disabled={disabled}
       >
         {preview.length > 0 ? (
-          <span className="-space-x-1.5 flex items-center pr-0.5">
+          <span className="flex items-center -space-x-1.5 pr-0.5">
             {preview.map((entry) => (
               <span
-                className="relative flex size-4 items-center justify-center overflow-hidden rounded-full bg-background ring-2 ring-background"
+                className="bg-background ring-background relative flex size-4 items-center justify-center overflow-hidden rounded-full ring-2"
                 key={entry.key}
               >
                 <EngineIcon className="size-3.5" engine={entry.engine} />

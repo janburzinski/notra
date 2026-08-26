@@ -1,8 +1,8 @@
-import type { OAuthProtectedResourceMetadata } from "@modelcontextprotocol/sdk/shared/auth.js";
 import {
   checkResourceAllowed,
   resourceUrlFromServerUrl,
 } from "@modelcontextprotocol/sdk/shared/auth-utils.js";
+import type { OAuthProtectedResourceMetadata } from "@modelcontextprotocol/sdk/shared/auth.js";
 import { assertPublicHttpUrlResolution } from "@notra/utils/url";
 import { McpOAuthAuthorizationError } from "../integrations/mcp-oauth-errors";
 

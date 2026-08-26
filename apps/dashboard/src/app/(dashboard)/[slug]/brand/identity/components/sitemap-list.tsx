@@ -132,7 +132,7 @@ export function SitemapList({
                   const safeUrl = getSafeHttpUrl(selectedSitemap.url);
                   return safeUrl ? (
                     <a
-                      className="group flex min-w-0 items-center gap-2 text-muted-foreground text-sm transition-colors hover:text-foreground"
+                      className="group text-muted-foreground hover:text-foreground flex min-w-0 items-center gap-2 text-sm transition-colors"
                       href={safeUrl}
                       rel="noopener noreferrer"
                       target="_blank"
@@ -150,7 +150,7 @@ export function SitemapList({
                       />
                     </a>
                   ) : (
-                    <div className="flex min-w-0 items-center gap-2 text-muted-foreground text-sm">
+                    <div className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
                       <HugeiconsIcon
                         className="size-4 shrink-0"
                         icon={GlobalIcon}
@@ -160,7 +160,7 @@ export function SitemapList({
                   );
                 })()}
                 <Button
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                  className="text-muted-foreground hover:text-destructive shrink-0"
                   onClick={() => setDeleteTargetId(selectedSitemap.id)}
                   size="sm"
                   variant="ghost"

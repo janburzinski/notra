@@ -23,14 +23,14 @@ export function DesignSystemFrame({
         <header className="space-y-3">
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-3">
-              <h1 className="font-semibold text-3xl tracking-tight">{title}</h1>
+              <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
               <DesignSystemNav />
             </div>
             <SidebarProvider className="min-h-0! w-auto" defaultOpen={false}>
               <ThemeToggle />
             </SidebarProvider>
           </div>
-          <p className="max-w-2xl text-muted-foreground text-sm">
+          <p className="text-muted-foreground max-w-2xl text-sm">
             {description}
           </p>
         </header>

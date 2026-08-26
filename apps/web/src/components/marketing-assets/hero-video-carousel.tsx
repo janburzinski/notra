@@ -37,7 +37,6 @@ export function HeroVideoCarousel({
     };
   }, []);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: activeIndex intentionally restarts slide progress.
   useEffect(() => {
     if (prefersReducedMotion || videos.length < 2) {
       setProgress(100);
@@ -67,7 +66,7 @@ export function HeroVideoCarousel({
     <div className={cn("flex flex-col", className)}>
       <div className="corner-squircle relative overflow-hidden rounded-2xl bg-[#C8B2EE40] supports-[corner-shape:round]:rounded-[1.25rem] dark:bg-white/[0.04]">
         <LoopVideo
-          className="fade-in-0 zoom-in-95 animate-in rounded-2xl border-border/70 shadow-none duration-500 supports-[corner-shape:round]:rounded-[1.25rem] motion-reduce:animate-none"
+          className="fade-in-0 zoom-in-95 animate-in border-border/70 rounded-2xl shadow-none duration-500 supports-[corner-shape:round]:rounded-[1.25rem] motion-reduce:animate-none"
           key={activeVideo.src}
           label={activeVideo.label}
           poster={activeVideo.poster}

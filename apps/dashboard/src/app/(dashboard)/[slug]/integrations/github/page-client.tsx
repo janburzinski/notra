@@ -158,7 +158,7 @@ function LegacyGitHubIntegrationsSection({
   return (
     <section className="space-y-3">
       <div className="space-y-0.5">
-        <h2 className="font-semibold text-lg">
+        <h2 className="text-lg font-semibold">
           Personal access token (Legacy)
         </h2>
         <p className="text-muted-foreground text-sm">
@@ -379,7 +379,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="font-bold text-3xl tracking-tight">GitHub</h1>
+            <h1 className="text-3xl font-bold tracking-tight">GitHub</h1>
             <p className="text-muted-foreground">
               Connect your repositories through the Notra GitHub App to generate
               changelogs, blog posts, and more.
@@ -410,7 +410,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
         <p className="text-muted-foreground text-xs">
           Still using a personal access token?{" "}
           <button
-            className="cursor-pointer font-medium text-foreground underline-offset-4 hover:underline"
+            className="text-foreground cursor-pointer font-medium underline-offset-4 hover:underline"
             onClick={() => setLegacyOpen(true)}
             type="button"
           >

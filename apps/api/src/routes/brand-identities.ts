@@ -8,7 +8,6 @@ import {
 } from "@notra/ai/jobs/brand-analysis";
 import { brandSettings, contentTriggers } from "@notra/db/schema";
 import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
-
 import {
   createBrandIdentityRequestSchema,
   createBrandIdentityResponseSchema,

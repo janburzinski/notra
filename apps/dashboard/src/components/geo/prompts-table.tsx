@@ -51,7 +51,7 @@ function PromptRowActions({
           render={
             <button
               aria-label="Auto-generated prompts cannot be paused or removed"
-              className="inline-flex size-8 cursor-help items-center justify-center text-muted-foreground"
+              className="text-muted-foreground inline-flex size-8 cursor-help items-center justify-center"
               onClick={(event) => event.stopPropagation()}
               onPointerDown={(event) => event.stopPropagation()}
               type="button"
@@ -149,7 +149,7 @@ export function PromptsTable({
         header: (
           <span className="inline-flex items-center gap-1.5">
             Prompt
-            <span className="font-normal text-muted-foreground tabular-nums">
+            <span className="text-muted-foreground font-normal tabular-nums">
               ({rows.length})
             </span>
           </span>
@@ -235,7 +235,7 @@ export function PromptsTable({
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-0 flex-1 sm:max-w-72">
           <HugeiconsIcon
-            className="-translate-y-1/2 absolute top-1/2 left-3 text-muted-foreground"
+            className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"
             icon={SearchIcon}
             size={15}
           />

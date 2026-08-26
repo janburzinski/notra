@@ -77,10 +77,10 @@ export function UserMessageActions({
   return (
     <div
       className={cn(
-        "mt-0.5 ml-auto flex items-center gap-1 text-muted-foreground transition-[opacity,height,margin] duration-200 ease-out",
+        "text-muted-foreground mt-0.5 ml-auto flex items-center gap-1 transition-[opacity,height,margin] duration-200 ease-out",
         isEditing
           ? "pointer-events-none mt-0 h-0 overflow-hidden opacity-0"
-          : "opacity-0 focus-within:opacity-100 group-hover:opacity-100 data-[force-visible=true]:opacity-100"
+          : "opacity-0 group-hover:opacity-100 focus-within:opacity-100 data-[force-visible=true]:opacity-100"
       )}
       data-force-visible={retryOpen || undefined}
     >
@@ -154,7 +154,7 @@ export function UserMessageActions({
                   <span className="text-muted-foreground text-xs">
                     {m.description}
                   </span>
-                  <span className="text-[0.625rem] text-muted-foreground/70">
+                  <span className="text-muted-foreground/70 text-[0.625rem]">
                     {m.pricing}
                   </span>
                 </div>
@@ -232,7 +232,6 @@ function UserMessageEditor({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const reduceMotion = useReducedMotion();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when value changes (scrollHeight is read from the DOM).
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) {
@@ -268,7 +267,7 @@ function UserMessageEditor({
   return (
     <div className="flex flex-col gap-2">
       <textarea
-        className="wrap-break-word max-h-80 min-h-6 w-full resize-none bg-transparent text-foreground text-sm leading-6 outline-none placeholder:text-muted-foreground"
+        className="text-foreground placeholder:text-muted-foreground max-h-80 min-h-6 w-full resize-none bg-transparent text-sm leading-6 wrap-break-word outline-none"
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {

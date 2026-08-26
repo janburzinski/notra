@@ -217,14 +217,12 @@ export async function publishPendingPostToX(
       accountId: pending.accountId,
       content: pending.text,
     }).pipe(
-      Effect.map(
-        (result): PostToXOutcome => ({
-          turnId,
-          postUrl: result.postUrl,
-          failed: false,
-          confirmed: result.confirmed,
-        })
-      ),
+      Effect.map((result): PostToXOutcome => ({
+        turnId,
+        postUrl: result.postUrl,
+        failed: false,
+        confirmed: result.confirmed,
+      })),
       Effect.catch((error) =>
         Effect.logWarning("[agent] Post to X failed", error).pipe(
           Effect.as<PostToXOutcome>({

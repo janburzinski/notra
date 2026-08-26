@@ -30,16 +30,16 @@ export default async function AuthLayout({
           <span aria-hidden="true">
             <Notra className="size-7" />
           </span>
-          <h1 className="font-semibold text-foreground text-lg tracking-tight">
+          <h1 className="text-foreground text-lg font-semibold tracking-tight">
             Notra
           </h1>
         </Link>
         <div className="w-full max-w-md">{children}</div>
         <div>
-          <p className="px-8 text-center text-muted-foreground text-xs">
+          <p className="text-muted-foreground px-8 text-center text-xs">
             By continuing, you agree to our{" "}
             <Link
-              className="underline underline-offset-4 hover:text-primary"
+              className="hover:text-primary underline underline-offset-4"
               href="https://usenotra.com/terms"
               rel="noopener noreferrer"
               target="_blank"
@@ -48,7 +48,7 @@ export default async function AuthLayout({
             </Link>{" "}
             and{" "}
             <Link
-              className="underline underline-offset-4 hover:text-primary"
+              className="hover:text-primary underline underline-offset-4"
               href="https://usenotra.com/privacy"
               rel="noopener noreferrer"
               target="_blank"

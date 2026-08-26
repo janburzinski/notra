@@ -27,10 +27,10 @@ export function GuidelinesTokensSection({
     <section className="space-y-3">
       <div className="flex items-center gap-2">
         <HugeiconsIcon
-          className="size-4 text-muted-foreground"
+          className="text-muted-foreground size-4"
           icon={DashboardSquare01Icon}
         />
-        <h2 className="font-semibold text-sm">UI Tokens</h2>
+        <h2 className="text-sm font-semibold">UI Tokens</h2>
         <span className="text-muted-foreground text-xs tabular-nums">
           {tokens.length}
         </span>
@@ -39,7 +39,7 @@ export function GuidelinesTokensSection({
       <div className="space-y-4">
         {groups.map((group) => (
           <div className="space-y-2" key={group.type}>
-            <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               {TOKEN_TYPE_LABELS[group.type]}
             </p>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -52,7 +52,7 @@ export function GuidelinesTokensSection({
                     {token.name}
                   </span>
                   <span
-                    className="max-w-[45%] truncate font-mono text-muted-foreground text-xs tabular-nums"
+                    className="text-muted-foreground max-w-[45%] truncate font-mono text-xs tabular-nums"
                     title={token.value}
                   >
                     {token.value}

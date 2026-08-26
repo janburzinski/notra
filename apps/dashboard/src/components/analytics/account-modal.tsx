@@ -24,7 +24,7 @@ export function AccountModal({ title, children }: AccountModalProps) {
     >
       <ResponsiveDialogContent className="max-h-[90svh] gap-4 overflow-hidden p-6 sm:max-w-4xl [&>*]:min-w-0">
         <ResponsiveDialogHeader className="sr-only">
-          <ResponsiveDialogTitle className="font-semibold text-xl">
+          <ResponsiveDialogTitle className="text-xl font-semibold">
             @{title}
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>

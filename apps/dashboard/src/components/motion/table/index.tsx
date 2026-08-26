@@ -285,7 +285,7 @@ export function Table<T>({
     <div className={cn("w-full text-sm", className)}>
       {/* Overlap (>= rounded-2xl) hides the header's side border in the body radius. */}
       <div
-        className="overflow-hidden rounded-t-2xl border border-border border-b-0 bg-muted pb-5"
+        className="border-border bg-muted overflow-hidden rounded-t-2xl border border-b-0 pb-5"
         ref={headerScrollRef}
         style={scrolls ? { scrollbarGutter: "stable" } : undefined}
       >
@@ -331,7 +331,7 @@ export function Table<T>({
 
       <div
         className={cn(
-          "-mt-5 scrollbar-floating relative box-content rounded-2xl border border-border bg-background outline-none",
+          "scrollbar-floating border-border bg-background relative -mt-5 box-content rounded-2xl border outline-none",
           scrolls ? "overflow-auto" : "overflow-x-auto overflow-y-hidden"
         )}
         onScroll={handleScroll}
@@ -366,7 +366,7 @@ export function Table<T>({
                 <tr>
                   <td className="p-0" colSpan={leadColumns + 1}>
                     <div
-                      className="flex items-center justify-center px-6 text-center text-muted-foreground"
+                      className="text-muted-foreground flex items-center justify-center px-6 text-center"
                       style={{ height: bodyHeight }}
                     >
                       {emptyState}

@@ -5,7 +5,7 @@ import { db } from "@notra/db/drizzle";
 import { brandSitemapPages, brandSitemaps } from "@notra/db/schema";
 import { type Tool, tool } from "ai";
 import { and, desc, eq, ilike, inArray, or } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 const DEFAULT_PAGE_LIMIT = 40;

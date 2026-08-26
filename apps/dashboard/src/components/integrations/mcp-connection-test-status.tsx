@@ -13,11 +13,11 @@ export function McpConnectionTestStatus({
   return (
     <output
       aria-live="polite"
-      className="flex items-center gap-2 rounded-lg border border-border/80 bg-muted/40 px-3 py-2 text-sm"
+      className="border-border/80 bg-muted/40 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
     >
       {status === "testing" ? (
         <>
-          <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+          <Loader2Icon className="text-muted-foreground size-4 animate-spin" />
           <span className="text-muted-foreground">Testing connection...</span>
         </>
       ) : null}
@@ -33,7 +33,7 @@ export function McpConnectionTestStatus({
       {status === "error" ? (
         <>
           <HugeiconsIcon
-            className="size-4 text-destructive"
+            className="text-destructive size-4"
             icon={Alert01Icon}
           />
           <span className="text-destructive">

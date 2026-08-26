@@ -15,7 +15,7 @@ import {
 } from "@notra/db/schema";
 import { type Tool, tool } from "ai";
 import { and, desc, eq, gte } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 const MS_PER_DAY = 86_400_000;

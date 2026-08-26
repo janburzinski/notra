@@ -55,7 +55,7 @@ export const CodeBlockContent = async ({
 
   return (
     <div
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: "Kinda how Shiki works"
+      // oxlint-disable-next-line react/no-danger -- "Kinda how Shiki works"
       dangerouslySetInnerHTML={{ __html: html }}
       {...props}
     />

@@ -2,7 +2,7 @@ import { db } from "@notra/db/drizzle";
 import { skills } from "@notra/db/schema";
 import { and, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { authorizedProcedure } from "@/lib/orpc/base";

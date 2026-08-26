@@ -35,7 +35,7 @@ function CodexTerminal({
           <div className="size-2.5 shrink-0 rounded-full bg-[#4A4A4A]" />
         </div>
         {title ? (
-          <span className="font-mono text-[#FFFFFF66] text-[0.75rem] leading-4">
+          <span className="font-mono text-[0.75rem] leading-4 text-[#FFFFFF66]">
             {title}
           </span>
         ) : null}

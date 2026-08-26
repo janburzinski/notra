@@ -22,7 +22,7 @@ export function NavModeSwitch({
 }: NavModeSwitchProps) {
   return (
     <SidebarGroup className="pt-0">
-      <div className="grid grid-cols-2 gap-0.5 rounded-lg bg-sidebar-accent p-0.5 group-data-[collapsible=icon]:hidden">
+      <div className="bg-sidebar-accent grid grid-cols-2 gap-0.5 rounded-lg p-0.5 group-data-[collapsible=icon]:hidden">
         {SIDEBAR_MODES.map((option) => {
           const isActive = option.id === mode;
           return (
@@ -31,7 +31,7 @@ export function NavModeSwitch({
               className={cn(
                 "flex h-7 items-center justify-center gap-1.5 rounded-md text-xs transition-colors",
                 isActive
-                  ? "bg-background font-medium text-foreground ring-1 ring-border"
+                  ? "bg-background text-foreground ring-border font-medium ring-1"
                   : "text-muted-foreground hover:text-foreground"
               )}
               href={geoNavHref(

@@ -41,7 +41,7 @@ export function ConnectGitHubDialog({
       <ResponsiveDialogContent className="sm:max-w-[520px]">
         <ResponsiveDialogHeader>
           <div className="flex items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+            <span className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-lg">
               <Github className="size-6" />
             </span>
             <div className="space-y-1">
@@ -64,10 +64,10 @@ export function ConnectGitHubDialog({
           <ul className="space-y-2">
             {GITHUB_APP_PERMISSIONS.map((permission) => (
               <li
-                className="flex items-start gap-2 text-muted-foreground text-sm"
+                className="text-muted-foreground flex items-start gap-2 text-sm"
                 key={permission}
               >
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-foreground/40" />
+                <span className="bg-foreground/40 mt-1.5 size-1.5 shrink-0 rounded-full" />
                 {permission}
               </li>
             ))}

@@ -46,7 +46,7 @@ export function GeoTagList({
         <div className="space-y-1">
           <Label className="flex items-center gap-2" htmlFor={id}>
             {label}
-            <span className="font-normal text-muted-foreground tabular-nums">
+            <span className="text-muted-foreground font-normal tabular-nums">
               {values.length}/{max}
             </span>
           </Label>
@@ -98,7 +98,7 @@ export function GeoTagList({
               {value}
               <button
                 aria-label={`Remove ${value}`}
-                className="cursor-pointer rounded-sm p-0.5 hover:bg-background disabled:cursor-not-allowed"
+                className="hover:bg-background cursor-pointer rounded-sm p-0.5 disabled:cursor-not-allowed"
                 disabled={disabled}
                 onClick={() => onChange(removeValue(values, value))}
                 type="button"

@@ -103,7 +103,7 @@ export function ImpressionsShareCard({
                     className="size-2 shrink-0 rounded-[0.0625rem]"
                     style={{ backgroundColor: `var(--color-${row.slice}-0)` }}
                   />
-                  <span className="min-w-0 flex-1 truncate text-muted-foreground">
+                  <span className="text-muted-foreground min-w-0 flex-1 truncate">
                     {row.account}
                   </span>
                   <span className="shrink-0 tabular-nums">
@@ -116,7 +116,7 @@ export function ImpressionsShareCard({
             </ChartColorScope>
           </div>
           {caption && (
-            <p className="mt-2 truncate text-[0.6875rem] text-muted-foreground">
+            <p className="text-muted-foreground mt-2 truncate text-[0.6875rem]">
               {caption}
             </p>
           )}

@@ -1,3 +1,5 @@
+import type { NotraBlogPost } from "~types/blog";
+import type { RssFeedItem, RssFeedOptions } from "~types/rss";
 import {
   RSS_FEED_DESCRIPTION,
   RSS_FEED_LANGUAGE,
@@ -5,8 +7,6 @@ import {
   RSS_FEED_TITLE,
 } from "@/utils/constants";
 import { SITE_URL } from "@/utils/urls";
-import type { NotraBlogPost } from "~types/blog";
-import type { RssFeedItem, RssFeedOptions } from "~types/rss";
 
 const XML_ESCAPE_REGEX = /[<>&'"]/g;
 const CDATA_END_REGEX = /]]>/g;

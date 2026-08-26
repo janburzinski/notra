@@ -1,7 +1,7 @@
 import { gateway } from "@notra/ai/gateway";
 import type { PlannerOutput } from "@notra/ai/schemas/autonomy/planner";
 import { generateText, Output } from "ai";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 import type { IrisEvalScenario } from "./fixtures";
 

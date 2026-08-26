@@ -21,15 +21,15 @@ export function NotificationToggleRow({
         "flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors",
         disabled
           ? "cursor-not-allowed opacity-60"
-          : "cursor-pointer hover:bg-muted/60"
+          : "hover:bg-muted/60 cursor-pointer"
       )}
       htmlFor={id}
     >
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted text-muted-foreground">
+      <div className="border-border/60 bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-md border">
         <HugeiconsIcon className="size-[18px]" icon={config.icon} />
       </div>
       <div className="min-w-0 flex-1 space-y-0.5">
-        <p className="font-medium text-sm">{config.label}</p>
+        <p className="text-sm font-medium">{config.label}</p>
         <p className="text-muted-foreground text-xs">{config.description}</p>
       </div>
       <Switch

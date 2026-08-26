@@ -27,7 +27,7 @@ export function SocialAccountSelector({
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          "flex min-w-0 cursor-pointer items-center gap-1 rounded-md hover:bg-accent",
+          "hover:bg-accent flex min-w-0 cursor-pointer items-center gap-1 rounded-md",
           className
         )}
         style={style}
@@ -60,7 +60,7 @@ export function SocialAccountSelector({
               </AvatarFallback>
             </Avatar>
             <div className="flex min-w-0 flex-col">
-              <span className="flex items-center gap-1 truncate font-medium text-xs">
+              <span className="flex items-center gap-1 truncate text-xs font-medium">
                 {account.displayName}
                 <XVerificationBadge
                   className="size-3.5 shrink-0"
@@ -68,7 +68,7 @@ export function SocialAccountSelector({
                   verifiedType={account.verifiedType}
                 />
               </span>
-              <span className="truncate text-muted-foreground text-xs">
+              <span className="text-muted-foreground truncate text-xs">
                 @{account.username}
               </span>
             </div>

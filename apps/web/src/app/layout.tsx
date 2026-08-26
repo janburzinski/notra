@@ -15,7 +15,6 @@ import {
   TWITTER_HANDLE,
 } from "../utils/metadata";
 import { SITE_URL } from "../utils/urls";
-
 import "@/styles/globals.css";
 
 const inter = Inter({

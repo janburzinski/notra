@@ -30,7 +30,7 @@ export function CreditTopupModal({
     return (
       <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
         <ResponsiveDialogContent className="sm:max-w-md">
-          <div className="-translate-x-1/2 pointer-events-none absolute top-0 left-1/2">
+          <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2">
             <Confetti
               colors={[
                 "var(--primary)",
@@ -55,7 +55,7 @@ export function CreditTopupModal({
               icon={Tick02Icon}
             />
             <div className="space-y-1">
-              <h2 className="font-bold text-xl">Credits Added!</h2>
+              <h2 className="text-xl font-bold">Credits Added!</h2>
               <p className="text-muted-foreground text-sm">
                 Your AI credits have been topped up and are ready to use.
               </p>

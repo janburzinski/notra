@@ -1,6 +1,6 @@
 import { Data, Effect } from "effect";
-import type { RepoStarData } from "@/types/star-video";
 import type { GitHubRepo, GitHubUser } from "~types/github";
+import type { RepoStarData } from "@/types/star-video";
 
 const MAX_AVATARS = 60;
 const REVALIDATE_SECONDS = 60 * 60 * 24;

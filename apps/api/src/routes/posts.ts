@@ -13,7 +13,6 @@ import { postCollections, posts } from "@notra/db/schema";
 import { buildPostCollectionName } from "@notra/db/utils/post-collections";
 import { and, count, eq, inArray, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
-
 import {
   ALL_POST_CONTENT_TYPES,
   ALL_POST_STATUSES,

@@ -127,7 +127,7 @@ export function LegacyEditTokenDialog({
                       value={field.state.value}
                     />
                     {field.state.meta.errors.length > 0 ? (
-                      <p className="mt-1 text-destructive text-sm">
+                      <p className="text-destructive mt-1 text-sm">
                         {typeof field.state.meta.errors[0] === "string"
                           ? field.state.meta.errors[0]
                           : ((
@@ -135,7 +135,7 @@ export function LegacyEditTokenDialog({
                             )?.message ?? "Invalid value")}
                       </p>
                     ) : null}
-                    <p className="mt-2 text-muted-foreground text-xs">
+                    <p className="text-muted-foreground mt-2 text-xs">
                       <a
                         className="text-primary hover:underline"
                         href="https://github.com/settings/tokens/new?scopes=repo&description=Notra%20Integration"

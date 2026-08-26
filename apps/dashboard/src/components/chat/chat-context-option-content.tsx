@@ -15,7 +15,7 @@ export function ChatContextOptionContent({
       )}
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-sm">{option.label}</span>
-        <span className="truncate text-muted-foreground text-xs">
+        <span className="text-muted-foreground truncate text-xs">
           {option.description}
         </span>
       </span>

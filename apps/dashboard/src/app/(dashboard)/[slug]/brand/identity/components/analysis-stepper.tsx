@@ -20,7 +20,7 @@ const STEP_ICONS: Record<StepIconState, () => ReactNode> = {
   active: () => <Loader2Icon className="size-4 animate-spin" />,
   pending: () => (
     <HugeiconsIcon
-      className="size-4 text-muted-foreground"
+      className="text-muted-foreground size-4"
       icon={MinusSignIcon}
     />
   ),

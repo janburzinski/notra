@@ -5,7 +5,7 @@ import type {
   GranolaToolsAccessConfig,
 } from "@notra/ai/types/tools";
 import { type Tool, tool } from "ai";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 import { getAICachedTools } from "./tool-cache";
 

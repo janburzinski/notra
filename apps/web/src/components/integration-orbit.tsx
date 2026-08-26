@@ -12,43 +12,43 @@ import { NotraMark } from "./notra-mark";
 
 const items = [
   <div
-    className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-sm"
+    className="border-border bg-background flex h-12 w-12 items-center justify-center rounded-full border shadow-sm"
     key="github"
   >
     <Github className="h-6 w-6" />
   </div>,
   <div
-    className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-sm"
+    className="border-border bg-background flex h-12 w-12 items-center justify-center rounded-full border shadow-sm"
     key="linear"
   >
     <Linear className="h-6 w-6" />
   </div>,
   <div
-    className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-sm"
+    className="border-border bg-background flex h-12 w-12 items-center justify-center rounded-full border shadow-sm"
     key="slack"
   >
     <Slack className="h-6 w-6" />
   </div>,
   <div
-    className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-sm"
+    className="border-border bg-background flex h-12 w-12 items-center justify-center rounded-full border shadow-sm"
     key="databuddy"
   >
     <Databuddy className="h-6 w-6" />
   </div>,
   <div
-    className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-sm"
+    className="border-border bg-background flex h-12 w-12 items-center justify-center rounded-full border shadow-sm"
     key="framer"
   >
     <Framer className="h-6 w-6" />
   </div>,
   <div
-    className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-sm"
+    className="border-border bg-background flex h-12 w-12 items-center justify-center rounded-full border shadow-sm"
     key="marble"
   >
     <Marble className="h-6 w-6" />
   </div>,
   <div
-    className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background shadow-sm"
+    className="border-border bg-background flex h-12 w-12 items-center justify-center rounded-full border shadow-sm"
     key="webflow"
   >
     <Webflow className="h-6 w-6" />
@@ -56,7 +56,7 @@ const items = [
 ];
 
 const centerLogo = (
-  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-background text-primary shadow-md dark:bg-[#f3eeea]">
+  <div className="bg-background text-primary flex h-14 w-14 items-center justify-center rounded-full shadow-md dark:bg-[#f3eeea]">
     <NotraMark className="h-7 w-7 shrink-0" />
   </div>
 );

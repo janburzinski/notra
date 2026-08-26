@@ -32,9 +32,9 @@ export const invitationColumns = [
       const email = info.getValue();
       return (
         <div className="flex items-center gap-3">
-          <div className="flex size-8 items-center justify-center rounded-full bg-muted">
+          <div className="bg-muted flex size-8 items-center justify-center rounded-full">
             <HugeiconsIcon
-              className="size-4 text-muted-foreground"
+              className="text-muted-foreground size-4"
               icon={Mail01Icon}
             />
           </div>

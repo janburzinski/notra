@@ -46,7 +46,7 @@ export function GitHubAccountSelect({
           </span>
         </span>
         <HugeiconsIcon
-          className="size-4 shrink-0 text-muted-foreground"
+          className="text-muted-foreground size-4 shrink-0"
           icon={ArrowDown01Icon}
         />
       </DropdownMenuTrigger>

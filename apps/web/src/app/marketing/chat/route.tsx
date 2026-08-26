@@ -294,7 +294,7 @@ export async function GET(request: NextRequest) {
                     fontWeight: 500,
                   }}
                 >
-                  {/* biome-ignore lint/performance/noImgElement: next/og JSX requires native img */}
+                  {/* oxlint-disable-next-line nextjs/no-img-element -- next/og JSX requires native img */}
                   <img alt="" height={14} src={notraDataUrl} width={14} />
                   <span>Auto</span>
                 </div>

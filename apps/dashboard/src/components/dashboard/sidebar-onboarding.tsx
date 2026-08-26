@@ -112,7 +112,7 @@ export function SidebarOnboarding() {
       <div
         className={cn(
           "overflow-hidden transition-[background-color,border-color,border-radius] duration-[250ms] ease-out",
-          collapsed ? "bg-transparent" : "rounded-xl bg-sidebar-accent/40"
+          collapsed ? "bg-transparent" : "bg-sidebar-accent/40 rounded-xl"
         )}
       >
         <button
@@ -120,8 +120,8 @@ export function SidebarOnboarding() {
           className={cn(
             "flex w-full cursor-pointer items-center gap-2 text-left transition-[padding,background-color,border-color,border-radius,color] duration-[250ms] ease-out",
             collapsed
-              ? "rounded-md px-2 py-1.5 text-muted-foreground text-xs hover:bg-muted"
-              : "rounded-t-xl border-b bg-muted/50 px-3 py-3 text-foreground text-sm"
+              ? "text-muted-foreground hover:bg-muted rounded-md px-2 py-1.5 text-xs"
+              : "bg-muted/50 text-foreground rounded-t-xl border-b px-3 py-3 text-sm"
           )}
           onClick={toggleCollapsed}
           type="button"
@@ -159,7 +159,7 @@ export function SidebarOnboarding() {
           inert={collapsed}
         >
           <div className="min-h-0 overflow-hidden">
-            <div className="px-3 pt-3 font-medium text-sm">
+            <div className="px-3 pt-3 text-sm font-medium">
               Complete these steps to get the most out of Notra.
             </div>
           </div>
@@ -183,7 +183,7 @@ export function SidebarOnboarding() {
           inert={collapsed}
         >
           <div className="min-h-0 overflow-hidden">
-            <p className="px-3 pt-1 text-muted-foreground text-xs tabular-nums">
+            <p className="text-muted-foreground px-3 pt-1 text-xs tabular-nums">
               {Math.round(progress)}% Completed
             </p>
             <OnboardingChecklistItems className="px-3 pt-3 pb-3">

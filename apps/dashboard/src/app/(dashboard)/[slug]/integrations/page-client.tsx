@@ -124,7 +124,7 @@ const IntegrationCard = memo(function IntegrationCard({
       }
       className={
         integration.available
-          ? "h-full cursor-pointer transition-colors hover:bg-muted/80"
+          ? "hover:bg-muted/80 h-full cursor-pointer transition-colors"
           : "h-full"
       }
       disabled={!integration.available}
@@ -139,7 +139,7 @@ const IntegrationCard = memo(function IntegrationCard({
       }
       icon={integration.icon}
     >
-      <p className="line-clamp-2 text-muted-foreground text-sm">
+      <p className="text-muted-foreground line-clamp-2 text-sm">
         {integration.description}
       </p>
     </TitleCard>
@@ -150,7 +150,7 @@ const IntegrationCard = memo(function IntegrationCard({
       {integration.available ? (
         <Link
           {...dither.interactionProps}
-          className="h-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="focus-visible:ring-ring h-full rounded-lg focus-visible:ring-2 focus-visible:outline-none"
           href={`/${organizationSlug}/integrations/${integration.href}`}
         >
           {cardContent}
@@ -221,7 +221,7 @@ export default function PageClient({
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="w-full space-y-6 px-4 lg:px-6">
           <div className="space-y-1">
-            <h1 className="font-bold text-3xl tracking-tight">Integrations</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Integrations</h1>
             <p className="text-muted-foreground">
               Please select an organization to view integrations
             </p>
@@ -247,7 +247,7 @@ export default function PageClient({
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="space-y-1">
-          <h1 className="font-bold text-3xl tracking-tight">Integrations</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Integrations</h1>
           <p className="text-muted-foreground">
             Connect external services to automate your workflows
           </p>

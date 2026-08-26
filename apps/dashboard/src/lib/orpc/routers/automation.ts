@@ -15,7 +15,7 @@ import {
 } from "@notra/db/schema";
 import { and, eq, inArray, ne } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import { DEFAULT_LOOKBACK_WINDOW } from "@/constants/workflows";
 import { assertOrganizationAccess } from "@/lib/auth/organization";

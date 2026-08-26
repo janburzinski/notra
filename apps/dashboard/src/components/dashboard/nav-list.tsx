@@ -49,7 +49,7 @@ export function NavList({
                   <SidebarLabel>{item.label}</SidebarLabel>
                   {item.badge && (
                     <Badge
-                      className="ml-auto h-[1.125rem] px-[0.375rem] text-[0.625rem] text-muted-foreground group-data-[collapsible=icon]:hidden"
+                      className="text-muted-foreground ml-auto h-[1.125rem] px-[0.375rem] text-[0.625rem] group-data-[collapsible=icon]:hidden"
                       variant="secondary"
                     >
                       {item.badge}

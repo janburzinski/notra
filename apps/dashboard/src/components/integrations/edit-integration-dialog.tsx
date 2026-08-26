@@ -173,7 +173,7 @@ export function EditIntegrationDialog({
                       value={field.state.value}
                     />
                     {field.state.meta.errors.length > 0 ? (
-                      <p className="mt-1 text-destructive text-sm">
+                      <p className="text-destructive mt-1 text-sm">
                         {typeof field.state.meta.errors[0] === "string"
                           ? field.state.meta.errors[0]
                           : ((
@@ -205,7 +205,7 @@ export function EditIntegrationDialog({
                             value={field.state.value}
                           />
                           {field.state.meta.errors.length > 0 ? (
-                            <p className="mt-1 text-destructive text-sm">
+                            <p className="text-destructive mt-1 text-sm">
                               {typeof field.state.meta.errors[0] === "string"
                                 ? field.state.meta.errors[0]
                                 : ((
@@ -235,7 +235,7 @@ export function EditIntegrationDialog({
                             value={field.state.value}
                           />
                           {field.state.meta.errors.length > 0 ? (
-                            <p className="mt-1 text-destructive text-sm">
+                            <p className="text-destructive mt-1 text-sm">
                               {typeof field.state.meta.errors[0] === "string"
                                 ? field.state.meta.errors[0]
                                 : ((

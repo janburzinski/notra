@@ -55,12 +55,12 @@ export default function HtmlToFigmaPage() {
   return (
     <>
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
+        // oxlint-disable-next-line react/no-danger -- server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
+        // oxlint-disable-next-line react/no-danger -- server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(softwareJsonLd) }}
         type="application/ld+json"
       />

@@ -131,16 +131,16 @@ function AssetFileField({
         {previewUrl ? (
           <span
             aria-hidden="true"
-            className="h-14 w-full max-w-48 bg-center bg-contain bg-no-repeat"
+            className="h-14 w-full max-w-48 bg-contain bg-center bg-no-repeat"
             style={{ backgroundImage: `url("${previewUrl}")` }}
           />
         ) : (
           <HugeiconsIcon
-            className="size-5 text-muted-foreground"
+            className="text-muted-foreground size-5"
             icon={Image01Icon}
           />
         )}
-        <span className="font-medium text-sm">
+        <span className="text-sm font-medium">
           {file
             ? `Selected ${getBrandGuidelineAssetTypeLabel(file)}`
             : "Drag and drop or click to upload"}

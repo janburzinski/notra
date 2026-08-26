@@ -1,4 +1,4 @@
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import {
   CONTACT_MESSAGE_MAX_LENGTH,

@@ -26,7 +26,7 @@ export function EventTriggerRulesSection({
   return (
     <section className="space-y-3">
       <div className="space-y-1">
-        <h3 className="font-semibold text-base">
+        <h3 className="text-base font-semibold">
           {FORMAT_CARD_META[outputType].label} rules
         </h3>
         <p className="text-muted-foreground text-sm">

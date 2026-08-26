@@ -46,7 +46,7 @@ export function AgentFeedbackSetupDialog({
           <div className="min-h-0 flex-1 overflow-y-auto p-4">
             <AgentFeedbackSetup organizationId={organizationId} setup={setup} />
           </div>
-          <ResponsiveDialogFooter className="mx-0 mb-0 shrink-0 rounded-b-xl border-t bg-muted/50 p-4">
+          <ResponsiveDialogFooter className="bg-muted/50 mx-0 mb-0 shrink-0 rounded-b-xl border-t p-4">
             <ResponsiveDialogClose render={<Button variant="outline" />}>
               Done
             </ResponsiveDialogClose>

@@ -56,8 +56,8 @@ export function IrisRunningState({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="font-bold text-3xl tracking-tight">Iris</h1>
-          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+          <h1 className="text-3xl font-bold tracking-tight">Iris</h1>
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <span className="relative flex size-2">
               {isPaused ? null : (
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/60" />

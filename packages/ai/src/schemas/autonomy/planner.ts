@@ -1,6 +1,6 @@
 import { capabilityNameSchema } from "@notra/ai/schemas/autonomy/capability";
 import { mandateRefSchema } from "@notra/ai/schemas/autonomy/mandate";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 export const PLANNER_CONTRACT_VERSION = 1;

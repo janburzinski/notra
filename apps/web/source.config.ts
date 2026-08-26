@@ -1,5 +1,5 @@
 import { defineCollections, defineConfig } from "fumadocs-mdx/config";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 
 export const changelog = defineCollections({

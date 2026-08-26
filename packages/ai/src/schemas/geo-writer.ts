@@ -8,7 +8,7 @@ import {
   GEO_BRIEF_MIN_SECTIONS,
 } from "@notra/ai/constants/geo-writer";
 import { BLOG_POST_SUBTYPES } from "@notra/db/constants/content";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 export const geoContentSubtypeSchema = z.enum(BLOG_POST_SUBTYPES);

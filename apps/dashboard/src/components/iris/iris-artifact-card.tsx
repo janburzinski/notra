@@ -10,7 +10,7 @@ export function IrisArtifactCard({
 }: IrisArtifactCardProps) {
   return (
     <Link
-      className="flex gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-muted/50"
+      className="border-border hover:bg-muted/50 flex gap-3 rounded-xl border p-3 transition-colors"
       href={`/${organizationSlug}/content/${artifact.postId}`}
     >
       {artifact.imageUrl ? (
@@ -34,8 +34,8 @@ export function IrisArtifactCard({
             {artifact.status === "published" ? "Published" : "Draft"}
           </Badge>
         </div>
-        <p className="truncate font-medium text-sm">{artifact.title}</p>
-        <p className="line-clamp-2 text-muted-foreground text-xs leading-relaxed">
+        <p className="truncate text-sm font-medium">{artifact.title}</p>
+        <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">
           {artifact.excerpt}
         </p>
       </div>

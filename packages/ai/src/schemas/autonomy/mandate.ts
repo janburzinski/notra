@@ -1,5 +1,5 @@
 import { capabilityNameSchema } from "@notra/ai/schemas/autonomy/capability";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 export const MANDATE_NAME_MAX_LENGTH = 120;

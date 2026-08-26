@@ -48,7 +48,7 @@ export default async function IntegrationsPage() {
   return (
     <div className="flex w-full flex-col items-center pb-8 antialiased [font-synthesis:none]">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
+        // oxlint-disable-next-line react/no-danger -- server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />

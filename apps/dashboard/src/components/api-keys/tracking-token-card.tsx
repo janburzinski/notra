@@ -36,7 +36,7 @@ export function TrackingTokenCard({ organizationId }: TrackingTokenCardProps) {
     <section className="space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
-          <h2 className="flex items-center gap-2 font-medium text-sm">
+          <h2 className="flex items-center gap-2 text-sm font-medium">
             Tracking token
             <Badge variant="secondary">Write-only</Badge>
           </h2>

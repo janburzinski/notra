@@ -15,14 +15,14 @@ function CardShell({
 }) {
   return (
     <div
-      className={`rounded-lg border border-border/80 bg-muted/80 p-2 ${
+      className={`border-border/80 bg-muted/80 rounded-lg border p-2 ${
         fullWidth ? "lg:col-span-2" : ""
       }`}
     >
       <div className="px-2 py-1.5">
         <Skeleton className={`h-6 ${headingWidth}`} />
       </div>
-      <div className="rounded-lg border border-border/80 bg-background px-4 py-4">
+      <div className="border-border/80 bg-background rounded-lg border px-4 py-4">
         {children}
       </div>
     </div>

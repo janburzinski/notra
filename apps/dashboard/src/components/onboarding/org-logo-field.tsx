@@ -52,7 +52,7 @@ export function OrgLogoField({
       >
         <Avatar
           className={cn(
-            "relative size-11 rounded-xl border border-border ring-2 ring-transparent transition-shadow group-hover/logo:ring-muted-foreground/20 group-focus-visible/logo:ring-ring",
+            "border-border group-hover/logo:ring-muted-foreground/20 group-focus-visible/logo:ring-ring relative size-11 rounded-xl border ring-2 ring-transparent transition-shadow",
             !previewUrl && "border-dashed"
           )}
         >
@@ -61,14 +61,14 @@ export function OrgLogoField({
             className="rounded-xl"
             src={previewUrl ?? undefined}
           />
-          <AvatarFallback className="rounded-xl bg-muted/50">
+          <AvatarFallback className="bg-muted/50 rounded-xl">
             <HugeiconsIcon
-              className="size-5 text-muted-foreground"
+              className="text-muted-foreground size-5"
               icon={Upload01Icon}
             />
           </AvatarFallback>
           {previewUrl ? (
-            <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/80 opacity-0 transition-opacity group-hover/logo:opacity-100">
+            <span className="bg-background/80 absolute inset-0 flex items-center justify-center rounded-xl opacity-0 transition-opacity group-hover/logo:opacity-100">
               <HugeiconsIcon className="size-5" icon={Upload01Icon} />
             </span>
           ) : null}

@@ -13,7 +13,7 @@ export default function Loading() {
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h1 className="font-bold text-3xl tracking-tight">API Keys</h1>
+            <h1 className="text-3xl font-bold tracking-tight">API Keys</h1>
             <p className="text-muted-foreground">
               Manage API keys for programmatic access to your organization
             </p>
@@ -29,8 +29,8 @@ export default function Loading() {
             </Button>
           </div>
         </div>
-        <div className="overflow-hidden rounded-lg border border-border/80 border-b-border/40 bg-muted/80 shadow-2xs">
-          <div className="space-y-3 rounded-t-lg bg-background p-4">
+        <div className="border-border/80 border-b-border/40 bg-muted/80 overflow-hidden rounded-lg border shadow-2xs">
+          <div className="bg-background space-y-3 rounded-t-lg p-4">
             {SKELETON_ROW_KEYS.map((key) => (
               <div className="flex items-center gap-4 py-2" key={key}>
                 <Skeleton className="h-4 w-32" />

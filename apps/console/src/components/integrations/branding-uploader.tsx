@@ -120,7 +120,7 @@ export function LogoVariantUploader({
     <div className={cn("relative h-32 rounded-lg border", surface)}>
       <span
         className={cn(
-          "pointer-events-none absolute top-2 left-2 z-10 inline-flex items-center gap-1 font-medium text-[0.6875rem] uppercase tracking-wide",
+          "pointer-events-none absolute top-2 left-2 z-10 inline-flex items-center gap-1 text-[0.6875rem] font-medium tracking-wide uppercase",
           labelText
         )}
       >
@@ -244,9 +244,9 @@ export function BannerUploader({
       onError={(error) => toast.error(error.message)}
     >
       {uploadMutation.isPending ? (
-        <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+        <Loader2Icon className="text-muted-foreground size-4 animate-spin" />
       ) : (
-        <span className="flex flex-col items-center gap-1 text-muted-foreground">
+        <span className="text-muted-foreground flex flex-col items-center gap-1">
           <HugeiconsIcon className="size-4" icon={Upload01Icon} />
           <span className="text-sm">Upload banner</span>
           <span className="text-xs">Recommended: 1500x500px (3:1)</span>

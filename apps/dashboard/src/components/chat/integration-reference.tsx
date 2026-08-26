@@ -91,7 +91,7 @@ function ReferenceIcon({
     <span
       aria-hidden="true"
       className={iconWrapperClass}
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline svg markup for editor reference chips.
+      // oxlint-disable-next-line react/no-danger -- static inline svg markup for editor reference chips.
       dangerouslySetInnerHTML={{ __html: getReferenceIconMarkup(kind) }}
     />
   );

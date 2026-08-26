@@ -127,7 +127,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="font-bold text-3xl tracking-tight">MCP Servers</h1>
+            <h1 className="text-3xl font-bold tracking-tight">MCP Servers</h1>
             <p className="text-muted-foreground">
               Connect custom Model Context Protocol servers to bring your own
               tools and context into Notra

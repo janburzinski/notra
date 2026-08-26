@@ -19,7 +19,7 @@ export function PresenceBadge({ status }: PresenceBadgeProps) {
   }
   return (
     <Badge
-      className="whitespace-nowrap rounded-sm text-[0.6875rem]"
+      className="rounded-sm text-[0.6875rem] whitespace-nowrap"
       title={PRESENCE_TITLES[status]}
       variant="outline"
     >

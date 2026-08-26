@@ -59,7 +59,7 @@ export function DirectionPagesTable({ className }: DirectionBlockProps) {
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      <div className="flex items-center justify-between px-1 text-muted-foreground text-xs">
+      <div className="text-muted-foreground flex items-center justify-between px-1 text-xs">
         <span>{GEO_DIRECTIONS_PAGES.length.toLocaleString()} pages</span>
       </div>
       <Table

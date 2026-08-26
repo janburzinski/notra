@@ -7,7 +7,7 @@ import {
   githubIntegrations,
 } from "@notra/db/schema";
 import { and, desc, eq, inArray, ne } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import {
   createScheduleRequestSchema,

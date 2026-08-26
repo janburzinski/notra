@@ -1,5 +1,5 @@
 import type { Redis } from "@upstash/redis";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
+// Zod recommended way to import
 import * as z from "zod";
 
 const JOB_TTL_SECONDS = 60 * 60 * 24;

@@ -102,12 +102,12 @@ export function ConversationBuilderDialog({
             <div className="space-y-2">
               {steps.map((step, index) => (
                 <div className="flex items-start gap-2" key={step.id}>
-                  <span className="mt-2 w-5 shrink-0 text-right text-muted-foreground text-xs tabular-nums">
+                  <span className="text-muted-foreground mt-2 w-5 shrink-0 text-right text-xs tabular-nums">
                     {index + 1}
                   </span>
-                  <div className="min-w-0 flex-1 rounded-2xl rounded-tl-sm border border-border bg-muted/40 px-3 py-2">
+                  <div className="border-border bg-muted/40 min-w-0 flex-1 rounded-2xl rounded-tl-sm border px-3 py-2">
                     <textarea
-                      className="block w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                      className="placeholder:text-muted-foreground block w-full resize-none bg-transparent text-sm outline-none"
                       onChange={(event) =>
                         setSteps((previous) =>
                           previous.map((item) =>

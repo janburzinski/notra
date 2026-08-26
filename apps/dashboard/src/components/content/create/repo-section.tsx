@@ -96,7 +96,7 @@ export function RepoSection({
   return (
     <div className="overflow-hidden rounded-lg border">
       <button
-        className="flex w-full items-center gap-2 bg-muted/30 px-3 py-2 text-left transition-colors hover:bg-muted/50"
+        className="bg-muted/30 hover:bg-muted/50 flex w-full items-center gap-2 px-3 py-2 text-left transition-colors"
         onClick={handleToggleAllRepo}
         type="button"
       >
@@ -113,7 +113,7 @@ export function RepoSection({
           )}
         </div>
         <Github className="size-4 shrink-0" />
-        <span className="flex-1 font-medium text-sm">
+        <span className="flex-1 text-sm font-medium">
           {repo.owner}/{repo.repo}
         </span>
       </button>

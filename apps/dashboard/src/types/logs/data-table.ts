@@ -8,7 +8,7 @@ export interface DataTableEmptyState {
 }
 
 export interface DataTableProps<TData> {
-  // biome-ignore lint/suspicious/noExplicitAny: TanStack Table columns have varying value types
+  // oxlint-disable-next-line typescript/no-explicit-any -- TanStack Table columns have varying value types
   columns: ColumnDef<TData, any>[];
   contentKey: string;
   data: TData[];

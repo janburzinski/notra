@@ -1,7 +1,7 @@
 import { db } from "@notra/db/drizzle";
 import { organizationNotificationSettings } from "@notra/db/schema";
 import { eq } from "drizzle-orm";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
+// Zod recommended way of importing
 import * as z from "zod";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { assertActiveSubscription } from "@/lib/billing/subscription";

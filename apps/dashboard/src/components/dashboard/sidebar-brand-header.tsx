@@ -9,7 +9,7 @@ export function SidebarBrandHeader() {
       <div className="flex size-7 shrink-0 items-center justify-center rounded-lg dark:bg-[#F6F3F1]">
         <Notra className="size-7 dark:size-5" />
       </div>
-      <SidebarLabel className="font-semibold text-base">Notra</SidebarLabel>
+      <SidebarLabel className="text-base font-semibold">Notra</SidebarLabel>
     </div>
   );
 }

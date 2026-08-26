@@ -31,7 +31,7 @@ export function WriteOptionCard({
   compact = false,
 }: WriteOptionCardProps) {
   const shellClassName = cn(
-    "group relative flex cursor-pointer rounded-lg border bg-card text-left transition-colors",
+    "group bg-card relative flex cursor-pointer rounded-lg border text-left transition-colors",
     "hover:border-foreground/20",
     selected ? "border-foreground/40 bg-foreground/[0.02]" : "border-border",
     compact ? "items-center gap-2.5 px-3 py-2" : "flex-col gap-3 p-4"
@@ -47,9 +47,9 @@ export function WriteOptionCard({
       >
         {icon}
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-sm leading-tight">{label}</p>
+          <p className="truncate text-sm leading-tight font-medium">{label}</p>
           {description ? (
-            <p className="truncate text-muted-foreground text-xs">
+            <p className="text-muted-foreground truncate text-xs">
               {description}
             </p>
           ) : null}
@@ -71,9 +71,9 @@ export function WriteOptionCard({
         <SelectionBox selected={selected} />
       </div>
       <div className="min-w-0 space-y-1">
-        <p className="truncate font-medium text-sm">{label}</p>
+        <p className="truncate text-sm font-medium">{label}</p>
         {description ? (
-          <p className="truncate text-muted-foreground text-xs leading-relaxed">
+          <p className="text-muted-foreground truncate text-xs leading-relaxed">
             {description}
           </p>
         ) : null}
