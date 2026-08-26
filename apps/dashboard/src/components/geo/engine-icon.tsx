@@ -139,7 +139,18 @@ export function EngineIcon({ engine, className }: EngineIconProps) {
     return themedIcon(Apple, AppleDark, iconClass);
   }
   if (key === "tiktok") {
-    return themedIcon(TikTok, TikTokDark, iconClass);
+    return (
+      <>
+        <TikTok
+          aria-hidden="true"
+          className={cn(iconClass, "block dark:hidden")}
+        />
+        <TikTokDark
+          aria-hidden="true"
+          className={cn(iconClass, "hidden dark:block")}
+        />
+      </>
+    );
   }
   if (key === "manus") {
     return themedIcon(Manus, ManusDark, iconClass);
