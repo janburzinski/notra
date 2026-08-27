@@ -21,7 +21,11 @@ async function setClientCookie(
     (window.location.protocol === "https:" ||
       process.env.NODE_ENV === "production");
 
-  if (typeof window !== "undefined" && "cookieStore" in window) {
+  if (
+    typeof document === "undefined" &&
+    typeof window !== "undefined" &&
+    "cookieStore" in window
+  ) {
     const cookieOptions: CookieInit = {
       name,
       value,
@@ -38,7 +42,7 @@ async function setClientCookie(
 
   if (typeof document !== "undefined") {
     const secureFlag = isSecure ? "; Secure" : "";
-    // biome-ignore lint/suspicious/noDocumentCookie: Fallback for browsers without Cookie Store API support
+    // biome-ignore lint/suspicious/noDocumentCookie: Navigation must see the updated cookie synchronously
     document.cookie = `${name}=${value}; max-age=${maxAge}; path=/; SameSite=Lax${secureFlag}`;
   }
 }
