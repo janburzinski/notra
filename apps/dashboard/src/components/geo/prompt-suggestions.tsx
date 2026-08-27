@@ -47,28 +47,24 @@ function bestPosition(suggestion: GeoPromptSuggestion): number | null {
 }
 
 function SuggestionRowActions({
-  checking,
+  accepting,
+  disabled,
+  onAccept,
   organizationId,
   suggestion,
 }: SuggestionRowActionsProps) {
-  const accept = useGeoSuggestionAccept(organizationId);
   const dismiss = useGeoSuggestionDismiss(organizationId);
-  const busy = checking || accept.isPending || dismiss.isPending;
+  const busy = disabled || dismiss.isPending;
 
   return (
     <div className="flex items-center justify-end gap-1">
-      <Button
-        disabled={busy}
-        onClick={() => accept.mutate({ suggestionId: suggestion.id })}
-        size="sm"
-        variant="outline"
-      >
-        {accept.isPending ? (
+      <Button disabled={busy} onClick={onAccept} size="sm" variant="outline">
+        {accepting ? (
           <StatusSpinner />
         ) : (
           <HugeiconsIcon icon={PlusSignIcon} size={14} />
         )}
-        {accept.isPending ? "Adding…" : "Track"}
+        {accepting ? "Adding…" : "Track"}
       </Button>
       <Button
         aria-label={`Dismiss ${suggestion.prompt}`}
@@ -92,9 +88,14 @@ export function PromptSuggestions({
     useGscStatus(organizationId);
   const { dismiss, dismissed } = useGscCardDismissal(organizationId);
   const checking = useGscAnalyzing(organizationId);
+  const accept = useGeoSuggestionAccept(organizationId);
   const acceptAll = useGeoSuggestionsAcceptAll(organizationId);
   const suggestions = data?.suggestions ?? [];
   const hasSuggestions = suggestions.length > 0;
+  const acceptingSuggestionId = accept.isPending
+    ? accept.variables?.suggestionId
+    : undefined;
+  const trackingDisabled = accept.isPending || acceptAll.isPending;
   const connectPromo =
     !isSearchConsolePending &&
     searchConsoleStatus !== undefined &&
@@ -188,7 +189,9 @@ export function PromptSuggestions({
       width: "8.5rem",
       cell: (row) => (
         <SuggestionRowActions
-          checking={checking}
+          accepting={acceptingSuggestionId === row.id}
+          disabled={checking || trackingDisabled}
+          onAccept={() => accept.mutate({ suggestionId: row.id })}
           organizationId={organizationId}
           suggestion={row}
         />
@@ -203,7 +206,7 @@ export function PromptSuggestions({
   const trackAllAction =
     !checking && suggestions.length > 1 ? (
       <Button
-        disabled={acceptAll.isPending}
+        disabled={trackingDisabled}
         onClick={() => acceptAll.mutate()}
         size="sm"
         variant="outline"
