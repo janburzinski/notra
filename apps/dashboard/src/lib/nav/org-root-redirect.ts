@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
 import { getSidebarModeFromCookies } from "@/utils/cookies";
 import { resolveOrgRootRedirect } from "@/utils/nav";
 

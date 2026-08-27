@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useStoredSidebarMode } from "@/lib/hooks/use-sidebar-mode";

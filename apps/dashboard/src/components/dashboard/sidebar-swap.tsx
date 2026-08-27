@@ -2,6 +2,7 @@
 
 import { cn } from "@notra/ui/lib/utils";
 import { useLayoutEffect, useState } from "react";
+
 import {
   SIDEBAR_MODE_ENTER_CLASS,
   SIDEBAR_MODE_EXIT_LEFT_CLASS,

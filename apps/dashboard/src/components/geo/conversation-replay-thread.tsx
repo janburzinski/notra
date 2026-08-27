@@ -6,6 +6,7 @@ import {
 } from "@notra/ui/components/brainless/perplexity/perplexity-search";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
+
 import { AnswerMarkdown } from "@/components/geo/geo-prompt-answer-thread";
 import { GeoSkinMessage } from "@/components/geo/geo-skin-message";
 import { GEO_CHAT_SKIN_SURFACE } from "@/constants/geo";
@@ -120,7 +121,7 @@ function ThinkingIndicator({ skin }: { skin: GeoChatSkin }) {
   return (
     <p
       className={cn(
-        "animate-pulse text-muted-foreground",
+        "text-muted-foreground animate-pulse",
         skin === "perplexity" ? "font-serif text-[17.5px]" : "text-[15px]"
       )}
     >
@@ -137,7 +138,7 @@ function SourcePills({ sources }: { sources: PerplexitySearchSource[] }) {
     <div className="flex flex-wrap gap-1.5 pt-1">
       {sources.map((source) => (
         <a
-          className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-muted-foreground text-xs transition-colors hover:text-foreground"
+          className="border-border text-muted-foreground hover:text-foreground inline-flex items-center rounded-full border px-2 py-0.5 text-xs transition-colors"
           href={source.url}
           key={source.url ?? source.domain}
           rel="noopener noreferrer"
@@ -154,7 +155,7 @@ function MentionPill({ turn }: { turn: GeoSequenceTurnResult }) {
   return (
     <p className="pt-1 text-xs">
       {turn.mentioned ? (
-        <span className="font-medium text-geo-up">
+        <span className="text-geo-up font-medium">
           {turn.position !== null
             ? `Mentioned at #${turn.position}`
             : "Mentioned"}

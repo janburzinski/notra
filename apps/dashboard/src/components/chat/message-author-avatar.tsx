@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { m, useReducedMotion } from "motion/react";
+
 import { cn } from "@/lib/utils";
 import type { MessageAuthorAvatarProps } from "@/types/components/chat-page";
 import { getUserAvatarUrl } from "@/utils/avatar";

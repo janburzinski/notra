@@ -2,6 +2,7 @@ import type {
   ChatMessageMetadata,
   ChatSessionSummary,
 } from "@notra/ai/types/chat";
+
 import type { ClientSessionData } from "@/types/auth/session";
 
 export interface ChatMessageAuthor {

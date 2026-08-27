@@ -4,6 +4,7 @@ import { ChatgptMessage } from "@notra/ui/components/brainless/chatgpt/chatgpt-m
 import { ClaudeChatMessage } from "@notra/ui/components/brainless/claude-chat/claude-chat-message";
 import { GeminiMessage } from "@notra/ui/components/brainless/gemini/gemini-message";
 import { PerplexityMessage } from "@notra/ui/components/brainless/perplexity/perplexity-message";
+
 import type { GeoSkinMessageProps } from "@/types/geo";
 
 export function GeoSkinMessage({

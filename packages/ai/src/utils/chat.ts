@@ -1,4 +1,5 @@
 import type { UIMessage } from "ai";
+
 import { CHAT_TITLE_MAX_LENGTH } from "../constants/chat";
 import type {
   BuildChatFinishMetadataInput,
