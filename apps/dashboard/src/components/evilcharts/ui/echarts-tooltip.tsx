@@ -230,10 +230,9 @@ function tooltipActivityRow(item: TooltipBodyItem, max: number): string {
       ? tooltipColorSwatchHtml(item.paint)
       : tooltipIndicatorHtml(item.key, item.colorsCount));
   const width = tooltipBarWidth(item.value ?? 0, max);
-  return `<div class="relative grid h-8 grid-cols-[2rem_minmax(0,1fr)_auto] overflow-hidden rounded-[7px] border border-white/[0.14] bg-white/[0.025]${item.dimmed}">
+  return `<div class="relative grid h-8 grid-cols-[minmax(0,1fr)_auto] overflow-hidden rounded-[7px] border border-white/[0.14] bg-white/[0.025]${item.dimmed}">
           <span class="absolute inset-y-0 left-0 rounded-r-[5px] bg-white/[0.16]" style="width:${width}%;${TOOLTIP_BAR_MOTION_STYLE}"></span>
-          <span class="relative flex items-center justify-center text-white">${indicatorHtml}</span>
-          <span class="relative flex min-w-0 items-center px-2.5 text-[11px] font-medium text-zinc-200"><span class="truncate">${escapeHtml(item.labelText)}</span></span>
+          <span class="relative flex min-w-0 items-center gap-2 px-2.5 text-[11px] font-medium text-zinc-200">${indicatorHtml}<span class="truncate">${escapeHtml(item.labelText)}</span></span>
           <span class="relative flex min-w-9 items-center justify-end px-2.5 font-mono text-[11px] font-semibold text-white tabular-nums" style="${TOOLTIP_VALUE_MOTION_STYLE}">${escapeHtml(item.valueText)}</span>
         </div>`;
 }
