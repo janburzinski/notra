@@ -138,7 +138,7 @@ function SelectSiteState({
   const selectSite = useGscSelectSite(organizationId);
 
   return (
-    <ResponsiveDialog defaultOpen>
+    <ResponsiveDialog>
       <div className="flex flex-col items-start gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-muted-foreground text-sm">
           {status.lastError ??
