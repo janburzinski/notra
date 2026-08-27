@@ -162,7 +162,8 @@ export function listDaysThrough(firstDay: string, lastDay: string): string[] {
 
 export function fitMentionTrendLine(
   rows: readonly MentionTrendRow[],
-  key: string
+  key: string,
+  today = todayIsoDate()
 ): (number | null)[] {
   let count = 0;
   let sumIndex = 0;
@@ -170,20 +171,24 @@ export function fitMentionTrendLine(
   let sumProduct = 0;
   let sumSquares = 0;
   let firstIndex: number | null = null;
-  let lastIndex: number | null = null;
+  let lastObservedIndex: number | null = null;
   for (const [index, row] of rows.entries()) {
     const value = row[key];
-    if (typeof value === "number") {
-      count += 1;
-      sumIndex += index;
-      sumValue += value;
-      sumProduct += index * value;
-      sumSquares += index * index;
-      firstIndex ??= index;
-      lastIndex = index;
+    if (typeof value !== "number") {
+      continue;
     }
+    lastObservedIndex = index;
+    if (row.rawDay === today) {
+      continue;
+    }
+    count += 1;
+    sumIndex += index;
+    sumValue += value;
+    sumProduct += index * value;
+    sumSquares += index * index;
+    firstIndex ??= index;
   }
-  if (count === 0 || firstIndex === null || lastIndex === null) {
+  if (count === 0 || firstIndex === null || lastObservedIndex === null) {
     return rows.map(() => null);
   }
 
@@ -195,7 +200,7 @@ export function fitMentionTrendLine(
   const intercept = (sumValue - slope * sumIndex) / count;
 
   return rows.map((_, index) =>
-    index >= firstIndex && index <= lastIndex
+    index >= firstIndex && index <= lastObservedIndex
       ? Math.max(0, intercept + slope * index)
       : null
   );
