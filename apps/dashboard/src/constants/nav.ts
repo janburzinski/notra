@@ -176,7 +176,6 @@ export const NAV_UTILITY_LINKS: readonly string[] = [
 
 export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   iris: true,
-  writer: true,
   analytics: true,
 };
 

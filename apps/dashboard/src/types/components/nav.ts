@@ -28,7 +28,6 @@ export interface NavPrimaryActionConfig {
 
 export interface NavVisibility {
   iris: boolean;
-  writer: boolean;
   analytics: boolean;
 }
 

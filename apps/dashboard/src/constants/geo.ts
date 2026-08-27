@@ -53,8 +53,6 @@ export const GEO_CURSOR_FLAG_CACHE_TTL_MS = 60_000;
 export const GEO_CURSOR_FLAG_STALE_TIME_MS = 30_000;
 export const GEO_CURSOR_FLAG_ERROR_REASON = "ERROR";
 
-/** Databuddy flag that exposes the GEO writer to an organization. */
-export const GEO_WRITER_FLAG_KEY = "geo-writer";
 export const GEO_WRITER_NAV_LINK = "/geo/write";
 export const GEO_GAPS_NAV_LINK = "/geo/gaps";
 export const GEO_PROMPTS_NAV_LINK = "/geo/prompts";

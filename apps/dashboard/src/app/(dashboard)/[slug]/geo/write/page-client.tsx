@@ -1,6 +1,5 @@
 "use client";
 
-import { useFlag } from "@databuddy/sdk/react";
 import { PencilEdit01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
@@ -11,10 +10,7 @@ import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import { BriefHistory } from "@/components/geo/writer/brief-history";
-import {
-  GeoWriterNeedsSetup,
-  GeoWriterUnavailable,
-} from "@/components/geo/writer/page-gate";
+import { GeoWriterNeedsSetup } from "@/components/geo/writer/page-gate";
 import { WriteDialog } from "@/components/geo/writer/write-dialog";
 import { PageContainer } from "@/components/layout/container";
 import {
@@ -26,7 +22,7 @@ import {
   EMPTY_STATE_TABLE_COLUMNS,
   EMPTY_STATE_TABLE_ROWS,
 } from "@/constants/empty-state";
-import { GEO_GAPS_NAV_LINK, GEO_WRITER_FLAG_KEY } from "@/constants/geo";
+import { GEO_GAPS_NAV_LINK } from "@/constants/geo";
 import { useGeoSettings } from "@/lib/hooks/use-geo";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useGeoWriterBriefs } from "@/lib/hooks/use-geo-writer";
@@ -37,7 +33,6 @@ import type {
 import type { GeoPageClientProps } from "@/types/geo";
 import { withGeoProject } from "@/utils/geo-paths";
 import { emptyWriteDialogState, geoContentPath } from "@/utils/geo-write-entry";
-import { isGeoWriterVisibleInNav } from "@/utils/geo-writer-flag";
 
 import { GeoWriterSkeleton } from "./skeleton";
 
@@ -62,9 +57,6 @@ function GeoWriterPageContent({ organizationSlug }: GeoWriterPageContentProps) {
       : orgFromList;
   const organizationId = organization?.id ?? "";
 
-  const writerFlag = useFlag(GEO_WRITER_FLAG_KEY);
-  const writerVisible = isGeoWriterVisibleInNav(writerFlag.on);
-
   const { data: settingsData, isPending: isSettingsPending } =
     useGeoSettings(organizationId);
   const briefsQuery = useGeoWriterBriefs(organizationId);
@@ -82,10 +74,6 @@ function GeoWriterPageContent({ organizationSlug }: GeoWriterPageContentProps) {
     setDialogInitial(initial ?? emptyWriteDialogState());
     setDialogOpen(true);
   }, []);
-
-  if (!writerVisible) {
-    return <GeoWriterUnavailable />;
-  }
 
   if (!(isSettingsPending || settingsData?.settings)) {
     return (

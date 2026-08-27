@@ -1,6 +1,5 @@
 "use client";
 
-import { useFlag } from "@databuddy/sdk/react";
 import {
   Sheet,
   SheetContent,
@@ -33,7 +32,6 @@ import {
   GEO_SEARCH_LABEL,
   GEO_SPARKLINE_MIN_POINTS,
   GEO_WITHOUT_SEARCH_LABEL,
-  GEO_WRITER_FLAG_KEY,
 } from "@/constants/geo";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type { ChartConfig } from "@/types/charts";
@@ -69,7 +67,6 @@ import {
   promptTableRowForId,
 } from "@/utils/geo-prompts";
 import { writeDialogStateFromGap } from "@/utils/geo-write-entry";
-import { isGeoWriterVisibleInNav } from "@/utils/geo-writer-flag";
 import { tableHeightFor } from "@/utils/table";
 
 const FAMILY_TREND_STROKE_WIDTH = 1.5;
@@ -387,8 +384,6 @@ function EngineFamilySheetSession({
     useState<WriteDialogInitialState | null>(null);
   const { projectId } = useGeoProjectScope();
   const { getOrganization, activeOrganization } = useOrganizationsContext();
-  const writerFlag = useFlag(GEO_WRITER_FLAG_KEY);
-  const writerVisible = isGeoWriterVisibleInNav(writerFlag.on);
   const organization =
     organizationSlug && activeOrganization?.slug === organizationSlug
       ? activeOrganization
@@ -396,8 +391,7 @@ function EngineFamilySheetSession({
         ? getOrganization(organizationSlug)
         : null;
   const organizationId = organization?.id ?? "";
-  const canWrite =
-    writerVisible && Boolean(organizationSlug) && Boolean(organizationId);
+  const canWrite = Boolean(organizationSlug) && Boolean(organizationId);
   const name = engineFamilyLabel(family.family);
   const showVariantHeadings = family.variants.length > 1;
   const lastChecked = engineFamilyLastCheckedAt(family);

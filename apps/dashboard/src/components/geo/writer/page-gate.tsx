@@ -9,19 +9,6 @@ import { useGeoProjectScope } from "@/components/providers/geo-project-provider"
 import type { GeoWriterNeedsSetupProps } from "@/types/components/geo-writer";
 import { withGeoProject } from "@/utils/geo-paths";
 
-export function GeoWriterUnavailable() {
-  return (
-    <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full space-y-6 px-4 lg:px-6">
-        <EmptyState
-          description="The GEO writer is not enabled for this organization yet."
-          title="Not available yet"
-        />
-      </div>
-    </PageContainer>
-  );
-}
-
 export function GeoWriterNeedsSetup({
   organizationSlug,
   title,

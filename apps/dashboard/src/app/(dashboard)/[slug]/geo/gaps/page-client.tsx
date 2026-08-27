@@ -1,19 +1,14 @@
 "use client";
 
-import { useFlag } from "@databuddy/sdk/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { GeoGapsTable } from "@/components/geo/gaps-table";
-import {
-  GeoWriterNeedsSetup,
-  GeoWriterUnavailable,
-} from "@/components/geo/writer/page-gate";
+import { GeoWriterNeedsSetup } from "@/components/geo/writer/page-gate";
 import { WriteDialog } from "@/components/geo/writer/write-dialog";
 import { PageContainer } from "@/components/layout/container";
 import { GeoProjectProvider } from "@/components/providers/geo-project-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { GEO_WRITER_FLAG_KEY } from "@/constants/geo";
 import {
   useGeoCompetitors,
   useGeoSettings,
@@ -30,7 +25,6 @@ import {
   geoContentPath,
   writeDialogStateFromGap,
 } from "@/utils/geo-write-entry";
-import { isGeoWriterVisibleInNav } from "@/utils/geo-writer-flag";
 
 import { GeoGapsSkeleton } from "./skeleton";
 
@@ -54,9 +48,6 @@ function GeoGapsPageContent({ organizationSlug }: GeoGapsPageContentProps) {
       : orgFromList;
   const organizationId = organization?.id ?? "";
 
-  const writerFlag = useFlag(GEO_WRITER_FLAG_KEY);
-  const writerVisible = isGeoWriterVisibleInNav(writerFlag.on);
-
   const { data: settingsData, isPending: isSettingsPending } =
     useGeoSettings(organizationId);
   const gapsQuery = useGeoWriterGaps(organizationId);
@@ -72,10 +63,6 @@ function GeoGapsPageContent({ organizationSlug }: GeoGapsPageContentProps) {
     setDialogInitial(initial ?? emptyWriteDialogState());
     setDialogOpen(true);
   }, []);
-
-  if (!writerVisible) {
-    return <GeoWriterUnavailable />;
-  }
 
   if (!(isSettingsPending || settingsData?.settings)) {
     return (

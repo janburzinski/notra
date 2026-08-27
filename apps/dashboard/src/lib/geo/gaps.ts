@@ -20,7 +20,6 @@ import {
 } from "@/constants/geo";
 import { competitorKey } from "@/lib/geo/domain";
 import { geoDb } from "@/lib/geo/effect";
-import { requireWriterEnabled } from "@/lib/geo/flag";
 import { requireGeoProject } from "@/lib/geo/projects";
 import {
   customPromptScanId,
@@ -213,7 +212,6 @@ export const loadPlannerGapPrompts = Effect.fn("geo.plannerGaps")(function* (
 export const loadGeoContentGaps = Effect.fn("geo.gaps")(function* (
   input: GeoScopeInput
 ) {
-  yield* requireWriterEnabled(input.organizationId);
   const scope = yield* requireGeoProject(input);
   const projectId = scope.projectId;
 

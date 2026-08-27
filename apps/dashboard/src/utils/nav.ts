@@ -16,7 +16,6 @@ import type {
 } from "@/types/components/nav";
 
 import { geoNavHref } from "./geo-paths";
-import { filterGeoWriterNavItems } from "./geo-writer-flag";
 import { filterIrisNavItems } from "./iris-flag";
 
 const NAV_ITEMS_BY_LINK = new Map(
@@ -76,10 +75,7 @@ export function resolveNavItems(
   const withAnalytics = visibility.analytics
     ? items
     : items.filter((item) => item.link !== ANALYTICS_NAV_LINK);
-  return filterGeoWriterNavItems(
-    filterIrisNavItems(withAnalytics, visibility.iris),
-    visibility.writer
-  );
+  return filterIrisNavItems(withAnalytics, visibility.iris);
 }
 
 export function resolveGeoImproveLinks(

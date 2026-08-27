@@ -17,7 +17,6 @@ import {
   SIDEBAR_MODE_FADE_CLASS,
   SIDEBAR_MODE_SLOT_CLASS,
 } from "@/constants/nav";
-import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { useHasGeoFeature } from "@/lib/hooks/use-plan";
 import type { NavModePrimaryActionProps } from "@/types/components/nav";
 import { geoNavHref } from "@/utils/geo-paths";
@@ -38,11 +37,10 @@ export function NavModePrimaryAction({
   organizationId,
   projectId,
 }: NavModePrimaryActionProps) {
-  const visibility = useNavVisibility();
   const { isLocked: geoLocked } = useHasGeoFeature();
   const [createOpen, setCreateOpen] = useState(false);
   const [createMounted, setCreateMounted] = useState(false);
-  const showWrite = visibility.writer && !geoLocked;
+  const showWrite = !geoLocked;
   const geoActive = mode === "geo";
   const studioActive = mode === "studio";
   const showSlot = studioActive || showWrite;

@@ -24,7 +24,7 @@ export function NavGeo({ slug, pathname, projectId }: NavGeoProps) {
   const visibility = useNavVisibility();
   const { isLocked: geoLocked } = useHasGeoFeature();
   const activeLink = resolveActiveNavLink(pathname, slug, NAV_GEO_LINKS);
-  const showWriteAction = visibility.writer && !geoLocked;
+  const showWriteAction = !geoLocked;
   const improveLinks = resolveGeoImproveLinks(showWriteAction);
 
   return (

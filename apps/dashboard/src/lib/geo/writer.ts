@@ -40,7 +40,6 @@ import {
   GeoWriterPlanError,
   GeoWriterStartError,
 } from "@/lib/geo/errors";
-import { requireWriterEnabled } from "@/lib/geo/flag";
 import { loadPlannerGapPrompts } from "@/lib/geo/gaps";
 import { requireBrandIdentity, requireGeoProject } from "@/lib/geo/projects";
 import { promptIdFromScanId } from "@/lib/geo/prompts";
@@ -351,7 +350,6 @@ export const approveAndStartGeoWriter = Effect.fn("geo.writer.start")(
     briefId: string,
     options: { autoApproved: boolean } = { autoApproved: false }
   ) {
-    yield* requireWriterEnabled(organizationId);
     const now = new Date();
     const runId = `${generateRunId(GEO_WRITER_TRIGGER_ID)}-${crypto.randomUUID()}`;
     const claimedRows = yield* geoDb("brief approve failed", () =>
@@ -453,7 +451,6 @@ export const planGeoContentBrief = Effect.fn("geo.writer.plan")(function* (
   input: GeoScopeInput & GeoWriterPlanInput,
   userId: string | undefined
 ) {
-  yield* requireWriterEnabled(input.organizationId);
   const scope = yield* requireGeoProject(input);
 
   const topic = yield* resolveWriterTopic(

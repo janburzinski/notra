@@ -100,12 +100,6 @@ export class GeoCursorFlagEvaluationError extends Data.TaggedError(
   readonly cause: unknown;
 }> {}
 
-export class GeoWriterDisabledError extends Data.TaggedError(
-  "GeoWriterDisabledError"
-)<{
-  readonly organizationId: string;
-}> {}
-
 export class GeoWriterCreditsExhaustedError extends Data.TaggedError(
   "GeoWriterCreditsExhaustedError"
 )<Record<string, never>> {}
@@ -155,6 +149,5 @@ export type GeoRouterError =
   | GeoSettingsMissingError
   | GeoTinybirdError
   | GeoWriterCreditsExhaustedError
-  | GeoWriterDisabledError
   | GeoWriterPlanError
   | GeoWriterStartError;
