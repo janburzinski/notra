@@ -756,13 +756,30 @@ export const geoRouter = {
       }
 
       try {
-        return await syncGscSuggestions(input.organizationId);
+        return await runGscSyncOrBadRequest(input.organizationId);
       } catch (error) {
         console.error(
           "[GSC] Initial sync failed after selecting property:",
           error
         );
-        return { status: "skipped", reason: "sync_failed" };
+        try {
+          // Keep authentication changes made while refreshing the token, but
+          // restore the selection state this request replaced.
+          await updateGscIntegration(input.organizationId, {
+            siteUrl: integration.siteUrl,
+            qstashScheduleId: integration.qstashScheduleId,
+            lastError: integration.lastError,
+          });
+        } catch (rollbackError) {
+          console.error(
+            "[GSC] Failed to restore integration after initial sync:",
+            rollbackError
+          );
+        }
+        if (scheduleId && scheduleId !== integration.qstashScheduleId) {
+          await removeGscSchedule(scheduleId);
+        }
+        throw error;
       }
     }),
   searchConsoleSync: authorizedProcedure
