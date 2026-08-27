@@ -23,6 +23,10 @@ export interface GeoSearchConsoleStatus {
   sites: GscSite[];
 }
 
+export interface GscSitesResponse {
+  sites: GscSite[];
+}
+
 export interface GscSelectSiteInput {
   siteUrl: string;
 }

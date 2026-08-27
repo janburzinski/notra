@@ -30,15 +30,19 @@ import { Google } from "@notra/ui/components/ui/svgs/google";
 import { type ReactNode, useId, useState } from "react";
 
 import { Button } from "@/components/button";
+import { ProjectLogo } from "@/components/geo/project-logo";
 import { StatusSpinner } from "@/components/geo/status-spinner";
+import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { GSC_OAUTH_AUTHORIZE_PATH } from "@/constants/google-search-console";
+import { useBrandSettings } from "@/lib/hooks/use-brand-analysis";
 import {
   useGscCardDismissal,
-  useGscClearSite,
   useGscDisconnect,
   useGscSelectSite,
+  useGscSites,
   useGscStatus,
   useGscSync,
+  useGeoProjects,
 } from "@/lib/hooks/use-geo";
 import { useGscConnectionToast } from "@/lib/hooks/use-gsc-connection-toast";
 import { cn } from "@/lib/utils";
@@ -47,11 +51,16 @@ import type {
   SearchConsoleConnectActionProps,
   SearchConsoleConnectedStateProps,
   SearchConsoleHeaderRowProps,
+  SearchConsolePropertyPickerProps,
   SearchConsoleSelectSiteStateProps,
 } from "@/types/components/geo";
 import type { GeoSearchConsoleStatus } from "@/types/google-search-console";
 import { formatRelative } from "@/utils/format-relative";
-import { formatGscSiteUrl } from "@/utils/gsc-site-url";
+import {
+  findMatchingGscSiteUrl,
+  formatGscSiteUrl,
+  getGscSiteDomain,
+} from "@/utils/gsc-site-url";
 
 function buildAuthorizeUrl(organizationId: string, callbackPath: string) {
   const params = new URLSearchParams({ organizationId, callbackPath });
@@ -128,15 +137,86 @@ function ConnectAction({
   );
 }
 
+function PropertyPicker({
+  organizationId,
+  sites,
+  websiteUrl,
+  onSelected,
+}: SearchConsolePropertyPickerProps) {
+  const id = useId();
+  const [selectedSiteUrl, setSelectedSiteUrl] = useState<string | null>(null);
+  const selectSite = useGscSelectSite(organizationId);
+  const siteUrl =
+    selectedSiteUrl ?? findMatchingGscSiteUrl(sites, websiteUrl) ?? "";
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor={`${id}-site`}>Property</Label>
+        <Select
+          onValueChange={(value) => setSelectedSiteUrl(value ?? "")}
+          value={siteUrl}
+        >
+          <SelectTrigger className="w-full" id={`${id}-site`}>
+            <SelectValue placeholder="Select a property">
+              {(value: string | null) => {
+                if (!value) {
+                  return "Select a property";
+                }
+                const label = formatGscSiteUrl(value);
+                return (
+                  <>
+                    <span aria-hidden="true">
+                      <ProjectLogo
+                        domain={getGscSiteDomain(value)}
+                        name={label}
+                      />
+                    </span>
+                    <span className="truncate">{label}</span>
+                  </>
+                );
+              }}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent align="start" alignItemWithTrigger={false}>
+            {sites.map((site) => {
+              const label = formatGscSiteUrl(site.siteUrl);
+              return (
+                <SelectItem key={site.siteUrl} value={site.siteUrl}>
+                  <span aria-hidden="true">
+                    <ProjectLogo
+                      domain={getGscSiteDomain(site.siteUrl)}
+                      name={label}
+                    />
+                  </span>
+                  <span>{label}</span>
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+      </div>
+      <Button
+        aria-busy={selectSite.isPending}
+        className={cn("w-full", selectSite.isPending && "disabled:opacity-100")}
+        disabled={siteUrl.length === 0 || selectSite.isPending}
+        onClick={() =>
+          selectSite.mutate({ siteUrl }, { onSuccess: () => onSelected?.() })
+        }
+      >
+        {selectSite.isPending ? <StatusSpinner /> : null}
+        {selectSite.isPending ? "Connecting…" : "Connect property"}
+      </Button>
+    </div>
+  );
+}
+
 function SelectSiteState({
   organizationId,
   callbackPath,
   status,
+  websiteUrl,
 }: SearchConsoleSelectSiteStateProps) {
-  const id = useId();
-  const [siteUrl, setSiteUrl] = useState("");
-  const selectSite = useGscSelectSite(organizationId);
-
   return (
     <ResponsiveDialog>
       <div className="flex flex-col items-start gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -162,41 +242,12 @@ function SelectSiteState({
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         {status.sites.length > 0 ? (
-          <div className="space-y-4 px-4 md:px-0">
-            <div className="space-y-2">
-              <Label htmlFor={`${id}-site`}>Property</Label>
-              <Select
-                onValueChange={(value) => setSiteUrl(value ?? "")}
-                value={siteUrl}
-              >
-                <SelectTrigger className="w-full" id={`${id}-site`}>
-                  <SelectValue placeholder="Select a property">
-                    {(value: string | null) =>
-                      value ? formatGscSiteUrl(value) : "Select a property"
-                    }
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent align="start" alignItemWithTrigger={false}>
-                  {status.sites.map((site) => (
-                    <SelectItem key={site.siteUrl} value={site.siteUrl}>
-                      {formatGscSiteUrl(site.siteUrl)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button
-              aria-busy={selectSite.isPending}
-              className={cn(
-                "w-full",
-                selectSite.isPending && "disabled:opacity-100"
-              )}
-              disabled={siteUrl.length === 0 || selectSite.isPending}
-              onClick={() => selectSite.mutate({ siteUrl })}
-            >
-              {selectSite.isPending ? <StatusSpinner /> : null}
-              {selectSite.isPending ? "Connecting…" : "Connect property"}
-            </Button>
+          <div className="px-4 md:px-0">
+            <PropertyPicker
+              organizationId={organizationId}
+              sites={status.sites}
+              websiteUrl={websiteUrl}
+            />
           </div>
         ) : (
           <div className="space-y-4 px-4 md:px-0">
@@ -239,71 +290,130 @@ function connectedMeta(status: GeoSearchConsoleStatus): string {
 
 function ConnectedState({
   organizationId,
+  callbackPath,
   status,
+  websiteUrl,
 }: SearchConsoleConnectedStateProps) {
+  const [changeOpen, setChangeOpen] = useState(false);
   const sync = useGscSync(organizationId);
-  const clearSite = useGscClearSite(organizationId);
+  const sites = useGscSites(organizationId, changeOpen);
   const disconnect = useGscDisconnect(organizationId);
-  const busy = sync.isPending || clearSite.isPending || disconnect.isPending;
+  const busy = sync.isPending || disconnect.isPending;
+
+  let changeDialogBody: ReactNode;
+  if (sites.isPending) {
+    changeDialogBody = (
+      <div className="text-muted-foreground flex items-center gap-2 px-4 py-3 text-sm md:px-0">
+        <StatusSpinner />
+        Loading properties…
+      </div>
+    );
+  } else if (sites.data?.sites.length) {
+    changeDialogBody = (
+      <div className="px-4 md:px-0">
+        <PropertyPicker
+          onSelected={() => setChangeOpen(false)}
+          organizationId={organizationId}
+          sites={sites.data.sites}
+          websiteUrl={websiteUrl}
+        />
+      </div>
+    );
+  } else {
+    changeDialogBody = (
+      <div className="space-y-4 px-4 md:px-0">
+        <p className="text-muted-foreground text-sm">
+          {sites.isError
+            ? "Search Console properties could not be loaded. Reconnect Google and try again."
+            : "No properties were found for this Google account."}
+        </p>
+        <Button
+          className="w-full"
+          nativeButton={false}
+          render={
+            <a href={buildAuthorizeUrl(organizationId, callbackPath)}>
+              Reconnect Google
+            </a>
+          }
+          variant="outline"
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
-      <div className="min-w-0 flex-1 space-y-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-sm leading-snug font-medium">
-            {formatGscSiteUrl(status.siteUrl ?? "")}
+    <>
+      <div className="flex items-center gap-3 px-4 py-3">
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="truncate text-sm leading-snug font-medium">
+              {formatGscSiteUrl(status.siteUrl ?? "")}
+            </p>
+            {status.weeklySyncScheduled ? (
+              <Badge className="font-normal" variant="secondary">
+                Weekly sync
+              </Badge>
+            ) : null}
+          </div>
+          <p className="text-muted-foreground text-xs leading-snug">
+            {connectedMeta(status)}
           </p>
-          {status.weeklySyncScheduled ? (
-            <Badge className="font-normal" variant="secondary">
-              Weekly sync
-            </Badge>
-          ) : null}
         </div>
-        <p className="text-muted-foreground text-xs leading-snug">
-          {connectedMeta(status)}
-        </p>
-      </div>
-      <div className="flex shrink-0 items-center gap-1">
-        <Button
-          disabled={busy}
-          onClick={() => sync.mutate()}
-          size="sm"
-          variant="outline"
-        >
-          {sync.isPending ? <StatusSpinner /> : null}
-          {sync.isPending ? "Syncing…" : "Sync now"}
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button
-                aria-label="Search Console actions"
+        <div className="flex shrink-0 items-center gap-1">
+          <Button
+            disabled={busy}
+            onClick={() => sync.mutate()}
+            size="sm"
+            variant="outline"
+          >
+            {sync.isPending ? <StatusSpinner /> : null}
+            {sync.isPending ? "Syncing…" : "Sync now"}
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  aria-label="Search Console actions"
+                  disabled={busy}
+                  size="icon-sm"
+                  variant="ghost"
+                >
+                  <HugeiconsIcon icon={MoreHorizontalIcon} size={16} />
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem
                 disabled={busy}
-                size="icon-sm"
-                variant="ghost"
+                onClick={() => setChangeOpen(true)}
               >
-                <HugeiconsIcon icon={MoreHorizontalIcon} size={16} />
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem
-              disabled={busy}
-              onClick={() => clearSite.mutate()}
-            >
-              Change property
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={busy}
-              onClick={() => disconnect.mutate()}
-              variant="destructive"
-            >
-              Disconnect
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                Change property
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={busy}
+                onClick={() => disconnect.mutate()}
+                variant="destructive"
+              >
+                Disconnect
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-    </div>
+      <ResponsiveDialog onOpenChange={setChangeOpen} open={changeOpen}>
+        <ResponsiveDialogContent className="sm:max-w-md">
+          <ResponsiveDialogHeader>
+            <ResponsiveDialogTitle>
+              Change Search Console property
+            </ResponsiveDialogTitle>
+            <ResponsiveDialogDescription>
+              Your current property stays connected until you confirm a new one.
+            </ResponsiveDialogDescription>
+          </ResponsiveDialogHeader>
+          {changeDialogBody}
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
+    </>
   );
 }
 
@@ -312,9 +422,22 @@ export function SearchConsoleCard({
   callbackPath,
 }: SearchConsoleCardProps) {
   const headingId = useId();
+  const { projectId } = useGeoProjectScope();
   useGscConnectionToast();
   const { data: status, isPending } = useGscStatus(organizationId);
   const { dismiss, dismissed } = useGscCardDismissal(organizationId);
+  const { data: projectsData } = useGeoProjects(organizationId);
+  const { data: brandData } = useBrandSettings(organizationId);
+
+  const projects = projectsData?.projects ?? [];
+  const activeProject =
+    projects.find((project) => project.id === projectId) ??
+    projects.at(0) ??
+    null;
+  const websiteUrl =
+    brandData?.voices.find(
+      (voice) => voice.id === activeProject?.brandSettingsId
+    )?.websiteUrl ?? null;
 
   const connectPromo = !isPending && status !== undefined && !status.connected;
 
@@ -349,13 +472,22 @@ export function SearchConsoleCard({
       );
     }
   } else if (status.siteUrl) {
-    body = <ConnectedState organizationId={organizationId} status={status} />;
+    body = (
+      <ConnectedState
+        callbackPath={callbackPath}
+        organizationId={organizationId}
+        status={status}
+        websiteUrl={websiteUrl}
+      />
+    );
   } else {
     body = (
       <SelectSiteState
         callbackPath={callbackPath}
+        key={activeProject?.id}
         organizationId={organizationId}
         status={status}
+        websiteUrl={websiteUrl}
       />
     );
   }

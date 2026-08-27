@@ -47,11 +47,21 @@ export interface SearchConsoleSelectSiteStateProps {
   organizationId: string;
   callbackPath: string;
   status: GeoSearchConsoleStatus;
+  websiteUrl: string | null;
+}
+
+export interface SearchConsolePropertyPickerProps {
+  organizationId: string;
+  sites: GeoSearchConsoleStatus["sites"];
+  websiteUrl: string | null;
+  onSelected?: () => void;
 }
 
 export interface SearchConsoleConnectedStateProps {
   organizationId: string;
+  callbackPath: string;
   status: GeoSearchConsoleStatus;
+  websiteUrl: string | null;
 }
 
 export interface GeoUpgradeGateProps {

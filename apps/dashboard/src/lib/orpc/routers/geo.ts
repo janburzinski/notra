@@ -136,6 +136,7 @@ import type {
 } from "@/types/geo";
 import type {
   GeoSearchConsoleStatus,
+  GscSitesResponse,
   GscSyncResult,
 } from "@/types/google-search-console";
 import { ratelimit } from "@/utils/ratelimit";
@@ -686,6 +687,29 @@ export const geoRouter = {
         sites,
       };
     }),
+  searchConsoleSites: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(async ({ context, input }): Promise<GscSitesResponse> => {
+      await assertGeoAccess({
+        headers: context.headers,
+        organizationId: input.organizationId,
+        user: context.user,
+      });
+
+      const integration = await getGscIntegration(input.organizationId);
+      if (!integration) {
+        throw notFound("Google Search Console is not connected");
+      }
+
+      try {
+        return { sites: await listGscSites(integration) };
+      } catch (error) {
+        console.error("[GSC] Failed to list sites:", error);
+        throw badRequest(
+          toGscErrorMessage(error, "Failed to load Search Console properties")
+        );
+      }
+    }),
   searchConsoleSelectSite: authorizedProcedure
     .input(gscSelectSiteInputSchema)
     .handler(async ({ context, input }): Promise<GscSyncResult> => {
@@ -731,7 +755,15 @@ export const geoRouter = {
         throw notFound("Google Search Console is not connected");
       }
 
-      return await runGscSyncOrBadRequest(input.organizationId);
+      try {
+        return await syncGscSuggestions(input.organizationId);
+      } catch (error) {
+        console.error(
+          "[GSC] Initial sync failed after selecting property:",
+          error
+        );
+        return { status: "skipped", reason: "sync_failed" };
+      }
     }),
   searchConsoleSync: authorizedProcedure
     .input(geoOrganizationInputSchema)
@@ -771,27 +803,6 @@ export const geoRouter = {
       }
 
       return await runGscSyncOrBadRequest(input.organizationId);
-    }),
-  searchConsoleClearSite: authorizedProcedure
-    .input(geoOrganizationInputSchema)
-    .handler(async ({ context, input }): Promise<{ cleared: boolean }> => {
-      await assertGeoAccess({
-        headers: context.headers,
-        organizationId: input.organizationId,
-        user: context.user,
-      });
-
-      const integration = await getGscIntegration(input.organizationId);
-      if (!integration) {
-        throw notFound("Google Search Console is not connected");
-      }
-      await removeGscSchedule(integration.qstashScheduleId);
-      await updateGscIntegration(input.organizationId, {
-        siteUrl: null,
-        qstashScheduleId: null,
-        lastError: null,
-      });
-      return { cleared: true };
     }),
   searchConsoleDisconnect: authorizedProcedure
     .input(geoOrganizationInputSchema)

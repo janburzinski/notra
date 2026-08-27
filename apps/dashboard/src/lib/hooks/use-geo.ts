@@ -61,6 +61,7 @@ import type {
 import type {
   GeoSearchConsoleStatus,
   GscSelectSiteInput,
+  GscSitesResponse,
   GscSyncResult,
 } from "@/types/google-search-console";
 import {
@@ -719,6 +720,16 @@ export function useGscStatus(organizationId: string) {
   });
 }
 
+export function useGscSites(organizationId: string, enabled: boolean) {
+  return useQuery<GscSitesResponse>({
+    ...dashboardOrpc.geo.searchConsoleSites.queryOptions({
+      input: { organizationId },
+    }),
+    enabled: !!organizationId && enabled,
+    meta: { errorMessage: "Failed to load Search Console properties" },
+  });
+}
+
 function useInvalidateGscQueries(organizationId: string) {
   const queryClient = useQueryClient();
   return async () => {
@@ -776,20 +787,6 @@ export function useGscSync(organizationId: string) {
     },
     onError: (error) => {
       toast.error(toErrorMessage(error, "Failed to sync Search Console"));
-    },
-  });
-}
-
-export function useGscClearSite(organizationId: string) {
-  const invalidate = useInvalidateGscQueries(organizationId);
-  return useMutation({
-    mutationFn: () =>
-      dashboardOrpc.geo.searchConsoleClearSite.call({ organizationId }),
-    onSuccess: async () => {
-      await invalidate();
-    },
-    onError: (error) => {
-      toast.error(toErrorMessage(error, "Failed to change property"));
     },
   });
 }
