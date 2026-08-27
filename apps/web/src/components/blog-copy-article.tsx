@@ -108,11 +108,7 @@ export function BlogCopyArticle({
             strokeWidth={2}
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="w-80 p-2"
-          showBackdrop={false}
-        >
+        <DropdownMenuContent align="end" className="w-80 p-2">
           <DropdownMenuItem
             className="px-2 py-2"
             closeOnClick={false}
