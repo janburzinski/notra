@@ -8,7 +8,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { McpIcon } from "@/components/integrations/mcp-icon";
 import { INTEGRATION_REFERENCE_TOKEN_SPLIT_REGEX } from "@/constants/integration-reference";
-import type { McpIconUrls } from "@/types/integrations/mcp";
+import type { McpIconSource } from "@/types/integrations/mcp";
 import {
   getIntegrationReferenceValue,
   getReferenceDisplay,
@@ -72,17 +72,21 @@ function ReferenceIcon({
   mcpIcon,
 }: {
   kind: ReferenceKind;
-  mcpIcon?: McpIconUrls;
+  mcpIcon?: McpIconSource;
 }) {
   const iconWrapperClass = getReferenceIconWrapperClass(kind);
 
-  if (kind === "mcp" && (mcpIcon?.lightUrl || mcpIcon?.darkUrl)) {
+  if (
+    kind === "mcp" &&
+    (mcpIcon?.lightUrl || mcpIcon?.darkUrl || mcpIcon?.serverUrl)
+  ) {
     return (
       <span aria-hidden="true" className={iconWrapperClass}>
         <McpIcon
           className="size-full"
           darkUrl={mcpIcon.darkUrl}
           lightUrl={mcpIcon.lightUrl}
+          serverUrl={mcpIcon.serverUrl}
         />
       </span>
     );
@@ -100,7 +104,7 @@ function ReferenceIcon({
 
 export function renderTextWithIntegrationReferences(
   text: string,
-  mcpIconsByIntegrationId?: ReadonlyMap<string, McpIconUrls>
+  mcpIconsByIntegrationId?: ReadonlyMap<string, McpIconSource>
 ): ReactNode[] {
   const nodes: ReactNode[] = [];
   let keySeed = 0;
@@ -189,7 +193,7 @@ interface IntegrationReferenceProps {
   value: string;
   display: string;
   kind: ReferenceKind;
-  mcpIcon?: McpIconUrls;
+  mcpIcon?: McpIconSource;
 }
 
 function IntegrationReference({

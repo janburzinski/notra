@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { Label } from "@notra/ui/components/ui/label";
 import {
   RadioGroup,
@@ -13,8 +9,8 @@ import {
 import { cn } from "@notra/ui/lib/utils";
 import { useId } from "react";
 
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import type { BrandIdentityRadioGroupProps } from "@/types/components/brand-identity";
-import { getBrandFaviconUrl } from "@/utils/brand";
 
 const EMPTY_SENTINEL = "__none__";
 
@@ -24,7 +20,7 @@ interface BrandIdentityOptionCardProps {
   title: string;
   subtitle: string;
   isSelected: boolean;
-  faviconUrl?: string;
+  websiteUrl?: string | null;
   fallback?: string;
 }
 
@@ -34,7 +30,7 @@ function BrandIdentityOptionCard({
   title,
   subtitle,
   isSelected,
-  faviconUrl,
+  websiteUrl,
   fallback,
 }: BrandIdentityOptionCardProps) {
   return (
@@ -50,8 +46,10 @@ function BrandIdentityOptionCard({
       <RadioGroupItem className="shrink-0" id={itemId} value={itemValue} />
       {fallback !== undefined && (
         <Avatar className="size-8 rounded-full after:rounded-full" size="sm">
-          <AvatarImage src={faviconUrl} />
-          <AvatarFallback>{fallback}</AvatarFallback>
+          <DomainLogoImage
+            domain={websiteUrl}
+            fallback={<AvatarFallback>{fallback}</AvatarFallback>}
+          />
         </Avatar>
       )}
       <div className="min-w-0 flex-1">
@@ -105,7 +103,6 @@ export function BrandIdentityRadioGroup({
         {voices.map((voice) => (
           <BrandIdentityOptionCard
             fallback={voice.name.slice(0, 2).toUpperCase()}
-            faviconUrl={getBrandFaviconUrl(voice.websiteUrl)}
             isSelected={value === voice.id}
             itemId={`${groupId}-${voice.id}`}
             itemValue={voice.id}
@@ -114,6 +111,7 @@ export function BrandIdentityRadioGroup({
               voice.isDefault ? "Default brand identity" : "Brand identity"
             }
             title={voice.name}
+            websiteUrl={voice.websiteUrl}
           />
         ))}
       </RadioGroup>

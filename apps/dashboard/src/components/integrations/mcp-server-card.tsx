@@ -16,11 +16,7 @@ import {
   ResponsiveAlertDialogHeader,
   ResponsiveAlertDialogTitle,
 } from "@notra/ui/components/shared/responsive-alert-dialog";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
   DropdownMenu,
@@ -33,7 +29,8 @@ import { RefreshCcwIcon } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/button";
-import { getMcpFaviconUrl, MCP_ACCENT_COLOR } from "@/lib/integrations/mcp";
+import { DomainLogoImage } from "@/components/domain-logo-image";
+import { MCP_ACCENT_COLOR } from "@/lib/integrations/mcp";
 import type { McpServerCardProps } from "@/types/integrations/mcp";
 
 export function McpServerCard({
@@ -135,13 +132,15 @@ export function McpServerCard({
         heading={server.name}
         icon={
           <Avatar className="size-7 rounded-md after:hidden">
-            <AvatarImage
+            <DomainLogoImage
               className="rounded-md"
-              src={getMcpFaviconUrl(server.url)}
+              domain={server.url}
+              fallback={
+                <AvatarFallback className="rounded-md bg-transparent">
+                  <HugeiconsIcon icon={CpuIcon} />
+                </AvatarFallback>
+              }
             />
-            <AvatarFallback className="rounded-md bg-transparent">
-              <HugeiconsIcon icon={CpuIcon} />
-            </AvatarFallback>
           </Avatar>
         }
       >

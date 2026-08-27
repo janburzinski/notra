@@ -92,7 +92,6 @@ import {
 } from "@/lib/chat/slack-relay";
 import { useElapsedSeconds } from "@/lib/hooks/use-elapsed-seconds";
 import { useSlackMirrorStream } from "@/lib/hooks/use-slack-mirror-stream";
-import { getMcpIconUrls } from "@/lib/integrations/mcp";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { isImageMimeType } from "@/lib/upload/mime";
 import { cn } from "@/lib/utils";
@@ -495,10 +494,11 @@ function StandaloneChatPageClient({
           (server) =>
             [
               server.id,
-              getMcpIconUrls({
+              {
                 darkUrl: server.logoDarkUrl,
                 lightUrl: server.logoLightUrl,
-              }),
+                serverUrl: server.websiteUrl ?? server.url,
+              },
             ] as const
         ),
         ...(mcpStoreData?.integrations ?? []).flatMap((integration) =>
@@ -506,10 +506,12 @@ function StandaloneChatPageClient({
             ? [
                 [
                   integration.connection.id,
-                  getMcpIconUrls({
+                  {
                     darkUrl: integration.logoDarkUrl,
                     lightUrl: integration.logoLightUrl,
-                  }),
+                    serverUrl:
+                      integration.websiteUrl ?? integration.connection.url,
+                  },
                 ] as const,
               ]
             : []

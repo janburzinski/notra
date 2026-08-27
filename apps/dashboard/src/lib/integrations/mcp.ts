@@ -2,10 +2,6 @@ import {
   type AddMcpServerFormValues,
   MCP_URL_PROTOCOL_REGEX,
 } from "@/schemas/integrations";
-import type {
-  GetMcpIconUrlsInput,
-  McpIconUrls,
-} from "@/types/integrations/mcp";
 
 export const MCP_ACCENT_COLOR = "#9333EA";
 
@@ -16,34 +12,6 @@ export function buildMcpUrl(raw: string) {
 
 export function toMcpFormUrl(url: string) {
   return url.trim().replace(MCP_URL_PROTOCOL_REGEX, "");
-}
-
-export function getMcpFaviconUrl(url: string | null | undefined) {
-  if (!url) {
-    return undefined;
-  }
-  const normalizedUrl = url.startsWith("http") ? url : `https://${url}`;
-  try {
-    const domain = new URL(normalizedUrl).hostname;
-    return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-  } catch {
-    return undefined;
-  }
-}
-
-export function getMcpIconUrls({
-  lightUrl,
-  darkUrl,
-  fallbackUrl,
-}: GetMcpIconUrlsInput): McpIconUrls {
-  const normalizedLightUrl = lightUrl?.trim() || undefined;
-  const normalizedDarkUrl = darkUrl?.trim() || undefined;
-  const normalizedFallbackUrl = fallbackUrl?.trim() || undefined;
-
-  return {
-    lightUrl: normalizedLightUrl ?? normalizedDarkUrl ?? normalizedFallbackUrl,
-    darkUrl: normalizedDarkUrl ?? normalizedLightUrl ?? normalizedFallbackUrl,
-  };
 }
 
 export function getMcpFormErrorMessage(error: unknown) {

@@ -1,11 +1,9 @@
 "use client";
 
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { cn } from "@notra/ui/lib/utils";
-import Image from "next/image";
-import { useState } from "react";
 
-import { CompetitorLogo } from "@/components/geo/competitor-logo";
-import { GEO_LOGO_SIZE_PX } from "@/constants/geo";
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import type { CompetitorBrandLogoProps } from "@/types/onboarding";
 
 export function CompetitorBrandLogo({
@@ -14,28 +12,27 @@ export function CompetitorBrandLogo({
   logo,
   className,
 }: CompetitorBrandLogoProps) {
-  const [failed, setFailed] = useState(false);
-
-  if (!logo || failed) {
-    return <CompetitorLogo className={className} domain={domain} name={name} />;
-  }
-
   return (
-    <span
+    <Avatar
       className={cn(
-        "bg-muted inline-flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-sm",
+        "bg-muted size-5 shrink-0 overflow-hidden rounded-sm after:hidden",
         className
       )}
     >
-      <Image
+      <DomainLogoImage
         alt={`${name} logo`}
         className="size-full object-contain"
-        height={GEO_LOGO_SIZE_PX}
-        onError={() => setFailed(true)}
-        src={logo}
-        unoptimized
-        width={GEO_LOGO_SIZE_PX}
+        domain={domain}
+        fallback={
+          <AvatarFallback
+            aria-hidden="true"
+            className="bg-muted text-[0.625rem] leading-none"
+          >
+            {name.trim().charAt(0).toUpperCase()}
+          </AvatarFallback>
+        }
+        preferredSources={[logo]}
       />
-    </span>
+    </Avatar>
   );
 }

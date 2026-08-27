@@ -6,11 +6,7 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { BreadcrumbPage } from "@notra/ui/components/ui/breadcrumb";
 import {
@@ -25,9 +21,9 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { useBrandSettings } from "@/lib/hooks/use-brand-analysis";
-import { getBrandFaviconUrl } from "@/utils/brand";
 import {
   findSelectedBrandIdentity,
   readStoredBrandIdentityId,
@@ -64,10 +60,14 @@ function BrandIdentityAvatar({
 }) {
   return (
     <Avatar className="size-4 after:rounded-full" size="sm">
-      <AvatarImage src={getBrandFaviconUrl(websiteUrl)} />
-      <AvatarFallback className="text-[9px]">
-        {name.slice(0, 2).toUpperCase()}
-      </AvatarFallback>
+      <DomainLogoImage
+        domain={websiteUrl}
+        fallback={
+          <AvatarFallback className="text-[9px]">
+            {name.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        }
+      />
     </Avatar>
   );
 }

@@ -180,6 +180,7 @@ export function WorkspaceForm({ existingOrg }: WorkspaceFormProps) {
               <div className="flex items-center gap-2">
                 <OrgLogoField
                   disabled={isSubmitting}
+                  domain={companyDomain}
                   isLoading={isCompanyLogoLoading}
                   onSelect={handleLogoSelect}
                   previewUrl={logoPreviewUrl ?? fetchedLogoUrl}

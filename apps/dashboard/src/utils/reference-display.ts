@@ -28,10 +28,6 @@ export function getReferenceDomain(
   }
 }
 
-export function getFaviconUrl(domain: string): string {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
-}
-
 export function getTwitterHandleFromUrl(
   sourceUrl: string | null | undefined
 ): string | null {

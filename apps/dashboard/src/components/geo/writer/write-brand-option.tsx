@@ -2,7 +2,7 @@
 
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
 import type { WriteBrandOptionProps } from "@/types/components/geo-writer";
-import { getWebsiteDomain } from "@/utils/brand";
+import { normalizeDomain } from "@/utils/domain-logo";
 
 export function WriteBrandOption({
   name,
@@ -13,7 +13,7 @@ export function WriteBrandOption({
     <span className="flex min-w-0 items-center gap-2">
       <CompetitorLogo
         className="size-5"
-        domain={getWebsiteDomain(websiteUrl)}
+        domain={normalizeDomain(websiteUrl)}
         name={name}
       />
       <span className="truncate">

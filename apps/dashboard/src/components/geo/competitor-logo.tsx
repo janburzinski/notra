@@ -1,71 +1,10 @@
 "use client";
 
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { cn } from "@notra/ui/lib/utils";
-import Image from "next/image";
-import { useMemo, useState } from "react";
 
-import { GEO_LOGO_SIZE_PX } from "@/constants/geo";
-import { competitorLogoSources } from "@/lib/geo/logo";
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import type { CompetitorLogoProps } from "@/types/geo";
-
-function CompetitorLogoFallback({
-  name,
-  className,
-}: {
-  name: string;
-  className: string;
-}) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn(className, "bg-muted text-[0.625rem] leading-none")}
-    >
-      {name.trim().charAt(0).toUpperCase()}
-    </span>
-  );
-}
-
-function CompetitorLogoInner({
-  name,
-  domain,
-  className,
-  onSettled,
-}: CompetitorLogoProps) {
-  const sources = useMemo(() => competitorLogoSources(domain), [domain]);
-  const [sourceIndex, setSourceIndex] = useState(0);
-  const src = sources[sourceIndex] ?? null;
-
-  const shellClassName = cn(
-    "inline-flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-sm",
-    className
-  );
-
-  if (!src) {
-    return <CompetitorLogoFallback className={shellClassName} name={name} />;
-  }
-
-  return (
-    <span className={cn(shellClassName, "bg-muted")}>
-      <Image
-        alt={`${name} logo`}
-        className="size-full object-contain"
-        height={GEO_LOGO_SIZE_PX}
-        onError={() => {
-          if (sourceIndex + 1 < sources.length) {
-            setSourceIndex((current) => current + 1);
-            return;
-          }
-          onSettled?.();
-          setSourceIndex(sources.length);
-        }}
-        onLoad={() => onSettled?.()}
-        src={src}
-        unoptimized
-        width={GEO_LOGO_SIZE_PX}
-      />
-    </span>
-  );
-}
 
 export function CompetitorLogo({
   name,
@@ -74,12 +13,26 @@ export function CompetitorLogo({
   onSettled,
 }: CompetitorLogoProps) {
   return (
-    <CompetitorLogoInner
-      className={className}
-      domain={domain}
-      key={`${domain ?? ""}:${name}`}
-      name={name}
-      onSettled={onSettled}
-    />
+    <Avatar
+      className={cn(
+        "bg-muted size-5 shrink-0 overflow-hidden rounded-sm after:hidden",
+        className
+      )}
+    >
+      <DomainLogoImage
+        alt={`${name} logo`}
+        className="size-full object-contain"
+        domain={domain}
+        fallback={
+          <AvatarFallback
+            aria-hidden="true"
+            className="bg-muted text-[0.625rem] leading-none"
+          >
+            {name.trim().charAt(0).toUpperCase()}
+          </AvatarFallback>
+        }
+        onSettled={onSettled}
+      />
+    </Avatar>
   );
 }

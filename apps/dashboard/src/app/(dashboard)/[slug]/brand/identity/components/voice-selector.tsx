@@ -15,11 +15,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,9 +35,9 @@ import { toast } from "sonner";
 
 import { AffectedTriggersWarning } from "@/components/affected-triggers-warning";
 import { Button } from "@/components/button";
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import { IDENTITY_NAME_MAX_LENGTH } from "@/constants/brand-identity";
 import type { VoiceSelectorProps } from "@/types/brand-identity";
-import { getBrandFaviconUrl } from "@/utils/brand";
 import { getWebsiteDisplayText } from "@/utils/brand-identity";
 import { truncateText } from "@/utils/format";
 
@@ -116,10 +112,14 @@ export function VoiceSelector({
                 className="size-8 shrink-0 rounded-full after:rounded-full"
                 size="sm"
               >
-                <AvatarImage src={getBrandFaviconUrl(voice.websiteUrl)} />
-                <AvatarFallback>
-                  {voice.name.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
+                <DomainLogoImage
+                  domain={voice.websiteUrl}
+                  fallback={
+                    <AvatarFallback>
+                      {voice.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  }
+                />
               </Avatar>
               <div className="min-w-0 flex-1">
                 {hasTooltipInfo ? (

@@ -25,11 +25,7 @@ import {
   contentChatSessionsPath,
   contentChatSessionsQueryKey,
 } from "@notra/ai/utils/chat";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Button } from "@notra/ui/components/ui/button";
 import { ButtonGroup } from "@notra/ui/components/ui/button-group";
@@ -70,6 +66,7 @@ import { ImageExportTargetIcon } from "@/components/content/image-export-target-
 import { PostSocialButton } from "@/components/content/post-social-button";
 import { RecommendationsSection } from "@/components/content/recommendations-section";
 import { RightPanelPortal } from "@/components/dashboard/right-panel-portal";
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import { WriterExecute } from "@/components/geo/writer/writer-execute";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
@@ -94,7 +91,6 @@ import { sourceMetadataSchema } from "@/schemas/content";
 import type { ContentChatMessageMetadata } from "@/types/content/chat";
 import type { ContentDetailPageClientProps } from "@/types/content/detail";
 import type { ImageExportTarget } from "@/types/content/image-export";
-import { getBrandFaviconUrl } from "@/utils/brand";
 import { getEditMarkdownDiff } from "@/utils/chat-document-diff";
 import { handleStandaloneChatError } from "@/utils/chat-error";
 import { snapshotContentChatAttachments } from "@/utils/content-chat-attachments";
@@ -1286,14 +1282,16 @@ export default function PageClient({
                                         className="mt-0.5 size-8 shrink-0 rounded-full after:rounded-full"
                                         size="sm"
                                       >
-                                        <AvatarImage
-                                          src={getBrandFaviconUrl(
-                                            voice.websiteUrl
-                                          )}
+                                        <DomainLogoImage
+                                          domain={voice.websiteUrl}
+                                          fallback={
+                                            <AvatarFallback className="text-xs">
+                                              {voice.name
+                                                .slice(0, 2)
+                                                .toUpperCase()}
+                                            </AvatarFallback>
+                                          }
                                         />
-                                        <AvatarFallback className="text-xs">
-                                          {voice.name.slice(0, 2).toUpperCase()}
-                                        </AvatarFallback>
                                       </Avatar>
                                       <div className="space-y-0.5">
                                         <p className="font-medium">

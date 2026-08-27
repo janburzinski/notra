@@ -40,7 +40,7 @@ import { formatElapsedSeconds } from "@/utils/format-elapsed-seconds";
 
 import {
   getMcpToolActionPhrase,
-  getMcpToolIconUrls,
+  getMcpToolIconSource,
   getMcpToolLabel,
   isMcpToolName,
 } from "./chat-tool-block/mcp/utils";
@@ -747,15 +747,16 @@ export function ChatToolBlock({
   let toolIcon: ReactNode = null;
 
   if (isMcp) {
-    const mcpIconUrls = getMcpToolIconUrls(toolMetadata);
+    const mcpIconSource = getMcpToolIconSource(toolMetadata);
     toolIcon = (
       <McpIcon
         darkUrl={
-          iconUrl ?? mcpLogoDarkUrl ?? mcpLogoLightUrl ?? mcpIconUrls.darkUrl
+          iconUrl ?? mcpLogoDarkUrl ?? mcpLogoLightUrl ?? mcpIconSource.darkUrl
         }
         lightUrl={
-          iconUrl ?? mcpLogoLightUrl ?? mcpLogoDarkUrl ?? mcpIconUrls.lightUrl
+          iconUrl ?? mcpLogoLightUrl ?? mcpLogoDarkUrl ?? mcpIconSource.lightUrl
         }
+        serverUrl={mcpIconSource.serverUrl}
       />
     );
   } else if (iconUrl) {

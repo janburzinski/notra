@@ -63,6 +63,7 @@ export interface ChatContextOption {
   contextItem: ContextItem;
   logoLightUrl?: string | null;
   logoDarkUrl?: string | null;
+  serverUrl?: string | null;
 }
 
 export interface ChatContextOptionContentProps {

@@ -2,15 +2,12 @@
 
 import { Upload01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { cn } from "@notra/ui/lib/utils";
 import { useRef } from "react";
 
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import { ALLOWED_RASTER_MIME_TYPES } from "@/constants/upload";
 import type { OrgLogoFieldProps } from "@/types/onboarding";
 
@@ -18,6 +15,7 @@ const ACCEPTED_LOGO_TYPES = ALLOWED_RASTER_MIME_TYPES.join(",");
 
 export function OrgLogoField({
   disabled,
+  domain,
   isLoading,
   onSelect,
   previewUrl,
@@ -57,17 +55,20 @@ export function OrgLogoField({
             !previewUrl && "border-dashed"
           )}
         >
-          <AvatarImage
+          <DomainLogoImage
             alt="Logo"
             className="rounded-xl"
-            src={previewUrl ?? undefined}
+            domain={domain}
+            fallback={
+              <AvatarFallback className="bg-muted/50 rounded-xl">
+                <HugeiconsIcon
+                  className="text-muted-foreground size-5"
+                  icon={Upload01Icon}
+                />
+              </AvatarFallback>
+            }
+            preferredSources={[previewUrl]}
           />
-          <AvatarFallback className="bg-muted/50 rounded-xl">
-            <HugeiconsIcon
-              className="text-muted-foreground size-5"
-              icon={Upload01Icon}
-            />
-          </AvatarFallback>
           {previewUrl ? (
             <span className="bg-background/80 absolute inset-0 flex items-center justify-center rounded-xl opacity-0 transition-opacity group-hover/logo:opacity-100">
               <HugeiconsIcon className="size-5" icon={Upload01Icon} />

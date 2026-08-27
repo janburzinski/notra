@@ -11,28 +11,20 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from "@notra/ui/components/shared/responsive-dialog";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { openMcpOAuthPopup } from "@notra/utils/oauth-popup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Image from "next/image";
 import type React from "react";
 import { isValidElement, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import { McpAuthenticationFields } from "@/components/integrations/mcp-authentication-fields";
 import { McpConnectionTestStatus } from "@/components/integrations/mcp-connection-test-status";
 import { McpDialogFooter } from "@/components/integrations/mcp-dialog-footer";
 import { McpServerDetailsFields } from "@/components/integrations/mcp-server-details-fields";
 import { useMcpServerForm } from "@/lib/hooks/use-mcp-server-form";
-import {
-  buildMcpHeaders,
-  buildMcpUrl,
-  getMcpFaviconUrl,
-} from "@/lib/integrations/mcp";
+import { buildMcpHeaders, buildMcpUrl } from "@/lib/integrations/mcp";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import {
   type AddMcpServerFormValues,
@@ -340,33 +332,34 @@ function McpDialogLogo({
   const lightLogo = lightUrl ?? darkUrl;
   const darkLogo = darkUrl ?? lightUrl;
 
-  if (lightLogo && darkLogo) {
-    return (
-      <div className="bg-muted size-9 shrink-0 overflow-hidden rounded-lg">
-        <Image
-          alt={`${name} logo`}
-          className="size-9 object-contain dark:hidden"
-          height={36}
-          src={lightLogo}
-          width={36}
-        />
-        <Image
-          alt={`${name} logo`}
-          className="hidden size-9 object-contain dark:block"
-          height={36}
-          src={darkLogo}
-          width={36}
-        />
-      </div>
-    );
-  }
-
   return (
-    <Avatar className="bg-muted size-9 shrink-0 rounded-lg after:hidden">
-      <AvatarImage className="rounded-lg" src={getMcpFaviconUrl(url)} />
-      <AvatarFallback className="text-foreground rounded-lg bg-transparent">
-        <HugeiconsIcon className="size-5" icon={CpuIcon} />
-      </AvatarFallback>
-    </Avatar>
+    <span className="relative size-9 shrink-0">
+      <Avatar className="bg-muted size-9 rounded-lg after:hidden dark:hidden">
+        <DomainLogoImage
+          alt={`${name} logo`}
+          className="rounded-lg object-contain"
+          domain={url}
+          fallback={
+            <AvatarFallback className="text-foreground rounded-lg bg-transparent">
+              <HugeiconsIcon className="size-5" icon={CpuIcon} />
+            </AvatarFallback>
+          }
+          preferredSources={[lightLogo, darkLogo]}
+        />
+      </Avatar>
+      <Avatar className="bg-muted hidden size-9 rounded-lg after:hidden dark:flex">
+        <DomainLogoImage
+          alt={`${name} logo`}
+          className="rounded-lg object-contain"
+          domain={url}
+          fallback={
+            <AvatarFallback className="text-foreground rounded-lg bg-transparent">
+              <HugeiconsIcon className="size-5" icon={CpuIcon} />
+            </AvatarFallback>
+          }
+          preferredSources={[darkLogo, lightLogo]}
+        />
+      </Avatar>
+    </span>
   );
 }

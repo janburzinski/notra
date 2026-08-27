@@ -36,13 +36,13 @@ import { Textarea } from "@notra/ui/components/ui/textarea";
 import { useState } from "react";
 
 import { Button } from "@/components/button";
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import type {
   ReferenceCardProps,
   TweetMetadata,
 } from "@/types/hooks/brand-references";
 import { formatTweetContent } from "@/utils/format-tweet-content";
 import {
-  getFaviconUrl,
   getMetadataString,
   getReferenceDomain,
   getTwitterAvatarUrl,
@@ -490,12 +490,15 @@ function BlogReferenceCard({
               className="bg-muted size-9 rounded-full after:rounded-full"
               size="sm"
             >
-              {domain && (
-                <AvatarImage className="p-2" src={getFaviconUrl(domain)} />
-              )}
-              <AvatarFallback>
-                {(domain ?? "??").slice(0, 2).toUpperCase()}
-              </AvatarFallback>
+              <DomainLogoImage
+                className="p-2"
+                domain={domain}
+                fallback={
+                  <AvatarFallback>
+                    {(domain ?? "??").slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                }
+              />
             </Avatar>
             <div className="min-w-0">
               <span className="block truncate text-sm leading-tight font-semibold">

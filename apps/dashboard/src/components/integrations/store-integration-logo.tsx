@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import type { StoreIntegrationLogoProps } from "@/types/integrations/mcp";
 
 export function StoreIntegrationLogo({
@@ -9,31 +10,40 @@ export function StoreIntegrationLogo({
 }: StoreIntegrationLogoProps) {
   const lightLogo = integration.logoLightUrl ?? integration.logoDarkUrl;
   const darkLogo = integration.logoDarkUrl ?? integration.logoLightUrl;
-
-  if (lightLogo && darkLogo) {
-    return (
-      <>
-        <Image
-          alt={`${integration.name} logo`}
-          className="size-6 rounded object-contain dark:hidden"
-          height={24}
-          src={lightLogo}
-          width={24}
-        />
-        <Image
-          alt={`${integration.name} logo`}
-          className="hidden size-6 rounded object-contain dark:block"
-          height={24}
-          src={darkLogo}
-          width={24}
-        />
-      </>
-    );
-  }
+  const domain = integration.websiteUrl ?? integration.url;
+  const fallback = integration.name.trim().slice(0, 2).toUpperCase() || "?";
 
   return (
-    <span className="bg-muted text-muted-foreground flex size-6 items-center justify-center rounded text-xs font-medium">
-      {integration.name.trim().slice(0, 2).toUpperCase() || "?"}
-    </span>
+    <>
+      <Avatar className="size-6 rounded after:hidden dark:hidden" size="sm">
+        <DomainLogoImage
+          alt={`${integration.name} logo`}
+          className="rounded object-contain"
+          domain={domain}
+          fallback={
+            <AvatarFallback className="rounded text-xs font-medium">
+              {fallback}
+            </AvatarFallback>
+          }
+          preferredSources={[lightLogo, darkLogo]}
+        />
+      </Avatar>
+      <Avatar
+        className="hidden size-6 rounded after:hidden dark:flex"
+        size="sm"
+      >
+        <DomainLogoImage
+          alt={`${integration.name} logo`}
+          className="rounded object-contain"
+          domain={domain}
+          fallback={
+            <AvatarFallback className="rounded text-xs font-medium">
+              {fallback}
+            </AvatarFallback>
+          }
+          preferredSources={[darkLogo, lightLogo]}
+        />
+      </Avatar>
+    </>
   );
 }

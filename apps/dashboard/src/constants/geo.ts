@@ -738,12 +738,8 @@ export const GEO_TAB_BREADCRUMB_LABELS: Record<string, string> = {
   journeys: "Journeys",
 };
 
-export const GEO_LOGO_LINK_BASE = "https://logos.context.dev/";
-export const GEO_LOGO_LINK_CLIENT_ID_ENV = "NEXT_PUBLIC_LOGOLINK_CLIENT_ID";
-export const GEO_FAVICON_BASE = "https://icons.duckduckgo.com/ip3";
 export const GEO_AVATAR_FALLBACK_BASE =
   "https://api.dicebear.com/9.x/glass/svg";
-export const GEO_LOGO_SIZE_PX = 40;
 
 export const GEO_COMPETITOR_DETAIL_DAYS = 30;
 export const GEO_COMPETITOR_DETAIL_MIN_POINTS = 2;

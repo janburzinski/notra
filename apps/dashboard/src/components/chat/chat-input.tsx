@@ -248,14 +248,27 @@ function getContextPickerDisabledReason(
   return null;
 }
 
-function ContextChipIcon({ item }: { item: ContextItem }) {
+function ContextChipIcon({
+  item,
+  option,
+}: {
+  item: ContextItem;
+  option?: ChatContextOption;
+}) {
   if (item.type === "github-repo") {
     return <Github className="size-3.5 shrink-0" />;
   }
   if (item.type === "linear-team") {
     return <Linear className="size-3.5 shrink-0" />;
   }
-  return <McpIcon className="size-3.5" />;
+  return (
+    <McpIcon
+      className="size-3.5"
+      darkUrl={option?.logoDarkUrl}
+      lightUrl={option?.logoLightUrl}
+      serverUrl={option?.serverUrl}
+    />
+  );
 }
 
 interface ChatInputAdvancedProps {
@@ -758,6 +771,7 @@ export function ChatInputAdvanced({
         },
         logoLightUrl: server.logoLightUrl,
         logoDarkUrl: server.logoDarkUrl,
+        serverUrl: server.websiteUrl ?? server.url,
       });
     }
 
@@ -780,6 +794,7 @@ export function ChatInputAdvanced({
         },
         logoLightUrl: integration.logoLightUrl,
         logoDarkUrl: integration.logoDarkUrl,
+        serverUrl: integration.websiteUrl ?? connection.url,
       });
     }
 
@@ -1627,9 +1642,12 @@ export function ChatInputAdvanced({
                   <>
                     {context.map((item) => {
                       const label = getReferenceDisplay(item);
+                      const option = contextOptions.find((candidate) =>
+                        contextItemsEqual(candidate.contextItem, item)
+                      );
                       return (
                         <Composer.Chip
-                          icon={<ContextChipIcon item={item} />}
+                          icon={<ContextChipIcon item={item} option={option} />}
                           key={contextItemKey(item)}
                           label={label}
                           onRemove={

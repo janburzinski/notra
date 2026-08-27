@@ -36,7 +36,7 @@ import {
 import { useBrandSettings } from "@/lib/hooks/use-brand-analysis";
 import { useGeoProjects } from "@/lib/hooks/use-geo";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
-import { getWebsiteDomain } from "@/utils/brand";
+import { normalizeDomain } from "@/utils/domain-logo";
 import { geoNavHref } from "@/utils/geo-paths";
 import { isStaleGeoProjectParam, resolveNavItems } from "@/utils/nav";
 
@@ -76,7 +76,7 @@ export function SidebarProjectSwitcher() {
   }, [staleProjectParam, setProjectParam]);
 
   const projectDomain = (brandSettingsId: string) =>
-    getWebsiteDomain(
+    normalizeDomain(
       voices.find((voice) => voice.id === brandSettingsId)?.websiteUrl ?? null
     );
 

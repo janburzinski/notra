@@ -115,6 +115,7 @@ export interface OnboardingGeoPageProps {
 
 export interface OrgLogoFieldProps {
   disabled?: boolean;
+  domain: string | null;
   isLoading?: boolean;
   onSelect: (file: File) => void;
   previewUrl: string | null;

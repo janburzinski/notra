@@ -1,16 +1,12 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@notra/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import type { BrandSettings } from "@/types/hooks/brand-analysis";
-import { getBrandFaviconUrl } from "@/utils/brand";
 
 export function BrandVoiceCell({
   voice,
@@ -53,10 +49,14 @@ export function BrandVoiceCell({
           className="mt-0.5 size-8 shrink-0 rounded-full after:rounded-full"
           size="sm"
         >
-          <AvatarImage src={getBrandFaviconUrl(voice.websiteUrl)} />
-          <AvatarFallback className="text-xs">
-            {voice.name.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
+          <DomainLogoImage
+            domain={voice.websiteUrl}
+            fallback={
+              <AvatarFallback className="text-xs">
+                {voice.name.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            }
+          />
         </Avatar>
         <div className="space-y-0.5">
           <p className="font-medium">{voice.name}</p>

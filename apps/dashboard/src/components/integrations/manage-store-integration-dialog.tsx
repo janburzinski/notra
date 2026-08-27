@@ -24,17 +24,18 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
+import { Avatar, AvatarFallback } from "@notra/ui/components/ui/avatar";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Field, FieldLabel } from "@notra/ui/components/ui/field";
 import { Input } from "@notra/ui/components/ui/input";
 import { openMcpOAuthPopup } from "@notra/utils/oauth-popup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RefreshCcwIcon } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/button";
+import { DomainLogoImage } from "@/components/domain-logo-image";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { MAX_MCP_HEADERS } from "@/schemas/integrations";
 import type {
@@ -437,32 +438,38 @@ function StoreIntegrationDialogLogo({
 }: StoreIntegrationDialogLogoProps) {
   const lightLogo = integration.logoLightUrl ?? integration.logoDarkUrl;
   const darkLogo = integration.logoDarkUrl ?? integration.logoLightUrl;
-
-  if (!(lightLogo && darkLogo)) {
-    return (
-      <span className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-medium">
-        {integration.name.trim().slice(0, 2).toUpperCase() || "?"}
-      </span>
-    );
-  }
+  const domain = integration.websiteUrl ?? integration.url;
+  const fallback = integration.name.trim().slice(0, 2).toUpperCase() || "?";
 
   return (
-    <div className="bg-muted size-9 shrink-0 overflow-hidden rounded-lg">
-      <Image
-        alt={`${integration.name} logo`}
-        className="size-9 object-contain dark:hidden"
-        height={36}
-        src={lightLogo}
-        width={36}
-      />
-      <Image
-        alt={`${integration.name} logo`}
-        className="hidden size-9 object-contain dark:block"
-        height={36}
-        src={darkLogo}
-        width={36}
-      />
-    </div>
+    <span className="relative size-9 shrink-0">
+      <Avatar className="size-9 rounded-lg after:hidden dark:hidden">
+        <DomainLogoImage
+          alt={`${integration.name} logo`}
+          className="rounded-lg object-contain"
+          domain={domain}
+          fallback={
+            <AvatarFallback className="rounded-lg text-xs font-medium">
+              {fallback}
+            </AvatarFallback>
+          }
+          preferredSources={[lightLogo, darkLogo]}
+        />
+      </Avatar>
+      <Avatar className="hidden size-9 rounded-lg after:hidden dark:flex">
+        <DomainLogoImage
+          alt={`${integration.name} logo`}
+          className="rounded-lg object-contain"
+          domain={domain}
+          fallback={
+            <AvatarFallback className="rounded-lg text-xs font-medium">
+              {fallback}
+            </AvatarFallback>
+          }
+          preferredSources={[darkLogo, lightLogo]}
+        />
+      </Avatar>
+    </span>
   );
 }
 
