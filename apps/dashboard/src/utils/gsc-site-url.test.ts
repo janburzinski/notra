@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { findMatchingGscSiteUrl, getGscSiteDomain } from "./gsc-site-url";
 
-const site = (siteUrl) => ({ siteUrl, permissionLevel: "siteOwner" });
+const site = (siteUrl: string) => ({ siteUrl, permissionLevel: "siteOwner" });
 
 describe("getGscSiteDomain", () => {
   test("extracts domains from domain and URL-prefix properties", () => {
