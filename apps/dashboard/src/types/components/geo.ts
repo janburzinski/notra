@@ -1,33 +1,26 @@
 import type { ReactNode } from "react";
 
-import type { GeoPromptSuggestion, GeoSuggestionKeyword } from "@/types/geo";
+import type { GeoPromptSuggestion } from "@/types/geo";
 import type { GeoSearchConsoleStatus } from "@/types/google-search-console";
 
 export interface PromptSuggestionsProps {
   organizationId: string;
+  callbackPath: string;
 }
 
-export interface SuggestionStatusRowProps {
-  action?: ReactNode;
-  description: string;
-  icon: ReactNode;
-  title: string;
-  titleId?: string;
-}
-
-export interface SuggestionEvidenceProps {
-  keywords: GeoSuggestionKeyword[];
-}
-
-export interface SuggestionRowProps {
+export interface SuggestionRowActionsProps {
   checking: boolean;
   organizationId: string;
   suggestion: GeoPromptSuggestion;
 }
 
-export interface SearchConsoleCardProps {
+export interface SearchConsoleToolbarProps {
+  action?: ReactNode;
   organizationId: string;
   callbackPath: string;
+  isPending: boolean;
+  onDismiss?: () => void;
+  status: GeoSearchConsoleStatus | undefined;
 }
 
 export interface SearchConsoleHeaderRowProps {
@@ -58,6 +51,7 @@ export interface SearchConsolePropertyPickerProps {
 }
 
 export interface SearchConsoleConnectedStateProps {
+  action?: ReactNode;
   organizationId: string;
   callbackPath: string;
   status: GeoSearchConsoleStatus;

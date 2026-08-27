@@ -28,8 +28,6 @@ export function GeoPromptsSkeleton() {
             <Kbd className="ml-1 hidden sm:inline-flex">P</Kbd>
           </Button>
         </header>
-        <Skeleton className="h-18 w-full rounded-xl" />
-        <Skeleton className="h-18 w-full rounded-xl" />
         <div className="space-y-3">
           <Skeleton className="h-9 w-full rounded-md sm:max-w-72" />
           <GeoTableSkeleton rows={PROMPT_ROW_COUNT} />
@@ -46,6 +44,20 @@ export function GeoPromptsSkeleton() {
           </div>
           <GeoTableSkeleton rows={2} />
         </div>
+        <GeoTableSkeleton
+          rows={3}
+          toolbar={
+            <div className="flex h-16 items-center gap-3 px-4">
+              <Skeleton className="size-4 shrink-0 rounded-full" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-4 w-40 rounded-md" />
+                <Skeleton className="h-3 w-56 max-w-full rounded-md" />
+              </div>
+              <Skeleton className="h-8 w-20 rounded-lg" />
+              <Skeleton className="h-8 w-24 rounded-lg" />
+            </div>
+          }
+        />
       </div>
     </PageContainer>
   );

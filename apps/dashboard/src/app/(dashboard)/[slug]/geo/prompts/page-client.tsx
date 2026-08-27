@@ -15,7 +15,6 @@ import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { PromptAddDialog } from "@/components/geo/prompt-add-dialog";
 import { PromptSuggestions } from "@/components/geo/prompt-suggestions";
 import { PromptsTable } from "@/components/geo/prompts-table";
-import { SearchConsoleCard } from "@/components/geo/search-console-card";
 import { PageContainer } from "@/components/layout/container";
 import {
   GeoProjectProvider,
@@ -134,14 +133,6 @@ function GeoPromptsPageContent({ organizationSlug }: PageClientProps) {
             </Button>
           </div>
         </header>
-        <PromptSuggestions organizationId={organizationId} />
-        <SearchConsoleCard
-          callbackPath={withGeoProject(
-            `/${organizationSlug}/geo/prompts`,
-            projectId
-          )}
-          organizationId={organizationId}
-        />
         <PromptsTable
           isScanning={isScanning}
           organizationId={organizationId}
@@ -149,6 +140,13 @@ function GeoPromptsPageContent({ organizationSlug }: PageClientProps) {
           results={promptResults?.results ?? []}
         />
         <ConversationsCard organizationId={organizationId} />
+        <PromptSuggestions
+          callbackPath={withGeoProject(
+            `/${organizationSlug}/geo/prompts`,
+            projectId
+          )}
+          organizationId={organizationId}
+        />
       </div>
       <PromptAddDialog
         onOpenChange={setAddOpen}

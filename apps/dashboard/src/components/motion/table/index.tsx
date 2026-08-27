@@ -62,6 +62,7 @@ export function Table<T>({
   onRowClick,
   onRowPointerEnter,
   isRowPinned,
+  toolbar,
   className,
 }: TableProps<T>) {
   "use no memo";
@@ -286,49 +287,54 @@ export function Table<T>({
   return (
     <div className={cn("w-full text-sm", className)}>
       {/* Overlap (>= rounded-2xl) hides the header's side border in the body radius. */}
-      <div
-        className="border-border bg-muted overflow-hidden rounded-t-2xl border border-b-0 pb-5"
-        ref={headerScrollRef}
-        style={scrolls ? { scrollbarGutter: "stable" } : undefined}
-      >
-        <table
-          className={cn(
-            "border-collapse",
-            sized ? "w-max min-w-full" : "w-full"
-          )}
-          style={{ tableLayout: "fixed" }}
+      <div className="border-border bg-muted overflow-hidden rounded-t-2xl border border-b-0 pb-5">
+        {toolbar ? (
+          <div className="border-border bg-background border-b">{toolbar}</div>
+        ) : null}
+        <div
+          className="overflow-hidden"
+          ref={headerScrollRef}
+          style={scrolls ? { scrollbarGutter: "stable" } : undefined}
         >
-          {columnGroup}
-          <TableHeader
-            activeColumn={hasColumnMenu ? activeColumn : null}
-            allSelected={allSelected}
-            columns={orderedColumns}
-            dragKey={dragKey}
-            dropIndex={dropIndex}
-            minColumnWidth={minColumnWidth}
-            onColumnActivate={hasColumnMenu ? activateColumn : undefined}
-            onColumnDeactivate={hasColumnMenu ? deactivateColumn : undefined}
-            onColumnRename={onColumnRename}
-            onDeleteColumn={onDeleteColumn}
-            onInsertColumn={onInsertColumn}
-            onReorderEnd={endReorder}
-            onReorderMove={moveReorder}
-            onReorderStart={startReorder}
-            onResizeEnd={endResize}
-            onResizeMove={moveResize}
-            onResizeStart={startResize}
-            onToggleAll={toggleAll}
-            onToggleSort={toggleSort}
-            reduce={!!reduce}
-            reorderable={reorderable}
-            resizable={resizable}
-            rowHeight={rowHeight}
-            selectable={selectable}
-            someSelected={someSelected}
-            sort={sort}
-            thRefs={thRefs}
-          />
-        </table>
+          <table
+            className={cn(
+              "border-collapse",
+              sized ? "w-max min-w-full" : "w-full"
+            )}
+            style={{ tableLayout: "fixed" }}
+          >
+            {columnGroup}
+            <TableHeader
+              activeColumn={hasColumnMenu ? activeColumn : null}
+              allSelected={allSelected}
+              columns={orderedColumns}
+              dragKey={dragKey}
+              dropIndex={dropIndex}
+              minColumnWidth={minColumnWidth}
+              onColumnActivate={hasColumnMenu ? activateColumn : undefined}
+              onColumnDeactivate={hasColumnMenu ? deactivateColumn : undefined}
+              onColumnRename={onColumnRename}
+              onDeleteColumn={onDeleteColumn}
+              onInsertColumn={onInsertColumn}
+              onReorderEnd={endReorder}
+              onReorderMove={moveReorder}
+              onReorderStart={startReorder}
+              onResizeEnd={endResize}
+              onResizeMove={moveResize}
+              onResizeStart={startResize}
+              onToggleAll={toggleAll}
+              onToggleSort={toggleSort}
+              reduce={!!reduce}
+              reorderable={reorderable}
+              resizable={resizable}
+              rowHeight={rowHeight}
+              selectable={selectable}
+              someSelected={someSelected}
+              sort={sort}
+              thRefs={thRefs}
+            />
+          </table>
+        </div>
       </div>
 
       <div

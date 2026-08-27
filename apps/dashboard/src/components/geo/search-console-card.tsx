@@ -11,7 +11,6 @@ import {
   ResponsiveDialogTrigger,
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Badge } from "@notra/ui/components/ui/badge";
-import { Card } from "@notra/ui/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,23 +35,21 @@ import { useGeoProjectScope } from "@/components/providers/geo-project-provider"
 import { GSC_OAUTH_AUTHORIZE_PATH } from "@/constants/google-search-console";
 import { useBrandSettings } from "@/lib/hooks/use-brand-analysis";
 import {
-  useGscCardDismissal,
   useGscDisconnect,
   useGscSelectSite,
   useGscSites,
-  useGscStatus,
   useGscSync,
   useGeoProjects,
 } from "@/lib/hooks/use-geo";
 import { useGscConnectionToast } from "@/lib/hooks/use-gsc-connection-toast";
 import { cn } from "@/lib/utils";
 import type {
-  SearchConsoleCardProps,
   SearchConsoleConnectActionProps,
   SearchConsoleConnectedStateProps,
   SearchConsoleHeaderRowProps,
   SearchConsolePropertyPickerProps,
   SearchConsoleSelectSiteStateProps,
+  SearchConsoleToolbarProps,
 } from "@/types/components/geo";
 import type { GeoSearchConsoleStatus } from "@/types/google-search-console";
 import { formatRelative } from "@/utils/format-relative";
@@ -289,6 +286,7 @@ function connectedMeta(status: GeoSearchConsoleStatus): string {
 }
 
 function ConnectedState({
+  action,
   organizationId,
   callbackPath,
   status,
@@ -343,10 +341,23 @@ function ConnectedState({
 
   return (
     <>
-      <div className="flex items-center gap-3 px-4 py-3">
+      <div
+        aria-label="Google Search Console"
+        className="flex flex-wrap items-center gap-3 px-4 py-3"
+        role="region"
+      >
+        <span className="inline-flex size-5 shrink-0 items-center justify-center">
+          <Google className="size-4" />
+        </span>
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-sm leading-snug font-medium">
+            <p className="text-sm leading-snug font-medium">
+              Google Search Console
+            </p>
+            <span className="text-muted-foreground text-xs" aria-hidden>
+              ·
+            </span>
+            <p className="text-muted-foreground truncate text-sm leading-snug">
               {formatGscSiteUrl(status.siteUrl ?? "")}
             </p>
             {status.weeklySyncScheduled ? (
@@ -360,15 +371,6 @@ function ConnectedState({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <Button
-            disabled={busy}
-            onClick={() => sync.mutate()}
-            size="sm"
-            variant="outline"
-          >
-            {sync.isPending ? <StatusSpinner /> : null}
-            {sync.isPending ? "Syncing…" : "Sync now"}
-          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
@@ -398,6 +400,16 @@ function ConnectedState({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            disabled={busy}
+            onClick={() => sync.mutate()}
+            size="sm"
+            variant="outline"
+          >
+            {sync.isPending ? <StatusSpinner /> : null}
+            {sync.isPending ? "Syncing…" : "Sync now"}
+          </Button>
+          {action}
         </div>
       </div>
       <ResponsiveDialog onOpenChange={setChangeOpen} open={changeOpen}>
@@ -417,15 +429,17 @@ function ConnectedState({
   );
 }
 
-export function SearchConsoleCard({
+export function SearchConsoleToolbar({
+  action,
   organizationId,
   callbackPath,
-}: SearchConsoleCardProps) {
+  isPending,
+  onDismiss,
+  status,
+}: SearchConsoleToolbarProps) {
   const headingId = useId();
   const { projectId } = useGeoProjectScope();
   useGscConnectionToast();
-  const { data: status, isPending } = useGscStatus(organizationId);
-  const { dismiss, dismissed } = useGscCardDismissal(organizationId);
   const { data: projectsData } = useGeoProjects(organizationId);
   const { data: brandData } = useBrandSettings(organizationId);
 
@@ -439,14 +453,25 @@ export function SearchConsoleCard({
       (voice) => voice.id === activeProject?.brandSettingsId
     )?.websiteUrl ?? null;
 
-  const connectPromo = !isPending && status !== undefined && !status.connected;
-
-  if (dismissed && (isPending || !status || connectPromo)) {
-    return null;
+  if (
+    !isPending &&
+    status?.connected &&
+    status.status === "active" &&
+    status.siteUrl
+  ) {
+    return (
+      <ConnectedState
+        action={action}
+        callbackPath={callbackPath}
+        organizationId={organizationId}
+        status={status}
+        websiteUrl={websiteUrl}
+      />
+    );
   }
 
   let body: ReactNode = null;
-  let headerAction: ReactNode = null;
+  let headerAction = action;
 
   if (isPending || !status) {
     body = (
@@ -456,13 +481,21 @@ export function SearchConsoleCard({
       </div>
     );
   } else if (!status.connected || status.status === "reauth_required") {
-    headerAction = (
+    const connectAction = (
       <ConnectAction
         callbackPath={callbackPath}
         configured={status.configured}
         organizationId={organizationId}
         reauth={status.status === "reauth_required"}
       />
+    );
+    headerAction = action ? (
+      <div className="flex items-center gap-2">
+        {connectAction}
+        {action}
+      </div>
+    ) : (
+      connectAction
     );
     if (status.status === "reauth_required") {
       body = (
@@ -471,15 +504,6 @@ export function SearchConsoleCard({
         </p>
       );
     }
-  } else if (status.siteUrl) {
-    body = (
-      <ConnectedState
-        callbackPath={callbackPath}
-        organizationId={organizationId}
-        status={status}
-        websiteUrl={websiteUrl}
-      />
-    );
   } else {
     body = (
       <SelectSiteState
@@ -493,15 +517,10 @@ export function SearchConsoleCard({
   }
 
   return (
-    <Card
-      aria-busy={isPending}
-      aria-labelledby={headingId}
-      className="gap-0 py-0"
-      role="region"
-    >
+    <div aria-busy={isPending} aria-labelledby={headingId} role="region">
       <HeaderRow
         action={headerAction}
-        onDismiss={connectPromo ? dismiss : undefined}
+        onDismiss={onDismiss}
         titleId={headingId}
       />
       {body ? (
@@ -510,6 +529,6 @@ export function SearchConsoleCard({
           {body}
         </>
       ) : null}
-    </Card>
+    </div>
   );
 }

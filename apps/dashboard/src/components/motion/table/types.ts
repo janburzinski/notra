@@ -83,6 +83,8 @@ export interface TableProps<T> {
   onRowPointerEnter?: (row: T) => void;
   /** Keep matching rows first after sort. They scroll with the table (not sticky). */
   isRowPinned?: (row: T) => boolean;
+  /** Content rendered above the column headers inside the table surface. */
+  toolbar?: ReactNode;
   emptyState?: ReactNode;
   className?: string;
 }

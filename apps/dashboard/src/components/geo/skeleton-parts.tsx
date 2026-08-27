@@ -30,10 +30,11 @@ export function GeoSectionSkeleton({
   );
 }
 
-export function GeoTableSkeleton({ rows }: GeoTableSkeletonProps) {
+export function GeoTableSkeleton({ rows, toolbar }: GeoTableSkeletonProps) {
   const id = useId();
   return (
     <div className="border-border overflow-hidden rounded-2xl border">
+      {toolbar ? <div className="border-border border-b">{toolbar}</div> : null}
       <div className="bg-muted/40 flex h-10 items-center justify-between px-4">
         <Skeleton className="h-3.5 w-28" />
         <Skeleton className="h-3.5 w-16" />
