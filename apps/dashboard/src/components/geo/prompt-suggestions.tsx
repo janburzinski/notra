@@ -2,6 +2,7 @@
 
 import { Cancel01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/button";
 import { SearchConsoleToolbar } from "@/components/geo/search-console-card";
@@ -99,16 +100,18 @@ export function PromptSuggestions({
   const accept = useGeoSuggestionAccept(organizationId);
   const acceptAll = useGeoSuggestionsAcceptAll(organizationId);
   const dismissSuggestion = useGeoSuggestionDismiss(organizationId);
+  const [acceptingSuggestionIds, setAcceptingSuggestionIds] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
+  const [dismissingSuggestionIds, setDismissingSuggestionIds] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
+  const [isTrackAllQueued, setIsTrackAllQueued] = useState(false);
+  const pendingSuggestionRequests = useRef(new Map<string, Promise<unknown>>());
+  const trackAllQueued = useRef(false);
   const suggestions = data?.suggestions ?? [];
   const hasSuggestions = suggestions.length > 0;
-  const acceptingSuggestionId = accept.isPending
-    ? accept.variables?.suggestionId
-    : undefined;
-  const dismissingSuggestionId = dismissSuggestion.isPending
-    ? dismissSuggestion.variables?.suggestionId
-    : undefined;
-  const actionsDisabled =
-    accept.isPending || acceptAll.isPending || dismissSuggestion.isPending;
+  const trackAllPending = isTrackAllQueued || acceptAll.isPending;
   const connectPromo =
     !isSearchConsolePending &&
     searchConsoleStatus !== undefined &&
@@ -117,6 +120,72 @@ export function PromptSuggestions({
     dismissed &&
     (isSearchConsolePending || !searchConsoleStatus || connectPromo)
   );
+
+  const acceptSuggestion = (suggestionId: string) => {
+    if (
+      pendingSuggestionRequests.current.has(suggestionId) ||
+      trackAllQueued.current ||
+      acceptAll.isPending
+    ) {
+      return;
+    }
+
+    const request = accept.mutateAsync({ suggestionId });
+    pendingSuggestionRequests.current.set(suggestionId, request);
+    setAcceptingSuggestionIds((current) => new Set(current).add(suggestionId));
+    void request
+      .catch(() => undefined)
+      .finally(() => {
+        pendingSuggestionRequests.current.delete(suggestionId);
+        setAcceptingSuggestionIds((current) => {
+          const next = new Set(current);
+          next.delete(suggestionId);
+          return next;
+        });
+      });
+  };
+
+  const dismissPromptSuggestion = (suggestionId: string) => {
+    if (
+      pendingSuggestionRequests.current.has(suggestionId) ||
+      trackAllQueued.current ||
+      acceptAll.isPending
+    ) {
+      return;
+    }
+
+    const request = dismissSuggestion.mutateAsync({ suggestionId });
+    pendingSuggestionRequests.current.set(suggestionId, request);
+    setDismissingSuggestionIds((current) => new Set(current).add(suggestionId));
+    void request
+      .catch(() => undefined)
+      .finally(() => {
+        pendingSuggestionRequests.current.delete(suggestionId);
+        setDismissingSuggestionIds((current) => {
+          const next = new Set(current);
+          next.delete(suggestionId);
+          return next;
+        });
+      });
+  };
+
+  const acceptAllSuggestions = async () => {
+    if (trackAllQueued.current || acceptAll.isPending) {
+      return;
+    }
+
+    trackAllQueued.current = true;
+    setIsTrackAllQueued(true);
+    await Promise.allSettled([...pendingSuggestionRequests.current.values()]);
+    try {
+      await acceptAll.mutateAsync();
+    } catch {
+      // The mutation hook reports the error.
+    } finally {
+      trackAllQueued.current = false;
+      setIsTrackAllQueued(false);
+    }
+  };
 
   const columns: TableColumn<GeoPromptSuggestion>[] = [
     {
@@ -200,16 +269,20 @@ export function PromptSuggestions({
       header: "",
       minWidth: "8.5rem",
       width: "8.5rem",
-      cell: (row) => (
-        <SuggestionRowActions
-          accepting={acceptingSuggestionId === row.id}
-          disabled={checking || actionsDisabled}
-          dismissing={dismissingSuggestionId === row.id}
-          onAccept={() => accept.mutate({ suggestionId: row.id })}
-          onDismiss={() => dismissSuggestion.mutate({ suggestionId: row.id })}
-          suggestion={row}
-        />
-      ),
+      cell: (row) => {
+        const accepting = acceptingSuggestionIds.has(row.id);
+        const dismissing = dismissingSuggestionIds.has(row.id);
+        return (
+          <SuggestionRowActions
+            accepting={accepting}
+            disabled={checking || trackAllPending || accepting || dismissing}
+            dismissing={dismissing}
+            onAccept={() => acceptSuggestion(row.id)}
+            onDismiss={() => dismissPromptSuggestion(row.id)}
+            suggestion={row}
+          />
+        );
+      },
     },
   ];
 
@@ -220,17 +293,17 @@ export function PromptSuggestions({
   const trackAllAction =
     !checking && suggestions.length > 1 ? (
       <Button
-        disabled={actionsDisabled}
-        onClick={() => acceptAll.mutate()}
+        disabled={trackAllPending}
+        onClick={acceptAllSuggestions}
         size="sm"
         variant="outline"
       >
-        {acceptAll.isPending ? (
+        {trackAllPending ? (
           <StatusSpinner />
         ) : (
           <HugeiconsIcon icon={PlusSignIcon} size={14} />
         )}
-        {acceptAll.isPending ? "Adding…" : `Track all (${suggestions.length})`}
+        {trackAllPending ? "Adding…" : `Track all (${suggestions.length})`}
       </Button>
     ) : null;
 
