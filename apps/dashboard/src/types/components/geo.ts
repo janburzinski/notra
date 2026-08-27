@@ -11,8 +11,9 @@ export interface PromptSuggestionsProps {
 export interface SuggestionRowActionsProps {
   accepting: boolean;
   disabled: boolean;
+  dismissing: boolean;
   onAccept: () => void;
-  organizationId: string;
+  onDismiss: () => void;
   suggestion: GeoPromptSuggestion;
 }
 

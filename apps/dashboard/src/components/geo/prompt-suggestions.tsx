@@ -49,16 +49,19 @@ function bestPosition(suggestion: GeoPromptSuggestion): number | null {
 function SuggestionRowActions({
   accepting,
   disabled,
+  dismissing,
   onAccept,
-  organizationId,
+  onDismiss,
   suggestion,
 }: SuggestionRowActionsProps) {
-  const dismiss = useGeoSuggestionDismiss(organizationId);
-  const busy = disabled || dismiss.isPending;
-
   return (
     <div className="flex items-center justify-end gap-1">
-      <Button disabled={busy} onClick={onAccept} size="sm" variant="outline">
+      <Button
+        disabled={disabled}
+        onClick={onAccept}
+        size="sm"
+        variant="outline"
+      >
         {accepting ? (
           <StatusSpinner />
         ) : (
@@ -68,12 +71,16 @@ function SuggestionRowActions({
       </Button>
       <Button
         aria-label={`Dismiss ${suggestion.prompt}`}
-        disabled={busy}
-        onClick={() => dismiss.mutate({ suggestionId: suggestion.id })}
+        disabled={disabled}
+        onClick={onDismiss}
         size="icon-sm"
         variant="ghost"
       >
-        <HugeiconsIcon icon={Cancel01Icon} size={16} />
+        {dismissing ? (
+          <StatusSpinner />
+        ) : (
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+        )}
       </Button>
     </div>
   );
@@ -86,16 +93,22 @@ export function PromptSuggestions({
   const { data } = useGeoSuggestions(organizationId);
   const { data: searchConsoleStatus, isPending: isSearchConsolePending } =
     useGscStatus(organizationId);
-  const { dismiss, dismissed } = useGscCardDismissal(organizationId);
+  const { dismiss: dismissCard, dismissed } =
+    useGscCardDismissal(organizationId);
   const checking = useGscAnalyzing(organizationId);
   const accept = useGeoSuggestionAccept(organizationId);
   const acceptAll = useGeoSuggestionsAcceptAll(organizationId);
+  const dismissSuggestion = useGeoSuggestionDismiss(organizationId);
   const suggestions = data?.suggestions ?? [];
   const hasSuggestions = suggestions.length > 0;
   const acceptingSuggestionId = accept.isPending
     ? accept.variables?.suggestionId
     : undefined;
-  const trackingDisabled = accept.isPending || acceptAll.isPending;
+  const dismissingSuggestionId = dismissSuggestion.isPending
+    ? dismissSuggestion.variables?.suggestionId
+    : undefined;
+  const actionsDisabled =
+    accept.isPending || acceptAll.isPending || dismissSuggestion.isPending;
   const connectPromo =
     !isSearchConsolePending &&
     searchConsoleStatus !== undefined &&
@@ -190,9 +203,10 @@ export function PromptSuggestions({
       cell: (row) => (
         <SuggestionRowActions
           accepting={acceptingSuggestionId === row.id}
-          disabled={checking || trackingDisabled}
+          disabled={checking || actionsDisabled}
+          dismissing={dismissingSuggestionId === row.id}
           onAccept={() => accept.mutate({ suggestionId: row.id })}
-          organizationId={organizationId}
+          onDismiss={() => dismissSuggestion.mutate({ suggestionId: row.id })}
           suggestion={row}
         />
       ),
@@ -206,7 +220,7 @@ export function PromptSuggestions({
   const trackAllAction =
     !checking && suggestions.length > 1 ? (
       <Button
-        disabled={trackingDisabled}
+        disabled={actionsDisabled}
         onClick={() => acceptAll.mutate()}
         size="sm"
         variant="outline"
@@ -225,7 +239,7 @@ export function PromptSuggestions({
       action={trackAllAction}
       callbackPath={callbackPath}
       isPending={isSearchConsolePending}
-      onDismiss={connectPromo ? dismiss : undefined}
+      onDismiss={connectPromo ? dismissCard : undefined}
       organizationId={organizationId}
       status={searchConsoleStatus}
     />
