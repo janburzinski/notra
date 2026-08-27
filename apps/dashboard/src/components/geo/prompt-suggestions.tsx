@@ -176,8 +176,13 @@ export function PromptSuggestions({
 
     trackAllQueued.current = true;
     setIsTrackAllQueued(true);
-    await Promise.allSettled([...pendingSuggestionRequests.current.values()]);
     try {
+      const pendingResults = await Promise.allSettled([
+        ...pendingSuggestionRequests.current.values(),
+      ]);
+      if (pendingResults.some((result) => result.status === "rejected")) {
+        return;
+      }
       await acceptAll.mutateAsync();
     } catch {
       // The mutation hook reports the error.
