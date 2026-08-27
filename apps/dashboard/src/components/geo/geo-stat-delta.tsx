@@ -25,6 +25,12 @@ const TONE_CLASS: Record<GeoStatDeltaTone, string> = {
   flat: "bg-muted text-muted-foreground",
 };
 
+const PLAIN_TONE_CLASS: Record<GeoStatDeltaTone, string> = {
+  up: "text-geo-up",
+  down: "text-geo-down",
+  flat: "text-muted-foreground",
+};
+
 const ICON_RING_CLASS: Record<GeoStatDeltaTone, string> = {
   up: "bg-geo-up text-white",
   down: "bg-geo-down text-white",
@@ -36,6 +42,12 @@ const TONE_ICON = {
   down: ArrowDown01Icon,
   flat: MinusSignIcon,
 } as const;
+
+const TONE_ARROW: Record<GeoStatDeltaTone, string> = {
+  up: "↑",
+  down: "↓",
+  flat: "−",
+};
 
 function GeoStatDeltaIcon({ tone }: { tone: GeoStatDeltaTone }) {
   return (
@@ -54,6 +66,7 @@ function GeoStatDeltaIcon({ tone }: { tone: GeoStatDeltaTone }) {
 export function GeoStatDelta({
   delta,
   kind = "mentions",
+  variant = "pill",
   label,
   hint,
   className,
@@ -64,15 +77,29 @@ export function GeoStatDelta({
 
   const tone = geoStatDeltaTone(delta, kind);
   const formatted = formatGeoStatDelta(delta, kind);
-  const pill = (
-    <span className={cn(PILL_CLASS, TONE_CLASS[tone], className)}>
-      <GeoStatDeltaIcon tone={tone} />
-      {formatted}
-    </span>
-  );
+  const displayedValue =
+    variant === "plain" ? formatted.replace(/^[+-]/, "") : formatted;
+  const content =
+    variant === "plain" ? (
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center gap-0.5 text-sm font-medium tabular-nums",
+          PLAIN_TONE_CLASS[tone],
+          className
+        )}
+      >
+        <span aria-hidden="true">{TONE_ARROW[tone]}</span>
+        {displayedValue}
+      </span>
+    ) : (
+      <span className={cn(PILL_CLASS, TONE_CLASS[tone], className)}>
+        <GeoStatDeltaIcon tone={tone} />
+        {formatted}
+      </span>
+    );
 
   if (!hint) {
-    return pill;
+    return content;
   }
 
   return (
@@ -88,7 +115,7 @@ export function GeoStatDelta({
           />
         }
       >
-        {pill}
+        {content}
       </TooltipTrigger>
       <TooltipContent>{hint}</TooltipContent>
     </Tooltip>

@@ -645,15 +645,14 @@ export const GEO_PROMPT_PREVIEW_ROW_HEIGHT = 72;
 export const GEO_PROMPT_NO_MENTION = "No engine named you";
 
 export const GEO_MENTION_TREND_TOTAL_KEY = "total";
-export const GEO_MENTION_TREND_TOTAL_LABEL = "All engines";
+export const GEO_MENTION_TREND_TOTAL_LABEL = "All providers";
 export const GEO_DEFAULT_RANGE: GeoRangePreset = "30d";
-export const GEO_MENTION_TREND_AVERAGE_KEY = "average";
-export const GEO_MENTION_TREND_AVERAGE_LABEL = "Average";
+export const GEO_MENTION_TREND_LINE_KEY = "trend";
+export const GEO_MENTION_TREND_LINE_LABEL = "Trend";
 export const GEO_MENTION_TREND_AGENT_ICON_LIMIT = 4;
-export const GEO_MENTION_TREND_ALL_AGENTS_LABEL = "All agents";
+export const GEO_MENTION_TREND_ALL_PROVIDERS_LABEL = "All providers";
 export const GEO_MENTION_ACTIVITY_LABEL = "Mention activity";
 export const GEO_MENTION_SUMMARY_VISIBLE = 5;
-export const GEO_MENTION_SUMMARY_MORE = "Show more";
 export const GEO_MENTION_SUMMARY_LESS = "Show less";
 export const GEO_RANGE_PRESETS = [
   { value: "today", label: "Today" },

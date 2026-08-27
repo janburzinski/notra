@@ -223,12 +223,38 @@ export function tooltipEmptyBody(label: string): string {
   return `<span class="text-muted-foreground">${escapeHtml(label)}</span>`;
 }
 
+function tooltipActivityRow(item: TooltipBodyItem, max: number): string {
+  const indicatorHtml =
+    item.indicatorHtml ??
+    (item.paint
+      ? tooltipColorSwatchHtml(item.paint)
+      : tooltipIndicatorHtml(item.key, item.colorsCount));
+  const width = tooltipBarWidth(item.value ?? 0, max);
+  return `<div class="relative grid h-8 grid-cols-[2rem_minmax(0,1fr)_auto] overflow-hidden rounded-[7px] border border-white/[0.14] bg-white/[0.025]${item.dimmed}">
+          <span class="absolute inset-y-0 left-0 rounded-r-[5px] bg-white/[0.16]" style="width:${width}%;${TOOLTIP_BAR_MOTION_STYLE}"></span>
+          <span class="relative flex items-center justify-center text-white">${indicatorHtml}</span>
+          <span class="relative flex min-w-0 items-center px-2.5 text-[11px] font-medium text-zinc-200"><span class="truncate">${escapeHtml(item.labelText)}</span></span>
+          <span class="relative flex min-w-9 items-center justify-end px-2.5 font-mono text-[11px] font-semibold text-white tabular-nums" style="${TOOLTIP_VALUE_MOTION_STYLE}">${escapeHtml(item.valueText)}</span>
+        </div>`;
+}
+
+function tooltipActivityBody(items: readonly TooltipBodyItem[]): string {
+  const ranked = [...items].sort(
+    (left, right) => (right.value ?? -1) - (left.value ?? -1)
+  );
+  const total = ranked.reduce((sum, item) => sum + (item.value ?? 0), 0);
+  return ranked.map((item) => tooltipActivityRow(item, total)).join("");
+}
+
 export function composeTooltipBody(
   items: readonly TooltipBodyItem[],
   layout: TooltipLayout,
   barMax?: number
 ): string {
-  if (layout !== "bars") {
+  if (layout === "activity") {
+    return tooltipActivityBody(items);
+  }
+  if (layout === "rows") {
     return items
       .map((item) =>
         tooltipRow({
@@ -291,13 +317,14 @@ export function tooltipShell({
   layout?: TooltipLayout;
 }): string {
   const isBars = layout === "bars";
+  const isActivity = layout === "activity";
   const header =
     label.length > 0
-      ? `<div class="font-medium text-foreground">${escapeHtml(label)}</div>`
+      ? `<div class="${isActivity ? "px-0.5 text-[11px] font-medium text-zinc-400" : "font-medium text-foreground"}">${escapeHtml(label)}</div>`
       : "";
-  return `<div class="grid ${isBars ? "min-w-56 gap-2.5 px-3 py-2.5" : "min-w-32 gap-1.5 px-2.5 py-1.5"} items-start border border-border/50 text-xs shadow-[0_12px_40px_-8px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.04)_inset] ${roundnessClass[roundness]} ${tooltipVariantClass[variant]}">
+  return `<div class="grid ${isActivity ? "min-w-60 gap-2 border-white/10 bg-[#111113] px-2.5 py-2.5" : `${isBars ? "min-w-56 gap-2.5 px-3 py-2.5" : "min-w-32 gap-1.5 px-2.5 py-1.5"} border-border/50 ${tooltipVariantClass[variant]}`} items-start border text-xs shadow-[0_12px_40px_-8px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.04)_inset] ${roundnessClass[roundness]}">
       ${header}
-      <div class="grid ${isBars ? "gap-2.5" : "gap-1.5"}" style="transition:opacity 0.24s ease">${body}</div>
+      <div class="grid ${isBars ? "gap-2.5" : isActivity ? "gap-1" : "gap-1.5"}" style="transition:opacity 0.24s ease">${body}</div>
     </div>`;
 }
 

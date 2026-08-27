@@ -24,6 +24,8 @@ import { FirecrawlDark } from "@notra/ui/components/ui/svgs/firecrawlDark";
 import { Firefox } from "@notra/ui/components/ui/svgs/firefox";
 import { Gemini } from "@notra/ui/components/ui/svgs/gemini";
 import { Google } from "@notra/ui/components/ui/svgs/google";
+import { Grok } from "@notra/ui/components/ui/svgs/grok";
+import { GrokDark } from "@notra/ui/components/ui/svgs/grokDark";
 import { Huawei } from "@notra/ui/components/ui/svgs/huawei";
 import { Kagi } from "@notra/ui/components/ui/svgs/kagi";
 import { Kimi } from "@notra/ui/components/ui/svgs/kimi";
@@ -40,8 +42,6 @@ import { OpencodeDark } from "@notra/ui/components/ui/svgs/opencodeDark";
 import { Perplexity } from "@notra/ui/components/ui/svgs/perplexity";
 import { Qwen } from "@notra/ui/components/ui/svgs/qwen";
 import { QwenDark } from "@notra/ui/components/ui/svgs/qwenDark";
-import { SpaceXai } from "@notra/ui/components/ui/svgs/spacexai";
-import { SpaceXaiDark } from "@notra/ui/components/ui/svgs/spacexaiDark";
 import { Tavily } from "@notra/ui/components/ui/svgs/tavily";
 import { Tencent } from "@notra/ui/components/ui/svgs/tencent";
 import { TikTok } from "@notra/ui/components/ui/svgs/tikTok";
@@ -67,7 +67,11 @@ export function EngineIcon(props: EngineIconProps) {
   );
 }
 
-function EngineIconGraphic({ engine, className }: EngineIconProps) {
+function EngineIconGraphic({
+  engine,
+  className,
+  darkSurface,
+}: EngineIconProps) {
   const key = resolveEngineIconKey(engine);
   if (!key) {
     const parsed = splitModelId(engine);
@@ -82,6 +86,9 @@ function EngineIconGraphic({ engine, className }: EngineIconProps) {
   const iconClass = cn("size-4 shrink-0", className);
 
   if (key === "openai") {
+    if (darkSurface) {
+      return <OpenaiDark className={iconClass} />;
+    }
     return (
       <>
         <Openai className={cn(iconClass, "block dark:hidden")} />
@@ -90,9 +97,12 @@ function EngineIconGraphic({ engine, className }: EngineIconProps) {
     );
   }
   if (key === "grok") {
-    return themedIcon(SpaceXai, SpaceXaiDark, iconClass);
+    return themedIcon(Grok, GrokDark, iconClass, darkSurface);
   }
   if (key === "qwen") {
+    if (darkSurface) {
+      return <QwenDark className={iconClass} />;
+    }
     return (
       <>
         <Qwen className={cn(iconClass, "block dark:hidden")} />
@@ -107,7 +117,9 @@ function EngineIconGraphic({ engine, className }: EngineIconProps) {
     return <Gemini className={cn(iconClass, "overflow-visible")} />;
   }
   if (key === "perplexity") {
-    return <Perplexity className={iconClass} />;
+    return (
+      <Perplexity className={cn(iconClass, darkSurface && "brightness-150")} />
+    );
   }
   if (key === "mistral") {
     return <Mistral className={iconClass} />;
@@ -146,19 +158,19 @@ function EngineIconGraphic({ engine, className }: EngineIconProps) {
     return <Kimi className={iconClass} />;
   }
   if (key === "apple") {
-    return themedIcon(Apple, AppleDark, iconClass);
+    return themedIcon(Apple, AppleDark, iconClass, darkSurface);
   }
   if (key === "tiktok") {
-    return themedIcon(TikTok, TikTokDark, iconClass);
+    return themedIcon(TikTok, TikTokDark, iconClass, darkSurface);
   }
   if (key === "manus") {
-    return themedIcon(Manus, ManusDark, iconClass);
+    return themedIcon(Manus, ManusDark, iconClass, darkSurface);
   }
   if (key === "firecrawl") {
-    return themedIcon(Firecrawl, FirecrawlDark, iconClass);
+    return themedIcon(Firecrawl, FirecrawlDark, iconClass, darkSurface);
   }
   if (key === "opencode") {
-    return themedIcon(Opencode, OpencodeDark, iconClass);
+    return themedIcon(Opencode, OpencodeDark, iconClass, darkSurface);
   }
   const simple = SIMPLE_ICONS[key];
   if (simple) {
@@ -197,8 +209,12 @@ const SIMPLE_ICONS: Partial<
 function themedIcon(
   Light: ComponentType<SVGProps<SVGSVGElement>>,
   Dark: ComponentType<SVGProps<SVGSVGElement>>,
-  iconClass: string
+  iconClass: string,
+  darkSurface = false
 ) {
+  if (darkSurface) {
+    return <Dark className={iconClass} />;
+  }
   return (
     <>
       <Light className={cn(iconClass, "block dark:hidden")} />
@@ -222,7 +238,11 @@ export function engineIconHtml(engine: string): string {
           aria-hidden="true"
           className="inline-flex size-3.5 shrink-0 items-center justify-center"
         >
-          <EngineIcon className={TOOLTIP_ICON_CLASS} engine={engine} />
+          <EngineIcon
+            className={TOOLTIP_ICON_CLASS}
+            darkSurface
+            engine={engine}
+          />
         </span>
       )
     : providerLogoImgHtml(engine);

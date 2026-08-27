@@ -23,7 +23,6 @@ import {
   GEO_EMPTY_TIMESERIES,
   GEO_FAMILY_STAT_TREND_HINT,
   GEO_MENTION_SUMMARY_LESS,
-  GEO_MENTION_SUMMARY_MORE,
   GEO_MENTION_SUMMARY_VISIBLE,
   GEO_MENTIONS_LABEL,
 } from "@/constants/geo";
@@ -82,7 +81,7 @@ function ProviderRow({
         clickable ? `Open ${name} mention breakdown` : `${name}, no mentions`
       }
       className={cn(
-        "flex w-full items-center gap-3 border-b px-1 py-2.5 text-left transition-colors",
+        "grid w-full grid-cols-[1rem_minmax(0,1fr)_auto] items-center gap-1.5 border-b py-2 text-left transition-colors",
         clickable ? "hover:bg-muted/50 cursor-pointer" : "cursor-default"
       )}
       disabled={!clickable}
@@ -93,7 +92,9 @@ function ProviderRow({
         {rank}
       </span>
       <span className="flex min-w-0 flex-1 items-center gap-2">
-        <EngineIcon engine={family.family} />
+        <span className="flex size-7 shrink-0 items-center justify-center">
+          <EngineIcon engine={family.family} />
+        </span>
         <span className="truncate text-sm font-medium">{name}</span>
       </span>
       <span className="flex shrink-0 items-center justify-end gap-2">
@@ -107,8 +108,8 @@ function ProviderRow({
         </span>
         <GeoStatDelta
           delta={mentionDelta}
-          hint={GEO_FAMILY_STAT_TREND_HINT}
           label={`${name} mentions`}
+          variant="plain"
         />
       </span>
     </button>
@@ -142,19 +143,23 @@ function ProviderList({
 
 function ProviderToggle({
   expanded,
+  hiddenCount,
   onToggle,
 }: {
   expanded: boolean;
+  hiddenCount: number;
   onToggle: () => void;
 }) {
   return (
     <button
       aria-expanded={expanded}
-      className="text-muted-foreground hover:text-foreground focus-visible:ring-ring flex min-h-8 w-full items-center gap-1 px-1 text-xs transition-colors outline-none focus-visible:ring-2"
+      className="text-muted-foreground hover:text-foreground focus-visible:ring-ring -mx-4 -mb-4 flex min-h-10 w-[calc(100%+2rem)] items-center justify-between pr-6 pl-9 text-sm transition-colors outline-none focus-visible:ring-2"
       onClick={onToggle}
       type="button"
     >
-      {expanded ? GEO_MENTION_SUMMARY_LESS : GEO_MENTION_SUMMARY_MORE}
+      {expanded
+        ? GEO_MENTION_SUMMARY_LESS
+        : `Tracking ${hiddenCount.toLocaleString()} more`}
       <HugeiconsIcon
         className={cn(
           "transition-transform duration-200 ease-out",
@@ -186,7 +191,11 @@ function ProviderOverlay({
     return expanded ? (
       <div className={OVERLAY_CLASS}>
         <ProviderList onOpen={onOpen} rows={rows} startRank={startRank} />
-        <ProviderToggle expanded onToggle={onToggle} />
+        <ProviderToggle
+          expanded
+          hiddenCount={rows.length}
+          onToggle={onToggle}
+        />
       </div>
     ) : null;
   }
@@ -226,7 +235,11 @@ function ProviderOverlay({
                 />
               </m.div>
             ))}
-            <ProviderToggle expanded onToggle={onToggle} />
+            <ProviderToggle
+              expanded
+              hiddenCount={rows.length}
+              onToggle={onToggle}
+            />
           </m.div>
         ) : null}
       </AnimatePresence>
@@ -288,8 +301,10 @@ export function MentionRateCard({
   return (
     <div className="relative h-full" ref={rootRef}>
       <InstrumentModule
+        bodyClassName={cn(expanded && "rounded-b-none")}
         className={cn("h-full overflow-visible", expanded && "rounded-b-none")}
         eyebrow={GEO_MENTIONS_LABEL}
+        variant="table"
       >
         {ranked.length === 0 || !totals ? (
           <InstrumentEmpty
@@ -301,7 +316,7 @@ export function MentionRateCard({
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex items-end gap-2">
-              <p className="text-4xl leading-none font-semibold tracking-tight tabular-nums">
+              <p className="text-3xl leading-none font-semibold tracking-tight tabular-nums">
                 {totals.mentions.toLocaleString()}
               </p>
               <GeoStatDelta
@@ -309,15 +324,16 @@ export function MentionRateCard({
                 delta={overviewDelta}
                 hint={GEO_FAMILY_STAT_TREND_HINT}
                 label={GEO_MENTIONS_LABEL}
+                variant="plain"
               />
             </div>
 
-            <div>
-              <div className="text-muted-foreground flex items-center justify-between gap-3 px-1 pb-1.5 text-xs">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between gap-3 text-sm font-medium">
                 <span>Provider</span>
                 <span>Mentions</span>
               </div>
-              <div className="border-border relative border-t">
+              <div className="border-border relative [&>button:last-of-type]:border-b-0">
                 <ProviderList
                   onOpen={setSelected}
                   rows={visible}
@@ -328,6 +344,7 @@ export function MentionRateCard({
                     {expanded ? null : (
                       <ProviderToggle
                         expanded={false}
+                        hiddenCount={hidden.length}
                         onToggle={() => setExpanded(true)}
                       />
                     )}

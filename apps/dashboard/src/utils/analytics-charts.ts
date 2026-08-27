@@ -36,6 +36,13 @@ const sparklineDayLabelFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+const fullDayLabelFormatter = new Intl.DateTimeFormat("en-NZ", {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
 export const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function formatMetric(value: number | null): string {
@@ -63,6 +70,14 @@ export function formatSparklineDayLabel(day: string): string {
     return day;
   }
   return sparklineDayLabelFormatter.format(date);
+}
+
+export function formatFullDayLabel(day: string): string {
+  const date = new Date(`${day}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    return day;
+  }
+  return fullDayLabelFormatter.format(date);
 }
 
 export function accountSeriesKey(

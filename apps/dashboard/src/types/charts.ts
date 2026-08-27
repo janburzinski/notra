@@ -57,9 +57,11 @@ export interface GridProps {
   lineType?: "solid" | "dashed";
 }
 
-export type TooltipLayout = "rows" | "bars";
+export type TooltipLayout = "rows" | "bars" | "activity";
 
 export type TooltipValueFormatter = (value: number) => string;
+
+export type TooltipLabelFormatter = (value: string) => string;
 
 export type TooltipEmptyLabel =
   | string

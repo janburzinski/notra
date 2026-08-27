@@ -172,6 +172,7 @@ export interface EngineFamilyStatTrends {
 export interface GeoStatDeltaProps {
   delta: number | null;
   kind?: GeoStatDeltaKind;
+  variant?: "pill" | "plain";
   label?: string;
   hint?: string;
   className?: string;
@@ -1196,7 +1197,7 @@ export interface GeoRangePickerProps {
 
 export interface MentionTrendAgentsPickerProps {
   series: readonly MentionTrendSeries[];
-  hiddenKeys: ReadonlySet<string>;
+  activeKeys: ReadonlySet<string>;
   onToggle: (key: string) => void;
   disabled?: boolean;
 }
@@ -1269,6 +1270,7 @@ export interface GeoSkinMessageProps {
 export interface EngineIconProps {
   engine: string;
   className?: string;
+  darkSurface?: boolean;
 }
 
 export interface GeoProviderWordmarkProps {

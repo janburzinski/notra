@@ -160,35 +160,45 @@ export function listDaysThrough(firstDay: string, lastDay: string): string[] {
   return days;
 }
 
-function visibleEngineStats(
-  row: MentionTrendRow,
-  keys: readonly string[]
-): { total: number; count: number } | null {
-  let total = 0;
+export function fitMentionTrendLine(
+  rows: readonly MentionTrendRow[],
+  key: string
+): (number | null)[] {
   let count = 0;
-  for (const key of keys) {
+  let sumIndex = 0;
+  let sumValue = 0;
+  let sumProduct = 0;
+  let sumSquares = 0;
+  let firstIndex: number | null = null;
+  let lastIndex: number | null = null;
+  for (const [index, row] of rows.entries()) {
     const value = row[key];
-    if (typeof value === "number" && value > 0) {
-      total += value;
+    if (typeof value === "number") {
       count += 1;
+      sumIndex += index;
+      sumValue += value;
+      sumProduct += index * value;
+      sumSquares += index * index;
+      firstIndex ??= index;
+      lastIndex = index;
     }
   }
-  return count > 0 ? { total, count } : null;
-}
+  if (count === 0 || firstIndex === null || lastIndex === null) {
+    return rows.map(() => null);
+  }
 
-function rowVisibleAverage(
-  row: MentionTrendRow,
-  keys: readonly string[]
-): number | null {
-  const stats = visibleEngineStats(row, keys);
-  return stats ? stats.total / stats.count : null;
-}
+  const denominator = count * sumSquares - sumIndex * sumIndex;
+  const slope =
+    denominator === 0
+      ? 0
+      : (count * sumProduct - sumIndex * sumValue) / denominator;
+  const intercept = (sumValue - slope * sumIndex) / count;
 
-export function fitMentionTrendAverage(
-  rows: readonly MentionTrendRow[],
-  keys: readonly string[]
-): (number | null)[] {
-  return rows.map((row) => rowVisibleAverage(row, keys));
+  return rows.map((_, index) =>
+    index >= firstIndex && index <= lastIndex
+      ? Math.max(0, intercept + slope * index)
+      : null
+  );
 }
 
 export function mentionTrendEmptyLabel(

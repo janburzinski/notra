@@ -74,6 +74,7 @@ import type {
   ChartMarker,
   TooltipBodyItem,
   TooltipEmptyLabel,
+  TooltipLabelFormatter,
   TooltipLayout,
   TooltipValueFormatter,
 } from "@/types/charts";
@@ -262,6 +263,7 @@ export interface YAxisProps {
   tickFormatter?: (value: number, index: number) => string; // formats y tick labels
   label?: string; // axis title, rotated alongside the tick labels
   hideDots?: boolean; // hides the tick dots beside this axis's labels
+  scale?: boolean; // when true, choose a data-relative range instead of forcing zero into view
 }
 
 /** Presence shows the y value axis. Renders nothing. */
@@ -283,6 +285,8 @@ export interface TooltipProps {
   position?: TooltipPosition; // "variable" follows both axes (default); "fixed" pins the tooltip near the top and sits beside the pointer's X
   layout?: TooltipLayout; // "rows" is the default swatch list; "bars" ranks series as a mini bar chart
   valueFormatter?: TooltipValueFormatter;
+  labelKey?: string; // optional row key used for the tooltip heading instead of the x-axis value
+  labelFormatter?: TooltipLabelFormatter;
   barMax?: number; // bar layout: scale tracks to this ceiling (e.g. 100 for percents); omit to scale to the hovered max
   confine?: boolean; // keep the tooltip inside the chart rect (default true); false lets small sparklines overflow
   // When set, tooltip rows come from these data keys at the hovered index
@@ -342,6 +346,7 @@ type YAxisSlot = {
   tickFormatter?: (value: number, index: number) => string;
   label?: string;
   hideDots: boolean;
+  scale: boolean;
 };
 type TooltipSlot = {
   present: boolean;
@@ -352,6 +357,8 @@ type TooltipSlot = {
   position: TooltipPosition;
   layout: TooltipLayout;
   valueFormatter?: TooltipValueFormatter;
+  labelKey?: string;
+  labelFormatter?: TooltipLabelFormatter;
   barMax?: number;
   confine: boolean;
   rowKeys?: readonly string[];
@@ -387,7 +394,7 @@ type CollectedConfig = {
 function collectConfig(children: ReactNode): CollectedConfig {
   const areas: AreaSeriesConfig[] = [];
   let xAxis: XAxisSlot = { present: false, hideDots: false };
-  let yAxis: YAxisSlot = { present: false, hideDots: false };
+  let yAxis: YAxisSlot = { present: false, hideDots: false, scale: false };
   let showGrid = false;
   let gridVariant: GridLineVariant = "dashed";
   let tooltip: TooltipSlot = {
@@ -458,6 +465,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         tickFormatter: props.tickFormatter,
         label: props.label,
         hideDots: props.hideDots ?? false,
+        scale: props.scale ?? false,
       };
     } else if (type === Grid) {
       showGrid = true;
@@ -474,6 +482,8 @@ function collectConfig(children: ReactNode): CollectedConfig {
         position: props.position ?? "variable",
         layout: props.layout ?? "rows",
         valueFormatter: props.valueFormatter,
+        labelKey: props.labelKey,
+        labelFormatter: props.labelFormatter,
         barMax: props.barMax,
         confine: props.confine ?? true,
         rowKeys: props.rowKeys,
@@ -970,6 +980,7 @@ function buildMainAxes(ctx: OptionBuildContext): {
     type: "value",
     show: yAxisSlot.present || showGrid,
     max: isExpanded ? 1 : undefined,
+    scale: !isExpanded && yAxisSlot.scale,
     // Axis title — rendered rotated alongside the tick labels, same styling.
     name: isLoading ? undefined : yAxisSlot.label,
     nameLocation: "middle",
@@ -1042,11 +1053,19 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
       name?: string;
       dataIndex?: number;
     };
-    // Label shows the RAW axis value — matches ChartTooltipContent (no tick formatter).
-    const axisValue = first.axisValue ?? first.name ?? "";
-    const label = String(axisValue);
     const hoveredRow =
       typeof first.dataIndex === "number" ? data[first.dataIndex] : undefined;
+    // Label shows the raw axis value unless the tooltip opts into a more
+    // descriptive value held on the hovered row.
+    const axisValue = first.axisValue ?? first.name ?? "";
+    const labelValue =
+      tooltipSlot.labelKey && hoveredRow?.[tooltipSlot.labelKey] != null
+        ? hoveredRow[tooltipSlot.labelKey]
+        : axisValue;
+    const rawLabel = String(labelValue);
+    const label = tooltipSlot.labelFormatter
+      ? tooltipSlot.labelFormatter(rawLabel)
+      : rawLabel;
     const rowKeys = tooltipSlot.rowKeys;
     if (rowKeys && rowKeys.length > 0 && typeof first.dataIndex === "number") {
       const items = tooltipItemsFromRow(
