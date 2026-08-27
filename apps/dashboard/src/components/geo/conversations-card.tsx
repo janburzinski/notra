@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useState } from "react";
+
 import { Button } from "@/components/button";
 import { ConversationBuilderDialog } from "@/components/geo/conversation-builder-dialog";
 import { ConversationResultsDialog } from "@/components/geo/conversation-results-dialog";
@@ -32,7 +33,7 @@ export function ConversationsCard({ organizationId }: ConversationsCardProps) {
 
   return (
     <Card className="overflow-visible rounded-2xl bg-transparent p-0 ring-0">
-      <CardHeader className="rounded-t-2xl border border-border border-b-0 bg-muted pt-4 pb-9">
+      <CardHeader className="border-border bg-muted rounded-t-2xl border border-b-0 pt-4 pb-9">
         <CardTitle>Conversations</CardTitle>
         <CardDescription>
           Multi-turn questions where buying decisions happen
@@ -51,13 +52,13 @@ export function ConversationsCard({ organizationId }: ConversationsCardProps) {
           </Button>
         </CardAction>
       </CardHeader>
-      <CardContent className="-mt-9 relative rounded-2xl border border-border bg-card pt-2 pb-2">
+      <CardContent className="border-border bg-card relative -mt-9 rounded-2xl border pt-2 pb-2">
         {sequences.length === 0 ? (
-          <p className="flex h-32 items-center justify-center text-center text-muted-foreground text-sm">
+          <p className="text-muted-foreground flex h-32 items-center justify-center text-center text-sm">
             Track an opening question plus the follow-ups that close the deal
           </p>
         ) : (
-          <div className="divide-y divide-border/60">
+          <div className="divide-border/60 divide-y">
             {sequences.map((sequence) => (
               <div
                 className="flex items-center gap-3 px-4 py-2.5"
@@ -68,10 +69,10 @@ export function ConversationsCard({ organizationId }: ConversationsCardProps) {
                   onClick={() => setViewing(sequence)}
                   type="button"
                 >
-                  <p className="truncate font-medium text-sm">
+                  <p className="truncate text-sm font-medium">
                     {sequence.name}
                   </p>
-                  <p className="truncate text-muted-foreground text-xs">
+                  <p className="text-muted-foreground truncate text-xs">
                     {sequence.steps.length}{" "}
                     {sequence.steps.length === 1 ? "turn" : "turns"} ·{" "}
                     {sequence.steps[0]}

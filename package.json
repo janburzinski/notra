@@ -1,6 +1,11 @@
 {
   "name": "turbo",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
   "scripts": {
     "build": "dotenv -- turbo run build",
     "dev": "dotenv -- turbo run dev",
@@ -15,7 +20,7 @@
     "email:dev": "dotenv -- bun run --filter=@notra/email dev",
     "devtools:api": "cd apps/api && bunx @ai-sdk/devtools",
     "devtools:dashboard": "cd apps/dashboard && bunx @ai-sdk/devtools",
-    "check": "ultracite check --threads=4 --report-unused-disable-directives",
+    "check": "ultracite check --threads=4",
     "format": "ultracite fix --threads=4",
     "format:unsafe": "ultracite fix --unsafe --threads=4",
     "commitlint": "commitlint",
@@ -35,14 +40,6 @@
     "turbo": "^2.9.18",
     "ultracite": "7.10.6"
   },
-  "engines": {
-    "node": "24.11.1"
-  },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "packageManager": "bun@1.4.0",
   "overrides": {
     "brace-expansion@1": "1.1.16",
     "brace-expansion@2": "2.1.2",
@@ -53,5 +50,9 @@
     "nf3": "0.3.17",
     "protobufjs@7": "7.6.5",
     "sharp": "^0.35.3"
-  }
+  },
+  "engines": {
+    "node": "24.11.1"
+  },
+  "packageManager": "bun@1.4.0"
 }

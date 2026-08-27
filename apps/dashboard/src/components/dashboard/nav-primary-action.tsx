@@ -5,6 +5,7 @@ import { Button, buttonVariants } from "@notra/ui/components/ui/button";
 import { SidebarGroup } from "@notra/ui/components/ui/sidebar";
 import { cn } from "@notra/ui/lib/utils";
 import Link from "next/link";
+
 import type { NavPrimaryActionProps } from "@/types/components/nav";
 
 const ACTION_CLASS =

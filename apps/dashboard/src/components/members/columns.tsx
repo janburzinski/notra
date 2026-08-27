@@ -7,6 +7,7 @@ import {
 } from "@notra/ui/components/ui/avatar";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { createColumnHelper } from "@tanstack/react-table";
+
 import { MemberActions } from "./member-actions";
 
 export interface Member {

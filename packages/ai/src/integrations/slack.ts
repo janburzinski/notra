@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+
 import {
   SLACK_API_BASE_URL,
   SLACK_REQUEST_TIMEOUT_MS,

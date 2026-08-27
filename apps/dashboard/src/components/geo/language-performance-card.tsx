@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useCallback, useMemo, useState } from "react";
+
 import { Button } from "@/components/button";
 import { GeoBar } from "@/components/geo/geo-bar";
 import { GeoLanguagesDialog } from "@/components/geo/geo-languages-dialog";
@@ -213,7 +214,7 @@ function languagePerformanceColumns({
             pending={pendingLanguage === row.language}
           />
         ) : (
-          <span className="text-[0.6875rem] text-muted-foreground tabular-nums">
+          <span className="text-muted-foreground text-[0.6875rem] tabular-nums">
             {trackedChecksLabel(row.mentions, row.checks, isScanning)}
           </span>
         ),
@@ -308,7 +309,7 @@ export function LanguagePerformanceCard({
       <InstrumentSection
         action={
           <button
-            className="text-muted-foreground text-xs underline-offset-4 hover:text-foreground hover:underline"
+            className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
             onClick={() => setLanguagesOpen(true)}
             type="button"
           >

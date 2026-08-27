@@ -12,6 +12,7 @@ import { insertGeoMentionChecks } from "@notra/db/utils/geo-checks";
 import { generateText, type ModelMessage, Output, stepCountIs } from "ai";
 import { and, asc, eq } from "drizzle-orm";
 import { Effect } from "effect";
+
 import {
   GEO_ANSWER_MAX_TOKENS,
   GEO_ANSWER_SYSTEM_PROMPT,

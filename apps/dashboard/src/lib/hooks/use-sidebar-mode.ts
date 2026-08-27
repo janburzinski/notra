@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
+
 import { localStorageKeys } from "@/constants/storage";
 import type { SidebarMode, UseSidebarModeResult } from "@/types/components/nav";
 import { isSidebarMode, resolveSidebarMode } from "@/utils/nav";

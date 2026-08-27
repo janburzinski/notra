@@ -5,6 +5,7 @@ import {
   SidebarGroupLabel,
 } from "@notra/ui/components/ui/sidebar";
 import { usePathname } from "next/navigation";
+
 import { GEO_UPGRADE_TOOLTIP, GEO_WRITER_NAV_LINK } from "@/constants/geo";
 import {
   NAV_CATEGORY_LABELS,
@@ -17,6 +18,7 @@ import { useHasGeoFeature } from "@/lib/hooks/use-plan";
 import type { NavGeoProps } from "@/types/components/nav";
 import { geoNavHref } from "@/utils/geo-paths";
 import { resolveActiveNavLink, resolveGeoImproveLinks } from "@/utils/nav";
+
 import { NavList } from "./nav-list";
 import { NavLockHint } from "./nav-lock-hint";
 import { NavPrimaryAction } from "./nav-primary-action";

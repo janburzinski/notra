@@ -1,9 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useSidebarMode } from "@/lib/hooks/use-sidebar-mode";
+
 import { NavGeo } from "./nav-geo";
 import { NavModeSwitch } from "./nav-mode-switch";
 import { NavStudio } from "./nav-studio";

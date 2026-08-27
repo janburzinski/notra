@@ -24,6 +24,7 @@ import {
 } from "@notra/ui/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 import { GeoProjectCreateDialog } from "@/components/geo/project-create-dialog";
 import { ProjectLogo } from "@/components/geo/project-logo";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -38,6 +39,7 @@ import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { getWebsiteDomain } from "@/utils/brand";
 import { geoNavHref } from "@/utils/geo-paths";
 import { isStaleGeoProjectParam, resolveNavItems } from "@/utils/nav";
+
 import { SidebarBrandHeader } from "./sidebar-brand-header";
 import { SidebarLabel } from "./sidebar-label";
 
@@ -112,7 +114,7 @@ export function SidebarProjectSwitcher() {
                   tooltip={activeProject.name}
                 >
                   <div
-                    className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-background ring-1 ring-foreground/10"
+                    className="bg-background ring-foreground/10 flex size-8 shrink-0 items-center justify-center rounded-lg ring-1"
                     data-slot="avatar"
                   >
                     <ProjectLogo
@@ -122,17 +124,17 @@ export function SidebarProjectSwitcher() {
                     />
                   </div>
                   <div className="grid min-w-0 flex-1 leading-tight">
-                    <SidebarLabel className="truncate font-semibold text-sm">
+                    <SidebarLabel className="truncate text-sm font-semibold">
                       {activeProject.name}
                     </SidebarLabel>
                     {activeDomain ? (
-                      <SidebarLabel className="truncate text-muted-foreground text-xs">
+                      <SidebarLabel className="text-muted-foreground truncate text-xs">
                         {activeDomain}
                       </SidebarLabel>
                     ) : null}
                   </div>
                   <HugeiconsIcon
-                    className="ml-auto text-muted-foreground"
+                    className="text-muted-foreground ml-auto"
                     icon={UnfoldMoreIcon}
                   />
                 </SidebarMenuButton>
@@ -160,7 +162,7 @@ export function SidebarProjectSwitcher() {
                     </span>
                     {activeProject.id === project.id ? (
                       <HugeiconsIcon
-                        className="absolute right-2 size-4 text-muted-foreground"
+                        className="text-muted-foreground absolute right-2 size-4"
                         icon={Tick02Icon}
                       />
                     ) : null}

@@ -1,4 +1,5 @@
 import type { PerplexitySearchSource } from "@notra/ui/components/brainless/perplexity/perplexity-search";
+
 import { getReferenceDomain } from "@/utils/reference-display";
 
 const MARKDOWN_LINK = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;

@@ -8,6 +8,7 @@ import { useIsApplePlatform } from "@notra/ui/hooks/use-is-apple-platform";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+
 import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import {
   NAV_AUTOMATION_LINKS,
@@ -19,6 +20,7 @@ import {
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import type { NavStudioProps } from "@/types/components/nav";
 import { resolveActiveNavLink } from "@/utils/nav";
+
 import { CollapsibleSidebarGroup } from "./collapsible-nav-group";
 import { NavList } from "./nav-list";
 import { NavPrimaryAction } from "./nav-primary-action";
