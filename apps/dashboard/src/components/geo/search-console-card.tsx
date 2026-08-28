@@ -163,7 +163,10 @@ function PropertyPicker({
                 const label = formatGscSiteUrl(value);
                 return (
                   <>
-                    <span aria-hidden="true">
+                    <span
+                      aria-hidden="true"
+                      className="flex shrink-0 items-center"
+                    >
                       <ProjectLogo
                         domain={getGscSiteDomain(value)}
                         name={label}
@@ -180,7 +183,10 @@ function PropertyPicker({
               const label = formatGscSiteUrl(site.siteUrl);
               return (
                 <SelectItem key={site.siteUrl} value={site.siteUrl}>
-                  <span aria-hidden="true">
+                  <span
+                    aria-hidden="true"
+                    className="flex shrink-0 items-center"
+                  >
                     <ProjectLogo
                       domain={getGscSiteDomain(site.siteUrl)}
                       name={label}
