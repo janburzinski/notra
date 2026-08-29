@@ -522,9 +522,12 @@ export interface GeoScanResult {
 
 export interface GeoScanRetryResult {
   status: "retry_no_successful_checks";
+  retryProjectIds: string[];
+  checks: number;
+  mentions: number;
 }
 
-export type GeoScanStepResult = GeoScanResult | GeoScanRetryResult;
+export type GeoScanRunResult = GeoScanResult | GeoScanRetryResult;
 
 export interface GeoProjectScanOutcome {
   checks: number;

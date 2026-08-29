@@ -18,7 +18,7 @@ import type {
 } from "@notra/db/types/geo-checks";
 import { insertGeoMentionChecks } from "@notra/db/utils/geo-checks";
 import { generateText, type ModelMessage, Output, stepCountIs } from "ai";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -88,6 +88,7 @@ import type {
   GeoPromptDefinition,
   GeoProjectScanOutcome,
   GeoScanResult,
+  GeoScanRunResult,
   GeoScopeInput,
   GeoSequenceCheckOutcome,
   GeoSequenceDefinition,
@@ -925,15 +926,15 @@ const runGeoSequenceCheck = Effect.fn("geo.runSequenceCheck")(function* (
 
 export const runGeoScan = Effect.fn("geo.runScan")(function* (
   organizationId: string,
-  projectId?: string
+  projectIds?: string[]
 ) {
   const settingsRows = yield* Effect.tryPromise({
     try: () =>
       db.query.geoSettings.findMany({
-        where: projectId
+        where: projectIds
           ? and(
               eq(geoSettings.organizationId, organizationId),
-              eq(geoSettings.projectId, projectId)
+              inArray(geoSettings.projectId, projectIds)
             )
           : eq(geoSettings.organizationId, organizationId),
         orderBy: [asc(geoSettings.createdAt)],
@@ -961,7 +962,7 @@ export const runGeoScan = Effect.fn("geo.runScan")(function* (
       event: "geo.scan.skipped",
       reason: "disabled",
       organizationId,
-      projectId: projectId ?? null,
+      projectId: projectIds?.length === 1 ? (projectIds[0] ?? null) : null,
     });
     const skipped: GeoScanResult = { status: "skipped" };
     return skipped;
@@ -969,6 +970,7 @@ export const runGeoScan = Effect.fn("geo.runScan")(function* (
 
   let checks = 0;
   let mentions = 0;
+  const retryProjectIds: string[] = [];
   for (const settingsRow of enabledRows) {
     const runId = `geo-scan-${settingsRow.projectId}-${crypto.randomUUID()}`;
     const gate = yield* Effect.tryPromise({
@@ -1016,8 +1018,13 @@ export const runGeoScan = Effect.fn("geo.runScan")(function* (
             );
           })
         )
-      )
+      ),
+      Effect.catchTag("GeoNoSuccessfulChecksError", () => Effect.succeed(null))
     );
+    if (!result) {
+      retryProjectIds.push(settingsRow.projectId);
+      continue;
+    }
 
     yield* Effect.promise(() =>
       finalizeContentBilling({
@@ -1045,6 +1052,16 @@ export const runGeoScan = Effect.fn("geo.runScan")(function* (
 
     checks += result.checks;
     mentions += result.mentions;
+  }
+
+  if (retryProjectIds.length > 0) {
+    const retry: GeoScanRunResult = {
+      status: "retry_no_successful_checks",
+      retryProjectIds,
+      checks,
+      mentions,
+    };
+    return retry;
   }
 
   const completed: GeoScanResult = {

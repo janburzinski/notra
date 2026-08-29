@@ -30,8 +30,13 @@ export async function geoScanWorkflow(
   }
 
   await sleep(GEO_SCAN_NO_RESULTS_RETRY_DELAY);
-  return await retryGeoScanStep(
+  const retryResult = await retryGeoScanStep(
     parseResult.data.organizationId,
-    parseResult.data.projectId
+    result.retryProjectIds
   );
+  return {
+    status: "completed",
+    checks: result.checks + (retryResult.checks ?? 0),
+    mentions: result.mentions + (retryResult.mentions ?? 0),
+  };
 }
