@@ -65,8 +65,7 @@ export const onboardingRouter = {
           ) ??
           response.results.find(
             (result) => result.domain.trim().toLowerCase() === key
-          ) ??
-          response.results[0];
+          );
         return {
           domain: brand?.domain ?? null,
           url: brand?.logo || null,
