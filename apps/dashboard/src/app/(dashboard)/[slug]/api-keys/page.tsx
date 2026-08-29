@@ -518,6 +518,7 @@ function CreateApiKeyDialog({
   onExpirationChange,
   onNameChange,
   onOpenChange,
+  onOpenChangeComplete,
   onScopesChange,
   onSubmit,
   open,
@@ -529,12 +530,17 @@ function CreateApiKeyDialog({
   onExpirationChange: (expiration: ApiKeyExpiration) => void;
   onNameChange: (name: string | null) => void;
   onOpenChange: (open: boolean) => void;
+  onOpenChangeComplete: (open: boolean) => void;
   onScopesChange: (scopes: string[]) => void;
   onSubmit: () => void;
   open: boolean;
 }) {
   return (
-    <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
+    <ResponsiveDialog
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={onOpenChangeComplete}
+      open={open}
+    >
       <ResponsiveDialogContent
         className={createdKey ? "sm:max-w-md" : "sm:max-w-2xl"}
       >
@@ -985,13 +991,17 @@ export default function ApiKeysPage() {
       return;
     }
 
-    if (!open) {
-      dispatchUi({ type: "createErrorChanged", createError: null });
-      mutation.reset();
-      dispatchUi({ type: "createdKeyChanged", createdKey: null });
-      setNewKeyConfig(null);
-    }
     dispatchUi({ type: "createDialogChanged", open });
+  };
+
+  const handleDialogOpenChangeComplete = (open: boolean) => {
+    if (open) {
+      return;
+    }
+
+    mutation.reset();
+    setNewKeyConfig(null);
+    dispatchUi({ type: "createDialogReset" });
   };
 
   const handleEditDialogClose = (open: boolean) => {
@@ -1074,6 +1084,7 @@ export default function ApiKeysPage() {
           setNewKeyConfig({ name });
         }}
         onOpenChange={handleDialogClose}
+        onOpenChangeComplete={handleDialogOpenChangeComplete}
         onScopesChange={(scopes) => setNewKeyConfig({ scopes })}
         onSubmit={handleCreateSubmit}
         open={dialogOpen}
