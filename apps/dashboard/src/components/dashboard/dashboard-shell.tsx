@@ -93,7 +93,6 @@ export function DashboardShell({
       return;
     }
 
-    dismiss();
     setDismissingOrganizationId(null);
   };
 
@@ -104,6 +103,7 @@ export function DashboardShell({
     }
 
     setDismissingOrganizationId(organizationId);
+    dismiss();
   };
 
   return (
@@ -111,7 +111,7 @@ export function DashboardShell({
       className="flex h-svh flex-col overflow-hidden overscroll-none"
       style={shellStyle}
     >
-      {bannerAvailable ? (
+      {bannerAvailable || dismissing ? (
         <div
           className={cn(
             "w-full shrink-0 overflow-hidden transition-[max-height,opacity] duration-200 ease-out motion-reduce:transition-none",
