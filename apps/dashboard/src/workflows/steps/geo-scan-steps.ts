@@ -21,7 +21,8 @@ export async function runGeoScanStep(
 
 export async function retryGeoScanStep(
   organizationId: string,
-  projectIds: string[]
+  projectIds: string[],
+  hadSuccessfulChecks: boolean
 ): Promise<GeoScanResult> {
   "use step";
   try {
@@ -29,9 +30,16 @@ export async function retryGeoScanStep(
       runGeoScan(organizationId, projectIds)
     );
     if (result.status === "retry_no_successful_checks") {
-      const message = `GEO scan retry produced no successful checks for ${result.retryProjectIds.length} projects`;
-      console.error(`[GEO] ${message}`);
-      throw new FatalError(message);
+      if (!hadSuccessfulChecks && result.checks === 0) {
+        const message = `GEO scan retry produced no successful checks for ${result.retryProjectIds.length} projects`;
+        console.error(`[GEO] ${message}`);
+        throw new FatalError(message);
+      }
+      return {
+        status: "completed",
+        checks: result.checks,
+        mentions: result.mentions,
+      };
     }
     return result;
   } finally {
