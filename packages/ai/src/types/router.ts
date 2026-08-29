@@ -168,9 +168,16 @@ export interface PlanCacheStore {
 export interface CreditTracker {
   record(gateway: GatewayId, balance: number | null): void;
   markExhausted(gateway: GatewayId): void;
-  markUnavailable(gateway: GatewayId, reason: FallbackReason): void;
+  markUnavailable(
+    gateway: GatewayId,
+    reason: FallbackReason,
+    modelId?: string
+  ): void;
   isExhausted(gateway: GatewayId): boolean;
-  unavailableReason(gateway: GatewayId): FallbackReason | undefined;
+  unavailableReason(
+    gateway: GatewayId,
+    modelId: string
+  ): FallbackReason | undefined;
   isStale(gateway: GatewayId): boolean;
   snapshot(gateway: GatewayId): CreditSnapshot | undefined;
 }
@@ -255,6 +262,8 @@ export interface ResolvedRoute {
   decision: RouteDecision;
   adapter: GatewayAdapter;
   model: LanguageModelV3;
+  /** This concrete attempt omits ZDR after a `preferred` request was rejected. */
+  relaxZdr: boolean;
 }
 
 export interface RoutedModelContext {

@@ -5,6 +5,7 @@ import { Effect, Exit } from "effect";
 
 import { geoDb, geoSkip } from "@/lib/geo/effect";
 import type { GeoDatabaseError } from "@/lib/geo/errors";
+import type { GeoScanCompletion, GeoScanStatus } from "@/types/geo";
 
 const markGeoScanStarted = Effect.fn("geo.markScanStarted")(function* (
   projectId: string
@@ -84,24 +85,27 @@ const createGeoScanRow = Effect.fn("geo.createScanRow")(function* (
 
 const finishGeoScanRow = Effect.fn("geo.finishScanRow")(function* (
   scanId: string,
-  status: "completed" | "failed"
+  status: Exclude<GeoScanStatus, "running">,
+  successfulChecks: number,
+  failedChecks: number
 ) {
   yield* geoDb("scan row finish failed", () =>
     db
       .update(geoScans)
-      .set({ status, finishedAt: new Date() })
+      .set({ status, successfulChecks, failedChecks, finishedAt: new Date() })
       .where(eq(geoScans.id, scanId))
   );
 });
 
 /**
  * Runs one persisted scan: inserts a `geo_scans` row, hands its id to
- * `run`, and stamps the row `completed` on success or `failed` on error or
- * interruption. Also maintains the `geo_settings` started/finished stamps the
- * dashboard polls. Insert failure aborts the scan — checks FK to `geo_scans`,
- * so a synthetic id would only waste model calls.
+ * `run`, and stamps the row `completed` or `partial` with check counts on
+ * success, or `failed` on error or interruption. Also maintains the
+ * `geo_settings` started/finished stamps the dashboard polls. Insert failure
+ * aborts the scan — checks FK to `geo_scans`, so a synthetic id would only
+ * waste model calls.
  */
-export function withGeoScanRun<A, E, R>(
+export function withGeoScanRun<A extends GeoScanCompletion, E, R>(
   scope: GeoScanRunScope,
   run: (scanId: string) => Effect.Effect<A, E, R>
 ): Effect.Effect<A, E | GeoDatabaseError, R> {
@@ -109,10 +113,22 @@ export function withGeoScanRun<A, E, R>(
     const scanId = yield* createGeoScanRow(scope);
     return yield* run(scanId).pipe(
       Effect.onExit((exit) => {
-        const status = Exit.isSuccess(exit) ? "completed" : "failed";
-        return finishGeoScanRow(scanId, status).pipe(
-          geoSkip("scan row finish failed")
-        );
+        const successfulChecks = Exit.isSuccess(exit) ? exit.value.checks : 0;
+        const failedChecks = Exit.isSuccess(exit) ? exit.value.failedChecks : 0;
+        let status: Exclude<GeoScanStatus, "running">;
+        if (!Exit.isSuccess(exit)) {
+          status = "failed";
+        } else if (failedChecks > 0) {
+          status = "partial";
+        } else {
+          status = "completed";
+        }
+        return finishGeoScanRow(
+          scanId,
+          status,
+          successfulChecks,
+          failedChecks
+        ).pipe(geoSkip("scan row finish failed"));
       })
     );
   });

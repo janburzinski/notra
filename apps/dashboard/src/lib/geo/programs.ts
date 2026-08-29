@@ -13,6 +13,7 @@ import {
   brandSettings,
   geoCompetitors,
   geoPrompts,
+  geoScans,
   geoSettings,
 } from "@notra/db/schema";
 import {
@@ -28,7 +29,7 @@ import {
   queryGeoCheckTimeseries,
   toGeoCheckWindow,
 } from "@notra/db/utils/geo-checks";
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -57,6 +58,7 @@ import { geoHiddenSourceParams } from "@/lib/geo/hidden-sources";
 import { lockGeoProject } from "@/lib/geo/lock";
 import {
   toGeoCompetitor,
+  toGeoScanSummary,
   toGeoSettings,
   toGeoTrafficLogEntry,
   toTrackedPrompt,
@@ -144,13 +146,26 @@ export const loadGeoSettings = Effect.fn("geo.settings")(function* (
   input: GeoScopeInput
 ) {
   const scope = yield* resolveGeoScope(input);
-  const row = scope.projectId
+  const [row, latestScan] = scope.projectId
     ? yield* geoDb("settings lookup failed", () =>
-        db.query.geoSettings.findFirst({
-          where: eq(geoSettings.projectId, scope.projectId ?? ""),
-        })
+        Promise.all([
+          db.query.geoSettings.findFirst({
+            where: eq(geoSettings.projectId, scope.projectId ?? ""),
+          }),
+          db.query.geoScans.findFirst({
+            columns: {
+              status: true,
+              successfulChecks: true,
+              failedChecks: true,
+              startedAt: true,
+              finishedAt: true,
+            },
+            where: eq(geoScans.projectId, scope.projectId ?? ""),
+            orderBy: [desc(geoScans.startedAt)],
+          }),
+        ])
       )
-    : null;
+    : [null, null];
 
   const catalog = yield* Effect.promise(() =>
     loadGeoModelCatalog(scope.organizationId)
@@ -158,6 +173,7 @@ export const loadGeoSettings = Effect.fn("geo.settings")(function* (
   const response: GeoSettingsResponse = {
     configured: isTinybirdConfigured(),
     settings: row ? toGeoSettings(row, catalog) : null,
+    latestScan: latestScan ? toGeoScanSummary(latestScan) : null,
   };
   return response;
 });
@@ -613,14 +629,28 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
     });
   }
 
-  const rows = yield* geoDb("settings lookup failed", () =>
-    db.select().from(geoSettings).where(eq(geoSettings.projectId, projectId))
+  const [rows, latestScan] = yield* geoDb("settings lookup failed", () =>
+    Promise.all([
+      db.select().from(geoSettings).where(eq(geoSettings.projectId, projectId)),
+      db.query.geoScans.findFirst({
+        columns: {
+          status: true,
+          successfulChecks: true,
+          failedChecks: true,
+          startedAt: true,
+          finishedAt: true,
+        },
+        where: eq(geoScans.projectId, projectId),
+        orderBy: [desc(geoScans.startedAt)],
+      }),
+    ])
   );
 
   const row = rows.at(0);
   const response: GeoSettingsResponse = {
     configured: isTinybirdConfigured(),
     settings: row ? toGeoSettings(row, catalog) : null,
+    latestScan: latestScan ? toGeoScanSummary(latestScan) : null,
   };
   return response;
 });

@@ -5,6 +5,7 @@ import {
 import type {
   CreditSnapshot,
   CreditTracker,
+  FallbackReason,
   GatewayId,
   UnavailableMark,
 } from "@notra/ai/types/router";
@@ -15,7 +16,25 @@ export function createCreditTracker(
   unavailableTtlMs: number = DEFAULT_UNAVAILABLE_TTL_MS
 ): CreditTracker {
   const snapshots = new Map<GatewayId, CreditSnapshot>();
-  const marks = new Map<GatewayId, UnavailableMark>();
+  const marks = new Map<string, UnavailableMark>();
+
+  const unavailableKey = (gateway: GatewayId, modelId?: string): string =>
+    modelId ? `${gateway}\0${modelId}` : gateway;
+
+  const readUnavailableReason = (
+    gateway: GatewayId,
+    modelId?: string
+  ): FallbackReason | undefined => {
+    const key = unavailableKey(gateway, modelId);
+    const mark = marks.get(key);
+    if (mark && mark.until > now()) {
+      return mark.reason;
+    }
+    if (mark) {
+      marks.delete(key);
+    }
+    return undefined;
+  };
 
   const isFresh = (snapshot: CreditSnapshot | undefined): boolean =>
     snapshot !== undefined && now() - snapshot.checkedAt < ttlMs;
@@ -35,22 +54,21 @@ export function createCreditTracker(
     markExhausted(gateway) {
       snapshots.set(gateway, { balance: 0, checkedAt: now() });
     },
-    markUnavailable(gateway, reason) {
-      marks.set(gateway, { reason, until: now() + unavailableTtlMs });
+    markUnavailable(gateway, reason, modelId) {
+      marks.set(unavailableKey(gateway, modelId), {
+        reason,
+        until: now() + unavailableTtlMs,
+      });
     },
     isExhausted,
-    unavailableReason(gateway) {
+    unavailableReason(gateway, modelId) {
       if (isExhausted(gateway)) {
         return "no-credits";
       }
-      const mark = marks.get(gateway);
-      if (mark && mark.until > now()) {
-        return mark.reason;
-      }
-      if (mark) {
-        marks.delete(gateway);
-      }
-      return undefined;
+      return (
+        readUnavailableReason(gateway, modelId) ??
+        readUnavailableReason(gateway)
+      );
     },
     isStale(gateway) {
       return !isFresh(snapshots.get(gateway));

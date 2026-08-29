@@ -55,11 +55,15 @@ gateway("meta/muse-spark-1.2", { organizationId, zdr: "preferred" });
 ```
 
 The first attempt still carries the ZDR flags. Only when the gateway rejects
-ZDR for that model (Vercel 403, OpenRouter 404 "no endpoints matching your
+ZDR for that model (Vercel 400/403, OpenRouter 404 "no endpoints matching your
 data policy") the same route is retried without the ZDR flag — no-training
 stays on, the gateway is not marked unavailable for strict requests, and the
 result is logged as `ai.router.zdr_bypassed` (`bypassReason: caller-preferred`)
-with `zdrEnforced: false` in the route metadata.
+with `zdrEnforced: false` in the route metadata. Strict model-level rejections
+are cached for five minutes and routed to the other gateway; the cache remains
+scoped to that model so other compliant models can keep using the gateway.
+Router route, fallback, and ZDR logs include `zdrMode` (`required` or
+`preferred`); `zdrEnforced` describes the selected attempt, not a user setting.
 
 ## Gateway coverage
 

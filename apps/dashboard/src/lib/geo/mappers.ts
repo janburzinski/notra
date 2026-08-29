@@ -9,6 +9,8 @@ import type {
   GeoPromptRow,
   GeoPromptSequence,
   GeoPromptSequenceRow,
+  GeoScanSummary,
+  GeoScanSummaryRow,
   GeoSettings,
   GeoSettingsRow,
   GeoTrackedPrompt,
@@ -52,6 +54,16 @@ export function toGeoSettings(
     isScanning: isGeoScanRunning(row.scanStartedAt, row.lastScanAt),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+export function toGeoScanSummary(row: GeoScanSummaryRow): GeoScanSummary {
+  return {
+    status: row.status,
+    successfulChecks: row.successfulChecks,
+    failedChecks: row.failedChecks,
+    startedAt: row.startedAt.toISOString(),
+    finishedAt: row.finishedAt?.toISOString() ?? null,
   };
 }
 

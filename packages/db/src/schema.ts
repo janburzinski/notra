@@ -1534,9 +1534,13 @@ export const geoScans = pgTable(
     projectId: text("project_id")
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
-    status: text("status", { enum: ["running", "completed", "failed"] })
+    status: text("status", {
+      enum: ["running", "completed", "partial", "failed"],
+    })
       .notNull()
       .default("running"),
+    successfulChecks: integer("successful_checks").notNull().default(0),
+    failedChecks: integer("failed_checks").notNull().default(0),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     finishedAt: timestamp("finished_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -298,7 +298,9 @@ describe("resolveRoute", () => {
 
 describe("RoutedLanguageModel", () => {
   test("does not resolve until first call and memoises the route", async () => {
-    const { router, openrouter, planLookups } = createTestRouter({ plans });
+    const { router, openrouter, planLookups, logger } = createTestRouter({
+      plans,
+    });
     const model = router.model(MODEL, { organizationId: FREE_ORG });
     assert.equal(model.provider, "notra-router");
     assert.equal(model.modelId, MODEL);
@@ -308,6 +310,10 @@ describe("RoutedLanguageModel", () => {
     await model.doGenerate(callOptions());
     assert.deepEqual(planLookups, [FREE_ORG]);
     assert.equal(openrouter?.calls.length, 2);
+    const route = logger.entries.find(
+      (entry) => entry.event === "ai.router.route"
+    );
+    assert.equal(route?.fields?.zdrMode, "required");
   });
 
   test("supportedUrls is lazy and resolves through the routed model", async () => {
@@ -655,13 +661,54 @@ describe("ZDR rejection by a gateway", () => {
       NoCompliantRouteError
     );
   });
+
+  test("a 400 model ZDR error falls back and only cools down that model", async () => {
+    const modelWithoutVercelZdr = "zai/glm-5.3";
+    const otherModel = "anthropic/claude-sonnet-5";
+    const vercel = createFakeAdapter({
+      id: "vercel",
+      onCall: (call) => {
+        if (call.modelId === modelWithoutVercelZdr) {
+          throw httpError(
+            HTTP_BAD_REQUEST,
+            "No ZDR providers or ZDR-attested BYOK credentials available"
+          );
+        }
+      },
+    });
+    const { router, openrouter } = createTestRouter({ plans, vercel });
+
+    const result = await router
+      .model(modelWithoutVercelZdr, {
+        organizationId: PAID_ORG,
+        zdr: "required",
+      })
+      .doGenerate(callOptions());
+    assert.equal(openrouter?.calls.length, 1);
+    assert.equal(metadataOf(result)?.fallbackReason, "non-compliant");
+
+    const sameModel = await router.resolveRoute({
+      modelId: modelWithoutVercelZdr,
+      organizationId: PAID_ORG,
+    });
+    assert.equal(sameModel.gateway, "openrouter");
+    assert.equal(sameModel.fallbackReason, "non-compliant");
+
+    const unaffectedModel = await router.resolveRoute({
+      modelId: otherModel,
+      organizationId: PAID_ORG,
+    });
+    assert.equal(unaffectedModel.gateway, "vercel");
+  });
 });
 
 describe("zdr: preferred", () => {
-  const ZDR_REJECTION =
+  const PLAN_ZDR_REJECTION =
     "Zero Data Retention (ZDR) is only available for Pro and Enterprise plans.";
+  const MODEL_ZDR_REJECTION =
+    "No ZDR providers or ZDR-attested BYOK credentials available";
 
-  test("retries on the same gateway without the ZDR flag and keeps no-training", async () => {
+  test("retries a 400 model rejection without the ZDR flag and keeps no-training", async () => {
     let rejected = false;
     const vercel = createFakeAdapter({
       id: "vercel",
@@ -671,7 +718,7 @@ describe("zdr: preferred", () => {
           | undefined;
         if (gatewayBlock?.zeroDataRetention === true) {
           rejected = true;
-          throw httpError(HTTP_FORBIDDEN, ZDR_REJECTION);
+          throw httpError(HTTP_BAD_REQUEST, MODEL_ZDR_REJECTION);
         }
       },
     });
@@ -694,6 +741,7 @@ describe("zdr: preferred", () => {
       (entry) => entry.event === "ai.router.zdr_bypassed"
     );
     assert.equal(bypass?.fields?.bypassReason, "caller-preferred");
+    assert.equal(bypass?.fields?.zdrMode, "preferred");
     assert.equal(bypass?.fields?.zdrEnforced, false);
 
     // Strict requests are unaffected: the gateway was not marked unavailable.
@@ -703,6 +751,83 @@ describe("zdr: preferred", () => {
     });
     assert.equal(strict.gateway, "vercel");
     assert.equal(strict.zdrEnforced, true);
+  });
+
+  test("a strict cooldown does not block a pinned preferred retry", async () => {
+    const vercel = createFakeAdapter({
+      id: "vercel",
+      onCall: (call) => {
+        const gatewayBlock = call.options.providerOptions?.gateway as
+          | Record<string, unknown>
+          | undefined;
+        if (gatewayBlock?.zeroDataRetention === true) {
+          throw httpError(HTTP_BAD_REQUEST, MODEL_ZDR_REJECTION);
+        }
+      },
+    });
+    const { router, openrouter } = createTestRouter({ plans, vercel });
+
+    await router
+      .model(MODEL, { organizationId: PAID_ORG, zdr: "required" })
+      .doGenerate(callOptions());
+    const preferred = await router
+      .model(MODEL, { gateway: "vercel", zdr: "preferred" })
+      .doGenerate(callOptions());
+
+    assert.equal(vercel.calls.length, 3);
+    assert.equal(openrouter?.calls.length, 1);
+    assert.equal(metadataOf(preferred)?.gateway, "vercel");
+    const retry = vercel.calls[2]?.options.providerOptions?.gateway as Record<
+      string,
+      unknown
+    >;
+    assert.equal(retry.zeroDataRetention, undefined);
+    assert.equal(retry.disallowPromptTraining, true);
+
+    const strict = await router.resolveRoute({
+      modelId: MODEL,
+      organizationId: PAID_ORG,
+    });
+    assert.equal(strict.gateway, "openrouter");
+    assert.equal(strict.fallbackReason, "non-compliant");
+  });
+
+  test("concurrent calls retry ZDR rejection independently", async () => {
+    const vercel = createFakeAdapter({
+      id: "vercel",
+      onCall: (call) => {
+        const gatewayBlock = call.options.providerOptions?.gateway as
+          | Record<string, unknown>
+          | undefined;
+        if (gatewayBlock?.zeroDataRetention === true) {
+          throw httpError(HTTP_BAD_REQUEST, MODEL_ZDR_REJECTION);
+        }
+      },
+    });
+    const { router, openrouter, logger } = createTestRouter({ plans, vercel });
+    const model = router.model(MODEL, {
+      organizationId: PAID_ORG,
+      zdr: "preferred",
+    });
+
+    await Promise.all([
+      model.doGenerate(callOptions()),
+      model.doGenerate(callOptions()),
+    ]);
+
+    assert.equal(vercel.calls.length, 4);
+    assert.equal(openrouter?.calls.length, 0);
+    const nonZdrCalls = vercel.calls.filter((call) => {
+      const gatewayBlock = call.options.providerOptions?.gateway as
+        | Record<string, unknown>
+        | undefined;
+      return gatewayBlock?.zeroDataRetention === undefined;
+    });
+    assert.equal(nonZdrCalls.length, 2);
+    assert.equal(
+      logger.entries.some((entry) => entry.event === "ai.router.zdr_rejected"),
+      false
+    );
   });
 
   test("openrouter 'no endpoints matching your data policy' is a ZDR rejection", async () => {
@@ -739,7 +864,7 @@ describe("zdr: preferred", () => {
     const vercel = createFakeAdapter({
       id: "vercel",
       onCall: () => {
-        throw httpError(HTTP_FORBIDDEN, ZDR_REJECTION);
+        throw httpError(HTTP_FORBIDDEN, PLAN_ZDR_REJECTION);
       },
     });
     const { router, openrouter } = createTestRouter({ plans, vercel });
@@ -852,6 +977,15 @@ describe("classifyUpstreamFailure", () => {
     assert.equal(
       classifyUpstreamFailure(httpError(HTTP_BAD_REQUEST)),
       undefined
+    );
+    assert.equal(
+      classifyUpstreamFailure(
+        httpError(
+          HTTP_BAD_REQUEST,
+          "No ZDR providers or ZDR-attested BYOK credentials available"
+        )
+      ),
+      "non-compliant"
     );
     assert.equal(
       classifyUpstreamFailure(new TypeError("fetch failed")),

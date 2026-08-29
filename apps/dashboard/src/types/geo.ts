@@ -123,6 +123,7 @@ export interface GeoSettings {
 export interface GeoSettingsResponse {
   configured: boolean;
   settings: GeoSettings | null;
+  latestScan: GeoScanSummary | null;
 }
 
 export interface GeoSettingsRow {
@@ -455,15 +456,38 @@ export interface GeoScanPayload {
 }
 
 export interface GeoScanResult {
-  status: "completed" | "skipped" | "invalid_payload";
+  status: "completed" | "partial" | "skipped" | "invalid_payload";
   checks?: number;
+  failedChecks?: number;
   mentions?: number;
 }
 
-export interface GeoProjectScanOutcome {
+export interface GeoScanCompletion {
   checks: number;
+  failedChecks: number;
+}
+
+export interface GeoProjectScanOutcome extends GeoScanCompletion {
   mentions: number;
   usage: AgentTokenUsage;
+}
+
+export type GeoScanStatus = "running" | "completed" | "partial" | "failed";
+
+export interface GeoScanSummaryRow {
+  status: GeoScanStatus;
+  successfulChecks: number;
+  failedChecks: number;
+  startedAt: Date;
+  finishedAt: Date | null;
+}
+
+export interface GeoScanSummary {
+  status: GeoScanStatus;
+  successfulChecks: number;
+  failedChecks: number;
+  startedAt: string;
+  finishedAt: string | null;
 }
 
 export interface GeoPromptDefinition {

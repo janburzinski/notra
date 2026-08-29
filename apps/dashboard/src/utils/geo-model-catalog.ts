@@ -37,6 +37,9 @@ function toCatalogEntry(
   model: GeoGatewayModel,
   provider: GeoModelProviderId
 ): GeoModelCatalogEntry {
+  const seedEntry = GEO_MODEL_CATALOG_SEED.find(
+    (entry) => entry.id === model.id
+  );
   return {
     id: model.id,
     provider,
@@ -44,7 +47,10 @@ function toCatalogEntry(
     zdr: model.zdr,
     released: toDayString(model.released),
     default: DEFAULT_ENGINE_SET.has(model.id),
-    gateways: ["vercel"],
+    // The feed only describes Vercel availability. Preserve independently
+    // known multi-gateway coverage; new feed models remain Vercel-only until
+    // their OpenRouter route has been confirmed.
+    gateways: seedEntry?.gateways ?? ["vercel"],
   };
 }
 

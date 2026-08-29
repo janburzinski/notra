@@ -6,6 +6,7 @@ import type {
   RouteDecision,
   RouteRequest,
   UsableAdapter,
+  ZdrMode,
 } from "@notra/ai/types/router";
 
 import {
@@ -42,7 +43,8 @@ function getUsableAdapter(
   context: ResolverContext,
   gateway: GatewayId,
   modelId: string,
-  organizationId: string | undefined
+  organizationId: string | undefined,
+  zdrMode: ZdrMode
 ): UsableAdapter | { unavailable: FallbackReason } {
   const adapter = context.adapters[gateway];
   if (!adapter) {
@@ -51,8 +53,11 @@ function getUsableAdapter(
   if (!adapter.supportsModel(modelId)) {
     return { unavailable: "unsupported-model" };
   }
-  const unavailableReason = context.credits.unavailableReason(gateway);
-  if (unavailableReason) {
+  const unavailableReason = context.credits.unavailableReason(gateway, modelId);
+  if (
+    unavailableReason &&
+    !(zdrMode === "preferred" && unavailableReason === "non-compliant")
+  ) {
     return { unavailable: unavailableReason };
   }
   if (adapter.enforcesZdr) {
@@ -63,6 +68,7 @@ function getUsableAdapter(
       gateway: adapter.id,
       modelId,
       organizationId,
+      zdrMode,
     });
     return { adapter, zdrEnforced: false };
   }
@@ -118,6 +124,7 @@ export async function resolveRoute(
   request: RouteRequest
 ): Promise<RouteDecision> {
   const { modelId, organizationId } = request;
+  const zdrMode = request.zdr ?? "required";
 
   let planLookup: PlanLookup | undefined;
   if (organizationId && !request.gateway) {
@@ -135,7 +142,8 @@ export async function resolveRoute(
     context,
     decision.gateway,
     modelId,
-    organizationId
+    organizationId,
+    zdrMode
   );
   if ("adapter" in primary) {
     return toDecision(primary, request, planLookup, decision.reason);
@@ -153,7 +161,8 @@ export async function resolveRoute(
     context,
     fallbackGateway,
     modelId,
-    organizationId
+    organizationId,
+    zdrMode
   );
   if ("adapter" in secondary) {
     context.logger.info("ai.router.fallback", {
@@ -162,6 +171,7 @@ export async function resolveRoute(
       fallbackReason: primary.unavailable,
       modelId,
       organizationId,
+      zdrMode,
     });
     return toDecision(secondary, request, planLookup, "fallback", {
       from: decision.gateway,
@@ -179,6 +189,7 @@ export async function resolveRoute(
       primary: decision.gateway,
       primaryReason: primary.unavailable,
       secondaryReason: secondary.unavailable,
+      zdrMode,
     });
     throw new NoCompliantRouteError(
       modelId,

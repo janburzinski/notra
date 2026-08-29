@@ -8,6 +8,7 @@ import type {
   SharedV3ProviderMetadata,
 } from "@ai-sdk/provider";
 import {
+  HTTP_BAD_REQUEST,
   HTTP_FORBIDDEN,
   HTTP_NOT_FOUND,
   HTTP_PAYMENT_REQUIRED,
@@ -26,6 +27,7 @@ import type {
   RouteDecision,
   RoutedModelContext,
   RouteMetadata,
+  ZdrMode,
 } from "@notra/ai/types/router";
 
 import { otherGateway } from "./policy";
@@ -72,9 +74,12 @@ export function classifyUpstreamFailure(
   if (status === HTTP_PAYMENT_REQUIRED) {
     return "no-credits";
   }
-  if (status === HTTP_FORBIDDEN && ZDR_ERROR_PATTERN.test(readMessage(error))) {
+  if (
+    (status === HTTP_BAD_REQUEST || status === HTTP_FORBIDDEN) &&
+    ZDR_ERROR_PATTERN.test(readMessage(error))
+  ) {
     // The gateway refused to honour the zero-data-retention requirement
-    // (e.g. Vercel ZDR is Pro/Enterprise only). The route is not compliant.
+    // (e.g. no ZDR host for the model, or ZDR requires another gateway plan).
     return "non-compliant";
   }
   if (
@@ -171,7 +176,7 @@ function annotateStream(
   );
 }
 
-function decisionLogFields(decision: RouteDecision) {
+function decisionLogFields(decision: RouteDecision, zdrMode: ZdrMode) {
   return {
     organizationId: decision.organizationId,
     plan: decision.plan,
@@ -182,6 +187,7 @@ function decisionLogFields(decision: RouteDecision) {
     reason: decision.reason,
     fallbackFrom: decision.fallbackFrom,
     fallbackReason: decision.fallbackReason,
+    zdrMode,
     zdrEnforced: decision.zdrEnforced,
   };
 }
@@ -200,8 +206,10 @@ export class RoutedLanguageModel implements LanguageModelV3 {
 
   private readonly context: RoutedModelContext;
   private routePromise: Promise<ResolvedRoute> | undefined;
-  /** Set once a `zdr: "preferred"` request has dropped the ZDR flag. */
-  private zdrRelaxed = false;
+
+  private get zdrMode(): ZdrMode {
+    return this.context.request.zdr ?? "required";
+  }
 
   constructor(context: RoutedModelContext) {
     this.context = context;
@@ -258,7 +266,10 @@ export class RoutedLanguageModel implements LanguageModelV3 {
   private async resolvePrimary(): Promise<ResolvedRoute> {
     const decision = await this.context.resolve(this.context.request);
     const route = this.materialize(decision);
-    this.context.logger.info("ai.router.route", decisionLogFields(decision));
+    this.context.logger.info(
+      "ai.router.route",
+      decisionLogFields(decision, this.zdrMode)
+    );
     return route;
   }
 
@@ -273,6 +284,7 @@ export class RoutedLanguageModel implements LanguageModelV3 {
       decision,
       adapter,
       model: adapter.createModel(decision.requestedModelId),
+      relaxZdr: false,
     };
   }
 
@@ -285,7 +297,7 @@ export class RoutedLanguageModel implements LanguageModelV3 {
       providerOptions: stripForeignGatewayOptions(route.decision.gateway, rest),
       router,
       allowNonZdr: this.context.policy.allowNonZdr,
-      relaxZdr: this.zdrRelaxed,
+      relaxZdr: route.relaxZdr,
     });
     return { ...options, providerOptions };
   }
@@ -309,8 +321,8 @@ export class RoutedLanguageModel implements LanguageModelV3 {
     }
   }
 
-  private canRelaxZdr(): boolean {
-    return this.context.request.zdr === "preferred" && !this.zdrRelaxed;
+  private canRelaxZdr(route: ResolvedRoute): boolean {
+    return this.context.request.zdr === "preferred" && !route.relaxZdr;
   }
 
   /**
@@ -319,14 +331,17 @@ export class RoutedLanguageModel implements LanguageModelV3 {
    * strict requests keep their own behaviour.
    */
   private relaxZdr(route: ResolvedRoute, error: unknown): ResolvedRoute {
-    this.zdrRelaxed = true;
     const decision: RouteDecision = { ...route.decision, zdrEnforced: false };
     this.context.logger.warn("ai.router.zdr_bypassed", {
-      ...decisionLogFields(decision),
+      ...decisionLogFields(decision, this.zdrMode),
       bypassReason: "caller-preferred",
       message: readMessage(error),
     });
-    const relaxedRoute: ResolvedRoute = { ...route, decision };
+    const relaxedRoute: ResolvedRoute = {
+      ...route,
+      decision,
+      relaxZdr: true,
+    };
     this.routePromise = Promise.resolve(relaxedRoute);
     return relaxedRoute;
   }
@@ -361,18 +376,27 @@ export class RoutedLanguageModel implements LanguageModelV3 {
     if (!reason) {
       return undefined;
     }
-    if (reason === "non-compliant" && this.canRelaxZdr()) {
+    const status = readStatusCode(error);
+    if (reason === "non-compliant" && this.canRelaxZdr(route)) {
       return this.relaxZdr(route, error);
     }
     if (reason === "no-credits") {
       this.context.credits.markExhausted(route.decision.gateway);
       this.verifyExhaustion(route.decision.gateway);
     } else if (reason === "non-compliant") {
-      this.context.credits.markUnavailable(route.decision.gateway, reason);
+      // A 400/404 means this model currently has no matching ZDR host. Keep
+      // the cooldown model-scoped so unrelated models can use the gateway.
+      // A 403 generally means the gateway/account cannot honour ZDR at all.
+      this.context.credits.markUnavailable(
+        route.decision.gateway,
+        reason,
+        status === HTTP_FORBIDDEN ? undefined : route.decision.requestedModelId
+      );
       this.context.logger.error("ai.router.zdr_rejected", {
         gateway: route.decision.gateway,
         requestedModel: route.decision.requestedModelId,
         organizationId: route.decision.organizationId,
+        zdrMode: this.zdrMode,
         message: readMessage(error),
       });
     }
@@ -385,7 +409,6 @@ export class RoutedLanguageModel implements LanguageModelV3 {
 
     const target = otherGateway(route.decision.gateway);
     const adapter = this.context.adapters[target];
-    const status = readStatusCode(error);
     const errorName = error instanceof Error ? error.name : typeof error;
 
     if (!adapter?.supportsModel(route.decision.requestedModelId)) {
@@ -395,6 +418,7 @@ export class RoutedLanguageModel implements LanguageModelV3 {
         fallbackReason: reason,
         errorName,
         status,
+        zdrMode: this.zdrMode,
       });
       return undefined;
     }
@@ -405,6 +429,7 @@ export class RoutedLanguageModel implements LanguageModelV3 {
         fallbackReason: reason,
         errorName,
         status,
+        zdrMode: this.zdrMode,
       });
       return undefined;
     }
@@ -419,7 +444,7 @@ export class RoutedLanguageModel implements LanguageModelV3 {
       zdrEnforced: adapter.enforcesZdr,
     };
     this.context.logger.warn("ai.router.fallback", {
-      ...decisionLogFields(decision),
+      ...decisionLogFields(decision, this.zdrMode),
       errorName,
       status,
     });
@@ -427,6 +452,7 @@ export class RoutedLanguageModel implements LanguageModelV3 {
       decision,
       adapter,
       model: adapter.createModel(decision.requestedModelId),
+      relaxZdr: false,
     };
     // Subsequent calls on this model instance stay on the fallback gateway.
     this.routePromise = Promise.resolve(fallbackRoute);

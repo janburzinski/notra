@@ -1,8 +1,13 @@
 "use client";
 
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@notra/ui/components/ui/alert";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, TriangleAlertIcon } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
@@ -111,6 +116,7 @@ function GeoPageContent({ organizationSlug }: GeoPageContentProps) {
   }
 
   const settings = settingsData?.settings ?? null;
+  const latestScan = settingsData?.latestScan ?? null;
 
   if (!settings) {
     return (
@@ -154,6 +160,18 @@ function GeoPageContent({ organizationSlug }: GeoPageContentProps) {
             </Button>
           </div>
         </header>
+
+        {latestScan?.status === "partial" ? (
+          <Alert>
+            <TriangleAlertIcon />
+            <AlertTitle>Scan completed with missing checks</AlertTitle>
+            <AlertDescription>
+              {latestScan.successfulChecks} checks succeeded and{" "}
+              {latestScan.failedChecks} failed. Results include the successful
+              engines only.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         <GeoTabs
           activeTab={activeTab}

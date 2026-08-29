@@ -466,9 +466,11 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
     nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
   };
   const trackedEngines: { engine: string; zdr: GeoZdrMode }[] = [];
+  let skippedTrackedEngines = 0;
   for (const engine of new Set(settings.engines)) {
     const zdr = resolveGeoZdrMode(catalog, engine, zdrPolicy);
     if (zdr === null) {
+      skippedTrackedEngines += 1;
       yield* Effect.logWarning(
         `geo: skipping ${engine} — no zero-data-retention host and not approved`
       );
@@ -494,9 +496,11 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
 
   const groundedEngines: { grounded: GeoGroundedEngine; zdr: GeoZdrMode }[] =
     [];
+  let skippedGroundedEngines = 0;
   for (const grounded of resolveGroundedEngines()) {
     const zdr = resolveGeoZdrMode(catalog, grounded.model, zdrPolicy);
     if (zdr === null) {
+      skippedGroundedEngines += 1;
       yield* Effect.logWarning(
         `geo: skipping ${grounded.key} — no zero-data-retention host and not approved`
       );
@@ -572,6 +576,27 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
     (result): result is GeoCheckOutcome => result !== null
   );
   const rows: GeoCheckWrite[] = checkOutcomes.map((outcome) => outcome.row);
+  const failedTranslations = localizedByLanguage.filter(
+    (entry) => entry === null
+  ).length;
+  const localizedChecksPerLanguage =
+    trackedEngines.length * Math.min(prompts.length, GEO_LANGUAGE_MAX_PROMPTS) +
+    groundedEngines.length *
+      Math.min(prompts.length, GEO_LANGUAGE_GROUNDED_MAX_PROMPTS);
+  const skippedChecks =
+    skippedTrackedEngines *
+      ((scanEnglish ? prompts.length : 0) +
+        extraLanguages.length *
+          Math.min(prompts.length, GEO_LANGUAGE_MAX_PROMPTS)) +
+    skippedGroundedEngines *
+      ((scanEnglish ? groundedPrompts.length : 0) +
+        extraLanguages.length *
+          Math.min(prompts.length, GEO_LANGUAGE_GROUNDED_MAX_PROMPTS));
+  let failedChecks =
+    results.length -
+    checkOutcomes.length +
+    failedTranslations * localizedChecksPerLanguage +
+    skippedChecks;
   let usage = checkOutcomes.reduce(
     (total, outcome) => addTokenUsage(total, outcome.usage),
     EMPTY_TOKEN_USAGE
@@ -601,6 +626,15 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
         }))
       )
     : [];
+  if (scanEnglish && skippedGroundedEngines > 0) {
+    failedChecks +=
+      skippedGroundedEngines *
+      sequenceRows.reduce(
+        (count, sequence) =>
+          count + Math.min(sequence.steps.length, GEO_SEQUENCE_MAX_TURNS),
+        0
+      );
+  }
   const sequenceResults = yield* Effect.forEach(
     sequencePairs,
     (pair) =>
@@ -609,8 +643,12 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
       ),
     { concurrency: GEO_SCAN_CONCURRENCY }
   );
-  for (const result of sequenceResults) {
+  for (const [index, result] of sequenceResults.entries()) {
     if (!result) {
+      failedChecks += Math.min(
+        sequencePairs[index]?.sequence.steps.length ?? 0,
+        GEO_SEQUENCE_MAX_TURNS
+      );
       continue;
     }
     rows.push(...result.rows);
@@ -625,6 +663,7 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
 
   const outcome: GeoProjectScanOutcome = {
     checks: rows.length,
+    failedChecks,
     mentions: rows.filter((row) => row.mentioned).length,
     usage,
   };
@@ -754,6 +793,7 @@ export const runGeoScan = Effect.fn("geo.runScan")(function* (
   }
 
   let checks = 0;
+  let failedChecks = 0;
   let mentions = 0;
   for (const settingsRow of enabledRows) {
     const runId = `geo-scan-${settingsRow.projectId}-${crypto.randomUUID()}`;
@@ -815,12 +855,14 @@ export const runGeoScan = Effect.fn("geo.runScan")(function* (
     );
 
     checks += result.checks;
+    failedChecks += result.failedChecks;
     mentions += result.mentions;
   }
 
   const completed: GeoScanResult = {
-    status: "completed",
+    status: failedChecks > 0 ? "partial" : "completed",
     checks,
+    failedChecks,
     mentions,
   };
   return completed;
@@ -954,12 +996,22 @@ export const runGeoSequenceNow = Effect.fn("geo.runSequenceNow")(function* (
         const succeeded = outcomes.filter(
           (outcome): outcome is GeoSequenceCheckOutcome => outcome !== null
         );
+        const failedChecks = outcomes.reduce(
+          (count, outcome) =>
+            outcome
+              ? count
+              : count +
+                Math.min(sequenceRow.steps.length, GEO_SEQUENCE_MAX_TURNS),
+          0
+        );
         if (succeeded.length === 0) {
-          return yield* Effect.fail(
-            new GeoSequenceRunError({
-              message: "Engines failed to answer this conversation. Try again.",
-            })
-          );
+          return {
+            rows: [],
+            usage: EMPTY_TOKEN_USAGE,
+            checks: 0,
+            failedChecks,
+            allFailed: true,
+          };
         }
         const rows = succeeded.flatMap((outcome) => outcome.rows);
         yield* Effect.tryPromise({
@@ -974,7 +1026,13 @@ export const runGeoSequenceNow = Effect.fn("geo.runSequenceNow")(function* (
           (total, outcome) => addTokenUsage(total, outcome.usage),
           EMPTY_TOKEN_USAGE
         );
-        return { rows, usage };
+        return {
+          rows,
+          usage,
+          checks: rows.length,
+          failedChecks,
+          allFailed: false,
+        };
       })
   );
 
@@ -994,6 +1052,26 @@ export const runGeoSequenceNow = Effect.fn("geo.runSequenceNow")(function* (
       )
     )
   );
+
+  if (result.allFailed) {
+    yield* Effect.promise(() =>
+      finalizeContentBilling({
+        reservation: gate,
+        action: "release",
+        logPrefix: "GeoSequenceRun",
+      }).catch((releaseError) => {
+        console.error(
+          "[GEO] sequence run credit release failed:",
+          releaseError
+        );
+      })
+    );
+    return yield* Effect.fail(
+      new GeoSequenceRunError({
+        message: "Engines failed to answer this conversation. Try again.",
+      })
+    );
+  }
 
   yield* Effect.promise(() =>
     finalizeContentBilling({
