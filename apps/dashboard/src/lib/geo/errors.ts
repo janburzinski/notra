@@ -1,7 +1,33 @@
+import type { AgentTokenUsage } from "@notra/ai/types/agents";
+import type { FinishReason, LanguageModelUsage } from "ai";
 import { Data } from "effect";
 
 export class GeoScanError extends Data.TaggedError("GeoScanError")<{
   readonly message: string;
+  readonly cause?: unknown;
+}> {}
+
+export class GeoEmptyAnswerError extends Data.TaggedError(
+  "GeoEmptyAnswerError"
+)<{
+  readonly message: string;
+  readonly engine: string;
+  readonly promptId: string;
+  readonly language: string;
+  readonly finishReason: FinishReason | null;
+  readonly usage?: LanguageModelUsage;
+}> {}
+
+export class GeoJudgeError extends Data.TaggedError("GeoJudgeError")<{
+  readonly message: string;
+  readonly cause: unknown;
+}> {}
+
+export class GeoTranslationError extends Data.TaggedError(
+  "GeoTranslationError"
+)<{
+  readonly message: string;
+  readonly language: string;
   readonly cause?: unknown;
 }> {}
 
@@ -89,6 +115,12 @@ export class GeoSequenceNotFoundError extends Data.TaggedError(
 export class GeoSequenceCreateFailedError extends Data.TaggedError(
   "GeoSequenceCreateFailedError"
 )<Record<string, never>> {}
+
+export class GeoSequenceEmptyError extends Data.TaggedError(
+  "GeoSequenceEmptyError"
+)<{
+  readonly usage: AgentTokenUsage;
+}> {}
 
 export class GeoSequenceRunUnavailableError extends Data.TaggedError(
   "GeoSequenceRunUnavailableError"

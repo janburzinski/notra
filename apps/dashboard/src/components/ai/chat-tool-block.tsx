@@ -780,7 +780,6 @@ export function ChatToolBlock({
           <Shimmer
             as="span"
             className="min-w-0 truncate text-sm leading-5"
-            duration={1.8}
           >
             {subtitle}
           </Shimmer>

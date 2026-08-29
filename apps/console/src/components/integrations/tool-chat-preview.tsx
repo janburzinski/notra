@@ -4,7 +4,6 @@ import { ArrowDown01Icon, CpuIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import { cn } from "cnfast";
-import { domAnimation, LazyMotion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -106,18 +105,15 @@ export function ToolChatPreview({
       <p className="text-muted-foreground/70 text-[0.65rem] font-medium tracking-wider uppercase">
         In chat
       </p>
-      <LazyMotion features={domAnimation}>
-        <div className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
-          {icon}
-          <Shimmer
-            as="span"
-            className="min-w-0 truncate text-sm leading-5"
-            duration={1.8}
-          >
-            {runningText}
-          </Shimmer>
-        </div>
-      </LazyMotion>
+      <div className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
+        {icon}
+        <Shimmer
+          as="span"
+          className="min-w-0 truncate text-sm leading-5"
+        >
+          {runningText}
+        </Shimmer>
+      </div>
       <div className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
         {icon}
         <span className="inline-block min-w-0 truncate leading-5">
