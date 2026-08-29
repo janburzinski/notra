@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@notra/ui/cta-button.css";
+@import "@notra/ui/text-shimmer.css";
 
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 
@@ -332,12 +333,6 @@
 
 .thinking-letter {
   animation: thinking-letter 1.35s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
 }
 
 @keyframes chat-input-slide-down {

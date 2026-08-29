@@ -28,7 +28,6 @@ import { Kbd } from "@notra/ui/components/ui/kbd";
 import { cn } from "@notra/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Command as CommandPrimitive } from "cmdk";
-import { domAnimation, LazyMotion } from "motion/react";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
@@ -494,18 +493,14 @@ export function CommandPalette() {
               <div className="flex h-[14rem] flex-col items-center justify-center px-6 text-center">
                 <div className="text-foreground grid grid-cols-[1.125rem_auto_1.125rem] items-center gap-2 text-sm">
                   <BrailleSpinner className="text-[18px] leading-none" />
-                  <LazyMotion features={domAnimation}>
-                    <Shimmer
-                      as="span"
-                      className="font-medium"
-                      duration={1.6}
-                      spread={1.4}
-                    >
-                      {isNavigatingAi
-                        ? `${(aiState as { status: "navigating"; label: string }).label}…`
-                        : "Thinking…"}
-                    </Shimmer>
-                  </LazyMotion>
+                  <Shimmer
+                    as="span"
+                    className="font-medium"
+                  >
+                    {isNavigatingAi
+                      ? `${(aiState as { status: "navigating"; label: string }).label}…`
+                      : "Thinking…"}
+                  </Shimmer>
                   <span aria-hidden="true" />
                 </div>
                 <p className="text-muted-foreground mt-3 max-w-xs text-xs">
