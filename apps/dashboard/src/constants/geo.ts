@@ -315,6 +315,7 @@ export const GEO_SCAN_INTERVAL_HOURS = GEO_SCAN_INTERVAL_OPTIONS.map(
 export const GEO_SCAN_INTERVAL_LABEL_PREFIX = /^Every\s+/;
 export const GEO_SCAN_INTERVAL_FALLBACK_NOUN = "scan interval";
 export const GEO_SCAN_WORKFLOW_PATH = "/api/workflows/geo-scan";
+export const GEO_SCAN_NO_RESULTS_RETRY_DELAY = "5m";
 export const GEO_SCAN_STALE_MS = 2 * 60 * 60 * 1000;
 export const GEO_SCAN_POLL_INTERVAL_MS = 3000;
 export const GEO_START_SCAN_MUTATION_KEY = "geo-start-scan";

@@ -1,9 +1,14 @@
+import { sleep } from "workflow";
 import { flattenError } from "zod";
 
+import { GEO_SCAN_NO_RESULTS_RETRY_DELAY } from "@/constants/geo";
 import { geoOrganizationInputSchema } from "@/schemas/geo";
 import type { GeoScanPayload, GeoScanResult } from "@/types/geo";
 
-import { runGeoScanStep } from "./steps/geo-scan-steps";
+import {
+  retryGeoScanStep,
+  runGeoScanStep,
+} from "./steps/geo-scan-steps";
 
 export async function geoScanWorkflow(
   payload: GeoScanPayload
@@ -16,7 +21,16 @@ export async function geoScanWorkflow(
     return { status: "invalid_payload" };
   }
 
-  return await runGeoScanStep(
+  const result = await runGeoScanStep(
+    parseResult.data.organizationId,
+    parseResult.data.projectId
+  );
+  if (result.status !== "retry_no_successful_checks") {
+    return result;
+  }
+
+  await sleep(GEO_SCAN_NO_RESULTS_RETRY_DELAY);
+  return await retryGeoScanStep(
     parseResult.data.organizationId,
     parseResult.data.projectId
   );

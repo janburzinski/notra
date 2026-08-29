@@ -48,6 +48,7 @@ import {
 import {
   GeoEmptyAnswerError,
   GeoJudgeError,
+  GeoNoSuccessfulChecksError,
   GeoScanError,
   GeoSequenceEmptyError,
   GeoSequenceNotFoundError,
@@ -769,6 +770,15 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
     droppedChecks += result.droppedTurns;
     rows.push(...result.rows);
     usage = addTokenUsage(usage, result.usage);
+  }
+
+  if (droppedChecks > 0 && rows.length === 0) {
+    return yield* Effect.fail(
+      new GeoNoSuccessfulChecksError({
+        message: `No successful GEO checks from ${droppedChecks} attempts`,
+        attemptedChecks: droppedChecks,
+      })
+    );
   }
 
   yield* Effect.tryPromise({

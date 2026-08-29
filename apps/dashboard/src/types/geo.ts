@@ -520,6 +520,12 @@ export interface GeoScanResult {
   mentions?: number;
 }
 
+export interface GeoScanRetryResult {
+  status: "retry_no_successful_checks";
+}
+
+export type GeoScanStepResult = GeoScanResult | GeoScanRetryResult;
+
 export interface GeoProjectScanOutcome {
   checks: number;
   mentions: number;

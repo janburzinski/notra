@@ -7,6 +7,13 @@ export class GeoScanError extends Data.TaggedError("GeoScanError")<{
   readonly cause?: unknown;
 }> {}
 
+export class GeoNoSuccessfulChecksError extends Data.TaggedError(
+  "GeoNoSuccessfulChecksError"
+)<{
+  readonly message: string;
+  readonly attemptedChecks: number;
+}> {}
+
 export class GeoEmptyAnswerError extends Data.TaggedError(
   "GeoEmptyAnswerError"
 )<{
