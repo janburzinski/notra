@@ -493,10 +493,7 @@ export function CommandPalette() {
               <div className="flex h-[14rem] flex-col items-center justify-center px-6 text-center">
                 <div className="text-foreground grid grid-cols-[1.125rem_auto_1.125rem] items-center gap-2 text-sm">
                   <BrailleSpinner className="text-[18px] leading-none" />
-                  <Shimmer
-                    as="span"
-                    className="font-medium"
-                  >
+                  <Shimmer as="span" className="font-medium">
                     {isNavigatingAi
                       ? `${(aiState as { status: "navigating"; label: string }).label}…`
                       : "Thinking…"}

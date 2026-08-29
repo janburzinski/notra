@@ -777,10 +777,7 @@ export function ChatToolBlock({
       >
         {toolIcon}
         {isStreaming ? (
-          <Shimmer
-            as="span"
-            className="min-w-0 truncate text-sm leading-5"
-          >
+          <Shimmer as="span" className="min-w-0 truncate text-sm leading-5">
             {subtitle}
           </Shimmer>
         ) : (
