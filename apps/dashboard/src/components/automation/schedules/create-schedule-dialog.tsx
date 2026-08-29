@@ -227,11 +227,9 @@ export function CreateScheduleDialog({
 
   const brandVoices = brandResponse?.voices ?? [];
   const nonDefaultBrandVoices = brandVoices.filter((voice) => !voice.isDefault);
-  const defaultBrandVoiceName = brandVoices.find(
-    (voice) => voice.isDefault
-  )?.name;
-  const defaultBrandVoiceLabel = defaultBrandVoiceName
-    ? `${defaultBrandVoiceName} (Default)`
+  const defaultBrandVoice = brandVoices.find((voice) => voice.isDefault);
+  const defaultBrandVoiceLabel = defaultBrandVoice
+    ? `${defaultBrandVoice.name} (Default)`
     : "Default brand voice";
 
   const { integrationOptions, githubIntegrationId } = useMemo(() => {
@@ -584,6 +582,7 @@ export function CreateScheduleDialog({
                           emptyOption={{
                             label: defaultBrandVoiceLabel,
                             description: "Use your default brand voice.",
+                            voice: defaultBrandVoice,
                           }}
                           id={field.name}
                           label="Brand voice"
