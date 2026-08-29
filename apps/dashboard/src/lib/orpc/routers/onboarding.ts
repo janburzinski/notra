@@ -1,4 +1,4 @@
-import { retrieveBrand } from "@notra/ai/utils/context-dev";
+import { retrieveBrand, searchBrands } from "@notra/ai/utils/context-dev";
 import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
@@ -40,7 +40,7 @@ export const onboardingRouter = {
     .input(companyLogoInputSchema)
     .handler(async ({ context, input }) => {
       const { success: withinLimit } = await ratelimit.companyLogo.limit(
-        `${context.user.id}:${input.domain.toLowerCase()}`
+        `${context.user.id}:${input.query.toLowerCase()}`
       );
       if (!withinLimit) {
         throw new ORPCError("TOO_MANY_REQUESTS", {
@@ -49,10 +49,33 @@ export const onboardingRouter = {
       }
 
       try {
-        const response = await retrieveBrand(input.domain);
-        return { url: pickCompanyLogoUrl(response.brand?.logos) };
+        if (!input.searchByName) {
+          const response = await retrieveBrand(input.query);
+          return {
+            domain: response.brand?.domain ?? input.query,
+            url: pickCompanyLogoUrl(response.brand?.logos),
+          };
+        }
+
+        const response = await searchBrands(input.query);
+        const key = input.query.toLowerCase();
+        const brand =
+          response.results.find(
+            (result) => result.name.trim().toLowerCase() === key
+          ) ??
+          response.results.find(
+            (result) => result.domain.trim().toLowerCase() === key
+          ) ??
+          response.results[0];
+        return {
+          domain: brand?.domain ?? null,
+          url: brand?.logo || null,
+        };
       } catch {
-        return { url: null };
+        return {
+          domain: input.searchByName ? null : input.query,
+          url: null,
+        };
       }
     }),
   get: authorizedProcedure

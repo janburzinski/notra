@@ -2,7 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import type { NextRequest } from "next/server";
 
-import { COMPANY_LOGO_RATE_LIMIT_PER_DOMAIN_PER_MINUTE } from "@/constants/company-logo";
+import { COMPANY_LOGO_RATE_LIMIT_PER_QUERY_PER_MINUTE } from "@/constants/company-logo";
 
 const redis = Redis.fromEnv();
 
@@ -72,7 +72,7 @@ export const ratelimit = {
     analytics: true,
     prefix: "ratelimit:company-logo",
     limiter: Ratelimit.slidingWindow(
-      COMPANY_LOGO_RATE_LIMIT_PER_DOMAIN_PER_MINUTE,
+      COMPANY_LOGO_RATE_LIMIT_PER_QUERY_PER_MINUTE,
       "1m"
     ),
   }),

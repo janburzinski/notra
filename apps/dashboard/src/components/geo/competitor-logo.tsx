@@ -75,14 +75,15 @@ export function CompetitorLogo({
   className,
   onSettled,
 }: CompetitorLogoProps) {
-  const { data } = useCompanyLogo(domain);
+  const { data } = useCompanyLogo(domain, name);
+  const resolvedDomain = domain ?? data?.domain ?? null;
   const logo = data?.url ?? null;
 
   return (
     <CompetitorLogoInner
       className={className}
-      domain={domain}
-      key={`${domain ?? ""}:${name}:${logo ?? ""}`}
+      domain={resolvedDomain}
+      key={`${resolvedDomain ?? ""}:${name}:${logo ?? ""}`}
       logo={logo}
       name={name}
       onSettled={onSettled}

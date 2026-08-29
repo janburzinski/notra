@@ -39,11 +39,12 @@ export function useOnboardingStatus(
   );
 }
 
-export function useCompanyLogo(domain: string | null) {
+export function useCompanyLogo(domain: string | null, name?: string | null) {
+  const query = domain ?? name?.trim() ?? "";
   return useQuery(
     dashboardOrpc.onboarding.companyLogo.queryOptions({
-      input: { domain: domain ?? "" },
-      enabled: !!domain,
+      input: { query, searchByName: !domain },
+      enabled: query.length > 0,
       staleTime: COMPANY_LOGO_STALE_TIME_MS,
       retry: false,
     })
