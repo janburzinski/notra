@@ -8,7 +8,6 @@ import type {
   SharedV3ProviderMetadata,
 } from "@ai-sdk/provider";
 import {
-  HTTP_FORBIDDEN,
   HTTP_NOT_FOUND,
   HTTP_PAYMENT_REQUIRED,
   HTTP_SERVER_ERROR_MIN,
@@ -17,6 +16,7 @@ import {
   ROUTED_MODEL_PROVIDER,
   ROUTER_METADATA_KEY,
   ZDR_ERROR_PATTERN,
+  ZDR_REJECTION_STATUS_CODES,
 } from "@notra/ai/constants/router";
 import type {
   FallbackReason,
@@ -43,11 +43,40 @@ function readStatusCode(error: unknown): number | undefined {
   return typeof candidate === "number" ? candidate : undefined;
 }
 
-function readMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
+function readBodyText(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
   }
-  return typeof error === "string" ? error : "";
+  if (typeof value !== "object" || value === null) {
+    return "";
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Message plus any response body the SDK attached. The gateway error classes
+ * keep an unparsed body on `response` (and the core `APICallError` on
+ * `responseBody`), and that is where rejection types like
+ * `no_providers_available` live when the body does not fit the SDK's schema.
+ */
+function readMessage(error: unknown): string {
+  if (typeof error === "string") {
+    return error;
+  }
+  if (typeof error !== "object" || error === null) {
+    return "";
+  }
+  const record = error as Record<string, unknown>;
+  const parts = [
+    error instanceof Error ? error.message : "",
+    readBodyText(record.response),
+    readBodyText(record.responseBody),
+  ];
+  return parts.filter((part) => part.length > 0).join(" ");
 }
 
 function readIsRetryable(error: unknown): boolean {
@@ -72,9 +101,14 @@ export function classifyUpstreamFailure(
   if (status === HTTP_PAYMENT_REQUIRED) {
     return "no-credits";
   }
-  if (status === HTTP_FORBIDDEN && ZDR_ERROR_PATTERN.test(readMessage(error))) {
-    // The gateway refused to honour the zero-data-retention requirement
-    // (e.g. Vercel ZDR is Pro/Enterprise only). The route is not compliant.
+  if (
+    status !== undefined &&
+    ZDR_REJECTION_STATUS_CODES.has(status) &&
+    ZDR_ERROR_PATTERN.test(readMessage(error))
+  ) {
+    // The gateway refused to honour the zero-data-retention requirement:
+    // Vercel answers 400 when no ZDR provider serves the model and 403 when
+    // the team plan lacks ZDR. Either way the route is not compliant.
     return "non-compliant";
   }
   if (
