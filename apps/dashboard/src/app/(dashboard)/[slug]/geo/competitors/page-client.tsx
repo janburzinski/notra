@@ -3,18 +3,18 @@
 import { PlusSignIcon, Upload01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Kbd } from "@notra/ui/components/ui/kbd";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useHotkey } from "@tanstack/react-hotkeys";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
-import { CompetitorEditDialog } from "@/components/geo/competitor-edit-dialog";
-import { CompetitorShareCard } from "@/components/geo/competitor-share-card";
 import { CompetitorsTable } from "@/components/geo/competitors-table";
-import { CompetitorsCsvImportDialog } from "@/components/geo/geo-csv-import-dialog";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
+import { GeoSectionSkeleton } from "@/components/geo/skeleton-parts";
 import { PageContainer } from "@/components/layout/container";
 import {
   GeoProjectProvider,
@@ -36,6 +36,34 @@ import { useGeoRange } from "@/lib/hooks/use-geo-range";
 import { withGeoProject } from "@/utils/geo-paths";
 
 import { GeoPageSkeleton } from "../skeleton";
+
+const loadCompetitorEditDialog = () =>
+  import("@/components/geo/competitor-edit-dialog").then(
+    (module) => module.CompetitorEditDialog
+  );
+const loadCompetitorsCsvImportDialog = () =>
+  import("@/components/geo/geo-csv-import-dialog").then(
+    (module) => module.CompetitorsCsvImportDialog
+  );
+
+const CompetitorEditDialog = dynamic(loadCompetitorEditDialog, { ssr: false });
+const CompetitorsCsvImportDialog = dynamic(loadCompetitorsCsvImportDialog, {
+  ssr: false,
+});
+const CompetitorShareCard = dynamic(
+  () =>
+    import("@/components/geo/competitor-share-card").then(
+      (module) => module.CompetitorShareCard
+    ),
+  {
+    loading: () => (
+      <GeoSectionSkeleton eyebrow="Share of voice">
+        <Skeleton className="h-64 w-full rounded-xl" />
+      </GeoSectionSkeleton>
+    ),
+    ssr: false,
+  }
+);
 
 interface PageClientProps {
   organizationSlug: string;
@@ -65,7 +93,8 @@ function GeoCompetitorsPageContent({ organizationSlug }: PageClientProps) {
   const { data: settingsData, isPending } = useGeoSettings(organizationId);
   const { data: competitorShare } = useGeoCompetitorShare(
     organizationId,
-    geoRange.query
+    geoRange.query,
+    true
   );
   const { competitors } = useGeoCompetitorsDb(organizationId);
   const isScanning = useIsGeoScanning(organizationId);
@@ -134,12 +163,19 @@ function GeoCompetitorsPageContent({ organizationSlug }: PageClientProps) {
             <Button
               className="gap-1.5"
               onClick={() => setImportOpen(true)}
+              onFocus={loadCompetitorsCsvImportDialog}
+              onMouseEnter={loadCompetitorsCsvImportDialog}
               variant="outline"
             >
               <HugeiconsIcon className="size-4" icon={Upload01Icon} />
               Import CSV
             </Button>
-            <Button className="gap-1.5" onClick={() => setManagerOpen(true)}>
+            <Button
+              className="gap-1.5"
+              onClick={() => setManagerOpen(true)}
+              onFocus={loadCompetitorEditDialog}
+              onMouseEnter={loadCompetitorEditDialog}
+            >
               <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
               Add Competitor
               <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
@@ -163,17 +199,21 @@ function GeoCompetitorsPageContent({ organizationSlug }: PageClientProps) {
           points={competitorShare?.points ?? []}
         />
       </div>
-      <CompetitorEditDialog
-        competitor={null}
-        onOpenChange={setManagerOpen}
-        open={managerOpen}
-        organizationId={organizationId}
-      />
-      <CompetitorsCsvImportDialog
-        onOpenChange={setImportOpen}
-        open={importOpen}
-        organizationId={organizationId}
-      />
+      {managerOpen ? (
+        <CompetitorEditDialog
+          competitor={null}
+          onOpenChange={setManagerOpen}
+          open
+          organizationId={organizationId}
+        />
+      ) : null}
+      {importOpen ? (
+        <CompetitorsCsvImportDialog
+          onOpenChange={setImportOpen}
+          open
+          organizationId={organizationId}
+        />
+      ) : null}
     </PageContainer>
   );
 }

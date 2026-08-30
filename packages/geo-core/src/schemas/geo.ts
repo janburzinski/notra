@@ -207,6 +207,10 @@ export const geoTimeseriesInputSchema = geoOrganizationInputSchema.extend({
   ...geoWindowFields,
 });
 
+export const geoCompetitorShareInputSchema = geoTimeseriesInputSchema.extend({
+  summaryOnly: boolean().optional(),
+});
+
 export const geoPromptCreateInputSchema = geoOrganizationInputSchema.extend({
   id: string().uuid().optional(),
   prompt: string().min(MIN_PROMPT_LENGTH).max(MAX_PROMPT_LENGTH),

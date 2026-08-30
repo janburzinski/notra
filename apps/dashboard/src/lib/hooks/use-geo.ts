@@ -268,12 +268,18 @@ export function useGeoPromptResults(
 
 export function useGeoCompetitorShare(
   organizationId: string,
-  range?: GeoRangeQuery
+  range?: GeoRangeQuery,
+  summaryOnly = false
 ) {
   const { projectId } = useGeoProjectScope();
   return useQuery<GeoCompetitorShareResponse>({
     ...dashboardOrpc.geo.competitorShare.queryOptions({
-      input: { organizationId, projectId, ...toGeoWindowInput(range) },
+      input: {
+        organizationId,
+        projectId,
+        ...toGeoWindowInput(range),
+        summaryOnly: summaryOnly || undefined,
+      },
     }),
     enabled: !!organizationId,
     placeholderData: keepPreviousData,

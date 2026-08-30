@@ -706,10 +706,36 @@ export const loadGeoPromptResults = Effect.fn("geo.promptResults")(function* (
 });
 
 export const loadGeoCompetitorShare = Effect.fn("geo.competitorShare")(
-  function* (input: GeoScopeInput, window: GeoWindowInput) {
+  function* (
+    input: GeoScopeInput,
+    window: GeoWindowInput,
+    summaryOnly = false
+  ) {
     const scope = yield* resolveGeoScope(input);
     const checkScope = geoCheckScope(scope);
     const checkWindow = toGeoCheckWindow(window);
+
+    if (summaryOnly) {
+      // The competitors page only renders aggregate shares. Avoid the two
+      // additional full-range scans used for overview sparklines and charts.
+      const rows = yield* geoDb("competitor share query failed", () =>
+        queryGeoCheckCompetitorShare(
+          checkScope,
+          checkWindow,
+          GEO_COMPETITOR_SHARE_LIMIT
+        )
+      );
+      const response: GeoCompetitorShareResponse = {
+        configured: true,
+        points: rows.map((row) => ({
+          brand: row.brand,
+          mentions: row.mentions,
+        })),
+        timeseries: [],
+      };
+      return response;
+    }
+
     const [rows, timeseries, trendRows] = yield* Effect.all(
       [
         geoDb("competitor share query failed", () =>
