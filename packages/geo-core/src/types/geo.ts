@@ -434,6 +434,13 @@ export interface GeoCheckTask {
   zdr: GeoZdrMode;
 }
 
+/** Log context for the scan-time ZDR entitlement re-check. */
+export interface GeoScanZdrPolicyFields {
+  projectId: string;
+  scanId?: string;
+  sequenceId?: string;
+}
+
 /** Per-project ZDR inputs needed to decide how an engine may run. */
 export interface GeoZdrPolicy {
   enforceZdr: boolean;

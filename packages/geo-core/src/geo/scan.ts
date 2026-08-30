@@ -41,7 +41,7 @@ import {
   GEO_SEQUENCE_MAX_TURNS,
   GEO_TRANSLATION_MAX_TOKENS,
 } from "../constants/geo";
-import { GeoContentBillingService, GeoEntitlementService } from "../deps";
+import { GeoContentBillingService } from "../deps";
 import {
   geoJudgeResultSchema,
   geoTranslationResultSchema,
@@ -67,7 +67,6 @@ import type {
   GeoSettingsRow,
   GeoSkipFields,
   GeoZdrMode,
-  GeoZdrPolicy,
 } from "../types/geo";
 import {
   resolveGeoEngineGateway,
@@ -115,6 +114,7 @@ import {
   renewGeoScanRun,
   withGeoScanRun,
 } from "./scan-status";
+import { resolveScanZdrPolicy } from "./zdr-policy";
 
 const MAX_JUDGE_COMPETITORS = 10;
 const GROUNDED_MAX_STEPS = 4;
@@ -465,41 +465,6 @@ const requireAnswerText = Effect.fn("geo.requireAnswerText")(function* (
       usage: answer.usage,
     })
   );
-});
-
-/**
- * Re-check the ZDR entitlement when a scan runs, not just when settings were
- * saved. Without the add-on no engine gets the ZDR flag; a stored "enforce"
- * flag from a lapsed add-on is dropped and logged. A billing outage keeps
- * enforcement so a paying organization never loses ZDR to a blip.
- */
-const resolveScanZdrPolicy = Effect.fn("geo.resolveZdrPolicy")(function* (
-  organizationId: string,
-  settings: GeoZdrPolicy,
-  fields: { projectId: string; scanId?: string; sequenceId?: string }
-) {
-  const entitlements = yield* GeoEntitlementService;
-  const entitlement = yield* entitlements.resolveZdrEntitlement(organizationId);
-  if (entitlement !== "not_entitled") {
-    const policy: GeoZdrPolicy = {
-      enforceZdr: settings.enforceZdr,
-      nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
-    };
-    return policy;
-  }
-  if (settings.enforceZdr) {
-    yield* geoLogWarn({
-      event: "geo.scan.zdr_unentitled",
-      organizationId,
-      ...fields,
-    });
-  }
-  const unentitled: GeoZdrPolicy = {
-    enforceZdr: false,
-    nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
-    nonEnforcedMode: "none",
-  };
-  return unentitled;
 });
 
 const runGeoCheck = Effect.fn("geo.runCheck")(function* (

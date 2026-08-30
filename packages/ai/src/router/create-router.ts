@@ -17,9 +17,9 @@ import type {
 import { createCreditTracker } from "./credits";
 import { GatewayCreditBalanceError } from "./errors";
 import { RoutedLanguageModel } from "./lazy-model";
-import { createMemoryTtlCache } from "./plan-cache";
 import { otherGateway } from "./policy";
 import { resolveRoute } from "./resolve";
+import { createMemoryTtlCache } from "./ttl-cache";
 
 const noopLogger: RouterLogger = {
   info: () => undefined,
