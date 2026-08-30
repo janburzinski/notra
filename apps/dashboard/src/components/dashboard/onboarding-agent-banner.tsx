@@ -55,7 +55,7 @@ export function OnboardingAgentBanner({
 
   return (
     <div
-      className="relative isolate flex h-(--eve-banner-height) w-full shrink-0 items-center justify-center overflow-hidden"
+      className="relative isolate flex h-full w-full items-center justify-center overflow-hidden"
       style={{ backgroundColor: colors.colorBack }}
     >
       <Dithering

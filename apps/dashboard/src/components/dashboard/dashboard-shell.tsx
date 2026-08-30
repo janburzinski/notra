@@ -2,6 +2,7 @@
 
 import { SidebarInset, SidebarProvider } from "@notra/ui/components/ui/sidebar";
 import { cn } from "@notra/ui/lib/utils";
+import { useReducedMotion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -36,7 +37,13 @@ export function DashboardShell({
     useOnboardingAgentBannerDismissal(organizationId);
   const running = data?.running ?? false;
   const canStart = !!data && !data.ran && !running && !dismissed;
-  const visible = running || canStart;
+  const bannerAvailable = running || canStart;
+  const [dismissingOrganizationId, setDismissingOrganizationId] = useState<
+    string | null
+  >(null);
+  const dismissing = dismissingOrganizationId === organizationId;
+  const visible = bannerAvailable && !dismissing;
+  const shouldReduceMotion = useReducedMotion();
   const starting =
     runAgent.isPending && runAgent.variables?.organizationId === organizationId;
   const shellStyle: DashboardShellStyle = {
@@ -45,6 +52,10 @@ export function DashboardShell({
   const pathname = usePathname();
   const mainScrollRef = useRef<HTMLDivElement>(null);
   const [mainScrolled, setMainScrolled] = useState(false);
+
+  useEffect(() => {
+    setDismissingOrganizationId(null);
+  }, [organizationId]);
 
   useEffect(() => {
     const el = mainScrollRef.current;
@@ -77,18 +88,54 @@ export function DashboardShell({
     );
   };
 
+  const handleBannerExitComplete = () => {
+    if (!dismissing) {
+      return;
+    }
+
+    setDismissingOrganizationId(null);
+  };
+
+  const handleDismiss = () => {
+    if (shouldReduceMotion) {
+      dismiss();
+      return;
+    }
+
+    setDismissingOrganizationId(organizationId);
+    dismiss();
+  };
+
   return (
     <div
       className="flex h-svh flex-col overflow-hidden overscroll-none"
       style={shellStyle}
     >
-      {visible ? (
-        <OnboardingAgentBanner
-          onDismiss={dismiss}
-          onStart={handleStart}
-          starting={starting}
-          state={running ? "running" : "idle"}
-        />
+      {bannerAvailable || dismissing ? (
+        <div
+          className={cn(
+            "w-full shrink-0 overflow-hidden transition-[max-height,opacity] duration-200 ease-out motion-reduce:transition-none",
+            visible ? "opacity-100" : "opacity-0"
+          )}
+          onTransitionEnd={(event) => {
+            if (
+              event.target === event.currentTarget &&
+              event.propertyName === "max-height"
+            ) {
+              handleBannerExitComplete();
+            }
+          }}
+          style={{ maxHeight: visible ? EVE_BANNER_HEIGHT : "0rem" }}
+        >
+          <div style={{ height: EVE_BANNER_HEIGHT }}>
+            <OnboardingAgentBanner
+              onDismiss={handleDismiss}
+              onStart={handleStart}
+              starting={starting}
+              state={running ? "running" : "idle"}
+            />
+          </div>
+        </div>
       ) : null}
       <SidebarProvider
         className="min-h-0! flex-1 overflow-hidden overscroll-none"
@@ -96,7 +143,7 @@ export function DashboardShell({
       >
         <DashboardSidebar
           className={cn(
-            "md:top-(--eve-banner-height) md:h-[calc(100svh-var(--eve-banner-height))]",
+            "transition-[left,right,width,top,height] [transition-duration:var(--sidebar-duration),var(--sidebar-duration),var(--sidebar-duration),200ms,200ms] [transition-timing-function:var(--sidebar-ease),var(--sidebar-ease),var(--sidebar-ease),ease-out,ease-out] motion-reduce:transition-none md:top-(--eve-banner-height) md:h-[calc(100svh-var(--eve-banner-height))]",
             visible && "md:pt-0!"
           )}
           variant="inset"

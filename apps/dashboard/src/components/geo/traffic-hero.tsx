@@ -1,11 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
-import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
-import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
-import { TrafficProviderLegend } from "@/components/geo/traffic-provider-legend";
-import { CHART_PRIMARY_COLOR, CHART_SECONDARY_COLOR } from "@/constants/charts";
 import {
   GEO_SPARKLINE_MIN_POINTS,
   GEO_TRAFFIC_TREND_CRAWLER_KEY,
@@ -14,11 +8,21 @@ import {
   GEO_TRAFFIC_TREND_REFERRAL_LABEL,
   GEO_TRAFFIC_TREND_TOTAL_KEY,
   GEO_TRAFFIC_TREND_TOTAL_LABEL,
-} from "@/constants/geo";
+} from "@notra/geo-core/constants/geo";
+import {
+  trafficSparklineDays,
+  trafficVisitDelta,
+} from "@notra/geo-core/utils/ai-traffic";
+import { todayIsoDate } from "@notra/geo-core/utils/day-label";
+import { useState } from "react";
+
+import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
+import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
+import { TrafficProviderLegend } from "@/components/geo/traffic-provider-legend";
+import { CHART_PRIMARY_COLOR, CHART_SECONDARY_COLOR } from "@/constants/charts";
 import { cn } from "@/lib/utils";
 import type { ChartConfig, TooltipRowGroup } from "@/types/charts";
 import type { TrafficHeroProps, TrafficTrendMetric } from "@/types/geo";
-import { trafficSparklineDays, trafficVisitDelta } from "@/utils/ai-traffic";
 import {
   buildTrafficTrendProviders,
   buildTrafficTrendRowsForProviders,
@@ -26,7 +30,6 @@ import {
   toggleTrafficTrendKey,
   trafficTrendProviderTypeKey,
 } from "@/utils/ai-traffic-trend";
-import { todayIsoDate } from "@/utils/analytics-charts";
 import { seriesColors } from "@/utils/chart-colors";
 import { engineIconHtml } from "@/utils/engine-icon-html";
 import { formatChartInteger } from "@/utils/geo-charts";

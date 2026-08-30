@@ -7,6 +7,21 @@ import {
   Upload01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  GEO_CSV_IMPORT_ACCEPT,
+  GEO_CSV_IMPORT_MAX_BYTES,
+  GEO_CSV_IMPORT_MAX_ISSUES_SHOWN,
+  GEO_IMPORT_COPY,
+} from "@notra/geo-core/constants/geo-import";
+import {
+  parseCompetitorsCsv,
+  parsePromptsCsv,
+  readGeoCsvFile,
+} from "@notra/geo-core/geo/csv-import";
+import type {
+  GeoCsvIssue,
+  GeoCsvSelection,
+} from "@notra/geo-core/types/geo-import";
 import { Dropzone } from "@notra/ui/components/kibo-ui/dropzone";
 import {
   ResponsiveDialog,
@@ -23,27 +38,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/button";
 import { StatusSpinner } from "@/components/geo/status-spinner";
 import {
-  GEO_CSV_IMPORT_ACCEPT,
-  GEO_CSV_IMPORT_MAX_BYTES,
-  GEO_CSV_IMPORT_MAX_ISSUES_SHOWN,
-  GEO_IMPORT_COPY,
-} from "@/constants/geo-import";
-import {
-  parseCompetitorsCsv,
-  parsePromptsCsv,
-  readGeoCsvFile,
-} from "@/lib/geo/csv-import";
-import {
   useGeoImportCompetitors,
   useGeoImportPrompts,
 } from "@/lib/hooks/use-geo";
 import { cn } from "@/lib/utils";
 import type {
   GeoCsvImportDialogProps,
-  GeoCsvIssue,
-  GeoCsvSelection,
   GeoImportDialogProps,
-} from "@/types/geo-import";
+} from "@/types/components/geo";
 import { downloadBlob } from "@/utils/download";
 import { formatCsvFileSize, geoImportNoun } from "@/utils/geo-import";
 

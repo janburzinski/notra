@@ -1,4 +1,7 @@
-import type { GeoOverviewEngine, GeoTimeseriesPoint } from "@/types/geo";
+import type {
+  GeoOverviewEngine,
+  GeoTimeseriesPoint,
+} from "@notra/geo-core/types/geo";
 
 const PROVIDERS = [
   { engine: "openai/gpt-5.4-grounded", baseline: 18, growth: 0.5 },
@@ -64,3 +67,10 @@ export const DESIGN_SYSTEM_GEO_OVERVIEW: GeoOverviewEngine[] = PROVIDERS.map(
     };
   }
 );
+
+export const DESIGN_SYSTEM_GEO_TRACKED_ENGINES: readonly string[] = [
+  ...PROVIDERS.filter(
+    (provider) => !provider.engine.startsWith("mistral/")
+  ).map((provider) => provider.engine),
+  "deepseek/deepseek-v4-pro",
+];

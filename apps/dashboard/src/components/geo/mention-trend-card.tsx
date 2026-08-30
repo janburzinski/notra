@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  GEO_MENTION_ACTIVITY_LABEL,
+  GEO_MENTION_TREND_LINE_KEY,
+  GEO_MENTION_TREND_LINE_LABEL,
+  GEO_MENTION_TREND_TOTAL_KEY,
+  GEO_MENTION_TREND_TOTAL_LABEL,
+} from "@notra/geo-core/constants/geo";
+import type { MentionTrendRow } from "@notra/geo-core/types/geo";
+import { todayIsoDate } from "@notra/geo-core/utils/day-label";
+import { geoScanEmptyMessage } from "@notra/geo-core/utils/geo-scan";
 import { useCallback, useMemo, useState } from "react";
 
 import { EmptyStateTrendPreview } from "@/components/empty-state-preview";
@@ -10,20 +20,9 @@ import {
   InstrumentModule,
 } from "@/components/instrument/instrument-module";
 import { CHART_MUTED_COLOR, CHART_PRIMARY_COLOR } from "@/constants/charts";
-import {
-  GEO_MENTION_ACTIVITY_LABEL,
-  GEO_MENTION_TREND_LINE_KEY,
-  GEO_MENTION_TREND_LINE_LABEL,
-  GEO_MENTION_TREND_TOTAL_KEY,
-  GEO_MENTION_TREND_TOTAL_LABEL,
-} from "@/constants/geo";
 import type { ChartConfig } from "@/types/charts";
-import type {
-  MentionTrendCardProps,
-  MentionTrendRow,
-  MentionTrendSeries,
-} from "@/types/geo";
-import { formatFullDayLabel, todayIsoDate } from "@/utils/analytics-charts";
+import type { MentionTrendCardProps, MentionTrendSeries } from "@/types/geo";
+import { formatFullDayLabel } from "@/utils/analytics-charts";
 import { accountSeriesColors, seriesColors } from "@/utils/chart-colors";
 import { chartKey } from "@/utils/chart-keys";
 import { engineIconHtml } from "@/utils/engine-icon-html";
@@ -34,7 +33,6 @@ import {
   formatEngineFamily,
   mentionTrendEmptyLabel,
 } from "@/utils/geo-charts";
-import { geoScanEmptyMessage } from "@/utils/geo-scan";
 
 const TOTAL_STROKE_WIDTH = 2;
 const ENGINE_STROKE_WIDTH = 1.5;

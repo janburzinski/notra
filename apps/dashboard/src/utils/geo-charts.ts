@@ -1,17 +1,11 @@
 import {
-  CHART_MIN_BAR_PERCENT,
-  CHART_OTHER_SLICE_LABEL,
-  CHART_PERCENT_SCALE,
-} from "@/constants/charts";
-import {
-  GEO_BRAND_LABELS,
   GEO_ENGINE_LABELS,
   GEO_MENTION_TREND_BACKFILL_DAYS,
   GEO_MENTION_TREND_TOTAL_KEY,
   GEO_SEARCH_LABEL,
   GEO_SHARE_OF_VOICE_TOP_BRANDS,
   GEO_SPARKLINE_MIN_POINTS,
-} from "@/constants/geo";
+} from "@notra/geo-core/constants/geo";
 import type {
   EngineFamilyModeTrendRow,
   EngineFamilyStatTrends,
@@ -34,16 +28,24 @@ import type {
   ShareOfVoiceBreakdown,
   ShareOfVoiceDonutSlice,
   ShareOfVoiceRow,
-} from "@/types/geo";
-import { formatDayLabel, todayIsoDate } from "@/utils/analytics-charts";
-import { chartKey } from "@/utils/chart-keys";
-import { mergeCompetitorSharePoints } from "@/utils/geo-competitors";
-import { resolveEngineIconKey } from "@/utils/geo-engine-icon";
+} from "@notra/geo-core/types/geo";
+import { formatDayLabel, todayIsoDate } from "@notra/geo-core/utils/day-label";
 import {
-  GROUNDED_SUFFIX_PATTERN,
-  isGroundedEngine,
-} from "@/utils/geo-presence";
-import { sumGeoSparklinePoints } from "@/utils/geo-sparkline";
+  engineFamilyLabel,
+  engineFamilyOf,
+  engineModelOf,
+} from "@notra/geo-core/utils/geo-engine-family";
+import { isGroundedEngine } from "@notra/geo-core/utils/geo-presence";
+import { sumGeoSparklinePoints } from "@notra/geo-core/utils/geo-sparkline";
+
+import {
+  CHART_MIN_BAR_PERCENT,
+  CHART_OTHER_SLICE_LABEL,
+  CHART_PERCENT_SCALE,
+} from "@/constants/charts";
+
+import { chartKey } from "./chart-keys";
+import { mergeCompetitorSharePoints } from "./geo-competitors";
 
 const GPT_PREFIX_PATTERN = /^gpt-/i;
 const MINI_SUFFIX_PATTERN = /-mini$/i;
@@ -370,23 +372,6 @@ export function buildMentionTrendRows(
   return { rows, engines: ranked };
 }
 
-export function engineModelOf(engine: string): string {
-  return engine.replace(GROUNDED_SUFFIX_PATTERN, "");
-}
-
-export function engineFamilyOf(engine: string): string {
-  return resolveEngineIconKey(engine) ?? engineModelOf(engine);
-}
-
-export function engineFamilyLabel(family: string): string {
-  return (
-    GEO_BRAND_LABELS[family] ??
-    GEO_ENGINE_LABELS[family] ??
-    GEO_ENGINE_LABELS[`${family}-grounded`] ??
-    family
-  );
-}
-
 export function engineVariantLabel(model: string, brandLabel: string): string {
   const label = engineFamilyLabel(model);
   const prefix = `${brandLabel} `;
@@ -666,13 +651,21 @@ export function buildMentionProviderRows(
     withTrackedMentionEngines(scanned, options?.trackedEngines)
   );
   const points = options?.timeseriesPoints ?? [];
+  const trackedFamilies = new Set(
+    (options?.trackedEngines ?? []).map((engine) => engineFamilyOf(engine))
+  );
   return families
     .map((family) => ({
       family,
       totals: engineFamilyTotals(family) ?? EMPTY_FAMILY_TOTALS,
       mentionDelta: engineFamilyStatTrends(points, family.family).mentionDelta,
+      tracked: trackedFamilies.size === 0 || trackedFamilies.has(family.family),
     }))
     .sort(compareMentionProviderRows);
+}
+
+export function mentionMoreModelsLabel(count: number): string {
+  return count === 1 ? "1 more model" : `${count.toLocaleString()} more models`;
 }
 
 function sumFamilyWindow(

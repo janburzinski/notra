@@ -1,7 +1,11 @@
+import type {
+  GeoCsvParseResult,
+  GeoImportKind,
+} from "@notra/geo-core/types/geo-import";
+import type { GeoSearchConsoleStatus } from "@notra/geo-core/types/google-search-console";
 import type { ReactNode } from "react";
 
 import type { GeoPromptSuggestion } from "@/types/geo";
-import type { GeoSearchConsoleStatus } from "@/types/google-search-console";
 
 export interface PromptSuggestionsProps {
   organizationId: string;
@@ -70,4 +74,19 @@ export interface GeoUpgradeDialogProps {
   slug: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+export interface GeoCsvImportDialogProps<TRow> {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  kind: GeoImportKind;
+  parse: (text: string) => GeoCsvParseResult<TRow>;
+  onImport: (rows: TRow[]) => Promise<unknown>;
+  isPending: boolean;
+}
+
+export interface GeoImportDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  organizationId: string;
 }
