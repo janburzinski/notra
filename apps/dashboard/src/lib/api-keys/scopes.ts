@@ -6,7 +6,6 @@ import {
 
 import {
   API_KEY_ACCESS_MODE_VALUES,
-  API_KEY_DEFAULT_SCOPES,
   API_KEY_GEO_SCOPES,
   API_KEY_GRANULAR_PERMISSIONS,
   API_KEY_GRANULAR_READ_PERMISSIONS,
@@ -19,6 +18,10 @@ import type {
   ApiKeyGranularScope,
   ApiKeyScopeGroup,
 } from "@/types/api-keys";
+
+const READ_SCOPE_SET: ReadonlySet<string> = new Set(
+  API_KEY_GRANULAR_READ_PERMISSIONS
+);
 
 export const API_KEY_SCOPE_GROUPS: ApiKeyScopeGroup[] =
   API_KEY_SCOPE_RESOURCES.map((resource) => ({
@@ -123,7 +126,9 @@ export function getApiKeyScopesForAccessMode(
   if (getApiKeyAccessMode(currentScopes) === "restricted") {
     return sortApiKeyScopes([...currentScopes]);
   }
-  return [...API_KEY_DEFAULT_SCOPES];
+  return sortApiKeyScopes(
+    currentScopes.filter((scope) => READ_SCOPE_SET.has(scope))
+  );
 }
 
 export function summarizeApiKeyScopes(scopes: readonly string[]) {

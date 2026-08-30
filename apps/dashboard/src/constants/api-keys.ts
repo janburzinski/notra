@@ -27,12 +27,11 @@ export const API_KEY_ACCEPTED_PERMISSIONS = API_ACCEPTED_SCOPES;
 
 export const API_KEY_DEFAULT_SCOPES = API_READ_SCOPES;
 
-export const API_KEY_GEO_SCOPES = API_SCOPE_RESOURCES.filter(
-  (resource) => resource.openApiTag === "GEO"
-).flatMap((resource) => [
-  getApiScopeId(resource.id, "read"),
-  getApiScopeId(resource.id, "write"),
-]);
+export const API_KEY_GEO_SCOPES = API_SCOPE_RESOURCES.flatMap((resource) =>
+  resource.openApiTag === "GEO"
+    ? [getApiScopeId(resource.id, "read"), getApiScopeId(resource.id, "write")]
+    : []
+);
 
 export const API_KEY_ACCESS_MODE_VALUES = [
   "full",

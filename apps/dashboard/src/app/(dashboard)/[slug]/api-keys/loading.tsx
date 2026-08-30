@@ -30,7 +30,7 @@ export default function Loading() {
             </Button>
           </div>
         </div>
-        <div className="border-border/80 border-b-border/40 bg-muted/80 overflow-hidden rounded-lg border shadow-2xs">
+        <div className="smooth-shadow-ring-xs bg-muted/80 overflow-hidden rounded-lg">
           <div className="bg-background space-y-3 rounded-t-lg p-4">
             {SKELETON_ROW_KEYS.map((key) => (
               <div className="flex items-center gap-4 py-2" key={key}>

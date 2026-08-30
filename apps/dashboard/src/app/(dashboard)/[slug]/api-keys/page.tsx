@@ -462,7 +462,7 @@ function ApiKeysTable({
   onSort: () => void;
 }) {
   return (
-    <div className="border-border/80 border-b-border/40 bg-muted/80 overflow-hidden rounded-lg border shadow-2xs">
+    <div className="smooth-shadow-ring-xs bg-muted/80 overflow-hidden rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>
