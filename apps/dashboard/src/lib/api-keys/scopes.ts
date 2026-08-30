@@ -6,6 +6,7 @@ import {
 
 import {
   API_KEY_ACCESS_MODE_VALUES,
+  API_KEY_DEFAULT_SCOPES,
   API_KEY_GEO_SCOPES,
   API_KEY_GRANULAR_PERMISSIONS,
   API_KEY_GRANULAR_READ_PERMISSIONS,
@@ -111,7 +112,7 @@ export function getApiKeyAccessMode(
 
 export function getApiKeyScopesForAccessMode(
   mode: ApiKeyAccessMode,
-  restrictedScopes: readonly string[]
+  currentScopes: readonly string[]
 ): ApiKeyGranularScope[] {
   if (mode === "full") {
     return [...API_KEY_GRANULAR_PERMISSIONS];
@@ -119,7 +120,10 @@ export function getApiKeyScopesForAccessMode(
   if (mode === "geo") {
     return [...API_KEY_GEO_SCOPES];
   }
-  return sortApiKeyScopes([...restrictedScopes]);
+  if (getApiKeyAccessMode(currentScopes) === "restricted") {
+    return sortApiKeyScopes([...currentScopes]);
+  }
+  return [...API_KEY_DEFAULT_SCOPES];
 }
 
 export function summarizeApiKeyScopes(scopes: readonly string[]) {

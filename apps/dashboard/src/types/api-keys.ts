@@ -52,16 +52,13 @@ export interface ApiKeyRevealFieldProps {
 }
 
 export interface ApiKeyPermissionSelectorProps {
-  accessMode: ApiKeyAccessMode;
   value: string[];
-  onAccessModeChange: (mode: ApiKeyAccessMode) => void;
   onValueChange: (scopes: string[]) => void;
   disabled?: boolean;
   className?: string;
 }
 
 export interface ApiKeyFormValues {
-  accessMode: ApiKeyAccessMode;
   keyId: string;
   name: string;
   scopes: string[];

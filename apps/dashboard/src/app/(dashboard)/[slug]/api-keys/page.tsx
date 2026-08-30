@@ -94,44 +94,35 @@ import { Button } from "@/components/button";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
-  API_KEY_ACCESS_MODE_VALUES,
   API_KEY_DEFAULT_SCOPES,
   API_KEY_EXPIRATION_OPTIONS,
   API_KEY_EXPIRATION_VALUES,
   API_KEY_PERMISSION_SUMMARY,
 } from "@/constants/api-keys";
 import { API_KEY_CARD_ITEMS, API_KEY_PRESETS } from "@/lib/api-keys/presets";
-import {
-  expandLegacyApiKeyScopes,
-  getApiKeyAccessMode,
-  getApiKeyScopesForAccessMode,
-} from "@/lib/api-keys/scopes";
+import { expandLegacyApiKeyScopes } from "@/lib/api-keys/scopes";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { CreateApiKeyInput, UpdateApiKeyInput } from "@/schemas/api-keys";
 import { createApiKeySchema, updateApiKeySchema } from "@/schemas/api-keys";
 import type {
-  ApiKeyAccessMode,
   ApiKeyCreateConfig,
   ApiKeyExpiration,
   ApiKeyFormValues,
 } from "@/types/api-keys";
 
 const NEW_KEY_CONFIG_PARSERS = {
-  accessMode: parseAsStringLiteral(API_KEY_ACCESS_MODE_VALUES),
   name: parseAsString,
   scopes: parseAsArrayOf(parseAsString),
   expiration: parseAsStringLiteral(API_KEY_EXPIRATION_VALUES),
 };
 
 const DEFAULT_NEW_KEY_CONFIG: ApiKeyCreateConfig = {
-  accessMode: "restricted",
   name: "",
   scopes: [...API_KEY_DEFAULT_SCOPES],
   expiration: "never",
 };
 
 const EDIT_FORM_DEFAULTS: ApiKeyFormValues = {
-  accessMode: "restricted",
   keyId: "",
   name: "",
   scopes: [...API_KEY_DEFAULT_SCOPES],
@@ -524,7 +515,6 @@ function CreateApiKeyDialog({
   createdKey,
   input,
   isPending,
-  onAccessModeChange,
   onExpirationChange,
   onNameChange,
   onOpenChange,
@@ -537,7 +527,6 @@ function CreateApiKeyDialog({
   createdKey: string | null;
   input: ApiKeyCreateConfig;
   isPending: boolean;
-  onAccessModeChange: (mode: ApiKeyAccessMode) => void;
   onExpirationChange: (expiration: ApiKeyExpiration) => void;
   onNameChange: (name: string | null) => void;
   onOpenChange: (open: boolean) => void;
@@ -646,10 +635,8 @@ function CreateApiKeyDialog({
                     <span className="text-destructive -ml-1">*</span>
                   </FieldLabel>
                   <ApiKeyPermissionSelector
-                    accessMode={input.accessMode}
                     className="[&>div]:py-2.5"
                     disabled={isPending}
-                    onAccessModeChange={onAccessModeChange}
                     onValueChange={onScopesChange}
                     value={input.scopes}
                   />
@@ -755,38 +742,20 @@ function EditApiKeyDialog({
               )}
             </editForm.Field>
 
-            <editForm.Field name="accessMode">
-              {(accessModeField) => (
-                <editForm.Field name="scopes">
-                  {(scopesField) => (
-                    <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                      <FieldLabel>
-                        Permissions
-                        <span className="text-destructive -ml-1">*</span>
-                      </FieldLabel>
-                      <ApiKeyPermissionSelector
-                        accessMode={
-                          accessModeField.state.value as ApiKeyAccessMode
-                        }
-                        className="[&>div]:py-2.5"
-                        disabled={isPending}
-                        onAccessModeChange={(mode) => {
-                          accessModeField.handleChange(mode);
-                          scopesField.handleChange(
-                            getApiKeyScopesForAccessMode(
-                              mode,
-                              scopesField.state.value as string[]
-                            )
-                          );
-                        }}
-                        onValueChange={(scopes) =>
-                          scopesField.handleChange(scopes)
-                        }
-                        value={scopesField.state.value as string[]}
-                      />
-                    </Field>
-                  )}
-                </editForm.Field>
+            <editForm.Field name="scopes">
+              {(field) => (
+                <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                  <FieldLabel>
+                    Permissions
+                    <span className="text-destructive -ml-1">*</span>
+                  </FieldLabel>
+                  <ApiKeyPermissionSelector
+                    className="[&>div]:py-2.5"
+                    disabled={isPending}
+                    onValueChange={(scopes) => field.handleChange(scopes)}
+                    value={field.state.value as string[]}
+                  />
+                </Field>
               )}
             </editForm.Field>
           </div>
@@ -865,7 +834,6 @@ export default function ApiKeysPage() {
     NEW_KEY_CONFIG_PARSERS
   );
   const hasNewKeyConfig =
-    newKeyConfig.accessMode !== null &&
     newKeyConfig.name !== null &&
     newKeyConfig.scopes !== null &&
     newKeyConfig.expiration !== null;
@@ -892,14 +860,11 @@ export default function ApiKeysPage() {
 
   const sortedKeys = sortApiKeys(keys, createdSortOrder);
 
-  const newKeyAccessMode =
-    newKeyConfig.accessMode ?? DEFAULT_NEW_KEY_CONFIG.accessMode;
   const newKeyName = newKeyConfig.name;
   const newKeyScopes = newKeyConfig.scopes ?? DEFAULT_NEW_KEY_CONFIG.scopes;
   const newKeyExpiration =
     newKeyConfig.expiration ?? DEFAULT_NEW_KEY_CONFIG.expiration;
   const createInput = {
-    accessMode: newKeyAccessMode,
     name: newKeyName ?? DEFAULT_NEW_KEY_CONFIG.name,
     scopes: newKeyScopes,
     expiration: newKeyExpiration,
@@ -917,7 +882,6 @@ export default function ApiKeysPage() {
       return;
     }
     const config = {
-      accessMode: getApiKeyAccessMode(preset.scopes),
       name: preset.defaultName,
       scopes: preset.scopes,
       expiration: preset.expiration,
@@ -1074,7 +1038,6 @@ export default function ApiKeysPage() {
     const scopes = expandLegacyApiKeyScopes(key.permissions);
 
     editForm.reset({
-      accessMode: getApiKeyAccessMode(scopes),
       keyId: key.keyId,
       name: key.name,
       scopes,
@@ -1125,12 +1088,6 @@ export default function ApiKeysPage() {
         createError={createError}
         input={createInput}
         isPending={mutation.isPending}
-        onAccessModeChange={(accessMode) =>
-          setNewKeyConfig({
-            accessMode,
-            scopes: getApiKeyScopesForAccessMode(accessMode, newKeyScopes),
-          })
-        }
         onExpirationChange={(expiration) => setNewKeyConfig({ expiration })}
         onNameChange={(name) => {
           dispatchUi({ type: "createErrorChanged", createError: null });
