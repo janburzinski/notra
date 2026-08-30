@@ -13,10 +13,10 @@ import {
 } from "@notra/ui/components/ui/sidebar";
 import { cn } from "@notra/ui/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type * as React from "react";
 import { useEffect, useRef } from "react";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import type { DashboardSidebarProps } from "@/types/components/sidebar-resize-handle";
 
 import { ChatHistoryNav } from "./chat-history-nav";
 import { NavBrandIdentity } from "./nav-brand-identity";
@@ -27,6 +27,7 @@ import { OrgSelector } from "./org-selector";
 import { SidebarLabel } from "./sidebar-label";
 import { SidebarOnboarding } from "./sidebar-onboarding";
 import { SidebarProjectSwitcher } from "./sidebar-project-switcher";
+import { SidebarResizeHandle } from "./sidebar-resize-handle";
 import { SidebarSwap } from "./sidebar-swap";
 import { SidebarTrialExpired } from "./sidebar-trial-expired";
 import { SidebarUpgrade } from "./sidebar-upgrade";
@@ -50,8 +51,13 @@ function SidebarBackButton({ onBack }: { onBack: () => void }) {
 
 export function DashboardSidebar({
   className,
+  onWidthChange,
+  onWidthChangeEnd,
+  onWidthChangeStart,
+  resizing,
+  width,
   ...props
-}: React.ComponentProps<typeof Sidebar>) {
+}: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -95,7 +101,11 @@ export function DashboardSidebar({
     <Sidebar
       collapsible="icon"
       {...props}
-      className={cn("overflow-hidden overscroll-none border-none", className)}
+      className={cn(
+        "overflow-hidden overscroll-none border-none",
+        resizing && "transition-none!",
+        className
+      )}
     >
       <SidebarHeader>
         <SidebarProjectSwitcher />
@@ -156,6 +166,12 @@ export function DashboardSidebar({
       <SidebarFooter>
         <OrgSelector />
       </SidebarFooter>
+      <SidebarResizeHandle
+        onWidthChange={onWidthChange}
+        onWidthChangeEnd={onWidthChangeEnd}
+        onWidthChangeStart={onWidthChangeStart}
+        width={width}
+      />
     </Sidebar>
   );
 }

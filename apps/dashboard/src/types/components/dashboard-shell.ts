@@ -8,3 +8,7 @@ export interface DashboardShellProps {
 export interface DashboardShellStyle extends CSSProperties {
   "--eve-banner-height": string;
 }
+
+export interface DashboardSidebarStyle extends CSSProperties {
+  "--sidebar-width": string;
+}

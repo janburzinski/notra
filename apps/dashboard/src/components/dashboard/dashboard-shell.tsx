@@ -20,8 +20,10 @@ import {
   useOnboardingAgentRun,
   useRunOnboardingAgent,
 } from "@/lib/hooks/use-onboarding";
+import { useSidebarWidth } from "@/lib/hooks/use-sidebar-width";
 import type {
   DashboardShellProps,
+  DashboardSidebarStyle,
   DashboardShellStyle,
 } from "@/types/components/dashboard-shell";
 
@@ -52,6 +54,13 @@ export function DashboardShell({
   const pathname = usePathname();
   const mainScrollRef = useRef<HTMLDivElement>(null);
   const [mainScrolled, setMainScrolled] = useState(false);
+  const {
+    finishSidebarResize,
+    setSidebarWidth,
+    sidebarResizing,
+    sidebarWidth,
+    startSidebarResize,
+  } = useSidebarWidth();
 
   useEffect(() => {
     setDismissingOrganizationId(null);
@@ -106,6 +115,10 @@ export function DashboardShell({
     dismiss();
   };
 
+  const sidebarStyle: DashboardSidebarStyle = {
+    "--sidebar-width": `${sidebarWidth}px`,
+  };
+
   return (
     <div
       className="flex h-svh flex-col overflow-hidden overscroll-none"
@@ -138,15 +151,25 @@ export function DashboardShell({
         </div>
       ) : null}
       <SidebarProvider
-        className="min-h-0! flex-1 overflow-hidden overscroll-none"
+        className={cn(
+          "min-h-0! flex-1 overflow-hidden overscroll-none",
+          sidebarResizing &&
+            "[&_[data-slot=sidebar-gap]]:transition-none! [&_[data-slot=sidebar-inset]]:transition-none!"
+        )}
         defaultOpen={initialSidebarOpen}
+        style={sidebarStyle}
       >
         <DashboardSidebar
           className={cn(
             "transition-[left,right,width,top,height] [transition-duration:var(--sidebar-duration),var(--sidebar-duration),var(--sidebar-duration),200ms,200ms] [transition-timing-function:var(--sidebar-ease),var(--sidebar-ease),var(--sidebar-ease),ease-out,ease-out] motion-reduce:transition-none md:top-(--eve-banner-height) md:h-[calc(100svh-var(--eve-banner-height))]",
             visible && "md:pt-0!"
           )}
+          onWidthChange={setSidebarWidth}
+          onWidthChangeEnd={finishSidebarResize}
+          onWidthChangeStart={startSidebarResize}
+          resizing={sidebarResizing}
           variant="inset"
+          width={sidebarWidth}
         />
         <SidebarInset
           className={cn(
