@@ -533,6 +533,13 @@ const runGeoCheck = Effect.fn("geo.runCheck")(function* (
   const usage = answer.usage
     ? addTokenUsage(EMPTY_TOKEN_USAGE, answer.usage)
     : EMPTY_TOKEN_USAGE;
+  if (task.zdr !== "none" && answer.zdrEnforced === false) {
+    yield* geoLogWarn({
+      ...checkFailureFields(context, task),
+      event: "geo.check.zdr_relaxed",
+      zdr: task.zdr,
+    });
+  }
 
   const row: GeoCheckWrite = {
     organizationId: context.organizationId,
@@ -754,6 +761,11 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
     scanId,
     runId,
     engines,
+    enforceZdr: zdrPolicy.enforceZdr,
+    zdrModes: Object.fromEntries([
+      ...trackedEngines.map((entry) => [entry.engine, entry.zdr]),
+      ...groundedEngines.map((entry) => [entry.grounded.key, entry.zdr]),
+    ]),
     promptCount: prompts.length,
     languages: settings.languages,
     tasks: tasks.length,
@@ -948,6 +960,14 @@ const runGeoSequenceCheck = Effect.fn("geo.runSequenceCheck")(function* (
       zdr
     );
     usage = addTokenUsage(usage, answer.usage);
+    if (zdr !== "none" && answer.zdrEnforced === false) {
+      yield* geoLogWarn({
+        ...failureFields,
+        event: "geo.check.zdr_relaxed",
+        turn: index,
+        zdr,
+      });
+    }
     const answerText = yield* requireAnswerText(
       grounded.key,
       sequencePromptId(sequence.id),
