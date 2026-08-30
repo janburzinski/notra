@@ -8,7 +8,6 @@ export const localStorageKeys = {
   imageExportTarget: "notra:image-export-target",
   contentView: "notra:content-view",
   sidebarMode: "notra:sidebar-mode:v1",
-  sidebarWidth: "notra:sidebar-width:v1",
   sidebarOnboardingCollapsed: (organizationId?: string) =>
     organizationId
       ? `onboarding-collapsed:${organizationId}`

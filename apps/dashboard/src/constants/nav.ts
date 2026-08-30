@@ -67,7 +67,7 @@ export const SIDEBAR_DEFAULT_WIDTH = 256;
 export const SIDEBAR_MIN_WIDTH = 240;
 export const SIDEBAR_MAX_WIDTH = 400;
 export const SIDEBAR_RESIZE_STEP = 8;
-export const SIDEBAR_WIDTH_EVENT = "notra:sidebar-width-change";
+export const SIDEBAR_WIDTH_COOKIE_NAME = "sidebar_width";
 
 export const SIDEBAR_MODES: SidebarModeOption[] = [
   { id: "geo", label: "GEO", icon: AiBrowserIcon },

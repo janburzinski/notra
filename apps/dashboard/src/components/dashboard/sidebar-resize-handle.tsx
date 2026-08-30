@@ -10,10 +10,7 @@ import {
   SIDEBAR_RESIZE_STEP,
 } from "@/constants/nav";
 import type { SidebarResizeHandleProps } from "@/types/components/sidebar-resize-handle";
-
-function clampSidebarWidth(width: number) {
-  return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, width));
-}
+import { clampSidebarWidth } from "@/utils/sidebar-width";
 
 export function SidebarResizeHandle({
   onWidthChange,
@@ -99,6 +96,7 @@ export function SidebarResizeHandle({
         onWidthChangeEnd(SIDEBAR_DEFAULT_WIDTH);
       }}
       onKeyDown={handleKeyDown}
+      onLostPointerCapture={finishResize}
       onPointerCancel={finishResize}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

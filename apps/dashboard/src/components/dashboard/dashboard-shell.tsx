@@ -30,6 +30,7 @@ import type {
 export function DashboardShell({
   children,
   initialSidebarOpen,
+  initialSidebarWidth,
 }: DashboardShellProps) {
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = activeOrganization?.id ?? "";
@@ -60,7 +61,7 @@ export function DashboardShell({
     sidebarResizing,
     sidebarWidth,
     startSidebarResize,
-  } = useSidebarWidth();
+  } = useSidebarWidth(initialSidebarWidth);
 
   useEffect(() => {
     setDismissingOrganizationId(null);

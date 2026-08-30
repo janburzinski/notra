@@ -5,7 +5,9 @@ import {
 import { cookies } from "next/headers";
 
 import { DashboardClientWrapper } from "@/components/dashboard/dashboard-client-wrapper";
+import { SIDEBAR_WIDTH_COOKIE_NAME } from "@/constants/nav";
 import { validateOrganizationAccess } from "@/lib/auth/actions";
+import { getSidebarWidthFromCookie } from "@/utils/sidebar-width";
 
 export const instant = false;
 
@@ -25,6 +27,9 @@ export default async function OrganizationLayout({
   const initialSidebarOpen = getSidebarOpenFromCookie(
     cookieStore.get(SIDEBAR_COOKIE_NAME)?.value
   );
+  const initialSidebarWidth = getSidebarWidthFromCookie(
+    cookieStore.get(SIDEBAR_WIDTH_COOKIE_NAME)?.value
+  );
 
   const { organization } = await validateOrganizationAccess(slug);
 
@@ -32,6 +37,7 @@ export default async function OrganizationLayout({
     <DashboardClientWrapper
       initialActiveOrganization={organization}
       initialSidebarOpen={initialSidebarOpen}
+      initialSidebarWidth={initialSidebarWidth}
       modal={modal}
     >
       {children}
