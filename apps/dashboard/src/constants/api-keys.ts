@@ -27,6 +27,43 @@ export const API_KEY_ACCEPTED_PERMISSIONS = API_ACCEPTED_SCOPES;
 
 export const API_KEY_DEFAULT_SCOPES = API_READ_SCOPES;
 
+export const API_KEY_GEO_SCOPES = API_SCOPE_RESOURCES.filter(
+  (resource) => resource.openApiTag === "GEO"
+).flatMap((resource) => [
+  getApiScopeId(resource.id, "read"),
+  getApiScopeId(resource.id, "write"),
+]);
+
+export const API_KEY_ACCESS_MODE_VALUES = [
+  "full",
+  "geo",
+  "restricted",
+] as const;
+
+export const API_KEY_ACCESS_MODE_OPTIONS = [
+  {
+    value: "full",
+    label: "Full Access",
+    title: "Full Access",
+    description:
+      "This key grants full access to all API resources. For better security, we recommend creating a restricted key.",
+  },
+  {
+    value: "geo",
+    label: "GEO Access",
+    title: "GEO Access",
+    description:
+      "This key grants read and write access to GEO resources only. All other API resources remain restricted.",
+  },
+  {
+    value: "restricted",
+    label: "Restricted",
+    title: "Resource access",
+    description:
+      "Set read and write access individually for every API resource.",
+  },
+] as const;
+
 export const API_KEY_SCOPE_LEVEL = {
   none: "none",
   read: "read",
@@ -68,6 +105,7 @@ export const API_KEY_PERMISSION_SUMMARY = {
   none: "No access",
   read: "Read only",
   write: "Read & write",
+  geo: "GEO access",
   custom: "Custom",
 } as const;
 

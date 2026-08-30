@@ -5,11 +5,19 @@ import {
 } from "@notra/utils/api-scopes";
 
 import {
+  API_KEY_ACCESS_MODE_VALUES,
+  API_KEY_GEO_SCOPES,
+  API_KEY_GRANULAR_PERMISSIONS,
+  API_KEY_GRANULAR_READ_PERMISSIONS,
   API_KEY_SCOPE_LEVEL,
   API_KEY_SCOPE_LEVEL_LABELS,
   API_KEY_SCOPE_RESOURCES,
 } from "@/constants/api-keys";
-import type { ApiKeyScopeGroup } from "@/types/api-keys";
+import type {
+  ApiKeyAccessMode,
+  ApiKeyGranularScope,
+  ApiKeyScopeGroup,
+} from "@/types/api-keys";
 
 export const API_KEY_SCOPE_GROUPS: ApiKeyScopeGroup[] =
   API_KEY_SCOPE_RESOURCES.map((resource) => ({
@@ -78,6 +86,42 @@ export const sortApiKeyScopes = sortApiScopes;
 
 export const getUnknownApiKeyPermissions = getUnknownApiScopes;
 
+function hasExactScopes(
+  scopes: readonly string[],
+  expected: readonly string[]
+) {
+  const selected = new Set(scopes);
+  return (
+    selected.size === expected.length &&
+    expected.every((scope) => selected.has(scope))
+  );
+}
+
+export function getApiKeyAccessMode(
+  scopes: readonly string[]
+): ApiKeyAccessMode {
+  if (hasExactScopes(scopes, API_KEY_GRANULAR_PERMISSIONS)) {
+    return API_KEY_ACCESS_MODE_VALUES[0];
+  }
+  if (hasExactScopes(scopes, API_KEY_GEO_SCOPES)) {
+    return API_KEY_ACCESS_MODE_VALUES[1];
+  }
+  return API_KEY_ACCESS_MODE_VALUES[2];
+}
+
+export function getApiKeyScopesForAccessMode(
+  mode: ApiKeyAccessMode,
+  restrictedScopes: readonly string[]
+): ApiKeyGranularScope[] {
+  if (mode === "full") {
+    return [...API_KEY_GRANULAR_PERMISSIONS];
+  }
+  if (mode === "geo") {
+    return [...API_KEY_GEO_SCOPES];
+  }
+  return sortApiKeyScopes([...restrictedScopes]);
+}
+
 export function summarizeApiKeyScopes(scopes: readonly string[]) {
   const selected = new Set(scopes);
   if (selected.size === 0) {
@@ -89,6 +133,10 @@ export function summarizeApiKeyScopes(scopes: readonly string[]) {
   );
   if (everyWrite) {
     return "write" as const;
+  }
+
+  if (hasExactScopes(scopes, API_KEY_GEO_SCOPES)) {
+    return "geo" as const;
   }
 
   const everyReadOnly = API_KEY_SCOPE_GROUPS.every(

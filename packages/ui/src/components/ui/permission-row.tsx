@@ -5,6 +5,7 @@ import type { KeyboardEvent, ReactNode } from "react";
 import { useId, useState } from "react";
 import { cn } from "@notra/ui/lib/utils";
 import {
+  type PermissionIndicatorMotion,
   PermissionRowContext,
   type PermissionRowContextValue,
 } from "./permission-selector-context";
@@ -63,6 +64,7 @@ export interface PermissionRowProps {
   disabled?: boolean;
   className?: string;
   layout?: "row" | "compact";
+  indicatorMotion?: PermissionIndicatorMotion;
 }
 
 export function PermissionRow({
@@ -75,6 +77,7 @@ export function PermissionRow({
   disabled = false,
   className,
   layout = "row",
+  indicatorMotion = "spring",
 }: PermissionRowProps) {
   const layoutId = useId();
   const [internalValue, setInternalValue] = useState(defaultValue);
@@ -89,6 +92,7 @@ export function PermissionRow({
     value: activeValue,
     select,
     layoutId,
+    indicatorMotion,
     disabled,
   };
 
