@@ -7,12 +7,6 @@ import { COMPANY_LOGO_RATE_LIMIT_PER_QUERY_PER_MINUTE } from "@/constants/compan
 const redis = Redis.fromEnv();
 
 export const ratelimit = {
-  free: new Ratelimit({
-    redis,
-    analytics: true,
-    prefix: "ratelimit:healthcheck",
-    limiter: Ratelimit.slidingWindow(2, "1m"),
-  }),
   fetchTweet: new Ratelimit({
     redis,
     analytics: true,
