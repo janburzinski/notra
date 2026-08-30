@@ -146,6 +146,8 @@ export interface GeoEngineAnswer {
   grounding: GeoCheckGrounding;
   finishReason: FinishReason | null;
   usage?: LanguageModelUsage;
+  /** Whether the call ran with ZDR enforced; null when the route did not say. */
+  zdrEnforced: boolean | null;
 }
 
 export interface GeoGroundedAnswer extends GeoEngineAnswer {
@@ -436,6 +438,11 @@ export interface GeoCheckTask {
 export interface GeoZdrPolicy {
   enforceZdr: boolean;
   nonZdrApprovedEngines: readonly string[];
+  /**
+   * Mode for engines when ZDR is not enforced. Defaults to `preferred`;
+   * organizations without the ZDR add-on get `none`.
+   */
+  nonEnforcedMode?: GeoZdrMode;
 }
 
 /** Engine a scan will actually call after ZDR skip/fallback. */
@@ -491,6 +498,11 @@ export interface GeoGroundedEngine {
   label: string;
   model: string;
   provider: GeoGroundedProvider;
+  /**
+   * ZDR coverage when the catalog has no entry for `model`. Direct vendor
+   * SDK engines bypass the router and can never honour ZDR.
+   */
+  zdr: GeoModelZdr;
   envVar: string | null;
   isAvailable: () => boolean;
 }
@@ -956,7 +968,10 @@ export interface GeoGatewayModel {
 }
 
 /** How strictly a scan asks the router for zero data retention. */
-export type GeoZdrMode = "required" | "preferred";
+export type GeoZdrMode = "required" | "preferred" | "none";
+
+/** Result of a ZDR entitlement lookup; `unknown` means billing did not answer. */
+export type GeoZdrEntitlement = "entitled" | "not_entitled" | "unknown";
 
 export interface ShareOfVoiceRow {
   brand: string;

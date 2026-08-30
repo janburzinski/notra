@@ -138,13 +138,16 @@ export function getGeoModelCatalogEntry(
   return catalog.models.find((model) => model.id === engine);
 }
 
-/** True when the model has at least one zero-data-retention host. */
+/**
+ * True when the model has at least one zero-data-retention host. Engines the
+ * catalog does not know fail closed: nothing vouches for their hosts.
+ */
 export function isGeoEngineZdrCapable(
   catalog: GeoModelCatalog,
   engine: string
 ): boolean {
   const entry = getGeoModelCatalogEntry(catalog, engine);
-  return entry ? entry.zdr !== "none" : true;
+  return entry ? entry.zdr !== "none" : false;
 }
 
 export function geoModelsForProvider(

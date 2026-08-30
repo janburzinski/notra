@@ -9,6 +9,7 @@ import {
   GeoGenerationService,
   GeoWorkflowService,
 } from "@notra/geo-core/deps";
+import type { GeoZdrEntitlement } from "@notra/geo-core/types/geo";
 import { Redis } from "@upstash/redis";
 import { Effect, Layer } from "effect";
 
@@ -78,24 +79,26 @@ const workflowLayer = Layer.succeed(GeoWorkflowService, {
 });
 
 const entitlementLayer = Layer.succeed(GeoEntitlementService, {
-  hasZdrEntitlement: Effect.fn("GeoApiEntitlement.hasZdr")(
+  resolveZdrEntitlement: Effect.fn("GeoApiEntitlement.resolveZdr")(
     function* (organizationId) {
       if (allowUnmeteredAiInDevelopment) {
-        return true;
+        return "entitled";
       }
       const client = autumn;
       if (!client) {
-        return process.env.NODE_ENV !== "production";
+        return process.env.NODE_ENV === "production"
+          ? "not_entitled"
+          : "entitled";
       }
-      return yield* Effect.promise(async () => {
+      return yield* Effect.promise(async (): Promise<GeoZdrEntitlement> => {
         try {
           const data = await client.check({
             customerId: organizationId,
             featureId: FEATURES.ZDR,
           });
-          return data.allowed === true;
+          return data.allowed === true ? "entitled" : "not_entitled";
         } catch {
-          return false;
+          return "unknown";
         }
       });
     }

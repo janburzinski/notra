@@ -1,13 +1,13 @@
-import type { PlanCacheEntry, PlanCacheStore } from "@notra/ai/types/router";
+import type { TtlCacheEntry, TtlCacheStore } from "@notra/ai/types/router";
 
 /**
- * Process-local TTL cache for plan lookups. A pluggable `PlanCacheStore`
- * (e.g. Redis) can be layered on top by the caller.
+ * Process-local TTL cache keyed by organization. A pluggable store (e.g.
+ * Redis) can be layered on top by the caller.
  */
-export function createMemoryPlanCache(
+export function createMemoryTtlCache<T>(
   now: () => number = () => Date.now()
-): PlanCacheStore {
-  const entries = new Map<string, PlanCacheEntry>();
+): TtlCacheStore<T> {
+  const entries = new Map<string, TtlCacheEntry<T>>();
 
   return {
     get(organizationId) {
@@ -19,10 +19,10 @@ export function createMemoryPlanCache(
         entries.delete(organizationId);
         return Promise.resolve(undefined);
       }
-      return Promise.resolve(entry.plan);
+      return Promise.resolve(entry.value);
     },
-    set(organizationId, plan, ttlMs) {
-      entries.set(organizationId, { plan, expiresAt: now() + ttlMs });
+    set(organizationId, value, ttlMs) {
+      entries.set(organizationId, { value, expiresAt: now() + ttlMs });
       return Promise.resolve();
     },
   };

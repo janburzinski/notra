@@ -150,6 +150,7 @@ export async function insertGeoMentionChecks(
       grounding: row.grounding,
       language: row.language,
       sources: row.sources ?? [],
+      zdrEnforced: row.zdrEnforced ?? null,
       capturedAt: row.capturedAt,
     }));
     const inserted = await db

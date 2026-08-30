@@ -1,4 +1,6 @@
+import { GEO_DIRECT_GROUNDED_PROVIDERS } from "../constants/geo";
 import type {
+  GeoGroundedEngine,
   GeoModelCatalog,
   GeoModelGateway,
   GeoZdrMode,
@@ -36,7 +38,8 @@ export function resolveTrackedEngines(
 
 /**
  * Decide how strictly an engine asks the router for zero data retention.
- * - ZDR off for the project → "preferred" (try ZDR, accept a non-ZDR host).
+ * - ZDR off for the project → `nonEnforcedMode` ("preferred" by default,
+ *   "none" without the add-on).
  * - ZDR on and the model has a ZDR host → "required" (fail closed).
  * - ZDR on, no ZDR host, approved by the user → "preferred".
  * - ZDR on, no ZDR host, not approved → null: the engine must be skipped.
@@ -47,12 +50,36 @@ export function resolveGeoZdrMode(
   policy: GeoZdrPolicy
 ): GeoZdrMode | null {
   if (!policy.enforceZdr) {
-    return "preferred";
+    return policy.nonEnforcedMode ?? "preferred";
   }
   if (isGeoEngineZdrCapable(catalog, engine)) {
     return "required";
   }
   return policy.nonZdrApprovedEngines.includes(engine) ? "preferred" : null;
+}
+
+/**
+ * Same decision for a grounded engine. Gateway-served models take their ZDR
+ * coverage from the catalog when it lists them; direct vendor SDK engines
+ * bypass the router entirely, so under enforced ZDR they run only when the
+ * user approved that specific engine.
+ */
+export function resolveGeoGroundedZdrMode(
+  catalog: GeoModelCatalog,
+  engine: GeoGroundedEngine,
+  policy: GeoZdrPolicy
+): GeoZdrMode | null {
+  if (!policy.enforceZdr) {
+    return policy.nonEnforcedMode ?? "preferred";
+  }
+  const routed = !GEO_DIRECT_GROUNDED_PROVIDERS.has(engine.provider);
+  const coverage = routed
+    ? (getGeoModelCatalogEntry(catalog, engine.model)?.zdr ?? engine.zdr)
+    : engine.zdr;
+  if (coverage !== "none") {
+    return "required";
+  }
+  return policy.nonZdrApprovedEngines.includes(engine.key) ? "preferred" : null;
 }
 
 /** Gateway pin for models that only one gateway serves, else undefined. */

@@ -7,7 +7,7 @@ import {
 } from "@notra/geo-core/deps";
 import { Effect, Layer } from "effect";
 
-import { hasZdrEntitlement } from "@/lib/billing/subscription";
+import { resolveZdrEntitlement } from "@/lib/billing/subscription";
 import { addActiveGeneration, generateRunId } from "@/lib/generations/tracking";
 import { isCursorEngineEnabledForOrganization } from "@/lib/geo/cursor-flag";
 
@@ -63,8 +63,9 @@ const billingLayer = Layer.succeed(GeoContentBillingService, {
 });
 
 const entitlementLayer = Layer.succeed(GeoEntitlementService, {
-  hasZdrEntitlement: Effect.fn("GeoDashboardEntitlement.hasZdr")(
-    (organizationId) => Effect.promise(() => hasZdrEntitlement(organizationId))
+  resolveZdrEntitlement: Effect.fn("GeoDashboardEntitlement.resolveZdr")(
+    (organizationId) =>
+      Effect.promise(() => resolveZdrEntitlement(organizationId))
   ),
 });
 

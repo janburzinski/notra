@@ -5,6 +5,7 @@ import type {
   GeoCompetitorKind,
   GeoCompetitorShareTimeseriesPoint,
   GeoGroundedEngine,
+  GeoGroundedProvider,
   GeoIngestFramework,
   GeoIngestPackageManager,
   GeoJourneyPathKind,
@@ -134,6 +135,7 @@ export const GEO_GROUNDED_ENGINES: readonly GeoGroundedEngine[] = [
     label: "ChatGPT",
     model: "openai/gpt-5.4",
     provider: "gateway-openai",
+    zdr: "some",
     envVar: null,
     isAvailable: () => true,
   },
@@ -142,6 +144,7 @@ export const GEO_GROUNDED_ENGINES: readonly GeoGroundedEngine[] = [
     label: "Claude Sonnet",
     model: "anthropic/claude-sonnet-4.6",
     provider: "gateway-anthropic",
+    zdr: "all",
     envVar: null,
     isAvailable: () => true,
   },
@@ -150,6 +153,7 @@ export const GEO_GROUNDED_ENGINES: readonly GeoGroundedEngine[] = [
     label: "Gemini",
     model: "google/gemini-3-flash",
     provider: "gateway-google",
+    zdr: "some",
     envVar: null,
     isAvailable: () => true,
   },
@@ -158,6 +162,7 @@ export const GEO_GROUNDED_ENGINES: readonly GeoGroundedEngine[] = [
     label: "ChatGPT",
     model: "gpt-5.4",
     provider: "direct-openai",
+    zdr: "none",
     envVar: GEO_OPENAI_API_KEY_ENV,
     isAvailable: () => hasEnv(GEO_OPENAI_API_KEY_ENV),
   },
@@ -166,6 +171,7 @@ export const GEO_GROUNDED_ENGINES: readonly GeoGroundedEngine[] = [
     label: "Claude Sonnet",
     model: "claude-sonnet-4-6",
     provider: "direct-anthropic",
+    zdr: "none",
     envVar: GEO_ANTHROPIC_API_KEY_ENV,
     isAvailable: () => hasEnv(GEO_ANTHROPIC_API_KEY_ENV),
   },
@@ -174,10 +180,19 @@ export const GEO_GROUNDED_ENGINES: readonly GeoGroundedEngine[] = [
     label: "Perplexity",
     model: "sonar",
     provider: "direct-perplexity",
+    zdr: "none",
     envVar: GEO_PERPLEXITY_API_KEY_ENV,
     isAvailable: () => hasEnv(GEO_PERPLEXITY_API_KEY_ENV),
   },
 ];
+
+/** Grounded engines that call the vendor SDK directly, outside the router. */
+export const GEO_DIRECT_GROUNDED_PROVIDERS: ReadonlySet<GeoGroundedProvider> =
+  new Set<GeoGroundedProvider>([
+    "direct-openai",
+    "direct-anthropic",
+    "direct-perplexity",
+  ]);
 
 const groundedEngineLabels = Object.fromEntries(
   GEO_GROUNDED_ENGINES.map((engine) => [engine.key, engine.label])

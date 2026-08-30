@@ -38,6 +38,7 @@ export interface GeoCheckWrite {
   grounding: GeoCheckGrounding;
   language: string;
   sources?: GeoCheckSourceItem[];
+  zdrEnforced?: boolean | null;
   capturedAt: Date;
 }
 

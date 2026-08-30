@@ -486,11 +486,12 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
 
   // Zero data retention needs the ZDR add-on: without the entitlement the
   // flag is forced off regardless of what the client sent.
-  // hasZdrEntitlement never throws; billing outages count as not entitled.
-  const canEnforceZdr = yield* entitlements.hasZdrEntitlement(
+  // resolveZdrEntitlement never throws; a billing outage answers "unknown",
+  // which counts as not entitled here so the toggle fails closed.
+  const entitlement = yield* entitlements.resolveZdrEntitlement(
     input.organizationId
   );
-  const enforceZdr = canEnforceZdr && input.enforceZdr;
+  const enforceZdr = entitlement === "entitled" && input.enforceZdr;
   const catalog = yield* loadGeoModelCatalog(input.organizationId);
   // Static engines hidden from this organization (missing credential or flag
   // off) keep their stored selection so a re-save doesn't silently drop them.

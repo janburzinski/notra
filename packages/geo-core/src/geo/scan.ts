@@ -2,7 +2,7 @@ import { describeContentBillingDenial } from "@notra/ai/billing/content-billing"
 import { FEATURES } from "@notra/ai/billing/features";
 import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
 import { geoLog } from "@notra/ai/evlog";
-import { gateway } from "@notra/ai/gateway";
+import { gateway, getRouteMetadata } from "@notra/ai/gateway";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
 import { EMPTY_GEO_CHECK_GROUNDING } from "@notra/db/constants/geo-checks";
 import { db } from "@notra/db/drizzle";
@@ -25,6 +25,7 @@ import {
   GEO_ANSWER_MAX_TOKENS,
   GEO_ANSWER_SYSTEM_PROMPT,
   GEO_CURSOR_TIMEOUT_MS,
+  GEO_DIRECT_GROUNDED_PROVIDERS,
   GEO_EXCERPT_MAX_LENGTH,
   GEO_GROUNDED_ANSWER_MAX_TOKENS,
   GEO_GROUNDED_MAX_PROMPTS,
@@ -40,7 +41,7 @@ import {
   GEO_SEQUENCE_MAX_TURNS,
   GEO_TRANSLATION_MAX_TOKENS,
 } from "../constants/geo";
-import { GeoContentBillingService } from "../deps";
+import { GeoContentBillingService, GeoEntitlementService } from "../deps";
 import {
   geoJudgeResultSchema,
   geoTranslationResultSchema,
@@ -66,9 +67,11 @@ import type {
   GeoSettingsRow,
   GeoSkipFields,
   GeoZdrMode,
+  GeoZdrPolicy,
 } from "../types/geo";
 import {
   resolveGeoEngineGateway,
+  resolveGeoGroundedZdrMode,
   resolveGeoZdrMode,
 } from "../utils/geo-engines";
 import {
@@ -265,6 +268,7 @@ const askGatewayEngine = Effect.fn("geo.askGatewayEngine")(function* (
     grounding: extractGrounding(result),
     finishReason: result.finishReason,
     usage: result.usage,
+    zdrEnforced: getRouteMetadata(result.providerMetadata)?.zdrEnforced ?? null,
   };
   return answer;
 });
@@ -300,6 +304,7 @@ const askCursorEngineEffect = Effect.fn("geo.askCursorEngine")(function* (
     text,
     grounding: EMPTY_GEO_CHECK_GROUNDING,
     finishReason: null,
+    zdrEnforced: false,
   };
   return answer;
 });
@@ -372,6 +377,9 @@ const askGroundedConversation = Effect.fn("geo.askGroundedConversation")(
       finishReason: result.finishReason,
       sources: collectGroundedSources(result.sources),
       usage: result.usage,
+      zdrEnforced: GEO_DIRECT_GROUNDED_PROVIDERS.has(engine.provider)
+        ? false
+        : (getRouteMetadata(result.providerMetadata)?.zdrEnforced ?? null),
     };
     return answer;
   }
@@ -459,6 +467,41 @@ const requireAnswerText = Effect.fn("geo.requireAnswerText")(function* (
   );
 });
 
+/**
+ * Re-check the ZDR entitlement when a scan runs, not just when settings were
+ * saved. Without the add-on no engine gets the ZDR flag; a stored "enforce"
+ * flag from a lapsed add-on is dropped and logged. A billing outage keeps
+ * enforcement so a paying organization never loses ZDR to a blip.
+ */
+const resolveScanZdrPolicy = Effect.fn("geo.resolveZdrPolicy")(function* (
+  organizationId: string,
+  settings: GeoZdrPolicy,
+  fields: { projectId: string; scanId?: string; sequenceId?: string }
+) {
+  const entitlements = yield* GeoEntitlementService;
+  const entitlement = yield* entitlements.resolveZdrEntitlement(organizationId);
+  if (entitlement !== "not_entitled") {
+    const policy: GeoZdrPolicy = {
+      enforceZdr: settings.enforceZdr,
+      nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
+    };
+    return policy;
+  }
+  if (settings.enforceZdr) {
+    yield* geoLogWarn({
+      event: "geo.scan.zdr_unentitled",
+      organizationId,
+      ...fields,
+    });
+  }
+  const unentitled: GeoZdrPolicy = {
+    enforceZdr: false,
+    nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
+    nonEnforcedMode: "none",
+  };
+  return unentitled;
+});
+
 const runGeoCheck = Effect.fn("geo.runCheck")(function* (
   context: GeoCheckContext,
   task: GeoCheckTask
@@ -508,6 +551,7 @@ const runGeoCheck = Effect.fn("geo.runCheck")(function* (
     competitors: judged.competitors.slice(0, MAX_JUDGE_COMPETITORS),
     excerpt: judged.excerpt.slice(0, GEO_EXCERPT_MAX_LENGTH),
     grounding: answer.grounding,
+    zdrEnforced: answer.zdrEnforced,
     language: task.language,
     sources: grounded?.sources ?? [],
   };
@@ -582,10 +626,10 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
     aliases: settings.aliases,
   };
 
-  const zdrPolicy = {
-    enforceZdr: settings.enforceZdr,
-    nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
-  };
+  const zdrPolicy = yield* resolveScanZdrPolicy(organizationId, settings, {
+    projectId: settingsRow.projectId,
+    scanId,
+  });
   const trackedEngines: { engine: string; zdr: GeoZdrMode }[] = [];
   for (const engine of new Set(settings.engines)) {
     const zdr = resolveGeoZdrMode(catalog, engine, zdrPolicy);
@@ -621,7 +665,7 @@ const runGeoScanForProject = Effect.fn("geo.runScanProject")(function* (
   const groundedEngines: { grounded: GeoGroundedEngine; zdr: GeoZdrMode }[] =
     [];
   for (const grounded of resolveGroundedEngines()) {
-    const zdr = resolveGeoZdrMode(catalog, grounded.model, zdrPolicy);
+    const zdr = resolveGeoGroundedZdrMode(catalog, grounded, zdrPolicy);
     if (zdr === null) {
       yield* geoLogWarn({
         event: "geo.scan.skipped",
@@ -945,6 +989,7 @@ const runGeoSequenceCheck = Effect.fn("geo.runSequenceCheck")(function* (
       competitors: judged.competitors.slice(0, MAX_JUDGE_COMPETITORS),
       excerpt: judged.excerpt.slice(0, GEO_EXCERPT_MAX_LENGTH),
       grounding: answer.grounding,
+      zdrEnforced: answer.zdrEnforced,
       language: DEFAULT_LANGUAGE,
       sources: answer.sources,
     });
@@ -1329,15 +1374,16 @@ const runGeoSequenceNowProgram = Effect.fn("geo.runSequenceNow")(function* (
 
   const catalog = yield* loadGeoModelCatalog(scope.organizationId);
   const settings = toGeoSettings(settingsRow, catalog);
-  const zdrPolicy = {
-    enforceZdr: settings.enforceZdr,
-    nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
-  };
+  const zdrPolicy = yield* resolveScanZdrPolicy(
+    scope.organizationId,
+    settings,
+    { projectId, sequenceId }
+  );
 
   const groundedEngines: { grounded: GeoGroundedEngine; zdr: GeoZdrMode }[] =
     [];
   for (const grounded of resolveGroundedEngines()) {
-    const zdr = resolveGeoZdrMode(catalog, grounded.model, zdrPolicy);
+    const zdr = resolveGeoGroundedZdrMode(catalog, grounded, zdrPolicy);
     if (zdr === null) {
       yield* geoLogWarn({
         event: "geo.scan.skipped",

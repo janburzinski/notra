@@ -7,7 +7,7 @@ import type {
   GateContentBillingInput,
 } from "./content-billing";
 import type { ActiveGeneration } from "./generation-tracking";
-import type { GeoWriterPayload } from "./geo";
+import type { GeoZdrEntitlement, GeoWriterPayload } from "./geo";
 
 export interface GeoWorkflowServiceShape {
   readonly startGeoScanRun: (payload: {
@@ -34,9 +34,9 @@ export interface GeoContentBillingServiceShape {
 }
 
 export interface GeoEntitlementServiceShape {
-  readonly hasZdrEntitlement: (
+  readonly resolveZdrEntitlement: (
     organizationId: string
-  ) => Effect.Effect<boolean>;
+  ) => Effect.Effect<GeoZdrEntitlement>;
 }
 
 export interface GeoFeatureFlagServiceShape {

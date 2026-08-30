@@ -661,50 +661,6 @@ describe("zdr: preferred", () => {
   const ZDR_REJECTION =
     "Zero Data Retention (ZDR) is only available for Pro and Enterprise plans.";
 
-  test("retries on the same gateway without the ZDR flag and keeps no-training", async () => {
-    let rejected = false;
-    const vercel = createFakeAdapter({
-      id: "vercel",
-      onCall: (call) => {
-        const gatewayBlock = call.options.providerOptions?.gateway as
-          | Record<string, unknown>
-          | undefined;
-        if (gatewayBlock?.zeroDataRetention === true) {
-          rejected = true;
-          throw httpError(HTTP_FORBIDDEN, ZDR_REJECTION);
-        }
-      },
-    });
-    const { router, openrouter, logger } = createTestRouter({ plans, vercel });
-    const result = await router
-      .model(MODEL, { organizationId: PAID_ORG, zdr: "preferred" })
-      .doGenerate(callOptions());
-
-    assert.equal(rejected, true);
-    assert.equal(vercel.calls.length, 2);
-    assert.equal(openrouter?.calls.length, 0);
-    const retry = vercel.calls[1]?.options.providerOptions?.gateway as Record<
-      string,
-      unknown
-    >;
-    assert.equal(retry.zeroDataRetention, undefined);
-    assert.equal(retry.disallowPromptTraining, true);
-    assert.equal(metadataOf(result)?.gateway, "vercel");
-    const bypass = logger.entries.find(
-      (entry) => entry.event === "ai.router.zdr_bypassed"
-    );
-    assert.equal(bypass?.fields?.bypassReason, "caller-preferred");
-    assert.equal(bypass?.fields?.zdrEnforced, false);
-
-    // Strict requests are unaffected: the gateway was not marked unavailable.
-    const strict = await router.resolveRoute({
-      modelId: MODEL,
-      organizationId: PAID_ORG,
-    });
-    assert.equal(strict.gateway, "vercel");
-    assert.equal(strict.zdrEnforced, true);
-  });
-
   test("openrouter 'no endpoints matching your data policy' is a ZDR rejection", async () => {
     const openrouter = createFakeAdapter({
       id: "openrouter",
@@ -725,14 +681,12 @@ describe("zdr: preferred", () => {
       .model(MODEL, { organizationId: FREE_ORG, zdr: "preferred" })
       .doGenerate(callOptions());
 
-    assert.equal(openrouter.calls.length, 2);
-    assert.equal(vercel?.calls.length, 0);
-    const retry = openrouter.calls[1]?.options.providerOptions?.openrouter as {
-      provider: Record<string, unknown>;
-    };
-    assert.equal(retry.provider.zdr, undefined);
-    assert.equal(retry.provider.data_collection, "deny");
-    assert.equal(metadataOf(result)?.gateway, "openrouter");
+    assert.equal(openrouter.calls.length, 1);
+    assert.equal(vercel?.calls.length, 1);
+    const metadata = metadataOf(result);
+    assert.equal(metadata?.gateway, "vercel");
+    assert.equal(metadata?.fallbackReason, "non-compliant");
+    assert.equal(metadata?.zdrEnforced, true);
   });
 
   test("strict requests still fall back instead of relaxing", async () => {

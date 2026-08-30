@@ -3,6 +3,7 @@ import {
   autumn,
 } from "@notra/ai/billing/autumn";
 import { FEATURES, PAID_OR_LEGACY_PLAN_IDS } from "@notra/ai/billing/features";
+import type { GeoZdrEntitlement } from "@notra/geo-core/types/geo";
 import { ORPCError } from "@orpc/server";
 
 import { GEO_PLAN_REQUIRED_MESSAGE } from "@/constants/billing";
@@ -38,27 +39,27 @@ export async function hasAiCreditsGrant(
 }
 
 /**
- * Non-throwing check for the zero data retention entitlement, granted by the
+ * Non-throwing lookup of the zero data retention entitlement, granted by the
  * ZDR add-on on any plan. Development without billing counts as entitled; a
- * billing outage counts as not entitled so gated settings fail closed.
+ * billing outage answers `unknown` so each gate can decide how to fail.
  */
-export async function hasZdrEntitlement(
+export async function resolveZdrEntitlement(
   organizationId: string
-): Promise<boolean> {
+): Promise<GeoZdrEntitlement> {
   if (allowUnmeteredAiInDevelopment) {
-    return true;
+    return "entitled";
   }
   if (!autumn) {
-    return process.env.NODE_ENV !== "production";
+    return process.env.NODE_ENV === "production" ? "not_entitled" : "entitled";
   }
   try {
     const data = await autumn.check({
       customerId: organizationId,
       featureId: FEATURES.ZDR,
     });
-    return data.allowed === true;
+    return data.allowed === true ? "entitled" : "not_entitled";
   } catch {
-    return false;
+    return "unknown";
   }
 }
 

@@ -123,6 +123,7 @@ export function buildRouteMetadata(
     ...(decision.fallbackReason
       ? { fallbackReason: decision.fallbackReason }
       : {}),
+    zdrEnforced: decision.zdrEnforced,
   };
 }
 
@@ -182,7 +183,9 @@ function decisionLogFields(decision: RouteDecision) {
     reason: decision.reason,
     fallbackFrom: decision.fallbackFrom,
     fallbackReason: decision.fallbackReason,
+    zdr: decision.zdr,
     zdrEnforced: decision.zdrEnforced,
+    zdrRelaxed: decision.zdrRelaxed,
   };
 }
 
@@ -285,7 +288,7 @@ export class RoutedLanguageModel implements LanguageModelV3 {
       providerOptions: stripForeignGatewayOptions(route.decision.gateway, rest),
       router,
       allowNonZdr: this.context.policy.allowNonZdr,
-      relaxZdr: this.zdrRelaxed,
+      relaxZdr: this.zdrRelaxed || route.decision.zdrRelaxed === true,
     });
     return { ...options, providerOptions };
   }
@@ -309,8 +312,12 @@ export class RoutedLanguageModel implements LanguageModelV3 {
     }
   }
 
-  private canRelaxZdr(): boolean {
-    return this.context.request.zdr === "preferred" && !this.zdrRelaxed;
+  private canRelaxZdr(route: ResolvedRoute): boolean {
+    return (
+      route.decision.zdr === "preferred" &&
+      !this.zdrRelaxed &&
+      route.decision.zdrRelaxed !== true
+    );
   }
 
   /**
@@ -320,7 +327,11 @@ export class RoutedLanguageModel implements LanguageModelV3 {
    */
   private relaxZdr(route: ResolvedRoute, error: unknown): ResolvedRoute {
     this.zdrRelaxed = true;
-    const decision: RouteDecision = { ...route.decision, zdrEnforced: false };
+    const decision: RouteDecision = {
+      ...route.decision,
+      zdrEnforced: false,
+      zdrRelaxed: true,
+    };
     this.context.logger.warn("ai.router.zdr_bypassed", {
       ...decisionLogFields(decision),
       bypassReason: "caller-preferred",
@@ -361,21 +372,43 @@ export class RoutedLanguageModel implements LanguageModelV3 {
     if (!reason) {
       return undefined;
     }
-    if (reason === "non-compliant" && this.canRelaxZdr()) {
-      return this.relaxZdr(route, error);
-    }
     if (reason === "no-credits") {
       this.context.credits.markExhausted(route.decision.gateway);
       this.verifyExhaustion(route.decision.gateway);
     } else if (reason === "non-compliant") {
-      this.context.credits.markUnavailable(route.decision.gateway, reason);
+      // A missing ZDR host is a fact about this model on this gateway, so the
+      // mark is model-scoped: other models keep routing here.
+      this.context.credits.markUnavailable(
+        route.decision.gateway,
+        reason,
+        route.decision.requestedModelId
+      );
       this.context.logger.error("ai.router.zdr_rejected", {
         gateway: route.decision.gateway,
         requestedModel: route.decision.requestedModelId,
         organizationId: route.decision.organizationId,
+        zdr: route.decision.zdr,
         message: readMessage(error),
       });
     }
+
+    // Prefer a ZDR-capable route on the other gateway over dropping the
+    // flag; a `preferred` request only relaxes once no such route exists.
+    const crossGateway = this.crossGatewayRoute(route, reason, error);
+    if (crossGateway) {
+      return crossGateway;
+    }
+    if (reason === "non-compliant" && this.canRelaxZdr(route)) {
+      return this.relaxZdr(route, error);
+    }
+    return undefined;
+  }
+
+  private crossGatewayRoute(
+    route: ResolvedRoute,
+    reason: FallbackReason,
+    error: unknown
+  ): ResolvedRoute | undefined {
     if (
       !this.context.policy.crossGatewayFallback ||
       this.context.request.gateway
@@ -393,6 +426,21 @@ export class RoutedLanguageModel implements LanguageModelV3 {
         from: route.decision.gateway,
         to: target,
         fallbackReason: reason,
+        errorName,
+        status,
+      });
+      return undefined;
+    }
+    const targetUnavailable = this.context.credits.unavailableReason(
+      target,
+      route.decision.requestedModelId
+    );
+    if (targetUnavailable) {
+      this.context.logger.warn("ai.router.fallback_unavailable", {
+        from: route.decision.gateway,
+        to: target,
+        fallbackReason: reason,
+        targetReason: targetUnavailable,
         errorName,
         status,
       });
@@ -416,7 +464,8 @@ export class RoutedLanguageModel implements LanguageModelV3 {
       reason: "fallback",
       fallbackFrom: route.decision.gateway,
       fallbackReason: reason,
-      zdrEnforced: adapter.enforcesZdr,
+      zdrEnforced: adapter.enforcesZdr && !this.zdrRelaxed,
+      zdrRelaxed: this.zdrRelaxed,
     };
     this.context.logger.warn("ai.router.fallback", {
       ...decisionLogFields(decision),

@@ -512,6 +512,13 @@
       "when": 1788009529729,
       "tag": "0072_tidy_thunderbird",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1788100094108,
+      "tag": "0073_flashy_greymalkin",
+      "breakpoints": true
     }
   ]
 }
