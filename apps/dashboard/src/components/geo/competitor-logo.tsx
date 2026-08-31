@@ -1,10 +1,12 @@
 "use client";
 
+import { GEO_LOGO_SIZE_PX } from "@notra/geo-core/constants/geo";
+import { competitorLogoSources } from "@notra/geo-core/geo/logo";
 import { cn } from "@notra/ui/lib/utils";
 import Image from "next/image";
-import { useMemo, useState } from "react";
-import { GEO_LOGO_SIZE_PX } from "@/constants/geo";
-import { competitorLogoSources } from "@/lib/geo/logo";
+import { useState } from "react";
+
+import { useCompanyLogo } from "@/lib/hooks/use-onboarding";
 import type { CompetitorLogoProps } from "@/types/geo";
 
 function CompetitorLogoFallback({
@@ -27,10 +29,11 @@ function CompetitorLogoFallback({
 function CompetitorLogoInner({
   name,
   domain,
+  logo,
   className,
   onSettled,
-}: CompetitorLogoProps) {
-  const sources = useMemo(() => competitorLogoSources(domain), [domain]);
+}: CompetitorLogoProps & { logo: string | null }) {
+  const sources = competitorLogoSources(domain, logo);
   const [sourceIndex, setSourceIndex] = useState(0);
   const src = sources[sourceIndex] ?? null;
 
@@ -72,11 +75,16 @@ export function CompetitorLogo({
   className,
   onSettled,
 }: CompetitorLogoProps) {
+  const { data } = useCompanyLogo(domain, name);
+  const resolvedDomain = domain ?? data?.domain ?? null;
+  const logo = data?.url ?? null;
+
   return (
     <CompetitorLogoInner
       className={className}
-      domain={domain}
-      key={`${domain ?? ""}:${name}`}
+      domain={resolvedDomain}
+      key={`${resolvedDomain ?? ""}:${name}:${logo ?? ""}`}
+      logo={logo}
       name={name}
       onSettled={onSettled}
     />

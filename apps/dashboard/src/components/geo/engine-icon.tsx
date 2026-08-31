@@ -5,6 +5,8 @@ import {
   Robot01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import type { EngineIconKey } from "@notra/geo-core/types/geo";
+import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
 import { Amazon } from "@notra/ui/components/ui/svgs/amazon";
 import { Apple } from "@notra/ui/components/ui/svgs/apple";
 import { AppleDark } from "@notra/ui/components/ui/svgs/appleDark";
@@ -24,6 +26,8 @@ import { FirecrawlDark } from "@notra/ui/components/ui/svgs/firecrawlDark";
 import { Firefox } from "@notra/ui/components/ui/svgs/firefox";
 import { Gemini } from "@notra/ui/components/ui/svgs/gemini";
 import { Google } from "@notra/ui/components/ui/svgs/google";
+import { Grok } from "@notra/ui/components/ui/svgs/grok";
+import { GrokDark } from "@notra/ui/components/ui/svgs/grokDark";
 import { Huawei } from "@notra/ui/components/ui/svgs/huawei";
 import { Kagi } from "@notra/ui/components/ui/svgs/kagi";
 import { Kimi } from "@notra/ui/components/ui/svgs/kimi";
@@ -40,8 +44,6 @@ import { OpencodeDark } from "@notra/ui/components/ui/svgs/opencodeDark";
 import { Perplexity } from "@notra/ui/components/ui/svgs/perplexity";
 import { Qwen } from "@notra/ui/components/ui/svgs/qwen";
 import { QwenDark } from "@notra/ui/components/ui/svgs/qwenDark";
-import { SpaceXai } from "@notra/ui/components/ui/svgs/spacexai";
-import { SpaceXaiDark } from "@notra/ui/components/ui/svgs/spacexaiDark";
 import { Tavily } from "@notra/ui/components/ui/svgs/tavily";
 import { Tencent } from "@notra/ui/components/ui/svgs/tencent";
 import { TikTok } from "@notra/ui/components/ui/svgs/tikTok";
@@ -49,15 +51,27 @@ import { TikTokDark } from "@notra/ui/components/ui/svgs/tikTokDark";
 import { Timpi } from "@notra/ui/components/ui/svgs/timpi";
 import { Xiaomi } from "@notra/ui/components/ui/svgs/xiaomi";
 import { YouCom } from "@notra/ui/components/ui/svgs/youCom";
+import { Zai } from "@notra/ui/components/ui/svgs/zai";
 import type { ComponentType, SVGProps } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+
 import { ModelProviderLogo } from "@/components/geo/model-provider-logo";
 import { cn } from "@/lib/utils";
-import type { EngineIconKey, EngineIconProps } from "@/types/geo";
-import { resolveEngineIconKey } from "@/utils/geo-engine-icon";
-import { modelsDevLogoUrl, splitModelId } from "@/utils/geo-model-display";
+import type { EngineIconProps } from "@/types/geo";
+import { splitModelId } from "@/utils/geo-model-display";
 
-export function EngineIcon({ engine, className }: EngineIconProps) {
+export function EngineIcon(props: EngineIconProps) {
+  return (
+    <span aria-hidden="true" className="contents">
+      <EngineIconGraphic {...props} />
+    </span>
+  );
+}
+
+function EngineIconGraphic({
+  engine,
+  className,
+  darkSurface,
+}: EngineIconProps) {
   const key = resolveEngineIconKey(engine);
   if (!key) {
     const parsed = splitModelId(engine);
@@ -72,6 +86,9 @@ export function EngineIcon({ engine, className }: EngineIconProps) {
   const iconClass = cn("size-4 shrink-0", className);
 
   if (key === "openai") {
+    if (darkSurface) {
+      return <OpenaiDark className={iconClass} />;
+    }
     return (
       <>
         <Openai className={cn(iconClass, "block dark:hidden")} />
@@ -80,9 +97,12 @@ export function EngineIcon({ engine, className }: EngineIconProps) {
     );
   }
   if (key === "grok") {
-    return themedIcon(SpaceXai, SpaceXaiDark, iconClass);
+    return themedIcon(Grok, GrokDark, iconClass, darkSurface);
   }
   if (key === "qwen") {
+    if (darkSurface) {
+      return <QwenDark className={iconClass} />;
+    }
     return (
       <>
         <Qwen className={cn(iconClass, "block dark:hidden")} />
@@ -97,7 +117,9 @@ export function EngineIcon({ engine, className }: EngineIconProps) {
     return <Gemini className={cn(iconClass, "overflow-visible")} />;
   }
   if (key === "perplexity") {
-    return <Perplexity className={iconClass} />;
+    return (
+      <Perplexity className={cn(iconClass, darkSurface && "brightness-150")} />
+    );
   }
   if (key === "mistral") {
     return <Mistral className={iconClass} />;
@@ -136,19 +158,19 @@ export function EngineIcon({ engine, className }: EngineIconProps) {
     return <Kimi className={iconClass} />;
   }
   if (key === "apple") {
-    return themedIcon(Apple, AppleDark, iconClass);
+    return themedIcon(Apple, AppleDark, iconClass, darkSurface);
   }
   if (key === "tiktok") {
-    return themedIcon(TikTok, TikTokDark, iconClass);
+    return themedIcon(TikTok, TikTokDark, iconClass, darkSurface);
   }
   if (key === "manus") {
-    return themedIcon(Manus, ManusDark, iconClass);
+    return themedIcon(Manus, ManusDark, iconClass, darkSurface);
   }
   if (key === "firecrawl") {
-    return themedIcon(Firecrawl, FirecrawlDark, iconClass);
+    return themedIcon(Firecrawl, FirecrawlDark, iconClass, darkSurface);
   }
   if (key === "opencode") {
-    return themedIcon(Opencode, OpencodeDark, iconClass);
+    return themedIcon(Opencode, OpencodeDark, iconClass, darkSurface);
   }
   const simple = SIMPLE_ICONS[key];
   if (simple) {
@@ -181,49 +203,22 @@ const SIMPLE_ICONS: Partial<
   timpi: Timpi,
   huawei: Huawei,
   kagi: Kagi,
+  zai: Zai,
 };
 
 function themedIcon(
   Light: ComponentType<SVGProps<SVGSVGElement>>,
   Dark: ComponentType<SVGProps<SVGSVGElement>>,
-  iconClass: string
+  iconClass: string,
+  darkSurface = false
 ) {
+  if (darkSurface) {
+    return <Dark className={iconClass} />;
+  }
   return (
     <>
       <Light className={cn(iconClass, "block dark:hidden")} />
       <Dark className={cn(iconClass, "hidden dark:block")} />
     </>
   );
-}
-
-const TOOLTIP_ICON_CLASS = "size-3.5";
-const TOOLTIP_ICON_IMG_PX = 14;
-const engineIconHtmlCache = new Map<string, string>();
-
-export function engineIconHtml(engine: string): string {
-  const cached = engineIconHtmlCache.get(engine);
-  if (cached !== undefined) {
-    return cached;
-  }
-  const html = resolveEngineIconKey(engine)
-    ? renderToStaticMarkup(
-        <span
-          aria-hidden="true"
-          className="inline-flex size-3.5 shrink-0 items-center justify-center"
-        >
-          <EngineIcon className={TOOLTIP_ICON_CLASS} engine={engine} />
-        </span>
-      )
-    : providerLogoImgHtml(engine);
-  engineIconHtmlCache.set(engine, html);
-  return html;
-}
-
-function providerLogoImgHtml(engine: string): string {
-  const parsed = splitModelId(engine);
-  if (!parsed) {
-    return "";
-  }
-  const src = modelsDevLogoUrl(parsed.provider);
-  return `<img alt="" class="size-3.5 shrink-0 dark:invert" height="${TOOLTIP_ICON_IMG_PX}" src="${src}" width="${TOOLTIP_ICON_IMG_PX}" />`;
 }

@@ -6,6 +6,7 @@ import {
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { GEO_SEARCH_LABEL } from "@notra/geo-core/constants/geo";
 import {
   Tooltip,
   TooltipContent,
@@ -13,9 +14,9 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { useId } from "react";
+
 import { Button } from "@/components/button";
 import { EngineIcon } from "@/components/geo/engine-icon";
-import { GEO_SEARCH_LABEL } from "@/constants/geo";
 import { cn } from "@/lib/utils";
 import type { PromptEngineSwitcherProps } from "@/types/geo";
 import {
@@ -66,10 +67,10 @@ export function PromptEngineSwitcher({
                 className={cn(
                   "relative inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-sm",
                   "transition-[color,transform] duration-150 ease-out",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                  "focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none",
                   "active:scale-[0.96]",
                   selected
-                    ? "font-medium text-foreground"
+                    ? "text-foreground font-medium"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 )}
                 key={result.engine}
@@ -81,7 +82,7 @@ export function PromptEngineSwitcher({
               >
                 {selected ? (
                   <motion.span
-                    className="absolute inset-0 rounded-full bg-muted"
+                    className="bg-muted absolute inset-0 rounded-full"
                     layoutId="geo-engine-pill"
                     transition={pillTransition}
                   />

@@ -13,7 +13,7 @@ export interface InstrumentModuleProps {
   children: ReactNode;
   className?: string;
   bodyClassName?: string;
-  variant?: "flat" | "panel";
+  variant?: "flat" | "panel" | "table";
   bareBody?: boolean;
 }
 

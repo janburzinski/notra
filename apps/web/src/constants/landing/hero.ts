@@ -8,6 +8,8 @@ export const HERO_HEADLINE_SEGMENTS: HeroHeadlineSegment[] = [
   { text: "." },
 ];
 
+export const HERO_HEADLINE_MOBILE_BREAK_INDEX = 2;
+
 export const HERO_SUBHEAD =
   "Notra turns your team's real GitHub and Linear activity into changelogs, launch posts, and social updates. In your voice, not ChatGPT's.";
 

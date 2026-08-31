@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@notra/ui/components/ui/card";
+
 import { cn } from "@/lib/utils";
 import type {
   InstrumentEmptyProps,
@@ -23,27 +24,40 @@ export function InstrumentModule({
   variant = "flat",
   bareBody = false,
 }: InstrumentModuleProps) {
-  if (variant === "panel") {
+  if (variant !== "flat") {
+    const tableHeader = variant === "table";
+    let headerClassName =
+      "border-border bg-muted min-h-24 content-start rounded-t-2xl border border-b-0 pt-4 pb-9";
+    let contentClassName =
+      "border-border bg-card relative -mt-9 flex flex-1 flex-col rounded-2xl border p-6";
+
+    if (bareBody) {
+      headerClassName = "px-1";
+      contentClassName = "flex flex-1 flex-col p-0";
+    } else if (tableHeader) {
+      headerClassName =
+        "border-border bg-muted h-[4.25rem] content-center rounded-t-2xl border border-b-0 pb-5";
+      contentClassName =
+        "border-border bg-card relative -mt-5 flex flex-1 flex-col rounded-2xl border p-4";
+    }
+
     return (
       <Card
         className={cn(
           "min-w-0 flex-1 overflow-visible rounded-2xl bg-transparent p-0 ring-0",
+          tableHeader && "gap-0",
           className
         )}
       >
-        <CardHeader
-          className={
-            bareBody
-              ? "px-1"
-              : "min-h-24 content-start rounded-t-2xl border border-border border-b-0 bg-muted pt-4 pb-9"
-          }
-        >
-          <CardTitle>{eyebrow}</CardTitle>
+        <CardHeader className={headerClassName}>
+          <CardTitle className={tableHeader ? "text-sm capitalize" : undefined}>
+            {eyebrow}
+          </CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
           {(readout || action) && (
             <CardAction className="flex min-w-0 items-center gap-2">
               {readout && (
-                <span className="truncate text-muted-foreground text-xs tabular-nums">
+                <span className="text-muted-foreground truncate text-xs tabular-nums">
                   {readout}
                 </span>
               )}
@@ -51,14 +65,7 @@ export function InstrumentModule({
             </CardAction>
           )}
         </CardHeader>
-        <CardContent
-          className={cn(
-            bareBody
-              ? "flex flex-1 flex-col p-0"
-              : "-mt-9 relative flex flex-1 flex-col rounded-2xl border border-border bg-card p-6",
-            bodyClassName
-          )}
-        >
+        <CardContent className={cn(contentClassName, bodyClassName)}>
           {children}
         </CardContent>
       </Card>
@@ -72,7 +79,7 @@ export function InstrumentModule({
         {(readout || action) && (
           <CardAction className="flex min-w-0 items-center gap-2 self-center">
             {readout && (
-              <span className="truncate text-muted-foreground text-xs capitalize tabular-nums">
+              <span className="text-muted-foreground truncate text-xs capitalize tabular-nums">
                 {readout}
               </span>
             )}
@@ -114,7 +121,7 @@ export function InstrumentSection({
         >
           <h2
             className={cn(
-              "font-medium text-foreground text-sm capitalize",
+              "text-foreground text-sm font-medium capitalize",
               !description && (readout || action) && "leading-none"
             )}
           >
@@ -127,7 +134,7 @@ export function InstrumentSection({
         {(readout || action) && (
           <div className="flex min-w-0 items-center gap-2">
             {readout && (
-              <span className="truncate text-muted-foreground text-xs capitalize tabular-nums">
+              <span className="text-muted-foreground truncate text-xs capitalize tabular-nums">
                 {readout}
               </span>
             )}
@@ -160,7 +167,7 @@ export function InstrumentEmpty({
       {preview ? (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 select-none opacity-40 [mask-image:linear-gradient(to_bottom,transparent_0%,black_24%,black_70%,transparent_100%)]"
+          className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_24%,black_70%,transparent_100%)] opacity-40 select-none"
         >
           {preview}
         </div>
@@ -169,13 +176,13 @@ export function InstrumentEmpty({
         className={cn(
           "relative z-10 flex items-center justify-center gap-2",
           preview &&
-            "rounded-full bg-background/85 px-3 py-1.5 shadow-xs backdrop-blur-[2px]"
+            "bg-background/85 rounded-full px-3 py-1.5 shadow-xs backdrop-blur-[2px]"
         )}
       >
         {busy ? (
           <span
             aria-hidden="true"
-            className="inline-flex size-4 text-muted-foreground motion-safe:animate-spin"
+            className="text-muted-foreground inline-flex size-4 motion-safe:animate-spin"
           >
             <svg
               aria-hidden="true"

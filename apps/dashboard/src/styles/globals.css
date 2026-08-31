@@ -46,12 +46,32 @@
     color: var(--geo-mid);
   }
 
+  .text-geo-search {
+    color: var(--geo-search);
+  }
+
+  .text-geo-memory {
+    color: var(--geo-memory);
+  }
+
   .bg-geo-up\/10 {
     background-color: color-mix(in oklab, var(--geo-up) 10%, transparent);
   }
 
   .bg-geo-down\/10 {
     background-color: color-mix(in oklab, var(--geo-down) 10%, transparent);
+  }
+
+  .bg-geo-mid\/10 {
+    background-color: color-mix(in oklab, var(--geo-mid) 10%, transparent);
+  }
+
+  .bg-geo-search\/10 {
+    background-color: color-mix(in oklab, var(--geo-search) 10%, transparent);
+  }
+
+  .bg-geo-memory\/10 {
+    background-color: color-mix(in oklab, var(--geo-memory) 10%, transparent);
   }
 }
 
@@ -196,9 +216,46 @@
   animation: thinking-letter 1.35s ease-in-out infinite;
 }
 
-@keyframes shimmer {
+@keyframes agent-readiness-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+.agent-readiness-progress {
+  animation: agent-readiness-progress 1.8s cubic-bezier(0.65, 0, 0.35, 1)
+    infinite;
+}
+
+@keyframes agent-readiness-pulse {
+  0%,
   100% {
-    transform: translateX(100%);
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.agent-readiness-pulse {
+  animation: agent-readiness-pulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-readiness-progress {
+    animation: none;
+    opacity: 0.5;
+    transform: none;
+    width: 100%;
+  }
+
+  .agent-readiness-pulse {
+    animation: none;
   }
 }
 

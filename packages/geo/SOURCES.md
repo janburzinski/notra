@@ -40,7 +40,7 @@ Last fully audited: **2026-08-22** (previous full audit 2026-08-05).
   OpenCode's fallback) and ten `reported` catalog tokens for major AI assistants and
   AI data providers. OpenAI, Anthropic and Perplexity publish no new tokens since the
   previous audit; `OAI-AdsBot` and Meta's crawlers were explicitly re-verified.
-- Total shipped signatures: 60.
+- Total shipped signatures: 63.
 
 - All 38 shipped signatures and every matched token were checked against the cited
   evidence below.
@@ -105,7 +105,10 @@ Last fully audited: **2026-08-22** (previous full audit 2026-08-05).
 | omgili | Webz.io | training-crawler | `omgilibot`<br>`omgili` | heuristic | [Webz.io bot docs](https://webz.io/blog/web-data/what-is-the-omgili-bot-and-why-is-it-crawling-your-website/) | — |
 | Mozilla Tabstack | Mozilla | assistant-browse | `Mozilla-Tabstack` | verified | [Tabstack access docs](https://docs.tabstack.ai/trust/controlling-access) | — |
 | AI2Bot | Ai2 | training-crawler | `AI2Bot` | verified | [Ai2 crawler notice](https://allenai.org/crawler) | — |
-| Kimi-User | Moonshot AI | assistant-browse | `Kimi-User` | reported | [ai.robots.txt catalog](https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json) | — |
+| Kimi-User | Moonshot AI | assistant-browse | `Kimi-User` | verified | [Kimi crawler policy](https://www.kimi.ai/policies/kimi-crawlers) | [IP ranges](https://www.kimi.ai/policies/kimi-user.json) |
+| KimiBot | Moonshot AI | training-crawler | `KimiBot` | verified | [Kimi crawler policy](https://www.kimi.ai/policies/kimi-crawlers) | [IP ranges](https://www.kimi.ai/policies/kimibot.json) |
+| Kimi-SearchBot | Moonshot AI | search-index | `Kimi-SearchBot` | verified | [Kimi crawler policy](https://www.kimi.ai/policies/kimi-crawlers) | [IP ranges](https://www.kimi.ai/policies/kimi-searchbot.json) |
+| ChatGLM-Spider | Zhipu AI | training-crawler | `ChatGLM-Spider` | reported | [Known Agents entry](https://knownagents.com/agents/chatglm-spider) | — |
 | TongyiBot | Alibaba | assistant-browse | `TongyiBot` | reported | [ai.robots.txt catalog](https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json) | — |
 | YiyanBot | Baidu | assistant-browse | `YiyanBot` | reported | [ai.robots.txt catalog](https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json) | — |
 | Manus-User | Butterfly Effect | assistant-browse | `Manus-User` | reported | [ai.robots.txt catalog](https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json) | — |
@@ -151,11 +154,14 @@ Last fully audited: **2026-08-22** (previous full audit 2026-08-05).
 - `Google` (exact match) is the bare user agent observed from the consumer Gemini app;
   Google does not document it, so it stays `reported`. Exact matching keeps it from
   claiming every other Google token.
-- The `reported` catalog tokens added on 2026-08-22 (`Kimi-User`, `TongyiBot`,
-  `YiyanBot`, `Manus-User`, `kagi-fetcher`, `DeepSeekBot`, `TikTokSpider`, `PanguBot`,
-  `ExaBot`, `TavilyBot`, `FirecrawlAgent`) are vendor-branded strings whose operators
-  are named in the catalog; none of those vendors publishes a crawler page with an IP
-  list yet. Treat them as attribution leads.
+- The `reported` catalog tokens added on 2026-08-22 (`TongyiBot`, `YiyanBot`,
+  `Manus-User`, `kagi-fetcher`, `DeepSeekBot`, `TikTokSpider`, `PanguBot`, `ExaBot`,
+  `TavilyBot`, `FirecrawlAgent`) are vendor-branded strings whose operators are named
+  in the catalog; none of those vendors publishes a crawler page with an IP list yet.
+  Treat them as attribution leads.
+- Moonshot has published an official Kimi crawler policy with IP JSON files since
+  2026. As of May 2026, each list contains four individual `/32` addresses in Alibaba
+  Cloud ranges.
 - `Applebot/` includes the slash intentionally. It avoids matching the robots-only
   `Applebot-Extended` directive.
 - The two Cline tokens share one signature and therefore both resolve to the agent name

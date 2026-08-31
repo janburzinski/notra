@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { CtaBanner } from "@/components/landing/cta-banner";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FeaturesSection } from "@/components/landing/features-section";
@@ -145,7 +146,7 @@ function LandingPageJsonLd() {
 
 export default function LandingPage() {
   return (
-    <div className="flex w-full flex-col items-stretch justify-start overflow-x-clip bg-white dark:bg-background">
+    <div className="dark:bg-background flex w-full flex-col items-stretch justify-start overflow-x-clip bg-white">
       <LandingPageJsonLd />
       <main className="flex w-full flex-col items-stretch justify-start">
         <HeroSection />
@@ -157,22 +158,19 @@ export default function LandingPage() {
         </p>
         <LogoMarquee />
         <FounderQuote />
-        <section className="content-defer" id="features">
+        <section id="features">
           <FeaturesSection />
         </section>
-        <section className="content-defer" id="testimonials">
+        <section id="testimonials">
           <TestimonialsSection />
         </section>
-        <div className="content-defer">
+        <div>
           <LandingPricingSection />
         </div>
-        <section className="content-defer" id="faq">
+        <section id="faq">
           <FaqSection />
         </section>
-        <section
-          className="px-6 pt-27.5 pb-27.5 content-defer lg:px-20"
-          id="cta"
-        >
+        <section className="px-6 pt-27.5 pb-27.5 lg:px-20" id="cta">
           <CtaBanner />
         </section>
       </main>

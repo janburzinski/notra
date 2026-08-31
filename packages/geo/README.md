@@ -3,7 +3,8 @@
 Request capture SDK for AI traffic attribution. It captures every page request your
 site serves and sends a neutral request envelope to Notra. All classification, crawler
 versus AI referral versus human, happens server side at ingest, so a stale local table
-never costs you traffic. The core tracker ships no signature table. Only the optional
+never costs you traffic. Requests classified as human are discarded at ingest and never
+stored. The core tracker ships no signature table. Only the optional
 Next.js `tagLinks` path bundles the matcher, because it has to decide at the edge which
 responses to rewrite for AI agents.
 
@@ -299,7 +300,7 @@ the operator's published IP range list or reverse DNS method where one exists.
 
 ## Agent feedback
 
-`@usenotra/geo/feedback` adds a `submit_feedback` tool to your MCP server so the agents using your product can report bugs, request features and leave praise in your Notra inbox. Copy the write-only feedback token from the Feedback page in your dashboard.
+`@usenotra/geo/feedback` adds a `submit_feedback` tool to your MCP server so the agents using your product can report bugs, request features and leave praise in your Notra inbox. Copy your feedback URL from the Feedback page in your dashboard. It is unique to your organization and needs no token.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -308,12 +309,12 @@ import { registerFeedbackTool } from "@usenotra/geo/feedback";
 const server = new McpServer({ name: "acme", version: "1.0.0" });
 
 registerFeedbackTool(server, {
-  token: process.env.NOTRA_FEEDBACK_TOKEN!,
+  url: "https://api.usenotra.com/v1/feedback/acme",
   productName: "Acme",
 });
 ```
 
-Outside of MCP, `submitFeedback(input, { token })` posts a single entry and resolves with `{ id, deduplicated }`. The MCP helper needs `zod` (already required by the MCP SDK); the plain client has no dependencies.
+Outside of MCP, `submitFeedback(input, { url })` posts a single entry and resolves with `{ id, deduplicated }`. The MCP helper needs `zod` (already required by the MCP SDK); the plain client has no dependencies.
 
 ## License
 
