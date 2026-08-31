@@ -150,7 +150,6 @@ import {
   assertActiveSubscription,
   assertGeoEntitlement,
 } from "@/lib/billing/subscription";
-import { assertAgentReadinessEnabled } from "@/lib/geo/agent-readiness-access";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { authorizedProcedure } from "@/lib/orpc/base";
 import { runOrpcEffect } from "@/lib/orpc/effect";
@@ -424,7 +423,6 @@ export const geoRouter = {
         organizationId: input.organizationId,
         user: context.user,
       });
-      await assertAgentReadinessEnabled(input.organizationId);
       const scope = await runOrpcEffect(
         requireGeoProject(input),
         toGeoOrpcError
@@ -442,7 +440,6 @@ export const geoRouter = {
           organizationId: input.organizationId,
           user: context.user,
         });
-        await assertAgentReadinessEnabled(input.organizationId);
         const scope = await runOrpcEffect(
           requireGeoProject(input),
           toGeoOrpcError

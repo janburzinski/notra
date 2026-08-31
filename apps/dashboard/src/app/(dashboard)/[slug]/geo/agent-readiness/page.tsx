@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { validateOrganizationAccess } from "@/lib/auth/actions";
-import { isAgentReadinessEnabledForOrganization } from "@/lib/geo/agent-readiness-flag";
 import type { AgentReadinessPageProps } from "@/types/agent-readiness";
 
 import PageClient from "./page-client";
@@ -17,11 +15,7 @@ export const instant = true;
 
 async function PageContent({ params }: AgentReadinessPageProps) {
   const { slug } = await params;
-  const { organization } = await validateOrganizationAccess(slug);
-  const enabled = await isAgentReadinessEnabledForOrganization(organization.id);
-  if (!enabled) {
-    notFound();
-  }
+  await validateOrganizationAccess(slug);
   return <PageClient organizationSlug={slug} />;
 }
 

@@ -34,6 +34,7 @@ import {
   canReuseAgentReadinessScan,
   toAgentReadinessApiErrorMessage,
 } from "../utils/agent-readiness";
+import { checkFeedbackMarkdown } from "../utils/feedback-md";
 import { normalizeWebsiteUrl } from "../utils/geo-website";
 
 export class AgentReadinessApiError extends Error {}
@@ -448,6 +449,11 @@ export async function executeAgentReadinessScan(
       );
     }
 
+    const feedbackMdIssue = await checkFeedbackMarkdown(payload.targetUrl);
+    const issues = feedbackMdIssue
+      ? [...report.issues, feedbackMdIssue]
+      : report.issues;
+
     const updated = await db
       .update(geoAgentReadinessReports)
       .set({
@@ -455,7 +461,9 @@ export async function executeAgentReadinessScan(
         score: report.score,
         scoreLabel: report.scoreLabel,
         scoreBreakdown: report.scoreBreakdown,
-        issues: report.issues,
+        // feedback.md is a Notra bonus check, so it does not alter the
+        // externally owned Is Agentic score or breakdown.
+        issues,
         eligibleChecks: report.eligibleChecks,
         reportUrl: report.reportUrl,
         errorMessage: null,

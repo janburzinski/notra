@@ -2,14 +2,6 @@
 export const AGENT_READINESS_API_ORIGIN = "https://is-agentic.com";
 export const AGENT_READINESS_USER_AGENT = "notra-geo/1.0 (+https://notra.so)";
 export const AGENT_READINESS_HTTP_NOT_FOUND = 404;
-export const AGENT_READINESS_FLAG_KEY = "agent-readiness";
-export const AGENT_READINESS_UNAVAILABLE_DESCRIPTION =
-  "Agent Readiness is not available for this organization.";
-/**
- * Error code the internal agent-readiness route returns when the feature flag
- * is off. The public API maps it onto a 403 instead of a generic start failure.
- */
-export const FEATURE_NOT_ENABLED_CODE = "FEATURE_NOT_ENABLED";
 /** Scans usually finish in 1-3 minutes; abort well past that. */
 export const AGENT_READINESS_SCAN_TIMEOUT_MS = 8 * 60 * 1000;
 export const AGENT_READINESS_REPORT_TIMEOUT_MS = 30 * 1000;

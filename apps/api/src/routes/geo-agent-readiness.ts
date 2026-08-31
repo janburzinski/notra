@@ -1,5 +1,4 @@
 import { createRoute } from "@hono/zod-openapi";
-import { FEATURE_NOT_ENABLED_CODE } from "@notra/geo-core/constants/agent-readiness";
 import {
   AgentReadinessApiError,
   AgentReadinessTargetMissingError,
@@ -21,25 +20,12 @@ import {
 import { projectParamsSchema } from "../schemas/geo-params";
 import { geoErrorResponse } from "../utils/geo";
 import { runGeoEffect } from "../utils/geo-effect";
-import { InternalDashboardError } from "../utils/internal-workflow";
 import { logError } from "../utils/logging";
 import { createOpenApiApp } from "../utils/openapi-app";
 import { rateLimitResponse } from "../utils/openapi-responses";
 import { enforceRatelimit, RATE_LIMITS, ratelimit } from "../utils/ratelimit";
 
-/**
- * Agent readiness reports.
- *
- * Both programs run in this process — they only touch the database and the
- * is-agentic API, which needs no credentials. The one capability the API lacks
- * is the Databuddy feature flag, and that is enforced where it can be: inside
- * the internal dashboard route that `startAgentReadinessRun` hands off to. A
- * disabled organization gets a 403 back through that hop.
- *
- * The read is deliberately not flag-gated. It returns rows this organization
- * already produced, and hiding a customer's own stored history behind a rollout
- * flag would be worse than showing it.
- */
+/** Agent readiness reports. */
 export const geoAgentReadinessRoutes = createOpenApiApp();
 
 const GEO_TAG = GEO_OPENAPI_TAG;
@@ -72,7 +58,7 @@ const startScanRoute = createRoute({
   operationId: "startGeoAgentReadinessScan",
   summary: "Start an agent readiness scan",
   description:
-    "Queues a readiness scan for the project's website. A scan already running against the same URL is reused rather than duplicated, in which case `alreadyRunning` is true. Requires the agent readiness feature to be enabled for the organization.",
+    "Queues a readiness scan for the project's website. A scan already running against the same URL is reused rather than duplicated, in which case `alreadyRunning` is true.",
   request: { params: projectParamsSchema },
   responses: {
     202: {
@@ -89,26 +75,11 @@ const startScanRoute = createRoute({
   },
 });
 
-/**
- * Maps the readiness helpers' thrown errors onto statuses.
- *
- * `AgentReadinessTargetMissingError` and `AgentReadinessApiError` are the two
- * the dashboard turns into a 400, so they read the same here. A flag refusal
- * arrives as an `InternalDashboardError` carrying `FEATURE_NOT_ENABLED`.
- */
+/** Maps the readiness helpers' thrown errors onto statuses. */
 function readinessFailure(error: unknown): {
-  status: 400 | 403 | 500;
+  status: 400 | 500;
   error: string;
 } {
-  if (
-    error instanceof InternalDashboardError &&
-    error.code === FEATURE_NOT_ENABLED_CODE
-  ) {
-    return {
-      status: 403,
-      error: "Agent Readiness is not available for this organization.",
-    };
-  }
   if (
     error instanceof AgentReadinessTargetMissingError ||
     error instanceof AgentReadinessApiError
@@ -139,9 +110,7 @@ geoAgentReadinessRoutes.openapi(getReadinessRoute, async (c) => {
       logError("[GEO] agentReadiness", error);
       return c.json({ error: failure.error }, 500);
     }
-    return failure.status === 403
-      ? c.json({ error: failure.error }, 403)
-      : c.json({ error: failure.error }, 400);
+    return c.json({ error: failure.error }, 400);
   }
 });
 
@@ -179,8 +148,6 @@ geoAgentReadinessRoutes.openapi(startScanRoute, async (c) => {
       logError("[GEO] agentReadinessScan", error);
       return c.json({ error: failure.error }, 500);
     }
-    return failure.status === 403
-      ? c.json({ error: failure.error }, 403)
-      : c.json({ error: failure.error }, 400);
+    return c.json({ error: failure.error }, 400);
   }
 });

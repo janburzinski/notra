@@ -14,10 +14,6 @@ import type {
 } from "../types/agent-readiness";
 import { stripWebsiteProtocol } from "./geo-website";
 
-export function isAgentReadinessVisibleInNav(flagOn: boolean): boolean {
-  return flagOn || process.env.NODE_ENV === "development";
-}
-
 export function canReuseAgentReadinessScan(
   running: AgentReadinessRunningScan,
   targetUrl: string,

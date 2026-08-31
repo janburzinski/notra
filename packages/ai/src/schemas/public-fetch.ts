@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const mcpFetchResponseSchema = z.custom<Response>(
+export const publicFetchResponseSchema = z.custom<Response>(
   (value) =>
     typeof value === "object" &&
     value !== null &&
