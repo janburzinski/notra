@@ -73,11 +73,6 @@ export interface AgentReadinessSectionHeaderProps {
   count: number;
 }
 
-export interface AgentReadinessScanningBreakdownTileProps {
-  label: string;
-  hint: string;
-}
-
 export interface AgentReadinessScoreDeltaProps {
   score: number;
   previousScore: number | null;
