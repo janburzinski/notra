@@ -46,8 +46,9 @@ Prompt rules:
 - A prompt is the exact text a real buyer would type into ChatGPT while researching this category - before they know this company exists. ${GEO_TRACKED_PROMPT_VOICE}
 - Treat the source queries as evidence of topics and buyer intent, not as copy. Rewrite the underlying intent in natural language. Never concatenate keywords, never mix languages within a prompt, and never write anything you would not plausibly type yourself.
 - Group related queries into one prompt; do not write one prompt per keyword.
-- Never mention "${brand}", its domain, or any brand name owned by ${brand} in the prompt. Never describe what ${brand} is or does. Frame each question around the topic, problem, or buying decision so the answer reveals whether an assistant recommends ${brand} unprompted. Competitor names are allowed only in alternatives or comparison prompts, still in the same lowercase voice ("what's a good hootsuite alternative").
-- Cover different intents across the set in that same voice: what tools to use, how to do a task, what to compare, and what a competitor alternative is. Use impressions to prioritize topics only after producing this balanced set. Do not append "${year}".
+- Never mention "${brand}", its domain, or any brand name owned by ${brand} in the prompt. Never describe what ${brand} is or does. Frame each question around the topic, problem, or buying decision so the answer reveals whether an assistant recommends ${brand} unprompted.
+- Only mention a competitor when its name appears verbatim in an exact source query attributed to that entry, and only in an alternative or comparison prompt. Never infer or invent a competitor.
+- Cover different intents supported by the source queries in that same voice, such as what tools to use, how to do a task, or what to compare. Do not force an intent that the source queries do not support. Use impressions to prioritize topics only after producing a balanced set. Do not append "${year}".
 - Each prompt must be between ${GEO_PROMPT_MIN_LENGTH} and ${GEO_PROMPT_MAX_LENGTH} characters, in the same language as the underlying queries.
 
 Title rules:
