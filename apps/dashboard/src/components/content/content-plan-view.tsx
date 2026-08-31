@@ -235,23 +235,17 @@ export function ContentPlanView({
 }: ContentPlanViewProps) {
   const readOnly = isWriting || !onChange;
   const [draft, setDraft] = useState(() => toKeyedPlan(brief));
-  const draftRef = useRef(draft);
-  draftRef.current = draft;
   const briefRef = useRef(brief);
-  const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
-  const onDirtyChangeRef = useRef(onDirtyChange);
-  onDirtyChangeRef.current = onDirtyChange;
 
-  const commit = (next = draftRef.current) => {
+  const commit = (next = draft) => {
     const savable = toSavableBrief(next);
-    if (!savable || !onChangeRef.current) {
+    if (!savable || !onChange) {
       return;
     }
-    if (briefsEqual(savable, briefRef.current)) {
+    if (briefsEqual(savable, brief)) {
       return;
     }
-    onChangeRef.current(savable);
+    onChange(savable);
   };
 
   useEffect(() => {
@@ -279,26 +273,25 @@ export function ContentPlanView({
     }
     const timer = window.setTimeout(() => {
       const savable = toSavableBrief(draft);
-      if (!savable || !onChangeRef.current) {
+      if (!savable || !onChange) {
         return;
       }
-      if (briefsEqual(savable, briefRef.current)) {
+      if (briefsEqual(savable, brief)) {
         return;
       }
-      onChangeRef.current(savable);
+      onChange(savable);
     }, CONTENT_PLAN_SAVE_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [draft, readOnly]);
+  }, [brief, draft, onChange, readOnly]);
 
   const savableDraft = toSavableBrief(draft);
   const isDirty = savableDraft === null || !briefsEqual(savableDraft, brief);
 
   useEffect(() => {
-    onDirtyChangeRef.current?.(isDirty);
-  }, [isDirty]);
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   const update = (next: KeyedContentPlan) => {
-    draftRef.current = next;
     setDraft(next);
   };
 
@@ -357,7 +350,6 @@ export function ContentPlanView({
                 }
                 const next = { ...draft, contentSubtype: value };
                 update(next);
-                draftRef.current = next;
                 commit(next);
               }}
               value={draft.contentSubtype}
