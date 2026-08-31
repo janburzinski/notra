@@ -17,6 +17,7 @@ import { generateText, Output } from "ai";
 import { and, eq, ne } from "drizzle-orm";
 
 import {
+  GEO_DISCOVERY_SYSTEM_PROMPT,
   GEO_GAP_TITLE_MAX_LENGTH,
   GEO_PROMPT_MAX_LENGTH,
   GEO_PROMPT_MIN_LENGTH,
@@ -39,16 +40,13 @@ import {
   resolveSourceKeywords,
   selectKeywordsForModel,
 } from "./suggestion-keywords";
-import {
-  buildGscSuggestionPrompt,
-  GSC_SUGGESTION_SYSTEM_PROMPT,
-} from "./suggestion-prompt";
+import { buildGscSuggestionPrompt } from "./suggestion-prompt";
 
 async function generateSuggestions(params: GscSuggestionGenerationParams) {
   const result = await generateText({
     model: gateway(GSC_SUGGESTION_MODEL, {}),
     output: Output.object({ schema: geoSearchConsoleSuggestionSchema }),
-    system: GSC_SUGGESTION_SYSTEM_PROMPT,
+    system: GEO_DISCOVERY_SYSTEM_PROMPT,
     prompt: buildGscSuggestionPrompt(params),
     maxOutputTokens: GSC_SUGGESTION_MAX_TOKENS,
   });
