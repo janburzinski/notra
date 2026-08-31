@@ -36,6 +36,7 @@ import {
   GEO_MAX_LANGUAGES,
   GEO_MAX_PROMPTS,
   GEO_MAX_SEQUENCES,
+  GEO_PROVIDER_TIMEOUT_MS,
   GEO_SCAN_CONCURRENCY,
   GEO_SCAN_LEASE_HEARTBEAT_MS,
   GEO_SEQUENCE_MAX_TURNS,
@@ -246,7 +247,7 @@ const askGatewayEngine = Effect.fn("geo.askGatewayEngine")(function* (
   gatewayPin: Exclude<GeoModelGateway, "cursor"> | undefined
 ) {
   const result = yield* Effect.tryPromise({
-    try: () =>
+    try: (signal) =>
       generateText({
         model: gateway(engine, {
           organizationId,
@@ -256,13 +257,24 @@ const askGatewayEngine = Effect.fn("geo.askGatewayEngine")(function* (
         prompt: promptText,
         system: GEO_ANSWER_SYSTEM_PROMPT,
         maxOutputTokens: GEO_ANSWER_MAX_TOKENS,
+        abortSignal: signal,
       }),
     catch: (cause) =>
       new GeoScanError({
         message: `Engine ${engine} failed to answer`,
         cause,
       }),
-  });
+  }).pipe(
+    Effect.timeoutOrElse({
+      duration: GEO_PROVIDER_TIMEOUT_MS,
+      orElse: () =>
+        Effect.fail(
+          new GeoScanError({
+            message: `Engine ${engine} timed out after ${GEO_PROVIDER_TIMEOUT_MS}ms`,
+          })
+        ),
+    })
+  );
   const answer: GeoEngineAnswer = {
     text: result.text,
     grounding: extractGrounding(result),
@@ -351,7 +363,7 @@ const askGroundedConversation = Effect.fn("geo.askGroundedConversation")(
     zdr: GeoZdrMode
   ) {
     const result = yield* Effect.tryPromise({
-      try: () => {
+      try: (signal) => {
         const invocation = buildGroundedInvocation(engine, {
           organizationId,
           zdr,
@@ -363,6 +375,7 @@ const askGroundedConversation = Effect.fn("geo.askGroundedConversation")(
           messages,
           system: GEO_ANSWER_SYSTEM_PROMPT,
           maxOutputTokens: GEO_GROUNDED_ANSWER_MAX_TOKENS,
+          abortSignal: signal,
         });
       },
       catch: (cause) =>
@@ -370,7 +383,17 @@ const askGroundedConversation = Effect.fn("geo.askGroundedConversation")(
           message: `Grounded engine ${engine.key} failed to answer`,
           cause,
         }),
-    });
+    }).pipe(
+      Effect.timeoutOrElse({
+        duration: GEO_PROVIDER_TIMEOUT_MS,
+        orElse: () =>
+          Effect.fail(
+            new GeoScanError({
+              message: `Grounded engine ${engine.key} timed out after ${GEO_PROVIDER_TIMEOUT_MS}ms`,
+            })
+          ),
+      })
+    );
     const answer: GeoGroundedAnswer = {
       text: result.text,
       grounding: extractGrounding(result),
@@ -391,7 +414,7 @@ const judgeAnswer = Effect.fn("geo.judgeAnswer")(function* (
   answer: string
 ) {
   const result = yield* Effect.tryPromise({
-    try: () =>
+    try: (signal) =>
       generateText({
         model: gateway(GEO_JUDGE_MODEL, {
           organizationId: context.organizationId,
@@ -401,10 +424,22 @@ const judgeAnswer = Effect.fn("geo.judgeAnswer")(function* (
         system:
           "You analyze AI assistant answers for brand mentions. Respond only with the requested structured data.",
         maxOutputTokens: GEO_JUDGE_MAX_TOKENS,
+        abortSignal: signal,
       }),
     catch: (cause) =>
       new GeoJudgeError({ message: "Judge model failed", cause }),
-  });
+  }).pipe(
+    Effect.timeoutOrElse({
+      duration: GEO_PROVIDER_TIMEOUT_MS,
+      orElse: () =>
+        Effect.fail(
+          new GeoJudgeError({
+            message: `Judge model timed out after ${GEO_PROVIDER_TIMEOUT_MS}ms`,
+            cause: new Error("Judge model request timed out"),
+          })
+        ),
+    })
+  );
   const judged: GeoJudgeResult = result.output;
   return judged;
 });
@@ -415,7 +450,7 @@ const translatePrompts = Effect.fn("geo.translatePrompts")(function* (
   prompts: GeoPromptDefinition[]
 ) {
   const result = yield* Effect.tryPromise({
-    try: () =>
+    try: (signal) =>
       generateText({
         model: gateway(GEO_JUDGE_MODEL, { organizationId }),
         output: Output.object({ schema: geoTranslationResultSchema }),
@@ -423,6 +458,7 @@ const translatePrompts = Effect.fn("geo.translatePrompts")(function* (
         system:
           "You translate user prompts faithfully, preserving intent and named entities. Respond only with the requested structured data.",
         maxOutputTokens: GEO_TRANSLATION_MAX_TOKENS,
+        abortSignal: signal,
       }),
     catch: (cause) =>
       new GeoTranslationError({
@@ -430,7 +466,18 @@ const translatePrompts = Effect.fn("geo.translatePrompts")(function* (
         language,
         cause,
       }),
-  });
+  }).pipe(
+    Effect.timeoutOrElse({
+      duration: GEO_PROVIDER_TIMEOUT_MS,
+      orElse: () =>
+        Effect.fail(
+          new GeoTranslationError({
+            message: `Translation to ${language} timed out after ${GEO_PROVIDER_TIMEOUT_MS}ms`,
+            language,
+          })
+        ),
+    })
+  );
   const translations = result.output.translations;
   if (translations.length !== prompts.length) {
     return yield* Effect.fail(

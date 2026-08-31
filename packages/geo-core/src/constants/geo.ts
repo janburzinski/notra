@@ -36,6 +36,8 @@ export const GEO_CURSOR_API_KEY_ENV = "CURSOR_API_KEY";
 /** Catalog id of the Cursor engine; the SDK model id is the slug part. */
 export const GEO_CURSOR_ENGINE_ID = "cursor/composer-2.5";
 export const GEO_CURSOR_MODEL_ID = "composer-2.5";
+/** Maximum wall-clock time for a single answer, judge, or translation call. */
+export const GEO_PROVIDER_TIMEOUT_MS = 90_000;
 /** Local Cursor runs took ~8s in testing; cold starts can be slower. */
 export const GEO_CURSOR_TIMEOUT_MS = 90_000;
 /** Databuddy flag that exposes the Cursor engine to an organization. */
