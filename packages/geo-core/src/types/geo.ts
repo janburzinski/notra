@@ -243,6 +243,11 @@ export interface GeoPromptResult {
   excerpt: string;
   searchQueries: string[];
   sources: GeoAnswerSource[];
+  finishReason: string | null;
+  promptTokens: number | null;
+  outputTokens: number | null;
+  reasoningTokens: number | null;
+  truncated: boolean | null;
   lastCheckedAt: string;
 }
 
@@ -378,6 +383,11 @@ export interface GeoSequenceTurnResult {
   excerpt: string;
   searchQueries: string[];
   sources: GeoAnswerSource[];
+  finishReason: string | null;
+  promptTokens: number | null;
+  outputTokens: number | null;
+  reasoningTokens: number | null;
+  truncated: boolean | null;
   lastCheckedAt: string;
 }
 

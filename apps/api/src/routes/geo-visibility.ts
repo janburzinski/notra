@@ -216,7 +216,27 @@ geoVisibilityRoutes.openapi(promptResultsRoute, async (c) => {
     return geoErrorResponse(c, outcome.failure);
   }
 
-  return c.json({ ...outcome.value, organization: base.organization }, 200);
+  const results = outcome.value.results.map((result) => ({
+    promptId: result.promptId,
+    engine: result.engine,
+    prompt: result.prompt,
+    answer: result.answer,
+    mentioned: result.mentioned,
+    position: result.position,
+    sentiment: result.sentiment,
+    excerpt: result.excerpt,
+    searchQueries: result.searchQueries,
+    sources: result.sources,
+    lastCheckedAt: result.lastCheckedAt,
+  }));
+  return c.json(
+    {
+      configured: outcome.value.configured,
+      results,
+      organization: base.organization,
+    },
+    200
+  );
 });
 
 geoVisibilityRoutes.openapi(competitorShareRoute, async (c) => {

@@ -154,6 +154,11 @@ export const loadGeoSequenceResults = Effect.fn("geo.sequenceResults")(
                 url: source.url,
                 domain: "",
               })),
+        finishReason: row.finishReason,
+        promptTokens: row.promptTokens,
+        outputTokens: row.outputTokens,
+        reasoningTokens: row.reasoningTokens,
+        truncated: row.truncated,
         lastCheckedAt: row.lastCheckedAt.toISOString(),
       })),
     };

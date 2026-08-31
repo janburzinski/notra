@@ -178,6 +178,10 @@ function buildMentionRow(input: {
     excerpt,
     grounding: EMPTY_GEO_CHECK_GROUNDING,
     language: input.language,
+    finishReason: null,
+    promptTokens: null,
+    outputTokens: null,
+    reasoningTokens: null,
   };
 }
 

@@ -699,6 +699,11 @@ export const loadGeoPromptResults = Effect.fn("geo.promptResults")(function* (
       excerpt: row.excerpt,
       searchQueries: row.grounding.queries,
       sources: row.grounding.sources,
+      finishReason: row.finishReason,
+      promptTokens: row.promptTokens,
+      outputTokens: row.outputTokens,
+      reasoningTokens: row.reasoningTokens,
+      truncated: row.truncated,
       lastCheckedAt: row.lastCheckedAt.toISOString(),
     })),
   };

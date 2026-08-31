@@ -150,6 +150,10 @@ export async function insertGeoMentionChecks(
       grounding: row.grounding,
       language: row.language,
       sources: row.sources ?? [],
+      finishReason: row.finishReason,
+      promptTokens: row.promptTokens,
+      outputTokens: row.outputTokens,
+      reasoningTokens: row.reasoningTokens,
       zdrEnforced: row.zdrEnforced ?? null,
       capturedAt: row.capturedAt,
     }));
@@ -254,6 +258,10 @@ export async function queryGeoCheckPromptResults(
       sentiment: geoMentionChecks.sentiment,
       excerpt: geoMentionChecks.excerpt,
       grounding: geoMentionChecks.grounding,
+      finishReason: geoMentionChecks.finishReason,
+      promptTokens: geoMentionChecks.promptTokens,
+      outputTokens: geoMentionChecks.outputTokens,
+      reasoningTokens: geoMentionChecks.reasoningTokens,
       lastCheckedAt: geoMentionChecks.capturedAt,
     })
     .from(geoMentionChecks)
@@ -280,6 +288,12 @@ export async function queryGeoCheckPromptResults(
       sentiment: row.sentiment,
       excerpt: row.excerpt,
       grounding: parseGeoCheckGrounding(row.grounding),
+      finishReason: row.finishReason,
+      promptTokens: row.promptTokens,
+      outputTokens: row.outputTokens,
+      reasoningTokens: row.reasoningTokens,
+      truncated:
+        row.finishReason === null ? null : row.finishReason === "length",
       lastCheckedAt: row.lastCheckedAt,
     }))
     .sort(
@@ -580,6 +594,10 @@ export async function queryGeoCheckSequenceResults(
         excerpt: geoMentionChecks.excerpt,
         sources: geoMentionChecks.sources,
         grounding: geoMentionChecks.grounding,
+        finishReason: geoMentionChecks.finishReason,
+        promptTokens: geoMentionChecks.promptTokens,
+        outputTokens: geoMentionChecks.outputTokens,
+        reasoningTokens: geoMentionChecks.reasoningTokens,
         lastCheckedAt: geoMentionChecks.capturedAt,
       }
     )
@@ -609,6 +627,12 @@ export async function queryGeoCheckSequenceResults(
         excerpt: row.excerpt,
         sources: row.sources,
         grounding: parseGeoCheckGrounding(row.grounding),
+        finishReason: row.finishReason,
+        promptTokens: row.promptTokens,
+        outputTokens: row.outputTokens,
+        reasoningTokens: row.reasoningTokens,
+        truncated:
+          row.finishReason === null ? null : row.finishReason === "length",
         lastCheckedAt: row.lastCheckedAt,
       },
     ];

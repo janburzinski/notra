@@ -1586,6 +1586,10 @@ export const geoMentionChecks = pgTable(
       .$type<{ url: string; title: string | null }[]>()
       .notNull()
       .default(sql`'[]'::jsonb`),
+    finishReason: text("finish_reason"),
+    promptTokens: integer("prompt_tokens"),
+    outputTokens: integer("output_tokens"),
+    reasoningTokens: integer("reasoning_tokens"),
     // Whether the engine call ran with zero data retention enforced. Null on
     // rows written before the column existed or when the route did not say.
     zdrEnforced: boolean("zdr_enforced"),
