@@ -11,107 +11,16 @@ import {
   type PerplexitySearchSource,
 } from "@notra/ui/components/brainless/perplexity/perplexity-search";
 import { useReducedMotion } from "motion/react";
-import { useEffect, useState } from "react";
 
 import { AnswerMarkdown } from "@/components/geo/geo-prompt-answer-thread";
 import { GeoSkinMessage } from "@/components/geo/geo-skin-message";
+import { useAnswerReplay } from "@/lib/hooks/use-answer-replay";
 import { cn } from "@/lib/utils";
-import type { ConversationReplayThreadProps } from "@/types/geo";
+import type {
+  AnswerReplayProgress,
+  ConversationReplayThreadProps,
+} from "@/types/geo";
 import { geoChatSkin } from "@/utils/geo-chat-skin";
-
-const USER_PAUSE_MS = 420;
-const THINKING_MS = 1400;
-const TURN_PAUSE_MS = 480;
-const REDUCED_MOTION_PAUSE_MS = 80;
-const TYPE_INTERVAL_MS = 24;
-const MIN_TYPE_INTERVAL_MS = 6;
-const MAX_TYPE_TOTAL_MS = 9000;
-const WHITESPACE_SPLIT = /(\s+)/;
-
-type ReplayStage = "user" | "thinking" | "typing";
-
-interface ReplayProgress {
-  index: number;
-  stage: ReplayStage;
-  typed: string;
-}
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function typeInterval(tokenCount: number): number {
-  if (tokenCount === 0) {
-    return TYPE_INTERVAL_MS;
-  }
-  return Math.max(
-    MIN_TYPE_INTERVAL_MS,
-    Math.min(TYPE_INTERVAL_MS, Math.round(MAX_TYPE_TOTAL_MS / tokenCount))
-  );
-}
-
-function useConversationReplay(
-  turns: readonly GeoSequenceTurnResult[],
-  playToken: number,
-  reducedMotion: boolean
-) {
-  const [progress, setProgress] = useState<ReplayProgress | null>(null);
-
-  useEffect(() => {
-    if (playToken === 0) {
-      return;
-    }
-    let cancelled = false;
-    const pause = (ms: number) =>
-      wait(reducedMotion ? REDUCED_MOTION_PAUSE_MS : ms);
-
-    async function play() {
-      const script = turns;
-      for (let index = 0; index < script.length; index += 1) {
-        if (cancelled) {
-          return;
-        }
-        setProgress({ index, stage: "user", typed: "" });
-        await pause(USER_PAUSE_MS);
-        if (cancelled) {
-          return;
-        }
-        setProgress({ index, stage: "thinking", typed: "" });
-        await pause(THINKING_MS);
-        if (cancelled) {
-          return;
-        }
-        const answer = script[index]?.answer ?? "";
-        if (reducedMotion) {
-          setProgress({ index, stage: "typing", typed: answer });
-        } else {
-          const tokens = answer.split(WHITESPACE_SPLIT);
-          const interval = typeInterval(tokens.length);
-          let typed = "";
-          for (const token of tokens) {
-            typed += token;
-            if (cancelled) {
-              return;
-            }
-            setProgress({ index, stage: "typing", typed });
-            await wait(interval);
-          }
-        }
-        await pause(TURN_PAUSE_MS);
-      }
-      if (!cancelled) {
-        setProgress(null);
-      }
-    }
-
-    play();
-    return () => {
-      cancelled = true;
-    };
-  }, [playToken, reducedMotion, turns]);
-
-  return progress;
-}
 
 function replaySources(turn: GeoSequenceTurnResult): PerplexitySearchSource[] {
   return perplexitySourcesFromStoredOrExcerpt(turn.sources, turn.answer);
@@ -175,7 +84,7 @@ function ReplayTurn({
 }: {
   turn: GeoSequenceTurnResult;
   skin: GeoChatSkin;
-  progress: ReplayProgress | null;
+  progress: AnswerReplayProgress | null;
   index: number;
 }) {
   const isReplaying = progress !== null;
@@ -239,11 +148,7 @@ export function ConversationReplayThread({
 }: ConversationReplayThreadProps) {
   const skin = geoChatSkin(engine);
   const reducedMotion = useReducedMotion();
-  const progress = useConversationReplay(
-    turns,
-    playToken,
-    Boolean(reducedMotion)
-  );
+  const progress = useAnswerReplay(turns, playToken, Boolean(reducedMotion));
 
   return (
     <div

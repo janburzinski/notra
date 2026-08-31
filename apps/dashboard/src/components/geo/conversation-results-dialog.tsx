@@ -69,7 +69,7 @@ export function ConversationResultsDialog({
     open ? sequence?.id : undefined
   );
   const [engine, setEngine] = useState<string | null>(null);
-  const [playToken, setPlayToken] = useState(0);
+  const [playToken, setPlayToken] = useState(1);
 
   const threads = useMemo(
     () => buildSequenceEngineThreads(data?.results ?? [], sequence?.id),
@@ -107,7 +107,6 @@ export function ConversationResultsDialog({
                 active={active}
                 onChange={(next) => {
                   setEngine(next);
-                  setPlayToken(0);
                 }}
                 results={threads}
               />

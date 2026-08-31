@@ -15,12 +15,17 @@ import { GeminiComposer } from "@notra/ui/components/brainless/gemini/gemini-com
 import { PerplexityActions } from "@notra/ui/components/brainless/perplexity/perplexity-actions";
 import { PerplexityComposer } from "@notra/ui/components/brainless/perplexity/perplexity-composer";
 import type { PerplexitySearchSource } from "@notra/ui/types/perplexity";
-import type { ReactNode } from "react";
+import { useReducedMotion } from "motion/react";
+import { type ReactNode, useMemo } from "react";
 
 import { GeoAnswerSearch } from "@/components/geo/geo-answer-search";
 import { GeoSkinMessage } from "@/components/geo/geo-skin-message";
+import { useAnswerReplay } from "@/lib/hooks/use-answer-replay";
 import { cn } from "@/lib/utils";
-import type { GeoPromptAnswerThreadProps } from "@/types/geo";
+import type {
+  AnswerReplayProgress,
+  GeoPromptAnswerThreadProps,
+} from "@/types/geo";
 import {
   chatgptModelForEngine,
   claudeModelForEngine,
@@ -100,14 +105,16 @@ export function AnswerMarkdown({
 function AssistantBody({
   answer,
   mentioned,
+  mode = "static",
   skin,
 }: {
   answer: string;
   mentioned: boolean;
+  mode?: "static" | "streaming";
   skin: GeoChatSkin;
 }) {
   if (answer.length > 0) {
-    return <AnswerMarkdown skin={skin} text={answer} />;
+    return <AnswerMarkdown mode={mode} skin={skin} text={answer} />;
   }
 
   return (
@@ -191,6 +198,7 @@ function ThreadMessages({
   timestamp,
   search,
   sources,
+  progress,
 }: {
   prompt: string;
   answer: string;
@@ -199,25 +207,56 @@ function ThreadMessages({
   timestamp: string;
   search: ReactNode;
   sources: PerplexitySearchSource[];
+  progress: AnswerReplayProgress | null;
 }) {
+  const stage = progress?.stage ?? null;
+  const answerDone = progress === null;
+  const showThinking = stage === "thinking";
+  const showAnswer = answerDone || stage === "typing";
+  const answerText = stage === "typing" ? (progress?.typed ?? "") : answer;
+
   return (
     <>
       <GeoSkinMessage from="user" skin={skin}>
         {prompt}
       </GeoSkinMessage>
-      <GeoSkinMessage
-        actions={assistantActions({
-          excerpt: answer,
-          skin,
-          sources,
-          timestamp,
-        })}
-        from="assistant"
-        search={search}
-        skin={skin}
-      >
-        <AssistantBody answer={answer} mentioned={mentioned} skin={skin} />
-      </GeoSkinMessage>
+      {(showThinking || showAnswer) && (
+        <GeoSkinMessage
+          actions={
+            answerDone
+              ? assistantActions({
+                  excerpt: answer,
+                  skin,
+                  sources,
+                  timestamp,
+                })
+              : undefined
+          }
+          from="assistant"
+          search={showAnswer ? search : undefined}
+          skin={skin}
+        >
+          {showThinking ? (
+            <p
+              className={cn(
+                "text-muted-foreground animate-pulse",
+                skin === "perplexity"
+                  ? "font-serif text-[17.5px]"
+                  : "text-[15px]"
+              )}
+            >
+              Thinking…
+            </p>
+          ) : (
+            <AssistantBody
+              answer={answerText}
+              mentioned={mentioned}
+              mode={answerDone ? "static" : "streaming"}
+              skin={skin}
+            />
+          )}
+        </GeoSkinMessage>
+      )}
     </>
   );
 }
@@ -228,6 +267,9 @@ export function GeoPromptAnswerThread({
 }: GeoPromptAnswerThreadProps) {
   const skin = geoChatSkin(result.engine);
   const answer = displayAnswer(result);
+  const replayTurns = useMemo(() => [{ answer }], [answer]);
+  const reducedMotion = useReducedMotion();
+  const progress = useAnswerReplay(replayTurns, 1, Boolean(reducedMotion));
   const sources = threadSources(result, answer);
   const search = isGroundedEngine(result.engine) ? (
     <GeoAnswerSearch
@@ -251,6 +293,7 @@ export function GeoPromptAnswerThread({
             answer={answer}
             mentioned={result.mentioned}
             prompt={prompt}
+            progress={progress}
             search={search}
             skin={skin}
             sources={sources}

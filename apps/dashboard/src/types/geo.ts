@@ -157,6 +157,18 @@ export interface ConversationReplayThreadProps {
   playToken: number;
 }
 
+export type AnswerReplayStage = "user" | "thinking" | "typing";
+
+export interface AnswerReplayProgress {
+  index: number;
+  stage: AnswerReplayStage;
+  typed: string;
+}
+
+export interface AnswerReplayTurn {
+  answer: string;
+}
+
 export interface GeoScanPayload {
   organizationId: string;
   projectId?: string;
