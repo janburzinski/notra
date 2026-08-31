@@ -118,3 +118,38 @@ export function useGeoWriterStart(organizationId: string) {
     },
   });
 }
+
+export function useGeoWriterUpdate(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  const invalidate = useInvalidateWriterQueries(organizationId);
+  return useMutation({
+    mutationFn: (input: {
+      briefId: string;
+      markdown: string;
+      workingTitle?: string;
+    }) =>
+      dashboardOrpc.geo.writerUpdate.call({
+        ...input,
+        organizationId,
+        projectId,
+      }),
+    onSuccess: async (result) => {
+      await Promise.all([
+        invalidate(),
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.writerBrief.queryKey({
+            input: {
+              organizationId,
+              projectId,
+              briefId: result.id,
+            },
+          }),
+        }),
+      ]);
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, "Failed to update the plan"));
+    },
+  });
+}

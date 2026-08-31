@@ -91,6 +91,9 @@ export async function updatePostRecord(
   if (params.recommendations !== undefined) {
     updates.recommendations = params.recommendations;
   }
+  if (params.contentSubtype !== undefined) {
+    updates.contentSubtype = params.contentSubtype;
+  }
 
   if (Object.keys(updates).length === 0) {
     return { status: "no_changes" };

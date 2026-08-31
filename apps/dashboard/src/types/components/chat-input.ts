@@ -34,6 +34,7 @@ export interface ChatInputProps {
   error?: string | null;
   onClearError?: () => void;
   connectedTop?: boolean;
+  placeholder?: string;
 }
 
 export type EnabledRepo = GitHubRepository & { integrationId: string };

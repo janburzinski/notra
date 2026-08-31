@@ -28,6 +28,7 @@ export interface UpdatePostRecordParams {
   slug?: string | null;
   markdown?: string;
   recommendations?: string | null;
+  contentSubtype?: BlogPostSubtype | null;
 }
 
 export interface UpdatePostRecordResult {

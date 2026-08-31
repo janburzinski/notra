@@ -48,6 +48,7 @@ export async function orchestrateChat(
     log: inputLog,
     timezone,
     telemetryMetadata,
+    documentMode,
   } = input;
 
   const log = deps?.log ?? inputLog;
@@ -109,6 +110,7 @@ export async function orchestrateChat(
   const systemPrompt = getContentEditorChatPrompt({
     selection,
     contentType,
+    documentMode,
     repoContext,
     linearContext,
     toolDescriptions: descriptions,

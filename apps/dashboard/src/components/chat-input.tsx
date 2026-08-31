@@ -78,6 +78,7 @@ const ChatInput = ({
   error: externalError,
   onClearError,
   connectedTop = false,
+  placeholder,
 }: ChatInputProps) => {
   const contextPickerId = useId();
   const [isFocused, setIsFocused] = useState(false);
@@ -471,7 +472,11 @@ const ChatInput = ({
           }}
           onFocus={() => setIsFocused(true)}
           onInput={resizeTextarea}
-          placeholder={isLoading ? "Queue a message..." : "Send a message..."}
+          placeholder={
+            isLoading
+              ? "Queue a message..."
+              : (placeholder ?? "Send a message...")
+          }
           ref={textareaRef}
           rows={1}
           value={value}

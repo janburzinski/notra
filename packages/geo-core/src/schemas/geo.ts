@@ -1,5 +1,7 @@
+import { GEO_BRIEF_MAX_TITLE_LENGTH } from "@notra/ai/constants/geo-writer";
 import { SUPPORTED_LANGUAGES } from "@notra/ai/constants/languages";
 import { geoContentSubtypeSchema } from "@notra/ai/schemas/geo-writer";
+import { POST_MARKDOWN_MAX_LENGTH } from "@notra/ai/schemas/limits";
 import {
   array,
   boolean,
@@ -402,6 +404,15 @@ export const geoWriterPlanInputSchema = geoOrganizationInputSchema.extend({
 
 export const geoWriterBriefIdInputSchema = geoOrganizationInputSchema.extend({
   briefId: string().min(1),
+});
+
+export const geoWriterUpdateInputSchema = geoWriterBriefIdInputSchema.extend({
+  markdown: string().trim().min(1).max(POST_MARKDOWN_MAX_LENGTH),
+  workingTitle: string()
+    .trim()
+    .min(1)
+    .max(GEO_BRIEF_MAX_TITLE_LENGTH)
+    .optional(),
 });
 
 export const geoWriterWorkflowPayloadSchema = object({

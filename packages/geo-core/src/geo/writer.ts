@@ -6,7 +6,10 @@ import type {
   GeoContentBrief,
   GeoPlannerSitemapPage,
 } from "@notra/ai/types/geo-writer";
-import { createPostRecord } from "@notra/ai/utils/post-service";
+import {
+  createPostRecord,
+  updatePostRecord,
+} from "@notra/ai/utils/post-service";
 import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
@@ -44,9 +47,13 @@ import type {
   GeoWriterPlanInput,
   GeoWriterPlanResponse,
   GeoWriterStartResponse,
+  GeoWriterUpdateInput,
 } from "../types/geo";
 import { REUSABLE_BRIEF_STATUSES } from "../utils/geo-gaps";
-import { geoBriefToMarkdown } from "../utils/geo-writer-brief-markdown";
+import {
+  geoBriefToMarkdown,
+  markdownToGeoBrief,
+} from "../utils/geo-writer-brief-markdown";
 import { geoDb } from "./effect";
 import {
   GeoContentBriefNotFoundError,
@@ -327,6 +334,96 @@ export const getGeoContentBrief = Effect.fn("geo.writer.briefGet")(function* (
   const row = yield* requireBriefRow(scope, briefId);
   return toBriefDetail(row);
 });
+
+const REVISABLE_BRIEF_STATUSES = ["draft", "failed"] as const;
+
+export const updateGeoContentBrief = Effect.fn("geo.writer.briefUpdate")(
+  function* (input: GeoScopeInput & GeoWriterUpdateInput) {
+    const scope = yield* requireGeoProject(input);
+    const row = yield* requireBriefRow(scope, input.briefId);
+    if (!REVISABLE_BRIEF_STATUSES.some((status) => status === row.status)) {
+      return yield* Effect.fail(
+        new GeoContentBriefStateError({
+          briefId: input.briefId,
+          status: row.status,
+        })
+      );
+    }
+
+    const brief = markdownToGeoBrief(input.markdown, {
+      workingTitle: input.workingTitle?.trim() || row.brief.workingTitle,
+      contentSubtype: row.brief.contentSubtype,
+    });
+    if (!brief) {
+      return yield* Effect.fail(
+        new GeoWriterPlanError({
+          message:
+            "Could not read this as a content plan. Keep the plan field structure and try again.",
+        })
+      );
+    }
+
+    const markdown = geoBriefToMarkdown(brief);
+    const updatedRows = yield* geoDb("brief revise failed", () =>
+      db
+        .update(geoContentBriefs)
+        .set({
+          brief,
+          error: null,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(geoContentBriefs.organizationId, scope.organizationId),
+            eq(geoContentBriefs.projectId, scope.projectId),
+            eq(geoContentBriefs.id, input.briefId),
+            inArray(geoContentBriefs.status, [...REVISABLE_BRIEF_STATUSES])
+          )
+        )
+        .returning()
+    );
+    const updated = updatedRows.at(0);
+    if (!updated) {
+      const current = yield* requireBriefRow(scope, input.briefId);
+      return yield* Effect.fail(
+        new GeoContentBriefStateError({
+          briefId: input.briefId,
+          status: current.status,
+        })
+      );
+    }
+
+    if (!updated.postId) {
+      return toBriefDetail(updated);
+    }
+
+    const postId = updated.postId;
+    const saved = yield* Effect.tryPromise({
+      try: () =>
+        updatePostRecord({
+          organizationId: scope.organizationId,
+          postId,
+          title: brief.workingTitle,
+          markdown,
+          contentSubtype: brief.contentSubtype,
+        }),
+      catch: (cause) =>
+        new GeoWriterPlanError({
+          message: "Failed to save the revised plan",
+          cause,
+        }),
+    });
+    if (saved.status === "not_found") {
+      return yield* Effect.fail(
+        new GeoWriterPlanError({
+          message: "Failed to save the revised plan",
+        })
+      );
+    }
+
+    return toBriefDetail(updated);
+  }
+);
 
 const markBriefFailed = (
   scope: Required<GeoScopeInput>,

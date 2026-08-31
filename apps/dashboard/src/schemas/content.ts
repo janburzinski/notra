@@ -304,6 +304,7 @@ export const chatRequestSchema = z.object({
   messages: z.array(uiMessageSchema).min(1).max(UI_MESSAGES_MAX),
   currentMarkdown: z.string().max(POST_MARKDOWN_MAX_LENGTH),
   contentType: z.string().max(100).optional(),
+  documentMode: z.enum(["plan"]).optional(),
   selection: textSelectionSchema.optional(),
   context: z.array(contextItemSchema).max(50).optional(),
   timezone: z.string().min(1).max(100).optional(),

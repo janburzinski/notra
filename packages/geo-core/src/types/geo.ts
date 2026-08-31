@@ -1127,6 +1127,12 @@ export interface GeoWriterPlanResponse {
   postId: string | null;
 }
 
+export interface GeoWriterUpdateInput {
+  briefId: string;
+  markdown: string;
+  workingTitle?: string;
+}
+
 export type GeoGapWriteAction = "write" | "review" | "writing" | "open";
 
 export interface GeoGapBriefRef {

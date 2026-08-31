@@ -23,6 +23,7 @@ export type BlogPostTonePromptInput = BaseTonePromptInput;
 export interface ContentEditorChatPromptParams {
   selection?: TextSelection;
   contentType?: string;
+  documentMode?: "plan";
   repoContext?: Array<{
     integrationId: string;
   }>;

@@ -59,3 +59,11 @@ export function parseGeoWriterDraft(sourceMetadata: unknown): {
     projectId: parsed.data.projectId,
   };
 }
+
+export function isGeoWriterPlanReviewable(status: string | undefined): boolean {
+  return status === "draft" || status === "failed";
+}
+
+export function isGeoWriterPlanActive(status: string | undefined): boolean {
+  return Boolean(status && status !== "completed");
+}
