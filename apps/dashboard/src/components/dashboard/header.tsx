@@ -352,7 +352,10 @@ export function SiteHeader() {
           />
           <NavUser />
           <ResponsiveDialog onOpenChange={setFeedbackOpen} open={feedbackOpen}>
-            <ResponsiveDialogContent className="gap-0 p-0 sm:max-w-md">
+            <ResponsiveDialogContent
+              className="gap-0 p-0 sm:max-w-md"
+              showCloseButton={false}
+            >
               <ResponsiveDialogHeader className="sr-only">
                 <ResponsiveDialogTitle>Send feedback</ResponsiveDialogTitle>
                 <ResponsiveDialogDescription>
