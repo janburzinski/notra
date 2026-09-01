@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Noto_Sans } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 
 import "@/styles/globals.css";
 
@@ -9,8 +9,8 @@ import { SITE_CONFIG } from "../utils/site";
 
 export const instant = false;
 
-const notoSans = Noto_Sans({
-  variable: "--font-noto-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -45,7 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${notoSans.variable} ${geistMono.variable} dark:scheme-dark`}
+      className={`${inter.variable} ${geistMono.variable} dark:scheme-dark`}
       lang="en"
       suppressHydrationWarning
     >
