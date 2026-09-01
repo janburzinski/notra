@@ -1,4 +1,8 @@
-import { GEO_SOURCE_DOMAIN_LIMIT } from "@notra/ai/constants/geo-tools";
+import {
+  GEO_SOURCE_DOMAIN_LIMIT,
+  GEO_SOURCES_MAX_SCANNED_RESULTS,
+  GEO_SOURCES_ROW_SCAN_MULTIPLIER,
+} from "@notra/ai/constants/geo-tools";
 import { getGeoSourcesInputSchema } from "@notra/ai/schemas/geo-tools";
 import type { GeoToolConfig } from "@notra/ai/types/geo-tools";
 import { toolDescription } from "@notra/ai/utils/description";
@@ -18,10 +22,14 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
     }),
     inputSchema: getGeoSourcesInputSchema,
     execute: async ({ days, limit, promptId, engine }) => {
+      const rowScanLimit = Math.min(
+        limit * GEO_SOURCES_ROW_SCAN_MULTIPLIER,
+        GEO_SOURCES_MAX_SCANNED_RESULTS,
+      );
       const rows = await queryGeoCheckPromptResults(
         { organizationId: config.organizationId, projectId: null },
         toGeoCheckWindow({ days }),
-        { limit, promptId, engine },
+        { limit: rowScanLimit, promptId, engine },
       );
       const seen = new Set<string>();
       const sources = rows
@@ -52,7 +60,7 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
       return {
         sources: sources.slice(0, limit),
         returnedSources: Math.min(sources.length, limit),
-        resultsMayBeTruncated: rows.length === limit,
+        resultsMayBeTruncated: sources.length > limit || rows.length === rowScanLimit,
         domains: Array.from(domainCounts, ([domain, citations]) => ({
           domain,
           citations,

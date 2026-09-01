@@ -22,7 +22,16 @@ export function createMemoryTtlCache<T>(
       return Promise.resolve(entry.value);
     },
     set(organizationId, value, ttlMs) {
-      entries.set(organizationId, { value, expiresAt: now() + ttlMs });
+      const currentTime = now();
+      for (const [key, entry] of entries) {
+        if (entry.expiresAt <= currentTime) {
+          entries.delete(key);
+        }
+      }
+      entries.set(organizationId, {
+        value,
+        expiresAt: currentTime + ttlMs,
+      });
       return Promise.resolve();
     },
   };

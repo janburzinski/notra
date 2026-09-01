@@ -14,14 +14,14 @@ export function createGetGeoPromptResultsTool(config: GeoToolConfig): Tool {
       whenToUse:
         "When the user asks which questions the brand wins or loses, how an AI engine answered a tracked prompt, or needs evidence for a content opportunity.",
       usageNotes:
-        "Results cover all GEO projects in the organization. Full answers are optional and truncated to keep context bounded.",
+        "Results cover all GEO projects in the organization. Optionally filter by a tracked prompt id or AI engine. Full answers are optional and truncated to keep context bounded.",
     }),
     inputSchema: getGeoPromptResultsInputSchema,
-    execute: async ({ days, limit, includeAnswers }) => {
+    execute: async ({ days, limit, includeAnswers, promptId, engine }) => {
       const rows = await queryGeoCheckPromptResults(
         { organizationId: config.organizationId, projectId: null },
         toGeoCheckWindow({ days }),
-        { limit },
+        { limit, promptId, engine },
       );
       const results = rows.map((row) => ({
         projectId: row.projectId,

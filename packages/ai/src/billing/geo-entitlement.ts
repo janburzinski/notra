@@ -24,8 +24,9 @@ export async function hasGeoEntitlement(organizationId: string): Promise<boolean
       customerId: organizationId,
       featureId: FEATURES.AI_ANSWERS,
     });
-    await geoEntitlementCache.set(organizationId, result.allowed, GEO_ENTITLEMENT_CACHE_TTL_MS);
-    return result.allowed;
+    const entitled = result.balance != null;
+    await geoEntitlementCache.set(organizationId, entitled, GEO_ENTITLEMENT_CACHE_TTL_MS);
+    return entitled;
   } catch (error) {
     console.error("[GEO Entitlement] Check failed", {
       organizationId,

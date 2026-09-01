@@ -21,6 +21,20 @@ export const getGeoOverviewInputSchema = geoWindowSchema;
 
 export const getGeoVisibilityTimeseriesInputSchema = geoWindowSchema;
 
+const geoPromptIdSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .optional()
+  .describe("Only return results for this tracked GEO prompt id.");
+
+const geoEngineSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .optional()
+  .describe("Only return results from this AI engine.");
+
 export const getGeoPromptResultsInputSchema = geoWindowSchema.extend({
   limit: z
     .number()
@@ -33,6 +47,8 @@ export const getGeoPromptResultsInputSchema = geoWindowSchema.extend({
     .boolean()
     .default(false)
     .describe("Include bounded full answers in addition to excerpts."),
+  promptId: geoPromptIdSchema,
+  engine: geoEngineSchema,
 });
 
 export const getGeoSourcesInputSchema = geoWindowSchema.extend({
@@ -43,11 +59,6 @@ export const getGeoSourcesInputSchema = geoWindowSchema.extend({
     .max(GEO_SOURCES_MAX_LIMIT)
     .default(GEO_SOURCES_DEFAULT_LIMIT)
     .describe("Maximum number of unique source occurrences to return."),
-  promptId: z
-    .string()
-    .trim()
-    .min(1)
-    .optional()
-    .describe("Only return sources for this tracked GEO prompt id."),
-  engine: z.string().trim().min(1).optional().describe("Only return sources from this AI engine."),
+  promptId: geoPromptIdSchema,
+  engine: geoEngineSchema,
 });
