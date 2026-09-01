@@ -48,7 +48,7 @@ export function ClaudeChatMessage({
     >
       {search}
       {children ? (
-        <div className="max-w-full font-serif text-[17px] leading-[1.7] text-[#1f1e1b] dark:text-foreground">
+        <div className="max-w-full font-sans text-[17px] leading-[1.7] text-[#1f1e1b] dark:text-foreground">
           {children}
         </div>
       ) : null}

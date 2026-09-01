@@ -56,7 +56,7 @@ export function FeaturesCardGaps() {
               </TableCell>
               <TableCell className="py-3">
                 <GapMeter
-                  label={`${row.mentionRate}% mention rate, ${row.opportunity}/${GEO_GAPS_METER_STEPS} opportunity`}
+                  label={`${row.mentionRate}% mention rate · ${row.opportunity}/${GEO_GAPS_METER_STEPS} opportunity`}
                   level={row.opportunity}
                 />
               </TableCell>

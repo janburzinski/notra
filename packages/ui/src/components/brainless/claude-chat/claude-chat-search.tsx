@@ -241,7 +241,7 @@ export function ClaudeChatSearch({
               />
             </span>
           </span>
-          <p className="flex h-5 items-center font-serif text-[16px] leading-none tracking-[-0.01em] text-[#8a8680]">
+          <p className="flex h-5 items-center font-sans text-[16px] leading-none tracking-[-0.01em] text-[#8a8680]">
             {verb}
           </p>
         </SearchRow>

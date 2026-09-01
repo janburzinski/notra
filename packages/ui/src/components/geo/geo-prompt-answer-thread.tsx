@@ -63,8 +63,6 @@ function AnswerMarkdown({ text, skin }: { text: string; skin: GeoChatSkin }) {
     <MessageResponse
       className={cn(
         ANSWER_MARKDOWN_CLASS,
-        skin === "claude" &&
-          "[&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif",
         skin === "perplexity" &&
           "font-serif [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif"
       )}

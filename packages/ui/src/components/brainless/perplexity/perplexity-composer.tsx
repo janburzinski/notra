@@ -182,7 +182,7 @@ export function PerplexityComposer({
           <IconButton label="Add">
             <HugeiconsIcon icon={PlusSignIcon} size={16} strokeWidth={1.75} />
           </IconButton>
-          <DropdownMenu onOpenChange={setFocusOpen} open={focusOpen}>
+          <DropdownMenu modal={false} onOpenChange={setFocusOpen} open={focusOpen}>
             <DropdownMenuTrigger
               render={
                 <button

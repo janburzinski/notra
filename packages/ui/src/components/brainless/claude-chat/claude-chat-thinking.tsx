@@ -47,7 +47,7 @@ export function ClaudeChatThinking({
         reducedMotion={reducedMotion}
         size={22}
       />
-      <span className="font-serif text-[16px] leading-none tracking-[-0.01em]">
+      <span className="font-sans text-[16px] leading-none tracking-[-0.01em]">
         {verb}
       </span>
     </div>

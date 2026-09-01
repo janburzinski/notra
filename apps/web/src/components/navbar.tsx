@@ -124,7 +124,7 @@ function MegaCard({
         <span className="font-sans text-base leading-5 font-semibold text-[#1E1E1E] dark:text-white">
           {card.label}
         </span>
-        <span className="self-stretch font-sans text-sm leading-[1.125rem] font-semibold text-[#1E1E1EBF] dark:text-neutral-400">
+        <span className="min-h-13.5 self-stretch font-sans text-sm leading-[1.125rem] font-semibold text-[#1E1E1EBF] dark:text-neutral-400">
           {card.description}
         </span>
       </span>
