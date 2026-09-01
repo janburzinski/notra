@@ -32,6 +32,16 @@ export const getPostingPerformanceInputSchema = z.object({
     .describe("Number of trailing days to include."),
 });
 
+export const getGeoOverviewInputSchema = z.object({
+  days: z
+    .number()
+    .int()
+    .min(1)
+    .max(365)
+    .default(30)
+    .describe("Number of trailing days to include."),
+});
+
 export const getAbTestsInputSchema = z.object({});
 
 export const createAbTestInputSchema = z.object({
