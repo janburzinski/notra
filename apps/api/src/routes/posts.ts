@@ -315,6 +315,12 @@ postsRoutes.openapi(getPostsRoute, async (c) => {
   const query = c.req.valid("query");
   const db = c.get("db");
   const { limit, page, sort, status, contentType, brandIdentityId } = query;
+  const organization = await getOrganizationResponse(db, orgId);
+
+  if (!organization) {
+    return c.json({ error: "Organization not found" }, 404);
+  }
+
   const offset = (page - 1) * limit;
   const whereClause = and(
     eq(posts.organizationId, orgId),
@@ -332,8 +338,7 @@ postsRoutes.openapi(getPostsRoute, async (c) => {
       : undefined
   );
 
-  const [organization, [countResult], results] = await Promise.all([
-    getOrganizationResponse(db, orgId),
+  const [[countResult], results] = await Promise.all([
     db
       .select({ totalItems: count(posts.id) })
       .from(posts)
@@ -362,10 +367,6 @@ postsRoutes.openapi(getPostsRoute, async (c) => {
       },
     }),
   ]);
-
-  if (!organization) {
-    return c.json({ error: "Organization not found" }, 404);
-  }
 
   const totalItems = countResult?.totalItems ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / limit));

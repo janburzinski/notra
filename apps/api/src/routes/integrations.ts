@@ -138,8 +138,13 @@ integrationsRoutes.openapi(getIntegrationsRoute, async (c) => {
   }
 
   const db = c.get("db");
-  const [organization, github, linear] = await Promise.all([
-    getOrganizationResponse(db, orgId),
+  const organization = await getOrganizationResponse(db, orgId);
+
+  if (!organization) {
+    return c.json({ error: "Organization not found" }, 404);
+  }
+
+  const [github, linear] = await Promise.all([
     db.query.githubIntegrations.findMany({
       where: and(
         eq(githubIntegrations.organizationId, orgId),
@@ -176,10 +181,6 @@ integrationsRoutes.openapi(getIntegrationsRoute, async (c) => {
       },
     }),
   ]);
-
-  if (!organization) {
-    return c.json({ error: "Organization not found" }, 404);
-  }
 
   return c.json(
     {
