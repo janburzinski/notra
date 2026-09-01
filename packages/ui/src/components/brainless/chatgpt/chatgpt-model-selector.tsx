@@ -57,7 +57,7 @@ export function ChatgptModelSelector({
           <button
             aria-label={`Model ${selectedModel.label}, effort ${selectedEffort.label}`}
             className={cn(
-              "flex h-8 shrink-0 items-center gap-1 rounded-full bg-transparent px-2.5 text-[13px] leading-none text-foreground outline-none transition-[background-color,transform] duration-150 hover:bg-muted focus-visible:ring-2 focus-visible:ring-blue-600/35 active:scale-[0.96]",
+              "flex h-8 shrink-0 items-center gap-1 rounded-full bg-transparent px-2.5 text-[13px] leading-none text-foreground outline-none transition-[background-color,transform] duration-fast hover:bg-muted focus-visible:ring-2 focus-visible:ring-blue-600/35 active:scale-[0.96]",
               open && "bg-muted",
               className
             )}
@@ -68,7 +68,7 @@ export function ChatgptModelSelector({
         <span>{selectedEffort.label}</span>
         <HugeiconsIcon
           className={cn(
-            "text-muted-foreground transition-transform duration-150",
+            "text-muted-foreground transition-transform duration-fast",
             open && "rotate-180"
           )}
           icon={ArrowDown01Icon}

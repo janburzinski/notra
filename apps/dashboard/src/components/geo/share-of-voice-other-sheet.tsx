@@ -2,6 +2,7 @@
 
 import { findCompetitorDomain } from "@notra/geo-core/geo/domain";
 import type { ShareOfVoiceRow } from "@notra/geo-core/types/geo";
+import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import {
   Sheet,
   SheetContent,
@@ -11,7 +12,6 @@ import {
 } from "@notra/ui/components/ui/sheet";
 
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
-import { GeoBar } from "@/components/geo/geo-bar";
 import { cn } from "@/lib/utils";
 import type { ShareOfVoiceOtherSheetProps } from "@/types/geo";
 import { formatMentionRate } from "@/utils/geo-charts";

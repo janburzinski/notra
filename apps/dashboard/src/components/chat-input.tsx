@@ -342,7 +342,7 @@ const ChatInput = ({
             {usageLimitError ? (
               <span className="flex min-w-0 items-center gap-1.5 text-sm">
                 <HugeiconsIcon
-                  className="size-4 shrink-0 text-amber-600 dark:text-amber-500"
+                  className="text-warning size-4 shrink-0"
                   icon={Alert02Icon}
                 />
                 <span className="truncate">{usageLimitError}</span>

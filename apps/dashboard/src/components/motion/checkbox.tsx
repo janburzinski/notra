@@ -1,5 +1,6 @@
 "use client";
 
+import { TRANSITION } from "@notra/ui/lib/motion";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useId } from "react";
 
@@ -49,7 +50,7 @@ export function Checkbox({
         aria-checked={indeterminate ? "mixed" : checked}
         aria-label={ariaLabel}
         className={cn(
-          "inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-md border-2 transition-colors duration-200 outline-none",
+          "duration-normal inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-md border-2 transition-colors outline-none",
           "focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2",
           "disabled:cursor-not-allowed disabled:opacity-60",
           showMark
@@ -85,9 +86,7 @@ export function Checkbox({
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={3}
-              transition={
-                reduce ? { duration: 0 } : { duration: 0.16, ease: EASE_OUT }
-              }
+              transition={reduce ? { duration: 0 } : TRANSITION.fade}
               viewBox="0 0 24 24"
               width="12"
             >

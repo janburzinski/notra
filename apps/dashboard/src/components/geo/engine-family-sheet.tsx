@@ -21,6 +21,7 @@ import type {
 import { formatAiTrafficTimestamp } from "@notra/geo-core/utils/ai-traffic";
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { engineFamilyLabel } from "@notra/geo-core/utils/geo-engine-family";
+import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import {
   Sheet,
   SheetContent,
@@ -41,7 +42,6 @@ import { WriteDialog } from "@/components/geo/writer/write-dialog";
 import { Table, type TableColumn } from "@/components/motion/table";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { TruncateWithTooltip } from "@/components/truncate-with-tooltip";
 import { CHART_PERCENT_SCALE } from "@/constants/charts";
 import {
   GEO_PROMPT_DETAIL_SURFACES,

@@ -30,6 +30,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { TRANSITION } from "@notra/ui/lib/motion";
 import { useCustomer } from "autumn-js/react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
@@ -117,16 +118,10 @@ function GeoModelRow({
           ? { duration: 0 }
           : {
               delay: hasRevealAnimation ? staggerDelay : 0,
-              filter: { duration: 0.18 },
-              layout: {
-                duration: 0.24,
-                ease: [0.77, 0, 0.175, 1],
-              },
-              opacity: { duration: 0.16 },
-              y: {
-                duration: 0.2,
-                ease: [0.23, 1, 0.32, 1],
-              },
+              filter: TRANSITION.fade,
+              layout: TRANSITION.enter,
+              opacity: TRANSITION.fade,
+              y: TRANSITION.enter,
             }
       }
     >
@@ -477,7 +472,7 @@ export function GeoEnginePicker({
                   )}
                   <HugeiconsIcon
                     className={cn(
-                      "text-muted-foreground size-3.5 shrink-0 transition-transform duration-200",
+                      "text-muted-foreground duration-normal size-3.5 shrink-0 transition-transform",
                       isExpanded && "rotate-180"
                     )}
                     icon={ArrowDown01Icon}
@@ -496,7 +491,7 @@ export function GeoEnginePicker({
               </div>
               <div
                 className={cn(
-                  "bg-muted/20 dark:bg-muted/15 grid transition-[grid-template-rows] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+                  "bg-muted/20 dark:bg-muted/15 duration-normal ease-emphasized grid transition-[grid-template-rows] motion-reduce:transition-none",
                   isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                 )}
               >
@@ -530,7 +525,7 @@ export function GeoEnginePicker({
                         <li
                           aria-hidden={!allModelsShown}
                           className={cn(
-                            "grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+                            "duration-slow ease-emphasized grid transition-[grid-template-rows] motion-reduce:transition-none",
                             allModelsShown
                               ? "grid-rows-[1fr]"
                               : "grid-rows-[0fr]"
@@ -601,7 +596,7 @@ export function GeoEnginePicker({
               <span className="flex size-7 shrink-0 items-center justify-center">
                 <HugeiconsIcon
                   className={cn(
-                    "size-3.5 transition-transform duration-200 motion-reduce:transition-none",
+                    "duration-normal size-3.5 transition-transform motion-reduce:transition-none",
                     showMore && "rotate-180"
                   )}
                   icon={ArrowDown01Icon}
@@ -623,7 +618,7 @@ export function GeoEnginePicker({
             <div className="flex items-center gap-1.5">
               <Label htmlFor={`${id}-zdr`}>Enforce ZDR</Label>
               {canEnforceZdr ? null : (
-                <Badge className="h-4 px-1.5 text-[0.625rem]" variant="outline">
+                <Badge size="sm" variant="outline">
                   Add-on
                 </Badge>
               )}

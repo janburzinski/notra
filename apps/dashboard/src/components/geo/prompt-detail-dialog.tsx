@@ -11,6 +11,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
+import { tween } from "@notra/ui/lib/motion";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 
@@ -18,7 +19,6 @@ import { GeoPromptAnswerThread } from "@/components/geo/geo-prompt-answer-thread
 import { PromptEngineSwitcher } from "@/components/geo/prompt-engine-switcher";
 import { GEO_PROMPT_DETAIL_SURFACES } from "@/constants/geo-analytics";
 import { trackEvent } from "@/lib/analytics/posthog-client";
-import { EASE_OUT } from "@/lib/ease";
 import type {
   PromptAnswerPageProps,
   PromptDetailDialogProps,
@@ -85,9 +85,7 @@ function PromptAnswerPage({
       prompt_id: row.id,
     });
   }, [activeEngine, resultCount, row.id, surface]);
-  const threadTransition = reduceMotion
-    ? INSTANT
-    : { duration: 0.28, ease: EASE_OUT };
+  const threadTransition = reduceMotion ? INSTANT : tween("slow", "emphasized");
 
   function selectEngine(next: string, nextDirection: number) {
     if (next === engine) {

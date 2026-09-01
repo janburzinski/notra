@@ -2,27 +2,25 @@
 
 import { m } from "motion/react";
 import type { ReactNode } from "react";
+import { SPRING, TRANSITION } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import {
   type PermissionTone,
   usePermissionRow,
 } from "./permission-selector-context";
 
-const SPRING = { type: "spring", bounce: 0.2, duration: 0.4 } as const;
-const SMOOTH = { type: "tween", duration: 0.18, ease: "easeOut" } as const;
-
 const TONE_TEXT: Record<PermissionTone, string> = {
   neutral: "text-foreground",
-  success: "text-emerald-600 dark:text-emerald-400",
+  success: "text-success",
   danger: "text-destructive",
-  warning: "text-amber-600 dark:text-amber-500",
+  warning: "text-warning",
 };
 
 const TONE_PILL: Record<PermissionTone, string> = {
   neutral: "bg-background ring-border",
-  success: "bg-emerald-500/10 ring-emerald-500/30",
+  success: "bg-success/10 ring-success/30",
   danger: "bg-destructive/10 ring-destructive/30",
-  warning: "bg-amber-500/10 ring-amber-500/30",
+  warning: "bg-warning/10 ring-warning/30",
 };
 
 export interface PermissionOptionProps {
@@ -58,7 +56,7 @@ export function PermissionOption({
       aria-checked={active}
       aria-label={ariaLabel}
       className={cn(
-        "relative flex min-w-7 cursor-pointer items-center justify-center rounded-md px-2.5 py-1 font-medium text-sm outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-4",
+        "relative flex min-w-7 cursor-pointer items-center justify-center rounded-md px-2.5 py-1 font-medium text-sm outline-none transition-colors duration-normal ease-out focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-4",
         active
           ? TONE_TEXT[tone]
           : "text-muted-foreground hover:text-foreground",
@@ -77,7 +75,11 @@ export function PermissionOption({
             TONE_PILL[tone]
           )}
           layoutId={indicatorMotion === "none" ? undefined : layoutId}
-          transition={indicatorMotion === "smooth" ? SMOOTH : SPRING}
+          transition={
+            indicatorMotion === "smooth"
+              ? TRANSITION.fade
+              : SPRING.indicator
+          }
         />
       )}
       <span className="relative z-10 flex items-center gap-1.5">

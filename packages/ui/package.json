@@ -5,6 +5,8 @@
   "exports": {
     "./globals.css": "./src/styles/globals.css",
     "./cta-button.css": "./src/styles/cta-button.css",
+    "./motion.css": "./src/styles/motion.css",
+    "./status.css": "./src/styles/status.css",
     "./text-shimmer.css": "./src/styles/text-shimmer.css",
     "./postcss.config": "./postcss.config.mjs",
     "./lib/*": "./src/lib/*.ts",

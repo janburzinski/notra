@@ -7,6 +7,8 @@ import {
   PROMPTS_TABLE_ROW_HEIGHT,
 } from "@notra/geo-core/constants/geo";
 import { geoScanEmptyMessage } from "@notra/geo-core/utils/geo-scan";
+import { PresenceBadge } from "@notra/ui/components/geo/presence-badge";
+import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Input } from "@notra/ui/components/ui/input";
 import { Switch } from "@notra/ui/components/ui/switch";
 import {
@@ -19,10 +21,8 @@ import { useCallback, useMemo, useState } from "react";
 
 import { Button } from "@/components/button";
 import { GeoRemoveDialog } from "@/components/geo/geo-remove-dialog";
-import { PresenceBadge } from "@/components/geo/presence-badge";
 import { PromptDetailDialog } from "@/components/geo/prompt-detail-dialog";
 import { Table, type TableColumn } from "@/components/motion/table";
-import { TruncateWithTooltip } from "@/components/truncate-with-tooltip";
 import { GEO_PROMPT_DETAIL_SURFACES } from "@/constants/geo-analytics";
 import { useGeoPromptsDb } from "@/lib/hooks/use-geo-db";
 import type { GeoPromptTableRow, PromptsTableProps } from "@/types/geo";

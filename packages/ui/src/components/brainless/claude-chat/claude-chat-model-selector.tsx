@@ -66,7 +66,7 @@ export function ClaudeChatModelSelector({
           <button
             aria-label={`Modell ${selectedModel.label}, Aufwand ${selectedEffort.label}`}
             className={cn(
-              "flex h-8 items-center gap-1 rounded-full px-2 font-sans text-[13px] leading-none text-[#1f1e1b] outline-none transition-[background-color,transform] duration-150 hover:bg-[#eceae4] focus-visible:ring-2 focus-visible:ring-[#1f1e1b]/20 active:scale-[0.96] dark:text-foreground dark:hover:bg-white/10",
+              "flex h-8 items-center gap-1 rounded-full px-2 font-sans text-[13px] leading-none text-[#1f1e1b] outline-none transition-[background-color,transform] duration-fast hover:bg-[#eceae4] focus-visible:ring-2 focus-visible:ring-[#1f1e1b]/20 active:scale-[0.96] dark:text-foreground dark:hover:bg-white/10",
               open && "bg-[#eceae4] dark:bg-white/10",
               className
             )}
@@ -78,7 +78,7 @@ export function ClaudeChatModelSelector({
         <span className="text-[#8a8680]">{selectedEffort.label}</span>
         <HugeiconsIcon
           className={cn(
-            "text-[#8a8680] transition-transform duration-150",
+            "text-[#8a8680] transition-transform duration-fast",
             open && "rotate-180"
           )}
           icon={ArrowDown01Icon}

@@ -17,6 +17,7 @@ import {
   MessageContent,
   MessageResponse,
 } from "@notra/ui/components/ai-elements/message";
+import { BrailleLoader } from "@notra/ui/components/shared/braille-loader";
 import { Button } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -32,7 +33,6 @@ import { Fragment, type ReactNode } from "react";
 
 import { ChatReasoningBlock } from "@/components/ai/chat-reasoning-block";
 import { ChatToolBlock } from "@/components/ai/chat-tool-block";
-import { BrailleLoader } from "@/components/braille-loader";
 import { ChatInputContextRow } from "@/components/chat/chat-input-context-row";
 import type {
   ContentChatActivityMessageProps,
@@ -45,7 +45,7 @@ import {
 import { getContentChatHistoryGroups } from "@/utils/content-chat-history";
 
 const ACTIVITY_MESSAGE_CLASSNAME =
-  "translate-y-0 opacity-100 transition-[opacity,translate] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] starting:translate-y-1 starting:opacity-0 motion-reduce:transition-none motion-reduce:starting:translate-y-0 motion-reduce:starting:opacity-100";
+  "translate-y-0 opacity-100 transition-[opacity,translate] duration-fast ease-emphasized starting:translate-y-1 starting:opacity-0 motion-reduce:transition-none motion-reduce:starting:translate-y-0 motion-reduce:starting:opacity-100";
 
 function ContentChatActivityFeed({
   children,

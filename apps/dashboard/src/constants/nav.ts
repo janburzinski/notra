@@ -33,6 +33,7 @@ import {
   GEO_PROMPTS_NAV_LINK,
   GEO_WRITER_NAV_LINK,
 } from "@notra/geo-core/constants/geo";
+import { DURATION } from "@notra/ui/lib/motion";
 
 import { AGENT_FEEDBACK_NAV_LINK } from "@/constants/agent-feedback";
 import { IRIS_NAV_LINK } from "@/constants/iris";
@@ -219,12 +220,12 @@ export const NAV_PRIMARY_ACTIONS: Record<SidebarMode, NavPrimaryActionConfig> =
 // the new one. Easing out dumps opacity and smears the blur in the first frames,
 // so the leftovers are gone before the eye lands on them.
 const SIDEBAR_MODE_SWOOSH_IN = "ease-[cubic-bezier(0.16,1,0.3,1)]";
-const SIDEBAR_MODE_SWOOSH_OUT = "ease-[cubic-bezier(0.23,1,0.32,1)]";
-const SIDEBAR_MODE_ENTER_TIMING = `duration-[320ms] ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:duration-150`;
-const SIDEBAR_MODE_EXIT_TIMING = `duration-[150ms] ${SIDEBAR_MODE_SWOOSH_OUT}`;
+const SIDEBAR_MODE_SWOOSH_OUT = "ease-emphasized";
+const SIDEBAR_MODE_ENTER_TIMING = `duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:duration-fast`;
+const SIDEBAR_MODE_EXIT_TIMING = `duration-fast ${SIDEBAR_MODE_SWOOSH_OUT}`;
 
-/** Must match `duration-[150ms]` on the exit classes. */
-export const SIDEBAR_MODE_EXIT_MS = 150;
+/** Derived from the `duration-fast` token used on the exit classes above. */
+export const SIDEBAR_MODE_EXIT_MS = DURATION.fast * 1000;
 
 /** Base class for a layer that participates in the mode swoosh. */
 export const SIDEBAR_MODE_FADE_CLASS =
@@ -240,12 +241,12 @@ export const SIDEBAR_MODE_EXIT_LEFT_CLASS = `pointer-events-none z-0 -translate-
 export const SIDEBAR_MODE_EXIT_RIGHT_CLASS = `pointer-events-none z-0 translate-x-5 opacity-0 blur-[8px] ${SIDEBAR_MODE_EXIT_TIMING}`;
 
 /** Indicator that slides between the two tabs of the mode switch. */
-export const SIDEBAR_MODE_PILL_CLASS = `pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-md bg-background ring-1 ring-border transition-[translate] will-change-[translate] duration-[320ms] ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
+export const SIDEBAR_MODE_PILL_CLASS = `pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-md bg-background ring-1 ring-border transition-[translate] will-change-[translate] duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
 
 export const SIDEBAR_MODE_PANEL_CLASS = `flex min-h-0 w-full flex-col ${SIDEBAR_MODE_FADE_CLASS}`;
 
 /** Collapses the primary-action row when the active mode has no action to offer. */
-export const SIDEBAR_MODE_SLOT_CLASS = `grid transition-[grid-template-rows,opacity] duration-[320ms] ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
+export const SIDEBAR_MODE_SLOT_CLASS = `grid transition-[grid-template-rows,opacity] duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
 
 export const NAV_RECENT_LABEL = "Recent";
 export const NAV_RECENT_LIMIT = 3;
@@ -261,7 +262,7 @@ export const POST_STATUS_LABELS: Record<PostStatus, string> = {
 
 export const POST_STATUS_DOT_CLASS: Record<PostStatus, string> = {
   draft: "bg-muted-foreground/50",
-  published: "bg-emerald-500",
+  published: "bg-success",
 };
 
 export const SETTINGS_ACCOUNT_NAV_ITEMS: NavSettingsItem[] = [

@@ -19,7 +19,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@notra/ui/components/ui/tabs";
-import { cn } from "@notra/ui/lib/utils";
 import { useCustomer, useListPlans } from "autumn-js/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { Suspense, useEffect, useId, useMemo, useState } from "react";
@@ -333,9 +332,9 @@ function BillingPageContent() {
                           value="yearly"
                         >
                           Yearly
-                          <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600">
+                          <Badge size="sm" variant="success">
                             Save 20%
-                          </span>
+                          </Badge>
                         </TabsTrigger>
                       </TabsList>
                     </Tabs>
@@ -427,13 +426,9 @@ function BillingPageContent() {
                               </TableCell>
                               <TableCell className="w-[120px]">
                                 <Badge
-                                  className={cn(
-                                    invoice.status === "paid" &&
-                                      "bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/15"
-                                  )}
                                   variant={
                                     invoice.status === "paid"
-                                      ? "default"
+                                      ? "success"
                                       : "secondary"
                                   }
                                 >

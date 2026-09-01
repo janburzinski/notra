@@ -7,11 +7,11 @@ import {
 import { findCompetitorDomain } from "@notra/geo-core/geo/domain";
 import type { ShareOfVoiceRow } from "@notra/geo-core/types/geo";
 import { geoScanEmptyMessage } from "@notra/geo-core/utils/geo-scan";
+import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import { useMemo } from "react";
 
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
-import { GeoBar } from "@/components/geo/geo-bar";
 import { GeoRateSparkline } from "@/components/geo/geo-rate-sparkline";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { InstrumentEmpty } from "@/components/instrument/instrument-module";

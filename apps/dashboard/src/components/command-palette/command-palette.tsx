@@ -592,7 +592,7 @@ export function CommandPalette() {
                   </div>
                   <div className="flex w-full flex-col gap-1.5">
                     <button
-                      className="group border-border/80 bg-background hover:border-border hover:bg-muted/60 flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-all duration-150 disabled:opacity-60"
+                      className="group border-border/80 bg-background hover:border-border hover:bg-muted/60 duration-fast flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-all disabled:opacity-60"
                       disabled={isLoading}
                       onClick={runAiSearch}
                       type="button"
@@ -614,7 +614,7 @@ export function CommandPalette() {
                       </div>
                     </button>
                     <button
-                      className="group border-border/80 bg-background hover:border-border hover:bg-muted/60 flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-all duration-150"
+                      className="group border-border/80 bg-background hover:border-border hover:bg-muted/60 duration-fast flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-all"
                       onClick={() => openChatWithQuery(trimmedQuery)}
                       type="button"
                     >

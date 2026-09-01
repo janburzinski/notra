@@ -55,7 +55,7 @@ export function NavModeSwitch({
               <Link
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "relative z-10 flex h-7 items-center justify-center gap-1.5 rounded-md text-xs transition-colors duration-150",
+                  "duration-fast relative z-10 flex h-7 items-center justify-center gap-1.5 rounded-md text-xs transition-colors",
                   isActive
                     ? "text-foreground font-medium"
                     : "text-muted-foreground hover:text-foreground"

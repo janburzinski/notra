@@ -66,7 +66,7 @@ export function PromptEngineSwitcher({
                 aria-selected={selected}
                 className={cn(
                   "relative inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-sm",
-                  "transition-[color,transform] duration-150 ease-out",
+                  "duration-fast transition-[color,transform] ease-out",
                   "focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none",
                   "active:scale-[0.96]",
                   selected

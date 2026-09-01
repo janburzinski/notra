@@ -73,7 +73,10 @@ export function ApiKeyPermissionSelector({
       </PermissionRow>
 
       {accessMode !== "restricted" && selectedMode ? (
-        <Alert className="grid-cols-[auto_1fr] gap-x-3 rounded-xl border-blue-500/25 bg-blue-500/8 p-4 text-blue-500 dark:border-blue-400/25 dark:bg-blue-400/10 dark:text-blue-400">
+        <Alert
+          className="grid-cols-[auto_1fr] gap-x-3 rounded-xl p-4"
+          variant="info"
+        >
           <HugeiconsIcon
             className="mt-0.5 size-5"
             icon={InformationCircleIcon}
@@ -81,7 +84,7 @@ export function ApiKeyPermissionSelector({
           <AlertTitle className="text-sm font-medium">
             {selectedMode.title}
           </AlertTitle>
-          <AlertDescription className="text-muted-foreground mt-1 text-xs leading-relaxed">
+          <AlertDescription className="mt-1 text-xs leading-relaxed">
             {selectedMode.description}
           </AlertDescription>
         </Alert>

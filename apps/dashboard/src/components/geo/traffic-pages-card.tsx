@@ -5,6 +5,8 @@ import {
   formatGeoSource,
   trafficVisitDelta,
 } from "@notra/geo-core/utils/ai-traffic";
+import { TablePagination } from "@notra/ui/components/shared/table-pagination";
+import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import type { ReactNode } from "react";
 
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
@@ -15,8 +17,6 @@ import {
   InstrumentSection,
 } from "@/components/instrument/instrument-module";
 import { Table, type TableColumn } from "@/components/motion/table";
-import { TablePagination } from "@/components/table-pagination";
-import { TruncateWithTooltip } from "@/components/truncate-with-tooltip";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { useTablePagination } from "@/lib/hooks/use-table-pagination";
 import type { GeoTrafficPageGroup, TrafficPagesCardProps } from "@/types/geo";

@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
+import { TRANSITION, tween } from "@notra/ui/lib/motion";
 import {
   AnimatePresence,
   domAnimation,
@@ -49,8 +50,6 @@ const SIGNIN_URL = "https://app.usenotra.com/login";
 const DASHBOARD_URL = "https://app.usenotra.com/callback";
 const HOVER_CLOSE_DELAY = 120;
 const CONTENT_SLIDE = 48;
-const EASE = [0.32, 0.72, 0, 1] as const;
-const SWAP_EASE = [0.25, 0.1, 0.25, 1] as const;
 const PANEL_PERSPECTIVE = 2000;
 const PANEL_SCALE_IN = {
   opacity: 0,
@@ -67,27 +66,15 @@ const PANEL_SCALE_REST = {
   rotateX: 0,
   scale: 1,
 } as const;
-const ENTER_EXIT_TRANSITION = {
-  duration: 0.2,
-  ease: SWAP_EASE,
-};
-const MORPH_TRANSITION = {
-  duration: 0.28,
-  ease: EASE,
-};
-const SHELL_TRANSITION = {
-  duration: 0.32,
-  ease: EASE,
-};
+const ENTER_EXIT_TRANSITION = TRANSITION.enter;
+const MORPH_TRANSITION = tween("slow", "emphasized");
+const SHELL_TRANSITION = tween("slow", "emphasized");
 const SCROLL_THRESHOLD = 64;
 const MOBILE_SCROLL_THRESHOLD = 16;
 const MOBILE_MEDIA_QUERY = "(max-width: 63.9375rem)";
 const ISLAND_CHROME =
   "bg-white shadow-[0_0.125rem_1.25rem_#1E1E1E14,0_0.0625rem_0.125rem_#28282814] ring-1 ring-[#1E1E1E14] dark:bg-neutral-950 dark:shadow-black/50 dark:ring-white/10";
-const SWAP_TRANSITION = {
-  duration: 0.15,
-  ease: SWAP_EASE,
-};
+const SWAP_TRANSITION = TRANSITION.fade;
 const contentVariants = {
   enter: (direction: number) => ({
     x: direction * CONTENT_SLIDE,
@@ -411,19 +398,19 @@ export function Navbar({ variant }: NavbarProps = {}) {
       >
         <m.header
           animate={{ borderRadius: chrome ? "1rem" : "0rem" }}
-          className={`transition-[background-color,box-shadow] duration-300 ease-out ${
+          className={`duration-slow transition-[background-color,box-shadow] ease-out ${
             chrome ? ISLAND_CHROME : "bg-transparent"
           }`}
           initial={false}
           transition={shellTransition}
         >
           <div
-            className={`max-lg:transition-[padding] max-lg:duration-300 max-lg:ease-out ${innerPaddingClass}`}
+            className={`max-lg:duration-slow max-lg:transition-[padding] max-lg:ease-out ${innerPaddingClass}`}
           >
             {/* biome-ignore lint/a11y/noStaticElementInteractions: onMouseLeave is a pointer-only convenience to dismiss the hover menu; the menu is fully operable via click, focus, and Escape */}
             {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: see above */}
             <div
-              className={`relative flex items-center justify-between gap-4 max-lg:transition-[height] max-lg:duration-300 max-lg:ease-out ${rowHeightClass}`}
+              className={`max-lg:duration-slow relative flex items-center justify-between gap-4 max-lg:transition-[height] max-lg:ease-out ${rowHeightClass}`}
               onMouseLeave={scheduleClose}
             >
               <DropdownMenu
@@ -452,7 +439,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                     />
                   }
                 >
-                  <span className="inline-flex origin-left items-center gap-2 transition-transform duration-150 ease-out group-active:scale-95">
+                  <span className="duration-fast inline-flex origin-left items-center gap-2 transition-transform ease-out group-active:scale-95">
                     <span className="flex size-10 items-center justify-center rounded-lg dark:bg-[#F6F3F1] dark:shadow-sm dark:ring-1 dark:inset-shadow-sm dark:shadow-black/40 dark:ring-white/10 dark:inset-shadow-white/8">
                       <NotraMark className="size-7 shrink-0" />
                     </span>
@@ -506,7 +493,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                   if (entry.type === "link") {
                     return (
                       <Link
-                        className={`font-sans text-base leading-5 tracking-[-0.02em] transition-colors duration-150 ease-out ${mutedNavClass}`}
+                        className={`duration-fast font-sans text-base leading-5 tracking-[-0.02em] transition-colors ease-out ${mutedNavClass}`}
                         href={entry.href}
                         key={entry.href}
                         onFocus={() => setActiveGroup(null)}
@@ -524,7 +511,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                     <button
                       aria-expanded={isActive}
                       aria-haspopup="menu"
-                      className={`inline-flex items-center gap-1 font-sans text-base leading-5 tracking-[-0.02em] transition-colors duration-150 ease-out aria-expanded:text-[#1E1E1E] dark:aria-expanded:text-white ${mutedNavClass}`}
+                      className={`duration-fast inline-flex items-center gap-1 font-sans text-base leading-5 tracking-[-0.02em] transition-colors ease-out aria-expanded:text-[#1E1E1E] dark:aria-expanded:text-white ${mutedNavClass}`}
                       key={entry.label}
                       onClick={() =>
                         setActiveGroup(isActive ? null : entry.label)
@@ -627,7 +614,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                 <div className="hidden items-center gap-3 lg:flex">
                   {isAuthenticated ? (
                     <Link
-                      className="font-display text-base leading-[1.14] font-semibold tracking-[-0.015em] text-[#1E1E1E] transition-opacity duration-150 ease-out hover:opacity-70 dark:text-white"
+                      className="font-display duration-fast text-base leading-[1.14] font-semibold tracking-[-0.015em] text-[#1E1E1E] transition-opacity ease-out hover:opacity-70 dark:text-white"
                       href={DASHBOARD_URL}
                     >
                       Dashboard
@@ -635,13 +622,13 @@ export function Navbar({ variant }: NavbarProps = {}) {
                   ) : (
                     <>
                       <Link
-                        className="font-display text-base leading-[1.14] tracking-[-0.015em] text-[#1E1E1E] transition-opacity duration-150 ease-out hover:opacity-70 dark:text-white"
+                        className="font-display duration-fast text-base leading-[1.14] tracking-[-0.015em] text-[#1E1E1E] transition-opacity ease-out hover:opacity-70 dark:text-white"
                         href={SIGNIN_URL}
                       >
                         Sign In
                       </Link>
                       <TrackedSignupLink
-                        className="font-display text-base leading-[1.14] font-semibold tracking-[-0.015em] text-[#1E1E1E] transition-opacity duration-150 ease-out hover:opacity-70 dark:text-white"
+                        className="font-display duration-fast text-base leading-[1.14] font-semibold tracking-[-0.015em] text-[#1E1E1E] transition-opacity ease-out hover:opacity-70 dark:text-white"
                         source="navbar_desktop_signup"
                       >
                         Sign Up
@@ -773,7 +760,7 @@ function ChevronIcon({ flipped }: { flipped: boolean }) {
   return (
     <svg
       aria-hidden="true"
-      className={`size-3.5 transition-transform duration-200 ${flipped ? "rotate-180" : ""}`}
+      className={`duration-normal size-3.5 transition-transform ${flipped ? "rotate-180" : ""}`}
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"

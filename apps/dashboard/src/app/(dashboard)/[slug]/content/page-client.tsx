@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@notra/ui/components/ui/table";
+import { getPageNumbers } from "@notra/ui/lib/get-page-numbers";
 import { cn } from "@notra/ui/lib/utils";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -35,7 +36,7 @@ import {
 } from "@/constants/empty-state";
 import { useCollections } from "@/lib/hooks/use-collections";
 import type { ContentListPageClientProps } from "@/types/content/collection";
-import { formatRelativeDate, getPageNumbers } from "@/utils/content-preview";
+import { formatRelativeDate } from "@/utils/content-preview";
 
 import { GroupsPageSkeleton } from "./skeleton";
 

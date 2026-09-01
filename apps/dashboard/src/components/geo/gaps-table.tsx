@@ -18,6 +18,7 @@ import type {
 } from "@notra/geo-core/types/geo";
 import { engineFamilyLabel } from "@notra/geo-core/utils/geo-engine-family";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { LogoStack } from "@notra/ui/components/geo/logo-stack";
 import { Input } from "@notra/ui/components/ui/input";
 import {
   PermissionOption,
@@ -44,7 +45,6 @@ import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
 import { EngineIcon } from "@/components/geo/engine-icon";
-import { LogoStack } from "@/components/geo/logo-stack";
 import { StatusSpinner } from "@/components/geo/status-spinner";
 import { Table, type TableColumn } from "@/components/motion/table";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
