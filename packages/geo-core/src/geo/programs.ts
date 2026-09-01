@@ -510,7 +510,10 @@ export const addGeoTrackedEngine = Effect.fn("geo.settingsEngineAdd")(
                 THEN ${initialEngines}::text[]
               WHEN ${input.engine} = ANY(${geoSettings.engines})
                 THEN ${geoSettings.engines}
-              WHEN cardinality(${geoSettings.engines}) < ${GEO_MAX_ENGINES}
+              WHEN (
+                SELECT count(DISTINCT engine)
+                FROM unnest(${geoSettings.engines}) AS tracked_engines(engine)
+              ) < ${GEO_MAX_ENGINES}
                 THEN array_append(${geoSettings.engines}, ${input.engine})
               ELSE ${geoSettings.engines}
             END
@@ -557,7 +560,10 @@ export const addGeoTrackedLanguage = Effect.fn("geo.settingsLanguageAdd")(
                 THEN ${initialLanguages}::text[]
               WHEN ${input.language} = ANY(${geoSettings.languages})
                 THEN ${geoSettings.languages}
-              WHEN cardinality(${geoSettings.languages}) < ${GEO_MAX_LANGUAGES}
+              WHEN (
+                SELECT count(DISTINCT language)
+                FROM unnest(${geoSettings.languages}) AS tracked_languages(language)
+              ) < ${GEO_MAX_LANGUAGES}
                 THEN array_append(${geoSettings.languages}, ${input.language})
               ELSE ${geoSettings.languages}
             END
