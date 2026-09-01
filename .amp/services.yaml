@@ -1,7 +1,0 @@
-services:
-  web:
-    command: bunx next dev --port "$PORT"
-    cwd: apps/web
-    portal:
-      title: Landing
-      description: Marketing site (apps/web) dev server.
