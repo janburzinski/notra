@@ -14,7 +14,7 @@ export async function hasGeoEntitlement(organizationId: string): Promise<boolean
       customerId: organizationId,
       featureId: FEATURES.AI_ANSWERS,
     });
-    return result.balance != null;
+    return result.allowed;
   } catch (error) {
     console.error("[GEO Entitlement] Check failed", {
       organizationId,
