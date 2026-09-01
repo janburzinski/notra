@@ -40,6 +40,8 @@ export function toGeoOrpcError(failure: GeoRouterError): Error {
       return badRequest("Configure your brand tracking settings first");
     case "GeoSettingsDisabledError":
       return badRequest("Enable brand tracking before starting a scan");
+    case "GeoSettingsTrackingError":
+      return badRequest(failure.message);
     case "GeoSampleDataDisabledError":
       return notFound();
     case "GeoDiscoveryError":

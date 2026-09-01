@@ -11,7 +11,6 @@ import type { LanguagePerformanceRow } from "@notra/geo-core/types/geo";
 import {
   buildLanguagePerformanceRows,
   trackedGeoLanguages,
-  withAddedGeoLanguage,
 } from "@notra/geo-core/utils/geo-language-rows";
 import {
   ResponsiveAlertDialog,
@@ -28,7 +27,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/button";
 import { GeoBar } from "@/components/geo/geo-bar";
@@ -39,7 +39,7 @@ import { InstrumentSection } from "@/components/instrument/instrument-module";
 import { Table, type TableColumn } from "@/components/motion/table";
 import { LANGUAGE_FLAGS } from "@/constants/language-flags";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
-import { useGeoSettingsUpsert } from "@/lib/hooks/use-geo";
+import { useGeoSettingsLanguageAdd } from "@/lib/hooks/use-geo";
 import { cn } from "@/lib/utils";
 import type { LanguagePerformanceCardProps } from "@/types/geo";
 import { formatMentionRate } from "@/utils/geo-charts";
@@ -212,17 +212,15 @@ export function LanguagePerformanceCard({
   settings,
 }: LanguagePerformanceCardProps) {
   const [languageToAdd, setLanguageToAdd] = useState<string>();
-  const upsert = useGeoSettingsUpsert(organizationId);
+  const addLanguage = useGeoSettingsLanguageAdd(organizationId);
   const savedExtras = trackedGeoLanguages(settings.languages);
-  const savedExtraSet = new Set(savedExtras);
+  const pendingLanguage = addLanguage.isPending
+    ? addLanguage.variables
+    : undefined;
   const configuredLanguages =
-    upsert.isPending && upsert.variables
-      ? trackedGeoLanguages(upsert.variables.languages)
+    pendingLanguage !== undefined
+      ? trackedGeoLanguages([...savedExtras, pendingLanguage])
       : savedExtras;
-  const configuredLanguageSet = new Set(configuredLanguages);
-  const pendingLanguage =
-    configuredLanguages.find((language) => !savedExtraSet.has(language)) ??
-    savedExtras.find((language) => !configuredLanguageSet.has(language));
   const atLimit = configuredLanguages.length >= GEO_MAX_LANGUAGES;
 
   const rows = buildLanguagePerformanceRows({
@@ -231,59 +229,25 @@ export function LanguagePerformanceCard({
     slotCount: GEO_VISIBILITY_TABLE_ROWS,
   });
 
-  const persistLanguages = useCallback(
-    (next: string[] | null) => {
-      if (upsert.isPending) {
-        return;
-      }
-      const companyName = settings.companyName.trim();
-      if (next === null || companyName.length === 0) {
-        return;
-      }
-      upsert.mutate({
-        aliases: settings.aliases,
-        companyName,
-        competitors: settings.competitors,
-        enabled: settings.enabled,
-        enforceZdr: settings.enforceZdr,
-        engines: settings.engines,
-        languages: next,
-        nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
-        organizationId,
-        scanIntervalHours: settings.scanIntervalHours,
-      });
-    },
-    [
-      organizationId,
-      settings.aliases,
-      settings.companyName,
-      settings.competitors,
-      settings.enabled,
-      settings.enforceZdr,
-      settings.engines,
-      settings.nonZdrApprovedEngines,
-      settings.scanIntervalHours,
-      upsert,
-    ]
-  );
-
-  const handleConfirmAddLanguage = useCallback(() => {
+  const handleConfirmAddLanguage = () => {
     if (!languageToAdd) {
       return;
     }
-    persistLanguages(withAddedGeoLanguage(configuredLanguages, languageToAdd));
+    addLanguage.mutate(languageToAdd, {
+      onSuccess: () => toast.success(`${languageToAdd} added to tracking`),
+    });
     setLanguageToAdd(undefined);
-  }, [configuredLanguages, languageToAdd, persistLanguages]);
+  };
 
   const columns = useMemo(
     () =>
       languagePerformanceColumns({
-        adding: upsert.isPending,
+        adding: addLanguage.isPending,
         atLimit,
         onAddLanguage: setLanguageToAdd,
         pendingLanguage,
       }),
-    [atLimit, pendingLanguage, upsert.isPending]
+    [addLanguage.isPending, atLimit, pendingLanguage]
   );
 
   return (

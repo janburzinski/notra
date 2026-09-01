@@ -39,6 +39,8 @@ import {
   GEO_COMPETITOR_SHARE_LIMIT,
   GEO_JOURNEY_DETAIL_LIMIT,
   GEO_MAX_COMPETITORS,
+  GEO_MAX_ENGINES,
+  GEO_MAX_LANGUAGES,
 } from "../constants/geo";
 import { GEO_MODEL_CATALOG_STATIC } from "../constants/geo-model-catalog";
 import { GeoEntitlementService } from "../deps";
@@ -60,6 +62,8 @@ import type {
   GeoPromptInsert,
   GeoPromptResultsResponse,
   GeoScopeInput,
+  GeoSettingsEngineAddInput,
+  GeoSettingsLanguageAddInput,
   GeoSettingsResponse,
   GeoSettingsUpsertInput,
   GeoTimeseriesResponse,
@@ -78,7 +82,12 @@ import type {
   GeoPromptImportRow,
 } from "../types/geo-import";
 import { toGeoTrafficTotals, toGeoVisitorType } from "../utils/ai-traffic";
-import { getGeoModelCatalogEntry } from "../utils/geo-model-catalog";
+import { trackedGeoLanguages } from "../utils/geo-language-rows";
+import {
+  geoDefaultEngines,
+  getGeoModelCatalogEntry,
+  isGeoEngineZdrCapable,
+} from "../utils/geo-model-catalog";
 import { groupGeoSparklinePoints } from "../utils/geo-sparkline";
 import { competitorKey } from "./domain";
 import { geoDb, geoQuery } from "./effect";
@@ -89,6 +98,7 @@ import {
   GeoScanAlreadyRunningError,
   GeoSettingsDisabledError,
   GeoSettingsMissingError,
+  GeoSettingsTrackingError,
 } from "./errors";
 import { geoHiddenSourceParams } from "./hidden-sources";
 import { lockGeoProject } from "./lock";
@@ -472,6 +482,103 @@ export const importGeoCompetitors = Effect.fn("geo.competitorsImport")(
       competitors,
     };
     return result;
+  }
+);
+
+export const addGeoTrackedEngine = Effect.fn("geo.settingsEngineAdd")(
+  function* (input: GeoSettingsEngineAddInput) {
+    const { projectId } = yield* requireGeoProject(input);
+    const catalog = yield* loadGeoModelCatalog(input.organizationId);
+    if (!getGeoModelCatalogEntry(catalog, input.engine)) {
+      return yield* Effect.fail(
+        new GeoSettingsTrackingError({
+          message: "This model is no longer available for tracking",
+        })
+      );
+    }
+
+    const initialEngines = [
+      ...new Set([...geoDefaultEngines(catalog), input.engine]),
+    ];
+    const updated = yield* geoDb("tracked engine update failed", () =>
+      db
+        .update(geoSettings)
+        .set({
+          engines: sql<string[]>`
+            CASE
+              WHEN ${geoSettings.engines} IS NULL OR cardinality(${geoSettings.engines}) = 0
+                THEN ${initialEngines}::text[]
+              WHEN ${input.engine} = ANY(${geoSettings.engines})
+                THEN ${geoSettings.engines}
+              WHEN cardinality(${geoSettings.engines}) < ${GEO_MAX_ENGINES}
+                THEN array_append(${geoSettings.engines}, ${input.engine})
+              ELSE ${geoSettings.engines}
+            END
+          `,
+        })
+        .where(
+          and(
+            eq(geoSettings.organizationId, input.organizationId),
+            eq(geoSettings.projectId, projectId),
+            sql`(
+              NOT ${geoSettings.enforceZdr}
+              OR ${isGeoEngineZdrCapable(catalog, input.engine)}
+              OR ${input.engine} = ANY(${geoSettings.nonZdrApprovedEngines})
+            )`
+          )
+        )
+        .returning({ engines: geoSettings.engines })
+    );
+
+    if (!updated.at(0)?.engines?.includes(input.engine)) {
+      return yield* Effect.fail(
+        new GeoSettingsTrackingError({
+          message:
+            "This model cannot be added under the current tracking settings",
+        })
+      );
+    }
+  }
+);
+
+export const addGeoTrackedLanguage = Effect.fn("geo.settingsLanguageAdd")(
+  function* (input: GeoSettingsLanguageAddInput) {
+    const { projectId } = yield* requireGeoProject(input);
+    const initialLanguages = [
+      ...new Set([...trackedGeoLanguages([]), input.language]),
+    ];
+    const updated = yield* geoDb("tracked language update failed", () =>
+      db
+        .update(geoSettings)
+        .set({
+          languages: sql<string[]>`
+            CASE
+              WHEN ${geoSettings.languages} IS NULL OR cardinality(${geoSettings.languages}) = 0
+                THEN ${initialLanguages}::text[]
+              WHEN ${input.language} = ANY(${geoSettings.languages})
+                THEN ${geoSettings.languages}
+              WHEN cardinality(${geoSettings.languages}) < ${GEO_MAX_LANGUAGES}
+                THEN array_append(${geoSettings.languages}, ${input.language})
+              ELSE ${geoSettings.languages}
+            END
+          `,
+        })
+        .where(
+          and(
+            eq(geoSettings.organizationId, input.organizationId),
+            eq(geoSettings.projectId, projectId)
+          )
+        )
+        .returning({ languages: geoSettings.languages })
+    );
+
+    if (!updated.at(0)?.languages?.includes(input.language)) {
+      return yield* Effect.fail(
+        new GeoSettingsTrackingError({
+          message: "This language cannot be added to tracking",
+        })
+      );
+    }
   }
 );
 

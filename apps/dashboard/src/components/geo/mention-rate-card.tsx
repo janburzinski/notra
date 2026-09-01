@@ -19,10 +19,7 @@ import {
   engineFamilyLabel,
   engineFamilyOf,
 } from "@notra/geo-core/utils/geo-engine-family";
-import {
-  resolveGeoZdrMode,
-  sortKnownEngines,
-} from "@notra/geo-core/utils/geo-engines";
+import { resolveGeoZdrMode } from "@notra/geo-core/utils/geo-engines";
 import { geoScanEmptyMessage } from "@notra/geo-core/utils/geo-scan";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
@@ -52,7 +49,10 @@ import {
 import { GEO_TRAFFIC_HOVER_DELAY_MS } from "@/constants/geo-traffic-hover";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { EASE_OUT } from "@/lib/ease";
-import { useGeoModelCatalog, useGeoSettingsUpsert } from "@/lib/hooks/use-geo";
+import {
+  useGeoModelCatalog,
+  useGeoSettingsEngineAdd,
+} from "@/lib/hooks/use-geo";
 import { useScrollOverflow } from "@/lib/hooks/use-scroll-overflow";
 import { cn } from "@/lib/utils";
 import type {
@@ -240,7 +240,7 @@ export function MentionRateCard({
 }: MentionRateCardProps) {
   const organizationId = settings?.organizationId ?? "";
   const { data: catalog } = useGeoModelCatalog(organizationId);
-  const upsert = useGeoSettingsUpsert(organizationId, { silentSuccess: true });
+  const addEngine = useGeoSettingsEngineAdd(organizationId);
   const ranked = useMemo(
     () =>
       buildMentionProviderRows(engines, {
@@ -286,14 +286,10 @@ export function MentionRateCard({
     }
     return result;
   }, [catalog, ranked, settings]);
-  const savedEngineSet = new Set(settings?.engines);
-  const pendingEngine =
-    upsert.isPending && upsert.variables
-      ? upsert.variables.engines.find((engine) => !savedEngineSet.has(engine))
+  const pendingFamily =
+    addEngine.isPending && addEngine.variables
+      ? engineFamilyOf(addEngine.variables)
       : undefined;
-  const pendingFamily = pendingEngine
-    ? engineFamilyOf(pendingEngine)
-    : undefined;
   const totals = mentionOverviewTotals(
     withTrackedMentionEngines(engines, trackedEngines)
   );
@@ -311,26 +307,12 @@ export function MentionRateCard({
     setSelected(family);
   };
   const trackEngine = (engine: string, name: string) => {
-    if (!catalog || !settings || upsert.isPending) {
+    if (addEngine.isPending) {
       return;
     }
-    upsert.mutate(
-      {
-        aliases: settings.aliases,
-        companyName: settings.companyName,
-        competitors: settings.competitors,
-        enabled: settings.enabled,
-        enforceZdr: settings.enforceZdr,
-        engines: sortKnownEngines(catalog, [...settings.engines, engine]),
-        languages: settings.languages,
-        nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
-        organizationId,
-        scanIntervalHours: settings.scanIntervalHours,
-      },
-      {
-        onSuccess: () => toast.success(`${name} added to tracking`),
-      }
-    );
+    addEngine.mutate(engine, {
+      onSuccess: () => toast.success(`${name} added to tracking`),
+    });
   };
   const { ref, hiddenBelow, atEnd, scrollToEnd } =
     useScrollOverflow<HTMLDivElement>(

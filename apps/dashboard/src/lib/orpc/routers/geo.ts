@@ -50,6 +50,8 @@ import {
   suggestGeoCompetitors,
 } from "@notra/geo-core/geo/onboarding";
 import {
+  addGeoTrackedEngine,
+  addGeoTrackedLanguage,
   createGeoPrompt,
   deleteGeoCompetitor,
   deleteGeoPrompt,
@@ -124,6 +126,8 @@ import {
   geoSequenceResultsInputSchema,
   geoSequenceRunInputSchema,
   geoSequenceUpdateInputSchema,
+  geoSettingsEngineAddInputSchema,
+  geoSettingsLanguageAddInputSchema,
   geoSettingsUpsertInputSchema,
   geoSuggestionIdInputSchema,
   geoTimeseriesInputSchema,
@@ -402,6 +406,12 @@ export const geoRouter = {
   settings: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(geoOpenHandler((input) => loadGeoSettings(input))),
+  settingsEngineAdd: authorizedProcedure
+    .input(geoSettingsEngineAddInputSchema)
+    .handler(geoHandler((input) => addGeoTrackedEngine(input))),
+  settingsLanguageAdd: authorizedProcedure
+    .input(geoSettingsLanguageAddInputSchema)
+    .handler(geoHandler((input) => addGeoTrackedLanguage(input))),
   settingsUpsert: authorizedProcedure
     .input(geoSettingsUpsertInputSchema)
     .handler(

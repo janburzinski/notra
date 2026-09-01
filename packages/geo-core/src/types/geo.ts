@@ -289,6 +289,14 @@ export interface GeoSettingsUpsertInput {
   scanIntervalHours: number;
 }
 
+export interface GeoSettingsEngineAddInput extends GeoScopeInput {
+  engine: string;
+}
+
+export interface GeoSettingsLanguageAddInput extends GeoScopeInput {
+  language: string;
+}
+
 export interface SyncGeoScanScheduleInput {
   organizationId: string;
   projectId: string;

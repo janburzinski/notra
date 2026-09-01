@@ -87,6 +87,12 @@ export class GeoSettingsDisabledError extends Data.TaggedError(
   readonly projectId: string;
 }> {}
 
+export class GeoSettingsTrackingError extends Data.TaggedError(
+  "GeoSettingsTrackingError"
+)<{
+  readonly message: string;
+}> {}
+
 export class GeoScanStartError extends Data.TaggedError("GeoScanStartError")<{
   readonly cause: unknown;
 }> {}
@@ -239,6 +245,7 @@ export type GeoRouterError =
   | GeoSequenceRunUnavailableError
   | GeoSettingsDisabledError
   | GeoSettingsMissingError
+  | GeoSettingsTrackingError
   | GeoTinybirdError
   | GeoWriterCreditsExhaustedError
   | GeoWriterPlanError

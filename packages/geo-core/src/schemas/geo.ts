@@ -101,6 +101,20 @@ export const geoModelCatalogInputSchema = object({
   organizationId: string().min(1),
 });
 
+export const geoSettingsEngineAddInputSchema =
+  geoOrganizationInputSchema.extend({
+    engine: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+  });
+
+export const geoSettingsLanguageAddInputSchema =
+  geoOrganizationInputSchema.extend({
+    language: string()
+      .min(1)
+      .refine((value) => GEO_SUPPORTED_LANGUAGE_SET.has(value), {
+        message: "Unsupported language",
+      }),
+  });
+
 export const geoSettingsUpsertInputSchema = geoOrganizationInputSchema.extend({
   companyName: string().min(1),
   aliases: array(string().min(1)).max(GEO_MAX_ALIASES),
