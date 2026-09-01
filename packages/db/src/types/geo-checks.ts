@@ -3,6 +3,11 @@ export interface GeoCheckScope {
   projectId: string | null;
 }
 
+export interface GeoCheckFilterOptions {
+  sequences?: "single";
+  englishOnly?: boolean;
+}
+
 export interface GeoCheckSourceItem {
   url: string;
   title: string | null;

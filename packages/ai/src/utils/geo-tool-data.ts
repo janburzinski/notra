@@ -5,6 +5,7 @@ import {
   GEO_CONTEXT_MAX_CHECKS,
   GEO_CONTEXT_MAX_EXCERPT_CHARS,
 } from "@notra/ai/constants/geo-writer";
+import { GEO_CHECK_ENGLISH_LANGUAGES } from "@notra/db/constants/geo-checks";
 import { db } from "@notra/db/drizzle";
 import {
   geoCompetitors,
@@ -20,7 +21,7 @@ import {
   queryGeoCheckTimeseries,
   toGeoCheckWindow,
 } from "@notra/db/utils/geo-checks";
-import { and, asc, desc, eq, gte } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull } from "drizzle-orm";
 
 const MS_PER_DAY = 86_400_000;
 
@@ -88,7 +89,8 @@ export async function loadGeoOverviewForTool(
     queryGeoCheckCompetitorShare(
       scope,
       window,
-      GEO_TOOL_DEFAULT_COMPETITOR_LIMIT
+      GEO_TOOL_DEFAULT_COMPETITOR_LIMIT,
+      { sequences: "single", englishOnly: true }
     ),
   ]);
 
@@ -116,7 +118,14 @@ export async function loadGeoTimeseriesForTool(
   days: number
 ) {
   const scope = geoScope(organizationId, projectId);
-  const rows = await queryGeoCheckTimeseries(scope, toGeoCheckWindow({ days }));
+  const rows = await queryGeoCheckTimeseries(
+    scope,
+    toGeoCheckWindow({ days }),
+    {
+      sequences: "single",
+      englishOnly: true,
+    }
+  );
 
   return {
     project_id: scope.projectId,
@@ -189,7 +198,8 @@ export async function loadGeoCompetitorShareForTool(
   const competitors = await queryGeoCheckCompetitorShare(
     scope,
     toGeoCheckWindow({ days }),
-    limit
+    limit,
+    { sequences: "single", englishOnly: true }
   );
 
   return {
@@ -211,6 +221,8 @@ export async function loadGeoProjectContextForTool(
   const mentionWhere = and(
     eq(geoMentionChecks.projectId, projectId),
     eq(geoMentionChecks.organizationId, organizationId),
+    isNull(geoMentionChecks.sequenceId),
+    inArray(geoMentionChecks.language, [...GEO_CHECK_ENGLISH_LANGUAGES]),
     eq(geoMentionChecks.turn, 0),
     gte(geoMentionChecks.capturedAt, since)
   );
