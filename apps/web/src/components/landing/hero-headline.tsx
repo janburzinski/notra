@@ -2,26 +2,19 @@
 
 import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { cn } from "@notra/ui/lib/utils";
-import {
-  AnimatePresence,
-  domAnimation,
-  LazyMotion,
-  m,
-  useReducedMotion,
-} from "motion/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AnimatePresence, domAnimation, LazyMotion, m } from "motion/react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { GEO_ENGINE_NAMES } from "@/constants/landing/geo-engines";
 import {
   HERO_HEADLINE_CYCLE,
-  HERO_HEADLINE_CYCLE_MS,
   HERO_HEADLINE_LINE_ONE,
   HERO_HEADLINE_LINE_TWO_PREFIX,
   HERO_HEADLINE_SUFFIX,
   HERO_WORD_SIZE_DESCENDER_EM,
   HERO_WORD_SIZE_EM,
 } from "@/constants/landing/hero";
-import type { HeroCycleWord } from "@/types/landing/hero";
+import type { HeroCycleWord, HeroHeadlineProps } from "@/types/landing/hero";
 
 const WORD_TRANSITION = { duration: 0.5, ease: [0.22, 1, 0.36, 1] } as const;
 
@@ -58,12 +51,9 @@ function WordContent({ word }: { word: HeroCycleWord }) {
   );
 }
 
-export function HeroHeadline() {
-  const reduceMotion = useReducedMotion();
-  const [index, setIndex] = useState(0);
+export function HeroHeadline({ word }: HeroHeadlineProps) {
   const [widths, setWidths] = useState<Record<string, number>>({});
   const measureRefs = useRef(new Map<string, HTMLSpanElement>());
-  const word = HERO_HEADLINE_CYCLE[index] ?? HERO_HEADLINE_CYCLE[0];
 
   useLayoutEffect(() => {
     const measure = () => {
@@ -81,20 +71,6 @@ export function HeroHeadline() {
     }
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    if (reduceMotion) {
-      return;
-    }
-    const interval = window.setInterval(() => {
-      setIndex((current) => (current + 1) % HERO_HEADLINE_CYCLE.length);
-    }, HERO_HEADLINE_CYCLE_MS);
-    return () => window.clearInterval(interval);
-  }, [reduceMotion]);
-
-  if (!word) {
-    return null;
-  }
 
   const width = widths[word.text];
 

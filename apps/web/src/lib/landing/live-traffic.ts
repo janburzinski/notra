@@ -1,11 +1,13 @@
 import {
   LIVE_TRAFFIC_MARKDOWN_PATHS,
-  LIVE_TRAFFIC_MAX_DELAY_MS,
-  LIVE_TRAFFIC_MIN_DELAY_MS,
   LIVE_TRAFFIC_PATHS,
   LIVE_TRAFFIC_PROVIDERS,
 } from "@/constants/landing/live-traffic";
-import type { CitationRow, LiveCitationRow } from "@/types/landing/geo";
+import type {
+  CitationRow,
+  EngineId,
+  LiveCitationRow,
+} from "@/types/landing/geo";
 
 const MS_PER_SECOND = 1000;
 const PAD_LENGTH = 2;
@@ -30,8 +32,13 @@ export function seedLiveRows(rows: CitationRow[]): LiveCitationRow[] {
   }));
 }
 
-export function randomLiveRow(offsetMs: number): LiveCitationRow {
-  const source = pick(LIVE_TRAFFIC_PROVIDERS);
+export function randomLiveRow(
+  offsetMs: number,
+  engine: EngineId
+): LiveCitationRow {
+  const source = pick(
+    LIVE_TRAFFIC_PROVIDERS.filter((provider) => provider.engine === engine)
+  );
   const path = pick(LIVE_TRAFFIC_PATHS);
   return {
     id: `live-${offsetMs}-${Math.random().toString(36).slice(2, 8)}`,
@@ -43,11 +50,6 @@ export function randomLiveRow(offsetMs: number): LiveCitationRow {
     markdown: LIVE_TRAFFIC_MARKDOWN_PATHS.has(path) ? true : undefined,
     offsetMs,
   };
-}
-
-export function randomLiveDelayMs(): number {
-  const span = LIVE_TRAFFIC_MAX_DELAY_MS - LIVE_TRAFFIC_MIN_DELAY_MS;
-  return LIVE_TRAFFIC_MIN_DELAY_MS + Math.random() * span;
 }
 
 export function formatCapturedAt(row: LiveCitationRow, base: number): string {

@@ -2,6 +2,7 @@
 
 import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { PurposeBadge } from "@notra/ui/components/geo/purpose-badge";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -13,7 +14,6 @@ import {
 import { cn } from "@notra/ui/lib/utils";
 import { AnimatePresence, domAnimation, LazyMotion, m } from "motion/react";
 
-import { LIVE_TRAFFIC_TIMESTAMP_PLACEHOLDER } from "@/constants/landing/live-traffic";
 import { formatCapturedAt } from "@/lib/landing/live-traffic";
 import type { CitationRowsProps, LiveCitationRow } from "@/types/landing/geo";
 
@@ -37,11 +37,15 @@ function CitationCells({
     <>
       <TableCell className="text-muted-foreground py-3.5 text-sm whitespace-nowrap tabular-nums">
         {base === null ? (
-          <span className="invisible">
-            {LIVE_TRAFFIC_TIMESTAMP_PLACEHOLDER}
-          </span>
+          <Skeleton aria-hidden className="h-4 w-32" />
         ) : (
-          formatCapturedAt(row, base)
+          <m.span
+            animate={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {formatCapturedAt(row, base)}
+          </m.span>
         )}
       </TableCell>
       <TableCell className="py-3.5">
