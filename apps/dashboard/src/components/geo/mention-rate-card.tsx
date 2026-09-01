@@ -90,6 +90,7 @@ function ProviderRow({
   onOpen,
   onTrack,
   trackEngine,
+  trackingDisabled,
   tracking,
 }: MentionProviderRowProps) {
   const { family, totals, mentionDelta, tracked } = row;
@@ -156,7 +157,7 @@ function ProviderRow({
           trackEngine ? (
             <Button
               aria-label={`Track ${name}`}
-              disabled={tracking}
+              disabled={trackingDisabled}
               onClick={() => onTrack(trackEngine, name)}
               size="xs"
               type="button"
@@ -368,6 +369,7 @@ export function MentionRateCard({
                       rank={index + 1}
                       row={row}
                       trackEngine={trackableEngines.get(row.family.family)}
+                      trackingDisabled={addEngine.isPending}
                       tracking={pendingFamily === row.family.family}
                     />
                   ))}

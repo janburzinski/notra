@@ -421,6 +421,7 @@ export interface MentionProviderRowProps {
   onOpen: (family: GeoEngineFamily) => void;
   onTrack: (engine: string, name: string) => void;
   trackEngine?: string;
+  trackingDisabled: boolean;
   tracking: boolean;
 }
 
