@@ -36,7 +36,7 @@ export function InstrumentModule({
       contentClassName = "flex flex-1 flex-col p-0";
     } else if (tableHeader) {
       headerClassName =
-        "border-border bg-muted h-[4.25rem] content-center rounded-t-2xl border border-b-0 pb-5";
+        "border-border bg-muted h-[4.25rem] content-center items-center rounded-t-2xl border border-b-0 pb-5";
       contentClassName =
         "border-border bg-card relative -mt-5 flex flex-1 flex-col rounded-2xl border p-4";
     }
@@ -55,7 +55,12 @@ export function InstrumentModule({
           </CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
           {(readout || action) && (
-            <CardAction className="flex min-w-0 items-center gap-2">
+            <CardAction
+              className={cn(
+                "flex min-w-0 items-center gap-2",
+                tableHeader && "row-span-1 self-center"
+              )}
+            >
               {readout && (
                 <span className="text-muted-foreground truncate text-xs tabular-nums">
                   {readout}
