@@ -71,6 +71,7 @@ const HINT_ROW_STYLE = {
 } as const;
 const LIST_STYLE = {
   maxHeight: `${GEO_MENTION_SUMMARY_VISIBLE * GEO_MENTION_ROW_HEIGHT_REM + GEO_MENTION_HINT_HEIGHT_REM}rem`,
+  scrollbarWidth: "none",
 } as const;
 
 function ProviderRow({ rank, row, onOpen }: MentionProviderRowProps) {
@@ -263,7 +264,7 @@ export function MentionRateCard({
               </div>
               <div className="relative flex-1">
                 <div
-                  className="border-border relative [scrollbar-width:none] overflow-y-auto [&::-webkit-scrollbar]:hidden [&>button:last-of-type]:border-b-0"
+                  className="border-border relative overflow-y-auto [&::-webkit-scrollbar]:hidden [&>button:last-of-type]:border-b-0"
                   ref={ref}
                   style={LIST_STYLE}
                 >
