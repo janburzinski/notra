@@ -3,3 +3,6 @@ export const ANALYTICS_NOT_CONFIGURED_MESSAGE =
 
 export const ANALYTICS_QUERY_FAILED_MESSAGE =
   "Failed to load social analytics from the analytics backend.";
+
+export const GEO_ANALYTICS_QUERY_FAILED_MESSAGE =
+  "Failed to load GEO analytics from the data store.";
