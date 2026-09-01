@@ -270,28 +270,15 @@ export async function loadGeoProjectContextForTool(
           eq(geoPrompts.enabled, true)
         )
       ),
-    includeAnswers
-      ? db
-          .selectDistinctOn(
-            [geoMentionChecks.promptId, geoMentionChecks.engine],
-            {
-              ...mentionCheckBaseColumns,
-              answer: geoMentionChecks.answer,
-            }
-          )
-          .from(geoMentionChecks)
-          .where(mentionWhere)
-          .orderBy(...mentionOrderBy)
-          .limit(GEO_CONTEXT_MAX_CHECKS)
-      : db
-          .selectDistinctOn(
-            [geoMentionChecks.promptId, geoMentionChecks.engine],
-            mentionCheckBaseColumns
-          )
-          .from(geoMentionChecks)
-          .where(mentionWhere)
-          .orderBy(...mentionOrderBy)
-          .limit(GEO_CONTEXT_MAX_CHECKS),
+    db
+      .selectDistinctOn([geoMentionChecks.promptId, geoMentionChecks.engine], {
+        ...mentionCheckBaseColumns,
+        ...(includeAnswers ? { answer: geoMentionChecks.answer } : {}),
+      })
+      .from(geoMentionChecks)
+      .where(mentionWhere)
+      .orderBy(...mentionOrderBy)
+      .limit(GEO_CONTEXT_MAX_CHECKS),
   ]);
 
   const latestChecks = checks.map((check) => {
