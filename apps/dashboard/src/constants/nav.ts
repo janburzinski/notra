@@ -84,9 +84,11 @@ export const GEO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
   "feedback",
 ]);
 
+// Only mode-exclusive routes belong here. Shared destinations such as Content
+// keep the currently stored mode so navigating there from GEO does not swap
+// the sidebar to Studio.
 export const STUDIO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
   "chat",
-  "content",
   "collection",
   "analytics",
   "brand",
