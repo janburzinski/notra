@@ -1,21 +1,28 @@
 "use client";
 
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   GEO_EMPTY_PROMPT_RESULTS,
   GEO_EMPTY_TIMESERIES,
   GEO_FAMILY_STAT_TREND_HINT,
+  GEO_MAX_ENGINES,
   GEO_MENTION_HINT_BLEED_REM,
   GEO_MENTION_HINT_HEIGHT_REM,
   GEO_MENTION_ROW_HEIGHT_REM,
   GEO_MENTION_SUMMARY_VISIBLE,
   GEO_MENTION_UNTRACKED_HINT,
-  GEO_MENTION_UNTRACKED_LABEL,
   GEO_MENTIONS_LABEL,
 } from "@notra/geo-core/constants/geo";
 import type { GeoEngineFamily } from "@notra/geo-core/types/geo";
-import { engineFamilyLabel } from "@notra/geo-core/utils/geo-engine-family";
+import {
+  engineFamilyLabel,
+  engineFamilyOf,
+} from "@notra/geo-core/utils/geo-engine-family";
+import {
+  resolveGeoZdrMode,
+  sortKnownEngines,
+} from "@notra/geo-core/utils/geo-engines";
 import { geoScanEmptyMessage } from "@notra/geo-core/utils/geo-scan";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
@@ -30,10 +37,13 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
+import { Button } from "@/components/button";
 import { EngineFamilySheet } from "@/components/geo/engine-family-sheet";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
+import { StatusSpinner } from "@/components/geo/status-spinner";
 import { TrafficBreakdownCard } from "@/components/geo/traffic-breakdown-card";
 import {
   InstrumentEmpty,
@@ -42,6 +52,7 @@ import {
 import { GEO_TRAFFIC_HOVER_DELAY_MS } from "@/constants/geo-traffic-hover";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { EASE_OUT } from "@/lib/ease";
+import { useGeoModelCatalog, useGeoSettingsUpsert } from "@/lib/hooks/use-geo";
 import { useScrollOverflow } from "@/lib/hooks/use-scroll-overflow";
 import { cn } from "@/lib/utils";
 import type {
@@ -73,7 +84,14 @@ const LIST_STYLE = {
   maxHeight: `${GEO_MENTION_SUMMARY_VISIBLE * GEO_MENTION_ROW_HEIGHT_REM + GEO_MENTION_HINT_HEIGHT_REM}rem`,
 } as const;
 
-function ProviderRow({ rank, row, onOpen }: MentionProviderRowProps) {
+function ProviderRow({
+  rank,
+  row,
+  onOpen,
+  onTrack,
+  trackEngine,
+  tracking,
+}: MentionProviderRowProps) {
   const { family, totals, mentionDelta, tracked } = row;
   const name = engineFamilyLabel(family.family);
   const clickable = totals.mentions > 0;
@@ -134,7 +152,29 @@ function ProviderRow({ rank, row, onOpen }: MentionProviderRowProps) {
         {content}
       </HoverCardTrigger>
       <TrafficBreakdownCard
-        aside={GEO_MENTION_UNTRACKED_LABEL}
+        aside={
+          trackEngine ? (
+            <Button
+              aria-label={`Track ${name}`}
+              disabled={tracking}
+              onClick={() => onTrack(trackEngine, name)}
+              size="xs"
+              type="button"
+              variant="outline"
+            >
+              {tracking ? (
+                <StatusSpinner />
+              ) : (
+                <HugeiconsIcon
+                  data-icon="inline-start"
+                  icon={PlusSignIcon}
+                  strokeWidth={2}
+                />
+              )}
+              Track
+            </Button>
+          ) : null
+        }
         icon={<EngineIcon className="size-4" engine={family.family} />}
         title={name}
       >
@@ -191,12 +231,16 @@ function MoreModelsHint({
 
 export function MentionRateCard({
   engines,
+  settings,
   trackedEngines,
   timeseriesPoints = GEO_EMPTY_TIMESERIES,
   promptResults = GEO_EMPTY_PROMPT_RESULTS,
   isScanning = false,
   organizationSlug,
 }: MentionRateCardProps) {
+  const organizationId = settings?.organizationId ?? "";
+  const { data: catalog } = useGeoModelCatalog(organizationId);
+  const upsert = useGeoSettingsUpsert(organizationId, { silentSuccess: true });
   const ranked = useMemo(
     () =>
       buildMentionProviderRows(engines, {
@@ -205,6 +249,51 @@ export function MentionRateCard({
       }),
     [engines, trackedEngines, timeseriesPoints]
   );
+  const trackableEngines = useMemo(() => {
+    const result = new Map<string, string>();
+    if (!catalog || !settings || settings.engines.length >= GEO_MAX_ENGINES) {
+      return result;
+    }
+
+    const knownEngines = new Set<string>();
+    const currentModelsByFamily = new Map<string, string[]>();
+    for (const model of catalog.models) {
+      knownEngines.add(model.id);
+      const family = engineFamilyOf(model.id);
+      const models = currentModelsByFamily.get(family) ?? [];
+      models.push(model.id);
+      currentModelsByFamily.set(family, models);
+    }
+    for (const row of ranked) {
+      if (row.tracked) {
+        continue;
+      }
+      const historicModels = row.family.variants.map(
+        (variant) => variant.model
+      );
+      const currentModels = currentModelsByFamily.get(row.family.family) ?? [];
+      const engine = [...historicModels, ...currentModels].find(
+        (candidate) =>
+          knownEngines.has(candidate) &&
+          resolveGeoZdrMode(catalog, candidate, {
+            enforceZdr: settings.enforceZdr,
+            nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
+          }) !== null
+      );
+      if (engine) {
+        result.set(row.family.family, engine);
+      }
+    }
+    return result;
+  }, [catalog, ranked, settings]);
+  const savedEngineSet = new Set(settings?.engines);
+  const pendingEngine =
+    upsert.isPending && upsert.variables
+      ? upsert.variables.engines.find((engine) => !savedEngineSet.has(engine))
+      : undefined;
+  const pendingFamily = pendingEngine
+    ? engineFamilyOf(pendingEngine)
+    : undefined;
   const totals = mentionOverviewTotals(
     withTrackedMentionEngines(engines, trackedEngines)
   );
@@ -220,6 +309,28 @@ export function MentionRateCard({
       tracked: row?.tracked ?? null,
     });
     setSelected(family);
+  };
+  const trackEngine = (engine: string, name: string) => {
+    if (!catalog || !settings || upsert.isPending) {
+      return;
+    }
+    upsert.mutate(
+      {
+        aliases: settings.aliases,
+        companyName: settings.companyName,
+        competitors: settings.competitors,
+        enabled: settings.enabled,
+        enforceZdr: settings.enforceZdr,
+        engines: sortKnownEngines(catalog, [...settings.engines, engine]),
+        languages: settings.languages,
+        nonZdrApprovedEngines: settings.nonZdrApprovedEngines,
+        organizationId,
+        scanIntervalHours: settings.scanIntervalHours,
+      },
+      {
+        onSuccess: () => toast.success(`${name} added to tracking`),
+      }
+    );
   };
   const { ref, hiddenBelow, atEnd, scrollToEnd } =
     useScrollOverflow<HTMLDivElement>(
@@ -271,8 +382,11 @@ export function MentionRateCard({
                     <ProviderRow
                       key={row.family.family}
                       onOpen={openFamily}
+                      onTrack={trackEngine}
                       rank={index + 1}
                       row={row}
+                      trackEngine={trackableEngines.get(row.family.family)}
+                      tracking={pendingFamily === row.family.family}
                     />
                   ))}
                 </div>

@@ -419,6 +419,9 @@ export interface MentionProviderRowProps {
   rank: number;
   row: MentionProviderRow;
   onOpen: (family: GeoEngineFamily) => void;
+  onTrack: (engine: string, name: string) => void;
+  trackEngine?: string;
+  tracking: boolean;
 }
 
 export interface MentionMoreModelsHintProps {
@@ -429,6 +432,7 @@ export interface MentionMoreModelsHintProps {
 
 export interface MentionRateCardProps {
   engines: GeoOverviewEngine[];
+  settings?: GeoSettings;
   trackedEngines?: readonly string[];
   timeseriesPoints?: readonly GeoTimeseriesPoint[];
   promptResults?: readonly GeoPromptResult[];

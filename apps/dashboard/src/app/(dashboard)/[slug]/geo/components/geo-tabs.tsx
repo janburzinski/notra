@@ -129,6 +129,7 @@ export function GeoTabs({
                 isScanning={isScanning}
                 organizationSlug={organizationSlug}
                 promptResults={promptResults}
+                settings={settings}
                 timeseriesPoints={timeseriesPoints}
                 trackedEngines={settings.engines}
               />
