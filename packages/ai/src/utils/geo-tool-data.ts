@@ -145,7 +145,8 @@ export async function loadGeoPromptResultsForTool(
   const scope = geoScope(organizationId, projectId);
   const rows = await queryGeoCheckPromptResults(
     scope,
-    toGeoCheckWindow({ days })
+    toGeoCheckWindow({ days }),
+    limit + 1
   );
   const results = rows.slice(0, limit).map((row) => {
     const base = {
@@ -174,7 +175,7 @@ export async function loadGeoPromptResultsForTool(
     days,
     results,
     count: results.length,
-    has_more: rows.length > results.length,
+    has_more: rows.length > limit,
   };
 }
 
