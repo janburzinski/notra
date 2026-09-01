@@ -1,3 +1,4 @@
+import { hasGeoEntitlement } from "@notra/ai/billing/geo-entitlement";
 import { getEnabledMcpServerCount } from "@notra/ai/integrations/mcp-tool-index";
 import { createModel } from "@notra/ai/model";
 import { getStandaloneChatPrompt } from "@notra/ai/prompts/standalone-chat";
@@ -64,7 +65,7 @@ const DEFAULT_STANDALONE_TOOL_NAMES = [
 ] as const;
 
 const NOTRA_TOOLING_DESCRIPTION =
-  "Notra app tools are available through lazy discovery. Use searchNotraTools to find built-in content, brand, GitHub, Linear, Granola, and post tools by intent, then activateNotraTools before calling them. Basic skills, integration discovery, web search, and webpage fetch tools are exposed by default. Context.dev tools require API configuration when called.";
+  "Notra app tools are available through lazy discovery. Use searchNotraTools to find built-in content, brand, GEO analytics, GitHub, Linear, Granola, and post tools by intent, then activateNotraTools before calling them. Basic skills, integration discovery, web search, and webpage fetch tools are exposed by default. Context.dev tools require API configuration when called.";
 const WHITESPACE_REGEX = /\s+/;
 const LEGACY_NOTRA_TOOL_ALIASES: Record<string, string> = {
   getBrandReferences: "getAvailableBrandReferences",
@@ -152,6 +153,9 @@ export async function orchestrateStandaloneChat(
   );
 
   const postResult: PostToolsResult = {};
+  const includeGeoTools = await (
+    deps?.checkGeoEntitlement ?? hasGeoEntitlement
+  )(organizationId);
 
   const baseToolSet = buildStandaloneToolSet(
     {
@@ -159,6 +163,7 @@ export async function orchestrateStandaloneChat(
       chatId,
       userId,
       useMarkup,
+      includeGeoTools,
       validatedIntegrations,
       postResult,
     },
@@ -192,9 +197,12 @@ export async function orchestrateStandaloneChat(
               : undefined,
         });
 
+  const notraToolingDescription = includeGeoTools
+    ? NOTRA_TOOLING_DESCRIPTION
+    : NOTRA_TOOLING_DESCRIPTION.replace(", GEO analytics", "");
   const descriptions = lazyMcpRuntime
-    ? [NOTRA_TOOLING_DESCRIPTION, ...lazyMcpRuntime.descriptions]
-    : [NOTRA_TOOLING_DESCRIPTION];
+    ? [notraToolingDescription, ...lazyMcpRuntime.descriptions]
+    : [notraToolingDescription];
 
   const hasGitHubToolsActive = notraToolRuntime
     .getActiveToolNames()

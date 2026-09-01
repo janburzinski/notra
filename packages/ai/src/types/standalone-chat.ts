@@ -34,6 +34,7 @@ export interface StandaloneChatInput {
 export interface StandaloneChatDeps {
   preValidatedIntegrations?: ValidatedIntegration[];
   integrationFetchers?: IntegrationFetchers;
+  checkGeoEntitlement?: (organizationId: string) => Promise<boolean>;
   resolveContext?: ResolveIntegrationContext;
   resolveLinearContext?: ResolveLinearIntegrationContext;
   resolveGranolaContext?: ResolveGranolaIntegrationContext;

@@ -14,6 +14,10 @@ import {
   createGetGranolaNotesTool,
   createGetGranolaNoteTool,
 } from "@notra/ai/tools/granola";
+import { createGetGeoOverviewTool } from "@notra/ai/tools/geo-overview";
+import { createGetGeoPromptResultsTool } from "@notra/ai/tools/geo-prompt-results";
+import { createGetGeoSourcesTool } from "@notra/ai/tools/geo-sources";
+import { createGetGeoVisibilityTimeseriesTool } from "@notra/ai/tools/geo-visibility-timeseries";
 import { createImageTool } from "@notra/ai/tools/image";
 import {
   createGetLinearCyclesTool,
@@ -64,6 +68,7 @@ export function buildStandaloneToolSet(
     organizationId,
     userId,
     useMarkup,
+    includeGeoTools,
     validatedIntegrations,
     postResult,
   } = params;
@@ -110,6 +115,15 @@ export function buildStandaloneToolSet(
     organizationId,
   });
   tools.addBrandReference = createAddBrandReferenceTool({ organizationId });
+  if (includeGeoTools) {
+    tools.getGeoOverview = createGetGeoOverviewTool({ organizationId });
+    tools.getGeoVisibilityTimeseries =
+      createGetGeoVisibilityTimeseriesTool({ organizationId });
+    tools.getGeoPromptResults = createGetGeoPromptResultsTool({
+      organizationId,
+    });
+    tools.getGeoSources = createGetGeoSourcesTool({ organizationId });
+  }
 
   descriptions.push(
     userId
@@ -122,6 +136,11 @@ export function buildStandaloneToolSet(
   descriptions.push(
     "**Brand References**: When the user tells you they just published a post and shares its URL, congratulate them, then ask if they want to save it as a brand reference. Only after they agree, call addBrandReference with the post content, type, and URL."
   );
+  if (includeGeoTools) {
+    descriptions.push(
+      "**GEO Analytics**: Inspect organization-wide AI visibility, trends, tracked prompt results, competitor share, and cited sources using getGeoOverview, getGeoVisibilityTimeseries, getGeoPromptResults, and getGeoSources"
+    );
+  }
 
   tools.listAvailableSkills = listAvailableSkills({ organizationId });
   tools.getSkillByName = getSkillByName({ organizationId });

@@ -194,6 +194,7 @@ export interface BuildStandaloneToolSetParams {
   chatId?: string;
   userId?: string;
   useMarkup?: boolean;
+  includeGeoTools: boolean;
   validatedIntegrations: ValidatedIntegration[];
   postResult: PostToolsResult;
 }
