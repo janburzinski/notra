@@ -6,7 +6,10 @@ import {
 import { getGeoSourcesInputSchema } from "@notra/ai/schemas/geo-tools";
 import type { GeoToolConfig } from "@notra/ai/types/geo-tools";
 import { toolDescription } from "@notra/ai/utils/description";
-import { queryGeoCheckPromptResults, toGeoCheckWindow } from "@notra/db/utils/geo-checks";
+import {
+  queryGeoCheckPromptResults,
+  toGeoCheckWindow,
+} from "@notra/db/utils/geo-checks";
 import { type Tool, tool } from "ai";
 
 export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
@@ -24,12 +27,12 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
     execute: async ({ days, limit, promptId, engine }) => {
       const rowScanLimit = Math.min(
         limit * GEO_SOURCES_ROW_SCAN_MULTIPLIER,
-        GEO_SOURCES_MAX_SCANNED_RESULTS,
+        GEO_SOURCES_MAX_SCANNED_RESULTS
       );
       const rows = await queryGeoCheckPromptResults(
         { organizationId: config.organizationId, projectId: null },
         toGeoCheckWindow({ days }),
-        { limit: rowScanLimit, promptId, engine },
+        { limit: rowScanLimit, promptId, engine }
       );
       const seen = new Set<string>();
       const sources = rows
@@ -42,7 +45,7 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
             title: source.title,
             url: source.url,
             lastCheckedAt: row.lastCheckedAt.toISOString(),
-          })),
+          }))
         )
         .filter((source) => {
           const key = `${source.projectId}:${source.promptId}:${source.engine}:${source.url}`;
@@ -54,20 +57,25 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
         });
       const domainCounts = new Map<string, number>();
       for (const source of sources) {
-        domainCounts.set(source.domain, (domainCounts.get(source.domain) ?? 0) + 1);
+        domainCounts.set(
+          source.domain,
+          (domainCounts.get(source.domain) ?? 0) + 1
+        );
       }
 
       return {
         sources: sources.slice(0, limit),
         returnedSources: Math.min(sources.length, limit),
-        resultsMayBeTruncated: sources.length > limit || rows.length === rowScanLimit,
+        resultsMayBeTruncated:
+          sources.length > limit || rows.length === rowScanLimit,
         domains: Array.from(domainCounts, ([domain, citations]) => ({
           domain,
           citations,
         }))
           .sort(
             (left, right) =>
-              right.citations - left.citations || left.domain.localeCompare(right.domain),
+              right.citations - left.citations ||
+              left.domain.localeCompare(right.domain)
           )
           .slice(0, GEO_SOURCE_DOMAIN_LIMIT),
       };

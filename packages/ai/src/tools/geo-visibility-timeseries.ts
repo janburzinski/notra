@@ -1,10 +1,15 @@
 import { getGeoVisibilityTimeseriesInputSchema } from "@notra/ai/schemas/geo-tools";
 import type { GeoToolConfig } from "@notra/ai/types/geo-tools";
 import { toolDescription } from "@notra/ai/utils/description";
-import { queryGeoCheckTimeseries, toGeoCheckWindow } from "@notra/db/utils/geo-checks";
+import {
+  queryGeoCheckTimeseries,
+  toGeoCheckWindow,
+} from "@notra/db/utils/geo-checks";
 import { type Tool, tool } from "ai";
 
-export function createGetGeoVisibilityTimeseriesTool(config: GeoToolConfig): Tool {
+export function createGetGeoVisibilityTimeseriesTool(
+  config: GeoToolConfig
+): Tool {
   return tool({
     description: toolDescription({
       toolName: "getGeoVisibilityTimeseries",
@@ -19,7 +24,7 @@ export function createGetGeoVisibilityTimeseriesTool(config: GeoToolConfig): Too
     execute: async ({ days }) => {
       const rows = await queryGeoCheckTimeseries(
         { organizationId: config.organizationId, projectId: null },
-        toGeoCheckWindow({ days }),
+        toGeoCheckWindow({ days })
       );
 
       return {

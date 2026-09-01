@@ -4,6 +4,10 @@ import {
   createGetAvailableBrandReferencesTool,
 } from "@notra/ai/tools/brand-references";
 import { exampleTool } from "@notra/ai/tools/example";
+import { createGetGeoOverviewTool } from "@notra/ai/tools/geo-overview";
+import { createGetGeoPromptResultsTool } from "@notra/ai/tools/geo-prompt-results";
+import { createGetGeoSourcesTool } from "@notra/ai/tools/geo-sources";
+import { createGetGeoVisibilityTimeseriesTool } from "@notra/ai/tools/geo-visibility-timeseries";
 import {
   createGetCommitsByTimeframeTool,
   createGetPullRequestsTool,
@@ -14,10 +18,6 @@ import {
   createGetGranolaNotesTool,
   createGetGranolaNoteTool,
 } from "@notra/ai/tools/granola";
-import { createGetGeoOverviewTool } from "@notra/ai/tools/geo-overview";
-import { createGetGeoPromptResultsTool } from "@notra/ai/tools/geo-prompt-results";
-import { createGetGeoSourcesTool } from "@notra/ai/tools/geo-sources";
-import { createGetGeoVisibilityTimeseriesTool } from "@notra/ai/tools/geo-visibility-timeseries";
 import { createImageTool } from "@notra/ai/tools/image";
 import {
   createGetLinearCyclesTool,
@@ -117,8 +117,9 @@ export function buildStandaloneToolSet(
   tools.addBrandReference = createAddBrandReferenceTool({ organizationId });
   if (includeGeoTools) {
     tools.getGeoOverview = createGetGeoOverviewTool({ organizationId });
-    tools.getGeoVisibilityTimeseries =
-      createGetGeoVisibilityTimeseriesTool({ organizationId });
+    tools.getGeoVisibilityTimeseries = createGetGeoVisibilityTimeseriesTool({
+      organizationId,
+    });
     tools.getGeoPromptResults = createGetGeoPromptResultsTool({
       organizationId,
     });

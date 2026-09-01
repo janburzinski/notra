@@ -6,7 +6,9 @@ import { FEATURES } from "./features";
 
 const geoEntitlementCache = createMemoryTtlCache<boolean>();
 
-export async function hasGeoEntitlement(organizationId: string): Promise<boolean> {
+export async function hasGeoEntitlement(
+  organizationId: string
+): Promise<boolean> {
   if (allowUnmeteredAiInDevelopment) {
     return true;
   }
@@ -25,7 +27,11 @@ export async function hasGeoEntitlement(organizationId: string): Promise<boolean
       featureId: FEATURES.AI_ANSWERS,
     });
     const entitled = result.balance != null;
-    await geoEntitlementCache.set(organizationId, entitled, GEO_ENTITLEMENT_CACHE_TTL_MS);
+    await geoEntitlementCache.set(
+      organizationId,
+      entitled,
+      GEO_ENTITLEMENT_CACHE_TTL_MS
+    );
     return entitled;
   } catch (error) {
     console.error("[GEO Entitlement] Check failed", {

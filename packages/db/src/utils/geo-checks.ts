@@ -300,7 +300,9 @@ export async function queryGeoCheckPromptResults(
     .from(latestRows)
     .orderBy(desc(latestRows.lastCheckedAt));
   const rows =
-    options.limit === undefined ? await query : await query.limit(options.limit);
+    options.limit === undefined
+      ? await query
+      : await query.limit(options.limit);
 
   return rows.map((row) => ({
     projectId: row.projectId,

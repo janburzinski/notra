@@ -26,7 +26,11 @@ export function createGetGeoOverviewTool(config: GeoToolConfig): Tool {
       const window = toGeoCheckWindow({ days });
       const [overview, competitors] = await Promise.all([
         queryGeoCheckOverview(scope, window),
-        queryGeoCheckCompetitorShare(scope, window, GEO_OVERVIEW_COMPETITOR_LIMIT),
+        queryGeoCheckCompetitorShare(
+          scope,
+          window,
+          GEO_OVERVIEW_COMPETITOR_LIMIT
+        ),
       ]);
 
       return {

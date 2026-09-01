@@ -2,7 +2,10 @@ import { GEO_PROMPT_RESULT_MAX_ANSWER_CHARS } from "@notra/ai/constants/geo-tool
 import { getGeoPromptResultsInputSchema } from "@notra/ai/schemas/geo-tools";
 import type { GeoToolConfig } from "@notra/ai/types/geo-tools";
 import { toolDescription } from "@notra/ai/utils/description";
-import { queryGeoCheckPromptResults, toGeoCheckWindow } from "@notra/db/utils/geo-checks";
+import {
+  queryGeoCheckPromptResults,
+  toGeoCheckWindow,
+} from "@notra/db/utils/geo-checks";
 import { type Tool, tool } from "ai";
 
 export function createGetGeoPromptResultsTool(config: GeoToolConfig): Tool {
@@ -21,7 +24,7 @@ export function createGetGeoPromptResultsTool(config: GeoToolConfig): Tool {
       const rows = await queryGeoCheckPromptResults(
         { organizationId: config.organizationId, projectId: null },
         toGeoCheckWindow({ days }),
-        { limit, promptId, engine },
+        { limit, promptId, engine }
       );
       const results = rows.map((row) => ({
         projectId: row.projectId,
@@ -35,7 +38,8 @@ export function createGetGeoPromptResultsTool(config: GeoToolConfig): Tool {
         ...(includeAnswers
           ? {
               answer: row.answer.slice(0, GEO_PROMPT_RESULT_MAX_ANSWER_CHARS),
-              answerTruncated: row.answer.length > GEO_PROMPT_RESULT_MAX_ANSWER_CHARS,
+              answerTruncated:
+                row.answer.length > GEO_PROMPT_RESULT_MAX_ANSWER_CHARS,
             }
           : {}),
         finishReason: row.finishReason,
