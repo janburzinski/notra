@@ -1,0 +1,1 @@
+export const GEO_ENTITLEMENT_CACHE_TTL_MS = 30_000;

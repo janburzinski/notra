@@ -64,6 +64,7 @@ export interface GeoCheckTimeseriesRow {
 }
 
 export interface GeoCheckPromptResultRow {
+  projectId: string;
   promptId: string;
   engine: string;
   prompt: string;
@@ -79,6 +80,12 @@ export interface GeoCheckPromptResultRow {
   reasoningTokens: number | null;
   truncated: boolean | null;
   lastCheckedAt: Date;
+}
+
+export interface GeoCheckPromptResultQueryOptions {
+  limit?: number;
+  promptId?: string;
+  engine?: string;
 }
 
 export interface GeoCheckCompetitorShareRow {

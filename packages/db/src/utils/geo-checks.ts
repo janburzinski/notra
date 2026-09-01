@@ -21,6 +21,7 @@ import type {
   GeoCheckLanguageShareRow,
   GeoCheckLanguageShareTrendRow,
   GeoCheckOverviewRow,
+  GeoCheckPromptResultQueryOptions,
   GeoCheckPromptResultRow,
   GeoCheckScope,
   GeoCheckSequenceResultRow,
@@ -242,64 +243,83 @@ export async function queryGeoCheckTimeseries(
 
 export async function queryGeoCheckPromptResults(
   scope: GeoCheckScope,
-  window: GeoCheckWindow | undefined
+  window: GeoCheckWindow | undefined,
+  options: GeoCheckPromptResultQueryOptions = {}
 ): Promise<GeoCheckPromptResultRow[]> {
-  // Every field must come from the same newest row per (prompt, engine).
+  // Every field must come from the same newest row per (project, prompt, engine).
   // Aggregating across the window would pair a current answer with a stale
   // mention flag or position.
-  const rows = await db
-    .selectDistinctOn([geoMentionChecks.promptId, geoMentionChecks.engine], {
-      promptId: geoMentionChecks.promptId,
-      engine: geoMentionChecks.engine,
-      prompt: geoMentionChecks.prompt,
-      answer: geoMentionChecks.answer,
-      mentioned: geoMentionChecks.mentioned,
-      position: geoMentionChecks.position,
-      sentiment: geoMentionChecks.sentiment,
-      excerpt: geoMentionChecks.excerpt,
-      grounding: geoMentionChecks.grounding,
-      finishReason: geoMentionChecks.finishReason,
-      promptTokens: geoMentionChecks.promptTokens,
-      outputTokens: geoMentionChecks.outputTokens,
-      reasoningTokens: geoMentionChecks.reasoningTokens,
-      lastCheckedAt: geoMentionChecks.capturedAt,
-    })
-    .from(geoMentionChecks)
-    .where(
-      mentionFilters(scope, window, {
-        sequences: "single",
-        englishOnly: true,
-      })
+  const filters = [
+    mentionFilters(scope, window, {
+      sequences: "single",
+      englishOnly: true,
+    }),
+  ];
+  if (options.promptId) {
+    filters.push(eq(geoMentionChecks.promptId, options.promptId));
+  }
+  if (options.engine) {
+    filters.push(eq(geoMentionChecks.engine, options.engine));
+  }
+  const latestRows = db
+    .selectDistinctOn(
+      [
+        geoMentionChecks.projectId,
+        geoMentionChecks.promptId,
+        geoMentionChecks.engine,
+      ],
+      {
+        projectId: geoMentionChecks.projectId,
+        promptId: geoMentionChecks.promptId,
+        engine: geoMentionChecks.engine,
+        prompt: geoMentionChecks.prompt,
+        answer: geoMentionChecks.answer,
+        mentioned: geoMentionChecks.mentioned,
+        position: geoMentionChecks.position,
+        sentiment: geoMentionChecks.sentiment,
+        excerpt: geoMentionChecks.excerpt,
+        grounding: geoMentionChecks.grounding,
+        finishReason: geoMentionChecks.finishReason,
+        promptTokens: geoMentionChecks.promptTokens,
+        outputTokens: geoMentionChecks.outputTokens,
+        reasoningTokens: geoMentionChecks.reasoningTokens,
+        lastCheckedAt: geoMentionChecks.capturedAt,
+      }
     )
+    .from(geoMentionChecks)
+    .where(and(...filters))
     .orderBy(
+      geoMentionChecks.projectId,
       geoMentionChecks.promptId,
       geoMentionChecks.engine,
       desc(geoMentionChecks.capturedAt)
-    );
+    )
+    .as("latest_geo_prompt_results");
+  const query = db
+    .select()
+    .from(latestRows)
+    .orderBy(desc(latestRows.lastCheckedAt));
+  const rows =
+    options.limit === undefined ? await query : await query.limit(options.limit);
 
-  return rows
-    .map((row) => ({
-      promptId: row.promptId,
-      engine: row.engine,
-      prompt: row.prompt,
-      answer: row.answer,
-      mentioned: row.mentioned,
-      position: row.position,
-      sentiment: row.sentiment,
-      excerpt: row.excerpt,
-      grounding: parseGeoCheckGrounding(row.grounding),
-      finishReason: row.finishReason,
-      promptTokens: row.promptTokens,
-      outputTokens: row.outputTokens,
-      reasoningTokens: row.reasoningTokens,
-      truncated:
-        row.finishReason === null ? null : row.finishReason === "length",
-      lastCheckedAt: row.lastCheckedAt,
-    }))
-    .sort(
-      (left, right) =>
-        right.lastCheckedAt.getTime() - left.lastCheckedAt.getTime()
-    );
+  return rows.map((row) => ({
+    projectId: row.projectId,
+    promptId: row.promptId,
+    engine: row.engine,
+    prompt: row.prompt,
+    answer: row.answer,
+    mentioned: row.mentioned,
+    position: row.position,
+    sentiment: row.sentiment,
+    excerpt: row.excerpt,
+    grounding: parseGeoCheckGrounding(row.grounding),
+    finishReason: row.finishReason,
+    promptTokens: row.promptTokens,
+    outputTokens: row.outputTokens,
+    reasoningTokens: row.reasoningTokens,
+    truncated: row.finishReason === null ? null : row.finishReason === "length",
+    lastCheckedAt: row.lastCheckedAt,
+  }));
 }
 
 export async function queryGeoCheckCompetitorShare(

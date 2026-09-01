@@ -64,8 +64,6 @@ const DEFAULT_STANDALONE_TOOL_NAMES = [
   "webSearch",
 ] as const;
 
-const NOTRA_TOOLING_DESCRIPTION =
-  "Notra app tools are available through lazy discovery. Use searchNotraTools to find built-in content, brand, GEO analytics, GitHub, Linear, Granola, and post tools by intent, then activateNotraTools before calling them. Basic skills, integration discovery, web search, and webpage fetch tools are exposed by default. Context.dev tools require API configuration when called.";
 const WHITESPACE_REGEX = /\s+/;
 const LEGACY_NOTRA_TOOL_ALIASES: Record<string, string> = {
   getBrandReferences: "getAvailableBrandReferences",
@@ -197,9 +195,7 @@ export async function orchestrateStandaloneChat(
               : undefined,
         });
 
-  const notraToolingDescription = includeGeoTools
-    ? NOTRA_TOOLING_DESCRIPTION
-    : NOTRA_TOOLING_DESCRIPTION.replace(", GEO analytics", "");
+  const notraToolingDescription = getNotraToolingDescription(includeGeoTools);
   const descriptions = lazyMcpRuntime
     ? [notraToolingDescription, ...lazyMcpRuntime.descriptions]
     : [notraToolingDescription];
@@ -371,6 +367,19 @@ async function getStandaloneSkillSummaries(organizationId: string) {
     { organizationId },
     { limit: STANDALONE_SKILL_CATALOG_LIMIT }
   );
+}
+
+function getNotraToolingDescription(includeGeoTools: boolean) {
+  const toolGroups = [
+    "content",
+    "brand",
+    ...(includeGeoTools ? ["GEO analytics"] : []),
+    "GitHub",
+    "Linear",
+    "Granola",
+    "post",
+  ];
+  return `Notra app tools are available through lazy discovery. Use searchNotraTools to find built-in ${toolGroups.join(", ")} tools by intent, then activateNotraTools before calling them. Basic skills, integration discovery, web search, and webpage fetch tools are exposed by default. Context.dev tools require API configuration when called.`;
 }
 
 function createStandaloneToolProvisioningRuntime({

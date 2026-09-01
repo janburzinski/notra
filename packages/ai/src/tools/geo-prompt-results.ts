@@ -21,8 +21,10 @@ export function createGetGeoPromptResultsTool(config: GeoToolConfig): Tool {
       const rows = await queryGeoCheckPromptResults(
         { organizationId: config.organizationId, projectId: null },
         toGeoCheckWindow({ days }),
+        { limit },
       );
-      const results = rows.slice(0, limit).map((row) => ({
+      const results = rows.map((row) => ({
+        projectId: row.projectId,
         promptId: row.promptId,
         engine: row.engine,
         prompt: row.prompt,
@@ -33,6 +35,7 @@ export function createGetGeoPromptResultsTool(config: GeoToolConfig): Tool {
         ...(includeAnswers
           ? {
               answer: row.answer.slice(0, GEO_PROMPT_RESULT_MAX_ANSWER_CHARS),
+              answerTruncated: row.answer.length > GEO_PROMPT_RESULT_MAX_ANSWER_CHARS,
             }
           : {}),
         finishReason: row.finishReason,
@@ -43,7 +46,7 @@ export function createGetGeoPromptResultsTool(config: GeoToolConfig): Tool {
       return {
         results,
         returnedResults: results.length,
-        totalResults: rows.length,
+        resultsMayBeTruncated: rows.length === limit,
       };
     },
   });

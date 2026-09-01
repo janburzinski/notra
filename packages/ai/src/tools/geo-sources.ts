@@ -21,16 +21,13 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
       const rows = await queryGeoCheckPromptResults(
         { organizationId: config.organizationId, projectId: null },
         toGeoCheckWindow({ days }),
-      );
-      const matchingRows = rows.filter(
-        (row) =>
-          (promptId === undefined || row.promptId === promptId) &&
-          (engine === undefined || row.engine === engine),
+        { limit, promptId, engine },
       );
       const seen = new Set<string>();
-      const sources = matchingRows
+      const sources = rows
         .flatMap((row) =>
           row.grounding.sources.map((source) => ({
+            projectId: row.projectId,
             promptId: row.promptId,
             engine: row.engine,
             domain: source.domain,
@@ -40,7 +37,7 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
           })),
         )
         .filter((source) => {
-          const key = `${source.promptId}:${source.engine}:${source.url}`;
+          const key = `${source.projectId}:${source.promptId}:${source.engine}:${source.url}`;
           if (seen.has(key)) {
             return false;
           }
@@ -55,7 +52,7 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
       return {
         sources: sources.slice(0, limit),
         returnedSources: Math.min(sources.length, limit),
-        totalSources: sources.length,
+        resultsMayBeTruncated: rows.length === limit,
         domains: Array.from(domainCounts, ([domain, citations]) => ({
           domain,
           citations,
@@ -65,7 +62,6 @@ export function createGetGeoSourcesTool(config: GeoToolConfig): Tool {
               right.citations - left.citations || left.domain.localeCompare(right.domain),
           )
           .slice(0, GEO_SOURCE_DOMAIN_LIMIT),
-        totalDomains: domainCounts.size,
       };
     },
   });
