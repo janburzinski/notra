@@ -902,6 +902,7 @@ export type EngineIconKey =
   | "kimi"
   | "zai"
   | "exa"
+  | "parallel"
   | "commoncrawl"
   | "youcom"
   | "liner"

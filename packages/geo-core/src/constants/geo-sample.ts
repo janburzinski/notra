@@ -155,6 +155,10 @@ export const GEO_SAMPLE_CRAWLERS: readonly {
   { agent: "PerplexityBot", category: "search-index" },
   { agent: "Google-Extended", category: "training-crawler" },
   { agent: "Bytespider", category: "training-crawler" },
+  { agent: "ExaSearchBot", category: "search-index" },
+  { agent: "FirecrawlAgent", category: "search-index" },
+  { agent: "ShapBot", category: "search-index" },
+  { agent: "Shap-User", category: "assistant-browse" },
 ];
 
 export const GEO_SAMPLE_REFERRALS: readonly {

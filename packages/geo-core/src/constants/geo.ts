@@ -459,8 +459,14 @@ export const GEO_SOURCE_LABELS: Record<string, string> = {
   baidu: "Baidu",
   kagi: "Kagi",
   exa: "Exa",
+  exabot: "Exa",
+  exasearchbot: "Exa",
+  parallel: "Parallel",
+  shapbot: "Parallel",
+  "shap-user": "Parallel",
   tavily: "Tavily",
   firecrawl: "Firecrawl",
+  firecrawlagent: "Firecrawl",
   diffbot: "Diffbot",
   liner: "Liner",
   timpi: "Timpi",
@@ -560,6 +566,13 @@ export const GEO_TRAFFIC_GROUPS_BY_ENGINE: Partial<
   duckduckgo: { key: "duckduckgo", label: "DuckDuckGo", icon: "duckduckgo" },
   opencode: { key: "opencode", label: "OpenCode", icon: "opencode" },
   cursor: { key: "cursor", label: "Cursor", icon: "cursor" },
+  exa: { key: "exa", label: "Exa", icon: "exasearchbot" },
+  firecrawl: {
+    key: "firecrawl",
+    label: "Firecrawl",
+    icon: "firecrawlagent",
+  },
+  parallel: { key: "parallel", label: "Parallel", icon: "shapbot" },
 };
 
 export const GEO_TRAFFIC_TREND_CRAWLER_KEY = "crawler";

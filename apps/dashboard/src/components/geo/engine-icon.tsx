@@ -41,6 +41,7 @@ import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import { Opencode } from "@notra/ui/components/ui/svgs/opencode";
 import { OpencodeDark } from "@notra/ui/components/ui/svgs/opencodeDark";
+import { Parallel } from "@notra/ui/components/ui/svgs/parallel";
 import { Perplexity } from "@notra/ui/components/ui/svgs/perplexity";
 import { Qwen } from "@notra/ui/components/ui/svgs/qwen";
 import { QwenDark } from "@notra/ui/components/ui/svgs/qwenDark";
@@ -171,6 +172,16 @@ function EngineIconGraphic({
   }
   if (key === "opencode") {
     return themedIcon(Opencode, OpencodeDark, iconClass, darkSurface);
+  }
+  if (key === "parallel") {
+    return (
+      <Parallel
+        className={cn(
+          iconClass,
+          darkSurface ? "text-[#FCFBFA]" : "text-[#1D1C1A] dark:text-[#FCFBFA]"
+        )}
+      />
+    );
   }
   const simple = SIMPLE_ICONS[key];
   if (simple) {
