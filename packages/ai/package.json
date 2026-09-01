@@ -72,7 +72,7 @@
     "satori": "^0.26.0",
     "satori-html": "^0.3.2",
     "undici": "^7.16.0",
-    "zod": "^4.3.4"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@ai-sdk/devtools": "^0.0.18",
