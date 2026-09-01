@@ -125,7 +125,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const { session } = await getServerSession({ headers: request.headers });
+    const { session, user } = await getServerSession({
+      headers: request.headers,
+    });
     if (!session?.userId || session.userId !== installState.userId) {
       return buildErrorRedirect({
         request,
@@ -151,6 +153,7 @@ export async function GET(request: NextRequest) {
       await assertOrganizationAccess({
         headers: request.headers,
         organizationId: installState.organizationId,
+        user,
       });
     } catch (accessError) {
       if (accessError instanceof ORPCError) {

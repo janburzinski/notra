@@ -334,6 +334,13 @@ async function getAffectedSchedulesForIntegration(
   integrationId: string
 ) {
   const allSchedules = await db.query.contentTriggers.findMany({
+    columns: {
+      enabled: true,
+      id: true,
+      name: true,
+      qstashScheduleId: true,
+      targets: true,
+    },
     where: and(
       eq(contentTriggers.organizationId, organizationId),
       eq(contentTriggers.sourceType, "cron")

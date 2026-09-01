@@ -138,42 +138,48 @@ integrationsRoutes.openapi(getIntegrationsRoute, async (c) => {
   }
 
   const db = c.get("db");
-  const organization = await getOrganizationResponse(db, orgId);
+  const [organization, github, linear] = await Promise.all([
+    getOrganizationResponse(db, orgId),
+    db.query.githubIntegrations.findMany({
+      where: and(
+        eq(githubIntegrations.organizationId, orgId),
+        eq(githubIntegrations.enabled, true)
+      ),
+      orderBy: [
+        asc(githubIntegrations.displayName),
+        asc(githubIntegrations.id),
+      ],
+      columns: {
+        id: true,
+        displayName: true,
+        owner: true,
+        repo: true,
+        defaultBranch: true,
+      },
+    }),
+    db.query.linearIntegrations.findMany({
+      where: and(
+        eq(linearIntegrations.organizationId, orgId),
+        eq(linearIntegrations.enabled, true)
+      ),
+      orderBy: [
+        asc(linearIntegrations.displayName),
+        asc(linearIntegrations.id),
+      ],
+      columns: {
+        id: true,
+        displayName: true,
+        linearOrganizationId: true,
+        linearOrganizationName: true,
+        linearTeamId: true,
+        linearTeamName: true,
+      },
+    }),
+  ]);
 
   if (!organization) {
     return c.json({ error: "Organization not found" }, 404);
   }
-
-  const github = await db.query.githubIntegrations.findMany({
-    where: and(
-      eq(githubIntegrations.organizationId, orgId),
-      eq(githubIntegrations.enabled, true)
-    ),
-    orderBy: [asc(githubIntegrations.displayName), asc(githubIntegrations.id)],
-    columns: {
-      id: true,
-      displayName: true,
-      owner: true,
-      repo: true,
-      defaultBranch: true,
-    },
-  });
-
-  const linear = await db.query.linearIntegrations.findMany({
-    where: and(
-      eq(linearIntegrations.organizationId, orgId),
-      eq(linearIntegrations.enabled, true)
-    ),
-    orderBy: [asc(linearIntegrations.displayName), asc(linearIntegrations.id)],
-    columns: {
-      id: true,
-      displayName: true,
-      linearOrganizationId: true,
-      linearOrganizationName: true,
-      linearTeamId: true,
-      linearTeamName: true,
-    },
-  });
 
   return c.json(
     {

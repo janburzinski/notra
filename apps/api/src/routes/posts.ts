@@ -315,12 +315,6 @@ postsRoutes.openapi(getPostsRoute, async (c) => {
   const query = c.req.valid("query");
   const db = c.get("db");
   const { limit, page, sort, status, contentType, brandIdentityId } = query;
-  const organization = await getOrganizationResponse(db, orgId);
-
-  if (!organization) {
-    return c.json({ error: "Organization not found" }, 404);
-  }
-
   const offset = (page - 1) * limit;
   const whereClause = and(
     eq(posts.organizationId, orgId),
@@ -338,37 +332,43 @@ postsRoutes.openapi(getPostsRoute, async (c) => {
       : undefined
   );
 
-  const [countResult] = await db
-    .select({ totalItems: count(posts.id) })
-    .from(posts)
-    .where(whereClause);
+  const [organization, [countResult], results] = await Promise.all([
+    getOrganizationResponse(db, orgId),
+    db
+      .select({ totalItems: count(posts.id) })
+      .from(posts)
+      .where(whereClause),
+    db.query.posts.findMany({
+      where: whereClause,
+      orderBy: (table, { asc, desc }) =>
+        sort === "asc"
+          ? [asc(table.createdAt), asc(table.id)]
+          : [desc(table.createdAt), desc(table.id)],
+      limit,
+      offset,
+      columns: {
+        id: true,
+        title: true,
+        slug: true,
+        content: true,
+        htmlUrl: true,
+        markdown: true,
+        recommendations: true,
+        contentType: true,
+        sourceMetadata: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
+
+  if (!organization) {
+    return c.json({ error: "Organization not found" }, 404);
+  }
 
   const totalItems = countResult?.totalItems ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / limit));
-
-  const results = await db.query.posts.findMany({
-    where: whereClause,
-    orderBy: (table, { asc, desc }) =>
-      sort === "asc"
-        ? [asc(table.createdAt), asc(table.id)]
-        : [desc(table.createdAt), desc(table.id)],
-    limit,
-    offset,
-    columns: {
-      id: true,
-      title: true,
-      slug: true,
-      content: true,
-      htmlUrl: true,
-      markdown: true,
-      recommendations: true,
-      contentType: true,
-      sourceMetadata: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
 
   return c.json(
     {

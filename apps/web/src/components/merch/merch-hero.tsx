@@ -60,7 +60,8 @@ export function MerchHero() {
               alt="The Notra Classic Hat in stone with the embroidered Notra mark"
               className="absolute -bottom-24 left-1/2 z-10 w-[clamp(19rem,60vw,24rem)] -translate-x-1/2 -rotate-6 drop-shadow-[0_1.5rem_2.5rem_#1E1E1E40] sm:top-5 sm:bottom-auto sm:w-[27.5rem] sm:-rotate-12 lg:-top-10 lg:w-[36rem] xl:-top-27.5 xl:w-[48.75rem]"
               height={1600}
-              priority
+              preload
+              sizes="(max-width: 40rem) min(60vw, 24rem), (max-width: 64rem) 27.5rem, (max-width: 80rem) 36rem, 48.75rem"
               src="/marketing/merch/hat-front.png"
               width={1200}
             />

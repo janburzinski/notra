@@ -265,12 +265,11 @@ export async function POST(request: NextRequest) {
   }
 
   const organizationId = member.organizationId;
-  const hasAiCredits = await hasAiCreditsGrant(organizationId).catch(
-    () => false
-  );
+  const [hasAiCredits, entities] = await Promise.all([
+    hasAiCreditsGrant(organizationId).catch(() => false),
+    fetchEntityContext(organizationId, query, slug),
+  ]);
   const routes = commandRoutesForAI(slug, hasAiCredits);
-
-  const entities = await fetchEntityContext(organizationId, query, slug);
 
   const allPaths = [
     ...routes.map((r) => r.path),

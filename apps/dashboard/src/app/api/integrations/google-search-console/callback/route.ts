@@ -96,7 +96,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { session } = await getServerSession({ headers: request.headers });
+    const { session, user } = await getServerSession({
+      headers: request.headers,
+    });
     if (!session?.userId || session.userId !== oauthState.userId) {
       await restoreOAuthState();
       return NextResponse.redirect(
@@ -110,6 +112,7 @@ export async function GET(request: NextRequest) {
       await assertOrganizationAccess({
         headers: request.headers,
         organizationId: oauthState.organizationId,
+        user,
       });
     } catch (accessError) {
       if (accessError instanceof ORPCError) {

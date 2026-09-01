@@ -20,6 +20,7 @@ export function MerchGallery() {
                 alt={image.alt}
                 className="aspect-3/4 w-full object-cover sm:aspect-4/5"
                 height={1440}
+                sizes="(max-width: 40rem) calc(100vw - 3rem), min(33vw, 26rem)"
                 src={image.src}
                 width={1080}
               />

@@ -13,7 +13,8 @@
     "./schema": "./src/schemas/figma.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "bun test src"
   },
   "dependencies": {
     "opentype.js": "^2.0.0",

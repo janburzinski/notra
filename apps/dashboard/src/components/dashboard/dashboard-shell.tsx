@@ -3,6 +3,7 @@
 import { SidebarInset, SidebarProvider } from "@notra/ui/components/ui/sidebar";
 import { cn } from "@notra/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -10,7 +11,6 @@ import { toast } from "sonner";
 import { SubscriptionGate } from "@/components/billing/subscription-gate";
 import { DashboardSidebar } from "@/components/dashboard/app-sidebar";
 import { SiteHeader } from "@/components/dashboard/header";
-import { OnboardingAgentBanner } from "@/components/dashboard/onboarding-agent-banner";
 import { RestoreSidebarHome } from "@/components/dashboard/restore-sidebar-home";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { EVE_BANNER_HEIGHT } from "@/constants/onboarding-agent";
@@ -26,6 +26,12 @@ import type {
   DashboardSidebarStyle,
   DashboardShellStyle,
 } from "@/types/components/dashboard-shell";
+
+const OnboardingAgentBanner = dynamic(() =>
+  import("@/components/dashboard/onboarding-agent-banner").then(
+    (module) => module.OnboardingAgentBanner
+  )
+);
 
 export function DashboardShell({
   children,

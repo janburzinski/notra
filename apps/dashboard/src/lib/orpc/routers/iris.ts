@@ -253,8 +253,10 @@ export const irisRouter = {
         throw internalServerError("Iris could not be started");
       }
 
-      await ensureWakeSchedule(mandate);
-      const manualRunId = await kickManualRun(input.organizationId);
+      const [, manualRunId] = await Promise.all([
+        ensureWakeSchedule(mandate),
+        kickManualRun(input.organizationId),
+      ]);
 
       trackServerEvent({
         event: POSTHOG_EVENTS.IRIS_STARTED,

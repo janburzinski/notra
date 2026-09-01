@@ -59,9 +59,10 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ error: "Chat not found" }, { status: 404 });
   }
 
-  await setLastResponseStopped(organizationId, safeChatId);
-
-  const activeStreamId = await getActiveChatStream(organizationId, safeChatId);
+  const [, activeStreamId] = await Promise.all([
+    setLastResponseStopped(organizationId, safeChatId),
+    getActiveChatStream(organizationId, safeChatId),
+  ]);
 
   trackServerEvent({
     event: POSTHOG_EVENTS.CHAT_GENERATION_STOPPED,

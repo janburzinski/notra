@@ -1,4 +1,3 @@
-import { getCalApi } from "@calcom/embed-react";
 import { ArrowRight01Icon, SearchIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -114,6 +113,7 @@ export function SiteHeader() {
 
   useEffect(() => {
     (async () => {
+      const { getCalApi } = await import("@calcom/embed-react");
       const cal = await getCalApi({ namespace: "15min" });
       cal("ui", { hideEventTypeDetails: false, layout: "month_view" });
     })();

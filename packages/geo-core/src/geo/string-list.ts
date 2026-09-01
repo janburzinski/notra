@@ -1,13 +1,3 @@
-function addUniqueValue(values: string[], candidate: string): string[] {
-  const trimmed = candidate.trim();
-  if (trimmed.length === 0) {
-    return values;
-  }
-  const normalized = trimmed.toLowerCase();
-  const exists = values.some((value) => value.toLowerCase() === normalized);
-  return exists ? values : [...values, trimmed];
-}
-
 export const LINE_BREAK_REGEX = /\r?\n/;
 
 export function addUniqueValues(
@@ -15,15 +5,29 @@ export function addUniqueValues(
   candidate: string,
   max = Number.POSITIVE_INFINITY
 ): string[] {
-  const parts = candidate.split(LINE_BREAK_REGEX).map((part) => part.trim());
-  let next = values;
-  for (const part of parts) {
-    if (next.length >= max) {
+  if (values.length >= max) {
+    return values;
+  }
+
+  const normalizedValues = new Set(values.map((value) => value.toLowerCase()));
+  let next: string[] | undefined;
+  for (const part of candidate.split(LINE_BREAK_REGEX)) {
+    if ((next?.length ?? values.length) >= max) {
       break;
     }
-    next = addUniqueValue(next, part);
+    const trimmed = part.trim();
+    if (trimmed.length === 0) {
+      continue;
+    }
+    const normalized = trimmed.toLowerCase();
+    if (normalizedValues.has(normalized)) {
+      continue;
+    }
+    normalizedValues.add(normalized);
+    next ??= [...values];
+    next.push(trimmed);
   }
-  return next;
+  return next ?? values;
 }
 
 export function removeValue(values: string[], target: string): string[] {

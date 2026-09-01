@@ -174,6 +174,14 @@ async function getTriggersForBrandVoice(
   voiceId: string
 ) {
   const allTriggers = await db.query.contentTriggers.findMany({
+    columns: {
+      enabled: true,
+      id: true,
+      name: true,
+      outputConfig: true,
+      qstashScheduleId: true,
+      sourceType: true,
+    },
     where: eq(contentTriggers.organizationId, organizationId),
   });
 

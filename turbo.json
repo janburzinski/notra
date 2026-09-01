@@ -105,11 +105,12 @@
       "dependsOn": ["^transit"]
     },
     "build": {
+      "dependsOn": ["transit"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**", ".vercel/**"]
     },
     "@notra/onboarding-agent#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "transit"],
       "outputs": [
         ".output/**",
         ".vercel/output/**",
@@ -131,7 +132,7 @@
       "persistent": true
     },
     "@notra/agent#build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "transit"],
       "outputs": [
         ".output/**",
         ".vercel/output/**",

@@ -114,6 +114,34 @@ describe("resolveRoute", () => {
     assert.equal(free.zdrEnforced, true);
   });
 
+  test("resolves independent plan and ZDR lookups concurrently", async () => {
+    let releasePlan: (() => void) | undefined;
+    const planPending = new Promise<void>((resolve) => {
+      releasePlan = resolve;
+    });
+    let zdrStarted = false;
+    const { router } = createTestRouter({
+      resolvePlan: async () => {
+        await planPending;
+        return "paid";
+      },
+      resolveZdr: () => {
+        zdrStarted = true;
+        return Promise.resolve("required");
+      },
+    });
+
+    const routePending = router.resolveRoute({
+      modelId: MODEL,
+      organizationId: PAID_ORG,
+    });
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+    assert.equal(zdrStarted, true);
+    releasePlan?.();
+    assert.equal((await routePending).gateway, "vercel");
+  });
+
   test("missing organization context uses the default gateway", async () => {
     const { router, planLookups } = createTestRouter({ plans });
     const decision = await router.resolveRoute({ modelId: MODEL });

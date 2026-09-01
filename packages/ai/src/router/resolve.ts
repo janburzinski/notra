@@ -187,11 +187,12 @@ export async function resolveRoute(
 ): Promise<RouteDecision> {
   const { modelId, organizationId } = request;
 
-  let planLookup: PlanLookup | undefined;
-  if (organizationId && !request.gateway) {
-    planLookup = await lookupPlan(context, organizationId);
-  }
-  const zdr = await lookupZdrMode(context, request);
+  const [planLookup, zdr] = await Promise.all([
+    organizationId && !request.gateway
+      ? lookupPlan(context, organizationId)
+      : Promise.resolve(undefined),
+    lookupZdrMode(context, request),
+  ]);
 
   const decision = decideGateway({
     policy: context.policy,

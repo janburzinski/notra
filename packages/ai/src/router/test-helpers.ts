@@ -207,6 +207,7 @@ export function createTestRouter(options: TestRouterOptions = {}): {
         planLookups.push(organizationId);
         return Promise.resolve(plans[organizationId] ?? "free");
       }),
+    resolveZdr: options.resolveZdr,
     policy: createPolicy(options.policy),
     logger,
     now: options.now,
