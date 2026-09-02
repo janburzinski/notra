@@ -232,6 +232,7 @@ export async function upsertGscIntegration(
         ...(googleAccountChanged
           ? {
               siteUrl: null,
+              topQueries: [],
               ...(oldScheduleDeleted ? { qstashScheduleId: null } : {}),
             }
           : {}),

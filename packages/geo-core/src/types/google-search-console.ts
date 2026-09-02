@@ -27,6 +27,10 @@ export interface GscSitesResponse {
   sites: GscSite[];
 }
 
+export interface GscKeywordsResponse {
+  keywords: GscQueryRow[];
+}
+
 export interface GscSelectSiteInput {
   siteUrl: string;
 }
@@ -36,6 +40,11 @@ export interface GscSyncResult {
   keywords?: number;
   suggestionsAdded?: number;
   reason?: string;
+}
+
+export interface GscSuggestionSyncOutcome {
+  result: GscSyncResult;
+  topQueries: GscQueryRow[];
 }
 
 export interface GscSyncPayload {

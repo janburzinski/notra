@@ -33,6 +33,7 @@ import {
 import { geoSearchConsoleSuggestionSchema } from "../schemas/google-search-console";
 import type {
   GscSuggestionGenerationParams,
+  GscSuggestionSyncOutcome,
   GscSyncResult,
 } from "../types/google-search-console";
 import {
@@ -83,12 +84,13 @@ export async function syncGscSuggestions(
   }
 
   try {
-    const result = await runSync(integration, integration.siteUrl);
+    const outcome = await runSync(integration, integration.siteUrl);
     await updateGscIntegration(organizationId, {
       lastSyncedAt: new Date(),
       lastError: null,
+      topQueries: outcome.topQueries,
     });
-    return result;
+    return outcome.result;
   } catch (error) {
     console.error("[GSC] Sync failed:", error);
     if (!(error instanceof GscReauthRequiredError)) {
@@ -128,7 +130,7 @@ function mergeCompetitorNames(
 async function runSync(
   integration: GscIntegrationRow,
   siteUrl: string
-): Promise<GscSyncResult> {
+): Promise<GscSuggestionSyncOutcome> {
   const organizationId = integration.organizationId;
 
   const [
@@ -177,7 +179,14 @@ async function runSync(
   const brandTerms = buildBrandTerms(settingsRow);
   const keywords = selectKeywordsForModel(rows, brandTerms);
   if (keywords.length === 0) {
-    return { status: "completed", keywords: rows.length, suggestionsAdded: 0 };
+    return {
+      result: {
+        status: "completed",
+        keywords: rows.length,
+        suggestionsAdded: 0,
+      },
+      topQueries: [],
+    };
   }
 
   const existingPrompts = [
@@ -257,8 +266,11 @@ async function runSync(
   }
 
   return {
-    status: "completed",
-    keywords: rows.length,
-    suggestionsAdded: inserted.length,
+    result: {
+      status: "completed",
+      keywords: rows.length,
+      suggestionsAdded: inserted.length,
+    },
+    topQueries: keywords,
   };
 }

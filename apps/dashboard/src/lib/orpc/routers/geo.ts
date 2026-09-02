@@ -163,6 +163,7 @@ import type {
 } from "@notra/geo-core/types/geo";
 import type {
   GeoSearchConsoleStatus,
+  GscKeywordsResponse,
   GscSitesResponse,
   GscSyncResult,
 } from "@notra/geo-core/types/google-search-console";
@@ -1195,6 +1196,18 @@ export const geoRouter = {
         weeklySyncScheduled: refreshed.qstashScheduleId !== null,
         sites,
       };
+    }),
+  searchConsoleKeywords: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(async ({ context, input }): Promise<GscKeywordsResponse> => {
+      await assertGeoAccess({
+        headers: context.headers,
+        organizationId: input.organizationId,
+        user: context.user,
+      });
+
+      const integration = await getGscIntegration(input.organizationId);
+      return { keywords: integration?.topQueries ?? [] };
     }),
   searchConsoleSites: authorizedProcedure
     .input(geoOrganizationInputSchema)

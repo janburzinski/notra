@@ -47,6 +47,7 @@ import type {
 } from "@notra/geo-core/types/geo-import";
 import type {
   GeoSearchConsoleStatus,
+  GscKeywordsResponse,
   GscSelectSiteInput,
   GscSitesResponse,
   GscSyncResult,
@@ -938,6 +939,16 @@ export function useGscStatus(organizationId: string) {
   });
 }
 
+export function useGscKeywords(organizationId: string, enabled = true) {
+  return useQuery<GscKeywordsResponse>({
+    ...dashboardOrpc.geo.searchConsoleKeywords.queryOptions({
+      input: { organizationId },
+    }),
+    enabled: !!organizationId && enabled,
+    meta: { errorMessage: "Failed to load Search Console keywords" },
+  });
+}
+
 export function useGscSites(organizationId: string, enabled: boolean) {
   return useQuery<GscSitesResponse>({
     ...dashboardOrpc.geo.searchConsoleSites.queryOptions({
@@ -959,6 +970,11 @@ function useInvalidateGscQueries(organizationId: string) {
       }),
       queryClient.invalidateQueries({
         queryKey: dashboardOrpc.geo.suggestionsList.queryKey({
+          input: { organizationId },
+        }),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.geo.searchConsoleKeywords.queryKey({
           input: { organizationId },
         }),
       }),
