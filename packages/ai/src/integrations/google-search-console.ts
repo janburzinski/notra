@@ -1,6 +1,6 @@
 import { db } from "@notra/db/drizzle";
 import { googleSearchConsoleIntegrations } from "@notra/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
 import {
@@ -255,6 +255,34 @@ export async function updateGscIntegration(
     .update(googleSearchConsoleIntegrations)
     .set(updates)
     .where(eq(googleSearchConsoleIntegrations.organizationId, organizationId))
+    .returning();
+  return row ?? null;
+}
+
+export async function updateGscIntegrationIfUnchanged(
+  integration: GscIntegrationRow,
+  updates: GscIntegrationUpdate
+): Promise<GscIntegrationRow | null> {
+  const [row] = await db
+    .update(googleSearchConsoleIntegrations)
+    .set(updates)
+    .where(
+      and(
+        eq(googleSearchConsoleIntegrations.id, integration.id),
+        eq(
+          googleSearchConsoleIntegrations.organizationId,
+          integration.organizationId
+        ),
+        eq(
+          googleSearchConsoleIntegrations.encryptedRefreshToken,
+          integration.encryptedRefreshToken
+        ),
+        eq(googleSearchConsoleIntegrations.status, integration.status),
+        integration.siteUrl === null
+          ? isNull(googleSearchConsoleIntegrations.siteUrl)
+          : eq(googleSearchConsoleIntegrations.siteUrl, integration.siteUrl)
+      )
+    )
     .returning();
   return row ?? null;
 }

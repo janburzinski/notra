@@ -4,7 +4,7 @@ import {
   GscReauthRequiredError,
   getGscIntegration,
   queryGscTopQueries,
-  updateGscIntegration,
+  updateGscIntegrationIfUnchanged,
 } from "@notra/ai/integrations/google-search-console";
 import type { GscIntegrationRow } from "@notra/ai/types/google-search-console";
 import { db } from "@notra/db/drizzle";
@@ -85,7 +85,7 @@ export async function syncGscSuggestions(
 
   try {
     const outcome = await runSync(integration, integration.siteUrl);
-    await updateGscIntegration(organizationId, {
+    await updateGscIntegrationIfUnchanged(integration, {
       lastSyncedAt: new Date(),
       lastError: null,
       topQueries: outcome.topQueries,
@@ -94,7 +94,7 @@ export async function syncGscSuggestions(
   } catch (error) {
     console.error("[GSC] Sync failed:", error);
     if (!(error instanceof GscReauthRequiredError)) {
-      await updateGscIntegration(organizationId, {
+      await updateGscIntegrationIfUnchanged(integration, {
         lastError: toStoredSyncError(error),
       });
     }
@@ -185,7 +185,7 @@ async function runSync(
         keywords: rows.length,
         suggestionsAdded: 0,
       },
-      topQueries: [],
+      topQueries: rows,
     };
   }
 
@@ -271,6 +271,6 @@ async function runSync(
       keywords: rows.length,
       suggestionsAdded: inserted.length,
     },
-    topQueries: keywords,
+    topQueries: rows,
   };
 }
