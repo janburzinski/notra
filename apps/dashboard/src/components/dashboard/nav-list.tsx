@@ -10,7 +10,6 @@ import {
 } from "@notra/ui/components/ui/sidebar";
 import Link from "next/link";
 
-import { AGENT_FEEDBACK_NAV_LINK } from "@/constants/agent-feedback";
 import type { NavListProps } from "@/types/components/nav";
 import { geoNavHref, isGeoDashboardPath } from "@/utils/geo-paths";
 import { resolveNavItems } from "@/utils/nav";
@@ -24,6 +23,7 @@ export function NavList({
   activeLink,
   projectId,
   geoLocked = false,
+  prefetch,
   visibility,
 }: NavListProps) {
   const items = resolveNavItems(links, visibility);
@@ -36,8 +36,6 @@ export function NavList({
     <SidebarMenu>
       {items.map((item) => {
         const isGeoItem = isGeoDashboardPath(item.link);
-        const prefetch =
-          isGeoItem || item.link === AGENT_FEEDBACK_NAV_LINK ? true : undefined;
         return (
           <SidebarMenuItem key={item.link}>
             <SidebarMenuButton

@@ -29,6 +29,7 @@ import { SidebarLabel } from "./sidebar-label";
 export function NavRecentContent({
   slug,
   organizationId,
+  prefetch,
 }: NavRecentContentProps) {
   const pathname = usePathname();
   const { data, isPending } = usePosts(organizationId, 1);
@@ -57,7 +58,7 @@ export function NavRecentContent({
                   <SidebarMenuButton
                     isActive={pathname === href}
                     render={
-                      <Link href={href}>
+                      <Link href={href} prefetch={prefetch}>
                         <span
                           aria-hidden="true"
                           className={cn(

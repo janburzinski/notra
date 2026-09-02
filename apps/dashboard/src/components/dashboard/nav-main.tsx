@@ -53,7 +53,8 @@ export function NavMain() {
         Both mode panels stay mounted so the swoosh has something to fade
         between. Only the active one sits in flow — a stacked layout would
         grow to whichever panel is taller, including while hidden async
-        content (recent posts, entitlements) settles.
+        content (recent posts, entitlements) settles. The hidden panel still
+        intersects the viewport, so only the active panel may prefetch links.
       */}
       <SidebarSwap
         activeId={mode}
@@ -65,6 +66,7 @@ export function NavMain() {
             children: (
               <NavGeo
                 pathname={navPathname}
+                prefetch={mode === "geo" ? null : false}
                 projectId={projectId}
                 slug={slug}
               />
@@ -77,6 +79,7 @@ export function NavMain() {
               <NavStudio
                 organizationId={activeOrganization.id}
                 pathname={navPathname}
+                prefetch={mode === "studio" ? null : false}
                 slug={slug}
               />
             ),

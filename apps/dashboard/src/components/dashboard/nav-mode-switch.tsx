@@ -67,7 +67,6 @@ export function NavModeSwitch({
                 )}
                 key={option.id}
                 onClick={() => handleModeSelect(option.id)}
-                prefetch={option.id === "geo"}
               >
                 <HugeiconsIcon className="size-3.5" icon={option.icon} />
                 {option.label}
@@ -89,7 +88,6 @@ export function NavModeSwitch({
                     projectId
                   )}
                   onClick={() => handleModeSelect(option.id)}
-                  prefetch={option.id === "geo"}
                 >
                   <HugeiconsIcon icon={option.icon} />
                   <SidebarLabel>{option.label}</SidebarLabel>

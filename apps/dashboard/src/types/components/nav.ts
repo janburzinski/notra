@@ -37,6 +37,7 @@ export interface NavListProps {
   activeLink: string | null;
   projectId?: string;
   geoLocked?: boolean;
+  prefetch?: boolean | null;
   visibility?: NavVisibility;
 }
 
@@ -52,6 +53,7 @@ export interface NavGeoProps {
   /** Route to resolve the active item against; may lead the real pathname. */
   pathname: string;
   projectId?: string;
+  prefetch?: boolean | null;
 }
 
 export interface NavStudioProps {
@@ -59,6 +61,7 @@ export interface NavStudioProps {
   organizationId: string;
   /** Route to resolve the active item against; may lead the real pathname. */
   pathname: string;
+  prefetch?: boolean | null;
 }
 
 export interface NavModePrimaryActionProps {
@@ -71,6 +74,7 @@ export interface NavModePrimaryActionProps {
 export interface NavRecentContentProps {
   slug: string;
   organizationId: string;
+  prefetch?: boolean | null;
 }
 
 export interface NavUtilityProps {

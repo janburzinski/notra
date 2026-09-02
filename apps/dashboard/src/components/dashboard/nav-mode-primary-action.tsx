@@ -77,7 +77,7 @@ export function NavModePrimaryAction({
                   render={
                     <Link
                       href={geoNavHref(slug, GEO_WRITER_NAV_LINK, projectId)}
-                      prefetch
+                      prefetch={geoActive ? null : false}
                     />
                   }
                   size="sm"

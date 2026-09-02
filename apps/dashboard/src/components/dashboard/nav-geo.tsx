@@ -20,7 +20,7 @@ import { NavList } from "./nav-list";
 import { NavLockHint } from "./nav-lock-hint";
 import { SidebarLabel } from "./sidebar-label";
 
-export function NavGeo({ slug, pathname, projectId }: NavGeoProps) {
+export function NavGeo({ slug, pathname, projectId, prefetch }: NavGeoProps) {
   const visibility = useNavVisibility();
   const { isLocked: geoLocked } = useHasGeoFeature();
   const activeLink = resolveActiveNavLink(pathname, slug, NAV_GEO_LINKS);
@@ -38,6 +38,7 @@ export function NavGeo({ slug, pathname, projectId }: NavGeoProps) {
           activeLink={activeLink}
           geoLocked={geoLocked}
           links={NAV_GEO_VISIBILITY_LINKS}
+          prefetch={prefetch}
           projectId={projectId}
           slug={slug}
           visibility={visibility}
@@ -51,6 +52,7 @@ export function NavGeo({ slug, pathname, projectId }: NavGeoProps) {
           activeLink={activeLink}
           geoLocked={geoLocked}
           links={improveLinks}
+          prefetch={prefetch}
           projectId={projectId}
           slug={slug}
           visibility={visibility}
