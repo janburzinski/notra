@@ -77,12 +77,15 @@ async function commitGscSuggestionSync(
   outcome: GscSuggestionSyncOutcome,
   integrationUpdates: GscIntegrationUpdate
 ): Promise<GscSyncResult> {
+  const lastSyncedAt = new Date(
+    Math.max(Date.now(), (integration.lastSyncedAt?.getTime() ?? 0) + 1)
+  );
   const suggestionsAdded = await db.transaction(async (tx) => {
     const currentIntegration = await updateGscIntegrationIfUnchanged(
       integration,
       {
         ...integrationUpdates,
-        lastSyncedAt: new Date(),
+        lastSyncedAt,
         lastError: null,
         topQueries: outcome.topQueries,
       },

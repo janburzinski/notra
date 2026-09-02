@@ -1,4 +1,5 @@
 import {
+  claimOrConfirmGscSchedule,
   deleteGscIntegration,
   GscApiError,
   GscReauthRequiredError,
@@ -6,7 +7,6 @@ import {
   getGscOAuthCredentials,
   listGscSites,
   revokeGscToken,
-  updateGscIntegrationIfUnchanged,
 } from "@notra/ai/integrations/google-search-console";
 import {
   createQstashRouteSchedule,
@@ -333,33 +333,55 @@ async function ensureGscSchedule(
   if (integration.qstashScheduleId) {
     return integration.qstashScheduleId;
   }
-  let scheduleId: string | null = null;
+  let scheduleId: string;
   try {
-    // Deterministic id: a retry (or a row that never recorded the id) reuses the
-    // same schedule instead of leaving an orphan firing every week.
+    // Each creator owns a distinct id, so a losing CAS can never delete the
+    // schedule that a concurrent request successfully recorded.
     scheduleId = await createQstashRouteSchedule({
       path: GSC_SYNC_WORKFLOW_PATH,
       cron: GSC_SYNC_CRON,
       body: { organizationId: integration.organizationId },
-      scheduleId: `${GSC_SCHEDULE_ID_PREFIX}${integration.organizationId}`,
+      scheduleId: `${GSC_SCHEDULE_ID_PREFIX}${crypto.randomUUID()}`,
     });
-    const updated = await updateGscIntegrationIfUnchanged(integration, {
-      qstashScheduleId: scheduleId,
-    });
-    if (updated) {
-      return scheduleId;
-    }
+  } catch (error) {
+    console.error("[GSC] Failed to create weekly sync schedule:", error);
+    return null;
+  }
 
+  let claimed: GscIntegrationRow | null;
+  try {
+    claimed = await claimOrConfirmGscSchedule(integration, scheduleId);
+  } catch (error) {
+    console.error(
+      "[GSC] Failed to record weekly sync schedule; retrying:",
+      error
+    );
+    try {
+      // The first write may have committed before surfacing an error. This
+      // idempotent retry confirms that exact id without relying on stale fields.
+      claimed = await claimOrConfirmGscSchedule(integration, scheduleId);
+    } catch (retryError) {
+      // The outcome is still unknown, so deleting could leave the DB pointing
+      // at a missing schedule. Keep the uniquely owned candidate for recovery.
+      console.error("[GSC] Failed to record weekly sync schedule:", retryError);
+      return null;
+    }
+  }
+
+  if (claimed) {
+    return scheduleId;
+  }
+
+  // This request definitively lost the claim. Remove its unique schedule before
+  // the optional winner read, which can fail independently.
+  await removeGscSchedule(scheduleId);
+  try {
     const currentIntegration = await getGscIntegration(
       integration.organizationId
     );
-    if (currentIntegration?.qstashScheduleId !== scheduleId) {
-      await removeGscSchedule(scheduleId);
-    }
     return currentIntegration?.qstashScheduleId ?? null;
   } catch (error) {
-    await removeGscSchedule(scheduleId);
-    console.error("[GSC] Failed to ensure weekly sync schedule:", error);
+    console.error("[GSC] Failed to load the recorded weekly schedule:", error);
     return null;
   }
 }

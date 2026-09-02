@@ -1,6 +1,9 @@
 import { db } from "@notra/db/drizzle";
-import { googleSearchConsoleIntegrations } from "@notra/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import {
+  geoPromptSuggestions,
+  googleSearchConsoleIntegrations,
+} from "@notra/db/schema";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
 import {
@@ -180,48 +183,46 @@ export function shouldClearGscSiteOnReconnect(
 export async function upsertGscIntegration(
   params: UpsertGscIntegrationParams
 ): Promise<GscIntegrationRow> {
-  const existing = await getGscIntegration(params.organizationId);
-  const googleAccountChanged = shouldClearGscSiteOnReconnect(
-    existing,
-    params.googleAccountEmail
-  );
-
   const encryptedAccessToken = encryptToken(params.accessToken);
   const encryptedRefreshToken = encryptToken(params.refreshToken);
 
-  // Tear the old account's schedule down before the upsert clears its id: if
-  // QStash deletion fails, keeping the (deterministic, per-organization) id on
-  // the row lets the next site selection reuse or replace the schedule instead
-  // of orphaning one that keeps firing.
-  let oldScheduleDeleted = true;
-  if (googleAccountChanged && existing) {
-    await revokeGscToken(existing);
-    if (existing.qstashScheduleId) {
-      try {
-        await deleteQstashSchedule(existing.qstashScheduleId);
-      } catch (error) {
-        console.error("[GSC] Failed to delete QStash schedule:", error);
-        oldScheduleDeleted = false;
+  return await db.transaction(async (tx) => {
+    // The advisory lock also serializes first-time inserts, where there is no
+    // row for SELECT FOR UPDATE to lock yet.
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtextextended(${`gsc-integration:${params.organizationId}`}, 0))`
+    );
+    const existing = await tx.query.googleSearchConsoleIntegrations.findFirst({
+      where: eq(
+        googleSearchConsoleIntegrations.organizationId,
+        params.organizationId
+      ),
+    });
+    const googleAccountChanged = shouldClearGscSiteOnReconnect(
+      existing ?? null,
+      params.googleAccountEmail
+    );
+
+    // Tear the old account's schedule down before clearing its id. If deletion
+    // fails, retaining the id lets the next selection reuse the still-live job.
+    let oldScheduleDeleted = true;
+    if (googleAccountChanged && existing) {
+      await revokeGscToken(existing);
+      if (existing.qstashScheduleId) {
+        try {
+          await deleteQstashSchedule(existing.qstashScheduleId);
+        } catch (error) {
+          console.error("[GSC] Failed to delete QStash schedule:", error);
+          oldScheduleDeleted = false;
+        }
       }
     }
-  }
 
-  const [row] = await db
-    .insert(googleSearchConsoleIntegrations)
-    .values({
-      id: `gsc_${nanoid()}`,
-      organizationId: params.organizationId,
-      createdByUserId: params.userId,
-      googleAccountEmail: params.googleAccountEmail,
-      encryptedAccessToken,
-      encryptedRefreshToken,
-      accessTokenExpiresAt: params.expiresAt,
-      status: "active",
-      lastError: null,
-    })
-    .onConflictDoUpdate({
-      target: googleSearchConsoleIntegrations.organizationId,
-      set: {
+    const [row] = await tx
+      .insert(googleSearchConsoleIntegrations)
+      .values({
+        id: `gsc_${nanoid()}`,
+        organizationId: params.organizationId,
         createdByUserId: params.userId,
         googleAccountEmail: params.googleAccountEmail,
         encryptedAccessToken,
@@ -229,22 +230,45 @@ export async function upsertGscIntegration(
         accessTokenExpiresAt: params.expiresAt,
         status: "active",
         lastError: null,
-        ...(googleAccountChanged
-          ? {
-              siteUrl: null,
-              topQueries: [],
-              ...(oldScheduleDeleted ? { qstashScheduleId: null } : {}),
-            }
-          : {}),
-      },
-    })
-    .returning();
+      })
+      .onConflictDoUpdate({
+        target: googleSearchConsoleIntegrations.organizationId,
+        set: {
+          createdByUserId: params.userId,
+          googleAccountEmail: params.googleAccountEmail,
+          encryptedAccessToken,
+          encryptedRefreshToken,
+          accessTokenExpiresAt: params.expiresAt,
+          status: "active",
+          lastError: null,
+          ...(googleAccountChanged
+            ? {
+                siteUrl: null,
+                topQueries: [],
+                ...(oldScheduleDeleted ? { qstashScheduleId: null } : {}),
+              }
+            : {}),
+        },
+      })
+      .returning();
 
-  if (!row) {
-    throw new Error("Failed to save Google Search Console integration");
-  }
+    if (!row) {
+      throw new Error("Failed to save Google Search Console integration");
+    }
 
-  return row;
+    if (!existing || googleAccountChanged) {
+      await tx
+        .delete(geoPromptSuggestions)
+        .where(
+          and(
+            eq(geoPromptSuggestions.organizationId, params.organizationId),
+            eq(geoPromptSuggestions.status, "pending")
+          )
+        );
+    }
+
+    return row;
+  });
 }
 
 export async function updateGscIntegration(
@@ -255,6 +279,46 @@ export async function updateGscIntegration(
     .update(googleSearchConsoleIntegrations)
     .set(updates)
     .where(eq(googleSearchConsoleIntegrations.organizationId, organizationId))
+    .returning();
+  return row ?? null;
+}
+
+export async function claimOrConfirmGscSchedule(
+  integration: GscIntegrationRow,
+  scheduleId: string
+): Promise<GscIntegrationRow | null> {
+  const [row] = await db
+    .update(googleSearchConsoleIntegrations)
+    .set({ qstashScheduleId: scheduleId })
+    .where(
+      and(
+        eq(googleSearchConsoleIntegrations.id, integration.id),
+        eq(
+          googleSearchConsoleIntegrations.organizationId,
+          integration.organizationId
+        ),
+        or(
+          eq(googleSearchConsoleIntegrations.qstashScheduleId, scheduleId),
+          and(
+            eq(
+              googleSearchConsoleIntegrations.encryptedRefreshToken,
+              integration.encryptedRefreshToken
+            ),
+            eq(googleSearchConsoleIntegrations.status, integration.status),
+            isNull(googleSearchConsoleIntegrations.qstashScheduleId),
+            integration.lastSyncedAt === null
+              ? isNull(googleSearchConsoleIntegrations.lastSyncedAt)
+              : eq(
+                  googleSearchConsoleIntegrations.lastSyncedAt,
+                  integration.lastSyncedAt
+                ),
+            integration.siteUrl === null
+              ? isNull(googleSearchConsoleIntegrations.siteUrl)
+              : eq(googleSearchConsoleIntegrations.siteUrl, integration.siteUrl)
+          )
+        )
+      )
+    )
     .returning();
   return row ?? null;
 }
@@ -279,6 +343,18 @@ export async function updateGscIntegrationIfUnchanged(
           integration.encryptedRefreshToken
         ),
         eq(googleSearchConsoleIntegrations.status, integration.status),
+        integration.qstashScheduleId === null
+          ? isNull(googleSearchConsoleIntegrations.qstashScheduleId)
+          : eq(
+              googleSearchConsoleIntegrations.qstashScheduleId,
+              integration.qstashScheduleId
+            ),
+        integration.lastSyncedAt === null
+          ? isNull(googleSearchConsoleIntegrations.lastSyncedAt)
+          : eq(
+              googleSearchConsoleIntegrations.lastSyncedAt,
+              integration.lastSyncedAt
+            ),
         integration.siteUrl === null
           ? isNull(googleSearchConsoleIntegrations.siteUrl)
           : eq(googleSearchConsoleIntegrations.siteUrl, integration.siteUrl)
@@ -291,11 +367,27 @@ export async function updateGscIntegrationIfUnchanged(
 export async function deleteGscIntegration(
   organizationId: string
 ): Promise<GscIntegrationRow | null> {
-  const [row] = await db
-    .delete(googleSearchConsoleIntegrations)
-    .where(eq(googleSearchConsoleIntegrations.organizationId, organizationId))
-    .returning();
-  return row ?? null;
+  return await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtextextended(${`gsc-integration:${organizationId}`}, 0))`
+    );
+    const [row] = await tx
+      .delete(googleSearchConsoleIntegrations)
+      .where(eq(googleSearchConsoleIntegrations.organizationId, organizationId))
+      .returning();
+    if (!row) {
+      return null;
+    }
+    await tx
+      .delete(geoPromptSuggestions)
+      .where(
+        and(
+          eq(geoPromptSuggestions.organizationId, organizationId),
+          eq(geoPromptSuggestions.status, "pending")
+        )
+      );
+    return row;
+  });
 }
 
 export async function revokeGscToken(integration: GscIntegrationRow) {
