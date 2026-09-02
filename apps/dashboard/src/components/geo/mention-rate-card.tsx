@@ -131,11 +131,7 @@ function ProviderRow({
         >
           {totals.mentions.toLocaleString()}
         </span>
-        <GeoStatDelta
-          delta={mentionDelta}
-          label={`${name} mentions`}
-          variant="plain"
-        />
+        <GeoStatDelta delta={mentionDelta} label={`${name} mentions`} />
       </span>
     </>
   );
@@ -346,7 +342,6 @@ export function MentionRateCard({
                 delta={overviewDelta}
                 hint={GEO_FAMILY_STAT_TREND_HINT}
                 label={GEO_MENTIONS_LABEL}
-                variant="plain"
               />
             </div>
 
