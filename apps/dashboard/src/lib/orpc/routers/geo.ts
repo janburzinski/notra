@@ -6,13 +6,13 @@ import {
   getGscOAuthCredentials,
   listGscSites,
   revokeGscToken,
-  updateGscIntegration,
   updateGscIntegrationIfUnchanged,
 } from "@notra/ai/integrations/google-search-console";
 import {
   createQstashRouteSchedule,
   deleteQstashSchedule,
 } from "@notra/ai/qstash/triggers";
+import type { GscIntegrationRow } from "@notra/ai/types/google-search-console";
 import { db } from "@notra/db/drizzle";
 import {
   geoAgentReadinessReports,
@@ -95,7 +95,10 @@ import {
   seedGeoSampleData,
 } from "@notra/geo-core/geo/sample-data";
 import { runGeoSequenceNow } from "@notra/geo-core/geo/scan";
-import { syncGscSuggestions } from "@notra/geo-core/geo/search-console";
+import {
+  selectGscSiteAndSyncSuggestions,
+  syncGscSuggestions,
+} from "@notra/geo-core/geo/search-console";
 import {
   createGeoSequence,
   deleteGeoSequence,
@@ -166,7 +169,6 @@ import type {
   GeoSearchConsoleStatus,
   GscKeywordsResponse,
   GscSitesResponse,
-  GscSuggestionSyncOptions,
   GscSyncResult,
 } from "@notra/geo-core/types/google-search-console";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
@@ -314,11 +316,10 @@ async function runAgentReadinessOrBadRequest<T>(
 }
 
 async function runGscSyncOrBadRequest(
-  organizationId: string,
-  options?: GscSuggestionSyncOptions
+  organizationId: string
 ): Promise<GscSyncResult> {
   try {
-    return await syncGscSuggestions(organizationId, options);
+    return await syncGscSuggestions(organizationId);
   } catch (error) {
     throw badRequest(
       toGscErrorMessage(error, "Failed to sync Search Console keywords")
@@ -327,23 +328,36 @@ async function runGscSyncOrBadRequest(
 }
 
 async function ensureGscSchedule(
-  organizationId: string,
-  existingScheduleId: string | null
+  integration: GscIntegrationRow
 ): Promise<string | null> {
-  if (existingScheduleId) {
-    return existingScheduleId;
+  if (integration.qstashScheduleId) {
+    return integration.qstashScheduleId;
   }
   try {
     // Deterministic id: a retry (or a row that never recorded the id) reuses the
     // same schedule instead of leaving an orphan firing every week.
-    return await createQstashRouteSchedule({
+    const scheduleId = await createQstashRouteSchedule({
       path: GSC_SYNC_WORKFLOW_PATH,
       cron: GSC_SYNC_CRON,
-      body: { organizationId },
-      scheduleId: `${GSC_SCHEDULE_ID_PREFIX}${organizationId}`,
+      body: { organizationId: integration.organizationId },
+      scheduleId: `${GSC_SCHEDULE_ID_PREFIX}${integration.organizationId}`,
     });
+    const updated = await updateGscIntegrationIfUnchanged(integration, {
+      qstashScheduleId: scheduleId,
+    });
+    if (updated) {
+      return scheduleId;
+    }
+
+    const currentIntegration = await getGscIntegration(
+      integration.organizationId
+    );
+    if (currentIntegration?.qstashScheduleId !== scheduleId) {
+      await removeGscSchedule(scheduleId);
+    }
+    return currentIntegration?.qstashScheduleId ?? null;
   } catch (error) {
-    console.error("[GSC] Failed to create weekly sync schedule:", error);
+    console.error("[GSC] Failed to ensure weekly sync schedule:", error);
     return null;
   }
 }
@@ -1264,64 +1278,32 @@ export const geoRouter = {
         );
       }
 
-      const scheduleId = await ensureGscSchedule(
-        input.organizationId,
-        integration.qstashScheduleId
-      );
-
-      const updated = await updateGscIntegrationIfUnchanged(integration, {
-        qstashScheduleId: scheduleId,
-        lastError: null,
-      });
-      if (!updated) {
-        const currentIntegration = await getGscIntegration(
-          input.organizationId
-        );
-        if (currentIntegration?.qstashScheduleId !== scheduleId) {
-          await removeGscSchedule(scheduleId);
-        }
-        throw notFound("Google Search Console is not connected");
-      }
-
       let synced: GscSyncResult;
       try {
-        synced = await runGscSyncOrBadRequest(input.organizationId, {
-          siteUrl: input.siteUrl,
-          qstashScheduleId: scheduleId,
-        });
-        if (synced.status !== "completed") {
-          throw badRequest(
-            "Search Console changed before the property could be connected"
-          );
-        }
+        synced = await selectGscSiteAndSyncSuggestions(
+          integration,
+          input.siteUrl
+        );
       } catch (error) {
         console.error(
           "[GSC] Initial sync failed after selecting property:",
           error
         );
-        let restored = false;
-        try {
-          restored = Boolean(
-            await updateGscIntegrationIfUnchanged(updated, {
-              qstashScheduleId: integration.qstashScheduleId,
-              lastError: integration.lastError,
-            })
-          );
-        } catch (rollbackError) {
-          console.error(
-            "[GSC] Failed to restore integration after initial sync:",
-            rollbackError
-          );
-        }
-        if (
-          restored &&
-          scheduleId &&
-          scheduleId !== integration.qstashScheduleId
-        ) {
-          await removeGscSchedule(scheduleId);
-        }
-        throw error;
+        throw badRequest(
+          toGscErrorMessage(error, "Failed to sync Search Console keywords")
+        );
       }
+      if (synced.status !== "completed") {
+        throw badRequest(
+          "Search Console changed before the property could be connected"
+        );
+      }
+
+      const selectedIntegration = await getGscIntegration(input.organizationId);
+      const scheduleId =
+        selectedIntegration?.siteUrl === input.siteUrl
+          ? await ensureGscSchedule(selectedIntegration)
+          : (selectedIntegration?.qstashScheduleId ?? null);
 
       trackGeoRouterEvent({
         context,
@@ -1368,15 +1350,7 @@ export const geoRouter = {
 
       if (!integration.qstashScheduleId) {
         // Backfill the weekly schedule if it could not be created earlier.
-        const scheduleId = await ensureGscSchedule(input.organizationId, null);
-        if (scheduleId) {
-          const updated = await updateGscIntegration(input.organizationId, {
-            qstashScheduleId: scheduleId,
-          });
-          if (!updated) {
-            await removeGscSchedule(scheduleId);
-          }
-        }
+        await ensureGscSchedule(integration);
       }
 
       return await runGscSyncOrBadRequest(input.organizationId);

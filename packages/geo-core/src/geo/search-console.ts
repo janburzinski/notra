@@ -6,7 +6,10 @@ import {
   queryGscTopQueries,
   updateGscIntegrationIfUnchanged,
 } from "@notra/ai/integrations/google-search-console";
-import type { GscIntegrationRow } from "@notra/ai/types/google-search-console";
+import type {
+  GscIntegrationRow,
+  GscIntegrationUpdate,
+} from "@notra/ai/types/google-search-console";
 import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
@@ -34,7 +37,6 @@ import { geoSearchConsoleSuggestionSchema } from "../schemas/google-search-conso
 import type {
   GscSuggestionGenerationParams,
   GscSuggestionSyncOutcome,
-  GscSuggestionSyncOptions,
   GscSyncResult,
 } from "../types/google-search-console";
 import {
@@ -70,16 +72,75 @@ function toStoredSyncError(error: unknown): string {
   return "We could not turn your Search Console keywords into prompt suggestions.";
 }
 
+async function commitGscSuggestionSync(
+  integration: GscIntegrationRow,
+  outcome: GscSuggestionSyncOutcome,
+  integrationUpdates: GscIntegrationUpdate
+): Promise<GscSyncResult> {
+  const suggestionsAdded = await db.transaction(async (tx) => {
+    const currentIntegration = await updateGscIntegrationIfUnchanged(
+      integration,
+      {
+        ...integrationUpdates,
+        lastSyncedAt: new Date(),
+        lastError: null,
+        topQueries: outcome.topQueries,
+      },
+      tx
+    );
+    if (!currentIntegration) {
+      return null;
+    }
+
+    await tx
+      .delete(geoPromptSuggestions)
+      .where(
+        and(
+          eq(geoPromptSuggestions.organizationId, integration.organizationId),
+          eq(geoPromptSuggestions.status, "pending")
+        )
+      );
+    if (outcome.suggestions.length === 0) {
+      return 0;
+    }
+
+    const inserted = await tx
+      .insert(geoPromptSuggestions)
+      .values(outcome.suggestions)
+      .onConflictDoNothing()
+      .returning({ id: geoPromptSuggestions.id });
+    return inserted.length;
+  });
+  if (suggestionsAdded === null) {
+    return { status: "skipped", reason: "integration_changed" };
+  }
+  return {
+    status: "completed",
+    keywords: outcome.topQueries.length,
+    suggestionsAdded,
+  };
+}
+
+export async function selectGscSiteAndSyncSuggestions(
+  integration: GscIntegrationRow,
+  siteUrl: string
+): Promise<GscSyncResult> {
+  if (integration.status === "reauth_required") {
+    return { status: "skipped", reason: "reauth_required" };
+  }
+
+  const outcome = await runSync(integration, siteUrl);
+  return await commitGscSuggestionSync(integration, outcome, { siteUrl });
+}
+
 export async function syncGscSuggestions(
-  organizationId: string,
-  options?: GscSuggestionSyncOptions
+  organizationId: string
 ): Promise<GscSyncResult> {
   const integration = await getGscIntegration(organizationId);
   if (!integration) {
     return { status: "skipped", reason: "not_connected" };
   }
-  const siteUrl = options?.siteUrl ?? integration.siteUrl;
-  if (!siteUrl) {
+  if (!integration.siteUrl) {
     return { status: "skipped", reason: "no_site_selected" };
   }
   if (integration.status === "reauth_required") {
@@ -87,53 +148,11 @@ export async function syncGscSuggestions(
   }
 
   try {
-    const outcome = await runSync(integration, siteUrl);
-    const suggestionsAdded = await db.transaction(async (tx) => {
-      const currentIntegration = await updateGscIntegrationIfUnchanged(
-        integration,
-        {
-          lastSyncedAt: new Date(),
-          lastError: null,
-          topQueries: outcome.topQueries,
-          ...(options
-            ? {
-                siteUrl: options.siteUrl,
-                qstashScheduleId: options.qstashScheduleId,
-              }
-            : {}),
-        },
-        tx
-      );
-      if (!currentIntegration) {
-        return null;
-      }
-
-      await tx
-        .delete(geoPromptSuggestions)
-        .where(
-          and(
-            eq(geoPromptSuggestions.organizationId, organizationId),
-            eq(geoPromptSuggestions.status, "pending")
-          )
-        );
-      if (outcome.suggestions.length === 0) {
-        return 0;
-      }
-
-      const inserted = await tx
-        .insert(geoPromptSuggestions)
-        .values(outcome.suggestions)
-        .onConflictDoNothing()
-        .returning({ id: geoPromptSuggestions.id });
-      return inserted.length;
-    });
-    if (suggestionsAdded === null) {
-      return { status: "skipped", reason: "integration_changed" };
-    }
-    return { ...outcome.result, suggestionsAdded };
+    const outcome = await runSync(integration, integration.siteUrl);
+    return await commitGscSuggestionSync(integration, outcome, {});
   } catch (error) {
     console.error("[GSC] Sync failed:", error);
-    if (!(error instanceof GscReauthRequiredError) && !options) {
+    if (!(error instanceof GscReauthRequiredError)) {
       await updateGscIntegrationIfUnchanged(integration, {
         lastError: toStoredSyncError(error),
       });
@@ -220,11 +239,6 @@ async function runSync(
   const keywords = selectKeywordsForModel(rows, brandTerms);
   if (keywords.length === 0) {
     return {
-      result: {
-        status: "completed",
-        keywords: rows.length,
-        suggestionsAdded: 0,
-      },
       suggestions: [],
       topQueries: rows,
     };
@@ -288,11 +302,6 @@ async function runSync(
   }
 
   return {
-    result: {
-      status: "completed",
-      keywords: rows.length,
-      suggestionsAdded: 0,
-    },
     suggestions: values,
     topQueries: rows,
   };
