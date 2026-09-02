@@ -769,7 +769,6 @@ export default function ApiKeysPage() {
   );
   const hasNewKeyConfig =
     newKeyConfig.name !== null &&
-    newKeyConfig.accessMode !== null &&
     newKeyConfig.scopes !== null &&
     newKeyConfig.expiration !== null;
 
