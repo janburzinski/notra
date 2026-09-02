@@ -192,7 +192,7 @@ export const PromptKeywordTextarea = forwardRef<
         {...props}
       />
       {hasMatches ? (
-        <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-lg border border-transparent px-2.5 py-2 text-base leading-5 wrap-break-word whitespace-pre-wrap md:text-sm">
+        <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded-lg border border-transparent px-2.5 py-2 text-base leading-5 wrap-break-word whitespace-pre-wrap focus-within:z-30 md:text-sm">
           <div ref={overlayContentRef}>
             {segments.map((segment, index) => {
               if (!segment.keyword) {
