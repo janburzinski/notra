@@ -39,8 +39,12 @@ import { useBrandSettings } from "@/lib/hooks/use-brand-analysis";
 import { useGeoProjects } from "@/lib/hooks/use-geo";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { getWebsiteDomain } from "@/utils/brand";
+import {
+  getLastVisitedProjectFromClient,
+  setLastVisitedProject,
+} from "@/utils/cookies";
 import { geoNavHref } from "@/utils/geo-paths";
-import { isStaleGeoProjectParam, resolveNavItems } from "@/utils/nav";
+import { resolveNavItems } from "@/utils/nav";
 
 import { SidebarBrandHeader } from "./sidebar-brand-header";
 import { SidebarLabel } from "./sidebar-label";
@@ -57,25 +61,41 @@ export function SidebarProjectSwitcher() {
 
   const { data, isPending } = useGeoProjects(organizationId);
   const { data: brandData } = useBrandSettings(organizationId);
-  const projects = data?.projects ?? [];
+  const loadedProjects = data?.projects;
+  const projects = loadedProjects ?? [];
   const voices = brandData?.voices ?? [];
 
   const activeProject =
     projects.find((project) => project.id === projectParam) ??
     projects.at(0) ??
     null;
-  const staleProjectParam =
-    data !== undefined &&
-    isStaleGeoProjectParam(
-      projects.map((project) => project.id),
-      projectParam
-    );
 
   useEffect(() => {
-    if (staleProjectParam) {
-      setProjectParam(null);
+    if (loadedProjects === undefined || !slug) {
+      return;
     }
-  }, [staleProjectParam, setProjectParam]);
+
+    const selectedProject = loadedProjects.find(
+      (project) => project.id === projectParam
+    );
+    if (selectedProject) {
+      setLastVisitedProject(slug, selectedProject.id).catch(() => {
+        // The current URL remains the source of truth if cookies fail.
+      });
+      return;
+    }
+
+    const lastVisitedProjectId = getLastVisitedProjectFromClient(slug);
+    const restoredProject =
+      loadedProjects.find((project) => project.id === lastVisitedProjectId) ??
+      loadedProjects.at(0) ??
+      null;
+    const restoredProjectId = restoredProject?.id ?? null;
+
+    if (projectParam !== restoredProjectId) {
+      setProjectParam(restoredProjectId);
+    }
+  }, [loadedProjects, projectParam, setProjectParam, slug]);
 
   const projectDomain = (brandSettingsId: string) =>
     getWebsiteDomain(

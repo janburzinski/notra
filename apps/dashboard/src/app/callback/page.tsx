@@ -11,6 +11,7 @@ import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { getLastActiveOrganization, getSession } from "@/lib/auth/actions";
 import { isSessionBanned } from "@/lib/auth/banned";
 import type { CallbackDestination } from "@/types/analytics/events";
+import { withGeoProject } from "@/utils/geo-paths";
 import {
   marketingAttributionServerSearchParams,
   marketingAttributionServerUrlKeys,
@@ -111,5 +112,5 @@ export default async function AuthCallback(props: {
   }
 
   trackRouted(CALLBACK_DESTINATIONS.DASHBOARD);
-  redirect(`/${organization.slug}`);
+  redirect(withGeoProject(`/${organization.slug}`, organization.projectId));
 }

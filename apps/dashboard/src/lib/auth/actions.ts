@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@notra/db/drizzle";
-import { members, organizations } from "@notra/db/schema";
-import { eq } from "drizzle-orm";
+import { members, organizations, projects } from "@notra/db/schema";
+import { and, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
@@ -11,6 +11,7 @@ import { isSessionBanned } from "@/lib/auth/banned";
 import { getAuthSession } from "@/lib/auth/server";
 import { retryTransientDbError } from "@/lib/db/retry";
 import { organizationSlugParamSchema } from "@/schemas/auth/organization";
+import { getLastVisitedProject } from "@/utils/cookies";
 
 export async function validateOrganizationAccess(rawSlug: string) {
   const slugValidation = organizationSlugParamSchema.safeParse(rawSlug);
@@ -78,6 +79,7 @@ async function getLastActiveOrganizationForUser(userId: string) {
   const lastVisitedOrgSlug = cookieStore.get(
     LAST_VISITED_ORGANIZATION_COOKIE
   )?.value;
+  let activeOrganization: { id: string; slug: string } | undefined;
 
   if (lastVisitedOrgSlug) {
     const organization = await retryTransientDbError(() =>
@@ -94,32 +96,51 @@ async function getLastActiveOrganizationForUser(userId: string) {
     );
 
     if (organization && organization.members.length > 0) {
-      return { slug: organization.slug, id: organization.id };
+      activeOrganization = { slug: organization.slug, id: organization.id };
     }
   }
 
-  const ownerMembership = await retryTransientDbError(() =>
-    db.query.members.findFirst({
-      where: eq(members.userId, userId),
-      columns: { organizationId: true, role: true },
-      orderBy: (m, { desc }) => [desc(m.createdAt)],
-    })
-  );
-
-  if (ownerMembership) {
-    const org = await retryTransientDbError(() =>
-      db.query.organizations.findFirst({
-        where: eq(organizations.id, ownerMembership.organizationId),
-        columns: { slug: true, id: true },
+  if (!activeOrganization) {
+    const membership = await retryTransientDbError(() =>
+      db.query.members.findFirst({
+        where: eq(members.userId, userId),
+        columns: { organizationId: true },
+        orderBy: (m, { desc }) => [desc(m.createdAt)],
       })
     );
 
-    if (org) {
-      return { slug: org.slug, id: org.id };
+    if (membership) {
+      activeOrganization = await retryTransientDbError(() =>
+        db.query.organizations.findFirst({
+          where: eq(organizations.id, membership.organizationId),
+          columns: { slug: true, id: true },
+        })
+      );
     }
   }
 
-  return;
+  if (!activeOrganization) {
+    return;
+  }
+
+  const organization = activeOrganization;
+  const lastVisitedProjectId = getLastVisitedProject(
+    cookieStore,
+    organization.slug
+  );
+  const project = lastVisitedProjectId
+    ? await retryTransientDbError(() =>
+        db.query.projects.findFirst({
+          where: and(
+            eq(projects.id, lastVisitedProjectId),
+            eq(projects.organizationId, organization.id)
+          ),
+          columns: { id: true },
+        })
+      )
+    : undefined;
+
+  return { ...organization, projectId: project?.id };
 }
 
 export async function getLastActiveOrganization() {

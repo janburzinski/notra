@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { AuthBrandPanel } from "@/components/auth/auth-brand-panel";
 import { getLastActiveOrganization, getSession } from "@/lib/auth/actions";
+import { withGeoProject } from "@/utils/geo-paths";
 
 export default async function AuthLayout({
   children,
@@ -16,7 +17,7 @@ export default async function AuthLayout({
     const organization = await getLastActiveOrganization();
 
     if (organization) {
-      redirect(`/${organization.slug}`);
+      redirect(withGeoProject(`/${organization.slug}`, organization.projectId));
     } else {
       redirect("/onboarding");
     }

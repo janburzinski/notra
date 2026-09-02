@@ -4,6 +4,8 @@ import type { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension
 import {
   LAST_VISITED_ORGANIZATION_COOKIE,
   LAST_VISITED_ORGANIZATION_COOKIE_MAX_AGE,
+  LAST_VISITED_PROJECT_COOKIE,
+  LAST_VISITED_PROJECT_COOKIE_MAX_AGE,
   SIDEBAR_MODE_COOKIE,
   SIDEBAR_MODE_COOKIE_MAX_AGE,
 } from "@/constants/cookies";
@@ -11,6 +13,41 @@ import type { SidebarMode } from "@/types/components/nav";
 import { isSidebarMode } from "@/utils/nav";
 
 type CookieJar = RequestCookies | ReadonlyRequestCookies;
+
+function parseLastVisitedProject(
+  value: string | undefined,
+  organizationSlug: string
+): string | undefined {
+  if (!value) {
+    return;
+  }
+
+  const [storedSlug, projectId, extra] = value.split(":");
+  if (!(storedSlug && projectId) || extra !== undefined) {
+    return;
+  }
+
+  try {
+    return decodeURIComponent(storedSlug) === organizationSlug
+      ? decodeURIComponent(projectId)
+      : undefined;
+  } catch {
+    return;
+  }
+}
+
+function readClientCookie(name: string): string | undefined {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  const prefix = `${name}=`;
+  // biome-ignore lint/suspicious/noDocumentCookie: The active project must be restored before the next navigation
+  const entry = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(prefix));
+  return entry?.slice(prefix.length);
+}
 
 async function setClientCookie(
   name: string,
@@ -62,6 +99,35 @@ export const setLastVisitedOrganization = async (
 export const getLastVisitedOrganization = (
   cookies: CookieJar
 ): string | undefined => cookies.get(LAST_VISITED_ORGANIZATION_COOKIE)?.value;
+
+export const setLastVisitedProject = async (
+  organizationSlug: string,
+  projectId: string,
+  maxAge: number = LAST_VISITED_PROJECT_COOKIE_MAX_AGE
+): Promise<void> => {
+  await setClientCookie(
+    LAST_VISITED_PROJECT_COOKIE,
+    `${encodeURIComponent(organizationSlug)}:${encodeURIComponent(projectId)}`,
+    maxAge
+  );
+};
+
+export const getLastVisitedProject = (
+  cookies: CookieJar,
+  organizationSlug: string
+): string | undefined =>
+  parseLastVisitedProject(
+    cookies.get(LAST_VISITED_PROJECT_COOKIE)?.value,
+    organizationSlug
+  );
+
+export const getLastVisitedProjectFromClient = (
+  organizationSlug: string
+): string | undefined =>
+  parseLastVisitedProject(
+    readClientCookie(LAST_VISITED_PROJECT_COOKIE),
+    organizationSlug
+  );
 
 export const setSidebarModeCookie = async (
   mode: SidebarMode,
