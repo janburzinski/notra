@@ -121,7 +121,10 @@ export function useGeoWriterStart(organizationId: string) {
   });
 }
 
-export function useGeoWriterUpdate(organizationId: string) {
+export function useGeoWriterUpdate(
+  organizationId: string,
+  contentId: string
+) {
   const { projectId } = useGeoProjectScope();
   const queryClient = useQueryClient();
   const invalidate = useInvalidateWriterQueries(organizationId);
@@ -176,15 +179,22 @@ export function useGeoWriterUpdate(organizationId: string) {
     },
     onError: (error, input) => {
       if (getConflictRevision(error).isConflict) {
-        void queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.geo.writerBrief.queryKey({
-            input: {
-              organizationId,
-              projectId,
-              briefId: input.briefId,
-            },
+        void Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: dashboardOrpc.geo.writerBrief.queryKey({
+              input: {
+                organizationId,
+                projectId,
+                briefId: input.briefId,
+              },
+            }),
           }),
-        });
+          queryClient.invalidateQueries({
+            queryKey: dashboardOrpc.content.get.queryKey({
+              input: { organizationId, contentId },
+            }),
+          }),
+        ]);
       }
       toast.error(toErrorMessage(error, "Failed to update the plan"));
     },

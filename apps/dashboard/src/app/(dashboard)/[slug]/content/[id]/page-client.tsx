@@ -183,7 +183,7 @@ export default function PageClient({
     organizationId,
     geoWriterDraft?.briefId ?? null
   );
-  const geoWriterUpdate = useGeoWriterUpdate(organizationId);
+  const geoWriterUpdate = useGeoWriterUpdate(organizationId, contentId);
   const [isPlanDirty, setIsPlanDirty] = useState(false);
   const briefStatus = geoWriterBriefQuery.data?.status;
   const isGeoWriterPlanMode = Boolean(
