@@ -85,12 +85,42 @@ export async function syncGscSuggestions(
 
   try {
     const outcome = await runSync(integration, integration.siteUrl);
-    await updateGscIntegrationIfUnchanged(integration, {
-      lastSyncedAt: new Date(),
-      lastError: null,
-      topQueries: outcome.topQueries,
+    const suggestionsAdded = await db.transaction(async (tx) => {
+      const currentIntegration = await updateGscIntegrationIfUnchanged(
+        integration,
+        {
+          lastSyncedAt: new Date(),
+          lastError: null,
+          topQueries: outcome.topQueries,
+        },
+        tx
+      );
+      if (!currentIntegration) {
+        return null;
+      }
+      if (outcome.suggestions.length === 0) {
+        return 0;
+      }
+
+      await tx
+        .delete(geoPromptSuggestions)
+        .where(
+          and(
+            eq(geoPromptSuggestions.organizationId, organizationId),
+            eq(geoPromptSuggestions.status, "pending")
+          )
+        );
+      const inserted = await tx
+        .insert(geoPromptSuggestions)
+        .values(outcome.suggestions)
+        .onConflictDoNothing()
+        .returning({ id: geoPromptSuggestions.id });
+      return inserted.length;
     });
-    return outcome.result;
+    if (suggestionsAdded === null) {
+      return { status: "skipped", reason: "integration_changed" };
+    }
+    return { ...outcome.result, suggestionsAdded };
   } catch (error) {
     console.error("[GSC] Sync failed:", error);
     if (!(error instanceof GscReauthRequiredError)) {
@@ -185,6 +215,7 @@ async function runSync(
         keywords: rows.length,
         suggestionsAdded: 0,
       },
+      suggestions: [],
       topQueries: rows,
     };
   }
@@ -246,31 +277,13 @@ async function runSync(
     });
   }
 
-  let inserted: { id: string }[] = [];
-  if (values.length > 0) {
-    await db.transaction(async (tx) => {
-      await tx
-        .delete(geoPromptSuggestions)
-        .where(
-          and(
-            eq(geoPromptSuggestions.organizationId, organizationId),
-            eq(geoPromptSuggestions.status, "pending")
-          )
-        );
-      inserted = await tx
-        .insert(geoPromptSuggestions)
-        .values(values)
-        .onConflictDoNothing()
-        .returning({ id: geoPromptSuggestions.id });
-    });
-  }
-
   return {
     result: {
       status: "completed",
       keywords: rows.length,
-      suggestionsAdded: inserted.length,
+      suggestionsAdded: 0,
     },
+    suggestions: values,
     topQueries: rows,
   };
 }

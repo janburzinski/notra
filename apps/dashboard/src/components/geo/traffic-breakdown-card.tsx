@@ -9,11 +9,15 @@ export function TrafficBreakdownCard({
   title,
   aside,
   children,
+  onPointerEnter,
+  onPointerLeave,
 }: TrafficBreakdownCardProps) {
   return (
     <HoverCardContent
       align="start"
       className="w-80 rounded-2xl bg-transparent p-0 shadow-none ring-0"
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
       side="bottom"
     >
       <div className="border-border bg-muted rounded-t-2xl border border-b-0 pb-5">

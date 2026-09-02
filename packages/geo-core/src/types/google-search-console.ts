@@ -2,6 +2,7 @@ import type {
   GscQueryRow,
   GscSite,
 } from "@notra/ai/types/google-search-console";
+import type { geoPromptSuggestions } from "@notra/db/schema";
 
 export interface GscOAuthState {
   organizationId: string;
@@ -44,6 +45,7 @@ export interface GscSyncResult {
 
 export interface GscSuggestionSyncOutcome {
   result: GscSyncResult;
+  suggestions: (typeof geoPromptSuggestions.$inferInsert)[];
   topQueries: GscQueryRow[];
 }
 

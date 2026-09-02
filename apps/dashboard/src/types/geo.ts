@@ -55,6 +55,7 @@ import type { GeoRequestPayload } from "@usenotra/geo";
 import type {
   ComponentProps,
   ComponentPropsWithoutRef,
+  PointerEventHandler,
   ReactNode,
 } from "react";
 
@@ -746,6 +747,8 @@ export interface TrafficBreakdownCardProps {
   title: string;
   aside?: ReactNode;
   children: ReactNode;
+  onPointerEnter?: PointerEventHandler<HTMLDivElement>;
+  onPointerLeave?: PointerEventHandler<HTMLDivElement>;
 }
 
 export interface TrafficSourceGroupIconProps {

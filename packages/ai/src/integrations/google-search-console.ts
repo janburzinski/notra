@@ -261,9 +261,10 @@ export async function updateGscIntegration(
 
 export async function updateGscIntegrationIfUnchanged(
   integration: GscIntegrationRow,
-  updates: GscIntegrationUpdate
+  updates: GscIntegrationUpdate,
+  executor: Pick<typeof db, "update"> = db
 ): Promise<GscIntegrationRow | null> {
-  const [row] = await db
+  const [row] = await executor
     .update(googleSearchConsoleIntegrations)
     .set(updates)
     .where(

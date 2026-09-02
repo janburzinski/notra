@@ -18,7 +18,10 @@ import {
 } from "react";
 
 import { TrafficBreakdownCard } from "@/components/geo/traffic-breakdown-card";
-import { GEO_TRAFFIC_HOVER_DELAY_MS } from "@/constants/geo-traffic-hover";
+import {
+  GEO_TRAFFIC_HOVER_CLOSE_DELAY_MS,
+  GEO_TRAFFIC_HOVER_DELAY_MS,
+} from "@/constants/geo-traffic-hover";
 import { cn } from "@/lib/utils";
 import type { PromptKeywordTextareaProps } from "@/types/geo";
 import { findPromptKeywordSegments } from "@/utils/geo-prompt-keywords";
@@ -44,6 +47,7 @@ export const PromptKeywordTextarea = forwardRef<
   const overlayContentRef = useRef<HTMLDivElement>(null);
   const markRefs = useRef(new Map<number, HTMLElement>());
   const hoverTimerRef = useRef<number | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
   const pendingHoverIndexRef = useRef<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
@@ -60,17 +64,39 @@ export const PromptKeywordTextarea = forwardRef<
   const hasMatches = segments.some((segment) => segment.keyword !== null);
   const activeIndex = focusedIndex ?? hoveredIndex;
 
+  function cancelPointerClose() {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }
+
   function clearPointerHover() {
     if (hoverTimerRef.current !== null) {
       window.clearTimeout(hoverTimerRef.current);
       hoverTimerRef.current = null;
     }
+    cancelPointerClose();
     pendingHoverIndexRef.current = null;
     setHoveredIndex(null);
   }
 
+  function schedulePointerClose() {
+    if (hoverTimerRef.current !== null) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    pendingHoverIndexRef.current = null;
+    cancelPointerClose();
+    closeTimerRef.current = window.setTimeout(() => {
+      closeTimerRef.current = null;
+      setHoveredIndex(null);
+    }, GEO_TRAFFIC_HOVER_CLOSE_DELAY_MS);
+  }
+
   function schedulePointerHover(index: number | null) {
     if (index === hoveredIndex || index === pendingHoverIndexRef.current) {
+      cancelPointerClose();
       return;
     }
 
@@ -106,6 +132,9 @@ export const PromptKeywordTextarea = forwardRef<
       if (hoverTimerRef.current !== null) {
         window.clearTimeout(hoverTimerRef.current);
       }
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+      }
     },
     []
   );
@@ -128,7 +157,7 @@ export const PromptKeywordTextarea = forwardRef<
           onPointerDown?.(event);
         }}
         onPointerLeave={(event) => {
-          clearPointerHover();
+          schedulePointerClose();
           onPointerLeave?.(event);
         }}
         onPointerMove={(event) => {
@@ -209,6 +238,7 @@ export const PromptKeywordTextarea = forwardRef<
                   <HoverCardTrigger
                     closeDelay={0}
                     delay={GEO_TRAFFIC_HOVER_DELAY_MS}
+                    id={triggerId}
                     onBlur={() => {
                       setFocusedIndex((current) =>
                         current === index ? null : current
@@ -236,6 +266,8 @@ export const PromptKeywordTextarea = forwardRef<
                   <TrafficBreakdownCard
                     aside="Last 28 days"
                     icon={<Google className="size-4" />}
+                    onPointerEnter={cancelPointerClose}
+                    onPointerLeave={schedulePointerClose}
                     title="Google Search Console"
                   >
                     <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 px-3 py-1.5 text-xs">
