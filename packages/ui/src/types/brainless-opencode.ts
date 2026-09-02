@@ -1,0 +1,54 @@
+import type * as React from "react";
+
+export type OpencodeActivityKind = "thought" | "tool";
+
+export interface OpencodeActivityProps {
+  kind?: OpencodeActivityKind;
+  label: string;
+  detail?: string;
+  duration?: string;
+  className?: string;
+}
+
+export interface OpencodeComposerProps {
+  value?: string;
+  defaultValue?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+  placeholder?: string;
+  agent?: string;
+  model?: string;
+  provider?: string;
+  effort?: string;
+  context?: string;
+  className?: string;
+  inputClassName?: string;
+  ref?: React.Ref<HTMLInputElement>;
+}
+
+export interface OpencodeLogoProps {
+  className?: string;
+  scale?: number;
+}
+
+export interface OpencodeMessageProps {
+  from?: "user" | "assistant";
+  className?: string;
+  children: React.ReactNode;
+}
+
+export interface OpencodeMcpServer {
+  name: string;
+  status?: string;
+}
+
+export interface OpencodeSidebarProps {
+  title?: string;
+  tokens?: string;
+  used?: string;
+  spent?: string;
+  servers?: OpencodeMcpServer[];
+  cwd?: string;
+  version?: string;
+  className?: string;
+}

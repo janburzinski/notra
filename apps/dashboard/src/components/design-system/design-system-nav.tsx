@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/design-system#perplexity-thread", label: "Perplexity" },
   { href: "/design-system#claude-session", label: "Claude TUI" },
   { href: "/design-system#codex-session", label: "Codex TUI" },
+  { href: "/design-system#opencode-session", label: "OpenCode TUI" },
 ] as const;
 
 export function DesignSystemNav() {

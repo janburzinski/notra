@@ -221,6 +221,7 @@ import { DesignSystemClaudeChatCatalog } from "@/app/design-system/claude-chat/p
 import { DesignSystemClaudeCatalog } from "@/app/design-system/claude/page-client";
 import { DesignSystemCodexCatalog } from "@/app/design-system/codex/page-client";
 import { DesignSystemGeminiCatalog } from "@/app/design-system/gemini/page-client";
+import { DesignSystemOpencodeCatalog } from "@/app/design-system/opencode/page-client";
 import { DesignSystemPerplexityCatalog } from "@/app/design-system/perplexity/page-client";
 import { BrailleLoader } from "@/components/braille-loader";
 import { Button, buttonVariants } from "@/components/button";
@@ -1575,6 +1576,7 @@ export default function DesignSystemClientPage() {
       <DesignSystemWriteDialogDemo />
       <DesignSystemClaudeCatalog />
       <DesignSystemCodexCatalog />
+      <DesignSystemOpencodeCatalog />
       <DesignSystemChatgptCatalog />
       <DesignSystemClaudeChatCatalog />
       <DesignSystemGeminiCatalog />
