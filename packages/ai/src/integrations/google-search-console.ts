@@ -20,7 +20,6 @@ import {
   REAUTH_ERROR_CODES,
 } from "../constants/google-search-console";
 import { decryptToken, encryptToken } from "../crypto/token-encryption";
-import { deleteQstashSchedule } from "../qstash/triggers";
 import {
   gscSearchAnalyticsResponseSchema,
   gscSitesResponseSchema,
@@ -186,7 +185,7 @@ export async function upsertGscIntegration(
   const encryptedAccessToken = encryptToken(params.accessToken);
   const encryptedRefreshToken = encryptToken(params.refreshToken);
 
-  return await db.transaction(async (tx) => {
+  const { integrationToRevoke, row } = await db.transaction(async (tx) => {
     // The advisory lock also serializes first-time inserts, where there is no
     // row for SELECT FOR UPDATE to lock yet.
     await tx.execute(
@@ -202,21 +201,6 @@ export async function upsertGscIntegration(
       existing ?? null,
       params.googleAccountEmail
     );
-
-    // Tear the old account's schedule down before clearing its id. If deletion
-    // fails, retaining the id lets the next selection reuse the still-live job.
-    let oldScheduleDeleted = true;
-    if (googleAccountChanged && existing) {
-      await revokeGscToken(existing);
-      if (existing.qstashScheduleId) {
-        try {
-          await deleteQstashSchedule(existing.qstashScheduleId);
-        } catch (error) {
-          console.error("[GSC] Failed to delete QStash schedule:", error);
-          oldScheduleDeleted = false;
-        }
-      }
-    }
 
     const [row] = await tx
       .insert(googleSearchConsoleIntegrations)
@@ -245,7 +229,6 @@ export async function upsertGscIntegration(
             ? {
                 siteUrl: null,
                 topQueries: [],
-                ...(oldScheduleDeleted ? { qstashScheduleId: null } : {}),
               }
             : {}),
         },
@@ -267,8 +250,19 @@ export async function upsertGscIntegration(
         );
     }
 
-    return row;
+    return {
+      row,
+      integrationToRevoke: googleAccountChanged && existing ? existing : null,
+    };
   });
+
+  // The schedule targets the organization and remains valid across Google
+  // account changes. Only token revocation is account-specific, and it must not
+  // hold a database connection or the organization advisory lock.
+  if (integrationToRevoke) {
+    await revokeGscToken(integrationToRevoke);
+  }
+  return row;
 }
 
 export async function updateGscIntegration(
@@ -300,10 +294,9 @@ export async function claimOrConfirmGscSchedule(
         or(
           eq(googleSearchConsoleIntegrations.qstashScheduleId, scheduleId),
           and(
-            eq(
-              googleSearchConsoleIntegrations.encryptedRefreshToken,
-              integration.encryptedRefreshToken
-            ),
+            integration.googleAccountEmail === null
+              ? isNull(googleSearchConsoleIntegrations.googleAccountEmail)
+              : sql`lower(trim(${googleSearchConsoleIntegrations.googleAccountEmail})) = ${integration.googleAccountEmail.trim().toLowerCase()}`,
             eq(googleSearchConsoleIntegrations.status, integration.status),
             isNull(googleSearchConsoleIntegrations.qstashScheduleId),
             integration.lastSyncedAt === null
