@@ -103,7 +103,9 @@ import type {
 
 const NEW_KEY_CONFIG_PARSERS = {
   name: parseAsString,
-  accessMode: parseAsStringLiteral(API_KEY_ACCESS_MODE_VALUES),
+  accessMode: parseAsStringLiteral(API_KEY_ACCESS_MODE_VALUES).withDefault(
+    "restricted"
+  ),
   scopes: parseAsArrayOf(parseAsString),
   expiration: parseAsStringLiteral(API_KEY_EXPIRATION_VALUES),
 };
