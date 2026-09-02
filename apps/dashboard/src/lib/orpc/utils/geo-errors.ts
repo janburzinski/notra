@@ -67,7 +67,12 @@ export function toGeoOrpcError(failure: GeoRouterError): Error {
         `This brief is already ${failure.status}. Start a new one.`
       );
     case "GeoContentBriefConflictError":
-      return conflict("This plan changed while it was being saved. Try again.");
+      return conflict(
+        "This plan changed while it was being saved. Try again.",
+        {
+          updatedAt: failure.updatedAt,
+        }
+      );
     case "GeoWriterPlanError":
       console.error("[GEO] writer planning failed:", failure);
       return badRequest(failure.message);

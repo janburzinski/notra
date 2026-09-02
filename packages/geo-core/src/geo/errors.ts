@@ -209,6 +209,7 @@ export class GeoContentBriefConflictError extends Data.TaggedError(
   "GeoContentBriefConflictError"
 )<{
   readonly briefId: string;
+  readonly updatedAt: string;
 }> {}
 
 export class GeoWriterPlanError extends Data.TaggedError("GeoWriterPlanError")<{

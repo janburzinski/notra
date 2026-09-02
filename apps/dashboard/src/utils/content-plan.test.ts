@@ -33,6 +33,27 @@ describe("toSavableBrief", () => {
     expect(toSavableBrief(draft)).toBeNull();
     expect(section.goal).toBe("Explain the first step");
   });
+
+  test("does not drop an existing link while its URL is invalid", () => {
+    const draft = toKeyedPlan({
+      ...brief,
+      internalLinks: [
+        {
+          url: "https://example.com/docs",
+          anchor: "Docs",
+          why: "More detail",
+        },
+      ],
+    });
+    const link = draft.internalLinks[0];
+    if (!link) {
+      throw new Error("Expected an internal link");
+    }
+    link.url = "https://example .com";
+
+    expect(toSavableBrief(draft)).toBeNull();
+    expect(draft.internalLinks).toHaveLength(1);
+  });
 });
 
 describe("completePlanLink", () => {

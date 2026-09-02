@@ -88,6 +88,11 @@ export function briefsEqual(
 export function toSavableBrief(
   draft: KeyedContentPlan
 ): GeoContentBrief | null {
+  const internalLinks = draft.internalLinks.map(completePlanLink);
+  if (internalLinks.some((link) => link === null)) {
+    return null;
+  }
+
   const parsed = geoContentBriefSchema.safeParse({
     ...fromKeyedPlan(draft),
     targetPrompt: draft.targetPrompt.trim(),
@@ -103,10 +108,7 @@ export function toSavableBrief(
     questionsToAnswer: draft.questionsToAnswer
       .map((question) => question.text.trim())
       .filter(Boolean),
-    internalLinks: draft.internalLinks.flatMap((link) => {
-      const completed = completePlanLink(link);
-      return completed ? [completed] : [];
-    }),
+    internalLinks,
     acceptanceChecklist: draft.acceptanceChecklist
       .map((item) => item.text.trim())
       .filter(Boolean),

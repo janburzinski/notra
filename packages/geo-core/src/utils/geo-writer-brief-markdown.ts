@@ -23,6 +23,17 @@ const TYPE_LINE_REGEX = /^blog post\s*\(([^)]+)\)\s*$/i;
 const BULLET_LINE_REGEX = /^- (.+)$/;
 const HEADING_REGEX = /^##\s+(.+)$/;
 
+function escapeMarkdownLinkUrl(url: string): string {
+  return url
+    .replaceAll("\\", "\\\\")
+    .replaceAll("(", "\\(")
+    .replaceAll(")", "\\)");
+}
+
+function unescapeMarkdownLinkUrl(url: string): string {
+  return url.replaceAll(/\\([\\()])/g, "$1");
+}
+
 export function geoBriefToMarkdown(brief: GeoContentBrief): string {
   const sections = brief.sections
     .map((section) => {
@@ -40,7 +51,10 @@ export function geoBriefToMarkdown(brief: GeoContentBrief): string {
   const links =
     brief.internalLinks.length > 0
       ? brief.internalLinks
-          .map((link) => `- [${link.anchor}](${link.url}): ${link.why}`)
+          .map(
+            (link) =>
+              `- [${link.anchor}](${escapeMarkdownLinkUrl(link.url)}): ${link.why}`
+          )
           .join("\n")
       : `- ${EMPTY_LIST}`;
   const checklist =
@@ -252,6 +266,10 @@ function parseInternalLink(line: string): GeoBriefInternalLink | null {
   let depth = 0;
   for (let index = urlStart; index < line.length; index += 1) {
     const character = line[index];
+    if (character === "\\" && index + 1 < line.length) {
+      index += 1;
+      continue;
+    }
     if (character === "(") {
       depth += 1;
       continue;
@@ -266,7 +284,7 @@ function parseInternalLink(line: string): GeoBriefInternalLink | null {
     if (line[index + 1] !== ":") {
       return null;
     }
-    const url = line.slice(urlStart, index).trim();
+    const url = unescapeMarkdownLinkUrl(line.slice(urlStart, index).trim());
     const why = line.slice(index + 2).trim();
     if (!(anchor && url && why)) {
       return null;

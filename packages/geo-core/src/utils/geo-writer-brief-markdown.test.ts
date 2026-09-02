@@ -48,6 +48,25 @@ describe("markdownToGeoBrief", () => {
     );
   });
 
+  test("preserves an internal-link URL with an unmatched parenthesis", () => {
+    const input = {
+      ...brief,
+      internalLinks: [
+        {
+          anchor: "Function docs",
+          url: "https://example.com/docs/function_(programming",
+          why: "Provides implementation details",
+        },
+      ],
+    };
+
+    const parsed = markdownToGeoBrief(geoBriefToMarkdown(input), fallback);
+
+    expect(parsed?.internalLinks[0]?.url).toBe(
+      "https://example.com/docs/function_(programming"
+    );
+  });
+
   for (const heading of ["FAQ", "Internal links", "Acceptance checklist"]) {
     test(`keeps an outline section named ${heading}`, () => {
       const input = {

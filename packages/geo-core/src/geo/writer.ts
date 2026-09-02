@@ -422,7 +422,10 @@ export const updateGeoContentBrief = Effect.fn("geo.writer.briefUpdate")(
       const current = yield* requireBriefRow(scope, input.briefId);
       if (current.status === "draft" || current.status === "failed") {
         return yield* Effect.fail(
-          new GeoContentBriefConflictError({ briefId: input.briefId })
+          new GeoContentBriefConflictError({
+            briefId: input.briefId,
+            updatedAt: current.updatedAt.toISOString(),
+          })
         );
       }
       return yield* Effect.fail(

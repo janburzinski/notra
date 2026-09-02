@@ -13,6 +13,7 @@ import { toast } from "sonner";
 
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { toErrorMessage } from "@/utils/error-message";
+import { getConflictRevision } from "@/utils/orpc-errors";
 
 import { dashboardOrpc } from "../orpc/query";
 
@@ -133,16 +134,31 @@ export function useGeoWriterUpdate(organizationId: string) {
       markdown: string;
       workingTitle?: string;
     }) => {
-      const result = await dashboardOrpc.geo.writerUpdate.call({
-        ...input,
-        expectedUpdatedAt:
-          latestRevisionByBrief.current.get(input.briefId) ??
-          input.expectedUpdatedAt,
-        organizationId,
-        projectId,
-      });
-      latestRevisionByBrief.current.set(input.briefId, result.updatedAt);
-      return result;
+      try {
+        const result = await dashboardOrpc.geo.writerUpdate.call({
+          ...input,
+          expectedUpdatedAt:
+            latestRevisionByBrief.current.get(input.briefId) ??
+            input.expectedUpdatedAt,
+          organizationId,
+          projectId,
+        });
+        latestRevisionByBrief.current.set(input.briefId, result.updatedAt);
+        return result;
+      } catch (error) {
+        const conflict = getConflictRevision(error);
+        if (conflict.isConflict) {
+          if (conflict.updatedAt) {
+            latestRevisionByBrief.current.set(
+              input.briefId,
+              conflict.updatedAt
+            );
+          } else {
+            latestRevisionByBrief.current.delete(input.briefId);
+          }
+        }
+        throw error;
+      }
     },
     onSuccess: async (result) => {
       await Promise.all([
@@ -158,7 +174,18 @@ export function useGeoWriterUpdate(organizationId: string) {
         }),
       ]);
     },
-    onError: (error) => {
+    onError: (error, input) => {
+      if (getConflictRevision(error).isConflict) {
+        void queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.writerBrief.queryKey({
+            input: {
+              organizationId,
+              projectId,
+              briefId: input.briefId,
+            },
+          }),
+        });
+      }
       toast.error(toErrorMessage(error, "Failed to update the plan"));
     },
   });
