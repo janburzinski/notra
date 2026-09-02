@@ -22,6 +22,7 @@ export interface ApiKeyPreset {
   description: string;
   docsHref: string;
   defaultName: string;
+  accessMode: ApiKeyAccessMode;
   scopes: ApiKeyGranularScope[];
   expiration: ApiKeyExpiration;
 }
@@ -52,7 +53,12 @@ export interface ApiKeyRevealFieldProps {
 }
 
 export interface ApiKeyPermissionSelectorProps {
+  accessMode: ApiKeyAccessMode;
   value: string[];
+  onAccessModeChange: (
+    accessMode: ApiKeyAccessMode,
+    scopes: ApiKeyGranularScope[]
+  ) => void;
   onValueChange: (scopes: string[]) => void;
   disabled?: boolean;
   className?: string;
@@ -61,6 +67,7 @@ export interface ApiKeyPermissionSelectorProps {
 export interface ApiKeyFormValues {
   keyId: string;
   name: string;
+  accessMode: ApiKeyAccessMode;
   scopes: string[];
   expiration: ApiKeyExpiration;
 }

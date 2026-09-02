@@ -8,6 +8,8 @@ import { API_KEY_EXPIRATION_MS } from "@/constants/api-keys";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import {
   expandLegacyApiKeyScopes,
+  getApiKeyAccessMode,
+  getApiKeyPermissionsForAccessMode,
   getUnknownApiKeyPermissions,
   summarizeApiKeyScopes,
 } from "@/lib/api-keys/scopes";
@@ -137,8 +139,10 @@ export const apiKeysRouter = {
           : [];
 
         const scopes = expandLegacyApiKeyScopes(permissions);
+        const accessMode = getApiKeyAccessMode(permissions, meta.accessMode);
 
         return {
+          accessMode,
           createdAt: key.createdAt,
           createdBy: meta.createdBy ?? null,
           enabled: key.enabled,
@@ -164,16 +168,22 @@ export const apiKeysRouter = {
       const { apiId, client } = requireUnkeyConfig();
       const expiresMs = API_KEY_EXPIRATION_MS[input.expiration];
       const expires = expiresMs ? Date.now() + expiresMs : undefined;
+      const permissions = getApiKeyPermissionsForAccessMode(
+        input.accessMode,
+        input.scopes
+      );
+      const scopes = expandLegacyApiKeyScopes(permissions);
 
       const created = await client.keys.createKey({
         apiId,
         expires,
         externalId: input.organizationId,
         meta: {
+          accessMode: input.accessMode,
           createdBy: context.user.name,
         },
         name: input.name,
-        permissions: input.scopes,
+        permissions,
         prefix: "ntra",
       });
 
@@ -191,8 +201,8 @@ export const apiKeysRouter = {
         organizationId: input.organizationId,
         properties: {
           key_id: keyId,
-          permission_preset: summarizeApiKeyScopes(input.scopes),
-          scope_count: input.scopes.length,
+          permission_preset: summarizeApiKeyScopes(scopes),
+          scope_count: scopes.length,
           expiration: input.expiration,
         },
       });
@@ -257,13 +267,24 @@ export const apiKeysRouter = {
         : [];
       const unknownPermissions =
         getUnknownApiKeyPermissions(currentPermissions);
+      const permissions = [
+        ...getApiKeyPermissionsForAccessMode(
+          input.payload.accessMode,
+          input.payload.scopes
+        ),
+        ...unknownPermissions,
+      ];
+      const scopes = expandLegacyApiKeyScopes(permissions);
 
       await client.keys.updateKey({
         expires,
         keyId: input.payload.keyId,
-        meta,
+        meta: {
+          ...meta,
+          accessMode: input.payload.accessMode,
+        },
         name: input.payload.name,
-        permissions: [...input.payload.scopes, ...unknownPermissions],
+        permissions,
       });
 
       trackServerEvent({
@@ -273,8 +294,8 @@ export const apiKeysRouter = {
         organizationId: input.organizationId,
         properties: {
           key_id: input.payload.keyId,
-          permission_preset: summarizeApiKeyScopes(input.payload.scopes),
-          scope_count: input.payload.scopes.length,
+          permission_preset: summarizeApiKeyScopes(scopes),
+          scope_count: scopes.length,
           expiration: input.payload.expiration,
           expiration_changed: input.payload.expiration !== currentExpiration,
         },
