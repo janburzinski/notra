@@ -3,6 +3,7 @@ import type {
   GeoContentBrief,
   GeoContentSubtype,
 } from "@notra/ai/types/geo-writer";
+import type { Ref } from "react";
 
 export interface ContentPlanViewProps {
   brief: GeoContentBrief;
@@ -13,13 +14,32 @@ export interface ContentPlanViewProps {
 
 export interface PlanTextProps {
   "aria-label": string;
+  autoFocus?: boolean;
   className?: string;
+  itemId?: string;
   maxLength?: number;
   onChange: (value: string) => void;
   onCommit?: () => void;
+  onEnter?: () => void;
+  onEscape?: () => void;
   placeholder?: string;
   readOnly?: boolean;
+  ref?: Ref<HTMLTextAreaElement>;
   value: string;
+}
+
+export interface PlanLineListProps {
+  addLabel: string;
+  itemAriaLabel: (index: number) => string;
+  itemClassName?: string;
+  items: KeyedPlanLine[];
+  maxItems: number;
+  onCommit: () => void;
+  onItemsChange: (items: KeyedPlanLine[]) => void;
+  placeholder: string;
+  readOnly: boolean;
+  removeAriaLabel: (index: number) => string;
+  showBullet?: boolean;
 }
 
 export interface KeyedPlanLine {
