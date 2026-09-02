@@ -1,10 +1,8 @@
 import { geoContentBriefSchema } from "@notra/ai/schemas/geo-writer";
 import type { GeoContentBrief } from "@notra/ai/types/geo-writer";
 
-import {
-  CONTENT_PLAN_LINK_DEFAULT_WHY,
-  CONTENT_PLAN_SUBTYPE_LABELS,
-} from "@/constants/content-plan";
+import { BLOG_POST_SUBTYPE_LABELS } from "@/constants/content-formats";
+import { CONTENT_PLAN_LINK_DEFAULT_WHY } from "@/constants/content-plan";
 import type {
   KeyedContentPlan,
   KeyedPlanLine,
@@ -97,15 +95,11 @@ export function toSavableBrief(
     workingTitle: draft.workingTitle.trim(),
     audience: draft.audience.trim(),
     jobToBeDone: draft.jobToBeDone.trim(),
-    sections: draft.sections
-      .map((section) => ({
-        heading: section.heading.trim(),
-        goal: section.goal.trim(),
-        claims: section.claims
-          .map((claim) => claim.text.trim())
-          .filter(Boolean),
-      }))
-      .filter((section) => section.heading && section.goal),
+    sections: draft.sections.map((section) => ({
+      heading: section.heading.trim(),
+      goal: section.goal.trim(),
+      claims: section.claims.map((claim) => claim.text.trim()).filter(Boolean),
+    })),
     questionsToAnswer: draft.questionsToAnswer
       .map((question) => question.text.trim())
       .filter(Boolean),
@@ -130,7 +124,7 @@ export function removeAt<T>(items: T[], index: number): T[] {
 
 export function formatPlanSubtypeLabel(subtype: string): string {
   if (isBlogPostSubtype(subtype)) {
-    return CONTENT_PLAN_SUBTYPE_LABELS[subtype];
+    return BLOG_POST_SUBTYPE_LABELS[subtype];
   }
   return subtype;
 }
@@ -164,6 +158,14 @@ export function completePlanLink(link: {
 }): { url: string; anchor: string; why: string } | null {
   const url = link.url.trim();
   if (!url) {
+    return null;
+  }
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+  } catch {
     return null;
   }
   const anchor = link.anchor.trim() || anchorFromUrl(url) || url;

@@ -316,13 +316,15 @@ export default function PageClient({
   const handlePlanBriefChange = useCallback(
     (nextBrief: GeoContentBrief) => {
       const briefId = geoWriterDraft?.briefId;
-      if (!briefId) {
+      const expectedUpdatedAt = geoWriterBriefQuery.data?.updatedAt;
+      if (!(briefId && expectedUpdatedAt)) {
         return;
       }
       const markdown = geoBriefToMarkdown(nextBrief);
       geoWriterUpdate.mutate(
         {
           briefId,
+          expectedUpdatedAt,
           markdown,
           workingTitle: nextBrief.workingTitle,
         },
@@ -346,6 +348,7 @@ export default function PageClient({
     [
       contentId,
       geoWriterDraft?.briefId,
+      geoWriterBriefQuery.data?.updatedAt,
       geoWriterUpdate,
       organizationId,
       queryClient,
@@ -933,11 +936,16 @@ export default function PageClient({
         setEditedMarkdown(fixedMarkdown);
         editedMarkdownRef.current = fixedMarkdown;
         if (part.type === "tool-editMarkdown") {
-          if (isGeoWriterPlanReviewableNow && geoWriterDraft?.briefId) {
+          if (
+            isGeoWriterPlanReviewableNow &&
+            geoWriterDraft?.briefId &&
+            geoWriterBriefQuery.data
+          ) {
             setReviewPreviousMarkdown(null);
             geoWriterUpdate.mutate(
               {
                 briefId: geoWriterDraft.briefId,
+                expectedUpdatedAt: geoWriterBriefQuery.data.updatedAt,
                 markdown: fixedMarkdown,
                 workingTitle: geoWriterBriefQuery.data?.brief.workingTitle,
               },
@@ -973,7 +981,7 @@ export default function PageClient({
   }, [
     contentId,
     data?.content?.contentType,
-    geoWriterBriefQuery.data?.brief.workingTitle,
+    geoWriterBriefQuery.data,
     geoWriterDraft?.briefId,
     geoWriterUpdate,
     invalidateContentQueries,
@@ -1323,6 +1331,7 @@ export default function PageClient({
       <ContentPlanView
         brief={planBrief}
         isWriting={briefStatus === "writing" || briefStatus === "approved"}
+        key={geoWriterDraft?.briefId ?? contentId}
         onChange={
           isGeoWriterPlanReviewableNow ? handlePlanBriefChange : undefined
         }

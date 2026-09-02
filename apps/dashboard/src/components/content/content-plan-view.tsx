@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, LazyMotion, m, useReducedMotion } from "motion/react";
 import {
   type MouseEvent,
   type ReactNode,
@@ -66,6 +66,9 @@ import {
   toSavableBrief,
 } from "@/utils/content-plan";
 import { isBlogPostSubtype } from "@/utils/content-subtype";
+
+const loadMotionFeatures = () =>
+  import("@/lib/motion-features").then((mod) => mod.default);
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
@@ -229,7 +232,7 @@ function PlanLineList({
       <ul className="space-y-1">
         <AnimatePresence initial={false} mode="popLayout">
           {items.map((item, index) => (
-            <motion.li
+            <m.li
               animate={{ opacity: 1 }}
               className="group/item flex min-h-9 items-start gap-1"
               exit={{ opacity: 0, transition: exitTransition }}
@@ -268,7 +271,7 @@ function PlanLineList({
                   onClick={() => onItemsChange(removeAt(items, index))}
                 />
               )}
-            </motion.li>
+            </m.li>
           ))}
         </AnimatePresence>
       </ul>
@@ -356,7 +359,7 @@ function PlanLinkList({
       <ul className="space-y-3">
         <AnimatePresence initial={false} mode="popLayout">
           {links.map((link, index) => (
-            <motion.li
+            <m.li
               animate={{ opacity: 1 }}
               className="group/item space-y-1"
               exit={{ opacity: 0, transition: exitTransition }}
@@ -406,7 +409,7 @@ function PlanLinkList({
                 readOnly={readOnly}
                 value={link.why}
               />
-            </motion.li>
+            </m.li>
           ))}
         </AnimatePresence>
       </ul>
@@ -510,254 +513,265 @@ export function ContentPlanView({
   };
 
   return (
-    <div aria-busy={isWriting} className="mx-auto w-full max-w-3xl space-y-12">
-      <PlanText
-        aria-label="Title"
-        className="text-3xl leading-tight font-semibold tracking-tight text-pretty md:text-4xl"
-        maxLength={GEO_BRIEF_MAX_TITLE_LENGTH}
-        onChange={(workingTitle) => update({ ...draft, workingTitle })}
-        onCommit={() => commit()}
-        placeholder="Title"
-        readOnly={readOnly}
-        value={draft.workingTitle}
-      />
+    <LazyMotion features={loadMotionFeatures} strict>
+      <div
+        aria-busy={isWriting}
+        className="mx-auto w-full max-w-3xl space-y-12"
+      >
+        <PlanText
+          aria-label="Title"
+          className="text-3xl leading-tight font-semibold tracking-tight text-pretty md:text-4xl"
+          maxLength={GEO_BRIEF_MAX_TITLE_LENGTH}
+          onChange={(workingTitle) => update({ ...draft, workingTitle })}
+          onCommit={() => commit()}
+          placeholder="Title"
+          readOnly={readOnly}
+          value={draft.workingTitle}
+        />
 
-      <section className="space-y-6">
-        <PlanField label="Target prompt">
-          <PlanText
-            aria-label="Target prompt"
-            onChange={(targetPrompt) => update({ ...draft, targetPrompt })}
-            onCommit={() => commit()}
-            placeholder="The question a buyer would ask"
-            readOnly={readOnly}
-            value={draft.targetPrompt}
-          />
-        </PlanField>
-        <div className="grid gap-6 sm:grid-cols-2">
-          <PlanField label="Intent">
+        <section className="space-y-6">
+          <PlanField label="Target prompt">
             <PlanText
-              aria-label="Intent"
-              onChange={(intent) => update({ ...draft, intent })}
+              aria-label="Target prompt"
+              onChange={(targetPrompt) => update({ ...draft, targetPrompt })}
               onCommit={() => commit()}
-              placeholder="Why someone is searching for this"
+              placeholder="The question a buyer would ask"
               readOnly={readOnly}
-              value={draft.intent}
+              value={draft.targetPrompt}
             />
           </PlanField>
-          <PlanField label="Audience">
-            <PlanText
-              aria-label="Audience"
-              onChange={(audience) => update({ ...draft, audience })}
-              onCommit={() => commit()}
-              placeholder="Who this is for"
-              readOnly={readOnly}
-              value={draft.audience}
-            />
-          </PlanField>
-          <PlanField label="Type">
-            {readOnly ? (
-              <p>{formatPlanSubtypeLabel(draft.contentSubtype)}</p>
-            ) : (
-              <Select
-                onValueChange={(value) => {
-                  if (typeof value !== "string" || !isBlogPostSubtype(value)) {
-                    return;
-                  }
-                  const next = { ...draft, contentSubtype: value };
-                  update(next);
-                  commit(next);
-                }}
-                value={draft.contentSubtype}
-              >
-                <SelectTrigger
-                  aria-label="Content type"
-                  className="h-auto min-h-0 w-fit gap-1 border-0 bg-transparent p-0 shadow-none dark:bg-transparent dark:hover:bg-transparent"
-                  size="sm"
-                >
-                  <SelectValue>
-                    {(value) =>
-                      typeof value === "string"
-                        ? formatPlanSubtypeLabel(value)
-                        : "Choose a type"
+          <div className="grid gap-6 sm:grid-cols-2">
+            <PlanField label="Intent">
+              <PlanText
+                aria-label="Intent"
+                onChange={(intent) => update({ ...draft, intent })}
+                onCommit={() => commit()}
+                placeholder="Why someone is searching for this"
+                readOnly={readOnly}
+                value={draft.intent}
+              />
+            </PlanField>
+            <PlanField label="Audience">
+              <PlanText
+                aria-label="Audience"
+                onChange={(audience) => update({ ...draft, audience })}
+                onCommit={() => commit()}
+                placeholder="Who this is for"
+                readOnly={readOnly}
+                value={draft.audience}
+              />
+            </PlanField>
+            <PlanField label="Type">
+              {readOnly ? (
+                <p>{formatPlanSubtypeLabel(draft.contentSubtype)}</p>
+              ) : (
+                <Select
+                  onValueChange={(value) => {
+                    if (
+                      typeof value !== "string" ||
+                      !isBlogPostSubtype(value)
+                    ) {
+                      return;
                     }
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent align="start">
-                  {BLOG_POST_SUBTYPES.map((subtype) => (
-                    <SelectItem key={subtype} value={subtype}>
-                      {formatPlanSubtypeLabel(subtype)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </PlanField>
-          <PlanField label="Job to be done">
-            <PlanText
-              aria-label="Job to be done"
-              onChange={(jobToBeDone) => update({ ...draft, jobToBeDone })}
-              onCommit={() => commit()}
-              placeholder="What the article should help them do"
-              readOnly={readOnly}
-              value={draft.jobToBeDone}
-            />
-          </PlanField>
-        </div>
-      </section>
+                    const next = { ...draft, contentSubtype: value };
+                    update(next);
+                    commit(next);
+                  }}
+                  value={draft.contentSubtype}
+                >
+                  <SelectTrigger
+                    aria-label="Content type"
+                    className="h-auto min-h-0 w-fit gap-1 border-0 bg-transparent p-0 shadow-none dark:bg-transparent dark:hover:bg-transparent"
+                    size="sm"
+                  >
+                    <SelectValue>
+                      {(value) =>
+                        typeof value === "string"
+                          ? formatPlanSubtypeLabel(value)
+                          : "Choose a type"
+                      }
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent align="start">
+                    {BLOG_POST_SUBTYPES.map((subtype) => (
+                      <SelectItem key={subtype} value={subtype}>
+                        {formatPlanSubtypeLabel(subtype)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </PlanField>
+            <PlanField label="Job to be done">
+              <PlanText
+                aria-label="Job to be done"
+                onChange={(jobToBeDone) => update({ ...draft, jobToBeDone })}
+                onCommit={() => commit()}
+                placeholder="What the article should help them do"
+                readOnly={readOnly}
+                value={draft.jobToBeDone}
+              />
+            </PlanField>
+          </div>
+        </section>
 
-      <section className="space-y-5">
-        <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
-          Outline
-        </h2>
-        <div className="space-y-8">
-          {draft.sections.map((section, index) => (
-            <article className="flex gap-4" key={section.id}>
-              <span
-                aria-hidden="true"
-                className="text-muted-foreground mt-0.5 w-6 shrink-0 font-mono text-xs leading-6"
-              >
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <div className="min-w-0 flex-1 space-y-2">
-                <div className="group/item flex items-start gap-1">
+        <section className="space-y-5">
+          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+            Outline
+          </h2>
+          <div className="space-y-8">
+            {draft.sections.map((section, index) => (
+              <article className="flex gap-4" key={section.id}>
+                <span
+                  aria-hidden="true"
+                  className="text-muted-foreground mt-0.5 w-6 shrink-0 font-mono text-xs leading-6"
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="group/item flex items-start gap-1">
+                    <PlanText
+                      aria-label={`Section ${index + 1} heading`}
+                      className="text-base leading-snug font-medium"
+                      onChange={(heading) =>
+                        update({
+                          ...draft,
+                          sections: replaceAt(draft.sections, index, {
+                            ...section,
+                            heading,
+                          }),
+                        })
+                      }
+                      onCommit={() => commit()}
+                      placeholder="Section heading"
+                      readOnly={readOnly}
+                      value={section.heading}
+                    />
+                    {readOnly ||
+                    draft.sections.length <= GEO_BRIEF_MIN_SECTIONS ? null : (
+                      <RemoveItemButton
+                        label={`Remove section ${index + 1}`}
+                        onClick={() =>
+                          update({
+                            ...draft,
+                            sections: removeAt(draft.sections, index),
+                          })
+                        }
+                      />
+                    )}
+                  </div>
                   <PlanText
-                    aria-label={`Section ${index + 1} heading`}
-                    className="text-base leading-snug font-medium"
-                    onChange={(heading) =>
+                    aria-label={`Section ${index + 1} goal`}
+                    className="text-muted-foreground text-sm leading-relaxed"
+                    onChange={(goal) =>
                       update({
                         ...draft,
                         sections: replaceAt(draft.sections, index, {
                           ...section,
-                          heading,
+                          goal,
                         }),
                       })
                     }
                     onCommit={() => commit()}
-                    placeholder="Section heading"
+                    placeholder="What the reader should take away"
                     readOnly={readOnly}
-                    value={section.heading}
+                    value={section.goal}
                   />
-                  {readOnly ||
-                  draft.sections.length <= GEO_BRIEF_MIN_SECTIONS ? null : (
-                    <RemoveItemButton
-                      label={`Remove section ${index + 1}`}
-                      onClick={() =>
-                        update({
-                          ...draft,
-                          sections: removeAt(draft.sections, index),
-                        })
-                      }
-                    />
-                  )}
+                  <PlanLineList
+                    addLabel={CONTENT_PLAN_POINT_ADD}
+                    itemAriaLabel={(claimIndex) =>
+                      `Section ${index + 1} point ${claimIndex + 1}`
+                    }
+                    itemClassName="text-muted-foreground text-sm leading-relaxed"
+                    items={section.claims}
+                    maxItems={GEO_BRIEF_MAX_CLAIMS}
+                    onCommit={() => commit()}
+                    onItemsChange={(claims) =>
+                      update({
+                        ...draft,
+                        sections: replaceAt(draft.sections, index, {
+                          ...section,
+                          claims,
+                        }),
+                      })
+                    }
+                    placeholder={CONTENT_PLAN_POINT_PLACEHOLDER}
+                    readOnly={readOnly}
+                    removeAriaLabel={(claimIndex) =>
+                      `Remove point ${claimIndex + 1}`
+                    }
+                    showBullet
+                  />
                 </div>
-                <PlanText
-                  aria-label={`Section ${index + 1} goal`}
-                  className="text-muted-foreground text-sm leading-relaxed"
-                  onChange={(goal) =>
-                    update({
-                      ...draft,
-                      sections: replaceAt(draft.sections, index, {
-                        ...section,
-                        goal,
-                      }),
-                    })
-                  }
-                  onCommit={() => commit()}
-                  placeholder="What the reader should take away"
-                  readOnly={readOnly}
-                  value={section.goal}
-                />
-                <PlanLineList
-                  addLabel={CONTENT_PLAN_POINT_ADD}
-                  itemAriaLabel={(claimIndex) =>
-                    `Section ${index + 1} point ${claimIndex + 1}`
-                  }
-                  itemClassName="text-muted-foreground text-sm leading-relaxed"
-                  items={section.claims}
-                  maxItems={GEO_BRIEF_MAX_CLAIMS}
-                  onCommit={() => commit()}
-                  onItemsChange={(claims) =>
-                    update({
-                      ...draft,
-                      sections: replaceAt(draft.sections, index, {
-                        ...section,
-                        claims,
-                      }),
-                    })
-                  }
-                  placeholder={CONTENT_PLAN_POINT_PLACEHOLDER}
-                  readOnly={readOnly}
-                  removeAriaLabel={(claimIndex) =>
-                    `Remove point ${claimIndex + 1}`
-                  }
-                  showBullet
-                />
-              </div>
-            </article>
-          ))}
-        </div>
-        {readOnly || draft.sections.length >= GEO_BRIEF_MAX_SECTIONS ? null : (
-          <AddItemButton
-            label="Add section"
-            onClick={() =>
-              update({
-                ...draft,
-                sections: [...draft.sections, emptyPlanSection()],
-              })
+              </article>
+            ))}
+          </div>
+          {readOnly ||
+          draft.sections.length >= GEO_BRIEF_MAX_SECTIONS ? null : (
+            <AddItemButton
+              label="Add section"
+              onClick={() =>
+                update({
+                  ...draft,
+                  sections: [...draft.sections, emptyPlanSection()],
+                })
+              }
+            />
+          )}
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+            {CONTENT_PLAN_FAQ_LABEL}
+          </h2>
+          <PlanLineList
+            addLabel={CONTENT_PLAN_FAQ_ADD}
+            itemAriaLabel={(index) => `FAQ ${index + 1}`}
+            items={draft.questionsToAnswer}
+            maxItems={GEO_BRIEF_MAX_QUESTIONS}
+            onCommit={() => commit()}
+            onItemsChange={(questionsToAnswer) =>
+              update({ ...draft, questionsToAnswer })
             }
+            placeholder={CONTENT_PLAN_FAQ_PLACEHOLDER}
+            readOnly={readOnly}
+            removeAriaLabel={(index) => `Remove question ${index + 1}`}
           />
-        )}
-      </section>
+        </section>
 
-      <section className="space-y-3">
-        <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
-          {CONTENT_PLAN_FAQ_LABEL}
-        </h2>
-        <PlanLineList
-          addLabel={CONTENT_PLAN_FAQ_ADD}
-          itemAriaLabel={(index) => `FAQ ${index + 1}`}
-          items={draft.questionsToAnswer}
-          maxItems={GEO_BRIEF_MAX_QUESTIONS}
-          onCommit={() => commit()}
-          onItemsChange={(questionsToAnswer) =>
-            update({ ...draft, questionsToAnswer })
-          }
-          placeholder={CONTENT_PLAN_FAQ_PLACEHOLDER}
-          readOnly={readOnly}
-          removeAriaLabel={(index) => `Remove question ${index + 1}`}
-        />
-      </section>
+        <section className="space-y-3">
+          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+            {CONTENT_PLAN_LINKS_LABEL}
+          </h2>
+          <PlanLinkList
+            links={draft.internalLinks}
+            onCommit={() => commit()}
+            onLinksChange={(internalLinks) =>
+              update({ ...draft, internalLinks })
+            }
+            readOnly={readOnly}
+          />
+        </section>
 
-      <section className="space-y-3">
-        <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
-          {CONTENT_PLAN_LINKS_LABEL}
-        </h2>
-        <PlanLinkList
-          links={draft.internalLinks}
-          onCommit={() => commit()}
-          onLinksChange={(internalLinks) => update({ ...draft, internalLinks })}
-          readOnly={readOnly}
-        />
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
-          {CONTENT_PLAN_CHECKS_LABEL}
-        </h2>
-        <PlanLineList
-          addLabel={CONTENT_PLAN_CHECKS_ADD}
-          itemAriaLabel={(index) => `Check ${index + 1}`}
-          items={draft.acceptanceChecklist}
-          maxItems={GEO_BRIEF_MAX_CHECKLIST}
-          onCommit={() => commit()}
-          onItemsChange={(acceptanceChecklist) =>
-            update({ ...draft, acceptanceChecklist })
-          }
-          placeholder={CONTENT_PLAN_CHECKS_PLACEHOLDER}
-          readOnly={readOnly}
-          removeAriaLabel={(index) => `Remove check ${index + 1}`}
-        />
-      </section>
-    </div>
+        <section className="space-y-3">
+          <h2 className="text-muted-foreground text-[0.6875rem] font-medium tracking-wide uppercase">
+            {CONTENT_PLAN_CHECKS_LABEL}
+          </h2>
+          <PlanLineList
+            addLabel={CONTENT_PLAN_CHECKS_ADD}
+            itemAriaLabel={(index) => `Check ${index + 1}`}
+            items={draft.acceptanceChecklist}
+            maxItems={GEO_BRIEF_MAX_CHECKLIST}
+            onCommit={() => commit()}
+            onItemsChange={(acceptanceChecklist) =>
+              update({ ...draft, acceptanceChecklist })
+            }
+            placeholder={CONTENT_PLAN_CHECKS_PLACEHOLDER}
+            readOnly={readOnly}
+            removeAriaLabel={(index) => `Remove check ${index + 1}`}
+          />
+        </section>
+      </div>
+    </LazyMotion>
   );
 }

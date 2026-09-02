@@ -56,6 +56,7 @@ import {
 } from "../utils/geo-writer-brief-markdown";
 import { geoDb } from "./effect";
 import {
+  GeoContentBriefConflictError,
   GeoContentBriefNotFoundError,
   GeoContentBriefStateError,
   GeoPromptNotFoundError,
@@ -364,48 +365,52 @@ export const updateGeoContentBrief = Effect.fn("geo.writer.briefUpdate")(
     }
 
     const markdown = geoBriefToMarkdown(brief);
-    const updatedRows = yield* geoDb("brief revise failed", () =>
-      db
-        .update(geoContentBriefs)
-        .set({
-          brief,
-          error: null,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(geoContentBriefs.organizationId, scope.organizationId),
-            eq(geoContentBriefs.projectId, scope.projectId),
-            eq(geoContentBriefs.id, input.briefId),
-            inArray(geoContentBriefs.status, [...REVISABLE_BRIEF_STATUSES])
-          )
-        )
-        .returning()
-    );
-    const updated = updatedRows.at(0);
-    if (!updated) {
-      const current = yield* requireBriefRow(scope, input.briefId);
-      return yield* Effect.fail(
-        new GeoContentBriefStateError({
-          briefId: input.briefId,
-          status: current.status,
-        })
-      );
-    }
-
-    if (!updated.postId) {
-      return toBriefDetail(updated);
-    }
-
-    const postId = updated.postId;
-    const saved = yield* Effect.tryPromise({
+    const updated = yield* Effect.tryPromise({
       try: () =>
-        updatePostRecord({
-          organizationId: scope.organizationId,
-          postId,
-          title: brief.workingTitle,
-          markdown,
-          contentSubtype: brief.contentSubtype,
+        db.transaction(async (tx) => {
+          const updatedRows = await tx
+            .update(geoContentBriefs)
+            .set({
+              brief,
+              error: null,
+              updatedAt: sql<Date>`greatest(
+                date_trunc('milliseconds', localtimestamp),
+                date_trunc('milliseconds', ${geoContentBriefs.updatedAt}) + interval '1 millisecond'
+              )`,
+            })
+            .where(
+              and(
+                eq(geoContentBriefs.organizationId, scope.organizationId),
+                eq(geoContentBriefs.projectId, scope.projectId),
+                eq(geoContentBriefs.id, input.briefId),
+                eq(
+                  sql<Date>`date_trunc('milliseconds', ${geoContentBriefs.updatedAt})`,
+                  new Date(input.expectedUpdatedAt)
+                ),
+                inArray(geoContentBriefs.status, [...REVISABLE_BRIEF_STATUSES])
+              )
+            )
+            .returning();
+          const updatedRow = updatedRows.at(0);
+          if (!updatedRow?.postId) {
+            return updatedRow;
+          }
+
+          const saved = await updatePostRecord(
+            {
+              organizationId: scope.organizationId,
+              postId: updatedRow.postId,
+              title: brief.workingTitle,
+              markdown,
+              contentSubtype: brief.contentSubtype,
+            },
+            tx
+          );
+          if (saved.status === "not_found") {
+            throw new Error("Associated draft post not found");
+          }
+
+          return updatedRow;
         }),
       catch: (cause) =>
         new GeoWriterPlanError({
@@ -413,10 +418,17 @@ export const updateGeoContentBrief = Effect.fn("geo.writer.briefUpdate")(
           cause,
         }),
     });
-    if (saved.status === "not_found") {
+    if (!updated) {
+      const current = yield* requireBriefRow(scope, input.briefId);
+      if (current.status === "draft" || current.status === "failed") {
+        return yield* Effect.fail(
+          new GeoContentBriefConflictError({ briefId: input.briefId })
+        );
+      }
       return yield* Effect.fail(
-        new GeoWriterPlanError({
-          message: "Failed to save the revised plan",
+        new GeoContentBriefStateError({
+          briefId: input.briefId,
+          status: current.status,
         })
       );
     }

@@ -20,7 +20,6 @@ const FAQ_HEADING = "faq";
 const LINKS_HEADING = "internal links";
 const CHECKLIST_HEADING = "acceptance checklist";
 const TYPE_LINE_REGEX = /^blog post\s*\(([^)]+)\)\s*$/i;
-const LINK_LINE_REGEX = /^- \[([^\]]+)\]\(([^)]+)\):\s*(.+)$/;
 const BULLET_LINE_REGEX = /^- (.+)$/;
 const HEADING_REGEX = /^##\s+(.+)$/;
 
@@ -152,16 +151,23 @@ function splitMarkdownBlocks(markdown: string): {
     headers.set(label, line.slice(separator + 1).trim());
   }
 
-  const faqIndex = headingIndexes.findIndex(
-    (item) => item.heading.toLowerCase() === FAQ_HEADING
-  );
-  const linksIndex = headingIndexes.findIndex(
-    (item) => item.heading.toLowerCase() === LINKS_HEADING
-  );
-  const checklistIndex = headingIndexes.findIndex(
+  const checklistIndex = headingIndexes.findLastIndex(
     (item) => item.heading.toLowerCase() === CHECKLIST_HEADING
   );
-  if (faqIndex < 0 || linksIndex < 0 || checklistIndex < 0) {
+  const linksIndex = headingIndexes.findLastIndex(
+    (item, index) =>
+      index < checklistIndex && item.heading.toLowerCase() === LINKS_HEADING
+  );
+  const faqIndex = headingIndexes.findLastIndex(
+    (item, index) =>
+      index < linksIndex && item.heading.toLowerCase() === FAQ_HEADING
+  );
+  if (
+    faqIndex < 0 ||
+    linksIndex !== faqIndex + 1 ||
+    checklistIndex !== linksIndex + 1 ||
+    checklistIndex !== headingIndexes.length - 1
+  ) {
     return null;
   }
 
@@ -228,16 +234,44 @@ function parseListItems(lines: string[], emptyToken: string): string[] {
 
 function parseInternalLinks(lines: string[]): GeoBriefInternalLink[] {
   return lines.flatMap((line) => {
-    const match = LINK_LINE_REGEX.exec(line.trim());
-    if (!match?.[1] || !match[2] || !match[3]) {
-      return [];
-    }
-    return [
-      {
-        anchor: match[1].trim(),
-        url: match[2].trim(),
-        why: match[3].trim(),
-      },
-    ];
+    const link = parseInternalLink(line.trim());
+    return link ? [link] : [];
   });
+}
+
+function parseInternalLink(line: string): GeoBriefInternalLink | null {
+  if (!line.startsWith("- [")) {
+    return null;
+  }
+  const anchorEnd = line.indexOf("](", 3);
+  if (anchorEnd < 0) {
+    return null;
+  }
+  const anchor = line.slice(3, anchorEnd).trim();
+  const urlStart = anchorEnd + 2;
+  let depth = 0;
+  for (let index = urlStart; index < line.length; index += 1) {
+    const character = line[index];
+    if (character === "(") {
+      depth += 1;
+      continue;
+    }
+    if (character !== ")") {
+      continue;
+    }
+    if (depth > 0) {
+      depth -= 1;
+      continue;
+    }
+    if (line[index + 1] !== ":") {
+      return null;
+    }
+    const url = line.slice(urlStart, index).trim();
+    const why = line.slice(index + 2).trim();
+    if (!(anchor && url && why)) {
+      return null;
+    }
+    return { anchor, url, why };
+  }
+  return null;
 }

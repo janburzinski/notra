@@ -1129,6 +1129,7 @@ export interface GeoWriterPlanResponse {
 
 export interface GeoWriterUpdateInput {
   briefId: string;
+  expectedUpdatedAt: string;
   markdown: string;
   workingTitle?: string;
 }

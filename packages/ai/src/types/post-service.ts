@@ -1,6 +1,9 @@
 import type { ContentType } from "@notra/ai/schemas/content";
+import type { db } from "@notra/db/drizzle";
 import type { PostSourceMetadata } from "@notra/db/schema";
 import type { BlogPostSubtype } from "@notra/db/types/content";
+
+export type PostDatabase = Pick<typeof db, "update">;
 
 export interface CreatePostRecordParams {
   organizationId: string;

@@ -29,15 +29,16 @@ export function PlanText({
         "placeholder:text-muted-foreground/70",
         "hover:bg-muted/40 focus:bg-muted/40",
         "ring-0 outline-none focus-visible:ring-0",
-        "disabled:hover:bg-transparent disabled:focus:bg-transparent",
-        "disabled:cursor-not-allowed disabled:opacity-70",
+        "read-only:hover:bg-transparent read-only:focus:bg-transparent",
+        "read-only:cursor-text read-only:opacity-70",
         className
       )}
       data-plan-id={itemId}
-      disabled={readOnly}
       maxLength={maxLength}
       onBlur={onCommit}
-      onChange={(event) => onChange(event.target.value)}
+      onChange={(event) =>
+        onChange(event.target.value.replaceAll(/\r?\n|\r/g, " "))
+      }
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           if (!onEscape) {
@@ -47,7 +48,7 @@ export function PlanText({
           onEscape();
           return;
         }
-        if (event.key !== "Enter" || event.shiftKey) {
+        if (event.key !== "Enter") {
           return;
         }
         event.preventDefault();

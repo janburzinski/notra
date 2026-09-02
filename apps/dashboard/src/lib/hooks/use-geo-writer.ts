@@ -8,6 +8,7 @@ import type {
   GeoWriterPlanInput,
 } from "@notra/geo-core/types/geo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { toast } from "sonner";
 
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
@@ -123,17 +124,26 @@ export function useGeoWriterUpdate(organizationId: string) {
   const { projectId } = useGeoProjectScope();
   const queryClient = useQueryClient();
   const invalidate = useInvalidateWriterQueries(organizationId);
+  const latestRevisionByBrief = useRef(new Map<string, string>());
   return useMutation({
-    mutationFn: (input: {
+    scope: { id: `geo-writer-update:${organizationId}:${projectId}` },
+    mutationFn: async (input: {
       briefId: string;
+      expectedUpdatedAt: string;
       markdown: string;
       workingTitle?: string;
-    }) =>
-      dashboardOrpc.geo.writerUpdate.call({
+    }) => {
+      const result = await dashboardOrpc.geo.writerUpdate.call({
         ...input,
+        expectedUpdatedAt:
+          latestRevisionByBrief.current.get(input.briefId) ??
+          input.expectedUpdatedAt,
         organizationId,
         projectId,
-      }),
+      });
+      latestRevisionByBrief.current.set(input.briefId, result.updatedAt);
+      return result;
+    },
     onSuccess: async (result) => {
       await Promise.all([
         invalidate(),

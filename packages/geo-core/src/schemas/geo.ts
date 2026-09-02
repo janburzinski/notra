@@ -407,6 +407,7 @@ export const geoWriterBriefIdInputSchema = geoOrganizationInputSchema.extend({
 });
 
 export const geoWriterUpdateInputSchema = geoWriterBriefIdInputSchema.extend({
+  expectedUpdatedAt: string().datetime(),
   markdown: string().trim().min(1).max(POST_MARKDOWN_MAX_LENGTH),
   workingTitle: string()
     .trim()
