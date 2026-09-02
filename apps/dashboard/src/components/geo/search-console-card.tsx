@@ -44,7 +44,6 @@ import {
   useGscSync,
   useGeoProjects,
 } from "@/lib/hooks/use-geo";
-import { useGscConnectionToast } from "@/lib/hooks/use-gsc-connection-toast";
 import { cn } from "@/lib/utils";
 import type {
   SearchConsoleConnectActionProps,
@@ -212,9 +211,12 @@ function PropertyPicker({
         aria-busy={selectSite.isPending}
         className={cn("w-full", selectSite.isPending && "disabled:opacity-100")}
         disabled={siteUrl.length === 0 || selectSite.isPending}
-        onClick={() =>
-          selectSite.mutate({ siteUrl }, { onSuccess: () => onSelected?.() })
-        }
+        onClick={() => {
+          void selectSite
+            .mutateAsync({ siteUrl })
+            .then(() => onSelected?.())
+            .catch(() => undefined);
+        }}
       >
         {selectSite.isPending ? <StatusSpinner /> : null}
         {selectSite.isPending ? "Connecting…" : "Connect property"}
@@ -226,11 +228,13 @@ function PropertyPicker({
 function SelectSiteState({
   organizationId,
   callbackPath,
+  onOpenChange,
+  open,
   status,
   websiteUrl,
 }: SearchConsoleSelectSiteStateProps) {
   return (
-    <ResponsiveDialog>
+    <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
       <div className="flex flex-col items-start gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-muted-foreground text-sm">
           {status.lastError ??
@@ -256,6 +260,7 @@ function SelectSiteState({
         {status.sites.length > 0 ? (
           <div className="px-4 md:px-0">
             <PropertyPicker
+              onSelected={() => onOpenChange(false)}
               organizationId={organizationId}
               sites={status.sites}
               websiteUrl={websiteUrl}
@@ -307,12 +312,13 @@ function ConnectedState({
   action,
   organizationId,
   callbackPath,
+  onPropertyPickerOpenChange,
+  propertyPickerOpen,
   status,
   websiteUrl,
 }: SearchConsoleConnectedStateProps) {
-  const [changeOpen, setChangeOpen] = useState(false);
   const sync = useGscSync(organizationId);
-  const sites = useGscSites(organizationId, changeOpen);
+  const sites = useGscSites(organizationId, propertyPickerOpen);
   const disconnect = useGscDisconnect(organizationId);
   const busy = sync.isPending || disconnect.isPending;
 
@@ -328,7 +334,7 @@ function ConnectedState({
     changeDialogBody = (
       <div className="px-4 md:px-0">
         <PropertyPicker
-          onSelected={() => setChangeOpen(false)}
+          onSelected={() => onPropertyPickerOpenChange(false)}
           organizationId={organizationId}
           sites={sites.data.sites}
           websiteUrl={websiteUrl}
@@ -408,7 +414,7 @@ function ConnectedState({
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem
                 disabled={busy}
-                onClick={() => setChangeOpen(true)}
+                onClick={() => onPropertyPickerOpenChange(true)}
               >
                 Change property
               </DropdownMenuItem>
@@ -433,7 +439,10 @@ function ConnectedState({
           {action}
         </div>
       </div>
-      <ResponsiveDialog onOpenChange={setChangeOpen} open={changeOpen}>
+      <ResponsiveDialog
+        onOpenChange={onPropertyPickerOpenChange}
+        open={propertyPickerOpen}
+      >
         <ResponsiveDialogContent className="sm:max-w-md">
           <ResponsiveDialogHeader>
             <ResponsiveDialogTitle>
@@ -456,11 +465,12 @@ export function SearchConsoleToolbar({
   callbackPath,
   isPending,
   onDismiss,
+  onPropertyPickerOpenChange,
+  propertyPickerOpen,
   status,
 }: SearchConsoleToolbarProps) {
   const headingId = useId();
   const { projectId } = useGeoProjectScope();
-  useGscConnectionToast();
   const { data: projectsData } = useGeoProjects(organizationId);
   const { data: brandData } = useBrandSettings(organizationId);
 
@@ -484,7 +494,9 @@ export function SearchConsoleToolbar({
       <ConnectedState
         action={action}
         callbackPath={callbackPath}
+        onPropertyPickerOpenChange={onPropertyPickerOpenChange}
         organizationId={organizationId}
+        propertyPickerOpen={propertyPickerOpen}
         status={status}
         websiteUrl={websiteUrl}
       />
@@ -529,7 +541,8 @@ export function SearchConsoleToolbar({
     body = (
       <SelectSiteState
         callbackPath={callbackPath}
-        key={activeProject?.id}
+        onOpenChange={onPropertyPickerOpenChange}
+        open={propertyPickerOpen}
         organizationId={organizationId}
         status={status}
         websiteUrl={websiteUrl}

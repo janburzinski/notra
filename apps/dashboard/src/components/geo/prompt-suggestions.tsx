@@ -19,6 +19,7 @@ import {
   useGscCardDismissal,
   useGscStatus,
 } from "@/lib/hooks/use-geo";
+import { useGscConnectionToast } from "@/lib/hooks/use-gsc-connection-toast";
 import type {
   PromptSuggestionsProps,
   SuggestionRowActionsProps,
@@ -94,6 +95,7 @@ export function PromptSuggestions({
   const { data } = useGeoSuggestions(organizationId);
   const { data: searchConsoleStatus, isPending: isSearchConsolePending } =
     useGscStatus(organizationId);
+  const connectionSucceeded = useGscConnectionToast();
   const { dismiss: dismissCard, dismissed } =
     useGscCardDismissal(organizationId);
   const checking = useGscAnalyzing(organizationId);
@@ -107,6 +109,8 @@ export function PromptSuggestions({
     ReadonlySet<string>
   >(() => new Set());
   const [isTrackAllQueued, setIsTrackAllQueued] = useState(false);
+  const [propertyPickerOpen, setPropertyPickerOpen] =
+    useState(connectionSucceeded);
   const pendingSuggestionRequests = useRef(new Map<string, Promise<unknown>>());
   const trackAllQueued = useRef(false);
   const suggestions = data?.suggestions ?? [];
@@ -318,7 +322,9 @@ export function PromptSuggestions({
       callbackPath={callbackPath}
       isPending={isSearchConsolePending}
       onDismiss={connectPromo ? dismissCard : undefined}
+      onPropertyPickerOpenChange={setPropertyPickerOpen}
       organizationId={organizationId}
+      propertyPickerOpen={propertyPickerOpen}
       status={searchConsoleStatus}
     />
   ) : (
