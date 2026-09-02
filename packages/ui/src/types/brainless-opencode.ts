@@ -37,9 +37,11 @@ export interface OpencodeMessageProps {
   children: React.ReactNode;
 }
 
+export type OpencodeMcpStatus = "Connected" | "Disconnected" | "Error";
+
 export interface OpencodeMcpServer {
   name: string;
-  status?: string;
+  status?: OpencodeMcpStatus;
 }
 
 export interface OpencodeSidebarProps {

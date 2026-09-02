@@ -2,7 +2,7 @@ import { OPENCODE_COLORS } from "@notra/ui/constants/brainless-opencode";
 import type { OpencodeSidebarProps } from "@notra/ui/types/brainless-opencode";
 import { cn } from "@notra/ui/lib/utils";
 
-const DEFAULT_SERVERS = [
+const DEFAULT_SERVERS: NonNullable<OpencodeSidebarProps["servers"]> = [
   { name: "notra", status: "Connected" },
   { name: "github", status: "Connected" },
   { name: "linear", status: "Connected" },
@@ -43,15 +43,28 @@ export function OpencodeSidebar({
           MCP
         </summary>
         <div className="mt-1 space-y-0.5">
-          {servers.map((server) => (
-            <div className="flex min-w-0 items-baseline gap-2" key={server.name}>
-              <span aria-hidden style={{ color: OPENCODE_COLORS.green }}>•</span>
-              <span className="truncate">{server.name}</span>
-              <span className="truncate" style={{ color: OPENCODE_COLORS.muted }}>
-                {server.status ?? "Connected"}
-              </span>
-            </div>
-          ))}
+          {servers.map((server) => {
+            const status = server.status ?? "Connected";
+            let indicatorColor: string = OPENCODE_COLORS.muted;
+
+            if (status === "Connected") {
+              indicatorColor = OPENCODE_COLORS.green;
+            } else if (status === "Error") {
+              indicatorColor = OPENCODE_COLORS.orange;
+            }
+
+            return (
+              <div className="flex min-w-0 items-baseline gap-2" key={server.name}>
+                <span aria-hidden style={{ color: indicatorColor }}>
+                  •
+                </span>
+                <span className="truncate">{server.name}</span>
+                <span className="truncate" style={{ color: OPENCODE_COLORS.muted }}>
+                  {status}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </details>
 
