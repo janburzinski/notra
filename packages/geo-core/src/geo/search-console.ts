@@ -98,9 +98,6 @@ export async function syncGscSuggestions(
       if (!currentIntegration) {
         return null;
       }
-      if (outcome.suggestions.length === 0) {
-        return 0;
-      }
 
       await tx
         .delete(geoPromptSuggestions)
@@ -110,6 +107,10 @@ export async function syncGscSuggestions(
             eq(geoPromptSuggestions.status, "pending")
           )
         );
+      if (outcome.suggestions.length === 0) {
+        return 0;
+      }
+
       const inserted = await tx
         .insert(geoPromptSuggestions)
         .values(outcome.suggestions)
