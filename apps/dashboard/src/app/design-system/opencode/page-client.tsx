@@ -100,7 +100,10 @@ export function DesignSystemOpencodeCatalog() {
         <OpencodeSurface>
           <div className="flex min-h-[28rem] flex-col px-5 py-6">
             <div className="m-auto w-full max-w-xl">
-              <OpencodeLogo className="mx-auto mb-10" scale={1.8} />
+              <OpencodeLogo
+                className="mx-auto mb-10 h-auto max-w-full"
+                scale={1.8}
+              />
               <OpencodeComposer />
               <div
                 className="mt-16 text-center text-[11px]"

@@ -1,6 +1,7 @@
 import { OPENCODE_COLORS } from "@notra/ui/constants/brainless-opencode";
 import type { OpencodeSidebarProps } from "@notra/ui/types/brainless-opencode";
 import { cn } from "@notra/ui/lib/utils";
+import type { CSSProperties } from "react";
 
 const DEFAULT_SERVERS: NonNullable<OpencodeSidebarProps["servers"]> = [
   { name: "notra", status: "Connected" },
@@ -33,7 +34,10 @@ export function OpencodeSidebar({
       <div style={{ color: OPENCODE_COLORS.muted }}>{spent}</div>
 
       <details className="group mt-5" open>
-        <summary className="flex cursor-pointer list-none items-center gap-2 font-semibold outline-none focus-visible:ring-1 focus-visible:ring-[#8256d6]/60 [&::-webkit-details-marker]:hidden">
+        <summary
+          className="flex cursor-pointer list-none items-center gap-2 font-semibold outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--opencode-purple)]/60 [&::-webkit-details-marker]:hidden"
+          style={{ "--opencode-purple": OPENCODE_COLORS.purple } as CSSProperties}
+        >
           <span
             aria-hidden
             className="inline-block text-[8px] transition-transform group-open:rotate-90"
