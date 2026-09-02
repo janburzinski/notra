@@ -15,6 +15,7 @@ import {
   GSC_OAUTH_TOKEN_URL,
   GSC_SEARCH_ANALYTICS_BASE_URL,
   GSC_SITES_URL,
+  GSC_TOKEN_REVOKE_TIMEOUT_MS,
   GSC_USERINFO_URL,
   MS_PER_DAY,
   REAUTH_ERROR_CODES,
@@ -256,9 +257,9 @@ export async function upsertGscIntegration(
     };
   });
 
-  // The schedule targets the organization and remains valid across Google
-  // account changes. Only token revocation is account-specific, and it must not
-  // hold a database connection or the organization advisory lock.
+  // The OAuth callback keeps its organization lock through revocation so a
+  // later callback cannot mint or install a replacement grant in parallel.
+  // The database transaction is already committed and its connection freed.
   if (integrationToRevoke) {
     await revokeGscToken(integrationToRevoke);
   }
@@ -390,6 +391,7 @@ export async function revokeGscToken(integration: GscIntegrationRow) {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ token: refreshToken }),
+      signal: AbortSignal.timeout(GSC_TOKEN_REVOKE_TIMEOUT_MS),
     });
   } catch (error) {
     console.error("[GSC] Failed to revoke Google token:", error);

@@ -13,6 +13,7 @@ import {
   deleteQstashSchedule,
 } from "@notra/ai/qstash/triggers";
 import type { GscIntegrationRow } from "@notra/ai/types/google-search-console";
+import { withGscIntegrationLock } from "@notra/ai/utils/gsc-integration-lock";
 import { db } from "@notra/db/drizzle";
 import {
   geoAgentReadinessReports,
@@ -330,56 +331,67 @@ async function runGscSyncOrBadRequest(
 async function ensureGscSchedule(
   integration: GscIntegrationRow
 ): Promise<string | null> {
-  if (integration.qstashScheduleId) {
-    return integration.qstashScheduleId;
-  }
-  const scheduleId = `${GSC_SCHEDULE_ID_PREFIX}${integration.organizationId}`;
-  try {
-    // QStash overwrites an existing custom id. Retrying this deterministic,
-    // organization-scoped schedule can therefore never create duplicates.
-    await createQstashRouteSchedule({
-      path: GSC_SYNC_WORKFLOW_PATH,
-      cron: GSC_SYNC_CRON,
-      body: { organizationId: integration.organizationId },
-      scheduleId,
-    });
-  } catch (error) {
-    console.error("[GSC] Failed to create weekly sync schedule:", error);
-    return null;
-  }
-
-  let claimed: GscIntegrationRow | null = null;
-  try {
-    claimed = await claimOrConfirmGscSchedule(integration, scheduleId);
-  } catch (error) {
-    console.error(
-      "[GSC] Failed to record weekly sync schedule; retrying:",
-      error
-    );
-    try {
-      // The first write may have committed before surfacing an error. This
-      // idempotent retry confirms that exact id without relying on stale fields.
-      claimed = await claimOrConfirmGscSchedule(integration, scheduleId);
-    } catch (retryError) {
-      console.error("[GSC] Failed to record weekly sync schedule:", retryError);
+  return await withGscIntegrationLock(integration.organizationId, async () => {
+    if (integration.qstashScheduleId) {
+      return integration.qstashScheduleId;
     }
-  }
+    const scheduleId = `${GSC_SCHEDULE_ID_PREFIX}${integration.organizationId}`;
+    try {
+      // QStash overwrites an existing custom id. Retrying this deterministic,
+      // organization-scoped schedule can therefore never create duplicates.
+      await createQstashRouteSchedule({
+        path: GSC_SYNC_WORKFLOW_PATH,
+        cron: GSC_SYNC_CRON,
+        body: { organizationId: integration.organizationId },
+        scheduleId,
+      });
+    } catch (error) {
+      console.error("[GSC] Failed to create weekly sync schedule:", error);
+      return null;
+    }
 
-  if (claimed) {
-    return scheduleId;
-  }
+    let claimed: GscIntegrationRow | null = null;
+    try {
+      claimed = await claimOrConfirmGscSchedule(integration, scheduleId);
+    } catch (error) {
+      console.error(
+        "[GSC] Failed to record weekly sync schedule; retrying:",
+        error
+      );
+      try {
+        // The first write may have committed before surfacing an error. This
+        // idempotent retry confirms that exact id without relying on stale fields.
+        claimed = await claimOrConfirmGscSchedule(integration, scheduleId);
+      } catch (retryError) {
+        console.error(
+          "[GSC] Failed to record weekly sync schedule:",
+          retryError
+        );
+      }
+    }
 
-  try {
-    const currentIntegration = await getGscIntegration(
-      integration.organizationId
-    );
-    return currentIntegration?.qstashScheduleId ?? null;
-  } catch (error) {
-    // The deterministic id remains recoverable: the next ensure attempt
-    // overwrites the same QStash schedule instead of creating a duplicate.
-    console.error("[GSC] Failed to reconcile weekly sync schedule:", error);
-    return null;
-  }
+    if (claimed) {
+      return scheduleId;
+    }
+
+    try {
+      const currentIntegration = await getGscIntegration(
+        integration.organizationId
+      );
+      if (currentIntegration?.qstashScheduleId === scheduleId) {
+        return scheduleId;
+      }
+      // Reconnect, disconnect, and schedule creation all take the same lock,
+      // so no newer integration can claim this candidate before it is removed.
+      await removeGscSchedule(scheduleId);
+      return currentIntegration?.qstashScheduleId ?? null;
+    } catch (error) {
+      // The deterministic id remains recoverable: the next ensure attempt
+      // overwrites the same QStash schedule instead of creating a duplicate.
+      console.error("[GSC] Failed to reconcile weekly sync schedule:", error);
+      return null;
+    }
+  });
 }
 
 async function removeGscSchedule(scheduleId: string | null) {
@@ -1384,14 +1396,23 @@ export const geoRouter = {
         user: context.user,
       });
 
-      const integration = await deleteGscIntegration(input.organizationId);
+      const integration = await withGscIntegrationLock(
+        input.organizationId,
+        async () => {
+          const deleted = await deleteGscIntegration(input.organizationId);
+          if (!deleted) {
+            return null;
+          }
+          await Promise.all([
+            removeGscSchedule(deleted.qstashScheduleId),
+            revokeGscToken(deleted),
+          ]);
+          return deleted;
+        }
+      );
       if (!integration) {
         return { disconnected: false };
       }
-      await Promise.all([
-        removeGscSchedule(integration.qstashScheduleId),
-        revokeGscToken(integration),
-      ]);
       trackGeoRouterEvent({
         context,
         input,

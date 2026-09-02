@@ -4,6 +4,7 @@ import {
   getGscOAuthCredentials,
   upsertGscIntegration,
 } from "@notra/ai/integrations/google-search-console";
+import { withGscIntegrationLock } from "@notra/ai/utils/gsc-integration-lock";
 import { redis } from "@notra/ai/utils/redis";
 import {
   GSC_OAUTH_CALLBACK_PATH,
@@ -136,17 +137,44 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let tokens: Awaited<ReturnType<typeof exchangeGscAuthorizationCode>>;
-    try {
-      tokens = await exchangeGscAuthorizationCode({
-        code,
-        redirectUri: getGscRedirectUri(baseUrl),
-      });
-    } catch (exchangeError) {
-      console.error(
-        "Google Search Console token exchange failed:",
-        exchangeError
-      );
+    const connectResult = await withGscIntegrationLock(
+      oauthState.organizationId,
+      async () => {
+        let tokens: Awaited<ReturnType<typeof exchangeGscAuthorizationCode>>;
+        try {
+          tokens = await exchangeGscAuthorizationCode({
+            code,
+            redirectUri: getGscRedirectUri(baseUrl),
+          });
+        } catch (exchangeError) {
+          console.error(
+            "Google Search Console token exchange failed:",
+            exchangeError
+          );
+          return "token_exchange_failed" as const;
+        }
+
+        if (!tokens.refreshToken) {
+          return "missing_refresh_token" as const;
+        }
+
+        const googleAccountEmail = await fetchGscAccountEmail(
+          tokens.accessToken
+        );
+
+        await upsertGscIntegration({
+          organizationId: oauthState.organizationId,
+          userId: oauthState.userId,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          expiresAt: tokens.expiresAt,
+          googleAccountEmail,
+        });
+        return "connected" as const;
+      }
+    );
+
+    if (connectResult === "token_exchange_failed") {
       await restoreOAuthState();
       return NextResponse.redirect(
         buildCallbackUrl(baseUrl, callbackPath, {
@@ -155,24 +183,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!tokens.refreshToken) {
+    if (connectResult === "missing_refresh_token") {
       return NextResponse.redirect(
         buildCallbackUrl(baseUrl, callbackPath, {
           error: "gsc_missing_refresh_token",
         })
       );
     }
-
-    const googleAccountEmail = await fetchGscAccountEmail(tokens.accessToken);
-
-    await upsertGscIntegration({
-      organizationId: oauthState.organizationId,
-      userId: oauthState.userId,
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      expiresAt: tokens.expiresAt,
-      googleAccountEmail,
-    });
 
     return NextResponse.redirect(
       buildCallbackUrl(baseUrl, callbackPath, { gscConnected: "true" })
