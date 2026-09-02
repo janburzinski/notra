@@ -58,7 +58,7 @@ export function ApiKeyPermissionSelector({
           const nextMode = mode as ApiKeyAccessMode;
           onAccessModeChange(
             nextMode,
-            getApiKeyScopesForAccessMode(nextMode, accessMode, value)
+            getApiKeyScopesForAccessMode(nextMode, value)
           );
         }}
         value={accessMode}
