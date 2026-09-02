@@ -43,6 +43,11 @@ export interface GscSyncResult {
   reason?: string;
 }
 
+export interface GscSuggestionSyncOptions {
+  siteUrl: string;
+  qstashScheduleId: string | null;
+}
+
 export interface GscSuggestionSyncOutcome {
   result: GscSyncResult;
   suggestions: (typeof geoPromptSuggestions.$inferInsert)[];

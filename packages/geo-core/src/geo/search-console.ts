@@ -34,6 +34,7 @@ import { geoSearchConsoleSuggestionSchema } from "../schemas/google-search-conso
 import type {
   GscSuggestionGenerationParams,
   GscSuggestionSyncOutcome,
+  GscSuggestionSyncOptions,
   GscSyncResult,
 } from "../types/google-search-console";
 import {
@@ -70,13 +71,15 @@ function toStoredSyncError(error: unknown): string {
 }
 
 export async function syncGscSuggestions(
-  organizationId: string
+  organizationId: string,
+  options?: GscSuggestionSyncOptions
 ): Promise<GscSyncResult> {
   const integration = await getGscIntegration(organizationId);
   if (!integration) {
     return { status: "skipped", reason: "not_connected" };
   }
-  if (!integration.siteUrl) {
+  const siteUrl = options?.siteUrl ?? integration.siteUrl;
+  if (!siteUrl) {
     return { status: "skipped", reason: "no_site_selected" };
   }
   if (integration.status === "reauth_required") {
@@ -84,7 +87,7 @@ export async function syncGscSuggestions(
   }
 
   try {
-    const outcome = await runSync(integration, integration.siteUrl);
+    const outcome = await runSync(integration, siteUrl);
     const suggestionsAdded = await db.transaction(async (tx) => {
       const currentIntegration = await updateGscIntegrationIfUnchanged(
         integration,
@@ -92,6 +95,12 @@ export async function syncGscSuggestions(
           lastSyncedAt: new Date(),
           lastError: null,
           topQueries: outcome.topQueries,
+          ...(options
+            ? {
+                siteUrl: options.siteUrl,
+                qstashScheduleId: options.qstashScheduleId,
+              }
+            : {}),
         },
         tx
       );
@@ -124,7 +133,7 @@ export async function syncGscSuggestions(
     return { ...outcome.result, suggestionsAdded };
   } catch (error) {
     console.error("[GSC] Sync failed:", error);
-    if (!(error instanceof GscReauthRequiredError)) {
+    if (!(error instanceof GscReauthRequiredError) && !options) {
       await updateGscIntegrationIfUnchanged(integration, {
         lastError: toStoredSyncError(error),
       });

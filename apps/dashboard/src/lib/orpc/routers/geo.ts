@@ -7,6 +7,7 @@ import {
   listGscSites,
   revokeGscToken,
   updateGscIntegration,
+  updateGscIntegrationIfUnchanged,
 } from "@notra/ai/integrations/google-search-console";
 import {
   createQstashRouteSchedule,
@@ -165,6 +166,7 @@ import type {
   GeoSearchConsoleStatus,
   GscKeywordsResponse,
   GscSitesResponse,
+  GscSuggestionSyncOptions,
   GscSyncResult,
 } from "@notra/geo-core/types/google-search-console";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
@@ -312,10 +314,11 @@ async function runAgentReadinessOrBadRequest<T>(
 }
 
 async function runGscSyncOrBadRequest(
-  organizationId: string
+  organizationId: string,
+  options?: GscSuggestionSyncOptions
 ): Promise<GscSyncResult> {
   try {
-    return await syncGscSuggestions(organizationId);
+    return await syncGscSuggestions(organizationId, options);
   } catch (error) {
     throw badRequest(
       toGscErrorMessage(error, "Failed to sync Search Console keywords")
@@ -1266,55 +1269,72 @@ export const geoRouter = {
         integration.qstashScheduleId
       );
 
-      const updated = await updateGscIntegration(input.organizationId, {
-        siteUrl: input.siteUrl,
+      const updated = await updateGscIntegrationIfUnchanged(integration, {
         qstashScheduleId: scheduleId,
         lastError: null,
       });
       if (!updated) {
-        // The row vanished mid-flight; do not leave the schedule behind.
-        await removeGscSchedule(scheduleId);
+        const currentIntegration = await getGscIntegration(
+          input.organizationId
+        );
+        if (currentIntegration?.qstashScheduleId !== scheduleId) {
+          await removeGscSchedule(scheduleId);
+        }
         throw notFound("Google Search Console is not connected");
       }
 
+      let synced: GscSyncResult;
       try {
-        const synced = await runGscSyncOrBadRequest(input.organizationId);
-        trackGeoRouterEvent({
-          context,
-          input,
-          event: POSTHOG_EVENTS.GSC_SITE_SELECTED,
-          properties: {
-            sync_status: synced.status,
-            keywords: synced.keywords ?? 0,
-            suggestions_created: synced.suggestionsAdded ?? 0,
-            weekly_sync_scheduled: scheduleId !== null,
-          },
+        synced = await runGscSyncOrBadRequest(input.organizationId, {
+          siteUrl: input.siteUrl,
+          qstashScheduleId: scheduleId,
         });
-        return synced;
+        if (synced.status !== "completed") {
+          throw badRequest(
+            "Search Console changed before the property could be connected"
+          );
+        }
       } catch (error) {
         console.error(
           "[GSC] Initial sync failed after selecting property:",
           error
         );
+        let restored = false;
         try {
-          // Keep authentication changes made while refreshing the token, but
-          // restore the selection state this request replaced.
-          await updateGscIntegration(input.organizationId, {
-            siteUrl: integration.siteUrl,
-            qstashScheduleId: integration.qstashScheduleId,
-            lastError: integration.lastError,
-          });
+          restored = Boolean(
+            await updateGscIntegrationIfUnchanged(updated, {
+              qstashScheduleId: integration.qstashScheduleId,
+              lastError: integration.lastError,
+            })
+          );
         } catch (rollbackError) {
           console.error(
             "[GSC] Failed to restore integration after initial sync:",
             rollbackError
           );
         }
-        if (scheduleId && scheduleId !== integration.qstashScheduleId) {
+        if (
+          restored &&
+          scheduleId &&
+          scheduleId !== integration.qstashScheduleId
+        ) {
           await removeGscSchedule(scheduleId);
         }
         throw error;
       }
+
+      trackGeoRouterEvent({
+        context,
+        input,
+        event: POSTHOG_EVENTS.GSC_SITE_SELECTED,
+        properties: {
+          sync_status: synced.status,
+          keywords: synced.keywords ?? 0,
+          suggestions_created: synced.suggestionsAdded ?? 0,
+          weekly_sync_scheduled: scheduleId !== null,
+        },
+      });
+      return synced;
     }),
   searchConsoleSync: authorizedProcedure
     .input(geoOrganizationInputSchema)
