@@ -333,10 +333,11 @@ async function ensureGscSchedule(
   if (integration.qstashScheduleId) {
     return integration.qstashScheduleId;
   }
+  let scheduleId: string | null = null;
   try {
     // Deterministic id: a retry (or a row that never recorded the id) reuses the
     // same schedule instead of leaving an orphan firing every week.
-    const scheduleId = await createQstashRouteSchedule({
+    scheduleId = await createQstashRouteSchedule({
       path: GSC_SYNC_WORKFLOW_PATH,
       cron: GSC_SYNC_CRON,
       body: { organizationId: integration.organizationId },
@@ -357,6 +358,7 @@ async function ensureGscSchedule(
     }
     return currentIntegration?.qstashScheduleId ?? null;
   } catch (error) {
+    await removeGscSchedule(scheduleId);
     console.error("[GSC] Failed to ensure weekly sync schedule:", error);
     return null;
   }

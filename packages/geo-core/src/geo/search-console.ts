@@ -129,8 +129,17 @@ export async function selectGscSiteAndSyncSuggestions(
     return { status: "skipped", reason: "reauth_required" };
   }
 
-  const outcome = await runSync(integration, siteUrl);
-  return await commitGscSuggestionSync(integration, outcome, { siteUrl });
+  try {
+    const outcome = await runSync(integration, siteUrl);
+    return await commitGscSuggestionSync(integration, outcome, { siteUrl });
+  } catch (error) {
+    if (!(error instanceof GscReauthRequiredError)) {
+      await updateGscIntegrationIfUnchanged(integration, {
+        lastError: toStoredSyncError(error),
+      });
+    }
+    throw error;
+  }
 }
 
 export async function syncGscSuggestions(
