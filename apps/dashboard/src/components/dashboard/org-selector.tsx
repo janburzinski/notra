@@ -272,7 +272,12 @@ export function OrgSelector() {
   const queryClient = useQueryClient();
   const { isMobile, state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const dropdownSide = isMobile ? "bottom" : isCollapsed ? "right" : "top";
+  let dropdownSide: "bottom" | "right" | "top" = "top";
+  if (isMobile) {
+    dropdownSide = "bottom";
+  } else if (isCollapsed) {
+    dropdownSide = "right";
+  }
   const { setTheme, resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");

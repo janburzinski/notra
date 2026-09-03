@@ -252,9 +252,14 @@ export function buildDataPointRestrictionInstructions(dataPoints: {
     return null;
   }
 
-  return instructions.length === restrictions.length
-    ? `Strict data-point restrictions:\n${restrictions.join("\n")}`
-    : restrictions.length > 0
-      ? `Strict data-point restrictions:\n${restrictions.join("\n")}\n\nCross-source instructions:\n${instructions.filter((i) => !restrictions.includes(i)).join("\n")}`
-      : `Cross-source instructions:\n${instructions.filter((i) => !restrictions.includes(i)).join("\n")}`;
+  if (instructions.length === restrictions.length) {
+    return `Strict data-point restrictions:\n${restrictions.join("\n")}`;
+  }
+
+  const crossSourceInstructions = instructions.slice(restrictions.length);
+  if (restrictions.length > 0) {
+    return `Strict data-point restrictions:\n${restrictions.join("\n")}\n\nCross-source instructions:\n${crossSourceInstructions.join("\n")}`;
+  }
+
+  return `Cross-source instructions:\n${crossSourceInstructions.join("\n")}`;
 }

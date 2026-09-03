@@ -390,12 +390,12 @@ function EngineFamilySheetSession({
     useState<WriteDialogInitialState | null>(null);
   const { projectId } = useGeoProjectScope();
   const { getOrganization, activeOrganization } = useOrganizationsContext();
-  const organization =
-    organizationSlug && activeOrganization?.slug === organizationSlug
-      ? activeOrganization
-      : organizationSlug
-        ? getOrganization(organizationSlug)
-        : null;
+  let organization = null;
+  if (organizationSlug && activeOrganization?.slug === organizationSlug) {
+    organization = activeOrganization;
+  } else if (organizationSlug) {
+    organization = getOrganization(organizationSlug);
+  }
   const organizationId = organization?.id ?? "";
   const canWrite = Boolean(organizationSlug) && Boolean(organizationId);
   const name = engineFamilyLabel(family.family);

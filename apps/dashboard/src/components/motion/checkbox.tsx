@@ -36,6 +36,12 @@ export function Checkbox({
   const reduce = useReducedMotion();
   const showMark = checked || indeterminate;
   const path = indeterminate ? INDETERMINATE_PATH : CHECK_PATH;
+  let state = "unchecked";
+  if (checked) {
+    state = "checked";
+  } else if (indeterminate) {
+    state = "indeterminate";
+  }
 
   return (
     <label
@@ -57,9 +63,7 @@ export function Checkbox({
             ? "border-primary bg-primary text-primary-foreground"
             : "border-muted-foreground/50 bg-background hover:border-muted-foreground"
         )}
-        data-state={
-          checked ? "checked" : indeterminate ? "indeterminate" : "unchecked"
-        }
+        data-state={state}
         disabled={disabled}
         id={id}
         onClick={() => !disabled && onCheckedChange(!checked)}

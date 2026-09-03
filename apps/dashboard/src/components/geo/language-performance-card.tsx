@@ -184,24 +184,29 @@ function languagePerformanceColumns({
       key: "trend",
       header: "Trend",
       width: "7.5rem",
-      cell: (row) =>
-        row.kind === "suggested" ? (
-          <LanguageAddButton
-            disabled={adding || atLimit}
-            language={row.language}
-            limitReached={atLimit}
-            onAdd={onAddLanguage}
-            pending={pendingLanguage === row.language}
-          />
-        ) : (row.trend?.length ?? 0) >= GEO_SPARKLINE_MIN_POINTS ? (
-          <GeoRateSparkline
-            className="text-geo-search"
-            label={`${row.language} mention rate trend`}
-            points={row.trend ?? []}
-          />
-        ) : (
-          <span className="text-muted-foreground text-xs">-</span>
-        ),
+      cell: (row) => {
+        if (row.kind === "suggested") {
+          return (
+            <LanguageAddButton
+              disabled={adding || atLimit}
+              language={row.language}
+              limitReached={atLimit}
+              onAdd={onAddLanguage}
+              pending={pendingLanguage === row.language}
+            />
+          );
+        }
+        if ((row.trend?.length ?? 0) >= GEO_SPARKLINE_MIN_POINTS) {
+          return (
+            <GeoRateSparkline
+              className="text-geo-search"
+              label={`${row.language} mention rate trend`}
+              points={row.trend ?? []}
+            />
+          );
+        }
+        return <span className="text-muted-foreground text-xs">-</span>;
+      },
     },
   ];
 }

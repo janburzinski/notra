@@ -149,11 +149,12 @@ function deriveCategory(
   if (isAFor?.[1] && isAFor[2]) {
     const useCase = cleanPhrase(isAFor[2]);
     const typePhrase = nounPhraseFromType(isAFor[1]);
-    const preferred = GERUND_REGEX.test(useCase)
-      ? useCase
-      : AUDIENCE_LIKE_REGEX.test(useCase)
-        ? typePhrase
-        : typePhrase || useCase;
+    let preferred = typePhrase || useCase;
+    if (GERUND_REGEX.test(useCase)) {
+      preferred = useCase;
+    } else if (AUDIENCE_LIKE_REGEX.test(useCase)) {
+      preferred = typePhrase;
+    }
     const category = finalizeCategory(preferred, brandTerms);
     if (category) {
       return category;

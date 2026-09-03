@@ -543,19 +543,22 @@ export function ChatInputAdvanced({
     [handleFilesSelected]
   );
 
+  const cleanupUnsubmittedAttachments = useCallback(() => {
+    for (const attachment of attachmentsRef.current) {
+      if (submittedKeysRef.current.has(attachment.key)) {
+        continue;
+      }
+      cleanupChatUpload(attachment.key).catch(() => undefined);
+    }
+  }, [cleanupChatUpload]);
+
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
-
-      for (const attachment of attachmentsRef.current) {
-        if (submittedKeysRef.current.has(attachment.key)) {
-          continue;
-        }
-        cleanupChatUpload(attachment.key).catch(() => undefined);
-      }
+      cleanupUnsubmittedAttachments();
     };
-  }, [cleanupChatUpload]);
+  }, [cleanupUnsubmittedAttachments]);
 
   const onEmptyChangeRef = useRef(onEmptyChange);
 
@@ -2072,17 +2075,17 @@ export function ChatInputAdvanced({
                     <HugeiconsIcon className="size-4" icon={StopIcon} />
                   );
                 }
+                let sendLabel = "Send message";
+                if (isLoading && isEmpty) {
+                  sendLabel = "Stop generating";
+                } else if (canQueue) {
+                  sendLabel = "Queue message";
+                }
                 return (
                   <Composer.Send
                     busy={sendBusy}
                     disabled={submitDisabled}
-                    label={
-                      isLoading && isEmpty
-                        ? "Stop generating"
-                        : canQueue
-                          ? "Queue message"
-                          : "Send message"
-                    }
+                    label={sendLabel}
                     onClick={submitOnClick}
                     tooltip={getSubmitTooltipText({
                       canQueue,

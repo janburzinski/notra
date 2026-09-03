@@ -74,19 +74,13 @@ function PromptSentimentLabel({ sentiment }: PromptSentimentLabelProps) {
   if (!label) {
     return <span className="text-muted-foreground text-xs">-</span>;
   }
-  return (
-    <span
-      className={
-        sentiment === "positive"
-          ? "text-geo-up text-xs"
-          : sentiment === "negative"
-            ? "text-geo-down text-xs"
-            : "text-muted-foreground text-xs"
-      }
-    >
-      {label}
-    </span>
-  );
+  let className = "text-muted-foreground text-xs";
+  if (sentiment === "positive") {
+    className = "text-geo-up text-xs";
+  } else if (sentiment === "negative") {
+    className = "text-geo-down text-xs";
+  }
+  return <span className={className}>{label}</span>;
 }
 
 function PromptCopyCell({ row }: { row: GeoPromptSummary }) {

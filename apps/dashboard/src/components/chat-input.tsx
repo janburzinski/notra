@@ -298,6 +298,12 @@ const ChatInput = ({
     sendTooltip =
       "Enter to queue this message. It will send once the AI finishes.";
   }
+  let sendLabel = "Send message";
+  if (showStop) {
+    sendLabel = "Stop generating";
+  } else if (canQueue) {
+    sendLabel = "Queue message";
+  }
 
   return (
     <Composer.Frame
@@ -483,13 +489,7 @@ const ChatInput = ({
         />
         <Composer.Send
           disabled={isInputLocked || (!showStop && isEmpty)}
-          label={
-            showStop
-              ? "Stop generating"
-              : canQueue
-                ? "Queue message"
-                : "Send message"
-          }
+          label={sendLabel}
           onClick={showStop ? onStop : handleSend}
           tooltip={sendTooltip}
         >

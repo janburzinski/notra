@@ -245,13 +245,16 @@ function GapsEmpty({
 }: GeoGapsEmptyProps) {
   const { projectId } = useGeoProjectScope();
   const copy = GEO_GAPS_EMPTY[kind];
-  const action =
-    kind === "no-scan" ? (
+  let action = null;
+  if (kind === "no-scan") {
+    action = (
       <Button disabled={isScanning} onClick={onRunScan}>
         {isScanning ? <StatusSpinner /> : null}
         {GEO_GAPS_EMPTY["no-scan"].action}
       </Button>
-    ) : kind === "no-search-gaps" ? (
+    );
+  } else if (kind === "no-search-gaps") {
+    action = (
       <Button
         nativeButton={false}
         render={
@@ -265,7 +268,8 @@ function GapsEmpty({
       >
         {GEO_GAPS_EMPTY["no-search-gaps"].action}
       </Button>
-    ) : null;
+    );
+  }
 
   return (
     <EmptyState

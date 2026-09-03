@@ -1358,7 +1358,7 @@ function StandaloneChatPageClient({
         : [];
       await resendFromUserMessage(userMessageId, newText, attachments);
     },
-    [extractUserMessageContent, resendFromUserMessage]
+    [extractUserMessageContent, resendFromUserMessage, stableChatId]
   );
 
   const handleRetryMessage = useCallback(

@@ -209,34 +209,36 @@ export function ContentChatActivityPanel({
                 <p className="text-muted-foreground px-2 py-1.5 text-center text-xs">
                   Loading chats...
                 </p>
-              ) : sessions.length === 0 ? (
+              ) : null}
+              {!isHistoryLoading && sessions.length === 0 ? (
                 <p className="text-muted-foreground px-2 py-1.5 text-center text-xs">
                   No previous chats
                 </p>
-              ) : (
-                historyGroups.map((group, groupIndex) => (
-                  <Fragment key={group.label}>
-                    {groupIndex > 0 ? <DropdownMenuSeparator /> : null}
-                    <DropdownMenuGroup>
-                      <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
-                      {group.sessions.map((session) => (
-                        <DropdownMenuItem
-                          className="data-[active=true]:bg-accent/70"
-                          data-active={activeChatId === session.chatId}
-                          disabled={isAgentBusy}
-                          key={session.chatId}
-                          onClick={() => onSelectChat(session.chatId)}
-                          title={session.title}
-                        >
-                          <span className="min-w-0 flex-1 truncate">
-                            {session.title}
-                          </span>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuGroup>
-                  </Fragment>
-                ))
-              )}
+              ) : null}
+              {!isHistoryLoading && sessions.length > 0
+                ? historyGroups.map((group, groupIndex) => (
+                    <Fragment key={group.label}>
+                      {groupIndex > 0 ? <DropdownMenuSeparator /> : null}
+                      <DropdownMenuGroup>
+                        <DropdownMenuLabel>{group.label}</DropdownMenuLabel>
+                        {group.sessions.map((session) => (
+                          <DropdownMenuItem
+                            className="data-[active=true]:bg-accent/70"
+                            data-active={activeChatId === session.chatId}
+                            disabled={isAgentBusy}
+                            key={session.chatId}
+                            onClick={() => onSelectChat(session.chatId)}
+                            title={session.title}
+                          >
+                            <span className="min-w-0 flex-1 truncate">
+                              {session.title}
+                            </span>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuGroup>
+                    </Fragment>
+                  ))
+                : null}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="gap-2"

@@ -89,10 +89,10 @@ function BillingPageContent() {
   const [now] = useState(() => Date.now());
   const invoiceListId = useId();
 
-  const invoices = customer?.invoices ?? [];
+  const invoices = customer?.invoices;
 
   const sortedInvoices = useMemo(() => {
-    return [...invoices].sort((a, b) => {
+    return [...(invoices ?? [])].sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateSortOrder === "desc" ? dateB - dateA : dateA - dateB;
