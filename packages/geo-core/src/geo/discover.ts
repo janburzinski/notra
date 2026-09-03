@@ -283,6 +283,14 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
       entries.push({ prompt: trimmed, title: title.length > 0 ? title : null });
     }
 
+    if (entries.length === 0) {
+      return yield* Effect.fail(
+        new GeoDiscoveryError({
+          message: "Website analysis did not produce any usable prompts",
+        })
+      );
+    }
+
     const inserted = yield* insertGeoPrompts(
       { organizationId, projectId },
       entries

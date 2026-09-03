@@ -42,7 +42,7 @@ export const requireBrandIdentity = Effect.fn("geo.requireBrandIdentity")(
   function* (organizationId: string, brandSettingsId: string) {
     const identity = yield* geoDb("brand identity lookup failed", () =>
       db.query.brandSettings.findFirst({
-        columns: { id: true },
+        columns: { id: true, websiteUrl: true },
         where: and(
           eq(brandSettings.id, brandSettingsId),
           eq(brandSettings.organizationId, organizationId)
@@ -56,7 +56,7 @@ export const requireBrandIdentity = Effect.fn("geo.requireBrandIdentity")(
       );
     }
 
-    return identity.id;
+    return identity;
   }
 );
 
@@ -100,7 +100,7 @@ export const createGeoProject = Effect.fn("geo.projectCreate")(function* (
   brandSettingsId?: string
 ) {
   const linkedBrandSettingsId = brandSettingsId
-    ? yield* requireBrandIdentity(organizationId, brandSettingsId)
+    ? (yield* requireBrandIdentity(organizationId, brandSettingsId)).id
     : yield* resolveDefaultBrandIdentity(organizationId);
 
   const rows = yield* geoDb("project create failed", () =>
@@ -129,7 +129,7 @@ export const updateGeoProject = Effect.fn("geo.projectUpdate")(function* (
   update: GeoProjectUpdateInput
 ) {
   const linkedBrandSettingsId = update.brandSettingsId
-    ? yield* requireBrandIdentity(organizationId, update.brandSettingsId)
+    ? (yield* requireBrandIdentity(organizationId, update.brandSettingsId)).id
     : undefined;
 
   const rows = yield* geoDb("project update failed", () =>
@@ -156,6 +156,26 @@ export const updateGeoProject = Effect.fn("geo.projectUpdate")(function* (
   }
 
   return toGeoProject(row);
+});
+
+/**
+ * Removes a project that has not completed creation. Unlike the user-facing
+ * delete operation, compensation must also remove an organization's first
+ * project and is idempotent when another actor already removed it.
+ */
+export const discardGeoProjectCreation = Effect.fn(
+  "geo.projectCreationDiscard"
+)(function* (organizationId: string, projectId: string) {
+  yield* geoDb("project creation discard failed", () =>
+    db
+      .delete(projects)
+      .where(
+        and(
+          eq(projects.id, projectId),
+          eq(projects.organizationId, organizationId)
+        )
+      )
+  );
 });
 
 /**

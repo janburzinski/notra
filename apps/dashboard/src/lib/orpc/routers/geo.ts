@@ -78,7 +78,9 @@ import {
 } from "@notra/geo-core/geo/programs";
 import {
   createGeoProject,
+  discardGeoProjectCreation,
   listGeoProjects,
+  requireBrandIdentity,
   requireGeoProject,
 } from "@notra/geo-core/geo/projects";
 import { promptKey } from "@notra/geo-core/geo/prompt-key";
@@ -864,6 +866,38 @@ export const geoRouter = {
             input.organizationId,
             input.name,
             input.brandSettingsId
+          ).pipe(
+            Effect.flatMap((project) =>
+              requireBrandIdentity(
+                input.organizationId,
+                project.brandSettingsId
+              ).pipe(
+                Effect.flatMap((identity) =>
+                  generateGeoFromWebsite(
+                    {
+                      organizationId: input.organizationId,
+                      projectId: project.id,
+                    },
+                    identity.websiteUrl
+                  )
+                ),
+                Effect.as(project),
+                Effect.tapError(() =>
+                  discardGeoProjectCreation(
+                    input.organizationId,
+                    project.id
+                  ).pipe(
+                    Effect.catch((cleanupError) => {
+                      console.error(
+                        "[GEO] Failed to remove project after setup failed:",
+                        cleanupError
+                      );
+                      return Effect.void;
+                    })
+                  )
+                )
+              )
+            )
           ),
         async ({ context, input, output }) => {
           const projectCount = await countGeoProjects(
