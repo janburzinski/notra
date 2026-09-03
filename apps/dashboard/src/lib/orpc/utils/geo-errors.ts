@@ -1,7 +1,12 @@
 import type { GeoRouterError } from "@notra/geo-core/geo/errors";
 
 import { toUnexpectedError } from "@/lib/orpc/effect";
-import { badRequest, notFound, paymentRequired } from "@/lib/orpc/utils/errors";
+import {
+  badRequest,
+  conflict,
+  notFound,
+  paymentRequired,
+} from "@/lib/orpc/utils/errors";
 
 export function toGeoOrpcError(failure: GeoRouterError): Error {
   switch (failure._tag) {
@@ -40,6 +45,8 @@ export function toGeoOrpcError(failure: GeoRouterError): Error {
       return badRequest("Configure your brand tracking settings first");
     case "GeoSettingsDisabledError":
       return badRequest("Enable brand tracking before starting a scan");
+    case "GeoSettingsTrackingError":
+      return badRequest(failure.message);
     case "GeoSampleDataDisabledError":
       return notFound();
     case "GeoDiscoveryError":
@@ -49,10 +56,6 @@ export function toGeoOrpcError(failure: GeoRouterError): Error {
       return toUnexpectedError(failure.cause, "Failed to start the scan");
     case "GeoScanAlreadyRunningError":
       return badRequest("A scan is already running for this project");
-    case "GeoScheduleCancelError":
-      return badRequest(
-        "Could not cancel this project's scheduled scan. Try again."
-      );
     case "GeoWriterCreditsExhaustedError":
       return paymentRequired(failure.message);
     case "GeoContentBriefNotFoundError":
@@ -60,6 +63,13 @@ export function toGeoOrpcError(failure: GeoRouterError): Error {
     case "GeoContentBriefStateError":
       return badRequest(
         `This brief is already ${failure.status}. Start a new one.`
+      );
+    case "GeoContentBriefConflictError":
+      return conflict(
+        "This plan changed while it was being saved. Try again.",
+        {
+          updatedAt: failure.updatedAt,
+        }
       );
     case "GeoWriterPlanError":
       console.error("[GEO] writer planning failed:", failure);

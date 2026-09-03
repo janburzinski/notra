@@ -8,14 +8,10 @@ import {
   trackServerEvent,
 } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
-import {
-  getAllUserOrganizations,
-  getLastActiveOrganization,
-  getSession,
-} from "@/lib/auth/actions";
+import { getLastActiveOrganization, getSession } from "@/lib/auth/actions";
 import { isSessionBanned } from "@/lib/auth/banned";
-import { hasPaidSubscriptionHistory } from "@/lib/billing/subscription";
 import type { CallbackDestination } from "@/types/analytics/events";
+import { withGeoProject } from "@/utils/geo-paths";
 import {
   marketingAttributionServerSearchParams,
   marketingAttributionServerUrlKeys,
@@ -107,32 +103,14 @@ export default async function AuthCallback(props: {
   const organization = await getLastActiveOrganization();
 
   if (!organization) {
+    const onboardingUrl = serializeMarketingAttribution(
+      "/onboarding",
+      marketingAttribution
+    );
     trackRouted(CALLBACK_DESTINATIONS.ONBOARDING);
-    redirect("/onboarding");
+    redirect(onboardingUrl);
   }
 
-  const hasSubHistory = await hasPaidSubscriptionHistory(organization.id);
-
-  if (hasSubHistory) {
-    trackRouted(CALLBACK_DESTINATIONS.DASHBOARD);
-    redirect(`/${organization.slug}`);
-  }
-
-  const allOrgs = await getAllUserOrganizations();
-  for (const org of allOrgs) {
-    if (
-      org.id !== organization.id &&
-      (await hasPaidSubscriptionHistory(org.id))
-    ) {
-      trackRouted(CALLBACK_DESTINATIONS.DASHBOARD);
-      redirect(`/${org.slug}`);
-    }
-  }
-
-  const onboardingUrl = serializeMarketingAttribution(
-    "/onboarding",
-    marketingAttribution
-  );
-  trackRouted(CALLBACK_DESTINATIONS.ONBOARDING);
-  redirect(onboardingUrl);
+  trackRouted(CALLBACK_DESTINATIONS.DASHBOARD);
+  redirect(withGeoProject(`/${organization.slug}`, organization.projectId));
 }

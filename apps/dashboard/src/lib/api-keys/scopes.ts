@@ -8,7 +8,7 @@ import {
   API_KEY_ACCESS_MODE_VALUES,
   API_KEY_GEO_SCOPES,
   API_KEY_GRANULAR_PERMISSIONS,
-  API_KEY_GRANULAR_READ_PERMISSIONS,
+  API_KEY_PERMISSIONS,
   API_KEY_SCOPE_LEVEL,
   API_KEY_SCOPE_LEVEL_LABELS,
   API_KEY_SCOPE_RESOURCES,
@@ -18,10 +18,6 @@ import type {
   ApiKeyGranularScope,
   ApiKeyScopeGroup,
 } from "@/types/api-keys";
-
-const READ_SCOPE_SET: ReadonlySet<string> = new Set(
-  API_KEY_GRANULAR_READ_PERMISSIONS
-);
 
 export const API_KEY_SCOPE_GROUPS: ApiKeyScopeGroup[] =
   API_KEY_SCOPE_RESOURCES.map((resource) => ({
@@ -102,33 +98,48 @@ function hasExactScopes(
 }
 
 export function getApiKeyAccessMode(
-  scopes: readonly string[]
+  permissions: readonly string[],
+  storedAccessMode?: unknown
 ): ApiKeyAccessMode {
-  if (hasExactScopes(scopes, API_KEY_GRANULAR_PERMISSIONS)) {
-    return API_KEY_ACCESS_MODE_VALUES[0];
+  if (
+    typeof storedAccessMode === "string" &&
+    API_KEY_ACCESS_MODE_VALUES.some((mode) => mode === storedAccessMode)
+  ) {
+    return storedAccessMode as ApiKeyAccessMode;
   }
-  if (hasExactScopes(scopes, API_KEY_GEO_SCOPES)) {
-    return API_KEY_ACCESS_MODE_VALUES[1];
+
+  if (permissions.includes(API_KEY_PERMISSIONS[1])) {
+    return "full";
   }
-  return API_KEY_ACCESS_MODE_VALUES[2];
+
+  return "restricted";
+}
+
+export function getApiKeyPermissionsForAccessMode(
+  mode: ApiKeyAccessMode,
+  scopes: readonly string[]
+): string[] {
+  if (mode === "full") {
+    return [...API_KEY_PERMISSIONS];
+  }
+  if (mode === "geo") {
+    return [...API_KEY_GEO_SCOPES];
+  }
+  return sortApiKeyScopes([...scopes]);
 }
 
 export function getApiKeyScopesForAccessMode(
   mode: ApiKeyAccessMode,
   currentScopes: readonly string[]
 ): ApiKeyGranularScope[] {
+  const scopes = sortApiKeyScopes([...currentScopes]);
+  if (scopes.length > 0 || mode === "restricted") {
+    return scopes;
+  }
   if (mode === "full") {
     return [...API_KEY_GRANULAR_PERMISSIONS];
   }
-  if (mode === "geo") {
-    return [...API_KEY_GEO_SCOPES];
-  }
-  if (getApiKeyAccessMode(currentScopes) === "restricted") {
-    return sortApiKeyScopes([...currentScopes]);
-  }
-  return sortApiKeyScopes(
-    currentScopes.filter((scope) => READ_SCOPE_SET.has(scope))
-  );
+  return [...API_KEY_GEO_SCOPES];
 }
 
 export function summarizeApiKeyScopes(scopes: readonly string[]) {

@@ -1,3 +1,4 @@
+import "zod/compile";
 import { z } from "@hono/zod-openapi";
 
 import {
@@ -43,6 +44,8 @@ const skillContentSchema = z
   .max(SKILL_CONTENT_MAX_LENGTH, "Content is too large")
   .openapi({
     description: "Full skill instructions, typically Markdown.",
+    example:
+      "# Humanizer\n\nRewrite the draft so it reads like a person wrote it. Remove filler, vary sentence length, and keep concrete details.",
   });
 
 export const skillParamsSchema = z.object({
@@ -73,7 +76,10 @@ const skillSummarySchema = z
     id: z.string(),
     name: z.string(),
     description: z.string(),
-    isSystem: z.boolean(),
+    isSystem: z.boolean().openapi({
+      description:
+        "True for built-in skills provided by Notra. System skills cannot be renamed or deleted.",
+    }),
     updatedAt: z.string(),
   })
   .openapi("SkillSummary");

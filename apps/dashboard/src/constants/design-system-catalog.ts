@@ -158,6 +158,36 @@ export const DESIGN_SYSTEM_CATALOG: DesignSystemCatalogItem[] = [
     level: "section",
   },
   {
+    id: "opencode-session",
+    label: "OpenCode · Session",
+    href: "/design-system#opencode-session",
+    level: "group",
+  },
+  {
+    id: "opencode-home",
+    label: "OpenCode · Home",
+    href: "/design-system#opencode-home",
+    level: "section",
+  },
+  {
+    id: "opencode-activity",
+    label: "OpenCode · Activity",
+    href: "/design-system#opencode-activity",
+    level: "section",
+  },
+  {
+    id: "opencode-composer",
+    label: "OpenCode · Composer",
+    href: "/design-system#opencode-composer",
+    level: "section",
+  },
+  {
+    id: "opencode-sidebar",
+    label: "OpenCode · Sidebar",
+    href: "/design-system#opencode-sidebar",
+    level: "section",
+  },
+  {
     id: "chatgpt-thread",
     label: "ChatGPT · Thread",
     href: "/design-system#chatgpt-thread",

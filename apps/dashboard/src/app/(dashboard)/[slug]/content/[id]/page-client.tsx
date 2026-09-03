@@ -19,12 +19,14 @@ import type {
   ContextItem,
   TextSelection,
 } from "@notra/ai/types/chat";
+import type { GeoContentBrief } from "@notra/ai/types/geo-writer";
 import {
   contentChatHistoryPath,
   contentChatHistoryQueryKey,
   contentChatSessionsPath,
   contentChatSessionsQueryKey,
 } from "@notra/ai/utils/chat";
+import { geoBriefToMarkdown } from "@notra/geo-core/utils/geo-writer-brief-markdown";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   Avatar,
@@ -65,6 +67,7 @@ import ChatInput from "@/components/chat-input";
 import { ChatQueue, type QueuedMessage } from "@/components/chat/chat-queue";
 import { getContentTypeLabel } from "@/components/content/content-card";
 import { ContentChatActivityPanel } from "@/components/content/content-chat-activity-panel";
+import { ContentPlanView } from "@/components/content/content-plan-view";
 import type { EditorRefHandle } from "@/components/content/editor/plugins/editor-ref-plugin";
 import { ContentEditorSwitch } from "@/components/content/editors";
 import { ImageExportTargetIcon } from "@/components/content/image-export-target-icon";
@@ -80,6 +83,10 @@ import {
   CONTENT_TITLE_REGEX,
   SAVE_BAR_SELECTOR,
 } from "@/constants/content-detail";
+import {
+  CONTENT_PLAN_CHAT_PLACEHOLDER,
+  CONTENT_PLAN_STAGE_LABEL,
+} from "@/constants/content-plan";
 import { IMAGE_EXPORT_TARGETS } from "@/constants/image-export";
 import { localStorageKeys } from "@/constants/storage";
 import { IMAGE_EXPORT_DOWNLOAD_TARGET } from "@/constants/studio-analytics";
@@ -90,7 +97,10 @@ import {
   copyImageAsPaper,
   downloadImage,
 } from "@/lib/content/image-export";
-import { useGeoWriterBrief } from "@/lib/hooks/use-geo-writer";
+import {
+  useGeoWriterBrief,
+  useGeoWriterUpdate,
+} from "@/lib/hooks/use-geo-writer";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
 import { sourceMetadataSchema } from "@/schemas/content";
@@ -102,12 +112,16 @@ import { getEditMarkdownDiff } from "@/utils/chat-document-diff";
 import { handleStandaloneChatError } from "@/utils/chat-error";
 import { snapshotContentChatAttachments } from "@/utils/content-chat-attachments";
 import { formatSnakeCaseLabel } from "@/utils/format";
-import { parseGeoWriterDraft } from "@/utils/geo-write-entry";
+import {
+  isGeoWriterPlanReviewable,
+  parseGeoWriterDraft,
+} from "@/utils/geo-write-entry";
 import { getImageExportHtml, isHttpImageContent } from "@/utils/image-content";
 import {
   getImageExportTargetLabel,
   isImageExportTarget,
 } from "@/utils/image-export";
+import { getConflictRevision } from "@/utils/orpc-errors";
 import { shakeElements } from "@/utils/shake-element";
 
 import { useContent } from "../../../../../lib/hooks/use-content";
@@ -170,9 +184,19 @@ export default function PageClient({
     organizationId,
     geoWriterDraft?.briefId ?? null
   );
-  const isGeoWriterPlanLocked = Boolean(
-    geoWriterDraft && geoWriterBriefQuery.data?.status !== "completed"
+  const geoWriterUpdate = useGeoWriterUpdate(organizationId, contentId);
+  const [isPlanDirty, setIsPlanDirty] = useState(false);
+  const [hasPlanConflict, setHasPlanConflict] = useState(false);
+  const [planEditorVersion, setPlanEditorVersion] = useState(0);
+  const briefStatus = geoWriterBriefQuery.data?.status;
+  const isGeoWriterPlanMode = Boolean(
+    geoWriterDraft && briefStatus !== "completed"
   );
+  const isGeoWriterPlanReviewableNow = isGeoWriterPlanReviewable(briefStatus);
+  const isGeoWriterChatLocked =
+    Boolean(geoWriterDraft) &&
+    !isGeoWriterPlanReviewableNow &&
+    briefStatus !== "completed";
   const { data: brandResponse } = useQuery(
     dashboardOrpc.brand.voices.list.queryOptions({
       input: { organizationId },
@@ -291,6 +315,53 @@ export default function PageClient({
   const hasMarkdownChanges =
     editedMarkdown !== null && editedMarkdown !== originalMarkdown;
   const hasChanges = hasMarkdownChanges || hasTitleChanges || hasSlugChanges;
+
+  const handlePlanBriefChange = useCallback(
+    (nextBrief: GeoContentBrief) => {
+      const briefId = geoWriterDraft?.briefId;
+      const expectedUpdatedAt = geoWriterBriefQuery.data?.updatedAt;
+      if (!(briefId && expectedUpdatedAt)) {
+        return;
+      }
+      const markdown = geoBriefToMarkdown(nextBrief);
+      geoWriterUpdate.mutate(
+        {
+          briefId,
+          expectedUpdatedAt,
+          markdown,
+          workingTitle: nextBrief.workingTitle,
+        },
+        {
+          onSuccess: () => {
+            setEditedMarkdown(markdown);
+            setOriginalMarkdown(markdown);
+            originalMarkdownRef.current = markdown;
+            editedMarkdownRef.current = markdown;
+            queryClient
+              .invalidateQueries({
+                queryKey: dashboardOrpc.content.get.queryKey({
+                  input: { organizationId, contentId },
+                }),
+              })
+              .catch(() => undefined);
+          },
+          onError: (error) => {
+            if (getConflictRevision(error).isConflict) {
+              setHasPlanConflict(true);
+            }
+          },
+        }
+      );
+    },
+    [
+      contentId,
+      geoWriterDraft?.briefId,
+      geoWriterBriefQuery.data?.updatedAt,
+      geoWriterUpdate,
+      organizationId,
+      queryClient,
+    ]
+  );
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -873,13 +944,35 @@ export default function PageClient({
         setEditedMarkdown(fixedMarkdown);
         editedMarkdownRef.current = fixedMarkdown;
         if (part.type === "tool-editMarkdown") {
-          setReviewPreviousMarkdown(
-            reviewPrevious && reviewPrevious !== fixedMarkdown
-              ? reviewPrevious
-              : null
-          );
-          setWriteFocusNonce((value) => value + 1);
-          setEditorKey((key) => key + 1);
+          if (
+            isGeoWriterPlanReviewableNow &&
+            geoWriterDraft?.briefId &&
+            geoWriterBriefQuery.data
+          ) {
+            setReviewPreviousMarkdown(null);
+            geoWriterUpdate.mutate(
+              {
+                briefId: geoWriterDraft.briefId,
+                expectedUpdatedAt: geoWriterBriefQuery.data.updatedAt,
+                markdown: fixedMarkdown,
+                workingTitle: geoWriterBriefQuery.data?.brief.workingTitle,
+              },
+              {
+                onSuccess: () => {
+                  setOriginalMarkdown(fixedMarkdown);
+                  originalMarkdownRef.current = fixedMarkdown;
+                },
+              }
+            );
+          } else {
+            setReviewPreviousMarkdown(
+              reviewPrevious && reviewPrevious !== fixedMarkdown
+                ? reviewPrevious
+                : null
+            );
+            setWriteFocusNonce((value) => value + 1);
+            setEditorKey((key) => key + 1);
+          }
           trackEvent(POSTHOG_EVENTS.CONTENT_AGENT_EDIT_APPLIED, {
             content_id: contentId,
             type: data?.content?.contentType ?? null,
@@ -896,7 +989,11 @@ export default function PageClient({
   }, [
     contentId,
     data?.content?.contentType,
+    geoWriterBriefQuery.data,
+    geoWriterDraft?.briefId,
+    geoWriterUpdate,
     invalidateContentQueries,
+    isGeoWriterPlanReviewableNow,
     messages,
   ]);
 
@@ -926,6 +1023,7 @@ export default function PageClient({
                 ? ""
                 : (editedMarkdown ?? data?.content?.markdown ?? ""),
             contentType: data?.content?.contentType,
+            documentMode: isGeoWriterPlanReviewableNow ? "plan" : undefined,
             selection: nextSelection,
             context: nextContext,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -939,6 +1037,7 @@ export default function PageClient({
       data?.content?.contentType,
       editedMarkdown,
       data?.content?.markdown,
+      isGeoWriterPlanReviewableNow,
     ]
   );
 
@@ -1051,7 +1150,7 @@ export default function PageClient({
     ) : null;
 
   const isChatDisabled =
-    isGeoWriterPlanLocked ||
+    isGeoWriterChatLocked ||
     !activeChatId ||
     contentChatSessionsQuery.isPending ||
     contentChatHistoryQuery.isFetching ||
@@ -1079,6 +1178,11 @@ export default function PageClient({
         onValueChange={setChatInputValue}
         organizationId={organizationId}
         organizationSlug={organizationSlug}
+        placeholder={
+          isGeoWriterPlanReviewableNow
+            ? CONTENT_PLAN_CHAT_PLACEHOLDER
+            : undefined
+        }
         selection={selection}
         value={chatInputValue}
       />
@@ -1175,6 +1279,132 @@ export default function PageClient({
     ? `/${organizationSlug}/collection/${collection.id}`
     : `/${organizationSlug}/content`;
   const backLabel = collection ? "Back to collection" : "Back to Content";
+  const planBrief = geoWriterBriefQuery.data?.brief;
+  let mainDocument = (
+    <ContentEditorSwitch
+      actions={{
+        setEditedMarkdown: (markdown) => {
+          setEditedMarkdown(markdown);
+          if (markdown !== null) {
+            editedMarkdownRef.current = markdown;
+          }
+        },
+        setOriginalMarkdown,
+        setEditingTitle,
+        setEditingSlug,
+        onEditorChange: handleEditorChange,
+        onSelectionChange: handleSelectionChange,
+      }}
+      content={{
+        id: content.id,
+        title: content.title,
+        slug: content.slug,
+        content: content.content,
+        htmlUrl: content.htmlUrl,
+        rawHtml: content.rawHtml,
+        markdown: content.markdown,
+        contentType: content.contentType,
+        date: content.date,
+        status: content.status,
+        sourceMetadata: content.sourceMetadata,
+      }}
+      contentType={content.contentType}
+      editorKey={editorKey}
+      editorRef={editorRef}
+      imageExportRef={imageExportRef}
+      organization={{
+        name: activeOrganization?.name ?? "Your Organization",
+        logo: activeOrganization?.logo ?? null,
+      }}
+      organizationId={organizationId}
+      readOnly={false}
+      reviewPreviousMarkdown={reviewPreviousMarkdown}
+      state={{
+        editedMarkdown,
+        originalMarkdown,
+        editingTitle,
+        serverTitle,
+        editingSlug,
+        serverSlug,
+        hasChanges,
+        hasMarkdownChanges,
+        hasTitleChanges,
+        hasSlugChanges,
+      }}
+      writeFocusNonce={writeFocusNonce}
+    />
+  );
+  if (isGeoWriterPlanMode && planBrief) {
+    mainDocument = (
+      <>
+        {hasPlanConflict ? (
+          <div
+            className="border-border bg-muted/50 mx-auto mb-6 flex w-full max-w-3xl flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
+            role="alert"
+          >
+            <div>
+              <p className="text-sm font-medium">This plan changed elsewhere</p>
+              <p className="text-muted-foreground text-sm">
+                Your edits are preserved. Choose which version to keep.
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <Button
+                onClick={async () => {
+                  const result = await geoWriterBriefQuery.refetch();
+                  if (result.isError) {
+                    toast.error("Failed to load the latest plan");
+                    return;
+                  }
+                  setPlanEditorVersion((version) => version + 1);
+                  setHasPlanConflict(false);
+                }}
+                size="sm"
+                variant="outline"
+              >
+                Load latest
+              </Button>
+              <Button
+                onClick={async () => {
+                  const result = await geoWriterBriefQuery.refetch();
+                  if (result.isError) {
+                    toast.error("Failed to refresh the plan");
+                    return;
+                  }
+                  setHasPlanConflict(false);
+                }}
+                size="sm"
+              >
+                Save my version
+              </Button>
+            </div>
+          </div>
+        ) : null}
+        <ContentPlanView
+          brief={planBrief}
+          isWriting={briefStatus === "writing" || briefStatus === "approved"}
+          key={`${geoWriterDraft?.briefId ?? contentId}:${planEditorVersion}`}
+          onChange={
+            isGeoWriterPlanReviewableNow && !hasPlanConflict
+              ? handlePlanBriefChange
+              : undefined
+          }
+          onDirtyChange={
+            isGeoWriterPlanReviewableNow ? setIsPlanDirty : undefined
+          }
+        />
+      </>
+    );
+  } else if (isGeoWriterPlanMode) {
+    mainDocument = (
+      <div className="mx-auto w-full max-w-3xl space-y-6">
+        <div className="bg-muted/60 h-4 w-24 animate-pulse rounded-sm" />
+        <div className="bg-muted/60 h-10 w-3/4 animate-pulse rounded-sm" />
+        <div className="bg-muted/60 h-16 w-full animate-pulse rounded-sm" />
+        <div className="bg-muted/60 h-40 w-full animate-pulse rounded-sm" />
+      </div>
+    );
+  }
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -1188,7 +1418,11 @@ export default function PageClient({
           </Link>
           <WriterExecute.Root
             briefId={geoWriterDraft?.briefId ?? null}
-            hasUnsavedChanges={hasChanges}
+            hasUnsavedChanges={
+              isGeoWriterPlanMode
+                ? isPlanDirty || geoWriterUpdate.isPending
+                : hasChanges
+            }
             onArticleReady={handleGeoArticleReady}
             organizationId={organizationId}
           >
@@ -1197,8 +1431,10 @@ export default function PageClient({
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 {content.contentType === "blog_post" ? (
                   <p className="text-muted-foreground text-sm">
-                    Blog post
-                    {content.status === "draft" ? (
+                    {isGeoWriterPlanMode
+                      ? CONTENT_PLAN_STAGE_LABEL
+                      : "Blog post"}
+                    {content.status === "draft" && !isGeoWriterPlanMode ? (
                       <>
                         {" \u00B7 "}
                         Draft
@@ -1355,7 +1591,6 @@ export default function PageClient({
                   })()}
               </div>
               <div className="ml-auto flex shrink-0 items-center gap-2">
-                {geoWriterDraft ? <WriterExecute.Button /> : null}
                 <Tooltip>
                   <TooltipTrigger
                     render={
@@ -1375,9 +1610,10 @@ export default function PageClient({
                   </TooltipTrigger>
                   <TooltipContent>Content Agent</TooltipContent>
                 </Tooltip>
-                {content.contentType !== "image" && (
+                {isGeoWriterPlanMode ? <WriterExecute.Button /> : null}
+                {content.contentType !== "image" && !isGeoWriterPlanMode ? (
                   <Button
-                    disabled={isGeoWriterPlanLocked || isTogglingStatus}
+                    disabled={isTogglingStatus}
                     onClick={handleToggleStatus}
                     size="sm"
                     variant={content.status === "draft" ? "default" : "outline"}
@@ -1397,7 +1633,7 @@ export default function PageClient({
                       }
                     />
                   </Button>
-                )}
+                ) : null}
                 {content.contentType === "linkedin_post" && (
                   <PostSocialButton
                     content={currentMarkdown}
@@ -1501,60 +1737,11 @@ export default function PageClient({
             </div>
           </WriterExecute.Root>
 
-          <ContentEditorSwitch
-            actions={{
-              setEditedMarkdown: (markdown) => {
-                setEditedMarkdown(markdown);
-                if (markdown !== null) {
-                  editedMarkdownRef.current = markdown;
-                }
-              },
-              setOriginalMarkdown,
-              setEditingTitle,
-              setEditingSlug,
-              onEditorChange: handleEditorChange,
-              onSelectionChange: handleSelectionChange,
-            }}
-            content={{
-              id: content.id,
-              title: content.title,
-              slug: content.slug,
-              content: content.content,
-              htmlUrl: content.htmlUrl,
-              rawHtml: content.rawHtml,
-              markdown: content.markdown,
-              contentType: content.contentType,
-              date: content.date,
-              status: content.status,
-              sourceMetadata: content.sourceMetadata,
-            }}
-            contentType={content.contentType}
-            editorKey={editorKey}
-            editorRef={editorRef}
-            imageExportRef={imageExportRef}
-            organization={{
-              name: activeOrganization?.name ?? "Your Organization",
-              logo: activeOrganization?.logo ?? null,
-            }}
-            organizationId={organizationId}
-            readOnly={isGeoWriterPlanLocked}
-            reviewPreviousMarkdown={reviewPreviousMarkdown}
-            state={{
-              editedMarkdown,
-              originalMarkdown,
-              editingTitle,
-              serverTitle,
-              editingSlug,
-              serverSlug,
-              hasChanges,
-              hasMarkdownChanges,
-              hasTitleChanges,
-              hasSlugChanges,
-            }}
-            writeFocusNonce={writeFocusNonce}
-          />
+          {mainDocument}
 
-          <RecommendationsSection value={content.recommendations} />
+          {isGeoWriterPlanMode ? null : (
+            <RecommendationsSection value={content.recommendations} />
+          )}
 
           <div className="h-24" />
         </div>

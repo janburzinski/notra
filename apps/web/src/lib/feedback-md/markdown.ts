@@ -1,4 +1,7 @@
 import {
+  FEEDBACK_MD_ADOPTERS,
+  FEEDBACK_MD_ADOPTERS_CTA_LABEL,
+  FEEDBACK_MD_ADOPTERS_DESCRIPTION,
   FEEDBACK_MD_DESCRIPTION,
   FEEDBACK_MD_EXAMPLE_DISCLAIMER,
   FEEDBACK_MD_HERO_LEAD,
@@ -83,6 +86,9 @@ export function buildFeedbackMdPageMarkdown() {
   const siblings = FEEDBACK_MD_SIBLINGS.map(
     (sibling) => `- ${sibling.file}: ${sibling.answers} (${sibling.direction})`
   );
+  const adopters = FEEDBACK_MD_ADOPTERS.map(
+    (adopter) => `- ${adopter.label}: ${adopter.feedbackUrl}`
+  );
   const questions = FEEDBACK_MD_QUESTIONS.flatMap((item) => [
     `### ${item.question}`,
     item.answer,
@@ -98,6 +104,13 @@ export function buildFeedbackMdPageMarkdown() {
     "",
     `Notra's own file: ${SITE_URL}${FEEDBACK_MD_PATH}`,
     "",
+    markdownSection("Adopted by", [
+      FEEDBACK_MD_ADOPTERS_DESCRIPTION,
+      "",
+      ...adopters,
+      "",
+      `${FEEDBACK_MD_ADOPTERS_CTA_LABEL}: serve your own feedback.md and email ${NOTRA_SUPPORT_EMAIL}.`,
+    ]),
     markdownSection("What it is", principles),
     markdownSection("Template", [
       "```markdown",

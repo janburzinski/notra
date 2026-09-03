@@ -2,7 +2,7 @@
 
 import { ScrollArea } from "@notra/ui/components/ui/scroll-area";
 import { useReducedMotion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CitationRows } from "@/components/landing/citation-rows";
 import {
@@ -10,38 +10,27 @@ import {
   HERO_COLLAGE_CITATION_ROWS,
 } from "@/constants/landing/hero-collage";
 import { LIVE_TRAFFIC_MAX_ROWS } from "@/constants/landing/live-traffic";
-import {
-  randomLiveDelayMs,
-  randomLiveRow,
-  seedLiveRows,
-} from "@/lib/landing/live-traffic";
+import { randomLiveRow, seedLiveRows } from "@/lib/landing/live-traffic";
 import { pageClockElapsedMs, usePageClockBase } from "@/lib/landing/page-clock";
+import type { HeroCollageProps } from "@/types/landing/hero";
 
-export function LiveTrafficLog() {
+export function LiveTrafficLog({ engine }: HeroCollageProps) {
   const reduceMotion = useReducedMotion();
   const base = usePageClockBase();
+  const previousEngine = useRef(engine);
   const [rows, setRows] = useState(() =>
     seedLiveRows(HERO_COLLAGE_CITATION_ROWS)
   );
   const live = !reduceMotion;
 
   useEffect(() => {
-    if (!live) {
+    if (!live || previousEngine.current === engine) {
       return;
     }
-    let timer = 0;
-    const schedule = () => {
-      timer = window.setTimeout(() => {
-        const row = randomLiveRow(pageClockElapsedMs());
-        setRows((previous) =>
-          [row, ...previous].slice(0, LIVE_TRAFFIC_MAX_ROWS)
-        );
-        schedule();
-      }, randomLiveDelayMs());
-    };
-    schedule();
-    return () => window.clearTimeout(timer);
-  }, [live]);
+    previousEngine.current = engine;
+    const row = randomLiveRow(pageClockElapsedMs(), engine);
+    setRows((previous) => [row, ...previous].slice(0, LIVE_TRAFFIC_MAX_ROWS));
+  }, [engine, live]);
 
   return (
     <ScrollArea className="h-full [&_[data-slot=table-container]]:overflow-visible">

@@ -6,11 +6,13 @@
   "exports": {
     "./api-scopes": "./src/api-scopes.ts",
     "./url": "./src/url.ts",
+    "./logo-link": "./src/logo-link.ts",
     "./callback-url": "./src/callback-url.ts",
     "./oauth-popup": "./src/oauth-popup.ts",
     "./slugify": "./src/slugify.ts",
     "./color": "./src/color.ts",
     "./ingest-token": "./src/ingest-token.ts",
+    "./require-api-key": "./src/require-api-key.ts",
     "./types/*": "./src/types/*.ts"
   },
   "scripts": {

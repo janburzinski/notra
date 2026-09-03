@@ -14,6 +14,7 @@ export function getContentEditorChatPrompt(
     hasGitHubEnabled,
     hasLinearEnabled,
     timezone,
+    documentMode,
   } = params;
 
   const selectionContext = selection
@@ -37,6 +38,11 @@ export function getContentEditorChatPrompt(
   const imageSection =
     contentType === "image"
       ? "\n\n## Image Editing Constraints\nThis is a generated image, not a markdown document.\n- Do NOT call getMarkdown or editMarkdown.\n- For any visual edit, call reviseImage with a concise prompt describing the requested change.\n- reviseImage restores the saved sandbox snapshot, updates the image, saves it back to the current content item, and stores a new snapshot."
+      : "";
+
+  const planSection =
+    documentMode === "plan"
+      ? "\n\n## Content Plan Constraints\nThe current document is a CONTENT PLAN (brief), not the finished article.\n- Do NOT write the article body.\n- Keep this exact structure: Target prompt, Intent, Type: blog post (<subtype>), Audience, Job to be done, then ## outline headings, then ## FAQ, ## Internal links, ## Acceptance checklist.\n- Only change the fields the user asked to refine.\n- Preserve internal link URLs exactly unless the user asks to change them.\n- Keep at least three outline sections."
       : "";
 
   const workflowSection =
@@ -78,7 +84,7 @@ export function getContentEditorChatPrompt(
     formatCurrentDate(timezone);
 
   return dedent`
-    You are a content editor assistant. Help users edit content.
+    You are a content editor assistant. Help users ${documentMode === "plan" ? "refine content plans" : "edit content"}.
 
     ## Current Date
     Today is ${currentDate} (${resolvedTimezone}). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
@@ -94,6 +100,6 @@ export function getContentEditorChatPrompt(
 
     ## Content Guidelines
     - Never use em dashes (—) or en dashes (–) in any content. Use hyphens (-) or rewrite the sentence instead.
-    ${capabilitiesSection}${linkedInSection}${twitterSection}${imageSection}${githubSection}${linearSection}${selectionContext}
+    ${capabilitiesSection}${linkedInSection}${twitterSection}${imageSection}${planSection}${githubSection}${linearSection}${selectionContext}
   `;
 }

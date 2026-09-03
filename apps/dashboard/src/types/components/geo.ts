@@ -27,6 +27,8 @@ export interface SearchConsoleToolbarProps {
   callbackPath: string;
   isPending: boolean;
   onDismiss?: () => void;
+  onPropertyPickerOpenChange: (open: boolean) => void;
+  propertyPickerOpen: boolean;
   status: GeoSearchConsoleStatus | undefined;
 }
 
@@ -46,6 +48,8 @@ export interface SearchConsoleConnectActionProps {
 export interface SearchConsoleSelectSiteStateProps {
   organizationId: string;
   callbackPath: string;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
   status: GeoSearchConsoleStatus;
   websiteUrl: string | null;
 }
@@ -61,6 +65,8 @@ export interface SearchConsoleConnectedStateProps {
   action?: ReactNode;
   organizationId: string;
   callbackPath: string;
+  onPropertyPickerOpenChange: (open: boolean) => void;
+  propertyPickerOpen: boolean;
   status: GeoSearchConsoleStatus;
   websiteUrl: string | null;
 }

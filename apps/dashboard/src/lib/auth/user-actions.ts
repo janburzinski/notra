@@ -3,13 +3,14 @@
 import { db } from "@notra/db/drizzle";
 import { socialConnections, users } from "@notra/db/schema";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { getWorkOS, signOut } from "@workos-inc/authkit-nextjs";
+import { getWorkOS, signOut, withAuth } from "@workos-inc/authkit-nextjs";
 import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
-import { sendResetPasswordAction } from "@/lib/email/actions";
+import { clearAuthSessionCookie } from "@/lib/auth/session-cookie";
+import { isWorkOSNotFound } from "@/lib/auth/workos-error";
 import { OrganizationActionError } from "@/lib/organizations/errors";
 import { requireSession } from "@/lib/organizations/guards";
 import { runOrganizationAction } from "@/lib/organizations/run-action";
@@ -113,6 +114,27 @@ export async function deleteUserAction(): Promise<
     Effect.gen(function* () {
       const session = yield* requireSession();
 
+      const { sessionId } = yield* tryAction(
+        () => withAuth(),
+        "Failed to read auth session"
+      );
+
+      if (sessionId) {
+        yield* tryAction(
+          () => getWorkOS().userManagement.revokeSession({ sessionId }),
+          "Failed to revoke WorkOS session"
+        ).pipe(
+          Effect.catch((error) =>
+            Effect.logWarning("Could not revoke WorkOS session").pipe(
+              Effect.annotateLogs({
+                userId: session.user.id,
+                error: error.message,
+              })
+            )
+          )
+        );
+      }
+
       if (session.user.workosUserId) {
         yield* tryAction(
           () =>
@@ -122,12 +144,11 @@ export async function deleteUserAction(): Promise<
           "Failed to delete WorkOS user"
         ).pipe(
           Effect.catch((error) =>
-            Effect.logWarning("Could not delete WorkOS user").pipe(
-              Effect.annotateLogs({
-                userId: session.user.id,
-                error: error.message,
-              })
-            )
+            isWorkOSNotFound(error.cause)
+              ? Effect.logWarning("WorkOS user was already deleted").pipe(
+                  Effect.annotateLogs({ userId: session.user.id })
+                )
+              : Effect.fail(error)
           )
         );
       }
@@ -147,6 +168,8 @@ export async function deleteUserAction(): Promise<
         "Failed to delete user"
       );
 
+      yield* tryAction(clearAuthSessionCookie, "Failed to clear session");
+
       return { deleted: true };
     })
   );
@@ -159,21 +182,12 @@ export async function requestPasswordResetAction(): Promise<
     Effect.gen(function* () {
       const session = yield* requireSession();
 
-      const reset = yield* tryAction(
+      yield* tryAction(
         () =>
           getWorkOS().userManagement.createPasswordReset({
             email: session.user.email,
           }),
         "Failed to create password reset"
-      );
-
-      yield* tryAction(
-        () =>
-          sendResetPasswordAction({
-            userEmail: session.user.email,
-            resetLink: reset.passwordResetUrl,
-          }),
-        "Failed to send password reset email"
       );
 
       return { sent: true };

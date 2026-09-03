@@ -107,12 +107,16 @@ export function GeoTabs({
       >
         <PermissionOption value="visibility">Visibility</PermissionOption>
         <PermissionOption value="prompts">
-          Prompts
-          <TriggerCount count={promptCount} />
+          <span className="flex items-baseline gap-1.5">
+            Prompts
+            <TriggerCount count={promptCount} />
+          </span>
         </PermissionOption>
         <PermissionOption value="journeys">
-          Journeys
-          <TriggerCount count={journeys.length} />
+          <span className="flex items-baseline gap-1.5">
+            Journeys
+            <TriggerCount count={journeys.length} />
+          </span>
         </PermissionOption>
       </PermissionRow>
 
@@ -129,6 +133,7 @@ export function GeoTabs({
                 isScanning={isScanning}
                 organizationSlug={organizationSlug}
                 promptResults={promptResults}
+                settings={settings}
                 timeseriesPoints={timeseriesPoints}
                 trackedEngines={settings.engines}
               />

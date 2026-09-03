@@ -1,3 +1,4 @@
+import "zod/compile";
 import {
   chatIdSchema,
   UI_MESSAGES_MAX,
@@ -128,6 +129,10 @@ export const createChatPostSchema = z.object({
 
 export const contentOrganizationIdInputSchema = z.object({
   organizationId: z.string().min(1, "Organization ID is required"),
+});
+
+export const contentProjectIdInputSchema = z.object({
+  projectId: z.string().min(1).optional(),
 });
 
 export const contentInputSchema = contentOrganizationIdInputSchema.extend({
@@ -304,6 +309,7 @@ export const chatRequestSchema = z.object({
   messages: z.array(uiMessageSchema).min(1).max(UI_MESSAGES_MAX),
   currentMarkdown: z.string().max(POST_MARKDOWN_MAX_LENGTH),
   contentType: z.string().max(100).optional(),
+  documentMode: z.enum(["plan"]).optional(),
   selection: textSelectionSchema.optional(),
   context: z.array(contextItemSchema).max(50).optional(),
   timezone: z.string().min(1).max(100).optional(),
@@ -339,14 +345,16 @@ export const onDemandContentTypeSchema = z.enum([
 ] as const);
 export type OnDemandContentType = z.infer<typeof onDemandContentTypeSchema>;
 
-export const createPostCollectionInputSchema =
-  contentOrganizationIdInputSchema.extend({
+export const createPostCollectionInputSchema = contentOrganizationIdInputSchema
+  .extend(contentProjectIdInputSchema.shape)
+  .extend({
     contentTypes: z.array(onDemandContentTypeSchema).min(1),
     expectedPostCount: z.number().int().positive(),
   });
 
-export const postCollectionsListInputSchema =
-  contentOrganizationIdInputSchema.extend({
+export const postCollectionsListInputSchema = contentOrganizationIdInputSchema
+  .extend(contentProjectIdInputSchema.shape)
+  .extend({
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(100).default(20),
   });

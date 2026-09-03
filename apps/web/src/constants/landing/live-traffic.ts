@@ -67,7 +67,4 @@ export const LIVE_TRAFFIC_MARKDOWN_PATHS = new Set([
   "/docs/mcp",
 ]);
 
-export const LIVE_TRAFFIC_MIN_DELAY_MS = 1800;
-export const LIVE_TRAFFIC_MAX_DELAY_MS = 4200;
 export const LIVE_TRAFFIC_MAX_ROWS = 20;
-export const LIVE_TRAFFIC_TIMESTAMP_PLACEHOLDER = "00/00/0000 00:00:00";

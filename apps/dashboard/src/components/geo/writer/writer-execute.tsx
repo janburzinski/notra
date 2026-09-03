@@ -12,6 +12,10 @@ import { Button } from "@notra/ui/components/ui/button";
 import { createContext, use, useEffect, useLayoutEffect, useRef } from "react";
 
 import { StatusSpinner } from "@/components/geo/status-spinner";
+import {
+  CONTENT_PLAN_WRITE_LABEL,
+  CONTENT_PLAN_WRITING_LABEL,
+} from "@/constants/content-plan";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import {
   useGeoWriterBrief,
@@ -162,12 +166,12 @@ function WriterExecuteButton() {
       return "Starting...";
     }
     if (status === "writing" || status === "approved") {
-      return "Writing...";
+      return CONTENT_PLAN_WRITING_LABEL;
     }
     if (isFailed) {
       return "Retry";
     }
-    return "Execute";
+    return CONTENT_PLAN_WRITE_LABEL;
   })();
 
   return (

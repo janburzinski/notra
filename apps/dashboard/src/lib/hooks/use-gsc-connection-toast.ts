@@ -28,6 +28,7 @@ export function useGscConnectionToast() {
   const pathname = usePathname();
   const router = useRouter();
   const trackedResultRef = useRef<string | null>(null);
+  const connectionSucceeded = searchParams.get("gscConnected") === "true";
 
   useEffect(() => {
     const connected = searchParams.get("gscConnected");
@@ -60,4 +61,6 @@ export function useGscConnectionToast() {
       scroll: false,
     });
   }, [searchParams, pathname, router]);
+
+  return connectionSucceeded;
 }

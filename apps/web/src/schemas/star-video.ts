@@ -50,3 +50,31 @@ export const repoQuerySchema = z.object({
   owner: ownerSlug,
   repo: repoSlug,
 });
+
+const REPO_PAIR = /^[\w.-]{1,100}\/[\w.-]{1,100}$/;
+
+export const githubReturnRepoSchema = z.string().trim().regex(REPO_PAIR);
+
+export const MAX_PENDING_OAUTH_STATES = 5;
+
+const githubOAuthStateSchema = z.object({
+  state: z.string().min(1),
+  repo: githubReturnRepoSchema.optional(),
+});
+
+export const githubOAuthStatesSchema = z
+  .array(githubOAuthStateSchema)
+  .max(MAX_PENDING_OAUTH_STATES);
+
+export const githubCallbackQuerySchema = z.object({
+  code: z.string().min(1),
+  state: z.string().min(1),
+});
+
+export const githubAccessTokenSchema = z.object({
+  access_token: z.string().min(1),
+});
+
+export const githubViewerSchema = z.object({
+  login: z.string().min(1),
+});

@@ -1,6 +1,8 @@
 import type { ClaudeTodo } from "@notra/ui/components/brainless/claude/claude-todo-list";
 
+import { DatabuddyLogo } from "@/components/landing/marquee-logos/databuddy-logo";
 import type {
+  FeedbackMdAdopter,
   FeedbackMdClient,
   FeedbackMdPrinciple,
   FeedbackMdQuestion,
@@ -9,6 +11,7 @@ import type {
   FeedbackMdTerminalHeader,
   FeedbackMdTerminalToolCall,
 } from "@/types/feedback-md";
+import { NOTRA_SUPPORT_EMAIL } from "@/utils/agent-metadata";
 import { DOCS_URL, SITE_URL } from "@/utils/urls";
 
 export const FEEDBACK_MD_PATH = "/feedback.md";
@@ -208,6 +211,25 @@ export const FEEDBACK_MD_SIBLINGS: FeedbackMdSibling[] = [
     href: FEEDBACK_MD_PATH,
   },
 ];
+
+export const FEEDBACK_MD_ADOPTERS: FeedbackMdAdopter[] = [
+  {
+    name: "databuddy",
+    label: "Databuddy",
+    siteUrl: "https://www.databuddy.cc",
+    feedbackUrl: "https://www.databuddy.cc/feedback.md",
+    Logo: DatabuddyLogo,
+  },
+];
+
+export const FEEDBACK_MD_ADOPTERS_CAPTION = "Adopted by";
+
+export const FEEDBACK_MD_ADOPTERS_DESCRIPTION =
+  "Teams already serving a feedback.md at their root. Each one links to the live file.";
+
+export const FEEDBACK_MD_ADOPTERS_CTA_LABEL = "This could be you";
+
+export const FEEDBACK_MD_ADOPTERS_CTA_HREF = `mailto:${NOTRA_SUPPORT_EMAIL}?subject=${encodeURIComponent("We adopted feedback.md")}`;
 
 const FEEDBACK_MD_PAGE_URL = `${SITE_URL}${FEEDBACK_MD_PAGE_PATH}`;
 

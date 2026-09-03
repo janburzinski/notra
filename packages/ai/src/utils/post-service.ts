@@ -1,8 +1,10 @@
+import { getChatProjectId } from "@notra/ai/chat/history";
 import { maybeGenerateCollectionTitle } from "@notra/ai/jobs/collection-title";
 import type {
   CreatePostRecordParams,
   CreatePostRecordResult,
   EnsureChatPostCollectionParams,
+  PostDatabase,
   UpdatePostRecordParams,
   UpdatePostRecordResult,
 } from "@notra/ai/types/post-service";
@@ -75,7 +77,8 @@ export async function createPostRecord(
 }
 
 export async function updatePostRecord(
-  params: UpdatePostRecordParams
+  params: UpdatePostRecordParams,
+  database: PostDatabase = db
 ): Promise<UpdatePostRecordResult> {
   const updates: Record<string, string | null> = {};
   if (params.title !== undefined) {
@@ -91,12 +94,15 @@ export async function updatePostRecord(
   if (params.recommendations !== undefined) {
     updates.recommendations = params.recommendations;
   }
+  if (params.contentSubtype !== undefined) {
+    updates.contentSubtype = params.contentSubtype;
+  }
 
   if (Object.keys(updates).length === 0) {
     return { status: "no_changes" };
   }
 
-  const rows = await db
+  const rows = await database
     .update(posts)
     .set(updates)
     .where(
@@ -115,12 +121,16 @@ export async function ensureChatPostCollection(
 ): Promise<string> {
   const now = new Date();
   const contentTypesJson = JSON.stringify([params.contentType]);
+  const projectId = params.chatId
+    ? await getChatProjectId(params.organizationId, params.chatId)
+    : null;
 
   const [collection] = await db
     .insert(postCollections)
     .values({
       id: generatePostId(),
       organizationId: params.organizationId,
+      projectId,
       source: "chat",
       sourceId: params.chatId ?? null,
       name: buildPostCollectionName([params.contentType], now),
@@ -142,6 +152,7 @@ export async function ensureChatPostCollection(
         isNotNull(postCollections.sourceId)
       ),
       set: {
+        projectId,
         contentTypes: sql`CASE
           WHEN ${postCollections.contentTypes} @> ${contentTypesJson}::jsonb
             THEN ${postCollections.contentTypes}

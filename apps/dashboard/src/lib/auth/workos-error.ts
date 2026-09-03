@@ -1,19 +1,6 @@
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
-import * as z from "zod";
+import { NotFoundException } from "@workos-inc/node";
 
-const workosErrorSchema = z.looseObject({
-  code: z.string().optional(),
-  message: z.string().optional(),
-  rawData: z
-    .looseObject({
-      code: z.string().optional(),
-      message: z.string().optional(),
-      email: z.string().optional(),
-      pending_authentication_token: z.string().optional(),
-      organizations: z.array(z.looseObject({ id: z.string() })).optional(),
-    })
-    .optional(),
-});
+import { workosErrorSchema } from "@/schemas/auth/workos-error";
 
 export interface WorkOSErrorInfo {
   code: string | null;
@@ -46,4 +33,8 @@ export function readWorkOSError(error: unknown): WorkOSErrorInfo {
     organizationIds:
       rawData?.organizations?.map((organization) => organization.id) ?? [],
   };
+}
+
+export function isWorkOSNotFound(error: unknown): boolean {
+  return error instanceof NotFoundException;
 }

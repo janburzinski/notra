@@ -7,6 +7,7 @@ import {
   GEO_ROUTE_SECTIONS,
   NAV_GEO_IMPROVE_LINKS,
   NAV_MAIN_ITEMS,
+  SHARED_ROUTE_SECTIONS,
   SIDEBAR_DEFAULT_MODE,
   STUDIO_ROUTE_SECTIONS,
 } from "@/constants/nav";
@@ -35,6 +36,11 @@ export function resolveSidebarMode(
   // GEO pick so opening `/{slug}` can restore that mode instead of writing
   // studio over it.
   if (section === undefined) {
+    return storedMode ?? "studio";
+  }
+  // Shared destinations keep the current mode. Without a stored choice, match
+  // the org root's visible Studio default instead of switching on navigation.
+  if (SHARED_ROUTE_SECTIONS.has(section)) {
     return storedMode ?? "studio";
   }
   if (GEO_ROUTE_SECTIONS.has(section)) {
@@ -86,16 +92,6 @@ export function resolveGeoImproveLinks(
     return NAV_GEO_IMPROVE_LINKS;
   }
   return NAV_GEO_IMPROVE_LINKS.filter((link) => link !== GEO_WRITER_NAV_LINK);
-}
-
-export function isStaleGeoProjectParam(
-  projectIds: readonly string[],
-  projectParam: string | null
-): boolean {
-  if (projectParam === null) {
-    return false;
-  }
-  return !projectIds.includes(projectParam);
 }
 
 export function resolveActiveNavLink(

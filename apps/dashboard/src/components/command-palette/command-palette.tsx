@@ -43,6 +43,7 @@ import { useFeedback } from "@/components/dashboard/feedback-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { COMMAND_PALETTE_AI_ERROR_ACTION } from "@/constants/studio-analytics";
 import { trackEvent } from "@/lib/analytics/posthog-client";
+import { useActiveProject } from "@/lib/hooks/use-active-project";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useHasAiCreditsFeature } from "@/lib/hooks/use-plan";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -182,6 +183,8 @@ export function CommandPalette() {
   const slug = activeOrganization?.slug ?? "";
   const organizationId = activeOrganization?.id ?? "";
   const [projectParam] = useGeoProjectQueryState();
+  const { projectId: activeProjectId, isResolved: isProjectResolved } =
+    useActiveProject();
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
@@ -200,15 +203,19 @@ export function CommandPalette() {
 
   const searchResults = useQuery({
     ...dashboardOrpc.search.global.queryOptions({
-      input: { organizationId, query: debouncedQuery },
+      input: {
+        organizationId,
+        projectId: activeProjectId ?? undefined,
+        query: debouncedQuery,
+      },
     }),
-    enabled: searchEnabled,
+    enabled: searchEnabled && isProjectResolved,
     staleTime: 15_000,
   });
 
   const entityHits: EntityHit[] = (() => {
     const data = searchResults.data;
-    if (!(data && slug)) {
+    if (!(data && slug && isProjectResolved)) {
       return [];
     }
     const hits: EntityHit[] = [];

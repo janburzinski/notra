@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 
 import { DEFAULT_SIDEBAR_ENTRY_MODE } from "@/constants/studio-analytics";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
-import { getSidebarModeFromCookies } from "@/utils/cookies";
+import {
+  getLastVisitedProject,
+  getSidebarModeFromCookies,
+} from "@/utils/cookies";
 import { resolveOrgRootRedirect } from "@/utils/nav";
 
 type OrgRootSearchParams = Promise<
@@ -20,8 +23,10 @@ export async function redirectOrgRootToStoredMode(
     headers(),
     searchParams,
   ]);
-  const projectId =
+  const requestedProjectId =
     typeof query.project === "string" ? query.project : undefined;
+  const projectId =
+    requestedProjectId ?? getLastVisitedProject(cookieStore, slug);
   const storedMode = getSidebarModeFromCookies(cookieStore);
   trackServerEvent({
     event: POSTHOG_EVENTS.DASHBOARD_ENTRY,

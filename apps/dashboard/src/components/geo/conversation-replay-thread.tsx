@@ -6,15 +6,11 @@ import type {
   GeoSequenceTurnResult,
 } from "@notra/geo-core/types/geo";
 import { perplexitySourcesFromStoredOrExcerpt } from "@notra/geo-core/utils/geo-perplexity-sources";
-import {
-  PerplexitySearch,
-  type PerplexitySearchSource,
-} from "@notra/ui/components/brainless/perplexity/perplexity-search";
-import { useReducedMotion } from "motion/react";
+import type { PerplexitySearchSource } from "@notra/ui/types/perplexity";
 
+import { GeoAnswerSearch } from "@/components/geo/geo-answer-search";
 import { AnswerMarkdown } from "@/components/geo/geo-prompt-answer-thread";
 import { GeoSkinMessage } from "@/components/geo/geo-skin-message";
-import { useAnswerReplay } from "@/lib/hooks/use-answer-replay";
 import { cn } from "@/lib/utils";
 import type {
   AnswerReplayProgress,
@@ -100,6 +96,13 @@ function ReplayTurn({
   const answerText =
     isCurrent && stage === "typing" ? progress.typed : turn.answer;
   const sources = replaySources(turn);
+  const hasRecordedSearch =
+    turn.searchQueries.length > 0 || turn.sources.length > 0;
+  const showSearch = skin === "perplexity" || hasRecordedSearch;
+  let searchQueries: readonly string[] = turn.searchQueries;
+  if (searchQueries.length === 0 && skin === "perplexity") {
+    searchQueries = [turn.prompt];
+  }
 
   return (
     <>
@@ -110,11 +113,11 @@ function ReplayTurn({
         <GeoSkinMessage
           from="assistant"
           search={
-            skin === "perplexity" && showAnswer ? (
-              <PerplexitySearch
-                queries={[turn.prompt]}
+            showSearch && showAnswer ? (
+              <GeoAnswerSearch
+                queries={searchQueries}
+                skin={skin}
                 sources={sources}
-                title="Web search"
               />
             ) : undefined
           }
@@ -129,9 +132,7 @@ function ReplayTurn({
                 skin={skin}
                 text={answerText}
               />
-              {answerDone && skin !== "perplexity" && (
-                <SourcePills sources={sources} />
-              )}
+              {answerDone && !showSearch && <SourcePills sources={sources} />}
               {answerDone && <MentionPill turn={turn} />}
             </>
           )}
@@ -144,11 +145,9 @@ function ReplayTurn({
 export function ConversationReplayThread({
   engine,
   turns,
-  playToken,
+  progress,
 }: ConversationReplayThreadProps) {
   const skin = geoChatSkin(engine);
-  const reducedMotion = useReducedMotion();
-  const progress = useAnswerReplay(turns, playToken, Boolean(reducedMotion));
 
   return (
     <div

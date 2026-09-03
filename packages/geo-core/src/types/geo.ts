@@ -1,4 +1,5 @@
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
+import type { ContentBillingReservation } from "@notra/ai/types/billing";
 import type { GeoLogEventName } from "@notra/ai/types/evlog";
 import type {
   GeoContentBrief,
@@ -94,7 +95,7 @@ export interface GeoSettingsRow {
   nonZdrApprovedEngines: string[];
   enabled: boolean;
   scanIntervalHours: number;
-  qstashMessageId: string | null;
+  nextScanAt: Date | null;
   scanStartedAt: Date | null;
   lastScanAt: Date | null;
   createdAt: Date;
@@ -145,6 +146,7 @@ export interface GeoGenerateTrace {
 export interface GeoEngineAnswer {
   text: string;
   grounding: GeoCheckGrounding;
+  sources: GeoCheckSourceItem[];
   finishReason: FinishReason | null;
   usage?: LanguageModelUsage;
   /** Whether the call ran with ZDR enforced; null when the route did not say. */
@@ -152,7 +154,6 @@ export interface GeoEngineAnswer {
 }
 
 export interface GeoGroundedAnswer extends GeoEngineAnswer {
-  sources: GeoCheckSourceItem[];
   usage: LanguageModelUsage;
 }
 
@@ -177,7 +178,7 @@ export type GeoScanSkipReason =
   | "billing"
   | "zdr"
   | "disabled"
-  | "superseded"
+  | "claim_lost"
   | "already_running";
 
 export interface GeoErrorFields {
@@ -289,13 +290,19 @@ export interface GeoSettingsUpsertInput {
   scanIntervalHours: number;
 }
 
-export interface SyncGeoScanScheduleInput {
-  organizationId: string;
-  projectId: string;
-  enabled: boolean;
-  scanIntervalHours: number;
-  existingMessageId: string | null;
-  reschedule?: boolean;
+export interface GeoSettingsEngineAddInput extends GeoScopeInput {
+  engine: string;
+}
+
+export interface GeoSettingsLanguageAddInput extends GeoScopeInput {
+  language: string;
+}
+
+export interface GeoScanCronSweepResult {
+  due: number;
+  started: number;
+  skipped: number;
+  staleScansFailed: number;
 }
 
 export interface GeoSampleDataResponse {
@@ -409,21 +416,62 @@ export interface GeoScanResult {
   mentions?: number;
 }
 
-export interface GeoScanRetryResult {
-  status: "retry_no_successful_checks";
-  retryProjectIds: string[];
-  checks: number;
-  mentions: number;
+export interface GeoScanPlannedTask {
+  engine: string;
+  groundedKey: string | null;
+  prompt: GeoPromptDefinition;
+  language: string;
+  zdr: GeoZdrMode;
 }
 
-export type GeoScanRunResult = GeoScanResult | GeoScanRetryResult;
+export interface GeoScanPlannedSequence {
+  sequenceId: string;
+  steps: string[];
+  engine: string;
+  groundedKey: string | null;
+  zdr: GeoZdrMode;
+}
 
-export interface GeoScanProgramOptions {
-  projectId?: string;
-  claimedAt?: Date;
-  scanId?: string;
-  /** Explicit project subset for a retry pass; overrides `projectId` scoping. */
-  projectIds?: readonly string[];
+export interface GeoScanProjectContext {
+  organizationId: string;
+  projectId: string;
+  scanId: string;
+  runId: string;
+  companyName: string;
+  aliases: string[];
+  gate: ContentBillingReservation;
+  startedAtMs: number;
+}
+
+export interface GeoScanProjectPlan {
+  context: GeoScanProjectContext;
+  /** ISO stamp of the claim token the batches rotate as they renew it. */
+  claimedAt: string;
+  tasks: GeoScanPlannedTask[];
+  sequences: GeoScanPlannedSequence[];
+  promptCount: number;
+  languages: string[];
+  engines: string[];
+}
+
+export type GeoScanProjectPlanResult =
+  | { status: "planned"; plan: GeoScanProjectPlan }
+  | { status: "skipped"; reason: GeoScanSkipReason };
+
+export interface GeoScanBatchOutcome {
+  checks: number;
+  mentions: number;
+  dropped: number;
+  usage: AgentTokenUsage;
+  /** Renewed claim token the next batch must use. */
+  claimedAt: string;
+}
+
+export interface GeoScanProjectTotals {
+  checks: number;
+  mentions: number;
+  dropped: number;
+  usage: AgentTokenUsage;
 }
 
 export interface GeoProjectScanOutcome {
@@ -935,16 +983,17 @@ export type GeoModelProviderId =
   | "spacexai"
   | "deepseek"
   | "mistral"
-  | "cursor";
+  | "cursor"
+  | "opencode";
 
 /** Zero-data-retention coverage as reported by the Vercel AI Gateway feed. */
 export type GeoModelZdr = "all" | "some" | "none";
 
 /**
- * Where a model is served. `cursor` runs through the Cursor SDK instead of
- * the AI router (see `lib/geo/cursor.ts`).
+ * Where a model is served. `cursor` runs through the Cursor SDK and `box`
+ * through OpenCode in Upstash Box instead of the AI router.
  */
-export type GeoModelGateway = "vercel" | "openrouter" | "cursor";
+export type GeoModelGateway = "vercel" | "openrouter" | "cursor" | "box";
 
 export interface GeoModelProvider {
   id: GeoModelProviderId;
@@ -1127,6 +1176,13 @@ export interface GeoWriterPlanResponse {
   status: GeoContentBriefStatus;
   runId: string | null;
   postId: string | null;
+}
+
+export interface GeoWriterUpdateInput {
+  briefId: string;
+  expectedUpdatedAt: string;
+  markdown: string;
+  workingTitle?: string;
 }
 
 export type GeoGapWriteAction = "write" | "review" | "writing" | "open";

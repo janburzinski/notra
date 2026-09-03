@@ -1,7 +1,7 @@
 import { PUBLIC_API_SCOPES } from "@notra/utils/api-scopes";
 
 export const API_URL = "https://api.usenotra.com";
-const DEFAULT_AUTHKIT_DOMAIN = "auth.usenotra.com";
+const DEFAULT_AUTHKIT_DOMAIN = "oauth.usenotra.com";
 const AUTH_SERVER_URL = `https://${DEFAULT_AUTHKIT_DOMAIN}`;
 const AUTH_ISSUER_URL = AUTH_SERVER_URL;
 const MCP_ORIGIN_URL = "https://mcp.usenotra.com";
@@ -57,11 +57,16 @@ export function buildAuthorizationServerMetadata() {
     issuer: AUTH_ISSUER_URL,
     authorization_endpoint: `${AUTH_SERVER_URL}/oauth2/authorize`,
     token_endpoint: `${AUTH_SERVER_URL}/oauth2/token`,
+    device_authorization_endpoint: `${AUTH_SERVER_URL}/oauth2/device_authorization`,
     registration_endpoint: `${AUTH_SERVER_URL}/oauth2/register`,
     revocation_endpoint: `${AUTH_SERVER_URL}/oauth2/revoke`,
     jwks_uri: `${AUTH_SERVER_URL}/oauth2/jwks`,
     response_types_supported: ["code"],
-    grant_types_supported: ["authorization_code", "refresh_token"],
+    grant_types_supported: [
+      "authorization_code",
+      "refresh_token",
+      "urn:ietf:params:oauth:grant-type:device_code",
+    ],
     token_endpoint_auth_methods_supported: ["none"],
     code_challenge_methods_supported: ["S256"],
     scopes_supported: PUBLIC_API_SCOPES,

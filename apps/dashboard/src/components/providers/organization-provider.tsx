@@ -14,6 +14,7 @@ import {
 } from "react";
 
 import { authClient } from "@/lib/auth/client";
+import { setLastVisitedOrganization } from "@/utils/cookies";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
 export type Organization = NonNullable<
@@ -136,6 +137,16 @@ export function OrganizationsProvider({
       setOptimisticActiveOrg(null);
     }
   }
+
+  useEffect(() => {
+    if (resolvedActiveOrganization?.slug !== slugFromPath) {
+      return;
+    }
+
+    setLastVisitedOrganization(slugFromPath).catch(() => {
+      // The active server session is still synchronized below if cookies fail.
+    });
+  }, [resolvedActiveOrganization?.slug, slugFromPath]);
 
   useEffect(() => {
     if (isLoadingOrgs || isLoadingActive) {

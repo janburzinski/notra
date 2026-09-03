@@ -21,6 +21,7 @@ import {
 } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { SocialConnectionError, UserSyncError } from "@/lib/auth/errors";
+import { isWorkOSNotFound } from "@/lib/auth/workos-error";
 import { sendWelcomeEmailAction } from "@/lib/email/actions";
 import type {
   OAuthProviderTokens,
@@ -28,6 +29,7 @@ import type {
 } from "@/types/auth/sync";
 
 const GITHUB_USER_ENDPOINT = "https://api.github.com/user";
+const WORKOS_USER_VERIFY_RETRIES = 2;
 
 const AUTH_METHOD_PROVIDERS: Record<string, string> = {
   GitHubOAuth: "github",
@@ -222,6 +224,31 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
         })
       );
     }
+
+    yield* Effect.tryPromise({
+      try: () => getWorkOS().userManagement.getUser(workosUser.id),
+      catch: (cause) =>
+        new UserSyncError({
+          message: isWorkOSNotFound(cause)
+            ? "WorkOS user no longer exists"
+            : "Failed to verify WorkOS user",
+          cause,
+        }),
+    }).pipe(
+      Effect.retry({
+        times: WORKOS_USER_VERIFY_RETRIES,
+        while: (error) => !isWorkOSNotFound(error.cause),
+      }),
+      Effect.tapError((error) =>
+        Effect.logWarning("Could not verify WorkOS user").pipe(
+          Effect.annotateLogs({
+            workosUserId: workosUser.id,
+            notFound: isWorkOSNotFound(error.cause),
+            error: error.message,
+          })
+        )
+      )
+    );
 
     const [created] = yield* Effect.tryPromise({
       try: () =>

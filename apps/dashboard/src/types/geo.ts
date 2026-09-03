@@ -16,6 +16,7 @@ import type {
   GeoModelCatalog,
   GeoOverviewEngine,
   GeoPresenceStatus,
+  GeoProject,
   GeoPromptResult,
   GeoPromptSequence,
   GeoRangePreset,
@@ -54,6 +55,11 @@ export interface GeoProjectCreateInput {
 
 export interface GeoProjectContextValue {
   projectId: string | undefined;
+}
+
+export interface GeoActiveProject {
+  project: GeoProject | null;
+  domain: string | null;
 }
 
 export interface GeoProjectProviderProps {
@@ -154,7 +160,7 @@ export interface GeoSequenceEngineThread {
 export interface ConversationReplayThreadProps {
   engine: string;
   turns: GeoSequenceTurnResult[];
-  playToken: number;
+  progress: AnswerReplayProgress | null;
 }
 
 export type AnswerReplayStage = "user" | "thinking" | "typing";
@@ -181,7 +187,7 @@ export interface GeoScanPayload {
   /**
    * `geo_scans` row the trigger inserted so its caller could poll it. The run
    * adopts this id rather than creating a row of its own. Absent when nobody
-   * is waiting on an id (the QStash schedule) or on runs queued before the
+   * is waiting on an id or on runs queued before the
    * field existed.
    */
   scanId?: string;
@@ -419,6 +425,10 @@ export interface MentionProviderRowProps {
   rank: number;
   row: MentionProviderRow;
   onOpen: (family: GeoEngineFamily) => void;
+  onTrack: (engine: string, name: string) => void;
+  trackEngine?: string;
+  trackingDisabled: boolean;
+  tracking: boolean;
 }
 
 export interface MentionMoreModelsHintProps {
@@ -429,6 +439,7 @@ export interface MentionMoreModelsHintProps {
 
 export interface MentionRateCardProps {
   engines: GeoOverviewEngine[];
+  settings?: GeoSettings;
   trackedEngines?: readonly string[];
   timeseriesPoints?: readonly GeoTimeseriesPoint[];
   promptResults?: readonly GeoPromptResult[];
@@ -706,7 +717,7 @@ export interface GeoEnginePickerProps {
   labeled?: boolean;
 }
 
-export type GeoCursorFlagState = "enabled" | "disabled" | "unavailable";
+export type GeoFlagState = "enabled" | "disabled" | "unavailable";
 
 export interface GeoLanguagePickerProps {
   selected: string[];
@@ -804,6 +815,7 @@ export interface CompetitorsTableProps {
   organizationSlug: string;
   companyName: string;
   aliases: string[];
+  ownDomain: string | null;
 }
 
 export interface PromptsTableProps {

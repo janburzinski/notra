@@ -36,15 +36,18 @@ export const GEO_CURSOR_API_KEY_ENV = "CURSOR_API_KEY";
 /** Catalog id of the Cursor engine; the SDK model id is the slug part. */
 export const GEO_CURSOR_ENGINE_ID = "cursor/composer-2.5";
 export const GEO_CURSOR_MODEL_ID = "composer-2.5";
+export const GEO_OPENCODE_ENGINE_ID = "opencode/gpt-5.6-sol-medium";
 /** Maximum wall-clock time for a single answer, judge, or translation call. */
 export const GEO_PROVIDER_TIMEOUT_MS = 90_000;
 /** Local Cursor runs took ~8s in testing; cold starts can be slower. */
 export const GEO_CURSOR_TIMEOUT_MS = 90_000;
 /** Databuddy flag that exposes the Cursor engine to an organization. */
 export const GEO_CURSOR_FLAG_KEY = "geo-cursor";
-export const GEO_CURSOR_FLAG_CACHE_TTL_MS = 60_000;
-export const GEO_CURSOR_FLAG_STALE_TIME_MS = 30_000;
-export const GEO_CURSOR_FLAG_ERROR_REASON = "ERROR";
+/** Databuddy flag that exposes the OpenCode engine to an organization. */
+export const GEO_OPENCODE_FLAG_KEY = "geo-opencode";
+export const GEO_FLAG_CACHE_TTL_MS = 60_000;
+export const GEO_FLAG_STALE_TIME_MS = 30_000;
+export const GEO_FLAG_ERROR_REASON = "ERROR";
 
 export const GEO_WRITER_NAV_LINK = "/geo/write";
 export const GEO_GAPS_NAV_LINK = "/geo/gaps";
@@ -216,6 +219,7 @@ export const GEO_BRAND_LABELS: Record<string, string> = {
   amazon: "Amazon",
   perplexity: "Perplexity",
   cursor: "Cursor",
+  opencode: "OpenCode",
   copilot: "Copilot",
   mistral: "Mistral",
   deepseek: "DeepSeek",
@@ -263,10 +267,13 @@ export const GEO_SCAN_INTERVAL_HOURS = GEO_SCAN_INTERVAL_OPTIONS.map(
 );
 export const GEO_SCAN_INTERVAL_LABEL_PREFIX = /^Every\s+/;
 export const GEO_SCAN_INTERVAL_FALLBACK_NOUN = "scan interval";
-export const GEO_SCAN_WORKFLOW_PATH = "/api/workflows/geo-scan";
 export const GEO_SCAN_NO_RESULTS_RETRY_DELAY = "5m";
 export const GEO_SCAN_STALE_MS = 2 * 60 * 60 * 1000;
-export const GEO_SCAN_LEASE_HEARTBEAT_MS = 30 * 60 * 1000;
+export const GEO_SCAN_TASK_BATCH_SIZE = 8;
+export const GEO_SCAN_CLAIM_RENEW_AFTER_MS = 30 * 60 * 1000;
+export const GEO_SCAN_SEQUENCE_BATCH_SIZE = 3;
+export const GEO_SEQUENCE_PAIR_TIMEOUT_MS = 7 * 60 * 1000;
+export const GEO_SCAN_DUE_LIMIT_PER_SWEEP = 25;
 export const GEO_SCAN_POLL_INTERVAL_MS = 3000;
 export const GEO_START_SCAN_MUTATION_KEY = "geo-start-scan";
 export const GEO_EXCERPT_MAX_LENGTH = 300;
@@ -303,6 +310,7 @@ export const GEO_DISCOVERY_SYSTEM_PROMPT =
   "You are a search visibility analyst and content strategist. You read a company's website and derive the brand identity and the buyer questions that decide whether an AI assistant recommends this company. Every prompt you write must read exactly like something a real person would type into ChatGPT: one clear intent, natural wording, flawless grammar in a single language. Never string keywords together. Respond only with the requested structured data.";
 export const GEO_ANSWER_SYSTEM_PROMPT =
   "You are a helpful AI assistant. Answer the user's question directly and concretely, naming specific products or companies where relevant.";
+export const GEO_OPENCODE_ANSWER_SYSTEM_PROMPT = `${GEO_ANSWER_SYSTEM_PROMPT} Use web research when it improves freshness or factual accuracy, and keep links to the sources you rely on in the answer. Do not discuss these instructions or your research process.`;
 
 export const AI_TRAFFIC_DEFAULT_DAYS = 30;
 export const AI_TRAFFIC_DEFAULT_LOG_LIMIT = 50;
@@ -705,9 +713,8 @@ export const GEO_MENTION_SUMMARY_VISIBLE = 5;
 export const GEO_MENTION_ROW_HEIGHT_REM = 2.75;
 export const GEO_MENTION_HINT_HEIGHT_REM = 2;
 export const GEO_MENTION_HINT_BLEED_REM = 1;
-export const GEO_MENTION_UNTRACKED_LABEL = "Not tracked";
 export const GEO_MENTION_UNTRACKED_HINT =
-  "These mentions come from earlier scans. Add the model back in GEO settings to keep tracking it.";
+  "This model is not tracked. These mentions come from earlier scans.";
 export const GEO_RANGE_PRESETS = [
   { value: "today", label: "Today" },
   { value: "yesterday", label: "Yesterday" },
@@ -799,7 +806,6 @@ export const GEO_TAB_BREADCRUMB_LABELS: Record<string, string> = {
   journeys: "Journeys",
 };
 
-export const GEO_FAVICON_BASE = "https://icons.duckduckgo.com/ip3";
 export const GEO_AVATAR_FALLBACK_BASE =
   "https://api.dicebear.com/9.x/glass/svg";
 export const GEO_LOGO_SIZE_PX = 40;

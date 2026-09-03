@@ -309,6 +309,11 @@ function deactivatedToolsSuffix(output: unknown): string | undefined {
   );
 }
 
+function geoDaysSuffix(input: unknown): string | undefined {
+  const days = getNumericValue(input, "days");
+  return days === undefined ? undefined : `from the last ${days} days`;
+}
+
 const TOOL_COPY: Record<string, ToolCopy> = {
   searchNotraTools: {
     verbs: ["Searching", "Searched"],
@@ -447,6 +452,37 @@ const TOOL_COPY: Record<string, ToolCopy> = {
   getAvailableIntegrations: {
     verbs: ["Checking", "Checked"],
     noun: "integrations",
+  },
+  listGeoProjects: {
+    verbs: ["Listing", "Listed"],
+    noun: "GEO projects",
+    suffix: (_input, output) =>
+      countSuffix(getNumericValue(output, "count"), "project", "projects"),
+  },
+  getGeoOverview: {
+    verbs: ["Loading", "Loaded"],
+    noun: "GEO overview",
+    suffix: geoDaysSuffix,
+  },
+  getGeoTimeseries: {
+    verbs: ["Loading", "Loaded"],
+    noun: "GEO trends",
+    suffix: geoDaysSuffix,
+  },
+  getGeoPromptResults: {
+    verbs: ["Loading", "Loaded"],
+    noun: "GEO prompt results",
+    suffix: geoDaysSuffix,
+  },
+  getGeoCompetitorShare: {
+    verbs: ["Loading", "Loaded"],
+    noun: "GEO competitor share",
+    suffix: geoDaysSuffix,
+  },
+  getGeoProjectContext: {
+    verbs: ["Loading", "Loaded"],
+    noun: "GEO project context",
+    suffix: (input) => idSuffix(input, ["projectId"]),
   },
   getMarkdown: { verbs: ["Reading", "Read"], noun: "document" },
   editMarkdown: { verbs: ["Editing", "Edited"], noun: "document" },

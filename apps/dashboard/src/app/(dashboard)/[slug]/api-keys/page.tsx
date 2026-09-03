@@ -2,9 +2,6 @@
 
 import {
   Add01Icon,
-  ArrowDown01Icon,
-  ArrowUp01Icon,
-  ArrowUpDownIcon,
   Book01Icon,
   Delete02Icon,
   Dots,
@@ -51,15 +48,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
-import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@notra/ui/components/ui/table";
 import {
   Tooltip,
   TooltipContent,
@@ -92,8 +80,10 @@ import { ApiKeyPermissionSelector } from "@/components/api-keys/permission-selec
 import { TrackingTokenCard } from "@/components/api-keys/tracking-token-card";
 import { Button } from "@/components/button";
 import { PageContainer } from "@/components/layout/container";
+import { Table, type TableColumn } from "@/components/motion/table";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
+  API_KEY_ACCESS_MODE_VALUES,
   API_KEY_DEFAULT_SCOPES,
   API_KEY_EXPIRATION_OPTIONS,
   API_KEY_EXPIRATION_VALUES,
@@ -105,6 +95,7 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 import type { CreateApiKeyInput, UpdateApiKeyInput } from "@/schemas/api-keys";
 import { createApiKeySchema, updateApiKeySchema } from "@/schemas/api-keys";
 import type {
+  ApiKeyAccessMode,
   ApiKeyCreateConfig,
   ApiKeyExpiration,
   ApiKeyFormValues,
@@ -112,12 +103,16 @@ import type {
 
 const NEW_KEY_CONFIG_PARSERS = {
   name: parseAsString,
+  accessMode: parseAsStringLiteral(API_KEY_ACCESS_MODE_VALUES).withDefault(
+    "restricted"
+  ),
   scopes: parseAsArrayOf(parseAsString),
   expiration: parseAsStringLiteral(API_KEY_EXPIRATION_VALUES),
 };
 
 const DEFAULT_NEW_KEY_CONFIG: ApiKeyCreateConfig = {
   name: "",
+  accessMode: "restricted",
   scopes: [...API_KEY_DEFAULT_SCOPES],
   expiration: "never",
 };
@@ -125,11 +120,10 @@ const DEFAULT_NEW_KEY_CONFIG: ApiKeyCreateConfig = {
 const EDIT_FORM_DEFAULTS: ApiKeyFormValues = {
   keyId: "",
   name: "",
+  accessMode: "restricted",
   scopes: [...API_KEY_DEFAULT_SCOPES],
   expiration: "never",
 };
-
-const API_KEY_SKELETON_ROWS = ["row-1", "row-2", "row-3"];
 
 interface ApiKeyEditForm {
   // TanStack Form's Field component carries deep generics that are local to the
@@ -159,6 +153,7 @@ type ApiKeyListItem = Omit<
   "name" | "expires"
 > & {
   name: string;
+  accessMode: ApiKeyAccessMode;
   expires: number | null;
   permission: keyof typeof API_KEY_PERMISSION_SUMMARY;
   permissions: string[];
@@ -173,15 +168,12 @@ interface ApiKeyMutationResponse {
   success: boolean;
 }
 
-type CreatedSortOrder = false | "asc" | "desc";
-
 interface ApiKeysUiState {
   dialogOpen: boolean;
   createdKey: string | null;
   createError: string | null;
   editDialogOpen: boolean;
   deletingKey: ApiKeyListItem | null;
-  createdSortOrder: CreatedSortOrder;
 }
 
 type ApiKeysUiAction =
@@ -190,7 +182,6 @@ type ApiKeysUiAction =
   | { type: "createErrorChanged"; createError: string | null }
   | { type: "editDialogChanged"; open: boolean }
   | { type: "deletingKeyChanged"; deletingKey: ApiKeyListItem | null }
-  | { type: "createdSortOrderChanged"; sortOrder: CreatedSortOrder }
   | { type: "createDialogReset" };
 
 const initialApiKeysUiState: ApiKeysUiState = {
@@ -199,7 +190,6 @@ const initialApiKeysUiState: ApiKeysUiState = {
   createError: null,
   editDialogOpen: false,
   deletingKey: null,
-  createdSortOrder: false,
 };
 
 function apiKeysUiReducer(
@@ -217,8 +207,6 @@ function apiKeysUiReducer(
       return { ...state, editDialogOpen: action.open };
     case "deletingKeyChanged":
       return { ...state, deletingKey: action.deletingKey };
-    case "createdSortOrderChanged":
-      return { ...state, createdSortOrder: action.sortOrder };
     case "createDialogReset":
       return {
         ...state,
@@ -272,136 +260,6 @@ function getDefaultEditExpiration(
   return "90d";
 }
 
-function getSortIcon(isSorted: false | "asc" | "desc") {
-  if (isSorted === "asc") {
-    return ArrowUp01Icon;
-  }
-  if (isSorted === "desc") {
-    return ArrowDown01Icon;
-  }
-  return ArrowUpDownIcon;
-}
-
-function sortApiKeys(
-  keys: ApiKeyListItem[],
-  createdSortOrder: false | "asc" | "desc"
-) {
-  if (createdSortOrder === false) {
-    return keys;
-  }
-
-  return keys
-    .slice()
-    .sort((a, b) =>
-      createdSortOrder === "desc"
-        ? b.createdAt - a.createdAt
-        : a.createdAt - b.createdAt
-    );
-}
-
-function ApiKeysTableContent({
-  isPending,
-  keys,
-  onDelete,
-  onEdit,
-  actionsDisabled,
-}: {
-  isPending: boolean;
-  keys: ApiKeyListItem[];
-  onDelete: (key: ApiKeyListItem) => void;
-  onEdit: (key: ApiKeyListItem) => void;
-  actionsDisabled: boolean;
-}) {
-  if (isPending) {
-    return (
-      <>
-        {API_KEY_SKELETON_ROWS.map((row) => (
-          <TableRow key={row}>
-            <TableCell>
-              <Skeleton className="h-4 w-32" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-4 w-28" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-4 w-24" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-4 w-20" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-4 w-24" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="size-8 rounded-md" />
-            </TableCell>
-          </TableRow>
-        ))}
-      </>
-    );
-  }
-
-  if (keys.length === 0) {
-    return (
-      <TableRow>
-        <TableCell
-          className="text-muted-foreground h-24 text-center"
-          colSpan={6}
-        >
-          No API keys yet
-        </TableCell>
-      </TableRow>
-    );
-  }
-
-  return keys.map((apiKey) => (
-    <TableRow key={apiKey.keyId}>
-      <TableCell className="font-medium">{apiKey.name}</TableCell>
-      <TableCell className="text-muted-foreground font-mono text-sm">
-        {apiKey.start}…
-      </TableCell>
-      <TableCell>{formatPermissionLabel(apiKey)}</TableCell>
-      <TableCell className="text-muted-foreground text-sm">
-        {formatExpiry(apiKey.expires)}
-      </TableCell>
-      <TableCell className="text-muted-foreground text-sm">
-        {new Date(apiKey.createdAt).toLocaleDateString()}
-      </TableCell>
-      <TableCell className="text-muted-foreground text-sm">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button size="icon" variant="ghost">
-                <HugeiconsIcon className="size-4" icon={Dots} />
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end" className="min-w-44">
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                disabled={actionsDisabled}
-                onClick={() => onEdit(apiKey)}
-              >
-                <HugeiconsIcon className="size-4" icon={Edit02Icon} />
-                Edit API key
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                disabled={actionsDisabled}
-                onClick={() => onDelete(apiKey)}
-                variant="destructive"
-              >
-                <HugeiconsIcon className="size-4" icon={Delete02Icon} />
-                Delete API key
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
-    </TableRow>
-  ));
-}
-
 function ApiKeysHeader({ onCreate }: { onCreate: () => void }) {
   return (
     <div className="flex items-center justify-between">
@@ -446,53 +304,119 @@ function ApiKeysHeader({ onCreate }: { onCreate: () => void }) {
 
 function ApiKeysTable({
   actionsDisabled,
-  createdSortOrder,
   isPending,
   keys,
   onDelete,
   onEdit,
-  onSort,
 }: {
   actionsDisabled: boolean;
-  createdSortOrder: false | "asc" | "desc";
   isPending: boolean;
   keys: ApiKeyListItem[];
   onDelete: (key: ApiKeyListItem) => void;
   onEdit: (key: ApiKeyListItem) => void;
-  onSort: () => void;
 }) {
-  return (
-    <div className="smooth-shadow-ring-xs bg-muted/80 overflow-hidden rounded-lg">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Key</TableHead>
-            <TableHead>Permission</TableHead>
-            <TableHead className="w-35">Expires</TableHead>
-            <TableHead className="w-35">
-              <Button className="-ml-4" onClick={onSort} variant="ghost">
-                Created At
-                <HugeiconsIcon
-                  className="ml-2 size-4"
-                  icon={getSortIcon(createdSortOrder)}
-                />
+  const columns: TableColumn<ApiKeyListItem>[] = [
+    {
+      key: "name",
+      header: "Name",
+      width: "1fr",
+      minWidth: "10rem",
+      cell: (apiKey) => <span className="font-medium">{apiKey.name}</span>,
+    },
+    {
+      key: "start",
+      header: "Key",
+      width: "1fr",
+      minWidth: "9rem",
+      cell: (apiKey) => (
+        <span className="text-muted-foreground font-mono text-sm">
+          {apiKey.start}…
+        </span>
+      ),
+    },
+    {
+      key: "permission",
+      header: "Permission",
+      width: "1fr",
+      minWidth: "9rem",
+      cell: formatPermissionLabel,
+    },
+    {
+      key: "expires",
+      header: "Expires",
+      width: "8.75rem",
+      cell: (apiKey) => (
+        <span className="text-muted-foreground text-sm">
+          {formatExpiry(apiKey.expires)}
+        </span>
+      ),
+    },
+    {
+      key: "createdAt",
+      header: "Created At",
+      sortable: true,
+      width: "9.5rem",
+      cell: (apiKey) => (
+        <span className="text-muted-foreground text-sm">
+          {new Date(apiKey.createdAt).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      width: "4rem",
+      minWidth: "4rem",
+      cell: (apiKey) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                aria-label={`Actions for ${apiKey.name}`}
+                size="icon"
+                variant="ghost"
+              >
+                <HugeiconsIcon className="size-4" icon={Dots} />
               </Button>
-            </TableHead>
-            <TableHead className="w-12" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <ApiKeysTableContent
-            actionsDisabled={actionsDisabled}
-            isPending={isPending}
-            keys={keys}
-            onDelete={onDelete}
-            onEdit={onEdit}
+            }
           />
-        </TableBody>
-      </Table>
-    </div>
+          <DropdownMenuContent align="end" className="min-w-44">
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                disabled={actionsDisabled}
+                onClick={() => onEdit(apiKey)}
+              >
+                <HugeiconsIcon className="size-4" icon={Edit02Icon} />
+                Edit API key
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                disabled={actionsDisabled}
+                onClick={() => onDelete(apiKey)}
+                variant="destructive"
+              >
+                <HugeiconsIcon className="size-4" icon={Delete02Icon} />
+                Delete API key
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+  const visibleRows = isPending ? 3 : Math.max(keys.length, 1);
+
+  return (
+    <Table
+      columns={columns}
+      data={keys}
+      emptyState="No API keys yet"
+      getRowId={(apiKey) => apiKey.keyId}
+      height={(visibleRows + 1) * 48}
+      loading={isPending}
+      rowHeight={48}
+    />
   );
 }
 
@@ -515,6 +439,7 @@ function CreateApiKeyDialog({
   createdKey,
   input,
   isPending,
+  onAccessModeChange,
   onExpirationChange,
   onNameChange,
   onOpenChange,
@@ -527,6 +452,7 @@ function CreateApiKeyDialog({
   createdKey: string | null;
   input: ApiKeyCreateConfig;
   isPending: boolean;
+  onAccessModeChange: (accessMode: ApiKeyAccessMode, scopes: string[]) => void;
   onExpirationChange: (expiration: ApiKeyExpiration) => void;
   onNameChange: (name: string | null) => void;
   onOpenChange: (open: boolean) => void;
@@ -635,8 +561,10 @@ function CreateApiKeyDialog({
                     <span className="text-destructive -ml-1">*</span>
                   </FieldLabel>
                   <ApiKeyPermissionSelector
+                    accessMode={input.accessMode}
                     className="[&>div]:py-2.5"
                     disabled={isPending}
+                    onAccessModeChange={onAccessModeChange}
                     onValueChange={onScopesChange}
                     value={input.scopes}
                   />
@@ -742,20 +670,33 @@ function EditApiKeyDialog({
               )}
             </editForm.Field>
 
-            <editForm.Field name="scopes">
-              {(field) => (
-                <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                  <FieldLabel>
-                    Permissions
-                    <span className="text-destructive -ml-1">*</span>
-                  </FieldLabel>
-                  <ApiKeyPermissionSelector
-                    className="[&>div]:py-2.5"
-                    disabled={isPending}
-                    onValueChange={(scopes) => field.handleChange(scopes)}
-                    value={field.state.value as string[]}
-                  />
-                </Field>
+            <editForm.Field name="accessMode">
+              {(accessModeField) => (
+                <editForm.Field name="scopes">
+                  {(scopesField) => (
+                    <Field className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                      <FieldLabel>
+                        Permissions
+                        <span className="text-destructive -ml-1">*</span>
+                      </FieldLabel>
+                      <ApiKeyPermissionSelector
+                        accessMode={
+                          accessModeField.state.value as ApiKeyAccessMode
+                        }
+                        className="[&>div]:py-2.5"
+                        disabled={isPending}
+                        onAccessModeChange={(accessMode, scopes) => {
+                          accessModeField.handleChange(accessMode);
+                          scopesField.handleChange(scopes);
+                        }}
+                        onValueChange={(scopes) =>
+                          scopesField.handleChange(scopes)
+                        }
+                        value={scopesField.state.value as string[]}
+                      />
+                    </Field>
+                  )}
+                </editForm.Field>
               )}
             </editForm.Field>
           </div>
@@ -820,14 +761,7 @@ export default function ApiKeysPage() {
   const organizationId = activeOrganization?.id;
   const queryClient = useQueryClient();
   const [
-    {
-      dialogOpen,
-      createdKey,
-      createError,
-      editDialogOpen,
-      deletingKey,
-      createdSortOrder,
-    },
+    { dialogOpen, createdKey, createError, editDialogOpen, deletingKey },
     dispatchUi,
   ] = useReducer(apiKeysUiReducer, initialApiKeysUiState);
   const [newKeyConfig, setNewKeyConfig] = useQueryStates(
@@ -858,14 +792,15 @@ export default function ApiKeysPage() {
     enabled: !!organizationId,
   });
 
-  const sortedKeys = sortApiKeys(keys, createdSortOrder);
-
   const newKeyName = newKeyConfig.name;
+  const newKeyAccessMode =
+    newKeyConfig.accessMode ?? DEFAULT_NEW_KEY_CONFIG.accessMode;
   const newKeyScopes = newKeyConfig.scopes ?? DEFAULT_NEW_KEY_CONFIG.scopes;
   const newKeyExpiration =
     newKeyConfig.expiration ?? DEFAULT_NEW_KEY_CONFIG.expiration;
   const createInput = {
     name: newKeyName ?? DEFAULT_NEW_KEY_CONFIG.name,
+    accessMode: newKeyAccessMode,
     scopes: newKeyScopes,
     expiration: newKeyExpiration,
   };
@@ -883,6 +818,7 @@ export default function ApiKeysPage() {
     }
     const config = {
       name: preset.defaultName,
+      accessMode: preset.accessMode,
       scopes: preset.scopes,
       expiration: preset.expiration,
     };
@@ -1040,6 +976,7 @@ export default function ApiKeysPage() {
     editForm.reset({
       keyId: key.keyId,
       name: key.name,
+      accessMode: key.accessMode,
       scopes,
       expiration: getDefaultEditExpiration(key.createdAt, key.expires),
     });
@@ -1058,9 +995,8 @@ export default function ApiKeysPage() {
 
         <ApiKeysTable
           actionsDisabled={editMutation.isPending || deleteMutation.isPending}
-          createdSortOrder={createdSortOrder}
           isPending={isPending}
-          keys={sortedKeys}
+          keys={keys}
           onDelete={(key) =>
             dispatchUi({
               type: "deletingKeyChanged",
@@ -1068,12 +1004,6 @@ export default function ApiKeysPage() {
             })
           }
           onEdit={openEditDialog}
-          onSort={() =>
-            dispatchUi({
-              type: "createdSortOrderChanged",
-              sortOrder: createdSortOrder === "asc" ? "desc" : "asc",
-            })
-          }
         />
 
         <ApiKeyQuickStart onSelect={handlePresetSelect} />
@@ -1088,6 +1018,9 @@ export default function ApiKeysPage() {
         createError={createError}
         input={createInput}
         isPending={mutation.isPending}
+        onAccessModeChange={(accessMode, scopes) =>
+          setNewKeyConfig({ accessMode, scopes })
+        }
         onExpirationChange={(expiration) => setNewKeyConfig({ expiration })}
         onNameChange={(name) => {
           dispatchUi({ type: "createErrorChanged", createError: null });

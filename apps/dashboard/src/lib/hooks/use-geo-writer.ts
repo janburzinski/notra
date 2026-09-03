@@ -8,10 +8,12 @@ import type {
   GeoWriterPlanInput,
 } from "@notra/geo-core/types/geo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { toast } from "sonner";
 
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { toErrorMessage } from "@/utils/error-message";
+import { getConflictRevision } from "@/utils/orpc-errors";
 
 import { dashboardOrpc } from "../orpc/query";
 
@@ -115,6 +117,75 @@ export function useGeoWriterStart(organizationId: string) {
     },
     onError: (error) => {
       toast.error(toErrorMessage(error, "Failed to start writing"));
+    },
+  });
+}
+
+export function useGeoWriterUpdate(organizationId: string, contentId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  const invalidate = useInvalidateWriterQueries(organizationId);
+  const latestRevisionByBrief = useRef(new Map<string, string>());
+  return useMutation({
+    scope: { id: `geo-writer-update:${organizationId}:${projectId}` },
+    mutationFn: async (input: {
+      briefId: string;
+      expectedUpdatedAt: string;
+      markdown: string;
+      workingTitle?: string;
+    }) => {
+      try {
+        const result = await dashboardOrpc.geo.writerUpdate.call({
+          ...input,
+          expectedUpdatedAt:
+            latestRevisionByBrief.current.get(input.briefId) ??
+            input.expectedUpdatedAt,
+          organizationId,
+          projectId,
+        });
+        latestRevisionByBrief.current.set(input.briefId, result.updatedAt);
+        return result;
+      } catch (error) {
+        if (getConflictRevision(error).isConflict) {
+          latestRevisionByBrief.current.delete(input.briefId);
+        }
+        throw error;
+      }
+    },
+    onSuccess: async (result) => {
+      await Promise.all([
+        invalidate(),
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.writerBrief.queryKey({
+            input: {
+              organizationId,
+              projectId,
+              briefId: result.id,
+            },
+          }),
+        }),
+      ]);
+    },
+    onError: (error, input) => {
+      if (getConflictRevision(error).isConflict) {
+        void Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: dashboardOrpc.geo.writerBrief.queryKey({
+              input: {
+                organizationId,
+                projectId,
+                briefId: input.briefId,
+              },
+            }),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: dashboardOrpc.content.get.queryKey({
+              input: { organizationId, contentId },
+            }),
+          }),
+        ]);
+      }
+      toast.error(toErrorMessage(error, "Failed to update the plan"));
     },
   });
 }

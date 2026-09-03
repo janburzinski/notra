@@ -1,6 +1,6 @@
 import { db } from "@notra/db/drizzle";
 import { geoScans, geoSettings } from "@notra/db/schema";
-import { and, eq, isNull, lt, or } from "drizzle-orm";
+import { and, eq, gte, isNull, lt, notExists, or } from "drizzle-orm";
 import { Effect, Exit } from "effect";
 
 import { GEO_SCAN_STALE_MS } from "../constants/geo";
@@ -13,7 +13,7 @@ import { type GeoDatabaseError, GeoScanStartError } from "./errors";
  * scan already holds it and the claim token when it does not.
  *
  * This single conditional `UPDATE … RETURNING` *is* the guard, and every entry
- * point that starts a scan (public API, dashboard trigger, QStash schedule)
+ * point that starts a scan (public API, dashboard trigger, cron sweep)
  * has to go through it. A read-then-check cannot work: concurrent triggers all
  * read "idle" before any of them writes, so they all proceed and the
  * organization gets billed for duplicate scans. Postgres instead serializes
@@ -298,6 +298,61 @@ export const createGeoScanRow = Effect.fn("geo.createScanRow")(function* (
  * finalizer and keeps a phantom "running" scan from lingering for clients that
  * poll the id the trigger handed them.
  */
+/**
+ * Fails every `geo_scans` row still `running` past the claim stale window
+ * whose project's scan-slot claim has also gone stale. A run in that state
+ * was killed without reaching its own finalizer (function timeout, crashed
+ * instance) and only misleads clients polling it.
+ *
+ * The row's own `started_at` is immutable, so age alone cannot distinguish a
+ * dead run from a legitimately long one: an alive batched scan renews
+ * `geo_settings.scan_started_at` as it goes. Rows are therefore left alone
+ * while their project's claim stamp is fresh — a dead run stops renewing and
+ * gets swept one stale window later.
+ */
+export const sweepStaleGeoScanRows = Effect.fn("geo.sweepStaleScanRows")(
+  function* () {
+    const staleBefore = new Date(Date.now() - GEO_SCAN_STALE_MS);
+    const failed = yield* geoDb("stale scan sweep failed", () =>
+      db
+        .update(geoScans)
+        .set({ status: "failed", finishedAt: new Date() })
+        .where(
+          and(
+            eq(geoScans.status, "running"),
+            lt(geoScans.startedAt, staleBefore),
+            notExists(
+              db
+                .select({ id: geoSettings.id })
+                .from(geoSettings)
+                .where(
+                  and(
+                    eq(geoSettings.projectId, geoScans.projectId),
+                    gte(geoSettings.scanStartedAt, staleBefore)
+                  )
+                )
+            )
+          )
+        )
+        .returning({
+          id: geoScans.id,
+          organizationId: geoScans.organizationId,
+          projectId: geoScans.projectId,
+        })
+    );
+    for (const row of failed) {
+      yield* geoLogError({
+        event: "geo.scan.failed",
+        reason: "stale_running_row",
+        organizationId: row.organizationId,
+        projectId: row.projectId,
+        scanId: row.id,
+      });
+    }
+    return failed.length;
+  }
+);
+
 export const failPendingGeoScanRow = Effect.fn("geo.failPendingScanRow")(
   function* (scope: GeoScanRunScope, scanId: string) {
     yield* geoDb("scan row fail stamp failed", () =>
@@ -316,7 +371,7 @@ export const failPendingGeoScanRow = Effect.fn("geo.failPendingScanRow")(
   }
 );
 
-const finishGeoScanRow = Effect.fn("geo.finishScanRow")(function* (
+export const finishGeoScanRow = Effect.fn("geo.finishScanRow")(function* (
   scope: GeoScanRunScope,
   scanId: string,
   status: "completed" | "failed"

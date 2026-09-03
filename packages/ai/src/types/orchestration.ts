@@ -138,6 +138,7 @@ export interface OrchestrateInput {
   messages: UIMessage[];
   currentMarkdown: string;
   contentType?: string;
+  documentMode?: "plan";
   currentPostId?: string;
   userId?: string;
   imageDefaults?: ImageDefaults;

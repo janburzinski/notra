@@ -228,6 +228,44 @@ export function useGeoSettingsUpsert(
   });
 }
 
+export function useGeoSettingsEngineAdd(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (engine: string) =>
+      dashboardOrpc.geo.settingsEngineAdd.call({
+        organizationId,
+        projectId,
+        engine,
+      }),
+    onSuccess: () =>
+      invalidateCompetitorQueries(queryClient, organizationId, projectId),
+    onError: (error) => {
+      trackEvent(POSTHOG_EVENTS.GEO_SETTINGS_SAVE_FAILED);
+      toast.error(toErrorMessage(error, "Failed to add model to tracking"));
+    },
+  });
+}
+
+export function useGeoSettingsLanguageAdd(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (language: string) =>
+      dashboardOrpc.geo.settingsLanguageAdd.call({
+        organizationId,
+        projectId,
+        language,
+      }),
+    onSuccess: () =>
+      invalidateCompetitorQueries(queryClient, organizationId, projectId),
+    onError: (error) => {
+      trackEvent(POSTHOG_EVENTS.GEO_SETTINGS_SAVE_FAILED);
+      toast.error(toErrorMessage(error, "Failed to add language to tracking"));
+    },
+  });
+}
+
 export function useGeoOverview(organizationId: string, range?: GeoRangeQuery) {
   const { projectId } = useGeoProjectScope();
   return useQuery<GeoOverviewResponse>({
@@ -732,7 +770,12 @@ export function useGeoProjects(organizationId: string) {
       input: { organizationId },
     }),
     enabled: !!organizationId,
-    meta: { errorMessage: "Failed to load projects" },
+    meta: {
+      errorMessage: "Failed to load projects",
+      showRetryAction: true,
+    },
+    refetchInterval: (query) =>
+      query.state.status === "error" ? 30_000 : false,
   });
 }
 

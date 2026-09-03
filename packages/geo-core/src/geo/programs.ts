@@ -39,6 +39,8 @@ import {
   GEO_COMPETITOR_SHARE_LIMIT,
   GEO_JOURNEY_DETAIL_LIMIT,
   GEO_MAX_COMPETITORS,
+  GEO_MAX_ENGINES,
+  GEO_MAX_LANGUAGES,
 } from "../constants/geo";
 import { GEO_MODEL_CATALOG_STATIC } from "../constants/geo-model-catalog";
 import { GeoEntitlementService } from "../deps";
@@ -60,6 +62,8 @@ import type {
   GeoPromptInsert,
   GeoPromptResultsResponse,
   GeoScopeInput,
+  GeoSettingsEngineAddInput,
+  GeoSettingsLanguageAddInput,
   GeoSettingsResponse,
   GeoSettingsUpsertInput,
   GeoTimeseriesResponse,
@@ -78,7 +82,12 @@ import type {
   GeoPromptImportRow,
 } from "../types/geo-import";
 import { toGeoTrafficTotals, toGeoVisitorType } from "../utils/ai-traffic";
-import { getGeoModelCatalogEntry } from "../utils/geo-model-catalog";
+import { trackedGeoLanguages } from "../utils/geo-language-rows";
+import {
+  geoDefaultEngines,
+  getGeoModelCatalogEntry,
+  isGeoEngineZdrCapable,
+} from "../utils/geo-model-catalog";
 import { groupGeoSparklinePoints } from "../utils/geo-sparkline";
 import { competitorKey } from "./domain";
 import { geoDb, geoQuery } from "./effect";
@@ -89,6 +98,7 @@ import {
   GeoScanAlreadyRunningError,
   GeoSettingsDisabledError,
   GeoSettingsMissingError,
+  GeoSettingsTrackingError,
 } from "./errors";
 import { geoHiddenSourceParams } from "./hidden-sources";
 import { lockGeoProject } from "./lock";
@@ -109,8 +119,8 @@ import {
 import { promptKey } from "./prompt-key";
 import { buildGeoPrompts } from "./prompts";
 import { startClaimedGeoScanRun } from "./scan-handoff";
+import { nextGeoScanAt } from "./scan-schedule";
 import { claimGeoScanRun } from "./scan-status";
-import { reconcileGeoScanSchedule } from "./schedule-reconcile";
 import { geoTrafficWindowParams } from "./window";
 
 function mergeLegacyCompetitors(
@@ -475,6 +485,109 @@ export const importGeoCompetitors = Effect.fn("geo.competitorsImport")(
   }
 );
 
+export const addGeoTrackedEngine = Effect.fn("geo.settingsEngineAdd")(
+  function* (input: GeoSettingsEngineAddInput) {
+    const { projectId } = yield* requireGeoProject(input);
+    const catalog = yield* loadGeoModelCatalog(input.organizationId);
+    if (!getGeoModelCatalogEntry(catalog, input.engine)) {
+      return yield* Effect.fail(
+        new GeoSettingsTrackingError({
+          message: "This model is no longer available for tracking",
+        })
+      );
+    }
+
+    const initialEngines = [
+      ...new Set([...geoDefaultEngines(catalog), input.engine]),
+    ];
+    const updated = yield* geoDb("tracked engine update failed", () =>
+      db
+        .update(geoSettings)
+        .set({
+          engines: sql<string[]>`
+            CASE
+              WHEN ${geoSettings.engines} IS NULL OR cardinality(${geoSettings.engines}) = 0
+                THEN ${sql.param(initialEngines)}::text[]
+              WHEN ${input.engine} = ANY(${geoSettings.engines})
+                THEN ${geoSettings.engines}
+              WHEN (
+                SELECT count(DISTINCT engine)
+                FROM unnest(${geoSettings.engines}) AS tracked_engines(engine)
+              ) < ${GEO_MAX_ENGINES}
+                THEN array_append(${geoSettings.engines}, ${input.engine})
+              ELSE ${geoSettings.engines}
+            END
+          `,
+        })
+        .where(
+          and(
+            eq(geoSettings.organizationId, input.organizationId),
+            eq(geoSettings.projectId, projectId),
+            sql`(
+              NOT ${geoSettings.enforceZdr}
+              OR ${isGeoEngineZdrCapable(catalog, input.engine)}
+              OR ${input.engine} = ANY(${geoSettings.nonZdrApprovedEngines})
+            )`
+          )
+        )
+        .returning({ engines: geoSettings.engines })
+    );
+
+    if (!updated.at(0)?.engines?.includes(input.engine)) {
+      return yield* Effect.fail(
+        new GeoSettingsTrackingError({
+          message:
+            "This model cannot be added under the current tracking settings",
+        })
+      );
+    }
+  }
+);
+
+export const addGeoTrackedLanguage = Effect.fn("geo.settingsLanguageAdd")(
+  function* (input: GeoSettingsLanguageAddInput) {
+    const { projectId } = yield* requireGeoProject(input);
+    const initialLanguages = [
+      ...new Set([...trackedGeoLanguages([]), input.language]),
+    ];
+    const updated = yield* geoDb("tracked language update failed", () =>
+      db
+        .update(geoSettings)
+        .set({
+          languages: sql<string[]>`
+            CASE
+              WHEN ${geoSettings.languages} IS NULL OR cardinality(${geoSettings.languages}) = 0
+                THEN ${sql.param(initialLanguages)}::text[]
+              WHEN ${input.language} = ANY(${geoSettings.languages})
+                THEN ${geoSettings.languages}
+              WHEN (
+                SELECT count(DISTINCT language)
+                FROM unnest(${geoSettings.languages}) AS tracked_languages(language)
+              ) < ${GEO_MAX_LANGUAGES}
+                THEN array_append(${geoSettings.languages}, ${input.language})
+              ELSE ${geoSettings.languages}
+            END
+          `,
+        })
+        .where(
+          and(
+            eq(geoSettings.organizationId, input.organizationId),
+            eq(geoSettings.projectId, projectId)
+          )
+        )
+        .returning({ languages: geoSettings.languages })
+    );
+
+    if (!updated.at(0)?.languages?.includes(input.language)) {
+      return yield* Effect.fail(
+        new GeoSettingsTrackingError({
+          message: "This language cannot be added to tracking",
+        })
+      );
+    }
+  }
+);
+
 export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   input: GeoSettingsUpsertInput
 ) {
@@ -507,7 +620,7 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
         engines: true,
         nonZdrApprovedEngines: true,
         enabled: true,
-        qstashMessageId: true,
+        nextScanAt: true,
         scanIntervalHours: true,
       },
       where: eq(geoSettings.projectId, projectId),
@@ -529,6 +642,21 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
     ]),
   ].filter((engine) => engineSet.has(engine));
 
+  // The schedule is a plain due stamp the cron sweep polls. A fresh enable or
+  // an interval change re-arms it a full interval out (matching the old
+  // delayed-message behaviour); an unchanged enabled row keeps its pending
+  // due time, and disabling clears it.
+  const keepNextScanAt =
+    input.enabled &&
+    existingSettings?.enabled === true &&
+    existingSettings.scanIntervalHours === input.scanIntervalHours;
+  let nextScanAt: Date | null = null;
+  if (input.enabled) {
+    nextScanAt = keepNextScanAt
+      ? (existingSettings?.nextScanAt ?? nextGeoScanAt(input.scanIntervalHours))
+      : nextGeoScanAt(input.scanIntervalHours);
+  }
+
   yield* geoDb("settings upsert failed", () =>
     db
       .insert(geoSettings)
@@ -545,6 +673,7 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
         nonZdrApprovedEngines,
         enabled: input.enabled,
         scanIntervalHours: input.scanIntervalHours,
+        nextScanAt,
       })
       .onConflictDoUpdate({
         target: geoSettings.projectId,
@@ -557,6 +686,7 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
           nonZdrApprovedEngines,
           enabled: input.enabled,
           scanIntervalHours: input.scanIntervalHours,
+          nextScanAt,
         },
       })
   );
@@ -565,20 +695,6 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
     { organizationId: input.organizationId, projectId },
     (current) => current
   );
-
-  const existingMessageId = existingSettings?.qstashMessageId ?? null;
-  yield* reconcileGeoScanSchedule({
-    organizationId: input.organizationId,
-    projectId,
-    snapshot: {
-      qstashMessageId: existingMessageId,
-      enabled: input.enabled,
-      scanIntervalHours: input.scanIntervalHours,
-    },
-    reschedule:
-      existingSettings?.enabled === false ||
-      existingSettings?.scanIntervalHours !== input.scanIntervalHours,
-  });
 
   const rows = yield* geoDb("settings lookup failed", () =>
     db.select().from(geoSettings).where(eq(geoSettings.projectId, projectId))
@@ -698,7 +814,14 @@ export const loadGeoPromptResults = Effect.fn("geo.promptResults")(function* (
       sentiment: row.sentiment,
       excerpt: row.excerpt,
       searchQueries: row.grounding.queries,
-      sources: row.grounding.sources,
+      sources:
+        row.grounding.sources.length > 0
+          ? row.grounding.sources
+          : row.sources.map((source) => ({
+              title: source.title ?? source.url,
+              url: source.url,
+              domain: "",
+            })),
       finishReason: row.finishReason,
       promptTokens: row.promptTokens,
       outputTokens: row.outputTokens,
@@ -1305,7 +1428,7 @@ export const startGeoScan = Effect.fn("geo.startScan")(function* (
 
   // Claim the scan slot atomically *before* handing off. Reading the settings
   // row and checking `isGeoScanRunning` cannot serialize anything: concurrent
-  // triggers (public API, dashboard, QStash schedule) all read "idle" before
+  // triggers (public API, dashboard, cron sweep) all read "idle" before
   // any of them stamps, and all of them start a scan the organization pays
   // for. Losing the claim means someone else is already scanning.
   const claim = yield* claimGeoScanRun(projectId);

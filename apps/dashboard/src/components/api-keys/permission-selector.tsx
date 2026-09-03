@@ -18,7 +18,6 @@ import {
   API_KEY_SCOPE_GROUPS,
   applyScopeLevel,
   deriveScopeLevel,
-  getApiKeyAccessMode,
   getApiKeyScopesForAccessMode,
   sortApiKeyScopes,
 } from "@/lib/api-keys/scopes";
@@ -29,13 +28,14 @@ import type {
 } from "@/types/api-keys";
 
 export function ApiKeyPermissionSelector({
+  accessMode,
   value,
+  onAccessModeChange,
   onValueChange,
   disabled,
   className,
 }: ApiKeyPermissionSelectorProps) {
   const selected = new Set(value);
-  const accessMode = getApiKeyAccessMode(value);
   const selectedMode = API_KEY_ACCESS_MODE_OPTIONS.find(
     (option) => option.value === accessMode
   );
@@ -54,11 +54,13 @@ export function ApiKeyPermissionSelector({
         indicatorMotion="smooth"
         label="API key access"
         layout="compact"
-        onValueChange={(mode) =>
-          onValueChange(
-            getApiKeyScopesForAccessMode(mode as ApiKeyAccessMode, value)
-          )
-        }
+        onValueChange={(mode) => {
+          const nextMode = mode as ApiKeyAccessMode;
+          onAccessModeChange(
+            nextMode,
+            getApiKeyScopesForAccessMode(nextMode, value)
+          );
+        }}
         value={accessMode}
       >
         {API_KEY_ACCESS_MODE_OPTIONS.map((option) => (

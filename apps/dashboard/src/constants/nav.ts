@@ -85,9 +85,10 @@ export const GEO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
   "feedback",
 ]);
 
+export const SHARED_ROUTE_SECTIONS: ReadonlySet<string> = new Set(["content"]);
+
 export const STUDIO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
   "chat",
-  "content",
   "collection",
   "analytics",
   "brand",
@@ -137,16 +138,16 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
     label: "Competitors",
   },
   { link: GEO_WRITER_NAV_LINK, icon: PencilEdit01Icon, label: "Write" },
-  { link: GEO_SETTINGS_NAV_LINK, icon: Settings01Icon, label: "GEO settings" },
+  { link: GEO_SETTINGS_NAV_LINK, icon: Settings01Icon, label: "Settings" },
   { link: SKILLS_NAV_LINK, icon: MagicWand01Icon, label: "Skills" },
   { link: API_KEYS_NAV_LINK, icon: Key01Icon, label: "API Keys" },
 ];
 
 export const NAV_GEO_VISIBILITY_LINKS: readonly string[] = [
   GEO_OVERVIEW_NAV_LINK,
+  GEO_TRAFFIC_NAV_LINK,
   GEO_PROMPTS_NAV_LINK,
   GEO_COMPETITORS_NAV_LINK,
-  GEO_TRAFFIC_NAV_LINK,
   AGENT_FEEDBACK_NAV_LINK,
 ];
 
@@ -156,6 +157,7 @@ export const NAV_GEO_IMPROVE_LINKS: readonly string[] = [
   GEO_WRITER_NAV_LINK,
   CONTENT_NAV_LINK,
   SCHEDULES_NAV_LINK,
+  GEO_SETTINGS_NAV_LINK,
 ];
 
 export const NAV_GEO_LINKS: readonly string[] = [

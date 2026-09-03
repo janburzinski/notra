@@ -1,19 +1,20 @@
-import { GEO_AVATAR_FALLBACK_BASE, GEO_FAVICON_BASE } from "../constants/geo";
+import { logoLinkUrl } from "@notra/utils/logo-link";
 
-function buildCompetitorFaviconUrl(domain: string): string {
-  return `${GEO_FAVICON_BASE}/${encodeURIComponent(domain)}.ico`;
-}
+import { GEO_AVATAR_FALLBACK_BASE } from "../constants/geo";
 
 export function competitorLogoSources(
   domain: string | null,
   logo: string | null
 ): string[] {
-  if (!domain) {
-    return logo ? [logo] : [];
+  const sources: string[] = [];
+  if (logo) {
+    sources.push(logo);
   }
-
-  const favicon = buildCompetitorFaviconUrl(domain);
-  return logo ? [logo, favicon] : [favicon];
+  const logoLink = logoLinkUrl(domain);
+  if (logoLink) {
+    sources.push(logoLink);
+  }
+  return sources;
 }
 
 export function projectLogoSources(

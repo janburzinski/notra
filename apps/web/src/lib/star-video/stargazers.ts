@@ -4,7 +4,6 @@ import type { GitHubRepo, GitHubUser } from "~types/github";
 import type { RepoStarData } from "@/types/star-video";
 
 const MAX_AVATARS = 60;
-const REVALIDATE_SECONDS = 60 * 60 * 24;
 
 class RepoNotFound extends Data.TaggedError("RepoNotFound")<{
   readonly owner: string;
@@ -16,43 +15,54 @@ class RepoUnavailable extends Data.TaggedError("RepoUnavailable")<{
   readonly repo: string;
 }> {}
 
-function buildHeaders(): Record<string, string> {
-  const headers: Record<string, string> = {
-    Accept: "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "notra-star-video",
+class RepoUnauthorized extends Data.TaggedError("RepoUnauthorized")<{
+  readonly owner: string;
+  readonly repo: string;
+}> {}
+
+function buildFetchOptions(token: string): RequestInit {
+  return {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "notra-star-video",
+    },
+    cache: "no-store",
   };
-  if (process.env.GITHUB_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  }
-  return headers;
 }
 
-async function fetchJson<T>(url: string): Promise<T | null> {
+const HTTP_NOT_FOUND = 404;
+const HTTP_UNAUTHORIZED = 401;
+
+class TokenRejected extends Error {}
+
+async function fetchJson<T>(url: string, token: string): Promise<T | null> {
+  let res: Response;
   try {
-    const res = await fetch(url, {
-      headers: buildHeaders(),
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
-    if (!res.ok) {
-      return null;
-    }
+    res = await fetch(url, buildFetchOptions(token));
+  } catch {
+    return null;
+  }
+  if (res.status === HTTP_UNAUTHORIZED) {
+    throw new TokenRejected();
+  }
+  if (!res.ok) {
+    return null;
+  }
+  try {
     return (await res.json()) as T;
   } catch {
     return null;
   }
 }
 
-const HTTP_NOT_FOUND = 404;
-
 async function fetchRepoMeta(
-  base: string
+  base: string,
+  token: string
 ): Promise<{ status: number; data: GitHubRepo | null }> {
   try {
-    const res = await fetch(base, {
-      headers: buildHeaders(),
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
+    const res = await fetch(base, buildFetchOptions(token));
     if (!res.ok) {
       return { status: res.status, data: null };
     }
@@ -82,19 +92,19 @@ function toAvatarUrls(users: GitHubUser[] | null): string[] {
   return urls;
 }
 
-async function fetchAvatars(base: string): Promise<string[]> {
-  if (process.env.GITHUB_TOKEN) {
-    const stargazers = await fetchJson<GitHubUser[]>(
-      `${base}/stargazers?per_page=100`
-    );
-    const fromStars = toAvatarUrls(stargazers);
-    if (fromStars.length > 0) {
-      return fromStars;
-    }
+async function fetchAvatars(base: string, token: string): Promise<string[]> {
+  const stargazers = await fetchJson<GitHubUser[]>(
+    `${base}/stargazers?per_page=100`,
+    token
+  );
+  const fromStars = toAvatarUrls(stargazers);
+  if (fromStars.length > 0) {
+    return fromStars;
   }
 
   const contributors = await fetchJson<GitHubUser[]>(
-    `${base}/contributors?per_page=100`
+    `${base}/contributors?per_page=100`,
+    token
   );
   const fromContributors = toAvatarUrls(contributors);
   if (fromContributors.length > 0) {
@@ -102,7 +112,8 @@ async function fetchAvatars(base: string): Promise<string[]> {
   }
 
   const commits = await fetchJson<Array<{ author: GitHubUser | null }>>(
-    `${base}/commits?per_page=100`
+    `${base}/commits?per_page=100`,
+    token
   );
   return toAvatarUrls(
     (commits ?? [])
@@ -113,14 +124,19 @@ async function fetchAvatars(base: string): Promise<string[]> {
 
 export const fetchRepoStarData = Effect.fn("fetchRepoStarData")(function* (
   owner: string,
-  repo: string
+  repo: string,
+  token: string
 ) {
   const base = `https://api.github.com/repos/${owner}/${repo}`;
 
-  const meta = yield* Effect.promise(() => fetchRepoMeta(base));
+  const meta = yield* Effect.promise(() => fetchRepoMeta(base, token));
 
   if (meta.status === HTTP_NOT_FOUND) {
     return yield* Effect.fail(new RepoNotFound({ owner, repo }));
+  }
+
+  if (meta.status === HTTP_UNAUTHORIZED) {
+    return yield* Effect.fail(new RepoUnauthorized({ owner, repo }));
   }
 
   const repoData = meta.data;
@@ -133,7 +149,10 @@ export const fetchRepoStarData = Effect.fn("fetchRepoStarData")(function* (
     return yield* Effect.fail(new RepoNotFound({ owner, repo }));
   }
 
-  const avatars = yield* Effect.promise(() => fetchAvatars(base));
+  const avatars = yield* Effect.tryPromise({
+    try: () => fetchAvatars(base, token),
+    catch: () => new RepoUnauthorized({ owner, repo }),
+  });
   const resolvedOwner = repoData.full_name.split("/")[0] ?? owner;
 
   return {

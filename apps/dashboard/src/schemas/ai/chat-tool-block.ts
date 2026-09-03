@@ -1,3 +1,4 @@
+import "zod/compile";
 import { z } from "zod";
 
 const optionalStringSchema = z.preprocess(
@@ -26,6 +27,7 @@ export const STRING_TOOL_FIELDS = [
   "memoryId",
   "name",
   "postId",
+  "projectId",
   "q",
   "query",
   "reason",
@@ -52,6 +54,7 @@ export const stringToolFieldsSchema = z
     memoryId: optionalStringSchema,
     name: optionalStringSchema,
     postId: optionalStringSchema,
+    projectId: optionalStringSchema,
     q: optionalStringSchema,
     query: optionalStringSchema,
     reason: optionalStringSchema,

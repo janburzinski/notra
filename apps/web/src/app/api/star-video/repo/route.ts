@@ -2,10 +2,11 @@ import { Effect } from "effect";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { GITHUB_CONNECTION_REQUIRED_MESSAGE } from "@/lib/star-video/github-cookies";
 import {
-  getCachedRepoStarData,
-  setCachedRepoStarData,
-} from "@/lib/star-video/cache";
+  clearGithubCookies,
+  readGithubToken,
+} from "@/lib/star-video/github-oauth";
 import { loadRepoStarData } from "@/lib/star-video/load-repo";
 import { enforceStarVideoRateLimit } from "@/lib/star-video/ratelimit";
 import { repoQuerySchema } from "@/schemas/star-video";
@@ -40,14 +41,24 @@ export async function GET(request: NextRequest) {
 
   const { owner, repo } = parsed.data;
   const id = `${owner}/${repo}`.toLowerCase();
-
-  const cached = await Effect.runPromise(getCachedRepoStarData(id));
-  if (cached) {
-    return NextResponse.json(cached);
+  const githubToken = readGithubToken(request);
+  if (!githubToken) {
+    return NextResponse.json(
+      { error: GITHUB_CONNECTION_REQUIRED_MESSAGE },
+      { status: 401 }
+    );
   }
 
-  const result = await loadRepoStarData(owner, repo, id);
+  const result = await loadRepoStarData(owner, repo, id, githubToken);
   if (!result.ok) {
+    if (result.kind === "unauthorized") {
+      const response = NextResponse.json(
+        { error: GITHUB_CONNECTION_REQUIRED_MESSAGE },
+        { status: 401 }
+      );
+      clearGithubCookies(response);
+      return response;
+    }
     if (result.kind === "unavailable") {
       return NextResponse.json(
         { error: "GitHub is unavailable right now. Please try again." },
@@ -60,6 +71,5 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  await Effect.runPromise(setCachedRepoStarData(result.data.id, result.data));
   return NextResponse.json(result.data);
 }

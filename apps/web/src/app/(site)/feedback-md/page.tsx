@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { FeedbackMdAdopters } from "@/components/feedback-md/feedback-md-adopters";
 import { FeedbackMdAnatomy } from "@/components/feedback-md/feedback-md-anatomy";
 import { FeedbackMdFaq } from "@/components/feedback-md/feedback-md-faq";
 import { FeedbackMdHero } from "@/components/feedback-md/feedback-md-hero";
@@ -62,6 +63,8 @@ export default function FeedbackMdPage() {
       <FeedbackMdHero />
       <div className="flex w-[min(100%-3rem,62.5rem)] flex-col gap-14 pt-6">
         <FeedbackMdTerminalDemo />
+
+        <FeedbackMdAdopters />
 
         <FeedbackMdSection
           description={FEEDBACK_MD_DESCRIPTION}

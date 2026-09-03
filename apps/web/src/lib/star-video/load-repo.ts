@@ -2,39 +2,54 @@ import { Effect } from "effect";
 
 import type { RepoStarData } from "@/types/star-video";
 
+import { fingerprintGithubToken } from "./github-oauth";
 import { fetchRepoStarData } from "./stargazers";
 
 export type LoadRepoResult =
   | { ok: true; data: RepoStarData }
-  | { ok: false; kind: "not-found" | "unavailable" };
+  | { ok: false; kind: "not-found" | "unavailable" | "unauthorized" };
+
+function failureKind(
+  tag: string
+): "not-found" | "unavailable" | "unauthorized" {
+  if (tag === "RepoUnavailable") {
+    return "unavailable";
+  }
+  if (tag === "RepoUnauthorized") {
+    return "unauthorized";
+  }
+  return "not-found";
+}
 
 const inflight = new Map<string, Promise<LoadRepoResult>>();
 
 export function loadRepoStarData(
   owner: string,
   repo: string,
-  id: string
+  id: string,
+  token: string
 ): Promise<LoadRepoResult> {
-  const existing = inflight.get(id);
+  const inflightKey = `${id}:${fingerprintGithubToken(token)}`;
+  const existing = inflight.get(inflightKey);
   if (existing) {
     return existing;
   }
 
   const promise = Effect.runPromise(
-    fetchRepoStarData(owner, repo).pipe(
+    fetchRepoStarData(owner, repo, token).pipe(
       Effect.match({
         onSuccess: (data): LoadRepoResult => ({ ok: true, data }),
         onFailure: (error): LoadRepoResult => ({
           ok: false,
-          kind: error._tag === "RepoUnavailable" ? "unavailable" : "not-found",
+          kind: failureKind(error._tag),
         }),
       })
     )
   );
 
-  inflight.set(id, promise);
+  inflight.set(inflightKey, promise);
   promise.finally(() => {
-    inflight.delete(id);
+    inflight.delete(inflightKey);
   });
   return promise;
 }

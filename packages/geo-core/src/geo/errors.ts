@@ -87,6 +87,12 @@ export class GeoSettingsDisabledError extends Data.TaggedError(
   readonly projectId: string;
 }> {}
 
+export class GeoSettingsTrackingError extends Data.TaggedError(
+  "GeoSettingsTrackingError"
+)<{
+  readonly message: string;
+}> {}
+
 export class GeoScanStartError extends Data.TaggedError("GeoScanStartError")<{
   readonly cause: unknown;
 }> {}
@@ -98,18 +104,6 @@ export class GeoScanStartError extends Data.TaggedError("GeoScanStartError")<{
  */
 export class GeoScanAlreadyRunningError extends Data.TaggedError(
   "GeoScanAlreadyRunningError"
-)<{
-  readonly projectId: string;
-}> {}
-
-/**
- * A pending QStash message could not be cancelled, so the operation that
- * depends on the cancellation (project deletion) was refused rather than
- * leaving a delayed job pointed at a row that no longer exists. Retryable:
- * the caller should try the same request again.
- */
-export class GeoScheduleCancelError extends Data.TaggedError(
-  "GeoScheduleCancelError"
 )<{
   readonly projectId: string;
 }> {}
@@ -179,8 +173,8 @@ export class GeoSampleDataDisabledError extends Data.TaggedError(
   "GeoSampleDataDisabledError"
 )<Record<string, never>> {}
 
-export class GeoCursorFlagEvaluationError extends Data.TaggedError(
-  "GeoCursorFlagEvaluationError"
+export class GeoFlagEvaluationError extends Data.TaggedError(
+  "GeoFlagEvaluationError"
 )<{
   readonly message: string;
   readonly cause: unknown;
@@ -205,6 +199,13 @@ export class GeoContentBriefStateError extends Data.TaggedError(
   readonly status: string;
 }> {}
 
+export class GeoContentBriefConflictError extends Data.TaggedError(
+  "GeoContentBriefConflictError"
+)<{
+  readonly briefId: string;
+  readonly updatedAt: string;
+}> {}
+
 export class GeoWriterPlanError extends Data.TaggedError("GeoWriterPlanError")<{
   readonly message: string;
   readonly cause?: unknown;
@@ -220,6 +221,7 @@ export type GeoRouterError =
   | GeoBrandIdentityMissingError
   | GeoBrandIdentityNotFoundError
   | GeoCompetitorLimitError
+  | GeoContentBriefConflictError
   | GeoContentBriefNotFoundError
   | GeoContentBriefStateError
   | GeoDatabaseError
@@ -232,13 +234,13 @@ export type GeoRouterError =
   | GeoSampleDataDisabledError
   | GeoScanAlreadyRunningError
   | GeoScanStartError
-  | GeoScheduleCancelError
   | GeoSequenceCreateFailedError
   | GeoSequenceNotFoundError
   | GeoSequenceRunError
   | GeoSequenceRunUnavailableError
   | GeoSettingsDisabledError
   | GeoSettingsMissingError
+  | GeoSettingsTrackingError
   | GeoTinybirdError
   | GeoWriterCreditsExhaustedError
   | GeoWriterPlanError

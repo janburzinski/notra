@@ -50,6 +50,8 @@ import {
   suggestGeoCompetitors,
 } from "@notra/geo-core/geo/onboarding";
 import {
+  addGeoTrackedEngine,
+  addGeoTrackedLanguage,
   createGeoPrompt,
   deleteGeoCompetitor,
   deleteGeoPrompt,
@@ -99,6 +101,7 @@ import {
   getGeoContentBrief,
   listGeoContentBriefs,
   planGeoContentBrief,
+  updateGeoContentBrief,
 } from "@notra/geo-core/geo/writer";
 import {
   aiTrafficInputSchema,
@@ -124,6 +127,8 @@ import {
   geoSequenceResultsInputSchema,
   geoSequenceRunInputSchema,
   geoSequenceUpdateInputSchema,
+  geoSettingsEngineAddInputSchema,
+  geoSettingsLanguageAddInputSchema,
   geoSettingsUpsertInputSchema,
   geoSuggestionIdInputSchema,
   geoTimeseriesInputSchema,
@@ -132,6 +137,7 @@ import {
   geoTrafficPagesInputSchema,
   geoWriterBriefIdInputSchema,
   geoWriterPlanInputSchema,
+  geoWriterUpdateInputSchema,
 } from "@notra/geo-core/schemas/geo";
 import { gscSelectSiteInputSchema } from "@notra/geo-core/schemas/google-search-console";
 import type {
@@ -402,6 +408,12 @@ export const geoRouter = {
   settings: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(geoOpenHandler((input) => loadGeoSettings(input))),
+  settingsEngineAdd: authorizedProcedure
+    .input(geoSettingsEngineAddInputSchema)
+    .handler(geoHandler((input) => addGeoTrackedEngine(input))),
+  settingsLanguageAdd: authorizedProcedure
+    .input(geoSettingsLanguageAddInputSchema)
+    .handler(geoHandler((input) => addGeoTrackedLanguage(input))),
   settingsUpsert: authorizedProcedure
     .input(geoSettingsUpsertInputSchema)
     .handler(
@@ -1040,6 +1052,25 @@ export const geoRouter = {
         properties: { brief_id: input.briefId, run_id: started.runId },
       });
       return started;
+    }),
+  writerUpdate: authorizedProcedure
+    .input(geoWriterUpdateInputSchema)
+    .handler(async ({ context, input }) => {
+      await Promise.all([
+        assertGeoAccess({
+          headers: context.headers,
+          organizationId: input.organizationId,
+          user: context.user,
+        }),
+        assertActiveSubscription(input.organizationId),
+      ]);
+
+      return runOrpcEffect(
+        updateGeoContentBrief(input).pipe(
+          Effect.provide(geoCoreDashboardLayer)
+        ),
+        toGeoOrpcError
+      );
     }),
   sampleData: authorizedProcedure
     .input(geoOrganizationInputSchema)

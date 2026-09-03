@@ -1,5 +1,7 @@
+import { GEO_BRIEF_MAX_TITLE_LENGTH } from "@notra/ai/constants/geo-writer";
 import { SUPPORTED_LANGUAGES } from "@notra/ai/constants/languages";
 import { geoContentSubtypeSchema } from "@notra/ai/schemas/geo-writer";
+import { POST_MARKDOWN_MAX_LENGTH } from "@notra/ai/schemas/limits";
 import {
   array,
   boolean,
@@ -78,7 +80,7 @@ export const geoOrganizationInputSchema = object({
  *
  * `scanId` is the `geo_scans` row the trigger already inserted so its caller
  * could be handed a pollable id. The run adopts it instead of creating a row
- * of its own. Optional: the QStash schedule starts a run with nobody waiting
+ * of its own. Optional: the scheduled sweep starts a run with nobody waiting
  * on an id, and so does any workflow queued before this field existed.
  */
 export const geoScanWorkflowPayloadSchema = geoOrganizationInputSchema
@@ -100,6 +102,20 @@ export const geoScanWorkflowPayloadSchema = geoOrganizationInputSchema
 export const geoModelCatalogInputSchema = object({
   organizationId: string().min(1),
 });
+
+export const geoSettingsEngineAddInputSchema =
+  geoOrganizationInputSchema.extend({
+    engine: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+  });
+
+export const geoSettingsLanguageAddInputSchema =
+  geoOrganizationInputSchema.extend({
+    language: string()
+      .min(1)
+      .refine((value) => GEO_SUPPORTED_LANGUAGE_SET.has(value), {
+        message: "Unsupported language",
+      }),
+  });
 
 export const geoSettingsUpsertInputSchema = geoOrganizationInputSchema.extend({
   companyName: string().min(1),
@@ -406,6 +422,16 @@ export const geoWriterPlanInputSchema = geoOrganizationInputSchema.extend({
 
 export const geoWriterBriefIdInputSchema = geoOrganizationInputSchema.extend({
   briefId: string().min(1),
+});
+
+export const geoWriterUpdateInputSchema = geoWriterBriefIdInputSchema.extend({
+  expectedUpdatedAt: string().datetime(),
+  markdown: string().trim().min(1).max(POST_MARKDOWN_MAX_LENGTH),
+  workingTitle: string()
+    .trim()
+    .min(1)
+    .max(GEO_BRIEF_MAX_TITLE_LENGTH)
+    .optional(),
 });
 
 export const geoWriterWorkflowPayloadSchema = object({
