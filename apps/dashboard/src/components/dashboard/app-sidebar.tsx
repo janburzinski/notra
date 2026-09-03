@@ -118,13 +118,11 @@ export function DashboardSidebar({
             {
               id: "main",
               side: "left",
-              className: "flex-1",
               children: <NavMain />,
             },
             {
               id: "chat",
               side: "right",
-              className: "flex-1",
               children: (
                 <>
                   <SidebarBackButton onBack={handleBack} />
@@ -135,7 +133,6 @@ export function DashboardSidebar({
             {
               id: "settings",
               side: "right",
-              className: "flex-1",
               children: (
                 <>
                   <SidebarBackButton onBack={handleBack} />
@@ -146,7 +143,6 @@ export function DashboardSidebar({
             {
               id: "brand",
               side: "right",
-              className: "flex-1",
               children: (
                 <>
                   <SidebarBackButton onBack={handleBack} />
