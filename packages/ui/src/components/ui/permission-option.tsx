@@ -51,6 +51,11 @@ export function PermissionOption({
   } = usePermissionRow();
   const active = selected === value;
   const disabled = rowDisabled || (optionDisabled ?? false);
+  const fades = indicatorMotion === "fade";
+  const indicatorClassName = cn(
+    "absolute inset-0 rounded-md shadow-sm ring-1",
+    TONE_PILL[tone]
+  );
 
   return (
     // biome-ignore lint/a11y/useSemanticElements: a single-select segmented control is the radiogroup/radio ARIA pattern; native radios can't hold custom pill content.
@@ -70,16 +75,24 @@ export function PermissionOption({
       tabIndex={selected === undefined || active ? 0 : -1}
       type="button"
     >
-      {active && (
-        <m.span
+      {fades ? (
+        <span
+          aria-hidden
           className={cn(
-            "absolute inset-0 rounded-md shadow-sm ring-1",
-            TONE_PILL[tone]
+            indicatorClassName,
+            "transition-opacity duration-200 ease-out",
+            active ? "opacity-100" : "opacity-0"
           )}
+        />
+      ) : null}
+      {active && !fades ? (
+        <m.span
+          className={indicatorClassName}
+          initial={false}
           layoutId={indicatorMotion === "none" ? undefined : layoutId}
           transition={indicatorMotion === "smooth" ? SMOOTH : SPRING}
         />
-      )}
+      ) : null}
       <span className="relative z-10 flex items-center gap-1.5">
         {children}
       </span>

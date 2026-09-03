@@ -51,7 +51,7 @@ export function ApiKeyPermissionSelector({
       <PermissionRow
         className="w-full"
         disabled={disabled}
-        indicatorMotion="smooth"
+        indicatorMotion="fade"
         label="API key access"
         layout="compact"
         onValueChange={(mode) => {
