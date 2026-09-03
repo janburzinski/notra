@@ -113,7 +113,7 @@ export function DashboardSidebar({
       <SidebarContent>
         <SidebarSwap
           activeId={panelId}
-          className="flex min-h-0 flex-1 flex-col overflow-x-clip"
+          className="overflow-x-clip"
           items={[
             {
               id: "main",
