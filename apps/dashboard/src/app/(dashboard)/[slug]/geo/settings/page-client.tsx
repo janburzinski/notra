@@ -57,6 +57,7 @@ function SettingsPageContent({ organizationSlug }: GeoPageClientProps) {
       <div className="w-full space-y-10 px-4 lg:px-6">
         <GeoSettingsForm
           catalog={catalog}
+          key={activeProjectId}
           organizationId={organizationId}
           settings={settingsData?.settings ?? null}
         />
