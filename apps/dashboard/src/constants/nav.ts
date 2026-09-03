@@ -221,7 +221,7 @@ export const NAV_PRIMARY_ACTIONS: Record<SidebarMode, NavPrimaryActionConfig> =
 // so the leftovers are gone before the eye lands on them.
 const SIDEBAR_MODE_SWOOSH_IN = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 const SIDEBAR_MODE_SWOOSH_OUT = "ease-emphasized";
-const SIDEBAR_MODE_ENTER_TIMING = `duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:duration-fast`;
+const SIDEBAR_MODE_ENTER_TIMING = `duration-slow ${SIDEBAR_MODE_SWOOSH_IN}`;
 const SIDEBAR_MODE_EXIT_TIMING = `duration-fast ${SIDEBAR_MODE_SWOOSH_OUT}`;
 
 /** Derived from the `duration-fast` token used on the exit classes above. */

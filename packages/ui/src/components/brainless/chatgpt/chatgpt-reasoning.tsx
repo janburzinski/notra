@@ -72,7 +72,7 @@ export function ChatgptReasoning({
           />
         </svg>
       </CollapsibleTrigger>
-      <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden outline-none transition-[height,opacity] duration-normal ease-emphasized data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0 motion-reduce:transition-opacity motion-reduce:duration-fast">
+      <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden outline-none transition-[height,opacity] duration-normal ease-emphasized data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0 motion-reduce:transition-opacity">
         <div className="mt-2 flex flex-col items-start gap-2.5 font-normal">
           {children ? <div className={TRACE_ENTER}>{children}</div> : null}
           {search ? (

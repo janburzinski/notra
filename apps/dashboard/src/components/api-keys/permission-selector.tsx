@@ -74,7 +74,7 @@ export function ApiKeyPermissionSelector({
 
       {accessMode !== "restricted" && selectedMode ? (
         <Alert
-          className="grid-cols-[auto_1fr] gap-x-3 rounded-xl p-4"
+          className="border-info/25 bg-info/10 grid-cols-[auto_1fr] gap-x-3 rounded-xl p-4"
           variant="info"
         >
           <HugeiconsIcon

@@ -125,10 +125,10 @@ export const AGENT_FEEDBACK_LABEL_PILL_CLASS =
 
 export const AGENT_FEEDBACK_KIND_PILL_CLASS: Record<AgentFeedbackKind, string> =
   {
-    bug: "border-chart-1/25 bg-chart-1/10 text-chart-1",
-    feature: "border-chart-2/25 bg-chart-2/10 text-chart-2",
-    praise: "border-chart-3/25 bg-chart-3/10 text-chart-3",
-    question: "border-chart-4/25 bg-chart-4/10 text-chart-4",
+    bug: "border-destructive/25 bg-destructive/10 text-foreground",
+    feature: "border-info/25 bg-info/10 text-foreground",
+    praise: "border-success/25 bg-success/10 text-foreground",
+    question: "border-warning/25 bg-warning/10 text-foreground",
     other: "border-border bg-muted/50 text-muted-foreground dark:bg-muted/30",
   };
 

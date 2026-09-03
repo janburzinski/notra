@@ -1,6 +1,12 @@
 "use client";
 
-import { AnimatePresence, domMax, LazyMotion, m } from "motion/react";
+import {
+  AnimatePresence,
+  domMax,
+  LazyMotion,
+  m,
+  useReducedMotion,
+} from "motion/react";
 import { type ReactNode, useId, useState } from "react";
 import {
   Tooltip,
@@ -39,6 +45,8 @@ function ExpandableTab({
   layoutId,
   onSelect,
 }: ExpandableTabProps) {
+  const reduceMotion = useReducedMotion();
+  const transition = reduceMotion ? { duration: 0 } : SPRING.indicator;
   const tabClassName =
     "relative flex shrink-0 cursor-pointer items-center rounded-xl p-2 outline-none transition-colors duration-normal ease-out focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -48,7 +56,7 @@ function ExpandableTab({
         <m.span
           className="absolute inset-0 rounded-xl bg-background shadow-sm ring-1 ring-border"
           layoutId={layoutId}
-          transition={SPRING.indicator}
+          transition={transition}
         />
       )}
       <span className="relative z-10 flex items-center">
@@ -60,7 +68,7 @@ function ExpandableTab({
               className="overflow-hidden whitespace-nowrap font-medium text-foreground text-sm"
               exit={{ width: 0, opacity: 0 }}
               initial={{ width: 0, opacity: 0 }}
-              transition={SPRING.indicator}
+              transition={transition}
             >
               <span className="block pr-1 pl-2">{item.label}</span>
             </m.span>
