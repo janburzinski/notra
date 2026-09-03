@@ -19,8 +19,7 @@
     "./hooks/use-mobile": "./src/hooks/use-mobile.tsx"
   },
   "scripts": {
-    "check-types": "tsc --noEmit",
-    "test": "bun test src"
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
