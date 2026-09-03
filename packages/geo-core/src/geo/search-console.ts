@@ -128,6 +128,9 @@ export async function selectGscSiteAndSyncSuggestions(
   integration: GscIntegrationRow,
   siteUrl: string
 ): Promise<GscSyncResult> {
+  if (integration.disconnectingAt) {
+    return { status: "skipped", reason: "integration_changed" };
+  }
   if (integration.status === "reauth_required") {
     return { status: "skipped", reason: "reauth_required" };
   }
@@ -151,6 +154,9 @@ export async function syncGscSuggestions(
   const integration = await getGscIntegration(organizationId);
   if (!integration) {
     return { status: "skipped", reason: "not_connected" };
+  }
+  if (integration.disconnectingAt) {
+    return { status: "skipped", reason: "integration_changed" };
   }
   if (!integration.siteUrl) {
     return { status: "skipped", reason: "no_site_selected" };

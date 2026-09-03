@@ -58,6 +58,13 @@ export class GscReauthRequiredError extends Error {
   }
 }
 
+export class GscDisconnectInProgressError extends Error {
+  constructor() {
+    super("Google Search Console disconnect is still in progress");
+    this.name = "GscDisconnectInProgressError";
+  }
+}
+
 export class GscApiError extends Error {
   readonly status: number;
 
@@ -207,6 +214,9 @@ export async function upsertGscIntegration(
         params.organizationId
       ),
     });
+    if (existing?.disconnectingAt) {
+      throw new GscDisconnectInProgressError();
+    }
     const googleAccountChanged = shouldClearGscSiteOnReconnect(
       existing ?? null,
       params.googleAccountEmail
@@ -286,7 +296,12 @@ export async function updateGscIntegration(
   const [row] = await db
     .update(googleSearchConsoleIntegrations)
     .set(updates)
-    .where(eq(googleSearchConsoleIntegrations.organizationId, organizationId))
+    .where(
+      and(
+        eq(googleSearchConsoleIntegrations.organizationId, organizationId),
+        isNull(googleSearchConsoleIntegrations.disconnectingAt)
+      )
+    )
     .returning();
   return row ?? null;
 }
@@ -313,6 +328,7 @@ export async function claimOrConfirmGscSchedule(
             googleSearchConsoleIntegrations.organizationId,
             integration.organizationId
           ),
+          isNull(googleSearchConsoleIntegrations.disconnectingAt),
           or(
             eq(googleSearchConsoleIntegrations.qstashScheduleId, scheduleId),
             and(
@@ -362,6 +378,12 @@ export async function updateGscIntegrationIfUnchanged(
           integration.encryptedRefreshToken
         ),
         eq(googleSearchConsoleIntegrations.status, integration.status),
+        integration.disconnectingAt === null
+          ? isNull(googleSearchConsoleIntegrations.disconnectingAt)
+          : eq(
+              googleSearchConsoleIntegrations.disconnectingAt,
+              integration.disconnectingAt
+            ),
         integration.qstashScheduleId === null
           ? isNull(googleSearchConsoleIntegrations.qstashScheduleId)
           : eq(
@@ -383,7 +405,7 @@ export async function updateGscIntegrationIfUnchanged(
   return row ?? null;
 }
 
-export async function deleteGscIntegration(
+export async function beginGscIntegrationDisconnect(
   organizationId: string,
   signal?: AbortSignal,
   assertLockOwned?: () => Promise<void>
@@ -395,8 +417,47 @@ export async function deleteGscIntegration(
     await assertLockOwned?.();
     signal?.throwIfAborted();
     const [row] = await tx
-      .delete(googleSearchConsoleIntegrations)
+      .update(googleSearchConsoleIntegrations)
+      .set({
+        disconnectingAt: sql`coalesce(${googleSearchConsoleIntegrations.disconnectingAt}, now())`,
+      })
       .where(eq(googleSearchConsoleIntegrations.organizationId, organizationId))
+      .returning();
+    return row ?? null;
+  });
+}
+
+export async function deleteGscIntegration(
+  integration: GscIntegrationRow,
+  signal?: AbortSignal,
+  assertLockOwned?: () => Promise<void>
+): Promise<GscIntegrationRow | null> {
+  const disconnectingAt = integration.disconnectingAt;
+  if (!disconnectingAt) {
+    return null;
+  }
+  return await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtextextended(${`gsc-integration:${integration.organizationId}`}, 0))`
+    );
+    await assertLockOwned?.();
+    signal?.throwIfAborted();
+    const [row] = await tx
+      .delete(googleSearchConsoleIntegrations)
+      .where(
+        and(
+          eq(googleSearchConsoleIntegrations.id, integration.id),
+          eq(
+            googleSearchConsoleIntegrations.organizationId,
+            integration.organizationId
+          ),
+          eq(
+            googleSearchConsoleIntegrations.encryptedRefreshToken,
+            integration.encryptedRefreshToken
+          ),
+          eq(googleSearchConsoleIntegrations.disconnectingAt, disconnectingAt)
+        )
+      )
       .returning();
     if (!row) {
       return null;
@@ -405,7 +466,7 @@ export async function deleteGscIntegration(
       .delete(geoPromptSuggestions)
       .where(
         and(
-          eq(geoPromptSuggestions.organizationId, organizationId),
+          eq(geoPromptSuggestions.organizationId, integration.organizationId),
           eq(geoPromptSuggestions.status, "pending")
         )
       );
@@ -416,19 +477,27 @@ export async function deleteGscIntegration(
 export async function revokeGscToken(
   integration: GscIntegrationRow,
   signal?: AbortSignal
-) {
+): Promise<boolean> {
   try {
     const refreshToken = decryptToken(integration.encryptedRefreshToken);
     const timeoutSignal = AbortSignal.timeout(GSC_TOKEN_REVOKE_TIMEOUT_MS);
-    await fetch(GSC_OAUTH_REVOKE_URL, {
+    const response = await fetch(GSC_OAUTH_REVOKE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ token: refreshToken }),
       signal: signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal,
     });
+    if (response.ok || response.status === 400) {
+      return true;
+    }
+    console.error(
+      `[GSC] Failed to revoke Google token with status ${response.status}`
+    );
+    return false;
   } catch (error) {
     signal?.throwIfAborted();
     console.error("[GSC] Failed to revoke Google token:", error);
+    return false;
   }
 }
 
@@ -478,7 +547,12 @@ async function refreshGscAccessToken(
       status: "active",
       lastError: null,
     })
-    .where(eq(googleSearchConsoleIntegrations.id, integration.id));
+    .where(
+      and(
+        eq(googleSearchConsoleIntegrations.id, integration.id),
+        isNull(googleSearchConsoleIntegrations.disconnectingAt)
+      )
+    );
 
   return accessToken;
 }
@@ -486,6 +560,9 @@ async function refreshGscAccessToken(
 export async function getGscAccessToken(
   integration: GscIntegrationRow
 ): Promise<string> {
+  if (integration.disconnectingAt) {
+    throw new GscDisconnectInProgressError();
+  }
   if (integration.status === "reauth_required") {
     throw new GscReauthRequiredError();
   }

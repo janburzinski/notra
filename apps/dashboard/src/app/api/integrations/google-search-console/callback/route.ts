@@ -1,6 +1,8 @@
 import {
   exchangeGscAuthorizationCode,
   fetchGscAccountEmail,
+  GscDisconnectInProgressError,
+  getGscIntegration,
   getGscOAuthCredentials,
   upsertGscIntegration,
 } from "@notra/ai/integrations/google-search-console";
@@ -140,6 +142,13 @@ export async function GET(request: NextRequest) {
     const connectResult = await withGscIntegrationLock(
       oauthState.organizationId,
       async (signal, assertLockOwned) => {
+        const currentIntegration = await getGscIntegration(
+          oauthState.organizationId
+        );
+        if (currentIntegration?.disconnectingAt) {
+          throw new GscDisconnectInProgressError();
+        }
+
         let tokens: Awaited<ReturnType<typeof exchangeGscAuthorizationCode>>;
         try {
           tokens = await exchangeGscAuthorizationCode({

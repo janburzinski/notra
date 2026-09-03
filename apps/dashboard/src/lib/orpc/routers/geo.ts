@@ -1,4 +1,5 @@
 import {
+  beginGscIntegrationDisconnect,
   claimOrConfirmGscSchedule,
   deleteGscIntegration,
   GscApiError,
@@ -177,6 +178,7 @@ import type {
   GscSyncResult,
 } from "@notra/geo-core/types/google-search-console";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { QstashError } from "@upstash/qstash";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -358,37 +360,101 @@ async function withGscIntegrationLockOrServiceUnavailable<T>(
   }
 }
 
+function assertGscDisconnectNotInProgress(
+  integration: GscIntegrationRow
+): void {
+  if (integration.disconnectingAt) {
+    throw serviceUnavailable(
+      "Google Search Console is being disconnected. Please try again."
+    );
+  }
+}
+
+function getGscScheduleId(integrationId: string): string {
+  return `${GSC_SCHEDULE_ID_PREFIX}${integrationId}`;
+}
+
+async function removeStaleGscScheduleAfterLeaseLoss(
+  integration: GscIntegrationRow,
+  scheduleId: string
+) {
+  try {
+    const currentIntegration = await getGscIntegration(
+      integration.organizationId
+    );
+    if (
+      currentIntegration?.id === integration.id &&
+      !currentIntegration.disconnectingAt
+    ) {
+      return;
+    }
+    await removeGscSchedule(scheduleId);
+  } catch (error) {
+    console.error(
+      "[GSC] Failed to clean up stale weekly sync schedule:",
+      error
+    );
+  }
+}
+
 async function ensureGscSchedule(
   integration: GscIntegrationRow
 ): Promise<string | null> {
   return await withGscIntegrationLockOrServiceUnavailable(
     integration.organizationId,
     async (signal, assertLockOwned) => {
-      if (integration.qstashScheduleId) {
-        return integration.qstashScheduleId;
+      const currentIntegration = await getGscIntegration(
+        integration.organizationId
+      );
+      if (
+        !currentIntegration ||
+        currentIntegration.id !== integration.id ||
+        currentIntegration.disconnectingAt
+      ) {
+        return null;
       }
-      const scheduleId = `${GSC_SCHEDULE_ID_PREFIX}${integration.organizationId}`;
+      if (currentIntegration.qstashScheduleId) {
+        return currentIntegration.qstashScheduleId;
+      }
+
+      const scheduleId = getGscScheduleId(currentIntegration.id);
+      let creationError: unknown = null;
       try {
-        // QStash overwrites an existing custom id. Retrying this deterministic,
-        // organization-scoped schedule can therefore never create duplicates.
+        // The QStash SDK does not accept an AbortSignal. The lock waits for
+        // this request to settle and compensates below if its lease was lost.
+        // Scoping the id to this integration keeps that cleanup generation-safe.
         await assertLockOwned();
         await createQstashRouteSchedule({
           path: GSC_SYNC_WORKFLOW_PATH,
           cron: GSC_SYNC_CRON,
-          body: { organizationId: integration.organizationId },
+          body: { organizationId: currentIntegration.organizationId },
           scheduleId,
         });
       } catch (error) {
-        signal.throwIfAborted();
-        console.error("[GSC] Failed to create weekly sync schedule:", error);
+        creationError = error;
+      }
+
+      try {
+        await assertLockOwned();
+      } catch (error) {
+        await removeStaleGscScheduleAfterLeaseLoss(
+          currentIntegration,
+          scheduleId
+        );
+        throw error;
+      }
+      if (creationError) {
+        console.error(
+          "[GSC] Failed to create weekly sync schedule:",
+          creationError
+        );
         return null;
       }
-      signal.throwIfAborted();
 
       let claimed: GscIntegrationRow | null = null;
       try {
         claimed = await claimOrConfirmGscSchedule(
-          integration,
+          currentIntegration,
           scheduleId,
           signal,
           assertLockOwned
@@ -403,7 +469,7 @@ async function ensureGscSchedule(
           // The first write may have committed before surfacing an error. This
           // idempotent retry confirms that exact id without relying on stale fields.
           claimed = await claimOrConfirmGscSchedule(
-            integration,
+            currentIntegration,
             scheduleId,
             signal,
             assertLockOwned
@@ -423,18 +489,18 @@ async function ensureGscSchedule(
       }
 
       try {
-        const currentIntegration = await getGscIntegration(
-          integration.organizationId
+        const refreshedIntegration = await getGscIntegration(
+          currentIntegration.organizationId
         );
         await assertLockOwned();
-        if (currentIntegration?.qstashScheduleId === scheduleId) {
+        if (refreshedIntegration?.qstashScheduleId === scheduleId) {
           return scheduleId;
         }
         // Reconnect, disconnect, and schedule creation all take the same lock,
         // so no newer integration can claim this candidate before it is removed.
         await removeGscSchedule(scheduleId);
         signal.throwIfAborted();
-        return currentIntegration?.qstashScheduleId ?? null;
+        return refreshedIntegration?.qstashScheduleId ?? null;
       } catch (error) {
         signal.throwIfAborted();
         // The deterministic id remains recoverable: the next ensure attempt
@@ -446,15 +512,40 @@ async function ensureGscSchedule(
   );
 }
 
+async function deleteGscScheduleIfPresent(scheduleId: string) {
+  try {
+    await deleteQstashSchedule(scheduleId);
+  } catch (error) {
+    if (error instanceof QstashError && error.status === 404) {
+      return;
+    }
+    throw error;
+  }
+}
+
 async function removeGscSchedule(scheduleId: string | null) {
   if (!scheduleId) {
     return;
   }
   try {
-    await deleteQstashSchedule(scheduleId);
+    await deleteGscScheduleIfPresent(scheduleId);
   } catch (error) {
     console.error("[GSC] Failed to delete QStash schedule:", error);
   }
+}
+
+function getGscScheduleIdsForDisconnect(
+  integration: GscIntegrationRow
+): string[] {
+  return [
+    ...new Set(
+      [
+        integration.qstashScheduleId,
+        getGscScheduleId(integration.id),
+        `${GSC_SCHEDULE_ID_PREFIX}${integration.organizationId}`,
+      ].filter((scheduleId): scheduleId is string => scheduleId !== null)
+    ),
+  ];
 }
 
 async function requireDefaultProjectId(
@@ -1270,7 +1361,11 @@ export const geoRouter = {
       let sites: GeoSearchConsoleStatus["sites"] = [];
       let lastError = integration.lastError;
       let refreshed = integration;
-      if (!integration.siteUrl && integration.status === "active") {
+      if (
+        !integration.disconnectingAt &&
+        !integration.siteUrl &&
+        integration.status === "active"
+      ) {
         try {
           sites = await listGscSites(integration);
         } catch (error) {
@@ -1323,6 +1418,7 @@ export const geoRouter = {
       if (!integration) {
         throw notFound("Google Search Console is not connected");
       }
+      assertGscDisconnectNotInProgress(integration);
 
       try {
         return { sites: await listGscSites(integration) };
@@ -1346,6 +1442,7 @@ export const geoRouter = {
       if (!integration) {
         throw notFound("Google Search Console is not connected");
       }
+      assertGscDisconnectNotInProgress(integration);
 
       let sites: Awaited<ReturnType<typeof listGscSites>>;
       try {
@@ -1428,6 +1525,7 @@ export const geoRouter = {
       if (!integration) {
         throw notFound("Google Search Console is not connected");
       }
+      assertGscDisconnectNotInProgress(integration);
       if (!integration.siteUrl) {
         throw badRequest("Select a Search Console property first");
       }
@@ -1452,20 +1550,54 @@ export const geoRouter = {
         input.organizationId,
         async (signal, assertLockOwned) => {
           signal.throwIfAborted();
-          const deleted = await deleteGscIntegration(
+          const disconnecting = await beginGscIntegrationDisconnect(
             input.organizationId,
             signal,
             assertLockOwned
           );
-          if (!deleted) {
+          if (!disconnecting) {
             return null;
           }
+
+          // Keep the durable row until Google confirms the grant is revoked.
+          // This request is bounded independently and must finish even if the
+          // Redis lease is lost, so a retry still has the exact token to revoke.
           await assertLockOwned();
-          await Promise.all([
-            removeGscSchedule(deleted.qstashScheduleId),
-            revokeGscToken(deleted, signal),
-          ]);
+          if (!(await revokeGscToken(disconnecting))) {
+            throw serviceUnavailable(
+              "Google Search Console could not be disconnected. Please try again."
+            );
+          }
           signal.throwIfAborted();
+
+          const scheduleIds = getGscScheduleIdsForDisconnect(disconnecting);
+          try {
+            await Promise.all(scheduleIds.map(deleteGscScheduleIfPresent));
+          } catch (error) {
+            console.error(
+              "[GSC] Failed to remove schedules on disconnect:",
+              error
+            );
+            throw serviceUnavailable(
+              "Google Search Console could not be disconnected. Please try again."
+            );
+          }
+          signal.throwIfAborted();
+
+          const deleted = await deleteGscIntegration(
+            disconnecting,
+            signal,
+            assertLockOwned
+          );
+          if (!deleted) {
+            throw serviceUnavailable(
+              "Google Search Console changed during disconnect. Please try again."
+            );
+          }
+
+          // Catch a schedule create that settled between the first cleanup and
+          // the conditional row deletion. These ids are generation-specific.
+          await Promise.all(scheduleIds.map(removeGscSchedule));
           return deleted;
         }
       );

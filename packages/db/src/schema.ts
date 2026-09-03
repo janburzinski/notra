@@ -1710,6 +1710,7 @@ export const googleSearchConsoleIntegrations = pgTable(
       .notNull()
       .default("active"),
     qstashScheduleId: text("qstash_schedule_id"),
+    disconnectingAt: timestamp("disconnecting_at"),
     lastSyncedAt: timestamp("last_synced_at"),
     lastError: text("last_error"),
     topQueries: jsonb("top_queries")
