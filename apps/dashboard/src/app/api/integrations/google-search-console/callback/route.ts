@@ -139,14 +139,16 @@ export async function GET(request: NextRequest) {
 
     const connectResult = await withGscIntegrationLock(
       oauthState.organizationId,
-      async () => {
+      async (signal, assertLockOwned) => {
         let tokens: Awaited<ReturnType<typeof exchangeGscAuthorizationCode>>;
         try {
           tokens = await exchangeGscAuthorizationCode({
             code,
             redirectUri: getGscRedirectUri(baseUrl),
+            signal,
           });
         } catch (exchangeError) {
+          signal.throwIfAborted();
           console.error(
             "Google Search Console token exchange failed:",
             exchangeError
@@ -159,17 +161,22 @@ export async function GET(request: NextRequest) {
         }
 
         const googleAccountEmail = await fetchGscAccountEmail(
-          tokens.accessToken
+          tokens.accessToken,
+          signal
         );
 
-        await upsertGscIntegration({
-          organizationId: oauthState.organizationId,
-          userId: oauthState.userId,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          expiresAt: tokens.expiresAt,
-          googleAccountEmail,
-        });
+        await upsertGscIntegration(
+          {
+            organizationId: oauthState.organizationId,
+            userId: oauthState.userId,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            expiresAt: tokens.expiresAt,
+            googleAccountEmail,
+          },
+          signal,
+          assertLockOwned
+        );
         return "connected" as const;
       }
     );

@@ -31,6 +31,7 @@ export type GscIntegrationUpdate = Partial<
 export interface ExchangeGscAuthorizationCodeParams {
   code: string;
   redirectUri: string;
+  signal?: AbortSignal;
 }
 
 export interface ExchangeGscAuthorizationCodeResult {
