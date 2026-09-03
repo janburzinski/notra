@@ -62,8 +62,10 @@ import {
 } from "@/lib/integrations/github/github-publish-failure-state";
 import {
   classifyGitHubPublishFailure,
+  GitHubContentBranchConflictError,
   GitHubContentPublishError,
   GitHubContentTargetExistsError,
+  GitHubRepositoryEmptyError,
   hasGitHubStatus,
   publishContentDraftPullRequest,
   resolveGitHubContentPath,
@@ -817,10 +819,13 @@ export const contentRouter = {
       if (!post.markdown) {
         throw badRequest("Save the content before publishing it to GitHub");
       }
-      if (
-        !(integration?.owner && integration.repo && integration.defaultBranch)
-      ) {
+      if (!(integration?.owner && integration.repo)) {
         throw notFound("Selected GitHub repository not found");
+      }
+      if (!integration.defaultBranch) {
+        throw badRequest(
+          "Selected GitHub repository does not have a default branch"
+        );
       }
       let contentOutput = integration.outputId
         ? {
@@ -905,6 +910,7 @@ export const contentRouter = {
         const result = await publishContentDraftPullRequest(
           createOctokit(token),
           {
+            contentId: input.contentId,
             contentType: input.contentType,
             owner: integration.owner,
             repo: integration.repo,
@@ -929,6 +935,14 @@ export const contentRouter = {
       } catch (error) {
         if (error instanceof GitHubContentTargetExistsError) {
           throw conflict(error.message);
+        }
+        if (error instanceof GitHubContentBranchConflictError) {
+          throw conflict(error.message, { branchName: error.branchName });
+        }
+        if (error instanceof GitHubRepositoryEmptyError) {
+          throw badRequest(
+            "Initialize the GitHub repository with a first commit before publishing"
+          );
         }
         if (error instanceof GitHubContentPublishError) {
           const failureKind = classifyGitHubPublishFailure(error.cause);
