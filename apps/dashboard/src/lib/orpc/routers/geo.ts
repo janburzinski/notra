@@ -78,6 +78,7 @@ import {
   upsertGeoSettings,
 } from "@notra/geo-core/geo/programs";
 import {
+  deleteGeoProject,
   listGeoProjects,
   requireBrandIdentity,
   requireGeoProject,
@@ -119,6 +120,7 @@ import {
   geoOnboardingBrandInputSchema,
   geoOrganizationInputSchema,
   geoProjectCreateInputSchema,
+  geoProjectDeleteInputSchema,
   geoPromptCreateInputSchema,
   geoPromptsImportInputSchema,
   geoPromptDeleteInputSchema,
@@ -897,6 +899,13 @@ export const geoRouter = {
             properties: { is_sample: false, project_count: projectCount },
           });
         }
+      )
+    ),
+  projectsDelete: authorizedProcedure
+    .input(geoProjectDeleteInputSchema)
+    .handler(
+      geoHandler((input) =>
+        deleteGeoProject(input.organizationId, input.projectId)
       )
     ),
   generateFromWebsite: authorizedProcedure

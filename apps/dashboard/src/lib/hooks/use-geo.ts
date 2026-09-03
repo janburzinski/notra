@@ -798,6 +798,25 @@ export function useGeoProjectCreate(organizationId: string) {
   });
 }
 
+export function useGeoProjectDelete(organizationId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (projectId: string) =>
+      dashboardOrpc.geo.projectsDelete.call({ organizationId, projectId }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.geo.projectsList.queryKey({
+          input: { organizationId },
+        }),
+      });
+      toast.success("Project deleted");
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, "Failed to delete project"));
+    },
+  });
+}
+
 export function useGeoRunSequence(organizationId: string) {
   const { projectId } = useGeoProjectScope();
   const queryClient = useQueryClient();

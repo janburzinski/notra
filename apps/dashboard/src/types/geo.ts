@@ -74,6 +74,13 @@ export interface GeoProjectCreateDialogProps {
   onCreated: (projectId: string) => void;
 }
 
+export interface GeoProjectDeleteSectionProps {
+  organizationId: string;
+  project: GeoProject;
+  replacementProjectId: string | undefined;
+  onDeleted: (projectId: string) => void;
+}
+
 export interface GeoProjectLogoProps {
   name: string;
   domain: string | null;
