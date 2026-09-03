@@ -230,6 +230,29 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
     );
     const companyName = existing?.companyName ?? discovery.companyName;
 
+    const brandTerms = buildBrandTerms({ companyName, aliases });
+    const entries: GeoPromptInsert[] = [];
+    for (const entry of discovery.prompts) {
+      const trimmed = entry.prompt.trim();
+      const title = entry.title.trim().slice(0, GEO_GAP_TITLE_MAX_LENGTH);
+      if (
+        trimmed.length < MIN_PROMPT_LENGTH ||
+        trimmed.length > MAX_PROMPT_LENGTH ||
+        promptMentionsBrand(trimmed, brandTerms)
+      ) {
+        continue;
+      }
+      entries.push({ prompt: trimmed, title: title.length > 0 ? title : null });
+    }
+
+    if (entries.length === 0) {
+      return yield* Effect.fail(
+        new GeoDiscoveryError({
+          message: "Website analysis did not produce any usable prompts",
+        })
+      );
+    }
+
     yield* Effect.tryPromise({
       try: () =>
         db
@@ -267,29 +290,6 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
         )
     );
     const competitors = competitorRows.map((competitor) => competitor.name);
-
-    const brandTerms = buildBrandTerms({ companyName, aliases });
-    const entries: GeoPromptInsert[] = [];
-    for (const entry of discovery.prompts) {
-      const trimmed = entry.prompt.trim();
-      const title = entry.title.trim().slice(0, GEO_GAP_TITLE_MAX_LENGTH);
-      if (
-        trimmed.length < MIN_PROMPT_LENGTH ||
-        trimmed.length > MAX_PROMPT_LENGTH ||
-        promptMentionsBrand(trimmed, brandTerms)
-      ) {
-        continue;
-      }
-      entries.push({ prompt: trimmed, title: title.length > 0 ? title : null });
-    }
-
-    if (entries.length === 0) {
-      return yield* Effect.fail(
-        new GeoDiscoveryError({
-          message: "Website analysis did not produce any usable prompts",
-        })
-      );
-    }
 
     const inserted = yield* insertGeoPrompts(
       { organizationId, projectId },
