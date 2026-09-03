@@ -1318,6 +1318,8 @@ const insertPromptsInTransaction = Effect.fn("geo.promptsInsertTx")(function* (
   return inserted;
 });
 
+export { insertPromptsInTransaction, reconcileCompetitorsInTransaction };
+
 export const insertGeoPrompts = Effect.fn("geo.promptsInsert")(function* (
   input: GeoScopeInput,
   entries: readonly GeoPromptInsert[]

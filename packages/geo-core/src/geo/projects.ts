@@ -159,26 +159,6 @@ export const updateGeoProject = Effect.fn("geo.projectUpdate")(function* (
 });
 
 /**
- * Removes a project that has not completed creation. Unlike the user-facing
- * delete operation, compensation must also remove an organization's first
- * project and is idempotent when another actor already removed it.
- */
-export const discardGeoProjectCreation = Effect.fn(
-  "geo.projectCreationDiscard"
-)(function* (organizationId: string, projectId: string) {
-  yield* geoDb("project creation discard failed", () =>
-    db
-      .delete(projects)
-      .where(
-        and(
-          eq(projects.id, projectId),
-          eq(projects.organizationId, organizationId)
-        )
-      )
-  );
-});
-
-/**
  * Deletes a project and everything hanging off it.
  *
  * Safety notes:
