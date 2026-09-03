@@ -226,7 +226,6 @@ import { DesignSystemPerplexityCatalog } from "@/app/design-system/perplexity/pa
 import { BrailleLoader } from "@/components/braille-loader";
 import { Button, buttonVariants } from "@/components/button";
 import ChatInput from "@/components/chat-input";
-import { ApiKeyPermissionSelectorDemo } from "@/components/design-system/api-key-permission-selector-demo";
 import { DesignSystemFrame } from "@/components/design-system/design-system-frame";
 import { DesignSystemSectionHeader } from "@/components/design-system/design-system-section-header";
 import { GeoRangePickerDemo } from "@/components/design-system/geo-range-picker-demo";
@@ -606,8 +605,6 @@ export default function DesignSystemClientPage() {
               </Combobox>
             </CardContent>
           </Card>
-
-          <ApiKeyPermissionSelectorDemo />
         </div>
       </section>
 
