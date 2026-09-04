@@ -211,8 +211,15 @@ export async function GET(request: NextRequest) {
       buildCallbackUrl(baseUrl, callbackPath, { gscConnected: "true" })
     );
   } catch (error) {
-    console.error("Error in Google Search Console OAuth callback:", error);
     await restoreOAuthState?.();
+    if (error instanceof GscDisconnectInProgressError) {
+      return NextResponse.redirect(
+        buildCallbackUrl(baseUrl, callbackPath, {
+          error: "gsc_disconnect_in_progress",
+        })
+      );
+    }
+    console.error("Error in Google Search Console OAuth callback:", error);
     return NextResponse.redirect(
       buildCallbackUrl(baseUrl, callbackPath, { error: "gsc_auth_failed" })
     );

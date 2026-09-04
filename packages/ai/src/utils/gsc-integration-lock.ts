@@ -84,18 +84,34 @@ export async function withGscIntegrationLock<T>(
 
   while (!acquired && Date.now() < deadline) {
     const acquisitionStartedAt = Date.now();
-    acquired =
-      (await activeRedis.set(lockKey, ownerToken, {
-        nx: true,
-        ex: GSC_INTEGRATION_LOCK_TTL_SECONDS,
-      })) === "OK";
+    const remainingWaitMs = deadline - acquisitionStartedAt;
+    if (remainingWaitMs <= 0) {
+      break;
+    }
+    try {
+      acquired =
+        (await withRedisTimeout(
+          activeRedis.set(lockKey, ownerToken, {
+            nx: true,
+            ex: GSC_INTEGRATION_LOCK_TTL_SECONDS,
+          }),
+          Math.min(GSC_INTEGRATION_LOCK_REDIS_TIMEOUT_MS, remainingWaitMs)
+        )) === "OK";
+    } catch (error) {
+      console.error("[GSC] Failed to acquire integration lock:", error);
+    }
     if (acquired) {
       // Redis starts the TTL before the HTTP response reaches us. Using the
       // request start is conservative when checking the local lease deadline.
       leaseValidUntil = acquisitionStartedAt + lockTtlMs;
     }
     if (!acquired) {
-      await sleep(GSC_INTEGRATION_LOCK_RETRY_DELAY_MS);
+      const remainingRetryMs = deadline - Date.now();
+      if (remainingRetryMs > 0) {
+        await sleep(
+          Math.min(GSC_INTEGRATION_LOCK_RETRY_DELAY_MS, remainingRetryMs)
+        );
+      }
     }
   }
 

@@ -95,7 +95,10 @@ export const PromptKeywordTextarea = forwardRef<
   }
 
   function schedulePointerHover(index: number | null) {
-    if (index === hoveredIndex || index === pendingHoverIndexRef.current) {
+    if (
+      index !== null &&
+      (index === hoveredIndex || index === pendingHoverIndexRef.current)
+    ) {
       cancelPointerClose();
       return;
     }

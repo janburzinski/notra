@@ -418,6 +418,23 @@ async function ensureGscSchedule(
       }
 
       const scheduleId = getGscScheduleId(currentIntegration.id);
+      const legacyScheduleId = `${GSC_SCHEDULE_ID_PREFIX}${currentIntegration.organizationId}`;
+      try {
+        // Older releases used an organization-scoped custom ID. Remove an
+        // unrecorded legacy schedule before creating this generation's ID so
+        // an interrupted migration cannot leave two weekly jobs running.
+        await assertLockOwned();
+        await deleteGscScheduleIfPresent(legacyScheduleId);
+        await assertLockOwned();
+      } catch (error) {
+        signal.throwIfAborted();
+        console.error(
+          "[GSC] Failed to reconcile legacy weekly sync schedule:",
+          error
+        );
+        return null;
+      }
+
       let creationError: unknown = null;
       try {
         // The QStash SDK does not accept an AbortSignal. The lock waits for
@@ -1481,10 +1498,19 @@ export const geoRouter = {
       }
 
       const selectedIntegration = await getGscIntegration(input.organizationId);
-      const scheduleId =
-        selectedIntegration?.siteUrl === input.siteUrl
-          ? await ensureGscSchedule(selectedIntegration)
-          : (selectedIntegration?.qstashScheduleId ?? null);
+      let scheduleId = selectedIntegration?.qstashScheduleId ?? null;
+      if (selectedIntegration?.siteUrl === input.siteUrl) {
+        try {
+          scheduleId = await ensureGscSchedule(selectedIntegration);
+        } catch (error) {
+          // The property and its first sync are already committed. Scheduling
+          // remains best-effort and is backfilled by the next manual sync.
+          console.error(
+            "[GSC] Failed to schedule weekly sync after selecting property:",
+            error
+          );
+        }
+      }
 
       trackGeoRouterEvent({
         context,
