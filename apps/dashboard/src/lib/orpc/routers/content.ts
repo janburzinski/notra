@@ -16,6 +16,7 @@ import { db } from "@notra/db/drizzle";
 import {
   githubAppInstallations,
   githubIntegrations,
+  organizations,
   postCollections,
   posts,
   repositoryOutputs,
@@ -71,6 +72,10 @@ import {
   publishContentDraftPullRequest,
   resolveGitHubContentPath,
 } from "@/lib/integrations/github/publish-content-to-github";
+import {
+  buildOpenInNotraBadgeUrls,
+  resolveNotraBaseUrl,
+} from "@/lib/integrations/github/pull-request-body";
 import { baseProcedure } from "@/lib/orpc/base";
 import { startOnDemandRun } from "@/lib/workflows/start";
 import { contentListQuerySchema } from "@/schemas/api-params";
@@ -758,7 +763,7 @@ export const contentRouter = {
         }
       }
 
-      const [post, integration] = await Promise.all([
+      const [post, integration, organization] = await Promise.all([
         db.query.posts.findFirst({
           where: and(
             eq(posts.id, input.contentId),
@@ -810,6 +815,10 @@ export const contentRouter = {
           )
           .limit(1)
           .then(([result]) => result),
+        db.query.organizations.findFirst({
+          columns: { slug: true },
+          where: eq(organizations.id, input.organizationId),
+        }),
       ]);
 
       if (!post) {
@@ -920,6 +929,8 @@ export const contentRouter = {
         );
       }
 
+      const notraBaseUrl = resolveNotraBaseUrl();
+
       try {
         const result = await publishContentDraftPullRequest(
           createOctokit(token),
@@ -932,6 +943,12 @@ export const contentRouter = {
             path,
             title: post.title,
             markdown: post.markdown,
+            ...(notraBaseUrl && organization
+              ? {
+                  badgeUrls: buildOpenInNotraBadgeUrls(notraBaseUrl),
+                  contentUrl: `${notraBaseUrl}/${organization.slug}/content/${input.contentId}`,
+                }
+              : {}),
           }
         );
         await clearGitHubPublishFailures({
