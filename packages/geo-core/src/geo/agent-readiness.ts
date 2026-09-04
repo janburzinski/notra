@@ -1,6 +1,10 @@
 import { db } from "@notra/db/drizzle";
-import { brandSettings, geoAgentReadinessReports } from "@notra/db/schema";
-import { and, desc, eq, inArray, ne } from "drizzle-orm";
+import {
+  brandSettings,
+  geoAgentReadinessReports,
+  projects,
+} from "@notra/db/schema";
+import { and, desc, eq, inArray, isNull, lt, ne, or } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -9,6 +13,7 @@ import {
   AGENT_READINESS_HTTP_NOT_FOUND,
   AGENT_READINESS_REPORT_TIMEOUT_MS,
   AGENT_READINESS_SCAN_TIMEOUT_MS,
+  AGENT_READINESS_STALE_RUNNING_MS,
   AGENT_READINESS_USER_AGENT,
 } from "../constants/agent-readiness";
 import { GeoWorkflowService } from "../deps";
@@ -24,6 +29,7 @@ import type {
   AgentReadinessReportRow,
   AgentReadinessResponse,
   AgentReadinessScanResponse,
+  AgentReadinessScanStartOptions,
   AgentReadinessScope,
   AgentReadinessSseEvent,
   AgentReadinessSseFrameBoundary,
@@ -304,6 +310,27 @@ async function loadHistory(
 export async function loadAgentReadiness(
   scope: AgentReadinessScope
 ): Promise<AgentReadinessResponse> {
+  const staleBefore = new Date(Date.now() - AGENT_READINESS_STALE_RUNNING_MS);
+  await db
+    .update(geoAgentReadinessReports)
+    .set({
+      status: "failed",
+      errorMessage: "Scan timed out before completion.",
+    })
+    .where(
+      and(
+        eq(geoAgentReadinessReports.organizationId, scope.organizationId),
+        eq(geoAgentReadinessReports.projectId, scope.projectId),
+        eq(geoAgentReadinessReports.status, "running"),
+        or(
+          and(
+            isNull(geoAgentReadinessReports.executionStartedAt),
+            lt(geoAgentReadinessReports.createdAt, staleBefore)
+          ),
+          lt(geoAgentReadinessReports.executionStartedAt, staleBefore)
+        )
+      )
+    );
   const targetUrl = await resolveTargetUrl(scope.brandSettingsId);
   const [completed, latest, history] = await Promise.all([
     latestRowWhere(scope.projectId, "completed", targetUrl),
@@ -318,13 +345,143 @@ export async function loadAgentReadiness(
 }
 
 export const startAgentReadinessScan = Effect.fn("geo.agentReadiness.start")(
-  function* (scope: AgentReadinessScope) {
+  function* (
+    scope: AgentReadinessScope,
+    options: AgentReadinessScanStartOptions = {}
+  ) {
     const workflows = yield* GeoWorkflowService;
-    const claim = yield* Effect.promise(async () => {
-      const [targetUrl, running] = await Promise.all([
+    const onboardingClaim =
+      options.reportId && options.redispatchExisting
+        ? yield* Effect.promise(async () => {
+            const targetUrl = await resolveTargetUrl(scope.brandSettingsId);
+            return await db.transaction(async (tx) => {
+              const active = await tx
+                .select({ id: projects.id })
+                .from(projects)
+                .where(
+                  and(
+                    eq(projects.id, scope.projectId),
+                    eq(projects.organizationId, scope.organizationId),
+                    eq(projects.setupStatus, "pending"),
+                    eq(projects.setupAttemptId, options.reportId)
+                  )
+                )
+                .limit(1)
+                .for("update");
+              if (!active.length) {
+                return {
+                  alreadyRunning: true as const,
+                  response: {
+                    reportId: options.reportId,
+                    alreadyRunning: true as const,
+                  },
+                };
+              }
+
+              const requested = await tx.query.geoAgentReadinessReports.findFirst(
+                {
+                  where: and(
+                    eq(geoAgentReadinessReports.id, options.reportId),
+                    eq(
+                      geoAgentReadinessReports.organizationId,
+                      scope.organizationId
+                    ),
+                    eq(geoAgentReadinessReports.projectId, scope.projectId)
+                  ),
+                }
+              );
+              if (requested) {
+                if (
+                  requested.status === "running" &&
+                  areWebsiteUrlsEquivalent(requested.targetUrl, targetUrl)
+                ) {
+                  return {
+                    alreadyRunning: false as const,
+                    preserveOnHandoffFailure: true,
+                    reportId: requested.id,
+                    targetUrl: requested.targetUrl,
+                  };
+                }
+                return {
+                  alreadyRunning: true as const,
+                  response: {
+                    reportId: requested.id,
+                    alreadyRunning: true as const,
+                  },
+                };
+              }
+
+              const running = await tx.query.geoAgentReadinessReports.findFirst(
+                {
+                  where: and(
+                    eq(geoAgentReadinessReports.projectId, scope.projectId),
+                    eq(geoAgentReadinessReports.status, "running")
+                  ),
+                  orderBy: desc(geoAgentReadinessReports.createdAt),
+                }
+              );
+              if (running) {
+                return {
+                  alreadyRunning: true as const,
+                  response: {
+                    reportId: running.id,
+                    alreadyRunning: true as const,
+                  },
+                };
+              }
+
+              await tx.insert(geoAgentReadinessReports).values({
+                id: options.reportId,
+                organizationId: scope.organizationId,
+                projectId: scope.projectId,
+                targetUrl,
+              });
+              return {
+                alreadyRunning: false as const,
+                preserveOnHandoffFailure: false,
+                reportId: options.reportId,
+                targetUrl,
+              };
+            });
+          })
+        : undefined;
+    const claim = onboardingClaim ?? (yield* Effect.promise(async () => {
+      const [targetUrl, requested, running] = await Promise.all([
         resolveTargetUrl(scope.brandSettingsId),
+        options.reportId
+          ? db.query.geoAgentReadinessReports.findFirst({
+              where: and(
+                eq(geoAgentReadinessReports.id, options.reportId),
+                eq(
+                  geoAgentReadinessReports.organizationId,
+                  scope.organizationId
+                ),
+                eq(geoAgentReadinessReports.projectId, scope.projectId)
+              ),
+            })
+          : undefined,
         latestRowWhere(scope.projectId, "running"),
       ]);
+
+      if (requested) {
+        if (
+          requested.status === "running" &&
+          areWebsiteUrlsEquivalent(requested.targetUrl, targetUrl) &&
+          options.redispatchExisting
+        ) {
+          return {
+            alreadyRunning: false as const,
+            preserveOnHandoffFailure: true,
+            reportId: requested.id,
+            targetUrl: requested.targetUrl,
+          };
+        }
+        return {
+          alreadyRunning: true as const,
+          response: { reportId: requested.id, alreadyRunning: true as const },
+        };
+      }
+
       if (running && canReuseAgentReadinessScan(running, targetUrl)) {
         return {
           alreadyRunning: true as const,
@@ -353,7 +510,7 @@ export const startAgentReadinessScan = Effect.fn("geo.agentReadiness.start")(
           );
       }
 
-      const reportId = crypto.randomUUID();
+      const reportId = options.reportId ?? crypto.randomUUID();
       const inserted = await db
         .insert(geoAgentReadinessReports)
         .values({
@@ -378,8 +535,13 @@ export const startAgentReadinessScan = Effect.fn("geo.agentReadiness.start")(
           response: { reportId: winner.id, alreadyRunning: true as const },
         };
       }
-      return { alreadyRunning: false as const, reportId, targetUrl };
-    });
+      return {
+        alreadyRunning: false as const,
+        preserveOnHandoffFailure: false,
+        reportId,
+        targetUrl,
+      };
+    }));
 
     if (claim.alreadyRunning) {
       return claim.response;
@@ -398,8 +560,11 @@ export const startAgentReadinessScan = Effect.fn("geo.agentReadiness.start")(
       })
       .pipe(
         Effect.map(() => response),
-        Effect.catch((error) =>
-          Effect.promise(() =>
+        Effect.catch((error) => {
+          if (claim.preserveOnHandoffFailure) {
+            return Effect.fail(error);
+          }
+          return Effect.promise(() =>
             db
               .update(geoAgentReadinessReports)
               .set({
@@ -412,8 +577,8 @@ export const startAgentReadinessScan = Effect.fn("geo.agentReadiness.start")(
                   eq(geoAgentReadinessReports.status, "running")
                 )
               )
-          ).pipe(Effect.andThen(Effect.fail(error)))
-        )
+          ).pipe(Effect.andThen(Effect.fail(error)));
+        })
       );
   }
 );
@@ -445,6 +610,24 @@ async function latestCompletedBefore(
 export async function executeAgentReadinessScan(
   payload: AgentReadinessWorkflowPayload
 ): Promise<AgentReadinessWorkflowResult> {
+  const claimed = await db
+    .update(geoAgentReadinessReports)
+    .set({ executionStartedAt: new Date() })
+    .where(
+      and(
+        eq(geoAgentReadinessReports.id, payload.reportId),
+        eq(geoAgentReadinessReports.organizationId, payload.organizationId),
+        eq(geoAgentReadinessReports.projectId, payload.projectId),
+        eq(geoAgentReadinessReports.targetUrl, payload.targetUrl),
+        eq(geoAgentReadinessReports.status, "running"),
+        isNull(geoAgentReadinessReports.executionStartedAt)
+      )
+    )
+    .returning({ id: geoAgentReadinessReports.id });
+  if (claimed.length === 0) {
+    return { status: "superseded" };
+  }
+
   try {
     const previous = await latestCompletedBefore(
       payload.projectId,

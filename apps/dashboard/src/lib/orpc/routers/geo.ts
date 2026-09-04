@@ -32,7 +32,6 @@ import {
   startAgentReadinessScan,
 } from "@notra/geo-core/geo/agent-readiness";
 import {
-  createGeoProjectFromWebsite,
   discoverGeoWebsite,
   generateGeoFromWebsite,
 } from "@notra/geo-core/geo/discover";
@@ -78,6 +77,8 @@ import {
   upsertGeoSettings,
 } from "@notra/geo-core/geo/programs";
 import {
+  claimGeoProjectSetupRetry,
+  createGeoProject,
   listGeoProjects,
   requireBrandIdentity,
   requireGeoProject,
@@ -119,6 +120,7 @@ import {
   geoOnboardingBrandInputSchema,
   geoOrganizationInputSchema,
   geoProjectCreateInputSchema,
+  geoProjectSetupRetryInputSchema,
   geoPromptCreateInputSchema,
   geoPromptsImportInputSchema,
   geoPromptDeleteInputSchema,
@@ -178,6 +180,7 @@ import {
   assertGeoEntitlement,
 } from "@/lib/billing/subscription";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
+import { dispatchGeoProjectSetup } from "@/lib/geo/project-setup";
 import { authorizedProcedure } from "@/lib/orpc/base";
 import { runOrpcEffect } from "@/lib/orpc/effect";
 import { badRequest, notFound } from "@/lib/orpc/utils/errors";
@@ -866,11 +869,35 @@ export const geoRouter = {
             input.brandSettingsId
           ).pipe(
             Effect.flatMap((identity) =>
-              createGeoProjectFromWebsite(
+              createGeoProject(
                 input.organizationId,
                 input.name,
                 input.brandSettingsId,
-                identity.websiteUrl
+                "pending"
+              ).pipe(
+                Effect.flatMap((project) =>
+                  Effect.tryPromise({
+                    try: () =>
+                      dispatchGeoProjectSetup(project, {
+                        organizationId: input.organizationId,
+                        projectId: project.id,
+                        brandSettingsId: input.brandSettingsId,
+                        websiteUrl: identity.websiteUrl,
+                      }),
+                    catch: (cause) => cause,
+                  }).pipe(
+                    Effect.catchCause((cause) => {
+                      console.error(
+                        "[GEO] Project setup dispatch failed unexpectedly:",
+                        cause
+                      );
+                      return Effect.succeed({
+                        ...project,
+                        setupStatus: "failed" as const,
+                      });
+                    })
+                  )
+                )
               )
             )
           ),
@@ -897,6 +924,53 @@ export const geoRouter = {
             properties: { is_sample: false, project_count: projectCount },
           });
         }
+      )
+    ),
+  projectsRetrySetup: authorizedProcedure
+    .input(geoProjectSetupRetryInputSchema)
+    .handler(
+      geoHandler((input) =>
+        requireGeoProject(input).pipe(
+          Effect.flatMap((scope) =>
+            requireBrandIdentity(
+              input.organizationId,
+              scope.brandSettingsId
+            ).pipe(
+              Effect.flatMap((identity) =>
+                claimGeoProjectSetupRetry(
+                  input.organizationId,
+                  scope.projectId
+                ).pipe(
+                  Effect.flatMap(({ claimed, project }) =>
+                    claimed
+                      ? Effect.tryPromise({
+                          try: () =>
+                            dispatchGeoProjectSetup(project, {
+                              organizationId: input.organizationId,
+                              projectId: scope.projectId,
+                              brandSettingsId: scope.brandSettingsId,
+                              websiteUrl: identity.websiteUrl,
+                            }),
+                          catch: (cause) => cause,
+                        }).pipe(
+                          Effect.catchCause((cause) => {
+                            console.error(
+                              "[GEO] Project setup retry failed unexpectedly:",
+                              cause
+                            );
+                            return Effect.succeed({
+                              ...project,
+                              setupStatus: "failed" as const,
+                            });
+                          })
+                        )
+                      : Effect.succeed(project)
+                  )
+                )
+              )
+            )
+          )
+        )
       )
     ),
   generateFromWebsite: authorizedProcedure

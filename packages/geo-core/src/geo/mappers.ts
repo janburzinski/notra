@@ -24,6 +24,8 @@ export function toGeoProject(row: GeoProjectRow): GeoProject {
     id: row.id,
     name: row.name,
     brandSettingsId: row.brandSettingsId,
+    setupStatus: row.setupStatus,
+    setupAttemptId: row.setupAttemptId,
     createdAt: row.createdAt.toISOString(),
   };
 }

@@ -12,7 +12,9 @@ import {
   brandSettings,
   geoCompetitors,
   geoPrompts,
+  geoScans,
   geoSettings,
+  projects,
 } from "@notra/db/schema";
 import {
   queryGeoCheckCompetitorPrompts,
@@ -41,6 +43,7 @@ import {
   GEO_MAX_COMPETITORS,
   GEO_MAX_ENGINES,
   GEO_MAX_LANGUAGES,
+  GEO_PROJECT_SETUP_STALE_MS,
 } from "../constants/geo";
 import { GEO_MODEL_CATALOG_STATIC } from "../constants/geo-model-catalog";
 import { GeoEntitlementService } from "../deps";
@@ -153,18 +156,32 @@ export const loadGeoSettings = Effect.fn("geo.settings")(function* (
   input: GeoScopeInput
 ) {
   const scope = yield* resolveGeoScope(input);
-  const row = scope.projectId
-    ? yield* geoDb("settings lookup failed", () =>
-        db.query.geoSettings.findFirst({
-          where: eq(geoSettings.projectId, scope.projectId ?? ""),
+  const project = scope.projectId
+    ? yield* geoDb("project settings lookup failed", () =>
+        db.query.projects.findFirst({
+          columns: { setupStatus: true, setupStartedAt: true },
+          with: { geoSettings: true },
+          where: and(
+            eq(projects.id, scope.projectId ?? ""),
+            eq(projects.organizationId, scope.organizationId)
+          ),
         })
       )
     : null;
+  const row = project?.geoSettings ?? null;
+  const setupRetryable =
+    project?.setupStatus === "failed" ||
+    (project?.setupStatus === "pending" &&
+      project.setupStartedAt !== null &&
+      project.setupStartedAt.getTime() <=
+        Date.now() - GEO_PROJECT_SETUP_STALE_MS);
 
   const catalog = yield* loadGeoModelCatalog(scope.organizationId);
   const response: GeoSettingsResponse = {
     configured: isTinybirdConfigured(),
     settings: row ? toGeoSettings(row, catalog) : null,
+    setupStatus: project?.setupStatus ?? null,
+    setupRetryable,
   };
   return response;
 });
@@ -614,72 +631,69 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
       unavailableStaticEngines.add(entry.id);
     }
   }
-  const existingSettings = yield* geoDb("settings lookup failed", () =>
-    db.query.geoSettings.findFirst({
-      columns: {
-        engines: true,
-        nonZdrApprovedEngines: true,
-        enabled: true,
-        nextScanAt: true,
-        scanIntervalHours: true,
-      },
-      where: eq(geoSettings.projectId, projectId),
-    })
-  );
-  const preservedEngines = (existingSettings?.engines ?? []).filter(
-    (engine) =>
-      unavailableStaticEngines.size > 0 && unavailableStaticEngines.has(engine)
-  );
-  const preservedEngineSet = new Set(preservedEngines);
-  const engines = [...new Set([...input.engines, ...preservedEngines])];
-  const engineSet = new Set(engines);
-  const nonZdrApprovedEngines = [
-    ...new Set([
-      ...input.nonZdrApprovedEngines,
-      ...(existingSettings?.nonZdrApprovedEngines ?? []).filter((engine) =>
-        preservedEngineSet.has(engine)
-      ),
-    ]),
-  ].filter((engine) => engineSet.has(engine));
+  // The manual save and cancellation of background setup commit together.
+  // Locking the project also serializes this final writer against discovery
+  // persistence and initial-scan handoff.
+  const row = yield* geoDb("settings upsert failed", () =>
+    db.transaction(async (tx) => {
+      await Effect.runPromise(lockGeoProject(tx, projectId));
+      const project = await tx
+        .select({ setupAttemptId: projects.setupAttemptId })
+        .from(projects)
+        .where(
+          and(
+            eq(projects.id, projectId),
+            eq(projects.organizationId, input.organizationId)
+          )
+        )
+        .limit(1)
+        .for("update");
+      const existingSettings = await tx.query.geoSettings.findFirst({
+        columns: {
+          engines: true,
+          nonZdrApprovedEngines: true,
+          enabled: true,
+          nextScanAt: true,
+          scanIntervalHours: true,
+        },
+        where: eq(geoSettings.projectId, projectId),
+      });
+      const preservedEngines = (existingSettings?.engines ?? []).filter(
+        (engine) =>
+          unavailableStaticEngines.size > 0 &&
+          unavailableStaticEngines.has(engine)
+      );
+      const preservedEngineSet = new Set(preservedEngines);
+      const engines = [...new Set([...input.engines, ...preservedEngines])];
+      const engineSet = new Set(engines);
+      const nonZdrApprovedEngines = [
+        ...new Set([
+          ...input.nonZdrApprovedEngines,
+          ...(existingSettings?.nonZdrApprovedEngines ?? []).filter((engine) =>
+            preservedEngineSet.has(engine)
+          ),
+        ]),
+      ].filter((engine) => engineSet.has(engine));
+      const keepNextScanAt =
+        input.enabled &&
+        existingSettings?.enabled === true &&
+        existingSettings.scanIntervalHours === input.scanIntervalHours;
+      const nextScanAt = input.enabled
+        ? keepNextScanAt
+          ? (existingSettings?.nextScanAt ??
+            nextGeoScanAt(input.scanIntervalHours))
+          : nextGeoScanAt(input.scanIntervalHours)
+        : null;
 
-  // The schedule is a plain due stamp the cron sweep polls. A fresh enable or
-  // an interval change re-arms it a full interval out (matching the old
-  // delayed-message behaviour); an unchanged enabled row keeps its pending
-  // due time, and disabling clears it.
-  const keepNextScanAt =
-    input.enabled &&
-    existingSettings?.enabled === true &&
-    existingSettings.scanIntervalHours === input.scanIntervalHours;
-  let nextScanAt: Date | null = null;
-  if (input.enabled) {
-    nextScanAt = keepNextScanAt
-      ? (existingSettings?.nextScanAt ?? nextGeoScanAt(input.scanIntervalHours))
-      : nextGeoScanAt(input.scanIntervalHours);
-  }
-
-  yield* geoDb("settings upsert failed", () =>
-    db
-      .insert(geoSettings)
-      .values({
-        id: crypto.randomUUID(),
-        organizationId: input.organizationId,
-        projectId,
-        companyName: input.companyName,
-        aliases: input.aliases,
-        competitors: [],
-        languages: input.languages,
-        engines,
-        enforceZdr,
-        nonZdrApprovedEngines,
-        enabled: input.enabled,
-        scanIntervalHours: input.scanIntervalHours,
-        nextScanAt,
-      })
-      .onConflictDoUpdate({
-        target: geoSettings.projectId,
-        set: {
+      await tx
+        .insert(geoSettings)
+        .values({
+          id: crypto.randomUUID(),
+          organizationId: input.organizationId,
+          projectId,
           companyName: input.companyName,
           aliases: input.aliases,
+          competitors: [],
           languages: input.languages,
           engines,
           enforceZdr,
@@ -687,23 +701,103 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
           enabled: input.enabled,
           scanIntervalHours: input.scanIntervalHours,
           nextScanAt,
-        },
-      })
-  );
+        })
+        .onConflictDoUpdate({
+          target: geoSettings.projectId,
+          set: {
+            companyName: input.companyName,
+            aliases: input.aliases,
+            languages: input.languages,
+            engines,
+            enforceZdr,
+            nonZdrApprovedEngines,
+            enabled: input.enabled,
+            scanIntervalHours: input.scanIntervalHours,
+            nextScanAt,
+          },
+        });
 
-  yield* reconcileGeoCompetitors(
-    { organizationId: input.organizationId, projectId },
-    (current) => current
-  );
+      await Effect.runPromise(
+        reconcileCompetitorsInTransaction(
+          tx,
+          input.organizationId,
+          projectId,
+          (current) => current
+        )
+      );
 
-  const rows = yield* geoDb("settings lookup failed", () =>
-    db.select().from(geoSettings).where(eq(geoSettings.projectId, projectId))
-  );
+      const setupAttemptId = project.at(0)?.setupAttemptId;
+      if (setupAttemptId) {
+        const handoff = await tx.query.geoScans.findFirst({
+          columns: { handoffClaimedAt: true },
+          where: and(
+            eq(geoScans.id, setupAttemptId),
+            eq(geoScans.organizationId, input.organizationId),
+            eq(geoScans.projectId, projectId),
+            eq(geoScans.status, "running"),
+            eq(geoScans.handoffStatus, "pending")
+          ),
+        });
+        const currentSettings = await tx.query.geoSettings.findFirst({
+          columns: { scanStartedAt: true },
+          where: eq(geoSettings.projectId, projectId),
+        });
+        const claimedAt = handoff?.handoffClaimedAt;
+        if (
+          claimedAt &&
+          currentSettings?.scanStartedAt?.getTime() === claimedAt.getTime()
+        ) {
+          const rejected = await tx
+            .update(geoScans)
+            .set({
+              status: "failed",
+              handoffStatus: "rejected",
+              finishedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(geoScans.id, setupAttemptId),
+                eq(geoScans.organizationId, input.organizationId),
+                eq(geoScans.projectId, projectId),
+                eq(geoScans.status, "running"),
+                eq(geoScans.handoffStatus, "pending"),
+                eq(geoScans.handoffClaimedAt, claimedAt)
+              )
+            )
+            .returning({ id: geoScans.id });
+          if (rejected.length) {
+            await tx
+              .update(geoSettings)
+              .set({ scanStartedAt: null })
+              .where(
+                and(
+                  eq(geoSettings.projectId, projectId),
+                  eq(geoSettings.scanStartedAt, claimedAt)
+                )
+              );
+          }
+        }
+      }
 
-  const row = rows.at(0);
+      await tx
+        .update(projects)
+        .set({
+          setupStatus: "ready",
+          setupError: null,
+          setupAttemptId: null,
+          setupStartedAt: null,
+        })
+        .where(eq(projects.id, projectId));
+      return await tx.query.geoSettings.findFirst({
+        where: eq(geoSettings.projectId, projectId),
+      });
+    })
+  );
   const response: GeoSettingsResponse = {
     configured: isTinybirdConfigured(),
     settings: row ? toGeoSettings(row, catalog) : null,
+    setupStatus: "ready",
+    setupRetryable: false,
   };
   return response;
 });

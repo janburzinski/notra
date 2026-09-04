@@ -7,11 +7,15 @@ import { contentGenerationWorkflowPayloadSchema } from "@notra/content-generatio
 import { agentReadinessWorkflowPayloadSchema } from "@notra/geo-core/schemas/agent-readiness";
 import {
   geoScanWorkflowPayloadSchema,
+  geoProjectSetupWorkflowPayloadSchema,
   geoWriterWorkflowPayloadSchema,
 } from "@notra/geo-core/schemas/geo";
 import { gscSyncPayloadSchema } from "@notra/geo-core/schemas/google-search-console";
 import type { AgentReadinessWorkflowPayload } from "@notra/geo-core/types/agent-readiness";
-import type { GeoWriterPayload } from "@notra/geo-core/types/geo";
+import type {
+  GeoProjectSetupWorkflowPayload,
+  GeoWriterPayload,
+} from "@notra/geo-core/types/geo";
 import type { GscSyncPayload } from "@notra/geo-core/types/google-search-console";
 import { start } from "workflow/api";
 
@@ -45,6 +49,7 @@ import { brandGuidelinesWorkflow } from "@/workflows/brand-guidelines";
 import { standaloneChatWorkflow } from "@/workflows/chat";
 import { eventContentWorkflow } from "@/workflows/event-content";
 import { geoScanWorkflow } from "@/workflows/geo-scan";
+import { geoProjectSetupWorkflow } from "@/workflows/geo-project-setup";
 import { geoWriterWorkflow } from "@/workflows/geo-writer";
 import { gscSyncWorkflow } from "@/workflows/gsc-sync";
 import { irisControllerRun } from "@/workflows/iris-controller";
@@ -218,6 +223,20 @@ export async function startGeoScanRun(payload: {
     organizationId: parsed.organizationId,
     projectId: parsed.projectId,
     properties: { scan_id: parsed.scanId },
+  });
+  return { runId: run.runId };
+}
+
+export async function startGeoProjectSetupRun(
+  payload: GeoProjectSetupWorkflowPayload
+): Promise<{ runId: string }> {
+  const parsed = geoProjectSetupWorkflowPayloadSchema.parse(payload);
+  const run = await start(geoProjectSetupWorkflow, [parsed]);
+  trackWorkflowStarted({
+    workflow: WORKFLOW_ANALYTICS_NAMES.GEO_PROJECT_SETUP,
+    runId: run.runId,
+    organizationId: parsed.organizationId,
+    projectId: parsed.projectId,
   });
   return { runId: run.runId };
 }

@@ -3,18 +3,24 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { stripWebsiteProtocol } from "@notra/geo-core/utils/geo-website";
 import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 
+import { Button } from "@/components/button";
 import { StatusSpinner } from "@/components/geo/status-spinner";
 import type { AgentReadinessScanningNoticeProps } from "@/types/agent-readiness";
 
 export function AgentReadinessScanningNotice({
   targetUrl,
+  canRetry = false,
+  isRetrying = false,
+  onRetry,
 }: AgentReadinessScanningNoticeProps) {
-  const domain = stripWebsiteProtocol(targetUrl);
+  const domain = targetUrl ? stripWebsiteProtocol(targetUrl) : null;
 
   return (
     <div
       aria-busy="true"
-      aria-label={`Scanning ${domain}`}
+      aria-label={
+        domain ? `Running the first scan for ${domain}` : "Running the first scan"
+      }
       aria-live="polite"
       className="flex min-h-[28rem] items-center justify-center px-6 py-12 text-center"
     >
@@ -30,14 +36,30 @@ export function AgentReadinessScanningNotice({
           <span className="flex size-5 shrink-0 items-center justify-center [&>span]:size-4">
             <StatusSpinner />
           </span>
-          <span>
-            <Shimmer as="span">Scanning...</Shimmer>{" "}
-            <span className="break-all">{domain}</span>
-          </span>
+          <Shimmer as="span">Running your first scan</Shimmer>
         </h2>
         <p className="text-muted-foreground mt-2 max-w-lg text-base leading-relaxed text-pretty">
-          Checking how AI agents understand your website.
+          Checking how AI agents understand{" "}
+          {domain ? (
+            <strong className="text-foreground font-medium break-all">
+              {domain}
+            </strong>
+          ) : (
+            "your website"
+          )}
+          . This can take a few minutes.
         </p>
+        {canRetry ? (
+          <Button
+            className="mt-5"
+            disabled={isRetrying}
+            onClick={onRetry}
+            size="sm"
+            variant="outline"
+          >
+            {isRetrying ? "Restarting…" : "Restart setup"}
+          </Button>
+        ) : null}
       </div>
     </div>
   );

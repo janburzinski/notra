@@ -68,6 +68,14 @@ export const geoOrganizationInputSchema = object({
   projectId: string().min(1).optional(),
 });
 
+export const geoProjectSetupWorkflowPayloadSchema = object({
+  organizationId: string().min(1),
+  projectId: string().min(1),
+  brandSettingsId: string().min(1),
+  websiteUrl: publicWebsiteUrlSchema,
+  setupAttemptId: string().min(1),
+});
+
 /**
  * Payload of the GEO scan workflow.
  *
@@ -217,6 +225,11 @@ export const geoProjectCreateInputSchema = object({
   organizationId: string().min(1),
   name: string().trim().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
   brandSettingsId: string().min(1),
+});
+
+export const geoProjectSetupRetryInputSchema = object({
+  organizationId: string().min(1),
+  projectId: string().min(1),
 });
 
 export const geoTimeseriesInputSchema = geoOrganizationInputSchema.extend({

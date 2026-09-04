@@ -5,8 +5,10 @@ import { isDefiniteGeoScanHandoffRejection } from "../utils/geo-scan";
 import { geoSkip } from "./effect";
 import { GeoScanStartError } from "./errors";
 import {
+  acceptGeoScanHandoff,
+  claimInitialGeoScanRun,
   createGeoScanRow,
-  failPendingGeoScanRow,
+  rejectGeoScanHandoff,
   releaseGeoScanRun,
 } from "./scan-status";
 
@@ -43,9 +45,18 @@ import {
  *   rule it out, which is exactly why the ambiguous case must not release.
  */
 export const startClaimedGeoScanRun = Effect.fn("geo.startClaimedScanRun")(
-  function* (organizationId: string, projectId: string, claimedAt: Date) {
+  function* (
+    organizationId: string,
+    projectId: string,
+    claimedAt: Date,
+    requestedScanId?: string
+  ) {
     const workflows = yield* GeoWorkflowService;
-    const scanId = yield* createGeoScanRow({ organizationId, projectId }).pipe(
+    const scanId = yield* createGeoScanRow(
+      { organizationId, projectId },
+      requestedScanId,
+      claimedAt
+    ).pipe(
       Effect.tapError(() =>
         releaseGeoScanRun(projectId, claimedAt).pipe(
           geoSkip("scan claim release failed")
@@ -64,18 +75,11 @@ export const startClaimedGeoScanRun = Effect.fn("geo.startClaimedScanRun")(
         Effect.mapError((cause) => new GeoScanStartError({ cause })),
         Effect.tapError((error) => {
           if (isDefiniteGeoScanHandoffRejection(error.cause)) {
-            return Effect.all(
-              [
-                releaseGeoScanRun(projectId, claimedAt).pipe(
-                  geoSkip("scan claim release failed")
-                ),
-                failPendingGeoScanRow(
-                  { organizationId, projectId },
-                  scanId
-                ).pipe(geoSkip("scan row fail stamp failed")),
-              ],
-              { discard: true }
-            );
+            return rejectGeoScanHandoff(
+              { organizationId, projectId },
+              scanId,
+              claimedAt
+            ).pipe(Effect.asVoid);
           }
           return Effect.logWarning(
             `geo: scan hand-off for project ${projectId} failed with an unknown outcome; holding the claim until it goes stale`
@@ -83,6 +87,102 @@ export const startClaimedGeoScanRun = Effect.fn("geo.startClaimedScanRun")(
         })
       );
 
+    const handoff = yield* acceptGeoScanHandoff(
+      { organizationId, projectId },
+      scanId,
+      claimedAt
+    );
+    if (handoff !== "accepted") {
+      return yield* Effect.fail(
+        new GeoScanStartError({
+          cause: new Error("The scan handoff was rejected concurrently"),
+        })
+      );
+    }
+
     return { runId, scanId };
+  }
+);
+
+/**
+ * Starts the onboarding scan under a stable id. A redelivered setup step
+ * re-dispatches the original claim token rather than claiming a second paid
+ * scan; the scan worker's atomic claim renewal admits only one delivery.
+ */
+export const startInitialGeoScanRun = Effect.fn("geo.startInitialScanRun")(
+  function* (
+    organizationId: string,
+    projectId: string,
+    setupAttemptId: string
+  ) {
+    const operation = yield* claimInitialGeoScanRun(
+      { organizationId, projectId },
+      setupAttemptId,
+      setupAttemptId
+    );
+
+    if (operation.status === "superseded") {
+      return false;
+    }
+    if (operation.status === "occupied") {
+      return yield* Effect.fail(
+        new GeoScanStartError({
+          cause: new Error("Another scan owns the project scan slot"),
+        })
+      );
+    }
+    if (operation.status === "claimed") {
+      yield* startClaimedGeoScanRun(
+        organizationId,
+        projectId,
+        operation.claimedAt,
+        setupAttemptId
+      );
+      return true;
+    }
+
+    const { scan } = operation;
+    if (scan.status === "completed" || scan.handoffStatus === "accepted") {
+      return true;
+    }
+    if (scan.status === "failed" || scan.handoffStatus === "rejected") {
+      return yield* Effect.fail(
+        new GeoScanStartError({
+          cause: new Error("The initial scan handoff was rejected"),
+        })
+      );
+    }
+    if (!scan.handoffClaimedAt) {
+      return yield* Effect.fail(
+        new GeoScanStartError({
+          cause: new Error("The initial scan has no handoff claim"),
+        })
+      );
+    }
+
+    const workflows = yield* GeoWorkflowService;
+    yield* workflows
+      .startGeoScanRun({
+        organizationId,
+        projectId,
+        claimedAt: scan.handoffClaimedAt.toISOString(),
+        scanId: setupAttemptId,
+      })
+      .pipe(
+        Effect.mapError((cause) => new GeoScanStartError({ cause }))
+      );
+    const handoff = yield* acceptGeoScanHandoff(
+      { organizationId, projectId },
+      setupAttemptId,
+      scan.handoffClaimedAt
+    );
+    if (handoff !== "accepted") {
+      return yield* Effect.fail(
+        new GeoScanStartError({
+          cause: new Error("The initial scan handoff was rejected concurrently"),
+        })
+      );
+    }
+    return true;
   }
 );

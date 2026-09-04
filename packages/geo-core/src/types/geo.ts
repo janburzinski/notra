@@ -11,6 +11,7 @@ import type {
   GeoCheckWrite,
 } from "@notra/db/types/geo-checks";
 import type { GeoContentBriefStatus } from "@notra/db/types/geo-writer";
+import type { GEO_PROJECT_SETUP_STATUSES } from "@notra/db/constants/geo-project";
 import type {
   FinishReason,
   LanguageModel,
@@ -22,14 +23,23 @@ export interface GeoProject {
   id: string;
   name: string;
   brandSettingsId: string;
+  setupStatus: GeoProjectSetupStatus;
+  setupAttemptId: string | null;
   createdAt: string;
 }
+
+export type GeoProjectSetupStatus =
+  (typeof GEO_PROJECT_SETUP_STATUSES)[number];
 
 export interface GeoProjectRow {
   id: string;
   organizationId: string;
   name: string;
   brandSettingsId: string;
+  setupStatus: GeoProjectSetupStatus;
+  setupError: string | null;
+  setupAttemptId: string | null;
+  setupStartedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,6 +58,21 @@ export interface GeoProjectScope {
 export interface GeoScopeInput {
   organizationId: string;
   projectId?: string;
+}
+
+export interface GeoProjectSetupWorkflowPayload {
+  organizationId: string;
+  projectId: string;
+  brandSettingsId: string;
+  websiteUrl: string;
+  setupAttemptId: string;
+}
+
+export interface GeoProjectSetupDispatchPayload {
+  organizationId: string;
+  projectId: string;
+  brandSettingsId: string;
+  websiteUrl: string;
 }
 
 export interface GeoProjectUpdateInput {
@@ -80,6 +105,8 @@ export interface GeoSettings {
 export interface GeoSettingsResponse {
   configured: boolean;
   settings: GeoSettings | null;
+  setupStatus: GeoProjectSetupStatus | null;
+  setupRetryable: boolean;
 }
 
 export interface GeoSettingsRow {

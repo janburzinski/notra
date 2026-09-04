@@ -3,7 +3,7 @@ import { scrapeWebsiteForBrandAnalysis } from "@notra/ai/utils/context-dev";
 import { db } from "@notra/db/drizzle";
 import { geoSettings, projects } from "@notra/db/schema";
 import { generateText, Output } from "ai";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -32,13 +32,14 @@ import type {
   GeoGenerateFromWebsiteResult,
   GeoPromptInsert,
   GeoScopeInput,
+  GeoProjectSetupWorkflowPayload,
   GeoWebsiteDiscovery,
 } from "../types/geo";
 import { readGeoCache, writeGeoCache } from "./cache";
 import { competitorKey, normalizeCompetitorDomain } from "./domain";
 import { geoSkip } from "./effect";
 import { GeoDiscoveryError } from "./errors";
-import { toGeoProject } from "./mappers";
+import { lockGeoProject } from "./lock";
 import {
   insertPromptsInTransaction,
   reconcileCompetitorsInTransaction,
@@ -419,55 +420,56 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
   }
 );
 
-export const createGeoProjectFromWebsite = Effect.fn(
-  "geo.projectCreateFromWebsite"
-)(function* (
-  organizationId: string,
-  name: string,
-  brandSettingsId: string,
-  url: string
-) {
-  const { discovery } = yield* discoverGeoWebsite(organizationId, url);
-  const { aliases, companyName, entries } =
-    yield* prepareGeoWebsiteGeneration(discovery);
+export const setupGeoProjectFromWebsite = Effect.fn("geo.projectSetup")(
+  function* (payload: GeoProjectSetupWorkflowPayload) {
+    const { discovery } = yield* discoverGeoWebsite(
+      payload.organizationId,
+      payload.websiteUrl
+    );
+    const { aliases, companyName, entries } =
+      yield* prepareGeoWebsiteGeneration(discovery);
 
-  const project = yield* Effect.tryPromise({
-    try: () =>
-      db.transaction(async (tx) => {
-        const rows = await tx
-          .insert(projects)
-          .values({
-            id: crypto.randomUUID(),
-            organizationId,
-            name: name.trim(),
-            brandSettingsId,
-          })
-          .returning();
-        const row = rows.at(0);
-        if (!row) {
-          throw new Error("Project insert returned no row");
-        }
+    const persisted = yield* Effect.tryPromise({
+      try: () =>
+        db.transaction(async (tx) => {
+          await Effect.runPromise(lockGeoProject(tx, payload.projectId));
+          const active = await tx
+            .select({ id: projects.id })
+            .from(projects)
+            .where(
+              and(
+                eq(projects.id, payload.projectId),
+                eq(projects.organizationId, payload.organizationId),
+                eq(projects.setupStatus, "pending"),
+                eq(projects.setupAttemptId, payload.setupAttemptId)
+              )
+            )
+            .limit(1)
+            .for("update");
+          if (!active.length) {
+            return false;
+          }
 
-        await Effect.runPromise(
-          persistGeoWebsiteGeneration(
-            tx,
-            organizationId,
-            row.id,
-            companyName,
-            aliases,
-            entries,
-            discovery.competitors
-          )
-        );
-        return toGeoProject(row);
-      }),
-    catch: (cause) =>
-      new GeoDiscoveryError({
-        message: "Failed to create and configure the project",
-        cause,
-      }),
-  });
+          await Effect.runPromise(
+            persistGeoWebsiteGeneration(
+              tx,
+              payload.organizationId,
+              payload.projectId,
+              companyName,
+              aliases,
+              entries,
+              discovery.competitors
+            )
+          );
+          return true;
+        }),
+      catch: (cause) =>
+        new GeoDiscoveryError({
+          message: "Failed to save project setup",
+          cause,
+        }),
+    });
 
-  yield* startGeoScanAfterWebsiteGeneration(organizationId, project.id, true);
-  return project;
-});
+    return persisted;
+  }
+);

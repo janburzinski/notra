@@ -21,6 +21,7 @@ import {
   AGENT_FEEDBACK_STATUSES,
 } from "./constants/agent-feedback";
 import { BLOG_POST_SUBTYPES } from "./constants/content";
+import { GEO_PROJECT_SETUP_STATUSES } from "./constants/geo-project";
 import { GEO_PROSPECT_REPORT_STATUSES } from "./constants/geo-prospect-reports";
 import {
   GEO_CONTENT_BRIEF_STATUSES,
@@ -1330,6 +1331,12 @@ export const projects = pgTable(
       .notNull()
       .references(() => brandSettings.id),
     isSample: boolean("is_sample").notNull().default(false),
+    setupStatus: text("setup_status", { enum: GEO_PROJECT_SETUP_STATUSES })
+      .notNull()
+      .default("ready"),
+    setupError: text("setup_error"),
+    setupAttemptId: text("setup_attempt_id"),
+    setupStartedAt: timestamp("setup_started_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -1546,6 +1553,10 @@ export const geoScans = pgTable(
     status: text("status", { enum: ["running", "completed", "failed"] })
       .notNull()
       .default("running"),
+    handoffClaimedAt: timestamp("handoff_claimed_at"),
+    handoffStatus: text("handoff_status", {
+      enum: ["pending", "accepted", "rejected"],
+    }),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     finishedAt: timestamp("finished_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -1657,6 +1668,7 @@ export const geoAgentReadinessReports = pgTable(
     eligibleChecks: integer("eligible_checks"),
     reportUrl: text("report_url"),
     errorMessage: text("error_message"),
+    executionStartedAt: timestamp("execution_started_at"),
     scannedAt: timestamp("scanned_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

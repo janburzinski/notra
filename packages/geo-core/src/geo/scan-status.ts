@@ -1,5 +1,5 @@
 import { db } from "@notra/db/drizzle";
-import { geoScans, geoSettings } from "@notra/db/schema";
+import { geoScans, geoSettings, projects } from "@notra/db/schema";
 import { and, eq, gte, isNull, lt, notExists, or } from "drizzle-orm";
 import { Effect, Exit } from "effect";
 
@@ -60,6 +60,169 @@ export const claimGeoScanRun = Effect.fn("geo.claimScanRun")(function* (
   }
   return { claimedAt: now };
 });
+
+/** Claims the scan slot and persists its deterministic handoff row atomically. */
+export const claimInitialGeoScanRun = Effect.fn("geo.claimInitialScanRun")(
+  function* (
+    scope: GeoScanRunScope,
+    scanId: string,
+    setupAttemptId: string
+  ) {
+    const now = new Date();
+    const staleBefore = new Date(now.getTime() - GEO_SCAN_STALE_MS);
+    return yield* geoDb("initial scan claim failed", () =>
+      db.transaction(async (tx) => {
+        const active = await tx
+          .select({ id: projects.id })
+          .from(projects)
+          .where(
+            and(
+              eq(projects.id, scope.projectId),
+              eq(projects.organizationId, scope.organizationId),
+              eq(projects.setupStatus, "pending"),
+              eq(projects.setupAttemptId, setupAttemptId)
+            )
+          )
+          .limit(1)
+          .for("update");
+        if (!active.length) {
+          return { status: "superseded" as const };
+        }
+        const existing = await tx.query.geoScans.findFirst({
+          columns: {
+            status: true,
+            handoffClaimedAt: true,
+            handoffStatus: true,
+          },
+          where: and(
+            eq(geoScans.id, scanId),
+            eq(geoScans.organizationId, scope.organizationId),
+            eq(geoScans.projectId, scope.projectId)
+          ),
+        });
+        if (existing) {
+          return { status: "existing" as const, scan: existing };
+        }
+        const claimed = await tx
+          .update(geoSettings)
+          .set({ scanStartedAt: now })
+          .where(
+            and(
+              eq(geoSettings.projectId, scope.projectId),
+              or(
+                isNull(geoSettings.scanStartedAt),
+                lt(geoSettings.scanStartedAt, staleBefore)
+              )
+            )
+          )
+          .returning({ id: geoSettings.id });
+        if (!claimed.length) {
+          return { status: "occupied" as const };
+        }
+        await tx
+          .insert(geoScans)
+          .values({
+            id: scanId,
+            organizationId: scope.organizationId,
+            projectId: scope.projectId,
+            status: "running",
+            handoffClaimedAt: now,
+            handoffStatus: "pending",
+            startedAt: now,
+          })
+          .onConflictDoNothing({ target: geoScans.id });
+        return { status: "claimed" as const, claimedAt: now };
+      })
+    );
+  }
+);
+
+export const acceptGeoScanHandoff = Effect.fn("geo.acceptScanHandoff")(
+  function* (scope: GeoScanRunScope, scanId: string, claimedAt: Date) {
+    return yield* geoDb("scan handoff acceptance failed", () =>
+      db.transaction(async (tx) => {
+        const accepted = await tx
+          .update(geoScans)
+          .set({ handoffStatus: "accepted" })
+          .where(
+            and(
+              eq(geoScans.id, scanId),
+              eq(geoScans.organizationId, scope.organizationId),
+              eq(geoScans.projectId, scope.projectId),
+              eq(geoScans.status, "running"),
+              eq(geoScans.handoffStatus, "pending"),
+              eq(geoScans.handoffClaimedAt, claimedAt)
+            )
+          )
+          .returning({ status: geoScans.handoffStatus });
+        if (accepted.length) {
+          return "accepted" as const;
+        }
+        const row = await tx.query.geoScans.findFirst({
+          columns: { status: true, handoffStatus: true },
+          where: and(
+            eq(geoScans.id, scanId),
+            eq(geoScans.organizationId, scope.organizationId),
+            eq(geoScans.projectId, scope.projectId)
+          ),
+        });
+        return row?.status === "completed" || row?.handoffStatus === "accepted"
+          ? ("accepted" as const)
+          : ("rejected" as const);
+      })
+    );
+  }
+);
+
+export const rejectGeoScanHandoff = Effect.fn("geo.rejectScanHandoff")(
+  function* (scope: GeoScanRunScope, scanId: string, claimedAt: Date) {
+    return yield* geoDb("scan handoff rejection failed", () =>
+      db.transaction(async (tx) => {
+        const rejected = await tx
+          .update(geoScans)
+          .set({
+            status: "failed",
+            handoffStatus: "rejected",
+            finishedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(geoScans.id, scanId),
+              eq(geoScans.organizationId, scope.organizationId),
+              eq(geoScans.projectId, scope.projectId),
+              eq(geoScans.status, "running"),
+              eq(geoScans.handoffStatus, "pending"),
+              eq(geoScans.handoffClaimedAt, claimedAt)
+            )
+          )
+          .returning({ id: geoScans.id });
+        if (rejected.length) {
+          await tx
+            .update(geoSettings)
+            .set({ scanStartedAt: null })
+            .where(
+              and(
+                eq(geoSettings.projectId, scope.projectId),
+                eq(geoSettings.scanStartedAt, claimedAt)
+              )
+            );
+          return "rejected" as const;
+        }
+        const row = await tx.query.geoScans.findFirst({
+          columns: { status: true, handoffStatus: true },
+          where: and(
+            eq(geoScans.id, scanId),
+            eq(geoScans.organizationId, scope.organizationId),
+            eq(geoScans.projectId, scope.projectId)
+          ),
+        });
+        return row?.status === "completed" || row?.handoffStatus === "accepted"
+          ? ("accepted" as const)
+          : ("rejected" as const);
+      })
+    );
+  }
+);
 
 /**
  * Revalidates a claim handed to a delayed workflow and rotates its ownership
@@ -247,7 +410,8 @@ interface GeoScanRunOptions {
  */
 export const createGeoScanRow = Effect.fn("geo.createScanRow")(function* (
   scope: GeoScanRunScope,
-  scanId?: string
+  scanId?: string,
+  handoffClaimedAt?: Date
 ) {
   const id = scanId ?? crypto.randomUUID();
   yield* geoDb("scan row insert failed", () =>
@@ -258,6 +422,8 @@ export const createGeoScanRow = Effect.fn("geo.createScanRow")(function* (
         organizationId: scope.organizationId,
         projectId: scope.projectId,
         status: "running",
+        handoffClaimedAt,
+        handoffStatus: handoffClaimedAt ? "pending" : null,
         startedAt: new Date(),
       })
       .onConflictDoNothing({ target: geoScans.id })
@@ -354,7 +520,11 @@ export const sweepStaleGeoScanRows = Effect.fn("geo.sweepStaleScanRows")(
 );
 
 export const failPendingGeoScanRow = Effect.fn("geo.failPendingScanRow")(
-  function* (scope: GeoScanRunScope, scanId: string) {
+  function* (
+    scope: GeoScanRunScope,
+    scanId: string,
+    preserveRedeliveredHandoff = false
+  ) {
     yield* geoDb("scan row fail stamp failed", () =>
       db
         .update(geoScans)
@@ -364,7 +534,10 @@ export const failPendingGeoScanRow = Effect.fn("geo.failPendingScanRow")(
             eq(geoScans.id, scanId),
             eq(geoScans.organizationId, scope.organizationId),
             eq(geoScans.projectId, scope.projectId),
-            eq(geoScans.status, "running")
+            eq(geoScans.status, "running"),
+            preserveRedeliveredHandoff
+              ? isNull(geoScans.handoffClaimedAt)
+              : undefined
           )
         )
     );

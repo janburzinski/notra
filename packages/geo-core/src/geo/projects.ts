@@ -1,11 +1,13 @@
 import { db } from "@notra/db/drizzle";
 import { brandSettings, geoSettings, projects } from "@notra/db/schema";
 import type { GeoCheckScope } from "@notra/db/types/geo-checks";
-import { and, asc, count, desc, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq, lt, or } from "drizzle-orm";
 import { Effect } from "effect";
 
+import { GEO_PROJECT_SETUP_STALE_MS } from "../constants/geo";
 import type {
   GeoProjectScope,
+  GeoProjectSetupStatus,
   GeoProjectsResponse,
   GeoProjectUpdateInput,
   GeoScopeInput,
@@ -97,7 +99,10 @@ const findOldestProjectId = Effect.fn("geo.oldestProject")(function* (
 export const createGeoProject = Effect.fn("geo.projectCreate")(function* (
   organizationId: string,
   name: string,
-  brandSettingsId?: string
+  brandSettingsId?: string,
+  setupStatus: GeoProjectSetupStatus = "ready",
+  setupAttemptId: string | null =
+    setupStatus === "pending" ? crypto.randomUUID() : null
 ) {
   const linkedBrandSettingsId = brandSettingsId
     ? (yield* requireBrandIdentity(organizationId, brandSettingsId)).id
@@ -111,6 +116,9 @@ export const createGeoProject = Effect.fn("geo.projectCreate")(function* (
         organizationId,
         name: name.trim(),
         brandSettingsId: linkedBrandSettingsId,
+        setupStatus,
+        setupAttemptId,
+        setupStartedAt: setupStatus === "pending" ? new Date() : null,
       })
       .returning()
   );
@@ -121,6 +129,131 @@ export const createGeoProject = Effect.fn("geo.projectCreate")(function* (
   }
 
   return toGeoProject(row);
+});
+
+export const updateGeoProjectSetupStatus = Effect.fn(
+  "geo.projectSetupStatusUpdate"
+)(function* (
+  organizationId: string,
+  projectId: string,
+  setupStatus: GeoProjectSetupStatus,
+  setupError: string | null = null,
+  setupAttemptId?: string
+) {
+  const rows = yield* geoDb("project setup status update failed", () =>
+    db
+      .update(projects)
+      .set(
+        setupStatus === "ready"
+          ? {
+              setupStatus,
+              setupError,
+              setupAttemptId: null,
+              setupStartedAt: null,
+            }
+          : { setupStatus, setupError }
+      )
+      .where(
+        and(
+          eq(projects.id, projectId),
+          eq(projects.organizationId, organizationId),
+          setupAttemptId
+            ? and(
+                eq(projects.setupStatus, "pending"),
+                eq(projects.setupAttemptId, setupAttemptId)
+              )
+            : undefined
+        )
+      )
+      .returning()
+  );
+  const row = rows.at(0);
+  if (row) {
+    return toGeoProject(row);
+  }
+
+  const existing = yield* geoDb("project lookup failed", () =>
+    db.query.projects.findFirst({
+      where: and(
+        eq(projects.id, projectId),
+        eq(projects.organizationId, organizationId)
+      ),
+    })
+  );
+  if (!existing) {
+    return yield* Effect.fail(new GeoProjectNotFoundError({ projectId }));
+  }
+  return toGeoProject(existing);
+});
+
+export const claimGeoProjectSetupRetry = Effect.fn(
+  "geo.projectSetupRetryClaim"
+)(function* (organizationId: string, projectId: string) {
+  const setupAttemptId = crypto.randomUUID();
+  const now = new Date();
+  const staleBefore = new Date(now.getTime() - GEO_PROJECT_SETUP_STALE_MS);
+  const rows = yield* geoDb("project setup retry claim failed", () =>
+    db
+      .update(projects)
+      .set({
+        setupStatus: "pending",
+        setupError: null,
+        setupAttemptId,
+        setupStartedAt: now,
+      })
+      .where(
+        and(
+          eq(projects.id, projectId),
+          eq(projects.organizationId, organizationId),
+          or(
+            eq(projects.setupStatus, "failed"),
+            and(
+              eq(projects.setupStatus, "pending"),
+              lt(projects.setupStartedAt, staleBefore)
+            )
+          )
+        )
+      )
+      .returning()
+  );
+  const claimed = rows.at(0);
+  if (claimed) {
+    return { project: toGeoProject(claimed), claimed: true };
+  }
+
+  const existing = yield* geoDb("project lookup failed", () =>
+    db.query.projects.findFirst({
+      where: and(
+        eq(projects.id, projectId),
+        eq(projects.organizationId, organizationId)
+      ),
+    })
+  );
+  if (!existing) {
+    return yield* Effect.fail(new GeoProjectNotFoundError({ projectId }));
+  }
+  return { project: toGeoProject(existing), claimed: false };
+});
+
+export const isGeoProjectSetupAttemptActive = Effect.fn(
+  "geo.projectSetupAttemptActive"
+)(function* (
+  organizationId: string,
+  projectId: string,
+  setupAttemptId: string
+) {
+  const row = yield* geoDb("project setup attempt lookup failed", () =>
+    db.query.projects.findFirst({
+      columns: { id: true },
+      where: and(
+        eq(projects.id, projectId),
+        eq(projects.organizationId, organizationId),
+        eq(projects.setupStatus, "pending"),
+        eq(projects.setupAttemptId, setupAttemptId)
+      ),
+    })
+  );
+  return Boolean(row);
 });
 
 export const updateGeoProject = Effect.fn("geo.projectUpdate")(function* (

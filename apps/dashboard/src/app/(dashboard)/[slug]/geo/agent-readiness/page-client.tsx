@@ -27,10 +27,14 @@ import { useOrganizationsContext } from "@/components/providers/organization-pro
 import {
   useAgentReadiness,
   useAgentReadinessScan,
+  useGeoProjectSetupRetry,
   useGeoSettings,
 } from "@/lib/hooks/use-geo";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
-import type { AgentReadinessBodyProps } from "@/types/agent-readiness";
+import type {
+  AgentReadinessBodyProps,
+  AgentReadinessPageBodyProps,
+} from "@/types/agent-readiness";
 import type { GeoPageClientProps } from "@/types/geo";
 import { withGeoProject } from "@/utils/geo-paths";
 
@@ -117,23 +121,51 @@ function ReadinessBody({
   );
 }
 
-function AgentReadinessPageContent({ organizationSlug }: GeoPageClientProps) {
-  const { projectId } = useGeoProjectScope();
-  const { getOrganization, activeOrganization } = useOrganizationsContext();
-  const orgFromList = getOrganization(organizationSlug);
-  const organization =
-    activeOrganization?.slug === organizationSlug
-      ? activeOrganization
-      : orgFromList;
-  const organizationId = organization?.id ?? "";
+function AgentReadinessPageBody({
+  organizationSlug,
+  projectId,
+  readinessData,
+  hasSettings,
+  setupPending,
+  setupFailed,
+  setupRetryable,
+  isScanPending,
+  isSetupRetryPending,
+  onRequestScan,
+  onRetrySetup,
+}: AgentReadinessPageBodyProps) {
+  if (
+    setupPending &&
+    !readinessData?.report &&
+    readinessData?.scan?.status !== "failed"
+  ) {
+    return (
+      <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="w-full space-y-6 px-4 lg:px-6">
+          <header className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {AGENT_READINESS_PAGE_TITLE}
+            </h1>
+            <p className="text-muted-foreground">
+              {AGENT_READINESS_PAGE_DESCRIPTION}
+            </p>
+          </header>
+          <AgentReadinessScanningNotice
+            canRetry={setupRetryable}
+            isRetrying={isSetupRetryPending}
+            onRetry={onRetrySetup}
+            targetUrl={readinessData?.targetUrl}
+          />
+        </div>
+      </PageContainer>
+    );
+  }
 
-  const { data: settingsData, isPending: isSettingsPending } =
-    useGeoSettings(organizationId);
-  const readinessQuery = useAgentReadiness(organizationId);
-  const scanMutation = useAgentReadinessScan(organizationId);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const hasReadinessActivity = Boolean(
+    readinessData?.report || readinessData?.scan
+  );
 
-  if (!(isSettingsPending || settingsData?.settings)) {
+  if (!(hasSettings || hasReadinessActivity || setupFailed)) {
     return (
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="w-full space-y-6 px-4 lg:px-6">
@@ -167,10 +199,6 @@ function AgentReadinessPageContent({ organizationSlug }: GeoPageClientProps) {
     );
   }
 
-  if (readinessQuery.isPending) {
-    return <AgentReadinessSkeleton />;
-  }
-
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
@@ -183,11 +211,29 @@ function AgentReadinessPageContent({ organizationSlug }: GeoPageClientProps) {
           </p>
         </header>
 
-        {readinessQuery.data ? (
+        {setupRetryable ? (
+          <div className="border-destructive/20 bg-destructive/5 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3">
+            <p className="text-sm">
+              {setupFailed
+                ? "Project setup failed before GEO tracking was ready."
+                : "Project setup is taking longer than expected."}
+            </p>
+            <Button
+              disabled={isSetupRetryPending}
+              onClick={onRetrySetup}
+              size="sm"
+              variant="outline"
+            >
+              {isSetupRetryPending ? "Retrying…" : "Try setup again"}
+            </Button>
+          </div>
+        ) : null}
+
+        {readinessData ? (
           <ReadinessBody
-            data={readinessQuery.data}
-            isScanPending={scanMutation.isPending}
-            onRequestScan={() => setDialogOpen(true)}
+            data={readinessData}
+            isScanPending={isScanPending}
+            onRequestScan={onRequestScan}
           />
         ) : (
           <EmptyState
@@ -197,7 +243,49 @@ function AgentReadinessPageContent({ organizationSlug }: GeoPageClientProps) {
           />
         )}
       </div>
+    </PageContainer>
+  );
+}
 
+function AgentReadinessPageContent({ organizationSlug }: GeoPageClientProps) {
+  const { projectId } = useGeoProjectScope();
+  const { getOrganization, activeOrganization } = useOrganizationsContext();
+  const orgFromList = getOrganization(organizationSlug);
+  const organization =
+    activeOrganization?.slug === organizationSlug
+      ? activeOrganization
+      : orgFromList;
+  const organizationId = organization?.id ?? "";
+
+  const { data: settingsData, isPending: isSettingsPending } =
+    useGeoSettings(organizationId);
+  const setupPending = settingsData?.setupStatus === "pending";
+  const setupFailed = settingsData?.setupStatus === "failed";
+  const setupRetryable = settingsData?.setupRetryable ?? false;
+  const readinessQuery = useAgentReadiness(organizationId, setupPending);
+  const scanMutation = useAgentReadinessScan(organizationId);
+  const setupRetry = useGeoProjectSetupRetry(organizationId);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  if (isSettingsPending || (!setupPending && readinessQuery.isPending)) {
+    return <AgentReadinessSkeleton />;
+  }
+
+  return (
+    <>
+      <AgentReadinessPageBody
+        hasSettings={Boolean(settingsData?.settings)}
+        isScanPending={scanMutation.isPending}
+        isSetupRetryPending={setupRetry.isPending}
+        onRequestScan={() => setDialogOpen(true)}
+        onRetrySetup={() => setupRetry.mutate()}
+        organizationSlug={organizationSlug}
+        projectId={projectId}
+        readinessData={readinessQuery.data}
+        setupFailed={setupFailed}
+        setupPending={setupPending}
+        setupRetryable={setupRetryable}
+      />
       <AgentReadinessScanDialog
         isPending={scanMutation.isPending}
         onConfirm={() => {
@@ -207,6 +295,6 @@ function AgentReadinessPageContent({ organizationSlug }: GeoPageClientProps) {
         onOpenChange={setDialogOpen}
         open={dialogOpen}
       />
-    </PageContainer>
+    </>
   );
 }

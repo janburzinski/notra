@@ -183,7 +183,8 @@ export function useGeoSettings(organizationId: string) {
     }),
     enabled: !!organizationId,
     refetchInterval: (current) =>
-      current.state.data?.settings?.isScanning
+      current.state.data?.settings?.isScanning ||
+      current.state.data?.setupStatus === "pending"
         ? GEO_SCAN_POLL_INTERVAL_MS
         : false,
     meta: { errorMessage: "Failed to load AI visibility settings" },
@@ -605,7 +606,10 @@ export function useIsGeoScanning(organizationId: string) {
   return pendingCount > 0 || Boolean(data?.settings?.isScanning);
 }
 
-export function useAgentReadiness(organizationId: string) {
+export function useAgentReadiness(
+  organizationId: string,
+  pollWhileProjectSetup = false
+) {
   const { projectId } = useGeoProjectScope();
   return useQuery<AgentReadinessResponse>({
     ...dashboardOrpc.geo.agentReadiness.queryOptions({
@@ -613,7 +617,7 @@ export function useAgentReadiness(organizationId: string) {
     }),
     enabled: !!organizationId,
     refetchInterval: (query) =>
-      query.state.data?.scan?.status === "running"
+      pollWhileProjectSetup || query.state.data?.scan?.status === "running"
         ? AGENT_READINESS_POLL_INTERVAL_MS
         : false,
     meta: { errorMessage: "Failed to load agent readiness" },
@@ -774,8 +778,16 @@ export function useGeoProjects(organizationId: string) {
       errorMessage: "Failed to load projects",
       showRetryAction: true,
     },
-    refetchInterval: (query) =>
-      query.state.status === "error" ? 30_000 : false,
+    refetchInterval: (query) => {
+      if (query.state.status === "error") {
+        return 30_000;
+      }
+      return query.state.data?.projects.some(
+        (project) => project.setupStatus === "pending"
+      )
+        ? GEO_SCAN_POLL_INTERVAL_MS
+        : false;
+    },
   });
 }
 
@@ -794,6 +806,38 @@ export function useGeoProjectCreate(organizationId: string) {
     },
     onError: (error) => {
       toast.error(toErrorMessage(error, "Failed to create project"));
+    },
+  });
+}
+
+export function useGeoProjectSetupRetry(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      dashboardOrpc.geo.projectsRetrySetup.call({
+        organizationId,
+        projectId: projectId ?? "",
+      }),
+    onSuccess: async (project) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.projectsList.queryKey({
+            input: { organizationId },
+          }),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.settings.queryKey({
+            input: { organizationId, projectId },
+          }),
+        }),
+      ]);
+      if (project.setupStatus === "failed") {
+        toast.error("Failed to restart project setup");
+      }
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, "Failed to restart project setup"));
     },
   });
 }

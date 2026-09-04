@@ -16,7 +16,10 @@ export interface AgentReadinessScoreCardProps {
 }
 
 export interface AgentReadinessScanningNoticeProps {
-  targetUrl: string;
+  targetUrl?: string;
+  canRetry?: boolean;
+  isRetrying?: boolean;
+  onRetry?: () => void;
 }
 
 export interface AgentReadinessChecklistProps {
@@ -39,6 +42,20 @@ export interface AgentReadinessBodyProps {
   data: AgentReadinessResponse;
   isScanPending: boolean;
   onRequestScan: () => void;
+}
+
+export interface AgentReadinessPageBodyProps {
+  organizationSlug: string;
+  projectId?: string;
+  readinessData: AgentReadinessResponse | undefined;
+  hasSettings: boolean;
+  setupPending: boolean;
+  setupFailed: boolean;
+  setupRetryable: boolean;
+  isScanPending: boolean;
+  isSetupRetryPending: boolean;
+  onRequestScan: () => void;
+  onRetrySetup: () => void;
 }
 
 export interface AgentReadinessCopyPromptButtonProps {

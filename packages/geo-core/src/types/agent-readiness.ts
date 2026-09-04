@@ -31,6 +31,11 @@ export interface AgentReadinessScope {
   brandSettingsId: string;
 }
 
+export interface AgentReadinessScanStartOptions {
+  reportId?: string;
+  redispatchExisting?: boolean;
+}
+
 export interface AgentReadinessReportView {
   id: string;
   status: AgentReadinessReportStatus;
@@ -79,6 +84,7 @@ export interface AgentReadinessWorkflowPayload {
 
 export type AgentReadinessWorkflowResult =
   | { status: "completed" }
+  | { status: "superseded" }
   | { status: "failed"; reason: string }
   | { status: "invalid_payload" };
 

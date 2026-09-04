@@ -276,6 +276,7 @@ export const GEO_SEQUENCE_PAIR_TIMEOUT_MS = 7 * 60 * 1000;
 export const GEO_SCAN_DUE_LIMIT_PER_SWEEP = 25;
 export const GEO_SCAN_POLL_INTERVAL_MS = 3000;
 export const GEO_START_SCAN_MUTATION_KEY = "geo-start-scan";
+export const GEO_PROJECT_SETUP_STALE_MS = 30 * 60 * 1000;
 export const GEO_EXCERPT_MAX_LENGTH = 300;
 export const GEO_PROMPT_MIN_LENGTH = 8;
 export const GEO_PROMPT_MAX_LENGTH = 300;

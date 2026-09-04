@@ -184,7 +184,7 @@ export function GeoProjectCreateDialog({
                 <Loader2Icon className="size-4 animate-spin" />
               )}
               {createProject.isPending
-                ? "Setting up project"
+                ? "Creating project"
                 : "Create project"}
             </Button>
           </ResponsiveDialogFooter>

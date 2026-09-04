@@ -799,7 +799,13 @@ export const prepareGeoScanProject = Effect.fn("geo.prepareScanProject")(
     if (options.claimedAt) {
       const renewed = yield* renewGeoScanRun(projectId, options.claimedAt);
       if (!renewed) {
-        yield* failHandedScanRow;
+        yield* options.scanId
+          ? failPendingGeoScanRow(
+              { organizationId, projectId },
+              options.scanId,
+              true
+            ).pipe(geoSkip("scan row fail stamp failed"))
+          : Effect.void;
         yield* geoLogWarn({
           event: "geo.scan.skipped",
           reason: "claim_lost",

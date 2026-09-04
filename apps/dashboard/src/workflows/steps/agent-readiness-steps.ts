@@ -12,6 +12,9 @@ export async function runAgentReadinessScanStep(
   "use step";
   const startedAt = Date.now();
   const result = await executeAgentReadinessScan(payload);
+  if (result.status === "superseded") {
+    return result;
+  }
   await trackAgentReadinessScanResult({
     payload,
     status: result.status,
@@ -20,3 +23,5 @@ export async function runAgentReadinessScanStep(
   });
   return result;
 }
+
+runAgentReadinessScanStep.maxRetries = 0;
