@@ -33,7 +33,12 @@ export async function GET(request: NextRequest) {
     ? pendingStates.find((entry) => entry.state === query.data.state)
     : undefined;
 
-  const returnUrl = new URL("/repo-star-video", request.nextUrl.origin);
+  const returnUrl = new URL(
+    stateData?.tool === "pr-merge-video"
+      ? "/pr-merge-video"
+      : "/repo-star-video",
+    request.nextUrl.origin
+  );
   if (stateData?.repo) {
     returnUrl.searchParams.set("repo", stateData.repo);
   }

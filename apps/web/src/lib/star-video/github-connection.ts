@@ -1,3 +1,5 @@
+import type { GithubVideoTool } from "@/types/star-video";
+
 import { GITHUB_CONNECTED_COOKIE } from "./github-cookies";
 
 export function subscribeToGithubConnection(listener: () => void): () => void {
@@ -25,9 +27,17 @@ export function getServerGithubLogin(): string | null {
   return null;
 }
 
-export function buildGithubConnectHref(repoParam: string | null): string {
-  if (!repoParam) {
-    return "/api/star-video/github/authorize";
+export function buildGithubConnectHref(
+  repoParam: string | null,
+  tool: GithubVideoTool = "star-video"
+): string {
+  const params = new URLSearchParams();
+  if (repoParam) {
+    params.set("repo", repoParam);
   }
-  return `/api/star-video/github/authorize?repo=${encodeURIComponent(repoParam)}`;
+  if (tool !== "star-video") {
+    params.set("tool", tool);
+  }
+  const query = params.toString();
+  return `/api/star-video/github/authorize${query ? `?${query}` : ""}`;
 }

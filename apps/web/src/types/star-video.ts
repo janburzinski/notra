@@ -6,9 +6,17 @@ export type StarVideoInputProps = {
   backgroundColor: string;
 };
 
+export type GithubVideoTool = "star-video" | "pr-merge-video";
+
+export interface RepoInputFormProps {
+  tool?: GithubVideoTool;
+  actionLabel?: string;
+}
+
 export interface GithubOAuthState {
   state: string;
   repo?: string;
+  tool?: GithubVideoTool;
 }
 
 export interface GithubOAuthConfig {

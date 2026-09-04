@@ -13,7 +13,10 @@ import {
   getGithubOAuthConfig,
   readPendingOAuthStates,
 } from "@/lib/star-video/github-oauth";
-import { githubReturnRepoSchema } from "@/schemas/star-video";
+import {
+  githubReturnRepoSchema,
+  githubVideoToolSchema,
+} from "@/schemas/star-video";
 
 export const runtime = "nodejs";
 
@@ -22,8 +25,15 @@ export function GET(request: NextRequest) {
     request.nextUrl.searchParams.get("repo") ?? ""
   );
   const repo = parsedRepo.success ? parsedRepo.data : null;
+  const parsedTool = githubVideoToolSchema.safeParse(
+    request.nextUrl.searchParams.get("tool") ?? ""
+  );
+  const tool = parsedTool.success ? parsedTool.data : "star-video";
 
-  const returnUrl = new URL("/repo-star-video", request.nextUrl.origin);
+  const returnUrl = new URL(
+    tool === "pr-merge-video" ? "/pr-merge-video" : "/repo-star-video",
+    request.nextUrl.origin
+  );
   if (repo) {
     returnUrl.searchParams.set("repo", repo);
   }
@@ -41,7 +51,7 @@ export function GET(request: NextRequest) {
   );
   const pendingStates = appendPendingOAuthState(
     readPendingOAuthStates(request.cookies.get(GITHUB_STATE_COOKIE)?.value),
-    { state, repo: repo ?? undefined }
+    { state, repo: repo ?? undefined, tool }
   );
   response.cookies.set(GITHUB_STATE_COOKIE, JSON.stringify(pendingStates), {
     httpOnly: true,

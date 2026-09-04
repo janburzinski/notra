@@ -13,11 +13,15 @@ import {
   subscribeToGithubConnection,
 } from "@/lib/star-video/github-connection";
 import { parseRepoInput } from "@/lib/star-video/parse-repo";
+import type { RepoInputFormProps } from "@/types/star-video";
 
 const DEFAULT_INPUT = "usenotra/notra";
 const AVATAR_SIZE_PX = 40;
 
-export function RepoInputForm() {
+export function RepoInputForm({
+  tool = "star-video",
+  actionLabel = "Generate video",
+}: RepoInputFormProps) {
   const [repoParam, setRepoParam] = useQueryState("repo");
   const [value, setValue] = useState(repoParam ?? DEFAULT_INPUT);
   const githubLogin = useSyncExternalStore(
@@ -36,7 +40,7 @@ export function RepoInputForm() {
     }
     const repoId = `${parsed.owner}/${parsed.repo}`.toLowerCase();
     if (!githubConnected) {
-      window.location.assign(buildGithubConnectHref(repoId));
+      window.location.assign(buildGithubConnectHref(repoId, tool));
       return;
     }
     setRepoParam(repoId);
@@ -62,7 +66,7 @@ export function RepoInputForm() {
           className="cta-gradient-primary-flat flex shrink-0 cursor-pointer items-center justify-center rounded-full px-5 py-3 font-sans text-[0.9375rem] leading-[1.29] font-semibold text-white sm:px-4.5 sm:py-2 sm:text-[0.875rem]"
           type="submit"
         >
-          {githubConnected ? "Generate video" : "Connect GitHub"}
+          {githubConnected ? actionLabel : "Connect GitHub"}
         </button>
       </form>
       <p className="font-sans text-sm text-[#1E1E1E99] dark:text-white/60">

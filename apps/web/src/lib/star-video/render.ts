@@ -9,6 +9,7 @@ import {
   selectComposition,
 } from "@remotion/renderer";
 
+import type { PrMergeVideoInputProps } from "@/types/pr-merge-video";
 import type { StarVideoInputProps } from "@/types/star-video";
 
 class RenderBusy extends Error {
@@ -40,8 +41,10 @@ function getServeUrl(): Promise<string> {
   return serveUrlPromise;
 }
 
-export async function renderStarVideo(
-  inputProps: StarVideoInputProps
+async function renderVideo(
+  compositionId: "StarVideo" | "PrMergeVideo",
+  outputName: string,
+  inputProps: Record<string, unknown>
 ): Promise<Buffer> {
   if (activeRenders >= MAX_CONCURRENT_RENDERS) {
     throw new RenderBusy("The renderer is busy. Please try again shortly.");
@@ -53,12 +56,12 @@ export async function renderStarVideo(
 
     const composition = await selectComposition({
       serveUrl,
-      id: "StarVideo",
+      id: compositionId,
       inputProps,
     });
 
-    const dir = await mkdtemp(join(tmpdir(), "star-video-"));
-    const outputLocation = join(dir, "star-video.mp4");
+    const dir = await mkdtemp(join(tmpdir(), `${outputName}-`));
+    const outputLocation = join(dir, `${outputName}.mp4`);
 
     try {
       await renderMedia({
@@ -75,4 +78,16 @@ export async function renderStarVideo(
   } finally {
     activeRenders -= 1;
   }
+}
+
+export function renderStarVideo(
+  inputProps: StarVideoInputProps
+): Promise<Buffer> {
+  return renderVideo("StarVideo", "star-video", inputProps);
+}
+
+export function renderPrMergeVideo(
+  inputProps: PrMergeVideoInputProps
+): Promise<Buffer> {
+  return renderVideo("PrMergeVideo", "pr-merge-video", inputProps);
 }
