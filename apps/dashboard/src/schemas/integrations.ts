@@ -9,6 +9,7 @@ import * as z from "zod";
 
 import {
   GITHUB_PATH_INVALID_CHARACTERS_REGEX,
+  GITHUB_PUBLISH_CONTENT_TYPES,
   GITHUB_URL_PATTERNS,
 } from "@/constants/github";
 import { organizationIdInputSchema } from "@/schemas/auth/organization";
@@ -278,7 +279,7 @@ export const repositoryContentDirectoryConfigSchema = z.looseObject({
 });
 
 export const repositoryContentDirectoryInputSchema = z.object({
-  contentType: z.enum(OUTPUT_CONTENT_TYPES),
+  contentType: z.enum(GITHUB_PUBLISH_CONTENT_TYPES),
 });
 
 export const updateRepositoryContentDirectoryBodySchema =
