@@ -39,22 +39,36 @@ function sleep(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+/**
+ * Rejects after `timeoutMs` but keeps observing the request: Redis may still
+ * apply a command whose response arrived too late, so `onLateSettle` lets the
+ * caller undo a write it has already given up on.
+ */
 function withRedisTimeout<T>(
   operation: Promise<T>,
-  timeoutMs: number
+  timeoutMs: number,
+  onLateSettle?: (value: T) => void
 ): Promise<T> {
   return new Promise((resolve, reject) => {
+    let timedOut = false;
     const timeout = setTimeout(() => {
+      timedOut = true;
       reject(new Error("Redis lock request timed out"));
     }, timeoutMs);
     operation
       .then((value) => {
         clearTimeout(timeout);
+        if (timedOut) {
+          onLateSettle?.(value);
+          return;
+        }
         resolve(value);
       })
       .catch((error: unknown) => {
         clearTimeout(timeout);
-        reject(error);
+        if (!timedOut) {
+          reject(error);
+        }
       });
   });
 }
@@ -82,6 +96,17 @@ export async function withGscIntegrationLock<T>(
   let acquired = false;
   let leaseValidUntil = 0;
 
+  const releaseLock = async () => {
+    try {
+      await withRedisTimeout(
+        activeRedis.eval(RELEASE_LOCK_SCRIPT, [lockKey], [ownerToken]),
+        GSC_INTEGRATION_LOCK_REDIS_TIMEOUT_MS
+      );
+    } catch (error) {
+      console.error("[GSC] Failed to release integration lock:", error);
+    }
+  };
+
   while (!acquired && Date.now() < deadline) {
     const acquisitionStartedAt = Date.now();
     const remainingWaitMs = deadline - acquisitionStartedAt;
@@ -95,7 +120,14 @@ export async function withGscIntegrationLock<T>(
             nx: true,
             ex: GSC_INTEGRATION_LOCK_TTL_SECONDS,
           }),
-          Math.min(GSC_INTEGRATION_LOCK_REDIS_TIMEOUT_MS, remainingWaitMs)
+          Math.min(GSC_INTEGRATION_LOCK_REDIS_TIMEOUT_MS, remainingWaitMs),
+          (value) => {
+            // The SET was applied after we stopped waiting: free the key so
+            // neither our retries nor other callers wait out the full TTL.
+            if (value === "OK") {
+              void releaseLock();
+            }
+          }
         )) === "OK";
     } catch (error) {
       console.error("[GSC] Failed to acquire integration lock:", error);
@@ -200,13 +232,6 @@ export async function withGscIntegrationLock<T>(
     if (renewal) {
       clearInterval(renewal);
     }
-    try {
-      await withRedisTimeout(
-        activeRedis.eval(RELEASE_LOCK_SCRIPT, [lockKey], [ownerToken]),
-        GSC_INTEGRATION_LOCK_REDIS_TIMEOUT_MS
-      );
-    } catch (error) {
-      console.error("[GSC] Failed to release integration lock:", error);
-    }
+    await releaseLock();
   }
 }

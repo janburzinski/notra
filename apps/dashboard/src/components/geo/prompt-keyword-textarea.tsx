@@ -215,19 +215,18 @@ export const PromptKeywordTextarea = forwardRef<
               const followedByPunctuation = /^\p{P}/u.test(nextText);
               const triggerId = `${triggerIdPrefix}-${index}`;
               const label = (
-                <a
+                <button
                   aria-label={`Search Console metrics for ${keyword.query}: ${keyword.impressions.toLocaleString("en-US")} impressions, ${keyword.clicks.toLocaleString("en-US")} clicks, position ${keyword.position.toLocaleString("en-US", { maximumFractionDigits: 1 })}`}
                   className={cn(
                     "pointer-events-none inline rounded-[5px] bg-blue-500/10 text-blue-700 shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.65),inset_0_1px_2px_rgb(255_255_255_/_0.9),inset_0_-1px_2px_rgb(37_99_235_/_0.12)] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-500 dark:bg-blue-400/15 dark:text-blue-300 dark:shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.14),inset_0_1px_2px_rgb(255_255_255_/_0.12),inset_0_-1px_2px_rgb(15_23_42_/_0.35)]",
                     !precededByPunctuation && "-ml-0.5 pl-0.5",
                     !followedByPunctuation && "-mr-0.5 pr-0.5"
                   )}
-                  href={`#${triggerId}`}
                   id={triggerId}
-                  tabIndex={0}
+                  type="button"
                 >
                   {segment.text}
-                </a>
+                </button>
               );
 
               return (
@@ -245,7 +244,6 @@ export const PromptKeywordTextarea = forwardRef<
                         current === index ? null : current
                       );
                     }}
-                    onClick={(event) => event.preventDefault()}
                     onFocus={() => {
                       clearPointerHover();
                       setFocusedIndex(index);

@@ -6,7 +6,10 @@ import {
   getGscOAuthCredentials,
   upsertGscIntegration,
 } from "@notra/ai/integrations/google-search-console";
-import { withGscIntegrationLock } from "@notra/ai/utils/gsc-integration-lock";
+import {
+  GscIntegrationLockLostError,
+  withGscIntegrationLock,
+} from "@notra/ai/utils/gsc-integration-lock";
 import { redis } from "@notra/ai/utils/redis";
 import {
   GSC_OAUTH_CALLBACK_PATH,
@@ -139,7 +142,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const connectResult = await withGscIntegrationLock(
+    // Set once the integration row is committed. A lease lost after that
+    // point only affects best-effort cleanup, not the stored connection.
+    let connectionCommitted = false;
+    const connect = withGscIntegrationLock(
       oauthState.organizationId,
       async (signal, assertLockOwned) => {
         const currentIntegration = await getGscIntegration(
@@ -186,9 +192,20 @@ export async function GET(request: NextRequest) {
           signal,
           assertLockOwned
         );
+        connectionCommitted = true;
         return "connected" as const;
       }
     );
+    const connectResult = await connect.catch((error: unknown) => {
+      if (error instanceof GscIntegrationLockLostError && connectionCommitted) {
+        console.error(
+          "[GSC] Integration lock lost after the connection was saved:",
+          error
+        );
+        return "connected" as const;
+      }
+      throw error;
+    });
 
     if (connectResult === "token_exchange_failed") {
       await restoreOAuthState();

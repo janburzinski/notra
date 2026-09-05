@@ -290,10 +290,20 @@ export async function upsertGscIntegration(
 
   // The OAuth callback keeps its organization lock through revocation so a
   // later callback cannot mint or install a replacement grant in parallel.
-  // The database transaction is already committed and its connection freed.
-  await assertLockOwned?.();
-  signal?.throwIfAborted();
+  // The database transaction is already committed and its connection freed,
+  // so losing the lock here must not read as a failed connection: skip the
+  // old grant's revocation instead of unwinding a saved integration.
   if (integrationToRevoke) {
+    try {
+      await assertLockOwned?.();
+      signal?.throwIfAborted();
+    } catch (error) {
+      console.error(
+        "[GSC] Integration lock lost after saving the connection; skipping revocation of the previous grant:",
+        error
+      );
+      return row;
+    }
     await revokeGscToken(integrationToRevoke, signal);
   }
   return row;

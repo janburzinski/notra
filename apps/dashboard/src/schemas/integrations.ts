@@ -7,7 +7,11 @@ import {
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
-import { GITHUB_URL_PATTERNS } from "@/constants/github";
+import {
+  GITHUB_PATH_INVALID_CHARACTERS_REGEX,
+  GITHUB_PUBLISH_CONTENT_TYPES,
+  GITHUB_URL_PATTERNS,
+} from "@/constants/github";
 import { organizationIdInputSchema } from "@/schemas/auth/organization";
 
 export const INTEGRATION_CATEGORIES = ["input", "output"] as const;
@@ -243,6 +247,49 @@ export const updateRepositoryBodySchema = z
     }
   );
 export type UpdateRepositoryBody = z.infer<typeof updateRepositoryBodySchema>;
+
+export const repositoryContentDirectorySchema = z
+  .string()
+  .trim()
+  .max(1024, "Directory is too long")
+  .refine(
+    (directory) => !directory.startsWith("/"),
+    "Enter a repository-relative directory"
+  )
+  .refine((directory) => !directory.endsWith("/"), "Remove the trailing slash")
+  .refine(
+    (directory) => !directory.includes("\\"),
+    "Use forward slashes in directories"
+  )
+  .refine(
+    (directory) => !GITHUB_PATH_INVALID_CHARACTERS_REGEX.test(directory),
+    "Directory contains invalid characters"
+  )
+  .refine(
+    (directory) =>
+      directory === "" ||
+      directory
+        .split("/")
+        .every((segment) => segment && segment !== "." && segment !== ".."),
+    "Directory contains an invalid segment"
+  );
+
+export const repositoryContentDirectoryConfigSchema = z.looseObject({
+  directory: repositoryContentDirectorySchema,
+});
+
+export const repositoryContentDirectoryInputSchema = z.object({
+  contentType: z.enum(GITHUB_PUBLISH_CONTENT_TYPES),
+});
+
+export const updateRepositoryContentDirectoryBodySchema =
+  repositoryContentDirectoryInputSchema.extend({
+    directory: repositoryContentDirectorySchema,
+  });
+
+export const listRepositoryDirectoriesInputSchema = z.object({
+  directory: repositoryContentDirectorySchema.default(""),
+});
 
 export const updateOutputBodySchema = z.object({
   enabled: z.boolean(),
