@@ -25,6 +25,8 @@ export type GscIntegrationUpdate = Partial<
     | "lastSyncedAt"
     | "lastError"
     | "topQueries"
+    | "encryptedAccessToken"
+    | "accessTokenExpiresAt"
   >
 >;
 

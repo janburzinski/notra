@@ -274,7 +274,17 @@ export async function upsertGscIntegration(
 
     return {
       row,
-      integrationToRevoke: googleAccountChanged && existing ? existing : null,
+      // Missing identity requires clearing cached property data, but does not
+      // prove the old grant belongs to a different Google account.
+      integrationToRevoke:
+        existing?.googleAccountEmail?.trim() &&
+        params.googleAccountEmail?.trim() &&
+        hasGscGoogleAccountChanged(
+          existing.googleAccountEmail,
+          params.googleAccountEmail
+        )
+          ? existing
+          : null,
     };
   });
 
@@ -526,7 +536,7 @@ async function refreshGscAccessToken(
   if (!(response.ok && parsed.success)) {
     const { code, description } = parseTokenError(payload);
     if (code && REAUTH_ERROR_CODES.has(code)) {
-      await updateGscIntegration(integration.organizationId, {
+      await updateGscIntegrationIfUnchanged(integration, {
         status: "reauth_required",
         lastError: description ?? code,
       });
@@ -539,20 +549,12 @@ async function refreshGscAccessToken(
   }
 
   const accessToken = parsed.data.access_token;
-  await db
-    .update(googleSearchConsoleIntegrations)
-    .set({
-      encryptedAccessToken: encryptToken(accessToken),
-      accessTokenExpiresAt: toExpiresAt(parsed.data.expires_in),
-      status: "active",
-      lastError: null,
-    })
-    .where(
-      and(
-        eq(googleSearchConsoleIntegrations.id, integration.id),
-        isNull(googleSearchConsoleIntegrations.disconnectingAt)
-      )
-    );
+  await updateGscIntegrationIfUnchanged(integration, {
+    encryptedAccessToken: encryptToken(accessToken),
+    accessTokenExpiresAt: toExpiresAt(parsed.data.expires_in),
+    status: "active",
+    lastError: null,
+  });
 
   return accessToken;
 }
