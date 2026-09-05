@@ -1,4 +1,7 @@
 declare module "bun:test" {
+  export const mock: {
+    module(id: string, factory: () => unknown): void;
+  };
   export function describe(name: string, fn: () => void): void;
   export function test(name: string, fn: () => void | Promise<void>): void;
   export function expect(actual: unknown): {

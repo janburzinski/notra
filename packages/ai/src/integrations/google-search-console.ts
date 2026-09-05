@@ -549,12 +549,19 @@ async function refreshGscAccessToken(
   }
 
   const accessToken = parsed.data.access_token;
-  await updateGscIntegrationIfUnchanged(integration, {
+  const updated = await updateGscIntegrationIfUnchanged(integration, {
     encryptedAccessToken: encryptToken(accessToken),
     accessTokenExpiresAt: toExpiresAt(parsed.data.expires_in),
     status: "active",
     lastError: null,
   });
+
+  if (!updated) {
+    throw new GscApiError(
+      "Google Search Console changed while refreshing access. Please try again.",
+      409
+    );
+  }
 
   return accessToken;
 }
