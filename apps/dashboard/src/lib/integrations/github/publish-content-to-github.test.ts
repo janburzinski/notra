@@ -55,6 +55,9 @@ function createGitHubFixture() {
     switch (route) {
       case "GET /repos/{owner}/{repo}/git/ref/{ref}": {
         const branch = branches.get(options.ref.slice(6));
+        if (options.ref !== "heads/main" && !branch) {
+          throw Object.assign(new Error("Not Found"), { status: 404 });
+        }
         return respond({
           object: { sha: options.ref === "heads/main" ? "base" : branch?.sha },
         });
@@ -166,6 +169,16 @@ function createGitHubFixture() {
 }
 
 describe("publishContentDraftPullRequest", () => {
+  test("does not create a branch when the first publication target already exists", async () => {
+    const fixture = createGitHubFixture();
+    fixture.defaultBranchPaths.add(publishParams.path);
+    await expect(
+      publishContentDraftPullRequest(fixture.octokit, publishParams)
+    ).rejects.toBeInstanceOf(GitHubContentTargetExistsError);
+    expect(fixture.branches.size).toBe(0);
+    expect(fixture.pullRequests.size).toBe(0);
+  });
+
   test.each(["changelogs/release-v2.md", "docs/releases/release-v1.md"])(
     "keeps the original PR and path after changing the target to %s",
     async (path) => {
@@ -213,6 +226,7 @@ describe("publishContentDraftPullRequest", () => {
       publishContentDraftPullRequest(fixture.octokit, publishParams)
     ).rejects.toThrow();
     fixture.setFailPullRequestCreation(false);
+    fixture.defaultBranchPaths.add("changelogs/new-slug.md");
     const result = await publishContentDraftPullRequest(fixture.octokit, {
       ...publishParams,
       path: "changelogs/new-slug.md",

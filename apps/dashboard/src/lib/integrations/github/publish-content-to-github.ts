@@ -548,6 +548,37 @@ async function assertContentCommitIsBranchHead(params: {
   throw new GitHubContentBranchConflictError(params.branchName, params.path);
 }
 
+async function assertContentDestinationMissing(
+  octokit: GitHubClient,
+  params: PublishContentDraftPullRequestParams,
+  baseSha: string
+) {
+  let destinationMissing = false;
+  try {
+    await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+      owner: params.owner,
+      repo: params.repo,
+      path: params.path,
+      ref: baseSha,
+      headers: GITHUB_API_VERSION_HEADERS,
+    });
+  } catch (error) {
+    if (!hasGitHubStatus(error, 404)) {
+      throw new GitHubContentPublishError(
+        "Failed to check the destination path",
+        error
+      );
+    }
+    destinationMissing = true;
+  }
+
+  if (!destinationMissing) {
+    throw new GitHubContentTargetExistsError(
+      `${params.path} already exists in ${params.owner}/${params.repo}`
+    );
+  }
+}
+
 export async function publishContentDraftPullRequest(
   octokit: GitHubClient,
   requestedParams: PublishContentDraftPullRequestParams
@@ -614,6 +645,29 @@ export async function publishContentDraftPullRequest(
 
   let createdBranch = false;
   if (!existingPullRequest) {
+    let branchExists = true;
+    try {
+      await octokit.request("GET /repos/{owner}/{repo}/git/ref/{ref}", {
+        owner: requestedParams.owner,
+        repo: requestedParams.repo,
+        ref: `heads/${branchName}`,
+        headers: GITHUB_API_VERSION_HEADERS,
+      });
+    } catch (error) {
+      if (!hasGitHubStatus(error, 404)) {
+        throw new GitHubContentPublishError(
+          "Failed to check for an existing content branch",
+          error,
+          branchName
+        );
+      }
+      branchExists = false;
+    }
+    // A branch left by an earlier attempt may use a different path. Its
+    // recorded destination is checked after branch validation below.
+    if (!branchExists) {
+      await assertContentDestinationMissing(octokit, requestedParams, baseSha);
+    }
     try {
       await octokit.request("POST /repos/{owner}/{repo}/git/refs", {
         owner: requestedParams.owner,
@@ -664,30 +718,7 @@ export async function publishContentDraftPullRequest(
   const params = { ...requestedParams, path: contentBranch.path };
   const { branchHeadSha } = contentBranch;
 
-  let destinationMissing = false;
-  try {
-    await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-      owner: params.owner,
-      repo: params.repo,
-      path: params.path,
-      ref: baseSha,
-      headers: GITHUB_API_VERSION_HEADERS,
-    });
-  } catch (error) {
-    if (!hasGitHubStatus(error, 404)) {
-      throw new GitHubContentPublishError(
-        "Failed to check the destination path",
-        error
-      );
-    }
-    destinationMissing = true;
-  }
-
-  if (!destinationMissing) {
-    throw new GitHubContentTargetExistsError(
-      `${params.path} already exists in ${params.owner}/${params.repo}`
-    );
-  }
+  await assertContentDestinationMissing(octokit, params, baseSha);
 
   const commitSha = await commitContentToBranch(
     octokit,
