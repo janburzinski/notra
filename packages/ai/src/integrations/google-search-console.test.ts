@@ -127,6 +127,7 @@ test("refresh only calls Google APIs after its token is persisted", async () => 
     for (const retryAfterUnauthorized of [false, true]) {
       for (const integrationUnchanged of [false, true]) {
         let writes = 0;
+        const events: string[] = [];
         mock.module("@notra/db/drizzle", () => ({
           createDb,
           db: {
@@ -135,6 +136,9 @@ test("refresh only calls Google APIs after its token is persisted", async () => 
                 where: () => ({
                   returning: async () => {
                     writes += 1;
+                    events.push(
+                      integrationUnchanged ? "persist" : "persist-rejected"
+                    );
                     return integrationUnchanged ? [integration] : [];
                   },
                 }),
@@ -153,11 +157,13 @@ test("refresh only calls Google APIs after its token is persisted", async () => 
           const request = new Request(input, init);
           requests.push(request);
           if (request.url.endsWith("/token")) {
+            events.push("fetch-token");
             return Response.json({
               access_token: "refreshed-access",
               expires_in: 3600,
             });
           }
+          events.push(`fetch-sites:${request.headers.get("Authorization")}`);
           if (retryAfterUnauthorized && requests.length === 1) {
             return new Response(null, { status: 401 });
           }
@@ -178,6 +184,16 @@ test("refresh only calls Google APIs after its token is persisted", async () => 
               error instanceof GscApiError && error.status === 409
           );
         }
+        assert.deepEqual(events, [
+          ...(retryAfterUnauthorized
+            ? ["fetch-sites:Bearer initial-access"]
+            : []),
+          "fetch-token",
+          integrationUnchanged ? "persist" : "persist-rejected",
+          ...(integrationUnchanged
+            ? ["fetch-sites:Bearer refreshed-access"]
+            : []),
+        ]);
         assert.equal(writes, 1);
         assert.equal(
           requests.length,
