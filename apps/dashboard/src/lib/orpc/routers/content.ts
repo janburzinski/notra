@@ -58,6 +58,7 @@ import {
   getCompletedGenerations,
 } from "@/lib/generations/tracking";
 import { requestGeoRescanForPublishedPost } from "@/lib/geo/rescan";
+import { authenticateGitHubPublish } from "@/lib/integrations/github/authenticate-github-publish";
 import {
   clearGitHubPublishFailures,
   recordGitHubPublishFailure,
@@ -884,32 +885,6 @@ export const contentRouter = {
           code: "github_content_publishing_paused",
         });
       }
-      let token: string | null;
-      try {
-        token = await getTokenForIntegrationId(integration.id, {
-          organizationId: input.organizationId,
-        });
-      } catch (error) {
-        if (
-          hasGitHubStatus(error, 401) ||
-          hasGitHubStatus(error, 404) ||
-          (error instanceof Error &&
-            error.message === "GitHub App installation not found")
-        ) {
-          throw unauthorized(
-            "GitHub authentication failed. Reconnect GitHub and try again.",
-            { code: "github_authentication_required" }
-          );
-        }
-        throw internalServerError("Failed to authenticate with GitHub", error);
-      }
-      if (!token) {
-        throw unauthorized(
-          "GitHub authentication failed. Reconnect GitHub and try again.",
-          { code: "github_authentication_required" }
-        );
-      }
-
       const outputConfig = repositoryContentDirectoryConfigSchema.safeParse(
         contentOutput.config
       );
@@ -932,6 +907,11 @@ export const contentRouter = {
       const notraBaseUrl = resolveNotraBaseUrl();
 
       try {
+        const token = await authenticateGitHubPublish(() =>
+          getTokenForIntegrationId(integration.id, {
+            organizationId: input.organizationId,
+          })
+        );
         const result = await publishContentDraftPullRequest(
           createOctokit(token),
           {
