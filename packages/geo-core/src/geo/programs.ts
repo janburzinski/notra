@@ -29,7 +29,7 @@ import {
   queryGeoCheckTimeseries,
   toGeoCheckWindow,
 } from "@notra/db/utils/geo-checks";
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -1280,7 +1280,7 @@ export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
       geoDb("prompts lookup failed", () =>
         db.query.geoPrompts.findMany({
           where: eq(geoPrompts.projectId, projectId),
-          orderBy: [asc(geoPrompts.createdAt)],
+          orderBy: [desc(geoPrompts.createdAt)],
         })
       ),
       geoDb("settings lookup failed", () =>

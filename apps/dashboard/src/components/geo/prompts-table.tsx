@@ -575,7 +575,6 @@ export function PromptsTable({
         className="rounded-2xl"
         columns={columns}
         data={rows}
-        defaultSort={{ key: "presence", direction: "desc" }}
         emptyState={
           prompts.length === 0
             ? geoScanEmptyMessage(
