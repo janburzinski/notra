@@ -1,8 +1,9 @@
 import { FEATURES } from "@notra/ai/billing/features";
+import { shouldBypassAutumnInDevelopment } from "@notra/ai/utils/autumn-development";
 
 const DEVELOPMENT_BALANCE = Number.MAX_SAFE_INTEGER;
 
-export function createDevelopmentAutumnCustomer() {
+function createDevelopmentAutumnCustomer() {
   return {
     id: "development",
     name: "Local development",
@@ -40,5 +41,27 @@ export function createDevelopmentAutumnCustomer() {
       ]),
     ),
     flags: {},
+  };
+}
+
+export function createDevelopmentAutumnHandler(
+  nodeEnv: string | undefined,
+  secretKey: string | undefined
+): ((request: Request) => Response) | null {
+  if (!shouldBypassAutumnInDevelopment(nodeEnv, secretKey)) {
+    return null;
+  }
+
+  return (request) => {
+    const route = new URL(request.url).pathname.split("/").at(-1);
+
+    if (route === "getOrCreateCustomer") {
+      return Response.json(createDevelopmentAutumnCustomer());
+    }
+
+    return Response.json(
+      { error: "Billing operations are unavailable without an Autumn key" },
+      { status: 503 }
+    );
   };
 }

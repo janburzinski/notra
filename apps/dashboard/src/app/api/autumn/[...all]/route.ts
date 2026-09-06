@@ -1,14 +1,18 @@
 import { autumnHandler } from "autumn-js/next";
-import { allowUnmeteredAiInDevelopment } from "@notra/ai/billing/autumn";
 
 import { getAuthSession } from "@/lib/auth/server";
 import { resolveBillingOrganizationId } from "@/lib/billing/resolve-billing-organization";
-import { createDevelopmentAutumnCustomer } from "@/utils/development-autumn-customer";
+import { createDevelopmentAutumnHandler } from "@/utils/development-autumn";
 
 type RouteHandler = (request: Request) => Response | Promise<Response>;
 
-const handlers: { GET: RouteHandler; POST: RouteHandler } | null = allowUnmeteredAiInDevelopment
-  ? null
+const developmentHandler = createDevelopmentAutumnHandler(
+  process.env.NODE_ENV,
+  process.env.AUTUMN_SECRET_KEY
+);
+
+const handlers: { GET: RouteHandler; POST: RouteHandler } = developmentHandler
+  ? { GET: developmentHandler, POST: developmentHandler }
   : autumnHandler({
       identify: async (request) => {
         const session = await getAuthSession();
@@ -33,18 +37,4 @@ const handlers: { GET: RouteHandler; POST: RouteHandler } | null = allowUnmetere
       },
     });
 
-const developmentHandler: RouteHandler = (request) => {
-  const route = new URL(request.url).pathname.split("/").at(-1);
-
-  if (route === "getOrCreateCustomer") {
-    return Response.json(createDevelopmentAutumnCustomer());
-  }
-
-  return Response.json(
-    { error: "Billing operations are unavailable without an Autumn key" },
-    { status: 503 },
-  );
-};
-
-export const GET = handlers?.GET ?? developmentHandler;
-export const POST = handlers?.POST ?? developmentHandler;
+export const { GET, POST } = handlers;
