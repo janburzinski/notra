@@ -580,12 +580,6 @@ export interface MentionProviderRowProps {
   tracking: boolean;
 }
 
-export interface MentionMoreModelsHintProps {
-  count: number;
-  visible: boolean;
-  onClick: () => void;
-}
-
 export interface MentionRateCardProps extends EngineFamilyBrandScope {
   engines: GeoOverviewEngine[];
   settings?: GeoSettings;
