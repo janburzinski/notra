@@ -9,6 +9,7 @@ import {
   NAV_MAIN_ITEMS,
   SHARED_ROUTE_PREFIXES,
   SIDEBAR_DEFAULT_MODE,
+  SIDEBAR_MODE_HOME_LINKS,
   STUDIO_ROUTE_SECTIONS,
 } from "@/constants/nav";
 import type {
@@ -30,12 +31,16 @@ export function isSidebarMode(value: unknown): value is SidebarMode {
 
 export function resolveSidebarMode(
   route: string | undefined,
-  storedMode: SidebarMode | null
+  storedMode: SidebarMode | null,
+  requestedMode?: string | null
 ): SidebarMode {
   // Org root is both Studio home and the dashboard entry URL. Keep a stored
   // GEO pick so opening `/{slug}` can restore that mode instead of writing
   // studio over it.
   if (route === undefined) {
+    if (requestedMode === "studio") {
+      return "studio";
+    }
     return storedMode ?? "studio";
   }
   // Shared destinations keep the current mode. Without a stored choice, match
@@ -70,12 +75,23 @@ export function isOrgRootPath(pathname: string, slug: string): boolean {
 export function resolveOrgRootRedirect(
   slug: string,
   storedMode: SidebarMode | null,
-  projectId?: string
+  projectId?: string,
+  requestedMode?: string | null
 ): string | null {
-  if (storedMode !== "geo") {
+  if (storedMode !== "geo" || requestedMode === "studio") {
     return null;
   }
   return geoNavHref(slug, GEO_OVERVIEW_NAV_LINK, projectId);
+}
+
+/** Explicit Studio intent must survive prefetching with the old GEO cookie. */
+export function sidebarModeHref(
+  slug: string,
+  mode: SidebarMode,
+  projectId?: string
+): string {
+  const href = geoNavHref(slug, SIDEBAR_MODE_HOME_LINKS[mode], projectId);
+  return mode === "studio" ? `${href}?mode=studio` : href;
 }
 
 export function resolveNavItems(

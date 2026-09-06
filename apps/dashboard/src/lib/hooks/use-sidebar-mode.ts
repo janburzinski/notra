@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
 
 import { localStorageKeys } from "@/constants/storage";
@@ -85,6 +86,8 @@ export function pickSidebarMode(
 export function useSidebarMode(
   route: string | undefined
 ): UseSidebarModeResult {
+  const searchParams = useSearchParams();
+  const requestedMode = searchParams.get("mode");
   const storedMode = useSyncExternalStore(
     subscribe,
     readStoredMode,
@@ -95,7 +98,7 @@ export function useSidebarMode(
     readPendingMode,
     getServerSnapshot
   );
-  const routeMode = resolveSidebarMode(route, storedMode);
+  const routeMode = resolveSidebarMode(route, storedMode, requestedMode);
 
   // Picking a mode navigates, so `route` — which outranks the stored mode —
   // only catches up once the new route commits. Deriving the mode from the route
@@ -128,13 +131,13 @@ export function useSidebarMode(
   useEffect(() => {
     // The org root is an entry URL, not a mode signal. Persisting studio
     // here would erase a GEO pick before the restore can send you back.
-    if (route === undefined) {
+    if (route === undefined && requestedMode !== "studio") {
       return;
     }
     if (storedMode !== mode) {
       persistMode(mode);
     }
-  }, [mode, route, storedMode]);
+  }, [mode, requestedMode, route, storedMode]);
 
   const setMode = (next: SidebarMode) => {
     pickSidebarMode(next, route);

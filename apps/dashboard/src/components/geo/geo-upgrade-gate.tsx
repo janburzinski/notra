@@ -19,7 +19,7 @@ import { toAnalyticsRoute } from "@/lib/analytics/route";
 import { useHasGeoFeature } from "@/lib/hooks/use-plan";
 import { pickSidebarMode } from "@/lib/hooks/use-sidebar-mode";
 import type { GeoUpgradeGateProps } from "@/types/components/geo";
-import { sidebarRouteFromPathname } from "@/utils/nav";
+import { sidebarModeHref, sidebarRouteFromPathname } from "@/utils/nav";
 
 export function GeoUpgradeGate({ slug, children }: GeoUpgradeGateProps) {
   const router = useRouter();
@@ -52,7 +52,7 @@ export function GeoUpgradeGate({ slug, children }: GeoUpgradeGateProps) {
     // here, which would reopen this paywall in a loop. Switch the sidebar to
     // Studio first so the redirect lets the user land on the Studio home.
     pickSidebarMode("studio", sidebarRouteFromPathname(pathname));
-    router.push(`/${slug}`);
+    router.push(sidebarModeHref(slug, "studio"));
   }
 
   return (

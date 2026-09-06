@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
@@ -15,13 +15,19 @@ import { isOrgRootPath, resolveOrgRootRedirect } from "@/utils/nav";
 export function RestoreSidebarHome() {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { activeOrganization } = useOrganizationsContext();
   const [projectParam] = useGeoProjectQueryState();
   const storedMode = useStoredSidebarMode();
   const slug = activeOrganization?.slug;
   const redirectTo =
     slug && isOrgRootPath(pathname, slug)
-      ? resolveOrgRootRedirect(slug, storedMode, projectParam ?? undefined)
+      ? resolveOrgRootRedirect(
+          slug,
+          storedMode,
+          projectParam ?? undefined,
+          searchParams.get("mode")
+        )
       : null;
 
   useEffect(() => {

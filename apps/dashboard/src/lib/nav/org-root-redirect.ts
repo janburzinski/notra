@@ -28,15 +28,24 @@ export async function redirectOrgRootToStoredMode(
   const projectId =
     requestedProjectId ?? getLastVisitedProject(cookieStore, slug);
   const storedMode = getSidebarModeFromCookies(cookieStore);
+  const requestedMode = typeof query.mode === "string" ? query.mode : undefined;
   trackServerEvent({
     event: POSTHOG_EVENTS.DASHBOARD_ENTRY,
     headers: requestHeaders,
     properties: {
-      mode: storedMode ?? DEFAULT_SIDEBAR_ENTRY_MODE,
+      mode:
+        requestedMode === "studio"
+          ? "studio"
+          : (storedMode ?? DEFAULT_SIDEBAR_ENTRY_MODE),
       has_project: Boolean(projectId),
     },
   });
-  const path = resolveOrgRootRedirect(slug, storedMode, projectId);
+  const path = resolveOrgRootRedirect(
+    slug,
+    storedMode,
+    projectId,
+    requestedMode
+  );
   if (path) {
     redirect(path);
   }

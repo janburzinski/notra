@@ -10,14 +10,10 @@ import {
 } from "@notra/ui/components/ui/sidebar";
 import { cn } from "@notra/ui/lib/utils";
 
-import {
-  SIDEBAR_MODE_HOME_LINKS,
-  SIDEBAR_MODE_PILL_CLASS,
-  SIDEBAR_MODES,
-} from "@/constants/nav";
+import { SIDEBAR_MODE_PILL_CLASS, SIDEBAR_MODES } from "@/constants/nav";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import type { NavModeSwitchProps, SidebarMode } from "@/types/components/nav";
-import { geoNavHref } from "@/utils/geo-paths";
+import { sidebarModeHref } from "@/utils/nav";
 
 import { SidebarLabel } from "./sidebar-label";
 import { SidebarNavLink } from "./sidebar-nav-link";
@@ -61,11 +57,7 @@ export function NavModeSwitch({
                     ? "text-foreground font-medium"
                     : "text-muted-foreground hover:text-foreground"
                 )}
-                href={geoNavHref(
-                  slug,
-                  SIDEBAR_MODE_HOME_LINKS[option.id],
-                  projectId
-                )}
+                href={sidebarModeHref(slug, option.id, projectId)}
                 key={option.id}
                 onClick={() => handleModeSelect(option.id)}
               >
@@ -83,11 +75,7 @@ export function NavModeSwitch({
               isActive={option.id === mode}
               render={
                 <SidebarNavLink
-                  href={geoNavHref(
-                    slug,
-                    SIDEBAR_MODE_HOME_LINKS[option.id],
-                    projectId
-                  )}
+                  href={sidebarModeHref(slug, option.id, projectId)}
                   onClick={() => handleModeSelect(option.id)}
                 >
                   <HugeiconsIcon icon={option.icon} />
