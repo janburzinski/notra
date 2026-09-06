@@ -9,4 +9,4 @@ export const autumn = AUTUMN_SECRET_KEY
 // Local development skips Autumn plan/credit gates so AI features work without
 // billing. Production never uses this bypass.
 export const allowUnmeteredAiInDevelopment =
-  process.env.NODE_ENV === "development";
+  process.env.NODE_ENV === "development" && !AUTUMN_SECRET_KEY;
