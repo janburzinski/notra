@@ -52,6 +52,18 @@ export interface GscSyncPayload {
   organizationId: string;
 }
 
+export interface GscAiSearchContext {
+  query: string;
+  engine: string;
+  prompt: string;
+}
+
+export interface GscContextProject {
+  id: string;
+  websiteUrl: string;
+  isSample: boolean;
+}
+
 export interface GscSuggestionGenerationParams {
   companyName: string | null;
   companyDescription: string | null;
@@ -59,4 +71,5 @@ export interface GscSuggestionGenerationParams {
   siteUrl: string;
   keywords: GscQueryRow[];
   existingPrompts: string[];
+  aiSearchContext?: GscAiSearchContext[];
 }

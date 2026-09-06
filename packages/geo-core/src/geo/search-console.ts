@@ -14,12 +14,14 @@ import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
   geoCompetitors,
+  geoMentionChecks,
   geoPromptSuggestions,
   geoPrompts,
   geoSettings,
+  projects,
 } from "@notra/db/schema";
 import { generateText, Output } from "ai";
-import { and, eq, ne } from "drizzle-orm";
+import { and, desc, eq, gte, ne, sql } from "drizzle-orm";
 
 import {
   GEO_DISCOVERY_SYSTEM_PROMPT,
@@ -28,6 +30,7 @@ import {
   GEO_PROMPT_MIN_LENGTH,
 } from "../constants/geo";
 import {
+  GSC_AI_CONTEXT_MAX_CHECKS,
   GSC_SUGGESTION_MAX_TOKENS,
   GSC_SUGGESTION_MODEL,
   GSC_SYNC_LOOKBACK_DAYS,
@@ -39,6 +42,7 @@ import type {
   GscSuggestionSyncOutcome,
   GscSyncResult,
 } from "../types/google-search-console";
+import { selectGscContextProject } from "./suggestion-context-project";
 import {
   buildBrandTerms,
   normalizeSuggestionKey,
@@ -225,7 +229,11 @@ async function runSync(
     }),
     db.query.geoSettings.findFirst({
       where: eq(geoSettings.organizationId, organizationId),
-      columns: { companyName: true, aliases: true, competitors: true },
+      columns: {
+        companyName: true,
+        aliases: true,
+        competitors: true,
+      },
     }),
     db.query.brandSettings.findFirst({
       where: and(
@@ -276,6 +284,37 @@ async function runSync(
     settingsRow?.competitors ?? []
   );
 
+  const contextProjects = await db
+    .select({
+      id: projects.id,
+      websiteUrl: brandSettings.websiteUrl,
+      isSample: projects.isSample,
+    })
+    .from(projects)
+    .innerJoin(brandSettings, eq(projects.brandSettingsId, brandSettings.id))
+    .where(
+      and(
+        eq(projects.organizationId, organizationId),
+        eq(brandSettings.organizationId, organizationId)
+      )
+    );
+  const contextProjectId = selectGscContextProject(siteUrl, contextProjects);
+  const since = new Date();
+  since.setUTCDate(since.getUTCDate() - GSC_SYNC_LOOKBACK_DAYS);
+  const checks = contextProjectId
+    ? await db.query.geoMentionChecks.findMany({
+        where: and(
+          eq(geoMentionChecks.organizationId, organizationId),
+          eq(geoMentionChecks.projectId, contextProjectId),
+          gte(geoMentionChecks.capturedAt, since),
+          sql`jsonb_array_length(${geoMentionChecks.grounding}->'queries') > 0`
+        ),
+        columns: { engine: true, prompt: true, grounding: true },
+        orderBy: [desc(geoMentionChecks.capturedAt), desc(geoMentionChecks.id)],
+        limit: GSC_AI_CONTEXT_MAX_CHECKS,
+      })
+    : [];
+
   const generated = await generateSuggestions({
     companyName: settingsRow?.companyName ?? null,
     companyDescription: brandRow?.companyDescription ?? null,
@@ -283,6 +322,13 @@ async function runSync(
     siteUrl,
     keywords,
     existingPrompts,
+    aiSearchContext: checks.flatMap((check) =>
+      check.grounding.queries.map((query) => ({
+        query,
+        engine: check.engine,
+        prompt: check.prompt,
+      }))
+    ),
   });
 
   const values: (typeof geoPromptSuggestions.$inferInsert)[] = [];
