@@ -29,7 +29,7 @@ export const IP_CHECKER_STATUS_MESSAGES: Partial<
 > = {
   invalid: "Enter a valid IPv4 or IPv6 address.",
   "rate-limited": "Too many checks in a row. Try again in a bit.",
-  error: "Something went wrong. Try again.",
+  error: "Unable to check that IP. Check your connection and try again.",
 };
 
 const MOTION_EASE = [0.22, 1, 0.36, 1] as const;

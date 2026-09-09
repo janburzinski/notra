@@ -110,7 +110,7 @@ export function StarVideoPreview() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setData(null);
-          toast.error("Something went wrong loading that repository.");
+          toast.error("Unable to load that repository. Check your connection and try again.");
         }
       })
       .finally(() => {
@@ -183,7 +183,7 @@ export function StarVideoPreview() {
         });
       }
     } catch {
-      toast.error("Something went wrong rendering the video.", { id: pending });
+      toast.error("Unable to render the video. Check your connection and try again.", { id: pending });
     }
     setIsRendering(false);
   };

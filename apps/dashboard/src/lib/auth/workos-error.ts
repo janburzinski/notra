@@ -15,7 +15,7 @@ export function readWorkOSError(error: unknown): WorkOSErrorInfo {
   if (!parsed.success) {
     return {
       code: null,
-      message: "Something went wrong",
+      message: "Unable to sign you in. Please try again.",
       email: null,
       pendingAuthenticationToken: null,
       organizationIds: [],
@@ -26,7 +26,7 @@ export function readWorkOSError(error: unknown): WorkOSErrorInfo {
 
   return {
     code: rawData?.code ?? code ?? null,
-    message: rawData?.message ?? message ?? "Something went wrong",
+    message: rawData?.message ?? message ?? "Unable to sign you in. Please try again.",
     email: rawData?.email ?? null,
     pendingAuthenticationToken: rawData?.pending_authentication_token ?? null,
     organizationIds:

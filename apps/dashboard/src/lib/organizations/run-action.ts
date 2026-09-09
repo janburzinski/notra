@@ -11,7 +11,7 @@ export function runOrganizationAction<T>(
       Effect.catchDefect((defect) =>
         Effect.fail(
           new OrganizationActionError({
-            message: "Something went wrong",
+            message: "Unable to complete this action. Please try again.",
             cause: defect,
           })
         )

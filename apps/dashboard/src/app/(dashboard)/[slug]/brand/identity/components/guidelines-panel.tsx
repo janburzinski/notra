@@ -48,7 +48,7 @@ export function GuidelinesPanel({
 
     toast.error("Guideline generation failed", {
       description:
-        generationError ?? "Something went wrong while generating guidelines.",
+        generationError ?? "Unable to generate guidelines. Please try again.",
       id: "brand-guideline-generation-failed",
     });
   }, [isFailed, generationError]);

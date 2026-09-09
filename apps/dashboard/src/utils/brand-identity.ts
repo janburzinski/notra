@@ -100,7 +100,7 @@ export function getModalDescription(
     return "Please wait while we extract your brand information";
   }
   if (status === "failed") {
-    return error ?? "Something went wrong";
+    return error ?? "Unable to extract your brand identity. Please try again.";
   }
   return "Enter your website URL to automatically extract your brand identity";
 }

@@ -34,7 +34,7 @@ export const FEATURES_TRAFFIC_COPY: FeaturesCardCopy = {
 };
 
 export const FEATURES_GAPS_COPY: FeaturesCardCopy = {
-  title: "Content Gaps to Write",
+  title: "Content gaps to write",
   description:
     "The questions where engines answer and you are not in the answer, ranked by how winnable they look. Write plans a guide, listicle or comparison and the draft lands in Content.",
 };

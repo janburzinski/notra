@@ -70,7 +70,7 @@ export function HeroSection() {
                 render={<Link href={HERO_BOOK_A_CALL_HREF} />}
                 variant="light"
               >
-                Book a Call
+                Book a call
               </CtaButton>
             </div>
           </div>

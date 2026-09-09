@@ -78,7 +78,7 @@ export function ProfileSection({
 
       if (!validated.success) {
         const issue = validated.error?.issues[0];
-        toast.error(issue?.message ?? "Invalid name");
+        toast.error(issue?.message ?? "Enter your name");
         return;
       }
 
@@ -112,7 +112,7 @@ export function ProfileSection({
   });
 
   return (
-    <TitleCard heading="Your Profile">
+    <TitleCard heading="Profile">
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <input
@@ -156,7 +156,7 @@ export function ProfileSection({
             <p className="text-muted-foreground text-xs">
               {isUploadingAvatar
                 ? "Uploading..."
-                : "Click to upload a new profile picture"}
+                : "Select to upload a new profile picture"}
             </p>
           </div>
         </div>
@@ -170,14 +170,14 @@ export function ProfileSection({
           <form.Field name="name">
             {(field) => (
               <div className="space-y-2">
-                <Label htmlFor={field.name}>Full Name</Label>
+                <Label htmlFor={field.name}>Full name</Label>
                 <div className="flex gap-2">
                   <Input
                     autoComplete="name"
                     id={field.name}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Your name"
+                    placeholder="Jane Doe"
                     value={field.state.value}
                   />
                   <Button disabled={isUpdating} size="default" type="submit">

@@ -23,11 +23,10 @@ export function ErrorContent({ error, reset, className }: ErrorContentProps) {
       <div className="text-center">
         <p className="text-muted-foreground text-sm font-medium">Error</p>
         <h1 className="text-foreground mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-          Something went wrong
+          Unable to load this page
         </h1>
         <p className="text-muted-foreground mx-auto mt-4 max-w-md text-base">
-          We hit an unexpected problem loading this page. You can try again or
-          head back home.
+          Check your connection and try again, or go back home.
         </p>
         {error.digest ? (
           <p className="text-muted-foreground mt-2 font-mono text-xs">

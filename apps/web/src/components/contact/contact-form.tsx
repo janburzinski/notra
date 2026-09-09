@@ -270,8 +270,8 @@ export function ContactForm() {
 
         {status === "error" ? (
           <p className={fieldErrorClass}>
-            Something went wrong sending your message. Please try again, or
-            email us at hello@usenotra.com.
+            Unable to send your message. Please try again, or email us at
+            hello@usenotra.com.
           </p>
         ) : null}
 

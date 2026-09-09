@@ -236,10 +236,10 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
             <EmptyState
               action={
                 <Button onClick={() => refetch()} size="sm" variant="outline">
-                  Retry
+                  Try again
                 </Button>
               }
-              description="Something went wrong while loading your Granola integrations."
+              description="Unable to load your Granola integrations. Check your connection and try again."
               title="Failed to load integrations"
             />
           ) : null}

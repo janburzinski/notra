@@ -245,7 +245,7 @@ export function OrganizationDetailsCard({
                 id={field.name}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="My Organization"
+                placeholder="Acme Inc."
                 value={field.state.value}
               />
               {field.state.meta.errors.length > 0 ? (

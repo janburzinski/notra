@@ -18,11 +18,11 @@ export const SOCIAL_CONNECT_STATE_TTL_SECONDS = 600;
 export const SOCIAL_CONNECT_ERROR_MESSAGES: Record<string, string> = {
   invalid_callback: "The connection attempt was invalid. Please try again.",
   expired_state: "The connection attempt expired. Please try again.",
-  connection_failed: "The account connection was canceled or failed.",
+  connection_failed:
+    "The account connection was canceled or failed. Please try again.",
   account_fetch_failed:
-    "We could not load the connected account. Please try again.",
-  callback_failed:
-    "Something went wrong while connecting the account. Please try again.",
+    "Unable to load the connected account. Please try again.",
+  callback_failed: "Unable to connect the account. Please try again.",
   state_mismatch:
     "This connection link was started from a different account. Please start the connection again from your own settings.",
 };

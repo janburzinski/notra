@@ -23,7 +23,7 @@ export async function fetchRepoStarData(
   } catch {
     return {
       data: null,
-      error: "Something went wrong loading that repository.",
+      error: "Unable to load that repository. Check your connection and try again.",
     };
   }
 }

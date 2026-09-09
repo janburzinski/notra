@@ -121,7 +121,7 @@ export function buildFeaturesMarkdown() {
       FEATURES_GAPS_COPY.description,
       "",
       "### Write",
-      "Pick a gap and choose guide, listicle or comparison. Write plans a brief from your brand identity, your sitemap and the competitors you track. You approve the brief and the draft opens in Content, with real internal links and a FAQ section.",
+      "Pick a gap and choose a guide, listicle or comparison. Write plans a brief from your brand identity, your sitemap and the competitors you track. You approve the brief and the draft opens in Content, with real internal links and a FAQ section.",
       "",
       "### Agent readiness",
       "A score out of 100 for how well AI agents can discover, understand and use your website, with a must-do and should-do checklist and copyable fix prompts for your coding agent.",

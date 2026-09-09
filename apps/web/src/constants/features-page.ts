@@ -70,7 +70,7 @@ export const FEATURES_PAGE_IMPROVE_CARDS: FeaturesPageCard[] = [
   {
     title: "Write",
     description:
-      "Pick a gap and choose guide, listicle or comparison. Write plans a brief from your brand identity, your sitemap and the competitors you track. Approve it and the draft opens in Content with real internal links and a FAQ.",
+      "Pick a gap and choose a guide, listicle or comparison. Write plans a brief from your brand identity, your sitemap and the competitors you track. Approve it and the draft opens in Content with real internal links and a FAQ.",
   },
   {
     title: "Agent readiness",

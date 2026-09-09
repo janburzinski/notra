@@ -126,7 +126,7 @@ export const SLACK_CTA_SUBCOPY =
 
 export const SLACK_CTA_PRIMARY_LABEL = "Start for free";
 
-export const SLACK_CTA_SECONDARY_LABEL = "Book a Call";
+export const SLACK_CTA_SECONDARY_LABEL = "Book a call";
 
 export const SLACK_CTA_CONTACT_HREF = "/contact";
 

@@ -329,7 +329,7 @@ function TwitterPost({
                       setLocalValue(value);
                       onContentChange?.(value);
                     }}
-                    placeholder="What is happening?!"
+                    placeholder="Share what shipped this week…"
                     spellCheck={false}
                     style={TWEET_EDITOR_OVERLAY_STYLE}
                     value={localValue}

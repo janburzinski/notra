@@ -117,7 +117,7 @@ function ResetPasswordForm() {
         toast.error("This reset link is invalid. Please request a new one.");
       } else {
         toast.error(
-          resetErrorMessage ?? "Something went wrong. Please try again."
+          resetErrorMessage ?? "Unable to reset your password. Please try again."
         );
       }
       setIsLoading(false);

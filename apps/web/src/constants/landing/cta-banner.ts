@@ -5,7 +5,7 @@ export const CTA_BANNER_SUBCOPY =
 
 export const CTA_BANNER_PRIMARY_LABEL = "Start for free";
 
-export const CTA_BANNER_SECONDARY_LABEL = "Book a Call";
+export const CTA_BANNER_SECONDARY_LABEL = "Book a call";
 
 export const CTA_BANNER_SIGNUP_SOURCE = "cta_banner";
 

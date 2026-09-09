@@ -114,7 +114,7 @@ export const ANSWER_EXAMPLE_FACTS = [
   },
   {
     id: "f-2",
-    title: "Search and without search",
+    title: "With and without search",
     text: "The same prompt runs with live retrieval and against the bare model. That tells you whether you live in the index or in the weights.",
   },
   {

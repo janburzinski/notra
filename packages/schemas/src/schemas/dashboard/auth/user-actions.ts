@@ -7,13 +7,13 @@ const USER_NAME_MAX_LENGTH = 100;
 const USER_IMAGE_URL_MAX_LENGTH = 2048;
 const PROVIDER_ID_MAX_LENGTH = 64;
 
-export const userNameSchema = z.string().trim().min(1, "Name cannot be empty");
+export const userNameSchema = z.string().trim().min(1, "Enter your name");
 
 export const updateUserInputSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Name is required")
+    .min(1, "Enter your name")
     .max(USER_NAME_MAX_LENGTH, "Name must be at most 100 characters")
     .optional(),
   image: z

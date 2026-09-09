@@ -51,7 +51,7 @@ export const FAQ_CONTENT: FaqContent = {
       id: "write",
       question: "Can Notra write the content too?",
       answer:
-        "Yes. Pick a gap, choose guide, listicle or comparison, and Write plans a brief from your brand identity, your sitemap and the competitors you track. You approve the brief, the draft opens in Content.",
+        "Yes. Pick a gap, choose a guide, listicle or comparison, and Write plans a brief from your brand identity, your sitemap and the competitors you track. You approve the brief, the draft opens in Content.",
       defaultOpen: false,
     },
   ],
