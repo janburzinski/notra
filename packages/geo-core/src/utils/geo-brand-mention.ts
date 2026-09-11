@@ -1,16 +1,57 @@
 const SEPARATOR_PATTERN = /[\s\-_/@.]+/g;
-const WORD_CHARACTER_PATTERN = /[\p{L}\p{N}]/u;
+const WORD_CHARACTER_PATTERN = /[\p{L}\p{N}\p{M}]/u;
+/** Scripts written without spaces; adjacency there is not a false-positive signal. */
+const SCRIPT_WITHOUT_SPACES =
+  /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Thai}]/u;
+const TRAIL_SURROGATE_MIN = 0xdc00;
+const TRAIL_SURROGATE_MAX = 0xdfff;
+const LEAD_SURROGATE_MIN = 0xd800;
+const LEAD_SURROGATE_MAX = 0xdbff;
 
 /**
  * Collapses casing, whitespace and package-style punctuation so that
  * `@acme/email-sdk`, `email_sdk` and `Email SDK` share one form.
  */
 function normalizeBrandText(text: string): string {
-  return text.toLowerCase().replace(SEPARATOR_PATTERN, " ").trim();
+  return text
+    .normalize("NFC")
+    .toLowerCase()
+    .replace(SEPARATOR_PATTERN, " ")
+    .trim();
+}
+
+function codePointAt(text: string, index: number): string | undefined {
+  if (index < 0 || index >= text.length) {
+    return undefined;
+  }
+  return String.fromCodePoint(text.codePointAt(index)!);
+}
+
+function codePointBefore(text: string, index: number): string | undefined {
+  if (index <= 0) {
+    return undefined;
+  }
+  const previous = index - 1;
+  const unit = text.charCodeAt(previous);
+  if (
+    previous > 0 &&
+    unit >= TRAIL_SURROGATE_MIN &&
+    unit <= TRAIL_SURROGATE_MAX
+  ) {
+    const lead = text.charCodeAt(previous - 1);
+    if (lead >= LEAD_SURROGATE_MIN && lead <= LEAD_SURROGATE_MAX) {
+      return codePointAt(text, previous - 1);
+    }
+  }
+  return codePointAt(text, previous);
 }
 
 function isWordCharacter(character: string | undefined): boolean {
-  return character !== undefined && WORD_CHARACTER_PATTERN.test(character);
+  return (
+    character !== undefined &&
+    WORD_CHARACTER_PATTERN.test(character) &&
+    !SCRIPT_WITHOUT_SPACES.test(character)
+  );
 }
 
 function containsTerm(haystack: string, term: string): boolean {
@@ -20,8 +61,8 @@ function containsTerm(haystack: string, term: string): boolean {
     if (index === -1) {
       return false;
     }
-    const before = haystack[index - 1];
-    const after = haystack[index + term.length];
+    const before = codePointBefore(haystack, index);
+    const after = codePointAt(haystack, index + term.length);
     if (!isWordCharacter(before) && !isWordCharacter(after)) {
       return true;
     }

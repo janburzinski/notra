@@ -44,6 +44,35 @@ describe("findBrandMention", () => {
     expect(findBrandMention("Pick Notra.", "Notra", [])).toBe("Notra");
   });
 
+  test("treats composed and decomposed names as the same brand", () => {
+    expect(findBrandMention("Try cafe\u0301 today.", "Café", [])).toBe("Café");
+    expect(findBrandMention("Try café today.", "Café", [])).toBe("Café");
+  });
+
+  test("does not match inside a word held by a combining mark", () => {
+    expect(findBrandMention("Try cafe\u0305 today.", "cafe", [])).toBeNull();
+  });
+
+  test("does not match when a supplementary-plane letter continues the word", () => {
+    const mathematicalBoldA = String.fromCodePoint(0x1d400);
+    expect(
+      findBrandMention(`Try foo${mathematicalBoldA} today.`, "foo", [])
+    ).toBeNull();
+    expect(
+      findBrandMention(`${mathematicalBoldA}foo today.`, "foo", [])
+    ).toBeNull();
+  });
+
+  test("matches CJK brands inside running text without spaces", () => {
+    expect(findBrandMention("推荐腾讯云和相关产品。", "腾讯", [])).toBe(
+      "腾讯"
+    );
+  });
+
+  test("matches a Latin brand embedded in CJK text", () => {
+    expect(findBrandMention("推荐Notra给团队。", "Notra", [])).toBe("Notra");
+  });
+
   test("ignores empty aliases", () => {
     expect(findBrandMention("Nothing here.", "Acme", ["", "  "])).toBeNull();
   });
