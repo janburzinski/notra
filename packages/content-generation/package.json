@@ -14,7 +14,7 @@
   "dependencies": {
     "@notra/ai": "workspace:*",
     "@upstash/redis": "^1.35.8",
-    "zod": "^4.4.3"
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",

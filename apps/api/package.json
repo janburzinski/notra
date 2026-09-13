@@ -36,7 +36,7 @@
     "nanoid": "^5.1.11",
     "sanitize-html": "^2.17.0",
     "tsup": "^8.5.1",
-    "zod": "^4.5.0"
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",
