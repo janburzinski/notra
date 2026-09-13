@@ -552,7 +552,7 @@ const runGeoCheck = Effect.fn("geo.runCheck")(function* (
   const ownedSourceCited = hasOwnedSourceCitation(
     context.websiteUrl,
     [...answer.grounding.sources, ...answer.sources],
-    context.aliases
+    context.domains
   );
   const usage = answer.usage
     ? addTokenUsage(EMPTY_TOKEN_USAGE, answer.usage)
@@ -1154,6 +1154,7 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
         companyName: settings.companyName,
         aliases: settings.aliases,
         websiteUrl: brand?.websiteUrl ?? null,
+        domains: settings.domains,
         gate,
         startedAtMs: Date.now(),
         scoped: promptIds !== undefined,
@@ -1199,6 +1200,7 @@ const buildGeoScanCheckContext = Effect.fn("geo.buildScanCheckContext")(
       companyName: context.companyName,
       aliases: context.aliases,
       websiteUrl: context.websiteUrl,
+      domains: context.domains,
     };
     return checkContext;
   }
@@ -1666,7 +1668,7 @@ const runGeoSequenceCheck = Effect.fn("geo.runSequenceCheck")(function* (
     const ownedSourceCited = hasOwnedSourceCitation(
       context.websiteUrl,
       [...answer.grounding.sources, ...answer.sources],
-      context.aliases
+      context.domains
     );
 
     rows.push({
@@ -1834,7 +1836,7 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
       const ownedSourceCited = hasOwnedSourceCitation(
         context.websiteUrl,
         [...answer.grounding.sources, ...answer.sources],
-        context.aliases
+        context.domains
       );
 
       rows.push({
@@ -2032,6 +2034,7 @@ const runGeoSequenceNowProgram = Effect.fn("geo.runSequenceNow")(function* (
           companyName: settings.companyName,
           aliases: settings.aliases,
           websiteUrl: brand?.websiteUrl ?? null,
+          domains: settings.domains,
         };
         const outcomes = yield* Effect.forEach(
           replayEngines,

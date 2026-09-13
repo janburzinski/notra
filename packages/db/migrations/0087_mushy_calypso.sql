@@ -20,6 +20,24 @@ WITH "brand_domains" AS (
 	INNER JOIN "brand_settings"
 		ON "brand_settings"."id" = "projects"."brand_settings_id"
 		AND "brand_settings"."organization_id" = "projects"."organization_id"
+	UNION
+	SELECT
+		"geo_settings"."project_id",
+		regexp_replace(
+			split_part(
+				split_part(
+					regexp_replace(lower(trim("tracked_domain"."value")), '^[a-z][a-z0-9+.-]*://', ''),
+					'/',
+					1
+				),
+				':',
+				1
+			),
+			'^www\.',
+			''
+		)
+	FROM "geo_settings"
+	CROSS JOIN LATERAL unnest("geo_settings"."domains") AS "tracked_domain"("value")
 )
 UPDATE "geo_mention_checks" AS "checks"
 SET "owned_source_cited" = true

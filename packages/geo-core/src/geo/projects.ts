@@ -21,6 +21,7 @@ import {
   GeoProjectNotFoundError,
   GeoSettingsMissingError,
 } from "./errors";
+import { invalidateGeoIngestHostsCache } from "./ingest-hosts-cache";
 import { lockGeoOrganization, lockGeoProject } from "./lock";
 import { toGeoProject } from "./mappers";
 
@@ -108,6 +109,10 @@ export const createGeoProject = Effect.fn("geo.projectCreate")(function* (
     return yield* Effect.fail(new GeoProjectCreateFailedError({}));
   }
 
+  yield* Effect.promise(() =>
+    invalidateGeoIngestHostsCache(organizationId, row.id)
+  );
+
   return toGeoProject(row);
 });
 
@@ -142,6 +147,10 @@ export const updateGeoProject = Effect.fn("geo.projectUpdate")(function* (
   if (!row) {
     return yield* Effect.fail(new GeoProjectNotFoundError({ projectId }));
   }
+
+  yield* Effect.promise(() =>
+    invalidateGeoIngestHostsCache(organizationId, projectId)
+  );
 
   return toGeoProject(row);
 });
@@ -246,6 +255,12 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
   if (outcome === "last_project") {
     return yield* Effect.fail(
       new GeoProjectDeleteBlockedError({ projectId, reason: "last_project" })
+    );
+  }
+
+  if (outcome === "deleted") {
+    yield* Effect.promise(() =>
+      invalidateGeoIngestHostsCache(organizationId, projectId)
     );
   }
 

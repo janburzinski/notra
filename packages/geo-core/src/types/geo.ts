@@ -65,6 +65,7 @@ export interface GeoSettings {
   aliases: string[];
   competitors: string[];
   conversionPaths: string[];
+  domains: string[];
   languages: string[];
   engines: string[];
   /** ZDR add-on: request zero data retention from every model host. */
@@ -95,6 +96,7 @@ export interface GeoSettingsRow {
   aliases: string[];
   competitors: string[];
   conversionPaths: string[];
+  domains: string[];
   languages: string[] | null;
   engines: string[] | null;
   enforceZdr: boolean;
@@ -406,6 +408,7 @@ export interface GeoSettingsUpsertInput {
   aliases: string[];
   competitors: string[];
   conversionPaths?: string[];
+  domains?: string[];
   languages: string[];
   engines: string[];
   enforceZdr: boolean;
@@ -613,6 +616,8 @@ export interface GeoScanProjectContext {
   aliases: string[];
   /** Canonical brand website used to recognize citations from owned subdomains. */
   websiteUrl?: string | null;
+  /** Additional project domains whose citations count as owned sources. */
+  domains?: string[];
   gate: ContentBillingReservation;
   startedAtMs: number;
   /** Partial prompt scans do not cover a scheduled project scan. Optional for persisted older plans. */
@@ -708,6 +713,7 @@ export interface GeoCheckContext {
   companyName: string;
   aliases: string[];
   websiteUrl?: string | null;
+  domains?: string[];
 }
 
 export interface GeoSequenceDefinition {
@@ -1010,6 +1016,7 @@ export interface AiTrafficResponse {
 }
 
 export interface GeoTrafficPage {
+  host: string;
   path: string;
   source: string;
   visitorType: GeoVisitorType;
@@ -1156,6 +1163,7 @@ export type EngineIconKey =
   | "mistral"
   | "deepseek"
   | "meta"
+  | "instagram"
   | "grok"
   | "qwen"
   | "copilot"
