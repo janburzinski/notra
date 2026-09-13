@@ -1,0 +1,37 @@
+apps/dashboard/src/components/onboarding/account-menu.tsx
+  s_06b3a663ddd463::t_1d479f6031e616 32,42
+apps/dashboard/src/utils/posthog.ts
+  s_06b3a663ddd463::t_1d479f6031e616 1-5,17-22
+apps/dashboard/src/components/dashboard/nav-user.tsx
+  s_06b3a663ddd463::t_1d479f6031e616 48,57
+apps/dashboard/src/components/auth/banned-notice.tsx
+  s_06b3a663ddd463::t_1d479f6031e616 10,14
+apps/dashboard/src/components/providers/posthog-identity.tsx
+  s_06b3a663ddd463::t_1d479f6031e616 10,32,38
+apps/dashboard/src/utils/providers.tsx
+  s_06b3a663ddd463::t_7282b8f1732582 13,16-18,94-101
+apps/dashboard/src/components/providers/onboarding-runtime-providers.tsx
+  s_06b3a663ddd463::t_7282b8f1732582 13
+apps/dashboard/src/lib/analytics/posthog-client.ts
+  s_06b3a663ddd463::t_1d479f6031e616 11,71
+  s_06b3a663ddd463::t_3a1a531493cbd4 68-70,72
+apps/dashboard/src/lib/auth/client.ts
+  s_06b3a663ddd463::t_1d479f6031e616 81-82,86-95,97-100,107
+  s_06b3a663ddd463::t_3a1a531493cbd4 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9d4ee9d05474990b47fe5eec5c33dc829354546e",
+  "prompts": {},
+  "sessions": {
+    "s_06b3a663ddd463": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09ae2-a4a2-7620-8128-dd6da00ca48d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
