@@ -14,6 +14,7 @@ import type {
   GeoCompetitor,
   GeoCompetitorSharePoint,
   GeoEngineFamily,
+  GeoEngineFamilyMentionTotals,
   GeoEngineFamilyTotals,
   GeoEngineMode,
   GeoEngineVariant,
@@ -533,7 +534,7 @@ export function engineFamilyTotals(
 
 export function engineFamilyMentionTotals(
   family: GeoEngineFamily
-): GeoEngineFamilyTotals | null {
+): GeoEngineFamilyMentionTotals | null {
   const sources = engineFamilySources(family);
   if (sources.length === 0) {
     return null;
@@ -569,12 +570,12 @@ function totalsForEngines(
   if (sources.length === 0) {
     return null;
   }
-  const mentions = sources.reduce(
+  const visible = sources.reduce(
     (sum, engine) => sum + (engine.visibility ?? engine.mentions),
     0
   );
   const checks = sources.reduce((sum, engine) => sum + engine.checks, 0);
-  return { mentions, checks, rate: checks === 0 ? 0 : mentions / checks };
+  return { visible, checks, rate: checks === 0 ? 0 : visible / checks };
 }
 
 export function buildEngineFamilyModeTrendRows(
@@ -653,14 +654,14 @@ function familyDayBuckets(
   return byDay;
 }
 
-export function mentionOverviewTotals(
+export function visibilityOverviewTotals(
   engines: readonly GeoOverviewEngine[]
 ): GeoEngineFamilyTotals | null {
   return totalsForEngines(engines);
 }
 
 const EMPTY_FAMILY_TOTALS: GeoEngineFamilyTotals = {
-  mentions: 0,
+  visible: 0,
   checks: 0,
   rate: 0,
 };
@@ -696,8 +697,8 @@ function compareMentionProviderRows(
   left: MentionProviderRow,
   right: MentionProviderRow
 ): number {
-  if (right.totals.mentions !== left.totals.mentions) {
-    return right.totals.mentions - left.totals.mentions;
+  if (right.totals.visible !== left.totals.visible) {
+    return right.totals.visible - left.totals.visible;
   }
   return engineFamilyLabel(left.family.family).localeCompare(
     engineFamilyLabel(right.family.family)

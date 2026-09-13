@@ -60,8 +60,8 @@ import type {
 import {
   buildMentionProviderRows,
   engineFamilyMentionTotals,
-  mentionOverviewTotals,
   mentionStatTrends,
+  visibilityOverviewTotals,
   withTrackedMentionEngines,
 } from "@/utils/geo-charts";
 
@@ -82,7 +82,7 @@ function ProviderRow({
 }: MentionProviderRowProps) {
   const { family, totals, visibilityDelta, tracked } = row;
   const name = engineFamilyLabel(family.family);
-  const clickable = totals.mentions > 0;
+  const clickable = totals.visible > 0;
   const buttonProps = {
     "aria-disabled": !clickable,
     "aria-label": clickable
@@ -113,10 +113,10 @@ function ProviderRow({
         <span
           className={cn(
             "text-sm tabular-nums",
-            totals.mentions === 0 && "text-muted-foreground"
+            totals.visible === 0 && "text-muted-foreground"
           )}
         >
-          {totals.mentions.toLocaleString()}
+          {totals.visible.toLocaleString()}
         </span>
         <GeoStatDelta delta={visibilityDelta} label={`${name} visibility`} />
       </span>
@@ -228,7 +228,7 @@ export function MentionRateCard({
     addEngine.isPending && addEngine.variables
       ? engineFamilyOf(addEngine.variables)
       : undefined;
-  const totals = mentionOverviewTotals(
+  const totals = visibilityOverviewTotals(
     withTrackedMentionEngines(engines, trackedEngines)
   );
   const overviewDelta = mentionStatTrends(timeseriesPoints).visibilityDelta;
@@ -241,7 +241,7 @@ export function MentionRateCard({
       mention_rate: mentionTotals?.rate ?? null,
       mentions: mentionTotals?.mentions ?? null,
       visibility_rate: row?.totals.rate ?? null,
-      visible: row?.totals.mentions ?? null,
+      visible: row?.totals.visible ?? null,
       tracked: row?.tracked ?? null,
     });
     setSelected(family);
@@ -274,7 +274,7 @@ export function MentionRateCard({
           <div className="flex flex-1 flex-col gap-4">
             <div className="flex items-end gap-2">
               <p className="text-3xl leading-none font-semibold tracking-tight tabular-nums">
-                {totals.mentions.toLocaleString()}
+                {totals.visible.toLocaleString()}
               </p>
               <GeoStatDelta
                 className="mb-0.5"

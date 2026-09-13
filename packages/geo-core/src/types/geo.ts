@@ -1069,6 +1069,12 @@ export interface GeoEngineFamily {
 }
 
 export interface GeoEngineFamilyTotals {
+  visible: number;
+  checks: number;
+  rate: number;
+}
+
+export interface GeoEngineFamilyMentionTotals {
   mentions: number;
   checks: number;
   rate: number;

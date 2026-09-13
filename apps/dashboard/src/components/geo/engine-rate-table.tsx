@@ -128,7 +128,7 @@ export function EngineRateTable({
           return (
             <span className="flex items-center gap-2">
               <span className="text-sm tabular-nums">
-                {totals.mentions.toLocaleString()}
+                {totals.visible.toLocaleString()}
               </span>
               <GeoStatDelta
                 delta={trends.visibilityDelta}
@@ -138,7 +138,7 @@ export function EngineRateTable({
             </span>
           );
         },
-        sortValue: (row) => engineFamilyTotals(row)?.mentions ?? -1,
+        sortValue: (row) => engineFamilyTotals(row)?.visible ?? -1,
       },
       {
         key: "citations",

@@ -190,7 +190,7 @@ function FamilyStats({
         delta={trends.visibilityDelta}
         kind="mentions"
         label={GEO_MENTIONS_LABEL}
-        value={totals ? `${totals.mentions}/${totals.checks}` : "—"}
+        value={totals ? `${totals.visible}/${totals.checks}` : "—"}
       />
       <Stat
         delta={trends.positionDelta}
