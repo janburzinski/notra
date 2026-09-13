@@ -615,6 +615,7 @@ function familySortRate(family: GeoEngineFamily): number {
 function emptyFamilyDayBucket(): FamilyDayBucket {
   return {
     mentions: 0,
+    visibility: 0,
     checks: 0,
     positionWeighted: 0,
     positionWeight: 0,
@@ -625,7 +626,8 @@ function addFamilyDayPoint(
   bucket: FamilyDayBucket,
   point: GeoTimeseriesPoint
 ): void {
-  bucket.mentions += point.visibility ?? point.mentions;
+  bucket.mentions += point.mentions;
+  bucket.visibility += point.visibility ?? point.mentions;
   bucket.checks += point.checks;
   if (point.avgPosition === null || point.avgPosition === undefined) {
     return;
@@ -720,7 +722,8 @@ export function buildMentionProviderRows(
     .map((family) => ({
       family,
       totals: engineFamilyTotals(family) ?? EMPTY_FAMILY_TOTALS,
-      mentionDelta: engineFamilyStatTrends(points, family.family).mentionDelta,
+      visibilityDelta: engineFamilyStatTrends(points, family.family)
+        .visibilityDelta,
       tracked: trackedFamilies.size === 0 || trackedFamilies.has(family.family),
     }))
     .sort(compareMentionProviderRows);
@@ -737,6 +740,7 @@ function sumFamilyWindow(
       continue;
     }
     total.mentions += bucket.mentions;
+    total.visibility += bucket.visibility;
     total.checks += bucket.checks;
     total.positionWeighted += bucket.positionWeighted;
     total.positionWeight += bucket.positionWeight;
@@ -744,11 +748,11 @@ function sumFamilyWindow(
   return total;
 }
 
-function windowRate(bucket: FamilyDayBucket): number | null {
+function windowVisibilityRate(bucket: FamilyDayBucket): number | null {
   if (bucket.checks <= 0) {
     return null;
   }
-  return bucket.mentions / bucket.checks;
+  return bucket.visibility / bucket.checks;
 }
 
 function windowPosition(bucket: FamilyDayBucket): number | null {
@@ -798,6 +802,7 @@ export function mentionStatTrends(
   const empty: EngineFamilyStatTrends = {
     ratePts: null,
     mentionDelta: null,
+    visibilityDelta: null,
     positionDelta: null,
   };
   const today = options?.today ?? todayIsoDate();
@@ -809,8 +814,8 @@ export function mentionStatTrends(
   }
   const previous = sumFamilyWindow(windows.previous, byDay);
   const current = sumFamilyWindow(windows.current, byDay);
-  const previousRate = windowRate(previous);
-  const currentRate = windowRate(current);
+  const previousRate = windowVisibilityRate(previous);
+  const currentRate = windowVisibilityRate(current);
   const previousPosition = windowPosition(previous);
   const currentPosition = windowPosition(current);
   return {
@@ -819,6 +824,7 @@ export function mentionStatTrends(
         ? null
         : (currentRate - previousRate) * CHART_PERCENT_SCALE,
     mentionDelta: trafficVisitDelta(current.mentions, previous.mentions),
+    visibilityDelta: trafficVisitDelta(current.visibility, previous.visibility),
     positionDelta:
       previousPosition === null || currentPosition === null
         ? null

@@ -131,9 +131,9 @@ export function EngineRateTable({
                 {totals.mentions.toLocaleString()}
               </span>
               <GeoStatDelta
-                delta={trends.mentionDelta}
+                delta={trends.visibilityDelta}
                 hint={GEO_FAMILY_STAT_TREND_HINT}
-                label={`${engineFamilyLabel(row.family)} mentions`}
+                label={`${engineFamilyLabel(row.family)} visibility`}
               />
             </span>
           );

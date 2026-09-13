@@ -80,7 +80,7 @@ function ProviderRow({
   trackingDisabled,
   tracking,
 }: MentionProviderRowProps) {
-  const { family, totals, mentionDelta, tracked } = row;
+  const { family, totals, visibilityDelta, tracked } = row;
   const name = engineFamilyLabel(family.family);
   const clickable = totals.mentions > 0;
   const buttonProps = {
@@ -118,7 +118,7 @@ function ProviderRow({
         >
           {totals.mentions.toLocaleString()}
         </span>
-        <GeoStatDelta delta={mentionDelta} label={`${name} visibility`} />
+        <GeoStatDelta delta={visibilityDelta} label={`${name} visibility`} />
       </span>
     </>
   );
@@ -231,7 +231,7 @@ export function MentionRateCard({
   const totals = mentionOverviewTotals(
     withTrackedMentionEngines(engines, trackedEngines)
   );
-  const overviewDelta = mentionStatTrends(timeseriesPoints).mentionDelta;
+  const overviewDelta = mentionStatTrends(timeseriesPoints).visibilityDelta;
   const [selected, setSelected] = useState<GeoEngineFamily | null>(null);
   const openFamily = (family: GeoEngineFamily) => {
     const row = ranked.find((entry) => entry.family.family === family.family);

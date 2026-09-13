@@ -144,6 +144,7 @@ export type GeoStatDeltaTone = "up" | "down" | "flat";
 export interface EngineFamilyStatTrends {
   ratePts: number | null;
   mentionDelta: number | null;
+  visibilityDelta: number | null;
   positionDelta: number | null;
 }
 
@@ -736,6 +737,7 @@ export interface MentionTrend {
 
 export interface FamilyDayBucket {
   mentions: number;
+  visibility: number;
   checks: number;
   positionWeighted: number;
   positionWeight: number;
@@ -1075,7 +1077,7 @@ export interface GeoEngineFamilyTotals {
 export interface MentionProviderRow {
   family: GeoEngineFamily;
   totals: GeoEngineFamilyTotals;
-  mentionDelta: number | null;
+  visibilityDelta: number | null;
   tracked: boolean;
 }
 

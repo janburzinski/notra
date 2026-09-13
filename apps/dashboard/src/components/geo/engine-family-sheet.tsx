@@ -10,6 +10,7 @@ import {
   GEO_FAMILY_STAT_TREND_HINT,
   GEO_MENTION_RATE_LABEL,
   GEO_MENTIONS_LABEL,
+  GEO_PROMPT_RECEIPT_LABELS,
   GEO_SEARCH_LABEL,
   GEO_SPARKLINE_MIN_POINTS,
   GEO_WITHOUT_SEARCH_LABEL,
@@ -186,7 +187,7 @@ function FamilyStats({
         value={totals ? formatMentionRate(totals.rate) : "—"}
       />
       <Stat
-        delta={trends.mentionDelta}
+        delta={trends.visibilityDelta}
         kind="mentions"
         label={GEO_MENTIONS_LABEL}
         value={totals ? `${totals.mentions}/${totals.checks}` : "—"}
@@ -421,8 +422,11 @@ function FamilyBrands({
 }
 
 function promptResultLabel(hit: EngineFamilyPromptHit): string {
+  if (hit.mentioned && hit.ownedSourceCited) {
+    return GEO_PROMPT_RECEIPT_LABELS.mentionedAndCited;
+  }
   if (!hit.mentioned && hit.ownedSourceCited) {
-    return "Cited";
+    return GEO_PROMPT_RECEIPT_LABELS.cited;
   }
   if (!hit.mentioned) {
     return "Miss";
@@ -459,7 +463,7 @@ function PromptHits({
     {
       key: "result",
       header: "Result",
-      width: "7rem",
+      width: "11rem",
       sortable: true,
       cell: (row) => {
         const visible = row.mentioned || Boolean(row.ownedSourceCited);
