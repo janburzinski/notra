@@ -1,0 +1,25 @@
+apps/dashboard/src/lib/content/content-publishing-metrics.server.ts
+  s_06b3a663ddd463::t_ce44bb58097e6c 7,9,33
+apps/dashboard/src/utils/content-publishing-metrics.ts
+  s_06b3a663ddd463::t_ce44bb58097e6c 1-28,30-37,39-73,75-78
+  s_06b3a663ddd463::t_c37b4e09ba439d 29,74
+  s_06b3a663ddd463::t_4b61253e4b36e0 38
+apps/dashboard/src/types/dashboard.ts
+  s_06b3a663ddd463::t_ce44bb58097e6c 23-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "12ce43195d4a3ac4346b82e036528b504da216e0",
+  "prompts": {},
+  "sessions": {
+    "s_06b3a663ddd463": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09ae2-a4a2-7620-8128-dd6da00ca48d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
