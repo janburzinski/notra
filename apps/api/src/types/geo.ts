@@ -8,8 +8,6 @@ import type {
   GeoSearchConsoleService,
 } from "@notra/geo-core/deps";
 import type { GeoRouterError } from "@notra/geo-core/geo/errors";
-import type { ZodType } from "zod";
-
 import type {
   AgentReadinessApiError,
   AgentReadinessClaimError,
@@ -17,6 +15,7 @@ import type {
   AgentReadinessStartError,
   AgentReadinessTargetMissingError,
 } from "@notra/geo-core/schemas/agent-readiness-errors";
+import type { ZodType } from "zod";
 
 import type {
   GeoScanNotFoundError,

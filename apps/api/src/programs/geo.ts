@@ -141,66 +141,66 @@ function serializeGeoScan(row: GeoScanRecord) {
   };
 }
 
-export const listGeoScansForProject = Effect.fn("geo.scans.list")(
-  function* (input: ListGeoScansInput) {
-    const scope = and(
-      eq(geoScans.projectId, input.projectId),
-      eq(geoScans.organizationId, input.organizationId)
-    );
+export const listGeoScansForProject = Effect.fn("geo.scans.list")(function* (
+  input: ListGeoScansInput
+) {
+  const scope = and(
+    eq(geoScans.projectId, input.projectId),
+    eq(geoScans.organizationId, input.organizationId)
+  );
 
-    const [totals, rows] = yield* Effect.all([
-      geoDb("list geo scans count", () =>
-        db.select({ value: count() }).from(geoScans).where(scope)
-      ),
-      geoDb("list geo scans", () =>
-        db.query.geoScans.findMany({
-          where: scope,
-          orderBy: [desc(geoScans.startedAt)],
-          limit: input.limit,
-          offset: (input.page - 1) * input.limit,
-        })
-      ),
-    ]);
-
-    const totalItems = totals.at(0)?.value ?? 0;
-    const totalPages = Math.max(1, Math.ceil(totalItems / input.limit));
-
-    return {
-      scans: rows.map(serializeGeoScan),
-      pagination: {
+  const [totals, rows] = yield* Effect.all([
+    geoDb("list geo scans count", () =>
+      db.select({ value: count() }).from(geoScans).where(scope)
+    ),
+    geoDb("list geo scans", () =>
+      db.query.geoScans.findMany({
+        where: scope,
+        orderBy: [desc(geoScans.startedAt)],
         limit: input.limit,
-        currentPage: input.page,
-        nextPage: input.page < totalPages ? input.page + 1 : null,
-        previousPage: input.page > 1 ? input.page - 1 : null,
-        totalPages,
-        totalItems,
-      },
-    };
-  }
-);
+        offset: (input.page - 1) * input.limit,
+      })
+    ),
+  ]);
+
+  const totalItems = totals.at(0)?.value ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / input.limit));
+
+  return {
+    scans: rows.map(serializeGeoScan),
+    pagination: {
+      limit: input.limit,
+      currentPage: input.page,
+      nextPage: input.page < totalPages ? input.page + 1 : null,
+      previousPage: input.page > 1 ? input.page - 1 : null,
+      totalPages,
+      totalItems,
+    },
+  };
+});
 
 export interface GetGeoScanInput extends GeoProjectScopeInput {
   readonly scanId: string;
 }
 
-export const getGeoScanForProject = Effect.fn("geo.scans.get")(
-  function* (input: GetGeoScanInput) {
-    const row = yield* geoDb("get geo scan", () =>
-      db.query.geoScans.findFirst({
-        where: and(
-          eq(geoScans.id, input.scanId),
-          eq(geoScans.projectId, input.projectId),
-          eq(geoScans.organizationId, input.organizationId)
-        ),
-      })
+export const getGeoScanForProject = Effect.fn("geo.scans.get")(function* (
+  input: GetGeoScanInput
+) {
+  const row = yield* geoDb("get geo scan", () =>
+    db.query.geoScans.findFirst({
+      where: and(
+        eq(geoScans.id, input.scanId),
+        eq(geoScans.projectId, input.projectId),
+        eq(geoScans.organizationId, input.organizationId)
+      ),
+    })
+  );
+
+  if (!row) {
+    return yield* Effect.fail(
+      new GeoScanNotFoundError({ scanId: input.scanId })
     );
-
-    if (!row) {
-      return yield* Effect.fail(
-        new GeoScanNotFoundError({ scanId: input.scanId })
-      );
-    }
-
-    return { scan: serializeGeoScan(row) };
   }
-);
+
+  return { scan: serializeGeoScan(row) };
+});
