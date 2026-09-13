@@ -20,7 +20,7 @@
     "@neondatabase/serverless": "^1.0.2",
     "drizzle-orm": "^0.45.2",
     "pg": "^8.20.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",

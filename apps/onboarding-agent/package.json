@@ -24,7 +24,7 @@
     "effect": "4.0.0-rc.112",
     "eve": "0.27.13",
     "pg": "^8.20.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",
