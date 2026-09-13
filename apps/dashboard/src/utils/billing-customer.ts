@@ -1,4 +1,4 @@
-import type { useCustomer } from "autumn-js/react";
+import type { UseCustomerParams } from "autumn-js/react";
 
 /**
  * Shared `expand` set for every Autumn customer read. Autumn keys its cache by
@@ -6,8 +6,8 @@ import type { useCustomer } from "autumn-js/react";
  * each open their own request — hence the de-duplication and the sort.
  */
 export function billingCustomerOptions(
-  params: Parameters<typeof useCustomer>[0] = {}
-) {
+  params: UseCustomerParams = {}
+): UseCustomerParams {
   return {
     ...params,
     expand: [
@@ -17,5 +17,5 @@ export function billingCustomerOptions(
         ...(params.expand ?? []),
       ]),
     ].sort(),
-  } satisfies Parameters<typeof useCustomer>[0];
+  };
 }

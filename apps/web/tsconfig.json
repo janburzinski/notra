@@ -9,11 +9,11 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "~types/*": ["./types/*"]
-    }
+    },
+    "types": ["node", "mdx"]
   },
   "include": [
     "next-env.d.ts",

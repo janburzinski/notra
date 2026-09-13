@@ -121,10 +121,11 @@
     "@types/react-dom": "^19.2.5",
     "@types/sanitize-html": "^2.16.0",
     "@types/three": "^0.182.0",
+    "@typescript/native": "npm:typescript@7.0.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "drizzle-kit": "^0.31.8",
     "knip": "^6.12.1",
     "postcss": "8.5.23",
-    "typescript": "^5"
+    "typescript": "npm:@typescript/typescript6@6.0.2"
   }
 }
