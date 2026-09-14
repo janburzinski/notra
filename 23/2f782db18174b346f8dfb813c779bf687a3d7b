@@ -1,0 +1,100 @@
+apps/dashboard/tests/geo-shelf-page.test.ts
+  s_dd90835652050c::t_db36c20901bd19 4-7
+  s_dd90835652050c::t_ec97bbdd03f08c 166-183
+apps/dashboard/src/lib/hooks/use-geo-shelf.ts
+  s_dd90835652050c::t_4db04989ed400a 5,11
+  s_dd90835652050c::t_4ff94cc5da7344 24-38
+packages/schemas/src/constants/dashboard/geo-shelf.ts
+  s_dd90835652050c::t_6f079f96be915d 58
+apps/dashboard/src/app/(dashboard)/[slug]/geo/shelf-space/page-client.tsx
+  s_dd90835652050c::t_02a26f2e5baa15 139
+apps/dashboard/src/types/geo-shelf.ts
+  s_dd90835652050c::t_eea40f737fa724 256
+  s_dd90835652050c::t_1fd96c5ceadc7b 31
+  s_dd90835652050c::t_f4a3291860042d 247
+  s_dd90835652050c::t_6675210d8d0ab5 447
+  s_dd90835652050c::t_07b831e73efcdd 94-96
+  s_dd90835652050c::t_475c58d45bfe3a 209
+apps/dashboard/src/lib/geo-shelf/store.ts
+  s_dd90835652050c::t_a694a7e5fbedf2 20-24
+  s_dd90835652050c::t_2cc6d45a58837b 334
+  s_dd90835652050c::t_849d5becf0f1b0 262-263,265
+  s_dd90835652050c::t_c06ef5d80ed6c8 340
+  s_dd90835652050c::t_c23207f15cbadb 363-364,369-372,375-399
+  s_dd90835652050c::t_353c4f4a204ce7 320-321
+apps/dashboard/src/utils/geo-shelf-page.ts
+  s_dd90835652050c::t_0c2cc5274f517f 123
+packages/schemas/src/schemas/dashboard/geo-shelf.ts
+  s_dd90835652050c::t_920470a82dbbf4 202-205
+  s_dd90835652050c::t_be7ade029c18c0 151
+  s_dd90835652050c::t_18eac8b9d0bc4b 10
+apps/dashboard/src/components/geo/shelf/shelf-view.tsx
+  s_dd90835652050c::t_a70693e6dcf4d6 45
+  s_dd90835652050c::t_af259a3f5318fa 18
+  s_dd90835652050c::t_7241887b247cfd 65
+apps/dashboard/src/lib/hooks/use-geo-shelf-sources.ts
+  s_dd90835652050c::t_efcc2703dcf37c 40-44,80,89-91,125-127,139-157,159,163,166-188,191-199,201,213,215,221,242,245,247,251,264,267,269,273,281-282,296
+apps/dashboard/src/components/geo/shelf/shelf-toolbar.tsx
+  s_dd90835652050c::t_cd47d8ba710500 6
+  s_dd90835652050c::t_87966ec0b83e48 54
+apps/dashboard/src/app/api/internal/geo/sequence-run/route.ts
+  s_dd90835652050c::t_436a287c57517c 6
+  s_dd90835652050c::t_7e7921a853801a 79-82
+apps/dashboard/src/lib/geo-shelf/citation-query.ts
+  s_dd90835652050c::t_4542f6095c6c50 66
+  s_dd90835652050c::t_5b3b7df466b68e 49-50
+  s_dd90835652050c::t_3c41e43d226763 7
+apps/dashboard/src/lib/hooks/use-geo-shelf-page.ts
+  s_dd90835652050c::t_61cfc7693e63da 125,127-128
+  s_dd90835652050c::t_759d259c646ef5 5
+apps/dashboard/src/utils/geo-shelf.ts
+  s_dd90835652050c::t_8e59a2ee6c7dfb 255-256
+apps/dashboard/src/components/geo/shelf/shelf-add-dialog.tsx
+  s_dd90835652050c::t_cdea9a300c2b0a 251,256
+  s_dd90835652050c::t_2491d94e33806c 380-382
+  s_dd90835652050c::t_ef46619baf660d 252-255
+  s_dd90835652050c::t_ba2dc0f24811d1 89-98
+  s_dd90835652050c::t_5809bd11ade1e4 47-50
+  s_dd90835652050c::t_bbc2ce81d625d0 190-193
+  s_dd90835652050c::t_46166874a09ce9 257-283
+  s_dd90835652050c::t_3b18f05f609ffc 284-285
+apps/dashboard/src/components/geo/shelf/shelf-board.tsx
+  s_dd90835652050c::t_c365caebff92ca 282-287,291-292
+  s_dd90835652050c::t_69b5677a595260 321-331
+  s_dd90835652050c::t_c959165e505ae5 28,31
+  s_dd90835652050c::t_437e00f0e30714 247-257,259
+  s_dd90835652050c::t_eb4392e96a0794 342
+  s_dd90835652050c::t_d6051ff12c8717 532-533
+apps/dashboard/src/lib/geo-shelf/service.ts
+  s_dd90835652050c::t_1f056162771074 55
+  s_dd90835652050c::t_3409608fa21a49 17,19
+  s_dd90835652050c::t_b830bc5ce4e8a4 344-347
+  s_dd90835652050c::t_98db11aa77a120 36
+  s_dd90835652050c::t_ab7822ee508059 172-193
+  s_dd90835652050c::t_06259111b960d1 226-227,231-258
+  s_dd90835652050c::t_ad76d1ec58ed37 358-364
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_dd90835652050c::t_c3c1c851485028 254,258
+  s_dd90835652050c::t_24e2a3b1f23ec8 213
+  s_dd90835652050c::t_214c18e15dfde9 794-807
+  s_dd90835652050c::t_82710a9e95768e 1348
+apps/dashboard/src/components/geo/shelf/shelf-table.tsx
+  s_dd90835652050c::t_1927748e9a4290 302-304
+  s_dd90835652050c::t_5633ed8730844b 193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "232f782db18174b346f8dfb813c779bf687a3d7b",
+  "prompts": {},
+  "sessions": {
+    "s_dd90835652050c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e985127-43b5-472d-b293-8130e3dd02ac",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
