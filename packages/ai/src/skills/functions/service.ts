@@ -1,9 +1,11 @@
 import { db } from "@notra/db/drizzle";
 import { skills } from "@notra/db/schema";
 import { and, asc, count, eq, sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 import { DEFAULT_SKILL_CATALOG_LIMIT } from "../constants";
 import type {
+  CreateSkillInput,
   ListSkillsOptions,
   SkillContent,
   SkillServiceContext,
@@ -83,4 +85,38 @@ export async function loadSkillByName(
     description: row.description,
     content: row.content.trim(),
   };
+}
+
+export async function createSkill(
+  ctx: SkillServiceContext,
+  input: CreateSkillInput
+): Promise<SkillContent> {
+  const name = input.name.trim();
+  const description = input.description.trim();
+  const content = input.content;
+
+  const existing = await db.query.skills.findFirst({
+    where: and(
+      eq(skills.organizationId, ctx.organizationId),
+      eq(skills.name, name)
+    ),
+    columns: { id: true },
+  });
+
+  if (existing) {
+    throw new Error(
+      `A skill named "${name}" already exists for this organization. Use a different name or update the existing skill instead.`
+    );
+  }
+
+  await db.insert(skills).values({
+    id: nanoid(),
+    organizationId: ctx.organizationId,
+    name,
+    description,
+    content,
+    isSystem: false,
+  });
+
+  return { name, description, content };
 }

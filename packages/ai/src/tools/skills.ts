@@ -1,14 +1,23 @@
 import { renderSkillToolOutput } from "@notra/ai/skills/functions/guidance";
 import {
+  createSkill as createSkillRecord,
   listSkillCatalog,
   loadSkillByName,
 } from "@notra/ai/skills/functions/service";
+import { toolDescription } from "@notra/ai/utils/description";
 import { type Tool, tool } from "ai";
 import z from "zod";
 
 export interface SkillsToolContext {
   organizationId: string;
 }
+
+// Mirrors packages/schemas constants/skills. That package depends on
+// @notra/ai, so it cannot be imported here without a package cycle.
+const SKILL_NAME_REGEX = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
+const SKILL_NAME_MAX_LENGTH = 64;
+const SKILL_DESCRIPTION_MAX_LENGTH = 1000;
+const SKILL_CONTENT_MAX_LENGTH = 200_000;
 
 export function listAvailableSkills(ctx: SkillsToolContext): Tool {
   return tool({
@@ -48,6 +57,59 @@ export function getSkillByName(ctx: SkillsToolContext): Tool {
         description: skill.description,
         content: skill.content,
         skillContent: renderSkillToolOutput(skill),
+      };
+    },
+  });
+}
+
+export function createCreateSkillTool(ctx: SkillsToolContext): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "createSkill",
+      intro:
+        "Creates a new reusable writing skill (voice, format, structure guidance) for this organization.",
+      whenToUse:
+        "The user explicitly asks for a new skill, or a clearly new and recurring writing need appears that no existing skill covers.",
+      whenNotToUse:
+        "An existing skill already fits; reuse or edit that skill instead of creating a near-duplicate.",
+      usageNotes:
+        "Check listAvailableSkills for duplicates first. The name must be unique, lowercase kebab-case (letters, digits, hyphens only, max 64 chars). Provide a one-sentence description of when the skill applies plus the full skill body as content.",
+    }),
+    needsApproval: true,
+    inputSchema: z.object({
+      name: z
+        .string()
+        .trim()
+        .min(1)
+        .max(SKILL_NAME_MAX_LENGTH)
+        .regex(
+          SKILL_NAME_REGEX,
+          "Name must be lowercase, start and end with a letter or digit, and contain only letters, digits, and hyphens"
+        )
+        .describe("Unique skill name in lowercase kebab-case."),
+      description: z
+        .string()
+        .trim()
+        .min(1)
+        .max(SKILL_DESCRIPTION_MAX_LENGTH)
+        .describe("One-sentence description of when to apply this skill."),
+      content: z
+        .string()
+        .min(1)
+        .max(SKILL_CONTENT_MAX_LENGTH)
+        .describe(
+          "The full skill body: the reusable writing guidance applied when drafting content."
+        ),
+    }),
+    execute: async ({ name, description, content }) => {
+      const skill = await createSkillRecord(
+        { organizationId: ctx.organizationId },
+        { name, description, content }
+      );
+
+      return {
+        name: skill.name,
+        status: "created",
       };
     },
   });
