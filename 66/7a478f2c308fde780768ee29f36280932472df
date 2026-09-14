@@ -1,0 +1,252 @@
+apps/dashboard/src/utils/skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 2-5,7-8,13,57-61,63-86,125-140
+  s_2ef98e1ea88d6c::t_ba546a8bfa4a47 6,9,87-90,92-93,95,118-124
+  s_2ef98e1ea88d6c::t_9699b3c699986f 62
+apps/docs/docs.json
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 161-162,256-260
+apps/dashboard/src/types/skills/page.ts
+  s_2ef98e1ea88d6c::t_35db3b970817a9 16-20
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-12,26-30,37-38,64-71,95-127,131-142
+  s_2ef98e1ea88d6c::t_9663ca8fee88ed 128-130
+apps/docs/devtools/mcp.mdx
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 226-231
+apps/docs/api/skills.mdx
+  s_2ef98e1ea88d6c::t_abfd8289807ae3 27
+  s_2ef98e1ea88d6c::t_c7160d02c809ac 50
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-26,28-37,39-49,51-118
+  s_2ef98e1ea88d6c::t_8d15db26081921 38
+packages/utils/tsconfig.json
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 7-8
+apps/dashboard/src/app/api/cron/system-skills-sync/route.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-31
+apps/docs/api/authentication.mdx
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 119
+apps/dashboard/src/components/skills/lazy-skill-update-dialog.tsx
+  s_2ef98e1ea88d6c::t_87cd815ff0b2c7 1-10
+packages/schemas/src/schemas/api/skills.ts
+  s_2ef98e1ea88d6c::t_329e7b704033fa 73
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 8-9,32-46,76,116-161
+apps/dashboard/src/app/(dashboard)/[slug]/skills/[id]/page-client.tsx
+  s_2ef98e1ea88d6c::t_7bbb42110f6e31 26-29,35-38,57-58,60,64-73,75-77,79-85,88-89,103,112,123,132-144,146-167,179,191-195,265,267,269,271-272,274-276,300,306-323,325
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_2ef98e1ea88d6c::t_d8b95d076d55ba 276,278,285,287,289,299
+  s_2ef98e1ea88d6c::t_1e85f20fa28317 258-261
+  s_2ef98e1ea88d6c::t_f7161c97b76be3 314
+  s_2ef98e1ea88d6c::t_80c7d544e51da2 329,347
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-13,21,25,34,46-69,103-118,120,143-145,147-167,169-182,184-188,190-208,286,288,290-294,296-298
+  s_2ef98e1ea88d6c::t_0feed0776d9048 168
+  s_2ef98e1ea88d6c::t_64491f245fe7b1 183,189
+  s_2ef98e1ea88d6c::t_d3e57aac7dcc0c 119,123,135,146
+  s_2ef98e1ea88d6c::t_6a1f9fd3ab4871 243
+packages/posthog/src/events.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 161
+apps/dashboard/src/types/react.d.ts
+  s_2ef98e1ea88d6c::t_c1dd57ff6ee6f7 1
+apps/dashboard/src/constants/skills.ts
+  s_2ef98e1ea88d6c::t_481ac0df3efeb6 12-22,24
+  s_2ef98e1ea88d6c::t_10de41b2c666eb 3-6,8,33-34
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 7,25-32,35-54
+packages/utils/src/three-way-merge.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-80
+apps/dashboard/src/components/skills/skill-editor-form.tsx
+  s_2ef98e1ea88d6c::t_375641eeef7e39 43,47-51
+  s_2ef98e1ea88d6c::t_d0c663d6b573df 10-12,16-21,68-103,105-106
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 15
+apps/api/src/utils/skill-errors.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-44
+packages/ai/src/skills/seed.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 5-6,8-13,15-18,21-25,29,31-33,37-47,51-61
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 10,72-75,77-80,82-85
+  s_2ef98e1ea88d6c::t_0f7ff7184c0626 60,66
+  s_2ef98e1ea88d6c::t_0a30dc69662eeb 76,81
+  s_2ef98e1ea88d6c::t_209315c65bdc33 41-43,50
+packages/ai/src/skills/types.ts
+  s_2ef98e1ea88d6c::t_541483c6603c4c 122-139
+  s_2ef98e1ea88d6c::t_584585398c7242 104
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-4,22-65,71-103,105-121,140-157
+  s_2ef98e1ea88d6c::t_5d9c118219649b 66-70
+apps/dashboard/src/components/skills/skill-detail-header.tsx
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 6-12,14,17,20,28-34,36-37,39-45,69,71-93,97-107,109-134
+  s_2ef98e1ea88d6c::t_8dce07facd9ee4 38,70,108
+  s_2ef98e1ea88d6c::t_9c9029e37f6a53 18
+  s_2ef98e1ea88d6c::t_0d10e6c22f866d 51
+  s_2ef98e1ea88d6c::t_06fa387ed0bfcb 58,62-68
+packages/schemas/src/schemas/shared/skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 2,38-45,48-69
+  s_2ef98e1ea88d6c::t_a8a1a1efd584e7 46-47
+apps/dashboard/src/components/skills/skills-table.tsx
+  s_2ef98e1ea88d6c::t_14a0629371231b 77
+  s_2ef98e1ea88d6c::t_acbc07aad71d78 4-10,16,22,75-76,78-81,101-145,147,174-176,192-194,198-199,203-205
+  s_2ef98e1ea88d6c::t_ef2b52824a0fbe 18,21
+  s_2ef98e1ea88d6c::t_c0d17b8d57d6ea 229,231-232,234-244
+  s_2ef98e1ea88d6c::t_8441a20deeb6a3 11,13-14,19
+  s_2ef98e1ea88d6c::t_f0f164e8dd07aa 86,90,92
+  s_2ef98e1ea88d6c::t_4aa5cc8eb185c6 207-208
+  s_2ef98e1ea88d6c::t_9579acfa4034a4 184
+  s_2ef98e1ea88d6c::t_b307bd0891f1fa 3
+  s_2ef98e1ea88d6c::t_598fe8f3bfeb5a 48-50,82-85,87-89,91,93-99
+  s_2ef98e1ea88d6c::t_5eb8d4f360d1b7 209-214,216-228
+  s_2ef98e1ea88d6c::t_3b78effb823d9c 28
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 20,23-24,27,29-32,36-38
+  s_2ef98e1ea88d6c::t_2d944c21d283af 26
+  s_2ef98e1ea88d6c::t_cab8d76349d600 230,233
+  s_2ef98e1ea88d6c::t_3e78bb4c6dbd07 146,148-173,177-183,185-191,195-197,200-202
+  s_2ef98e1ea88d6c::t_56dee640304e06 55,57-58,61-74
+  s_2ef98e1ea88d6c::t_cae3ccc16561de 51-53,56,60
+packages/ai/src/skills/functions/hash.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-14
+packages/ai/src/skills/functions/hash.test.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-66
+apps/dashboard/src/app/(dashboard)/[slug]/skills/[id]/loading.tsx
+  ai_agent 1-28
+packages/ai/src/skills/definitions.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-46
+apps/dashboard/src/lib/hooks/use-skill-diff-highlighter.ts
+  s_2ef98e1ea88d6c::t_cf8e73132290f6 1-40,44-50
+  s_2ef98e1ea88d6c::t_ad29a7a9593416 41-43
+apps/api/src/routes/skills.ts
+  s_2ef98e1ea88d6c::t_1d8f264ef9354a 140
+  s_2ef98e1ea88d6c::t_fbd4815a5d23f8 331-335,337
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 7,12-15,21,23-24,30-31,33,35,44-45,57,75-76,168-259,359-426
+  s_2ef98e1ea88d6c::t_cb473f36fb223a 125
+apps/docs/api/agent-feedback.mdx
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 26
+apps/dashboard/src/components/skills/skill-diff.tsx
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 3-4,6-7,10-14,16,19,23,28,30-36,46,57-60,62-65,67-69,71-77
+  s_2ef98e1ea88d6c::t_0647e479a150b6 5
+  s_2ef98e1ea88d6c::t_566226b92d4ab2 17,20-22,24,47-56,61,66,70
+  s_2ef98e1ea88d6c::t_7a5cd705e56474 26
+  s_2ef98e1ea88d6c::t_d31f1ca8a996a7 41-43
+  s_2ef98e1ea88d6c::t_a726d67572eb06 15
+packages/utils/src/api-scopes.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 155-156,158
+packages/ai/src/skills/humanizer-content.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 14,443-447,453-456,480,492-507,513,526
+packages/ai/src/skills/constants.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 4-19
+apps/dashboard/src/components/skills/lazy-skill-diff.tsx
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-16
+packages/ai/src/skills/functions/upstream.test.ts
+  s_2ef98e1ea88d6c::t_ae0fed5001685d 13
+  s_2ef98e1ea88d6c::t_3ccd490f06ab08 40
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-12,14-39,41-116
+packages/ai/src/prompts/geo_writer/humanizer.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 3,18-24
+packages/ai/src/utils/repo-image-skills.ts
+  s_2ef98e1ea88d6c::t_09a60d26b6afaa 18-20
+  s_2ef98e1ea88d6c::t_6e57990c1ed347 112-115
+  s_2ef98e1ea88d6c::t_4f1281bf51963b 187
+packages/ai/src/skills/definitions.test.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-47
+apps/dashboard/src/app/(dashboard)/[slug]/skills/[id]/page.tsx
+  s_2ef98e1ea88d6c::t_3f75d39be1c888 14,16-19
+apps/api/src/types/skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 5,12-13,15,21-22,24,26-27,29-39,55-56
+packages/db/migrations/meta/_journal.json
+  ai_agent 599-605
+.agents/skills/humanizer/SKILL.md
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 3,35,58,62,76,80,92,96,108,112,124,128,140,144,156,160,174,178,190,194,201,204,208,211-218,226,230,240,244,254,258,270,274,284,288,298,304,314,318,328,334,344,348,362,366,378,382,392,396,406,421,425,435,439,464,475,490,493,505,511,521,537,546
+apps/api/src/programs/skills.ts
+  s_2ef98e1ea88d6c::t_9f9368fecfc236 14
+  s_2ef98e1ea88d6c::t_91fc51654dc3d8 98
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-3,5-11,22,27,30-32,35-36,58-71,73-75,77,93-97,100-104,125-126,128-132,157,161,164-168,200-213,215-240
+  s_2ef98e1ea88d6c::t_3d34ae71f73239 214
+  s_2ef98e1ea88d6c::t_ba02cfa3a28f5e 141-152,154,162
+  s_2ef98e1ea88d6c::t_2bb9a93313c37b 57
+  s_2ef98e1ea88d6c::t_dc5998b8215d67 76
+  s_2ef98e1ea88d6c::t_842b7a0b7be7d1 4
+apps/dashboard/src/components/skills/skill-merge-boundary.tsx
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-31
+apps/api/src/errors/skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 22-36
+packages/utils/src/three-way-merge.test.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-129
+apps/dashboard/src/styles/globals.css
+  s_2ef98e1ea88d6c::t_703f39b9931eee 203-204,208-214,217-220,223-249,251-269,282-283
+apps/dashboard/package.json
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 55
+packages/ai/src/skills/functions/service.ts
+  s_2ef98e1ea88d6c::t_a4bc9dc1bc0fb7 2-3,19-26,74-114,126-127,130
+packages/db/migrations/meta/0085_snapshot.json
+  ai_agent 1-11027
+packages/tools/src/skill-editor/update-skill.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-2,16,23-35
+  s_2ef98e1ea88d6c::t_e93f3153b9acc2 11
+  s_2ef98e1ea88d6c::t_63462b8d830067 17-20
+packages/ai/src/skills/registry.ts
+  s_2ef98e1ea88d6c::t_61e298f76a7d76 126-147
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-17,19-125,148-296
+  s_2ef98e1ea88d6c::t_483797fae4ca69 18
+packages/utils/package.json
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 13,20-24
+packages/ai/src/skills/errors.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-64
+bun.lock
+  ai_agent 138,606-608,4205-4206
+apps/api/tests/skills.test.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-129
+apps/dashboard/src/components/skills/skill-page-transition.tsx
+  s_2ef98e1ea88d6c::t_f10f1bdd8ff45e 1-5,7-20
+apps/dashboard/src/utils/skill-merge.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-89
+apps/dashboard/vercel.json
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 15-18
+apps/api/src/index.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 63,327
+packages/ai/src/agents/geo-writer.ts
+  s_2ef98e1ea88d6c::t_8923af436ed7af 353-355,361
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 13,23,25-26,351-352,356-360,362-382,387-389,401
+  s_2ef98e1ea88d6c::t_f2928bdeae819b 24
+packages/ai/src/skills/functions/versions.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-23
+apps/dashboard/src/types/skills/merge.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-12
+packages/ai/src/skills/functions/upstream.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-12,14-21,23-29,31-46,70-83,85-95,98-100,102-106,108-111,113-114,117-122,125-130,132-142,145-157,159-162,164-194,197-201,203-204,206-238,244-246,248,250-252,261,263-265,267-268,271-288,294-301,303-305,307-337,341-343,345-349,356,359-361,363-365,367-368,373,375-379,381-384,386
+  s_2ef98e1ea88d6c::t_e37beb5e141800 13,22,30,47-69,84,96-97,101,107,112,115-116,123-124,131,143-144,158,163,195-196,202,205,239-243,247,249,253-260,262,266,269-270,289-293,302,306,338-340,344,350-355,357-358,362,366,369-372,374,380,385
+apps/dashboard/src/components/skills/skill-merge.tsx
+  s_2ef98e1ea88d6c::t_c7d15e2d76663c 18
+  s_2ef98e1ea88d6c::t_f327dcf8822647 57
+  s_2ef98e1ea88d6c::t_4f1fe6089f282d 111-114
+  s_2ef98e1ea88d6c::t_19672fec034b13 3
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-2,4-17,19-56,58-110,115-171
+packages/db/src/schema.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 2032-2059,2071-2075,2085,3250-3253,3256-3261
+apps/dashboard/src/components/skills/skill-update-dialog.tsx
+  s_2ef98e1ea88d6c::t_5d3abe425b2d0b 1-68,73-78,83-175
+  s_2ef98e1ea88d6c::t_39c3d4b314343e 69-72,79-82
+apps/api/src/utils/system-skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-44
+apps/api/src/utils/skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 1-5,50-55,57-79
+  s_2ef98e1ea88d6c::t_fcf536b77cbb4a 56
+packages/db/migrations/0085_system_skill_versions.sql
+  ai_agent 1-16
+apps/dashboard/src/app/(dashboard)/[slug]/skills/skeleton.tsx
+  s_2ef98e1ea88d6c::t_69c3f4c0cced6b 12
+apps/dashboard/src/app/(dashboard)/[slug]/skills/page-client.tsx
+  s_2ef98e1ea88d6c::t_9da59e9bbab354 209
+  s_2ef98e1ea88d6c::t_7b296618ce101e 358
+  s_2ef98e1ea88d6c::t_70b2eeba6c50ac 275-278
+apps/api/src/constants/skills.ts
+  s_2ef98e1ea88d6c::t_b56bf0dd15a36a 5-9
+apps/dashboard/src/app/(dashboard)/[slug]/skills/page.tsx
+  s_2ef98e1ea88d6c::t_86085305ee75db 3-4,13-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "667a478f2c308fde780768ee29f36280932472df",
+  "prompts": {},
+  "sessions": {
+    "s_2ef98e1ea88d6c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1f19aef4-68bf-4dc0-adec-58e26898de14",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
