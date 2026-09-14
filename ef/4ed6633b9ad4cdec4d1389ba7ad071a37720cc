@@ -1,0 +1,103 @@
+packages/geo-core/src/utils/geo-scan-plan.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 20-22,35
+  s_5b3d7a4b8ace21::t_1726004c9c97a7 23-28,30-34
+packages/db/src/types/seed-persona-visibility.ts
+  s_5b3d7a4b8ace21::t_69b133579d1b05 11
+packages/geo-core/src/constants/geo.ts
+  s_5b3d7a4b8ace21::t_597d95b9089896 595
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_5b3d7a4b8ace21::t_d69e4232a026dd 31,74,122,298,313,328-329
+  s_5b3d7a4b8ace21::t_1aa25b33597919 40,236,314-327
+  s_5b3d7a4b8ace21::t_7ddd43946e11af 101-105
+packages/db/src/scripts/seed-persona-visibility.ts
+  s_5b3d7a4b8ace21::t_69b133579d1b05 40,67-70,109-112,152-155,194-197,236-239,463,486,501,514,517,599-601,614
+packages/geo-core/tests/geo-personas.test.ts
+  s_5b3d7a4b8ace21::t_69b133579d1b05 6,82-86,98,133-135
+  s_5b3d7a4b8ace21::t_7ddd43946e11af 17,39-58
+  s_5b3d7a4b8ace21::t_2c9178851f4a03 136
+apps/dashboard/src/components/geo/persona-prompts.tsx
+  s_5b3d7a4b8ace21::t_1aa25b33597919 7-12,34-51,57-60
+  s_5b3d7a4b8ace21::t_d69e4232a026dd 1-6,13-33,52-56
+packages/db/src/schema.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 1569-1572
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_5b3d7a4b8ace21::t_707709d3f05611 1366-1367
+apps/dashboard/src/schemas/persona-generation.ts
+  s_5b3d7a4b8ace21::t_707709d3f05611 9
+packages/geo-core/src/types/geo-conversations.ts
+  s_5b3d7a4b8ace21::t_ee8f1773a476e4 10-13
+packages/geo-core/src/geo/conversation.ts
+  s_5b3d7a4b8ace21::t_ee8f1773a476e4 18
+packages/geo-core/src/constants/geo-personas.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 12
+  s_7bc78803604f16::t_116b84967a25d2 14
+packages/geo-core/src/geo/personas.ts
+  s_5b3d7a4b8ace21::t_619652e2500ed5 34
+  s_5b3d7a4b8ace21::t_85648267536c44 137,377
+  s_5b3d7a4b8ace21::t_707709d3f05611 90-91,308-309,322-328,360-361,428-438,442,456-460,464-466,486-487,567-568,575-576
+  s_5b3d7a4b8ace21::t_4ffc2def3a1f67 496-502
+  s_5b3d7a4b8ace21::t_2d2f152d97cbf0 93-98,117
+packages/geo-core/src/utils/persona-snapshot.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 5,8-11,13-16,19
+  s_5b3d7a4b8ace21::t_619652e2500ed5 3
+packages/geo-core/src/geo/scan.ts
+  s_5b3d7a4b8ace21::t_85648267536c44 1046,1059-1067
+packages/geo-core/src/utils/geo-personas.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 6-7,73-76
+packages/geo-core/src/geo/mappers.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 140
+apps/dashboard/src/lib/hooks/use-geo-personas.ts
+  s_5b3d7a4b8ace21::t_1aa25b33597919 118-130,133-137
+packages/geo-core/src/types/geo-personas.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 28,123
+apps/dashboard/src/types/geo-personas-ui.ts
+  s_5b3d7a4b8ace21::t_d69e4232a026dd 53,62,83-84
+  s_5b3d7a4b8ace21::t_1aa25b33597919 85-87
+apps/dashboard/src/constants/geo-personas.ts
+  s_5b3d7a4b8ace21::t_d69e4232a026dd 20,28-30
+  s_5b3d7a4b8ace21::t_4ffc2def3a1f67 31
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_5b3d7a4b8ace21::t_69b133579d1b05 137
+packages/geo-core/src/geo/persona-scan.ts
+  s_5b3d7a4b8ace21::t_85648267536c44 62,123,136-137,144,148-153,159,161-166,215,272,274-275
+  s_5b3d7a4b8ace21::t_1726004c9c97a7 36
+  s_5b3d7a4b8ace21::t_619652e2500ed5 4,24-27,60-61,326,402-408
+apps/dashboard/src/workflows/steps/persona-generation-steps.ts
+  s_5b3d7a4b8ace21::t_707709d3f05611 31-32
+apps/dashboard/src/types/persona-generation.ts
+  s_5b3d7a4b8ace21::t_707709d3f05611 7,14-18
+packages/geo-core/src/types/geo.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 612-613
+apps/dashboard/src/lib/geo/persona-generation.ts
+  s_5b3d7a4b8ace21::t_707709d3f05611 47-48,57
+packages/db/src/types/geo-personas.ts
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 13-14,26-30,37-44
+packages/geo-core/src/schemas/geo-personas.ts
+  s_5b3d7a4b8ace21::t_707709d3f05611 62
+  s_5b3d7a4b8ace21::t_0e154ba50719a2 8-9,42-44
+  s_5b3d7a4b8ace21::t_1b14f12e35f4d2 58-59,63-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ef4ed6633b9ad4cdec4d1389ba7ad071a37720cc",
+  "prompts": {},
+  "sessions": {
+    "s_5b3d7a4b8ace21": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f6091d61effeoipNlbRt64W5g8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_7bc78803604f16": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f609f86caffe2mrD55yzc1VQVa",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
