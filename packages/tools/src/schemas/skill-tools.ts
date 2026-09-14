@@ -2,7 +2,7 @@ import {
   skillContentSchema,
   skillDescriptionSchema,
   skillNameSchema,
-} from "@notra/schemas/shared/skills";
+} from "@notra/ai/schemas/skills";
 import { z } from "zod";
 
 export const skillNameInputSchema = z.object({

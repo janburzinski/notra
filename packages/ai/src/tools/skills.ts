@@ -1,3 +1,4 @@
+import { createSkillSchema } from "@notra/ai/schemas/skills";
 import { renderSkillToolOutput } from "@notra/ai/skills/functions/guidance";
 import {
   createSkill as createSkillRecord,
@@ -11,13 +12,6 @@ import z from "zod";
 export interface SkillsToolContext {
   organizationId: string;
 }
-
-// Mirrors packages/schemas constants/skills. That package depends on
-// @notra/ai, so it cannot be imported here without a package cycle.
-const SKILL_NAME_REGEX = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
-const SKILL_NAME_MAX_LENGTH = 64;
-const SKILL_DESCRIPTION_MAX_LENGTH = 1000;
-const SKILL_CONTENT_MAX_LENGTH = 200_000;
 
 export function listAvailableSkills(ctx: SkillsToolContext): Tool {
   return tool({
@@ -76,30 +70,16 @@ export function createCreateSkillTool(ctx: SkillsToolContext): Tool {
         "Check listAvailableSkills for duplicates first. The name must be unique, lowercase kebab-case (letters, digits, hyphens only, max 64 chars). Provide a one-sentence description of when the skill applies plus the full skill body as content.",
     }),
     needsApproval: true,
-    inputSchema: z.object({
-      name: z
-        .string()
-        .trim()
-        .min(1)
-        .max(SKILL_NAME_MAX_LENGTH)
-        .regex(
-          SKILL_NAME_REGEX,
-          "Name must be lowercase, start and end with a letter or digit, and contain only letters, digits, and hyphens"
-        )
-        .describe("Unique skill name in lowercase kebab-case."),
-      description: z
-        .string()
-        .trim()
-        .min(1)
-        .max(SKILL_DESCRIPTION_MAX_LENGTH)
-        .describe("One-sentence description of when to apply this skill."),
-      content: z
-        .string()
-        .min(1)
-        .max(SKILL_CONTENT_MAX_LENGTH)
-        .describe(
-          "The full skill body: the reusable writing guidance applied when drafting content."
-        ),
+    inputSchema: createSkillSchema.extend({
+      name: createSkillSchema.shape.name.describe(
+        "Unique skill name in lowercase kebab-case."
+      ),
+      description: createSkillSchema.shape.description.describe(
+        "One-sentence description of when to apply this skill."
+      ),
+      content: createSkillSchema.shape.content.describe(
+        "The full skill body: the reusable writing guidance applied when drafting content."
+      ),
     }),
     execute: async ({ name, description, content }) => {
       const skill = await createSkillRecord(

@@ -95,28 +95,26 @@ export async function createSkill(
   const description = input.description.trim();
   const content = input.content;
 
-  const existing = await db.query.skills.findFirst({
-    where: and(
-      eq(skills.organizationId, ctx.organizationId),
-      eq(skills.name, name)
-    ),
-    columns: { id: true },
-  });
+  const inserted = await db
+    .insert(skills)
+    .values({
+      id: nanoid(),
+      organizationId: ctx.organizationId,
+      name,
+      description,
+      content,
+      isSystem: false,
+    })
+    .onConflictDoNothing({
+      target: [skills.organizationId, skills.name],
+    })
+    .returning({ id: skills.id });
 
-  if (existing) {
+  if (inserted.length === 0) {
     throw new Error(
       `A skill named "${name}" already exists for this organization. Use a different name or update the existing skill instead.`
     );
   }
-
-  await db.insert(skills).values({
-    id: nanoid(),
-    organizationId: ctx.organizationId,
-    name,
-    description,
-    content,
-    isSystem: false,
-  });
 
   return { name, description, content };
 }
