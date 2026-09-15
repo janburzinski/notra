@@ -1,0 +1,9 @@
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  ai_agent 1499
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b69331443a4d5ac15041e700f810c6c5d76d5a78",
+  "prompts": {}
+}
