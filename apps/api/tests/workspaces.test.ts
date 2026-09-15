@@ -3,6 +3,7 @@ import { describe, expect, mock, test } from "bun:test";
 import { getWorkspacesResponseSchema } from "@notra/schemas/api/workspaces";
 import { isUnscopedApiPath } from "@notra/utils/api-scopes";
 
+import { WorkspaceInvitationServiceError } from "../src/errors/workspaces";
 import { workspaceRoutes } from "../src/routes/workspaces";
 import type { AuthData } from "../src/types/auth";
 import { createOpenApiApp } from "../src/utils/openapi-app";
@@ -211,6 +212,30 @@ describe("workspace context", () => {
     expect(JSON.stringify(response)).not.toMatch(
       /must-not-leak|acceptInvitationUrl|member@example.com|workos_org_pending/
     );
+  });
+
+  test("distinguishes invitation-service failures from database failures", async () => {
+    const db = createDb();
+    const auth: AuthData = {
+      type: "oauth",
+      keyId: "oauth:user_test:org_current",
+      userId: "user_test",
+      scopes: [],
+      identity: { externalId: currentWorkspace.id },
+    };
+
+    await expect(
+      getWorkspaceContext(db, auth, currentWorkspace.id, async () => {
+        throw new Error("WorkOS unavailable");
+      })
+    ).rejects.toBeInstanceOf(WorkspaceInvitationServiceError);
+
+    db.query.members.findMany.mockImplementationOnce(async () => {
+      throw new Error("database unavailable");
+    });
+    await expect(
+      getWorkspaceContext(db, auth, currentWorkspace.id)
+    ).rejects.toThrow("database unavailable");
   });
 
   test("is reachable for every valid bearer token without a resource scope", () => {

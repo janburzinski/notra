@@ -4,6 +4,7 @@ import {
   getWorkspacesResponseSchema,
 } from "@notra/schemas/api/workspaces";
 
+import { WorkspaceInvitationServiceError } from "../errors/workspaces";
 import {
   getOrganizationIdFromAuth,
   isIngestAuth,
@@ -75,8 +76,11 @@ workspaceRoutes.openapi(getWorkspacesRoute, async (c) => {
         ? (email) => listPendingWorkspaceInvitations(workosApiKey, email)
         : undefined
     );
-  } catch {
-    return c.json({ error: "Authentication service unavailable" }, 503);
+  } catch (error) {
+    if (error instanceof WorkspaceInvitationServiceError) {
+      return c.json({ error: "Authentication service unavailable" }, 503);
+    }
+    throw error;
   }
   if (!response) {
     return c.json({ error: "Current workspace not found" }, 404);

@@ -2,6 +2,7 @@ import type { createDb } from "@notra/db/drizzle";
 import { members, organizations, users } from "@notra/db/schema";
 import { eq, inArray } from "drizzle-orm";
 
+import { WorkspaceInvitationServiceError } from "../errors/workspaces";
 import type { WorkspaceAuthData } from "../types/auth";
 import { isOAuthAuth } from "../types/auth";
 import type {
@@ -88,7 +89,11 @@ export async function getWorkspaceContext(
       return null;
     }
 
-    const invitations = await loadPendingInvitations(user.email);
+    const invitations = await loadPendingInvitations(user.email).catch(
+      (cause) => {
+        throw new WorkspaceInvitationServiceError(cause);
+      }
+    );
     const activeWorkspaceIds = new Set(
       workspaces.map((workspace) => workspace.id)
     );
