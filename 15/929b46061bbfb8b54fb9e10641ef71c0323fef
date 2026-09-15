@@ -1,0 +1,19 @@
+apps/dashboard/vercel.json
+  s_caf703faa665f0::t_66692f65b6cb24 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "15929b46061bbfb8b54fb9e10641ef71c0323fef",
+  "prompts": {},
+  "sessions": {
+    "s_caf703faa665f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "62bf07a5-328a-4658-8cfe-4c868bcb080f",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
