@@ -1,0 +1,19 @@
+apps/dashboard/tests/proxy-matcher.test.ts
+  s_caf703faa665f0::t_f421419ccf8197 1-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "47e81ecb28d471a2c2877f1c13dcefa93a9a6986",
+  "prompts": {},
+  "sessions": {
+    "s_caf703faa665f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "62bf07a5-328a-4658-8cfe-4c868bcb080f",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
