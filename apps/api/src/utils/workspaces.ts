@@ -51,21 +51,15 @@ export async function getWorkspaceContext(
     };
   }
 
-  const [membershipRows, user] = await Promise.all([
-    db.query.members.findMany({
-      where: eq(members.userId, auth.userId),
-      columns: { role: true },
-      with: {
-        organizations: {
-          columns: { id: true, slug: true, name: true, logo: true },
-        },
+  const membershipRows = await db.query.members.findMany({
+    where: eq(members.userId, auth.userId),
+    columns: { role: true },
+    with: {
+      organizations: {
+        columns: { id: true, slug: true, name: true, logo: true },
       },
-    }),
-    db.query.users.findFirst({
-      where: eq(users.id, auth.userId),
-      columns: { email: true },
-    }),
-  ]);
+    },
+  });
 
   const workspaces = membershipRows.flatMap((membership) => {
     if (!membership.organizations) {
@@ -83,13 +77,17 @@ export async function getWorkspaceContext(
 
   if (!workspaces.some((workspace) => workspace.isCurrent)) {
     workspaces.unshift(toWorkspaceMembership(currentWorkspace, null, true));
-  } else {
-    workspaces.sort(
-      (left, right) => Number(right.isCurrent) - Number(left.isCurrent)
-    );
   }
 
-  if (user && loadPendingInvitations) {
+  if (loadPendingInvitations) {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, auth.userId),
+      columns: { email: true },
+    });
+    if (!user) {
+      return null;
+    }
+
     const invitations = await loadPendingInvitations(user.email);
     const activeWorkspaceIds = new Set(
       workspaces.map((workspace) => workspace.id)

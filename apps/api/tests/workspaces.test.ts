@@ -5,9 +5,7 @@ import { isUnscopedApiPath } from "@notra/utils/api-scopes";
 
 import { workspaceRoutes } from "../src/routes/workspaces";
 import type { AuthData } from "../src/types/auth";
-import { getApiAuthRequirements } from "../src/utils/auth-scopes";
 import { createOpenApiApp } from "../src/utils/openapi-app";
-import { paginateWorkspaces } from "../src/utils/workspace-pagination";
 import { getWorkspaceContext } from "../src/utils/workspaces";
 
 const currentWorkspace = {
@@ -76,6 +74,7 @@ describe("workspace context", () => {
       authentication: { type: "apiKey" },
     });
     expect(db.query.members.findMany).not.toHaveBeenCalled();
+    expect(db.query.users.findFirst).not.toHaveBeenCalled();
   });
 
   test("OAuth users receive all accepted memberships with the current workspace first", async () => {
@@ -121,12 +120,8 @@ describe("workspace context", () => {
         scopes: ["posts.read"],
       },
     });
-    expect(
-      getWorkspacesResponseSchema.safeParse({
-        ...response,
-        pagination: { nextCursor: null },
-      }).success
-    ).toBe(true);
+    expect(getWorkspacesResponseSchema.safeParse(response).success).toBe(true);
+    expect(db.query.users.findFirst).not.toHaveBeenCalled();
   });
 
   test("keeps the token workspace visible while membership sync catches up", async () => {
@@ -220,10 +215,6 @@ describe("workspace context", () => {
 
   test("is reachable for every valid bearer token without a resource scope", () => {
     expect(isUnscopedApiPath("/v1/me/workspaces")).toBe(true);
-    expect(getApiAuthRequirements("/v1/me/workspaces", "GET")).toEqual({
-      legacyPermissions: [],
-    });
-    expect(getApiAuthRequirements("/v1/not-a-route", "GET")).toBeNull();
   });
 
   test("serves the workspace contract through the HTTP route", async () => {
@@ -246,38 +237,35 @@ describe("workspace context", () => {
         },
       ],
       authentication: { type: "apiKey" },
-      pagination: { nextCursor: null },
     });
   });
 
-  test("paginates workspaces with a stable resource cursor", () => {
-    const workspaces = [
-      {
-        ...currentWorkspace,
-        role: "admin",
-        status: "active" as const,
-        isCurrent: true,
-      },
-      {
-        id: "org_second",
-        slug: "second",
-        name: "Second",
-        logo: null,
-        role: "member",
-        status: "active" as const,
-        isCurrent: false,
-      },
-    ];
+  test("does not require WorkOS to return active OAuth workspaces", async () => {
+    const response = await createWorkspaceApp({
+      type: "oauth",
+      keyId: "oauth:user_test:org_current",
+      userId: "user_test",
+      scopes: [],
+      identity: { externalId: currentWorkspace.id },
+    }).request("/me/workspaces");
 
-    expect(paginateWorkspaces(workspaces, 1)).toEqual({
-      workspaces: [workspaces[0]],
-      pagination: { nextCursor: currentWorkspace.id },
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      currentWorkspace,
+      workspaces: [
+        {
+          ...currentWorkspace,
+          role: "owner",
+          status: "active",
+          isCurrent: true,
+        },
+      ],
+      authentication: {
+        type: "oauth",
+        accountId: "user_test",
+        scopes: [],
+      },
     });
-    expect(paginateWorkspaces(workspaces, 1, currentWorkspace.id)).toEqual({
-      workspaces: [workspaces[1]],
-      pagination: { nextCursor: null },
-    });
-    expect(paginateWorkspaces(workspaces, 1, "org_unknown")).toBeNull();
   });
 
   test("rejects public ingest tokens", async () => {
@@ -287,7 +275,7 @@ describe("workspace context", () => {
       scopes: ["feedback.write"],
       projectId: null,
       identity: { externalId: currentWorkspace.id },
-    }).request("/me/workspaces");
+    }).request("/me/workspaces?includePending=true");
 
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({
@@ -302,7 +290,7 @@ describe("workspace context", () => {
       userId: "user_test",
       scopes: [],
       identity: { externalId: currentWorkspace.id },
-    }).request("/me/workspaces");
+    }).request("/me/workspaces?includePending=true");
 
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({

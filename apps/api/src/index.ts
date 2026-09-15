@@ -4,7 +4,14 @@ import { flushLogs } from "@notra/ai/evlog";
 import { createDb } from "@notra/db/drizzle";
 import { shutdownPostHogServer } from "@notra/posthog/server";
 import { publicStatusResponseSchema } from "@notra/schemas/api/status";
-import { API_OPENAPI_TAGS } from "@notra/utils/api-scopes";
+import {
+  API_OPENAPI_TAGS,
+  getRequiredApiScope,
+  isApiMutationMethod,
+  isUnscopedApiPath,
+  LEGACY_API_READ_SCOPE,
+  LEGACY_API_WRITE_SCOPE,
+} from "@notra/utils/api-scopes";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { trimTrailingSlash } from "hono/trailing-slash";
@@ -50,7 +57,6 @@ import {
   SITE_URL,
 } from "./utils/agent-discovery";
 import { trackApiException } from "./utils/analytics";
-import { getApiAuthRequirements } from "./utils/auth-scopes";
 import { assertRequiredEnv } from "./utils/env";
 import { isPublicFeedbackIngestRequest } from "./utils/feedback";
 import { logError } from "./utils/logging";
@@ -167,14 +173,29 @@ app.openapi(publicStatusRoute, (c) => {
 
 const oauthScopeMiddleware = async (c: Context, next: () => Promise<void>) => {
   const pathname = new URL(c.req.url).pathname;
-  const requirements = getApiAuthRequirements(pathname, c.req.method);
-  if (!requirements) {
+  const requiredScope = getRequiredApiScope(pathname, c.req.method);
+  if (!requiredScope && !isUnscopedApiPath(pathname)) {
     // A route that was not registered must never silently become accessible
     // to any valid key. Returning 404 keeps unknown endpoints conventional
     // while making a newly added-but-unregistered operation unreachable.
     return c.json({ error: "Not found" }, 404);
   }
-  return await authMiddleware(requirements)(c, next);
+  if (!requiredScope) {
+    return await authMiddleware({ legacyPermissions: [] })(c, next);
+  }
+
+  // `expandLegacyApiScopes` is the registry's rule: `api.write` implies every
+  // scope, `api.read` only the read scopes. So a read may fall back to either
+  // legacy scope, while a write accepts `api.write` alone — offering
+  // `api.read` on a write would hand read-only keys mutation access.
+  const legacyPermissions = isApiMutationMethod(c.req.method)
+    ? [LEGACY_API_WRITE_SCOPE]
+    : [LEGACY_API_READ_SCOPE, LEGACY_API_WRITE_SCOPE];
+
+  return await authMiddleware({
+    legacyPermissions,
+    permissions: requiredScope,
+  })(c, next);
 };
 
 const unlessPublicFeedbackIngest =
