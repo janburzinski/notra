@@ -626,6 +626,9 @@
   "trustedDependencies": [
     "sharp",
   ],
+  "patchedDependencies": {
+    "evlog@2.28.1": "patches/evlog@2.28.1.patch",
+  },
   "overrides": {
     "brace-expansion@1": {
       ".": "1.1.16",

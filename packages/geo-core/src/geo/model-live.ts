@@ -37,17 +37,27 @@ export const geoModelLive = Layer.succeed(
     answer: Effect.fn("GeoModel.answer")((input) =>
       Effect.tryPromise({
         try: async (signal) => {
-          const result = await generateText({
-            model: gateway(input.engine, {
-              organizationId: input.organizationId,
-              zdr: input.zdr,
-              gateway: input.gateway,
-            }),
+          const model = gateway(input.engine, {
+            organizationId: input.organizationId,
+            zdr: input.zdr,
+            gateway: input.gateway,
+          });
+          const options = {
             prompt: input.prompt,
             instructions: GEO_ANSWER_SYSTEM_PROMPT,
             maxOutputTokens: GEO_ANSWER_MAX_TOKENS,
             abortSignal: signal,
-          });
+          };
+          let result = await generateText({ model, ...options });
+          // Reasoning engines can spend the entire output budget on thought
+          // and return no text at all; retry once at low effort.
+          if (result.finishReason === "length" && !result.text.trim()) {
+            result = await generateText({
+              model,
+              ...options,
+              reasoning: "low",
+            });
+          }
           return {
             text: result.text,
             grounding: extractGrounding(result),
