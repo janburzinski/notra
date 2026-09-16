@@ -290,7 +290,7 @@ export interface GeoPromptResult {
   prompt: string;
   answer: string;
   mentioned: boolean;
-  ownedSourceCited?: boolean;
+  ownedSourceCited: boolean;
   position: number | null;
   sentiment: string | null;
   competitors: string[];
@@ -310,8 +310,7 @@ export interface GeoPromptResultsResponse {
   results: GeoPromptResult[];
 }
 
-export interface GeoPromptResultDetailInput {
-  organizationId: string;
+export interface GeoPromptResultDetailInput extends GeoScopeInput {
   checkId: string;
 }
 
@@ -335,6 +334,15 @@ export type GeoPromptResultSummary = Pick<
 export interface GeoPromptResultSummariesResponse {
   configured: boolean;
   results: GeoPromptResultSummary[];
+  nextCursor?: string | null;
+}
+
+export interface GeoPromptResultSummaryQuery {
+  offset: number;
+  limit: number;
+  engine?: string;
+  mentioned?: boolean;
+  query?: string;
 }
 
 export interface GeoPromptResultDetailResponse {
