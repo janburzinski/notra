@@ -208,7 +208,11 @@ geoDiagnosticsRoutes.openapi(sentimentEvidenceRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
   const query = c.req.valid("query");
-  const cursor = decodeGeoSentimentCursor(query.cursor);
+  const cursorSecret = c.env.INTEGRATION_ENCRYPTION_KEY;
+  if (!cursorSecret) {
+    return c.json({ error: "Sentiment evidence pagination unavailable" }, 503);
+  }
+  const cursor = decodeGeoSentimentCursor(query.cursor, cursorSecret);
   const expectedScope = JSON.stringify([
     base.organizationId,
     projectId,
@@ -247,7 +251,8 @@ geoDiagnosticsRoutes.openapi(sentimentEvidenceRoute, async (c) => {
       items: outcome.value.items,
       nextCursor: encodeGeoSentimentCursor(
         outcome.value.nextCursor,
-        evidenceWindow
+        evidenceWindow,
+        cursorSecret
       ),
     }),
     200
