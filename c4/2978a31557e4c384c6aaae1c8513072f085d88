@@ -1,0 +1,22 @@
+packages/geo-core/src/geo/personas.ts
+  s_60ac843e79c2e2::t_ffb0d604ba12a7 399-406,411,428-434
+packages/geo-core/tests/persona-scan.test.ts
+  s_60ac843e79c2e2::t_7a3383b64dd78a 443,445,465,468-470
+  s_60ac843e79c2e2::t_6981f1e96f46ca 303-366
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c42978a31557e4c384c6aaae1c8513072f085d88",
+  "prompts": {},
+  "sessions": {
+    "s_60ac843e79c2e2": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0a910-8e28-7fee-b3e5-e394e4c55d46",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
