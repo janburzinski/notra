@@ -1,0 +1,189 @@
+apps/dashboard/src/lib/hooks/use-geo-personas.ts
+  s_96f108afae6829::t_ffa3cdf709365d 147-148,168-188,191
+apps/api/src/routes/posts.ts
+  s_96f108afae6829::t_ffa3cdf709365d 6-7,22,179-219,478-524
+apps/dashboard/src/components/geo/geo-remove-dialog.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 48-51,62,75,77-79
+apps/dashboard/src/constants/content-formats.ts
+  s_96f108afae6829::t_ffa3cdf709365d 4,56-64
+package.json
+  s_96f108afae6829::t_ffa3cdf709365d 44,61-64
+packages/schemas/src/schemas/api/geo-visibility.ts
+  s_96f108afae6829::t_ffa3cdf709365d 97-147
+packages/ui/src/components/ui/button.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 7
+apps/dashboard/src/components/geo/persona-profile-editor.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 7,16-19,30-37,80-86,93-98,105,312,317-318
+apps/api/src/programs/posts.ts
+  s_96f108afae6829::t_ffa3cdf709365d 35-36,305-395
+apps/dashboard/src/components/automation/schedules/create-schedule-dialog.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 101,197,200
+packages/geo-core/src/schemas/geo-personas.ts
+  s_96f108afae6829::t_ffa3cdf709365d 112-115
+packages/schemas/src/schemas/api/geo-diagnostics.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-183
+packages/schemas/src/schemas/dashboard/content.ts
+  s_96f108afae6829::t_ffa3cdf709365d 19,330,347-349
+apps/dashboard/src/types/geo-personas-ui.ts
+  s_96f108afae6829::t_ffa3cdf709365d 39-40,49,53
+apps/dashboard/src/types/geo-personas.ts
+  s_96f108afae6829::t_ffa3cdf709365d 5-12
+apps/dashboard/src/types/geo.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1247-1250
+packages/schemas/src/schemas/api/geo-shelf.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-18
+patches/evlog@2.28.1.patch
+  s_96f108afae6829::t_ffa3cdf709365d 1-23
+packages/db/migrations/meta/0092_snapshot.json
+  ai_agent 2,5807-5811
+apps/dashboard/src/utils/form-field-error.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-15
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_96f108afae6829::t_ffa3cdf709365d 61,196,1471,1477-1491
+packages/posthog/src/events.ts
+  s_96f108afae6829::t_ffa3cdf709365d 72-73
+packages/geo-core/src/utils/sentiment-analysis.ts
+  s_96f108afae6829::t_ffa3cdf709365d 35,37,44,46-49,51-78,80,82-84,92
+packages/db/src/utils/geo-persona-checks.ts
+  s_96f108afae6829::t_ffa3cdf709365d 131,135,137-139,151,156-157
+packages/geo-core/scripts/bench-sentiment-models.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-185
+apps/dashboard/src/components/content/create-post-dialog.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 1-300
+apps/dashboard/src/app/(dashboard)/[slug]/geo/personas/page-client.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 143-144,157,195-196,219,222
+apps/api/src/routes/geo-diagnostics.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-260
+packages/geo-core/src/utils/geo-personas.ts
+  s_96f108afae6829::t_ffa3cdf709365d 14-15,27-58
+packages/db/src/scripts/seed-persona-visibility.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1,422-423
+packages/schemas/src/schemas/api/content.ts
+  s_96f108afae6829::t_ffa3cdf709365d 23,441-459
+packages/geo-core/src/geo/sentiment-analysis-cache.ts
+  s_96f108afae6829::t_ffa3cdf709365d 15,87-119,122-127,132-134
+packages/geo-core/tests/persona-scan.test.ts
+  s_96f108afae6829::t_ffa3cdf709365d 13-19,23,44-52,86-366,443,445,465,468-470,513-514,522-524
+packages/ai/src/evlog.ts
+  s_96f108afae6829::t_ffa3cdf709365d 35-37
+apps/dashboard/src/types/content/create-post.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-41
+apps/dashboard/src/lib/hooks/use-create-post.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-35
+packages/utils/src/api-scopes.ts
+  s_96f108afae6829::t_ffa3cdf709365d 215-220,222-223
+apps/dashboard/src/constants/geo-personas.ts
+  s_96f108afae6829::t_ffa3cdf709365d 28,30
+packages/geo-core/src/types/geo.ts
+  s_96f108afae6829::t_ffa3cdf709365d 313,337-345
+packages/db/migrations/meta/_journal.json
+  ai_agent 652-660
+packages/geo-core/tests/token-usage.test.ts
+  s_96f108afae6829::t_ffa3cdf709365d 10,15-53
+apps/dashboard/src/app/(dashboard)/[slug]/content/page-client.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 10,76-79
+apps/dashboard/src/app/(dashboard)/[slug]/page-client.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 141
+packages/ai/tests/github-poll.test.ts
+  s_96f108afae6829::t_ffa3cdf709365d 37-45
+apps/dashboard/src/components/geo/persona-table-actions.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 4-5,12,34-35,37-71,98,108,112,124,128,130-141,174-175
+packages/schemas/src/constants/content.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-6
+bun.lock
+  ai_agent 21,629-631,2370,2372,2374,2376,2378,2380,5182
+apps/api/src/routes/geo-visibility.ts
+  s_96f108afae6829::t_ffa3cdf709365d 10-13,19-20,25-26,122-168,301-360
+apps/dashboard/src/components/content/lazy-create-content-dialog.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 7,9,16-19,21-22,26,28,30,41,46,48,52-53,56-57,69-74
+apps/dashboard/src/components/geo/personas-table.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 3-6,12,40,45,61,63-67,71,100-104,111-119,121-127,147-148,157-162,186-193,208-209,213,215,221-222,227,229-230,249-250,264,269,284,287,316-318,336-337
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_96f108afae6829::t_ffa3cdf709365d 46
+apps/dashboard/src/types/automation/schedule.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-5,21,51-72
+packages/geo-core/tests/sentiment-analysis.test.ts
+  s_96f108afae6829::t_ffa3cdf709365d 227,247-295,321-322,500-520
+apps/api/src/routes/geo-shelf.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-63
+packages/db/src/utils/geo-checks.ts
+  s_96f108afae6829::t_ffa3cdf709365d 7,34,550-551,559-560,570-571,600,603-613,615-617
+packages/geo-core/src/geo/scan.ts
+  s_96f108afae6829::t_ffa3cdf709365d 25,1063-1064
+apps/dashboard/src/components/automation/schedules/schedule-quick-start.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 1-33
+packages/schemas/src/schemas/shared/post.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-29
+apps/dashboard/src/app/(dashboard)/[slug]/automation/schedules/page-client.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 53,68,127-129,395,416,480-485
+apps/dashboard/src/constants/schedule-presets.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-64
+packages/geo-core/src/types/geo-personas.ts
+  s_96f108afae6829::t_ffa3cdf709365d 46,74,76
+packages/db/migrations/meta/0093_snapshot.json
+  ai_agent 1-11883
+apps/api/src/types/posts.ts
+  s_96f108afae6829::t_ffa3cdf709365d 5,85-90
+packages/db/src/schema.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1579
+turbo.json
+  s_96f108afae6829::t_ffa3cdf709365d 2
+apps/dashboard/src/utils/persona-activity.ts
+  s_96f108afae6829::t_ffa3cdf709365d 10,13-59,64,68-71,78-85,90,95,97-100,104-105,110,121,123,128,133-141,151-152,154-156,160-163
+apps/dashboard/src/utils/manual-post-content-type.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-9
+apps/api/src/utils/geo-diagnostic-cursor.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-78
+packages/geo-core/src/geo/persona-scan.ts
+  s_96f108afae6829::t_ffa3cdf709365d 7,93-94,171-172
+apps/dashboard/src/components/geo/persona-activity-card.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 27,44-47,49-57,59-68,101-108,165,167-171,173,178-198
+packages/ai/src/utils/log-flush-scheduler.ts
+  s_96f108afae6829::t_ffa3cdf709365d 15-16,18-33
+packages/geo-core/src/constants/sentiment-analysis.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-2
+packages/geo-core/src/geo/personas.ts
+  s_96f108afae6829::t_ffa3cdf709365d 22-31,63-66,83-84,88-96,134,153-154,359-360,398-406,411,428-434,584-615,620-622,629-630,641,649-650,652-653,658-659,670-739,820-829
+packages/geo-core/src/geo/prompt-results.ts
+  s_96f108afae6829::t_ffa3cdf709365d 12,25-29,32-36,38,41-45,53
+packages/geo-core/src/geo/sentiment-analysis-agent.ts
+  s_96f108afae6829::t_ffa3cdf709365d 5,25-26
+packages/db/migrations/0092_famous_titania.sql
+  ai_agent 1
+packages/db/src/types/geo-checks.ts
+  s_96f108afae6829::t_ffa3cdf709365d 126-133
+packages/geo-core/src/geo/sentiment-analysis.ts
+  s_96f108afae6829::t_ffa3cdf709365d 134-193
+packages/geo-core/src/geo/mappers.ts
+  s_96f108afae6829::t_ffa3cdf709365d 142
+apps/api/src/index.ts
+  s_96f108afae6829::t_ffa3cdf709365d 36,42,292-293
+apps/dashboard/src/components/content/create-content-button-group.tsx
+  s_96f108afae6829::t_ffa3cdf709365d 1-63
+packages/geo-core/src/geo/shelf.ts
+  s_96f108afae6829::t_ffa3cdf709365d 1-50
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_96f108afae6829::t_ffa3cdf709365d 58,670-754
+apps/dashboard/src/utils/schedule-form.ts
+  s_96f108afae6829::t_ffa3cdf709365d 2,7,11-12,49-50,72,75,77,79,85-102
+packages/geo-core/src/utils/token-usage.ts
+  s_96f108afae6829::t_ffa3cdf709365d 3,17-59
+packages/geo-core/src/geo/model-live.ts
+  s_96f108afae6829::t_ffa3cdf709365d 28,41-46,51-64,70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "64b0dcf5c4800e20b2880ed8f196156e2963a980",
+  "prompts": {},
+  "sessions": {
+    "s_96f108afae6829": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0aa82-e9c9-7263-8fad-126a91e243a2",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
