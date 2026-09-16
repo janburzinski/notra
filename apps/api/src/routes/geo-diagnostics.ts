@@ -9,6 +9,7 @@ import {
 } from "@notra/geo-core/geo/sentiment";
 import { loadStoredGeoSentimentAnalysis } from "@notra/geo-core/geo/sentiment-analysis";
 import { geoWindow } from "@notra/geo-core/geo/window";
+import { sentimentPeriods } from "@notra/geo-core/utils/sentiment-period";
 import {
   geoChangesResponseSchema,
   geoPromptHistoryParamsSchema,
@@ -221,6 +222,9 @@ geoDiagnosticsRoutes.openapi(sentimentEvidenceRoute, async (c) => {
       400
     );
   }
+  const evidenceWindow = cursor
+    ? { from: cursor.from, to: cursor.to }
+    : sentimentPeriods(geoWindow(query)).current;
   const outcome = await runGeoEffect(
     "sentimentEvidence",
     loadGeoSentimentEvidence(
@@ -232,7 +236,7 @@ geoDiagnosticsRoutes.openapi(sentimentEvidenceRoute, async (c) => {
         from: query.from,
         to: query.to,
       },
-      geoWindow(query)
+      evidenceWindow
     )
   );
   if (!outcome.ok) {
@@ -241,7 +245,10 @@ geoDiagnosticsRoutes.openapi(sentimentEvidenceRoute, async (c) => {
   return c.json(
     attachGeoOrganization(base.organization, {
       items: outcome.value.items,
-      nextCursor: encodeGeoSentimentCursor(outcome.value.nextCursor),
+      nextCursor: encodeGeoSentimentCursor(
+        outcome.value.nextCursor,
+        evidenceWindow
+      ),
     }),
     200
   );

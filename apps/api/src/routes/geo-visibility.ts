@@ -308,7 +308,7 @@ geoVisibilityRoutes.openapi(promptResultSummariesRoute, async (c) => {
       { organizationId: base.organizationId, projectId },
       geoWindow(query),
       {
-        offset: Number.parseInt(query.cursor ?? "0", 10),
+        offset: query.cursor ?? 0,
         limit: query.limit,
         engine: query.engine,
         mentioned: query.mentioned,

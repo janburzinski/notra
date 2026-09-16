@@ -109,7 +109,7 @@ const promptResultSummarySchema = promptResultSchema
   .extend({ checkId: z.string() });
 
 export const promptResultSummaryQuerySchema = geoWindowQuerySchema.extend({
-  cursor: z.string().regex(/^\d+$/).optional(),
+  cursor: z.coerce.number().int().min(0).max(100_000).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   engine: z.string().trim().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
   mentioned: z
