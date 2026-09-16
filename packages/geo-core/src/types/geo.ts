@@ -290,7 +290,7 @@ export interface GeoPromptResult {
   prompt: string;
   answer: string;
   mentioned: boolean;
-  ownedSourceCited: boolean;
+  ownedSourceCited?: boolean;
   position: number | null;
   sentiment: string | null;
   competitors: string[];

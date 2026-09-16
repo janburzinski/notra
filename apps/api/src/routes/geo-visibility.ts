@@ -323,7 +323,10 @@ geoVisibilityRoutes.openapi(promptResultSummariesRoute, async (c) => {
   return c.json(
     attachGeoOrganization(base.organization, {
       configured: outcome.value.configured,
-      results: outcome.value.results,
+      results: outcome.value.results.map((result) => ({
+        ...result,
+        ownedSourceCited: result.ownedSourceCited ?? false,
+      })),
       nextCursor: outcome.value.nextCursor ?? null,
     }),
     200
@@ -349,7 +352,12 @@ geoVisibilityRoutes.openapi(promptResultDetailRoute, async (c) => {
   }
 
   return c.json(
-    attachGeoOrganization(base.organization, { result: outcome.value.result }),
+    attachGeoOrganization(base.organization, {
+      result: {
+        ...outcome.value.result,
+        ownedSourceCited: outcome.value.result.ownedSourceCited ?? false,
+      },
+    }),
     200
   );
 });
