@@ -187,9 +187,7 @@ export function useGeoOverviewPage(
         // callbacks never run if this page unmounts first, the promise does.
         void (async () => {
           try {
-            await startScan.mutateAsync(
-              engines ? { engines } : undefined
-            );
+            await startScan.mutateAsync(engines ? { engines } : undefined);
             toast.success(
               "Scan started. It runs in the background. You can leave this page."
             );
