@@ -136,9 +136,7 @@ export function purgeGeoProjectData(
     for (const datasource of GEO_DATASOURCES) {
       yield* deleteFromDatasource(datasource, condition);
     }
-    yield* Effect.tryPromise(() =>
-      bumpAnalyticsVersions("geo", [input.organizationId])
-    );
+    // No cache bump: the geo scope is TTL-cached (seconds), not versioned.
   });
   return Effect.runPromise(program);
 }

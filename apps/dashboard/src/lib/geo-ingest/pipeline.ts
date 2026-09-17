@@ -1,12 +1,12 @@
+import { flushGeoLog, geoLog } from "@notra/ai/evlog";
+import type { GeoLogEvent } from "@notra/ai/types/evlog";
 import { ingestGeoTrafficEvents } from "@notra/analytics/tinybird/client";
 import type { GeoTrafficEventRow } from "@notra/analytics/tinybird/datasources";
 import { GEO_INGEST_BEARER_PREFIX } from "@notra/geo-core/constants/geo";
 import { verifyGeoIngestToken } from "@notra/geo-core/geo/ingest";
 import { geoRequestPayloadSchema } from "@notra/geo-core/schemas/geo";
-import type { GeoIngestIdentity } from "@notra/geo-core/types/geo";
 import { isTrackedGeoVisitorType } from "@notra/geo-core/utils/ai-traffic";
 import { acceptsIngestHost } from "@notra/geo-core/utils/geo-project-domains";
-import type { GeoRequestPayload } from "@usenotra/geo";
 import { Effect } from "effect";
 import { after, type NextRequest } from "next/server";
 
@@ -25,6 +25,15 @@ import { loadIngestAllowedHosts } from "@/lib/geo-ingest/hosts";
 import { isGeoIngestIdentityActive } from "@/lib/geo-ingest/identity";
 import { resolveJourneyId } from "@/lib/geo-ingest/journey";
 import { ratelimit } from "@/utils/ratelimit";
+
+// Dropped (human/unknown) traffic outnumbers stored events by an order of
+// magnitude; log a sample so drop reasons stay visible without paying for a
+// log line per page view.
+const DROPPED_LOG_SAMPLE_RATE = 0.05;
+
+function emitIngestLog(fields: Omit<GeoLogEvent, "event">) {
+  geoLog.info({ event: "geo.ingest", ...fields });
+}
 
 const readBearerIdentity = Effect.fn("geoIngest.readBearerIdentity")(function* (
   request: NextRequest
@@ -80,45 +89,6 @@ const parseUrl = Effect.fn("geoIngest.parseUrl")(function* (value: string) {
   });
 });
 
-const buildEvent = Effect.fn("geoIngest.buildEvent")(function* (
-  identity: GeoIngestIdentity,
-  payload: GeoRequestPayload,
-  allowedHosts: string[] | null
-) {
-  const url = yield* parseUrl(payload.url);
-  if (!acceptsIngestHost(url.hostname, allowedHosts)) {
-    return null;
-  }
-  const classification = classifyVisitor({
-    userAgent: payload.userAgent,
-    referer: payload.referer,
-    accept: payload.accept,
-    signals: payload.signals,
-  });
-  if (!isTrackedGeoVisitorType(classification.visitorType)) {
-    return null;
-  }
-  const capturedAt = toCapturedDate(payload.timestamp);
-  const journey = resolveJourneyId({
-    url,
-    source: classification.source,
-    ip: payload.ip,
-    capturedAt,
-    visitorType: classification.visitorType,
-    category: classification.category,
-  });
-
-  return buildGeoTrafficEvent({
-    organizationId: identity.organizationId,
-    projectId: identity.projectId,
-    payload,
-    url,
-    capturedAt,
-    classification,
-    journey,
-  });
-});
-
 const ingestEvent = Effect.fn("geoIngest.ingest")(function* (
   event: GeoTrafficEventRow
 ) {
@@ -132,11 +102,34 @@ export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
   request: NextRequest
 ) {
   const identity = yield* readBearerIdentity(request);
-  // Independent round trips; the token check still wins over a bad payload.
-  const [active, payload, allowedHosts] = yield* Effect.all(
+  const payload = yield* readPayload(request);
+  const url = yield* parseUrl(payload.url);
+  // Classification is pure CPU on the payload. Run it before any Redis/DB
+  // round trip so the ~95% of requests that are not AI traffic cost nothing.
+  const classification = classifyVisitor({
+    userAgent: payload.userAgent,
+    referer: payload.referer,
+    accept: payload.accept,
+    signals: payload.signals,
+  });
+  if (!isTrackedGeoVisitorType(classification.visitorType)) {
+    yield* Effect.sync(() => {
+      if (Math.random() < DROPPED_LOG_SAMPLE_RATE) {
+        emitIngestLog({
+          outcome: "dropped",
+          reason: "visitor_type",
+          visitorType: classification.visitorType,
+          organizationId: identity.organizationId,
+          projectId: identity.projectId ?? "",
+        });
+      }
+    });
+    return;
+  }
+
+  const [active, allowedHosts] = yield* Effect.all(
     [
       Effect.promise(() => isGeoIngestIdentityActive(identity)),
-      Effect.result(readPayload(request)),
       Effect.promise(() => loadIngestAllowedHosts(identity)),
     ],
     { concurrency: "unbounded" }
@@ -144,15 +137,52 @@ export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
   if (!active) {
     return yield* Effect.fail(new GeoIngestInvalidTokenError({}));
   }
-  if (payload._tag === "Failure") {
-    return yield* Effect.fail(payload.failure);
-  }
-  const event = yield* buildEvent(identity, payload.success, allowedHosts);
-  if (!event) {
+  if (!acceptsIngestHost(url.hostname, allowedHosts)) {
+    yield* Effect.sync(() =>
+      emitIngestLog({
+        outcome: "dropped",
+        reason: "host",
+        host: url.hostname,
+        organizationId: identity.organizationId,
+        projectId: identity.projectId ?? "",
+      })
+    );
     return;
   }
+
+  const capturedAt = toCapturedDate(payload.timestamp);
+  const journey = resolveJourneyId({
+    url,
+    source: classification.source,
+    ip: payload.ip,
+    capturedAt,
+    visitorType: classification.visitorType,
+    category: classification.category,
+  });
+  const event = buildGeoTrafficEvent({
+    organizationId: identity.organizationId,
+    projectId: identity.projectId,
+    payload,
+    url,
+    capturedAt,
+    classification,
+    journey,
+  });
+
   yield* enforceRateLimit(identity.organizationId);
+  const ingestStartedAt = Date.now();
   yield* ingestEvent(event);
+  const ingestMs = Date.now() - ingestStartedAt;
+  yield* Effect.sync(() =>
+    emitIngestLog({
+      outcome: "ingested",
+      visitorType: classification.visitorType,
+      source: classification.source,
+      ingestMs,
+      organizationId: identity.organizationId,
+      projectId: identity.projectId ?? "",
+    })
+  );
   // Analytics must not hold the 202 open for the site that sent the event.
   yield* Effect.sync(() =>
     after(async () => {
@@ -165,6 +195,7 @@ export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
           projectId: identity.projectId,
         });
       }
+      await flushGeoLog().catch(() => null);
     })
   );
 });

@@ -6,9 +6,11 @@ import {
   EXTERNAL_CACHE_TTL_SECONDS,
   GLOBAL_SCOPE_ID,
   INITIAL_CACHE_VERSION,
+  LIVE_QUERY_CACHE_TTL_SECONDS,
   QUERY_CACHE_KEY_PREFIX,
   QUERY_CACHE_TTL_SECONDS,
   VERSION_KEY_PREFIX,
+  VERSIONED_CACHE_SCOPES,
 } from "../constants/cache";
 import type { AnalyticsCacheScope, CachedQueryOptions } from "../types/cache";
 import { getAnalyticsRedis } from "./redis";
@@ -55,13 +57,14 @@ export function cachedQuery<TResult>(
   if (!redis) {
     return options.fetch();
   }
+  const versioned = VERSIONED_CACHE_SCOPES.has(options.scope);
   const program = Effect.gen(function* () {
-    const version = yield* readVersion(
-      redis,
-      options.scope,
-      options.organizationId
-    );
-    const key = `${QUERY_CACHE_KEY_PREFIX}:${options.scope}:${version}:${options.pipe}:${stableParams(options.params)}`;
+    // Live (unversioned) scopes read a single key; versioned scopes pay one
+    // extra round trip for the version so ingest can invalidate on demand.
+    const version = versioned
+      ? yield* readVersion(redis, options.scope, options.organizationId)
+      : null;
+    const key = `${QUERY_CACHE_KEY_PREFIX}:${options.scope}:${version ?? "live"}:${options.pipe}:${stableParams(options.params)}`;
     const hit = yield* Effect.tryPromise(() => redis.get<TResult>(key)).pipe(
       Effect.orElseSucceed(() => null)
     );
@@ -71,7 +74,11 @@ export function cachedQuery<TResult>(
     const fresh = yield* Effect.tryPromise(() => options.fetch());
     if (fresh !== null) {
       yield* Effect.tryPromise(() =>
-        redis.set(key, toJsonSafe(fresh), { ex: QUERY_CACHE_TTL_SECONDS })
+        redis.set(key, toJsonSafe(fresh), {
+          ex: versioned
+            ? QUERY_CACHE_TTL_SECONDS
+            : LIVE_QUERY_CACHE_TTL_SECONDS,
+        })
       ).pipe(Effect.ignore);
     }
     return fresh;
@@ -85,7 +92,7 @@ export function bumpAnalyticsVersions(
 ): Promise<void> {
   const redis = getAnalyticsRedis();
   const keys = [...new Set(organizationIds.map((id) => versionKey(scope, id)))];
-  if (!redis || keys.length === 0) {
+  if (!redis || keys.length === 0 || !VERSIONED_CACHE_SCOPES.has(scope)) {
     return Promise.resolve();
   }
   const program = Effect.tryPromise(() => {
