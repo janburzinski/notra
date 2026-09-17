@@ -1,0 +1,20 @@
+apps/web/src/components/navbar.tsx
+  ai_agent 562
+  s_f18de9a04242c6::t_cdec16e0d4535b 184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ffb06f68876d88dc482072d4e28e8654dd61b632",
+  "prompts": {},
+  "sessions": {
+    "s_f18de9a04242c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "df56ede8-f316-461b-918a-4921d954c4f6",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
