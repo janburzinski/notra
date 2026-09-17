@@ -8,6 +8,8 @@ import {
 } from "@tinybirdco/sdk";
 
 import {
+  GEO_CAPTURED_CURRENT_CONDITION,
+  GEO_CAPTURED_PREVIOUS_CONDITION,
   GEO_CAPTURED_WINDOW_SQL,
   GEO_DAY_COMPARISON_WINDOW_SQL,
   GEO_DAY_CURRENT_CONDITION,
@@ -88,7 +90,7 @@ export const geoTrafficPagesByHostDailyBackfill = defineCopyPipe(
   "geo_traffic_pages_by_host_daily_backfill",
   {
     description:
-      "On-demand replace of geo_traffic_pages_by_host_daily from geo_traffic_events. Run once after the initial deploy to backfill history the MV missed.",
+      "On-demand replace of geo_traffic_pages_by_host_daily from geo_traffic_events. Run once after deploy, before switching geo_traffic_pages off the raw event table.",
     datasource: geoTrafficPagesByHostDaily,
     copy_mode: "replace",
     copy_schedule: "@on-demand",
@@ -203,22 +205,25 @@ export const geoTrafficPages = defineEndpoint("geo_traffic_pages", {
   nodes: [
     node({
       name: "top_pages",
+      // Reads the raw event table on purpose: the by-host rollup would
+      // require a one-time backfill to serve full history, and the 30s
+      // query cache bounds the raw scan cost.
       sql: `
         SELECT
           host,
           path,
           source,
           visitor_type,
-          countMergeIf(visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS visits,
-          countMergeIf(visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_visits,
-          maxMergeIf(last_seen_state, (${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at
-        FROM geo_traffic_pages_by_host_daily
+          countIf(${GEO_CAPTURED_CURRENT_CONDITION}) AS visits,
+          countIf(${GEO_CAPTURED_PREVIOUS_CONDITION}) AS previous_visits,
+          maxIf(captured_at, (${GEO_CAPTURED_CURRENT_CONDITION})) AS last_seen_at
+        FROM geo_traffic_events
         WHERE organization_id = {{String(organization_id)}}
           ${GEO_PROJECT_SCOPE_SQL}
           ${GEO_EXCLUDED_SOURCES_SQL}
           AND visitor_type IN ('crawler', 'ai_referral')
           AND ({{String(visitor, '')}} = '' OR visitor_type = {{String(visitor, '')}})
-          ${GEO_DAY_COMPARISON_WINDOW_SQL}
+          AND ((${GEO_CAPTURED_CURRENT_CONDITION}) OR (${GEO_CAPTURED_PREVIOUS_CONDITION}))
           ${GEO_HOST_FILTER_SQL}
         GROUP BY host, path, source, visitor_type
         HAVING visits > 0

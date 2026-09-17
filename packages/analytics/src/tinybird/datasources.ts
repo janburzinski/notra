@@ -268,7 +268,7 @@ export const geoTrafficPagesByHostDaily = defineDatasource(
   "geo_traffic_pages_by_host_daily",
   {
     description:
-      "Daily rollup of geo_traffic_events per organization, visitor type, source, host and path; read with countMerge/maxMerge",
+      "Daily rollup of geo_traffic_events per organization, visitor type, source, host and path; read with countMerge/maxMerge. Populate with geo_traffic_pages_by_host_daily_backfill before switching readers off geo_traffic_events.",
     schema: {
       day: t.date(),
       organization_id: t.string(),
