@@ -4,6 +4,7 @@
 @import "./cta-button.css";
 @import "./motion.css";
 @import "./opencode.css";
+@import "./skeleton-shimmer.css";
 @import "./status.css";
 @import "./text-shimmer.css";
 
@@ -204,19 +205,6 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
-}
-
-@theme {
-  --animate-skeleton-shimmer: skeleton-shimmer 1.8s ease-in-out infinite;
-
-  @keyframes skeleton-shimmer {
-    from {
-      transform: translateX(-100%);
-    }
-    to {
-      transform: translateX(100%);
-    }
-  }
 }
 
 @layer base {
