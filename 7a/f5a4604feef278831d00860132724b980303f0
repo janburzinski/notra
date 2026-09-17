@@ -1,0 +1,21 @@
+packages/geo-core/tests/auto-prompts.test.ts
+  s_144501959684d3::t_c7899b8449e283 141-160
+packages/geo-core/src/geo/prompts.ts
+  s_144501959684d3::t_2486011f85cdc0 179-185,189,228-240,243-246,249,336-338
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7af5a4604feef278831d00860132724b980303f0",
+  "prompts": {},
+  "sessions": {
+    "s_144501959684d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06e9c3a8-7daf-4ed9-957f-b92292ea1e3d",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
