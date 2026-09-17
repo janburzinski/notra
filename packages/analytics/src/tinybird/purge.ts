@@ -1,6 +1,9 @@
 import { Effect } from "effect";
 
-import { bumpAnalyticsVersions } from "../cache/query-cache";
+import {
+  bumpAnalyticsVersions,
+  evictAnalyticsQueries,
+} from "../cache/query-cache";
 import type {
   PurgeGeoProjectInput,
   PurgeSocialAccountInput,
@@ -136,7 +139,11 @@ export function purgeGeoProjectData(
     for (const datasource of GEO_DATASOURCES) {
       yield* deleteFromDatasource(datasource, condition);
     }
-    // No cache bump: the geo scope is TTL-cached (seconds), not versioned.
+    // The geo scope is TTL-cached without a version to bump, so deleted
+    // rows would stay readable until entries expire; evict them directly.
+    yield* Effect.promise(() =>
+      evictAnalyticsQueries("geo", input.organizationId)
+    );
   });
   return Effect.runPromise(program);
 }

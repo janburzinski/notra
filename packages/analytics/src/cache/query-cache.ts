@@ -64,7 +64,8 @@ export function cachedQuery<TResult>(
     const version = versioned
       ? yield* readVersion(redis, options.scope, options.organizationId)
       : null;
-    const key = `${QUERY_CACHE_KEY_PREFIX}:${options.scope}:${version ?? "live"}:${options.pipe}:${stableParams(options.params)}`;
+    // The org segment lets purges evict live (unversioned) keys by scan.
+    const key = `${QUERY_CACHE_KEY_PREFIX}:${options.scope}:${version ?? "live"}:${options.organizationId ?? GLOBAL_SCOPE_ID}:${options.pipe}:${stableParams(options.params)}`;
     const hit = yield* Effect.tryPromise(() => redis.get<TResult>(key)).pipe(
       Effect.orElseSucceed(() => null)
     );
@@ -101,6 +102,34 @@ export function bumpAnalyticsVersions(
       pipeline.incr(key);
     }
     return pipeline.exec();
+  }).pipe(Effect.ignore);
+  return Effect.runPromise(program);
+}
+
+// Live scopes carry no version to bump, so data purges delete the org's
+// cached query entries directly. Errors are swallowed: a lingering entry
+// expires within LIVE_QUERY_CACHE_TTL_SECONDS anyway.
+export function evictAnalyticsQueries(
+  scope: AnalyticsCacheScope,
+  organizationId: string | null
+): Promise<void> {
+  const redis = getAnalyticsRedis();
+  if (!redis) {
+    return Promise.resolve();
+  }
+  const pattern = `${QUERY_CACHE_KEY_PREFIX}:${scope}:*:${organizationId ?? GLOBAL_SCOPE_ID}:*`;
+  const program = Effect.tryPromise(async () => {
+    let cursor = 0;
+    do {
+      const [nextCursor, keys] = await redis.scan(cursor, {
+        match: pattern,
+        count: 200,
+      });
+      cursor = Number(nextCursor);
+      if (keys.length > 0) {
+        await redis.del(...keys);
+      }
+    } while (cursor !== 0);
   }).pipe(Effect.ignore);
   return Effect.runPromise(program);
 }
