@@ -183,12 +183,20 @@ export function useGeoOverviewPage(
       open: preflightOpen,
       onOpenChange: setPreflightOpen,
       onConfirm: (engines) => {
-        startScan.mutate(engines ? { engines } : undefined, {
-          onSuccess: () =>
+        // Await the promise instead of passing onSuccess to mutate: observer
+        // callbacks never run if this page unmounts first, the promise does.
+        void (async () => {
+          try {
+            await startScan.mutateAsync(
+              engines ? { engines } : undefined
+            );
             toast.success(
               "Scan started. It runs in the background. You can leave this page."
-            ),
-        });
+            );
+          } catch {
+            // The mutation reports the error itself.
+          }
+        })();
         setPreflightOpen(false);
       },
       isPending: startScan.isPending,
