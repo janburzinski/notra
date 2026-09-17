@@ -1,4 +1,5 @@
 export const CODE_MODE_TOOL_NAME = "code_mode";
+export const CODE_MODE_SEARCH_TOOL_NAME = "searchTools";
 export const CODE_MODE_TIMEOUT_MS = 120_000;
 
 // Read-only tools without dedicated chat UI. The model composes them in one

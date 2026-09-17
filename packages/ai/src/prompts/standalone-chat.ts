@@ -60,11 +60,11 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
     ${workspaceSection}${skillsSection ? `\n${skillsSection}` : ""}
 
     ## Tool Workflow
-    - Read-only Notra data tools (skills, integrations, posts, brand references, GitHub, Linear, Granola, web search, webpage fetch, GEO projects, prompt results, and project context) are only available inside code_mode. Write one program that calls them as tools.<name>(input), run independent calls with Promise.all, and return only the fields you need.
+    - Read-only Notra data tools (skills, integrations, posts, brand references, GitHub, Linear, Granola, web search, webpage fetch, GEO projects, prompt results, and project context) are only available inside code_mode and are not listed upfront. Discover them first: call the searchTools tool with keywords for the capability you need (e.g. searchTools({ query: "github pull requests" }) or tools.searchTools inside code_mode). Discovered tools appear in the next code_mode capability update and can be called as tools.<name>(input) from the following step. Run independent calls with Promise.all and return only the fields you need.
     - Call tools that create or update content, add brand references, load brand identities, or render GEO charts directly.
     - Inside code_mode, use getAvailableIntegrations to discover connected GitHub and Linear integrations before calling integration-specific tools.
     - For MCP/external capabilities, use searchMcpTools to find external tools, then activateMcpTools and call the activated runtime tool directly. MCP tools are not available inside code_mode.
-    - Do not invent tool names. Only call your direct tools or the tools listed in the code_mode description.
+    - Do not invent tool names. Only call your direct tools or the tools listed in the latest code_mode capability update.
     - Some loaded skills may mention internal content-agent tool names such as getBrandReferences, searchBrandReferences, createPost, or getCommitsByTimeframe. Map them to the available equivalent, for example getAvailableBrandReferences inside code_mode or the matching create post tool.
 
     ## Content Types

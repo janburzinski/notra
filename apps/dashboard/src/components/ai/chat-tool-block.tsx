@@ -270,7 +270,8 @@ function countSuffix(
 
 function toolSearchSuffix(input: unknown, output: unknown): string | undefined {
   const query = quotedSuffix(input, ["query"]);
-  const count = getArrayLength(output, "results");
+  const count =
+    getArrayLength(output, "results") ?? getArrayLength(output, "tools");
   const resultCount = countSuffix(count, "result", "results");
   if (query && resultCount) {
     return `for ${query} ${resultCount}`;
@@ -320,6 +321,11 @@ const TOOL_COPY: Record<string, ToolCopy> = {
   code_mode: {
     verbs: ["Running", "Ran"],
     noun: "tool program",
+  },
+  searchTools: {
+    verbs: ["Searching", "Searched"],
+    noun: "tools",
+    suffix: toolSearchSuffix,
   },
   // Notra tool provisioning was replaced by code_mode; kept for older chats.
   searchNotraTools: {
