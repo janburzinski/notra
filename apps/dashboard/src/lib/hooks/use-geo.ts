@@ -742,6 +742,19 @@ export function useAgentReadinessScan(organizationId: string) {
   });
 }
 
+// keepPreviousData, but only while the project scope is unchanged: carrying
+// rows across a project switch would briefly render the previous project's
+// traffic under the new one. The ref still holds the previous project while
+// the first render of a new scope runs, so the placeholder is skipped there.
+function useProjectScopedPreviousData<TData>(projectId: string | undefined) {
+  const previousProjectId = useRef(projectId);
+  useEffect(() => {
+    previousProjectId.current = projectId;
+  }, [projectId]);
+  return (previousData: TData | undefined): TData | undefined =>
+    previousProjectId.current === projectId ? previousData : undefined;
+}
+
 export function useAiTraffic(organizationId: string, range?: GeoRangeQuery) {
   const { projectId } = useGeoProjectScope();
   return useQuery<AiTrafficResponse>({
@@ -749,7 +762,7 @@ export function useAiTraffic(organizationId: string, range?: GeoRangeQuery) {
       input: geoOverviewQueryInput({ organizationId, projectId }, range),
     }),
     enabled: !!organizationId,
-    placeholderData: keepPreviousData,
+    placeholderData: useProjectScopedPreviousData<AiTrafficResponse>(projectId),
     meta: { errorMessage: "Failed to load AI traffic" },
   });
 }
@@ -791,7 +804,8 @@ export function useGeoTrafficPages(
       ),
     }),
     enabled: !!organizationId,
-    placeholderData: keepPreviousData,
+    placeholderData:
+      useProjectScopedPreviousData<GeoTrafficPagesResponse>(projectId),
     meta: { errorMessage: "Failed to load top AI pages" },
   });
 }
