@@ -1,0 +1,19 @@
+apps/dashboard/src/utils/onboarding.test.ts
+  s_309f517818a681::t_9819d7cf77af64 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f9640d2ff8c70f6437c7784f1747d4a1839382ec",
+  "prompts": {},
+  "sessions": {
+    "s_309f517818a681": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "bb0e600b-1866-4fad-a39b-bc62460e772a",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
