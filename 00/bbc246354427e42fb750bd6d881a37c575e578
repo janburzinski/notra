@@ -1,0 +1,71 @@
+packages/ai/src/utils/github-mention-process.ts
+  s_de8ac50ae39290::t_d31833413ec22f 82-111
+  s_de8ac50ae39290::t_616bada479d870 119,137,143-144,154-155,167-169
+packages/ai/src/utils/github-mention-ingest.ts
+  s_de8ac50ae39290::t_4715c862167428 61-66,191,195
+packages/ai/src/utils/retry-write.ts
+  s_de8ac50ae39290::t_27d0f92e48e29b 1-20
+packages/ai/src/utils/github-mention-path-policy.test.ts
+  s_de8ac50ae39290::t_bd5a7305b0b57f 61
+  s_de8ac50ae39290::t_54205604cb658e 1-60,62-69,77-85,87-97
+  s_de8ac50ae39290::t_7e51424cba5e3d 70-76,86
+packages/ai/src/utils/github-mention-write-target.test.ts
+  s_de8ac50ae39290::t_aa49cc0a49d453 8-11,51
+packages/ai/src/utils/github-mention-path-policy.ts
+  s_de8ac50ae39290::t_54205604cb658e 1-59
+apps/dashboard/src/lib/integrations/github/publish-content-to-github.ts
+  s_de8ac50ae39290::t_446754c4e53a40 173-174,178-180,953-954,962-963,1007-1013,1059-1060
+packages/ai/src/agents/github-mention.ts
+  s_de8ac50ae39290::t_eec8339d09432f 21-23,46,48-53,107-108
+packages/ai/src/utils/github-pr-commit.ts
+  s_de8ac50ae39290::t_d2c50a38f504a2 111-116,123-143,145
+packages/ai/src/utils/github-mention-sandbox.ts
+  s_de8ac50ae39290::t_bd5a7305b0b57f 11,163-164,265-266,285-287
+  s_de8ac50ae39290::t_d31833413ec22f 178-187
+packages/ai/src/utils/github-mention-sandbox.test.ts
+  s_de8ac50ae39290::t_d4fcb71f6c191a 15-16,29-30
+apps/dashboard/src/app/api/webhooks/github/app/route.ts
+  s_de8ac50ae39290::t_4715c862167428 5-7,50-61,70-72,85
+packages/ai/src/utils/update-published-content.ts
+  s_de8ac50ae39290::t_27d0f92e48e29b 6,39,48,84,97
+  s_de8ac50ae39290::t_eec8339d09432f 3,13-14,35-37,62-64,68-73,101-104
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_de8ac50ae39290::t_446754c4e53a40 1177
+  s_de8ac50ae39290::t_7e51424cba5e3d 27
+  s_de8ac50ae39290::t_27d0f92e48e29b 1179-1180,1188
+packages/ai/src/utils/github-mention.ts
+  s_de8ac50ae39290::t_5608c8df82ce4f 69,76,121-123,125-132,136-137,141,151
+  s_de8ac50ae39290::t_7e51424cba5e3d 133-135
+packages/ai/src/utils/github-mention-published-file.ts
+  s_de8ac50ae39290::t_5c8b0bfd2ec570 1-95
+packages/ai/src/utils/github-mention.test.ts
+  s_de8ac50ae39290::t_95a2418e5d0b9f 223-283
+packages/ai/src/utils/github-mention-published-file.test.ts
+  s_de8ac50ae39290::t_5c8b0bfd2ec570 1-85
+packages/ai/src/prompts/github-mention.ts
+  s_de8ac50ae39290::t_eec8339d09432f 15-16,35-37
+packages/ai/src/schemas/github-mention.ts
+  s_de8ac50ae39290::t_7e51424cba5e3d 36-38
+  s_de8ac50ae39290::t_d31833413ec22f 35
+packages/ai/src/constants/github-mention.ts
+  s_de8ac50ae39290::t_54205604cb658e 58-72
+packages/ai/src/tools/github-mention.ts
+  s_de8ac50ae39290::t_eec8339d09432f 9,36-37,190-193
+  s_de8ac50ae39290::t_bd5a7305b0b57f 8,222,236-245,279
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "00bbc246354427e42fb750bd6d881a37c575e578",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
