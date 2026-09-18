@@ -1,0 +1,19 @@
+apps/dashboard/src/components/comments/comment-item.tsx
+  s_dde69df82ae03c::t_32ce1cc37d355f 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c644b352aceeb0bebe89fe1580d4829f35a5280e",
+  "prompts": {},
+  "sessions": {
+    "s_dde69df82ae03c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f4a5400eaffeKhFVsueqLLAkBJ",
+        "model": "muse-spark-1.3-contributor-free"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
