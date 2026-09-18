@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import {
   bumpAnalyticsVersions,
-  evictAnalyticsQueries,
+  bumpPurgeGeneration,
 } from "../cache/query-cache";
 import type {
   PurgeGeoProjectInput,
@@ -139,10 +139,11 @@ export function purgeGeoProjectData(
     for (const datasource of GEO_DATASOURCES) {
       yield* deleteFromDatasource(datasource, condition);
     }
-    // The geo scope is TTL-cached without a version to bump, so deleted
-    // rows would stay readable until entries expire; evict them directly.
+    // The geo scope is TTL-cached without a version to bump; advancing the
+    // purge generation orphans every entry written before the deletion,
+    // including writes from in-flight pre-purge reads that land afterwards.
     yield* Effect.promise(() =>
-      evictAnalyticsQueries("geo", input.organizationId)
+      bumpPurgeGeneration("geo", input.organizationId)
     );
   });
   return Effect.runPromise(program);

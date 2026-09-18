@@ -1,5 +1,6 @@
 export const QUERY_CACHE_KEY_PREFIX = "tb:q";
 export const VERSION_KEY_PREFIX = "tb:ver";
+export const PURGE_GENERATION_KEY_PREFIX = "tb:purgegen";
 export const QUERY_CACHE_TTL_SECONDS = 21_600;
 export const LIVE_QUERY_CACHE_TTL_SECONDS = 30;
 export const GLOBAL_SCOPE_ID = "global";
