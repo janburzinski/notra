@@ -5,6 +5,7 @@ import type { GeoTrafficEventRow } from "@notra/analytics/tinybird/datasources";
 import { GEO_INGEST_BEARER_PREFIX } from "@notra/geo-core/constants/geo";
 import { verifyGeoIngestToken } from "@notra/geo-core/geo/ingest";
 import { geoRequestPayloadSchema } from "@notra/geo-core/schemas/geo";
+import type { GeoIngestIdentity } from "@notra/geo-core/types/geo";
 import { isTrackedGeoVisitorType } from "@notra/geo-core/utils/ai-traffic";
 import { acceptsIngestHost } from "@notra/geo-core/utils/geo-project-domains";
 import { Effect } from "effect";
@@ -98,12 +99,42 @@ const ingestEvent = Effect.fn("geoIngest.ingest")(function* (
   });
 });
 
+// Auth errors stay authoritative over payload errors: before classification
+// moved ahead of the identity lookup, a revoked token failed as 401 no
+// matter how broken the payload was. The re-check only runs on the (rare)
+// validation-error path, so well-formed traffic keeps the zero-I/O fast
+// path.
+const failWithAuthPrecedence = Effect.fn("geoIngest.failWithAuthPrecedence")(
+  function* (
+    identity: GeoIngestIdentity,
+    error: GeoIngestInvalidPayloadError | GeoIngestUnparseableUrlError
+  ) {
+    const active = yield* Effect.promise(() =>
+      isGeoIngestIdentityActive(identity)
+    );
+    if (!active) {
+      return yield* Effect.fail(new GeoIngestInvalidTokenError({}));
+    }
+    return yield* Effect.fail(error);
+  }
+);
+
 export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
   request: NextRequest
 ) {
   const identity = yield* readBearerIdentity(request);
-  const payload = yield* readPayload(request);
-  const url = yield* parseUrl(payload.url);
+
+  const payloadResult = yield* Effect.result(readPayload(request));
+  if (payloadResult._tag === "Failure") {
+    return yield* failWithAuthPrecedence(identity, payloadResult.failure);
+  }
+  const payload = payloadResult.success;
+
+  const urlResult = yield* Effect.result(parseUrl(payload.url));
+  if (urlResult._tag === "Failure") {
+    return yield* failWithAuthPrecedence(identity, urlResult.failure);
+  }
+  const url = urlResult.success;
   // Classification is pure CPU on the payload. Run it before any Redis/DB
   // round trip so the ~95% of requests that are not AI traffic cost nothing.
   const classification = classifyVisitor({

@@ -71,7 +71,11 @@ mock.module("next/server", () => ({
 
 const { Effect } = await import("effect");
 const { runGeoIngest } = await import("./pipeline");
-const { GeoIngestInvalidTokenError } = await import("./errors");
+const {
+  GeoIngestInvalidPayloadError,
+  GeoIngestInvalidTokenError,
+  GeoIngestUnparseableUrlError,
+} = await import("./errors");
 
 function ingestRequest(
   body: unknown = { method: "GET", url: "https://example.com/" }
@@ -154,5 +158,47 @@ describe("runGeoIngest ordering", () => {
 
     expect(outcome._tag).toBe("Success");
     expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+  });
+
+  test("keeps 401 authoritative when a revoked token sends a malformed payload", async () => {
+    isGeoIngestIdentityActive.mockImplementation(async () => false);
+
+    const outcome = await run(ingestRequest({ method: "GET" }));
+
+    expect(outcome._tag).toBe("Failure");
+    if (outcome._tag === "Failure") {
+      expect(outcome.failure).toBeInstanceOf(GeoIngestInvalidTokenError);
+    }
+    expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+  });
+
+  test("keeps 401 authoritative when a revoked token sends an unparseable url", async () => {
+    isGeoIngestIdentityActive.mockImplementation(async () => false);
+
+    const outcome = await run(ingestRequest({ method: "GET", url: ":::" }));
+
+    expect(outcome._tag).toBe("Failure");
+    if (outcome._tag === "Failure") {
+      expect(outcome.failure).toBeInstanceOf(GeoIngestInvalidTokenError);
+    }
+    expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+  });
+
+  test("returns 400 for malformed payloads while the identity is active", async () => {
+    const outcome = await run(ingestRequest({ method: "GET" }));
+
+    expect(outcome._tag).toBe("Failure");
+    if (outcome._tag === "Failure") {
+      expect(outcome.failure).toBeInstanceOf(GeoIngestInvalidPayloadError);
+    }
+  });
+
+  test("returns 400 for unparseable urls while the identity is active", async () => {
+    const outcome = await run(ingestRequest({ method: "GET", url: ":::" }));
+
+    expect(outcome._tag).toBe("Failure");
+    if (outcome._tag === "Failure") {
+      expect(outcome.failure).toBeInstanceOf(GeoIngestUnparseableUrlError);
+    }
   });
 });
