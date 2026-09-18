@@ -1,0 +1,27 @@
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_e4cf4a4f4243aa::t_a5896923e8ba8f 60
+  s_e4cf4a4f4243aa::t_81917cbc1f025c 442-567
+  s_e4cf4a4f4243aa::t_12398859737227 568
+  s_e4cf4a4f4243aa::t_f857e2b587cc97 37-42
+  s_e4cf4a4f4243aa::t_0b69cfabebe219 786-792
+  s_e4cf4a4f4243aa::t_818404d2cb053b 713-724
+apps/dashboard/src/components/dashboard/chat-topbar-title.tsx
+  s_e4cf4a4f4243aa::t_9686b0e3ec709e 238-242
+  s_e4cf4a4f4243aa::t_06ec41bb83a188 48-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "915d44539c0d6961d8f8bfb07b76217b5f888bf6",
+  "prompts": {},
+  "sessions": {
+    "s_e4cf4a4f4243aa": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "52e66653-b794-4a96-a300-3a5d745515e0",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
