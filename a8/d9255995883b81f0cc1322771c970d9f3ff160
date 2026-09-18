@@ -1,0 +1,19 @@
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_899ed9d273a9b2::t_e515ad79ca9c41 489
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a8d9255995883b81f0cc1322771c970d9f3ff160",
+  "prompts": {},
+  "sessions": {
+    "s_899ed9d273a9b2": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QulsN26FPGGUmXUmguW",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
