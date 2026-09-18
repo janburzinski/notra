@@ -1,0 +1,21 @@
+apps/dashboard/package.json
+  s_d68a422d55b645::t_f4b604ff3dfc35 117
+bun.lock
+  ai_agent 204,2677,2679,2681,2683,2687,2689,2691,2693,2695,2699,2707,2709,5473
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8fcac0600d50bb0a5e8f1f011c992b9885e05cb3",
+  "prompts": {},
+  "sessions": {
+    "s_d68a422d55b645": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "42fbc77b-2230-4ed6-b6d1-3c07781aa9a7",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
