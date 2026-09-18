@@ -1,0 +1,25 @@
+packages/geo-core/src/geo/discover.ts
+  s_b066d480a90510::t_afe4e4a3fc9dc8 69
+packages/geo-core/src/utils/geo-model-catalog.ts
+  s_b066d480a90510::t_afe4e4a3fc9dc8 2,240-246,248-250,256-259,263
+packages/geo-core/tests/geo-audience-engines.test.ts
+  s_b066d480a90510::t_afe4e4a3fc9dc8 3-7,28-57
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_b066d480a90510::t_afe4e4a3fc9dc8 475,489-495
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "edef41fe08d7b2fb2357efc49da701883d701e9e",
+  "prompts": {},
+  "sessions": {
+    "s_b066d480a90510": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5849b809-dbb7-447e-902f-b5ab89583ab0",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
