@@ -1,0 +1,24 @@
+packages/ai/src/constants/github-mention.ts
+  s_de8ac50ae39290::t_885c2e417e3465 110-113
+packages/ai/src/tools/github-mention.ts
+  s_de8ac50ae39290::t_885c2e417e3465 1-4,203,278
+packages/ai/src/utils/github-mention-sandbox.ts
+  s_de8ac50ae39290::t_885c2e417e3465 2,224
+  s_de8ac50ae39290::t_07dcb49c12b26c 192-194,201,205-206,213,223,225
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fc379861b7f81a5bea6cb718615256d7d3dac483",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
