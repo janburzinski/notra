@@ -193,7 +193,7 @@ export const GEO_SHELF_TABLE_COLUMN = {
   competitors: { width: "7.5rem" },
   ticket: { width: "7rem" },
 } as const;
-export const GEO_SHELF_HOVER_DELAY_MS = 150;
+export const GEO_SHELF_HOVER_DELAY_MS = 0;
 export const GEO_SHELF_ENGINE_STACK_LIMIT = 3;
 export const GEO_SHELF_COMPETITOR_STACK_LIMIT = 4;
 export const GEO_SHELF_NOTES_SAVE_DEBOUNCE_MS = 300;
