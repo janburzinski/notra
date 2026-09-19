@@ -745,6 +745,7 @@ export const GEO_SOURCE_LABELS: Record<string, string> = {
   qwen: "Qwen",
   alibaba: "Alibaba",
   meta: "Meta",
+  "meta-webindexer": "Meta Webindexer",
   instagram: "Instagram",
   amazon: "Amazon",
   apple: "Apple",
