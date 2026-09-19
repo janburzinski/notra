@@ -1,0 +1,43 @@
+apps/geo-runner/railway.json
+  s_3d4b8c6c686c63::t_a7431fa2c34b41 1-24
+apps/geo-runner/package.json
+  s_3d4b8c6c686c63::t_3adfa4f40ec692 6,15
+  s_3d4b8c6c686c63::t_cab886df04f32d 1-5,7-14,16-22
+apps/geo-runner/tsconfig.json
+  s_3d4b8c6c686c63::t_cab886df04f32d 1-12
+turbo.json
+  s_3d4b8c6c686c63::t_a7431fa2c34b41 20
+apps/geo-runner/src/http/auth.ts
+  s_3d4b8c6c686c63::t_20a3fee348f268 1-30
+apps/geo-runner/src/http/routes.ts
+  s_3d4b8c6c686c63::t_20a3fee348f268 1-4,6-51,53,70,97-98,106-130,145
+  s_3d4b8c6c686c63::t_d01116a330cdc1 5,52,54-69,71-96,99-105,131-144
+apps/geo-runner/src/services/run-queue.ts
+  s_3d4b8c6c686c63::t_20a3fee348f268 1-62
+apps/geo-runner/src/constants/runner.ts
+  s_3d4b8c6c686c63::t_20a3fee348f268 1-8
+apps/geo-runner/Dockerfile
+  s_3d4b8c6c686c63::t_a7431fa2c34b41 1-69
+apps/geo-runner/README.md
+  s_3d4b8c6c686c63::t_53ab332b1e624f 1-32
+apps/geo-runner/src/layers/geo.ts
+  s_3d4b8c6c686c63::t_20a3fee348f268 1-88
+apps/geo-runner/src/index.ts
+  s_3d4b8c6c686c63::t_20a3fee348f268 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c9bcdb020ee5a272feff321b8402c8188dab9efa",
+  "prompts": {},
+  "sessions": {
+    "s_3d4b8c6c686c63": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "13844649-9866-4ab0-ba6e-911597dcf3bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
