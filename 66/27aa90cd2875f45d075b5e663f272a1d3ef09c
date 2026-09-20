@@ -1,0 +1,45 @@
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_2155bbf998ffd1::t_12ccd2ba9e6ece 140
+apps/dashboard/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_2155bbf998ffd1::t_9da415fc707f4f 2551,2565-2566,2601
+  s_2155bbf998ffd1::t_ae22d25e65c6f2 2561-2562
+  s_2155bbf998ffd1::t_9aa66242c6f55a 2563
+apps/dashboard/src/components/dashboard/sidebar-label.tsx
+  s_2155bbf998ffd1::t_2005041fc8584a 7-11
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_db936a8c557b0e::t_b9517276d8e9d3 349
+apps/dashboard/src/styles/globals.css
+  s_2155bbf998ffd1::t_9bde90bd3d1ef7 51-57,62-64,69,74
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_2155bbf998ffd1::t_f0b7dc70e7de78 113,116,132,163
+apps/dashboard/src/app/(dashboard)/[slug]/geo/page-client.tsx
+  s_2155bbf998ffd1::t_be9d3715947b63 46-47,49-63,65-67
+packages/ui/src/components/ui/sidebar.tsx
+  s_2155bbf998ffd1::t_112cd6346d90c0 37,166,263,544
+apps/dashboard/src/constants/right-panel.ts
+  s_2155bbf998ffd1::t_ffe811d883cf82 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6627aa90cd2875f45d075b5e663f272a1d3ef09c",
+  "prompts": {},
+  "sessions": {
+    "s_2155bbf998ffd1": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0bedf-8f4b-777e-ae8f-4fad609b98b7",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_db936a8c557b0e": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034S6M3YwIYUyVZMOaonrj",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
