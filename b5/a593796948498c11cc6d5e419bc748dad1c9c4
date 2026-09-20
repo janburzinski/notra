@@ -1,0 +1,26 @@
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_023e6c4703dd3e::t_14fabbde9c90f5 267-271
+  s_023e6c4703dd3e::t_2c9ca49a13b5d2 106-109,290
+  s_023e6c4703dd3e::t_c2b41d30d4ce10 200-202,210-211,218,234-240,242-250,262-264,266,272-273,289,291-293,295-297,302,306,311
+  s_023e6c4703dd3e::t_721cabdc46c214 50,294,298-301
+apps/dashboard/src/components/geo/geo-mode-icon.tsx
+  s_023e6c4703dd3e::t_62f939c61fc3f2 16-17
+  s_023e6c4703dd3e::t_34175482f5e95f 18
+  s_023e6c4703dd3e::t_bfd3f5be70130b 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b5a593796948498c11cc6d5e419bc748dad1c9c4",
+  "prompts": {},
+  "sessions": {
+    "s_023e6c4703dd3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc4c91ba-a673-4815-880e-5500bc8e78e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
