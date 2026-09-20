@@ -1,0 +1,78 @@
+apps/web/package.json
+  s_a65ee9be69c2ec::t_1453d49499ca79 18,46
+apps/web/src/utils/faq-answer-segments.ts
+  s_a65ee9be69c2ec::t_bca3d603966d5f 1-45
+apps/web/src/lib/faq-assistant/use-faq-assistant.ts
+  s_a65ee9be69c2ec::t_474355881c3d48 1-82
+apps/web/src/constants/landing/faq.ts
+  s_a65ee9be69c2ec::t_a0b5a8586c2b6b 5
+apps/dashboard/src/app/(dashboard)/[slug]/geo/page-client.tsx
+  s_a65ee9be69c2ec::t_9a7cb89d17b72f 46-47,49-63,65-67
+apps/web/src/components/landing/faq-section.tsx
+  s_a65ee9be69c2ec::t_a0b5a8586c2b6b 6,122
+apps/web/src/lib/faq-assistant/same-origin.ts
+  s_a65ee9be69c2ec::t_d01b57d2632fd9 1-28
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  s_a65ee9be69c2ec::t_9a7cb89d17b72f 19-20,22-28,30-32
+apps/web/src/lib/faq-assistant/prompts.ts
+  s_a65ee9be69c2ec::t_d3a57f059aa865 1-23,34-35,38-44,48-56,61-67,72
+  s_a65ee9be69c2ec::t_05bb8475fce535 24-33,36-37,45-47,57-60,68-71
+apps/dashboard/src/styles/globals.css
+  s_a65ee9be69c2ec::t_fcc8401b6bf200 48-56,61-62,67,72
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_a65ee9be69c2ec::t_7609506c154226 140
+apps/web/src/app/api/faq-assistant/route.ts
+  s_a65ee9be69c2ec::t_830ba4892e4534 1-110
+apps/web/src/types/landing/faq-assistant.ts
+  s_a65ee9be69c2ec::t_cd01c3d6691a44 1-7
+apps/web/src/constants/landing/faq-assistant.ts
+  s_a65ee9be69c2ec::t_c9d042a90a9d6e 1-12,14-43
+  s_a65ee9be69c2ec::t_05bb8475fce535 13
+apps/web/src/components/landing/faq-assistant-row.tsx
+  s_a65ee9be69c2ec::t_3dee6de47befed 1-140,142-159
+  s_a65ee9be69c2ec::t_a0b5a8586c2b6b 141
+apps/web/src/schemas/faq-assistant.ts
+  s_a65ee9be69c2ec::t_f6f0914fa109ba 1-28
+turbo.json
+  s_a65ee9be69c2ec::t_54d3f3d6d257a1 7
+.env.example
+  s_a65ee9be69c2ec::t_6576960075d908 56-57
+packages/geo-core/src/constants/geo.ts
+  s_a65ee9be69c2ec::t_872cbca194035b 1051
+apps/web/src/lib/faq-assistant/guard.ts
+  s_a65ee9be69c2ec::t_05bb8475fce535 7,41,45-46
+  s_a65ee9be69c2ec::t_cb04e1b1991e77 1-6,8-40,42-44,47-56
+packages/ui/src/components/ui/sidebar.tsx
+  s_a65ee9be69c2ec::t_7609506c154226 542-545
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_a65ee9be69c2ec::t_34350aef97dba3 104,107,123,153
+apps/dashboard/src/constants/right-panel.ts
+  s_a65ee9be69c2ec::t_9a7cb89d17b72f 5
+apps/web/src/lib/faq-assistant/ratelimit.ts
+  s_8a84ce74393bce::t_5e6d6c025fd3f5 12
+  s_a65ee9be69c2ec::t_0143050edc84af 1-11,13-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "efe0bbd3a7bbf8736c902fa65498e9553a635842",
+  "prompts": {},
+  "sessions": {
+    "s_8a84ce74393bce": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034S5EHlfy4T7Lpi4TYqCE",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_a65ee9be69c2ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fecb9ce-d6ed-4410-92b8-9a7a0289b731",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
