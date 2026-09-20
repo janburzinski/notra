@@ -1,0 +1,24 @@
+packages/geo-core/tests/brand-terms.test.ts
+  s_023e6c4703dd3e::t_59d661d202e767 1-7,16-41,44-45,47-66,73-78
+  s_023e6c4703dd3e::t_38777adcdf1d62 42-43,46,67-72
+  s_023e6c4703dd3e::t_78e8b03217057a 8-15
+packages/geo-core/src/geo/suggestion-keywords.ts
+  s_023e6c4703dd3e::t_26cbb47e79a614 12-20
+  s_023e6c4703dd3e::t_b1a6c3aa7ec701 67-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a9db27169aeb50f96321c49874681eb60a2daba0",
+  "prompts": {},
+  "sessions": {
+    "s_023e6c4703dd3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc4c91ba-a673-4815-880e-5500bc8e78e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
