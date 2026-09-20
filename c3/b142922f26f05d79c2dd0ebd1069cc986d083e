@@ -1,0 +1,35 @@
+apps/web/src/types/offering-check.ts
+  s_2a7de27d6efa0f::t_a0016368c2e02f 29
+apps/web/src/lib/offering-check/ratelimit.ts
+  s_2a7de27d6efa0f::t_a0016368c2e02f 14-20
+apps/web/src/utils/offering-check.ts
+  s_2a7de27d6efa0f::t_a0016368c2e02f 68-78
+apps/web/package.json
+  s_d81190b23f9700::t_987e5529427462 79
+apps/web/knip.json
+  s_2a7de27d6efa0f::t_a0016368c2e02f 3-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c3b142922f26f05d79c2dd0ebd1069cc986d083e",
+  "prompts": {},
+  "sessions": {
+    "s_2a7de27d6efa0f": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034RvbxlXx2WkzhHRWFIeJ",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_d81190b23f9700": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034RvdBBHNoAucU5RbSGjf",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
