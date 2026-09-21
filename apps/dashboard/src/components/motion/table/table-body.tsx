@@ -29,7 +29,6 @@ export function TableBody<T>({
   onCellEdit,
   onRowClick,
   isRowClickable,
-  isRowExpanded,
   onRowPointerEnter,
   renderRowContextMenu,
   renderRowDetail,
@@ -75,16 +74,18 @@ export function TableBody<T>({
         const renderedDetail = renderRowDetail?.(entry.row);
         const detail =
           typeof renderedDetail === "boolean" ? null : (renderedDetail ?? null);
+        const detailId = detail === null ? undefined : `${entry.id}-detail`;
         return (
           <Fragment key={entry.id}>
             <TableBodyRow
               columns={columns}
+              detailId={detailId}
               entry={entry}
               hasRowMenu={hasRowMenu}
               index={index}
               isLastRow={index === rowCount - 1 && detail === null}
               isSelected={selected.has(entry.id)}
-              expanded={isRowExpanded?.(entry.row)}
+              expanded={renderRowDetail ? detail !== null : undefined}
               onActivate={onActivate}
               onCellEdit={onCellEdit}
               onDeactivate={onDeactivate}
@@ -109,6 +110,7 @@ export function TableBody<T>({
                   <motion.tr
                     animate="open"
                     exit="closed"
+                    id={detailId}
                     initial="closed"
                     key={`${entry.id}-detail`}
                   >

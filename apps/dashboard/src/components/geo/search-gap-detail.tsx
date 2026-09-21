@@ -14,9 +14,10 @@ import {
   SheetScrollArea,
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
-import { useState } from "react";
+import { useMemo } from "react";
 
 import { Table } from "@/components/motion/table";
+import { useRetainedValue } from "@/lib/hooks/use-retained-value";
 import type { GeoSearchGapDetailSheetProps } from "@/types/components/geo-gaps";
 import { formatCount, formatPercent } from "@/utils/format";
 
@@ -25,12 +26,12 @@ export function SearchGapDetailSheet({
   actions,
   onOpenChange,
 }: GeoSearchGapDetailSheetProps) {
-  // Preserve the content during the sheet's closing animation.
-  const [retained, setRetained] = useState(row);
-  if (row && row !== retained) {
-    setRetained(row);
-  }
-  const gap = row ?? retained;
+  const payload = useMemo(
+    () => (row ? { row, actions } : null),
+    [row, actions]
+  );
+  const [retained, releasePayload] = useRetainedValue(payload);
+  const gap = retained?.row;
   const title = gap?.brief?.workingTitle ?? gap?.title;
   const ctr =
     gap?.impressions != null && gap.impressions > 0 && gap.clicks !== null
@@ -38,7 +39,11 @@ export function SearchGapDetailSheet({
       : null;
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={row !== null}>
+    <Sheet
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={releasePayload}
+      open={row !== null}
+    >
       <SheetContent
         className="data-[side=right]:w-[calc(100%-1rem)]"
         side="right"
@@ -248,9 +253,9 @@ export function SearchGapDetailSheet({
           </SheetScrollArea>
         ) : null}
 
-        {actions ? (
+        {retained?.actions ? (
           <SheetFooter className="shrink-0 flex-row flex-wrap justify-end border-t">
-            {actions}
+            {retained.actions}
           </SheetFooter>
         ) : null}
       </SheetContent>

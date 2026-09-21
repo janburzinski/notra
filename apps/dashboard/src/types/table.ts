@@ -93,7 +93,6 @@ export interface TableBodyProps<T> extends Pick<
   TableProps<T>,
   | "onRowClick"
   | "isRowClickable"
-  | "isRowExpanded"
   | "onRowPointerEnter"
   | "onCellEdit"
   | "renderRowContextMenu"
