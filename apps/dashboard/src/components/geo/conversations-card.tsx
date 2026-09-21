@@ -267,6 +267,7 @@ export function ConversationsCard({ organizationId }: ConversationsCardProps) {
             </Button>
           ) : null}
           <Button
+            disabled={isLoading || sequences.length >= GEO_MAX_SEQUENCES}
             onClick={() => {
               setEditing(null);
               setBuilderOpen(true);
