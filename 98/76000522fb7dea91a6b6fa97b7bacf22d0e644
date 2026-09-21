@@ -1,0 +1,19 @@
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_72d35d6cc08a05::t_993e11983e8af4 1209,1212-1234
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9876000522fb7dea91a6b6fa97b7bacf22d0e644",
+  "prompts": {},
+  "sessions": {
+    "s_72d35d6cc08a05": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SfeOPd6Ic7lBWvVQ8C6",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
