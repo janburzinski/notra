@@ -1,0 +1,27 @@
+packages/geo-core/src/geo/sequences.ts
+  s_ca5a1cf8413055::t_0999f98531e15e 4,7,19,22,54-75,78-83,87
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_ca5a1cf8413055::t_0999f98531e15e 42-45
+apps/dashboard/src/components/geo/conversations-card.tsx
+  s_ca5a1cf8413055::t_0999f98531e15e 270
+packages/geo-core/src/geo/errors.ts
+  s_ca5a1cf8413055::t_0999f98531e15e 165-170,283
+packages/geo-core/tests/sequences.test.ts
+  s_ca5a1cf8413055::t_0999f98531e15e 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0294fde153b8102937eca0f0554f6bcf92674db7",
+  "prompts": {},
+  "sessions": {
+    "s_ca5a1cf8413055": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUb69uCpvJgYLW1OT9D",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
