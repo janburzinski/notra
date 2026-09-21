@@ -9,8 +9,10 @@ import type {
 import type { ReactNode } from "react";
 
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
+import { EngineIcon } from "@/components/geo/engine-icon";
 import { PromptReceiptHistory } from "@/components/geo/prompt-receipt-history";
 import type { PromptReceiptAnalysisProps } from "@/types/geo";
+import { uniquePromptBrandNames } from "@/utils/geo-prompt-brands";
 import {
   promptHistoryChanges,
   promptOutcomeLabel,
@@ -48,11 +50,20 @@ function CompetitorsCell({
     <ul className="divide-border/60 border-border/60 divide-y border-t">
       {names.map((name) => (
         <li className="flex min-w-0 items-center gap-3 px-4 py-2.5" key={name}>
-          <CompetitorLogo
-            className="size-6 rounded-md border"
-            competitors={competitors}
-            name={name}
-          />
+          {name === "ChatGPT" || name === "Gemini" ? (
+            <span className="bg-muted inline-flex size-6 shrink-0 items-center justify-center rounded-md border">
+              <EngineIcon
+                className="size-3.5"
+                engine={name === "ChatGPT" ? "openai" : "gemini"}
+              />
+            </span>
+          ) : (
+            <CompetitorLogo
+              className="size-6 rounded-md border"
+              competitors={competitors}
+              name={name}
+            />
+          )}
           <span className="min-w-0 truncate text-sm" title={name}>
             {name}
           </span>
@@ -178,7 +189,7 @@ export function PromptReceiptAnalysis({
   scrollable = true,
 }: PromptReceiptAnalysisProps) {
   const entries = promptHistoryChanges(history);
-  const competitorNames = [...new Set(result.competitors)];
+  const competitorNames = uniquePromptBrandNames(result.competitors);
 
   return (
     <div

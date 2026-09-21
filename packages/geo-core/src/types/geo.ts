@@ -1580,6 +1580,7 @@ export interface GeoCompetitorDetailResponse {
   configured: boolean;
   points: GeoCompetitorTimeseriesPoint[];
   prompts: GeoCompetitorPromptRow[];
+  summary?: GeoCompetitorPromptSummary;
 }
 
 export type GeoCompetitorTypeFilter = "all" | GeoCompetitorKind;

@@ -18,6 +18,7 @@ import { db } from "../drizzle";
 import { geoMentionChecks, geoScans, geoSettings } from "../schema";
 import type {
   GeoCheckCompetitorPromptRow,
+  GeoCheckCompetitorPromptSummaryRow,
   GeoCheckCompetitorShareRow,
   GeoCheckCompetitorShareTimeseriesRow,
   GeoCheckCompetitorShareTrendRow,
@@ -851,6 +852,53 @@ export async function queryGeoCheckCompetitorPrompts(
     .sort(
       (left, right) => right.capturedAt.getTime() - left.capturedAt.getTime()
     );
+}
+
+export async function queryGeoCheckCompetitorPromptSummary(
+  scope: GeoCheckScope,
+  brand: string,
+  window: GeoCheckWindow | undefined
+): Promise<GeoCheckCompetitorPromptSummaryRow> {
+  const latest = db
+    .selectDistinctOn([geoMentionChecks.promptId, geoMentionChecks.engine], {
+      promptId: geoMentionChecks.promptId,
+      engine: geoMentionChecks.engine,
+      mentioned: geoMentionChecks.mentioned,
+    })
+    .from(geoMentionChecks)
+    .where(
+      and(
+        scopeWhere(scope),
+        withoutPersonaRows,
+        sql`${geoMentionChecks.competitors} @> array[${brand}]::text[]`,
+        ...capturedWithin(window)
+      )
+    )
+    .orderBy(
+      geoMentionChecks.promptId,
+      geoMentionChecks.engine,
+      desc(geoMentionChecks.capturedAt)
+    )
+    .as("latest_geo_competitor_prompts");
+
+  const [row] = await db
+    .select({
+      answers: sql<number>`count(*)::int`,
+      prompts: sql<number>`count(distinct ${latest.promptId})::int`,
+      engineIds: sql<
+        string[]
+      >`coalesce(array_agg(distinct ${latest.engine}), '{}')`,
+      ownMentioned: sql<number>`count(*) filter (where ${latest.mentioned})::int`,
+    })
+    .from(latest)
+    .$withCache(GEO_CHECK_AGGREGATE_CACHE);
+
+  return {
+    answers: toNumber(row?.answers),
+    prompts: toNumber(row?.prompts),
+    engineIds: row?.engineIds ?? [],
+    ownMentioned: toNumber(row?.ownMentioned),
+  };
 }
 
 export async function queryGeoCheckLanguageShare(

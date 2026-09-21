@@ -1045,7 +1045,12 @@ export const geoRouter = {
     .input(geoCompetitorDetailInputSchema)
     .handler(
       geoHandler((input) =>
-        loadGeoCompetitorDetail(input, input.brand, geoWindow(input))
+        loadGeoCompetitorDetail(
+          input,
+          input.brand,
+          geoWindow(input),
+          input.summaryOnly
+        )
       )
     ),
   agentReadiness: authorizedProcedure

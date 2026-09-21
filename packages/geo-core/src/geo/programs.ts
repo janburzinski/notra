@@ -19,6 +19,7 @@ import {
 } from "@notra/db/schema";
 import {
   queryGeoCheckCompetitorPrompts,
+  queryGeoCheckCompetitorPromptSummary,
   queryGeoCheckCompetitorShare,
   queryGeoCheckCompetitorShareTimeseries,
   queryGeoCheckCompetitorShareTrends,
@@ -110,6 +111,7 @@ import {
   normalizeConversionPaths,
   sumConversionVisits,
 } from "../utils/geo-conversion-paths";
+import { engineFamilyOf } from "../utils/geo-engine-family";
 import { scopeGeoScanEngines } from "../utils/geo-engines";
 import { trackedGeoLanguages } from "../utils/geo-language-rows";
 import {
@@ -1053,13 +1055,36 @@ export const loadGeoCompetitorShare = Effect.fn("geo.competitorShare")(
 );
 
 export const loadGeoCompetitorDetail = Effect.fn("geo.competitorDetail")(
-  function* (input: GeoScopeInput, brand: string, window: GeoWindowInput) {
+  function* (
+    input: GeoScopeInput,
+    brand: string,
+    window: GeoWindowInput,
+    summaryOnly = false
+  ) {
     const scope = yield* resolveGeoScope(input);
     const resolvedWindow =
       toGeoCheckWindow(window) ??
       toGeoCheckWindow({ days: GEO_COMPETITOR_DETAIL_DAYS });
 
     const checkScope = geoCheckScope(scope);
+    if (summaryOnly) {
+      const summary = yield* geoDb("competitor summary query failed", () =>
+        queryGeoCheckCompetitorPromptSummary(checkScope, brand, resolvedWindow)
+      );
+      const response: GeoCompetitorDetailResponse = {
+        configured: true,
+        points: [],
+        prompts: [],
+        summary: {
+          answers: summary.answers,
+          prompts: summary.prompts,
+          engines: new Set(summary.engineIds.map(engineFamilyOf)).size,
+          ownMentioned: summary.ownMentioned,
+        },
+      };
+      return response;
+    }
+
     const [timeseries, prompts] = yield* Effect.all(
       [
         geoDb("competitor timeseries query failed", () =>

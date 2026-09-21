@@ -118,21 +118,13 @@ function CompetitorMentionMark({
   const competitor = findMentionedCompetitor(competitors, phrase);
   const brand = competitor?.name ?? phrase;
   const [open, setOpen] = useState(false);
-  const { openRow, prefetchRow } = useGeoCompetitorRowNavigation(
+  const { openRow } = useGeoCompetitorRowNavigation(
     organizationSlug || undefined,
     organizationId
   );
 
   return (
-    <HoverCard
-      onOpenChange={(next) => {
-        setOpen(next);
-        if (next) {
-          prefetchRow(brand);
-        }
-      }}
-      open={open}
-    >
+    <HoverCard onOpenChange={setOpen} open={open}>
       <HoverCardTrigger
         render={
           <button
