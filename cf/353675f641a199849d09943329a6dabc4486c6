@@ -1,0 +1,19 @@
+apps/dashboard/src/constants/right-panel.ts
+  s_23a02b24226f79::t_1aff0bc91d0176 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cf353675f641a199849d09943329a6dabc4486c6",
+  "prompts": {},
+  "sessions": {
+    "s_23a02b24226f79": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034S4enhfKLGl9bzCyO9ok",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
