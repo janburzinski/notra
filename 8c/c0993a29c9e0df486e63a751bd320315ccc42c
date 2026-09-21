@@ -1,0 +1,99 @@
+apps/dashboard/src/components/motion/table/index.tsx
+  s_4898eba6df9a8d::t_c5e80a7e22371c 74,294
+apps/dashboard/src/app/design-system/geo-gaps/page.tsx
+  s_4898eba6df9a8d::t_6a90157ac075ea 7-8,17-56,59-61,68-78,80-82
+  s_4898eba6df9a8d::t_5a36e8a173282a 6,12-16,58,64-67,83,85
+  s_4898eba6df9a8d::t_4fd8e8375ff1eb 1-5,9,11,57,62-63,86-88
+  s_4898eba6df9a8d::t_4328a8cf54084d 79
+  s_4898eba6df9a8d::t_5d930bfa0a0183 10,84
+apps/dashboard/src/constants/design-system-gaps.ts
+  s_4898eba6df9a8d::t_ca2f5e9ee4982e 1-2,4-50,53-64,67-68,71-100
+  s_4898eba6df9a8d::t_599522e19ec849 3,101-184,188-200
+  s_4898eba6df9a8d::t_458cde4aa9805e 185-187
+  s_4898eba6df9a8d::t_6a90157ac075ea 65-66,201-254
+  s_4898eba6df9a8d::t_44c005bbbee1f9 51-52,69-70
+apps/dashboard/src/components/motion/table/types.ts
+  s_4898eba6df9a8d::t_c5e80a7e22371c 100-105
+apps/dashboard/src/components/geo/search-gap-detail.tsx
+  s_4898eba6df9a8d::t_4328a8cf54084d 12,14
+  s_4898eba6df9a8d::t_d7b140394e9007 1-3,5-11,13,15-45,47-72
+  s_4898eba6df9a8d::t_5a36e8a173282a 4,46
+apps/dashboard/src/lib/hooks/use-geo-gaps-page.ts
+  s_4898eba6df9a8d::t_9268189e838fe2 95
+apps/dashboard/src/components/geo/search-console-card.tsx
+  s_2a29b4d1ac81c5::t_f93b3d2baa11d9 258-263,547-558,560-564
+apps/dashboard/src/components/geo/gap-detail-sheet.tsx
+  s_4898eba6df9a8d::t_e9bc6047b15d1d 40
+  s_4898eba6df9a8d::t_6472ac28110972 14-15,17,21-22,26,28-30,32-36,39,41-57,59-60
+apps/dashboard/src/types/components/geo-gaps.ts
+  s_4898eba6df9a8d::t_9268189e838fe2 164-165
+  s_4898eba6df9a8d::t_b44af4c917dc20 33-34,39-43,46-51,83
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_4898eba6df9a8d::t_5a36e8a173282a 529-531,1008
+  s_4898eba6df9a8d::t_9268189e838fe2 4,66,527-528,533-548,1055-1056,1059,1062
+  s_4898eba6df9a8d::t_176cf5603767fd 750,763-764,766,801,910-916,997,1007,1009,1013,1015-1016,1020-1022
+  s_4898eba6df9a8d::t_4328a8cf54084d 1014
+apps/dashboard/src/components/geo/conversation-results-dialog.tsx
+  s_f9e501b9c04f05::t_1ced12145f5bfe 75
+  s_1016ac0ea6e07c::t_d1a0e3a44529a3 7-12,22,68,72,102-109,111-112,114-115,117,119-122,124,162,192-193
+apps/dashboard/src/components/geo/conversations-card.tsx
+  s_0268fe193b1131::t_192d11b62e7272 151-155,157
+apps/dashboard/src/components/motion/table/table-body.tsx
+  s_4898eba6df9a8d::t_c5e80a7e22371c 1-3,33,71-115
+apps/dashboard/src/types/table.ts
+  s_4898eba6df9a8d::t_c5e80a7e22371c 99
+apps/dashboard/src/components/geo/gap-answer-panel.tsx
+  s_4898eba6df9a8d::t_57616b4d69f138 1-189
+apps/dashboard/src/app/design-system/geo-gaps/prototype-answer-sheet.tsx
+  s_4898eba6df9a8d::t_458cde4aa9805e 3-6,21-22,47,93-96,100-107,109,112-114
+  s_4898eba6df9a8d::t_33e976e5b0a934 1-2,7-20,23-30,32-33,36-46,48-63,65-92,97-99,108,110-111,115-118,120-125
+  s_4898eba6df9a8d::t_06a2be3d2ccd46 31,34-35,64,119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8cc0993a29c9e0df486e63a751bd320315ccc42c",
+  "prompts": {},
+  "sessions": {
+    "s_0268fe193b1131": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SEl7td2hVFDbd28TIIa",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_1016ac0ea6e07c": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SEkMUVUir6A5jhiVDlh",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_2a29b4d1ac81c5": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SElSTw9MAlNfsJZPGIH",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_4898eba6df9a8d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6feb4291-afac-4c5e-a0ca-4477eda8ea5a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f9e501b9c04f05": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SEwlBDOahJAM8zhFsBZ",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
