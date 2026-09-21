@@ -1,0 +1,19 @@
+packages/geo-core/src/geo/scan.ts
+  s_3d4b8c6c686c63::t_2e50a6146db6db 563-564,567,570-574,594-596
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "34bdd58d8e9b9bc827d8cb6d01ed4b1a3cb4ff53",
+  "prompts": {},
+  "sessions": {
+    "s_3d4b8c6c686c63": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "13844649-9866-4ab0-ba6e-911597dcf3bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
