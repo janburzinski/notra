@@ -1,5 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
 
+import { GeoSequenceLimitError } from "@notra/geo-core/geo/errors";
 import { AgentReadinessTargetMissingError } from "@notra/geo-core/schemas/agent-readiness-errors";
 import { SUPPORTED_GEO_LANGUAGES } from "@notra/geo-core/utils/geo-language-rows";
 import { seedGeoModelCatalog } from "@notra/geo-core/utils/geo-model-catalog";
@@ -76,6 +77,22 @@ describe("runGeoEffect", () => {
       expect(outcome.failure.status).toBe(400);
       expect(outcome.failure.error).toContain("Unknown engines");
       expect(outcome.failure.error).toContain("not-a-real-engine");
+    }
+  });
+
+  test("maps GeoSequenceLimitError to 400", async () => {
+    const outcome = await runGeoEffect(
+      "createSequence",
+      Effect.fail(new GeoSequenceLimitError({ limit: 10 }))
+    );
+
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure).toEqual({
+        status: 400,
+        error:
+          "You can have up to 10 conversations. Remove one before adding another.",
+      });
     }
   });
 });
