@@ -1,0 +1,93 @@
+apps/dashboard/src/lib/hooks/use-post-actions.ts
+  s_d2c8a528e60267::t_d084da3c749990 44,46-59,65,68-69,73-85,87-96
+apps/dashboard/src/app/(dashboard)/[slug]/content/skeleton.tsx
+  s_d2c8a528e60267::t_d084da3c749990 6-9,22-24
+apps/dashboard/src/lib/hooks/use-content-detail-chat.ts
+  s_f66651309dc766::t_ccee9dc4f29fca 605
+apps/dashboard/knip.json
+  s_d2c8a528e60267::t_d084da3c749990 5
+apps/dashboard/src/components/content/content-detail-main-document.tsx
+  s_f66651309dc766::t_ccee9dc4f29fca 19,28,166
+apps/dashboard/src/components/content/create-content-dialog.tsx
+  s_0230580782dd76::t_80aee2e4a1902d 93-234,1081-1085,1191-1200,1204-1212
+  s_b24219034c22f5::t_39a36c9ed2fb79 536-542,554-555,566,575,593,608,613-619,621-627,642,648-653
+apps/dashboard/src/components/content/editors/types.ts
+  s_f66651309dc766::t_ccee9dc4f29fca 22
+apps/dashboard/src/components/content/editor/plugins/selection-plugin.tsx
+  s_f66651309dc766::t_ccee9dc4f29fca 6,10,24-27,29-33,42-46,50,57,103,109-111
+apps/dashboard/src/constants/content-collections.ts
+  s_d2c8a528e60267::t_d084da3c749990 5-8
+packages/ui/src/components/shared/table-pagination.tsx
+  s_d2c8a528e60267::t_d084da3c749990 52-53
+apps/dashboard/src/components/content/editor/lexical-editor.tsx
+  s_c46bab4d76ec7b::t_9ce693bddf6b65 45,57
+  s_f66651309dc766::t_ccee9dc4f29fca 144-147
+apps/dashboard/src/components/content/content-detail-loaded-view.tsx
+  s_f66651309dc766::t_ccee9dc4f29fca 35,50,142
+apps/dashboard/src/components/content/content-skeleton-card.tsx
+  s_d2c8a528e60267::t_d084da3c749990 36
+apps/dashboard/src/components/content/collections-view.tsx
+  s_d2c8a528e60267::t_d084da3c749990 136-139,200
+apps/dashboard/src/components/content/editors/long-form-editor.tsx
+  s_f66651309dc766::t_ccee9dc4f29fca 232
+apps/dashboard/src/app/(dashboard)/[slug]/content/[id]/page-client.tsx
+  s_f66651309dc766::t_ccee9dc4f29fca 77
+apps/dashboard/tests/fixtures/content-selection.fixture.ts
+  s_ca707ea50a7bbe::t_3be7e947cc0e21 16-18,23-32,39-45,61-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0ea2579dade4a39f47f3f965c135b18b80a9f64f",
+  "prompts": {},
+  "sessions": {
+    "s_0230580782dd76": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SULdaulgRxR4GDioGa8",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_b24219034c22f5": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUFzuYizNrXaLXo7jU3",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_c46bab4d76ec7b": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUOV1RvZmHOTorl0Gu7",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_ca707ea50a7bbe": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUILRJnz3v7YbZ6pQFM",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_d2c8a528e60267": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUFNr9RfXBGVdzROCTG",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f66651309dc766": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUHhQ9qakN1R5GX2iqi",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
