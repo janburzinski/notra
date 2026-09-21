@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@notra/ui/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -13,7 +12,6 @@ import { useState } from "react";
 
 import { GapAnswerPanel } from "@/components/geo/gap-answer-panel";
 import type { GeoGapDetailSheetProps } from "@/types/components/geo-gaps";
-import { formatMentionRate } from "@/utils/geo-charts";
 import { gapMissingEngineFamilies } from "@/utils/geo-gaps";
 
 export function GapDetailSheet({
@@ -36,13 +34,12 @@ export function GapDetailSheet({
     ...(gap?.mentionedEngines ?? []),
     ...(gap?.engines ?? []),
   ]).length;
-  const coverage = `${visible} of ${total} engines mention you · ${formatMentionRate(gap?.ownMentionRate ?? 0)} mention rate`;
+  const coverage = `Mentioned by ${visible} of ${total} engines`;
 
   return (
     <Sheet onOpenChange={onOpenChange} open={prompt !== null}>
       <SheetContent side="right" variant="inset">
         <SheetHeader className="bg-muted/50 shrink-0 gap-1.5 border-b pr-14">
-          <Badge variant="secondary">Prompt gap</Badge>
           <SheetTitle className="text-base leading-snug text-balance break-words">
             {headline ?? gap?.prompt ?? "Content gap"}
           </SheetTitle>

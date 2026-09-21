@@ -32,6 +32,7 @@ export function TableBodyRow<T>({
   isSelected,
   columns,
   onRowClick,
+  expanded,
   onRowPointerEnter,
   hasRowMenu,
   onActivate,
@@ -50,6 +51,7 @@ export function TableBodyRow<T>({
   isSelected: boolean;
   columns: TableColumn<T>[];
   onRowClick?: (row: T) => void;
+  expanded?: boolean;
   onRowPointerEnter?: (row: T) => void;
   hasRowMenu: boolean;
   onActivate?: (id: string, index: number) => void;
@@ -64,6 +66,7 @@ export function TableBodyRow<T>({
   const cellBorder = isLastRow ? "border-b-0" : "border-border/60 border-b";
   const tableRow = (
     <tr
+      aria-expanded={expanded}
       className={cn(
         "group transition-colors",
         "data-[selected=true]:bg-primary/5",

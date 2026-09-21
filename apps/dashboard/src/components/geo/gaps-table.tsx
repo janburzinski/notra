@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowDown01Icon,
   RefreshIcon,
   SearchIcon,
   ViewOffSlashIcon,
@@ -63,7 +62,7 @@ import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { GapDetailSheet } from "@/components/geo/gap-detail-sheet";
-import { SearchGapDetail } from "@/components/geo/search-gap-detail";
+import { SearchGapDetailSheet } from "@/components/geo/search-gap-detail";
 import { StatusSpinner } from "@/components/geo/status-spinner";
 import { Table, type TableColumn } from "@/components/motion/table";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
@@ -524,28 +523,16 @@ function VisibleOnCell({
   );
 }
 
-function QueriesCell({ prompt, queries, expanded }: GeoGapQueriesCellProps) {
+function QueriesCell({ prompt, queries }: GeoGapQueriesCellProps) {
   const count =
     queries.length === 1
       ? "1 search query"
       : `${queries.length} search queries`;
   return (
-    <span className="flex min-w-0 items-center gap-2">
-      <HugeiconsIcon
-        aria-hidden="true"
-        className={cn(
-          "text-muted-foreground shrink-0 transition-transform",
-          expanded && "rotate-180"
-        )}
-        icon={ArrowDown01Icon}
-        size={15}
-        strokeWidth={2}
-      />
-      <ContentCell
-        subtitle={queries.length === 0 ? null : count}
-        title={prompt}
-      />
-    </span>
+    <ContentCell
+      subtitle={queries.length === 0 ? null : count}
+      title={prompt}
+    />
   );
 }
 
@@ -644,6 +631,7 @@ function GapsTabs({
 }
 
 function GapsFilters({
+  tab,
   query,
   onQueryChange,
   engine,
@@ -651,7 +639,8 @@ function GapsFilters({
   engineFamilies,
 }: GeoGapsFiltersProps) {
   const showEngineFilter =
-    engineFamilies.length > 0 || engine !== GEO_GAPS_ENGINE_FILTER_ALL;
+    tab === "prompt" &&
+    (engineFamilies.length > 0 || engine !== GEO_GAPS_ENGINE_FILTER_ALL);
 
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
@@ -761,9 +750,11 @@ export function GeoGapsTable({
 }: GeoGapsTableProps) {
   const [tab, setTab] = useState<GeoGapsTab>("prompt");
   const [detailPromptId, setDetailPromptId] = useState<string | null>(null);
-  const [expandedSearchId, setExpandedSearchId] = useState<string | null>(null);
+  const [detailSearchId, setDetailSearchId] = useState<string | null>(null);
   const selectedPrompt =
     promptGaps.find((row) => row.id === detailPromptId) ?? null;
+  const selectedSearch =
+    searchGaps.find((row) => row.id === detailSearchId) ?? null;
   const [query, setQuery] = useQueryState(
     "q",
     parseAsString.withDefault("").withOptions({ clearOnDefault: true })
@@ -907,19 +898,14 @@ export function GeoGapsTable({
       key: "question",
       header: "Source question",
       width: "1fr",
-      cell: (row) => (
-        <QueriesCell
-          expanded={row.id === expandedSearchId}
-          prompt={row.prompt}
-          queries={row.queries}
-        />
-      ),
+      cell: (row) => <QueriesCell prompt={row.prompt} queries={row.queries} />,
       sortValue: (row) => row.prompt,
       sortable: true,
     },
     {
       key: "impressions",
       header: "Impressions",
+      hint: "Total Google Search impressions across the queries in this gap.",
       width: "7rem",
       cell: (row) => (
         <NumberCell
@@ -933,6 +919,7 @@ export function GeoGapsTable({
     {
       key: "recommendation",
       header: "Recommendation",
+      hint: "Suggested next step based on search demand and overlap with your existing content.",
       width: "9rem",
       cell: (row) => <RecommendationCell recommendation={row.recommendation} />,
       sortValue: (row) => searchGapActionOrder(row.recommendation.action),
@@ -940,7 +927,7 @@ export function GeoGapsTable({
     },
     {
       key: "write",
-      header: "",
+      header: "Action",
       align: "right",
       width: "12rem",
       minWidth: "12rem",
@@ -1004,16 +991,10 @@ export function GeoGapsTable({
         className="rounded-2xl"
         columns={searchColumns}
         data={filteredSearchGaps}
-        onRowClick={(row) =>
-          setExpandedSearchId((current) => (current === row.id ? null : row.id))
-        }
+        onRowClick={(row) => setDetailSearchId(row.id)}
         defaultSort={{ key: "impressions", direction: "desc" }}
         getRowId={(row) => row.id}
         height={tableHeight}
-        renderRowDetail={(row) =>
-          row.id === expandedSearchId ? <SearchGapDetail row={row} /> : null
-        }
-        rowSizing="content"
       />
     );
 
@@ -1036,6 +1017,7 @@ export function GeoGapsTable({
           onEngineChange={setEngine}
           onQueryChange={setQuery}
           query={query}
+          tab={tab}
         />
       </div>
 
@@ -1061,6 +1043,31 @@ export function GeoGapsTable({
         }}
         organizationId={organizationId}
         prompt={selectedPrompt}
+      />
+      <SearchGapDetailSheet
+        actions={
+          selectedSearch ? (
+            <SearchWriteCell
+              isDismissing={dismissingSearchId === selectedSearch.id}
+              onDismiss={() => onDismissSearch(selectedSearch)}
+              onOpenPost={(postId) => {
+                setDetailSearchId(null);
+                onOpenPost(postId);
+              }}
+              onWrite={(existingPageUrl) => {
+                setDetailSearchId(null);
+                onWriteSearch(selectedSearch, existingPageUrl);
+              }}
+              row={selectedSearch}
+            />
+          ) : null
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setDetailSearchId(null);
+          }
+        }}
+        row={selectedSearch}
       />
     </div>
   );

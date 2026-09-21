@@ -36,6 +36,12 @@ export interface GeoGapDetailSheetProps {
   onOpenChange: (open: boolean) => void;
 }
 
+export interface GeoSearchGapDetailSheetProps {
+  row: GeoSearchGapRow | null;
+  actions?: ReactNode;
+  onOpenChange: (open: boolean) => void;
+}
+
 export interface GeoGapAnswerPanelProps {
   organizationId: string;
   promptId: string;
@@ -112,6 +118,7 @@ export interface GeoGapsTabsProps {
 }
 
 export interface GeoGapsFiltersProps {
+  tab: GeoGapsTab;
   query: string;
   onQueryChange: (value: string) => void;
   engine: string;
@@ -153,8 +160,6 @@ export interface GeoGapWriteCellProps {
 export interface GeoGapQueriesCellProps {
   prompt: string;
   queries: readonly GeoSuggestionKeyword[];
-  /** Turns the disclosure chevron once the row's detail panel is open. */
-  expanded: boolean;
 }
 
 export interface GeoGapNumberCellProps {

@@ -95,6 +95,8 @@ interface TableBaseProps<T> {
   onRowClick?: (row: T) => void;
   /** Only matching rows receive click handlers, keyboard activation, and pointer styling. */
   isRowClickable?: (row: T) => boolean;
+  /** Exposes an expandable row's current state to assistive technology. */
+  isRowExpanded?: (row: T) => boolean;
   /** Menu content shown when a row is opened with the context-menu gesture. */
   renderRowContextMenu?: (row: T) => ReactNode;
   /** Called when a pointer enters a row — prefetch, hover menus, etc. */

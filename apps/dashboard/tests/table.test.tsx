@@ -140,4 +140,22 @@ describe("shared dashboard table", () => {
 
     expect(html.match(/<tr\b/g)).toHaveLength(2);
   });
+
+  test("expandable rows expose their state", () => {
+    const html = renderToStaticMarkup(
+      <Table
+        columns={[{ key: "label", header: "Gap" }]}
+        data={[{ id: "gap", label: "Search gap" }]}
+        getRowId={(row) => row.id}
+        isRowExpanded={() => true}
+        onRowClick={() => undefined}
+        renderRowDetail={() => <p>Gap details</p>}
+        rowSizing="content"
+      />
+    );
+
+    expect(html).toMatch(
+      /<tr[^>]*aria-expanded="true"[^>]*>[\s\S]*?Search gap/
+    );
+  });
 });

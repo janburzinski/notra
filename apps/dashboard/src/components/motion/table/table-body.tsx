@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "motion/react";
 import { Fragment } from "react";
 
 import { cn } from "@/lib/utils";
@@ -28,9 +29,11 @@ export function TableBody<T>({
   onCellEdit,
   onRowClick,
   isRowClickable,
+  isRowExpanded,
   onRowPointerEnter,
   renderRowContextMenu,
   renderRowDetail,
+  reduce,
   rowRefs,
 }: TableBodyProps<T>) {
   const colSpan = columns.length + (selectable ? 1 : 0) + 1;
@@ -81,6 +84,7 @@ export function TableBody<T>({
               index={index}
               isLastRow={index === rowCount - 1 && detail === null}
               isSelected={selected.has(entry.id)}
+              expanded={isRowExpanded?.(entry.row)}
               onActivate={onActivate}
               onCellEdit={onCellEdit}
               onDeactivate={onDeactivate}
@@ -99,19 +103,44 @@ export function TableBody<T>({
               }}
               selectable={selectable}
             />
-            {detail === null ? null : (
-              <tr>
-                <td
-                  className={cn(
-                    "bg-muted/20 p-0",
-                    index === rowCount - 1 ? undefined : "border-b"
-                  )}
-                  colSpan={colSpan}
-                >
-                  {detail}
-                </td>
-              </tr>
-            )}
+            {renderRowDetail ? (
+              <AnimatePresence initial={false}>
+                {detail === null ? null : (
+                  <motion.tr
+                    animate="open"
+                    exit="closed"
+                    initial="closed"
+                    key={`${entry.id}-detail`}
+                  >
+                    <td
+                      className={cn(
+                        "bg-muted/20 p-0",
+                        index === rowCount - 1 ? undefined : "border-b"
+                      )}
+                      colSpan={colSpan}
+                    >
+                      <motion.div
+                        animate="open"
+                        className="overflow-hidden"
+                        exit="closed"
+                        initial="closed"
+                        transition={
+                          reduce
+                            ? { duration: 0 }
+                            : { duration: 0.2, ease: [0.23, 1, 0.32, 1] }
+                        }
+                        variants={{
+                          closed: { height: 0, opacity: 0 },
+                          open: { height: "auto", opacity: 1 },
+                        }}
+                      >
+                        {detail}
+                      </motion.div>
+                    </td>
+                  </motion.tr>
+                )}
+              </AnimatePresence>
+            ) : null}
           </Fragment>
         );
       })}

@@ -70,6 +70,7 @@ export function Table<T>({
   emptyState = "No data",
   onRowClick,
   isRowClickable,
+  isRowExpanded,
   renderRowContextMenu,
   renderRowDetail,
   onRowPointerEnter,
@@ -289,9 +290,11 @@ export function Table<T>({
             onCellEdit={onCellEdit}
             onRowClick={onRowClick}
             isRowClickable={isRowClickable}
+            isRowExpanded={isRowExpanded}
             onRowPointerEnter={onRowPointerEnter}
             renderRowContextMenu={renderRowContextMenu}
             renderRowDetail={renderRowDetail}
+            reduce={!!reduce}
             rowRefs={rowRefs}
           />
         </table>
