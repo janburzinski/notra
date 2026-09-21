@@ -96,6 +96,7 @@ export interface TableBodyProps<T> extends Pick<
   | "onRowPointerEnter"
   | "onCellEdit"
   | "renderRowContextMenu"
+  | "renderRowDetail"
   | "emptyState"
   | "rowSizing"
 > {

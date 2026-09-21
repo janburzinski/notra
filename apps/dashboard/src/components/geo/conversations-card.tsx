@@ -9,7 +9,6 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { GEO_MAX_SEQUENCES } from "@notra/geo-core/constants/geo";
 import type { GeoPromptSequence } from "@notra/geo-core/types/geo";
 import { Switch } from "@notra/ui/components/ui/switch";
 import {
@@ -149,8 +148,13 @@ function ConversationRowActions({
 }
 
 export function ConversationsCard({ organizationId }: ConversationsCardProps) {
-  const { sequences, pendingSequenceIds, updateSequence, removeSequence } =
-    useGeoSequencesDb(organizationId);
+  const {
+    sequences,
+    isLoading,
+    pendingSequenceIds,
+    updateSequence,
+    removeSequence,
+  } = useGeoSequencesDb(organizationId);
   const runSequence = useGeoRunSequence(organizationId);
   const generateSequences = useGeoSequencesGenerate(organizationId);
   const [builderOpen, setBuilderOpen] = useState(false);
@@ -246,22 +250,21 @@ export function ConversationsCard({ organizationId }: ConversationsCardProps) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            disabled={
-              generateSequences.isPending ||
-              sequences.length >= GEO_MAX_SEQUENCES
-            }
-            onClick={() => generateSequences.mutate()}
-            size="sm"
-            variant="ghost"
-          >
-            {generateSequences.isPending ? (
-              <StatusSpinner />
-            ) : (
-              <HugeiconsIcon icon={AiMagicIcon} size={14} />
-            )}
-            {generateSequences.isPending ? "Generating…" : "Generate"}
-          </Button>
+          {!isLoading && sequences.length === 0 ? (
+            <Button
+              disabled={generateSequences.isPending}
+              onClick={() => generateSequences.mutate()}
+              size="sm"
+              variant="ghost"
+            >
+              {generateSequences.isPending ? (
+                <StatusSpinner />
+              ) : (
+                <HugeiconsIcon icon={AiMagicIcon} size={14} />
+              )}
+              {generateSequences.isPending ? "Generating…" : "Generate"}
+            </Button>
+          ) : null}
           <Button
             onClick={() => {
               setEditing(null);

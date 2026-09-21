@@ -255,18 +255,12 @@ function SelectSiteState({
 }: SearchConsoleSelectSiteStateProps) {
   return (
     <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
-      <div className="flex flex-col items-start gap-2 pt-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-muted-foreground text-sm">
-          {status.lastError ??
-            "Choose which Search Console property Notra should analyze."}
-        </p>
-        <ResponsiveDialogTrigger
-          className="shrink-0"
-          render={<Button size="sm" variant="outline" />}
-        >
-          Choose property
-        </ResponsiveDialogTrigger>
-      </div>
+      <ResponsiveDialogTrigger
+        className="shrink-0"
+        render={<Button size="sm" variant="outline" />}
+      >
+        Choose property
+      </ResponsiveDialogTrigger>
       <ResponsiveDialogContent className="sm:max-w-md">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>
@@ -550,16 +544,24 @@ export function SearchConsoleToolbar({
       );
     }
   } else {
-    body = (
-      <SelectSiteState
-        callbackPath={callbackPath}
-        onOpenChange={onPropertyPickerOpenChange}
-        open={propertyPickerOpen}
-        organizationId={organizationId}
-        status={status}
-        websiteUrl={websiteUrl}
-      />
+    headerAction = (
+      <div className="flex flex-wrap items-center gap-2">
+        <SelectSiteState
+          callbackPath={callbackPath}
+          onOpenChange={onPropertyPickerOpenChange}
+          open={propertyPickerOpen}
+          organizationId={organizationId}
+          status={status}
+          websiteUrl={websiteUrl}
+        />
+        {action}
+      </div>
     );
+    if (status.lastError) {
+      body = (
+        <p className="text-destructive pt-3 text-sm">{status.lastError}</p>
+      );
+    }
   }
 
   return (

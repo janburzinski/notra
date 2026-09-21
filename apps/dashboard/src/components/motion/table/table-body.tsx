@@ -1,3 +1,6 @@
+import { Fragment } from "react";
+
+import { cn } from "@/lib/utils";
 import type { TableBodyProps } from "@/types/table";
 
 import { SkeletonRows } from "./skeleton-rows";
@@ -27,6 +30,7 @@ export function TableBody<T>({
   isRowClickable,
   onRowPointerEnter,
   renderRowContextMenu,
+  renderRowDetail,
   rowRefs,
 }: TableBodyProps<T>) {
   const colSpan = columns.length + (selectable ? 1 : 0) + 1;
@@ -64,34 +68,51 @@ export function TableBody<T>({
           <td colSpan={colSpan} />
         </tr>
       ) : null}
-      {renderedRows.map(({ entry, index }) => (
-        <TableBodyRow
-          columns={columns}
-          entry={entry}
-          hasRowMenu={hasRowMenu}
-          index={index}
-          isLastRow={index === rowCount - 1}
-          isSelected={selected.has(entry.id)}
-          key={entry.id}
-          onActivate={onActivate}
-          onCellEdit={onCellEdit}
-          onDeactivate={onDeactivate}
-          onRowClick={
-            !isRowClickable || isRowClickable(entry.row)
-              ? onRowClick
-              : undefined
-          }
-          onRowPointerEnter={onRowPointerEnter}
-          onToggleRow={onToggleRow}
-          renderRowContextMenu={renderRowContextMenu}
-          rowHeight={rowHeight}
-          rowSizing={rowSizing}
-          rowRef={(element) => {
-            rowRefs.current[entry.id] = element;
-          }}
-          selectable={selectable}
-        />
-      ))}
+      {renderedRows.map(({ entry, index }) => {
+        const detail = renderRowDetail?.(entry.row) ?? null;
+        return (
+          <Fragment key={entry.id}>
+            <TableBodyRow
+              columns={columns}
+              entry={entry}
+              hasRowMenu={hasRowMenu}
+              index={index}
+              isLastRow={index === rowCount - 1 && detail === null}
+              isSelected={selected.has(entry.id)}
+              onActivate={onActivate}
+              onCellEdit={onCellEdit}
+              onDeactivate={onDeactivate}
+              onRowClick={
+                !isRowClickable || isRowClickable(entry.row)
+                  ? onRowClick
+                  : undefined
+              }
+              onRowPointerEnter={onRowPointerEnter}
+              onToggleRow={onToggleRow}
+              renderRowContextMenu={renderRowContextMenu}
+              rowHeight={rowHeight}
+              rowSizing={rowSizing}
+              rowRef={(element) => {
+                rowRefs.current[entry.id] = element;
+              }}
+              selectable={selectable}
+            />
+            {detail === null ? null : (
+              <tr>
+                <td
+                  className={cn(
+                    "bg-muted/20 p-0",
+                    index === rowCount - 1 ? undefined : "border-b"
+                  )}
+                  colSpan={colSpan}
+                >
+                  {detail}
+                </td>
+              </tr>
+            )}
+          </Fragment>
+        );
+      })}
       {scrolls && paddingBottom > 0 ? (
         <tr aria-hidden style={{ height: paddingBottom }}>
           <td colSpan={colSpan} />

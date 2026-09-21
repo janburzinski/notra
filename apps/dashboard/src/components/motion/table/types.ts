@@ -97,6 +97,12 @@ export interface TableProps<T> {
   onRowClick?: (row: T) => void;
   /** Only matching rows receive click handlers, keyboard activation, and pointer styling. */
   isRowClickable?: (row: T) => boolean;
+  /**
+   * Detail panel rendered in a full-width row beneath a row. Return null for
+   * collapsed rows. Requires `rowSizing="content"`, since a detail row breaks
+   * the fixed-height estimate virtualization relies on.
+   */
+  renderRowDetail?: (row: T) => ReactNode;
   /** Menu content shown when a row is opened with the context-menu gesture. */
   renderRowContextMenu?: (row: T) => ReactNode;
   /** Called when a pointer enters a row — prefetch, hover menus, etc. */
