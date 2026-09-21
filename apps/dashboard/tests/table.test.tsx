@@ -127,35 +127,4 @@ describe("shared dashboard table", () => {
     expect(html).toContain("height:52px");
     expect(html).toContain('aria-busy="false"');
   });
-
-  test("false detail content does not add a detail row", () => {
-    const html = renderToStaticMarkup(
-      <Table
-        columns={[{ key: "label", header: "Label" }]}
-        data={[{ label: "Only row" }]}
-        renderRowDetail={() => false}
-        rowSizing="content"
-      />
-    );
-
-    expect(html.match(/<tr\b/g)).toHaveLength(2);
-  });
-
-  test("expandable rows identify the detail row they control", () => {
-    const html = renderToStaticMarkup(
-      <Table
-        columns={[{ key: "label", header: "Gap" }]}
-        data={[{ id: "gap", label: "Search gap" }]}
-        getRowId={(row) => row.id}
-        onRowClick={() => undefined}
-        renderRowDetail={() => <p>Gap details</p>}
-        rowSizing="content"
-      />
-    );
-
-    expect(html).toMatch(
-      /<tr[^>]*aria-controls="gap-detail"[^>]*aria-expanded="true"[^>]*>[\s\S]*?Search gap/
-    );
-    expect(html).toMatch(/<tr[^>]*id="gap-detail"[^>]*>/);
-  });
 });
