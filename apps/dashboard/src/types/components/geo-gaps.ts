@@ -43,14 +43,6 @@ export interface GeoGapAnswerPanelProps {
   isScanning: boolean;
 }
 
-export interface GeoSearchGapDetailProps {
-  row: GeoSearchGapRow;
-  isDismissing: boolean;
-  onOpenPost: (postId: string) => void;
-  onWrite: (existingPageUrl?: string) => void;
-  onDismiss: () => void;
-}
-
 export type GeoGapsMeterTone = "empty" | "low" | "mid" | "high";
 
 export type GeoGapLiftTone = "up" | "down" | "flat";

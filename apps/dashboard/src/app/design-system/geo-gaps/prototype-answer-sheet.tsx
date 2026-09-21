@@ -68,7 +68,7 @@ export function PrototypeAnswerSheet({
         <div className="bg-muted/20 flex shrink-0 flex-wrap items-center gap-1 border-b px-4 py-2.5">
           {results.map((row) => (
             <button
-              aria-label={engineFamilyLabel(row.engine)}
+              aria-label={`View ${engineFamilyLabel(row.engine)} answer — ${outcomeLabel(row)}`}
               aria-pressed={row.engine === active.engine}
               className={cn(
                 "relative inline-flex size-8 items-center justify-center rounded-lg border transition-colors",

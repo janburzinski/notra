@@ -127,4 +127,17 @@ describe("shared dashboard table", () => {
     expect(html).toContain("height:52px");
     expect(html).toContain('aria-busy="false"');
   });
+
+  test("false detail content does not add a detail row", () => {
+    const html = renderToStaticMarkup(
+      <Table
+        columns={[{ key: "label", header: "Label" }]}
+        data={[{ label: "Only row" }]}
+        renderRowDetail={() => false}
+        rowSizing="content"
+      />
+    );
+
+    expect(html.match(/<tr\b/g)).toHaveLength(2);
+  });
 });

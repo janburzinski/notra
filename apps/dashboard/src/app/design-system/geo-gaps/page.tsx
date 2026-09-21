@@ -38,7 +38,7 @@ const SEARCH_COLUMNS: TableColumn<
     width: "7rem",
     cell: (row) => (
       <span className="tabular-nums">
-        {row.impressions?.toLocaleString() ?? "—"}
+        {row.impressions?.toLocaleString("en-US") ?? "—"}
       </span>
     ),
   },

@@ -69,9 +69,9 @@ export const DESIGN_SYSTEM_SEARCH_GAP: GeoSearchGapRow = {
   prompt:
     "Where can I find the Neon database changelog and latest release notes?",
   title: "Neon Changelog: Latest Updates, Releases & New Features Explained",
-  impressions: 52,
-  clicks: 0,
-  position: 5.2,
+  impressions: 101,
+  clicks: 1,
+  position: 7.1,
   queries: [
     { query: "neon changelog", clicks: 0, impressions: 52, position: 5.2 },
     { query: "neon release notes", clicks: 1, impressions: 31, position: 7.4 },
@@ -208,7 +208,7 @@ DESIGN_SYSTEM_SEARCH_GAPS.push(
     title: "Neon + Next.js: Setup, Pooling and Edge Runtime",
     impressions: 318,
     clicks: 12,
-    position: 8.7,
+    position: 8.2,
     queries: [
       { query: "neon next.js", clicks: 9, impressions: 210, position: 6.1 },
       {

@@ -1,7 +1,8 @@
 "use client";
 
 import type { GeoSearchGapRow } from "@notra/geo-core/types/geo";
-import type { ReactNode } from "react";
+
+import { formatCount } from "@/utils/format";
 
 const QUERY_ROW_CLASS =
   "grid grid-cols-[minmax(0,1fr)_5rem_4rem_4.5rem] items-center gap-3 px-3 py-2 text-sm";
@@ -55,10 +56,10 @@ export function SearchGapDetail({ row }: { row: GeoSearchGapRow }) {
                 {query.query}
               </span>
               <span className="text-right tabular-nums">
-                {query.impressions.toLocaleString()}
+                {formatCount(query.impressions)}
               </span>
               <span className="text-right tabular-nums">
-                {query.clicks.toLocaleString()}
+                {formatCount(query.clicks)}
               </span>
               <span className="text-right tabular-nums">
                 #{query.position.toFixed(1)}

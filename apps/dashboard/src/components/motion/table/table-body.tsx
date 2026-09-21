@@ -69,7 +69,9 @@ export function TableBody<T>({
         </tr>
       ) : null}
       {renderedRows.map(({ entry, index }) => {
-        const detail = renderRowDetail?.(entry.row) ?? null;
+        const renderedDetail = renderRowDetail?.(entry.row);
+        const detail =
+          typeof renderedDetail === "boolean" ? null : (renderedDetail ?? null);
         return (
           <Fragment key={entry.id}>
             <TableBodyRow

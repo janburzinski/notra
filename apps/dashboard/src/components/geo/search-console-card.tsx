@@ -557,11 +557,17 @@ export function SearchConsoleToolbar({
         {action}
       </div>
     );
-    if (status.lastError) {
-      body = (
-        <p className="text-destructive pt-3 text-sm">{status.lastError}</p>
-      );
-    }
+    body = (
+      <p
+        className={cn(
+          "pt-3 text-sm",
+          status.lastError ? "text-destructive" : "text-muted-foreground"
+        )}
+      >
+        {status.lastError ??
+          "Choose which Search Console property Notra should analyze."}
+      </p>
+    );
   }
 
   return (

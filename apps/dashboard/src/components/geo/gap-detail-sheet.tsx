@@ -32,7 +32,10 @@ export function GapDetailSheet({
   const gap = prompt ?? retained;
   const headline = gap?.brief?.workingTitle ?? gap?.title ?? null;
   const visible = gapMissingEngineFamilies(gap?.mentionedEngines ?? []).length;
-  const total = visible + gapMissingEngineFamilies(gap?.engines ?? []).length;
+  const total = gapMissingEngineFamilies([
+    ...(gap?.mentionedEngines ?? []),
+    ...(gap?.engines ?? []),
+  ]).length;
   const coverage = `${visible} of ${total} engines mention you · ${formatMentionRate(gap?.ownMentionRate ?? 0)} mention rate`;
 
   return (

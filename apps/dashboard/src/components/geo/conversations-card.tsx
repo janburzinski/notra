@@ -9,6 +9,7 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { GEO_MAX_SEQUENCES } from "@notra/geo-core/constants/geo";
 import type { GeoPromptSequence } from "@notra/geo-core/types/geo";
 import { Switch } from "@notra/ui/components/ui/switch";
 import {
@@ -250,7 +251,7 @@ export function ConversationsCard({ organizationId }: ConversationsCardProps) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {!isLoading && sequences.length === 0 ? (
+          {!isLoading && sequences.length < GEO_MAX_SEQUENCES ? (
             <Button
               disabled={generateSequences.isPending}
               onClick={() => generateSequences.mutate()}
