@@ -1,7 +1,12 @@
 "use client";
 
 import { SidebarRail, useSidebar } from "@notra/ui/components/ui/sidebar";
-import { type KeyboardEvent, type PointerEvent, useRef } from "react";
+import {
+  type KeyboardEvent,
+  type PointerEvent,
+  useEffect,
+  useRef,
+} from "react";
 
 import {
   SIDEBAR_DEFAULT_WIDTH,
@@ -23,6 +28,16 @@ export function SidebarResizeHandle({
   const currentWidthRef = useRef<number | null>(null);
   const startWidthRef = useRef(0);
   const startXRef = useRef(0);
+  const clickTimeoutRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (clickTimeoutRef.current !== null) {
+        window.clearTimeout(clickTimeoutRef.current);
+      }
+    },
+    [state]
+  );
 
   const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     if (event.button !== 0) {
@@ -30,6 +45,10 @@ export function SidebarResizeHandle({
     }
 
     event.preventDefault();
+    if (clickTimeoutRef.current !== null) {
+      window.clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
     draggedRef.current = false;
     currentWidthRef.current = width;
     startWidthRef.current = width;
@@ -125,12 +144,22 @@ export function SidebarResizeHandle({
       aria-valuetext={state === "collapsed" ? "Collapsed" : `${width} pixels`}
       className="touch-none group-data-[collapsible=icon]:-right-5.5! after:hidden max-sm:hidden"
       onClick={(event) => {
-        if (!draggedRef.current || event.detail === 0) {
+        if (event.detail === 0) {
           setOpen(state === "collapsed");
+        } else if (!draggedRef.current && event.detail === 1) {
+          // Keep the rail under the pointer until a possible double-click.
+          clickTimeoutRef.current = window.setTimeout(() => {
+            clickTimeoutRef.current = null;
+            setOpen(state === "collapsed");
+          }, 500);
         }
         draggedRef.current = false;
       }}
       onDoubleClick={() => {
+        if (clickTimeoutRef.current !== null) {
+          window.clearTimeout(clickTimeoutRef.current);
+          clickTimeoutRef.current = null;
+        }
         setOpen(true);
         onWidthChange(SIDEBAR_DEFAULT_WIDTH);
         onWidthChangeEnd(SIDEBAR_DEFAULT_WIDTH);
