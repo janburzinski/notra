@@ -1,8 +1,7 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Kbd } from "@notra/ui/components/ui/kbd";
+import { Loader2Icon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
@@ -80,5 +79,5 @@ function GeoScanSpinner({ visible }: GeoScanSpinnerProps) {
     return null;
   }
 
-  return <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />;
+  return <Loader2Icon className="size-4 animate-spin" />;
 }

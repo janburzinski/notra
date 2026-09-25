@@ -1,13 +1,11 @@
 "use client";
 
-import {
-  Loading03Icon,
-  CheckmarkCircle02Icon,
-} from "@hugeicons/core-free-icons";
+import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Label } from "@notra/ui/components/ui/label";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/button";
@@ -78,10 +76,7 @@ export function LoginDetailsSection({
             >
               {passwordResetMutation.isPending ? (
                 <>
-                  <HugeiconsIcon
-                    icon={Loading03Icon}
-                    className="size-4 animate-spin"
-                  />
+                  <Loader2Icon className="size-4 animate-spin" />
                   Sending...
                 </>
               ) : (

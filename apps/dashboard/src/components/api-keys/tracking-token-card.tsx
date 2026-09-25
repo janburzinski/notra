@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveAlertDialog,
   ResponsiveAlertDialogAction,
@@ -14,6 +12,7 @@ import {
 } from "@notra/ui/components/shared/responsive-alert-dialog";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 
 import { ApiKeyRevealField } from "@/components/api-keys/api-key-reveal-field";
@@ -54,10 +53,7 @@ export function TrackingTokenCard({ organizationId }: TrackingTokenCardProps) {
           variant="outline"
         >
           {rotate.isPending ? (
-            <HugeiconsIcon
-              icon={Loading03Icon}
-              className="size-4 animate-spin"
-            />
+            <Loader2Icon className="size-4 animate-spin" />
           ) : null}
           Rotate
         </Button>

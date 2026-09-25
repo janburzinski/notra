@@ -1,6 +1,6 @@
 "use client";
 
-import { Loading03Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DropdownMenu,
@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
+import { Loader2Icon } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/button";
 import { cn } from "@/lib/utils";
@@ -36,9 +37,7 @@ export function AddReferenceControl({
         className={cn(buttonVariants({ variant: "outline" }))}
         disabled={isPending}
       >
-        {isPending ? (
-          <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
-        ) : null}
+        {isPending ? <Loader2Icon className="size-4 animate-spin" /> : null}
         Add as reference
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

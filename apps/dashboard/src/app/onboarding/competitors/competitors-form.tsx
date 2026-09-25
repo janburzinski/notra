@@ -1,6 +1,6 @@
 "use client";
 
-import { Loading03Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_MAX_COMPETITORS } from "@notra/geo-core/constants/geo";
 import type { GeoCompetitor } from "@notra/geo-core/types/geo";
@@ -8,6 +8,7 @@ import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { AuthFormHeader } from "@notra/ui/components/shared/auth/auth-form-header";
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { Label } from "@notra/ui/components/ui/label";
+import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
@@ -276,10 +277,7 @@ function CompetitorsPicker({
       <CtaButton className="w-full" disabled={busy} type="submit">
         {busy ? (
           <>
-            <HugeiconsIcon
-              icon={Loading03Icon}
-              className="size-4 animate-spin"
-            />
+            <Loader2Icon className="size-4 animate-spin" />
             {geoLocked ? "Saving" : "Running your first scan"}
           </>
         ) : (

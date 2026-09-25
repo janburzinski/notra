@@ -1,5 +1,4 @@
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { Loader2Icon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import type { ModalContentProps } from "@/types/brand-identity";
@@ -19,10 +18,7 @@ export function ModalContent({
   if (isPendingSettings) {
     return (
       <div className="flex justify-center py-4">
-        <HugeiconsIcon
-          icon={Loading03Icon}
-          className="text-primary size-8 animate-spin"
-        />
+        <Loader2Icon className="text-primary size-8 animate-spin" />
       </div>
     );
   }
@@ -63,10 +59,7 @@ export function ModalContent({
         >
           {isPending ? (
             <>
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-4 animate-spin"
-              />
+              <Loader2Icon className="size-4 animate-spin" />
               <span>Analyzing</span>
             </>
           ) : (

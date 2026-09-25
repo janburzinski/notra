@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { POST_TITLE_MAX_LENGTH } from "@notra/ai/schemas/limits";
 import { supportsPostSlug } from "@notra/ai/schemas/post";
 import {
@@ -28,6 +26,7 @@ import {
 } from "@notra/ui/components/ui/select";
 import { cn } from "@notra/ui/lib/utils";
 import { useForm, useStore } from "@tanstack/react-form";
+import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useRef } from "react";
 import { toast } from "sonner";
@@ -287,10 +286,7 @@ export function CreatePostDialog({
                   type="submit"
                 >
                   {mutation.isPending ? (
-                    <HugeiconsIcon
-                      icon={Loading03Icon}
-                      className="size-4 animate-spin"
-                    />
+                    <Loader2Icon className="size-4 animate-spin" />
                   ) : null}
                   Create post
                 </Button>

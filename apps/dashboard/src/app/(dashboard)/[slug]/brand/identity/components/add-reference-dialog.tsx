@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Loading03Icon,
   Add01Icon,
   ArrowLeft01Icon,
   Cancel01Icon,
@@ -34,6 +33,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -349,10 +349,7 @@ function TweetUrlStep({
         >
           {isPending ? (
             <>
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-4 animate-spin"
-              />
+              <Loader2Icon className="size-4 animate-spin" />
               Adding...
             </>
           ) : (
@@ -486,10 +483,7 @@ function ImportXStep({
 
         {isLoading && (
           <div className="flex justify-center py-8">
-            <HugeiconsIcon
-              icon={Loading03Icon}
-              className="text-muted-foreground size-6 animate-spin"
-            />
+            <Loader2Icon className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
 
@@ -550,10 +544,7 @@ function ImportXStep({
                 >
                   {isImporting && (
                     <>
-                      <HugeiconsIcon
-                        icon={Loading03Icon}
-                        className="size-3.5 animate-spin"
-                      />
+                      <Loader2Icon className="size-3.5 animate-spin" />
                       Importing...
                     </>
                   )}
@@ -581,10 +572,7 @@ function ImportXStep({
           >
             <div className="bg-muted flex size-9 shrink-0 items-center justify-center rounded-full">
               {isConnecting ? (
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
               ) : (
                 <HugeiconsIcon className="size-4" icon={Add01Icon} />
               )}

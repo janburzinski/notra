@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Loading03Icon,
   Delete02Icon,
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
@@ -30,6 +29,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -176,10 +176,7 @@ export function AttachmentsSection() {
             variant="destructive"
           >
             {deleteManyMutation.isPending ? (
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-4 animate-spin"
-              />
+              <LoaderCircle className="size-4 animate-spin" />
             ) : (
               <HugeiconsIcon icon={Delete02Icon} size={16} />
             )}

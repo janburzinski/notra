@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { addGranolaIntegrationFormSchema } from "@notra/schemas/dashboard/granola";
 import {
@@ -18,6 +16,7 @@ import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
 import { Granola } from "@notra/ui/components/ui/svgs/granola";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import type React from "react";
 import { isValidElement, useId, useState } from "react";
 import { toast } from "sonner";
@@ -180,10 +179,7 @@ export function AddGranolaIntegrationDialog({
           <Button disabled={createMutation.isPending} onClick={handleSubmit}>
             {createMutation.isPending ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
                 Verifying key
               </>
             ) : (

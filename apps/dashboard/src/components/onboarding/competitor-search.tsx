@@ -1,9 +1,8 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_BRAND_SEARCH_MAX_QUERY_LENGTH } from "@notra/geo-core/constants/geo";
 import { Combobox, ComboboxInput } from "@notra/ui/components/ui/combobox";
+import { Loader2Icon } from "lucide-react";
 
 import { CompetitorSearchContent } from "@/components/onboarding/competitor-search-content";
 import { useCompetitorSearchState } from "@/lib/hooks/use-competitor-search-state";
@@ -50,10 +49,7 @@ export function CompetitorSearch({
       >
         {search.searching ? (
           <span className="text-muted-foreground flex items-center pr-3">
-            <HugeiconsIcon
-              icon={Loading03Icon}
-              className="size-4 animate-spin"
-            />
+            <Loader2Icon className="size-4 animate-spin" />
           </span>
         ) : null}
       </ComboboxInput>

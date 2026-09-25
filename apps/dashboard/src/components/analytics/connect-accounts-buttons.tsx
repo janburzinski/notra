@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Loading03Icon,
   ArrowDown01Icon,
   Linkedin02Icon,
   NewTwitterIcon,
@@ -14,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
+import { Loader2Icon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { CONNECT_X_CLASS } from "@/constants/analytics";
@@ -48,7 +48,7 @@ export function ConnectAccountsButtons({
         }}
       >
         {twitter.isPending ? (
-          <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
+          <Loader2Icon className="size-4 animate-spin" />
         ) : (
           <HugeiconsIcon className="size-4" icon={NewTwitterIcon} />
         )}
@@ -80,10 +80,7 @@ export function ConnectAccountsButtons({
             }}
           >
             {linkedin.isPending ? (
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-4 animate-spin"
-              />
+              <Loader2Icon className="size-4 animate-spin" />
             ) : (
               <HugeiconsIcon className="size-4" icon={Linkedin02Icon} />
             )}

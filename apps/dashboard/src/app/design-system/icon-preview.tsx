@@ -3,7 +3,6 @@
 import {
   Copy01Icon,
   LinkSquare02Icon,
-  Loading03Icon,
   Refresh03Icon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
@@ -20,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -96,12 +96,11 @@ export function DesignSystemIconPreview() {
                   size="sm"
                   variant="outline"
                 >
-                  <HugeiconsIcon
-                    className={
-                      iconLoading ? "size-4 motion-safe:animate-spin" : "size-4"
-                    }
-                    icon={iconLoading ? Loading03Icon : Refresh03Icon}
-                  />
+                  {iconLoading ? (
+                    <Loader2Icon className="size-4 motion-safe:animate-spin" />
+                  ) : (
+                    <HugeiconsIcon className="size-4" icon={Refresh03Icon} />
+                  )}
                   {iconLoading ? "Scanning…" : "Rescan"}
                 </Button>
                 <Tooltip>

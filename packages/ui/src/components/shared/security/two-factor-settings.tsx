@@ -1,15 +1,8 @@
 "use client";
 
-import {
-  Add01Icon,
-  ArrowReloadHorizontalIcon,
-  Delete02Icon,
-  Loading03Icon,
-  SmartPhone01Icon,
-  SquareLockPasswordIcon,
-  TwoFactorAccessIcon,
-} from "@hugeicons/core-free-icons";
+import { Add01Icon, ArrowReloadHorizontalIcon, Delete02Icon, SmartPhone01Icon, SquareLockPasswordIcon, TwoFactorAccessIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Loader2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import type {
@@ -161,11 +154,7 @@ function FactorList({
                 variant="outline"
               >
                 {isRemoving ? (
-                  <HugeiconsIcon
-                    icon={Loading03Icon}
-                    className="animate-spin"
-                    data-icon="inline-start"
-                  />
+                  <Loader2Icon className="animate-spin" data-icon="inline-start" />
                 ) : (
                   <HugeiconsIcon data-icon="inline-start" icon={Delete02Icon} />
                 )}
@@ -237,11 +226,7 @@ export function TwoFactorSettings({
       type="button"
     >
       {isStartingEnrollment ? (
-        <HugeiconsIcon
-          icon={Loading03Icon}
-          className="animate-spin"
-          data-icon="inline-start"
-        />
+        <Loader2Icon className="animate-spin" data-icon="inline-start" />
       ) : (
         <HugeiconsIcon data-icon="inline-start" icon={Add01Icon} />
       )}

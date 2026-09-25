@@ -1,6 +1,6 @@
 "use client";
 
-import { CodeIcon, Loading03Icon } from "@hugeicons/core-free-icons";
+import { CodeIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ContentType } from "@notra/ai/schemas/content";
 import { Badge } from "@notra/ui/components/ui/badge";
@@ -10,6 +10,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { Loader2Icon } from "lucide-react";
 
 import { getContentTypeLabel } from "@/components/content/content-card";
 import { cn } from "@/lib/utils";
@@ -37,10 +38,7 @@ export function ContentSkeletonCard({
       <div className="border-border/60 bg-background flex min-h-28 flex-1 flex-col gap-2 overflow-hidden rounded-lg border px-3 pt-2.5 pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
-            <HugeiconsIcon
-              icon={Loading03Icon}
-              className="text-muted-foreground size-4 shrink-0 animate-spin"
-            />
+            <Loader2Icon className="text-muted-foreground size-4 shrink-0 animate-spin" />
             <p className="text-muted-foreground truncate text-base font-medium">
               Generating content...
             </p>

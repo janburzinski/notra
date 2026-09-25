@@ -1,9 +1,8 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -75,10 +74,7 @@ export function DevSettingsPane() {
           >
             {replay.isPending ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
                 Starting…
               </>
             ) : (

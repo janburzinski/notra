@@ -1,9 +1,9 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+
 import { useForm } from "@tanstack/react-form";
 
+import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState, useSyncExternalStore } from "react";
 import { useAuthFlow } from "../../../hooks/use-auth-flow";
@@ -268,10 +268,7 @@ export function LoginForm({
             >
               {authMethod === "email" ? (
                 <>
-                  <HugeiconsIcon
-                    icon={Loading03Icon}
-                    className="size-4 animate-spin"
-                  />
+                  <Loader2Icon className="size-4 animate-spin" />
                   Signing in...
                 </>
               ) : (

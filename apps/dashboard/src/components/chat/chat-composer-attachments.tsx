@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Loading03Icon,
   File02Icon,
   PlusSignIcon,
   Upload04Icon,
@@ -13,6 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 
@@ -128,12 +128,7 @@ export function ChatComposerAttachmentChips({
       ))}
       {pendingUploads.map((pending) => (
         <Composer.Chip
-          icon={
-            <HugeiconsIcon
-              icon={Loading03Icon}
-              className="size-3 animate-spin"
-            />
-          }
+          icon={<Loader2Icon className="size-3 animate-spin" />}
           key={pending.id}
           label={pending.filename}
           pending

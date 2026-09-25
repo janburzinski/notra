@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   onboardingWorkspaceFormFieldsSchema,
   onboardingWorkspaceFormSchema,
@@ -20,6 +18,7 @@ import {
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { useForm } from "@tanstack/react-form";
 import { useDebouncedValue } from "@tanstack/react-pacer";
+import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -446,10 +445,7 @@ export function WorkspaceForm({
             >
               {isSubmitting ? (
                 <>
-                  <HugeiconsIcon
-                    icon={Loading03Icon}
-                    className="size-4 animate-spin"
-                  />
+                  <Loader2Icon className="size-4 animate-spin" />
                   Setting up...
                 </>
               ) : (

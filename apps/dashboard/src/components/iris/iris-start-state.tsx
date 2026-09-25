@@ -1,9 +1,6 @@
-import {
-  Loading03Icon,
-  Alert02Icon,
-  RainbowIcon,
-} from "@hugeicons/core-free-icons";
+import { Alert02Icon, RainbowIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/button";
@@ -39,10 +36,7 @@ export function IrisStartState({
           >
             {isStarting ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
                 Starting Iris
               </>
             ) : (

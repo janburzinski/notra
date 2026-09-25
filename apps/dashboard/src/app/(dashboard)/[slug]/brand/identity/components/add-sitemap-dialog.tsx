@@ -1,6 +1,6 @@
 "use client";
 
-import { Loading03Icon, GlobalIcon } from "@hugeicons/core-free-icons";
+import { GlobalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveDialog,
@@ -12,6 +12,7 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
+import { Loader2Icon } from "lucide-react";
 import { type KeyboardEvent, useState } from "react";
 import { toast } from "sonner";
 
@@ -149,10 +150,7 @@ export function AddSitemapDialog({
           >
             {createSitemap.isPending ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
                 Adding...
               </>
             ) : (

@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Loading03Icon,
   Cancel01Icon,
   MinusSignIcon,
   PlusSignIcon,
@@ -18,6 +17,7 @@ import {
   ResponsiveDialogTrigger,
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Dithering } from "@paper-design/shaders-react";
+import { Loader2Icon } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
@@ -67,8 +67,7 @@ export function OnboardingAgentBanner({
       />
       {state === "running" ? (
         <output className="text-foreground flex items-center gap-2">
-          <HugeiconsIcon
-            icon={Loading03Icon}
+          <Loader2Icon
             aria-hidden
             className="size-4 animate-spin motion-reduce:animate-none"
           />
@@ -87,8 +86,7 @@ export function OnboardingAgentBanner({
               render={<Button size="sm" />}
             >
               {starting ? (
-                <HugeiconsIcon
-                  icon={Loading03Icon}
+                <Loader2Icon
                   aria-hidden
                   className="size-4 animate-spin motion-reduce:animate-none"
                 />

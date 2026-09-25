@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Confetti } from "@neoconfetti/react";
 import {
   ResponsiveDialog,
@@ -14,6 +12,7 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Linkedin } from "@notra/ui/components/ui/svgs/linkedin";
 import { XTwitter } from "@notra/ui/components/ui/svgs/twitter";
+import { Loader2Icon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -301,10 +300,7 @@ export function PostSocialButton({
               >
                 {publishMutation.isPending ? (
                   <>
-                    <HugeiconsIcon
-                      icon={Loading03Icon}
-                      className="size-4 animate-spin"
-                    />
+                    <Loader2Icon className="size-4 animate-spin" />
                     Posting...
                   </>
                 ) : (

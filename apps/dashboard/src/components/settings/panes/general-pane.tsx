@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Loading03Icon,
   Add01Icon,
   ArrowReloadHorizontalIcon,
   Cancel01Icon,
@@ -23,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -204,10 +204,7 @@ export function GeneralSettingsPane() {
                   >
                     {isRemovingOrganization ? (
                       <>
-                        <HugeiconsIcon
-                          icon={Loading03Icon}
-                          className="size-4 animate-spin"
-                        />
+                        <Loader2Icon className="size-4 animate-spin" />
                         Deleting...
                       </>
                     ) : (
@@ -326,10 +323,7 @@ function ConnectedAccountsGroup({
         {accounts.length > 0 && (
           <Button disabled={isConnecting} onClick={onConnect} size="sm">
             {isConnecting ? (
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-3.5 animate-spin"
-              />
+              <Loader2Icon className="size-3.5 animate-spin" />
             ) : (
               <HugeiconsIcon className="size-3.5" icon={Add01Icon} />
             )}
@@ -349,10 +343,7 @@ function ConnectedAccountsGroup({
           <Button disabled={isConnecting} onClick={onConnect} size="sm">
             {isConnecting ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-3.5 animate-spin"
-                />
+                <Loader2Icon className="size-3.5 animate-spin" />
                 Connecting...
               </>
             ) : (
@@ -423,10 +414,7 @@ function ConnectedAccountsGroup({
                   }
                 >
                   {isRefreshing ? (
-                    <HugeiconsIcon
-                      icon={Loading03Icon}
-                      className="size-3.5 animate-spin"
-                    />
+                    <Loader2Icon className="size-3.5 animate-spin" />
                   ) : (
                     <HugeiconsIcon
                       className="size-3.5"
@@ -450,10 +438,7 @@ function ConnectedAccountsGroup({
               >
                 {isDisconnecting ? (
                   <>
-                    <HugeiconsIcon
-                      icon={Loading03Icon}
-                      className="size-3.5 animate-spin"
-                    />
+                    <Loader2Icon className="size-3.5 animate-spin" />
                     Disconnecting...
                   </>
                 ) : (

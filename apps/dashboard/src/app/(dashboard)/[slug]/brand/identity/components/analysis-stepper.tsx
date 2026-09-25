@@ -1,8 +1,4 @@
-import {
-  Loading03Icon,
-  MinusSignIcon,
-  Tick02Icon,
-} from "@hugeicons/core-free-icons";
+import { MinusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Stepper,
@@ -13,6 +9,7 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@notra/ui/components/ui/stepper";
+import { Loader2Icon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ANALYSIS_STEPS } from "@/constants/brand-identity";
@@ -21,9 +18,7 @@ import { getStepIconState, getStepperValue } from "@/utils/brand-identity";
 
 const STEP_ICONS: Record<StepIconState, () => ReactNode> = {
   completed: () => <HugeiconsIcon className="size-4" icon={Tick02Icon} />,
-  active: () => (
-    <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
-  ),
+  active: () => <Loader2Icon className="size-4 animate-spin" />,
   pending: () => (
     <HugeiconsIcon
       className="text-muted-foreground size-4"

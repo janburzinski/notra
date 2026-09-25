@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Loading03Icon,
-  Copy01Icon,
-  Download01Icon,
-} from "@hugeicons/core-free-icons";
+import { Copy01Icon, Download01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ChatAttachment } from "@notra/ai/types/chat";
 import { MIME_DISPLAY_LABELS } from "@notra/schemas/constants/dashboard/upload";
@@ -15,6 +11,7 @@ import {
   DialogTitle,
 } from "@notra/ui/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -55,7 +52,7 @@ function TextPreview({ url }: { url: string }) {
   if (content === undefined) {
     return (
       <div className="text-muted-foreground flex h-full items-center justify-center">
-        <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
+        <Loader2Icon className="size-4 animate-spin" />
       </div>
     );
   }

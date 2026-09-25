@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Loading03Icon,
-  Logout02Icon,
-  ViewIcon,
-} from "@hugeicons/core-free-icons";
+import { Logout02Icon, ViewIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Avatar,
@@ -15,6 +11,7 @@ import { Badge } from "@notra/ui/components/ui/badge";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -254,10 +251,7 @@ export function OrganizationsSection() {
                       variant="outline"
                     >
                       {isSwitching === org.id ? (
-                        <HugeiconsIcon
-                          icon={Loading03Icon}
-                          className="size-4 animate-spin"
-                        />
+                        <LoaderCircle className="size-4 animate-spin" />
                       ) : (
                         <>
                           <HugeiconsIcon icon={ViewIcon} size={16} />
@@ -280,10 +274,7 @@ export function OrganizationsSection() {
                           variant="destructive"
                         >
                           {isProcessingOrgAction === org.id ? (
-                            <HugeiconsIcon
-                              icon={Loading03Icon}
-                              className="size-4 animate-spin"
-                            />
+                            <LoaderCircle className="size-4 animate-spin" />
                           ) : (
                             <>
                               <HugeiconsIcon icon={Logout02Icon} size={16} />

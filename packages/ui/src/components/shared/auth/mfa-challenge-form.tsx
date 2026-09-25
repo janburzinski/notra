@@ -1,13 +1,13 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+
 import {
   BACKUP_CODE_LENGTH,
   TOTP_CODE_LENGTH,
 } from "@notra/schemas/constants/dashboard/auth";
 import { normalizeBackupCode } from "@notra/schemas/utils/auth";
 
+import { Loader2Icon } from "lucide-react";
 import { useRef, useState } from "react";
 
 import type {
@@ -36,7 +36,7 @@ function SubmitButton({
     <CtaButton className="w-full" disabled={disabled} type="submit">
       {isPending ? (
         <>
-          <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
+          <Loader2Icon className="size-4 animate-spin" />
           {pendingLabel}
         </>
       ) : (

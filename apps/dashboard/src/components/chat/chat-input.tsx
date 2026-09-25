@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Loading03Icon,
   AiBrain01Icon,
   Alert02Icon,
   ArrowDown01Icon,
@@ -58,6 +57,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -333,7 +333,7 @@ function ChatComposerSendButton({
       tooltip={send.tooltip}
     >
       {send.icon === "queued" ? (
-        <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
+        <Loader2Icon className="size-4 animate-spin" />
       ) : (
         <HugeiconsIcon
           className="size-4"
@@ -683,12 +683,7 @@ function ChatComposerNudge({
           ))}
           {pendingUploads.map((pending) => (
             <Composer.Chip
-              icon={
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-3 animate-spin"
-                />
-              }
+              icon={<Loader2Icon className="size-3 animate-spin" />}
               key={pending.id}
               label={pending.filename}
               pending

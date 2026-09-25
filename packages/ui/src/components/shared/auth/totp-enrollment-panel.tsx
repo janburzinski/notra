@@ -1,13 +1,10 @@
 "use client";
 
-import {
-  CheckmarkCircle02Icon,
-  Copy01Icon,
-  Loading03Icon,
-} from "@hugeicons/core-free-icons";
+import { CheckmarkCircle02Icon, Copy01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TOTP_CODE_LENGTH } from "@notra/schemas/constants/dashboard/auth";
 
+import { Loader2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import type {
@@ -215,7 +212,7 @@ export function TotpEnrollmentPanel({
             type="submit"
           >
             {isPending && (
-              <HugeiconsIcon icon={Loading03Icon} className="animate-spin" />
+              <Loader2Icon className="animate-spin" />
             )}
             {submitLabel}
           </Button>

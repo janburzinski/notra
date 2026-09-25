@@ -1,6 +1,6 @@
 "use client";
 
-import { Loading03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveDialog,
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@notra/ui/components/ui/select";
+import { Loader2Icon } from "lucide-react";
 import { useId, useState } from "react";
 
 import { AddIdentityDialog } from "@/app/(dashboard)/[slug]/brand/identity/components/add-identity-dialog";
@@ -179,12 +180,7 @@ export function GeoProjectCreateDialog({
               onClick={handleCreate}
               type="button"
             >
-              {isCreating && (
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
-              )}
+              {isCreating && <Loader2Icon className="size-4 animate-spin" />}
               {isCreating ? "Setting up project" : "Create project"}
             </Button>
           </ResponsiveDialogFooter>

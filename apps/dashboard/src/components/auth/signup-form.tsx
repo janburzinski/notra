@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { signupSchema } from "@notra/schemas/dashboard/auth/credentials";
 import { AuthEmailField } from "@notra/ui/components/shared/auth/auth-email-field";
@@ -17,6 +15,7 @@ import { useAuthFlow } from "@notra/ui/hooks/use-auth-flow";
 import { setLastUsedLoginMethod } from "@notra/ui/lib/last-login-method";
 import type { AuthMethod, SocialProvider } from "@notra/ui/types/auth";
 import { useForm } from "@tanstack/react-form";
+import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useQueryStates } from "nuqs";
 import { useRef, useState } from "react";
@@ -303,10 +302,7 @@ export function SignupForm({
           >
             {authMethod === "email" ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
                 Creating account...
               </>
             ) : (

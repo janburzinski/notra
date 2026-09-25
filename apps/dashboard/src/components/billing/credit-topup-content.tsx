@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ADDONS,
   FEATURES,
@@ -14,6 +12,7 @@ import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { Input } from "@notra/ui/components/ui/input";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { cn } from "@notra/ui/lib/utils";
+import { Loader2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -218,9 +217,7 @@ export function CreditTopupContent({ onSuccess }: CreditTopupContentProps) {
         disabled={!activeAmount || loading}
         onClick={handleTopup}
       >
-        {loading && (
-          <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
-        )}
+        {loading && <Loader2Icon className="size-4 animate-spin" />}
         {!loading && activeAmount && `Add $${activeAmount} in credits`}
         {!(loading || activeAmount) && "Select an amount"}
       </Button>

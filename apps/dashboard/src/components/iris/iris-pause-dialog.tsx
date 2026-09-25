@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -10,6 +8,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
+import { Loader2Icon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import type { IrisPauseDialogProps } from "@/types/iris";
@@ -41,10 +40,7 @@ export function IrisPauseDialog({
           <Button disabled={isPausing} onClick={onConfirm}>
             {isPausing ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
                 Pausing
               </>
             ) : (

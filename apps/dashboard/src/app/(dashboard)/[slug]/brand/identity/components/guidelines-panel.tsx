@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  Loading03Icon,
-  Refresh03Icon,
-  SparklesIcon,
-} from "@hugeicons/core-free-icons";
+import { Refresh03Icon, SparklesIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { Loader2Icon } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -92,10 +89,7 @@ export function GuidelinesPanel({
         action={
           <Button disabled={isRefreshBusy} onClick={refresh.refreshGuidelines}>
             {isRefreshBusy ? (
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-4 animate-spin"
-              />
+              <Loader2Icon className="size-4 animate-spin" />
             ) : (
               <HugeiconsIcon className="size-4" icon={SparklesIcon} />
             )}
@@ -121,10 +115,7 @@ export function GuidelinesPanel({
       <div className="space-y-6">
         <div className="flex items-center justify-between gap-3">
           <p className="text-muted-foreground flex items-center gap-2 text-sm">
-            <HugeiconsIcon
-              icon={Loading03Icon}
-              className="size-4 animate-spin"
-            />
+            <Loader2Icon className="size-4 animate-spin" />
             Generating guidelines…
           </p>
         </div>
@@ -141,7 +132,7 @@ export function GuidelinesPanel({
     <div className="space-y-6">
       {isGenerating ? (
         <p className="text-muted-foreground flex items-center justify-end gap-2 text-xs">
-          <HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin" />
+          <Loader2Icon className="size-3 animate-spin" />
           Updating guidelines…
         </p>
       ) : null}
@@ -190,10 +181,7 @@ export function GuidelinesPanel({
               onClick={refresh.refreshGuidelines}
             >
               {isRefreshBusy ? (
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
               ) : (
                 <HugeiconsIcon className="size-4" icon={Refresh03Icon} />
               )}

@@ -1,7 +1,7 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+
+import { Loader2Icon } from "lucide-react";
 import { useId, useState } from "react";
 
 import type { SecondFactorConfirmProps } from "../../../types/security";
@@ -94,7 +94,7 @@ export function SecondFactorConfirm({
           variant={destructive ? "destructive" : "default"}
         >
           {isPending && (
-            <HugeiconsIcon icon={Loading03Icon} className="animate-spin" />
+            <Loader2Icon className="animate-spin" />
           )}
           {confirmLabel}
         </Button>

@@ -1,7 +1,5 @@
 "use client";
 
-import { Loading03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Confetti } from "@neoconfetti/react";
 import type { AgentFeedbackStatus } from "@notra/db/types/agent-feedback";
 import {
@@ -19,6 +17,7 @@ import {
   PermissionRow,
 } from "@notra/ui/components/ui/permission-selector";
 import { cn } from "@notra/ui/lib/utils";
+import { Loader2Icon } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useState } from "react";
 
@@ -286,10 +285,7 @@ function FeedbackList({
             variant="outline"
           >
             {isFetchingNextPage ? (
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-4 animate-spin"
-              />
+              <Loader2Icon className="size-4 animate-spin" />
             ) : null}
             Load more
           </Button>

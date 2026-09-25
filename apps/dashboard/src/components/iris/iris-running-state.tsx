@@ -1,6 +1,6 @@
 "use client";
 
-import { Loading03Icon, PauseIcon, PlayIcon } from "@hugeicons/core-free-icons";
+import { PauseIcon, PlayIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
@@ -9,6 +9,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@notra/ui/components/ui/tabs";
+import { Loader2Icon } from "lucide-react";
 import { useId } from "react";
 
 import { Button } from "@/components/button";
@@ -80,10 +81,7 @@ export function IrisRunningState({
           >
             {isRunNowPending ? (
               <>
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-4 animate-spin"
-                />
+                <Loader2Icon className="size-4 animate-spin" />
                 Starting
               </>
             ) : (
@@ -96,10 +94,7 @@ export function IrisRunningState({
             variant={isPaused ? "default" : "outline"}
           >
             {isStatusPending ? (
-              <HugeiconsIcon
-                icon={Loading03Icon}
-                className="size-4 animate-spin"
-              />
+              <Loader2Icon className="size-4 animate-spin" />
             ) : (
               <HugeiconsIcon
                 className="size-4"
@@ -172,10 +167,7 @@ export function IrisRunningState({
               >
                 {runsState.isLoadingMore ? (
                   <>
-                    <HugeiconsIcon
-                      icon={Loading03Icon}
-                      className="size-4 animate-spin"
-                    />
+                    <Loader2Icon className="size-4 animate-spin" />
                     Loading
                   </>
                 ) : (

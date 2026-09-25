@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  Add01Icon,
-  ArrowDownLeftIcon,
-  AttachmentIcon,
-  Cancel01Icon,
-  Image01Icon,
-  Loading03Icon,
-  Mic01Icon,
-  Square01Icon,
-} from "@hugeicons/core-free-icons";
+import { Add01Icon, ArrowDownLeftIcon, AttachmentIcon, Cancel01Icon, Image01Icon, Mic01Icon, Square01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@notra/ui/components/ui/button";
 import {
@@ -48,6 +39,7 @@ import {
 import type { ChatStatus, FileUIPart } from "ai";
 
 import { nanoid } from "nanoid";
+import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import {
   type ChangeEvent,
@@ -1031,7 +1023,7 @@ export type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {
 
 const STATUS_ICONS: Record<ChatStatus, ReactNode> = {
   submitted: (
-    <HugeiconsIcon icon={Loading03Icon} className="size-4 animate-spin" />
+    <Loader2Icon className="size-4 animate-spin" />
   ),
   streaming: <HugeiconsIcon className="size-4" icon={Square01Icon} />,
   error: <HugeiconsIcon className="size-4" icon={Cancel01Icon} />,
