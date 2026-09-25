@@ -9,12 +9,7 @@ export async function isContactSpam(
 ): Promise<boolean> {
   const evaluation = await getEvaluationClient().tryEvaluate({
     feature: "contact-spam",
-    state: {
-      name: input.name,
-      email: input.email,
-      company: input.company ?? null,
-      message: input.message,
-    },
+    state: { message: input.message },
     questions: CONTACT_SPAM_QUESTION,
   });
 
