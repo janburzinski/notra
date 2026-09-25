@@ -1025,7 +1025,7 @@ function StepperIndicator(props: StepperIndicatorProps) {
     ) : children ? (
       children
     ) : dataState === "completed" ? (
-      <HugeiconsIcon icon={Tick02Icon} className="size-4" />
+      <HugeiconsIcon icon={Tick02Icon} className="size-4" strokeWidth={2} />
     ) : (
       stepPosition
     );
