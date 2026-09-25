@@ -1,5 +1,7 @@
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { HTMLAttributes } from "react";
-import { Loader2Icon } from "lucide-react";
+
 import { cn } from "@notra/ui/lib/utils";
 
 export type LoaderProps = HTMLAttributes<HTMLDivElement> & {
@@ -11,6 +13,6 @@ export const Loader = ({ className, size = 16, ...props }: LoaderProps) => (
     className={cn("inline-flex items-center justify-center", className)}
     {...props}
   >
-    <Loader2Icon className="animate-spin" size={size} />
+    <HugeiconsIcon icon={Loading03Icon} className="animate-spin" size={size} />
   </div>
 );

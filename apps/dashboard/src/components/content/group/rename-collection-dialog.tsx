@@ -1,5 +1,7 @@
 "use client";
 
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -12,7 +14,6 @@ import { Button } from "@notra/ui/components/ui/button";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 
@@ -115,7 +116,10 @@ export function RenameCollectionDialog({
           <Button disabled={!canSubmit} onClick={handleSubmit}>
             {rename.isPending ? (
               <>
-                <Loader2Icon className="size-4 animate-spin" />
+                <HugeiconsIcon
+                  icon={Loading03Icon}
+                  className="size-4 animate-spin"
+                />
                 Saving...
               </>
             ) : (

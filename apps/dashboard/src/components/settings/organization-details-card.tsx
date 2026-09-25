@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload01Icon } from "@hugeicons/core-free-icons";
+import { Loading03Icon, Upload01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   organizationNameSchema,
@@ -16,7 +16,6 @@ import { Label } from "@notra/ui/components/ui/label";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -210,7 +209,10 @@ export function OrganizationDetailsCard({
               </AvatarFallback>
               {isUploadingLogo && (
                 <span className="bg-background/80 absolute inset-0 flex items-center justify-center rounded-lg">
-                  <Loader2Icon className="size-6 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-6 animate-spin"
+                  />
                 </span>
               )}
               <span className="bg-background/80 absolute inset-0 flex items-center justify-center rounded-lg opacity-0 transition-opacity group-hover/logo:opacity-100">
@@ -296,7 +298,10 @@ export function OrganizationDetailsCard({
         <Button disabled={isUpdating} type="submit">
           {isUpdating ? (
             <>
-              <Loader2Icon className="size-4 animate-spin" />
+              <HugeiconsIcon
+                icon={Loading03Icon}
+                className="size-4 animate-spin"
+              />
               Saving...
             </>
           ) : (

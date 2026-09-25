@@ -27,7 +27,6 @@ const nextConfig: NextConfig = {
       "cmdk",
       "date-fns",
       "echarts",
-      "lucide-react",
       "motion/react",
       "nuqs",
       "recharts",

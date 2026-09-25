@@ -1,11 +1,10 @@
 "use client";
 
-import { GlobalIcon } from "@hugeicons/core-free-icons";
+import { Loading03Icon, GlobalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_WRITE_SITEMAP_SKELETON_KEYS } from "@notra/geo-core/constants/geo";
 import { Input } from "@notra/ui/components/ui/input";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { type KeyboardEvent, useState } from "react";
 import { toast } from "sonner";
@@ -159,7 +158,10 @@ export function WriteSitemapSection({
             variant="outline"
           >
             {createSitemap.isPending ? (
-              <Loader2Icon className="size-4 animate-spin" />
+              <HugeiconsIcon
+                icon={Loading03Icon}
+                className="size-4 animate-spin"
+              />
             ) : null}
             {sitemaps.length > 0 ? "Add another" : "Add sitemap"}
           </Button>

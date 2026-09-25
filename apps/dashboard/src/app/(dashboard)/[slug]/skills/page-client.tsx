@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Loading03Icon,
   Link04Icon,
   PlusSignIcon,
   Search01Icon,
@@ -28,7 +29,6 @@ import { Separator } from "@notra/ui/components/ui/separator";
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -375,7 +375,10 @@ function CreateSkillFormDialog({
                   size="sm"
                 >
                   {importPending ? (
-                    <Loader2Icon className="size-3.5 animate-spin" />
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      className="size-3.5 animate-spin"
+                    />
                   ) : null}
                   {importPending ? "Importing" : "Import"}
                 </Button>

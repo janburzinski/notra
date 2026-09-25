@@ -1,7 +1,8 @@
 "use client";
 
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { AuthFlowResult } from "@notra/schemas/types/dashboard/auth";
-import { Loader2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { LoginForm } from "@/components/auth/login-form";
@@ -37,7 +38,11 @@ export function SocialEnrollmentResume({
         className="text-muted-foreground flex min-h-48 items-center justify-center"
         role="status"
       >
-        <Loader2Icon aria-hidden className="size-5 animate-spin" />
+        <HugeiconsIcon
+          icon={Loading03Icon}
+          aria-hidden
+          className="size-5 animate-spin"
+        />
         <span className="sr-only">Preparing two-factor setup</span>
       </div>
     );

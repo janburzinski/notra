@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Loading03Icon,
   ArrowReloadHorizontalIcon,
   ArrowRight01Icon,
   Cancel01Icon,
@@ -27,7 +28,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { Loader2Icon } from "lucide-react";
 import { useCallback, useEffect, useReducer } from "react";
 import { toast } from "sonner";
 
@@ -355,7 +355,10 @@ export function BlogChangelogPreview({
                 >
                   {effectiveState === "loading" ? (
                     <>
-                      <Loader2Icon className="size-4 animate-spin" />
+                      <HugeiconsIcon
+                        icon={Loading03Icon}
+                        className="size-4 animate-spin"
+                      />
                       Saving
                     </>
                   ) : (
@@ -376,7 +379,10 @@ export function BlogChangelogPreview({
                   {effectiveState === "loading" &&
                   userAction === "publishing" ? (
                     <>
-                      <Loader2Icon className="size-4 animate-spin" />
+                      <HugeiconsIcon
+                        icon={Loading03Icon}
+                        className="size-4 animate-spin"
+                      />
                       Publishing
                     </>
                   ) : (

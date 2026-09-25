@@ -1,6 +1,10 @@
 "use client";
 
-import { Delete02Icon, Logout01Icon } from "@hugeicons/core-free-icons";
+import {
+  Loading03Icon,
+  Delete02Icon,
+  Logout01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveDialog,
@@ -16,7 +20,6 @@ import {
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -125,7 +128,10 @@ export function OnboardingAccountMenu() {
                 variant="outline"
               >
                 {isSigningOut ? (
-                  <Loader2Icon className="size-4 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-4 animate-spin"
+                  />
                 ) : (
                   <HugeiconsIcon icon={Logout01Icon} size={16} />
                 )}

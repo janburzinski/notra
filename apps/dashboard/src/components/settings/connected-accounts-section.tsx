@@ -1,11 +1,10 @@
 "use client";
 
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Loading03Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Google } from "@notra/ui/components/ui/svgs/google";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
-import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -114,7 +113,10 @@ export function ConnectedAccountsSection({
                 variant="outline"
               >
                 {loadingProvider === "google" ? (
-                  <Loader2Icon className="size-4 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-4 animate-spin"
+                  />
                 ) : (
                   <>
                     <HugeiconsIcon icon={Cancel01Icon} size={16} />
@@ -131,7 +133,10 @@ export function ConnectedAccountsSection({
                 variant="outline"
               >
                 {loadingProvider === "google" ? (
-                  <Loader2Icon className="size-4 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-4 animate-spin"
+                  />
                 ) : (
                   "Connect"
                 )}
@@ -162,7 +167,10 @@ export function ConnectedAccountsSection({
                 variant="outline"
               >
                 {loadingProvider === "github" ? (
-                  <Loader2Icon className="size-4 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-4 animate-spin"
+                  />
                 ) : (
                   <>
                     <HugeiconsIcon icon={Cancel01Icon} size={16} />
@@ -179,7 +187,10 @@ export function ConnectedAccountsSection({
                 variant="outline"
               >
                 {loadingProvider === "github" ? (
-                  <Loader2Icon className="size-4 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-4 animate-spin"
+                  />
                 ) : (
                   "Connect"
                 )}

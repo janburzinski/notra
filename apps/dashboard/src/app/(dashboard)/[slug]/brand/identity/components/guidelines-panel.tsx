@@ -1,9 +1,12 @@
 "use client";
 
-import { RefreshIcon, SparklesIcon } from "@hugeicons/core-free-icons";
+import {
+  Loading03Icon,
+  Refresh03Icon,
+  SparklesIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Loader2Icon } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -72,7 +75,7 @@ export function GuidelinesPanel({
   if (isError) {
     return (
       <EmptyState
-        actionIcon={<HugeiconsIcon className="size-4" icon={RefreshIcon} />}
+        actionIcon={<HugeiconsIcon className="size-4" icon={Refresh03Icon} />}
         actionLabel="Retry"
         description="We couldn't load this brand identity's guidelines."
         onActionClick={() => refetch()}
@@ -89,7 +92,10 @@ export function GuidelinesPanel({
         action={
           <Button disabled={isRefreshBusy} onClick={refresh.refreshGuidelines}>
             {isRefreshBusy ? (
-              <Loader2Icon className="size-4 animate-spin" />
+              <HugeiconsIcon
+                icon={Loading03Icon}
+                className="size-4 animate-spin"
+              />
             ) : (
               <HugeiconsIcon className="size-4" icon={SparklesIcon} />
             )}
@@ -115,7 +121,10 @@ export function GuidelinesPanel({
       <div className="space-y-6">
         <div className="flex items-center justify-between gap-3">
           <p className="text-muted-foreground flex items-center gap-2 text-sm">
-            <Loader2Icon className="size-4 animate-spin" />
+            <HugeiconsIcon
+              icon={Loading03Icon}
+              className="size-4 animate-spin"
+            />
             Generating guidelines…
           </p>
         </div>
@@ -132,7 +141,7 @@ export function GuidelinesPanel({
     <div className="space-y-6">
       {isGenerating ? (
         <p className="text-muted-foreground flex items-center justify-end gap-2 text-xs">
-          <Loader2Icon className="size-3 animate-spin" />
+          <HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin" />
           Updating guidelines…
         </p>
       ) : null}
@@ -181,9 +190,12 @@ export function GuidelinesPanel({
               onClick={refresh.refreshGuidelines}
             >
               {isRefreshBusy ? (
-                <Loader2Icon className="size-4 animate-spin" />
+                <HugeiconsIcon
+                  icon={Loading03Icon}
+                  className="size-4 animate-spin"
+                />
               ) : (
-                <HugeiconsIcon className="size-4" icon={RefreshIcon} />
+                <HugeiconsIcon className="size-4" icon={Refresh03Icon} />
               )}
               {isRefreshBusy ? "Refreshing…" : "Refresh Guidelines"}
             </Button>

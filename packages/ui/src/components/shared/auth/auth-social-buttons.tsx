@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2Icon } from "lucide-react";
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type {
   AuthSocialButtonsProps,
   SocialProvider,
@@ -42,7 +43,10 @@ export function AuthSocialButtons({
             variant="light"
           >
             {authMethod === provider ? (
-              <Loader2Icon className="size-4 animate-spin" />
+              <HugeiconsIcon
+                icon={Loading03Icon}
+                className="size-4 animate-spin"
+              />
             ) : (
               <Icon
                 className={

@@ -1,7 +1,9 @@
 "use client";
 
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useForm } from "@tanstack/react-form";
-import { Loader2Icon } from "lucide-react";
+
 import Link from "next/link";
 import { useRef, useState, useSyncExternalStore } from "react";
 import { useAuthFlow } from "../../../hooks/use-auth-flow";
@@ -37,7 +39,7 @@ const returnNull = () => null;
 
 const validateFilledField = (
   validate: (value: string) => string | undefined,
-  value: string
+  value: string,
 ) => (value.length > 0 ? validate(value) : undefined);
 
 export function LoginForm({
@@ -59,14 +61,14 @@ export function LoginForm({
 }: LoginFormProps) {
   const [authMethod, setAuthMethod] = useState<AuthMethod | null>(null);
   const [formError, setFormError] = useState<string | null>(
-    initialError ?? null
+    initialError ?? null,
   );
   const authInFlightRef = useRef(false);
   const flow = useAuthFlow({ initialPending, onSuccess });
   const lastMethod = useSyncExternalStore(
     subscribeToNothing,
     getLastUsedLoginMethod,
-    returnNull
+    returnNull,
   );
   const isAuthLoading = authMethod !== null;
   const callbackURL = returnTo ?? callbackPath;
@@ -79,7 +81,7 @@ export function LoginForm({
   function startRedirectSignIn(
     method: AuthMethod,
     start: () => Promise<void>,
-    fallbackError: string
+    fallbackError: string,
   ) {
     if (authInFlightRef.current) {
       return;
@@ -117,7 +119,7 @@ export function LoginForm({
         setFormError(
           result.status === "error"
             ? result.message || LOGIN_ERROR_FALLBACK
-            : LOGIN_ERROR_FALLBACK
+            : LOGIN_ERROR_FALLBACK,
         );
       }
       if (result.status !== "success") {
@@ -133,7 +135,10 @@ export function LoginForm({
   const form = useForm({
     defaultValues: { email: "", password: "" },
     onSubmit: async ({ value }) => {
-      if (validators.email(value.email) || validators.password(value.password)) {
+      if (
+        validators.email(value.email) ||
+        validators.password(value.password)
+      ) {
         return;
       }
       await submitPassword(value.email, value.password);
@@ -153,7 +158,7 @@ export function LoginForm({
       return;
     }
     setFormError(
-      `Backup code accepted. Two-factor authentication was turned off for ${recoveredEmail}. Sign in again to continue.`
+      `Backup code accepted. Two-factor authentication was turned off for ${recoveredEmail}. Sign in again to continue.`,
     );
   }
 
@@ -186,7 +191,7 @@ export function LoginForm({
             startRedirectSignIn(
               provider,
               () => startSocialSignIn({ provider, returnTo: callbackURL }),
-              SOCIAL_ERROR_FALLBACK
+              SOCIAL_ERROR_FALLBACK,
             )
           }
         />
@@ -252,10 +257,7 @@ export function LoginForm({
 
           <div className="relative mt-4 pt-2">
             {lastMethod === "email" && (
-              <Badge
-                className="-right-2 absolute top-0 z-10"
-                variant="default"
-              >
+              <Badge className="-right-2 absolute top-0 z-10" variant="default">
                 Last Used
               </Badge>
             )}
@@ -266,7 +268,10 @@ export function LoginForm({
             >
               {authMethod === "email" ? (
                 <>
-                  <Loader2Icon className="size-4 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-4 animate-spin"
+                  />
                   Signing in...
                 </>
               ) : (

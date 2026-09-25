@@ -1,5 +1,7 @@
 "use client";
 
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_SAMPLE_DATA_ENABLED } from "@notra/geo-core/constants/geo";
 import {
   ResponsiveAlertDialog,
@@ -14,7 +16,6 @@ import {
 } from "@notra/ui/components/shared/responsive-alert-dialog";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/button";
@@ -121,7 +122,10 @@ export function DevSampleDataCard({ organizationId }: DevSampleDataCardProps) {
           <Button disabled={isPending} onClick={() => reset.mutate()} size="sm">
             {reset.isPending ? (
               <>
-                <Loader2Icon className="size-4 animate-spin" />
+                <HugeiconsIcon
+                  icon={Loading03Icon}
+                  className="size-4 animate-spin"
+                />
                 Resetting…
               </>
             ) : (

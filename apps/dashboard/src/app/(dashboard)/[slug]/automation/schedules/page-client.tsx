@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Loading03Icon,
   Add01Icon,
   Delete02Icon,
   Edit02Icon,
@@ -43,7 +44,6 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -694,7 +694,10 @@ function ScheduleDeleteDialog({
           >
             {isPending ? (
               <>
-                <Loader2Icon className="size-4 animate-spin" />
+                <HugeiconsIcon
+                  icon={Loading03Icon}
+                  className="size-4 animate-spin"
+                />
                 Deleting...
               </>
             ) : (
@@ -851,7 +854,10 @@ function ScheduleTable({
                   variant="ghost"
                 >
                   {isThisUpdating || isThisRunning ? (
-                    <Loader2Icon className="size-4 animate-spin" />
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      className="size-4 animate-spin"
+                    />
                   ) : (
                     <HugeiconsIcon
                       className="text-muted-foreground size-4"

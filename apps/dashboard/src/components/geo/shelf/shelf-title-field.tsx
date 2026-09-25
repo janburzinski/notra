@@ -1,9 +1,10 @@
 "use client";
 
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_SHELF_TITLE_MAX_LENGTH } from "@notra/schemas/constants/dashboard/geo-shelf";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
-import { Loader2Icon } from "lucide-react";
 
 import type { GeoShelfTitleFieldProps } from "@/types/geo-shelf";
 
@@ -29,7 +30,10 @@ export function ShelfTitleField({
         </Label>
         {isPreviewLoading ? (
           <span className="text-muted-foreground inline-flex items-center gap-1 text-xs">
-            <Loader2Icon className="size-3 animate-spin" />
+            <HugeiconsIcon
+              icon={Loading03Icon}
+              className="size-3 animate-spin"
+            />
             Reading page title
           </span>
         ) : null}

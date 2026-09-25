@@ -1,6 +1,6 @@
 "use client";
 
-import { Tick02Icon } from "@hugeicons/core-free-icons";
+import { Loading03Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Avatar,
@@ -9,7 +9,6 @@ import {
 } from "@notra/ui/components/ui/avatar";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Notra } from "@notra/ui/components/ui/svgs/notra";
-import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
@@ -193,7 +192,10 @@ function LinkedInConnectContent() {
           onClick={handleConnect}
         >
           {completeMutation.isPending && (
-            <Loader2Icon className="size-4 animate-spin" />
+            <HugeiconsIcon
+              icon={Loading03Icon}
+              className="size-4 animate-spin"
+            />
           )}
           {selectedIds.length === 1
             ? "Connect 1 profile"
@@ -233,7 +235,10 @@ export default function LinkedInConnectPage() {
     <Suspense
       fallback={
         <div className="flex min-h-svh items-center justify-center">
-          <Loader2Icon className="text-muted-foreground size-6 animate-spin" />
+          <HugeiconsIcon
+            icon={Loading03Icon}
+            className="text-muted-foreground size-6 animate-spin"
+          />
         </div>
       }
     >

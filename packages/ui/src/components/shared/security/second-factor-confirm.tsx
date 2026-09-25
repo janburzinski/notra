@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2Icon } from "lucide-react";
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useId, useState } from "react";
 
 import type { SecondFactorConfirmProps } from "../../../types/security";
@@ -56,9 +57,7 @@ export function SecondFactorConfirm({
         <p className="text-muted-foreground text-sm">{description}</p>
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor={inputId}>
-          Authenticator or backup code
-        </Label>
+        <Label htmlFor={inputId}>Authenticator or backup code</Label>
         <Input
           aria-describedby={error ? errorId : undefined}
           aria-invalid={error ? true : undefined}
@@ -75,11 +74,7 @@ export function SecondFactorConfirm({
           value={code}
         />
         {error && (
-          <p
-            className="text-destructive text-xs"
-            id={errorId}
-            role="alert"
-          >
+          <p className="text-destructive text-xs" id={errorId} role="alert">
             {error}
           </p>
         )}
@@ -98,7 +93,9 @@ export function SecondFactorConfirm({
           type="submit"
           variant={destructive ? "destructive" : "default"}
         >
-          {isPending && <Loader2Icon className="animate-spin" />}
+          {isPending && (
+            <HugeiconsIcon icon={Loading03Icon} className="animate-spin" />
+          )}
           {confirmLabel}
         </Button>
       </div>

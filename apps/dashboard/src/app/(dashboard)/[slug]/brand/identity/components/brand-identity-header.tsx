@@ -1,9 +1,12 @@
 "use client";
 
-import { Add01Icon, RefreshIcon } from "@hugeicons/core-free-icons";
+import {
+  Loading03Icon,
+  Add01Icon,
+  Refresh03Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Kbd } from "@notra/ui/components/ui/kbd";
-import { Loader2Icon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { BRAND_TAB_HEADERS } from "@/constants/brand-identity";
@@ -51,9 +54,12 @@ export function BrandIdentityHeader({
       {activeTab === "guidelines" ? (
         <Button disabled={isRefreshingGuidelines} onClick={onRefreshGuidelines}>
           {isRefreshingGuidelines ? (
-            <Loader2Icon className="size-4 animate-spin" />
+            <HugeiconsIcon
+              icon={Loading03Icon}
+              className="size-4 animate-spin"
+            />
           ) : (
-            <HugeiconsIcon className="size-4" icon={RefreshIcon} />
+            <HugeiconsIcon className="size-4" icon={Refresh03Icon} />
           )}
           Refresh Guidelines
         </Button>

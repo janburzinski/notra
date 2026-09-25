@@ -1,6 +1,11 @@
 "use client";
 
-import { ArrowDown01Icon, CpuIcon } from "@hugeicons/core-free-icons";
+import {
+  ArrowDown01Icon,
+  Cancel01Icon,
+  CpuIcon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   commitsByTimeframeInputSchema,
@@ -30,7 +35,6 @@ import {
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
 import { cn } from "@notra/ui/lib/utils";
-import { CheckIcon, XIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { type ReactNode, useState } from "react";
 
@@ -956,7 +960,7 @@ export function ChatToolBlock({
             <div className="flex flex-wrap items-center gap-2">
               {onApprove ? (
                 <Button onClick={onApprove} size="sm" type="button">
-                  <CheckIcon className="size-3.5" />
+                  <HugeiconsIcon icon={Tick02Icon} className="size-3.5" />
                   Allow
                 </Button>
               ) : null}
@@ -967,7 +971,7 @@ export function ChatToolBlock({
                   type="button"
                   variant="ghost"
                 >
-                  <XIcon className="size-3.5" />
+                  <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
                   Deny
                 </Button>
               ) : null}

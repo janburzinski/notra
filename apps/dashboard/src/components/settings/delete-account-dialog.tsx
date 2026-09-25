@@ -1,6 +1,10 @@
 "use client";
 
-import { Alert01Icon, Building06Icon } from "@hugeicons/core-free-icons";
+import {
+  Loading03Icon,
+  Alert01Icon,
+  Building06Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveAlertDialog,
@@ -25,7 +29,6 @@ import {
 } from "@notra/ui/components/ui/radio-group";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ReactElement } from "react";
 import { useState } from "react";
@@ -301,7 +304,10 @@ export function DeleteAccountDialog({
           >
             {isDeleting ? (
               <>
-                <Loader2Icon className="size-4 animate-spin" />
+                <HugeiconsIcon
+                  icon={Loading03Icon}
+                  className="size-4 animate-spin"
+                />
                 Deleting...
               </>
             ) : (

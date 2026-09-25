@@ -1,7 +1,9 @@
 "use client";
 
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { TOTP_CODE_LENGTH } from "@notra/schemas/constants/dashboard/auth";
-import { Loader2Icon } from "lucide-react";
+
 import { useRef, useState } from "react";
 import type { EmailVerificationFormProps } from "../../../types/auth";
 import { CtaButton } from "../cta-button";
@@ -43,7 +45,7 @@ export function EmailVerificationForm({
       return;
     }
     setFormError(
-      result?.status === "error" ? result.message : VERIFY_ERROR_FALLBACK
+      result?.status === "error" ? result.message : VERIFY_ERROR_FALLBACK,
     );
     setCode("");
     setIsPending(false);
@@ -84,7 +86,10 @@ export function EmailVerificationForm({
           >
             {isPending ? (
               <>
-                <Loader2Icon className="size-4 animate-spin" />
+                <HugeiconsIcon
+                  icon={Loading03Icon}
+                  className="size-4 animate-spin"
+                />
                 Verifying...
               </>
             ) : (

@@ -1,5 +1,7 @@
 "use client";
 
+import { Loading03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { promptKey } from "@notra/geo-core/geo/prompt-key";
 import { buildBrandTerms } from "@notra/geo-core/geo/suggestion-keywords";
 import { normalizeWebsiteUrl } from "@notra/geo-core/utils/geo-website";
@@ -8,7 +10,6 @@ import { AuthFormHeader } from "@notra/ui/components/shared/auth/auth-form-heade
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
-import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
@@ -153,7 +154,10 @@ function VisibilityReview({
       <CtaButton className="w-full" disabled={!canSubmit} type="submit">
         {busy ? (
           <>
-            <Loader2Icon className="size-4 animate-spin" />
+            <HugeiconsIcon
+              icon={Loading03Icon}
+              className="size-4 animate-spin"
+            />
             Saving
           </>
         ) : (
@@ -293,7 +297,10 @@ export function VisibilityForm({
               />
               {isAnalyzing ? (
                 <span className="text-muted-foreground flex h-full items-center px-3.5">
-                  <Loader2Icon className="size-4 animate-spin" />
+                  <HugeiconsIcon
+                    icon={Loading03Icon}
+                    className="size-4 animate-spin"
+                  />
                 </span>
               ) : null}
             </div>
