@@ -26,10 +26,11 @@ export function createSaveMemoryTool() {
           retryTransientEffect(
             requestSupermemoryEffect("/v4/search", {
               q: content,
-              searchMode: "hybrid",
+              searchMode: "memories",
               limit: 5,
               rerank: true,
               containerTag,
+              filters: { AND: [{ key: "source", value: MEMORY_SOURCE_TAG }] },
             }),
             { operationName: "Supermemory duplicate check" }
           )
@@ -37,14 +38,13 @@ export function createSaveMemoryTool() {
       );
       const existing = existingSearch.results.find(
         (result) =>
-          result.memory === content ||
-          result.chunk === content ||
-          result.chunks?.some((chunk) => chunk.content === content)
+          result.memory === content &&
+          result.metadata?.source === MEMORY_SOURCE_TAG
       );
       if (existing) {
         return {
           documentId: existing.documentId ?? null,
-          memoryId: existing.memory ? (existing.id ?? null) : null,
+          memoryId: existing.id ?? null,
           skipped: true,
           topic,
         };
