@@ -146,7 +146,19 @@ describe("selected grounded engines", () => {
           type: "language",
           zdr: "none" as const,
         },
+        {
+          id: "perplexity/sonar-pro",
+          name: "Sonar Pro",
+          owned_by: "perplexity",
+          type: "language",
+          zdr: "none" as const,
+        },
       ];
+      expect(
+        buildGeoModelCatalogFromFeed(feed)
+          .models.filter((model) => model.provider === "perplexity")
+          .map((model) => model.id)
+      ).toEqual(["perplexity/sonar"]);
       for (const available of [
         seedGeoModelCatalog(),
         buildGeoModelCatalogFromFeed(feed),

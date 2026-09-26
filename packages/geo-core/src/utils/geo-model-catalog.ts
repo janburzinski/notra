@@ -98,7 +98,10 @@ export function buildGeoModelCatalogFromFeed(
   for (const provider of GEO_MODEL_PROVIDERS) {
     const entries = feed
       .filter(
-        (model) => model.owned_by === provider.id && isEligibleFeedModel(model)
+        (model) =>
+          model.owned_by === provider.id &&
+          (provider.id !== "perplexity" || model.id === "perplexity/sonar") &&
+          isEligibleFeedModel(model)
       )
       .map((model) => toCatalogEntry(model, provider.id))
       .sort(byReleaseDescending);
