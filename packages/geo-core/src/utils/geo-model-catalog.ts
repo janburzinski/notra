@@ -105,8 +105,17 @@ export function buildGeoModelCatalogFromFeed(
       )
       .map((model) => toCatalogEntry(model, provider.id))
       .sort(byReleaseDescending);
+    const fallback =
+      provider.id === "perplexity"
+        ? GEO_MODEL_CATALOG_SEED.filter(
+            (entry) =>
+              entry.provider === provider.id &&
+              !GEO_MODEL_EXCLUDED_IDS.has(entry.id) &&
+              !feed.some((model) => model.id === entry.id)
+          )
+        : [];
     models.push(
-      ...markHiddenGeoModels(entries),
+      ...markHiddenGeoModels([...entries, ...fallback]),
       ...staticEntriesForProvider(provider.id)
     );
   }

@@ -159,6 +159,23 @@ describe("selected grounded engines", () => {
           .models.filter((model) => model.provider === "perplexity")
           .map((model) => model.id)
       ).toEqual(["perplexity/sonar"]);
+      const partial = buildGeoModelCatalogFromFeed([
+        {
+          id: "openai/gpt-5.6-sol",
+          name: "GPT-5.6 Sol",
+          owned_by: "openai",
+          type: "language",
+          zdr: "some" as const,
+        },
+        ...feed.slice(1),
+      ]);
+      expect(partial.models.map((model) => model.id)).toEqual([
+        "openai/gpt-5.6-sol",
+        "perplexity/sonar",
+      ]);
+      expect(
+        resolveGroundedEngines(["perplexity/sonar"], partial)[0]?.provider
+      ).toBe("gateway-perplexity");
       for (const available of [
         seedGeoModelCatalog(),
         buildGeoModelCatalogFromFeed(feed),
