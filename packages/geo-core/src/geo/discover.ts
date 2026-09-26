@@ -16,9 +16,8 @@ import {
   GEO_DISCOVERY_MAX_COMPETITORS,
   GEO_DISCOVERY_MAX_PROMPTS,
   GEO_DISCOVERY_MAX_TOKENS,
-  GEO_DISCOVERY_MIN_COMPETITORS,
   GEO_DISCOVERY_MIN_PROMPTS,
-  GEO_DISCOVERY_MODEL,
+  GEO_WEBSITE_DISCOVERY_MODEL,
   GEO_DISCOVERY_SYSTEM_PROMPT,
   GEO_GAP_TITLE_MAX_LENGTH,
   GEO_PROMPT_MAX_LENGTH,
@@ -74,22 +73,22 @@ Derive the brand tracking configuration for this company:
 
 1. companyName: the company or product name exactly as it brands itself.
 2. aliases: up to ${GEO_DISCOVERY_MAX_ALIASES} alternative spellings that identify this company - product names, the bare domain, and common misspellings. Never include generic words that could refer to anything else.
-3. competitors: between ${GEO_DISCOVERY_MIN_COMPETITORS} and ${GEO_DISCOVERY_MAX_COMPETITORS} real, named companies or products that compete in the same category. For each one give its name and its bare website domain (for example "stripe.com"), or null for domain when you are not sure.
+3. competitors: up to ${GEO_DISCOVERY_MAX_COMPETITORS} real, named products at the SAME product layer that directly replace this product. Return fewer (even zero) rather than inventing competitors. A sponsor, integration, underlying service provider, or adjacent managed SaaS is not a direct competitor merely because it solves a related problem. For an SDK/library, list other SDKs/libraries, not email delivery providers or managed social media APIs/schedulers. For each confident competitor give its name and bare website domain, or null if unsure. Never guess a domain.
 4. audienceType: who pays this company, judged by its own buyers and never by the industry it serves. "technical" when the buyers are developers, engineers or AI-native teams who deliberately choose which AI model they use (developer tools, APIs, infrastructure, AI products). "commerce" when consumers find it by searching Google for something to buy, book or visit (online shops, consumer products, restaurants, travel, local businesses and trades). "general" for everyone else (professional services, non-technical B2B, media, education), whose buyers just use whatever model their assistant ships with. Software or services sold to shops, restaurants or other businesses are "general" or "technical", not "commerce": a store builder or an email tool for merchants is "general".
-5. prompts: between ${GEO_DISCOVERY_MIN_PROMPTS} and ${GEO_DISCOVERY_MAX_PROMPTS} entries, each with a "prompt" and a "title".
+5. prompts: ${GEO_DISCOVERY_MIN_PROMPTS} to ${GEO_DISCOVERY_MAX_PROMPTS} entries, each with a "prompt" and a "title". Stop when you run out of genuinely different buyer problems; a narrow product needs fewer prompts than a broad one.
 6. conversations: exactly ${GEO_DISCOVERY_CONVERSATIONS} multi-turn conversations, each with a "name" and "steps" (the messages in order). Follow the conversation rules below.
 
-Before writing prompts, picture three or four different people who would end up buying from this company (their job, company size, stage, budget, what they are struggling with today). Write the prompts those specific people would type, spread across the set.
+Before writing prompts, picture the different people who might need this kind of product. Write what they would ask an assistant while still deciding how to solve their problem. They are not asking how to promote the company whose website you read. Draft the messages first; only then write an article title for each one. Never reverse-engineer a message from an SEO title.
 
 Prompt rules:
 - ${GEO_TRACKED_PROMPT_VOICE}
-- Cover these intents across the set:
-  - 4 or 5 recommendation prompts: someone looking for something to solve this problem, each from a different angle (role, budget, stack, scale, stage, region).
-  - 3 problem-first prompts: describe the pain or the task in the words a person would use, without naming any tool category ("my transactional emails keep landing in spam, what am i doing wrong").
-  - 2 comparison or alternative prompts built on the competitors you listed, phrased the way a person would ("is mailchimp worth it or should i just use something simpler", "switching away from hubspot, what are people using now"). Never compare against the company itself.
-  - 1 or 2 evaluation prompts: how to choose, what it should cost, or whether they need a dedicated tool at all.
+- Match the exact job and product layer described on this website. Do not shift to adjacent categories (e.g. from an SDK to its underlying providers), or suggest capabilities and customer problems the site does not support. In particular, don't turn a provider-agnostic email library into a deliverability service or a social API library into a scheduling platform.
+- For each draft, ask whether a truthful assistant could recommend this product as a direct answer. If not, replace it. For an email abstraction library, questions only about which delivery provider to buy, spam/SPF setup, or scheduled sending fail this test even if those topics appear on the website. A question about switching providers without rewriting code passes. Do not manufacture needs just because a feature or sponsor is mentioned.
+- Do not invent time-sensitive facts about legal deadlines, mandatory formats, prices, product support or release dates. Ask about a requirement without asserting when it takes effect unless the provided site explicitly gives that date and it is still current.
+- Mix requests for recommendations with practical problems, tradeoffs and buying constraints. Make each message meaningfully different, not the same question with a different opener or role.
+- Before finalizing, group the messages by the actual problem they ask about. Keep at most two about the same problem; replacing a provider name, person's role, stack, or opening phrase does not make a new problem. Use the other slots for distinct jobs this product actually helps with. If the site supports fewer distinct jobs, explore different real constraints on those jobs without repeating the same question.
+- Mention a direct competitor only when a real buyer might compare it. If there are none, compare ways to solve the problem instead; never invent a product or compare against the company itself.
 - Never mention the company name, product name, domain, or any alias. Not even once. Never copy taglines, feature names, coined terms, or marketing copy from the website. Do not explain what the company is.
-- Use the words "tool", "software", "platform" or "solution" in at most 4 prompts; real people often describe the outcome instead.
 - Write every prompt in the language the website's audience speaks (a German website gets German prompts). Never mix languages within a prompt. Do not append "${year}".
 - Each prompt must be between ${MIN_PROMPT_LENGTH} and ${MAX_PROMPT_LENGTH} characters.
 
@@ -141,7 +140,7 @@ function buildCompetitorSeeds(
   }));
 }
 
-const prepareGeoWebsiteGeneration = Effect.fn(
+export const prepareGeoWebsiteGeneration = Effect.fn(
   "geo.generateFromWebsite.prepare"
 )(function* (
   discovery: GeoWebsiteDiscovery,
@@ -154,7 +153,10 @@ const prepareGeoWebsiteGeneration = Effect.fn(
     GEO_DISCOVERY_ALIAS_LIMIT
   );
   const companyName = existingCompanyName ?? discovery.companyName;
-  const brandTerms = buildBrandTerms({ companyName, aliases });
+  const brandTerms = buildBrandTerms({
+    companyName: discovery.companyName,
+    aliases: [companyName, ...existingAliases, ...discovery.aliases],
+  });
   const entries: GeoPromptInsert[] = [];
 
   for (const entry of discovery.prompts) {
@@ -209,7 +211,7 @@ const extractDiscovery = Effect.fn("geo.discover.extract")(function* (
   const result = yield* Effect.tryPromise({
     try: () =>
       generateText({
-        model: gateway(GEO_DISCOVERY_MODEL, {
+        model: gateway(GEO_WEBSITE_DISCOVERY_MODEL, {
           organizationId,
         }),
         providerOptions: { gateway: { tags: ["geo-discovery"] } },
@@ -235,10 +237,13 @@ function discoveryCacheKey(organizationId: string, url: string): string {
 
 export const discoverGeoWebsite = Effect.fn("geo.discoverWebsite")(function* (
   organizationId: string,
-  url: string
+  url: string,
+  fresh = false
 ) {
   const cacheKey = discoveryCacheKey(organizationId, url);
-  const cached = yield* readGeoCache(cacheKey, geoWebsiteDiscoverySchema);
+  const cached = fresh
+    ? null
+    : yield* readGeoCache(cacheKey, geoWebsiteDiscoverySchema);
   if (cached) {
     const result: GeoDiscoverWebsiteResult = { url, discovery: cached };
     return result;
@@ -398,7 +403,7 @@ const startGeoScanAfterWebsiteGeneration = Effect.fn(
 export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
   function* (scopeInput: GeoScopeInput, url: string) {
     const organizationId = scopeInput.organizationId;
-    const { discovery } = yield* discoverGeoWebsite(organizationId, url);
+    const { discovery } = yield* discoverGeoWebsite(organizationId, url, true);
 
     const projectId = yield* ensureGeoProject(
       scopeInput,
@@ -494,7 +499,7 @@ export const createGeoProjectFromWebsite = Effect.fn(
   brandSettingsId: string,
   url: string
 ) {
-  const { discovery } = yield* discoverGeoWebsite(organizationId, url);
+  const { discovery } = yield* discoverGeoWebsite(organizationId, url, true);
   const { aliases, companyName, entries, conversations } =
     yield* prepareGeoWebsiteGeneration(discovery);
   const seedEngines = yield* resolveSeedEngines(organizationId, discovery);
