@@ -6,10 +6,15 @@ import {
 } from "../src/constants/geo-model-catalog";
 import type { GeoModelCatalog } from "../src/types/geo";
 import { engineModelOf } from "../src/utils/geo-engine-family";
+import { resolveGeoGroundedZdrMode } from "../src/utils/geo-engines";
 import {
   resolveGroundedEngineByKey,
   resolveGroundedEngines,
 } from "../src/utils/geo-grounded-engines";
+import {
+  buildGeoModelCatalogFromFeed,
+  seedGeoModelCatalog,
+} from "../src/utils/geo-model-catalog";
 
 const catalog: GeoModelCatalog = {
   providers: [...GEO_MODEL_PROVIDERS],
@@ -123,5 +128,74 @@ describe("selected grounded engines", () => {
     );
     expect(engineModelOf("openai-direct-grounded")).toBe("openai/gpt-5.4");
     expect(engineModelOf("perplexity-sonar")).toBe("perplexity/sonar");
+  });
+
+  test("Sonar is selectable only with a credential and runs through the direct search route", () => {
+    const previous = process.env.PERPLEXITY_API_KEY;
+    try {
+      delete process.env.PERPLEXITY_API_KEY;
+      expect(
+        seedGeoModelCatalog().models.some(
+          (model) => model.id === "perplexity/sonar"
+        )
+      ).toBe(false);
+      const feed = [
+        {
+          id: "perplexity/sonar",
+          name: "Sonar",
+          owned_by: "perplexity",
+          type: "language",
+          zdr: "none" as const,
+        },
+      ];
+      expect(
+        buildGeoModelCatalogFromFeed(feed).models.some(
+          (model) => model.id === "perplexity/sonar"
+        )
+      ).toBe(false);
+
+      process.env.PERPLEXITY_API_KEY = "test-key";
+      const available = seedGeoModelCatalog();
+      expect(
+        buildGeoModelCatalogFromFeed(feed).models.filter(
+          (model) => model.id === "perplexity/sonar"
+        )
+      ).toHaveLength(1);
+      const sonar = available.models.find(
+        (model) => model.id === "perplexity/sonar"
+      );
+      expect(sonar?.gateways).toEqual([]);
+      const [grounded] = resolveGroundedEngines(
+        ["perplexity/sonar"],
+        available
+      );
+      expect(grounded?.key).toBe("perplexity/sonar-direct-grounded");
+      expect(grounded?.provider).toBe("direct-perplexity");
+      expect(grounded?.model).toBe("sonar");
+      expect(resolveGroundedEngineByKey(grounded?.key ?? "")?.model).toBe(
+        "sonar"
+      );
+      if (!grounded) {
+        throw new Error("Sonar should have a grounded route");
+      }
+      expect(
+        resolveGeoGroundedZdrMode(available, grounded, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: [],
+        })
+      ).toBe(null);
+      expect(
+        resolveGeoGroundedZdrMode(available, grounded, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: ["perplexity/sonar"],
+        })
+      ).toBe("preferred");
+    } finally {
+      if (previous === undefined) {
+        delete process.env.PERPLEXITY_API_KEY;
+      } else {
+        process.env.PERPLEXITY_API_KEY = previous;
+      }
+    }
   });
 });

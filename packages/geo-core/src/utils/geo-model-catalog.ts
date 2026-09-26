@@ -10,8 +10,6 @@ import {
   GEO_MODEL_EXCLUDED_TAGS,
   GEO_MODEL_HIDDEN_ID_PATTERN,
   GEO_MODEL_PROVIDERS,
-  GEO_MODEL_VERSION_PATTERN,
-  GEO_MODELS_PER_PROVIDER,
   GEO_STATIC_ENGINE_ENV,
 } from "../constants/geo-model-catalog";
 import type {
@@ -87,7 +85,9 @@ function staticEntriesForProvider(
 ): GeoModelCatalogEntry[] {
   return GEO_MODEL_CATALOG_STATIC.filter(
     (entry) =>
-      entry.provider === providerId && isGeoStaticEngineAvailable(entry)
+      entry.provider === providerId &&
+      !GEO_MODEL_EXCLUDED_IDS.has(entry.id) &&
+      isGeoStaticEngineAvailable(entry)
   );
 }
 
@@ -96,18 +96,18 @@ export function buildGeoModelCatalogFromFeed(
 ): GeoModelCatalog {
   const models: GeoModelCatalogEntry[] = [];
   for (const provider of GEO_MODEL_PROVIDERS) {
-    const entries = feed
-      .filter(
-        (model) => model.owned_by === provider.id && isEligibleFeedModel(model)
-      )
-      .map((model) => toCatalogEntry(model, provider.id))
-      .sort(byReleaseDescending);
-    const newest = entries.slice(0, GEO_MODELS_PER_PROVIDER);
-    const olderDefaults = entries
-      .slice(GEO_MODELS_PER_PROVIDER)
-      .filter((entry) => entry.default);
+    const entries =
+      provider.id === "perplexity"
+        ? []
+        : feed
+            .filter(
+              (model) =>
+                model.owned_by === provider.id && isEligibleFeedModel(model)
+            )
+            .map((model) => toCatalogEntry(model, provider.id))
+            .sort(byReleaseDescending);
     models.push(
-      ...markHiddenGeoModels([...newest, ...olderDefaults]),
+      ...markHiddenGeoModels(entries),
       ...staticEntriesForProvider(provider.id)
     );
   }
@@ -124,28 +124,15 @@ function byReleaseDescending(
   return right.released.localeCompare(left.released);
 }
 
-/** Model id without provider prefix and version numbers. */
-function geoModelFamily(id: string): string {
-  const slug = id.slice(id.indexOf("/") + 1);
-  return slug.replace(GEO_MODEL_VERSION_PATTERN, "");
-}
-
 /**
- * Hide superseded releases (an older version of the same model family) and
- * niche variants from the picker. Defaults are never hidden. Hidden models
- * stay in the catalog so stored selections keep resolving.
+ * Hide niche variants from the picker. Defaults are never hidden. Hidden
+ * models stay in the catalog so stored selections keep resolving.
  */
 function markHiddenGeoModels(
   entries: readonly GeoModelCatalogEntry[]
 ): GeoModelCatalogEntry[] {
-  const families = new Set<string>();
-  return [...entries].sort(byReleaseDescending).map((entry) => {
-    const family = geoModelFamily(entry.id);
-    const superseded = families.has(family);
-    families.add(family);
-    const hidden =
-      !entry.default &&
-      (superseded || GEO_MODEL_HIDDEN_ID_PATTERN.test(entry.id));
+  return entries.map((entry) => {
+    const hidden = !entry.default && GEO_MODEL_HIDDEN_ID_PATTERN.test(entry.id);
     return hidden ? { ...entry, hidden } : entry;
   });
 }
@@ -155,7 +142,11 @@ export function seedGeoModelCatalog(): GeoModelCatalog {
   for (const provider of GEO_MODEL_PROVIDERS) {
     models.push(
       ...markHiddenGeoModels(
-        GEO_MODEL_CATALOG_SEED.filter((entry) => entry.provider === provider.id)
+        GEO_MODEL_CATALOG_SEED.filter(
+          (entry) =>
+            entry.provider === provider.id &&
+            !GEO_MODEL_EXCLUDED_IDS.has(entry.id)
+        )
       ),
       ...staticEntriesForProvider(provider.id)
     );

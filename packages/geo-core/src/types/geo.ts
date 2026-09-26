@@ -1380,6 +1380,7 @@ export type GeoModelProviderId =
   | "spacexai"
   | "deepseek"
   | "mistral"
+  | "perplexity"
   | "cursor"
   | "opencode"
   | "claude-code"

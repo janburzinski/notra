@@ -63,6 +63,12 @@ export const GEO_MODEL_PROVIDERS: readonly GeoModelProvider[] = [
     featured: false,
   },
   {
+    id: "perplexity",
+    label: "Perplexity",
+    brand: "perplexity",
+    featured: true,
+  },
+  {
     id: "cursor",
     label: "Cursor",
     brand: "cursor",
@@ -417,6 +423,15 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
  */
 export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
   {
+    id: "perplexity/sonar",
+    provider: "perplexity",
+    label: "Sonar",
+    zdr: "none",
+    released: "",
+    default: false,
+    gateways: [],
+  },
+  {
     id: "cursor/composer-2.5",
     provider: "cursor",
     label: "Composer 2.5",
@@ -494,6 +509,7 @@ const GEO_NATIVE_BOX_ENGINE_ENV = ["UPSTASH_BOX_API_KEY"] as const;
 export const GEO_STATIC_ENGINE_ENV: Readonly<
   Record<string, readonly string[]>
 > = {
+  "perplexity/sonar": ["PERPLEXITY_API_KEY"],
   "cursor/composer-2.5": ["CURSOR_API_KEY"],
   "opencode/gpt-5.6-sol-medium": GEO_OPENCODE_ENGINE_ENV,
   "claude-code/claude-fable-5.1": GEO_NATIVE_BOX_ENGINE_ENV,
@@ -538,8 +554,6 @@ export const GEO_MODEL_FEED_REVALIDATE_SECONDS = 3600;
 export const GEO_PICKER_VISIBLE_MODELS = 3;
 /** Providers shown in the picker before "Show x more providers". */
 export const GEO_PICKER_VISIBLE_PROVIDERS = 7;
-/** Newest models kept per provider; defaults are always included. */
-export const GEO_MODELS_PER_PROVIDER = 10;
 /**
  * Variants kept in the catalog but hidden from the picker: tiers that answer
  * like their base model, dated snapshots, and open-weight families that no
@@ -547,19 +561,18 @@ export const GEO_MODELS_PER_PROVIDER = 10;
  */
 export const GEO_MODEL_HIDDEN_ID_PATTERN =
   /(-nano|-lite|-thinking|-reasoning|-multi-agent|-\d{4}(?:\d{4})?)$|^openai\/.+-pro$|codex|-code\b|gemma|llama|grok-build/;
-/** Version numbers stripped to group a model with its older releases. */
-export const GEO_MODEL_VERSION_PATTERN = /\d+(?:\.\d+)*/g;
 export const GEO_MODEL_EXCLUDED_TAGS: ReadonlySet<string> = new Set([
   "image-generation",
   "video-generation",
 ]);
 /** Host-speed variants and previews duplicate a model's answers. */
 export const GEO_MODEL_EXCLUDED_ID_PATTERN = /(-fast|-beta|-contributor)$/;
-/** Retired catalog ids that the gateway feed may still publish. */
+/** Retire a model here; add a replacement below to migrate saved selections. */
 export const GEO_MODEL_EXCLUDED_IDS: ReadonlySet<string> = new Set([
   "meta/muse-spark-1.1",
+  "spacexai/grok-4.6",
 ]);
-/** Stored engine ids that should keep scanning as their replacement. */
+/** Optional replacements for retired ids in saved selections and scans. */
 export const GEO_MODEL_REPLACED_IDS: Readonly<Record<string, string>> = {
   "meta/muse-spark-1.1": "meta/muse-spark-1.3",
   "spacexai/grok-4.6": "spacexai/grok-4.7",
