@@ -111,7 +111,7 @@ export function buildGeoModelCatalogFromFeed(
             (entry) =>
               entry.provider === provider.id &&
               !GEO_MODEL_EXCLUDED_IDS.has(entry.id) &&
-              !feed.some((model) => model.id === entry.id)
+              !entries.some((model) => model.id === entry.id)
           )
         : [];
     models.push(

@@ -138,14 +138,15 @@ describe("selected grounded engines", () => {
     const previous = process.env.PERPLEXITY_API_KEY;
     try {
       delete process.env.PERPLEXITY_API_KEY;
+      const sonarFeed = {
+        id: "perplexity/sonar",
+        name: "Sonar",
+        owned_by: "perplexity",
+        type: "language",
+        zdr: "none" as const,
+      };
       const feed = [
-        {
-          id: "perplexity/sonar",
-          name: "Sonar",
-          owned_by: "perplexity",
-          type: "language",
-          zdr: "none" as const,
-        },
+        sonarFeed,
         {
           id: "perplexity/sonar-pro",
           name: "Sonar Pro",
@@ -176,6 +177,26 @@ describe("selected grounded engines", () => {
       expect(
         resolveGroundedEngines(["perplexity/sonar"], partial)[0]?.provider
       ).toBe("gateway-perplexity");
+      for (const ineligible of [
+        { ...sonarFeed, deprecated_at: 1 },
+        { ...sonarFeed, type: "embedding" },
+        { ...sonarFeed, tags: ["image-generation"] },
+      ]) {
+        const available = buildGeoModelCatalogFromFeed([
+          ineligible,
+          ...feed.slice(1),
+        ]);
+        expect(
+          available.models.filter((model) => model.id === "perplexity/sonar")
+        ).toEqual(
+          seedGeoModelCatalog().models.filter(
+            (model) => model.id === "perplexity/sonar"
+          )
+        );
+        expect(
+          resolveGroundedEngines(["perplexity/sonar"], available)[0]?.provider
+        ).toBe("gateway-perplexity");
+      }
       for (const available of [
         seedGeoModelCatalog(),
         buildGeoModelCatalogFromFeed(feed),
