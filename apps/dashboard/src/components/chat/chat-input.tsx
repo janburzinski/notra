@@ -1013,7 +1013,6 @@ interface ChatInputAdvancedProps {
   onEditQueued?: (message: QueuedMessage) => void;
   onRemoveQueued?: (id: string) => void;
   onSteerQueued?: (message: QueuedMessage) => void;
-  onUpdateQueued?: (id: string, text: string) => void;
   authorsById?: Map<string, ChatMessageAuthor>;
   showAuthorAvatars?: boolean;
   onEmptyChange?: (isEmpty: boolean) => void;
