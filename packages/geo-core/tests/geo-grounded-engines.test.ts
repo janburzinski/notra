@@ -6,7 +6,11 @@ import {
 } from "../src/constants/geo-model-catalog";
 import type { GeoModelCatalog } from "../src/types/geo";
 import { engineModelOf } from "../src/utils/geo-engine-family";
-import { resolveGeoGroundedZdrMode } from "../src/utils/geo-engines";
+import {
+  resolveGeoGroundedZdrMode,
+  resolveTrackedEngines,
+  scopeGeoScanEngines,
+} from "../src/utils/geo-engines";
 import {
   resolveGroundedEngineByKey,
   resolveGroundedEngines,
@@ -196,6 +200,48 @@ describe("selected grounded engines", () => {
       } else {
         process.env.PERPLEXITY_API_KEY = previous;
       }
+    }
+  });
+
+  test("older catalog models stay selectable until explicitly retired", () => {
+    const feed = Array.from({ length: 12 }, (_, index) => ({
+      id: `openai/example-${index}.0`,
+      name: `Example ${index}`,
+      owned_by: "openai",
+      type: "language",
+      zdr: "none" as const,
+      released: 1_700_000_000 + index,
+    }));
+    const models = buildGeoModelCatalogFromFeed(feed).models.filter(
+      (model) => model.provider === "openai"
+    );
+    expect(models).toHaveLength(12);
+    expect(
+      models.find((model) => model.id === "openai/example-0.0")?.hidden
+    ).toBeUndefined();
+  });
+
+  test("retired Grok 4.6 is removed from feed and seed, then remapped for scans", () => {
+    const feed = ["spacexai/grok-4.6", "spacexai/grok-4.7"].map((id) => ({
+      id,
+      name: id,
+      owned_by: "spacexai",
+      type: "language",
+      zdr: "none" as const,
+    }));
+    for (const available of [
+      buildGeoModelCatalogFromFeed(feed),
+      seedGeoModelCatalog(),
+    ]) {
+      expect(
+        available.models.some((model) => model.id === "spacexai/grok-4.6")
+      ).toBe(false);
+      expect(resolveTrackedEngines(available, ["spacexai/grok-4.6"])).toEqual([
+        "spacexai/grok-4.7",
+      ]);
+      expect(scopeGeoScanEngines(available, [], ["spacexai/grok-4.6"])).toEqual(
+        ["spacexai/grok-4.7"]
+      );
     }
   });
 });

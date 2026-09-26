@@ -416,7 +416,7 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
 /**
  * Models that do not run through the Notra AI router. They are appended to the
  * catalog instead of coming from the gateway feed. `zdr: "none"` because
- * neither Cursor, Box, nor SerpApi exposes an enforceable ZDR route to GEO;
+ * neither Perplexity, Cursor, Box, nor SerpApi exposes an enforceable ZDR route to GEO;
  * under enforced ZDR each engine therefore needs explicit approval before it
  * is scanned. Google AI Overview is fetched through SerpApi and is also
  * non-ZDR.
@@ -427,6 +427,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     provider: "perplexity",
     label: "Sonar",
     zdr: "none",
+    // Sonar is an unversioned alias, not a release with a stable date.
     released: "",
     default: false,
     gateways: [],
