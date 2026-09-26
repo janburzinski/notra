@@ -124,7 +124,7 @@ export async function orchestrateStandaloneChat(
   const modelWithMemory = createModel(
     organizationId,
     routingDecision.model,
-    {},
+    { supermemory: { customId: chatId } },
     log
   );
 

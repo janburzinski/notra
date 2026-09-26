@@ -26,6 +26,7 @@ export function createSaveMemoryTool() {
           retryTransientEffect(
             requestSupermemoryEffect("/v4/search", {
               q: content,
+              searchMode: "hybrid",
               limit: 5,
               rerank: true,
               containerTag,
@@ -37,12 +38,13 @@ export function createSaveMemoryTool() {
       const existing = existingSearch.results.find(
         (result) =>
           result.memory === content ||
+          result.chunk === content ||
           result.chunks?.some((chunk) => chunk.content === content)
       );
       if (existing) {
         return {
           documentId: existing.documentId ?? null,
-          memoryId: null,
+          memoryId: existing.memory ? (existing.id ?? null) : null,
           skipped: true,
           topic,
         };
