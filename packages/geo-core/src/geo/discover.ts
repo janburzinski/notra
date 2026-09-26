@@ -233,10 +233,13 @@ const extractDiscovery = Effect.fn("geo.discover.extract")(function* (
 
 export const discoverGeoWebsite = Effect.fn("geo.discoverWebsite")(function* (
   organizationId: string,
-  url: string
+  url: string,
+  fresh = false
 ) {
   const cacheKey = geoDiscoveryCacheKey(organizationId, url);
-  const cached = yield* readGeoCache(cacheKey, geoWebsiteDiscoverySchema);
+  const cached = fresh
+    ? null
+    : yield* readGeoCache(cacheKey, geoWebsiteDiscoverySchema);
   if (cached) {
     const result: GeoDiscoverWebsiteResult = { url, discovery: cached };
     return result;
@@ -396,7 +399,7 @@ const startGeoScanAfterWebsiteGeneration = Effect.fn(
 export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
   function* (scopeInput: GeoScopeInput, url: string) {
     const organizationId = scopeInput.organizationId;
-    const { discovery } = yield* discoverGeoWebsite(organizationId, url);
+    const { discovery } = yield* discoverGeoWebsite(organizationId, url, true);
 
     const projectId = yield* ensureGeoProject(
       scopeInput,
@@ -492,7 +495,7 @@ export const createGeoProjectFromWebsite = Effect.fn(
   brandSettingsId: string,
   url: string
 ) {
-  const { discovery } = yield* discoverGeoWebsite(organizationId, url);
+  const { discovery } = yield* discoverGeoWebsite(organizationId, url, true);
   const { aliases, companyName, entries, conversations } =
     yield* prepareGeoWebsiteGeneration(discovery);
   const seedEngines = yield* resolveSeedEngines(organizationId, discovery);

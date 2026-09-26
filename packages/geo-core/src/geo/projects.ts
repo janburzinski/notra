@@ -269,9 +269,11 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
   }
 
   if (outcome === "deleted") {
-    yield* deleteGeoCache(
-      geoDiscoveryCacheKey(organizationId, existing.websiteUrl)
-    );
+    if (URL.canParse(existing.websiteUrl)) {
+      yield* deleteGeoCache(
+        geoDiscoveryCacheKey(organizationId, existing.websiteUrl)
+      );
+    }
     yield* Effect.promise(() =>
       invalidateGeoIngestHostsCache(organizationId, projectId)
     );

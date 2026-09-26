@@ -6,5 +6,5 @@ export function geoDiscoveryCacheKey(
 ): string {
   const parsed = new URL(url);
   const host = parsed.host.replace(/^www\./, "");
-  return `${GEO_DISCOVERY_CACHE_PREFIX}:${organizationId}:${host}${parsed.pathname.replace(/\/$/, "")}${parsed.search}`;
+  return `${GEO_DISCOVERY_CACHE_PREFIX}:${organizationId}:${parsed.protocol}//${host}${parsed.pathname.replace(/\/$/, "")}${parsed.search}`;
 }
