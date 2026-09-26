@@ -372,10 +372,11 @@ async function scrapeBrandAnalysisPages(urls: string[]) {
         timeoutMS: 20_000,
         url: pageUrl,
       });
-      if (
-        normalizeBrandHostname(new URL(page.url).hostname) !==
-        normalizeBrandHostname(new URL(pageUrl).hostname)
-      ) {
+      const sourceHost = normalizeBrandHostname(new URL(pageUrl).hostname);
+      const finalHost = normalizeBrandHostname(
+        new URL(page.metadata?.finalUrl ?? page.url, page.url).hostname
+      );
+      if (finalHost !== sourceHost && !finalHost.endsWith(`.${sourceHost}`)) {
         throw new Error("Scraped page redirected to a different website");
       }
       return page;

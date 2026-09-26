@@ -11,7 +11,9 @@ import type {
   GeoProjectUpdateInput,
   GeoScopeInput,
 } from "../types/geo";
+import { geoDiscoveryCacheKey } from "../utils/geo-discovery-cache";
 import { memoizeGeoRequest } from "../utils/request-memo";
+import { deleteGeoCache } from "./cache";
 import { geoDb } from "./effect";
 import {
   GeoBrandIdentityMissingError,
@@ -183,15 +185,22 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
   organizationId: string,
   projectId: string
 ) {
-  const [existing, projectCount] = yield* Effect.all([
+  const [existingRows, projectCount] = yield* Effect.all([
     geoDb("project lookup failed", () =>
-      db.query.projects.findFirst({
-        columns: { id: true },
-        where: and(
-          eq(projects.id, projectId),
-          eq(projects.organizationId, organizationId)
-        ),
-      })
+      db
+        .select({ websiteUrl: brandSettings.websiteUrl })
+        .from(projects)
+        .innerJoin(
+          brandSettings,
+          eq(projects.brandSettingsId, brandSettings.id)
+        )
+        .where(
+          and(
+            eq(projects.id, projectId),
+            eq(projects.organizationId, organizationId)
+          )
+        )
+        .limit(1)
     ),
     geoDb("projects count failed", () =>
       db
@@ -201,6 +210,7 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
     ),
   ]);
 
+  const existing = existingRows.at(0);
   if (!existing) {
     return yield* Effect.fail(new GeoProjectNotFoundError({ projectId }));
   }
@@ -259,6 +269,9 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
   }
 
   if (outcome === "deleted") {
+    yield* deleteGeoCache(
+      geoDiscoveryCacheKey(organizationId, existing.websiteUrl)
+    );
     yield* Effect.promise(() =>
       invalidateGeoIngestHostsCache(organizationId, projectId)
     );

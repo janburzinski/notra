@@ -8,7 +8,6 @@ import { Effect } from "effect";
 
 import {
   GEO_DISCOVERY_ALIAS_LIMIT,
-  GEO_DISCOVERY_CACHE_PREFIX,
   GEO_DISCOVERY_CACHE_TTL_SECONDS,
   GEO_DISCOVERY_COMPETITOR_LIMIT,
   GEO_DISCOVERY_CONVERSATIONS,
@@ -36,6 +35,7 @@ import type {
   GeoWebsiteDiscovery,
 } from "../types/geo";
 import { geoConversationRules } from "../utils/conversation-generation-prompt";
+import { geoDiscoveryCacheKey } from "../utils/geo-discovery-cache";
 import { geoEnginesForAudience } from "../utils/geo-model-catalog";
 import { readGeoCache, writeGeoCache } from "./cache";
 import { competitorKey, normalizeCompetitorDomain } from "./domain";
@@ -231,19 +231,12 @@ const extractDiscovery = Effect.fn("geo.discover.extract")(function* (
   return discovery;
 });
 
-function discoveryCacheKey(organizationId: string, url: string): string {
-  return `${GEO_DISCOVERY_CACHE_PREFIX}:${organizationId}:${url}`;
-}
-
 export const discoverGeoWebsite = Effect.fn("geo.discoverWebsite")(function* (
   organizationId: string,
-  url: string,
-  fresh = false
+  url: string
 ) {
-  const cacheKey = discoveryCacheKey(organizationId, url);
-  const cached = fresh
-    ? null
-    : yield* readGeoCache(cacheKey, geoWebsiteDiscoverySchema);
+  const cacheKey = geoDiscoveryCacheKey(organizationId, url);
+  const cached = yield* readGeoCache(cacheKey, geoWebsiteDiscoverySchema);
   if (cached) {
     const result: GeoDiscoverWebsiteResult = { url, discovery: cached };
     return result;
@@ -403,7 +396,7 @@ const startGeoScanAfterWebsiteGeneration = Effect.fn(
 export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
   function* (scopeInput: GeoScopeInput, url: string) {
     const organizationId = scopeInput.organizationId;
-    const { discovery } = yield* discoverGeoWebsite(organizationId, url, true);
+    const { discovery } = yield* discoverGeoWebsite(organizationId, url);
 
     const projectId = yield* ensureGeoProject(
       scopeInput,
@@ -499,7 +492,7 @@ export const createGeoProjectFromWebsite = Effect.fn(
   brandSettingsId: string,
   url: string
 ) {
-  const { discovery } = yield* discoverGeoWebsite(organizationId, url, true);
+  const { discovery } = yield* discoverGeoWebsite(organizationId, url);
   const { aliases, companyName, entries, conversations } =
     yield* prepareGeoWebsiteGeneration(discovery);
   const seedEngines = yield* resolveSeedEngines(organizationId, discovery);
