@@ -134,15 +134,10 @@ describe("selected grounded engines", () => {
     expect(engineModelOf("perplexity-sonar")).toBe("perplexity/sonar");
   });
 
-  test("Sonar is selectable only with a credential and runs through the direct search route", () => {
+  test("Sonar uses the gateway without a Perplexity key", () => {
     const previous = process.env.PERPLEXITY_API_KEY;
     try {
       delete process.env.PERPLEXITY_API_KEY;
-      expect(
-        seedGeoModelCatalog().models.some(
-          (model) => model.id === "perplexity/sonar"
-        )
-      ).toBe(false);
       const feed = [
         {
           id: "perplexity/sonar",
@@ -152,48 +147,45 @@ describe("selected grounded engines", () => {
           zdr: "none" as const,
         },
       ];
-      expect(
-        buildGeoModelCatalogFromFeed(feed).models.some(
+      for (const available of [
+        seedGeoModelCatalog(),
+        buildGeoModelCatalogFromFeed(feed),
+      ]) {
+        const sonar = available.models.find(
           (model) => model.id === "perplexity/sonar"
-        )
-      ).toBe(false);
-
-      process.env.PERPLEXITY_API_KEY = "test-key";
-      const available = seedGeoModelCatalog();
-      expect(
-        buildGeoModelCatalogFromFeed(feed).models.filter(
-          (model) => model.id === "perplexity/sonar"
-        )
-      ).toHaveLength(1);
-      const sonar = available.models.find(
-        (model) => model.id === "perplexity/sonar"
-      );
-      expect(sonar?.gateways).toEqual([]);
-      const [grounded] = resolveGroundedEngines(
-        ["perplexity/sonar"],
-        available
-      );
-      expect(grounded?.key).toBe("perplexity/sonar-direct-grounded");
-      expect(grounded?.provider).toBe("direct-perplexity");
-      expect(grounded?.model).toBe("sonar");
-      expect(resolveGroundedEngineByKey(grounded?.key ?? "")?.model).toBe(
-        "sonar"
-      );
-      if (!grounded) {
-        throw new Error("Sonar should have a grounded route");
+        );
+        expect(sonar?.gateways).toEqual(["vercel"]);
+        const [grounded] = resolveGroundedEngines(
+          ["perplexity/sonar"],
+          available
+        );
+        expect(grounded?.key).toBe("perplexity/sonar-grounded");
+        expect(grounded?.provider).toBe("gateway-perplexity");
+        expect(grounded?.model).toBe("perplexity/sonar");
+        expect(resolveGroundedEngineByKey(grounded?.key ?? "")?.model).toBe(
+          "perplexity/sonar"
+        );
+        if (!grounded) {
+          throw new Error("Sonar should have a grounded route");
+        }
+        expect(
+          resolveGeoGroundedZdrMode(available, grounded, {
+            enforceZdr: true,
+            nonZdrApprovedEngines: [],
+          })
+        ).toBe(null);
+        expect(
+          resolveGeoGroundedZdrMode(available, grounded, {
+            enforceZdr: true,
+            nonZdrApprovedEngines: ["perplexity/sonar"],
+          })
+        ).toBe("preferred");
       }
+      process.env.PERPLEXITY_API_KEY = "test-key";
       expect(
-        resolveGeoGroundedZdrMode(available, grounded, {
-          enforceZdr: true,
-          nonZdrApprovedEngines: [],
-        })
-      ).toBe(null);
-      expect(
-        resolveGeoGroundedZdrMode(available, grounded, {
-          enforceZdr: true,
-          nonZdrApprovedEngines: ["perplexity/sonar"],
-        })
-      ).toBe("preferred");
+        resolveGroundedEngines(["perplexity/sonar"], seedGeoModelCatalog())[0]
+          ?.provider
+      ).toBe("gateway-perplexity");
     } finally {
       if (previous === undefined) {
         delete process.env.PERPLEXITY_API_KEY;

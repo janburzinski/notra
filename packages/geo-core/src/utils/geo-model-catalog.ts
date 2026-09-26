@@ -96,16 +96,12 @@ export function buildGeoModelCatalogFromFeed(
 ): GeoModelCatalog {
   const models: GeoModelCatalogEntry[] = [];
   for (const provider of GEO_MODEL_PROVIDERS) {
-    const entries =
-      provider.id === "perplexity"
-        ? []
-        : feed
-            .filter(
-              (model) =>
-                model.owned_by === provider.id && isEligibleFeedModel(model)
-            )
-            .map((model) => toCatalogEntry(model, provider.id))
-            .sort(byReleaseDescending);
+    const entries = feed
+      .filter(
+        (model) => model.owned_by === provider.id && isEligibleFeedModel(model)
+      )
+      .map((model) => toCatalogEntry(model, provider.id))
+      .sort(byReleaseDescending);
     models.push(
       ...markHiddenGeoModels(entries),
       ...staticEntriesForProvider(provider.id)

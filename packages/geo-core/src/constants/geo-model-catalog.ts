@@ -411,27 +411,26 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel"],
   },
-];
-
-/**
- * Models that do not run through the Notra AI router. They are appended to the
- * catalog instead of coming from the gateway feed. `zdr: "none"` because
- * neither Perplexity, Cursor, Box, nor SerpApi exposes an enforceable ZDR route to GEO;
- * under enforced ZDR each engine therefore needs explicit approval before it
- * is scanned. Google AI Overview is fetched through SerpApi and is also
- * non-ZDR.
- */
-export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
   {
     id: "perplexity/sonar",
     provider: "perplexity",
     label: "Sonar",
     zdr: "none",
-    // Sonar is an unversioned alias, not a release with a stable date.
-    released: "",
+    released: "2025-02-19",
     default: false,
-    gateways: [],
+    gateways: ["vercel"],
   },
+];
+
+/**
+ * Models that do not run through the Notra AI router. They are appended to the
+ * catalog instead of coming from the gateway feed. `zdr: "none"` because
+ * neither Cursor, Box, nor SerpApi exposes an enforceable ZDR route to GEO;
+ * under enforced ZDR each engine therefore needs explicit approval before it
+ * is scanned. Google AI Overview is fetched through SerpApi and is also
+ * non-ZDR.
+ */
+export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
   {
     id: "cursor/composer-2.5",
     provider: "cursor",
@@ -510,7 +509,6 @@ const GEO_NATIVE_BOX_ENGINE_ENV = ["UPSTASH_BOX_API_KEY"] as const;
 export const GEO_STATIC_ENGINE_ENV: Readonly<
   Record<string, readonly string[]>
 > = {
-  "perplexity/sonar": ["PERPLEXITY_API_KEY"],
   "cursor/composer-2.5": ["CURSOR_API_KEY"],
   "opencode/gpt-5.6-sol-medium": GEO_OPENCODE_ENGINE_ENV,
   "claude-code/claude-fable-5.1": GEO_NATIVE_BOX_ENGINE_ENV,

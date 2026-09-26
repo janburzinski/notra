@@ -814,6 +814,7 @@ export type GeoGroundedProvider =
   | "gateway-openai"
   | "gateway-anthropic"
   | "gateway-google"
+  | "gateway-perplexity"
   | "direct-openai"
   | "direct-anthropic"
   | "direct-perplexity";
