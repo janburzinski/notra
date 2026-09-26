@@ -311,6 +311,12 @@ export const GEO_GROUNDED_PROVIDERS: readonly GeoGroundedProviderConfig[] = [
     isAvailable: () => true,
   },
   {
+    provider: "gateway-perplexity",
+    zdr: "none",
+    envVar: null,
+    isAvailable: () => true,
+  },
+  {
     provider: "direct-openai",
     zdr: "none",
     envVar: GEO_OPENAI_API_KEY_ENV,
