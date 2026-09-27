@@ -251,10 +251,12 @@ export async function confirmContentBilling(
   const costCents = input.usage
     ? calculateAiCreditCostCents(
         input.usage,
-        input.usage.modelId ??
+        input.usage.route?.model ??
+          input.usage.modelId ??
           input.fallbackModelId ??
           DEFAULT_FALLBACK_MODEL_ID,
-        reservation.useMarkup
+        reservation.useMarkup,
+        input.usage.route?.gateway
       ).costCents
     : 1;
   await finalizeAutumnLock(

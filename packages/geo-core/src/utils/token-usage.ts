@@ -94,7 +94,7 @@ function usageCostUsd(usage: AgentTokenUsage): number {
   }
   return calculateTokenCostUsd(
     usage,
-    usage.modelId ?? GEO_JUDGE_MODEL,
+    usage.route?.model ?? usage.modelId ?? GEO_JUDGE_MODEL,
     usage.route?.gateway
   );
 }

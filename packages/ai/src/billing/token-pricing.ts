@@ -252,9 +252,10 @@ const MINIMUM_COST_CENTS = 1;
 export function calculateTokenCostCents(
   usage: AgentTokenUsage,
   modelId?: string,
-  applyMarkup = true
+  applyMarkup = true,
+  gateway?: GatewayId
 ): number {
-  const baseCostDollars = calculateTokenCostUsd(usage, modelId);
+  const baseCostDollars = calculateTokenCostUsd(usage, modelId, gateway);
 
   const multiplier = applyMarkup ? MARKUP_MULTIPLIER : 1;
   const costCents = Math.ceil(baseCostDollars * multiplier * 100);
@@ -272,13 +273,7 @@ export function calculateTokenCostUsd(
     return usage.tokenCostUsd;
   }
 
-  const pricing = resolvePricingTier(
-    getModelPricing(
-      usage.route?.model ?? modelId,
-      usage.route?.gateway ?? gateway
-    ),
-    usage
-  );
+  const pricing = resolvePricingTier(getModelPricing(modelId, gateway), usage);
 
   const inputCostDollars =
     (usage.inputTokens / 1_000_000) * pricing.inputPerMillionTokens;
