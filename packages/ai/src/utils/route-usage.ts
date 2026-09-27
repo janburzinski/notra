@@ -46,7 +46,11 @@ export async function summarizeRouteUsage(
     if (usage) {
       pricedSteps += 1;
       maxPromptTokens = Math.max(maxPromptTokens, promptTokensOf(usage));
-      tokenCostUsd += calculateTokenCostUsd(usage, modelId, stepRoute?.gateway);
+      tokenCostUsd += calculateTokenCostUsd(
+        usage,
+        stepRoute?.model ?? modelId,
+        stepRoute?.gateway
+      );
     }
   }
 

@@ -178,6 +178,29 @@ describe("GEO billing usage", () => {
     expect(total.totalUsd).toBeCloseTo(2.4);
   });
 
+  test("settles raw token usage using the served route", () => {
+    const cost = calculateAiCreditCostCents(
+      {
+        inputTokens: 100_000,
+        outputTokens: 100_000,
+        totalTokens: 200_000,
+        cacheReadTokens: 0,
+        cacheWriteTokens: 0,
+        route: {
+          gateway: "vercel",
+          requestedModel: "openai/gpt-5.6-sol",
+          model: "openai/gpt-5.4-mini",
+          reason: "paid",
+        },
+      },
+      "openai/gpt-5.6-sol",
+      false
+    );
+
+    expect(cost.billingBasis).toBe("tokens");
+    expect(cost.costCents).toBe(53);
+  });
+
   test("carries reasoning tokens through aggregation", () => {
     const total = addAgentTokenUsage(EMPTY_AGENT_TOKEN_USAGE, {
       inputTokens: 10,

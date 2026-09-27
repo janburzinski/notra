@@ -272,7 +272,13 @@ export function calculateTokenCostUsd(
     return usage.tokenCostUsd;
   }
 
-  const pricing = resolvePricingTier(getModelPricing(modelId, gateway), usage);
+  const pricing = resolvePricingTier(
+    getModelPricing(
+      usage.route?.model ?? modelId,
+      usage.route?.gateway ?? gateway
+    ),
+    usage
+  );
 
   const inputCostDollars =
     (usage.inputTokens / 1_000_000) * pricing.inputPerMillionTokens;
