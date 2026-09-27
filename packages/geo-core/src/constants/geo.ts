@@ -296,14 +296,6 @@ export const GEO_GAPS_ENGINE_FILTER_ALL = "all";
 export const GEO_WRITER_TRIGGER_ID = "geo_writer";
 export const GEO_WRITER_TRIGGER_NAME = "GEO Writer";
 
-export const GEO_WRITE_SIDEBAR_SHORTCUT = "b";
-export const GEO_WRITE_PANEL_HEADER_CLASS =
-  "overflow-hidden rounded-t-2xl border border-border border-b-0 bg-muted pb-5";
-export const GEO_WRITE_PANEL_HEADER_ROW_CLASS = "flex h-10 items-center";
-export const GEO_WRITE_PANEL_FOOTER_CLASS =
-  "-mt-5 overflow-hidden rounded-b-2xl border border-border border-t-0 bg-muted pt-5";
-export const GEO_WRITE_PANEL_FOOTER_ROW_CLASS = "flex min-h-12 items-center";
-export const GEO_WRITE_SIDEBAR_WIDTH = "13rem";
 export const GEO_WRITE_SITEMAP_SKELETON_KEYS = ["sitemap-1", "sitemap-2"];
 export const GEO_WRITE_TABLE_HEIGHT = 420;
 export const GEO_WRITE_TABLE_ROW_HEIGHT = 56;
@@ -620,7 +612,7 @@ export const GEO_PROMPT_INTENT_LABELS: Record<GeoPromptIntent, string> = {
   other: "Other",
 };
 export const GEO_GAP_TITLE_MAX_LENGTH = 160;
-export const GEO_DISCOVERY_MODEL = "anthropic/claude-sonnet-4.6";
+export const GEO_DISCOVERY_MODEL = "anthropic/claude-sonnet-5";
 export const GEO_WEBSITE_DISCOVERY_MODEL = "moonshotai/kimi-k3";
 export const GEO_DISCOVERY_MAX_TOKENS = 10000;
 export const GEO_DISCOVERY_MAX_ALIASES = 6;
