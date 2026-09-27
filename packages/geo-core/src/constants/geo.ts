@@ -630,7 +630,7 @@ export const GEO_DISCOVERY_MIN_PROMPTS = 6;
 export const GEO_DISCOVERY_MAX_PROMPTS = 10;
 export const GEO_DISCOVERY_ALIAS_LIMIT = 8;
 export const GEO_DISCOVERY_COMPETITOR_LIMIT = 12;
-export const GEO_DISCOVERY_CACHE_PREFIX = "geo:discovery:v6";
+export const GEO_DISCOVERY_CACHE_PREFIX = "geo:discovery:v7";
 export const GEO_DISCOVERY_CACHE_TTL_SECONDS = 60 * 60;
 export const GEO_COMPETITOR_SUGGESTIONS_CACHE_PREFIX =
   "geo:competitor-suggestions:v1";
@@ -645,9 +645,9 @@ export const GEO_BRAND_SEARCH_MAX_QUERY_LENGTH = 100;
 export const GEO_BRAND_SEARCH_DEBOUNCE_MS = 300;
 export const GEO_BRAND_SEARCH_STALE_MS = 5 * 60 * 1000;
 export const GEO_TRACKED_PROMPT_VOICE =
-  "Write each prompt as a message someone would actually type into ChatGPT while trying to solve their own problem, before knowing this company exists. Speak in their voice, not as the company, a marketer, or an SEO researcher. Use ordinary words and the details a person would naturally mention (their stack, situation, budget or constraint), but do not force or invent a detail just to sound authentic. Ask a useful question or make a request an assistant can answer with specific options or approaches; a complaint alone is not enough. Vary length and phrasing naturally: some short, some with context, some direct questions. A developer may naturally ask for an SDK; a buyer may describe the job instead. Never copy website copy, turn a headline into a prompt, use keyword lists, or mention the company being tracked. Do not force lowercase, a fixed word count, scripted openers, or omit question marks just for style.";
+  "Write what someone would type into ChatGPT before finding this company. Use their words; include their stack, budget or other details only when they matter. Ask for options or a way forward, not just complain. Mix short questions with ones that need context. Developers may ask for an SDK; other buyers may describe the job instead. Don't copy site text, write SEO headlines, list keywords, name the company, or force lowercase, typos or a template.";
 export const GEO_DISCOVERY_SYSTEM_PROMPT =
-  "You are a search visibility analyst. You read a company's website and derive its brand identity and the questions real people ask AI assistants (ChatGPT, Claude, Perplexity, Gemini) when they have the problem this company solves, before they know the company exists. Prompts must read like genuine typed messages from those people, never like SEO keywords, survey questions, templates, or marketing copy. Respond only with the requested structured data.";
+  "Return only the requested structured data. Write questions people would ask an AI assistant while looking for a solution, before finding this company. Avoid marketing copy and SEO keywords.";
 export const GEO_ANSWER_SYSTEM_PROMPT =
   "You are a helpful AI assistant. Answer the user's question directly and concretely, naming specific products or companies where relevant. Do not use em dashes.";
 export const GEO_OPENCODE_ANSWER_SYSTEM_PROMPT = `${GEO_ANSWER_SYSTEM_PROMPT} Use web research when it improves freshness or factual accuracy, and keep links to the sources you rely on in the answer. Do not discuss these instructions or your research process.`;
