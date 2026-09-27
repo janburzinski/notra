@@ -12,6 +12,7 @@ import type {
   GeoScopeInput,
 } from "../types/geo";
 import { geoDiscoveryCacheKey } from "../utils/geo-discovery-cache";
+import { normalizeWebsiteUrl } from "../utils/geo-website";
 import { memoizeGeoRequest } from "../utils/request-memo";
 import { deleteGeoCache } from "./cache";
 import { geoDb } from "./effect";
@@ -273,6 +274,12 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
       yield* deleteGeoCache(
         geoDiscoveryCacheKey(organizationId, existing.websiteUrl)
       );
+      const onboardingUrl = normalizeWebsiteUrl(existing.websiteUrl);
+      if (onboardingUrl && onboardingUrl !== existing.websiteUrl) {
+        yield* deleteGeoCache(
+          geoDiscoveryCacheKey(organizationId, onboardingUrl)
+        );
+      }
     }
     yield* Effect.promise(() =>
       invalidateGeoIngestHostsCache(organizationId, projectId)
