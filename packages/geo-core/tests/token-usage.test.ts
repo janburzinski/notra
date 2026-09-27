@@ -162,6 +162,22 @@ describe("GEO billing usage", () => {
     expect(asEngine.totalUsd).not.toBe(untagged.totalUsd);
   });
 
+  test("uses the gateway-specific price for routed model usage", () => {
+    const total = addAgentTokenUsage(EMPTY_AGENT_TOKEN_USAGE, {
+      inputTokens: 100_000,
+      outputTokens: 100_000,
+      totalTokens: 200_000,
+      modelId: "openai/gpt-5.6-sol",
+      route: {
+        gateway: "vercel",
+        requestedModel: "openai/gpt-5.6-sol",
+        model: "openai/gpt-5.6-sol",
+        reason: "paid",
+      },
+    });
+    expect(total.totalUsd).toBeCloseTo(2.4);
+  });
+
   test("carries reasoning tokens through aggregation", () => {
     const total = addAgentTokenUsage(EMPTY_AGENT_TOKEN_USAGE, {
       inputTokens: 10,

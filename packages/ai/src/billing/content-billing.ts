@@ -24,7 +24,7 @@ import { hasActivePaidPlan } from "./chat-billing";
 import { FEATURES, PAID_OR_LEGACY_PLAN_IDS } from "./features";
 import { shouldApplyMarkup } from "./token-pricing";
 
-const DEFAULT_FALLBACK_MODEL_ID = "anthropic/claude-sonnet-4.6";
+const DEFAULT_FALLBACK_MODEL_ID = "anthropic/claude-sonnet-5";
 
 const PLAN_INCLUDED_RESERVATION: ContentBillingReservation = {
   allowed: true,

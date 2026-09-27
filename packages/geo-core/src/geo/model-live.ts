@@ -1,5 +1,6 @@
 import { getEvaluationClient } from "@notra/ai/evaluation/client";
 import { gateway, getRouteMetadata } from "@notra/ai/gateway";
+import type { RouteMetadata } from "@notra/ai/types/router";
 import { generateText, isStepCount, Output } from "ai";
 import { Effect, Layer } from "effect";
 
@@ -42,9 +43,10 @@ import { buildGscSuggestionPrompt } from "./suggestion-prompt";
 
 function usageWithModel(
   usage: GeoModelTokenUsage,
-  modelId: string
+  modelId: string,
+  route?: RouteMetadata
 ): GeoModelTokenUsage {
-  return { ...usage, modelId: usage.modelId ?? modelId };
+  return { ...usage, modelId: usage.modelId ?? modelId, route };
 }
 
 /** Retains SDK default retries; no additional Effect retry policy. */
@@ -84,7 +86,11 @@ export const geoModelLive = Layer.succeed(
             grounding: extractGrounding(result),
             sources: collectSources(result.sources),
             finishReason: result.finishReason,
-            usage: usageWithModel(usage, input.engine),
+            usage: usageWithModel(
+              usage,
+              input.engine,
+              getRouteMetadata(result.finalStep.providerMetadata)
+            ),
             zdrEnforced:
               getRouteMetadata(result.finalStep.providerMetadata)
                 ?.zdrEnforced ?? null,
@@ -130,7 +136,11 @@ export const geoModelLive = Layer.succeed(
             grounding: extractGrounding(result),
             finishReason: result.finishReason,
             sources: collectSources(result.sources),
-            usage: usageWithModel(result.usage, input.engine.key),
+            usage: usageWithModel(
+              result.usage,
+              input.engine.key,
+              getRouteMetadata(result.finalStep.providerMetadata)
+            ),
             zdrEnforced: GEO_DIRECT_GROUNDED_PROVIDERS.has(
               input.engine.provider
             )
@@ -174,7 +184,11 @@ export const geoModelLive = Layer.succeed(
           });
           return {
             ...result.output,
-            usage: usageWithModel(result.usage, GEO_JUDGE_MODEL),
+            usage: usageWithModel(
+              result.usage,
+              GEO_JUDGE_MODEL,
+              getRouteMetadata(result.providerMetadata)
+            ),
           };
         },
         catch: (cause) =>
@@ -223,7 +237,11 @@ export const geoModelLive = Layer.succeed(
           });
           return {
             translations: result.output.translations,
-            usage: usageWithModel(result.usage, GEO_JUDGE_MODEL),
+            usage: usageWithModel(
+              result.usage,
+              GEO_JUDGE_MODEL,
+              getRouteMetadata(result.providerMetadata)
+            ),
           };
         },
         catch: (cause) =>
@@ -261,7 +279,11 @@ export const geoModelLive = Layer.succeed(
           });
           return {
             prompts: result.output.prompts,
-            usage: usageWithModel(result.usage, GSC_SUGGESTION_MODEL),
+            usage: usageWithModel(
+              result.usage,
+              GSC_SUGGESTION_MODEL,
+              getRouteMetadata(result.providerMetadata)
+            ),
           };
         },
         catch: (cause) => new GeoModelError({ operation: "suggest", cause }),
