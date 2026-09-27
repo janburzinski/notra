@@ -187,12 +187,6 @@ export function ConnectedAccountsSection({
             )}
           </div>
         </div>
-
-        {!canUnlink && (
-          <p className="text-muted-foreground text-xs">
-            You need at least one connected account or password to sign in
-          </p>
-        )}
       </div>
     </TitleCard>
   );
