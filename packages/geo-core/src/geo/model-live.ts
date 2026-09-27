@@ -1,6 +1,8 @@
+import { calculateTokenCostUsd } from "@notra/ai/billing/token-pricing";
 import { getEvaluationClient } from "@notra/ai/evaluation/client";
 import { gateway, getRouteMetadata } from "@notra/ai/gateway";
 import type { RouteMetadata } from "@notra/ai/types/router";
+import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
 import { generateText, isStepCount, Output } from "ai";
 import { Effect, Layer } from "effect";
 
@@ -44,9 +46,27 @@ import { buildGscSuggestionPrompt } from "./suggestion-prompt";
 function usageWithModel(
   usage: GeoModelTokenUsage,
   modelId: string,
-  route?: RouteMetadata
+  route?: RouteMetadata,
+  totalUsd?: number
 ): GeoModelTokenUsage {
-  return { ...usage, modelId: usage.modelId ?? modelId, route };
+  return {
+    ...usage,
+    modelId: usage.modelId ?? modelId,
+    route,
+    ...(totalUsd === undefined ? {} : { totalUsd }),
+  };
+}
+
+function routedUsageCostUsd(
+  usage: GeoModelTokenUsage,
+  modelId: string,
+  route?: RouteMetadata
+): number {
+  return calculateTokenCostUsd(
+    toAgentTokenUsage(usage),
+    route?.model ?? modelId,
+    route?.gateway
+  );
 }
 
 /** Retains SDK default retries; no additional Effect retry policy. */
@@ -70,30 +90,34 @@ export const geoModelLive = Layer.succeed(
           };
           let result = await generateText({ model, ...options });
           let usage = result.usage;
+          let route = getRouteMetadata(result.finalStep.providerMetadata);
+          let totalUsd: number | undefined;
           // Reasoning engines can spend the entire output budget on thought
           // and return no text at all; retry once at low effort.
           if (result.finishReason === "length" && !result.text.trim()) {
+            const firstCostUsd = routedUsageCostUsd(usage, input.engine, route);
             const retry = await generateText({
               model,
               ...options,
               reasoning: "low",
             });
+            const retryRoute = getRouteMetadata(
+              retry.finalStep.providerMetadata
+            );
+            totalUsd =
+              firstCostUsd +
+              routedUsageCostUsd(retry.usage, input.engine, retryRoute);
             usage = addLanguageModelTokenUsage(usage, retry.usage);
             result = retry;
+            route = retryRoute;
           }
           return {
             text: result.text,
             grounding: extractGrounding(result),
             sources: collectSources(result.sources),
             finishReason: result.finishReason,
-            usage: usageWithModel(
-              usage,
-              input.engine,
-              getRouteMetadata(result.finalStep.providerMetadata)
-            ),
-            zdrEnforced:
-              getRouteMetadata(result.finalStep.providerMetadata)
-                ?.zdrEnforced ?? null,
+            usage: usageWithModel(usage, input.engine, route, totalUsd),
+            zdrEnforced: route?.zdrEnforced ?? null,
           };
         },
         catch: (cause) =>
