@@ -13,6 +13,7 @@ import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useListPlans } from "autumn-js/react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -45,12 +46,15 @@ export function GeoUpgradeDialog({
   open,
   onOpenChange,
   onOpenChangeComplete,
+  sidebar = false,
 }: GeoUpgradeDialogProps) {
   const t = useTranslations("billing.geoUpgrade");
+  const tUpgrade = useTranslations("nav.upgrade");
   const tCommon2 = useTranslations("common");
   const tCommon = useTranslations("common.states");
   const tBilling = useTranslations("billing");
   const locale = useLocale();
+  const router = useRouter();
   const { data: plans, isLoading: plansLoading } = useListPlans({
     queryOptions: { enabled: open },
   });
@@ -60,6 +64,7 @@ export function GeoUpgradeDialog({
   const [includeZdr, setIncludeZdr] = useState(false);
 
   const planGroups = groupBillingPlans(plans);
+  const surface = sidebar ? PLAN_SURFACES.SIDEBAR : PLAN_SURFACES.GEO_PAYWALL;
   const intervalLabel = isYearly
     ? tCommon2("labels.year")
     : tCommon2("labels.month");
@@ -67,7 +72,7 @@ export function GeoUpgradeDialog({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       trackEvent(POSTHOG_EVENTS.PAYWALL_DISMISSED, {
-        kind: PAYWALL_KINDS.GEO_LOCKED,
+        kind: sidebar ? PAYWALL_KINDS.UPGRADE_CARD : PAYWALL_KINDS.GEO_LOCKED,
       });
     }
     onOpenChange(nextOpen);
@@ -77,7 +82,7 @@ export function GeoUpgradeDialog({
     const yearly = value === "yearly";
     trackEvent(POSTHOG_EVENTS.PRICING_INTERVAL_TOGGLED, {
       interval: billingInterval(yearly),
-      surface: PLAN_SURFACES.GEO_PAYWALL,
+      surface,
     });
     setIsYearly(yearly);
   }
@@ -85,7 +90,7 @@ export function GeoUpgradeDialog({
   function handleIncludeZdrChange(checked: boolean) {
     trackEvent(POSTHOG_EVENTS.ZDR_ADDON_TOGGLED, {
       enabled: checked,
-      surface: PLAN_SURFACES.GEO_PAYWALL,
+      surface,
     });
     setIncludeZdr(checked);
   }
@@ -99,7 +104,7 @@ export function GeoUpgradeDialog({
         planId,
         isYearly,
         includeZdr,
-        surface: PLAN_SURFACES.GEO_PAYWALL,
+        surface,
       })
     );
     try {
@@ -108,17 +113,22 @@ export function GeoUpgradeDialog({
         multiAttach,
         planId,
         includeZdr,
-        successUrl: `${window.location.origin}/${slug}/geo`,
+        successUrl: sidebar
+          ? window.location.href
+          : `${window.location.origin}/${slug}/geo`,
       });
       if (result.paymentUrl) {
         window.location.assign(result.paymentUrl);
         return;
       }
       await refetch();
+      if (sidebar) {
+        router.refresh();
+      }
     } catch (err) {
       trackEvent(POSTHOG_EVENTS.CHECKOUT_FAILED, {
         plan_id: planId,
-        surface: PLAN_SURFACES.GEO_PAYWALL,
+        surface,
       });
       toast.error(
         err instanceof Error
@@ -178,9 +188,13 @@ export function GeoUpgradeDialog({
     >
       <ResponsiveDialogContent className="flex max-h-[90svh] flex-col overflow-hidden sm:max-w-5xl">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>{t("title")}</ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>
+            {sidebar ? tUpgrade("freeHeading") : t("title")}
+          </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            {tCommon2("messages.aiVisibilityTrackingIsIncluded")}
+            {sidebar
+              ? tUpgrade("freeDescription")
+              : tCommon2("messages.aiVisibilityTrackingIsIncluded")}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <div className="flex justify-center">
