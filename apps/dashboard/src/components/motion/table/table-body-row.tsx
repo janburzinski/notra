@@ -82,7 +82,7 @@ export function TableBodyRow<T>({
       )}
       data-selected={isSelected}
       onClick={
-        onRowClick && rowKeyboardActivation
+        onRowClick
           ? (event) => {
               if (isInteractiveTarget(event.target)) {
                 return;
@@ -92,7 +92,7 @@ export function TableBodyRow<T>({
           : undefined
       }
       onKeyDown={
-        onRowClick
+        onRowClick && rowKeyboardActivation
           ? (event) => {
               if (event.target !== event.currentTarget) {
                 return;
