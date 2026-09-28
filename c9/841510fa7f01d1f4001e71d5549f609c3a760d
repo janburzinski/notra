@@ -1,0 +1,36 @@
+apps/dashboard/src/components/geo/geo-upgrade-gate.tsx
+  s_1b4cd5d35b899e::t_073afa91f0ad00 15,39-42,48-53,56-67,70-75,78,81,86,118-128,158-164
+  s_1b4cd5d35b899e::t_a722364b86e005 43-44
+apps/dashboard/tests/geo-upgrade-gate.test.tsx
+  s_1b4cd5d35b899e::t_4e704b495ddb35 11-16
+  s_1b4cd5d35b899e::t_94fa428fa1f293 22-23,76-78
+apps/dashboard/package.json
+  s_1b4cd5d35b899e::t_7e032ffc5abace 134
+apps/dashboard/src/constants/storage.ts
+  s_1b4cd5d35b899e::t_073afa91f0ad00 21-22
+apps/dashboard/tests/geo-upgrade-gate.client.test.tsx
+  s_1b4cd5d35b899e::t_c9b9e96f3b78c6 106-108,110,117,137,161
+  s_1b4cd5d35b899e::t_a722364b86e005 28-30,119-123
+  s_1b4cd5d35b899e::t_63d634f161d2cc 95,103,105,109
+  s_1b4cd5d35b899e::t_030fd392864e35 1-27,31-84,87-94,96-102,104,111-116,118,124-136,138-139,147-160,162-171
+  s_1b4cd5d35b899e::t_19db5b8e401898 140-146
+  s_1b4cd5d35b899e::t_c48e3ba95c203a 85-86
+bun.lock
+  ai_agent 221,2674-2675,3044-3045,3502,3834-3835,5578-5579,6556-6557,6656-6657,7800
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c9841510fa7f01d1f4001e71d5549f609c3a760d",
+  "prompts": {},
+  "sessions": {
+    "s_1b4cd5d35b899e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e76e-0184-7261-a170-20308cbd11f5",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
