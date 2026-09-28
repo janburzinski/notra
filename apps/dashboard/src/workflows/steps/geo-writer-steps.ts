@@ -12,8 +12,10 @@ import {
   GEO_WRITER_TRIGGER_ID,
   GEO_WRITER_TRIGGER_NAME,
 } from "@notra/geo-core/constants/geo";
+import { refreshGeoContentGaps } from "@notra/geo-core/geo/gaps";
 import { briefProvenanceMetadata } from "@notra/geo-core/geo/writer";
 import { and, eq } from "drizzle-orm";
+import { Effect } from "effect";
 
 import {
   trackGeoWriterCompleted,
@@ -191,6 +193,11 @@ export async function finishGeoWriter(input: {
     humanized: input.humanized,
     startedAt: updated[0]?.startedAt ?? null,
   });
+  try {
+    await Effect.runPromise(refreshGeoContentGaps(input));
+  } catch (error) {
+    console.error("[GEO] Could not refresh content gaps after writing:", error);
+  }
 }
 
 export async function failGeoWriter(input: {
@@ -235,6 +242,11 @@ export async function failGeoWriter(input: {
     reason: input.failureReason,
     startedAt: updated[0]?.startedAt ?? null,
   });
+  try {
+    await Effect.runPromise(refreshGeoContentGaps(input));
+  } catch (error) {
+    console.error("[GEO] Could not refresh content gaps after failure:", error);
+  }
 }
 
 export async function trackGeoWriterSkipped(

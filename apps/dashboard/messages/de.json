@@ -2575,7 +2575,6 @@
         "mentioned": "Erwähnt dich",
         "searched": "Hat diese Suche ausgeführt"
       },
-      "searchQueriesCount": "{count, plural, one {# Suchanfrage} other {# Suchanfragen}}",
       "empty": {
         "scanning": {
           "title": "KI-Engines werden gescannt",
@@ -2588,14 +2587,9 @@
           "title": "Keine Prompt-Lücken",
           "description": "KI-Engines erwähnen dich bereits bei den Fragen, die du trackst."
         },
-        "noAiSearchGaps": {
-          "title": "Keine KI-Suchlücken",
-          "description": "Bei keiner Suche, die KI-Engines in deinen Scans ausgeführt haben, fehlst du bisher."
-        },
         "noSearchGaps": {
           "title": "Keine Suchlücken",
-          "description": "Verbinde die Search Console unter Prompts, um Suchanfragen abzurufen, die du noch nicht abdeckst.",
-          "action": "Prompts öffnen"
+          "description": "Search Console und KI-Scans haben noch keine unbesetzten Suchanfragen gefunden."
         },
         "noMatches": {
           "title": "Keine passenden Lücken",
@@ -2603,10 +2597,10 @@
         }
       },
       "gapType": "Lückentyp",
+      "openSearchGap": "Details zu {query} öffnen",
       "tabs": {
         "prompt": "Prompt-Lücken",
-        "search": "Suchlücken",
-        "ai": "KI-Suchlücken"
+        "search": "Suchlücken"
       },
       "filterLabel": "Inhaltslücken filtern",
       "filterPlaceholder": "Lücken filtern…",
@@ -2618,16 +2612,9 @@
       "columns": {
         "opportunity": "Potenzial",
         "visibleOn": "Sichtbar auf",
-        "sourceQuestion": "Ausgangsfrage",
+        "searchQuery": "Suchanfrage",
         "action": "Aktion",
-        "aiSearch": "KI-Suche",
-        "searches": "Suchen",
-        "searchedBy": "Gesucht von"
-      },
-      "hints": {
-        "impressions": "Google-Search-Impressionen insgesamt über alle Suchanfragen dieser Lücke.",
-        "recommendation": "Empfohlener nächster Schritt basierend auf Suchnachfrage und Überschneidung mit deinen bestehenden Inhalten.",
-        "searches": "Scan-Antworten, in denen eine KI-Engine diese Websuche ausgeführt hat."
+        "searches": "KI-Suchen"
       },
       "aiSearched": "KI suchte: {queries}",
       "aiSearchSubtitle": "{more, plural, =0 {Aus „{prompt}“} other {Aus „{prompt}“ und # weiteren}}"

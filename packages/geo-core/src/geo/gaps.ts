@@ -4,6 +4,7 @@ import {
   brandSitemapPages,
   brandSitemaps,
   geoCompetitors,
+  geoContentGapSnapshots,
   geoContentBriefs,
   geoMentionChecks,
   geoPromptSuggestions,
@@ -195,6 +196,7 @@ const loadMentionGapInputs = Effect.fn("geo.mentionGapInputs")(function* (
             engine: geoMentionChecks.engine,
             prompt: geoMentionChecks.prompt,
             mentioned: geoMentionChecks.mentioned,
+            ownedSourceCited: geoMentionChecks.ownedSourceCited,
             competitors: geoMentionChecks.competitors,
             grounding: geoMentionChecks.grounding,
           }
@@ -266,6 +268,8 @@ const loadAiSearchQueries = Effect.fn("geo.gaps.aiSearchQueries")(function* (
           case when jsonb_typeof(${queries}) = 'array' then ${queries} else '[]'::jsonb end
         ) as searched_query(value)
         where ${recentFirstTurnChecks(projectId)}
+          and not ${geoMentionChecks.mentioned}
+          and not ${geoMentionChecks.ownedSourceCited}
           and ${activeGapScanFilter(
             geoMentionChecks.promptId,
             matchedScanIds,
@@ -303,6 +307,7 @@ function aggregateMentionChecks(
     promptId: string;
     prompt: string;
     mentioned: boolean;
+    ownedSourceCited: boolean;
     engine: string;
     competitors: string[];
     grounding: { queries: string[] };
@@ -320,13 +325,15 @@ function aggregateMentionChecks(
       searchQueriesByEngine: [] as string[][],
     };
     entry.total += 1;
-    entry.searchQueriesByEngine.push(check.grounding.queries);
     if (check.mentioned) {
       entry.mentioned += 1;
       entry.mentionedEngines.push(check.engine);
     } else {
       entry.missing.push(check.engine);
       entry.competitors.push(...check.competitors);
+      if (!check.ownedSourceCited) {
+        entry.searchQueriesByEngine.push(check.grounding.queries);
+      }
     }
     byPrompt.set(check.promptId, entry);
   }
@@ -606,7 +613,7 @@ function searchGapRecommendation(
   });
 }
 
-export const loadGeoContentGaps = Effect.fn("geo.gaps")(function* (
+const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
   input: GeoScopeInput
 ) {
   const scope = yield* requireGeoProject(input);
@@ -797,6 +804,66 @@ export const loadGeoContentGaps = Effect.fn("geo.gaps")(function* (
     hasScanData: checks.length > 0,
   };
   return response;
+});
+
+export const loadGeoContentGaps = Effect.fn("geo.gaps.load")(function* (
+  input: GeoScopeInput
+) {
+  const scope = yield* requireGeoProject(input);
+  const [stored] = yield* geoDb("content gaps snapshot lookup failed", () =>
+    db
+      .select({ snapshot: geoContentGapSnapshots.snapshot })
+      .from(geoContentGapSnapshots)
+      .where(eq(geoContentGapSnapshots.projectId, scope.projectId))
+      .limit(1)
+  );
+  return (
+    (stored?.snapshot as GeoContentGapsResponse | null) ?? {
+      promptGaps: [],
+      searchGaps: [],
+      aiSearchGaps: [],
+      hasScanData: false,
+    }
+  );
+});
+
+export const refreshGeoContentGaps = Effect.fn("geo.gaps.refresh")(function* (
+  input: GeoScopeInput
+) {
+  const scope = yield* requireGeoProject(input);
+  const startedAt = new Date();
+  const snapshot = yield* computeGeoContentGaps({
+    organizationId: scope.organizationId,
+    projectId: scope.projectId,
+  });
+  yield* geoDb("content gaps snapshot update failed", () =>
+    db
+      .insert(geoContentGapSnapshots)
+      .values({
+        organizationId: scope.organizationId,
+        projectId: scope.projectId,
+        snapshot,
+        updatedAt: startedAt,
+      })
+      .onConflictDoUpdate({
+        target: geoContentGapSnapshots.projectId,
+        set: { snapshot, updatedAt: startedAt },
+        setWhere: sql`${geoContentGapSnapshots.updatedAt} <= ${startedAt}`,
+      })
+  );
+  return snapshot;
+});
+
+export const refreshGeoContentGapsBestEffort = Effect.fn(
+  "geo.gaps.refreshBestEffort"
+)(function* (input: GeoScopeInput) {
+  yield* refreshGeoContentGaps(input).pipe(
+    Effect.catchCause((cause) =>
+      Effect.sync(() => {
+        console.error("[GEO] Could not refresh content gaps:", cause);
+      })
+    )
+  );
 });
 
 export const setGeoPromptGapIgnored = Effect.fn("geo.gaps.ignore")(function* (

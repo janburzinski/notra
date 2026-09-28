@@ -12,8 +12,6 @@ import {
   GEO_GAPS_METER_TONE_CLASS,
   GEO_GAPS_TABLE_HEIGHT,
   GEO_GAPS_TABLE_LOGO_LIMIT,
-  GEO_PROMPTS_NAV_LINK,
-  GEO_SEARCH_GAP_ACTION_CLASS,
 } from "@notra/geo-core/constants/geo";
 import { findCompetitor } from "@notra/geo-core/geo/domain";
 import type {
@@ -44,7 +42,6 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
@@ -57,7 +54,6 @@ import { GapDetailSheet } from "@/components/geo/gap-detail-sheet";
 import { SearchGapDetailSheet } from "@/components/geo/search-gap-detail";
 import { StatusSpinner } from "@/components/geo/status-spinner";
 import { Table, type TableColumn } from "@/components/motion/table";
-import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import {
   EMPTY_STATE_TABLE_COLUMNS,
   EMPTY_STATE_TABLE_ROWS,
@@ -65,7 +61,6 @@ import {
 import {
   GEO_GAPS_EMPTY_MESSAGE_KEYS,
   GEO_GAPS_TABS,
-  GEO_SEARCH_GAP_ACTION_LABEL_KEYS,
 } from "@/constants/geo-gaps";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useLogoStackLabels } from "@/lib/i18n/use-logo-stack-labels";
@@ -78,8 +73,6 @@ import type {
   GeoGapMeterProps,
   GeoGapNumberCellProps,
   GeoGapOpportunityCellProps,
-  GeoGapQueriesCellProps,
-  GeoGapRecommendationCellProps,
   GeoGapSearchWriteCellProps,
   GeoGapsWriteCellProps,
   GeoGapsEmptyProps,
@@ -87,6 +80,7 @@ import type {
   GeoGapsTab,
   GeoGapsTableProps,
   GeoGapsTabsProps,
+  GeoUnifiedSearchGap,
   GeoGapVisibleOnCellProps,
 } from "@/types/components/geo-gaps";
 import { formatMentionRate } from "@/utils/geo-charts";
@@ -103,10 +97,9 @@ import {
   geoGapsEmptyKind,
   isGeoGapsTab,
   maxGapOpportunity,
-  searchGapActionOrder,
+  unifySearchGaps,
   uniqueGapEngineFamilies,
 } from "@/utils/geo-gaps";
-import { withGeoProject } from "@/utils/geo-paths";
 
 function remainingTableHeight(element: HTMLElement): number {
   const elementTop = element.getBoundingClientRect().top;
@@ -284,58 +277,6 @@ function WriteCell({
         {writeActionLabels[action]}
       </Button>
     </span>
-  );
-}
-
-function RecommendationCell({ recommendation }: GeoGapRecommendationCellProps) {
-  const tGeoShared = useTranslations("geo.shared");
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <Badge
-            className={cn(
-              "cursor-default font-normal",
-              GEO_SEARCH_GAP_ACTION_CLASS[recommendation.action]
-            )}
-            variant="outline"
-          />
-        }
-      >
-        {tGeoShared(GEO_SEARCH_GAP_ACTION_LABEL_KEYS[recommendation.action])}
-      </TooltipTrigger>
-      <TooltipContent className="max-w-sm">
-        <span className="flex flex-col gap-1.5">
-          <span>{recommendation.reason}</span>
-          {recommendation.targets.length > 0 ? (
-            <span className="flex flex-col gap-0.5">
-              {recommendation.targets.map((target) => (
-                <span
-                  className="flex items-center justify-between gap-3"
-                  key={`${target.kind}:${target.id}`}
-                >
-                  {target.url ? (
-                    <a
-                      className="truncate underline underline-offset-2"
-                      href={target.url}
-                      rel="noopener"
-                      target="_blank"
-                    >
-                      {target.title}
-                    </a>
-                  ) : (
-                    <span className="truncate">{target.title}</span>
-                  )}
-                  <span className="text-muted-foreground shrink-0 tabular-nums">
-                    {Math.round(target.score * 100)}%
-                  </span>
-                </span>
-              ))}
-            </span>
-          ) : null}
-        </span>
-      </TooltipContent>
-    </Tooltip>
   );
 }
 
@@ -561,17 +502,6 @@ function EngineLogos({ engines, detail }: GeoGapEngineLogosProps) {
   );
 }
 
-function QueriesCell({ prompt, queries }: GeoGapQueriesCellProps) {
-  const t = useTranslations("geo.gapsTable");
-  const count = t("searchQueriesCount", { count: queries.length });
-  return (
-    <ContentCell
-      subtitle={queries.length === 0 ? null : count}
-      title={prompt}
-    />
-  );
-}
-
 function NumberCell({ value, emptyLabel, format }: GeoGapNumberCellProps) {
   const locale = useLocale();
   if (value === null) {
@@ -584,15 +514,9 @@ function NumberCell({ value, emptyLabel, format }: GeoGapNumberCellProps) {
   );
 }
 
-function GapsEmpty({
-  kind,
-  isScanning,
-  organizationSlug,
-  onRunScan,
-}: GeoGapsEmptyProps) {
+function GapsEmpty({ kind, isScanning, onRunScan }: GeoGapsEmptyProps) {
   const t = useTranslations("geo.gapsTable.empty");
   const tGeoShared = useTranslations("geo.shared");
-  const { projectId } = useGeoProjectScope();
   const copyKey = GEO_GAPS_EMPTY_MESSAGE_KEYS[kind];
   let action = null;
   if (kind === "no-scan") {
@@ -600,22 +524,6 @@ function GapsEmpty({
       <Button disabled={isScanning} onClick={onRunScan}>
         {isScanning ? <StatusSpinner /> : null}
         {tGeoShared("runScan")}
-      </Button>
-    );
-  } else if (kind === "no-search-gaps") {
-    action = (
-      <Button
-        nativeButton={false}
-        render={
-          <Link
-            href={withGeoProject(
-              `/${organizationSlug}${GEO_PROMPTS_NAV_LINK}`,
-              projectId
-            )}
-          />
-        }
-      >
-        {t("noSearchGaps.action")}
       </Button>
     );
   }
@@ -783,7 +691,6 @@ export function GeoGapsTable({
   hasScanData,
   isScanning,
   organizationId,
-  organizationSlug,
   onRunScan,
   onWritePrompt,
   onWriteSearch,
@@ -964,138 +871,150 @@ export function GeoGapsTable({
     },
   ];
 
-  const searchColumns: TableColumn<GeoSearchGapRow>[] = [
+  const unifiedSearchRows = unifySearchGaps(
+    filteredSearchGaps,
+    filteredAiSearchGaps
+  );
+  const searchColumns: TableColumn<GeoUnifiedSearchGap>[] = [
     {
       key: "question",
-      header: t("columns.sourceQuestion"),
+      header: (
+        <>
+          <span className="hidden sm:inline">{t("columns.searchQuery")}</span>
+          <span className="sm:hidden">{tCommon("labels.query")}</span>
+        </>
+      ),
       width: "1fr",
-      cell: (row) => <QueriesCell prompt={row.prompt} queries={row.queries} />,
-      sortValue: (row) => row.prompt,
+      minWidth: "9rem",
+      cell: ({ kind, row }) =>
+        kind === "console" ? (
+          <button
+            aria-label={t("openSearchGap", { query: row.prompt })}
+            className="w-full cursor-pointer text-left"
+            onClick={() => setDetailSearchId(row.id)}
+            type="button"
+          >
+            <ContentCell subtitle={null} title={row.prompt} />
+          </button>
+        ) : (
+          <ContentCell
+            subtitle={
+              row.prompts[0]
+                ? t("aiSearchSubtitle", {
+                    prompt: row.prompts[0],
+                    more: row.prompts.length - 1,
+                  })
+                : null
+            }
+            title={row.brief?.workingTitle ?? row.query}
+          />
+        ),
+      sortValue: ({ kind, row }) =>
+        kind === "console" ? row.prompt : row.query,
       sortable: true,
     },
     {
       key: "impressions",
       header: tCommon("labels.impressions"),
-      hint: t("hints.impressions"),
-      width: "7rem",
-      cell: (row) => (
-        <NumberCell
-          emptyLabel={t("emptyCell.impressions")}
-          value={row.impressions}
-        />
-      ),
-      sortValue: (row) => row.impressions ?? -1,
+      width: "8.5rem",
+      minWidth: "8.5rem",
+      collapsePriority: 2,
+      cell: (gap) =>
+        gap.kind === "console" ? (
+          <NumberCell
+            emptyLabel={t("emptyCell.impressions")}
+            value={gap.row.impressions}
+          />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+      sortValue: (gap) =>
+        gap.kind === "console" ? (gap.row.impressions ?? -1) : -1,
       sortable: true,
     },
     {
-      key: "recommendation",
-      header: tCommon("labels.recommendation"),
-      hint: t("hints.recommendation"),
-      width: "9rem",
-      cell: (row) => <RecommendationCell recommendation={row.recommendation} />,
-      sortValue: (row) => searchGapActionOrder(row.recommendation.action),
+      key: "searches",
+      header: t("columns.searches"),
+      width: "8.5rem",
+      minWidth: "8.5rem",
+      collapsePriority: 1,
+      cell: (gap) => {
+        const ai = gap.kind === "console" ? gap.ai : gap.row;
+        return ai ? (
+          <span className="inline-flex items-center gap-1 whitespace-nowrap">
+            <NumberCell emptyLabel="" value={ai.searches} />
+            <EngineLogos
+              detail={t("engineDetail.searched")}
+              engines={ai.engines}
+            />
+          </span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        );
+      },
+      sortValue: (gap) =>
+        gap.kind === "console" ? (gap.ai?.searches ?? -1) : gap.row.searches,
       sortable: true,
     },
     {
       key: "write",
       header: t("columns.action"),
       align: "right",
-      width: "12rem",
-      minWidth: "12rem",
-      cell: (row) => (
-        <SearchWriteCell
-          isDismissing={dismissingSearchId === row.id}
-          onDismiss={() => onDismissSearch(row)}
-          onOpenPost={onOpenPost}
-          onWrite={(existingPageUrl) => onWriteSearch(row, existingPageUrl)}
-          row={row}
-        />
-      ),
-    },
-  ];
-
-  const aiSearchColumns: TableColumn<GeoAiSearchGapRow>[] = [
-    {
-      key: "query",
-      header: t("columns.aiSearch"),
-      width: "1fr",
-      minWidth: "12rem",
-      cell: (row) => (
-        <ContentCell
-          subtitle={
-            row.prompts[0]
-              ? t("aiSearchSubtitle", {
-                  prompt: row.prompts[0],
-                  more: row.prompts.length - 1,
-                })
-              : null
-          }
-          title={row.brief?.workingTitle ?? row.query}
-        />
-      ),
-      sortValue: (row) => row.query,
-      sortable: true,
-    },
-    {
-      key: "searches",
-      header: t("columns.searches"),
-      hint: t("hints.searches"),
-      width: "7rem",
-      cell: (row) => (
-        <NumberCell
-          emptyLabel={t("emptyCell.impressions")}
-          value={row.searches}
-        />
-      ),
-      sortValue: (row) => row.searches,
-      sortable: true,
-    },
-    {
-      key: "engines",
-      collapsePriority: 1,
-      header: t("columns.searchedBy"),
-      width: "9.5rem",
-      cell: (row) => (
-        <EngineLogos
-          detail={t("engineDetail.searched")}
-          engines={row.engines}
-        />
-      ),
-      sortValue: (row) => gapMissingEngineFamilies(row.engines).length,
-      sortable: true,
-    },
-    competitorsColumn(),
-    {
-      key: "write",
-      header: "",
-      align: "right",
-      width: "9.5rem",
-      minWidth: "9.5rem",
-      cell: (row) => (
-        <WriteCell
-          action={gapWriteAction(row.brief)}
-          onOpenPost={onOpenPost}
-          onWrite={() => onWriteAiSearch(row)}
-          opportunityBucket={gapOpportunityLevel(
-            row.opportunity,
-            maxAiSearchOpportunity
-          )}
-          postId={row.brief?.postId}
-          sourceKind="ai_search"
-        />
-      ),
+      width: "8rem",
+      minWidth: "8rem",
+      cell: (gap) =>
+        gap.kind === "console" ? (
+          <span className="inline-flex flex-wrap items-center justify-end gap-1">
+            <SearchWriteCell
+              isDismissing={dismissingSearchId === gap.row.id}
+              onDismiss={() => onDismissSearch(gap.row)}
+              onOpenPost={onOpenPost}
+              onWrite={(existingPageUrl) =>
+                onWriteSearch(gap.row, existingPageUrl)
+              }
+              row={gap.row}
+            />
+            {gap.ai?.brief ? (
+              <WriteCell
+                action={gapWriteAction(gap.ai.brief)}
+                onOpenPost={onOpenPost}
+                onWrite={() => {
+                  if (gap.ai) {
+                    onWriteAiSearch(gap.ai);
+                  }
+                }}
+                opportunityBucket={gapOpportunityLevel(
+                  gap.ai.opportunity,
+                  maxAiSearchOpportunity
+                )}
+                postId={gap.ai.brief.postId}
+                sourceKind="ai_search"
+              />
+            ) : null}
+          </span>
+        ) : (
+          <WriteCell
+            action={gapWriteAction(gap.row.brief)}
+            onOpenPost={onOpenPost}
+            onWrite={() => onWriteAiSearch(gap.row)}
+            opportunityBucket={gapOpportunityLevel(
+              gap.row.opportunity,
+              maxAiSearchOpportunity
+            )}
+            postId={gap.row.brief?.postId}
+            sourceKind="ai_search"
+          />
+        ),
     },
   ];
 
   const sourceRowsByTab = {
     prompt: promptGaps,
-    search: searchGaps,
-    ai: aiSearchGaps,
+    search: unifySearchGaps(searchGaps, aiSearchGaps),
   };
   const rowsByTab = {
     prompt: filteredPromptGaps,
-    search: filteredSearchGaps,
-    ai: filteredAiSearchGaps,
+    search: unifiedSearchRows,
   };
   const sourceRows = sourceRowsByTab[tab];
   const rows = rowsByTab[tab];
@@ -1153,23 +1072,13 @@ export function GeoGapsTable({
     ),
     search: (
       <Table
-        className="rounded-2xl"
+        className="rounded-2xl [&_tbody_td]:align-middle"
         columns={searchColumns}
-        data={filteredSearchGaps}
-        defaultSort={{ key: "impressions", direction: "desc" }}
-        getRowId={(row) => row.id}
+        data={unifiedSearchRows}
+        defaultSort={{ key: "question", direction: "asc" }}
+        getRowId={({ kind, row }) => `${kind}:${row.id}`}
         height={tableHeight}
-        onRowClick={(row) => setDetailSearchId(row.id)}
-      />
-    ),
-    ai: (
-      <Table
-        className="rounded-2xl"
-        columns={aiSearchColumns}
-        data={filteredAiSearchGaps}
-        defaultSort={{ key: "searches", direction: "desc" }}
-        getRowId={(row) => row.id}
-        height={tableHeight}
+        rowSizing="content"
       />
     ),
   };
@@ -1186,8 +1095,7 @@ export function GeoGapsTable({
           onTabChange={setTab}
           counts={{
             prompt: filteredPromptGaps.length,
-            search: filteredSearchGaps.length,
-            ai: filteredAiSearchGaps.length,
+            search: unifiedSearchRows.length,
           }}
           tab={tab}
         />
@@ -1207,7 +1115,6 @@ export function GeoGapsTable({
             isScanning={isScanning}
             kind={emptyKind}
             onRunScan={onRunScan}
-            organizationSlug={organizationSlug}
           />
         ) : (
           table

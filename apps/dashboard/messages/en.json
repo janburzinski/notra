@@ -2575,7 +2575,6 @@
         "mentioned": "Mentions you",
         "searched": "Ran this search"
       },
-      "searchQueriesCount": "{count, plural, one {# search query} other {# search queries}}",
       "empty": {
         "scanning": {
           "title": "Scanning engines",
@@ -2588,14 +2587,9 @@
           "title": "No prompt gaps",
           "description": "Engines already mention you on the questions you track."
         },
-        "noAiSearchGaps": {
-          "title": "No AI search gaps",
-          "description": "None of the searches engines ran in your scans leave you out yet."
-        },
         "noSearchGaps": {
           "title": "No search gaps",
-          "description": "Connect Search Console on Prompts to pull queries you don't cover yet.",
-          "action": "Open Prompts"
+          "description": "Search Console and AI scans have not found any uncovered searches yet."
         },
         "noMatches": {
           "title": "No matching gaps",
@@ -2603,10 +2597,10 @@
         }
       },
       "gapType": "Gap type",
+      "openSearchGap": "Open details for {query}",
       "tabs": {
         "prompt": "Prompt Gaps",
-        "search": "Search Gaps",
-        "ai": "AI Search Gaps"
+        "search": "Search Gaps"
       },
       "filterLabel": "Filter content gaps",
       "filterPlaceholder": "Filter gaps…",
@@ -2618,16 +2612,9 @@
       "columns": {
         "opportunity": "Opportunity",
         "visibleOn": "Visible on",
-        "sourceQuestion": "Source question",
+        "searchQuery": "Search query",
         "action": "Action",
-        "aiSearch": "AI search",
-        "searches": "Searches",
-        "searchedBy": "Searched by"
-      },
-      "hints": {
-        "impressions": "Total Google Search impressions across the queries in this gap.",
-        "recommendation": "Suggested next step based on search demand and overlap with your existing content.",
-        "searches": "Scan answers in which an engine ran this web search."
+        "searches": "AI searches"
       },
       "aiSearched": "AI searched: {queries}",
       "aiSearchSubtitle": "{more, plural, =0 {From \"{prompt}\"} other {From \"{prompt}\" and # more}}"

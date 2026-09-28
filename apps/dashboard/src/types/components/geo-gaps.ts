@@ -3,9 +3,7 @@ import type {
   GeoCompetitor,
   GeoGapWriteAction,
   GeoPromptGapRow,
-  GeoSearchGapRecommendation,
   GeoSearchGapRow,
-  GeoSuggestionKeyword,
   GeoWriterSourceKind,
 } from "@notra/geo-core/types/geo";
 import type { ReactNode } from "react";
@@ -27,7 +25,11 @@ export interface GeoGapsWriteCellProps {
   compact?: boolean;
 }
 
-export type GeoGapsTab = "prompt" | "search" | "ai";
+export type GeoGapsTab = "prompt" | "search";
+
+export type GeoUnifiedSearchGap =
+  | { kind: "console"; row: GeoSearchGapRow; ai: GeoAiSearchGapRow | null }
+  | { kind: "ai"; row: GeoAiSearchGapRow };
 
 export interface GeoGapDetailSheetProps {
   prompt: GeoPromptGapRow | null;
@@ -71,7 +73,6 @@ export type GeoGapsEmptyKind =
   | "no-scan"
   | "no-prompt-gaps"
   | "no-search-gaps"
-  | "no-ai-search-gaps"
   | "no-matches";
 
 export interface GeoGapsTableProps {
@@ -82,7 +83,6 @@ export interface GeoGapsTableProps {
   hasScanData: boolean;
   isScanning: boolean;
   organizationId: string;
-  organizationSlug: string;
   onRunScan: () => void;
   onWritePrompt: (row: GeoPromptGapRow) => void;
   onWriteSearch: (row: GeoSearchGapRow, existingPageUrl?: string) => void;
@@ -93,10 +93,6 @@ export interface GeoGapsTableProps {
   onIgnorePrompt: (row: GeoPromptGapRow) => void;
   ignoringPromptId: string | null;
   onOpenPost: (postId: string) => void;
-}
-
-export interface GeoGapRecommendationCellProps {
-  recommendation: GeoSearchGapRecommendation;
 }
 
 export interface GeoGapSearchWriteCellProps {
@@ -110,7 +106,6 @@ export interface GeoGapSearchWriteCellProps {
 export interface GeoGapsEmptyProps {
   kind: GeoGapsEmptyKind;
   isScanning: boolean;
-  organizationSlug: string;
   onRunScan: () => void;
 }
 
@@ -168,11 +163,6 @@ export interface GeoGapWriteCellProps {
   onWrite: () => void;
   onRescan?: () => void;
   rescanDisabled?: boolean;
-}
-
-export interface GeoGapQueriesCellProps {
-  prompt: string;
-  queries: readonly GeoSuggestionKeyword[];
 }
 
 export interface GeoGapNumberCellProps {

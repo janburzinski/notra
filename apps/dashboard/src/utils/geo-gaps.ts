@@ -1,7 +1,6 @@
 import {
   GEO_GAPS_ENGINE_FILTER_ALL,
   GEO_GAPS_METER_STEPS,
-  GEO_SEARCH_GAP_ACTION_ORDER,
 } from "@notra/geo-core/constants/geo";
 import type {
   GeoAiSearchGapRow,
@@ -9,7 +8,6 @@ import type {
   GeoGapBriefRef,
   GeoGapWriteAction,
   GeoPromptGapRow,
-  GeoSearchGapAction,
   GeoSearchGapRow,
 } from "@notra/geo-core/types/geo";
 import {
@@ -23,9 +21,35 @@ import type {
   GeoGapsEmptyKind,
   GeoGapsMeterTone,
   GeoGapsTab,
+  GeoUnifiedSearchGap,
 } from "@/types/components/geo-gaps";
 
 import { bestFuzzyScore, fuzzyMatches } from "./fuzzy";
+
+export function unifySearchGaps(
+  searchGaps: readonly GeoSearchGapRow[],
+  aiSearchGaps: readonly GeoAiSearchGapRow[]
+): GeoUnifiedSearchGap[] {
+  const remainingAi = [...aiSearchGaps];
+  const consoleRows: GeoUnifiedSearchGap[] = searchGaps.map((row) => {
+    const queries = new Set(
+      [row.prompt, ...row.queries.map((keyword) => keyword.query)].map(
+        (query) => query.trim().toLowerCase()
+      )
+    );
+    const index = remainingAi.findIndex((candidate) =>
+      [candidate.query, ...candidate.variants].some((query) =>
+        queries.has(query.trim().toLowerCase())
+      )
+    );
+    const [ai = null] = index < 0 ? [] : remainingAi.splice(index, 1);
+    return { kind: "console", row, ai };
+  });
+  return [
+    ...consoleRows,
+    ...remainingAi.map((row) => ({ kind: "ai" as const, row })),
+  ];
+}
 
 export function withoutPromptGap(
   response: GeoContentGapsResponse,
@@ -67,7 +91,7 @@ export function gapOpportunityLevel(
 }
 
 export function isGeoGapsTab(value: unknown): value is GeoGapsTab {
-  return value === "prompt" || value === "search" || value === "ai";
+  return value === "prompt" || value === "search";
 }
 
 /** Map 0–1 intensity onto a 1–5 inspo-style meter (empty when intensity is 0). */
@@ -169,10 +193,6 @@ export function gapLiftTone(delta: number): GeoGapLiftTone {
   return "flat";
 }
 
-export function searchGapActionOrder(action: GeoSearchGapAction): number {
-  return GEO_SEARCH_GAP_ACTION_ORDER[action];
-}
-
 export function existingPageLabel(url: string): string {
   try {
     const parsed = new URL(url);
@@ -208,7 +228,7 @@ export function geoGapsEmptyKind({
   if (!hasScanData) {
     return "no-scan";
   }
-  return tab === "ai" ? "no-ai-search-gaps" : "no-prompt-gaps";
+  return "no-prompt-gaps";
 }
 
 function gapSearchValues(row: {

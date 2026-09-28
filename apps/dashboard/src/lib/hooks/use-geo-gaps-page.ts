@@ -169,7 +169,6 @@ export function useGeoGapsPage(organizationSlug: string): GeoGapsPageModel {
             topic: row.query,
           });
         },
-        organizationSlug,
         promptGaps: gapsQuery.data?.promptGaps ?? [],
         searchGaps: gapsQuery.data?.searchGaps ?? [],
         aiSearchGaps: gapsQuery.data?.aiSearchGaps ?? [],

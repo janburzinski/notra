@@ -28,6 +28,9 @@ const track = mock(
     undefined
 );
 const appendLog = mock(async (_input: { status: string }) => undefined);
+const refreshGaps = mock(
+  async (_input: { organizationId: string; projectId: string }) => undefined
+);
 
 mock.module("../src/workflows/steps/gsc-sync-steps", () => ({
   listGscSyncProjectsStep: listProjects,
@@ -37,6 +40,9 @@ mock.module("../src/workflows/steps/gsc-sync-steps", () => ({
 mock.module("../src/workflows/steps/content-generation-steps", () => ({
   fetchLogRetention: async () => 30,
   appendAutomationLogBestEffort: appendLog,
+}));
+mock.module("../src/workflows/steps/refresh-geo-content-gaps", () => ({
+  refreshGeoContentGapsStep: refreshGaps,
 }));
 
 const { gscSyncWorkflow } = await import("../src/workflows/gsc-sync");
@@ -72,6 +78,7 @@ beforeEach(() => {
   syncProject.mockReset();
   track.mockClear();
   appendLog.mockClear();
+  refreshGaps.mockClear();
   syncProject.mockResolvedValue({
     status: "completed",
     keywords: 1,
@@ -115,6 +122,10 @@ test("successful project steps aggregate their results", async () => {
     suggestionsAdded: 2,
   });
   expect(appendLog.mock.calls[0]?.[0]).toMatchObject({ status: "success" });
+  expect(refreshGaps.mock.calls.map(([scope]) => scope.projectId)).toEqual([
+    "project-a",
+    "project-b",
+  ]);
 });
 
 test("disconnect invalidates cached queries for both projects but not other organizations", async () => {

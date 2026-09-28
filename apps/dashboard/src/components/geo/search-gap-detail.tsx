@@ -153,19 +153,15 @@ export function SearchGapDetailSheet({
                 </div>
               </section>
 
-              <section className="min-w-0">
+              <section className="min-w-0 space-y-3">
+                <h3 className="text-sm font-medium">
+                  {tGeoShared("searchQueries")}{" "}
+                  <span className="text-muted-foreground font-normal tabular-nums">
+                    {gap.queries.length}
+                  </span>
+                </h3>
                 <Table
                   className="rounded-2xl"
-                  toolbar={
-                    <div className="bg-muted/70 flex items-center justify-between gap-3 px-4 py-3">
-                      <h3 className="text-sm font-medium">
-                        {tGeoShared("searchQueries")}
-                      </h3>
-                      <span className="text-muted-foreground text-xs tabular-nums">
-                        {gap.queries.length}
-                      </span>
-                    </div>
-                  }
                   columns={[
                     {
                       key: "query",
