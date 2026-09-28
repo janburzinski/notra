@@ -268,8 +268,6 @@ const loadAiSearchQueries = Effect.fn("geo.gaps.aiSearchQueries")(function* (
           case when jsonb_typeof(${queries}) = 'array' then ${queries} else '[]'::jsonb end
         ) as searched_query(value)
         where ${recentFirstTurnChecks(projectId)}
-          and not ${geoMentionChecks.mentioned}
-          and not ${geoMentionChecks.ownedSourceCited}
           and ${activeGapScanFilter(
             geoMentionChecks.promptId,
             matchedScanIds,
@@ -282,8 +280,8 @@ const loadAiSearchQueries = Effect.fn("geo.gaps.aiSearchQueries")(function* (
         coalesce(array_agg(distinct check_id) filter (where mentioned), '{}') as mentioned_check_ids,
         coalesce(array_agg(distinct check_id) filter (where mentioned or owned_source_cited), '{}') as covered_check_ids,
         array_agg(distinct engine) as engines,
-        array_agg(distinct prompt) as prompts,
-        coalesce(jsonb_agg(distinct to_jsonb(competitors)) filter (where not mentioned), '[]'::jsonb) as competitors
+        coalesce(array_agg(distinct prompt) filter (where not mentioned and not owned_source_cited), '{}') as prompts,
+        coalesce(jsonb_agg(distinct to_jsonb(competitors)) filter (where not mentioned and not owned_source_cited), '[]'::jsonb) as competitors
       from searched
       where query <> ''
       group by lower(query)

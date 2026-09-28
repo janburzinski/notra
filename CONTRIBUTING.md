@@ -100,6 +100,10 @@ existing GEO scans, populate its Content Gaps snapshots once:
 bunx dotenv -- bun apps/dashboard/scripts/backfill-geo-content-gaps.ts
 ```
 
+The dashboard's hourly `/api/cron/geo-content-gaps` job refreshes up to 25
+missing or day-old snapshots per run. Keep `CRON_SECRET` configured in deployed
+environments so rolling 30-day gaps continue to expire without page-load work.
+
 6. Start development:
 
 ```bash

@@ -278,20 +278,6 @@ export function filterPromptGaps(
   return filterGapsByQuery(byEngine, query, gapSearchValues);
 }
 
-export function filterSearchGaps(
-  rows: readonly GeoSearchGapRow[],
-  query: string
-): GeoSearchGapRow[] {
-  return filterGapsByQuery(rows, query, gapSearchValues);
-}
-
-export function filterAiSearchGaps(
-  rows: readonly GeoAiSearchGapRow[],
-  query: string
-): GeoAiSearchGapRow[] {
-  return filterGapsByQuery(rows, query, aiSearchGapSearchValues);
-}
-
 function aiSearchGapSearchValues(row: GeoAiSearchGapRow): string[] {
   return [
     row.query,
@@ -299,6 +285,20 @@ function aiSearchGapSearchValues(row: GeoAiSearchGapRow): string[] {
     ...row.prompts,
     row.brief?.workingTitle ?? "",
   ];
+}
+
+export function filterUnifiedSearchGaps(
+  rows: readonly GeoUnifiedSearchGap[],
+  query: string
+): GeoUnifiedSearchGap[] {
+  return filterGapsByQuery(rows, query, (gap) =>
+    gap.kind === "console"
+      ? [
+          ...gapSearchValues(gap.row),
+          ...(gap.ai ? aiSearchGapSearchValues(gap.ai) : []),
+        ]
+      : aiSearchGapSearchValues(gap.row)
+  );
 }
 
 export function uniqueGapEngineFamilies(

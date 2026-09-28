@@ -128,6 +128,18 @@ test("successful project steps aggregate their results", async () => {
   ]);
 });
 
+test("a failed snapshot refresh marks the project sync as failed", async () => {
+  refreshGaps.mockImplementationOnce(async () => {
+    throw new Error("Snapshot unavailable");
+  });
+
+  await expect(
+    gscSyncWorkflow({ organizationId: "org-test" })
+  ).rejects.toBeInstanceOf(FatalError);
+  expect(track.mock.calls[0]?.[1]).toMatchObject({ status: "failed" });
+  expect(refreshGaps).toHaveBeenCalledTimes(2);
+});
+
 test("disconnect invalidates cached queries for both projects but not other organizations", async () => {
   const client = new QueryClient();
   const result: { current?: ReturnType<typeof useGscDisconnect> } = {};

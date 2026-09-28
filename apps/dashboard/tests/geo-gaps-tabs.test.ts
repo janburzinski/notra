@@ -6,7 +6,11 @@ import type {
 } from "@notra/geo-core/types/geo";
 
 import { GEO_GAPS_TABS } from "../src/constants/geo-gaps";
-import { isGeoGapsTab, unifySearchGaps } from "../src/utils/geo-gaps";
+import {
+  filterUnifiedSearchGaps,
+  isGeoGapsTab,
+  unifySearchGaps,
+} from "../src/utils/geo-gaps";
 
 test("content gaps has one search tab for both search sources", () => {
   expect(GEO_GAPS_TABS.map((tab) => tab.value)).toEqual(["prompt", "search"]);
@@ -36,7 +40,7 @@ test("the same query from Search Console and AI appears once", () => {
     id: "ai-1",
     query: "ai content generation platform comparison",
     variants: [],
-    prompts: [],
+    prompts: ["AI-specific discovery"],
     engines: ["openai/gpt-5.4-grounded"],
     searches: 2,
     ownMentionRate: 0,
@@ -49,4 +53,13 @@ test("the same query from Search Console and AI appears once", () => {
   expect(unifySearchGaps([consoleGap], [aiGap])).toEqual([
     { kind: "console", row: consoleGap, ai: aiGap },
   ]);
+  expect(
+    filterUnifiedSearchGaps(unifySearchGaps([consoleGap], [aiGap]), "Compare")
+  ).toEqual([{ kind: "console", row: consoleGap, ai: aiGap }]);
+  expect(
+    filterUnifiedSearchGaps(
+      unifySearchGaps([consoleGap], [aiGap]),
+      "AI-specific discovery"
+    )
+  ).toEqual([{ kind: "console", row: consoleGap, ai: aiGap }]);
 });

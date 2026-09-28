@@ -173,6 +173,12 @@ export async function finishGeoWriter(input: {
     )
     .returning({ startedAt: geoContentBriefs.startedAt });
 
+  try {
+    await Effect.runPromise(refreshGeoContentGaps(input));
+  } catch (error) {
+    console.error("[GEO] Could not refresh content gaps after writing:", error);
+  }
+
   await completeActiveGeneration(input.organizationId, {
     runId: input.runId,
     triggerId: GEO_WRITER_TRIGGER_ID,
@@ -193,11 +199,6 @@ export async function finishGeoWriter(input: {
     humanized: input.humanized,
     startedAt: updated[0]?.startedAt ?? null,
   });
-  try {
-    await Effect.runPromise(refreshGeoContentGaps(input));
-  } catch (error) {
-    console.error("[GEO] Could not refresh content gaps after writing:", error);
-  }
 }
 
 export async function failGeoWriter(input: {
@@ -223,6 +224,12 @@ export async function failGeoWriter(input: {
     )
     .returning({ startedAt: geoContentBriefs.startedAt });
 
+  try {
+    await Effect.runPromise(refreshGeoContentGaps(input));
+  } catch (error) {
+    console.error("[GEO] Could not refresh content gaps after failure:", error);
+  }
+
   await completeActiveGeneration(input.organizationId, {
     runId: input.runId,
     triggerId: GEO_WRITER_TRIGGER_ID,
@@ -242,11 +249,6 @@ export async function failGeoWriter(input: {
     reason: input.failureReason,
     startedAt: updated[0]?.startedAt ?? null,
   });
-  try {
-    await Effect.runPromise(refreshGeoContentGaps(input));
-  } catch (error) {
-    console.error("[GEO] Could not refresh content gaps after failure:", error);
-  }
 }
 
 export async function trackGeoWriterSkipped(

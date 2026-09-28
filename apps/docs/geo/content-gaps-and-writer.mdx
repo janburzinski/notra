@@ -28,7 +28,7 @@ The **Improve** group of the GEO sidebar turns scan results into work. **Content
 
 ## Content gaps
 
-The **Content Gaps** page (`/geo/gaps`) is subtitled "Questions engines answer without mentioning you". It has two gap types, switchable with the **Gap type** control, plus a text filter and an **All engines** filter. Results update after a GEO scan, a Search Console sync, or a change to a gap or tracked prompt.
+The **Content Gaps** page (`/geo/gaps`) is subtitled "Questions engines answer without mentioning you". It has two gap types, switchable with the **Gap type** control, plus a text filter and an **All engines** filter. Results update after a GEO scan, a Search Console sync, or a change to a gap or tracked prompt. A background job also refreshes older results so answers outside the rolling 30-day window expire without recalculating on page load.
 
 ### Prompt gaps
 

@@ -46,15 +46,8 @@ export async function gscSyncWorkflow(
       try {
         const outcome = await runGscProjectSyncStep(organizationId, projectId);
         if (outcome.status === "completed") {
-          try {
-            // react-doctor-disable-next-line react-doctor/async-await-in-loop -- sequential durable syncs bound per-project database work
-            await refreshGeoContentGapsStep({ organizationId, projectId });
-          } catch (error) {
-            console.error(
-              `[GSC] Content gaps could not refresh for ${projectId}:`,
-              error
-            );
-          }
+          // react-doctor-disable-next-line react-doctor/async-await-in-loop -- sequential durable syncs bound per-project database work
+          await refreshGeoContentGapsStep({ organizationId, projectId });
           completed++;
           keywords += outcome.keywords ?? 0;
           suggestionsAdded += outcome.suggestionsAdded ?? 0;

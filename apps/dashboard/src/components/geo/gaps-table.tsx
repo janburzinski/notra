@@ -85,9 +85,8 @@ import type {
 } from "@/types/components/geo-gaps";
 import { formatMentionRate } from "@/utils/geo-charts";
 import {
-  filterAiSearchGaps,
   filterPromptGaps,
-  filterSearchGaps,
+  filterUnifiedSearchGaps,
   gapCanRescan,
   gapOpportunityLevel,
   gapMeterTone,
@@ -737,13 +736,13 @@ export function GeoGapsTable({
     () => filterPromptGaps(promptGaps, query, engine),
     [engine, promptGaps, query]
   );
-  const filteredSearchGaps = useMemo(
-    () => filterSearchGaps(searchGaps, query),
-    [query, searchGaps]
+  const unifiedSearchRows = useMemo(
+    () => unifySearchGaps(searchGaps, aiSearchGaps),
+    [aiSearchGaps, searchGaps]
   );
-  const filteredAiSearchGaps = useMemo(
-    () => filterAiSearchGaps(aiSearchGaps, query),
-    [aiSearchGaps, query]
+  const filteredSearchRows = useMemo(
+    () => filterUnifiedSearchGaps(unifiedSearchRows, query),
+    [query, unifiedSearchRows]
   );
   const maxAiSearchOpportunity = useMemo(
     () => maxGapOpportunity(aiSearchGaps),
@@ -871,10 +870,6 @@ export function GeoGapsTable({
     },
   ];
 
-  const unifiedSearchRows = unifySearchGaps(
-    filteredSearchGaps,
-    filteredAiSearchGaps
-  );
   const searchColumns: TableColumn<GeoUnifiedSearchGap>[] = [
     {
       key: "question",
@@ -940,8 +935,18 @@ export function GeoGapsTable({
       collapsePriority: 1,
       cell: (gap) => {
         const ai = gap.kind === "console" ? gap.ai : gap.row;
+        const competitorNames = ai
+          ? [...ai.competitors, ...ai.discoveredCompetitors]
+          : [];
         return ai ? (
-          <span className="inline-flex items-center gap-1 whitespace-nowrap">
+          <span
+            className="inline-flex items-center gap-1 whitespace-nowrap"
+            title={
+              competitorNames.length > 0
+                ? `${tCommon("labels.competitors")}: ${competitorNames.join(", ")}`
+                : undefined
+            }
+          >
             <NumberCell emptyLabel="" value={ai.searches} />
             <EngineLogos
               detail={t("engineDetail.searched")}
@@ -954,6 +959,29 @@ export function GeoGapsTable({
       },
       sortValue: (gap) =>
         gap.kind === "console" ? (gap.ai?.searches ?? -1) : gap.row.searches,
+      sortable: true,
+    },
+    {
+      key: "competitors",
+      collapsePriority: 3,
+      header: tCommon("labels.competitors"),
+      width: "9.5rem",
+      cell: (gap) => {
+        const ai = gap.kind === "console" ? gap.ai : gap.row;
+        return ai ? (
+          <BrandMentionsCell
+            competitors={competitors}
+            discovered={ai.discoveredCompetitors}
+            tracked={ai.competitors}
+          />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        );
+      },
+      sortValue: (gap) => {
+        const ai = gap.kind === "console" ? gap.ai : gap.row;
+        return ai ? ai.competitors.length + ai.discoveredCompetitors.length : 0;
+      },
       sortable: true,
     },
     {
@@ -1010,11 +1038,11 @@ export function GeoGapsTable({
 
   const sourceRowsByTab = {
     prompt: promptGaps,
-    search: unifySearchGaps(searchGaps, aiSearchGaps),
+    search: unifiedSearchRows,
   };
   const rowsByTab = {
     prompt: filteredPromptGaps,
-    search: unifiedSearchRows,
+    search: filteredSearchRows,
   };
   const sourceRows = sourceRowsByTab[tab];
   const rows = rowsByTab[tab];
@@ -1074,7 +1102,7 @@ export function GeoGapsTable({
       <Table
         className="rounded-2xl [&_tbody_td]:align-middle"
         columns={searchColumns}
-        data={unifiedSearchRows}
+        data={filteredSearchRows}
         defaultSort={{ key: "question", direction: "asc" }}
         getRowId={({ kind, row }) => `${kind}:${row.id}`}
         height={tableHeight}
@@ -1095,7 +1123,7 @@ export function GeoGapsTable({
           onTabChange={setTab}
           counts={{
             prompt: filteredPromptGaps.length,
-            search: unifiedSearchRows.length,
+            search: filteredSearchRows.length,
           }}
           tab={tab}
         />

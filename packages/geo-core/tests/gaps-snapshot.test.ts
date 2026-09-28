@@ -47,6 +47,11 @@ test("AI search gaps exclude checks that mention or cite the project", async () 
       { id: "uncovered-2", query: "content generation tools" },
       { id: "mentioned", query: "mentioned content tools", mentioned: true },
       { id: "cited", query: "cited content tools", ownedSourceCited: true },
+      ...Array.from({ length: 10 }, (_, index) => ({
+        id: `mostly-covered-${index}`,
+        query: "mostly covered tools",
+        mentioned: index < 8,
+      })),
     ].map((check) => ({
       id: check.id,
       ...scope,

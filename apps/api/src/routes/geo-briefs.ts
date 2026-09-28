@@ -242,6 +242,12 @@ geoBriefsRoutes.openapi(planBriefRoute, async (c) => {
   if (!outcome.ok) {
     return geoErrorResponse(c, outcome.failure);
   }
+  await Effect.runPromise(
+    refreshGeoContentGapsBestEffort({
+      organizationId: base.organizationId,
+      projectId,
+    })
+  );
 
   trackApiEvent(c, {
     event: POSTHOG_EVENTS.GEO_BRIEF_PLANNED,
@@ -279,6 +285,12 @@ geoBriefsRoutes.openapi(approveBriefRoute, async (c) => {
       briefId
     ).pipe(
       Effect.tap(() =>
+        refreshGeoContentGapsBestEffort({
+          organizationId: base.organizationId,
+          projectId,
+        })
+      ),
+      Effect.tapError(() =>
         refreshGeoContentGapsBestEffort({
           organizationId: base.organizationId,
           projectId,
