@@ -128,16 +128,26 @@ test("successful project steps aggregate their results", async () => {
   ]);
 });
 
-test("a failed snapshot refresh marks the project sync as failed", async () => {
+test("a failed snapshot refresh leaves a committed Search Console sync successful", async () => {
   refreshGaps.mockImplementationOnce(async () => {
     throw new Error("Snapshot unavailable");
   });
 
-  await expect(
-    gscSyncWorkflow({ organizationId: "org-test" })
-  ).rejects.toBeInstanceOf(FatalError);
-  expect(track.mock.calls[0]?.[1]).toMatchObject({ status: "failed" });
+  expect(await gscSyncWorkflow({ organizationId: "org-test" })).toEqual({
+    status: "completed",
+    keywords: 2,
+    suggestionsAdded: 2,
+  });
+  expect(track.mock.calls[0]?.[1]).toMatchObject({ status: "completed" });
   expect(refreshGaps).toHaveBeenCalledTimes(2);
+  expect(appendLog.mock.calls.map(([entry]) => entry.status)).toEqual([
+    "failed",
+    "success",
+  ]);
+  expect(appendLog.mock.calls[0]?.[0]).toMatchObject({
+    title: "Content gaps could not refresh for project-a",
+    errorMessage: "Snapshot unavailable",
+  });
 });
 
 test("disconnect invalidates cached queries for both projects but not other organizations", async () => {
