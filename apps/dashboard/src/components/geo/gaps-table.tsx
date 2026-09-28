@@ -883,7 +883,14 @@ export function GeoGapsTable({
       minWidth: "9rem",
       cell: ({ kind, row }) =>
         kind === "console" ? (
-          <ContentCell subtitle={null} title={row.prompt} />
+          <button
+            aria-label={t("openSearchGap", { query: row.prompt })}
+            className="w-full cursor-pointer text-left"
+            onClick={() => setDetailSearchId(row.id)}
+            type="button"
+          >
+            <ContentCell subtitle={null} title={row.prompt} />
+          </button>
         ) : (
           <ContentCell
             subtitle={
@@ -1105,6 +1112,7 @@ export function GeoGapsTable({
             setDetailSearchId(gap.row.id);
           }
         }}
+        rowKeyboardActivation={false}
         rowSizing="content"
       />
     ),
