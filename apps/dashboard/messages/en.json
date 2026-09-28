@@ -2576,6 +2576,10 @@
         "searched": "Ran this search"
       },
       "empty": {
+        "preparing": {
+          "title": "Preparing content gaps",
+          "description": "Search and scan results are being organized. Check back shortly."
+        },
         "scanning": {
           "title": "Scanning engines",
           "description": "Gaps appear here once the scan finishes."
@@ -3235,8 +3239,13 @@
       "choosePropertyHint": "Choose which Search Console property Notra should analyze."
     },
     "searchGapDetail": {
-      "eyebrow": "Search gap · Source question",
+      "eyebrow": "Search gap",
       "fallbackTitle": "Search gap",
+      "aiEvidence": "AI search evidence",
+      "uncoveredSearches": "{count, plural, one {# answer without your brand or site} other {# answers without your brand or site}}",
+      "searchedBy": "Engines that ran this search",
+      "relatedPrompts": "Questions these engines answered",
+      "mentionedCompetitors": "Competitors mentioned",
       "acrossQueries": "Across this gap's Google Search queries.",
       "draftTitle": "Draft title",
       "noQueryData": "No query-level data available for this gap.",

@@ -1,7 +1,7 @@
 import { db } from "@notra/db/drizzle";
 import { geoContentGapSnapshots, geoSettings } from "@notra/db/schema";
 import { refreshGeoContentGaps } from "@notra/geo-core/geo/gaps";
-import { asc, eq, isNull, lt, or, sql } from "drizzle-orm";
+import { eq, isNull, lt, or, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -27,7 +27,11 @@ export async function refreshDueGeoContentGaps() {
         lt(geoContentGapSnapshots.updatedAt, cutoff)
       )
     )
-    .orderBy(asc(sql`coalesce(${geoContentGapSnapshots.updatedAt}, 'epoch')`))
+    // Prepare new projects first; shuffle within each group so failures cannot monopolize a batch.
+    .orderBy(
+      sql`case when ${geoContentGapSnapshots.projectId} is null then 0 else 1 end`,
+      sql`random()`
+    )
     .limit(GEO_CONTENT_GAP_REFRESH_BATCH_SIZE);
 
   let refreshed = 0;

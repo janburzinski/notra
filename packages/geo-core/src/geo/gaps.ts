@@ -277,22 +277,20 @@ const loadAiSearchQueries = Effect.fn("geo.gaps.aiSearchQueries")(function* (
       select
         mode() within group (order by query) as query,
         array_agg(distinct check_id) as check_ids,
-        coalesce(array_agg(distinct check_id) filter (where mentioned), '{}') as mentioned_check_ids,
         coalesce(array_agg(distinct check_id) filter (where mentioned or owned_source_cited), '{}') as covered_check_ids,
-        array_agg(distinct engine) as engines,
+        coalesce(array_agg(distinct engine) filter (where not mentioned and not owned_source_cited), '{}') as engines,
         coalesce(array_agg(distinct prompt) filter (where not mentioned and not owned_source_cited), '{}') as prompts,
         coalesce(jsonb_agg(distinct to_jsonb(competitors)) filter (where not mentioned and not owned_source_cited), '[]'::jsonb) as competitors
       from searched
       where query <> ''
       group by lower(query)
-      order by count(distinct check_id) desc
+      order by count(distinct check_id) filter (where not mentioned and not owned_source_cited) desc
       limit ${GEO_AI_SEARCH_GAP_MAX_QUERIES}
     `)
   );
   return result.rows.map((row: GeoAiSearchQueryDbRow): GeoAiSearchQueryRow => ({
     query: row.query,
     checkIds: row.check_ids,
-    mentionedCheckIds: row.mentioned_check_ids,
     coveredCheckIds: row.covered_check_ids,
     engines: row.engines,
     prompts: row.prompts,
@@ -357,18 +355,18 @@ function aggregateAiSearches(
       prompts: new Set<string>(),
       engines: new Set<string>(),
       checkIds: new Set<string>(),
-      mentionedCheckIds: new Set<string>(),
       coveredCheckIds: new Set<string>(),
       competitors: [] as string[],
     };
     entry.variants.set(
       row.query,
-      (entry.variants.get(row.query) ?? 0) + row.checkIds.length
+      (entry.variants.get(row.query) ?? 0) +
+        row.checkIds.length -
+        row.coveredCheckIds.length
     );
     addAll(entry.prompts, row.prompts);
     addAll(entry.engines, row.engines);
     addAll(entry.checkIds, row.checkIds);
-    addAll(entry.mentionedCheckIds, row.mentionedCheckIds);
     addAll(entry.coveredCheckIds, row.coveredCheckIds);
     entry.competitors.push(...row.competitors.flat());
     byKey.set(key, entry);
@@ -389,10 +387,11 @@ function toAiSearchGapRows(
 ): GeoAiSearchGapRow[] {
   const rows: GeoAiSearchGapRow[] = [];
   for (const [key, entry] of byKey) {
-    const searches = entry.checkIds.size;
+    const totalSearches = entry.checkIds.size;
+    const searches = totalSearches - entry.coveredCheckIds.size;
     if (
       searches < GEO_AI_SEARCH_GAP_MIN_SEARCHES ||
-      !isMissingMajority(searches - entry.coveredCheckIds.size, searches)
+      !isMissingMajority(searches, totalSearches)
     ) {
       continue;
     }
@@ -410,8 +409,8 @@ function toAiSearchGapRows(
       ...scoreGap(
         {
           competitors: entry.competitors,
-          mentioned: entry.mentionedCheckIds.size,
-          total: searches,
+          mentioned: entry.coveredCheckIds.size,
+          total: totalSearches,
         },
         trackedAliases
       ),
@@ -821,6 +820,7 @@ export const loadGeoContentGaps = Effect.fn("geo.gaps.load")(function* (
       searchGaps: [],
       aiSearchGaps: [],
       hasScanData: false,
+      snapshotReady: false,
     }
   );
 });

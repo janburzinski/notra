@@ -8,13 +8,28 @@ import type {
 import { GEO_GAPS_TABS } from "../src/constants/geo-gaps";
 import {
   filterUnifiedSearchGaps,
+  geoGapsEmptyKind,
   isGeoGapsTab,
+  primarySearchQuery,
+  searchGapActionSource,
+  searchGapDemandRank,
   unifySearchGaps,
 } from "../src/utils/geo-gaps";
 
 test("content gaps has one search tab for both search sources", () => {
   expect(GEO_GAPS_TABS.map((tab) => tab.value)).toEqual(["prompt", "search"]);
   expect(isGeoGapsTab("ai")).toBe(false);
+});
+
+test("a missing snapshot is preparing rather than claiming there was no scan", () => {
+  expect(
+    geoGapsEmptyKind({
+      tab: "prompt",
+      hasScanData: false,
+      snapshotReady: false,
+      isScanning: false,
+    })
+  ).toBe("preparing");
 });
 
 test("the same query from Search Console and AI appears once", () => {
@@ -53,6 +68,42 @@ test("the same query from Search Console and AI appears once", () => {
   expect(unifySearchGaps([consoleGap], [aiGap])).toEqual([
     { kind: "console", row: consoleGap, ai: aiGap },
   ]);
+  expect(primarySearchQuery(consoleGap)).toBe(
+    "AI content generation platform comparison"
+  );
+  expect(
+    searchGapDemandRank({ kind: "console", row: consoleGap, ai: aiGap })
+  ).toBeGreaterThan(
+    searchGapDemandRank({ kind: "console", row: consoleGap, ai: null })
+  );
+  expect(
+    searchGapActionSource({ kind: "console", row: consoleGap, ai: aiGap })
+  ).toBe("console");
+  const aiWithBrief = {
+    ...aiGap,
+    brief: {
+      briefId: "brief-ai",
+      status: "draft" as const,
+      postId: null,
+      workingTitle: "AI content tools",
+      publishedAt: null,
+      baseline: null,
+      rescanned: false,
+    },
+  };
+  expect(
+    searchGapActionSource({ kind: "console", row: consoleGap, ai: aiWithBrief })
+  ).toBe("ai");
+  expect(
+    searchGapActionSource({
+      kind: "console",
+      row: {
+        ...consoleGap,
+        brief: { ...aiWithBrief.brief, briefId: "brief-console" },
+      },
+      ai: aiWithBrief,
+    })
+  ).toBe("console");
   expect(
     filterUnifiedSearchGaps(unifySearchGaps([consoleGap], [aiGap]), "Compare")
   ).toEqual([{ kind: "console", row: consoleGap, ai: aiGap }]);

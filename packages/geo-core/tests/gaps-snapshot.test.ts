@@ -47,6 +47,18 @@ test("AI search gaps exclude checks that mention or cite the project", async () 
       { id: "uncovered-2", query: "content generation tools" },
       { id: "mentioned", query: "mentioned content tools", mentioned: true },
       { id: "cited", query: "cited content tools", ownedSourceCited: true },
+      { id: "mixed-uncovered-1", query: "mixed content tools" },
+      { id: "mixed-uncovered-2", query: "mixed content tools" },
+      {
+        id: "mixed-cited-1",
+        query: "mixed content tools",
+        ownedSourceCited: true,
+      },
+      {
+        id: "mixed-cited-2",
+        query: "mixed content tools",
+        ownedSourceCited: true,
+      },
       ...Array.from({ length: 10 }, (_, index) => ({
         id: `mostly-covered-${index}`,
         query: "mostly covered tools",
@@ -58,7 +70,7 @@ test("AI search gaps exclude checks that mention or cite the project", async () 
       scanId: "scan",
       promptId: check.id,
       prompt: "Which content tools should I use?",
-      engine: "openai",
+      engine: check.id.startsWith("mixed-cited") ? "anthropic" : "openai",
       answer: "Answer",
       mentioned: check.mentioned ?? false,
       ownedSourceCited: check.ownedSourceCited ?? false,
@@ -68,8 +80,20 @@ test("AI search gaps exclude checks that mention or cite the project", async () 
   );
 
   const snapshot = await Effect.runPromise(refreshGeoContentGaps(scope));
-  expect(snapshot.aiSearchGaps).toEqual([
-    expect.objectContaining({ query: "content generation tools", searches: 2 }),
-  ]);
+  expect(snapshot.aiSearchGaps).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        query: "content generation tools",
+        searches: 2,
+      }),
+      expect.objectContaining({
+        query: "mixed content tools",
+        searches: 2,
+        ownMentionRate: 0.5,
+        engines: ["openai"],
+      }),
+    ])
+  );
+  expect(snapshot.aiSearchGaps).toHaveLength(2);
   expect(await Effect.runPromise(loadGeoContentGaps(scope))).toEqual(snapshot);
 });

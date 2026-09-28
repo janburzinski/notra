@@ -115,6 +115,10 @@ export const contentGapsResponseSchema = z
     hasScanData: z.boolean().openapi({
       description: "False until the project has at least one scan result.",
     }),
+    snapshotReady: z.boolean().optional().openapi({
+      description:
+        "False while the project's content gaps snapshot is being prepared.",
+    }),
     organization: organizationResponseSchema,
   })
   .openapi("GeoContentGapsResponse");

@@ -8,6 +8,7 @@ export const GEO_GAPS_TABS: { value: GeoGapsTab }[] = [
 ];
 
 export const GEO_GAPS_EMPTY_MESSAGE_KEYS = {
+  preparing: "preparing",
   scanning: "scanning",
   "no-scan": "noScan",
   "no-prompt-gaps": "noPromptGaps",

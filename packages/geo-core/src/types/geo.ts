@@ -1683,7 +1683,6 @@ export interface GeoGapScore {
 export type GeoAiSearchQueryDbRow = {
   query: string;
   check_ids: string[];
-  mentioned_check_ids: string[];
   covered_check_ids: string[];
   engines: string[];
   prompts: string[];
@@ -1693,7 +1692,6 @@ export type GeoAiSearchQueryDbRow = {
 export interface GeoAiSearchQueryRow {
   query: string;
   checkIds: string[];
-  mentionedCheckIds: string[];
   coveredCheckIds: string[];
   engines: string[];
   prompts: string[];
@@ -1705,7 +1703,6 @@ export interface GeoAiSearchAgg {
   prompts: Set<string>;
   engines: Set<string>;
   checkIds: Set<string>;
-  mentionedCheckIds: Set<string>;
   coveredCheckIds: Set<string>;
   competitors: string[];
 }
@@ -1795,6 +1792,7 @@ export interface GeoContentGapsResponse {
   searchGaps: GeoSearchGapRow[];
   aiSearchGaps: GeoAiSearchGapRow[];
   hasScanData: boolean;
+  snapshotReady?: boolean;
 }
 
 export interface GeoWriterStartResponse {

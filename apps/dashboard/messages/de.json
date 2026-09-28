@@ -2576,6 +2576,10 @@
         "searched": "Hat diese Suche ausgeführt"
       },
       "empty": {
+        "preparing": {
+          "title": "Inhaltslücken werden vorbereitet",
+          "description": "Such- und Scan-Ergebnisse werden aufbereitet. Schau gleich noch einmal vorbei."
+        },
         "scanning": {
           "title": "KI-Engines werden gescannt",
           "description": "Lücken erscheinen hier, sobald der Scan abgeschlossen ist."
@@ -3235,8 +3239,13 @@
       "choosePropertyHint": "Wähle, welche Search-Console-Property Notra analysieren soll."
     },
     "searchGapDetail": {
-      "eyebrow": "Suchlücke · Ausgangsfrage",
+      "eyebrow": "Suchlücke",
       "fallbackTitle": "Suchlücke",
+      "aiEvidence": "Belege aus KI-Suchen",
+      "uncoveredSearches": "{count, plural, one {# Antwort ohne deine Marke oder Website} other {# Antworten ohne deine Marke oder Website}}",
+      "searchedBy": "Engines, die diese Suche ausgeführt haben",
+      "relatedPrompts": "Beantwortete Fragen",
+      "mentionedCompetitors": "Erwähnte Wettbewerber",
       "acrossQueries": "Über alle Google-Suchanfragen dieser Lücke.",
       "draftTitle": "Entwurfstitel",
       "noQueryData": "Für diese Lücke sind keine Daten auf Suchanfrage-Ebene verfügbar.",

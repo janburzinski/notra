@@ -96,6 +96,9 @@ import {
   geoGapsEmptyKind,
   isGeoGapsTab,
   maxGapOpportunity,
+  primarySearchQuery,
+  searchGapActionSource,
+  searchGapDemandRank,
   unifySearchGaps,
   uniqueGapEngineFamilies,
 } from "@/utils/geo-gaps";
@@ -688,6 +691,7 @@ export function GeoGapsTable({
   aiSearchGaps,
   competitors,
   hasScanData,
+  snapshotReady = true,
   isScanning,
   organizationId,
   onRunScan,
@@ -709,8 +713,6 @@ export function GeoGapsTable({
   const [detailSearchId, setDetailSearchId] = useState<string | null>(null);
   const selectedPrompt =
     promptGaps.find((row) => row.id === detailPromptId) ?? null;
-  const selectedSearch =
-    searchGaps.find((row) => row.id === detailSearchId) ?? null;
   const [query, setQuery] = useQueryState(
     "q",
     parseAsString.withDefault("").withOptions({ clearOnDefault: true })
@@ -737,9 +739,16 @@ export function GeoGapsTable({
     [engine, promptGaps, query]
   );
   const unifiedSearchRows = useMemo(
-    () => unifySearchGaps(searchGaps, aiSearchGaps),
+    () =>
+      unifySearchGaps(searchGaps, aiSearchGaps).sort(
+        (left, right) => searchGapDemandRank(right) - searchGapDemandRank(left)
+      ),
     [aiSearchGaps, searchGaps]
   );
+  const selectedSearchGap =
+    unifiedSearchRows.find(
+      (gap) => `${gap.kind}:${gap.row.id}` === detailSearchId
+    ) ?? null;
   const filteredSearchRows = useMemo(
     () => filterUnifiedSearchGaps(unifiedSearchRows, query),
     [query, unifiedSearchRows]
@@ -748,6 +757,58 @@ export function GeoGapsTable({
     () => maxGapOpportunity(aiSearchGaps),
     [aiSearchGaps]
   );
+
+  const renderSearchActions = (gap: GeoUnifiedSearchGap, inSheet = false) => {
+    const consoleRow = gap.kind === "console" ? gap.row : null;
+    const ai = gap.kind === "console" ? gap.ai : gap.row;
+    const closeSheet = () => {
+      if (inSheet) {
+        setDetailSearchId(null);
+      }
+    };
+    if (consoleRow && searchGapActionSource(gap) === "console") {
+      return (
+        <SearchWriteCell
+          isDismissing={dismissingSearchId === consoleRow.id}
+          onDismiss={() => {
+            closeSheet();
+            onDismissSearch(consoleRow);
+          }}
+          onOpenPost={(postId) => {
+            closeSheet();
+            onOpenPost(postId);
+          }}
+          onWrite={(existingPageUrl) => {
+            closeSheet();
+            onWriteSearch(consoleRow, existingPageUrl);
+          }}
+          row={consoleRow}
+        />
+      );
+    }
+    if (!ai) {
+      return null;
+    }
+    return (
+      <WriteCell
+        action={gapWriteAction(ai.brief)}
+        onOpenPost={(postId) => {
+          closeSheet();
+          onOpenPost(postId);
+        }}
+        onWrite={() => {
+          closeSheet();
+          onWriteAiSearch(ai);
+        }}
+        opportunityBucket={gapOpportunityLevel(
+          ai.opportunity,
+          maxAiSearchOpportunity
+        )}
+        postId={ai.brief?.postId}
+        sourceKind="ai_search"
+      />
+    );
+  };
 
   const renderPromptActions = (row: GeoPromptGapRow, inSheet = false) => {
     const action = gapWriteAction(row.brief);
@@ -884,28 +945,40 @@ export function GeoGapsTable({
       cell: ({ kind, row }) =>
         kind === "console" ? (
           <button
-            aria-label={t("openSearchGap", { query: row.prompt })}
+            aria-label={t("openSearchGap", { query: primarySearchQuery(row) })}
             className="w-full cursor-pointer text-left"
-            onClick={() => setDetailSearchId(row.id)}
+            onClick={() => setDetailSearchId(`console:${row.id}`)}
             type="button"
           >
-            <ContentCell subtitle={null} title={row.prompt} />
+            <ContentCell
+              subtitle={
+                row.prompt === primarySearchQuery(row) ? null : row.prompt
+              }
+              title={primarySearchQuery(row)}
+            />
           </button>
         ) : (
-          <ContentCell
-            subtitle={
-              row.prompts[0]
-                ? t("aiSearchSubtitle", {
-                    prompt: row.prompts[0],
-                    more: row.prompts.length - 1,
-                  })
-                : null
-            }
-            title={row.brief?.workingTitle ?? row.query}
-          />
+          <button
+            aria-label={t("openSearchGap", { query: row.query })}
+            className="w-full cursor-pointer text-left"
+            onClick={() => setDetailSearchId(`ai:${row.id}`)}
+            type="button"
+          >
+            <ContentCell
+              subtitle={
+                row.prompts[0]
+                  ? t("aiSearchSubtitle", {
+                      prompt: row.prompts[0],
+                      more: row.prompts.length - 1,
+                    })
+                  : null
+              }
+              title={row.query}
+            />
+          </button>
         ),
       sortValue: ({ kind, row }) =>
-        kind === "console" ? row.prompt : row.query,
+        kind === "console" ? primarySearchQuery(row) : row.query,
       sortable: true,
     },
     {
@@ -990,49 +1063,7 @@ export function GeoGapsTable({
       align: "right",
       width: "8rem",
       minWidth: "8rem",
-      cell: (gap) =>
-        gap.kind === "console" ? (
-          <span className="inline-flex flex-wrap items-center justify-end gap-1">
-            <SearchWriteCell
-              isDismissing={dismissingSearchId === gap.row.id}
-              onDismiss={() => onDismissSearch(gap.row)}
-              onOpenPost={onOpenPost}
-              onWrite={(existingPageUrl) =>
-                onWriteSearch(gap.row, existingPageUrl)
-              }
-              row={gap.row}
-            />
-            {gap.ai?.brief ? (
-              <WriteCell
-                action={gapWriteAction(gap.ai.brief)}
-                onOpenPost={onOpenPost}
-                onWrite={() => {
-                  if (gap.ai) {
-                    onWriteAiSearch(gap.ai);
-                  }
-                }}
-                opportunityBucket={gapOpportunityLevel(
-                  gap.ai.opportunity,
-                  maxAiSearchOpportunity
-                )}
-                postId={gap.ai.brief.postId}
-                sourceKind="ai_search"
-              />
-            ) : null}
-          </span>
-        ) : (
-          <WriteCell
-            action={gapWriteAction(gap.row.brief)}
-            onOpenPost={onOpenPost}
-            onWrite={() => onWriteAiSearch(gap.row)}
-            opportunityBucket={gapOpportunityLevel(
-              gap.row.opportunity,
-              maxAiSearchOpportunity
-            )}
-            postId={gap.row.brief?.postId}
-            sourceKind="ai_search"
-          />
-        ),
+      cell: (gap) => renderSearchActions(gap),
     },
   ];
 
@@ -1052,6 +1083,7 @@ export function GeoGapsTable({
       ? geoGapsEmptyKind({
           tab,
           hasScanData,
+          snapshotReady,
           isScanning,
           hasSourceRows: sourceRows.length > 0,
           hasMatches: rows.length > 0,
@@ -1103,15 +1135,9 @@ export function GeoGapsTable({
         className="rounded-2xl [&_tbody_td]:align-middle"
         columns={searchColumns}
         data={filteredSearchRows}
-        defaultSort={{ key: "question", direction: "asc" }}
         getRowId={({ kind, row }) => `${kind}:${row.id}`}
         height={tableHeight}
-        isRowClickable={(gap) => gap.kind === "console"}
-        onRowClick={(gap) => {
-          if (gap.kind === "console") {
-            setDetailSearchId(gap.row.id);
-          }
-        }}
+        onRowClick={(gap) => setDetailSearchId(`${gap.kind}:${gap.row.id}`)}
         rowKeyboardActivation={false}
         rowSizing="content"
       />
@@ -1168,28 +1194,16 @@ export function GeoGapsTable({
       />
       <SearchGapDetailSheet
         actions={
-          selectedSearch ? (
-            <SearchWriteCell
-              isDismissing={dismissingSearchId === selectedSearch.id}
-              onDismiss={() => onDismissSearch(selectedSearch)}
-              onOpenPost={(postId) => {
-                setDetailSearchId(null);
-                onOpenPost(postId);
-              }}
-              onWrite={(existingPageUrl) => {
-                setDetailSearchId(null);
-                onWriteSearch(selectedSearch, existingPageUrl);
-              }}
-              row={selectedSearch}
-            />
-          ) : null
+          selectedSearchGap
+            ? renderSearchActions(selectedSearchGap, true)
+            : null
         }
         onOpenChange={(open) => {
           if (!open) {
             setDetailSearchId(null);
           }
         }}
-        row={selectedSearch}
+        row={selectedSearchGap}
       />
     </div>
   );

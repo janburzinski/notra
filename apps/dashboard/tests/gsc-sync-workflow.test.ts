@@ -2,6 +2,7 @@ import { beforeEach, expect, mock, test } from "bun:test";
 
 import type { GscSyncResult } from "@notra/geo-core/types/google-search-console";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NextIntlClientProvider } from "next-intl";
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { FatalError } from "workflow";
@@ -190,9 +191,19 @@ test("disconnect invalidates cached queries for both projects but not other orga
   client.setQueryData(otherKey, status);
   renderToString(
     createElement(
-      QueryClientProvider,
-      { client },
-      createElement(DisconnectHook)
+      NextIntlClientProvider,
+      {
+        locale: "en",
+        timeZone: "UTC",
+        messages: {
+          geo: { toasts: { googleSearchConsoleDisconnected: "Disconnected" } },
+        },
+      } as Parameters<typeof NextIntlClientProvider>[0],
+      createElement(
+        QueryClientProvider,
+        { client },
+        createElement(DisconnectHook)
+      )
     )
   );
   await result.current?.mutateAsync();
@@ -227,14 +238,24 @@ test("Search Console analysis mutations and pending state are project-scoped", a
   }
   renderToString(
     createElement(
-      QueryClientProvider,
-      { client },
+      NextIntlClientProvider,
+      {
+        locale: "en",
+        timeZone: "UTC",
+        messages: {
+          geo: { toasts: { searchConsoleSync: { noNewSuggestions: "Done" } } },
+        },
+      } as Parameters<typeof NextIntlClientProvider>[0],
       createElement(
-        GeoProjectProvider,
-        {
-          projectId: "project-a",
-        } as Parameters<typeof GeoProjectProvider>[0],
-        createElement(AnalyzeHook)
+        QueryClientProvider,
+        { client },
+        createElement(
+          GeoProjectProvider,
+          {
+            projectId: "project-a",
+          } as Parameters<typeof GeoProjectProvider>[0],
+          createElement(AnalyzeHook)
+        )
       )
     )
   );

@@ -40,9 +40,18 @@ export interface GeoGapDetailSheetProps {
 }
 
 export interface GeoSearchGapDetailSheetProps {
-  row: GeoSearchGapRow | null;
+  row: GeoUnifiedSearchGap | null;
   actions?: ReactNode;
   onOpenChange: (open: boolean) => void;
+}
+
+export interface GeoConsoleSearchGapDetailsProps {
+  gap: GeoSearchGapRow;
+  ai: GeoAiSearchGapRow | null;
+}
+
+export interface GeoAiSearchEvidenceProps {
+  ai: GeoAiSearchGapRow;
 }
 
 export interface GeoGapAnswerPanelProps {
@@ -69,6 +78,7 @@ export interface GeoGapLiftLineProps {
 }
 
 export type GeoGapsEmptyKind =
+  | "preparing"
   | "scanning"
   | "no-scan"
   | "no-prompt-gaps"
@@ -81,6 +91,7 @@ export interface GeoGapsTableProps {
   aiSearchGaps: GeoAiSearchGapRow[];
   competitors: GeoCompetitor[];
   hasScanData: boolean;
+  snapshotReady?: boolean;
   isScanning: boolean;
   organizationId: string;
   onRunScan: () => void;
