@@ -883,14 +883,7 @@ export function GeoGapsTable({
       minWidth: "9rem",
       cell: ({ kind, row }) =>
         kind === "console" ? (
-          <button
-            aria-label={t("openSearchGap", { query: row.prompt })}
-            className="w-full cursor-pointer text-left"
-            onClick={() => setDetailSearchId(row.id)}
-            type="button"
-          >
-            <ContentCell subtitle={null} title={row.prompt} />
-          </button>
+          <ContentCell subtitle={null} title={row.prompt} />
         ) : (
           <ContentCell
             subtitle={
@@ -1106,6 +1099,12 @@ export function GeoGapsTable({
         defaultSort={{ key: "question", direction: "asc" }}
         getRowId={({ kind, row }) => `${kind}:${row.id}`}
         height={tableHeight}
+        isRowClickable={(gap) => gap.kind === "console"}
+        onRowClick={(gap) => {
+          if (gap.kind === "console") {
+            setDetailSearchId(gap.row.id);
+          }
+        }}
         rowSizing="content"
       />
     ),
