@@ -399,7 +399,7 @@ export function PromptSuggestions({
     );
   const suggestions = data?.suggestions ?? [];
   const hasSuggestions = suggestions.length > 0;
-  const loading = checking || suggestionsPending || isSearchConsolePending;
+  const loading = checking || suggestionsPending;
   const showSuggestionsTable =
     loading || hasSuggestions || Boolean(searchConsoleStatus?.siteUrl);
   const detail = suggestions.find((row) => row.id === detailId) ?? null;
@@ -461,7 +461,7 @@ export function PromptSuggestions({
     },
   });
 
-  if (!(checking || hasSuggestions || showSearchConsole)) {
+  if (!(loading || hasSuggestions || showSearchConsole)) {
     return null;
   }
 
