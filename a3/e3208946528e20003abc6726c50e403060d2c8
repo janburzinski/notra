@@ -1,0 +1,20 @@
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_9fa078b4096bf0::t_03e464fdf6aa8e 114,534
+  s_9fa078b4096bf0::t_8474a2c39c56c1 530-531
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a3e3208946528e20003abc6726c50e403060d2c8",
+  "prompts": {},
+  "sessions": {
+    "s_9fa078b4096bf0": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e783-d153-7802-86d8-647da5a32cab",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
