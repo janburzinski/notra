@@ -23,6 +23,18 @@ beforeAll(initializeDatabase, 30_000);
 afterAll(() => database.postgres.close());
 beforeEach(resetDatabase);
 
+test("content gaps reports an unprepared project without a snapshot", async () => {
+  const scope = await seedProject("new");
+
+  expect(await Effect.runPromise(loadGeoContentGaps(scope))).toEqual({
+    promptGaps: [],
+    searchGaps: [],
+    aiSearchGaps: [],
+    hasScanData: false,
+    snapshotReady: false,
+  });
+});
+
 test("content gaps reads the saved project snapshot", async () => {
   const scope = await seedProject("selected");
   const snapshot = {
@@ -35,7 +47,10 @@ test("content gaps reads the saved project snapshot", async () => {
     .insert(geoContentGapSnapshots)
     .values({ ...scope, snapshot, updatedAt: new Date() });
 
-  expect(await Effect.runPromise(loadGeoContentGaps(scope))).toEqual(snapshot);
+  expect(await Effect.runPromise(loadGeoContentGaps(scope))).toEqual({
+    ...snapshot,
+    snapshotReady: true,
+  });
 });
 
 test("AI search gaps exclude checks that mention or cite the project", async () => {
@@ -80,6 +95,7 @@ test("AI search gaps exclude checks that mention or cite the project", async () 
   );
 
   const snapshot = await Effect.runPromise(refreshGeoContentGaps(scope));
+  expect(snapshot.snapshotReady).toBe(true);
   expect(snapshot.aiSearchGaps).toEqual(
     expect.arrayContaining([
       expect.objectContaining({

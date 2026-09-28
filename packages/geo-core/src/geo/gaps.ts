@@ -799,6 +799,7 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
     searchGaps,
     aiSearchGaps,
     hasScanData: checks.length > 0,
+    snapshotReady: true,
   };
   return response;
 });
@@ -814,15 +815,15 @@ export const loadGeoContentGaps = Effect.fn("geo.gaps.load")(function* (
       .where(eq(geoContentGapSnapshots.projectId, scope.projectId))
       .limit(1)
   );
-  return (
-    (stored?.snapshot as GeoContentGapsResponse | null) ?? {
-      promptGaps: [],
-      searchGaps: [],
-      aiSearchGaps: [],
-      hasScanData: false,
-      snapshotReady: false,
-    }
-  );
+  return stored?.snapshot
+    ? { ...(stored.snapshot as GeoContentGapsResponse), snapshotReady: true }
+    : {
+        promptGaps: [],
+        searchGaps: [],
+        aiSearchGaps: [],
+        hasScanData: false,
+        snapshotReady: false,
+      };
 });
 
 export const refreshGeoContentGaps = Effect.fn("geo.gaps.refresh")(function* (

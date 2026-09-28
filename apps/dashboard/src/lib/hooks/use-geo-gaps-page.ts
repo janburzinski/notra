@@ -91,7 +91,7 @@ export function useGeoGapsPage(organizationSlug: string): GeoGapsPageModel {
         competitors,
         organizationId,
         hasScanData: gapsQuery.data?.hasScanData ?? false,
-        snapshotReady: gapsQuery.data?.snapshotReady ?? true,
+        snapshotReady: gapsQuery.data?.snapshotReady ?? false,
         isScanning,
         onOpenPost: (postId) => {
           router.push(geoContentPath(organizationSlug, postId));

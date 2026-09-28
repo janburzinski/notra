@@ -1792,7 +1792,7 @@ export interface GeoContentGapsResponse {
   searchGaps: GeoSearchGapRow[];
   aiSearchGaps: GeoAiSearchGapRow[];
   hasScanData: boolean;
-  snapshotReady?: boolean;
+  snapshotReady: boolean;
 }
 
 export interface GeoWriterStartResponse {
