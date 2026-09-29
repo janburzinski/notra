@@ -1,0 +1,37 @@
+apps/dashboard/src/components/button.tsx
+  s_3fe088ed19fbc3::t_de0bb356133b87 1
+apps/ui/components/ui/button.tsx
+  s_3fe088ed19fbc3::t_fdf17979032d3d 6
+  s_3fe088ed19fbc3::t_de0bb356133b87 10
+  ai_agent 11,13,15,17,19
+packages/ui/src/components/ui/button.tsx
+  s_3fe088ed19fbc3::t_de0bb356133b87 11
+  s_3fe088ed19fbc3::t_fdf17979032d3d 7,12,14,16,18,20
+apps/ui/registry/notra/button/examples/button-sizes.tsx
+  s_3fe088ed19fbc3::t_fc6af1a13f57eb 1-16
+apps/ui/registry/notra/button/examples/button-variants.tsx
+  s_3fe088ed19fbc3::t_fc6af1a13f57eb 1-14
+apps/ui/docs/components/button.mdx
+  s_3fe088ed19fbc3::t_fc6af1a13f57eb 1-22
+apps/dashboard/public/design.md
+  s_3fe088ed19fbc3::t_d8f8a28ca0972a 137,171
+apps/ui/registry.json
+  s_3fe088ed19fbc3::t_4a439511ca0fec 835
+  s_3fe088ed19fbc3::t_fc6af1a13f57eb 829-834,836-842
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "237941eef1480827ff0df0d342fd4939114a34fc",
+  "prompts": {},
+  "sessions": {
+    "s_3fe088ed19fbc3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "de91e775-7144-4850-91d9-0a2a787fa730",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
