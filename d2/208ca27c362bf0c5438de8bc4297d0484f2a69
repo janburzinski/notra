@@ -1,0 +1,29 @@
+packages/geo-core/src/utils/geo-model-catalog.ts
+  s_68e1d274968ce0::t_e4c712d4de2372 132-135,140,143-144,147-148
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_1cab1616a99dcb::t_3750ee384beff2 483-484
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d2208ca27c362bf0c5438de8bc4297d0484f2a69",
+  "prompts": {},
+  "sessions": {
+    "s_1cab1616a99dcb": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QzcYOOKsoxeuuHbcTMf",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_68e1d274968ce0": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034Qzcd7DlmxFU9yAIfqbt",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

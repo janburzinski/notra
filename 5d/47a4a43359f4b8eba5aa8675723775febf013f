@@ -1,0 +1,39 @@
+apps/dashboard/src/workflows/content-publication-reconciliation.ts
+  s_de8ac50ae39290::t_ddb605a8a78506 4-5,8
+packages/ai/src/tools/github-mention.ts
+  s_de8ac50ae39290::t_fb23d80a72c18a 208-210
+packages/ai/src/utils/github-mention.ts
+  s_de8ac50ae39290::t_8f7c30fecb7f6d 48
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_de8ac50ae39290::t_4c6c9e68c0394e 1183-1198,1202-1207,1209
+  s_de8ac50ae39290::t_e899891819c194 1182,1199-1201
+packages/tools/src/assistant/update-published-content.ts
+  s_de8ac50ae39290::t_fb23d80a72c18a 64-65
+apps/dashboard/src/workflows/steps/content-publication-reconciliation-step.ts
+  s_de8ac50ae39290::t_ddb605a8a78506 1,4-5,8
+packages/ai/src/utils/github-mention-content-policy.test.ts
+  s_de8ac50ae39290::t_1b41b76b9095c9 164-177
+apps/dashboard/src/lib/workflows/start.ts
+  s_de8ac50ae39290::t_ddb605a8a78506 100-101,103-106
+packages/ai/src/utils/content-publication.ts
+  s_de8ac50ae39290::t_ddb605a8a78506 7,124-149
+packages/ai/src/utils/github-mention-content-policy.ts
+  s_de8ac50ae39290::t_8f7c30fecb7f6d 5,42,199-201
+  s_de8ac50ae39290::t_e899891819c194 202-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5d47a4a43359f4b8eba5aa8675723775febf013f",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

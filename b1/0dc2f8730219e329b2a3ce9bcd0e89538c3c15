@@ -1,0 +1,28 @@
+apps/dashboard/src/components/settings/settings-modal.tsx
+  s_bc7ddc7b40ba10::t_92d0941f260d74 12,14
+  s_b5317b4abe0aab::t_27bfb3976b7f13 43-144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b10dc2f8730219e329b2a3ce9bcd0e89538c3c15",
+  "prompts": {},
+  "sessions": {
+    "s_b5317b4abe0aab": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SnKRlg2newnPdNfryyV",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_bc7ddc7b40ba10": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SnK5C3ZyVzWJeVkpZSC",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

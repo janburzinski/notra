@@ -1,0 +1,36 @@
+apps/dashboard/src/lib/geo-shelf/store.ts
+  s_dd90835652050c::t_5586922dcd3161 288-293,295-296
+apps/dashboard/src/lib/hooks/use-geo-shelf-sources.ts
+  s_dd90835652050c::t_fbf93aaa173232 3
+  s_dd90835652050c::t_8a4c79a414c60f 42
+  s_dd90835652050c::t_9bb04742c4a874 79-80
+  s_dd90835652050c::t_7708f711efda95 191,193,195-198
+  s_dd90835652050c::t_47bbdbef2c35a3 30
+apps/dashboard/src/lib/geo-shelf/service.ts
+  s_dd90835652050c::t_df08ff63fc445a 169-170
+  s_dd90835652050c::t_294ae72873e669 535
+  s_dd90835652050c::t_34089655fdd22b 230
+  s_dd90835652050c::t_95b655f9586b29 16
+  s_dd90835652050c::t_710bcb71f1d85c 40
+  s_dd90835652050c::t_acc9bd82e7e407 251-254,259-263
+apps/dashboard/src/lib/hooks/use-geo-shelf-page.ts
+  s_dd90835652050c::t_5f1c2ff3b8c647 117-120
+  s_dd90835652050c::t_97f5eaf22b8b66 129-130,132
+  s_dd90835652050c::t_d6a0af279cee91 198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4c9755c52684b591f12f1b5d69dccdacf4e78ee6",
+  "prompts": {},
+  "sessions": {
+    "s_dd90835652050c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e985127-43b5-472d-b293-8130e3dd02ac",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

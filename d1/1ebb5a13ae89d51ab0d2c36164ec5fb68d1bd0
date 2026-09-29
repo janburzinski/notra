@@ -1,0 +1,42 @@
+apps/dashboard/src/utils/chat-history-groups.ts
+  s_f581beece97ad0::t_26501d1fa5d33b 103-130
+apps/dashboard/src/components/dashboard/chat-topbar-title.tsx
+  s_f581beece97ad0::t_26501d1fa5d33b 30,53,58,77,136,212-220,246-249
+  s_e4cf4a4f4243aa::t_cfafcd5543d6a6 137-142
+  s_e4cf4a4f4243aa::t_16ddf6b570955a 209
+apps/dashboard/src/lib/hooks/use-chat-sessions.ts
+  s_e4cf4a4f4243aa::t_ba15c3716a5c9a 109
+  s_f581beece97ad0::t_26501d1fa5d33b 20-40,47-50,70-82,85-86,99-102,105-108,110-133,268-274
+apps/dashboard/src/components/dashboard/chat-history-nav.tsx
+  s_f581beece97ad0::t_26501d1fa5d33b 48,67-71,124,129-133,200-202,231-234,275-283,290-298,302,332,359-362,414,427
+apps/dashboard/src/utils/chat-history-groups.test.ts
+  s_f581beece97ad0::t_26501d1fa5d33b 1-48
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_e4cf4a4f4243aa::t_419b2beca4b679 722
+  s_f581beece97ad0::t_26501d1fa5d33b 101,456-457,631-636,657,717-721,1490,1514
+  s_e4cf4a4f4243aa::t_bfbf802b0c59ca 1056,1059,1062
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d11ebb5a13ae89d51ab0d2c36164ec5fb68d1bd0",
+  "prompts": {},
+  "sessions": {
+    "s_e4cf4a4f4243aa": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "52e66653-b794-4a96-a300-3a5d745515e0",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f581beece97ad0": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f4b6a31fcffeRA4PMS3y4tgwKI",
+        "model": "muse-spark-1.3-contributor-free"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

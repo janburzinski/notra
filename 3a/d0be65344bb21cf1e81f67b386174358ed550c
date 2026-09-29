@@ -1,0 +1,19 @@
+packages/analytics/src/tinybird/datasources.ts
+  s_c876d202377cc6::t_5b0b123fb6bd7f 235-238
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3ad0be65344bb21cf1e81f67b386174358ed550c",
+  "prompts": {},
+  "sessions": {
+    "s_c876d202377cc6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "99d9c1f8-6c6f-48ff-b194-7143f61e99c8",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

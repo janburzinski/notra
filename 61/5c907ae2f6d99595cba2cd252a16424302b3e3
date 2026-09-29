@@ -1,0 +1,33 @@
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_6554d5e7a6538d::t_b0813016f43d5d 87-88,90-113,116-120
+apps/dashboard/src/components/geo/persona-profile-editor.tsx
+  s_eec9f08ee9cbca::t_33dedd9b15726c 112,218-220
+  s_eec9f08ee9cbca::t_26fea74aca6318 82,84,98-111,113-124,129-144,147,149,151-175,177-217,221-223,225-235,237-240
+  s_eec9f08ee9cbca::t_663d329cf621df 96,127
+apps/dashboard/src/schemas/persona-generation.ts
+  s_6554d5e7a6538d::t_b0813016f43d5d 12-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "615c907ae2f6d99595cba2cd252a16424302b3e3",
+  "prompts": {},
+  "sessions": {
+    "s_6554d5e7a6538d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a71e-e287-7ff1-9b25-c95193f84e0a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_eec9f08ee9cbca": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f5b7b8841ffe96FMZV7ui5q5WU",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

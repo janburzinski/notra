@@ -1,0 +1,19 @@
+packages/geo-core/tests/accuracy-analysis.test.ts
+  s_6ec04744c09fc4::t_296900f32ae438 44,53-65,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d9b1d4ab691fbcf4c94ec3d90b138dd0aa3e2d98",
+  "prompts": {},
+  "sessions": {
+    "s_6ec04744c09fc4": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c836a765-851b-4a64-9374-b5b65fbe7728",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

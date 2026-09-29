@@ -1,0 +1,47 @@
+packages/db/package.json
+  s_caf703faa665f0::t_85366c5c637d7f 21
+apps/dashboard/src/constants/company-logo.ts
+  s_caf703faa665f0::t_75e0d6869a56ac 11-13
+apps/dashboard/src/app/(dashboard)/[slug]/page.tsx
+  s_caf703faa665f0::t_0b3f47839bbb18 51-52
+  s_caf703faa665f0::t_2f070015c55734 31-32
+  s_caf703faa665f0::t_c1e1c4476e5a9f 33-36
+apps/dashboard/src/utils/dashboard-home-prefetch.server.ts
+  s_caf703faa665f0::t_9be7217fc5f487 1,10,13-36,46-47,49-60,74-77,81-83,89-91
+packages/ai/src/utils/context-dev.ts
+  s_caf703faa665f0::t_162ca5b11468ff 458-459,465
+  s_caf703faa665f0::t_f0a3adb7b60ce5 486-487,497
+apps/dashboard/src/lib/geo-ingest/pipeline.ts
+  s_caf703faa665f0::t_6c2f3033c2d7e3 85-86
+  s_caf703faa665f0::t_fc7d4875627730 11
+  s_caf703faa665f0::t_772a45dde8823a 134-150,156-159
+  s_caf703faa665f0::t_c1e1c4476e5a9f 29
+apps/dashboard/src/lib/orpc/routers/onboarding.ts
+  s_caf703faa665f0::t_6692a0956e6a8e 21
+  s_caf703faa665f0::t_30271f6d7202d7 68-69,72,79,86-88,93-95
+apps/dashboard/src/lib/geo-ingest/identity.ts
+  s_caf703faa665f0::t_24fda3eb5207fb 42-48,60-65
+bun.lock
+  ai_agent 407,2554,6050-6051,7428-7429,8224
+packages/db/src/drizzle.ts
+  s_caf703faa665f0::t_6185e978043f69 1
+  s_caf703faa665f0::t_f536222df5ccd7 21
+  s_caf703faa665f0::t_b6c634168cb2a6 20
+  s_caf703faa665f0::t_11d979cc3d4a05 36-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "187ffdfba814f2e31420c638828edc419a2f00d2",
+  "prompts": {},
+  "sessions": {
+    "s_caf703faa665f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "62bf07a5-328a-4658-8cfe-4c868bcb080f",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+apps/ui/registry/notra/chat-ui/types/chatgpt.ts
+  s_722cc11de57c72::t_ffce2778ee19b1 36-39
+  s_722cc11de57c72::t_361f0cf7beeab2 22-35,40-43
+apps/ui/registry/notra/chat-ui/components/blocks/chatgpt-block.tsx
+  s_722cc11de57c72::t_e8d96c6807005b 41-55,66-71
+  s_722cc11de57c72::t_ffce2778ee19b1 14-17,39-40,56
+  s_722cc11de57c72::t_361f0cf7beeab2 5,20
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-tool-call.tsx
+  s_722cc11de57c72::t_6f0febedecd4f0 23
+  s_722cc11de57c72::t_bada2ddea4316b 39,41-43,45-51
+  s_722cc11de57c72::t_361f0cf7beeab2 1-2,5-10,21,26,28,52-54,56-57
+apps/ui/docs/blocks/chatgpt-chat.mdx
+  s_722cc11de57c72::t_e6fb53e2f4732d 16-18
+apps/ui/registry/notra/chat-ui/examples/chatgpt-preview.tsx
+  s_722cc11de57c72::t_361f0cf7beeab2 7,9
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-actions.tsx
+  s_722cc11de57c72::t_e8d96c6807005b 92-109
+  s_722cc11de57c72::t_6f0febedecd4f0 28
+  s_722cc11de57c72::t_ffce2778ee19b1 54-56,60-62
+apps/ui/registry.json
+  s_722cc11de57c72::t_32e1c0b4a34211 2199
+  s_722cc11de57c72::t_da9b17c643bee3 851,856,861,866,871,876,881,886,891,896,901,906,911,916,994,999,1004,1009,1014,1019,1024,1029,1034,1039,1044,1049,1054,1059,1064,2054,2069,2074,2089,2094,2099,2104,2109,2124,2129,2144,2149,2154,2159,2174,2189,2204,2209,2224,2229
+apps/ui/docs/components/chatgpt-ui.mdx
+  s_722cc11de57c72::t_e6fb53e2f4732d 14
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-composer.tsx
+  s_722cc11de57c72::t_e8d96c6807005b 74-83
+  s_722cc11de57c72::t_e6fb53e2f4732d 52,111
+  s_722cc11de57c72::t_ffce2778ee19b1 23,36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e734c4678cdb5fa171450167f363b75821c0672f",
+  "prompts": {},
+  "sessions": {
+    "s_722cc11de57c72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e769-f4b6-7900-87e3-7854599b7356",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

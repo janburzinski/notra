@@ -1,0 +1,19 @@
+apps/docs/integrations/github.mdx
+  s_de8ac50ae39290::t_2d15864b1697f3 111-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "61acfeee87cfbf8f79123e76255d0e036e92c00a",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

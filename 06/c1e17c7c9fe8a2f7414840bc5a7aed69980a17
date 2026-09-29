@@ -1,0 +1,34 @@
+apps/dashboard/src/components/settings/two-factor-section.tsx
+  s_1e325abf04c4e2::t_f9e533290cd67f 29-31
+packages/db/migrations/0090_user_backup_codes.sql
+  ai_agent 1,9-15
+apps/dashboard/src/components/design-system/auth-security-demo.tsx
+  s_1e325abf04c4e2::t_f9e533290cd67f 32,53-54,166
+apps/dashboard/src/components/design-system/auth-flow-simulator-panel.tsx
+  s_1e325abf04c4e2::t_f9e533290cd67f 22-36,41
+packages/ui/src/components/shared/auth/totp-enrollment-panel.tsx
+  s_1e325abf04c4e2::t_f9e533290cd67f 8-11,130-137
+apps/dashboard/scripts/create-dev-auth-account.ts
+  s_1e325abf04c4e2::t_f9e533290cd67f 66-71
+apps/dashboard/src/components/design-system/auth-flow-playground.tsx
+  s_1e325abf04c4e2::t_089b6ac06cf486 26-27,37,52-53,57,71,73-74,81-82,108,110,112,115-120,131,133-134,138
+  s_1e325abf04c4e2::t_51e8e661f77fa3 75,85-87,93,113-114,121,130,132,135-137
+apps/dashboard/src/components/design-system/use-auth-flow-playground.ts
+  s_1e325abf04c4e2::t_089b6ac06cf486 1-402
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "06c1e17c7c9fe8a2f7414840bc5a7aed69980a17",
+  "prompts": {},
+  "sessions": {
+    "s_1e325abf04c4e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f98b95b6-a893-4a57-9f87-93bd7c030132",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

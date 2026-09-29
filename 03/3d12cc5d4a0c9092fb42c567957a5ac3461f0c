@@ -1,0 +1,19 @@
+packages/ai/src/utils/github-mention-sandbox.ts
+  s_de8ac50ae39290::t_64ad953fdd0a4e 4,141-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "033d12cc5d4a0c9092fb42c567957a5ac3461f0c",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,101 @@
+packages/ai/src/prompts/geo_writer/writer.ts
+  s_d6564c67c0368a::t_5a8fbf952f4eff 146-148
+  s_d6564c67c0368a::t_26af75d73da845 125-128,133,136
+packages/ai/src/agents/geo-writer.ts
+  s_d6564c67c0368a::t_6bd652a2d31c98 446-467,474,484
+  s_d6564c67c0368a::t_0af9503753b51c 37
+  s_d6564c67c0368a::t_a5261558a99754 63
+apps/dashboard/src/components/chat-input.tsx
+  s_d6564c67c0368a::t_8598ae8defd6dd 327-329
+  s_d6564c67c0368a::t_3bd57bc13a6b71 359-364
+  s_d6564c67c0368a::t_09f423a3847296 614-623
+  s_d6564c67c0368a::t_8710998a19a999 100-104,106-115
+  s_d6564c67c0368a::t_c66ccae1f5395a 256-264,287-288,292-293,295-296,298-300,302-304,306
+  s_d6564c67c0368a::t_95f6d7957cb4a1 330-331,366-391,394-411,413-429,431-443,446-612
+  s_d6564c67c0368a::t_23e68b5a3a9b7e 45-50,57
+  s_d6564c67c0368a::t_395abbdee542bd 105
+  s_d6564c67c0368a::t_09341e5ab600fd 365
+  s_d6564c67c0368a::t_cbf978d8eac958 340-343
+apps/dashboard/src/lib/hooks/use-chat-composer-attachments.ts
+  s_d6564c67c0368a::t_1bbaded9ea0fa3 247-255,260,262
+  s_d6564c67c0368a::t_5f572263fb0124 264-266,268-274,276-288,290-293,295-296,306-308
+  s_d6564c67c0368a::t_84d3a95cbe20ce 11
+  s_d6564c67c0368a::t_7be12cc2227f67 1-10,12-24,29-246,256-259,261,263,267,275,289,294,297-305,309,311-326,333,336-344
+  s_d6564c67c0368a::t_95f6d7957cb4a1 25-28
+  s_d6564c67c0368a::t_3affec706365f6 310,334-335
+  s_d6564c67c0368a::t_527839a553b69f 327-332
+apps/dashboard/src/types/components/chat-composer-attachments.ts
+  s_d6564c67c0368a::t_8b44a82a11a415 1-23
+apps/dashboard/src/types/hooks/chat-composer-attachments.ts
+  s_d6564c67c0368a::t_a7179a570388b6 23
+  s_d6564c67c0368a::t_d80eb7bc9245ea 1,3-14,21-22,24-31
+  s_d6564c67c0368a::t_3f25dc4e5b4650 2
+  s_d6564c67c0368a::t_f8c378efcdfc2a 15-20
+apps/dashboard/src/components/content/content-detail-chat-shell.tsx
+  s_d6564c67c0368a::t_cd064b5a7950a2 27-30
+  s_d6564c67c0368a::t_a2ff9741a2022d 4
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  s_d6564c67c0368a::t_0fe531f6ace981 163
+  s_d6564c67c0368a::t_f0700f5cc67414 49
+apps/dashboard/src/components/content/content-chat-activity-panel.tsx
+  s_d6564c67c0368a::t_8d6decb97ed34b 153
+  s_d6564c67c0368a::t_b6fa72b8052cda 46-47,50
+  s_d6564c67c0368a::t_95f6d7957cb4a1 176-178,180-189,191-192,196-200,202-236,238-266
+  s_d6564c67c0368a::t_f3254c636a242a 175
+  s_d6564c67c0368a::t_40c6d15dd909e4 57
+  s_d6564c67c0368a::t_b0c8e06eb19f74 267
+  s_d6564c67c0368a::t_95deb910eef7cb 41
+  s_d6564c67c0368a::t_60aaa99f71b9fb 99-103,109-126,150-152,154,158-167,169,172,179,193-195,201,237,269-277
+  s_d6564c67c0368a::t_449c11e2955a15 127-134
+packages/ai/src/tools/web-search.ts
+  s_d6564c67c0368a::t_e9a5bcfcba10bf 184
+  s_d6564c67c0368a::t_6c8a1bebf7ca8b 181-183,185-195
+apps/dashboard/src/components/chat/chat-composer-attachments.tsx
+  s_d6564c67c0368a::t_554cc161e48c84 10-14,21-25,35-46,50-52,56-91,93-98,100-137
+  s_d6564c67c0368a::t_5ed7129ec9d9e7 1-2,8-9,15-20,26-34,47-49,53-55,92,99,138-139
+  s_d6564c67c0368a::t_95f6d7957cb4a1 3-7
+apps/dashboard/src/app/api/organizations/[organizationId]/content/[contentId]/chat/route.ts
+  s_d6564c67c0368a::t_13820def848845 36
+  s_d6564c67c0368a::t_ab6b42c04c95e2 195
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_d6564c67c0368a::t_0e9b1bccb6d5c4 69
+apps/dashboard/src/lib/hooks/use-content-detail-chat.ts
+  s_d6564c67c0368a::t_c192c4f6b26ffc 429-430,437-464,468,470,484,488-490,506
+  s_d6564c67c0368a::t_2cc8ad66dbb11f 9
+  s_d6564c67c0368a::t_b59d6c805fbcff 46
+apps/dashboard/src/components/dashboard/dashboard-agent-panel.tsx
+  s_d6564c67c0368a::t_01fafd99690216 57
+  s_d6564c67c0368a::t_03f4352786bf10 284-287,311-317
+  s_d6564c67c0368a::t_6ae6d50a8210b0 8
+apps/dashboard/src/types/components/chat-input.ts
+  s_d6564c67c0368a::t_338eb11469456f 23
+  s_d6564c67c0368a::t_4bd9bc7b7fb053 2
+apps/dashboard/src/components/chat/chat-image-attachment.tsx
+  s_d6564c67c0368a::t_5052cd66a9badd 1-3,5-33,35-40,42-44,46-50
+  s_d6564c67c0368a::t_3f29fd457ed72c 4,34,41,45
+apps/dashboard/src/utils/chat-message-parts.ts
+  s_d6564c67c0368a::t_0fbb17fb2a93f0 22,24-32
+  s_d6564c67c0368a::t_f2de575caab9e3 21,23,33-34
+  s_d6564c67c0368a::t_c021b08d412ad7 1-20
+packages/ai/src/prompts/content-editor.ts
+  s_d6564c67c0368a::t_e0234e8379e1b1 52-53,57
+packages/ai/src/orchestration/tool-registry.ts
+  s_d6564c67c0368a::t_a925efef134042 60-61
+  s_d6564c67c0368a::t_54a1e630488852 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6c5382fb0afd2d998506e6ee33fe8745e800ac8f",
+  "prompts": {},
+  "sessions": {
+    "s_d6564c67c0368a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7e57542d-82ce-49fe-bfd8-be3967312d1d",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+apps/web/src/components/mcp-use-cases/use-case-prompt-block.tsx
+  s_f18de9a04242c6::t_2f97c805ef959d 1-13,15-27,29-44,46-63,65-70,72-83
+  s_f18de9a04242c6::t_7802cfc6fb76d5 14,28,45,64,71
+apps/web/src/components/mcp-use-cases/use-case-detail-view.tsx
+  s_f18de9a04242c6::t_8ec712da39e6bf 1
+  s_f18de9a04242c6::t_2c8249da2b7eed 11,14,22,35
+  s_f18de9a04242c6::t_9c8213fefce8cd 2-10,12-13,15-17,19-20,23-34,36,38,40-41,43-44,46-48,50-52,54-58,60-87,89-94,96-121,123-130
+  s_f18de9a04242c6::t_7802cfc6fb76d5 18,21,37,39,42,45,49,53,59,88,95,122
+apps/web/src/app/(site)/mcp/use-cases/[slug]/page.tsx
+  s_f18de9a04242c6::t_d56e6f8322d15a 1-18,20-25,27,29-31,35-62,64,66-72,74-83,86-89
+  s_f18de9a04242c6::t_7802cfc6fb76d5 19,26,28,32-34,63,65,73,84-85
+apps/web/src/utils/mcp.ts
+  s_f18de9a04242c6::t_f9796458b2be4c 12-15
+apps/web/src/app/(site)/mcp/use-cases/page.tsx
+  s_f18de9a04242c6::t_7802cfc6fb76d5 50,53-55
+  s_f18de9a04242c6::t_40bccc5307a6ef 1-49,51-52,56-80
+apps/web/src/app/sitemap.ts
+  s_f18de9a04242c6::t_7802cfc6fb76d5 123-124
+  s_f18de9a04242c6::t_6c67b1aae87ab6 4,14
+  s_f18de9a04242c6::t_18decac98205b1 120-122,125-126
+apps/web/src/components/mcp-use-cases/use-cases-browser.tsx
+  s_f18de9a04242c6::t_7802cfc6fb76d5 113-114
+  s_f18de9a04242c6::t_4504def03495a7 1-2,4-11,13-21,23-24,26-49,55-85,87,111-112,115-125
+  s_f18de9a04242c6::t_023b2f936ca319 3,25,50,86,88-110
+  s_f18de9a04242c6::t_2c8249da2b7eed 12,22,51-54
+apps/web/src/styles/ui-sources.css
+  s_f18de9a04242c6::t_2ff660e0dcc689 117,169
+apps/web/src/components/mcp/mcp-use-cases-callout.tsx
+  s_f18de9a04242c6::t_f9796458b2be4c 1-8,10-35
+  s_f18de9a04242c6::t_7802cfc6fb76d5 9
+apps/web/src/app/(site)/mcp/page.tsx
+  s_f18de9a04242c6::t_f9796458b2be4c 7,68
+apps/web/src/utils/mcp-use-cases.ts
+  s_f18de9a04242c6::t_96c1388c10bf06 1-7,13,16-17,19,26-28,30-38,40-43,45-46,50,55-61
+  s_c49e930673b82f::t_f0326ef5348239 44,47-49,51-54
+  s_f18de9a04242c6::t_7802cfc6fb76d5 14-15,29,39
+  s_f18de9a04242c6::t_2c8249da2b7eed 8-12,18,20-25
+apps/web/src/components/mcp-use-cases/use-case-card.tsx
+  s_f18de9a04242c6::t_63b02f595ac9ef 21,28,30-31,37-43,45
+  s_f18de9a04242c6::t_e5a642e2fd55c7 2-6,8-15,19-20,22-23,25,27,33-34,36,46-50
+  s_f18de9a04242c6::t_7802cfc6fb76d5 16-17,24,26,29,32,35,44
+  s_f18de9a04242c6::t_2c8249da2b7eed 1,7,18
+apps/web/src/components/mcp-use-cases/use-case-category-pill.tsx
+  s_f18de9a04242c6::t_2c8249da2b7eed 1-15
+apps/web/src/components/mcp-use-cases/use-case-tool-icon.tsx
+  s_f18de9a04242c6::t_2c8249da2b7eed 39
+  s_f18de9a04242c6::t_8ec712da39e6bf 74
+  s_f18de9a04242c6::t_8aca1a1c767134 82,94
+  s_f18de9a04242c6::t_e1b336b97b431d 1-34,36-38,40-73,75-81,83-93,95-111
+  s_f18de9a04242c6::t_7b4b7fba0bed33 35
+apps/web/src/types/mcp-use-cases.ts
+  s_f18de9a04242c6::t_f49812cb603076 3-11,13-17,19-33,35-55,57-75,82-84,86-91
+  s_f18de9a04242c6::t_7b4b7fba0bed33 34
+  s_f18de9a04242c6::t_2c8249da2b7eed 1-2,12,77-81
+  s_f18de9a04242c6::t_023b2f936ca319 18
+  s_f18de9a04242c6::t_7802cfc6fb76d5 56,76,85
+apps/web/src/utils/navigation.ts
+  ai_agent 13,87-90
+apps/web/src/constants/mcp-use-cases.ts
+  s_f18de9a04242c6::t_2c8249da2b7eed 1-8,27-28,43-58
+  s_f18de9a04242c6::t_03adcfd0470ad7 9-26,29-42,59-338
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c756c88f18328c679b52b04a1dec04a6fc19845a",
+  "prompts": {},
+  "sessions": {
+    "s_c49e930673b82f": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0abcf-7362-740d-8c66-4e27e766afb7",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f18de9a04242c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "df56ede8-f316-461b-918a-4921d954c4f6",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

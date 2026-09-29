@@ -1,0 +1,15 @@
+apps/dashboard/src/components/settings/panes/general-pane.tsx
+  ai_agent 171-174,176-186,188-189,191-192
+packages/db/migrations/meta/0097_snapshot.json
+  ai_agent 1-12116
+packages/db/migrations/0097_agent_session_id_protocol.sql
+  ai_agent 1
+packages/db/migrations/meta/_journal.json
+  ai_agent 683-689
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7e097c4d3c0ffe2a5e104ecb3bef73e90b58440b",
+  "prompts": {}
+}

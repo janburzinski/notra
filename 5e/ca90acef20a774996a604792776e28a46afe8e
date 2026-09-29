@@ -1,0 +1,47 @@
+apps/dashboard/src/lib/geo-ingest/pipeline.ts
+  s_f68894894fd1b2::t_d6326f31b6e1ee 102-121,126-137
+  s_1df081fe8d3801::t_fd81e8a481d13a 8
+apps/dashboard/src/lib/geo-ingest/pipeline.test.ts
+  s_d65dda2d3ef9c3::t_24c2fb06c676ee 74-78
+  s_13c82f3650e23a::t_f3d41c94f05b57 162-203
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5eca90acef20a774996a604792776e28a46afe8e",
+  "prompts": {},
+  "sessions": {
+    "s_13c82f3650e23a": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QmXd2u65oZrs3ZawIwy",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_1df081fe8d3801": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QmWqtxsau8yrWjZ0dTv",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_d65dda2d3ef9c3": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QmXQXXzLcIrLqwXWh48",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f68894894fd1b2": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QmX3OvksUbgDkRRc92p",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+apps/dashboard/src/components/geo/journey-group-sheet.tsx
+  s_023e6c4703dd3e::t_2dd6c8c1c5dc63 302
+  s_023e6c4703dd3e::t_312a0dc06dc098 28,38,209
+packages/ui/src/components/animated-number.tsx
+  s_023e6c4703dd3e::t_a4e612a97e7622 6,66
+  s_023e6c4703dd3e::t_25418e51cc461d 24-29,39
+apps/dashboard/src/types/components/geo.ts
+  s_023e6c4703dd3e::t_164bea8225be7a 24-32
+apps/dashboard/src/components/geo/journey-detail-sheet.tsx
+  s_023e6c4703dd3e::t_2dd6c8c1c5dc63 186
+  s_023e6c4703dd3e::t_3c1e7c0cdc36d8 25
+apps/dashboard/src/components/geo/sheet-stat-grid.tsx
+  s_023e6c4703dd3e::t_fcd6b18c225b19 1-37
+apps/dashboard/src/components/geo/prompt-suggestions.tsx
+  s_023e6c4703dd3e::t_1816bc7f46f9cc 16,35
+  s_023e6c4703dd3e::t_98d681c66893d3 300-306
+  s_023e6c4703dd3e::t_0367dd0e5e7b48 253-264
+  s_023e6c4703dd3e::t_cd9dbe898eddcb 103-115,118-119,123-125,129-130,138-139,141-148,220,222-223,230-231
+apps/dashboard/src/components/geo/traffic-source-sheet.tsx
+  s_023e6c4703dd3e::t_2dd6c8c1c5dc63 180
+  s_023e6c4703dd3e::t_3c1e7c0cdc36d8 25,33
+  s_023e6c4703dd3e::t_312a0dc06dc098 142
+apps/dashboard/src/types/geo.ts
+  s_023e6c4703dd3e::t_b3966036d8d21e 503-514
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bc7fb11b70b3f38f9d579018f1d2a89ad6f020eb",
+  "prompts": {},
+  "sessions": {
+    "s_023e6c4703dd3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc4c91ba-a673-4815-880e-5500bc8e78e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

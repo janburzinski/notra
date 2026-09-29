@@ -1,0 +1,21 @@
+apps/api/src/runtime/geo.ts
+  s_ff7bac7844479e::t_9da5b27856ddc2 105-109
+apps/api/tests/geo-runtime.test.ts
+  s_ff7bac7844479e::t_9da5b27856ddc2 3,82-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "beb670efdbbef28d525e1757678ea749a2badd13",
+  "prompts": {},
+  "sessions": {
+    "s_ff7bac7844479e": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUnOF67hUybONqU6NaE",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

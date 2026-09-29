@@ -1,0 +1,37 @@
+packages/geo-core/src/geo/scan.ts
+  s_9d87a27d0088b3::t_2a7f7edd09ab09 922-923
+packages/geo-core/src/types/geo.ts
+  s_9d87a27d0088b3::t_b46a68b005a9fa 210-211
+packages/geo-core/src/utils/geo-engines.ts
+  s_9d87a27d0088b3::t_bb7e6e87a81068 79-80,86
+apps/web/src/constants/landing/pricing.ts
+  s_9d87a27d0088b3::t_551e57870297b5 9
+apps/web/src/constants/features-page.ts
+  s_9d87a27d0088b3::t_37606e4b4f8e94 34
+apps/docs/geo/overview.mdx
+  s_9d87a27d0088b3::t_c9802a53e77140 139
+  s_9d87a27d0088b3::t_b6b1e4527d720d 89,92
+packages/geo-core/tests/geo-scan-size.test.ts
+  s_9d87a27d0088b3::t_c56cfd3d056d8b 9-12
+  s_9d87a27d0088b3::t_54a93ae96cfc85 78-86,93-95
+  s_9d87a27d0088b3::t_a68637b5d3a333 87-92,96
+apps/docs/concepts/how-it-works.mdx
+  s_9d87a27d0088b3::t_7ec5b38ea2b16d 68
+  s_9d87a27d0088b3::t_df4ad6bd8c8752 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "feb4e880a43ca7b74351c3832581e30cff77f404",
+  "prompts": {},
+  "sessions": {
+    "s_9d87a27d0088b3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "324ee7ae-cdb3-431b-9318-63a827e9deb3",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

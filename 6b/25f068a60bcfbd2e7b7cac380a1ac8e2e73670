@@ -1,0 +1,61 @@
+packages/ai/src/prompts/github-mention.ts
+  s_de8ac50ae39290::t_824c92dc0216ef 90
+packages/ai/src/types/github-mention.ts
+  s_de8ac50ae39290::t_b527371343a4d6 103-104
+packages/ai/src/utils/github-mention-change-review.ts
+  s_de8ac50ae39290::t_32d051b22caab3 13-19,43-50
+  s_de8ac50ae39290::t_ad0bfdc1dd1a30 1,23-27,33,35,51-55,58-72
+  s_de8ac50ae39290::t_5d785912a0ddc7 2-12,20-22,28-32,34,36-42,56-57,73-74
+apps/docs/integrations/github.mdx
+  s_de8ac50ae39290::t_824c92dc0216ef 113
+  s_de8ac50ae39290::t_dad17be30aef82 114
+packages/ai/src/utils/github-mention-content-policy.test.ts
+  s_de8ac50ae39290::t_d71a9f9e9763c2 110
+  s_de8ac50ae39290::t_48bd41efb9d03e 85-109,111-114,116-122
+  s_de8ac50ae39290::t_99937f37cbaa4d 115
+  s_de8ac50ae39290::t_ad27b3d7d7e4b7 1-71,73-84,123-134
+  s_de8ac50ae39290::t_c26adabac46a39 72
+packages/ai/src/utils/github-mention-change-review.test.ts
+  s_de8ac50ae39290::t_ad0bfdc1dd1a30 1,8,60
+  s_de8ac50ae39290::t_a7e836c5132c23 16
+  s_de8ac50ae39290::t_6fd98ec7969356 2-7,9-15,17-59,61-80
+packages/ai/src/utils/github-mention-content-policy.ts
+  s_de8ac50ae39290::t_99937f37cbaa4d 97-100
+  s_de8ac50ae39290::t_48bd41efb9d03e 10-18,44-46,52-94,96,111-113,115,130-143
+  s_de8ac50ae39290::t_6d2ad807234402 1-9,19-43,47-51,95,101-110,114,116-129,144-147
+packages/ai/src/tools/github-mention.ts
+  s_de8ac50ae39290::t_529c9c86783c01 8
+  s_de8ac50ae39290::t_32d051b22caab3 33,35,191-206,212,270-281
+  s_de8ac50ae39290::t_824c92dc0216ef 34
+packages/ai/src/utils/github-mention.test.ts
+  s_de8ac50ae39290::t_b527371343a4d6 126,146,156,166,256,266,276,286
+  s_de8ac50ae39290::t_83bc0f0d0ad596 112,130-138,198,208,218,228
+packages/ai/src/constants/github-mention.ts
+  s_de8ac50ae39290::t_b527371343a4d6 109-119
+  s_de8ac50ae39290::t_f83a0638ea5f73 74-88,94,96-104,106-108
+  s_de8ac50ae39290::t_213d7f0d18970c 89-93,95,105
+  s_de8ac50ae39290::t_1893f92955fbd1 35
+packages/ai/src/utils/github-mention-sandbox.ts
+  s_de8ac50ae39290::t_529c9c86783c01 10,185,189-201
+packages/ai/src/utils/github-mention.ts
+  s_de8ac50ae39290::t_b527371343a4d6 114-116,153-155
+packages/ai/src/utils/github-pr-commit.ts
+  s_de8ac50ae39290::t_83bc0f0d0ad596 5
+  s_de8ac50ae39290::t_b527371343a4d6 112-114,156-158,283-285
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6b25f068a60bcfbd2e7b7cac380a1ac8e2e73670",
+  "prompts": {},
+  "sessions": {
+    "s_de8ac50ae39290": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "632f80fc-df24-4671-95a8-4741af8eb2bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

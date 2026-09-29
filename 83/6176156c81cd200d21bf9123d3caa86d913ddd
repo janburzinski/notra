@@ -1,0 +1,57 @@
+packages/ai/src/utils/github-mention-ingest.ts
+  s_f42d08e1cc3e9b::t_61c6a9d5bc82a9 109-110
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 5,12-15,23-24,43,46,52-58,61-66,70,75-108,111,114,226
+  s_f42d08e1cc3e9b::t_4ca6af8b3df55f 59-60,67-69
+packages/ai/src/prompts/github-mention.test.ts
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 3-6,69-92
+  s_f42d08e1cc3e9b::t_50fb857baba65e 93-94
+apps/docs/integrations/github.mdx
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 101,108
+packages/ai/src/utils/update-published-content.ts
+  s_f42d08e1cc3e9b::t_742ab67e740b9a 284
+  s_f42d08e1cc3e9b::t_11e81be9daaf1b 257-267
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 1,223-256,268-283
+packages/ai/src/tools/github-mention.ts
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 6,129-136,139
+packages/ai/src/utils/update-published-content.test.ts
+  s_f42d08e1cc3e9b::t_17f43f8c9aa24c 303-335
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 30,267-302,336-355
+  s_f42d08e1cc3e9b::t_e6292f68fe54ac 356-357
+packages/ai/src/prompts/github-mention.ts
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 2-3,164-172,189,202
+packages/ai/src/utils/github-mention-ingest.test.ts
+  s_f42d08e1cc3e9b::t_8ab0ef6c0c3061 24
+  s_f42d08e1cc3e9b::t_6a59b32d4fbcb3 172-268
+  s_f42d08e1cc3e9b::t_608382c81dcf48 157,169
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 7-9,23,25-32,79-81,116-156,158-168,170-171,269-293
+packages/ai/src/tools/github-mention.test.ts
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 1-24
+packages/ai/src/utils/content-publication.ts
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 342-374
+  s_f42d08e1cc3e9b::t_d651ed776e4f3e 384-385
+packages/ai/src/agents/github-mention.ts
+  s_f42d08e1cc3e9b::t_ffc40aa5b76289 11,75-103,122-125
+packages/ai/src/utils/github-mention.local.test.ts
+  s_f42d08e1cc3e9b::t_7f1abe6b4a9648 196
+  s_f42d08e1cc3e9b::t_150edb563a7f27 1,4-7,51,62-63,65-98,101-136,138-150,152-153,156-164,166-195,199-244
+  s_f42d08e1cc3e9b::t_7bce956e743ce0 2-3,8-30,36-50,52-61,99-100,151,154-155,165,197-198
+  s_f42d08e1cc3e9b::t_ad1daf93f89563 64
+  s_f42d08e1cc3e9b::t_9cf8ffeb6e5c2f 137
+  s_f42d08e1cc3e9b::t_ad506bbb34ed25 31-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "836176156c81cd200d21bf9123d3caa86d913ddd",
+  "prompts": {},
+  "sessions": {
+    "s_f42d08e1cc3e9b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "70babf50-e845-4cf2-9b7c-0819910cf726",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

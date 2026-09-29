@@ -1,0 +1,31 @@
+packages/ui/src/components/geo/logo-stack.tsx
+  s_023e6c4703dd3e::t_28b6163f72e7b4 31
+  s_023e6c4703dd3e::t_294d1406e932ff 62-63,69-70
+  s_023e6c4703dd3e::t_808ecad9a0d7d6 60-61
+  s_023e6c4703dd3e::t_a125bdea6958ad 45-56
+  s_023e6c4703dd3e::t_e04f03c9b4da29 88
+apps/dashboard/src/components/geo/what-changed-card.tsx
+  s_023e6c4703dd3e::t_d0c7f109b1e34e 251-261
+  s_023e6c4703dd3e::t_f85b3a7835f1f6 13
+packages/ui/src/types/geo.ts
+  s_023e6c4703dd3e::t_515e8bcae8f16b 146-151
+packages/geo-core/src/constants/geo.ts
+  s_023e6c4703dd3e::t_c31697cf173211 1276-1277
+  s_023e6c4703dd3e::t_c56b829f81c572 1270-1274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "519b2fa9b340428cb339d6a991ed62ba672a125e",
+  "prompts": {},
+  "sessions": {
+    "s_023e6c4703dd3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc4c91ba-a673-4815-880e-5500bc8e78e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

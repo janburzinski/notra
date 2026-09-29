@@ -1,0 +1,21 @@
+apps/dashboard/src/lib/chat/standalone-chat-transport.ts
+  s_e4cf4a4f4243aa::t_2966f17f494e7a 86
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_e4cf4a4f4243aa::t_e2d3b86127d49d 620-631
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cfaedc30866a97aa080a62a5e880fb108557a4df",
+  "prompts": {},
+  "sessions": {
+    "s_e4cf4a4f4243aa": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "52e66653-b794-4a96-a300-3a5d745515e0",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+apps/dashboard/src/lib/hooks/use-geo-writer.ts
+  s_6bfa68bf4a73a2::t_c057739e2305ae 16
+  s_6bfa68bf4a73a2::t_cf9e61b68977c9 105-108,118
+apps/dashboard/src/utils/geo-gaps.ts
+  s_6bfa68bf4a73a2::t_c229a62adaa976 31-56
+  s_6bfa68bf4a73a2::t_1c6d7201f78675 9
+apps/dashboard/tests/geo-gaps-ignore-cache.test.ts
+  s_6bfa68bf4a73a2::t_3cd1928a01f974 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a2b19561aab0004522216dab37cfccdbab180684",
+  "prompts": {},
+  "sessions": {
+    "s_6bfa68bf4a73a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "22e23188-4611-4f94-8480-8b06d1a65fad",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

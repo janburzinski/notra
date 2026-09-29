@@ -1,0 +1,22 @@
+apps/dashboard/tests/gsc-sync-workflow.test.ts
+  s_2c5b3ad6297ff7::t_f6112823927966 131,136-141,143-150
+apps/dashboard/src/workflows/gsc-sync.ts
+  s_2c5b3ad6297ff7::t_f6112823927966 52-65,68-70
+  s_2c5b3ad6297ff7::t_07c4dc1fd2df68 66-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "171d60b1d1f236dd860286ef8cdedb408816b282",
+  "prompts": {},
+  "sessions": {
+    "s_2c5b3ad6297ff7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e771-370d-7cb1-91f5-637f533cedf1",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

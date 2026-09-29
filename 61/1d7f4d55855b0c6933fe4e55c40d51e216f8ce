@@ -1,0 +1,19 @@
+packages/webhooks/.gitignore
+  s_3143cff77c6901::t_f2fe97f2986eb8 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "611d7f4d55855b0c6933fe4e55c40d51e216f8ce",
+  "prompts": {},
+  "sessions": {
+    "s_3143cff77c6901": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QOGGOQ1OyOH7yqOyIEk",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

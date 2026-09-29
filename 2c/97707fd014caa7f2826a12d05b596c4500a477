@@ -1,0 +1,22 @@
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_dd90835652050c::t_d9e17316922944 592-611
+  s_dd90835652050c::t_41257c41ba81fa 94,100
+  s_dd90835652050c::t_339f1f6d7a0f51 31-34
+  s_dd90835652050c::t_162570baec242a 43-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2c97707fd014caa7f2826a12d05b596c4500a477",
+  "prompts": {},
+  "sessions": {
+    "s_dd90835652050c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e985127-43b5-472d-b293-8130e3dd02ac",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

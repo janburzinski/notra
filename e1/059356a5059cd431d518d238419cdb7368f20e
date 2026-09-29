@@ -1,0 +1,65 @@
+packages/webhooks/src/programs/events.ts
+  s_ebf18e8e6a08e2::t_443a15972f1f80 20
+  s_729af8cc380c62::t_1e1a7bb3b57d9c 41-42
+  s_94b859eaebc1ec::t_c9a49fd38b877c 78
+  s_12654c4b08d6b5::t_913a5f5b64cba8 19,21-36,38-40,43,45
+packages/webhooks/src/drizzle.ts
+  s_537deae29a29e5::t_148dfe7c9f59aa 64-68
+  s_2b1a8ab21b6ea8::t_e84a5fafc625f5 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e1059356a5059cd431d518d238419cdb7368f20e",
+  "prompts": {},
+  "sessions": {
+    "s_12654c4b08d6b5": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QONK9o8lljCFHw55Rvw",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_2b1a8ab21b6ea8": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QONhsC9jJdrPWJN3SXM",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_537deae29a29e5": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QONjdxY09PelZjp9gW9",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_729af8cc380c62": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QO7QZcTt6MTAMY6OkLP",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_94b859eaebc1ec": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QONLZpX3C5t3QNjzbn6",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_ebf18e8e6a08e2": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QONxsRiTRyEZ2k477tn",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

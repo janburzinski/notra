@@ -1,0 +1,19 @@
+packages/ui/src/components/shared/auth/email-verification-form.tsx
+  s_1e325abf04c4e2::t_504739f9379bbd 3,10,25-28,36,49,61,66,69-77,84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "69c1b53f067f971fe07a4a3b7cccc7a62070f941",
+  "prompts": {},
+  "sessions": {
+    "s_1e325abf04c4e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f98b95b6-a893-4a57-9f87-93bd7c030132",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

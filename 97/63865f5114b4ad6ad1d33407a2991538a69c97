@@ -1,0 +1,29 @@
+packages/webhooks/src/utils/dns.ts
+  s_6cde60905effcd::t_dcedc9f551f2c3 25-27
+packages/webhooks/src/utils/retry.ts
+  s_2bf21b21bb2430::t_ca859d23fefe09 9-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9763865f5114b4ad6ad1d33407a2991538a69c97",
+  "prompts": {},
+  "sessions": {
+    "s_2bf21b21bb2430": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QLozjIAanlGLQSW5elP",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_6cde60905effcd": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QLLU883ai2YpDymKcbO",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
