@@ -14,6 +14,7 @@ import {
   engineFamilyLabel,
   engineFamilyOf,
 } from "@notra/geo-core/utils/geo-engine-family";
+import { aiSearchMatchKey } from "@notra/geo-core/utils/geo-gaps";
 
 import type {
   GeoGapLift,
@@ -33,14 +34,15 @@ export function unifySearchGaps(
   const remainingAi = [...aiSearchGaps];
   const consoleRows: GeoUnifiedSearchGap[] = searchGaps.map((row) => {
     const queries = new Set(
-      [row.prompt, ...row.queries.map((keyword) => keyword.query)].map(
-        (query) => query.trim().toLowerCase()
-      )
+      [row.prompt, ...row.queries.map((keyword) => keyword.query)]
+        .map(aiSearchMatchKey)
+        .filter(Boolean)
     );
     const index = remainingAi.findIndex((candidate) =>
-      [candidate.query, ...candidate.variants].some((query) =>
-        queries.has(query.trim().toLowerCase())
-      )
+      [candidate.query, ...candidate.variants].some((query) => {
+        const key = aiSearchMatchKey(query);
+        return key.length > 0 && queries.has(key);
+      })
     );
     const [ai = null] = index < 0 ? [] : remainingAi.splice(index, 1);
     return { kind: "console", row, ai };

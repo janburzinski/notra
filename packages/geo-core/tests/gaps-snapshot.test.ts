@@ -4,6 +4,7 @@ import { afterAll, beforeAll, beforeEach, expect, test } from "bun:test";
 import {
   geoContentGapSnapshots,
   geoMentionChecks,
+  geoPromptSuggestions,
   geoScans,
 } from "@notra/db/schema";
 import { Effect } from "effect";
@@ -112,4 +113,48 @@ test("AI search gaps exclude checks that mention or cite the project", async () 
   );
   expect(snapshot.aiSearchGaps).toHaveLength(2);
   expect(await Effect.runPromise(loadGeoContentGaps(scope))).toEqual(snapshot);
+});
+
+test("one uncovered AI search is enough when Search Console confirms the query", async () => {
+  const scope = await seedProject("selected");
+  await testDb.insert(geoScans).values({ id: "scan", ...scope });
+  await testDb.insert(geoPromptSuggestions).values({
+    id: "gsc-gap",
+    ...scope,
+    prompt: "AI content generation tools 2026",
+    sourceKeywords: [
+      {
+        query: "AI content generation tools 2026",
+        clicks: 2,
+        impressions: 100,
+        position: 12,
+      },
+    ],
+  });
+  await testDb.insert(geoMentionChecks).values(
+    [
+      { id: "corroborated", query: "best AI content generation tools 2026" },
+      { id: "ai-only", query: "content scheduling tools" },
+    ].map((check) => ({
+      id: check.id,
+      ...scope,
+      scanId: "scan",
+      promptId: check.id,
+      prompt: "Which content tools should I use?",
+      engine: "openai",
+      answer: "Answer",
+      mentioned: false,
+      ownedSourceCited: false,
+      grounding: { queries: [check.query], sources: [] },
+      capturedAt: new Date(),
+    }))
+  );
+
+  const snapshot = await Effect.runPromise(refreshGeoContentGaps(scope));
+  expect(snapshot.aiSearchGaps).toEqual([
+    expect.objectContaining({
+      query: "best AI content generation tools 2026",
+      searches: 1,
+    }),
+  ]);
 });

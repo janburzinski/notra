@@ -54,6 +54,7 @@ import {
 import {
   aiSearchGapId,
   aiSearchGroupKey,
+  aiSearchMatchKey,
   gapOpportunityScore,
   interleaveSearchQueries,
   isMissingMajority,
@@ -383,14 +384,19 @@ function addAll<T>(target: Set<T>, values: readonly T[]): void {
 function toAiSearchGapRows(
   byKey: Map<string, GeoAiSearchAgg>,
   trackedAliases: Map<string, string>,
+  searchConsoleKeys: ReadonlySet<string>,
   briefFor: (key: string) => GapBriefRow | undefined
 ): GeoAiSearchGapRow[] {
   const rows: GeoAiSearchGapRow[] = [];
   for (const [key, entry] of byKey) {
     const totalSearches = entry.checkIds.size;
     const searches = totalSearches - entry.coveredCheckIds.size;
+    const corroboratedBySearchConsole = [...entry.variants.keys()].some(
+      (query) => searchConsoleKeys.has(aiSearchMatchKey(query))
+    );
     if (
-      searches < GEO_AI_SEARCH_GAP_MIN_SEARCHES ||
+      searches <
+        (corroboratedBySearchConsole ? 1 : GEO_AI_SEARCH_GAP_MIN_SEARCHES) ||
       !isMissingMajority(searches, totalSearches)
     ) {
       continue;
@@ -791,6 +797,15 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
   const aiSearchGaps = toAiSearchGapRows(
     aggregateAiSearches(aiSearchChecks, brandTerms),
     trackedAliases,
+    new Set(
+      pending
+        .flatMap((suggestion) => [
+          suggestion.prompt,
+          ...(suggestion.sourceKeywords ?? []).map((keyword) => keyword.query),
+        ])
+        .map(aiSearchMatchKey)
+        .filter(Boolean)
+    ),
     (key) => briefBySource.get(sourceKey("ai_search", key))
   );
 

@@ -53,7 +53,7 @@ test("the same query from Search Console and AI appears once", () => {
   };
   const aiGap: GeoAiSearchGapRow = {
     id: "ai-1",
-    query: "ai content generation platform comparison",
+    query: "best AI content generation platform comparison",
     variants: [],
     prompts: ["AI-specific discovery"],
     engines: ["openai/gpt-5.4-grounded"],
@@ -113,4 +113,18 @@ test("the same query from Search Console and AI appears once", () => {
       "AI-specific discovery"
     )
   ).toEqual([{ kind: "console", row: consoleGap, ai: aiGap }]);
+  expect(
+    unifySearchGaps(
+      [
+        {
+          ...consoleGap,
+          queries: consoleGap.queries.map((keyword) => ({
+            ...keyword,
+            query: "AI content tools 2026",
+          })),
+        },
+      ],
+      [{ ...aiGap, query: "best AI content tools 2025" }]
+    )
+  ).toHaveLength(2);
 });
