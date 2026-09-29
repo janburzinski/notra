@@ -126,5 +126,5 @@ test("the same query from Search Console and AI appears once", () => {
       ],
       [{ ...aiGap, query: "best AI content tools 2025" }]
     )
-  ).toHaveLength(2);
+  ).toHaveLength(1);
 });

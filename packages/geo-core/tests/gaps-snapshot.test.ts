@@ -158,3 +158,52 @@ test("one uncovered AI search is enough when Search Console confirms the query",
     }),
   ]);
 });
+
+test("Search Console confirms AI searches regardless of the year in the query", async () => {
+  const scope = await seedProject("selected");
+  await testDb.insert(geoScans).values({ id: "scan", ...scope });
+  await testDb.insert(geoPromptSuggestions).values({
+    id: "gsc-gap",
+    ...scope,
+    prompt: "content scheduling tools",
+    sourceKeywords: [
+      {
+        query: "content scheduling tools",
+        clicks: 1,
+        impressions: 80,
+        position: 14,
+      },
+    ],
+  });
+  await testDb.insert(geoMentionChecks).values(
+    [
+      { id: "uncovered", query: "content scheduling tools 2026" },
+      {
+        id: "covered-variant",
+        query: "content scheduling tools 2025",
+        mentioned: true,
+      },
+    ].map((check) => ({
+      id: check.id,
+      ...scope,
+      scanId: "scan",
+      promptId: check.id,
+      prompt: "Which content tools should I use?",
+      engine: "openai",
+      answer: "Answer",
+      mentioned: check.mentioned ?? false,
+      ownedSourceCited: false,
+      grounding: { queries: [check.query], sources: [] },
+      capturedAt: new Date(),
+    }))
+  );
+
+  const snapshot = await Effect.runPromise(refreshGeoContentGaps(scope));
+  expect(snapshot.aiSearchGaps).toEqual([
+    expect.objectContaining({
+      query: "content scheduling tools 2026",
+      variants: [],
+      searches: 1,
+    }),
+  ]);
+});

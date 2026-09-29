@@ -129,11 +129,6 @@ export function aiSearchGapId(
   return latestYear ? `${groupKey} ${latestYear}` : groupKey;
 }
 
-export function aiSearchMatchKey(query: string): string {
-  const groupKey = aiSearchGroupKey(query);
-  return groupKey ? aiSearchGapId(groupKey, [query]) : "";
-}
-
 export function interleaveSearchQueries(
   lists: readonly (readonly string[])[],
   limit: number

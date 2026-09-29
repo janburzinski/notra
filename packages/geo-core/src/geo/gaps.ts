@@ -54,7 +54,6 @@ import {
 import {
   aiSearchGapId,
   aiSearchGroupKey,
-  aiSearchMatchKey,
   gapOpportunityScore,
   interleaveSearchQueries,
   isMissingMajority,
@@ -391,9 +390,8 @@ function toAiSearchGapRows(
   for (const [key, entry] of byKey) {
     const totalSearches = entry.checkIds.size;
     const searches = totalSearches - entry.coveredCheckIds.size;
-    const corroboratedBySearchConsole = [...entry.variants.keys()].some(
-      (query) => searchConsoleKeys.has(aiSearchMatchKey(query))
-    );
+    // Console queries match on the same year-free key AI searches group by.
+    const corroboratedBySearchConsole = searchConsoleKeys.has(key);
     if (
       searches <
         (corroboratedBySearchConsole ? 1 : GEO_AI_SEARCH_GAP_MIN_SEARCHES) ||
@@ -402,6 +400,7 @@ function toAiSearchGapRows(
       continue;
     }
     const [query = key, ...variants] = [...entry.variants.entries()]
+      .filter(([, uncovered]) => uncovered > 0)
       .sort((left, right) => right[1] - left[1])
       .map(([variant]) => variant);
     const id = aiSearchGapId(key, entry.variants.keys());
@@ -803,7 +802,7 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
           suggestion.prompt,
           ...(suggestion.sourceKeywords ?? []).map((keyword) => keyword.query),
         ])
-        .map(aiSearchMatchKey)
+        .map(aiSearchGroupKey)
         .filter(Boolean)
     ),
     (key) => briefBySource.get(sourceKey("ai_search", key))
