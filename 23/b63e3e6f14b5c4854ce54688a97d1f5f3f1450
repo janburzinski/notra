@@ -1,0 +1,52 @@
+packages/ai/src/constants/repo-image.ts
+  s_789a1240c5b3e3::t_f1b765c9c22a03 12-13
+packages/ai/src/utils/code-research-actions.ts
+  s_789a1240c5b3e3::t_675fe27ddff117 126
+packages/ai/src/schemas/code-research-tools.ts
+  s_789a1240c5b3e3::t_7ad0eb671ef82f 42-45
+  s_789a1240c5b3e3::t_f1b765c9c22a03 1,41
+packages/ai/src/schemas/code-research.ts
+  s_789a1240c5b3e3::t_f1b765c9c22a03 14,16,64-67
+packages/ai/src/utils/code-research-commands.test.ts
+  s_789a1240c5b3e3::t_bf0bffa1e17903 107-120
+  s_789a1240c5b3e3::t_5cac89fa2e9a3e 324-330
+  s_789a1240c5b3e3::t_7740691afc9d4d 340-341
+packages/ai/src/integrations/github.ts
+  s_789a1240c5b3e3::t_f1b765c9c22a03 1847
+packages/ai/src/tools/code-researcher.ts
+  s_789a1240c5b3e3::t_675fe27ddff117 7-11
+  s_789a1240c5b3e3::t_f1b765c9c22a03 216-225
+packages/ai/src/utils/code-researcher-steps.ts
+  s_789a1240c5b3e3::t_f1b765c9c22a03 10,98-99,101-105
+packages/ai/src/utils/code-research-session.ts
+  s_789a1240c5b3e3::t_49d497955fbf51 9
+  s_789a1240c5b3e3::t_675fe27ddff117 184-208,212-213,229,231-236,260
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_789a1240c5b3e3::t_ded0314e9ad64f 2078
+packages/ai/src/constants/code-research.ts
+  s_789a1240c5b3e3::t_f1b765c9c22a03 90-95
+  s_789a1240c5b3e3::t_675fe27ddff117 35
+  s_789a1240c5b3e3::t_49d497955fbf51 36
+packages/ai/src/billing/code-research-billing.ts
+  s_789a1240c5b3e3::t_675fe27ddff117 9-10,49-64
+packages/ai/src/utils/code-research-commands.ts
+  s_789a1240c5b3e3::t_610eff75e0389e 428
+  s_789a1240c5b3e3::t_eb88883d0415fe 538
+  s_789a1240c5b3e3::t_675fe27ddff117 20-21,26,134-142,411-427,439,530,532,534-537,539
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "23b63e3e6f14b5c4854ce54688a97d1f5f3f1450",
+  "prompts": {},
+  "sessions": {
+    "s_789a1240c5b3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe45ce4b-5c51-424d-b9d3-be060c25613c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
