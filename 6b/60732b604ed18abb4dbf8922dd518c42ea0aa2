@@ -1,0 +1,24 @@
+apps/dashboard/src/constants/instrument.ts
+  s_4baa408569e898::t_4eabed5bdf07ea 1-19
+apps/web/src/styles/globals.css
+  s_4baa408569e898::t_8c010dabe213fa 82
+apps/dashboard/src/components/instrument/instrument-module.tsx
+  s_4baa408569e898::t_4eabed5bdf07ea 21
+  s_4baa408569e898::t_92b9dc9beb7059 45-98,113-122,124-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6b60732b604ed18abb4dbf8922dd518c42ea0aa2",
+  "prompts": {},
+  "sessions": {
+    "s_4baa408569e898": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "241d7d30-8eee-46fc-91e5-b12cdcfff521",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
