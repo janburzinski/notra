@@ -194,9 +194,9 @@ export function SidebarUpgrade() {
       </div>
       {upgradeOpen && hasNoPlan && activeOrganization?.slug && (
         <GeoUpgradeDialog
+          entry="sidebar"
           onOpenChange={setUpgradeOpen}
           open={upgradeOpen}
-          sidebar
           slug={activeOrganization.slug}
         />
       )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -7,7 +8,9 @@ import { GeoUpgradeDialog } from "@/components/billing/geo-upgrade-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateCardsPreview } from "@/components/empty-state-preview";
 import { PageContainer } from "@/components/layout/container";
+import { PAYWALL_KINDS } from "@/constants/analytics-events";
 import { EMPTY_STATE_CARD_COUNT } from "@/constants/empty-state";
+import { trackEvent } from "@/lib/analytics/posthog-client";
 import type { StudioUpgradeGateProps } from "@/types/dashboard/home";
 
 export function StudioUpgradeGate({ slug }: StudioUpgradeGateProps) {
@@ -21,7 +24,13 @@ export function StudioUpgradeGate({ slug }: StudioUpgradeGateProps) {
         actionLabel={tUpgrade("upgradeNow")}
         className="my-auto"
         description={t("upgradeDescription")}
-        onActionClick={() => setOpen(true)}
+        onActionClick={() => {
+          trackEvent(POSTHOG_EVENTS.PAYWALL_SHOWN, {
+            kind: PAYWALL_KINDS.STUDIO_LOCKED,
+            route: "/",
+          });
+          setOpen(true);
+        }}
         preview={
           <EmptyStateCardsPreview
             columns={3}
@@ -32,7 +41,12 @@ export function StudioUpgradeGate({ slug }: StudioUpgradeGateProps) {
         title={t("upgradeTitle")}
       />
       {open && (
-        <GeoUpgradeDialog onOpenChange={setOpen} open sidebar slug={slug} />
+        <GeoUpgradeDialog
+          entry="studio"
+          onOpenChange={setOpen}
+          open
+          slug={slug}
+        />
       )}
     </PageContainer>
   );

@@ -18,7 +18,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { PlanCard } from "@/components/billing/plan-card";
-import { PAYWALL_KINDS, PLAN_SURFACES } from "@/constants/analytics-events";
+import { UPGRADE_DIALOG_EVENTS } from "@/constants/analytics-events";
 import { FEATURED_PLAN_TIER } from "@/constants/billing";
 import {
   billingInterval,
@@ -46,7 +46,7 @@ export function GeoUpgradeDialog({
   open,
   onOpenChange,
   onOpenChangeComplete,
-  sidebar = false,
+  entry = "geo",
 }: GeoUpgradeDialogProps) {
   const t = useTranslations("billing.geoUpgrade");
   const tUpgrade = useTranslations("nav.upgrade");
@@ -64,7 +64,8 @@ export function GeoUpgradeDialog({
   const [includeZdr, setIncludeZdr] = useState(false);
 
   const planGroups = groupBillingPlans(plans);
-  const surface = sidebar ? PLAN_SURFACES.SIDEBAR : PLAN_SURFACES.GEO_PAYWALL;
+  const { kind, surface } = UPGRADE_DIALOG_EVENTS[entry];
+  const upgradeFlow = entry !== "geo";
   const intervalLabel = isYearly
     ? tCommon2("labels.year")
     : tCommon2("labels.month");
@@ -72,7 +73,7 @@ export function GeoUpgradeDialog({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       trackEvent(POSTHOG_EVENTS.PAYWALL_DISMISSED, {
-        kind: sidebar ? PAYWALL_KINDS.UPGRADE_CARD : PAYWALL_KINDS.GEO_LOCKED,
+        kind,
       });
     }
     onOpenChange(nextOpen);
@@ -113,8 +114,8 @@ export function GeoUpgradeDialog({
         multiAttach,
         planId,
         includeZdr,
-        successUrl: sidebar
-          ? window.location.href
+        successUrl: upgradeFlow
+          ? `${window.location.origin}/${slug}/settings/billing/success`
           : `${window.location.origin}/${slug}/geo`,
       });
       if (result.paymentUrl) {
@@ -122,7 +123,7 @@ export function GeoUpgradeDialog({
         return;
       }
       await refetch();
-      if (sidebar) {
+      if (upgradeFlow) {
         router.refresh();
       }
     } catch (err) {
@@ -189,10 +190,10 @@ export function GeoUpgradeDialog({
       <ResponsiveDialogContent className="flex max-h-[90svh] flex-col overflow-hidden sm:max-w-5xl">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>
-            {sidebar ? tUpgrade("freeHeading") : t("title")}
+            {upgradeFlow ? tUpgrade("freeHeading") : t("title")}
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            {sidebar
+            {upgradeFlow
               ? tUpgrade("freeDescription")
               : tCommon2("messages.aiVisibilityTrackingIsIncluded")}
           </ResponsiveDialogDescription>
