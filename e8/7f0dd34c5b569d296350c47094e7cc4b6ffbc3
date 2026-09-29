@@ -1,0 +1,13 @@
+apps/ui/registry/notra/marketing-button/examples/marketing-button-demo.tsx
+  ai_agent 7
+apps/ui/registry/notra/marketing-button/examples/marketing-button-link.tsx
+  ai_agent 5
+apps/ui/registry/notra/marketing-button/examples/marketing-button-sizes.tsx
+  ai_agent 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e87f0dd34c5b569d296350c47094e7cc4b6ffbc3",
+  "prompts": {}
+}
