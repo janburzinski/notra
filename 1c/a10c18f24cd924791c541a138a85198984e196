@@ -1,0 +1,57 @@
+apps/ui/registry/notra/chatgpt/components/chatgpt-activity.tsx
+  s_68efd06bd8cdc3::t_369d4f11495bde 180-191
+apps/ui/registry/notra/chatgpt/hooks/use-chatgpt-playback.ts
+  s_68efd06bd8cdc3::t_64c0b346c031ae 116
+apps/ui/registry/notra/opencode/hooks/use-opencode-sources-sequence.ts
+  s_68efd06bd8cdc3::t_830301b0e21b74 1-59
+apps/ui/registry/notra/claude/hooks/use-claude-search-sequence.ts
+  s_68efd06bd8cdc3::t_bb84c947860317 1-65
+apps/ui/registry/notra/perplexity/components/perplexity-search.tsx
+  s_68efd06bd8cdc3::t_ff9361e5cd4d9b 5,376-385,388-389
+  s_68efd06bd8cdc3::t_0dd87fa19edacf 29,97-108,149-158,160-161,165-170,174,182-226,232,246,249-252,261-262,264-326,328-375,386-387,390-408,456-474
+apps/ui/registry/notra/perplexity/hooks/use-perplexity-playback.ts
+  s_68efd06bd8cdc3::t_64c0b346c031ae 145
+apps/ui/registry/notra/opencode/hooks/use-opencode-reduced-motion.ts
+  s_68efd06bd8cdc3::t_830301b0e21b74 1-25
+apps/ui/registry/notra/chatgpt/examples/chatgpt-demo.tsx
+  s_68efd06bd8cdc3::t_bb84c947860317 80-81
+apps/ui/components/ui/item.tsx
+  s_68efd06bd8cdc3::t_865eeeb9ffc016 11
+apps/ui/components/ui/toggle-group.tsx
+  s_68efd06bd8cdc3::t_865eeeb9ffc016 36-40,55
+apps/ui/registry/notra/claude/hooks/use-claude-playback.ts
+  s_68efd06bd8cdc3::t_64c0b346c031ae 127
+apps/ui/registry.json
+  s_68efd06bd8cdc3::t_74b2f2159414d4 1198-1202,2839-2843,5545,6518-6522,7050,7287-7291,9157-9166,9423-9432
+apps/ui/registry/notra/claude/components/claude-usage-ring.tsx
+  s_68efd06bd8cdc3::t_865eeeb9ffc016 5
+  s_68efd06bd8cdc3::t_18104a6324ca4a 69-74
+apps/ui/registry/notra/opencode/components/opencode-sources.tsx
+  s_68efd06bd8cdc3::t_b15f523cf8602c 19-21,121,126-132
+  s_68efd06bd8cdc3::t_314320532bcb0b 80-81,83,87-100,108-112
+apps/ui/registry/notra/perplexity/hooks/use-perplexity-search-sequence.ts
+  s_68efd06bd8cdc3::t_0dd87fa19edacf 1-86
+apps/ui/registry/notra/claude/components/claude-search.tsx
+  s_68efd06bd8cdc3::t_b2fc68688af40c 12,35-36,216-220,222-238,265,285-286,288-306,308-315
+  s_68efd06bd8cdc3::t_bb84c947860317 317-321
+apps/ui/registry/notra/claude/lib/claude-search.ts
+  s_68efd06bd8cdc3::t_bb84c947860317 37,45-46,50-51,54
+apps/ui/registry/notra/gemini/hooks/use-gemini-playback.ts
+  s_68efd06bd8cdc3::t_64c0b346c031ae 123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1ca10c18f24cd924791c541a138a85198984e196",
+  "prompts": {},
+  "sessions": {
+    "s_68efd06bd8cdc3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff5b0bb1-cc5d-44be-af5f-6d10a56bd786",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
