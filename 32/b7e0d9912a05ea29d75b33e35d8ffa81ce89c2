@@ -1,0 +1,50 @@
+packages/ui/src/styles/step-slider.css
+  s_806a85cabd9a25::t_3b49ca61e50093 1-13
+packages/ui/src/styles/globals.css
+  s_806a85cabd9a25::t_3b49ca61e50093 9
+packages/ui/src/types/step-slider.ts
+  s_806a85cabd9a25::t_3b49ca61e50093 1-33,40-48
+  s_806a85cabd9a25::t_a23a544ed2ec53 34-39
+apps/ui/registry/notra/step-slider/types/step-slider.ts
+  s_806a85cabd9a25::t_a23a544ed2ec53 34-39
+apps/ui/registry/notra/step-slider/components/step-slider.tsx
+  s_806a85cabd9a25::t_3bb826e834086f 28,42-46,52,73-75,78,102,162
+  s_806a85cabd9a25::t_22a9ecbd36b768 122-124
+  s_806a85cabd9a25::t_a9273585ffcf5b 156
+  s_806a85cabd9a25::t_a23a544ed2ec53 11,107-108,117
+apps/web/src/utils/prompt-calculator.ts
+  s_806a85cabd9a25::t_f8b727f5645102 44
+apps/web/src/styles/ui-sources.css
+  s_806a85cabd9a25::t_22a9ecbd36b768 78,185,197
+apps/web/src/styles/globals.css
+  s_806a85cabd9a25::t_56e67ea2c46333 9
+packages/ui/src/lib/step-slider.ts
+  s_806a85cabd9a25::t_3b49ca61e50093 1-14
+packages/ui/src/components/ui/step-slider.tsx
+  s_806a85cabd9a25::t_3bb826e834086f 28,42-46,52,73-75,78,102,160
+  s_806a85cabd9a25::t_3b49ca61e50093 1-10,12-27,29-41,47-51,53-72,76-77,79-101,103-106,109-116,118-121,123-153,155-159,161-181
+  s_806a85cabd9a25::t_a9273585ffcf5b 154
+  s_806a85cabd9a25::t_a23a544ed2ec53 11,107-108,117,122
+apps/web/src/components/landing/prompt-calculator.tsx
+  s_806a85cabd9a25::t_c7c60ca8aafb24 17
+  s_806a85cabd9a25::t_31163128c6319c 104-110
+  s_806a85cabd9a25::t_72d07370401fbb 216-227
+apps/ui/docs/components/step-slider.mdx
+  s_806a85cabd9a25::t_d23811c0e54696 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "32b7e0d9912a05ea29d75b33e35d8ffa81ce89c2",
+  "prompts": {},
+  "sessions": {
+    "s_806a85cabd9a25": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "776afac6-b58f-4a94-a058-ac7e5b4494d7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
