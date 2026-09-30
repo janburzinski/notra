@@ -13,6 +13,7 @@ import {
   primarySearchQuery,
   searchGapActionSource,
   searchGapDemandRank,
+  searchGapDismissesConsoleFromAi,
   unifySearchGaps,
 } from "../src/utils/geo-gaps";
 
@@ -104,6 +105,31 @@ test("the same query from Search Console and AI appears once", () => {
       ai: aiWithBrief,
     })
   ).toBe("console");
+  const ignoredConsoleGap: GeoSearchGapRow = {
+    ...consoleGap,
+    recommendation: { action: "ignore", reason: "Covered", targets: [] },
+  };
+  expect(
+    searchGapDismissesConsoleFromAi({
+      kind: "console",
+      row: ignoredConsoleGap,
+      ai: aiWithBrief,
+    })
+  ).toBe(true);
+  expect(
+    searchGapDismissesConsoleFromAi({
+      kind: "console",
+      row: consoleGap,
+      ai: aiWithBrief,
+    })
+  ).toBe(false);
+  expect(
+    searchGapDismissesConsoleFromAi({
+      kind: "console",
+      row: ignoredConsoleGap,
+      ai: aiGap,
+    })
+  ).toBe(false);
   expect(
     filterUnifiedSearchGaps(unifySearchGaps([consoleGap], [aiGap]), "Compare")
   ).toEqual([{ kind: "console", row: consoleGap, ai: aiGap }]);

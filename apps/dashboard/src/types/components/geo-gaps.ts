@@ -21,6 +21,8 @@ export interface GeoGapsWriteCellProps {
   rescanDisabled?: boolean;
   onIgnore?: () => void;
   isIgnoring?: boolean;
+  /** Defaults to "Ignore"; merged Search Console rows dismiss their suggestion instead. */
+  ignoreLabel?: string;
   /** Render Ignore as an icon button so the table's action column stays narrow. */
   compact?: boolean;
 }

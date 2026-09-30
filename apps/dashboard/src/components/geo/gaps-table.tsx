@@ -98,6 +98,7 @@ import {
   maxGapOpportunity,
   primarySearchQuery,
   searchGapActionSource,
+  searchGapDismissesConsoleFromAi,
   searchGapDemandRank,
   unifySearchGaps,
   uniqueGapEngineFamilies,
@@ -177,6 +178,7 @@ function WriteCell({
   rescanDisabled = false,
   onIgnore,
   isIgnoring = false,
+  ignoreLabel,
   compact = false,
 }: GeoGapsWriteCellProps) {
   const t = useTranslations("geo.gapsTable");
@@ -188,6 +190,7 @@ function WriteCell({
     writing: tGeoShared2("writing"),
     open: t("writeActions.open"),
   };
+  const ignoreText = ignoreLabel ?? t("ignore");
   return (
     <span className="inline-flex items-center justify-end gap-1">
       {onIgnore && compact ? (
@@ -195,7 +198,7 @@ function WriteCell({
           <TooltipTrigger
             render={
               <Button
-                aria-label={t("ignore")}
+                aria-label={ignoreText}
                 className="text-muted-foreground"
                 disabled={isIgnoring}
                 onClick={(event) => {
@@ -213,7 +216,7 @@ function WriteCell({
               <HugeiconsIcon icon={ViewOffSlashIcon} size={15} />
             )}
           </TooltipTrigger>
-          <TooltipContent>{t("ignore")}</TooltipContent>
+          <TooltipContent>{ignoreText}</TooltipContent>
         </Tooltip>
       ) : null}
       {onIgnore && !compact ? (
@@ -227,7 +230,7 @@ function WriteCell({
           variant="ghost"
         >
           {isIgnoring ? <StatusSpinner /> : null}
-          {t("ignore")}
+          {ignoreText}
         </Button>
       ) : null}
       {onRescan ? (
@@ -789,9 +792,20 @@ export function GeoGapsTable({
     if (!ai) {
       return null;
     }
+    const dismissConsole =
+      consoleRow && searchGapDismissesConsoleFromAi(gap)
+        ? () => {
+            closeSheet();
+            onDismissSearch(consoleRow);
+          }
+        : undefined;
     return (
       <WriteCell
         action={gapWriteAction(ai.brief)}
+        compact={!inSheet}
+        ignoreLabel={tCommon("labels.dismiss")}
+        isIgnoring={consoleRow ? dismissingSearchId === consoleRow.id : false}
+        onIgnore={dismissConsole}
         onOpenPost={(postId) => {
           closeSheet();
           onOpenPost(postId);

@@ -79,6 +79,17 @@ export function searchGapActionSource(
     : "ai";
 }
 
+/** A merged row showing the AI brief still lets users dismiss the Console suggestion. */
+export function searchGapDismissesConsoleFromAi(
+  gap: GeoUnifiedSearchGap
+): boolean {
+  return (
+    gap.kind === "console" &&
+    searchGapActionSource(gap) === "ai" &&
+    gap.row.recommendation.action === "ignore"
+  );
+}
+
 export function withoutPromptGap(
   response: GeoContentGapsResponse,
   promptId: string
