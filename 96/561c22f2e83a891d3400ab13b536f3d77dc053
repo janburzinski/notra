@@ -1,0 +1,25 @@
+apps/web/src/components/landing/prompt-calculator.tsx
+  s_faf314cda5b1a8::t_6fa575858ade7e 38,156,178,180-182,189,315,413,546,614-617
+  s_faf314cda5b1a8::t_ebf897048c2890 57,60,622-723,777,823-825,828,830
+  s_faf314cda5b1a8::t_c197228a4524f3 442-459,461
+apps/web/src/utils/site-markdown.ts
+  s_faf314cda5b1a8::t_6fa575858ade7e 288
+apps/web/src/components/landing/animated-text.tsx
+  s_faf314cda5b1a8::t_6fa575858ade7e 5,73-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "96561c22f2e83a891d3400ab13b536f3d77dc053",
+  "prompts": {},
+  "sessions": {
+    "s_faf314cda5b1a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e656d0e-e558-446f-b1b4-4964a61637ce",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
