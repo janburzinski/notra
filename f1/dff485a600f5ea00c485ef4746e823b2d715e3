@@ -1,0 +1,19 @@
+apps/ui/src/components/install-command.astro
+  s_1b94e23f546e8f::t_0fde80a5cc46cf 18-20,40-43,89-91,94-95,97,100-112,114,117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f1dff485a600f5ea00c485ef4746e823b2d715e3",
+  "prompts": {},
+  "sessions": {
+    "s_1b94e23f546e8f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0a8cb99-28ab-4611-b813-10e95ea6e984",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
