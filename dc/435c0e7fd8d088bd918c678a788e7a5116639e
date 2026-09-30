@@ -1,0 +1,20 @@
+apps/web/src/utils/site-markdown.ts
+  s_faf314cda5b1a8::t_b67dd679563f27 264-265,269-270,288
+  s_faf314cda5b1a8::t_a88f2514ccee08 224,226-233,235-238,268
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dc435c0e7fd8d088bd918c678a788e7a5116639e",
+  "prompts": {},
+  "sessions": {
+    "s_faf314cda5b1a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e656d0e-e558-446f-b1b4-4964a61637ce",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
