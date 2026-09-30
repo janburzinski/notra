@@ -1,0 +1,25 @@
+apps/ui/src/components/landing-hero.astro
+  s_1b94e23f546e8f::t_4b05f9f5e92e11 45
+apps/ui/src/components/install-command.astro
+  s_1b94e23f546e8f::t_3a8565d81fc952 6-8,13-14,17-20,40-41,46-50,55-59,63-103,108
+apps/ui/src/constants/landing.ts
+  s_1b94e23f546e8f::t_4b05f9f5e92e11 7-16
+apps/ui/src/types/landing.ts
+  s_1b94e23f546e8f::t_4b05f9f5e92e11 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "52c7e32c5fbb22d8313208e74e89660de4338333",
+  "prompts": {},
+  "sessions": {
+    "s_1b94e23f546e8f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0a8cb99-28ab-4611-b813-10e95ea6e984",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
