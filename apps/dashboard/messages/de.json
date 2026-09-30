@@ -8,11 +8,11 @@
       },
       "sections": {
         "account": {
-          "description": "Profil, Anmeldung und Datenschutz"
+          "description": "Profil, Login und verbundene Konten"
         },
         "appearance": {
-          "label": "Darstellung",
-          "description": "Heller, dunkler oder System-Modus"
+          "label": "Einstellungen",
+          "description": "Design, Sprache, Chat und Datenschutz"
         },
         "general": {
           "label": "Allgemein",
@@ -58,8 +58,8 @@
     "modal": {
       "close": "Einstellungen schließen",
       "descriptions": {
-        "account": "Verwalte dein Profil und deine Kontoeinstellungen",
-        "appearance": "Wähle, wie Notra auf diesem Gerät aussieht",
+        "account": "Verwalte dein Profil und deinen Login",
+        "appearance": "Lege fest, wie Notra für dich aussieht und sich verhält",
         "general": "Verwalte die Einstellungen deiner Organisation",
         "members": "Verwalte, wer Zugriff auf diese Organisation hat",
         "notifications": "Konfiguriere E-Mail-Benachrichtigungen für deine Organisation",
@@ -1064,11 +1064,12 @@
     "visibility": {
       "metaTitle": "Tracke deine KI-Sichtbarkeit",
       "brandName": "Markenname",
+      "brandNameRequired": "Gib deinen Markennamen ein, um fortzufahren.",
       "brandNamePlaceholder": "Acme",
       "questionsFrom": "Fragen von {host} <muted>({selected} von {total})</muted>",
       "questions": "Fragen <muted>({selected} von {total})</muted>",
       "skipStep": "Diesen Schritt überspringen",
-      "description": "Wir fragen ChatGPT, Claude, Gemini und Perplexity, was deine Käufer sie fragen, und prüfen, ob du genannt wirst.",
+      "description": "Notra ist ein modernes GEO-Tool, das ChatGPT, Claude und Gemini die Fragen deiner Käufer stellt. Sieh, ob du in den Antworten vorkommst, wer stattdessen genannt wird und wie du das ändern kannst.",
       "title": "Sieh, was KI über dich sagt",
       "reading": "{host} wird gelesen. Das dauert etwa 20 Sekunden.",
       "readFailed": "{host} konnte nicht gelesen werden. Prüfe die Adresse oder gib unten einfach deinen Markennamen ein."
@@ -1076,13 +1077,19 @@
     "pricing": {
       "freeTrial": "Kostenlose Testphase",
       "startFreeTrial": "Kostenlos testen",
-      "getStarted": "Loslegen",
+      "selectPlan": "Tarif {plan} auswählen",
       "title": "Wähle deinen Tarif",
       "description": "Nutze Feedback kostenlos oder upgrade für KI-Inhalte und Sichtbarkeits-Tracking.",
       "continueFree": "Mit kostenlosem Feedback fortfahren",
       "renews": "{interval, select, year {Dein Tarif verlängert sich jedes Jahr automatisch, bis du kündigst.} other {Dein Tarif verlängert sich jeden Monat automatisch, bis du kündigst.}}"
     },
     "workspace": {
+      "slugStatus": {
+        "checking": "Slug-Verfügbarkeit wird geprüft",
+        "available": "Slug ist verfügbar",
+        "unavailable": "Slug ist bereits vergeben",
+        "error": "Slug-Verfügbarkeit konnte nicht geprüft werden"
+      },
       "validation": {
         "checkField": "Bitte prüfe dieses Feld",
         "websiteInvalid": "Bitte gib eine gültige öffentliche Website-URL ein (z. B. https://example.com)",
@@ -2297,25 +2304,7 @@
       "exactExcerpt": "Exakter Auszug: "
     },
     "brandSentimentCard": {
-      "scoreHint": "Von KI bewertete Tonalität gegenüber deiner Marke, von 0 bis 100. Positive Erwähnungen zählen 100, neutrale 50 und negative 0. Nur englische Single-Turn-Antworten. Unbekannte Labels und Nicht-Erwähnungen werden ausgeschlossen. Das ist ein beschreibender Score, keine Konfidenz und kein Prozentwert.",
-      "loadingThemes": "Themen werden geladen…",
-      "noThemes": "Keine Themen gefunden",
-      "runAnalysis": "Starte eine Analyse, um Themen zu finden",
-      "polarityShare": {
-        "positive": "{share} positiv",
-        "neutral": "{share} neutral",
-        "negative": "{share} negativ"
-      },
-      "cta": {
-        "positive": "Sieh dir an, was in gespeicherten Antworten funktioniert.",
-        "negative": "Erkenne, was schadet, bevor es sich verbreitet."
-      },
-      "analysisStatus": {
-        "stalePrevious": "Vorherige Themen werden angezeigt. Die Analyse muss aktualisiert werden.",
-        "failedPrevious": "Analyse fehlgeschlagen. Vorherige Themen werden angezeigt.",
-        "failedRetry": "Analyse fehlgeschlagen. Versuch es noch einmal.",
-        "unavailable": "Die Themenanalyse ist nicht verfügbar."
-      }
+      "scoreHint": "Von KI bewertete Tonalität gegenüber deiner Marke, von 0 bis 100. Positive Erwähnungen zählen 100, neutrale 50 und negative 0. Nur englische Single-Turn-Antworten. Unbekannte Labels und Nicht-Erwähnungen werden ausgeschlossen. Das ist ein beschreibender Score, keine Konfidenz und kein Prozentwert."
     },
     "citationsTable": {
       "showDetails": "{title}, Details anzeigen",
@@ -3217,9 +3206,9 @@
       "itemInProgress": "in Bearbeitung",
       "itemMissing": "fehlend",
       "itemAnswers": "Antworten",
-      "viewLabel": "Scan-Antworten",
+      "viewLabel": "Scan-Ergebnistyp",
       "missing": "Fehlend",
-      "filterByModel": "Scan-Antworten nach Modell filtern"
+      "filterByModel": "Scan-Ergebnisse nach Modell filtern"
     },
     "searchConsoleCard": {
       "description": "Prompt-Ideen aus den Suchanfragen, für die du in der Google Search Console rankst",
@@ -3257,30 +3246,40 @@
     },
     "sentimentResultsTable": {
       "columns": {
-        "claim": "Aussage",
+        "claim": "Thema",
         "evidence": "Belege"
       },
       "empty": "Noch keine Stimmungsthemen.",
-      "sheetDescription": "Exakte Zitate aus der analysierten Stichprobe gespeicherter Antworten.",
       "capturedAt": "{date} UTC"
     },
-    "sentimentScore": {
-      "comparisonLabel": "Score-Vergleich und Zeiträume",
-      "noComparable": "Kein vergleichbarer Score",
-      "deltaVsPrevious": "{delta} Pkt. ggü. Vorperiode",
-      "current": "Aktuell: {period}",
-      "previous": "Vorher: {period}",
-      "positionLabel": "Position des Stimmungs-Scores",
-      "outOf100": "{score} von 100",
-      "currentScoreLabel": "Aktueller Stimmungs-Score: {score} von 100"
+    "sentimentBreakdown": {
+      "eyebrow": "Markenstimmung",
+      "byEngine": "Nach Engine",
+      "enginesCount": "{count, plural, one {# Engine} other {# Engines}}",
+      "loading": {
+        "title": "Stimmung wird geladen"
+      },
+      "empty": {
+        "title": "Noch keine Stimmung",
+        "scanningTitle": "Antworten werden gescannt"
+      },
+      "error": {
+        "title": "Stimmung konnte nicht geladen werden",
+        "body": "Beim Laden des Werts ist etwas schiefgelaufen.",
+        "retry": "Erneut versuchen"
+      },
+      "noRatedAnswers": "Keine bewerteten Antworten",
+      "deltaLabel": "Stimmungswert",
+      "deltaHint": "ggü. Vorperiode",
+      "band": {
+        "strong": "Sehr positiv",
+        "positive": "Überwiegend positiv",
+        "mixed": "Gemischt",
+        "negative": "Überwiegend negativ"
+      }
     },
     "sentimentSkeleton": {
       "loading": "Stimmung wird geladen"
-    },
-    "sentimentSummary": {
-      "label": "Stimmungsübersicht",
-      "loadError": "Stimmungsübersicht konnte nicht geladen werden.",
-      "retry": "Übersicht erneut laden"
     },
     "sentimentThemesEmpty": {
       "retryAnalysis": "Analyse wiederholen",
@@ -3304,18 +3303,14 @@
         "couldNotFind": "Themen konnten nicht gefunden werden. Versuch es noch einmal.",
         "notConfigured": "Die Themenanalyse ist für dieses Projekt nicht eingerichtet."
       },
+      "analysisStatus": {
+        "stalePrevious": "Frühere Themen werden angezeigt. Die Analyse muss aktualisiert werden.",
+        "failedPrevious": "Analyse fehlgeschlagen. Frühere Themen werden angezeigt.",
+        "failedRetry": "Analyse fehlgeschlagen. Versuche es erneut.",
+        "unavailable": "Themenanalyse ist nicht verfügbar."
+      },
       "status": {
         "loading": "Analyse wird geladen…"
-      }
-    },
-    "sentimentTrendCard": {
-      "label": "Stimmungsverlauf",
-      "loadError": "Stimmung konnte nicht geladen werden.",
-      "retry": "Stimmung erneut laden",
-      "chart": {
-        "score": "Score",
-        "previous": "Vorperiode",
-        "estimate": "Geschätzter Score"
       }
     },
     "shareOfVoiceBrandTag": {
@@ -6210,7 +6205,9 @@
     "activityDescription": "Deine Inhaltserstellung im Jahresverlauf",
     "emptyAction": "Inhalte ansehen",
     "emptyDescription": "Du hast heute noch keine neuen Beiträge. Erstelle jetzt einen oder sieh dir deine Entwürfe auf der Inhaltsseite an.",
-    "emptyTitle": "Heute noch keine Inhalte erstellt"
+    "emptyTitle": "Heute noch keine Inhalte erstellt",
+    "upgradeTitle": "Mit Studio Inhalte erstellen",
+    "upgradeDescription": "Studio ist in den kostenpflichtigen Plänen enthalten. Upgrade, um Inhalte zu erstellen und KI-Tools zu nutzen."
   },
   "ai": {
     "toolBlock": {
