@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/prompts-table.tsx
+  s_7b039f4d3eff6f::t_48eb8fd8445c3d 50,220,312-325,430
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dc68a702d5e300c2a9b83b2f4617b3205174c540",
+  "prompts": {},
+  "sessions": {
+    "s_7b039f4d3eff6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e961a23f-f14c-4ba9-b844-9f37ef414231",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
