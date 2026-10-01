@@ -2580,6 +2580,9 @@
       }
     },
     "engineFamilySheet": {
+      "missedTitle": "{count, plural, one {# prompt misses you} other {# prompts miss you}}",
+      "foundTitle": "{count, plural, one {# prompt shows you} other {# prompts show you}}",
+      "trend": "Visibility over time",
       "descriptionModels": "How visible your brand is in each model",
       "descriptionEngine": "How visible your brand is in this engine",
       "lastChecked": "Last checked {time}",
@@ -2589,10 +2592,6 @@
       "seriesLabel": "Brand visibility · {mode}",
       "answerMode": "Answer mode",
       "brandsHint": "How often each brand shows up in this engine's answers to your prompts",
-      "result": {
-        "miss": "Miss"
-      },
-      "promptsCount": "Prompts ({count, number})",
       "resultHeader": "Result",
       "emptyPrompts": "No prompts scanned yet"
     },
@@ -2616,27 +2615,6 @@
       "empty": "Run a scan to see engine mention rates",
       "emptySeed": "Mention rate by engine",
       "noMatches": "No engines match this filter"
-    },
-    "familyImproveCard": {
-      "closeGaps": "Close these gaps",
-      "insights": {
-        "searchAhead": {
-          "title": "Search finds you. Memory doesn't.",
-          "body": "When {family} looks at the web it mentions you {search}. Without search it's {memory}. Pages that answer the {count, plural, one {# prompt} other {# prompts}} it missed help search keep citing you."
-        },
-        "memoryAhead": {
-          "title": "Remembered, not found.",
-          "body": "{family} already names you without searching ({memory}), but live search only mentions you {search}. Pages that match the {count, plural, one {# prompt} other {# prompts}} it missed close that gap."
-        },
-        "closing": {
-          "title": "{count, plural, one {# prompt still misses you} other {# prompts still miss you}}",
-          "body": "{family} already mentions you often. Closing the remaining misses is the fastest way to raise the rate."
-        },
-        "bothWeak": {
-          "title": "{count, plural, one {# prompt never mentions you} other {# prompts never mention you}}",
-          "body": "Neither search nor memory is recommending you on these questions. Write the pages that answer them."
-        }
-      }
     },
     "gapDetailSheet": {
       "coverage": "Mentioned by {visible} of {total} engines",
@@ -4815,7 +4793,7 @@
       "engagementRate": "Engagement rate",
       "engagementHint": "{interactions} interactions / {impressions} impressions",
       "followersHint": "across {count, plural, one {# connected account} other {# connected accounts}}",
-      "impressionsHint": "posts, {range}",
+      "impressionsHint": "across all posts, {range}",
       "interactionsHint": "{posts} posts, {range}"
     },
     "ranges": {
@@ -6521,6 +6499,9 @@
     "nextSlide": "Next slide",
     "scrollToEnd": "Scroll to end",
     "scrollToStart": "Scroll to start",
+    "conversationTurns": "Conversation turns",
+    "previousTurn": "Previous turn",
+    "nextTurn": "Next turn",
     "commandPaletteDescription": "Search for a command to run…",
     "chooseOption": "Choose an option",
     "catalog": "Catalog",
@@ -6545,6 +6526,132 @@
       "hue": "Hue",
       "opacity": "Opacity",
       "eyeDropper": "Pick a color from the screen"
+    }
+  },
+  "demo": {
+    "start": {
+      "title": "Opening the demo…",
+      "description": "Just a moment.",
+      "errorTitle": "The demo workspace couldn't be created",
+      "errorDescription": "Please try again in a moment.",
+      "retry": "Try again"
+    },
+    "banner": {
+      "title": "Explore the Notra demo.",
+      "titleNamed": "Welcome to the Notra demo, {name}.",
+      "customize": "Customize",
+      "api": "Try the API",
+      "reset": "Reset",
+      "signup": "Create account",
+      "resetTitle": "Reset your demo workspace?",
+      "resetDescription": "Everything you changed is thrown away and the sample data is restored. Your demo ID, API key and customization stay the same.",
+      "cancel": "Cancel",
+      "resetConfirm": "Reset workspace",
+      "resetting": "Resetting…",
+      "resetFailed": "The workspace couldn't be reset. Please try again."
+    },
+    "playground": {
+      "title": "API playground",
+      "description": "Send real requests to the demo API and watch them change this workspace.",
+      "tabs": {
+        "console": "Console",
+        "requests": "Requests",
+        "missions": "Missions"
+      },
+      "toastStatus": "{status}",
+      "toastChanged": "{status} · {label}",
+      "view": "View",
+      "openFeed": "Details",
+      "demoId": "Demo ID {id}",
+      "idCopied": "Demo ID copied"
+    },
+    "console": {
+      "keyLabel": "Your demo API key",
+      "copy": "Copy",
+      "keyCopied": "API key copied",
+      "keyHint": "Works with curl, the Notra CLI and MCP against {url}. It expires with your workspace.",
+      "noKey": "No API key is available for this workspace.",
+      "preset": "Example",
+      "method": "Method",
+      "path": "Path",
+      "body": "Request body (JSON)",
+      "send": "Send request",
+      "sending": "Sending…",
+      "copyCurl": "Copy as curl",
+      "curlCopied": "curl command copied",
+      "seeFeed": "The request also shows up under Requests, and the dashboard updates live.",
+      "presets": {
+        "listPosts": "List recent posts",
+        "createPost": "Create a draft post",
+        "createPrompt": "Track a new GEO prompt",
+        "startScan": "Start a GEO scan",
+        "visibility": "Get AI visibility overview",
+        "traffic": "Get AI traffic overview",
+        "listSchedules": "List schedules",
+        "createSkill": "Create a skill"
+      }
+    },
+    "feed": {
+      "loading": "Loading…",
+      "emptyTitle": "No requests yet",
+      "emptyDescription": "Send a request from the console, use curl, or click around the dashboard. Everything shows up here.",
+      "sources": {
+        "api": "API",
+        "console": "Console",
+        "ui": "UI",
+        "webhook": "Webhook"
+      },
+      "sameViaApi": "Do the same via the API",
+      "copyCurl": "Copy curl",
+      "curlCopied": "curl command copied",
+      "request": "Request",
+      "response": "Response"
+    },
+    "missions": {
+      "progress": "{done} of {total} done",
+      "complete": "Done",
+      "open": "Not done yet",
+      "scan": {
+        "title": "Run a GEO scan",
+        "description": "Click Run scan on the GEO overview and watch new results come in."
+      },
+      "apiPrompt": {
+        "title": "Add a prompt through the API",
+        "description": "Send \"Track a new GEO prompt\" from the console. It appears under GEO › Prompts right away."
+      },
+      "agentPost": {
+        "title": "Write a post, then fetch it via API",
+        "description": "Ask the agent to write a post, then run \"List recent posts\"."
+      },
+      "schedule": {
+        "title": "Automate content",
+        "description": "Create a schedule under Automation or use Run now on one."
+      },
+      "externalClient": {
+        "title": "Call the API from your machine",
+        "description": "Copy a request as curl and run it in your terminal, or connect the CLI or MCP with your demo key."
+      },
+      "finishedTitle": "You've seen it all",
+      "finishedDescription": "Set Notra up for your own brand in a few minutes.",
+      "signup": "Start free",
+      "openConsole": "Open the console"
+    },
+    "customize": {
+      "title": "Customize the Notra demo",
+      "description": "Tell us who you are and the demo is rebuilt around your company: brand, AI visibility, content and team.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "companyName": "Company name",
+      "note": "Takes a few seconds. What you entered only lives in this demo workspace.",
+      "cancel": "Cancel",
+      "submit": "Customize demo",
+      "saving": "Rebuilding…",
+      "failed": "The demo couldn't be customized. Please try again."
+    },
+    "apiCallout": {
+      "title": "Try the API with your demo key",
+      "description": "Send requests from the playground and watch them change this workspace live. curl, the CLI and MCP work too.",
+      "open": "Open API playground"
     }
   }
 }

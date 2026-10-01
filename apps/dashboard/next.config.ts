@@ -1,8 +1,14 @@
 import path from "node:path";
 
+import { isDemoMode } from "@notra/utils/demo-mode";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withWorkflow } from "workflow/next";
+
+import { LAST_VISITED_ORGANIZATION_COOKIE } from "./src/constants/cookies";
+import { DEMO_FRAME_ANCESTOR } from "./src/constants/demo";
+
+const demoMode = isDemoMode();
 
 const nextConfig: NextConfig = {
   // Only recognize page.dev.tsx/layout.dev.tsx in next dev; design-system
@@ -118,6 +124,18 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/api-keys",
+        has: [
+          {
+            type: "cookie",
+            key: LAST_VISITED_ORGANIZATION_COOKIE,
+            value: "(?<slug>[a-z0-9-]+)",
+          },
+        ],
+        destination: "/:slug/api-keys",
+        permanent: false,
+      },
+      {
         source: "/:slug/settings",
         destination: "/:slug?settings=general",
         permanent: false,
@@ -148,9 +166,17 @@ const nextConfig: NextConfig = {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
+          ...(demoMode
+            ? []
+            : [
+                {
+                  key: "X-Frame-Options",
+                  value: "DENY",
+                },
+              ]),
           {
-            key: "X-Frame-Options",
-            value: "DENY",
+            key: "Content-Security-Policy",
+            value: `frame-ancestors ${demoMode ? DEMO_FRAME_ANCESTOR : "'none'"}`,
           },
           {
             key: "Referrer-Policy",
