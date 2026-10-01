@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  File02Icon,
   Refresh03Icon,
   SearchIcon,
   ViewOffSlashIcon,
@@ -44,6 +45,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
@@ -97,8 +99,7 @@ import {
   isGeoGapsTab,
   maxGapOpportunity,
   primarySearchQuery,
-  searchGapActionSource,
-  searchGapDismissesConsoleFromAi,
+  searchGapAiDraft,
   searchGapDemandRank,
   unifySearchGaps,
   uniqueGapEngineFamilies,
@@ -178,8 +179,8 @@ function WriteCell({
   rescanDisabled = false,
   onIgnore,
   isIgnoring = false,
-  ignoreLabel,
   compact = false,
+  iconOnly = false,
 }: GeoGapsWriteCellProps) {
   const t = useTranslations("geo.gapsTable");
   const tGeoShared2 = useTranslations("geo.shared");
@@ -190,7 +191,23 @@ function WriteCell({
     writing: tGeoShared2("writing"),
     open: t("writeActions.open"),
   };
-  const ignoreText = ignoreLabel ?? t("ignore");
+  const handleWrite = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    trackEvent(POSTHOG_EVENTS.GEO_GAP_WRITE_CLICKED, {
+      source_kind: sourceKind,
+      action,
+      has_existing_post: Boolean(postId),
+      opportunity_bucket: opportunityBucket,
+    });
+    if (
+      (action === "open" || action === "review" || action === "writing") &&
+      postId
+    ) {
+      onOpenPost(postId);
+      return;
+    }
+    onWrite();
+  };
   return (
     <span className="inline-flex items-center justify-end gap-1">
       {onIgnore && compact ? (
@@ -198,7 +215,7 @@ function WriteCell({
           <TooltipTrigger
             render={
               <Button
-                aria-label={ignoreText}
+                aria-label={t("ignore")}
                 className="text-muted-foreground"
                 disabled={isIgnoring}
                 onClick={(event) => {
@@ -216,7 +233,7 @@ function WriteCell({
               <HugeiconsIcon icon={ViewOffSlashIcon} size={15} />
             )}
           </TooltipTrigger>
-          <TooltipContent>{ignoreText}</TooltipContent>
+          <TooltipContent>{t("ignore")}</TooltipContent>
         </Tooltip>
       ) : null}
       {onIgnore && !compact ? (
@@ -230,7 +247,7 @@ function WriteCell({
           variant="ghost"
         >
           {isIgnoring ? <StatusSpinner /> : null}
-          {ignoreText}
+          {t("ignore")}
         </Button>
       ) : null}
       {onRescan ? (
@@ -256,31 +273,31 @@ function WriteCell({
           </TooltipContent>
         </Tooltip>
       ) : null}
-      <Button
-        onClick={(event) => {
-          event.stopPropagation();
-          trackEvent(POSTHOG_EVENTS.GEO_GAP_WRITE_CLICKED, {
-            source_kind: sourceKind,
-            action,
-            has_existing_post: Boolean(postId),
-            opportunity_bucket: opportunityBucket,
-          });
-          if (
-            (action === "open" ||
-              action === "review" ||
-              action === "writing") &&
-            postId
-          ) {
-            onOpenPost(postId);
-            return;
-          }
-          onWrite();
-        }}
-        size="sm"
-        variant={action === "write" ? "default" : "outline"}
-      >
-        {writeActionLabels[action]}
-      </Button>
+      {iconOnly ? (
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button
+                aria-label={writeActionLabels[action]}
+                onClick={handleWrite}
+                size="icon-sm"
+                variant="outline"
+              />
+            }
+          >
+            <HugeiconsIcon icon={File02Icon} size={15} />
+          </TooltipTrigger>
+          <TooltipContent>{writeActionLabels[action]}</TooltipContent>
+        </Tooltip>
+      ) : (
+        <Button
+          onClick={handleWrite}
+          size="sm"
+          variant={action === "write" ? "default" : "outline"}
+        >
+          {writeActionLabels[action]}
+        </Button>
+      )}
     </span>
   );
 }
@@ -769,8 +786,30 @@ export function GeoGapsTable({
         setDetailSearchId(null);
       }
     };
-    if (consoleRow && searchGapActionSource(gap) === "console") {
-      return (
+    const renderAiWriteCell = (aiRow: GeoAiSearchGapRow, iconOnly = false) => (
+      <WriteCell
+        action={gapWriteAction(aiRow.brief)}
+        iconOnly={iconOnly}
+        onOpenPost={(postId) => {
+          closeSheet();
+          onOpenPost(postId);
+        }}
+        onWrite={() => {
+          closeSheet();
+          onWriteAiSearch(aiRow);
+        }}
+        opportunityBucket={gapOpportunityLevel(
+          aiRow.opportunity,
+          maxAiSearchOpportunity
+        )}
+        postId={aiRow.brief?.postId}
+        sourceKind="ai_search"
+      />
+    );
+    if (consoleRow) {
+      // Console actions stay available; an AI-only draft is offered alongside.
+      const aiDraft = searchGapAiDraft(gap);
+      const consoleActions = (
         <SearchWriteCell
           isDismissing={dismissingSearchId === consoleRow.id}
           onDismiss={() => {
@@ -788,40 +827,17 @@ export function GeoGapsTable({
           row={consoleRow}
         />
       );
+      if (!aiDraft) {
+        return consoleActions;
+      }
+      return (
+        <span className="inline-flex items-center justify-end gap-1">
+          {renderAiWriteCell(aiDraft, !inSheet)}
+          {consoleActions}
+        </span>
+      );
     }
-    if (!ai) {
-      return null;
-    }
-    const dismissConsole =
-      consoleRow && searchGapDismissesConsoleFromAi(gap)
-        ? () => {
-            closeSheet();
-            onDismissSearch(consoleRow);
-          }
-        : undefined;
-    return (
-      <WriteCell
-        action={gapWriteAction(ai.brief)}
-        compact={!inSheet}
-        ignoreLabel={tCommon("labels.dismiss")}
-        isIgnoring={consoleRow ? dismissingSearchId === consoleRow.id : false}
-        onIgnore={dismissConsole}
-        onOpenPost={(postId) => {
-          closeSheet();
-          onOpenPost(postId);
-        }}
-        onWrite={() => {
-          closeSheet();
-          onWriteAiSearch(ai);
-        }}
-        opportunityBucket={gapOpportunityLevel(
-          ai.opportunity,
-          maxAiSearchOpportunity
-        )}
-        postId={ai.brief?.postId}
-        sourceKind="ai_search"
-      />
-    );
+    return ai ? renderAiWriteCell(ai) : null;
   };
 
   const renderPromptActions = (row: GeoPromptGapRow, inSheet = false) => {

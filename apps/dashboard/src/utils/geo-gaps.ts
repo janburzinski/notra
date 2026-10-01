@@ -71,23 +71,14 @@ export function searchGapDemandRank(gap: GeoUnifiedSearchGap): number {
   return Math.log1p(impressions) + 2 * Math.log1p(searches);
 }
 
-export function searchGapActionSource(
+/** AI draft to surface next to Console actions when only the AI match has a brief. */
+export function searchGapAiDraft(
   gap: GeoUnifiedSearchGap
-): "console" | "ai" {
-  return gap.kind === "console" && (gap.row.brief || !gap.ai?.brief)
-    ? "console"
-    : "ai";
-}
-
-/** A merged row showing the AI brief still lets users dismiss the Console suggestion. */
-export function searchGapDismissesConsoleFromAi(
-  gap: GeoUnifiedSearchGap
-): boolean {
-  return (
-    gap.kind === "console" &&
-    searchGapActionSource(gap) === "ai" &&
-    gap.row.recommendation.action === "ignore"
-  );
+): GeoAiSearchGapRow | null {
+  if (gap.kind !== "console" || gap.row.brief || !gap.ai?.brief) {
+    return null;
+  }
+  return gap.ai;
 }
 
 export function withoutPromptGap(
