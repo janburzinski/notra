@@ -1,0 +1,25 @@
+packages/email/src/emails/daily-summary.tsx
+  s_ed683f50a09ec7::t_3599e7e384e9c5 469
+apps/dashboard/src/utils/daily-summary.test.ts
+  s_ed683f50a09ec7::t_3599e7e384e9c5 7,58,62-67,139-158
+apps/dashboard/src/lib/email/daily-summary.ts
+  s_ed683f50a09ec7::t_3599e7e384e9c5 44,250-257,259-276
+apps/dashboard/src/utils/daily-summary.ts
+  s_ed683f50a09ec7::t_3599e7e384e9c5 92-94,164-176,184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b1e0a4afaec0bd075b45b2c67a1c93d06b99e174",
+  "prompts": {},
+  "sessions": {
+    "s_ed683f50a09ec7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "47f0141d-2a81-4854-b399-54b95e1a88ec",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
