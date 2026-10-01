@@ -7,6 +7,7 @@ import {
   geoPromptSuggestions,
   geoScans,
 } from "@notra/db/schema";
+import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
@@ -24,16 +25,40 @@ beforeAll(initializeDatabase, 30_000);
 afterAll(() => database.postgres.close());
 beforeEach(resetDatabase);
 
-test("content gaps reports an unprepared project without a snapshot", async () => {
-  const scope = await seedProject("new");
-
-  expect(await Effect.runPromise(loadGeoContentGaps(scope))).toEqual({
-    promptGaps: [],
-    searchGaps: [],
-    aiSearchGaps: [],
-    hasScanData: false,
-    snapshotReady: false,
+test("the first read builds and saves a missing snapshot", async () => {
+  const scope = await seedProject("existing");
+  await testDb.insert(geoScans).values({ id: "scan", ...scope });
+  await testDb.insert(geoMentionChecks).values({
+    id: "check",
+    ...scope,
+    scanId: "scan",
+    promptId: "prompt",
+    prompt: "Which content tools should I use?",
+    engine: "openai",
+    answer: "Answer",
+    mentioned: false,
+    ownedSourceCited: false,
+    grounding: { queries: [], sources: [] },
+    capturedAt: new Date(),
   });
+
+  const first = await Effect.runPromise(loadGeoContentGaps(scope));
+  expect(first).toMatchObject({ hasScanData: true, snapshotReady: true });
+  const saved = await testDb
+    .select()
+    .from(geoContentGapSnapshots)
+    .where(eq(geoContentGapSnapshots.projectId, scope.projectId));
+  expect(saved).toHaveLength(1);
+
+  // Later reads return the saved snapshot instead of recomputing it.
+  await testDb
+    .update(geoContentGapSnapshots)
+    .set({ snapshot: { ...first, promptGaps: [] } })
+    .where(eq(geoContentGapSnapshots.projectId, scope.projectId));
+  expect(
+    (await Effect.runPromise(loadGeoContentGaps(scope))).promptGaps
+  ).toEqual([]);
+  expect(first.promptGaps.length).toBeGreaterThan(0);
 });
 
 test("content gaps reads the saved project snapshot", async () => {

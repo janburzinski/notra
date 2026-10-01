@@ -829,15 +829,29 @@ export const loadGeoContentGaps = Effect.fn("geo.gaps.load")(function* (
       .where(eq(geoContentGapSnapshots.projectId, scope.projectId))
       .limit(1)
   );
-  return stored?.snapshot
-    ? { ...(stored.snapshot as GeoContentGapsResponse), snapshotReady: true }
-    : {
-        promptGaps: [],
-        searchGaps: [],
-        aiSearchGaps: [],
-        hasScanData: false,
-        snapshotReady: false,
-      };
+  if (stored?.snapshot) {
+    return {
+      ...(stored.snapshot as GeoContentGapsResponse),
+      snapshotReady: true,
+    };
+  }
+  // Projects without a snapshot (new, or from before snapshots existed) build it
+  // once on first read; later reads only load it. A failed build shows the
+  // preparing state and the hourly cron retries.
+  return yield* refreshGeoContentGaps(scope).pipe(
+    Effect.catchCause((cause) =>
+      Effect.sync((): GeoContentGapsResponse => {
+        console.error("[GEO] Could not build content gaps snapshot:", cause);
+        return {
+          promptGaps: [],
+          searchGaps: [],
+          aiSearchGaps: [],
+          hasScanData: false,
+          snapshotReady: false,
+        };
+      })
+    )
+  );
 });
 
 export const refreshGeoContentGaps = Effect.fn("geo.gaps.refresh")(function* (
