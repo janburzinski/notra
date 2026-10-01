@@ -1,0 +1,59 @@
+bun.lock
+  ai_agent 10,46,87,178,250,319,384,414,450,502,550,568,660,1089,1091,1093,1095,1097,1099,1101,1103,3541,4587
+packages/db/package.json
+  s_993f20cebd4688::t_f971f65c957984 31
+apps/dashboard/package.json
+  s_993f20cebd4688::t_f971f65c957984 88
+packages/geo-core/package.json
+  s_993f20cebd4688::t_f971f65c957984 32
+package.json
+  s_993f20cebd4688::t_f971f65c957984 33
+packages/ai/package.json
+  s_993f20cebd4688::t_f971f65c957984 69
+packages/webhooks/src/runtime/crypto.ts
+  s_993f20cebd4688::t_89b744af689d4e 6
+bunfig.toml
+  s_993f20cebd4688::t_f971f65c957984 64-73
+apps/api/package.json
+  s_993f20cebd4688::t_f971f65c957984 34
+packages/webhooks/e2e/worker.local.ts
+  s_993f20cebd4688::t_89b744af689d4e 15
+apps/agent/package.json
+  s_993f20cebd4688::t_f971f65c957984 31
+packages/analytics/package.json
+  s_993f20cebd4688::t_f971f65c957984 20
+packages/webhooks/src/runtime/worker.ts
+  s_993f20cebd4688::t_89b744af689d4e 12,15
+packages/webhooks/src/runtime/postgres.ts
+  s_993f20cebd4688::t_89b744af689d4e 10
+apps/onboarding-agent/package.json
+  s_993f20cebd4688::t_f971f65c957984 24
+apps/web/package.json
+  s_993f20cebd4688::t_f971f65c957984 47
+.agents/skills/effect/references/CONFIG.md
+  s_993f20cebd4688::t_89b744af689d4e 16-18,31
+packages/schemas/package.json
+  s_993f20cebd4688::t_f971f65c957984 24
+packages/tools/package.json
+  s_993f20cebd4688::t_f971f65c957984 18
+packages/webhooks/package.json
+  s_993f20cebd4688::t_f971f65c957984 27
+apps/api/src/lib/internal-dashboard.ts
+  s_993f20cebd4688::t_89b744af689d4e 103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b529a3892f26bbdf7c487394a3778ae6ff88df86",
+  "prompts": {},
+  "sessions": {
+    "s_993f20cebd4688": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "843637b1-60a9-4ca3-83ed-56dadc27b62d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
