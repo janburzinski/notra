@@ -93,15 +93,10 @@ Helpful provider docs:
 bun run db:migrate
 ```
 
-After applying migration `0106_geo_content_gaps_snapshot` to a database with
-existing GEO scans, populate its Content Gaps snapshots once:
-
-```bash
-bunx dotenv -- bun apps/dashboard/scripts/backfill-geo-content-gaps.ts
-```
-
-The dashboard's hourly `/api/cron/geo-content-gaps` job refreshes up to 25
-missing or day-old snapshots per run. Keep `CRON_SECRET` configured in deployed
+Content Gaps reads a saved snapshot per project. Scans, Search Console syncs,
+and gap mutations refresh it, and the dashboard's hourly
+`/api/cron/geo-content-gaps` job fills up to 25 missing or day-old snapshots per
+run, missing ones first. Keep `CRON_SECRET` configured in deployed
 environments so rolling 30-day gaps continue to expire without page-load work.
 
 6. Start development:
