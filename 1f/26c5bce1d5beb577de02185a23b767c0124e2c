@@ -1,0 +1,19 @@
+CONTRIBUTING.md
+  s_2c5b3ad6297ff7::t_0f3adc62301573 96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1f26c5bce1d5beb577de02185a23b767c0124e2c",
+  "prompts": {},
+  "sessions": {
+    "s_2c5b3ad6297ff7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e771-370d-7cb1-91f5-637f533cedf1",
+        "model": "gpt-6-sol"
+      },
+      "human_author": null
+    }
+  }
+}
