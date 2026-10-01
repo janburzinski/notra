@@ -2,6 +2,7 @@
 
 import {
   File02Icon,
+  MoreHorizontalIcon,
   Refresh03Icon,
   SearchIcon,
   ViewOffSlashIcon,
@@ -25,6 +26,12 @@ import { engineFamilyLabel } from "@notra/geo-core/utils/geo-engine-family";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { LogoStack } from "@notra/ui/components/geo/logo-stack";
 import { Badge } from "@notra/ui/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@notra/ui/components/ui/dropdown-menu";
 import { Input } from "@notra/ui/components/ui/input";
 import {
   PermissionOption,
@@ -45,7 +52,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import type { MouseEvent } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
@@ -168,6 +175,70 @@ function useFillHeight(fallback: number) {
   return [ref, height] as const;
 }
 
+function runGapWriteAction({
+  action,
+  postId,
+  sourceKind,
+  opportunityBucket,
+  onOpenPost,
+  onWrite,
+}: Pick<
+  GeoGapsWriteCellProps,
+  | "action"
+  | "postId"
+  | "sourceKind"
+  | "opportunityBucket"
+  | "onOpenPost"
+  | "onWrite"
+>) {
+  trackEvent(POSTHOG_EVENTS.GEO_GAP_WRITE_CLICKED, {
+    source_kind: sourceKind,
+    action,
+    has_existing_post: Boolean(postId),
+    opportunity_bucket: opportunityBucket,
+  });
+  if (
+    (action === "open" || action === "review" || action === "writing") &&
+    postId
+  ) {
+    onOpenPost(postId);
+    return;
+  }
+  onWrite();
+}
+
+function MoreActionsMenu({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            aria-label={label}
+            onClick={(event) => event.stopPropagation()}
+            size="icon-sm"
+            variant="ghost"
+          >
+            <HugeiconsIcon icon={MoreHorizontalIcon} size={16} />
+          </Button>
+        }
+      />
+      <DropdownMenuContent
+        align="end"
+        className="w-48"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 function WriteCell({
   action,
   postId,
@@ -180,7 +251,6 @@ function WriteCell({
   onIgnore,
   isIgnoring = false,
   compact = false,
-  iconOnly = false,
 }: GeoGapsWriteCellProps) {
   const t = useTranslations("geo.gapsTable");
   const tGeoShared2 = useTranslations("geo.shared");
@@ -193,20 +263,14 @@ function WriteCell({
   };
   const handleWrite = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    trackEvent(POSTHOG_EVENTS.GEO_GAP_WRITE_CLICKED, {
-      source_kind: sourceKind,
+    runGapWriteAction({
       action,
-      has_existing_post: Boolean(postId),
-      opportunity_bucket: opportunityBucket,
+      postId,
+      sourceKind,
+      opportunityBucket,
+      onOpenPost,
+      onWrite,
     });
-    if (
-      (action === "open" || action === "review" || action === "writing") &&
-      postId
-    ) {
-      onOpenPost(postId);
-      return;
-    }
-    onWrite();
   };
   return (
     <span className="inline-flex items-center justify-end gap-1">
@@ -273,31 +337,13 @@ function WriteCell({
           </TooltipContent>
         </Tooltip>
       ) : null}
-      {iconOnly ? (
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                aria-label={writeActionLabels[action]}
-                onClick={handleWrite}
-                size="icon-sm"
-                variant="outline"
-              />
-            }
-          >
-            <HugeiconsIcon icon={File02Icon} size={15} />
-          </TooltipTrigger>
-          <TooltipContent>{writeActionLabels[action]}</TooltipContent>
-        </Tooltip>
-      ) : (
-        <Button
-          onClick={handleWrite}
-          size="sm"
-          variant={action === "write" ? "default" : "outline"}
-        >
-          {writeActionLabels[action]}
-        </Button>
-      )}
+      <Button
+        onClick={handleWrite}
+        size="sm"
+        variant={action === "write" ? "default" : "outline"}
+      >
+        {writeActionLabels[action]}
+      </Button>
     </span>
   );
 }
@@ -308,6 +354,8 @@ function SearchWriteCell({
   onOpenPost,
   onWrite,
   onDismiss,
+  compact = false,
+  menuItems,
 }: GeoGapSearchWriteCellProps) {
   const t = useTranslations("geo.gapsTable");
   const tCommon = useTranslations("common");
@@ -327,6 +375,46 @@ function SearchWriteCell({
   }
   const { action, targets } = row.recommendation;
   const topTargetUrl = targets[0]?.url ?? undefined;
+  const moreLabel = t("moreActions", { query: row.prompt });
+  if (compact) {
+    // The table column only fits the primary action; the rest go in a menu.
+    const hasDismiss = action === "ignore";
+    return (
+      <span className="inline-flex items-center justify-end gap-1">
+        <Button
+          onClick={(event) => {
+            event.stopPropagation();
+            onWrite(
+              action === "create" || action === "ignore"
+                ? undefined
+                : topTargetUrl
+            );
+          }}
+          size="sm"
+          variant={action === "ignore" ? "outline" : "default"}
+        >
+          {action === "update"
+            ? tGeoShared("updatePage")
+            : t(`searchWrite.${action}`)}
+        </Button>
+        {hasDismiss || menuItems ? (
+          <MoreActionsMenu label={moreLabel}>
+            {menuItems}
+            {hasDismiss ? (
+              <DropdownMenuItem disabled={isDismissing} onClick={onDismiss}>
+                {isDismissing ? (
+                  <StatusSpinner />
+                ) : (
+                  <HugeiconsIcon icon={ViewOffSlashIcon} size={15} />
+                )}
+                {tCommon("labels.dismiss")}
+              </DropdownMenuItem>
+            ) : null}
+          </MoreActionsMenu>
+        ) : null}
+      </span>
+    );
+  }
   if (action === "ignore") {
     return (
       <span className="inline-flex items-center gap-1.5">
@@ -786,32 +874,43 @@ export function GeoGapsTable({
         setDetailSearchId(null);
       }
     };
-    const renderAiWriteCell = (aiRow: GeoAiSearchGapRow, iconOnly = false) => (
-      <WriteCell
-        action={gapWriteAction(aiRow.brief)}
-        iconOnly={iconOnly}
-        onOpenPost={(postId) => {
-          closeSheet();
-          onOpenPost(postId);
-        }}
-        onWrite={() => {
-          closeSheet();
-          onWriteAiSearch(aiRow);
-        }}
-        opportunityBucket={gapOpportunityLevel(
-          aiRow.opportunity,
-          maxAiSearchOpportunity
-        )}
-        postId={aiRow.brief?.postId}
-        sourceKind="ai_search"
-      />
+    const aiWriteProps = (aiRow: GeoAiSearchGapRow) => ({
+      action: gapWriteAction(aiRow.brief),
+      onOpenPost: (postId: string) => {
+        closeSheet();
+        onOpenPost(postId);
+      },
+      onWrite: () => {
+        closeSheet();
+        onWriteAiSearch(aiRow);
+      },
+      opportunityBucket: gapOpportunityLevel(
+        aiRow.opportunity,
+        maxAiSearchOpportunity
+      ),
+      postId: aiRow.brief?.postId,
+      sourceKind: "ai_search" as const,
+    });
+    const renderAiWriteCell = (aiRow: GeoAiSearchGapRow) => (
+      <WriteCell {...aiWriteProps(aiRow)} />
     );
     if (consoleRow) {
       // Console actions stay available; an AI-only draft is offered alongside.
       const aiDraft = searchGapAiDraft(gap);
       const consoleActions = (
         <SearchWriteCell
+          compact={!inSheet}
           isDismissing={dismissingSearchId === consoleRow.id}
+          menuItems={
+            aiDraft ? (
+              <DropdownMenuItem
+                onClick={() => runGapWriteAction(aiWriteProps(aiDraft))}
+              >
+                <HugeiconsIcon icon={File02Icon} size={15} />
+                {t("openAiDraft")}
+              </DropdownMenuItem>
+            ) : undefined
+          }
           onDismiss={() => {
             closeSheet();
             onDismissSearch(consoleRow);
@@ -827,12 +926,12 @@ export function GeoGapsTable({
           row={consoleRow}
         />
       );
-      if (!aiDraft) {
+      if (!aiDraft || !inSheet) {
         return consoleActions;
       }
       return (
         <span className="inline-flex items-center justify-end gap-1">
-          {renderAiWriteCell(aiDraft, !inSheet)}
+          {renderAiWriteCell(aiDraft)}
           {consoleActions}
         </span>
       );

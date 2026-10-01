@@ -2712,7 +2712,9 @@
         "searches": "KI-Suchen"
       },
       "aiSearched": "KI suchte: {queries}",
-      "aiSearchSubtitle": "{more, plural, =0 {Aus „{prompt}“} other {Aus „{prompt}“ und # weiteren}}"
+      "aiSearchSubtitle": "{more, plural, =0 {Aus „{prompt}“} other {Aus „{prompt}“ und # weiteren}}",
+      "moreActions": "Weitere Aktionen für {query}",
+      "openAiDraft": "KI-Suchentwurf öffnen"
     },
     "geoAnswerActions": {
       "copy": "Antwort kopieren",

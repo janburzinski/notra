@@ -23,8 +23,6 @@ export interface GeoGapsWriteCellProps {
   isIgnoring?: boolean;
   /** Render Ignore as an icon button so the table's action column stays narrow. */
   compact?: boolean;
-  /** Render the write/open action as an icon button with its label in a tooltip. */
-  iconOnly?: boolean;
 }
 
 export type GeoGapsTab = "prompt" | "search";
@@ -114,6 +112,10 @@ export interface GeoGapSearchWriteCellProps {
   onOpenPost: (postId: string) => void;
   onWrite: (existingPageUrl?: string) => void;
   onDismiss: () => void;
+  /** Table mode: show only the primary action and move the rest into a menu. */
+  compact?: boolean;
+  /** Extra menu entries for compact mode, such as the matched AI draft. */
+  menuItems?: ReactNode;
 }
 
 export interface GeoGapsEmptyProps {

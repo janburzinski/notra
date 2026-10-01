@@ -2712,7 +2712,9 @@
         "searches": "AI searches"
       },
       "aiSearched": "AI searched: {queries}",
-      "aiSearchSubtitle": "{more, plural, =0 {From \"{prompt}\"} other {From \"{prompt}\" and # more}}"
+      "aiSearchSubtitle": "{more, plural, =0 {From \"{prompt}\"} other {From \"{prompt}\" and # more}}",
+      "moreActions": "More actions for {query}",
+      "openAiDraft": "Open AI search draft"
     },
     "geoAnswerActions": {
       "copy": "Copy answer",
