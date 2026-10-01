@@ -93,7 +93,7 @@ Helpful provider docs:
 bun run db:migrate
 ```
 
-After applying migration `0104_geo_content_gaps_snapshot` to a database with
+After applying migration `0106_geo_content_gaps_snapshot` to a database with
 existing GEO scans, populate its Content Gaps snapshots once:
 
 ```bash

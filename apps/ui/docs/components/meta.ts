@@ -6,11 +6,13 @@ export default defineMeta({
   pages: [
     "button",
     "marketing-button",
-    "tooltip",
     "shimmer",
-    "search",
-    "browser-apps",
-    "terminal-apps",
+    "step-slider",
+    "tooltip",
+    "chat-minimap",
+    "ai-search",
+    "ai-chat",
+    "coding-agents",
   ],
   title: "Components",
 });

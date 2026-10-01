@@ -543,13 +543,6 @@ export const AI_TRAFFIC_DEFAULT_JOURNEYS_LIMIT = 25;
 
 export const OWN_BRAND_ROW_ID = "own-brand";
 
-export const COMPETITOR_TYPE_FILTER_VALUES = [
-  "all",
-  "direct",
-  "indirect",
-] as const;
-
-export const COMPETITORS_TABLE_HEIGHT = 420;
 export const COMPETITOR_PROMPTS_TABLE_HEIGHT = 288;
 export const COMPETITOR_PROMPTS_PAGE_TABLE_HEIGHT = 620;
 export const COMPETITORS_TABLE_ROW_HEIGHT = 52;
@@ -967,9 +960,9 @@ export const GEO_CHAT_SKIN_SURFACE: Record<GeoChatSkin, string> = {
   chatgpt: "bg-background",
   gemini: "bg-white dark:bg-[#1f1f1f]",
   perplexity: "bg-white dark:bg-[#111]",
-  opencode: "bg-[var(--opencode-tui-background,#fdfdfd)]",
-  "claude-code": "bg-[#1a1a1a]",
-  codex: "bg-[#1a1a1a]",
+  opencode: "bg-[var(--opencode-tui-background,#090909)]",
+  "claude-code": "bg-[#0f0f0f]",
+  codex: "bg-[#0f0f0f]",
 };
 
 export const GEO_TAB_BREADCRUMB_LABELS = {

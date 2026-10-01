@@ -1,4 +1,8 @@
+"use client";
+
 import { cn } from "cn";
+import { useState } from "react";
+import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
 
 import {
   InputGroup,
@@ -7,61 +11,134 @@ import {
 } from "@/components/ui/input-group";
 import { Kbd } from "@/components/ui/kbd";
 
-import { OPENCODE_DEFAULT_PLACEHOLDER } from "../constants/opencode";
+import {
+  OPENCODE_DEFAULT_AGENT,
+  OPENCODE_DEFAULT_EFFORT,
+  OPENCODE_DEFAULT_MODEL,
+  OPENCODE_DEFAULT_PLACEHOLDER,
+  OPENCODE_DEFAULT_PROVIDER,
+} from "../constants/opencode";
 import type { OpencodeComposerProps } from "../types/opencode";
+import { OpencodeProgress } from "./opencode-progress";
 
 const KBD_CLASS =
-  "text-opencode-fg h-auto min-w-0 rounded-none bg-transparent p-0 font-opencode text-[length:inherit] font-normal";
+  "text-opencode-fg font-opencode h-auto min-w-0 rounded-none bg-transparent p-0 text-[length:inherit] font-normal";
 
 export const OpencodeComposer = ({
-  agent = "Build",
+  agent = OPENCODE_DEFAULT_AGENT,
   "aria-label": ariaLabel = "Prompt",
+  busy = false,
   className,
   context,
-  effort = "low",
+  cwd,
+  defaultValue,
+  effort = OPENCODE_DEFAULT_EFFORT,
   inputClassName,
-  model = "GPT-5.6 Sol",
+  model = OPENCODE_DEFAULT_MODEL,
+  onChange,
+  onKeyDown,
+  onSend,
+  onStop,
   placeholder = OPENCODE_DEFAULT_PLACEHOLDER,
-  provider = "OpenAI",
+  provider = OPENCODE_DEFAULT_PROVIDER,
+  value,
   ...props
-}: OpencodeComposerProps) => (
-  <div
-    className={cn("font-opencode min-w-0", className)}
-    data-slot="opencode-composer"
-  >
-    <InputGroup className="border-opencode-purple bg-opencode-surface has-[[data-slot=input-group-control]:focus-visible]:border-opencode-purple dark:bg-opencode-surface h-auto items-stretch rounded-none border-0 border-s-2 px-[2ch] py-[1.0625rem] has-[[data-slot=input-group-control]:focus-visible]:ring-0 has-[>[data-align=block-end]]:[&>input]:pt-0">
-      <InputGroupInput
-        aria-label={ariaLabel}
-        className={cn(
-          "text-opencode-fg caret-opencode-fg placeholder:text-opencode-muted h-auto px-0 py-0 text-[0.8125rem] leading-[1.3] md:text-[0.8125rem]",
-          inputClassName
+}: OpencodeComposerProps) => {
+  const [draft, setDraft] = useState(String(defaultValue ?? ""));
+  const isControlled = value !== undefined;
+  const text = isControlled ? String(value) : draft;
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setDraft(event.target.value);
+    onChange?.(event);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape" && busy && onStop) {
+      event.preventDefault();
+      onStop();
+    }
+    onKeyDown?.(event);
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const message = text.trim();
+    if (!message || busy || !onSend) {
+      return;
+    }
+    onSend(message);
+    if (!isControlled) {
+      setDraft("");
+    }
+  };
+
+  return (
+    <form
+      className={cn("flex min-w-0 flex-col gap-[1lh]", className)}
+      data-slot="opencode-composer"
+      onSubmit={handleSubmit}
+    >
+      <InputGroup className="border-opencode-blue bg-opencode-panel dark:bg-opencode-panel has-[[data-slot=input-group-control]:focus-visible]:border-opencode-blue h-auto flex-col items-stretch gap-[0.5lh] rounded-none border-0 border-s-2 py-[0.5lh] ps-[calc(3ch-2px)] pe-[2ch] has-[[data-slot=input-group-control]:focus-visible]:ring-0 has-[>[data-align=block-end]]:[&>input]:pt-0">
+        <InputGroupInput
+          aria-label={ariaLabel}
+          className={cn(
+            "peer text-opencode-fg caret-opencode-fg placeholder:text-opencode-muted h-[1lh] px-0 py-0 text-[length:inherit] leading-[inherit] md:text-[length:inherit] [&:placeholder-shown:not(:focus)]:indent-[1ch]",
+            inputClassName
+          )}
+          autoComplete="off"
+          enterKeyHint="send"
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          type="text"
+          value={text}
+          {...props}
+        />
+        <span
+          aria-hidden="true"
+          className="bg-opencode-fg pointer-events-none absolute start-[calc(3ch-2px)] top-[0.5lh] hidden h-[1lh] w-[1ch] peer-[:placeholder-shown:not(:focus)]:block"
+        />
+        <InputGroupAddon
+          align="block-end"
+          className="min-w-0 cursor-default flex-wrap justify-start gap-x-[1ch] gap-y-0 p-0 text-[length:inherit] leading-[inherit] font-normal group-has-[>input]/input-group:pb-0"
+        >
+          <span className="text-opencode-blue">{agent}</span>
+          <span aria-hidden="true" className="text-opencode-muted">
+            ·
+          </span>
+          <span className="text-opencode-fg">{model}</span>
+          <span className="text-opencode-muted">{provider}</span>
+          <span aria-hidden="true" className="text-opencode-muted">
+            ·
+          </span>
+          <span className="text-opencode-orange font-bold">{effort}</span>
+        </InputGroupAddon>
+      </InputGroup>
+      <div className="text-opencode-muted flex min-w-0 items-center justify-between gap-[2ch] ps-[1ch]">
+        {busy ? (
+          <span className="flex min-w-0 items-center gap-[2ch]">
+            <OpencodeProgress />
+            <span>
+              <Kbd className={KBD_CLASS}>esc</Kbd> interrupt
+            </span>
+          </span>
+        ) : (
+          <span className="min-w-0 truncate">{cwd}</span>
         )}
-        placeholder={placeholder}
-        type="text"
-        {...props}
-      />
-      <InputGroupAddon
-        align="block-end"
-        className="mt-[1.0625rem] cursor-default flex-wrap gap-x-[1ch] gap-y-0 p-0 text-[0.8125rem] leading-[1.3] font-normal group-has-[>input]/input-group:pb-0"
-      >
-        <span className="text-opencode-purple">{agent}</span>
-        <span aria-hidden="true" className="text-opencode-muted">
-          ·
+        <span className="flex shrink-0 items-center gap-[2ch]">
+          {context ? (
+            <span className="tabular-nums">{context}</span>
+          ) : (
+            <span>
+              <Kbd className={KBD_CLASS}>tab</Kbd> agents
+            </span>
+          )}
+          <span>
+            <Kbd className={KBD_CLASS}>ctrl+p</Kbd> commands
+          </span>
         </span>
-        <span className="text-opencode-fg">{model}</span>
-        <span className="text-opencode-muted">{provider}</span>
-        <span aria-hidden="true" className="text-opencode-muted">
-          ·
-        </span>
-        <span className="text-opencode-orange font-semibold">{effort}</span>
-      </InputGroupAddon>
-    </InputGroup>
-    <div className="text-opencode-muted flex min-w-0 items-center justify-between gap-[2ch] px-[2ch] pt-[1.0625rem] text-[0.8125rem] leading-[1.3]">
-      <span>
-        <Kbd className={KBD_CLASS}>tab</Kbd> agents
-        <Kbd className={cn(KBD_CLASS, "ms-[2ch]")}>ctrl+p</Kbd> commands
-      </span>
-      {context && <span>{context}</span>}
-    </div>
-  </div>
-);
+      </div>
+    </form>
+  );
+};

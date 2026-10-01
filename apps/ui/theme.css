@@ -1,3 +1,11 @@
+/* Blume inlines this file into .blume/src/generated/ and only rebases @source,
+   so the import path is relative to that folder. */
+@import "../../../src/styles/blocks.css";
+
+html {
+  scrollbar-gutter: stable;
+}
+
 :root {
   --notra-content-width: 72rem;
   --notra-content-gutter: 1.5rem;
@@ -209,4 +217,13 @@
     --marketing-gradient-from: oklab(95.5% 0 0);
     --marketing-gradient-to: oklab(85% 0 0);
   }
+}
+
+nav > ul > li > details > .blume-nav-summary {
+  color: var(--blume-foreground);
+  font-weight: 500;
+}
+
+li + li:has(> .blume-nav-heading) {
+  margin-top: 0.75rem;
 }
