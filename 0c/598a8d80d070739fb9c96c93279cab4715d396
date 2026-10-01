@@ -1,0 +1,23 @@
+apps/web/src/components/pricing-comparison-table.tsx
+  s_6afe770cc1ce40::t_7f4dade84f5234 161
+apps/web/src/components/landing/prompt-calculator.tsx
+  s_6afe770cc1ce40::t_7f4dade84f5234 953
+apps/web/src/components/landing/pricing-section.tsx
+  s_6afe770cc1ce40::t_607f3bc98c16fa 324
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0c598a8d80d070739fb9c96c93279cab4715d396",
+  "prompts": {},
+  "sessions": {
+    "s_6afe770cc1ce40": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "347330c8-9e22-455c-990e-56a42094237f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
