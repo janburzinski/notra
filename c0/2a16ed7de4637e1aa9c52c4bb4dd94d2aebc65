@@ -1,0 +1,19 @@
+apps/dashboard/src/components/content/content-chat-activity-panel.tsx
+  s_ff4e6b3d618575::t_c8440522098242 411
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c02a16ed7de4637e1aa9c52c4bb4dd94d2aebc65",
+  "prompts": {},
+  "sessions": {
+    "s_ff4e6b3d618575": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ebb6-e735-7081-914b-68c0029d194e",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/conversation-builder-dialog.tsx
+  s_aa3c2242aae0e4::t_baf3ac0df373e9 6,49-52,62-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "826b1c7477fc41d6dcabd6027c4565cd1aca66de",
+  "prompts": {},
+  "sessions": {
+    "s_aa3c2242aae0e4": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUcVt6NHngpOjCEggBq",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

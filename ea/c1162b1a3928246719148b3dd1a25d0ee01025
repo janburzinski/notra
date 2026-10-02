@@ -1,0 +1,43 @@
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_b066d480a90510::t_04ecd9be7fa110 478-480,483,485
+  s_b066d480a90510::t_d8817ebcf79516 475-477,481-482,484,486-488
+packages/geo-core/src/utils/geo-model-catalog.ts
+  s_b066d480a90510::t_a56283f8ecc037 3,17,238-239,242-253
+  s_b066d480a90510::t_04ecd9be7fa110 240-241
+apps/dashboard/src/app/onboarding/visibility/visibility-form.tsx
+  s_b066d480a90510::t_a56283f8ecc037 90
+packages/geo-core/src/geo/onboarding.ts
+  s_b066d480a90510::t_a56283f8ecc037 44-47
+  s_b066d480a90510::t_2ed5a1f283f545 22
+packages/geo-core/src/schemas/geo.ts
+  s_b066d480a90510::t_d8817ebcf79516 380,421
+  s_b066d480a90510::t_2ed5a1f283f545 49
+packages/geo-core/tests/geo-audience-engines.test.ts
+  s_b066d480a90510::t_04ecd9be7fa110 17,21
+  s_b066d480a90510::t_d0d7a02535ecde 1-16,18-20,22-34
+apps/dashboard/src/types/onboarding.ts
+  s_b066d480a90510::t_a56283f8ecc037 2,172
+apps/dashboard/src/utils/onboarding-brand.ts
+  s_b066d480a90510::t_a56283f8ecc037 59
+packages/geo-core/src/types/geo.ts
+  s_b066d480a90510::t_a56283f8ecc037 18
+  s_b066d480a90510::t_d8817ebcf79516 854-855,859,885
+packages/geo-core/src/geo/discover.ts
+  s_b066d480a90510::t_a56283f8ecc037 69-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eac1162b1a3928246719148b3dd1a25d0ee01025",
+  "prompts": {},
+  "sessions": {
+    "s_b066d480a90510": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5849b809-dbb7-447e-902f-b5ab89583ab0",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

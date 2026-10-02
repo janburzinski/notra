@@ -1,0 +1,71 @@
+apps/ui/docs/components/(terminal-apps)/codex/exec.mdx
+  s_0a7c546ca46997::t_313c853dff6914 14
+packages/ui/src/components/ai-skins/codex/codex-exec.tsx
+  s_0a7c546ca46997::t_313c853dff6914 81
+apps/ui/registry.json
+  s_0a7c546ca46997::t_7e8220140f68c5 7261,7357,7468,7569,7670,7766,7867,7973,8230,8335,8438,8541,8644,8759,8869,8972,9070
+packages/ui/src/components/ai-skins/claude-code/claude-code-tool-call.tsx
+  s_0a7c546ca46997::t_313c853dff6914 48
+packages/ui/src/components/ai-skins/codex/codex-composer.tsx
+  s_0a7c546ca46997::t_7e0239903fd9a9 103
+apps/dashboard/src/app/design-system/claude/page-client.tsx
+  s_0a7c546ca46997::t_e02be807da83c2 17,49,63,100,133,142,145,154,159,168,170,179,204,213,216,227-230,237,250,260
+apps/web/src/components/mcp/mcp-terminal-demo.tsx
+  s_0a7c546ca46997::t_e02be807da83c2 5,26-45,47-55
+apps/ui/docs/components/(terminal-apps)/claude-code/thinking.mdx
+  s_0a7c546ca46997::t_313c853dff6914 12
+apps/ui/registry/notra/claude-code/components/claude-code-thinking.tsx
+  s_0a7c546ca46997::t_313c853dff6914 35
+apps/web/src/components/feedback-md/feedback-md-terminal-demo.tsx
+  s_0a7c546ca46997::t_e02be807da83c2 5,23-38,40-50
+packages/ui/src/components/ai-skins/claude-code/claude-code-message.tsx
+  s_0a7c546ca46997::t_7e908174bd6c54 4
+packages/ui/src/components/ai-skins/claude-code/claude-code-prompt.tsx
+  s_0a7c546ca46997::t_e73feb6e6cc9f8 118
+apps/web/src/styles/ui-sources.css
+  s_0a7c546ca46997::t_46f4f3ae40de70 12,16
+packages/ui/src/components/ai-skins/codex/codex-markdown.tsx
+  s_0a7c546ca46997::t_a7fd7788f11b2f 5-19,28-29,44,73-75,79,82,91-92
+apps/ui/registry/notra/codex/components/codex-exec.tsx
+  s_0a7c546ca46997::t_313c853dff6914 78
+packages/geo-core/src/constants/geo.ts
+  s_0a7c546ca46997::t_da766abfd54102 970-972
+packages/ui/src/components/ai-skins/claude-code/claude-code-inline.tsx
+  s_0a7c546ca46997::t_7e908174bd6c54 1-27
+apps/ui/registry/notra/claude-code/components/claude-code-prompt.tsx
+  s_0a7c546ca46997::t_e73feb6e6cc9f8 70
+packages/ui/src/components/geo/geo-prompt-answer-thread.tsx
+  s_0a7c546ca46997::t_da766abfd54102 48-50
+apps/ui/registry/notra/codex/components/codex-composer.tsx
+  s_0a7c546ca46997::t_7e0239903fd9a9 92
+packages/ui/src/components/ai-skins/claude-code/claude-code-terminal.tsx
+  s_0a7c546ca46997::t_e02be807da83c2 1-43
+packages/ui/src/components/ai-skins/claude-code/claude-code-status.tsx
+  s_0a7c546ca46997::t_7e908174bd6c54 6
+apps/ui/registry/notra/claude-code/lib/claude-code-inline.tsx
+  s_0a7c546ca46997::t_7e908174bd6c54 9-14,34
+packages/ui/src/components/ai-skins/claude-code/claude-code-header.tsx
+  s_0a7c546ca46997::t_7e908174bd6c54 4
+apps/ui/docs/components/(terminal-apps)/claude-code/tool-call.mdx
+  s_0a7c546ca46997::t_313c853dff6914 14
+apps/ui/registry/notra/codex/components/codex-markdown.tsx
+  s_0a7c546ca46997::t_a7fd7788f11b2f 2,6-19,34-35,49-68,70-71,74-97
+apps/ui/registry/notra/claude-code/components/claude-code-tool-call.tsx
+  s_0a7c546ca46997::t_313c853dff6914 42,125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ed51d07c271297507d29153817960896400afeb8",
+  "prompts": {},
+  "sessions": {
+    "s_0a7c546ca46997": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4629158-9e1c-4378-a825-ace111c4f25a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

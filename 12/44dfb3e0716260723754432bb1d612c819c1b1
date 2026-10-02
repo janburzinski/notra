@@ -1,0 +1,39 @@
+packages/geo-core/src/constants/geo.ts
+  s_3d4b8c6c686c63::t_876cb7e32ec3a5 1325-1328
+packages/geo-core/src/geo/adhoc-scan.ts
+  s_3d4b8c6c686c63::t_876cb7e32ec3a5 1-45,47-292,306-416,418-419,430-481
+  s_3d4b8c6c686c63::t_79b7ff13293aea 46,293-305
+  s_3d4b8c6c686c63::t_39a2a2b8506a54 417
+  s_3d4b8c6c686c63::t_cab886df04f32d 420-429
+packages/db/src/types/geo-adhoc-scan.ts
+  s_3d4b8c6c686c63::t_7108fa6e04bb85 1-38
+packages/geo-core/src/geo/errors.ts
+  s_3d4b8c6c686c63::t_876cb7e32ec3a5 251-269
+packages/db/src/schema.ts
+  s_3d4b8c6c686c63::t_876cb7e32ec3a5 1765-1767
+  s_3d4b8c6c686c63::t_7108fa6e04bb85 35-38,1750-1764,1768-1786
+packages/geo-core/tests/adhoc-scan.test.ts
+  s_3d4b8c6c686c63::t_cc15b77cc23548 56-62
+  s_3d4b8c6c686c63::t_6c1dd80159e79f 23,53,123,197-198
+  s_3d4b8c6c686c63::t_e2508de277a0fd 67-77
+  s_3d4b8c6c686c63::t_351c08ed9a3bd2 47
+  s_3d4b8c6c686c63::t_43a6e38ed85e5b 1-22,24-46,48-52,54-55,63-66,78-122,124-196,199-240
+packages/geo-core/tests/utils/database.ts
+  s_3d4b8c6c686c63::t_43a6e38ed85e5b 4,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1244dfb3e0716260723754432bb1d612c819c1b1",
+  "prompts": {},
+  "sessions": {
+    "s_3d4b8c6c686c63": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "13844649-9866-4ab0-ba6e-911597dcf3bc",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

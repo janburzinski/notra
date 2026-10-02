@@ -1,0 +1,31 @@
+packages/geo-core/src/geo/scan.ts
+  ai_agent 510,1707-1708
+packages/geo-core/src/geo/sentiment-analysis-cache.ts
+  s_6554d5e7a6538d::t_b0813016f43d5d 135-144
+bun.lock
+  ai_agent 29-30,42,64-65,81,106-108,113,164,175,232,238,336-339,349,356,361,373,463-466,473,476,573,651,653,655,657,659,661,663,665,667,669-673,971,1147,1527,1583,2727,3439,4843-4844,5231,5713-5714,5931-5932,6065-6066,6071-6072
+apps/dashboard/src/app/rpc/[[...rest]]/route.ts
+  s_6554d5e7a6538d::t_b0813016f43d5d 13
+packages/geo-core/src/geo/sentiment-analysis.ts
+  s_6554d5e7a6538d::t_b0813016f43d5d 17,20,34-36,39
+packages/geo-core/src/geo/conversation.ts
+  ai_agent 106-107
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_6554d5e7a6538d::t_b0813016f43d5d 938
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "957895801549cc55eaf1236232d018b8c1679eee",
+  "prompts": {},
+  "sessions": {
+    "s_6554d5e7a6538d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a71e-e287-7ff1-9b25-c95193f84e0a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

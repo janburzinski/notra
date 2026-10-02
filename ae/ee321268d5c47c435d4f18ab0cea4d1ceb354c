@@ -1,0 +1,19 @@
+packages/db/src/utils/geo-checks.ts
+  s_d71ef90ac5ef34::t_dc15964fd3c584 313
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "aeee321268d5c47c435d4f18ab0cea4d1ceb354c",
+  "prompts": {},
+  "sessions": {
+    "s_d71ef90ac5ef34": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0a996-f89f-7c89-8197-63cc20881693",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

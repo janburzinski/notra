@@ -1,0 +1,23 @@
+apps/dashboard/public/design.md
+  s_4baa408569e898::t_75a909c89fa4ef 65
+apps/dashboard/src/components/instrument/instrument-module.tsx
+  s_4baa408569e898::t_75a909c89fa4ef 64
+apps/dashboard/src/constants/instrument.ts
+  s_4baa408569e898::t_75a909c89fa4ef 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f6a1a1d9df04a747d9800bf911839b6a24d07a4d",
+  "prompts": {},
+  "sessions": {
+    "s_4baa408569e898": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "241d7d30-8eee-46fc-91e5-b12cdcfff521",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+apps/dashboard/src/components/integrations/github/github-directory-picker.tsx
+  s_32ffa205186666::t_cf8cc7e082bad9 25
+packages/ai/src/integrations/github.ts
+  s_32ffa205186666::t_cf8cc7e082bad9 334-336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fb7e31a108d1d41d070b05fb1448ea7dc362c44d",
+  "prompts": {},
+  "sessions": {
+    "s_32ffa205186666": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "617d1014-f81a-4766-8cc5-2f058ac5cd82",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

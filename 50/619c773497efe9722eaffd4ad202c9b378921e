@@ -1,0 +1,31 @@
+apps/dashboard/src/utils/onboarding.ts
+  s_309f517818a681::t_2b6ef06faaa30d 29-37
+  s_309f517818a681::t_e3799dc60ecaf0 3
+apps/dashboard/src/utils/onboarding-brand.ts
+  s_309f517818a681::t_f55d769ac075bc 43-49
+apps/dashboard/src/app/onboarding/visibility/visibility-form.tsx
+  s_309f517818a681::t_d4a18e3b36d7bb 38
+  s_309f517818a681::t_ec3f58e8c6ce4c 67
+apps/dashboard/src/utils/onboarding.test.ts
+  s_309f517818a681::t_f83e2d019d4a22 1-34
+apps/dashboard/src/utils/onboarding-brand.test.ts
+  s_309f517818a681::t_00c3f588258a5a 1-44
+apps/dashboard/src/app/onboarding/workspace/workspace-form.tsx
+  s_309f517818a681::t_f3562a2ca12a88 46-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "50619c773497efe9722eaffd4ad202c9b378921e",
+  "prompts": {},
+  "sessions": {
+    "s_309f517818a681": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "bb0e600b-1866-4fad-a39b-bc62460e772a",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

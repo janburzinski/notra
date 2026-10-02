@@ -1,0 +1,21 @@
+apps/dashboard/src/styles/globals.css
+  s_4b1931312d2ba5::t_281ce2ffff573e 27-35
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  s_4b1931312d2ba5::t_281ce2ffff573e 192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4628b9f19fd5c710cf86c11bbb51ccc23c3c05fa",
+  "prompts": {},
+  "sessions": {
+    "s_4b1931312d2ba5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0b0668f3-5686-4596-837d-4d457051243c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,61 @@
+apps/dashboard/src/components/settings/profile-section.tsx
+  s_1608a20a569a81::t_f04e2eeee668ee 174
+  s_1608a20a569a81::t_2fbefa64b6857c 154
+  s_1608a20a569a81::t_12d9553d2a92b5 183-188
+apps/dashboard/src/components/settings/panes/members-pane.tsx
+  s_1608a20a569a81::t_c97177f1934e56 83
+apps/dashboard/src/components/settings/login-details-section.tsx
+  s_1608a20a569a81::t_801b71a36e2ace 56
+apps/dashboard/src/components/settings/settings-modal.tsx
+  s_1608a20a569a81::t_b5f194137030ea 206-208
+  s_1608a20a569a81::t_10d22b3f59bd16 301
+  s_1608a20a569a81::t_44bdd5e0fade1f 329
+apps/dashboard/src/components/settings/organizations-section.tsx
+  s_1608a20a569a81::t_7d535736cc0ff5 202,205-206
+  s_1608a20a569a81::t_1c6f5b7be47975 241
+  s_1608a20a569a81::t_2dd387d1762196 216-218
+apps/dashboard/src/components/settings/connected-accounts-section.tsx
+  s_1608a20a569a81::t_5019a6dd15c69b 110
+  s_1608a20a569a81::t_668f4675035d3b 142-144,147
+  s_1608a20a569a81::t_886e0fd62f78f8 158
+  s_1608a20a569a81::t_edbd1b697c156b 94-96,99
+  s_1608a20a569a81::t_6c9bb44b34b8ea 127
+  s_1608a20a569a81::t_3976a30cd7ee53 175
+apps/dashboard/src/components/settings/delete-account.tsx
+  s_1608a20a569a81::t_e1fbda3413c3b3 20
+  s_1608a20a569a81::t_3be094ed77482f 23-25
+apps/dashboard/src/components/settings/panes/general-pane.tsx
+  s_1608a20a569a81::t_fa99d43bdef8db 404-405
+  s_1608a20a569a81::t_d197de35aeb9b5 188
+  s_1608a20a569a81::t_a59b301fd4f732 375-377,379,381-384,387-403,406-452
+  s_1608a20a569a81::t_0302c61d248fea 453
+  s_1608a20a569a81::t_3be094ed77482f 205-210
+  s_1608a20a569a81::t_ac07cfad0df622 173-174
+  s_1608a20a569a81::t_832f1854f1c278 371,374
+apps/dashboard/src/components/settings/settings-modal-nav.tsx
+  s_1608a20a569a81::t_f3b8449c351003 95-100
+  s_1608a20a569a81::t_2ea215e9e42a95 146,172
+  s_1608a20a569a81::t_65f0015b1bc53a 279-282
+  s_1608a20a569a81::t_e0ad5e7b80fe26 7
+  s_1608a20a569a81::t_b367028c7f4520 62-63
+  s_1608a20a569a81::t_a887b88ad173a3 251
+  s_1608a20a569a81::t_0be8ba1bed55d2 78-94,101-107
+  s_1608a20a569a81::t_8de39af2c0f5a5 189-201,208-209,213,215
+  s_1608a20a569a81::t_ef6a5e6f364e92 202-207,210-212,214,216-247,249-250
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "74c60add98cae8aefeb6482adada9cf9e41948cc",
+  "prompts": {},
+  "sessions": {
+    "s_1608a20a569a81": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "712c20db-e25e-4f53-aaa6-53db123fa0d6",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

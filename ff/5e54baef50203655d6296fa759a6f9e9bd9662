@@ -1,0 +1,28 @@
+packages/ai/src/evaluation/client.test.ts
+  s_4a6b333a828ca0::t_5b46c5a463a724 3-4
+  s_46de870422d659::t_e9a0325bf06111 121-139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ff5e54baef50203655d6296fa759a6f9e9bd9662",
+  "prompts": {},
+  "sessions": {
+    "s_46de870422d659": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QMru2Ltc9e5ErKIWm9c",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_4a6b333a828ca0": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QMrikvt7QRGwBrzXzEE",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

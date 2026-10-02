@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/prompt-suggestions.tsx
+  s_457473fefaf624::t_3cc672b9e18f8c 402,464
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bf259c753a8f6e8855fd2473c710ee08057c95ba",
+  "prompts": {},
+  "sessions": {
+    "s_457473fefaf624": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e76d-9181-7d00-8bb7-9aef4825957f",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

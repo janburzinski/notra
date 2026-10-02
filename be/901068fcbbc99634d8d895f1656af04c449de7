@@ -1,0 +1,122 @@
+apps/dashboard/src/utils/geo-journey.test.ts
+  s_023e6c4703dd3e::t_dd16452f03092d 86
+apps/dashboard/src/components/geo/competitor-detail-view.tsx
+  s_023e6c4703dd3e::t_1489bae7c0edf0 490
+  s_023e6c4703dd3e::t_8c2a3489d67960 292,297-299
+  s_023e6c4703dd3e::t_30a12bf3d55176 168
+  s_023e6c4703dd3e::t_82756f115af722 315
+  s_023e6c4703dd3e::t_1d872485890545 174,178,183,188,193
+  s_023e6c4703dd3e::t_7312d75b208a74 316,320-321
+  s_023e6c4703dd3e::t_251bc994cc19ab 472-476
+  s_023e6c4703dd3e::t_ead6eaca625051 86,92,94-101
+  s_023e6c4703dd3e::t_fab90c56328b9d 222,231-235,503
+apps/dashboard/src/components/geo/journey-group-sheet.tsx
+  s_023e6c4703dd3e::t_4c86be1eda3c3c 135
+apps/dashboard/src/components/geo/traffic-source-sheet.tsx
+  s_023e6c4703dd3e::t_ee09f6c9aa643e 7-10,14
+  s_023e6c4703dd3e::t_6280468f53f3ab 52-56,60,73-75
+  s_023e6c4703dd3e::t_1c26c78ceecdd5 206
+  s_023e6c4703dd3e::t_fcb9e49b3be514 27
+  s_023e6c4703dd3e::t_653e4a5f612ab0 249-255,260,264,266,268
+  s_023e6c4703dd3e::t_8a4b8041c6f9ff 223-229
+apps/dashboard/src/constants/geo-directions.ts
+  s_023e6c4703dd3e::t_dd16452f03092d 353,364,375
+packages/geo-core/src/constants/geo.ts
+  s_023e6c4703dd3e::t_da5266f306c028 471-472
+apps/dashboard/src/components/evilcharts/ui/echarts-resize.ts
+  s_023e6c4703dd3e::t_09e6cb76cb5a6a 26-27,32,34,55
+apps/dashboard/src/components/geo/journey-overview-card.tsx
+  s_023e6c4703dd3e::t_d6e735646d882c 71-73
+  s_023e6c4703dd3e::t_9142b145a39f4d 28,70,74
+packages/analytics/src/tinybird/pipes/geo-traffic.ts
+  s_023e6c4703dd3e::t_4ce0e30e3a87aa 362
+  s_023e6c4703dd3e::t_c6077636bcabf2 379
+  s_023e6c4703dd3e::t_c4ce404a49b117 558-560,564
+apps/dashboard/src/components/geo/journey-paths-card.tsx
+  s_023e6c4703dd3e::t_9142b145a39f4d 23,69
+  s_023e6c4703dd3e::t_d6e735646d882c 64-66
+packages/schemas/src/schemas/api/geo-traffic.ts
+  s_023e6c4703dd3e::t_61ff53c1fa0482 178
+apps/dashboard/src/utils/geo-journey.ts
+  s_023e6c4703dd3e::t_d6e735646d882c 342-346
+apps/dashboard/src/components/geo/journeys-card.tsx
+  s_023e6c4703dd3e::t_f18aef2cfd2444 75,79
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_023e6c4703dd3e::t_2b1d5ffd7e1ffb 85
+  s_023e6c4703dd3e::t_7c1e3fc78cdd85 833,849
+  s_023e6c4703dd3e::t_0283d16cfed90e 853-856
+  s_023e6c4703dd3e::t_5d260ec579232b 1152-1154
+apps/dashboard/src/types/geo.ts
+  s_023e6c4703dd3e::t_ce8ca77df3f96e 478,531,551-552,559-560
+  s_023e6c4703dd3e::t_3880a8cb3d320c 1306
+  s_023e6c4703dd3e::t_fa4e2ea780f065 816
+  s_023e6c4703dd3e::t_8bd7c107d4254b 1296-1297
+packages/geo-core/src/geo/discover.ts
+  s_023e6c4703dd3e::t_487da0fafb9b67 14
+  s_023e6c4703dd3e::t_da5266f306c028 80,183
+packages/geo-core/src/geo/sequence-generation.ts
+  s_023e6c4703dd3e::t_1e9c15c573814e 11,38
+  s_023e6c4703dd3e::t_b5c68060119201 134,185
+  s_023e6c4703dd3e::t_960d0fb042bef0 230-232,234-256,258-264
+packages/geo-core/src/geo/suggestion-keywords.ts
+  s_023e6c4703dd3e::t_6f1d49c6780333 44
+  s_023e6c4703dd3e::t_726a0348782821 22-25
+apps/dashboard/src/components/motion/table/index.tsx
+  s_023e6c4703dd3e::t_eab2d4da18ca08 30
+  s_023e6c4703dd3e::t_c5cb546daf0f00 99-109,120
+apps/dashboard/src/lib/hooks/use-geo-overview-page.ts
+  s_023e6c4703dd3e::t_0283d16cfed90e 153-161,207
+apps/dashboard/src/components/geo/directions/direction-leaderboard.tsx
+  s_023e6c4703dd3e::t_4c86be1eda3c3c 174,177
+apps/dashboard/src/components/evilcharts/charts/echarts-bar-chart.tsx
+  s_023e6c4703dd3e::t_fbb05eb451ab9a 1702-1707
+apps/dashboard/src/app/design-system/geo-traffic/page-client.tsx
+  s_023e6c4703dd3e::t_1afd1579e1b3b9 12-15,17-23
+apps/dashboard/src/components/motion/table/use-collapsible-columns.ts
+  s_023e6c4703dd3e::t_027ac8afb8cb9b 75-77,129
+packages/geo-core/src/types/geo.ts
+  s_023e6c4703dd3e::t_61ff53c1fa0482 1063-1064
+  s_023e6c4703dd3e::t_b5c68060119201 874
+apps/dashboard/src/components/geo/search-console-card.tsx
+  s_023e6c4703dd3e::t_76392250a560c7 407-411
+apps/dashboard/src/utils/geo-hydration.ts
+  s_023e6c4703dd3e::t_39d7ab149dfd00 10,84-85,96-97
+packages/geo-core/src/geo/programs.ts
+  s_023e6c4703dd3e::t_38c9b6fa168198 1311-1316
+  s_023e6c4703dd3e::t_10f9964931a57d 1243-1245
+  s_023e6c4703dd3e::t_e746b9c64ffd1e 1306-1310
+apps/docs/geo/traffic.mdx
+  s_023e6c4703dd3e::t_4bc1f400c689bc 227
+packages/ui/src/components/ui/svgs/instagram.tsx
+  s_023e6c4703dd3e::t_430465512ac1fc 6
+apps/dashboard/src/components/motion/table/utils.ts
+  s_023e6c4703dd3e::t_7c841f2c93719e 204-230
+apps/dashboard/src/components/evilcharts/charts/echarts-line-chart.tsx
+  s_023e6c4703dd3e::t_fbb05eb451ab9a 1789-1794
+apps/dashboard/src/components/geo/journey-path-summary.tsx
+  s_023e6c4703dd3e::t_d5a23b3c7a61f1 13,17,25-28
+packages/geo-core/src/utils/ai-traffic.ts
+  s_023e6c4703dd3e::t_8f0bca58b86c1a 44-60,63,69
+packages/ui/src/components/animated-number.tsx
+  s_023e6c4703dd3e::t_1354b5835f0b83 17-21
+  s_023e6c4703dd3e::t_444f10bfa912b2 6,74
+  s_023e6c4703dd3e::t_2ecf148f009a48 31-35,37,39,47
+apps/dashboard/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_023e6c4703dd3e::t_fbb05eb451ab9a 2268-2273
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "be901068fcbbc99634d8d895f1656af04c449de7",
+  "prompts": {},
+  "sessions": {
+    "s_023e6c4703dd3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc4c91ba-a673-4815-880e-5500bc8e78e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

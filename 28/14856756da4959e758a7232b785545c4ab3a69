@@ -1,0 +1,814 @@
+apps/ui/docs/components/(desktop-apps)/gemini/message.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11,13-16,18-21
+  s_68efd06bd8cdc3::t_3ac6329acb484a 12,17
+apps/ui/registry/notra/opencode/components/opencode-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-67
+apps/ui/registry/notra/perplexity/components/perplexity-user-actions.tsx
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 1-108
+apps/ui/docs/components/(terminal-apps)/codex/reasoning.mdx
+  s_68efd06bd8cdc3::t_987fb75bbfe495 1-17
+apps/ui/docs/components/(desktop-apps)/claude/spinner.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/registry/notra/gemini/examples/gemini-sparkle.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-13
+apps/ui/registry/notra/codex/components/codex-header.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-43
+apps/ui/registry/notra/chatgpt/components/chatgpt-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-25
+apps/ui/registry/notra/chatgpt/components/chatgpt-reasoning.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-91
+apps/ui/docs/components/(desktop-apps)/chatgpt/actions.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-21
+apps/ui/docs/components/(desktop-apps)/claude/actions.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-21
+apps/ui/registry/notra/claude-code/examples/claude-code-prompt.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-91
+apps/ui/registry/notra/perplexity/constants/perplexity.ts
+  s_68efd06bd8cdc3::t_021cedf8d701ed 17
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1,3-16,18-21,24-92,99
+  s_68efd06bd8cdc3::t_1993d0f3ba765b 2,93-98
+  s_68efd06bd8cdc3::t_9c886d3d850134 22-23
+apps/ui/registry/notra/gemini/types/gemini.ts
+  s_68efd06bd8cdc3::t_a035f7fc4af02a 25,75-112,117,119
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 4
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-3,5-24,26-32,35-74,113-116,118,120-125
+  s_68efd06bd8cdc3::t_76e4a9ca30b652 33-34
+apps/ui/registry/notra/chatgpt/examples/chatgpt-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-23
+apps/ui/registry/notra/perplexity/components/perplexity-citation.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 3,6,15,25,37,104-107,109
+  s_68efd06bd8cdc3::t_9c886d3d850134 1-2,4-5,7-14,16-24,26-36,38-45,48-49,51-55,57-62,64-68,70-71,74-75,77-85,89-90,92-94,96-103,108,110-153,155-161
+  s_68efd06bd8cdc3::t_20a053e4eb0457 46-47,50,56,63,69,72-73,76,86-88,91,95,154
+apps/ui/registry/notra/chatgpt/components/chatgpt-icons.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-49
+apps/ui/registry/notra/codex/components/codex-exec.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-103
+apps/ui/docs/introduction.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 19-39
+apps/ui/docs/blocks/(terminal-apps)/codex.mdx
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 26
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-25,27-39
+  s_68efd06bd8cdc3::t_2095b49bfee73a 6
+apps/ui/registry/notra/codex/examples/codex-reasoning.tsx
+  s_68efd06bd8cdc3::t_987fb75bbfe495 1-22
+apps/ui/registry/notra/codex/components/codex-terminal.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-40
+apps/ui/docs/components/(terminal-apps)/codex/message.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-16
+apps/ui/docs/components/(desktop-apps)/perplexity/model-selector.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-30
+apps/ui/docs/blocks/(desktop-apps)/perplexity.mdx
+  s_68efd06bd8cdc3::t_ee771755cd5e62 6,24
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 30
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-5,7-23,25-29,31-44
+  s_68efd06bd8cdc3::t_20a053e4eb0457 3
+apps/ui/registry/notra/claude/components/claude-usage-ring.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-84
+apps/ui/docs/components/(desktop-apps)/perplexity/citation.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/docs/components/(desktop-apps)/gemini/sparkle.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/src/constants/landing.ts
+  s_68efd06bd8cdc3::t_d7fa3ea86f3cf1 1-5,10
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 27-32,48-76,79-99,104
+  s_68efd06bd8cdc3::t_08b6367da0bb01 34,47,77-78,102-103
+apps/ui/docs/components/(desktop-apps)/perplexity/user-actions.mdx
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 1-18
+apps/ui/registry/notra/shimmer/examples/shimmer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-10
+apps/ui/registry/notra/opencode/examples/opencode-activity.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/components/ui/toggle.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-44
+apps/ui/registry/notra/chatgpt/examples/chatgpt-demo.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19,21-26,32-34,42-59,67-76,93-115,117-123,125,127-138,170-173,182-246
+  s_68efd06bd8cdc3::t_61233cf9b0df86 20,27-31,38-41,60-66,77-92,174-181
+  s_68efd06bd8cdc3::t_99a1fd821f3bf8 35-37,116
+  s_68efd06bd8cdc3::t_494ded6617eae4 124
+  s_68efd06bd8cdc3::t_971bb767c23747 126,139-169
+apps/ui/registry/notra/opencode/examples/opencode-demo.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1,3-20,40,42-46,48-59
+  s_68efd06bd8cdc3::t_684f169ade1c97 2,21-39,41,47
+apps/ui/docs/components/(desktop-apps)/chatgpt/activity.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-40
+apps/ui/registry/notra/chatgpt/examples/chatgpt-thread.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/registry/notra/opencode/constants/opencode-demo.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-87
+apps/ui/docs/components/(desktop-apps)/perplexity/thinking.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/gemini/components/gemini-sparkle.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-147
+apps/ui/registry/notra/chatgpt/components/chatgpt-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-150
+apps/ui/components/ui/input-group.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-159
+apps/ui/registry/notra/opencode/components/opencode-sidebar.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-121
+apps/ui/registry/notra/claude/components/claude-spinner.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-119
+apps/ui/registry/notra/gemini/examples/gemini-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-21
+apps/ui/registry/notra/perplexity/components/perplexity-message.tsx
+  s_68efd06bd8cdc3::t_9c886d3d850134 16-19,24-28
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-15,20-23,29-54
+apps/ui/registry/notra/gemini/components/gemini-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-16,18-36
+  s_68efd06bd8cdc3::t_e4f9750c89e6c4 17
+apps/ui/registry/notra/codex/examples/codex-exec.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-26
+apps/ui/docs/components/(terminal-apps)/codex/meta.ts
+  s_68efd06bd8cdc3::t_987fb75bbfe495 5
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-4,6-7
+apps/ui/registry/notra/perplexity/components/perplexity-sources-summary.tsx
+  s_68efd06bd8cdc3::t_021cedf8d701ed 1-64
+apps/ui/registry/notra/perplexity/examples/perplexity-sources-summary.tsx
+  s_68efd06bd8cdc3::t_021cedf8d701ed 1-12
+apps/ui/docs/components/(terminal-apps)/opencode/activity.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-21
+apps/ui/registry/notra/claude/constants/claude-models.ts
+  s_68efd06bd8cdc3::t_9422494a09d4d7 15-21,24-34,37,39-40,43,45-46,48,50,55-62,70,74
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-14,22-23,35-36,38,41-42,44,47,49,51-54,63-69,71-73
+apps/ui/registry/notra/opencode/constants/opencode.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-34
+apps/ui/registry/notra/perplexity/examples/perplexity-search.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-22
+apps/ui/registry/notra/gemini/examples/gemini-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/claude-code/components/claude-code-prompt.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-42,44-104,118-132
+  s_68efd06bd8cdc3::t_a3ac29abe58d34 43,105-117
+apps/ui/registry/notra/gemini/examples/gemini-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11
+apps/ui/registry/notra/opencode/components/opencode-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-43
+apps/ui/docs/components/(desktop-apps)/gemini/thinking.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/registry/notra/claude-code/examples/claude-code-demo.tsx
+  s_68efd06bd8cdc3::t_a3ac29abe58d34 44,52-54,62
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-9,11-38,42-43,45-51,55-61,63-68
+  s_68efd06bd8cdc3::t_670b3c669f55ed 39-41
+  s_68efd06bd8cdc3::t_987fb75bbfe495 10
+apps/ui/registry/notra/gemini/constants/gemini-models.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-37
+apps/ui/registry/notra/opencode/examples/opencode-logo.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-32
+apps/ui/docs/components/(desktop-apps)/perplexity/message.mdx
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 18
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/docs/components/(terminal-apps)/opencode/window.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/docs/components/(search)/ai-overview/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-7
+apps/ui/registry/notra/claude/components/claude-search.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-29,31-40,46-50,53-56,59-89,92,94,96,98,186,211-212,225-227,230-243,290,298-303,305-307,309-311,318-319,321-328,330-341,344-354,365-369,371-377,379-383,386-390,396-399,401-409
+  s_68efd06bd8cdc3::t_90cbac3451ee09 30,41-45,51-52,57-58,90-91,93,95,97,99,101-135,137-161,163-174,176-185,187-197,199-207,209-210,213-215,217-224,228-229,244-289,291-297,304,308,312-317,320,329,342-343,355-364,378,391-392,394-395,400
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 100,136,162,175,198,208,216,370,393
+  s_68efd06bd8cdc3::t_5748371fe75662 6,384-385
+apps/ui/docs/components/(terminal-apps)/codex/exec.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/components/ui/input.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/registry/notra/claude/hooks/use-claude-playback.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-174
+apps/ui/registry/notra/chatgpt/components/chatgpt-action-button.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-46
+apps/ui/registry/notra/claude/types/claude.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-47,66-72,78-103,106-116,119-120,126-203,205-214,216-222
+  s_68efd06bd8cdc3::t_9422494a09d4d7 6
+  s_68efd06bd8cdc3::t_21912734d7566d 48-65,104-105
+  s_68efd06bd8cdc3::t_6e4c226ff193cd 73-77,117-118,121-125,215
+  s_68efd06bd8cdc3::t_51416f267979e2 204
+apps/ui/docs/components/(search)/ai-overview/header.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/components/ui/textarea.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/registry/notra/claude/examples/claude-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-9,21-27
+  s_68efd06bd8cdc3::t_b4c0034604e36d 6,10-20
+apps/ui/docs/blocks/(search)/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-7
+apps/ui/docs/components/(desktop-apps)/gemini/source-chip.mdx
+  s_68efd06bd8cdc3::t_3ac6329acb484a 1-18
+apps/ui/registry/notra/perplexity/components/perplexity-favicon.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-26
+apps/ui/registry/notra/chatgpt/constants/chatgpt-story.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-4,6-80,105-112,114-115,117-133
+  s_68efd06bd8cdc3::t_971bb767c23747 5,81-104,113
+  s_68efd06bd8cdc3::t_61233cf9b0df86 116
+apps/ui/registry/notra/claude/examples/claude-tool-calls.tsx
+  s_68efd06bd8cdc3::t_392bd7f0b2bffd 1-20
+apps/ui/registry/notra/claude/examples/claude-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-9
+apps/ui/docs/components/(terminal-apps)/claude-code/prompt.mdx
+  s_68efd06bd8cdc3::t_e5f1a18e90e261 18
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17,19-23
+apps/ui/docs/blocks/(desktop-apps)/claude.mdx
+  s_68efd06bd8cdc3::t_ee771755cd5e62 6,22
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 26
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-21,23-25,27-39
+apps/ui/registry/notra/claude/lib/claude-search.ts
+  s_68efd06bd8cdc3::t_21912734d7566d 32-57
+  s_68efd06bd8cdc3::t_392bd7f0b2bffd 7
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-6,8-31
+apps/ui/docs/blocks/(desktop-apps)/gemini.mdx
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 28
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-15,17-23,25-27,29-42
+  s_68efd06bd8cdc3::t_2095b49bfee73a 6
+  s_68efd06bd8cdc3::t_ee771755cd5e62 16,24
+apps/ui/components/ui/spinner.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-16
+apps/ui/docs/components/(desktop-apps)/chatgpt/reasoning.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/registry/notra/claude-code/examples/claude-code-terminal.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/claude/constants/claude-demo.ts
+  s_68efd06bd8cdc3::t_392bd7f0b2bffd 32,38-45
+  s_68efd06bd8cdc3::t_b4c0034604e36d 1-5,7-19,54-55
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 6,20-29,33-34,37,46-47,49,51-53,56-92
+  s_68efd06bd8cdc3::t_51416f267979e2 30-31,35-36,48,50
+apps/ui/registry/notra/claude-code/examples/claude-code-header.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-20
+apps/ui/registry/notra/claude-code/examples/claude-code-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/docs/components/(desktop-apps)/chatgpt/composer.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-22
+apps/ui/docs/components/(terminal-apps)/opencode/composer.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-21
+apps/ui/registry/notra/claude/examples/claude-demo.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-96,98-159,161-187
+  s_68efd06bd8cdc3::t_51416f267979e2 97
+  s_68efd06bd8cdc3::t_1d81eb406a4fee 160
+apps/ui/registry/notra/opencode/examples/opencode-window.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/docs/components/(terminal-apps)/opencode/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-15
+apps/ui/docs/components/(desktop-apps)/chatgpt/model-selector.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-11,13,16-19
+  s_68efd06bd8cdc3::t_035572eacf0450 12,15,20-21
+  s_68efd06bd8cdc3::t_98c0d5b6db3b0c 3
+  s_68efd06bd8cdc3::t_414e155f37e746 14
+apps/ui/docs/components/(desktop-apps)/perplexity/sources-summary.mdx
+  s_68efd06bd8cdc3::t_021cedf8d701ed 1-16
+apps/ui/docs/components/(terminal-apps)/claude-code/terminal.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/docs/components/(desktop-apps)/gemini/composer.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-23
+apps/ui/registry/notra/chatgpt/components/chatgpt-favicon.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-25
+apps/ui/registry/notra/claude/examples/claude-search.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-9,11-22
+  s_68efd06bd8cdc3::t_acac52b2dcea11 10
+apps/ui/registry/notra/perplexity/components/perplexity-answer.tsx
+  s_68efd06bd8cdc3::t_9c886d3d850134 56
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-55,57-138
+apps/ui/registry/notra/gemini/components/gemini-thoughts.tsx
+  s_68efd06bd8cdc3::t_9d3cee12e66a13 6,69-70,72,75
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 1-5,7-68,71,73-74,76-84
+apps/ui/registry/notra/claude-code/components/claude-code-todo-list.tsx
+  s_68efd06bd8cdc3::t_c0e5a4d55b29d8 21,33,41
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-20,22-32,44-76
+  s_68efd06bd8cdc3::t_a3ac29abe58d34 34-40,42-43
+apps/ui/docs/components/(desktop-apps)/claude/sources.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-11,13,23
+  s_68efd06bd8cdc3::t_e17acebe38a414 3,12,14-22
+apps/ui/registry/notra/claude/examples/claude-model-selector.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-22
+apps/ui/registry/notra/gemini/components/gemini-actions.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-3,5-7,9-15,18
+  s_68efd06bd8cdc3::t_76e4a9ca30b652 4,8,16-17,19-34
+apps/ui/docs/components/(terminal-apps)/claude-code/todo-list.mdx
+  s_68efd06bd8cdc3::t_e5f1a18e90e261 12
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11,13-19
+apps/ui/registry/notra/claude/hooks/use-claude-reduced-motion.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-24
+apps/ui/docs/components/(terminal-apps)/claude-code/thinking.mdx
+  s_68efd06bd8cdc3::t_987fb75bbfe495 1-17
+apps/ui/registry/notra/gemini/examples/gemini-model-selector.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-20
+apps/ui/registry/notra/perplexity/examples/perplexity-user-actions.tsx
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 1-19
+apps/ui/components/ui/slider.tsx
+  s_68efd06bd8cdc3::t_88e590cfdad104 1-2,16,32,43,48,51
+  s_68efd06bd8cdc3::t_3d268d92fd9a90 3-15,17-31,33-42,44-47,49-50
+apps/ui/registry/notra/claude/examples/claude-actions.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-15
+apps/ui/registry/notra/codex/constants/codex.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-23
+apps/ui/src/components/landing-hero.astro
+  s_68efd06bd8cdc3::t_8b2d267bd82805 6,45
+  s_68efd06bd8cdc3::t_00fc09c0dc5fe5 1-5,7-44,46-58
+apps/ui/docs/components/(terminal-apps)/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-8
+apps/ui/registry/notra/perplexity/examples/perplexity-model-icon.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-30
+apps/ui/registry/notra/perplexity/constants/perplexity-demo.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-107,131-136,153-157,167-184
+  s_68efd06bd8cdc3::t_9c886d3d850134 108-130,137-152,158-166
+apps/ui/registry/notra/chatgpt/examples/chatgpt-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11
+apps/ui/docs/components/(desktop-apps)/perplexity/actions.mdx
+  s_68efd06bd8cdc3::t_fca2e5794536cf 12,18-20
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-11,13-16,21
+  s_68efd06bd8cdc3::t_20a053e4eb0457 3,17
+apps/ui/registry/notra/claude/components/claude-composer.tsx
+  s_68efd06bd8cdc3::t_90cbac3451ee09 102
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 159,198,223
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-101,103-158,160-197,199-222,224-237
+apps/ui/registry/notra/opencode/components/opencode-activity.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-94
+apps/ui/registry/notra/gemini/components/gemini-source-chip.tsx
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 1-5,7-29,32-71
+  s_68efd06bd8cdc3::t_9d3cee12e66a13 6,30-31
+apps/ui/registry/notra/gemini/components/gemini-action-button.tsx
+  s_68efd06bd8cdc3::t_e4f9750c89e6c4 26
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-25,27-46
+apps/ui/registry/notra/codex/types/codex.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-34,43-68,70-73
+  s_68efd06bd8cdc3::t_670b3c669f55ed 35-42,69
+apps/ui/registry/notra/chatgpt/components/chatgpt-thread.tsx
+  s_68efd06bd8cdc3::t_21ea0c8e44dcb9 104
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-103,105-115
+apps/ui/registry/notra/chatgpt/examples/chatgpt-model-selector.tsx
+  s_68efd06bd8cdc3::t_d84abb18c52630 11
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-10,12-14,16-24
+  s_68efd06bd8cdc3::t_06d3eb01995631 15
+apps/ui/components/ui/dropdown-menu.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-271
+apps/ui/registry/notra/chatgpt/examples/chatgpt-source-chip.tsx
+  s_68efd06bd8cdc3::t_99a1fd821f3bf8 1-19
+apps/ui/registry/notra/claude-code/components/claude-code-tool-call.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-96
+apps/ui/registry/notra/claude/examples/claude-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-9
+apps/ui/registry/notra/gemini/constants/gemini.ts
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 8-17
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-7
+apps/ui/docs/components/(terminal-apps)/claude-code/header.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-24
+apps/ui/registry/notra/perplexity/examples/perplexity-rewrite-panel.tsx
+  s_68efd06bd8cdc3::t_22e5532c6f35e8 1-11
+apps/ui/docs/components/(desktop-apps)/perplexity/model-icon.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/perplexity/examples/perplexity-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/registry/notra/claude/constants/claude-tool-calls.ts
+  s_68efd06bd8cdc3::t_392bd7f0b2bffd 1-46
+apps/ui/docs/components/(search)/ai-overview/citation.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-45
+apps/ui/registry/notra/opencode/examples/opencode-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-13
+apps/ui/registry/notra/chatgpt/examples/chatgpt-search.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-3,5-9,12-14
+  s_68efd06bd8cdc3::t_593f317c8e0096 4,10-11
+apps/ui/registry/notra/claude-code/components/claude-code-thinking.tsx
+  s_68efd06bd8cdc3::t_670b3c669f55ed 1-55
+apps/ui/registry/notra/claude/components/claude-plus-menu.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-122,124-125,127-171
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 123,126
+apps/ui/docs/components/(desktop-apps)/chatgpt/search.mdx
+  s_68efd06bd8cdc3::t_593f317c8e0096 3,17
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-16
+apps/ui/registry/notra/perplexity/examples/perplexity-favicon.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-16
+apps/ui/registry/notra/claude/examples/claude-plus-menu.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-9
+apps/ui/docs/trademarks.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 7,9-11
+apps/ui/registry/notra/claude/components/claude-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-51,53-57
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 52
+apps/ui/registry/notra/chatgpt/constants/chatgpt-models.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-7,9-11,16-22,24-28,41
+  s_68efd06bd8cdc3::t_d84abb18c52630 8,12-15,23,29-40
+apps/ui/registry/notra/opencode/components/opencode-window.tsx
+  s_68efd06bd8cdc3::t_684f169ade1c97 18
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17,19
+apps/ui/docs/components/(search)/ai-overview/content.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/claude-code/examples/claude-code-tool-call.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-24
+apps/ui/registry/notra/claude-code/components/claude-code-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-49
+apps/ui/registry/notra/perplexity/components/perplexity-icons.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-177
+apps/ui/docs/components/(terminal-apps)/opencode/sidebar.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-22
+apps/ui/components/ui/kbd.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-26
+apps/ui/registry/notra/perplexity/components/perplexity-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-29
+apps/ui/registry/notra/perplexity/examples/perplexity-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-13
+apps/ui/docs/components/(desktop-apps)/gemini/thoughts.mdx
+  s_68efd06bd8cdc3::t_862101019d550b 12
+  s_68efd06bd8cdc3::t_3ac6329acb484a 1-11,13-17
+apps/ui/docs/components/(terminal-apps)/opencode/message.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/registry/notra/codex/examples/codex-terminal.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/chatgpt/types/chatgpt.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-8,10-16,23-26,28-29,31-76,78-151,156-158,160-183
+  s_68efd06bd8cdc3::t_971bb767c23747 77,152-155,159
+  s_68efd06bd8cdc3::t_61233cf9b0df86 184-190
+  s_68efd06bd8cdc3::t_d84abb18c52630 9,17-22,27,30
+apps/ui/docs/components/(desktop-apps)/claude/search.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-15,17-19,22-24,26-32
+  s_68efd06bd8cdc3::t_ee771755cd5e62 16
+apps/ui/registry/notra/claude/components/claude-sources.tsx
+  s_68efd06bd8cdc3::t_b4c0034604e36d 29
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 19
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,5-7,9-17,22-24,33-35
+  s_68efd06bd8cdc3::t_6e4c226ff193cd 3-4,8,18,20-21,25-28,30-32
+apps/ui/docs/components/(desktop-apps)/perplexity/composer.mdx
+  s_68efd06bd8cdc3::t_a8f1cda35b32d1 20
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-11,13-19,22-23
+  s_68efd06bd8cdc3::t_07666e991ec48b 3,12,21
+apps/ui/registry/notra/claude/examples/claude-spinner.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11
+apps/ui/registry/notra/claude/components/claude-model-selector.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-23,25-27,30-36,41,45,49,51-54,57-79,81-93,95-97,121-122,124-129,131,133-143,145-147,149-153,155,157-159,161,163,182-187
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 44,80,114
+  s_68efd06bd8cdc3::t_0d3f8c4f5b5bdc 24,28-29,37-40,42-43,46-48,50,55-56,94,98-113,115-120,123,130,132,144,148,154,156,160,162,164-181
+apps/ui/docs/components/(desktop-apps)/perplexity/meta.ts
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 12
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-10,14-20
+  s_68efd06bd8cdc3::t_22e5532c6f35e8 11
+  s_68efd06bd8cdc3::t_021cedf8d701ed 13
+apps/ui/registry/notra/opencode/examples/opencode-sources.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-10,12-13,15-20
+  s_68efd06bd8cdc3::t_acac52b2dcea11 11,14
+apps/ui/docs/components/(desktop-apps)/gemini/model-selector.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-28
+apps/ui/registry/notra/perplexity/components/perplexity-model-selector.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-134
+apps/ui/docs/components/(terminal-apps)/claude-code/message.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/docs/components/(terminal-apps)/claude-code/meta.ts
+  s_68efd06bd8cdc3::t_987fb75bbfe495 5-13
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-4,14-15
+apps/ui/registry/notra/google-ai-overview/components/ai-overview.tsx
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 43
+apps/ui/docs/components/(desktop-apps)/claude/composer.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-13,15-26
+  s_68efd06bd8cdc3::t_90cbac3451ee09 14,27
+apps/ui/docs/components/(desktop-apps)/chatgpt/source-chip.mdx
+  s_68efd06bd8cdc3::t_99a1fd821f3bf8 1-16
+apps/ui/registry/notra/gemini/lib/gemini-text.ts
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 5-6,30-35
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-4,7-29
+apps/ui/src/components/sidebar-memory.astro
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-70
+apps/ui/components/ui/toggle-group.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-89
+apps/ui/registry/notra/codex/examples/codex-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-16
+apps/ui/pages/index.astro
+  s_68efd06bd8cdc3::t_d7fa3ea86f3cf1 5-6,28-29
+apps/ui/src/constants/sidebar-memory.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1
+apps/ui/registry/notra/gemini/components/gemini-message.tsx
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 11,39
+  s_68efd06bd8cdc3::t_e4f9750c89e6c4 22,42
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-10,12-21,23-38,40-41,43-53
+apps/ui/registry/notra/claude-code/examples/claude-code-thinking.tsx
+  s_68efd06bd8cdc3::t_987fb75bbfe495 1-16
+apps/ui/registry/notra/perplexity/hooks/use-perplexity-reduced-motion.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/registry/notra/perplexity/components/perplexity-composer.tsx
+  s_68efd06bd8cdc3::t_9d3cee12e66a13 8,117-118,120,124
+  s_68efd06bd8cdc3::t_2fe63d53335d28 4,22,34
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-3,5-7,9-21,23-33,35-116,125-150,152-164
+  s_68efd06bd8cdc3::t_21ea0c8e44dcb9 119,121-123,151
+apps/ui/components/ui/item.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-201
+apps/ui/registry/notra/gemini/constants/gemini-story.ts
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 1-5,7-42,53-55
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 6,43-52,56-71
+apps/ui/registry/notra/claude/components/claude-actions.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-166
+apps/ui/registry/notra/chatgpt/components/chatgpt-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-49
+apps/ui/registry/notra/claude/components/claude-source-link.tsx
+  s_68efd06bd8cdc3::t_1d81eb406a4fee 43,46-47
+  s_68efd06bd8cdc3::t_6e4c226ff193cd 1-42,44-45,48-60
+apps/ui/components/ui/popover.tsx
+  s_68efd06bd8cdc3::t_88e590cfdad104 1,3-5,8,12,39,46,56,66,79,89
+  s_68efd06bd8cdc3::t_3d268d92fd9a90 2,6-7,9-11,13-38,40-45,47-55,57-65,67-78,80-88
+apps/ui/theme.css
+  s_68efd06bd8cdc3::t_41d55606ad5384 23-48
+  s_68efd06bd8cdc3::t_08b6367da0bb01 145-212
+apps/ui/registry/notra/perplexity/examples/perplexity-demo.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-4,6-15,17-24,28-41,52-59,61-154
+  s_68efd06bd8cdc3::t_99a1fd821f3bf8 25-27,60
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 16,42-51
+  s_68efd06bd8cdc3::t_c854e12f53828b 5
+apps/ui/components/ui/card.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-102
+apps/ui/components/ui/progress.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-82
+apps/ui/registry.json
+  s_68efd06bd8cdc3::t_3ce5429ab13603 3191-3194,3196-3197,3199-3318,4120,4306-4310
+  s_68efd06bd8cdc3::t_593f317c8e0096 3423-3432
+  s_68efd06bd8cdc3::t_cc4676a1ab3f73 2877-2883,2903-2910,2930-2937,2992-2998,3018-3025,3045-3052,3102-3108,3128-3135,3155-3162,3345-3351,3371-3378,3398-3405,3479-3485,3505-3512,3532-3539,3615-3621,3641-3648,3668-3675,3731-3737,3757-3764,3784-3791,3859-3864,3886-3893,3913-3920,3999-4004,4026-4033,4053-4060,4152-4157,4179-4186,4206-4213
+  s_68efd06bd8cdc3::t_6f2a358d1de257 1489,1491-1492,1643,1647,2633,3198,3836-3837,3976-3977,4128,4463-4469,4585-4591,4950
+  s_68efd06bd8cdc3::t_06d3eb01995631 3834-3835,3974-3975,4123,4127
+  s_68efd06bd8cdc3::t_54c0583d05ef40 4439-4453,4571-4575,4698-4707,4719,4949,4952-4953,5072-5076,5089,5211,5325,5329,5331
+  s_68efd06bd8cdc3::t_987fb75bbfe495 7747-7750,7753-7861,8252-8256,8473-8478,8481-8542,8796-8800
+  s_68efd06bd8cdc3::t_20a053e4eb0457 1754,1756,1927,1929-1930,2032,2034,2761,2763
+  s_68efd06bd8cdc3::t_3ac6329acb484a 4330-4335,4338-4438,4454-4461,4470-4570,4576-4577,4948,4951,4954-4955,5208-5210,5212-5213,5503-5512
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 1798-1801,1804-1910,1916-1926,2824-2828
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 12,116,218,320,546,652,835,908,942-943,1066,1213,1359-1360,1483,1636,1802-1803,1931-1932,2065,2216,2361-2362,2490,2618,2849,2970-2971,3080-3081,3195,3323-3324,3448,3587,3703,3829,3968,4113,4336-4337,4462,4584,4716,4836-4837,4947,5085,5207,5323,5528,5719-5720,5888-5889,6052-6053,6201-6202,6355,6533-6534,6697,6864-6865,7023,7296-7297,7406-7407,7526-7527,7636-7637,7751-7752,7866-7867,7981,8103,8272-8273,8344,8407,8414,8472,8479-8480,8549-8550,8619,8694,8816-8817,8885-8886,8947-8948,9009-9010,9071-9072,9143-9144,9210,9283
+  s_68efd06bd8cdc3::t_ee97e3a0c0a84c 3865-3866,3950-3959,4005-4006,4094-4103,4158-4159,4317-4326
+  s_68efd06bd8cdc3::t_fca2e5794536cf 1479-1482,1484-1488,1490,1493-1631,1637-1642,1644-1646,1648-1649,1772-1786,2630,2829-2833
+  s_68efd06bd8cdc3::t_315d29c1f7e233 830-834,836-888,902-903
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 904-907,909-941,944-1065,1067-1212,1222-1338,1344-1358,1361-1478,1632-1635,1650-1753,1755,1757-1771,1787-1797,1928,1933-2031,2033,2035-2064,2066-2215,2217-2360,2363-2489,2491-2617,2619-2626,2628-2629,2631-2632,2634-2760,2762,2764-2823,2834-2848,2850-2876,2884-2902,2911-2929,2938-2969,2972-2991,2999-3017,3026-3044,3053-3079,3082-3101,3109-3127,3136-3154,3163-3190,3319-3322,3325-3344,3352-3370,3379-3397,3406-3422,3433-3447,3449-3478,3486-3504,3513-3531,3540-3586,3588-3614,3622-3640,3649-3667,3676-3702,3704-3730,3738-3756,3765-3783,3792-3828,3830-3833,3838-3858,3867-3885,3894-3912,3921-3949,3960-3967,3969-3973,3978-3998,4007-4025,4034-4052,4061-4093,4104-4112,4114-4119,4121-4122,4124-4126,4129-4151,4160-4178,4187-4205,4214-4305,4311-4316,4327-4329,4578-4583,4592-4697,4708-4715,4717-4718,4720-4835,4838-4946,4956-5071,5077-5084,5086-5088,5090-5206,5214-5322,5324,5326-5328,5330,5332-5502,5513-5527,5529-5718,5721-5887,5890-6051,6054-6200,6203-6354,6356-6361,6363-6532,6535-6655,6671-6696,6698-6863,6866-7022,7024-7029,7031-7254,7270-7295,7298-7405,7408-7525,7528-7635,7638-7746,7862-7865,7868-7980,7982-8102,8104-8251,8257-8271,8274-8343,8345-8406,8408-8413,8415-8471,8543-8548,8551-8618,8620-8693,8695-8795,8801-8815,8818-8884,8887-8946,8949-9008,9011-9070,9073-9142,9145-9209,9211-9282,9284-9399
+  s_68efd06bd8cdc3::t_e17acebe38a414 6656-6670,7030,7265-7269
+  s_68efd06bd8cdc3::t_0951dad1e26aa9 1214-1221,1339-1343,2627
+apps/ui/registry/notra/codex/constants/codex-demo.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-32,35-59
+  s_68efd06bd8cdc3::t_670b3c669f55ed 33-34
+apps/ui/docs/components/(terminal-apps)/codex/terminal.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-16
+apps/ui/registry/notra/perplexity/types/perplexity.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-29,55-99,107-109,111-116,122-125,127-131,139-179,181-203
+  s_68efd06bd8cdc3::t_17f983c9c0aee5 132-137
+  s_68efd06bd8cdc3::t_1993d0f3ba765b 30-54,117-121,126
+  s_68efd06bd8cdc3::t_9c886d3d850134 100-106,110,180
+  s_68efd06bd8cdc3::t_021cedf8d701ed 138
+apps/ui/docs/components/(desktop-apps)/perplexity/search.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-31
+apps/ui/components/ui/tooltip.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-65
+apps/ui/registry/notra/perplexity/components/perplexity-model-icon.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-52
+apps/ui/registry/notra/chatgpt/examples/chatgpt-actions.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-13
+apps/ui/docs/components/(search)/ai-overview/skeleton.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/chatgpt/hooks/use-chatgpt-playback.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-163
+apps/ui/src/types/landing.ts
+  s_68efd06bd8cdc3::t_8b2d267bd82805 16-20,23
+  s_68efd06bd8cdc3::t_08b6367da0bb01 11
+  s_68efd06bd8cdc3::t_d7fa3ea86f3cf1 15,21-22,24
+apps/ui/docs/components/(terminal-apps)/opencode/logo.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/docs/components/meta.ts
+  s_68efd06bd8cdc3::t_8764aff0d2d02c 6-14
+apps/ui/docs/components/(terminal-apps)/claude-code/tool-call.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17,20-23
+  s_68efd06bd8cdc3::t_ea811cc6b62724 18-19
+apps/ui/registry/notra/claude-code/types/claude-code.ts
+  s_68efd06bd8cdc3::t_c0e5a4d55b29d8 113
+  s_68efd06bd8cdc3::t_a3ac29abe58d34 88-92,103,112
+  s_68efd06bd8cdc3::t_670b3c669f55ed 128-135,160
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-87,93-102,104-111,114-127,136-159,161-165
+bun.lock
+  ai_agent 281
+apps/ui/registry/notra/claude-code/constants/claude-code.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-149
+apps/ui/src/components/site-footer.astro
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 2,8,13
+apps/ui/registry/notra/claude/components/claude-message.tsx
+  s_68efd06bd8cdc3::t_1d81eb406a4fee 21,39
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 28,48
+  s_68efd06bd8cdc3::t_6e4c226ff193cd 47,50
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-20,22-27,29-38,40-46,49,51-56
+apps/ui/docs/blocks/(desktop-apps)/chatgpt.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-15,17-32,34-36,38-50
+  s_68efd06bd8cdc3::t_2095b49bfee73a 6
+  s_68efd06bd8cdc3::t_ee771755cd5e62 16,33
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 37
+apps/ui/docs/components/(desktop-apps)/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-8
+apps/ui/registry/notra/claude/components/claude-icons.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-39
+apps/ui/registry/notra/chatgpt/examples/chatgpt-reasoning.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-31
+apps/ui/registry/notra/claude/lib/claude-models.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19,22
+  s_68efd06bd8cdc3::t_9422494a09d4d7 20-21,23-24
+apps/ui/registry/notra/perplexity/hooks/use-perplexity-playback.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-200
+apps/ui/src/components/landing-sections.astro
+  s_68efd06bd8cdc3::t_d7fa3ea86f3cf1 1-44
+apps/ui/docs/blocks/(terminal-apps)/claude-code.mdx
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 31
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-5,7-30,32-44
+  s_68efd06bd8cdc3::t_2095b49bfee73a 6
+apps/ui/package.json
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 30-31
+apps/ui/registry/notra/opencode/types/opencode.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-112
+apps/ui/src/styles/examples.css
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-3,144-148,185-319,353-375,409-427,434-856
+  s_68efd06bd8cdc3::t_dac44c5ae7b474 857-858
+  s_68efd06bd8cdc3::t_ee97e3a0c0a84c 161-177
+  s_68efd06bd8cdc3::t_cc4676a1ab3f73 320-325,376-381,428-433
+  s_68efd06bd8cdc3::t_06d3eb01995631 326-352,382-408
+  s_68efd06bd8cdc3::t_41d55606ad5384 4,7-14,17-25,28-30
+  s_68efd06bd8cdc3::t_7f1e9862902f4b 151-160
+  s_68efd06bd8cdc3::t_4f6b2dd76c1894 5-6,15-16,26-27
+apps/ui/docs/components/(desktop-apps)/chatgpt/thread.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/docs/components/(desktop-apps)/perplexity/favicon.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/docs/blocks/(terminal-apps)/opencode.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-25,27-39
+  s_68efd06bd8cdc3::t_5907c1d6b485c1 26
+apps/ui/components/ui/empty.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-100
+apps/ui/registry/notra/codex/components/codex-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-45
+apps/ui/registry/notra/claude/lib/claude-text.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-22
+apps/ui/registry/notra/chatgpt/examples/chatgpt-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-14
+apps/ui/docs/components/(desktop-apps)/gemini/actions.mdx
+  s_68efd06bd8cdc3::t_76e4a9ca30b652 3,12,16-17
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-11,13-15,18-27
+apps/ui/registry/notra/claude-code/components/claude-code-icons.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-61
+apps/ui/registry/notra/gemini/components/gemini-model-selector.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-85,87-96,98-125
+  s_68efd06bd8cdc3::t_e4f9750c89e6c4 86,97
+apps/ui/registry/notra/gemini/hooks/use-gemini-playback.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-181
+apps/ui/docs/components/(search)/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-7
+apps/ui/registry/notra/chatgpt/examples/chatgpt-activity.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/docs/components/shimmer.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-23
+apps/ui/registry/notra/google-ai-overview/components/ai-overview-citation.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 3,138,140-149,152
+apps/ui/registry/notra/opencode/examples/opencode-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-26
+apps/ui/docs/components/(desktop-apps)/claude/model-selector.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11,13-15,17,19-22
+  s_68efd06bd8cdc3::t_90cbac3451ee09 12,16,18,23
+apps/ui/registry/notra/opencode/components/opencode-sources.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-244
+apps/ui/registry/notra/perplexity/examples/perplexity-model-selector.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-26
+apps/ui/registry/notra/chatgpt/constants/chatgpt.ts
+  s_68efd06bd8cdc3::t_ee97e3a0c0a84c 20-31
+  s_68efd06bd8cdc3::t_61233cf9b0df86 32-35
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/docs/blocks/(search)/google-ai-overview.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-51
+apps/ui/docs/components/(desktop-apps)/chatgpt/meta.ts
+  s_68efd06bd8cdc3::t_3ce5429ab13603 11
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-10,12-18
+apps/ui/docs/components/(desktop-apps)/claude/message.mdx
+  s_68efd06bd8cdc3::t_e17acebe38a414 12,18
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11,13-17,19
+apps/ui/registry/notra/claude-code/examples/claude-code-todo-list.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11
+apps/ui/registry/notra/gemini/examples/gemini-thoughts.tsx
+  s_68efd06bd8cdc3::t_3ac6329acb484a 1-12
+apps/ui/registry/notra/gemini/hooks/use-gemini-reduced-motion.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/registry/notra/perplexity/components/perplexity-search.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-449
+apps/ui/registry/notra/claude-code/components/claude-code-terminal.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-16,18-36,41-47
+  s_68efd06bd8cdc3::t_a3ac29abe58d34 17,37-40
+apps/ui/docs/components/(desktop-apps)/chatgpt/thinking.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/registry/notra/perplexity/components/perplexity-rewrite-panel.tsx
+  s_68efd06bd8cdc3::t_1993d0f3ba765b 1-3,12-16,25-26,28-53,59-84,89-91,105-107,109-111,113-115,117-133,135-136,138-150,152,156,158,166,168,176,178,180-192
+  s_68efd06bd8cdc3::t_d3e639d4114590 4-11,54-58,85-88
+  s_68efd06bd8cdc3::t_fb7d9a840bc16a 154
+  s_68efd06bd8cdc3::t_eb701a5f742cb6 17-24,27,92-104,108,112,116,134,137,151,153,155,157,159-165,167,169-175,177,179
+apps/ui/registry/notra/chatgpt/components/chatgpt-source-chip.tsx
+  s_68efd06bd8cdc3::t_9d3cee12e66a13 5,40-41
+  s_68efd06bd8cdc3::t_61233cf9b0df86 1-4,6-39,42-86
+apps/ui/registry/notra/opencode/examples/opencode-sidebar.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-23
+apps/ui/registry/notra/shimmer/components/shimmer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-32
+apps/ui/registry/notra/opencode/components/opencode-logo.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-48
+apps/ui/components/ui/scroll-area.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-54
+apps/ui/registry/notra/codex/examples/codex-demo.tsx
+  s_68efd06bd8cdc3::t_af6160cb596896 7,19-21
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-6,8-18,22-43
+apps/ui/registry/notra/claude/examples/claude-sources.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 2,4-6,16-18
+  s_68efd06bd8cdc3::t_b4c0034604e36d 1,3,7-15
+apps/ui/registry/notra/perplexity/components/perplexity-actions.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-14,16-18,33-43,46-51,54,87,90,94-98,100-107,110-151,172-174,176-184,224-228
+  s_68efd06bd8cdc3::t_d3e639d4114590 15,19-32,44,52-53,55-86,88-89,91-93,99,108-109,152-171,185-223
+  s_68efd06bd8cdc3::t_021cedf8d701ed 45,175
+apps/ui/registry/notra/codex/examples/codex-header.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-13
+apps/ui/registry/notra/chatgpt/components/chatgpt-search.tsx
+  s_68efd06bd8cdc3::t_971bb767c23747 3,7,10-11,14,30-46
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,4-6,8-9,12-13,15-29,47-50
+apps/ui/docs/components/(desktop-apps)/chatgpt/message.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/registry/notra/chatgpt/components/chatgpt-activity.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-88,92-93,95-217
+  s_68efd06bd8cdc3::t_971bb767c23747 94
+  s_68efd06bd8cdc3::t_494ded6617eae4 89-91
+apps/ui/registry/notra/chatgpt/components/chatgpt-actions.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-88
+apps/ui/registry/notra/gemini/examples/gemini-actions.tsx
+  s_68efd06bd8cdc3::t_76e4a9ca30b652 13
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12,14-16
+apps/ui/registry/notra/claude/constants/claude.ts
+  s_68efd06bd8cdc3::t_6e4c226ff193cd 73-76
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-71
+  s_68efd06bd8cdc3::t_69c0d4f63585a7 72
+apps/ui/registry/notra/codex/components/codex-composer.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-58
+apps/ui/registry/notra/perplexity/examples/perplexity-thinking.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11
+apps/ui/docs/components/(desktop-apps)/claude/thinking.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/docs/components/(desktop-apps)/gemini/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-7,10-16
+  s_68efd06bd8cdc3::t_3ac6329acb484a 8-9
+apps/ui/registry/notra/gemini/components/gemini-story-text.tsx
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 3-10,12,24-44,47,50-66
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-2,11,13-23,45-46,48-49
+apps/ui/registry/notra/codex/examples/codex-message.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/docs/blocks/(terminal-apps)/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-8
+apps/ui/registry/notra/gemini/components/gemini-composer.tsx
+  s_68efd06bd8cdc3::t_e4f9750c89e6c4 31,80,89,92,138,152,157,182
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-30,32-79,81-88,90-91,93-137,139-151,153-156,158-181,183-202
+apps/ui/registry/notra/chatgpt/components/chatgpt-model-selector.tsx
+  s_68efd06bd8cdc3::t_ee97e3a0c0a84c 16,37-40,216,228-245
+  s_68efd06bd8cdc3::t_98c0d5b6db3b0c 175
+  s_68efd06bd8cdc3::t_6c787a76546f06 201
+  s_68efd06bd8cdc3::t_9d3cee12e66a13 14,70-82,84-85,87,100,102
+  s_68efd06bd8cdc3::t_d84abb18c52630 4-5,9-13,19,23-33,35-36,41-42,44-53,55-69,83,86,88-99,101,103,115-117,119-125,127-136,138-145,147-148,151,153,169,172-173,179-185,187-197,199-200,202-215,217-227,246-260
+  s_68efd06bd8cdc3::t_414e155f37e746 162-166
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-3,6-8,15,17-18,20-22,34,43,54,104-114,118,126,137,146,149-150,152,154-161,167-168,170-171,174,176-178,186,198,261-262
+apps/ui/docs/components/(terminal-apps)/codex/header.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/docs/blocks/(desktop-apps)/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-8
+apps/ui/docs/components/(search)/ai-overview/highlight.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-12
+apps/ui/components/ui/sheet.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-134
+apps/ui/registry/notra/claude-code/constants/claude-code-session.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-26,29-36,46-47,49-50,52,55-56,58,61-103
+  s_68efd06bd8cdc3::t_670b3c669f55ed 27-28
+  s_68efd06bd8cdc3::t_a3ac29abe58d34 37-45,48,51,53-54,57,59-60
+apps/ui/src/components/install-command.astro
+  s_68efd06bd8cdc3::t_8b2d267bd82805 1-63
+apps/ui/registry/notra/codex/components/codex-reasoning.tsx
+  s_68efd06bd8cdc3::t_670b3c669f55ed 1-53
+apps/ui/docs/components/(terminal-apps)/codex/composer.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/registry/notra/gemini/examples/gemini-demo.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-4,6-12,14-57,60-79,81-85,91-94,99-119
+  s_68efd06bd8cdc3::t_c854e12f53828b 5
+  s_68efd06bd8cdc3::t_733ffa1da6c0a1 13,86-90,95-98
+  s_68efd06bd8cdc3::t_e4f9750c89e6c4 58-59
+  s_68efd06bd8cdc3::t_76e4a9ca30b652 80
+apps/ui/docs/components/(terminal-apps)/opencode/sources.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-11,13-29
+  s_68efd06bd8cdc3::t_ee771755cd5e62 12
+apps/ui/docs/components/(desktop-apps)/perplexity/rewrite-panel.mdx
+  s_68efd06bd8cdc3::t_22e5532c6f35e8 1-21
+apps/ui/registry/notra/perplexity/examples/perplexity-citation.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+apps/ui/registry/notra/gemini/examples/gemini-source-chip.tsx
+  s_68efd06bd8cdc3::t_3ac6329acb484a 1-15
+apps/ui/docs/components/(desktop-apps)/claude/meta.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/registry/notra/gemini/lib/gemini-model.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-17
+apps/ui/registry/notra/perplexity/examples/perplexity-actions.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-19
+apps/ui/registry/notra/shimmer/types/shimmer.ts
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-6
+apps/ui/registry/notra/claude-code/components/claude-code-header.tsx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-126
+apps/ui/docs/components/(desktop-apps)/claude/plus-menu.mdx
+  s_68efd06bd8cdc3::t_b16b2cef7ae45b 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2814856756da4959e758a7232b785545c4ab3a69",
+  "prompts": {},
+  "sessions": {
+    "s_68efd06bd8cdc3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff5b0bb1-cc5d-44be-af5f-6d10a56bd786",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

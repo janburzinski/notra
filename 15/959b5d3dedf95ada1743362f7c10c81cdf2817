@@ -1,0 +1,53 @@
+packages/ai/src/utils/github-mention-content-policy.test.ts
+  s_499734802df790::t_b60956376e4a6c 238-247,376-382
+packages/ai/src/utils/retry-write.ts
+  s_499734802df790::t_b60956376e4a6c 1,19-25,27-30
+apps/dashboard/src/app/api/internal/workflows/content-publication-sync-repair/route.ts
+  s_499734802df790::t_b60956376e4a6c 5,17-21
+packages/tools/src/assistant/update-published-content.ts
+  s_499734802df790::t_b60956376e4a6c 121-141
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_499734802df790::t_b60956376e4a6c 1204-1216
+packages/ai/src/utils/github-pr-commit.ts
+  s_499734802df790::t_b60956376e4a6c 124
+packages/ai/src/utils/content-publication-mapping.test.ts
+  s_baf772bf3d5c23::t_9f8ba6165cb6e7 98-102,285-315
+apps/dashboard/src/workflows/steps/content-publication-reconciliation-step.ts
+  s_499734802df790::t_b60956376e4a6c 14,33
+packages/ai/src/utils/content-publication.ts
+  s_499734802df790::t_b60956376e4a6c 307,326-328
+packages/ai/src/utils/github-mention-path-policy.ts
+  s_499734802df790::t_b60956376e4a6c 69-73
+packages/ai/src/tools/github-mention.ts
+  s_499734802df790::t_b60956376e4a6c 435,437
+packages/ai/src/utils/parse-github-mention-content.ts
+  s_499734802df790::t_b60956376e4a6c 43,58,80,111,114,116,123-126,130,132-135,198
+packages/ai/src/utils/github-mention-path-policy.test.ts
+  s_499734802df790::t_b60956376e4a6c 12
+packages/ai/src/utils/content-publication-repair-scheduler.ts
+  s_499734802df790::t_b60956376e4a6c 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "15959b5d3dedf95ada1743362f7c10c81cdf2817",
+  "prompts": {},
+  "sessions": {
+    "s_499734802df790": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SUITm9peDgcSZIMUsCK",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_baf772bf3d5c23": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034SULHUFWEpi36ijXrxVh",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

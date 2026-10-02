@@ -1,0 +1,23 @@
+bun.lock
+  ai_agent 106,5225,6059-6060,6065
+apps/dashboard/knip.json
+  s_aae8a83012bcf6::t_70b885af1046bb 12
+apps/dashboard/package.json
+  s_aae8a83012bcf6::t_09fb911515460e 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "607bb498da9040f3d28ba45f38371b45871404e2",
+  "prompts": {},
+  "sessions": {
+    "s_aae8a83012bcf6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23621157-e8d6-43b5-b134-0c5a45e82dc8",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

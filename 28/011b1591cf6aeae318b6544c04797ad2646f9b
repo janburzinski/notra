@@ -1,0 +1,21 @@
+packages/geo-core/tests/geo-audience-engines.test.ts
+  s_b066d480a90510::t_0e27e83094b965 71-82
+packages/geo-core/src/utils/geo-model-catalog.ts
+  s_b066d480a90510::t_0e27e83094b965 242-245,251,255-262
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "28011b1591cf6aeae318b6544c04797ad2646f9b",
+  "prompts": {},
+  "sessions": {
+    "s_b066d480a90510": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5849b809-dbb7-447e-902f-b5ab89583ab0",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

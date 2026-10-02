@@ -1,0 +1,386 @@
+apps/ui/registry/notra/chat-ui/types/claude-chat.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-32
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-favicon.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-22,27-37,39-41
+  s_722cc11de57c72::t_2bd2d4ec19c793 23-26,38
+apps/ui/registry/notra/chat-ui/components/opencode/opencode-sources.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 3-6,19,185-191
+  s_722cc11de57c72::t_0b4499b605686e 25
+  s_722cc11de57c72::t_2faf9579b150b6 1-2,7-18,20-24,26-184,192-234
+apps/ui/registry/notra/chat-ui/components/blocks/chatgpt-block.tsx
+  s_722cc11de57c72::t_4fb66a3ecb3d43 21
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,10-16,18-20,22-24,32-36
+  s_722cc11de57c72::t_6843b8d0fffde7 1-3,5-9,17,25-31,37-48
+apps/ui/docs/trademarks.mdx
+  s_722cc11de57c72::t_56ec02bdb9e73e 12-13
+packages/ui/src/components/brainless/opencode/opencode-composer.tsx
+  s_722cc11de57c72::t_5bbaa520e780d4 23,120
+  s_722cc11de57c72::t_56ec02bdb9e73e 4-15,17-22,24-75,82,84-94,96,101-119,121-131,134-138,142,146,148,150,153-158,162-168,170,173-187,189-207,210-225,228-243
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-composer.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-2,8-11,17,19-66,68-73,75-80,82-125
+  s_722cc11de57c72::t_2bd2d4ec19c793 3-7,12-16,18,67,74,81
+apps/ui/registry/notra/chat-ui/components/ui/svgs/perplexity.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-29
+apps/ui/registry/notra/chat-ui/constants/chatgpt-models.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-35
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-model-selector.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-8,12-17,19-24,26-32,34-39,41-48,50-84,86-95,97-109,111-112,114-125
+  s_722cc11de57c72::t_2bd2d4ec19c793 9-11,18,25,33,40,49,85,110,113
+  s_722cc11de57c72::t_0b4499b605686e 96
+apps/ui/registry/notra/chat-ui/components/opencode/opencode-logo.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 2-3,21-24,26-29,35-38,40-43
+  s_722cc11de57c72::t_2faf9579b150b6 1,4-20,25,30-34,39,44-46
+apps/ui/registry/notra/chat-ui/lib/claude-chat-model.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-17,20-26,29-42
+  s_722cc11de57c72::t_2bd2d4ec19c793 18-19,27-28
+apps/ui/registry/notra/chat-ui/lib/gemini-model.ts
+  s_722cc11de57c72::t_2faf9579b150b6 2-12
+  s_722cc11de57c72::t_2bd2d4ec19c793 1
+apps/ui/registry/notra/chat-ui/examples/chatgpt-preview.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,6,9-11,13-16,28,33-43
+  s_722cc11de57c72::t_f4a3ad41b4072a 12,17-27
+  s_722cc11de57c72::t_6843b8d0fffde7 1-3,5,7-8,29-32,44
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-search-timing.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-21
+apps/ui/docs/blocks/opencode-start.mdx
+  s_722cc11de57c72::t_f6b37c61259d6f 1-13,15,18
+  s_722cc11de57c72::t_cf3d04f3c13ed9 16-17
+  s_722cc11de57c72::t_ead6db4d1dcd6f 14
+apps/ui/registry/notra/chat-ui/components/blocks/opencode-start-block.tsx
+  s_722cc11de57c72::t_536afda89cdd89 1-15,17-18,20,23-24,26-29,35-41,43-46,51,54,61,63,66-70,85-88,93-98
+  s_722cc11de57c72::t_f73b2e85fe854d 30-34,47-50,71-84,89-92
+  s_722cc11de57c72::t_4818b592bf4bdb 16,19,21-22,25,52-53,55-60,62,64-65
+  s_722cc11de57c72::t_11bdc0717a0a2d 42
+apps/ui/docs/components/gemini-ui.mdx
+  s_722cc11de57c72::t_183800954d629c 1-13,15-20
+  s_722cc11de57c72::t_8b313b052d9c2e 14
+apps/ui/registry/notra/chat-ui/constants/gemini-models.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-37
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-spinner.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-29,33-146
+  s_722cc11de57c72::t_2bd2d4ec19c793 30-32
+packages/ui/src/types/brainless-opencode.ts
+  s_722cc11de57c72::t_56ec02bdb9e73e 18,21-22,24-26,29-30,32,38-41
+apps/ui/registry/notra/chat-ui/components/gemini/gemini-actions.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-12,17-37,39-97
+  s_722cc11de57c72::t_2bd2d4ec19c793 13-16,38
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-search-timing.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-20
+apps/ui/registry/notra/chat-ui/constants/brainless-opencode.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-25
+packages/ui/src/constants/brainless-opencode-models.ts
+  s_722cc11de57c72::t_eeaf8973cc2678 1-9
+apps/ui/registry/notra/chat-ui/lib/chatgpt-model.ts
+  s_722cc11de57c72::t_2bd2d4ec19c793 19-21
+  s_722cc11de57c72::t_2faf9579b150b6 1-18,22
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-sources-sheet.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-4,7-15,19-69,71-99,101-111,113-116,118-124,126-139
+  s_722cc11de57c72::t_2bd2d4ec19c793 5-6,16-18,70,100,112,117,125
+apps/ui/docs/blocks/gemini-chat.mdx
+  s_722cc11de57c72::t_183800954d629c 1-16
+apps/ui/package.json
+  s_722cc11de57c72::t_56ec02bdb9e73e 15-16
+apps/ui/registry/notra/chat-ui/types/perplexity.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-50
+apps/ui/docs/components/chatgpt-ui.mdx
+  s_722cc11de57c72::t_183800954d629c 1-13,15-20
+  s_722cc11de57c72::t_8b313b052d9c2e 14
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-activity.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 3-7,9-11,22,55,63,67,80,88,92,135,146,157,163,166,172,178,184,187,195,197,210,213,216
+  s_722cc11de57c72::t_2faf9579b150b6 1-2,8,12-21,23-54,56-62,64-66,68-79,81-87,89-91,93-134,136-145,147-156,158-162,164-165,167-171,173-177,179-183,185-186,188-194,196,198-209,211-212,214-215,217-228
+apps/ui/registry/notra/chat-ui/components/opencode/opencode-message.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 3-43
+  s_722cc11de57c72::t_2bd2d4ec19c793 1-2
+apps/ui/registry/notra/chat-ui/components/opencode/opencode-sidebar.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-2,6-28,33-42,46-66,71-74,79-92,100-107
+  s_722cc11de57c72::t_2bd2d4ec19c793 3-5,29-32,43-45,67-70,75-78,93-99
+apps/ui/registry/notra/chat-ui/types/brainless-opencode.ts
+  s_722cc11de57c72::t_c34960feb23f1c 32
+  s_722cc11de57c72::t_cd6051787174cb 18,21-22,24-26,29-30,36-41
+  s_722cc11de57c72::t_2faf9579b150b6 1-17,19-20,23,27-28,31,33-35,42-94
+apps/ui/registry/notra/chat-ui/components/gemini/gemini-model-selector.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-4,8-14,17-38,40-47,49-51,53-56,58-85,87-96,98-133
+  s_722cc11de57c72::t_0b4499b605686e 97
+  s_722cc11de57c72::t_2bd2d4ec19c793 5-7,15-16,39,48,52,57,86
+apps/ui/components/ui/input.tsx
+  s_722cc11de57c72::t_e462a783f26318 1-2,4-8,10-19
+  s_722cc11de57c72::t_a1a9ceb38ef3fe 3,9
+apps/ui/registry/notra/chat-ui/components/ui/svgs/gemini.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-32
+apps/ui/registry/notra/chat-ui/components/opencode/opencode-composer.tsx
+  s_722cc11de57c72::t_e462a783f26318 7-13,21-24,26-77,84,86-96,103-107,112-119,123-134,148,155-160,171-172,175,177-189,191-209,212,215-227,231,248
+  s_722cc11de57c72::t_f73b2e85fe854d 235-238
+  s_722cc11de57c72::t_2939b4fb6d5964 85,145,152,165-167
+  s_722cc11de57c72::t_2faf9579b150b6 1-2,78-83,97,99-102,122,135,141-143,146-147,149,151,153-154,161-163,173-174,190,210-211,228-229,249-250
+  s_722cc11de57c72::t_16cd9db3e21408 137,150
+  s_722cc11de57c72::t_c34960feb23f1c 98,230,232,239-242,246-247
+  s_722cc11de57c72::t_2bd2d4ec19c793 25,164,168-170,213
+  s_722cc11de57c72::t_21727c72068df0 108-111,144,176,214
+  s_722cc11de57c72::t_0570952fc023f5 120-121
+  s_722cc11de57c72::t_a1a9ceb38ef3fe 3-6,14-20,136,138-140,233-234,243-245
+apps/ui/docs/introduction.mdx
+  s_722cc11de57c72::t_56ec02bdb9e73e 19-24
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-citation.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-3,5-8,10-40,42-54
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,9,41
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-search.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-7,9-44,46-57
+  s_722cc11de57c72::t_2bd2d4ec19c793 8,45
+apps/ui/registry.json
+  s_722cc11de57c72::t_56ec02bdb9e73e 829-3209
+apps/ui/registry/notra/chat-ui/constants/opencode-story.ts
+  s_722cc11de57c72::t_31e3543c5be29b 9-38,59-68
+  s_722cc11de57c72::t_2939b4fb6d5964 41
+  s_722cc11de57c72::t_70bed7f42b225c 1-8,39-40,42-58,69
+apps/ui/docs/components/opencode-ui.mdx
+  s_722cc11de57c72::t_183800954d629c 1-7,10-15,17-22
+  s_722cc11de57c72::t_8b313b052d9c2e 16
+  s_722cc11de57c72::t_f6b37c61259d6f 8-9
+apps/ui/docs/blocks/claude-chat.mdx
+  s_722cc11de57c72::t_183800954d629c 1,4-5,7-13,15
+  s_722cc11de57c72::t_df4a2a5e3a60a0 2
+  s_722cc11de57c72::t_9a7e26f4e47578 3,6,14,16
+apps/ui/src/constants/landing.ts
+  s_722cc11de57c72::t_56ec02bdb9e73e 12-36,49-77
+  s_722cc11de57c72::t_f6b37c61259d6f 78
+apps/ui/public/fonts/GEIST-MONO-OFL.txt
+  s_722cc11de57c72::t_9884e2a4e193d2 21,93
+  s_722cc11de57c72::t_d00ff1d7c76524 1-20,22-92
+apps/ui/registry/notra/chat-ui/components/blocks/opencode-block.tsx
+  s_722cc11de57c72::t_536afda89cdd89 1-2,5,18,20,23-24,29-30
+  s_722cc11de57c72::t_6843b8d0fffde7 3,6,8,31,68,76-78
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,9-11,32-34,37-39
+  s_722cc11de57c72::t_44e62f7c24aac8 40,46
+  s_722cc11de57c72::t_2bbd3f08092c22 7,26-28,44-45,47,49-52,54,56,59-61,70-74
+  s_722cc11de57c72::t_d9a0e396235a78 12-15,17
+  s_722cc11de57c72::t_0570952fc023f5 16,19,21-22,25,48,53,55,57-58
+  s_722cc11de57c72::t_e53c01d3d97b72 35-36,69,75
+  ai_agent 41-43
+  s_722cc11de57c72::t_31e3543c5be29b 62-67
+apps/ui/registry/notra/chat-ui/components/blocks/claude-chat-block.tsx
+  s_722cc11de57c72::t_4fb66a3ecb3d43 21
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,10-16,18-20,22-24,31-37
+  s_722cc11de57c72::t_6843b8d0fffde7 1-3,5-9,17,25-30,38-49
+apps/ui/registry/notra/chat-ui/components/ui/svgs/claudeAiIcon.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-12
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-model-selector.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 9-10,23,93,136,198
+  s_722cc11de57c72::t_0b4499b605686e 79
+  s_722cc11de57c72::t_2faf9579b150b6 1-8,11-22,24-68,70-78,80-92,94-135,137-197,199-207
+  s_722cc11de57c72::t_933800098c40fc 69
+apps/ui/components/ui/tooltip.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 1,3-4,16,20,24,52,58,62,65
+  s_722cc11de57c72::t_650b8689e75219 2,5-15,17-19,21-23,25-51,53-57,59-61,63-64
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-message.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 2-3,25,40
+  s_722cc11de57c72::t_0b4499b605686e 7
+  s_722cc11de57c72::t_2faf9579b150b6 1,4-6,8-24,26-39,41-48
+apps/ui/docs/blocks/chatgpt-chat.mdx
+  s_722cc11de57c72::t_183800954d629c 1-16
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-model-selector.tsx
+  s_722cc11de57c72::t_0b4499b605686e 66
+  s_722cc11de57c72::t_2bd2d4ec19c793 5-6,17,22,57,81,114
+  s_722cc11de57c72::t_2faf9579b150b6 1-4,7-16,18-21,23-56,58-65,67-80,82-113,115-147
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-composer.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 13,22,60,113,203
+  s_722cc11de57c72::t_2faf9579b150b6 1-12,14-21,23-40,42-59,61-81,83-109,111-112,114-202,204-245
+  s_722cc11de57c72::t_0b4499b605686e 41,82,110
+apps/ui/theme.css
+  s_722cc11de57c72::t_56ec02bdb9e73e 134-149
+apps/ui/registry/notra/chat-ui/constants/perplexity-models.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-98
+apps/ui/docs/blocks/perplexity-chat.mdx
+  s_722cc11de57c72::t_183800954d629c 1-7,10-18
+  s_722cc11de57c72::t_f11089b18a3d35 8-9
+apps/ui/components/ui/sheet.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 1,3-6,8,11,15,19,23,36,46-47,56,73,79,89,99,106,109,119,122,134
+  s_722cc11de57c72::t_710ed23ccfc7b5 2,7,9-10,12-14,16-18,20-22,24-35,37-45,48-55,57-72,74-78,80-88,90-98,100-105,107-108,110-118,120-121,123-133
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-search.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-9,14-42,44,46,48-77,79-232,234-263,265-270,272-294,296-300,305-311,313-337,339-348
+  s_722cc11de57c72::t_0b4499b605686e 43,45,47,233
+  s_722cc11de57c72::t_2bd2d4ec19c793 10-13,78,264,271,295,301-304,312,338
+apps/ui/components/ui/dropdown-menu.tsx
+  s_722cc11de57c72::t_650b8689e75219 2,7-8,10-12,14-16,18-42,47-50,52-54,56-62,64-69,71-74,76-83,86-92,94-97,99-101,103-110,112-117,119-125,127-139,144-149,151-159,161-166,168-177,179-182,184-191,193-200,202-207,209-217,219-222,224-232,234-235,237-246,248-251,253-270
+  s_722cc11de57c72::t_2bd2d4ec19c793 1,3-6,9,13,17,43-46,51,55,63,70,75,84-85,93,98,102,111,118,126,140-143,150,160,167,178,183,192,201,208,218,223,233,236,247,252,271
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-reasoning.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-2,4-5,7-13,15-40,42-52,54-58,60-62,64-75,77-88
+  s_722cc11de57c72::t_2bd2d4ec19c793 3,6,41,53,59,76
+  s_722cc11de57c72::t_0b4499b605686e 14,63
+apps/ui/public/fonts/INTER-OFL.txt
+  s_722cc11de57c72::t_d00ff1d7c76524 1-20,22-93
+  s_722cc11de57c72::t_9884e2a4e193d2 21
+apps/ui/registry/notra/chat-ui/components/ui/svgs/kimi.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-3,23-25
+  s_722cc11de57c72::t_2bd2d4ec19c793 4-22
+apps/ui/blume.config.ts
+  s_722cc11de57c72::t_56ec02bdb9e73e 5-6,76-78
+apps/ui/registry/notra/chat-ui/components/blocks/gemini-block.tsx
+  s_722cc11de57c72::t_4fb66a3ecb3d43 21
+  s_722cc11de57c72::t_6843b8d0fffde7 1-3,5-9,17,25-31,37-48
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,10-16,18-20,22-24,32-36
+apps/ui/registry/notra/chat-ui/components/gemini/gemini-sparkle.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 56,124
+  s_722cc11de57c72::t_2faf9579b150b6 1-55,57-123,125-132
+apps/ui/docs/components/claude-chat-ui.mdx
+  s_722cc11de57c72::t_8b313b052d9c2e 14
+  s_722cc11de57c72::t_183800954d629c 1-13,15-20
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-search.tsx
+  s_722cc11de57c72::t_0b4499b605686e 124,127,258
+  s_722cc11de57c72::t_2bd2d4ec19c793 9-12,18,23-28,86,244,255,268-331,333,337-345
+  s_722cc11de57c72::t_2faf9579b150b6 1-8,13-17,19-22,29-85,87-123,125-126,128-243,245-254,256-257,259-267,332,334-336,346-351
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-thinking.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 4-5
+  s_722cc11de57c72::t_2faf9579b150b6 1-3,6-19,21-31
+  s_722cc11de57c72::t_0b4499b605686e 20
+apps/ui/registry/notra/chat-ui/components/gemini/gemini-thinking.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-3,6-19,21-28
+  s_722cc11de57c72::t_2bd2d4ec19c793 4-5,20
+apps/ui/registry/notra/chat-ui/types/chat-block.ts
+  s_722cc11de57c72::t_0570952fc023f5 7-10,42,44,46-47,50
+  s_722cc11de57c72::t_c34960feb23f1c 40-41,43,45,48-49,54-56,61-64
+  s_722cc11de57c72::t_f73b2e85fe854d 57-60
+  s_722cc11de57c72::t_6e75dffd7492c2 1-5
+  s_722cc11de57c72::t_31e3543c5be29b 6
+  s_722cc11de57c72::t_2bbd3f08092c22 51-53
+  s_722cc11de57c72::t_6843b8d0fffde7 11-28,39
+  s_722cc11de57c72::t_d9a0e396235a78 29-38
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-message.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 2,22
+  s_722cc11de57c72::t_e36f08f6d7e07b 33
+  s_722cc11de57c72::t_2faf9579b150b6 1,3-21,23-32,34-42
+apps/ui/registry/notra/chat-ui/constants/claude-chat-models.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-92
+bun.lock
+  ai_agent 263-264
+apps/ui/registry/notra/chat-ui/components/ui/svgs/zai.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-10
+apps/ui/registry/notra/chat-ui/lib/perplexity-model.ts
+  s_722cc11de57c72::t_2bd2d4ec19c793 14-19,28-30
+  s_722cc11de57c72::t_2faf9579b150b6 1-13,20-27,31-35
+apps/ui/src/styles/examples.css
+  s_722cc11de57c72::t_56ec02bdb9e73e 118-235
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-actions.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-11,16-36,38-64,66-98
+  s_722cc11de57c72::t_2bd2d4ec19c793 12-15,37,65
+apps/ui/docs/components/perplexity-ui.mdx
+  s_722cc11de57c72::t_8b313b052d9c2e 14
+  s_722cc11de57c72::t_183800954d629c 1-13,15-20
+apps/ui/registry/notra/chat-ui/examples/perplexity-preview.tsx
+  s_722cc11de57c72::t_e385639ed94148 27-38,101-106,119-121,134-138,176-179,181-182
+  s_722cc11de57c72::t_6843b8d0fffde7 1-2,7,17,78,87,94-96,221
+  s_722cc11de57c72::t_2bd2d4ec19c793 6,16,80-82,86,220
+  ai_agent 129-131,142-144,146-148,156-158,171-173,194-198
+  s_722cc11de57c72::t_38871b6a0a4a28 3-5,8-15,18-19,21-26,39-41,60-77,79,83,85,88-93,97-100,107-118,122-127,132-133,139-141,145,149-155,159,169,174-175,183-187,189-191,193,199-219
+  s_722cc11de57c72::t_aacd4823d7065a 188
+  s_722cc11de57c72::t_74c5827f1e5f3c 20,42-59,84,128,160-168,170,180,192
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-model-icon.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-2,7-40,42-52
+  s_722cc11de57c72::t_2bd2d4ec19c793 3-6,41
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-thinking.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-3,6-16,18-28
+  s_722cc11de57c72::t_2bd2d4ec19c793 4-5,17
+apps/ui/registry/notra/chat-ui/types/chatgpt.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-21
+apps/ui/registry/notra/chat-ui/components/blocks/perplexity-block.tsx
+  s_722cc11de57c72::t_6eded20b333375 26
+  ai_agent 42
+  s_722cc11de57c72::t_2bd2d4ec19c793 5,11-15,17,39-41,43-45,57-61
+  s_722cc11de57c72::t_6a5c261f25e2fb 4,16,18-22,29-37,46-47,49-50
+  s_722cc11de57c72::t_e36f08f6d7e07b 23-25,27-28,48
+  s_722cc11de57c72::t_6843b8d0fffde7 1-3,6-10,38,51-56,62-73
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-sources.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-22,24-32
+  s_722cc11de57c72::t_2bd2d4ec19c793 23
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-thinking.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-4,7-42,45-50
+  s_722cc11de57c72::t_2bd2d4ec19c793 5-6,43-44
+apps/ui/registry/notra/chat-ui/components/opencode/opencode-activity.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 1-2,21-25
+  s_722cc11de57c72::t_2faf9579b150b6 3-20,26,30,33-38
+  s_722cc11de57c72::t_2bbd3f08092c22 27-29,31-32
+apps/ui/registry/notra/chat-ui/components/gemini/gemini-message.tsx
+  s_722cc11de57c72::t_0b4499b605686e 7
+  s_722cc11de57c72::t_2bd2d4ec19c793 2,25,41
+  s_722cc11de57c72::t_2faf9579b150b6 1,3-6,8-24,26-40,42-50
+apps/ui/registry/notra/chat-ui/components/ai-elements/shimmer.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-3,5-36,38-44
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,37
+apps/ui/registry/notra/chat-ui/components/gemini/gemini-composer.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-11,13-14,16-17,19-30,32-58,60-61,63-64,66-137,139-144,146-172
+  s_722cc11de57c72::t_2bd2d4ec19c793 12,15,62,65,138,145
+  s_722cc11de57c72::t_0b4499b605686e 18,31,59
+apps/ui/registry/notra/chat-ui/examples/gemini-preview.tsx
+  s_722cc11de57c72::t_f4a3ad41b4072a 12,17-27
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,6,9-11,13-16,28,33-43
+  s_722cc11de57c72::t_6843b8d0fffde7 1-3,5,7-8,29-32,44
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-actions.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-14,19-23,27-42,44-96,101-122
+  s_722cc11de57c72::t_2bd2d4ec19c793 15-18,24-26,43,97-100
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-composer.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 12-15,22,33,51,76,175,194,225-228
+  s_722cc11de57c72::t_2faf9579b150b6 1-11,16-21,23-32,34-35,37-50,52-75,77-174,176-193,195-204,206-224,229-254
+  s_722cc11de57c72::t_0b4499b605686e 36,205
+apps/ui/registry/notra/chat-ui/components/ui/svgs/openai.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-9
+apps/ui/registry/notra/chat-ui/examples/opencode-start-preview.tsx
+  s_722cc11de57c72::t_45399e4524a80e 1-5,7,19,26,28,36-38,56-57
+  s_722cc11de57c72::t_af51986e6cf91c 11,20-21,51-53
+  s_722cc11de57c72::t_536afda89cdd89 6,9-10,60
+  s_722cc11de57c72::t_b6d3223645a6db 23,58-59
+  s_722cc11de57c72::t_44e62f7c24aac8 41
+  s_722cc11de57c72::t_2ae43fe03f658a 8,12-18,22,25,27,29-35,39-40,42-50,54-55
+  s_722cc11de57c72::t_aacd4823d7065a 24
+apps/ui/src/constants/fonts.ts
+  s_722cc11de57c72::t_6ac8b74f3d2d5d 1-3,14-20,31-32
+  s_722cc11de57c72::t_d1f2507aec3f9f 4-13,21-30
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-actions.tsx
+  s_722cc11de57c72::t_2faf9579b150b6 1-13,18-39,41-92,94-140
+  s_722cc11de57c72::t_2bd2d4ec19c793 14-17,40,93
+apps/ui/registry/notra/chat-ui/constants/opencode-models.ts
+  s_722cc11de57c72::t_e462a783f26318 1-4,10-13
+  s_722cc11de57c72::t_a1a9ceb38ef3fe 5-9
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-message.tsx
+  s_722cc11de57c72::t_0b4499b605686e 7
+  s_722cc11de57c72::t_2bd2d4ec19c793 2,32,51
+  s_722cc11de57c72::t_2faf9579b150b6 1,3-6,8-31,33-50,52-59
+apps/ui/registry/notra/chat-ui/types/gemini.ts
+  s_722cc11de57c72::t_2faf9579b150b6 1-12
+apps/ui/registry/notra/chat-ui/examples/opencode-preview.tsx
+  s_722cc11de57c72::t_2939b4fb6d5964 32
+  s_722cc11de57c72::t_af51986e6cf91c 16-18,26-31,52-54
+  s_722cc11de57c72::t_45399e4524a80e 55-56
+  s_722cc11de57c72::t_b6d3223645a6db 22,39,49,57-58
+  s_722cc11de57c72::t_2bd2d4ec19c793 20,59
+  s_722cc11de57c72::t_f188b3e2845841 1-4
+  s_722cc11de57c72::t_6843b8d0fffde7 5,13-14,60
+  s_722cc11de57c72::t_44e62f7c24aac8 23
+  s_722cc11de57c72::t_536afda89cdd89 6-7
+  s_722cc11de57c72::t_aacd4823d7065a 21
+  s_722cc11de57c72::t_268189303c1ce7 8-12,15,19,24-25,33-38,40-48,50-51
+apps/ui/registry/notra/chat-ui/examples/claude-chat-preview.tsx
+  s_722cc11de57c72::t_2bd2d4ec19c793 4,6,9-11,13-16,28,33-43
+  s_722cc11de57c72::t_f4a3ad41b4072a 12,17-27
+  s_722cc11de57c72::t_6843b8d0fffde7 1-3,5,7-8,29-32,44
+apps/ui/docs/blocks/opencode-chat.mdx
+  s_722cc11de57c72::t_f6b37c61259d6f 17,20
+  s_722cc11de57c72::t_183800954d629c 1-2,4-15
+  s_722cc11de57c72::t_70bed7f42b225c 3
+  s_722cc11de57c72::t_45399e4524a80e 16
+  s_722cc11de57c72::t_cf3d04f3c13ed9 18-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dc95bbfa9dcb87ad2a7be6614de3234cee2af820",
+  "prompts": {},
+  "sessions": {
+    "s_722cc11de57c72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e769-f4b6-7900-87e3-7854599b7356",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

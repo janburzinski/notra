@@ -1,0 +1,25 @@
+apps/dashboard/src/components/twitter-post.tsx
+  s_f05d2ff863b779::t_4736411da8b2ce 368
+apps/dashboard/src/components/automation/schedules/create-schedule-dialog.tsx
+  s_f05d2ff863b779::t_4736411da8b2ce 422
+apps/web/src/components/contact/contact-form.tsx
+  s_f05d2ff863b779::t_4736411da8b2ce 231
+apps/dashboard/src/components/geo/shelf/shelf-ticket-form.tsx
+  s_f05d2ff863b779::t_4736411da8b2ce 211
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bad0349692fc9f3f0cde6c0399a75bedc9a4d6c6",
+  "prompts": {},
+  "sessions": {
+    "s_f05d2ff863b779": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f5fa008c7ffeFBE3uAv0jwhzZQ",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+packages/geo-core/src/utils/sentiment-analysis.ts
+  s_e9222c29aead20::t_0cee0af11d73b8 61-62
+packages/geo-core/src/geo/sentiment-analysis-cache.ts
+  s_e9222c29aead20::t_ccadfd37f4e395 88-95,101-120
+packages/geo-core/src/utils/token-usage.ts
+  s_e9222c29aead20::t_c44f840482d958 3,17-18,20-27,29-34,36-38,40-42,44-49,51-53,55-59
+  s_e9222c29aead20::t_83e38e6b38d2e8 19,28,35,39,43,50,54
+packages/geo-core/src/geo/model-live.ts
+  s_e9222c29aead20::t_83e38e6b38d2e8 28
+  s_e9222c29aead20::t_f6edf92f616c3f 53,57,62-63,70
+packages/geo-core/tests/sentiment-analysis.test.ts
+  s_e9222c29aead20::t_83e38e6b38d2e8 293
+  s_e9222c29aead20::t_0cee0af11d73b8 270-271,274
+  s_e9222c29aead20::t_dcb1cf0857c9d3 227,272-273,275-292,294-295,502,509
+packages/geo-core/tests/token-usage.test.ts
+  s_e9222c29aead20::t_83e38e6b38d2e8 38
+  s_e9222c29aead20::t_0cee0af11d73b8 10,15-37,39-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1e4d4a96fccf8afdac17f686f4f4ea9e88f2dc4e",
+  "prompts": {},
+  "sessions": {
+    "s_e9222c29aead20": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0aba1-24e2-7a60-b60e-c803d22d9a93",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

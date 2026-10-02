@@ -1,0 +1,123 @@
+apps/dashboard/src/components/geo/agent-readiness/readiness-score-card.tsx
+  s_4fbeb17edc00dd::t_f4a7615890c377 132
+apps/dashboard/src/constants/geo-personas.ts
+  s_4fbeb17edc00dd::t_f4a7615890c377 29
+apps/dashboard/src/lib/demo/rpc.ts
+  s_4fbeb17edc00dd::t_9c6938ec14c6c9 415,417
+  s_4fbeb17edc00dd::t_88a5447f584bf0 25,53-56,60,358-364,366,369,371,373-376
+  s_4fbeb17edc00dd::t_f4a7615890c377 40,127,421-422
+  s_4fbeb17edc00dd::t_f101d8a32dd076 129-157,235-252,266-292,294-306
+  s_4fbeb17edc00dd::t_36bc14999b4cd3 105,201,204-210,216,442,450-452,454,456
+  s_4fbeb17edc00dd::t_b68be1fb7a457f 16-17,253-265,319,330-342
+  s_4fbeb17edc00dd::t_fb84762803da40 1-2,4,393-394,396,399,423,425,427,429,431,433-436,441
+  s_4fbeb17edc00dd::t_83ffecab91c5be 75,437-439
+  s_4fbeb17edc00dd::t_93ee388ad9fa12 5-15,18-22,24,61-64,66,71,218-233,307-314,316-318,326-329,344-345,347,354,356,377,379-380,391-392,400-410,412-414,419-420,458-462,464-473
+apps/dashboard/src/i18n/request.ts
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 28-29
+apps/dashboard/src/constants/demo/studio.ts
+  s_4fbeb17edc00dd::t_83ffecab91c5be 1-2,4,6-11,15,17-304
+  s_4fbeb17edc00dd::t_f4a7615890c377 5,305-318,321-322
+  s_4fbeb17edc00dd::t_f5f05f3bc7831a 3,12-14,16
+apps/dashboard/src/constants/demo/opportunities.ts
+  s_4fbeb17edc00dd::t_7ee87664b9a3e6 133-135,143,145-148
+  s_4fbeb17edc00dd::t_d07d20d26d5f89 2,12-15,17,19-20,117,130-132,217-236,251,359-360,409-410,446
+  s_4fbeb17edc00dd::t_83ffecab91c5be 421-425,438-442
+  s_4fbeb17edc00dd::t_f101d8a32dd076 3-11,21-116,118-129,136-142,144,153-155,161-216,237-250,252-338,340-358,361-367,369-408,411-420,426-437,443-445
+  s_4fbeb17edc00dd::t_946bdf938f0f6e 1,149-152,156-160
+apps/dashboard/src/lib/demo/is-demo.ts
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 1-7
+apps/dashboard/src/components/motion/table/table-header.tsx
+  s_4fbeb17edc00dd::t_f4a7615890c377 185-190,359,411
+apps/dashboard/src/components/providers/organization-provider.tsx
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 272-274,276-277,279-287,289-291,293-295,297
+apps/dashboard/src/components/dashboard/dashboard-client-wrapper.tsx
+  s_4fbeb17edc00dd::t_36bc14999b4cd3 81
+apps/web/next.config.ts
+  s_4fbeb17edc00dd::t_d2cfd7e5121803 7,137-146
+  s_4fbeb17edc00dd::t_141daa7967313c 147-153,155-159
+apps/dashboard/src/constants/demo/workspace.ts
+  s_4fbeb17edc00dd::t_dcce3ef378755d 72-88,96-102
+  s_4fbeb17edc00dd::t_93ee388ad9fa12 12-22,66-71,89-95,103-108,111-112
+  s_4fbeb17edc00dd::t_9c6938ec14c6c9 52
+  s_4fbeb17edc00dd::t_88a5447f584bf0 54-55
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 2-11,23-27,29-39,41-51,53,56-60,62-65,113
+apps/dashboard/next.config.ts
+  s_4fbeb17edc00dd::t_bb8b842d7118ee 168-177,179
+apps/dashboard/src/components/demo/demo-runtime.tsx
+  s_4fbeb17edc00dd::t_36bc14999b4cd3 8,84
+  s_4fbeb17edc00dd::t_943463974e3bc9 39-43
+  s_4fbeb17edc00dd::t_72ec60f66a8741 37-38
+  s_4fbeb17edc00dd::t_bb7992c614024a 66-70
+apps/dashboard/src/components/charts/echarts-plot-frame.tsx
+  s_4fbeb17edc00dd::t_f4a7615890c377 37
+apps/dashboard/src/components/composer/composer-shell.tsx
+  s_4fbeb17edc00dd::t_f4a7615890c377 175-180
+apps/dashboard/src/proxy.ts
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 28-39,47
+apps/dashboard/src/lib/orpc/client.ts
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 6-7,50-59
+apps/web/src/app/demo/page.tsx
+  s_4fbeb17edc00dd::t_bb8b842d7118ee 4-14,17,20-22
+apps/dashboard/src/app/demo/layout.tsx
+  s_4fbeb17edc00dd::t_946f5910d9be15 1-5,7-9,11
+apps/dashboard/src/lib/demo/data.test.ts
+  s_4fbeb17edc00dd::t_83ffecab91c5be 1-86,92-95
+apps/dashboard/src/components/demo/demo-pages.tsx
+  s_4fbeb17edc00dd::t_9c6938ec14c6c9 140,142-150,153-160,164-168,173-179
+  s_4fbeb17edc00dd::t_88a5447f584bf0 5,141,151-152,161-163,169-172
+  s_4fbeb17edc00dd::t_36bc14999b4cd3 7-67
+apps/dashboard/src/types/components/dashboard-shell.ts
+  s_4fbeb17edc00dd::t_bb7992c614024a 7
+apps/dashboard/src/components/geo/prompts-table.tsx
+  s_4fbeb17edc00dd::t_f4a7615890c377 354-355
+apps/dashboard/src/app/demo/[[...path]]/page.tsx
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 1-2,4-5
+  s_4fbeb17edc00dd::t_946f5910d9be15 6-8
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  s_4fbeb17edc00dd::t_bb7992c614024a 205,325
+apps/dashboard/src/components/geo/prompt-engine-switcher.tsx
+  s_4fbeb17edc00dd::t_10e7a340ef7a4e 56,69
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_4fbeb17edc00dd::t_bb7992c614024a 149,161-164
+apps/dashboard/src/constants/demo/geo.ts
+  s_4fbeb17edc00dd::t_f1c3b9aaaf1e8b 56-61,98-110,112-114,117-118,124-138,140,142-148,155-158,160-170,173-176,193-197,199-200
+  s_4fbeb17edc00dd::t_93ee388ad9fa12 2-7,9-16,18-22,24-55,62-67,69-76,78-84,86-92,94-97,119-123,141,201
+  s_4fbeb17edc00dd::t_946bdf938f0f6e 149-154,177-192
+  s_4fbeb17edc00dd::t_fb84762803da40 1
+  s_4fbeb17edc00dd::t_f101d8a32dd076 159,172
+  s_4fbeb17edc00dd::t_b68be1fb7a457f 202-242
+apps/web/src/app/demo/README.md
+  s_4fbeb17edc00dd::t_946bdf938f0f6e 25-29
+  s_4fbeb17edc00dd::t_dcce3ef378755d 1-6,8-24,30-44
+apps/dashboard/src/components/demo/demo-loader.tsx
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 1-12
+apps/dashboard/src/lib/demo/network.ts
+  s_4fbeb17edc00dd::t_fb84762803da40 12-13,16-22
+  s_4fbeb17edc00dd::t_c307b1ec1a9d73 2-11,14-15,23,40-55
+  s_4fbeb17edc00dd::t_88a5447f584bf0 24-29,31,39
+apps/dashboard/src/constants/demo/traffic.ts
+  s_4fbeb17edc00dd::t_88a5447f584bf0 1-14,16-34,57-59,68,76,82,86-177,184,192-194,209-225,234
+apps/dashboard/src/constants/demo/content.ts
+  ai_agent 6-93,140-149
+  s_4fbeb17edc00dd::t_f5f05f3bc7831a 139
+apps/web/src/constants/content-security-policy.ts
+  s_4fbeb17edc00dd::t_d2cfd7e5121803 1-19
+apps/dashboard/src/lib/demo/rpc.test.ts
+  s_4fbeb17edc00dd::t_dcce3ef378755d 1-64,70,72-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "929878d3cdba1757c36099a2305e520c274c72f5",
+  "prompts": {},
+  "sessions": {
+    "s_4fbeb17edc00dd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e927-676a-71d2-9534-cea3af994e0d",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

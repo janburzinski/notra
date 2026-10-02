@@ -1,0 +1,38 @@
+apps/ui/registry/notra/chat-ui/examples/perplexity-preview.tsx
+  ai_agent 65
+  s_722cc11de57c72::t_09be2bb92fb386 9-12,66-67,69-95,109,175,178-183,196-211,225
+apps/ui/registry/notra/chat-ui/components/ui/svgs/perplexity.tsx
+  ai_agent 3-6
+  s_722cc11de57c72::t_8dcfd2ecb036ae 10,17,24
+apps/ui/registry/notra/chat-ui/types/perplexity.ts
+  s_722cc11de57c72::t_4569264205a3af 54-67
+  s_722cc11de57c72::t_38da6b1c6120d8 1-2,53,68-80
+apps/ui/docs/components/perplexity-ui.mdx
+  s_722cc11de57c72::t_39cf986c05058b 18,20
+apps/ui/docs/blocks/perplexity-chat.mdx
+  s_722cc11de57c72::t_39cf986c05058b 8,19-20
+apps/ui/registry.json
+  s_722cc11de57c72::t_dfe0edae33fed4 1455-1458,1642-1646,2836-2852
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-research.tsx
+  s_722cc11de57c72::t_dadae1b67cb962 45
+  s_722cc11de57c72::t_375fe398a48c22 1-35,41-44,46-93
+  ai_agent 36-40
+apps/ui/registry/notra/chat-ui/components/perplexity/perplexity-search.tsx
+  s_722cc11de57c72::t_4569264205a3af 20,143,149,158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3f0c0435de36f19affe08b4b6b3cf400b20b989f",
+  "prompts": {},
+  "sessions": {
+    "s_722cc11de57c72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e769-f4b6-7900-87e3-7854599b7356",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

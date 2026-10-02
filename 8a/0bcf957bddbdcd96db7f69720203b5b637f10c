@@ -1,0 +1,19 @@
+.gitattributes
+  s_40136f389067fc::t_89d9cbb9ed35b7 2-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8a0bcf957bddbdcd96db7f69720203b5b637f10c",
+  "prompts": {},
+  "sessions": {
+    "s_40136f389067fc": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QVM5GY61CQ1akUzVxWP",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

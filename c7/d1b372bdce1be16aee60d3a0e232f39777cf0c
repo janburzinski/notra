@@ -1,0 +1,60 @@
+packages/geo-core/src/geo/sentiment-automation.ts
+  s_6c80644add4551::t_238fd27c37bf5a 74,76-77,88
+apps/dashboard/src/utils/geo-sentiment.ts
+  s_6c80644add4551::t_277e636a501bc0 98
+  s_6c80644add4551::t_bdfce99c46fdcc 103
+apps/dashboard/src/components/geo/sentiment-themes-empty.tsx
+  s_6c80644add4551::t_2d802963df3e36 34,37-44,48-69,75-80
+  s_6c80644add4551::t_29acdc0936cda6 45-47,70-74
+  s_6c80644add4551::t_976e16ceb76096 119
+apps/dashboard/src/components/geo/prompt-receipt-analysis.tsx
+  s_6c80644add4551::t_0e1c5d43dd920f 54-57
+packages/geo-core/tests/sentiment-analysis.test.ts
+  s_6c80644add4551::t_821bf8409a4918 654-659
+  s_6c80644add4551::t_06080471beb2e1 521
+  s_6c80644add4551::t_9604a51cc86f0e 660-661,681-700
+  s_6c80644add4551::t_124ec45d93f3a2 662-680
+  s_6c80644add4551::t_703bb4c82d9aec 504
+  s_6c80644add4551::t_f68170d265e9eb 25
+apps/dashboard/src/components/geo/sentiment-themes.tsx
+  s_6c80644add4551::t_61dae7011595f0 33-44
+apps/dashboard/src/components/geo/sentiment-results-table.tsx
+  s_6c80644add4551::t_5a4e987b176133 1,15-20
+  s_6c80644add4551::t_7a07e6aaa4c0ed 86
+  s_6c80644add4551::t_b112b65fad649a 68,70
+  s_6c80644add4551::t_50924f2f4f76e6 101
+  s_6c80644add4551::t_e9bb66e098465e 30-49
+packages/geo-core/src/utils/sentiment-analysis.ts
+  s_6c80644add4551::t_8c4ab850ec674a 33,39-40
+  s_6c80644add4551::t_254e686c919336 27-32,34-38,41-53
+  s_6c80644add4551::t_f2bd336aae9b5c 13,21
+packages/geo-core/src/geo/sentiment-analysis.ts
+  s_6c80644add4551::t_b061deb86199e1 199-202,204,216,219-220
+  s_6c80644add4551::t_29acdc0936cda6 125
+  s_6c80644add4551::t_976416eb2fd976 130-136
+  s_6c80644add4551::t_78ecbfa7a86248 115
+  s_6c80644add4551::t_b28341c61e5453 38-51,53-57,59-61,63-69
+  s_6c80644add4551::t_45a688901997ae 52,58,62
+  s_6c80644add4551::t_f5de1229d73f0a 19,21
+  s_6c80644add4551::t_161b3c0a2d8a6a 23-26
+apps/dashboard/src/types/geo-sentiment.ts
+  s_6c80644add4551::t_1c783bbba01815 60
+apps/dashboard/src/utils/geo-sentiment.test.ts
+  s_6c80644add4551::t_b89d2041b5a8b0 15-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c7d1b372bdce1be16aee60d3a0e232f39777cf0c",
+  "prompts": {},
+  "sessions": {
+    "s_6c80644add4551": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4ab5cfc4-776d-4678-a9d3-b0dc4fc3c577",
+        "model": "grok-4.7"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

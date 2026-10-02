@@ -1,0 +1,19 @@
+packages/ui/src/components/ui/split-button.tsx
+  s_8b132bbfe82690::t_2d6dac009f8d09 41,52-53,61-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a020a8fc130098e35b61bcc32013384ae8a22f1f",
+  "prompts": {},
+  "sessions": {
+    "s_8b132bbfe82690": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2fd413c7-a60d-4525-bc4a-77e7831c9f3c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

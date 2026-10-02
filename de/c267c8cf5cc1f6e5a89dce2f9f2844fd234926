@@ -1,0 +1,27 @@
+apps/ui/docs/components/(browser-apps)/meta.ts
+  s_68efd06bd8cdc3::t_12a9dcd02d3492 7
+apps/ui/docs/components/meta.ts
+  s_68efd06bd8cdc3::t_12a9dcd02d3492 12
+apps/ui/src/components/sidebar-memory.astro
+  s_68efd06bd8cdc3::t_12a9dcd02d3492 24
+apps/ui/docs/blocks/(browser-apps)/meta.ts
+  s_68efd06bd8cdc3::t_12a9dcd02d3492 7
+apps/ui/src/constants/landing.ts
+  s_68efd06bd8cdc3::t_12a9dcd02d3492 79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dec267c8cf5cc1f6e5a89dce2f9f2844fd234926",
+  "prompts": {},
+  "sessions": {
+    "s_68efd06bd8cdc3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff5b0bb1-cc5d-44be-af5f-6d10a56bd786",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

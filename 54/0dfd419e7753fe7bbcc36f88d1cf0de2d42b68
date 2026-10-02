@@ -1,0 +1,21 @@
+apps/dashboard/tests/geo-upgrade-gate.client.test.tsx
+  s_1b4cd5d35b899e::t_57d840797dee85 144-145
+apps/dashboard/src/components/geo/geo-upgrade-gate.tsx
+  s_1b4cd5d35b899e::t_57d840797dee85 118,130-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "540dfd419e7753fe7bbcc36f88d1cf0de2d42b68",
+  "prompts": {},
+  "sessions": {
+    "s_1b4cd5d35b899e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e76e-0184-7261-a170-20308cbd11f5",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

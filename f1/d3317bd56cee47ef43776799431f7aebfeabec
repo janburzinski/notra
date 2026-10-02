@@ -1,0 +1,68 @@
+packages/db/src/schema.ts
+  s_c80978ef004b34::t_984541bf33ffe1 2920
+  s_c80978ef004b34::t_506fbada2a7d2b 3398-3408
+  s_c80978ef004b34::t_8198ec3e9f504f 3316
+apps/geo-runner/src/index.ts
+  s_c80978ef004b34::t_ec353cd85cb5b9 42-48,54-55
+  s_c80978ef004b34::t_3dc366ca29b458 33-34,39-41,62-80
+packages/ai/src/gateway.ts
+  s_c80978ef004b34::t_f19fc41c3ef903 50-59
+packages/geo-core/src/geo/adhoc-scan.ts
+  s_c80978ef004b34::t_9e3434a7fc35fb 221-223
+  s_c80978ef004b34::t_556d3932d8f950 135-137
+  s_c80978ef004b34::t_c96e49ebc0ec89 248-297
+  s_c80978ef004b34::t_f6588f7c7b524e 13
+apps/geo-runner/tests/routes.test.ts
+  s_c80978ef004b34::t_bb2a124a95f8a8 100
+  s_c80978ef004b34::t_df3a0c00d155b9 231-256
+  s_c80978ef004b34::t_5606f4b79a8b41 228-230
+  s_c80978ef004b34::t_defb9b4d060fe1 298-302
+  s_c80978ef004b34::t_195468b41745c5 343-344,346-352,354,356-363,365-382,411,438
+  s_c80978ef004b34::t_9d73a6712f509d 383-410,412-437
+apps/geo-runner/src/http/auth.ts
+  s_c80978ef004b34::t_e8b4bd2cea019f 5
+  s_c80978ef004b34::t_528a3133c0137c 16-31,38-39,42
+.env.example
+  s_c80978ef004b34::t_93191bce4f4f26 38-40,42
+apps/geo-runner/src/layers/geo.ts
+  s_c80978ef004b34::t_10df19e0aa3a0d 21-29,32-33
+apps/geo-runner/src/services/run-queue.ts
+  s_c80978ef004b34::t_e731dbaa5d4f6a 4
+  s_c80978ef004b34::t_e9a65dfd5bbbc8 25-26
+  s_c80978ef004b34::t_15abfd503a5e23 77-110
+  s_c80978ef004b34::t_395c2220cf2b8b 38-39,51-52
+apps/geo-runner/src/http/routes.ts
+  s_c80978ef004b34::t_28e609d04a0f90 9
+  s_c80978ef004b34::t_5606f4b79a8b41 239
+  s_c80978ef004b34::t_2a537fb0e48034 232-238,240-254
+  s_c80978ef004b34::t_7e9e66399edeeb 2
+  s_c80978ef004b34::t_2f69d1cb5cce2d 115-117
+apps/geo-runner/scripts/smoke.ts
+  s_c80978ef004b34::t_8b8d433f1352d7 63,72-75
+  s_c80978ef004b34::t_5606f4b79a8b41 166-167
+  s_c80978ef004b34::t_e52be4b1eace51 47-49,51,56,58,62,64-71,76-82,86,93-107
+  s_c80978ef004b34::t_8e112e06ce3b5b 151-155,157-161,170,174,184-185
+  s_c80978ef004b34::t_1273abeb1edeed 8
+  s_c80978ef004b34::t_77b209e716a403 162-165,168-169
+apps/dashboard/src/components/motion/checkbox.tsx
+  s_c80978ef004b34::t_251f73753fef0c 4,10-11
+  s_c80978ef004b34::t_5606f4b79a8b41 60-61,63-68,70-77,79-132
+  s_c80978ef004b34::t_848d20fb086eb0 50-51,53-55,57,59
+  s_c80978ef004b34::t_0d2f9dba96dbc3 133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f1d3317bd56cee47ef43776799431f7aebfeabec",
+  "prompts": {},
+  "sessions": {
+    "s_c80978ef004b34": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7b1279fd-27b8-435d-9f15-60fd75e35728",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

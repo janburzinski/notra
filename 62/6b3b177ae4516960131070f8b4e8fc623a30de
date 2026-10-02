@@ -1,0 +1,36 @@
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-message.tsx
+  s_722cc11de57c72::t_d666d9fd4d2a96 12,20,52
+apps/ui/registry/notra/chat-ui/types/chat-block.ts
+  s_722cc11de57c72::t_d666d9fd4d2a96 18
+apps/ui/registry/notra/chat-ui/components/blocks/claude-chat-block.tsx
+  s_722cc11de57c72::t_d666d9fd4d2a96 32
+apps/ui/docs/components/claude-chat-ui.mdx
+  s_722cc11de57c72::t_bb893cfcb34456 18
+apps/ui/registry/notra/chat-ui/types/claude-chat-tool-call.ts
+  s_722cc11de57c72::t_d666d9fd4d2a96 1-9
+apps/ui/docs/blocks/claude-chat.mdx
+  s_722cc11de57c72::t_bb893cfcb34456 16
+apps/ui/registry/notra/chat-ui/components/claude-chat/claude-chat-tool-call.tsx
+  s_722cc11de57c72::t_1a545419c2f248 21-24
+  s_722cc11de57c72::t_d666d9fd4d2a96 1-20,25-41
+apps/ui/registry.json
+  s_722cc11de57c72::t_977be57ab72c43 1165-1168,1179-1183,1254-1258,1274-1278,2376-2392
+apps/ui/registry/notra/chat-ui/examples/claude-chat-preview.tsx
+  s_722cc11de57c72::t_bb893cfcb34456 6,19-33,37-40,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "626b3b177ae4516960131070f8b4e8fc623a30de",
+  "prompts": {},
+  "sessions": {
+    "s_722cc11de57c72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e769-f4b6-7900-87e3-7854599b7356",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

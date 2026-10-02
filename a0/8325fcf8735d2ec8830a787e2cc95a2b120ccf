@@ -1,0 +1,29 @@
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-composer.tsx
+  s_722cc11de57c72::t_236efbae0b88f7 74-82
+apps/ui/registry/notra/chat-ui/components/blocks/chatgpt-block.tsx
+  s_722cc11de57c72::t_236efbae0b88f7 30
+apps/ui/registry/notra/chat-ui/components/chatgpt/chatgpt-actions.tsx
+  s_722cc11de57c72::t_236efbae0b88f7 28,37-38,93-101
+apps/ui/docs/blocks/chatgpt-chat.mdx
+  s_722cc11de57c72::t_236efbae0b88f7 18
+apps/ui/registry/notra/chat-ui/examples/chatgpt-preview.tsx
+  s_722cc11de57c72::t_904685210e17e7 6-7,20-39,41-47,49-55,74,78-91,94,100
+  s_722cc11de57c72::t_d31946e55cbede 15,40,48
+  s_722cc11de57c72::t_b2f0674f1245ad 56-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a08325fcf8735d2ec8830a787e2cc95a2b120ccf",
+  "prompts": {},
+  "sessions": {
+    "s_722cc11de57c72": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e769-f4b6-7900-87e3-7854599b7356",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

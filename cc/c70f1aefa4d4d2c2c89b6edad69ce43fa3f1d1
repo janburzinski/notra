@@ -1,0 +1,86 @@
+apps/dashboard/src/types/components/geo-gaps.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 28-32
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_2c5b3ad6297ff7::t_0f3adc62301573 83,100,517,874-878,881-886,888-913,919-932,938-939,941-956,961,963-1007,1013,1017,1075,1077-1079,1081,1098
+apps/dashboard/src/workflows/gsc-sync.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 18,49-57
+packages/geo-core/src/geo/gaps.ts
+  s_2c5b3ad6297ff7::t_2625439c30e791 867-868
+  s_2c5b3ad6297ff7::t_0f3adc62301573 7,199,271-272,310,334-336,616,809-866
+CONTRIBUTING.md
+  s_2c5b3ad6297ff7::t_0f3adc62301573 96-102
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 41,422,427-432,916-919,1009-1012,1035-1038,1053-1056,1245-1247,1263-1266,1283-1286,1302,1309-1311,1316-1319,1810-1813,1868-1869,1905-1908,1930,1936-1940,2129-2132,2274-2288,2327-2330,2375-2378,2410-2411
+  s_2c5b3ad6297ff7::t_6660261173918e 1870-1871
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_2c5b3ad6297ff7::t_fa629faf6b4179 37-40,52-54,106,113,200-203
+apps/dashboard/src/utils/geo-gaps.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 24,29-53,94,231
+apps/api/src/routes/geo-competitors.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 5,26,197-203,256-262,314-320
+apps/api/src/routes/geo-prompts.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 3,25,182-188,212-218,240-246,291-301
+apps/dashboard/messages/de.json
+  s_2c5b3ad6297ff7::t_0f3adc62301573 2592,2600,2603,2615,2617
+packages/db/src/schema.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 1522-1532
+apps/dashboard/tests/geo-gaps-tabs.test.ts
+  s_2c5b3ad6297ff7::t_c37d2ca641b061 2
+  s_2c5b3ad6297ff7::t_eb010a9090b3c8 3-6,9,14-51
+  s_2c5b3ad6297ff7::t_3d3f8b1c5f7df8 1,7-8,10-13,52
+apps/dashboard/src/components/geo/search-gap-detail.tsx
+  s_2c5b3ad6297ff7::t_0f3adc62301573 156-162
+apps/dashboard/tests/gsc-sync-workflow.test.ts
+  s_2c5b3ad6297ff7::t_b703bc47a8f86b 31-33
+  s_2c5b3ad6297ff7::t_fa629faf6b4179 44-46,81,125-128
+apps/dashboard/src/workflows/geo-scan.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 47,185-205
+packages/geo-core/tests/gaps-snapshot.test.ts
+  s_2c5b3ad6297ff7::t_b703bc47a8f86b 19-20
+  s_2c5b3ad6297ff7::t_173359024b6338 1-3,9-17,21-34,64,69-70
+  s_2c5b3ad6297ff7::t_ef7c4f9842ec4a 35-36
+  s_2c5b3ad6297ff7::t_fa629faf6b4179 18
+  s_2c5b3ad6297ff7::t_d74bfbb9c3ff84 4-8,37-63,65-68
+apps/api/src/routes/geo-briefs.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 3-5,22,280-286
+apps/dashboard/src/workflows/steps/geo-writer-steps.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 15,18,196-200,245-249
+apps/dashboard/messages/en.json
+  s_2c5b3ad6297ff7::t_0f3adc62301573 2592,2600,2603,2615,2617
+apps/api/src/routes/geo-settings.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 2,9,112-119
+packages/geo-core/tests/utils/database.ts
+  s_2c5b3ad6297ff7::t_2809945852bdeb 4-5,13,29,33,48-50,53,57
+  s_2c5b3ad6297ff7::t_0f3adc62301573 12,47
+  s_2c5b3ad6297ff7::t_3321de39fe43b2 6-7,30-32,51-52,54-56
+apps/dashboard/scripts/backfill-geo-content-gaps.ts
+  s_2c5b3ad6297ff7::t_192b3eb8a2d3f3 2,12-16,19
+  s_2c5b3ad6297ff7::t_8de769ad742352 4
+  s_2c5b3ad6297ff7::t_553fe80c13e66b 30
+  s_2c5b3ad6297ff7::t_aca7e260b7967a 7,17-18,21-23,25-29,31,35-36
+  s_2c5b3ad6297ff7::t_25ab292bf01f90 8-11,32-34
+  s_2c5b3ad6297ff7::t_ca48ee6479a0e2 24
+  s_2c5b3ad6297ff7::t_ceffb0b0f923a7 1,3,5-6,20,37
+apps/docs/geo/content-gaps-and-writer.mdx
+  s_2c5b3ad6297ff7::t_0f3adc62301573 31,46
+packages/schemas/src/schemas/api/geo-content.ts
+  s_2c5b3ad6297ff7::t_0f3adc62301573 97-98,113
+apps/dashboard/src/workflows/steps/refresh-geo-content-gaps.ts
+  s_2c5b3ad6297ff7::t_1b44e9a63a77f3 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ccc70f1aefa4d4d2c2c89b6edad69ce43fa3f1d1",
+  "prompts": {},
+  "sessions": {
+    "s_2c5b3ad6297ff7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e771-370d-7cb1-91f5-637f533cedf1",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

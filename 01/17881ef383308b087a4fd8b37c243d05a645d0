@@ -1,0 +1,21 @@
+packages/ai/src/utils/github-mention-ingest.test.ts
+  s_f42d08e1cc3e9b::t_05167807b7f626 265-268
+packages/ai/src/utils/github-mention.local.test.ts
+  s_f42d08e1cc3e9b::t_33ceb6c972032c 187-189,193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0117881ef383308b087a4fd8b37c243d05a645d0",
+  "prompts": {},
+  "sessions": {
+    "s_f42d08e1cc3e9b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "70babf50-e845-4cf2-9b7c-0819910cf726",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

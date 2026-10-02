@@ -1,0 +1,111 @@
+apps/dashboard/src/components/geo/persona-add-dialog.tsx
+  s_994a2114fd6636::t_267bc77d73063f 4-6,61
+packages/db/src/types/geo-persona-checks.ts
+  s_994a2114fd6636::t_6ce5b46b70d54c 1-29
+packages/geo-core/src/utils/geo-personas.ts
+  s_994a2114fd6636::t_f434326278e2b8 9,22
+packages/db/src/utils/geo-checks.ts
+  s_994a2114fd6636::t_64e9e1526855e0 15
+  s_994a2114fd6636::t_95be2d8b5e8da3 25,321-327,329,332-333,376-378,380
+packages/db/src/scripts/seed-persona-visibility.ts
+  s_673016718f8ea8::t_2149529176dcfd 1,305,570,601,630
+  s_673016718f8ea8::t_57ab28d15dc74b 295,298-300,571-573
+  s_673016718f8ea8::t_be4b0603d27470 306-307
+  s_673016718f8ea8::t_59e233074d465b 303
+packages/db/src/utils/geo-persona-checks.ts
+  s_994a2114fd6636::t_64e9e1526855e0 1-9,11-152
+  s_994a2114fd6636::t_6ce5b46b70d54c 10
+apps/dashboard/src/constants/geo-personas.ts
+  s_994a2114fd6636::t_f434326278e2b8 47
+packages/geo-core/src/geo/conversation.ts
+  s_673016718f8ea8::t_fe158550683c9b 30,32,54-55,78,87,89,136
+apps/dashboard/src/components/geo/persona-prompts.tsx
+  s_994a2114fd6636::t_f434326278e2b8 1-4
+packages/geo-core/src/types/geo-personas.ts
+  s_994a2114fd6636::t_2a82351dcfb21e 14-29
+apps/dashboard/src/types/persona-generation.ts
+  s_673016718f8ea8::t_2b1b62ebe4185f 1-5,8
+packages/geo-core/src/constants/geo-personas.ts
+  s_994a2114fd6636::t_f434326278e2b8 13,22-23
+packages/geo-core/src/types/geo-conversations.ts
+  s_673016718f8ea8::t_fe158550683c9b 20,24-25
+packages/geo-core/src/schemas/geo-personas.ts
+  s_994a2114fd6636::t_f434326278e2b8 5,9-10,61,72-74,81,83-85,112-120
+  s_673016718f8ea8::t_2b1b62ebe4185f 62-65,95-100
+  s_673016718f8ea8::t_7bb276ca51bf56 2,101-106
+packages/db/src/utils/persona-snapshot.ts
+  s_994a2114fd6636::t_6ce5b46b70d54c 7
+apps/dashboard/src/types/geo-personas-ui.ts
+  s_673016718f8ea8::t_2b1b62ebe4185f 29-31
+  s_994a2114fd6636::t_f434326278e2b8 11-21
+packages/geo-core/src/geo/persona-scan.ts
+  s_994a2114fd6636::t_9bfb3a432c7ec5 26
+  s_673016718f8ea8::t_fe158550683c9b 150-151,206-220
+  s_994a2114fd6636::t_d4dba489814a04 4,264-265,269-270
+  s_994a2114fd6636::t_95be2d8b5e8da3 404-405
+packages/geo-core/tests/geo-personas.test.ts
+  s_994a2114fd6636::t_0bc1775c7a3969 3,45-70
+  s_994a2114fd6636::t_3f94205e6bec15 14-17,30,32-36,41
+  s_673016718f8ea8::t_ce0b8a4248dba3 100
+  s_994a2114fd6636::t_9bfb3a432c7ec5 37-40
+apps/dashboard/src/lib/hooks/use-geo-personas.ts
+  s_994a2114fd6636::t_4204d53021047a 26-29
+  s_673016718f8ea8::t_2b1b62ebe4185f 7,102-103,106-107
+apps/dashboard/src/utils/persona-activity.ts
+  s_673016718f8ea8::t_2149529176dcfd 97
+packages/geo-core/src/geo/scan.ts
+  s_673016718f8ea8::t_fe158550683c9b 1516
+apps/dashboard/src/utils/geo-persona-queries.ts
+  s_994a2114fd6636::t_4204d53021047a 1-22
+packages/db/src/types/geo-checks.ts
+  s_994a2114fd6636::t_95be2d8b5e8da3 59-63
+apps/dashboard/src/schemas/persona-generation.ts
+  s_673016718f8ea8::t_2b1b62ebe4185f 12-13
+apps/dashboard/src/app/(dashboard)/[slug]/geo/personas/page-client.tsx
+  s_994a2114fd6636::t_f434326278e2b8 36-37,43,57
+apps/dashboard/src/components/geo/persona-detail-dialog.tsx
+  s_673016718f8ea8::t_2b1b62ebe4185f 136
+packages/geo-core/src/geo/personas.ts
+  s_994a2114fd6636::t_2a82351dcfb21e 52
+  s_994a2114fd6636::t_197b368da9846d 55
+  s_994a2114fd6636::t_64e9e1526855e0 15,17,20
+apps/dashboard/src/app/(dashboard)/[slug]/geo/personas/page.tsx
+  s_994a2114fd6636::t_f434326278e2b8 5,16,22
+packages/geo-core/src/geo/conversation-replay.ts
+  s_994a2114fd6636::t_95be2d8b5e8da3 4-5,84,111-112,119,136
+packages/geo-core/src/utils/persona-generation-prompt.ts
+  s_994a2114fd6636::t_4d90ec7bf3bd85 44
+  s_994a2114fd6636::t_197b368da9846d 1-43,45-73
+apps/dashboard/src/components/geo/persona-activity-card.tsx
+  s_673016718f8ea8::t_2149529176dcfd 90
+apps/dashboard/src/components/geo/personas-table.tsx
+  s_994a2114fd6636::t_f434326278e2b8 29,198-201
+  s_673016718f8ea8::t_e93a62d0876c72 58,184
+  s_673016718f8ea8::t_a8a75f68a2e81f 172,219
+  s_673016718f8ea8::t_2b1b62ebe4185f 4-7,47,252
+  s_994a2114fd6636::t_4204d53021047a 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1e4720ae5f582fb10e9d04dcad0f98b683845d55",
+  "prompts": {},
+  "sessions": {
+    "s_673016718f8ea8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f601954f8ffe13mkB1H0c1JzrB",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_994a2114fd6636": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f5ff45d96ffeQRgtH1wJtj1rFx",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

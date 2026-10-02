@@ -1,0 +1,29 @@
+apps/ai-traffic-ingest/Dockerfile
+  s_45641a3bab5e77::t_a6975cf1b4a233 28
+packages/geo-core/src/geo/ingest.ts
+  s_45641a3bab5e77::t_a6975cf1b4a233 171-175,179
+packages/db/src/drizzle.ts
+  s_45641a3bab5e77::t_3d2b08e9af8b98 42-46
+apps/ai-traffic-ingest/src/index.ts
+  s_45641a3bab5e77::t_89475496b44cd5 3-7,41,46-62
+apps/ai-traffic-ingest/src/constants/server.ts
+  s_45641a3bab5e77::t_89475496b44cd5 3-5
+apps/ai-traffic-ingest/.env.example
+  s_45641a3bab5e77::t_26715fffbd70ca 15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "279aa1f1319c5d554d55d8886f326d7d3fb22006",
+  "prompts": {},
+  "sessions": {
+    "s_45641a3bab5e77": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d429e19c-f119-4473-b62b-ecd77b29c374",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

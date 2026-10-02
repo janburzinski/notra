@@ -1,0 +1,38 @@
+apps/ui/registry/notra/marketing-button/components/marketing-button.tsx
+  s_f7b7c774894531::t_145b2183d8690a 1-49
+apps/ui/src/constants/landing.ts
+  ai_agent 7-8
+  s_f7b7c774894531::t_145b2183d8690a 9-10
+  s_f7b7c774894531::t_a0e1639354d1c2 11
+apps/ui/registry/notra/marketing-button/examples/marketing-button-demo.tsx
+  s_f7b7c774894531::t_145b2183d8690a 1-15
+apps/ui/registry/notra/marketing-button/examples/marketing-button-link.tsx
+  s_f7b7c774894531::t_145b2183d8690a 1-14
+apps/ui/registry.json
+  s_f7b7c774894531::t_145b2183d8690a 7,9,15,20,25,30-33,35,37,40-41,44-47,49,51,54-55
+  s_f7b7c774894531::t_40c1fc55b7e653 11-12
+  s_f7b7c774894531::t_85f5e9e046a792 8,10,13-14,16-19,21-24,26-29,34,36,38-39,42-43,48,50,52-53,56-59
+apps/ui/docs/components/marketing-button.mdx
+  s_f7b7c774894531::t_145b2183d8690a 1-29
+apps/ui/registry/notra/marketing-button/examples/marketing-button-sizes.tsx
+  s_f7b7c774894531::t_145b2183d8690a 1-10
+apps/ui/src/styles/examples.css
+  s_f7b7c774894531::t_a0e1639354d1c2 118,120-124,126-130,134-135,138-143,146-147,149-151,154-156,160-161,164-168,171-172,174-176,179-180
+  s_f7b7c774894531::t_145b2183d8690a 119,125,131-133,136-137,144-145,148,152-153,157-159,162-163,169-170,173,177-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "238cf00646b1a7f8298c85086a283d1bd9d2b54d",
+  "prompts": {},
+  "sessions": {
+    "s_f7b7c774894531": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43d8bdd-fb9c-4324-9a96-c19912a2f71e",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+apps/dashboard/src/components/settings/settings-modal.tsx
+  s_0eb94bee7a56fa::t_eeb49525b9fe41 56-68
+apps/dashboard/messages/de.json
+  s_0eb94bee7a56fa::t_c46ca57d204ff4 6183
+apps/dashboard/messages/en.json
+  s_0eb94bee7a56fa::t_c46ca57d204ff4 6183
+apps/dashboard/src/components/dashboard/dashboard-client-wrapper.tsx
+  ai_agent 28-30
+  s_0eb94bee7a56fa::t_c46ca57d204ff4 4,22-24,33-35,37-42,44-47,49-68,74
+  s_0eb94bee7a56fa::t_fd66bde8862e07 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "04fdb7d8eba5357be90e635ce292291eee6d72c9",
+  "prompts": {},
+  "sessions": {
+    "s_0eb94bee7a56fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3c1b7f1a-f4b0-4883-96dc-46a2ce7ce7db",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

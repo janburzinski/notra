@@ -1,0 +1,217 @@
+packages/ai/src/utils/observe-model-stream.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 1,6,8,11
+packages/ai/src/router/adapters/vercel.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 2,63
+apps/agent/package.json
+  s_aae8a83012bcf6::t_b5f99a0aeba988 16-17,29
+apps/api/src/lib/chat/direct-stream.ts
+  s_aae8a83012bcf6::t_a85bae92046bed 16
+  s_aae8a83012bcf6::t_8939bf3123d870 158-159
+  s_aae8a83012bcf6::t_719a4f266a1447 197
+  s_aae8a83012bcf6::t_588f2c3cb06132 231-235
+packages/ai/src/model.ts
+  s_aae8a83012bcf6::t_e19b35f17ce943 36-38,43
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 74
+packages/ai/src/agents/background-gen.ts
+  s_aae8a83012bcf6::t_db09d2a2b4487e 29-30
+  s_aae8a83012bcf6::t_93d4511666583f 188-189
+  s_aae8a83012bcf6::t_6144d2549fcffa 220-224,226
+packages/ai/src/router/adapters/openrouter.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 1,91
+packages/ai/src/jobs/feedback-classifier.ts
+  s_aae8a83012bcf6::t_8f4a561a31b704 16-17
+  s_aae8a83012bcf6::t_204430ff080070 35,39-40,47,53
+packages/ai/src/types/model-call-telemetry.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 2-3,19-20
+packages/ai/src/types/mcp-runtime.ts
+  s_aae8a83012bcf6::t_1315e8125cdda5 29
+  s_aae8a83012bcf6::t_ef7f26112ad1a7 72
+packages/ai/src/gateway.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 1,133
+apps/dashboard/src/workflows/steps/brand-analysis-steps.ts
+  s_aae8a83012bcf6::t_50b1275b5d36ee 6
+  s_aae8a83012bcf6::t_8b8f6e0a0ce3f6 82,87
+packages/ai/src/tools/edit-markdown.ts
+  s_aae8a83012bcf6::t_94345cca35def2 6
+  s_aae8a83012bcf6::t_499297b9f0f3d0 38-41
+packages/ai/src/orchestration/orchestrate.ts
+  s_aae8a83012bcf6::t_925f078a6f1cdf 11,14
+  s_aae8a83012bcf6::t_bcd23562367747 126,131
+  s_aae8a83012bcf6::t_f3a3c46178869b 142-143,145
+apps/api/src/tcc.ts
+  s_aae8a83012bcf6::t_630ee5556aa0e4 4-5,12
+packages/geo-core/src/geo/sentiment-analysis-agent.ts
+  s_aae8a83012bcf6::t_e1321bb91de388 21
+  s_aae8a83012bcf6::t_d712371b2e4250 32
+packages/ai/src/router/router.test.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 4,620,632
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_aae8a83012bcf6::t_f5f5eabce9ad48 44-50
+  s_aae8a83012bcf6::t_983447be6bea2a 562-563
+  s_aae8a83012bcf6::t_df9a0e51090beb 600
+  s_aae8a83012bcf6::t_47b443902dad7d 642-646
+apps/onboarding-agent/package.json
+  s_aae8a83012bcf6::t_b5f99a0aeba988 16,22
+packages/ai/src/utils/tcc.ts
+  s_aae8a83012bcf6::t_88b981a7f9adc5 5-8,13-19
+packages/ai/evals/geo/consistency.ts
+  s_aae8a83012bcf6::t_e93f8c3403d134 74
+  s_aae8a83012bcf6::t_9bb32b16ba1975 81
+packages/ai/src/prompts/standalone-chat.ts
+  s_aae8a83012bcf6::t_e25b45ae5bd5e7 63-68
+  s_aae8a83012bcf6::t_a0f0a78e747a36 81-82
+  s_aae8a83012bcf6::t_b78931c77686e4 87
+apps/dashboard/next.config.ts
+  s_aae8a83012bcf6::t_add794875dd826 41-46
+packages/geo-core/tests/sentiment-analysis.test.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 4,272
+packages/ui/src/components/ai-elements/context.tsx
+  s_aae8a83012bcf6::t_20a706fba5535c 319
+  s_aae8a83012bcf6::t_b4347a881482f8 359
+packages/ai/src/jobs/collection-title.ts
+  s_aae8a83012bcf6::t_54ae7523b08ca7 17
+  s_aae8a83012bcf6::t_05794ac3eb9658 21
+  s_aae8a83012bcf6::t_67345f1a2a9967 99-102
+  s_aae8a83012bcf6::t_045561d8b509cc 111
+  s_aae8a83012bcf6::t_25fdf90328f9b5 116,120-121,126,133
+apps/dashboard/src/instrumentation.ts
+  s_aae8a83012bcf6::t_b9a17329c916ee 19-24,26
+packages/geo-core/package.json
+  s_aae8a83012bcf6::t_b5f99a0aeba988 20-23,30
+  s_aae8a83012bcf6::t_8eaba0168d694d 33
+packages/ai/src/utils/evlog-runtime.ts
+  s_aae8a83012bcf6::t_2c57040f9e96da 9
+packages/ai/src/orchestration/orchestrate-standalone.ts
+  s_aae8a83012bcf6::t_356a32bed8e00e 1
+  s_aae8a83012bcf6::t_aadd718d2599fd 2-6
+  s_aae8a83012bcf6::t_e181938db748f0 29
+  s_aae8a83012bcf6::t_69247be0a97d2c 33
+  s_aae8a83012bcf6::t_6ef3ee5403fa30 35
+  s_aae8a83012bcf6::t_77b7fb676f44e5 54
+  s_aae8a83012bcf6::t_652383dceb4717 59
+  s_aae8a83012bcf6::t_eede24d53f517a 160-163,165-166,169-172
+  s_aae8a83012bcf6::t_61835fa09fc548 167-168
+  s_aae8a83012bcf6::t_742d59b3c086a0 173
+  s_aae8a83012bcf6::t_b5b5479f0ffe9b 174
+  s_aae8a83012bcf6::t_dc9c8f60fa118b 183
+  s_aae8a83012bcf6::t_a9bfe13b0f6ee8 193
+  s_aae8a83012bcf6::t_645e078b2744cd 199-200
+  s_aae8a83012bcf6::t_7afbdc456606a8 250
+  s_aae8a83012bcf6::t_de9f87659ec26d 259
+  s_aae8a83012bcf6::t_9572fe1a667100 262-264,267
+  s_aae8a83012bcf6::t_aac4c646b29c4e 274-278
+  s_aae8a83012bcf6::t_6630c0af9d138d 279
+  s_aae8a83012bcf6::t_1f80bcbbe24d61 286
+  s_aae8a83012bcf6::t_c228e5448e94b8 313
+  s_aae8a83012bcf6::t_43a38d4896e423 331
+  s_aae8a83012bcf6::t_a76f6401b7a305 349,351
+apps/dashboard/src/workflows/steps/chat-steps.ts
+  s_aae8a83012bcf6::t_0e2c7d7877263f 36
+  s_aae8a83012bcf6::t_1bb5ab16211b37 346-347
+  s_aae8a83012bcf6::t_4146c1b6b5fca8 384
+  s_aae8a83012bcf6::t_2ca8cf43313f1c 409-418,420-421
+packages/ai/src/router/lazy-model.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 3-8,149,171,173,186,188-189,191,233,236,238-239,264-265,293-294,356-357,369,372
+packages/ai/src/router/test-helpers.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 2-8,38,49,52,56,71,75,104,234-235,254-256
+packages/geo-core/src/geo/model-live.ts
+  s_aae8a83012bcf6::t_cebdd823367b60 2
+  s_aae8a83012bcf6::t_d83161b4f7c3a8 47
+  s_aae8a83012bcf6::t_1daa80a86e25d4 58-59
+  s_aae8a83012bcf6::t_af09d5b425f67c 90,92
+  s_aae8a83012bcf6::t_dd9f0496e1580c 110-111
+  s_aae8a83012bcf6::t_01f21206815f1b 142
+  s_aae8a83012bcf6::t_cbf9ca90644ad3 174
+  s_aae8a83012bcf6::t_b8e7e6b19efed9 208
+apps/api/package.json
+  s_aae8a83012bcf6::t_b5f99a0aeba988 13,30
+  s_aae8a83012bcf6::t_a1fd25a48069d2 14
+packages/ai/package.json
+  s_aae8a83012bcf6::t_4df53dd856b107 42
+  s_aae8a83012bcf6::t_b5f99a0aeba988 43-45,62,79
+  s_aae8a83012bcf6::t_c47d83eedeae25 55
+  s_aae8a83012bcf6::t_8eaba0168d694d 67
+packages/ai/src/chat/history.ts
+  s_aae8a83012bcf6::t_f6436e42cf249a 26
+  s_aae8a83012bcf6::t_e8ee4e7ca54ef5 1050,1056
+packages/ai/src/types/router.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 2-4,121,128,132,143,255,259,304
+packages/ui/package.json
+  s_aae8a83012bcf6::t_b5f99a0aeba988 39
+packages/ai/src/tools/mcp-lazy.ts
+  s_aae8a83012bcf6::t_0c252fc60ad8ae 101,104-106
+  s_aae8a83012bcf6::t_7cde90381e275b 304
+  s_aae8a83012bcf6::t_8c66096ccb54e9 611
+packages/ai/src/router/provider-options.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 1,60,62,80-81,93,130,170,216,218
+packages/ai/src/evlog.ts
+  s_aae8a83012bcf6::t_3ca703d7a9128f 12
+packages/ai/src/orchestration/router.ts
+  s_aae8a83012bcf6::t_91c37d06e2edf7 14
+  s_aae8a83012bcf6::t_028805ea80e5e8 131
+  s_aae8a83012bcf6::t_e991f7858ef5f3 138,142
+  s_aae8a83012bcf6::t_6e041ffa449da7 171
+  s_aae8a83012bcf6::t_ade49ff8b4f70a 185-186
+packages/ai/src/autonomy/capabilities.ts
+  s_aae8a83012bcf6::t_42f6ace2b8dd5b 208
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  s_aae8a83012bcf6::t_b90e7f432585be 320-324
+packages/ai/src/agents/geo-writer.ts
+  s_aae8a83012bcf6::t_43d9671895d74e 52
+  s_aae8a83012bcf6::t_ed09cf57236fa3 58
+  s_aae8a83012bcf6::t_d4e677e5c9689d 214
+  s_aae8a83012bcf6::t_bf3e28c3c3be8d 362,368
+  s_aae8a83012bcf6::t_f0fdcf4135051c 472-473
+  s_aae8a83012bcf6::t_867a5f3a1abf65 495
+apps/dashboard/src/app/api/command-palette/navigate/route.ts
+  s_aae8a83012bcf6::t_34935747de3bf5 4
+  s_aae8a83012bcf6::t_d16fb27acc9bd8 20
+  s_aae8a83012bcf6::t_03b88966be7fef 273,277-278
+  s_aae8a83012bcf6::t_5ba17b75a18122 300
+apps/dashboard/package.json
+  s_aae8a83012bcf6::t_b5f99a0aeba988 19-20,74
+  s_aae8a83012bcf6::t_a1fd25a48069d2 25
+  s_aae8a83012bcf6::t_8eaba0168d694d 85
+packages/ai/src/orchestration/standalone-tool-registry.ts
+  s_aae8a83012bcf6::t_ac1d34769dc884 70-80
+packages/ai/evals/geo/judge-accuracy.ts
+  s_aae8a83012bcf6::t_4d7916409d234e 338
+packages/ai/src/autonomy/planner.ts
+  s_aae8a83012bcf6::t_98ffe4842deccc 60
+packages/ai/src/constants/code-mode.ts
+  s_aae8a83012bcf6::t_183aa8999c06c4 1-29
+packages/geo-core/src/geo/scan.ts
+  s_aae8a83012bcf6::t_4b7822e947bd7a 591
+  s_aae8a83012bcf6::t_4030bdaecbdacb 1703
+  s_aae8a83012bcf6::t_a8eed983214893 1871-1872
+apps/dashboard/src/app/api/organizations/[organizationId]/content/[contentId]/chat/route.ts
+  s_aae8a83012bcf6::t_983d5372f68133 27
+  s_aae8a83012bcf6::t_fed500af8f351c 320-321,325
+  s_aae8a83012bcf6::t_46582be5afabca 346-350
+packages/ai/src/types/gateway.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 1,7
+packages/ai/src/router/create-router.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 1,138
+packages/ai/src/types/router-test.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 1,16
+packages/ai/src/utils/observe-model-stream.test.ts
+  s_aae8a83012bcf6::t_a0aec5ab9d95ce 5,16-17,20,35
+packages/geo-core/src/geo/discover.ts
+  s_aae8a83012bcf6::t_a631a275219904 191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bf1b47aa918dc96dc897c242bca4914472108c8a",
+  "prompts": {},
+  "sessions": {
+    "s_aae8a83012bcf6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23621157-e8d6-43b5-b134-0c5a45e82dc8",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

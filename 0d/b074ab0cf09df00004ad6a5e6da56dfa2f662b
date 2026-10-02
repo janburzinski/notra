@@ -1,0 +1,36 @@
+apps/dashboard/src/lib/hooks/use-chat-sessions.ts
+  s_e4cf4a4f4243aa::t_4a05385cbc5d01 164-167,191-194
+  s_e4cf4a4f4243aa::t_5fd5284b61c803 55
+  s_e4cf4a4f4243aa::t_883a23c54f4d88 74,83-86,114-121,123,128-142,147
+  s_e4cf4a4f4243aa::t_a4ac7e147bfa5a 57-71
+  s_e4cf4a4f4243aa::t_12510792afd40d 36-42
+  s_e4cf4a4f4243aa::t_cab63c46dc48a1 14-18
+  s_e4cf4a4f4243aa::t_4b0f58f58546dd 143
+  s_e4cf4a4f4243aa::t_6f7a4a2f010799 190,195-196,204
+  s_e4cf4a4f4243aa::t_c26d74da9cf4fd 19,24-27
+  s_e4cf4a4f4243aa::t_a2851bd0e75a4b 326
+apps/dashboard/src/utils/chat-history-groups.test.ts
+  s_e4cf4a4f4243aa::t_36cd54d4102022 3-6,34,47-67
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_e4cf4a4f4243aa::t_77e2fe5b1941f1 544-552
+  s_e4cf4a4f4243aa::t_4e59b3ad456820 107-110
+apps/dashboard/src/utils/chat-history-groups.ts
+  s_e4cf4a4f4243aa::t_dfca92285b4b17 107,109-110,113-114,116-121,124-125
+  ai_agent 108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0db074ab0cf09df00004ad6a5e6da56dfa2f662b",
+  "prompts": {},
+  "sessions": {
+    "s_e4cf4a4f4243aa": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "52e66653-b794-4a96-a300-3a5d745515e0",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

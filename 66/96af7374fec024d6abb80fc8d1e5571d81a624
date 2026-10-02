@@ -1,0 +1,23 @@
+packages/ui/src/components/ui/svgs/firefox.tsx
+  s_86b284ae0be899::t_476c5f7007d4e9 1,3-6,8-10
+packages/ui/src/components/ui/svgs/openaiWordmarkDark.tsx
+  s_86b284ae0be899::t_476c5f7007d4e9 1,3-6,8,12,17-18
+packages/ui/src/components/ui/svgs/google.tsx
+  s_86b284ae0be899::t_476c5f7007d4e9 1,3-6,16,20,32,44,51,61,65,76,88,91,102,104,113,115,124,126,135,137,146,148,157,159,168,170,175,185,192,196,199-200,204-205,209-210,214-215,220,224-225,229-230,234-235,239-240,245-246
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6696af7374fec024d6abb80fc8d1e5571d81a624",
+  "prompts": {},
+  "sessions": {
+    "s_86b284ae0be899": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3171844c-d967-4f87-8f7e-a6299d49fd3b",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_2c5b3ad6297ff7::t_c22a2545bb1a02 965-982,984-986
+  s_2c5b3ad6297ff7::t_8073a1f54b4a77 938-940,942-949
+  s_2c5b3ad6297ff7::t_488051fceb7663 983
+  s_2c5b3ad6297ff7::t_9dbc6c6cb5fd01 89,739-741,743-745,1041,1045,1105,1126
+apps/dashboard/src/workflows/steps/geo-writer-steps.ts
+  s_2c5b3ad6297ff7::t_9dbc6c6cb5fd01 176-181,227-232
+apps/api/src/routes/geo-briefs.ts
+  s_2c5b3ad6297ff7::t_37a7f8367689bd 245-250
+  s_2c5b3ad6297ff7::t_9dbc6c6cb5fd01 292-297
+apps/dashboard/tests/gsc-sync-workflow.test.ts
+  s_2c5b3ad6297ff7::t_79128b3d18d898 131-142
+apps/dashboard/vercel.json
+  s_2c5b3ad6297ff7::t_083060d7d17f26 16-18
+apps/docs/geo/content-gaps-and-writer.mdx
+  s_2c5b3ad6297ff7::t_c0d8e60e88f093 31
+apps/dashboard/src/workflows/gsc-sync.ts
+  s_2c5b3ad6297ff7::t_9dbc6c6cb5fd01 49-50
+packages/geo-core/src/geo/gaps.ts
+  s_2c5b3ad6297ff7::t_752b4ceae5f309 283-284
+packages/geo-core/tests/gaps-snapshot.test.ts
+  s_2c5b3ad6297ff7::t_91201b0615a252 50-54
+apps/dashboard/src/lib/geo/content-gaps-refresh.ts
+  s_2c5b3ad6297ff7::t_083060d7d17f26 1-49
+apps/dashboard/src/app/api/cron/geo-content-gaps/route.ts
+  s_2c5b3ad6297ff7::t_083060d7d17f26 1-13
+CONTRIBUTING.md
+  s_2c5b3ad6297ff7::t_c0d8e60e88f093 103-106
+apps/dashboard/src/constants/geo-content-gaps.ts
+  s_2c5b3ad6297ff7::t_083060d7d17f26 1-2
+apps/dashboard/src/utils/geo-gaps.ts
+  s_2c5b3ad6297ff7::t_7d7236a48e7682 290-301
+apps/dashboard/tests/geo-gaps-tabs.test.ts
+  s_2c5b3ad6297ff7::t_9cd7018e9885f1 43,62
+  s_2c5b3ad6297ff7::t_79128b3d18d898 9-13,56-61,63-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1d77ce9cfb49f967afcab76ed88c794f92215cf8",
+  "prompts": {},
+  "sessions": {
+    "s_2c5b3ad6297ff7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e771-370d-7cb1-91f5-637f533cedf1",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+packages/geo-core/src/geo/gaps.ts
+  s_6bfa68bf4a73a2::t_b4bf8f0c5bd027 603,608,610-614
+  s_6bfa68bf4a73a2::t_d8481c379aef8d 53
+apps/dashboard/src/components/geo/gap-detail-sheet.tsx
+  s_6bfa68bf4a73a2::t_33da83c5bb6c5c 357-406,427,429-433
+apps/dashboard/src/lib/hooks/use-geo-writer.ts
+  s_6bfa68bf4a73a2::t_1cfb7279137854 97,100,102-103,105-106,109,112-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8b9c4cc41871aa22a502db353c71da7c99441422",
+  "prompts": {},
+  "sessions": {
+    "s_6bfa68bf4a73a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "22e23188-4611-4f94-8480-8b06d1a65fad",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+apps/dashboard/src/components/geo/mention-rate-card.tsx
+  s_c747c006804356::t_19a92e4b6f4a0a 335-336
+  s_c747c006804356::t_7cabd492f1dce1 178-179
+apps/dashboard/messages/de.json
+  s_c747c006804356::t_19a92e4b6f4a0a 2584
+apps/dashboard/messages/en.json
+  s_c747c006804356::t_19a92e4b6f4a0a 2584
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_c747c006804356::t_19a92e4b6f4a0a 29,217-223
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "986277d410888b6f6aa0a9904218b0997c5a9f1d",
+  "prompts": {},
+  "sessions": {
+    "s_c747c006804356": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5967cfa3-bd7c-4241-9469-82caf8b7b57a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

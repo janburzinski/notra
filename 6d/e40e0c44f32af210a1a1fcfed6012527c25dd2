@@ -1,0 +1,51 @@
+apps/dashboard/messages/en.json
+  s_492d69f8779584::t_1195eea38e6cbb 6427-6429
+apps/dashboard/src/utils/chat-minimap.ts
+  s_492d69f8779584::t_b2fbde0c4498bf 24-26
+  s_492d69f8779584::t_84e33f26ed794f 1-23,27-53
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_492d69f8779584::t_9d44731b146a91 77,150
+  s_492d69f8779584::t_c707c48e97d0bb 2645,2647,2906
+  s_492d69f8779584::t_b2fbde0c4498bf 2646
+packages/ui/src/components/ui/chat-minimap.tsx
+  s_492d69f8779584::t_0a9b51668f2b49 163
+  s_492d69f8779584::t_96f0b5b8fcf43f 115
+  s_492d69f8779584::t_a79e2ffc23ac1a 1-114,116-162,164-199
+apps/dashboard/messages/de.json
+  s_492d69f8779584::t_1195eea38e6cbb 6427-6429
+apps/dashboard/src/lib/i18n/ui-labels.ts
+  s_492d69f8779584::t_cfd960c601d90a 33-35
+apps/dashboard/src/utils/chat-minimap.test.ts
+  s_492d69f8779584::t_84e33f26ed794f 1,3-44
+  s_492d69f8779584::t_9d44731b146a91 2
+apps/dashboard/src/components/chat/chat-minimap-rail.tsx
+  s_492d69f8779584::t_107e1ef6c6050f 1-44,46-47,49-54,56-73
+  s_492d69f8779584::t_0285e69396fa56 45,48
+  s_492d69f8779584::t_456d470011f66c 55
+packages/ui/src/types/chat-minimap.ts
+  s_492d69f8779584::t_a79e2ffc23ac1a 1-31
+packages/ui/src/types/ui-labels.ts
+  s_492d69f8779584::t_1195eea38e6cbb 26-28
+apps/dashboard/src/types/chat-minimap.ts
+  s_492d69f8779584::t_84e33f26ed794f 1-11
+packages/ui/src/constants/ui-labels.ts
+  s_492d69f8779584::t_1195eea38e6cbb 25-27
+packages/ui/src/lib/chat-minimap.ts
+  s_492d69f8779584::t_a79e2ffc23ac1a 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6de40e0c44f32af210a1a1fcfed6012527c25dd2",
+  "prompts": {},
+  "sessions": {
+    "s_492d69f8779584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "235864aa-569e-4bc1-ae72-3878ba3cc1d8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

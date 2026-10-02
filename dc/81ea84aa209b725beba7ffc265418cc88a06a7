@@ -1,0 +1,29 @@
+apps/dashboard/src/types/table.ts
+  s_2c5b3ad6297ff7::t_61fb4db40a155a 108
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_2c5b3ad6297ff7::t_61fb4db40a155a 886-893,1115
+apps/dashboard/src/components/motion/table/table-body.tsx
+  s_2c5b3ad6297ff7::t_61fb4db40a155a 32,99
+apps/dashboard/src/components/motion/table/types.ts
+  s_2c5b3ad6297ff7::t_61fb4db40a155a 105-106
+apps/dashboard/src/components/motion/table/table-body-row.tsx
+  s_2c5b3ad6297ff7::t_61fb4db40a155a 36,57,85,124
+apps/dashboard/src/components/motion/table/index.tsx
+  s_2c5b3ad6297ff7::t_61fb4db40a155a 76,306
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dc81ea84aa209b725beba7ffc265418cc88a06a7",
+  "prompts": {},
+  "sessions": {
+    "s_2c5b3ad6297ff7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0e771-370d-7cb1-91f5-637f533cedf1",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

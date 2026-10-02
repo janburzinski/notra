@@ -1,0 +1,35 @@
+apps/dashboard/src/components/geo/ai-traffic-card.tsx
+  s_613bf42aae7038::t_07736fda528110 47,81-85
+packages/geo-core/tests/ai-traffic-trend.test.ts
+  s_613bf42aae7038::t_7b8ee7626b834b 1-30
+packages/geo-core/src/utils/ai-traffic.ts
+  s_613bf42aae7038::t_3bc30a5d2ada0a 231-233,238-250,255-256,278-280,285-286
+  s_613bf42aae7038::t_f701ad09e46f66 235-237
+apps/dashboard/src/types/geo.ts
+  s_613bf42aae7038::t_07736fda528110 719
+apps/dashboard/src/components/geo/traffic-hero.tsx
+  s_613bf42aae7038::t_f788829916fe5d 140
+  s_613bf42aae7038::t_07736fda528110 10,142
+  s_613bf42aae7038::t_6a8fe2b3c6f334 141,272-273,286-287,299
+  s_613bf42aae7038::t_8886d48cfae058 270-271,284-285
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_613bf42aae7038::t_07736fda528110 115
+apps/dashboard/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_613bf42aae7038::t_9133e84b80793d 1462-1464
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dae30198002782dc10f9731bb9e5681aaf3d0741",
+  "prompts": {},
+  "sessions": {
+    "s_613bf42aae7038": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ecb3-4609-7a51-99b5-0394d04280ad",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+apps/dashboard/src/lib/hooks/use-geo-gaps-page.ts
+  s_6bfa68bf4a73a2::t_66f68f21c1fbe5 101-128
+  s_6bfa68bf4a73a2::t_541eaac2440f89 55
+  s_6bfa68bf4a73a2::t_4f03593001213e 21-24
+  s_6bfa68bf4a73a2::t_f731ae09c59d5b 3-7
+packages/geo-core/src/constants/geo.ts
+  s_6bfa68bf4a73a2::t_3dd422d474f589 234-236
+packages/posthog/src/events.ts
+  s_6bfa68bf4a73a2::t_f2cd4b20837c44 82
+packages/db/migrations/0089_geo_ignored_gap_prompt_ids.sql
+  ai_agent 1
+apps/dashboard/src/components/geo/gap-detail-sheet.tsx
+  s_6bfa68bf4a73a2::t_b0ea741475b592 260-262
+  s_6bfa68bf4a73a2::t_da3d445d40e17d 4-6,10-15,35,37-47,49-73,75-88,90-164,166-176,179-196,198-199,202-203,205-233,237,241-254,256-259,263-266,270-271,301-308,339,344-357,360-362,364-381,385-408,410-416
+packages/db/migrations/meta/0089_snapshot.json
+  ai_agent 1-11225
+apps/dashboard/src/types/components/geo-gaps.ts
+  s_6bfa68bf4a73a2::t_b4585ef7ec814b 104-105
+  s_6bfa68bf4a73a2::t_5042a51f604fbb 23-24,33-37,40-42,46-65
+packages/db/migrations/meta/_journal.json
+  ai_agent 627-633
+apps/dashboard/tests/geo-gaps-page.test.tsx
+  s_6bfa68bf4a73a2::t_7458134dfab356 41
+packages/geo-core/src/schemas/geo.ts
+  s_6bfa68bf4a73a2::t_345841c6eb0ef6 291-295
+packages/db/src/schema.ts
+  s_6bfa68bf4a73a2::t_a9e0c934eb4188 1463-1467
+apps/dashboard/src/lib/hooks/use-geo-writer.ts
+  s_6bfa68bf4a73a2::t_de0f94b036c76f 82-121
+packages/geo-core/src/geo/gaps.ts
+  s_6bfa68bf4a73a2::t_3e3e4d48b370ff 488-494
+  s_6bfa68bf4a73a2::t_1ff94f0362fcc5 31
+  s_6bfa68bf4a73a2::t_5bcfa1f854fdbf 294,302-306
+  s_6bfa68bf4a73a2::t_e3c60825a39e87 182-186,195
+  s_6bfa68bf4a73a2::t_6c423a08b0d4b6 522-524
+  s_6bfa68bf4a73a2::t_747591555aeda7 593-609
+packages/geo-core/src/types/geo.ts
+  s_6bfa68bf4a73a2::t_bd630c608e6862 353-357
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_6bfa68bf4a73a2::t_2a16cc55c3662a 1468-1482
+  s_6bfa68bf4a73a2::t_7b3023d59465dc 40-43
+  s_6bfa68bf4a73a2::t_689cdd444c4404 159
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_6bfa68bf4a73a2::t_eeb990ffc5a795 1022-1024,1030
+  s_6bfa68bf4a73a2::t_b2d738ce421f85 59
+  s_6bfa68bf4a73a2::t_41898a79e3fde9 16
+  s_6bfa68bf4a73a2::t_09867b8c2116e3 862
+  s_6bfa68bf4a73a2::t_4237f1cdf37ed9 1032
+  s_6bfa68bf4a73a2::t_1f5832d537911f 764,766-770,775-786,790-793
+  s_6bfa68bf4a73a2::t_7fc4ddac60bdd6 765,771-774,787-789,794-803
+  s_6bfa68bf4a73a2::t_a8dc1db03664e5 720-721
+  s_6bfa68bf4a73a2::t_d554abe13adbdf 730-733
+  s_6bfa68bf4a73a2::t_44778921524893 971-991
+  s_6bfa68bf4a73a2::t_d2b35a16348c63 178-179,183-196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "281789857f5b6d260da17b8d25e23f3410e7ac5e",
+  "prompts": {},
+  "sessions": {
+    "s_6bfa68bf4a73a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "22e23188-4611-4f94-8480-8b06d1a65fad",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

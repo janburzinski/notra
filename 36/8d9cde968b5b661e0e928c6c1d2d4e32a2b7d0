@@ -1,0 +1,33 @@
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 140
+packages/ui/src/components/ui/sidebar.tsx
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 542-545
+apps/dashboard/src/constants/right-panel.ts
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 5
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 104,107,123,153
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 19-20,22-28,30-32
+packages/geo-core/src/constants/geo.ts
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 1051
+apps/dashboard/src/app/(dashboard)/[slug]/geo/page-client.tsx
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 46-47,49-63,65-67
+apps/dashboard/src/styles/globals.css
+  s_a65ee9be69c2ec::t_d4bf32d52ecb3b 48-56,61-62,67,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "368d9cde968b5b661e0e928c6c1d2d4e32a2b7d0",
+  "prompts": {},
+  "sessions": {
+    "s_a65ee9be69c2ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fecb9ce-d6ed-4410-92b8-9a7a0289b731",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

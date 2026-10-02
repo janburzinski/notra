@@ -1,0 +1,19 @@
+packages/ui/src/components/ui/sidebar.tsx
+  s_a65ee9be69c2ec::t_cef28aa3490004 37-42,171,268,549-554
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b789b676b44920b74f0a23c823fef87c7d6b5643",
+  "prompts": {},
+  "sessions": {
+    "s_a65ee9be69c2ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fecb9ce-d6ed-4410-92b8-9a7a0289b731",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

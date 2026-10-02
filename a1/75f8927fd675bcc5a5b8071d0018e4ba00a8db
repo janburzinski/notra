@@ -1,0 +1,29 @@
+packages/geo-core/tests/geo-check-evaluation.test.ts
+  s_40a8cf18534049::t_011ad78d85d6bb 129-140
+packages/ai/src/evaluation/client.test.ts
+  s_36160a38df393d::t_eea119c2f5b0c9 98-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a175f8927fd675bcc5a5b8071d0018e4ba00a8db",
+  "prompts": {},
+  "sessions": {
+    "s_36160a38df393d": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QMEqXXCDoJodd7cEkd0",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_40a8cf18534049": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QMEMEPe2BAjG4sHu4yX",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+packages/webhooks/e2e/receiver.ts
+  s_21aa2ead8cbfcc::t_da71d9640ca1e4 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b64527548e0bb2382e2541e274e2e469b90c8306",
+  "prompts": {},
+  "sessions": {
+    "s_21aa2ead8cbfcc": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034QPru9J752Yy7UKv7UDP",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

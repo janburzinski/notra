@@ -1,0 +1,29 @@
+apps/ui/components/ui/input-group.tsx
+  s_68efd06bd8cdc3::t_4d4f2e46144735 49
+  s_68efd06bd8cdc3::t_98bd17636f71f6 60-61
+apps/ui/registry/notra/chatgpt/components/chatgpt-thread.tsx
+  s_68efd06bd8cdc3::t_4d4f2e46144735 61-63,66
+apps/ui/registry/notra/claude-code/components/claude-code-todo-list.tsx
+  s_68efd06bd8cdc3::t_98bd17636f71f6 58
+apps/ui/registry/notra/claude-code/constants/claude-code-session.ts
+  s_68efd06bd8cdc3::t_98bd17636f71f6 39
+apps/ui/registry/notra/gemini/components/gemini-thoughts.tsx
+  s_68efd06bd8cdc3::t_98bd17636f71f6 86-92
+  s_68efd06bd8cdc3::t_4d4f2e46144735 84-85,93-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fc29ef8c6dd28ecc25d5f34235cbab709fe674f4",
+  "prompts": {},
+  "sessions": {
+    "s_68efd06bd8cdc3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff5b0bb1-cc5d-44be-af5f-6d10a56bd786",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

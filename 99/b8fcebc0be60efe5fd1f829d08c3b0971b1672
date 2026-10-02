@@ -1,0 +1,30 @@
+apps/dashboard/src/app/onboarding/pricing/page.tsx
+  s_309f517818a681::t_e7e9c00bd3cbd1 7,12-14,27-31,39-40
+apps/dashboard/src/app/onboarding/competitors/page.tsx
+  s_309f517818a681::t_06b260c110e5ba 13-17
+  s_309f517818a681::t_1da3d6ffaf2482 60
+apps/dashboard/src/app/onboarding/visibility/page.tsx
+  s_309f517818a681::t_62cc25ac98e3c7 15
+  s_309f517818a681::t_d940069967799d 59-61
+apps/dashboard/src/app/onboarding/page.tsx
+  s_309f517818a681::t_6fc18c206a3a8e 9-19,28-32,36,45,48,50,53,56
+apps/dashboard/src/app/onboarding/workspace/page.tsx
+  s_309f517818a681::t_750da838dfc970 34-38,63,70-71
+  s_309f517818a681::t_8812cb6bdf0593 14,19-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "99b8fcebc0be60efe5fd1f829d08c3b0971b1672",
+  "prompts": {},
+  "sessions": {
+    "s_309f517818a681": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "bb0e600b-1866-4fad-a39b-bc62460e772a",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

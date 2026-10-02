@@ -1,0 +1,25 @@
+apps/ui/docs/components/step-slider.mdx
+  s_57aaddf5583939::t_b22ee4b36f3e88 37
+packages/ui/src/components/ui/step-slider.tsx
+  s_57aaddf5583939::t_f807306d40fdfd 5,19,22-26,34,70,75,80-81,91-92
+  s_57aaddf5583939::t_3bc5f918b1a917 16-18,20-21,27-33,67-69,71-74,76-79,82-90,93-101,153-162
+apps/ui/registry/notra/step-slider/components/step-slider.tsx
+  s_57aaddf5583939::t_f807306d40fdfd 5,19,22-26,34,70,75,80-81,91-92
+  s_57aaddf5583939::t_3bc5f918b1a917 16-18,20-21,27-33,67-69,71-74,76-79,82-90,93-101,153-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ea81173e60af394dfcb1cf17701b7cf846c668a9",
+  "prompts": {},
+  "sessions": {
+    "s_57aaddf5583939": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9102de7f-1765-4d4b-9143-ce18b62228c6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

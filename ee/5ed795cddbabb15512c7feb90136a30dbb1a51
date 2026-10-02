@@ -1,0 +1,56 @@
+apps/dashboard/src/components/geo/sentiment-breakdown-placeholder.tsx
+  s_f40c8347a9ce7d::t_0e4afbef20473f 1-2,5,9,11-16,18-20,23-25,28-30,32,37,39-51,53-57,59-68,89-124,126-131,135-150,152-153
+  s_f40c8347a9ce7d::t_fd65fa86405c03 3,7,21,26-27,31,33-36,38,58,70-85,125,132-134,151
+apps/dashboard/src/styles/globals.css
+  s_f40c8347a9ce7d::t_fd65fa86405c03 95-116,118-129
+apps/dashboard/src/utils/geo-sentiment.ts
+  s_f40c8347a9ce7d::t_06fb02ffc8d24b 6-9,11-16,18,20,143-176
+apps/dashboard/src/constants/geo-sentiment.ts
+  s_67220b7c802e07::t_8b0137ad28bf56 49-53
+  s_f40c8347a9ce7d::t_06fb02ffc8d24b 48,54-61
+  s_f40c8347a9ce7d::t_0e4afbef20473f 62-85
+apps/dashboard/src/types/geo-sentiment.ts
+  s_f40c8347a9ce7d::t_0e4afbef20473f 127-133
+  s_f40c8347a9ce7d::t_06fb02ffc8d24b 103-126
+apps/dashboard/messages/de.json
+  s_f40c8347a9ce7d::t_0e4afbef20473f 3258-3266
+  s_f40c8347a9ce7d::t_a469f0c8389894 2299
+  s_f40c8347a9ce7d::t_06fb02ffc8d24b 3254-3257,3267-3275
+apps/dashboard/src/components/geo/sentiment-themes-empty.tsx
+  s_f40c8347a9ce7d::t_a469f0c8389894 37,42,49
+apps/dashboard/src/components/geo/brand-sentiment-card.tsx
+  s_f40c8347a9ce7d::t_bea0ae5a974ce2 3,6
+  s_f40c8347a9ce7d::t_e51a253a6e2165 29,31,38
+  s_f40c8347a9ce7d::t_0e4afbef20473f 4,9,20-24,32-37
+  s_f40c8347a9ce7d::t_172cc09c6e2273 30
+apps/dashboard/messages/en.json
+  s_f40c8347a9ce7d::t_06fb02ffc8d24b 3254-3257,3267-3275
+  s_f40c8347a9ce7d::t_0e4afbef20473f 3258-3266
+  s_f40c8347a9ce7d::t_a469f0c8389894 2299
+apps/dashboard/src/components/geo/sentiment-distribution-bar.tsx
+  s_f40c8347a9ce7d::t_bea0ae5a974ce2 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ee5ed795cddbabb15512c7feb90136a30dbb1a51",
+  "prompts": {},
+  "sessions": {
+    "s_67220b7c802e07": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa80fa9b-d8b0-444f-a254-472651094150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f40c8347a9ce7d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dad65e4a-226b-487a-8160-8ae43add53fe",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

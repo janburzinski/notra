@@ -1,0 +1,343 @@
+apps/dashboard/src/components/geo/language-performance-card.tsx
+  s_023e6c4703dd3e::t_3efe6e6ed2bbc1 188
+apps/dashboard/src/components/geo/competitor-detail-view.tsx
+  s_023e6c4703dd3e::t_369306ed4d9f50 56,158
+  s_023e6c4703dd3e::t_e5ef28e34e6182 55,155-156,159-186,188-196,199,211,218,220,222,225-232,300-302,344-345,347-356,470
+  s_023e6c4703dd3e::t_0143969a5c9420 333
+  s_023e6c4703dd3e::t_473db506c66f7a 453,471-479
+apps/dashboard/src/types/geo.ts
+  s_023e6c4703dd3e::t_369306ed4d9f50 1272
+  s_023e6c4703dd3e::t_313a1434a9e9dd 549-552
+  s_023e6c4703dd3e::t_e5ef28e34e6182 1273-1283
+  s_023e6c4703dd3e::t_473db506c66f7a 12
+  s_023e6c4703dd3e::t_cfafd7d7704040 477,496-497,506-507,527-528,536,538,542-543,546,556-557
+  s_023e6c4703dd3e::t_f2974d9365a9a7 618-619,881-901,1662,1671
+  s_023e6c4703dd3e::t_a780252bfe6e3f 485-495,498-505,508-511,517-520
+  s_023e6c4703dd3e::t_d9a5bfb1a248ae 21-24
+  s_023e6c4703dd3e::t_40aae106c64afc 512-516
+  s_023e6c4703dd3e::t_d09a806a68c164 544,555,558
+  s_023e6c4703dd3e::t_7d5b474bab4442 795
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_023e6c4703dd3e::t_baeb3362424be0 846-861
+  s_023e6c4703dd3e::t_7d5b474bab4442 833-838
+  s_023e6c4703dd3e::t_3286065e3b3ec1 1139-1157
+  s_023e6c4703dd3e::t_d9a5bfb1a248ae 7
+  s_023e6c4703dd3e::t_0f6429d8e90bca 35
+  s_bbae6077250de4::t_3ce1888bd1e6ea 11,774-775,796,819-820
+packages/geo-core/src/utils/conversation-generation-prompt.ts
+  s_023e6c4703dd3e::t_54d87dfa91d5c3 1-46
+packages/posthog/src/events.ts
+  s_023e6c4703dd3e::t_816b11df4d2e36 66
+apps/dashboard/src/components/geo/traffic-sources-group.tsx
+  s_023e6c4703dd3e::t_a31c0ee2e4e4e6 28,114-116
+  s_023e6c4703dd3e::t_bfe05c36ca52fe 79
+  s_023e6c4703dd3e::t_69a3dd966ae0e1 37,117,133,153
+  s_023e6c4703dd3e::t_13536f06ce0544 7,136-140,143,149
+apps/dashboard/src/types/geo-scan-activity.ts
+  s_023e6c4703dd3e::t_2fc9e500973a34 2,58-72,92-96
+  s_023e6c4703dd3e::t_4afd46f2d75d36 83-84,87-91
+apps/dashboard/src/components/agent-feedback/feedback-detail-dialog.tsx
+  s_023e6c4703dd3e::t_52eb7b891a388b 121
+apps/dashboard/src/components/motion/table/index.tsx
+  s_023e6c4703dd3e::t_13536f06ce0544 22
+  s_023e6c4703dd3e::t_a9483cfc907da9 93-97,105-109,200
+packages/ui/src/components/animated-number.tsx
+  s_023e6c4703dd3e::t_5dcc6b9e4102e9 16-20,28,34,36-37,40,45,51-61,63-84
+  s_3f40a5bf1e02ff::t_58fceea1567168 50
+  s_bbae6077250de4::t_3ce1888bd1e6ea 1-5,7-15,21-23,26-27,29-33,38-39,41-44,46-49,85-88
+packages/geo-core/src/schemas/geo.ts
+  s_023e6c4703dd3e::t_8771c1ad5511dd 27-28,420-434,455-457
+  s_023e6c4703dd3e::t_7f5b64890d08bd 516-519
+apps/dashboard/src/lib/design-system/text-segments.ts
+  s_023e6c4703dd3e::t_987e023573a9ef 20-24
+apps/dashboard/src/components/geo/prompt-keyword-textarea.tsx
+  s_023e6c4703dd3e::t_145a4663198df1 9-12
+  s_023e6c4703dd3e::t_92d445081cb3b6 94,116
+apps/dashboard/src/components/geo/prompt-engine-switcher.tsx
+  s_023e6c4703dd3e::t_654404407278eb 77-79
+apps/dashboard/src/types/components/geo-gaps.ts
+  s_023e6c4703dd3e::t_e8e795d26116a8 25-26
+apps/dashboard/src/components/geo/prompt-copy-button.tsx
+  s_023e6c4703dd3e::t_cae6d915a15426 56
+  s_023e6c4703dd3e::t_53245eeacffc8f 14,51
+  s_023e6c4703dd3e::t_1f679db5303385 3-11,15-22,24-50,52,55,57-58,62-67,75-101
+  s_023e6c4703dd3e::t_15e7a4810e7a02 61,68-74
+apps/dashboard/src/components/geo/journey-overview-card.tsx
+  s_023e6c4703dd3e::t_27d42f2c6944c1 4-8,15-20,23,27,31-55,57-58,60-64,67-68,74-75,79,83,86,90-91
+  s_023e6c4703dd3e::t_32db0696c0304b 29,95
+  s_023e6c4703dd3e::t_d09a806a68c164 11,56,59
+packages/analytics/src/tinybird/pipes/geo-traffic.ts
+  s_023e6c4703dd3e::t_b6e2e7fce667d4 530,539,542-559,574
+  s_023e6c4703dd3e::t_3b9f9a1658db07 11,23-24,382-442,448-457,466-521,525-529,531-533,540-541,560-573
+  s_023e6c4703dd3e::t_aede85e0be644c 443-447,458-465,522-524,534-538
+apps/dashboard/src/components/geo/traffic-source-sheet.tsx
+  s_023e6c4703dd3e::t_313a1434a9e9dd 25,205
+  s_023e6c4703dd3e::t_69a3dd966ae0e1 1-24,26-204,206-271
+apps/dashboard/src/components/geo/what-changed-card.tsx
+  s_023e6c4703dd3e::t_3efe6e6ed2bbc1 278,298,307
+apps/dashboard/src/components/geo/journeys-card.tsx
+  s_023e6c4703dd3e::t_4ad0860d867c8b 11,23-27,41,73-74,103-104
+apps/dashboard/src/constants/geo-answer-mentions.ts
+  s_023e6c4703dd3e::t_e5ef28e34e6182 19
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_023e6c4703dd3e::t_be3ec506ea93f4 185
+apps/dashboard/src/components/geo/journey-path-summary.tsx
+  s_023e6c4703dd3e::t_6eae30bc238dac 1-2,7-19,22-23,25-33
+  s_023e6c4703dd3e::t_8010b4e4f67625 3-6,20-21
+  s_023e6c4703dd3e::t_32db0696c0304b 24
+apps/dashboard/src/components/geo/journeys-tab.tsx
+  s_023e6c4703dd3e::t_777cb0afd3813b 23,66,71-73,75-77,119,125,128,140,142
+  s_023e6c4703dd3e::t_32db0696c0304b 4-5,7,9-10,20-22,78-95,110-118,120,123-124,126,129,133-137,139,141,143-161
+  s_023e6c4703dd3e::t_dec58b0b0a5e34 74
+  s_023e6c4703dd3e::t_40aae106c64afc 99
+  s_023e6c4703dd3e::t_d09a806a68c164 127
+packages/geo-core/tests/scan-history.test.ts
+  s_023e6c4703dd3e::t_6dd968728f434d 340,342,350,356,371,378-379,405
+apps/dashboard/src/components/geo/journey-group-sheet.tsx
+  s_023e6c4703dd3e::t_eb41677713d8ec 3-8,13,28,42-44,46,103,105-111,169-170,180-202,204-236,240,255,308-318,323-326,328-329,334,358-359,375,377
+  s_023e6c4703dd3e::t_40aae106c64afc 37,104
+  s_023e6c4703dd3e::t_799b3bdc16e67e 58,272-273,276,287,301-302
+  s_023e6c4703dd3e::t_9b5175db2bd94a 1-2,9-12,14-25,27,29-36,38-41,45,47-57,59-84,88-102,112-168,171-179,203,237-239,241-254,256-271,274-275,277-286,288-300,303-307,319-322,330-333,335-357,360-374,376,378-386
+  s_023e6c4703dd3e::t_313a1434a9e9dd 26,327
+  s_023e6c4703dd3e::t_2ea4f78561064d 85-87
+apps/dashboard/src/components/geo/journey-stat-card.tsx
+  s_023e6c4703dd3e::t_9a8951647ce07b 2-3,18
+  s_023e6c4703dd3e::t_3956a6e390dea7 39-46
+  s_023e6c4703dd3e::t_d09a806a68c164 1,34
+apps/dashboard/src/app/design-system/geo-traffic/page-client.tsx
+  s_bbae6077250de4::t_3ce1888bd1e6ea 1-13,19-47
+  s_023e6c4703dd3e::t_29d7e60add814a 14-18
+apps/dashboard/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_023e6c4703dd3e::t_942c1ec6876513 86
+  s_023e6c4703dd3e::t_9db8d6e7f93706 2266-2270,2524
+apps/dashboard/src/components/geo/journey-count-cell.tsx
+  s_023e6c4703dd3e::t_d09a806a68c164 1-25
+apps/dashboard/src/components/evilcharts/charts/echarts-bar-chart.tsx
+  s_023e6c4703dd3e::t_942c1ec6876513 76
+  s_023e6c4703dd3e::t_9db8d6e7f93706 1700-1704,1888
+apps/dashboard/src/components/geo/traffic-source-group-cell.tsx
+  s_023e6c4703dd3e::t_e7a860239ca11e 3,5,11-18,20-21
+apps/dashboard/src/components/motion/table/types.ts
+  s_023e6c4703dd3e::t_8e383601f55818 23-28
+apps/dashboard/src/components/agent-feedback/feedback-table.tsx
+  s_023e6c4703dd3e::t_52eb7b891a388b 38,56,64,73,94
+apps/dashboard/src/constants/geo-traffic-sources.ts
+  s_023e6c4703dd3e::t_8d1721b8853160 53-54
+  s_023e6c4703dd3e::t_69a3dd966ae0e1 22-27
+packages/ui/src/constants/hover-card.ts
+  s_023e6c4703dd3e::t_805f05a8eaa864 1-9
+apps/dashboard/src/utils/ratelimit.ts
+  s_023e6c4703dd3e::t_816b11df4d2e36 139-144
+apps/dashboard/src/styles/globals.css
+  s_023e6c4703dd3e::t_e63eb27d7dd7de 23-25
+apps/dashboard/src/components/geo/share-of-voice-table.tsx
+  s_023e6c4703dd3e::t_da8970de865a20 127,150
+packages/geo-core/src/geo/programs.ts
+  s_023e6c4703dd3e::t_7f5b64890d08bd 4-5,41,89-90,1250-1311,1313-1315
+  s_023e6c4703dd3e::t_2661b0fb7a9176 1312
+apps/dashboard/src/components/geo/geo-answer-mention-card.tsx
+  s_023e6c4703dd3e::t_67638994df558a 15,85,88,90-91,93
+packages/geo-core/src/utils/ai-traffic.ts
+  s_023e6c4703dd3e::t_90142e016bd288 5,49-52
+packages/ui/src/components/ui/svgs/instagram.tsx
+  s_023e6c4703dd3e::t_610d43b0cd170f 4,6
+apps/dashboard/src/components/geo/ai-traffic-card.tsx
+  s_023e6c4703dd3e::t_8d1721b8853160 154-158,160-168,170-172,174-184
+  s_023e6c4703dd3e::t_be3ec506ea93f4 23,30,42-46,68,92-97,186,215-217,221-230
+  s_023e6c4703dd3e::t_353f3628e469c9 159,173
+packages/geo-core/src/constants/geo.ts
+  s_023e6c4703dd3e::t_90142e016bd288 806-819
+  s_023e6c4703dd3e::t_7f5b64890d08bd 723-724
+  s_bbae6077250de4::t_3ce1888bd1e6ea 629
+  s_023e6c4703dd3e::t_870d9db710eac7 411-412
+  s_023e6c4703dd3e::t_f16fda704f80ee 114
+  s_023e6c4703dd3e::t_9f58025d6fa95e 423-429
+  s_023e6c4703dd3e::t_8771c1ad5511dd 469-475,585
+  s_023e6c4703dd3e::t_e803a8d21d75dc 402
+  s_023e6c4703dd3e::t_3b13e681a94752 104
+  s_023e6c4703dd3e::t_d9a5bfb1a248ae 725-726
+apps/dashboard/src/components/geo/journey-paths-card.tsx
+  s_023e6c4703dd3e::t_d09a806a68c164 4,8,24,50,53,62
+  s_023e6c4703dd3e::t_32db0696c0304b 26,76
+  s_023e6c4703dd3e::t_27d42f2c6944c1 3,6,12-16,19,22-23,28-49,51-52,54-57,61,66-67,71-72
+apps/dashboard/src/utils/geo-citations.ts
+  s_023e6c4703dd3e::t_3bf5f9ffd68868 7-10
+  s_023e6c4703dd3e::t_90142e016bd288 35
+apps/dashboard/src/components/geo/mention-rate-card.tsx
+  s_023e6c4703dd3e::t_ff037fa02ab9cb 131
+packages/geo-core/tests/sequence-generation.test.ts
+  s_023e6c4703dd3e::t_8b3ff807c0c556 1-21,23-62
+  s_023e6c4703dd3e::t_0838ae55c6bb12 22
+apps/dashboard/src/components/geo/scan-activity.tsx
+  s_023e6c4703dd3e::t_175f6552aea946 37
+  s_023e6c4703dd3e::t_603b4d5c944118 7,12,14,22-25,27-28,38-43,45-47
+  s_023e6c4703dd3e::t_187fe1b36ffc84 3,13,20-21,26,29-30
+apps/dashboard/src/app/design-system/layout.tsx
+  s_023e6c4703dd3e::t_f552c9cbeec343 5,17-22
+  s_023e6c4703dd3e::t_1ceb63d6dc921e 4,6,16
+apps/dashboard/src/components/geo/prompt-detail-dialog.tsx
+  s_023e6c4703dd3e::t_1e1cb6b65d70ab 198-201,203-205
+packages/analytics/src/constants/geo-queries.ts
+  s_023e6c4703dd3e::t_f1393d2435fd7b 97-105
+apps/dashboard/src/utils/geo-gaps.ts
+  s_023e6c4703dd3e::t_32436c10bde1fd 87
+apps/dashboard/src/lib/hooks/use-geo-overview-page.ts
+  s_023e6c4703dd3e::t_7d5b474bab4442 21,153-158,203-205
+apps/dashboard/src/components/geo/traffic-pages-card.tsx
+  s_023e6c4703dd3e::t_07e2bee6b90a9b 230
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_023e6c4703dd3e::t_3b13e681a94752 457,462,483,486-497,500
+  s_023e6c4703dd3e::t_d22bcee02aec6a 904-905
+  s_023e6c4703dd3e::t_32436c10bde1fd 512,743,852
+  s_023e6c4703dd3e::t_3efe6e6ed2bbc1 872,886
+  s_023e6c4703dd3e::t_e8e795d26116a8 3-7,185,189-215,816,863,887-888
+  s_023e6c4703dd3e::t_f1dab2ec68ca23 18,874
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_023e6c4703dd3e::t_baeb3362424be0 84
+  s_023e6c4703dd3e::t_cf8adc18a9da66 188,1135-1138
+  s_023e6c4703dd3e::t_0838ae55c6bb12 125
+  s_023e6c4703dd3e::t_816b11df4d2e36 1301-1323,1649
+packages/ui/src/types/animated-number.ts
+  s_bbae6077250de4::t_3ce1888bd1e6ea 1-4
+apps/dashboard/src/components/geo/journey-detail-sheet.tsx
+  s_023e6c4703dd3e::t_799b3bdc16e67e 155-157,184-185,189
+apps/dashboard/src/components/geo/traffic-hero.tsx
+  s_bbae6077250de4::t_3ce1888bd1e6ea 19,104-107
+apps/dashboard/src/components/evilcharts/charts/echarts-pie-chart.tsx
+  s_023e6c4703dd3e::t_942c1ec6876513 53
+  s_023e6c4703dd3e::t_9db8d6e7f93706 1162,1190
+apps/dashboard/src/utils/geo-competitors.ts
+  s_023e6c4703dd3e::t_a8a91b1620a3a7 111,113,115-118,121-126
+packages/geo-core/src/constants/geo-scan-history.ts
+  s_023e6c4703dd3e::t_3ed46efe480979 2
+packages/analytics/src/types/tinybird-endpoints.ts
+  s_023e6c4703dd3e::t_173003c1761f70 5-6,52-53
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_023e6c4703dd3e::t_cfec1b57990143 24
+  s_023e6c4703dd3e::t_9fb11881eeecf2 75,99-105,199
+apps/dashboard/src/components/geo/ai-traffic-log-card.tsx
+  s_023e6c4703dd3e::t_6bbff1637508d2 3,12,19-22,92,96-119,121-138,143,148-151,156,161-176
+  s_023e6c4703dd3e::t_bfe05c36ca52fe 93-95
+apps/dashboard/src/app/(dashboard)/[slug]/geo/prompts/page-client.tsx
+  s_023e6c4703dd3e::t_603b4d5c944118 142
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_023e6c4703dd3e::t_f1d322e00f87c9 186
+  s_023e6c4703dd3e::t_3efe6e6ed2bbc1 120,311
+apps/dashboard/src/components/geo/engine-rate-table.tsx
+  s_023e6c4703dd3e::t_3efe6e6ed2bbc1 145,174,186,197
+apps/dashboard/src/app/design-system/geo-traffic/page.tsx
+  s_bbae6077250de4::t_3ce1888bd1e6ea 1,4
+apps/dashboard/src/utils/geo-overview-page.ts
+  s_023e6c4703dd3e::t_7d5b474bab4442 51,95
+  s_023e6c4703dd3e::t_d9a5bfb1a248ae 7
+apps/dashboard/src/components/motion/table/use-collapsible-columns.ts
+  s_023e6c4703dd3e::t_9b21cefc593531 4,12-43,107
+  s_023e6c4703dd3e::t_353f3628e469c9 63
+  s_023e6c4703dd3e::t_34576fa5c4aebb 72-73,75,79-86,90,108,110-111,126,132,134
+  s_023e6c4703dd3e::t_a9483cfc907da9 76-78
+  s_023e6c4703dd3e::t_8e383601f55818 1-3,5-11,44-62,64-71,74,87-89,91-94,100-106,109,112-125,127-131,133,135-137
+  s_023e6c4703dd3e::t_13536f06ce0544 95-99
+apps/dashboard/src/components/evilcharts/charts/echarts-line-chart.tsx
+  s_023e6c4703dd3e::t_942c1ec6876513 79
+  s_023e6c4703dd3e::t_9db8d6e7f93706 1787-1791,2003
+apps/dashboard/src/components/geo/scan-run-detail.tsx
+  s_023e6c4703dd3e::t_14cbbc0f36b426 60-62,101,179
+  s_023e6c4703dd3e::t_bb2bd1e5586063 5,7,11-25,31-32,36,39-41,44,46-47,49-56,58-59,63-90,92-100,102-123,125-134,136-147,149-150,152-168,170-178,180-195,197-200,202-252,254-261,263-305,307,312,315,324,326-331,349,351-377,381-405,407-413,416-422,424,426,428,430,433
+  s_023e6c4703dd3e::t_a2909658544c28 91,124,135,169
+  s_023e6c4703dd3e::t_4afd46f2d75d36 26,35,37,48,57,350
+  s_023e6c4703dd3e::t_3f1b67a5cc1854 253,332-334,348
+  s_023e6c4703dd3e::t_603b4d5c944118 335-347,380
+packages/geo-core/src/geo/discover.ts
+  s_023e6c4703dd3e::t_c170d7a439d7e6 496,525
+  s_023e6c4703dd3e::t_378d02b56c3dda 23,34,39,55-58,80,98-100,180,182-186,275,335-349,357,442,462
+  s_023e6c4703dd3e::t_69a16f68306a5c 181
+packages/geo-core/src/geo/sequence-generation.ts
+  s_023e6c4703dd3e::t_984c1d93d6dc3e 1-247
+apps/dashboard/src/components/geo/prompt-suggestions.tsx
+  s_023e6c4703dd3e::t_ec48a79aff5caf 371-373,381-383
+  s_023e6c4703dd3e::t_3471d36d5a742c 216,219-221,224-233,259
+  s_023e6c4703dd3e::t_c141276ebd2830 3,5-14,70,85,95,123-124,276-277,287,328,330,332-334,343-348,361-370,374-380,384-400
+  s_023e6c4703dd3e::t_c490a47403509a 75,87,215,222-223,240-253,261,265-266,312
+apps/dashboard/src/components/geo/scan-activity-status.tsx
+  s_023e6c4703dd3e::t_5ecd06aba88662 1,8,10,16,18-21,24,26,33-34,37-39,41,44
+  s_023e6c4703dd3e::t_7fa448fea84d60 5,9,11-12,17,22
+  s_023e6c4703dd3e::t_9499f881821c84 13-15
+  s_023e6c4703dd3e::t_cde613a1e571fc 23,30-32,35-36,40,42-43,45-46,50,55
+packages/analytics/src/tinybird/client.ts
+  s_023e6c4703dd3e::t_173003c1761f70 19-20,53-54,113-114,415-422,424-434
+  s_023e6c4703dd3e::t_3956a6e390dea7 423,435
+apps/dashboard/src/components/geo/daily-trend-chart.tsx
+  s_023e6c4703dd3e::t_313a1434a9e9dd 1-54
+apps/dashboard/src/components/geo/conversations-card.tsx
+  s_023e6c4703dd3e::t_0838ae55c6bb12 25
+  s_023e6c4703dd3e::t_848e12ccc65bf8 4,12,28-31,155,248-276,284-288
+apps/dashboard/src/components/geo/citations-table.tsx
+  s_023e6c4703dd3e::t_353f3628e469c9 202,212
+packages/ui/src/components/ui/hover-card.tsx
+  s_023e6c4703dd3e::t_049014a212d937 5-8,15-19,21-26
+apps/dashboard/src/components/geo/prompt-receipt-history.tsx
+  s_023e6c4703dd3e::t_3b3fdb81a71387 326
+  s_023e6c4703dd3e::t_e9498969d043e3 327,337-339,347
+  s_023e6c4703dd3e::t_66b659f8d1c9e6 263-266,346
+  s_023e6c4703dd3e::t_7bc95686338446 271
+apps/dashboard/src/utils/geo-journey.test.ts
+  s_023e6c4703dd3e::t_380feec48315f6 10-12,92-111,113-114
+  s_023e6c4703dd3e::t_d358523cb2911a 112
+apps/dashboard/src/utils/geo-journey.ts
+  s_023e6c4703dd3e::t_59b440ea9d6206 22
+  s_023e6c4703dd3e::t_a780252bfe6e3f 360-376,378-380,469
+  s_023e6c4703dd3e::t_6bf08cee9c7688 343-346,348,351
+  s_023e6c4703dd3e::t_32db0696c0304b 377
+  s_023e6c4703dd3e::t_0589c3d7e6770f 14-16,381-468
+apps/dashboard/src/components/evilcharts/ui/echarts-resize.ts
+  s_023e6c4703dd3e::t_b886219439f3d1 5-6,8-19,34,54,56-60,71
+  s_023e6c4703dd3e::t_9db8d6e7f93706 1-4,7,20-33,35-53,55,61-70,72-73
+apps/dashboard/src/components/geo/search-console-card.tsx
+  s_023e6c4703dd3e::t_77226c876e73c9 80,82
+  s_023e6c4703dd3e::t_3956a6e390dea7 124-126
+  s_023e6c4703dd3e::t_f1af414c5b5790 91,258,393,521,545,570
+  s_023e6c4703dd3e::t_191d3e15934f1f 81,83-84,92-93,396-397
+  s_023e6c4703dd3e::t_3fbee2c271a362 3,110-123,127-128,142,144
+  s_023e6c4703dd3e::t_ba175c1eafcdc4 94-104,398-408
+packages/geo-core/src/types/geo.ts
+  s_023e6c4703dd3e::t_54d87dfa91d5c3 881
+  s_023e6c4703dd3e::t_8771c1ad5511dd 862-880,889
+  s_023e6c4703dd3e::t_2661b0fb7a9176 1105
+  s_023e6c4703dd3e::t_7f5b64890d08bd 1070-1104,1106-1107
+  s_023e6c4703dd3e::t_a8a91b1620a3a7 1567,1569-1570,1572-1573
+apps/dashboard/src/utils/ai-traffic-groups.ts
+  s_023e6c4703dd3e::t_3c3ecb9ecf33ef 185-231
+  s_023e6c4703dd3e::t_f2974d9365a9a7 7,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b26a62142a7b63d72d87143c2c35022d7988d75f",
+  "prompts": {},
+  "sessions": {
+    "s_023e6c4703dd3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc4c91ba-a673-4815-880e-5500bc8e78e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_3f40a5bf1e02ff": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034Rhduyl9q439ug1SgXRy",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_bbae6077250de4": {
+      "agent_id": {
+        "tool": "amp",
+        "id": "TU-034RhTSae4BRlGNVbk92dN",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

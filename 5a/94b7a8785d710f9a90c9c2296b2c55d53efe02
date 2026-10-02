@@ -1,0 +1,29 @@
+apps/ui/docs/components/(coding-agents)/claude-code/terminal.mdx
+  s_e6b940b0cae1df::t_b60b5964150ae1 3
+apps/ui/docs/components/(coding-agents)/opencode/window.mdx
+  s_e6b940b0cae1df::t_b60b5964150ae1 3
+apps/ui/registry/notra/codex/components/codex-terminal.tsx
+  s_e6b940b0cae1df::t_616be0800dca35 17
+apps/ui/registry/notra/claude-code/components/claude-code-terminal.tsx
+  s_e6b940b0cae1df::t_616be0800dca35 18
+apps/ui/docs/components/(coding-agents)/opencode/sidebar.mdx
+  s_e6b940b0cae1df::t_b60b5964150ae1 12
+apps/ui/src/styles/examples.css
+  s_e6b940b0cae1df::t_423c2e6a5c8609 638-658,668,692,714-737,747,774,799-810
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5a94b7a8785d710f9a90c9c2296b2c55d53efe02",
+  "prompts": {},
+  "sessions": {
+    "s_e6b940b0cae1df": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9243a46f-3df5-43b5-bff1-11626158f24e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

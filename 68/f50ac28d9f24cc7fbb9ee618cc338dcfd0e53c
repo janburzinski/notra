@@ -1,0 +1,11 @@
+packages/geo-core/src/geo/prompts.ts
+  ai_agent 203-206,209
+packages/geo-core/tests/auto-prompts.test.ts
+  ai_agent 188-195
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "68f50ac28d9f24cc7fbb9ee618cc338dcfd0e53c",
+  "prompts": {}
+}

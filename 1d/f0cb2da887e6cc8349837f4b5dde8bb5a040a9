@@ -1,0 +1,419 @@
+apps/ui/registry/notra/claude-code/components/claude-code-todo-list.tsx
+  s_0a7c546ca46997::t_4ded3185be2c9b 4-5,16-19,21,23-24,28-29,31,34,36-37,39,41-52,54-59,62
+  s_0a7c546ca46997::t_29697c8cef9159 26,30,32-33,35,53,60-61
+packages/ui/src/components/ai-skins/chatgpt/chatgpt-activity.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 5
+apps/ui/registry/notra/opencode/components/opencode-composer.tsx
+  s_0a7c546ca46997::t_fcfc4fbd670b55 54-56
+  s_0a7c546ca46997::t_8882e6f9978013 43,47
+apps/dashboard/src/app/design-system/perplexity/page-client.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 5-10
+apps/ui/registry/notra/opencode/examples/opencode-composer.tsx
+  s_0a7c546ca46997::t_8303d88bb46654 6-7,10-23
+  s_0a7c546ca46997::t_9a326ac3d77c89 9
+apps/web/src/components/feedback-md/feedback-md-terminal-demo.tsx
+  s_0a7c546ca46997::t_0afd189e13f96c 4,16,22-27,33-35,42-50,54
+  s_0a7c546ca46997::t_f4b6c2938c7458 1-3,5-6,37,41,55
+  s_0a7c546ca46997::t_8f4f38fe795311 38-40,51-53
+packages/ui/src/components/ai-skins/gemini/gemini-composer.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 9
+packages/ui/src/components/ai-skins/opencode/opencode-composer.tsx
+  s_0a7c546ca46997::t_1ffcabb26bad1c 3-10,12-21,28-32,34-35,43-49,53,62-74,76,79-94
+apps/dashboard/src/types/design-system-claude.ts
+  s_0a7c546ca46997::t_f4b6c2938c7458 2-3,5-6,22,48,57-58
+  s_0a7c546ca46997::t_6ef63b723f60e2 4
+  ai_agent 26-39,44,46-47,49-50,52
+packages/ui/src/lib/geo-perplexity-sources.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 1
+apps/dashboard/src/app/design-system/opencode/page-client.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 3-8
+  s_0a7c546ca46997::t_8882e6f9978013 30,142,148
+  s_0a7c546ca46997::t_62ab471635a6b2 77
+  s_0a7c546ca46997::t_17eab49057f5a7 9,39-64,72,78-85,87-98,102,104-108,112,116,120,128,133-140,143-146,149-150,152,160,164-169,174-191,197,201-214,220,226-227,230,234
+  s_0a7c546ca46997::t_65985e357694e6 86,170,173
+packages/ui/src/components/ai-skins/opencode/opencode-progress.tsx
+  s_0a7c546ca46997::t_1ffcabb26bad1c 1-61
+apps/ui/registry/notra/claude-code/constants/claude-code-session.ts
+  s_0a7c546ca46997::t_db51c3389297f3 1,6-7,9-10,12,14,17-24,26-36,38-42,44-56
+packages/ui/src/components/ai-skins/claude-code/claude-code-message.tsx
+  s_0a7c546ca46997::t_5d59ec961b2fda 2,5,28-29,35,38,53
+  s_0a7c546ca46997::t_fd12db526d5eb1 4,6-27,37,42-43,46,48-52,54-58
+apps/dashboard/src/constants/design-system-opencode.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 1
+  s_0a7c546ca46997::t_cef26dc240ae9f 9-13,15-20,25-46,52-54,57-59,62-64,69-70,75,77
+apps/ui/docs/components/(terminal-apps)/opencode/window.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,12
+apps/ui/registry/notra/opencode/components/opencode-activity.tsx
+  s_0a7c546ca46997::t_8fc0c794290081 12-19,22-37,47-48,52-74,79,88-90,92-102,104-108
+apps/ui/registry/notra/codex/components/codex-working.tsx
+  s_0a7c546ca46997::t_38ade37f7caa3f 52
+  s_0a7c546ca46997::t_686c51c287bb00 1-51,53-62
+packages/ui/src/components/ai-skins/claude-chat/claude-chat-thinking.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 3
+apps/dashboard/src/app/design-system/claude-chat/page-client.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 5-10
+apps/ui/docs/components/(terminal-apps)/opencode/sidebar.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,12,17-18,21-23
+apps/ui/registry/notra/opencode/constants/opencode-demo.ts
+  s_0a7c546ca46997::t_8882e6f9978013 31
+  s_0a7c546ca46997::t_ef385b399bbc23 4,9-11,13-15,20,22-26,29,32-44,47-128,134,139-140,142-143,146-151,154-181
+apps/ui/registry/notra/codex/examples/codex-header.tsx
+  s_0a7c546ca46997::t_b969437665c89d 8
+apps/ui/registry/notra/opencode/hooks/use-opencode-frame.ts
+  s_0a7c546ca46997::t_07f24b43a6172e 1-30
+apps/dashboard/src/components/geo/geo-skin-message.tsx
+  s_0a7c546ca46997::t_f4b6c2938c7458 5,50,55
+  s_0a7c546ca46997::t_6ef63b723f60e2 3-4,6-9
+apps/ui/registry/notra/claude-code/examples/claude-code-tool-call.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 2-9,14-53
+apps/ui/registry/notra/opencode/constants/opencode.ts
+  s_0a7c546ca46997::t_01163ffd2151ad 1-13,16,18,31-46,49-73,76,86-92,94,98-103
+  s_0a7c546ca46997::t_1db06731c7393b 93,95-97
+packages/ui/src/components/ai-skins/opencode/opencode-activity.tsx
+  s_0a7c546ca46997::t_1ffcabb26bad1c 1-9,11-12,14-26,33-34,38,44,47,49-67
+  s_0a7c546ca46997::t_65985e357694e6 43
+  s_0a7c546ca46997::t_6ef63b723f60e2 13
+apps/ui/registry/notra/claude-code/components/claude-code-status.tsx
+  s_0a7c546ca46997::t_56056985d0715b 19,80
+  s_0a7c546ca46997::t_29db25eb685eb0 1-18,20-79,81-110
+apps/ui/docs/components/(terminal-apps)/opencode/activity.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,12-19,23-25,27-30
+packages/ui/src/components/ai-skins/codex/codex-working.tsx
+  s_0a7c546ca46997::t_16af406dc77829 1-76
+apps/ui/registry/notra/codex/lib/codex-shell.ts
+  s_0a7c546ca46997::t_0591f044f6832e 1-29
+apps/ui/registry/notra/opencode/components/opencode-sources.tsx
+  s_0a7c546ca46997::t_8882e6f9978013 161
+  s_0a7c546ca46997::t_6e783e97c5f883 23-24,26-27,35,37,42-45,51,60-76,79-92,101,108,110,119-120,124-125,130,132-133,135,139,143,150,154,157,159,170
+apps/ui/registry/notra/opencode/components/opencode-progress.tsx
+  s_0a7c546ca46997::t_8882e6f9978013 19-22
+  s_0a7c546ca46997::t_b2a3601d49cf3d 4,67-68
+apps/ui/registry/notra/codex/constants/codex.ts
+  s_0a7c546ca46997::t_0591f044f6832e 3,5,11-18,20,27-28,30-41
+packages/ui/src/components/ai-skins/perplexity/perplexity-composer.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 12
+packages/ui/src/components/ai-skins/claude-code/claude-code-prompt.tsx
+  s_0a7c546ca46997::t_5d59ec961b2fda 4,6-9,12-17,19,55,61-62,70-71,73-74,79,84-85
+  s_0a7c546ca46997::t_6db1e8bc660fb8 5,10,27-29,31,33-35,37-38,40-42,46-52,60,63,75-76,81-83,86-91,95-98,100-101,104-126,128-154
+apps/ui/registry/notra/claude-code/examples/claude-code-thinking.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 4-5,10-13
+apps/ui/docs/components/(terminal-apps)/opencode/turn-footer.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 1-18
+apps/dashboard/src/components/design-system/use-perplexity-playback.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 7
+packages/ui/src/components/ai-skins/gemini/gemini-thinking.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 3
+apps/ui/registry/notra/codex/components/codex-terminal.tsx
+  s_0a7c546ca46997::t_6ddd8c2ff09543 11,17,23-30,33,39,43
+packages/ui/src/components/ai-skins/opencode/opencode-turn-footer.tsx
+  s_0a7c546ca46997::t_1ffcabb26bad1c 1-4,6,8-11,13,17,21-35
+apps/dashboard/src/components/comments/comment-body.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 4
+apps/ui/registry/notra/codex/examples/codex-reasoning.tsx
+  s_0a7c546ca46997::t_b969437665c89d 8-9
+apps/ui/docs/components/(terminal-apps)/claude-code/message.mdx
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 3,12-17
+packages/ui/src/lib/codex-shell.ts
+  s_0a7c546ca46997::t_8bb08e90eab9ee 1-30
+packages/ui/src/components/ai-skins/opencode/opencode-sidebar.tsx
+  s_0a7c546ca46997::t_1ffcabb26bad1c 1-8,10-11,13-26,30-31,33-37,40-41,45,49,51-63,67-70,75-94,96-99,101-108,110-111
+apps/ui/registry/notra/opencode/components/opencode-sidebar.tsx
+  s_0a7c546ca46997::t_6e783e97c5f883 21-40,42,51-52,58,65-77,83,90,97,101-102,107-112,115,119-124,126-128,132-136
+  s_0a7c546ca46997::t_8882e6f9978013 79
+apps/dashboard/src/types/design-system-opencode.ts
+  s_0a7c546ca46997::t_cef26dc240ae9f 1-4,8-9,14-21,24-27,29,33-34,36
+apps/dashboard/src/types/design-system-codex.ts
+  s_0a7c546ca46997::t_31fa1bba14ae70 1-4,11-17,21,23-38
+packages/ui/src/components/ai-skins/codex/codex-explored.tsx
+  s_0a7c546ca46997::t_16af406dc77829 1-50
+apps/ui/registry/notra/opencode/examples/opencode-logo.tsx
+  s_0a7c546ca46997::t_8303d88bb46654 7-8,11-21,24-30
+  s_0a7c546ca46997::t_9a326ac3d77c89 10
+  s_0a7c546ca46997::t_8882e6f9978013 22-23
+apps/ui/registry/notra/codex/examples/codex-demo.tsx
+  s_0a7c546ca46997::t_d86ca4f387fe0a 1,43,45
+  s_0a7c546ca46997::t_872a78faae3a2a 18
+  s_0a7c546ca46997::t_b969437665c89d 5,7,17,19-30,33-37,39-42,44,46-51
+packages/ui/src/components/ai-skins/opencode/opencode-logo.tsx
+  s_0a7c546ca46997::t_1ffcabb26bad1c 1-4,6-31,38,41-42,44-53
+packages/ui/src/components/ai-skins/claude-code/claude-code-header.tsx
+  s_0a7c546ca46997::t_5d59ec961b2fda 25,29,33,48,62-68,83,101
+  s_0a7c546ca46997::t_fd12db526d5eb1 2,4,6-13,20,23,26,32,36-39,41-43,45-47,49-57,75,77,81-82,87,91-99,102-105,107-114,117
+  s_0a7c546ca46997::t_da1688576ff00c 14-17,21-22
+apps/ui/docs/components/(terminal-apps)/claude-code/meta.ts
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 12
+packages/ui/src/components/ai-skins/perplexity/perplexity-model-selector.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 9
+apps/dashboard/src/types/design-system-gemini.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 1
+apps/web/src/styles/ui-sources.css
+  s_0a7c546ca46997::t_6ef63b723f60e2 3-13,15-25,27-36
+  s_0a7c546ca46997::t_63385f8334300b 14,26,150,158,163,183,189
+apps/ui/registry/notra/opencode/components/opencode-window.tsx
+  s_0a7c546ca46997::t_f8cda1568623d0 13
+apps/ui/registry/notra/codex/examples/codex-composer.tsx
+  s_0a7c546ca46997::t_b969437665c89d 2,7-8,10-24
+packages/ui/src/components/ai-skins/perplexity/perplexity-citation.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 4
+apps/ui/registry/notra/opencode/examples/opencode-message.tsx
+  s_0a7c546ca46997::t_8303d88bb46654 3,6,13,15,19-22,25-28,30
+  s_0a7c546ca46997::t_9a326ac3d77c89 12
+apps/ui/registry/notra/codex/components/codex-header.tsx
+  s_0a7c546ca46997::t_6ddd8c2ff09543 5,7,14,18-19,23-24,26,28-36
+apps/ui/registry/notra/claude-code/lib/claude-code-inline.tsx
+  s_0a7c546ca46997::t_6b8c1511dc3227 1-33
+apps/ui/docs/components/(terminal-apps)/claude-code/prompt.mdx
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 3,12,16-18,23
+apps/ui/registry/notra/opencode/components/opencode-logo.tsx
+  s_0a7c546ca46997::t_f8cda1568623d0 3,6-29,41,44-45,48-57
+packages/ui/src/components/ai-skins/chatgpt/chatgpt-composer.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 5
+apps/ui/registry/notra/opencode/examples/opencode-sources.tsx
+  s_0a7c546ca46997::t_9a326ac3d77c89 10
+  s_0a7c546ca46997::t_8303d88bb46654 11,15
+apps/ui/registry/notra/codex/components/codex-reasoning.tsx
+  s_0a7c546ca46997::t_6ddd8c2ff09543 3,11-12,16-18
+apps/ui/registry/notra/codex/components/codex-markdown.tsx
+  s_0a7c546ca46997::t_686c51c287bb00 1-77
+apps/ui/registry/notra/claude-code/components/claude-code-header.tsx
+  s_0a7c546ca46997::t_afd99920cfaa8a 31
+  s_0a7c546ca46997::t_29697c8cef9159 13-15
+  s_0a7c546ca46997::t_3cbdc77502c5af 3-4,6,18-19,22,24,30,32-40,42-55,57-58
+apps/ui/docs/blocks/(terminal-apps)/claude-code.mdx
+  s_0a7c546ca46997::t_35a0c9c53011bd 3,6,22,31
+apps/dashboard/src/app/design-system/gemini/page-client.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 5-8
+apps/ui/registry/notra/codex/components/codex-composer.tsx
+  s_0a7c546ca46997::t_686c51c287bb00 1-2,4,14-15,17,21-28,30,32-35,37-38,40-42,44-62,64-65,67,69-122,125-133,135-136
+apps/ui/registry/notra/claude-code/constants/claude-code.ts
+  s_0a7c546ca46997::t_da1688576ff00c 121-124,128-129
+  s_0a7c546ca46997::t_b537aecb576367 6,8,12,17,30-55,58-60,62-67,70,72,74-88,91,93,95-101,104-110,114,116-118,125-127,130
+  s_0a7c546ca46997::t_cf3055ccb0be14 111-113,115,119-120
+packages/ui/src/components/ai-skins/codex/codex-exec.tsx
+  s_0a7c546ca46997::t_16af406dc77829 1-88
+apps/ui/registry/notra/opencode/components/opencode-turn-footer.tsx
+  s_0a7c546ca46997::t_f8cda1568623d0 1-40
+apps/ui/docs/components/(terminal-apps)/claude-code/thinking.mdx
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 12,16
+packages/ui/src/components/ai-skins/claude-code/claude-code-todo-list.tsx
+  s_0a7c546ca46997::t_5d59ec961b2fda 3,5-7,10-11,13-15,19-21,25-27,31,34,39
+  s_0a7c546ca46997::t_fd12db526d5eb1 12,16-18,22-24,28-30,36,40-41,45,47,51-65,67-84
+apps/dashboard/src/types/design-system-perplexity.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 1
+apps/web/src/components/mcp/mcp-terminal-demo.tsx
+  s_0a7c546ca46997::t_f4b6c2938c7458 1-3,5-6,37,48-49,58,60
+  s_0a7c546ca46997::t_0afd189e13f96c 4,16,25-30,36,41,43,45,47,50-57,59
+packages/ui/src/components/ai-skins/claude-code/claude-code-tool-call.tsx
+  s_0a7c546ca46997::t_2d5ad28df12da1 1-2,5,11,13-18,21-23,35,38,40-51,54,56,59,61-62,66-72,75-92,96,100-103,108-110,115,117-120,124-145
+  s_0a7c546ca46997::t_5d59ec961b2fda 4,7,9-10,12,34,63,65,73,97-99,104-107,111-114,116,121-123
+packages/ui/src/components/ai-skins/codex/codex-message.tsx
+  s_0a7c546ca46997::t_34bcd28e9f90b8 3,9,19,21,32-34
+  s_0a7c546ca46997::t_16af406dc77829 1,13-14,16,28-29,31
+packages/ui/src/components/ai-skins/codex/codex-composer.tsx
+  s_0a7c546ca46997::t_128540c57d3b89 1-131,134-144
+apps/ui/registry/notra/opencode/components/opencode-message.tsx
+  s_0a7c546ca46997::t_f8cda1568623d0 5-11,24,38,44-49
+apps/dashboard/src/constants/design-system-codex.ts
+  s_0a7c546ca46997::t_31fa1bba14ae70 7-20,22-33,35-37,40-42,45-47,50-67,73-74,76,80,86
+packages/ui/src/components/ai-skins/perplexity/perplexity-sources-sheet.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 5
+apps/ui/registry/notra/claude-code/examples/claude-code-prompt.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 22-23,34,39-40,43-80
+packages/ui/src/components/ai-skins/codex/codex-header.tsx
+  s_0a7c546ca46997::t_34bcd28e9f90b8 1-7,9,11-14,16,19-20,22-36,38-39
+apps/ui/registry/notra/claude-code/examples/claude-code-terminal.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 3-5,9-11
+apps/ui/registry/notra/claude-code/examples/claude-code-message.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 5-6,10-11
+apps/ui/registry/notra/opencode/examples/opencode-activity.tsx
+  s_0a7c546ca46997::t_8882e6f9978013 12
+  s_0a7c546ca46997::t_9a326ac3d77c89 9
+  s_0a7c546ca46997::t_8303d88bb46654 6-7,10-11,13,15-23
+apps/ui/registry/notra/codex/examples/codex-working.tsx
+  s_0a7c546ca46997::t_b969437665c89d 1-6,8-13
+apps/dashboard/src/app/design-system/chatgpt/page-client.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 5-10
+packages/ui/src/hooks/use-opencode-frame.ts
+  s_0a7c546ca46997::t_9f4ddd9524af96 1-30
+apps/ui/docs/components/(terminal-apps)/claude-code/status.mdx
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 1-23
+apps/web/src/constants/mcp.ts
+  s_0a7c546ca46997::t_f4b6c2938c7458 1,121
+packages/ui/src/components/ai-skins/perplexity/perplexity-actions.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 16
+apps/ui/registry/notra/claude-code/components/claude-code-message.tsx
+  s_0a7c546ca46997::t_0788435e064a77 3,12,17-20,23,29-32,34,36-38
+  s_0a7c546ca46997::t_8f4f38fe795311 27-28,33
+  s_0a7c546ca46997::t_29697c8cef9159 35
+apps/ui/registry/notra/claude-code/examples/claude-code-header.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 8
+apps/ui/registry/notra/codex/components/codex-explored.tsx
+  s_0a7c546ca46997::t_58a516a1af95fe 1-91
+apps/ui/registry/notra/codex/examples/codex-markdown.tsx
+  s_0a7c546ca46997::t_b969437665c89d 3-11,13-20,22,24-31
+  s_0a7c546ca46997::t_d86ca4f387fe0a 1-2,21,23
+apps/ui/docs/components/(terminal-apps)/claude-code/terminal.mdx
+  s_0a7c546ca46997::t_7a96d363c57a99 18
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 3,12,16-17,20
+apps/web/src/types/feedback-md.ts
+  s_0a7c546ca46997::t_f4b6c2938c7458 1,67
+apps/ui/registry/notra/codex/components/codex-exec.tsx
+  s_0a7c546ca46997::t_58a516a1af95fe 13,16-17,19,22-28,33,37-39,43,48-67,69,72,77,80-81,84,86-87
+apps/ui/src/styles/examples.css
+  s_0a7c546ca46997::t_4c3275a8f330f5 635-637,639-640,642-648,651,654,659-661,663-664,666-672,675,678,692-693,708-710,712-730,735-737,739-757,768,770-771,773-778,780-781,790-801,806-817,822-823,827
+apps/dashboard/src/app/design-system/claude/page-client.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 6,12
+  s_0a7c546ca46997::t_f4b6c2938c7458 4-5,7,9-11,17,79-80,85,136,142,162,179,193,204,217,226,263,286
+  s_0a7c546ca46997::t_ffbc043140d7c5 13-16,18-21,49,53-57,65-67,137,139-141,149-161,163-164,166,173,178,185,190,192,210,215,228-237,242-250,276
+apps/ui/docs/components/(terminal-apps)/opencode/logo.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,12
+apps/ui/registry/notra/opencode/examples/opencode-turn-footer.tsx
+  s_0a7c546ca46997::t_9a326ac3d77c89 6
+  s_0a7c546ca46997::t_8303d88bb46654 1-5,7-13
+apps/ui/docs/components/(terminal-apps)/claude-code/todo-list.mdx
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 3,12
+apps/ui/registry/notra/codex/examples/codex-exec.tsx
+  s_0a7c546ca46997::t_b969437665c89d 11-19
+  s_0a7c546ca46997::t_38ade37f7caa3f 3-6
+packages/ui/src/components/ai-skins/claude-chat/claude-chat-composer.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 10
+apps/ui/docs/components/(terminal-apps)/claude-code/header.mdx
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 3,12,16-20,22-24
+packages/ui/src/components/ai-skins/claude-code/claude-code-status.tsx
+  s_0a7c546ca46997::t_2d5ad28df12da1 1-109
+apps/web/src/lib/feedback-md/constants.ts
+  s_0a7c546ca46997::t_f4b6c2938c7458 1,108
+apps/dashboard/src/types/design-system-claude-chat.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 1,5-6
+apps/ui/registry/notra/claude-code/components/claude-code-logo.tsx
+  s_0a7c546ca46997::t_3cbdc77502c5af 1,4-6,10,12,14-30,32-33,35,37,39-53
+  s_0a7c546ca46997::t_afd99920cfaa8a 13
+apps/ui/registry/notra/claude-code/examples/claude-code-status.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 1-19
+apps/ui/registry/notra/claude-code/components/claude-code-prompt.tsx
+  s_0a7c546ca46997::t_db51c3389297f3 97
+  s_0a7c546ca46997::t_328db0ab93df37 1,3-5,11,16,19,22,27-29,31-38,43,53-54,58-59,61-77,81-87,89-90,94-96,98-100
+apps/ui/registry/notra/opencode/examples/opencode-sidebar.tsx
+  s_0a7c546ca46997::t_9a326ac3d77c89 9
+  s_0a7c546ca46997::t_8303d88bb46654 12-13,16
+  s_0a7c546ca46997::t_1db06731c7393b 10
+apps/ui/docs/components/(terminal-apps)/opencode/composer.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,12-14,18-26
+packages/ui/src/components/ai-skins/perplexity/perplexity-search.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 9,14
+packages/ui/src/components/geo/geo-prompt-answer-thread.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 4-6,9-23
+  s_0a7c546ca46997::t_f4b6c2938c7458 7-8,247,252,258,325
+apps/ui/registry/notra/claude-code/components/claude-code-thinking.tsx
+  s_0a7c546ca46997::t_0788435e064a77 21,27,31-36,40
+apps/ui/registry/notra/opencode/types/opencode.ts
+  s_0a7c546ca46997::t_dff120db3ff1db 131,133,139-140,142-143,149
+  s_0a7c546ca46997::t_8882e6f9978013 132
+  s_0a7c546ca46997::t_4e0cdc2cf51341 5,9,17,21-35,39,41,44-49,52-56,64-65,67,69-70,86-87,128,144,146-148,150-154,157-159,161
+  s_0a7c546ca46997::t_563c515a1a567e 134-138,141
+apps/ui/registry/notra/opencode/hooks/use-opencode-reduced-motion.ts
+  s_0a7c546ca46997::t_07f24b43a6172e 8-10,13,16,18,22-23
+packages/ui/src/styles/opencode.css
+  s_0a7c546ca46997::t_9f4ddd9524af96 1-4,6-17,20-32
+apps/ui/registry/notra/opencode/examples/opencode-window.tsx
+  s_0a7c546ca46997::t_9a326ac3d77c89 6
+  s_0a7c546ca46997::t_8303d88bb46654 7
+apps/ui/registry/notra/claude-code/components/claude-code-tool-call.tsx
+  s_0a7c546ca46997::t_56056985d0715b 21,88
+  s_0a7c546ca46997::t_29697c8cef9159 31-32,48-51,53-57,134,136-138
+  s_0a7c546ca46997::t_4ded3185be2c9b 12-13,15-20,33-43,46-47,52,59-61,63-72,74-87,89-122,124-130,132
+  s_0a7c546ca46997::t_29db25eb685eb0 123
+packages/ui/src/components/ai-skins/claude-chat/claude-chat-search.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 16-17
+packages/ui/src/components/ai-skins/opencode/opencode-message.tsx
+  s_0a7c546ca46997::t_1ffcabb26bad1c 2,4-9,22,32-37,40-43
+  s_0a7c546ca46997::t_6ef63b723f60e2 3
+apps/ui/registry/notra/codex/constants/codex-demo.ts
+  s_0a7c546ca46997::t_5c7f689cfd9be1 4-26,28-48,51-53,56-58,61-72,74,76,81,83-89,93,100
+apps/ui/registry/notra/opencode/examples/opencode-demo.tsx
+  s_0a7c546ca46997::t_8303d88bb46654 1,7,11,13-68,74,76-87,89-101,103-105,107-110,113-125
+  s_0a7c546ca46997::t_62ab471635a6b2 75
+apps/ui/docs/blocks/(terminal-apps)/opencode.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,6,18,20,22,26,28,32-33,39
+apps/ui/registry/notra/codex/examples/codex-message.tsx
+  s_0a7c546ca46997::t_b969437665c89d 8,12
+apps/dashboard/src/app/design-system/codex/page-client.tsx
+  s_0a7c546ca46997::t_38ade37f7caa3f 129-133
+  s_0a7c546ca46997::t_d86ca4f387fe0a 15,52,54
+  s_0a7c546ca46997::t_6ef63b723f60e2 3-4,6,11
+  s_0a7c546ca46997::t_993ec523c3cc6e 5,7-10,12-13,33,36,38,43-51,53,55-64,72,76,79-82,84,86-90,97,101,108,112,114,120,122,124-128,134,140,144,147-151
+apps/dashboard/src/components/design-system/use-claude-chat-playback.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 3
+packages/ui/src/constants/codex-skin.ts
+  s_0a7c546ca46997::t_8bb08e90eab9ee 1-54
+apps/dashboard/src/components/geo/geo-answer-search.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 11-13
+packages/ui/src/types/codex-skin.ts
+  s_0a7c546ca46997::t_8bb08e90eab9ee 3-60,62-74,81,83,85
+apps/ui/registry/notra/opencode/hooks/use-opencode-sources-sequence.ts
+  s_0a7c546ca46997::t_07f24b43a6172e 16,18,24,31,34-35,37-42,45,52
+packages/ui/src/components/ai-skins/codex/codex-markdown.tsx
+  s_0a7c546ca46997::t_16af406dc77829 1-81
+apps/ui/docs/components/(terminal-apps)/opencode/message.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,12-14
+packages/ui/src/constants/opencode-skin.ts
+  s_0a7c546ca46997::t_9f4ddd9524af96 1-64,66,73-87
+apps/ui/src/constants/example-heights.ts
+  s_0a7c546ca46997::t_8882e6f9978013 22-27,29,40-49,69-77
+  s_0a7c546ca46997::t_affa564c8765ac 21
+apps/ui/docs/components/(terminal-apps)/claude-code/tool-call.mdx
+  s_0a7c546ca46997::t_e2d9e2f1d97ede 3,12,14,18-20,22-24
+apps/ui/registry.json
+  s_0a7c546ca46997::t_4c3275a8f330f5 7259,7274-7275,7287-7289,7291-7292,7294-7300,7303,7306,7309-7311,7313-7314,7316-7322,7325,7328,7355,7357,7370-7371,7383-7385,7387-7388,7390-7396,7399,7402,7405-7407,7409-7410,7412-7418,7421,7424,7434,7436,7447-7451,7466,7468,7481-7482,7494-7496,7498-7499,7501-7507,7510,7513,7516-7518,7520-7521,7523-7529,7532,7535,7548-7552,7567,7569,7582-7583,7595-7597,7599-7600,7602-7608,7611,7614,7617-7619,7621-7622,7624-7630,7633,7636,7668,7671-7764,7779-7780,7792-7794,7796-7797,7799-7805,7808,7811,7814-7816,7818-7819,7821-7827,7830,7833,7837-7841,7862,7864-7865,7867,7880-7881,7893-7895,7897-7898,7900-7906,7909,7912,7915-7917,7919-7920,7922-7928,7931,7934,7939,7941,7952-7956,7971,7973,7986-7987,7999-8001,8003-8004,8006-8012,8015,8018,8021-8023,8025-8026,8028-8034,8037,8040,8072,8087-8088,8100-8102,8104-8105,8107-8113,8116,8119,8122-8124,8126-8127,8129-8135,8138,8141,8156,8158,8165-8169,8180-8184,8206-8208,8211,8213,8228,8240,8242-8243,8245-8250,8252-8253,8259-8261,8263-8281,8284-8286,8288-8306,8333,8344,8346-8347,8349-8354,8356-8357,8363-8365,8367-8385,8388-8390,8392-8410,8429,8435,8446,8448-8449,8451-8456,8458-8459,8465-8467,8469-8487,8490-8492,8494-8512,8521-8525,8531,8537,8548,8550-8551,8553-8558,8560-8561,8567-8569,8571-8589,8592-8594,8596-8614,8618-8622,8639,8651,8653-8654,8656-8661,8663-8664,8670-8672,8674-8692,8695-8697,8699-8717,8726-8754,8757-8864,8866-8949,8962-8966,8968-9058,9063,9075,9077-9078,9080-9085,9087-9088,9094-9096,9098-9116,9119-9121,9123-9141,9166,9174,9185,9187-9188,9190-9195,9197-9198,9204-9206,9208-9226,9229-9231,9233-9251,9270-9274,9280-9294,9300-9309,9316-9318,9321,9323,9338,9344-9345,9349,9358-9369,9372-9383,9410,9416-9417,9421,9430-9441,9444-9455,9464-9468,9480,9486-9487,9491,9500-9511,9514-9525,9541-9545,9548-9610,9615,9621-9622,9626,9635-9646,9649-9660,9669-9673,9678-9687,9695,9701-9702,9706,9715-9726,9729-9740,9773-9777,9785,9791-9792,9796,9805-9816,9819-9830,9839-9843,9853-9862,9870,9876-9877,9881,9890-9901,9904-9915,9940,9953-9954,9958,9967-9978,9981-9992,10016-10020,10032-10034,10046-10050,10062,10064,10070-10074
+  s_0a7c546ca46997::t_8882e6f9978013 7261,7669-7670,7766,8074,8230,8641,8755-8756,8865,8967,9065,9546-9547,9617,9697,9872
+apps/ui/registry/notra/claude-code/examples/claude-code-demo.tsx
+  s_0a7c546ca46997::t_affa564c8765ac 41-52
+  s_0a7c546ca46997::t_b7f94f5f85b54c 9-12,15-18,29-31,53-77,79
+apps/ui/registry/notra/claude-code/examples/claude-code-todo-list.tsx
+  s_0a7c546ca46997::t_b7f94f5f85b54c 3,8
+apps/dashboard/src/types/design-system-chatgpt.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 4
+packages/ui/src/components/ai-skins/opencode/opencode-sources.tsx
+  s_0a7c546ca46997::t_6ef63b723f60e2 3,9,15,86
+  s_0a7c546ca46997::t_1ffcabb26bad1c 13,19-21,23-24,26-33,36,41-44,50-85,87,90,92,96-97,99-100,102,105-106,112-122,125-126,131,134,143,147,149-150,156-158,162-166,168,170-171,173,177-179,181,183-186,188
+apps/ui/registry/notra/codex/examples/codex-explored.tsx
+  s_0a7c546ca46997::t_b969437665c89d 1-6,8-17
+packages/ui/src/types/opencode-skin.ts
+  s_0a7c546ca46997::t_9f4ddd9524af96 3,7-9,11,13-21,35,37-40,59-66,79,81-82,100-103
+apps/ui/docs/components/(terminal-apps)/opencode/sources.mdx
+  s_0a7c546ca46997::t_43dd63660105b9 3,12,18,20
+apps/ui/registry/notra/claude-code/types/claude-code.ts
+  s_0a7c546ca46997::t_db51c3389297f3 179-186,188-189,194-200,205
+  s_0a7c546ca46997::t_affa564c8765ac 69-70
+  s_0a7c546ca46997::t_a07d820cb21d58 31-34,38,43,45-51,59-63,75,78,82,85,93-98,101-109,112-118,135,140-158,187,190-193,201-202,207,209
+apps/ui/registry/notra/claude-code/components/claude-code-terminal.tsx
+  s_0a7c546ca46997::t_dd514235f56d78 18,24-31,34,42
+  s_0a7c546ca46997::t_affa564c8765ac 12,50-54
+apps/dashboard/src/constants/design-system-claude.ts
+  s_0a7c546ca46997::t_6ef63b723f60e2 4
+  s_0a7c546ca46997::t_f4b6c2938c7458 2-3,5,13,21,80
+  ai_agent 33-35,38-39,42,45-53,55-57,59,61,63-77,89-90,96-97,102-104
+apps/ui/registry/notra/codex/components/codex-message.tsx
+  s_0a7c546ca46997::t_6ddd8c2ff09543 3,16-17,24,27,29,36,41-46
+apps/ui/registry/notra/codex/types/codex.ts
+  s_0a7c546ca46997::t_0591f044f6832e 3,10-31,33,36,42,50-53,60,64,68-85,94-95,97-99,109-112,116-129,134-142
+  s_0a7c546ca46997::t_6ddd8c2ff09543 106-108
+apps/ui/docs/components/(terminal-apps)/opencode/meta.ts
+  s_0a7c546ca46997::t_43dd63660105b9 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1df0cb2da887e6cc8349837f4b5dde8bb5a040a9",
+  "prompts": {},
+  "sessions": {
+    "s_0a7c546ca46997": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4629158-9e1c-4378-a825-ace111c4f25a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

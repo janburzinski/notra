@@ -1,0 +1,42 @@
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_c747c006804356::t_bef7940a2cd639 56,65
+  s_c747c006804356::t_2b2cac5fdc7c28 3,467,473-477,479,488-490,506,538-547,550-560
+  s_c747c006804356::t_cf6f1ba0bd4593 471-472,478,480-487,491-494,496,500-501,503-505,517,520,525,528,530,536-537,548-549,561-562
+  s_c747c006804356::t_eac79b4c2f8a1f 43-44,46,318
+  s_c747c006804356::t_30cf24f241cbdd 90,106,376,382,435,615,617-621
+  s_c747c006804356::t_331874e80c9d5c 108-112
+  s_c747c006804356::t_6fe0294ce21c0a 282,372
+  s_c747c006804356::t_5e4108d3f5a5fc 387
+  s_c747c006804356::t_f1368b924851e3 614
+  s_c747c006804356::t_941a9a93231510 495,498-499
+  s_c747c006804356::t_107c051a8038d8 332
+  s_c747c006804356::t_b03684c8903be9 45,85,139,184-192,208,215-219,222,241-245,248-249,255-265,270,292,295,306,330
+  s_c747c006804356::t_b035356833c00e 4,623
+apps/dashboard/src/app/design-system/geo-demo/page.dev.tsx
+  s_c747c006804356::t_40bf769874d106 7,37,39
+apps/dashboard/messages/de.json
+  s_c747c006804356::t_6fe0294ce21c0a 2585
+  s_c747c006804356::t_cf6f1ba0bd4593 2583-2584
+apps/dashboard/messages/en.json
+  s_c747c006804356::t_6fe0294ce21c0a 2585
+  s_c747c006804356::t_cf6f1ba0bd4593 2583-2584
+apps/dashboard/src/constants/design-system-geo.ts
+  s_c747c006804356::t_a3c066223a7745 9,131,144-160
+  s_c747c006804356::t_40bf769874d106 3,87-130,132-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c739b08e8fed9ab5412676b42d10d5d6a1b074b2",
+  "prompts": {},
+  "sessions": {
+    "s_c747c006804356": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5967cfa3-bd7c-4241-9469-82caf8b7b57a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

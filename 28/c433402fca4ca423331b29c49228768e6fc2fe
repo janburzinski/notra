@@ -1,0 +1,121 @@
+apps/dashboard/src/utils/brand-identity-nav.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 43-44
+packages/db/migrations/meta/0101_snapshot.json
+  ai_agent 1-12429
+packages/db/migrations/meta/0100_snapshot.json
+  ai_agent 1-12391
+packages/geo-core/src/geo/brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-191
+packages/geo-core/tests/accuracy-evaluation.test.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-53
+packages/geo-core/src/utils/accuracy-evaluation.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-28,31-99
+packages/geo-core/src/constants/accuracy-analysis.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-41
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-tabs.tsx
+  s_6ec04744c09fc4::t_c15ba933e95da4 14,44,96-99
+packages/db/migrations/0100_geo_brand_facts.sql
+  ai_agent 1
+apps/dashboard/src/utils/geo-accuracy.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-130
+packages/geo-core/src/geo/accuracy-analysis.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-182
+packages/geo-core/src/geo/accuracy-rank.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-47
+packages/db/src/utils/brand-knowledge-store.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-164
+packages/geo-core/src/types/brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-20
+packages/geo-core/src/utils/brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-133
+apps/dashboard/src/lib/orpc/routers/brand.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 24-28,30-34,78,1779-1838
+apps/dashboard/src/components/geo/accuracy-tab.tsx
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-280
+packages/geo-core/src/geo/accuracy-analysis-cache.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-214
+packages/geo-core/src/geo/brand-knowledge-web.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-74
+packages/geo-core/tests/accuracy-evaluation.live.test.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-94
+packages/db/migrations/0101_brand_knowledge.sql
+  ai_agent 1-32
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 30,148,958-977
+packages/db/src/types/geo-accuracy.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-17,19-47
+apps/dashboard/src/types/geo-accuracy.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-39
+packages/db/src/utils/geo-accuracy.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-113
+packages/geo-core/src/constants/geo.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1229,1250
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/knowledge-panel.tsx
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-382
+packages/geo-core/src/geo/brand-knowledge-github.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-179
+apps/dashboard/src/utils/geo-prefetch.server.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 84-85,93-98
+packages/geo-core/src/utils/accuracy-analysis.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-309
+packages/db/migrations/meta/_journal.json
+  ai_agent 2-720
+apps/dashboard/src/lib/hooks/use-geo-accuracy.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-45
+apps/dashboard/src/components/geo/accuracy-claims-empty.tsx
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-82
+packages/geo-core/src/geo/brand-knowledge-agent.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-41
+packages/db/src/utils/brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-51
+packages/geo-core/tests/accuracy-analysis.test.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-184
+packages/geo-core/src/geo/accuracy-analysis-agent.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-49
+packages/geo-core/src/schemas/brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-52
+packages/geo-core/tests/brand-knowledge.test.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-119
+apps/dashboard/src/constants/brand-identity.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 2,69,82,106-109
+packages/geo-core/src/types/accuracy-analysis.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-127
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_6ec04744c09fc4::t_c15ba933e95da4 11,98,201-208
+apps/dashboard/src/components/geo/accuracy-claims-table.tsx
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-302
+packages/geo-core/src/schemas/accuracy-analysis.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-33
+apps/dashboard/src/lib/hooks/use-brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-34
+packages/geo-core/src/geo/accuracy-analysis-billing.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-64
+apps/dashboard/src/types/brand-identity.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 19-24
+apps/dashboard/src/constants/geo-accuracy.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-45
+packages/db/src/schema.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 875-883,1462-1465,3182-3184
+packages/geo-core/src/constants/brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-40
+packages/geo-core/tests/utils/database.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 9-10,39-40
+apps/dashboard/src/types/brand-knowledge.ts
+  s_6ec04744c09fc4::t_c15ba933e95da4 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "28c433402fca4ca423331b29c49228768e6fc2fe",
+  "prompts": {},
+  "sessions": {
+    "s_6ec04744c09fc4": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c836a765-851b-4a64-9374-b5b65fbe7728",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

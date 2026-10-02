@@ -1,0 +1,35 @@
+apps/dashboard/src/components/onboarding/progress.tsx
+  s_f4d25940bd03b9::t_535f32e536262f 47-50
+  s_f4d25940bd03b9::t_4af96df64d118e 46,51-53,59
+apps/dashboard/messages/en.json
+  s_f4d25940bd03b9::t_4af96df64d118e 1067,1080
+apps/dashboard/messages/de.json
+  s_f4d25940bd03b9::t_4af96df64d118e 1067,1080
+apps/dashboard/src/app/onboarding/pricing-client.tsx
+  s_f4d25940bd03b9::t_4af96df64d118e 152-154,217
+apps/dashboard/src/app/onboarding/workspace/workspace-form.tsx
+  s_f4d25940bd03b9::t_535f32e536262f 288-290,345-347
+  s_f4d25940bd03b9::t_7f6f2cd224d970 180,189-191,193-197,287,291,314,344,348-349,377,392,419-424,440,481-485,506-509,537-541,559-562
+  s_f4d25940bd03b9::t_adb7134ee8e144 192
+  s_f4d25940bd03b9::t_6f7aa8eae0523c 595-602,604
+  s_f4d25940bd03b9::t_a1b9cec5791fda 181-188
+apps/dashboard/src/app/onboarding/visibility/visibility-form.tsx
+  s_f4d25940bd03b9::t_f49b3c27b481e6 95
+  s_f4d25940bd03b9::t_873b03e7046c32 60-61,74,90-94,129-134,140,143-147,181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3594d4843d9aded921565a1cfcd7e41cd4fa375e",
+  "prompts": {},
+  "sessions": {
+    "s_f4d25940bd03b9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0eba1-422d-7621-9be8-686bdf3e7924",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

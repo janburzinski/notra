@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/prompt-detail-dialog.tsx
+  s_201b145bc0c5db::t_c8ef5cc1c55772 384,388
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f54fc469591cbcb8ab5d6516888803e2786a25d0",
+  "prompts": {},
+  "sessions": {
+    "s_201b145bc0c5db": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3c1f7f44-1990-4b33-b179-8a1f5605dc20",
+        "model": "grok-4.6"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}

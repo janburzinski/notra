@@ -1,0 +1,26 @@
+apps/ui/docs/components/marketing-button.mdx
+  s_f7b7c774894531::t_a92f2cc2d53508 12
+apps/ui/registry/notra/marketing-button/components/marketing-button.tsx
+  s_f7b7c774894531::t_a92f2cc2d53508 1,10-11,25-26,30-31,34-35,37-42
+  ai_agent 6
+apps/ui/registry.json
+  s_f7b7c774894531::t_a92f2cc2d53508 10,32,46
+apps/ui/src/styles/examples.css
+  s_f7b7c774894531::t_a92f2cc2d53508 135,161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8e9967807dd48102f7d087916e1bf5d6acb9ef40",
+  "prompts": {},
+  "sessions": {
+    "s_f7b7c774894531": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43d8bdd-fb9c-4324-9a96-c19912a2f71e",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
