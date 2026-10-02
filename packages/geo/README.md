@@ -128,6 +128,12 @@ send alive.
 | `onError` | none | Called with anything that goes wrong. The SDK never throws |
 | `fetch` | global `fetch` | Injectable fetch, for tests |
 
+Requests go directly to `https://ingest.usenotra.com` when `endpoint` is omitted.
+The SDK does not automatically retry through the dashboard. To switch back to
+the dashboard ingestion route, set `endpoint: "https://app.usenotra.com"` and
+redeploy your site. Self-hosted installations must set `endpoint` to their own
+ingestion origin.
+
 ### What gets captured
 
 Only `GET` requests that look like pages. Asset requests are skipped: anything under
