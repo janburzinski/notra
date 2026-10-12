@@ -1,0 +1,131 @@
+apps/dashboard/src/components/webhooks/status.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1,9-14
+apps/dashboard/src/components/geo/trend-badge.test.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1-46
+apps/dashboard/src/components/geo/agent-readiness/readiness-change-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3,17-23,25,27
+apps/dashboard/src/constants/agent-readiness.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 5-6,17,19,25-28
+examples/sites/match-your-website/style.css
+  s_679a387b188ae8::t_2c4dd647aabf45 1-2,20
+packages/ui/src/constants/trend-badge.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 1-29
+apps/dashboard/src/components/analytics/followers-card.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 7,53,55-60
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 34-41,599-605,607-631
+bun.lock
+  ai_agent 373
+apps/dashboard/src/components/sites/site-status-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3
+apps/web/src/components/blog-diagrams/notra-demo.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 71,76,79,85,88,94,97,107,170,174,201-202,345,349,355,359
+apps/web/src/components/blog-diagrams/primitives.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 158-159,168,176
+apps/web/src/styles/globals.css
+  s_679a387b188ae8::t_2c4dd647aabf45 448-450,454,459-463,479-495,498,511,514,527,532
+packages/ui/src/components/status-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 6
+apps/docs/sites/customize/seo.mdx
+  s_679a387b188ae8::t_2c4dd647aabf45 39
+apps/dashboard/src/components/sites/site-deployment-timeline.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3,56-63,66-73,75,106,118,121-158,160
+apps/sites-builder/src/styles/global.css
+  s_679a387b188ae8::t_2c4dd647aabf45 27-29,31-32,55,57-58
+apps/dashboard/src/app/design-system/page-client.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 9,695-705
+apps/dashboard/src/constants/geo-change-icons.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 9,11,13,16-17,26-32
+packages/sites-server/src/pipeline.ts
+  ai_agent 67-70,86
+apps/dashboard/src/components/geo/geo-stat-delta.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 5,40-50
+apps/docs/sites/domains/vercel.mdx
+  s_679a387b188ae8::t_2c4dd647aabf45 60
+apps/dashboard/src/components/api-keys/api-key-permission-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3
+apps/dashboard/src/components/sites/site-build-logs.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 12,29,111-114,171,195-223,226,230-232,234
+apps/dashboard/messages/en.json
+  s_679a387b188ae8::t_2c4dd647aabf45 6703,7713
+apps/dashboard/tests/site-create-deploy-surface.test.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 281,287,363
+apps/dashboard/src/components/automation/triggers/trigger-status-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1,7-10
+apps/docs/sites/domains/nextjs.mdx
+  s_679a387b188ae8::t_2c4dd647aabf45 65
+packages/ui/src/types/trend-badge.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 1-8
+apps/dashboard/src/components/sites/site-build-log-rows.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 16,21-39,41,44,49-56,59,65-72,77,80-91,95,99,183,213
+examples/sites/custom-components/style.css
+  s_679a387b188ae8::t_2c4dd647aabf45 1-2,7
+apps/dashboard/src/components/content/overview/content-status-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3,13
+apps/dashboard/src/components/sites/site-delete-dialog.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 11,23,83-86,90-99,102,104
+apps/dashboard/src/components/geo/directions/direction-delta.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3,17,19
+apps/ui/package.json
+  s_679a387b188ae8::t_2c4dd647aabf45 15
+apps/dashboard/src/components/geo/agent-readiness/readiness-score-card.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 17,52,54
+packages/ui/src/styles/status.css
+  s_679a387b188ae8::t_2c4dd647aabf45 42-43
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 394
+apps/ui/docs/components/meta.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 8
+apps/ui/registry/notra/badge/examples/badge-showcase.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1-9
+apps/dashboard/src/types/components/status-badge.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 1-4
+packages/ui/src/types/status-badge.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 1-14
+apps/dashboard/src/components/analytics/followers-card.test.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1-63
+apps/dashboard/src/components/iris/iris-run-status-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1,9,11,22-25
+apps/dashboard/src/components/design-system/design-system-topbar.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 98-114
+packages/ui/src/components/trend-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1-55
+apps/dashboard/src/components/api-keys/api-key-status-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3
+apps/dashboard/src/types/components/sites.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 278-286,308
+apps/dashboard/src/components/logs/log-status-badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1,19-22
+apps/ui/docs/components/badges.mdx
+  s_679a387b188ae8::t_2c4dd647aabf45 1-42
+apps/dashboard/messages/de.json
+  s_679a387b188ae8::t_2c4dd647aabf45 6703,7713
+packages/ui/src/components/ui/badge.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 35
+apps/ui/src/styles/examples.css
+  s_679a387b188ae8::t_2c4dd647aabf45 6-11
+apps/sites-builder/src/lib/theme.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 35-37,41-43,49-51
+apps/dashboard/src/utils/site-build-log.ts
+  s_679a387b188ae8::t_2c4dd647aabf45 254-272
+apps/dashboard/src/components/geo/what-changed-card.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 3,29,91
+packages/ui/src/components/badge-showcase.tsx
+  s_679a387b188ae8::t_2c4dd647aabf45 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "030882cac8da5b33ab38bf38f2d9fb1bdc74dff8",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
