@@ -1,0 +1,9 @@
+apps/api/src/index.ts
+  ai_agent 374,382
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d3cb2fe150ec3fe98bfb9a427bcf01fd27e483b1",
+  "prompts": {}
+}
