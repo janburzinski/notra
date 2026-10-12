@@ -1,0 +1,33 @@
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_1359d1465ed409::t_cab7c01d57282f 1291,1359
+  s_1359d1465ed409::t_b49f78a1fee27e 1300,1365
+  s_1359d1465ed409::t_d3e067c1025241 1334-1343
+  s_1359d1465ed409::t_5f802e3319d4a8 87,835
+  s_1359d1465ed409::t_399bcc7d87bdc4 105,583,585
+  s_1359d1465ed409::t_e0e8bf535e26bd 709-718
+  s_1359d1465ed409::t_6ff6d68f595475 1255-1263,1271-1272
+  s_1359d1465ed409::t_02c840e972fc7b 1219,1229,1239,1251,1280
+  s_1359d1465ed409::t_9d9bb7493c46bd 818-819
+  s_1359d1465ed409::t_8bfaa800c6e55d 475-476,499-500,515
+  s_1359d1465ed409::t_59976e6ee06d07 43,873,1019-1034
+apps/dashboard/src/components/command-palette/command-palette-item.tsx
+  s_1359d1465ed409::t_59976e6ee06d07 63
+apps/dashboard/src/utils/command-palette.ts
+  s_1359d1465ed409::t_5f802e3319d4a8 2,95-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4a05e63863f24f9795694e69b9c645a7b13907c7",
+  "prompts": {},
+  "sessions": {
+    "s_1359d1465ed409": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d7bb4d01-e901-46b4-bbf5-8ebe8bb2803b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
