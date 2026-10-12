@@ -1,0 +1,9 @@
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  ai_agent 394,399-402
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1f0c7deb9b2924a4624df9ce12d276da859b11d8",
+  "prompts": {}
+}
