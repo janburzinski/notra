@@ -1,0 +1,1155 @@
+apps/docs/api/types.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 108-129,145-146,172-183,189-203,239-240,263-280,292,320-339,346,353-354
+apps/dashboard/src/components/sites/sites-list.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 4-8,13-15,18-26,30-31,34-35,38-39,42-46,49-50,52,55,57,63,66-77,86,89-90,92-107,111-168,170-189,192-194,197-208,210-222,227-229,235-259
+apps/docs/sites/customize/navigation.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 4,18,90,92,103-112,114-127
+infra/observability/check-prometheus-resources.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-460
+packages/ai/src/schemas/post-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-134
+apps/dashboard/src/utils/site-previews.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 77-101
+apps/evals/src/headless.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 25,29,176
+apps/dashboard/src/lib/errors/site-entry.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-7
+infra/observability/history/backfill-db.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-106
+packages/sites-core/src/schemas/site-layout.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 198,205,233
+apps/web/src/components/blog-diagrams/primitives.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-304
+infra/observability/check-queries.test.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-190
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 15,298,928
+infra/observability/loki/entrypoint.sh
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4
+packages/ai/src/utils/axiom-pipeline.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4,6-7,9-10,16-18,20-23,25-29,31-32
+apps/dashboard/src/lib/hooks/use-switch-organization.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-104
+apps/evals/src/scoring/jev-judge.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5,29,80
+apps/sites-builder/src/schemas/entries.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-32,34-35,38,40,42,48-49,51,54
+packages/ai/src/evaluation/client.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 17,87-96
+packages/ui/src/components/ui/dropdown-menu.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 7-10,48-49,74,77,96-97,100,104,123-124,127,153,166,168-170,175-176,180,184,208,210-212,216-217,221,225,243,257
+apps/api/src/types/posts.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,18,22,37-43,49-70,74-75,94,111-117,159
+apps/sites-builder/compiler/constants/cli.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3,5
+apps/web/src/styles/ui-sources.css
+  s_679a387b188ae8::t_49e63c97f74bd4 191
+infra/observability/grafana/Dockerfile
+  s_679a387b188ae8::t_49e63c97f74bd4 1-26
+packages/sites-server/src/constants/sandbox.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4-5
+apps/dashboard/src/lib/auth/organization.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 16,65-67,143-147
+infra/observability/grafana/dashboards/notra-accounting.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-218
+infra/observability/config.test.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-324
+apps/dashboard/src/utils/geo-query-input.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 35-39,43-44,50,67-68,74,81-82,90
+packages/ai/src/prompts/changelog/shared.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 130-131
+apps/evals/src/utils/stats.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4,8,56-70,89-93,107-114,163-166
+apps/dashboard/src/lib/upload/server.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 24,55,81,127-128
+apps/dashboard/src/constants/traffic-path.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-6
+apps/dashboard/src/types/api-keys.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8,11,79-92
+apps/dashboard/src/utils/brand-guidelines.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 311-315
+packages/geo-core/src/utils/claim-first-ingest-hit.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-44
+apps/dashboard/src/constants/studio-analytics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 63-68
+infra/observability/vercel/server.test.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-80
+packages/ui/src/components/ui/badge.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 8,16,18,20-21,30,34-37,42,51,59,66
+packages/sites-server/tests/deployment-admission.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9,109
+apps/dashboard/src/workflows/iris-controller.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 37,236-243
+apps/dashboard/src/workflows/steps/on-demand-generation-step.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5,67-69,72
+apps/dashboard/src/lib/hooks/use-content-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-141
+apps/sites-builder/src/middleware.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-34
+apps/dashboard/src/lib/orpc/routers/user.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 30,57-63,161-165,279-283
+packages/geo-core/src/geo/model-live.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 236,258-275,283,339-341
+packages/sites-server/src/schemas/sandbox.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 21-22
+apps/dashboard/src/lib/hooks/use-sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 40,43-44,62
+packages/ai/src/utils/send-axiom-batch.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-70
+apps/web/src/content/blog/how-we-built-the-notra-demo.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-212
+packages/analytics/src/tinybird/pipes/geo-traffic.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 27-29,128,177,183,196,228,240,254,260,291,318,350-351,374
+packages/ai/src/utils/checkpoint-pipeline.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-91
+apps/dashboard/src/components/command-palette/command-palette-item.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-76
+apps/dashboard/src/types/content/overview.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-152
+apps/dashboard/src/app/api/command-palette/navigate/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 6,12,18,20,22-31,34-110,146,163,168-173,175,187-206,216
+apps/dashboard/src/components/sites/site-preview-access-control.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 27,147
+packages/schemas/src/schemas/dashboard/upload.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8,51-62,91
+infra/observability/prometheus/Dockerfile
+  s_679a387b188ae8::t_49e63c97f74bd4 1-9
+.railway/README.md
+  s_679a387b188ae8::t_49e63c97f74bd4 1,3-4,10-132,166,169-172,177-179,198-217,221-236,239-242
+apps/dashboard/src/components/content/overview/content-authors-dialog.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-353
+packages/sites-server/README.md
+  s_679a387b188ae8::t_49e63c97f74bd4 73-81,126-134,241-336
+apps/dashboard/src/components/sites/site-create-deploy.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 203-208
+packages/tools/src/content-writer/create-post.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 56-57
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9,15,19-24,28-31,60,65,84,109,111,154-160,222-252,269,872-878,950-1022
+apps/dashboard/src/components/content/content-panel-header-button.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-40
+apps/dashboard/tests/rpc-custom-attribution.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-333
+apps/dashboard/src/constants/storage.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 10,25-26
+packages/ai/src/constants/evlog.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4-15,18-24
+apps/sites-builder/src/pages/sitemap.xml.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3,6-7,10-28,52
+apps/dashboard/src/components/dashboard/org-selector.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 42,52-53,233-234
+packages/ai/src/observability.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4,14-35
+packages/ai/src/constants/brand-guideline-source.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-9
+apps/dashboard/src/components/sites/site-settings-danger-zone.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 24,27-29,70,90
+apps/dashboard/src/utils/demo-same-origin.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-45
+apps/dashboard/src/workflows/steps/schedule-generation-step.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5,61-63,66
+apps/dashboard/tests/rpc-request-id.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-93
+apps/dashboard/src/app/design-system/page-client.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3-8,113-115,339-345,815,891,893-911,916-925,946-949
+apps/dashboard/Dockerfile.dockerignore
+  s_679a387b188ae8::t_49e63c97f74bd4 18-19
+apps/dashboard/src/constants/nav.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 283-291
+apps/sites-builder/src/components/ChangelogEntry.astro
+  s_679a387b188ae8::t_49e63c97f74bd4 4-5,8,10,17-18,51,55,69-70,74
+packages/ai/src/agents/repo-image.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 26,32,39,41-44,246-258,322-325,329-333,349-360
+apps/sites-builder/src/utils/images.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-11
+apps/sites-builder/src/types/entries.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 29-35,41
+apps/dashboard/src/components/sites/site-create-form.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 18,60,84,95,173,229
+packages/ai/src/utils/otlp-buffering.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-77
+apps/dashboard/src/types/search.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-6
+packages/sites-server/src/runner.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 21,180-192
+packages/ai/src/autonomy/planner.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 50-51,58,204-205
+packages/utils/src/types/client-ip.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4
+apps/dashboard/src/types/components/site-settings.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-94
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 21,23-24,44-47,49-52,69-70,99-102,126-134,139-140,152-156,161-183,203,210,214-215,224,233-237,283-284
+apps/evals/src/types/picker.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,21-23
+packages/ai/src/utils/evlog-runtime.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 7,25
+apps/sites-builder/src/lib/tags.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-54
+infra/observability/grafana/query-fixtures.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-490
+packages/geo-core/tests/site-project-delete.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9,11,39-40,51,54-56,60,67,69-70,73-75,77-112,114-117,119-123,125,127-139,141-152
+apps/dashboard/src/lib/orpc/routers/integrations.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 164,1936-1937,2034-2035,2106-2107,2171-2172,2266-2267,2321
+infra/observability/prometheus/entrypoint.sh
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4
+packages/ai/src/utils/telemetry-event.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-128
+apps/dashboard/src/utils/rpc-request-scope.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-16
+infra/observability/grafana/provisioning/datasources/notra.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 1-17
+infra/observability/vercel/utils/api.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-80
+apps/dashboard/src/types/hooks/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 51-55
+packages/ai/src/router/adapters/vercel.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 10-14,67-68,71-79,95-106,108,110-119,121
+apps/dashboard/messages/de.json
+  s_679a387b188ae8::t_49e63c97f74bd4 653-676,975,1117-1123,1161-1167,1488-1501,4006-4010,4184-4192,6554-6661,6678-6679,6682-6684,6694-6695,6699-6719,6920-6922,7217-7224,7238,7240-7242,7253-7254,7308-7311,7558-7580,7643,7963-7964,7971,7978
+apps/dashboard/src/types/components/command-palette.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,66-139,142,187-201,205-207,209-210,223-239,241-243,245-248,250-251,253-262,264,267,270-274
+apps/dashboard/tests/fixtures/demo-storage.fixture.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 20-21,57,70-72,196-198,202-204,314,455-462
+packages/ai/src/agents/background-gen.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 35,47-56,178-181
+packages/ai/src/types/geo-writer.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 81,98
+apps/evals/src/suites/content-unslop.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 253
+packages/sites-core/src/schemas/site-config.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,46,170-206,212-214,216,218,230
+apps/sites-builder/src/lib/authors.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-6,10-13,18,28,34-46,49-63,68-72,81-108
+packages/ai/src/utils/telemetry-value.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-89
+.railway/observability.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-92
+apps/dashboard/src/types/components/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 44-59,71,77-95,167,206,211-212,607
+packages/db/src/utils/post-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-43
+apps/sites-builder/src/lib/seo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 143-144,147-151
+apps/evals/src/harness/content-harness.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 43,484
+packages/sites-server/tests/host-reclaim.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 13,255-257,264,508
+packages/ai/src/router/create-router.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 16,154-191,195-203
+apps/dashboard/src/components/content/overview/overview-cover-field.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-259
+apps/dashboard/src/lib/organizations/guards.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 13,68
+apps/dashboard/src/lib/integrations/github/site-publish-target.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 15-16,18,74-78,81-82,99-102,118-143,146-163,167-178
+apps/ui/components/constants/dropdown.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-14
+apps/evals/src/models/gateway.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-7,18-25,64,67-108,111-117,122,124-127,165,223-227
+packages/sites-server/tests/organization-teardown.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9,168-170,179,486
+packages/tools/src/schemas/assistant-tools.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,41
+apps/onboarding-agent/agent/lib/utils/model.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3,21,23,29-33
+packages/db/migrations/meta/0117_snapshot.json
+  ai_agent 1-15779
+infra/observability/utils/prometheus-fixture.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-101
+packages/ai/src/utils/request-ai-usage.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-8,10,16-18,22-33,36-39,41-42,62,65,68-81,86-93,121-127,130-134,136-137,143-160,176-177,182-186
+apps/sites-builder/src/constants/tags.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-10
+infra/observability/check-loki-resources.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-330
+packages/sites-server/tests/utils/site-project.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-24
+packages/ai/src/router/model-ids.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,6,43-53
+packages/ai/src/utils/demo-context-dev.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 100-103
+apps/api/tests/auth-telemetry.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-84
+packages/ai/src/types/evlog.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 33-36,38,42
+apps/dashboard/src/components/sites/site-deployment-summary.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 16,131
+apps/dashboard/src/types/hooks/brand-guidelines.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 37-39,118-121
+apps/dashboard/src/components/sites/site-environment-badge.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 20-22,27,29
+packages/sites-server/src/types/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 31
+infra/observability/vercel/tsconfig.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-13
+infra/observability/grafana/dashboards/notra.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-789
+apps/dashboard/src/types/site-variables.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,10
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 10,51-58,78,96,106,108,120,280,283,288,291,406-407,413-429,431,1065,1085,1088-1090,1100
+apps/dashboard/src/components/geo/traffic-path-filter.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-73
+packages/geo-core/tests/ingest-first-hit.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-88
+apps/ui/registry/notra/select/examples/select-demo.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-62
+packages/geo-core/src/geo/writer.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 763-766
+packages/ai/src/constants/usage-attribution.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-12
+packages/ai/src/utils/gateway-agent-model.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-3,15,20-30,36,38-74
+packages/db/migrations/0115_sites_required_project.sql
+  ai_agent 1-36
+apps/dashboard/src/types/orpc/context.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8-10
+infra/observability/blackbox/blackbox.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 1-11
+apps/dashboard/src/lib/orpc/context.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 7
+apps/api/src/utils/analytics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 29,65,144,156
+packages/schemas/src/schemas/dashboard/command-palette.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8
+apps/dashboard/tests/site-create-defaults.test.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 31
+packages/geo-core/src/constants/ingest.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2
+packages/analytics/src/constants/geo-queries.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 169-180
+packages/ai/src/autonomy/capabilities.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 206,456,463,522,587,632
+apps/sites-builder/src/components/PostCard.astro
+  s_679a387b188ae8::t_49e63c97f74bd4 3,7,13,15,19-21,43,70,99
+packages/ai/src/types/autonomy-capabilities.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 88
+packages/db/migrations/0116_brand_guidelines_source_pdf.sql
+  ai_agent 1-5
+apps/dashboard/src/components/content/content-detail-chat-shell.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 10-15,20-23,25-31,98-111,116,119-144,147-160
+infra/observability/history/schemas/history.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-34
+apps/dashboard/src/components/sites/site-form-fields.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 18
+apps/dashboard/src/lib/brand-guidelines.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,3,6-7,11,21-22,28,30-31,33,35,38-42,485-638
+apps/sites-builder/src/utils/tags.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-11
+apps/dashboard/src/lib/orpc/routers/api-keys.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 6,8,12,23,85,88,92,107,110,113,117-194,206,212,293,304-309,332-334,359,384-542
+apps/docs/api/pagination.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 209-217
+apps/dashboard/src/utils/content-detail.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-2,4,31-63
+packages/ai/src/utils/gateway-evaluation-model.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-56
+packages/ai/src/utils/brand-guideline-source.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-52
+apps/dashboard/src/constants/api-keys.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 102-104
+packages/db/migrations/meta/0115_snapshot.json
+  ai_agent 1-15533
+apps/dashboard/src/components/content/overview/content-status-badge.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-31
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-panel.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 24,135-147
+apps/dashboard/src/lib/content-panel-tab.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-100
+infra/observability/loki/Dockerfile
+  s_679a387b188ae8::t_49e63c97f74bd4 1-9
+packages/ai/src/utils/evlog-request.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-192
+infra/observability/vercel/Dockerfile
+  s_679a387b188ae8::t_49e63c97f74bd4 1-10
+packages/ai/src/types/log-shipping.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-12
+apps/dashboard/src/app/api/demo/sandbox/customize/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,15
+packages/ai/src/utils/otlp-pipeline.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-170
+packages/ai/src/utils/evlog-request.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-2,22-25,27-36,54
+.railway/constants/imported-variables.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-64
+apps/sites-builder/src/components/BlogPost.astro
+  s_679a387b188ae8::t_49e63c97f74bd4 9,19,34,97,101
+packages/ai/src/types/request-ai-usage.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-38
+packages/geo-core/src/geo/check-evaluation.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 44-49
+packages/ai/src/utils/observe-model-stream.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 23
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 5,7-8,10-11,14-16,19,22-26,35,39-40,43,45,48-50,59-63,66,68-69,73-76,79,86,88-89,95,98-101,103,119-121,123-124,131,145,171-172,176-177,179,186-187,192,194-198,200-203,205-206,208-216,218-226,229-234,236-243,245-256,259-278,281-293,297,299-300,302-306,310-313,316-324,332-357,359-368,370-381,385-389,392,396-402,405-457,459,461-465,467-468,470-522,527,529,533,537,546,554,556-636,639-658,660-687,689-709,711-720,722,726,728-729,731,734-740,742,745,750-751,755,757-760,766-767,770-772,774,776,779-781,783-934,936-974,976-980,982-991
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-header.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 16-17,25-26,55-67
+apps/dashboard/src/lib/hooks/use-brand-guidelines.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 22-25,227-252
+apps/dashboard/src/lib/content/apply-content-chat-tool-output.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 90-104
+apps/dashboard/src/types/integrations/site-github-publish.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 12-36,41,43,45-49,79,83-85,91-97,103-110
+packages/db/migrations/meta/0116_snapshot.json
+  ai_agent 1-15563
+apps/evals/src/ui/screens/results/overview.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 16,22-26,42-47,52-55,59,238,256,260-262,265
+packages/analytics/src/tinybird/pipes/web.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 18-19,24,27,29,133,151,171,183,202,224,246,249,254,265,270-301,321,326,336,340-367,386,395,398,404,408-433,476-477,486,496,533,550
+apps/sites-builder/src/pages/notra-pages.json.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3,40-44
+apps/web/src/components/blog-mdx-components.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 4,6-18,21-43,46-51
+infra/observability/grafana/dashboards/notra-vercel.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-329
+apps/dashboard/src/lib/hooks/use-guideline-pdf-upload.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-82
+apps/dashboard/src/utils/site-preview-reachability.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-21
+packages/ai/src/types/feedback-classifier.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 13-14
+apps/dashboard/src/app/api/demo/sandbox/timezone/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8,22-31
+packages/analytics/src/tinybird/pipes/web-session-rollups.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 91
+.railway/constants/observability.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-23
+apps/dashboard/src/constants/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 11-14,25,112,114,116-124,177-178,206-208
+infra/observability/collector/Dockerfile
+  s_679a387b188ae8::t_49e63c97f74bd4 1-8
+packages/analytics/src/constants/web-queries.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 35-50
+packages/sites-server/tests/draft-cas-postgres.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 15,177
+packages/ui/src/components/ui/select.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 12-17,25,56-60,87,89,103,109-110,117,131-134,149-150,161,180
+packages/ai/src/router/credits.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-155
+packages/ai/src/tools/post.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8,19,73,96-97,128-135,162-163
+packages/ai/src/constants/post-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-10
+packages/ai/src/jobs/feedback-classifier.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 24,48,80,85-130,135
+packages/ai/src/constants/telemetry-test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-8
+packages/ui/src/constants/instrument.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9
+apps/dashboard/src/lib/demo/sandbox.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 38,47-48,259-261,308-332,334-335,500-516,519,522,525,527,618,649-663
+packages/schemas/src/schemas/dashboard/api-keys.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 50-62
+apps/agent/agent/lib/constants/usage.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-56
+infra/observability/history/types/history.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-30
+apps/dashboard/src/components/sites/site-overview-hero.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 68-71
+packages/sites-core/src/utils/build-target.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4
+apps/dashboard/src/app/api/organizations/[organizationId]/content/[contentId]/chat/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 92
+packages/schemas/src/schemas/dashboard/content.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 25-28,113,390-413
+apps/evals/src/ui/screens/history.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 7-12,101
+apps/dashboard/src/constants/demo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 62,80-88,158-163
+infra/observability/prometheus/prometheus.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 1-75
+apps/ui/registry.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1005-1042,1115,2043,2472,2623,3026,5568,5690,5808,6010,6186-6191,6347-6351,7405
+apps/dashboard/src/lib/hooks/use-command-palette-ai.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-137
+packages/ui/src/styles/status.css
+  s_679a387b188ae8::t_49e63c97f74bd4 26-31,50-54,61-64
+apps/dashboard/src/types/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5,7,55-60,88,161,172-173,176-187
+infra/observability/collector/entrypoint.sh
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4
+apps/dashboard/src/utils/rpc-telemetry.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-182
+apps/dashboard/src/utils/site-github-publish.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 79,118-273
+packages/geo-core/src/schemas/geo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 78-79,462,468,482,540
+apps/dashboard/src/components/sites/site-delete-dialog.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 47
+infra/observability/loki/loki.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 1-79
+apps/dashboard/src/lib/orpc/routers/attachments.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-79
+apps/dashboard/src/lib/upload/validate.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5,8,24,43-44
+apps/api/src/routes/geo-projects.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 112
+apps/dashboard/tests/sites-feature-flag.test.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 162-164,185
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 27-33
+apps/dashboard/src/app/(dashboard)/[slug]/sites/skeleton.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 17-35
+apps/web/src/components/blog-diagrams/notra-demo.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-380
+apps/dashboard/src/components/content/content-detail-loaded-view.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 129-130
+apps/dashboard/src/components/sites/editor/site-publish-change.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 43,47-49,52,69
+packages/ai/src/types/context-dev.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 139-143
+apps/dashboard/src/lib/sites/serialize.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 34
+packages/ai/src/orchestration/orchestrate-standalone.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 293-295,297-304,311,313
+apps/web/src/lib/offering-check/scan.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 41-42,57,129,134,147
+packages/ai/src/constants/router-test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-5
+packages/schemas/src/constants/dashboard/post-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-10
+apps/dashboard/src/app/(dashboard)/[slug]/content/[id]/page-client.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3-4,12,79-90
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 34,39-40,42,45,55,60-69,82-87,126-130,201,245
+apps/sites-builder/src/styles/global.css
+  s_679a387b188ae8::t_49e63c97f74bd4 107-132,417-418,428-432
+packages/ai/src/agents/repo-image-agent.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-7,76-77,88-101,104-171,218-223
+apps/dashboard/src/components/sites/site-settings-item.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-187
+apps/sites-builder/src/constants/entries.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2-21
+infra/observability/history/history.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-172
+infra/observability/utils/docker.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-14
+packages/ai/src/evlog.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 16,34-39,43,57-59,91
+apps/dashboard/src/utils/rpc-telemetry.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-57
+apps/web/src/utils/offering-gateway.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8-22,24
+apps/agent/agent/lib/hooks/usage.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 18-23,25-30,50,79-104,118-227,243-249,255,279-294,296-307,310,316-318
+apps/dashboard/src/types/brand-identity.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 10,47-50,117-118
+apps/dashboard/src/types/components/site-editor.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,42,44-47
+apps/dashboard/src/types/iris.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 110
+apps/dashboard/src/components/dashboard/header.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 331-333
+packages/sites-server/tests/production-projection.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 7-8,99,282
+packages/ai/src/prompts/content-dispatcher.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 27
+apps/dashboard/src/workflows/steps/brand-analysis-steps.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 70
+apps/dashboard/src/constants/geo-personas.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9-11
+packages/ai/src/utils/send-otlp-batch.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-97
+packages/ui/src/constants/dropdown.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-14
+apps/dashboard/src/app/api/demo/sandbox/reset/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,3-5
+infra/observability/vercel/utils/poll.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-72
+packages/schemas/src/types/dashboard/upload.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-7
+packages/ai/src/constants/context-dev.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4
+apps/dashboard/src/lib/hooks/use-command-palette-entity-search.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-388
+apps/dashboard/src/utils/site-github-publish.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4,9,24,31,224-262,265-270,274-323,327-362
+apps/dashboard/src/components/sites/site-preview-frame.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3,10,14,22-35,42,56,61,63,65,79-83,85
+apps/ui/registry/notra/select/constants/select.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-6
+packages/ai/src/types/mcp-telemetry.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-25
+apps/dashboard/src/workflows/steps/iris-steps.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 402,448,457,463-472,552,554-568,578-579
+apps/sites-builder/src/constants/post-card.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 6-8
+apps/dashboard/src/components/sites/site-settings-editor.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-85
+apps/dashboard/src/components/sites/pages/site-integrations-page.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 6
+apps/dashboard/src/lib/hooks/use-command-palette-recents.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-65
+packages/ai/src/tools/code-researcher.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 222-234
+apps/dashboard/src/utils/content-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-58
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 23,235,237-246,253-258,441,458
+infra/observability/vercel/metrics.test.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-147
+apps/dashboard/src/types/components/content-chat-activity-panel.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,8-9,38,54-62
+apps/dashboard/src/components/content/overview/content-overview.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-298
+apps/api/src/middleware/auth.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3,5,9,12-15,17,28,58-61,246-249,467-563,628-629,638-661
+apps/api/src/programs/posts.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 11,13-16,22,31,35,50-51,56-58,79-84,96-129,298,304,329-330,333,337-361,442,517-537,612,635-640,643
+apps/dashboard/src/components/sites/site-list-menu-items.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-151
+apps/dashboard/src/utils/geo-hydration.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 7,125,129-131,135-136
+packages/geo-core/src/geo/errors.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 133-134,140
+bun.lock
+  ai_agent 23,240,5246
+infra/observability/tunnel/Dockerfile
+  s_679a387b188ae8::t_49e63c97f74bd4 1-2
+apps/dashboard/src/types/content/detail.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 101-110
+packages/sites-server/tests/postgres-lifecycle.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 16-17,149,187,271,314
+packages/ai/src/utils/request-ai-usage.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-109
+apps/dashboard/src/lib/orpc/routers/brand.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 42,52,66-67,70,976-1015
+apps/evals/src/runner/demo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 176
+apps/dashboard/src/app/rpc/[[...rest]]/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 21-24,86-90,97,108
+apps/dashboard/tests/site-variables-surface.test.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 91
+apps/sites-builder/src/lib/featured.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,4,7,9-11,13-14,17-27
+apps/ui/registry/notra/dropdown-menu/examples/dropdown-menu-demo.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-88
+.gitignore
+  s_679a387b188ae8::t_49e63c97f74bd4 24-26
+packages/ai/src/constants/repo-image.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5-6
+apps/agent/agent/lib/utils/session-model.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,15,17,23-27
+packages/sites-server/src/utils/sandbox-transport.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,12-13,40,48-55,149-151,154-157,159-193,195-201,214-216,225
+apps/dashboard/src/components/sites/site-visitors-card.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 120
+packages/ai/src/prompts/geo_writer/writer.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 116,122,127
+apps/dashboard/src/components/content/overview/overview-tags-input.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-180
+apps/sites-builder/src/pages/[...slug].astro
+  s_679a387b188ae8::t_49e63c97f74bd4 37,65
+apps/dashboard/src/constants/content-overview.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-41
+packages/ai/src/utils/telemetry-event.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-70
+apps/sites-builder/src/components/CopyArticle.astro
+  s_679a387b188ae8::t_49e63c97f74bd4 13,69-75,80,82,86-94,96,98-107,109,111-133
+packages/ai/src/types/operational-log.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 16,27,33-35
+infra/observability/check-queries.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-644
+infra/observability/vercel/schemas/metrics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-81
+packages/ai/src/utils/post-service.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-4,12,53-131,138-143,163-164
+apps/sites-builder/src/lib/cards.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-16
+packages/geo-core/src/geo/failure-wire.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,20,39-40
+packages/schemas/src/schemas/shared/post-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-113
+turbo.json
+  s_679a387b188ae8::t_49e63c97f74bd4 103-106
+infra/observability/constants/prometheus-fixtures.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-55
+packages/ai/src/utils/model-call-telemetry.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-289
+packages/tools/src/assistant/create-post.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 38-39,41,57-58
+apps/dashboard/src/workflows/steps/event-generation-step.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4,26-36,68
+packages/db/migrations/0117_blog_post_metadata.sql
+  ai_agent 1-28
+apps/dashboard/src/constants/command-palette.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 17,24,32,35,415-472
+.railway/constants/targets.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-14
+apps/dashboard/src/components/sites/site-variables-settings.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3-4,8,28-30,36-55,58,60,65,70,77,85,96-99,105-113,115-116,118,120-123,130,155-175,177-179,182-203,205-239,243-246,248,250,252-256,258,260-292,297,300,307-314,316-317
+packages/ai/src/types/post-service.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 20-22,51-56
+apps/dashboard/src/lib/hooks/use-content-authors.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-50
+packages/ai/src/utils/usage-attribution.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-170
+apps/dashboard/src/components/content/overview/content-panel-tabs.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-133
+infra/observability/vercel/server.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-73
+packages/ai/src/utils/axiom-pipeline.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-178
+packages/utils/src/account-api-key.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-17
+apps/evals/src/ui/screens/picker.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 182,193-199,235,262,330-334,347-349
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1173-1179,1186,1198-1199,1231-1232
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-686
+infra/observability/validate-config.test.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-64
+apps/dashboard/src/components/chat/attachment-preview.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 189
+apps/dashboard/src/components/sites/site-previews-table.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 29,145-147,184,237-244
+apps/dashboard/src/lib/hooks/use-content-detail-chat.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8,40,561-564,586
+packages/schemas/src/schemas/api/content.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-6,21-25,33-36,357-420,443-446,472-520,557,564-565,576-594
+apps/dashboard/src/lib/orpc/routers/content-authors.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-231
+apps/dashboard/src/components/sites/pages/site-settings-page.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3-19,22,24-36,43,45,47-55,57-60,62-65,69-70,72-78,80-81,84-91,94-95,100-103,106-108,110-115,118,120-138,140-158,161-198,200-213,215-263,265-268,270-280,283-284,286-291,293-294,296-306,317-637
+.github/workflows/code-quality.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 74-89
+packages/utils/src/client-ip.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-152
+apps/agent/agent/lib/utils/model.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4-5,92-98,100,128-135,138
+apps/dashboard/src/components/content/content-chat-activity-panel.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 57,419,429-433,505-517,521-529
+apps/dashboard/src/components/content/overview/overview-author-select.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-135
+apps/dashboard/src/components/sites/site-layout.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 11,17,19-22,38-39,41-43,45-53,56-58,97-125
+apps/docs/docs.json
+  s_679a387b188ae8::t_49e63c97f74bd4 479
+CONTRIBUTING.md
+  s_679a387b188ae8::t_49e63c97f74bd4 447-449
+apps/ui/docs/components/data-table.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 14
+.railway/tests/config.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 6-7,9,12,47,80-81,84-85,103-109,119-121,124,127-131,134,139-158
+apps/sites-builder/src/types/seo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 11-12,25
+apps/dashboard/src/utils/demo-ip-hash.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-8,10,14-15,20-23,32-37
+.railway/demo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-5,7
+apps/dashboard/src/lib/hooks/use-traffic-path.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-39
+apps/dashboard/tests/site-create-deploy-surface.test.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 39
+apps/docs/sites/agents.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 54,56
+apps/dashboard/src/routes/-sites-ui.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 128-133
+apps/dashboard/messages/en.json
+  s_679a387b188ae8::t_49e63c97f74bd4 653-676,975,1117-1123,1161-1167,1488-1501,4006-4010,4184-4192,6554-6661,6678-6679,6682-6684,6694-6695,6699-6719,6920-6922,7217-7224,7238,7240-7242,7253-7254,7308-7311,7558-7580,7643,7963-7964,7971,7978
+apps/api/src/utils/posts.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-2,4,9,13-14,22-76,90,108-114,121-145,173-185
+packages/ai/src/constants/router.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 24-38
+apps/dashboard/src/app/api/uploads/content-image/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,6,36-39
+infra/observability/history/tsconfig.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-12
+packages/ai/src/router/adapters/openrouter.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 117-119,129-137,139
+apps/ui/components/ui/dropdown-menu.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 8-12,49-50,76,99-100,125-126,148,172-173,180,212,214-215,221,240,254
+apps/dashboard/src/components/geo/traffic-path-empty.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-43
+packages/schemas/src/schemas/api/internal-geo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 23
+apps/sites-builder/src/components/TagList.astro
+  s_679a387b188ae8::t_49e63c97f74bd4 1-17
+apps/dashboard/src/lib/orpc/utils/github-publish-error.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,55-59
+infra/observability/history/utils/push-history.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-73
+packages/ai/src/utils/load-brand-guideline-source.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-30
+packages/geo-core/src/ingest/analytics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 10
+apps/sites-builder/src/types/tags.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-26
+apps/dashboard/src/components/content/overview/overview-date-field.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-96
+apps/dashboard/src/utils/site-links.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 7-8,13-21
+packages/analytics/src/tinybird/pipes/web-audience.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 14-16
+apps/api/tests/post-metadata.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-234
+packages/sites-server/src/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 4,104-115,155
+apps/dashboard/src/app/(dashboard)/[slug]/sites/new/page-client.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 6,10,18,21,24-60,66-71
+packages/tools/src/image/generate-image.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 77-81
+packages/db/migrations/meta/_journal.json
+  ai_agent 809-829,832
+apps/api/src/utils/workspaces.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 7,47,160-166
+apps/dashboard/src/lib/orpc/routers/upload.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 33,59,68,114,195
+packages/utils/src/constants/account-api-key.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-8
+packages/geo-core/src/geo/projects.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5,199-200,280-288,303,305
+apps/docs/sites/reference/blog-json.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 105-106,122-123,142,146,164
+infra/observability/history/constants/history.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-9
+apps/agent/agent/subagents/content-writer/instructions.md
+  s_679a387b188ae8::t_49e63c97f74bd4 37
+apps/evals/src/suites/collection-title.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 245
+apps/dashboard/src/components/geo/traffic-export-button.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-45
+infra/observability/history/utils/project-day.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-61
+packages/ai/src/tools/mcp-lazy.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,340-354,356-360,362-364,366-371,373-402,405-410,412-432
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 134
+.dockerignore
+  s_679a387b188ae8::t_49e63c97f74bd4 46-47
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 97
+apps/dashboard/src/types/brand-guidelines.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 169-172,190-212
+infra/observability/grafana/surface-query-fixtures.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-262
+packages/geo-core/src/geo/search-console.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 419
+packages/ai/src/utils/request-id.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-13
+packages/schemas/src/constants/dashboard/upload.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 39-42
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 29-33,40,65
+apps/evals/src/ui/screens/results/cases.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 4,75-76,79,82-87
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-source-pdf-section.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-119
+infra/observability/check-prometheus-resources.test.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-202
+infra/observability/tunnel/ingress.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-25
+apps/docs/sites/customize/layouts.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 29,46,54
+apps/dashboard/src/utils/command-palette.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-12,14,42,47-131
+packages/ai/src/utils/github-mention-sandbox.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 21,141-144
+apps/dashboard/src/constants/site-github-publish.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 26-39
+infra/observability/collector/collector.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 1-55
+apps/api/src/utils/ratelimit.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 10-11,172-177
+packages/tools/src/schemas/content-writer-tools.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3,9
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-pdf-upload-button.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3-4,8-33,36-42
+packages/ai/src/utils/route-usage.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 35-40,64-78,85-86,91,97-101,106-119,122-132,136-137,140,145-169
+packages/ai/src/types/router.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 88,95,97-105,122-135,167-168,372-381
+infra/observability/README.md
+  s_679a387b188ae8::t_49e63c97f74bd4 1-632
+apps/api/src/runtime/geo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 55-57
+apps/dashboard/src/components/geo/ai-traffic-log-card.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 37,52,58,75-77
+packages/ai/src/prompts/standalone-chat.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 95
+packages/ai/src/utils/model-call-telemetry.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,3-4,9-14,16-20,29,32-37,41,45,62-65,67,96,109-131,140-142,149-151,154,162-199,201,225-227,234-253,259-273,306-327
+apps/dashboard/src/lib/integrations/github/site-entry-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-138
+apps/dashboard/src/components/sites/site-deployments-table.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 16,131,145-146,150,235,261
+apps/dashboard/src/types/upload/client.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-7
+apps/dashboard/src/types/geo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 169-170,418,1958-1971
+.railway/utils/assert-target.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-18
+apps/ai-traffic-ingest/README.md
+  s_679a387b188ae8::t_49e63c97f74bd4 77,90-94
+apps/dashboard/src/utils/ai-traffic-pages.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 114-128
+apps/sites-builder/src/types/authors.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-18
+infra/observability/grafana/entrypoint.sh
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4
+apps/dashboard/src/components/content/content-detail-source-metadata.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 17,19-23
+apps/dashboard/src/utils/ratelimit.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9-12,195-208
+packages/ai/src/types/model-call-telemetry.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8,17,20,31
+packages/analytics/src/tinybird/demo-geo-traffic.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 102
+apps/sites-builder/src/pages/tags/[...tag].astro
+  s_679a387b188ae8::t_3263434e705aad 46
+  s_679a387b188ae8::t_49e63c97f74bd4 1-45,47-84
+infra/observability/grafana/provisioning/dashboards/notra.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 1-9
+apps/api/src/types/auth.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 25-33,44-50
+packages/utils/src/constants/cloudflare-ips.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-30
+infra/observability/railway.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-71
+apps/dashboard/src/utils/site-create.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 41
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 892-893,900-905,918-919,926-931,954-955,969-970,980-981
+.railway/tsconfig.json
+  s_679a387b188ae8::t_49e63c97f74bd4 8
+apps/evals/src/runner/run-eval.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 91-93
+apps/ui/components/ui/select.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 5-10,13-19,26,45,50,56,58-62,70,82,84,99,106-107,113-115,130-133,148-149,159,175
+packages/db/src/schema.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 82,1090-1094,2354-2368,2406-2442,3798-3804,4288-4290,4342
+infra/observability/validate-config.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-126
+packages/sites-core/src/constants/site-config.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5
+packages/sites-server/tests/github-consent.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 7,115
+apps/dashboard/src/components/sites/site-status-badge.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3-4,7,9,11,15,17-18,22,26-47,49-51,58,60-62
+apps/api/src/routes/workspaces.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 10,28,66-70
+packages/ai/src/tools/organization.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 6,78-112,114-116,118-129
+apps/dashboard/src/constants/brand-guidelines.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 27-30
+packages/ai/src/utils/observe-mcp-tool.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-60
+infra/observability/vercel/utils/metrics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-217
+apps/dashboard/tests/site-analytics-page.test.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 51-57
+apps/dashboard/src/lib/search/workspace-search.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-307
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 605-606
+apps/dashboard/src/lib/api-keys/expiration.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-29
+apps/dashboard/tests/sites-get-read-only.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 43
+infra/observability/vercel/constants/metrics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-48
+packages/ai/src/tools/image.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 54
+packages/ai/src/router/router.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9-14,29,311-315,330-334
+apps/dashboard/src/components/sites/site-overview-status.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 11-12,16,25,36,39,54,60
+apps/api/src/programs/feedback.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 231-235
+apps/dashboard/src/lib/orpc/base.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4,10,29-41,48-51
+packages/ai/src/utils/brand-guideline-source.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-12,14-16,19-22,24-25,28-30,32-35,39-41,43-45,47-52
+.railway/ai-traffic.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-5,9
+apps/api/src/routes/posts.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 17,35,76,105,126-149,183,204-206,382-383,386,394-419,448-450,547,561-562,615
+apps/dashboard/src/components/geo/personas-table.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 24,37,84-88,105-107,246-247,319-321
+packages/ai/src/router/route-usage.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-29
+packages/utils/package.json
+  s_679a387b188ae8::t_49e63c97f74bd4 25-28
+apps/dashboard/src/utils/site-previews.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 43-47
+apps/dashboard/src/utils/brand-guideline-pdf.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-48
+package.json
+  s_679a387b188ae8::t_49e63c97f74bd4 14,52
+packages/ai/src/utils/context-dev.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 11,36,558-574
+packages/geo-core/src/types/geo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1017
+apps/evals/src/utils/cost.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-161
+apps/sites-builder/compiler/utils/local-options.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-20
+apps/ui/docs/components/dropdown-menu.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-49
+infra/observability/vercel/types/metrics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-62
+apps/dashboard/src/utils/site-project.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-10
+infra/observability/utils/cost-capacity.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-37
+.github/workflows/railway-iac.yml
+  s_679a387b188ae8::t_49e63c97f74bd4 1-102
+apps/api/src/errors/posts.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 13-23
+apps/ui/docs/components/meta.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8-9
+apps/dashboard/tests/fixtures/schedule-dedupe.fixture.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 59
+apps/evals/src/types/eval.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 18-46,75,140,191-196
+packages/geo-core/src/types/google-search-console.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 59
+apps/dashboard/src/app/(dashboard)/[slug]/sites/page-client.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 6,13,20,23,25-26,30-33,36-76,94-107,150
+packages/analytics/src/types/demo-traffic.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 24
+apps/dashboard/src/lib/demo/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,4,7-8,11-12,15-21,25-27,32,35-60
+infra/observability/check-loki-resources.test.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 1-56
+packages/ai/src/utils/observe-mcp-tool.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-46
+apps/dashboard/src/app/api/demo/sandbox/route.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 9,16-17
+apps/dashboard/src/lib/orpc/routers/search.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 5,15
+packages/ai/src/orchestration/tool-registry.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1,31,118-129
+apps/api/src/middleware/observability.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2-5,8-12,15-33
+packages/ai/src/types/repo-image.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 11,28-38
+packages/ai/src/utils/checkpoint-pipeline.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-62
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-workspace.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 65-66
+packages/ai/src/constants/telemetry.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-309
+packages/geo-core/src/geo/web-analytics.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 73-74,83,185-186,191-192,198-199,212,220-221,230
+packages/geo-core/src/geo/programs.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1221-1222,1228,1323-1324,1335,1492-1493,1504
+packages/db/src/types/post-metadata.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-17
+apps/sites-builder/src/pages/feed.xml.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3,9,16,19-32,49,56
+packages/ai/src/types/evaluation.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 2,33
+apps/dashboard/src/utils/traffic-export.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-69
+apps/dashboard/src/lib/orpc/routers/attachments.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 18,93,117,126,182
+packages/ai/src/types/tools.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 113-117
+apps/ui/docs/components/select.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-52
+packages/ai/src/utils/repo-image-skills.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 41,447-449
+packages/ai/src/router/adapters/vercel.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-252
+apps/dashboard/src/components/sites/editor/site-file-diff.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 18,20-23,26,31,50
+apps/api/src/constants/demo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 3-10
+packages/schemas/src/schemas/dashboard/brand-guidelines.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 6-9,101-118
+apps/dashboard/src/components/sites/site-create-project.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-29
+apps/evals/src/ui/screens/run.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 17,77,151,188
+apps/dashboard/src/components/sites/pages/site-analytics-page.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 16-17,22-26,35-39,45-52,82,96-112
+apps/dashboard/src/components/dashboard/dashboard-agent-button.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 3,9-12,20,23,28-33,37,40-45,47,50-54
+apps/evals/src/utils/picker.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 17,21-24,58-59,79-82,127-128,204,209-213,252-254,256-258
+apps/web/src/components/blog-diagrams/logos.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1-72
+apps/dashboard/src/utils/content-authors.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-36
+apps/dashboard/src/lib/command-palette/jev-navigation.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-86
+packages/ai/src/agents/geo-writer.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 52,58,64,82-84,87,205-214,238-254,269,274,283-285,300-308,323,431,557-566,597-598,608,656-660
+apps/docs/api/common-tasks.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 37,48-56,76-91,154-243
+packages/analytics/src/tinybird/pipes/geo-traffic.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 36-41
+packages/ai/src/router/test-helpers.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 10,30-34
+packages/ai/src/utils/shipping-pipeline.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-80
+apps/agent/agent/lib/types/usage.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-8
+apps/dashboard/src/components/content/overview/overview-field.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 1,3-44,46,48,50-51,53-58,61-64,66-92
+apps/sites-builder/src/constants/seo.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 19-32
+apps/dashboard/tests/sites-editor-wiring.test.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 59
+apps/dashboard/package.json
+  s_679a387b188ae8::t_49e63c97f74bd4 133
+patches/evlog@2.28.1.patch
+  s_679a387b188ae8::t_49e63c97f74bd4 24-54
+apps/docs/sites/posts.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 3,29,31,43,45-47,71,73,76,110-132,135-142,151-152,188
+apps/web/src/routes/_site/_blog/blog/$slug/index.tsx
+  s_679a387b188ae8::t_49e63c97f74bd4 88-101,113
+apps/sites-builder/src/pages/author/[author].astro
+  s_679a387b188ae8::t_49e63c97f74bd4 8-9,19-20,25-26,65,68
+  s_679a387b188ae8::t_3263434e705aad 43
+infra/observability/grafana/dashboards/notra-surfaces.json
+  s_679a387b188ae8::t_49e63c97f74bd4 1-221
+infra/observability/blackbox/Dockerfile
+  s_679a387b188ae8::t_49e63c97f74bd4 1-4
+apps/evals/src/scoring/content-post.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 90,112,132,232-238
+apps/web/public/schemas/blog.json
+  s_679a387b188ae8::t_49e63c97f74bd4 646,655-664,757-760
+apps/sites-builder/compiler/cli.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 8,29,63-68,70-73,75,78,83,88,120-126,162,166-172
+packages/ai/src/router/lazy-model.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 34,166-168,178-190,300,302,332,334,395-403
+packages/ai/src/utils/otlp-pipeline.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-64
+packages/ai/src/tools/post-details.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-140
+apps/api/src/index.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 17,21,25,34-37,179-184,210-216,283-284,387-396
+apps/dashboard/src/lib/integrations/github/publish-saved-content.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 39,41,56,59,64,105-112,344-372,430-469,471-472,474,476-485
+scripts/github/check-blog-links.mjs
+  s_679a387b188ae8::t_49e63c97f74bd4 6-7
+apps/dashboard/src/lib/hooks/use-update-site-settings.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-30
+apps/web/src/styles/globals.css
+  s_679a387b188ae8::t_49e63c97f74bd4 448-515
+apps/docs/sites/overview.mdx
+  s_679a387b188ae8::t_49e63c97f74bd4 32
+infra/observability/history/import-axiom.ts
+  s_679a387b188ae8::t_49e63c97f74bd4 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "16f3c4aa9bc9a3405d0f7f1db4b4617a448a5503",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
