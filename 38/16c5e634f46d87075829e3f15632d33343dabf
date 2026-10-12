@@ -1,0 +1,19 @@
+apps/sites-builder/src/styles/global.css
+  s_3200ad40c3f503::t_55290000047342 105-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3816c5e634f46d87075829e3f15632d33343dabf",
+  "prompts": {},
+  "sessions": {
+    "s_3200ad40c3f503": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cc277e23-df4e-4f87-8e06-46489132b2b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
