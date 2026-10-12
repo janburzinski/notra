@@ -1,0 +1,25 @@
+apps/docs/sites/repository.mdx
+  s_679a387b188ae8::t_09be3e82a751a4 17
+apps/docs/sites/previews.mdx
+  s_679a387b188ae8::t_122d8bbd27b004 25
+apps/docs/sites/publishing.mdx
+  s_679a387b188ae8::t_2eab444bd17b9f 53
+  s_679a387b188ae8::t_de026328a8be15 32-35
+  s_679a387b188ae8::t_b7e4d70a8f4dbc 45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "afdc6f3c634087b2b0719cd9ae3b45f07501d22b",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
