@@ -1,0 +1,9 @@
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  ai_agent 328-331,363,411
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "25803a41a0c4206f8e97eafc88257ab56c29ae2d",
+  "prompts": {}
+}
