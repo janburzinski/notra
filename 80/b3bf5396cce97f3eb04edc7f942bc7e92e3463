@@ -1,0 +1,95 @@
+apps/dashboard/src/components/geo/personas-table.tsx
+  s_1359d1465ed409::t_208383136d9355 24,37,84-88,105-107,317-319
+apps/dashboard/src/constants/command-palette.ts
+  s_1359d1465ed409::t_c830b658179082 17,24,32,35,425-439,445-447
+  s_1359d1465ed409::t_7655ccfc16964f 415-424
+  s_1359d1465ed409::t_c913b527924eb9 448-465
+  s_1359d1465ed409::t_371fc50a18cd1c 440-444
+apps/dashboard/src/types/components/command-palette.ts
+  s_1359d1465ed409::t_c830b658179082 2,86-91,98,105-139,142
+  s_1359d1465ed409::t_037f1e5bdf6c41 92-97,187-201,205-207,209-210
+  s_1359d1465ed409::t_6914fa103fa5dc 223-227,229-238,241-243,245-248,250-251,253
+  s_1359d1465ed409::t_195df97da6daf0 66-70,75-80,82-85
+  s_1359d1465ed409::t_2b86debff97413 99-104
+  s_1359d1465ed409::t_d3f9e9823d3432 71
+  s_1359d1465ed409::t_c913b527924eb9 72-74,81
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_1359d1465ed409::t_1cf80cde752719 95-98,866
+  s_1359d1465ed409::t_914dfb2a9ef7d1 5,7-8,11-12,15-17,20,23-27,36,40-41,45,48-50,59-61,64,66-67,71-74,77,84,92,167,181,198,204,219,222,241,246,262,265,280,283,295,298,477-478,480-483,490-493,504,529,576-577,584,588-591,593-599,602,604-605,607-615,618-623,626-634,636-664,666,714-722,727-752,754-763,765-776,780-784,787,791,800,802-831,833-834,837-846,848-849,851,853-857,859-860,862-865,867-914,919,921,925,938,946,948-1003,1005-1018,1021-1040,1042-1069,1071-1091,1093-1102,1104,1108,1110-1111,1113,1116-1122,1124,1127,1132-1133,1137,1148-1149,1152-1154,1156,1158,1161-1163,1165-1246,1249-1264,1266-1268,1270-1279,1281-1338,1340-1378,1380-1384,1386-1395
+  s_1359d1465ed409::t_371fc50a18cd1c 103,123-125,127-128,134-147,313-316,324,331-339,345-354,367-375,381-389,395-397,405-407,409-410,416
+  s_1359d1465ed409::t_4db667ed1afdbd 205-209,223-227,247-251,266-270,284-288,299-303,325-329,340-344,355-366,376-380,390-394,424,431,682
+  s_1359d1465ed409::t_8e7ff65c6ac275 801
+  s_1359d1465ed409::t_855e7b1a752081 929
+  s_1359d1465ed409::t_2b86debff97413 86
+  s_1359d1465ed409::t_e8a48c0c386a22 832,835-836
+  s_1359d1465ed409::t_5f39cc6af0c7e7 1004
+  s_1359d1465ed409::t_bc65ba71fd0f97 317-323,330,1139-1141
+  s_1359d1465ed409::t_ba041f7d542e8f 1142,1247-1248,1265,1269,1280
+  s_1359d1465ed409::t_3847342b5be96e 792-797,847
+apps/dashboard/messages/en.json
+  s_1359d1465ed409::t_2ec3eff652b24f 6522
+  s_1359d1465ed409::t_037f1e5bdf6c41 6510
+  s_1359d1465ed409::t_bc65ba71fd0f97 6511-6512
+  s_1359d1465ed409::t_5f39cc6af0c7e7 6523-6524,6528
+  s_1359d1465ed409::t_74bc38027a0c66 6505-6507,6529-6548
+apps/dashboard/src/lib/hooks/use-command-palette-recents.ts
+  s_1359d1465ed409::t_fbd0e0b95440b9 1-55
+apps/dashboard/src/constants/storage.ts
+  s_1359d1465ed409::t_c830b658179082 24-25
+apps/dashboard/src/lib/hooks/use-switch-organization.ts
+  s_1359d1465ed409::t_3785274efda2f6 1-92
+apps/dashboard/src/utils/command-palette.ts
+  s_1359d1465ed409::t_7655ccfc16964f 41
+  s_1359d1465ed409::t_2b86debff97413 5-8,10-11,13,46-77
+  s_1359d1465ed409::t_c913b527924eb9 1-4,9,78-92
+apps/dashboard/src/constants/geo-personas.ts
+  s_1359d1465ed409::t_208383136d9355 9-11
+apps/dashboard/src/lib/orpc/routers/search.ts
+  s_1359d1465ed409::t_25fe3055401a77 5,15
+apps/dashboard/messages/de.json
+  s_1359d1465ed409::t_74bc38027a0c66 6505-6507,6529-6548
+  s_1359d1465ed409::t_5f39cc6af0c7e7 6523-6524,6528
+  s_1359d1465ed409::t_037f1e5bdf6c41 6510
+  s_1359d1465ed409::t_2ec3eff652b24f 6522
+  s_1359d1465ed409::t_bc65ba71fd0f97 6511-6512
+apps/dashboard/src/lib/command-palette/jev-navigation.ts
+  s_1359d1465ed409::t_c913b527924eb9 4,41
+  s_1359d1465ed409::t_1cf80cde752719 40
+  s_1359d1465ed409::t_7655ccfc16964f 1-3,5-10,12-26,28-39,42-79
+  s_1359d1465ed409::t_195df97da6daf0 11,27
+apps/dashboard/src/app/api/command-palette/navigate/route.ts
+  s_1359d1465ed409::t_ead5439bf88288 34-40,42-45,47-105,141,158,163-168,170,211
+  s_1359d1465ed409::t_bc65ba71fd0f97 46
+  s_1359d1465ed409::t_4db667ed1afdbd 6,12,20,22-23,25-28,30-31
+  s_1359d1465ed409::t_195df97da6daf0 18,190-200
+  s_1359d1465ed409::t_c913b527924eb9 24,29,41,182-189
+apps/dashboard/src/constants/studio-analytics.ts
+  s_1359d1465ed409::t_c830b658179082 63-68
+apps/dashboard/src/components/command-palette/command-palette-item.tsx
+  s_1359d1465ed409::t_cd389ad441e24d 63
+  s_1359d1465ed409::t_6c06ebd0bdf794 1-62,64-76
+apps/dashboard/src/lib/search/workspace-search.ts
+  s_1359d1465ed409::t_25fe3055401a77 1-42,44-307
+  s_1359d1465ed409::t_2b86debff97413 43
+packages/schemas/src/schemas/dashboard/command-palette.ts
+  s_1359d1465ed409::t_ead5439bf88288 8
+apps/dashboard/src/components/dashboard/org-selector.tsx
+  s_1359d1465ed409::t_3785274efda2f6 233-234
+  s_1359d1465ed409::t_d83898b087c23b 42,52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "80b3bf5396cce97f3eb04edc7f942bc7e92e3463",
+  "prompts": {},
+  "sessions": {
+    "s_1359d1465ed409": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d7bb4d01-e901-46b4-bbf5-8ebe8bb2803b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
