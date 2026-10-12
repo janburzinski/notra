@@ -1,0 +1,67 @@
+apps/dashboard/messages/en.json
+  s_f2137bb6ba04d1::t_65505b6cd1dabd 6605-6607
+  s_f2137bb6ba04d1::t_9e5ae0100b81cb 6883-6885
+apps/dashboard/src/components/content/overview/content-overview.tsx
+  s_f2137bb6ba04d1::t_65505b6cd1dabd 29,269-270,272-273
+  s_f2137bb6ba04d1::t_6ed050bcd1d221 5
+  s_f2137bb6ba04d1::t_bc06a9898a96ff 6
+apps/dashboard/src/types/content/overview.ts
+  s_f2137bb6ba04d1::t_65505b6cd1dabd 123-131
+  s_f2137bb6ba04d1::t_9c817f690f8693 9-12,14
+apps/dashboard/src/components/content/overview/content-panel-tabs.tsx
+  s_f2137bb6ba04d1::t_fe2dc5a22435d0 19,24
+  s_f2137bb6ba04d1::t_9c817f690f8693 17,30-33,37-40,42-45,47-95
+apps/dashboard/src/components/content/content-detail-chat-shell.tsx
+  s_f2137bb6ba04d1::t_4974265d32d10e 10,20-26,115-136,140,146
+apps/dashboard/src/constants/content-overview.ts
+  s_f2137bb6ba04d1::t_9c817f690f8693 1-5,43-48
+apps/dashboard/src/lib/integrations/github/site-entry-metadata.ts
+  s_f2137bb6ba04d1::t_bc06a9898a96ff 1
+apps/dashboard/src/utils/content-metadata.ts
+  s_f2137bb6ba04d1::t_fe4a3b68ced06f 3
+  s_f2137bb6ba04d1::t_bc06a9898a96ff 1
+  s_f2137bb6ba04d1::t_65505b6cd1dabd 36-48
+apps/dashboard/src/components/content/overview/overview-date-field.tsx
+  s_f2137bb6ba04d1::t_65505b6cd1dabd 1-91
+apps/dashboard/src/components/content/overview/overview-cover-field.tsx
+  s_f2137bb6ba04d1::t_6ed050bcd1d221 9-10
+apps/dashboard/src/components/ai/chat-tool-block.tsx
+  s_f2137bb6ba04d1::t_9e5ae0100b81cb 605-606
+apps/dashboard/messages/de.json
+  s_f2137bb6ba04d1::t_65505b6cd1dabd 6605-6607
+  s_f2137bb6ba04d1::t_9e5ae0100b81cb 6883-6885
+apps/dashboard/src/components/content/overview/overview-tags-input.tsx
+  s_f2137bb6ba04d1::t_bc06a9898a96ff 8
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_f2137bb6ba04d1::t_bc06a9898a96ff 9
+  s_f2137bb6ba04d1::t_fe4a3b68ced06f 64
+apps/dashboard/src/constants/storage.ts
+  s_f2137bb6ba04d1::t_7f7a57fd6cc32c 10
+apps/dashboard/src/components/content/content-detail-toolbar.tsx
+  s_f2137bb6ba04d1::t_4974265d32d10e 3
+apps/dashboard/src/lib/content-panel-tab.ts
+  s_f2137bb6ba04d1::t_6ab468671f3353 5,8-10,12,15,28-39,43-83
+apps/dashboard/src/components/dashboard/dashboard-agent-button.tsx
+  s_f2137bb6ba04d1::t_ad28455c9a03cd 3,10-11,20,23,28-30,38,41-42,47-48,50-54
+  s_f2137bb6ba04d1::t_fe2dc5a22435d0 31-33,37
+apps/dashboard/src/components/content/overview/overview-author-select.tsx
+  s_f2137bb6ba04d1::t_d7352ed8d894e3 3
+apps/dashboard/src/lib/content/apply-content-chat-tool-output.ts
+  s_f2137bb6ba04d1::t_9e5ae0100b81cb 90-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9523fc4d53e9f6fd716ede7941288cbe88f1482c",
+  "prompts": {},
+  "sessions": {
+    "s_f2137bb6ba04d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05d9cd4e-8273-4590-8796-cf8becc4d59b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
