@@ -1,0 +1,13 @@
+packages/db/migrations/meta/0117_snapshot.json
+  ai_agent 1-15779
+packages/db/migrations/meta/_journal.json
+  ai_agent 823-829
+packages/db/migrations/0117_blog_post_metadata.sql
+  ai_agent 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5fd0cd5b63a7d84b29072e952725c88ca009fbad",
+  "prompts": {}
+}
