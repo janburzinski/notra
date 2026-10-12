@@ -1,0 +1,58 @@
+apps/dashboard/src/lib/brand-guidelines.ts
+  s_f54b06300e2289::t_827f2462533141 22
+  s_f54b06300e2289::t_7d2f3dcfcdfc64 569-571,575,577-581,583-590,592-593
+  s_f54b06300e2289::t_c30f7781702774 40,565-568
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-pdf-upload-button.tsx
+  s_f54b06300e2289::t_c30f7781702774 11
+  s_f54b06300e2289::t_677ceaa7980ca0 24-32
+  s_f54b06300e2289::t_30549542669ff1 1-10,12-23,33-45
+apps/dashboard/messages/en.json
+  s_f54b06300e2289::t_053e64eb81171e 1458-1459
+  s_f54b06300e2289::t_e828fc893ebcc6 1469
+  s_f54b06300e2289::t_7d2f3dcfcdfc64 1093
+apps/dashboard/src/lib/hooks/use-brand-guidelines.ts
+  s_f54b06300e2289::t_827f2462533141 66-68
+apps/dashboard/messages/de.json
+  s_f54b06300e2289::t_053e64eb81171e 1458-1459
+  s_f54b06300e2289::t_e828fc893ebcc6 1469
+  s_f54b06300e2289::t_7d2f3dcfcdfc64 1093
+apps/dashboard/src/lib/hooks/use-guideline-pdf-upload.ts
+  s_f54b06300e2289::t_30549542669ff1 1-92
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-source-pdf-section.tsx
+  s_f54b06300e2289::t_b64b8f40c3e1b6 9-10,15,34,51,53-54,57,104-116
+  s_f54b06300e2289::t_192dda5de3c067 14,45-48,50,52,55-56,58-60,71-102,117
+  s_f54b06300e2289::t_33f380ee33a415 61-70
+  s_f54b06300e2289::t_e6b690c49cd4e9 6,16-17,26,29-32,35,37-39,41-42
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-header.tsx
+  s_f54b06300e2289::t_df15b3ae7c72a9 55-67
+  s_f54b06300e2289::t_053e64eb81171e 16-17,25-26
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/brand-identity-workspace.tsx
+  s_f54b06300e2289::t_053e64eb81171e 65-66
+apps/dashboard/src/types/brand-identity.ts
+  s_f54b06300e2289::t_053e64eb81171e 117-118
+apps/dashboard/src/utils/brand-guideline-pdf.ts
+  s_f54b06300e2289::t_c30f7781702774 4,31-43
+apps/dashboard/src/components/chat/attachment-preview.tsx
+  s_f54b06300e2289::t_583a62c5fd6499 189
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/components/guidelines-panel.tsx
+  s_f54b06300e2289::t_827f2462533141 43-45,92-104,135-147
+apps/dashboard/src/types/brand-guidelines.ts
+  s_f54b06300e2289::t_7d2f3dcfcdfc64 204
+  s_f54b06300e2289::t_c30f7781702774 209-217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a94cb5ac1222e9ae83a88b5d447d50444c8d0daa",
+  "prompts": {},
+  "sessions": {
+    "s_f54b06300e2289": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bb5baa0-60a5-4b8a-aed8-b90b015797b0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
