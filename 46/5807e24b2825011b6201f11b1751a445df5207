@@ -1,0 +1,19 @@
+apps/web/src/content/blog/how-we-built-the-notra-demo.mdx
+  s_996bc2fa8dc596::t_3124dc4f0ae279 190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "465807e24b2825011b6201f11b1751a445df5207",
+  "prompts": {},
+  "sessions": {
+    "s_996bc2fa8dc596": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "37826b10-31a3-42fa-be2c-6de31ce5ea10",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
