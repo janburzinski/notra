@@ -1,0 +1,41 @@
+apps/dashboard/src/components/sites/site-environment-badge.tsx
+  s_44ec6f90dfe9bd::t_f1e2d19a64c863 30
+apps/dashboard/messages/en.json
+  s_44ec6f90dfe9bd::t_2d7eb0ce551a58 7035
+  s_44ec6f90dfe9bd::t_f1e2d19a64c863 7066
+apps/dashboard/src/app/(dashboard)/[slug]/sites/skeleton.tsx
+  s_44ec6f90dfe9bd::t_52a7f21de44d81 20,23,29
+apps/dashboard/src/app/(dashboard)/[slug]/sites/page-client.tsx
+  s_44ec6f90dfe9bd::t_54065f663b2cbc 23,52-54
+apps/dashboard/src/components/sites/sites-list.tsx
+  s_44ec6f90dfe9bd::t_2d7eb0ce551a58 77
+  s_44ec6f90dfe9bd::t_809c1752001bad 62-64,75,79-81,107
+  s_44ec6f90dfe9bd::t_52a7f21de44d81 114,117,181,183,196
+  s_44ec6f90dfe9bd::t_3d3e812c128817 27,47,49,93-94,96-106,231-234,243
+  s_44ec6f90dfe9bd::t_835dadcccaf3a7 171
+  s_44ec6f90dfe9bd::t_a368defaa3816c 192-194
+apps/dashboard/messages/de.json
+  s_44ec6f90dfe9bd::t_f1e2d19a64c863 7066
+  s_44ec6f90dfe9bd::t_2d7eb0ce551a58 7035
+apps/dashboard/src/utils/site-links.ts
+  s_44ec6f90dfe9bd::t_54065f663b2cbc 2
+apps/dashboard/src/components/sites/site-preview-frame.tsx
+  s_44ec6f90dfe9bd::t_cdf95f2b97f99c 31,54
+  s_44ec6f90dfe9bd::t_b5ea5f43d7bfa2 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c6957fdc3cb6da49d4c550ecc3ef236d019d22a1",
+  "prompts": {},
+  "sessions": {
+    "s_44ec6f90dfe9bd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04a08c6a-d954-469c-b124-6850eb732c67",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
