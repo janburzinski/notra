@@ -1,0 +1,19 @@
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_f871e6fe06f929::t_916727fa8f1b52 19,29-32,53,63,114,332,414,421,498,508,557-564,571-574
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "90196e35027e43dcc3a1797f44dfcd6f57ca95ce",
+  "prompts": {},
+  "sessions": {
+    "s_f871e6fe06f929": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "70903be8-237c-44ea-8cb8-704c987ae22d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
