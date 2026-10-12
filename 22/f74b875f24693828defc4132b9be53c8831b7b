@@ -1,0 +1,27 @@
+apps/dashboard/src/lib/hooks/use-guideline-pdf-upload.ts
+  s_f54b06300e2289::t_66411bb4f42383 12,52
+packages/ai/src/constants/brand-guideline-source.ts
+  s_f54b06300e2289::t_66411bb4f42383 5,7,9
+apps/dashboard/src/constants/brand-guidelines.ts
+  s_f54b06300e2289::t_66411bb4f42383 29-30
+apps/dashboard/src/utils/brand-guideline-pdf.ts
+  s_f54b06300e2289::t_66411bb4f42383 3-6,17,19-21
+packages/ai/src/utils/brand-guideline-source.ts
+  s_f54b06300e2289::t_66411bb4f42383 4-6,11,13-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "22f74b875f24693828defc4132b9be53c8831b7b",
+  "prompts": {},
+  "sessions": {
+    "s_f54b06300e2289": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1bb5baa0-60a5-4b8a-aed8-b90b015797b0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
