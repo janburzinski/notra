@@ -1,0 +1,56 @@
+apps/dashboard/src/constants/sites.ts
+  s_9f0b000a0f9ce4::t_22a0424b70490e 2,99-107
+apps/dashboard/src/components/sites/site-domain-add-form.tsx
+  s_9f0b000a0f9ce4::t_f9c7312243c249 3-8,10-17,20-28,30,34-48,51-69,72-82,85-86,89-145,147-158,160-182
+  s_9f0b000a0f9ce4::t_0615c3e46d450d 146,159
+apps/dashboard/messages/de.json
+  s_9f0b000a0f9ce4::t_437cd977ec2779 7834,7843,7881-7882,7927-7930
+  s_9f0b000a0f9ce4::t_06da3a0088a5f3 7883,7899-7901
+apps/dashboard/src/components/sites/site-domain-proxy.tsx
+  s_9f0b000a0f9ce4::t_06da3a0088a5f3 12-17,42-46,63,126-127
+  s_9f0b000a0f9ce4::t_e97193698b088a 47-54,64-65
+apps/dashboard/src/components/sites/site-domain-card.tsx
+  s_9f0b000a0f9ce4::t_f71a82d8d0cb12 4,11,20,25-29,31,33-35,40,50,88-92,98,101,105,107-108,111-126,128,130-146,155-166,168-172,174-176,197
+  s_9f0b000a0f9ce4::t_0615c3e46d450d 43-46,147-151
+  s_9f0b000a0f9ce4::t_05d33c4677fc6a 109
+  s_9f0b000a0f9ce4::t_06da3a0088a5f3 127
+  s_9f0b000a0f9ce4::t_39f007d794be38 152-154
+  s_9f0b000a0f9ce4::t_02c6ac5c1bda27 177-181,183-187,189-196
+apps/dashboard/src/components/sites/site-domain-dns.tsx
+  s_9f0b000a0f9ce4::t_bf8b2405254d03 5,86,213,231-237,240-244
+  s_9f0b000a0f9ce4::t_39f007d794be38 68
+  s_9f0b000a0f9ce4::t_02c6ac5c1bda27 84
+  s_9f0b000a0f9ce4::t_c6d4a3b1581bc1 182
+apps/dashboard/src/types/components/sites.ts
+  s_9f0b000a0f9ce4::t_bf8b2405254d03 525,529,532,542,546,549,551-553
+apps/dashboard/messages/en.json
+  s_9f0b000a0f9ce4::t_437cd977ec2779 7834,7843,7881-7882,7927-7930
+  s_9f0b000a0f9ce4::t_06da3a0088a5f3 7883,7899-7901
+apps/dashboard/src/components/sites/site-domain-add-dialog.tsx
+  s_9f0b000a0f9ce4::t_8260cf7fd234b9 14,36-41,43-47,49-57
+  s_9f0b000a0f9ce4::t_2009621e8458a1 42
+apps/dashboard/tests/site-domain-setup.test.tsx
+  s_9f0b000a0f9ce4::t_05d33c4677fc6a 11,40-41,82,86,109-115,172,181,200,203,205,215-216,231,235,265,269,275,288,292,298
+  s_9f0b000a0f9ce4::t_321043322c6aba 277-280
+apps/dashboard/src/components/sites/pages/site-domains-page.tsx
+  s_9f0b000a0f9ce4::t_437cd977ec2779 7,16-17,89-99,102,104-129
+  s_9f0b000a0f9ce4::t_02c6ac5c1bda27 103
+apps/dashboard/tests/site-proxy-agent-prompt.test.tsx
+  s_9f0b000a0f9ce4::t_e97193698b088a 101-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ba42a6d00ec51d49cd873fa0e24e15e23f49cb43",
+  "prompts": {},
+  "sessions": {
+    "s_9f0b000a0f9ce4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "489a0aec-293e-4292-9db2-c42a193d3048",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
