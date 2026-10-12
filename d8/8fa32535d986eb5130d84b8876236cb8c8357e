@@ -1,0 +1,28 @@
+apps/web/src/content/blog/how-we-built-the-notra-demo.mdx
+  s_63d7008b16c3bb::t_9c1383f40042e1 7
+apps/web/src/utils/blog.ts
+  s_63d7008b16c3bb::t_9c1383f40042e1 21
+apps/web/src/schemas/content.ts
+  s_63d7008b16c3bb::t_9c1383f40042e1 10
+apps/web/types/blog.ts
+  s_63d7008b16c3bb::t_9c1383f40042e1 55
+apps/web/src/routes/_site/_blog/blog/$slug/index.tsx
+  s_63d7008b16c3bb::t_02fa21b8e5fa35 31-34,159
+  s_63d7008b16c3bb::t_e96693dfa84440 45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d88fa32535d986eb5130d84b8876236cb8c8357e",
+  "prompts": {},
+  "sessions": {
+    "s_63d7008b16c3bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8d7b8068-fc44-4f32-a01b-7805de6ef2e0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
