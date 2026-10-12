@@ -1,0 +1,26 @@
+packages/sites-server/src/webhooks.ts
+  s_679a387b188ae8::t_fdd9cf3f3aa08c 127-150,182-189
+  s_679a387b188ae8::t_d3b463983f50cf 40
+packages/sites-server/src/constants/webhooks.ts
+  s_679a387b188ae8::t_d3b463983f50cf 17-19
+packages/sites-server/src/utils/push-paths.ts
+  s_679a387b188ae8::t_d3b463983f50cf 1-32
+packages/sites-server/src/types/webhooks.ts
+  s_679a387b188ae8::t_d3b463983f50cf 20-25,30-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4fcbc4d50ec3309057f03bf599104982d781fa48",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
