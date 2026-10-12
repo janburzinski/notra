@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/personas-table.tsx
+  s_1359d1465ed409::t_bae752caa39c26 246-247
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a4d6d319c75cd67b8cef18591b43ffded857409c",
+  "prompts": {},
+  "sessions": {
+    "s_1359d1465ed409": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d7bb4d01-e901-46b4-bbf5-8ebe8bb2803b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
