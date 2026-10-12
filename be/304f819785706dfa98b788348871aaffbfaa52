@@ -1,0 +1,27 @@
+apps/docs/sites/match-your-website.mdx
+  s_679a387b188ae8::t_5f957ceaf17cd7 85
+apps/sites-builder/src/components/AreaHero.astro
+  s_679a387b188ae8::t_1b2af7b51617ec 19,27
+apps/docs/sites/customize/design.mdx
+  s_679a387b188ae8::t_1b2af7b51617ec 43
+apps/sites-builder/src/lib/theme.ts
+  s_679a387b188ae8::t_1b2af7b51617ec 35,40-41,48-49
+apps/sites-builder/src/styles/global.css
+  s_679a387b188ae8::t_a7f6711f4b6100 695,734-735
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "be304f819785706dfa98b788348871aaffbfaa52",
+  "prompts": {},
+  "sessions": {
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
