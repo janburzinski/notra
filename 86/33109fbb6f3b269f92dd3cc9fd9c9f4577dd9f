@@ -1,0 +1,50 @@
+apps/dashboard/src/components/sites/site-create-bulk-fields.tsx
+  s_679a387b188ae8::t_11bfb8dee11412 32,49,59,96,109,135,171,209,231
+apps/dashboard/src/constants/site-create.ts
+  s_679a387b188ae8::t_11bfb8dee11412 111-112
+apps/dashboard/src/types/components/sites.ts
+  s_679a387b188ae8::t_11bfb8dee11412 145-146
+  s_679a387b188ae8::t_f8e6bda0a9752a 173
+apps/dashboard/src/types/sites.ts
+  s_679a387b188ae8::t_11bfb8dee11412 287-291,304,308-312
+packages/sites-server/src/webhooks.ts
+  s_679a387b188ae8::t_ae1ff1dd35c6c6 229-230
+apps/dashboard/src/utils/site-create-bulk.ts
+  s_679a387b188ae8::t_11bfb8dee11412 7-10,17,114,148-161,165
+  s_0ce31974e09b8c::t_39715de9cb0269 32-35,162-164
+apps/dashboard/src/components/sites/site-address-input.tsx
+  s_679a387b188ae8::t_f8e6bda0a9752a 21,30
+apps/dashboard/src/lib/hooks/use-site-bulk-import.ts
+  s_679a387b188ae8::t_25c8ee461fbd66 14,27,45-65,68-69
+packages/sites-server/src/sites.ts
+  s_679a387b188ae8::t_ae1ff1dd35c6c6 181-189
+apps/dashboard/src/components/sites/site-create-form.tsx
+  s_679a387b188ae8::t_25c8ee461fbd66 116-120,123-124,127,135-143,229,420
+  s_0ce31974e09b8c::t_39715de9cb0269 66,258
+apps/dashboard/src/components/sites/site-create-bulk-results.tsx
+  s_679a387b188ae8::t_11bfb8dee11412 19,44-48,120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8633109fbb6f3b269f92dd3cc9fd9c9f4577dd9f",
+  "prompts": {},
+  "sessions": {
+    "s_0ce31974e09b8c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13125-3cb1-75d1-978b-3f7c9c1c3ccb",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_679a387b188ae8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cda3aa5-c3b0-46de-afc0-446f42005067",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
