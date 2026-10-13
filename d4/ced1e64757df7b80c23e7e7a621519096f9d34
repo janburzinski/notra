@@ -1,0 +1,78 @@
+apps/dashboard/src/utils/geo-overview-page.test.ts
+  s_5106379bc774f1::t_423cc073db3926 1-3,5-17,27-33,41-43,51-52
+  s_5106379bc774f1::t_9911be2e7c9c26 4,18-26,34-40,44-50
+apps/dashboard/src/app/(dashboard)/[slug]/geo/page-client.tsx
+  s_5106379bc774f1::t_c6146196e07a3f 9,20,22-23,25-28,33-39
+  s_5106379bc774f1::t_f98890197c119f 21,29-32
+  s_5106379bc774f1::t_f37354447ef13a 19,24,40
+  s_5106379bc774f1::t_2f4486ddc6276f 46-52,54-58,60-61
+apps/dashboard/src/types/ui-route.ts
+  s_5106379bc774f1::t_89a2b34ad62266 51-52,54
+apps/dashboard/src/components/sites/site-layout.tsx
+  s_5106379bc774f1::t_2d352fa390df66 17,72-76,78-108
+  s_5106379bc774f1::t_ab9150e7bcc758 65,70-71,109
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_5106379bc774f1::t_5c5147739907e7 34,36,109,118,132,144,158
+  s_5106379bc774f1::t_9649bacf3c8d77 90,102
+apps/dashboard/src/utils/geo-overview-page.ts
+  s_5106379bc774f1::t_9911be2e7c9c26 17-21,49-53
+  s_5106379bc774f1::t_b6a2672294ff91 42-48
+apps/dashboard/src/types/skeleton.ts
+  s_5106379bc774f1::t_f98890197c119f 7-8
+  s_5106379bc774f1::t_c6146196e07a3f 1-6,9
+apps/dashboard/src/constants/skeleton.ts
+  s_5106379bc774f1::t_ab9150e7bcc758 1
+  s_5106379bc774f1::t_c6146196e07a3f 2-3
+apps/dashboard/src/components/sites/pages/site-deployment-detail-page.tsx
+  s_5106379bc774f1::t_2d352fa390df66 29,66-81,85-98
+  s_5106379bc774f1::t_ab9150e7bcc758 65,99,138
+apps/dashboard/src/routes/-ui-route.tsx
+  s_5106379bc774f1::t_5c8ba5c4cb4b36 181,188-189
+  s_5106379bc774f1::t_6ae8c0f8dcd1f0 190-192
+  s_5106379bc774f1::t_89a2b34ad62266 107-111
+apps/dashboard/src/components/skeleton-crossfade.tsx
+  s_5106379bc774f1::t_c6146196e07a3f 5-12,14-15,17-46
+  s_5106379bc774f1::t_f98890197c119f 13,16
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_5106379bc774f1::t_cbeb1c983df419 294
+  s_5106379bc774f1::t_b33fbbc16c9f4c 29,273-293
+apps/dashboard/src/routes/-sites-ui.tsx
+  s_5106379bc774f1::t_be8d6acbc42a12 9,30
+  s_5106379bc774f1::t_2d352fa390df66 10,12-16
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  ai_agent 20-24
+  s_5106379bc774f1::t_da92f417115814 3,18,27,45-49,51-56,58-59,61,63-64,66-69,76
+apps/dashboard/src/types/geo.ts
+  s_5106379bc774f1::t_b6a2672294ff91 196-204
+apps/dashboard/src/components/geo/journeys-tab.tsx
+  s_5106379bc774f1::t_f37354447ef13a 74
+  s_5106379bc774f1::t_c6146196e07a3f 18,174
+  ai_agent 107-143,145-147,150-151,153-158,161,163-171
+  s_5106379bc774f1::t_5c5147739907e7 149,173
+apps/dashboard/src/lib/hooks/use-geo-overview-page.ts
+  s_5106379bc774f1::t_e7dc5e30da4dde 111,116,172,190
+  s_5106379bc774f1::t_b6a2672294ff91 34,125-134,136-138,140-141,159-164,171
+  s_5106379bc774f1::t_9911be2e7c9c26 165-170
+apps/dashboard/src/routes/-geo-ui.tsx
+  s_5106379bc774f1::t_fa94459c546f84 133
+  s_5106379bc774f1::t_be8d6acbc42a12 4,7-10,13,83
+  s_5106379bc774f1::t_9c66df7ee42dda 63
+  s_5106379bc774f1::t_2d352fa390df66 5-6,11-12
+  s_5106379bc774f1::t_89a2b34ad62266 67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d4ced1e64757df7b80c23e7e7a621519096f9d34",
+  "prompts": {},
+  "sessions": {
+    "s_5106379bc774f1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a133a4-385c-7ab2-b195-53eb8da22eeb",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
