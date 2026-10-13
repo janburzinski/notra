@@ -1,0 +1,43 @@
+packages/geo-core/src/geo/programs.ts
+  s_f53a31e6153529::t_1b6b7f9a7fb68a 65,145,482-506
+  s_f53a31e6153529::t_1130cd355828c6 1215-1219,1224,1248,1254-1259
+  s_f53a31e6153529::t_9fcba15cb51e8a 117
+packages/db/src/utils/geo-checks.ts
+  s_f53a31e6153529::t_d34efcb7ec979b 1007
+  s_f53a31e6153529::t_1130cd355828c6 1003-1006,1008-1018,1023,1032,1050,1057,1097,1112
+apps/dashboard/src/components/geo/competitor-sheet-host.tsx
+  s_f53a31e6153529::t_d34efcb7ec979b 3,9,30,40-47
+packages/geo-core/src/schemas/geo.ts
+  s_f53a31e6153529::t_1b6b7f9a7fb68a 196-205
+packages/geo-core/src/types/geo.ts
+  s_f53a31e6153529::t_1b6b7f9a7fb68a 390-393
+packages/geo-core/src/utils/geo-competitor-names.ts
+  s_f53a31e6153529::t_1130cd355828c6 3-34
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_f53a31e6153529::t_1b6b7f9a7fb68a 70,169,1076-1078
+apps/dashboard/src/lib/hooks/use-geo-competitor-domain-backfill.ts
+  s_f53a31e6153529::t_dd09c62148f011 5,8,10,12,16-17,23-24,32,36-38,41,43-44,46-55,57-58
+  s_f53a31e6153529::t_d34efcb7ec979b 56
+apps/dashboard/src/utils/geo-competitor-scope.ts
+  s_f53a31e6153529::t_d34efcb7ec979b 49-52
+  s_f53a31e6153529::t_5438b3e678db0a 39-48,53-70,190-194,196-200
+  s_f53a31e6153529::t_9fcba15cb51e8a 7-9
+apps/dashboard/src/components/geo/competitor-edit-form.tsx
+  s_f53a31e6153529::t_ff3b7aac8e6f2c 352-356,358
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eb5c1e120bed7dbf0495a4ccd73eb6f1b9dc80d5",
+  "prompts": {},
+  "sessions": {
+    "s_f53a31e6153529": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ccb45782-d0f1-430f-b96e-5816ba3ceebf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
