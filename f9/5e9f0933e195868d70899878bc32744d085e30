@@ -1,0 +1,146 @@
+apps/dashboard/src/components/geo/competitor-detail-view.tsx
+  s_f53a31e6153529::t_512d9907ba471a 296-297,300
+  s_f53a31e6153529::t_a30be9ac2d1c63 22,164,169,174,179-181,184-185,187-190,192,194-206,508-513,521
+  s_f53a31e6153529::t_527bcf25ad8ceb 45-48
+  s_f53a31e6153529::t_3447eef5cf4425 495
+  s_f53a31e6153529::t_7695b5fd4d7777 276,278,412-415,419
+  s_f53a31e6153529::t_f91d3058396566 6,55,57,120-121,129-130,292-295,298-299,301-308,421,425,427-429,453-459,461-487,489-491,493-494,496-499,549
+packages/db/migrations/meta/_journal.json
+  ai_agent 830-836
+apps/dashboard/src/components/geo/competitor-modal.tsx
+  s_f53a31e6153529::t_d12c9fc11644d6 18-22,31
+packages/posthog/src/events.ts
+  s_f53a31e6153529::t_81571a3932fcff 71
+packages/geo-core/tests/geo-check-evaluation.test.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 35
+apps/dashboard/src/components/evilcharts/charts/echarts-bar-chart.tsx
+  s_f53a31e6153529::t_97da1dae3f6424 230,854,1266,1421,1942,2163,2219
+apps/dashboard/src/types/geo.ts
+  s_f53a31e6153529::t_d1e5f34579ce5d 1646-1652
+  s_f53a31e6153529::t_c27b7ff6e86124 80
+  s_f53a31e6153529::t_0034d8ddb9ce2d 1645
+  s_f53a31e6153529::t_d12c9fc11644d6 1640-1641,1653-1654
+  s_f53a31e6153529::t_31b5012ae79c63 1389-1390,1399
+apps/dashboard/src/components/geo/competitor-engine-matrix-card.tsx
+  s_f53a31e6153529::t_fda8e4c7075b15 3-4,14,17,34,55,98,117-121,145,154,158-162,170,216,259-280
+packages/geo-core/src/geo/prompt-translations.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 9,375
+apps/dashboard/src/components/geo/competitor-sheet-host.tsx
+  s_f53a31e6153529::t_d12c9fc11644d6 1,3-46,49-56
+apps/dashboard/src/types/route-modal.ts
+  s_f53a31e6153529::t_d12c9fc11644d6 4
+packages/geo-core/src/schemas/geo.ts
+  s_f53a31e6153529::t_d47364c4ec7a08 196-202
+apps/dashboard/src/lib/hooks/use-onboarding.ts
+  s_f53a31e6153529::t_66ed63a576dd62 4-8,53,55-71
+apps/dashboard/src/types/geo-competitors.ts
+  s_f53a31e6153529::t_439ade11129bfd 1-6,19-42
+apps/dashboard/messages/en.json
+  s_f53a31e6153529::t_a30be9ac2d1c63 2577-2578
+  s_f53a31e6153529::t_fda8e4c7075b15 2605-2607
+  s_f53a31e6153529::t_0034d8ddb9ce2d 4199
+  s_f53a31e6153529::t_527bcf25ad8ceb 2576
+  s_f53a31e6153529::t_718f5bb608b0c5 4144-4145
+  s_f53a31e6153529::t_d1e5f34579ce5d 4196-4198,4200-4202
+apps/dashboard/src/routes/-geo-ui.tsx
+  s_f53a31e6153529::t_0f569b43039cb8 13-14,96,99-108
+packages/db/src/schema.ts
+  s_f53a31e6153529::t_d47364c4ec7a08 1580-1584
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/page-client.tsx
+  s_f53a31e6153529::t_a3193ef94afb02 33,89
+  s_f53a31e6153529::t_0034d8ddb9ce2d 16,199-205
+  s_f53a31e6153529::t_1f81e6f6494202 36,133-142
+packages/geo-core/src/geo/scan-context.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 18
+apps/dashboard/src/utils/geo-competitors.ts
+  s_f53a31e6153529::t_0a13b63cbb2d90 394
+  s_f53a31e6153529::t_986d26e5013cde 25
+packages/geo-core/src/geo/model-live.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 18,23,235,299,314
+apps/dashboard/src/components/geo/competitor-suggestions-table.tsx
+  s_f53a31e6153529::t_0034d8ddb9ce2d 1-155
+apps/dashboard/src/components/geo/competitor-edit-form.tsx
+  s_f53a31e6153529::t_66ed63a576dd62 336-337,339-341
+  s_f53a31e6153529::t_31b5012ae79c63 45,296,315,338,342-353
+apps/dashboard/src/lib/hooks/use-geo.ts
+  s_f53a31e6153529::t_b961ffe69d49d0 70
+  s_f53a31e6153529::t_718f5bb608b0c5 250-297
+  s_f53a31e6153529::t_e29af305b12015 73,600-602,609-610,613-615,618,621-627,631,634-636,638-640
+apps/dashboard/src/utils/route-modal.ts
+  s_f53a31e6153529::t_d12c9fc11644d6 12,30,38
+apps/dashboard/src/constants/geo-competitors.ts
+  s_f53a31e6153529::t_439ade11129bfd 28-36
+  s_f53a31e6153529::t_66ed63a576dd62 37-38
+  s_f53a31e6153529::t_fda8e4c7075b15 9-10,12,14-19
+  s_f53a31e6153529::t_0a13b63cbb2d90 26-27
+  s_f53a31e6153529::t_527bcf25ad8ceb 20-25
+packages/geo-core/src/geo/persona-scan.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 429
+packages/geo-core/src/utils/geo-check-evaluation.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 32,41,45-52
+apps/dashboard/src/components/geo/competitor-edit-dialog.tsx
+  s_f53a31e6153529::t_31b5012ae79c63 21,42
+packages/geo-core/src/geo/mappers.ts
+  s_f53a31e6153529::t_d47364c4ec7a08 63
+apps/dashboard/src/utils/geo-competitor-scope.ts
+  s_f53a31e6153529::t_1ad68af6006111 125,127-129,131-139
+  s_f53a31e6153529::t_439ade11129bfd 1-124,126,130,140-148,150-174
+  s_f53a31e6153529::t_62f4726a0440e4 149
+apps/dashboard/src/lib/hooks/use-geo-competitor-domain-backfill.ts
+  s_f53a31e6153529::t_49d8ba6466ed18 1-35,37-44,46
+  s_f53a31e6153529::t_a3193ef94afb02 36,45
+packages/db/migrations/meta/0118_snapshot.json
+  ai_agent 1-15786
+packages/db/migrations/0118_geo_ignored_competitors.sql
+  ai_agent 1
+apps/dashboard/src/utils/geo-competitor.ts
+  s_f53a31e6153529::t_a30be9ac2d1c63 4
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_f53a31e6153529::t_20815b1105e438 366
+packages/geo-core/src/types/geo.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 700-701,836-837
+  s_f53a31e6153529::t_396a43d07fa5df 162-171
+  s_f53a31e6153529::t_be15565b2d064e 125
+  s_f53a31e6153529::t_d47364c4ec7a08 92-93,390-392
+apps/dashboard/src/routes/-dashboard-ui.tsx
+  s_f53a31e6153529::t_d12c9fc11644d6 174
+  s_f53a31e6153529::t_0f569b43039cb8 15
+packages/geo-core/src/constants/geo.ts
+  s_f53a31e6153529::t_613bab6f398145 41-51,388-389
+packages/geo-core/src/geo/programs.ts
+  s_f53a31e6153529::t_81571a3932fcff 65
+  s_f53a31e6153529::t_d47364c4ec7a08 492-520
+apps/dashboard/src/lib/orpc/routers/geo.ts
+  s_f53a31e6153529::t_91a6157b9befe8 70
+  s_f53a31e6153529::t_81571a3932fcff 168,1072-1084
+apps/dashboard/src/components/geo/share-of-voice-brand-tag.tsx
+  s_f53a31e6153529::t_572863f2c346dd 7
+apps/dashboard/messages/de.json
+  s_f53a31e6153529::t_527bcf25ad8ceb 2576
+  s_f53a31e6153529::t_718f5bb608b0c5 4144-4145
+  s_f53a31e6153529::t_0034d8ddb9ce2d 4199
+  s_f53a31e6153529::t_fda8e4c7075b15 2605-2607
+  s_f53a31e6153529::t_d1e5f34579ce5d 4196-4198,4200-4202
+  s_f53a31e6153529::t_a30be9ac2d1c63 2577-2578
+apps/dashboard/src/utils/geo-charts.ts
+  s_f53a31e6153529::t_396a43d07fa5df 784-785,821-823
+  s_f53a31e6153529::t_f72a5ae56fa3b3 824-827
+packages/geo-core/src/geo/scan.ts
+  s_f53a31e6153529::t_8899c2f1a0e451 1123,2024
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f95e9f0933e195868d70899878bc32744d085e30",
+  "prompts": {},
+  "sessions": {
+    "s_f53a31e6153529": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ccb45782-d0f1-430f-b96e-5816ba3ceebf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
