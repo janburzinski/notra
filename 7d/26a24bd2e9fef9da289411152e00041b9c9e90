@@ -1,0 +1,23 @@
+infra/observability/constants/prometheus-fixtures.mjs
+  s_f9ae1f3c815fd9::t_e13884ea42096f 11-12,16-17
+infra/observability/check-prometheus-resources.mjs
+  s_f9ae1f3c815fd9::t_e13884ea42096f 316-317
+infra/observability/utils/prometheus-fixture.mjs
+  s_f9ae1f3c815fd9::t_e13884ea42096f 62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7d26a24bd2e9fef9da289411152e00041b9c9e90",
+  "prompts": {},
+  "sessions": {
+    "s_f9ae1f3c815fd9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a133a4-fd40-7b00-a3aa-87f40cdd7488",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
