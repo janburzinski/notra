@@ -1,0 +1,27 @@
+apps/web/src/components/blog-post-toc.tsx
+  s_00f57d6ad2f65b::t_478e4eb940ee3f 20-22,160-162,182-184
+  s_00f57d6ad2f65b::t_5705576bd8013d 152,177
+  s_00f57d6ad2f65b::t_08db7b630af9fa 33-36,133,174
+  s_00f57d6ad2f65b::t_5383eb3eaa6191 3-4,13,19,23-24,126-131,134-148,155-159,163-165,167-173,175-176,178-181,185-198
+apps/web/src/lib/blog/toc.ts
+  s_00f57d6ad2f65b::t_5383eb3eaa6191 2,4,30-42,45
+apps/web/types/blog.ts
+  ai_agent 149
+  s_00f57d6ad2f65b::t_5383eb3eaa6191 151-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b4779e70d8057998ed0e00dceef0e51488fdc3ce",
+  "prompts": {},
+  "sessions": {
+    "s_00f57d6ad2f65b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02bf849a-9aaa-4d95-8d8d-64f065f09bd5",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
