@@ -1,0 +1,58 @@
+apps/dashboard/src/components/geo/purpose-badge.tsx
+  s_67d72b59596675::t_2376e2824d7ce0 4,32,35,38-39
+  s_67d72b59596675::t_a87d1d6e6b554d 33
+apps/dashboard/src/components/geo/journey-group-sheet.tsx
+  s_67d72b59596675::t_2376e2824d7ce0 81
+apps/dashboard/src/utils/ai-traffic-groups.ts
+  s_67d72b59596675::t_21b905427aafc3 246-274
+packages/analytics/src/tinybird/pipes/geo-traffic.ts
+  s_67d72b59596675::t_7fee56e72acf85 144-146,169-171,179-180,221-222
+packages/geo-core/src/geo/programs.ts
+  s_67d72b59596675::t_7fee56e72acf85 1296-1298,1300-1302
+apps/dashboard/src/components/geo/traffic-sheet-hero.tsx
+  s_67d72b59596675::t_21b905427aafc3 59
+apps/dashboard/src/components/geo/daily-trend-chart.tsx
+  s_67d72b59596675::t_43e94dbf0bab8a 9,13,42,44,51-52,57-60
+packages/geo-core/src/types/geo.ts
+  s_67d72b59596675::t_7fee56e72acf85 1046,1048
+apps/dashboard/src/components/geo/journey-detail-sheet.tsx
+  s_67d72b59596675::t_2376e2824d7ce0 171
+apps/dashboard/src/constants/geo-traffic-sources.ts
+  s_67d72b59596675::t_0dce44ae69e802 16
+  s_67d72b59596675::t_d72f2b6212edbb 15
+packages/analytics/src/tinybird/demo-geo-traffic.ts
+  s_67d72b59596675::t_7fee56e72acf85 130-131,154-155,166-167,176
+apps/docs/ai-traffic/overview.mdx
+  s_67d72b59596675::t_21b905427aafc3 112
+apps/dashboard/src/types/geo.ts
+  s_67d72b59596675::t_21b905427aafc3 512-513
+apps/dashboard/src/lib/hooks/use-traffic-source-columns.tsx
+  s_67d72b59596675::t_d72f2b6212edbb 49-53
+packages/schemas/src/schemas/api/geo-traffic.ts
+  s_67d72b59596675::t_7fee56e72acf85 108,110
+apps/dashboard/src/components/geo/traffic-source-sheet.tsx
+  s_67d72b59596675::t_21b905427aafc3 46-47,110-119,123-128,140-141,155-158,164-170
+  s_67d72b59596675::t_2376e2824d7ce0 204
+  s_67d72b59596675::t_fe6bbee4555b18 120-122
+packages/geo-core/tests/traffic-baseline.test.ts
+  s_67d72b59596675::t_43cf45137eeaa6 84-85,120-121,135-136
+apps/dashboard/src/constants/design-system-traffic.ts
+  s_67d72b59596675::t_43cf45137eeaa6 27-31
+  s_67d72b59596675::t_91c78f6cf7efad 9-13,20,26,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ac797a3693b7eb692386515082262c807d711e27",
+  "prompts": {},
+  "sessions": {
+    "s_67d72b59596675": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e99a2e3d-270f-4f2b-a5ea-31ca473f2d8c",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
