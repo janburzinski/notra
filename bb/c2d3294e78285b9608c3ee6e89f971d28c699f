@@ -1,0 +1,19 @@
+packages/db/src/utils/geo-checks.ts
+  s_f53a31e6153529::t_90cd2533ff3bcb 1004,1018
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bbc2d3294e78285b9608c3ee6e89f971d28c699f",
+  "prompts": {},
+  "sessions": {
+    "s_f53a31e6153529": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ccb45782-d0f1-430f-b96e-5816ba3ceebf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
