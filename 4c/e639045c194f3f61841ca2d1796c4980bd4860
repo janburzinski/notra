@@ -1,0 +1,26 @@
+apps/dashboard/src/components/geo/engine-family-sheet.tsx
+  s_197e2ebc6864d7::t_7ac8c834107c66 57,118,122,144-145,478,517
+apps/dashboard/src/utils/geo-prompts.ts
+  s_197e2ebc6864d7::t_7ac8c834107c66 221-224,226-228,230-232,234-237,243-261
+  s_197e2ebc6864d7::t_229f1867fa6e92 225,229,233,238-242
+apps/dashboard/src/lib/hooks/use-engine-family-sheet.ts
+  s_197e2ebc6864d7::t_229f1867fa6e92 61-64
+  s_197e2ebc6864d7::t_7ac8c834107c66 17,30,116
+  s_197e2ebc6864d7::t_15f1fe0fab38f2 76-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4ce639045c194f3f61841ca2d1796c4980bd4860",
+  "prompts": {},
+  "sessions": {
+    "s_197e2ebc6864d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd7b9e45-6b87-4274-8a84-8d7ec3dfd637",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
