@@ -1,0 +1,9 @@
+apps/web/src/components/blog-post-toc.tsx
+  ai_agent 174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fc0a4c98acd6680852f6586dd8572d1e3462bb96",
+  "prompts": {}
+}
