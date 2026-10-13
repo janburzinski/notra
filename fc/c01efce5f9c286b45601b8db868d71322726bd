@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/geo-count-cell.test.tsx
+  s_197e2ebc6864d7::t_2c23c164c1bec6 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fcc01efce5f9c286b45601b8db868d71322726bd",
+  "prompts": {},
+  "sessions": {
+    "s_197e2ebc6864d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd7b9e45-6b87-4274-8a84-8d7ec3dfd637",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
