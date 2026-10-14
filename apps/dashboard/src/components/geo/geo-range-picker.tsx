@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowDown01Icon, Calendar03Icon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  GEO_FILTER_TRIGGER_CLASS,
   GEO_MAX_RANGE_DAYS,
   GEO_RANGE_PRESETS,
 } from "@notra/geo-core/constants/geo";
@@ -72,12 +71,11 @@ export function GeoRangePicker({ control }: GeoRangePickerProps) {
     <Popover onOpenChange={handleOpenChange} open={open}>
       <PopoverTrigger
         aria-label={t("label")}
-        className={GEO_FILTER_TRIGGER_CLASS}
+        render={<Button size="sm" variant="secondary" />}
       >
         <HugeiconsIcon
-          className="text-muted-foreground"
+          className="text-muted-foreground size-3.5"
           icon={Calendar03Icon}
-          size={12}
         />
         <span className="tabular-nums">
           {control.preset === "custom"
@@ -85,9 +83,9 @@ export function GeoRangePicker({ control }: GeoRangePickerProps) {
             : tLabels(GEO_RANGE_PRESET_LABEL_KEYS[control.preset])}
         </span>
         <HugeiconsIcon
-          className="text-muted-foreground"
-          icon={ArrowDown01Icon}
-          size={12}
+          className="text-muted-foreground pointer-events-none size-4"
+          icon={UnfoldMoreIcon}
+          strokeWidth={2}
         />
       </PopoverTrigger>
       <PopoverContent align="end" className="w-auto overflow-hidden p-0">
