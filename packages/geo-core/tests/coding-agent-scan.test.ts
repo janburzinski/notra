@@ -153,7 +153,7 @@ describe("coding-agent task scans", () => {
       );
       expect(result.tasks).toMatchObject({
         checks: 0,
-        dropped: 6,
+        dropped: GEO_PAID_CODING_AGENT_ENGINE_IDS.length,
         engineUsage: { totalUsd: 0 },
       });
       expect(result.sequences).toMatchObject({

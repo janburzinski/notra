@@ -135,7 +135,10 @@ function markHiddenGeoModels(
   entries: readonly GeoModelCatalogEntry[]
 ): GeoModelCatalogEntry[] {
   return entries.map((entry) => {
-    const hidden = !entry.default && GEO_MODEL_HIDDEN_ID_PATTERN.test(entry.id);
+    const hidden =
+      !entry.default &&
+      !STATIC_ENGINE_IDS.has(entry.id) &&
+      GEO_MODEL_HIDDEN_ID_PATTERN.test(entry.id);
     return hidden ? { ...entry, hidden } : entry;
   });
 }

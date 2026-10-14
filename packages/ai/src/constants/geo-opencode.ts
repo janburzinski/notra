@@ -1,4 +1,4 @@
-export const GEO_OPENCODE_BOX_MODEL_ID = "openrouter/openai/gpt-5.6-sol";
+export const GEO_OPENCODE_BOX_MODEL_ID = "openrouter/openai/gpt-6.1-sol";
 export const GEO_OPENCODE_REASONING_EFFORT = "medium" as const;
 export const GEO_CLAUDE_CODE_EFFORT = "medium" as const;
 export const GEO_CODEX_REASONING_EFFORT = "medium" as const;

@@ -16,6 +16,7 @@ import {
 } from "../src/constants/geo";
 import { GeoCodingAgentAccessService } from "../src/deps";
 import { loadGeoModelCatalog } from "../src/geo/model-catalog";
+import { geoBoxAgentForEngine } from "../src/utils/geo-coding-agents";
 import {
   geoEngineUsedWebSearch,
   isGeoNativeSearchEngine,
@@ -25,7 +26,10 @@ import {
   resolveTrackedEngines,
   geoScanEmptyEngineSkipReason,
 } from "../src/utils/geo-engines";
-import { seedGeoModelCatalog } from "../src/utils/geo-model-catalog";
+import {
+  geoModelsForProvider,
+  seedGeoModelCatalog,
+} from "../src/utils/geo-model-catalog";
 import { CODING_AGENT_TARGETS } from "./constants/coding-agents";
 
 const envKeys = [
@@ -70,6 +74,33 @@ afterAll(() => {
 });
 
 describe("coding-agent catalog and paid-plan boundaries", () => {
+  test.each(["claude-code", "codex", "opencode"])(
+    "%s exposes its curated selectable models with explicit run targets",
+    (provider) => {
+      const catalog = seedGeoModelCatalog();
+      const models = geoModelsForProvider(catalog, provider);
+      expect(models).toHaveLength(provider === "opencode" ? 5 : 3);
+      for (const model of models) {
+        expect(model.hidden).not.toBe(true);
+        expect(geoBoxAgentForEngine(model.id)?.harness).toBe(provider);
+      }
+    }
+  );
+
+  test("migrates retired coding-agent selections to available successors", () => {
+    expect(
+      resolveTrackedEngines(seedGeoModelCatalog(), [
+        "opencode/gpt-5.6-sol-medium",
+        "claude-code/claude-opus-5",
+        "codex/gpt-5.6-sol-rei",
+      ])
+    ).toEqual([
+      "opencode/gpt-6.1-sol-medium",
+      "claude-code/claude-opus-5.5",
+      "codex/gpt-6.1-sol",
+    ]);
+  });
+
   test.each([false, true])(
     "paid=%s gates every coding engine without rollout flags",
     async (paid) => {
@@ -145,9 +176,9 @@ describe("coding-agent catalog and paid-plan boundaries", () => {
       catalog.models.some((model) => model.id === GEO_OPENCODE_ENGINE_ID)
     ).toBe(false);
     for (const [engine, harness] of CODING_AGENT_TARGETS) {
-      if (harness) {
-        expect(catalog.models.some((model) => model.id === engine)).toBe(true);
-      }
+      expect(catalog.models.some((model) => model.id === engine)).toBe(
+        harness !== "opencode"
+      );
     }
   });
 });

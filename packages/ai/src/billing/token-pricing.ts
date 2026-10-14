@@ -66,6 +66,7 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
   "vercel/anthropic/claude-opus-5": CLAUDE_OPUS_5_PRICING,
   "opencode/claude-opus-5.5": CLAUDE_OPUS_5_5_PRICING,
   "anthropic/claude-opus-5.5": CLAUDE_OPUS_5_5_PRICING,
+  "anthropic/claude-opus-5-5": CLAUDE_OPUS_5_5_PRICING,
   "vercel/anthropic/claude-opus-5.5": CLAUDE_OPUS_5_5_PRICING,
   "opencode/claude-opus-4-8": CLAUDE_OPUS_4_8_PRICING,
   "anthropic/claude-opus-4.8": CLAUDE_OPUS_4_8_PRICING,
@@ -77,6 +78,7 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
   "anthropic/claude-sonnet-5": CLAUDE_SONNET_5_PRICING,
   "vercel/anthropic/claude-sonnet-5": CLAUDE_SONNET_5_PRICING,
   "anthropic/claude-sonnet-5.5": CLAUDE_SONNET_5_PRICING,
+  "anthropic/claude-sonnet-5-5": CLAUDE_SONNET_5_PRICING,
   "vercel/anthropic/claude-sonnet-5.5": CLAUDE_SONNET_5_PRICING,
   "anthropic/claude-haiku-4.5": {
     inputPerMillionTokens: 1.0,
@@ -139,6 +141,19 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
       outputPerMillionTokens: 45.0,
       cacheReadPerMillionTokens: 1.0,
       cacheWritePerMillionTokens: 0,
+    },
+  },
+  "openai/gpt-6.1-sol": {
+    inputPerMillionTokens: 2.0,
+    outputPerMillionTokens: 10.0,
+    cacheReadPerMillionTokens: 0.1,
+    cacheWritePerMillionTokens: 2.5,
+    longContext: {
+      promptTokens: OPENAI_LONG_CONTEXT_PROMPT_TOKENS,
+      inputPerMillionTokens: 4.0,
+      outputPerMillionTokens: 15.0,
+      cacheReadPerMillionTokens: 0.2,
+      cacheWritePerMillionTokens: 5.0,
     },
   },
   "openai/gpt-6-sol": {
@@ -310,10 +325,12 @@ export function getModelPricing(
   modelId?: string,
   source?: ModelPricingSource
 ): ModelPricing {
-  const routedModelId = source && modelId ? `${source}/${modelId}` : undefined;
+  const normalizedModelId = modelId?.replace(/^openrouter\//, "");
+  const routedModelId =
+    source && normalizedModelId ? `${source}/${normalizedModelId}` : undefined;
   return (
     (routedModelId && MODEL_PRICING[routedModelId]) ||
-    (modelId && MODEL_PRICING[modelId]) ||
+    (normalizedModelId && MODEL_PRICING[normalizedModelId]) ||
     DEFAULT_PRICING
   );
 }

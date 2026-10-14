@@ -53,22 +53,31 @@ export const GEO_SERPAPI_API_KEY_ENV = "SERPAPI_API_KEY";
 /** Catalog id of the Cursor engine; the SDK model id is the slug part. */
 export const GEO_CURSOR_ENGINE_ID = "cursor/composer-2.5";
 export const GEO_CURSOR_MODEL_ID = "composer-2.5";
-export const GEO_OPENCODE_ENGINE_ID = "opencode/gpt-5.6-sol-medium";
+export const GEO_OPENCODE_ENGINE_ID = "opencode/gpt-6.1-sol-medium";
+export const GEO_OPENCODE_ENGINE_IDS = [
+  "opencode/gpt-6-astra",
+  "opencode/gpt-6-luna",
+  "opencode/gpt-6.1-sol-medium",
+  "opencode/claude-sonnet-5.5",
+  "opencode/claude-opus-5.5",
+] as const;
 export const GEO_CLAUDE_CODE_ENGINE_IDS = [
+  "claude-code/claude-sonnet-5.5",
+  "claude-code/claude-opus-5.5",
   "claude-code/claude-fable-5.1",
-  "claude-code/claude-opus-5",
 ] as const;
 export const GEO_CODEX_ENGINE_IDS = [
+  "codex/gpt-6.1-sol",
+  "codex/gpt-6-luna",
   "codex/gpt-6-astra",
-  "codex/gpt-5.6-sol-rei",
 ] as const;
 export const GEO_CODING_AGENT_ENGINE_IDS = [
+  ...GEO_OPENCODE_ENGINE_IDS,
   ...GEO_CLAUDE_CODE_ENGINE_IDS,
   ...GEO_CODEX_ENGINE_IDS,
 ] as const;
 export const GEO_PAID_CODING_AGENT_ENGINE_IDS: readonly string[] = [
   GEO_CURSOR_ENGINE_ID,
-  GEO_OPENCODE_ENGINE_ID,
   ...GEO_CODING_AGENT_ENGINE_IDS,
 ];
 export const GEO_AI_OVERVIEW_ENGINE_ID = "google/ai-overview";

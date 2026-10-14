@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import assert from "node:assert/strict";
 
 import { calculateAiCreditCostCents } from "@notra/ai/billing/ai-credit-cost";
+import { getModelPricing } from "@notra/ai/billing/token-pricing";
 import { geoBoxTokenUsage } from "@notra/ai/utils/geo-opencode-usage";
 
 import { geoBoxAgentForEngine } from "../src/utils/geo-coding-agents";
@@ -12,6 +13,27 @@ import {
 } from "../src/utils/token-usage";
 
 describe("GEO billing usage", () => {
+  test.each([
+    ["claude-code/claude-sonnet-5.5", 2, 10],
+    ["claude-code/claude-opus-5.5", 4, 20],
+    ["claude-code/claude-fable-5.1", 10, 50],
+    ["codex/gpt-6.1-sol", 2, 10],
+    ["codex/gpt-6-luna", 0.1, 0.5],
+    ["codex/gpt-6-astra", 10, 50],
+    ["opencode/gpt-6.1-sol-medium", 2, 10],
+    ["opencode/gpt-6-luna", 0.1, 0.5],
+    ["opencode/gpt-6-astra", 10, 50],
+    ["opencode/claude-sonnet-5.5", 2, 10],
+    ["opencode/claude-opus-5.5", 4, 20],
+  ] as const)("%s prices its actual run model", (engine, input, output) => {
+    const target = geoBoxAgentForEngine(engine);
+    assert.ok(target);
+    expect(getModelPricing(target.model)).toMatchObject({
+      inputPerMillionTokens: input,
+      outputPerMillionTokens: output,
+    });
+  });
+
   test("Codex fallback pricing matches its observed Box backend run cost", () => {
     const usage = geoBoxTokenUsage(
       {
@@ -71,7 +93,7 @@ describe("GEO billing usage", () => {
   });
 
   test("keeps Box costs through turn, batch, and project aggregation", () => {
-    const opusTarget = geoBoxAgentForEngine("claude-code/claude-opus-5");
+    const opusTarget = geoBoxAgentForEngine("claude-code/claude-opus-5.5");
     const codexTarget = geoBoxAgentForEngine("codex/gpt-6-astra");
     assert.ok(opusTarget);
     assert.ok(codexTarget);
@@ -95,7 +117,7 @@ describe("GEO billing usage", () => {
       },
       codexTarget.model
     );
-    expect(opus.modelId).toBe("anthropic/claude-opus-5");
+    expect(opus.modelId).toBe("anthropic/claude-opus-5-5");
     expect(codex.modelId).toBe("openai/gpt-6-astra");
     const sequence = addAgentTokenUsage(
       addAgentTokenUsage(EMPTY_AGENT_TOKEN_USAGE, opus),
@@ -119,7 +141,7 @@ describe("GEO billing usage", () => {
   });
 
   test("uses the mapped model when Box has no reported cost", () => {
-    const opusTarget = geoBoxAgentForEngine("claude-code/claude-opus-5");
+    const opusTarget = geoBoxAgentForEngine("claude-code/claude-opus-5.5");
     assert.ok(opusTarget);
     const usage = geoBoxTokenUsage(
       {
@@ -132,10 +154,10 @@ describe("GEO billing usage", () => {
       opusTarget.model
     );
     const total = addAgentTokenUsage(EMPTY_AGENT_TOKEN_USAGE, usage);
-    expect(total.totalUsd).toBeCloseTo(29.1);
+    expect(total.totalUsd).toBeCloseTo(23.24);
     expect(
       calculateAiCreditCostCents(total, "openai/gpt-5.4-mini", false).costCents
-    ).toBe(2910);
+    ).toBe(2324);
   });
 
   test("includes token-priced calls alongside reported Box costs without rounding each call", () => {

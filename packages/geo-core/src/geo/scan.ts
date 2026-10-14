@@ -2007,10 +2007,7 @@ const runGeoSequenceNowProgram = Effect.fn("geo.runSequenceNow")(function* (
     groundedEngines.push({ grounded, zdr });
   }
   const boxReplayEngines: { engine: string; zdr: GeoZdrMode }[] = [];
-  for (const engineId of [
-    GEO_OPENCODE_ENGINE_ID,
-    ...GEO_CODING_AGENT_ENGINE_IDS,
-  ]) {
+  for (const engineId of GEO_CODING_AGENT_ENGINE_IDS) {
     if (
       !settings.engines.includes(engineId) ||
       !catalog.models.some((model) => model.id === engineId)

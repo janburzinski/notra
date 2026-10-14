@@ -1,9 +1,15 @@
 export const CODING_AGENT_TARGETS = [
-  ["opencode/gpt-5.6-sol-medium", undefined],
+  ["opencode/gpt-6-astra", "opencode"],
+  ["opencode/gpt-6-luna", "opencode"],
+  ["opencode/gpt-6.1-sol-medium", "opencode"],
+  ["opencode/claude-sonnet-5.5", "opencode"],
+  ["opencode/claude-opus-5.5", "opencode"],
+  ["claude-code/claude-sonnet-5.5", "claude-code"],
+  ["claude-code/claude-opus-5.5", "claude-code"],
   ["claude-code/claude-fable-5.1", "claude-code"],
-  ["claude-code/claude-opus-5", "claude-code"],
+  ["codex/gpt-6.1-sol", "codex"],
+  ["codex/gpt-6-luna", "codex"],
   ["codex/gpt-6-astra", "codex"],
-  ["codex/gpt-5.6-sol-rei", "codex"],
 ] as const;
 
 export const CODING_AGENT_USAGE = {
