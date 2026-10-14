@@ -2,6 +2,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { createOpenAI, openai } from "@ai-sdk/openai";
 import { createPerplexity } from "@ai-sdk/perplexity";
+import { xai } from "@ai-sdk/xai";
 import { gateway } from "@notra/ai/gateway";
 import { requireApiKey } from "@notra/utils/require-api-key";
 
@@ -52,6 +53,11 @@ export function buildGroundedInvocation(
       };
     case "gateway-perplexity":
       return { model: gateway(engine.model, groundedGateway), tools: {} };
+    case "gateway-spacexai":
+      return {
+        model: gateway(engine.model, groundedGateway),
+        tools: { web_search: xai.tools.webSearch({}) },
+      };
     case "direct-openai": {
       const provider = createOpenAI({
         apiKey: requireApiKey(GEO_OPENAI_API_KEY_ENV),

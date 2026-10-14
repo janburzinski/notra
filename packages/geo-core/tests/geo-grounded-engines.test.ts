@@ -7,6 +7,7 @@ import {
 import type { GeoModelCatalog } from "../src/types/geo";
 import { engineModelOf } from "../src/utils/geo-engine-family";
 import {
+  isGeoWebSearchEngine,
   isPartialGeoScanEngineScope,
   resolveGeoGroundedZdrMode,
 } from "../src/utils/geo-engines";
@@ -25,6 +26,75 @@ const catalog: GeoModelCatalog = {
 };
 
 describe("selected grounded engines", () => {
+  test("Grok models use native gateway search and retain their ZDR policy", () => {
+    const available = buildGeoModelCatalogFromFeed([
+      {
+        id: "spacexai/grok-4.7",
+        name: "Grok 4.7",
+        owned_by: "spacexai",
+        type: "language",
+        zdr: "all",
+      },
+      {
+        id: "spacexai/grok-4.5",
+        name: "Grok 4.5",
+        owned_by: "spacexai",
+        type: "language",
+        zdr: "none",
+      },
+      {
+        id: "spacexai/grok-4.3",
+        name: "Grok 4.3",
+        owned_by: "spacexai",
+        type: "language",
+        zdr: "all",
+      },
+    ]);
+    const resolved = {
+      ...available,
+      models: available.models.map((model) => ({
+        ...model,
+        supportsGroundedChecks:
+          resolveGroundedEngines([model.id], available).length > 0,
+      })),
+    };
+    for (const model of available.models.filter(
+      (entry) => entry.provider === "spacexai"
+    )) {
+      const [engine] = resolveGroundedEngines([model.id], available);
+      expect(engine).toMatchObject({
+        key: `${model.id}-grounded`,
+        model: model.id,
+        provider: "gateway-spacexai",
+      });
+      expect(resolveGroundedEngineByKey(engine?.key ?? "")?.model).toBe(
+        model.id
+      );
+      expect(isGeoWebSearchEngine(resolved, model.id)).toBe(true);
+      if (!engine) {
+        throw new Error("Grok should have a grounded route");
+      }
+      expect(
+        resolveGeoGroundedZdrMode(available, engine, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: [],
+        })
+      ).toBe(model.zdr === "none" ? null : "required");
+      expect(
+        resolveGeoGroundedZdrMode(available, engine, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: [model.id],
+        })
+      ).toBe(model.zdr === "none" ? "preferred" : "required");
+      expect(
+        resolveGroundedEngines([model.id], {
+          ...available,
+          models: [{ ...model, gateways: ["openrouter"] }],
+        })
+      ).toEqual([]);
+    }
+  });
+
   test("only plans selected models, even when older models remain in the catalog", () => {
     const selected = ["anthropic/claude-sonnet-5", "openai/gpt-5.6-sol"];
     const engines = resolveGroundedEngines(selected, catalog);

@@ -98,6 +98,11 @@ function collectToolOutputs(
       }
       if (isRecord(item.action)) {
         addQuery(queries, seenQueries, item.action.query);
+        for (const query of Array.isArray(item.action.queries)
+          ? item.action.queries
+          : []) {
+          addQuery(queries, seenQueries, query);
+        }
       }
       addQuery(queries, seenQueries, item.query);
       addSource(sources, seenUrls, item);
