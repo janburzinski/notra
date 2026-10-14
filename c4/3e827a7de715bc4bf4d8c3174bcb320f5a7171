@@ -1,0 +1,26 @@
+apps/web/tests/fixtures/geo-ingest-fetch.mjs
+  s_b0cc07746965aa::t_bea19c3fca4bc1 1-16
+apps/web/src/start.ts
+  s_b0cc07746965aa::t_2ae21a6154d74a 50,70-81
+apps/web/tests/production-cache.test.mjs
+  s_b0cc07746965aa::t_b2683025596cff 7-26,65-80,82-101
+  s_b0cc07746965aa::t_79288f8ce2a272 36
+  s_b0cc07746965aa::t_0ea204d0bfd160 81
+  s_b0cc07746965aa::t_bea19c3fca4bc1 27-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c43e827a7de715bc4bf4d8c3174bcb320f5a7171",
+  "prompts": {},
+  "sessions": {
+    "s_b0cc07746965aa": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13a28-892e-7790-a718-518d942ade77",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
