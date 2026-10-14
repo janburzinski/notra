@@ -45,17 +45,9 @@ async function proxy(request: Request, next: () => Promise<Response>) {
     return next();
   }
 
-  if (geoTagLinks) {
-    const tagged = await tagMarkdownResponse(request, geoTagLinks, {});
-    if (tagged) {
-      tagged.headers.set("Cache-Control", DYNAMIC_PAGE_CACHE_CONTROL);
-      waitUntil(request, geoTracker.track(request));
-      return tagged;
-    }
-  }
   waitUntil(request, geoTracker.track(request));
 
-  return negotiateMarkdown(request, async () => {
+  const response = await negotiateMarkdown(request, async () => {
     const response = await next();
     if (response.status !== 200) {
       return response;
@@ -75,6 +67,18 @@ async function proxy(request: Request, next: () => Promise<Response>) {
     }
     return response;
   });
+
+  if (geoTagLinks) {
+    const tagged = await tagMarkdownResponse(request, geoTagLinks, {
+      // Reuse the rendered page instead of tracking an internal HTTP visit.
+      fetch: () => Promise.resolve(response.clone()),
+    });
+    if (tagged) {
+      tagged.headers.set("Cache-Control", DYNAMIC_PAGE_CACHE_CONTROL);
+      return tagged;
+    }
+  }
+  return response;
 }
 
 const siteMiddleware = createMiddleware().server(async ({ request, next }) => {
