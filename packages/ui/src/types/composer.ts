@@ -1,3 +1,4 @@
+import type { ButtonProps } from "@notra/ui/components/ui/button";
 import type { ComponentProps, ReactNode } from "react";
 
 export interface ComposerFrameProps {
@@ -31,12 +32,15 @@ export interface ComposerChipProps {
   labelClassName?: string;
 }
 
+export type ComposerInputProps = ComponentProps<"textarea">;
+
 export interface ComposerToolbarProps {
   children: ReactNode;
   className?: string;
 }
 
-export type ComposerToolbarButtonProps = ComponentProps<"button">;
+/** A ghost `Button`. Use `size="icon-sm"` for icon-only actions. */
+export type ComposerToolbarButtonProps = Omit<ButtonProps, "variant">;
 
 export interface ComposerSendProps {
   children: ReactNode;

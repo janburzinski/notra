@@ -955,134 +955,114 @@ function ChatComposerContextPicker({
   const t = useTranslations("chat.input.contextPicker");
   const tChatShared = useTranslations("chat.shared");
   return (
-    <Tooltip disabled={isContextPickerOpen}>
-      <TooltipTrigger
-        render={
-          contextPickerDisabledReason ? (
-            // biome-ignore lint/a11y/useSemanticElements: a real button would illegally nest the disabled popover trigger button.
-            <span
-              aria-disabled="true"
-              aria-label={tChatShared("addToolsOrContext")}
-              className="inline-flex size-7 shrink-0 cursor-not-allowed items-center justify-center"
-              role="button"
-              tabIndex={0}
+    <Popover onOpenChange={setIsContextPickerOpen} open={isContextPickerOpen}>
+      <Tooltip disabled={isContextPickerOpen}>
+        <TooltipTrigger
+          render={
+            <PopoverTrigger
+              render={
+                <Composer.ToolbarButton
+                  aria-label={tChatShared("addToolsOrContext")}
+                  disabled={isLoading || isQueued}
+                  // Stays focusable while disabled so the tooltip can explain why.
+                  focusableWhenDisabled
+                  size="icon-sm"
+                />
+              }
             />
-          ) : (
-            <span className="inline-flex size-7 shrink-0 items-center justify-center" />
-          )
-        }
-      >
-        <Popover
-          onOpenChange={setIsContextPickerOpen}
-          open={isContextPickerOpen}
+          }
         >
-          <PopoverTrigger
-            render={
-              <Composer.ToolbarButton
-                aria-controls={contextPickerId}
-                aria-expanded={isContextPickerOpen}
-                aria-haspopup="listbox"
-                aria-label={tChatShared("addToolsOrContext")}
-                className="size-7 justify-center px-0"
-                disabled={isLoading || isQueued}
-                role="combobox"
+          <HugeiconsIcon className="size-4" icon={AtIcon} />
+        </TooltipTrigger>
+        <TooltipContent>
+          {contextPickerDisabledReason ?? tChatShared("toolsAndContext")}
+        </TooltipContent>
+      </Tooltip>
+      <PopoverContent
+        align="start"
+        className="w-80 p-0"
+        id={contextPickerId}
+        sideOffset={6}
+      >
+        <Command>
+          <CommandInput placeholder={tChatShared("searchToolsAndContext")} />
+          <CommandList>
+            <CommandEmpty>
+              {contextOptions.length === 0
+                ? tChatShared("noMatchingIntegrations")
+                : tChatShared("noMatchingToolsOrContext")}
+            </CommandEmpty>
+            {contextOptions.length === 0 && organizationSlug ? (
+              <ChatContextConnectSuggestions
+                onSelect={() => setIsContextPickerOpen(false)}
+                organizationSlug={organizationSlug}
               />
-            }
-          >
-            <HugeiconsIcon className="size-4" icon={AtIcon} />
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="w-80 p-0"
-            id={contextPickerId}
-            sideOffset={6}
-          >
-            <Command>
-              <CommandInput
-                placeholder={tChatShared("searchToolsAndContext")}
-              />
-              <CommandList>
-                <CommandEmpty>
-                  {contextOptions.length === 0
-                    ? tChatShared("noMatchingIntegrations")
-                    : tChatShared("noMatchingToolsOrContext")}
-                </CommandEmpty>
-                {contextOptions.length === 0 && organizationSlug ? (
-                  <ChatContextConnectSuggestions
-                    onSelect={() => setIsContextPickerOpen(false)}
-                    organizationSlug={organizationSlug}
-                  />
-                ) : null}
-                {integrationContextOptions.length > 0 ? (
-                  <CommandGroup heading={tChatShared("context")}>
-                    {integrationContextOptions.map((option) => {
-                      const inContext = isInContext(option.contextItem);
-                      return (
-                        <CommandItem
-                          data-checked={inContext}
-                          key={option.id}
-                          keywords={[option.searchText]}
-                          onSelect={() => {
-                            if (inContext) {
-                              removeContext(option.contextItem);
-                            } else {
-                              addContext(option);
-                            }
-                            setIsContextPickerOpen(false);
-                          }}
-                          value={option.id}
-                        >
-                          <ChatContextOptionContent option={option} />
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                ) : null}
-                {mcpToolOptions.length > 0 ? (
-                  <CommandGroup heading={t("mcpGroup")}>
-                    {mcpToolOptions.map((option) => {
-                      const inContext = isInContext(option.contextItem);
-                      return (
-                        <CommandItem
-                          data-checked={inContext}
-                          key={option.id}
-                          keywords={[option.searchText]}
-                          onSelect={() => {
-                            if (inContext) {
-                              removeContext(option.contextItem);
-                            } else {
-                              addContext(option);
-                            }
-                            setIsContextPickerOpen(false);
-                          }}
-                          value={option.id}
-                        >
-                          <ChatContextOptionContent option={option} />
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                ) : null}
-              </CommandList>
-              {organizationSlug ? (
-                <div className="border-border border-t p-1">
-                  <Link
-                    className="text-muted-foreground hover:bg-accent hover:text-accent-foreground flex items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
-                    href={`/${organizationSlug}/integrations`}
-                    onClick={() => setIsContextPickerOpen(false)}
-                  >
-                    {tChatShared("manageIntegrations")}
-                  </Link>
-                </div>
-              ) : null}
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </TooltipTrigger>
-      <TooltipContent>
-        {contextPickerDisabledReason ?? tChatShared("toolsAndContext")}
-      </TooltipContent>
-    </Tooltip>
+            ) : null}
+            {integrationContextOptions.length > 0 ? (
+              <CommandGroup heading={tChatShared("context")}>
+                {integrationContextOptions.map((option) => {
+                  const inContext = isInContext(option.contextItem);
+                  return (
+                    <CommandItem
+                      data-checked={inContext}
+                      key={option.id}
+                      keywords={[option.searchText]}
+                      onSelect={() => {
+                        if (inContext) {
+                          removeContext(option.contextItem);
+                        } else {
+                          addContext(option);
+                        }
+                        setIsContextPickerOpen(false);
+                      }}
+                      value={option.id}
+                    >
+                      <ChatContextOptionContent option={option} />
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            ) : null}
+            {mcpToolOptions.length > 0 ? (
+              <CommandGroup heading={t("mcpGroup")}>
+                {mcpToolOptions.map((option) => {
+                  const inContext = isInContext(option.contextItem);
+                  return (
+                    <CommandItem
+                      data-checked={inContext}
+                      key={option.id}
+                      keywords={[option.searchText]}
+                      onSelect={() => {
+                        if (inContext) {
+                          removeContext(option.contextItem);
+                        } else {
+                          addContext(option);
+                        }
+                        setIsContextPickerOpen(false);
+                      }}
+                      value={option.id}
+                    >
+                      <ChatContextOptionContent option={option} />
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            ) : null}
+          </CommandList>
+          {organizationSlug ? (
+            <div className="border-border border-t p-1">
+              <Link
+                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground flex items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
+                href={`/${organizationSlug}/integrations`}
+                onClick={() => setIsContextPickerOpen(false)}
+              >
+                {tChatShared("manageIntegrations")}
+              </Link>
+            </div>
+          ) : null}
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 

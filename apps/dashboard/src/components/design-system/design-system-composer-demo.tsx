@@ -64,9 +64,8 @@ function DemoComposer({ withNudge }: { withNudge: boolean }) {
         ) : null
       }
     >
-      <textarea
+      <Composer.Input
         aria-label="Message"
-        className="placeholder:text-muted-foreground block [field-sizing:content] max-h-50 min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 outline-none"
         onChange={(event) => setValue(event.target.value)}
         placeholder="Send a message... (type @ for tools, / for skills)"
         value={value}
@@ -83,16 +82,10 @@ function DemoComposer({ withNudge }: { withNudge: boolean }) {
           <HugeiconsIcon className="size-3" icon={ArrowDown01Icon} />
         </Composer.ToolbarButton>
         <div className="ml-auto flex items-center gap-1">
-          <Composer.ToolbarButton
-            aria-label="Add context"
-            className="size-7 justify-center px-0"
-          >
+          <Composer.ToolbarButton aria-label="Add context" size="icon-sm">
             <HugeiconsIcon className="size-4" icon={AtIcon} />
           </Composer.ToolbarButton>
-          <Composer.ToolbarButton
-            aria-label="Attach files"
-            className="size-7 justify-center px-0"
-          >
+          <Composer.ToolbarButton aria-label="Attach files" size="icon-sm">
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
           </Composer.ToolbarButton>
           <Composer.Send

@@ -24,7 +24,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@notra/ui/components/ui/popover";
-import { Textarea } from "@notra/ui/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -196,7 +195,7 @@ function ContentChatInputComposer(props: ChatInputProps) {
               ref={fileInputRef}
               type="file"
             />
-            <Textarea
+            <Composer.Input
               aria-activedescendant={
                 isSlashMenuOpen && filteredSkills[slashIndex]
                   ? `chat-skill-slash-option-${filteredSkills[slashIndex].name}`
@@ -210,7 +209,7 @@ function ContentChatInputComposer(props: ChatInputProps) {
               aria-expanded={isSlashMenuOpen}
               aria-haspopup={isSlashMenuOpen ? "listbox" : undefined}
               aria-label={tChatShared("sendAMessage")}
-              className="text-foreground caret-foreground block field-sizing-fixed max-h-50 min-h-12 w-full min-w-0 resize-none overflow-y-auto rounded-none border-0 bg-transparent px-3 py-2 text-sm leading-6 whitespace-pre-wrap shadow-none ring-0 outline-none focus-visible:border-transparent focus-visible:ring-0 disabled:cursor-not-allowed disabled:bg-transparent disabled:opacity-50 dark:bg-transparent dark:disabled:bg-transparent"
+              className="field-sizing-fixed whitespace-pre-wrap"
               disabled={isInputLocked}
               onBlur={() => {
                 setIsFocused(false);
@@ -406,109 +405,92 @@ function ChatInputContextPicker({
 }: ChatInputContextPickerProps) {
   const tChatShared = useTranslations("chat.shared");
   return (
-    <Tooltip disabled={isOpen}>
-      <TooltipTrigger
-        render={
-          disabledReason ? (
-            // biome-ignore lint/a11y/useSemanticElements: a real button would illegally nest the disabled popover trigger button.
-            <span
-              aria-disabled="true"
-              aria-label={tChatShared("addToolsOrContext")}
-              className="inline-flex size-7 shrink-0 cursor-not-allowed items-center justify-center"
-              role="button"
-              tabIndex={0}
+    <Popover modal onOpenChange={onOpenChange} open={isOpen}>
+      <Tooltip disabled={isOpen}>
+        <TooltipTrigger
+          render={
+            <PopoverTrigger
+              render={
+                <Composer.ToolbarButton
+                  aria-label={tChatShared("addToolsOrContext")}
+                  disabled={Boolean(disabledReason)}
+                  // Stays focusable while disabled so the tooltip can explain why.
+                  focusableWhenDisabled
+                  size="icon-sm"
+                />
+              }
             />
-          ) : (
-            <span className="inline-flex size-7 shrink-0 items-center justify-center" />
-          )
-        }
+          }
+        >
+          <HugeiconsIcon className="size-4" icon={AtIcon} />
+        </TooltipTrigger>
+        <TooltipContent>
+          {disabledReason ?? tChatShared("toolsAndContext")}
+        </TooltipContent>
+      </Tooltip>
+      <PopoverContent
+        align="start"
+        className="w-80 p-0"
+        id={contextPickerId}
+        showBackdrop
+        sideOffset={6}
       >
-        <Popover modal onOpenChange={onOpenChange} open={isOpen}>
-          <PopoverTrigger
-            render={
-              <Composer.ToolbarButton
-                aria-controls={contextPickerId}
-                aria-expanded={isOpen}
-                aria-haspopup="listbox"
-                aria-label={tChatShared("addToolsOrContext")}
-                className="size-7 justify-center px-0"
-                disabled={Boolean(disabledReason)}
-                role="combobox"
+        <Command>
+          <CommandInput placeholder={tChatShared("searchToolsAndContext")} />
+          <CommandList>
+            <CommandEmpty>
+              {contextOptions.length === 0
+                ? tChatShared("noMatchingIntegrations")
+                : tChatShared("noMatchingToolsOrContext")}
+            </CommandEmpty>
+            {contextOptions.length === 0 && organizationSlug ? (
+              <ChatContextConnectSuggestions
+                onSelect={() => onOpenChange(false)}
+                organizationSlug={organizationSlug}
               />
-            }
-          >
-            <HugeiconsIcon className="size-4" icon={AtIcon} />
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="w-80 p-0"
-            id={contextPickerId}
-            showBackdrop
-            sideOffset={6}
-          >
-            <Command>
-              <CommandInput
-                placeholder={tChatShared("searchToolsAndContext")}
-              />
-              <CommandList>
-                <CommandEmpty>
-                  {contextOptions.length === 0
-                    ? tChatShared("noMatchingIntegrations")
-                    : tChatShared("noMatchingToolsOrContext")}
-                </CommandEmpty>
-                {contextOptions.length === 0 && organizationSlug ? (
-                  <ChatContextConnectSuggestions
-                    onSelect={() => onOpenChange(false)}
-                    organizationSlug={organizationSlug}
-                  />
-                ) : null}
-                {contextOptions.length > 0 ? (
-                  <CommandGroup heading={tChatShared("context")}>
-                    {contextOptions.map((option) => {
-                      const inContext = isInContext(option.contextItem);
-                      return (
-                        <CommandItem
-                          data-checked={inContext}
-                          key={option.id}
-                          keywords={[option.searchText]}
-                          onSelect={() => {
-                            toggleContextItem(option.contextItem, inContext);
-                            onOpenChange(false);
-                          }}
-                          value={option.id}
-                        >
-                          <ChatContextOptionContent option={option} />
-                          {inContext ? (
-                            <HugeiconsIcon
-                              className="text-primary ml-auto size-3.5"
-                              icon={Tick02Icon}
-                            />
-                          ) : null}
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                ) : null}
-              </CommandList>
-              {organizationSlug ? (
-                <div className="border-border border-t p-1">
-                  <Link
-                    className="text-muted-foreground hover:bg-accent hover:text-accent-foreground flex items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
-                    href={`/${organizationSlug}/integrations`}
-                    onClick={() => onOpenChange(false)}
-                  >
-                    {tChatShared("manageIntegrations")}
-                  </Link>
-                </div>
-              ) : null}
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </TooltipTrigger>
-      <TooltipContent>
-        {disabledReason ?? tChatShared("toolsAndContext")}
-      </TooltipContent>
-    </Tooltip>
+            ) : null}
+            {contextOptions.length > 0 ? (
+              <CommandGroup heading={tChatShared("context")}>
+                {contextOptions.map((option) => {
+                  const inContext = isInContext(option.contextItem);
+                  return (
+                    <CommandItem
+                      data-checked={inContext}
+                      key={option.id}
+                      keywords={[option.searchText]}
+                      onSelect={() => {
+                        toggleContextItem(option.contextItem, inContext);
+                        onOpenChange(false);
+                      }}
+                      value={option.id}
+                    >
+                      <ChatContextOptionContent option={option} />
+                      {inContext ? (
+                        <HugeiconsIcon
+                          className="text-primary ml-auto size-3.5"
+                          icon={Tick02Icon}
+                        />
+                      ) : null}
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            ) : null}
+          </CommandList>
+          {organizationSlug ? (
+            <div className="border-border border-t p-1">
+              <Link
+                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground flex items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
+                href={`/${organizationSlug}/integrations`}
+                onClick={() => onOpenChange(false)}
+              >
+                {tChatShared("manageIntegrations")}
+              </Link>
+            </div>
+          ) : null}
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 

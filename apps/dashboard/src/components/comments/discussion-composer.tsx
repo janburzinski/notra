@@ -3,7 +3,6 @@
 import { ArrowUp02Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Composer } from "@notra/ui/components/ui/composer";
-import { Textarea } from "@notra/ui/components/ui/textarea";
 import { cn } from "@notra/ui/lib/utils";
 import { useTranslations } from "use-intl";
 
@@ -54,8 +53,8 @@ export function DiscussionComposer({
           ) : null
         }
       >
-        <div className="flex items-end gap-2 p-1.5">
-          <Textarea
+        <div className="flex items-end gap-2 p-2">
+          <Composer.Input
             ref={textarea}
             aria-label={
               reply ? t("replyTo", { name: reply.name }) : t("writeComment")
@@ -63,7 +62,7 @@ export function DiscussionComposer({
             placeholder={
               reply ? t("writeReplyPlaceholder") : t("writeCommentPlaceholder")
             }
-            className="max-h-32 min-h-7 flex-1 resize-none border-0 bg-transparent px-2 py-1 text-sm leading-5 shadow-none focus-visible:ring-0 dark:bg-transparent"
+            className="max-h-32 min-h-7 flex-1 px-2 py-1 leading-5"
             rows={1}
             maxLength={10000}
             value={draft}

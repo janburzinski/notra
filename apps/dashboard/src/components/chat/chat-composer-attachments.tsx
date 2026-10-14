@@ -39,11 +39,13 @@ export function ChatComposerAttachButton({
         render={
           <Composer.ToolbarButton
             aria-label={t("attachFiles")}
-            className="size-7 justify-center px-0"
+            size="icon-sm"
             disabled={
               disabled ||
               attachmentCount + pendingUploadCount >= MAX_CHAT_ATTACHMENTS
             }
+            // Stays focusable while disabled so the tooltip can explain why.
+            focusableWhenDisabled
             onClick={onAttach}
           />
         }

@@ -84,6 +84,13 @@ export const LANDING_SECTIONS: LandingSection[] = [
       },
       {
         description:
+          "The chat composer from the dashboard, with queued messages on the tray.",
+        href: "/components/composer",
+        preview: "composer",
+        title: "Composer",
+      },
+      {
+        description:
           "A sortable, paged table in the grey shell, with an infinite-scroll variant.",
         href: "/components/data-table",
         preview: "data-table",
