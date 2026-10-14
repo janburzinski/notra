@@ -50,12 +50,12 @@ let releaseMirror;
 const mirrorEntered = new Promise((resolve) => { enterMirror = resolve; });
 const mirrorReleased = new Promise((resolve) => { releaseMirror = resolve; });
 mock.module(${JSON.stringify(mirrorPath)}, () => ({ mirrorPublicSlackThread: () => Effect.promise(async () => {
-  if (scenario === "leave-race") { enterMirror(); await mirrorReleased; }
+  if (scenario === "leave-race" || scenario === "initial-status") { enterMirror(); await mirrorReleased; }
   return null;
 }) }));
 const outbound = [];
 globalThis.fetch = async (url, init) => {
-  outbound.push({ url: String(url), authorization: new Headers(init.headers).get("authorization") });
+  outbound.push({ url: String(url), authorization: new Headers(init.headers).get("authorization"), body: Object.fromEntries(new URLSearchParams(String(init.body))) });
   const name = new URL(String(url)).pathname.split("/").at(-1);
   if (name === "conversations.info") return Response.json({ ok: true, channel: { id: "C-room", is_private: false } });
   if (name === "conversations.replies") return Response.json({ ok: true, messages: [{ ts: "1.5", user: "U-other", text: "Prior topic" }] });
@@ -106,9 +106,23 @@ async function request(payload, interactivity = false) {
 }
 async function message(text, mention = false) {
   await request({ type: "event_callback", team_id: "T-install", api_app_id: "A-notra", event_id: "event-" + (++eventId), authorizations: [{ is_bot: true, team_id: "T-install", user_id: "U-notra" }],
-    event: { type: mention ? "app_mention" : "message", channel: "C-room", thread_ts: "1.0", ts: "2." + eventId, user: "U-human", text } });
+    event: { type: mention ? "app_mention" : "message", channel: "C-room", ...(scenario === "initial-status" ? {} : { thread_ts: "1.0" }), ts: "2." + eventId, user: "U-human", text } });
 }
-if (scenario === "chart-failure-with-publish") {
+if (scenario === "initial-status") {
+  owner = undefined;
+  await message("<@U-notra> chart our GEO performance", true);
+  await mirrorEntered;
+  const statuses = outbound.filter((call) => call.url.endsWith("assistant.threads.setStatus"));
+  assert.equal(statuses.length, 1);
+  assert.equal(statuses[0].authorization, "Bearer fixture-install");
+  assert.equal(statuses[0].body.channel_id, "C-room");
+  assert.equal(statuses[0].body.thread_ts, "2.1");
+  assert.equal(statuses[0].body.status, "Thinking...");
+  assert.equal(created.length, 0);
+  releaseMirror();
+  await Promise.all(tasks);
+  assert.equal(created.length, 1);
+} else if (scenario === "chart-failure-with-publish") {
   for (const outcome of ["publish", "draft"]) {
     const messages = [];
     const state = {
@@ -182,6 +196,8 @@ if (scenario === "chart-failure-with-publish") {
 }
 
 describe("Slack native channel boundaries", () => {
+  test("the first top-level mention sets native status before preparing the session", () =>
+    runSlackChannel("initial-status"));
   test("a chart failure does not hide successful publishing or draft creation", () =>
     runSlackChannel("chart-failure-with-publish"));
   test("Slack Connect checks the installation policy, not the actor policy", () =>

@@ -105,6 +105,7 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
       await handleSlackControl(control, ctx);
       return null;
     }
+    await ctx.thread.startTyping("Thinking...");
     const chatId = await Effect.runPromise(
       mirrorPublicSlackThread(ctx, message, installation.organizationId)
     );
