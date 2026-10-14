@@ -1,8 +1,11 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useCustomer } from "autumn-js/react";
+import { useCallback } from "react";
 
 import { useIsClient } from "@/lib/hooks/use-is-client";
+import { dashboardOrpc } from "@/lib/orpc/query";
 import { billingCustomerOptions } from "@/utils/billing-customer";
 
 /**
@@ -15,11 +18,28 @@ import { billingCustomerOptions } from "@/utils/billing-customer";
 export function useBillingCustomer(params?: Parameters<typeof useCustomer>[0]) {
   const customer = useCustomer(billingCustomerOptions(params));
   const hydrated = useIsClient();
+  const queryClient = useQueryClient();
+  const refetch = useCallback(
+    async (...args: Parameters<typeof customer.refetch>) => {
+      const result = await customer.refetch(...args);
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.modelCatalog.key(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.settings.key(),
+        }),
+      ]);
+      return result;
+    },
+    [customer.refetch, queryClient]
+  );
   if (hydrated) {
-    return customer;
+    return { ...customer, refetch };
   }
   return {
     ...customer,
+    refetch,
     data: undefined,
     check: (checkParams: Parameters<typeof customer.check>[0]) => ({
       ...customer.check(checkParams),

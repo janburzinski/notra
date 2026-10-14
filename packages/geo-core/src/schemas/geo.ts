@@ -145,9 +145,9 @@ export const geoSettingsUpsertInputSchema = geoOrganizationInputSchema.extend({
         message: "Unsupported language",
       }
     ),
-  engines: array(string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH))
-    .min(1)
-    .max(GEO_MAX_ENGINES),
+  engines: array(string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH)).max(
+    GEO_MAX_ENGINES
+  ),
   enforceZdr: boolean(),
   nonZdrApprovedEngines: array(
     string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH)

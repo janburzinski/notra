@@ -1,26 +1,20 @@
 import { checkContentBilling } from "@notra/ai/billing/content-billing";
 import { FEATURES } from "@notra/ai/billing/features";
 import {
-  GEO_CURSOR_FLAG_KEY,
-  GEO_OPENCODE_FLAG_KEY,
-} from "@notra/geo-core/constants/geo";
-import {
   GeoContentBillingService,
   GeoEntitlementService,
-  GeoFeatureFlagService,
   GeoGenerationService,
   GeoWorkflowService,
 } from "@notra/geo-core/deps";
-import { GeoFlagEvaluationError } from "@notra/geo-core/geo/errors";
 import {
   agentReadinessNetworkLayer,
   geoModelLayer,
+  geoCodingAgentAccessLayer,
 } from "@notra/geo-core/geo/host-layers";
 import { geoSearchConsoleLive } from "@notra/geo-core/geo/search-console-live";
 import { Effect, Layer } from "effect";
 
 import { addActiveGeneration, generateRunId } from "@/lib/generations/tracking";
-import { resolveGeoFlagState } from "@/lib/geo/flag";
 import { resolveZdrEntitlement } from "@/utils/resolve-zdr-entitlement";
 
 const workflowLayer = Layer.succeed(GeoWorkflowService, {
@@ -91,38 +85,6 @@ const entitlementLayer = Layer.succeed(GeoEntitlementService, {
   ),
 });
 
-function geoEngineFlagEnabled(
-  flagKey: string,
-  organizationId: string
-): Effect.Effect<boolean, GeoFlagEvaluationError> {
-  return resolveGeoFlagState(flagKey, organizationId).pipe(
-    Effect.flatMap((state) => {
-      if (state === "unavailable") {
-        return Effect.fail(
-          new GeoFlagEvaluationError({
-            message: `GEO feature flag "${flagKey}" is unavailable`,
-            cause: null,
-          })
-        );
-      }
-      return Effect.succeed(state === "enabled");
-    })
-  );
-}
-
-const featureFlagLayer = Layer.succeed(GeoFeatureFlagService, {
-  isCursorEngineEnabledForOrganization: Effect.fn(
-    "GeoDashboardFeatureFlags.isCursorEnabled"
-  )((organizationId) =>
-    geoEngineFlagEnabled(GEO_CURSOR_FLAG_KEY, organizationId)
-  ),
-  isOpenCodeEngineEnabledForOrganization: Effect.fn(
-    "GeoDashboardFeatureFlags.isOpenCodeEnabled"
-  )((organizationId) =>
-    geoEngineFlagEnabled(GEO_OPENCODE_FLAG_KEY, organizationId)
-  ),
-});
-
 const generationLayer = Layer.succeed(GeoGenerationService, {
   addActiveGeneration: Effect.fn("GeoDashboardGeneration.addActive")(
     (organizationId, generation) =>
@@ -143,6 +105,6 @@ export const geoCoreDashboardLayer = Layer.mergeAll(
   workflowLayer,
   billingLayer,
   entitlementLayer,
-  featureFlagLayer,
+  geoCodingAgentAccessLayer,
   generationLayer
 );

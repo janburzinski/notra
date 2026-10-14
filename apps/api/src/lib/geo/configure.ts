@@ -6,13 +6,13 @@ import { checkContentBilling } from "@notra/ai/billing/content-billing";
 import { FEATURES } from "@notra/ai/billing/features";
 import {
   GeoEntitlementService,
-  GeoFeatureFlagService,
   GeoGenerationService,
   GeoWorkflowService,
 } from "@notra/geo-core/deps";
 import {
   agentReadinessNetworkLayer,
   geoModelLayer,
+  geoCodingAgentAccessLayer,
 } from "@notra/geo-core/geo/host-layers";
 import { geoSearchConsoleLive } from "@notra/geo-core/geo/search-console-live";
 import type { GeoZdrEntitlement } from "@notra/geo-core/types/geo";
@@ -105,15 +105,6 @@ const entitlementLayer = Layer.succeed(GeoEntitlementService, {
   ),
 });
 
-const featureFlagLayer = Layer.succeed(GeoFeatureFlagService, {
-  isCursorEngineEnabledForOrganization: Effect.fn(
-    "GeoApiFeatureFlags.isCursorEnabled"
-  )(() => Effect.succeed(false)),
-  isOpenCodeEngineEnabledForOrganization: Effect.fn(
-    "GeoApiFeatureFlags.isOpenCodeEnabled"
-  )(() => Effect.succeed(false)),
-});
-
 const generationLayer = Layer.succeed(GeoGenerationService, {
   addActiveGeneration: Effect.fn("GeoApiGeneration.addActive")(
     (organizationId, generation) =>
@@ -133,6 +124,6 @@ export const geoCoreApiLayer = Layer.mergeAll(
   geoSearchConsoleLive,
   workflowLayer,
   entitlementLayer,
-  featureFlagLayer,
+  geoCodingAgentAccessLayer,
   generationLayer
 );

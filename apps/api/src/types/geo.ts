@@ -1,6 +1,6 @@
 import type {
   GeoEntitlementService,
-  GeoFeatureFlagService,
+  GeoCodingAgentAccessService,
   GeoGenerationService,
   GeoWorkflowService,
   AgentReadinessNetwork,
@@ -38,7 +38,7 @@ export type GeoApiRuntime =
   | GeoModelService
   | GeoSearchConsoleService
   | GeoEntitlementService
-  | GeoFeatureFlagService
+  | GeoCodingAgentAccessService
   | GeoGenerationService
   | GeoWorkflowService;
 

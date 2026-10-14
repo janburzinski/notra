@@ -1,7 +1,7 @@
 import type { askGeoOpenCode } from "@notra/ai/agents/geo-opencode";
 import { Effect } from "effect";
 
-import { GeoFeatureFlagService, GeoModelService } from "../../src/deps";
+import { GeoCodingAgentAccessService, GeoModelService } from "../../src/deps";
 import type { GeoModelServiceShape } from "../../src/types/model";
 import { CODING_AGENT_USAGE } from "../constants/coding-agents";
 import { fakeModels } from "../constants/geo-boundaries";
@@ -10,13 +10,12 @@ export function withCodingAgentModels(
   models: GeoModelServiceShape = fakeModels
 ) {
   return <A, E>(
-    effect: Effect.Effect<A, E, GeoModelService | GeoFeatureFlagService>
+    effect: Effect.Effect<A, E, GeoModelService | GeoCodingAgentAccessService>
   ) =>
     effect.pipe(
       Effect.provideService(GeoModelService, models),
-      Effect.provideService(GeoFeatureFlagService, {
-        isCursorEngineEnabledForOrganization: () => Effect.succeed(true),
-        isOpenCodeEngineEnabledForOrganization: () => Effect.succeed(true),
+      Effect.provideService(GeoCodingAgentAccessService, {
+        hasPaidPlanForOrganization: () => Effect.succeed(true),
       })
     );
 }

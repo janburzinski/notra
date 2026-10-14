@@ -1,10 +1,6 @@
 import { Effect } from "effect";
 
-import {
-  GEO_CODING_AGENT_ENGINE_IDS,
-  GEO_CURSOR_ENGINE_ID,
-  GEO_OPENCODE_ENGINE_ID,
-} from "../constants/geo";
+import { GEO_PAID_CODING_AGENT_ENGINE_IDS } from "../constants/geo";
 import {
   GEO_MODEL_FEED_REVALIDATE_SECONDS,
   GEO_MODEL_FEED_URL,
@@ -18,7 +14,7 @@ import {
   seedGeoModelCatalog,
   withoutGeoModelCatalogEntries,
 } from "../utils/geo-model-catalog";
-import { loadGeoEngineFlags } from "./engine-flags";
+import { loadGeoCodingAgentAccess } from "./coding-agent-access";
 
 const MS_PER_SECOND = 1000;
 
@@ -66,27 +62,20 @@ async function loadSharedGeoModelCatalog(): Promise<GeoModelCatalog> {
   }
 }
 
-/**
- * The shared catalog narrowed to what one organization may see. Direct
- * engines are flag-gated per organization on top of their credential checks.
- * OpenCode, Claude Code, and Codex share `geo-opencode`.
- */
 export const loadGeoModelCatalog = Effect.fn("geo.modelCatalog")(function* (
   organizationId: string
 ) {
-  const [catalog, { cursorEnabled, openCodeEnabled }] = yield* Effect.all(
+  const [catalog, codingAgentsAllowed] = yield* Effect.all(
     [
       Effect.promise(loadSharedGeoModelCatalog),
-      loadGeoEngineFlags(organizationId),
+      loadGeoCodingAgentAccess(organizationId),
     ],
     { concurrency: "unbounded" }
   );
-  const available = withoutGeoModelCatalogEntries(catalog, [
-    ...(cursorEnabled ? [] : [GEO_CURSOR_ENGINE_ID]),
-    ...(openCodeEnabled
-      ? []
-      : [GEO_OPENCODE_ENGINE_ID, ...GEO_CODING_AGENT_ENGINE_IDS]),
-  ]);
+  const available = withoutGeoModelCatalogEntries(
+    catalog,
+    codingAgentsAllowed ? [] : GEO_PAID_CODING_AGENT_ENGINE_IDS
+  );
   return {
     ...available,
     models: available.models.map((model) => ({

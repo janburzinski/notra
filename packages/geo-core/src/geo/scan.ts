@@ -37,6 +37,7 @@ import {
   GEO_MAX_SEQUENCES,
   GEO_OPENCODE_ANSWER_SYSTEM_PROMPT,
   GEO_OPENCODE_ENGINE_ID,
+  GEO_PAID_CODING_AGENT_ENGINE_IDS,
   GEO_SCAN_CONCURRENCY,
   GEO_SEQUENCE_PAIR_TIMEOUT_MS,
   GEO_SEQUENCE_MAX_TURNS,
@@ -124,6 +125,7 @@ import {
 } from "../utils/token-usage";
 import { fetchGoogleAiOverview } from "./ai-overview";
 import { judgeAnswer, requireAnswerText } from "./check-evaluation";
+import { requireGeoCodingAgentAccess } from "./coding-agent-access";
 import { runGeoConversation } from "./conversation";
 import { runGeoConversationReplay } from "./conversation-replay";
 import { askCursorEngine } from "./cursor";
@@ -383,6 +385,9 @@ const askEngine = Effect.fn("geo.askEngine")(function* (
   language: string,
   logContext: GatewayModelOptions["logContext"]
 ) {
+  if (GEO_PAID_CODING_AGENT_ENGINE_IDS.includes(engine)) {
+    yield* requireGeoCodingAgentAccess(organizationId);
+  }
   if (gatewayPin === "cursor") {
     return yield* askCursorEngineEffect(engine, promptText);
   }
@@ -1707,6 +1712,7 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
     engine: string,
     zdr: GeoZdrMode
   ) {
+    yield* requireGeoCodingAgentAccess(context.organizationId);
     const rows: GeoCheckWrite[] = [];
     const steps = sequence.steps.slice(0, GEO_SEQUENCE_MAX_TURNS);
     const deadlineAtMs = Date.now() + GEO_SEQUENCE_PAIR_TIMEOUT_MS;
@@ -2005,7 +2011,10 @@ const runGeoSequenceNowProgram = Effect.fn("geo.runSequenceNow")(function* (
     GEO_OPENCODE_ENGINE_ID,
     ...GEO_CODING_AGENT_ENGINE_IDS,
   ]) {
-    if (!settings.engines.includes(engineId)) {
+    if (
+      !settings.engines.includes(engineId) ||
+      !catalog.models.some((model) => model.id === engineId)
+    ) {
       continue;
     }
     const zdr = resolveGeoZdrMode(catalog, engineId, zdrPolicy);

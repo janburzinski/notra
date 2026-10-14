@@ -12,8 +12,8 @@ import {
 } from "@notra/geo-core/constants/geo";
 import type { GeoSettingsUpsertInput } from "@notra/geo-core/types/geo";
 import { normalizeConversionPaths } from "@notra/geo-core/utils/geo-conversion-paths";
-import { resolveTrackedEngines } from "@notra/geo-core/utils/geo-engines";
 import { trackedGeoLanguages } from "@notra/geo-core/utils/geo-language-rows";
+import { geoDefaultEngines } from "@notra/geo-core/utils/geo-model-catalog";
 import { extraProjectDomains } from "@notra/geo-core/utils/geo-project-domains";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Badge } from "@notra/ui/components/ui/badge";
@@ -72,8 +72,8 @@ export function GeoSettingsForm({
   const [languages, setLanguages] = useState(() =>
     trackedGeoLanguages(settings?.languages ?? [])
   );
-  const [engines, setEngines] = useState<string[]>(() =>
-    resolveTrackedEngines(catalog, settings?.engines)
+  const [engines, setEngines] = useState<string[]>(
+    () => settings?.engines ?? geoDefaultEngines(catalog)
   );
   const [enforceZdr, setEnforceZdr] = useState(
     () => settings?.enforceZdr ?? true
@@ -273,7 +273,7 @@ function useGeoSettingsAutosave({
           ),
           domains: extraProjectDomains(settings?.domains ?? [], brandDomain),
           languages: trackedGeoLanguages(settings?.languages ?? []),
-          engines: resolveTrackedEngines(catalog, settings?.engines),
+          engines: settings?.engines ?? geoDefaultEngines(catalog),
           enforceZdr: settings?.enforceZdr ?? true,
           nonZdrApprovedEngines: settings?.nonZdrApprovedEngines ?? [],
           enabled: settings?.enabled ?? true,

@@ -1,4 +1,8 @@
 import type { GeoBoxRunTarget } from "@notra/ai/types/geo-opencode";
+import { Duration } from "effect";
+
+export const GEO_CODING_AGENT_ACCESS_CACHE_TTL = Duration.seconds(30);
+export const GEO_CODING_AGENT_ACCESS_CACHE_CAPACITY = 500;
 
 /**
  * Native Upstash Box harness + model for Claude Code and Codex.

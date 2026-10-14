@@ -4,6 +4,7 @@ import {
   beforeEach,
   describe,
   expect,
+  mock,
   spyOn,
   test,
 } from "bun:test";
@@ -17,14 +18,25 @@ import { TestClock } from "effect/testing";
 import {
   GEO_SEQUENCE_PAIR_TIMEOUT_MS,
   GEO_SEQUENCE_MAX_TURNS,
+  GEO_PAID_CODING_AGENT_ENGINE_IDS,
 } from "../src/constants/geo";
-import { GeoContentBillingService, GeoEntitlementService } from "../src/deps";
-import { GeoJudgeError } from "../src/geo/errors";
+import {
+  GeoContentBillingService,
+  GeoEntitlementService,
+  GeoCodingAgentAccessService,
+  GeoModelService,
+} from "../src/deps";
+import { GeoJudgeError, GeoCodingAgentAccessError } from "../src/geo/errors";
+import { geoSettingsUpsertInputSchema } from "../src/schemas/geo";
 import type { FinalizeContentBillingInput } from "../src/types/content-billing";
 import type {
   GeoScanProjectContext,
   GeoScanPlannedTask,
 } from "../src/types/geo";
+import {
+  seedGeoModelCatalog,
+  withoutGeoModelCatalogEntries,
+} from "../src/utils/geo-model-catalog";
 import { geoScanAnswerKey } from "../src/utils/geo-scan-plan";
 import { fakeModels, testBillingGate } from "./constants/geo-boundaries";
 import {
@@ -45,6 +57,10 @@ import {
   mockAskGeoOpenCodeConversation,
 } from "./utils/infrastructure";
 
+mock.module("../src/geo/cursor", () => ({
+  askCursorEngine: () => Effect.die("Denied plan reached Cursor"),
+}));
+
 const {
   prepareGeoScanProject,
   runGeoScanTaskBatch,
@@ -52,6 +68,8 @@ const {
   finalizeGeoScanProject,
 } = await import("../src/geo/scan");
 const { claimGeoScanRun } = await import("../src/geo/scan-status");
+const { upsertGeoSettings } = await import("../src/geo/programs");
+const catalogModule = await import("../src/geo/model-catalog");
 const envKeys = ["UPSTASH_BOX_API_KEY", "OPENROUTER_API_KEY"] as const;
 const originalEnv = envKeys.map((key) => process.env[key]);
 
@@ -82,6 +100,72 @@ beforeEach(async () => {
 });
 
 describe("coding-agent task scans", () => {
+  test.each(["unpaid", "billing failure"])(
+    "%s blocks saved coding-agent tasks and sequences before provider calls",
+    async (failure) => {
+      const scope = await seedProject("denied-coding-agents");
+      const context: GeoScanProjectContext = {
+        ...scope,
+        scanId: "denied-coding-agents-scan",
+        runId: "run",
+        companyName: "Notra",
+        aliases: [],
+        gate: testBillingGate,
+        startedAtMs: Date.now(),
+      };
+      await testDb.insert(geoScans).values({ id: context.scanId, ...scope });
+      const result = await Effect.runPromise(
+        Effect.gen(function* () {
+          const tasks = yield* runGeoScanTaskBatch(
+            context,
+            GEO_PAID_CODING_AGENT_ENGINE_IDS.map((engine) => ({
+              engine,
+              groundedKey: null,
+              prompt: { id: engine, text: "question" },
+              language: "English",
+              zdr: "none" as const,
+            }))
+          );
+          const sequences = yield* runGeoScanSequenceBatch(context, [
+            {
+              sequenceId: "sequence",
+              steps: ["first", "second"],
+              language: "English",
+              engine: "codex/gpt-6-astra",
+              groundedKey: null,
+              zdr: "none",
+            },
+          ]);
+          return { tasks, sequences };
+        }).pipe(
+          Effect.provideService(GeoModelService, fakeModels),
+          Effect.provideService(GeoCodingAgentAccessService, {
+            hasPaidPlanForOrganization: () =>
+              failure === "billing failure"
+                ? Effect.fail(
+                    new GeoCodingAgentAccessError({
+                      cause: new Error("billing unavailable"),
+                    })
+                  )
+                : Effect.succeed(false),
+          })
+        )
+      );
+      expect(result.tasks).toMatchObject({
+        checks: 0,
+        dropped: 6,
+        engineUsage: { totalUsd: 0 },
+      });
+      expect(result.sequences).toMatchObject({
+        checks: 0,
+        dropped: 2,
+        engineUsage: { totalUsd: 0 },
+      });
+      expect(mockAskGeoOpenCode).not.toHaveBeenCalled();
+      expect(mockAskGeoOpenCodeConversation).not.toHaveBeenCalled();
+      expect(await testDb.select().from(geoMentionChecks)).toHaveLength(0);
+    }
+  );
   test("a native task persists source and token accounting", async () => {
     const engine = "codex/gpt-6-astra";
     const scope = await seedProject("native-task");
@@ -556,6 +640,71 @@ describe("coding-agent conversation scans", () => {
 });
 
 describe("coding-agent planning and billing", () => {
+  test.each([true, false])(
+    "an empty visible selection preserves hidden engines=%s without enabling defaults",
+    async (hasHiddenEngines) => {
+      const stored = hasHiddenEngines
+        ? ["codex/gpt-6-astra"]
+        : ["openai/gpt-5.4-mini"];
+      const scope = await seedProject("unavailable-settings");
+      await testDb
+        .update(geoSettings)
+        .set({ engines: stored })
+        .where(eq(geoSettings.projectId, scope.projectId));
+      const catalog = withoutGeoModelCatalogEntries(
+        seedGeoModelCatalog(),
+        GEO_PAID_CODING_AGENT_ENGINE_IDS
+      );
+      const lookup = spyOn(
+        catalogModule,
+        "loadGeoModelCatalog"
+      ).mockImplementation(() =>
+        Effect.succeed({
+          ...catalog,
+          models: catalog.models.map((model) => ({
+            ...model,
+            supportsGroundedChecks: false,
+          })),
+        })
+      );
+      try {
+        const input = geoSettingsUpsertInputSchema.parse({
+          ...scope,
+          companyName: "Updated name",
+          aliases: [],
+          competitors: [],
+          languages: ["English"],
+          engines: [],
+          enforceZdr: false,
+          nonZdrApprovedEngines: [],
+          enabled: true,
+          scanIntervalHours: 24,
+        });
+        const result = Effect.runPromise(
+          upsertGeoSettings(input).pipe(
+            Effect.provideService(GeoEntitlementService, {
+              resolveZdrEntitlement: () => Effect.succeed("not_entitled"),
+              checkScanBilling: () => Effect.die("Settings reached billing"),
+            }),
+            withCodingAgentModels(fakeModels)
+          )
+        );
+        if (hasHiddenEngines) {
+          expect((await result).settings?.engines).toEqual([]);
+          expect((await settingsFor(scope.projectId))?.companyName).toBe(
+            "Updated name"
+          );
+        } else {
+          await expect(result).rejects.toMatchObject({
+            _tag: "GeoSettingsTrackingError",
+          });
+        }
+        expect((await settingsFor(scope.projectId))?.engines).toEqual(stored);
+      } finally {
+        lookup.mockRestore();
+      }
+    }
+  );
   test("enforced ZDR skips unapproved native engines and releases the billing reservation", async () => {
     const scope = await seedProject("native-zdr", { enabled: true });
     await testDb

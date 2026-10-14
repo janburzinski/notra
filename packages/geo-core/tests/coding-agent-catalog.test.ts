@@ -14,7 +14,7 @@ import {
   GEO_CURSOR_ENGINE_ID,
   GEO_OPENCODE_ENGINE_ID,
 } from "../src/constants/geo";
-import { GeoFeatureFlagService } from "../src/deps";
+import { GeoCodingAgentAccessService } from "../src/deps";
 import { loadGeoModelCatalog } from "../src/geo/model-catalog";
 import {
   geoEngineUsedWebSearch,
@@ -22,6 +22,8 @@ import {
   resolveGeoEngineGateway,
   resolveGeoZdrMode,
   scopeGeoScanEngines,
+  resolveTrackedEngines,
+  geoScanEmptyEngineSkipReason,
 } from "../src/utils/geo-engines";
 import { seedGeoModelCatalog } from "../src/utils/geo-model-catalog";
 import { CODING_AGENT_TARGETS } from "./constants/coding-agents";
@@ -67,40 +69,36 @@ afterAll(() => {
   }
 });
 
-describe("coding-agent catalog and flag boundaries", () => {
-  test.each([
-    [false, false],
-    [false, true],
-    [true, false],
-    [true, true],
-  ])(
-    "Cursor=%s and Box=%s independently gate every coding engine",
-    async (cursorEnabled, openCodeEnabled) => {
+describe("coding-agent catalog and paid-plan boundaries", () => {
+  test.each([false, true])(
+    "paid=%s gates every coding engine without rollout flags",
+    async (paid) => {
       const catalog = await Effect.runPromise(
-        loadGeoModelCatalog(`flags-${cursorEnabled}-${openCodeEnabled}`).pipe(
-          Effect.provideService(GeoFeatureFlagService, {
-            isCursorEngineEnabledForOrganization: () =>
-              Effect.succeed(cursorEnabled),
-            isOpenCodeEngineEnabledForOrganization: () =>
-              Effect.succeed(openCodeEnabled),
+        loadGeoModelCatalog(`paid-${paid}`).pipe(
+          Effect.provideService(GeoCodingAgentAccessService, {
+            hasPaidPlanForOrganization: () => Effect.succeed(paid),
           })
         )
       );
       expect(
         catalog.models.some((model) => model.id === GEO_CURSOR_ENGINE_ID)
-      ).toBe(cursorEnabled);
+      ).toBe(paid);
       for (const [engine] of CODING_AGENT_TARGETS) {
-        expect(catalog.models.some((model) => model.id === engine)).toBe(
-          openCodeEnabled
-        );
+        expect(catalog.models.some((model) => model.id === engine)).toBe(paid);
       }
       expect(
         catalog.models.some((model) => model.id === "openai/gpt-5.4-mini")
       ).toBe(true);
-      if (!openCodeEnabled) {
+      if (!paid) {
+        expect(resolveTrackedEngines(catalog, ["codex/gpt-6-astra"])).toEqual(
+          []
+        );
+        expect(geoScanEmptyEngineSkipReason([], 0)).toBe(
+          "scoped_engines_missing"
+        );
         expect(
           catalog.providers.some((provider) =>
-            ["opencode", "claude-code", "codex"].includes(provider.id)
+            ["cursor", "opencode", "claude-code", "codex"].includes(provider.id)
           )
         ).toBe(false);
         expect(

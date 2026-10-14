@@ -4,7 +4,7 @@ import type { AgentReadinessNetworkShape } from "./types/agent-readiness";
 import type {
   GeoContentBillingServiceShape,
   GeoEntitlementServiceShape,
-  GeoFeatureFlagServiceShape,
+  GeoCodingAgentAccessServiceShape,
   GeoGenerationServiceShape,
   GeoWorkflowServiceShape,
   GeoSearchConsoleServiceShape,
@@ -45,11 +45,10 @@ export class GeoEntitlementService extends Context.Service<
   GeoEntitlementServiceShape
 >()("@notra/geo-core/GeoEntitlementService") {}
 
-/** Host-owned feature flag reads. */
-export class GeoFeatureFlagService extends Context.Service<
-  GeoFeatureFlagService,
-  GeoFeatureFlagServiceShape
->()("@notra/geo-core/GeoFeatureFlagService") {}
+export class GeoCodingAgentAccessService extends Context.Service<
+  GeoCodingAgentAccessService,
+  GeoCodingAgentAccessServiceShape
+>()("@notra/geo-core/GeoCodingAgentAccessService") {}
 
 /** Host-owned generation tracking and run-id generation. */
 export class GeoGenerationService extends Context.Service<

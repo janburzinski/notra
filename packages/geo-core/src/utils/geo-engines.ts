@@ -2,6 +2,7 @@ import {
   GEO_AI_OVERVIEW_ENGINE_ID,
   GEO_DIRECT_GROUNDED_PROVIDERS,
   GEO_OPENCODE_ENGINE_ID,
+  GEO_PAID_CODING_AGENT_ENGINE_IDS,
 } from "../constants/geo";
 import { GEO_MODEL_REPLACED_IDS } from "../constants/geo-model-catalog";
 import type {
@@ -122,7 +123,10 @@ export function geoScanEmptyEngineSkipReason(
   runnableEngineCount: number,
   requestedEngines?: readonly string[]
 ): GeoScanSkipReason | null {
-  if (requestedEngines !== undefined && scanEngines.length === 0) {
+  if (
+    scanEngines.length === 0 &&
+    (requestedEngines !== undefined || runnableEngineCount === 0)
+  ) {
     return "scoped_engines_missing";
   }
   if (scanEngines.length > 0 && runnableEngineCount === 0) {
@@ -140,11 +144,17 @@ export function resolveTrackedEngines(
   catalog: GeoModelCatalog,
   stored: readonly string[] | null | undefined
 ): string[] {
-  const selected = sortKnownEngines(
-    catalog,
-    remapRetiredGeoEngineIds(stored ?? [])
-  );
-  return selected.length === 0 ? geoDefaultEngines(catalog) : selected;
+  const configured = remapRetiredGeoEngineIds(stored ?? []);
+  const selected = sortKnownEngines(catalog, configured);
+  if (
+    selected.length > 0 ||
+    configured.some((engine) =>
+      GEO_PAID_CODING_AGENT_ENGINE_IDS.includes(engine)
+    )
+  ) {
+    return selected;
+  }
+  return geoDefaultEngines(catalog);
 }
 
 /**

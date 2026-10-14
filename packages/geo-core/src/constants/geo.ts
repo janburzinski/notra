@@ -36,7 +36,7 @@ import {
 } from "./geo-model-catalog";
 
 export const GEO_MAX_ENGINES = 64;
-export const GEO_MODEL_CATALOG_STALE_MS = 60 * 60 * 1000;
+export const GEO_MODEL_CATALOG_STALE_MS = 30_000;
 
 export const GEO_JUDGE_MODEL = "openai/gpt-6-luna";
 /** Default effort spends 350+ reasoning tokens per answer for no gain. */
@@ -66,15 +66,16 @@ export const GEO_CODING_AGENT_ENGINE_IDS = [
   ...GEO_CLAUDE_CODE_ENGINE_IDS,
   ...GEO_CODEX_ENGINE_IDS,
 ] as const;
+export const GEO_PAID_CODING_AGENT_ENGINE_IDS: readonly string[] = [
+  GEO_CURSOR_ENGINE_ID,
+  GEO_OPENCODE_ENGINE_ID,
+  ...GEO_CODING_AGENT_ENGINE_IDS,
+];
 export const GEO_AI_OVERVIEW_ENGINE_ID = "google/ai-overview";
 export const GEO_PROVIDER_TIMEOUT_MS = 120_000;
 export const GEO_ANSWER_TIMEOUT_MS = 180_000;
 export const GEO_CURSOR_TIMEOUT_MS = GEO_ANSWER_TIMEOUT_MS;
 export const GEO_AI_OVERVIEW_TIMEOUT_MS = GEO_ANSWER_TIMEOUT_MS;
-/** Databuddy flag that exposes the Cursor engine to an organization. */
-export const GEO_CURSOR_FLAG_KEY = "geo-cursor";
-/** Databuddy flag that exposes OpenCode, Claude Code, and Codex. */
-export const GEO_OPENCODE_FLAG_KEY = "geo-opencode";
 export const GEO_FLAG_CACHE_TTL_MS = 60_000;
 export const GEO_FLAG_STALE_TIME_MS = 30_000;
 export const GEO_FLAG_ERROR_REASON = "ERROR";

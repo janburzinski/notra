@@ -13,12 +13,12 @@ import { geoMentionChecks, geoScanEvents, geoScans } from "@notra/db/schema";
 import { queryGeoCheckOverview } from "@notra/db/utils/geo-checks";
 import { Effect } from "effect";
 
-import { GeoModelService, GeoFeatureFlagService } from "../src/deps";
+import { GeoModelService, GeoCodingAgentAccessService } from "../src/deps";
 import { GeoScanError } from "../src/geo/errors";
 import {
   fakeModels,
   testBillingGate,
-  testFeatureFlags,
+  testCodingAgentAccess,
 } from "./constants/geo-boundaries";
 import {
   initializeDatabase,
@@ -82,7 +82,10 @@ describe("model service in real scan batches", () => {
                 ? Effect.fail(new GeoScanError({ message: "provider refused" }))
                 : fakeModels.answer(input),
           }),
-          Effect.provideService(GeoFeatureFlagService, testFeatureFlags)
+          Effect.provideService(
+            GeoCodingAgentAccessService,
+            testCodingAgentAccess
+          )
         )
       );
       expect(result.checks).toBe(1);
@@ -170,7 +173,10 @@ describe("model service in real scan batches", () => {
               zdrEnforced: null,
             }),
         }),
-        Effect.provideService(GeoFeatureFlagService, testFeatureFlags)
+        Effect.provideService(
+          GeoCodingAgentAccessService,
+          testCodingAgentAccess
+        )
       )
     );
     expect(result.checks).toBe(1);
@@ -235,7 +241,10 @@ describe("model service in real scan batches", () => {
               zdrEnforced: null,
             }),
         }),
-        Effect.provideService(GeoFeatureFlagService, testFeatureFlags)
+        Effect.provideService(
+          GeoCodingAgentAccessService,
+          testCodingAgentAccess
+        )
       )
     );
     const [row] = await testDb.select().from(geoMentionChecks);
@@ -281,7 +290,10 @@ describe("model service in real scan batches", () => {
             );
           },
         }),
-        Effect.provideService(GeoFeatureFlagService, testFeatureFlags)
+        Effect.provideService(
+          GeoCodingAgentAccessService,
+          testCodingAgentAccess
+        )
       )
     );
     expect(attempts).toBe(1);

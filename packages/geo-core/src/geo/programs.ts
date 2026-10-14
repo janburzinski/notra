@@ -723,10 +723,13 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   input: GeoSettingsUpsertInput
 ) {
   const entitlements = yield* GeoEntitlementService;
-  const projectId = yield* ensureGeoProject(
-    { organizationId: input.organizationId, projectId: input.projectId },
-    input.companyName
-  );
+  const projectId =
+    input.engines.length === 0
+      ? (yield* requireGeoProject(input)).projectId
+      : yield* ensureGeoProject(
+          { organizationId: input.organizationId, projectId: input.projectId },
+          input.companyName
+        );
 
   const entitlement = yield* entitlements.resolveZdrEntitlement(
     input.organizationId
@@ -788,6 +791,11 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   );
   const preservedEngineSet = new Set(preservedEngines);
   const engines = [...new Set([...input.engines, ...preservedEngines])];
+  if (engines.length === 0) {
+    return yield* Effect.fail(
+      new GeoSettingsTrackingError({ message: "Choose at least one model" })
+    );
+  }
   const engineSet = new Set(engines);
   const nonZdrApprovedEngines = [
     ...new Set([

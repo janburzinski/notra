@@ -5,7 +5,7 @@ import type {
 } from "@notra/ai/types/google-search-console";
 import type { Effect } from "effect";
 
-import type { GeoFlagEvaluationError } from "../geo/errors";
+import type { GeoCodingAgentAccessError } from "../geo/errors";
 import type { GeoSearchConsoleError } from "../schemas/search-console-errors";
 import type { AgentReadinessWorkflowPayload } from "./agent-readiness";
 import type {
@@ -61,17 +61,10 @@ export interface GeoEntitlementServiceShape {
   ) => Effect.Effect<ContentBillingReservation, unknown>;
 }
 
-/**
- * A provider that cannot answer fails with `GeoFlagEvaluationError`; callers
- * treat that as "not entitled" for this request without caching the answer.
- */
-export interface GeoFeatureFlagServiceShape {
-  readonly isCursorEngineEnabledForOrganization: (
+export interface GeoCodingAgentAccessServiceShape {
+  readonly hasPaidPlanForOrganization: (
     organizationId: string
-  ) => Effect.Effect<boolean, GeoFlagEvaluationError>;
-  readonly isOpenCodeEngineEnabledForOrganization: (
-    organizationId: string
-  ) => Effect.Effect<boolean, GeoFlagEvaluationError>;
+  ) => Effect.Effect<boolean, GeoCodingAgentAccessError>;
 }
 
 export interface GeoGenerationServiceShape {

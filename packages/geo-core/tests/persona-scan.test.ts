@@ -24,13 +24,13 @@ import { GEO_PERSONA_BILLING_MULTIPLIER } from "../src/constants/geo-personas";
 import {
   GeoContentBillingService,
   GeoEntitlementService,
-  GeoFeatureFlagService,
+  GeoCodingAgentAccessService,
   GeoModelService,
 } from "../src/deps";
 import {
   fakeModels,
   testBillingGate,
-  testFeatureFlags,
+  testCodingAgentAccess,
 } from "./constants/geo-boundaries";
 import { generatedPersona } from "./constants/personas";
 import {
@@ -271,7 +271,10 @@ describe("planned persona snapshots", () => {
           gateContentBilling: () => Effect.succeed(testBillingGate),
           finalizeContentBilling: () => Effect.void,
         }),
-        Effect.provideService(GeoFeatureFlagService, testFeatureFlags),
+        Effect.provideService(
+          GeoCodingAgentAccessService,
+          testCodingAgentAccess
+        ),
         Effect.provideService(GeoModelService, fakeModels),
         Effect.provideService(GeoEntitlementService, {
           resolveZdrEntitlement: () => Effect.succeed("not_entitled"),
@@ -344,7 +347,10 @@ describe("planned persona snapshots", () => {
               });
             },
           }),
-          Effect.provideService(GeoFeatureFlagService, testFeatureFlags)
+          Effect.provideService(
+            GeoCodingAgentAccessService,
+            testCodingAgentAccess
+          )
         )
       );
       expect(result.checks).toBe(persona.conversationPrompts.length);
@@ -369,7 +375,10 @@ describe("planned persona snapshots", () => {
     const paused = await Effect.runPromise(
       runGeoScanPersonaBatch(plan.context, plan.personas).pipe(
         Effect.provideService(GeoModelService, fakeModels),
-        Effect.provideService(GeoFeatureFlagService, testFeatureFlags)
+        Effect.provideService(
+          GeoCodingAgentAccessService,
+          testCodingAgentAccess
+        )
       )
     );
     expect(paused.checks).toBe(0);
