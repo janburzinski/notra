@@ -35,6 +35,7 @@ import {
   deploymentElapsedMs,
   formatBuildDuration,
   hasDeploymentInProgress,
+  isPinnedLiveDeployment,
   shortSha,
 } from "@/utils/site-deployments";
 import { siteDeploymentHref } from "@/utils/site-links";
@@ -45,6 +46,7 @@ export function SiteDeploymentsTable({
   organizationSlug,
   siteId,
   deployments,
+  allDeployments = deployments,
   emptyState,
   withActions = false,
   highlightNewRows = false,
@@ -132,6 +134,7 @@ export function SiteDeploymentsTable({
     },
     {
       key: "environment",
+      verticalAlign: "middle",
       header: t("columns.environment"),
       width: "11rem",
       collapsePriority: 2,
@@ -146,6 +149,7 @@ export function SiteDeploymentsTable({
     },
     {
       key: "status",
+      verticalAlign: "middle",
       header: t("columns.status"),
       width: "12rem",
       minWidth: "8rem",
@@ -163,7 +167,7 @@ export function SiteDeploymentsTable({
             }
             status={deployment.status}
           />
-          {deployment.kind === "production" && deployment.live ? (
+          {isPinnedLiveDeployment(deployment, allDeployments) ? (
             <Badge shape="rounded" variant="success">
               {tDeployments("live")}
             </Badge>
@@ -173,6 +177,7 @@ export function SiteDeploymentsTable({
     },
     {
       key: "author",
+      verticalAlign: "middle",
       header: t("columns.author"),
       width: "10rem",
       collapsePriority: 3,
@@ -190,6 +195,7 @@ export function SiteDeploymentsTable({
     },
     {
       key: "created",
+      verticalAlign: "middle",
       header: t("columns.created"),
       width: "8rem",
       align: "right",
@@ -208,6 +214,7 @@ export function SiteDeploymentsTable({
   if (withActions) {
     columns.push({
       key: "actions",
+      verticalAlign: "middle",
       header: <span className="sr-only">{t("columns.actions")}</span>,
       width: "3.25rem",
       align: "right",

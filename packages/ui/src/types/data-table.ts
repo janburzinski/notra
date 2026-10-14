@@ -29,6 +29,8 @@ export interface TableColumn<T> {
   sortable?: boolean;
   /** Cell text alignment. */
   align?: "left" | "center" | "right";
+  /** Vertical cell alignment in content-sized rows. Defaults to "top". */
+  verticalAlign?: "top" | "middle";
   /** Column width as a CSS length, e.g. "160px", "20%" or "2fr". Omit to share remaining space equally. */
   width?: string;
   /** Floor for this column. Defaults to the header label plus sort/padding chrome so titles never ellipsize. */

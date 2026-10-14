@@ -33,6 +33,36 @@ export function hasDeploymentInProgress(
   );
 }
 
+/**
+ * The newest ready production deployment is live by default, so only a
+ * deployment that is live although it is not the newest (after a rollback)
+ * needs a badge.
+ */
+export function isPinnedLiveDeployment(
+  deployment: Pick<SiteDeployment, "id" | "kind" | "live">,
+  deployments: readonly Pick<
+    SiteDeployment,
+    "id" | "kind" | "status" | "createdAt"
+  >[]
+): boolean {
+  if (!deployment.live || deployment.kind !== "production") {
+    return false;
+  }
+  let newestReady: (typeof deployments)[number] | null = null;
+  for (const candidate of deployments) {
+    if (
+      candidate.kind === "production" &&
+      candidate.status === "ready" &&
+      (!newestReady ||
+        new Date(candidate.createdAt).getTime() >
+          new Date(newestReady.createdAt).getTime())
+    ) {
+      newestReady = candidate;
+    }
+  }
+  return newestReady?.id !== deployment.id;
+}
+
 export function stripAnsi(text: string): string {
   return text.replace(ANSI_SEQUENCE, "");
 }

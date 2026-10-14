@@ -368,6 +368,7 @@ export function SiteDeploymentsPage() {
       </div>
 
       <SiteDeploymentsTable
+        allDeployments={deployments}
         deployments={visible}
         emptyState={<div className="text-foreground w-full">{emptyState}</div>}
         highlightNewRows

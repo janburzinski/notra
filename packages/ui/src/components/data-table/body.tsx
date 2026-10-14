@@ -155,7 +155,14 @@ export function DataTableBodyRow<T>({
         <TableCell
           className={cn(
             "h-auto max-w-0",
-            contentSized ? "overflow-visible align-top" : "overflow-hidden",
+            contentSized
+              ? cn(
+                  "overflow-visible",
+                  column.verticalAlign === "middle"
+                    ? "align-middle"
+                    : "align-top"
+                )
+              : "overflow-hidden",
             cellBorder,
             alignText(column.align)
           )}

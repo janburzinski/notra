@@ -359,6 +359,8 @@ export interface SiteDeploymentsTableProps {
   organizationSlug: string;
   siteId: string;
   deployments: SiteDeployment[];
+  /** Unfiltered list; decides which deployment is live by default. */
+  allDeployments?: SiteDeployment[];
   emptyState?: ReactNode;
   withActions?: boolean;
   highlightNewRows?: boolean;
