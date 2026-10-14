@@ -285,6 +285,15 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     gateways: ["vercel", "openrouter"],
   },
   {
+    id: "meta/muse-wonder-1.0",
+    provider: "meta",
+    label: "Muse Wonder",
+    zdr: "none",
+    released: "2026-10-12",
+    default: false,
+    gateways: ["vercel"],
+  },
+  {
     id: "meta/muse-spark-1.3",
     provider: "meta",
     label: "Muse Spark 1.3",
@@ -533,6 +542,14 @@ export const GEO_COMMERCE_AUDIENCE_ENGINE_IDS: readonly string[] = [
 
 export const GEO_MODEL_FEED_URL = "https://ai-gateway.vercel.sh/v1/models";
 export const GEO_MODEL_FEED_REVALIDATE_SECONDS = 3600;
+
+/** Meta's native search is limited to its hosted text models and excludes ZDR. */
+export const GEO_META_SEARCH_MODEL_IDS: ReadonlySet<string> = new Set([
+  "meta/muse-wonder-1.0",
+  "meta/muse-spark-1.3",
+  "meta/muse-spark-1.2",
+  "meta/muse-spark-1.1",
+]);
 /** Models shown per provider before "Show x other models". */
 export const GEO_PICKER_VISIBLE_MODELS = 3;
 /** Providers shown in the picker before "Show x more providers". */
@@ -552,6 +569,7 @@ export const GEO_MODEL_EXCLUDED_TAGS: ReadonlySet<string> = new Set([
 export const GEO_MODEL_EXCLUDED_ID_PATTERN = /(-fast|-beta|-contributor)$/;
 /** Retire a model here; add a replacement below to migrate saved selections. */
 export const GEO_MODEL_EXCLUDED_IDS: ReadonlySet<string> = new Set([
+  "meta/muse-glimmer-30b",
   "meta/muse-spark-1.1",
   "spacexai/grok-4.6",
 ]);

@@ -159,6 +159,9 @@ export const geoModelLive = Layer.succeed(
             providerOptions: {
               gateway: {
                 tags: ["geo-scan-grounded"],
+                ...(input.engine.provider === "gateway-meta"
+                  ? { disallowPromptTraining: true }
+                  : {}),
                 ...(input.engine.provider === "gateway-openai" && useFlex
                   ? { serviceTier: "flex" }
                   : {}),

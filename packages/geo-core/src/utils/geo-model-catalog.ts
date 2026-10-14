@@ -2,6 +2,7 @@ import {
   GEO_COMMERCE_AUDIENCE_ENGINE_IDS,
   GEO_DEFAULT_ENGINE_IDS,
   GEO_GENERAL_AUDIENCE_ENGINE_IDS,
+  GEO_META_SEARCH_MODEL_IDS,
   GEO_MODEL_CATALOG_SEED,
   GEO_MODEL_CATALOG_STATIC,
   GEO_MODEL_EXCLUDED_ID_PATTERN,
@@ -49,7 +50,7 @@ function toCatalogEntry(
     id: model.id,
     provider,
     label: model.name,
-    zdr: model.zdr,
+    zdr: GEO_META_SEARCH_MODEL_IDS.has(model.id) ? "none" : model.zdr,
     released:
       toDayString(model.released) || (SEED_RELEASE_DATES.get(model.id) ?? ""),
     default: DEFAULT_ENGINE_SET.has(model.id),

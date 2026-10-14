@@ -12,6 +12,7 @@ import {
   resolveGeoGroundedZdrMode,
 } from "../src/utils/geo-engines";
 import {
+  hasGroundedVariant,
   resolveGroundedEngineByKey,
   resolveGroundedEngines,
 } from "../src/utils/geo-grounded-engines";
@@ -93,6 +94,96 @@ describe("selected grounded engines", () => {
         })
       ).toEqual([]);
     }
+  });
+
+  test("Meta search is limited to hosted Muse models and requires non-ZDR approval", () => {
+    const available = buildGeoModelCatalogFromFeed(
+      [
+        "muse-wonder-1.0",
+        "muse-spark-1.3",
+        "muse-glimmer-30b",
+        "llama-4-scout",
+      ].map((slug) => ({
+        id: `meta/${slug}`,
+        name: slug,
+        owned_by: "meta",
+        type: "language",
+        zdr: "all" as const,
+      }))
+    );
+    const resolved = {
+      ...available,
+      models: available.models.map((model) => ({
+        ...model,
+        supportsGroundedChecks:
+          resolveGroundedEngines([model.id], available).length > 0,
+      })),
+    };
+    for (const id of ["meta/muse-wonder-1.0", "meta/muse-spark-1.3"]) {
+      const [engine] = resolveGroundedEngines([id], available);
+      expect(engine).toMatchObject({
+        key: `${id}-grounded`,
+        model: id,
+        provider: "gateway-meta",
+      });
+      expect(available.models.find((model) => model.id === id)?.zdr).toBe(
+        "none"
+      );
+      expect(isGeoWebSearchEngine(resolved, id)).toBe(true);
+      expect(hasGroundedVariant(id)).toBe(true);
+      expect(resolveGroundedEngineByKey(engine?.key ?? "")?.model).toBe(id);
+      if (!engine) {
+        throw new Error("Hosted Muse models should have a search route");
+      }
+      expect(
+        resolveGeoGroundedZdrMode(available, engine, {
+          enforceZdr: false,
+          nonEnforcedMode: "preferred",
+          nonZdrApprovedEngines: [],
+        })
+      ).toBe("none");
+      expect(
+        resolveGeoGroundedZdrMode(available, engine, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: [],
+        })
+      ).toBe(null);
+      expect(
+        resolveGeoGroundedZdrMode(available, engine, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: [id],
+        })
+      ).toBe("none");
+    }
+    for (const id of ["meta/muse-glimmer-30b", "meta/llama-4-scout"]) {
+      expect(resolveGroundedEngines([id], available)).toEqual([]);
+      expect(resolveGroundedEngineByKey(`${id}-grounded`)).toBe(null);
+      expect(hasGroundedVariant(id)).toBe(false);
+      expect(isGeoWebSearchEngine(resolved, id)).toBe(false);
+    }
+    expect(
+      available.models.find((model) => model.id === "meta/muse-glimmer-30b")
+    ).toBeUndefined();
+    expect(
+      available.models.find((model) => model.id === "meta/llama-4-scout")?.zdr
+    ).toBe("all");
+    const fallback = seedGeoModelCatalog();
+    expect(
+      fallback.models.find((model) => model.id === "meta/muse-wonder-1.0")
+    ).toMatchObject({
+      label: "Muse Wonder",
+      zdr: "none",
+      gateways: ["vercel"],
+    });
+    expect(
+      resolveGroundedEngines(["meta/muse-wonder-1.0"], fallback)
+    ).toHaveLength(1);
+    expect(
+      fallback.models.some((model) => model.id.includes("wonder-full"))
+    ).toBe(false);
+    expect(
+      resolveGroundedEngineByKey("meta/muse-wonder-full-1.0-grounded")
+    ).toBe(null);
   });
 
   test("only plans selected models, even when older models remain in the catalog", () => {

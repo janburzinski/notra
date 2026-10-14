@@ -180,6 +180,12 @@ export function resolveGeoGroundedZdrMode(
   engine: GeoGroundedEngine,
   policy: GeoZdrPolicy
 ): GeoZdrMode | null {
+  if (engine.provider === "gateway-meta") {
+    return !policy.enforceZdr ||
+      policy.nonZdrApprovedEngines.includes(engineModelOf(engine.key))
+      ? "none"
+      : null;
+  }
   if (!policy.enforceZdr) {
     return policy.nonEnforcedMode ?? "preferred";
   }

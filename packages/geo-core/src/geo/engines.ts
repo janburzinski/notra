@@ -53,6 +53,15 @@ export function buildGroundedInvocation(
       };
     case "gateway-perplexity":
       return { model: gateway(engine.model, groundedGateway), tools: {} };
+    case "gateway-meta":
+      // Meta accepts the OpenAI-compatible search tool, but rejects it under ZDR.
+      if (options.zdr === "required") {
+        throw new Error("Meta web search does not support zero data retention");
+      }
+      return {
+        model: gateway(engine.model, { ...groundedGateway, zdr: "none" }),
+        tools: { web_search: openai.tools.webSearch({}) },
+      };
     case "gateway-spacexai":
       return {
         model: gateway(engine.model, groundedGateway),

@@ -30,6 +30,7 @@ Notra runs every engine you select. Engines that can search the live web always 
 | Anthropic | Claude Opus, Fable, Sonnet, Haiku |
 | Google | Gemini Flash and Pro |
 | Perplexity | Sonar |
+| Meta | Muse Wonder and Muse Spark |
 | SpaceXAI | Grok |
 | Google AI Overview | Fetched from Google search results |
 
@@ -37,7 +38,7 @@ These engines save the search queries they ran and the sources they cited. See [
 
 ## Engines without web search
 
-Some providers have no web search route in Notra: Meta, Moonshot AI (Kimi), Z.AI (GLM), DeepSeek, Mistral AI and Cursor. Notra still runs them, but they answer from what the model learned in training, so their answers have no sources or search queries.
+Some models have no web search route in Notra: Meta's Llama, Moonshot AI (Kimi), Z.AI (GLM), DeepSeek, Mistral AI and Cursor. Notra still runs them, but they answer from what the model learned in training, so their answers have no sources or search queries.
 
 The model picker and the results label these engines **No web search**. Compare them with each other rather than with search engines, because a model without search can't see pages you published recently.
 
@@ -52,5 +53,9 @@ Notra fetches Google AI Overview from Google search results rather than a model 
 ## Zero data retention
 
 The **Zero data retention** toggle limits scans to models with a ZDR route, and it needs the ZDR add-on to turn on. You can approve models without ZDR one by one, including Google AI Overview and the coding agents.
+
+Meta's native web search does not support ZDR. Muse Wonder and Muse Spark need individual approval when you enforce ZDR, even though their answers without search have ZDR hosts. Notra keeps prompt training disabled for their search calls. See [Meta's ZDR restrictions](https://dev.meta.ai/help/policies-and-privacy/zero-data-retention).
+
+Muse Wonder Full is available only through a Muse Code subscription and has no Model API route, so Notra does not list it as an API model. See [Meta's model availability](https://dev.meta.ai/docs/models).
 
 You can enable up to 64 models. Each engine multiplies the answers a scan uses, so more engines use more of your AI answer quota.

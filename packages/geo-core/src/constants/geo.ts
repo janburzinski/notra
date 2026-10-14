@@ -265,6 +265,12 @@ export const GEO_GROUNDED_PROVIDERS: readonly GeoGroundedProviderConfig[] = [
     isAvailable: () => true,
   },
   {
+    provider: "gateway-meta",
+    zdr: "none",
+    envVar: null,
+    isAvailable: () => true,
+  },
+  {
     provider: "gateway-spacexai",
     zdr: "none",
     envVar: null,

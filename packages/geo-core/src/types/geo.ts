@@ -878,6 +878,7 @@ export type GeoGroundedProvider =
   | "gateway-anthropic"
   | "gateway-google"
   | "gateway-perplexity"
+  | "gateway-meta"
   | "gateway-spacexai"
   | "direct-openai"
   | "direct-anthropic"
