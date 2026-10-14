@@ -134,8 +134,6 @@ async function consumeGeoOpenCodeStream(
     if (!signal.aborted) {
       throw error;
     }
-    // The caller deletes this conversation's one-use box next, terminating the
-    // backend run. Keep the abandoned SDK promise handled until that completes.
     void consumption.catch(() => undefined);
     throw abortReason(signal);
   } finally {

@@ -8,16 +8,10 @@ import {
 import type { OfferingDomainFaviconProps } from "@/types/offering-check";
 import { normalizeDomain, offeringFaviconUrl } from "@/utils/offering-domain";
 
-/**
- * Shows the site's favicon next to the domain field, but only once a real
- * icon has loaded. Nothing shows while it loads, when it fails, or when Google
- * only has its small default globe for the domain.
- */
 export function OfferingDomainFavicon({ value }: OfferingDomainFaviconProps) {
   const [domain, setDomain] = useState<string | null>(null);
   const [loaded, setLoaded] = useState<string | null>(null);
 
-  // Waits for a pause in typing so intermediate domains are never fetched.
   useEffect(() => {
     const timer = setTimeout(
       () => setDomain(normalizeDomain(value)),
@@ -43,7 +37,6 @@ export function OfferingDomainFavicon({ value }: OfferingDomainFaviconProps) {
     };
   }, [domain]);
 
-  // Hides at once when the text changes, not only after the next settle.
   const visible =
     loaded !== null && loaded === domain && normalizeDomain(value) === domain;
 

@@ -9,7 +9,6 @@ import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { verifyInternalWorkflowRequest } from "@/lib/workflows/internal-auth";
 import { ratelimit } from "@/utils/ratelimit";
 
-/** Status the API turns back into a mapped GEO error. */
 const GEO_FAILURE_STATUS = 422;
 
 /**

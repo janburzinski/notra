@@ -32,7 +32,6 @@ const chatRateLimitResponse = rateLimitResponse(
   RATE_LIMITS.chatGeneration.window
 );
 
-// The demo has no agent service; /v1/chats answers with the demo agent.
 const DEMO_AGENT_UNAVAILABLE =
   "The agent session API isn't available in the demo. Use POST /v1/chats to try the agent.";
 
@@ -208,8 +207,6 @@ agentChatsRoutes.openAPIRegistry.registerPath(
   })
 );
 
-// Continues a session the create call already audited; one audit row per
-// turn would only be noise.
 // evlog-map-disable-next-line audit -- audited on session creation
 agentChatsRoutes.post("/eve/v1/session/:sessionId", async (c) => {
   const log = c.get("log");
@@ -290,8 +287,6 @@ agentChatsRoutes.openAPIRegistry.registerPath(
   })
 );
 
-// Continues a session the create call already audited; one audit row per
-// turn would only be noise.
 // evlog-map-disable-next-line audit -- audited on session creation
 agentChatsRoutes.get("/eve/v1/session/:sessionId/stream", async (c) => {
   const log = c.get("log");

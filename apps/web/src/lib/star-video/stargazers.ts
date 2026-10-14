@@ -51,10 +51,6 @@ const readGitHubJson = <T>(response: Response) =>
     catch: (cause) => new GitHubRequestFailed({ cause }),
   });
 
-/**
- * Avatar sources are best effort: a failed or non-OK request yields `null` so
- * the next source can be tried. Only a rejected token is a real failure.
- */
 function fetchAvatarSource<T>(
   url: string,
   token: string,

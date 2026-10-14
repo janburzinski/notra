@@ -12,10 +12,6 @@ import { getDemoClientIp, hashDemoClientIp } from "@/utils/demo-ip-hash";
 import { resolveDemoLanding, safeDemoReturnTo } from "@/utils/demo-return-to";
 import { ratelimit } from "@/utils/ratelimit";
 
-/**
- * Relative redirect: behind a proxy (e.g. Railway) request.url carries the
- * bind address instead of the public host, so absolute URLs would leak it.
- */
 function redirectTo(location: string) {
   return new Response(null, { status: 307, headers: { location } });
 }
@@ -42,7 +38,6 @@ export async function GET(request: Request) {
   const sandbox = success
     ? await claimPooledSandbox({ timeZone: null, ipHash })
     : null;
-  // Denied requests must not buy pool maintenance (cleanup, rebase, seeding).
   if (success) {
     maintainDemoSandboxPool();
   }

@@ -66,7 +66,6 @@ export function WebTrendChart({
       if (current.includes(key)) {
         return current.filter((hiddenKey) => hiddenKey !== key);
       }
-      // The chart always keeps one series on screen.
       return current.length + 1 >= series.length ? current : [...current, key];
     });
   };

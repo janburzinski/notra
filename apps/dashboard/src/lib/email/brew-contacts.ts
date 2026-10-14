@@ -23,16 +23,11 @@ import {
 
 const WHITESPACE_REGEX = /\s+/;
 
-/**
- * True when any organization the user owns has the flag on. Only owners get
- * these emails, and a missing settings row falls back the way the senders do.
- */
 function ownedOrganizationsWith(column: AnyColumn, missingRowDefault: boolean) {
   return sql<boolean>`coalesce(bool_or(${members.role} = 'owner' and coalesce(${column}, ${sql.raw(String(missingRowDefault))})), false)`;
 }
 
 function splitName(name: string, email: string) {
-  // Users without a real name have their email (or its local part) as name.
   if (name === email || name === email.split("@")[0]) {
     return {};
   }

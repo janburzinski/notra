@@ -45,14 +45,6 @@ function SlideInTabIcon({ children, pinned = false }: SlideInTabIconProps) {
   );
 }
 
-/**
- * Tabs indicator for triggers whose width animates when they turn active.
- * The built-in indicator measures its target once and chases it with a CSS
- * transition, so it lags and overshoots while the tabs resize. This one
- * re-measures the active tab every frame and interpolates from where it
- * started, so it lands with the resize in one motion and never leaves the
- * space between the two tabs.
- */
 function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const boxRef = useRef<IconTabsIndicatorBox | null>(null);
@@ -75,7 +67,6 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
       frame = 0;
       const target = measureActiveTab(list);
       if (!target) {
-        // The active tab can be marked a frame after this effect runs.
         if (now - start < ICON_TABS_INDICATOR_MS) {
           frame = requestAnimationFrame(tick);
         }
@@ -104,7 +95,6 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
     };
     tick(start);
 
-    // Keep following the tab once settled, e.g. when a count changes.
     const observer = new ResizeObserver(() => {
       if (frame !== 0) {
         return;

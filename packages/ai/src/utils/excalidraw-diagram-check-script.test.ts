@@ -10,8 +10,6 @@ import {
   DIAGRAM_SPEC_PATH,
 } from "../constants/excalidraw-diagram";
 
-// The check script ships as a string into the sandbox and runs under plain
-// node there, so run it the same way here.
 let dir: string;
 
 beforeAll(() => {

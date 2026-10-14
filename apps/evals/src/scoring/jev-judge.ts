@@ -15,7 +15,6 @@ function hash(text: string): number {
   return value >>> 0;
 }
 
-/** Stable fake verdict for demo runs, skewed by `quality` (0..1). */
 function demoVerdict(
   questions: Questions,
   seedText: string,
@@ -29,17 +28,12 @@ function demoVerdict(
   return { values, costUsd: 0, costSource: "estimated" };
 }
 
-/**
- * Jev as an LLM-judge replacement: typed questions in, calibrated
- * probabilities out, ~300 ms and a fraction of a cent per call.
- */
 export async function judgeWithJev(params: {
   feature: string;
   state: Record<string, unknown>;
   questions: Questions;
   abortSignal: AbortSignal;
   demo: boolean;
-  /** Only used in demo mode. */
   demoQuality?: number;
 }): Promise<JudgeVerdict> {
   if (params.demo) {

@@ -23,7 +23,6 @@ import {
 } from "../utils/excalidraw-diagram";
 import { renderExcalidrawSceneToSvg } from "../utils/excalidraw-render";
 
-// Every character is half the font size wide, so expected sizes are easy to derive.
 const CHAR_WIDTH_RATIO = 0.5;
 const measurer: DiagramTextMeasurer = {
   measure(text, fontSize) {
@@ -73,7 +72,6 @@ describe("buildExcalidrawScene", () => {
     const labelWidth = "A much longer label than fits".length * 20 * 0.5;
 
     expect(box.width).toBe(labelWidth + DIAGRAM_SHAPE_PADDING * 2);
-    // The authored center (160, 130) stays put while the box grows.
     expect(box.x + box.width / 2).toBe(160);
     expect(box.y + box.height / 2).toBe(130);
     expect(label.containerId).toBe("box");
@@ -117,7 +115,6 @@ describe("buildExcalidrawScene", () => {
     const last = arrow.points.at(-1) ?? [0, 0];
     const end: [number, number] = [arrow.x + last[0], arrow.y + last[1]];
 
-    // Pull each endpoint back by the gap; the result must sit on the outline.
     const direction = [end[0] - start[0], end[1] - start[1]];
     const length = Math.hypot(direction[0] ?? 0, direction[1] ?? 0);
     const unit = [(direction[0] ?? 0) / length, (direction[1] ?? 0) / length];
@@ -163,7 +160,6 @@ describe("buildExcalidrawScene", () => {
 
     expect(arrow.points).toHaveLength(4);
     expect(arrow.roundness).toBeNull();
-    // Leaves a's right edge toward the first waypoint, not toward b's center.
     expect(arrow.x).toBe(160 + DIAGRAM_BINDING_GAP);
     expect(label.containerId).toBe("loop");
     expect(label.x + label.width / 2).toBeCloseTo(300, 5);

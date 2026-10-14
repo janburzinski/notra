@@ -16,10 +16,6 @@ import {
 import { cn } from "@/lib/utils";
 import type { TrafficSheetHeroProps } from "@/types/geo";
 
-/**
- * The AI traffic page's hero at drawer size: a metric strip on the shell with
- * the daily chart on the lifted card below it.
- */
 export function TrafficSheetHero({
   stats,
   series,
@@ -40,8 +36,6 @@ export function TrafficSheetHero({
       >
         {stats.map((stat) => (
           <div
-            // Narrow drawers list the metrics as label/value rows so large numbers
-            // keep every digit; wider ones switch to three columns.
             className="border-border flex min-w-0 items-center justify-between gap-3 overflow-hidden border-b px-4 py-3 last:border-b-0 @sm/hero:flex-col @sm/hero:items-start @sm/hero:justify-start @sm/hero:gap-2 @sm/hero:border-r @sm/hero:border-b-0 @sm/hero:py-4 @sm/hero:last:border-r-0 @md/hero:px-5"
             key={stat.label}
           >

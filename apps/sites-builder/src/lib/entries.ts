@@ -36,10 +36,6 @@ export function getAreaEntries(): Promise<BlogEntry[] | ChangelogEntry[]> {
   return params.area === "blog" ? getBlogEntries() : getChangelogEntries();
 }
 
-/**
- * Mounted areas worth linking to. Navigation keeps the current area even when
- * it is empty so readers can still switch away; feeds pass `keepCurrent: false`.
- */
 export async function listedAreas({ keepCurrent = true } = {}): Promise<
   SiteArea[]
 > {

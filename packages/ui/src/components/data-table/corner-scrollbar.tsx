@@ -72,7 +72,6 @@ export function TableCornerScrollbar({
       const top = CORNER_SCROLLBAR_GAP_PX + progress * travel;
       thumb.style.height = `${length}px`;
       thumb.style.transform = `translateY(${top}px)`;
-      // A thumb end inside the corner's radius would be clipped by the curve.
       wrapper.dataset.cornerStart = String(visible && top < TABLE_BODY_RADIUS_PX);
       wrapper.dataset.cornerEnd = String(
         visible && top + length > element.offsetHeight - TABLE_BODY_RADIUS_PX
@@ -130,8 +129,6 @@ export function TableCornerScrollbar({
       update();
     };
 
-    // Dragging maps pointer travel along the track back to scroll distance.
-    // Pointer capture keeps move/up on the thumb, so the listeners can stay.
     let dragStartY = 0;
     let dragStartScroll = 0;
     const handlePointerDown = (event: PointerEvent) => {

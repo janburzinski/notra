@@ -82,7 +82,6 @@ const loadWebAnalyticsForScope = Effect.fn("web.analytics")(function* (
   };
   const params = { ...base, hosts: scope.hosts.join(","), path };
   const configured = isTinybirdConfigured();
-  // Demo traffic is generated locally; unsupported web pipes return null.
   const query = configured && !isDemoMode() ? geoRequiredQuery : geoQuery;
 
   const [

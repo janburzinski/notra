@@ -14,7 +14,6 @@ export const UPDATE_TODOS_MAX_CALLS = 6;
  * calls the reply already made so the cap holds across approvals.
  */
 export function createUpdateTodosTool(previousCalls = 0): Tool {
-  // Approvals resume a reply in a new request, so earlier calls count too.
   let calls = previousCalls;
 
   return tool({

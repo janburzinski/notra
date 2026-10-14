@@ -19,11 +19,6 @@ import { Button } from "@/components/button";
 import { SCHEDULE_DIALOG_MODES } from "@/constants/content-calendar";
 import type { ScheduleDialogFooterProps } from "@/types/content/schedule";
 
-/**
- * One button per footer: the form's submit, or the schedule's own action when
- * there is nothing to edit. Rarer actions on an editable schedule (publish
- * now, unschedule) sit in a menu so they don't compete with saving.
- */
 export function ScheduleDialogFooter({
   mode,
   isBusy,

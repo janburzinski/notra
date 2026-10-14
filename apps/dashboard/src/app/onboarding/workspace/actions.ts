@@ -305,8 +305,6 @@ async function triggerOnboardingBrandAnalysisImpl(
     };
   }
 
-  // The visibility step prefills its language from the browser, so warm the
-  // same variant.
   const language = preferredGeoLanguage(requestHeaders?.get("accept-language"));
   afterResponse(() =>
     warmGeoOnboardingCache(input.organizationId, input.websiteUrl, language)
@@ -552,7 +550,6 @@ async function saveOnboardingNotificationSettingsImpl(
     organizationId: parsed.data.organizationId,
     dailySummary: parsed.data.dailySummary,
   });
-  // Marketing consent is the user's own, not the organization's.
   await applyOnboardingMarketingChoice({
     userId,
     enabled: parsed.data.marketingEmails,

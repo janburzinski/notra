@@ -21,10 +21,6 @@ export interface SectionTickItem {
   level?: SectionTickLevel;
 }
 
-/**
- * The tick number is the item's position in the list, so it is derived from the
- * index rather than stored on every item.
- */
 function tickNumber(index: number) {
   return String(index + 1).padStart(2, "0");
 }

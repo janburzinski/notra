@@ -56,7 +56,6 @@ function serializePostMetadata(post: PostRow, authors: PostAuthorsById) {
   };
 }
 
-/** Author IDs referenced by the posts that expose metadata, deduplicated. */
 export function collectPostAuthorIds(
   rows: readonly Pick<PostRow, "contentType" | "authorIds">[]
 ) {
@@ -120,7 +119,6 @@ export function postQueryColumns() {
   } as const;
 }
 
-/** `.returning()` projection matching `PostRow`. */
 export function postReturningColumns() {
   return {
     id: posts.id,
@@ -146,7 +144,6 @@ export function postReturningColumns() {
   };
 }
 
-/** Leave unexpected database errors to Hono's central error handler. */
 export function runPostProgram<A, E extends PostDomainError>(
   program: Effect.Effect<A, E | PostDatabaseError>
 ) {

@@ -231,9 +231,7 @@ const LinkedInPreview = dynamic(
 const loadMotionFeatures = () =>
   import("@/lib/motion-features").then((mod) => mod.default);
 
-const emptySubscribe = () => () => {
-  // no external store to subscribe to; used to detect hydration
-};
+const emptySubscribe = () => () => {};
 
 function SlackMirrorNotice() {
   const t = useTranslations("chat.page");
@@ -604,8 +602,6 @@ function StandaloneChatPageClient({
   const hasCustomizedContextRef = useRef(hasCustomizedContext);
   const organizationIdRef = useRef(organizationId);
   const activeProjectIdRef = useRef(activeProjectId);
-  // Latest user message the server rejected because another response for
-  // this chat was still streaming.
   const activeStreamConflictRef = useRef<string | null>(null);
   const requeueConflictedMessageRef = useRef<(messageId: string) => boolean>(
     () => false
@@ -668,12 +664,8 @@ function StandaloneChatPageClient({
   const [wasStoppedByUser, setWasStoppedByUser] = useState(false);
   const wasStoppedByUserRef = useRef(false);
 
-  const drainQueueRef = useRef<() => void>(() => {
-    // Populated after dispatchMessage is defined below.
-  });
-  const flushSteerAfterStopRef = useRef<() => void>(() => {
-    // Populated after dispatchMessage is defined below.
-  });
+  const drainQueueRef = useRef<() => void>(() => {});
+  const flushSteerAfterStopRef = useRef<() => void>(() => {});
   const steerAfterStopRef = useRef<QueuedMessage | null>(null);
   const queuedMessagesRef = useRef<QueuedMessage[]>([]);
   const messagesRef = useRef<ChatUIMessage[]>([]);
@@ -683,12 +675,10 @@ function StandaloneChatPageClient({
   const isWaitingForActiveStreamRef = useRef(false);
   const wasInterruptedForQueueRef = useRef(false);
   const finishAfterStopRef = useRef<(() => void) | null>(null);
-  // Moving a new chat to its own URL remounts this page, so it waits until no
-  // response is streaming or queued.
   const hasPendingChatNavigationRef = useRef(false);
-  const navigateToNewChatRef = useRef<(message: ChatUIMessage) => void>(() => {
-    // Populated after the queue refs are defined below.
-  });
+  const navigateToNewChatRef = useRef<(message: ChatUIMessage) => void>(
+    () => {}
+  );
 
   const handleFinish = useCallback<ChatOnFinishCallback<ChatUIMessage>>(
     ({
@@ -823,8 +813,6 @@ function StandaloneChatPageClient({
   });
 
   const chatPosts = useMemo(() => getChatPosts(messages), [messages]);
-  // Rebuilt per streamed chunk; only a new id, title or type is a real
-  // change, so the composer does not re-render on every token.
   const mentionsDraft = chatPosts.flatMap((post) =>
     post.postId
       ? [
@@ -850,12 +838,10 @@ function StandaloneChatPageClient({
   );
   const { active: activeRightPanel, closePanel, openPanel } = useRightPanel();
   const isPreviewOpen = activeRightPanel === "preview";
-  // Preview tabs: each post opens at most once, in the order it was opened.
   const [storedPreviewTabIds, setPreviewTabIds] = useState<string[]>([]);
   const [storedPreviewToolCallId, setPreviewToolCallId] = useState<
     string | null
   >(null);
-  // Retry, edit or a branch switch can drop posts; their tabs go with them.
   const previewTabIds = useMemo(() => {
     const postIds = new Set(chatPosts.map((post) => post.toolCallId));
     return storedPreviewTabIds.filter((id) => postIds.has(id));
@@ -909,7 +895,6 @@ function StandaloneChatPageClient({
     [tCommon]
   );
 
-  // Clicking an annotation opens its post and jumps to the passage.
   const annotationFocus = useChatQuote()?.annotationFocus ?? null;
   const openFocusedPost = useEffectEvent((postId: string) => {
     const post = chatPosts.find((entry) => entry.postId === postId);
@@ -923,7 +908,6 @@ function StandaloneChatPageClient({
     }
   }, [annotationFocus]);
 
-  // While the preview is open it follows the newest post the agent starts.
   const latestPostToolCallId = chatPosts.at(-1)?.toolCallId ?? null;
   const [followedPostToolCallId, setFollowedPostToolCallId] =
     useState(latestPostToolCallId);
@@ -939,8 +923,6 @@ function StandaloneChatPageClient({
     }
   }
 
-  // updatePost and editPost change a saved post mid-reply; refetch it as soon
-  // as each call lands so the preview tracks the agent's edits.
   const refreshedPostEditsRef = useRef(new Set<string>());
   useEffect(() => {
     const lastMessage = messages.at(-1);
@@ -1639,8 +1621,6 @@ function StandaloneChatPageClient({
       const original = message
         ? extractUserMessageContent(message)
         : { text: "", attachments: [] };
-      // The editor shows display text only; keep the annotations and post
-      // tags the original message carried.
       await resendFromUserMessage(
         userMessageId,
         restoreChatReferences(original.text, newText, postTitlesById),
@@ -1921,7 +1901,6 @@ function StandaloneChatPageClient({
   }, []);
 
   const handleEditQueued = useCallback((message: QueuedMessage) => {
-    // Restore files first: if they don't fit, the message stays queued.
     if (
       message.attachments?.length &&
       !chatInputRef.current?.setAttachments(message.attachments)
@@ -2109,8 +2088,6 @@ function StandaloneChatPageClient({
     const data = await dashboardOrpcClient.chat.sessions
       .get({ organizationId, chatId: stableChatId })
       .catch((error: unknown) => {
-        // A failed response just waits for the next poll; network errors
-        // still surface through the poller's logging.
         if (error instanceof ORPCError) {
           return null;
         }
@@ -2120,8 +2097,6 @@ function StandaloneChatPageClient({
       return;
     }
     stopActiveStreamPolling();
-    // Continue from the server history so the finished response is kept
-    // instead of being overwritten by this client's stale copy.
     if (data.messages?.length) {
       setMessages(data.messages);
     }
@@ -2158,7 +2133,6 @@ function StandaloneChatPageClient({
         return false;
       }
       const { text, attachments } = extractUserMessageContent(message);
-      // The queue carries text only; attachments keep the error and retry flow.
       if (attachments.length > 0 || !text.trim()) {
         return false;
       }
@@ -2340,8 +2314,6 @@ function StandaloneChatPageClient({
           part.type === "tool-createImage" ||
           part.type === `tool-${UPDATE_TODOS_TOOL_NAME}`)),
   });
-  // Between steps of an assistant reply the indicator would blink in and out
-  // for a few frames, so it only appears once that gap actually lasts.
   const showThinkingIndicator = useDelayedAppearance(
     chatActivity.showThinkingIndicator,
     {
@@ -2350,8 +2322,6 @@ function StandaloneChatPageClient({
     }
   );
 
-  // A message shows one checklist, where the plan was first written, with
-  // the latest state of every later update.
   function renderTodoPart(toolPart: RenderableToolPart, messageId: string) {
     const message = messages.find((entry) => entry.id === messageId);
     const todoParts =
@@ -2362,9 +2332,6 @@ function StandaloneChatPageClient({
     if (todoParts[0] !== toolPart) {
       return null;
     }
-    // Updates over the per-reply cap come back with accepted: false. A
-    // later update counts once its input is complete, so a half-streamed list
-    // never replaces the full one; the first plan may stream in.
     const latest = todoParts.findLast((part, partIndex) => {
       if (!isToolUIPart(part)) {
         return false;
@@ -2388,8 +2355,6 @@ function StandaloneChatPageClient({
     const isLastAssistant =
       messages.findLast((entry) => entry.role === "assistant")?.id ===
       messageId;
-    // The last reply knows whether the user stopped it. An older reply that
-    // ended with a step still running was cut off the same way.
     const isStopped = isLastAssistant
       ? wasStoppedByUser
       : todos.data.todos.some((todo) => todo.status === "in_progress");
@@ -2414,7 +2379,6 @@ function StandaloneChatPageClient({
         return null;
       }
 
-      // Annotations from the preview arrive as a block ahead of the text.
       const annotated = parseChatAnnotations(rawText);
       if (annotated) {
         return (
@@ -3027,7 +2991,6 @@ function StandaloneChatPageClient({
                       const userContentParts = isUser
                         ? message.parts.filter((part) => part.type !== "file")
                         : message.parts;
-                      // Images and other files share one tile grid above the bubble.
                       const userAttachmentParts = isUser
                         ? message.parts.filter((part) => part.type === "file")
                         : [];

@@ -78,8 +78,6 @@ export function useBrandAnalysisProgress(
     enabled: !!organizationId,
     refetchInterval: (query) => {
       const progress = query.state.data?.progress;
-      // No data yet (still loading, or the last request failed): keep polling
-      // so a single transient failure cannot freeze the progress UI.
       if (!progress) {
         return INITIAL_POLL_INTERVAL_MS;
       }

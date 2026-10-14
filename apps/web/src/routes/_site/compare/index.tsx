@@ -66,12 +66,10 @@ function ComparePage() {
   return (
     <>
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }}
         type="application/ld+json"
       />

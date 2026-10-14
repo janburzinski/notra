@@ -13,15 +13,6 @@ import { Zai } from "@notra/ui/components/ui/svgs/zai";
 
 import type { PromptCalculatorEngine } from "@/types/landing/prompt-calculator";
 
-/**
- * Engines every plan can scan, and their current models. Mirrors
- * `GEO_MODEL_CATALOG_SEED` in `packages/geo-core/src/constants/geo-model-catalog.ts`
- * the way the dashboard's engine picker shows it: newest release first, with
- * `grok-4.6` excluded. Older models the product still accepts are left off so
- * the list stays short. `defaultModel` is the catalog's `default: true` model,
- * or the newest where there is none. The coding agents (Cursor, Claude Code,
- * Codex, OpenCode) are flag-gated per organization, so they stay off here.
- */
 export const PROMPT_CALCULATOR_ENGINES: PromptCalculatorEngine[] = [
   {
     id: "chatgpt",
@@ -139,7 +130,6 @@ export const PROMPT_CALCULATOR_ENGINES: PromptCalculatorEngine[] = [
   },
 ];
 
-/** Every model id the `models` query param accepts, in display order. */
 export const PROMPT_CALCULATOR_MODEL_IDS: string[] =
   PROMPT_CALCULATOR_ENGINES.flatMap((engine) =>
     engine.models.map((model) => model.id)

@@ -47,8 +47,6 @@ export function DiagramEditorDialog({
 }: DiagramEditorDialogProps) {
   const t = useTranslations("content.diagramEditor");
   const [open, setOpen] = useState(false);
-  // Save stays off until this session's canvas hands over its API; a ref
-  // alone would still point at the previous, unmounted editor on reopen.
   const [editorReady, setEditorReady] = useState(false);
   const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
   const sceneUrl = `/api/organizations/${organizationId}/content/${contentId}/excalidraw`;
@@ -71,12 +69,9 @@ export function DiagramEditorDialog({
     enabled: open,
     gcTime: 0,
     staleTime: 0,
-    // The canvas only reads the scene on mount; a refetch mid-edit is wasted.
     refetchOnWindowFocus: false,
   });
 
-  // Every session starts from the stored scene: a cached one would bring back
-  // the drawing from before the last save or chat edit.
   const openEditor = () => {
     apiRef.current = null;
     setEditorReady(false);
@@ -120,7 +115,6 @@ export function DiagramEditorDialog({
       return { status: "saved", droppedTypes };
     },
     onSuccess: async (result) => {
-      // Keep the editor open so the drawing is not lost.
       if (result.status === "conflict") {
         toast.error(t("conflict"));
         return;
@@ -171,8 +165,6 @@ export function DiagramEditorDialog({
         <HugeiconsIcon className="size-4" icon={PencilEdit02Icon} />
         {t("open")}
       </Button>
-      {/* Escape and outside clicks belong to Excalidraw (deselect, leave text
-          editing); closing on them would throw away unsaved edits. */}
       <Dialog
         disablePointerDismissal
         onOpenChange={(nextOpen, eventDetails) => {

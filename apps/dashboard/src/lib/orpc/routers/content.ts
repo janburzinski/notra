@@ -138,8 +138,6 @@ import {
 
 const TITLE_REGEX = /^#\s+(.+)$/m;
 
-// Upper bound for the sibling rail on the content detail response; matches the
-// maximum page size of the content list.
 const CONTENT_SIBLING_LIMIT = 100;
 
 const postReadColumns = {
@@ -169,8 +167,6 @@ const postReadColumns = {
   updatedAt: true,
 } as const;
 
-// List consumers (sidebar "Recent", dashboard home cards) render a title, a
-// status and a two-line preview, so text bodies stay in the database.
 const POST_LIST_MARKDOWN_PREVIEW_CHARS = 2000;
 
 const postListColumns = {
@@ -338,8 +334,6 @@ export async function buildContentUpdateData(
   }
 
   if (input.socialVideo !== undefined) {
-    // Merge in SQL so a concurrent write to another metadata key survives.
-    // SQL NULL, JSON null or a non-object would turn `||` into an array.
     updateData.sourceMetadata = sql`(case when jsonb_typeof(${posts.sourceMetadata}) = 'object' then ${posts.sourceMetadata} else '{}'::jsonb end) || jsonb_build_object('socialVideo', ${JSON.stringify(input.socialVideo)}::jsonb)`;
   }
 
@@ -705,8 +699,6 @@ export const contentRouter = {
               contentType: true,
               status: true,
             },
-            // The current post is excluded in SQL, and the rail is bounded: a
-            // collection can hold hundreds of posts.
             where: ne(posts.id, post.id),
             orderBy: [asc(posts.createdAt), asc(posts.id)],
             limit: CONTENT_SIBLING_LIMIT,
@@ -1028,7 +1020,6 @@ export const contentRouter = {
       return { content: serializeContent(updated) };
     }),
   authors: contentAuthorsRouter,
-  /** Tags already used in the organization, most used first. */
   tagSuggestions: baseProcedure
     .input(contentOrganizationIdInputSchema)
     .handler(async ({ context, input }) => {
@@ -1051,7 +1042,6 @@ export const contentRouter = {
         organizationId: input.organizationId,
       });
       await assertActiveSubscription(input.organizationId);
-      // The demo's repository is fictional; GitHub writes need a real one.
       assertNotDemo();
 
       if (
@@ -1148,8 +1138,6 @@ export const contentRouter = {
         ]);
 
         const collectionIds = collectionRows.map((collection) => collection.id);
-        // One row per collection: counting and de-duplicating the content types
-        // in Postgres avoids shipping every post of every listed collection.
         const aggregateRows =
           collectionIds.length > 0
             ? await db

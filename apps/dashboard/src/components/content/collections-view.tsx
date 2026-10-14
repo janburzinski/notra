@@ -234,7 +234,6 @@ export function CollectionsView({
   const now = useNow({ updateInterval: 60_000 });
   const formatRelativeDate = (dateString: string) => {
     const date = new Date(dateString);
-    // date-fns has no "just now"; it would print "0 seconds ago".
     if (Math.abs(now.getTime() - date.getTime()) < COLLECTION_JUST_NOW_MS) {
       return tCommon("time.justNow");
     }
@@ -318,7 +317,6 @@ export function CollectionsView({
     },
   ];
 
-  // One shared tooltip glides between the cells instead of reopening.
   return (
     <TooltipProvider delay={COLLECTION_TABLE_TOOLTIP_DELAY_MS}>
       <DataTable

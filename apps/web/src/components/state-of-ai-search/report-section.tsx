@@ -3,10 +3,6 @@ import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { cn } from "@notra/ui/lib/utils";
 import type { ReactNode } from "react";
 
-/**
- * Every block on the report: the dashboard's title row, then one dualtone
- * surface (a framed table or a ReportPanel). No other wrappers.
- */
 export function ReportBlock({
   title,
   description,
@@ -17,7 +13,6 @@ export function ReportBlock({
   title: string;
   description?: ReactNode;
   readout?: ReactNode;
-  /** Pass a subgrid class here to line blocks up across a row. */
   className?: string;
   children: ReactNode;
 }) {
@@ -33,11 +28,6 @@ export function ReportBlock({
   );
 }
 
-/**
- * The table frame for content that is not a table: the shell row carries the
- * labels, the lifted card carries the content, same as a table's header and
- * rows.
- */
 export function ReportPanel({
   header,
   footer,
@@ -46,7 +36,6 @@ export function ReportPanel({
   children,
 }: {
   header?: ReactNode;
-  /** Sits on the shell under the card, like a table footer row. */
   footer?: ReactNode;
   className?: string;
   bodyClassName?: string;
@@ -88,11 +77,6 @@ function ReportHeading({
   );
 }
 
-/**
- * Two blocks side by side whose titles share one row and whose surfaces share
- * the next, so both tables start and end on the same line. On small screens
- * they stack as two normal blocks.
- */
 export function ReportPair({
   left,
   right,

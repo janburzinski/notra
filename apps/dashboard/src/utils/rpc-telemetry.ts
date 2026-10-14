@@ -19,7 +19,6 @@ export function recordAuthorizedOrganization(
   const context = getOperationalContext();
   if (context) {
     context.userId = userId;
-    // A procedure that accesses multiple tenants has no single target.
     context.organizationId =
       context.organizationId === undefined ||
       context.organizationId === organizationId
@@ -47,7 +46,6 @@ export function finalizeRpcRequestAttribution(
     return;
   }
   const emit = logger.emit.bind(logger);
-  // Streaming batches can authorize more targets after the handler returns.
   logger.emit = (overrides) =>
     emit({
       ...overrides,

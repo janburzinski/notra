@@ -2,7 +2,6 @@ export const ASSISTANT_MODEL_ID = "anthropic/claude-sonnet-5.5";
 export const ASSISTANT_FAST_MODEL_ID = "openai/gpt-6-luna";
 export const ASSISTANT_DEEP_MODEL_ID = "anthropic/claude-opus-5.5";
 export const ASSISTANT_TASK_MODEL_ID = "openai/gpt-6-sol";
-/** The image designer subagent stays on a fixed model; it never routes. */
 export const IMAGE_DESIGNER_MODEL_ID = "anthropic/claude-sonnet-5.5";
 export const CONTENT_WRITER_MODEL_ID = "openai/gpt-6-sol";
 export const GPT_6_SOL_CONTEXT_WINDOW_TOKENS = 1_050_000;
@@ -14,12 +13,6 @@ export const ASSISTANT_MODEL_TIERS: readonly string[] = [
   ASSISTANT_DEEP_MODEL_ID,
 ];
 
-/**
- * Choices for the eve `autoModel` evaluator, keyed by gateway model ID. The
- * descriptions guide task classification: the evaluator sees only these
- * plus recent message text, so each one has to cover its slice of the space.
- * Wording was tuned against labelled router cases — see the PR for numbers.
- */
 export const ASSISTANT_AUTO_MODEL_OPTIONS = {
   [ASSISTANT_FAST_MODEL_ID]: {
     description:
@@ -38,7 +31,6 @@ export const ASSISTANT_AUTO_MODEL_OPTIONS = {
   },
 } as const;
 
-/** Set to `off`, `false` or `0` to pin chat to ASSISTANT_MODEL_ID; tasks stay fixed. */
 export const AUTO_MODEL_FLAG_ENV = "NOTRA_JEV_CLASSIFIERS";
 export const AUTO_MODEL_DISABLED_VALUES: ReadonlySet<string> = new Set([
   "0",

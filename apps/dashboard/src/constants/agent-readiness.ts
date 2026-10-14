@@ -5,7 +5,6 @@ import {
 import type { AgentReadinessScoreBandKey } from "@notra/geo-core/types/agent-readiness";
 import { TREND_BADGE_APPEARANCES } from "@notra/ui/constants/trend-badge";
 
-/** Worst news first in the "Since last scan" card. */
 export const AGENT_READINESS_CHANGE_ROW_ORDER = [
   "worsened",
   "added",
@@ -20,7 +19,6 @@ export const AGENT_READINESS_CHANGE_ICONS = {
   resolved: CheckmarkCircle01Icon,
 } as const;
 
-/** Same tones as the GEO "What changed" table. */
 export const AGENT_READINESS_CHANGE_TONE_CLASSES = {
   worsened: TREND_BADGE_APPEARANCES.down.foreground,
   added: TREND_BADGE_APPEARANCES.down.foreground,
@@ -33,7 +31,6 @@ export const AGENT_READINESS_CHANGES_DEFAULT_SORT = {
   direction: "asc",
 } as const;
 
-/** Literal class names live here so Tailwind's dashboard source scan sees them. */
 export const AGENT_READINESS_BAND_TEXT_CLASS = {
   great: "text-emerald-500",
   "needs-improvement": "text-amber-500",

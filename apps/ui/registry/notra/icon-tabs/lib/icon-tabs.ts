@@ -1,6 +1,5 @@
 import type { IconTabsIndicatorBox } from "../types/icon-tabs";
 
-/** Strong deceleration, close to the `ease-emphasized` curve. */
 export function easeOutQuint(progress: number): number {
   return 1 - (1 - progress) ** 5;
 }

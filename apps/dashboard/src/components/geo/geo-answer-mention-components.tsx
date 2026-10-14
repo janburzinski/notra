@@ -37,7 +37,6 @@ import { findMentionedCompetitor } from "@/utils/geo-answer-mention-competitor";
 const MENTION_HOST_PREFIX = "GeoAnswerMention.";
 const SKIP_TAGS = new Set(["code", "pre", "mark", "kbd", "samp", "button"]);
 
-// Set while highlighting so a block knows it names the user's own brand.
 type OwnMentionFlag = { found: boolean };
 
 function mentionMarks(

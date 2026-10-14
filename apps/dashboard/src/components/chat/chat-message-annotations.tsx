@@ -5,8 +5,6 @@ import { useTranslations } from "use-intl";
 import { useChatQuote } from "@/components/chat/chat-quote";
 import type { ChatMessageAnnotationsProps } from "@/types/components/chat-message-annotations";
 
-// The annotations a user sent, shown in their message instead of the raw
-// block. A row opens its post in the preview and flashes the passage.
 export function ChatMessageAnnotations({
   annotations,
 }: ChatMessageAnnotationsProps) {

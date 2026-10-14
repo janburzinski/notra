@@ -9,7 +9,6 @@ import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { verifyInternalWorkflowRequest } from "@/lib/workflows/internal-auth";
 import { ratelimit } from "@/utils/ratelimit";
 
-/** Status the API turns back into a mapped GEO error. */
 const GEO_FAILURE_STATUS = 422;
 
 /**
@@ -48,8 +47,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // The same limiter the dashboard's `geo.writerPlan` procedure uses, so both
-  // surfaces draw from one per-organization budget.
   const { success } = await ratelimit.geoWriterPlan.limit(
     parsed.data.organizationId
   );

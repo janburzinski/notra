@@ -4,10 +4,6 @@ import { useSyncExternalStore } from "react";
 
 import { useIsSavingSocialVideo } from "@/lib/hooks/use-content";
 
-/**
- * Uploads in flight per post. They outlive the dialog that started them, so
- * a dialog opened later still knows the post's video isn't saved yet.
- */
 const uploadCounts = new Map<string, number>();
 const listeners = new Set<() => void>();
 

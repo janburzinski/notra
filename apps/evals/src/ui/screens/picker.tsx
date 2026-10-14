@@ -84,7 +84,6 @@ function PlanTable({
   index: number;
   width: number;
 }) {
-  // Fixed columns take 82 cells; borders, margins and padding take 6.
   const modelWidth = Math.max(12, Math.min(20, Math.floor((width - 88) / 2)));
   let totalNow = 0;
   let totalNext = 0;
@@ -305,7 +304,6 @@ interface Segment {
   readonly color: string;
 }
 
-/** Collapses a scatter row into runs of equal colour. */
 function rowSegments(row: readonly number[], isBarRow: boolean): Segment[] {
   const segments: Segment[] = [];
   for (const [col, series] of row.entries()) {

@@ -31,7 +31,6 @@ export function createReviseImageTool() {
         );
       }
 
-      // Only for answering a repeated call with the current image.
       const post = await db.query.posts.findFirst({
         columns: { title: true, content: true },
         where: and(

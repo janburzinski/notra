@@ -42,11 +42,6 @@ function getResultErrorMessage(result: SocialPostResult): string {
   return "The platform rejected the post";
 }
 
-/**
- * The demo's accounts are fictional: publishing succeeds without reaching a
- * platform and the post shows up in analytics with generated stats, so the
- * flow can be tried end to end.
- */
 const publishDemoPost = Effect.fn("publishDemoPost")(function* (
   params: PublishSocialPostParams
 ) {
@@ -160,8 +155,6 @@ export const publishSocialPost = Effect.fn("publishSocialPost")(function* (
       })
     );
   }
-  // The check above passes when either platform has a key; this account
-  // needs its own platform's key.
   if (!isSocialConnectPlatformConfigured(parsedPlatform.data)) {
     return yield* Effect.fail(
       new SocialConnectConfigError({
@@ -197,7 +190,6 @@ export const publishSocialPost = Effect.fn("publishSocialPost")(function* (
           }),
   });
 
-  // The platform publishes asynchronously; poll until it reports a result.
   const postResult = yield* Effect.sleep(RESULT_POLL_DELAY).pipe(
     Effect.andThen(
       Effect.tryPromise({
@@ -256,7 +248,6 @@ export const publishSocialPost = Effect.fn("publishSocialPost")(function* (
     postUrl,
     username: account.username,
     platform: account.provider,
-    // The provider accepted the post but reported no platform result yet.
     confirmed: postResult !== null,
   };
 });

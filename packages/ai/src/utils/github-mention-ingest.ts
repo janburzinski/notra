@@ -25,7 +25,6 @@ import { syncPublishedPostFromPullRequestHead } from "@notra/ai/utils/update-pub
 
 const HANDLED_EVENTS = new Set([
   "issue_comment",
-  // Mentions in review threads under "Files changed".
   "pull_request_review_comment",
   "pull_request",
 ]);

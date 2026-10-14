@@ -29,12 +29,9 @@ const loadSettingsModal = () =>
     (module) => module.SettingsModal
   );
 
-/** Upper bound for waiting on an idle period before warming the overlays anyway. */
 const OVERLAY_PRELOAD_IDLE_TIMEOUT_MS = 3000;
 const OVERLAY_PRELOAD_FALLBACK_DELAY_MS = 1500;
 
-// Overlays stay out of the initial bundle, but are fetched once the page is
-// idle so the first ⌘K or settings open never shows an interim loading dialog.
 const CommandPalette = dynamic(loadCommandPalette, {
   loading: () => null,
   ssr: false,
@@ -89,7 +86,6 @@ function DashboardOverlays() {
 
 interface DashboardClientWrapperProps {
   children: React.ReactNode;
-  /** The visitor opened the demo with `?banner=off`. */
   demoBannerHidden?: boolean;
   initialActiveOrganization?: InitialActiveOrganization | null;
   initialOnboardingAgentRun: InitialOnboardingAgentRun;

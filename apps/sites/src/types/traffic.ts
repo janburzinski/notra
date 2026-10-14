@@ -55,6 +55,5 @@ export interface IngestPost {
   ingestUrl: string;
   token: string;
   kind: "traffic" | "engagement";
-  /** Built inside the error boundary so a malformed URL is logged, not thrown. */
   buildBody: () => TrafficPayload | Record<string, unknown>;
 }

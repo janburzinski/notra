@@ -1,4 +1,3 @@
-/** Checks built reports against the additive raw cache. No paid requests. */
 import { strict as assert } from "node:assert";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -92,8 +91,6 @@ for (const category of REPORT_CATEGORIES) {
       const rate = brand.byEngine[engine];
       assert.ok(typeof rate === "number" && rate >= 0 && rate <= 100);
     }
-    // Visibility averages unrounded engine rates; byEngine holds rounded
-    // ones, so the two can differ by a point.
     const roundedMean =
       engines.reduce((sum, engine) => sum + (brand.byEngine[engine] ?? 0), 0) /
       engines.length;

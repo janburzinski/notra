@@ -2,8 +2,6 @@ import { DIAGRAM_SKILL_CONTENT } from "@notra/ai/constants/excalidraw-diagram";
 import type { DiagramSpec } from "@notra/ai/types/excalidraw-diagram";
 import dedent from "dedent";
 
-// Reuse the sandbox skill's format, layout, and palette sections so both edit
-// paths follow the same rules. The check-script section only applies in the sandbox.
 const DIAGRAM_RULES = DIAGRAM_SKILL_CONTENT.slice(
   DIAGRAM_SKILL_CONTENT.indexOf("## Format"),
   DIAGRAM_SKILL_CONTENT.indexOf("## Check before you stop")

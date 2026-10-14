@@ -15,7 +15,6 @@ export class PostMetadataNotSupportedError extends Schema.TaggedError<PostMetada
   {}
 ) {}
 
-/** metadata.authorIds names an author that is not in this organization. */
 export class PostUnknownAuthorError extends Schema.TaggedError<PostUnknownAuthorError>()(
   "PostUnknownAuthorError",
   {}
@@ -46,7 +45,6 @@ export class PostGenerationQueueFailedError extends Schema.TaggedError<PostGener
   { jobId: Schema.optional(Schema.String) }
 ) {}
 
-/** A requested repository, Linear integration or brand voice is not usable by this organization. */
 export class PostGenerationTargetUnavailableError extends Schema.TaggedError<PostGenerationTargetUnavailableError>()(
   "PostGenerationTargetUnavailableError",
   { message: Schema.String }

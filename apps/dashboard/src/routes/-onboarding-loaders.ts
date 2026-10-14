@@ -162,7 +162,6 @@ export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
           columns: { dailySummary: true },
         }),
         getGeoOnboardingStage(organization.id, projectId),
-        // Marketing consent is the user's own, not the organization's.
         db.query.users.findFirst({
           where: eq(users.id, userId),
           columns: { marketingOptInAt: true },

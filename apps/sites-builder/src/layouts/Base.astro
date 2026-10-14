@@ -32,19 +32,15 @@ const feeds = (await listedAreas({ keepCurrent: false })).flatMap((area) => {
   return mount ? [{ title: namedAreaTitle(area), href: mountPath(mount, "feed.xml") }] : [];
 });
 const fontsUrl = fontStylesheetUrl();
-// Inter is only the default; skip the preload when the site brings its own body font.
 const preloadInter = !(config.fonts?.body?.family ?? config.fonts?.family);
 const appearance = config.appearance;
 const codeDark = config.styling.codeblocks === "dark";
 const lightFavicon = faviconFor("light");
 const darkFavicon = faviconFor("dark");
 const metaTags = extraMetaTags();
-// A tag set in seo.metatags replaces the theme's own instead of adding a second one.
 const customTags = new Set(metaTags.map((tag) => tag.value.toLowerCase()));
 const builtIn = (name: string) => !customTags.has(name);
-// Previews must stay out of search engines, whatever the site sets.
 const customRobots = !params.noindex && !noindex && !builtIn("robots");
-// A custom og:image makes the theme's alt text and card size wrong.
 const customImage = !builtIn("og:image");
 const twitterCard = customImage || ogImage?.large ? "summary_large_image" : "summary";
 const banner = siteBanner();

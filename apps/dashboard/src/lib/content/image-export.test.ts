@@ -110,7 +110,6 @@ test("diagram copy keeps the native clipboard path and falls back without losing
     expect(textarea.remove).toHaveBeenCalledTimes(2);
     expect(success).toHaveBeenCalledTimes(4);
     expect(error).not.toHaveBeenCalled();
-    // No second download is needed for any clipboard fallback.
     expect(fetchScene).toHaveBeenCalledTimes(4);
 
     nativeCopy.mockReturnValue(false);

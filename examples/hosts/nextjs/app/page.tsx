@@ -23,7 +23,6 @@ export default function Home() {
           <Image src="/logo.svg" alt="" width={28} height={28} priority />
           Pathway
         </a>
-        {/* Plain <a> tags: /blog and /changelog are served by Notra through the rewrites in next.config.ts. */}
         <nav aria-label="Main">
           <a href="/blog">Blog</a>
           <a href="/changelog">Changelog</a>

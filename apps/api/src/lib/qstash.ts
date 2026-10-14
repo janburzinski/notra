@@ -17,12 +17,6 @@ export class QstashService extends Context.Service<
   QstashOperations
 >()("api/Qstash") {}
 
-// Keep the existing platform fetch transport, but own cancellation and decoding
-// inside the adapter rather than leaking them into schedule transactions.
-/**
- * The public demo never schedules real QStash callbacks; schedules are saved
- * and can be run on demand from the dashboard instead.
- */
 const demoQstashLayer = Layer.succeed(
   QstashService,
   QstashService.of({

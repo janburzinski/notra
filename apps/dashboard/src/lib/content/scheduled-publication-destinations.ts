@@ -41,9 +41,6 @@ import {
 } from "@/utils/github-publish-failure";
 import { getSocialVideoUrls } from "@/utils/social-video";
 
-// GitHub's 405 reasons that waiting won't fix: a required check that already
-// failed, and a branch protection rule that wants the branch up to date
-// (updating it would push a new head and restart the checks).
 const GITHUB_MERGE_NEEDS_PERSON_REGEX = /is failing|not up to date/i;
 
 const RETRYABLE_ORPC_CODES = new Set([
@@ -59,16 +56,8 @@ function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
-/**
- * A scheduled post has no one waiting on it, so it gives the provider about
- * half a minute to report the platform result before calling it unconfirmed.
- */
 const SCHEDULED_SOCIAL_RESULT_POLL_ATTEMPTS = 15;
 
-/**
- * What a GitHub publish takes from the post: the slug and title (which also
- * pick the file path) and the saved markdown.
- */
 function postContentHash(post: {
   slug: string | null;
   title: string;
@@ -79,17 +68,10 @@ function postContentHash(post: {
     .digest("hex");
 }
 
-/** oRPC errors carry user-facing copy; anything else may carry internals. */
 function publicErrorMessage(error: unknown, fallback: string) {
   return error instanceof ORPCError && error.message ? error.message : fallback;
 }
 
-/**
- * Pending checks (405), rate limits and upstream errors clear up on their own.
- * A missing pull request, lost access, a rejected request, a branch that
- * moved after Notra pushed it (409), a failed required check, or a branch
- * that must first be brought up to date needs a person.
- */
 function isRetryableGitHubMergeError(error: unknown) {
   if ([404, 409, 422].some((status) => hasGitHubStatus(error, status))) {
     return false;
@@ -114,7 +96,6 @@ function failure(
   return { kind: "error", code, message, retryable, result };
 }
 
-/** Upstream and infrastructure failures are worth a retry; bad input is not. */
 function isRetryablePublishError(error: unknown) {
   if (error instanceof ORPCError) {
     return RETRYABLE_ORPC_CODES.has(error.code);
@@ -126,9 +107,6 @@ async function publishInNotra(
   attempt: ScheduledPublicationAttempt,
   post: ScheduledPublicationPost
 ): Promise<ScheduledPublicationOutcome> {
-  // Guarded like Iris shipping: a post someone published by hand in the
-  // meantime counts as done instead of being stamped a second time. The
-  // `post.published` webhook comes from the trigger on `posts`.
   const [published] = await db
     .update(posts)
     .set({ status: "published", publishedAt: new Date() })
@@ -164,7 +142,6 @@ async function publishInNotra(
   return { kind: "published", result: {} };
 }
 
-/** One authenticated client per attempt for the scheduled repository. */
 async function githubRepositoryClient(
   organizationId: string,
   repositoryId: string
@@ -237,7 +214,6 @@ async function mergePullRequest(
     );
     return merged;
   } catch (error) {
-    // Someone may have merged it by hand between the read and the merge.
     const after = await getContentPullRequestState(client.octokit, ref).catch(
       () => null
     );
@@ -255,7 +231,6 @@ async function mergePullRequest(
   }
 }
 
-/** A pushed pull request is done once merged, or right away without merge. */
 function completePullRequest(
   client: GitHubRepositoryClient,
   merge: boolean,
@@ -266,13 +241,6 @@ function completePullRequest(
     : { kind: "published", result: pullRequest };
 }
 
-/**
- * The post's linked pull request when it was merged since this row was
- * created. A retry after a merge whose outcome was lost must not publish the
- * file again (it is on the default branch now), so such a merge counts as
- * done. A merge from an earlier publication does not: the post was edited
- * and scheduled again since.
- */
 async function findMergedLinkedPullRequest(
   client: GitHubRepositoryClient,
   attempt: ScheduledPublicationAttempt,
@@ -320,14 +288,11 @@ async function publishToGitHub(
     );
   }
 
-  // What this schedule already pushed, like the pull request opened ahead
-  // of the slot or one whose merge failed, unless the post changed since.
   const previous = attempt.result;
   const pushedIsStale =
     previous?.contentHash !== undefined &&
     previous.contentHash !== postContentHash(post);
   if (!pushedIsStale) {
-    // A merge since the schedule was created counts as done.
     const merged = config.merge
       ? await findMergedLinkedPullRequest(
           client,
@@ -346,9 +311,6 @@ async function publishToGitHub(
         },
       };
     }
-    // An open pull request is merged as it is, pinned to the pushed commit.
-    // Pushing again would restart CI, so a repository with required checks
-    // could never merge in time.
     if (
       previous?.pullRequestNumber &&
       previous.pullRequestUrl &&
@@ -423,9 +385,6 @@ export async function openScheduledPullRequestAhead(params: {
       contentType: post.contentType,
       repositoryId: params.repositoryId,
     });
-    // The publish reads the post itself. Only when it is the same before and
-    // after can the fingerprint be trusted to describe what was pushed; an
-    // edit in between just means the run pushes again at the slot.
     const after = await db.query.posts.findFirst({
       columns: { markdown: true, slug: true, title: true },
       where: and(
@@ -470,7 +429,6 @@ async function publishToSocial(
       false
     );
   }
-  // Posting is not idempotent. From here on, a lost outcome is final.
   const marked = await markScheduledPublicationExternalAttempt({
     id: attempt.id,
     claimToken,
@@ -482,8 +440,6 @@ async function publishToSocial(
       false
     );
   }
-  // A crash past this point may have happened after the post went out, so a
-  // defect counts as an unconfirmed send like a lost response does.
   const outcome = await Effect.runPromise(
     Effect.result(
       publishSocialPost({

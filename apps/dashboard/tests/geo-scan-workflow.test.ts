@@ -38,10 +38,6 @@ const refreshGaps =
   mock<
     typeof import("../src/workflows/steps/refresh-geo-content-gaps").refreshGeoContentGapsStep
   >();
-// These tests exercise orchestration decisions as ordinary functions. The
-// durable runtime and model/billing steps have separate integration
-// boundaries — the activity-log steps are mocked too, otherwise they would
-// perform real Redis/billing network I/O during orchestration tests.
 mock.module("workflow", () => ({ FatalError, sleep }));
 mock.module("../src/workflows/steps/start-geo-sentiment", () => ({
   startGeoSentimentStep: startSentiment,
@@ -55,8 +51,6 @@ mock.module("../src/workflows/steps/refresh-geo-content-gaps", () => ({
 mock.module("../src/workflows/steps/content-generation-steps", () => ({
   appendAutomationLog: appendLog,
   fetchLogRetention: fetchRetention,
-  // Mirrors the production best-effort wrapper so orchestration tests can
-  // exercise logging failures without real Redis access.
   appendAutomationLogBestEffort: async (input: AppendAutomationLogInput) => {
     try {
       await appendLog(input);
@@ -395,13 +389,11 @@ describe("GEO scan workflow orchestration", () => {
     });
     const run = geoScanWorkflow({ organizationId: "org-test" });
     await settle(() => releases.length === GEO_SCAN_BATCH_CONCURRENCY);
-    // Two healthy batches settle first and each refills its slot.
     releases.shift()?.();
     releases.shift()?.();
     await settle(
       () => taskBatch.mock.calls.length === GEO_SCAN_BATCH_CONCURRENCY + 2
     );
-    // The third batch fails: the window drains but no further batch starts.
     releases.shift()?.();
     await tick();
     while (releases.length > 0) {
@@ -567,8 +559,6 @@ describe("GEO scan workflow orchestration", () => {
       promptIds: ["prompt-0"],
       engines: ["openai/gpt-4.1"],
     });
-    // Each attempt leaves an activity-log entry: the failed first pass, the
-    // healthy project, and the successful retry.
     expect(
       appendLog.mock.calls.map(([input]) => [
         input.integrationId,

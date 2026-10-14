@@ -12,8 +12,6 @@ export function useCreateSites() {
   return useMutation({
     mutationFn: (input: SiteCreateManyInput) =>
       dashboardOrpc.sites.createMany.call(input),
-    // Only the list: refetching the repository scan would empty the rows
-    // that show the results.
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: dashboardOrpc.sites.list.key(),

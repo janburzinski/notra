@@ -296,11 +296,6 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
   return answer;
 });
 
-/**
- * Cursor is not hosted on any AI gateway, so it runs through the local Cursor
- * SDK instead of `generateText`. Zero data retention is irrelevant here: the
- * catalog marks the engine as non-ZDR and approval is handled upstream.
- */
 const askCursorEngineEffect = Effect.fn("geo.askCursorEngine")(function* (
   engine: string,
   promptText: string
@@ -887,8 +882,6 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
       }
       trackedEngines.push({ engine, zdr });
     }
-    // Stored prompts are written in the project's prompt language; every other
-    // tracked language is a translation of them.
     const sourceLanguage = settings.promptLanguage;
     const scanSourceLanguage = settings.languages.includes(sourceLanguage);
     const scanEnglish = settings.languages.includes(DEFAULT_LANGUAGE);
@@ -965,8 +958,6 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
     }
 
     let translateUsage = EMPTY_TOKEN_USAGE;
-    // Translations are stored per prompt and language; this only translates
-    // picks that are new or whose prompt changed since.
     const localizedByLanguage = yield* syncGeoPromptTranslations(
       {
         organizationId,
@@ -976,7 +967,6 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
         prompts: allPrompts,
       },
       {
-        // A scoped scan only translates and asks the prompts it was given.
         promptIds: promptIds
           ? new Set(prompts.map((prompt) => prompt.id))
           : undefined,
@@ -1570,7 +1560,6 @@ const finalizeGeoScanProjectBody = Effect.fn("geo.finalizeScanProject.body")(
       geoSkip("scan claim token invalid")
     );
 
-    // A failed scan still bills the answers its drained batches stored.
     if (totals.checks > 0) {
       yield* billing
         .finalizeContentBilling({
@@ -1912,7 +1901,6 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
         ...geoCheckWriteUsage(
           answer.usage,
           judged.usage,
-          // ponytail: Box computeMs stands in for engine wall-clock; the conversation already finished before this loop.
           Math.round(
             (answer.usage?.computeMs ?? 0) + (performance.now() - turnStartedMs)
           )

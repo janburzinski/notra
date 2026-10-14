@@ -206,8 +206,6 @@ test("real Vercel adapter generate and stream metadata price served aliases iden
       }
     }
     assert.ok(lookups > 0);
-    // These reviewed aliases are not priced registry entries; normalization
-    // alone is tested, never DEFAULT-versus-DEFAULT as pricing evidence.
     for (const [raw, canonical] of [
       ["claude-opus-4-6", "anthropic/claude-opus-4.6"],
       ["google/gemini-3-flash-preview", "google/gemini-3-flash"],
@@ -242,8 +240,6 @@ test("current vendor aliases resolve to owned canonical pricing entries", async 
     assert.equal(adapter.extractRouteMetadata(undefined, raw).model, canonical);
   }
   for (const canonical of Object.values(VERCEL_SERVED_MODEL_ALIASES)) {
-    // The retained legacy Opus 4.6 alias is normalization-only. Any newly
-    // added alias must own pricing rather than silently use DEFAULT.
     assert.equal(
       Object.hasOwn(MODEL_PRICING, canonical),
       canonical !== "anthropic/claude-opus-4.6"

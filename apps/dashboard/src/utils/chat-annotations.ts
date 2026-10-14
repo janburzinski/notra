@@ -38,11 +38,6 @@ function unescapeText(value: string) {
   );
 }
 
-/**
- * Serializes annotations as a block the agent reads before the message:
- * numbered so the user can refer to them, with the post token and the exact
- * passage it can locate in the post.
- */
 function serializeChatAnnotations(annotations: readonly ChatAnnotation[]) {
   const items = annotations.map((annotation, index) => {
     const note = annotation.note
@@ -90,7 +85,6 @@ export function parseChatAnnotations(
   const annotations = Array.from(
     block[1]?.matchAll(CHAT_ANNOTATION_ITEM_REGEX) ?? [],
     ([, postId = "", title = "", body = ""]) => {
-      // Older messages hold the bare passage without passage/note tags.
       const passage = body.match(CHAT_ANNOTATION_PASSAGE_REGEX)?.[1] ?? body;
       const note = body.match(CHAT_ANNOTATION_NOTE_REGEX)?.[1];
       return {

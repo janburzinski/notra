@@ -210,7 +210,6 @@ export interface BuildStandaloneToolSetParams {
   userId?: string;
   useMarkup?: boolean;
   chargeAiCredits?: boolean;
-  // Lets the chat read connected repositories through the code researcher.
   codeResearch?: boolean;
   validatedIntegrations: ValidatedIntegration[];
   postResult: PostToolsResult;

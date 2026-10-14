@@ -13,10 +13,6 @@ interface DemoMissionsProps {
   onOpenConsole: () => void;
 }
 
-/**
- * Guided walkthrough. Progress comes from what actually happened in the
- * sandbox, so doing a step any way (UI, console, curl, MCP) checks it off.
- */
 export function DemoMissions({ sandbox, onOpenConsole }: DemoMissionsProps) {
   const t = useTranslations("demo.missions");
   if (!sandbox) {

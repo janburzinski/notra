@@ -41,7 +41,6 @@ export const outboundWebhooksRouter = {
               listEndpoints(organizationId),
               listDeliveries(organizationId, input.offset, input.status),
               deliveryStats(organizationId),
-              // The chart is optional: a failed trace must not hide the rest of the pane.
               deliveryActivity(organizationId).pipe(
                 Effect.catch((error) =>
                   Effect.logWarning("Webhook delivery activity failed").pipe(

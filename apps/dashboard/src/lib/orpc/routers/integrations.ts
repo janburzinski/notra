@@ -1101,8 +1101,6 @@ export const integrationsRouter = {
             );
           }
 
-          // The demo repository has no credentials; its reads come from
-          // fixtures.
           if (!(token || isDemoMode())) {
             const tErrors = await getTranslations("errors.integrations");
             throw forbidden(tErrors("githubAuthFailed"));
@@ -1407,8 +1405,6 @@ export const integrationsRouter = {
           });
         }
 
-        // Not the row itself: it carries the encrypted access token and
-        // webhook secret, which no client needs.
         return (
           updated && {
             id: updated.id,
@@ -1933,7 +1929,6 @@ export const integrationsRouter = {
     create: baseProcedure
       .input(createMcpServerRequestSchema)
       .handler(async ({ context, input }) => {
-        // The server would fetch any public URL on an anonymous visitor's behalf.
         assertNotDemo();
         const auth = await assertOrganizationAccess({
           headers: context.headers,
@@ -2031,7 +2026,6 @@ export const integrationsRouter = {
     update: baseProcedure
       .input(mcpServerInputSchema.and(updateMcpServerBodySchema))
       .handler(async ({ context, input }) => {
-        // Every MCP call reaches the server's URL on an anonymous visitor's behalf.
         assertNotDemo();
         const auth = await assertOrganizationAccess({
           headers: context.headers,
@@ -2103,7 +2097,6 @@ export const integrationsRouter = {
     beginOAuth: baseProcedure
       .input(beginMcpOAuthRequestSchema)
       .handler(async ({ context, input }) => {
-        // Every MCP call reaches the server's URL on an anonymous visitor's behalf.
         assertNotDemo();
         const access = await assertOrganizationAccess({
           headers: context.headers,
@@ -2168,7 +2161,6 @@ export const integrationsRouter = {
     reauthorizeOAuth: baseProcedure
       .input(reauthorizeMcpOAuthRequestSchema)
       .handler(async ({ context, input }) => {
-        // Every MCP call reaches the server's URL on an anonymous visitor's behalf.
         assertNotDemo();
         const access = await assertOrganizationAccess({
           headers: context.headers,
@@ -2263,7 +2255,6 @@ export const integrationsRouter = {
     refreshTools: baseProcedure
       .input(mcpServerInputSchema)
       .handler(async ({ context, input }) => {
-        // Every MCP call reaches the server's URL on an anonymous visitor's behalf.
         assertNotDemo();
         const auth = await assertOrganizationAccess({
           headers: context.headers,

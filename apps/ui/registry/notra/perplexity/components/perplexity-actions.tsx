@@ -49,7 +49,6 @@ const ICON_STROKE = 1.75;
 interface ActionButtonProps extends ComponentProps<typeof Button> {
   children: ReactNode;
   label: string;
-  /** Wraps the button in another trigger, like a popover or menu trigger. */
   trigger?: (button: ReactElement) => ReactElement;
 }
 

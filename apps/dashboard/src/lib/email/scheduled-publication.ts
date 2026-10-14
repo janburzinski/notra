@@ -86,7 +86,6 @@ export async function notifyScheduledPublicationFailed(
       status: scheduledPublications.status,
       failedAt: scheduledPublications.updatedAt,
       postTitle: posts.title,
-      // Only set while the person who scheduled it is still a member.
       schedulerEmail: users.email,
     })
     .from(scheduledPublications)
@@ -116,7 +115,6 @@ export async function notifyScheduledPublicationFailed(
   }
 
   const email = {
-    // A row that fails again after a manual retry is a new failure.
     failureKey: `${row.id}:${row.failedAt.getTime()}`,
     organizationName: notification.organizationName,
     organizationSlug: notification.organizationSlug,

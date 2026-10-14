@@ -86,7 +86,6 @@ function DestinationRow({
   );
 }
 
-/** Where a post went out: one row per destination with its status. */
 export function ScheduleDestinationStatusList({
   schedule,
   ...rowProps

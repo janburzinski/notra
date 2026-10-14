@@ -8,8 +8,6 @@ import { AUTH_SPLIT_PANEL_MIN_WIDTH } from "@/constants/auth-split-panel";
 import dynamic from "@/utils/lazy-component";
 import { supportsWebGL } from "@/utils/supports-webgl";
 
-// Shader background: client-only and skipped entirely for reduced motion, so the
-// WebGL bundle never reaches the auth forms' critical path.
 const Dithering = dynamic(
   () =>
     import("@paper-design/shaders-react").then((module) => module.Dithering),
@@ -22,8 +20,6 @@ const DITHERING_SPEED = 0.5;
 
 let webGLSupport: boolean | undefined;
 
-// Only called once the panel mounts, which happens after the media query
-// effect, so it never runs on the server.
 function canRenderShader() {
   webGLSupport ??= supportsWebGL(document.createElement("canvas"));
   return webGLSupport;

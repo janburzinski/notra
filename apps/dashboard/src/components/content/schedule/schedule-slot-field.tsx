@@ -9,7 +9,6 @@ import { TimeField } from "@/components/time-field";
 import { useLocalDateFormat } from "@/lib/hooks/use-local-date-format";
 import type { ScheduleSlotFieldProps } from "@/types/content/schedule";
 
-/** The "When" section of the schedule dialog: a day and a local time. */
 export function ScheduleSlotField({
   date,
   earliestDate,
@@ -32,14 +31,11 @@ export function ScheduleSlotField({
         <span className="text-muted-foreground text-xs">{timeZone}</span>
       </div>
       <div className="flex flex-col gap-3 sm:flex-row">
-        {/* Flex, not space-y: the open popover inserts focus guards after the
-            trigger, and space-y would then add a margin under it. */}
         <div className="flex flex-1 flex-col">
           <Label className="sr-only" id={dateLabelId}>
             {t("date")}
           </Label>
           <DateField
-            // "Date", then the picked date the button shows.
             aria-labelledby={`${dateLabelId} ${dateId}`}
             disabledDays={{ before: earliestDate }}
             display={

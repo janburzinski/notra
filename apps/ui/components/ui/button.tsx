@@ -74,7 +74,6 @@ function Button({
   return (
     <ButtonPrimitive
       aria-busy={busy || undefined}
-      // Announces the upload percentage without changing the button's name.
       aria-describedby={
         hasProgress
           ? [ariaDescribedBy, progressTextId].filter(Boolean).join(" ")

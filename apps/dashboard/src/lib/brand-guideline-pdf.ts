@@ -115,7 +115,6 @@ export async function attachBrandGuidelineSourcePdf(
     const text = await readGuidelinePdfText(input.key);
     const now = new Date();
 
-    // Row lock so concurrent replaces each know which key they replaced.
     replacedKey = await db.transaction(async (tx) => {
       const [locked] = await tx
         .select({ sourcePdfStorageKey: brandGuidelines.sourcePdfStorageKey })
@@ -136,8 +135,6 @@ export async function attachBrandGuidelineSourcePdf(
       return locked?.sourcePdfStorageKey ?? null;
     });
   } catch (error) {
-    // The key may belong to another voice of the same org, so only delete
-    // it when no row references it.
     await deleteGuidelinePdfIfUnreferenced(input.key);
     throw error;
   }
@@ -158,7 +155,6 @@ export async function removeBrandGuidelineSourcePdf(brandSettingsId: string) {
     return getBrandGuidelines(brandSettingsId);
   }
 
-  // Compare-and-set on the key so a concurrent replace is never cleared.
   const cleared = await db
     .update(brandGuidelines)
     .set({

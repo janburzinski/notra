@@ -7,7 +7,6 @@ import {
   trafficGroupCurrentMembers,
 } from "@/utils/ai-traffic-groups";
 
-/** Source name plus bot count; the row opens the source drawer with the breakdown. */
 export function TrafficSourceGroupCell({ group }: TrafficSourceGroupCellProps) {
   const tGeoShared = useTranslations("geo.shared");
   const tCommon = useTranslations("common");

@@ -4,7 +4,6 @@ import {
   GEO_SHELF_TICKET_FILTERS,
 } from "@notra/schemas/constants/dashboard/geo-shelf";
 
-/** The table is virtualized, so a page only bounds the payload per request. */
 export const GEO_SHELF_PAGE_SIZE = 100;
 export const GEO_SHELF_SEARCH_DEBOUNCE_MS = 250;
 export const GEO_SHELF_DEFAULT_SORT = {
@@ -53,7 +52,6 @@ export const GEO_SHELF_BOARD_COLUMN_SCROLL_HEIGHT =
 export const GEO_SHELF_TABLE_ROW_HEIGHT = 56;
 export const GEO_SHELF_TABLE_HEIGHT = 560;
 export const GEO_SHELF_MIN_VIEWPORT_RATIO = 0.6;
-/** `title` flexes; other columns size to their header/content so the row fits. */
 export const GEO_SHELF_TABLE_COLUMN = {
   title: { width: "1fr", minWidth: "10rem" },
   citations: { width: "10rem" },
@@ -110,7 +108,6 @@ export const GEO_SHELF_PREVIEW_STALE_MS = 10 * 60 * 1000;
 export const GEO_SHELF_PREVIEW_TIMEOUT_MS = 30_000;
 export const GEO_SHELF_PREVIEW_CACHE_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Non-public IPv4 space from the IANA special-purpose registries. */
 export const GEO_SHELF_BLOCKED_IPV4_SUBNETS: readonly (readonly [
   string,
   number,
@@ -135,7 +132,6 @@ export const GEO_SHELF_BLOCKED_IPV4_SUBNETS: readonly (readonly [
   ["240.0.0.0", 4],
 ];
 
-/** Non-public IPv6 space from the IANA special-purpose registries. */
 export const GEO_SHELF_BLOCKED_IPV6_SUBNETS: readonly (readonly [
   string,
   number,

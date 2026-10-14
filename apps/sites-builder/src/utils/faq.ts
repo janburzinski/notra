@@ -4,11 +4,6 @@ import { parseBody, plainText } from "./excerpt";
 
 const collapse = (text: string) => text.replace(/\s+/g, " ").trim();
 
-/**
- * Questions and answers from a post's FAQ section: an H2 titled "FAQ" (or
- * "Frequently asked questions", "Q&A") whose H3s are questions and whose
- * paragraphs below each H3 are the answer.
- */
 export function faqEntries(body: string | undefined): FaqEntry[] {
   if (!body) {
     return [];

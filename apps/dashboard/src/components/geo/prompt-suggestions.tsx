@@ -81,12 +81,6 @@ function SuggestionRowActions({
   );
 }
 
-/**
- * Per-row pending state for a suggestion mutation. Accept and dismiss share
- * one in-flight map so "Track all" can wait for both and a row can never fire
- * twice. `isBlocked` is a getter, not a boolean: "Track all" flips its ref
- * synchronously, before React re-renders these closures.
- */
 function useSuggestionRowAction(
   mutateAsync: (input: { suggestionId: string }) => Promise<unknown>,
   pendingRequests: RefObject<Map<string, Promise<unknown>>>,
@@ -293,7 +287,6 @@ function SuggestionDetailActions({
   );
 }
 
-/** Whether the open suggestion can't take an action right now. */
 function isSuggestionBusy(
   suggestion: GeoPromptSuggestion | null,
   state: {
@@ -312,7 +305,6 @@ function isSuggestionBusy(
   );
 }
 
-/** Accepts the rest once every in-flight row request settled without error. */
 async function acceptAllAfterPending(
   pendingRequests: Map<string, Promise<unknown>>,
   acceptAll: () => Promise<unknown>
@@ -326,10 +318,6 @@ async function acceptAllAfterPending(
   await acceptAll();
 }
 
-/**
- * "Track all" waits for any single-row accept or dismiss still in flight, then
- * accepts the rest. While it is queued, row actions are blocked.
- */
 function useTrackAllQueue(
   acceptAll: { isPending: boolean; mutateAsync: () => Promise<unknown> },
   pendingRequests: RefObject<Map<string, Promise<unknown>>>
@@ -347,9 +335,7 @@ function useTrackAllQueue(
     await acceptAllAfterPending(
       pendingRequests.current,
       acceptAll.mutateAsync
-    ).catch(() => {
-      // The mutation hook reports the error.
-    });
+    ).catch(() => {});
     queued.current = false;
     setIsQueued(false);
   };

@@ -75,7 +75,6 @@ export function createListBrandIdentitiesTool(
 export function createGetBrandIdentityTool(
   config: OrganizationToolConfig
 ): Tool {
-  // Uncached so a newly attached or removed guideline PDF shows up at once.
   return tool({
     description: toolDescription({
       toolName: "getBrandIdentity",

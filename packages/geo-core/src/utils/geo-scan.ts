@@ -49,21 +49,8 @@ export function geoScanEmptyMessage(
   return isScanning ? "Scanning engines…" : idleMessage;
 }
 
-/**
- * Non-2xx answer from the dashboard's internal workflow route
- * (`InternalDashboardError` in `apps/api`), matched by name because the class
- * lives in the host and cannot be imported here.
- */
 const HANDOFF_REJECTED_ERROR_NAME = "InternalDashboardError";
 
-/**
- * Failures raised while the connection was still being established, so the
- * request bytes provably never reached the dashboard. `EAI_AGAIN` and
- * `ENOTFOUND` are DNS, `ECONNREFUSED` is a closed port, and
- * `UND_ERR_CONNECT_TIMEOUT` is undici giving up before the socket opened.
- * Anything later (a reset mid-flight, a headers/body timeout, an aborted wait)
- * is deliberately absent: the workflow may well have been accepted.
- */
 const HANDOFF_REJECTED_ERROR_CODES = new Set([
   "ECONNREFUSED",
   "EAI_AGAIN",

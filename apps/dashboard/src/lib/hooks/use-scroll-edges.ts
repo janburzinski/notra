@@ -2,7 +2,6 @@
 
 import { type RefObject, useEffect, useState } from "react";
 
-// Within a pixel counts as the edge, so sub-pixel layouts don't flicker.
 const EDGE_TOLERANCE_PX = 1;
 
 /** Whether a scroll container has more content above and below its viewport. */

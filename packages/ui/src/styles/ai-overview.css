@@ -1,7 +1,3 @@
-/*
- * Google AI Overview palette, as Google renders it in light and dark mode.
- * Same palette as the apps/ui registry block, for the @notra/ui skin.
- */
 :root {
   --aio-bg: #ffffff;
   --aio-fg: #0a0a0a;

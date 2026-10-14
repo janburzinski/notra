@@ -18,13 +18,8 @@ export function OfferingSentenceField({
   const lastValue = useRef<string | null>(null);
   const value = String(props.value ?? "");
   const placeholder = props.placeholder ?? "";
-  // Never narrower than the placeholder while the sentence is being edited,
-  // so nothing moves under the cursor. Afterwards it hugs the text.
   const holdPlaceholderWidth = value.length === 0 || holdWidth || active;
 
-  // Sized before paint on every change. Typing resizes instantly, because an
-  // animated width would lag behind the text and scroll it inside the input.
-  // Only the sentence opening and closing up (focus in or out) animates.
   useLayoutEffect(() => {
     const field = input.current;
     const measured = sizer.current?.getBoundingClientRect().width;
@@ -37,7 +32,6 @@ export function OfferingSentenceField({
     field.style.width = `${measured}px`;
   }, [value, placeholder, holdPlaceholderWidth]);
 
-  // Late font loads change text widths without any prop changing.
   useEffect(() => {
     const element = sizer.current;
     const field = input.current;
@@ -67,10 +61,6 @@ export function OfferingSentenceField({
         {label}
       </label>
       {leading}
-      {/*
-        The invisible sizer holds the text the input should fit; the input
-        takes its measured width.
-      */}
       <span className="relative inline-flex max-w-full min-w-0">
         <span
           aria-hidden

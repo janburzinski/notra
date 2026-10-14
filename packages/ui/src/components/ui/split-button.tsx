@@ -16,9 +16,6 @@ const TRIGGER_SIZES = {
 
 type SplitButtonSize = keyof typeof TRIGGER_SIZES;
 
-// Segments keep their own Button variant; the group only flattens the inner
-// corners, drops the doubled border so the seam reads as a single divider,
-// and turns off the press scale so one half never shrinks out of the seam.
 // Siblings are matched by data-slot because the open menu inserts unslotted
 // focus guards next to the trigger, which breaks :last-child.
 function SplitButton({ className, ...props }: React.ComponentProps<"div">) {
@@ -49,7 +46,6 @@ function SplitButtonTrigger({
   }) {
   return (
     <DropdownMenuTrigger
-      // Custom children name themselves; only the bare chevron needs a fallback.
       aria-label={label ?? (children ? undefined : "More options")}
       className={className}
       render={<Button size={TRIGGER_SIZES[size]} variant={variant} />}

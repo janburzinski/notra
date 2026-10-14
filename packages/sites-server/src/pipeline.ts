@@ -61,14 +61,6 @@ const currentBranchHead = Effect.fn("Sites.currentBranchHead")(function* (
   }).pipe(Effect.catchIf(isNotFoundError, () => Effect.succeed(null)));
 });
 
-/**
- * Pushes that leave a site's folder alone create no deployment for it, so a
- * build whose branch moved on only by such commits still has the newest
- * content and must not be dropped. Only a comparison that shows a change in
- * the folder supersedes it: when the comparison is unknown (too many files,
- * an error), the push that changed the folder queued its own deployment,
- * which replaces this one through the newer-deployment check.
- */
 const headMatchesForFolder = Effect.fn("Sites.headMatchesForFolder")(function* (
   { repository, token }: SiteRepositoryAccess,
   deployment: SiteDeployment,
@@ -180,7 +172,6 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
         try: () => compareSmartDeployment(site, deployment, access),
         catch: (error) => error,
       });
-      // The head or a newer deployment may change during comparison.
       skipReason = yield* whyNotBuild(access, deployment, site.rootDirectory);
     }
     if (skipReason) {
@@ -196,7 +187,6 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
       );
       return { kind: "skipped" as const, reason: skipReason };
     }
-    // A failed skip may already have advanced R2. Retry instead of building.
     if (
       yield* Effect.uninterruptible(
         Effect.tryPromise({
@@ -334,7 +324,6 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
       return { kind: "failed" as const, summary, diagnostics };
     }
 
-    // Compilation can outlast the branch head or a newer deployment.
     skipReason = yield* whyNotBuild(access, deployment, site.rootDirectory);
     if (skipReason) {
       yield* Effect.uninterruptible(

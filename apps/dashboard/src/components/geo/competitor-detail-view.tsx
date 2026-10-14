@@ -181,8 +181,6 @@ function CompetitorSummaryStats({
         : null,
     },
   ];
-  // Same borderless stat row as the engine sheet: numbers carry the weight,
-  // no boxes around them.
   return (
     <dl
       aria-label={competitor}
@@ -290,11 +288,7 @@ export function CompetitorDetailView({
   );
   const discovered = entry === null && !ownBrand;
   const { domain: projectDomain } = useGeoActiveProject(organizationId);
-  // Discovered brands only arrive as names from scan answers. The brand lookup
-  // behind their logo resolves a website too, so show that instead of nothing.
   const knownDomain = ownBrand ? projectDomain : (entry?.domain ?? null);
-  // Engine brands (Claude Code, Cursor, …) draw a built-in icon, but still
-  // need the lookup for their website.
   const { data: brandLookup } = useCompanyLogo(
     knownDomain,
     knownDomain ? null : competitor
@@ -312,11 +306,7 @@ export function CompetitorDetailView({
     competitor
   );
   const showLoading = !organizationId || (isPending && !data);
-  // A failed request leaves `data` undefined with nothing pending — summarising
-  // that would read as a competitor with zero answers instead of a failure.
   const unavailable = isError && data === undefined;
-  // The answer sheet needs the prompt's full result set; the competitor
-  // detail only carries one row per prompt and engine.
   const { data: promptResults } = useGeoPromptResults(organizationId);
   const [selectedAnswer, setSelectedAnswer] = useState<{
     promptId: string;

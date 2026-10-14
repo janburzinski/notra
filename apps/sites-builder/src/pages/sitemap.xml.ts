@@ -7,7 +7,6 @@ import { collectTags, tagsHref } from "../lib/tags";
 import type { BlogEntry, ChangelogEntry } from "../types/entries";
 import { isoDate } from "../utils/dates";
 
-/** Author and tag pages, which search engines only index with `seo.indexing: "all"`. */
 function listingUrls(indexable: (BlogEntry | ChangelogEntry)[]): string[] {
   if (config.seo.indexing !== "all" || indexable.length === 0) {
     return [];

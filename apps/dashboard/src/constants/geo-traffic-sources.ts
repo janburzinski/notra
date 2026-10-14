@@ -8,7 +8,6 @@ export const TRAFFIC_SOURCE_BANDS = [
 
 export const TRAFFIC_SOURCE_COLLAPSED_BORDER_PX = 2;
 
-/** Floors so band titles ("Crawlers") and source names cannot crush to "Cri". */
 export const TRAFFIC_SOURCE_COLUMN_MIN_WIDTH = {
   source: "16rem",
   botSource: "11rem",

@@ -19,7 +19,6 @@ export async function checkLokiResources(spawn = spawnSync, fetchImpl = fetch) {
   const name = `notra-loki-resources-${randomUUID()}`;
   const volume = `${name}-volume`;
   const containers = [`${name}-first`, `${name}-replay`];
-  // Reserve cleanup inside the ten-minute gate, including image build and startup.
   const deadline = Date.now() + 540_000;
   const docker = (args, timeout = 10_000) =>
     runDocker(

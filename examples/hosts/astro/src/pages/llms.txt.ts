@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 
-// /llms.txt belongs to this website and links to the llms.txt of each Notra section.
 export const GET: APIRoute = ({ site }) => {
   const origin = site?.origin ?? "";
   const body = `# Fernhill

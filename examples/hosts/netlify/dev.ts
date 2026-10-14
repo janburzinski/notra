@@ -1,6 +1,3 @@
-// Local stand-in for Netlify: serves public/ and applies the proxy rules from netlify.toml.
-// Set NOTRA_SITE_ORIGIN to point the rules at another Notra address, for example a local build.
-// On Netlify itself this file isn't used.
 import { join, normalize } from "node:path";
 import config from "./netlify.toml";
 
@@ -17,7 +14,6 @@ const port = Number(process.env.PORT ?? 8888);
 const publicDir = join(import.meta.dir, "public");
 const redirects = (config as { redirects: Redirect[] }).redirects;
 
-// Headers Notra doesn't need, so visitors' sessions stay on this domain.
 const DROPPED_REQUEST_HEADERS = ["cookie", "authorization", "host", "connection"];
 // fetch() decompresses the body, so these no longer describe it.
 const DROPPED_RESPONSE_HEADERS = ["content-encoding", "content-length", "transfer-encoding", "connection"];

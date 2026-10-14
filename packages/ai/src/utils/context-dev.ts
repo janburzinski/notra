@@ -370,8 +370,6 @@ function formatScrapedPagesForBrandAnalysis(
 export async function scrapeWebsiteForBrandAnalysis(
   url: string
 ): Promise<ContextDevScrapingResult> {
-  // The public demo never fetches websites; the analysis runs on a canned
-  // homepage so brand setup still completes end to end.
   if (isDemoMode()) {
     return { success: true, content: DEMO_BRAND_WEBSITE_CONTENT };
   }

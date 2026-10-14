@@ -87,8 +87,6 @@ export function collectContentChatToolOutputEffects({
   }
 
   for (const part of lastAssistantMessage.parts) {
-    // Post details live outside the markdown: just refetch the post so the
-    // Overview tab shows what the agent changed.
     if (part.type === "tool-updatePostDetails") {
       const detailsPart = part as { toolCallId: string; state: string };
       if (

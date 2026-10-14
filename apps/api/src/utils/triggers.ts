@@ -44,8 +44,6 @@ export async function getTriggersForIntegration(
   organizationId: string,
   integrationId: string
 ) {
-  // Triggers currently persist both GitHub integration IDs and Linear selections
-  // inside targets.repositoryIds. Linear values are stored with a `linear:` prefix.
   const allTriggers = await db.query.contentTriggers.findMany({
     where: eq(contentTriggers.organizationId, organizationId),
     columns: {

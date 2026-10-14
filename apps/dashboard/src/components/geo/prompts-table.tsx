@@ -148,7 +148,6 @@ function PromptTableContextMenu({
         <HugeiconsIcon icon={Tag01Icon} strokeWidth={2} />
         {tGeoShared("editTags")}
       </ContextMenuItem>
-      {/* Pausing is gone; prompts paused before that can still resume. */}
       {row.enabled ? null : (
         <ContextMenuItem disabled={isPending} onClick={onEnable}>
           <HugeiconsIcon icon={PlayIcon} strokeWidth={2} />
@@ -226,7 +225,6 @@ export function PromptsTable({
     null
   );
   const [detail, setDetail] = useState<GeoPromptTableRow | null>(null);
-  // Deep link from the "View" action on the tracked-prompt toast.
   const [linkedPromptId, setLinkedPromptId] = useQueryState(
     GEO_PROMPT_DETAIL_QUERY_KEY,
     parseAsString
@@ -253,7 +251,6 @@ export function PromptsTable({
   const { competitors } = useGeoCompetitorsDb(organizationId);
   const prefetchPromptAnswer = usePrefetchGeoPromptAnswer(organizationId);
 
-  // Looked up without filters so an active filter can't hide the linked prompt.
   const linkedRow = useMemo(
     () =>
       linkedPromptId
@@ -310,8 +307,6 @@ export function PromptsTable({
 
   const noPromptsTracked = !promptsLoading && prompts.length === 0;
   const staleFilters = noPromptsTracked && promptFiltersActive(filters);
-  // The empty state hides the filter bar, so filters left in the URL would
-  // silently hide the next prompt someone adds.
   useEffect(() => {
     if (!staleFilters) {
       return;
@@ -384,7 +379,6 @@ export function PromptsTable({
           competitors={competitors}
         />
       ),
-      // Groups prompts by the brand that wins them most.
       sortValue: (row) => mentionedInstead.get(row.id)?.[0]?.name ?? "",
     },
     {
@@ -417,7 +411,6 @@ export function PromptsTable({
     },
   ];
 
-  // Nothing tracked yet: filters and an empty table would only add noise.
   if (noPromptsTracked && !isScanning) {
     return (
       <Empty>

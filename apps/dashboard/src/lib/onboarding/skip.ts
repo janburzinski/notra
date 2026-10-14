@@ -36,7 +36,6 @@ async function skipOnboardingImpl(slug: string, step: OnboardingStep) {
     URL.parse(requestHeaders?.get("referer") ?? "")?.searchParams.get(
       "project"
     ) ?? undefined;
-  // Validate before writing so a failed lookup cannot leave onboarding dismissed.
   const projectId = await validatedOnboardingProjectId(
     organization.id,
     requestedProjectId

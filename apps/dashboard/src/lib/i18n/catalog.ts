@@ -6,11 +6,6 @@ import { isDashboardLocale } from "@/utils/i18n";
 import deCatalogUrl from "../../../messages/de.json?url";
 import enCatalogUrl from "../../../messages/en.json?url";
 
-/**
- * The message catalog (~300 KB) is a hashed static asset instead of root
- * loader data: in loader data it was serialized into every HTML response and
- * cost ~8 ms of server CPU per request. Browsers fetch it once and cache it.
- */
 const CATALOG_URLS: Record<DashboardLocale, string> = {
   de: deCatalogUrl,
   en: enCatalogUrl,
@@ -19,8 +14,6 @@ const CATALOG_URLS: Record<DashboardLocale, string> = {
 const catalogs = new Map<DashboardLocale, AbstractIntlMessages>();
 const pending = new Map<DashboardLocale, Promise<AbstractIntlMessages>>();
 
-// The dev server resolves `?url` imports to app paths, which the auth
-// middleware redirects to /login, so dev imports the catalog like the server.
 const SERVES_CATALOG_ASSETS = !import.meta.env.DEV;
 
 async function fetchCatalog(

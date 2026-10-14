@@ -26,10 +26,6 @@ const TOPICS = [
 const PAGE_SIZE = 10;
 const ROW_HEIGHT = 48;
 const VISIBLE_ROWS = 10;
-/**
- * A full page plus the pager and padding. The preview keeps this height on the
- * short last page, so the docs frame and the page below it don't resize.
- */
 const PREVIEW_MIN_HEIGHT = 628;
 
 const PROMPTS: Prompt[] = Array.from({ length: 36 }, (_, index) => {

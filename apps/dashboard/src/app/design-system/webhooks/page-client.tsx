@@ -152,7 +152,6 @@ function OverlayTriggers() {
   const [detail, setDetail] = useState<
     keyof typeof DESIGN_SYSTEM_WEBHOOK_DETAILS | "loading" | "error" | null
   >(null);
-  // "Creating…" blocks every close path, so resolve it like a real request would.
   useEffect(() => {
     if (create !== "pending") {
       return;
@@ -250,7 +249,6 @@ function SettingsModalSample() {
 }
 
 export default function WebhooksDesignSystemClientPage() {
-  // Fixture timestamps are relative to page load, so skip SSR to avoid hydration drift.
   const isClient = useIsClient();
   return (
     <DesignSystemFrame

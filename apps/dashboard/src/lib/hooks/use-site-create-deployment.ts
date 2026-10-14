@@ -9,8 +9,6 @@ import {
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SiteCreateDeploymentInput } from "@/types/site-create-deploy";
 
-// Follows the newest deployment of a freshly created site. After a retry the
-// failed deployment is ignored until the new one shows up.
 export function useSiteCreateDeployment({
   organizationId,
   siteId,

@@ -69,7 +69,6 @@ export async function validateUpload({
   fileType: string;
   fileSize: number;
 }) {
-  // Videos get the smaller cap X, LinkedIn and GitHub drafts all accept.
   const maxSize =
     type === "content" && isVideoMimeType(fileType)
       ? Math.min(maxSizeByType[type], MAX_CONTENT_VIDEO_BYTES)

@@ -13,11 +13,6 @@ import { DESIGN_SYSTEM_SEARCH_GAPS } from "@/constants/design-system-gaps";
 
 import { PrototypeAnswerSheet } from "./prototype-answer-sheet";
 
-/**
- * Mocked previews of the two content-gap surfaces: the prompt gap sheet and
- * the search gap sheet. The shipped components read live scan data, so
- * this page mirrors their layout with fixtures.
- */
 const SEARCH_COLUMNS: TableColumn<
   (typeof DESIGN_SYSTEM_SEARCH_GAPS)[number]
 >[] = [

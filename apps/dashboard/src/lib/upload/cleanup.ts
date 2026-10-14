@@ -122,8 +122,6 @@ export async function deleteOrganizationChatFiles(organizationId: string) {
     );
     const deleted = await deleteR2Keys(keys);
 
-    // Remove DB rows for these keys so they don't re-surface in user
-    // attachment lists with dead URLs.
     if (keys.length > 0) {
       await db
         .delete(chatAttachments)

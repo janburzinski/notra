@@ -98,8 +98,6 @@ function TimestampCell({ value }: { value: string }) {
   const locale = useLocale();
   const now = useNow({ updateInterval: 60_000 });
   const isClient = useIsClient();
-  // The viewer's time zone is only known in the browser, so the server
-  // renders a placeholder instead of a UTC time that flips on hydration.
   const parts = isClient ? formatCitationTimestamp(value, locale, now) : null;
 
   if (!isClient) {
@@ -240,8 +238,6 @@ export function CitationsTable({
   const trafficLabels = useAiTrafficLabels();
   const locale = useLocale();
   const rowIds = useMemo(() => citationRowIds(entries), [entries]);
-  // Adjusted during render ("state from previous props") so the render that
-  // shows new rows already marks them.
   const [known, setKnown] = useState<{
     key: string | undefined;
     ids: ReadonlySet<string>;
@@ -253,8 +249,6 @@ export function CitationsTable({
   const idsChanged =
     currentIds.size !== known.ids.size ||
     [...currentIds].some((id) => !known.ids.has(id));
-  // A placeholder (no key) waits for its result. A result of another query,
-  // such as a relaxed filter, brings older rows that did not just arrive.
   if (liveKey !== undefined && (idsChanged || liveKey !== known.key)) {
     setArrivedIds(
       liveKey === known.key
@@ -263,8 +257,6 @@ export function CitationsTable({
     );
     setKnown({ key: liveKey, ids: currentIds });
   }
-  // The log is virtualized: a row scrolled back into view remounts and would
-  // replay its arrival, so the mark comes off once the animation is over.
   useEffect(() => {
     if (arrivedIds.size === 0) {
       return;
@@ -277,7 +269,6 @@ export function CitationsTable({
   }, [arrivedIds]);
   const rowId = (entry: GeoTrafficLogEntry, index: number) =>
     rowIds.get(entry) ?? String(index);
-  // Position among this update's arrivals, in table order, for the stagger.
   const arrivalOrder = new Map<string, number>();
   for (const id of rowIds.values()) {
     if (arrivedIds.has(id)) {

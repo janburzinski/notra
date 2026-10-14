@@ -16,9 +16,6 @@ import { db } from "@notra/db/drizzle";
 import { posts } from "@notra/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 
-// Saving diagram edits on a post: hand edits from the editor and fast chat
-// edits, both compare-and-set on the post's diagram revision.
-
 /** Thrown when the diagram changed between reading and saving it. */
 export class DiagramConflictError extends Error {
   constructor() {
@@ -107,7 +104,6 @@ export async function saveDiagramRevision(params: {
       and(
         eq(posts.id, params.postId),
         eq(posts.organizationId, params.organizationId),
-        // Compare-and-set: a save that landed while we rendered wins.
         sql`coalesce((${posts.sourceMetadata}->>'diagramRevision')::int, 0) = ${revision}`
       )
     )

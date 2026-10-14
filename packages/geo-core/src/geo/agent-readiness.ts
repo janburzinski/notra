@@ -36,7 +36,6 @@ import {
 } from "../utils/geo-website";
 import { geoDb } from "./effect";
 
-/** Everything `toReportView` reads — the two JSONB-free columns are omitted. */
 type AgentReadinessReportFields = Pick<
   AgentReadinessReportRow,
   | "id"
@@ -455,8 +454,6 @@ export const executeAgentReadinessScan = Effect.fn(
           score: report.score,
           scoreLabel: report.scoreLabel,
           scoreBreakdown: report.scoreBreakdown,
-          // feedback.md is a Notra bonus check, so it does not alter the
-          // externally owned Is Agentic score or breakdown.
           issues,
           eligibleChecks: report.eligibleChecks,
           reportUrl: report.reportUrl,

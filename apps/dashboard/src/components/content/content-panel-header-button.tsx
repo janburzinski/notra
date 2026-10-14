@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/button";
 import type { ContentPanelHeaderButtonProps } from "@/types/components/content-chat-activity-panel";
 
-/** Icon button with a tooltip in the right panel's header. */
 export function ContentPanelHeaderButton({
   icon,
   label,

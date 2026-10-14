@@ -34,7 +34,6 @@ export function useCopyToClipboard({
 
   const copy = useCallback(
     async (text: string) => {
-      // A failed attempt must not keep showing the previous success.
       const clear = () => {
         if (timerRef.current) {
           clearTimeout(timerRef.current);

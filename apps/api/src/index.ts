@@ -132,7 +132,6 @@ function getAllowedOrigin(origin: string | undefined): string | null {
     ...(IS_PRODUCTION ? [] : [LOCAL_DEV_ORIGIN_PATTERN]),
   ];
 
-  // The demo dashboard's API console calls demo-api from the browser.
   if (IS_DEMO && origin === process.env.NOTRA_DEMO_DASHBOARD_ORIGIN) {
     return origin;
   }
@@ -207,7 +206,6 @@ app.use("/v1/*", databaseMiddleware);
 app.use("/v2/*", databaseMiddleware);
 
 if (IS_DEMO) {
-  // Before the request log, which buffers bodies ahead of auth.
   const demoBodyLimit = bodyLimit({
     maxSize: DEMO_API_MAX_BODY_BYTES,
     onError: (c) => c.json({ error: "Payload too large" }, 413),
@@ -236,19 +234,12 @@ const oauthScopeMiddleware = async (c: Context, next: () => Promise<void>) => {
   const pathname = new URL(c.req.url).pathname;
   const requiredScope = getRequiredApiScope(pathname, c.req.method);
   if (!requiredScope && !isUnscopedApiPath(pathname)) {
-    // A route that was not registered must never silently become accessible
-    // to any valid key. Returning 404 keeps unknown endpoints conventional
-    // while making a newly added-but-unregistered operation unreachable.
     return c.json({ error: "Not found" }, 404);
   }
   if (!requiredScope) {
     return await authMiddleware({ legacyPermissions: [] })(c, next);
   }
 
-  // `expandLegacyApiScopes` is the registry's rule: `api.write` implies every
-  // scope, `api.read` only the read scopes. So a read may fall back to either
-  // legacy scope, while a write accepts `api.write` alone — offering
-  // `api.read` on a write would hand read-only keys mutation access.
   const legacyPermissions = isApiMutationMethod(c.req.method)
     ? [LEGACY_API_WRITE_SCOPE]
     : [LEGACY_API_READ_SCOPE, LEGACY_API_WRITE_SCOPE];
@@ -266,8 +257,6 @@ const unlessPublicFeedbackIngest =
       ? next()
       : middleware(c, next);
 
-// Feedback is the only API resource available without a paid plan. Auth and
-// scopes still apply to every request except the public ingest endpoint.
 const unlessFeedbackRequest =
   (middleware: (c: Context, next: () => Promise<void>) => Promise<unknown>) =>
   (c: Context, next: () => Promise<void>) =>
@@ -286,9 +275,6 @@ app.use("/v2/*", apiAuthTelemetryMiddleware);
 app.use("/v1/*", unlessFeedbackRequest(subscriptionMiddleware()));
 app.use("/v2/*", subscriptionMiddleware());
 
-// GEO is a paid add-on, so every GEO endpoint — reads included — additionally
-// requires the `ai_answers` plan entitlement. `subscriptionMiddleware` above
-// still applies unchanged.
 const requireGeoEntitlement = geoEntitlementMiddleware();
 app.use("/v1/projects/*", requireGeoEntitlement);
 app.use("/v1/geo/ingest/*", requireGeoEntitlement);
@@ -296,31 +282,26 @@ app.use("/v1/projects/*", geoContextMiddleware());
 app.use("/v1/projects/:projectId/*", geoProjectContextMiddleware());
 app.use("/v1/geo/ingest/*", geoContextMiddleware());
 
-// Liveness probe; apiObservabilityMiddleware already records the request
 // evlog-map-disable-next-line -- liveness probe
 app.get("/", (c) => {
   return c.text("ok");
 });
 
-// Liveness probe; apiObservabilityMiddleware already records the request
 // evlog-map-disable-next-line -- liveness probe
 app.get("/ping", (c) => {
   return c.text("pong");
 });
 
-// Static OAuth metadata; apiObservabilityMiddleware already records the request
 // evlog-map-disable-next-line -- static OAuth metadata
 app.get("/.well-known/oauth-protected-resource", (c) => {
   return c.json(buildProtectedResourceMetadata(new URL(c.req.url).origin));
 });
 
-// Static OAuth metadata; apiObservabilityMiddleware already records the request
 // evlog-map-disable-next-line -- static OAuth metadata
 app.get("/.well-known/oauth-authorization-server", (c) => {
   return c.json(buildAuthorizationServerMetadata());
 });
 
-// Static API catalog; apiObservabilityMiddleware already records the request
 // evlog-map-disable-next-line -- static API catalog
 app.get("/.well-known/api-catalog", (c) => {
   c.header(
@@ -396,9 +377,7 @@ app.openAPIRegistry.registerComponent("parameters", "OrganizationSelector", {
   schema: { type: "string" },
 });
 
-// Routes and schema configuration are fixed after startup.
 let openApiJson: string | undefined;
-// Static OpenAPI document; apiObservabilityMiddleware already records the request
 // evlog-map-disable-next-line -- static OpenAPI document
 app.get("/openapi.json", (c) => {
   openApiJson ??= JSON.stringify(

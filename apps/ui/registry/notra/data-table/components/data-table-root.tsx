@@ -40,7 +40,6 @@ import {
   TableScrollFade,
 } from "./data-table-surfaces";
 
-/** Shared engine behind `DataTable` and `InfiniteDataTable`. */
 export function DataTableRoot<T>(props: DataTableRootProps<T>) {
   return (
     <DataTableLabelsProvider labels={props.labels}>
@@ -144,8 +143,6 @@ function DataTableRootInner<T>({
       </>
     ) : undefined;
 
-  // A paged table shows its whole page by default; only an explicit `height`
-  // caps it with a scrolling body.
   const height =
     heightProp ??
     (pagination
@@ -213,8 +210,6 @@ function DataTableRootInner<T>({
     >
       <TableFrame flushBottom={flushBottom} flushTop={flushTop}>
         <TableHeaderSurface flushTop={flushTop} toolbar={toolbar}>
-          {/* Transparent side borders match the body's, so both tables get the
-              same width and the columns line up. */}
           <div
             className="overflow-hidden border-x border-transparent"
             ref={headerScrollRef}

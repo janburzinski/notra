@@ -29,7 +29,6 @@ export function SocialVideoAttachment({
 }: SocialVideoAttachmentProps) {
   const t = useTranslations("content.postSocial");
   const inputRef = useRef<HTMLInputElement>(null);
-  // A ref, so two drops in one frame can't both start an upload.
   const busyRef = useRef(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,8 +46,6 @@ export function SocialVideoAttachment({
     setError(null);
     if (file.size > SOCIAL_VIDEO.maxBytes) {
       setError(t("videoTooLarge", { maxMb: SOCIAL_VIDEO.maxBytesMb }));
-      // Leave the rejected file selected and the same pick fires no change
-      // event — reset so retrying the same file works.
       if (inputRef.current) {
         inputRef.current.value = "";
       }
@@ -60,13 +57,9 @@ export function SocialVideoAttachment({
       : undefined;
     setUploadingState(true);
     try {
-      // EBML headers can exceed 4 KiB; the size gate bounds this full-file read.
       const mimeType = validateContentVideo(
         new Uint8Array(await file.arrayBuffer())
       );
-      // The presigned upload trusts `file.type` for validation and the
-      // stored Content-Type — normalize to the sniffed bytes so a wrong
-      // browser MIME can neither bypass the gate nor mistype the object.
       const normalized =
         file.type === mimeType
           ? file
@@ -77,7 +70,6 @@ export function SocialVideoAttachment({
       });
       onChange({ key, url, mimeType, size: file.size });
     } catch (cause) {
-      // The dialog may have unmounted this input while the upload was running.
       toast.error(t("videoUploadFailed"));
       setError(
         cause instanceof Error && cause.message

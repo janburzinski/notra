@@ -44,7 +44,6 @@ export function getGateway(): ReturnType<typeof createGateway> {
   return gatewayInstance;
 }
 
-// Same tags as prod calls so eval spend is visible separately in the gateway.
 const gatewayProviderOptions = (feature: string) => ({
   gateway: {
     disallowPromptTraining: true,
@@ -100,7 +99,6 @@ export async function runCostDetails(
                 },
               };
             } catch {
-              // Cost lookup cannot invalidate an already completed evaluation.
               return step;
             }
           })
@@ -184,7 +182,6 @@ export interface JevAnswer<QUESTIONS extends JevQuestions> {
   confidence: Record<string, number>;
 }
 
-/** Same call shape as packages/ai/src/evaluation/client.ts. */
 export async function callJev<QUESTIONS extends JevQuestions>(
   params: JevCallParams<QUESTIONS>
 ): Promise<CallResult<JevAnswer<QUESTIONS>>> {

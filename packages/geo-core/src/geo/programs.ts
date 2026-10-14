@@ -220,11 +220,6 @@ function mergeLegacyCompetitors(
   return merged;
 }
 
-/**
- * One settings read per request: a GEO batch (overview, prompts, competitors,
- * traffic) otherwise reads the same row once per procedure. Outside a request
- * memo (workflows, mutations) it reads straight through.
- */
 function findGeoSettingsRow(projectId: string) {
   return memoizeGeoRequest(`settings:${projectId}`, () =>
     db.query.geoSettings.findFirst({
@@ -733,17 +728,11 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
     input.companyName
   );
 
-  // Zero data retention needs the ZDR add-on: without the entitlement the
-  // flag is forced off regardless of what the client sent.
-  // resolveZdrEntitlement never throws; a billing outage answers "unknown",
-  // which counts as not entitled here so the toggle fails closed.
   const entitlement = yield* entitlements.resolveZdrEntitlement(
     input.organizationId
   );
   const enforceZdr = entitlement === "entitled" && input.enforceZdr;
   const catalog = yield* loadGeoModelCatalog(input.organizationId);
-  // Static engines hidden from this organization (missing credential or flag
-  // off) keep their stored selection so a re-save doesn't silently drop them.
   const unavailableStaticEngines = new Set<string>();
   for (const entry of GEO_MODEL_CATALOG_STATIC) {
     if (!getGeoModelCatalogEntry(catalog, entry.id)) {
@@ -783,8 +772,6 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   const domains = normalizeProjectDomains(
     input.domains ?? existingSettings?.domains ?? []
   );
-  // Stored prompts are written in the prompt language, so it is fixed once set
-  // and always stays tracked; otherwise scans would only run translations.
   const promptLanguage =
     existingSettings?.promptLanguage ?? input.promptLanguage ?? null;
   const languages = withPromptLanguage(input.languages, promptLanguage);
@@ -811,12 +798,6 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
     ]),
   ].filter((engine) => engineSet.has(engine));
 
-  // The schedule is a plain due stamp the cron sweep polls. An unchanged
-  // enabled row keeps its pending due time (a still-null stamp stays null and
-  // is picked up by the next sweep), disabling clears it, and a fresh enable
-  // or an interval change re-arms it from the last finished scan — not a full
-  // interval out from now, which used to push the next scan a whole day away
-  // every time settings were saved.
   const keepNextScanAt =
     input.enabled &&
     existingSettings?.enabled === true &&
@@ -830,9 +811,6 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
       existingSettings?.lastScanAt ?? null
     );
   }
-  // A re-armed or cleared schedule must not stay leased by the sweep that was
-  // mid-tick, or the new stamp would be ignored until the lease expires. An
-  // untouched schedule keeps whatever lease that sweep holds.
   const clearedLease = keepNextScanAt
     ? {}
     : { scanLeaseUntil: null, scanFirstFailedAt: null };
@@ -1152,11 +1130,6 @@ export const loadGeoCompetitorEngineMatrix = Effect.fn(
     ],
     { concurrency: "unbounded" }
   );
-  // Tracked competitors are matched by name and synonyms regardless of rank,
-  // so one outside the top brands still gets its row. Untracked brands only
-  // stand in while nothing is tracked.
-  // Same mapping as the client, so an exact tracked name wins over another
-  // competitor's synonym.
   const brands = competitorCanonicalMap(competitors);
   if (brands.size === 0) {
     const topBrands = yield* geoDb("competitor share query failed", () =>
@@ -1446,8 +1419,6 @@ export const loadGeoTrafficJourneys = Effect.fn("geo.trafficJourneys")(
         distinctPaths: Number(row.distinct_paths),
         firstSeenAt: row.first_seen_at,
         lastSeenAt: row.last_seen_at,
-        // `sample_paths` is a set with no ordering guarantee, so it is only a
-        // fallback for pipe versions deployed before `entry_path` existed.
         entryPath: row.entry_path ?? row.sample_paths[0] ?? "",
         samplePaths: row.sample_paths,
       })),
@@ -1466,7 +1437,6 @@ function toJourneyDailyPoints(
   }));
 }
 
-/** `maxIf` over no rows yields the epoch; treat it as "not seen". */
 function journeyLastSeen(value: string): string | null {
   return value.startsWith(JOURNEY_EPOCH_PREFIX) ? null : value;
 }
@@ -1509,7 +1479,6 @@ export const loadGeoJourneyStats = Effect.fn("geo.journeyStats")(function* (
       lastSeenAt: journeyLastSeen(row.last_seen_at),
       daily: toJourneyDailyPoints(row.days, row.daily_journeys),
     })),
-    // Rows with no journeys in the window only ride along to carry the totals.
     pages: pageRows
       .filter((row) => Number(row.journeys) > 0)
       .map((row) => ({
@@ -2113,8 +2082,6 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
     }
   }
 
-  // Refuse before claiming, so an organization out of credits gets a 402 now
-  // instead of a scan id whose run fails at its billing gate.
   const denial = yield* findGeoScanBillingDenial(
     scope.organizationId,
     projectId
@@ -2127,19 +2094,11 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
     );
   }
 
-  // Claim the scan slot atomically *before* handing off. Reading the settings
-  // row and checking `isGeoScanRunning` cannot serialize anything: concurrent
-  // triggers (public API, dashboard, cron sweep) all read "idle" before
-  // any of them stamps, and all of them start a scan the organization pays
-  // for. Losing the claim means someone else is already scanning.
   const claim = yield* claimGeoScanRun(projectId);
   if (!claim) {
     return yield* Effect.fail(new GeoScanAlreadyRunningError({ projectId }));
   }
 
-  // The hand-off creates the `geo_scans` row the caller polls, carries the
-  // claim token, and owns the rules for a failed start (definite refusal
-  // releases the claim and fails the row, unknown outcome holds both).
   return yield* startClaimedGeoScanRun(
     scope.organizationId,
     projectId,

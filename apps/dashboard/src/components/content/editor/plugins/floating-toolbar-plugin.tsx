@@ -74,17 +74,14 @@ function FloatingToolbar({
     const rect = range.getBoundingClientRect();
     const anchorRect = anchorElem.getBoundingClientRect();
 
-    // Calculate position above selection
     const spaceAbove = rect.top - anchorRect.top;
     const toolbarHeight = toolbar.offsetHeight;
     const minSpaceNeeded = toolbarHeight + 16;
 
     let top: number;
     if (spaceAbove < minSpaceNeeded) {
-      // Not enough space above, position below selection
       top = rect.bottom - anchorRect.top + 8;
     } else {
-      // Position above selection
       top = rect.top - anchorRect.top - toolbarHeight - 8;
     }
 
@@ -134,7 +131,6 @@ function FloatingToolbar({
     );
   }, [editor, updatePosition]);
 
-  // Focus input when entering link edit mode
   useEffect(() => {
     if (isLinkEditMode) {
       const timeoutId = setTimeout(() => linkInputRef.current?.focus(), 0);
@@ -144,12 +140,10 @@ function FloatingToolbar({
 
   const handleLinkClick = useCallback(() => {
     if (isLink) {
-      // Edit existing link - populate with current URL
       setLinkUrl(existingLinkUrl || "https://");
       setIsEditingExistingLink(true);
       setIsLinkEditMode(true);
     } else {
-      // Create link with placeholder URL first, then enter edit mode
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, "https://");
       setLinkUrl("https://");
       setIsEditingExistingLink(false);
@@ -160,13 +154,11 @@ function FloatingToolbar({
   const submitLink = useCallback(() => {
     const trimmedUrl = linkUrl.trim();
     if (trimmedUrl !== "" && trimmedUrl !== "https://") {
-      // Validate URL format
       let isValidUrl = false;
       try {
         new URL(trimmedUrl);
         isValidUrl = true;
       } catch {
-        // Check if it's a relative URL
         isValidUrl =
           trimmedUrl.startsWith("/") ||
           trimmedUrl.startsWith("./") ||
@@ -178,11 +170,9 @@ function FloatingToolbar({
       if (isValidUrl) {
         editor.dispatchCommand(TOGGLE_LINK_COMMAND, trimmedUrl);
       } else {
-        // Invalid URL format, remove the link
         editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
       }
     } else {
-      // Remove the link if URL is empty
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     }
     setIsLinkEditMode(false);
@@ -191,8 +181,6 @@ function FloatingToolbar({
   }, [editor, linkUrl, setIsLinkEditMode]);
 
   const cancelLinkEdit = useCallback(() => {
-    // Only remove the link if we're canceling a new link creation
-    // If editing an existing link, keep the original URL
     if (!isEditingExistingLink) {
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     }
@@ -417,7 +405,6 @@ export function FloatingToolbarPlugin({
     );
   }, [editor, updateToolbar]);
 
-  // Keep toolbar visible while in link edit mode even if selection changes
   if (!(isText || isLinkEditMode)) {
     return null;
   }

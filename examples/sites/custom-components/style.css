@@ -1,4 +1,3 @@
-/* Mint-tinted surfaces instead of the theme's neutral greys. */
 :root {
   --muted: #e2f3ea;
   --border: #d2e7dc;
@@ -10,9 +9,6 @@ html.dark {
   --card: #0a1c16;
 }
 
-/* Playful touches on the built-in components: rounder corners that stay
-   concentric, and a solid fill so the dotted page background doesn't run
-   through text. */
 .callout,
 .tabs,
 .card {
@@ -20,7 +16,6 @@ html.dark {
   background-color: var(--background);
 }
 
-/* Code inside Tabs sits 1rem in, so the frame gets 0.75rem + 1rem. */
 .tabs {
   border-radius: 1.75rem;
 }
@@ -37,8 +32,6 @@ html.dark {
   }
 }
 
-/* On phones the hero image crops to its middle, so the icon pattern sits
-   behind the title. Dim it there. */
 @media (max-width: 40rem) {
   section:has(> div > #page-title) {
     background-image:

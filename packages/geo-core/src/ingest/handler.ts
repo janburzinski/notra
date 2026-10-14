@@ -97,8 +97,6 @@ async function handleLogged<A>(
           }
         : onSuccess(outcome.success);
   } catch (error) {
-    // Defects (thrown outside the typed error channel) must still answer and
-    // still be counted instead of surfacing as an opaque framework 500.
     handled = {
       response: toGeoIngestErrorResponse(
         new GeoIngestFailedError({ cause: error })

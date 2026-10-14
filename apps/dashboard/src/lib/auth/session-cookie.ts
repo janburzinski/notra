@@ -20,8 +20,6 @@ export function clearHostAuthSessionCookie() {
   if (!domain || domain === new URL(getRequest().url).hostname) {
     return;
   }
-  // The previous SDK configuration wrote host-only cookies. Remove those
-  // after signing in so they cannot shadow the configured domain cookie.
   deleteCookie(
     process.env.WORKOS_COOKIE_NAME || WORKOS_SESSION_COOKIE_FALLBACK,
     { path: "/" }

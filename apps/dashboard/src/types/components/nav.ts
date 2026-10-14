@@ -113,10 +113,6 @@ export interface NavUtilityProps {
   slug: string;
 }
 
-/**
- * A mode the user picked that the route has not caught up with yet. Scoped to
- * the route it was picked from so it stops applying once navigation moves on.
- */
 export interface PendingSidebarMode {
   mode: SidebarMode;
   route: string | undefined;

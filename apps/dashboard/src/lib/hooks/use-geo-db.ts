@@ -57,11 +57,6 @@ import type { GeoProjectCreateInput } from "@/types/geo";
 import { toErrorMessage } from "@/utils/error-message";
 import { sortGeoProjectsOldestFirst } from "@/utils/geo-projects";
 
-/**
- * Dialogs that stay mounted while closed pass `enabled: false` so the collection
- * does not start a full-table sync before the user opens them. A disabled live
- * query returns no data but leaves the collection handle usable for mutations.
- */
 interface GeoDbOptions {
   enabled?: boolean;
 }

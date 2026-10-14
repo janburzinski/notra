@@ -95,7 +95,6 @@ export const ANSWER_EXAMPLE_OUTCOME_LABELS = {
 
 export const ANSWER_EXAMPLE_POSITION_NONE = "None";
 
-/** Same bands as the dashboard directions table: 1–2 top, 3–4 mid. */
 export const ANSWER_EXAMPLE_POSITION_TOP = 2;
 export const ANSWER_EXAMPLE_POSITION_MID = 4;
 

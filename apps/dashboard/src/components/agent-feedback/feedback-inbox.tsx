@@ -55,10 +55,6 @@ const FEEDBACK_CONFETTI_COLORS = [
   "#34D399",
 ];
 
-/**
- * The feedback list with its filter, detail and delete dialogs. The caller
- * supplies the heading and, optionally, its own empty state.
- */
 export function AgentFeedbackInbox({
   emptyState,
   footer,
@@ -69,8 +65,6 @@ export function AgentFeedbackInbox({
   const [statusFilter, setStatusFilter] = useState<AgentFeedbackStatusFilter>(
     AGENT_FEEDBACK_DEFAULT_STATUS_FILTER
   );
-  // Held as a snapshot so the sheet stays open when a status change moves the
-  // item out of the active filter.
   const [selected, setSelected] = useState<AgentFeedbackItem | null>(null);
   const [deleteCandidate, setDeleteCandidate] =
     useState<AgentFeedbackItem | null>(null);
@@ -263,7 +257,6 @@ function FeedbackList({
   selectedId: string | null;
   showEmptyState: boolean;
   statusFilter: AgentFeedbackStatusFilter;
-  /** Fill the leftover height; off when content follows the table. */
   tableGrows: boolean;
 }) {
   const tCommon = useTranslations("common");

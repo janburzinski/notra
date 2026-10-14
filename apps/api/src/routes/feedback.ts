@@ -298,7 +298,6 @@ feedbackRoutes.openapi(listFeedbackRoute, async (c) => {
       query: c.req.valid("query"),
     })
   );
-  // listFeedback only fails on database errors; domain 404s are not produced here.
   if (result._tag === "Failure") {
     throw result.failure;
   }

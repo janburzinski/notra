@@ -52,7 +52,6 @@ export type PostAuthorSummary = Pick<
   "id" | "slug" | "name" | "title" | "avatarUrl"
 >;
 
-/** Authors referenced by a set of posts, keyed by author ID. */
 export type PostAuthorsById = ReadonlyMap<string, PostAuthorSummary>;
 
 type ContentAuthorRow = Pick<

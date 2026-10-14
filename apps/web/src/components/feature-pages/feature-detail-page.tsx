@@ -30,7 +30,6 @@ export function FeatureDetailPage({
   return (
     <div className="flex w-full flex-col items-center gap-20 pb-20 antialiased [font-synthesis:none] lg:gap-24 lg:pb-28">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(buildFeatureDetailBreadcrumb(copy)),
         }}

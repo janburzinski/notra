@@ -24,8 +24,6 @@ import type {
   SendWorkflowPausedEmailProps,
 } from "@/types/email/send";
 
-// --- Send Functions ---
-
 export async function sendWelcomeEmail({ userEmail }: { userEmail: string }) {
   return sendBrewEmail({
     category: "welcome",
@@ -67,13 +65,11 @@ export async function sendScheduledPublicationFailedEmail({
   failureKey,
   ...props
 }: SendScheduledPublicationFailedEmailProps) {
-  // Shares the scheduled-content failure trigger: same audience and setting.
   return sendBrewEmail({
     category: "schedule-content-failed",
     to: recipientEmail,
     subject: `"${props.postTitle}" could not be published`,
     react: ScheduledPublicationFailedEmail(props),
-    // One email per failure and recipient, however often the step retries.
     idempotencyKey: `scheduled-publication:${failureKey}:${recipientEmail}`,
   });
 }
@@ -190,8 +186,6 @@ export async function sendFeedbackEmail({
       pageUrl,
       userAgent,
     }),
-    // Everything the email shows: the same feedback from the same page within
-    // Brew's 24 h window is a double submit, anything else a new message.
     idempotencyKey: JSON.stringify([
       to,
       userName,
@@ -239,10 +233,8 @@ export async function sendWeeklySummaryEmail({
   ...props
 }: SendWeeklySummaryEmailProps) {
   return sendBrewEmail({
-    // Same Brew trigger the daily recap used; renaming it needs brew:setup.
     category: "daily-summary",
     to: recipientEmail,
-    // The headline goes in the preview text; long subjects get truncated.
     subject: `Weekly GEO recap for ${props.organizationName}, ${props.weekLabel}`,
     react: WeeklySummaryEmail(props),
     idempotencyKey: `${recipientEmail}:${props.organizationSlug}:week:${weekKey}`,

@@ -130,7 +130,6 @@ export interface WriteDialogProps {
   entry?: GeoWriteDialogEntry;
 }
 
-/** Input for opening WriteDialog from a GEO gap row. */
 export interface GeoGapsWriteEntry {
   promptId: string;
   prompt: string;

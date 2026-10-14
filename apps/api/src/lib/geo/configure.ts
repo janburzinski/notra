@@ -106,9 +106,6 @@ const entitlementLayer = Layer.succeed(GeoEntitlementService, {
 });
 
 const featureFlagLayer = Layer.succeed(GeoFeatureFlagService, {
-  // The API has no feature-flag client. Hidden engines are preserved when
-  // settings are saved, so reporting direct engines as disabled cannot remove
-  // access.
   isCursorEngineEnabledForOrganization: Effect.fn(
     "GeoApiFeatureFlags.isCursorEnabled"
   )(() => Effect.succeed(false)),
@@ -130,12 +127,6 @@ const generationLayer = Layer.succeed(GeoGenerationService, {
   ),
 });
 
-/**
- * Capabilities the public API can truthfully provide to GEO programs.
- *
- * Content billing is deliberately absent. Programs that require it run in the
- * dashboard and are reached through its authenticated internal endpoints.
- */
 export const geoCoreApiLayer = Layer.mergeAll(
   agentReadinessNetworkLayer,
   geoModelLayer,

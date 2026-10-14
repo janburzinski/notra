@@ -1,6 +1,5 @@
 import { MAX_RESPONSE_BYTES } from "../constants/metrics.ts";
 
-/** Fetch exposes decoded bytes. Enforce the budget before decoding or JSON parsing. */
 export async function readJson(response: Response): Promise<unknown> {
   const reader = response.body?.getReader();
   if (!reader) {
@@ -31,7 +30,6 @@ export async function readJson(response: Response): Promise<unknown> {
     text += decoder.decode();
     return JSON.parse(text);
   } catch {
-    // Cancellation must not replace a fixed diagnostic with stream/provider text.
     await reader.cancel().catch(() => undefined);
     throw new Error(failure);
   } finally {

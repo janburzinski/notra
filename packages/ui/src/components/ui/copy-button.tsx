@@ -13,26 +13,16 @@ import type {
   CopyStateIconProps,
 } from "@notra/ui/types/copy-button";
 
-// Both states share one grid cell and cross-fade in place, so the swap never
-// reflows. The incoming state grows from a blurred quarter-size.
 const SWAP_CLASS =
   "col-start-1 row-start-1 transition-[opacity,scale,filter] duration-normal ease-out motion-reduce:transition-none";
 const SWAP_HIDDEN_CLASS = "scale-25 opacity-0 blur-xs";
-// A tick's weight sits in its bottom stroke and caps sit above the line box's
-// centre, so a box-centred tick reads low next to text. Nudge it up optically
-// and match the medium label weight.
 const TICK_OPTICAL_CLASS = "-translate-y-px";
 const TICK_STROKE_WIDTH = 2;
-// Green on a filled background loses contrast; there the tick keeps the label
-// colour.
 const FILLED_VARIANTS = new Set<CopyButtonProps["variant"]>([
   "default",
   "destructive",
 ]);
 
-/* True from the first `copied` change until the swap back has finished, so
-   buttons don't animate on mount and stop clipping once they're idle again.
-   Same lifecycle as Button's loading swap. */
 function useCopiedSwap(copied: boolean) {
   const [previousCopied, setPreviousCopied] = useState(copied);
   const [isSwapping, setIsSwapping] = useState(false);
@@ -80,8 +70,6 @@ export function CopyStateIcon({
   );
 }
 
-/* Like Button's loading state: the idle label sets the width and blurs up and
-   out, the copied label rises in centred over it. */
 function CopiedLabelSwap({
   copied,
   children,
@@ -178,11 +166,9 @@ export function CopyButton({
     timeout,
     onError: onCopyError,
   });
-  // Only the value that actually landed on the clipboard reads as copied.
   const copied = copiedText === value;
   const hasLabel = children !== undefined && children !== null;
   const tinted = !FILLED_VARIANTS.has(variant);
-  // A visible label names the button itself; icon-only buttons need one.
   const iconOnlyAriaLabel = copied
     ? (copiedAriaLabel ?? labels.copied)
     : (ariaLabel ?? labels.copy);

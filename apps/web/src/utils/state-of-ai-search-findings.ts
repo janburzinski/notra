@@ -1,6 +1,5 @@
 import type { StateOfAiSearchReport } from "@/types/state-of-ai-search";
 
-/** Three to five plain-language takeaways, all derived from the report data. */
 export function buildReportFindings(report: StateOfAiSearchReport): string[] {
   const findings: string[] = [];
   const [leader, runnerUp] = report.ranking;

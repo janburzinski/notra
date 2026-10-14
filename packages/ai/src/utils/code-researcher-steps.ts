@@ -116,7 +116,6 @@ export function addStepUsage(
     cacheReadTokens: total.cacheReadTokens + step.cacheReadTokens,
     cacheWriteTokens: total.cacheWriteTokens + step.cacheWriteTokens,
     reasoningTokens: (total.reasoningTokens ?? 0) + (step.reasoningTokens ?? 0),
-    // Labels the charge; the cost itself is already priced per step.
     modelId:
       total.modelId === stepModel ? stepModel : CODE_RESEARCH_MIXED_MODELS,
     maxPromptTokens: Math.max(total.maxPromptTokens ?? 0, promptTokens(step)),

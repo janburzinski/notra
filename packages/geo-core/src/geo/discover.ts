@@ -294,7 +294,6 @@ const persistGeoWebsiteGeneration = Effect.fn(
           companyName,
           aliases,
           competitors: [],
-          // Only a new row is seeded; an existing selection is left alone.
           engines: seedEngines,
           languages: seedLanguages ? [...seedLanguages] : null,
           promptLanguage: seedLanguages?.at(0) ?? null,
@@ -315,8 +314,6 @@ const persistGeoWebsiteGeneration = Effect.fn(
     tx,
     organizationId,
     projectId,
-    // Discovery only tops a project up to its own limit; competitors that
-    // are already tracked (e.g. a CSV import) are never dropped.
     (current) =>
       buildCompetitorSeeds(
         unionValues(
@@ -377,13 +374,6 @@ const startGeoScanAfterWebsiteGeneration = Effect.fn(
     return;
   }
 
-  // Take the same atomic claim every other trigger takes, rather than
-  // stamping a start blindly. The stamp is what the dashboard reads as
-  // "Scanning…", and writing it without owning the slot both lied about a
-  // scan that a concurrent trigger is already running and overwrote the
-  // token that run needs to release it. Losing the claim means a scan is
-  // already in flight for this project — its results are what onboarding
-  // is waiting for anyway, so start nothing.
   const claim = yield* claimGeoScanRun(projectId).pipe(
     geoSkip("scan claim failed")
   );
@@ -422,8 +412,6 @@ const loadExistingSettings = (projectId: string) =>
 export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
   function* (scopeInput: GeoScopeInput, url: string) {
     const organizationId = scopeInput.organizationId;
-    // The project `ensureGeoProject` settles on (the oldest when none is
-    // given) decides the prompt language, so resolve it before discovery.
     const scope = yield* resolveGeoScope(scopeInput).pipe(
       Effect.mapError(
         (cause) =>
@@ -505,8 +493,6 @@ export const generateGeoFromWebsite = Effect.fn("geo.generateFromWebsite")(
         }),
     });
 
-    // Newly created settings default to enabled; an existing disabled row is
-    // left alone so we never stamp a scan start that the scan will skip.
     yield* startGeoScanAfterWebsiteGeneration(
       organizationId,
       projectId,

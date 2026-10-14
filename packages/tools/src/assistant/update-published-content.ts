@@ -116,8 +116,6 @@ export function createUpdatePublishedContentTool() {
           blocked,
         };
       }
-      // Do not retry this whole operation: GitHub may have accepted the commit
-      // before publication synchronization failed.
       const result = await withGitHubRateLimitHandling(() =>
         updatePublishedContentAndCommit({
           octokit,

@@ -53,7 +53,6 @@ export function useContentMetadata(
   const pending = useRef<PendingMetadataPatch | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestRequest = useRef(0);
-  // Writes go out one after another, so the last edit is also the last write.
   const queue = useRef<Promise<void> | null>(null);
 
   const write = useCallback(
@@ -65,7 +64,6 @@ export function useContentMetadata(
             ...target,
             metadata: patch,
           });
-          // Optimistic edits made since stay on screen until their own write.
           if (request === latestRequest.current && pending.current === null) {
             setMetadataFor(target, () => result.content.metadata);
           }
@@ -108,7 +106,6 @@ export function useContentMetadata(
     (patch: PostMetadataPatch) => {
       const target = { organizationId, contentId };
       setMetadataFor(target, (metadata) => applyMetadataPatch(metadata, patch));
-      // An edit still waiting for another post goes out to that post first.
       if (pending.current && pending.current.target.contentId !== contentId) {
         void flush();
       }
@@ -126,7 +123,6 @@ export function useContentMetadata(
     [contentId, flush, organizationId, setMetadataFor]
   );
 
-  // Never drop a pending edit when the panel goes away or shows another post.
   const flushNow = useEffectEvent(() => {
     void flush();
   });

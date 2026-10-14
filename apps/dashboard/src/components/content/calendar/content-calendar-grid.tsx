@@ -18,9 +18,6 @@ export function ContentCalendarGrid({
 }: ContentCalendarGridProps) {
   const formatDate = useLocalDateFormat();
 
-  // Dualtone, like the content tables: weekdays sit on the shell, the
-  // days are the lifted body overlapping it.
-  // One shared tooltip glides between the chips instead of reopening.
   return (
     <TooltipProvider delay={CONTENT_CALENDAR_TOOLTIP_DELAY_MS}>
       <div className="border-shell-border bg-shell overflow-hidden rounded-t-2xl border border-b-0 pb-5">

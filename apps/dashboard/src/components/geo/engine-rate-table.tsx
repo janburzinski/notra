@@ -49,7 +49,6 @@ import { tableHeightFor } from "@/utils/table";
 
 const NOT_SCANNED_RATE = -1;
 
-/** Rate and the change in it. */
 function VisibilityCell({
   family,
   timeseriesPoints,
@@ -117,11 +116,6 @@ export function EngineRateTable({
   aliases,
   competitors,
 }: EngineRateTableProps) {
-  /*
-   * Engines the workspace stopped scanning keep their old rows, so an
-   * untracked engine sits here frozen at 0 visible / 0% and reads as a bad
-   * result rather than an absent one. Only show what is still being scanned.
-   */
   const families = useMemo(
     () => keepTrackedFamilies(groupEngineFamilies(engines), trackedEngines),
     [engines, trackedEngines]

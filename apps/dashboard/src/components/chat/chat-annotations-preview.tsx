@@ -20,7 +20,6 @@ import { useChatQuote } from "@/components/chat/chat-quote";
 import type { ChatAnnotationsPreviewProps } from "@/types/components/chat-annotations-preview";
 import { getChatQuoteComposer } from "@/utils/chat-quote";
 
-// Numbered like the block the agent receives. A row opens its note for edits.
 export function ChatAnnotationsPreview({
   disabled = false,
 }: ChatAnnotationsPreviewProps) {

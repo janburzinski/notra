@@ -38,12 +38,6 @@ import {
 export const GEO_MAX_ENGINES = 64;
 export const GEO_MODEL_CATALOG_STALE_MS = 60 * 60 * 1000;
 
-/**
- * Reads every scan answer for mentions, position, sentiment and competitors.
- * Benchmarked 2026-10-13 on 60 real answers: with the competitor rules in
- * buildJudgePrompt, gpt-6-luna at low effort found competitors at F1 0.95
- * (gpt-5.4-nano: 0.60 with the old prompt) at a similar price.
- */
 export const GEO_JUDGE_MODEL = "openai/gpt-6-luna";
 /** Default effort spends 350+ reasoning tokens per answer for no gain. */
 export const GEO_JUDGE_REASONING_EFFORT = "low";
@@ -298,7 +292,6 @@ export const GEO_DIRECT_GROUNDED_PROVIDERS: ReadonlySet<GeoGroundedProvider> =
     "direct-perplexity",
   ]);
 
-// Decode historical records and queued tasks only; never used to select models.
 export const GEO_LEGACY_GROUNDED_MODELS: Readonly<Record<string, string>> = {
   "openai-direct-grounded": "openai/gpt-5.4",
   "anthropic-direct-grounded": "anthropic/claude-sonnet-4.6",
@@ -944,11 +937,6 @@ export const GEO_MENTION_TREND_ALL_PROVIDERS_LABEL = "All Models";
 export const GEO_MENTION_SUMMARY_VISIBLE = 5;
 export const GEO_MENTION_ROW_HEIGHT_REM = 2.75;
 export const GEO_MENTION_FADE_HEIGHT_REM = 2;
-/*
- * Visible counts `mentioned OR ownedSourceCited`, Citations counts
- * `ownedSourceCited` alone, so Citations is a subset of Visible and the two
- * never add up. Spell that out: side by side the numbers read as rival totals.
- */
 export const GEO_SCAN_PREFLIGHT_PENDING = "Starting…";
 export const GEO_RANGE_PRESETS = [
   { value: "today" },
@@ -1139,34 +1127,14 @@ export const GEO_MENTION_EVALUATION_NO_POSITION = "none";
 
 export const GEO_LIVE_CHANNEL_PREFIX = "geo";
 export const GEO_LIVE_WATCH_KEY_PREFIX = "geo:live:watch";
-// Refreshed on every realtime (re)connect, which happens at least every
-// 300 s (Upstash Realtime's Fluid stream limit), so it lapses shortly after
-// the last GEO tab closed.
 export const GEO_LIVE_WATCH_TTL_SECONDS = 330;
-// How long ingest trusts a watch lookup. A tab opened within this window
-// waits at most this long for its first live update; polling covers it.
 export const GEO_LIVE_WATCH_MEMO_MS = 15_000;
-// "Nobody watches" is remembered only briefly: a tab that just opened should
-// not miss the traffic of its first seconds.
 export const GEO_LIVE_UNWATCHED_MEMO_MS = 3000;
-// Scan batches finish every few seconds; viewers refetch at most this often
-// while a scan runs. Start and finish are always announced.
 export const GEO_VISIBILITY_LIVE_PROGRESS_INTERVAL_SECONDS = 10;
-// Consecutive realtime connects that never opened (expired session, outage)
-// before the GEO pages stop retrying for a while and rely on polling.
 export const GEO_LIVE_MAX_FAILED_CONNECTS = 3;
 export const GEO_LIVE_PAUSE_AFTER_FAILURES_MS = 60_000;
-// Tinybird buffers rows written with wait=false and flushes them within
-// ~2.8 s (p90). Traffic updates are announced once that window has passed,
-// so the refetch they trigger already sees the new rows.
 export const GEO_TRAFFIC_LIVE_SETTLE_MS = 4000;
-// A busy site announces at most this often, so open tabs refetch the traffic
-// pipes every few seconds instead of after every request burst.
 export const GEO_TRAFFIC_LIVE_MIN_INTERVAL_MS = 10_000;
-// With a live connection, polling only covers missed or dropped events.
 export const GEO_LIVE_FALLBACK_INTERVAL_MS = 120_000;
-// A running scan still polls slowly: its last batch can finish between two
-// events while the stream reconnects.
 export const GEO_LIVE_SCAN_FALLBACK_INTERVAL_MS = 15_000;
-// Coalesces bursts (parallel scan batches, several projects) into one refetch.
 export const GEO_LIVE_INVALIDATE_THROTTLE_MS = 2000;

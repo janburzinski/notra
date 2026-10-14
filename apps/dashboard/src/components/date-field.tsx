@@ -13,10 +13,8 @@ import { Button } from "@/components/button";
 import { Calendar } from "@/components/calendar";
 import type { DateFieldProps } from "@/types/components/date-field";
 
-/** Day of the week the calendar starts on, Monday. */
 const WEEK_STARTS_ON = 1;
 
-/** One day, picked from the shared calendar in a popover. */
 export function DateField({
   id,
   "aria-labelledby": ariaLabelledBy,
@@ -78,7 +76,6 @@ export function DateField({
               setOpen(false);
             }
           }}
-          // Clicking the picked day again would clear it; that has its own action.
           required
           selected={selected}
           weekStartsOn={WEEK_STARTS_ON}

@@ -88,7 +88,6 @@ export function LoginForm({
     authInFlightRef.current = true;
     setAuthMethod(method);
     setLastUsedLoginMethod(method);
-    // A successful start navigates away and never settles.
     start().catch(() => {
       releaseAuth();
       setFormError(fallbackError);

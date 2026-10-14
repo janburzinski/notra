@@ -132,9 +132,6 @@ export function GeoUpgradeGate({
     if (wasReopened) {
       return;
     }
-    // The org root restores a stored "geo" mode by redirecting straight back
-    // here, which would reopen this paywall in a loop. Switch the sidebar to
-    // Studio first so the redirect lets the user land on the Studio home.
     pickSidebarMode("studio", sidebarRouteFromPathname(pathname));
     navigateAfterCloseRef.current = true;
   }

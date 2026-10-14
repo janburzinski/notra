@@ -34,7 +34,6 @@ export function trafficCsvTable(
     const day = trafficDayKey(point.day);
     counts.set(day, (counts.get(day) ?? 0) + point.visits);
   }
-  // Seeding `from` keeps one zero row per day when the range has no visits.
   const days = trafficSparklineDays(
     [
       ...(from ? [{ day: from }] : []),

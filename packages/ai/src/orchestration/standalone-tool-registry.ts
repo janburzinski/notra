@@ -242,7 +242,6 @@ export function buildStandaloneToolSet(
     if (params.codeResearch && chatId && isCodeResearchConfigured()) {
       tools[CODE_RESEARCHER_TOOL_NAME] = createCodeResearcherTool({
         organizationId,
-        // One box per chat and repository, reused across turns.
         sessionKey: `chat:${chatId}`,
         allowedIntegrationIds,
         resolveContext: deps?.resolveContext,

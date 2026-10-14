@@ -3,7 +3,6 @@ const SPACE_REGEX = /\s/;
 const BLOCK_SELECTOR =
   "p, li, h1, h2, h3, h4, h5, h6, blockquote, pre, td, th, dt, dd, figcaption";
 
-/** Maps a whitespace-collapsed copy of `root`'s text back to DOM positions. */
 function indexText(root: HTMLElement) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const positions: { node: Text; offset: number }[] = [];
@@ -12,8 +11,6 @@ function indexText(root: HTMLElement) {
   let lastBlock: Element | null = null;
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const value = node.textContent ?? "";
-    // Blocks render on their own lines, which a selection copies as a line
-    // break; their text nodes sit side by side, so add the gap here.
     const block = node.parentElement?.closest(BLOCK_SELECTOR) ?? null;
     if (block !== lastBlock && !lastWasSpace) {
       text += " ";

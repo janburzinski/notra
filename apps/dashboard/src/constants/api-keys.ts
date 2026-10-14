@@ -19,11 +19,6 @@ import {
 import type { ApiKeyStatus } from "@/types/api-keys";
 import type { StatusBadgeAppearance } from "@/types/components/status-badge";
 
-/**
- * Scope names and resource metadata come from the shared registry in
- * `@notra/utils/api-scopes`, which `apps/api` uses to authorize requests.
- * Add new resources there, not here.
- */
 export const API_KEY_PERMISSIONS = LEGACY_API_SCOPES;
 
 export const API_KEY_GRANULAR_READ_PERMISSIONS = API_READ_SCOPES;
@@ -113,13 +108,10 @@ export const API_KEY_EXPIRATION_MS = {
   "90d": 90 * 24 * 60 * 60 * 1000,
 } as const;
 
-/** Header row plus enough body for the empty state's icon, copy and button. */
 export const API_KEYS_EMPTY_TABLE_HEIGHT = 320;
 
-/** A key inside this window of its expiry is flagged before it stops working. */
 export const API_KEY_EXPIRING_SOON_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** How often the table re-evaluates status so a key flips when its expiry passes. */
 export const API_KEY_STATUS_REFRESH_MS = 60_000;
 
 export const API_KEY_STATUS_BADGES: Record<

@@ -175,7 +175,6 @@ export const sandboxRequestEffect = Effect.fn("Sites.Sandbox.request")(
             Effect.catch(() => Effect.succeed(null))
           )
         : null;
-      // Never retain a partial response: truncation can split a credential.
       let responseBody =
         capped === null && fetched
           ? "[Provider error response could not be read]"
@@ -248,7 +247,6 @@ export const sandboxJsonEffect = Effect.fn("Sites.Sandbox.decode")(function* <
   );
 });
 
-// A 4xx answer means the sandbox refused the request, so nothing ran in the guest.
 export function isRejectedBeforeExecution(error: unknown): boolean {
   return (
     error instanceof SandboxRequestError &&

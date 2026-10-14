@@ -19,7 +19,6 @@ export const POST = demoSandboxRoute(async (sandbox, request: Request) => {
     parsed.success ? (parsed.data.timeZone ?? null) : null
   );
   if (timeZone !== sandbox.timeZone) {
-    // A new zone can move "today" and force a full rebase of the sandbox.
     const { success } = await ratelimit.demoSandboxTimeZone.limit(
       sandbox.anonymousId
     );

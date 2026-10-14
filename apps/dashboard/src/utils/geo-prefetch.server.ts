@@ -18,7 +18,6 @@ import { getGeoServerQueryClient } from "@/utils/geo-query-client.server";
 
 async function canPrefetchGeoQueries(organizationId: string, headers: Headers) {
   await createORPCContext({ headers });
-  // Authorization is mandatory even when the optional billing prefetch fails.
   await assertOrganizationAccess({ organizationId, headers });
   try {
     return (await resolveGeoEntitlement(organizationId, headers)) !== "denied";
@@ -39,8 +38,6 @@ async function canPrefetchGeoQueries(organizationId: string, headers: Headers) {
 export function dehydrateGeoOverviewQueries(
   ...args: Parameters<typeof dehydrateGeoOverview>
 ) {
-  // The procedures below each resolve the same project scope and settings;
-  // the request memo (as on /rpc) lets them share one lookup.
   return runWithGeoRequestMemo(() => dehydrateGeoOverview(...args));
 }
 
@@ -81,8 +78,6 @@ async function dehydrateGeoOverview(
     queryFn: () => client.geo.competitors(input.competitors),
   });
 
-  // The remaining queries only mount on specific tabs (see
-  // `useGeoOverviewPage`); prefetching them for another tab would be wasted.
   if (input.activeTab === "journeys") {
     void queryClient.prefetchQuery({
       ...dashboardOrpc.geo.trafficJourneys.queryOptions({

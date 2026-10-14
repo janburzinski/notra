@@ -1,4 +1,3 @@
-// CLI routing metadata, not IaC resource identities. Keep existing services in place.
 export const demoTarget = {
   projectId: "48abcb3c-19e1-4c81-a7d3-e2c697c86832",
   projectName: "notra-demo",

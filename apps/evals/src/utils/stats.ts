@@ -114,7 +114,6 @@ export function totalRunCost(
 
 export interface ConfusionMatrix {
   readonly labels: readonly string[];
-  /** counts[expected][actual] */
   readonly counts: ReadonlyMap<string, ReadonlyMap<string, number>>;
   readonly max: number;
 }

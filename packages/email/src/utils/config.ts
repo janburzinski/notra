@@ -25,17 +25,11 @@ export const EMAIL_CONFIG = {
     );
   },
 
-  /**
-   * Get the email-safe PNG icon URL (uses site URL)
-   */
   getLogoUrl(): string {
     const siteUrl = this.getSiteUrl();
     return `${siteUrl}/web-app-manifest-192x192.png`;
   },
 
-  /**
-   * Reply-to email address
-   */
   replyTo: "support@usenotra.com",
 
   /**

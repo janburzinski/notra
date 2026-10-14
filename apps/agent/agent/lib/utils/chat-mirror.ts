@@ -35,7 +35,6 @@ import { getSelectedAssistantModelId } from "./model";
 
 const SNAKE_SEGMENT_REGEX = /_([a-z0-9])/gu;
 
-// eve streams deltas only, so each in-flight message keeps its own buffer.
 const deltaBuffers = new Map<string, { publishedAt: number; text: string }>();
 
 export function mirrorStep<T>(

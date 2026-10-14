@@ -27,8 +27,6 @@ import { Box, BoxError, EphemeralBox } from "@upstash/box";
 const NOT_FOUND_STATUS = 404;
 const HOME_DIR = "/workspace/home";
 
-// Tool calls on one research session often land on the same warm function,
-// so skip the Box.get + status round trips for recently verified boxes.
 const verifiedBoxes = new Map<
   string,
   { box: CodeResearchBoxHandle; verifiedAt: number }
@@ -36,7 +34,6 @@ const verifiedBoxes = new Map<
 
 function rememberVerifiedBox(box: CodeResearchBoxHandle) {
   const now = Date.now();
-  // Drop stale entries so a long-lived worker does not keep every box handle.
   for (const [id, entry] of verifiedBoxes) {
     if (now - entry.verifiedAt >= CODE_RESEARCH_BOX_VERIFY_INTERVAL_MS) {
       verifiedBoxes.delete(id);
@@ -98,8 +95,6 @@ export async function createCodeResearchBox(params: {
   repository: CodeResearchRepository;
   token: string | null;
 }): Promise<{ box: CodeResearchBoxHandle; expiresAt: number }> {
-  // Not retried: if the response were lost after the box was created, a
-  // retry would leave the first box running until its TTL.
   const box = await EphemeralBox.create({
     apiKey: requireBoxApiKey(),
     baseUrl: BOX_BASE_URL,
@@ -145,7 +140,6 @@ export async function attachCodeResearchBox(
         timeout: CODE_RESEARCH_BOX_REQUEST_TIMEOUT_MS,
       })
     );
-    // Box.get still resolves for deleted boxes; only the status call 404s.
     await withBoxRetry(() => box.getStatus());
     rememberVerifiedBox(box);
     return box;

@@ -8,7 +8,6 @@ import { IRIS_FLAG_KEY } from "@/constants/iris";
 import { SITES_FLAG_KEY } from "@/constants/sites";
 import type { NavVisibility } from "@/types/components/nav";
 
-// The demo shows what a new workspace sees: flagged features stay off.
 function isFlagVisibleInNav(flagOn: boolean): boolean {
   return (
     !isDemoModeClient() && (flagOn || process.env.NODE_ENV === "development")

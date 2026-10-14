@@ -3,7 +3,6 @@ import {
   turnstileVerificationSchema,
 } from "@/schemas/turnstile";
 
-/** True when Turnstile confirms the token for this action on one of our hosts. */
 export async function verifyTurnstile(
   token: unknown,
   action: string
@@ -62,7 +61,6 @@ export async function verifyTurnstile(
   }
 }
 
-/** Turnstile can only be checked when the secret and hostnames are set. */
 export function isTurnstileConfigured(): boolean {
   return Boolean(
     process.env.TURNSTILE_SECRET?.trim() &&

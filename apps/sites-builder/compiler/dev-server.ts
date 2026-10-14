@@ -80,7 +80,6 @@ function forwardOutput(text: string) {
   }
 }
 
-/** Resolves with a port nothing listens on yet, starting at `from`. */
 export async function findFreePort(from: number): Promise<number> {
   for (
     let port = from;
@@ -105,7 +104,6 @@ export async function startAstroDev(
   toolchainRoot: string,
   area: DevAreaServer
 ): Promise<RunningDevArea | null> {
-  // Each area gets its own Astro root so the two servers never share `.astro/`.
   const root = join(dirname(area.paramsPath), "astro", area.area);
   area.hmrToken ??= randomBytes(18).toString("base64url");
   area.hmrGeneration = (area.hmrGeneration ?? 0) + 1;
@@ -178,12 +176,9 @@ export async function startAstroDev(
     running = { area, child };
     child.once("close", () => sourceWatcher.close());
     child.once("error", () => sourceWatcher.close());
-    // Ready only once this child reports its own URL, so a stray server on the
-    // same port can never pass for it. The reported port wins over the requested one.
     const port = await new Promise<number | null>((resolve, reject) => {
       const timer = setTimeout(() => resolve(null), DEV_READY_TIMEOUT_MS);
       let ready = false;
-      // Each stream keeps a short tail so a URL split across chunks still matches.
       const watch = (stream: NodeJS.ReadableStream) => {
         let tail = "";
         stream.on("data", (chunk: Buffer) => {
@@ -544,7 +539,6 @@ export function startDevProxy(
   });
   return new Promise((resolve, reject) => {
     server.once("error", reject);
-    // Loopback only: the preview includes drafts.
     server.listen(port, "127.0.0.1", () => resolve(server));
   });
 }

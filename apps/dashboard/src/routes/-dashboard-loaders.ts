@@ -52,7 +52,6 @@ export const loadOrganizationShell = createServerFn({ method: "GET" })
     };
   });
 
-/** Redirects of the organization root that must precede a streamed render. */
 export const gateDashboardHome = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput) => data)
   .handler(async ({ data: { params, searchParams } }) => {
@@ -75,8 +74,6 @@ export const loadDashboardHome = createServerFn({
     if (!gated) {
       await redirectOrgRootToStoredMode(slug, Promise.resolve(searchParams));
     }
-    // The billing lookup is a round trip to Autumn; the home data does not
-    // depend on it, so both run at once and the data is dropped without access.
     const billingPromise = import("@/lib/billing/subscription").then(
       ({ resolveAiProductAccess }) => resolveAiProductAccess(organization.id)
     );
@@ -109,9 +106,6 @@ export const loadDashboardHome = createServerFn({
         ),
       };
     })();
-    // Observed right away: if the home data fails while billing is still in
-    // flight (or billing itself fails), the rejection must not count as
-    // unhandled. Awaiting homePromise below still rethrows it.
     homePromise.catch(() => undefined);
     const billing = await billingPromise;
     if (!billing.hasAccess) {
@@ -161,8 +155,6 @@ export const loadOrganizationPage = createServerFn({
     const requestedPage = Number(rawPage);
     const page =
       Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-    // Prefetch modules (and the oRPC routers behind them) load on first use:
-    // a cold server instance renders its first page without all of them.
     let state: DehydratedState | undefined;
     if (kind === "content") {
       const { dehydrateContentListQueries } =
@@ -225,14 +217,11 @@ export const loadGeoScope = createServerFn({ method: "GET" })
         )
         .catch(() => "unknown" as const),
     ]);
-    // Lets the GEO pages render while the client's own billing lookup runs;
-    // the client still shows the paywall if that lookup says locked.
     return { projectId, geoEntitled: entitlement !== "denied" };
   });
 
 type GeoPageKind = "overview" | "traffic" | "gsc";
 
-/** Sends a stale `?project=` to the repaired URL before a streamed render. */
 export const gateGeoPage = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput & { kind: GeoPageKind }) => data)
   .handler(async ({ data: { params, searchParams, kind } }) => {

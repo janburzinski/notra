@@ -9,6 +9,5 @@ export const BUILDABLE_STATUSES = new Set([
   "building",
   "uploading",
   "ready",
-  // A skip may still need its GitHub check/comment reported after a retry.
   "skipped",
 ]);

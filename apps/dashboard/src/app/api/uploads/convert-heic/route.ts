@@ -8,7 +8,6 @@ import { assertAuthenticated } from "@/lib/auth/organization";
 import { compressContentImage, isHeic } from "@/utils/compress-content-image";
 import { readBoundedRequestBody } from "@/utils/read-bounded-request-body";
 
-// Convert authenticated chat attachments without storing an unreadable Apple image or trusting its extension.
 export async function POST(request: Request) {
   try {
     await assertAuthenticated({ headers: request.headers });

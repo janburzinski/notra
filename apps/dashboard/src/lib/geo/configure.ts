@@ -24,8 +24,6 @@ import { resolveGeoFlagState } from "@/lib/geo/flag";
 import { resolveZdrEntitlement } from "@/utils/resolve-zdr-entitlement";
 
 const workflowLayer = Layer.succeed(GeoWorkflowService, {
-  // Lazy imports keep the workflow modules from closing a module cycle through
-  // their GEO step implementations.
   startGeoScanRun: Effect.fn("GeoDashboardWorkflow.startGeoScanRun")(
     (payload) =>
       Effect.tryPromise({
@@ -138,7 +136,6 @@ const generationLayer = Layer.succeed(GeoGenerationService, {
   ),
 });
 
-/** Complete dashboard runtime for GEO programs. */
 export const geoCoreDashboardLayer = Layer.mergeAll(
   agentReadinessNetworkLayer,
   geoModelLayer,

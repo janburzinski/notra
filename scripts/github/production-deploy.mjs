@@ -32,8 +32,6 @@ const projects = [
     productionAlias: "notra-onboarding-agent-notra.vercel.app",
   },
 ];
-// Railway services follow the Vercel release instead of auto-deploying every
-// push to main, so the demo and the ingest never run ahead of production.
 const railwayServices = [
   {
     name: "demo-dashboard",
@@ -71,7 +69,6 @@ function deploymentSha(deployment) {
   return deployment?.gitSource?.sha ?? deployment?.meta?.githubCommitSha;
 }
 
-// Shared packages and root inputs conservatively affect every application.
 export function hasBuildChanges(directory, previousSha, sha) {
   if (!previousSha) {
     return true;
@@ -92,7 +89,6 @@ export function hasBuildChanges(directory, previousSha, sha) {
         (file && !file.startsWith("apps/"))
     );
   } catch {
-    // A deleted or unavailable historical commit cannot prove a build is safe to skip.
     return true;
   }
 }
@@ -153,8 +149,6 @@ export async function release({
       signal: AbortSignal.timeout(30_000),
     });
     if (!response.ok) {
-      // Do not log response bodies or retry deployment creation: a timed-out
-      // POST might already have started a billable build.
       throw new Error(`${provider} ${url.pathname}: HTTP ${response.status}`);
     }
     return response.json();
@@ -474,7 +468,6 @@ export async function release({
     }
   }
   if (failures.length > 0) {
-    // Keep Railway on the previous commit while production did not move.
     await report("Railway: skipped, a Vercel production deployment failed");
     throw new Error(failures.join("\n"));
   }
@@ -586,7 +579,6 @@ export async function release({
     }
   }
 
-  // Railway builds run in parallel; Docker builds take longer than Vercel's.
   const deadline = Date.now() + 20 * 60_000;
   let pending = started;
   while (pending.length > 0) {

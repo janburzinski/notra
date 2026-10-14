@@ -73,7 +73,6 @@ export async function triggerContentGenerationWorkflow(
   return await startDashboardWorkflow(url, payload);
 }
 
-/** True when the dashboard explicitly rejected content generation before acceptance. */
 export const isConfirmedContentGenerationRejection =
   isConfirmedWorkflowTriggerRejection;
 

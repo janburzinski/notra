@@ -90,7 +90,6 @@ export default function KiboCodeBlockComponent({
     setLocalCode(code);
   }
 
-  // Auto-resize textarea when content changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: localCode triggers resize
   useEffect(() => {
     const textarea = textareaRef.current;

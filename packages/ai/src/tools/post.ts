@@ -43,8 +43,6 @@ const postSlugSchema = z
     "Slug must contain lowercase letters, numbers, and hyphens only"
   );
 
-// Rejecting the call makes the model retry instead of saving a post whose body
-// contains the rest of its broken tool call (and the recommendations).
 const postTextSchema = z
   .string()
   .refine(
@@ -332,8 +330,6 @@ export function createEditPostTool(config: PostToolsConfig): Tool {
         return { postId, status: "edit_failed" as const, error: applied.error };
       }
 
-      // Save only if nobody changed the body since it was read, so a
-      // concurrent edit is never overwritten with this stale copy.
       const { status } = await updatePostRecord({
         organizationId: config.organizationId,
         postId,

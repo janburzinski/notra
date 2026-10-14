@@ -55,7 +55,6 @@ async function requireUnkeyConfig() {
   };
 }
 
-/** The sandbox's own key powers the API playground, so it must survive. */
 async function assertNotDemoSandboxKey(organizationId: string, keyId: string) {
   if (!isDemoMode()) {
     return;
@@ -287,7 +286,6 @@ export const apiKeysRouter = {
         );
       }
 
-      // The playground depends on the demo key keeping full access.
       await assertNotDemoSandboxKey(input.organizationId, input.payload.keyId);
 
       const key = await findKeyByExternalId(

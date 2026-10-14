@@ -12,7 +12,6 @@ import {
 } from "@/components/settings/notification-toggle-row";
 import { dashboardOrpc } from "@/lib/orpc/query";
 
-/** The signed-in user's own marketing opt-in, independent of the organization. */
 export function MarketingEmailsCard() {
   const t = useTranslations("settings.panes.notifications");
   const tLabels = useTranslations("common.labels");
@@ -34,7 +33,6 @@ export function MarketingEmailsCard() {
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : t("updateFailed"));
-      // The choice is saved before Brew is called, so show what was stored.
       queryClient.invalidateQueries({ queryKey });
     },
   });

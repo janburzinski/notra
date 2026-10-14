@@ -272,7 +272,6 @@ export async function createOrganization(
 ): Promise<ActionResult<OrganizationRow>> {
   return runAction(
     Effect.gen(function* () {
-      // One sandbox workspace per demo visitor.
       if (isDemoMode()) {
         return yield* Effect.fail(
           new ActionFailure({ message: DEMO_DISABLED_MESSAGE })
@@ -862,8 +861,6 @@ export async function removeMember(
         session,
         input.organizationId
       );
-      // Before the lookup: a non-member must not learn from the error which
-      // emails belong to the organization.
       yield* requireMembership(session, organizationId);
 
       const isEmail = input.memberIdOrEmail.includes("@");
@@ -964,7 +961,6 @@ export async function listInvitations(
         input?.query?.organizationId
       );
       yield* requireMembership(session, organizationId);
-      // The public demo has no WorkOS and therefore no pending invitations.
       if (isDemoMode()) {
         return [];
       }
@@ -989,7 +985,6 @@ export async function inviteMember(
 ): Promise<ActionResult<InvitationSummary>> {
   return runAction(
     Effect.gen(function* () {
-      // Invitations need WorkOS; explain instead of failing on the seat check.
       if (isDemoMode()) {
         return yield* Effect.fail(
           new ActionFailure({ message: DEMO_DISABLED_MESSAGE })

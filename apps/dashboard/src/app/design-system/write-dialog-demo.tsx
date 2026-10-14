@@ -8,7 +8,6 @@ import { WriteDialog } from "@/components/geo/writer/write-dialog";
 
 export function DesignSystemWriteDialogDemo() {
   const [open, setOpen] = useState(false);
-  // Mount on first open so the closed dialog doesn't sync org data.
   const [mounted, setMounted] = useState(false);
   const [events, setEvents] = useState<string[]>([]);
 

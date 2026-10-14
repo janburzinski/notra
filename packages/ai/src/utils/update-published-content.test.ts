@@ -292,7 +292,6 @@ if (process.env.NOTRA_PUBLICATION_TEST_WORKER !== "1") {
       for (const verified of [true, false]) {
         let message: unknown;
         const octokit = {
-          // Without App credentials the publisher login comes from GET /user.
           request: async (route: string) => ({
             data: {
               login: route === "GET /user" ? "notra-test[bot]" : undefined,

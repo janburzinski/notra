@@ -77,7 +77,6 @@ function buildLockId(mentionKey: string, featureId: string) {
  */
 export async function reserveGitHubMentionBilling(input: {
   organizationId: string;
-  /** Webhook delivery id, or the comment id when GitHub sent no delivery. */
   mentionKey: string;
 }): Promise<GitHubMentionBillingReservation> {
   if (!autumn || allowUnmeteredAiInDevelopment) {
@@ -103,7 +102,6 @@ export async function reserveGitHubMentionBilling(input: {
       mode: "pull_request_credits",
       featureId: FEATURES.PULL_REQUEST_CREDITS,
       lockId: planLockId,
-      // Plan credits reset every month, so they never carry the top-up markup.
       useMarkup: false,
     };
   }
@@ -120,9 +118,6 @@ export async function reserveGitHubMentionBilling(input: {
   });
 
   if (credits.duplicateLock || credits.response?.allowed) {
-    // A duplicate lock answers without a balance, so the markup the first
-    // attempt decided on has to be read again. Defaulting it away would bill a
-    // run paid from a top-up at the plan rate.
     const balance = credits.duplicateLock
       ? (
           await checkAutumnFeature({

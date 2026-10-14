@@ -11,7 +11,6 @@ import {
 import { retainIngestDatabaseConnections } from "../src/utils/retain-database-connections";
 
 test("retains worker connections without changing shared pool defaults or safety limits", async () => {
-  // Construct pools only: this test never connects to either database.
   const worker = createDb(
     "postgres://test:test@127.0.0.1:1/worker-pool"
   ).$client;

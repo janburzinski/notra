@@ -11,7 +11,6 @@ import {
 } from "@notra/schemas/api/schedules";
 import { and, eq, inArray } from "drizzle-orm";
 import { Effect } from "effect";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import type { ScheduleDatabaseError } from "../errors/schedules";
@@ -26,7 +25,6 @@ import { logError } from "./logging";
 
 export const DEFAULT_SCHEDULE_NAME = "Untitled Schedule";
 
-/** Leave unexpected database errors to Hono's central error handler. */
 export function runScheduleProgram<A, E extends ScheduleDomainError>(
   program: Effect.Effect<A, E | ScheduleDatabaseError>
 ) {

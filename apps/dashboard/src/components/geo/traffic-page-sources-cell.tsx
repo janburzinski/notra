@@ -60,8 +60,6 @@ export function TrafficPageSourcesCell({ group }: TrafficPageSourcesCellProps) {
             </span>
           ))}
           {overflow > 0 ? (
-            // Not tucked under the last logo like the others: the overlap
-            // would hide the "+" of the count.
             <span className="bg-muted border-border text-muted-foreground ml-1 flex h-6 min-w-6 items-center justify-center rounded-full border px-1.5 text-[0.625rem] font-medium tabular-nums">
               +{overflow}
             </span>

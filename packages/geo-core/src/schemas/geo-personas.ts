@@ -13,9 +13,6 @@ import {
 } from "../constants/geo-personas";
 import { geoOrganizationInputSchema } from "./geo-scope";
 
-// The model-facing schema stays lenient on purpose: models routinely overshoot
-// list lengths by one, and a hard max would discard an otherwise good set.
-// `normalizeGeneratedPersona` trims everything to the product limits.
 const requiredText = string().trim().min(1);
 const textList = array(requiredText).min(GEO_PERSONA_PROFILE_LIST_MIN);
 

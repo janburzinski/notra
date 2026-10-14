@@ -11,8 +11,6 @@ export function wrapModelWithObservability<T>(model: T, log?: AILogTarget): T {
     return model;
   }
 
-  // The router owns request-wide usage; evlog's model-local accumulator adds
-  // rich timing and tool details without replacing those counters.
   const target: AILogTarget =
     isRecord(model) && model.provider === ROUTED_MODEL_PROVIDER
       ? {

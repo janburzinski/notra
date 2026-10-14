@@ -40,7 +40,6 @@ interface AssistantModelSelection {
   modelId: string;
 }
 
-// Hooks cannot see which model eve resolved, so billing reads it from here.
 const assistantModelSelection = defineState<AssistantModelSelection | null>(
   "notra.assistant-model-selection",
   () => null
@@ -73,7 +72,6 @@ function isModelSelection(
   );
 }
 
-/** Pins automated tasks and routes chat turns with eve's `autoModel`. */
 export function createAssistantModel() {
   const autoOptions = Object.fromEntries(
     Object.entries(ASSISTANT_AUTO_MODEL_OPTIONS).map(

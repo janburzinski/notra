@@ -10,7 +10,6 @@ import { useContent, useSaveSocialVideo } from "@/lib/hooks/use-content";
 import { useSocialVideoPending } from "@/lib/hooks/use-social-video-pending";
 import type { ScheduleVideoSectionProps } from "@/types/content/schedule";
 
-/** The video that goes out with a scheduled X or LinkedIn post. */
 export function ScheduleVideoSection({
   organizationId,
   contentId,
@@ -24,18 +23,14 @@ export function ScheduleVideoSection({
   const saveVideo = useSaveSocialVideo(organizationId, contentId);
   const pending = useSocialVideoPending(organizationId, contentId);
 
-  // The video only goes out through the social destination.
   const socialEnabled = destinations.social?.checked;
   if (!(socialEnabled && SOCIAL_VIDEO.contentTypes.has(contentType) && data)) {
     return null;
   }
 
-  // The saved video, or the one being saved until the answer lands. Reading
-  // the cache keeps a dialog opened mid-save in step with that save.
   const saved = data.content.sourceMetadata?.socialVideo ?? null;
   const video = saveVideo.isPending ? (saveVideo.variables ?? null) : saved;
 
-  // The post keeps the video, so the scheduled send posts it as well.
   const handleChange = (next: SocialVideoDraft | null) => {
     saveVideo.mutate(next, {
       onError: () => toast.error(tPost("attachmentSaveFailed")),

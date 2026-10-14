@@ -12,11 +12,6 @@ export class OfferingCheckVerificationUnavailable extends Data.TaggedError(
   "OfferingCheckVerificationUnavailable"
 ) {}
 
-/**
- * Uncached scans cost money, so they need a Turnstile token for this tool.
- * Without Turnstile config, local dev skips the check and production fails
- * closed, like the rate limiter.
- */
 export const ensureOfferingVisitorIsHuman = Effect.fn(
   "ensureOfferingVisitorIsHuman"
 )(function* (request: Request) {

@@ -4,7 +4,6 @@ import type { CodexListProps, CodexTableProps } from "@notra/ui/types/codex-skin
 import type * as React from "react";
 import type { ReactNode } from "react";
 
-/** Keys items by their text, counting repeats so duplicate rows stay unique. */
 const withTextKeys = <T,>(items: readonly T[], toText: (item: T) => string) => {
   const seen = new Map<string, number>();
   return items.map((item) => {
@@ -46,8 +45,6 @@ export function CodexTable({
     borderBottom: isLastRow ? undefined : `1px solid ${CODEX_COLORS.rule}`,
   });
 
-  // The skin mirrors the Codex terminal, so it renders a bare table instead
-  // of the app's framed one.
   return (
     <div
       className={cn(

@@ -14,7 +14,6 @@ import type { HomeFeedbackSectionProps } from "@/types/dashboard/home";
 const RECENT_FEEDBACK_LIMIT = 3;
 const FEEDBACK_SKELETON_IDS = ["first", "second", "third"] as const;
 
-/** Latest agent feedback on the Studio home, or a nudge to set it up. */
 export function HomeFeedbackSection({
   organizationId,
   slug,

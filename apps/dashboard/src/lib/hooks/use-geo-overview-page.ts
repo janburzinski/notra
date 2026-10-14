@@ -171,7 +171,6 @@ export function useGeoOverviewPage(
   });
   const ready = !loading;
 
-  // Mirrors the menu's own disabled state, which renders no popover.
   const canOpenScanMenu =
     Boolean(settings?.enabled) && (settings?.engines.length ?? 0) > 0;
   useHotkey("R", () => setScanMenuOpen(true), {

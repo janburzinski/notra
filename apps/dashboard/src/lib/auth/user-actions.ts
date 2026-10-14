@@ -51,8 +51,6 @@ const tryAction = <T>(run: () => Promise<T>, message: string) =>
 export async function signOut(options?: SignOutActionOptions) {
   const parsed = signOutOptionsSchema.safeParse(options);
   await clearLocaleCookie();
-  // Leaving the public demo drops the sandbox cookie; the sandbox itself
-  // expires on its own.
   if (isDemoMode()) {
     await clearSignedCookie(DEMO_SESSION_COOKIE);
     return DEMO_EXIT_URL;
@@ -170,8 +168,6 @@ export async function deleteUser(): Promise<
       }
       const session = yield* requireSession();
 
-      // Before anything else: once the user row is gone, prune can no longer
-      // tell this contact apart from one Brew got elsewhere.
       yield* tryAction(
         () => deleteBrewContact(session.user.email),
         "Failed to delete email contact"
@@ -233,8 +229,6 @@ export async function deleteUser(): Promise<
         () => db.delete(users).where(eq(users.id, session.user.id)),
         "Failed to delete user"
       );
-      // Again once the row is gone: a contact sync that read the user just
-      // before could have recreated the contact in between.
       yield* Effect.sync(() =>
         runAfterResponse("[BrewContacts] Delete failed", () =>
           deleteBrewContact(session.user.email)

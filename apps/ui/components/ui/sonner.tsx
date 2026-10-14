@@ -14,15 +14,11 @@ import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 import { buttonVariants } from "@/components/ui/button";
 
-// Status colours fall back to Notra's values when the project has no
-// --success, --warning or --info tokens of its own.
 const statusTokens = cn(
   "[--toast-info:var(--info,oklch(0.55_0.13_250))] [--toast-success:var(--success,oklch(0.55_0.109_155))] [--toast-warning:var(--warning,oklch(0.57_0.113_55))]",
   "dark:[--toast-info:var(--info,oklch(0.7_0.12_250))] dark:[--toast-success:var(--success,oklch(0.7_0.125_155))] dark:[--toast-warning:var(--warning,oklch(0.7_0.125_55))]"
 );
 
-// The Depth surface of the outline button: squircle corners, a soft vertical
-// gradient, an inset top highlight and a layered drop shadow.
 const toastClassName = cn(
   "group/toast border-border bg-background from-background to-muted/60 text-popover-foreground flex w-(--width) items-center gap-2.5 rounded-[0.875rem] border bg-linear-to-b p-3 text-sm [corner-shape:squircle]",
   "shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_1px_2px_rgba(0,0,0,0.06),0_8px_24px_-8px_rgba(0,0,0,0.14)]",

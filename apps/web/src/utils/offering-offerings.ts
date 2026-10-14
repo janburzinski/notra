@@ -1,6 +1,5 @@
 import { OFFERING_WHITESPACE_RUN } from "@/constants/offering-check";
 
-/** The judge sometimes repeats an offering with different casing or spacing. */
 export function uniqueOfferings(offerings: readonly string[]): string[] {
   const seen = new Set<string>();
   return offerings.flatMap((offering) => {

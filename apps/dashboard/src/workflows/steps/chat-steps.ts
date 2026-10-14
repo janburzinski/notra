@@ -247,8 +247,6 @@ export async function streamChatResponseStep(
 
   const publishTerminal = async (chunks: UIMessageChunk[]) => {
     await drainPendingFlushes();
-    // onEnd has saved history before the reader reaches EOF. Release only
-    // this generation's lease before clients can drain their queued messages.
     await clearActiveChatStream(organizationId, chatId, streamId);
     await channel.emit("ai.chunk", chunks as never);
     terminalPublished = true;
@@ -312,8 +310,6 @@ export async function streamChatResponseStep(
           const cost = calculateAiCreditCostCents(
             {
               ...toAgentTokenUsage(usage),
-              // This usage sums every step, and prices can depend on how big
-              // each single request was, so bill the per-step cost.
               maxPromptTokens: routeUsage?.maxPromptTokens,
               tokenCostUsd: routeUsage?.tokenCostUsd,
             },

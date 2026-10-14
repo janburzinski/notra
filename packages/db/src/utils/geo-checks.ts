@@ -264,8 +264,6 @@ export function toGeoCheckWindow(
   if (input.days === undefined) {
     return;
   }
-  // Anchored to the start of the UTC day, like the `from`/`to` branch: a
-  // millisecond-precise `now` would make every request a distinct cache key.
   const from = new Date();
   from.setUTCHours(0, 0, 0, 0);
   from.setUTCDate(from.getUTCDate() - input.days);
@@ -420,9 +418,6 @@ export async function insertGeoMentionChecksWithSummary(
     checks += inserted.length;
     mentions += inserted.filter((row) => row.mentioned).length;
   }
-  // Bump even when every row already existed: a retried step whose first
-  // attempt inserted the rows but died before this bump still has to make
-  // the aggregates cached during the scan stale.
   await bumpGeoCheckGeneration(rows.map((row) => row.organizationId));
   return { checks, mentions };
 }
@@ -547,9 +542,6 @@ export async function queryGeoCheckPromptResults(
   window: GeoCheckWindow | undefined,
   limit?: number
 ): Promise<GeoCheckPromptResultRow[]> {
-  // Every field must come from the same newest row per (prompt, engine).
-  // Aggregating across the window would pair a current answer with a stale
-  // mention flag or position.
   const latestPromptResults = db
     .selectDistinctOn(
       [geoMentionChecks.promptId, geoMentionChecks.engine],
@@ -607,8 +599,6 @@ export async function queryGeoCheckPromptSummaries(
   window: GeoCheckWindow | undefined,
   query?: GeoCheckPromptSummaryQuery
 ): Promise<GeoCheckPromptSummaryRow[]> {
-  // Deliberately omits answer/grounding/sources/token counts: the list only
-  // needs mention state, and those columns dominate the payload size.
   const latest = db
     .selectDistinctOn([geoMentionChecks.promptId, geoMentionChecks.engine], {
       checkId: geoMentionChecks.id,
@@ -662,8 +652,6 @@ export async function queryGeoCheckPromptHistory(
     return [];
   }
 
-  // Mention state only: the answer, excerpt, grounding and sources of an older
-  // check are loaded on demand through `queryGeoCheckById`.
   const rowsQuery = db
     .select({
       id: geoMentionChecks.id,
@@ -1296,8 +1284,6 @@ const SCAN_COMPARISON_SCAN_COUNT = 2;
 export async function queryGeoScanComparison(
   input: GeoCheckScanComparisonInput
 ): Promise<GeoCheckScanComparison> {
-  // Daily recaps compare closing snapshots, not the last two intraday scans.
-  // Keep the dashboard's unbounded, start-ordered comparison unchanged.
   const cutoffs = input.window
     ? [input.window.toExclusive, input.window.from]
     : [undefined];
@@ -1343,9 +1329,6 @@ export async function queryGeoScanComparison(
       ownedSourceCited: geoMentionChecks.ownedSourceCited,
       position: geoMentionChecks.position,
       competitors: geoMentionChecks.competitors,
-      // The diff only reads source domains. Search queries and titles make up
-      // most of the column, so only url + domain of each source leave Postgres
-      // (url is still needed: the parser drops sources without a valid URL).
       grounding: sql<unknown>`jsonb_build_object('sources', (
         select coalesce(
           jsonb_agg(jsonb_build_object('url', source->'url', 'domain', source->'domain')),

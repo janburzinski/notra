@@ -39,10 +39,6 @@ function resolveFallbackModels(
   return isStringArray(existingModels) ? existingModels : undefined;
 }
 
-/**
- * Production forces ZDR on. A relaxed call (caller accepted a non-ZDR route)
- * drops it; the development bypass only sends it when the caller asks.
- */
 function resolveZdrFlag(
   relaxZdr: boolean,
   allowNonZdr: boolean,
@@ -99,8 +95,6 @@ export function buildVercelProviderOptions(
     toVercelModelId
   );
 
-  // Relaxed routes accept providers without ZDR or no-training guarantees.
-  // Explicit caller no-training restrictions still apply.
   const zeroDataRetention = resolveZdrFlag(
     relaxZdr,
     allowNonZdr,

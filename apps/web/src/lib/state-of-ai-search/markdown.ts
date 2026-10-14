@@ -26,9 +26,7 @@ import { SITE_URL } from "@/utils/urls";
 
 import { listLatestSummaries } from "./reports";
 
-/** Brands listed per prompt before the rest collapse into "+N more". */
 const PROMPT_BRANDS_LISTED = 4;
-/** Brands that get a "What the assistants say" entry. */
 const QUOTED_BRANDS = 5;
 
 const BACKSLASH_REGEX = /\\/g;
@@ -40,7 +38,6 @@ interface Column {
   align?: "left" | "right";
 }
 
-/** Cell text that cannot break the row: no pipes, no line breaks, no stray escapes. */
 function cell(value: string): string {
   return value
     .replace(LINE_BREAK_REGEX, " ")
@@ -222,7 +219,6 @@ function quotesMarkdown(report: StateOfAiSearchReport): string | null {
   if (entries.length === 0) {
     return null;
   }
-  // The section adds its own blank line after the last quote.
   return markdownSection("What the assistants say", entries.slice(0, -1));
 }
 

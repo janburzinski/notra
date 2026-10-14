@@ -372,7 +372,6 @@ describe("RoutedLanguageModel", () => {
       logger.entries.some((entry) => entry.event === "ai.router.fallback")
     );
 
-    // Subsequent calls stay on the fallback gateway.
     await model.doGenerate(callOptions());
     assert.equal(failures, 1);
     assert.equal(vercel?.calls.length, 2);
@@ -594,14 +593,11 @@ describe("RoutedLanguageModel", () => {
       async () => await model.doGenerate(callOptions()),
       GatewayUnavailableError
     );
-    // Reusing the same model honors the mark instead of calling the
-    // rejected gateway again.
     await assert.rejects(
       async () => await model.doGenerate(callOptions()),
       GatewayUnavailableError
     );
     assert.equal(openrouter.calls.length, 1);
-    // The gateway stays marked, so route resolution fails fast as well.
     await assert.rejects(
       router.resolveRoute({ modelId: MODEL, organizationId: FREE_ORG }),
       GatewayUnavailableError
@@ -633,9 +629,6 @@ describe("RoutedLanguageModel", () => {
         .map((entry) => entry.fields?.gateway),
       ["openrouter", "vercel"]
     );
-    // Both gateways are marked and the cached fallback route is dropped, so
-    // reusing the same model and resolving later routes fail fast without
-    // new upstream calls.
     await assert.rejects(
       async () => await model.doGenerate(callOptions()),
       GatewayUnavailableError
@@ -734,7 +727,6 @@ describe("ZDR rejection by a gateway", () => {
       logger.entries.some((entry) => entry.event === "ai.router.zdr_rejected")
     );
 
-    // Later routes skip the non-compliant gateway without another roundtrip.
     const next = await router.resolveRoute({
       modelId: MODEL,
       organizationId: PAID_ORG,
@@ -753,7 +745,6 @@ describe("ZDR rejection by a gateway", () => {
       "the rejection must not disable unrelated models"
     );
 
-    // Pinned requests to the non-compliant gateway fail closed.
     await assert.rejects(
       router.resolveRoute({ modelId: MODEL, gateway: "vercel" }),
       NoCompliantRouteError

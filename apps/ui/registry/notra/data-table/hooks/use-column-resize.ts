@@ -29,8 +29,6 @@ export function useColumnResize<T>({
     (key: string, e: ReactPointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      // Freeze every column to its current pixel width so resizing one only
-      // moves the trailing spacer, never the other columns.
       const snapshot = { ...widths };
       for (const column of orderedColumns) {
         if (snapshot[column.key] == null) {

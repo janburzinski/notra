@@ -22,7 +22,6 @@ import type {
   PromptTranslationTextProps,
 } from "@/types/geo";
 
-/** Why this prompt's switch is locked for a language, if it is. */
 function pickLock(
   picked: boolean,
   pickCount: number,
@@ -47,7 +46,6 @@ function PromptTranslationEditor({
   const t = useTranslations("geo.promptTranslations");
   const [draft, setDraft] = useState(initialText);
   const save = async () => {
-    // A failed save keeps the draft so nothing has to be typed again.
     if (await onSave(draft)) {
       onClose();
     }
@@ -181,10 +179,6 @@ function PromptTranslationRow({
   );
 }
 
-/**
- * Which other tracked languages scan this prompt, and the stored translation
- * each of them asks. Missing translations are made on open.
- */
 export function PromptTranslationsSection({
   organizationId,
   row,

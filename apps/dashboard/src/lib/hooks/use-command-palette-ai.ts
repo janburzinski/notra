@@ -112,8 +112,6 @@ export function useCommandPaletteAi({
       query_length: trimmed.length,
     });
     if (result.action === "navigate" && result.path) {
-      // Settings open as a modal on top of the current page, like a picked
-      // settings row, instead of navigating to the workspace home.
       const settingsRoute = COMMAND_ROUTES.find(
         (route) => route.settingsSection && route.path(slug) === result.path
       );

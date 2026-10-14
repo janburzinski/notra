@@ -93,11 +93,9 @@ export function JourneysTab({
       pages: journey.pages,
       distinct_paths: journey.distinctPaths,
     });
-    // One drawer at a time: the journey replaces the source/page drawer.
     setGroup(null);
     setSelectedJourney(journey);
   };
-  // Both cards preview the same number of rows so their tables line up.
   const previewRows = Math.max(
     1,
     Math.min(GEO_JOURNEY_OVERVIEW_ROWS, Math.max(activeSources, pages.length))

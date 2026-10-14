@@ -3,8 +3,6 @@ import type {
   StateOfAiSearchSummary,
 } from "@/types/state-of-ai-search";
 
-// Built by packages/geo-core/scripts/state-of-ai-search/build.ts. Summaries
-// are tiny and bundled; a full report is its own chunk, loaded per page.
 const SUMMARY_MODULES = import.meta.glob<StateOfAiSearchSummary>(
   "/src/content/state-of-ai-search/*/*.summary.json",
   { eager: true, import: "default" }
@@ -40,7 +38,6 @@ export function latestSummary(
   )[0];
 }
 
-/** Newest edition per category. */
 export function listLatestSummaries(): StateOfAiSearchSummary[] {
   const slugs = [...new Set(SUMMARIES.map((summary) => summary.slug))];
   return slugs.flatMap((slug) => latestSummary(slug) ?? []);

@@ -39,7 +39,6 @@ export function isForeignDemoRequest(request: Request): boolean {
       .map(originOf)
       .filter((value) => value !== null)
   );
-  // `Origin: null` (sandboxed frames, some redirects) parses to null: foreign.
   const requestOrigin = originOf(origin);
   return !(requestOrigin && allowed.has(requestOrigin));
 }

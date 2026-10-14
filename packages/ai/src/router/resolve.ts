@@ -104,10 +104,6 @@ function getUsableAdapter(
   return { unavailable: "non-compliant" };
 }
 
-/**
- * A request that accepts non-ZDR routes may still use a gateway that is only
- * marked non-compliant for this model: the ZDR flag is dropped up front.
- */
 function getRelaxedAdapter(
   context: ResolverContext,
   gateway: GatewayId,
@@ -136,7 +132,6 @@ function toDecision(
   reason: RouteDecision["reason"],
   fallback?: { from: GatewayId; reason: FallbackReason }
 ): RouteDecision {
-  // `none` never sends the flag, so the route is relaxed from the start.
   const usable: UsableAdapter =
     zdr === "none"
       ? { adapter: candidate.adapter, zdrEnforced: false, zdrRelaxed: true }
@@ -219,7 +214,6 @@ export async function resolveRoute(
   const canCrossGateway =
     context.policy.crossGatewayFallback && !request.gateway;
   if (!canCrossGateway) {
-    // Pinned routes never move, and fallback can be disabled by injected test policies.
     const relaxed = acceptsNonZdr
       ? getRelaxedAdapter(
           context,

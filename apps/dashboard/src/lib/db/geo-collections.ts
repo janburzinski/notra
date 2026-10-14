@@ -19,7 +19,6 @@ import {
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { GeoCollectionSpec } from "@/types/geo-db";
 
-// Bounded retries instead of an unbounded error poll on every dashboard page.
 const GEO_PROJECTS_RETRY_COUNT = 3;
 
 function scopeKey(scope: GeoScopeInput): string {
@@ -67,7 +66,6 @@ function buildScopedCollection<T extends object>(
         try {
           return await spec.fetch(scope);
         } catch (error) {
-          // The upgrade gate handles entitlement denials, not load-error toasts.
           if (
             !(
               error instanceof ORPCError && error.code === "PAYMENT_REQUIRED"

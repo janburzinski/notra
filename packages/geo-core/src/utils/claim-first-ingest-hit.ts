@@ -29,7 +29,6 @@ export async function claimFirstIngestHit(
     .set(key, "1", { nx: true })
     .then((result) => {
       if (result === "OK" || result === null) {
-        // Eviction only adds an NX check; the durable marker still prevents duplicates.
         if (confirmed.size >= GEO_INGEST_FIRST_HIT_MEMO_MAX_ENTRIES) {
           confirmed.clear();
         }

@@ -402,8 +402,6 @@ export function useContentDetailChat({
   }, []);
 
   const handleSelectionChange = useCallback((sel: TextSelection | null) => {
-    // Attaching follows the editor selection in both directions: selecting adds
-    // the excerpt as context, deselecting takes it away again.
     setSelection(sel && sel.text.length > 0 ? sel : null);
   }, []);
 
@@ -558,7 +556,6 @@ export function useContentDetailChat({
 
   const handleAiEdit = useCallback(
     async (instruction: string, files: ChatAttachment[] = []) => {
-      // Only posts with an overview have tabs to switch.
       if (supportsPostSlug(content?.contentType ?? "")) {
         setContentPanelTab("agent");
       }
@@ -612,8 +609,6 @@ export function useContentDetailChat({
   }, []);
 
   const handleEditQueued = useCallback((message: QueuedMessage) => {
-    // Restore files into whichever composer is on screen; if they don't fit,
-    // the message stays queued.
     if (message.attachments?.length) {
       const visibleInput = [floatingInputRef, panelInputRef]
         .map((ref) => ref.current)

@@ -114,7 +114,6 @@ export async function checkQueries(
   fetchImpl = fetch,
   capacity = false
 ) {
-  // Include image setup and reserve bounded cleanup inside the five-minute capacity budget.
   const capacityDeadline = capacity ? Date.now() + 255_000 : undefined;
   function docker(args, timeout = 10_000) {
     if (capacity) {
@@ -169,8 +168,6 @@ export async function checkQueries(
     "grafana/loki"
   );
   const name = `notra-query-fixtures-${randomUUID()}`;
-  // Pull before attempting creation; all Docker calls are bounded. No .env,
-  // production volumes, credentials, or service endpoints are used.
   docker(["pull", image], 120_000);
   const deadline = capacityDeadline ?? Date.now() + 120_000;
   let failure;
@@ -389,7 +386,6 @@ export async function checkQueries(
       ),
     });
     assert.equal(boundaryPush.status, 204, await boundaryPush.text());
-    // Old fixture chunks need store visibility; do not widen production ingestion queries.
     const boundaryFlush = await request("/flush", { method: "POST" });
     assert.ok(boundaryFlush.ok, await boundaryFlush.text());
     const boundaryExpression = target("notra-overview", 109, "A");
@@ -407,7 +403,6 @@ export async function checkQueries(
       [{ metric: { organizationId: "org_boundary" }, value: [0, 2] }],
       ["organizationId"]
     );
-    // Pinned native Loki excludes the exact left edge, as well as the older sample.
     compareVectors(
       await query(
         boundaryExpression.replace(
@@ -436,7 +431,6 @@ export async function checkQueries(
         await delay(Math.ceil(Buffer.byteLength(body) / 2000));
       }
     }
-    // Old six-day chunks must be persisted before the store can query them.
     if (capacity) {
       const response = await request("/flush", { method: "POST" });
       assert.ok(response.ok, await response.text());
@@ -587,8 +581,6 @@ export async function checkQueries(
       encoding: "utf8",
       timeout: 10_000,
     });
-    // --rm may already have removed an exited container. Other cleanup failures
-    // must be reported; never broaden removal beyond this random container name.
     if (
       (removed.error || removed.status !== 0) &&
       !removed.stderr?.includes("No such container")

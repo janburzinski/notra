@@ -55,8 +55,6 @@ const OAUTH_AUDIENCES = [
   "https://mcp.usenotra.com",
   "https://mcp.usenotra.com/mcp",
 ] as const;
-// Workspace-scoped MCP connections (`/mcp/{workspace}`) get tokens for their
-// own resource URL; same segment rule as the MCP server.
 const SCOPED_MCP_AUDIENCE_REGEX =
   /^https:\/\/mcp\.usenotra\.com\/mcp\/[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
 const SCOPE_SEPARATOR_REGEX = /\s+/;
@@ -90,16 +88,6 @@ type AuthResult =
       code?: string;
     };
 
-/**
- * Unkey's verification codes, mapped onto answers a client can act on.
- *
- * The codes are Unkey's internal vocabulary (`Code` in `@unkey/api`): passing
- * one through as the `error` string told the caller of an unknown key that
- * something was `NOT_FOUND` — which reads like a missing resource, not a
- * rejected credential — and leaked how the key store answers. Anything not
- * listed here, including codes Unkey adds later (`Code` is an open enum), gets
- * the generic invalid-key answer rather than its raw name.
- */
 const UNKEY_AUTH_FAILURES: Record<
   string,
   { error: string; status: AuthFailureStatus }
@@ -179,9 +167,6 @@ async function resolveLocalUserId(
   }
 
   if (!user) {
-    // Standalone Connect stores our local ID as the WorkOS external_id without
-    // necessarily populating users.workosUserId. Resolve that server-side link;
-    // never infer identity from an email or an untrusted token claim.
     if (!apiKey) {
       throw new Error("WorkOS API key is required to resolve OAuth subjects");
     }
@@ -232,7 +217,6 @@ async function resolveLocalOrganizationId(
   return organization.id;
 }
 
-/** Callers must handle a missing `aud` claim before calling this. */
 function isAllowedAudience(
   aud: NonNullable<JWTPayload["aud"]>,
   workosClientId: string | undefined
@@ -488,12 +472,8 @@ async function resolveAccountKeyAuth(
   const memberOrgIds = membershipRows.map((row) => row.organizationId);
   const requestedOrganization = getRequestedOrganizationId(c);
 
-  // Membership is read on every request, so leaving an organization revokes
-  // the key there immediately.
   let organizationId: string | undefined;
   if (requestedOrganization) {
-    // The header takes an organization id or slug, so configs can use the
-    // readable slug.
     organizationId = membershipRows.find(
       (row) =>
         row.organizationId === requestedOrganization ||
@@ -533,8 +513,6 @@ async function resolveAccountKeyAuth(
   return { success: true, auth };
 }
 
-// An organization key always acts in its own workspace. Naming another one in
-// the selection header would otherwise silently act on the key's workspace.
 async function checkOrganizationKeySelection(
   c: Context,
   organizationId: string

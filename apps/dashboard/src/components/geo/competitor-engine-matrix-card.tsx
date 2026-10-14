@@ -45,7 +45,6 @@ function MatrixCell({
   minRate: number;
   maxRate: number;
   noChecksLabel: string;
-  /** Mention count for screen readers; sighted pointer users get the tooltip. */
   countLabel: string;
   onPointerMove: (event: PointerEvent<HTMLSpanElement>) => void;
 }) {

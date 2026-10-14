@@ -1,4 +1,3 @@
-/* Northwind: ink on paper, one serif voice, no panels. */
 .northwind-kicker {
   font-family: var(--font-body);
   font-size: 0.8125rem;
@@ -16,12 +15,10 @@
   letter-spacing: -0.025em;
 }
 
-/* Links are ink like the text, so keep their underline visible. */
 .mdx-content a {
   text-decoration-color: color-mix(in oklab, var(--foreground) 45%, transparent);
 }
 
-/* Buttons are ink in light mode; flip to paper in dark mode so the CTA stays visible. */
 html.dark #topbar-cta-button > a {
   background: #ece8e1;
   color: #141413;

@@ -244,8 +244,6 @@ function searchTrackedCompetitors(
   const normalized = search.toLowerCase();
   const pattern = escapeLikePattern(normalized);
   const lowerName = sql`lower(${geoCompetitors.name})`;
-  // Exact names first, then prefixes, so the limit never hides the one
-  // competitor the agent asked for by its full name.
   return db
     .select({
       id: geoCompetitors.id,
@@ -309,7 +307,6 @@ export async function loadGeoProjectContextForTool(
         eq(geoSettings.organizationId, organizationId)
       ),
     }),
-    // The ones engines recommend most; a search reaches the rest.
     selectGeoContextCompetitors({ organizationId, projectId }),
     db
       .select({ id: geoPrompts.id, prompt: geoPrompts.prompt })

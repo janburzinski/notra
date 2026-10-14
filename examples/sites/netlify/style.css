@@ -1,6 +1,4 @@
-/* Tidepool: soft, rounded shapes to match the main website. Uses only the documented styling hooks. */
 
-/* The theme draws buttons as squircles, so switch back to round corners for a pill. */
 #topbar-cta-button > a {
   border-radius: 9999px;
   corner-shape: round;
@@ -42,7 +40,6 @@
   overflow: hidden;
 }
 
-/* Blog and changelog hero (slots/blog-hero.mdx, slots/changelog-hero.mdx): centered, no panel. */
 .tp-hero {
   display: flex;
   flex-direction: column;

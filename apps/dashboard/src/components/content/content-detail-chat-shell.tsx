@@ -95,7 +95,6 @@ interface ContentDetailChatPanelProps {
   sessions: ChatSessionSummary[];
   status: ChatStatus;
   composer: ContentDetailChatComposerProps;
-  /** Post details tab next to the agent; blog posts and changelogs only. */
   overview?: ReactNode;
 }
 
@@ -126,8 +125,6 @@ export function ContentDetailChatPanel({
     }
   });
 
-  // Blog posts and changelogs open with the panel showing, unless it was
-  // closed on purpose; the header button then shows "Details".
   useEffect(() => {
     setContentPanelHasOverview(hasOverview);
     if (hasOverview) {

@@ -279,7 +279,6 @@ function seededRandom(seed: number) {
   };
 }
 
-/** Splits `total` across `weights` with largest-remainder rounding, so sums stay exact. */
 function distribute(total: number, weights: readonly number[]): number[] {
   const sum = weights.reduce((acc, weight) => acc + weight, 0) || 1;
   const raw = weights.map((weight) => (weight / sum) * total);
@@ -298,7 +297,6 @@ function distribute(total: number, weights: readonly number[]): number[] {
   return counts;
 }
 
-/** Plausible daily buckets that add up to the given 30-day totals. */
 export function webhookActivityFor(
   stats: typeof DESIGN_SYSTEM_WEBHOOK_STATS
 ): WebhookActivityDay[] {
@@ -327,7 +325,6 @@ export function webhookActivityFor(
   });
   const succeeded = distribute(stats.succeeded, volume);
   const failed = distribute(stats.failed, failureWeights);
-  // Open deliveries are recent: spread them over the last three days.
   const active = distribute(
     stats.active,
     volume.map((weight, index) => (index >= ACTIVITY_DAYS - 3 ? weight : 0))

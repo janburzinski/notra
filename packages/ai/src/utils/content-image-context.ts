@@ -8,8 +8,6 @@ import {
 } from "@notra/ai/utils/diagram-metadata";
 import { isRecord, readString } from "@notra/ai/utils/unknown-record";
 
-// Build from the authorized stored post, never from client-supplied metadata.
-// Keep repository credentials and sandbox identifiers out of the model context.
 export function getContentImageContext(
   post: ContentImageContextSource
 ): ContentImageContext {

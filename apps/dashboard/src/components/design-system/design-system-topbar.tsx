@@ -42,7 +42,6 @@ function useCrumbs(activeId: string | null): string[] {
           item.children?.some((child) => child.id === entry.id)
         )
       : null;
-  // Children are named after their parent skin, so the category adds nothing.
   return [parent ? parent.label : category?.label, entry.label].filter(
     (label): label is string => Boolean(label)
   );

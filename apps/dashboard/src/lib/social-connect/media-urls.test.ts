@@ -34,7 +34,6 @@ test("rejects another organization's objects on the shared host", () => {
       "org_1"
     )
   ).not.toThrow();
-  // Without a caller the prefix cannot be checked — host-only gating.
   expect(() =>
     assertAllowedSocialMediaUrls([`${R2_HOST}/organization/org_2/clip.mp4`])
   ).not.toThrow();
@@ -44,7 +43,6 @@ test("allows the configured R2 host, rejects app and other hosts", () => {
   expect(() =>
     assertAllowedSocialMediaUrls([`${R2_HOST}/organization/org_1/a.mp4`])
   ).not.toThrow();
-  // App-origin media requires dashboard auth, which PostForMe lacks.
   expect(() =>
     assertAllowedSocialMediaUrls([
       `${APP_HOST}/api/uploads/content-images/a.mp4`,

@@ -27,8 +27,6 @@ import { generateText } from "ai";
 
 const VERCEL_MODEL_PREFIX_REGEX = /^vercel\//;
 
-// Models often write a multi-line label with a literal line break instead of
-// "\n", which is invalid JSON. Escape raw line breaks that sit inside strings.
 function escapeRawNewlinesInStrings(json: string) {
   let output = "";
   let inString = false;
@@ -64,7 +62,6 @@ export async function editDiagramSpecWithAi(params: {
   spec: DiagramSpec;
   prompt: string;
   organizationId: string;
-  /** Override for model comparisons; production uses DIAGRAM_EDIT_MODEL_ID. */
   modelId?: string;
   providerOptions?: Record<string, Record<string, unknown>>;
 }): Promise<{
@@ -80,18 +77,12 @@ export async function editDiagramSpecWithAi(params: {
     totalTokens: 0,
     cacheReadTokens: 0,
     cacheWriteTokens: 0,
-    // Billing prices by provider model id; the "vercel/" routing prefix is
-    // not in the pricing table for every model.
     modelId: modelId.replace(VERCEL_MODEL_PREFIX_REGEX, ""),
   };
   let best: { spec: DiagramSpec; issues: string[] } | undefined;
-  // Layout problems of the last valid answer, and why the latest answer
-  // could not be used at all; the model gets each under its own heading.
   let layoutError: string | undefined;
   let answerError: string | undefined;
   let lastValid: DiagramSpec | undefined;
-  // Problems the diagram already has (often on purpose after a hand edit) are
-  // not the edit's job; only problems the edit introduces need another round.
   const existingIssues = new Set(
     findDiagramLayoutIssues((await renderDiagram(params.spec)).scene)
   );
@@ -104,8 +95,6 @@ export async function editDiagramSpecWithAi(params: {
           organizationId: params.organizationId,
         }),
         system: buildDiagramEditSystemPrompt(),
-        // After a layout-only failure, fix the previous answer instead of
-        // redoing the whole change from the original diagram.
         prompt: lastValid
           ? buildDiagramEditPrompt({
               spec: lastValid,
@@ -128,7 +117,6 @@ export async function editDiagramSpecWithAi(params: {
         ),
       });
     } catch (caught) {
-      // A failed or timed-out fix round should not throw away a usable edit.
       if (best) {
         logWarn("[diagram-edit] Edit attempt failed; keeping best result", {
           attempt,
@@ -146,8 +134,6 @@ export async function editDiagramSpecWithAi(params: {
     usage.cacheWriteTokens += callUsage.cacheWriteTokens;
 
     if (result.finishReason === "length") {
-      // The whole diagram did not fit in the answer; more rounds hit the
-      // same limit.
       if (best) {
         break;
       }
@@ -158,7 +144,6 @@ export async function editDiagramSpecWithAi(params: {
 
     try {
       const spec = parseDiagramSpecText(result.text);
-      // Building the scene catches dangling arrow ids before we save anything.
       const rendered = await renderDiagram(spec);
       const issues = findDiagramLayoutIssues(rendered.scene).filter(
         (issue) => !existingIssues.has(issue)
@@ -166,11 +151,7 @@ export async function editDiagramSpecWithAi(params: {
       if (issues.length === 0) {
         return { spec, usage, attempts: attempt, layoutIssues: [] };
       }
-      // Layout issues are worth one more round, but an imperfect valid
-      // diagram beats failing the edit.
       lastValid = spec;
-      // A fix round can make things worse; keep the attempt with the fewest
-      // problems as the fallback.
       if (!best || issues.length < best.issues.length) {
         best = { spec, issues };
       }

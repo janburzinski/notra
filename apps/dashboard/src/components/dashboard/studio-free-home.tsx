@@ -10,7 +10,6 @@ import { AgentFeedbackSetupNudge } from "@/components/agent-feedback/feedback-se
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import type { StudioFreeHomeProps } from "@/types/dashboard/home";
 
-/** Studio home for workspaces without a paid plan: the free feedback inbox. */
 export function StudioFreeHome({ greetingText, slug }: StudioFreeHomeProps) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");

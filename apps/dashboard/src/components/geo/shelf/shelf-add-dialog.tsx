@@ -56,7 +56,6 @@ function toKind(value: string): GeoShelfSourceKind {
   return GEO_SHELF_SOURCE_KINDS.find((kind) => kind === value) ?? "other";
 }
 
-/** Stored rows may predate canonicalization, so compare both sides canonical. */
 function canonicalizeShelfUrlSafe(raw: string): string {
   return isAllowedShelfUrl(raw) ? canonicalizeShelfUrl(raw) : raw;
 }
@@ -174,7 +173,6 @@ export function ShelfAddDialog({
       : null;
   const preview = useGeoShelfPreview(organizationId, previewUrl);
   const previewTitle = preview.data?.title ?? null;
-  // `existingUrls` only covers loaded rows; the server knows the whole shelf.
   const urlCheck = useGeoShelfUrlCheck(organizationId, previewUrl);
   const isServerDuplicate =
     urlCheck.data?.onShelf === true && urlValue.trim() === debouncedUrl.trim();

@@ -62,7 +62,6 @@ function BrandPage() {
   return (
     <div className="border-border/70 flex w-full flex-col items-center justify-start overflow-hidden border-b">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />

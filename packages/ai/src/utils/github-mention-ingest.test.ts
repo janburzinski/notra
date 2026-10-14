@@ -145,8 +145,6 @@ describe("ingestGitHubAppMentionWebhook", () => {
     });
     expect(result.context).toBeDefined();
     expect(processGitHubMention).not.toHaveBeenCalled();
-    // Admission never claims a delivery: if enqueue fails or the request dies,
-    // another request can still hand it to the durable worker.
     expect(
       (await ingest("issue_comment", mentionPayload, "ok-1")).httpStatus
     ).toBe(202);

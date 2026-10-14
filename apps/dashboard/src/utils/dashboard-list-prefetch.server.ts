@@ -13,8 +13,6 @@ function routerContext(requestHeaders: Headers) {
   return () => createORPCContext({ headers: requestHeaders });
 }
 
-// Routers load with the page that needs them: importing all four (the GEO
-// engines, the Linear SDK, …) for any one page slowed every cold start.
 const loadContentRouter = () =>
   import("@/lib/orpc/routers/content").then((module) => module.contentRouter);
 const loadGeoRouter = () =>
@@ -61,8 +59,6 @@ export async function dehydrateContentListQueries(
     queryFn: async () =>
       (await client.geo.projectsList(organizationInput)).projects,
   });
-  // Awaited (the route streams, so the shell does not wait): the list is in
-  // the server HTML instead of rendering only after the client hydrates.
   await queryClient.prefetchQuery({
     ...dashboardOrpc.content.collections.list.queryOptions({
       input: listInput,
@@ -89,8 +85,6 @@ export async function dehydrateIntegrationsQueries(
   const queryClient = getGeoServerQueryClient();
   const input = { organizationId };
 
-  // Awaited for the same reason as the content list: the cards render in
-  // the server HTML of the streamed route.
   await Promise.all([
     queryClient.prefetchQuery({
       ...dashboardOrpc.integrations.list.queryOptions({ input }),
@@ -125,9 +119,6 @@ export async function dehydrateSkillsQueries(
   const queryClient = getGeoServerQueryClient();
   const input = { organizationId };
 
-  // The list is small. Wait for it so the first HTML includes the cards.
-  // Dehydrating a still-pending query made the browser start a second request
-  // after the page's client bundle hydrated.
   await queryClient.prefetchQuery({
     ...dashboardOrpc.skills.list.queryOptions({ input }),
     queryFn: () => client.skills.list(input),

@@ -82,8 +82,6 @@ describe("cachedQuery live scope", () => {
     );
 
     const inFlight = cachedQuery(liveOptions(staleFetch));
-    // Wait until the pre-purge fetch is actually in flight, then purge
-    // before it resolves — the interleaving from the review finding.
     while (staleFetch.mock.calls.length === 0) {
       await new Promise((resolve) => setTimeout(resolve, 0));
     }

@@ -56,7 +56,6 @@ function Citation({
   return first ? <AIOverviewCitation sources={[first, ...rest]} /> : null;
 }
 
-/** "Neon: Best for…" lists bold the lead like Google does. */
 function LeadText({ text }: { text: string }) {
   const separator = text.indexOf(LEAD_SEPARATOR);
   if (separator <= 0 || separator > LEAD_MAX_LENGTH) {
@@ -70,7 +69,6 @@ function LeadText({ text }: { text: string }) {
   );
 }
 
-/** Google's AI Overview in the AI Overview skin from @notra/ui. */
 export function GoogleAiOverview({
   overview,
   className,
@@ -78,7 +76,6 @@ export function GoogleAiOverview({
   overview: StateOfAiSearchOverview;
   className?: string;
 }) {
-  // Blocks have no ids and headings such as "Pros" repeat.
   const blockKeys = uniqueKeys(
     overview.blocks.map(
       (block) =>
@@ -120,11 +117,6 @@ export function GoogleAiOverview({
   );
 }
 
-/**
- * The overview at the height of its neighbour: on wide screens the text is
- * taken out of flow so the sources table sets the row height, and the reader
- * scrolls inside the panel.
- */
 export function AiOverviewPanel({
   overview,
   header,
@@ -142,7 +134,6 @@ export function AiOverviewPanel({
         className="overscroll-contain lg:absolute lg:inset-0 lg:overflow-y-auto"
         aria-label="AI Overview text"
         role="region"
-        // Keyboard users need to reach the text that scrolls.
         // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
       >

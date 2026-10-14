@@ -4,14 +4,9 @@
   "main": "worker.js",
   "compatibility_date": "2026-09-01",
   "vars": {
-    // The Notra address from your site's Domains page.
     "NOTRA_SITE_ORIGIN": "https://relaywave-cloudflare.notra.site"
   },
-  // Serve the whole domain from this Worker:
   // "routes": [{ "pattern": "www.relaywave.dev", "custom_domain": true }]
-  //
-  // Or keep your current website and only send the sections here
-  // (then set PASS_THROUGH to "true" in vars):
   // "routes": [
   //   { "pattern": "www.relaywave.dev/blog*", "zone_name": "relaywave.dev" },
   //   { "pattern": "www.relaywave.dev/changelog*", "zone_name": "relaywave.dev" }

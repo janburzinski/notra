@@ -67,7 +67,6 @@ export function searchGapDemandRank(gap: GeoUnifiedSearchGap): number {
   const impressions = gap.kind === "console" ? (gap.row.impressions ?? 0) : 0;
   const searches =
     gap.kind === "console" ? (gap.ai?.searches ?? 0) : gap.row.searches;
-  // ponytail: simple ranking heuristic; calibrate weights once demand-to-draft data exists.
   return Math.log1p(impressions) + 2 * Math.log1p(searches);
 }
 

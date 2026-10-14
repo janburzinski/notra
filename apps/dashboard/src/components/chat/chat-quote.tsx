@@ -55,8 +55,6 @@ export function useChatQuote() {
   return useContext(ChatQuoteContext);
 }
 
-// The live range follows scrolling; once a re-render detaches its text (the
-// agent saved an edit), the last measured position keeps the popover put.
 function getDraftRect(draft: ChatQuoteSelection) {
   const { range } = draft;
   if (range.startContainer.isConnected && !range.collapsed) {
@@ -77,7 +75,6 @@ export function ChatQuoteProvider({
   const [annotationFocus, setAnnotationFocus] =
     useState<ChatAnnotationFocus | null>(null);
   const [selection, setSelection] = useState<ChatQuoteSelection | null>(null);
-  // An annotation being written: the popover holds a note form for it.
   const [draft, setDraft] = useState<ChatQuoteSelection | null>(null);
   const draftRef = useRef(draft);
   useEffect(() => {
@@ -158,7 +155,6 @@ export function ChatQuoteProvider({
       });
     }
     function dismiss() {
-      // A note in progress follows its passage instead of closing.
       if (!draftRef.current) {
         setSelection(null);
       }
@@ -193,7 +189,6 @@ export function ChatQuoteProvider({
     };
   }, [scopeId]);
 
-  // Keeps the passage marked while focus sits in the note form.
   useEffect(() => {
     if (!(draft && "highlights" in CSS)) {
       return;
@@ -220,7 +215,6 @@ export function ChatQuoteProvider({
         setSelection(null);
         return;
       }
-      // Text selected in a previewed post opens a note form for it.
       setDraft(selection);
       setSelection(null);
       window.getSelection()?.removeAllRanges();
@@ -357,7 +351,6 @@ export function ChatQuoteMessage(props: MessageProps) {
   return <Message {...props} data-chat-quote-source={context?.scopeId} />;
 }
 
-// This short accordion resizes the composer so the input moves with the quote.
 export function ChatQuotePreview({ disabled = false }: ChatQuotePreviewProps) {
   const t = useTranslations("chat.quote");
   const context = useChatQuote();

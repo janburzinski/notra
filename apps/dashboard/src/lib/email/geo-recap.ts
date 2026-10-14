@@ -315,7 +315,6 @@ async function sendWeeklyRecap({
       answersChecked: rates.current.checks,
       items: visibleItems,
       remainingCount: items.length - visibleItems.length,
-      // Quiet weeks keep it to the one number that held.
       competitors: quiet ? [] : competitors,
       action,
       dashboardLink: `${appUrl}/${recipients.slug}/geo`,
@@ -361,10 +360,6 @@ function buildCompetitorRows({
     }));
 }
 
-/**
- * One concrete next step: the strongest open content gap, else the biggest
- * prompt the brand dropped out of.
- */
 async function pickAction(
   organizationSlug: string,
   pairs: readonly GeoRecapPair[],
@@ -426,8 +421,6 @@ async function sendDropAlert({
   organizationId: string;
   window: GeoRecapWindow;
 }): Promise<GeoRecapOrganizationResult> {
-  // A daily scan answers each prompt once a day, so the recent side only
-  // needs one answer per prompt; the aggregate threshold keeps it honest.
   const pairs = buildComparablePairs(
     await queryGeoCheckPeriodPrompts(periodInput(organizationId, window)),
     1
@@ -483,12 +476,6 @@ function alertCooldownKey(organizationId: string, email: string) {
   return `geo-recap:drop-alert:v1:${organizationId}:${email.toLowerCase()}`;
 }
 
-/**
- * Owners hear about a drop once per cooldown, not every day it lasts. The
- * cooldown starts only after a successful send, so a failed send is retried
- * by the next run. Without a working Redis everyone is due: a repeated alert
- * beats a lost one, and Brew's per-day idempotency key stops same-day repeats.
- */
 async function recipientsOutsideAlertCooldown({
   organizationId,
   emails,

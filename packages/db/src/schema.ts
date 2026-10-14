@@ -2356,8 +2356,6 @@ export const posts = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     sourceMetadata: jsonb("source_metadata"),
     githubPublish: jsonb("github_publish").$type<PostGitHubPublish | null>(),
-    // Site metadata for blog posts and changelog entries, written into the
-    // frontmatter on publish.
     coverImage: jsonb("cover_image").$type<PostCoverImage | null>(),
     tags: text("tags")
       .array()
@@ -2416,7 +2414,6 @@ export const contentAuthors = pgTable(
     organizationId: text("organization_id")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
-    // Stable id on hosted sites: the author page lives at /author/<slug>.
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     title: text("title"),
@@ -4115,15 +4112,11 @@ export const demoSandboxes = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    // Demo keys only work against demo-api and expire with the sandbox, so
-    // keeping the plaintext lets the in-app API console send real requests.
     apiKey: text("api_key"),
     apiKeyId: text("api_key_id"),
     timeZone: text("time_zone").default("UTC").notNull(),
     anchorAt: timestamp("anchor_at").notNull(),
     ipHash: text("ip_hash"),
-    // What the visitor entered under "Customize your experience"; reapplied
-    // on every reset. Null means the default Fieldnote workspace.
     personalization: jsonb("personalization").$type<DemoPersonalization>(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),

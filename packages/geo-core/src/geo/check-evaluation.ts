@@ -20,8 +20,6 @@ export const judgeAnswer = Effect.fn("geo.judgeAnswer")(function* (
   const models = yield* GeoModelService;
   const mentioned =
     findBrandMention(answer, context.companyName, context.aliases) !== null;
-  // The judge LLM still supplies competitors and excerpt; the typed
-  // evaluation only runs when there is a mention to rate.
   const [judged, evaluation] = yield* Effect.all(
     [
       models

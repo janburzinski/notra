@@ -9,7 +9,6 @@ import { nodeRange } from "./estree";
 import { expressionPrograms } from "./mdast";
 
 export function mdxVariableCodeRanges(source: string): SourceRange[] {
-  // Mask placeholders without moving offsets so MDX can distinguish prose from JavaScript.
   const masked = source.replace(
     VARIABLE_OR_CODE_SPAN,
     (match, codeSpan, name) =>
@@ -35,7 +34,6 @@ export function mdxVariableCodeRanges(source: string): SourceRange[] {
     });
     return ranges;
   } catch {
-    // Leave malformed MDX untouched; the compiler reports its syntax error.
     return [{ start: 0, end: source.length }];
   }
 }

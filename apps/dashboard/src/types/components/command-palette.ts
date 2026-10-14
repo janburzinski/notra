@@ -226,7 +226,6 @@ export type CommandPaletteAiState =
   | { status: "navigating"; labelKey: CommandPaletteNavigatingLabelKey }
   | { status: "error" };
 
-/** State and handlers the palette container hands to its sections. */
 export interface CommandPaletteController {
   slug: string;
   organizationId: string;

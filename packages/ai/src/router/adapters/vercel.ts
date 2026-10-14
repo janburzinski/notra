@@ -45,7 +45,6 @@ export function createVercelAdapter(
 
   return {
     id: "vercel",
-    // Privacy flags are injected on every request by buildVercelProviderOptions.
     enforcesZdr: true,
     supportsModel: (modelId) => isModelSupported("vercel", modelId),
     mapModelId: toVercelModelId,

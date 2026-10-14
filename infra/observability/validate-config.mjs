@@ -118,9 +118,6 @@ export function validateConfigs(spawn = spawnSync) {
   }
 
   for (const { service, args } of commands) {
-    // These commands never start services or touch persistent storage. Collector
-    // validation requires a directory, supplied only by disposable fixture tmpfs.
-    // No .env file or host token is loaded/forwarded.
     const result = spawn("docker", args, { stdio: "inherit" });
     if (result.error || result.status !== 0) {
       throw Object.assign(

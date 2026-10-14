@@ -70,7 +70,6 @@ import {
 } from "@/utils/geo-charts";
 import { tableHeightFor } from "@/utils/table";
 
-// Matches the visibility activity card's headline series.
 const FAMILY_TOTAL_STROKE_WIDTH = 2;
 const FAMILY_CHART_HEIGHT_CLASS = "h-52 w-full cursor-crosshair";
 const FAMILY_SHEET_CONTENT_CLASS =
@@ -94,7 +93,6 @@ function Stat({
   return (
     <div className="flex min-w-0 flex-col gap-2">
       <p className="text-muted-foreground text-xs">{label}</p>
-      {/* Matches the overview headline: the delta sits beside the number. */}
       <div className="flex items-end gap-2">
         <p className="text-2xl leading-none font-semibold tracking-tight tabular-nums">
           {value}
@@ -361,8 +359,6 @@ function PromptHits({
   };
   const missed = hits.filter((hit) => !(hit.mentioned || hit.ownedSourceCited));
   const found = hits.filter((hit) => hit.mentioned || hit.ownedSourceCited);
-  // The count lives in the first column header, so each table carries its
-  // own title and lines up with its rows.
   const promptColumn = (
     header: string
   ): TableColumn<EngineFamilyPromptHit> => ({
@@ -398,7 +394,6 @@ function PromptHits({
     {
       key: "result",
       header: t("resultHeader"),
-      // Fits "Mentioned and cited" plus the outcome icon and cell padding.
       width: "13rem",
       sortable: true,
       cell: (row) => {
@@ -413,7 +408,6 @@ function PromptHits({
           </span>
         );
       },
-      // Ranked answers first, then unranked mentions, then citation-only.
       sortValue: (row) => {
         if (row.mentioned) {
           return row.position ?? Number.MAX_SAFE_INTEGER - 1;
@@ -568,8 +562,6 @@ export function EngineFamilySheet({
   onOpenChange,
 }: EngineFamilySheetProps) {
   const [family, releaseFamily] = useRetainedValue(familyProp);
-  // A stand-in sheet here would mount, then get replaced once `family` arrives,
-  // replaying the slide. The real sheet mounts once, when there is something to show.
   if (!family) {
     return null;
   }

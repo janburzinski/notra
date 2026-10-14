@@ -60,8 +60,6 @@ async function recordWrite(
   commitSha: string,
   target: { branch: string; pullRequestUrl: string }
 ) {
-  // The commit already landed, so mark it before anything else can throw: a
-  // run that wrote must never look retryable.
   params.state.committed = true;
   params.state.commitSha = commitSha;
   if (params.context.destination.mode === "new_pull_request") {
@@ -90,10 +88,6 @@ function createWriteQueue() {
   };
 }
 
-/**
- * A missing App permission fails the same way on every attempt. Instead of
- * letting the model retry, the run is flagged and ends with a fixed reply.
- */
 function stopOnPermissionError(
   tools: Record<string, Tool>,
   state: GitHubMentionToolState
@@ -187,8 +181,6 @@ export function buildGitHubMentionTools(params: {
   }
 
   const inWriteOrder = createWriteQueue();
-  // Cache only within this agent run. Including the commit keeps reads fresh
-  // after a write, while the entry cap bounds memory when browsing many files.
   const fileReads = new Map<string, Promise<string>>();
 
   const tools: Record<string, Tool> = {

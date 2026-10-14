@@ -40,15 +40,12 @@ function SiteSettingsEditorFooter({
   );
 }
 
-/** Holds a draft of the site settings for one expanded row and saves only what changed. */
 export function SiteSettingsEditor({
   onDone,
   isValid,
   children,
 }: SiteSettingsEditorProps) {
   const { site } = useSite().detail;
-  // Diff against the settings as they were when the row opened, so saving one
-  // row never sends stale values for settings changed elsewhere meanwhile.
   const [base] = useState(site);
   const [form, setForm] = useState<SiteSettingsForm>(() =>
     siteSettingsFormFromSite(base)

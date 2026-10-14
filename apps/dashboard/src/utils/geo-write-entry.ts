@@ -9,14 +9,6 @@ import type {
 import { normalizeGeoProjectId } from "@/utils/geo-hydration";
 import { isNotFoundError } from "@/utils/orpc-errors";
 
-/**
- * GEO write entry helpers.
- *
- * Gaps Write opens `WriteDialog` with `writeDialogStateFromGap`, then
- * navigates to `geoContentPath(slug, postId)` after plan.
- * Do not `router.push("/${slug}/geo/write?brief=")`. Topic is resolved
- * server-side from `geo_prompts` via `sourceKind` + `sourceId`.
- */
 export function geoContentPath(
   organizationSlug: string,
   postId: string

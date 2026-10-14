@@ -1,8 +1,3 @@
-# Tidepool's main website on Netlify.
-# The rules below serve the Notra site under /blog and /changelog on this domain.
-# netlify.toml can't read environment variables in redirects, so the Notra address
-# is written out. Replace tidepool-netlify.notra.site with the address on your
-# site's Domains page in Notra.
 
 [build]
   publish = "public"

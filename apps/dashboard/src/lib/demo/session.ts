@@ -22,10 +22,6 @@ export async function writeDemoSession(anonymousId: string) {
   );
 }
 
-/**
- * The visitor's sandbox, resolved once per request from the signed cookie.
- * The anonymousId alone is public; only a valid signature opens the sandbox.
- */
 export const getCurrentDemoSandbox = cacheAuthRequest(
   async (): Promise<DemoSandbox | null> => {
     const payload = await readSignedCookie(

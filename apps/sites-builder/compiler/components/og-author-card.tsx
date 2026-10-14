@@ -12,7 +12,6 @@ import type { OgAuthorCardContent } from "../types/og-images";
 const AVATAR_SIZE = 64;
 const LOGO_SIZE = 56;
 
-/** Logo and label on top, the title, then the first author and the site's domain. */
 export function OgAuthorCard(content: OgAuthorCardContent): ReactElement {
   const colors = OG_THEME[content.appearance];
   const { author } = content;

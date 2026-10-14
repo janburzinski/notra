@@ -31,7 +31,6 @@ export function createIngestApp(
     await next();
   });
 
-  // Railway polls these; one event per probe would only add drain volume.
   // evlog-map-disable-next-line -- health probe
   app.get("/healthz", (context) => context.json({ ok: true }));
   // evlog-map-disable-next-line -- readiness probe

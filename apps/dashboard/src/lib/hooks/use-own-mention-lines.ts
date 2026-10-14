@@ -11,8 +11,6 @@ function tintMentionLines(block: HTMLElement) {
   const lineHeight =
     Number.parseFloat(getComputedStyle(block).lineHeight) || 24;
   const lineTops = new Set<number>();
-  // An own-brand mention is the only <mark> inside a block; competitor
-  // mentions render as buttons. Each client rect is one wrapped line.
   for (const mark of block.querySelectorAll("mark")) {
     for (const rect of mark.getClientRects()) {
       const center = rect.top - blockTop + rect.height / 2;

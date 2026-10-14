@@ -7,7 +7,6 @@ import {
 import { productionTarget } from "./constants/targets.ts";
 import { assertTarget } from "./utils/assert-target.ts";
 
-// Monitoring only: never take ownership of the application's ingest service.
 export const partial = "observability";
 
 export default defineRailway((ctx) => {
@@ -18,7 +17,6 @@ export default defineRailway((ctx) => {
   const lokiVolume = volume("loki-volume", monitoringVolume);
   const collectorVolume = volume("otel-collector-volume", monitoringVolume);
 
-  // Sources stay unset: upload each existing Docker context with railway up.
   const grafana = service("grafana", {
     ...monitoringService,
     healthcheck: "/api/health",
@@ -33,7 +31,6 @@ export default defineRailway((ctx) => {
   });
   const prometheus = service("prometheus", {
     ...monitoringService,
-    // Railway rejects /-/ready; verify TSDB readiness privately after deploying.
     healthcheck: "/metrics",
     volumeMounts: { "/prometheus": prometheusVolume },
     env: { PORT: "9090", RAILWAY_RUN_UID: "0" },

@@ -158,7 +158,6 @@ export function useOnboardingAgentBannerDismissal(
   organizationId: string,
   serverDismissed: boolean
 ) {
-  // Dismissals from before the cookie were only kept in localStorage.
   const legacyKey =
     localStorageKeys.onboardingAgentBannerDismissed(organizationId);
   const dismissed = useSyncExternalStore(

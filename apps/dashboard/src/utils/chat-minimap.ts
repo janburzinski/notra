@@ -6,8 +6,6 @@ const MARKDOWN_SYNTAX_REGEX = /[#*_`>~[\]]+|\(https?:\/\/[^)]*\)/g;
 const WHITESPACE_REGEX = /\s+/g;
 const MAX_DESCRIPTION_LENGTH = 200;
 
-// Earlier messages keep their identity while a reply streams, so only the
-// streaming message is re-parsed on each update.
 const titleCache = new WeakMap<UIMessage, string>();
 const descriptionCache = new WeakMap<UIMessage, string>();
 
@@ -43,7 +41,6 @@ function getDescription(message: UIMessage) {
   return description;
 }
 
-// One turn per user message; assistant replies attach to the turn before them.
 export function buildChatMinimapTurns<TMessage extends UIMessage>(
   messages: TMessage[],
   getUserTitle: (message: TMessage) => string

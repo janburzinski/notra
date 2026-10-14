@@ -26,7 +26,6 @@ export async function moveGitHubMentionContent(
     repo: context.repo,
     ref: target.expectedHeadOid,
   };
-  // Any existing entry, including a directory or symlink, is a collision.
   const destination = await octokit
     .request("GET /repos/{owner}/{repo}/contents/{path}", {
       ...location,
@@ -76,8 +75,6 @@ export async function moveGitHubMentionContent(
     };
   }
   const contents = bytes.toString("utf8");
-  // A move must preserve the entire source, including BOMs and line endings.
-  // Reject truncated responses and lossy UTF-8 decoding before deleting it.
   if (
     bytes.length !== source.size ||
     !Buffer.from(contents, "utf8").equals(bytes)
@@ -88,9 +85,6 @@ export async function moveGitHubMentionContent(
     };
   }
   const files = [{ path: toPath, contents }];
-  // These bytes came from the source at the expected commit, not the model.
-  // Existing constructs may move unchanged within the same file format, but
-  // changing formats must not turn previously inert text into executable MDX.
   const blockedContent = findNewActiveContent({
     path: toPath,
     previous:
@@ -132,8 +126,6 @@ export async function moveGitHubMentionContent(
     scheduleRepair: params.scheduleRepair,
   });
   if (publication) {
-    // Keep subsequent tools on the moved file, even on a follow-up branch or
-    // while a durable repair is pending. Only the sync above changes the DB.
     publication.path = toPath;
     publication.headSha = commitSha;
     publication.markdown =

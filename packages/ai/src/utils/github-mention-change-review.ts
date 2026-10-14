@@ -51,8 +51,6 @@ export async function reviewGitHubMentionChange(params: {
         path: file.path,
         ref: params.branch,
       }).catch((error: unknown) => {
-        // Not on the branch yet means a new file, where everything counts as
-        // added. Any other failure stops the write instead of guessing.
         if (isNotFound(error)) {
           return null;
         }

@@ -20,28 +20,6 @@ import {
 } from "../utils/internal-workflow";
 import { logError } from "../utils/logging";
 
-/**
- * GEO execution surfaces:
- *
- * - `runGeoEffect` — programs the API host can run (database, workflow
- *   starters, entitlement checks). Wired through `geoCoreApiLayer`.
- *
- * - `runRemoteGeoEffect` — paid synchronous work that only the dashboard can
- *   execute (brief planning, sequence runs). Returns the dashboard's tagged
- *   domain failure verbatim; remote timeouts map to 409 so clients do not
- *   retry in-flight billing.
- */
-
-/**
- * Maps a tagged GEO failure onto an HTTP status and a client-safe message.
- *
- * Mirrors the dashboard's `toGeoOrpcError` so the same domain failure reads
- * the same on both surfaces; only the transport differs (status codes here,
- * ORPCError there).
- *
- * Takes the wire shape rather than the error instance so that a program the
- * dashboard ran on our behalf lands on the same status as one we ran here.
- */
 function toGeoFailure(failure: GeoFailureWire): GeoFailure {
   switch (failure._tag) {
     case "GeoSuggestionNotFoundError":
@@ -157,14 +135,6 @@ function toGeoProgramFailure(error: GeoProgramError): GeoFailure {
   }
 }
 
-/**
- * Runs a GEO program and normalizes both failure channels.
- *
- * The API's host capabilities are provided here explicitly. Some adapters use
- * `Effect.promise`, so a rejection there surfaces as a *defect* rather than a
- * typed failure and would escape `Effect.result`. Both channels are caught and
- * reported as a 500 so no route leaks a raw stack trace.
- */
 export async function runGeoEffect<A, E extends GeoProgramError>(
   label: string,
   effect: Effect.Effect<A, E, GeoApiRuntime>
@@ -201,17 +171,6 @@ function readRemoteFailure(detail: string): GeoFailureWire | null {
   }
 }
 
-/**
- * Runs a GEO program that only the dashboard can execute, and normalizes the
- * answer into the same outcome `runGeoEffect` produces.
- *
- * Some programs reach capabilities the API process does not have — the planner
- * model and the `"use step"` billing gates, in particular. Those run behind an
- * internal dashboard route, which returns the tagged domain failure verbatim so
- * the mapping to a status happens here, once, for both execution loci.
- * Every such call is paid synchronous work, so its timeout and operation-specific
- * no-retry guidance are mandatory.
- */
 export async function runRemoteGeoEffect<A>(
   label: string,
   url: string,
@@ -231,14 +190,9 @@ export async function runRemoteGeoEffect<A>(
   } catch (error) {
     if (error instanceof InternalDashboardTimeoutError) {
       logError(`[GEO] ${label} (remote timeout)`, error);
-      // The dashboard is still working and still billing, so tell the client
-      // not to fire the same request again.
       return {
         ok: false,
         failure: {
-          // The paid operation may still be running, so this is not a
-          // retryable service outage. 409 makes that transport distinction
-          // machine-readable until these calls have durable job resources.
           status: 409,
           error: options.timeoutMessage,
         },

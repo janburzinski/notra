@@ -26,7 +26,6 @@ function Home() {
             <img src="/favicon.svg" alt="" width={28} height={28} />
             Brightdesk
           </a>
-          {/* Plain <a> tags: /blog and /changelog are served by Notra, not by this app's router. */}
           <nav className="links" aria-label="Main">
             <a href="/blog">Blog</a>
             <a href="/changelog">Changelog</a>

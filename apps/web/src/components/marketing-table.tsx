@@ -1,8 +1,5 @@
 "use client";
 
-/* Bare table primitives for marketing mockups, which draw their own frames.
- * App tables use `@notra/ui/components/ui/table` and `data-table`. */
-
 import { cn } from "@notra/ui/lib/utils";
 import * as React from "react";
 

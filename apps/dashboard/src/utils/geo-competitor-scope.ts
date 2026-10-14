@@ -35,10 +35,6 @@ function assistantKeys(engines: readonly string[]): Set<string> {
   return keys;
 }
 
-/**
- * The server's daily shares are relative to its own top brands. Recomputed
- * over the scoped brands, the sparkline agrees with the share beside it.
- */
 function withScopedTrends(
   points: readonly GeoCompetitorSharePoint[],
   series: readonly GeoCompetitorShareTimeseriesPoint[]
@@ -93,7 +89,6 @@ export function scopeCompetitorShare({
   }
   const assistants = assistantKeys(engines);
   const ignored = new Set(ignoredCompetitors.map(brandFoldKey));
-  // The most mentioned spelling of an untracked brand names the folded row.
   const discoveredByFold = new Map<string, string>();
   for (const point of [...points].sort((a, b) => b.mentions - a.mentions)) {
     const fold = brandFoldKey(point.brand);
@@ -146,8 +141,6 @@ export function scopeCompetitorShare({
       mentions: (existing?.mentions ?? 0) + point.mentions,
     });
   }
-  // The server keeps the top 50 brands in `points`; a tracked brand ranked
-  // below that still has its daily mentions.
   const fromSeries = new Map<string, GeoCompetitorSharePoint>();
   for (const point of mergedSeries.values()) {
     const tracked = canonicalByKey.has(competitorKey(point.brand));

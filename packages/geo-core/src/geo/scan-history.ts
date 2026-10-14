@@ -32,9 +32,6 @@ export const loadGeoScanRuns = Effect.fn("geo.scanRuns")(function* (
         finishedAt: true,
       },
       extras: {
-        // `tasks` holds one entry per prompt × engine × language with the full
-        // prompt text; this list is polled every 3 s during a scan and only
-        // renders totals and engines.
         plan: sql<GeoScanPlanSnapshot | null>`${geoScans.plan} - 'tasks' - 'taskStates'`.as(
           "plan"
         ),
@@ -155,8 +152,6 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
           .orderBy(asc(geoMentionChecks.createdAt), asc(geoMentionChecks.id))
           .limit(GEO_SCAN_RESULTS_PAGE_SIZE)
           .offset(input.offset),
-        // One pass over the scan's rows: run-wide totals for the status line
-        // plus the engine-filtered total for pagination.
         db
           .select({
             checks: count(),
@@ -234,7 +229,6 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
   };
 });
 
-/** The run summary only needs totals, engines and languages, not every task. */
 function withoutPlanTasks({
   tasks: _tasks,
   taskStates: _taskStates,

@@ -47,8 +47,6 @@ import { paginatedTableHeightFor } from "@/utils/table";
 
 const FEEDBACK_DETAIL_ROW_HEIGHT = 36;
 
-// Long IDs and URLs are truncated to keep rows compact; the copy button keeps
-// the full value reachable without hover.
 function CopyableValue({ value }: { value: string }) {
   return (
     <span className="flex min-w-0 items-center gap-1">
@@ -255,7 +253,6 @@ export function AgentFeedbackDetailDialog({
     item?.metadata && Object.keys(item.metadata).length > 0
       ? JSON.stringify(item.metadata, null, 2)
       : null;
-  // Short feedback often gets its message reused as the title.
   const showMessage = item ? item.message.trim() !== item.title?.trim() : false;
 
   return (

@@ -64,12 +64,6 @@ function toDayString(seconds: number | undefined): string {
   return new Date(seconds * MS_PER_SECOND).toISOString().slice(0, DAY_LENGTH);
 }
 
-/**
- * True when a static (non-gateway) engine can actually run, i.e. its provider
- * credential is configured. Server-side only — the catalog is built in
- * `lib/geo/model-catalog.ts`. Per-organization exposure (feature flags) is
- * applied on top of this by `withoutGeoModelCatalogEntries`.
- */
 function isGeoStaticEngineAvailable(entry: GeoModelCatalogEntry): boolean {
   const envKeys = GEO_STATIC_ENGINE_ENV[entry.id];
   if (!envKeys) {

@@ -474,7 +474,6 @@ export async function getSiteRepositoryOverview(
   };
   const [{ data: repo }, commits] = await Promise.all([
     octokit.request("GET /repos/{owner}/{repo}", params),
-    // An empty repository or a deleted branch has no commit to show.
     octokit
       .request("GET /repos/{owner}/{repo}/commits", {
         ...params,

@@ -88,8 +88,6 @@ export function PricingClient({
     });
   }, [plansLoading, plans]);
 
-  // A stored "geo" mode would send the org root straight to the GEO paywall,
-  // so switch to Studio (where free feedback lives) before leaving.
   async function handleClose(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
     trackEvent(POSTHOG_EVENTS.PAYWALL_DISMISSED, {

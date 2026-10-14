@@ -9,11 +9,6 @@ import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
 import { JourneyEmpty } from "@/components/geo/journey-empty";
 import type { JourneyStatCardProps } from "@/types/geo";
 
-/**
- * Shared layout for the two journey overviews, so the headline, the stat row
- * and the preview table always line up side by side. It has no card of its
- * own: the table brings the frame.
- */
 export function JourneyStatCard({
   eyebrow,
   total,

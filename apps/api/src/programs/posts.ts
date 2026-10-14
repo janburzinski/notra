@@ -93,7 +93,6 @@ function queueFailureMessage(error: unknown) {
   return error instanceof Error ? error.message : "Failed to trigger workflow";
 }
 
-/** One query for every author referenced by `rows`, regardless of page size. */
 function loadPostAuthors(
   input: { db: ListPostsProgramInput["db"]; organizationId: string },
   rows: readonly Pick<PostRow, "contentType" | "authorIds">[]
@@ -632,8 +631,6 @@ export const commitPatchPost = Effect.fn("posts.commitPatch")(function* (
     return yield* new PostConcurrentModificationError();
   }
 
-  // The post is already saved: a failed author lookup only leaves the
-  // response without author details instead of reporting the write as failed.
   const authors = yield* loadPostAuthors(input, [updatedPost]).pipe(
     Effect.catch(() => Effect.succeed<PostAuthorsById>(new Map()))
   );

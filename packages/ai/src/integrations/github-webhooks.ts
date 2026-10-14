@@ -6,8 +6,6 @@ export async function getGitHubWebhookIntegrations(
   integrationId: string,
   repositoryId: string
 ) {
-  // Repository IDs are integration IDs; load both path IDs to retain
-  // the existing missing-repository and mismatched-integration responses.
   return await db
     .select({
       id: githubIntegrations.id,

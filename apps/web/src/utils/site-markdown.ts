@@ -221,7 +221,6 @@ function buildPromptCalculatorMarkdown() {
       ? `| ${plan.name} | more than ${PRICING_CARD_PLANS.at(-2)?.answersPerMonth?.toLocaleString("en-US") ?? ""} | ${plan.price.monthly} |`
       : `| ${plan.name} | ${plan.answersPerMonth.toLocaleString("en-US")} | ${plan.price.monthly}/month or ${plan.price.yearly}/year |`
   );
-  // Exact scans per month, so an agent's arithmetic matches the calculator.
   const frequencies = PROMPT_CALCULATOR_FREQUENCIES.map((option) => {
     if (option.intervalDays === 1) {
       return `\`${option.id}\` (${PROMPT_CALCULATOR_DAYS_PER_MONTH})`;

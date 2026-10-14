@@ -98,11 +98,6 @@ geoScansRoutes.openapi(createScanRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
 
-  // Charged only once the request is known to be well-formed and authorized, so
-  // a caller correcting a bad project id does not burn scan slots on 404s. The
-  // domain-level failures below (GEO disabled, lost already-running claim) still
-  // spend a slot: pre-reading the settings row here would duplicate the atomic
-  // claim described in the next comment.
   const rateLimited = await enforceRatelimit(
     c,
     ratelimit.scanTrigger,
@@ -112,10 +107,6 @@ geoScansRoutes.openapi(createScanRoute, async (c) => {
     return rateLimited;
   }
 
-  // No read-then-check here on purpose: `startGeoScan` takes an atomic claim on
-  // the settings row (`claimGeoScanRun`) that every trigger — this route, the
-  // dashboard and the cron sweep — shares, and fails with
-  // `GeoScanAlreadyRunningError` when it loses. That maps to the 409 below.
   const outcome = await runGeoEffect(
     "startScan",
     startGeoScan({ organizationId: base.organizationId, projectId })
@@ -124,10 +115,6 @@ geoScansRoutes.openapi(createScanRoute, async (c) => {
     return geoErrorResponse(c, outcome.failure);
   }
 
-  // `startGeoScan` inserts the `geo_scans` row before handing the workflow off,
-  // so this id is already readable through the GET route below. The workflow's
-  // run id stays internal: it identifies a Vercel Workflow run, not a scan, and
-  // returning it left clients polling for a row that did not exist yet.
   const { scanId } = outcome.value;
   const statusUrl = `/v1/projects/${projectId}/geo/scans/${scanId}`;
   trackApiEvent(c, {

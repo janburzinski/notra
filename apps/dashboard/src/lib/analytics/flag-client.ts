@@ -39,8 +39,6 @@ const evaluateAnalyticsFlag = Effect.fn("evaluateAnalyticsFlag")(
       properties: JSON.stringify({ organizationId }),
       keys: SOCIAL_ANALYTICS_FLAG_KEY,
     });
-    // Use the SDK's public endpoint directly: getFlag cannot accept a signal.
-    // Keep body consumption inside tryPromise so timeout aborts that too.
     const json = yield* Effect.tryPromise({
       try: async (signal) => {
         const response = await fetch(`${ANALYTICS_FLAGS_API_URL}?${params}`, {

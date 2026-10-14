@@ -76,8 +76,6 @@ export function CreditActivity() {
       .withDefault(CREDIT_EVENTS_PAGE_SIZE)
       .withOptions({ clearOnDefault: true })
   );
-  // The URL is untrusted: snap it to an offered size before it drives paging
-  // or a request with a bounded limit.
   const pageSize = normalizePageSize(rawPageSize, CREDIT_EVENTS_PAGE_SIZE);
   const eventsOffset = Math.max(0, page - 1) * pageSize;
   const autumnClient = useAutumnClient({ caller: "CreditsPageClient" });

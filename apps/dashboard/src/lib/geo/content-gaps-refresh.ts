@@ -28,8 +28,6 @@ export async function refreshDueGeoContentGaps() {
         lt(geoContentGapSnapshots.updatedAt, cutoff)
       )
     )
-    // Prepare new projects first, then serve the oldest due snapshots first.
-    // Shuffle new projects and snapshots with equal timestamps to avoid a fixed retry order.
     .orderBy(
       sql`case when ${geoContentGapSnapshots.projectId} is null then 0 else 1 end`,
       asc(geoContentGapSnapshots.updatedAt),

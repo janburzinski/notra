@@ -15,11 +15,6 @@ import { useDemoSandbox } from "@/lib/hooks/use-demo-sandbox";
 import { demoHomePath } from "@/utils/demo-return-to";
 import { rebuildDemoSandbox } from "@/utils/demo-sandbox-request";
 
-/**
- * Top bar of the public demo: invites the visitor to make the demo their own,
- * resets the workspace and links to sign-up. Fades in once on load; its
- * height is reserved up front so the page below never shifts.
- */
 export function DemoBanner() {
   const t = useTranslations("demo.banner");
   const { data: sandbox } = useDemoSandbox(true);
@@ -47,7 +42,6 @@ export function DemoBanner() {
       >
         <Notra className="size-5" />
       </span>
-      {/* Phones keep the actions; the greeting needs the room on wider screens. */}
       <p className="hidden min-w-0 truncate sm:block">
         {firstName ? t("titleNamed", { name: firstName }) : t("title")}
       </p>

@@ -93,7 +93,6 @@ export function createGeoUiRoutes(parent: AnyRoute) {
     }),
     createUiRoute({
       parent,
-      // Old full-page detail links now open the sheet over the index.
       path: "competitors/$competitor",
       title: { namespace: "geo.shared", key: "competitor" },
       component: () => null,

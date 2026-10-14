@@ -51,7 +51,6 @@ export function readSortValue<T>(
   return (row as Record<string, string | number>)[column.key] ?? "";
 }
 
-/** Slice `rows` to the current page; unpaged when `pageSize` is unset. */
 export function pageRows<T>(
   rows: TableRow<T>[],
   page: number,
@@ -64,7 +63,6 @@ export function pageRows<T>(
   return rows.slice(pageStart, pageStart + pageSize);
 }
 
-/** After column sort, move matching rows to the front without pinning them sticky. */
 export function pinRowsFirst<T>(
   rows: readonly TableRow<T>[],
   isRowPinned?: (row: T) => boolean
@@ -114,11 +112,6 @@ export function headerMinWidth(
   return `${minColumnWidth}px`;
 }
 
-/**
- * The width a column actually occupies at its narrowest: fixed widths never
- * shrink below their declared size (see `colWidthStyle`), flexible ones stop
- * at their header floor.
- */
 export function columnFloorCss<T>(
   column: Pick<
     TableColumn<T>,
@@ -137,17 +130,11 @@ export function columnFloorCss<T>(
   return `max(${column.width}, ${floor})`;
 }
 
-/** Share of the table a `"20%"` width takes, or null for any other width. */
 function percentWidth(width: string | undefined): number | null {
   const match = width ? PERCENT_WIDTH_REGEX.exec(width) : null;
   return match ? Number.parseFloat(match[1] ?? "0") : null;
 }
 
-/**
- * Sum of column floors so `table-layout: fixed` cannot crush titles. Fixed
- * widths count in full: WebKit fits a fixed table to its `min-width`, so a
- * smaller sum squeezes the flexible columns to nothing on narrow screens.
- */
 export function tableMinWidthCss<T>(
   columns: readonly Pick<
     TableColumn<T>,
@@ -166,8 +153,6 @@ export function tableMinWidthCss<T>(
   const sum =
     parts.length === 1 ? (parts[0] ?? "0px") : `calc(${parts.join(" + ")})`;
 
-  // A `"20%"` column takes its share of the table, not of the container, so
-  // the table has to grow until both that column and the rest fit.
   const percentTotal = columns.reduce(
     (total, column) => total + (percentWidth(column.width) ?? 0),
     0
@@ -213,8 +198,6 @@ export function resolveColumnWidths<T>(
   extraFixedWidths: readonly string[] = []
 ): (string | undefined)[] {
   const hasFr = columns.some((column) => isFrWidth(column.width));
-  // Next to fr columns, a column without a width takes one share of the
-  // rest instead of collapsing to nothing under `table-layout: fixed`.
   const frValues = columns.map((column) => {
     if (!column.width) {
       return hasFr ? 1 : null;
@@ -251,7 +234,6 @@ export function resolveColumnWidths<T>(
   });
 }
 
-/** Dim existing rows, append skeletons for load-more, or fill an empty table. */
 export function tableLoadingOverlay(
   loading: boolean,
   rowCount: number,
@@ -283,7 +265,6 @@ export function getTableViewportLayout({
   horizontalScrollbarHeight,
 }: TableViewportLayoutOptions): TableViewportLayout {
   const resolvedHeight = Math.max(height, minHeight ?? 0);
-  // Fixed viewports end on a whole row so separators meet the bottom border.
   const bodyHeight =
     Math.floor(Math.max(rowHeight, resolvedHeight - rowHeight) / rowHeight) *
     rowHeight;
@@ -335,17 +316,14 @@ export function getTableViewportLayout({
   };
 }
 
-/** Class and inline style shared by the header and body `<table>`s. */
 export function tableLayout<T>(
   columns: readonly TableColumn<T>[],
   widths: Record<string, number>,
   minColumnWidth: number,
   extraFixedWidths: readonly string[]
 ) {
-  // Shrink-wrap only after every column has an explicit resized width.
   const sized =
     columns.length > 0 && columns.every((column) => widths[column.key] != null);
-  // A resized column floors at its dragged width, not the declared one.
   const floorColumns = columns.map((column) => {
     const override = widths[column.key];
     return override == null ? column : { ...column, width: `${override}px` };

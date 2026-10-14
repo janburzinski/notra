@@ -193,11 +193,6 @@ function contentBranchDiscriminator(contentId: string) {
     .slice(0, CONTENT_BRANCH_HASH_LENGTH);
 }
 
-/**
- * `notra/changelog-dashboard-clarity-and-a1b2c3d4e5f67890`.
- * The title slug is what you see in GitHub. The hash stays stable when the
- * title changes, so a later publish still finds this pull request.
- */
 function createContentBranchName(
   contentType: GitHubPublishContentType,
   title: string,
@@ -248,8 +243,6 @@ function toPullRequestResult(
 ) {
   return {
     branchName,
-    // The commit this publish put on the branch. Mentions compare it with the
-    // pull request head to notice pushes made outside Notra.
     headSha,
     operation,
     path,
@@ -362,10 +355,6 @@ async function getPullRequestAfterCommit(params: {
   return data;
 }
 
-/**
- * Republish refreshes the description to the file path and the Open in Notra
- * link. Failures are non-fatal: the content commit already landed.
- */
 async function ensurePullRequestBody(params: {
   branchName: string;
   currentBody: string | null | undefined;
@@ -573,10 +562,6 @@ async function assertRecoverableContentBranch(
           headers: GITHUB_API_VERSION_HEADERS,
         }
       );
-      // GitHub signs commits it creates through its API for the authenticated
-      // identity. A commit hand-built through the git data API with a spoofed
-      // author is unsigned, so only signed commits by the publisher can vouch
-      // for the files a publication owns.
       const trusted =
         params.publisherLogin !== null &&
         commit.author?.login === params.publisherLogin &&
@@ -682,7 +667,6 @@ async function commitContentToBranch(
           fallback,
         })
       : fallback;
-  // Authored by the GitHub App bot when the caller uses an installation token.
   try {
     const result = await octokit.graphql<GitHubCreateCommitOnBranchResult>(
       GITHUB_CREATE_COMMIT_ON_BRANCH_MUTATION,
@@ -984,8 +968,6 @@ export async function publishContentDraftPullRequest(
         }
       }
     }
-    // A branch left by an earlier attempt may use a different path. Its
-    // recorded destination is checked after branch validation below.
     if (!branchExists) {
       await assertContentDestinationsMissing(
         octokit,
@@ -1046,12 +1028,8 @@ export async function publishContentDraftPullRequest(
         publisherLogin: requestedParams.publisherLogin ?? null,
         repo: requestedParams.repo,
       });
-  // The first content commit records the publication path. Keep it even when
-  // the post's slug or the repository's configured output directory changes.
   const contentPath = contentBranch.path;
   const { branchHeadSha } = contentBranch;
-  // Assets are owned only when the publisher's last signed commit recorded
-  // them and the branch still adds them; anything else belongs to someone else.
   const commitMetadata = parseContentCommitMetadata(
     contentBranch.commitMessage
   );

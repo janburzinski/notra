@@ -75,7 +75,7 @@ function createProviderClients() {
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
-        gcTime: 1000 * 60 * 60, // 1 hour
+        gcTime: 1000 * 60 * 60,
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         refetchOnReconnect: true,

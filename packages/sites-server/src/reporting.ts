@@ -165,7 +165,6 @@ async function reportPreviewComment(
   }
   await safely("preview_comment", () =>
     db.transaction(async (tx) => {
-      // Serialize only comments; GitHub requests must not hold site/deployment row locks.
       await tx.execute(
         sql`select pg_advisory_xact_lock(hashtextextended(${`sites-preview-comment:${site.id}:${pullRequestNumber}`}, 0))`
       );

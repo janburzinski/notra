@@ -111,7 +111,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   );
   const [addOpen, setAddOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  // Tabs render their own actions into this slot, beside the tab switcher.
   const [tabActionsSlot, setTabActionsSlot] = useState<HTMLDivElement | null>(
     null
   );
@@ -262,8 +261,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                   projectId
                 )}
                 onViewTrackedPrompt={(promptId) => {
-                  // A full URL, not query state: the toast that calls this
-                  // can outlive the page.
                   const query = promptId
                     ? `?${GEO_PROMPT_DETAIL_QUERY_KEY}=${encodeURIComponent(promptId)}`
                     : "";

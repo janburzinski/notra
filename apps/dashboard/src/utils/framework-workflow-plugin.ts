@@ -5,7 +5,6 @@ import { join } from "node:path";
 import { type Plugin, transformWithOxc } from "vite";
 import { workflow } from "workflow/vite";
 
-// Relative: vite.config.ts loads this file without the "@" alias.
 import {
   SOURCE_MAPPING_URL_COMMENT,
   WORKFLOW_DEV_BUNDLE_FILES,
@@ -21,7 +20,6 @@ export function traceWorkflowDependencies(files: string[], packages: string[]) {
   files.push(...packages.map((name) => require.resolve(name)));
 }
 
-/** The esbuild the workflow builder bundles with (workflow → @workflow/nitro → @workflow/builders). */
 function loadWorkflowEsbuild(): { stop: () => Promise<void> | void } {
   let require = createRequire(import.meta.url);
   for (const name of ["workflow", "@workflow/nitro", "@workflow/builders"]) {
@@ -30,11 +28,6 @@ function loadWorkflowEsbuild(): { stop: () => Promise<void> | void } {
   return require("esbuild");
 }
 
-/**
- * The dev workflow builder bundles with esbuild and leaves its service process
- * running (~600 MB RSS) after every build. Stopping it once the builds settle
- * frees that memory; esbuild starts a new service on the next build.
- */
 function createEsbuildReleaser() {
   let timer: ReturnType<typeof setTimeout> | undefined;
   return () => {
@@ -164,8 +157,6 @@ export function dashboardWorkflow(): Plugin[] {
             );
             if (nitro.options.dev) {
               devBuildDir = nitro.options.buildDir;
-              // Registered after the workflow module's own hooks, so these
-              // run once its builds have finished.
               nitro.hooks.hook("build:before", compileDevBundles);
               nitro.hooks.hook("dev:reload", compileDevBundles);
               nitro.hooks.hook("build:before", releaseEsbuild);
@@ -186,8 +177,6 @@ export function dashboardWorkflow(): Plugin[] {
         // each run rebuilt every workflow bundle. One environment is enough.
         applyToEnvironment: (environment) => environment.name === "client",
         async hotUpdate(...args: unknown[]) {
-          // The generated bundles contain "use step" themselves; treating a
-          // write to them as a source change rebuilt them in a loop.
           const [update] = args as [{ file?: string } | undefined];
           if (update?.file && WORKFLOW_DEV_OUTPUT_PATTERN.test(update.file)) {
             return;

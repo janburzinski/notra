@@ -14,7 +14,6 @@ const logSyncFailure = (context: Record<string, unknown>) =>
     )
   );
 
-// The public demo has no WorkOS; memberships only live in the database.
 const skipInDemo = <A, E, R>(
   effect: Effect.Effect<A, E, R>
 ): Effect.Effect<A | void, E, R> =>

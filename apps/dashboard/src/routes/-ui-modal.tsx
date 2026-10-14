@@ -6,8 +6,6 @@ import { AccountModal } from "@/components/analytics/account-modal";
 import type { UiModalProviderProps } from "@/types/ui-route";
 import { lazyPage } from "@/utils/lazy-page";
 
-// The sheets themselves are tiny and open on click; only their (heavy) detail
-// views load lazily, behind skeletons inside the already open sheet.
 const AccountDetail = lazyPage(() =>
   import("@/components/analytics/account-detail-view").then((module) => ({
     default: module.AccountDetailView,

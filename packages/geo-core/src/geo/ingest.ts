@@ -33,17 +33,6 @@ export {
   invalidateGeoIngestHostsCacheForBrand,
 } from "./ingest-hosts-cache";
 
-/**
- * Tracking-token issuing, revocation and install snippets.
- *
- * This used to live in `apps/dashboard/src/lib/geo-ingest/*`. It is entirely
- * Next-free — `node:crypto`, drizzle and `process.env` — and the
- * public API needs the exact same answers as the dashboard, so it moved here
- * rather than being copied. The dashboard modules now re-export from this file,
- * which keeps a single implementation and leaves every existing dashboard
- * import path working.
- */
-
 const GENERATION_SEGMENT_REGEX = /^g\d+$/;
 const FALLBACK_APP_URL = "https://app.usenotra.com";
 

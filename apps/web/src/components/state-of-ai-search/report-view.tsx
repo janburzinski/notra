@@ -60,13 +60,8 @@ import {
 const TIE_POINTS = 2;
 const PODIUM_SIZE = 3;
 
-/** Podium order: second on the left, first in the middle, third on the right. */
 const PODIUM_ORDER = [1, 0, 2] as const;
 
-/**
- * The top three as a podium in the headline: first place in the middle,
- * larger and in front, second and third smaller and tucked behind it.
- */
 function PodiumLogos({ leaders }: { leaders: StateOfAiSearchRankingRow[] }) {
   return (
     <span
@@ -155,7 +150,6 @@ export function ReportView({
       rows={report.sources}
     />
   );
-  // Cited sources do not depend on Google showing an overview.
   let sourcesBlock: ReactNode = null;
   if (report.overview) {
     sourcesBlock = (

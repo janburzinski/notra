@@ -27,7 +27,6 @@ import {
   seedProject,
   testDb,
 } from "./utils/database";
-// Registers the module mocks the scan batches below run against.
 import "./utils/infrastructure";
 
 const { runGeoScanTaskBatch } = await import("../src/geo/scan");

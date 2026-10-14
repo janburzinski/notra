@@ -47,12 +47,9 @@ import type {
   ComposerToolbarProps,
 } from "@notra/ui/types/composer";
 
-// Animates the nudge in and out, and follows its height when chips are added
-// or removed while it is open, so the input card never snaps.
 function ComposerNudgeShell({ children }: { children: ReactNode }) {
   const reduceMotion = useReducedMotion();
   const contentRef = useRef<HTMLDivElement>(null);
-  // "auto" until measured, so server-rendered markup already shows the nudge.
   const [height, setHeight] = useState<number | "auto">("auto");
 
   useLayoutEffect(() => {
@@ -82,9 +79,6 @@ function ComposerNudgeShell({ children }: { children: ReactNode }) {
   );
 }
 
-// A muted tray around the input card. The nudge (queue, chips, notices) sits
-// directly on the tray above the card. Flat composers only show the tray
-// while there is a nudge.
 function ComposerFrame({
   children,
   nudge,
@@ -251,8 +245,6 @@ function ComposerChip({
   );
 }
 
-// The textarea for plain composers. Rich editors (mentions, chips inline)
-// bring their own contentEditable host instead.
 function ComposerInput({ className, ...props }: ComposerInputProps) {
   return (
     <Textarea
@@ -312,7 +304,6 @@ function ComposerSend({
       isInert ? COMPOSER_SEND_INERT : COMPOSER_SEND_ACTIVE
     ),
     disabled,
-    // Stays focusable while disabled so the tooltip can still explain why.
     focusableWhenDisabled: true,
     onClick,
     size: "icon",

@@ -37,7 +37,6 @@ export function scanRunDetailView(
   const pending = input.data?.pending ?? [];
   const results = input.data?.results ?? [];
   const running = input.run.status === "running";
-  // Answers fill in place while a scan runs; the missing list only exists once it ended.
   const showsPending = pendingTotal > 0 && !running;
   const activeView = showsPending ? input.view : "answers";
   const engines = input.run.plan?.engines ?? [];

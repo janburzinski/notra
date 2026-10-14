@@ -11,19 +11,12 @@ import type { CompetitorSheetHostProps } from "@/types/geo";
 import { loadCompetitorDetailView } from "@/utils/competitor-detail-chunk";
 import { lazyPage } from "@/utils/lazy-page";
 
-// The sheet opens on click; only the (heavy) detail view loads lazily, behind
-// a skeleton inside the already open sheet.
 const CompetitorDetail = lazyPage(() =>
   loadCompetitorDetailView().then((module) => ({
     default: module.CompetitorDetailView,
   }))
 );
 
-/**
- * Competitor details always open as a sheet over the current GEO page, driven
- * by `?competitor=`. Deep links and reloads therefore land on the same sheet
- * instead of a separate full page.
- */
 export function GeoCompetitorSheetHost({
   organizationSlug,
 }: CompetitorSheetHostProps) {

@@ -40,7 +40,6 @@ function isAsyncIterable(value: unknown): value is AsyncIterable<unknown> {
   );
 }
 
-// Generator tools stream preliminary results; errors surface while iterating.
 async function* withIterableErrorPayload(
   toolName: string,
   iterable: AsyncIterable<unknown>,

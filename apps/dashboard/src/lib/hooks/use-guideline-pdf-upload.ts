@@ -49,7 +49,6 @@ export function useGuidelinePdfUpload(organizationId: string, voiceId: string) {
               }),
         type: "brand_guideline_pdf",
       });
-      // The server deletes the upload itself when attaching fails.
       await attach.mutateAsync({ filename, key: uploaded.key });
       toast.success(tPdf("saved"));
     } catch (error) {

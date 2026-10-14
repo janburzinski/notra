@@ -28,8 +28,6 @@ html {
   }
 }
 
-/* Notra dashboard palette (packages/ui/src/styles/globals.css), mapped onto
-   Blume's tokens so the docs site matches the product in both themes. */
 :root {
   --notra-primary: oklch(0.6056 0.2189 292.7172);
   --notra-card: hsl(0 0% 100%);

@@ -26,8 +26,6 @@ export function SentimentEngineList({
   return (
     <InstrumentModule
       bodyClassName="flex min-h-0 flex-col divide-y overflow-y-auto p-0"
-      // Side by side, the list takes the chart's height and scrolls instead of
-      // stretching the whole row to fit every engine.
       className="h-full @min-[44rem]/main:col-span-5 @min-[44rem]/main:[contain:size]"
       eyebrow={t("byEngine")}
       readout={t("enginesCount", { count: families.length })}
@@ -35,10 +33,7 @@ export function SentimentEngineList({
     >
       {families.map(({ family, iconEngine, label, bucket }) => (
         <Tooltip key={family}>
-          <TooltipTrigger
-            // A button, so keyboard users can open the breakdown too.
-            className="hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:ring-ring grid w-full grid-cols-[minmax(0,9rem)_minmax(0,1fr)_2rem] items-center gap-4 px-5 py-2.5 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset"
-          >
+          <TooltipTrigger className="hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:ring-ring grid w-full grid-cols-[minmax(0,9rem)_minmax(0,1fr)_2rem] items-center gap-4 px-5 py-2.5 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset">
             <span className="flex min-w-0 items-center gap-2 font-medium">
               <EngineIcon className="size-4 shrink-0" engine={iconEngine} />
               <span className="truncate">{label}</span>
@@ -63,8 +58,6 @@ export function SentimentEngineList({
                         aria-hidden="true"
                         className={cn(
                           "size-2 rounded-full",
-                          // The tooltip is inverted; the page's neutral grey
-                          // would vanish on it.
                           polarity === "neutral"
                             ? "bg-background/50"
                             : SENTIMENT_POLARITY_STYLES[polarity].fill

@@ -22,10 +22,6 @@ import { loadGeoEngineFlags } from "./engine-flags";
 
 const MS_PER_SECOND = 1000;
 
-/**
- * `next.revalidate` is honoured by the Next.js fetch cache and ignored by any
- * other runtime, so the same request works inside and outside the dashboard.
- */
 interface NextRevalidateRequestInit extends RequestInit {
   next?: { revalidate?: number };
 }

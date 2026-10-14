@@ -218,8 +218,6 @@ export const writeGeoTrafficEvents = Effect.fn("geoIngest.ingest")(function* (
         ),
     })
   );
-  // A 202 promises the event was stored: a missing client or a quarantined
-  // row would otherwise be acknowledged and silently lost.
   if (!result) {
     return yield* Effect.fail(
       new GeoIngestFailedError({
@@ -236,11 +234,6 @@ export const writeGeoTrafficEvents = Effect.fn("geoIngest.ingest")(function* (
   }
 });
 
-// Auth errors stay authoritative over payload errors: before classification
-// moved ahead of the identity lookup, a revoked token failed as 401 no
-// matter how broken the payload was. The re-check only runs on the (rare)
-// validation-error path, so well-formed traffic keeps the zero-I/O fast
-// path.
 const failWithAuthPrecedence = Effect.fn("geoIngest.failWithAuthPrecedence")(
   function* (
     identity: GeoIngestIdentity,
@@ -291,7 +284,6 @@ function droppedResult(
   };
 }
 
-/** A page view or engagement row was stored, but no AI traffic event. */
 function webOnlyResult(
   identity: GeoIngestIdentity,
   visitorType: GeoVisitorType
@@ -314,8 +306,6 @@ function isOutsideSiteMounts(identity: GeoIngestIdentity, url: URL): boolean {
   );
 }
 
-// The Notra Sites script reports how long a page stayed visible. Only site
-// tokens may send it: the worker forwards it from its own first-party path.
 const runWebEngagementIngest = Effect.fn("geoIngest.engagement")(function* (
   identity: GeoIngestIdentity,
   body: unknown,
@@ -382,8 +372,6 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     return yield* failWithAuthPrecedence(identity, urlResult.failure);
   }
   const url = urlResult.success;
-  // Classification is pure CPU on the payload. Run it before any Redis/DB
-  // round trip so the ~95% of requests that are not AI traffic cost nothing.
   const classification = classifyVisitor({
     userAgent: payload.userAgent,
     referer: payload.referer,
@@ -391,7 +379,6 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     signals: payload.signals,
   });
   const isAi = isTrackedGeoVisitorType(classification.visitorType);
-  // People are only counted on Notra Sites; SDK installs report AI traffic.
   const countsVisitors =
     identity.site !== undefined &&
     isHumanPageView({ classification, payload, url });
@@ -423,8 +410,6 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     ],
     { concurrency: "unbounded" }
   );
-  // A legacy token has no project in its signature. On a host-lookup outage,
-  // failing open could accept a sibling project's traffic as unassigned.
   if (!identity.projectId && allowedHosts === null) {
     return yield* Effect.fail(
       new GeoIngestFailedError({
@@ -492,16 +477,11 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
 
   yield* enforceRateLimit(identity.organizationId);
   const ingestStartedAt = Date.now();
-  // A buffered event is acknowledged before it reaches Tinybird; the batcher
-  // retries failed writes and announces rows once written. Without a buffer
-  // (or when it is full) the 202 still waits for the write.
   const buffered = buffer?.enqueue(event) ?? false;
   if (!buffered) {
     yield* writeGeoTrafficEvents([event]);
   }
   const ingestMs = Date.now() - ingestStartedAt;
-  // Analytics and the live update must not hold the 202 open for the site
-  // that sent the event.
   yield* Effect.sync(() =>
     defer(async () => {
       const announced =

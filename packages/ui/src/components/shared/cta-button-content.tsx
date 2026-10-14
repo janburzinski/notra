@@ -4,8 +4,6 @@ import { useState } from "react";
 
 import { cn } from "@notra/ui/lib/utils";
 
-/* True from the first `loading` change until the swap back has finished, so
-   buttons don't animate on mount and stop clipping once they're idle again. */
 function useLoadingSwap(loading: boolean) {
   const [previousLoading, setPreviousLoading] = useState(loading);
   const [isSwapping, setIsSwapping] = useState(false);
@@ -67,11 +65,6 @@ function CtaButtonSpinner({
   );
 }
 
-/* The animated inside of `CtaButton`, the same swap as `Button`'s loading
-   state with a spinner instead of dots: the label blurs up and out, the
-   spinner rises in from below. Kept in its own client module so
-   `cta-button.tsx` stays importable from server code that only calls
-   `ctaButtonVariants`. The label is only wrapped while a state is showing. */
 function CtaButtonContent({
   children,
   loading,
@@ -94,7 +87,6 @@ function CtaButtonContent({
                 ? "animate-button-swap-out"
                 : "animate-button-swap-in [animation-delay:70ms]")
           )}
-          // Tells the button to clip the swapping layers to its shape.
           data-clip=""
           data-slot="cta-button-label"
         >

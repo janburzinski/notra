@@ -1695,8 +1695,6 @@ export interface GeoSuggestionKeyword {
   position: number;
 }
 
-// --- GEO writer ---
-
 export type GeoWriterSourceKind =
   | "manual"
   | "gap"

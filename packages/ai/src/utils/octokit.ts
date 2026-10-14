@@ -13,7 +13,6 @@ import { demoGitHubFetch } from "./demo-github";
 export const GITHUB_INTERACTIVE_READ_TIMEOUT_MS = 15_000;
 
 function requestFetch(timeoutMs?: number): typeof fetch | undefined {
-  // The public demo reads a fictional repository and never calls GitHub.
   if (isDemoMode()) {
     return demoGitHubFetch;
   }

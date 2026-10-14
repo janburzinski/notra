@@ -24,7 +24,6 @@ export function trackRequestLoggerEmit(logger: RequestLogger): void {
       logger.setLevel("error");
     }
     emittedLoggers.add(logger);
-    // The body lifecycle can fail after the handler has recorded success.
     return emit(
       typeof status === "number"
         ? {

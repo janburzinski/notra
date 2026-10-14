@@ -14,7 +14,6 @@ function pickFeatured(
       .map((slug) => byId.get(slug.replace(EDGE_SLASHES, "")))
       .filter((entry): entry is BlogEntry => entry !== undefined);
   }
-  // "none" in blog.json leaves the choice to `featured: true` in posts.
   return entries
     .filter((entry) => entry.data.featured)
     .slice(0, FRONTMATTER_FEATURED_LIMIT);

@@ -41,7 +41,6 @@ function Highlighted({ text, query, muted }: SiteBuildLogHighlightProps) {
   if (ranges.length === 0 && !muted) {
     return text;
   }
-  // A match wins over the dimmed tag color, so it may run across the tag.
   const parts: ReactNode[] = [];
   let cursor = 0;
   for (const [start, end] of ranges) {
@@ -78,7 +77,6 @@ function LineText({ line, query }: SiteBuildLogLineTextProps) {
     return <Highlighted query={query} text={line.text} />;
   }
   if (query) {
-    // Search the raw text so matches can include the status prefix.
     const prefix = LOG_STATUS_PREFIX.exec(line.text)?.[0].length ?? 0;
     const { tag } = splitLogTag(line.text.slice(prefix));
     return (

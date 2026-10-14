@@ -333,8 +333,6 @@ export function CompetitorEditForm({
     },
   });
 
-  // A brand without a website (a discovered one, or one tracked by name only)
-  // gets the website the logo lookup already found, unless the user typed one.
   const lookupName =
     competitor?.domain || initialDomain
       ? null
@@ -349,8 +347,6 @@ export function CompetitorEditForm({
     if (websiteMeta?.isDirty || form.getFieldValue("website")) {
       return;
     }
-    // The lookup belongs to the name the form opened with; once the user
-    // renames the brand, its website no longer applies.
     if (form.getFieldValue("name").trim() !== lookupName) {
       return;
     }

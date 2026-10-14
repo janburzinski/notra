@@ -29,8 +29,6 @@ import type {
   UpdateOrganizationInput,
 } from "@/types/organizations/actions";
 
-// Each operation authenticates, validates its input and answers with an
-// `ActionResult`, so the procedures only carry the call.
 export const organizationRouter = {
   create: baseProcedure
     .input(type<CreateOrganizationInput>())

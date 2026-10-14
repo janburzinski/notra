@@ -186,8 +186,6 @@ describe("migration executable security contracts", () => {
       new RPCLink({
         url: "https://app.invalid/rpc",
         plugins: createDashboardLinkPlugins(),
-        // Like the framework, cookies set during the call join the response
-        // headers once the handler returns; whatever comes later is lost.
         fetch: async (request) => {
           const resHeaders = new Headers();
           const { response = new Response("Not Found", { status: 404 }) } =

@@ -2,13 +2,6 @@
 
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-/**
- * WriteDialog is the GEO write entry: a sidebar of sections that jump to
- * one scrolling form (prompt, content type, brand identity, competitors),
- * then Plan or Write. Gaps open this with `writeDialogStateFromGap`.
- * After plan, go to `geoContentPath`. Do not send users to
- * `/geo/write?brief=`.
- */
 import { GEO_WRITER_TOPIC_MIN_LENGTH } from "@notra/geo-core/constants/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
@@ -197,7 +190,6 @@ function WriteDialogForm({
     enabled: open,
   });
 
-  // Until someone picks, the selection follows the loaded competitors.
   const selectedCompetitorIds = competitorsTouched
     ? competitorIds
     : defaultWriterCompetitorIds(competitors, mentionedCompetitors);

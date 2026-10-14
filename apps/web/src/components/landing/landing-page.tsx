@@ -105,29 +105,24 @@ function LandingPageJsonLd() {
   return (
     <>
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(softwareJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(organizationJsonLd),
         }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(serviceJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: SSR'd JSON-LD payload, escaped via serializeJsonLd
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(speakableJsonLd) }}
         type="application/ld+json"
       />

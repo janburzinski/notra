@@ -15,7 +15,6 @@ export function costCapacityStreams(count, capacity) {
   entries.push(
     ...entries.slice(0, 100).map((entry) => ({ ...entry, ageSeconds: 10 }))
   );
-  // Hour buckets keep six-day ingestion within Loki's out-of-order allowance.
   const hours = new Map();
   for (const entry of entries) {
     const hour = capacity ? Math.floor(entry.ageSeconds / 3600) : 0;

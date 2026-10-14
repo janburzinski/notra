@@ -1,24 +1,20 @@
 import type { ChartColorPair } from "@/types/charts";
 
-/** Matches `--geo-search`. Light stays on `--primary`; dark is lifted. */
 export const CHART_PRIMARY_COLOR: ChartColorPair = {
   light: "#8B5CF6",
   dark: "#9C87E3",
 };
 
-/** Matches `--geo-memory`. Same lightness as Search; teal near sRGB max. */
 export const CHART_SECONDARY_COLOR: ChartColorPair = {
   light: "#18929F",
   dark: "#20ABBA",
 };
 
-/** AI referrals: warm amber, the one hue not shared with the Search/Memory roles. */
 export const CHART_REFERRAL_COLOR: ChartColorPair = {
   light: "#E89A1C",
   dark: "#FFB547",
 };
 
-/** Series gold: 3:1 on white. Not a Search or Memory hue. */
 const SERIES_GOLD: ChartColorPair = {
   light: "#B68F3C",
   dark: "#DAB15E",
@@ -77,7 +73,6 @@ export const COMPETITOR_SWATCHES: readonly string[] = [
   "#6B6B75",
 ];
 
-/** Rivals skip Search (brand) and Memory hues so those roles stay exclusive. */
 export const RIVAL_SWATCHES: readonly string[] = COMPETITOR_SWATCHES.slice(2);
 
 export const GEO_TRAFFIC_PROVIDER_COLORS: readonly ChartColorPair[] = [

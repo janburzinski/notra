@@ -51,19 +51,15 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
       clearOnDefault: true,
       history: "replace",
       scroll: false,
-      // State updates at once; the URL follows after typing pauses, so the
-      // router does not re-render on every keystroke.
       limitUrlUpdates: debounce(OFFERING_FORM_URL_DEBOUNCE_MS),
     }
   );
   const [notice, setNotice] = useState<OfferingFormProblem | null>(null);
-  // Counts failed submits so a repeated error shakes the field again.
   const [attempt, setAttempt] = useState(0);
   const [editingSentence, setEditingSentence] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const turnstile = useRef<TurnstileHandle>(null);
   const sentence = useRef<HTMLParagraphElement>(null);
-  // Focus moving between the two sentence fields keeps the sentence "open".
   const leaveSentenceField = (event: FocusEvent<HTMLInputElement>) => {
     if (!sentence.current?.contains(event.relatedTarget)) {
       setEditingSentence(false);
@@ -85,8 +81,6 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
     setNotice(null);
     setPending(true);
     try {
-      // Writes the URL now, so a still-pending debounced update cannot
-      // replace the report entry after navigating.
       await setValues(
         {
           domain: input.domain,
@@ -108,8 +102,6 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
           problem: input.problem || undefined,
           webSearch: input.webSearch || undefined,
         },
-        // Tokens are single-use: the report spends this one on its scan, and
-        // the form needs a new one if the visitor comes back.
         state: { offeringTurnstileToken: turnstileToken },
       });
       turnstile.current?.reset();
@@ -160,8 +152,6 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit}>
-      {/* Two lines tall at least, so the fields closing up never moves the
-          problem field below. */}
       <p
         className="font-display text-foreground min-h-[3.1em] text-[1.75rem]/[1.55] font-medium tracking-[-0.02em] text-pretty sm:min-h-[3em] sm:text-[2.25rem]/[1.5]"
         ref={sentence}
@@ -216,7 +206,6 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
         ?
       </p>
 
-      {/* Always rendered so nothing below shifts when the feature gets a name. */}
       <div
         className={cn(
           "flex flex-col gap-2 pt-6 transition-opacity duration-200",
@@ -255,7 +244,6 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
               rows={2}
               value={problem}
             />
-            {/* Overlaid so the hint never shifts the layout. */}
             <span
               aria-hidden={problemLeft > OFFERING_CHECK_PROBLEM_COUNTER_FROM}
               className={cn(
@@ -286,7 +274,6 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
         Let the model search the web
       </Label>
 
-      {/* Field errors show as a tooltip on the field; this repeats them for screen readers. */}
       {shown?.field ? (
         <p className="sr-only" id="offering-check-error" role="alert">
           {shown.message}
@@ -356,7 +343,6 @@ export function OfferingCheckForm({ samples }: OfferingCheckFormProps) {
           </span>
         </CtaButton>
       </div>
-      {/* Invisible unless Cloudflare needs a click; uncached scans need it. */}
       <Turnstile
         action={OFFERING_TURNSTILE_ACTION}
         appearance="interaction-only"

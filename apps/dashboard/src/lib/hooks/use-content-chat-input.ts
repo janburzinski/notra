@@ -124,7 +124,6 @@ export function useContentChatInput({
     ref,
     () => ({
       setAttachments: restoreAttachments,
-      // A closed right panel stays in layout at w-0 but is inert.
       isVisible: () => {
         const element = textareaRef.current;
         return Boolean(

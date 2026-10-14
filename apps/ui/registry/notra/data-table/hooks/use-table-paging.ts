@@ -3,11 +3,6 @@ import { useState } from "react";
 import { pageRows } from "../lib/data-table";
 import type { DataTablePagination, TableRow } from "../types/data-table";
 
-/**
- * Slices client-paged rows and owns the reader's page size when the caller
- * does not control it. Server and cursor pages arrive already sliced as
- * `data`, so they pass through untouched.
- */
 export function useTablePaging<T>(
   rows: TableRow<T>[],
   pagination: DataTablePagination | undefined,

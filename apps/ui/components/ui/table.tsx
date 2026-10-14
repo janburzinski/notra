@@ -3,11 +3,6 @@
 import { cn } from "cn";
 import type * as React from "react";
 
-/**
- * Dualtone chrome for a single `<table>`: the header sits on the grey shell,
- * the body cells form the lifted white card. `border-separate` is required
- * because row borders and radii only render on cells in that model.
- */
 const TABLE_CARD_CELLS_CLASS = [
   "[&>tbody>tr>td]:bg-background [&>tbody>tr>td]:border-border/60 [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
   "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--background))]",

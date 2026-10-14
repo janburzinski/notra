@@ -38,8 +38,6 @@ type Point = [number, number];
 type RoughGenerator = ReturnType<typeof rough.generator>;
 type Drawable = ReturnType<RoughGenerator["line"]>;
 
-// Excalidraw caps how far a small diagram is blown up; we do the same so a
-// three-box diagram does not render with 60px labels.
 const MAX_RENDER_SCALE = 1.6;
 
 // Bundlers expose opentype.js's named exports, but Node's CommonJS interop
@@ -76,8 +74,6 @@ function lineAdvance(font: Font, line: string, fontSize: number) {
   }, 0);
 }
 
-// opentype.js 2.0 `toPathData` emits NaN for some coordinates, so serialize
-// the commands ourselves.
 function pathCommandsToData(commands: PathCommand[]) {
   const n = (value: number) => value.toFixed(2);
   return commands
@@ -166,7 +162,6 @@ function roughOptions(element: ExcalidrawElement): RoughOptions {
     fillStyle: element.fillStyle,
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
-    // Excalidraw draws dashed strokes with a single pass so the dashes stay crisp.
     disableMultiStroke: element.strokeStyle !== "solid",
     preserveVertices: element.roughness < 2,
   };
@@ -341,7 +336,6 @@ function renderText(
   const lineHeightPx = element.fontSize * element.lineHeight;
   const lines = element.text.split("\n");
 
-  // Arrow labels sit on the line, so knock the line out behind them.
   const knockout = background
     ? `<rect x="${element.x - 4}" y="${element.y - 2}" width="${element.width + 8}" height="${element.height + 4}" rx="4" fill="${escapeAttribute(background)}"/>`
     : "";
@@ -466,7 +460,6 @@ export async function renderDiagram(
     spec,
     scene,
     svg,
-    // Wrapping the SVG keeps the existing Figma/Paper clipboard exports working.
     html: `<div style="width:${REPO_IMAGE_WIDTH}px;height:${REPO_IMAGE_HEIGHT}px;display:flex">${svg}</div>`,
     pngBase64: png.toString("base64"),
   };

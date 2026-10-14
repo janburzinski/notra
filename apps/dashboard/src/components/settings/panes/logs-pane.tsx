@@ -42,8 +42,6 @@ export function LogsSettingsPane() {
     "pageSize",
     parseAsInteger.withDefault(LOGS_PAGE_SIZE)
   );
-  // The URL is untrusted: snap it to an offered size before it drives paging
-  // or a request with a bounded limit.
   const pageSize = normalizePageSize(rawPageSize, LOGS_PAGE_SIZE);
   const [search, setSearch] = useQueryState("q", parseAsString.withDefault(""));
   const [source, setSource] = useQueryState(

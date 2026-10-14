@@ -64,7 +64,6 @@ function toNullableNumber(value: number | bigint | null): number | null {
 
 const syncTrackedAccountNow = Effect.fn("analytics.syncTrackedAccount")(
   function* (account: SyncableSocialAccount) {
-    // Demo stats are generated at read time; there is nothing to sync.
     if (isDemoMode()) {
       return;
     }

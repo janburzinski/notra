@@ -28,7 +28,6 @@ test("only verified OAuth identities propagate to nested calls and request event
   ];
   for (const auth of identities) {
     const app = new Hono<{ Variables: { auth: AuthData } }>();
-    // This fixture stands in for the already-tested credential verifier.
     app.use("*", async (c, next) => {
       c.set("auth", auth);
       await next();

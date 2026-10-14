@@ -6,7 +6,6 @@ import { useTranslations } from "use-intl";
 import { CONTENT_STATUS_BADGES } from "@/constants/content-overview";
 import type { ContentStatusBadgeProps } from "@/types/content/overview";
 
-/** Post status in the same badge style as site deployments. */
 export function ContentStatusBadge({ status }: ContentStatusBadgeProps) {
   const t = useTranslations("content.overview.status");
   const appearance = CONTENT_STATUS_BADGES[status];

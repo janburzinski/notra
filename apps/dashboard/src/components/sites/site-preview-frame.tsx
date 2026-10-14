@@ -29,8 +29,6 @@ export function SitePreviewFrame({
     staleTime: SITE_PREVIEW_REACHABILITY_STALE_MS,
   });
   const reachable = reachability.data === true;
-  // A failed refetch keeps the last successful result, so only an error
-  // without one hides the preview.
   const unavailable =
     !url || reachability.data === false || (reachability.isError && !reachable);
   const [width, setWidth] = useState(0);

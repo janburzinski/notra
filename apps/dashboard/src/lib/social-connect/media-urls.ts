@@ -15,15 +15,10 @@ function allowedMediaBaseUrl(): URL | null {
   try {
     return new URL(value);
   } catch {
-    // Malformed configuration fails closed.
     return null;
   }
 }
 
-// ponytail: UI only sends uploaded URLs, but the API takes any URL and hands
-// it to PostForMe's fetcher. Confine that to our own storage origin — and,
-// when the caller is known, to its own `organization/{orgId}/` prefix, so one
-// org cannot publish another org's objects to a provider.
 export function assertAllowedSocialMediaUrls(
   urls: string[] | undefined,
   organizationId?: string
@@ -50,8 +45,6 @@ export function assertAllowedSocialMediaUrls(
         cause: null,
       });
     }
-    // Origin covers scheme and port too: `ftp://` or another port on the
-    // same host is not our storage.
     if (!baseUrl || url.origin !== baseUrl.origin) {
       throw new SocialConnectRequestError({
         message: "Media URL host is not allowed",

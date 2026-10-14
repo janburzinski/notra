@@ -6,7 +6,6 @@ import AuthorAvatar from "./AuthorAvatar.astro";
 import Icon from "./Icon.astro";
 
 const { next, previous } = Astro.props;
-// Older post on the left, newer on the right, so each arrow points the way its label reads.
 const cards = [
   ...(previous ? [{ entry: previous, label: "Previous", right: false }] : []),
   ...(next ? [{ entry: next, label: "Next", right: true }] : []),

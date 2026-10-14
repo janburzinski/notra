@@ -25,10 +25,6 @@ import type {
   ContentPanelTab,
 } from "@/types/content/overview";
 
-/**
- * Overview and Agent, in the same tab style as the chat's content panel:
- * the active tab is a secondary button, the others are quiet ghosts.
- */
 export function ContentPanelTabs() {
   const t = useTranslations("content.overview.tabs");
   const tab = useContentPanelTab();
@@ -89,7 +85,6 @@ export function ContentPanelTabs() {
   );
 }
 
-/** The overview tab in the same chrome as the agent panel. */
 export function ContentPanelOverview({
   onClose,
   children,

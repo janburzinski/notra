@@ -7,7 +7,6 @@ import { useTranslations } from "use-intl";
 import type { ChatFileAttachmentProps } from "@/types/components/chat-input";
 import { getAttachmentExtension } from "@/utils/chat-input";
 
-// Square tile for non-image files so they sit in the same grid as images.
 export function ChatFileAttachment({
   url,
   filename,

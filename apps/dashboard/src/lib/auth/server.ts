@@ -143,13 +143,8 @@ const loadLocalDevIdentity = Effect.fn("auth.identity.localDev")(function* () {
 
 export const getAuthIdentity = cacheAuthRequest(
   async (): Promise<AuthIdentityData | null> => {
-    // The public demo has no WorkOS: a signed cookie maps the anonymous
-    // visitor to their sandbox user.
     if (isDemoMode()) {
       try {
-        // Imported only in demo mode: the sandbox module pulls in the GEO
-        // sample data and scan programs, which every request would otherwise
-        // load on a cold server.
         const { loadDemoIdentity } = await import("@/lib/demo/session");
         return await loadDemoIdentity();
       } catch (error) {

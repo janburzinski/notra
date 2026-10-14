@@ -25,7 +25,6 @@ function isHiddenFromFeatureList(featureId: string) {
   return (
     featureId === FEATURES.AI_ANSWERS ||
     featureId === FEATURES.AI_CREDITS ||
-    // Both credit balances are cents, which the count rows would misread.
     featureId === FEATURES.PULL_REQUEST_CREDITS ||
     featureId === FEATURES.ZDR ||
     isLogRetentionFeature(featureId)

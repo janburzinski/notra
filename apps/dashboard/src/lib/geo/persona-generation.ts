@@ -64,8 +64,6 @@ export async function startPersonaGeneration(
   if (job.id !== requested.id) {
     return job;
   }
-  // Keep the claim on an ambiguous dispatch failure. The workflow registers its
-  // run ID on entry, and status polling expires an unstarted claim after a grace period.
   const run = await start(personaGenerationWorkflow, [job]);
   await updatePersonaGenerationJob(job, { runId: run.runId });
   return { ...job, runId: run.runId };

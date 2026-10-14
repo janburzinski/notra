@@ -62,7 +62,6 @@ export function GeoUpgradeDialog({
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [includeZdr, setIncludeZdr] = useState(false);
-  // Focus the panel, not the interval switch, so it doesn't open with a ring.
   const popupRef = useRef<HTMLDivElement>(null);
 
   const planGroups = groupBillingPlans(plans);

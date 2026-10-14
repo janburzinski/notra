@@ -8,10 +8,6 @@ import { useStoredSidebarMode } from "@/lib/hooks/use-sidebar-mode";
 import { usePathname, useRouter, useSearchParams } from "@/lib/navigation";
 import { isOrgRootPath, resolveOrgRootRedirect } from "@/utils/nav";
 
-/**
- * Fallback for a GEO pick that only lives in localStorage (no cookie yet).
- * The org-root page already server-redirects when the cookie is present.
- */
 export function RestoreSidebarHome() {
   const pathname = usePathname();
   const searchParams = useSearchParams();

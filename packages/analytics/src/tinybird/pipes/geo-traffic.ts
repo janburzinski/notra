@@ -300,9 +300,6 @@ export const geoTrafficPages = defineEndpoint("geo_traffic_pages", {
   nodes: [
     node({
       name: "top_pages",
-      // Reads the raw event table on purpose: the by-host rollup would
-      // require a one-time backfill to serve full history, and the 30s
-      // query cache bounds the raw scan cost.
       sql: `
         SELECT
           host,
@@ -383,10 +380,6 @@ export const geoTrafficLog = defineEndpoint("geo_traffic_log", {
   nodes: [
     node({
       name: "recent",
-      // The sort key can't serve newest-first across both visitor types, so
-      // a plain ORDER BY ... LIMIT reads every column of the 90-day window.
-      // Finding the cutoff on captured_at alone first and then reading only
-      // the rows at or after it cut bytes read ~9x in a benchmark.
       sql: `
         SELECT
           captured_at,
@@ -498,11 +491,6 @@ export const geoTrafficJourneys = defineEndpoint("geo_traffic_journeys", {
   },
 });
 
-/**
- * Journey events across the selected window and the one before it. Filters
- * on the sorting key (organization_id, visitor_type, captured_at) so both
- * windows prune by primary key.
- */
 const GEO_JOURNEY_COMPARISON_EVENTS_SQL = `
         SELECT
           journey_id,
@@ -675,9 +663,6 @@ export const geoJourneyPages = defineEndpoint("geo_journey_pages", {
     }),
     node({
       name: "journey_pages",
-      // Previous-window-only pages stay in so the totals on every row survive a
-      // window with no journeys at all; they sort last and the caller drops
-      // them from the page list.
       sql: `
         SELECT *
         FROM journey_page_counts

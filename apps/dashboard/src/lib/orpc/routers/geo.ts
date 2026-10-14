@@ -535,9 +535,6 @@ async function ensureGscSchedule(
       const scheduleId = getGscScheduleId(currentIntegration.id);
       const legacyScheduleId = `${GSC_SCHEDULE_ID_PREFIX}${currentIntegration.organizationId}`;
       try {
-        // Older releases used an organization-scoped custom ID. Remove an
-        // unrecorded legacy schedule before creating this generation's ID so
-        // an interrupted migration cannot leave two weekly jobs running.
         await assertLockOwned();
         await deleteGscScheduleIfPresent(legacyScheduleId);
         await assertLockOwned();
@@ -595,8 +592,6 @@ async function ensureGscSchedule(
           error
         );
         try {
-          // The first write may have committed before surfacing an error. This
-          // idempotent retry confirms that exact id without relying on stale fields.
           claimed = await claimOrConfirmGscSchedule(
             currentIntegration,
             scheduleId,
@@ -622,15 +617,11 @@ async function ensureGscSchedule(
         if (refreshedIntegration?.qstashScheduleId === scheduleId) {
           return scheduleId;
         }
-        // Reconnect, disconnect, and schedule creation all take the same lock,
-        // so no newer integration can claim this candidate before it is removed.
         await removeGscSchedule(scheduleId);
         signal.throwIfAborted();
         return refreshedIntegration?.qstashScheduleId ?? null;
       } catch (error) {
         signal.throwIfAborted();
-        // The deterministic id remains recoverable: the next ensure attempt
-        // overwrites the same QStash schedule instead of creating a duplicate.
         logError("[GSC] Failed to reconcile weekly sync schedule", error);
         return null;
       }
@@ -696,7 +687,6 @@ async function loadGeoShelfSeed(
   return { ...shelfContext, members };
 }
 
-/** Members are only needed to strip ids of people who left the organization. */
 async function resolveGeoShelfReadMembers(
   organizationId: string,
   loadedMembers: GeoShelfMember[],
@@ -717,7 +707,6 @@ export const geoRouter = {
     .input(geoShelfListInputSchema)
     .handler(async ({ context, input }) => {
       const seed = await loadGeoShelfSeed(context, input, {
-        // Member names only matter to resolve "mine" and name searches.
         withMembers:
           GEO_SAMPLE_DATA_ENABLED ||
           input.ticket === "mine" ||
@@ -908,7 +897,6 @@ export const geoRouter = {
   modelCatalog: authorizedProcedure
     .input(geoModelCatalogInputSchema)
     .handler(async ({ context, input }) => {
-      // The catalog carries the organization's engine flags.
       await assertOrganizationAccess({
         headers: context.headers,
         organizationId: input.organizationId,
@@ -1427,8 +1415,6 @@ export const geoRouter = {
   sequencesGenerate: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async (options) => {
-      // Membership first: the limiter is keyed by organization, so without this
-      // any signed-in user could drain another organization's generation budget.
       await assertOrganizationAccess({
         headers: options.context.headers,
         organizationId: options.input.organizationId,
@@ -2030,7 +2016,6 @@ export const geoRouter = {
       if (!GEO_SAMPLE_DATA_ENABLED) {
         throw notFound();
       }
-      // The demo is already sample data; reseeding would wipe the sandbox.
       assertNotDemo();
       return geoHandler((input) => seedGeoSampleData(input))(options);
     }),
@@ -2040,7 +2025,6 @@ export const geoRouter = {
       if (!GEO_SAMPLE_DATA_ENABLED) {
         throw notFound();
       }
-      // The demo is already sample data; reseeding would wipe the sandbox.
       assertNotDemo();
       return geoHandler((input) => clearGeoSampleData(input))(options);
     }),
@@ -2096,8 +2080,6 @@ export const geoRouter = {
           logError("[GSC] Failed to list sites", error);
           lastError = await toGscErrorMessage(error, "properties");
         }
-        // Listing may have refreshed the access token or flipped the row to
-        // reauth_required, so re-read only on that path.
         refreshed =
           (await getGscIntegration(input.organizationId)) ?? integration;
       }
@@ -2133,8 +2115,6 @@ export const geoRouter = {
             where: eq(projects.id, scope.projectId),
           })
         : null;
-      // A disconnect in flight may still fail its revocation; do not keep
-      // highlighting keywords from an integration that is on its way out.
       return {
         keywords:
           integration && !integration.disconnectingAt
@@ -2223,8 +2203,6 @@ export const geoRouter = {
         try {
           scheduleId = await ensureGscSchedule(selectedIntegration);
         } catch (error) {
-          // The property and its first sync are already committed. Scheduling
-          // remains best-effort and is backfilled by the next manual sync.
           logError(
             "[GSC] Failed to schedule weekly sync after selecting property",
             error
@@ -2287,7 +2265,6 @@ export const geoRouter = {
       }
 
       if (!integration.qstashScheduleId) {
-        // Backfill the weekly schedule if it could not be created earlier.
         await ensureGscSchedule(integration);
       }
 
@@ -2315,9 +2292,6 @@ export const geoRouter = {
             return null;
           }
 
-          // Keep the durable row until Google confirms the grant is revoked.
-          // This request is bounded independently and must finish even if the
-          // Redis lease is lost, so a retry still has the exact token to revoke.
           await assertLockOwned();
           if (!(await revokeGscToken(disconnecting))) {
             const tErrors = await getTranslations("errors.geo");
@@ -2345,8 +2319,6 @@ export const geoRouter = {
             throw serviceUnavailable(tErrors("gscChangedDuringDisconnect"));
           }
 
-          // Catch a schedule create that settled between the first cleanup and
-          // the conditional row deletion. These ids are generation-specific.
           await Promise.all(scheduleIds.map(removeGscSchedule));
           return deleted;
         }

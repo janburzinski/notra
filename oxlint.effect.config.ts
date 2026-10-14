@@ -1,6 +1,5 @@
 import { defineConfig } from "oxlint";
 
-// isolate Effect diagnostics from the monorepo's established lint baseline
 export default defineConfig({
   plugins: ["effecttsgo"],
   options: { typeAware: true },

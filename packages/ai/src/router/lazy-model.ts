@@ -63,12 +63,6 @@ function readBodyText(value: unknown): string {
   }
 }
 
-/**
- * Message plus any response body the SDK attached. The gateway error classes
- * keep an unparsed body on `response` (and the core `APICallError` on
- * `responseBody`), and that is where rejection types like
- * `no_providers_available` live when the body does not fit the SDK's schema.
- */
 function readMessage(error: unknown): string {
   if (typeof error === "string") {
     return error;
@@ -279,7 +273,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
 
   private readonly context: RoutedModelContext;
   private routePromise: Promise<ResolvedRoute> | undefined;
-  /** Set once a `zdr: "preferred"` request has dropped the ZDR flag. */
   private zdrRelaxed = false;
 
   constructor(context: RoutedModelContext) {
@@ -361,7 +354,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     if (!this.routePromise) {
       const promise = this.resolvePrimary();
       this.routePromise = promise;
-      // Do not memoise failures so a later call can retry resolution.
       promise.catch(() => {
         if (this.routePromise === promise) {
           this.routePromise = undefined;
@@ -450,11 +442,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     );
   }
 
-  /**
-   * The caller accepts a non-ZDR route for this model: retry on the same
-   * gateway without the ZDR flag. The gateway is not marked unavailable so
-   * strict requests keep their own behaviour.
-   */
   private relaxZdr(route: ResolvedRoute, error: unknown): ResolvedRoute {
     this.zdrRelaxed = true;
     const decision: RouteDecision = {
@@ -472,9 +459,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     return relaxedRoute;
   }
 
-  // A single 402 marks the shared gateway account exhausted for every request
-  // in this process. Confirm with the gateway's balance endpoint so a spurious
-  // 402 heals within one round-trip instead of blocking traffic for the TTL.
   private verifyExhaustion(gateway: GatewayId): void {
     const adapter = this.context.adapters[gateway];
     if (!adapter) {
@@ -494,11 +478,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       });
   }
 
-  /**
-   * Record a classified upstream failure so later routes avoid the gateway
-   * (or just the model on it) until the mark expires. Returns whether a mark
-   * was recorded — an unmarked failure leaves routing untouched.
-   */
   private recordUpstreamFailure(
     route: ResolvedRoute,
     reason: FallbackReason,
@@ -510,8 +489,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       return true;
     }
     if (reason === "auth-failure") {
-      // A rejected key is a fact about the gateway account, not the model:
-      // mark the whole gateway so later routes avoid it until the TTL heals.
       this.context.credits.markUnavailable(route.decision.gateway, reason);
       this.context.logger.error("ai.router.auth_rejected", {
         gateway: route.decision.gateway,
@@ -522,8 +499,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       return true;
     }
     if (reason === "non-compliant") {
-      // A missing ZDR host is a fact about this model on this gateway, so the
-      // mark is model-scoped: other models keep routing here.
       this.context.credits.markUnavailable(
         route.decision.gateway,
         reason,
@@ -541,11 +516,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     return false;
   }
 
-  /**
-   * The fallback call failed too: classify and record it on the fallback
-   * gateway so later routes avoid it, and normalize rejected credentials to
-   * the same error a route-time failure would produce.
-   */
   private classifyFallbackFailure(
     route: ResolvedRoute,
     error: unknown
@@ -555,8 +525,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       return error;
     }
     if (this.recordUpstreamFailure(route, reason, error)) {
-      // The mark must win over the cached fallback route: drop it so the next
-      // call re-resolves instead of hitting the marked gateway again.
       this.routePromise = undefined;
     }
     if (reason === "auth-failure") {
@@ -578,8 +546,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     }
     const marked = this.recordUpstreamFailure(route, reason, error);
 
-    // Prefer a ZDR-capable route on the other gateway over dropping the
-    // flag; a `preferred` request only relaxes once no such route exists.
     const crossGateway = this.crossGatewayRoute(route, reason, error);
     if (crossGateway) {
       return crossGateway;
@@ -588,13 +554,9 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       return this.relaxZdr(route, error);
     }
     if (marked) {
-      // No usable route survives: the mark must win over the cached route, so
-      // the next call re-resolves instead of hitting the marked gateway.
       this.routePromise = undefined;
     }
     if (reason === "auth-failure") {
-      // No eligible fallback: surface the normalized router error a
-      // route-time auth rejection would throw, not the raw upstream 401.
       throw new GatewayUnavailableError(
         route.decision.gateway,
         "authentication failed"
@@ -676,7 +638,6 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       adapter,
       model: adapter.createModel(decision.requestedModelId),
     };
-    // Subsequent calls on this model instance stay on the fallback gateway.
     this.routePromise = Promise.resolve(fallbackRoute);
     return fallbackRoute;
   }

@@ -34,8 +34,6 @@ function isUnbatchedProcedure(path: readonly string[]) {
   ) {
     return true;
   }
-  // The GitHub catalog talks to GitHub. Keeping it out of the page batch
-  // means a slow GitHub response cannot hold back the saved repositories.
   return path[0] === "github" && path[1] === "app" && path[2] === "catalog";
 }
 

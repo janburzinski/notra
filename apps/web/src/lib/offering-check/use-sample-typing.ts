@@ -12,7 +12,6 @@ import type {
 } from "@/types/offering-check";
 import { getReducedMotionSnapshot } from "@/utils/reduced-motion";
 
-/** Small, repeatable variation so the typing does not tick like a metronome. */
 function keystrokeDelay(character: string, base: number): number {
   const jitter = (character.charCodeAt(0) * 7) % 5;
   const pause = OFFERING_SAMPLE_PAUSE_CHARACTER.test(character)
@@ -21,7 +20,6 @@ function keystrokeDelay(character: string, base: number): number {
   return base + jitter * OFFERING_SAMPLE_TYPING.jitterStepMs + pause;
 }
 
-/** Erases what is there, then types each field in turn with short pauses. */
 function buildFrames(
   from: OfferingSampleValues,
   to: OfferingSampleValues
@@ -64,11 +62,6 @@ function buildFrames(
   return frames;
 }
 
-/**
- * Types a sample into the form like a person would: clears the old text,
- * then fills domain, feature and problem one after another. Returns the
- * field being typed so it can look focused without stealing focus.
- */
 export function useSampleTyping(
   current: OfferingSampleValues,
   apply: (values: OfferingSampleValues) => void
@@ -88,7 +81,6 @@ export function useSampleTyping(
 
   useEffect(() => cancel, []);
 
-  /** Stops typing where it is, e.g. when the visitor types themselves. */
   const stopTyping = () => {
     if (frame.current === null) {
       return;
@@ -98,10 +90,6 @@ export function useSampleTyping(
     setTypingField(null);
   };
 
-  /**
-   * Jumps to the end of a running example and returns its full values, so a
-   * submit mid-animation sends the whole sample instead of half of it.
-   */
   const finishTyping = (): OfferingSampleValues | null => {
     const values = frame.current === null ? null : target.current;
     stopTyping();
@@ -111,8 +99,6 @@ export function useSampleTyping(
     return values;
   };
 
-  // Driven by elapsed time, so slow renders skip characters instead of
-  // stretching the whole animation.
   const typeSample = (sample: OfferingSampleValues) => {
     cancel();
     target.current = sample;

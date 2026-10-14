@@ -31,8 +31,6 @@ const cancelOrphans: SqlStatement = {
   parameters: [],
 };
 
-// Deliveries are the source of truth for outstanding work, so an event only
-// needs to be marked dispatched to become eligible for retention cleanup.
 const markEventsDispatched: SqlStatement = {
   sql: `WITH dispatched AS (
     UPDATE webhook_events SET dispatch_at = NULL WHERE dispatch_at <= now() RETURNING 1
@@ -101,8 +99,6 @@ export const sweep = Effect.fn("webhooks.sweep")(function* () {
     ]);
   let page = yield* decodeRows(DueDeliveryRow, due);
   let queuedDeliveries = 0;
-  // Pages past the transaction only exist during a backlog; queue each page
-  // before reading the next so no sweep caps how much work it submits.
   while (page.length > 0) {
     yield* queues.deliveries(page.map((row) => row.id));
     queuedDeliveries += page.length;

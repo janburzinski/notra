@@ -36,26 +36,13 @@ export const RATE_LIMITS = {
     requests: AGENT_FEEDBACK_RATE_LIMIT_PER_ORGANIZATION,
     window: AGENT_FEEDBACK_RATE_LIMIT_ORGANIZATION_WINDOW_LABEL,
   },
-  // GEO. A scan fans out across every engine for every tracked prompt, so it
-  // is the most expensive thing an API key can trigger; geo-core's
-  // already-running stamp blocks overlap but not a slow drip of runs.
   scanTrigger: { requests: 4, window: "1 hour" },
-  // Matches the dashboard's `geoSequenceRun` limiter exactly.
   sequenceRun: { requests: 10, window: "10 minutes" },
-  // The dashboard caps imports by row count only. These are conservative
-  // per-organization limits for the unattended API surface.
   promptImport: { requests: 10, window: "10 minutes" },
   competitorImport: { requests: 10, window: "10 minutes" },
   competitorSuggestions: { requests: 10, window: "10 minutes" },
-  // Matches the dashboard's `geoWriterPlan` limiter exactly. Planning runs a
-  // model and books AI credits, so it is throttled like the dashboard does it.
   writerPlan: { requests: 10, window: "10 minutes" },
-  // Approving only claims a row and starts a workflow, so it is cheaper than
-  // planning — but it does start a paid generation, so it is not free either.
   writerApprove: { requests: 20, window: "10 minutes" },
-  // The dashboard does not throttle readiness scans at all; it relies on the
-  // feature flag and on geo-core reusing an in-flight scan. An unattended API
-  // key has neither habit, so this is a conservative cap.
   agentReadinessScan: { requests: 10, window: "1 hour" },
 } as const;
 
@@ -169,8 +156,6 @@ export const ratelimit = {
 type RatelimitScope = "credential" | "organization" | "ip";
 
 function getClientIp(c: Context): string {
-  // demo-api runs on Railway, where the first X-Forwarded-For entry is
-  // whatever the client sent.
   if (isDemoMode()) {
     const ip = getRailwayClientIp(c.req.raw.headers);
     return ip ? ipNetworkKey(ip) : "unknown";

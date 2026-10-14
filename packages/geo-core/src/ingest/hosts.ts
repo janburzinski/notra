@@ -32,8 +32,6 @@ function parseCachedHosts(value: unknown): string[] | undefined {
 async function lookupAllowedHosts(
   identity: GeoIngestIdentity
 ): Promise<string[]> {
-  // Legacy organization tokens belong to the oldest project only. Never
-  // accept another project's host and attribute its traffic to the oldest.
   const projectId =
     identity.projectId ??
     (

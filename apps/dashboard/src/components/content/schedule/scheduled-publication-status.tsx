@@ -6,7 +6,6 @@ import { SCHEDULED_PUBLICATION_STATUS_DOTS } from "@/constants/content-calendar"
 import { cn } from "@/lib/utils";
 import type { ScheduledPublicationStatusProps } from "@/types/content/schedule";
 
-/** A destination's status: a colored dot and its label. */
 export function ScheduledPublicationStatus({
   status,
   className,

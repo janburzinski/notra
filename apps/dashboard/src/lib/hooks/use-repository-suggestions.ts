@@ -44,7 +44,6 @@ export function useRepositorySuggestions(
       Boolean(repositoryId ?? siteId) &&
       (base.isPending || selected.isFetching),
     isReady,
-    // A failed or truncated tree scan can miss an existing blog.json.
     isComplete: scanned?.truncated === false,
   };
 }

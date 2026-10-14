@@ -96,9 +96,6 @@ geoSettingsRoutes.openapi(patchSettingsRoute, async (c) => {
       aliases: body.aliases,
       conversionPaths: body.conversionPaths,
       domains: body.domains,
-      // `upsertGeoSettings` always writes an empty competitor array and then
-      // reconciles from `geo_competitors`, so this field is inert. Competitors
-      // are owned by the competitors endpoints.
       competitors: [],
       languages: body.languages,
       engines: body.engines,

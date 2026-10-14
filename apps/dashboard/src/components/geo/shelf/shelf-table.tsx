@@ -49,7 +49,6 @@ import type { GeoShelfRow, GeoShelfTableProps } from "@/types/geo-shelf";
 import { groupShelfCitationEngines } from "@/utils/geo-shelf";
 import { toGeoShelfSortState } from "@/utils/geo-shelf-page";
 
-/** Below `md` the page, citations and presence columns carry the story. */
 const MOBILE_HIDDEN_COLUMN_KEYS: readonly string[] = ["competitors"];
 
 function PageCell({ row }: { row: GeoShelfRow }) {
@@ -124,8 +123,6 @@ function CompetitorsCell({
   const tGeoShared = useTranslations("geo.shared");
   const tStates = useTranslations("common.states");
   if (row.presentCompetitors.length === 0) {
-    // Unchecked competitors are not stored, so "none on the page" needs a
-    // classified placement for every tracked competitor.
     const checkedCount = row.competitorPlacements.filter(
       (placement) => placement.status !== "unknown"
     ).length;
@@ -332,8 +329,6 @@ export function ShelfTable({
       loading={isFetchingNextPage}
       loadingMore={isFetchingNextPage}
       manualSort
-      // The table only re-arms end-of-list after `loading` settles, so it must
-      // not fire during a filter or refetch that `loadMore` would ignore.
       onEndReached={hasNextPage && !isFetching ? onLoadMore : undefined}
       onRowClick={onRowClick}
       onSortChange={(next) => onSortChange(toGeoShelfSortState(next))}

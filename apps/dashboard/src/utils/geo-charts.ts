@@ -139,7 +139,6 @@ export function toShareOfVoiceDonutSlices(
   }));
 }
 
-// Below this a rate would round to "0%" even though the brand showed up.
 const MIN_ROUNDED_RATE_PERCENT = 0.5;
 
 export function formatMentionRate(rate: number): string {
@@ -299,8 +298,6 @@ export function buildMentionTrendRows(
 ): MentionTrend {
   const byDay = new Map<string, Map<string, GeoTimeseriesPoint>>();
   for (const point of points) {
-    // Hover/picker series are provider families (ChatGPT, Claude), not every
-    // model variant — a day can otherwise list a dozen near-duplicate rows.
     const family = engineFamilyOf(point.engine);
     const dayPoints: Map<string, GeoTimeseriesPoint> =
       byDay.get(point.day) ?? new Map();
@@ -819,7 +816,6 @@ export function formatGeoStatDelta(
     return signed && rounded >= 0 ? `+${points}` : points;
   }
   if (kind === "rank") {
-    // A rank going from #40 to #34 reads as six places gained, not "-6".
     const gained = -Math.round(delta);
     if (!signed) {
       return String(Math.abs(gained));

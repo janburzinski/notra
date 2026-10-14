@@ -160,7 +160,6 @@ export function classifyPairChange(
     return { pair, kind: "lost" };
   }
 
-  // Rank only means something where the brand shows up most of the time.
   const from = pair.previous.avgPosition;
   const to = pair.current.avgPosition;
   if (

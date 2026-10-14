@@ -17,13 +17,6 @@ import type {
   SiteEntryMetadata,
 } from "@/types/integrations/site-github-publish";
 
-/**
- * Copies one image into the pull request the same way inline images are
- * copied, and returns the path the site serves it from. Images hosted
- * elsewhere keep their absolute URL; Notra upload URLs that cannot be copied
- * (another organization's, or missing) are dropped instead of leaking a
- * dashboard-only path onto the site.
- */
 async function prepareEntryImage(
   url: string,
   name: string,
@@ -40,8 +33,6 @@ async function prepareEntryImage(
       slug: context.slug,
     });
   } catch (error) {
-    // A deleted or oversized upload costs the post its cover or an avatar,
-    // never the whole publish.
     logError("Skipped a site entry image that could not be copied", error, {
       name,
       organizationId: context.organizationId,
@@ -49,8 +40,6 @@ async function prepareEntryImage(
     return { src: null, assets: [] };
   }
   const src = MARKDOWN_IMAGE_DESTINATION.exec(prepared.markdown.trim())?.[1];
-  // Only root paths and https URLs work in frontmatter: a relative path (a
-  // custom image folder outside public/) would resolve against the post URL.
   const servable =
     src !== undefined &&
     !src.startsWith("/api/") &&
@@ -70,7 +59,6 @@ async function loadAuthors(organizationId: string, authorIds: string[]) {
     .from(contentAuthors)
     .where(contentAuthorsInOrganization(organizationId, authorIds));
   const byId = new Map(rows.map((row) => [row.id, row]));
-  // Keep the order chosen in Notra.
   return authorIds.flatMap((id) => {
     const row = byId.get(id);
     return row ? [row] : [];
@@ -94,7 +82,6 @@ export async function prepareSiteEntryMetadata(
   }
 
   const authors: SiteEntryAuthor[] = [];
-  // Only blog posts credit authors; changelogs would commit unused avatars.
   const authorIds = context.contentType === "blog_post" ? post.authorIds : [];
   for (const row of await loadAuthors(context.organizationId, authorIds)) {
     let avatar: string | null = null;

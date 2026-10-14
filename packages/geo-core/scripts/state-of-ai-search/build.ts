@@ -1,9 +1,3 @@
-/**
- * Aggregates the cached raw answers from `collect.ts` into one JSON report per
- * category under apps/web/src/content/state-of-ai-search. Free to rerun.
- *
- *   bun run packages/geo-core/scripts/state-of-ai-search/build.ts
- */
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -64,9 +58,7 @@ const HIGHLIGHT_MAX_LENGTH = 320;
 const SUMMARY_LEADERS = 5;
 const QUOTE_MIN_LENGTH = 50;
 const QUOTE_MAX_LENGTH = 260;
-/** "Profound, a competitor, calls it…" quotes someone about another brand. */
 const SECONDHAND_CLAIM = /\b(a|another) competitor\b|\bcalls it\b/i;
-/** The leader has to be the subject, not a side note late in the sentence. */
 const QUOTE_SUBJECT_MAX_INDEX = 40;
 const RECOMMENDATION_WORDS =
   /\b(best|top pick|recommend|default|go-to|my pick|strongest|winner|first choice|start with|leading)\b/i;
@@ -120,7 +112,6 @@ async function loadAnswers(category: string): Promise<RawAnswer[]> {
 interface AnalyzedAnswer {
   raw: RawAnswer;
   clean: string;
-  /** Tracked brands in order of first mention. */
   mentioned: ReportBrand[];
 }
 
@@ -181,9 +172,6 @@ function buildRanking(
         list.length
       );
     }
-    // Every brand metric weights each answering engine equally, regardless
-    // of sample count: AI Overview's one answer per prompt counts as much as
-    // an LLM's ten. Means use unrounded engine rates.
     const engineMean = (matches: (answer: AnalyzedAnswer) => boolean) =>
       Math.round(
         (engines.reduce((sum, engine) => {
@@ -231,7 +219,6 @@ function buildPrompts(
       .map(([brand]) => toBrand(brand));
     const firsts = answers.flatMap((answer) => answer.mentioned.slice(0, 1));
     const topPick = mostCommon(firsts, (brand) => brand.name);
-    // One vote per answering engine: its modal first-mentioned brand across samples.
     const engineFirsts = ENGINE_ORDER.flatMap((engine) => {
       const engineAnswers = answers.filter(
         (answer) => answer.raw.engine === engine
@@ -314,9 +301,6 @@ function buildSources(
       counts.set(domain, (counts.get(domain) ?? 0) + 1);
     }
   }
-  // Same weighting as brand visibility: the mean of each engine's citation
-  // rate, so AI Overview's single sample per prompt counts as much as an
-  // engine with ten.
   const answering = ENGINE_ORDER.flatMap((engine) => {
     const list = byEngine.get(engine) ?? [];
     return list.length > 0 ? [list] : [];
@@ -532,7 +516,6 @@ function sentencesOf(text: string): string[] {
     );
 }
 
-/** The first sentence that names each tracked brand, in answer order. */
 function buildHighlights(answer: AnalyzedAnswer) {
   const text =
     answer.raw.engine === "ai-overview" && answer.raw.overview
@@ -707,7 +690,6 @@ async function buildReport(
         prompts.filter((prompt) => prompt.consensus).length,
         prompts.length
       ),
-      // Display rate among checked queries; unqueried prompts are not absences.
       aiOverviewShown: percent(
         overviewShown.size,
         Math.max(1, overviewAnswers.length)
@@ -734,7 +716,6 @@ for (const category of REPORT_CATEGORIES) {
   }
   const dir = join(OUTPUT_ROOT, category.slug);
   await mkdir(dir, { recursive: true });
-  // Minified: the report is a lazy chunk on the site, not a file to diff by hand.
   await writeFile(
     join(dir, `${REPORT_EDITION}.json`),
     `${JSON.stringify(report)}\n`

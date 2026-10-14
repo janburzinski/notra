@@ -20,8 +20,6 @@ export function useArrivedRowIds({
   ready,
   enabled,
 }: ArrivedRowIdsInput): ReadonlyMap<string, number> {
-  // Adjusted during render ("state from previous props") so the render that
-  // shows a new row already marks it.
   const [state, setState] = useState<ArrivedRowIdsState>(() => ({
     viewKey,
     known: new Set(ids),
@@ -30,8 +28,6 @@ export function useArrivedRowIds({
   const isNewView = state.viewKey !== viewKey;
   const fresh = ids.filter((id) => !state.known.has(id));
   if (ready && (isNewView || fresh.length > 0)) {
-    // The stagger slot is fixed when a row arrives, so a later batch neither
-    // cuts off nor re-times the animations still running.
     setState({
       viewKey,
       known: new Set([...(isNewView ? [] : state.known), ...ids]),
@@ -45,8 +41,6 @@ export function useArrivedRowIds({
     });
   }
   const { arrived } = state;
-  // A row scrolled out and back would replay its arrival, so the marks come
-  // off once the newest animation is over.
   useEffect(() => {
     if (arrived.size === 0) {
       return;

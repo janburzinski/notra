@@ -173,7 +173,6 @@ const CASES: EvalCase<FeedbackInput, FeedbackExpected>[] = ROWS.map(
   })
 );
 
-/** Same prompt as packages/ai/src/jobs/feedback-classifier.ts buildPrompt. */
 function buildPrompt(input: FeedbackInput): string {
   return [
     input.title ? `Title: ${input.title}` : null,

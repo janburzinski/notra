@@ -18,7 +18,6 @@ function readScope(body: unknown): OfferingRateLimitScope {
   return scope === "site" || scope === "busy" ? scope : "visitor";
 }
 
-/** Maps a failed API response to what the visitor should be told. */
 export async function failureStatusFor(
   response: Response | null
 ): Promise<OfferingFailureStatus> {

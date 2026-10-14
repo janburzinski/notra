@@ -331,7 +331,6 @@ export function LandingPricingSection({
       <section
         className={cn(
           "flex w-full flex-col items-center gap-13.5 px-6 pb-24",
-          // Without its own header the section sits right under the page hero.
           showHeader ? "pt-24" : "pt-6"
         )}
         id="pricing"

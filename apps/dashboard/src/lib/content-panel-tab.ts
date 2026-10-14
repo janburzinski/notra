@@ -5,13 +5,8 @@ import { useSyncExternalStore } from "react";
 import { localStorageKeys } from "@/constants/storage";
 import type { ContentPanelTab } from "@/types/content/overview";
 
-// The header button and the floating composer live outside the panel, so the
-// panel's tab and whether the current post has an overview are a tiny
-// global store.
 let activeTab: ContentPanelTab = "overview";
 let hasOverview = false;
-// Each tab's header is its own subtree, so keyboard focus has to be handed
-// to the new header after it mounts.
 let focusRequested = false;
 const listeners = new Set<() => void>();
 

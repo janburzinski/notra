@@ -22,7 +22,6 @@ interface TitleInput {
 }
 
 interface TitleExpected {
-  /** At least one must appear with this exact spelling. */
   mustInclude: string[];
 }
 
@@ -151,7 +150,6 @@ const CASES: EvalCase<TitleInput, TitleExpected>[] = [
   },
 ];
 
-/** Same prompt text as packages/ai/src/jobs/collection-title.ts. */
 function buildPromptText(input: TitleInput): string {
   const summaries = input.posts.map((post, index) =>
     [`Post ${index + 1} (${post.type}): ${post.title}`, post.excerpt].join("\n")

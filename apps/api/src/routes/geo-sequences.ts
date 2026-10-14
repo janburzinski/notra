@@ -236,9 +236,6 @@ geoSequencesRoutes.openapi(runSequenceRoute, async (c) => {
     );
   }
 
-  // Charged immediately before the remote run. Project ownership and service
-  // availability have already been established; the canonical sequence lookup
-  // happens in `runGeoSequenceNow` inside the internal endpoint.
   const rateLimited = await enforceRatelimit(
     c,
     ratelimit.sequenceRun,
@@ -248,13 +245,6 @@ geoSequencesRoutes.openapi(runSequenceRoute, async (c) => {
     return rateLimited;
   }
 
-  // Synchronous by necessity: there is no GEO sequence workflow to hand off
-  // to, so the dashboard runs the sequence to completion and we relay its real
-  // result. Returning 202 with a made-up run id — as this route used to — named
-  // nothing a client could poll.
-  //
-  // TODO(Phase 6 — durable workflow): once the sequence run is a durable
-  // workflow, hand off and return a real run id plus a status endpoint.
   const outcome = await runConfiguredRemoteGeoEffect(
     GEO_REMOTE_SEQUENCE_RUN,
     url,

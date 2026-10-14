@@ -28,8 +28,6 @@ export const saveGitHubRepositorySelection = Effect.fn(
   Effect.tryPromise({
     try: () =>
       db.transaction(async (tx) => {
-        // Serialize selection changes for this organization, including saves
-        // where no repository records exist yet.
         await tx
           .select({ id: organizations.id })
           .from(organizations)

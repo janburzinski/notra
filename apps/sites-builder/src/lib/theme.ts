@@ -19,7 +19,6 @@ export function themeStyle(): string {
     `--primary-button: ${button}`,
     `--primary-foreground: ${readableOn(button)}`,
   ];
-  // Light-only values, so a light page color never leaks into dark mode.
   const light: string[] = [];
   const dark: string[] = [];
   root.push(...layoutWidths());
@@ -32,9 +31,6 @@ export function themeStyle(): string {
   if (darkImage && darkImage !== lightImage) {
     dark.push(`--page-image: url(${JSON.stringify(darkImage)})`);
   }
-  // Surfaces mix from --background, so it, --card and --muted follow the
-  // page color in both modes. They go through --notra-* so a site's own
-  // :root values for those tokens still win (see global.css).
   if (background.color?.light) {
     light.push(
       `--page-background: ${background.color.light}`,

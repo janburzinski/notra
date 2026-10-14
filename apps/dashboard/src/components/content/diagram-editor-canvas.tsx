@@ -12,7 +12,6 @@ import { DIAGRAM_EDITOR_VIEWPORT_ZOOM } from "@/constants/diagram-editor";
 import type { DiagramEditorCanvasProps } from "@/types/components/diagram-editor";
 import { waitForDiagramFonts } from "@/utils/diagram-editor-fonts";
 
-// Loaded only through lazyComponent: Excalidraw is client-only and large.
 export default function DiagramEditorCanvas({
   scene,
   onReady,
@@ -22,8 +21,6 @@ export default function DiagramEditorCanvas({
   const [sceneLoaded, setSceneLoaded] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const reportReady = useEffectEvent(onReady);
-  // The scene is JSON from our API; restoreElements is Excalidraw's own
-  // validator and fills in anything an older scene is missing.
   const [elements] = useState(() =>
     restoreElements(
       scene.elements as unknown as ImportedDataState["elements"],
@@ -40,8 +37,6 @@ export default function DiagramEditorCanvas({
     let cancelled = false;
     let frame: number | undefined;
 
-    // The API arrives in Excalidraw's constructor, before scene/font loading.
-    // Its first non-loading change is the safe point to await the scene fonts.
     waitForDiagramFonts().then(() => {
       if (cancelled) {
         return;
@@ -52,7 +47,6 @@ export default function DiagramEditorCanvas({
         maxZoom: 1,
         animate: false,
       });
-      // Excalidraw paints the fitted canvas on the next animation frame.
       frame = requestAnimationFrame(() => {
         frame = requestAnimationFrame(() => {
           setRevealed(true);
@@ -105,7 +99,6 @@ export default function DiagramEditorCanvas({
               loadScene: false,
               saveToActiveFile: false,
             },
-            // Notra cannot render images in a diagram; they would be dropped on save.
             tools: { image: false },
           }}
         />

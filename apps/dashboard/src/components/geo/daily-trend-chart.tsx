@@ -14,7 +14,6 @@ import { formatChartInteger } from "@/utils/geo-charts";
 
 const DAILY_TREND_SERIES_KEY = "value";
 
-/** Per-day bars with labelled axes, for the source and page drawers. */
 export function DailyTrendChart({ points, label }: DailyTrendChartProps) {
   const locale = useLocale();
   const config = useMemo<ChartConfig>(
@@ -34,7 +33,6 @@ export function DailyTrendChart({ points, label }: DailyTrendChartProps) {
       })),
     [locale, points]
   );
-  // Today is still filling up, so its bar is drawn as a buffer.
   const incompleteTail = points.at(-1)?.day === todayIsoDate();
 
   return (

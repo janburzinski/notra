@@ -18,8 +18,6 @@ import { CONTENT_LIST_VIEWS } from "@/constants/content-collections";
 import type { ContentListPageClientProps } from "@/types/content/collection";
 import dynamic from "@/utils/lazy-component";
 
-// Days, "today" and times depend on the browser's time zone, so the
-// calendar renders on the client only.
 const ContentCalendarView = dynamic(
   () =>
     import("@/components/content/calendar/content-calendar-view").then(
@@ -49,7 +47,6 @@ export default function PageClient({
       .withOptions({ clearOnDefault: true })
   );
   const [, setCalendarDate] = useQueryState(CONTENT_CALENDAR_DATE_PARAM);
-  // The calendar renders its month navigation into the end of the tab row.
   const [tabRowEnd, setTabRowEnd] = useState<HTMLDivElement | null>(null);
 
   return (
@@ -73,7 +70,6 @@ export default function PageClient({
                 (option) => option === value
               );
               void setView(next ?? "list");
-              // Coming back to the calendar starts at the current month.
               void setCalendarDate(null);
             }}
             value={view}

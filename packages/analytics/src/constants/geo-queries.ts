@@ -2,7 +2,6 @@ import { p } from "@tinybirdco/sdk";
 
 import { TRAILING_DAYS_PARAM } from "./analytics-params";
 
-// Shared project scope and date-window plumbing for GEO traffic endpoints.
 export const GEO_PROJECT_SCOPE_PARAMS = {
   project_id: p
     .string()

@@ -10,7 +10,6 @@ const realErrorCodes = realLibheif.heif_error_code;
 const RealImage = realLibheif.HeifImage;
 const primary = mock(realPrimary);
 
-// Model a HEIC container whose coded dimensions are larger than its compact byte representation.
 function box(type: string, payload: Buffer): Buffer {
   const header = Buffer.alloc(8);
   header.writeUInt32BE(payload.length + 8);
@@ -18,7 +17,6 @@ function box(type: string, payload: Buffer): Buffer {
   return Buffer.concat([header, payload]);
 }
 
-// Build metadata that must fail before the native HEIF decoder is invoked.
 function oversizedHeic(): Buffer {
   const dimensions = Buffer.alloc(12);
   dimensions.writeUInt32BE(100_000, 4);
@@ -35,11 +33,9 @@ function oversizedHeic(): Buffer {
   ]);
 }
 
-// Observe native context disposal when malformed files fail to parse.
 const freed = mock(
   (_value: Parameters<HeicDecoder["heif_context_free"]>[0]) => undefined
 );
-// Simulate the pre-handle parsing exception that leaked in heic-decode.
 const parse = mock(
   (
     value: Parameters<HeicDecoder["heif_context_read_from_memory"]>[0],
@@ -48,12 +44,8 @@ const parse = mock(
     throw new Error("malformed item");
   }
 );
-// Track whether oversized metadata is rejected before native context allocation.
-// Emulate the actual Embind context object rather than the old numeric mock.
 const context = { $$: { ptr: 123 } };
-// Observe context allocation after valid-size metadata passes preflight.
 const alloc = mock(() => context);
-// Assert the raw WASM setter receives a pointer and the correct square-root bound.
 const limit = mock((_pointer: number, _maximumWidth: number) => undefined);
 
 mock.module("@tanstack/react-start/server-only", () => ({}));

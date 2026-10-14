@@ -4,7 +4,6 @@ import { useFormatRelative } from "@/lib/hooks/use-format-relative";
 import type { GeoScanActivityStatusProps } from "@/types/geo-scan-activity";
 import { hasScanActivityStatus } from "@/utils/geo-scan-activity";
 
-/** One-line note above the answers when the last scan stopped early. */
 export function ScanActivityStatus({ run }: GeoScanActivityStatusProps) {
   const t = useTranslations("geo.scanActivityStatus");
   const formatRelative = useFormatRelative();

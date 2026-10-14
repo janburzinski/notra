@@ -45,7 +45,6 @@ export function createAnalyticsUiRoutes(parent: AnyRoute) {
       pendingComponent: Loading,
       preload: AccountDetailView.preload,
       component: ({ params }) => {
-        // The router already decodes path params.
         const handle = params.handle;
         return (
           <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">

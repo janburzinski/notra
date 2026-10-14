@@ -46,7 +46,6 @@ export async function listSyncableAccounts(
   organizationId?: string
 ): Promise<SyncableSocialAccount[]> {
   "use step";
-  // Demo accounts are fictional and their stats are generated at read time.
   if (!isTinybirdConfigured() || isDemoMode()) {
     return [];
   }

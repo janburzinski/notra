@@ -27,10 +27,6 @@ function accountLabel(account: ConnectedAccount) {
   return `${account.displayName} · @${account.username}`;
 }
 
-/**
- * One opt-in destination of the "Where" list: its mark and hint, a switch,
- * and below them its settings, indented under the name.
- */
 function DestinationToggleRow({
   destination,
   socialPlatform,
@@ -182,7 +178,6 @@ function ScheduleSocialDestination({
   );
 }
 
-/** The "Where" section: Notra always, plus the destinations this type has. */
 export function ScheduleWhereSection({
   destinations,
   form,
@@ -195,7 +190,6 @@ export function ScheduleWhereSection({
     <section className="space-y-3">
       <h3 className="text-sm font-medium">{t("where")}</h3>
       <ul className="bg-card ring-foreground/10 divide-border divide-y rounded-xl ring-1">
-        {/* Notra always publishes; the rest are opt-in. */}
         <li className="flex min-h-11 items-center justify-between gap-4 px-3 py-2.5">
           <ScheduleDestinationMark destination="notra" socialPlatform={null} />
           <span className="text-muted-foreground text-xs">{t("always")}</span>

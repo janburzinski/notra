@@ -15,12 +15,6 @@ const COPIED_RESET_MS = 1400;
 const SWOOSH_PX = 8;
 const INSTANT = { duration: 0 } as const;
 
-/**
- * Confirms the copy in the control itself instead of a toast: the prompt
- * swooshes out the top, "Copied" comes up from below. An invisible copy of the
- * prompt keeps the box at its original width so the header never reflows.
- * Long prompts truncate to one line; the full text is in the tooltip.
- */
 export function PromptCopyButton({ prompt }: PromptCopyButtonProps) {
   const t = useTranslations("geo.promptCopyButton");
   const tGeoShared = useTranslations("geo.shared");
@@ -50,12 +44,6 @@ export function PromptCopyButton({ prompt }: PromptCopyButtonProps) {
         >
           {prompt}
         </span>
-        {/*
-         * No `popLayout`: it takes the leaving label out of flow with
-         * `position: absolute`, which on the first swap lands it outside the
-         * button. Both labels already share one grid cell, so they overlap on
-         * their own.
-         */}
         <AnimatePresence initial={false}>
           <motion.span
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

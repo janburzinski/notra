@@ -5,7 +5,6 @@ import { Input } from "@notra/ui/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { TimeFieldProps } from "@/types/components/date-field";
 
-/** A local time of day, without the browser's own picker icon. */
 export function TimeField({
   id,
   value,

@@ -27,7 +27,6 @@ interface RouterExpected {
 
 type Row = [string, RouterExpected["complexity"], boolean, boolean, boolean?];
 
-// [message, complexity, requiresTools, reasoningHeavy, hasIntegrationContext]
 const ROWS: Row[] = [
   [
     "Write a changelog for everything we shipped this week",

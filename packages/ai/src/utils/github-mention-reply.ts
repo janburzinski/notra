@@ -182,8 +182,6 @@ export function findGitHubMentionReplyAnchor(
         lastAdded = newLine;
         newLine += 1;
       } else if (line.startsWith("-")) {
-        // The line before the removed text always exists; the one after may not
-        // (deletion at the end of the file).
         deletionAt ??= Math.max(newLine - 1, 1);
       } else if (line.startsWith(" ")) {
         newLine += 1;
@@ -199,7 +197,6 @@ export function findGitHubMentionReplyAnchor(
   return null;
 }
 
-/** A closing offer ("Want me to ...?") reads better below the diff than above it. */
 function splitFollowUpQuestion(text: string) {
   const paragraphs = text.trim().split(/\n{2,}/);
   const last = paragraphs.at(-1) ?? "";

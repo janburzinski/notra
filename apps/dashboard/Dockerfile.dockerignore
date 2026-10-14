@@ -1,4 +1,3 @@
-# Build context is the monorepo root (overrides the API-focused .dockerignore).
 .git
 node_modules
 **/node_modules

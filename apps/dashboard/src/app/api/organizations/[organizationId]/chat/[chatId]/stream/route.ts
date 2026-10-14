@@ -71,8 +71,6 @@ export async function GET(request: Request, { params }: RouteContext) {
   }
 
   const activeStreamId = await getActiveChatStream(organizationId, safeChatId);
-  // Reconnect to the same generation even after its lease has been released.
-  // Its terminal chunk may be in history while a newer generation is active.
   const streamId = resume.data.streamId ?? activeStreamId;
 
   if (!streamId) {
@@ -112,8 +110,6 @@ export async function GET(request: Request, { params }: RouteContext) {
         controller.close();
       };
 
-      // This is a connection deadline, not the end of generation. Leave the
-      // active stream and history intact so the client can resume it.
       timeout = setTimeout(close, CHAT_STREAM_MAX_LIFETIME_MS);
       request.signal.addEventListener("abort", close, { once: true });
       removeAbortListener = () =>
@@ -146,8 +142,6 @@ export async function GET(request: Request, { params }: RouteContext) {
           }
         };
 
-        // Subscribe first, then replay history and deduplicate the overlap by
-        // Redis stream ID. A finish arriving during history() must not be lost.
         unsubscribe = await channel.subscribe({
           events: ["ai.chunk"],
           onData: (message) => {
@@ -169,8 +163,6 @@ export async function GET(request: Request, { params }: RouteContext) {
           return;
         }
         const [resumeId, resumeIndex] = resume.data.cursor?.split(":") ?? [];
-        // Start at the cursor's timestamp instead of the oldest retained item.
-        // A full page may still contain the terminal chunk needed to resume.
         const history = await channel.history({
           start: resumeId ? Number(resumeId.split("-")[0]) : undefined,
           limit: CHAT_STREAM_HISTORY_LIMIT,
@@ -186,8 +178,6 @@ export async function GET(request: Request, { params }: RouteContext) {
         ) {
           throw new Error("Chat replay cursor is no longer available");
         }
-        // A pending finish alone cannot prove continuity after a full page.
-        // Require an ID seen in both history and the subscription.
         const replayHistory = history.slice(resumePosition);
         if (
           resumeId &&

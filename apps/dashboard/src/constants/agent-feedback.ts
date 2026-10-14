@@ -31,7 +31,6 @@ export const AGENT_FEEDBACK_PACKAGE_ENTRY = `${AGENT_FEEDBACK_PACKAGE}/feedback`
 export const AGENT_FEEDBACK_DEFAULT_STATUS_FILTER: AgentFeedbackStatusFilter =
   "open";
 
-/** Tab order on the feedback page. `statuses` is undefined for "all". */
 export const AGENT_FEEDBACK_STATUS_FILTERS: {
   value: AgentFeedbackStatusFilter;
   statuses?: readonly AgentFeedbackStatus[];
@@ -141,7 +140,6 @@ export const AGENT_FEEDBACK_CLIENT_BRAND_RULES: readonly AgentFeedbackClientBran
     { brand: "gemini", aliases: ["gemini"] },
   ];
 
-/** Words that don't title-case cleanly when formatting slug client names. */
 export const AGENT_FEEDBACK_CLIENT_WORD_LABELS: Record<string, string> = {
   ai: "AI",
   api: "API",

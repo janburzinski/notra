@@ -8,10 +8,8 @@ const IPV4_BITS = 32;
 const IPV6_BITS = 128;
 const HEXTET_BITS = 16n;
 const HEXTET_MASK = 0xff_ffn;
-/** ::ffff:0:0/96 shifted right by 32 bits. */
 const IPV4_MAPPED_PREFIX = 0xff_ffn;
 const IPV4_MASK = 0xff_ff_ff_ffn;
-/** One IPv6 /64 is one subscriber network; hosts inside it are free to pick. */
 const IPV6_NETWORK_HEXTETS = 4;
 
 function parseIpv4(raw: string): bigint | null {

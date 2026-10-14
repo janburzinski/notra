@@ -1,8 +1,6 @@
 import { TRAFFIC_REPORT_TIMEOUT_MS } from "../constants/traffic";
 import type { IngestPost } from "../types/traffic";
 
-// Reporting never fails the page: errors are logged and dropped. A 401 means
-// the site's traffic token was rotated, which is expected and not logged.
 export async function postToIngest(post: IngestPost): Promise<void> {
   try {
     const response = await post.fetch(post.ingestUrl, {

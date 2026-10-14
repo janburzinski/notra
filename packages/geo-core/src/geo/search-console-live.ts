@@ -16,8 +16,6 @@ export const geoSearchConsoleLive = Layer.effect(
   GeoSearchConsoleService,
   Effect.sync(() =>
     GeoSearchConsoleService.of({
-      // The shared Google integration currently accepts no AbortSignal on this method.
-      // It owns token refresh/reauth stamping; interruption cannot cancel that SDK boundary.
       topQueries: Effect.fn("GeoSearchConsole.topQueries")(
         (integration, siteUrl) =>
           Effect.tryPromise({

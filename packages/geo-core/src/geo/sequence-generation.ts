@@ -179,8 +179,6 @@ export const generateGeoSequences = Effect.fn("geo.sequencesGenerate")(
       companyName,
       companyDescription: brand?.companyDescription ?? null,
       audience: brand?.audience ?? null,
-      // Scans label conversation turns with the prompt language, so the steps
-      // must be written in it rather than in the brand identity's language.
       language: settings?.promptLanguage ?? DEFAULT_LANGUAGE,
       competitors: competitors.competitors.map((row) => row.name),
       prompts: prompts.map((row) => row.prompt),
@@ -229,9 +227,6 @@ export const generateGeoSequences = Effect.fn("geo.sequencesGenerate")(
       );
     }
 
-    // The capacity check above happened before a slow model call, so recount
-    // under the project lock: two generations in flight would otherwise both
-    // read the same room and push the project past the limit.
     const rows = yield* geoDb("sequences insert failed", () =>
       db.transaction(async (tx) => {
         await Effect.runPromise(lockGeoProject(tx, scope.projectId));

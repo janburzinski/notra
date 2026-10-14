@@ -89,11 +89,6 @@ export function authorNamesOf(entry: BlogEntry | ChangelogEntry): string[] {
     : [];
 }
 
-/**
- * Every author with a page: the blog.json authors plus authors that only
- * exist in frontmatter with an `id`. Entries come newest first, so the newest
- * post's details win, older posts fill the gaps and blog.json wins over both.
- */
 export function allAuthors(entries: BlogEntry[]): ResolvedAuthor[] {
   const inline = new Map<string, AuthorFields>();
   for (const entry of entries) {

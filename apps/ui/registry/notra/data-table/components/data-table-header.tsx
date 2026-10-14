@@ -18,8 +18,6 @@ import { useDataTableLabels } from "./data-table-labels";
 
 const HINT_ICON_PX_SIZE = 13;
 
-/** Header text plus its info icon. The icon is decoration: the element around
- * it is the tooltip trigger, so a sortable header stays a single button. */
 function HeaderLabel<T>({ column }: { column: TableColumn<T> }) {
   if (!column.hint) {
     return <span className="whitespace-nowrap">{column.header}</span>;
@@ -36,8 +34,6 @@ function HeaderLabel<T>({ column }: { column: TableColumn<T> }) {
   );
 }
 
-/** Wraps the header's own button/span as the tooltip trigger, so the hint
- * never adds a nested button or a second tab stop. */
 function WithHeaderHint<T>({
   column,
   children,

@@ -6,7 +6,6 @@ import {
 } from "@/constants/offering-check";
 import type { OfferingMarkdownNode } from "@/types/offering-check";
 
-/** Drops the inline `([site](url))` citations; sources are shown separately. */
 export function stripAnswerCitations(text: string): string {
   return text.replace(OFFERING_MARKDOWN_CITATION_PATTERN, "").trim();
 }

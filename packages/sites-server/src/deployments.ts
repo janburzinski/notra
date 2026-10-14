@@ -237,7 +237,6 @@ export async function startDeploymentBuild(
     if (!organizationId) {
       return false;
     }
-    // Match enqueue's site -> budget -> deployment lock order.
     const [site] = await tx
       .select()
       .from(sites)

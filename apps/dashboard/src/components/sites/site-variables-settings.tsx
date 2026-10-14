@@ -35,7 +35,6 @@ function useSiteConfigDocument() {
   );
 }
 
-/** Number of variables in blog.json, or null while loading or when it can't be read. */
 export function useSiteVariablesCount(): number | null {
   const query = useSiteConfigDocument();
   if (!query.data) {
@@ -112,7 +111,6 @@ function SiteVariablesForm({ document }: SiteVariablesFormProps) {
   };
   const [rows, setRows] = useState<SiteVariableRow[]>(initialRows);
   const [error, setError] = useState<string | null>(null);
-  // A row with neither name nor value is a blank slot, not a variable.
   const filled = rows.filter((row) => row.name.trim() || row.value);
   const dirty =
     JSON.stringify(filled.map(({ name, value }) => [name.trim(), value])) !==

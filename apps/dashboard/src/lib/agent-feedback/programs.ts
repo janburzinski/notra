@@ -71,8 +71,6 @@ export const listAgentFeedback = Effect.fn("agentFeedback.list")(function* (
     }
   }
 
-  // Counts drive the status tabs, which only read the first page, so later
-  // pages skip the aggregate. Both queries run concurrently.
   const [rows, counts] = yield* Effect.all(
     [
       agentFeedbackDb("list", () =>

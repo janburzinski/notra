@@ -24,11 +24,6 @@ import {
 import type { CompetitorSuggestionsTableProps } from "@/types/geo";
 import type { GeoCompetitorSuggestion } from "@/types/geo-competitors";
 
-/**
- * Brands the assistants keep naming that you don't track yet, laid out like
- * the tracked table above it. Tracking one adds it to share of voice;
- * dismissing hides it for good.
- */
 export function CompetitorSuggestionsTable({
   suggestions,
   competitors,

@@ -23,13 +23,6 @@ import { invalidateGeoScanResultQueries } from "@/utils/geo-scan-results";
 
 const GeoLiveContext = createContext(false);
 
-/**
- * Subscribes the GEO pages to `geo:{orgId}`. Ingest announces new AI traffic
- * once Tinybird can serve it, and scans announce start, every persisted batch
- * and completion, so traffic and visibility refetch within seconds. Polling
- * hooks read `useGeoLive()` and fall back to their short intervals only while
- * the stream is down.
- */
 export function GeoLiveProvider({
   organizationId,
   children,
@@ -90,8 +83,6 @@ export function GeoLiveProvider({
     },
   });
 
-  // Adjusted during render ("state from previous props"): every attempt is a
-  // connecting → disconnected/error transition, a success resets the count.
   const [previousStatus, setPreviousStatus] = useState(status);
   if (status !== previousStatus) {
     setPreviousStatus(status);
@@ -106,7 +97,6 @@ export function GeoLiveProvider({
     if (!paused) {
       return;
     }
-    // Polling keeps the page current meanwhile (the stream counts as down).
     const resume = setTimeout(
       () => setFailedConnects(0),
       GEO_LIVE_PAUSE_AFTER_FAILURES_MS
@@ -121,7 +111,6 @@ export function GeoLiveProvider({
   );
 }
 
-/** True while GEO live updates stream in; polling can back off. */
 export function useGeoLive(): boolean {
   return useContext(GeoLiveContext);
 }

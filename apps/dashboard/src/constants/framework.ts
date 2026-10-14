@@ -6,21 +6,14 @@ export const DASHBOARD_SECURITY_HEADERS = {
   "X-DNS-Prefetch-Control": "on",
 };
 
-/**
- * Routes that need longer than the project's default function timeout (600 s).
- * Nitro builds a full copy of the server for every rule, so shorter caps are
- * left to the default rather than costing a copy each.
- */
 export const DASHBOARD_FUNCTION_RULES = {
   "/api/organizations/*/chat": { maxDuration: 1800 },
   "/api/organizations/*/dashboard-agent/chat": { maxDuration: 1800 },
   "/api/organizations/*/agent/**": { maxDuration: 800 },
 };
 
-/** Quiet period after a dev workflow build before its esbuild service is stopped. */
 export const WORKFLOW_ESBUILD_IDLE_STOP_MS = 5000;
 
-/** Virtual dev handlers @workflow/nitro registers for its generated bundles. */
 export const WORKFLOW_DEV_HANDLER_IDS = [
   "#workflow/steps.mjs",
   "#workflow/workflows.mjs",
@@ -30,7 +23,6 @@ export const WORKFLOW_DEV_HANDLER_IDS = [
 export const WORKFLOW_DEV_REQUIRE_BANNER =
   'import { createRequire as __notraCreateRequire } from "node:module";\nconst require = __notraCreateRequire(import.meta.url);\n';
 
-/** Files under Nitro's build dir that the dev workflow builder writes. */
 export const WORKFLOW_DEV_OUTPUT_PATTERN = /[\\/]\.nitro[\\/]workflow[\\/]/;
 
 export const WORKFLOW_DEV_DYNAMIC_IMPORT = "import(/* @vite-ignore */ ";
@@ -45,14 +37,6 @@ export const SOURCE_MAPPING_URL_COMMENT = /\/\/# sourceMappingURL=\S+\s*$/;
 
 export const ORGANIZATION_COOKIE_SLUG_PATTERN = /^[a-z0-9-]+$/;
 
-/**
- * Packages only server code imports. The client's dependency scan starts at
- * the router and follows route loaders into server-function handlers, which
- * the Start compiler strips from the browser build, so without this list the
- * dev server pre-bundles these SDKs for the browser on every cold start. A
- * server package missing here is only bundled needlessly; never list one the
- * browser imports (it would be served unbundled).
- */
 export const SERVER_ONLY_PACKAGES = [
   "@ai-sdk/anthropic",
   "@ai-sdk/code-mode",

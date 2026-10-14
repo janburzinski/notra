@@ -47,8 +47,6 @@ export function GeoStatDelta({
       {displayedValue}
     </TrendBadge>
   );
-  // The whole badge swaps, background included, so tone changes never blend
-  // green into red mid-transition.
   const content = animated ? (
     <FadeSwap swapKey={`${tone}:${formatted}`} value={delta}>
       {staticContent}

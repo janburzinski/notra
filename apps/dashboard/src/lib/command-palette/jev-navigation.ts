@@ -63,7 +63,6 @@ export async function resolveNavigationWithJev({
   }
 
   const { choice, probabilities } = result.answers.destination;
-  // Unsure or unreported picks, chat included, go to the LLM fallback.
   const confidence = probabilities?.[choice] ?? result.confidence.destination;
   if (
     confidence === undefined ||

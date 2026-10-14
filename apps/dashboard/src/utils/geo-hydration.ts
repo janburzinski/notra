@@ -60,8 +60,6 @@ export function geoProjectRepairPath(
   return `/${encodeURIComponent(slug)}${basePath}${suffix ? `?${suffix}` : ""}`;
 }
 
-// Project ids are generated tokens; anything else (e.g. a NUL byte, which
-// Postgres rejects with an error that quotes the SQL) is not a project.
 const PROJECT_ID = /^[\w-]+$/;
 
 export function normalizeGeoProjectId(
@@ -94,7 +92,6 @@ export function geoHydrationInputs(
     activeTab,
     settings: geoSettingsQueryInput(scope),
     overview: windowed,
-    // Same shape as `overview`; kept separate so the query keys stay explicit.
     timeseries: windowed,
     promptResultSummaries: windowed,
     competitorShare: windowed,

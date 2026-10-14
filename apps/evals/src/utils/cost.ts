@@ -6,7 +6,6 @@ import type {
   UsageLike,
 } from "../types/eval";
 
-/** Gateway response cost alone excludes BYOK inference; require a verified total. */
 export function readGatewayCost(metadata: unknown): number | undefined {
   const route = (
     metadata as
@@ -40,7 +39,6 @@ export function estimateCost(
   ) {
     return undefined;
   }
-  // Same list-price approximation as before: cache reads at 10% of input price.
   const cost =
     (inputTokens - cached) * price.input +
     cached * price.input * 0.1 +
@@ -48,7 +46,6 @@ export function estimateCost(
   return Number.isFinite(cost) ? cost : undefined;
 }
 
-/** Estimate only missing steps, never replace a reported subtotal. */
 export function summarizeCosts(
   steps: readonly EvalCostStep[],
   price?: ModelPrice
@@ -101,7 +98,6 @@ export function hasKnownCost(
   );
 }
 
-/** Combine saved call costs without presenting known subtotals as a total. */
 export function aggregateCosts(costs: readonly Partial<EvalCost>[]): EvalCost {
   let reportedCostUsd = 0;
   let estimatedCostUsd = 0;
@@ -115,7 +111,6 @@ export function aggregateCosts(costs: readonly Partial<EvalCost>[]): EvalCost {
       estimatedCostUsd += cost.estimatedCostUsd ?? 0;
       continue;
     }
-    // Legacy runs predate provenance; don't assert their costs were reported.
     const source = cost.costSource ?? "estimated";
     reported ||= source === "reported" || source === "mixed";
     estimated ||= source === "estimated" || source === "mixed";

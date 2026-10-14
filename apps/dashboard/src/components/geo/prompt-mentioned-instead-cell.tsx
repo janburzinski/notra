@@ -12,17 +12,12 @@ import { useTranslations } from "use-intl";
 import { CompetitorLogo } from "@/components/geo/competitor-logo";
 import type { GeoPromptBrandCount } from "@/types/geo";
 
-/**
- * Who the engines named instead of you on one prompt: the top brands with
- * their logos, the full ranking with answer counts on hover.
- */
 export function PromptMentionedInsteadCell({
   brands,
   answers,
   competitors,
 }: {
   brands: readonly GeoPromptBrandCount[];
-  /** Answers the counts are out of. */
   answers: number;
   competitors: readonly GeoCompetitor[] | undefined;
 }) {

@@ -200,8 +200,6 @@ integrationsRoutes.openapi(createGitHubIntegrationRoute, async (c) => {
     throw duplicateCheck.failure;
   }
 
-  // Charged immediately before the GitHub round-trip and the write: the 404
-  // and 409 above must not spend the caller's budget.
   const rateLimited = await enforceRatelimit(c, ratelimit.integrationCreate);
   if (rateLimited) {
     return rateLimited;

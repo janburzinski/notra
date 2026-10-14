@@ -49,7 +49,6 @@ export const onboardingRouter = {
         searchByName: input.searchByName,
       };
 
-      // Cached logos cost nothing upstream and do not consume the user's budget.
       const cached = await readCachedCompanyLogo(cacheKeyInput);
       if (cached) {
         return cached;
@@ -83,8 +82,6 @@ export const onboardingRouter = {
           };
         }
       } catch {
-        // Failures and timeouts are cached as unresolved (short TTL) so every
-        // page view does not wait on the same slow lookup again.
         result = {
           domain: input.searchByName ? null : input.query,
           url: null,
@@ -122,9 +119,6 @@ export const onboardingRouter = {
         user: context.user,
       });
 
-      // Mounted by the sidebar on every page: one round trip instead of five.
-      // Columns in a single-table select render unqualified, so the subqueries
-      // bind the organization id as a parameter instead of correlating.
       const organizationId = input.organizationId;
       const [org] = await db
         .select({

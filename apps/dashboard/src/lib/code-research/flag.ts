@@ -37,7 +37,6 @@ function getFlagsManager(): ServerFlagsManager | null {
 export async function isCodeResearchEnabledForOrganization(
   organizationId: string
 ): Promise<boolean> {
-  // The kill switch wins over the development default.
   if (!isCodeResearchConfigured()) {
     return false;
   }

@@ -8,7 +8,6 @@ const PLAN = [
   "Write a LinkedIn post about both",
 ];
 
-// Six steps done, the seventh running, the rest open.
 function longPlanStatus(index: number): ChatTodoItem["status"] {
   if (index < 6) {
     return "completed";
@@ -96,7 +95,6 @@ export const DESIGN_SYSTEM_TODO_STATES: {
   },
 ];
 
-/** Steps the live demo walks through, one per update call. */
 export const DESIGN_SYSTEM_TODO_LIVE_STEPS: ChatTodoItem[][] = [
   plan(["in_progress"]),
   plan(["completed", "in_progress"]),

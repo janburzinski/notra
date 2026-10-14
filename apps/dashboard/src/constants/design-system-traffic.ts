@@ -6,7 +6,6 @@ import type {
 } from "@notra/geo-core/types/geo";
 import { toGeoTrafficTotals } from "@notra/geo-core/utils/ai-traffic";
 
-// Fixture comparison period, so the drawers show the trend badges.
 const PREVIOUS_VISITS_RATIO = 0.72;
 const MARKDOWN_SHARE = 0.12;
 const PREVIOUS_MARKDOWN_SHARE = 0.07;
@@ -70,8 +69,6 @@ const REFERRERS = [
   "grok",
 ] as const;
 
-// A long quiet stretch, then a spike, plus a handful of referrals: the shape the
-// real hero has, where the referral series is too small to read next to crawlers.
 function dayVolume(index: number): number {
   const wobble = Math.sin(index * 1.7) * 90 + Math.cos(index * 0.9) * 60;
   const late = index >= TRAFFIC_DAYS - 9;

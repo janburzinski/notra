@@ -38,7 +38,6 @@ export function coverCandidatesInMarkdown(markdown: string): string[] {
       visit(child);
     }
   };
-  // A real parser: image URLs may contain balanced parentheses.
   visit(fromMarkdown(markdown) as SiteMarkdownNode);
   return [...new Set(urls)].filter(
     (url) => postCoverImageSchema.shape.url.safeParse(url).success

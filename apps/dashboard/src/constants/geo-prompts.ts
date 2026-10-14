@@ -62,14 +62,12 @@ export const GEO_PROMPT_OUTCOME_LABEL_KEYS = {
   notMentioned: "notMentioned",
 } as const;
 
-/** Illustrative query → prompt pairs for the Search Console empty state. */
 export const GSC_SETUP_EXAMPLES = [
   { key: "projectManagement", impressions: 1240 },
   { key: "startupCrm", impressions: 860 },
   { key: "invoicing", impressions: 430 },
 ] as const;
 
-/** Query param that opens a tracked prompt's detail on the prompts tab. */
 export const GEO_PROMPT_DETAIL_QUERY_KEY = "prompt";
 
 export const GEO_PROMPTS_PAGE_TABS = [

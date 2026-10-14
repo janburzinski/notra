@@ -7,7 +7,6 @@ import {
 } from "@notra/schemas/api/event-triggers";
 import { and, eq, inArray } from "drizzle-orm";
 import { Effect } from "effect";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import type { EventTriggerDatabaseError } from "../errors/event-triggers";

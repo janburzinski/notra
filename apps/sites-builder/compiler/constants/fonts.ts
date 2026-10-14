@@ -23,5 +23,4 @@ export const FONT_WEIGHT_RANGES = [
 ] as const;
 // Static fonts are served one weight at a time; these cover most families.
 export const FONT_COMMON_WEIGHTS = [300, 400, 500, 600, 700] as const;
-// Mirrors --font-heading-weight in src/styles/global.css.
 export const DEFAULT_HEADING_WEIGHT = 600;

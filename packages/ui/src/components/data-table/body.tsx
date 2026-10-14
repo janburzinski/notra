@@ -98,8 +98,6 @@ export function DataTableBodyRow<T>({
 }: DataTableBodyRowProps<T>) {
   const labels = useUiLabels();
   const contentSized = rowSizing === "content";
-  // The virtualizer's bottom spacer <tr> can be :last-child, so a CSS
-  // last-child rule misses the real final row; flag it explicitly instead.
   const cellBorder = isLastRow ? "border-b-0" : TABLE_ROW_BORDER_CLASS;
   const keyboardActivation = Boolean(onRowClick) && rowKeyboardActivation;
   const tableRow = (

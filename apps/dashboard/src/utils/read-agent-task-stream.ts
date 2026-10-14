@@ -78,7 +78,6 @@ export async function readAgentTaskStream(
     reader.releaseLock();
   }
 
-  // Keep the existing EOF/failure precedence, including malformed event handling.
   if (failed) {
     return { failed };
   }

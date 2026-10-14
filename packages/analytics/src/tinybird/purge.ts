@@ -139,11 +139,6 @@ export function purgeGeoProjectData(
     for (const datasource of GEO_DATASOURCES) {
       yield* deleteFromDatasource(datasource, condition);
     }
-    // The geo scope is TTL-cached without a version to bump; advancing the
-    // purge generation orphans every entry written before the deletion,
-    // including writes from in-flight pre-purge reads that land afterwards.
-    // A failed bump fails the purge: otherwise deleted rows would stay
-    // readable until the next flush window.
     yield* Effect.tryPromise(() =>
       advancePurgeGeneration("geo", input.organizationId)
     );

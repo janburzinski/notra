@@ -62,16 +62,11 @@ function ScheduleContentForm({
       storedRepositoryId: readStoredGitHubPublishRepositoryId(organizationId),
     })
   );
-  // Taken once as the dialog opens, like the form. The server re-checks the
-  // slot with a few minutes of grace, so the open time is a close enough
-  // "now". The scheduled rows are what a submit replaces: if the schedule
-  // changed meanwhile, the server answers with a conflict.
   const [opened] = useState(() => ({
     at: Date.now(),
     expectedScheduledIds: summarizePostSchedule(schedule).scheduledIds,
   }));
   const videoPending = useSocialVideoPending(organizationId, contentId);
-  // A schedule and a publish both send the saved post and its saved video.
   const sendBlocked = hasUnsavedChanges || videoPending;
   const timeZone = getLocalTimezone();
 
@@ -216,10 +211,8 @@ export function ScheduleContentDialog({
     <ResponsiveDialog onOpenChange={onOpenChange} open={open}>
       <ResponsiveDialogContent
         className="min-w-0 sm:max-w-[560px]"
-        // The drawer pads its direct children, but the form sits in between.
         drawerClassName="[&>form>*:not([data-slot=sheet-header]):not([data-slot=sheet-footer])]:px-4"
       >
-        {/* Remount per open so the form starts from the current schedule. */}
         {open ? (
           <ScheduleContentForm onOpenChange={onOpenChange} {...props} />
         ) : null}

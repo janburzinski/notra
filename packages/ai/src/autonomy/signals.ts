@@ -213,8 +213,6 @@ export const recordSignals = Effect.fn("iris.signals.recordBatch")(function* (
           // A failed commit acknowledgement is ambiguous; do not replay it.
           return Effect.fail(error);
         }
-        // The failed chunk rolled back. Reuse the serial path so a bad item
-        // still leaves exactly the successfully recorded prefix behind.
         usedFallback = true;
         return Effect.forEach(
           chunk,

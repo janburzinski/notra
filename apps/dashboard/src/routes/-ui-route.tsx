@@ -17,10 +17,6 @@ interface RootLoaderData {
   locale: DashboardLocale;
 }
 
-/**
- * Page titles come from the catalog the root route already loaded, so a
- * navigation never needs a server round trip just to translate its title.
- */
 function translateTitle(title: UiRouteTitle, root: RootLoaderData | undefined) {
   const messages = root && getCatalog(root.locale);
   if (!(title.namespace && title.key && root && messages)) {
@@ -191,7 +187,6 @@ export function createUiRoute<T = undefined>({
       page
     );
   }
-  // The router calls `component.preload` while the route preloads or loads.
   const preloadPage =
     preload ?? (Page as { preload?: () => Promise<unknown> }).preload;
   const preloadPending = (

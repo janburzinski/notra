@@ -549,13 +549,8 @@ export const generateGeoPersonas = Effect.fn("geo.personasGenerate")(function* (
     promptsOnly
   ).pipe(Effect.tapError(() => settle("release")));
 
-  // The set is committed at this point, so the credits are spent no matter
-  // what happens while building the response below.
   yield* settle("confirm", generated.usage);
 
-  // Personas only produce results inside a scan, so a fresh set kicks one off
-  // right away when the project scans at all. An existing scan keeps its frozen
-  // plan; new personas will be picked up by the next project scan.
   if (settings?.enabled) {
     const claim = yield* claimGeoScanRun(scope.projectId).pipe(
       geoSkip("scan claim failed")

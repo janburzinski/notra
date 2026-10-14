@@ -22,17 +22,13 @@ export const DIAGRAM_MIN_SHAPE_WIDTH = 120;
 export const DIAGRAM_MIN_SHAPE_HEIGHT = 60;
 export const DIAGRAM_BINDING_GAP = 8;
 export const DIAGRAM_CANVAS_PADDING = 48;
-// Arrows may graze a shape's outline; only count crossings this far inside.
 export const DIAGRAM_LAYOUT_TOLERANCE = 6;
-// Hand-edited angles and arrow focus below these are noise and not kept.
 export const DIAGRAM_ANGLE_TOLERANCE = 0.001;
-// An arrow end this close to where Notra would snap it counts as not moved.
 export const DIAGRAM_ATTACHMENT_TOLERANCE = 2;
 export const DIAGRAM_ROUNDED_CORNER_RADIUS = 32;
 export const DIAGRAM_ROUNDED_CORNER_RATIO = 0.25;
 export const DIAGRAM_ARROWHEAD_LENGTH = 16;
 export const DIAGRAM_ARROWHEAD_ANGLE_DEG = 25;
-// Ellipses and diamonds need extra room so a label fits inside the curve.
 export const DIAGRAM_ELLIPSE_LABEL_FACTOR = 1.42;
 export const DIAGRAM_DIAMOND_LABEL_FACTOR = 2;
 export const EXCALIDRAW_ROUNDNESS_ADAPTIVE = 3;
@@ -96,7 +92,6 @@ If a brand-identity skill exists, use one brand color as the accent (stroke or f
 Run \`node ${DIAGRAM_CHECK_SCRIPT_PATH}\` after every write. It validates the JSON, checks that arrow ids resolve, estimates label sizes, and reports overlapping shapes, arrow labels that do not fit their gap, and the render scale. Fix every ERROR and WARNING, then run it again.
 `;
 
-// Plain JS so it runs with the sandbox's node without a build step.
 export const DIAGRAM_CHECK_SCRIPT = `import { readFileSync } from "node:fs";
 
 const CHAR_WIDTH = 0.56;
@@ -229,18 +224,10 @@ console.log(errors.length === 0 && warnings.length === 0 ? "OK" : errors.length 
 process.exit(errors.length > 0 ? 1 : 0);
 `;
 
-// Fast spec edits run without a sandbox. Benchmarked 2026-10-02 on 6 edit
-// tasks x 4 runs with the layout-check retry: GPT-6 Luna passed 23/24 with
-// 23/24 clean layouts at ~$0.0013 per edit; Sonnet 5 passed 24/24 with 22/24
-// clean at ~$0.027, same ~13 s median.
 export const DIAGRAM_EDIT_MODEL_ID = "vercel/openai/gpt-6-luna";
-// Luna is cheap enough that a third layout-fix round costs well under a cent.
 export const DIAGRAM_EDIT_ATTEMPTS = 3;
-// Luna answers in ~15 s; a fallback model with thinking can take minutes.
 export const DIAGRAM_EDIT_ATTEMPT_TIMEOUT_MS = 60_000;
 export const DIAGRAM_EDIT_MAX_OUTPUT_TOKENS = 16_000;
-// Both keys are set so a router fallback to Claude also skips thinking: Sonnet
-// 5 at low effort took 90 to 220 s per edit versus ~13 s with thinking off.
 export const DIAGRAM_EDIT_PROVIDER_OPTIONS = {
   openai: { reasoningEffort: "low" },
   anthropic: { thinking: { type: "disabled" } },
@@ -248,9 +235,6 @@ export const DIAGRAM_EDIT_PROVIDER_OPTIONS = {
 export const JSON_CODE_FENCE_REGEX = /```(?:json)?\s*([\s\S]*?)```/;
 export const DIAGRAM_SHAPE_TYPES = ["rectangle", "ellipse", "diamond"] as const;
 
-// Spec limits. Hand-edited scenes are clamped to these on save, so a normal
-// Excalidraw edit never fails validation, and a crafted one cannot make the
-// renderer draw a 100k px hachure fill or a megabyte of glyph paths.
 export const DIAGRAM_MAX_ELEMENTS = 150;
 export const DIAGRAM_MAX_VIA_POINTS = 12;
 export const DIAGRAM_MAX_TEXT_LENGTH = 2000;
@@ -259,7 +243,6 @@ export const DIAGRAM_MAX_COORDINATE = 100_000;
 export const DIAGRAM_MAX_FONT_SIZE = 120;
 export const DIAGRAM_MAX_LABEL_FONT_SIZE = 96;
 export const DIAGRAM_MAX_STROKE_WIDTH = 8;
-// Excalidraw arrowheads the spec has no equivalent for, drawn as the closest one.
 export const DIAGRAM_ARROWHEAD_FALLBACKS: Record<string, string> = {
   circle: "dot",
   circle_outline: "dot",

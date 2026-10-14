@@ -46,7 +46,6 @@ describe("reserveGitHubMentionBilling", () => {
       mode: "pull_request_credits",
       lockId: lock("pull_request_credits"),
     });
-    // The AI credit balance is not even looked at while the plan has room.
     expect(checkAutumnFeature).toHaveBeenCalledTimes(1);
 
     checkAutumnFeature.mockReset();
@@ -139,7 +138,6 @@ test("collects outer steps and nested sandbox spend once", () => {
     tokenCostUsd: 0.02,
     computeMs: 20,
   });
-  // The sandbox reports its Box stream cost through the same callback.
   usage.add({
     inputTokens: 30,
     outputTokens: 4,

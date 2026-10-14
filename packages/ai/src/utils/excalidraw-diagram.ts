@@ -69,7 +69,6 @@ const LABEL_FACTORS: Record<DiagramShapeSpec["type"], number> = {
   diamond: DIAGRAM_DIAMOND_LABEL_FACTOR,
 };
 
-// Stable per-id seed so re-rendering the same scene draws the same strokes.
 function seedFromId(id: string): number {
   let hash = 2_166_136_261;
   for (const char of id) {
@@ -171,7 +170,6 @@ function buildShape(
     DIAGRAM_MIN_SHAPE_HEIGHT,
     labelSize.height * factor + DIAGRAM_SHAPE_PADDING * 2
   );
-  // Grow around the authored center so neighbours keep their spacing.
   const x = spec.x - (width - (spec.width ?? width)) / 2;
   const y = spec.y - (height - (spec.height ?? height)) / 2;
 
@@ -265,7 +263,6 @@ export function boundPoint(
       shape.angle
     );
   }
-  // Intersect in the shape's own frame, then rotate back.
   const local = edgePoint(shape, rotatePoint(toward, center, -shape.angle));
   return rotatePoint(local, center, shape.angle);
 }
@@ -359,7 +356,6 @@ function buildLinear(
     );
   }
   if (startShape && startShape === endShape && !spec.via?.length) {
-    // Both ends would snap to the same point: a stray arrowhead on the label.
     throw new DiagramSpecError(
       `Arrow ${id} starts and ends at "${startShape.id}". Add via points to draw a loop around it.`
     );
@@ -395,8 +391,6 @@ function buildLinear(
       height: Math.max(...ys) - Math.min(...ys),
     }),
     type: spec.type,
-    // Sharp elbows unless the user curved the arrow by hand: the layout check
-    // and label placement follow straight segments between \`via\` points.
     roundness:
       spec.curved && via.length > 0
         ? { type: EXCALIDRAW_ROUNDNESS_PROPORTIONAL }
@@ -477,10 +471,6 @@ function buildFreeText(
   return text;
 }
 
-/**
- * Labels are `${containerId}-label`, which can collide with an element the
- * spec named that way. Excalidraw keys elements by id, so rename the label.
- */
 function dedupeLabelIds(elements: ExcalidrawElement[]) {
   const taken = new Set<string>();
   for (const element of elements) {
@@ -520,8 +510,6 @@ export function buildExcalidrawScene(
   spec: DiagramSpec,
   measurer: DiagramTextMeasurer
 ): ExcalidrawScene {
-  // Explicit ids first, so a generated `rectangle-0` cannot take an id that
-  // an arrow later in the spec points at.
   const usedIds = new Set<string>();
   const explicitIds = spec.elements.map((element) => {
     if (!element.id || usedIds.has(element.id)) {

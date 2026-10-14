@@ -20,7 +20,6 @@ function resolveSecurityStatus(
   isPending: boolean,
   isError: boolean
 ): SecurityLoadStatus {
-  // The demo has no WorkOS, so there is nothing to load: show the empty state.
   if (isDemoModeClient()) {
     return "ready";
   }

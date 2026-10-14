@@ -239,10 +239,6 @@ function PromptAnswerHeader({
   );
 }
 
-/**
- * The history list only carries mention state; the captured answer, sources
- * and search queries of an older scan load when the user opens it.
- */
 function HistoryAnswerThread({
   checkId,
   organizationId,
@@ -510,8 +506,6 @@ export function PromptAnswerPage({
   const checkIdFor = (target: string) =>
     results.find((result) => result.engine === target)?.checkId;
   const activeEngine = active?.engine ?? null;
-  // Arrow keys step to a neighbour; warm both once the shown answer is in,
-  // so stepping doesn't wait on a round trip.
   const neighbourCheckIds =
     open && activeEngine && detailState.status === "ready"
       ? [-1, 1].map((delta) =>
@@ -528,8 +522,6 @@ export function PromptAnswerPage({
 
   useEffect(() => {
     if (open) {
-      // Analysis is the default view; fetch the raw answer's markdown
-      // renderer in the background so switching to it doesn't flash.
       loadGeoPromptAnswerThread().catch(() => undefined);
     }
   }, [open]);
@@ -656,7 +648,6 @@ export function PromptAnswerPage({
   );
 }
 
-/** The prompt answer drawer: the shared detail sheet at its wide size. */
 export function PromptAnswerSheetContent({
   children,
 }: {
@@ -681,8 +672,6 @@ export function PromptDetailDialog({
   const scanControls = useGeoScanControls();
   const resolvedOrganizationId = organizationId ?? activeOrganization?.id ?? "";
   const [row, releaseRow] = useRetainedValue(rowProp);
-  // Callers clear the engine with the row; keep it until the exit finishes,
-  // or the closing sheet swaps engines mid-slide.
   const [engine, releaseEngine] = useRetainedValue(initialEngine ?? null);
 
   const content = row ? (

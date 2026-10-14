@@ -52,8 +52,6 @@ export async function toGitHubPublishOrpcError(
   error: unknown,
   context: GitHubPublishFailureContext
 ) {
-  // Errors thrown on purpose while preparing the content already carry the
-  // status and message the user should see.
   if (error instanceof ORPCError) {
     return error;
   }

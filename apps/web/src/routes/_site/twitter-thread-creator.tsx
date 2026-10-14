@@ -68,12 +68,10 @@ function ThreadsPage() {
   return (
     <div className="flex w-full flex-col items-center">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(softwareJsonLd) }}
         type="application/ld+json"
       />

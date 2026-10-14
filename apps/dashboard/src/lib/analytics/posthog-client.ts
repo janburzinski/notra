@@ -10,7 +10,6 @@ import {
 } from "@/lib/analytics/posthog-lazy";
 import { clearPostHogIdentity } from "@/utils/posthog";
 
-/** Cap so logout/checkout cannot wait on a hung PostHog chunk load. */
 const FLUSH_TRACK_EVENT_TIMEOUT_MS = 400;
 
 export function trackEvent(

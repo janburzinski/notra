@@ -14,7 +14,6 @@ import { AGENT_READINESS_BAND_TEXT_CLASS } from "@/constants/agent-readiness";
 import { cn } from "@/lib/utils";
 import type { AgentReadinessScoreGaugeProps } from "@/types/agent-readiness";
 
-/** Lighthouse-style circular score ring, colored by band. */
 export function AgentReadinessScoreGauge({
   score,
   className,

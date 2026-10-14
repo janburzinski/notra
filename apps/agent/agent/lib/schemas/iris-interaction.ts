@@ -1,5 +1,4 @@
 import { Data } from "effect";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
 export const irisInteractionValueSchema = z.object({

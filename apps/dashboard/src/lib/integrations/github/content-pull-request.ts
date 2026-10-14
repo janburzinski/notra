@@ -41,8 +41,6 @@ export async function getContentPullRequestState(
   return { status: "open", draft: Boolean(data.draft), nodeId: data.node_id };
 }
 
-// 405 covers both "method not allowed in this repo" and "not mergeable yet";
-// only the first is worth trying the next method for.
 function isMergeMethodNotAllowed(error: unknown) {
   return (
     hasGitHubStatus(error, 405) &&

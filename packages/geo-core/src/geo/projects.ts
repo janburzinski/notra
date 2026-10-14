@@ -307,8 +307,6 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
   }
 
   if (outcome === "deleted") {
-    // The project's checks went with it (cascade); org-wide aggregates must
-    // stop counting them now, not when their cache entries expire.
     yield* Effect.promise(() => bumpGeoCheckGeneration([organizationId]));
     if (URL.canParse(existing.websiteUrl)) {
       const onboardingUrl = normalizeWebsiteUrl(existing.websiteUrl);
@@ -316,7 +314,6 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
       if (onboardingUrl && onboardingUrl !== existing.websiteUrl) {
         urls.push(onboardingUrl);
       }
-      // Discovery is cached per prompt language, so drop every variant.
       yield* deleteGeoCache(
         ...urls.flatMap((url) =>
           SUPPORTED_GEO_LANGUAGES.map((language) =>
@@ -338,8 +335,6 @@ export const resolveGeoScope = Effect.fn("geo.resolveScope")(function* (
 ) {
   const { organizationId, projectId } = input;
   if (projectId) {
-    // One round trip instead of two, shared by every GEO procedure in the
-    // same request.
     const row = yield* geoDb("project lookup failed", () =>
       memoizeGeoRequest(`scope:${organizationId}:${projectId}`, async () => {
         const [found] = await db

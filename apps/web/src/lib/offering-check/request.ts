@@ -33,10 +33,6 @@ function isSameOriginRequest(request: Request): boolean {
   return Boolean(requestOrigin && URL.parse(origin)?.origin === requestOrigin);
 }
 
-/**
- * Gate shared by the check and preflight endpoints: kill switch, same-origin
- * and body validation. Returns the parsed input or the response to send.
- */
 export async function readOfferingCheckRequest(
   request: Request
 ): Promise<OfferingCheckInput | Response> {
@@ -54,7 +50,6 @@ export async function readOfferingCheckRequest(
     : jsonError(OFFERING_CHECK_INVALID_REQUEST_MESSAGE, 400);
 }
 
-/** Maps the typed failures of both endpoints to HTTP responses. */
 export function checkErrorResponse(
   error:
     | OfferingCheckRateLimitExceeded

@@ -117,7 +117,6 @@ export function toMentionEvaluation(
   };
 }
 
-/** The evaluator only offers ranks 1–MAX_POSITION and "none". */
 function isEvaluablePosition(position: number | null): boolean {
   return position === null || position <= GEO_MENTION_EVALUATION_MAX_POSITION;
 }

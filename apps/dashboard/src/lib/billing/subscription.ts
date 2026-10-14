@@ -17,13 +17,6 @@ import { getTranslations } from "@/lib/i18n/server";
 import { getORPCRequestMemo } from "@/lib/orpc/context";
 import { internalServerError, paymentRequired } from "@/lib/orpc/utils/errors";
 
-/**
- * Positive billing answers are reused across requests for a minute: every
- * GEO batch and dashboard render otherwise waits on an Autumn round trip.
- * Denials and provider failures are never cached, so an upgrade applies on the
- * next request; a cancellation takes up to the TTL to apply. Concurrent checks
- * for one organization share a single lookup.
- */
 const GRANTED_ACCESS_TTL = Duration.minutes(1);
 const GRANTED_ACCESS_CACHE_CAPACITY = 10_000;
 

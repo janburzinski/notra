@@ -848,7 +848,6 @@ if (!databaseUrl) {
         startedAt: new Date(),
       }))
     );
-    // Higher historical generations must not supersede the current branch head.
     expect((await runDeploymentPipeline(site, await queue())).kind).toBe(
       "skipped"
     );

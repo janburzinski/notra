@@ -61,7 +61,6 @@ function CommandSnippet({
   );
 }
 
-/** Underlined variant tabs that sit in a `CodeSnippet` header. */
 export function CodeSnippetTabs({
   label,
   value,
@@ -73,8 +72,6 @@ export function CodeSnippetTabs({
       <TabsList aria-label={label} className="h-9 gap-3" variant="line">
         {options.map((option) => (
           <TabsTrigger
-            // The underline (the trigger's last child) sits on the header's
-            // bottom edge instead of below it, where the code body covers it.
             className="flex-none gap-1.5 px-0 text-xs [&>span:last-child]:bottom-0"
             key={option.value}
             value={option.value}
@@ -88,10 +85,6 @@ export function CodeSnippetTabs({
   );
 }
 
-/**
- * "Copy agent prompt" with the confirmation in place: icon and label cross-fade
- * to the copied state inside a fixed-width label cell, so nothing reflows.
- */
 export function CopyPromptButton({
   prompt,
   disabled,

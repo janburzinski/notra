@@ -50,9 +50,7 @@ interface DataTablePaginationBase {
   page: number;
   pageSize: number;
   onPageChange: (page: number) => void;
-  /** Noun after the range, e.g. "items" in "1-20 of 64 items". */
   itemLabel?: string;
-  /** Replaces the whole range text, e.g. to add a refresh note. */
   formatRange?: (range: TablePaginationRange) => string;
   /**
    * Lets the reader pick the page size in the footer. Client paging works

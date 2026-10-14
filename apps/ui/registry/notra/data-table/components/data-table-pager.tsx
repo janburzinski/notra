@@ -3,7 +3,6 @@
 import type { DataTablePagerProps } from "../types/data-table";
 import { TablePagination } from "./data-table-pagination";
 
-/** The footer pager every paged table shares, whatever the paging source. */
 export function DataTablePager({
   pagination,
   rowCount,
@@ -18,7 +17,6 @@ export function DataTablePager({
     pageSizeOptions,
   } = pagination;
   const changePageSize = pagination.onPageSizeChange ?? onClientPageSizeChange;
-  // A new size reflows every page, so start over at the first one.
   const onPageSizeChange = changePageSize
     ? (next: number) => {
         changePageSize(next);

@@ -42,16 +42,6 @@ import { createOpenApiApp } from "../utils/openapi-app";
 import { errorResponse, rateLimitResponse } from "../utils/openapi-responses";
 import { enforceRatelimit, RATE_LIMITS, ratelimit } from "../utils/ratelimit";
 
-/**
- * Content gaps and the writer's content briefs.
- *
- * Planning is the one operation here that cannot run in this process: it books
- * AI credits through the Vercel Workflow `"use step"` billing gates and calls
- * the planner model. It is therefore handed to an internal dashboard route,
- * which returns the tagged domain failure so the status mapping still happens
- * here. Everything else — listing, reading, approving — only needs the database
- * and the writer workflow starter, both of which the API can reach.
- */
 export const geoBriefsRoutes = createOpenApiApp();
 
 const GEO_TAG = GEO_OPENAPI_TAG;
@@ -219,8 +209,6 @@ geoBriefsRoutes.openapi(planBriefRoute, async (c) => {
     );
   }
 
-  // Charged immediately before the paid planning run: the 404 and 503 above
-  // must not spend the caller's budget.
   const rateLimited = await enforceRatelimit(
     c,
     ratelimit.writerPlan,
@@ -261,7 +249,6 @@ geoBriefsRoutes.openapi(approveBriefRoute, async (c) => {
   const base = c.get("geo");
   const { projectId, briefId } = c.req.valid("param");
 
-  // Charged immediately before the paid generation starts.
   const rateLimited = await enforceRatelimit(
     c,
     ratelimit.writerApprove,

@@ -429,8 +429,6 @@ export function Navbar({ variant }: NavbarProps = {}) {
           <div
             className={`max-lg:duration-slow max-lg:transition-[padding] max-lg:ease-out ${innerPaddingClass}`}
           >
-            {/* biome-ignore lint/a11y/noStaticElementInteractions: onMouseLeave is a pointer-only convenience to dismiss the hover menu; the menu is fully operable via click, focus, and Escape */}
-            {/* biome-ignore lint/a11y/noNoninteractiveElementInteractions: see above */}
             <div
               className={`max-lg:duration-slow relative flex items-center justify-between gap-4 max-lg:transition-[height] max-lg:ease-out ${rowHeightClass}`}
               onMouseLeave={scheduleClose}

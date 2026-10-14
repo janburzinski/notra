@@ -42,7 +42,6 @@ import type {
 import { dashboardShellStyle } from "@/utils/dashboard-shell-style";
 import dynamic from "@/utils/lazy-component";
 
-// Demo-only UI: loaded on demand so production bundles don't carry it.
 const DashboardDemoChrome = dynamic(() =>
   import("@/components/demo/dashboard-demo-chrome").then(
     (module) => module.DashboardDemoChrome
@@ -135,10 +134,6 @@ function DashboardAgentSlot() {
     setSlotReady(true);
   }, []);
 
-  // The slot has to exist before the first open. A panel that mounts already
-  // open has no previous width, so the CSS width transition never runs.
-  // Keep the host under this slot at every width. Moving it between the dock
-  // and the mobile dialog remounts the chat and drops the in-flight thread.
   if (!slotReady) {
     return null;
   }

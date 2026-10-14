@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-// Real PostgreSQL semantics (partial unique indexes, row locks, CAS updates)
-// through PGlite, in a worker so the mocked db module stays out of other files.
 if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
   test("scheduled publication lifecycle (PGlite)", () => {
     const result = spawnSync(
@@ -211,7 +209,6 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
         })
       ).toEqual({ ok: false, reason: "repository_not_found" });
       await seedPost("linkedin", "linkedin_post");
-      // The X account cannot post a LinkedIn post.
       expect(
         await schedule("linkedin", {
           destinations: [{ destination: "social", accountId: "x-1" }],
@@ -276,7 +273,6 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
         now: SLOT,
       });
       expect(claims.map((claim) => claim.postId)).toEqual(["due"]);
-      // A second sweep inside the lease finds nothing to do.
       expect(
         await lifecycle.claimDueScheduledPublications({
           now: new Date(SLOT.getTime() + MINUTE),
@@ -296,7 +292,6 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
       if (!first) {
         throw new Error("expected a claim");
       }
-      // The first run dies; after the lease a later sweep takes over.
       const takeoverAt = new Date(
         SLOT.getTime() + SCHEDULED_PUBLICATION_LEASE_MS + MINUTE
       );
@@ -340,7 +335,6 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
       expect(row?.nextAttemptAt.getTime()).toBe(
         SLOT.getTime() + SCHEDULED_PUBLICATION_START_RETRY_MS
       );
-      // The late-starting run of the released claim is fenced out.
       expect(
         await lifecycle.beginScheduledPublicationAttempt(claim, SLOT)
       ).toBeNull();
@@ -445,7 +439,6 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
         await lifecycle.markScheduledPublicationExternalAttempt(social, SLOT)
       ).toBe(false);
 
-      // The run dies after sending; the next sweep takes the row over.
       const takeoverAt = new Date(
         SLOT.getTime() + SCHEDULED_PUBLICATION_LEASE_MS + MINUTE
       );
@@ -670,12 +663,10 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
         )
       ).toBe("failed");
 
-      // The API and chat pass no expected ids; they still must not repost.
       expect(await schedule("tweet")).toEqual({
         ok: false,
         reason: "unconfirmed_social_post",
       });
-      // Dismissing it is the explicit acknowledgement.
       await lifecycle.cancelPostSchedule({
         organizationId: ORG,
         postId: "tweet",
@@ -701,7 +692,6 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
         ok: false,
         reason: "social_already_posted",
       });
-      // Another account of the same platform can still get it.
       await db.insert(connectedSocialAccounts).values({
         id: "x-2",
         organizationId: ORG,
@@ -897,7 +887,6 @@ if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
         destinations: [{ destination: "social", accountId: "x-1" }],
       });
       const seen = (await rowsFor("tweet")).map((row) => row.id);
-      // The sweep publishes both rows while the user still has the page open.
       const claims = await lifecycle.claimDueScheduledPublications({
         now: SLOT,
       });

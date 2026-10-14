@@ -20,8 +20,6 @@ import { gscOAuthErrorParam } from "@/lib/integrations/google-search-console/oau
 import { getGscRedirectUri } from "@/lib/integrations/google-search-console/redirect-uri";
 import { ratelimit } from "@/utils/ratelimit";
 
-// OAuth authorize endpoints are GET by spec; the only side effect is storing
-// a random, short-lived CSRF state nonce in Redis.
 export async function GET(request: Request) {
   const baseUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
 

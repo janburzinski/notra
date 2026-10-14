@@ -23,17 +23,14 @@ export type {
   TableColumn,
 } from "../types/data-table";
 
-/** The app's table: sortable, selectable, paged or bounded with a scrolling body. */
 function DataTable<T>(props: DataTableProps<T>) {
   return <DataTableRoot {...props} />;
 }
 
-/** A fixed-height, virtualized table that asks for the next page near the bottom. */
 function InfiniteDataTable<T>(props: InfiniteDataTableProps<T>) {
   return <DataTableRoot {...props} rowSizing="fixed" />;
 }
 
-/** Loading placeholder with the same chrome as a real table. */
 function DataTableSkeleton({
   columnWidths = TABLE_SKELETON_COLUMN_WIDTHS,
   rows = TABLE_SKELETON_ROW_COUNT,

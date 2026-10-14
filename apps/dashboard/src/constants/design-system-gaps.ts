@@ -161,7 +161,6 @@ const DEMO_SOURCES = [
   },
 ];
 
-/** One mocked answer per scanned engine, so the prototypes can be clicked through. */
 export const DESIGN_SYSTEM_GAP_RESULTS: GeoPromptResult[] = [
   ...DEMO_MENTIONED_ENGINES,
   ...DEMO_MISSING_ENGINES,

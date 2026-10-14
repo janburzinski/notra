@@ -6,8 +6,6 @@ import {
   BRAND_GUIDELINE_LINE_BREAK_REGEX,
 } from "@notra/ai/constants/brand-guideline-source";
 
-// Keeps the markdown structure (headings, lists, tables) of the parsed PDF and
-// only collapses runs of spaces and blank lines.
 function normalizeBrandGuidelineSourceText(value: string) {
   return value
     .replace(BRAND_GUIDELINE_LINE_BREAK_REGEX, "\n")
@@ -25,8 +23,6 @@ export function limitBrandGuidelineSourceText(value: string) {
   return `${normalized.slice(0, BRAND_GUIDELINE_SOURCE_TEXT_LIMIT).trimEnd()}${BRAND_GUIDELINE_SOURCE_TRUNCATION_MARKER}`;
 }
 
-// Swaps angle brackets for look-alikes so the document can never close its
-// wrapper tag. Same length, so the character limit still holds.
 function escapeBrandGuidelineDelimiters(value: string) {
   return value.replaceAll("<", "‹").replaceAll(">", "›");
 }

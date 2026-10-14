@@ -25,9 +25,6 @@ import type {
 import { summarizePostSchedule } from "@/utils/content-calendar";
 import { OutputTypeIcon } from "@/utils/output-types";
 
-// Each state tints the whole chip, like an event in a calendar app, and
-// colors its time and the bar a chip shrinks to on phones. Published posts
-// are done, so they stay quiet.
 const FAILED_STYLE = {
   chip: "bg-destructive/8 hover:bg-destructive/14 ring-destructive/20",
   time: "text-destructive",
@@ -56,18 +53,13 @@ const STATE_STYLES: Record<
   partial: FAILED_STYLE,
 };
 
-// Time on its own line and the title on up to two lines below it, so a
-// narrow month cell still shows most of the title.
 const chipBase =
   "relative flex w-full min-w-0 flex-col items-start gap-0.5 rounded-lg px-2.5 py-1.5 text-left text-xs leading-4 transition-colors duration-150 ease-out focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-none";
 
-// Phones: a cell chip shrinks to a colored bar and lets taps through to the
-// day, which opens the day list with full titles.
 const BAR_ON_PHONES =
   "max-sm:pointer-events-none max-sm:h-1.5 max-sm:overflow-hidden max-sm:p-0";
 const HIDDEN_ON_PHONES = "max-sm:sr-only";
 
-/** A chip's face: an icon and the time, then the title on up to two lines. */
 function ChipFace({
   icon,
   time,
@@ -164,7 +156,6 @@ export function ContentCalendarItemChip({
     title: entry.post.title,
   });
 
-  // The drop target looks the schedule up again, so the drag carries the ID.
   const handleDragStart = (event: DragEvent<HTMLAnchorElement>) => {
     if (!draggable) {
       return;
@@ -222,7 +213,6 @@ export function ContentCalendarItemChip({
           <p className="text-muted-foreground">
             {t("preview.when", { date: shortDate, state: stateLabel })}
           </p>
-          {/* With Notra alone the line above already says it all. */}
           {entry.kind === "scheduled" &&
           entry.schedule.publications.length > 1 ? (
             <ul className="mt-1 flex flex-col gap-1">

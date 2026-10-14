@@ -175,8 +175,6 @@ async function streamOfferingCheck(
   const onFailure = (status: OfferingFailureStatus) =>
     update({ type: "failed", status });
   if (response && (await needsVerification(response))) {
-    // A fresh token that still fails means verification is broken, not that
-    // the visitor needs another try; asking again would loop forever.
     update(
       canAskAgain ? { type: "verify" } : { type: "failed", status: "error" }
     );
@@ -199,11 +197,6 @@ async function streamOfferingCheck(
   }
 }
 
-/**
- * Starts the check once someone watches it. A missing or spent Turnstile
- * token makes the server ask for verification; `verify` reruns the check
- * with a fresh token from the report page.
- */
 function createOfferingStreamStore(
   input: OfferingCheckInput,
   turnstileToken: string
@@ -264,7 +257,6 @@ export function useOfferingStream(
   turnstileToken: string
 ): { state: OfferingLiveState; verify: (token: string) => void } {
   const { domain, feature, problem, webSearch } = input;
-  // The token from the form is only used for the first request.
   const [initialToken] = useState(turnstileToken);
   const store = useMemo(
     () =>

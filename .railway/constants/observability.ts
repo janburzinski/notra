@@ -14,7 +14,6 @@ export const monitoringService = {
   tcp: [],
 } satisfies ServiceConfigInput;
 
-// Imported allocation and alert thresholds; adopting these must not resize data.
 export const monitoringVolume = {
   alerts: { usage: { "80": {}, "95": {}, "100": {} } },
   allowOnlineResize: true,

@@ -1,4 +1,3 @@
-/* Kilnworks: a row of glaze test tiles under a centred title, like the board on a studio wall. */
 .kiln-eyebrow {
   font-size: 0.8125rem;
   font-weight: 500;
@@ -25,7 +24,6 @@
   gap: 0.5rem;
 }
 
-/* Bisque tile with the glaze poured over the top two thirds. */
 .kiln-tile {
   display: block;
   width: 3rem;

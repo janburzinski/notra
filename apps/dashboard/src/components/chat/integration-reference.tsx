@@ -176,10 +176,6 @@ export function renderTextWithIntegrationReferences(
   return nodes;
 }
 
-/**
- * Builds the same non-editable chip the message bubble renders, for inserting
- * into the composer. It serializes to `@post/<id>` through `data-value`.
- */
 export function createPostReferenceElement(post: {
   postId: string;
   title: string;
@@ -203,10 +199,6 @@ export function createPostReferenceElement(post: {
   return chip;
 }
 
-/**
- * Fills the composer from serialized text, turning `@post/<id>` tokens back
- * into chips. Unknown posts keep the generic label.
- */
 export function setEditorTextWithPostReferences(
   editor: HTMLElement,
   text: string,

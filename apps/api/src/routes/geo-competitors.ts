@@ -295,8 +295,6 @@ geoCompetitorsRoutes.openapi(importCompetitorsRoute, async (c) => {
     }
   }
 
-  // Charged only once the payload is known to contain importable rows, so a
-  // caller fixing a malformed CSV does not spend the import budget on 400s.
   const rateLimited = await enforceRatelimit(
     c,
     ratelimit.competitorImport,

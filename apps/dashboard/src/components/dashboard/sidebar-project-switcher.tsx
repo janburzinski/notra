@@ -92,9 +92,7 @@ export function SidebarProjectSwitcher() {
     }
 
     if (activeProject?.id === projectParam) {
-      setLastVisitedProject(slug, activeProject.id).catch(() => {
-        // The current URL remains the source of truth if cookies fail.
-      });
+      setLastVisitedProject(slug, activeProject.id).catch(() => {});
       return;
     }
 

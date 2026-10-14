@@ -102,7 +102,6 @@ export function AiTrafficCard({
         ) ?? null);
 
   const sourceColumns = useTrafficSourceColumns({ seriesByKey: seriesByGroup });
-  // A group shows its busiest bot's path count, a lower bound once several bots are active.
   const columns = useMemo(
     () =>
       sourceColumns.map((column) =>

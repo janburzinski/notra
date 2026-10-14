@@ -1,4 +1,3 @@
-/** Inboxes cut preview text at roughly 90 characters. */
 const PREVIEW_MAX_LENGTH = 90;
 const WHITESPACE_REGEX = /\s+/g;
 

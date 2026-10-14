@@ -7,8 +7,6 @@ import type { OfferingSearchActivityProps } from "@/types/offering-check";
 
 import { OfferingFavicon } from "./offering-favicon";
 
-// Items fade in as the stream delivers them; there is no stagger, the stream
-// already spaces them out. Reopening a finished trace shows them at once.
 const ENTER_CLASS =
   "animate-in fade-in duration-200 ease-out motion-reduce:animate-none";
 

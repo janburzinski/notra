@@ -67,8 +67,6 @@ export function askCursorEngine(promptText: string) {
       throw new Error("Cursor run aborted before agent creation");
     }
 
-    // Loaded per run: importing the SDK costs ~0.7 s of startup CPU, which
-    // every server cold start paid although only Cursor scans use it.
     const { Agent, JsonlLocalAgentStore } = await import("@cursor/sdk");
     agentPromise = Agent.create({
       apiKey,
@@ -102,7 +100,6 @@ export function askCursorEngine(promptText: string) {
 
         const cwd = await cwdPromise?.catch(() => undefined);
         if (cwd) {
-          // Best effort: cleanup failures must not mask the run error.
           await rm(cwd, { recursive: true, force: true }).catch(
             () => undefined
           );

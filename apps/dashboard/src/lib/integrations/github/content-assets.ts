@@ -46,17 +46,6 @@ export function expandGitHubPathTemplate(template: string, slug: string) {
   return template.replaceAll(":slug", slug);
 }
 
-/**
- * Returns image and video URL spans in source order. Image destinations keep
- * alt text, titles, and angle-bracket forms. Reference-style images and raw
- * `<img>` HTML stay untouched: the editor only emits inline images and
- * `<video controls src="...">`.
- *
- * The extension overrides mdast-util-from-markdown's default
- * `resourceDestinationString` handlers, which is the only place the parser
- * exposes the destination's offsets. The replacement keeps the default
- * behaviour (`buffer` on enter, `resume` + `node.url` on exit).
- */
 function findMarkdownMediaOccurrences(markdown: string) {
   const occurrences: Array<{ end: number; start: number; url: string }> = [];
   let destination: { end: number; image: boolean; start: number } | undefined;
@@ -68,9 +57,6 @@ function findMarkdownMediaOccurrences(markdown: string) {
           resourceDestinationString(token) {
             destination = {
               end: token.end.offset,
-              // A destination belongs to an image when the image node is on
-              // top of the stack and it is not nested inside another image's
-              // alt text (that inner syntax is rendered as plain text).
               image:
                 this.stack.at(-1)?.type === "image" &&
                 !this.stack.slice(0, -1).some((node) => node.type === "image"),
@@ -184,7 +170,6 @@ function resolveStoredAssetPath(
       .split("/")
       .pop()
       ?.replace(/\.[^.]+$/, "") || "media";
-  // Identity-stable: reorder and republish keep the same GitHub path.
   const base = template
     .replaceAll(":index", stem)
     .replace(GITHUB_IMAGE_EXTENSION_REGEX, "");

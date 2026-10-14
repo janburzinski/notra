@@ -67,11 +67,6 @@ export const claimGeoScanRun = Effect.fn("geo.claimScanRun")(function* (
 ) {
   const now = new Date();
   const staleBefore = new Date(now.getTime() - GEO_SCAN_STALE_MS);
-  // The scheduled sweep passes the slot it is about to serve. Folding "no
-  // attempt finished after that slot" into the same statement keeps the
-  // coverage check and the claim atomic: a scan that finishes between the
-  // sweep reading `last_scan_at` and claiming would otherwise free the slot
-  // and let a second paid scan start for the slot it just covered.
   const notCovered = options.unlessFinishedAfter
     ? or(
         isNull(geoSettings.lastScanAt),
@@ -357,9 +352,6 @@ export const createGeoScanRow = Effect.fn("geo.createScanRow")(function* (
       .onConflictDoNothing({ target: geoScans.id })
   );
 
-  // A supplied id may already exist because the trigger inserted the row
-  // before handing the workflow off. Adopt it only when it belongs to this
-  // exact run scope; an id collision from another project must fail closed.
   const row = yield* geoDb("scan row ownership verification failed", () =>
     db.query.geoScans.findFirst({
       columns: { id: true },
@@ -523,8 +515,6 @@ export const finishGeoScanRow = Effect.fn("geo.finishScanRow")(function* (
         )
       )
   ).pipe(
-    // Only retry this idempotent status write, never the surrounding scan or
-    // billing settlement. The running predicate also handles a lost DB reply.
     Effect.retry(
       Schedule.exponential("100 millis").pipe(Schedule.upTo({ times: 3 }))
     )

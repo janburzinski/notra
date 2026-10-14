@@ -275,8 +275,6 @@ export const POST = withEvlog(async function POST(
           const cost = calculateAiCreditCostCents(
             {
               ...toAgentTokenUsage(usage),
-              // This usage sums every step, and prices can depend on how big
-              // each single request was, so bill the per-step cost.
               maxPromptTokens: routeUsage?.maxPromptTokens,
               tokenCostUsd: routeUsage?.tokenCostUsd,
             },

@@ -24,7 +24,6 @@ export const SURROUNDING_SLASHES = /^\/+|\/+$/g;
 export const SITE_IMAGE_URL = /^(?:https:\/\/|\/(?!\/))/;
 export const ELLIPSIS = "…";
 
-/** Optional author fields copied into frontmatter, in output order. */
 export const SITE_ENTRY_AUTHOR_FIELDS = [
   "title",
   "bio",
@@ -35,5 +34,4 @@ export const SITE_ENTRY_AUTHOR_FIELDS = [
   "github",
 ] as const;
 
-/** The destination of a single `![](url)` image line. */
 export const MARKDOWN_IMAGE_DESTINATION = /^!\[[^\]]*\]\((\S+?)\)$/;

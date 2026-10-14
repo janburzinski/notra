@@ -22,7 +22,6 @@ import { createOpenApiApp } from "../utils/openapi-app";
 import { rateLimitResponse } from "../utils/openapi-responses";
 import { enforceRatelimit, RATE_LIMITS, ratelimit } from "../utils/ratelimit";
 
-/** Agent readiness reports. */
 export const geoAgentReadinessRoutes = createOpenApiApp();
 
 const GEO_TAG = GEO_OPENAPI_TAG;
@@ -91,8 +90,6 @@ geoAgentReadinessRoutes.openapi(startScanRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
 
-  // Charged immediately before the scan starts: rejected requests (unknown
-  // project, GEO not enabled) must not spend the hourly budget.
   const rateLimited = await enforceRatelimit(
     c,
     ratelimit.agentReadinessScan,

@@ -112,8 +112,6 @@ export async function startGitHubInstall(params: {
           if (error._tag === "GitHubAccountConnectionIncompleteError") {
             return { started: false, reason: "account-connection-incomplete" };
           }
-          // Forbidden carries a message meant for the user, e.g. that
-          // installing is off in the demo.
           const { cause } = error;
           const isForbidden =
             cause instanceof ORPCError && cause.code === "FORBIDDEN";

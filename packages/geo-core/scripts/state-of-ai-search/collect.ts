@@ -2,19 +2,6 @@ import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 import { anthropic } from "@ai-sdk/anthropic";
-/**
- * Collects answers for the public "State of AI Search" reports.
- *
- * Asks every prompt of every category to ChatGPT, Claude, grounded Gemini
- * and Perplexity, and fetches Google's AI Overview through
- * SerpApi. Raw answers are cached per prompt, engine and sample, so a rerun
- * only fills the gaps and `build.ts` can re-aggregate for free.
- *
- *   bun --env-file=../../.env run packages/geo-core/scripts/state-of-ai-search/collect.ts
- *   SOAS_ONLY=postgres SOAS_ENGINES=chatgpt SOAS_LIMIT=1 bun ... collect.ts
- *
- * Needs AI_GATEWAY_API_KEY and SERPAPI_API_KEY.
- */
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { gateway, generateText } from "ai";
@@ -163,7 +150,6 @@ async function askModel(
   const inputTokens = result.totalUsage.inputTokens ?? 0;
   const outputTokens = result.totalUsage.outputTokens ?? 0;
   const price = prices.get(model);
-  // Fallback includes the maximum configured search calls, conservatively.
   const estimatedCost =
     inputTokens * Number(price?.input ?? 0) +
     outputTokens * Number(price?.output ?? 0) +
@@ -234,7 +220,6 @@ const spendPath = join(
 let spend = 0;
 let reserved = 0;
 const prices = new Map<string, Record<string, string>>();
-// Reserve enough for a 6k-token answer plus search input; stop before $400.
 const requestReserve: Record<Exclude<ReportEngine, "ai-overview">, number> = {
   chatgpt: 1,
   claude: 1,
@@ -296,8 +281,6 @@ async function askAiOverview(
   }
   const parsed = parseGoogleAiOverview(payload);
   if (parsed.status === "invalid") {
-    // A failed or malformed response is not an absence: throw so the retry
-    // path asks again instead of caching a miss.
     throw new Error(`SerpApi returned an invalid AI Overview for "${prompt}"`);
   }
   if (parsed.status !== "present") {
@@ -353,7 +336,6 @@ async function runPool<T>(
   );
 }
 
-/** Cost of one ledger line; blank or half-written lines count as zero. */
 function readLedgerCost(line: string): number {
   try {
     const entry: unknown = JSON.parse(line);
@@ -423,7 +405,6 @@ async function main() {
     }
   }
 
-  // Fill lower sample indices across categories first if a budget-limited rerun is needed.
   jobs.sort((a, b) => a.sample - b.sample || a.promptIndex - b.promptIndex);
   const overviewJobs = jobs.filter((job) => job.engine === "ai-overview");
   if (overviewJobs.length > 0) {
@@ -490,7 +471,6 @@ async function main() {
         );
       }
     } catch (error) {
-      // Conservatively account for potentially billed requests without a response.
       spend += hold;
       await appendFile(
         spendPath,

@@ -150,17 +150,8 @@ function buildScanShelfSource(
   } satisfies GeoShelfSource);
 }
 
-/**
- * Shelf space is cited scan pages plus anything added by hand. The cited pages
- * are folded in from the whole mention-check history, which is too expensive
- * for every page view, so this runs when a scan or conversation run finishes.
- * Returns how many shelf sources it inserted or updated, so a caller that
- * already read the page knows when to read it again.
- */
 async function syncGeoShelfCitations(seed: GeoShelfStoreSeed): Promise<number> {
   const key = storeKey(seed);
-  // A scan and a conversation run can finish together. Holding a per-project
-  // lock for read and write keeps an older snapshot from landing last.
   return await db.transaction(async (tx) => {
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtextextended(${`geo-shelf-sync:${key.projectId}`}, 0))`
@@ -275,7 +266,6 @@ export function resolveGeoShelfSearch(
   };
 }
 
-/** Sample data only exists in development, so paging it in memory is fine. */
 function pageSampleGeoShelfSources(
   seed: GeoShelfStoreSeed,
   sources: GeoShelfSource[],
@@ -331,8 +321,6 @@ export async function listGeoShelfSourcePage(
   }
 
   const page = await queryGeoShelfSourcePage(key, query);
-  // A project whose last scan predates the post-scan sync has no scan rows
-  // yet, even when someone already added a shelf by hand.
   if (page.hasScanData || query.offset > 0) {
     return { ...page, isSampleData: false };
   }
@@ -401,9 +389,6 @@ export function buildPlacements(
   const statusByBrand = new Map(
     writes.map((write) => [placementKey(write.competitorId), write.status])
   );
-  // A project can track hundreds of competitors, so only the own brand and
-  // competitors with a known status are stored. A missing competitor reads as
-  // "unknown".
   return shelfBrands(seed).flatMap((brand) => {
     const status =
       statusByBrand.get(placementKey(brand.competitorId)) ?? "unknown";
@@ -441,8 +426,6 @@ export function mergePlacements(
     if (previous?.status === write.status) {
       continue;
     }
-    // A competitor without a stored placement reads as "unknown", so
-    // clearing one drops it instead of storing "unknown".
     if (write.competitorId !== null && write.status === "unknown") {
       if (previous) {
         next.splice(index, 1);

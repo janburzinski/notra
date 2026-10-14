@@ -199,20 +199,17 @@ export interface InfiniteDataTableProps<T> extends Omit<
   loadingMore?: boolean;
 }
 
-/** Engine props shared by both public tables. */
 export interface DataTableRootProps<T> extends DataTableProps<T> {
   visibleRowCount?: number;
   onEndReached?: () => void;
   loadingMore?: boolean;
 }
 
-/** A data row paired with its stable id. */
 export interface TableRow<T> {
   row: T;
   id: string;
 }
 
-/** Ref map from column key to its header cell, shared across the resize hook. */
 export interface HeaderCellRefs {
   current: Record<string, HTMLTableCellElement | null>;
 }
@@ -246,7 +243,6 @@ export interface TableScrollFadeProps extends Pick<
   "scrollFade"
 > {
   edge: "top" | "bottom";
-  /** No rows hidden past this edge, so the fade is not shown. */
   hidden: boolean;
 }
 
@@ -266,10 +262,6 @@ export interface TableBodySurfaceProps {
   onScroll: UIEventHandler<HTMLDivElement>;
   scrollRef: RefObject<HTMLDivElement | null>;
   style: CSSProperties;
-  /**
-   * Draw `TableCornerScrollbar` instead of the native scrollbar. Off when the
-   * rows scroll sideways, since it only covers the vertical axis.
-   */
   cornerScrollbar: boolean;
   children: ReactNode;
 }
@@ -277,7 +269,6 @@ export interface TableBodySurfaceProps {
 export interface TableCornerScrollbarProps {
   scrollId: string;
   scrollRef: RefObject<HTMLDivElement | null>;
-  /** Element that receives the hover listeners and the corner data attributes. */
   wrapperRef: RefObject<HTMLDivElement | null>;
 }
 
@@ -381,8 +372,6 @@ export interface DataTableBodyRowProps<T> extends Pick<
 
 export interface DataTablePagerProps {
   pagination: DataTablePagination;
-  /** Client paging only: the table owns the page size when the caller does not. */
   onClientPageSizeChange?: (pageSize: number) => void;
-  /** Rows across all pages, used by client pagination. */
   rowCount: number;
 }

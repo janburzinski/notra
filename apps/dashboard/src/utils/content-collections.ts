@@ -10,7 +10,6 @@ export function collectionTitle(collection: PostCollectionSummary): string {
     !collection.isGenerating && collection.postCount === 1
       ? collection.singlePost?.title.trim()
       : undefined;
-  // A single post with a blank title falls back to its collection's name.
   return postTitle || collection.name;
 }
 

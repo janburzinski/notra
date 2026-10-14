@@ -28,8 +28,6 @@ export function LogsDataTable<TData>({
   totalCount,
 }: LogsDataTableProps<TData>) {
   const t = useTranslations("settings.logs");
-  // Paged tables size to their page; only the first load needs room for
-  // skeleton rows.
   const skeletonHeight =
     isLoading && data.length === 0
       ? paginatedTableHeightFor(LOGS_SKELETON_ROW_COUNT, TABLE_ROW_HEIGHT)

@@ -446,8 +446,6 @@ export async function publishSavedContentToGitHub(
             )
           ).values(),
         ];
-        // Cover and avatars are prepared on their own, so check the
-        // combined draft against the same budget the body images use.
         const assetBytes = assets.reduce(
           (total, asset) => total + asset.contents.byteLength,
           0
@@ -511,9 +509,6 @@ export async function publishSavedContentToGitHub(
         (await getTranslations("errors.github"))("pullRequestUnavailable")
       );
     }
-    // The pull request already exists; losing the mention mapping must not
-    // report the publish as failed. Retry the mapping so a later mention
-    // can still find the post.
     const publication = {
       organizationId: input.organizationId,
       postId: input.contentId,
@@ -532,8 +527,6 @@ export async function publishSavedContentToGitHub(
       contentId: input.contentId,
       pullRequestUrl: result.pullRequestUrl,
     };
-    // Queue the durable insert/close reconciliation before making the
-    // mapping visible. A close event cannot be lost in the gap.
     let reconciliationScheduled = false;
     try {
       await startContentPublicationReconciliation(publication, publishedAt);
@@ -569,9 +562,6 @@ export async function publishSavedContentToGitHub(
       }
     } catch (error) {
       logError("Failed to record content publication", error, logContext);
-      // The PR already exists, so hand the idempotent mapping write to a
-      // durable workflow instead of relying on this request process. The
-      // publish itself succeeded, whatever happens to the handover.
       if (!reconciliationScheduled) {
         try {
           await startContentPublicationReconciliation(publication, publishedAt);
@@ -584,8 +574,6 @@ export async function publishSavedContentToGitHub(
         }
       }
     }
-    // Keep metadata failure independent of the durable publication handoff.
-    // A slower publish must not replace a link written since we read the post.
     try {
       await retryWrite(() =>
         db

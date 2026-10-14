@@ -34,8 +34,6 @@ async function startSocialSignInActionImpl(rawInput: StartSocialSignInInput) {
 
   const input = parsed.data;
 
-  // The demo has no WorkOS client; the UI explains this before calling, so
-  // just send the visitor back instead of failing with a 500.
   if (isDemoMode()) {
     throw redirect({ href: sanitizeReturnTo(input.returnTo ?? null) ?? "/" });
   }

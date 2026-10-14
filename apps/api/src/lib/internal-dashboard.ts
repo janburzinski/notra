@@ -114,8 +114,6 @@ export const internalDashboardLive = internalDashboardLayer({
     if (secret.trim()) {
       return secret.trim();
     }
-    // Preserve unauthenticated fallback: the dashboard remains the authority
-    // and returns its existing HTTP refusal when OIDC is unavailable.
     return yield* Effect.tryPromise({
       try: () => getVercelOidcToken(),
       catch: () =>

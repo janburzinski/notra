@@ -87,7 +87,6 @@ export function SiteSettingsPage() {
     callbackPath: siteHref(organizationSlug, siteId, "settings"),
     organizationId,
   });
-  // Drafts belong to one site; switching sites must start from fresh state.
   return <SiteSettingsContent key={siteId} />;
 }
 
@@ -107,7 +106,6 @@ function SiteSettingsContent() {
     open: openRow === key,
     onOpenChange: (open: boolean) => setOpenRow(open ? key : null),
   });
-  // Only close the row that finished saving; another row may be open by now.
   const closeRow = (key: SiteSettingsRowKey) => () =>
     setOpenRow((current) => (current === key ? null : current));
   const previewMode = site.previewsEnabled

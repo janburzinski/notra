@@ -30,7 +30,6 @@ import type {
   WebhookWorkspaceViewProps,
 } from "@/types/webhooks/outbound";
 
-/** Data-free webhooks workspace, shared by the settings pane and the design-system preview. */
 export function WebhookWorkspaceView({
   stats,
   activity,

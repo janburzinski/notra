@@ -7,10 +7,6 @@ import { useTranslations } from "use-intl";
 
 import { useDemoPlayground } from "@/components/demo/demo-playground-context";
 
-/**
- * Public demo only: the API keys page is where visitors look for the API, so
- * the playground (console, live request feed, missions) opens from here.
- */
 export function DemoApiCallout() {
   const t = useTranslations("demo.apiCallout");
   const playground = useDemoPlayground();

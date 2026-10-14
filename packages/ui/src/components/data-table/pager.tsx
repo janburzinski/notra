@@ -21,7 +21,6 @@ export function DataTablePager({
   const changePageSize = pageSizeSelector
     ? (pagination.onPageSizeChange ?? onClientPageSizeChange)
     : undefined;
-  // A new size reflows every page, so start over at the first one.
   const onPageSizeChange = changePageSize
     ? (next: number) => {
         changePageSize(next);

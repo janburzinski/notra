@@ -6,7 +6,6 @@ export const IMAGE_EXPORT_TARGETS = [
   "wonder",
 ] as const;
 
-/** Targets that paste the editable Excalidraw scene; only diagram images have one. */
 export const DIAGRAM_EXPORT_TARGETS = ["excalidraw", "tldraw"] as const;
 
 export const EXCALIDRAW_CLIPBOARD_TYPE = "excalidraw/clipboard";

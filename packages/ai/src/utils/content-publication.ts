@@ -77,8 +77,6 @@ export async function recordContentPublication(
       `${params.owner}/${params.repo}`,
       params.pullRequestNumber
     );
-    // Publication creation and content synchronization lock the post first.
-    // This serializes ownership changes with revision-guarded post updates.
     const [post] = await tx
       .select({ id: posts.id })
       .from(posts)
@@ -115,8 +113,6 @@ export async function recordContentPublication(
         eq(contentPublications.pullRequestNumber, params.pullRequestNumber)
       ),
     });
-    // Check the target before retiring the post's current mapping. A stale
-    // terminal retry and a PR already owned by another post are both no-ops.
     if (
       existingTarget &&
       (existingTarget.organizationId !== params.organizationId ||
@@ -127,9 +123,6 @@ export async function recordContentPublication(
     }
 
     if (status === "open") {
-      // A post keeps one open publication. Republishing after its pull request
-      // closed, or into another repository, supersedes the older row instead of
-      // violating contentPublications_open_post_uidx.
       await tx
         .update(contentPublications)
         .set({ status: "closed", updatedAt: new Date() })
@@ -171,8 +164,6 @@ export async function recordContentPublication(
           contentPublications.repositoryId,
           contentPublications.pullRequestNumber,
         ],
-        // A delayed writer must not steal a PR mapping from another post or
-        // resurrect a terminal publication.
         setWhere: and(
           eq(contentPublications.postId, params.postId),
           eq(contentPublications.status, "open")
@@ -183,8 +174,6 @@ export async function recordContentPublication(
           path: params.path,
           branch: params.branch,
           pullRequestUrl: params.pullRequestUrl,
-          // Advance a republish only from its recorded baseline. Replays must
-          // not overwrite a newer publish or a concurrent content sync.
           headSha: sql`case
             when ${contentPublications.headSha} is not distinct from ${params.previousHeadSha ?? null}
               and ${contentPublications.createdAt} <= ${publishedAt}::timestamp
@@ -234,9 +223,6 @@ export async function reconcileContentPublication(
     return recorded;
   }
 
-  // Overlapping publishes can commit on top of a head recorded after their
-  // initial read. Advance only along GitHub's graph, and only from the head
-  // we validated. A race retries through the caller or the durable workflow.
   const [advanced] = await db
     .update(contentPublications)
     .set({ headSha: publication.headSha, updatedAt: new Date() })
@@ -275,8 +261,6 @@ export async function syncContentPublication(
   if (snapshot.headSha === repair.commitSha) {
     return { status: "synchronized", markdown: repair.markdown };
   }
-  // Null is an explicit initial baseline. Otherwise only move forwards along
-  // the PR's commit graph; manual and unrelated intermediary commits are safe.
   if (
     snapshot.headSha !== null &&
     !(await isAncestor(snapshot.headSha, repair.commitSha))
@@ -312,8 +296,6 @@ export async function syncContentPublication(
     if (!publication) {
       return { status: "superseded" } as const;
     }
-    // Idempotent repair: do not overwrite post content after this revision was
-    // already recorded by a successful newer execution.
     if (publication.headSha === repair.commitSha) {
       return { status: "synchronized", markdown: repair.markdown } as const;
     }

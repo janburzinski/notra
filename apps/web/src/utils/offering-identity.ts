@@ -5,7 +5,6 @@ function normalizeOfferingCheckText(input: string): string {
   return input.trim().toLowerCase().replace(OFFERING_WHITESPACE_RUN, " ");
 }
 
-/** Same brand and feature, whatever the casing or spacing. Used for limits. */
 export function getOfferingCheckBrandFeatureIdentity(
   input: OfferingCheckInput
 ): string {
@@ -15,7 +14,6 @@ export function getOfferingCheckBrandFeatureIdentity(
   ]);
 }
 
-/** Everything that changes the answer, normalized. Used for the cache key. */
 export function getOfferingCheckCacheIdentity(
   input: OfferingCheckInput
 ): string {

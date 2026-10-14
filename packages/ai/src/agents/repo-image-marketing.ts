@@ -94,7 +94,6 @@ async function reviewLogos(params: {
 
 export const marketingFormat: RepoImageFormatRunner = {
   async prepare({ box, restoreSnapshotId }) {
-    // A restored snapshot already has them.
     if (!restoreSnapshotId) {
       await withBoxRetry(() =>
         box.exec.command(IMAGE_GEN_AGENT_SKILLS_INSTALL_COMMAND)

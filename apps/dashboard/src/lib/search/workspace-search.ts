@@ -41,7 +41,6 @@ export async function searchWorkspace(params: WorkspaceSearchParams) {
     : orgFilter;
 
   const { projectId } = params;
-  // Chats without a project are visible in every project.
   const chatProjectFilter = projectId
     ? or(eq(chatSessions.projectId, projectId), isNull(chatSessions.projectId))
     : undefined;

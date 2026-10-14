@@ -13,7 +13,6 @@ export function PersonaPrompts({
 }: PersonaPromptsProps) {
   const t = useTranslations("geo.personaPrompts");
   const tGeoShared = useTranslations("geo.shared");
-  // Two turns can share the same text, so number repeats to keep keys unique.
   const occurrences = new Map<string, number>();
   const items = prompts.map((prompt) => {
     const occurrence = (occurrences.get(prompt) ?? 0) + 1;

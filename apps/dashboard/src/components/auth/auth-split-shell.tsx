@@ -5,7 +5,6 @@ import { AuthLegalNotice } from "@/components/auth/auth-legal-notice";
 import { AuthThemeHotkey } from "@/components/auth/auth-theme-hotkey";
 import { AuthWordmark } from "@/components/auth/auth-wordmark";
 
-/** Two-column chrome shared by the sign-in, sign-up and invitation pages. */
 export function AuthSplitShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen w-full justify-center lg:grid lg:grid-cols-2">

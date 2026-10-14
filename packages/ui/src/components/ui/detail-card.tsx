@@ -6,8 +6,6 @@ import type {
   DetailCardRowProps,
 } from "@notra/ui/types/detail-card";
 
-// Hover card with a shell header and a body panel. The shell keeps a 2px rim
-// around the body on the left, right and bottom, like dualtone tables.
 export function DetailCardContent({
   icon,
   title,

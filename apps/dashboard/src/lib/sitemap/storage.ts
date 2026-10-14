@@ -179,8 +179,6 @@ export async function saveStoredSitemap(input: {
   pages: SitemapPage[];
 }) {
   await db.transaction(async (tx) => {
-    // Re-adding a URL replaces this identity's earlier row, including rows
-    // saved before ids were scoped to the identity.
     await tx
       .delete(brandSitemaps)
       .where(

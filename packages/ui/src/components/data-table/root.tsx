@@ -139,8 +139,6 @@ export function DataTableRoot<T>({
       </>
     ) : undefined;
 
-  // A paged table shows its whole page by default; only an explicit `height`
-  // caps it with a scrolling body.
   const height =
     heightProp ??
     (pagination
@@ -212,8 +210,6 @@ export function DataTableRoot<T>({
           flushTop={flushTop}
           toolbar={toolbar}
         >
-          {/* Transparent side borders match the body's, so both tables get the
-              same width and the columns line up. */}
           <div
             className="overflow-hidden border-x border-transparent"
             ref={headerScrollRef}

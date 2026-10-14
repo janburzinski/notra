@@ -80,8 +80,6 @@ export function ContentCalendarView({
     [data?.entries, automation?.triggers, range]
   );
 
-  // The current month is the default, so paging back to it clears the param
-  // (and the "Today" button with it).
   const setAnchor = (date: Date) => {
     void setAnchorKey(
       isSameMonth(date, new Date()) ? null : calendarDayKey(date)
@@ -98,7 +96,6 @@ export function ContentCalendarView({
     if (isSameDay(previous, day)) {
       return;
     }
-    // Moving keeps the time of day and every destination.
     const scheduledAt = combineDateAndTime(day, toTimeInputValue(previous));
     if (scheduledAt.getTime() < Date.now()) {
       toast.error(t("toasts.moveIntoPast"));
@@ -108,7 +105,6 @@ export function ContentCalendarView({
       {
         contentId: post.id,
         scheduledAt,
-        // The new wall-clock time was picked in this browser's zone.
         timeZone: getLocalTimezone(),
         destinations: scheduleDestinationsOf(schedule),
         expectedScheduledIds: summarizePostSchedule(schedule).scheduledIds,

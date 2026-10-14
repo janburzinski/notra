@@ -33,7 +33,6 @@ function uploadKind(form: FormData): ContentMediaKind {
 }
 
 export async function POST(request: Request) {
-  // Checked before parsing so the demo never buffers an anonymous upload.
   if (isDemoMode()) {
     return Response.json({ message: DEMO_DISABLED_MESSAGE }, { status: 403 });
   }

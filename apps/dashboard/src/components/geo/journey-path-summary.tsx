@@ -7,10 +7,6 @@ import {
   toGeoJourneyPathNode,
 } from "@/utils/geo-journey";
 
-/**
- * Entry page plus a count of the rest. A full trail cannot fit a table cell
- * without clipping mid-pill; the journey sheet shows the whole path.
- */
 export function JourneyPathSummary({
   entryPath,
   paths,

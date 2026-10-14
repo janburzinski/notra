@@ -199,7 +199,6 @@ function GeoPersonasPageContent({ organizationSlug }: GeoPageClientProps) {
 
   const isLoadingPersonas = isPersonasPending && !hasStoredPersonas;
   const showEmptyState = !(isLoadingPersonas || hasStoredPersonas);
-  // The empty state carries the primary action until personas exist.
   const headerAction =
     showEmptyState || isLoadingPersonas ? null : (
       <GeneratePersonasButton

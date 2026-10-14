@@ -34,16 +34,12 @@ import {
   type UnknownRecord,
 } from "@notra/ai/utils/unknown-record";
 
-// Turns a scene edited by hand in Excalidraw back into the compact spec.
-
 function isShapeType(
   type: string | undefined
 ): type is (typeof DIAGRAM_SHAPE_TYPES)[number] {
   return DIAGRAM_SHAPE_TYPES.some((shapeType) => shapeType === type);
 }
 
-// Values the spec would fall back to anyway. Leaving them out keeps the spec
-// close to what an agent writes and cheap to send back to the model.
 const STYLE_DEFAULTS: Record<string, string | number> = {
   strokeColor: DIAGRAM_DEFAULT_STROKE,
   backgroundColor: "transparent",
@@ -78,7 +74,6 @@ function clipText(value: string) {
   return value.slice(0, DIAGRAM_MAX_TEXT_LENGTH);
 }
 
-/** Keeps the first and last waypoint and evenly spaced ones in between. */
 function limitVia(points: [number, number][]) {
   if (points.length <= DIAGRAM_MAX_VIA_POINTS) {
     return points;
@@ -90,7 +85,6 @@ function limitVia(points: [number, number][]) {
   );
 }
 
-// Excalidraw offers more arrowheads than the spec; draw the closest one.
 function readArrowhead(element: UnknownRecord, key: string) {
   const value = element[key];
   if (value === null || value === undefined) {
@@ -172,7 +166,6 @@ function boundEndpoint(
   ) {
     return { id: shapeId };
   }
-  // Undo the shape's rotation so the anchor is in its own frame.
   const [cx, cy] = shapeCenter(shape);
   const cos = Math.cos(-shape.angle);
   const sin = Math.sin(-shape.angle);
@@ -286,7 +279,6 @@ export function sceneToDiagramSpec(scene: unknown): {
         y: coordinate(y),
         width: size(readNumber(element, "width")),
         height: size(readNumber(element, "height")),
-        // Rectangles default to rounded corners; other shapes to sharp ones.
         rounded: rounded === (type === "rectangle") ? undefined : rounded,
         angle: readAngle(element),
         label: labelFor(id),
@@ -348,8 +340,6 @@ export function sceneToDiagramSpec(scene: unknown): {
       });
       const first = absolute[0] ?? [x, y];
       const last = absolute.at(-1) ?? first;
-      // Mirror the scene builder: a bound end faces the next point, or the
-      // other end's shape center when there are no waypoints.
       const boundCenter = (key: "startBinding" | "endBinding") => {
         const binding = element[key];
         const shapeId = isRecord(binding)

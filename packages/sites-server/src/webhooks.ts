@@ -226,7 +226,6 @@ async function handlePullRequest(
     }
     if (
       site.rootDirectory &&
-      // An unreadable preview state counts as open, so it never skips a build.
       !(await isPreviewOpen(site.id, previewKey).catch(() => true)) &&
       !(await pullRequestTouchesRootDirectory(
         site,

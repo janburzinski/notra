@@ -3,7 +3,6 @@ import type { ComponentProps, ReactNode } from "react";
 
 import type { CodexListProps, CodexTableProps } from "../types/codex";
 
-/** Keys items by their text, counting repeats so duplicate rows stay unique. */
 const withTextKeys = <T,>(items: readonly T[], toText: (item: T) => string) => {
   const seen = new Map<string, number>();
   return items.map((item) => {
@@ -49,8 +48,6 @@ export const CodexTable = ({
 }: CodexTableProps) => {
   const codeColumnSet = new Set(codeColumns);
 
-  // The block mirrors the Codex terminal, so it renders a bare table rather
-  // than the framed shadcn one.
   return (
     <div className="-ms-[2ch] max-w-[calc(100%+2ch)] overflow-x-auto">
       <table

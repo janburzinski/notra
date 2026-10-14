@@ -22,8 +22,6 @@ export function GapDetailSheet({
   actions,
   onOpenChange,
 }: GeoGapDetailSheetProps) {
-  // Keep the last gap rendered while the sheet animates out, e.g. after an
-  // ignored gap disappears from the list.
   const t = useTranslations("geo.gapDetailSheet");
   const [retained, setRetained] = useState(prompt);
   if (prompt && prompt !== retained) {

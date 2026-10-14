@@ -21,7 +21,6 @@ const ABSOLUTE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
   timeZoneName: "short",
 };
 
-/** Muted "2 hours ago" with the exact time in a tooltip. */
 export function RelativeTime({ iso, className }: RelativeTimeProps) {
   const [absolute, setAbsolute] = useState(iso);
   const locale = useLocale();

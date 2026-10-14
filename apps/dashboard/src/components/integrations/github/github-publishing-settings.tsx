@@ -61,9 +61,6 @@ function GitHubContentPublishingSettings({
     dashboardOrpc.integrations.repositories.contentDirectory.get.queryKey({
       input: { organizationId, repositoryId, contentType },
     });
-  // Both saves return the whole configuration. Overlapping requests can
-  // resolve out of order, so the server state is refetched after each save
-  // instead of trusting the response as the latest configuration.
   const settleDirectoryConfig = (
     result: NonNullable<typeof directoryQuery.data>
   ) => {

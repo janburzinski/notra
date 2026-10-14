@@ -414,7 +414,6 @@ function ChatInputContextPicker({
                 <Composer.ToolbarButton
                   aria-label={tChatShared("addToolsOrContext")}
                   disabled={Boolean(disabledReason)}
-                  // Stays focusable while disabled so the tooltip can explain why.
                   focusableWhenDisabled
                   size="icon-sm"
                 />

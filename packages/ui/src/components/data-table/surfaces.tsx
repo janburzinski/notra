@@ -30,8 +30,6 @@ export function TableFrame({
         TABLE_FRAME_CLASS,
         flushTop && "rounded-t-none border-t-0",
         flushBottom && "rounded-b-none border-b-0",
-        // When the body is the last section (no footer) and its bottom corner
-        // wraps the scrollbar, follow it to stay concentric.
         !flushBottom &&
           "transition-[border-radius] duration-200 ease-out has-[>[data-corner-end=true]:last-child]:rounded-br-(--corner-shell-radius) motion-reduce:transition-none"
       )}
@@ -128,9 +126,6 @@ export function TableBodySurface({
   if (!cornerScrollbar) {
     return body;
   }
-  // The thumb sits over the card instead of inside the scroller, so it stays
-  // put while the rows move. When it reaches a corner, the card's radius
-  // tightens to wrap the thumb's round end.
   return (
     <div
       className="group/table-body relative -mt-5"

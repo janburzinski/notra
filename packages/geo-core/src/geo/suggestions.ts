@@ -43,7 +43,6 @@ export const listSuggestions = Effect.fn("geo.suggestions.list")(function* (
   };
 });
 
-/** SQL-only transaction adapter. Project lock serializes normalized prompt reuse. */
 async function acceptSuggestionInTx(
   tx: DbTransaction,
   organizationId: string,
@@ -96,7 +95,6 @@ export const acceptSuggestion = Effect.fn("geo.suggestions.accept")(function* (
     try: () =>
       db.transaction(async (tx) => {
         await lockGeoProjectInTransaction(tx, projectId);
-        // Read pending state under a row lock, so dismiss/accept cannot both win.
         const [suggestion] = await tx
           .select()
           .from(geoPromptSuggestions)

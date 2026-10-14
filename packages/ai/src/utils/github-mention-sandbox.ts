@@ -88,7 +88,6 @@ async function clonePullRequestBranch(params: {
       .catch(() => undefined);
   }
 
-  // A leftover credential would let the agent push, so verify instead of trusting the cleanup.
   const leftover = await params.box.exec.command(
     `test ! -e ${shellQuote(REPO_CLONE_TOKEN_PATH)} && test ! -e ~/.git-credentials`
   );
@@ -132,9 +131,6 @@ export async function runGitHubMentionSandbox(params: {
     };
   }
 
-  // Starting the box takes seconds and does not need the token, so both run at
-  // once. A box created while the token lookup fails would otherwise sit there
-  // until its own timeout, so it is torn down explicitly.
   const starting = Box.create({
     apiKey: boxApiKey,
     runtime: "node" satisfies Runtime,
@@ -153,9 +149,6 @@ export async function runGitHubMentionSandbox(params: {
     },
     timeout: GITHUB_MENTION_SANDBOX_TIMEOUT_MS,
   } satisfies BoxConfig);
-  // Nothing awaits the box until the token is in, so a failure in between
-  // would otherwise surface as an unhandled rejection. It is still thrown
-  // below, where it belongs.
   void starting.catch(() => undefined);
 
   let token: string | null;
@@ -182,9 +175,6 @@ export async function runGitHubMentionSandbox(params: {
   });
 
   try {
-    // The box never holds a GitHub credential after the clone: the token file is
-    // removed and no git identity or token is configured. The agent can edit the
-    // working tree, but only this function can commit, through the API below.
     const baseSha = await clonePullRequestBranch({
       box,
       owner: params.context.owner,
@@ -252,9 +242,6 @@ export async function runGitHubMentionSandbox(params: {
       (file): file is { path: string; contents: string } =>
         typeof file.contents === "string"
     );
-    // Same gate as the direct commit tools, and like them all or nothing. A
-    // partial commit could land the deletion half of a rename whose new path
-    // was blocked, and the content would be gone.
     const review = await reviewGitHubMentionChange({
       octokit: params.octokit,
       context: params.context,
@@ -296,7 +283,6 @@ export async function runGitHubMentionSandbox(params: {
       owner: params.context.owner,
       repo: params.context.repo,
       branch: params.branch,
-      // The commit must apply to exactly the tree the sandbox agent saw.
       expectedHeadOid: baseSha,
       headline: "docs: apply requested changes",
       files,

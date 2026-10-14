@@ -100,14 +100,12 @@ const DEFAULT_INPUT: PromptCalculatorInput = {
 
 const THOUSAND = 1000;
 const LAST_STOP_INDEX = PROMPT_CALCULATOR_STOPS.length - 1;
-/** Stops whose label stays visible when the slider is narrow. */
 const MAJOR_STOPS = PROMPT_CALCULATOR_MILESTONES.map((entry) => entry.prompts);
 
 function formatStopLabel(stop: number) {
   return stop >= THOUSAND ? `${stop / THOUSAND}K` : stop;
 }
 
-// Same pill language as the MCP use-case filters.
 const PILL_BASE =
   "flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-4 py-1.75 font-medium font-sans text-[0.875rem] leading-[1.29] tracking-[-0.01em] outline-none transition-[color,background-color,box-shadow] duration-100 ease-out has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary";
 const PILL_ACTIVE =
@@ -115,10 +113,8 @@ const PILL_ACTIVE =
 const PILL_INACTIVE =
   "bg-white text-[#1E1E1EA6] [box-shadow:#ECECEC_0_0_0_0.0625rem] hover:text-[#1E1E1E] dark:bg-white/[0.04] dark:text-white/60 dark:[box-shadow:#FFFFFF14_0_0_0_0.0625rem] dark:hover:text-white";
 
-/** Logos the mobile engine field shows before collapsing the rest into "+N". */
 const MAX_STACKED_LOGOS = 3;
 
-/** A full-width select-style field for the compact mobile controls. */
 const MOBILE_FIELD =
   "flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl bg-white px-3.5 text-left font-sans text-[0.9375rem] font-medium tracking-[-0.01em] text-[#1E1E1E] outline-none [box-shadow:#ECECEC_0_0_0_0.0625rem] focus-visible:ring-2 focus-visible:ring-primary dark:bg-white/[0.04] dark:text-white dark:[box-shadow:#FFFFFF14_0_0_0_0.0625rem]";
 
@@ -127,14 +123,8 @@ const GROUP_LABEL =
 const GROUP_META =
   "font-sans text-sm tracking-[-0.015em] text-[#1E1E1E99] tabular-nums dark:text-white/50";
 
-function noop() {
-  // The fallback renders before the URL is readable and ignores input.
-}
+function noop() {}
 
-/**
- * `onDarkPill` picks the light mark for monochrome logos. Selected pills turn
- * white in dark mode, so they keep the default (dark) mark in both themes.
- */
 function EngineLogo({
   engine,
   onDarkPill,
@@ -182,8 +172,6 @@ function PromptsPanel({ value, onChange }: PromptCalculatorPanelProps) {
             min={PROMPT_CALCULATOR_MIN_PROMPTS}
             onBlur={() => setDraft(null)}
             onChange={(event) => {
-              // Keep what the visitor types (even an empty field) until they
-              // leave it; only valid numbers reach the estimate.
               setDraft(event.target.value);
               const next = Number.parseInt(event.target.value, 10);
               if (!Number.isNaN(next)) {
@@ -230,12 +218,9 @@ function PromptsPanel({ value, onChange }: PromptCalculatorPanelProps) {
 const MORE_ENGINE_COUNT = PROMPT_CALCULATOR_ENGINES.filter(
   (engine) => !engine.featured
 ).length;
-/** Distance from either end, in px, under which the strip counts as at that end. */
 const STRIP_EDGE_PX = 4;
-/** Width of the fade at a scrollable edge of the engine strip. */
 const STRIP_FADE_PX = 48;
 
-/** Phones get one select-style field instead of a row of pills. */
 function EngineDropdown({
   value,
   selectedModels,
@@ -248,7 +233,6 @@ function EngineDropdown({
   const selectedEngines = PROMPT_CALCULATOR_ENGINES.filter((engine) =>
     engine.models.some((model) => selectedModels.has(model.id))
   );
-  // From four engines on, the mobile field shows three logos and a "+N".
   const stackedEngines =
     selectedEngines.length > MAX_STACKED_LOGOS
       ? selectedEngines.slice(0, MAX_STACKED_LOGOS)
@@ -316,7 +300,6 @@ function EngineDropdown({
   );
 }
 
-/** The scrollable engine pills, from the sm breakpoint up. */
 function EngineStrip({
   value,
   selectedModels,
@@ -335,8 +318,6 @@ function EngineStrip({
       return;
     }
     const maxScroll = strip.scrollWidth - strip.clientWidth;
-    // The fades grow with the distance to each end, so they ease in and out
-    // while scrolling instead of switching on and off.
     strip.style.setProperty(
       "--fade-start",
       `${Math.min(strip.scrollLeft, STRIP_FADE_PX)}px`
@@ -416,9 +397,6 @@ function EngineStrip({
                 <EngineLogo engine={engine} onDarkPill={!checked} />
               </span>
               {engine.name}
-              {/* Stays mounted and eases its width, so the pill grows
-                    smoothly when a second model of the engine is picked. The
-                    negative margin cancels the pill gap while collapsed. */}
               <span
                 aria-hidden={selectedCount < 2}
                 className={cn(
@@ -453,7 +431,6 @@ function EngineStrip({
           onClick={scrollStrip}
           type="button"
         >
-          {/* Both labels share one cell so the button never changes width. */}
           <span
             aria-hidden="true"
             className={cn(
@@ -480,7 +457,6 @@ function EngineStrip({
   );
 }
 
-/** A disclosure listing every current model per engine. */
 function ExactModels({
   value,
   selectedModels,
@@ -512,7 +488,6 @@ function ExactModels({
           icon={ArrowDown01Icon}
         />
       </button>
-      {/* Grid rows animate from 0fr to 1fr, so the panel opens smoothly. */}
       <div
         className={cn(
           "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
@@ -571,7 +546,6 @@ function ExactModels({
 function ModelPills({ value, onChange }: PromptCalculatorPanelProps) {
   const selectedModels = new Set(value.models);
 
-  /** Adds or removes one model, keeping catalog order and at least one model. */
   function toggleModel(id: string) {
     if (value.models.includes(id)) {
       if (value.models.length > 1) {
@@ -586,7 +560,6 @@ function ModelPills({ value, onChange }: PromptCalculatorPanelProps) {
     });
   }
 
-  /** An engine pill adds its default model, or drops every model of it. */
   function toggleEngine(engine: PromptCalculatorEngine) {
     const engineModels = new Set(engine.models.map((model) => model.id));
     const remaining = value.models.filter((id) => !engineModels.has(id));
@@ -819,7 +792,6 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
 
   return (
     <article className="relative flex flex-col overflow-clip rounded-3xl bg-[#8B5CF6]">
-      {/* Flipped to the top so the dither sits behind the glass header, not the breakdown. */}
       <div className="pointer-events-none absolute inset-0 -scale-y-100 opacity-60">
         <PricingProShader />
       </div>

@@ -142,7 +142,6 @@ function remainingTableHeight(element: HTMLElement): number {
     parent = parent.parentElement;
   }
 
-  // The table frame adds its rim and borders on top of the passed height.
   return (
     Math.max(element.clientHeight, pageAvailable, scrollAvailable) -
     TABLE_FRAME_INSET_PX
@@ -385,7 +384,6 @@ function SearchWriteCell({
   const topTargetUrl = targets[0]?.url ?? undefined;
   const moreLabel = t("moreActions", { query: row.prompt });
   if (compact) {
-    // The table column only fits the primary action; the rest go in a menu.
     const hasDismiss = action === "ignore";
     return (
       <span className="inline-flex items-center justify-end gap-1">
@@ -903,7 +901,6 @@ export function GeoGapsTable({
       <WriteCell {...aiWriteProps(aiRow)} />
     );
     if (consoleRow) {
-      // Console actions stay available; an AI-only draft is offered alongside.
       const aiDraft = searchGapAiDraft(gap);
       const consoleActions = (
         <SearchWriteCell

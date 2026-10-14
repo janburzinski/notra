@@ -26,8 +26,6 @@ export default defineConfig({
   options: {
     reportUnusedDisableDirectives: "warn",
   },
-  // Keep the full presets as the source of truth while baselining rules that
-  // conflict with existing code. Newly added Ultracite rules stay enabled.
   rules: {
     "shadcn/no-restyle": [
       "warn",
@@ -39,23 +37,16 @@ export default defineConfig({
             allow: ["layout", "gap-6", "p-6"],
           },
           { pattern: "^Skeleton$", allow: ["layout", "shape"] },
-          // Icon-only copy buttons sit next to secondary text (code headers,
-          // input addons), so callers mute the idle icon. The tick keeps its
-          // own success colour.
           {
             pattern: "^CopyButton$",
             allow: ["layout", "text-muted-foreground"],
           },
-          // Spinner draws in currentColor, so callers tint it like an icon.
           { pattern: "^Spinner$", allow: ["layout", "color"] },
           {
             pattern: "^TitleCard$",
             allow: ["layout", "border-t-0", "pt-0"],
           },
           {
-            // TooltipTrigger is wrapped around arbitrary content everywhere, so
-            // the restyles below are the baseline that already exists. Listing
-            // them keeps the rule flagging anything new.
             pattern: "^TooltipTrigger$",
             allow: [
               "layout",
@@ -268,8 +259,6 @@ export default defineConfig({
       },
     },
     {
-      // Every Autumn customer read must go through the shared wrapper, or it
-      // requests a differently-shaped `expand` and gets its own cache entry.
       files: ["apps/dashboard/src/**"],
       rules: {
         "no-restricted-imports": [

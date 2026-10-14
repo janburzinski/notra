@@ -15,7 +15,6 @@ const split = splitFeatured(entries, featuredSetting);
 const lead = layout === "magazine" && split.featured.length === 0 ? splitFeatured(entries, "latest") : split;
 const { featured, rest } = lead;
 const images = cardImages(entries);
-// Two columns when three would leave the last row half empty (2 or 4 cards).
 const twoColumns = rest.length % 3 !== 0 && rest.length % 2 === 0;
 ---
 

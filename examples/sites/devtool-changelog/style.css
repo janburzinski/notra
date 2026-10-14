@@ -1,7 +1,4 @@
-/* Forgekit reads like a terminal: mono headings, one orange accent,
-   and a changelog drawn as a commit graph. */
 
-/* Changelog index: every release hangs off one rail, newest on top. */
 #content section > article[id] {
   position: relative;
   padding-left: 2rem;
@@ -37,7 +34,6 @@
   background: var(--accent);
 }
 
-/* The date and version line becomes the release tag, in the accent. */
 #content article[id] > p:first-child {
   color: var(--accent);
   text-transform: none;
@@ -56,8 +52,6 @@
   text-transform: uppercase;
 }
 
-/* The hero eyebrow is set like a shell prompt. Older theme builds don't
-   put the .eyebrow class on it, so the title next to it finds it too. */
 #content section > div > :is(.eyebrow, p:has(+ #page-title)) {
   font-family: var(--font-code);
   font-size: 0.8125rem;

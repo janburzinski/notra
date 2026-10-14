@@ -20,7 +20,6 @@ export function useGeoPromptTranslations(
       input: { organizationId, projectId },
     }),
     enabled: enabled && !!organizationId,
-    // Prompts and languages change elsewhere; always load the current picks.
     staleTime: 0,
     meta: { errorMessage: tToast("loadPromptTranslationsFailed") },
   });

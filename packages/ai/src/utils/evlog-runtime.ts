@@ -19,8 +19,6 @@ function createDatasetDrain(dataset: string | undefined) {
 
 export function getEvlogRuntime(): EvlogRuntimeState {
   const host = globalThis as EvlogGlobal;
-  // Next bundles instrumentation and route modules separately. Share both the
-  // buffers and scheduler so after() always flushes the emitting bundle's logs.
   host.__notraEvlogRuntime ??= {
     otlpDrain: createOTLPPipeline(),
     aiDrain: createDatasetDrain(

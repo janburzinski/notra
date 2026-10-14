@@ -168,12 +168,6 @@ function assertEmailSent({
   );
 }
 
-/**
- * Pins the events a flush sends to its first attempt, so a retry resends the
- * same email under the same Brew idempotency key. Events appended meanwhile
- * go to the next flush. `acknowledge` is safe to repeat and tells whether
- * such events are waiting. A run that lost its window sends nothing.
- */
 async function readDigestBatch(
   { digestKey, lockToken = "" }: ContentEmailDigestPayload,
   batchId: string

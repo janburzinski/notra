@@ -52,7 +52,6 @@ export function serializeBrandIdentity(brandIdentity: BrandIdentityRow) {
   };
 }
 
-/** Leave unexpected database errors to Hono's central error handler. */
 export function runBrandIdentityProgram<A, E extends BrandIdentityDomainError>(
   program: Effect.Effect<A, E | BrandIdentityDatabaseError>
 ) {

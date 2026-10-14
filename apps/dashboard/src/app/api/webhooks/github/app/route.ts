@@ -62,8 +62,6 @@ export const POST = withEvlog(async (request: Request) => {
     rawBody,
   });
 
-  // No delivery claim exists until the durable run starts. A failed enqueue
-  // fails the request; a redelivery can safely enqueue another competing run.
   if (result.context) {
     await startGitHubMentionRun(result.context);
   }

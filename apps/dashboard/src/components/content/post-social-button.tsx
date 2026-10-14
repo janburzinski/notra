@@ -79,7 +79,6 @@ export function PostSocialButton({
   const [video, setVideo] = useState<SocialVideoDraft | null>(
     initialVideo ?? null
   );
-  // Posting while an upload runs would send the post without its video.
   const [videoUploading, setVideoUploading] = useState(false);
   const saveVideo = useSaveSocialVideo(organizationId, contentId ?? "");
   const videoPending = videoUploading || saveVideo.isPending;
@@ -99,20 +98,17 @@ export function PostSocialButton({
     setOpen(nextOpen);
     if (nextOpen) {
       setLocalDraft(content);
-      // A save still in flight is newer than the saved video.
       if (!saveVideo.isPending) {
         setVideo(initialVideo ?? null);
       }
       return;
     }
     publishMutation.reset();
-    // Closing doesn't cancel an upload; keep its guard across dialog remounts.
     setReferencedVoiceIds([]);
     setPublishedContent(null);
     setLocalDraft(content);
   };
 
-  // Saved posts keep the video, so a scheduled delivery posts it as well.
   const handleVideoChange = (next: SocialVideoDraft | null) => {
     const previous = video;
     setVideo(next);

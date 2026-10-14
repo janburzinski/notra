@@ -81,7 +81,6 @@ function UpdatePullRequestHint({
   const updatePullRequest = async () => {
     setPending(true);
     try {
-      // A description typed a moment ago is still debounced: save it first.
       await flushPending();
       const result = await dashboardOrpc.content.publishChangelogToGitHub.call({
         organizationId,

@@ -18,24 +18,19 @@ import { useDataTableLabels } from "./data-table-labels";
 
 interface TablePaginationProps {
   page: number;
-  /** Omit when only "is there a next page" is known (cursor paging). */
   pageCount?: number;
   pageSize: number;
-  /** Omit when only "is there a next page" is known (cursor paging). */
   totalItems?: number;
-  /** Required without `pageCount`: whether a page follows this one. */
   hasNextPage?: boolean;
   pageRowCount: number;
   setPage: (page: number) => void;
   itemLabel?: string;
   className?: string;
   formatRange?: (range: TablePaginationRange) => string;
-  /** Shows a page-size select in place of the range text. */
   onPageSizeChange?: (pageSize: number) => void;
   pageSizeOptions?: readonly number[];
 }
 
-/** The offered sizes plus the current one, so a custom default still shows. */
 function pageSizeChoices(
   options: readonly number[],
   pageSize: number
@@ -43,7 +38,6 @@ function pageSizeChoices(
   return [...new Set([...options, pageSize])].sort((a, b) => a - b);
 }
 
-/** Visible row range for a page; `total` is unknown with cursor paging. */
 function pageRange(
   page: number,
   pageSize: number,
@@ -184,11 +178,6 @@ function PageControls({
   );
 }
 
-/**
- * Footer pager: the page-size select (or the visible range) on the left,
- * "Page 2 of 9" and prev/next on the right. One shape for known and unknown
- * totals, so every table pages the same way.
- */
 export function TablePagination({
   page,
   pageCount,
@@ -207,7 +196,6 @@ export function TablePagination({
   const isFirst = page <= 1;
   const isLast = pageCount === undefined ? !hasNextPage : page >= pageCount;
   const hasPages = !(isFirst && isLast);
-  // A size picker only helps once there is more than the smallest page.
   const smallestSize = Math.min(...pageSizeOptions, pageSize);
   const hasMoreThanSmallest =
     range.total === undefined

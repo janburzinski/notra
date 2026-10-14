@@ -112,8 +112,6 @@ export const HORIZONTAL_RULE: ElementTransformer = {
   regExp: /^(---|\*\*\*|___)\s?$/,
   replace: (parentNode, _children, _match, isImport) => {
     const hrNode = $createHorizontalRuleNode();
-    // When importing from markdown or when there's a next sibling, replace the node.
-    // Otherwise, insert before to ensure proper cursor positioning after the transformation.
     if (isImport || parentNode.getNextSibling() != null) {
       parentNode.replace(hrNode);
     } else {
@@ -149,7 +147,6 @@ export const KIBO_CODE_BLOCK: MultilineElementTransformer = {
   ) => {
     const language = startMatch[1] || "";
 
-    // During markdown import (linesInBetween has content)
     if (linesInBetween) {
       const code = linesInBetween.join("\n");
       const codeBlockNode = $createKiboCodeBlockNode(code, language);
@@ -157,7 +154,6 @@ export const KIBO_CODE_BLOCK: MultilineElementTransformer = {
       return;
     }
 
-    // During markdown shortcut (children exist, replace parent)
     if (children && children.length > 0) {
       const code = children.map((child) => child.getTextContent()).join("\n");
       const codeBlockNode = $createKiboCodeBlockNode(code, language);
@@ -168,7 +164,6 @@ export const KIBO_CODE_BLOCK: MultilineElementTransformer = {
         rootNode.append(codeBlockNode);
       }
     } else {
-      // Handle empty code block (just ``` with no content)
       const codeBlockNode = $createKiboCodeBlockNode("", language);
       rootNode.append(codeBlockNode);
     }

@@ -16,7 +16,6 @@ export interface SiteTag<
 export interface TagListProps {
   tags: TagLink[];
   class?: string;
-  /** Lifts the links above a card's full-size link overlay. */
   overlay?: boolean;
 }
 

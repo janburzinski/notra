@@ -22,7 +22,6 @@ import {
 
 import { conflict, notFound } from "../utils/errors";
 
-/** First free `<base>`, `<base>-2`, … in the organization. */
 async function freeAuthorSlug(organizationId: string, name: string) {
   const base = authorSlugBase(name);
   const taken = new Set(
@@ -69,7 +68,6 @@ export const contentAuthorsRouter = {
       };
     }),
 
-  /** The current member's author entry, created from their profile on first use. */
   ensureSelf: baseProcedure
     .input(contentOrganizationIdInputSchema)
     .handler(async ({ context, input }) => {
@@ -98,9 +96,6 @@ export const contentAuthorsRouter = {
             eq(contentAuthors.userId, auth.user.id)
           ),
         });
-      // A unique violation is either this member's own concurrent request
-      // (return its row) or another author taking the same slug in the
-      // meantime (pick the next free slug and try again).
       for (let attempt = 1; ; attempt++) {
         const slug = await freeAuthorSlug(input.organizationId, name);
         try {

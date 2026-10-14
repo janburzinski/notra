@@ -23,8 +23,6 @@ import type { RouteContext } from "@/types/api/routes";
 
 const TRAILING_SLASHES_RE = /\/+$/;
 
-// Serves the diagram's Excalidraw scene same-origin, so the clipboard export
-// does not depend on the asset bucket's CORS rules.
 export async function GET(
   request: Request,
   { params }: RouteContext<{ organizationId: string; contentId: string }>
@@ -60,7 +58,6 @@ export async function GET(
       { status: 503 }
     );
   }
-  // Only fetch our own asset bucket, never an arbitrary URL from metadata.
   if (!excalidrawUrl.startsWith(`${publicUrl}/`)) {
     return Response.json(
       { error: "This image has no Excalidraw scene" },
@@ -80,8 +77,6 @@ export async function GET(
     headers: {
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "no-store",
-      // The editor sends this back on save, so a save based on an older scene
-      // cannot overwrite a newer chat or hand edit.
       [DIAGRAM_REVISION_HEADER]: String(
         readDiagramRevision(post?.sourceMetadata)
       ),
@@ -89,8 +84,6 @@ export async function GET(
   });
 }
 
-// Saves a diagram edited by hand in the embedded Excalidraw editor: the scene
-// becomes the post's spec again, so chat edits continue from the hand edits.
 export async function PUT(
   request: Request,
   { params }: RouteContext<{ organizationId: string; contentId: string }>
@@ -124,7 +117,6 @@ export async function PUT(
       eq(posts.contentType, "image")
     ),
   });
-  // Only diagrams: saving a scene over a marketing image would replace it.
   if (!(post && canEditDiagramWithoutSandbox(post.sourceMetadata))) {
     return Response.json({ error: "Diagram not found" }, { status: 404 });
   }

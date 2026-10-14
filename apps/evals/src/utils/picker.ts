@@ -17,7 +17,6 @@ import type {
 import { aggregateCosts } from "./cost";
 import { mean, percentile } from "./stats";
 
-/** Per-call spend reads badly at classifier prices, so show it per 1k calls. */
 export function formatPerThousand(costPerCall: number | undefined): string {
   if (costPerCall === undefined || !Number.isFinite(costPerCall)) {
     return "–";
@@ -83,7 +82,6 @@ function evidenceFromTasks(
   };
 }
 
-/** Latest run per model for this suite, matching the demo/live mode. */
 export function collectEvidence(
   runs: readonly EvalRun[],
   suiteId: string,
@@ -116,7 +114,6 @@ export function collectEvidence(
   return [...latest.values()];
 }
 
-/** Not beaten by any model that is at least as good and at most as cheap. */
 function isOnFrontier(
   item: Pick<ModelEvidence, "score" | "costPerCall">,
   all: readonly Pick<ModelEvidence, "score" | "costPerCall">[]
@@ -203,7 +200,6 @@ export function pickForSuite({
     })
     .sort((a, b) => (a.costPerCall ?? Infinity) - (b.costPerCall ?? Infinity));
 
-  // Cheapest model that clears the bar; latency breaks ties.
   const recommended = evidence
     .filter((item) => item.eligible)
     .sort(
@@ -259,7 +255,6 @@ export function pickForSuite({
   };
 }
 
-/** Models worth a verification run: prod, the pick, the frontier, 2 candidates. */
 export function verificationModels(pick: SuitePick): string[] {
   const ids = new Set<string>([pick.suite.productionModel]);
   if (pick.recommended) {

@@ -15,7 +15,6 @@ export const EMAIL_THEME = {
   geoUpWash: "#EAF3EE",
   geoDown: "#D83E38",
   geoDownWash: "#FBECEB",
-  /** Hex twins of `cta-gradient-primary` in `packages/ui/src/styles/cta-button.css`. */
   ctaFrom: "#A385FF",
   ctaTo: "#7C00FF",
   ctaGlow: "#8B5CF640",

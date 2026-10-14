@@ -136,12 +136,6 @@ function describeError(error: unknown): string {
   return error instanceof Error ? error.message : "Unknown error";
 }
 
-/**
- * `result.output` throws when the model did not finish with `stop`, so an
- * unfinished response has to be described before the output is read. A
- * `length` finish means the brief hit the token budget; the truncated JSON is
- * handed back to the model so the repair attempt can shorten it.
- */
 function describeUnfinishedPlan(
   finishReason: FinishReason,
   text: string,

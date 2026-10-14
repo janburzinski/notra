@@ -67,7 +67,6 @@ function createLazyDevToolsMiddleware(): LanguageModelMiddleware {
   let middlewarePromise: Promise<LanguageModelMiddleware> | undefined;
 
   const getMiddleware = async () => {
-    // Next.js must be able to eliminate this import from the workflow bundle.
     if (process.env.NODE_ENV !== "development") {
       return undefined;
     }

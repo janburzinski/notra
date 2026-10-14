@@ -261,10 +261,6 @@ function CompetitorLogosCell({
       ),
     };
   });
-  /*
-   * One named brand beats four anonymous logos: the column is narrow, and the
-   * row already says what happened, so the only open question is "to whom".
-   */
   return (
     <LogoStack
       labels={logoStackLabels}
@@ -342,7 +338,6 @@ function changeRowId(event: GeoChangeEvent): string {
   return `${event.kind}-${event.promptId}-${event.engine}`;
 }
 
-/** Empty body for the changes card: no comparison scan yet, or nothing moved. */
 function ChangesEmpty({
   isScanning,
   reason,

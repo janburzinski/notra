@@ -11,7 +11,6 @@
   line-height: 1.2;
 }
 
-/* Blockquotes become pull quotes: large display type between two rules. */
 .mdx-content blockquote {
   margin: 2.5rem 0;
   padding: 1.25rem 0;
@@ -36,14 +35,10 @@
   margin: 0;
 }
 
-/* Captions under framed figures read like a magazine caption. */
 .frame figcaption {
   font-style: italic;
 }
 
-/* The index hero reads as a masthead: the issue line in spaced small
-   capitals over a large title. Older theme builds don't put the .eyebrow
-   class on the issue line, so the title next to it finds it too. */
 #content section > div > :is(.eyebrow, p:has(+ #page-title)) {
   font-size: 1rem;
   font-variant-caps: all-small-caps;

@@ -116,16 +116,11 @@ async function answerQuestion(
   };
 }
 
-/**
- * Asks every question in parallel, then grades all answers in one judge call
- * that alone sees the feature name and the problem.
- */
 export async function runOfferingCheck(
   input: OfferingCheckInput,
   emit: OfferingStreamEmit,
   abortSignal: AbortSignal
 ): Promise<OfferingCheckResult> {
-  // One failed answer fails the check, so stop paying for the other one.
   const runId = crypto.randomUUID();
   const answering = new AbortController();
   const signal = AbortSignal.any([abortSignal, answering.signal]);

@@ -223,53 +223,26 @@ export const NAV_PRIMARY_ACTIONS: Record<SidebarMode, NavPrimaryActionConfig> =
     studio: { icon: PlusSignIcon },
   };
 
-// Shared sidebar panel swap (GEO <-> Studio, main <-> chat/brand).
-// Both layers travel their own side while the outgoing one blurs out and the
-// incoming one resolves — the blur is what lets them overlap for the full
-// window without the two lists colliding into an unreadable double image, so
-// neither layer has to wait for the other.
-//
-// Two things these classes have to get right:
-//   1. Tailwind v4 compiles `translate-x-*` to the standalone `translate`
-//      property, not to `transform`. Transitioning `transform` animates nothing
-//      and the panels snap sideways — `translate` has to be named explicitly.
-//   2. Every nav label is split into one <span> per character for the collapse
-//      animation. Without an up-front compositor layer the browser re-rasterises
-//      all of them on every frame of the fade, which is what makes it stutter.
-//
-// The outgoing layer eases *out*, not in. Accelerating away is the tempting
-// reading of a swoosh, but a single timing function drives opacity and blur too,
-// and an ease-in barely moves them for the first half of the window — the old
-// panel then sits there sharp and opaque long enough to read as a ghost behind
-// the new one. Easing out dumps opacity and smears the blur in the first frames,
-// so the leftovers are gone before the eye lands on them.
 const SIDEBAR_MODE_SWOOSH_IN = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 const SIDEBAR_MODE_SWOOSH_OUT = "ease-emphasized";
 const SIDEBAR_MODE_ENTER_TIMING = `duration-slow ${SIDEBAR_MODE_SWOOSH_IN}`;
 const SIDEBAR_MODE_EXIT_TIMING = `duration-fast ${SIDEBAR_MODE_SWOOSH_OUT}`;
 
-/** Derived from the `duration-fast` token used on the exit classes above. */
 export const SIDEBAR_MODE_EXIT_MS = DURATION.fast * 1000;
 
-/** Base class for a layer that participates in the mode swoosh. */
 export const SIDEBAR_MODE_FADE_CLASS =
   "transition-[opacity,translate,filter] will-change-[opacity,translate,filter] motion-reduce:translate-x-0 motion-reduce:blur-none motion-reduce:transition-opacity";
 
-/** Applied to the layer belonging to the mode that is now active. */
 export const SIDEBAR_MODE_ENTER_CLASS = `z-10 translate-x-0 opacity-100 blur-[0px] ${SIDEBAR_MODE_ENTER_TIMING}`;
 
-/** Applied to the hidden layer of the left-hand (GEO) mode. */
 export const SIDEBAR_MODE_EXIT_LEFT_CLASS = `pointer-events-none z-0 -translate-x-5 opacity-0 blur-[8px] ${SIDEBAR_MODE_EXIT_TIMING}`;
 
-/** Applied to the hidden layer of the right-hand (Studio) mode. */
 export const SIDEBAR_MODE_EXIT_RIGHT_CLASS = `pointer-events-none z-0 translate-x-5 opacity-0 blur-[8px] ${SIDEBAR_MODE_EXIT_TIMING}`;
 
-/** Indicator that slides between the two tabs of the mode switch. */
 export const SIDEBAR_MODE_PILL_CLASS = `pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-md bg-background ring-1 ring-border transition-[translate] will-change-[translate] duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
 
 export const SIDEBAR_MODE_PANEL_CLASS = `flex min-h-0 w-full flex-col ${SIDEBAR_MODE_FADE_CLASS}`;
 
-/** Collapses the primary-action row when the active mode has no action to offer. */
 export const SIDEBAR_MODE_SLOT_CLASS = `grid transition-[grid-template-rows,opacity] duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
 
 export const NAV_RECENT_LIMIT = 3;
@@ -281,9 +254,6 @@ export const POST_STATUS_DOT_CLASS: Record<PostStatus, string> = {
   published: "bg-success",
 };
 
-// Second-level segments under these are static pages (geo/prompts,
-// automation/schedules); under any other section they are record ids that
-// belong to the workspace being left.
 export const ORG_SWITCH_STATIC_PAGE_SECTIONS: ReadonlySet<string> = new Set([
   "geo",
   "automation",

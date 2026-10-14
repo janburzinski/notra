@@ -44,7 +44,6 @@ export function ChatComposerAttachButton({
               disabled ||
               attachmentCount + pendingUploadCount >= MAX_CHAT_ATTACHMENTS
             }
-            // Stays focusable while disabled so the tooltip can explain why.
             focusableWhenDisabled
             onClick={onAttach}
           />

@@ -6,7 +6,6 @@ import {
 } from "../constants/billing";
 import type { GeoBillingError } from "../errors/billing";
 
-/** One cache per billing credential; never cache denials or provider failures. */
 export function makeGeoEntitlementCache(
   lookup: (organizationId: string) => Effect.Effect<boolean, GeoBillingError>
 ) {

@@ -35,9 +35,6 @@ function generationKey(organizationId: string): string {
   return `${GEO_CHECK_GENERATION_KEY_PREFIX}:${organizationId}`;
 }
 
-// A dashboard render runs several aggregates at once; they share one read.
-// Nothing outlives the request: a remembered generation could serve entries
-// from before the next scan batch.
 const pendingReads = new Map<string, Promise<number | null>>();
 
 function readGeneration(

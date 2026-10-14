@@ -44,10 +44,6 @@ import {
   summarizePostSchedule,
 } from "@/utils/content-calendar";
 
-/**
- * A menu action that needs the saved post. While edits are unsaved it stays
- * in the menu, disabled, with the reason underneath.
- */
 function GatedMenuItem({
   icon,
   label,
@@ -76,7 +72,6 @@ function GatedMenuItem({
   );
 }
 
-/** A live schedule's state, opening its dialog, with its actions in a menu. */
 function ScheduleStatusControls({
   organizationId,
   contentId,
@@ -158,11 +153,6 @@ function ScheduleStatusControls({
   );
 }
 
-/**
- * Publish, with scheduling in its menu. Once a schedule is live it takes the
- * button's place, since publishing by hand would bypass its destinations; its
- * own menu publishes every destination now or drops the schedule.
- */
 export function ContentPublishButton({
   organizationId,
   organizationSlug,
@@ -182,7 +172,6 @@ export function ContentPublishButton({
   const blocked = hasUnsavedChanges || videoPending;
 
   let controls = publishButton;
-  // A schedule still going out, or one with failures to resolve.
   if (active || failed) {
     const statusControls = (
       <ScheduleStatusControls
@@ -208,7 +197,6 @@ export function ContentPublishButton({
         <DropdownMenu>
           <SplitButtonTrigger label={t("moreActions")} size="sm" />
           <DropdownMenuContent align="end" className="w-56">
-            {/* Unsaved edits would not be part of what goes out. */}
             <GatedMenuItem
               blocked={blocked}
               hint={t("saveFirstHint")}

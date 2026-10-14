@@ -1,14 +1,3 @@
-/**
- * Provisions the Brew side of Notra email: sending domains, pass-through
- * designs, one strict trigger + published automation per email type, the
- * contact fields the app syncs, and a marketing opt-in audience.
- *
- *   bun run brew:setup -- --profile test
- *   bun run brew:setup -- --profile production
- *
- * Safe to re-run. Objects are matched by name. On an existing automation only
- * the node with id "send" is reconciled, so steps added in Brew survive.
- */
 import {
   BREW_MARKETING_DOMAIN,
   BREW_CONTACT_FIELD_TYPES,
@@ -82,7 +71,6 @@ interface BrewAutomation {
 }
 
 const PROFILES: Record<Profile, Record<SenderRole, Sender>> = {
-  // One verified test domain, so the test welcome flow stays transactional.
   test: {
     notifications: {
       domain: "jan-test.usenotra.com",
@@ -174,10 +162,6 @@ const PAYLOAD_SCHEMA = {
   ],
 };
 
-/**
- * No default: profiles only differ in sender, so running the wrong one against
- * a live brand would repoint and publish every automation's send step.
- */
 function parseProfile(): Profile {
   const index = process.argv.indexOf("--profile");
   const value = index === -1 ? undefined : process.argv[index + 1];
@@ -218,7 +202,6 @@ async function ensureDomain(
   return domain;
 }
 
-/** Resolves each sender role to a verified domain id. */
 async function ensureSenderDomains(
   senders: Record<SenderRole, Sender>
 ): Promise<Record<SenderRole, string>> {
@@ -304,7 +287,6 @@ async function ensureDesign(
   return created;
 }
 
-/** Resolves each sender role to the pass-through design for its purpose. */
 async function ensureSenderDesigns(
   senders: Record<SenderRole, Sender>
 ): Promise<Record<SenderRole, BrewEmail>> {
@@ -354,7 +336,6 @@ async function ensureStrictContract(
       enforcement: "strict",
     });
   } catch (error) {
-    // Don't leave a live email switched off when the setup stops here.
     if (wasPublished) {
       await api("PATCH", `/automations/${automation.automationId}`, {
         published: true,
@@ -432,10 +413,6 @@ function createAutomation(
   });
 }
 
-/**
- * Brings the "send" step in line with the profile and keeps every other node.
- * Returns null for graphs reshaped in Brew without that step.
- */
 async function reconcileSendStep(
   automationId: string,
   sendConfig: SendConfig
@@ -478,8 +455,6 @@ async function ensureAutomation(
     ? await reconcileSendStep(existing.automationId, sendConfig)
     : await createAutomation(name, triggerEventId, sendConfig);
 
-  // A reshaped graph is left as is, but ensureStrictContract may have
-  // unpublished it, so bring it back live.
   if (!automation && existing?.published) {
     await api("PATCH", `/automations/${existing.automationId}`, {
       published: true,
@@ -511,7 +486,6 @@ async function main() {
   await ensureMarketingAudience();
   const domainIds = await ensureSenderDomains(senders);
   const designs = await ensureSenderDesigns(senders);
-  // Pass-through designs look empty in Brew; the group name says why.
   await ensureEmailGroup(SYSTEM_GROUP_NAME, [
     ...new Set(Object.values(designs).map((design) => design.emailId)),
   ]);

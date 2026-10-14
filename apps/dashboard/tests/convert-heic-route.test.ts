@@ -22,7 +22,6 @@ mock.module("@/utils/compress-content-image", () => ({
 
 const { POST } = await import("../src/app/api/uploads/convert-heic/route");
 
-// Simulate untrusted streaming bodies whose Content-Length is missing or intentionally inaccurate.
 function streamedRequest(length: number, declaredLength?: string) {
   let canceled = false;
   let sent = false;

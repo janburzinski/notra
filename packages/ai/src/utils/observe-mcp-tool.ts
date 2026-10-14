@@ -41,7 +41,6 @@ export async function observeMcpTool<T>(
     }
     throw error;
   } finally {
-    // Monitoring failure must never change the tool result or original exception.
     try {
       const context = getOperationalContext();
       emit({

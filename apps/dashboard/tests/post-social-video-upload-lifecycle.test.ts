@@ -201,8 +201,6 @@ if (!process.env.NOTRA_SOCIAL_VIDEO_LIFECYCLE_TEST_WORKER) {
     tree.props.onOpenChange(true);
     tree = render();
     const uploadingAttachment = find(tree, SocialVideoAttachment);
-    // A long EBML header and wrong browser MIME exercise full-file sniffing
-    // and normalization in the same upload lifecycle, without another harness.
     const bytes = new Uint8Array(5016);
     bytes.set([0x1a, 0x45, 0xdf, 0xa3, 0x53, 0x92]);
     bytes.set([0x42, 0x82, 0x84, 0x77, 0x65, 0x62, 0x6d], 6);

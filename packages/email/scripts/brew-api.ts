@@ -1,4 +1,3 @@
-/** Throwing wrappers around the app's Brew client, for the Brew scripts. */
 import type { BrewRequestInit } from "../src/types/brew";
 import { brewRequest } from "../src/utils/brew";
 

@@ -17,7 +17,6 @@ export function useAnnotationHighlights(
   passages: readonly string[],
   contentKey: string
 ) {
-  // A string key keeps the effect from re-running on every new array.
   const passagesKey = passages.join(PASSAGE_SEPARATOR);
 
   useEffect(() => {
@@ -34,6 +33,5 @@ export function useAnnotationHighlights(
         CSS.highlights.delete(CHAT_ANNOTATION_HIGHLIGHT_NAME);
       }
     };
-    // contentKey re-runs the search when the post body changes.
   }, [rootRef, passagesKey, contentKey]);
 }

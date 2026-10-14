@@ -336,8 +336,6 @@ brandIdentitiesRoutes.openapi(createBrandIdentityRoute, async (c) => {
     throw duplicateCheck.failure;
   }
 
-  // Charged immediately before the brand analysis workflow is queued: the 404,
-  // 503 and 409 above must not spend the caller's budget.
   const rateLimited = await enforceRatelimit(c, ratelimit.brandGeneration);
   if (rateLimited) {
     return rateLimited;

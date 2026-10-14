@@ -10,7 +10,6 @@ import {
   localDateToDisplayDate,
 } from "@/utils/content-metadata";
 
-/** The shared date field, with a reset back to the publish date. */
 export function OverviewDateField({
   id,
   value,
@@ -20,7 +19,6 @@ export function OverviewDateField({
   const t = useTranslations("content.overview.date");
   const locale = useLocale();
   const day = value ?? fallback;
-  // A calendar day, so format it in UTC: server and browser agree on it.
   const formatter = useMemo(
     () =>
       new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }),

@@ -66,11 +66,6 @@ export function citationsEqual(
   );
 }
 
-/**
- * Collapse raw mention-check URL groups onto canonical shelf URLs so
- * `www` / `old.reddit.com` / tracking-param variants count as one page.
- * Bare homepages are dropped: a brand's own root domain is not shelf space.
- */
 type FoldedCitationPage = GeoShelfCitedPage & {
   promptIds: Set<string>;
   checkIds: Set<string>;

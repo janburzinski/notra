@@ -17,7 +17,6 @@ import { demoPoolSize } from "../../src/utils/demo-limits";
 const originalPoolSize = process.env.NOTRA_DEMO_POOL_SIZE;
 let total = 300;
 let pooled = 3;
-/** Visitors seen within the eviction floor; never returned as candidates. */
 let activeVisitors = 0;
 let lockedPoolRows = 0;
 let transactionActive = false;
@@ -286,7 +285,6 @@ const mockedDb = {
   query: { demoSandboxes: { findMany } },
 };
 mock.module("@notra/db/drizzle", () => ({ db: mockedDb }));
-// A full pool makes refill exit without seeding. No external service is used.
 mock.module("@notra/ai/utils/redis", () => ({ redis: null }));
 mock.module("@notra/ai/utils/server-log", () => ({ logError: mock() }));
 mock.module("@/lib/demo/api-key", () => ({

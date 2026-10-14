@@ -8,17 +8,8 @@ export const SCHEDULE_AI_CREDIT_LOCK_TTL_MS = 3 * 60 * 60 * 1000;
 export const EVENT_MAX_LISTED_COMMITS = 10;
 export const CONTENT_EMAIL_DIGEST_DELAY = "5m";
 export const CONTENT_EMAIL_DIGEST_TTL_SECONDS = 15 * 60;
-// Brew's idempotency window: a flush retried within it never sends twice.
 export const CONTENT_EMAIL_DIGEST_BATCH_TTL_SECONDS = 24 * 60 * 60;
 export const CONTENT_EMAIL_DIGEST_BATCH_SENT = "sent";
-/**
- * Pins a flush to the events listed on its first attempt and renews the
- * window. Returns the batch (an event count or the sent marker), or nil when
- * another run took the window over after it expired. Runs started before
- * lock tokens hold the window as "1", so they yield to a token run.
- * KEYS: list, lock, batch. ARGV: lock token ("" for old runs), lock ttl,
- * batch ttl.
- */
 export const PIN_CONTENT_EMAIL_DIGEST_SCRIPT = `
 local lock = redis.call("GET", KEYS[2])
 if ARGV[1] == "" then
@@ -34,15 +25,6 @@ end
 redis.call("SET", KEYS[3], redis.call("LLEN", KEYS[1]), "EX", ARGV[3], "NX")
 return redis.call("GET", KEYS[3])
 `;
-/**
- * Acknowledges a sent batch in one step, so a retry can't trim twice: drops
- * the batch's events once and marks it sent. Keeps the window (returns 1)
- * when events arrived meanwhile, otherwise releases it (returns 0). A run
- * that lost the window trims nothing: the new owner may resend its events,
- * but none get dropped.
- * KEYS: list, lock, batch. ARGV: lock token ("" for old runs), lock ttl,
- * batch ttl, sent marker.
- */
 export const ACK_CONTENT_EMAIL_DIGEST_SCRIPT = `
 local lock = redis.call("GET", KEYS[2])
 local owner

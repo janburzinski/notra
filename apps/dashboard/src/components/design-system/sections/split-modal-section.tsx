@@ -165,8 +165,6 @@ function DemoSectionBody({ activeSection }: { activeSection: DemoSectionId }) {
   );
 }
 
-/* Below md the nav pane is hidden, so sections become a scrolling chip row
-   under the title, the same way the GEO write dialog does it. */
 function DemoMobileNav({
   activeSection,
   onSelect,

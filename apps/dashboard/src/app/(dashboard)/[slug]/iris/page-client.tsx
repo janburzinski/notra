@@ -53,7 +53,6 @@ export default function PageClient({ organizationSlug }: IrisPageClientProps) {
       initialPageParam: undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
       enabled: isReady,
-      // Keep discovering runs started by the scheduler or another session.
       refetchInterval: (query: {
         state: { data?: { pages: IrisListRunsResult[] } };
       }) =>

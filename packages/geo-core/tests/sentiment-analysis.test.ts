@@ -108,7 +108,6 @@ test("billing blocks denied and expired requests, confirms attempted calls inclu
           },
         };
         if (mode === "missing-details") {
-          // Simulate a provider response omitting details despite the SDK type.
           Reflect.deleteProperty(result.usage, "inputTokenDetails");
         }
         return result;

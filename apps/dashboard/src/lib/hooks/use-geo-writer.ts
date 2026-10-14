@@ -62,8 +62,6 @@ export function useGeoWriterBrief(
     }),
     enabled: !!organizationId && !!briefId,
     retry: (failureCount, error) => !isNotFoundError(error) && failureCount < 1,
-    // Poll while the writer is running. New runs skip "approved" (draft/failed
-    // go straight to "writing"), but legacy rows can still sit in "approved".
     refetchInterval: (query) => {
       const status = query.state.data?.status;
       return status === "writing" || status === "approved"
@@ -125,7 +123,6 @@ export function useGeoPromptGapIgnore(organizationId: string) {
       return { removed };
     },
     onError: (error, _input, context) => {
-      // Restore only this row so concurrent ignores of other rows stay removed.
       const removed = context?.removed;
       if (removed) {
         queryClient.setQueryData<GeoContentGapsResponse>(

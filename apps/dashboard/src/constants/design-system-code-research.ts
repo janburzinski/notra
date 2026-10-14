@@ -11,7 +11,6 @@ export const CODE_RESEARCH_DEMO_REDIS_KEY = `code-research:box:${CODE_RESEARCH_D
 export const CODE_RESEARCH_DEMO_BOX_TTL_MINUTES = 15;
 export const CODE_RESEARCH_DEMO_REUSE_MARGIN_MINUTES = 5;
 
-// Playback pacing at 1x. Real durations from the live test are shown separately.
 export const CODE_RESEARCH_PLAYBACK_DELAYS = {
   user: 500,
   assistantStart: 700,
@@ -25,7 +24,6 @@ export const CODE_RESEARCH_PLAYBACK_DELAYS = {
 export const CODE_RESEARCH_REAL_TO_PLAYBACK_RATIO = 0.35;
 export const CODE_RESEARCH_PLAYBACK_SPEEDS = [0.5, 1, 2, 4] as const;
 
-// Measured against real Upstash boxes on 2026-09-29.
 export const CODE_RESEARCH_MEASURED_MS = {
   lookup: 12,
   lease: 9,

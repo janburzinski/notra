@@ -37,6 +37,5 @@ export function getDitherEnvironmentServerSnapshot() {
 }
 
 export function getDitherMobileServerSnapshot() {
-  // Keep WebGL out of the hydration render until the viewport is known.
   return true;
 }

@@ -72,11 +72,6 @@ export async function assertAuthenticated(args: { headers: Headers }) {
   return assertAuthenticatedWithDeps(args);
 }
 
-/**
- * Batched oRPC calls arrive as one HTTP request, so every procedure in the
- * batch would otherwise repeat the same membership SELECT. The memo lives in a
- * WeakMap keyed by that request's `Headers`, so it cannot outlive the request.
- */
 async function findMembershipMemoized(
   deps: Pick<OrganizationAuthDependencies, "findMembership">,
   headers: Headers,

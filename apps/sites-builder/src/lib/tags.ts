@@ -12,7 +12,6 @@ function tagLink(name: string, slug: string): TagLink {
   return { name, slug, href: href(`tags/${slug}`) };
 }
 
-/** The entry's tags, deduplicated by slug in their written order. */
 export function entryTags(
   entry: BlogEntry | ChangelogEntry,
   listedEntries?: (BlogEntry | ChangelogEntry)[]
@@ -36,10 +35,6 @@ export function entryTags(
   return links;
 }
 
-/**
- * Tags across the entries, most used first. Tags group case-insensitively and
- * keep the spelling of the newest entry that uses them.
- */
 export function collectTags<Entry extends BlogEntry | ChangelogEntry>(
   entries: Entry[]
 ): SiteTag<Entry>[] {
@@ -61,7 +56,6 @@ export function collectTags<Entry extends BlogEntry | ChangelogEntry>(
   );
 }
 
-/** "1 post", "3 updates": the count in the current area's words. */
 export function entryCount(count: number): string {
   const nouns = TAG_ENTRY_NOUNS[params.area];
   return `${count} ${count === 1 ? nouns.one : nouns.other}`;

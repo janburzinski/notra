@@ -20,13 +20,11 @@ const FEEDBACK_SERIES_KEY = "feedback";
 const FEEDBACK_STROKE_WIDTH = 2;
 const Y_AXIS_TICK_COUNT = 4;
 
-/** Whole-number y-axis from zero: counts never get 0.5 ticks. */
 function countAxis(peak: number) {
   const interval = Math.max(1, Math.ceil(peak / Y_AXIS_TICK_COUNT));
   return { max: interval * Y_AXIS_TICK_COUNT, interval };
 }
 
-/** Feedback received per day in the picked range, styled like the GEO trend. */
 export function AgentFeedbackActivityCard({
   organizationId,
 }: AgentFeedbackActivityCardProps) {
@@ -59,7 +57,6 @@ export function AgentFeedbackActivityCard({
   const yAxis = countAxis(
     Math.max(0, ...data.points.map((point) => point.value))
   );
-  // Today is still filling up, so the last segment is drawn as a buffer.
   const markIncompleteTail = data.points.at(-1)?.day === todayIsoDate();
 
   return (

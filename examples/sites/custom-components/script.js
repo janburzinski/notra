@@ -1,6 +1,3 @@
-// Copy-to-clipboard for anything with a data-copy attribute: icon names in
-// posts and the name chip in the icon search. One listener on the document
-// also covers elements React renders after this script runs.
 (() => {
   let toast;
   let hideTimer;

@@ -55,7 +55,6 @@ export function plainText(node: Nodes): string {
   }
 }
 
-/** Parses a post body as MDX, falling back to plain Markdown when the MDX is invalid. */
 export function parseBody(body: string): Root {
   try {
     return fromMarkdown(body, {

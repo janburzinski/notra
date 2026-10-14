@@ -1,7 +1,6 @@
 import { getConversationalBlogPostPrompt } from "../../prompts/blog_post/conversational";
 import { UNSLOP_CONTENT } from "../unslop-content";
 
-/** System skills whose seeded copies follow the code instead of the seed-time text. */
 const REFRESHED_SYSTEM_SKILLS: Readonly<Record<string, () => string>> = {
   "blog-post": getConversationalBlogPostPrompt,
   unslop: () => UNSLOP_CONTENT,

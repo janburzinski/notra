@@ -72,7 +72,6 @@ export const sourceMetadataSchema = z
     chatId: z.string().nullable().optional(),
     briefId: z.string().optional(),
     projectId: z.string().optional(),
-    /** Video posted with the X/LinkedIn post, now or from the calendar. */
     socialVideo: socialVideoAttachmentSchema.nullable().optional(),
     sandbox: z
       .object({
@@ -383,7 +382,6 @@ export const updateContentSchema = z
     slug: postSlugSchema.nullable().optional(),
     markdown: z.string().max(POST_MARKDOWN_MAX_LENGTH).optional(),
     status: postStatusSchema.optional(),
-    /** Sets or clears the video posted with an X/LinkedIn post. */
     socialVideo: socialVideoAttachmentSchema.nullable().optional(),
   })
   .refine(

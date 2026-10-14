@@ -54,12 +54,10 @@ const blogContent = browserCollections.blog.createClientLoader({
     return (
       <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch px-4 pt-24 sm:px-6 sm:pt-28 md:px-8 md:pt-32">
         <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD payload is server-built and script-close-escaped
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
           type="application/ld+json"
         />
         <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD payload is server-built and script-close-escaped
           dangerouslySetInnerHTML={{
             __html: serializeJsonLd(breadcrumbJsonLd),
           }}
@@ -67,7 +65,6 @@ const blogContent = browserCollections.blog.createClientLoader({
         />
         {faqJsonLd ? (
           <script
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD payload is server-built and script-close-escaped
             dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
             type="application/ld+json"
           />

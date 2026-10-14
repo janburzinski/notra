@@ -21,7 +21,6 @@ export const OPENROUTER_PRIVACY_PROVIDER_ROUTING = {
 
 export const VERCEL_NAMESPACE_PREFIX = "vercel/";
 
-// Vendor response IDs with reviewed, unambiguous canonical identities.
 export const VERCEL_SERVED_MODEL_ALIASES: Readonly<Record<string, string>> = {
   "gpt-5.4": "openai/gpt-5.4",
   "gpt-5.4-mini": "openai/gpt-5.4-mini",

@@ -1,6 +1,5 @@
 import { DIAGRAM_EDITOR_FONT_TIMEOUT_MS } from "@/constants/diagram-editor";
 
-// Call after Excalidraw has loaded the scene and started loading its fonts.
 export async function waitForDiagramFonts() {
   let timeout: ReturnType<typeof setTimeout> | undefined;
   try {

@@ -65,7 +65,6 @@ export function withUsageAttribution(
   const correlations = USAGE_CORRELATION_FIELDS.flatMap((field) => {
     const value = resolved[field];
     const tag = `${field}:${value}`;
-    // Never truncate an ID into a different identity. Full IDs remain in logs.
     return typeof value === "string" &&
       value.length > 0 &&
       tag.length <= GATEWAY_MAX_REPORTING_TAG_LENGTH &&

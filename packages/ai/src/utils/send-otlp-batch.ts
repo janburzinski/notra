@@ -69,11 +69,8 @@ export async function sendOTLPBatch(
     );
     if (!response.ok) {
       await response.body?.cancel().catch(() => {});
-      // Never attach response text to errors; the shipping shell classifies status only.
       throw new Error(`OTLP API error: ${response.status}`);
     }
-    // A 2xx batch is already accepted: malformed or interrupted response bodies
-    // must not trigger retries that replay the accepted subset.
     const body: unknown = await response.json().catch(() => undefined);
     if (isRecord(body) && isRecord(body.partialSuccess)) {
       const raw = body.partialSuccess.rejectedLogRecords;

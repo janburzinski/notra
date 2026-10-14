@@ -100,8 +100,6 @@ export async function buildRevisionSourceMetadata(params: {
     sourcePostId: params.postId,
     sandbox: params.result.sandbox,
     usage: params.result.usage ?? null,
-    // A sandbox revision replaces the diagram too, so an editor opened before
-    // it must not save over it.
     ...(params.result.format === "diagram"
       ? { diagramRevision: readDiagramRevision(existing) + 1 }
       : {}),

@@ -6,7 +6,6 @@ import { historyDate, historySnapshot } from "./schemas/history.ts";
 import type { HistoryEvent, ScanHistoryRow } from "./types/history.ts";
 import { pushHistory } from "./utils/push-history.ts";
 
-// Run inside the existing production environment. Never copy its DB credential.
 if (!process.env.DATABASE_URL) {
   throw new Error("Database is not configured");
 }

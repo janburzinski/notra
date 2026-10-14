@@ -143,8 +143,6 @@ export async function GET(request: Request) {
       );
     }
 
-    // Set once the integration row is committed. A lease lost after that
-    // point only affects best-effort cleanup, not the stored connection.
     let connectionCommitted = false;
     const connect = withGscIntegrationLock(
       oauthState.organizationId,

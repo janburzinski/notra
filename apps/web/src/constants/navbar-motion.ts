@@ -4,7 +4,6 @@ export const NAVBAR_PANEL_ENTER = { opacity: 0, y: -6, scale: 0.98 } as const;
 export const NAVBAR_PANEL_REST = { opacity: 1, y: 0, scale: 1 } as const;
 export const NAVBAR_PANEL_EXIT = { opacity: 0, y: -4, scale: 0.99 } as const;
 
-// Position and dimensions share a clock so the surface stays anchored as it resizes.
 export const NAVBAR_MORPH_TRANSITION = {
   type: "spring",
   bounce: 0,

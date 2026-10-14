@@ -36,7 +36,6 @@ export function telemetryEvent(event: WideEvent): WideEvent {
       ? TELEMETRY_EVENT_ENUM_FIELDS[event.event]
       : undefined;
   for (const [key, choices] of Object.entries(eventEnums ?? {})) {
-    // Event-specific producer codes replace the generic enum, never widen it.
     delete safe[key];
     const value = event[key];
     if (typeof value === "string" && choices.has(value)) {

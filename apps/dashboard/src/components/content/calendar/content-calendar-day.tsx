@@ -18,11 +18,6 @@ import { useLocalDateFormat } from "@/lib/hooks/use-local-date-format";
 import { cn } from "@/lib/utils";
 import type { ContentCalendarDayProps } from "@/types/content/calendar";
 
-/**
- * One month cell. The day number opens a popover with every entry of the
- * day at full length; on phones the whole cell does, since chips shrink to
- * bars there.
- */
 export function ContentCalendarDay({
   day,
   items,

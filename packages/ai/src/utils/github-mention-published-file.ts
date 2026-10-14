@@ -143,9 +143,6 @@ export function resolveEditableMarkdown(params: {
       "The pull request changed, but its published file could not be read. Retry once the current file is available; the stale Notra post cannot safely replace it."
     );
   }
-  // The changed file is not an original source-to-repository mapping. Keep its
-  // repository targets rather than guessing by image position and corrupting
-  // replacements or reorders.
   const markdown = params.publishedFile;
   return { markdown, fromPullRequest: markdown !== params.postMarkdown };
 }

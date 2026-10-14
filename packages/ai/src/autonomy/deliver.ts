@@ -54,7 +54,6 @@ const inlineRetrySchedule = Schedule.passthrough(inlineBackoffSchedule).pipe(
   ),
   Schedule.upTo({ times: SLACK_DELIVERY_INLINE_RETRY_ATTEMPTS }),
   Schedule.while(({ input }) =>
-    // Only short provider cooldowns fit the existing inline backoff budget.
     Effect.succeed(
       input._tag === "SlackDeliveryRetryableError" &&
         (input.retryAfterSeconds ?? 0) <=

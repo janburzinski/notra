@@ -461,8 +461,6 @@ export const sitesRouter = {
     .input(siteScopeInputSchema)
     .handler(async ({ context, input }) => {
       const { site } = await requireSite(context, input);
-      // Hover details are optional: a disconnected repository or a GitHub
-      // outage shows "unavailable" instead of failing the page.
       return await getSiteRepositoryOverview(site).catch((error: unknown) => {
         console.warn("sites.repository_overview_failed", {
           siteId: site.id,
@@ -523,8 +521,6 @@ export const sitesRouter = {
       if (!(await isSitesBulkImportEnabled(input.organizationId))) {
         throw forbidden("Bulk import is not enabled for this organization");
       }
-      // One at a time, so each site claims its address before the next one
-      // picks a slug. A failed row doesn't stop the rest.
       const results: CreateSitesResult[] = [];
       const jobIds: Array<string | null> = [];
       for (const entry of input.sites) {

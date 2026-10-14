@@ -377,7 +377,6 @@ export const githubRouter = {
           headers: context.headers,
           organizationId: input.organizationId,
         });
-        // The demo never installs the GitHub App; it ships a sample repository.
         assertNotDemo();
 
         return runOrpcEffect(

@@ -92,7 +92,6 @@ export async function classifyAgentFeedback(
       };
     }
     const generated = await generateClassification(params);
-    // Known labels can use the existing title fallback without evaluating them.
     return (
       generated ?? {
         kind: supplied.kind,

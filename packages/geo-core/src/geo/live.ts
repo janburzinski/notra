@@ -59,7 +59,6 @@ async function isGeoLiveWatched(organizationId: string): Promise<boolean> {
   if (memo && memo.expiresAt > now) {
     return memo.watched;
   }
-  // Drop expired lookups so the memo only holds recently active orgs.
   for (const [id, entry] of watchMemo) {
     if (entry.expiresAt <= now) {
       watchMemo.delete(id);
@@ -97,8 +96,6 @@ export async function publishGeoTrafficChange(
   organizationId: string,
   projectIds: string[]
 ): Promise<void> {
-  // Without a viewer the cached traffic queries expire on their own TTL, as
-  // before live updates existed; skipping saves the purge and the publish.
   if (!(realtime && (await hasGeoLiveViewers(organizationId)))) {
     return;
   }

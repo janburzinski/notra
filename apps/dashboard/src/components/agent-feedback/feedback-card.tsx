@@ -8,7 +8,6 @@ import Link from "@/components/framework/link";
 import { useFormatRelative } from "@/lib/hooks/use-format-relative";
 import type { AgentFeedbackCardProps } from "@/types/agent-feedback";
 
-/** Feedback item in the same card frame as content cards on the home page. */
 export function AgentFeedbackCard({ item, href }: AgentFeedbackCardProps) {
   const formatRelative = useFormatRelative();
   const heading = item.title ?? item.message;

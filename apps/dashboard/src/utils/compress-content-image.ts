@@ -25,7 +25,6 @@ const FORMAT_MIME = {
   webp: "image/webp",
 } as const satisfies Record<string, ContentImageMimeType>;
 
-// Recognize HEIC by its container signature rather than trusting a browser-supplied filename or MIME type.
 export function isHeic(bytes: Uint8Array) {
   return (
     bytes.byteLength >= 16 &&
@@ -45,8 +44,6 @@ function mimeFromFormat(
   return FORMAT_MIME[format as keyof typeof FORMAT_MIME] ?? null;
 }
 
-// sharp (native) and libheif (WASM) load on first use; this module reaches the
-// shared oRPC router, so static imports would cost every server cold start.
 const loadSharp = () => import("sharp").then((module) => module.default);
 const loadLibheif = () =>
   import("libheif-js/wasm-bundle").then((module) => module.default);
@@ -75,14 +72,12 @@ async function encode(
   if (mimeType === "image/png") {
     return image.png({ compressionLevel: 9, effort: 10 }).toBuffer();
   }
-  // WebP stays lossless until the GitHub size cap forces a smaller encode.
   if (maxEdge) {
     return image.webp({ effort: 4, quality: 90 }).toBuffer();
   }
   return image.webp({ effort: 6, lossless: true }).toBuffer();
 }
 
-// Decode the primary image, including grids, using an Embind pointer and a squared-width pixel cap before releasing native state.
 async function decodeContentHeic(bytes: Uint8Array): Promise<Buffer> {
   validateHeicCodedPixels(bytes);
   const [libheif, sharp] = await Promise.all([loadLibheif(), loadSharp()]);
@@ -179,7 +174,6 @@ export async function compressContentImage(bytes: Uint8Array): Promise<{
   }
 
   const encoded = await encode(source, mimeType, null);
-  // ponytail: keep the smaller file. A larger recompress can still hold EXIF.
   let chosen =
     encoded.byteLength < source.byteLength ? encoded : Buffer.from(source);
   if (chosen.byteLength <= GITHUB_CONTENT_MAX_SINGLE_ASSET_BYTES) {

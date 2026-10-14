@@ -54,8 +54,6 @@ export const contentEmailDigestPayloadSchema = z.object({
     "scheduled_content_failed",
     "scheduled_content_skipped",
   ]),
-  // Identifies the run holding the digest window. Optional only for runs
-  // started before it existed.
   lockToken: z.string().min(1).optional(),
 });
 

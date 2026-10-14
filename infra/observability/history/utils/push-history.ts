@@ -1,7 +1,6 @@
 import { historyDate, historySnapshot } from "../schemas/history.ts";
 import type { HistoryEvent, HistorySnapshot } from "../types/history.ts";
 
-/** The backfill writer can only reach the existing private Loki origin. */
 export async function pushHistory(
   events: HistoryEvent[],
   service: string,
@@ -53,7 +52,6 @@ export async function pushHistory(
               service_name: service,
               deployment_environment_name: "production",
               history_snapshot: snapshotEnd.replaceAll(/[-:.]/g, ""),
-              // Bounded hour streams keep retries inside Loki's one-hour out-of-order window.
               history_hour: hour,
             },
             values: records.map((event) => [

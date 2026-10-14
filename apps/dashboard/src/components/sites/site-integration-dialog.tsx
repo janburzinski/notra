@@ -106,7 +106,6 @@ export function SiteIntegrationDialog({
     autosave.update({ provider: provider.id, settings: null });
     const removed = await autosave.flush();
     if (!removed) {
-      // Navigation must not retry a failed removal in the unmount save.
       await autosave.cancel();
     }
     setRemovalFailed(!removed);

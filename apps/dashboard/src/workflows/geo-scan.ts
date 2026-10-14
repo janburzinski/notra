@@ -98,15 +98,6 @@ type GeoScanBatchSettlement =
   | { index: number; outcome: GeoScanBatchOutcome }
   | { index: number; error: unknown };
 
-/**
- * Runs the batches of one item kind through a sliding window of
- * `GEO_SCAN_BATCH_CONCURRENCY` parallel steps: whenever one batch settles the
- * next one starts, so a slow engine never idles the other slots the way a
- * fixed wave would. The claim token is renewed from here, never inside a
- * batch, so parallel batches cannot race each other for the compare-and-set.
- * After a failure no further batch starts, but the ones already in flight are
- * drained so the rows they persisted count toward billing and the verdict.
- */
 async function runGeoScanBatchWindow<T>(
   context: GeoScanProjectContext,
   items: readonly T[],
@@ -133,8 +124,6 @@ async function runGeoScanBatchWindow<T>(
             nextClaimRenewalToken(state.claimedAt, now)
           );
         } catch (error) {
-          // A failed renewal stops new work, not the batches already running.
-          // Drain those before finalizing or releasing their claim.
           failed = true;
           failure = error;
           break;
@@ -167,11 +156,6 @@ async function runGeoScanBatchWindow<T>(
   }
 }
 
-/**
- * Persists the project outcome and records it in the organization activity
- * log, so a finished scan stays visible (with checks, mentions, and the
- * failure reason) after the live job tracking has disappeared.
- */
 async function finalizeProjectRun(
   plan: GeoScanProjectPlan,
   totals: GeoScanProjectTotals,
@@ -212,8 +196,6 @@ async function finalizeProjectRun(
     }
   }
   if (status === "completed" && totals.checks > 0) {
-    // Shelf space reads the synced citations instead of folding the whole
-    // mention-check history on every page view.
     try {
       await syncGeoShelfCitationsStep({
         organizationId: context.organizationId,
@@ -289,17 +271,6 @@ async function finalizeProjectRun(
   });
 }
 
-/**
- * One project scan as a chain of small steps: plan → task batches →
- * sequence batches → persona batches → finalize. Each batch persists its own results, so a
- * killed invocation costs one batch, not the scan — the previous single-step
- * design was killed wholesale by the function timeout once an organization
- * tracked enough engines, leaving the scan on "running" forever with zero
- * rows written. Batches run through a sliding window of parallel steps; the
- * first batched design ran them strictly one after another, which capped a
- * whole project at four model calls in flight and stretched large scans past
- * forty minutes.
- */
 async function runGeoScanProjectRun(
   organizationId: string,
   projectId: string,
@@ -418,10 +389,6 @@ export async function geoScanWorkflow(
   let mentions = 0;
   const retryProjectIds: string[] = [];
   let ranProject = false;
-  // A project already runs several model calls per batch. Keep projects in one
-  // workflow sequential so batch concurrency is the aggregate provider bound,
-  // rather than multiplying it by every project in the organization. A claim
-  // handed to this workflow goes first so prepare can revalidate it immediately.
   for (const scanProjectId of orderedProjectIds) {
     const claimed = scanProjectId === projectId;
     // react-doctor-disable-next-line react-doctor/async-await-in-loop -- sequential projects enforce the workflow's provider concurrency budget

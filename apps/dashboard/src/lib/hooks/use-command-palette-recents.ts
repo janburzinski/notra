@@ -36,8 +36,6 @@ export function useCommandPaletteRecents(organizationId: string) {
     organizationId,
     recents: readRecents(organizationId),
   }));
-  // The palette stays mounted across workspace switches; reload per workspace
-  // so one workspace's recents never show up in (or get saved to) another.
   let { recents } = state;
   if (state.organizationId !== organizationId) {
     recents = readRecents(organizationId);

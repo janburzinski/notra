@@ -129,8 +129,6 @@ export function geoAnswerMentionSpans(
 
   const occupied = new Array<boolean>(text.length).fill(false);
   const spans: GeoAnswerMentionSpan[] = [];
-  // With hundreds of tracked competitors most terms never occur, so a
-  // substring check skips the regex for them.
   const foldedText = foldCase(text);
   const byLength = terms
     .filter((term) => foldedText.includes(foldPhrase(term.phrase)))

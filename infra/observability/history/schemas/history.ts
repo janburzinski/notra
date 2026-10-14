@@ -1,7 +1,6 @@
 import { HISTORY_WINDOW_MS } from "../constants/history.ts";
 import type { HistorySnapshot } from "../types/history.ts";
 
-/** UTC seconds or milliseconds in; real, canonical millisecond dates out. */
 export function historyDate(value: unknown): string {
   if (
     typeof value !== "string" ||
@@ -20,7 +19,6 @@ export function historyDate(value: unknown): string {
   return canonical;
 }
 
-/** End-only snapshot IDs are safe only for this fixed seven-day workflow. */
 export function historySnapshot(start: unknown, end: unknown): HistorySnapshot {
   const snapshotStart = historyDate(start);
   const snapshotEnd = historyDate(end);

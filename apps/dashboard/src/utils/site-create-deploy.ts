@@ -70,7 +70,6 @@ export function deploymentFailureSummary(
   );
 }
 
-// Make sure the failure reason is visible even when the log stops before it.
 export function logWithFailure(log: string, summary: string): string {
   if (stripAnsi(log).includes(summary)) {
     return log;

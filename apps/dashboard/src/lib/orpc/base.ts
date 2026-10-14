@@ -9,9 +9,6 @@ import { assertAuthenticated } from "@/lib/auth/organization";
 import type { ORPCContext } from "@/types/orpc/context";
 import { runWithRpcRequestMemo } from "@/utils/rpc-request-scope";
 
-// In the public demo every successful mutation also lands in the visitor's
-// request feed. Outside the demo this returns right away and the demo logger
-// is never loaded.
 export const baseProcedure = os
   .$context<ORPCContext>()
   .use(async ({ next, path }, input) => {
@@ -19,7 +16,6 @@ export const baseProcedure = os
       return next();
     }
     const startedAt = performance.now();
-    // Load the logger while the procedure runs; time only the procedure.
     const logger = import("@/lib/demo/ui-actions");
     const result = await next();
     const durationMs = performance.now() - startedAt;
@@ -29,8 +25,6 @@ export const baseProcedure = os
   })
   .use(({ next, context }) => {
     const parent = getOperationalContext();
-    // Each batched procedure gets its own mutable attribution scope. The active
-    // UI organization is not proof that this procedure targets that tenant.
     return runWithRpcRequestMemo(context.requestMemo, () =>
       parent
         ? runWithOperationalContext(

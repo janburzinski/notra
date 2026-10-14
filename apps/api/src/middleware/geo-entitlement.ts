@@ -63,7 +63,6 @@ export function geoEntitlementMiddleware(
       return c.json({ error: ORGANIZATION_SCOPED_API_KEY_ERROR }, 403);
     }
 
-    // Keep the client/cache across requests; rotation discards the old grant cache.
     const layer =
       options.billingLayer ??
       (currentLayer && currentSecretKey === secretKey

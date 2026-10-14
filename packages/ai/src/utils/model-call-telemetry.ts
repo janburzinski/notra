@@ -146,8 +146,6 @@ export function createModelCallTelemetry({
       msToFirstChunk ??= Math.round(performance.now() - startedAt);
     },
     complete(result) {
-      // A streamed error may precede the provider's final usage/charge report.
-      // Terminal events and accounting have independent once-only boundaries.
       if (completionRecorded) {
         return;
       }
@@ -167,7 +165,6 @@ export function createModelCallTelemetry({
         routeMetadata.model.trim().length > 0
           ? routeMetadata.model
           : undefined;
-      // OpenRouter returns charges with usage; Vercel enriches them separately.
       if (
         route?.decision.gateway === "openrouter" &&
         typeof routeMetadata?.gatewayCostUsd === "number" &&
@@ -256,8 +253,6 @@ export function createModelCallTelemetry({
             : {}),
         }
       );
-      // Do not hold a successful answer/stream finish past its SDK deadline.
-      // Request teardown waits for the bounded lookup through flushLogs().
       if (
         lookupRouteMetadata &&
         typeof generationId === "string" &&

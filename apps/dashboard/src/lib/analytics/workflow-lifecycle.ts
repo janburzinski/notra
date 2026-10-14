@@ -30,7 +30,6 @@ function resolveDurationMs(startedAt: number | undefined): number | undefined {
 }
 
 export function trackWorkflowStarted(input: WorkflowStartedInput): void {
-  // start() acknowledges queue acceptance, not the beginning of execution.
   logWorkflowTelemetry({
     event: "job.queued",
     runId: input.runId,

@@ -5,5 +5,4 @@ export const POST_CARD_RADIUS = {
   box: "after:rounded-2xl",
 } as const;
 
-/** Tags beyond this many stay on the post page. */
 export const POST_CARD_TAG_LIMIT = 3;

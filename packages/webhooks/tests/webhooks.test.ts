@@ -196,7 +196,7 @@ describe("durable webhook pipeline", () => {
           concurrency: 2,
         });
         expect(ids[0]).toBe(ids[1]);
-        yield* endpoint(); // A subscription added after the event does not receive history.
+        yield* endpoint();
         yield* publish();
         expect(yield* listDeliveries(org)).toHaveLength(1);
         expect(yield* listDeliveries(otherOrg)).toHaveLength(0);
@@ -558,7 +558,6 @@ test("transactional outbox publish commits and rolls back with the caller", asyn
       tx,
       postPublishedInput({ organizationId: org, postId: "post_tx_committed" })
     );
-    // The outbox row is visible inside the caller's transaction.
     const inside = await tx.execute(
       drizzleSql`SELECT id FROM webhook_events WHERE id = ${id}`
     );
@@ -579,7 +578,6 @@ test("transactional outbox publish commits and rolls back with the caller", asyn
     })
   ).rejects.toThrow("simulated caller failure");
 
-  // The Effect pipeline dedupes against the transactionally committed event.
   const deduped = await Effect.runPromise(
     publishPostPublished({
       organizationId: org,

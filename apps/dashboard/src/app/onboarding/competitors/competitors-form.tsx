@@ -47,10 +47,6 @@ import {
   findCompetitor,
 } from "@/utils/onboarding-competitors";
 
-/**
- * A scan billing refuses up front is no reason to block onboarding; the
- * mutation's toast already explains it.
- */
 function leaveOnPaymentRequired(leave: () => void) {
   return (error: unknown) => {
     if (error instanceof ORPCError && error.code === "PAYMENT_REQUIRED") {

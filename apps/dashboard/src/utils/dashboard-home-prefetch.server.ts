@@ -12,10 +12,6 @@ import { prefetchRecentPostsQuery } from "@/utils/content-recents-prefetch.serve
 import { getGeoServerQueryClient } from "@/utils/geo-query-client.server";
 import { seedMembership } from "@/utils/seed-membership.server";
 
-/**
- * The request logs only show how long the whole page stream stayed open, so
- * each prefetch reports its own duration to find the one holding it.
- */
 function timedPrefetch<T>(query: string, run: () => Promise<T>) {
   return async () => {
     const startedAt = performance.now();
@@ -68,8 +64,6 @@ export async function dehydrateDashboardHomeQueries(
       async () => (await client.geo.projectsList(organizationInput)).projects
     ),
   });
-  // The home body is awaited (the route streams, so the shell does not wait)
-  // and renders in the server HTML; sidebar data below stays pending.
   const homeBody = Promise.all([
     queryClient.prefetchQuery({
       ...dashboardOrpc.content.home.get.queryOptions({ input: homeInput }),

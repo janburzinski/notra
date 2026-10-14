@@ -1,4 +1,3 @@
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import { parseAsBoolean, parseAsString } from "nuqs";
 import * as z from "zod";
 
@@ -191,8 +190,6 @@ export const offeringReportSearchSchema = z.object({
   webSearch: z.boolean().optional().catch(undefined),
 });
 
-// The form lives in the URL, so going back from a report keeps the input and
-// links like /offering?domain=acme.com prefill it.
 export const offeringFormParsers = {
   domain: parseAsString.withDefault(""),
   feature: parseAsString.withDefault(""),

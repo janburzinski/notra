@@ -27,7 +27,6 @@ export function vercelApi(
     throw new Error("Invalid Vercel monitoring credentials");
   }
   return async (path, body) => {
-    // This client cannot mutate projects, read env vars, or forward auth off-origin.
     if (path !== "/metrics/v1" && !path.startsWith("/metrics/v1?")) {
       throw new Error("Unsupported monitoring API");
     }
@@ -48,7 +47,6 @@ export function vercelApi(
     } catch {
       throw new Error("request_failed");
     }
-    // Never print provider bodies: they can contain sensitive metadata.
     if (!response.ok) {
       await response.body?.cancel().catch(() => undefined);
       throw new Error(`http_${response.status}`);

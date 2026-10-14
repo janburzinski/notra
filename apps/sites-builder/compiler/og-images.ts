@@ -89,7 +89,6 @@ async function loadBackground(
   return { dataUri: `data:${mimeType};base64,${bytes.toString("base64")}` };
 }
 
-/** A site image from public/ as a data URI, or nothing when it isn't a local raster or SVG file. */
 async function publicImage(
   params: WriteOgImagesParams,
   path: string | undefined
@@ -140,7 +139,6 @@ async function firstAuthor(
   };
 }
 
-/** Without a usable avatar the card shows the site logo in its place. */
 function authorWithFallback(
   author: OgAuthor | undefined,
   logo: string | undefined

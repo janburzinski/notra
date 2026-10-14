@@ -33,7 +33,6 @@ import type {
 } from "@/types/state-of-ai-search";
 import { formatPercent } from "@/utils/state-of-ai-search";
 
-/** Path of a cited page, for a compact second line under its title. */
 function pagePath(url: string): string {
   try {
     const { pathname } = new URL(url);
@@ -43,10 +42,6 @@ function pagePath(url: string): string {
   }
 }
 
-/**
- * The app's detail drawer for one cited domain: how often each assistant
- * links it, which pages, and for which prompts. Prompts stack on top.
- */
 export function SourceSheet({
   report,
   source: sourceProp,

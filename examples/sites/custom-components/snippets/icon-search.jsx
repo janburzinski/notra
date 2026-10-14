@@ -1,6 +1,3 @@
-// A small icon browser: type to filter, click an icon to preview it at
-// different sizes. The name chip uses data-copy, which script.js turns into
-// copy-to-clipboard.
 const ICONS = [
   { name: "leaf", tags: "nature plant eco", d: "M5 19c0-8 5-14 14-14 0 9-6 14-14 14Z M5 19l8-8" },
   { name: "sprout", tags: "plant grow nature", d: "M7 14h10l-1.5 7h-7Z M12 14V8 M12 8c0-3 2-5 5-5 0 3-2 5-5 5Z M12 10c0-2.5-1.8-4-4.5-4 0 2.5 1.8 4 4.5 4Z" },

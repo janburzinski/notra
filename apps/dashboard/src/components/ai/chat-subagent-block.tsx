@@ -46,7 +46,6 @@ function getOutcome(params: {
   result: ChatSubagentResult | null;
 }): SubagentOutcome {
   if (params.isPending) {
-    // A pending run whose message stopped streaming never finished.
     return params.isActive ? "running" : "interrupted";
   }
   if (params.isError || params.result?.kind === "failed") {
@@ -150,11 +149,6 @@ function SubagentResultLine({ summary }: { summary: string }) {
   );
 }
 
-/**
- * A delegated subagent run, styled like the chat's activity rows: one muted
- * line with the agent's name and progress, its own tool calls hanging off
- * the same guide line the activity group uses, and the result as last line.
- */
 export function ChatSubagentBlock({
   agentName,
   toolCallId,

@@ -163,8 +163,6 @@ export function SearchConsolePropertyPicker({
         className={cn("w-full", selectSite.isPending && "disabled:opacity-100")}
         disabled={siteUrl.length === 0 || selectSite.isPending}
         onClick={() => {
-          // Progress and the result are reported by toasts, so the caller can
-          // close its dialog instead of blocking on the first sync.
           selectSite.mutate({ siteUrl });
           onSelected?.();
         }}
@@ -398,7 +396,6 @@ function ReconnectButton({
   );
 }
 
-/** Empty state for every Search Console step before a property is synced. */
 function SetupState({
   organizationId,
   callbackPath,
@@ -543,7 +540,6 @@ export function SearchConsoleToolbar({
       websiteUrl={websiteUrl}
     />
   );
-  // Suggestions from an earlier sync stay actionable while Google is disconnected.
   if (!action) {
     return setup;
   }

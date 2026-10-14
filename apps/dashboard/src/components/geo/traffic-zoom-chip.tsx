@@ -5,7 +5,6 @@ import { useTranslations } from "use-intl";
 
 import type { TrafficZoomChipProps } from "@/types/geo";
 
-/** Shows the zoomed day range and resets it. Renders nothing while not zoomed. */
 export function TrafficZoomChip({
   rows,
   zoomed,

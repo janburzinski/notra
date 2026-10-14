@@ -1,4 +1,3 @@
-// Monthly/yearly switch for the Pixelmint plans. Yearly saves a third.
 const PLANS = [
   { name: "Free", monthly: 0, yearly: 0, note: "1,200 icons, MIT license" },
   { name: "Pro", monthly: 12, yearly: 96, note: "Every icon and illustration, Figma plugin" },

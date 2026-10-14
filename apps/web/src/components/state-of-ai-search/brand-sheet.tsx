@@ -41,10 +41,6 @@ import {
   formatShortDate,
 } from "@/utils/state-of-ai-search";
 
-/**
- * The app's detail drawer for one brand. Prompts opened from here stack on
- * top of it instead of replacing it.
- */
 export function BrandSheet({
   report,
   brand: brandProp,

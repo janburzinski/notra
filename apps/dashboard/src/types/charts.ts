@@ -5,7 +5,6 @@ export interface ChartColorPair {
   dark: string;
 }
 
-// Require at least one theme key — identical constraint to the repo's ChartConfig.
 export type AtLeastOneThemeColor =
   | { light: string[]; dark?: string[] }
   | { light?: string[]; dark: string[] };

@@ -46,7 +46,6 @@ export async function runSocialConnect<A>(
 
   const { error } = result;
   if (error._tag === "SocialConnectConfigError") {
-    // The demo never links real accounts; its seeded ones are read-only.
     assertNotDemo();
     const tCommonErrors = await getTranslations("common.errors");
     throw serviceUnavailable(tCommonErrors("generic"));
@@ -55,7 +54,6 @@ export async function runSocialConnect<A>(
   logError(options.logLabel, error);
   const tErrors = await getTranslations("errors.socialAccounts");
   if (error._tag === "SocialConnectDeliveryUnknownError") {
-    // "Try again" here could post twice.
     throw serviceUnavailable(tErrors("deliveryUnknown"));
   }
   const statusCode = getSocialConnectStatusCode(error.cause);

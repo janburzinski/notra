@@ -77,7 +77,6 @@ export function getChatPosts(messages: readonly ChatUIMessage[]) {
   return entries;
 }
 
-// A later updatePost renames or rewrites the post; tabs and the @ menu follow.
 function applyPostUpdate(
   entriesByPostId: Map<string, ChatPostEntry>,
   part: Extract<ChatUIMessage["parts"][number], { toolCallId: string }>

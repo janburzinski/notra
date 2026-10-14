@@ -28,7 +28,6 @@ import type {
 
 export const SITES_NAV_LINK = "/sites";
 export { SITES_FLAG_KEY } from "@notra/ai/constants/sites-access";
-/** Importing every site of a repository at once, rolled out per organization. */
 export const SITES_BULK_IMPORT_FLAG_KEY = "sites-bulk-import";
 export const SITES_FLAG_TIMEOUT_MS = 3000;
 

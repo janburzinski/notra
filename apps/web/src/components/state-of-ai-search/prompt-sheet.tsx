@@ -49,7 +49,6 @@ import { uniqueKeys } from "@/utils/unique-keys";
 
 type PromptSheetView = "raw" | "analysis";
 
-/** Engine tabs switch fast here; the dashboard keeps its default spring. */
 const ENGINE_PILL_TRANSITION = {
   type: "spring",
   bounce: 0,
@@ -75,10 +74,6 @@ function switcherItems(
   });
 }
 
-/**
- * Which assistant's answer is showing: the reader's pick, else the starting
- * engine, else the first answer. Shared by the inline viewer and the drawer.
- */
 function useSelectedAnswer(
   report: StateOfAiSearchReport,
   prompt: StateOfAiSearchPromptRow,
@@ -92,7 +87,6 @@ function useSelectedAnswer(
   return { response, engine, setEngineId };
 }
 
-/** The assistant tabs above an answer. */
 function AnswerSwitcher({
   report,
   prompt,
@@ -119,10 +113,6 @@ function AnswerSwitcher({
   );
 }
 
-/**
- * One engine's answer in its skin: ChatGPT and Claude in the chat thread,
- * Google's overview in the AI Overview skin.
- */
 function AnswerBody({
   prompt,
   response,
@@ -162,7 +152,6 @@ function AnswerBody({
   );
 }
 
-/** Inline answer viewer for the report page: switcher on the shell, answer below. */
 export function AnswerViewer({
   report,
   prompt,
@@ -195,12 +184,8 @@ function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/** The highlight sentence with the brand name marked. */
 function HighlightText({ text, brand }: { text: string; brand: string }) {
-  // `brand` is the name or alias as the answer wrote it.
   const parts = text.split(new RegExp(`(${escapeRegex(brand)})`, "i"));
-  // A sentence that opens with the brand yields an empty part and the brand
-  // at the same offset, so keys carry an occurrence suffix.
   const keys = uniqueKeys(
     parts.map((_, index) =>
       String(parts.slice(0, index).reduce((sum, part) => sum + part.length, 0))
@@ -224,10 +209,6 @@ function HighlightText({ text, brand }: { text: string; brand: string }) {
   );
 }
 
-/**
- * One assistant's answer at a glance: who it named and in which order, the
- * line it used for each brand, what it searched for and what it read.
- */
 function PromptOverview({
   report,
   response,
@@ -485,10 +466,6 @@ function PromptSheetBody({
   );
 }
 
-/**
- * The app's prompt drawer for a report prompt. Brands opened from here stack
- * on top of it instead of replacing it.
- */
 export function PromptSheet({
   report,
   prompt: promptProp,
@@ -500,7 +477,6 @@ export function PromptSheet({
   prompt: StateOfAiSearchPromptRow | null;
   onClose: () => void;
   depth?: number;
-  /** Assistant tab to open on, e.g. the one that cited the source. */
   initialEngine?: StateOfAiSearchEngineId;
 }) {
   const [prompt, releasePrompt] = useRetainedValue(promptProp);

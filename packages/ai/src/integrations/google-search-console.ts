@@ -166,9 +166,6 @@ export function hasGscGoogleAccountChanged(
 ): boolean {
   const previous = previousEmail?.trim().toLowerCase();
   const next = nextEmail?.trim().toLowerCase();
-  // Userinfo can fail, return malformed JSON, or omit email. If we cannot
-  // confirm the next identity, treat the account as changed so reconnect
-  // never keeps the previous property or weekly schedule under new tokens.
   if (!next) {
     return true;
   }
@@ -188,8 +185,6 @@ export function shouldClearGscSiteOnReconnect(
   if (hasGscGoogleAccountChanged(existing.googleAccountEmail, nextEmail)) {
     return true;
   }
-  // A selected property with no stored email cannot be proven to belong to
-  // the account that just signed in.
   return Boolean(existing.siteUrl && !existing.googleAccountEmail?.trim());
 }
 
@@ -203,8 +198,6 @@ export async function upsertGscIntegration(
   const encryptedRefreshToken = encryptToken(params.refreshToken);
 
   const { integrationToRevoke, row } = await db.transaction(async (tx) => {
-    // The advisory lock also serializes first-time inserts, where there is no
-    // row for SELECT FOR UPDATE to lock yet.
     await tx.execute(
       sql`SELECT pg_advisory_xact_lock(hashtextextended(${`gsc-integration:${params.organizationId}`}, 0))`
     );
@@ -299,8 +292,6 @@ export async function upsertGscIntegration(
 
     return {
       row,
-      // Missing identity requires clearing cached property data, but does not
-      // prove the old grant belongs to a different Google account.
       integrationToRevoke:
         existing?.googleAccountEmail?.trim() &&
         params.googleAccountEmail?.trim() &&
@@ -313,11 +304,6 @@ export async function upsertGscIntegration(
     };
   });
 
-  // The OAuth callback keeps its organization lock through revocation so a
-  // later callback cannot mint or install a replacement grant in parallel.
-  // The database transaction is already committed and its connection freed,
-  // so losing the lock here must not read as a failed connection: skip the
-  // old grant's revocation instead of unwinding a saved integration.
   if (integrationToRevoke) {
     try {
       await assertLockOwned?.();

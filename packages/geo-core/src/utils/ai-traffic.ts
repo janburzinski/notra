@@ -43,11 +43,6 @@ export function isTrackedGeoVisitorType(value: GeoVisitorType): boolean {
   return !GEO_UNTRACKED_VISITOR_TYPES.includes(value);
 }
 
-/**
- * Own string members only: sources and agents come from request headers, so a
- * visitor sending "constructor" would otherwise be labelled with an inherited
- * `Object` member instead of a string.
- */
 function lookupLabel(
   labels: Record<string, string>,
   key: string,
@@ -65,8 +60,6 @@ export function formatGeoSource(source: string): string {
   return lookupLabel(GEO_SOURCE_LABELS, trimmed.toLowerCase(), trimmed);
 }
 
-// Signature names keep the vendor's casing ("GPTBot"), so a lowercased token
-// from older rows or hand-written data can be mapped back to it.
 const SIGNATURE_AGENT_NAMES: Record<string, string> = Object.fromEntries(
   AI_AGENT_SIGNATURES.map((signature) => [
     signature.agent.toLowerCase(),
@@ -117,9 +110,6 @@ export function toGeoTrafficTotals(
   return totals;
 }
 
-// Previous-window totals, mirroring toGeoTrafficTotals. Returns null when the
-// endpoint sent no comparison data at all, so callers can hide their deltas
-// instead of rendering an all-zero baseline as "+100%".
 export function toGeoTrafficPreviousTotals(
   sources: readonly GeoTrafficSource[],
   previousConversions: number | null = null

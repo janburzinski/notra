@@ -219,7 +219,6 @@ const syncLanguage = Effect.fn("geo.promptTranslations.syncLanguage")(
         : null;
     const usage = translated ? agentTokenUsageFrom(translated.usage) : null;
     if (usage) {
-      // Reported before saving: the model work happened even if a save fails.
       options.onUsage?.(usage);
     }
     const fresh = new Map<string, string>();
@@ -235,8 +234,6 @@ const syncLanguage = Effect.fn("geo.promptTranslations.syncLanguage")(
         }
       }
     }
-    // A failed translation keeps an older stored text rather than dropping
-    // the prompt; prompts that were never translated sit this scan out.
     const prompts: GeoPromptDefinition[] = entries.flatMap((entry) => {
       const text = fresh.get(entry.promptId) ?? entry.text;
       return text ? [{ id: entry.promptId, text }] : [];
@@ -394,7 +391,6 @@ export const translateGeoPromptTranslations = Effect.fn(
         )
       );
 
-  // Bill whatever the model already did, also when a later step fails.
   let spent: AgentTokenUsage | null = null;
   const settleSpent = () =>
     Effect.suspend(() =>

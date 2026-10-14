@@ -12,13 +12,6 @@ import {
 import type { TableCornerScrollbarProps } from "../types/data-table";
 import { useDataTableLabels } from "./data-table-labels";
 
-/**
- * Straight scrollbar thumb along the card's right edge. While it is visible
- * and runs into the top or bottom corner, it flags that corner on the
- * wrapper (`data-corner-start` / `data-corner-end`) so the card can tighten
- * its radius around the thumb instead of clipping it. Size and offset come
- * from `CORNER_SCROLLBAR_VARS` on the table frame.
- */
 export function TableCornerScrollbar({
   scrollId,
   scrollRef,
@@ -75,7 +68,6 @@ export function TableCornerScrollbar({
       const top = CORNER_SCROLLBAR_GAP_PX + progress * travel;
       thumb.style.height = `${length}px`;
       thumb.style.transform = `translateY(${top}px)`;
-      // A thumb end inside the corner's radius would be clipped by the curve.
       wrapper.dataset.cornerStart = String(
         visible && top < TABLE_BODY_RADIUS_PX
       );
@@ -138,8 +130,6 @@ export function TableCornerScrollbar({
       update();
     };
 
-    // Dragging maps pointer travel along the track back to scroll distance.
-    // Pointer capture keeps move/up on the thumb, so the listeners can stay.
     let dragStartY = 0;
     let dragStartScroll = 0;
     const handlePointerDown = (event: PointerEvent) => {

@@ -30,11 +30,6 @@ interface DemoCustomizeDialogProps {
   current: DemoPersonalization | null;
 }
 
-/**
- * "Customize your experience": rebuilds the demo workspace around the
- * visitor's name and company, so every page shows their brand instead of
- * the sample one.
- */
 export function DemoCustomizeDialog({
   open,
   onOpenChange,

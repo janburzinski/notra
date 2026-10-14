@@ -88,8 +88,6 @@ function TrafficSourcesGroup({
       ? columns
       : [{ ...first, header, sortable: false }, ...rest];
 
-  // Bands share one grey shell: only the outer edges of the stack get a
-  // border and radius, the seams between bands stay open.
   const collapsedBar = (
     <div
       className={cn(
@@ -112,8 +110,6 @@ function TrafficSourcesGroup({
       flushBottom={followedByStack}
       flushTop={stacked}
       getRowId={(row) => trafficGroupKey(row.band, row.key)}
-      // Uncapped so no band scrolls on its own: a scrollbar would shift its
-      // columns out of line with the bands stacked above and below.
       height={paginatedTableHeightFor(count)}
       loading={loading}
       onRowClick={onOpen}
@@ -137,9 +133,6 @@ export function TrafficSourcesStack({
     (band) => band !== "cited" || groups.some((group) => group.band === band)
   );
   const lastIndex = bands.length - 1;
-  // Collapse once for the whole stack so every band keeps the same columns.
-  // Bands are framed, so reserve the rim or an expanded band scrolls on its
-  // own while the collapsed bars next to it do not.
   const { containerRef, visibleColumns } = useCollapsibleColumns(columns, {
     minColumnWidth: DEFAULT_MIN_COLUMN_WIDTH,
     extraFixedWidths: [TABLE_FRAME_INSET],

@@ -5,7 +5,6 @@ import { contentAgentSuite, contentDraftSuite } from "./content-agent";
 import { contentUnslopSuite } from "./content-unslop";
 import { feedbackClassifierSuite } from "./feedback-classifier";
 
-/** Ordered like the content pipeline: write → edit → name, then classifiers. */
 export const SUITES: readonly AnySuite[] = [
   contentDraftSuite,
   contentUnslopSuite,

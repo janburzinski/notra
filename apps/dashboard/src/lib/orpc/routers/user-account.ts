@@ -27,8 +27,6 @@ import type {
   UpdateUserInput,
 } from "@/types/auth/user-actions";
 
-// Each operation authenticates, validates its input and answers with an
-// `ActionResult`, so the procedures only carry the call.
 export const userAccountRouter = {
   update: baseProcedure
     .input(type<UpdateUserInput>())

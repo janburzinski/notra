@@ -34,8 +34,6 @@ export function ShareOfVoiceCard({
   );
   const { domain: projectDomain } = useGeoActiveProject(organizationId ?? "");
   const { data: settingsData } = useGeoSettings(organizationId ?? "");
-  // Same brand set as the competitors page: you and your tracked rivals,
-  // variants folded, the assistants themselves left out.
   const scoped = scopeCompetitorShare({
     points,
     timeseries,

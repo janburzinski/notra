@@ -15,13 +15,6 @@ import {
   shiftDay,
 } from "../utils/demo-pipe";
 
-/**
- * The public demo has no Tinybird. Its AI traffic is generated per request
- * and the GEO traffic endpoints are answered by these TypeScript mirrors of
- * the pipes in `pipes/geo-traffic.ts`, so charts are always current to the
- * hour and nothing is ever ingested.
- */
-
 const LOG_LOOKBACK_DAYS = 90;
 const AI_VISITOR_TYPES = new Set(["crawler", "ai_referral"]);
 
@@ -51,7 +44,6 @@ function windowOf(params: DemoTrafficParams, now: Date) {
   return {
     isCurrent: (day: string) => day >= from && (to === null || day <= to),
     isPrevious: (day: string) => day >= previousFrom && day < from,
-    /** GEO_CAPTURED_WINDOW_SQL compares the timestamp, not the day. */
     inCapturedWindow: (event: DemoTrafficEvent) => {
       const day = utcDay(event.captured_at);
       if (!params.date_from) {
@@ -586,7 +578,6 @@ export async function queryDemoPipe<TRow>(
   if (!handler) {
     return null;
   }
-  // Every caller passes the pipe's typed params (`InferParams`).
   const parsed = params as DemoTrafficParams;
   const events = await scopedEvents(parsed);
   return demoQueryResult(handler(events, parsed, new Date()) as TRow[]);

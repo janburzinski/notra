@@ -92,8 +92,6 @@ export function SiteCreateForm({
     sourceRevision.current += 1;
     setStarterPullRequestUrl(null);
   };
-  // Snapshot the source when the request starts, so a PR for an older
-  // repository, branch or folder never lands on the current one.
   const startStarterRequest = () => {
     const revision = sourceRevision.current;
     return (url: string) => {
@@ -120,10 +118,7 @@ export function SiteCreateForm({
   });
   const createManyMutation = useCreateSites();
   const isBulk = bulk.active;
-  // One creation at a time: neither mode can start while the other runs.
   const isAnyCreating = isCreating || createManyMutation.isPending;
-  // While a bulk import runs or once it created sites, the repository and
-  // branch stay put, so results always land on the rows that were sent.
   const bulkLocked = bulk.createdCount > 0 || isAnyCreating;
   const isReady =
     Boolean(projectId) &&
@@ -135,7 +130,6 @@ export function SiteCreateForm({
   const firstPendingRow = bulk.pendingRows[0];
   let configureFocusId = `${id}-name`;
   if (isBulk) {
-    // The toggle is disabled once sites exist, so focus the first row instead.
     configureFocusId =
       bulkLocked && firstPendingRow
         ? siteBulkFieldId(id, firstPendingRow.rootDirectory, "name")

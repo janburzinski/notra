@@ -58,14 +58,12 @@ export function useTableViewport<T>({
       })
     : rows.map((entry, index) => ({ entry, index }));
 
-  // Allow another near-bottom notification after the current load completes.
   useEffect(() => {
     if (!loading) {
       endReachedRef.current = false;
     }
   }, [loading]);
 
-  // And once the row count changes (client-side infinite scroll).
   useEffect(() => {
     endReachedRef.current = false;
   }, [rows.length]);
@@ -73,9 +71,6 @@ export function useTableViewport<T>({
   const [atEnd, setAtEnd] = useState(true);
   const [atStart, setAtStart] = useState(true);
 
-  // Asks for the next page once the reader is near the bottom. Also runs when
-  // the rows or the viewport change, so a first page too short to scroll
-  // still loads the rest.
   const requestMoreIfNearEnd = useCallback(
     (element: HTMLDivElement) => {
       if (!onEndReached || loading || endReachedRef.current) {
@@ -107,8 +102,6 @@ export function useTableViewport<T>({
     requestMoreIfNearEnd(element);
   }, [requestMoreIfNearEnd]);
 
-  // Keep the end fade in sync when content or viewport size changes without a
-  // scroll event (initial render, rows appended, container resized).
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) {
@@ -127,7 +120,6 @@ export function useTableViewport<T>({
     return () => observer.disconnect();
   }, [rows.length, requestMoreIfNearEnd]);
 
-  // Classic horizontal scrollbars consume height; compensate to avoid clipping a row.
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) {
@@ -148,9 +140,6 @@ export function useTableViewport<T>({
     return () => observer.disconnect();
   }, []);
 
-  // Rounding at some zoom levels leaves the rows a pixel wider than the body,
-  // which lets a trackpad nudge the table sideways. Only scroll sideways when
-  // the columns really don't fit.
   useEffect(() => {
     const element = scrollRef.current;
     const table = element?.querySelector("table");

@@ -60,11 +60,6 @@ export function buildOpenInNotraBadgeUrls(
   };
 }
 
-/**
- * GitHub renders `<picture>` with `prefers-color-scheme` sources in Markdown,
- * so the badge follows the viewer's theme. The plain `<img>` is the fallback
- * for clients without `<picture>` support (e.g. notification emails).
- */
 function renderOpenInNotraButton(
   contentUrl: string,
   badgeUrls: OpenInNotraBadgeUrls
@@ -101,10 +96,6 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/**
- * Drops a previously rendered deep link so republishing can place one fresh
- * link after the file path, including after notes another app appended.
- */
 function stripOpenInNotraLink(
   body: string,
   params: BuildContentPullRequestBodyParams
@@ -130,11 +121,6 @@ function openInNotraTail(params: BuildContentPullRequestBodyParams) {
   return link ? `\n\n${link}` : "";
 }
 
-/**
- * Older pull requests only had this summary (and later the Open in Notra
- * button). Keep generating it so republishing can still find and replace
- * unmarked legacy bodies.
- */
 function buildManagedIntro(params: BuildContentPullRequestBodyParams) {
   return joinParagraphs([
     draftSummary(params.contentType),

@@ -186,8 +186,6 @@ export function WebVisitorsSection({
     };
   });
 
-  // Side by side, a pair shares the taller of its own heights (an empty list
-  // keeps its empty-state height). Stacked, each table sizes itself.
   const pairHeight = (first: number, second: number) =>
     sideBySide
       ? Math.max(webTableHeight(first), webTableHeight(second))

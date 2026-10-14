@@ -127,7 +127,6 @@ export function SidebarResizeHandle({
       }
       className="touch-none group-data-[collapsible=icon]:-right-5.5! after:hidden max-sm:hidden"
       onClick={(event) => {
-        // A mouse click must not move the rail before the second click lands.
         if (event.detail === 0) {
           setOpen(state === "collapsed");
         }

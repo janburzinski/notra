@@ -1,4 +1,3 @@
-// Deliberately exclude prompts, outputs, URLs, headers, emails and error text.
 export const TELEMETRY_EVENT_FIELDS = [
   "timestamp",
   "level",
@@ -45,7 +44,6 @@ export const TELEMETRY_EVENT_FIELDS = [
   "spanId",
 ] as const;
 
-// These fields can include caller-supplied identifiers, never arbitrary text.
 export const TELEMETRY_IDENTIFIER_FIELDS = new Set([
   "requestId",
   "callId",
@@ -138,7 +136,6 @@ export const TELEMETRY_MODEL_NAMESPACES = new Set([
   "spacexai",
 ]);
 export const TELEMETRY_UPSTREAM_PROVIDERS = new Set(TELEMETRY_PROVIDERS);
-// Reviewed aliases only: never lowercase or sanitize arbitrary provider text.
 export const TELEMETRY_PROVIDER_ALIASES: Readonly<Record<string, string>> = {
   "Context.dev": "context.dev",
 };
@@ -228,14 +225,12 @@ export const TELEMETRY_CODE_FIELDS = new Set([
   "surface",
 ]);
 export const TELEMETRY_CODE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/;
-// Framework route templates, not URLs, query strings or arbitrary request paths.
 export const TELEMETRY_ROUTE_SENTINELS = new Set(["unmatched"]);
 export const TELEMETRY_ROUTE_SEGMENT_PATTERN =
   /^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*|\.[A-Za-z][A-Za-z0-9_.-]*|[:$][A-Za-z_][A-Za-z0-9_]*|\$|\*|\[\[\.\.\.[A-Za-z_][A-Za-z0-9_]*\]\]|\[(?:\.\.\.)?[A-Za-z_][A-Za-z0-9_]*\])$/;
 export const TELEMETRY_SECRET_PATTERN =
   /(?:^|[/.:_-])(?:sk[-_]|bearer|password|secret|token[-_]|axiom[-_])/i;
 
-// Only geo.ingest has reviewed reason codes; other events may use free text.
 export const TELEMETRY_GEO_INGEST_REASONS = new Set([
   "missing_token",
   "invalid_token",
@@ -267,7 +262,6 @@ export const TELEMETRY_EVENT_ENUM_FIELDS: Readonly<
   "geo.ingest.runtime": { runtime: GEO_INGEST_RUNTIMES },
 };
 
-// Only geo.ingest.runtime emits these reviewed nonnegative numeric fields.
 export const TELEMETRY_GEO_INGEST_RUNTIME_FIELDS = [
   "uptimeSeconds",
   "rssBytes",

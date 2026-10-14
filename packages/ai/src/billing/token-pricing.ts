@@ -59,7 +59,6 @@ const CLAUDE_FABLE_5_PRICING: ModelPricing = {
 
 export const MODEL_PRICING: Record<string, ModelPricing> = {
   "anthropic/claude-fable-5.1": CLAUDE_FABLE_5_1_PRICING,
-  // Claude Code reports Fable 5.1 usage with the dashed id.
   "anthropic/claude-fable-5-1": CLAUDE_FABLE_5_1_PRICING,
   "anthropic/claude-fable-5": CLAUDE_FABLE_5_PRICING,
   "opencode/claude-opus-5": CLAUDE_OPUS_5_PRICING,
@@ -327,12 +326,6 @@ export function promptTokensOf(usage: AgentTokenUsage): number {
   );
 }
 
-/**
- * Long-context rates apply to the whole request once its prompt crosses the
- * threshold. Usage that aggregates several calls has to carry
- * `maxPromptTokens`, otherwise the sum of small calls would look like one
- * long one.
- */
 function resolvePricingTier(
   pricing: ModelPricing,
   usage: AgentTokenUsage

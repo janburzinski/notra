@@ -41,8 +41,6 @@ const openRouterHeaders = {
 
 let router: ModelRouter | null = null;
 
-// requestId joins each ai.call.* event to the wide event of the request that
-// made the call.
 const routerLogger: RouterLogger = {
   info: (event: string, fields?: RouterLogFields) =>
     log.info({ ...getOperationalContext(), event, ...fields }),
@@ -78,7 +76,6 @@ function buildAdapters(): Partial<Record<GatewayId, GatewayAdapter>> {
 }
 
 function createRouter(): ModelRouter {
-  // The public demo has no provider keys; answer every call in-process.
   if (isDemoMode()) {
     return createDemoModelRouter();
   }

@@ -393,9 +393,6 @@ function geoPromptResultDetailQueryOptions(input: {
   return {
     ...dashboardOrpc.geo.promptResultDetail.queryOptions({ input }),
     staleTime: Number.POSITIVE_INFINITY,
-    // Keep a selected answer loading when users switch models. Consuming the
-    // generated AbortSignal would otherwise surface normal switches as failed
-    // requests and throw away work that is useful when they switch back.
     queryFn: () => dashboardOrpc.geo.promptResultDetail.call(input),
   };
 }
@@ -452,8 +449,6 @@ export function usePrefetchGeoPromptAnswer(organizationId: string) {
         latestPromptResults(row.results, [], promptId, row.prompt)
       )[0]?.checkId
     );
-    // The raw answer's markdown renderer, so "Raw answer" opens without a
-    // skeleton.
     loadGeoPromptAnswerThread().catch(() => undefined);
   };
 }
@@ -636,7 +631,6 @@ export function useGeoCompetitorRowNavigation(
       return;
     }
     prefetchDetail(brand);
-    // The detail sheet's code, so the click only waits for data.
     loadCompetitorDetailView().catch(() => undefined);
   };
 
@@ -1276,7 +1270,6 @@ export function useGscSelectSite(organizationId: string) {
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
   const invalidate = useInvalidateGscQueries(organizationId, projectId);
-  // Scoped so a slow sync in one project isn't overwritten by another.
   const toastId = `gsc-select-site:${organizationId}:${projectId ?? "default"}`;
   return useMutation({
     mutationKey: gscAnalyzeMutationKey(organizationId, projectId),
@@ -1286,8 +1279,6 @@ export function useGscSelectSite(organizationId: string) {
         organizationId,
         projectId,
       }),
-    // The first sync can take a while, so progress lives in a toast and the
-    // caller can close its dialog right away.
     onMutate: (input) => {
       toast.loading(
         tToast("connectingProperty", {

@@ -77,7 +77,6 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
         balance,
       });
     } catch (error) {
-      // Balance lookups are best effort; unknown balance never blocks traffic.
       logger.warn("ai.router.credits_check_failed", {
         gateway: decision.gateway,
         error: error instanceof Error ? error.message : String(error),
@@ -104,8 +103,6 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
       throw new GatewayCreditBalanceError(balance, decision.gateway);
     }
 
-    // The resolver now treats the exhausted gateway as unavailable and
-    // returns the compliant fallback (or throws when there is none).
     const fallback = await resolve(request);
     await refreshBalance(fallback);
     if (credits.isExhausted(fallback.gateway)) {
@@ -155,8 +152,6 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
           if (enriched.costUsd !== undefined) {
             recordRequestAICost(metadata.generationId, enriched.costUsd);
           }
-          // Generation ID permits deduplication in queries. This is usage, not
-          // cash paid: only provider billing can account for promotional credits.
           logger.info("ai.cost.reported", {
             costId: `${metadata.gateway}:${metadata.generationId}`,
             ...(metadata.organizationId

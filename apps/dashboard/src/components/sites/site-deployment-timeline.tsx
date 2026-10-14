@@ -35,8 +35,6 @@ export function SiteDeploymentTimeline({
       }),
     [locale]
   );
-  // Bars follow the frame clock: only the active phase grows past the last
-  // one-second tick, so nothing is re-parsed per frame.
   const frameGrowth = Math.max(0, frameNow - now);
   const phases = useMemo(
     () =>
@@ -53,7 +51,6 @@ export function SiteDeploymentTimeline({
     [deployment, log, now, locale, time]
   );
 
-  // A phase that ran without timing would make the sum a partial total.
   const timed = phases.filter((phase) => phase.state !== "pending");
   const totalMs =
     timed.length > 0 && timed.every((phase) => phase.durationMs !== null)
@@ -159,7 +156,6 @@ export function SiteDeploymentTimeline({
                 </div>
                 <div className="text-muted-foreground/70 min-h-4 font-mono text-xs tabular-nums">
                   {phase.startIso !== null ? (
-                    // Local time: the server renders in its own zone first.
                     <time
                       dateTime={phase.startIso}
                       suppressHydrationWarning

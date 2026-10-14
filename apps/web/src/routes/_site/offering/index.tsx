@@ -27,14 +27,12 @@ function OfferingCheckPage() {
   return (
     <div className="flex w-full flex-col items-center">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(OFFERING_CHECK_BREADCRUMB_JSONLD),
         }}
         type="application/ld+json"
       />
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
         dangerouslySetInnerHTML={{
           __html: serializeJsonLd(OFFERING_CHECK_SOFTWARE_JSONLD),
         }}

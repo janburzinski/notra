@@ -30,7 +30,6 @@ interface PanelProps {
   aside?: ReactNode;
   step?: number;
   accent?: boolean;
-  /** Sweep the panel at this fraction of the flow loop. */
   scan?: number;
   className?: string;
   children?: ReactNode;
@@ -140,7 +139,6 @@ function StepCircle({
   );
 }
 
-/** Flow delays are fractions of one loop (see globals.css), so a diagram plays as one sequence. */
 type FlowAxis = "down" | "right" | "left";
 
 const FLOW_TARGET: Record<FlowAxis, string> = {
@@ -153,13 +151,10 @@ interface FlowDotProps {
   axis?: FlowAxis;
   delay?: number;
   accent?: boolean;
-  /** Travel faster, for stubs that are only a few pixels long. */
   short?: boolean;
-  /** Constant speed, for a segment that joins other segments of one path. */
   linear?: boolean;
 }
 
-/** A packet that travels along its parent line. The parent must be positioned. */
 export function FlowDot({
   axis = "down",
   delay = 0,
@@ -212,7 +207,6 @@ export function FlowDot({
   );
 }
 
-/** Sweeps across a panel top to bottom when a packet arrives at it. */
 function FlowScan({ delay, accent }: { delay: number; accent: boolean }) {
   return (
     <span
@@ -234,7 +228,6 @@ function FlowScan({ delay, accent }: { delay: number; accent: boolean }) {
 
 interface ConnectorProps {
   step?: number;
-  /** Send a packet down the line, starting at this fraction of the flow loop. */
   flowDelay?: number;
   label?: ReactNode;
   dashed?: boolean;
@@ -242,7 +235,6 @@ interface ConnectorProps {
   className?: string;
 }
 
-/** Vertical arrow between two stacked panels, with an optional numbered label. */
 export function Connector({
   step,
   label,

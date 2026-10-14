@@ -78,9 +78,7 @@ const TAB_DROP_ANIMATION = {
   easing: "cubic-bezier(0.23, 1, 0.32, 1)",
 };
 
-function noop() {
-  // The dragged copy is not interactive.
-}
+function noop() {}
 
 function isSocialPost(post: ChatPostEntry) {
   return (
@@ -208,9 +206,6 @@ function ChatContentPanelDocument({
   );
 }
 
-// The look of one tab, shared by the tab in the bar and the copy that follows
-// the pointer while dragging. Button surfaces without the press scale; only
-// colours animate, so drag transforms never fight a CSS transition.
 function ChatContentPanelTabSurface({
   dragHandleProps,
   isActive,
@@ -240,8 +235,6 @@ function ChatContentPanelTabSurface({
         className={cn(
           "focus-visible:ring-ring flex h-full min-w-0 flex-1 items-center gap-1.5 rounded-[inherit] pl-2.5 outline-none focus-visible:ring-2",
           isOverlay ? "cursor-grabbing" : "cursor-pointer",
-          // Active tabs keep room for the close button; inactive ones show it
-          // over the title end on hover, which fades out instead of moving.
           isActive || isOverlay ? "pr-7" : "pr-2.5"
         )}
         onClick={onActivate}
@@ -294,15 +287,8 @@ function ChatContentPanelTab({
 
   return (
     <div
-      // While dragging, the slot stays as a faint placeholder; the copy in
-      // the overlay follows the pointer.
       className={cn(
-        // All tabs share the bar evenly between the same bounds; past the
-        // minimum the bar scrolls.
         "max-w-64 min-w-28 flex-1 basis-0",
-        // A new tab grows in from nothing, so the tabs after it and the "+"
-        // slide over instead of jumping. The clip margin keeps the tab's
-        // shadow and focus ring visible.
         "-my-1 overflow-clip py-1 transition-[max-width,min-width,opacity] duration-200 ease-out [overflow-clip-margin:4px] motion-reduce:transition-none starting:max-w-0 starting:min-w-0 starting:opacity-0",
         isDragging && "opacity-35"
       )}
@@ -355,14 +341,12 @@ export function ChatContentPanel({
     (post) => post.toolCallId === activeToolCallId
   );
 
-  // A small threshold keeps a plain click on a tab a click, not a drag.
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
   const tablistRef = useRef<HTMLDivElement>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const draggingPost = draggingId ? postsById.get(draggingId) : undefined;
-  // The dragged copy slides along the bar only and never leaves it.
   const keepInTabBar: Modifier = ({ transform, draggingNodeRect }) => {
     const bar = tablistRef.current?.getBoundingClientRect();
     if (!(bar && draggingNodeRect)) {
@@ -391,7 +375,6 @@ export function ChatContentPanel({
     );
   };
 
-  // A tab that opens or activates off-screen slides into view.
   useEffect(() => {
     const tab = activeToolCallId
       ? tablistRef.current?.querySelector(
@@ -407,7 +390,6 @@ export function ChatContentPanel({
     });
   }, [activeToolCallId, openToolCallIds.length]);
 
-  // The panel belongs to this chat; leaving it must not leave the slot open.
   const closeOnLeave = useEffectEvent(() => closePanel("preview"));
   useEffect(() => () => closeOnLeave(), []);
 
@@ -440,8 +422,6 @@ export function ChatContentPanel({
           />
           <div
             aria-label={t("title")}
-            // Grows only as wide as its tabs at full width, so the "+" stays
-            // right after the last tab.
             className="flex max-w-(--tabs-max-width) min-w-0 flex-1 scrollbar-none items-center gap-1 overflow-x-auto"
             ref={tablistRef}
             role="tablist"
@@ -452,7 +432,6 @@ export function ChatContentPanel({
             }
           >
             <DndContext
-              // The bar scrolling under the pointer clips the dragged tab.
               autoScroll={false}
               collisionDetection={closestCenter}
               onDragCancel={() => setDraggingId(null)}
@@ -563,7 +542,6 @@ export function ChatContentPanel({
     );
   }
 
-  // Below lg the dock is hidden, so the same tabs open in a drawer.
   return (
     <ResponsiveDialog
       onOpenChange={(open) => {

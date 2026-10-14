@@ -149,8 +149,6 @@ export const POST = withEvlog(async function POST(
           { status: 409 }
         );
       }
-      // Existing chats keep the project stored at creation. Continuing with a
-      // different active project must not retarget GEO tools or content.
       bindProjectFromSession = true;
       projectId = existingSession.projectId;
     }
@@ -232,8 +230,6 @@ export const POST = withEvlog(async function POST(
     }
     cleanupStreamId = streamId;
 
-    // Finish all preparation before error cleanup can release the stream lock.
-    // Code research fails closed on its own, so it never rejects here.
     const [hydrationResult, integrationsResult, codeResearchResult] =
       await Promise.allSettled([
         hydrateSavedChatPosts(organizationId, chatId, messages),
@@ -256,13 +252,11 @@ export const POST = withEvlog(async function POST(
     );
 
     await clearLastResponseStopped(organizationId, chatId);
-    // Persist only after preparation succeeds so a failed send leaves no turn.
     const historySaved = await replaceChatHistory(
       organizationId,
       chatId,
       messages,
       undefined,
-      // Reject a snapshot made stale before acquiring the stream lock.
       existingSession
         ? (existingSession.messages.at(-1)?.id ?? null)
         : undefined,
@@ -284,7 +278,6 @@ export const POST = withEvlog(async function POST(
     }
 
     if (messages.length === 1 && latestMessage.role === "user") {
-      // Start immediately alongside the response and keep it alive after the request.
       afterResponse(async () => {
         await generateAndSetChatTitle(organizationId, chatId, latestMessage);
       });
@@ -514,8 +507,6 @@ async function createDirectStandaloneChatResponse({
           const cost = calculateAiCreditCostCents(
             {
               ...toAgentTokenUsage(usage),
-              // This usage sums every step, and prices can depend on how big
-              // each single request was, so bill the per-step cost.
               maxPromptTokens: routeUsage?.maxPromptTokens,
               tokenCostUsd: routeUsage?.tokenCostUsd,
             },

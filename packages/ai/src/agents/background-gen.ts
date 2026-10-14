@@ -146,8 +146,6 @@ async function runBackgroundGenWithContext(
         },
         gateway: { tags: ["content-generation"] },
       },
-      // Fall back to the previous, proven content model rather than the
-      // generic OpenAI chain (gpt-5.4-mini), which was never evaluated here.
       { modelId: CONTENT_AGENT_MODEL, fallbackModels: [AGENT_DEFAULT_MODEL] }
     ),
     tools: {

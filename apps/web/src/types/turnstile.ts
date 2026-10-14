@@ -24,7 +24,6 @@ declare global {
   }
 }
 
-/** "interaction-only" stays invisible unless Cloudflare needs a click. */
 type TurnstileAppearance = "always" | "execute" | "interaction-only";
 
 export interface TurnstileHandle {
@@ -32,7 +31,6 @@ export interface TurnstileHandle {
 }
 
 export interface TurnstileProps {
-  /** Checked again on the server, so a token only works for its own form. */
   action: string;
   appearance?: TurnstileAppearance;
   failureMessage: string;

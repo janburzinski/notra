@@ -39,7 +39,6 @@ export function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
 }
 
-/** Everything a format needs once the repository is in the sandbox. */
 export interface RepoImageFormatContext {
   box: RepoImageBox;
   input: GenerateRepoImageInput;
@@ -166,7 +165,6 @@ async function streamAgent(
     }
     throw error;
   } finally {
-    // Unknown usage must stay undefined, not create a zero-token minimum bill.
     recordCost(reportedCost);
   }
 }

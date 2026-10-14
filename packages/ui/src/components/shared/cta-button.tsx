@@ -60,7 +60,6 @@ function CtaButton({
       data-loading={loading ? "" : undefined}
       data-slot="cta-button"
       disabled={disabled || loading}
-      // Keeps focus on the button while it loads instead of dropping it.
       focusableWhenDisabled={focusableWhenDisabled ?? loading}
       {...props}
     >

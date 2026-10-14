@@ -6,7 +6,6 @@ import { InfiniteDataTable, type TableColumn } from "../components/data-table";
 
 interface Crawler {
   name: string;
-  /** Provider id on models.dev, e.g. `openai` for models.dev/logos/openai.svg. */
   provider: string;
 }
 

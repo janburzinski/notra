@@ -157,8 +157,6 @@ export function schedulePollTier(
   if (imminent) {
     return "active";
   }
-  // TanStack evaluates the interval only after a fetch, so a page left open
-  // must keep polling to notice the slot approaching.
   return publications.some((publication) => publication.status === "scheduled")
     ? "idle"
     : null;
@@ -172,8 +170,6 @@ export function getScheduleDialogMode({
   if (active) {
     return editable ? "edit" : "locked";
   }
-  // Failed destinations are resolved first (retry or clear), so the dialog
-  // does not offer two competing actions at once.
   return failed ? "failed" : "create";
 }
 
@@ -407,7 +403,6 @@ export function canSubmitSchedule({
   inPast: boolean;
   destinationsBlocked: boolean;
   busy: boolean;
-  /** Unsaved edits, or a video still uploading or saving. */
   sendBlocked: boolean;
 }) {
   return (

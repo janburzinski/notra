@@ -61,7 +61,6 @@ export const notificationsRouter = {
         throw forbidden(tErrors("ownerOnly"));
       }
 
-      // Owners must still be able to opt out after their subscription expires.
       if (Object.values(input).some((value) => value === true)) {
         await assertActiveSubscription(input.organizationId);
       }
@@ -108,7 +107,6 @@ export const notificationsRouter = {
 
       return { settings: updated };
     }),
-  /** The signed-in user's own marketing email consent. */
   marketing: authorizedProcedure.handler(({ context }) =>
     getMarketingEmailsState(context.user.id)
   ),

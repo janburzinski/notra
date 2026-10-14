@@ -1,4 +1,3 @@
-// Drag the handle (or use the arrow keys) to compare two images.
 export const BeforeAfter = ({ before, after, beforeLabel = "Before", afterLabel = "After", alt = "" }) => {
   const [position, setPosition] = useState(50);
 

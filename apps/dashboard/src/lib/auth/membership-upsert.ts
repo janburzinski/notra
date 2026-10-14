@@ -64,8 +64,6 @@ async function upsertMembershipAtomically(
         set: {
           role: sql`CASE WHEN ${members.role} = 'owner' THEN ${members.role} ELSE excluded.role END`,
         },
-        // Skip the UPDATE when the row already matches: every login hits this
-        // path, and owners keep their role regardless of the incoming value.
         setWhere: sql`${members.role} <> 'owner' AND ${members.role} <> excluded.role`,
       });
   });
@@ -84,7 +82,6 @@ async function updateMembershipRoleIfNeeded(
   }
 }
 
-/** Pre-0085 path: serialize reads and writes for each membership. */
 async function upsertMembershipReadThenWrite(
   input: MembershipUpsertInput
 ): Promise<void> {
@@ -131,13 +128,6 @@ async function upsertMembershipReadThenWrite(
   });
 }
 
-/**
- * Runs the atomic upsert and, if Postgres reports that no unique index matches
- * the ON CONFLICT target (migration 0085 not applied yet), the legacy path.
- * Cache a missing index for 60 seconds to avoid a failed statement on every login.
- * The next call after expiry retries the atomic upsert so warm processes recover
- * after the migration without restarting.
- */
 async function runMembershipUpsert(
   strategies: MembershipUpsertStrategies,
   input: MembershipUpsertInput
@@ -172,10 +162,6 @@ const productionStrategies: MembershipUpsertStrategies = {
   onFallback: warnConflictTargetMissing,
 };
 
-/**
- * Upserts a membership keyed by (organization_id, user_id).
- * TODO: drop the read-then-write fallback once 0085 is confirmed in production.
- */
 export function upsertMembership(input: MembershipUpsertInput): Promise<void> {
   return runMembershipUpsert(productionStrategies, input);
 }

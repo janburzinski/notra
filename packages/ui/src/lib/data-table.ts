@@ -167,8 +167,6 @@ export function tableMinWidthCss<T>(
   }
   const sum = parts.length === 1 ? (parts[0] ?? "0px") : `calc(${parts.join(" + ")})`;
 
-  // A `"20%"` column takes its share of the table, not of the container, so
-  // the table has to grow until both that column and the rest fit.
   const percentTotal = columns.reduce(
     (total, column) => total + (percentWidth(column.width) ?? 0),
     0
@@ -214,8 +212,6 @@ export function resolveColumnWidths<T>(
   extraFixedWidths: readonly string[] = []
 ): (string | undefined)[] {
   const hasFr = columns.some((column) => isFrWidth(column.width));
-  // Next to fr columns, a column without a width takes one share of the
-  // rest instead of collapsing to nothing under `table-layout: fixed`.
   const frValues = columns.map((column) => {
     if (!column.width) {
       return hasFr ? 1 : null;
@@ -286,7 +282,6 @@ export function getTableViewportLayout({
   horizontalScrollbarHeight,
 }: TableViewportLayoutOptions): TableViewportLayout {
   const resolvedHeight = Math.max(height, minHeight ?? 0);
-  // Fixed viewports end on a whole row so separators meet the bottom border.
   const bodyHeight =
     Math.floor(Math.max(rowHeight, resolvedHeight - headerHeight) / rowHeight) *
     rowHeight;
@@ -359,10 +354,8 @@ export function tableLayout<T>(
   minColumnWidth: number,
   extraFixedWidths: readonly string[]
 ) {
-  // Shrink-wrap only after every column has an explicit resized width.
   const sized =
     columns.length > 0 && columns.every((column) => widths[column.key] != null);
-  // A resized column floors at its dragged width, not the declared one.
   const floorColumns = columns.map((column) => {
     const override = widths[column.key];
     return override == null ? column : { ...column, width: `${override}px` };

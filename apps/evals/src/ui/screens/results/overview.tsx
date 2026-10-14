@@ -65,7 +65,6 @@ function MetricChart({
   );
 }
 
-/** Mean score per case tag (content type, expected decision) and contender. */
 function TagBreakdown({
   run,
   suite,

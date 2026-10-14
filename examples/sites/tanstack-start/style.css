@@ -1,4 +1,3 @@
-/* Brightdesk: the blog hero is a support thread (slots/blog-hero.mdx). */
 .brightdesk-thread {
   background: var(--card);
   box-shadow: 0 1px 2px oklch(0 0 0 / 0.04), 0 12px 32px -12px oklch(0.45 0.12 45 / 0.18);
@@ -9,7 +8,6 @@ html.dark .brightdesk-thread {
   box-shadow: none;
 }
 
-/* Bubbles are nested in the thread: 24px outer radius = 8px inner + 16px padding. */
 .brightdesk-bubble {
   max-width: 85%;
   padding: 0.625rem 0.875rem;

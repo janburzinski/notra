@@ -201,8 +201,6 @@ function collectEntityHits(
     hits.push({
       key: `prompt:${prompt.id}`,
       kind: "prompt",
-      // The prompt text is what gets tracked and searched; the generated
-      // title only helps tell similar prompts apart.
       label: truncateSnippet(
         prompt.prompt,
         COMMAND_PALETTE_REFERENCE_SNIPPET_MAX

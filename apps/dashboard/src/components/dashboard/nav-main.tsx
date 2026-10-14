@@ -64,17 +64,11 @@ export function NavMain() {
     return null;
   }
 
-  // While a pick is in flight the panels have already swapped but `pathname`
-  // still points at the old route, so every item would resolve as inactive and
-  // the highlight would pop in once navigation lands. Resolve against where the
-  // pick is heading instead, so the highlight arrives with the panel.
   const navPathname = pendingMode
     ? `/${slug}${SIDEBAR_MODE_HOME_LINKS[pendingMode]}`
     : pathname;
 
   const handleModeChange = (next: SidebarMode) => {
-    // Cookie first: org-root navigation reads it. Prefetching Studio before
-    // persist would cache the GEO restore redirect as `/{slug}`.
     setMode(next);
     prefetchModeHome(next);
     router.push(geoNavHref(slug, SIDEBAR_MODE_HOME_LINKS[next], projectId));
@@ -95,11 +89,6 @@ export function NavMain() {
         projectId={projectId}
         slug={slug}
       />
-      {/*
-        Both mode panels stay mounted so the swoosh has something to fade
-        between. Recents stay unfetched on first GEO paint, then warm on idle
-        or when Studio is hovered so the first switch is not a cold list fetch.
-      */}
       <SidebarSwap
         activeId={mode}
         className="overflow-hidden"

@@ -20,11 +20,6 @@ interface DemoPlaygroundProviderProps {
   children: React.ReactNode;
 }
 
-/**
- * Public demo only: owns the API playground sheet and the live request feed.
- * Requests from outside the dashboard (curl, CLI, MCP, the console) get a
- * toast that links to what they changed.
- */
 export function DemoPlaygroundProvider({
   children,
 }: DemoPlaygroundProviderProps) {

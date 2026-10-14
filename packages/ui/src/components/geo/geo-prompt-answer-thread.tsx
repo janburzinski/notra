@@ -41,10 +41,8 @@ import type {
 const ANSWER_MARKDOWN_CLASS =
   "[&_h1]:mt-0 [&_h1]:mb-2 [&_h1]:text-[1.15em] [&_h1]:font-semibold [&_h2]:mt-3 [&_h2]:mb-1.5 [&_h2]:text-[1.05em] [&_h2]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:text-[1em] [&_h3]:font-semibold [&_p]:my-2.5 [&_ul]:my-2.5 [&_ol]:my-2.5";
 
-/** Space between the last line of the answer and the floating composer. */
 const THREAD_COMPOSER_GAP_PX = 24;
 
-/** Tracks an element's height, so content can leave room for an overlay. */
 function useElementHeight(ref: RefObject<HTMLElement | null>): number {
   const [height, setHeight] = useState(0);
   useEffect(() => {
@@ -476,8 +474,6 @@ export function GeoPromptAnswerThread({
           />
         </div>
       </div>
-      {/* The composer floats over the answer like the real apps: the text
-          scrolls behind it, and only the pill itself takes clicks. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
         <div className="mx-auto w-full max-w-3xl px-6 pb-4" ref={composerRef}>
           <div className="pointer-events-auto">

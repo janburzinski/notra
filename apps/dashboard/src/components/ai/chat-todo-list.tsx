@@ -18,7 +18,6 @@ import type { ChatTodoListProps } from "@/types/components/chat-todo-list";
 const ICON_LAYER_CLASSNAME =
   "absolute inset-0 size-3.5 transition-[opacity,scale] duration-200 ease-out motion-reduce:transition-none";
 
-// All icons stay mounted and crossfade, so a status change never pops.
 function TodoStatusIcon({
   status,
   isActive,
@@ -77,7 +76,6 @@ function TodoStatusIcon({
   );
 }
 
-// Items have no ids; the content is the identity, numbered when repeated.
 function withTodoKeys(todos: ChatTodoItem[]) {
   const seen = new Map<string, number>();
   return todos.map((todo) => {
@@ -98,7 +96,6 @@ export function ChatTodoList({
   const { canScrollUp, canScrollDown } = useScrollEdges(listRef);
   const currentIndex = todos.findIndex((todo) => todo.status === "in_progress");
 
-  // Long plans scroll inside the box; keep the running step in view.
   useEffect(() => {
     const list = listRef.current;
     const item = currentIndex === -1 ? null : list?.children[currentIndex];
@@ -139,7 +136,6 @@ export function ChatTodoList({
       <div className="border-border bg-background overflow-hidden rounded-[14px] border">
         <ol
           className={cn(
-            // About five single-line steps before the list scrolls.
             "relative flex max-h-36 scrollbar-none flex-col gap-1.5 overflow-y-auto overscroll-contain px-3 py-2.5",
             canScrollUp &&
               canScrollDown &&

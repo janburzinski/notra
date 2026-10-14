@@ -153,7 +153,6 @@ describe("sceneToDiagramSpec", () => {
     if (!(send && "points" in send)) {
       throw new Error("missing arrow");
     }
-    // The user rotates the event box and drags the arrow's start to its corner.
     const startPoint: [number, number] = [send.x - 30, send.y + 25];
     const edited = {
       ...scene,
@@ -337,7 +336,6 @@ describe("findDiagramLayoutIssues", () => {
 
   test("checks rotated shapes by their rotated outline", () => {
     const quarter = Math.PI / 2;
-    // Two wide boxes turned upright: far apart on screen, overlapping unrotated.
     const upright = findDiagramLayoutIssues(
       sceneOf({
         elements: [
@@ -363,7 +361,6 @@ describe("findDiagramLayoutIssues", () => {
         ],
       })
     );
-    // A box tilted by hand is left alone; a tall turned box still counts for size.
     const tilted = findDiagramLayoutIssues(
       sceneOf({
         elements: [
@@ -390,7 +387,6 @@ describe("findDiagramLayoutIssues", () => {
       })
     );
 
-    // Only a and the upright b really touch; b and c only overlap unrotated.
     expect(upright.filter((issue) => issue.includes("overlap"))).toEqual([
       "Shapes a and b overlap.",
     ]);

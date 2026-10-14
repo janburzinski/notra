@@ -58,7 +58,6 @@ export async function saveContentDetail({
     queryClient.invalidateQueries({
       queryKey: dashboardOrpc.content.collections.list.key(),
     }),
-    // The calendar shows the title.
     queryClient.invalidateQueries({
       queryKey: dashboardOrpc.contentCalendar.list.key(),
     }),
@@ -121,7 +120,6 @@ export async function toggleContentDetailStatus({
         input: { organizationId },
       }),
     }),
-    // Published posts show on the calendar on the day they went out.
     queryClient.invalidateQueries({
       queryKey: dashboardOrpc.contentCalendar.list.key(),
     }),

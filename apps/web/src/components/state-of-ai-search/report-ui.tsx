@@ -23,17 +23,10 @@ import type {
 } from "@/types/state-of-ai-search";
 import { brandColor, formatPercent } from "@/utils/state-of-ai-search";
 
-/*
- * The one vocabulary every State of AI Search table and list speaks, on the
- * page, in the drawers, on the overview cards and in the carousel.
- */
-
 const PERCENT_MAX = 100;
-/** Hairline around logos so white marks hold their shape on white. */
 export const LOGO_OUTLINE =
   "outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10";
 
-/** A brand as logo plus name, truncating in narrow cells. */
 export function Brand({
   name,
   domain,
@@ -51,7 +44,6 @@ export function Brand({
   );
 }
 
-/** A percentage as a bar plus its number, the same width everywhere. */
 export function PercentBar({
   value,
   max = PERCENT_MAX,
@@ -80,12 +72,10 @@ export function EngineLabel({ engine }: { engine: StateOfAiSearchEngine }) {
   );
 }
 
-/** Secondary values in a row: counts, ranks, ratios, domains. */
 export function MutedText({ children }: { children: ReactNode }) {
   return <span className="text-muted-foreground tabular-nums">{children}</span>;
 }
 
-/** Three headline numbers above a drawer's tables. */
 export function StatStrip({
   stats,
 }: {
@@ -109,16 +99,10 @@ export interface ReportListColumn<T> {
   key: string;
   header: ReactNode;
   align?: "left" | "right";
-  /** The column that takes the remaining width and wraps. */
   grow?: boolean;
   cell: (row: T) => ReactNode;
 }
 
-/**
- * A framed table for drawers and short lists, with the same row height,
- * padding and type as the page's DataTables. Rows open something when
- * `onSelect` is set, by click, Enter or Space.
- */
 export function ReportList<T>({
   rows,
   columns,
@@ -130,7 +114,6 @@ export function ReportList<T>({
   columns: ReportListColumn<T>[];
   getKey: (row: T) => string;
   onSelect?: (row: T) => void;
-  /** Rows that leave the site, such as cited pages. */
   getHref?: (row: T) => string;
 }) {
   const activate = (row: T) => {
@@ -196,7 +179,6 @@ export function ReportList<T>({
   );
 }
 
-/** Top brands of a category, as rows: on the overview cards and in the carousel. */
 export function LeaderList({
   leaders,
 }: {
@@ -222,7 +204,6 @@ export function LeaderList({
   );
 }
 
-/** Last row of a report card or board; the whole card is the link. */
 export function ReadReportRow({ subject }: { subject: string }) {
   return (
     <span className="text-muted-foreground group-hover:text-foreground border-border/60 flex h-11 items-center justify-between border-t px-4 text-sm font-medium transition-colors">

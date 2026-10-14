@@ -55,24 +55,6 @@ function geoSelectionErrorMessage(
   return null;
 }
 
-/**
- * Rejects engine ids and languages the storage layer would silently rewrite.
- *
- * `resolveTrackedEngines` drops ids that are not in the catalog and falls back
- * to the *full* default engine set once nothing known is left, so a single
- * typo could turn a one-engine scan into a five-engine one. `trackedGeoLanguages`
- * coerces an unknown language to English the same way. Both used to answer 200,
- * so the caller never learned its selection had been replaced.
- *
- * Engines are checked against the catalog this organization can see. That is
- * the same set `GET .../geo/settings` reports (it maps stored engines through
- * `resolveTrackedEngines`), so a read-modify-write round trip always passes.
- * Engines that are stored but currently hidden from the organization are
- * preserved by `upsertGeoSettings` itself and are deliberately not required in
- * the payload. `nonZdrApprovedEngines` is *not* validated here: the GET
- * response returns it straight from the row, hidden ids included, so rejecting
- * them would break that same round trip.
- */
 const validateGeoSelection = Effect.fn("geo.validateSelection")(function* (
   input: ValidateGeoSelectionInput
 ) {

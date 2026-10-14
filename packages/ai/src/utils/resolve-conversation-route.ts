@@ -58,8 +58,6 @@ function getConversationSelection(messages: UIMessage[]) {
   return saved.success ? saved.data : undefined;
 }
 
-// Keep a server-saved selection when retry/edit truncates the assistant history.
-// The first message survives truncation, including a retry of the first turn.
 export function preserveConversationSelection(
   messages: UIMessage[],
   savedMessages: UIMessage[]

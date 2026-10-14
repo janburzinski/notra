@@ -19,7 +19,6 @@ function untrustedBlock(label: string, value: unknown) {
   ].join("\n");
 }
 
-/** The organization wrote these fields, so they steer the edit like instructions. */
 function voiceSection(voice: GitHubMentionVoice | null) {
   if (!voice) {
     return "";
@@ -62,7 +61,6 @@ export function getGitHubMentionPrompt(params: {
   publicationPath: string | null;
   publicationTitle: string | null;
   markdown: string | null;
-  /** True when the markdown is the pull request file, which is ahead of the Notra post. */
   markdownFromPullRequest?: boolean;
   thread: ReadonlyArray<{ author: string; body: string }>;
   review: GitHubMentionReviewThread | null;

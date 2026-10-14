@@ -55,8 +55,6 @@ import {
   settingsSearchContainsSection,
 } from "@/utils/settings-search";
 
-// Panes are imported directly: the modal chunk is already warmed while the
-// page idles, and lazy panes flashed a skeleton on the first open of each tab.
 const STANDARD_SETTINGS_PANES = {
   account: AccountSettingsPane,
   appearance: AppearanceSettingsPane,
@@ -114,7 +112,6 @@ export function SettingsModal() {
           "flex! max-w-none sm:max-w-none",
           "top-0 right-0 bottom-0 left-0 h-auto w-auto translate-none rounded-none",
           "md:top-1/2 md:right-auto md:bottom-auto md:left-1/2 md:h-[min(44rem,calc(100svh-2rem))] md:w-[min(64rem,calc(100%-1.5rem))] md:-translate-x-1/2 md:-translate-y-1/2",
-          // brightness-60 matches the black/40 page dim and, unlike an overlay, also covers the border
           "transition-[box-shadow,filter] data-nested-dialog-open:shadow-[0_0_0_100vmax_rgb(0_0_0/0.4)] data-nested-dialog-open:brightness-60"
         )}
       >

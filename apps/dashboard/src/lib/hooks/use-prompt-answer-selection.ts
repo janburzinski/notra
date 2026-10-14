@@ -19,8 +19,6 @@ import {
   withoutSupersededNoSearchResults,
 } from "@/utils/geo-prompt-history";
 
-// A scan-scoped view shows exactly what that scan answered; the latest view
-// hides legacy no-search answers a search answer replaced.
 function promptAnswerResults({
   row,
   visibleChecks,
@@ -67,8 +65,6 @@ export function usePromptAnswerSelection({
   const [engine, setEngine] = useState(initialEngine ?? "");
   const active =
     results.find((result) => result.engine === engine) ?? results[0] ?? null;
-  // Keyed through the close: the page unmounts once the slide-out ends, and
-  // dropping the key here blanks the answer while it is still on screen.
   const checkId = active?.checkId ?? null;
   const detail = useGeoPromptResultDetail(organizationId, checkId);
   const detailState = geoPromptDetailState(

@@ -269,8 +269,6 @@ function getComposerSendState({
 }) {
   const hasAnyContent =
     !isEmpty || attachmentCount > 0 || pendingUploadCount > 0;
-  // While the agent runs, anything in the composer (text and/or files) queues
-  // as one message; an empty composer turns the button into stop.
   const canQueue = isLoading && hasAnyContent && !hasUnsupportedAttachments;
   const showStop = isLoading && !hasAnyContent;
 
@@ -964,7 +962,6 @@ function ChatComposerContextPicker({
                 <Composer.ToolbarButton
                   aria-label={tChatShared("addToolsOrContext")}
                   disabled={isLoading || isQueued}
-                  // Stays focusable while disabled so the tooltip can explain why.
                   focusableWhenDisabled
                   size="icon-sm"
                 />
@@ -1096,7 +1093,6 @@ interface ChatInputAdvancedProps {
   showAuthorAvatars?: boolean;
   onEmptyChange?: (isEmpty: boolean) => void;
   draftStorageKey?: string;
-  /** Posts from this chat that `@` can tag. */
   postMentions?: readonly ChatPostMention[];
   ref?: Ref<ChatInputHandle>;
 }
@@ -1105,7 +1101,6 @@ interface QueuedSendSnapshot {
   value: string;
   attachments: ChatAttachment[];
   pendingUploadIds: string[];
-  /** Annotations already in `value`; ones added while waiting stay. */
   annotationIds: string[];
 }
 
@@ -1247,7 +1242,6 @@ function sendOrQueueComposer({
       taggedSkillNames
     );
     if (attachments.length > 0) {
-      // Files stay with this message in the queue and go out when it drains.
       sendSnapshot(
         prependComposerPrefix(outbound, quote),
         [...attachments],
@@ -1364,7 +1358,6 @@ export function ChatInputAdvanced({
       ),
     [postTitlesById, tAnnotations]
   );
-  // The quote and any post annotations go out ahead of the typed text.
   const composerPrefix = buildComposerPrefix(
     quoteContext?.quote,
     quoteContext?.annotations ?? EMPTY_ANNOTATIONS
@@ -1941,9 +1934,7 @@ export function ChatInputAdvanced({
     }
     return (editor.innerText ?? "").replace(/\u00A0/g, " ");
   }, []);
-  const submitRef = useRef<() => void>(() => {
-    // noop
-  });
+  const submitRef = useRef<() => void>(() => {});
 
   const insertPostChip = useCallback(
     (post: { postId: string; title: string }, range: Range) => {
@@ -1975,8 +1966,6 @@ export function ChatInputAdvanced({
         if (!editor) {
           return;
         }
-        // A queued message comes back serialized: lift its annotations back
-        // into the tray and its post tags back into chips.
         const parsed = parseChatAnnotations(text);
         if (parsed && quoteContextRef.current) {
           quoteContextRef.current.setAnnotations(
@@ -2007,7 +1996,6 @@ export function ChatInputAdvanced({
         if (!editor) {
           return;
         }
-        // One chip per post: a second quote from it only needs the focus.
         const existing = Array.from(
           editor.querySelectorAll<HTMLElement>("[data-integration-reference]")
         ).some(

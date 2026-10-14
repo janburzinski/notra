@@ -25,8 +25,6 @@ export function DashboardAgentButton() {
     ? "content"
     : "agent";
   const open = active === panelId;
-  // Blog posts and changelogs: the panel holds Overview and Agent tabs, so
-  // the button shows and hides the whole panel instead of opening the agent.
   const isDetails = panelId === "content" && hasOverview;
   const label = isDetails
     ? tOverview("detailsButton")

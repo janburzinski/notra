@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-/** How far below the viewport top a heading must pass to count as current. */
 const ACTIVE_LINE_PX = 120;
 
 /**
@@ -37,7 +36,6 @@ export function useActiveSection(ids: readonly string[]): string | null {
     };
 
     update();
-    // Capture so scrolls inside the inset panel count too.
     window.addEventListener("scroll", schedule, {
       capture: true,
       passive: true,

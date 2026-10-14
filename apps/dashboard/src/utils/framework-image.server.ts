@@ -252,7 +252,6 @@ async function readLocalImage(source: string): Promise<Buffer> {
     }
   }
   try {
-    // Nitro's `useStorage` is a plain accessor, not a React hook.
     const { useStorage: getStorage } = await import("nitro/storage");
     const asset = await getStorage("assets:images").getItemRaw<Uint8Array>(
       pathname.slice(1)

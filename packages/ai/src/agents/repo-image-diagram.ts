@@ -100,10 +100,6 @@ async function reviewRenderedDiagram(params: {
   return output;
 }
 
-/**
- * What the diagram still needs after it renders: deterministic geometry
- * problems first, and the vision review only for a layout that passes them.
- */
 async function findRevisionPrompt(params: {
   rendered: RenderedDiagram;
   source: RepoImageSourceContext;
@@ -141,8 +137,6 @@ async function findRevisionPrompt(params: {
 export const diagramFormat: RepoImageFormatRunner = {
   async prepare({ box, restoreSnapshotId, restoreDiagramSpec }) {
     await injectExcalidrawDiagramSkill({ box });
-    // Hand and chat edits happen outside the sandbox, so the snapshot can
-    // hold an older diagram.json than the post.
     if (restoreSnapshotId && restoreDiagramSpec) {
       await withBoxRetry(() =>
         box.files.write({
@@ -212,8 +206,6 @@ export const diagramFormat: RepoImageFormatRunner = {
       if ("rendered" in revised) {
         ({ rendered } = revised);
       } else {
-        // Keep the version that renders, and put it back so later revisions
-        // start from a file that renders.
         logWarn(
           "[repo-image] Diagram review revision not renderable; keeping previous diagram",
           { error: revised.error ?? "missing" }

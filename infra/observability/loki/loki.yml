@@ -1,4 +1,3 @@
-# Private network only. The collector authenticates external senders.
 auth_enabled: false
 server:
   http_listen_address: "::"

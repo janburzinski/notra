@@ -27,8 +27,6 @@ export async function runScheduledPublicationAttempt(
     id: input.scheduledPublicationId,
     claimToken: input.claimToken,
   };
-  // A retried call whose first response got lost: hand back what that call
-  // achieved instead of publishing again.
   const recorded = await getRecordedScheduledPublicationAttempt(claim);
   if (recorded) {
     return recorded;
@@ -43,9 +41,6 @@ export async function runScheduledPublicationAttempt(
     try {
       outcome = await publishScheduledDestination(attempt, input.claimToken);
     } catch (error) {
-      // Only infrastructure errors get here; destination errors are returned.
-      // The raw message stays in the log: it can carry SQL and parameters,
-      // and `lastError` is shown in the app, the API and the failure email.
       console.error("[ScheduledPublication] Unexpected publish error", {
         scheduledPublicationId: attempt.id,
         error,

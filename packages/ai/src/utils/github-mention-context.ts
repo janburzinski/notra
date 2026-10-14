@@ -64,9 +64,6 @@ export async function resolveGitHubMentionContext(params: {
   if (isGitHubBotSender(sender)) {
     return { status: "ignored", reason: "bot_sender" };
   }
-  // A reply in a review thread Notra already answered is aimed at Notra even
-  // without the handle. Only the thread lookup below can tell, and that needs
-  // the integration first.
   const mentioned = commentMentionsNotra(comment.body);
   if (!(mentioned || comment.in_reply_to_id)) {
     return { status: "ignored", reason: "not_mentioned" };

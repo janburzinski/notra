@@ -49,7 +49,6 @@ export const EmailLogo = ({
         <tbody>
           <tr>
             <td style={{ paddingRight: "8px", verticalAlign: "middle" }}>
-              {/* Decorative: the "Notra" link next to it names the brand. */}
               <Img
                 alt=""
                 height={LOCKUP_MARK_SIZE}

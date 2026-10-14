@@ -23,10 +23,6 @@ function isNotFound(error: unknown): boolean {
   );
 }
 
-/**
- * Fails only when DNS says the domain does not exist. Slow or broken DNS lets
- * the check through, so a resolver hiccup never locks visitors out.
- */
 export const ensureOfferingSiteExists = Effect.fn("ensureOfferingSiteExists")(
   function* (domain: string) {
     const missing = yield* Effect.tryPromise(() => lookup(domain)).pipe(

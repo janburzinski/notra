@@ -159,7 +159,6 @@ export function ScanModelMenu({
   const [selectedIds, setSelectedIds] = useState(() =>
     defaultScanModelSelection(options)
   );
-  // Every open starts fresh, including one driven by a controlled `open`.
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
     setWasOpen(open);

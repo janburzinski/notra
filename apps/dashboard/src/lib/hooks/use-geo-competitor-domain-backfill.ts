@@ -36,7 +36,6 @@ export function useGeoCompetitorDomainBackfill(
     return domain ? [{ name: competitor.name, domain }] : [];
   });
 
-  // Runs after each render; the ref sends every competitor at most once.
   useEffect(() => {
     const domains = resolved.filter(
       (entry) => !attempted.current.has(entry.name)
@@ -54,7 +53,6 @@ export function useGeoCompetitorDomainBackfill(
           queryKey: geoDbQueryKey("competitors", { organizationId, projectId }),
         })
       )
-      // Best effort: a failed fill is retried on the next visit.
       .catch(() => undefined);
   }, [resolved, organizationId, projectId, queryClient]);
 }

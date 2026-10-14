@@ -4,11 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 import type { DateRange, Matcher } from "react-day-picker";
 
 interface UseRangeSelectionOptions {
-  /** The range that is currently applied; shown until the user starts a new one. */
   committed: DateRange | undefined;
-  /** Days that can never be picked, e.g. the future. */
   disabled?: Matcher;
-  /** Longest allowed span in days, counting both ends. */
   maxDays?: number;
   onCommit: (range: { from: Date; to: Date }) => void;
 }

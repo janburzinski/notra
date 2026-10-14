@@ -93,7 +93,6 @@ if (values.help) {
   const { App } = await import("./ui/app");
   const demo = values.demo || !process.env.AI_GATEWAY_API_KEY;
   const renderer = await createCliRenderer({
-    // The app handles Ctrl+C itself so a running eval is saved first.
     exitOnCtrlC: false,
     targetFps: 30,
   });

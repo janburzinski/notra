@@ -3,7 +3,6 @@ import {
   DEMO_MAX_ACTIVE_SANDBOXES,
 } from "@/constants/demo";
 
-/** An integer env override of at least `min`, else the fallback. */
 function envInteger(name: string, min: number, fallback: number): number {
   const configured = Number(process.env[name]);
   return Number.isInteger(configured) && configured >= min

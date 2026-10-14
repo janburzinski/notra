@@ -28,9 +28,6 @@ export function usePackageManager() {
   return useAtom(packageManagerAtom);
 }
 
-/**
- * Props for the CodeBlockCommand component.
- */
 export type CodeBlockCommandProps = {
   /**
    * Natural language instruction for AI agents to install a package or component.
@@ -252,9 +249,6 @@ function getIconForPackageManager(manager: PackageManager) {
   }
 }
 
-/**
- * Result of converting an npm command to all package managers.
- */
 export type ConvertNpmCommandResult = {
   /**
    * Command for pnpm package manager.
@@ -301,7 +295,6 @@ export type ConvertNpmCommandResult = {
  * ```
  */
 export function convertNpmCommand(npmCommand: string): ConvertNpmCommandResult {
-  // npm install
   if (npmCommand.startsWith("npm install")) {
     return {
       pnpm: npmCommand.replaceAll("npm install", "pnpm add"),
@@ -311,7 +304,6 @@ export function convertNpmCommand(npmCommand: string): ConvertNpmCommandResult {
     };
   }
 
-  // npx create- (must be checked before generic npx)
   if (npmCommand.startsWith("npx create-")) {
     return {
       pnpm: npmCommand.replace("npx create-", "pnpm create "),
@@ -321,7 +313,6 @@ export function convertNpmCommand(npmCommand: string): ConvertNpmCommandResult {
     };
   }
 
-  // npm create
   if (npmCommand.startsWith("npm create")) {
     return {
       pnpm: npmCommand.replace("npm create", "pnpm create"),
@@ -331,7 +322,6 @@ export function convertNpmCommand(npmCommand: string): ConvertNpmCommandResult {
     };
   }
 
-  // npx (general)
   if (npmCommand.startsWith("npx")) {
     return {
       pnpm: npmCommand.replace("npx", "pnpm dlx"),
@@ -341,7 +331,6 @@ export function convertNpmCommand(npmCommand: string): ConvertNpmCommandResult {
     };
   }
 
-  // npm run
   if (npmCommand.startsWith("npm run")) {
     return {
       pnpm: npmCommand.replace("npm run", "pnpm"),

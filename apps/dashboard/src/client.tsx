@@ -47,9 +47,6 @@ function guardStreamedSegments() {
 
 guardStreamedSegments();
 
-// The root route renders from the in-memory catalog, so it has to be there
-// before hydration. The document head preloads it, so this rarely waits. On a
-// failed fetch the root route retries and surfaces the error itself.
 loadDocumentCatalog()
   .catch(() => undefined)
   .finally(hydrate);

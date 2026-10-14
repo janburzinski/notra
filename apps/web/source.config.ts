@@ -1,5 +1,4 @@
 import { defineCollections, defineConfig } from "fumadocs-mdx/config";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way of importing
 import * as z from "zod";
 
 import { CODE_THEMES } from "./src/constants/content";

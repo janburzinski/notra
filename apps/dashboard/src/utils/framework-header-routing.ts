@@ -19,7 +19,6 @@ export function getDashboardHeaderRouting(
     vercelConfig: vercel
       ? {
           version: 3 as const,
-          // CDN headers must not stop external rewrites; specific headers win last.
           routes: [
             { src: "/(.*)", headers, continue: true },
             {

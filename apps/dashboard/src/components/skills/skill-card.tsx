@@ -27,11 +27,7 @@ export function SkillCard({ skill, slug }: SkillCardProps) {
   const updatedAtTime = updatedAt.getTime();
   const relative =
     formatSkillUpdatedAt(skill.updatedAt, locale) ?? tCommon("labels.justNow");
-  // Default Link prefetch runs when a card enters the viewport, so opening the
-  // list would fetch every detail route. Stay off until hover or focus.
   const [prefetch, setPrefetch] = useState<false | null>(false);
-  // The browser zone is only known on the client. Wait for a hover before
-  // formatting, then derive the tooltip so a later refresh cannot go stale.
   const [tooltipReady, setTooltipReady] = useState(false);
   const absoluteTitle = tooltipReady
     ? new Date(updatedAtTime).toLocaleString(

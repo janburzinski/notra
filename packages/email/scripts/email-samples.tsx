@@ -1,4 +1,3 @@
-/** One sample per email type, shared by the Brew test-send and preview scripts. */
 import type { ReactElement } from "react";
 
 import { AiCreditsDepletedEmail } from "../src/emails/ai-credits-depleted";
@@ -12,7 +11,6 @@ import { WelcomeEmail } from "../src/emails/welcome";
 import { WorkflowPausedEmail } from "../src/emails/workflow-paused";
 import type { BrewEmailCategory } from "../src/types/brew";
 
-// Every template falls back to sample data for omitted props.
 export const EMAIL_SAMPLES: Record<BrewEmailCategory, [string, ReactElement]> =
   {
     welcome: ["Welcome to Notra", WelcomeEmail()],

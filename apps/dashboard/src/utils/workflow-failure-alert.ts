@@ -42,7 +42,6 @@ async function alertWorkflowFailure(
   }
 
   const sentKey = `workflow:failure-alert:${input.runId}:sent`;
-  // A short lock lets another sweep retry if this worker disappears mid-send.
   const claimed = await redis.set(
     `workflow:failure-alert:${input.runId}:lock`,
     "1",

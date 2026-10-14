@@ -78,7 +78,6 @@ function WriterExecuteProvider({
     if (notifiedCompletionRef.current) {
       return;
     }
-    // Edits made while the writer ran belong to the plan, never the article.
     if (hasUnsavedChanges && !sawWritingRef.current) {
       return;
     }

@@ -48,7 +48,6 @@ function ItemText({ title, description, value }: SiteSettingsItemTextProps) {
           {description}
         </span>
       ) : null}
-      {/* Phones show the value under the text so the title keeps its width. */}
       {value ? <span className="flex pt-2 sm:hidden">{value}</span> : null}
     </span>
   );
@@ -112,7 +111,6 @@ export function SiteSettingsItem({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-4 sm:flex-nowrap sm:px-5">
         <IconTile icon={icon} />
         <ItemText description={description} title={title} />
-        {/* On phones the control drops below the title instead of squeezing it. */}
         <div className="w-full pl-13 sm:w-auto sm:shrink-0 sm:pl-0">
           {value}
         </div>

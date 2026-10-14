@@ -59,7 +59,6 @@ const optionalLinkSchema = z
   .string()
   .trim()
   .max(CONTENT_AUTHOR_LINK_MAX_LENGTH)
-  // Same rule as author links in site frontmatter, so publishing never fails on one.
   .refine(
     (value) =>
       value === "" || z.url({ protocol: /^https?$/ }).safeParse(value).success,

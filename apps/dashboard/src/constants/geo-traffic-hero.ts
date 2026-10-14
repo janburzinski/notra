@@ -1,4 +1,3 @@
-/** Grey shell around metrics and chart, with a 2px rim like every table. */
 export const TRAFFIC_HERO_FRAME_CLASS =
   "@container/hero min-w-0 rounded-2xl border border-shell-border bg-shell px-0.5 pb-0.5";
 

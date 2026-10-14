@@ -27,9 +27,7 @@ export interface ChangelogEntryProps {
 }
 
 export interface CardImages {
-  /** Shows covers on this listing's cards. */
   show: boolean;
-  /** Frames cards without a cover with a placeholder. */
   placeholder: boolean;
 }
 
@@ -40,7 +38,6 @@ export interface PostCardProps {
   featured?: boolean;
   images?: CardImages;
   showAuthor?: boolean;
-  /** Loads the cover eagerly; only for the first card above the fold. */
   priority?: boolean;
 }
 

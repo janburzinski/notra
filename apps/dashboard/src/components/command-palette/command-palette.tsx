@@ -199,7 +199,6 @@ export function CommandPalette() {
 
   const close = () => setOpen(false);
 
-  // Paths that already pick a project (the project switcher) keep it.
   const scopedPath = (path: string) =>
     isGeoDashboardPath(path) && !GEO_PROJECT_PARAM_PATTERN.test(path)
       ? withGeoProject(path, projectParam ?? undefined)
@@ -235,7 +234,6 @@ export function CommandPalette() {
 
   useEffect(() => {
     if (open && !wasOpenRef.current) {
-      // The workspace list loads lazily; "Switch workspace" needs it.
       requestOrganizations();
       trackEvent(POSTHOG_EVENTS.COMMAND_PALETTE_OPENED, {
         source: openSourceRef.current ?? "button",
@@ -269,8 +267,6 @@ export function CommandPalette() {
       kind: "entity",
       entity_type: hit.kind,
     });
-    // GEO entities live in one project; pin it so a recent opened after a
-    // project switch still points at the right prompt or competitor.
     const path =
       isGeoDashboardPath(hit.path) && !GEO_PROJECT_PARAM_PATTERN.test(hit.path)
         ? withGeoProject(hit.path, activeProjectId ?? undefined)
@@ -366,7 +362,6 @@ export function CommandPalette() {
   return (
     <Dialog
       onOpenChange={(next, eventDetails) => {
-        // Esc on a sub page steps back instead of closing the palette.
         if (!next && page && eventDetails.reason === "escape-key") {
           eventDetails.cancel();
           closePage();
@@ -404,7 +399,6 @@ function CommandPaletteBody({
   const canUseAi = page === null && hasQuery;
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Clicking a page entry moves focus off the input; keep typing possible.
   useEffect(() => {
     inputRef.current?.focus();
   }, [page]);
@@ -412,7 +406,6 @@ function CommandPaletteBody({
   return (
     <CommandPrimitive
       className="text-popover-foreground flex size-full min-w-0 flex-col bg-transparent"
-      // Remount per page so cmdk selects the first item of the new list.
       key={page ?? "home"}
       onKeyDown={(event) => {
         if (event.key === "Backspace" && page && query.length === 0) {
@@ -608,7 +601,6 @@ function CommandPaletteEmpty({
           <EmptyDescription>{t("empty.description")}</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          {/* A button too, so touch devices without ⌘↵ can still ask AI. */}
           <Button
             loading={aiState.status === "loading"}
             onClick={() => {
@@ -861,8 +853,6 @@ function CommandPaletteActions({
           setTheme(isDark ? "light" : "dark");
         }}
         trailing={<Kbd>{COMMAND_PALETTE_THEME_SHORTCUT}</Kbd>}
-        // Stable: the label flips with the theme, and a changing value
-        // leaves cmdk selecting an item that no longer exists.
         value="__action_toggle_theme"
       />
       <CommandPaletteItem
@@ -923,9 +913,6 @@ function CommandPaletteProjectsPage({
                 setProjectParam(project.id);
                 return;
               }
-              // nuqs keeps the last `project` value across routes; set it
-              // first so the sidebar does not restore the previous project
-              // once the GEO page mounts.
               setProjectParam(project.id)
                 .catch(() => null)
                 .finally(() => {

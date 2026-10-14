@@ -541,10 +541,6 @@ export function CreateContentDialog({
       const calls = formats.flatMap((format) =>
         voiceIds.map((voiceId) => ({ format, voiceId }))
       );
-      // TODO: replace this client-side fan-out with a single boss agent
-      // that delegates to N sub-agents (one per format), with the boss
-      // deciding the angle / topic each sub-agent writes about so the
-      // outputs are coordinated instead of independently drafted.
       const { collectionId } =
         await dashboardOrpc.content.createCollection.call({
           organizationId: requestOrganizationId,

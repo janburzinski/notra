@@ -20,23 +20,13 @@ function columnSignature<T>(column: TableColumn<T>): string {
   ].join(":");
 }
 
-/**
- * Drops low-priority columns while the container is narrower than the
- * remaining column floors. Floors are CSS lengths (rem, ch, calc), so each
- * candidate set is measured once with a hidden probe; resizing afterwards only
- * compares numbers and re-renders when the hidden set actually changes.
- */
 export function useCollapsibleColumns<T>(
   columns: TableColumn<T>[],
   { minColumnWidth, extraFixedWidths = [] }: CollapsibleColumnsOptions
 ) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hiddenCount, setHiddenCount] = useState(0);
-  // Columns are usually rebuilt every render; only their floors matter here,
-  // so effects key on this signature and read the latest columns from a ref.
   const signature = columns.map(columnSignature).join("|");
-  // Fixed chrome widths shift the floors too, and they arrive as a fresh
-  // array every render, so they join the deps as a string like the columns do.
   const chromeSignature = extraFixedWidths.join("|");
   const latest = useRef({ columns, extraFixedWidths });
   useLayoutEffect(() => {

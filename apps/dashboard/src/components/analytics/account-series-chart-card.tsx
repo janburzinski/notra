@@ -29,9 +29,6 @@ export function AccountSeriesChartCard({
   emptyMessage,
 }: AccountSeriesChartCardProps) {
   const seriesKeys = allKeys.filter((key) => !hiddenKeys.has(key));
-  // Every day in the selected range is zero-filled by buildAccountSeriesRows,
-  // so render the chart whenever an account is selected - a quiet range shows a
-  // flat line at zero rather than an empty state.
   const hasData = rows.length > 0 && seriesKeys.length > 0;
 
   return (

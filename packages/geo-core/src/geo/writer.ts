@@ -715,8 +715,6 @@ export const planGeoContentBrief = Effect.fn("geo.writer.plan")(function* (
       : Effect.succeed(null),
   ]);
 
-  // Brands the engines named for this prompt rank first, then the ones they
-  // recommend most often overall.
   const competitorSelection = yield* geoDb("competitors lookup failed", () =>
     selectGeoContextCompetitors(scope, {
       ids: input.competitorIds,
@@ -936,7 +934,6 @@ const resolveWriterTopic = Effect.fn("geo.writer.topic")(function* (
         new GeoPromptNotFoundError({ promptId: sourceId })
       );
     }
-    // Keep the suggestion as the reuse key, but honor edits to its topic.
     return input.topic;
   }
 

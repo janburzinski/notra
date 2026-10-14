@@ -2,7 +2,6 @@ import { z } from "astro/zod";
 
 import { AUTHOR_AVATAR, AUTHOR_ID, HTTP_PROTOCOL } from "../constants/entries";
 
-// Keep in sync with blogFrontmatterSchema / changelogFrontmatterSchema in @notra/sites-core.
 const linkSchema = z.url({
   protocol: HTTP_PROTOCOL,
   error: "Use a full http(s):// URL",

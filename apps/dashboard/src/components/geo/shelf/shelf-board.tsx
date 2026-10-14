@@ -235,7 +235,6 @@ const ShelfBoardColumn = memo(function ShelfBoardColumn({
   pendingSourceIds: ReadonlySet<string>;
   activeId: string | null;
   onRowClick: (row: GeoShelfRow) => void;
-  /** Set while the server has more cards for this column than are loaded. */
   onLoadMore: (() => void) | undefined;
 }) {
   "use no memo";
@@ -280,8 +279,6 @@ const ShelfBoardColumn = memo(function ShelfBoardColumn({
   });
   const virtualItems = virtualizer.getVirtualItems();
 
-  // Pages are shared by every column, so only the column being read asks for
-  // more; a sparse column never pages through the shelf on its own.
   const handleScroll = () => {
     const element = scrollRef.current;
     if (!(element && onLoadMore)) {
@@ -297,8 +294,6 @@ const ShelfBoardColumn = memo(function ShelfBoardColumn({
   return (
     <section
       className={cn(
-        // min-h-0 keeps the column inside the board; otherwise it grows with
-        // every card and the virtualizer mounts the full list.
         "bg-secondary flex h-full min-h-0 shrink-0 flex-col overflow-hidden rounded-md border",
         "transition-[border-color,background-color] duration-150 ease-out",
         isOver && !dropDisabled && "border-foreground/15 bg-background/40",

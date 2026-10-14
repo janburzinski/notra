@@ -38,9 +38,6 @@ export default defineConfig(({ mode }) => {
                 ],
               },
             },
-            // Parity with Next's production `removeConsole` (errors and
-            // warnings stay): the browser bundle drops debug logging. Server
-            // logs are untouched.
             treeshake: {
               manualPureFunctions: [
                 "console.log",
@@ -73,16 +70,10 @@ export default defineConfig(({ mode }) => {
       dashboardWorkflow(),
       tailwindcss(),
       tanstackStart(),
-      // Parity with the former Next `reactCompiler: true`: components rely on
-      // its memoization (e.g. SettingsPane's titleAccessory effect loops
-      // without it).
       react({ compiler: true }),
       nitro(),
     ],
     ssr: {
-      // autumn-js stays external so Node loads its light React entry and its
-      // heavy SDK entry separately; bundled, both share one chunk and every
-      // cold start paid for the SDK's schemas (see @notra/ai/billing/autumn).
       // React is external too (as in apps/web), so the bundle and external
       // packages share one React instance.
       external: [

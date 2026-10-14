@@ -26,8 +26,6 @@ export function createOTLPPipeline() {
       throw new Error("invalid endpoint");
     }
   } catch {
-    // Optional shipping must not take down app startup or the Axiom drain.
-    // Do not include the supplied URL: it may contain credentials.
     console.warn("[otlp] invalid NOTRA_OTLP_ENDPOINT; export disabled");
     return undefined;
   }

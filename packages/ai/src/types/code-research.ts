@@ -42,7 +42,6 @@ export interface CodeResearchWorkspaceState {
   repository: CodeResearchRepository;
   target: CodeResearchTarget;
   headSha: string;
-  // Unix seconds when Upstash deletes the box.
   expiresAt: number;
 }
 

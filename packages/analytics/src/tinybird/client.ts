@@ -96,10 +96,6 @@ import {
   webTimeseries,
 } from "./pipes/web";
 
-/**
- * Analytics queries sit on the request path, so a stalled Tinybird must fail
- * instead of holding the request open. The SDK's own default is 30s.
- */
 const TINYBIRD_REQUEST_TIMEOUT_MS = 10_000;
 
 function hasTinybirdToken(): boolean {
@@ -214,7 +210,6 @@ function cachedPipeQuery<TParams extends Record<string, unknown>, TRow>(
     client: NonNullable<ReturnType<typeof getTinybirdQueryClient>>
   ) => Promise<QueryResult<TRow>>
 ): Promise<QueryResult<TRow> | null> {
-  // The public demo has no Tinybird; its analytics are generated at read time.
   if (isDemoMode()) {
     return isDemoSocialPipe(pipe)
       ? queryDemoSocialPipe<TRow>(pipe, params)

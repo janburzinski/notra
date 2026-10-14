@@ -19,7 +19,6 @@ import { useCollections } from "@/lib/hooks/use-collections";
 import type { ContentCollectionsSectionProps } from "@/types/content/collection";
 import type { TablePaginationState } from "@/types/table";
 
-/** The content page's table of collections. */
 export function ContentCollectionsSection({
   organizationId,
   organizationSlug,
@@ -38,8 +37,6 @@ export function ContentCollectionsSection({
       .withDefault(COLLECTIONS_PAGE_SIZE)
       .withOptions({ clearOnDefault: true })
   );
-  // The URL is untrusted: snap it to an offered size before it drives paging
-  // or a request with a bounded limit.
   const pageSize = normalizePageSize(rawPageSize, COLLECTIONS_PAGE_SIZE);
 
   const { data, isPending, isError, isPlaceholderData, refetch } =

@@ -21,11 +21,6 @@ import {
 import type { PersonaProfileEditorProps } from "@/types/geo-personas-ui";
 import { groupPersonaMemories, personaPointsText } from "@/utils/geo-personas";
 
-/**
- * The editor splits glued points onto their own lines for display. An
- * untouched field goes back as stored, so saving without edits does not
- * count as a change (and regenerate prompts) or push it past the length cap.
- */
 function unsplitPoints(value: FormDataEntryValue | null, stored: string) {
   return value === personaPointsText(stored) ? stored : value;
 }

@@ -97,8 +97,6 @@ function TrafficPageView({
     );
   }
 
-  // A path filter can empty the totals; the unfiltered host list still
-  // tells whether this site reports human visitors.
   const showVisitors =
     hasWebAnalytics(web) || (pathQuery !== "" && (web?.hosts.length ?? 0) > 0);
 

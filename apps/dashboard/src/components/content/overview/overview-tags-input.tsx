@@ -24,8 +24,6 @@ export function OverviewTagsInput({
   const [draft, setDraft] = useState("");
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(0);
-  // Enter takes a suggestion only after arrowing to it or on an exact match,
-  // so typing a new tag that prefixes an old one still adds the new one.
   const [navigated, setNavigated] = useState(false);
   const { data } = useQuery(
     dashboardOrpc.content.tagSuggestions.queryOptions({
@@ -102,7 +100,6 @@ export function OverviewTagsInput({
                 suggestions.length > 0
               ) {
                 event.preventDefault();
-                // The first arrow press lands on an end of the list.
                 if (!navigated) {
                   setNavigated(true);
                   setHighlighted(
@@ -117,7 +114,6 @@ export function OverviewTagsInput({
                 );
                 return;
               }
-              // Enter also confirms an IME candidate; that must not add a tag.
               if (event.nativeEvent.isComposing) {
                 return;
               }

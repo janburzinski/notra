@@ -8,8 +8,6 @@ import { useTranslations } from "use-intl";
 
 import type { ChatAnnotationNoteFormProps } from "@/types/components/chat-annotation-note-form";
 
-// Enter adds, Shift+Enter breaks the line, Escape cancels. The note is
-// optional: an empty one keeps the passage as a plain reference.
 export function ChatAnnotationNoteForm({
   className,
   initialNote = "",
@@ -21,8 +19,6 @@ export function ChatAnnotationNoteForm({
   const [note, setNote] = useState(initialNote);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Focus once when the form opens, after any existing note, so later
-  // re-renders never pull focus back from the composer.
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) {

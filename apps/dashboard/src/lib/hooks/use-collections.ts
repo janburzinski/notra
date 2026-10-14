@@ -21,8 +21,6 @@ export function useCollections(
 ) {
   const tToast = useTranslations("content.toasts");
   const { projectId, isResolved } = useActiveProject();
-  // The server already resolved the same project the switcher will settle on.
-  // Waiting for the projects collection first made the list a second round trip.
   const scopedProjectId = isResolved
     ? (projectId ?? undefined)
     : (initialProjectId ?? undefined);

@@ -6,7 +6,6 @@ import {
 import { historyDate, historySnapshot } from "../schemas/history.ts";
 import type { HistoryEvent } from "../types/history.ts";
 
-/** Aggregate-only import: raw Axiom records and arbitrary metadata are forbidden. */
 export function projectDay(record: Record<string, unknown>): HistoryEvent {
   if (typeof record.kind !== "string" || !HISTORY_KINDS.has(record.kind)) {
     throw new Error("Invalid history kind");

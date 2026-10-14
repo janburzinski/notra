@@ -61,7 +61,6 @@ function remainingTableHeight(element: HTMLElement): number {
     return 0;
   }
 
-  // The table frame adds its rim and borders on top of the passed height.
   return (
     page.getBoundingClientRect().bottom -
     inset -
@@ -118,7 +117,6 @@ export function BriefHistory({
   const [tableRef, tableHeight] = useFillHeight(GEO_WRITE_TABLE_HEIGHT);
   const tableBodyHeight = Math.min(
     tableHeight,
-    // One extra row for the header, which `height` includes.
     (Math.max(briefs.length, GEO_WRITE_TABLE_MIN_ROWS) + 1) *
       GEO_WRITE_TABLE_ROW_HEIGHT
   );

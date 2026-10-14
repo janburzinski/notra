@@ -104,7 +104,6 @@ export function getContentChatInputChrome({
   const isEmpty = value.trim().length === 0 && skillTagCount === 0;
   const hasAttachmentChips = hasReadyAttachments || pendingUploadCount > 0;
   const isInputLocked = disabled || isUsageBlocked;
-  // Attachments queue with their message, but only once every upload is done.
   const canQueue =
     isLoading && (!isEmpty || hasReadyAttachments) && pendingUploadCount === 0;
   const showStop = isLoading && !canQueue && Boolean(onStop);

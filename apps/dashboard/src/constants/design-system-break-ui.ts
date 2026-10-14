@@ -16,13 +16,6 @@ import type {
   OrganizationRow,
 } from "@/types/organizations/actions";
 
-/**
- * Fixtures for /design-system/break-ui. "Worst case" values are either real
- * naming patterns or the limits the schemas allow (org name 100 chars,
- * collection name 200 chars); fields without a limit get long but believable
- * values.
- */
-/** RPC procedures the preview answers locally instead of calling. */
 export const PREVIEW_WRITE_PROCEDURE =
   /^(create|update|delete|remove|set|invite|cancel|resend|revoke|rename|duplicate|archive|publish|move)/i;
 
@@ -51,8 +44,6 @@ const TREND_DAYS = 14;
 const HUGE_MEMBER_COUNT = 1284;
 const HUGE_INVITATION_COUNT = 212;
 
-// ---------------------------------------------------------------- sentiment
-
 function sentimentBucket(
   counts: Omit<BreakUiSentimentCounts, "engine">
 ): GeoSentimentBucket {
@@ -78,8 +69,6 @@ function sentimentResponse(
     engine,
   }));
   const summary = summarizeSentiment(engines);
-  // Spread each total over the range; the remainder lands on the latest days,
-  // so a single answer shows up as one bar today.
   const share = (total: number, index: number) =>
     Math.floor(total / TREND_DAYS) +
     (index >= TREND_DAYS - (total % TREND_DAYS) ? 1 : 0);
@@ -111,12 +100,6 @@ const DEMO_SENTIMENT = sentimentResponse([
   },
 ]);
 
-/**
- * Every engine family a scan can produce, plus engines that left the catalog
- * (their raw id becomes the label), a perfect and a zero score, a single
- * rated answer, five-digit counts, and engines that mentioned the brand but
- * never got a rating.
- */
 const WORST_SENTIMENT = sentimentResponse([
   {
     engine: "openai/gpt-5.4-grounded",
@@ -199,8 +182,6 @@ const ONE_SENTIMENT = sentimentResponse([
   { engine: "openai/gpt-5.4-grounded", positive: 1, neutral: 0, negative: 0 },
 ]);
 
-// ------------------------------------------------------------ organizations
-
 function organization(
   id: string,
   name: string,
@@ -232,7 +213,6 @@ const DEMO_ORGANIZATIONS = [
   organization("org_initech", "Initech"),
 ];
 
-/** 96 characters, under the 100-character limit of `organizationNameSchema`. */
 const WORST_ORG = organization(
   "org_northwind",
   "Northwind Industries Holdings — Global Platform Infrastructure & Developer Experience (EMEA)",
@@ -254,8 +234,6 @@ const WORST_ORGANIZATIONS = [
   organization("org_script", "<script>alert(1)</script> &amp; Co"),
   organization("org_ops", "ops"),
 ];
-
-// ------------------------------------------------------------------ members
 
 function member(
   index: number,
@@ -352,7 +330,6 @@ const WORST_INVITATIONS = [
     6
   ),
   invitation(2, "first.last+billing-notifications@example.com", null, 0),
-  // Still "pending" in the database, but past its expiry date.
   invitation(3, "jo@b.co", "member", -12),
   invitation(4, "ops@sub.department.region.example.co.uk", "billing-admin", 3),
 ];
@@ -367,8 +344,6 @@ const HUGE_INVITATIONS = Array.from(
       (index % 14) - 7
     )
 );
-
-// -------------------------------------------------------------- collections
 
 function collection(
   overrides: Partial<PostCollectionSummary> & Pick<PostCollectionSummary, "id">
@@ -416,7 +391,6 @@ const DEMO_COLLECTIONS = [
 const WORST_COLLECTIONS = [
   collection({
     id: "col_long",
-    // An AI-generated post title; post titles have no length limit.
     singlePost: {
       id: "post_long",
       title:
@@ -426,7 +400,6 @@ const WORST_COLLECTIONS = [
   }),
   collection({
     id: "col_formats",
-    // 200 characters: the `renameCollectionSchema` limit.
     name: "Q3 Board Deck — FINAL (revised) v12 [approved by legal] — Launch week assets for the Northwind enterprise rollout across EMEA, APAC and North America, plus partner co-marketing and investor follow-ups",
     nameSource: "user",
     source: "automation",
@@ -489,8 +462,6 @@ const WORST_COLLECTIONS = [
 ];
 
 const HUGE_COLLECTION_TOTAL = 1284;
-
-// ----------------------------------------------------------------- datasets
 
 export const BREAK_UI_FIXTURES: Record<BreakUiDataset, BreakUiFixture> = {
   demo: {

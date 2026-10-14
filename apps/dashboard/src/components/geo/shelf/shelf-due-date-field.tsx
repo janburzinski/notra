@@ -7,7 +7,6 @@ import { DateField } from "@/components/date-field";
 import type { GeoShelfDueDateFieldProps } from "@/types/geo-shelf";
 import { formatShelfDueDate, shelfDueDateToIso } from "@/utils/geo-shelf";
 
-/** Opens upward and stays fixed: it sits low in a scrolling ticket form. */
 const DUE_DATE_POPOVER = {
   collisionAvoidance: { fallbackAxisSide: "none" },
   positionMethod: "fixed",

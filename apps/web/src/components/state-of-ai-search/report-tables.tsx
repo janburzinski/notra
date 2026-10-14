@@ -37,16 +37,10 @@ import type {
 } from "@/types/state-of-ai-search";
 import { brandColor, formatPercent } from "@/utils/state-of-ai-search";
 
-/**
- * Tooltips invert the page colors, so themed logos (OpenAI) need the variant
- * of the opposite theme. Themed icons render the light and dark SVG as a
- * pair; single-SVG icons are left alone.
- */
 const INVERTED_ICON =
   "inline-flex [&_svg:first-child:not(:last-child)]:!hidden [&_svg:last-child:not(:first-child)]:!block dark:[&_svg:first-child:not(:last-child)]:!block dark:[&_svg:last-child:not(:first-child)]:!hidden";
 const BRAND_STACK_LIMIT = 6;
 
-/** Same tint scale as the dashboard's recommendations-by-assistant heatmap. */
 function heatTint(rate: number, min: number, max: number): number {
   if (rate <= 0 || max <= 0) {
     return 0;
@@ -61,7 +55,6 @@ function heatTint(rate: number, min: number, max: number): number {
 interface HeatCellDetail {
   brand: StateOfAiSearchRankingRow;
   engine: StateOfAiSearchEngine;
-  /** 1-based rank of the brand among all brands for this assistant. */
   rank: number;
   total: number;
 }
@@ -136,16 +129,11 @@ function HeatCell({
   );
 }
 
-/** Page state shared by tables that sit side by side and flip together. */
 export interface SharedPage {
   page: number;
   onPageChange: (page: number) => void;
 }
 
-/**
- * Fixed rows, so two tables with the same page size end on the same line.
- * The viewport height counts the header row too, as in the dashboard.
- */
 function pagedTableProps(rowCount: number, pageSize: number) {
   const height = (Math.min(rowCount, pageSize) + 1) * REPORT_ROW_HEIGHT;
   return { height, minHeight: height, rowHeight: REPORT_ROW_HEIGHT };
@@ -213,7 +201,6 @@ export function RankingTable({
   );
 }
 
-/** Brands × assistants, tinted like the dashboard heatmap. */
 export function EngineHeatmap({
   rows,
   engines,
@@ -252,8 +239,6 @@ export function EngineHeatmap({
     },
     ...engines.map((engine): TableColumn<StateOfAiSearchRankingRow> => ({
       key: engine.id,
-      // Icons only: five assistants have to fit half the page width. The
-      // label stays for screen readers and in the cell tooltips.
       header: (
         <span className="inline-flex" title={engine.label}>
           <EngineIcon className="size-4" engine={engine.model} />
@@ -375,8 +360,6 @@ export function SourcesTable({
   onSelect: (row: StateOfAiSearchSource) => void;
 }) {
   const max = Math.max(...rows.map((row) => row.share), 1);
-  // One column for the assistant that links the domain most; the full split
-  // per assistant is in the source drawer.
   const leaderOf = (row: StateOfAiSearchSource) => {
     let leader: { engine: StateOfAiSearchEngine; value: number } | null = null;
     for (const engine of engines) {

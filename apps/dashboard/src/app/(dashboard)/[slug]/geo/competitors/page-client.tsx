@@ -79,8 +79,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
 
   const geoRange = useGeoRange();
   const { data: settingsData, isPending } = useGeoSettings(organizationId);
-  // Full response: the share-of-voice change indicators need the daily
-  // mention timeseries, which the summary-only variant leaves out.
   const { data: competitorShare, isPending: isSharePending } =
     useGeoCompetitorShare(organizationId, geoRange.query);
   const { competitors } = useGeoCompetitorsDb(organizationId);

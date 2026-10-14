@@ -1,11 +1,8 @@
 [install]
 linkWorkspacePackages = false
-# Only install package versions published at least 7 days ago
 minimumReleaseAge = 604800
 minimumReleaseAgeExcludes = [
-  # Our own package; apps bump it right after each publish.
   "@usenotra/geo",
-  # c15t 3.0.0 and the @c15t packages it pulls in. Drop once 3.0.0 is a week old.
   "c15t",
   "@c15t/astro",
   "@c15t/core",

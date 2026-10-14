@@ -23,7 +23,6 @@ function sanitizeHeaderValue(value: string): string {
   return value.replace(HEADER_NEWLINE_REGEX, " ").trim();
 }
 
-// NUL-separated so different field splits never produce the same key.
 function buildIdempotencyKey(
   message: ContactMessageEmailProps,
   recipient: string

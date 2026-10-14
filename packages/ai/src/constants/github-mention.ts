@@ -80,7 +80,6 @@ export const GITHUB_MENTION_SEPARATE_PR_PATTERNS = [
 ] as const;
 
 export const GITHUB_MENTION_REPLY_DIFF = {
-  /** Longer diffs collapse into a <details> block. */
   inlineLineLimit: 24,
   totalLineLimit: 120,
   lineLengthLimit: 240,
@@ -88,11 +87,8 @@ export const GITHUB_MENTION_REPLY_DIFF = {
 } as const;
 
 export const GITHUB_MENTION_SUGGESTION = {
-  /** Changed regions this many unchanged lines apart become one suggestion. */
   mergeGap: 1,
-  /** More separate regions than this read better as a commit. */
   maxSuggestions: 8,
-  /** Line pairs the diff compares before it treats the middle as one rewrite. */
   diffCellLimit: 1_000_000,
 } as const;
 
@@ -113,7 +109,6 @@ export const GITHUB_MENTION_THREAD_CONTEXT = {
  */
 export const GITHUB_MENTION_WRITABLE_EXTENSIONS = {
   content: ["md", "mdx", "markdown", "txt"],
-  /** Navigation and frontmatter data that sits next to content. */
   data: ["json", "yaml", "yml", "toml", "csv"],
 } as const;
 

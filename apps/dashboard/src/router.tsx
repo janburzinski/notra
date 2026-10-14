@@ -23,10 +23,6 @@ export function getRouter() {
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
     defaultPreload: "intent",
-    // A loader preloaded on hover serves the click that follows instead of
-    // running again, so the click no longer waits for a server round trip.
-    // Revisits within the window reuse the loader result too; page data
-    // itself stays fresh through React Query.
     defaultPreloadStaleTime: 30_000,
     defaultStaleTime: 30_000,
     parseSearch,

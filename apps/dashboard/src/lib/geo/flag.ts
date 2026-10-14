@@ -41,7 +41,6 @@ export function resolveGeoFlagState(
 ): Effect.Effect<GeoFlagState> {
   return Effect.gen(function* () {
     const manager = getFlagsManager();
-    // The demo shows what a new workspace sees: flagged features stay off.
     if (!manager || isDemoMode()) {
       return "disabled";
     }

@@ -95,7 +95,6 @@ export const GEO_MODEL_PROVIDERS: readonly GeoModelProvider[] = [
 ];
 
 export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
-  // Anthropic
   {
     id: "anthropic/claude-opus-5.5",
     provider: "anthropic",
@@ -150,7 +149,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // OpenAI
   {
     id: "openai/gpt-6-sol",
     provider: "openai",
@@ -184,7 +182,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     label: "GPT-5.6 Sol",
     zdr: "some",
     released: "2026-07-09",
-    // ZDR-capable counterpart to GPT-6 Sol for technical scans.
     default: true,
     gateways: ["vercel", "openrouter"],
   },
@@ -233,7 +230,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // Google
   {
     id: "google/gemini-3.8-flash",
     provider: "google",
@@ -270,7 +266,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // Moonshot
   {
     id: "moonshotai/kimi-k3",
     provider: "moonshotai",
@@ -289,7 +284,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // Meta
   {
     id: "meta/muse-spark-1.3",
     provider: "meta",
@@ -308,7 +302,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // Z.AI
   {
     id: "zai/glm-5.3",
     provider: "zai",
@@ -336,7 +329,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // xAI
   {
     id: "spacexai/grok-4.7",
     provider: "spacexai",
@@ -364,7 +356,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // DeepSeek
   {
     id: "deepseek/deepseek-v4-pro",
     provider: "deepseek",
@@ -383,7 +374,6 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["vercel", "openrouter"],
   },
-  // Mistral
   {
     id: "mistral/mistral-medium-3.5",
     provider: "mistral",
@@ -496,10 +486,6 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
   },
 ];
 
-/**
- * Environment variables that have to be set for a static engine to be
- * runnable. Static entries are hidden from the catalog while a key is missing.
- */
 const GEO_OPENCODE_ENGINE_ENV = [
   "UPSTASH_BOX_API_KEY",
   "OPENROUTER_API_KEY",

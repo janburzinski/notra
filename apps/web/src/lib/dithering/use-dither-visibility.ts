@@ -56,7 +56,6 @@ export function useDitherVisibility(
       }
     };
 
-    // Let the document, styles, and fonts finish loading before starting WebGL.
     if (document.readyState === "complete") {
       schedule();
     } else {
@@ -93,8 +92,6 @@ export function useDitherVisibility(
     return () => observer.disconnect();
   }, []);
 
-  // The hero's eager hint applies only to desktop. Mobile always waits for
-  // load + idle, and every background must enter the viewport before loading.
   const renderEagerly = eager && !isMobile;
 
   return {

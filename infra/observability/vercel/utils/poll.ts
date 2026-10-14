@@ -36,7 +36,6 @@ export async function pollMetrics(
   const pending = [...groups, ...platformBreakdowns(catalog)];
   const results: QueryResult[] = [];
   let fatal: Error | undefined;
-  // Two workers, bounded requests, no overlapping polls or unbounded retries.
   await Promise.all(
     [0, 1].map(async () => {
       for (let group = pending.shift(); group; group = pending.shift()) {
@@ -54,7 +53,6 @@ export async function pollMetrics(
             return;
           }
           const summary = metricSummary(response);
-          // No awaits after taking this checkpoint: both workers share one budget.
           candidate = { ...budget };
           groupLines = metricSamples(group, query, summary, candidate);
           appendSnapshotLine(
@@ -83,7 +81,6 @@ export async function pollMetrics(
             fatal = error;
             return;
           }
-          // Failed groups retain neither partial samples nor their budget charges.
           groupLines = [];
           candidate = { ...budget };
           const reason =
@@ -121,7 +118,6 @@ export async function pollMetrics(
       }
     })
   );
-  // Settle the other timeout-bounded worker, then invalidate the entire poll.
   if (fatal) {
     throw fatal;
   }

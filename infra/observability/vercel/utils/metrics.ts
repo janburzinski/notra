@@ -77,7 +77,6 @@ export function platformBreakdowns(catalog: CatalogMetric[]): MetricGroup[] {
 export function metricGroups(catalog: CatalogMetric[]): MetricGroup[] {
   const groups = new Map<string, MetricGroup>();
   for (const metric of catalog) {
-    // Only bounded platform metric IDs, never arbitrary custom metric names.
     if (!METRIC_ID_PATTERN.test(metric.id)) {
       continue;
     }
@@ -175,7 +174,6 @@ export function metricSamples(
   summary: MetricSummary[],
   budget: SnapshotBudget = { lines: 0, bytes: 0 }
 ): string[] {
-  // A top-N response is not complete team coverage. Reject rather than silently truncate.
   if (summary.length >= SERIES_LIMIT) {
     throw new Error("series_limit");
   }
@@ -215,7 +213,6 @@ export function metricSamples(
   return samples;
 }
 
-/** Count the final newline and actual UTF-8 bytes before retaining each line. */
 export function appendSnapshotLine(
   lines: string[],
   line: string,

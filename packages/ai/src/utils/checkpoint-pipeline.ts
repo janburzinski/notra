@@ -36,7 +36,6 @@ export function createCheckpointPipeline(
       options.onDropped?.(events, error);
     },
   })(async (batch) => {
-    // A full batch starts synchronously in push(). Keep shipping off that path.
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
     await send(batch);
     settle(batch);
@@ -47,7 +46,6 @@ export function createCheckpointPipeline(
       return;
     }
     pumping = true;
-    // New arrivals may keep evlog's pump busy; lifecycles await checkpoints only.
     void pipeline
       .flush()
       .catch(() => console.error("[evlog] checkpoint flush pump failed"))

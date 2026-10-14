@@ -16,7 +16,6 @@ export function reportPath(slug: string, edition: string): string {
   return `${reportCategoryPath(slug)}/${edition}`;
 }
 
-/** Bar color for a ranked brand; everyone past the top five shares slate. */
 export function brandColor(rank: number): string {
   return REPORT_BRAND_COLORS[rank - 1] ?? REPORT_OTHER_BRAND_COLOR;
 }
@@ -25,7 +24,6 @@ export function reportTitle(report: StateOfAiSearchReport): string {
   return `State of AI Search: ${report.subject} · ${report.editionLabel}`;
 }
 
-/** Engine names for running text: "Google's AI Overview" instead of the chip label. */
 export function engineNames(report: StateOfAiSearchReport): string {
   return listFormat(
     report.engines.map((engine) =>

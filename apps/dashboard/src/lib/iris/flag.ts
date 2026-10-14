@@ -40,7 +40,6 @@ export function resolveIrisFlagState(
   organizationId: string
 ): Effect.Effect<IrisFlagState> {
   return Effect.gen(function* () {
-    // The demo shows what a new workspace sees: flagged features stay off.
     if (isDemoMode()) {
       return "disabled";
     }

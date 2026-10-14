@@ -51,8 +51,6 @@ export function filterSkills<T extends SkillListItem>(
     return (
       name.includes(needle) ||
       skill.description.toLowerCase().includes(needle) ||
-      // Labels only insert spaces where the slug has hyphens, so a needle
-      // without a space that matches the label already matches the slug.
       (needle.includes(" ") &&
         skillDisplayName(skill.name).toLowerCase().includes(needle))
     );

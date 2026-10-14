@@ -1,4 +1,3 @@
-/* Orbitly design tokens, copied from the marketing site. */
 :root {
   --orbitly-navy-950: #060b1e;
   --orbitly-navy-900: #0b1330;
@@ -26,7 +25,6 @@ html.dark {
   --card: #0b1330;
 }
 
-/* Header: frosted page color, so it sits on the page in both modes. */
 .orbitly-header {
   background: color-mix(in oklab, var(--background) 82%, transparent);
 }
@@ -45,7 +43,6 @@ html.dark .orbitly-eyebrow,
 }
 
 .orbitly-button {
-  /* No display here, so Tailwind's hidden / sm:inline-flex in the markup win. */
   height: 2.5rem;
   align-items: center;
   justify-content: center;
@@ -76,8 +73,6 @@ html.dark .orbitly-button:hover {
   background: var(--orbitly-cyan-300);
 }
 
-/* Blog hero: the night-side panel from the landing page. It stays dark in
-   both modes, so it redefines the theme colors for everything inside it. */
 .orbitly-hero {
   --foreground: #e8eefc;
   --muted-foreground: #a3aed3;
@@ -97,7 +92,6 @@ html.dark .orbitly-button:hover {
     radial-gradient(ellipse 60% 90% at 100% 100%, color-mix(in oklab, #22d3ee 16%, transparent), transparent 70%),
     linear-gradient(180deg, var(--orbitly-navy-950), var(--orbitly-navy-900));
 }
-/* Planet limb in the lower right, with an orbit ring around it. */
 .orbitly-hero::before,
 .orbitly-hero::after {
   content: "";
@@ -159,7 +153,6 @@ html.dark .orbitly-button:hover {
   background: #10b981;
 }
 
-/* Squarer cards and code blocks, like the rest of orbitly.com. */
 .callout,
 .card,
 .code-block {

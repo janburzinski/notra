@@ -1,4 +1,3 @@
-/* Slate surfaces in dark mode, so cards and panels match the page color. */
 html.dark:root {
   --card: #1e293b;
   --muted: #1e293b;

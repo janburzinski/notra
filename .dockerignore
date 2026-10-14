@@ -1,36 +1,27 @@
-# Build context is the monorepo root:
-#   docker build -f apps/api/Dockerfile -t notra-api .
-# Keep exceptions in sync with COPY lines in apps/api/Dockerfile.
 
-# VCS
 .git
 .gitignore
 
-# Dependencies & caches (reinstalled in the image)
 node_modules
 **/node_modules
 .turbo
 **/.turbo
 
-# Build outputs
 dist
 **/dist
 **/.vercel
 **/.wrangler
 
-# Secrets / env
 .env
 .env.*
 **/.env
 **/.env.*
 **/.dev.vars
 
-# Tests
 coverage
 **/*.test.ts
 **/*.spec.ts
 
-# Local tooling (not used to build the API)
 .vscode
 .idea
 .cursor
@@ -47,14 +38,11 @@ coverage
 .railway-plans
 scripts
 
-# OS / logs
 .DS_Store
 Thumbs.db
 *.log
 logs/
 
-# Apps not copied as source — keep package.json for bun workspaces
-# ai-traffic-ingest stays included for its Dockerfile, which shares this context.
 apps/agent/**
 !apps/agent/package.json
 apps/dashboard/**
@@ -68,7 +56,6 @@ apps/ui/**
 apps/web/**
 !apps/web/package.json
 
-# Packages copied as package.json only (not source)
 packages/email/**
 !packages/email/package.json
 packages/geo/**

@@ -1,13 +1,9 @@
 # syntax=docker/dockerfile:1
-# Build from the monorepo root changes here
-#   docker build -f apps/api/Dockerfile -t notra-api .
 
-# ─── Stage 1: install dependencies ───────────────────────────────────────────
 FROM oven/bun:1.4.0-alpine@sha256:07235578f79ef8c6f97d94aee7938e76f5cdba5f21ae5dbfdd3d3d38058437eb AS deps
 
 WORKDIR /app
 
-# Copy workspace manifests needed to resolve the full dependency graph
 COPY package.json bun.lock bunfig.toml ./
 COPY patches ./patches
 COPY apps/agent/package.json ./apps/agent/package.json
@@ -37,13 +33,10 @@ COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/utils/package.json ./packages/utils/package.json
 COPY packages/webhooks/package.json ./packages/webhooks/package.json
 
-# Install all workspace deps. Root prepare scripts are local-dev only.
 RUN bun install --ignore-scripts
 
-# ─── Stage 2: build ──────────────────────────────────────────────────────────
 FROM deps AS builder
 
-# Copy source for all packages the API depends on
 COPY packages/ai ./packages/ai
 COPY packages/analytics ./packages/analytics
 COPY packages/content-generation ./packages/content-generation
@@ -60,7 +53,6 @@ COPY apps/api ./apps/api
 WORKDIR /app/apps/api
 RUN bun run build
 
-# ─── Stage 3: production image ───────────────────────────────────────────────
 FROM oven/bun:1.4.0-alpine@sha256:07235578f79ef8c6f97d94aee7938e76f5cdba5f21ae5dbfdd3d3d38058437eb AS runner
 
 WORKDIR /app

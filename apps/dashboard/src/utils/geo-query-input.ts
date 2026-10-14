@@ -32,7 +32,6 @@ export function geoOverviewQueryInput(
   return { ...geoSettingsQueryInput(scope), ...toGeoWindowInput(range) };
 }
 
-/** Omitted when empty so unfiltered inputs match the server prefetch. */
 function trafficPathInput(path: string | undefined) {
   return path ? { path } : {};
 }

@@ -52,8 +52,6 @@ export async function generatePersonasStep(
   }
 }
 
-// Generation replaces profiles and settles credits; retrying the entire operation
-// after an ambiguous failure could generate and charge twice.
 generatePersonasStep.maxRetries = 0;
 
 function creditsExhaustedMessage(error: unknown): string | null {

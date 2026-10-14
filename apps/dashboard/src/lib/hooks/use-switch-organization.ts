@@ -18,11 +18,6 @@ import { errorMessageOr } from "@/lib/utils";
 import { setLastVisitedOrganization } from "@/utils/cookies";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
-/**
- * Keeps the section but drops record ids and names, which belong to the old
- * workspace: `content/<id>` → `content`, `geo/competitors/GitLab` →
- * `geo/competitors`.
- */
 function sectionPath(segments: string[]): string {
   const [section, page] = segments;
   return section && page && ORG_SWITCH_STATIC_PAGE_SECTIONS.has(section)

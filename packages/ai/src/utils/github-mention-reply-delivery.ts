@@ -141,8 +141,6 @@ function fitProposalToReviewThread(
   ) {
     return null;
   }
-  // If the file reads differently there, the thread's numbers are stale and a
-  // suggestion would replace other text.
   const commentedLine = hunkLineAt(review.diffHunk ?? null, review.line);
   if (
     commentedLine === null ||

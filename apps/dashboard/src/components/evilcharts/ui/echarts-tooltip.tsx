@@ -22,24 +22,12 @@ import {
 } from "@/utils/chart-tooltip-position";
 import { echartsDatumValue } from "@/utils/echarts-datum";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tooltip — the shared HTML shell/row primitives and the chart-agnostic option
-// fields. The tooltip DOM lives inside `[data-chart={id}]`, so the injected
-// `--color-*` vars and Tailwind classes resolve directly (no color read). Each
-// chart composes its own rows but shares the shell/styling and base option.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type TooltipVariant = "default" | "frosted-glass";
 export type TooltipRoundness = "sm" | "md" | "lg" | "xl";
-// Tooltip anchoring: "variable" follows both axes (ECharts default, current
-// behavior); "fixed" sits beside the pointer's X so the hover line stays
-// visible, and stays pinned near the top (fixed Y).
 export type TooltipPosition = "fixed" | "variable";
 export type TooltipAxisPointer = "none" | "line" | "shadow" | "cross";
 
-// Hover motion — the cursor line snaps to the hovered category (an eased line
-// trails the pointer and smears); the tooltip box and its bars get a short
-// ease so values do not pop.
 export const TOOLTIP_BAR_MOTION_STYLE = `transition:width ${TOOLTIP_MOVE_DURATION_S}s ${TOOLTIP_MOVE_EASING}`;
 export const TOOLTIP_VALUE_MOTION_STYLE =
   "transition:opacity 0.24s ease,transform 0.24s ease";
@@ -72,21 +60,14 @@ export const tooltipVariantClass: Record<TooltipVariant, string> = {
   "frosted-glass": "bg-popover/70 backdrop-blur-md",
 };
 
-// The standard series indicator swatch — a rounded square filled with the
-// series' solid var or multi-stop gradient (indicatorBackground). A chart drops
-// this into a tooltipRow's `indicatorHtml`.
 export function tooltipIndicatorHtml(key: string, colorsCount: number): string {
   return `<div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicatorBackground(key, colorsCount)}"></div>`;
 }
 
-/** Swatch for tooltips mounted outside `[data-chart]`, where series CSS vars do not resolve. */
 export function tooltipColorSwatchHtml(color: string): string {
   return `<div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${escapeHtml(color)}"></div>`;
 }
 
-// One tooltip row: indicator swatch + label/value pair. `dimmed` is a class
-// fragment (e.g. " opacity-30") appended to the row so the selection/hover dim
-// stays byte-identical to the inlined markup.
 export function tooltipRow({
   indicatorHtml,
   labelText,
@@ -110,7 +91,6 @@ export function tooltipRow({
 const TOOLTIP_BAR_TRACK = 100;
 const TOOLTIP_BAR_MIN = 2;
 
-// Shared flat track + fill for every bar-style tooltip row.
 const TOOLTIP_BAR_TRACK_CLASS = "h-1 overflow-hidden rounded-full bg-muted";
 const TOOLTIP_BAR_FILL_CLASS = "ec-tooltip-bar-fill h-full rounded-full";
 
@@ -223,7 +203,6 @@ export function tooltipItemsFromRow(
 
 const MORE_ROW_KEY = "__more";
 
-/** Biggest first, with the folded "+N more" row always last. */
 function compareByValueDesc(left: TooltipBodyItem, right: TooltipBodyItem): number {
   if (left.key === MORE_ROW_KEY) {
     return 1;
@@ -234,11 +213,6 @@ function compareByValueDesc(left: TooltipBodyItem, right: TooltipBodyItem): numb
   return (right.value ?? -1) - (left.value ?? -1);
 }
 
-/**
- * Keeps the `maxRows` biggest rows and folds the rest into one muted
- * "+N more" row carrying their sum, so a tooltip over many providers stays a
- * fixed height.
- */
 export function capTooltipItems(
   items: TooltipBodyItem[],
   maxRows: number | undefined,
@@ -267,12 +241,6 @@ export function capTooltipItems(
 
 const MIN_ROWS_PER_SECTION = 3;
 
-/**
- * Fits sections into one row budget so the tooltip height stays the same no
- * matter how many providers exist. Every section keeps at least
- * `MIN_ROWS_PER_SECTION` rows (a fold row counts as one); the rest go to the
- * sections with the most traffic per row already shown.
- */
 export function capTooltipGroups(
   groups: TooltipBodyGroup[],
   maxRows: number | undefined,
@@ -290,8 +258,6 @@ export function capTooltipGroups(
     Math.min(group.items.length, MIN_ROWS_PER_SECTION)
   );
   let spare = maxRows - rows.reduce((sum, count) => sum + count, 0);
-  // A budget below the section minimums: take rows back from the sections with
-  // the least traffic per row. Every section keeps one row (its "+N more").
   while (spare < 0) {
     let worst = -1;
     let worstScore = Number.POSITIVE_INFINITY;
@@ -334,7 +300,6 @@ export function capTooltipGroups(
   }
   return groups.map((group, index) => ({
     heading: group.heading,
-    // A folded section spends one of its rows on "+N more".
     items: capTooltipItems(
       group.items,
       Math.max((rows[index] ?? 0) - 1, 0),
@@ -380,9 +345,6 @@ export function composeTooltipBody(
     return items
       .map((item) =>
         tooltipRow({
-          // `paint` is the resolved color/gradient; prefer it over the
-          // `var(--color-*)` swatch, which only resolves while the tooltip DOM
-          // lives inside `[data-chart]` (appendTo:"body" tooltips do not).
           indicatorHtml:
             item.indicatorHtml ??
             (item.paint
@@ -423,8 +385,6 @@ export function composeTooltipBody(
     .join("");
 }
 
-// The outer tooltip surface — border, padding, shadow, roundness + variant
-// classes — wrapping the axis label and the composed rows.
 export function tooltipShell({
   label,
   body,
@@ -456,13 +416,6 @@ export function tooltipShell({
     </div>`;
 }
 
-// Maps the TooltipPosition prop onto the ECharts tooltip `position` field.
-// "variable" + confine → undefined (ECharts default, stays inside the chart).
-// "variable" without confine → follow the pointer, clamp X so a left-edge flip
-// cannot paint outside the chart. Pair with appendTo:"body" so overflow-hidden
-// ancestors (sheet cards, rounded groups) cannot clip the box.
-// "fixed" → sit beside the pointer's X (right, or left if it does not fit),
-// pin near the top, still clamp X so the hover line stays visible.
 export function resolveTooltipPosition(
   position: TooltipPosition,
   confine = true
@@ -482,10 +435,6 @@ export function resolveTooltipPosition(
     );
 }
 
-// The chart-agnostic tooltip option fields (show, trigger, confine,
-// background/border/padding/extraCssText, axisPointer, position). The chart
-// supplies only `formatter` and spreads this in. `axisPointerColor` is the
-// pre-resolved cursor-line color, so this helper needs no live token read.
 export function tooltipBaseOption(params: {
   present: boolean;
   cursor: boolean;
@@ -526,8 +475,6 @@ export function tooltipBaseOption(params: {
     },
   };
 
-  // Custom `position` normally disables ECharts' transform transition — keep
-  // a short one so the box settles instead of teleporting.
   const tooltipMotionCss = `box-shadow:none;pointer-events:none;will-change:transform;transition:transform ${TOOLTIP_MOVE_DURATION_S}s ${TOOLTIP_MOVE_EASING},opacity 0.28s ease;`;
 
   return {
@@ -538,8 +485,6 @@ export function tooltipBaseOption(params: {
     showDelay: 0,
     hideDelay: 80,
     transitionDuration: TOOLTIP_MOVE_DURATION_S,
-    // Sparklines sit in overflow-hidden cards; appending to body is what
-    // actually lets confine:false paint above a 40–48px plot.
     ...(confine ? {} : { appendTo: "body" as const }),
     backgroundColor: "transparent",
     borderWidth: 0,
@@ -558,15 +503,10 @@ export function tooltipBaseOption(params: {
   };
 }
 
-// Fixed-size slot so swatches (10 px) and provider icons (14 px) put their
-// labels at the same x in every row of a sectioned list.
 function tooltipIndicatorSlot(indicatorHtml: string): string {
   return `<span class="flex size-3.5 shrink-0 items-center justify-center">${indicatorHtml}</span>`;
 }
 
-// Compact sectioned list: a small caption (swatch, label, total) per group
-// followed by plain swatch rows, no bars. Reads as one flat list while still
-// telling crawlers from referrals.
 export function composeTooltipSectionedRows(
   groups: readonly TooltipBodyGroup[]
 ): string {
@@ -583,8 +523,6 @@ export function composeTooltipSectionedRows(
             (item.paint
               ? tooltipColorSwatchHtml(item.paint)
               : tooltipIndicatorHtml(item.key, item.colorsCount));
-          // No wrapping: while the box resizes between days a wrapping row
-          // would flash with its icon on a line of its own.
           return `<div class="flex w-full items-center gap-2 whitespace-nowrap${item.dimmed}">
           ${tooltipIndicatorSlot(indicatorHtml)}
           <div class="flex flex-1 items-center justify-between gap-4 leading-none">
@@ -609,9 +547,6 @@ export function composeTooltipSectionedRows(
     .join("");
 }
 
-// Sectioned activity list: each group renders a heading (swatch, label, total)
-// followed by activity rows scaled to the heading value, so children read as
-// shares of it — the same rows the single-group "activity" layout uses.
 export function composeTooltipGroupedBody(
   groups: readonly TooltipBodyGroup[]
 ): string {

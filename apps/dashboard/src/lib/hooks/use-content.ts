@@ -38,7 +38,6 @@ export function useSaveSocialVideo(organizationId: string, contentId: string) {
       const queryKey = dashboardOrpc.content.get.queryKey({
         input: { organizationId, contentId },
       });
-      // Reopening the dialog before the refetch lands must see the new video.
       queryClient.setQueryData<ContentApiResponse>(queryKey, (current) =>
         current
           ? {

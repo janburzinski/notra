@@ -58,8 +58,6 @@ describe("findNewActiveContent", () => {
           '  onerror="fetch(1)" />',
         ].join("\n")
       )
-      // The incomplete second script owns the following HTML according to the
-      // parser. Either finding blocks the complete edit.
     ).toEqual(["adds a script tag", "adds a script tag"]);
   });
 

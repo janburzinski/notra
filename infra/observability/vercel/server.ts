@@ -42,7 +42,6 @@ async function poll() {
 
 const server = createServer((request, response) => {
   if (request.url === "/healthz") {
-    // Process liveness, not proof of Vercel access; dashboards expose query status.
     response.end("ok\n");
   } else if (request.url === "/metrics") {
     response.setHeader(

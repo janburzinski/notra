@@ -236,7 +236,6 @@ export function ShareOfVoiceChart(props: ShareOfVoiceChartProps) {
   } = buildShareOfVoiceChartModel(props, tGeoShared("otherBrands"));
   const summary = own ?? ranking[0];
   const sliceById = new Map(slices.map((row) => [row.id, row.slice]));
-  // Brands folded into "Other" in the donut share its gray swatch.
   const otherSlice = other ? (sliceById.get(other.id) ?? "") : "";
   const donutConfig = Object.fromEntries(
     Object.entries(config).map(([key, item]) => [
@@ -305,7 +304,6 @@ export function ShareOfVoiceChart(props: ShareOfVoiceChartProps) {
             variant="table"
             bodyClassName="flex flex-col p-3"
           >
-            {/* Fills the card, which the ranking card next to it stretches. */}
             <div className="relative min-h-72 w-full flex-1">
               <EChartsPieChart
                 className="absolute inset-0"

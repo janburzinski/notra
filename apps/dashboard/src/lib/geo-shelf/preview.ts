@@ -115,8 +115,6 @@ export async function previewGeoShelfUrl(
     const fetchUrl = shelfFetchUrl(rawUrl);
     await assertStablePublicShelfUrl(fetchUrl);
     const page = await fetchWebpage({
-      // Hash and tracking params stripped so variants share a cache entry, but
-      // the host is kept as typed because not every site serves the apex domain.
       url: fetchUrl,
       includeImages: false,
       includeLinks: false,
@@ -126,9 +124,6 @@ export async function previewGeoShelfUrl(
     });
     const finalUrl = page.metadata?.finalUrl ?? page.url ?? null;
     if (finalUrl) {
-      // Context.dev follows redirects remotely and does not expose each hop. At
-      // minimum, reject an unsafe or unstable final destination before trusting
-      // any metadata returned for it.
       await assertStablePublicShelfUrl(finalUrl);
     }
     return {

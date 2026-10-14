@@ -36,11 +36,6 @@ import * as React from "react";
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
-// Width a menu button ends up with once the sidebar is collapsed: the icon rail
-// minus the p-2 that SidebarHeader/SidebarContent put around it. That box is
-// itself centered in the rail, so centering an icon inside it centers it in the
-// rail. Inset and floating sidebars override this: their container is 2px wider
-// to make room for the inset border.
 const SIDEBAR_RAIL_CONTENT = "calc(var(--sidebar-width-icon) - 1rem)";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 const SIDEBAR_DURATION = "var(--transition-duration-slow)";
@@ -88,8 +83,6 @@ function SidebarProvider({
 	const [openMobile, setOpenMobile] = React.useState(false);
 	const { contentRef, proxyWheelToContent } = useSidebarScroll();
 
-	// This is the internal state of the sidebar.
-	// We use openProp and setOpenProp for control from outside the component.
 	const [_open, _setOpen] = React.useState(defaultOpen);
 	const open = openProp ?? _open;
 	const setOpen = React.useCallback(
@@ -101,20 +94,17 @@ function SidebarProvider({
 				_setOpen(openState);
 			}
 
-			// This sets the cookie to keep the sidebar state.
 			document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
 		},
 		[setOpenProp, open],
 	);
 
-	// Helper to toggle the sidebar.
 	const toggleSidebar = React.useCallback(
 		() =>
 			isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open),
 		[isMobile, setOpen],
 	);
 
-	// Adds a keyboard shortcut to toggle the sidebar.
 	React.useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (
@@ -130,8 +120,6 @@ function SidebarProvider({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [toggleSidebar]);
 
-	// We add a state so that we can do data-state="expanded" or "collapsed".
-	// This makes it easier to style the sidebar with Tailwind classes.
 	const state = open ? "expanded" : "collapsed";
 
 	const contextValue = React.useMemo<SidebarContextProps>(
@@ -248,7 +236,6 @@ function Sidebar({
 			data-state={state}
 			data-variant={variant}
 		>
-			{/* This is what handles the sidebar gap on desktop */}
 			<div
 				className={cn(
 					`relative w-(--sidebar-width) bg-transparent transition-width ${SIDEBAR_WIDTH_TRANSITION}`,
@@ -266,7 +253,6 @@ function Sidebar({
 					side === "left"
 						? "left-0 group-data-[collapsible=offExamples]:left-[calc(var(--sidebar-width)*-1)]"
 						: "right-0 group-data-[collapsible=offExamples]:right-[calc(var(--sidebar-width)*-1)]",
-					// Adjust the padding for floating and inset variants.
 					variant === "floating" || variant === "inset"
 						? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)] [--sidebar-rail-content:calc(var(--sidebar-width-icon)_-_1rem_+_2px)]"
 						: "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
@@ -551,11 +537,6 @@ const sidebarMenuButtonVariants = cva(
 			size: {
 				default: "h-8 text-sm",
 				sm: "h-7 text-xs",
-				// Collapsed: pad the leading icon to where centering would put it
-				// instead of using justify-center. The collapsible state flips at
-				// once while the width animates, so centering measures the still-wide
-				// button and throws the icon to the far side before sliding it back.
-				// Callers whose leading icon is not 2rem set --sidebar-lg-icon.
 				lg: "h-12 text-sm transition-[padding] duration-(--sidebar-duration) ease-(--sidebar-ease) motion-reduce:transition-none group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:pl-[calc((var(--sidebar-rail-content)_-_var(--sidebar-lg-icon,_2rem))_/_2)]!",
 			},
 		},
@@ -607,7 +588,6 @@ function SidebarMenuButton({
 		};
 	}
 
-	// Wrap the base component with TooltipTrigger when tooltip is present
 	const comp =
 		baseComp.type === "button" ? (
 			<TooltipTrigger className="w-full" render={baseComp} />
@@ -694,7 +674,6 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
 	showIcon?: boolean;
 }) {
-	// Width between 50 and 89%, derived from useId so SSR and hydration match.
 	const width = skeletonWidthFromId(React.useId());
 
 	return (

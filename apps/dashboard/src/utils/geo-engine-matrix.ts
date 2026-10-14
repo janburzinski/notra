@@ -55,8 +55,6 @@ function familyColumns(
     }
     byFamily.set(family, totals);
   }
-  // Enabled assistants without answers in the range keep their column, so
-  // the gap reads as "no answers" instead of the assistant going missing.
   for (const engine of trackedEngines) {
     const family = engineFamilyOf(engine);
     if (!byFamily.has(family)) {
@@ -101,7 +99,6 @@ export function buildEngineMatrix(
   );
 
   const brands = new Map<string, { brand: string; mentions: number[] }>();
-  // Seeded so a tracked competitor without mentions shows its 0% row.
   for (const competitor of options.competitors ?? []) {
     if (
       !isOwnBrandName(competitor.name, options.companyName, options.aliases)
@@ -132,8 +129,6 @@ export function buildEngineMatrix(
 
   const total = (mentions: readonly number[]) =>
     mentions.reduce((sum, value) => sum + value, 0);
-  // Tracked competitors are what the user asked to compare against; untracked
-  // brands only fill in while nothing is tracked yet.
   const ranked = [...brands.entries()]
     .filter(([key]) => trackedKeys.size === 0 || trackedKeys.has(key))
     .map(([, entry]) => entry)

@@ -46,7 +46,6 @@ export function useTrafficSourceColumns({
     const categorySize = isMobile
       ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.categoryMobile
       : TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.category;
-    // Without sparklines (the drawer's bot list) the column only holds a number.
     const visitsSize =
       isMobile || seriesByKey === undefined
         ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.visitsMobile
@@ -56,7 +55,6 @@ export function useTrafficSourceColumns({
         key: "source",
         header: sourceHeader ?? tCommon("labels.source"),
         width: "1fr",
-        // The drawer is narrower than the page, so bot names get less room.
         minWidth: rowsAreBots
           ? TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.botSource
           : TRAFFIC_SOURCE_COLUMN_MIN_WIDTH.source,
@@ -77,7 +75,6 @@ export function useTrafficSourceColumns({
         header: tShared("purpose"),
         width: categorySize,
         minWidth: categorySize,
-        // Only the drawer drops it, and last: the page table scrolls sideways.
         collapsePriority: rowsAreBots ? 1 : undefined,
         sortable: true,
         cell: (row) =>

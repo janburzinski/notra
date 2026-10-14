@@ -263,8 +263,6 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
     return current;
   }, []);
 
-  // Puts already-uploaded files back, e.g. when a queued message is edited.
-  // They count as submitted so unmount cleanup never deletes them.
   const restoreAttachments = useCallback(
     (next: ChatAttachment[]) => {
       const merged = mergeChatAttachments(attachmentsRef.current, next);

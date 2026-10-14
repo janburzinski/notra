@@ -43,7 +43,6 @@ function countingFlagProvider(options?: {
   };
 }
 
-/** Each test uses its own key: the cache is a module-level singleton. */
 let nextOrganizationId = 0;
 function organizationId(): string {
   nextOrganizationId += 1;
@@ -63,7 +62,6 @@ describe("engine flag cache", () => {
       openCodeEnabled: true,
       available: true,
     });
-    // Two questions per organization, asked concurrently.
     expect(provider.calls()).toBe(2);
 
     for (let index = 0; index < 9; index += 1) {

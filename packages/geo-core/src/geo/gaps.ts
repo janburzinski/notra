@@ -391,7 +391,6 @@ function toAiSearchGapRows(
   for (const [key, entry] of byKey) {
     const totalSearches = entry.checkIds.size;
     const searches = totalSearches - entry.coveredCheckIds.size;
-    // Console queries match on the same year-free key AI searches group by.
     const corroboratedBySearchConsole = searchConsoleKeys.has(key);
     if (
       searches <
@@ -702,7 +701,6 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
     ),
     loadCollisionCandidates(scope),
   ]);
-  // `loadMentionGapInputs` already read this project's geo_settings row.
   const {
     checks,
     prompts,
@@ -836,9 +834,6 @@ export const loadGeoContentGaps = Effect.fn("geo.gaps.load")(function* (
       snapshotReady: true,
     };
   }
-  // Projects without a snapshot (new, or from before snapshots existed) build it
-  // once on first read; later reads only load it. A failed build shows the
-  // preparing state and the hourly cron retries.
   return yield* refreshGeoContentGaps(scope).pipe(
     Effect.catchCause((cause) =>
       Effect.sync((): GeoContentGapsResponse => {

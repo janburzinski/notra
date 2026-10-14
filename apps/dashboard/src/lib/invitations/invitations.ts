@@ -179,8 +179,6 @@ export async function acceptInvitationByToken(
     if (accepted.acceptedUserId !== identity.user.workosUserId) {
       return { ok: false, reason: "mismatch" };
     }
-    // Reconcile current access, not the old invitation's role: a retry must
-    // never re-add a removed member or undo a role change.
     const memberships =
       await getWorkOS().userManagement.listOrganizationMemberships({
         organizationId: invitation.organizationId,

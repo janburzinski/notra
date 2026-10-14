@@ -413,14 +413,12 @@ export function buildListFilesScript(
   path: string,
   glob?: string
 ): string {
-  // The glob filters before the scan cap so large repositories still match.
   const filter = glob?.trim()
     ? ` | grep -E ${shellQuote(globToPathPattern(path, glob))}`
     : "";
   return `${GIT} ls-tree -r --name-only ${shellQuote(assertFullSha(sha))} -- ${shellQuote(path || ".")}${filter} | head -n ${String(CODE_RESEARCH_LIST_SCAN_LIMIT + 1)}`;
 }
 
-// Anchored pattern over full repository paths; valid in both JS and ERE.
 function globToPathPattern(basePath: string, glob: string): string {
   const prefix = basePath
     ? `${basePath}/`.replace(/[.+^${}()|[\]\\*?]/g, "\\$&")
@@ -428,7 +426,6 @@ function globToPathPattern(basePath: string, glob: string): string {
   return `^${prefix}${globToRegExp(glob).source.slice(1).replaceAll("\\/", "/")}`;
 }
 
-// Supports *, ** and ? relative to the listed directory.
 export function globToRegExp(glob: string): RegExp {
   let pattern = "";
   const source = glob.trim().replace(/^\/+/, "");
@@ -479,7 +476,6 @@ export function parseListFiles(
     };
   }
 
-  // Too many files: collapse everything below the next directory level.
   const directFiles: string[] = [];
   const directoryCounts = new Map<string, number>();
   for (const file of allFiles) {
@@ -571,7 +567,6 @@ export function parseSearchMatches(
       truncated = true;
       break;
     }
-    // Redact first: clipping could cut a secret short of its pattern.
     const redacted = redactSecrets(text.trim());
     matches.push({
       path,
@@ -672,8 +667,6 @@ export function buildShowChangeScript(params: {
     )} ${ref} -- ${pathspec} && echo @@PATCH && ${GIT} show --no-color --diff-merges=first-parent --format= --patch ${ref} -- ${pathspec} | head -c ${limit}`;
   }
 
-  // No ref: diff the recorded commit against where it forked from the default
-  // branch. Older forks sit below the shallow clone, so deepen until found.
   const branch = assertSafeRef(params.defaultBranch, "branch");
   const base = shellQuote(`refs/remotes/origin/${branch}`);
   const head = shellQuote(assertFullSha(params.sha));
@@ -703,7 +696,6 @@ export function stripDeniedDiffFiles(patch: string): {
   for (const line of patch.split("\n")) {
     const header = DIFF_FILE_HEADER_PATTERN.exec(line);
     if (header) {
-      // A rename can move a secret file to a harmless name, so check both.
       const paths = [header[1] ?? "", header[2] ?? ""];
       skipping = paths.some(isDeniedRepoPath);
       if (skipping) {
@@ -754,7 +746,6 @@ export function parseShowChange(output: string) {
   );
   return {
     commit,
-    // Everything between the subject line and the stat block is the message body plus stat.
     summary: redactSecrets(stripDeniedStatLines(rest.join("\n").trim())),
     patch: truncatedPatch.text,
     patchTruncated:

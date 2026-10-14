@@ -100,8 +100,6 @@ export function ChatActivityGroup({
     settleMs: ACTIVITY_STEP_SETTLE_MS,
     minVisibleMs: ACTIVITY_STEP_MIN_VISIBLE_MS,
   });
-  // Approval prompts need an immediate answer, and leaving one must not keep
-  // the stale "waiting" label, so both transitions skip the settle delay.
   const displayedStep =
     step === "waitingForApproval" || settledStep === "waitingForApproval"
       ? step
@@ -134,8 +132,6 @@ export function ChatActivityGroup({
   const label = isStreaming ? stepLabel : workedLabel;
   const active = isStreaming && step !== "waitingForApproval";
 
-  // While streaming the group starts closed so the layout stays still, but it
-  // is still a trigger: people want to peek at what is happening right now.
   if (!hasDetails) {
     return (
       <div data-activity-group={groupId}>

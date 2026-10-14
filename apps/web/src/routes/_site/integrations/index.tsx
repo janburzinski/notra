@@ -77,7 +77,6 @@ function IntegrationsPage() {
     <>
       <div className="flex w-full flex-col items-center pb-8 antialiased [font-synthesis:none]">
         <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD
           dangerouslySetInnerHTML={{
             __html: serializeJsonLd(breadcrumbJsonLd),
           }}

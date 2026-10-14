@@ -15,7 +15,6 @@ function DestinationIcon({
   socialPlatform,
 }: ScheduleDestinationMarkProps) {
   if (destination === "notra") {
-    // The mark carries its own label; the name beside it already says it.
     return (
       <span aria-hidden className="contents">
         <Notra className={MARK_CLASS} />
@@ -31,7 +30,6 @@ function DestinationIcon({
   return <XTwitter aria-hidden className={MARK_CLASS} />;
 }
 
-/** A destination's brand mark and name, e.g. GitHub or X. */
 export function ScheduleDestinationMark(props: ScheduleDestinationMarkProps) {
   const destinationName = useScheduleDestinationName();
   return (

@@ -82,9 +82,6 @@ export async function withGscIntegrationLock<T>(
   ) => Promise<T>
 ): Promise<T> {
   const activeRedis = redis;
-  // OAuth cannot be initiated without Redis. Preserve disconnect and manual
-  // sync support in unconfigured development environments where no competing
-  // callback can be created.
   if (!activeRedis) {
     const signal = new AbortController().signal;
     return await operation(signal, async () => signal.throwIfAborted());
@@ -123,8 +120,6 @@ export async function withGscIntegrationLock<T>(
           }),
           Math.min(GSC_INTEGRATION_LOCK_REDIS_TIMEOUT_MS, remainingWaitMs),
           (value) => {
-            // The SET was applied after we stopped waiting: free the key so
-            // neither our retries nor other callers wait out the full TTL.
             if (value === "OK") {
               void releaseLock();
             }
@@ -199,7 +194,6 @@ export async function withGscIntegrationLock<T>(
 
   let renewal: ReturnType<typeof setInterval> | null = null;
   try {
-    // Ensure a delayed acquisition response did not consume the initial TTL.
     await assertOwned();
     renewal = setInterval(() => {
       if (finished || renewalInFlight || controller.signal.aborted) {

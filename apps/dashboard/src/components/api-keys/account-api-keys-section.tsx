@@ -336,8 +336,6 @@ export function AccountApiKeysSection() {
     },
   ];
 
-  // A failed background refetch keeps the cached keys, so only an empty list
-  // turns into the load error.
   const showLoadError = isError && keys.length === 0;
   const isEmpty = !(isPending || showLoadError) && keys.length === 0;
   const visibleRows = isPending ? 2 : keys.length;

@@ -193,7 +193,6 @@ test("grouped instant gauges retain every customer/outcome series, names and cus
       } else if (dashboard.uid === "notra-surfaces" && panel.id === 9) {
         label = "userId";
       }
-      // Loki converts instant vectors to a long table; restore labels before reduction.
       assert.deepEqual(panel.transformations, [
         { id: "prepareTimeSeries", options: { format: "multi" } },
       ]);
@@ -207,7 +206,6 @@ test("grouped instant gauges retain every customer/outcome series, names and cus
         values: false,
       });
       for (const target of panel.targets) {
-        // Pinned Grafana's Loki migration maps the legacy flag to native instant mode.
         assert.equal(
           target.queryType ?? (target.instant === true ? "instant" : "range"),
           "instant"

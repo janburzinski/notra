@@ -31,11 +31,6 @@ function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   );
 }
 
-/**
- * A sheet opened from inside another sheet hands its width to the parent, so
- * the parent can slide clear of it (see `sheet-motion`). Both widths follow
- * resizes; offsetWidth ignores the slide transform.
- */
 function useSheetStack(popup: HTMLElement | null) {
   const parentPopup = React.useContext(SheetStackContext)?.parent?.popup;
 

@@ -8,8 +8,6 @@ import {
   renderLoadedGeoPromptAnswerThread,
 } from "@/utils/prompt-answer-thread-chunk";
 
-// Markdown renderer (~138 kB gz) stays off the dashboard shell until a prompt
-// answer sheet actually opens.
 const SuspendingGeoPromptAnswerThread = dynamic(
   () =>
     loadGeoPromptAnswerThread().then((module) => module.GeoPromptAnswerThread),

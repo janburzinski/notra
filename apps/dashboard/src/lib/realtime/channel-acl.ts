@@ -68,12 +68,10 @@ export async function authorizeRealtimeChannels({
         return jsonResponse(403, { error: "Forbidden channel" });
       }
     }
-    // Public demo request feed: `demo:{orgId}`, only in demo mode.
     const demo = isDemoMode() ? DEMO_CHANNEL_PATTERN.exec(channel) : null;
     if (demo?.[1]) {
       parsed = { organizationId: demo[1], chatId: "demo", streamId: "demo" };
     }
-    // GEO live updates: `geo:{orgId}`, any member of the organization.
     const geo = GEO_LIVE_CHANNEL_PATTERN.exec(channel);
     if (geo?.[1]) {
       parsed = { organizationId: geo[1], chatId: "geo", streamId: "geo" };

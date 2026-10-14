@@ -373,7 +373,6 @@ export const PerplexitySearch = ({
     onStepOpenChange
   );
 
-  // Stable identities: the sequence effect restarts when these change.
   const handleStart = useCallback(() => {
     setOpenState(true);
     setStepOpenState(true);

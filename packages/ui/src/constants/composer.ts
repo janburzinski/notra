@@ -1,7 +1,6 @@
 export const COMPOSER_TRAY_TRANSITION =
   "transition-[background-color,padding] duration-slow ease-emphasized-in-out motion-reduce:transition-none";
 
-// Resets the Textarea's field chrome: the composer card is the field.
 export const COMPOSER_INPUT =
   "block max-h-50 min-h-12 min-w-0 resize-none overflow-y-auto rounded-none border-0 bg-transparent px-3 py-2 text-foreground text-sm leading-6 caret-foreground shadow-none focus-visible:border-transparent focus-visible:ring-0 disabled:bg-transparent md:text-sm dark:bg-transparent dark:disabled:bg-transparent";
 
@@ -9,7 +8,6 @@ export const COMPOSER_TOOLBAR_BUTTON = "rounded-md text-muted-foreground";
 
 export const COMPOSER_TOOLBAR_BUTTON_LABEL = "px-2 text-sm";
 
-// Ghost Button turned into the filled square send action.
 export const COMPOSER_SEND_BUTTON =
   "size-8 rounded-[10px] active:scale-[0.96] data-disabled:not-aria-busy:opacity-100";
 

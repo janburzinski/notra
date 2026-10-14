@@ -77,8 +77,6 @@ export function withEvlog<TArgs extends unknown[], TReturn>(
   handler: (...args: TArgs) => TReturn
 ) {
   return async (...args: TArgs) => {
-    // An outer wrapper (the dashboard's route middleware) already owns this
-    // request's event, so a nested handler adds to it instead of emitting twice.
     if (getOpenRequestLogger()) {
       return await handler(...args);
     }
@@ -128,6 +126,5 @@ export const geoLog: GeoLogger = {
 };
 
 export async function flushGeoLog(): Promise<void> {
-  // GEO jobs can also call AI and website-data integrations.
   await flushLogs();
 }

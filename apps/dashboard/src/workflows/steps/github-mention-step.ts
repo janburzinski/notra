@@ -37,8 +37,6 @@ export async function processGitHubMentionStep(context: GitHubMentionContext) {
   return await processGitHubMention(context, startContentPublicationSyncRepair);
 }
 
-// A killed attempt may have committed or replied before its result persisted.
-// Replaying the whole agent is unsafe; it must be reconciled first.
 processGitHubMentionStep.maxRetries = 0;
 
 export async function completeGitHubMentionStep(

@@ -35,7 +35,6 @@ type InternalGeoSequenceRunResponse = z.infer<
   typeof internalGeoSequenceRunResponseSchema
 >;
 
-/** Paid synchronous brief planning — dashboard-only billing gates. */
 export const GEO_REMOTE_WRITER_PLAN: RemoteGeoOperation<InternalGeoWriterPlanResponse> =
   {
     label: "writerPlan",
@@ -46,7 +45,6 @@ export const GEO_REMOTE_WRITER_PLAN: RemoteGeoOperation<InternalGeoWriterPlanRes
     unavailableMessage: "Brief planning is unavailable",
   };
 
-/** Paid synchronous sequence run — dashboard-only model credentials. */
 export const GEO_REMOTE_SEQUENCE_RUN: RemoteGeoOperation<InternalGeoSequenceRunResponse> =
   {
     label: "sequenceRun",
@@ -57,7 +55,6 @@ export const GEO_REMOTE_SEQUENCE_RUN: RemoteGeoOperation<InternalGeoSequenceRunR
     unavailableMessage: "Sequence runs are unavailable",
   };
 
-/** Resolves the dashboard URL for a configured remote GEO operation. */
 export function resolveRemoteGeoUrl(
   env: InternalWorkflowEnv,
   operation: Pick<RemoteGeoOperation<unknown>, "path">
@@ -65,10 +62,6 @@ export function resolveRemoteGeoUrl(
   return getInternalWorkflowUrl(env, operation.path);
 }
 
-/**
- * Runs a pre-configured remote GEO operation with the mandatory synchronous
- * timeout and caller-specific no-retry guidance.
- */
 export async function runConfiguredRemoteGeoEffect<A>(
   operation: RemoteGeoOperation<A>,
   url: string,

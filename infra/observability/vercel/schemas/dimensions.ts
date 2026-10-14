@@ -6,7 +6,6 @@ import {
   REQUEST_METHODS,
 } from "../constants/metrics.ts";
 
-/** Only requested platform fields cross the label boundary; never coerce free text. */
 export function dimensionValue(name: string, value: unknown): string | number {
   if (value == null) {
     return "unattributed";

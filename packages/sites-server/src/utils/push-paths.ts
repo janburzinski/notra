@@ -18,7 +18,6 @@ export function pushTouchesRootDirectory(
     payload.created ||
     commits.length === 0 ||
     commits.length >= PUSH_PAYLOAD_COMMIT_LIMIT ||
-    // A commit without its path lists can't prove it stayed outside.
     commits.some(
       (commit) => !(commit.added && commit.modified && commit.removed)
     )

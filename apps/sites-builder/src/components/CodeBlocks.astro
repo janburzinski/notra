@@ -7,8 +7,6 @@
   const checkIcon =
     '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
   for (const pre of document.querySelectorAll<HTMLPreElement>(".prose-notra pre")) {
-    // Builtins that wrap Markdown are not-prose for their own chrome only, so
-    // only the nearest not-prose decides.
     const nearest = pre.closest(".not-prose");
     const optedOut = nearest && !nearest.hasAttribute("data-notra-markdown");
     if (optedOut || pre.parentElement?.classList.contains("code-block")) continue;

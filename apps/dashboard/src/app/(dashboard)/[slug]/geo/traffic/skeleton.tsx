@@ -56,7 +56,6 @@ const CRAWLER_ROW_COUNT = 4;
 const REFERRAL_ROW_COUNT = 2;
 const LOG_ROW_COUNT = 6;
 
-/** A table in its loading state with the real header labels, so only the cells are placeholders. */
 function TrafficTableSkeleton({
   columns,
   rows,
@@ -156,7 +155,6 @@ function TrafficSourcesSkeleton() {
           },
         ] satisfies TableColumn<unknown>[])),
   ];
-  // Same collapse as the real stack, so the bands keep one set of columns.
   const { containerRef, visibleColumns } = useCollapsibleColumns(columns, {
     minColumnWidth: DEFAULT_MIN_COLUMN_WIDTH,
     extraFixedWidths: [TABLE_FRAME_INSET],

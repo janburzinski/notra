@@ -14,7 +14,6 @@ export interface ChatQuotePreviewProps {
   disabled?: boolean;
 }
 
-/** A saved post the quoted text came from, e.g. the chat's preview panel. */
 export interface ChatQuotePost {
   postId: string;
   title: string;

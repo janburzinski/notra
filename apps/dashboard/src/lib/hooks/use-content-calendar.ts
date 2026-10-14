@@ -73,7 +73,6 @@ export function useContentCalendar(organizationId: string, anchor: Date) {
     },
   });
 
-  // Warm the neighbouring months so paging is instant.
   useEffect(() => {
     if (!enabled) {
       return;
@@ -109,9 +108,6 @@ export function usePostSchedule(organizationId: string, contentId: string) {
     },
   });
 
-  // A destination that just went out changed the post (status, PR link) on
-  // the server; refresh what the page shows about it. Null until the first
-  // response, so loading a schedule that already went out refreshes nothing.
   const publishedIds = query.data
     ? (query.data.schedule?.publications
         .filter((publication) => publication.status === "published")
@@ -128,8 +124,6 @@ export function usePostSchedule(organizationId: string, contentId: string) {
     if (previous === null || previous === publishedIds || !publishedIds) {
       return;
     }
-    // Status, PR link, recent-posts badges and collection counts all read
-    // from the content queries.
     queryClient.invalidateQueries({ queryKey: dashboardOrpc.content.key() });
     queryClient.invalidateQueries({
       queryKey: dashboardOrpc.contentCalendar.list.key(),
@@ -139,10 +133,6 @@ export function usePostSchedule(organizationId: string, contentId: string) {
   return query;
 }
 
-/**
- * Writes a post's fresh schedule into the cache and invalidates what depends
- * on it: every calendar month and the post itself.
- */
 function useScheduleInvalidation(organizationId: string) {
   const queryClient = useQueryClient();
   return (contentId: string, schedule: PostScheduleView | null) => {
@@ -155,7 +145,6 @@ function useScheduleInvalidation(organizationId: string) {
     queryClient.invalidateQueries({
       queryKey: dashboardOrpc.contentCalendar.list.key(),
     });
-    // "Publish now" and retries flip the post to published within seconds.
     queryClient.invalidateQueries({
       queryKey: dashboardOrpc.content.get.queryKey({
         input: { organizationId, contentId },
@@ -164,11 +153,6 @@ function useScheduleInvalidation(organizationId: string) {
   };
 }
 
-/**
- * Reloads a post's schedule after a rejected change. The usual cause is a
- * schedule that changed elsewhere, and until the cache catches up every new
- * attempt would send the same stale view and be rejected again.
- */
 function useScheduleRefetch(organizationId: string) {
   const queryClient = useQueryClient();
   return (contentId: string) => {

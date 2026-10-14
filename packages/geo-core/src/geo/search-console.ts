@@ -41,10 +41,6 @@ import {
   selectKeywordsForModel,
 } from "./suggestion-keywords";
 
-/**
- * `lastError` is rendered in the dashboard, so only curated copy goes in —
- * raw provider/SDK messages stay in the logs.
- */
 function toStoredSyncError(error: unknown): string {
   if (error instanceof GeoSearchConsoleError) {
     return error.status === 403
@@ -297,11 +293,6 @@ const syncIntegration = Effect.fn("geo.searchConsole.syncIntegration")(
   }
 );
 
-/**
- * Tracked competitors are the only third-party names the model may use in a
- * prompt. Everything else the site ranks for (e.g. "<product> changelog") is
- * navigational and not a gap the company can win.
- */
 function mergeCompetitorNames(
   competitorRows: { name: string }[],
   settingsCompetitors: string[]
@@ -319,7 +310,6 @@ function mergeCompetitorNames(
     seen.add(key);
     names.push(name.trim());
   }
-  // Ranked rows come first, so the cut keeps the most relevant names.
   return names.slice(0, GEO_CONTEXT_COMPETITOR_LIMIT);
 }
 
@@ -374,8 +364,6 @@ const runSync = Effect.fn("geo.searchConsole.generateSuggestions")(function* (
           columns: { prompt: true },
         })
       ),
-      // Accepted/dismissed rows occupy the (organizationId, prompt) unique index
-      // even after the tracked prompt is deleted. Pending rows are replaced later.
       geoDb("read prior suggestions", () =>
         db.query.geoPromptSuggestions.findMany({
           where: and(

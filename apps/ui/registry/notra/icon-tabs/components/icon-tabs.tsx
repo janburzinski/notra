@@ -57,13 +57,6 @@ function SlideInIcon({ children, pinned = false }: IconTabsSlideInIconProps) {
   );
 }
 
-/**
- * Indicator for triggers whose width animates when they turn active. A CSS
- * transition measures its target once, so it lags and overshoots while the
- * tabs resize. This one re-measures the active tab every frame and
- * interpolates from where it started, so it lands with the resize in one
- * motion and never leaves the space between the two tabs.
- */
 function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const boxRef = useRef<IconTabsIndicatorBox | null>(null);
@@ -86,13 +79,11 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
       frame = 0;
       const target = measureActiveTab(list);
       if (!target) {
-        // The active tab can be marked a frame after this effect runs.
         if (now - start < ICON_TABS_INDICATOR_MS) {
           frame = requestAnimationFrame(tick);
         }
         return;
       }
-      // rAF timestamps mark the frame start and can predate `start`.
       const elapsed = Math.max(0, now - start);
       const progress = animate
         ? Math.min(1, elapsed / ICON_TABS_INDICATOR_MS)
@@ -115,7 +106,6 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
     };
     tick(start);
 
-    // Keep following the tab once settled, e.g. when a count changes.
     const observer = new ResizeObserver(() => {
       if (frame !== 0) {
         return;

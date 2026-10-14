@@ -20,22 +20,15 @@ const BRAND_TOKEN_SEPARATOR = "[-_\\s]+";
  * letter from its accent.
  */
 const BRAND_WORD_CHAR = "[\\p{L}\\p{N}\\p{M}_]";
-/*
- * Own-site account and careers pages only. Changelog / status page /
- * privacy policy are product categories ("changelog generator"), so those
- * stay in and the suggestion prompt skips "<product> changelog".
- */
 const NAVIGATIONAL_QUERY =
   /^(?:[\p{L}\p{N}._-]+\s+){0,2}(?:log(?:in|\s+in|-in)|sign(?:\s+|-)?(?:in|up)|anmelden|einloggen|careers|karriere|stellenangebote|impressum)$/iu;
 const WINNING_POSITION = 3;
 const STRIKING_POSITION = 20;
 const WEAK_POSITION = 40;
-/** 0.02: a 12k-impression 40% CTR #1 still loses to a 200-impression gap at position 11. */
 const WINNING_WEIGHT = 0.02;
 const STRIKING_WEIGHT = 1;
 const WEAK_WEIGHT = 0.6;
 const DISTANT_WEIGHT = 0.25;
-/** CTR above this counts as satisfied demand and stops lowering the score. */
 const CTR_SATURATION = 0.5;
 
 function escapeRegExp(value: string): string {
@@ -47,9 +40,6 @@ export function normalizeSuggestionKey(value: string): string {
 }
 
 function normalizeForBrandMatch(value: string): string {
-  // NFC so an accent written as a combining mark folds back into its letter;
-  // the punctuation pass below would otherwise strip the bare mark and make
-  // decomposed "Nestlé" stop matching the composed alias.
   return normalizeSuggestionKey(value.normalize("NFC"))
     .replace(/[-_]+/g, " ")
     .replace(/[^\p{L}\p{N}\s]+/gu, " ")
@@ -62,7 +52,6 @@ export function promptMentionsBrand(
   brandTerms: string[]
 ): boolean {
   const normalized = ` ${normalizeForBrandMatch(text)} `;
-  // Space-delimited so a short alias like "hub" does not drop "github".
   return brandTerms.some((term) =>
     normalized.includes(` ${normalizeForBrandMatch(term)} `)
   );

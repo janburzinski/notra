@@ -472,7 +472,6 @@ const COMPETITOR_MATCH_EXACT = 0;
 const COMPETITOR_MATCH_PREFIX = 1;
 const COMPETITOR_MATCH_PARTIAL = 2;
 
-/** Lower is better; null when the competitor does not match at all. */
 function competitorMatchRank(
   competitor: GeoCompetitor,
   query: string

@@ -9,7 +9,6 @@ import {
   SITE_DEPLOYMENT_SUMMARY_SURFACE_CLASS,
 } from "@/constants/sites";
 
-/** A site section's body; `SiteLayout` already renders the page shell. */
 export function SiteSectionSkeleton() {
   return (
     <div className="space-y-6" data-page-skeleton="">
@@ -25,7 +24,6 @@ export function SiteSectionSkeleton() {
 
 const SUMMARY_FACT_KEYS = ["a", "b", "c", "d", "e", "f"] as const;
 
-/** Mirrors the deployment page frames so the swap to content doesn't shift. */
 export function SiteDeploymentSkeleton() {
   return (
     <div className="space-y-6" data-page-skeleton="">

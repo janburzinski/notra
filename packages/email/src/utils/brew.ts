@@ -48,7 +48,6 @@ async function brewFetch<T>(
   { method, body, idempotencyKey }: BrewRequestInit
 ): Promise<BrewResponse<T>> {
   const headers: Record<string, string> = { Authorization: `Bearer ${apiKey}` };
-  // Organization-scoped keys must name the brand; brand-scoped keys ignore it.
   if (process.env.BREW_BRAND_ID) {
     headers["X-Brand-Id"] = process.env.BREW_BRAND_ID;
   }
@@ -132,8 +131,6 @@ export async function brewRequest<T>(
 
   for (let attempt = 0; ; attempt += 1) {
     const result = await brewFetch<T>(apiKey, path, init);
-    // Waiting out a longer Retry-After would hold the request open for
-    // minutes; the caller's own retry (workflow step, nightly cron) is better.
     const retryAfterMs = result.ok ? 0 : (result.error.retryAfterMs ?? 0);
     if (
       result.ok ||
@@ -205,8 +202,6 @@ export async function sendBrewEmail(
     return { data: null, error: result.error };
   }
 
-  // A 2xx means Brew accepted the fire, even when the body is unreadable
-  // (null). Reporting that as a failure would make callers send twice.
   const fired: Partial<BrewTriggerFireResponse> | null = result.data;
   const notStartedReason = fired?.notStarted?.[0]?.reason;
 
@@ -221,7 +216,6 @@ export async function sendBrewEmail(
     };
   }
 
-  // Like a provider suppression list: accepted, nothing delivered, no retry.
   if ((fired?.counts?.skipped ?? 0) > 0) {
     console.warn(`[Brew] ${category} email skipped, recipient is suppressed`);
   }
@@ -331,7 +325,6 @@ export async function deleteBrewContact(email: string): Promise<void> {
 
 let marketingDomainId: Promise<string> | undefined;
 
-/** Looks up the marketing domain id once per process. */
 function getMarketingDomainId(): Promise<string> {
   marketingDomainId ??= (async () => {
     let cursor: string | null = null;

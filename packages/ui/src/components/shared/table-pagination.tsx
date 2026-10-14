@@ -35,7 +35,6 @@ interface TablePaginationProps {
   pageSizeOptions?: readonly number[];
 }
 
-/** The offered sizes plus the current one, so a custom default still shows. */
 function pageSizeChoices(
   options: readonly number[],
   pageSize: number
@@ -43,7 +42,6 @@ function pageSizeChoices(
   return [...new Set([...options, pageSize])].sort((a, b) => a - b);
 }
 
-/** Visible row range for a page; `total` is unknown with cursor paging. */
 function pageRange(
   page: number,
   pageSize: number,
@@ -204,7 +202,6 @@ export function TablePagination({
   const isFirst = page <= 1;
   const isLast = pageCount === undefined ? !hasNextPage : page >= pageCount;
   const hasPages = !(isFirst && isLast);
-  // A size picker only helps once there is more than the smallest page.
   const smallestSize = Math.min(...pageSizeOptions, pageSize);
   const hasMoreThanSmallest =
     range.total === undefined

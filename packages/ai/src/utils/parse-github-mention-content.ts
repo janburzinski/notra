@@ -214,8 +214,6 @@ export function parseGitHubMentionContent(
       node.children?.forEach((child) => {
         if (coversInlineHtml && child.type === "html") {
           if (!inspectedInlineHtml) {
-            // Markdown splits inline HTML into tag nodes and ordinary text.
-            // Parse the enclosing block so active element bodies are included.
             inspectHtml(nodeSource, constructs);
             inspectedInlineHtml = true;
           }

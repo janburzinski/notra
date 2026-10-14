@@ -89,7 +89,6 @@ export async function scheduleContentWorkflow(payload: {
     console.log(`[Schedule] Trigger ${triggerId} is disabled, canceling`);
     return { status: "trigger_disabled" };
   }
-  // "Every N days" schedules fire daily from QStash; only interval days run.
   const customInterval = parseCustomIntervalCron(trigger.sourceConfig);
   if (!manual && customInterval && !isCustomIntervalDue(customInterval)) {
     console.log(

@@ -10,7 +10,6 @@ import {
 } from "@/constants/charts";
 import type { ChartColorPair, ChartSeriesColors } from "@/types/charts";
 
-/** How far toward white the far end of a donut sector fades, per theme. */
 const SOFT_GRADIENT_LIGHT_TINT = 0.45;
 const SOFT_GRADIENT_DARK_TINT = 0.3;
 

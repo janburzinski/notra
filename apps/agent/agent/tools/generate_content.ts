@@ -22,8 +22,6 @@ async function canResearchCode(
   return isCodeResearchEnabled({ session });
 }
 
-// Best effort: a failed cleanup must not turn a saved post into a failed
-// task, and the boxes still expire on their own TTL.
 async function releaseResearchBoxes(sessionKey: string): Promise<void> {
   // codeql[js/unknown-directive] Eve requires this directive for durable steps.
   "use step";
@@ -39,7 +37,6 @@ async function releaseResearchBoxes(sessionKey: string): Promise<void> {
   }
 }
 
-// The brief only enriches the post, so a failed research run never fails the task.
 async function researchFeature(
   ctx: WorkflowToolContext,
   message: string
@@ -63,8 +60,6 @@ async function generateContentTask(
 
   const shouldResearch =
     codeResearch !== undefined && (await canResearchCode(ctx.session));
-  // Task runs get no follow-up questions, so their boxes go as soon as the
-  // writer is done instead of idling until the TTL.
   const sessionKey = ctx.session.parent?.rootSessionId ?? ctx.session.id;
   try {
     const brief = shouldResearch

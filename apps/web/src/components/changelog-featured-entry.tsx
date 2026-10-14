@@ -33,7 +33,6 @@ export function ChangelogFeaturedEntry({
             {item.description}
           </p>
         </div>
-        {/* Styled like a CtaButton, but a span: the whole card is the link. */}
         <span
           className={cn(
             ctaButtonVariants({ size: "sm" }),

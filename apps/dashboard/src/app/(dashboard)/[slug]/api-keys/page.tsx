@@ -150,8 +150,6 @@ const EDIT_FORM_DEFAULTS: ApiKeyFormValues = {
 };
 
 interface ApiKeyEditForm {
-  // TanStack Form's Field component carries deep generics that are local to the
-  // useForm call site. The dialog only renders fields from that instance.
   Field: ComponentType<{
     name: string;
     validators?: unknown;
@@ -457,7 +455,6 @@ function ApiKeyQuickStart({
 }) {
   const t = useTranslations("apiKeys.quickStart");
   const tCommon2 = useTranslations("common");
-  // The account table shares this query, so reading it here costs no request.
   const { data: accountKeys } = useQuery(
     dashboardOrpc.apiKeys.account.list.queryOptions()
   );
@@ -467,8 +464,6 @@ function ApiKeyQuickStart({
     docsLabel: t("viewDocs"),
     selectLabel: t("createKey", { title: item.title }),
   }));
-  // Gate on loaded data rather than query status, so a failed background
-  // refetch keeps the last known answer.
   if (organizationKeys?.length !== 0 || accountKeys?.length !== 0) {
     return null;
   }
@@ -845,11 +840,7 @@ export default function ApiKeysPage() {
   const { openSettings } = useSettingsModal();
   const tMembers = useTranslations("members");
   const tBilling = useTranslations("errors.billing");
-  // Creating a key needs an active plan; say so up front instead of after
-  // the user has filled in the form.
   const openCreateDialog = () => {
-    // Until billing has loaded we cannot tell, and an open form would only be
-    // rejected on submit.
     if (planLoading) {
       return false;
     }
@@ -902,8 +893,6 @@ export default function ApiKeysPage() {
     expiration: newKeyExpiration,
   };
 
-  // A preconfigured link waits for billing, so a free plan gets the hint
-  // instead of a form it cannot submit.
   const openPreconfiguredDialog = useEffectEvent(() => {
     openCreateDialog();
   });

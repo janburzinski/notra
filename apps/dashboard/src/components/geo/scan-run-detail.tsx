@@ -357,7 +357,6 @@ function ScanRunAnswersTable({
     t("itemAnswers"),
     onOffsetChange
   );
-  // The pager renders nothing without answers, so the footer carries the count then.
   const progressText = progress
     ? t("progress", {
         checks: progress.checks.toLocaleString(locale),
@@ -512,7 +511,6 @@ function ScanRunEmpty({ isError, onRetry }: GeoScanRunEmptyProps) {
   );
 }
 
-/** Answers of the project's newest scan: status line, filters and table. */
 export function ScanRunDetail({ organizationId }: GeoScanRunDetailProps) {
   const tGeoShared = useTranslations("geo.shared");
   const isScanning = useIsGeoScanning(organizationId);
@@ -525,7 +523,6 @@ export function ScanRunDetail({ organizationId }: GeoScanRunDetailProps) {
     state.pendingOffset
   );
   const run = query.data?.run;
-  // A newer scan replaced the one on screen: its pages and models differ.
   if (run && run.id !== state.runId) {
     setState({ ...INITIAL_SCAN_RUN_STATE, runId: run.id });
   }
@@ -576,7 +573,6 @@ function ScanRunLoaded({
   const t = useTranslations("geo.scanRunDetail");
   const tGeoShared = useTranslations("geo.shared");
   const tCommon = useTranslations("common");
-  // Pin the open answer to its scan so a newer run can't swap the sheet's scope.
   const [openAnswer, setOpenAnswer] = useState<GeoScanOpenAnswer | null>(null);
   const checkId = openAnswer?.checkId ?? null;
   const model = scanRunDetailView({

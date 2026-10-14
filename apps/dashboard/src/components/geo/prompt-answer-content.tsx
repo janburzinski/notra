@@ -30,9 +30,6 @@ export function PromptAnswerContent({
   const { result } = state;
   const promptText = prompt ?? result.prompt;
 
-  // The raw answer only mounts while visible: it is a full markdown parse and
-  // re-ran on every engine switch behind Analysis. Analysis stays mounted so
-  // its local state (expanded sources) survives a trip to the raw view.
   return (
     <>
       {view === "raw" ? (

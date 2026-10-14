@@ -27,7 +27,6 @@ interface ReviseImagePostParams {
   postId: string;
   prompt: string;
   title?: string;
-  /** Diagrams only: edit in the sandbox because the change needs the code. */
   useRepository?: boolean;
   userId: string | null;
   useMarkup?: boolean;
@@ -78,8 +77,6 @@ export async function reviseImagePost(params: ReviseImagePostParams) {
       brandIdentityId: previousSnapshot.brandIdentityId,
       mode: "prompt",
       prompt,
-      // From the post, not from files in the restored repo: a customer repo
-      // can contain its own diagram.json.
       format: readImageFormat(post.sourceMetadata),
     },
     restoreSnapshotId: previousSnapshot.snapshotId,

@@ -55,7 +55,6 @@ function BlogPage() {
   return (
     <div className="flex w-full flex-col items-center gap-12 md:gap-16">
       <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD payload is server-built and script-close-escaped
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         type="application/ld+json"
       />

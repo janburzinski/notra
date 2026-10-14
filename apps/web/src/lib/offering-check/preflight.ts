@@ -5,7 +5,6 @@ import type {
 } from "@/types/offering-check";
 import { failureStatusFor } from "@/utils/offering-report";
 
-/** Asks the API whether a check would run, without spending a check. */
 export async function preflightOfferingCheck(
   input: OfferingCheckInput
 ): Promise<OfferingFailureStatus | null> {

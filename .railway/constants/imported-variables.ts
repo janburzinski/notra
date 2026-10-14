@@ -1,4 +1,3 @@
-// Adoption contract: removing an imported name must be an intentional review change.
 export const importedVariables = {
   "demo-api": [
     "CRON_SECRET",

@@ -14,10 +14,6 @@ import type {
   OfferingThread,
 } from "@/types/offering-check";
 
-/**
- * The hero leads with the problem question when one was asked, since buyers
- * who do not know the feature name are the harder audience to reach.
- */
 export function getOfferingHeroCopy(
   result: OfferingCheckResult | null,
   hasFeature: boolean
@@ -55,7 +51,6 @@ export function getOfferingActivityLabel(thread: OfferingThread): string {
   return thread.queries.length > 0 ? "Searching the web" : "Thinking";
 }
 
-/** The message for a form notice, and the field it belongs to if any. */
 export function describeOfferingNotice(
   notice: OfferingFormProblem
 ): OfferingNoticeDescription {

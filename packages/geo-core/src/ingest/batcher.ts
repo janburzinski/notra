@@ -31,17 +31,10 @@ const EMPTY_COUNTS: GeoWriteCounts = {
   rejected: 0,
 };
 
-/** A write that may succeed if tried again later. */
 class RetryableWriteError extends Error {}
 
-// Tinybird rejected the payload itself; resending it unchanged never works.
 const PERMANENT_STATUS_CODES = new Set([400, 413, 422]);
 
-/**
- * Network failures, timeouts, rate limits, server errors and auth/config
- * problems are retried. Rejected payloads and the SDK's own client-side
- * validation errors are not: retrying them would block every later event.
- */
 function isRetryable(error: unknown): boolean {
   if (error instanceof RetryableWriteError || error instanceof TypeError) {
     return true;
@@ -130,12 +123,6 @@ export function createEventBatcher<R extends BatchedRow>(
     }
   }
 
-  /**
-   * Writes one chunk. A rejected payload is split in halves until the rows
-   * Tinybird refuses are isolated, so one bad row (or an oversized chunk)
-   * never takes valid events down with it. On a retryable failure the rows
-   * not yet accepted come back as `pending`, never ones already written.
-   */
   async function writeChunk(
     chunk: R[],
     context: Record<string, unknown>
@@ -187,7 +174,6 @@ export function createEventBatcher<R extends BatchedRow>(
     }
   }
 
-  /** Resolves to false when a retryable failure put rows back in the buffer. */
   async function writeAll(
     rows: R[],
     trigger: GeoFlushTrigger
@@ -230,8 +216,6 @@ export function createEventBatcher<R extends BatchedRow>(
       durationMs: Math.round(performance.now() - startedAt),
       ...context,
     } as const;
-    // Quarantined or rejected rows failed Tinybird's checks and would fail
-    // again, so they are reported instead of retried.
     if (totals.quarantined > 0 || totals.rejected > 0) {
       geoLog.error({ ...fields, outcome: "partial" });
     } else {
@@ -285,8 +269,6 @@ export function createEventBatcher<R extends BatchedRow>(
     liveWrites.add(writing);
     writing
       .then((written) => {
-        // A transient failure must not leave an open live view waiting for
-        // the next window; retry a few times before falling back to it.
         const attempts = written ? 0 : (liveAttempts.get(organizationId) ?? 0);
         if (written || attempts >= GEO_INGEST_LIVE_MAX_RETRIES) {
           liveAttempts.delete(organizationId);
@@ -320,7 +302,6 @@ export function createEventBatcher<R extends BatchedRow>(
       return true;
     },
     expedite(organizationId) {
-      // One pending write per organization absorbs a burst of requests.
       scheduleLiveFlush(organizationId, liveFlushDelayMs);
     },
     flush: () => flush(),
@@ -331,8 +312,6 @@ export function createEventBatcher<R extends BatchedRow>(
         clearTimeout(liveTimer);
       }
       liveTimers.clear();
-      // Live writes hold rows outside the buffer; a failed one puts them
-      // back, so the final flush below covers it.
       await Promise.all([windowFlush, ...liveWrites]);
       await flush("shutdown");
     },

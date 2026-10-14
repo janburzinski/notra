@@ -225,7 +225,6 @@ function ChatOgComposer({ notraDataUrl }: ChatOgComposerProps) {
               fontWeight: 500,
             }}
           >
-            {/* biome-ignore lint/performance/noImgElement: next/og JSX requires native img */}
             <img alt="" height={14} src={notraDataUrl} width={14} />
             <span>Auto</span>
           </div>

@@ -46,7 +46,6 @@ async function getTrustedParentCommitBody(
     .slice(1)
     .join("\n\n")
     .split(/\r?\n/)
-    // Only the exported snapshot may suppress a webhook import, not its edits.
     .filter((line) => !line.startsWith(GITHUB_CONTENT_POST_TRAILER))
     .join("\n");
   return body || undefined;

@@ -45,7 +45,6 @@
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(0 0% 98%);
   --border: hsl(0 0% 89.8%);
-  /* Dualtone shell around tables and panels, shared with @notra/ui. */
   --shell: hsl(240 6% 94.5%);
   --shell-border: hsl(240 5% 87%);
   --surface-lift:
@@ -444,9 +443,6 @@
   }
 }
 
-/* Blog diagrams: a dot travels one segment in 0.6 s (0.25 s for short stubs) and
-   a scan sweeps a panel in 0.55 s, so a whole sequence fits in the first ~80% of
-   the cycle and the rest is a pause. */
 .diagram-flow-travel,
 .diagram-flow-travel-short,
 .diagram-flow-scan {
@@ -455,7 +451,6 @@
     calc(var(--flow-delay, 0) * var(--flow-cycle)) infinite both;
 }
 
-/* Segments of a multi-part path move at constant speed so the dot doesn't stall at corners. */
 .diagram-flow-travel.diagram-flow-linear {
   animation-name: diagramFlowTravelLinear;
 }
@@ -545,9 +540,3 @@
   animation-duration: 420ms;
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
-
-/*
- * The reduced-motion baseline lives in @notra/ui/motion.css and the status /
- * GEO colour tokens live in @notra/ui/status.css — both imported at the top of
- * this file.
- */

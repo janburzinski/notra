@@ -30,7 +30,6 @@ export function DesignSystemSidebar({ activeId }: { activeId: string | null }) {
   const pathname = usePathname();
   const onIndex = pathname === DESIGN_SYSTEM_PATH;
   const { isMobile, setOpenMobile } = useSidebar();
-  // The mobile sidebar is a sheet over the page; close it so the target shows.
   const closeOnMobile = () => {
     if (isMobile) {
       setOpenMobile(false);

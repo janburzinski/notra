@@ -73,8 +73,6 @@ export function useEngineFamilySheet({
       (result) => engineFamilyOf(result.engine) === family.family
     )?.engine ?? null;
   const promptHits = engineFamilyPromptHits(family.family, promptResults);
-  // A disabled live query reports loading forever, so only an org's prompt
-  // list can hold the stat back.
   const promptCoverage =
     organizationId && isPromptsLoading
       ? null

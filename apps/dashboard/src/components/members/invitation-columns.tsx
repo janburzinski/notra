@@ -73,7 +73,6 @@ export function useInvitationColumns(): TableColumn<InvitationSummary>[] {
       cell: (invitation) => {
         const expiresAt = new Date(invitation.expiresAt);
         const date = expiresAt.toLocaleDateString(locale);
-        // Expired invitations stay "pending" until resent or canceled.
         const expired = expiresAt.getTime() <= now.getTime();
         return (
           <span

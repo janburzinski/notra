@@ -63,7 +63,6 @@ function weightCandidates(weights: (number | undefined)[]): string[] {
   ];
 }
 
-/** The Google families the site uses, with every weight the theme renders. */
 function requestedWeights(
   fonts: SiteConfig["fonts"]
 ): Map<string, (number | undefined)[]> {
@@ -74,14 +73,11 @@ function requestedWeights(
       weights: [fonts?.body?.weight ?? fonts?.weight],
     },
     {
-      // Headings fall back to the top-level font, then to the body font.
       spec: fonts?.heading?.family
         ? fonts.heading
         : fonts?.family
           ? fonts
           : fonts?.body,
-      // Without its own weight a heading renders at the theme default, so that
-      // weight has to be downloaded even when the body pins another one.
       weights:
         headingWeight === undefined
           ? [undefined, DEFAULT_HEADING_WEIGHT]
@@ -131,7 +127,6 @@ async function firstSupportedSpec(
   throw new Error(`Google Fonts has no ${family} in the requested weights`);
 }
 
-/** Picks, per family, the first weight spec Google accepts. */
 async function supportedFontsUrl(
   candidates: Map<string, string[]>
 ): Promise<URL> {
@@ -215,13 +210,10 @@ export async function prepareSiteFonts(
         [...candidates].map(([family, specs]) => [family, specs[0] ?? ""])
       )
     );
-    // The fallback can download other weights than the first URL asks for,
-    // so the candidates belong in the key too.
     const key = createHash("sha256")
       .update(url.toString())
       .update(JSON.stringify([...candidates]))
       .digest("hex");
-    // Preparation clears site/, but unchanged preview fonts can survive in this cache.
     const cacheRoot = join(workDir, "font-cache");
     const cacheDir = join(cacheRoot, key);
     const publicPath = `/${SITE_ASSETS_DIR}/fonts/${key}`;
@@ -238,7 +230,6 @@ export async function prepareSiteFonts(
         // A font without the full default range: retry with ranges it has.
         await rm(stagingDir, { recursive: true, force: true });
         stagingDir = await mkdtemp(join(cacheRoot, "batch-"));
-        // Each family passed on its own, so a renamed family can't fail it again.
         await downloadSiteFonts(
           await supportedFontsUrl(candidates),
           [...families.keys()],
@@ -261,7 +252,6 @@ export async function prepareSiteFonts(
       diagnostics: [],
     };
   } catch (error) {
-    // Downloads never touch public/. Remove a partial copy if publishing itself failed.
     await Promise.all(
       [stagingDir, publicDir]
         .filter((path) => path !== undefined)
@@ -311,7 +301,6 @@ async function downloadSiteFonts(
   ) {
     throw new FontRequestError(400);
   }
-  // Validate the entire stylesheet before making any font requests.
   const sources = urls.map((source) => {
     const parsed = new URL(source);
     if (
@@ -351,7 +340,6 @@ async function downloadSiteFonts(
       replacements.set(source, `./${name}`);
     })
   );
-  // Bound in-flight buffers, and wait for every worker before cleaning a failed batch.
   const results = await Promise.allSettled(
     Array.from({ length: FONT_DOWNLOAD_CONCURRENCY }, async () => {
       let download = downloads.shift();

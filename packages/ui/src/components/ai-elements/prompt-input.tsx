@@ -106,7 +106,6 @@ export const usePromptInputController = () => {
   return ctx;
 };
 
-// Optional variants (do NOT throw). Useful for dual-mode components.
 const useOptionalPromptInputController = () =>
   useContext(PromptInputController);
 
@@ -135,11 +134,9 @@ export function PromptInputProvider({
   initialInput: initialTextInput = "",
   children,
 }: PromptInputProviderProps) {
-  // ----- textInput state
   const [textInput, setTextInput] = useState(initialTextInput);
   const clearInput = useCallback(() => setTextInput(""), []);
 
-  // ----- attachments state (global when wrapped)
   const [attachmentFiles, setAttachmentFiles] = useState<
     (FileUIPart & { id: string })[]
   >([]);
@@ -181,7 +178,6 @@ export function PromptInputProvider({
     }
   }, []);
 
-  // Cleanup blob URLs on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
       const previous = attachmentsRef.current;
@@ -240,14 +236,10 @@ export function PromptInputProvider({
   );
 }
 
-// ============================================================================
-// Component Context & Hooks
-// ============================================================================
 
 const LocalAttachmentsContext = createContext<AttachmentsContext | null>(null);
 
 export const usePromptInputAttachments = () => {
-  // Dual-mode: prefer provider if present, otherwise use local
   const provider = useOptionalProviderAttachments();
   const local = useContext(LocalAttachmentsContext);
   const context = provider ?? local;
@@ -423,9 +415,6 @@ export type PromptInputProps = Omit<
   multiple?: boolean;
   // When true, accepts drops anywhere on document. Default false (opt-in).
   globalDrop?: boolean;
-  // Render a hidden input with given name and keep it in sync for native form posts. Default false.
-  syncHiddenInput?: boolean;
-  // Minimal constraints
   maxFiles?: number;
   maxFileSize?: number; // bytes
   onError?: (err: {
@@ -443,7 +432,6 @@ export const PromptInput = ({
   accept,
   multiple,
   globalDrop,
-  syncHiddenInput,
   maxFiles,
   maxFileSize,
   onError,
@@ -451,15 +439,12 @@ export const PromptInput = ({
   children,
   ...props
 }: PromptInputProps) => {
-  // Try to use a provider controller if present
   const controller = useOptionalPromptInputController();
   const usingProvider = !!controller;
 
-  // Refs
   const inputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
-  // ----- Local attachments (only used when no provider)
   const [items, setItems] = useState<(FileUIPart & { id: string })[]>([]);
   const itemsRef = useRef<(FileUIPart & { id: string })[]>([]);
   const files = usingProvider ? controller.attachments.files : items;
@@ -481,7 +466,7 @@ export const PromptInput = ({
 
       return patterns.some((pattern) => {
         if (pattern.endsWith("/*")) {
-          const prefix = pattern.slice(0, -1); // e.g: image/* -> image/
+          const prefix = pattern.slice(0, -1);
           return f.type.startsWith(prefix);
         }
         return f.type === pattern;
@@ -559,7 +544,6 @@ export const PromptInput = ({
     ? controller.attachments.openFileDialog
     : openFileDialogLocal;
 
-  // Let provider know about our hidden file input so external menus can call openFileDialog()
   useEffect(() => {
     if (!usingProvider) {
       return;
@@ -567,22 +551,13 @@ export const PromptInput = ({
     controller.__registerFileInput(inputRef, () => inputRef.current?.click());
   }, [usingProvider, controller]);
 
-  // Note: File input cannot be programmatically set for security reasons
-  // The syncHiddenInput prop is no longer functional
-  useEffect(() => {
-    if (syncHiddenInput && inputRef.current && files.length === 0) {
-      inputRef.current.value = "";
-    }
-  }, [files, syncHiddenInput]);
-
-  // Attach drop handlers on nearest form and document (opt-in)
   useEffect(() => {
     const form = formRef.current;
     if (!form) {
       return;
     }
     if (globalDrop) {
-      return; // when global drop is on, let the document-level handler own drops
+      return;
     }
 
     const onDragOver = (e: DragEvent) => {
@@ -649,7 +624,6 @@ export const PromptInput = ({
     if (event.currentTarget.files) {
       add(event.currentTarget.files);
     }
-    // Reset input value to allow selecting files that were previously removed
     event.currentTarget.value = "";
   };
 
@@ -693,18 +667,14 @@ export const PromptInput = ({
           return (formData.get("message") as string) || "";
         })();
 
-    // Reset form immediately after capturing text to avoid race condition
-    // where user input during async blob conversion would be lost
     if (!usingProvider) {
       form.reset();
     }
 
-    // Convert blob URLs to data URLs asynchronously
     Promise.all(
       files.map(async ({ ...item }) => {
         if (item.url?.startsWith("blob:")) {
           const dataUrl = await convertBlobUrlToDataUrl(item.url);
-          // If conversion failed, keep the original blob URL
           return {
             ...item,
             url: dataUrl ?? item.url,
@@ -717,7 +687,6 @@ export const PromptInput = ({
         try {
           const result = onSubmit({ text, files: convertedFiles }, event);
 
-          // Handle both sync and async onSubmit
           if (result instanceof Promise) {
             result
               .then(() => {
@@ -730,7 +699,6 @@ export const PromptInput = ({
                 // Don't clear on error - user may want to retry
               });
           } else {
-            // Sync function completed without throwing, clear attachments
             clear();
             if (usingProvider) {
               controller.textInput.clear();
@@ -745,7 +713,6 @@ export const PromptInput = ({
       });
   };
 
-  // Render with or without local provider
   const inner = (
     <>
       <input
@@ -811,7 +778,6 @@ export const PromptInputTextarea = ({
       }
       e.preventDefault();
 
-      // Check if the submit button is disabled before submitting
       const form = e.currentTarget.form;
       const submitButton = form?.querySelector(
         'button[type="submit"]',
@@ -823,7 +789,6 @@ export const PromptInputTextarea = ({
       form?.requestSubmit();
     }
 
-    // Remove last attachment when Backspace is pressed and textarea is empty
     if (
       e.key === "Backspace" &&
       e.currentTarget.value === "" &&
@@ -989,8 +954,6 @@ export const PromptInputActionMenuItem = ({
   <DropdownMenuItem className={cn(className)} {...props} />
 );
 
-// Note: Actions that perform side-effects (like opening a file dialog)
-// are provided in opt-in modules (e.g., prompt-input-attachments).
 
 export type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {
   status?: ChatStatus;

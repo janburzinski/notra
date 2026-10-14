@@ -7,7 +7,6 @@ import type { ChartRangeSelection } from "@/components/evilcharts/charts/echarts
 interface ZoomRange {
   from: number;
   to: number;
-  /** The date range the zoom was made on, so a new range drops it. */
   key: string;
 }
 
@@ -60,7 +59,6 @@ export function useTrafficZoom<Row>(
         resetZoom();
       }
     };
-    // Capture phase: a focused button or the canvas must not swallow Escape.
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
   }, [zoomed, resetZoom]);

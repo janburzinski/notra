@@ -73,7 +73,6 @@ export function countSourcePages(
   return sources.reduce((total, source) => total + source.pages, 0);
 }
 
-/** Sites, pages and use of the own site across every answer of a check. */
 export function summarizeOfferingSources(
   answers: readonly OfferingAnswer[]
 ): OfferingSourceSummary {

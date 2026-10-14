@@ -41,8 +41,6 @@ export function modelsDevLogoUrl(provider: string): string {
   return `${MODELS_DEV_LOGO_BASE}/${encodeURIComponent(modelsDevLogoSlug(provider))}.svg`;
 }
 
-// Tracked engines carry a curated label (GEO_ENGINE_LABELS); fall back to the
-// slug-derived label so the same engine id reads identically across cards.
 export function formatModelLabel(modelId: string): string {
   const trimmed = modelId.trim();
   const engineLabel = engineFamilyLabel(trimmed);
@@ -93,9 +91,6 @@ export function resolveChartEngineId(label: string): string {
   return chartLabelToEngineId(label.trim());
 }
 
-// Agent/studio GEO charts store either a raw engine id or the older
-// `provider/slug (grounded)` axis label. Catalog keys (including slash-less
-// legacy ids like `perplexity-sonar`) win before any display-label passthrough.
 export function formatChartEngineLabel(label: string): string {
   const trimmed = label.trim();
   const engineId = chartLabelToEngineId(trimmed);
@@ -159,8 +154,6 @@ function formatModelToken(token: string): string {
   if (ALPHA_TOKEN.test(token)) {
     return `${token.charAt(0).toUpperCase()}${token.slice(1).toLowerCase()}`;
   }
-  // Mixed tokens ("qwen3", "o3", "4o", "5.4"): reuse a known label for the
-  // alphabetic prefix when there is one, otherwise keep the token as written.
   const match = ALPHA_PREFIX_WITH_DIGITS.exec(lower);
   if (match) {
     const [, prefix = "", rest = ""] = match;

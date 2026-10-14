@@ -71,11 +71,6 @@ export async function findSiteGitHubPublishTarget(
   };
 }
 
-/**
- * Reads a text file, null when it does not exist. With `strict`, any other
- * failure throws: callers that merge into the file must not mistake a GitHub
- * hiccup for "no file" and drop what it contains.
- */
 async function readRepositoryTextFile(
   token: string,
   params: ReadSiteRepositoryTextFileParams,

@@ -106,8 +106,6 @@ export function recordRequestAIUsage(call: ModelCallUsage): void {
   }
   const usage = usageFor(logger);
   const route = routeInfo(call.providerMetadata);
-  // The router metadata names the model that answered, which differs from the
-  // requested one when OpenRouter served a fallback.
   const model = route.model ?? call.model;
   const inputTokens = call.inputTokens ?? 0;
   const outputTokens = call.outputTokens ?? 0;

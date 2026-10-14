@@ -12,7 +12,6 @@ import {
   getTextLineRects,
 } from "@/utils/find-passage-range";
 
-// The post body may still be loading or the panel still opening.
 const FIND_ATTEMPTS = 12;
 const FIND_RETRY_MS = 100;
 
@@ -49,8 +48,6 @@ export function useAnnotationFlash(
       const article = articleRef.current;
       const scroller = scrollRef.current;
       const [range] = article ? findPassageRanges(article, [passage]) : [];
-      // Measure only once the panel has stopped growing, or the boxes land
-      // where the text was before it reflowed.
       const width = scroller?.clientWidth ?? -1;
       const settling = width !== lastWidth;
       lastWidth = width;
@@ -87,8 +84,6 @@ export function useAnnotationFlash(
       );
       timer = setTimeout(() => {
         setRects([]);
-        // Cleared once shown, so remounting this tab later does not flash
-        // the same passage again.
         markHandled();
       }, CHAT_ANNOTATION_FLASH_MS);
     };

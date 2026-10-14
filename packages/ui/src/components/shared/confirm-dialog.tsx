@@ -35,7 +35,6 @@ export function ConfirmDialog({
   const busy = pending || running;
 
   function handleOpenChange(nextOpen: boolean) {
-    // Keep the dialog up while the action runs so its result stays visible.
     if (busy) {
       return;
     }

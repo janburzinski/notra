@@ -244,7 +244,6 @@ function parseFrontmatter(markdown: string | null | undefined): {
   };
 }
 
-/** Dates stay unquoted so YAML-aware tools read them as dates. */
 function plainScalar(value: string): Scalar {
   const scalar = new Scalar(value);
   scalar.type = Scalar.PLAIN;
@@ -272,7 +271,6 @@ export function buildSiteEntryMarkdown(
   params: BuildSiteEntryMarkdownParams
 ): string {
   const own = parseFrontmatter(params.markdown);
-  // A broken block would otherwise end up in the article body.
   if (own.invalid) {
     throw new SiteEntryFrontmatterError();
   }
@@ -290,8 +288,6 @@ export function buildSiteEntryMarkdown(
     : stripLeadingTitleHeading(params.markdown, params.title);
   const metadata = params.metadata ?? {};
   const isBlog = params.contentType === "blog_post";
-  // Hand-written editor frontmatter is taken as complete: nothing is
-  // derived from the body then.
   const autoFill = !own.document;
   const write = (key: string, value: unknown) => {
     if (ownKeys.has(key)) {
@@ -304,7 +300,6 @@ export function buildSiteEntryMarkdown(
     }
   };
 
-  // Leave an unchanged title alone so its quoting style survives.
   if (document.get("title") !== params.title) {
     document.set("title", params.title);
   }
@@ -330,7 +325,6 @@ export function buildSiteEntryMarkdown(
   } else if (authors.length > 1) {
     write("author", authors.map(authorNode));
   } else {
-    // Nobody chosen in Notra: credit the publisher, as before authors existed.
     write("author", isBlog ? params.author?.trim() || null : null);
   }
 
@@ -345,12 +339,10 @@ export function buildSiteEntryMarkdown(
     metadata.tags && metadata.tags.length > 0 ? metadata.tags : null
   );
 
-  // Changelog entries have no featured slot and no per-entry noindex.
   write("featured", isBlog && metadata.featured ? true : null);
   write("noindex", isBlog && metadata.noindex ? true : null);
   write("hidden", metadata.hidden ? true : null);
 
-  // Quoted strings: YAML 1.1 parsers would read a plain `No` or `on` as a boolean.
   const yaml = document
     .toString({
       defaultKeyType: "PLAIN",

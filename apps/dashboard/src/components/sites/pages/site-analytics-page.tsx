@@ -46,7 +46,6 @@ export function SiteAnalyticsPage() {
     trafficPathOptions(data?.web.pages ?? []),
     siteId
   );
-  // A path filter that matches nothing must still show the filter to clear it.
   const isFiltered = pathQuery !== "";
   const canShowAnalytics =
     data?.web.configured && (hasVisits || analyticsOn || isFiltered);

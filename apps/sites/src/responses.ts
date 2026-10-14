@@ -62,7 +62,6 @@ export async function serveFile(params: ServeFileParams): Promise<Response> {
     status === 200 && file.contentType.startsWith("text/html")
       ? (params.analytics ?? null)
       : null;
-  // The injected tag changes the body, so it must change the validator too.
   const etag = analytics ? `"${file.sha256}-a"` : `"${file.sha256}"`;
   const headers = new Headers({
     "Content-Type": file.contentType,

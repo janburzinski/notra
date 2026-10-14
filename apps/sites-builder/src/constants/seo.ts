@@ -31,5 +31,4 @@ export const IMAGE_MIME_TYPES: Record<string, string> = {
 
 export const IMAGE_URL_EXTENSION = /\.([a-z0-9]+)$/i;
 
-/** H2 titles that mark a FAQ section; its H3s become FAQPage questions. */
 export const FAQ_HEADING = /^(?:frequently asked questions|faqs?|q\s*&\s*a)$/i;

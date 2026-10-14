@@ -1,4 +1,3 @@
-// Local wrangler entry: same queue/cron handler as src/worker.ts, Postgres instead of Neon.
 import { Config, ConfigProvider, Effect, Layer } from "effect";
 
 import { sweep } from "../src/programs/recovery";

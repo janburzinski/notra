@@ -33,7 +33,6 @@ export function getIngestProjectId(c: Context): string | undefined {
   if (!auth || !isIngestAuth(auth)) {
     return undefined;
   }
-  // Unbound org-scoped ingest tokens use null; fall back to body.projectId.
   return auth.projectId ?? undefined;
 }
 
@@ -44,15 +43,10 @@ export function isPublicFeedbackIngestRequest(
   return method === "POST" && PUBLIC_FEEDBACK_INGEST_PATH_REGEX.test(pathname);
 }
 
-/**
- * Any request aimed at the feedback resource — public slug ingest included.
- * The subscription gate skips the whole resource because feedback is free.
- */
 export function isFeedbackApiRequest(pathname: string): boolean {
   return FEEDBACK_API_PATH_REGEX.test(pathname);
 }
 
-/** Leave unexpected database errors to Hono's central error handler. */
 export function runFeedbackProgram<A, E extends FeedbackDomainError>(
   program: Effect.Effect<A, E | FeedbackDatabaseError>
 ) {

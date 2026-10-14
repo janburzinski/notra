@@ -33,7 +33,6 @@ export function SiteCreateDeployHeading({
       ) : (
         headline
       )}
-      {/* Only settled states are announced; the ticking build timer is not. */}
       <span aria-live="polite" className="sr-only">
         {tone === "pending" ? "" : headline}
       </span>

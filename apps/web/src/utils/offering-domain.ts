@@ -5,7 +5,6 @@ import {
   OFFERING_WWW_PATTERN,
 } from "@/constants/offering-check";
 
-/** The bare hostname for what a visitor typed, or null if it is not a site. */
 export function normalizeDomain(input: string): string | null {
   const trimmed = input.trim().toLowerCase();
   if (trimmed.length === 0) {

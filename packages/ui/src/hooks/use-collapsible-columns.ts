@@ -35,11 +35,7 @@ export function useCollapsibleColumns<T>(
 ) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hiddenCount, setHiddenCount] = useState(0);
-  // Columns are usually rebuilt every render; only their floors matter here,
-  // so effects key on this signature and read the latest columns from a ref.
   const signature = columns.map(columnSignature).join("|");
-  // Fixed chrome widths shift the floors too, and they arrive as a fresh
-  // array every render, so they join the deps as a string like the columns do.
   const chromeSignature = extraFixedWidths.join("|");
   const latest = useRef({ columns, extraFixedWidths });
   useLayoutEffect(() => {

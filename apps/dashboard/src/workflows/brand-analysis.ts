@@ -33,11 +33,6 @@ interface BrandAnalysisLogContext {
   retentionDays: LogRetentionDays;
 }
 
-/**
- * Records the analysis outcome in the organization activity log. The progress
- * state above powers the live UI only; without a log entry there is no
- * durable record of what ran or why it failed.
- */
 async function logBrandAnalysisRun(
   context: BrandAnalysisLogContext,
   outcome:

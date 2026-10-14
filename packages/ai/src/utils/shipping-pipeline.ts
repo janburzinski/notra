@@ -54,7 +54,6 @@ export function createShippingPipeline(
           overflowCount += events.length;
         } else {
           reportOverflow();
-          // Transport errors may contain response bodies or credentials.
           console.error(
             `[${policy.label}] dropped ${events.length} events (delivery failed)`
           );

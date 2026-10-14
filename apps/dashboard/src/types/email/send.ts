@@ -6,10 +6,6 @@ import type {
 import type { ScheduledPublicationFailedEmailProps } from "@notra/email/types/scheduled-publication-failed";
 import type { WorkflowPausedReason } from "@notra/email/types/workflow-paused";
 
-/**
- * Digest emails are keyed by the exact batch they flush, so a retried workflow
- * step replays the Brew fire instead of sending twice.
- */
 interface DigestEmailProps {
   digestBatchKey: string;
 }

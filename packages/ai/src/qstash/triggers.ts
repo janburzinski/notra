@@ -52,7 +52,6 @@ function getScheduleAppUrl() {
   return appUrl;
 }
 
-/** Classify the SDK's text-only rejection once, where the raw body lives. */
 function toScheduleCreateError(error: unknown) {
   if (
     error instanceof QStashSdkError &&
@@ -100,8 +99,6 @@ export function buildCronExpression(config?: TriggerCronConfig) {
     return `${minute} ${hour} ${dayOfMonth} * *`;
   }
 
-  // "custom" (every N days) fires daily; the schedule workflow gates the run
-  // against the interval anchor because cron cannot express it.
   return `${minute} ${hour} * * *`;
 }
 
@@ -147,7 +144,6 @@ export async function createQstashSchedule({
   cron,
   scheduleId,
 }: CreateQstashScheduleProps) {
-  // The public demo saves schedules but never registers real callbacks.
   if (isDemoMode()) {
     return scheduleId ?? `demo-schedule-${triggerId}`;
   }
@@ -234,7 +230,6 @@ export async function publishQstashRouteMessage({
   await client.publishJSON({
     url: `${baseUrl}${path}`,
     body,
-    // Whole seconds, rounded up so the message never lands before the time.
     notBefore: Math.ceil(notBefore.getTime() / 1000),
     deduplicationId,
   });

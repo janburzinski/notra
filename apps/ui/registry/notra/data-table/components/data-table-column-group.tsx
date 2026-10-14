@@ -17,8 +17,6 @@ export function DataTableColumnGroup<T>({
     columns,
     selectable ? [CHECKBOX_COLUMN_WIDTH] : []
   );
-  // The trailing spacer only takes leftover room when every column is fixed;
-  // otherwise it would split the space with the flexible columns.
   const hasFlexibleColumn = columns.some(
     (column) =>
       widths[column.key] == null && (!column.width || isFrWidth(column.width))

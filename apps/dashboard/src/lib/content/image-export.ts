@@ -25,15 +25,12 @@ type CopyAsPaperImport = () => Promise<CopyAsPaper>;
 
 const importCopyAsFigma: CopyAsFigmaImport = async () => {
   const kiwi = await import("@notra/kiwi");
-  // Inter (~1.17 MB) is a nested dynamic import. Warm it here so copy-ready
-  // means the click path will not wait on the font before clipboard.write.
   await kiwi.loadFallbackFont();
   return kiwi.copyAsFigma;
 };
 const importCopyAsPaper: CopyAsPaperImport = () =>
   import("@notra/kiwi/paper").then((module) => module.copyAsPaper);
 
-// Kiwi (Figma/Paper paste + Inter payload) stays off `/content/[id]` initial JS.
 let copyAsFigmaPromise: Promise<CopyAsFigma> | null = null;
 let copyAsPaperPromise: Promise<CopyAsPaper> | null = null;
 let copyAsFigmaFn: CopyAsFigma | null = null;
@@ -73,7 +70,6 @@ export function isImageExportCopyReady(target: ImageExportTarget): boolean {
   if (target === "paper") {
     return copyAsPaperFn !== null;
   }
-  // The scene is fetched inside the click; nothing to preload.
   return isDiagramExportTarget(target);
 }
 
@@ -236,7 +232,6 @@ async function fetchExcalidrawClipboardBlob(sceneUrl: string): Promise<Blob> {
     throw new Error("Excalidraw scene has no elements");
   }
   const files = "files" in scene ? scene.files : {};
-  // Excalidraw and tldraw both read this shape from text/plain on paste.
   const payload = JSON.stringify({
     type: EXCALIDRAW_CLIPBOARD_TYPE,
     elements: scene.elements,
@@ -259,8 +254,6 @@ export async function copyDiagramScene(
         new ClipboardItem({ "text/plain": blob }),
       ]);
     } catch {
-      // The scene is plain text; ClipboardItem support or permission is not
-      // required when the browser's text/native copy path is available.
       await writeClipboardText(await (await blob).text());
     }
     toast.success(

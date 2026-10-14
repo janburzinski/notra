@@ -103,7 +103,6 @@ function validateSlotFile(path: string): SiteDiagnostic[] {
 
 type Instructions = SiteConfig["markdown"]["instructions"];
 
-/** Fills variables in, then re-checks the length limits against the result. */
 function substituteInstructions(
   instructions: Instructions,
   fill: (text: string, setting: string) => string | undefined,

@@ -250,8 +250,6 @@ export async function listSiteDrafts(siteId: string): Promise<SiteDraft[]> {
     .where(eq(siteDrafts.siteId, siteId));
 }
 
-// Locks the site row so a branch or root directory change cannot race the
-// draft write, and rejects drafts made against a different source.
 async function lockSourceContext(
   tx: SiteStorageTransaction,
   siteId: string,

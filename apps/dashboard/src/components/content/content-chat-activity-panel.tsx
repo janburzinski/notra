@@ -104,8 +104,6 @@ function ContentChatActivityFeed({
   );
 }
 
-// Subagents get their own row with nested steps instead of hiding inside the
-// collapsed activity group.
 function isAgentPanelStandaloneTool(
   part: Parameters<typeof isContentEditorStandaloneTool>[0]
 ): boolean {

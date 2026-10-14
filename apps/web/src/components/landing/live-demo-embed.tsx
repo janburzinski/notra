@@ -28,8 +28,6 @@ function openStandaloneDemo() {
 export function LiveDemoEmbed() {
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  // The iframe mounts on the first click; the preview stays on top until the
-  // demo has finished its entry redirects so fullscreen never opens blank.
   const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
   const [stalled, setStalled] = useState(false);

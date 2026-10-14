@@ -41,8 +41,6 @@
   }
 }
 
-/* The primary gradient without the soft halo, for buttons inside cards and
-   callouts where the halo would crowd the edges. */
 @utility cta-gradient-primary-flat {
   --cta-gradient-from: oklab(69.9% 0.067 -0.16);
   --cta-gradient-to: oklab(52.6% 0.113 -0.27);

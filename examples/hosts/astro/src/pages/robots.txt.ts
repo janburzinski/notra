@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 
-// /robots.txt belongs to this website, so it lists the section sitemaps that Notra serves.
 export const GET: APIRoute = ({ site }) => {
   const origin = site?.origin ?? "";
   const body = [

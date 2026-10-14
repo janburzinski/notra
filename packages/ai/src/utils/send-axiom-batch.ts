@@ -50,10 +50,8 @@ export async function sendAxiomBatch(
   });
   if (!response.ok) {
     await response.body?.cancel().catch(() => {});
-    // Match the shipping policy without including response text or credentials.
     throw new Error(`Axiom API error: ${response.status}`);
   }
-  // A 2xx may already have accepted a subset. Never replay it for a bad response body.
   const body: unknown = await response.json().catch(() => undefined);
   if (isRecord(body)) {
     if (

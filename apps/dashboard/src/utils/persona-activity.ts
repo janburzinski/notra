@@ -84,11 +84,6 @@ function lastScanDayByKey(points: readonly GeoPersonaActivityPoint[]) {
   return lastDay;
 }
 
-/**
- * A day without checks reads as 0% so the line stays on the baseline instead
- * of breaking. Two exceptions stay empty: today before its scan has landed
- * (the forecast bridges it), and days after a previous snapshot was replaced.
- */
 function missingDayRate(
   item: PersonaActivitySeries,
   day: string,
@@ -162,8 +157,6 @@ export function buildPersonaActivityRows(
     const key = personaForecastKey(item.personaId, item.snapshotVersion);
     const forecast = Math.max(0, Math.min(100, (mentions / checks) * 100));
     forecasts.set(key, forecast);
-    // Start the dashed line on the latest actual value so it continues the
-    // solid one; while today's scan is pending, today already shows the forecast.
     const todayRate = last[item.dataKey];
     if (typeof todayRate === "number") {
       last[key] = todayRate;

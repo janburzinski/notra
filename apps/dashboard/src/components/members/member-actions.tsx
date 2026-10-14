@@ -108,12 +108,10 @@ export function MemberActions({ member }: MemberActionsProps) {
     newRole: normalizeMemberRole(member.role),
   });
 
-  // Don't show actions for the current user or if no organization
   if (!activeOrganization || member.userId === currentUser?.id) {
     return null;
   }
 
-  // Don't show actions for owners (they can't be removed)
   if (member.role === "owner") {
     return null;
   }
@@ -123,7 +121,6 @@ export function MemberActions({ member }: MemberActionsProps) {
       return;
     }
 
-    // Don't update if role hasn't changed
     if (newRole === member.role) {
       dispatch({ type: "roleDialogChanged", open: false });
       return;

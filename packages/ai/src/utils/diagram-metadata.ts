@@ -7,8 +7,6 @@ import {
   readString,
 } from "@notra/ai/utils/unknown-record";
 
-// What an image post's sourceMetadata says about its diagram.
-
 /** The editable spec saved on a diagram post, or null for other images. */
 export function readDiagramSpec(metadata: unknown): DiagramSpec | null {
   if (!isRecord(metadata)) {

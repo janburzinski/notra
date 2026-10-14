@@ -160,7 +160,6 @@ test("OpenRouter telemetry and billing distinguish absent/null BYOK measurement 
         measuredCost === undefined ? undefined : 0.25 + measuredCost
       );
       assert.equal(metadata?.byokInferenceCostUsd, measuredCost);
-      // Chat SDK normalization drops raw is_byok, so false cannot prove zero.
       const normalizedUsage = result.providerMetadata?.openrouter?.usage;
       assert.ok(isRecord(normalizedUsage));
       assert.equal(normalizedUsage.is_byok, undefined);

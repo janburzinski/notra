@@ -49,7 +49,6 @@ type AgentReadinessProgramError =
   | AgentReadinessStartError
   | AgentReadinessTargetMissingError;
 
-/** Domain failures from geo-core plus API-boundary validation errors. */
 export type GeoProgramError =
   | GeoRouterError
   | GeoSelectionInvalidError

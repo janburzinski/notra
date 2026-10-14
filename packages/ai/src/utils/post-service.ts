@@ -79,8 +79,6 @@ export async function matchExistingTags(
   if (!parsed.success || parsed.data.length === 0) {
     return [];
   }
-  // Only the requested tags, any case, most used spelling first: no limit
-  // can hide a rarely used tag.
   const keys = parsed.data.map((tag) => tag.toLowerCase());
   const existing = await db.execute<{ tag: string }>(sql`
     select tag

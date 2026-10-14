@@ -27,7 +27,6 @@ const Sites = lazyPage(
 const NewSite = lazyPage(
   () => import("@/app/(dashboard)/[slug]/sites/new/page-client")
 );
-// Child routes render only the body; SiteLayout owns the page shell.
 const Overview = lazyPage(() =>
   import("@/components/sites/pages/site-overview-page").then((module) => ({
     default: module.SiteOverviewPage,

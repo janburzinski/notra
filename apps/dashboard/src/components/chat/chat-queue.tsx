@@ -35,7 +35,6 @@ interface ChatQueueProps {
   onRemove?: (id: string) => void;
   onSteer?: (message: QueuedMessage) => void;
   authorsById?: Map<string, ChatMessageAuthor>;
-  /** Turns the serialized message into a readable chip label. */
   formatLabel?: (text: string) => string;
   showAuthorAvatars?: boolean;
 }

@@ -179,8 +179,6 @@ export async function createSite(
     throw new Error("Could not create site");
   }
   await invalidateSiteIngestCaches(site);
-  // The site exists from here on, so a failed first write must not report the
-  // creation as failed: the first activation writes the serving state anyway.
   await mutateServingState(site, (state) => ({
     write: state,
     result: undefined,

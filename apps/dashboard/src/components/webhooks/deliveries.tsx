@@ -81,7 +81,6 @@ export function WebhookDeliveries({
 }: WebhookDeliveriesProps) {
   const t = useTranslations("settings.panes.webhooks");
   const columns = useWebhookColumns();
-  // A paged table shows the whole page; the header takes one row of height.
   const tableHeight =
     rows.length === 0
       ? WEBHOOK_TABLE_EMPTY_HEIGHT

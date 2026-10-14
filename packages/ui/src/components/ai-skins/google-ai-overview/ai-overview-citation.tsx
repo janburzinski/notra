@@ -37,7 +37,6 @@ export const AIOverviewCitation = ({
     "bg-aio-chip text-aio-muted focus-visible:outline-aio-focus [a]:hover:bg-aio-chip-hover max-w-[10.9375rem] justify-start rounded-full border-0 py-px ps-px pe-2 align-text-top text-[0.6875rem] leading-4 focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-solid",
     className
   );
-  // The same page can back several references, so repeats get a suffix.
   const itemKeys = sources.map((item, index) => {
     const earlier = sources
       .slice(0, index)

@@ -65,7 +65,6 @@ function boxesOverlap(a: Box, b: Box) {
   );
 }
 
-// Liang-Barsky clip: does the segment pass through the box interior?
 function segmentHitsBox([x1, y1]: Point, [x2, y2]: Point, box: Box) {
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -110,10 +109,6 @@ function describe(element: ExcalidrawElement, labels: Map<string, string>) {
  */
 export function findDiagramLayoutIssues(scene: ExcalidrawScene): string[] {
   const issues: string[] = [];
-  // A quarter-turned element is checked by its rotated box, which is exact.
-  // Other angles and curved arrows only come from hand edits; leave them out
-  // of the overlap and crossing checks rather than flag problems that the
-  // straight-segment geometry here cannot see correctly.
   const checked = scene.elements.flatMap((element): ExcalidrawElement[] => {
     if (isLinear(element)) {
       return element.roundness ? [] : [element];
@@ -149,8 +144,6 @@ export function findDiagramLayoutIssues(scene: ExcalidrawScene): string[] {
     }
   }
 
-  // Free text (titles, annotations) and arrow labels are obstacles too: cheap
-  // models like to drop a new arrow label right on top of an annotation.
   const linearIds = new Set(linears.map((linear) => linear.id));
   const freeTexts = texts.filter((text) => text.containerId === null);
   const arrowLabels = texts.filter(

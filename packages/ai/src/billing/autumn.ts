@@ -11,7 +11,6 @@ const AUTUMN_SECRET_KEY = process.env.AUTUMN_SECRET_KEY;
  */
 export const AUTUMN_READ_TIMEOUT_MS = 5000;
 
-/** The part of the Autumn SDK the apps use. */
 export interface AutumnClient {
   check: Autumn["check"];
   track: Autumn["track"];
@@ -19,11 +18,6 @@ export interface AutumnClient {
   balances: Pick<Autumn["balances"], "finalize">;
 }
 
-/**
- * Importing `autumn-js` builds its request/response schemas up front (~0.9 s
- * of CPU), which every cold serverless instance paid before its first
- * response. The SDK now loads on the first billing call instead.
- */
 function createLazyAutumn(secretKey: string): AutumnClient {
   let client: Promise<Autumn> | undefined;
   const load = () => {
@@ -51,8 +45,6 @@ export const autumn = AUTUMN_SECRET_KEY
   ? createLazyAutumn(AUTUMN_SECRET_KEY)
   : null;
 
-// Local development skips Autumn plan/credit gates so AI features work without
-// billing. Production never uses this bypass.
 export const allowUnmeteredAiInDevelopment = shouldBypassAutumnInDevelopment(
   process.env.NODE_ENV,
   AUTUMN_SECRET_KEY

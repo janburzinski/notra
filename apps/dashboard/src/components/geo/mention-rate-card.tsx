@@ -296,8 +296,6 @@ export function MentionRateCard({
                   {totals.visible.toLocaleString(locale)}
                 </FadeSwap>
               </p>
-              {/* Slides with the number's width instead of jumping under the
-                  outgoing value. */}
               <LazyMotion features={loadMotionFeatures} strict>
                 <m.span
                   className="mb-0.5 inline-flex"

@@ -27,7 +27,6 @@ const handler = realtime
           user,
         });
         if (!denied) {
-          // Ingest only publishes traffic updates while someone watches.
           await markGeoLiveWatched(geoLiveChannelOrganizations(channels));
         }
         return denied;

@@ -70,9 +70,7 @@ async function setClientCookie(
       sameSite: "lax",
     };
 
-    await cookieStore.set(cookieOptions).catch(() => {
-      // Failed to set cookie - silently continue
-    });
+    await cookieStore.set(cookieOptions).catch(() => {});
     return;
   }
 
@@ -127,10 +125,6 @@ export const getLastVisitedProjectFromClient = (
     organizationSlug
   );
 
-/**
- * Per workspace, so the shell loader can leave a dismissed onboarding banner
- * out of the server render instead of hiding it after hydration.
- */
 export const onboardingBannerDismissedCookie = (organizationId: string) =>
   `${ONBOARDING_BANNER_DISMISSED_COOKIE_PREFIX}${organizationId}`;
 

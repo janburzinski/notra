@@ -149,7 +149,6 @@ export async function getPostSchedule(params: {
   if (!latest) {
     return null;
   }
-  // Rows written by one schedule call share the slot of the newest row.
   const current = rows.filter(
     (row) => row.scheduledAt.getTime() === latest.scheduledAt.getTime()
   );
@@ -334,13 +333,9 @@ export async function schedulePostPublication(
       if (current.some((row) => row.status === "publishing")) {
         return { ok: false, reason: "publishing_in_progress" };
       }
-      // A social post that may already be live is never replaced silently:
-      // a person checks the account, then retries or cancels it.
       if (current.some((row) => row.externalAttemptAt)) {
         return { ok: false, reason: "unconfirmed_social_post" };
       }
-      // Posting the same text to the same account again is a second post,
-      // not a reschedule. Another account of the platform is fine.
       const socialConfig = validated.configs.find(
         (config) => config.destination === "social"
       );
@@ -361,10 +356,6 @@ export async function schedulePostPublication(
           return { ok: false, reason: "social_already_posted" };
         }
       }
-      // The caller states which pending rows it is replacing. Anything else
-      // (a row that published or failed since the user loaded the page) means
-      // the user is looking at a stale schedule, and replacing it could send
-      // a destination a second time.
       if (params.expectedScheduledIds) {
         const expected = new Set(params.expectedScheduledIds);
         const matches =
@@ -376,7 +367,6 @@ export async function schedulePostPublication(
           return { ok: false, reason: "conflict" };
         }
       }
-      // Failed rows of an earlier slot are superseded by the new schedule.
       await tx
         .update(scheduledPublications)
         .set({ status: "canceled", claimToken: null, leaseUntil: null })
@@ -407,7 +397,6 @@ export async function schedulePostPublication(
       return outcome;
     }
   } catch (error) {
-    // Two schedule calls for the same post raced on the active-row index.
     if (isUniqueViolation(error)) {
       return { ok: false, reason: "conflict" };
     }
@@ -481,9 +470,7 @@ export async function recordScheduledPullRequest(params: {
         eq(scheduledPublications.postId, params.postId),
         eq(scheduledPublications.destination, "github"),
         eq(scheduledPublications.status, "scheduled"),
-        // A run that already pushed (and failed to merge) knows better.
         isNull(scheduledPublications.result),
-        // A schedule moved to another repository meanwhile keeps its own PR.
         sql`${scheduledPublications.destinationConfig}->>'repositoryId' = ${params.repositoryId}`
       )
     );
@@ -586,7 +573,6 @@ function dueCondition(now: Date, dueBy = now) {
       eq(scheduledPublications.status, "scheduled"),
       lte(scheduledPublications.nextAttemptAt, dueBy)
     ),
-    // A run that died (deploy, crash, lost hand-off) left its lease to expire.
     and(
       eq(scheduledPublications.status, "publishing"),
       or(
@@ -618,7 +604,6 @@ export async function settleAbandonedScheduledPublications(params?: {
     params?.postId ? eq(scheduledPublications.postId, params.postId) : undefined
   );
   const released = { claimToken: null, leaseUntil: null };
-  // Nothing went out yet, so a cancel that arrived meanwhile just wins.
   await db
     .update(scheduledPublications)
     .set({ ...released, status: "canceled" })
@@ -717,7 +702,6 @@ export async function releaseScheduledPublicationClaim(
   now = new Date()
 ): Promise<"released" | "failed" | "canceled" | "superseded"> {
   const fence = claimFence(claim);
-  // Nothing went out yet, so a cancel that arrived meanwhile just wins.
   const canceled = await db
     .update(scheduledPublications)
     .set({ status: "canceled", claimToken: null, leaseUntil: null })
@@ -726,8 +710,6 @@ export async function releaseScheduledPublicationClaim(
   if (canceled.length > 0) {
     return "canceled";
   }
-  // A start that keeps failing (bad deploy, broken config) must surface
-  // instead of cycling every minute forever.
   const givenUp = await db
     .update(scheduledPublications)
     .set({
@@ -956,13 +938,9 @@ export async function finishScheduledPublicationAttempt(
   const retry =
     outcome.retryable && attempts < SCHEDULED_PUBLICATION_MAX_ATTEMPTS;
   const status = retry ? "scheduled" : "failed";
-  // Only an unconfirmed send (or an error we can't place) may have reached
-  // the platform. A definite failure clears the marker, so a later
-  // reschedule or cancel is not treated as a possibly live post.
   const mayBeLive =
     outcome.code === SCHEDULED_PUBLICATION_ERROR_CODES.OUTCOME_UNKNOWN ||
     outcome.code === SCHEDULED_PUBLICATION_ERROR_CODES.UNEXPECTED;
-  // A cancel requested meanwhile wins, except over a post that may be live.
   const canceled = mayBeLive
     ? and(
         isNotNull(scheduledPublications.cancelRequestedAt),

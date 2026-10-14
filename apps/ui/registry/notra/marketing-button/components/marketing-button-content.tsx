@@ -3,8 +3,6 @@
 import { cn } from "cn";
 import { useState } from "react";
 
-/* True from the first `loading` change until the swap back has finished, so
-   buttons don't animate on mount and stop clipping once they're idle again. */
 function useLoadingSwap(loading: boolean) {
   const [previousLoading, setPreviousLoading] = useState(loading);
   const [isSwapping, setIsSwapping] = useState(false);
@@ -28,8 +26,6 @@ function MarketingButtonSpinner({
     <span
       aria-hidden
       className={cn(
-        // Shortened rather than removed under reduced motion: the swap only
-        // finishes on `animationend`, which never fires without an animation.
         "pointer-events-none absolute inset-0 flex items-center justify-center motion-reduce:[animation-delay:0ms] motion-reduce:[animation-duration:1ms]",
         loading
           ? entering && "animate-button-swap-in [animation-delay:70ms]"
@@ -66,11 +62,6 @@ function MarketingButtonSpinner({
   );
 }
 
-/* The animated inside of `MarketingButton`, the same swap as `Button`'s loading
-   state with a spinner instead of dots: the label blurs up and out, the
-   spinner rises in from below. Kept in its own client module so
-   `marketing-button.tsx` stays importable from server code that only calls
-   `marketingButtonVariants`. The label is only wrapped while a state is showing. */
 function MarketingButtonContent({
   children,
   loading,
@@ -93,7 +84,6 @@ function MarketingButtonContent({
                 ? "animate-button-swap-out"
                 : "animate-button-swap-in [animation-delay:70ms]")
           )}
-          // Tells the button to clip the swapping layers to its shape.
           data-clip=""
           data-slot="marketing-button-label"
         >

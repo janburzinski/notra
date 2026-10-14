@@ -3,9 +3,6 @@ import {
   TOOLTIP_MOVE_EASING,
 } from "@/constants/chart-tooltip";
 
-// The size morph only makes sense for a deliberate jump. While the pointer is
-// sweeping, the content changes every few frames; restarting the 160 ms morph
-// each time would pin the box in its first, clipped frames.
 const SIZE_MOTION_SETTLE_MS = 300;
 
 export function withTooltipSizeMotion(formatter: (params: unknown) => string) {
@@ -22,8 +19,6 @@ export function withTooltipSizeMotion(formatter: (params: unknown) => string) {
       return html;
     }
     container ??= document.createElement("div");
-    // ECharts calls the formatter on every pointer move. Identical content must
-    // not touch the DOM, or a running morph restarts from its first frame.
     if (html === lastHtml && container.firstElementChild) {
       return container;
     }

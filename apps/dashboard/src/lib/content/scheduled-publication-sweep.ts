@@ -69,7 +69,6 @@ export async function runScheduledPublicationSweep(options?: {
           await notifyFailure(claim.id);
         }
       } catch (error) {
-        // The lease expires on its own; the row is retried after that.
         console.error("[ScheduledPublication] Failed to release claim", {
           scheduledPublicationId: claim.id,
           error,

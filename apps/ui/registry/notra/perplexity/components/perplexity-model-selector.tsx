@@ -106,7 +106,6 @@ export const PerplexityModelSelector = ({
               </>
             );
 
-            // Locked models still highlight on hover like the real menu, they just can't be picked.
             return item.locked ? (
               <DropdownMenuItem
                 aria-disabled="true"

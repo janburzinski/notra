@@ -35,7 +35,6 @@ interface FeedbackProgramInput {
 
 export interface SubmitFeedbackProgramInput extends FeedbackProgramInput {
   body: SubmitFeedbackBody;
-  /** Set when the request is authenticated with a project-bound ingest token. */
   ingestProjectId?: string;
   userAgent?: string | null;
 }

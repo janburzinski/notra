@@ -6,7 +6,6 @@ import {
   IconTabsTrigger,
 } from "../../../registry/notra/icon-tabs/components/icon-tabs";
 
-/** The preview is never hydrated, so the measured indicator never appears. */
 const SELECTED_CLASS =
   "data-active:bg-background data-active:shadow-[0_1px_2px_rgba(0,0,0,0.08)] dark:data-active:bg-foreground/10";
 

@@ -23,7 +23,6 @@ import { GitHubAccountSelect } from "./account-select";
 
 const MAX_VISIBLE_REPOSITORIES = 50;
 
-// Keeps large GitHub installations browsable without rendering every repository at once.
 export function RepositoryMultiSelect({
   repositories,
   value,

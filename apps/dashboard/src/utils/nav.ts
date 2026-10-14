@@ -34,14 +34,9 @@ export function resolveSidebarMode(
   route: string | undefined,
   storedMode: SidebarMode | null
 ): SidebarMode {
-  // Org root is both Studio home and the dashboard entry URL. Keep a stored
-  // GEO pick so opening `/{slug}` can restore that mode instead of writing
-  // studio over it.
   if (route === undefined) {
     return storedMode ?? "studio";
   }
-  // Shared destinations keep the current mode. Without a stored choice, match
-  // the org root's visible Studio default instead of switching on navigation.
   if (
     SHARED_ROUTE_PREFIXES.some(
       (prefix) => route === prefix || route.startsWith(`${prefix}/`)

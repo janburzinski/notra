@@ -83,7 +83,6 @@ function ContentDetailImageActions({
       target,
     });
     let copying: Promise<void>;
-    // Diagram targets are only offered when the post has a scene.
     if (isDiagramExportTarget(target)) {
       copying = copyDiagramScene(
         `/api/organizations/${organizationId}/content/${contentId}/excalidraw`,
@@ -204,7 +203,6 @@ function ContentDetailImageActions({
   );
 }
 
-/** The linked pull request, or the dialog that opens one. */
 function ContentDetailGitHubAction({
   content,
   contentId,
@@ -332,7 +330,6 @@ export function ContentDetailToolbar(props: ContentDetailToolbarProps) {
   const videoPending = videoUploading || videoSaving;
   const t = useTranslations("content.toolbar");
   const { data: scheduleData } = usePostSchedule(organizationId, contentId);
-  // Posting by hand while a social send is pending would post it twice.
   const socialSendPending = Boolean(
     scheduleData?.schedule?.publications.some(
       (publication) =>

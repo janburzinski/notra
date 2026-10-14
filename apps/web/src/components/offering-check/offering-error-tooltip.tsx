@@ -9,10 +9,6 @@ import { OFFERING_FIELD_SHAKE } from "@/constants/offering-check";
 import type { OfferingErrorTooltipProps } from "@/types/offering-check";
 import { getReducedMotionSnapshot } from "@/utils/reduced-motion";
 
-/**
- * Shakes the field and pins the message under it. `attempt` changes on every
- * failed submit, so the same error shakes again when the visitor retries.
- */
 export function OfferingErrorTooltip({
   error,
   attempt,

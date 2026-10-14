@@ -29,7 +29,6 @@ export const OFFERING_CHECK_HERO_SUBTITLE =
 
 export const OFFERING_CHECK_MODEL = "openai/gpt-6-luna";
 
-/** The scan request carries the visitor's Turnstile token in this header. */
 export const OFFERING_TURNSTILE_HEADER = "x-turnstile-token";
 
 export const OFFERING_CHECK_GATEWAY_TAG = "offering-check";
@@ -46,7 +45,6 @@ export const OFFERING_CHECK_PROBLEM_MIN_LENGTH = 12;
 
 export const OFFERING_CHECK_PROBLEM_MAX_LENGTH = 200;
 
-/** The remaining-characters hint shows once this few are left. */
 export const OFFERING_CHECK_PROBLEM_COUNTER_FROM = 40;
 
 export const OFFERING_CHECK_MAX_OTHER_OFFERINGS = 8;
@@ -61,7 +59,6 @@ export const OFFERING_CHECK_MAX_OUTPUT_TOKENS = 1200;
 
 export const OFFERING_CHECK_TIMEOUT_MS = 50_000;
 
-/** Upper bound for one Upstash call; cache misses and rate-limit outages fall back after it. */
 export const OFFERING_CHECK_REDIS_TIMEOUT = "1500 millis";
 
 export const OFFERING_CHECK_DNS_TIMEOUT = "2 seconds";
@@ -74,10 +71,6 @@ export const OFFERING_CHECK_CACHE_PREFIX = "web:offering-check:v8";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/**
- * `scope` says whose quota ran out, so the visitor is only told "you used your
- * checks" when it really was their own limit.
- */
 export const OFFERING_CHECK_RATE_LIMITS = {
   preflightPerIpMinute: { requests: 30, windowMs: 60 * 1000, scope: "visitor" },
   perIpHour: { requests: 5, windowMs: 60 * 60 * 1000, scope: "visitor" },
@@ -255,7 +248,6 @@ export const OFFERING_SAMPLE_TYPING = {
   wordPauseMs: 35,
   fieldPauseMs: 160,
   eraseMs: 14,
-  /** Old text is erased in this many steps per field, however long it is. */
   eraseSteps: 8,
 } as const;
 
@@ -263,7 +255,6 @@ export const OFFERING_FAVICON_SETTLE_MS = 350;
 
 export const OFFERING_FORM_URL_DEBOUNCE_MS = 400;
 
-/** Size of the default globe Google returns for domains it has no icon for. */
 export const OFFERING_FAVICON_FALLBACK_SIZE = 16;
 
 export const OFFERING_FIELD_SHAKE = {
@@ -278,27 +269,22 @@ export const OFFERING_FIELD_SHAKE = {
   timing: { duration: 380, easing: "ease-out" },
 } satisfies { keyframes: Keyframe[]; timing: KeyframeAnimationOptions };
 
-// Input and URL parsing.
 export const OFFERING_PROTOCOL_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//i;
 export const OFFERING_WWW_PATTERN = /^www\./;
 export const OFFERING_HOSTNAME_PATTERN =
   /^(?=.{4,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/;
 export const OFFERING_TRACKING_PARAM = "utm_source";
 export const OFFERING_DOMAIN_INPUT_MAX_LENGTH = 200;
-/** Control and invisible formatting characters (e.g. NUL, RTL override). */
 export const OFFERING_CONTROL_CHARACTER_PATTERN = /[\p{Cc}\p{Cf}]/u;
 export const OFFERING_WHITESPACE_RUN = /\s+/g;
-/** Links would turn the free-text fields into a way to put URLs on our pages. */
 export const OFFERING_LINK_PATTERN = /https?:\/\/|www\.|\]\(/i;
 export const OFFERING_SENTENCE_END_PATTERN = /[.!?]$/;
 
-// Judge output limits.
 export const OFFERING_SUMMARY_MAX_LENGTH = 400;
 export const OFFERING_OTHER_OFFERING_MAX_LENGTH = 80;
 export const OFFERING_COMPANY_NAME_MAX_LENGTH = 60;
 export const OFFERING_COMPANY_DESCRIPTION_MAX_LENGTH = 320;
 
-// Answer markdown.
 export const OFFERING_MARKDOWN_CITATION_PATTERN = /\s*\(\[[^\]]+\]\([^)]+\)\)/g;
 export const OFFERING_REGEX_SPECIAL_PATTERN = /[.*+?^${}()|[\]\\]/g;
 export const OFFERING_WORD_CHARACTER = String.raw`[\p{L}\p{M}\p{N}_]`;
@@ -311,11 +297,9 @@ export const OFFERING_HIGHLIGHT_CLASSES = [
   "dark:bg-[#8B5CF640]",
 ];
 
-// Report copy while the check runs.
 export const OFFERING_PENDING_HERO_BODY =
   "Asking the model now. You are watching the answer come in.";
 
-/** Which form field a notice belongs to; the rest show below the form. */
 export const OFFERING_NOTICE_FIELD: Partial<
   Record<OfferingFormProblem, OfferingSampleField>
 > = {
@@ -325,7 +309,6 @@ export const OFFERING_NOTICE_FIELD: Partial<
   "invalid-problem": "problem",
 };
 
-// Server plumbing.
 export const OFFERING_MS_PER_SECOND = 1000;
 export const OFFERING_RATE_LIMIT_GLOBAL_KEY = "global";
 export const OFFERING_DNS_NOT_FOUND_CODES = new Set(["ENOTFOUND", "ENODATA"]);
@@ -335,7 +318,6 @@ export const OFFERING_STREAM_HEADERS = {
   "X-Accel-Buffering": "no",
 };
 
-// UI.
 export const OFFERING_ELAPSED_TICK_MS = 1000;
 export const OFFERING_SEARCH_MAX_VISIBLE_DOMAINS = 8;
 export const OFFERING_SOURCES_STACKED_FAVICONS = 4;

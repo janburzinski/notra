@@ -160,8 +160,6 @@ const runPlannedPersona = Effect.fn("geo.runPlannedPersona")(function* (
 ) {
   const tasks = geoScanPersonaTasks(planned);
   const grounded = resolveGroundedEngineByKey(planned.groundedKey);
-  // Older persisted plans lack a snapshot and cannot reconstruct the original
-  // profile safely. Omit them rather than mix old prompts with current context.
   if (!grounded || !planned.snapshot) {
     yield* omitGeoScanTasks(
       checkContext,

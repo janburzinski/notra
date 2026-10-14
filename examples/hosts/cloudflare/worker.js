@@ -1,5 +1,3 @@
-// Serves the Relaywave landing page and forwards /blog and /changelog to Notra.
-// The proxy part follows https://usenotra.com/docs/sites/domains/cloudflare
 import { landingPage } from "./landing.js";
 
 const DEFAULT_SITE_ORIGIN = "https://relaywave-cloudflare.notra.site";
@@ -12,7 +10,6 @@ export default {
       (mount) => url.pathname === mount || url.pathname.startsWith(`${mount}/`)
     );
     if (!mounted) {
-      // With section routes in front of an existing website, let the request through.
       if (env.PASS_THROUGH === "true") {
         return fetch(request);
       }
@@ -20,10 +17,8 @@ export default {
     }
     const siteOrigin = env.NOTRA_SITE_ORIGIN ?? DEFAULT_SITE_ORIGIN;
     const headers = new Headers(request.headers);
-    // Your visitors' sessions stay on your domain.
     headers.delete("cookie");
     headers.delete("authorization");
-    // Lets site analytics see the visitor, not Cloudflare.
     headers.set("x-forwarded-for", request.headers.get("cf-connecting-ip") ?? "");
     return fetch(new URL(url.pathname + url.search, siteOrigin), {
       method: request.method,

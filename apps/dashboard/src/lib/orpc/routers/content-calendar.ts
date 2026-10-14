@@ -28,7 +28,6 @@ import { getTranslations } from "@/lib/i18n/server";
 import { baseProcedure } from "../base";
 import { badRequest, conflict, notFound } from "../utils/errors";
 
-/** A slot this close publishes right away instead of waiting for the cron. */
 const IMMEDIATE_PUBLISH_WINDOW_MS = 60 * 1000;
 
 const SCHEDULE_FAILURE_MESSAGE_KEYS = {
@@ -55,13 +54,11 @@ async function toScheduleError(reason: SchedulePostFailureReason) {
   );
 }
 
-/** Runs the sweep for one post right after the response, best effort. */
 function publishDueNow(postId: string) {
   afterResponse(async () => {
     try {
       await runScheduledPublicationSweep({ postId });
     } catch (error) {
-      // The QStash wake queued with the change picks the rows up.
       console.error("[ScheduledPublication] Immediate sweep failed", {
         postId,
         error,

@@ -53,7 +53,6 @@ import { engineIconHtml } from "@/utils/engine-icon-html";
 import { formatChartInteger } from "@/utils/geo-charts";
 
 const TRAFFIC_TREND_STROKE_WIDTH = 2;
-// Provider rows in the hover tooltip across both sections; the rest folds into "+N more".
 const TRAFFIC_TOOLTIP_MAX_ROWS = 8;
 
 function metricDelta(
@@ -162,9 +161,6 @@ export function TrafficHero({
       : provider
   );
   const providerSeries = buildTrafficTrendSeries(providers);
-  // Referrals are a trickle next to crawler hits on the same axis. Zero days
-  // become gaps, so the series shows only the days that had visits instead of a
-  // second line lying on the baseline.
   const chartRows = buildTrafficTrendRowsForProviders(
     points,
     providers,

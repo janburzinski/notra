@@ -13,7 +13,6 @@ import {
 } from "@/constants/empty-state";
 import type { AgentFeedbackSetupNudgeProps } from "@/types/agent-feedback";
 
-/** Empty inbox prompt on the home page: docs link plus the setup dialog. */
 export function AgentFeedbackSetupNudge({
   organizationId,
   compact = false,

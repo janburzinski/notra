@@ -64,7 +64,6 @@ import {
 import { seriesColors } from "@/utils/chart-colors";
 import { isSquareTwitterAvatar } from "@/utils/twitter";
 
-/** Columns for an account's top posts, newest metrics on the right. */
 function useTopPostColumns(): TableColumn<TopPostItem>[] {
   const tAnalyticsShared = useTranslations("analytics.shared");
   const tCommon = useTranslations("common");
@@ -156,7 +155,6 @@ function useTopPostColumns(): TableColumn<TopPostItem>[] {
   );
 }
 
-/** Avatar, name, handle and follower count at the top of the account view. */
 function AccountHeader({
   handle,
   identity,

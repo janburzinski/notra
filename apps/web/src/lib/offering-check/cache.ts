@@ -29,7 +29,6 @@ export const readCachedOfferingCheck = Effect.fn("readCachedOfferingCheck")(
     if (!redis) {
       return null;
     }
-    // A slow or failing cache is a miss, never a reason to hold the request.
     const cached = yield* Effect.tryPromise(() =>
       redis.get(cacheKey(input))
     ).pipe(

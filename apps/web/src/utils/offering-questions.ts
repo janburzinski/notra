@@ -8,10 +8,6 @@ import type {
   OfferingQuestionKind,
 } from "@/types/offering-check";
 
-/**
- * The name question always runs. With a problem, a second question describes
- * the need the way a buyer would, without the feature name.
- */
 export function buildOfferingQuestions(
   input: OfferingCheckInput
 ): OfferingQuestion[] {

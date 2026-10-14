@@ -12,7 +12,6 @@ import type {
 } from "@notra/ai/types/router";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
 
-/** One step's usage in the shape the pricing helpers expect. */
 function stepUsage(step: RouteUsageStep): AgentTokenUsage | undefined {
   return step.usage ? toAgentTokenUsage(step.usage) : undefined;
 }

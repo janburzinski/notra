@@ -98,7 +98,6 @@ function createRetrySchedule(
       )
     ),
     Schedule.upTo({ times: Math.max(0, maxAttempts - 1) }),
-    // Surface long provider cooldowns instead of blocking the caller or retrying early.
     Schedule.while(({ input }) =>
       Effect.succeed(input.retryable && (input.retryAfterMs ?? 0) <= maxDelayMs)
     ),

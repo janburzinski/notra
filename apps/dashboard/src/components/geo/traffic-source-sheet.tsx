@@ -50,7 +50,6 @@ import {
 } from "@/utils/ai-traffic-groups";
 import { paginatedTableHeightFor } from "@/utils/table";
 
-/** A single bot as a one-member group, so it fits the overview's table columns. */
 function botAsGroup(
   group: GeoTrafficSourceGroup,
   member: GeoTrafficSource
@@ -107,7 +106,6 @@ function formatShare(part: number, total: number): string {
   return total === 0 ? "0%" : `${Math.round((part / total) * 100)}%`;
 }
 
-/** Percentage-point change of a share, or null without a previous period. */
 function shareDelta(
   part: number,
   total: number,
@@ -238,8 +236,6 @@ function TrafficSourceSheetContent({
             locale
           )}
           data={topPages}
-          // `pages` is the site-wide busiest-pages list, so a quiet source can
-          // contribute none of them even though it did visit pages.
           emptyState={group.paths > 0 ? t("pagesOutsideBusiest") : t("noPages")}
           getRowId={(row) => row.key}
           height={paginatedTableHeightFor(topPages.length)}
@@ -256,8 +252,6 @@ export function TrafficSourceSheet({
   pages,
   onOpenChange,
 }: TrafficSourceSheetProps) {
-  // The parent drops the series the moment the sheet closes, so it travels with
-  // the group and the visits chart survives the exit animation.
   const open = useMemo(
     () => (groupProp === null ? null : { group: groupProp, series }),
     [groupProp, series]

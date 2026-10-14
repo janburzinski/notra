@@ -151,7 +151,6 @@ async function main() {
     let nextPort = port + 1;
     try {
       for (const entry of mounted) {
-        // Sequential on purpose: each search starts after the last port taken.
         const areaPort = await findFreePort(nextPort);
         nextPort = areaPort + 1;
         areas.push({

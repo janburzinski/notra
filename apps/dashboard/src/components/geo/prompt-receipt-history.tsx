@@ -116,7 +116,6 @@ function HistoryRow({
   }
   return (
     <button
-      // The row's text (outcome, time, changes) is its accessible name.
       title={t("viewAnswer")}
       className={cn(
         rowClass,
@@ -130,11 +129,6 @@ function HistoryRow({
   );
 }
 
-/**
- * One line per scan: outcome, when, and what moved since the scan before.
- * Clicking a row opens the answer that scan captured. Rows render a page at a
- * time as the sheet scrolls; the history itself is already loaded.
- */
 export function PromptReceiptHistory({
   entries,
   isLoading,
@@ -147,8 +141,6 @@ export function PromptReceiptHistory({
   const sentinelRef = useRef<HTMLLIElement>(null);
   const hasMore = !isLoading && visibleCount < entries.length;
 
-  // Re-observes after every page, so a sentinel that is still in view keeps
-  // loading until the list fills past it.
   useEffect(() => {
     const node = sentinelRef.current;
     if (!(hasMore && node)) {

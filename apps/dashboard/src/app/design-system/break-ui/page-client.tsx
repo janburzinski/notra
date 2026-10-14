@@ -37,10 +37,6 @@ const datasetParser = parseAsStringLiteral(BREAK_UI_DATASETS)
   .withDefault("demo")
   .withOptions({ clearOnDefault: true });
 
-/**
- * Seeds the same query keys the real components read, so fixtures enter
- * through the data boundary instead of through props the app never passes.
- */
 function fixtureQueryClient(fixture: BreakUiFixture) {
   const client = new QueryClient({
     defaultOptions: {
@@ -137,10 +133,6 @@ function SentimentSample({ fixture }: { fixture: BreakUiFixture }) {
   );
 }
 
-/**
- * The pager pages through `collectionTotal` rows while the fixture holds a
- * handful; repeat them with distinct ids and names so every page differs.
- */
 function collectionsForPage(
   collections: BreakUiFixture["collections"],
   total: number,
@@ -191,7 +183,6 @@ async function isPreviewWrite(request: Request) {
   if (!url.pathname.endsWith("/__batch__")) {
     return isPreviewWriteProcedure(url.pathname);
   }
-  // A batch carries every call's own URL; one write blocks the whole batch.
   const items: unknown = await request.clone().json();
   return (
     Array.isArray(items) &&
@@ -206,18 +197,10 @@ async function isPreviewWrite(request: Request) {
   );
 }
 
-/**
- * The samples are real components wired to real clients. Writes from this
- * page (deleting a fixture collection, switching or creating an organization,
- * inviting) are answered locally instead of reaching the API. The oRPC client
- * resolves `fetch` per call, so it goes through this guard too.
- */
 function usePreviewWriteGuard() {
   useEffect(() => {
     const realFetch = window.fetch;
     window.fetch = async (input, init) => {
-      // Building the Request consumes a Request input's body, so the built
-      // one is what gets forwarded.
       const request = new Request(input, init);
       if (await isPreviewWrite(request)) {
         return Response.json(
@@ -297,7 +280,6 @@ function BreakUiSamples({ dataset }: { dataset: BreakUiDataset }) {
           >
             <SidebarProvider className="min-h-0!" defaultOpen>
               <FeedbackProvider>
-                {/* w-60 matches SIDEBAR_MIN_WIDTH. */}
                 <div className="bg-sidebar text-sidebar-foreground w-60 rounded-xl border">
                   <SidebarFooter>
                     <OrgSelector />
@@ -320,7 +302,6 @@ function BreakUiSamples({ dataset }: { dataset: BreakUiDataset }) {
 }
 
 export default function BreakUiDesignSystemClientPage() {
-  // Fixture dates are relative to page load, so skip SSR to avoid hydration drift.
   const isClient = useIsClient();
   const [dataset, setDataset] = useQueryState("data", datasetParser);
   return (

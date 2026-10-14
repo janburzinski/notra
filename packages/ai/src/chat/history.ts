@@ -165,7 +165,6 @@ async function upsertChatSession(
     expectedHistory
   );
 
-  // A response may only replace the turn it started from, never create a chat.
   if (expectedLastMessageId) {
     const updated = await db
       .update(chatSessions)

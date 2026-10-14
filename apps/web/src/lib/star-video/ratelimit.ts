@@ -11,8 +11,6 @@ type LimiterKind = "lookup" | "render" | "render-global";
 const LIMITS: Record<LimiterKind, { requests: number; window: "1 h" }> = {
   lookup: { requests: 20, window: "1 h" },
   render: { requests: 10, window: "1 h" },
-  // Shared cap across every caller/instance so IP rotation can't multiply the
-  // expensive render budget beyond a bounded total per hour.
   "render-global": { requests: 40, window: "1 h" },
 };
 
@@ -57,10 +55,6 @@ const enforceLimit = Effect.fn("enforceStarVideoLimit")(function* (
   const limiter = getLimiter(kind);
 
   if (!limiter) {
-    // Fail closed on any deployed environment (production, preview, staging)
-    // so the endpoints are never left unprotected when Redis is misconfigured.
-    // Only the local dev environment (no VERCEL, non-production) is allowed
-    // through without a limiter.
     const isDeployed =
       process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL);
     if (isDeployed) {
@@ -72,8 +66,6 @@ const enforceLimit = Effect.fn("enforceStarVideoLimit")(function* (
     return;
   }
 
-  // Fail closed on Redis errors: a transient outage must not silently
-  // disable rate limiting on the expensive render path.
   const result = yield* Effect.tryPromise({
     try: () => limiter.limit(key),
     catch: () => new StarVideoRateLimitExceeded({ reset: 0 }),

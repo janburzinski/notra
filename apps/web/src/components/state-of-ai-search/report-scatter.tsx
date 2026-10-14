@@ -17,32 +17,21 @@ import { formatPercent } from "@/utils/state-of-ai-search";
 const PERCENT_MAX = 100;
 const X_TICKS = [0, 25, 50, 75, 100] as const;
 const Y_TICK_COUNT = 4;
-/** The named-first axis rounds its top up to this step. */
 const Y_STEP = 10;
-/** Logo edge in pixels, smaller on narrow plots so crowds stay readable. */
 const LOGO_SIZE = 28;
 const LOGO_SIZE_COMPACT = 22;
 const COMPACT_PLOT_WIDTH = 480;
-/** On narrow plots only the leaders get a logo; everyone else is a dot. */
 const COMPACT_LOGO_RANKS = 5;
 const DOT_SIZE = 10;
-/** Space kept between logos that had to move apart. */
 const LOGO_GAP = 3;
 
 interface Point {
   row: StateOfAiSearchRankingRow;
-  /** Pixels from the plot's left edge. */
   left: number;
-  /** Pixels from the plot's bottom edge. */
   bottom: number;
   size: number;
 }
 
-/**
- * Logos keep their exact height and only move sideways, just enough to stop
- * overlapping. Each crowd is then shifted back so its centre stays where the
- * data put it.
- */
 function placePoints(
   rows: StateOfAiSearchRankingRow[],
   yMax: number,
@@ -77,8 +66,6 @@ function placePoints(
     );
     if (minLeft > point.left) {
       point.left = minLeft;
-      // A point pushed past blockers from several crowds joins all of them
-      // into one, so recentring moves them together and nothing overlaps.
       const blocking = new Set(blockers);
       const touched = crowds.filter((members) =>
         members.some((member) => blocking.has(member))
@@ -102,7 +89,6 @@ function placePoints(
     const last = members.at(-1);
     const minShift = last ? last.left - (width - last.size / 2) : 0;
     const maxShift = first ? first.left - first.size / 2 : 0;
-    // Recentre, but keep the whole crowd inside the plot.
     const shift = Math.min(Math.max(drift, minShift), maxShift);
     return members.map(({ row, left, bottom, size }) => ({
       row,
@@ -157,7 +143,6 @@ function PointTooltip({ row }: { row: StateOfAiSearchRankingRow }) {
   );
 }
 
-/** Faint label in a corner of the plot, naming what that corner means. */
 function Corner({ className, label }: { className: string; label: string }) {
   return (
     <span
@@ -171,11 +156,6 @@ function Corner({ className, label }: { className: string; label: string }) {
   );
 }
 
-/**
- * Every brand by how often it is named (right) against how often it is named
- * first (up): the top right is the default pick, the bottom right the brand
- * that comes up but rarely leads.
- */
 export function VisibilityScatter({
   rows,
   onSelect,
@@ -197,7 +177,6 @@ export function VisibilityScatter({
     }
     return row.rank <= COMPACT_LOGO_RANKS ? LOGO_SIZE_COMPACT : DOT_SIZE;
   };
-  // Lower ranks paint first, so the leaders sit on top where logos touch.
   const points =
     plot.width > 0
       ? placePoints(rows, yMax, plot.width, plot.height, sizeOf).toSorted(

@@ -12,7 +12,6 @@ import type { EChartsPlotFrameProps } from "@/types/charts";
 const EXPORT_REVEAL =
   "pointer-events-none opacity-0 transition-opacity duration-200 [@media(hover:hover)]:group-hover/chart:opacity-100 group-focus-within/chart:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100 group-hover/chart:pointer-events-auto group-focus-within/chart:pointer-events-auto motion-reduce:transition-none";
 
-// The Notra watermark only goes into the downloaded PNG (utils/chart-download).
 function ChartPlotChrome() {
   return (
     <div

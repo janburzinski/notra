@@ -24,7 +24,6 @@ import { generateObject, generateText } from "ai";
 
 const LLM_ROUTER_FALLBACK_MODEL = "openai/gpt-oss-120b";
 const ROUTER_EVALUATION_FEATURE = "chat_router";
-// Slower than this and the LLM router would have answered anyway.
 const ROUTER_EVALUATION_TIMEOUT_MS = 2500;
 
 const AUTO_POOL = {
@@ -117,8 +116,6 @@ export async function routeMessage(
     };
   }
 
-  // Typed evaluation first (~300 ms); the LLM router below is the fallback
-  // when the gateway is unavailable, the flag is off, or the call fails.
   const evaluation = await getEvaluationClient().tryEvaluate({
     feature: ROUTER_EVALUATION_FEATURE,
     organizationId:

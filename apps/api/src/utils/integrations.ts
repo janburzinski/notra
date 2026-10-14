@@ -18,7 +18,6 @@ export function serializeDisabledTriggers(
   };
 }
 
-/** Leave unexpected database errors to Hono's central error handler. */
 export function runIntegrationProgram<A, E extends IntegrationDomainError>(
   program: Effect.Effect<A, E | IntegrationDatabaseError>
 ) {

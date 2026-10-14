@@ -269,11 +269,6 @@ export async function orchestrateStandaloneChat(
     experimental_toolApprovalSecret: approvalSecret,
     stopWhen: isStepCount(maxSteps),
     experimental_transform: smoothStream(),
-    // Without this, a tool call whose inputs fail schema validation throws an
-    // `InvalidToolInputError` that surfaces as a fatal stream error and bricks
-    // the chat. Instead, re-derive valid inputs from the schema so the agent
-    // can carry on. Unknown tool names can't be repaired this way, so we let
-    // them fall through to `onError` where they become a readable message.
     repairToolCall: async ({
       toolCall,
       tools: availableTools,
@@ -294,7 +289,6 @@ export async function orchestrateStandaloneChat(
         const schema = await inputSchema({ toolName: toolCall.toolName });
         abortSignal?.throwIfAborted();
         const { output: repairedInput } = await generateText({
-          // Schema repair must not retrieve or persist conversation memories.
           model: createModel(
             organizationId,
             routingDecision.model,
@@ -420,12 +414,6 @@ function getLastUserMessage(messages: UIMessage[]): string {
   return "";
 }
 
-// Tool-part states that are "complete" from the user's perspective and must
-// survive history trimming before `convertToModelMessages` runs. Missing
-// `approval-responded` here previously dropped the user's approval payload,
-// leaving the conversation ending on an assistant turn — which Bedrock-routed
-// Anthropic (Sonnet 4.6 / Opus 4.7 via AI Gateway) rejects with
-// "This model does not support assistant message prefill".
 const TERMINAL_TOOL_STATES = new Set([
   "output-available",
   "output-error",
@@ -673,10 +661,6 @@ async function getEnabledLinearIntegrations(
   }
 }
 
-/**
- * updateTodos calls in the reply being continued: an approval resumes the
- * last assistant message instead of starting a new one.
- */
 function countReplyTodoCalls(messages: StandaloneChatInput["messages"]) {
   const last = messages.at(-1);
   if (last?.role !== "assistant") {

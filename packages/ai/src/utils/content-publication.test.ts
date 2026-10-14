@@ -2,8 +2,6 @@ import { expect, mock, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-// This is deliberately an in-memory Drizzle transaction/row-lock simulation,
-// not a PostgreSQL integration test. Keep it isolated from .env databases.
 if (process.env.NOTRA_CONTENT_PUBLICATION_TEST_WORKER !== "1") {
   test("content publication synchronization regressions (in-memory adapter)", () => {
     const result = spawnSync(

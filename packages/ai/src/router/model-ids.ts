@@ -19,7 +19,6 @@ export function toOpenRouterModelId(modelId: string): string {
   return OPENROUTER_MODEL_ALIASES[neutral] ?? neutral;
 }
 
-// Snapshot suffix OpenRouter may append, e.g. "-20260115" or "-2026-01-15".
 const SNAPSHOT_SUFFIX_REGEX = /-\d{4}-?\d{2}-?\d{2}$/;
 
 /**

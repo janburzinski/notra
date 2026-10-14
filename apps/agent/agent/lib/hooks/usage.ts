@@ -108,7 +108,6 @@ function shouldChargeAiCredits(ctx: Parameters<typeof getSessionAttribute>[0]) {
   return getSessionAttribute(ctx, "chargeAiCredits") !== "false";
 }
 
-/** `modelId` may resolve per turn for agents whose model is chosen at runtime. */
 export function createUsageHook(
   modelId: string | ((turnId: string) => string)
 ): HookDefinition {
@@ -168,8 +167,6 @@ export function createUsageHook(
       // A durable reconciliation path remains outside this change; neither
       // this claim nor the pending record guarantees exactly-once billing.
       await redis.persist(billingKey);
-      // Read the frozen hash, not a live snapshot from before RENAME. EVAL
-      // ordered before RENAME is included; later EVAL retains a separate key.
       const accumulated =
         await redis.hgetall<Record<string, string>>(billingKey);
       if (!accumulated) {
@@ -184,7 +181,6 @@ export function createUsageHook(
           outputTokens: Number(accumulated.outputTokens ?? 0),
           cacheReadTokens: Number(accumulated.cacheReadTokens ?? 0),
           cacheWriteTokens: Number(accumulated.cacheWriteTokens ?? 0),
-          // Old accumulators lack this field; a reported zero is not missing.
           costMicroUsd:
             accumulated.costMicroUsd === undefined
               ? undefined

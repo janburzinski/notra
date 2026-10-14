@@ -2,19 +2,9 @@ import { ALLOWED_VIDEO_MIME_TYPES } from "@notra/schemas/constants/dashboard/upl
 
 import { MAX_CONTENT_VIDEO_BYTES } from "@/constants/content-video";
 
-/**
- * Constraints for video attachments on X / LinkedIn posts.
- *
- * Capped at 10MB to match the server-enforced presigned `content` video
- * ceiling, the GitHub single asset ceiling, and what X / LinkedIn accept
- * without transcoding (no ffmpeg here) — platform rejections surface
- * through the delivery result instead.
- */
 export const SOCIAL_VIDEO = {
   accept: ALLOWED_VIDEO_MIME_TYPES.join(","),
-  /** Content types that are posted to X / LinkedIn and can carry a video. */
   contentTypes: new Set(["twitter_post", "linkedin_post"]),
-  /** Effective upload ceiling (matches server validation). */
   maxBytes: MAX_CONTENT_VIDEO_BYTES,
   maxBytesMb: MAX_CONTENT_VIDEO_BYTES / 1024 / 1024,
 } as const;

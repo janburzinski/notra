@@ -5,16 +5,11 @@ type ZrRect = InstanceType<typeof echarts.graphic.Rect>;
 type ZrCircle = InstanceType<typeof echarts.graphic.Circle>;
 
 const SCRUB_Z = 110;
-/**
- * Canvas layer for scrubbed series and the overlay. Clipping repaints them every
- * frame; on their own layer the axes and labels on layer 0 stay untouched.
- */
 export const SCRUB_ZLEVEL = 1;
 const DOT_RADIUS = 4;
 const LINE_WIDTH = 1;
 const HALO_WIDTH = 6;
 
-/** Opacity of the unclipped trail while scrubbing — original color, faded. */
 export const SCRUB_MUTE_OPACITY = 0.3;
 
 export type ScrubDot = {
@@ -75,7 +70,6 @@ export function nearestCategoryIndex(
   return Math.max(0, Math.min(length - 1, Math.round(raw)));
 }
 
-/** True for generated companion IDs (`__reveal-key`, `__loading`), not user keys. */
 export function isScrubSkipSeries(
   id: string,
   prefixes: readonly string[],
@@ -88,7 +82,6 @@ export function isScrubSkipSeries(
   });
 }
 
-/** Pixel-space Y on a packed [x0,y0,x1,y1,…] polyline. NaN breaks the segment. */
 export function yAtXOnPackedPoints(
   packed: ArrayLike<number>,
   x: number
@@ -142,10 +135,6 @@ function findEcPolyline(root: ZrEl | undefined): ZrEl | null {
   return found;
 }
 
-/**
- * Y on the drawn series path at pixel x — ECharts' own polyline (smooth,
- * stacked, scaled). Falls back to a chord through the layout points.
- */
 export function pointOnSeriesAtX(
   chart: EChartsInstance,
   seriesId: string,

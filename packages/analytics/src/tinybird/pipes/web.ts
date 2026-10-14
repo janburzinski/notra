@@ -269,8 +269,6 @@ export const webSources = defineEndpoint("web_sources", {
         HAVING sessions > 0
       `,
     }),
-    // web_sources_daily has no path, so a path filter reads the raw landing
-    // views (90-day TTL) instead.
     node({
       name: "sources_path",
       sql: `

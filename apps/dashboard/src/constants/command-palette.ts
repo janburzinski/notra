@@ -415,11 +415,8 @@ export const COMMAND_SECTIONS: CommandSection[] = [
 
 export const COMMAND_PALETTE_JEV_FEATURE = "command_palette_navigation";
 
-// Jev answers in ~300 ms; past this the sequential LLM fallback (~1.5 s)
-// should start rather than stacking on a slow evaluation.
 export const COMMAND_PALETTE_JEV_TIMEOUT_MS = 1200;
 
-// Below this the pick is a guess; the LLM fallback decides instead.
 export const COMMAND_PALETTE_JEV_MIN_CONFIDENCE = 0.5;
 
 export const COMMAND_PALETTE_JEV_CHAT_CHOICE = "chat";
@@ -447,7 +444,6 @@ export const COMMAND_PALETTE_ENTITY_ICONS = {
 
 export const COMMAND_PALETTE_THEME_SHORTCUT = "D";
 
-/** How Jev reads each search hit kind when picking a destination. */
 export const COMMAND_PALETTE_ENTITY_DESCRIPTIONS = {
   prompt: "tracked GEO prompt",
   competitor: "competitor brand tracked in AI answers",
@@ -462,7 +458,6 @@ export const COMMAND_PALETTE_ENTITY_DESCRIPTIONS = {
   social: "connected social account",
 } as const satisfies Record<CommandPaletteEntityKind, string>;
 
-// A query this long that starts exactly one hit's name opens it without AI.
 export const COMMAND_PALETTE_NAME_MATCH_MIN_LENGTH = 3;
 
 export const COMMAND_PALETTE_SEARCH_DEBOUNCE_MS = 300;

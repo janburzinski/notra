@@ -460,7 +460,6 @@ export async function planIrisRun(input: {
   );
 }
 
-// A failed write must not repeat a completed, paid planner invocation.
 planIrisRun.maxRetries = 0;
 
 export async function persistIrisPlannerOutput(

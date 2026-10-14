@@ -391,7 +391,6 @@ postsRoutes.openapi(getPostsRoute, async (c) => {
   );
 });
 
-// Registered before GET /posts/{postId} so "authors" is not read as a post ID.
 postsRoutes.openapi(listPostAuthorsRoute, async (c) => {
   const orgId = getOrganizationId(c);
   if (!orgId) {
@@ -520,8 +519,6 @@ postsRoutes.openapi(patchPostRoute, async (c) => {
     throw preparedResult.failure;
   }
 
-  // Charged immediately before the write: the 404s and 400s above must not
-  // spend the caller's update budget.
   const rateLimited = await enforceRatelimit(c, ratelimit.postUpdate);
   if (rateLimited) {
     return rateLimited;
@@ -725,8 +722,6 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
   const { repositoryIds, linearIntegrationIds, resolvedBrandVoiceId } =
     targets.success;
 
-  // Charged immediately before the billable generation is queued: the 503, 404
-  // and 400 responses above must not spend the caller's budget.
   const rateLimited = await enforceRatelimit(c, ratelimit.postGeneration);
   if (rateLimited) {
     return rateLimited;

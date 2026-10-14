@@ -76,8 +76,6 @@ export function AiTrafficLogCard({ organizationId }: AiTrafficLogCardProps) {
             ? undefined
             : JSON.stringify([filters, hostQuery, pathQuery])
         }
-        // Live refetches swap rows in place; only a new filter or host,
-        // which shows the previous result as placeholder, dims the table.
         loading={isPending || isPlaceholderData}
       />
     );

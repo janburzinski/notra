@@ -13,8 +13,6 @@ import { getOrganizationId } from "../utils/auth";
 
 export type SubscriptionMiddlewareOptions = BillingMiddlewareOptions;
 
-// DELETE and GET are intentionally unrestricted so lapsed/unsubscribed orgs
-// retain read access and data-deletion rights (GDPR / data portability).
 export function subscriptionMiddleware(
   options: SubscriptionMiddlewareOptions = {}
 ) {

@@ -107,7 +107,6 @@ export function WebhookSetupDialog({
     },
   });
 
-  // Auto-generate webhook secret when dialog opens and no config exists
   const { isPending, isSuccess, isError, mutate } = generateMutation;
   useEffect(() => {
     if (

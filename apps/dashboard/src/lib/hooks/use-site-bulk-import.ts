@@ -34,7 +34,6 @@ export function useSiteBulkImport({
   const [previewsEnabled, setPreviewsEnabled] = useState(false);
   const repositoryId = repository?.id ?? null;
   const [scopeId, setScopeId] = useState(repositoryId);
-  // A newly imported repository starts over instead of keeping old rows.
   if (scopeId !== repositoryId) {
     setScopeId(repositoryId);
     setEnabled(false);
@@ -42,8 +41,6 @@ export function useSiteBulkImport({
     setResults({});
     setPreviewsEnabled(false);
   }
-  // Keep the last complete scan, so a background refetch (which reports no
-  // folders while it runs) never hides rows, results or the source lock.
   const scope = `${repositoryId ?? ""}:${branch}`;
   const [scan, setScan] = useState<SiteBulkScan | null>(null);
   if (
@@ -58,8 +55,6 @@ export function useSiteBulkImport({
     });
   }
   const current = scan?.scope === scope ? scan : null;
-  // Folders that already have an outcome stay listed even if a later scan
-  // no longer finds them.
   const directories = [
     ...new Set([...(current?.directories ?? []), ...Object.keys(results)]),
   ];
@@ -86,7 +81,6 @@ export function useSiteBulkImport({
       ...current,
       [rootDirectory]: { ...current[rootDirectory], ...edit },
     }));
-    // An edited row gets a fresh attempt, so its old error no longer applies.
     setResults((current) => {
       if (!current[rootDirectory]) {
         return current;

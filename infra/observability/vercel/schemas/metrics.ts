@@ -26,7 +26,6 @@ function isStringArray(value: unknown, limit: number): value is string[] {
   );
 }
 
-/** Validate provider JSON once, then expose only the fields used by monitoring. */
 export function catalogPage(value: unknown): CatalogPage {
   if (!isRecord(value) || !Array.isArray(value.metrics)) {
     throw new Error("invalid_catalog");

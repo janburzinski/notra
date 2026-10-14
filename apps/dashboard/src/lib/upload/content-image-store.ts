@@ -50,7 +50,6 @@ function mimeForKey(key: string): ContentMediaMimeType | null {
   return null;
 }
 
-// ponytail: tmp dir when R2 is unset. Images vanish on reboot; set CLOUDFLARE_* to keep them.
 function diskRoot() {
   return path.join(os.tmpdir(), "notra-content-images");
 }
@@ -179,8 +178,6 @@ export async function saveContentImage(params: {
     await writeDisk(key, params.bytes);
   }
 
-  // ponytail: app URL only, so a draft is as private as the post. A public R2
-  // bucket still serves a key that already leaked; use a private bucket then.
   return { key, url: `${CONTENT_IMAGE_ROUTE}/${key}` };
 }
 

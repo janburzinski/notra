@@ -28,14 +28,12 @@ export async function checkPrometheusResources(
   const name = `notra-prometheus-resources-${randomUUID()}`;
   const containers = [`${name}-exporter`, `${name}-normal`, `${name}-reject`];
   const network = `${name}-network`;
-  // Leave cleanup time inside the five-minute test budget.
   const deadline = Date.now() + 230_000;
   const source = fileURLToPath(new URL(".", import.meta.url));
   mkdirSync(resolve(source, "../../.artifacts"), { recursive: true });
   const directory = mkdtempSync(
     resolve(source, "../../.artifacts/prometheus-fixtures-")
   );
-  // This bind mount contains only synthetic fixtures; the exporter stays UID 1000.
   chmodSync(directory, 0o755);
   const setMode = (mode) => {
     const temporary = resolve(directory, "state.tmp");

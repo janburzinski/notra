@@ -81,13 +81,11 @@ export function PersonasTable({
   const reactivatePersona = restorePersona.mutate;
   const [viewing, setViewing] = useState<GeoPersona | null>(null);
   const [removing, setRemoving] = useState<GeoPersona | null>(null);
-  // Deep link from the command palette.
   const [linkedPersonaId, setLinkedPersonaId] = useQueryState(
     GEO_PERSONA_DETAIL_QUERY_KEY,
     parseAsString
   );
 
-  // Prevent deleting a persona while its profile is being saved.
   const pendingPersonaIds = useMutationState({
     filters: {
       mutationKey: geoPersonaUpdateMutationKey(organizationId, projectId),

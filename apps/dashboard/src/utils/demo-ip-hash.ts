@@ -29,8 +29,6 @@ export function hashDemoClientIp(ip: string): string {
   if (!secret) {
     throw new Error("WORKOS_COOKIE_PASSWORD must be defined");
   }
-  // Domain-separated so this MAC over visitor-chosen input can never collide
-  // with another use of the same secret.
   return createHmac("sha256", secret)
     .update(`demo-ip:${ip}`)
     .digest("hex")

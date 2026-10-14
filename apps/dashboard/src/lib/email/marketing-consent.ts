@@ -40,7 +40,6 @@ export async function getMarketingEmailsState(
   };
 }
 
-/** The checkbox exactly as the user saw it, in their language. */
 async function buildConsentEvidence(source: MarketingOptInSource) {
   const locale = await getLocale();
   const tLabels = await getTranslations("common.labels");
@@ -56,7 +55,6 @@ async function buildConsentEvidence(source: MarketingOptInSource) {
   return `Notra ${source} (${locale}): unchecked checkbox "${tLabels("productUpdates")}: ${description}", ticked by the signed-in user (verified email)`;
 }
 
-/** Stores the choice. Throws only on database errors. */
 async function saveMarketingChoice({
   userId,
   enabled,
@@ -89,7 +87,6 @@ async function saveMarketingChoice({
   return user.email;
 }
 
-/** Never throws, so an opt-out still reaches the unsubscribe list. */
 async function trySyncContact(userId: string): Promise<boolean> {
   try {
     const { failed } = await syncBrewContacts([userId]);
@@ -100,12 +97,6 @@ async function trySyncContact(userId: string): Promise<boolean> {
   }
 }
 
-/**
- * Mirrors a stored choice to Brew. An opt-in upserts the contact (with its
- * consent record) before lifting the unsubscribe, because Brew creates
- * unknown addresses as globally unsubscribed. An opt-out unsubscribes even
- * when the contact sync fails, so no marketing email slips through.
- */
 async function mirrorMarketingChoice({
   userId,
   email,

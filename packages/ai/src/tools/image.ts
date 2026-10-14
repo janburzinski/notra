@@ -42,7 +42,6 @@ export function createImageTool(config: ImageToolConfig): Tool {
           branch: input.branch,
           brandIdentityId,
           mode: input.mode,
-          // A follow-up keeps the source image's format unless asked otherwise.
           format: input.format ?? restoreSnapshot?.format,
           prompt: input.prompt,
           prNumber: input.prNumber,

@@ -242,7 +242,6 @@ function refererPath(event: GeoJourneyEvent): string | null {
   }
 }
 
-/** Deepest visited section page the path lives under, e.g. /docs for /docs/a. */
 function closestVisitedSection(
   path: string,
   nodes: ReadonlyMap<string, GeoJourneyTreeNode>

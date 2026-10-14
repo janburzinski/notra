@@ -431,9 +431,6 @@ export const irisRouter = {
           : eq(autonomyRuns.organizationId, input.organizationId),
         orderBy: (run, { desc: descending }) => [descending(run.startedAt)],
         limit: IRIS_RUNS_PAGE_SIZE + 1,
-        // Only the fields `toIrisRunView` reads: planner output stays (decision
-        // and reason) and task results stay (artifacts), but task params,
-        // action refs/errors and outbox payloads are left in the database.
         columns: {
           id: true,
           trigger: true,

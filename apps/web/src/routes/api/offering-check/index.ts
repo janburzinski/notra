@@ -52,8 +52,6 @@ function streamEvents(
             AbortSignal.timeout(OFFERING_CHECK_TIMEOUT_MS),
           ])
         );
-        // Send the result first; the cache write must not delay what the
-        // visitor is waiting for. It still finishes before the stream closes.
         emit({ type: "result", result });
         await Effect.runPromise(writeCachedOfferingCheck(input, result));
       } catch {
@@ -83,7 +81,6 @@ async function POST(request: Request) {
     Effect.gen(function* () {
       const cached = yield* readCachedOfferingCheck(input);
       if (!cached) {
-        // Before the rate limit, so a typo does not cost a free check.
         yield* ensureOfferingSiteExists(input.domain);
         yield* ensureOfferingVisitorIsHuman(request);
         yield* enforceOfferingCheckRateLimit(request, input);

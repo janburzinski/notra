@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-// The site's Notra address, from the Domains page. Set NOTRA_SITE_ORIGIN to try
-// another one, like a local build served on http://localhost:4321.
 const NOTRA_SITE = process.env.NOTRA_SITE_ORIGIN ?? "https://pathway-nextjs.notra.site";
 
 const nextConfig: NextConfig = {

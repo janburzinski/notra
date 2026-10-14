@@ -2,12 +2,6 @@ export const ANALYTICS_EVENT_MAX_BYTES = 1024;
 
 export const ANALYTICS_SCRIPT_CACHE_CONTROL = "public, max-age=3600";
 
-/**
- * Measures how long the page stays visible and how far it was scrolled, then
- * reports the running total with sendBeacon whenever the tab hides. One view
- * can report several times; the dashboard reads the largest total per view.
- * Framed pages (the dashboard preview) are not measured.
- */
 export const ANALYTICS_SCRIPT = `(() => {
   const script = document.currentScript;
   const endpoint = script && script.dataset.endpoint;
