@@ -8,11 +8,11 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/gateway": "4.0.85",
+    "@ai-sdk/gateway": "4.0.105",
     "@notra/ai": "workspace:*",
-    "@opentui/core": "0.5.12",
-    "@opentui/react": "0.5.12",
-    "ai": "7.0.105",
+    "@opentui/core": "0.5.14",
+    "@opentui/react": "0.5.14",
+    "ai": "7.0.129",
     "react": "^19.3.0",
     "zod": "^4.6.5"
   },

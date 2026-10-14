@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "react": "^19.3.0",
-    "react-email": "6.9.3"
+    "react-email": "6.9.5"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",
