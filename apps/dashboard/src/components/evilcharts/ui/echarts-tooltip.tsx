@@ -445,6 +445,7 @@ export function tooltipBaseOption(params: {
   crosshair?: boolean;
   confine?: boolean;
   pointer?: TooltipAxisPointer;
+  scrub?: boolean;
 }): TooltipComponentOption {
   const {
     present,
@@ -455,6 +456,7 @@ export function tooltipBaseOption(params: {
     crosshair,
     confine = true,
     pointer = cursor ? (crosshair ? "cross" : "line") : "none",
+    scrub = false,
   } = params;
 
   const linePointer = {
@@ -475,7 +477,8 @@ export function tooltipBaseOption(params: {
     },
   };
 
-  const tooltipMotionCss = `box-shadow:none;pointer-events:none;will-change:transform;transition:transform ${TOOLTIP_MOVE_DURATION_S}s ${TOOLTIP_MOVE_EASING},opacity 0.28s ease;`;
+  const moveDuration = scrub ? 0 : TOOLTIP_MOVE_DURATION_S;
+  const tooltipMotionCss = `box-shadow:none;pointer-events:none;will-change:transform;transition:transform ${moveDuration}s ${TOOLTIP_MOVE_EASING},opacity 0.28s ease;`;
 
   return {
     show: present,
@@ -484,7 +487,7 @@ export function tooltipBaseOption(params: {
     enterable: false,
     showDelay: 0,
     hideDelay: 80,
-    transitionDuration: TOOLTIP_MOVE_DURATION_S,
+    transitionDuration: moveDuration,
     ...(confine ? {} : { appendTo: "body" as const }),
     backgroundColor: "transparent",
     borderWidth: 0,

@@ -1194,6 +1194,7 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
       axisPointerColor: withAlpha(tokens.mutedForeground, AXIS_POINTER_OPACITY),
       strokeWidth: AXIS_POINTER_WIDTH,
       confine: tooltipSlot.confine,
+      scrub: tooltipSlot.scrub,
     }),
     ...(tooltipSlot.scrub ? { triggerOn: "none" as const } : {}),
     formatter: withTooltipSizeMotion(createTooltipFormatter(ctx)),
@@ -1757,6 +1758,7 @@ type LiveState = {
   scrubStore: ScrubOverlayStore;
   scrubIndex: number | null;
   scrubX: number | null;
+  scrubY: number;
   scrubOpacity: number;
   scrubTarget: number;
   scrubRaf: number;
@@ -1802,6 +1804,7 @@ function createLiveState(): LiveState {
     scrubStore: emptyScrubStore(),
     scrubIndex: null,
     scrubX: null,
+    scrubY: 0,
     scrubOpacity: 0,
     scrubTarget: 0,
     scrubRaf: 0,
@@ -2384,6 +2387,17 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     live.paintScrub = paintScrub;
 
     const tickScrub = () => {
+      if (live.scrubTarget === 1 && live.scrubX !== null) {
+        live.scrubRaf = 0;
+        live.scrubOpacity = 1;
+        chart.dispatchAction({
+          type: "showTip",
+          x: live.scrubX,
+          y: live.scrubY,
+        });
+        paintScrub();
+        return;
+      }
       live.scrubOpacity += (live.scrubTarget - live.scrubOpacity) * SCRUB_LERP;
       const grid = live.scrubTarget === 0 ? readScrubGrid(chart) : null;
       const snapX =
@@ -2441,23 +2455,14 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         leaveScrub();
         return;
       }
-      const snapX = chart.convertToPixel({ xAxisIndex: 0 }, idx);
-      if (typeof snapX !== "number" || !Number.isFinite(snapX)) return;
-      if (live.scrubTarget === 1 && live.scrubIndex === idx) return;
       const entering = live.scrubTarget === 0;
       live.scrubIndex = idx;
-      if (
-        live.scrubX === null ||
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ) {
-        live.scrubX = snapX;
-      }
+      live.scrubX = x;
+      live.scrubY = y;
       live.scrubTarget = 1;
       if (entering) setMutedOpacity(SCRUB_MUTE_OPACITY);
       const zrDom = chart.getZr()?.dom as HTMLElement | undefined;
       if (zrDom) zrDom.style.cursor = "crosshair";
-      chart.dispatchAction({ type: "showTip", x: snapX, y });
-      paintScrub();
       if (!live.scrubRaf) live.scrubRaf = requestAnimationFrame(tickScrub);
     };
 
