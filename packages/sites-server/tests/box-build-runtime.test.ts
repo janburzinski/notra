@@ -223,8 +223,9 @@ test("success records lifecycle, guest resources, compiler areas and completion 
 test("source archives over 100 MB upload in bounded parts and reassemble byte for byte", async () => {
   const sourceArchive = new Uint8Array(100_000_001);
   sourceArchive[0] = 1;
-  sourceArchive[64 * 1024 * 1024] = 2;
-  sourceArchive[sourceArchive.length - 1] = 3;
+  sourceArchive[8 * 1024 * 1024] = 2;
+  sourceArchive[64 * 1024 * 1024] = 3;
+  sourceArchive[sourceArchive.length - 1] = 4;
   const directory = mkdtempSync(join(tmpdir(), "sites-upload-"));
   try {
     const build = await runSandboxBuild({ ...params, sourceArchive });
@@ -240,7 +241,7 @@ test("source archives over 100 MB upload in bounded parts and reassemble byte fo
       const paths = form.getAll("paths") as string[];
       const blobs = form.getAll("files") as File[];
       for (const [index, blob] of blobs.entries()) {
-        expect(blob.size).toBeLessThanOrEqual(64 * 1024 * 1024);
+        expect(blob.size).toBeLessThanOrEqual(8 * 1024 * 1024);
         const path = paths[index] ?? "";
         expect(path).toStartWith("/workspace/home/");
         const bytes = new Uint8Array(await blob.arrayBuffer());
@@ -274,7 +275,7 @@ test("source archives over 100 MB upload in bounded parts and reassemble byte fo
   }
 });
 
-test.each([0, 64 * 1024 * 1024])(
+test.each([0, 8 * 1024 * 1024])(
   "source archives of %i bytes retain a single upload without reassembly",
   async (size) => {
     await runSandboxBuild({ ...params, sourceArchive: new Uint8Array(size) });
@@ -289,6 +290,33 @@ test.each([0, 64 * 1024 * 1024])(
     ]);
     expect((form.get("files") as File).size).toBe(size);
     expect(command.mock.calls[0]?.[0]).not.toContain("cat ");
+  }
+);
+
+test.each([8 * 1024 * 1024 + 1, 16 * 1024 * 1024, 64 * 1024 * 1024])(
+  "source archives of %i bytes split at the provider-safe boundary",
+  async (size) => {
+    await runSandboxBuild({ ...params, sourceArchive: new Uint8Array(size) });
+    const uploads = fetchMock.mock.calls.filter(([input]) =>
+      String(input).endsWith("/files/upload")
+    );
+    expect(uploads).toHaveLength(Math.ceil(size / (8 * 1024 * 1024)));
+    let sourceBytes = 0;
+    let targetCount = 0;
+    for (const [part, [, init]] of uploads.entries()) {
+      const form = init?.body as FormData;
+      const paths = form.getAll("paths") as string[];
+      const blobs = form.getAll("files") as File[];
+      expect(paths[0]).toBe(`/workspace/home/source.tgz.part-${part}`);
+      expect(blobs[0]?.size).toBeLessThanOrEqual(8 * 1024 * 1024);
+      sourceBytes += blobs[0]?.size ?? 0;
+      targetCount += paths.filter((path) =>
+        path.endsWith("/target.json")
+      ).length;
+    }
+    expect(sourceBytes).toBe(size);
+    expect(targetCount).toBe(1);
+    expect(command.mock.calls[0]?.[0]).toContain("cat ");
   }
 );
 
