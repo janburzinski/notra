@@ -1,0 +1,21 @@
+apps/dashboard/src/components/geo/traffic-path-filter.tsx
+  s_777ac88dac5204::t_4692e48914ba5e 20-23,30,33-34,43
+apps/dashboard/src/constants/traffic-path.ts
+  s_777ac88dac5204::t_4692e48914ba5e 7-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "341f73d26271c299b8b14fbcbaef47cfff3df5fb",
+  "prompts": {},
+  "sessions": {
+    "s_777ac88dac5204": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c02877d-6abd-4e66-9368-09a6173da41d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
