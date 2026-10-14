@@ -40,6 +40,14 @@ export const EMPTY_TREE_SCAN: RepositoryTreeScan = {
   truncated: false,
 };
 export const GITHUB_ARCHIVE_TIMEOUT_MS = 60_000;
+export const GITHUB_SOURCE_DOWNLOAD_CONCURRENCY = 4;
+export const GITHUB_SOURCE_DOWNLOAD_MAX_FILES = 128;
+export const GITHUB_TREE_RESPONSE_MAX_BYTES = 16 * 1024 * 1024;
+export const GITHUB_SOURCE_METADATA_MAX_BYTES = 512 * 1024;
+export const GITHUB_METADATA_ATTRIBUTE_LINE =
+  /^\S+\s+[-!]?linguist-[\w-]+(?:=\S+)?(?:\s+[-!]?linguist-[\w-]+(?:=\S+)?)*$/;
+export const GITHUB_LFS_POINTER_HEADER =
+  "version https://git-lfs.github.com/spec/v1";
 // The compare API lists at most 300 changed files for a whole comparison
 // (per_page only pages its commits), so 300 files may mean a cut-off list.
 export const GITHUB_COMPARE_MAX_FILES = 300;

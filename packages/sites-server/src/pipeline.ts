@@ -18,11 +18,11 @@ import {
   transitionDeployment,
 } from "./deployments";
 import {
-  downloadRepositoryTarballEffect,
   changedPathsBetween,
   getBranchHead,
   siteRepositoryAccess,
 } from "./github";
+import { downloadSiteSourceEffect } from "./github-source";
 import { publishDeploymentFilesEffect } from "./publish";
 import { r2PutEffect } from "./r2";
 import { openCheckRun, reportOutcome } from "./reporting";
@@ -232,10 +232,11 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
     }
     yield* writeBuildLog(site.id, deployment.id, phaseLog);
     const sourceStarted = performance.now();
-    const sourceArchive = yield* downloadRepositoryTarballEffect(
+    const sourceArchive = yield* downloadSiteSourceEffect(
       access.repository,
       access.token,
-      deployment.commitSha
+      deployment.commitSha,
+      site.rootDirectory
     ).pipe(
       Effect.ensuring(
         Effect.sync(() => {
