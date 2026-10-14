@@ -10,6 +10,7 @@ import {
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import { SiteCreateScrollList } from "@/components/sites/site-create-scroll-list";
 import {
   useCreateSiteStarter,
   useSiteStarterStatus,
@@ -58,7 +59,7 @@ export function SiteCreateStarter({
           strokeWidth={1.75}
         />
         <AlertTitle>{t("existingTitle")}</AlertTitle>
-        <div className="col-start-2 space-y-1">
+        <SiteCreateScrollList>
           {existingRoots.map((directory) => {
             const path = directory ? `${directory}/blog.json` : "blog.json";
             return (
@@ -81,7 +82,7 @@ export function SiteCreateStarter({
               </div>
             );
           })}
-        </div>
+        </SiteCreateScrollList>
       </Alert>
     );
   }

@@ -650,6 +650,10 @@ export interface SiteCreateStepListProps {
   onSelect: (id: SiteCreateStepId) => void;
 }
 
+export interface SiteCreateScrollListProps {
+  children: ReactNode;
+}
+
 export interface SiteCreateStageProps {
   activeIndex: number;
   left: ReactNode;

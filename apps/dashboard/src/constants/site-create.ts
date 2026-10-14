@@ -80,6 +80,7 @@ export const SITE_CREATE_ROW_VARIANTS: Variants = {
 
 export const SITE_CREATE_STAGE_FIRST_OFFSET_PX = 8;
 export const SITE_CREATE_STAGE_EDGE_PX = 24;
+export const SITE_CREATE_SCROLL_FADE_REM = 1.5;
 
 export const SITE_CREATE_STARTER_DEBOUNCE_MS = 400;
 export const SITE_CONFIG_MISSING_DIAGNOSTIC = "config_missing";
