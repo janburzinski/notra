@@ -17,17 +17,21 @@ import {
 } from "@notra/ui/components/ui/combobox";
 import { useTranslations } from "use-intl";
 
-import { TRAFFIC_PATH_ALL } from "@/constants/traffic-path";
+import {
+  TRAFFIC_PATH_ALL,
+  TRAFFIC_PATH_FILTER_LIMIT,
+} from "@/constants/traffic-path";
 import { useTrafficPathQuery } from "@/lib/hooks/use-traffic-path";
 import type { TrafficPathFilterProps } from "@/types/geo";
 
 export function TrafficPathFilter({ paths }: TrafficPathFilterProps) {
   const t = useTranslations("geo.trafficPathFilter");
   const [path, setPath] = useTrafficPathQuery();
+  // The selected path leads so the row limit never hides it.
   const options = [
     TRAFFIC_PATH_ALL,
-    ...(path && !paths.includes(path) ? [path] : []),
-    ...paths,
+    ...(path ? [path] : []),
+    ...paths.filter((known) => known !== path),
   ];
   const label = (value: string) =>
     value === TRAFFIC_PATH_ALL ? t("allPages") : value;
@@ -36,6 +40,7 @@ export function TrafficPathFilter({ paths }: TrafficPathFilterProps) {
     <Combobox
       itemToStringLabel={label}
       items={options}
+      limit={TRAFFIC_PATH_FILTER_LIMIT}
       onValueChange={(next) => {
         void setPath(!next || next === TRAFFIC_PATH_ALL ? "" : next);
       }}
