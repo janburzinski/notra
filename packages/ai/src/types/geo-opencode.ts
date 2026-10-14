@@ -24,3 +24,11 @@ export interface GeoBoxTokenUsage extends LanguageModelUsage {
   totalUsd?: number;
   computeMs: number;
 }
+
+export interface GeoBoxAnswer {
+  text: string;
+  sources: { url: string; title: null }[];
+  groundingSources: { url: string; title: null }[];
+  toolCalls: unknown[];
+  usage: GeoBoxTokenUsage;
+}

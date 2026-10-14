@@ -12,6 +12,25 @@ import {
 } from "../src/utils/token-usage";
 
 describe("GEO billing usage", () => {
+  test("Codex fallback pricing matches its observed Box backend run cost", () => {
+    const usage = geoBoxTokenUsage(
+      {
+        inputTokens: 28_747,
+        outputTokens: 96,
+        cachedInputTokens: 12_359,
+        computeMs: 6469,
+        totalUsd: 0,
+      },
+      "openai/gpt-6-astra",
+      "codex"
+    );
+    expect(usage.totalUsd).toBeUndefined();
+    const priced = addAgentTokenUsage(EMPTY_AGENT_TOKEN_USAGE, usage);
+    expect(priced.totalUsd).toBeCloseTo(0.181039, 8);
+    expect(priced.cacheReadTokens).toBe(12_359);
+    expect(priced.inputTokens).toBe(16_388);
+  });
+
   test("adds usage from retried language-model calls", () => {
     const usage = addLanguageModelTokenUsage(
       {

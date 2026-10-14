@@ -1,10 +1,18 @@
-import type { GeoBoxTokenUsage } from "@notra/ai/types/geo-opencode";
+import type {
+  GeoBoxHarness,
+  GeoBoxTokenUsage,
+} from "@notra/ai/types/geo-opencode";
 import type { RunCost } from "@upstash/box";
 
 export function geoBoxTokenUsage(
   cost: RunCost,
-  model: string
+  model: string,
+  harness: GeoBoxHarness = "opencode"
 ): GeoBoxTokenUsage {
+  const inputTokens =
+    harness === "claude-code"
+      ? cost.inputTokens + cost.cachedInputTokens
+      : cost.inputTokens;
   return {
     modelId: model,
     ...(Number.isFinite(cost.totalUsd) &&
@@ -16,9 +24,9 @@ export function geoBoxTokenUsage(
       ? { totalUsd: cost.totalUsd }
       : {}),
     computeMs: cost.computeMs,
-    inputTokens: cost.inputTokens,
+    inputTokens,
     inputTokenDetails: {
-      noCacheTokens: Math.max(0, cost.inputTokens - cost.cachedInputTokens),
+      noCacheTokens: Math.max(0, inputTokens - cost.cachedInputTokens),
       cacheReadTokens: cost.cachedInputTokens,
       cacheWriteTokens: undefined,
     },
@@ -27,6 +35,6 @@ export function geoBoxTokenUsage(
       textTokens: cost.outputTokens,
       reasoningTokens: undefined,
     },
-    totalTokens: cost.inputTokens + cost.outputTokens,
+    totalTokens: inputTokens + cost.outputTokens,
   };
 }

@@ -9,7 +9,7 @@ import {
   GEO_OPENCODE_RUN_TIMEOUT_MS,
   GEO_OPENCODE_SOURCE_LIMIT,
 } from "@notra/ai/constants/geo-opencode";
-import type { GeoBoxHarness } from "@notra/ai/types/geo-opencode";
+import type { GeoBoxAnswer, GeoBoxHarness } from "@notra/ai/types/geo-opencode";
 import {
   createGeoOpenCodeBoxName,
   createGeoOpenCodeBox,
@@ -75,10 +75,11 @@ function remainingRunTimeout(deadlineAtMs?: number) {
   if (deadlineAtMs === undefined) {
     return GEO_OPENCODE_RUN_TIMEOUT_MS;
   }
-  return Math.max(
-    1,
-    Math.min(GEO_OPENCODE_RUN_TIMEOUT_MS, deadlineAtMs - Date.now())
-  );
+  const remainingMs = deadlineAtMs - Date.now();
+  if (remainingMs <= 0) {
+    throw new DOMException("The operation timed out", "TimeoutError");
+  }
+  return Math.min(GEO_OPENCODE_RUN_TIMEOUT_MS, remainingMs);
 }
 
 function operationSignal(signal: AbortSignal | undefined, timeoutMs: number) {
@@ -102,8 +103,14 @@ async function consumeGeoOpenCodeStream(
 ) {
   const consume = async () => {
     const stream = await streamPromise;
-    for await (const _chunk of stream) {
-      // Draining the iterator populates the SDK's final result and cost.
+    let finished = false;
+    for await (const chunk of stream) {
+      if (chunk.type === "finish") {
+        finished = true;
+      }
+    }
+    if (!finished) {
+      throw new BoxError("Box agent stream ended without a finish event");
     }
     return stream;
   };
@@ -179,9 +186,6 @@ async function runGeoOpenCodePrompt(
     }
 
     const text = stream.result.trim();
-    if (!text) {
-      throw new BoxError("Box agent returned no result");
-    }
     return {
       text,
       sources: extractHttpUrls(text)
@@ -189,7 +193,11 @@ async function runGeoOpenCodePrompt(
         .map((url) => ({ url, title: null })),
       groundingSources: [...sourceUrls].map((url) => ({ url, title: null })),
       toolCalls,
-      usage: geoBoxTokenUsage(stream.cost, model),
+      usage: geoBoxTokenUsage(
+        stream.cost,
+        model,
+        agent === Agent.ClaudeCode ? "claude-code" : "opencode"
+      ),
     };
   } catch (error) {
     if (operation.signal.aborted) {
@@ -206,7 +214,8 @@ export async function askGeoOpenCodeConversation(
   signal?: AbortSignal,
   deadlineAtMs?: number,
   model = GEO_OPENCODE_BOX_MODEL_ID,
-  harness: GeoBoxHarness = "opencode"
+  harness: GeoBoxHarness = "opencode",
+  onResult?: (result: GeoBoxAnswer) => void
 ) {
   if (prompts.length === 0) {
     return [];
@@ -241,21 +250,38 @@ export async function askGeoOpenCodeConversation(
     return cleanupPromise;
   };
   const results: Awaited<ReturnType<typeof runGeoOpenCodePrompt>>[] = [];
+  let previousSessionUsd = 0;
+  let previousSessionCostWasValid = true;
   let operationFailed = false;
   let operationError: unknown;
   try {
     for (const prompt of prompts) {
-      results.push(
-        // react-doctor-disable-next-line react-doctor/async-await-in-loop -- each prompt depends on the previous turn in the same box conversation
-        await runGeoOpenCodePrompt(
-          box,
-          prompt,
-          agent,
-          model,
-          signal,
-          deadlineAtMs
-        )
+      const result = await runGeoOpenCodePrompt(
+        box,
+        prompt,
+        agent,
+        model,
+        signal,
+        deadlineAtMs
       );
+      if (agent === Agent.ClaudeCode) {
+        const sessionUsd = result.usage.totalUsd;
+        const validSessionCost =
+          sessionUsd !== undefined && sessionUsd >= previousSessionUsd;
+        result.usage.totalUsd =
+          validSessionCost && previousSessionCostWasValid
+            ? sessionUsd - previousSessionUsd
+            : undefined;
+        if (validSessionCost) {
+          previousSessionUsd = sessionUsd;
+        }
+        previousSessionCostWasValid = validSessionCost;
+      }
+      results.push(result);
+      onResult?.(result);
+      if (!result.text) {
+        throw new BoxError("Box agent returned no result");
+      }
     }
     if (signal?.aborted) {
       throw abortReason(signal);
@@ -292,14 +318,16 @@ export async function askGeoOpenCode(
   signal?: AbortSignal,
   deadlineAtMs?: number,
   model = GEO_OPENCODE_BOX_MODEL_ID,
-  harness: GeoBoxHarness = "opencode"
+  harness: GeoBoxHarness = "opencode",
+  onResult?: (result: GeoBoxAnswer) => void
 ) {
   const [result] = await askGeoOpenCodeConversation(
     [prompt],
     signal,
     deadlineAtMs,
     model,
-    harness
+    harness,
+    onResult
   );
   if (!result) {
     throw new Error("Box agent returned no result");

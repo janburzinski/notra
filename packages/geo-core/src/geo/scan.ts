@@ -6,6 +6,7 @@ import { FEATURES } from "@notra/ai/billing/features";
 import { GEO_OPENCODE_BOX_MODEL_ID } from "@notra/ai/constants/geo-opencode";
 import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
 import type { GatewayModelOptions } from "@notra/ai/types/gateway";
+import type { GeoBoxAnswer } from "@notra/ai/types/geo-opencode";
 import { describeContentBillingDenial } from "@notra/ai/utils/content-billing-messages";
 import {
   EMPTY_GEO_CHECK_GROUNDING,
@@ -226,6 +227,7 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
   const deadlineAtMs = Date.now() + GEO_ANSWER_TIMEOUT_MS;
   const boxAgent = geoBoxAgentForEngine(engine);
   let openCodePromise: ReturnType<typeof askGeoOpenCode> | null = null;
+  let completedResult: GeoBoxAnswer | undefined;
   const result = yield* Effect.tryPromise({
     try: (signal) => {
       openCodePromise = askGeoOpenCode(
@@ -233,13 +235,18 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
         signal,
         deadlineAtMs,
         boxAgent?.model ?? GEO_OPENCODE_BOX_MODEL_ID,
-        boxAgent?.harness
+        boxAgent?.harness,
+        (result) => {
+          completedResult = result;
+        }
       );
       return openCodePromise;
     },
     catch: (cause) =>
       new GeoScanError({
         message: `Engine ${engine} failed to answer`,
+        timedOut:
+          cause instanceof DOMException && cause.name === "TimeoutError",
         cause,
       }),
   }).pipe(
@@ -263,6 +270,16 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
             timedOut: true,
           })
         ),
+    }),
+    Effect.catchTag("GeoScanError", (error) => {
+      const recovered = completedResult;
+      if (!recovered) {
+        return Effect.fail(error);
+      }
+      return Effect.sync(() => {
+        logGeoSkip("native answer failed", { engine }, error);
+        return recovered;
+      });
     })
   );
   const answer: GeoEngineAnswer = {
@@ -1715,6 +1732,9 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
     let conversationPromise: ReturnType<
       typeof askGeoOpenCodeConversation
     > | null = null;
+    const completedResults: Awaited<
+      ReturnType<typeof askGeoOpenCodeConversation>
+    > = [];
     const results = yield* Effect.tryPromise({
       try: (signal) => {
         conversationPromise = askGeoOpenCodeConversation(
@@ -1725,7 +1745,8 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
           signal,
           deadlineAtMs,
           boxModel,
-          boxAgent?.harness
+          boxAgent?.harness,
+          (result) => completedResults.push(result)
         );
         return conversationPromise;
       },
@@ -1754,6 +1775,15 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
               message: `Sequence ${sequence.id} on ${engine} timed out after ${GEO_SEQUENCE_PAIR_TIMEOUT_MS}ms`,
             })
           ),
+      }),
+      Effect.catchTag("GeoScanError", (error) => {
+        if (completedResults.length === 0) {
+          return Effect.fail(error);
+        }
+        return Effect.sync(() => {
+          logGeoSkip("native conversation incomplete", failureFields, error);
+          return completedResults;
+        });
       })
     );
     const engineUsage = results.reduce(
@@ -1812,11 +1842,16 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
       }
       const judgeTimeoutMs = deadlineAtMs - Date.now();
       if (judgeTimeoutMs <= 0) {
-        return yield* Effect.fail(
+        logGeoSkip(
+          "sequence turn failed",
+          { ...failureFields, turn: index + 1 },
           new GeoScanError({
             message: `Sequence ${sequence.id} on ${engine} timed out after ${GEO_SEQUENCE_PAIR_TIMEOUT_MS}ms`,
+            timedOut: true,
           })
         );
+        droppedTurns = steps.length - index;
+        break;
       }
       const judged = yield* judgeAnswer(context, step, answerText, {
         promptId: sequencePromptId(sequence.id),
@@ -1826,8 +1861,10 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
           duration: judgeTimeoutMs,
           orElse: () =>
             Effect.fail(
-              new GeoScanError({
+              new GeoJudgeError({
                 message: `Sequence ${sequence.id} on ${engine} timed out after ${GEO_SEQUENCE_PAIR_TIMEOUT_MS}ms`,
+                timedOut: true,
+                cause: undefined,
               })
             ),
         }),

@@ -159,6 +159,9 @@ export async function createGeoOpenCodeBox(
   model = GEO_OPENCODE_BOX_MODEL_ID,
   agent: Agent = Agent.OpenCode
 ) {
+  if (signal.aborted) {
+    throw abortReason(signal);
+  }
   const headers = { "X-Box-Api-Key": apiKey };
   let boxId: string | undefined;
   let creationMayHaveSucceeded = true;
@@ -176,7 +179,8 @@ export async function createGeoOpenCodeBox(
       signal,
     });
     if (!response.ok) {
-      creationMayHaveSucceeded = false;
+      creationMayHaveSucceeded =
+        response.status === 408 || response.status >= 500;
       throw new BoxError(
         await geoOpenCodeBoxErrorMessage(response),
         response.status
@@ -199,10 +203,24 @@ export async function createGeoOpenCodeBox(
       );
       if (pollResponse.ok) {
         data = (await pollResponse.json()) as BoxData;
+      } else {
+        const pollError = new BoxError(
+          await geoOpenCodeBoxErrorMessage(pollResponse),
+          pollResponse.status
+        );
+        if (!isRetryableBoxError(pollError) && !isNotFoundBoxError(pollError)) {
+          throw pollError;
+        }
       }
     }
     if (data.status === "error") {
       throw new BoxError("Box creation failed");
+    }
+    if (data.status !== "idle" && data.status !== "running") {
+      throw new BoxError("Box creation returned an unexpected status");
+    }
+    if (signal.aborted) {
+      throw abortReason(signal);
     }
 
     return new Box(data, {
