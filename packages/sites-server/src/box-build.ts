@@ -19,6 +19,7 @@ import {
   SANDBOX_EXEC_TIMEOUT_MS,
   SANDBOX_LOG_RESPONSE_BYTES,
   SANDBOX_LOG_TAIL_SCRIPT,
+  SANDBOX_UPLOAD_CHUNK_BYTES,
 } from "./constants/sandbox";
 import { getBoxApiKey, getSitesBuilderSnapshotId } from "./env";
 import { guestBuildTelemetrySchema } from "./schemas/build-telemetry";
@@ -346,6 +347,7 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
           new Error("Sandbox allocation is unavailable")
         );
       }
+      const sourceParts: string[] = [];
       yield* measureSandboxPhase(
         metrics,
         "sourceUpload",
@@ -354,13 +356,32 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
             try: () => siteBuildRequestSchema.parse(params.target),
             catch: (error) => error,
           });
-          yield* uploadBytesEffect(apiKey, currentBoxId, [
-            { path: `${BOX_WORKDIR}/source.tgz`, data: params.sourceArchive },
-            {
-              path: `${BOX_WORKDIR}/target.json`,
-              data: new TextEncoder().encode(JSON.stringify(target)),
-            },
-          ]);
+          const partCount = Math.max(
+            1,
+            Math.ceil(
+              params.sourceArchive.byteLength / SANDBOX_UPLOAD_CHUNK_BYTES
+            )
+          );
+          for (let index = 0; index < partCount; index++) {
+            const path = `${BOX_WORKDIR}/source.tgz${partCount > 1 ? `.part-${index}` : ""}`;
+            const files: SandboxUploadFile[] = [
+              {
+                path,
+                data: params.sourceArchive.subarray(
+                  index * SANDBOX_UPLOAD_CHUNK_BYTES,
+                  (index + 1) * SANDBOX_UPLOAD_CHUNK_BYTES
+                ),
+              },
+            ];
+            if (index === 0) {
+              files.push({
+                path: `${BOX_WORKDIR}/target.json`,
+                data: new TextEncoder().encode(JSON.stringify(target)),
+              });
+            }
+            yield* uploadBytesEffect(apiKey, currentBoxId, files);
+            sourceParts.push(path);
+          }
         })
       );
 
@@ -369,6 +390,12 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
         : "../src";
       const script = [
         `cd ${BOX_WORKDIR} || exit 3`,
+        ...(sourceParts.length > 1
+          ? [
+              `cat ${sourceParts.map(shellQuote).join(" ")} > source.tgz || exit 3`,
+              `rm ${sourceParts.map(shellQuote).join(" ")} || exit 3`,
+            ]
+          : []),
         "rm -rf src out out.tgz result.json build.log exit-code build-metrics.json",
         "mkdir -p src",
         `node -e ${shellQuote(GUEST_BUILD_RUNNER)} -- ${shellQuote(sourceDir)} ${SITE_BUILD_LIMITS.buildTimeoutSeconds}`,

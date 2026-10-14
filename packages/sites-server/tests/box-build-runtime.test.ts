@@ -8,9 +8,10 @@ import {
   test,
 } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { setTimeout } from "node:timers/promises";
 
 import { SITE_BUILD_LIMITS } from "@notra/sites-core/constants/sites";
@@ -217,6 +218,91 @@ test("success records lifecycle, guest resources, compiler areas and completion 
     ttl: SITE_BUILD_LIMITS.buildTimeoutSeconds + 5 * 60,
   });
   expect(command.mock.calls[0]?.[0]).toContain("node -e");
+});
+
+test("source archives over 100 MB upload in bounded parts and reassemble byte for byte", async () => {
+  const sourceArchive = new Uint8Array(100_000_001);
+  sourceArchive[0] = 1;
+  sourceArchive[64 * 1024 * 1024] = 2;
+  sourceArchive[sourceArchive.length - 1] = 3;
+  const directory = mkdtempSync(join(tmpdir(), "sites-upload-"));
+  try {
+    const build = await runSandboxBuild({ ...params, sourceArchive });
+    expect(build.result?.ok).toBe(true);
+    const uploads = fetchMock.mock.calls.filter(([input]) =>
+      String(input).endsWith("/files/upload")
+    );
+    expect(uploads.length).toBeGreaterThan(1);
+    const sourceHash = createHash("sha256");
+    let sourceBytes = 0;
+    for (const [, init] of uploads) {
+      const form = init?.body as FormData;
+      const paths = form.getAll("paths") as string[];
+      const blobs = form.getAll("files") as File[];
+      for (const [index, blob] of blobs.entries()) {
+        expect(blob.size).toBeLessThanOrEqual(64 * 1024 * 1024);
+        const path = paths[index] ?? "";
+        expect(path).toStartWith("/workspace/home/");
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        writeFileSync(join(directory, basename(path)), bytes);
+        if (path.includes("source.tgz")) {
+          sourceHash.update(bytes);
+          sourceBytes += bytes.byteLength;
+        }
+      }
+    }
+    expect(sourceBytes).toBe(sourceArchive.byteLength);
+    const expectedHash = createHash("sha256")
+      .update(sourceArchive)
+      .digest("hex");
+    expect(sourceHash.digest("hex")).toBe(expectedHash);
+    const script = command.mock.calls[0]?.[0] ?? "";
+    expect(script).toContain("cat ");
+    const assembly = (script.split("rm -rf src out")[0] ?? "").replaceAll(
+      "/workspace/home",
+      directory
+    );
+    const result = spawnSync("sh", ["-c", assembly], { encoding: "utf8" });
+    expect(result.status).toBe(0);
+    expect(
+      createHash("sha256")
+        .update(readFileSync(join(directory, "source.tgz")))
+        .digest("hex")
+    ).toBe(expectedHash);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test.each([0, 64 * 1024 * 1024])(
+  "source archives of %i bytes retain a single upload without reassembly",
+  async (size) => {
+    await runSandboxBuild({ ...params, sourceArchive: new Uint8Array(size) });
+    const uploads = fetchMock.mock.calls.filter(([input]) =>
+      String(input).endsWith("/files/upload")
+    );
+    expect(uploads).toHaveLength(1);
+    const form = uploads[0]?.[1]?.body as FormData;
+    expect(form.getAll("paths")).toEqual([
+      "/workspace/home/source.tgz",
+      "/workspace/home/target.json",
+    ]);
+    expect((form.get("files") as File).size).toBe(size);
+    expect(command.mock.calls[0]?.[0]).not.toContain("cat ");
+  }
+);
+
+test("a failed source part upload skips execution and deletes the sandbox", async () => {
+  upload.mockResolvedValueOnce(new Response("ok"));
+  upload.mockResolvedValueOnce(
+    new Response("upload rejected", { status: 400 })
+  );
+  await expect(
+    runSandboxBuild({ ...params, sourceArchive: new Uint8Array(100_000_001) })
+  ).rejects.toMatchObject({ operation: "upload", status: 400 });
+  expect(command).not.toHaveBeenCalled();
+  expect(remove).toHaveBeenCalledTimes(1);
+  expect(complete).toHaveBeenCalledTimes(1);
 });
 
 test("startup failure still completes with redacted metrics and preserves the original exception", async () => {

@@ -1,6 +1,7 @@
 import { SITE_BUILD_LIMITS } from "@notra/sites-core/constants/sites";
 
 export const SANDBOX_REQUEST_TIMEOUT_MS = 30_000;
+export const SANDBOX_UPLOAD_CHUNK_BYTES = 64 * 1024 * 1024;
 export const SANDBOX_ERROR_RESPONSE_BYTES = 4096;
 export const SANDBOX_ERROR_RESPONSE_TIMEOUT_MS = 2000;
 export const SANDBOX_CLEANUP_TIMEOUT_MS = 5_000;
