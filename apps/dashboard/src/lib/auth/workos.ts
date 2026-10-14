@@ -1,5 +1,6 @@
 import {
   getConfig,
+  getWorkOS,
   selectStalePKCEVerifierCookieNames,
   sessionEncryption,
   type Session,
@@ -9,7 +10,11 @@ import {
   getAuthKitContext,
 } from "@workos/authkit-tanstack-react-start";
 
-import { clearHostAuthSessionCookie } from "@/lib/auth/session-cookie";
+import { sanitizeReturnTo } from "@/lib/auth/return-to";
+import {
+  clearHostAuthSessionCookie,
+  markAuthSessionCleared,
+} from "@/lib/auth/session-cookie";
 import type { SignOutActionOptions } from "@/types/auth/user-actions";
 
 export async function createAuthSignInUrl() {
@@ -38,13 +43,16 @@ export async function createAuthSignInUrl() {
 
 export async function signOutAuthSession(options?: SignOutActionOptions) {
   const auth = getAuthKitContext().auth();
-  if (!auth.user || !auth.sessionId) {
-    return options?.returnTo || "/";
+  if (auth.user && auth.sessionId) {
+    await getWorkOS().userManagement.revokeSession({
+      sessionId: auth.sessionId,
+    });
   }
   const authkit = await getAuthkit();
-  const { logoutUrl } = await authkit.signOut(auth.sessionId, options);
+  await authkit.clearSession(new Response());
   clearHostAuthSessionCookie();
-  return logoutUrl;
+  markAuthSessionCleared(getAuthKitContext().request);
+  return sanitizeReturnTo(options?.returnTo ?? null) ?? "/login";
 }
 
 export async function saveAuthSession(session: Session) {

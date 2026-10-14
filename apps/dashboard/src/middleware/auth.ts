@@ -8,6 +8,8 @@ import {
 } from "@workos/authkit-tanstack-react-start";
 
 import { NON_DASHBOARD_PATH } from "@/constants/auth-routes";
+import { WORKOS_SESSION_COOKIE_FALLBACK } from "@/constants/cookies";
+import { wasAuthSessionCleared } from "@/lib/auth/session-cookie";
 import { demoProxy } from "@/utils/demo-proxy";
 import {
   evaluateLocalDevAuth,
@@ -69,7 +71,7 @@ export const dashboardAuthMiddleware = createMiddleware().server(
     if (!authenticate) {
       throw new Error("AuthKit middleware is unavailable");
     }
-    return authenticate({
+    const result = await authenticate({
       ...args,
       next: (options) => {
         const context = options?.context as AuthKitContext;
@@ -88,5 +90,31 @@ export const dashboardAuthMiddleware = createMiddleware().server(
         return next(options);
       },
     });
+    if (!wasAuthSessionCleared(request)) {
+      return result;
+    }
+    const sessionCookieName =
+      process.env.WORKOS_COOKIE_NAME || WORKOS_SESSION_COOKIE_FALLBACK;
+    const response = result instanceof Response ? result : result.response;
+    const headers = new Headers(response.headers);
+    const cookies = headers
+      .getSetCookie()
+      .filter(
+        (cookie) =>
+          !cookie.startsWith(`${sessionCookieName}=`) ||
+          /(?:^|;)\s*Max-Age=0(?:;|$)/i.test(cookie)
+      );
+    headers.delete("Set-Cookie");
+    for (const cookie of cookies) {
+      headers.append("Set-Cookie", cookie);
+    }
+    const clearedResponse = new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+    return result instanceof Response
+      ? clearedResponse
+      : { ...result, response: clearedResponse };
   }
 );

@@ -57,11 +57,16 @@ export async function signOut(options?: SignOutActionOptions) {
     await clearSignedCookie(DEMO_SESSION_COOKIE);
     return DEMO_EXIT_URL;
   }
-  const identity = await getAuthIdentity().catch(() => null);
-  if (identity) {
-    await revokeSitePreviewSessions(identity.user.id);
-  }
-  return signOutAuthSession(parsed.success ? parsed.data : undefined);
+  const [destination] = await Promise.all([
+    signOutAuthSession(parsed.success ? parsed.data : undefined),
+    (async () => {
+      const identity = await getAuthIdentity().catch(() => null);
+      if (identity) {
+        await revokeSitePreviewSessions(identity.user.id);
+      }
+    })(),
+  ]);
+  return destination;
 }
 
 export async function updateUser(

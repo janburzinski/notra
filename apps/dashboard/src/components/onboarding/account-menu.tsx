@@ -42,8 +42,8 @@ export function OnboardingAccountMenu() {
       await signOut();
     } catch {
       toast.error(tCommon("labels.failedToSignOut"));
-      setIsSigningOut(false);
     }
+    setIsSigningOut(false);
   }
 
   function handleOpenDelete() {

@@ -19,8 +19,9 @@ test("native WorkOS operations preserve PKCE, session persistence, and logout wi
     };
     mock.module("@tanstack/react-start", () => ({ ...start, getGlobalStartContext: () => context }));
     globalThis.fetch = () => { throw new Error("Unexpected provider request"); };
-    const { configure, sessionEncryption } = await import("@workos/authkit-session");
+    const { configure, getWorkOS, sessionEncryption } = await import("@workos/authkit-session");
     configure({ apiKey: "sk_test_local_fixture_only", clientId: "client_local_fixture", cookiePassword: "local-test-cookie-password-with-32-characters", redirectUri: context.redirectUri });
+    getWorkOS().userManagement.revokeSession = async () => undefined;
     const { createAuthSignInUrl, saveAuthSession, signOutAuthSession } = await import("./src/lib/auth/workos.ts");
     const url = new URL(await createAuthSignInUrl());
     assert.equal(url.searchParams.get("redirect_uri"), context.redirectUri);
@@ -44,9 +45,7 @@ test("native WorkOS operations preserve PKCE, session persistence, and logout wi
     assert.deepEqual(await sessionEncryption.unsealData(sealed, { password: "local-test-cookie-password-with-32-characters", ttl: 0 }), session);
     emitted.delete("set-cookie");
     auth = { user: session.user, sessionId: "session_local_fixture" };
-    const logoutUrl = new URL(await signOutAuthSession({ returnTo: "http://localhost:3000/login" }));
-    assert.equal(logoutUrl.searchParams.get("session_id"), "session_local_fixture");
-    assert.equal(logoutUrl.searchParams.get("return_to"), "http://localhost:3000/login");
+    assert.equal(await signOutAuthSession({ returnTo: "/login" }), "/login");
     assert.ok(emitted.getSetCookie().some(cookie => cookie.startsWith("wos-session=") && cookie.includes("Max-Age=0")));
     auth = { user: null };
     assert.equal(await signOutAuthSession({ returnTo: "/login" }), "/login");

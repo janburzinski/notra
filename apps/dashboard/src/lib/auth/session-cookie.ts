@@ -2,6 +2,16 @@ import { deleteCookie, getRequest } from "@tanstack/react-start/server";
 
 import { WORKOS_SESSION_COOKIE_FALLBACK } from "@/constants/cookies";
 
+const clearedAuthSessionRequests = new WeakSet<Request>();
+
+export function markAuthSessionCleared(request: Request) {
+  clearedAuthSessionRequests.add(request);
+}
+
+export function wasAuthSessionCleared(request: Request) {
+  return clearedAuthSessionRequests.has(request);
+}
+
 export function clearHostAuthSessionCookie() {
   const domain = process.env.WORKOS_COOKIE_DOMAIN?.replace(
     /^\./,
@@ -27,4 +37,5 @@ export async function clearAuthSessionCookie() {
       path: "/",
     }
   );
+  markAuthSessionCleared(getRequest());
 }

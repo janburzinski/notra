@@ -12,6 +12,7 @@ import { SkillDetailHeader } from "@/components/skills/skill-detail-header";
 import { SkillEditorForm } from "@/components/skills/skill-editor-form";
 import { SkillUnsavedChangesToast } from "@/components/skills/skill-unsaved-changes-toast";
 import { SKILL_EDITOR_VIEWS } from "@/constants/skills";
+import { useWarnBeforeUnload } from "@/lib/hooks/use-warn-before-unload";
 import { useRouter } from "@/lib/navigation";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { updateSkillFormSchema } from "@/schemas/skill-form";
@@ -179,15 +180,7 @@ export default function PageClient({
     };
   }, []);
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasChanges) {
-        e.preventDefault();
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [hasChanges]);
+  useWarnBeforeUnload(hasChanges);
 
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">

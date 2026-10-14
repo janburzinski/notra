@@ -1,16 +1,21 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useTranslations } from "use-intl";
 
 import { resetPostHogIdentity } from "@/lib/analytics/posthog-client";
 import { signOutAction } from "@/lib/auth/sign-out-action";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import type { ClientSessionData } from "@/types/auth/session";
 import type { SignOutActionOptions } from "@/types/auth/user-actions";
+import { allowUnloadAfterSignOut, confirmSignOut } from "@/utils/before-unload";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
-async function fetchSession(): Promise<ClientSessionData | null> {
-  const response = await fetch("/api/session", { cache: "no-store" });
+async function fetchSession(
+  signal: AbortSignal
+): Promise<ClientSessionData | null> {
+  const response = await fetch("/api/session", { cache: "no-store", signal });
 
   if (!response.ok) {
     return null;
@@ -22,7 +27,7 @@ async function fetchSession(): Promise<ClientSessionData | null> {
 function useSession() {
   const query = useQuery({
     queryKey: QUERY_KEYS.AUTH.session,
-    queryFn: fetchSession,
+    queryFn: ({ signal }) => fetchSession(signal),
     staleTime: 60 * 1000,
   });
 
@@ -62,13 +67,33 @@ function useSessionInvalidation() {
 }
 
 function useSignOut() {
-  const invalidateSession = useSessionInvalidation();
+  const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return async (options?: SignOutActionOptions) => {
-    const logoutUrl = await signOutAction({ returnTo: options?.returnTo });
-    invalidateSession();
-    resetPostHogIdentity();
-    window.location.assign(logoutUrl);
+    if (
+      !(await confirmSignOut(
+        t("nav.user.confirmSignOutUnsaved"),
+        t("common.labels.logOut"),
+        t("common.actions.cancel")
+      ))
+    ) {
+      return;
+    }
+    const toastId = toast.loading(t("nav.user.signingOut"));
+    try {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.AUTH.session });
+      const destination = await signOutAction({ returnTo: options?.returnTo });
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.AUTH.session });
+      queryClient.setQueryData(QUERY_KEYS.AUTH.session, null);
+      resetPostHogIdentity();
+      toast.success(t("common.labels.signedOutSuccessfully"), { id: toastId });
+      allowUnloadAfterSignOut();
+      window.location.replace(destination);
+    } catch (error) {
+      toast.dismiss(toastId);
+      throw error;
+    }
   };
 }
 

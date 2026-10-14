@@ -13,7 +13,9 @@ export function BannedNotice() {
 
   function handleSignOut() {
     setIsSigningOut(true);
-    signOut().catch(() => setIsSigningOut(false));
+    signOut()
+      .catch(() => undefined)
+      .finally(() => setIsSigningOut(false));
   }
 
   return (

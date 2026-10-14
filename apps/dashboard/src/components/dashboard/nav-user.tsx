@@ -53,13 +53,13 @@ export function NavUser() {
 
   async function handleSignOut() {
     setIsSigningOut(true);
-    await flushTrackEvent(POSTHOG_EVENTS.LOGOUT);
+    void flushTrackEvent(POSTHOG_EVENTS.LOGOUT);
     try {
       await signOut();
     } catch (_error) {
       toast.error(tCommon("labels.failedToSignOut"));
-      setIsSigningOut(false);
     }
+    setIsSigningOut(false);
   }
 
   if (!hasHydrated || (!user && isPending)) {

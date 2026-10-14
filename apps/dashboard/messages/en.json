@@ -5650,6 +5650,7 @@
       "copyLink": "Copy link"
     },
     "user": {
+      "confirmSignOutUnsaved": "You have unsaved changes. Signing out will discard them. Sign out anyway?",
       "signingOut": "Signing out…"
     },
     "upgrade": {

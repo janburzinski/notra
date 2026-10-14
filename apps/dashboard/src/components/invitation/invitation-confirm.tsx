@@ -12,6 +12,7 @@ import {
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
 import { type ReactNode, useState } from "react";
+import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -139,9 +140,11 @@ function Mismatch({
         loading={isSigningOut}
         onClick={() => {
           setIsSigningOut(true);
-          signOut({ returnTo: window.location.href }).catch(() =>
-            setIsSigningOut(false)
-          );
+          signOut({
+            returnTo: window.location.pathname + window.location.search,
+          })
+            .catch(() => undefined)
+            .finally(() => setIsSigningOut(false));
         }}
       >
         {t("signOut")}
@@ -199,9 +202,9 @@ function PendingInvitationCard({ data }: { data: PendingInvitation }) {
   }
 
   function switchAccount() {
-    signOut({ returnTo: window.location.href }).catch(() =>
-      setError(t("failed"))
-    );
+    signOut({
+      returnTo: window.location.pathname + window.location.search,
+    }).catch(() => toast.error(t("failed")));
   }
 
   function accept() {

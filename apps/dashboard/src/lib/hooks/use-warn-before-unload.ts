@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 
-export function useWarnBeforeUnload(active: boolean) {
+import { registerBeforeUnloadGuard } from "@/utils/before-unload";
+
+export function useWarnBeforeUnload(active: boolean, onBlocked?: () => void) {
   useEffect(() => {
     if (!active) {
       return;
     }
-    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [active]);
+    return registerBeforeUnloadGuard((event) => {
+      event.preventDefault();
+      event.returnValue = "";
+      onBlocked?.();
+    });
+  }, [active, onBlocked]);
 }

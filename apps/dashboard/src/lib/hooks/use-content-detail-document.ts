@@ -28,6 +28,7 @@ import {
   useGeoWriterBrief,
   useGeoWriterUpdate,
 } from "@/lib/hooks/use-geo-writer";
+import { useWarnBeforeUnload } from "@/lib/hooks/use-warn-before-unload";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { ImageExportTarget } from "@/types/content/image-export";
 import type { ContentApiResponse } from "@/types/hooks/content";
@@ -326,23 +327,10 @@ export function useContentDetailDocument({
     ]
   );
 
-  useEffect(() => {
-    if (!hasChanges) {
-      return;
-    }
-
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-      shakeElements(SAVE_BAR_SELECTOR);
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [hasChanges]);
+  useWarnBeforeUnload(
+    hasChanges,
+    useCallback(() => shakeElements(SAVE_BAR_SELECTOR), [])
+  );
 
   const linkedGitHubPublish = linkedPublishForContent(data?.content);
 
