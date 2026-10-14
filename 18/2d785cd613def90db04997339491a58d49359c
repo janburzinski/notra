@@ -1,0 +1,21 @@
+apps/ui/registry/notra/composer/examples/composer-queue.tsx
+  s_0a7cb893d7a81f::t_7d2ccd56b18fe8 16-17,34-35,37,39,44,49,82-83
+apps/ui/src/constants/example-heights.ts
+  s_0a7cb893d7a81f::t_901b179784d7c7 50-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "182d785cd613def90db04997339491a58d49359c",
+  "prompts": {},
+  "sessions": {
+    "s_0a7cb893d7a81f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a138c3-a339-7ef1-9001-b0326ddbc675",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
