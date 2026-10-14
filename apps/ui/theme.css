@@ -6,6 +6,17 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Base UI injects this rule as a React-hoisted <style>, which Blume's
+   client-side navigation drops from <head> and React never re-inserts, so
+   ScrollArea viewports show native scrollbars after the first page change. */
+.base-ui-disable-scrollbar {
+  scrollbar-width: none;
+}
+
+.base-ui-disable-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 :root {
   --notra-content-width: 72rem;
   --notra-content-gutter: 1.5rem;
