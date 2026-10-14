@@ -4,6 +4,7 @@ import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import { consentManifest } from "c15t/tanstack-start/build";
 import mdx from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
@@ -85,6 +86,9 @@ export default defineConfig(({ command }) => ({
   plugins: [
     contentMdx(),
     tailwindcss(),
+    consentManifest({
+      backendURL: "https://notra-prod-notra.inth.app",
+    }),
     tanstackStart(),
     react(),
     babel({ presets: [reactCompilerPreset()] }),

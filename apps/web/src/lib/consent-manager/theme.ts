@@ -1,11 +1,4 @@
-import type { Theme } from "@c15t/react";
-
-const smoothingSlot = {
-  style: {
-    WebkitFontSmoothing: "antialiased",
-    MozOsxFontSmoothing: "grayscale",
-  },
-} satisfies NonNullable<Theme["slots"]>["consentBanner"];
+import type { Theme } from "c15t/tanstack-start";
 
 const colors = {
   primary: "var(--primary)",
@@ -36,10 +29,17 @@ export const consentTheme = {
     fontFamily: "var(--font-inter)",
   },
   radius,
-  slots: {
-    consentBanner: smoothingSlot,
-    consentBannerCard: smoothingSlot,
-    consentDialog: smoothingSlot,
-    consentDialogCard: smoothingSlot,
-  },
 } satisfies Theme;
+
+const smoothingStyle = {
+  WebkitFontSmoothing: "antialiased",
+  MozOsxFontSmoothing: "grayscale",
+} as const;
+
+export const consentComponents = {
+  banner: {
+    root: { style: smoothingStyle },
+    card: { style: smoothingStyle },
+  },
+  dialog: { root: { style: smoothingStyle }, card: { style: smoothingStyle } },
+};

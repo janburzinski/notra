@@ -1,5 +1,6 @@
 import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { ConsentDialogLink } from "c15t/tanstack-start/components/consent-dialog-link";
 
 import { DeferredDithering } from "@/components/deferred-dithering";
 import {
@@ -115,6 +116,9 @@ export default function FooterSection() {
                     {link.label}
                   </Link>
                 ))}
+                <ConsentDialogLink className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1e66] transition-colors hover:text-[#1e1e1e]">
+                  Privacy settings
+                </ConsentDialogLink>
               </div>
               <p className="dark:text-foreground/50 font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1e66]">
                 {`© ${year} Notra, Inc.`}

@@ -1,7 +1,6 @@
 @import "tailwindcss" source("../");
 @import "./ui-sources.css";
 @import "tw-animate-css";
-@import "@c15t/react/styles.css";
 @import "@fontsource-variable/inter";
 @import "@fontsource/instrument-serif/400.css";
 @import "../../../../packages/ui/src/styles/ai-overview.css";

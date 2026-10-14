@@ -5,4 +5,19 @@ minimumReleaseAge = 604800
 minimumReleaseAgeExcludes = [
   # Our own package; apps bump it right after each publish.
   "@usenotra/geo",
+  # c15t 3.0.0 and the @c15t packages it pulls in. Drop once 3.0.0 is a week old.
+  "c15t",
+  "@c15t/astro",
+  "@c15t/core",
+  "@c15t/dev-tools",
+  "@c15t/iab",
+  "@c15t/integrations",
+  "@c15t/nextjs",
+  "@c15t/react",
+  "@c15t/schema",
+  "@c15t/svelte",
+  "@c15t/tanstack-start",
+  "@c15t/translations",
+  "@c15t/ui",
+  "@c15t/vue",
 ]

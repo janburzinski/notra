@@ -1,4 +1,4 @@
-import { Databuddy, FlagsProvider } from "@databuddy/sdk/react";
+import { FlagsProvider } from "@databuddy/sdk/react";
 import { Toaster } from "@notra/ui/components/ui/sonner";
 import {
   createRootRoute,
@@ -6,13 +6,26 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
-import { buildPrefetchScript } from "c15t";
+import { createServerFn } from "@tanstack/react-start";
+import { DevTools } from "c15t/react/devtools";
+import {
+  ConsentBanner,
+  ConsentDialog,
+  ConsentRoot,
+  ConsentTheme,
+  offline,
+} from "c15t/tanstack-start";
+import {
+  consentLoaderOptions,
+  createConsentStateHandler,
+} from "c15t/tanstack-start/server";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import type { ReactNode } from "react";
 
-import { ConsentManager } from "@/components/consent-manager";
 import NotFound from "@/components/not-found-page";
 import { ThemeProvider } from "@/components/theme-provider";
+import { consentScripts } from "@/consent-scripts";
+import { consentComponents, consentTheme } from "@/lib/consent-manager/theme";
 import { RSS_FEED_PATH, RSS_FEED_TITLE } from "@/utils/constants";
 import { buildNavbarSessionScript } from "@/utils/navbar-session";
 
@@ -20,7 +33,13 @@ import globalsCss from "@/styles/globals.css?url";
 
 const databuddyClientId = import.meta.env.NEXT_PUBLIC_DATABUDDY_WEB_WEBSITE_ID;
 
+const getConsentState = createServerFn({ method: "GET" }).handler(
+  createConsentStateHandler({ proxy: true, routePrefix: "/api/c15t" })
+);
+
 export const Route = createRootRoute({
+  ...consentLoaderOptions,
+  loader: async () => ({ consent: await getConsentState() }),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -54,10 +73,6 @@ export const Route = createRootRoute({
         id: "navbar-session-prefetch",
         children: buildNavbarSessionScript(),
       },
-      {
-        id: "c15t-initial-data-prefetch",
-        children: buildPrefetchScript({ backendURL: "/api/c15t" }),
-      },
     ],
   }),
   component: Outlet,
@@ -66,6 +81,7 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: ReactNode }) {
+  const { consent } = Route.useLoaderData();
   return (
     <html
       lang="en"
@@ -92,22 +108,29 @@ function RootDocument({ children }: { children: ReactNode }) {
           disableTransitionOnChange
           enableSystem
         >
-          <FlagsProvider
-            clientId={databuddyClientId ?? ""}
-            disabled={!databuddyClientId}
+          <ConsentTheme theme={consentTheme} />
+          <ConsentRoot
+            state={consent}
+            scripts={consentScripts}
+            options={{
+              consentCategories: ["necessary", "measurement", "marketing"],
+              theme: consentTheme,
+              components: consentComponents,
+              ...(process.env.NODE_ENV !== "production"
+                ? { mode: offline() }
+                : {}),
+            }}
           >
-            {databuddyClientId && (
-              <Databuddy
-                clientId={databuddyClientId}
-                trackAttributes={true}
-                trackErrors={true}
-                trackHashChanges={true}
-              />
-            )}
-            <ConsentManager>
+            <ConsentBanner />
+            <ConsentDialog />
+            {process.env.NODE_ENV !== "production" && <DevTools />}
+            <FlagsProvider
+              clientId={databuddyClientId ?? ""}
+              disabled={!databuddyClientId}
+            >
               <NuqsAdapter>{children}</NuqsAdapter>
-            </ConsentManager>
-          </FlagsProvider>
+            </FlagsProvider>
+          </ConsentRoot>
           <Toaster position="bottom-right" />
         </ThemeProvider>
         <Scripts />
