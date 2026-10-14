@@ -66,9 +66,10 @@ const SKIN_SURFACE: Record<GeoChatSkin, string> = {
   chatgpt: "bg-background",
   gemini: "bg-white dark:bg-[#1f1f1f]",
   perplexity: "bg-white dark:bg-[#111]",
-  opencode: "bg-[var(--opencode-tui-background,#090909)]",
-  "claude-code": "bg-[#0f0f0f]",
-  codex: "bg-[#0f0f0f]",
+  opencode:
+    "dark bg-[var(--opencode-tui-background,#090909)] text-foreground scheme-dark",
+  "claude-code": "dark bg-[#0f0f0f] text-foreground scheme-dark",
+  codex: "dark bg-[#0f0f0f] text-foreground scheme-dark",
 };
 
 function ignoreFollowUp(_text: string): void {
