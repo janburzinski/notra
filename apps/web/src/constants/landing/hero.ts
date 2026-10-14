@@ -1,8 +1,8 @@
 import type { HeroCycleWord } from "@/types/landing/hero";
 
-export const HERO_HEADLINE_LINE_ONE = "Your next customer";
+export const HERO_HEADLINE_LINE_ONE = "Be the answer when";
 
-export const HERO_HEADLINE_LINE_TWO_PREFIX = "is asking";
+export const HERO_HEADLINE_LINE_TWO_PREFIX = "buyers ask";
 
 export const HERO_HEADLINE_SUFFIX = ".";
 
