@@ -1,0 +1,21 @@
+scripts/github/utils/release-ci.test.mjs
+  s_f26798f16e7a66::t_3481205350bad0 1-73
+scripts/github/utils/release-ci.mjs
+  s_f26798f16e7a66::t_44ac4bd3ede59a 1,5-21,31-78,89,95-97,99-107,111,114-116,130-131,135-199,204-207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8a6a2b8e55c051e4b82ef4207799251b352ef2cc",
+  "prompts": {},
+  "sessions": {
+    "s_f26798f16e7a66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89485ffb-58c2-44bb-95ea-0d7dcdff65cb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
