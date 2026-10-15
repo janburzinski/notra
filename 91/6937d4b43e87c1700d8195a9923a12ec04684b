@@ -1,0 +1,23 @@
+packages/db/tests/post-history.test.ts
+  s_24ef0f81a57362::t_f24c6b8724670a 69-72
+  s_24ef0f81a57362::t_5041cc68b96f44 142,161
+  s_24ef0f81a57362::t_a4f44b0dbcd018 1-68,73-141,143-160,162-165
+.github/workflows/code-quality.yml
+  s_24ef0f81a57362::t_6a02e20a304889 156-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "916937d4b43e87c1700d8195a9923a12ec04684b",
+  "prompts": {},
+  "sessions": {
+    "s_24ef0f81a57362": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "660b52b9-44b8-42fe-8c6c-a672d4299f24",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
