@@ -7,6 +7,7 @@ import {
 } from "../constants/geo-model-catalog";
 import { geoModelFeedSchema } from "../schemas/geo-model-feed";
 import type { GeoModelCatalog, GeoResolvedModelCatalog } from "../types/geo";
+import { isGeoNativeSearchEngine } from "../utils/geo-engines";
 import { resolveGroundedEngines } from "../utils/geo-grounded-engines";
 import { logGeoFailure } from "../utils/geo-log";
 import {
@@ -76,12 +77,20 @@ export const loadGeoModelCatalog = Effect.fn("geo.modelCatalog")(function* (
     catalog,
     codingAgentsAllowed ? [] : GEO_PAID_CODING_AGENT_ENGINE_IDS
   );
-  return {
+  const resolved: GeoResolvedModelCatalog = {
     ...available,
-    models: available.models.map((model) => ({
-      ...model,
-      supportsGroundedChecks:
-        resolveGroundedEngines([model.id], available).length > 0,
-    })),
-  } satisfies GeoResolvedModelCatalog;
+    models: available.models.map((model) => {
+      const supportsGroundedChecks =
+        resolveGroundedEngines([model.id], available).length > 0;
+      return {
+        ...model,
+        hidden:
+          model.hidden ||
+          (!supportsGroundedChecks &&
+            !isGeoNativeSearchEngine(available, model.id)),
+        supportsGroundedChecks,
+      };
+    }),
+  };
+  return resolved;
 });

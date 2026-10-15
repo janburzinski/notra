@@ -17,6 +17,7 @@ import {
 import { GeoCodingAgentAccessService } from "../src/deps";
 import { loadGeoModelCatalog } from "../src/geo/model-catalog";
 import { geoBoxAgentForEngine } from "../src/utils/geo-coding-agents";
+import { engineModelOf } from "../src/utils/geo-engine-family";
 import {
   geoEngineUsedWebSearch,
   isGeoNativeSearchEngine,
@@ -100,6 +101,23 @@ describe("coding-agent catalog and paid-plan boundaries", () => {
       "codex/gpt-6.1-sol",
     ]);
   });
+
+  test.each([
+    "opencode/gpt-5.6-sol-medium",
+    "claude-code/claude-opus-5",
+    "codex/gpt-5.6-sol-rei",
+  ])("historical %s retains web search without changing identity", (engine) => {
+    expect(geoEngineUsedWebSearch(engine)).toBe(true);
+    expect(engineModelOf(engine)).toBe(engine);
+    expect(geoBoxAgentForEngine(engine)).toBeNull();
+  });
+
+  test.each(["cursor/auto", "openai/gpt-5.4-mini", "unknown/model"])(
+    "%s is not classified as historical web search",
+    (engine) => {
+      expect(geoEngineUsedWebSearch(engine)).toBe(false);
+    }
+  );
 
   test.each([false, true])(
     "paid=%s gates every coding engine without rollout flags",

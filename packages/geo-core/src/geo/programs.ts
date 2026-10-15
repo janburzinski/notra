@@ -124,7 +124,10 @@ import {
   sumConversionVisits,
 } from "../utils/geo-conversion-paths";
 import { engineFamilyOf } from "../utils/geo-engine-family";
-import { scopeGeoScanEngines } from "../utils/geo-engines";
+import {
+  remapRetiredGeoEngineIds,
+  scopeGeoScanEngines,
+} from "../utils/geo-engines";
 import {
   trackedGeoLanguages,
   withPromptLanguage,
@@ -620,7 +623,8 @@ export const addGeoTrackedEngine = Effect.fn("geo.settingsEngineAdd")(
   function* (input: GeoSettingsEngineAddInput) {
     const { projectId } = yield* requireGeoProject(input);
     const catalog = yield* loadGeoModelCatalog(input.organizationId);
-    if (!getGeoModelCatalogEntry(catalog, input.engine)) {
+    const model = getGeoModelCatalogEntry(catalog, input.engine);
+    if (!model) {
       return yield* Effect.fail(
         new GeoSettingsTrackingError({
           message: "This model is no longer available for tracking",
@@ -654,6 +658,7 @@ export const addGeoTrackedEngine = Effect.fn("geo.settingsEngineAdd")(
           and(
             eq(geoSettings.organizationId, input.organizationId),
             eq(geoSettings.projectId, projectId),
+            sql`(NOT ${Boolean(model.hidden)} OR ${input.engine} = ANY(${geoSettings.engines}))`,
             sql`(
               NOT ${geoSettings.enforceZdr}
               OR ${isGeoEngineZdrCapable(catalog, input.engine)}
@@ -763,6 +768,23 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
       where: eq(geoSettings.projectId, projectId),
     })
   );
+  const storedEngines = remapRetiredGeoEngineIds(
+    existingSettings?.engines ?? []
+  );
+  const storedEngineSet = new Set(storedEngines);
+  const requestedEngines = remapRetiredGeoEngineIds(input.engines);
+  if (
+    requestedEngines.some((engine) => {
+      const model = getGeoModelCatalogEntry(catalog, engine);
+      return !storedEngineSet.has(engine) && (!model || model.hidden);
+    })
+  ) {
+    return yield* Effect.fail(
+      new GeoSettingsTrackingError({
+        message: "Legacy or unavailable models cannot be newly selected",
+      })
+    );
+  }
   const pausedAutoPromptIds =
     input.pausedAutoPromptIds ?? existingSettings?.pausedAutoPromptIds ?? [];
   const removedAutoPromptIds =
@@ -785,12 +807,12 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
       })
     );
   }
-  const preservedEngines = (existingSettings?.engines ?? []).filter(
+  const preservedEngines = storedEngines.filter(
     (engine) =>
       unavailableStaticEngines.size > 0 && unavailableStaticEngines.has(engine)
   );
   const preservedEngineSet = new Set(preservedEngines);
-  const engines = [...new Set([...input.engines, ...preservedEngines])];
+  const engines = [...new Set([...requestedEngines, ...preservedEngines])];
   if (engines.length === 0) {
     return yield* Effect.fail(
       new GeoSettingsTrackingError({ message: "Choose at least one model" })
@@ -799,10 +821,10 @@ export const upsertGeoSettings = Effect.fn("geo.settingsUpsert")(function* (
   const engineSet = new Set(engines);
   const nonZdrApprovedEngines = [
     ...new Set([
-      ...input.nonZdrApprovedEngines,
-      ...(existingSettings?.nonZdrApprovedEngines ?? []).filter((engine) =>
-        preservedEngineSet.has(engine)
-      ),
+      ...remapRetiredGeoEngineIds(input.nonZdrApprovedEngines),
+      ...remapRetiredGeoEngineIds(
+        existingSettings?.nonZdrApprovedEngines ?? []
+      ).filter((engine) => preservedEngineSet.has(engine)),
     ]),
   ].filter((engine) => engineSet.has(engine));
 

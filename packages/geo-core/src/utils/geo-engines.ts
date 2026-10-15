@@ -51,7 +51,8 @@ export function remapRetiredGeoEngineIds(ids: Iterable<string>): string[] {
 /**
  * Resolve a this-run engine selection. `undefined` keeps the full tracked set.
  * An explicit selection may include catalog models the project does not track,
- * so a one-off scan can try a model before tracking it. Unknown ids are dropped.
+ * so a one-off scan can try a model before tracking it. Unknown ids and
+ * untracked legacy models are dropped.
  */
 export function scopeGeoScanEngines(
   catalog: GeoModelCatalog,
@@ -61,7 +62,15 @@ export function scopeGeoScanEngines(
   if (!requested) {
     return [...tracked];
   }
-  return sortKnownEngines(catalog, remapRetiredGeoEngineIds(requested));
+  const trackedIds = new Set(remapRetiredGeoEngineIds(tracked));
+  return sortKnownEngines(
+    catalog,
+    remapRetiredGeoEngineIds(requested).filter(
+      (engine) =>
+        trackedIds.has(engine) ||
+        !getGeoModelCatalogEntry(catalog, engine)?.hidden
+    )
+  );
 }
 
 /**
@@ -109,7 +118,7 @@ export function geoEngineUsedWebSearch(engine: string): boolean {
     engineModelOf(engine) !== engine ||
     engine === GEO_AI_OVERVIEW_ENGINE_ID ||
     engine === GEO_OPENCODE_ENGINE_ID ||
-    isGeoBoxCodingAgent(engine)
+    isGeoBoxCodingAgent(GEO_MODEL_REPLACED_IDS[engine] ?? engine)
   );
 }
 

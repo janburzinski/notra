@@ -49,11 +49,13 @@ import type {
   GeoEngineProviderListProps,
   GeoEngineProviderModelsProps,
   GeoEngineProviderRowProps,
+  GeoPendingModelRemoval,
 } from "@/types/geo";
 import {
   findActivePlanSubscription,
   zdrAddonPlanId,
 } from "@/utils/billing-plans";
+import { removedLegacyGeoModels } from "@/utils/geo-legacy-models";
 
 const ROW_CLASS = "flex items-center justify-between gap-3 px-3 py-2";
 
@@ -112,11 +114,21 @@ function GeoModelRow({
       }
     >
       <Label
-        className="flex min-w-0 flex-1 items-center gap-2 font-normal"
+        className="flex min-w-0 flex-1 flex-wrap items-center gap-2 font-normal"
         htmlFor={id}
       >
         <span className="min-w-0 text-xs">{model.label}</span>
         {webSearch ? null : <NoWebSearchBadge />}
+        {model.hidden ? (
+          <Tooltip>
+            <TooltipTrigger render={<span className="inline-flex" />}>
+              <Badge className="shrink-0" size="sm" variant="outline">
+                {t("legacyModel")}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>{t("legacyModelDescription")}</TooltipContent>
+          </Tooltip>
+        ) : null}
         {showZdrState && model.zdr === "none" ? (
           <span className="text-muted-foreground shrink-0 text-xs">
             {approved ? t("approvedWithoutZdr") : t("noZdrHost")}
@@ -162,16 +174,29 @@ export function GeoEnginePicker({
   const [pendingApproval, setPendingApproval] =
     useState<GeoModelCatalogEntry | null>(null);
   const [pendingDisable, setPendingDisable] =
-    useState<GeoModelCatalogEntry | null>(null);
+    useState<GeoPendingModelRemoval | null>(null);
   const [showAllModels, setShowAllModels] = useState<Set<string>>(
     () => new Set()
   );
 
   const lastSelected = selected.length <= 1;
   const zdrActive = enforceZdr && canEnforceZdr;
+  const selectedIds = new Set(selected);
+  const pendingModelLabels = removedLegacyGeoModels(
+    catalog.models,
+    selected,
+    pendingDisable?.ids ?? []
+  )
+    .map((model) => model.label)
+    .join(", ");
 
   const select = (ids: readonly string[]) => {
-    onChange(sortKnownEngines(catalog, [...selected, ...ids]));
+    const eligible = ids.filter((id) =>
+      catalog.models.some(
+        (model) => model.id === id && (!model.hidden || selectedIds.has(id))
+      )
+    );
+    onChange(sortKnownEngines(catalog, [...selected, ...eligible]));
   };
   const deselect = (ids: readonly string[]) => {
     const remove = new Set(ids);
@@ -179,6 +204,13 @@ export function GeoEnginePicker({
     onNonZdrApprovedChange(
       nonZdrApproved.filter((engine) => !remove.has(engine))
     );
+  };
+  const requestDeselect = (ids: readonly string[]) => {
+    if (removedLegacyGeoModels(catalog.models, selected, ids).length > 0) {
+      setPendingDisable({ ids });
+      return;
+    }
+    deselect(ids);
   };
 
   const toggleExpanded = (providerId: string) => {
@@ -211,7 +243,7 @@ export function GeoEnginePicker({
     checked: boolean
   ) => {
     if (!checked) {
-      deselect(models.map((model) => model.id));
+      requestDeselect(models.map((model) => model.id));
       return;
     }
     const eligible = zdrActive
@@ -231,11 +263,10 @@ export function GeoEnginePicker({
 
   const toggleModel = (model: GeoModelCatalogEntry, checked: boolean) => {
     if (!checked) {
-      if (model.hidden) {
-        setPendingDisable(model);
-        return;
-      }
-      deselect([model.id]);
+      requestDeselect([model.id]);
+      return;
+    }
+    if (model.hidden && !selectedIds.has(model.id)) {
       return;
     }
     const needsApproval =
@@ -262,21 +293,43 @@ export function GeoEnginePicker({
     if (!pendingDisable) {
       return;
     }
-    deselect([pendingDisable.id]);
+    if (pendingDisable.enforceZdr) {
+      onEnforceZdrChange(true);
+      onChange(
+        applyGeoZdrEngineFallback(catalog, selected, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: nonZdrApproved,
+        })
+      );
+      const removedIds = new Set(pendingDisable.ids);
+      onNonZdrApprovedChange(
+        nonZdrApproved.filter((id) => !removedIds.has(id))
+      );
+    } else {
+      deselect(pendingDisable.ids);
+    }
     setPendingDisable(null);
   };
 
   const handleZdrChange = useCallback(
     (next: boolean) => {
-      onEnforceZdrChange(next);
       if (next) {
-        onChange(
-          applyGeoZdrEngineFallback(catalog, selected, {
-            enforceZdr: true,
-            nonZdrApprovedEngines: nonZdrApproved,
-          })
-        );
+        const nextSelected = applyGeoZdrEngineFallback(catalog, selected, {
+          enforceZdr: true,
+          nonZdrApprovedEngines: nonZdrApproved,
+        });
+        const nextIds = new Set(nextSelected);
+        const removedIds = selected.filter((id) => !nextIds.has(id));
+        if (
+          removedLegacyGeoModels(catalog.models, selected, removedIds).length >
+          0
+        ) {
+          setPendingDisable({ ids: removedIds, enforceZdr: true });
+          return;
+        }
+        onChange(nextSelected);
       }
+      onEnforceZdrChange(next);
     },
     [catalog, nonZdrApproved, onChange, onEnforceZdrChange, selected]
   );
@@ -447,7 +500,7 @@ export function GeoEnginePicker({
       <ConfirmDialog
         confirmLabel={t("turnOff")}
         description={t("turnOffDescription", {
-          model: pendingDisable?.label ?? "",
+          model: pendingModelLabels,
         })}
         onConfirm={confirmDisable}
         onOpenChange={(open) => {
@@ -456,7 +509,7 @@ export function GeoEnginePicker({
           }
         }}
         open={pendingDisable !== null}
-        title={t("turnOffTitle", { model: pendingDisable?.label ?? "" })}
+        title={t("turnOffTitle", { model: pendingModelLabels })}
       />
     </div>
   );

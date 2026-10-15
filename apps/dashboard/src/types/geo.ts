@@ -1220,6 +1220,11 @@ export interface GeoEnginePickerProps {
   scheduleRow?: ReactNode;
 }
 
+export interface GeoPendingModelRemoval {
+  ids: readonly string[];
+  enforceZdr?: boolean;
+}
+
 export interface GeoEngineProviderListProps {
   catalog: GeoResolvedModelCatalog;
   disabled: boolean;

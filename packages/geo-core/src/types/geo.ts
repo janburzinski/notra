@@ -1526,8 +1526,8 @@ export interface GeoModelCatalogEntry {
   /** Gateways that serve the model; OpenRouter-only models are pinned. */
   gateways: readonly GeoModelGateway[];
   /**
-   * Superseded or niche model: still scannable for projects that track it,
-   * but not offered in the picker.
+   * Legacy model (superseded, niche, or without web search): still scannable
+   * for projects that track it, but not offered for new selections.
    */
   hidden?: boolean;
 }

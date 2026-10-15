@@ -226,12 +226,15 @@ export function geoModelsForProvider(
 
 export function geoDefaultEngines(catalog: GeoModelCatalog): string[] {
   const defaults = catalog.models
-    .filter((model) => model.default)
+    .filter((model) => model.default && !model.hidden)
     .map((model) => model.id);
   if (defaults.length > 0) {
     return defaults;
   }
-  return catalog.models.slice(0, 1).map((model) => model.id);
+  return catalog.models
+    .filter((model) => !model.hidden)
+    .slice(0, 1)
+    .map((model) => model.id);
 }
 
 /**
@@ -248,7 +251,9 @@ export function geoEnginesForAudience(
   if (audienceType !== "general" && audienceType !== "commerce") {
     return geoDefaultEngines(catalog);
   }
-  const known = new Set(catalog.models.map((model) => model.id));
+  const known = new Set(
+    catalog.models.filter((model) => !model.hidden).map((model) => model.id)
+  );
   if (!GEO_GENERAL_AUDIENCE_ENGINE_IDS.every((id) => known.has(id))) {
     return geoDefaultEngines(catalog);
   }
