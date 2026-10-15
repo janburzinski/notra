@@ -1,0 +1,41 @@
+apps/dashboard/messages/de.json
+  s_e525c92d4fac0c::t_791e89a88c2d4d 3027
+  s_e525c92d4fac0c::t_02b43278a835cb 2913
+  s_e525c92d4fac0c::t_886cd7b0582997 2914
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  s_e525c92d4fac0c::t_539bbf41b7aec7 82
+  s_e525c92d4fac0c::t_3cd412eab36a53 78,546
+  s_e525c92d4fac0c::t_73b57536688882 552,559
+  s_e525c92d4fac0c::t_886cd7b0582997 487,490,530-540,543,583,591-592,606-623,626
+  s_e525c92d4fac0c::t_02b43278a835cb 52,196-198,201-203,205,208-211,214,509-510,547,557,560,562-582,584-586,588,590,593,598,603
+apps/dashboard/messages/en.json
+  s_e525c92d4fac0c::t_886cd7b0582997 2914
+  s_e525c92d4fac0c::t_791e89a88c2d4d 3027
+  s_e525c92d4fac0c::t_02b43278a835cb 2913
+apps/dashboard/src/components/settings/panes/geo-pane.tsx
+  s_e525c92d4fac0c::t_c1187b555fa065 11
+apps/dashboard/src/types/geo.ts
+  s_e525c92d4fac0c::t_5b6709de248e67 693,695
+apps/dashboard/src/components/geo/geo-scan-schedule.tsx
+  s_e525c92d4fac0c::t_5b6709de248e67 21,30,46-47,50,52,70-72,86-91,106-110,142-150,153
+apps/dashboard/src/components/geo/geo-settings-form.tsx
+  s_e525c92d4fac0c::t_5b6709de248e67 484,487
+  s_e525c92d4fac0c::t_98109a403826b7 29
+  s_e525c92d4fac0c::t_c1187b555fa065 495-506
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4bc4429fb34f37f35aa99abe804197c51bb79a20",
+  "prompts": {},
+  "sessions": {
+    "s_e525c92d4fac0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "df5244bc-a21c-4194-a5a3-cf853a380544",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
