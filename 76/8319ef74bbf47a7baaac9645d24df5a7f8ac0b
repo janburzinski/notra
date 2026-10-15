@@ -1,0 +1,45 @@
+infra/observability/config.test.mjs
+  s_a0799efed517c8::t_31caf77774d7e3 104
+infra/observability/constants/prometheus-fixtures.mjs
+  s_a0799efed517c8::t_31caf77774d7e3 13,24-26
+CONTRIBUTING.md
+  s_a0799efed517c8::t_31caf77774d7e3 337-342,346-350
+infra/observability/grafana/dashboards/notra-vercel.json
+  s_a0799efed517c8::t_31caf77774d7e3 3,61,66,71,78-79,82-85,88-91,99-100,113-114,119-120,125-126,131-132,137-138,159,337-392
+infra/observability/grafana/dashboards/notra.json
+  s_a0799efed517c8::t_31caf77774d7e3 59,787-1020
+infra/observability/utils/prometheus-fixture.mjs
+  s_a0799efed517c8::t_31caf77774d7e3 52-56
+apps/dashboard/src/app/api/cron/monitoring/route.ts
+  s_a0799efed517c8::t_31caf77774d7e3 2,39-40
+packages/ai/src/utils/workflow-telemetry-value.ts
+  s_a0799efed517c8::t_31caf77774d7e3 1-28
+infra/observability/check-prometheus-resources.mjs
+  s_a0799efed517c8::t_31caf77774d7e3 312-313
+README.md
+  s_a0799efed517c8::t_31caf77774d7e3 75
+infra/observability/README.md
+  s_a0799efed517c8::t_31caf77774d7e3 5-81
+packages/ai/src/constants/workflow-telemetry.ts
+  s_a0799efed517c8::t_31caf77774d7e3 1-117
+.claude/CLAUDE.md
+  s_a0799efed517c8::t_31caf77774d7e3 1
+AGENTS.md
+  s_a0799efed517c8::t_31caf77774d7e3 3-8,18-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "768319ef74bbf47a7baaac9645d24df5a7f8ac0b",
+  "prompts": {},
+  "sessions": {
+    "s_a0799efed517c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd2fba69-476b-482b-aae2-b39793aeb150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
