@@ -1,0 +1,21 @@
+packages/geo-core/src/geo/scan.ts
+  s_a9685c24cd5e54::t_1689a590a29dd6 601-602,645-650
+packages/geo-core/tests/olostep-manual-runs.test.ts
+  s_a9685c24cd5e54::t_e406d45e0c94b2 282-318
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "50a2f0a1f36c03f2ae4ff36f2729c780a97a5c85",
+  "prompts": {},
+  "sessions": {
+    "s_a9685c24cd5e54": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13def-cbf1-7980-9022-65d839abe2a2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
