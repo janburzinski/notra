@@ -1,0 +1,21 @@
+packages/sites-server/src/cleanup.ts
+  s_1493644349eb54::t_11ddef2cffe07a 12,50,53,79,81-84
+packages/sites-server/src/runner.ts
+  s_1493644349eb54::t_11ddef2cffe07a 20,127-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1dea089109b2ab37cb623344e12394cd3530ce3d",
+  "prompts": {},
+  "sessions": {
+    "s_1493644349eb54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d134c4b9-c28e-47f3-a8ee-5d16b21c4720",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
