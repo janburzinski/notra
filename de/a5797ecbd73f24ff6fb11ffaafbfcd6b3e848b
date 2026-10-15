@@ -1,0 +1,187 @@
+apps/docs/geo/metrics/citations.mdx
+  s_a0799efed517c8::t_3a99ea6d206a14 23
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 95-100,556-609,617-620,637-642
+packages/ai/src/utils/geo-opencode-sources.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 58-60
+apps/dashboard/src/components/dashboard/nav-jobs.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1-62
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 14,20-21,33,54-72,76,79,86-88
+apps/dashboard/src/app/(dashboard)/[slug]/api-keys/page.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 417-419
+apps/dashboard/src/components/api-keys/account-api-keys-section.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 341,420
+apps/dashboard/src/app/(dashboard)/[slug]/chat/skeleton.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 41-63
+apps/dashboard/src/components/dashboard/org-selector.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 6,17,51-53,210-243,247,398-399
+apps/dashboard/src/routes/-integrations-ui.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 4-6
+apps/dashboard/src/routes/-dashboard-loaders.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 11,43
+apps/dashboard/src/utils/workspace-search-json-rows.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-33
+apps/dashboard/src/types/components/nav.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 38-58
+apps/dashboard/src/utils/geo-gaps.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 28,289-296
+apps/web/src/components/landing/live-demo-link.test.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 6,11,16,29-32,37
+packages/ai/src/utils/geo-box-operation.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-26
+packages/geo-core/src/constants/geo-coding-agents.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 54-77
+packages/geo-core/src/constants/geo.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 74-81,86,358
+packages/geo-core/src/utils/geo-engine-icon.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 5-8
+apps/dashboard/src/constants/geo-engine-icons.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 19,51
+apps/dashboard/src/lib/orpc/routers/comments.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 100-108,117-119
+apps/dashboard/src/routes/-dashboard-ui.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 11-23,337
+packages/ai/src/schemas/geo-fx.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-17
+apps/dashboard/src/components/dashboard/nav-group-list.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1-225
+apps/dashboard/src/lib/chat/history.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 28-35,39
+packages/geo-core/src/geo/scan.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 221,291,302-304,315,326,1227,1260-1269,1281-1292,1294-1305,1690,1702-1708,1730,1741-1743
+packages/geo-core/src/utils/geo-engines.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 54-55,65-73,121
+packages/ui/src/components/geo/geo-prompt-answer-thread.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 342-351
+packages/ui/src/components/ui/svgs/fx.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1-10
+apps/dashboard/src/constants/nav.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 41,49-51,218-292
+apps/ui/docs/blocks/(ai-search)/google-ai-overview.mdx
+  s_a0799efed517c8::t_3a99ea6d206a14 24
+apps/ui/registry/notra/google-ai-overview/components/ai-overview.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 39
+packages/ui/src/lib/geo-engine-icon.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 5-8
+apps/dashboard/src/utils/geo-chat-skin.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 21
+packages/geo-core/src/geo/programs.ts
+  ai_agent 128-130,628-629,663,773-789,812,816,825-828
+packages/ai/src/constants/geo-fx.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-226
+apps/dashboard/src/components/dashboard/dashboard-client-wrapper.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 14,92,104,117-136
+packages/geo-core/src/geo/errors.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 10
+apps/web/src/styles/ui-sources.css
+  s_a0799efed517c8::t_3a99ea6d206a14 134
+packages/ai/src/agents/geo-opencode.ts
+  ai_agent 2-7,19-30,49-51,62-64,72-74,140,149-150,154,171-181,187-195,205-207,216-222,228-230,243-244,279-309,313-315,319-320,340-345,383-384,392-393
+apps/dashboard/src/components/dashboard/app-sidebar.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 18,32-33,42,69-74,90,166-175,185,220
+packages/ui/src/lib/geo-chat-skin.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 21
+packages/ui/src/components/geo/engine-icon.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 26,99
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/skeleton.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 3-4,7,11,51-57
+apps/dashboard/messages/de.json
+  s_a0799efed517c8::t_3a99ea6d206a14 2134-2135,2909-2911,3972
+apps/dashboard/src/app/(dashboard)/[slug]/content/loading.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 16,19-22,24-29
+packages/ai/src/utils/geo-fx-usage.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-28
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 253
+apps/dashboard/src/routes/-analytics-ui.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 3
+apps/dashboard/src/utils/geo-legacy-models.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-14
+packages/ai/src/types/geo-fx.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-9
+apps/dashboard/src/utils/fuzzy.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 5
+apps/dashboard/src/components/dashboard/dashboard-global-actions.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1-95
+apps/dashboard/src/components/providers/jobs-sidebar-provider.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1-44
+apps/web/src/components/landing/hero-section.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 8,78
+packages/geo-core/src/geo/model-catalog.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 10,80,82-95
+apps/dashboard/src/constants/workspace-search.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1-76
+packages/ui/src/components/ai-skins/google-ai-overview/ai-overview.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 39
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 10,285-298,300-304
+apps/dashboard/src/lib/search/workspace-search.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 16,18,21,50,53-135,138-156,159-235,238-243,269-273
+apps/dashboard/src/components/dashboard/dashboard-shell.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 21-22,26,246,337,346
+apps/dashboard/src/constants/cookies.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 4-5
+apps/dashboard/messages/en.json
+  s_a0799efed517c8::t_3a99ea6d206a14 2134-2135,2909-2911,3972
+apps/dashboard/src/app/(dashboard)/[slug]/chat/new-loading.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1-5
+apps/dashboard/src/utils/cookies.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 2,7,161-168
+apps/dashboard/src/utils/geo-scan-models.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 37
+apps/dashboard/src/components/dashboard/header.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 13,44,100-142,144-147
+apps/docs/geo/engines.mdx
+  s_a0799efed517c8::t_3a99ea6d206a14 47,50
+apps/dashboard/src/components/dashboard/nav-footer.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1-96
+apps/docs/geo/how-scans-work.mdx
+  s_a0799efed517c8::t_3a99ea6d206a14 45
+apps/web/src/components/landing/live-demo-link.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 1,7,10,13-16,18-25
+apps/web/src/constants/landing/live-demo.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 3
+packages/ai/src/utils/geo-opencode-box.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1,173-186
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 52,58,117,122-131,177,184-191,194-199,208-214,246,266-269,296-310,317-330,332,503,512
+packages/ai/src/types/geo-opencode.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 3
+packages/db/src/utils/geo-checks.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 333-336,342-346,359,553-558,569-574,576-578
+packages/geo-core/src/types/geo.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1397,1454-1455,1462,1494-1495
+apps/dashboard/src/components/geo/competitor-engine-matrix-card.tsx
+  s_a0799efed517c8::t_3a99ea6d206a14 131
+packages/geo-core/src/utils/geo-model-catalog.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 229,234-237,254-256
+apps/web/src/utils/security-headers.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1,24
+packages/ui/src/types/geo.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 59
+apps/dashboard/src/lib/orpc/routers/automation.ts
+  ai_agent 475,478,485-494,496,505-519
+packages/geo-core/tests/coding-agent-catalog.test.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 12,92-107
+apps/dashboard/src/utils/dashboard-paths.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 16-41
+apps/dashboard/src/types/geo.ts
+  s_a0799efed517c8::t_3a99ea6d206a14 1223-1227
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dea5797ecbd73f24ff6fb11ffaafbfcd6b3e848b",
+  "prompts": {},
+  "sessions": {
+    "s_a0799efed517c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd2fba69-476b-482b-aae2-b39793aeb150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
