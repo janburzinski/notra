@@ -1,0 +1,88 @@
+apps/sites-builder/tests/sandbox-imports.test.ts
+  s_51cb0c1a9382f5::t_fab843219e14ea 7
+apps/docs/sites/reference/blog-json.mdx
+  s_51cb0c1a9382f5::t_3519b6b82d78fc 65
+apps/sites-builder/src/themes/notra/theme.css
+  s_51cb0c1a9382f5::t_880e97a851bcc1 1
+apps/sites-builder/src/layouts/Base.astro
+  s_51cb0c1a9382f5::t_880e97a851bcc1 6,12-13,55
+apps/sites-builder/README.md
+  s_51cb0c1a9382f5::t_f18371e7c6c9cb 39-61
+apps/sites-builder/src/components/ChangelogIndex.astro
+  s_51cb0c1a9382f5::t_880e97a851bcc1 7-8
+apps/sites-builder/src/pages/[...slug].astro
+  s_51cb0c1a9382f5::t_880e97a851bcc1 5
+apps/sites-builder/src/pages/index.astro
+  s_51cb0c1a9382f5::t_880e97a851bcc1 2-3
+apps/web/public/schemas/blog.json
+  s_51cb0c1a9382f5::t_0ba62b4237367a 10
+  s_51cb0c1a9382f5::t_d1e448b3d3ef9c 12
+packages/sites-core/src/constants/site-themes.ts
+  s_51cb0c1a9382f5::t_0ba62b4237367a 19,21,23
+  s_51cb0c1a9382f5::t_c5d01350d3e179 1-18,20,22,24-31
+apps/sites-builder/src/components/BlogIndex.astro
+  s_51cb0c1a9382f5::t_880e97a851bcc1 8-9
+apps/sites-builder/src/types/assets.d.ts
+  s_51cb0c1a9382f5::t_c5ddaee3be21ca 2
+bun.lock
+  ai_agent 337,1520
+apps/sites-builder/src/themes/folio/theme.css
+  s_51cb0c1a9382f5::t_84a200c7121221 62-63
+  s_51cb0c1a9382f5::t_e79dd120587937 1,5-18,25-35,42-56,60-61,70-72,75-77,80-81
+  s_51cb0c1a9382f5::t_952d336c428c06 2-4,19-24,36-41,57-59,64-69,73-74,78-79
+apps/docs/sites/customize/design.mdx
+  s_51cb0c1a9382f5::t_3519b6b82d78fc 17
+apps/sites-builder/src/components/BlogPost.astro
+  s_51cb0c1a9382f5::t_880e97a851bcc1 7
+  s_51cb0c1a9382f5::t_70f7a8c0be974d 15,53
+apps/docs/docs.json
+  s_51cb0c1a9382f5::t_3519b6b82d78fc 278
+apps/sites-builder/astro.config.mjs
+  s_51cb0c1a9382f5::t_d1e448b3d3ef9c 78-80
+  s_51cb0c1a9382f5::t_23371f9691db5d 1,34-38,59-77,81-83,114
+  s_51cb0c1a9382f5::t_3ddefa0a972351 39-58,186
+apps/sites-builder/package.json
+  s_51cb0c1a9382f5::t_6182c3f3b7d8b3 26
+apps/sites-builder/tests/themes.test.ts
+  s_51cb0c1a9382f5::t_37ece517221242 1-16,18-27
+  s_51cb0c1a9382f5::t_a1f61e08a9de51 17
+packages/sites-core/src/utils/site-themes.ts
+  s_51cb0c1a9382f5::t_c5d01350d3e179 1-39
+apps/sites-builder/src/types/entries.ts
+  s_51cb0c1a9382f5::t_a7953f77dddb5f 25-27,29-33
+  s_51cb0c1a9382f5::t_70f7a8c0be974d 3,28
+packages/sites-core/src/schemas/site-config.ts
+  s_51cb0c1a9382f5::t_c5d01350d3e179 11-14,110-112
+  s_51cb0c1a9382f5::t_0ac4e15e3808b3 113-115
+apps/sites-builder/src/components/PostHeader.astro
+  s_51cb0c1a9382f5::t_70f7a8c0be974d 1-54
+apps/sites-builder/src/pages/tags/[...tag].astro
+  s_51cb0c1a9382f5::t_1897f0dc679d28 6
+  s_51cb0c1a9382f5::t_92bfac2d47e53f 5
+packages/sites-core/src/types/site-themes.ts
+  s_51cb0c1a9382f5::t_c5d01350d3e179 1-6
+apps/docs/sites/customize/themes.mdx
+  s_51cb0c1a9382f5::t_3519b6b82d78fc 1-16,18-39,41-50,53-66
+  s_51cb0c1a9382f5::t_845a2d5cfaa373 17,40,51-52
+packages/sites-compiler/src/validate.ts
+  s_51cb0c1a9382f5::t_0ac4e15e3808b3 221
+  s_51cb0c1a9382f5::t_012ffb15949ffe 21
+apps/sites-builder/src/pages/author/[author].astro
+  s_51cb0c1a9382f5::t_1897f0dc679d28 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "21d56be1f016b4493fb56ea6c6ace015556b8d42",
+  "prompts": {},
+  "sessions": {
+    "s_51cb0c1a9382f5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "043818f4-3679-4ff6-8df7-7dd127cf41b1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
