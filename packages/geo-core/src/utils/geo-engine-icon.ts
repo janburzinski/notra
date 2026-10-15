@@ -2,6 +2,11 @@ import type { EngineIconKey, EngineIconRule } from "../types/geo";
 
 const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
   {
+    key: "fx",
+    patterns: ["fx/"],
+    exact: ["fx"],
+  },
+  {
     key: "tencent",
     patterns: ["tencent", "hunyuan", "hy3"],
   },

@@ -42,7 +42,7 @@ The public API only queues scans and reads results.
     The scan takes every enabled prompt (custom and auto-derived), every enabled engine from your Settings and every tracked language. Notra writes prompts in your prompt language and translates them into every other tracked language first. Each engine, prompt and language combination becomes one task, and tasks run four at a time.
   </Step>
   <Step title="Ask the engines">
-    **Engines** come from the model catalog, a live model list grouped by provider, and every selected engine answers every prompt. Engines that support live web search answer with retrieval: ChatGPT, Claude, Gemini and Perplexity, plus Google AI Overview. Engines without a search route, such as Grok, DeepSeek, Mistral and Cursor, answer from training data and carry the **No web search** label. Coding agents (Cursor, OpenCode, Claude Code and Codex) are available on request, as described in [Engines](/geo/engines).
+    **Engines** come from the model catalog, a live model list grouped by provider, and every selected engine answers every prompt. Engines that support live web search answer with retrieval: ChatGPT, Claude, Gemini and Perplexity, plus Google AI Overview. Engines without a search route, such as Grok, DeepSeek, Mistral and Cursor, answer from training data and carry the **No web search** label. Coding agents (Cursor, OpenCode, Claude Code, Codex and fx) require a paid plan and configured credentials, as described in [Engines](/geo/engines).
   </Step>
   <Step title="Grounded scanning">
     Grounded engines record the search queries they issued and the sources they cited, so you can see which pages an engine read before it answered. The dashboard labels these results **Search**.

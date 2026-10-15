@@ -1,4 +1,11 @@
 import {
+  GEO_FX_HARNESS_PATH,
+  GEO_FX_HARNESS_SOURCE,
+  GEO_FX_INSTALL_COMMAND,
+  GEO_FX_MODEL_API_KEY_ENV,
+  GEO_FX_USAGE_TOOL_ID,
+} from "@notra/ai/constants/geo-fx";
+import {
   GEO_CLAUDE_CODE_EFFORT,
   GEO_CODEX_REASONING_EFFORT,
   GEO_CODEX_WEB_SEARCH,
@@ -9,7 +16,18 @@ import {
   GEO_OPENCODE_RUN_TIMEOUT_MS,
   GEO_OPENCODE_SOURCE_LIMIT,
 } from "@notra/ai/constants/geo-opencode";
-import type { GeoBoxAnswer, GeoBoxHarness } from "@notra/ai/types/geo-opencode";
+import { geoFxUsageSchema } from "@notra/ai/schemas/geo-fx";
+import type {
+  GeoFxConversationMessage,
+  GeoFxUsage,
+} from "@notra/ai/types/geo-fx";
+import type {
+  GeoBoxAnswer,
+  GeoBoxHarness,
+  GeoBoxTokenUsage,
+} from "@notra/ai/types/geo-opencode";
+import { awaitGeoBoxOperation } from "@notra/ai/utils/geo-box-operation";
+import { geoFxTokenUsage } from "@notra/ai/utils/geo-fx-usage";
 import {
   createGeoOpenCodeBoxName,
   createGeoOpenCodeBox,
@@ -28,6 +46,9 @@ import type {
 import { Agent, Box, BoxApiKey, BoxError } from "@upstash/box";
 
 function boxAgentFromHarness(harness: GeoBoxHarness | undefined): Agent {
+  if (harness === "fx") {
+    return Agent.Custom;
+  }
   if (harness === "claude-code") {
     return Agent.ClaudeCode;
   }
@@ -38,6 +59,9 @@ function boxAgentFromHarness(harness: GeoBoxHarness | undefined): Agent {
 }
 
 function boxModelApiKey(agent: Agent) {
+  if (agent === Agent.Custom) {
+    return requireApiKey(GEO_FX_MODEL_API_KEY_ENV);
+  }
   if (agent === Agent.OpenCode) {
     return requireApiKey(GEO_OPENCODE_MODEL_API_KEY_ENV);
   }
@@ -45,6 +69,9 @@ function boxModelApiKey(agent: Agent) {
 }
 
 function boxStreamOptions(agent: Agent) {
+  if (agent === Agent.Custom) {
+    return {};
+  }
   if (agent === Agent.ClaudeCode) {
     const options: ClaudeCodeAgentOptions = {
       effort: GEO_CLAUDE_CODE_EFFORT,
@@ -115,30 +142,7 @@ async function consumeGeoOpenCodeStream(
     return stream;
   };
 
-  if (!signal) {
-    return consume();
-  }
-  if (signal.aborted) {
-    throw abortReason(signal);
-  }
-
-  let onAbort = () => {};
-  const aborted = new Promise<never>((_, reject) => {
-    onAbort = () => reject(abortReason(signal));
-  });
-  signal.addEventListener("abort", onAbort, { once: true });
-  const consumption = consume();
-  try {
-    return await Promise.race([consumption, aborted]);
-  } catch (error) {
-    if (!signal.aborted) {
-      throw error;
-    }
-    void consumption.catch(() => undefined);
-    throw abortReason(signal);
-  } finally {
-    signal.removeEventListener("abort", onAbort);
-  }
+  return awaitGeoBoxOperation(consume(), signal);
 }
 
 async function runGeoOpenCodePrompt(
@@ -147,10 +151,12 @@ async function runGeoOpenCodePrompt(
   agent: Agent,
   model: string,
   signal?: AbortSignal,
-  deadlineAtMs?: number
+  deadlineAtMs?: number,
+  onUsage?: (usage: GeoBoxTokenUsage) => void
 ) {
   const sourceUrls = new Set<string>();
   const toolCalls: unknown[] = [];
+  let fxUsage: GeoFxUsage | undefined;
   const collectSources = (value: unknown) => {
     for (const url of extractHttpUrls(value)) {
       if (sourceUrls.size >= GEO_OPENCODE_SOURCE_LIMIT) {
@@ -167,13 +173,31 @@ async function runGeoOpenCodePrompt(
     }
     const stream = await consumeGeoOpenCodeStream(
       box.agent.stream({
-        prompt,
+        prompt:
+          agent === Agent.Custom
+            ? JSON.stringify({
+                kind: "notra_fx_prompt",
+                prompt,
+                timeoutMs: Math.max(
+                  1,
+                  remainingRunTimeout(deadlineAtMs) - 2000
+                ),
+              })
+            : prompt,
         options: { ...boxStreamOptions(agent) },
         onToolUse: (tool) => {
           toolCalls.push(tool);
           collectSources(tool.input);
         },
-        onToolResult: ({ output }) => {
+        onToolResult: ({ output, toolCallId }) => {
+          if (agent === Agent.Custom && toolCallId === GEO_FX_USAGE_TOOL_ID) {
+            const parsed = geoFxUsageSchema.safeParse(output);
+            if (parsed.success && parsed.data.usage.modelId === model) {
+              fxUsage = parsed.data;
+              onUsage?.(geoFxTokenUsage(parsed.data));
+            }
+            return;
+          }
           collectSources(output);
         },
       }),
@@ -183,6 +207,9 @@ async function runGeoOpenCodePrompt(
       throw abortReason(operation.signal);
     }
 
+    if (agent === Agent.Custom && !fxUsage?.verified) {
+      throw new BoxError("fx returned no verified answer or usage");
+    }
     const text = stream.result.trim();
     return {
       text,
@@ -191,15 +218,20 @@ async function runGeoOpenCodePrompt(
         .map((url) => ({ url, title: null })),
       groundingSources: [...sourceUrls].map((url) => ({ url, title: null })),
       toolCalls,
-      usage: geoBoxTokenUsage(
-        stream.cost,
-        model,
-        agent === Agent.ClaudeCode ? "claude-code" : "opencode"
-      ),
+      usage: fxUsage
+        ? geoFxTokenUsage(fxUsage, stream.cost.computeMs)
+        : geoBoxTokenUsage(
+            stream.cost,
+            model,
+            agent === Agent.ClaudeCode ? "claude-code" : "opencode"
+          ),
     };
   } catch (error) {
     if (operation.signal.aborted) {
       throw abortReason(operation.signal);
+    }
+    if (fxUsage?.timedOut) {
+      throw new DOMException("The fx operation timed out", "TimeoutError");
     }
     throw error;
   } finally {
@@ -213,7 +245,8 @@ export async function askGeoOpenCodeConversation(
   deadlineAtMs?: number,
   model = GEO_OPENCODE_BOX_MODEL_ID,
   harness: GeoBoxHarness = "opencode",
-  onResult?: (result: GeoBoxAnswer) => void
+  onResult?: (result: GeoBoxAnswer) => void,
+  onUsage?: (usage: GeoBoxTokenUsage) => void
 ) {
   if (prompts.length === 0) {
     return [];
@@ -253,14 +286,48 @@ export async function askGeoOpenCodeConversation(
   let operationFailed = false;
   let operationError: unknown;
   try {
+    if (agent === Agent.Custom) {
+      const bootstrap = operationSignal(
+        signal,
+        remainingRunTimeout(deadlineAtMs)
+      );
+      try {
+        if (bootstrap.signal.aborted) {
+          throw abortReason(bootstrap.signal);
+        }
+        const installation = await awaitGeoBoxOperation(
+          box.exec.command(GEO_FX_INSTALL_COMMAND),
+          bootstrap.signal
+        );
+        if (
+          installation.status !== "completed" ||
+          installation.exitCode !== 0
+        ) {
+          throw new BoxError("fx installation failed");
+        }
+        await awaitGeoBoxOperation(
+          box.files.write({
+            path: GEO_FX_HARNESS_PATH.replace("/workspace/home/", ""),
+            content: GEO_FX_HARNESS_SOURCE,
+          }),
+          bootstrap.signal
+        );
+      } finally {
+        bootstrap.dispose();
+      }
+    }
+    const transcript: GeoFxConversationMessage[] = [];
     for (const prompt of prompts) {
       const result = await runGeoOpenCodePrompt(
         box,
-        prompt,
+        agent === Agent.Custom && transcript.length > 0
+          ? `Previous conversation (use as context):\n${JSON.stringify(transcript)}\n\nCurrent question:\n${prompt}`
+          : prompt,
         agent,
         model,
         signal,
-        deadlineAtMs
+        deadlineAtMs,
+        onUsage
       );
       if (agent === Agent.ClaudeCode) {
         const sessionUsd = result.usage.totalUsd;
@@ -279,6 +346,12 @@ export async function askGeoOpenCodeConversation(
       onResult?.(result);
       if (!result.text) {
         throw new BoxError("Box agent returned no result");
+      }
+      if (agent === Agent.Custom) {
+        transcript.push(
+          { role: "user", content: prompt },
+          { role: "assistant", content: result.text }
+        );
       }
     }
     if (signal?.aborted) {
@@ -317,7 +390,8 @@ export async function askGeoOpenCode(
   deadlineAtMs?: number,
   model = GEO_OPENCODE_BOX_MODEL_ID,
   harness: GeoBoxHarness = "opencode",
-  onResult?: (result: GeoBoxAnswer) => void
+  onResult?: (result: GeoBoxAnswer) => void,
+  onUsage?: (usage: GeoBoxTokenUsage) => void
 ) {
   const [result] = await askGeoOpenCodeConversation(
     [prompt],
@@ -325,7 +399,8 @@ export async function askGeoOpenCode(
     deadlineAtMs,
     model,
     harness,
-    onResult
+    onResult,
+    onUsage
   );
   if (!result) {
     throw new Error("Box agent returned no result");

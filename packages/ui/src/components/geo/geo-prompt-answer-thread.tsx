@@ -339,6 +339,16 @@ function SkinComposer({ engine, skin }: { engine: string; skin: GeoChatSkin }) {
     );
   }
   if (skin === "opencode") {
+    if (engine.startsWith("fx/")) {
+      return (
+        <OpencodeComposer
+          agent="fx"
+          model={engine.slice("fx/".length)}
+          placeholder="Ask fx to do anything"
+          provider="AI Gateway"
+        />
+      );
+    }
     return <OpencodeComposer placeholder='Ask anything... "Draft a launch post"' />;
   }
   if (skin === "claude-code") {

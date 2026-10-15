@@ -1,6 +1,6 @@
 import type { LanguageModelUsage } from "ai";
 
-export type GeoBoxHarness = "claude-code" | "codex" | "opencode";
+export type GeoBoxHarness = "claude-code" | "codex" | "opencode" | "fx";
 
 export interface GeoBoxRunTarget {
   harness: GeoBoxHarness;

@@ -208,7 +208,7 @@ function sequenceFailureFields(
 
 function droppedCheckOutcome(
   fields: GeoSkipFields,
-  error: GeoEmptyAnswerError | GeoJudgeError
+  error: GeoEmptyAnswerError | GeoJudgeError | GeoScanError
 ): GeoCheckOutcome {
   logGeoSkip("check failed", fields, error);
   const engineUsage = error.usage
@@ -230,6 +230,7 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
   const boxAgent = geoBoxAgentForEngine(engine);
   let openCodePromise: ReturnType<typeof askGeoOpenCode> | null = null;
   let completedResult: GeoBoxAnswer | undefined;
+  let reportedUsage: GeoBoxAnswer["usage"] | undefined;
   const result = yield* Effect.tryPromise({
     try: (signal) => {
       openCodePromise = askGeoOpenCode(
@@ -240,6 +241,9 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
         boxAgent?.harness,
         (result) => {
           completedResult = result;
+        },
+        (usage) => {
+          reportedUsage = usage;
         }
       );
       return openCodePromise;
@@ -250,6 +254,7 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
         timedOut:
           cause instanceof DOMException && cause.name === "TimeoutError",
         cause,
+        usage: reportedUsage,
       }),
   }).pipe(
     Effect.ensuring(
@@ -270,6 +275,7 @@ const askOpenCodeEngineEffect = Effect.fn("geo.askOpenCodeEngine")(function* (
           new GeoScanError({
             message: `Engine ${engine} timed out after ${GEO_ANSWER_TIMEOUT_MS}ms`,
             timedOut: true,
+            usage: reportedUsage,
           })
         ),
     }),
@@ -1234,6 +1240,7 @@ const runGeoScanTaskBatchBody = Effect.fn("geo.runScanTaskBatch.body")(
       tasks,
       (task) => {
         const fields = checkFailureFields(checkContext, task);
+        let failedAttemptUsage = EMPTY_TOKEN_USAGE;
         return updateGeoScanTaskStatus(context, task, "running").pipe(
           Effect.andThen(
             withGeoScanEvent(
@@ -1266,6 +1273,16 @@ const runGeoScanTaskBatchBody = Effect.fn("geo.runScanTaskBatch.body")(
                     })
                   : Effect.void
               ),
+              Effect.tapError((error) =>
+                Effect.sync(() => {
+                  if (error._tag === "GeoScanError" && error.usage) {
+                    failedAttemptUsage = addTokenUsage(
+                      failedAttemptUsage,
+                      error.usage
+                    );
+                  }
+                })
+              ),
               Effect.retry({
                 times: 1,
                 while: (error) =>
@@ -1277,7 +1294,31 @@ const runGeoScanTaskBatchBody = Effect.fn("geo.runScanTaskBatch.body")(
               Effect.catchTag("GeoJudgeError", (error) =>
                 Effect.sync(() => droppedCheckOutcome(fields, error))
               ),
+              Effect.catchTag("GeoScanError", (error) =>
+                Effect.sync(() =>
+                  droppedCheckOutcome(
+                    fields,
+                    new GeoScanError({
+                      message: error.message,
+                      cause: error.cause,
+                      timedOut: error.timedOut,
+                    })
+                  )
+                )
+              ),
               geoSkip("check failed", fields),
+              Effect.map((result): GeoCheckOutcome | null =>
+                result
+                  ? {
+                      ...result,
+                      engineUsage: addTokenUsage(
+                        result.engineUsage ?? EMPTY_TOKEN_USAGE,
+                        failedAttemptUsage
+                      ),
+                      usage: addTokenUsage(result.usage, failedAttemptUsage),
+                    }
+                  : result
+              ),
               Effect.tap((result) =>
                 result?.row
                   ? Effect.void
@@ -1730,6 +1771,7 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
     const completedResults: Awaited<
       ReturnType<typeof askGeoOpenCodeConversation>
     > = [];
+    let reportedUsage: GeoBoxAnswer["usage"] | undefined;
     const results = yield* Effect.tryPromise({
       try: (signal) => {
         conversationPromise = askGeoOpenCodeConversation(
@@ -1741,7 +1783,13 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
           deadlineAtMs,
           boxModel,
           boxAgent?.harness,
-          (result) => completedResults.push(result)
+          (result) => {
+            completedResults.push(result);
+            reportedUsage = undefined;
+          },
+          (usage) => {
+            reportedUsage = usage;
+          }
         );
         return conversationPromise;
       },
@@ -1772,7 +1820,7 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
           ),
       }),
       Effect.catchTag("GeoScanError", (error) => {
-        if (completedResults.length === 0) {
+        if (completedResults.length === 0 && !reportedUsage) {
           return Effect.fail(error);
         }
         return Effect.sync(() => {
@@ -1783,7 +1831,9 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
     );
     const engineUsage = results.reduce(
       (total, result) => addTokenUsage(total, result.usage),
-      EMPTY_TOKEN_USAGE
+      reportedUsage
+        ? addTokenUsage(EMPTY_TOKEN_USAGE, reportedUsage)
+        : EMPTY_TOKEN_USAGE
     );
     let judgeUsage = EMPTY_TOKEN_USAGE;
     let droppedTurns = 0;

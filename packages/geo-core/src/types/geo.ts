@@ -1431,6 +1431,7 @@ export type EngineIconKey =
   | "cursor"
   | "claude-code"
   | "codex"
+  | "fx"
   | "apple"
   | "duckduckgo"
   | "cloudflare"
@@ -1487,14 +1488,15 @@ export type GeoModelProviderId =
   | "cursor"
   | "opencode"
   | "claude-code"
-  | "codex";
+  | "codex"
+  | "fx";
 
 /** Zero-data-retention coverage as reported by the Vercel AI Gateway feed. */
 export type GeoModelZdr = "all" | "some" | "none";
 
 /**
  * Where a model is served. `cursor` runs through the Cursor SDK, `box`
- * through OpenCode, Claude Code, and Codex in Upstash Box, and `serpapi`
+ * through OpenCode, Claude Code, Codex, and fx in Upstash Box, and `serpapi`
  * through SerpApi's Google AI Overview endpoint — none of those go through
  * the AI router.
  */

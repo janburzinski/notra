@@ -92,6 +92,12 @@ export const GEO_MODEL_PROVIDERS: readonly GeoModelProvider[] = [
     brand: "codex",
     featured: false,
   },
+  {
+    id: "fx",
+    label: "fx",
+    brand: "fx",
+    featured: false,
+  },
 ];
 
 export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
@@ -547,6 +553,60 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     default: false,
     gateways: ["serpapi"],
   },
+  {
+    id: "fx/gpt-6.1-sol",
+    provider: "fx",
+    label: "GPT-6.1 Sol",
+    zdr: "none",
+    released: "2026-09-29",
+    default: false,
+    gateways: ["box"],
+  },
+  {
+    id: "fx/gpt-5.4-mini",
+    provider: "fx",
+    label: "GPT-5.4 mini",
+    zdr: "none",
+    released: "2026-03-17",
+    default: false,
+    gateways: ["box"],
+  },
+  {
+    id: "fx/claude-opus-5.5",
+    provider: "fx",
+    label: "Claude Opus 5.5",
+    zdr: "none",
+    released: "2026-09-22",
+    default: false,
+    gateways: ["box"],
+  },
+  {
+    id: "fx/claude-sonnet-5.5",
+    provider: "fx",
+    label: "Claude Sonnet 5.5",
+    zdr: "none",
+    released: "2026-09-28",
+    default: false,
+    gateways: ["box"],
+  },
+  {
+    id: "fx/kimi-k3",
+    provider: "fx",
+    label: "Kimi K3",
+    zdr: "none",
+    released: "2026-07-16",
+    default: false,
+    gateways: ["box"],
+  },
+  {
+    id: "fx/grok-4.7",
+    provider: "fx",
+    label: "Grok 4.7",
+    zdr: "none",
+    released: "2026-09-21",
+    default: false,
+    gateways: ["box"],
+  },
 ];
 
 const GEO_OPENCODE_ENGINE_ENV = [
@@ -554,6 +614,10 @@ const GEO_OPENCODE_ENGINE_ENV = [
   "OPENROUTER_API_KEY",
 ] as const;
 const GEO_NATIVE_BOX_ENGINE_ENV = ["UPSTASH_BOX_API_KEY"] as const;
+const GEO_FX_ENGINE_ENV = [
+  "UPSTASH_BOX_API_KEY",
+  "AI_GATEWAY_API_KEY",
+] as const;
 
 export const GEO_STATIC_ENGINE_ENV: Readonly<
   Record<string, readonly string[]>
@@ -570,6 +634,12 @@ export const GEO_STATIC_ENGINE_ENV: Readonly<
   "codex/gpt-6.1-sol": GEO_NATIVE_BOX_ENGINE_ENV,
   "codex/gpt-6-luna": GEO_NATIVE_BOX_ENGINE_ENV,
   "codex/gpt-6-astra": GEO_NATIVE_BOX_ENGINE_ENV,
+  "fx/gpt-6.1-sol": GEO_FX_ENGINE_ENV,
+  "fx/gpt-5.4-mini": GEO_FX_ENGINE_ENV,
+  "fx/claude-opus-5.5": GEO_FX_ENGINE_ENV,
+  "fx/claude-sonnet-5.5": GEO_FX_ENGINE_ENV,
+  "fx/kimi-k3": GEO_FX_ENGINE_ENV,
+  "fx/grok-4.7": GEO_FX_ENGINE_ENV,
   "google/ai-overview": ["SERPAPI_API_KEY"],
 };
 

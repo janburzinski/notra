@@ -51,4 +51,28 @@ export const GEO_BOX_CODING_AGENT_TARGETS: Readonly<
     harness: "codex",
     model: "openai/gpt-6-astra",
   },
+  "fx/gpt-6.1-sol": {
+    harness: "fx",
+    model: "openai/gpt-6.1-sol",
+  },
+  "fx/gpt-5.4-mini": {
+    harness: "fx",
+    model: "openai/gpt-5.4-mini",
+  },
+  "fx/claude-opus-5.5": {
+    harness: "fx",
+    model: "anthropic/claude-opus-5.5",
+  },
+  "fx/claude-sonnet-5.5": {
+    harness: "fx",
+    model: "anthropic/claude-sonnet-5.5",
+  },
+  "fx/kimi-k3": {
+    harness: "fx",
+    model: "moonshotai/kimi-k3",
+  },
+  "fx/grok-4.7": {
+    harness: "fx",
+    model: "spacexai/grok-4.7",
+  },
 };

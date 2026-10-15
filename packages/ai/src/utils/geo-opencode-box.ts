@@ -1,3 +1,4 @@
+import { GEO_FX_HARNESS_PATH } from "@notra/ai/constants/geo-fx";
 import {
   GEO_OPENCODE_BOX_API_BASE_URL,
   GEO_OPENCODE_BOX_DELETE_ATTEMPTS,
@@ -174,7 +175,20 @@ export async function createGeoOpenCodeBox(
         runtime: "node",
         agent,
         model,
-        agent_api_key: modelApiKey,
+        ...(agent === Agent.Custom
+          ? {
+              custom_runner: {
+                command: "node",
+                args: [GEO_FX_HARNESS_PATH],
+                protocol: "box-sse-v1",
+              },
+              attach_headers: {
+                "ai-gateway.vercel.sh": {
+                  Authorization: `Bearer ${modelApiKey}`,
+                },
+              },
+            }
+          : { agent_api_key: modelApiKey }),
       }),
       signal,
     });

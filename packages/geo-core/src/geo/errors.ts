@@ -7,6 +7,7 @@ export class GeoScanError extends Data.TaggedError("GeoScanError")<{
   readonly message: string;
   readonly timedOut?: boolean;
   readonly cause?: unknown;
+  readonly usage?: LanguageModelUsage;
 }> {}
 
 export class GeoCodingAgentAccessError extends Data.TaggedError(

@@ -23,6 +23,7 @@ import { Exa } from "@notra/ui/components/ui/svgs/exa";
 import { Firecrawl } from "@notra/ui/components/ui/svgs/firecrawl";
 import { FirecrawlDark } from "@notra/ui/components/ui/svgs/firecrawlDark";
 import { Firefox } from "@notra/ui/components/ui/svgs/firefox";
+import { Fx } from "@notra/ui/components/ui/svgs/fx";
 import { Gemini } from "@notra/ui/components/ui/svgs/gemini";
 import { Google } from "@notra/ui/components/ui/svgs/google";
 import { Huawei } from "@notra/ui/components/ui/svgs/huawei";
@@ -95,6 +96,7 @@ function EngineIconGraphic({ engine, className }: EngineIconProps) {
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 const SIMPLE_ICONS: Partial<Record<EngineIconKey, IconComponent>> = {
+  fx: Fx,
   claude: ClaudeAiIcon,
   "claude-code": ClaudeAiIcon,
   gemini: Gemini,

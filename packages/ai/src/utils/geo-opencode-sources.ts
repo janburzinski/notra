@@ -55,6 +55,9 @@ function collectHttpUrlsFromString(value: string, urls: Set<string>): void {
     }
     let candidate = token[0];
     const prefix = value.slice(0, match.index);
+    if (prefix.endsWith("[") && candidate.includes("](")) {
+      continue;
+    }
     if (prefix.endsWith("](")) {
       let depth = 0;
       for (let index = 0; index < candidate.length; index += 1) {

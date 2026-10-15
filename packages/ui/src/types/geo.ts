@@ -56,6 +56,7 @@ export type EngineIconKey =
   | "cursor"
   | "claude-code"
   | "codex"
+  | "fx"
   | "apple"
   | "duckduckgo"
   | "cloudflare"

@@ -71,10 +71,19 @@ export const GEO_CODEX_ENGINE_IDS = [
   "codex/gpt-6-luna",
   "codex/gpt-6-astra",
 ] as const;
+export const GEO_FX_ENGINE_IDS = [
+  "fx/gpt-6.1-sol",
+  "fx/gpt-5.4-mini",
+  "fx/claude-opus-5.5",
+  "fx/claude-sonnet-5.5",
+  "fx/kimi-k3",
+  "fx/grok-4.7",
+] as const;
 export const GEO_CODING_AGENT_ENGINE_IDS = [
   ...GEO_OPENCODE_ENGINE_IDS,
   ...GEO_CLAUDE_CODE_ENGINE_IDS,
   ...GEO_CODEX_ENGINE_IDS,
+  ...GEO_FX_ENGINE_IDS,
 ] as const;
 export const GEO_PAID_CODING_AGENT_ENGINE_IDS: readonly string[] = [
   GEO_CURSOR_ENGINE_ID,
@@ -352,6 +361,7 @@ export const GEO_BRAND_LABELS: Record<string, string> = {
   opencode: "OpenCode",
   "claude-code": "Claude Code",
   codex: "Codex",
+  fx: "fx",
   copilot: "Copilot",
   mistral: "Mistral",
   cohere: "Cohere",
