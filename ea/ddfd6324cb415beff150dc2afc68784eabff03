@@ -1,0 +1,191 @@
+apps/dashboard/src/components/content/content-collaboration.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-70
+apps/dashboard/src/types/content/document-save.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-43
+packages/ai/src/utils/post-service.ts
+  ai_agent 19,29-32,100-115,133,255-261
+apps/dashboard/src/utils/discussion-access.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-31
+apps/dashboard/src/app/(dashboard)/[slug]/content/[id]/page-client.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 10,39,66,88-96
+packages/schemas/src/constants/dashboard/content-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-3
+apps/dashboard/src/components/content/inline-comments/content-comment-thread-card.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-237
+apps/dashboard/src/utils/content-idle-checkpoint.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-67
+apps/dashboard/tests/comments.test.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 3-4,7-10,13-46,62-102
+apps/dashboard/src/lib/hooks/use-content-comment-rail.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-118
+apps/dashboard/src/components/content/inline-comments/content-comments-gutter.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-26
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 52,78,82,196-198,201-203,205,208-211,214,487,490,509-510,530-540,543,546-547,552,557,559-560,562-586,588,590-593,598,603,606-623,626
+apps/dashboard/src/types/components/header-actions-portal.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-5
+apps/dashboard/src/constants/content-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-9
+apps/dashboard/src/types/components/content-detail-toolbar.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 17-21
+apps/dashboard/src/utils/comment-channel.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1,7-25
+apps/dashboard/src/schemas/comments.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 3-8,12,14-54,63-66
+apps/dashboard/src/components/settings/panes/geo-pane.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 11
+apps/dashboard/src/components/content/inline-comments/content-comments-provider.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-316
+apps/dashboard/src/lib/hooks/use-content-detail-document.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 6,9-16,30,42,45-46,102,112-136,168-171,175,178,208,255-262,266-451,510,550-554,557-560,566-568,570-573,576-586,588-647,649-691,698-701,737-754,759-761,769-771,775,784-803,812-816,821,824,828-831,843,847-851,857,875,884-907,913,917-927,935-940,1025,1041-1044,1048,1066
+apps/dashboard/src/components/content/inline-comments/content-detached-comments.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-50
+packages/db/tests/post-history.test.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-165
+apps/dashboard/src/components/content/editor/lexical-editor.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 30,155
+apps/dashboard/src/types/geo.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 693,695
+apps/dashboard/src/types/content/inline-comments.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-117
+apps/dashboard/src/components/dashboard/header-actions-portal.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 3-28,32-45,48-51,54-55
+apps/dashboard/src/components/geo/geo-scan-schedule.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 21,30,46-47,50,52,70-72,86-91,106-110,142-150,153
+packages/ai/src/tools/post-details.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 11,116-138
+apps/dashboard/messages/de.json
+  s_a0799efed517c8::t_ffbb4f06642d47 1132-1133,1173-1177,2918-2919,3032,6233-6235,6687-6764,7105-7107
+apps/dashboard/src/components/content/publish-content-to-github-dialog.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 95-96,221
+apps/dashboard/src/lib/hooks/use-discussion.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 4,18,30-52,55,61-63,70,73,83,152-156,158,161-163,165,184,193,198-214,296-356,369,373
+apps/dashboard/src/components/content/editor/plugins/comment-anchors-plugin.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-224
+apps/dashboard/src/utils/comment-permissions.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 2,26-29
+packages/db/src/utils/post-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-102
+apps/dashboard/src/styles/globals.css
+  s_a0799efed517c8::t_ffbb4f06642d47 336-352
+packages/db/src/constants/post-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-12
+apps/dashboard/src/lib/orpc/routers/comments.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 6,14,21,24-35,40-73,86,144,164-165,167-237,241-266
+apps/dashboard/src/components/geo/geo-settings-form.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 29,484,487,495-506
+apps/dashboard/src/components/dashboard/content-topbar-title.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 3-10,13,16,32-64
+apps/dashboard/src/utils/comment-anchor.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-316
+packages/ai/src/tools/github-mention.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 41
+apps/dashboard/src/components/content/inline-comments/content-comment-composer.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-130
+apps/dashboard/src/types/content/history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-44
+packages/db/src/schema.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 55,67,84,2353-2354,2415-2458,4095-4101,4107,4127-4135,4141-4143
+apps/api/src/programs/posts.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 14,369,550-552,565-566
+packages/db/src/types/post-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-44
+apps/dashboard/src/lib/hooks/use-content-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-169
+apps/dashboard/src/constants/comments.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 11-44
+packages/schemas/src/schemas/dashboard/content.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 107
+packages/schemas/src/types/dashboard/content-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-9
+apps/dashboard/messages/en.json
+  s_a0799efed517c8::t_ffbb4f06642d47 1132-1133,1173-1177,2918-2919,3032,6233-6235,6687-6764,7105-7107
+apps/dashboard/src/types/comments.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-2,6-9,12-16,30-32,43,123-125
+apps/dashboard/src/components/content/content-detail-loaded-view.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 11,17-21,23,54,65-71,84-85,93-127,129,131,133,135-151,153,155,157-159,161-166,171-172
+apps/dashboard/src/components/content/inline-comments/content-comments-layer.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-133
+apps/dashboard/src/utils/content-document-save.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-51
+packages/schemas/src/schemas/dashboard/content-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-94
+apps/dashboard/src/components/content/content-history.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-465
+packages/tools/src/assistant/update-post.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1
+apps/dashboard/src/components/content/overview/content-overview.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 196
+apps/dashboard/src/components/content/content-detail-toolbar.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 3-8,25,47,211,217-220,222-237,240,243-244,250,253-254,262,267,273-282,292-301,317-318,343-442
+apps/dashboard/src/components/dashboard/header.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 23-26,28,48-51,65,71-77,86-102,104,106-115,155-156,467-474
+apps/dashboard/src/types/content/detail.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 24-25
+apps/dashboard/src/components/content/editor/plugins/floating-toolbar-plugin.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 5,27-33,63,66,84-90,114,289-321,380,459
+apps/dashboard/src/lib/orpc/routers/content-history.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-280
+apps/dashboard/src/constants/content-document-save.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-11
+apps/dashboard/src/utils/content-comment-thread.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-31
+apps/dashboard/src/utils/content-history-server.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-47
+apps/dashboard/src/components/content/content-detail-document-actions.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-141
+packages/db/migrations/0120_post_history.sql
+  ai_agent 1-158
+apps/dashboard/src/lib/hooks/use-content-metadata.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 19-22,70-83,94
+apps/dashboard/src/utils/content-metadata.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 6,9-27
+packages/db/migrations/meta/0120_snapshot.json
+  ai_agent 1-16074
+.github/workflows/code-quality.yml
+  s_a0799efed517c8::t_ffbb4f06642d47 156-161
+apps/dashboard/src/utils/comment-submit-id.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 2-7,9-10,12-14
+packages/ai/src/tools/post.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 18
+packages/db/migrations/meta/_journal.json
+  ai_agent 844-850,853
+apps/dashboard/src/lib/realtime/channel-acl.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 6-7,59,61-66,81-90
+apps/dashboard/src/components/content/editor/plugins/markdown-sync-plugin.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 6,25-30,34-50
+packages/ai/src/agents/geo-writer.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 53,675
+apps/dashboard/src/components/content/inline-comments/content-comment-avatar.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-30
+apps/dashboard/src/components/content/content-save-conflict.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-164
+apps/dashboard/src/components/content/inline-comments/content-inline-comment.tsx
+  s_a0799efed517c8::t_ffbb4f06642d47 1-254
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 16-19,32-36,74,121,156,267,274,576,779-782,830-938,984-989,1000,1023-1024,1085-1086,1120-1135,1137-1138
+apps/dashboard/src/types/content/history-server.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-12
+apps/dashboard/src/lib/content/save-content-detail.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 5-10,16,22-23,25-29,32-45,49-50,53-56,58-82,86-91,95-124
+packages/db/src/types/discussion-comments.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 1-8
+apps/dashboard/src/types/content/overview.ts
+  s_a0799efed517c8::t_ffbb4f06642d47 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "eaddfd6324cb415beff150dc2afc68784eabff03",
+  "prompts": {},
+  "sessions": {
+    "s_a0799efed517c8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cd2fba69-476b-482b-aae2-b39793aeb150",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
