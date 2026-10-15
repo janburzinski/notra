@@ -1,0 +1,26 @@
+packages/ui/src/components/ui/composer.tsx
+  s_fed923d48a1422::t_f61d0fd89dcd7c 115,118,313
+  s_fed923d48a1422::t_c426f38ae72349 116-117
+apps/ui/registry/notra/composer/constants/composer.ts
+  s_fed923d48a1422::t_f61d0fd89dcd7c 18,20,23
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_fed923d48a1422::t_c426f38ae72349 113-114
+packages/ui/src/constants/composer.ts
+  s_fed923d48a1422::t_f61d0fd89dcd7c 12,14,17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b729cd05207d859702cefdce746ea72db35c1566",
+  "prompts": {},
+  "sessions": {
+    "s_fed923d48a1422": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "754fc29a-e354-40d6-b790-83ff8b0268bb",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
