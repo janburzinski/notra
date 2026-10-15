@@ -1,0 +1,23 @@
+apps/dashboard/tests/geo-scan-workflow.test.ts
+  s_a9685c24cd5e54::t_9e19e7d49a7ffc 1-9,19-23,39-41,87-89,114-116,164-166,618-795
+apps/dashboard/src/workflows/geo-scan.ts
+  ai_agent 11,187-188,192,194-195,197-199,201-203,213-227,229-230,241-256,261-262,265-268,270-273
+packages/geo-core/src/constants/geo-olostep.ts
+  ai_agent 8,10-11,14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a7b88aa521b19825d54198e8d3f78a6de4e3bac6",
+  "prompts": {},
+  "sessions": {
+    "s_a9685c24cd5e54": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a13def-cbf1-7980-9022-65d839abe2a2",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
