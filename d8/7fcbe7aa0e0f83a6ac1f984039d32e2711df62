@@ -1,0 +1,29 @@
+apps/dashboard/src/components/integrations/manage-store-integration-dialog.tsx
+  s_b05215cb6a0858::t_fdbeeed93870ec 251
+apps/dashboard/src/components/integrations/mcp-server-card.tsx
+  s_b05215cb6a0858::t_fdbeeed93870ec 176
+packages/ui/src/components/shared/auth/totp-enrollment-panel.tsx
+  s_b05215cb6a0858::t_fdbeeed93870ec 301-306
+apps/dashboard/src/lib/analytics/posthog-lazy.ts
+  s_b05215cb6a0858::t_a4bdf1dc7963be 43,55-57,62-65
+apps/dashboard/src/components/providers/posthog-identity.tsx
+  s_b05215cb6a0858::t_a4bdf1dc7963be 9,45,52
+apps/dashboard/src/components/demo/demo-api-console.tsx
+  s_b05215cb6a0858::t_fdbeeed93870ec 144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d87fcbe7aa0e0f83a6ac1f984039d32e2711df62",
+  "prompts": {},
+  "sessions": {
+    "s_b05215cb6a0858": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "793740ec-b587-41ed-9b70-cf537dd3cd6e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
