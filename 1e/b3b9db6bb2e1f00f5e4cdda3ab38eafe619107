@@ -1,0 +1,21 @@
+apps/dashboard/src/components/sites/site-deployment-failure.tsx
+  s_f1f91ec6cf4800::t_63be480e07a417 12-15,23-52,118-124
+apps/dashboard/src/types/components/sites.ts
+  s_f1f91ec6cf4800::t_63be480e07a417 23,431-433
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1eb3b9db6bb2e1f00f5e4cdda3ab38eafe619107",
+  "prompts": {},
+  "sessions": {
+    "s_f1f91ec6cf4800": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d589c55c-dc1e-4c78-a533-5fdb42e388e1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
