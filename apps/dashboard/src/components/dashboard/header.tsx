@@ -1,13 +1,6 @@
 import { ArrowRight01Icon, SearchIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ResponsiveDialog,
-  ResponsiveDialogContent,
-  ResponsiveDialogDescription,
-  ResponsiveDialogHeader,
-  ResponsiveDialogTitle,
-} from "@notra/ui/components/shared/responsive-dialog";
-import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -17,9 +10,9 @@ import {
 } from "@notra/ui/components/ui/breadcrumb";
 import { Kbd, KbdGroup } from "@notra/ui/components/ui/kbd";
 import { Separator } from "@notra/ui/components/ui/separator";
+import { useSidebar } from "@notra/ui/components/ui/sidebar";
 import { useIsApplePlatform } from "@notra/ui/hooks/use-is-apple-platform";
 import { cn } from "@notra/ui/lib/utils";
-import { useHotkey } from "@tanstack/react-hotkeys";
 import { parseAsString, useQueryState } from "nuqs";
 import { useId } from "react";
 import { useTranslations } from "use-intl";
@@ -29,8 +22,6 @@ import { BrandTopbarIdentitySelector } from "@/components/dashboard/brand-topbar
 import { ChatTopbarTitle } from "@/components/dashboard/chat-topbar-title";
 import { ContentTopbarTitle } from "@/components/dashboard/content-topbar-title";
 import { DashboardAgentButton } from "@/components/dashboard/dashboard-agent-button";
-import { useFeedback } from "@/components/dashboard/feedback-context";
-import { FeedbackForm } from "@/components/dashboard/feedback-popover";
 import { NavUser } from "@/components/dashboard/nav-user";
 import { SidebarToggle } from "@/components/dashboard/sidebar-toggle";
 import Link from "@/components/framework/link";
@@ -43,7 +34,6 @@ import { SITE_SECTIONS } from "@/constants/sites";
 import { useBreadcrumbLabels } from "@/lib/hooks/use-breadcrumb-labels";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
-import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { usePathname } from "@/lib/navigation";
 import type { BreadcrumbLabels } from "@/types/dashboard/breadcrumbs";
 import {
@@ -51,9 +41,9 @@ import {
   isBreadcrumbSegment,
   isGeoBreadcrumbSegment,
 } from "@/utils/dashboard-breadcrumbs";
+import { isRecordDetailPathname } from "@/utils/dashboard-paths";
 import { withGeoProject } from "@/utils/geo-paths";
 import { toGeoTab } from "@/utils/geo-tabs";
-import { scheduleDemo } from "@/utils/schedule-demo";
 import { siteHref } from "@/utils/site-links";
 
 const NON_ORG_PATHS: string[] = [];
@@ -64,45 +54,9 @@ const NON_CLICKABLE_SEGMENTS: ReadonlySet<string> = new Set([
 ]);
 
 export function SiteHeader() {
-  const t = useTranslations("dashboard.header");
   const tCommon = useTranslations("common");
-  const pathname = usePathname();
-  const segments = pathname.split("/").filter(Boolean);
-  const slug = segments[0];
-  const {
-    open: feedbackOpen,
-    setOpen: setFeedbackOpen,
-    openFeedback,
-  } = useFeedback();
   const { setOpen: setCommandPaletteOpen } = useCommandPalette();
-  const {
-    isOpen: settingsOpen,
-    openSettings,
-    closeSettings,
-  } = useSettingsModal();
   const isApplePlatform = useIsApplePlatform();
-
-  useHotkey("Mod+,", (event) => {
-    event.preventDefault();
-    if (!slug) {
-      return;
-    }
-
-    if (settingsOpen) {
-      closeSettings();
-      return;
-    }
-
-    openSettings("account");
-  });
-
-  useHotkey("F", () => {
-    openFeedback();
-  });
-
-  useHotkey("S", () => {
-    void scheduleDemo();
-  });
 
   return (
     <header className="@container/topbar relative flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -142,37 +96,55 @@ export function SiteHeader() {
             </button>
             <DashboardAgentButton />
           </div>
-          <button
-            aria-hidden
-            className="hidden"
-            data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
-            data-cal-link="dominikkoch/15min"
-            data-cal-namespace="15min"
-            tabIndex={-1}
-            type="button"
-          />
           <NavUser />
-          <ResponsiveDialog onOpenChange={setFeedbackOpen} open={feedbackOpen}>
-            <ResponsiveDialogContent
-              className="gap-0 p-0 sm:max-w-md"
-              showCloseButton={false}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/**
+ * Topbar for the jobs sidebar. Desktop pages title themselves and the sidebar
+ * carries search and the agent, so the bar only stays for record pages, which
+ * need breadcrumbs, and on small screens, where it holds the sidebar toggle.
+ */
+export function JobsSiteHeader() {
+  const tCommon = useTranslations("common");
+  const pathname = usePathname();
+  const { isMobile } = useSidebar();
+  const { setOpen: setCommandPaletteOpen } = useCommandPalette();
+
+  if (!(isMobile || isRecordDetailPathname(pathname))) {
+    return null;
+  }
+
+  return (
+    <header className="@container/topbar relative flex h-12 shrink-0 items-center gap-2 border-b">
+      <div className="flex h-full w-full min-w-0 items-center justify-between gap-2 px-4 lg:px-6">
+        <div className="flex min-w-0 items-center gap-1 overflow-hidden lg:gap-2">
+          {isMobile ? (
+            <>
+              <SidebarToggle className="-ml-1" />
+              <Separator
+                className="mx-2 h-4 self-center data-[orientation=vertical]:h-4 data-[orientation=vertical]:self-center"
+                orientation="vertical"
+              />
+            </>
+          ) : null}
+          <DashboardHeaderBreadcrumbs />
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          {isMobile ? (
+            <button
+              aria-label={tCommon("actions.search")}
+              className="text-muted-foreground hover:bg-muted/50 hover:text-foreground inline-flex size-7 items-center justify-center rounded-lg"
+              onClick={() => setCommandPaletteOpen(true)}
+              type="button"
             >
-              <ResponsiveDialogHeader className="sr-only">
-                <ResponsiveDialogTitle>
-                  {tCommon("labels.sendFeedback")}
-                </ResponsiveDialogTitle>
-                <ResponsiveDialogDescription>
-                  {t("feedbackDescription")}
-                </ResponsiveDialogDescription>
-              </ResponsiveDialogHeader>
-              {feedbackOpen ? (
-                <FeedbackForm
-                  autoFocus={false}
-                  onSubmitted={() => setFeedbackOpen(false)}
-                />
-              ) : null}
-            </ResponsiveDialogContent>
-          </ResponsiveDialog>
+              <HugeiconsIcon icon={SearchIcon} size={14} strokeWidth={1.8} />
+            </button>
+          ) : null}
+          <DashboardAgentButton />
         </div>
       </div>
     </header>

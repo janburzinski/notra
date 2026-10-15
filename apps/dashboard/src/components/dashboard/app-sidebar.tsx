@@ -15,6 +15,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { useJobsSidebar } from "@/components/providers/jobs-sidebar-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { usePathname, useRouter, useSearchParams } from "@/lib/navigation";
@@ -28,6 +29,8 @@ import {
   DeferredSidebarUpgrade,
 } from "./deferred-sidebar-status";
 import { NavBrandIdentity } from "./nav-brand-identity";
+import { NavFooter } from "./nav-footer";
+import { NavJobs } from "./nav-jobs";
 import { NavMain } from "./nav-main";
 import { NavSite } from "./nav-site";
 import { NavUtility } from "./nav-utility";
@@ -36,6 +39,7 @@ import { SidebarLabel } from "./sidebar-label";
 import { SidebarProjectSwitcher } from "./sidebar-project-switcher";
 import { SidebarResizeHandle } from "./sidebar-resize-handle";
 import { SidebarSwap } from "./sidebar-swap";
+import { SidebarToggle } from "./sidebar-toggle";
 
 const ChatHistoryNav = dynamic(
   () => import("./chat-history-nav").then((module) => module.ChatHistoryNav),
@@ -62,6 +66,12 @@ function SidebarBackButton({ onBack }: { onBack: () => void }) {
   );
 }
 
+function SidebarHeaderActions() {
+  const { isMobile } = useSidebar();
+  // The mobile sheet closes through the topbar toggle instead.
+  return isMobile ? null : <SidebarToggle className="shrink-0" />;
+}
+
 export function DashboardSidebar({
   className,
   onWidthChange,
@@ -77,6 +87,7 @@ export function DashboardSidebar({
   const { isMobile, setOpenMobile } = useSidebar();
   const { activeOrganization } = useOrganizationsContext();
   const visibility = useNavVisibility();
+  const jobsSidebar = useJobsSidebar();
   const navigationKey = `${pathname}?${searchParams.toString()}`;
   const pathnameSegments = pathname.split("/").filter(Boolean);
   const slug = pathnameSegments[0] ?? activeOrganization?.slug ?? "";
@@ -152,7 +163,16 @@ export function DashboardSidebar({
       )}
     >
       <SidebarHeader className="pt-px pb-0.5">
-        <SidebarProjectSwitcher />
+        {jobsSidebar ? (
+          <div className="flex items-center gap-1 group-data-[collapsible=icon]:flex-col">
+            <div className="min-w-0 flex-1 group-data-[collapsible=icon]:flex-none">
+              <SidebarProjectSwitcher />
+            </div>
+            <SidebarHeaderActions />
+          </div>
+        ) : (
+          <SidebarProjectSwitcher />
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarSwap
@@ -162,7 +182,7 @@ export function DashboardSidebar({
             {
               id: "main",
               side: "left",
-              children: <NavMain />,
+              children: jobsSidebar ? <NavJobs /> : <NavMain />,
             },
             {
               id: "chat",
@@ -197,7 +217,7 @@ export function DashboardSidebar({
           ]}
         />
         <div className="mt-auto">
-          <NavUtility slug={slug} />
+          {jobsSidebar ? <NavFooter slug={slug} /> : <NavUtility slug={slug} />}
           <DeferredSidebarStatus />
         </div>
         <div aria-hidden className="h-px shrink-0" ref={scrollEndRef} />

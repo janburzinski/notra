@@ -128,6 +128,7 @@ export function CompetitorEngineMatrixCard({
   return (
     <InstrumentModule
       bodyClassName="p-2"
+      className={isEmpty ? "min-h-96" : undefined}
       eyebrow={t("title")}
       hint={t("hint")}
       readout={isError && !isEmpty ? t("refreshFailed") : undefined}

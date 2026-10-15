@@ -8,6 +8,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestHeaders } from "@tanstack/react-start/server";
 import { Effect } from "effect";
 
+import { JOBS_SIDEBAR_COOKIE } from "@/constants/cookies";
 import { DEMO_BANNER_COOKIE, DEMO_BANNER_OFF } from "@/constants/demo";
 import { SIDEBAR_WIDTH_COOKIE_NAME } from "@/constants/nav";
 import { validateOrganizationAccess } from "@/lib/auth/actions";
@@ -39,6 +40,7 @@ export const loadOrganizationShell = createServerFn({ method: "GET" })
       initialSidebarWidth: getSidebarWidthFromCookie(
         getCookie(SIDEBAR_WIDTH_COOKIE_NAME)
       ),
+      initialJobsSidebar: getCookie(JOBS_SIDEBAR_COOKIE) === "1",
       demoBannerHidden: getCookie(DEMO_BANNER_COOKIE) === DEMO_BANNER_OFF,
       onboardingBannerDismissed:
         getCookie(onboardingBannerDismissedCookie(organization.id)) === "1",

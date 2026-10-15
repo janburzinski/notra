@@ -2131,6 +2131,8 @@
       "input": "Eingabe",
       "output": "Ausgabe",
       "workspace": "Workspace",
+      "improve": "Verbessern",
+      "docs": "Docs",
       "off": "Aus",
       "resume": "Fortsetzen",
       "manageIntegration": "Integration verwalten",
@@ -3967,8 +3969,7 @@
       },
       "overview": {
         "description": "Wie KI-Engines über {companyName} sprechen",
-        "descriptionFallback": "Wie KI-Engines über deine Marke sprechen",
-        "mentionActivity": "Erwähnungsaktivität"
+        "descriptionFallback": "Wie KI-Engines über deine Marke sprechen"
       },
       "personas": {
         "metaTitle": "GEO-Personas",
@@ -6434,7 +6435,6 @@
     },
     "list": {
       "description": "Beiträge und Sammlungen an einem Ort.",
-      "loadingDescription": "Alle erstellten Inhalte, organisiert in Sammlungen.",
       "allContent": "Alle Inhalte",
       "loadFailedTitle": "Inhalte konnten nicht geladen werden",
       "loadFailedDescription": "Versuch, deine Inhalte neu zu laden.",

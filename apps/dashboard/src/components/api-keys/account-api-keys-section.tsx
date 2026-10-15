@@ -338,7 +338,7 @@ export function AccountApiKeysSection() {
 
   const showLoadError = isError && keys.length === 0;
   const isEmpty = !(isPending || showLoadError) && keys.length === 0;
-  const visibleRows = isPending ? 2 : keys.length;
+  const visibleRows = keys.length;
 
   return (
     <section className="space-y-3">
@@ -417,7 +417,7 @@ export function AccountApiKeysSection() {
         }
         getRowId={(key) => key.keyId}
         height={
-          isEmpty || showLoadError
+          isEmpty || showLoadError || isPending
             ? API_KEYS_EMPTY_TABLE_HEIGHT
             : (visibleRows + 1) * 48
         }

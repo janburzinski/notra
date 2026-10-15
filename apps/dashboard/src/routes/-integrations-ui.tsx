@@ -1,6 +1,9 @@
 import { HydrationBoundary } from "@tanstack/react-query";
 import { type AnyRoute, redirect } from "@tanstack/react-router";
 
+import GithubLoading from "@/app/(dashboard)/[slug]/integrations/github/loading";
+import GscLoading from "@/app/(dashboard)/[slug]/integrations/google-search-console/loading";
+import Loading from "@/app/(dashboard)/[slug]/integrations/loading";
 import { GeoProjectQueryProvider } from "@/components/providers/geo-project-provider";
 import type { UiPageProps } from "@/types/ui-route";
 import { lazyPage } from "@/utils/lazy-page";
@@ -43,16 +46,6 @@ const Mcp = lazyPage(
 );
 const Slack = lazyPage(
   () => import("@/app/(dashboard)/[slug]/integrations/slack/page-client")
-);
-const Loading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/integrations/loading")
-);
-const GithubLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/integrations/github/loading")
-);
-const GscLoading = lazyPage(
-  () =>
-    import("@/app/(dashboard)/[slug]/integrations/google-search-console/loading")
 );
 
 function FramerPage({ params }: UiPageProps<undefined>) {

@@ -35,6 +35,27 @@ export type NavItemLabelKey =
 
 export type NavBadgeKey = "beta";
 
+export type NavGroupLabelKey =
+  | "overview"
+  | "prompts"
+  | "competitors"
+  | "improve"
+  | "content"
+  | "sites"
+  | "feedback"
+  | "workspace";
+
+/**
+ * One sidebar row. The first visible link is the row's own page; the rest show
+ * as sub-rows while the row is active, so a row never repeats its own name.
+ */
+export interface NavGroup {
+  id: NavGroupLabelKey;
+  icon: IconSvgElement;
+  labelKey: NavGroupLabelKey;
+  links: readonly string[];
+}
+
 export interface NavItem {
   link: string;
   icon: IconSvgElement;

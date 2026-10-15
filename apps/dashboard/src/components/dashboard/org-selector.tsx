@@ -3,6 +3,7 @@
 import {
   ArrowUp01Icon,
   Calendar03Icon,
+  Logout01Icon,
   Message01Icon,
   Moon02Icon,
   PlusSignIcon,
@@ -13,6 +14,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PAID_OR_LEGACY_PLAN_IDS } from "@notra/ai/billing/features";
+import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   Avatar,
   AvatarFallback,
@@ -46,6 +48,9 @@ import { useTranslations } from "use-intl";
 import { CreditBalanceMenuItem } from "@/components/billing/credit-balance-button";
 import { CreditTopupModal } from "@/components/billing/credit-topup-modal";
 import { useFeedback } from "@/components/dashboard/feedback-context";
+import { useJobsSidebar } from "@/components/providers/jobs-sidebar-provider";
+import { flushTrackEvent } from "@/lib/analytics/posthog-client";
+import { authClient } from "@/lib/auth/client";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
@@ -202,9 +207,44 @@ function OrganizationOptionsList({
   );
 }
 
+/** The jobs sidebar drops the topbar user menu, so sign-out moves here. */
+function OrgSelectorSignOut() {
+  const tCommon = useTranslations("common.labels");
+  const tUser = useTranslations("nav.user");
+  const signOut = authClient.useSignOut();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    await flushTrackEvent(POSTHOG_EVENTS.LOGOUT);
+    try {
+      await signOut();
+    } catch {
+      toast.error(tCommon("failedToSignOut"));
+      setIsSigningOut(false);
+    }
+  }
+
+  return (
+    <>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem
+        className={ORG_MENU_ITEM_CLASS}
+        disabled={isSigningOut}
+        onClick={handleSignOut}
+        variant="destructive"
+      >
+        <HugeiconsIcon icon={Logout01Icon} />
+        {isSigningOut ? tUser("signingOut") : tCommon("logOut")}
+      </DropdownMenuItem>
+    </>
+  );
+}
+
 export function OrgSelector() {
   const t = useTranslations("nav.orgSelector");
   const tCommon2 = useTranslations("common");
+  const jobsSidebar = useJobsSidebar();
   const tCommon = useTranslations("common.actions");
   const isClient = useIsClient();
   const { isMobile, state } = useSidebar();
@@ -355,6 +395,8 @@ export function OrgSelector() {
               {isDark ? t("lightMode") : t("darkMode")}
               <Kbd className="ml-auto">D</Kbd>
             </DropdownMenuItem>
+
+            {jobsSidebar ? <OrgSelectorSignOut /> : null}
           </DropdownMenuContent>
         </DropdownMenu>
 

@@ -2131,6 +2131,8 @@
       "input": "Input",
       "output": "Output",
       "workspace": "Workspace",
+      "improve": "Improve",
+      "docs": "Docs",
       "off": "Off",
       "resume": "Resume",
       "manageIntegration": "Manage integration",
@@ -3967,8 +3969,7 @@
       },
       "overview": {
         "description": "How AI engines talk about {companyName}",
-        "descriptionFallback": "How AI engines talk about your brand",
-        "mentionActivity": "Mention activity"
+        "descriptionFallback": "How AI engines talk about your brand"
       },
       "personas": {
         "metaTitle": "GEO Personas",
@@ -6434,7 +6435,6 @@
     },
     "list": {
       "description": "Posts and collections in one place.",
-      "loadingDescription": "Every batch of generated content, organized into collections.",
       "allContent": "All content",
       "loadFailedTitle": "Couldn't load content",
       "loadFailedDescription": "Try loading your content again.",

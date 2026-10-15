@@ -38,12 +38,16 @@ import { AGENT_FEEDBACK_NAV_LINK } from "@/constants/agent-feedback";
 import { IRIS_NAV_LINK } from "@/constants/iris";
 import { SITES_NAV_LINK } from "@/constants/sites";
 import type {
+  NavGroup,
   NavMainItem,
   NavPrimaryActionConfig,
   NavVisibility,
   SidebarMode,
   SidebarModeOption,
 } from "@/types/components/nav";
+
+/** Databuddy flag for the one-row-per-job sidebar. Off keeps the GEO/Studio sidebar. */
+export const JOBS_SIDEBAR_FLAG_KEY = "jobs-sidebar";
 
 export const HOME_NAV_LINK = "";
 export const CHAT_NAV_LINK = "/chat";
@@ -210,6 +214,82 @@ export const NAV_UTILITY_LINKS: readonly string[] = [
   SKILLS_NAV_LINK,
   API_KEYS_NAV_LINK,
 ];
+
+/**
+ * Main navigation. One row per job: the row opens its first page and reveals
+ * the related pages underneath while one of them is active.
+ */
+export const NAV_GROUPS: readonly NavGroup[] = [
+  {
+    id: "overview",
+    icon: Home01Icon,
+    labelKey: "overview",
+    links: [
+      GEO_OVERVIEW_NAV_LINK,
+      GEO_TRAFFIC_NAV_LINK,
+      ANALYTICS_NAV_LINK,
+      HOME_NAV_LINK,
+    ],
+  },
+  {
+    id: "prompts",
+    icon: AiChat01Icon,
+    labelKey: "prompts",
+    links: [GEO_PROMPTS_NAV_LINK, GEO_PERSONAS_NAV_LINK],
+  },
+  {
+    id: "competitors",
+    icon: ChartAnalysisIcon,
+    labelKey: "competitors",
+    links: [GEO_COMPETITORS_NAV_LINK, GEO_SHELF_SPACE_NAV_LINK],
+  },
+  {
+    id: "improve",
+    icon: SearchList01Icon,
+    labelKey: "improve",
+    links: [
+      GEO_GAPS_NAV_LINK,
+      GEO_AGENT_READINESS_NAV_LINK,
+      GEO_WRITER_NAV_LINK,
+    ],
+  },
+  {
+    id: "content",
+    icon: NoteIcon,
+    labelKey: "content",
+    links: [
+      CONTENT_NAV_LINK,
+      CHAT_NAV_LINK,
+      SCHEDULES_NAV_LINK,
+      EVENTS_NAV_LINK,
+      IRIS_NAV_LINK,
+    ],
+  },
+  {
+    id: "sites",
+    icon: WebDesign01Icon,
+    labelKey: "sites",
+    links: [SITES_NAV_LINK],
+  },
+  {
+    id: "feedback",
+    icon: Comment01Icon,
+    labelKey: "feedback",
+    links: [AGENT_FEEDBACK_NAV_LINK],
+  },
+];
+
+export const NAV_WORKSPACE_GROUP: NavGroup = {
+  id: "workspace",
+  icon: Settings01Icon,
+  labelKey: "workspace",
+  links: [
+    BRAND_IDENTITY_NAV_LINK,
+    INTEGRATIONS_NAV_LINK,
+    SKILLS_NAV_LINK,
+    API_KEYS_NAV_LINK,
+  ],
+};
 
 export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   iris: true,

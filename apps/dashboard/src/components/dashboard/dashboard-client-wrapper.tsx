@@ -11,6 +11,7 @@ import { FeedbackProvider } from "@/components/dashboard/feedback-context";
 import { RightPanelProvider } from "@/components/dashboard/right-panel-context";
 import { DashboardRuntimeProviders } from "@/components/providers/dashboard-runtime-providers";
 import { DatabuddyFlagsProvider } from "@/components/providers/databuddy-flags-provider";
+import { JobsSidebarProvider } from "@/components/providers/jobs-sidebar-provider";
 import {
   type InitialActiveOrganization,
   OrganizationsProvider,
@@ -88,6 +89,7 @@ interface DashboardClientWrapperProps {
   children: React.ReactNode;
   demoBannerHidden?: boolean;
   initialActiveOrganization?: InitialActiveOrganization | null;
+  initialJobsSidebar?: boolean;
   initialOnboardingAgentRun: InitialOnboardingAgentRun;
   initialSidebarOpen?: boolean;
   initialSidebarWidth: number;
@@ -99,6 +101,7 @@ export function DashboardClientWrapper({
   children,
   demoBannerHidden = false,
   initialActiveOrganization,
+  initialJobsSidebar = false,
   initialOnboardingAgentRun,
   initialSidebarOpen = true,
   initialSidebarWidth,
@@ -111,24 +114,26 @@ export function DashboardClientWrapper({
         initialActiveOrganization={initialActiveOrganization}
       >
         <DatabuddyFlagsProvider>
-          <FeedbackProvider>
-            <CommandPaletteProvider>
-              <RightPanelProvider>
-                <DashboardShell
-                  demoBannerHidden={demoBannerHidden}
-                  initialOnboardingAgentRun={initialOnboardingAgentRun}
-                  initialSidebarOpen={initialSidebarOpen}
-                  initialSidebarWidth={initialSidebarWidth}
-                  onboardingBannerDismissed={onboardingBannerDismissed}
-                >
-                  {children}
-                </DashboardShell>
-                <Suspense fallback={null}>
-                  <DashboardOverlays />
-                </Suspense>
-              </RightPanelProvider>
-            </CommandPaletteProvider>
-          </FeedbackProvider>
+          <JobsSidebarProvider initial={initialJobsSidebar}>
+            <FeedbackProvider>
+              <CommandPaletteProvider>
+                <RightPanelProvider>
+                  <DashboardShell
+                    demoBannerHidden={demoBannerHidden}
+                    initialOnboardingAgentRun={initialOnboardingAgentRun}
+                    initialSidebarOpen={initialSidebarOpen}
+                    initialSidebarWidth={initialSidebarWidth}
+                    onboardingBannerDismissed={onboardingBannerDismissed}
+                  >
+                    {children}
+                  </DashboardShell>
+                  <Suspense fallback={null}>
+                    <DashboardOverlays />
+                  </Suspense>
+                </RightPanelProvider>
+              </CommandPaletteProvider>
+            </FeedbackProvider>
+          </JobsSidebarProvider>
         </DatabuddyFlagsProvider>
         {modal}
       </OrganizationsProvider>

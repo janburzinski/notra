@@ -1,8 +1,10 @@
 import {
+  JOBS_SIDEBAR_COOKIE,
   LAST_VISITED_ORGANIZATION_COOKIE,
   LAST_VISITED_ORGANIZATION_COOKIE_MAX_AGE,
   LAST_VISITED_PROJECT_COOKIE,
   LAST_VISITED_PROJECT_COOKIE_MAX_AGE,
+  JOBS_SIDEBAR_COOKIE_MAX_AGE,
   ONBOARDING_BANNER_DISMISSED_COOKIE_MAX_AGE,
   ONBOARDING_BANNER_DISMISSED_COOKIE_PREFIX,
   SIDEBAR_MODE_COOKIE,
@@ -155,4 +157,13 @@ export const getSidebarModeFromCookies = (
 ): SidebarMode | null => {
   const value = cookies.get(SIDEBAR_MODE_COOKIE)?.value;
   return isSidebarMode(value) ? value : null;
+};
+
+/** Remembers the sidebar flag so the next server render starts on the right sidebar. */
+export const setJobsSidebarCookie = async (on: boolean): Promise<void> => {
+  await setClientCookie(
+    JOBS_SIDEBAR_COOKIE,
+    on ? "1" : "0",
+    JOBS_SIDEBAR_COOKIE_MAX_AGE
+  );
 };

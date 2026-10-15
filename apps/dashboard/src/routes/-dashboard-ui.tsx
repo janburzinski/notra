@@ -8,6 +8,19 @@ import {
 } from "@tanstack/react-router";
 import { Suspense, useEffect } from "react";
 
+import EventsLoading from "@/app/(dashboard)/[slug]/automation/events/loading";
+import SchedulesLoading from "@/app/(dashboard)/[slug]/automation/schedules/loading";
+import BrandLoading from "@/app/(dashboard)/[slug]/brand/identity/loading";
+import ChatLoading from "@/app/(dashboard)/[slug]/chat/loading";
+import NewChatLoading from "@/app/(dashboard)/[slug]/chat/new-loading";
+import CollectionLoading from "@/app/(dashboard)/[slug]/collection/[id]/loading";
+import ContentDetailLoading from "@/app/(dashboard)/[slug]/content/[id]/loading";
+import ContentLoading from "@/app/(dashboard)/[slug]/content/loading";
+import FeedbackLoading from "@/app/(dashboard)/[slug]/feedback/loading";
+import IrisLoading from "@/app/(dashboard)/[slug]/iris/loading";
+import DashboardLoading from "@/app/(dashboard)/[slug]/loading";
+import SkillDetailLoading from "@/app/(dashboard)/[slug]/skills/[name]/loading";
+import SkillsLoading from "@/app/(dashboard)/[slug]/skills/loading";
 import { AnalyticsProvider } from "@/components/analytics/analytics-context";
 import { AnalyticsShell } from "@/components/analytics/analytics-shell";
 import { DashboardClientWrapper } from "@/components/dashboard/dashboard-client-wrapper";
@@ -82,42 +95,6 @@ const Iris = lazyPage(
 );
 const BillingSuccess = lazyPage(
   () => import("@/app/(dashboard)/[slug]/settings/billing/success/page")
-);
-const DashboardLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/loading")
-);
-const ContentLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/content/loading")
-);
-const ContentDetailLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/content/[id]/loading")
-);
-const CollectionLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/collection/[id]/loading")
-);
-const SkillsLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/skills/loading")
-);
-const SkillDetailLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/skills/[name]/loading")
-);
-const ChatLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/chat/loading")
-);
-const EventsLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/automation/events/loading")
-);
-const SchedulesLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/automation/schedules/loading")
-);
-const BrandLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/brand/identity/loading")
-);
-const FeedbackLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/feedback/loading")
-);
-const IrisLoading = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/iris/loading")
 );
 
 type OrganizationShell = Awaited<ReturnType<typeof loadOrganizationShell>>;
@@ -357,7 +334,7 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
       parent: organization,
       path: "chat",
       title: { title: "Chat" },
-      pendingComponent: ChatLoading,
+      pendingComponent: NewChatLoading,
       preload: Chat.preload,
       component: ({ params }) => <Chat organizationSlug={params.slug} />,
     }),

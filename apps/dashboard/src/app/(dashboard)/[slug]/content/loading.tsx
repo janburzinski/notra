@@ -13,12 +13,20 @@ export default function Loading() {
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         <PageHeading
-          description={t("loadingDescription")}
+          description={t("description")}
           title={tCommon("labels.content")}
         >
-          <Skeleton className="h-9 w-40 rounded-md" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-9 w-[6.75rem] rounded-md" />
+            <Skeleton className="h-9 w-[11.75rem] rounded-md" />
+          </div>
         </PageHeading>
-        <CollectionsPageSkeleton />
+        <div className="space-y-3">
+          <div className="flex min-h-8 items-center">
+            <Skeleton className="h-8 w-56 rounded-md" />
+          </div>
+          <CollectionsPageSkeleton />
+        </div>
       </div>
     </PageContainer>
   );

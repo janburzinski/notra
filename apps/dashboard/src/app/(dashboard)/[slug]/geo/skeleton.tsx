@@ -11,11 +11,14 @@ import { GeoSectionSkeleton } from "@/components/geo/skeleton-parts";
 import { PageContainer } from "@/components/layout/container";
 
 const ENGINE_ROW_COUNT = 4;
+const PROVIDER_ROW_COUNT = 5;
 
 export function GeoPageSkeleton() {
   const t = useTranslations("geo.pages.overview");
   const tGeoShared = useTranslations("geo.shared");
   const tCommon = useTranslations("common");
+  const tTrend = useTranslations("geo.mentionTrendCard");
+  const tWhatChanged = useTranslations("geo.whatChangedCard");
   return (
     <PageContainer
       aria-busy="true"
@@ -27,7 +30,7 @@ export function GeoPageSkeleton() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-3xl font-bold tracking-tight">GEO</h1>
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <Skeleton className="h-7 w-16 rounded-full" />
+              <Skeleton className="h-8 w-[8.625rem] rounded-md" />
               <Button className="w-fit gap-2" disabled size="sm">
                 {tGeoShared("runScan")}
                 <Kbd className="hidden sm:inline-flex">R</Kbd>
@@ -48,23 +51,41 @@ export function GeoPageSkeleton() {
               eyebrow={tCommon("labels.visibility")}
               variant="table"
             >
-              <div className="flex min-h-64 flex-col gap-4">
-                <Skeleton className="h-8 w-12" />
-                <DataTableSkeleton rows={ENGINE_ROW_COUNT} />
+              <div className="flex flex-col gap-3">
+                <Skeleton className="h-[1.625rem] w-12" />
+                <div>
+                  <div className="flex h-9 items-center justify-between">
+                    <Skeleton className="h-3.5 w-16" />
+                    <Skeleton className="h-3.5 w-16" />
+                  </div>
+                  {Array.from({ length: PROVIDER_ROW_COUNT }, (_, index) => (
+                    <div
+                      className="border-border/60 flex h-11 items-center gap-3 border-t"
+                      key={index}
+                    >
+                      <Skeleton className="size-3.5" />
+                      <Skeleton className="size-4 rounded-full" />
+                      <Skeleton className="h-3.5 w-24" />
+                      <Skeleton className="ml-auto h-3.5 w-6" />
+                    </div>
+                  ))}
+                </div>
               </div>
             </InstrumentModule>
             <InstrumentModule
-              action={<Skeleton className="h-7 w-28 rounded-full" />}
+              action={<Skeleton className="h-7 w-[6.5rem] rounded-md" />}
               bodyClassName="flex min-h-0 flex-1 flex-col px-4 pt-1 pb-4"
               className="h-full @min-[44rem]/main:col-span-7"
-              eyebrow={t("mentionActivity")}
+              eyebrow={tTrend("eyebrow")}
               variant="table"
             >
               <Skeleton className="min-h-64 w-full flex-1 rounded-xl" />
             </InstrumentModule>
           </div>
           <GeoSectionSkeleton eyebrow={tGeoShared("whatChanged")}>
-            <Skeleton className="mb-3 h-4 w-48" />
+            <p className="text-muted-foreground mb-3 text-sm">
+              {tWhatChanged("subline")}
+            </p>
             <DataTableSkeleton rows={ENGINE_ROW_COUNT} />
           </GeoSectionSkeleton>
           <GeoSectionSkeleton

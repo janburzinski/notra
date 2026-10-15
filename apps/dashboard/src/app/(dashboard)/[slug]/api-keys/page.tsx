@@ -414,8 +414,9 @@ function ApiKeysTable({
       ),
     },
   ];
-  const visibleRows = isPending ? 3 : keys.length;
-  const isEmpty = !isPending && keys.length === 0;
+  const visibleRows = keys.length;
+  // Loading reserves the empty state height, the common first-visit case.
+  const isEmpty = isPending || keys.length === 0;
 
   return (
     <DataTable

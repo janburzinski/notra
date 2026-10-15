@@ -250,7 +250,7 @@ export function ShareOfVoiceChart(props: ShareOfVoiceChartProps) {
   if (totalMentions === 0) {
     return (
       <>
-        <Empty className="border-border rounded-2xl border py-12 md:py-12">
+        <Empty className="border-border min-h-96 rounded-2xl border py-12 md:py-12">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <HugeiconsIcon

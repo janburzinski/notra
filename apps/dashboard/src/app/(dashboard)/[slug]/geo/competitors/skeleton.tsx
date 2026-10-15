@@ -1,10 +1,14 @@
 "use client";
 
+import { PlusSignIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
+import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
 import { PageContainer } from "@/components/layout/container";
 
 const COMPETITOR_ROW_COUNT = 6;
@@ -44,11 +48,16 @@ export function GeoCompetitorsSkeleton() {
           description={t("description")}
           title={tCommon("labels.competitors")}
         >
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-8 w-36 rounded-md" />
-            <Skeleton className="h-7 w-48 rounded-md" />
+          <div className="flex flex-wrap items-center gap-2">
+            <Skeleton className="h-8 w-[8.625rem] rounded-md" />
+            <Button disabled size="sm">
+              <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
+              {t("newCompetitor")}
+              <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
+            </Button>
           </div>
         </PageHeading>
+        <Skeleton className="h-96 w-full rounded-2xl" />
         <Skeleton className="h-96 w-full rounded-2xl" />
         <DataTableSkeleton rows={COMPETITOR_ROW_COUNT} />
       </div>
