@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { HeroDither } from "@/components/landing/hero-dither";
 import { HeroHeadline } from "@/components/landing/hero-headline";
-import { LiveDemoEmbed } from "@/components/landing/live-demo-embed";
+import { LiveDemoLink } from "@/components/landing/live-demo-link";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
   HERO_BOOK_A_CALL_HREF,
@@ -75,7 +75,7 @@ export function HeroSection() {
 
           <div className="mt-9 flex w-full flex-1 flex-col items-center overflow-clip py-3.75 sm:mt-16.25 lg:pb-0">
             <div className="flex w-full flex-1 flex-col items-center px-3">
-              <LiveDemoEmbed />
+              <LiveDemoLink />
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { APP_URL, DEMO_URL } from "./urls";
+import { APP_URL } from "./urls";
 
 const LOCAL_DASHBOARD_ORIGIN = "http://localhost:3000";
 
@@ -21,7 +21,7 @@ export function buildSecurityHeaders(isDevelopment: boolean) {
       "font-src 'self'",
       "img-src 'self' data: blob: databuddy.cc *.databuddy.cc avatars.githubusercontent.com www.google.com *.gstatic.com cdn.contentport.io media.brand.dev *.r2.dev cdn.usenotra.com pbs.twimg.com abs.twimg.com",
       `connect-src 'self' databuddy.cc *.databuddy.cc *.inth.app *.c15t.com *.c15t.dev ${dashboardSessionOrigin}`,
-      `frame-src https://challenges.cloudflare.com ${DEMO_URL}`,
+      "frame-src https://challenges.cloudflare.com",
       "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'",

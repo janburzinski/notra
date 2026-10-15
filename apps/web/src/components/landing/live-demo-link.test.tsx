@@ -3,16 +3,17 @@ import { runInNewContext } from "node:vm";
 
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { LiveDemoEmbed } from "@/components/landing/live-demo-embed";
+import { LiveDemoLink } from "@/components/landing/live-demo-link";
 import {
   LIVE_DEMO_PREVIEW_DARK_SRC,
   LIVE_DEMO_PREVIEW_SRC,
   LIVE_DEMO_PREVIEW_THEME_SCRIPT,
+  LIVE_DEMO_URL,
 } from "@/constants/landing/live-demo";
 
 describe("live demo preview delivery", () => {
   test("lets the browser select a single high-priority image before hydration", () => {
-    const html = renderToStaticMarkup(<LiveDemoEmbed />);
+    const html = renderToStaticMarkup(<LiveDemoLink />);
 
     expect(html.match(/<img\b/g)).toHaveLength(1);
     expect(html).toContain("<picture>");
@@ -25,13 +26,15 @@ describe("live demo preview delivery", () => {
     expect(html).not.toContain('rel="preload"');
   });
 
-  test("does not load the interactive demo until it is opened", () => {
-    const html = renderToStaticMarkup(<LiveDemoEmbed />);
+  test("links to the demo in the same tab instead of embedding it", () => {
+    const html = renderToStaticMarkup(<LiveDemoLink />);
+    expect(html).toContain(`href="${LIVE_DEMO_URL}"`);
+    expect(html).not.toContain("target=");
     expect(html).not.toContain("<iframe");
   });
 
   test("selects the applied theme before enabling the initial image request", () => {
-    const html = renderToStaticMarkup(<LiveDemoEmbed />);
+    const html = renderToStaticMarkup(<LiveDemoLink />);
 
     expect(html).toContain('loading="lazy"');
     expect(html).toContain(LIVE_DEMO_PREVIEW_THEME_SCRIPT);
