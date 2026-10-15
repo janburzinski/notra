@@ -1,0 +1,19 @@
+apps/dashboard/src/components/geo/geo-engine-picker.tsx
+  s_26b8b063efd6ae::t_031f226f41a833 262-265
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0e1a4cf6839b582d3eb644cf72b761c5414cc474",
+  "prompts": {},
+  "sessions": {
+    "s_26b8b063efd6ae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4992c9fc-2858-4903-9c63-df2f9d7d3f27",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
