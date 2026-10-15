@@ -1,0 +1,57 @@
+packages/geo-core/src/geo/errors.ts
+  s_9acb868acb273f::t_b283150c39a8e2 13-19
+packages/geo-core/src/geo/programs.ts
+  s_9acb868acb273f::t_13ed8729b5c89c 2083-2088,2092-2093,2110-2111,2145-2146
+packages/geo-core/src/geo/scan-handoff.ts
+  s_9acb868acb273f::t_13ed8729b5c89c 86-87,106
+packages/geo-core/src/types/deps.ts
+  s_9acb868acb273f::t_13ed8729b5c89c 33
+apps/dashboard/src/workflows/geo-scan.ts
+  s_9acb868acb273f::t_36adee2c579d84 361,485-493,498,522,557
+packages/schemas/src/schemas/api/geo-sequences.ts
+  s_9acb868acb273f::t_8d28c329dbf15c 69-70,76-87
+apps/dashboard/src/app/api/internal/geo/sequence-run/route.ts
+  s_9acb868acb273f::t_35cfecf211b96b 22-26
+apps/dashboard/src/workflows/steps/geo-scan-steps.ts
+  s_9acb868acb273f::t_36adee2c579d84 71-76,85,102,115
+packages/geo-core/src/geo/persona-scan.ts
+  s_9acb868acb273f::t_b283150c39a8e2 484-488,497-499
+packages/geo-core/src/geo/conversation-replay.ts
+  s_9acb868acb273f::t_b283150c39a8e2 21-24,113-115
+packages/geo-core/src/geo/scan.ts
+  s_9acb868acb273f::t_a9f2c38991e4aa 639-640,711-712
+  s_9acb868acb273f::t_b283150c39a8e2 2272-2276,2285-2293
+  s_9acb868acb273f::t_13ed8729b5c89c 611,637-638,641,643,655,686,709-710,713
+packages/geo-core/src/geo/olostep-conversation-scan.ts
+  s_9acb868acb273f::t_13ed8729b5c89c 50-51,64
+apps/api/src/routes/geo-sequences.ts
+  s_9acb868acb273f::t_8d28c329dbf15c 131
+  s_9acb868acb273f::t_35cfecf211b96b 135-136,274-275
+packages/geo-core/src/schemas/geo-workflows.ts
+  s_9acb868acb273f::t_13ed8729b5c89c 1,20-25,36,38-43
+apps/api/tests/geo-sequence-run-contract.test.ts
+  s_9acb868acb273f::t_c7a3a92a1203b7 1-2,4-27
+  s_9acb868acb273f::t_01ef2dd1156fda 3
+apps/dashboard/src/lib/workflows/start.ts
+  s_9acb868acb273f::t_13ed8729b5c89c 260
+packages/geo-core/tests/olostep-manual-runs.test.ts
+  s_9acb868acb273f::t_a9f2c38991e4aa 24
+  s_9acb868acb273f::t_c402588a212956 263-268
+  s_9acb868acb273f::t_9e58bcdd9db413 13-14,31,46,66-69,73,213-262,269-431
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "aed983bdd18fa36a2af0a7fd24c705131e040cd3",
+  "prompts": {},
+  "sessions": {
+    "s_9acb868acb273f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03ce46c3-a19d-4400-a9bf-698b31d0af2b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
