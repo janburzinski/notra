@@ -77,8 +77,12 @@ import type { Tool } from "ai";
 /** Tools that write user-visible records and must pause for user approval. */
 export function getStandaloneApprovalToolNames(): Set<string> {
   const toolNames = new Set<string>([
+    "addBrandReference",
+    "createImage",
     "createSchedule",
     "createSkill",
+    "editPost",
+    "updatePost",
     "schedulePost",
     "cancelPostSchedule",
   ]);
