@@ -9,6 +9,7 @@ import { engineModelOf } from "../src/utils/geo-engine-family";
 import {
   isGeoWebSearchEngine,
   isPartialGeoScanEngineScope,
+  remapRetiredGeoEngineIds,
   resolveGeoGroundedZdrMode,
   resolveTrackedEngines,
   scopeGeoScanEngines,
@@ -22,6 +23,7 @@ import {
   buildGeoModelCatalogFromFeed,
   geoDefaultEngines,
   geoEnginesForAudience,
+  geoModelsForProvider,
   seedGeoModelCatalog,
 } from "../src/utils/geo-model-catalog";
 import { isGeoOlostepEngine } from "../src/utils/geo-olostep";
@@ -32,6 +34,73 @@ const catalog: GeoModelCatalog = {
 };
 
 describe("selected grounded engines", () => {
+  test("batch transport variants are not separate models, even without a base in the feed", () => {
+    const available = buildGeoModelCatalogFromFeed([
+      {
+        id: "openai/gpt-6.1-sol",
+        name: "GPT-6.1 Sol",
+        owned_by: "openai",
+        type: "language",
+        zdr: "none",
+      },
+      {
+        id: "openai/gpt-6.1-sol-batch",
+        name: "GPT-6.1 Sol (Batch)",
+        owned_by: "openai",
+        type: "language",
+        zdr: "none",
+      },
+      {
+        id: "anthropic/claude-opus-5.5-batch",
+        name: "Claude Opus 5.5 (Batch)",
+        owned_by: "anthropic",
+        type: "language",
+        zdr: "none",
+      },
+    ]);
+    expect(available.models.some((model) => model.id.endsWith("-batch"))).toBe(
+      false
+    );
+    expect(
+      geoModelsForProvider(available, "openai").map((model) => model.id)
+    ).toContain("openai/gpt-6.1-sol");
+    expect(
+      geoDefaultEngines(available).every((id) => !id.endsWith("-batch"))
+    ).toBe(true);
+    expect(
+      resolveTrackedEngines(available, [
+        "openai/gpt-6.1-sol-batch",
+        "openai/gpt-6.1-sol",
+      ])
+    ).toEqual(["openai/gpt-6.1-sol"]);
+    expect(
+      scopeGeoScanEngines(
+        available,
+        ["openai/gpt-6.1-sol-batch"],
+        ["openai/gpt-6.1-sol-batch"]
+      )
+    ).toEqual(["openai/gpt-6.1-sol"]);
+    expect(
+      isPartialGeoScanEngineScope(
+        ["openai/gpt-6.1-sol-batch"],
+        ["openai/gpt-6.1-sol"]
+      )
+    ).toBe(false);
+  });
+
+  test("saved batch approvals and retired models canonicalize without rewriting historical check identities", () => {
+    expect(
+      remapRetiredGeoEngineIds([
+        "spacexai/grok-4.6-batch",
+        "spacexai/grok-4.7",
+        "openai/gpt-6.1-sol-batch",
+      ])
+    ).toEqual(["spacexai/grok-4.7", "openai/gpt-6.1-sol"]);
+    expect(engineModelOf("openai/gpt-6.1-sol-batch-grounded")).toBe(
+      "openai/gpt-6.1-sol-batch"
+    );
+  });
+
   test("Grok models use native gateway search and retain their ZDR policy", () => {
     const available = buildGeoModelCatalogFromFeed([
       {

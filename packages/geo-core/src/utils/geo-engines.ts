@@ -4,7 +4,10 @@ import {
   GEO_OPENCODE_ENGINE_ID,
   GEO_PAID_CODING_AGENT_ENGINE_IDS,
 } from "../constants/geo";
-import { GEO_MODEL_REPLACED_IDS } from "../constants/geo-model-catalog";
+import {
+  GEO_MODEL_BATCH_SUFFIX,
+  GEO_MODEL_REPLACED_IDS,
+} from "../constants/geo-model-catalog";
 import type {
   GeoGroundedEngine,
   GeoModelCatalog,
@@ -34,12 +37,15 @@ export function sortKnownEngines(
     .map((model) => model.id);
 }
 
-/** Swap retired catalog ids for the engine that replaced them. */
+/** Canonicalize saved batch variants and replace retired catalog ids. */
 export function remapRetiredGeoEngineIds(ids: Iterable<string>): string[] {
   const seen = new Set<string>();
   const next: string[] = [];
   for (const id of ids) {
-    const mapped = GEO_MODEL_REPLACED_IDS[id] ?? id;
+    const base = id.endsWith(GEO_MODEL_BATCH_SUFFIX)
+      ? id.slice(0, -GEO_MODEL_BATCH_SUFFIX.length)
+      : id;
+    const mapped = GEO_MODEL_REPLACED_IDS[base] ?? base;
     if (seen.has(mapped)) {
       continue;
     }

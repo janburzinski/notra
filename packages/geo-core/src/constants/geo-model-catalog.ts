@@ -727,6 +727,9 @@ export const GEO_COMMERCE_AUDIENCE_ENGINE_IDS: readonly string[] = [
 export const GEO_MODEL_FEED_URL = "https://ai-gateway.vercel.sh/v1/models";
 export const GEO_MODEL_FEED_REVALIDATE_SECONDS = 3600;
 
+/** Batch is a transport mode, not a separately tracked GEO model. */
+export const GEO_MODEL_BATCH_SUFFIX = "-batch";
+
 /** Meta's native search is limited to its hosted text models and excludes ZDR. */
 export const GEO_META_SEARCH_MODEL_IDS: ReadonlySet<string> = new Set([
   "meta/muse-wonder-1.0",

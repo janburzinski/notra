@@ -3,6 +3,7 @@ import {
   GEO_DEFAULT_ENGINE_IDS,
   GEO_GENERAL_AUDIENCE_ENGINE_IDS,
   GEO_META_SEARCH_MODEL_IDS,
+  GEO_MODEL_BATCH_SUFFIX,
   GEO_MODEL_CATALOG_SEED,
   GEO_MODEL_CATALOG_STATIC,
   GEO_MODEL_EXCLUDED_ID_PATTERN,
@@ -25,7 +26,6 @@ import type {
 const MS_PER_SECOND = 1000;
 const MS_PER_DAY = 86_400_000;
 const DAY_LENGTH = 10;
-const BATCH_SUFFIX = "-batch";
 const VERSION_PATTERN = /\d+(?:\.\d+)*/g;
 const DEFAULT_ENGINE_SET = new Set<string>(GEO_DEFAULT_ENGINE_IDS);
 const SEED_RELEASE_DATES = new Map(
@@ -38,6 +38,8 @@ function isEligibleFeedModel(model: GeoGatewayModel): boolean {
   }
   if (
     GEO_MODEL_EXCLUDED_IDS.has(model.id) ||
+    // Gateway batches cannot run GEO's web-search tools or enforce ZDR.
+    model.id.endsWith(GEO_MODEL_BATCH_SUFFIX) ||
     GEO_MODEL_EXCLUDED_ID_PATTERN.test(model.id) ||
     GEO_MODEL_EXCLUDED_SLUG_PATTERN.test(model.id)
   ) {
@@ -147,17 +149,15 @@ function releasedAt(entry: GeoModelCatalogEntry): number {
 
 /**
  * Hide niche variants and superseded releases from the picker: per model line
- * only the newest release stays, and lines that went stale disappear. Batch
- * variants follow their base model. Defaults are never hidden. Hidden models
- * stay in the catalog so stored selections keep resolving.
+ * only the newest release stays, and lines that went stale disappear.
+ * Defaults are never hidden. Hidden models stay in the catalog so stored
+ * selections keep resolving.
  */
 function markHiddenGeoModels(
   entries: readonly GeoModelCatalogEntry[]
 ): GeoModelCatalogEntry[] {
   const candidates = entries.filter(
-    (entry) =>
-      !entry.id.endsWith(BATCH_SUFFIX) &&
-      !GEO_MODEL_HIDDEN_ID_PATTERN.test(entry.id)
+    (entry) => !GEO_MODEL_HIDDEN_ID_PATTERN.test(entry.id)
   );
   // Without a release date neither recency rule can judge a model, so it stays.
   const undated = candidates.filter((entry) => releasedAt(entry) === 0);
@@ -181,13 +181,8 @@ function markHiddenGeoModels(
   );
   const isListed = (entry: GeoModelCatalogEntry) =>
     entry.default || STATIC_ENGINE_IDS.has(entry.id) || listed.has(entry.id);
-  const byId = new Map(entries.map((entry) => [entry.id, entry]));
-
   return entries.map((entry) => {
-    const base = entry.id.endsWith(BATCH_SUFFIX)
-      ? byId.get(entry.id.slice(0, -BATCH_SUFFIX.length))
-      : entry;
-    const hidden = !(base && isListed(base)) && !isListed(entry);
+    const hidden = !isListed(entry);
     return hidden ? { ...entry, hidden } : entry;
   });
 }
