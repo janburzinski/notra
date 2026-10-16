@@ -210,6 +210,10 @@ export function respondToPostFailure(c: Context, failure: PostDomainError) {
     return c.json({ error: failure.message }, 400);
   }
 
+  if (failure._tag === "PostGenerationSourcesUnavailableError") {
+    return c.json({ error: failure.message, code: failure.code }, 400);
+  }
+
   return c.json(
     {
       error: "Failed to queue content generation",

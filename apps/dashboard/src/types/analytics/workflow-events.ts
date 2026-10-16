@@ -2,6 +2,7 @@ import type { PostHogProperties } from "@notra/posthog/types/posthog";
 
 import type {
   WORKFLOW_ANALYTICS_NAMES,
+  WORKFLOW_FAILURE_CLASSIFICATIONS,
   WORKFLOW_OUTCOMES,
   WORKFLOW_TRIGGERS,
 } from "@/constants/workflow-analytics";
@@ -15,6 +16,20 @@ export type WorkflowTrigger =
 export type WorkflowOutcome =
   (typeof WORKFLOW_OUTCOMES)[keyof typeof WORKFLOW_OUTCOMES];
 
+export type WorkflowFailureClassification =
+  (typeof WORKFLOW_FAILURE_CLASSIFICATIONS)[keyof typeof WORKFLOW_FAILURE_CLASSIFICATIONS];
+
+/** Booleans and counts only, so diagnostics can never carry user content. */
+export type WorkflowFailureDiagnostics = Record<string, boolean | number>;
+
+export interface WorkflowFailureDetail {
+  reason?: string;
+  errorCode?: string;
+  phase?: string;
+  classification?: WorkflowFailureClassification;
+  diagnostics?: WorkflowFailureDiagnostics;
+}
+
 export interface WorkflowStartedInput {
   workflow: WorkflowAnalyticsName;
   runId: string;
@@ -25,7 +40,7 @@ export interface WorkflowStartedInput {
   properties?: PostHogProperties;
 }
 
-export interface WorkflowOutcomeInput {
+export interface WorkflowOutcomeInput extends WorkflowFailureDetail {
   websiteUrl?: string;
   workflow: WorkflowAnalyticsName;
   outcome: WorkflowOutcome;
@@ -34,7 +49,6 @@ export interface WorkflowOutcomeInput {
   runId?: string;
   startedAt?: number;
   stepFailed?: string;
-  reason?: string;
   properties?: PostHogProperties;
 }
 

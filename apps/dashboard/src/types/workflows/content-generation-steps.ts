@@ -72,6 +72,7 @@ export interface TrackContentOutcomeInput {
   source: DatabuddyWorkflowSource;
   postIds?: string[];
   reason?: string;
+  errorCode?: string;
   logPrefix: string;
 }
 

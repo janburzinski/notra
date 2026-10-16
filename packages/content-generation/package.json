@@ -4,9 +4,12 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./constants/errors": "./src/constants/errors.ts",
     "./databuddy": "./src/databuddy.ts",
     "./jobs": "./src/jobs.ts",
-    "./schemas": "./src/schemas.ts"
+    "./schemas": "./src/schemas.ts",
+    "./types/sources": "./src/types/sources.ts",
+    "./utils/sources": "./src/utils/sources.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo"

@@ -25,7 +25,12 @@ import {
 } from "@notra/ai/schemas/post-metadata";
 import { toneProfileSchema } from "@notra/ai/schemas/tone";
 import { isValidTimezone } from "@notra/ai/utils/current-date";
+import {
+  CONTENT_GENERATION_ERROR_CODES,
+  NO_ACTIVITY_TYPES_MESSAGE,
+} from "@notra/content-generation/constants/errors";
 import { SUPPORTED_CONTENT_GENERATION_TYPES } from "@notra/content-generation/schemas";
+import { hasEnabledActivityType } from "@notra/content-generation/utils/sources";
 import { lookbackWindowEnum, postStatusEnum } from "@notra/db/schema";
 import { assertPublicHttpUrl } from "@notra/utils/url";
 
@@ -938,6 +943,12 @@ export const createPostGenerationRequestSchema = z
         includeReleases: z.boolean().default(true),
         includeLinearData: z.boolean().default(false),
       })
+      .refine(hasEnabledActivityType, {
+        message: NO_ACTIVITY_TYPES_MESSAGE,
+        params: {
+          code: CONTENT_GENERATION_ERROR_CODES.NO_ACTIVITY_TYPES_SELECTED,
+        },
+      })
       .default({
         includePullRequests: true,
         includeCommits: true,
@@ -946,7 +957,7 @@ export const createPostGenerationRequestSchema = z
       })
       .openapi({
         description:
-          "Which kinds of activity to collect from the selected sources.",
+          "Which kinds of activity to collect from the selected sources. At least one must be true.",
       }),
     selectedItems: z
       .object({
@@ -1075,6 +1086,11 @@ const contentGenerationJobSchema = z.object({
   }),
   error: z.string().nullable().openapi({
     description: "Failure reason when status is failed.",
+  }),
+  errorCode: z.string().nullable().optional().openapi({
+    description:
+      "Stable machine-readable failure code when status is failed, such as NO_ACTIVITY_TYPES_SELECTED or NO_AVAILABLE_SOURCES. Absent or null for other failures and for older jobs.",
+    example: "NO_AVAILABLE_SOURCES",
   }),
   source: z.enum(["api", "dashboard"]),
   createdAt: z.string(),

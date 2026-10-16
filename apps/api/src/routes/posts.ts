@@ -43,6 +43,7 @@ import { getOrganizationId } from "../utils/auth";
 import {
   getContentGenerationUnavailableReason,
   resolveRequestedBrandVoiceId,
+  assertContentGenerationSourcesAvailable,
   resolveRequestedLinearIntegrationIds,
   resolveRequestedRepositoryIds,
 } from "../utils/content-generation";
@@ -277,7 +278,7 @@ const createPostGenerationRoute = createRoute({
   operationId: "createPostGeneration",
   summary: "Queue async post generation",
   description:
-    "Queues a generation job for one content type and returns 202 with the job. Select sources with integrations.github, integrations.linear, or github.repositories; when no selector is given at all, every connected GitHub integration is used. Poll GET /v1/posts/generate/{jobId} until job.status is completed, failed, or skipped. Subscribe to post.generation.completed, post.generation.failed, or post.generation.skipped using /v1/webhooks for completion notifications.",
+    "Queues a generation job for one content type and returns 202 with the job. Select sources with integrations.github, integrations.linear, or github.repositories; when no selector is given at all, every connected GitHub integration is used. Requests with every dataPoints flag false, or with no usable source, are rejected with 400 and code NO_ACTIVITY_TYPES_SELECTED or NO_AVAILABLE_SOURCES before a job is created. Poll GET /v1/posts/generate/{jobId} until job.status is completed, failed, or skipped. Subscribe to post.generation.completed, post.generation.failed, or post.generation.skipped using /v1/webhooks for completion notifications.",
   request: {
     body: {
       content: {
@@ -652,6 +653,21 @@ postsRoutes.openapi(createPostGenerationRoute, async (c) => {
 
   const { repositoryIds, linearIntegrationIds, resolvedBrandVoiceId } =
     targets.success;
+
+  const sources = await runPostProgram(
+    assertContentGenerationSourcesAvailable(c.get("db"), orgId, {
+      dataPoints: body.dataPoints,
+      repositoryIds,
+      linearIntegrationIds,
+    })
+  );
+
+  if (sources._tag === "Failure") {
+    return c.json(
+      { error: sources.failure.message, code: sources.failure.code },
+      400
+    );
+  }
 
   const rateLimited = await enforceRatelimit(c, ratelimit.postGeneration);
   if (rateLimited) {

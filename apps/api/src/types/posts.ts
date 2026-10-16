@@ -13,6 +13,7 @@ import type {
   PostConcurrentModificationError,
   PostGenerationJobNotFoundError,
   PostGenerationQueueFailedError,
+  PostGenerationSourcesUnavailableError,
   PostGenerationTargetUnavailableError,
   PostInvalidMarkdownError,
   PostMetadataNotSupportedError,
@@ -78,6 +79,7 @@ export type PostDomainError =
   | PostConcurrentModificationError
   | PostGenerationJobNotFoundError
   | PostGenerationQueueFailedError
+  | PostGenerationSourcesUnavailableError
   | PostGenerationTargetUnavailableError;
 
 interface PostProgramInput {

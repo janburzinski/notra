@@ -30,6 +30,16 @@ export const WORKFLOW_OUTCOMES = {
   FAILED: "failed",
 } as const;
 
+export const WORKFLOW_FAILURE_CLASSIFICATIONS = {
+  CONFIGURATION: "configuration",
+  UNEXPECTED: "unexpected",
+} as const;
+
+export const WORKFLOW_ON_DEMAND_PHASES = {
+  SOURCE_VALIDATION: "source_validation",
+  GENERATION: "generation",
+} as const;
+
 export const WORKFLOW_UNEXPECTED_FAILURE_REASON = "unexpected_error";
 
 export const CONTENT_OUTCOME_EVENTS = {

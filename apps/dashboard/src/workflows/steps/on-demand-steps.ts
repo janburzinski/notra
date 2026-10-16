@@ -1,7 +1,7 @@
 import "@/workflows/runtime";
 import { db } from "@notra/db/drizzle";
-import { githubIntegrations } from "@notra/db/schema";
-import { and, eq } from "drizzle-orm";
+import { githubIntegrations, linearIntegrations } from "@notra/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 
 import { WORKFLOW_OUTCOMES } from "@/constants/workflow-analytics";
 import { trackWorkflowOutcomeAndFlush } from "@/lib/analytics/workflow-lifecycle";
@@ -93,6 +93,38 @@ export async function fetchOnDemandRepositories(input: {
   return validRepos;
 }
 
+/**
+ * Linear selections are made when the run is queued, so integrations can be
+ * disabled or removed before it starts. Keep only the ones still enabled for
+ * this organization so source checks and generation never see stale ids.
+ */
+export async function resolveOnDemandLinearIntegrationIds(input: {
+  organizationId: string;
+  linearIntegrationIds?: string[];
+}): Promise<string[] | undefined> {
+  "use step";
+  if (input.linearIntegrationIds === undefined) {
+    return undefined;
+  }
+  if (input.linearIntegrationIds.length === 0) {
+    return [];
+  }
+
+  const enabled = await db
+    .select({ id: linearIntegrations.id })
+    .from(linearIntegrations)
+    .where(
+      and(
+        eq(linearIntegrations.organizationId, input.organizationId),
+        eq(linearIntegrations.enabled, true),
+        inArray(linearIntegrations.id, input.linearIntegrationIds)
+      )
+    );
+  const enabledIds = new Set(enabled.map((integration) => integration.id));
+
+  return input.linearIntegrationIds.filter((id) => enabledIds.has(id));
+}
+
 export async function resolveManualBrandSettings(input: {
   organizationId: string;
   brandVoiceId?: string;
@@ -144,6 +176,10 @@ export async function finishOnDemand(
       runId: input.runId,
       startedAt: input.startedAt,
       reason: input.reason,
+      errorCode: input.errorCode,
+      phase: input.phase,
+      classification: input.classification,
+      diagnostics: input.diagnostics,
       properties: {
         status: input.status,
         output_type: input.contentType,
@@ -177,11 +213,13 @@ export async function finishOnDemand(
 
   await setTrackedJobStatus(input.jobId, input.status, {
     error: input.reason ?? null,
+    ...(input.errorCode ? { errorCode: input.errorCode } : {}),
   });
   await appendTrackedJobEvent(
     input.jobId,
     input.status,
-    input.reason ?? "Generation did not complete"
+    input.reason ?? "Generation did not complete",
+    input.errorCode ? { errorCode: input.errorCode } : null
   );
 }
 

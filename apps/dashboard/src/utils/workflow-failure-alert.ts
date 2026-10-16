@@ -3,6 +3,7 @@ import { websiteLogUrl } from "@notra/ai/utils/website-log-url";
 
 import { WORKFLOW_FAILURE_ALERT } from "@/constants/workflow-failure-alert";
 import type { WorkflowFailureAlertInput } from "@/types/workflow-failure-alert";
+import { formatFailureDiagnostics } from "@/utils/workflow-failure";
 import { logWorkflowTelemetry } from "@/utils/workflow-telemetry";
 
 const pendingKey = "workflow:failure-alerts:pending";
@@ -58,6 +59,7 @@ async function alertWorkflowFailure(
       return;
     }
     const websiteUrl = websiteLogUrl(input.websiteUrl);
+    const diagnostics = formatFailureDiagnostics(input.diagnostics);
     const response = await fetch(webhook, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -71,7 +73,13 @@ async function alertWorkflowFailure(
             ? [`Organization: ${input.organizationId}`]
             : []),
           ...(input.projectId ? [`Project: ${input.projectId}`] : []),
+          ...(input.phase ? [`Phase: ${input.phase}`] : []),
+          ...(input.classification
+            ? [`Classification: ${input.classification}`]
+            : []),
+          ...(input.errorCode ? [`Code: ${input.errorCode}`] : []),
           ...(input.reason ? [`Reason: ${input.reason.slice(0, 500)}`] : []),
+          ...(diagnostics ? [`Diagnostics: ${diagnostics}`] : []),
         ].join("\n"),
       }),
       signal: AbortSignal.timeout(5000),

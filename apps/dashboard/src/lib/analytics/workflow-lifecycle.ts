@@ -17,6 +17,10 @@ import type {
 } from "@/types/analytics/workflow-events";
 import type { BrandAnalysisProgressInput } from "@/types/workflows/brand-analysis";
 import type { TrackContentOutcomeInput } from "@/types/workflows/content-generation-steps";
+import {
+  buildFailureTelemetryFields,
+  isConfigurationFailure,
+} from "@/utils/workflow-failure";
 import { notifyWorkflowFailure } from "@/utils/workflow-failure-alert";
 import { getCurrentWorkflowRunId } from "@/utils/workflow-run-id";
 import { logWorkflowTelemetry } from "@/utils/workflow-telemetry";
@@ -54,7 +58,12 @@ export async function trackWorkflowOutcomeAndFlush(
   input: WorkflowOutcomeInput
 ): Promise<void> {
   const failed = input.outcome === WORKFLOW_OUTCOMES.FAILED;
+  const configurationFailure = failed && isConfigurationFailure(input);
   const runId = getCurrentWorkflowRunId();
+  let telemetryOutcome: "success" | "warning" | "error" = "success";
+  if (failed) {
+    telemetryOutcome = configurationFailure ? "warning" : "error";
+  }
   logWorkflowTelemetry({
     event: failed ? "job.failed" : "job.completed",
     runId,
@@ -63,17 +72,24 @@ export async function trackWorkflowOutcomeAndFlush(
     organizationId: input.organizationId,
     projectId: input.projectId,
     durationMs: resolveDurationMs(input.startedAt),
-    outcome: failed ? "error" : "success",
+    outcome: telemetryOutcome,
     stepFailed: input.stepFailed,
+    ...(failed ? buildFailureTelemetryFields(input) : {}),
   });
   const alertRunId = runId ?? input.runId;
-  if (failed && alertRunId) {
+  // Configuration failures are caused by the request, not by an outage, so
+  // they keep their status, logs, and analytics but do not page.
+  if (failed && alertRunId && !configurationFailure) {
     await notifyWorkflowFailure({
       runId: alertRunId,
       workflow: input.workflow,
       organizationId: input.organizationId,
       projectId: input.projectId,
       reason: input.reason ?? input.stepFailed,
+      errorCode: input.errorCode,
+      phase: input.phase,
+      classification: input.classification,
+      diagnostics: input.diagnostics,
       websiteUrl: input.websiteUrl,
     });
   }
@@ -89,6 +105,17 @@ export async function trackWorkflowOutcomeAndFlush(
       duration_ms: resolveDurationMs(input.startedAt),
       step_failed: input.stepFailed,
       reason: input.reason,
+      ...(input.errorCode ? { error_code: input.errorCode } : {}),
+      ...(input.phase ? { phase: input.phase } : {}),
+      ...(input.classification
+        ? { failure_classification: input.classification }
+        : {}),
+      ...Object.fromEntries(
+        Object.entries(input.diagnostics ?? {}).map(([key, value]) => [
+          `diagnostic_${key}`,
+          value,
+        ])
+      ),
       ...input.properties,
     },
   });
@@ -105,6 +132,7 @@ export async function trackContentOutcomeAndFlush(
       creation_mode: input.creationMode,
       output_type: input.outputType,
       reason: input.reason,
+      error_code: input.errorCode,
       repository_count: input.repositoryCount,
       lookback_window: input.lookbackWindow,
       post_count: input.postIds?.length,

@@ -3,7 +3,13 @@ import { describeContentBillingDenial } from "@notra/ai/utils/content-billing-me
 import { contentGenerationWorkflowPayloadSchema } from "@notra/content-generation/schemas";
 import { flattenError } from "zod";
 
-import { WORKFLOW_ANALYTICS_NAMES } from "@/constants/workflow-analytics";
+import {
+  WORKFLOW_ANALYTICS_NAMES,
+  WORKFLOW_FAILURE_CLASSIFICATIONS,
+  WORKFLOW_ON_DEMAND_PHASES,
+} from "@/constants/workflow-analytics";
+import { describeOnDemandSourceFailure } from "@/lib/workflows/on-demand/source-validation";
+import type { WorkflowFailureDetail } from "@/types/analytics/workflow-events";
 import type { OnDemandContentWorkflowResult } from "@/types/workflows/on-demand-generation";
 
 import {
@@ -21,6 +27,7 @@ import {
   markOnDemandJobRunning,
   reconcileCollectionAttempt,
   resolveManualBrandSettings,
+  resolveOnDemandLinearIntegrationIds,
 } from "./steps/on-demand-steps";
 
 const LOG_PREFIX = "OnDemandContent";
@@ -49,7 +56,6 @@ export async function onDemandContentWorkflow(
     repositoryIds,
     brandVoiceId,
     dataPoints,
-    linearIntegrationIds,
     source,
   } = parsed;
 
@@ -72,8 +78,7 @@ export async function onDemandContentWorkflow(
 
   const finish = (
     status: "success" | "failed" | "skipped",
-    detail: {
-      reason?: string;
+    detail: WorkflowFailureDetail & {
       title?: string;
       primaryPostId?: string;
       postCount?: number;
@@ -112,21 +117,30 @@ export async function onDemandContentWorkflow(
 
   let repositories: Awaited<ReturnType<typeof fetchOnDemandRepositories>>;
   let brand: Awaited<ReturnType<typeof resolveManualBrandSettings>>;
+  let linearIntegrationIds: string[] | undefined;
   try {
-    [repositories, brand] = await Promise.all([
+    [repositories, brand, linearIntegrationIds] = await Promise.all([
       fetchOnDemandRepositories({
         organizationId,
         repositoryIds,
-        linearIntegrationIds,
+        linearIntegrationIds: parsed.linearIntegrationIds,
       }),
       resolveManualBrandSettings({ organizationId, brandVoiceId }),
+      resolveOnDemandLinearIntegrationIds({
+        organizationId,
+        linearIntegrationIds: parsed.linearIntegrationIds,
+      }),
     ]);
   } catch (error) {
     await releaseBilling();
     throw error;
   }
 
-  const trackUnsuccessfulRun = (kind: "failed" | "skipped", reason: string) =>
+  const trackUnsuccessfulRun = (
+    kind: "failed" | "skipped",
+    reason: string,
+    errorCode?: string
+  ) =>
     trackContentOutcome({
       kind,
       triggerId: "manual_on_demand",
@@ -134,6 +148,7 @@ export async function onDemandContentWorkflow(
       outputType: contentType,
       creationMode: "manual",
       reason,
+      errorCode,
       lookbackWindow,
       repositoryCount: repositories.length,
       source: "on_demand",
@@ -160,13 +175,24 @@ export async function onDemandContentWorkflow(
     linearIntegrationIds.length > 0
   );
 
-  if (repositories.length === 0 && !hasLinearSources) {
-    console.error("[OnDemandContent] No valid data sources found, canceling", {
+  const resolvedPayload = { ...parsed, linearIntegrationIds };
+  const sourceFailure = describeOnDemandSourceFailure(
+    resolvedPayload,
+    repositories.length
+  );
+  if (sourceFailure) {
+    console.warn("[OnDemandContent] No usable data sources, canceling", {
       organizationId,
+      errorCode: sourceFailure.errorCode,
+      ...sourceFailure.diagnostics,
     });
-    await finish("failed", { reason: "No valid data sources found" });
+    await finish("failed", sourceFailure);
     await releaseBilling();
-    await trackUnsuccessfulRun("failed", "No valid data sources found");
+    await trackUnsuccessfulRun(
+      "failed",
+      sourceFailure.reason,
+      sourceFailure.errorCode
+    );
     await reconcileCollection();
     return { status: "no_sources" };
   }
@@ -175,7 +201,7 @@ export async function onDemandContentWorkflow(
     await logOnDemandGenerating(jobId);
 
     const contentResult = await runOnDemandGeneration({
-      payload: parsed,
+      payload: resolvedPayload,
       repositories,
       brand,
       hasLinearSources,
@@ -290,7 +316,11 @@ export async function onDemandContentWorkflow(
 
     return { status: "success", postId: contentResult.postId };
   } catch (error) {
-    await finish("failed", { reason: "Unexpected workflow error" });
+    await finish("failed", {
+      reason: "Unexpected workflow error",
+      phase: WORKFLOW_ON_DEMAND_PHASES.GENERATION,
+      classification: WORKFLOW_FAILURE_CLASSIFICATIONS.UNEXPECTED,
+    });
     await releaseBilling();
     await trackUnsuccessfulRun("failed", "Unexpected workflow error");
     await reconcileCollection();

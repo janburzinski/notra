@@ -1,15 +1,20 @@
-import type { ContentGenerationWorkflowPayload } from "@notra/content-generation/schemas";
+import type {
+  ContentDataPointSettings,
+  ContentGenerationWorkflowPayload,
+} from "@notra/content-generation/schemas";
+import { findContentSourceIssue } from "@notra/content-generation/utils/sources";
 import {
   brandSettings,
   githubIntegrations,
   linearIntegrations,
 } from "@notra/db/schema";
 import { InternalDashboardAdapterError } from "@notra/schemas/api/internal-dashboard";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNotNull } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
   PostDatabaseError,
+  PostGenerationSourcesUnavailableError,
   PostGenerationTargetUnavailableError,
 } from "../errors/posts";
 import type { DbClient } from "../types/db";
@@ -308,4 +313,47 @@ export const resolveRequestedBrandVoiceId = Effect.fn(
   );
 
   return latestVoice?.id ?? null;
+});
+
+export const assertContentGenerationSourcesAvailable = Effect.fn(
+  "posts.assertContentGenerationSourcesAvailable"
+)(function* (
+  db: DbClient,
+  organizationId: string,
+  request: {
+    dataPoints: ContentDataPointSettings;
+    repositoryIds?: string[];
+    linearIntegrationIds?: string[];
+  }
+) {
+  const hasLinearSelection = Boolean(request.linearIntegrationIds?.length);
+  let gitHubSourceCount = request.repositoryIds?.length ?? 0;
+
+  // Without any selector the workflow reads every connected repository.
+  if (request.repositoryIds === undefined && !hasLinearSelection) {
+    const [row] = yield* queryPostTargets(() =>
+      db
+        .select({ total: count() })
+        .from(githubIntegrations)
+        .where(
+          and(
+            eq(githubIntegrations.organizationId, organizationId),
+            eq(githubIntegrations.enabled, true),
+            isNotNull(githubIntegrations.owner),
+            isNotNull(githubIntegrations.repo)
+          )
+        )
+    );
+    gitHubSourceCount = row?.total ?? 0;
+  }
+
+  const issue = findContentSourceIssue({
+    dataPoints: request.dataPoints,
+    gitHubSourceCount,
+    hasLinearSelection,
+  });
+
+  if (issue) {
+    return yield* new PostGenerationSourcesUnavailableError(issue);
+  }
 });

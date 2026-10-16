@@ -50,6 +50,11 @@ export class PostGenerationTargetUnavailableError extends Schema.TaggedError<Pos
   { message: Schema.String }
 ) {}
 
+export class PostGenerationSourcesUnavailableError extends Schema.TaggedError<PostGenerationSourcesUnavailableError>()(
+  "PostGenerationSourcesUnavailableError",
+  { message: Schema.String, code: Schema.String }
+) {}
+
 export class PostDatabaseError extends Schema.TaggedError<PostDatabaseError>()(
   "PostDatabaseError",
   { cause: Schema.Defect() }
