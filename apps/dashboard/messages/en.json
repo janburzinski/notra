@@ -1374,6 +1374,8 @@
         "descriptionPlaceholder": "A short overview of your company",
         "toneLanguageHeading": "Tone & Language",
         "toneLabel": "Tone",
+        "toneModePreset": "Preset",
+        "toneModeCustom": "Custom",
         "toneProfileLabel": "Tone profile",
         "selectTone": "Select tone",
         "toneScopeNote": "Tone only changes how things are phrased. Structure and facts stay the same. Pick Custom Tone to describe your own voice instead.",
@@ -1423,6 +1425,7 @@
         }
       },
       "tabs": {
+        "label": "Brand identity sections",
         "guidelines": "Guidelines"
       },
       "toasts": {

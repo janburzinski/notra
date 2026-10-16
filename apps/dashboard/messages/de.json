@@ -1374,6 +1374,8 @@
         "descriptionPlaceholder": "Ein kurzer Überblick über dein Unternehmen",
         "toneLanguageHeading": "Ton & Sprache",
         "toneLabel": "Ton",
+        "toneModePreset": "Vorlage",
+        "toneModeCustom": "Eigener",
         "toneProfileLabel": "Tonprofil",
         "selectTone": "Ton auswählen",
         "toneScopeNote": "Der Ton ändert nur die Formulierung. Struktur und Fakten bleiben gleich. Wähle Eigener Ton, um stattdessen deine eigene Stimme zu beschreiben.",
@@ -1423,6 +1425,7 @@
         }
       },
       "tabs": {
+        "label": "Bereiche der Markenidentität",
         "guidelines": "Richtlinien"
       },
       "toasts": {

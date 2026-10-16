@@ -276,6 +276,10 @@ export interface AudienceFieldProps {
   form: BrandFormApi;
 }
 
+export interface CustomInstructionsFieldProps {
+  form: BrandFormApi;
+}
+
 export type StepIconState = "pending" | "active" | "completed";
 
 export interface GuidelinesStatusLineProps {

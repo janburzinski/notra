@@ -63,7 +63,7 @@ export function CompanyProfileFields({ form }: CompanyProfileFieldsProps) {
                 {tCommon("labels.description")}
               </Label>
               <Textarea
-                className="min-h-30"
+                className="max-h-60 min-h-24"
                 id={field.name}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}

@@ -40,7 +40,7 @@ export function BrandIdentityTabs({
     >
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-4">
         <div className="max-w-full min-w-0 overflow-x-auto pb-2">
-          <TabsList variant="line">
+          <TabsList aria-label={t("label")}>
             <TabsTrigger value="identity">
               {tCommon("labels.companyInfo")}
             </TabsTrigger>

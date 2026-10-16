@@ -14,7 +14,7 @@ export function AudienceField({ form }: AudienceFieldProps) {
           <div className="space-y-2">
             <Label htmlFor={field.name}>{t("audienceLabel")}</Label>
             <Textarea
-              className="min-h-30"
+              className="max-h-60 min-h-24"
               id={field.name}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
