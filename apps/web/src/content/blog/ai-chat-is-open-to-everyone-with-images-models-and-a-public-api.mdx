@@ -10,13 +10,13 @@ Notra's AI chat used to live behind a feature flag. Over the last two weeks, we 
 
 ## Open to everyone, and a lot less janky [#open-to-everyone-and-a-lot-less-janky]
 
-The first thing that changed is the feature flag is gone. The Databuddy `ai-chat-experiment` gate came out of the sidebar, the chat page, the content composer and every chat workflow route ([4e31cafb](https://github.com/usenotra/notra/commit/4e31cafb46a5d9bc7d4287501f7d6ee5a301cb2a)). If you have a workspace, you have chat.
+The first thing that changed is the feature flag is gone. The Databuddy `ai-chat-experiment` gate came out of the sidebar, the chat page, the content composer and every chat workflow route. If you have a workspace, you have chat.
 
 We also fixed several small bugs that made the chat feel unreliable:
 
-- The input now focuses the moment you start typing, instead of swallowing your first keystroke ([#308](https://github.com/usenotra/notra/pull/308)).
-- The command palette routes between conversations more predictably ([#307](https://github.com/usenotra/notra/pull/307)).
-- Switching chats and clicking "New chat" no longer pollutes the back button. If you are already on a chat route, navigation uses `replace`, so the back button takes you back to the dashboard instead of walking through every chat you opened ([#314](https://github.com/usenotra/notra/issues/314)).
+- The input now focuses the moment you start typing, instead of swallowing your first keystroke.
+- The command palette routes between conversations more predictably.
+- Switching chats and clicking "New chat" no longer pollutes the back button. If you are already on a chat route, navigation uses `replace`, so the back button takes you back to the dashboard instead of walking through every chat you opened.
 - The first-message URL sync no longer flashes a skeleton, attachments survive when you retry or edit a message and long URLs in the input now wrap instead of blowing out the layout.
 
 There is also a new model picker. The plain dropdown is now a `Popover` plus `Command` combobox so you can search, and we added Kimi K2.6 and GPT-5.5 to the lineup with proper icons.
@@ -27,11 +27,11 @@ Chat sessions used to live in Redis. That worked for an experiment, but people n
 
 Chats now persist in Postgres in a `chat_sessions` table with a JSONB messages column, soft deletes via `deleted_at` and indexes on `(organization_id)` and `(organization_id, deleted_at)`. The upsert is scoped to `deleted_at IS NULL` and uses `RETURNING`, so a delete that lands between a `SELECT` and `UPDATE` no longer writes to a tombstoned chat. Redis now only holds short-lived data such as stream IDs, abort flags and last-stopped markers.
 
-On top of that, chat now accepts media. You can drag a file into the composer or paste an image straight from your clipboard ([#284](https://github.com/usenotra/notra/pull/284)). Images render at their natural aspect ratio. Attachments are scoped per organization and stored under `organization/{orgId}/chat/` in R2, and the per-user auto-delete retention setting we shipped earlier is gone. Access control runs through the same org-membership check the rest of the dashboard uses, so an injected `activeOrganizationId` cannot reach into another workspace's files.
+On top of that, chat now accepts media. You can drag a file into the composer or paste an image straight from your clipboard. Images render at their natural aspect ratio. Attachments are scoped per organization and stored under `organization/{orgId}/chat/` in R2, and the per-user auto-delete retention setting we shipped earlier is gone. Access control runs through the same org-membership check the rest of the dashboard uses, so an injected `activeOrganizationId` cannot reach into another workspace's files.
 
 ## A public Chats API, and Discord and Slack out of the box [#a-public-chats-api-and-discord-and-slack-out-of-the-box]
 
-Chat now also runs outside the dashboard. We extracted the chat backend out of `apps/dashboard` into `@notra/ai/chat` so any app can run it ([#318](https://github.com/usenotra/notra/pull/318)), then built a public API on top of it ([#319](https://github.com/usenotra/notra/pull/319)):
+Chat now also runs outside the dashboard. We extracted the chat backend out of `apps/dashboard` into `@notra/ai/chat` so any app can run it, then built a public API on top of it:
 
 ```http
 GET  /v1/chats
@@ -42,7 +42,7 @@ POST /v1/chats/{chatId}
 
 `POST /v1/chats` always returns a streaming response now, instead of a 202 with a stream ID that only the dashboard could subscribe to. The minted chat ID comes back in the `X-Chat-Id` header and in the start chunk's `messageMetadata.chatId`, so external clients can resume the conversation cleanly.
 
-The piece we are most curious to see people use is `externalChannelId` ([#320](https://github.com/usenotra/notra/pull/320)). When you start a chat, you can tag it with a `{ source: "discord" | "slack" | "dashboard", id?: string }` tuple. Send another message with the same tuple and you land in the same chat session, atomically claimed via `INSERT ... ON CONFLICT DO NOTHING`:
+The piece we are most curious to see people use is `externalChannelId`. When you start a chat, you can tag it with a `{ source: "discord" | "slack" | "dashboard", id?: string }` tuple. Send another message with the same tuple and you land in the same chat session, atomically claimed via `INSERT ... ON CONFLICT DO NOTHING`:
 
 ```ts
 await fetch("https://api.usenotra.com/v1/chats", {
@@ -57,7 +57,7 @@ await fetch("https://api.usenotra.com/v1/chats", {
 
 A partial unique index on `(organization_id, external_channel_source, external_channel_id)` keeps the tuple from colliding across sources or workspaces, scoped to live rows.
 
-While we were in there, we also closed an authorization gap in `/api/realtime`: the middleware used to check that you had a session and ignore the channel array, which meant any authenticated user could subscribe to another tenant's `chat:<orgId>:<chatId>:<streamId>` stream. The middleware now enforces the exact channel shape, rejects wildcards and verifies organization membership on every channel ([#325](https://github.com/usenotra/notra/pull/325)).
+While we were in there, we also closed an authorization gap in `/api/realtime`: the middleware used to check that you had a session and ignore the channel array, which meant any authenticated user could subscribe to another tenant's `chat:<orgId>:<chatId>:<streamId>` stream. The middleware now enforces the exact channel shape, rejects wildcards and verifies organization membership on every channel.
 
 ## What comes next [#what-this-unlocks]
 
