@@ -43,7 +43,7 @@ export function TrafficDomainSelect({ hosts }: TrafficDomainSelectProps) {
           {value === GEO_TRAFFIC_HOST_ALL ? t("allDomains") : value}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="w-auto max-w-(--available-width) min-w-(--anchor-width)">
         <SelectItem value={GEO_TRAFFIC_HOST_ALL}>{t("allDomains")}</SelectItem>
         {options.map((host) => (
           <SelectItem key={host} value={host}>
