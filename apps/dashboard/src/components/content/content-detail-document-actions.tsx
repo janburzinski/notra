@@ -15,6 +15,7 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { ContentCollaboration } from "@/components/content/content-collaboration";
+import { ContentPullRequestButton } from "@/components/content/content-pull-request-button";
 import { PublishContentToGitHubDialog } from "@/components/content/publish-content-to-github-dialog";
 import type { ContentDetailToolbarProps } from "@/types/components/content-detail-toolbar";
 
@@ -29,6 +30,7 @@ export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
   const [githubOpen, setGithubOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
+  const githubPublish = content.githubPublish;
   const blocked =
     document.hasSaveConflict ||
     document.isSaving ||
@@ -49,25 +51,11 @@ export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
         >
           {tCollaboration("history")}
         </Button>
-        {content.githubPublish ? (
-          <Button
-            className="min-w-0"
-            nativeButton={false}
-            render={
-              <a
-                href={content.githubPublish.pullRequestUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github aria-hidden="true" />
-                <span className="min-w-0 truncate">
-                  {tHeader("openPullRequest")}
-                </span>
-              </a>
-            }
-            size="sm"
-            title={tHeader("openPullRequest")}
-            variant="outline"
+        {githubPublish ? (
+          <ContentPullRequestButton
+            contentId={contentId}
+            githubPublish={githubPublish}
+            organizationId={organizationId}
           />
         ) : (
           <Button
@@ -98,7 +86,7 @@ export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
         open={historyOpen}
         onOpenChange={setHistoryOpen}
       />
-      {!content.githubPublish &&
+      {!githubPublish &&
       (content.contentType === "blog_post" ||
         content.contentType === "changelog") ? (
         <PublishContentToGitHubDialog

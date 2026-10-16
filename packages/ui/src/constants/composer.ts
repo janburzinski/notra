@@ -11,6 +11,10 @@ export const COMPOSER_TOOLBAR_BUTTON_LABEL = "px-2 text-sm";
 export const COMPOSER_SEND_BUTTON =
   "size-8 data-disabled:not-aria-busy:opacity-100";
 
+/** Dense send for single-line inline composers like comment replies. */
+export const COMPOSER_SEND_BUTTON_SM =
+  "size-7 data-disabled:not-aria-busy:opacity-100 [&_svg:not([class*='size-'])]:size-3.5";
+
 export const COMPOSER_SEND_ACTIVE = "";
 
 export const COMPOSER_SEND_INERT =

@@ -26,7 +26,15 @@ export function useDiscussion(target: CommentTarget, active = true) {
       }),
     [organizationId, targetId, targetType]
   );
-  const lock = useRef(false);
+  // reactions skip the queue, so refetches wait until they settle too
+  const reacting = useRef(0);
+  const reactionQueue = useRef(new Map<string, Promise<unknown>>());
+  // edits, deletes, resolves and new comments run one at a time; later ones
+  // queue up instead of being dropped while an earlier one is saving
+  const queue = useRef<Promise<unknown> | null>(null);
+  const queued = useRef(0);
+  const blockingCount = useRef(0);
+  const quiet = () => queued.current > 0 || reacting.current > 0;
   const resolveToasts = useRef({ active: false, ids: new Set<string>() });
   useEffect(() => {
     const scope = { active: true, ids: new Set<string>() };
@@ -45,7 +53,7 @@ export function useDiscussion(target: CommentTarget, active = true) {
     enabled:
       active && client.getQueryData(options.queryKey)?.realtimeEnabled === true,
     onData: () => {
-      if (!lock.current) {
+      if (!quiet()) {
         void client.invalidateQueries({ queryKey: options.queryKey });
       }
     },
@@ -58,16 +66,16 @@ export function useDiscussion(target: CommentTarget, active = true) {
       !(error instanceof ORPCError && error.code === "NOT_FOUND") &&
       failureCount < 1,
     refetchInterval: (current) =>
-      status === "connected" || lock.current || current.state.status === "error"
+      status === "connected" || quiet() || current.state.status === "error"
         ? false
         : 10000,
     refetchOnWindowFocus: (current) =>
-      !lock.current && current.state.status !== "error",
+      !quiet() && current.state.status !== "error",
     refetchOnReconnect: (current) =>
-      !lock.current && current.state.status !== "error",
+      !quiet() && current.state.status !== "error",
   });
   useEffect(() => {
-    if (active && status === "connected" && !lock.current) {
+    if (active && status === "connected" && !quiet()) {
       void client.invalidateQueries({ queryKey: options.queryKey });
     }
   }, [active, status, client, options.queryKey]);
@@ -106,47 +114,60 @@ export function useDiscussion(target: CommentTarget, active = true) {
 
   function update(
     optimistic: (comments: DiscussionComment[]) => DiscussionComment[],
-    persist: () => Promise<unknown>
+    persist: () => Promise<unknown>,
+    // only comment creation blocks the composers; edits, deletes and resolves
+    // keep the rest of the thread interactive
+    blocking = false
   ) {
-    if (lock.current) {
-      return Promise.resolve(false);
+    queued.current += 1;
+    if (blocking) {
+      blockingCount.current += 1;
+      setBusy(true);
     }
-    lock.current = true;
-    setBusy(true);
-    let previous = client.getQueryData(options.queryKey);
-    return client
-      .cancelQueries({ queryKey: options.queryKey })
-      .then(() => {
-        previous = client.getQueryData(options.queryKey);
-        client.setQueryData(options.queryKey, (data) =>
-          data ? { ...data, items: optimistic(data.items) } : data
-        );
-        return persist();
-      })
-      .then(() => {
-        client.setQueryData(options.queryKey, (data) =>
-          data
-            ? {
-                ...data,
-                items: data.items.map((item) => ({
-                  ...item,
-                  pending: false,
-                })),
-              }
-            : data
-        );
-        return true;
-      })
-      .catch((error: unknown) => {
-        client.setQueryData(options.queryKey, previous);
-        toast.error(error instanceof Error ? error.message : t("saveFailed"));
-        return false;
-      })
-      .finally(() => {
-        void client.invalidateQueries({ queryKey: options.queryKey });
-        lock.current = false;
-        setBusy(false);
-      });
+    const run = () => {
+      let previous = client.getQueryData(options.queryKey);
+      return client
+        .cancelQueries({ queryKey: options.queryKey })
+        .then(() => {
+          previous = client.getQueryData(options.queryKey);
+          client.setQueryData(options.queryKey, (data) =>
+            data ? { ...data, items: optimistic(data.items) } : data
+          );
+          return persist();
+        })
+        .then(() => {
+          client.setQueryData(options.queryKey, (data) =>
+            data
+              ? {
+                  ...data,
+                  items: data.items.map((item) => ({
+                    ...item,
+                    pending: false,
+                  })),
+                }
+              : data
+          );
+          return true;
+        })
+        .catch((error: unknown) => {
+          client.setQueryData(options.queryKey, previous);
+          toast.error(error instanceof Error ? error.message : t("saveFailed"));
+          return false;
+        })
+        .finally(() => {
+          queued.current -= 1;
+          if (!quiet()) {
+            void client.invalidateQueries({ queryKey: options.queryKey });
+          }
+          if (blocking) {
+            blockingCount.current -= 1;
+            setBusy(blockingCount.current > 0);
+          }
+        });
+    };
+    const next = (queue.current ?? Promise.resolve()).then(run);
+    queue.current = next;
+    return next;
   }
 
   function createComment(
@@ -154,7 +175,7 @@ export function useDiscussion(target: CommentTarget, active = true) {
     parent: DiscussionComment | null,
     anchor?: DiscussionCommentAnchor
   ) {
-    if (!body || !user || lock.current) {
+    if (!(body && user)) {
       return Promise.resolve(null);
     }
     const parentId = parent?.id ?? null;
@@ -191,7 +212,8 @@ export function useDiscussion(target: CommentTarget, active = true) {
           parentId,
           body,
           ...(anchor ? { anchor } : {}),
-        })
+        }),
+      true
     ).then((saved) => {
       if (saved) {
         retry.current = null;
@@ -204,7 +226,7 @@ export function useDiscussion(target: CommentTarget, active = true) {
 
   function submit() {
     const body = draft.trim();
-    if (!body || !user || lock.current) {
+    if (!(body && user) || busy) {
       return;
     }
     const parent = reply;
@@ -267,30 +289,63 @@ export function useDiscussion(target: CommentTarget, active = true) {
     if (!parsedEmoji || !user) {
       return;
     }
-    void update(
-      (comments) =>
-        comments.map((item) =>
-          item.id === commentId
-            ? {
-                ...item,
-                reactions: [
-                  ...item.reactions.filter(
-                    (reaction) =>
-                      !(reaction.userId === user.id && reaction.emoji === emoji)
-                  ),
-                  ...(active ? [{ userId: user.id, emoji }] : []),
-                ],
-              }
-            : item
-        ),
-      () =>
+    const toggle = (on: boolean) =>
+      client.setQueryData(options.queryKey, (data) =>
+        data
+          ? {
+              ...data,
+              items: data.items.map((item) =>
+                item.id === commentId
+                  ? {
+                      ...item,
+                      reactions: [
+                        ...item.reactions.filter(
+                          (reaction) =>
+                            !(
+                              reaction.userId === user.id &&
+                              reaction.emoji === parsedEmoji
+                            )
+                        ),
+                        ...(on
+                          ? [{ userId: user.id, emoji: parsedEmoji }]
+                          : []),
+                      ],
+                    }
+                  : item
+              ),
+            }
+          : data
+      );
+    // optimistic and instant; the request for the same reaction is queued so
+    // quick toggles reach the server in order
+    reacting.current += 1;
+    void client.cancelQueries({ queryKey: options.queryKey });
+    toggle(active);
+    const key = `${commentId}:${parsedEmoji}`;
+    const queued = (reactionQueue.current.get(key) ?? Promise.resolve())
+      .catch(() => undefined)
+      .then(() =>
         dashboardOrpc.comments.react.call({
           ...target,
           commentId,
           emoji: parsedEmoji,
           active,
         })
-    );
+      )
+      .catch((error: unknown) => {
+        toggle(!active);
+        toast.error(error instanceof Error ? error.message : t("saveFailed"));
+      })
+      .finally(() => {
+        reacting.current -= 1;
+        if (reactionQueue.current.get(key) === queued) {
+          reactionQueue.current.delete(key);
+        }
+        if (!quiet()) {
+          void client.invalidateQueries({ queryKey: options.queryKey });
+        }
+      });
+    reactionQueue.current.set(key, queued);
   }
 
   function setCommentResolved(commentId: string, resolved: boolean) {

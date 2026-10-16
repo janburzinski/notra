@@ -184,7 +184,7 @@ export function ContentCommentsLayer({ container }: ContentCommentsLayerProps) {
       {fits ? (
         <div
           aria-label={t("title")}
-          className="absolute top-0 left-(--comment-rail-left) w-80"
+          className="duration-normal absolute top-0 left-(--comment-rail-left) w-80 transition-opacity ease-out motion-reduce:transition-none starting:opacity-0"
           ref={rail}
           role="region"
           style={{ "--comment-rail-left": `${left}px` } as React.CSSProperties}

@@ -6654,6 +6654,7 @@
         "reset": "Veröffentlichungsdatum verwenden"
       },
       "source": {
+        "createdBy": "Erstellt von",
         "label": "Entstehung"
       },
       "recommendations": "Empfehlungen",
@@ -6769,7 +6770,13 @@
       "saved": "Gespeichert",
       "unsaved": "Ungespeicherte Änderungen",
       "moreActions": "Weitere Aktionen",
-      "openPullRequest": "GitHub-Pull-Request öffnen",
+      "openPullRequest": "GitHub-PR öffnen",
+      "pullRequestState": {
+        "open": "Offen",
+        "draft": "Entwurf",
+        "merged": "Gemergt",
+        "closed": "Geschlossen"
+      },
       "discardDescription": "Ungespeicherte Änderungen verwerfen und zur letzten gespeicherten Version zurückkehren?"
     },
     "comments": {

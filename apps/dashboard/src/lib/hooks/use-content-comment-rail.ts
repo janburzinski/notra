@@ -6,8 +6,8 @@ import { useContentComments } from "@/components/content/inline-comments/content
 import {
   CONTENT_COMMENT_CARD_FALLBACK_HEIGHT,
   CONTENT_COMMENT_CARD_GAP,
+  CONTENT_COMMENT_RAIL_BREAKPOINT_REM,
   CONTENT_COMMENT_RAIL_OFFSET,
-  CONTENT_COMMENT_RAIL_WIDTH,
 } from "@/constants/comments";
 import type { ContentCommentRailLayout } from "@/types/content/inline-comments";
 import {
@@ -32,17 +32,22 @@ export function useContentCommentRail(
       setFits(false);
       return;
     }
-    const bounds = element.getBoundingClientRect();
-    const editorBounds = root.getBoundingClientRect();
-    const available = bounds.right - element.clientLeft - editorBounds.right;
-    setFits(available >= CONTENT_COMMENT_RAIL_WIDTH);
-    setLeft(
-      editorBounds.right -
-        bounds.left -
-        element.clientLeft +
-        element.scrollLeft +
-        CONTENT_COMMENT_RAIL_OFFSET
+    // The rail lives inside the document column, so it moves with the
+    // document through padding transitions instead of chasing it per frame.
+    const column = root.closest<HTMLElement>("[data-comment-column]");
+    if (!column) {
+      setFits(false);
+      return;
+    }
+    // Same threshold as the gutter's @6xl/editor container query, so the
+    // padding and the rail switch on the same frame.
+    const rem = Number.parseFloat(
+      getComputedStyle(document.documentElement).fontSize
     );
+    setFits(element.clientWidth >= CONTENT_COMMENT_RAIL_BREAKPOINT_REM * rem);
+    const bounds = column.getBoundingClientRect();
+    const editorBounds = root.getBoundingClientRect();
+    setLeft(editorBounds.right - bounds.left + CONTENT_COMMENT_RAIL_OFFSET);
     const nodes = collectCommentTextNodes(root);
     const positioned = (comments?.threads ?? [])
       .flatMap((thread) => {
@@ -57,8 +62,7 @@ export function useContentCommentRail(
           ? [
               {
                 id: thread.comment.id,
-                top:
-                  rect.top - bounds.top - element.clientTop + element.scrollTop,
+                top: rect.top - bounds.top,
               },
             ]
           : [];

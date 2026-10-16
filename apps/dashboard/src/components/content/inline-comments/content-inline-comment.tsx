@@ -165,7 +165,7 @@ export function ContentInlineComment({
                           key={emoji}
                           type="button"
                           aria-label={t(`reactions.${key}`)}
-                          className="hover:bg-muted focus-visible:ring-ring/50 inline-flex size-8 items-center justify-center rounded-md text-lg outline-none focus-visible:ring-2"
+                          className="hover:bg-muted focus-visible:ring-ring/50 duration-fast inline-flex size-8 items-center justify-center rounded-md text-lg transition-[background-color,scale] ease-out outline-none focus-visible:ring-2 active:scale-90 motion-reduce:transition-none"
                           disabled={disabled}
                           onClick={() => {
                             onReact(
@@ -288,7 +288,7 @@ function ContentInlineCommentReactions({
             })}
             aria-pressed={active}
             disabled={disabled}
-            className="border-border hover:bg-muted aria-pressed:bg-muted inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs"
+            className="border-border hover:bg-muted aria-pressed:bg-muted duration-fast inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs tabular-nums transition-[background-color,opacity,scale] ease-out active:scale-[0.96] motion-reduce:transition-none starting:scale-90 starting:opacity-0"
             onClick={() => onReact(comment.id, emoji, !active)}
           >
             {emoji} {reactions.length}

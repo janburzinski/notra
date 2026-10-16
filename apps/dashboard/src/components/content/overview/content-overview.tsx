@@ -35,12 +35,14 @@ import { useContentMetadata } from "@/lib/hooks/use-content-metadata";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   ContentOverviewProps,
+  OverviewCreatedByRowProps,
   OverviewDisclosureProps,
   UpdatePullRequestHintProps,
 } from "@/types/content/overview";
 import type { ContentApiResponse } from "@/types/hooks/content";
 import { parseSourceMetadata } from "@/utils/content-detail";
 import { toErrorMessage } from "@/utils/error-message";
+import { formatSnakeCaseLabel } from "@/utils/format";
 import { extractMarkdownExcerpt } from "@/utils/site-github-publish";
 
 function OverviewDisclosure({ label, children }: OverviewDisclosureProps) {
@@ -58,6 +60,28 @@ function OverviewDisclosure({ label, children }: OverviewDisclosureProps) {
         <div className="pt-2">{children}</div>
       </CollapsibleContent>
     </Collapsible>
+  );
+}
+
+function OverviewCreatedByRow({ sourceMetadata }: OverviewCreatedByRowProps) {
+  const t = useTranslations("content.overview.source");
+  const tSource = useTranslations("content.detail.source");
+  const source = parseSourceMetadata(sourceMetadata);
+  if (!source) {
+    return null;
+  }
+  return (
+    <div className="flex min-h-8 items-center justify-between gap-3">
+      <span className="text-foreground text-[13px] font-medium">
+        {t("createdBy")}
+      </span>
+      <span className="text-muted-foreground min-w-0 truncate text-xs">
+        {tSource("trigger", {
+          type: source.triggerSourceType,
+          fallback: formatSnakeCaseLabel(source.triggerSourceType),
+        })}
+      </span>
+    </div>
   );
 }
 
@@ -170,6 +194,7 @@ export function ContentOverview(props: ContentOverviewProps) {
             /{section}/{slug}
           </span>
         </div>
+        <OverviewCreatedByRow sourceMetadata={content.sourceMetadata} />
         {isBlog ? (
           <OverviewToggleRow
             checked={metadata.featured}

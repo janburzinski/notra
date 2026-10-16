@@ -12,7 +12,6 @@ import { type ReactNode, useRef } from "react";
 import { useTranslations } from "use-intl";
 
 import { ContentDetailMainDocument } from "@/components/content/content-detail-main-document";
-import { ContentDetailSourceMetadata } from "@/components/content/content-detail-source-metadata";
 import { ContentDetailToolbar } from "@/components/content/content-detail-toolbar";
 import { ContentCommentComposer } from "@/components/content/inline-comments/content-comment-composer";
 import { ContentCommentsGutter } from "@/components/content/inline-comments/content-comments-gutter";
@@ -134,15 +133,13 @@ export function ContentDetailLoadedView({
           >
             <ContentCommentsGutter>
               <div
-                className={`mx-auto w-full space-y-6 px-4 lg:px-6 ${isLongForm ? "max-w-3xl" : "max-w-5xl"}`}
+                className={`relative mx-auto w-full space-y-6 px-4 lg:px-6 ${isLongForm ? "max-w-3xl" : "max-w-5xl"}`}
+                data-comment-column
               >
-                {document.geoWriterDraft ? <WriterExecute.Banner /> : null}
-                {!isLongForm ? (
-                  <ContentDetailSourceMetadata
-                    organizationId={organizationId}
-                    sourceMetadata={content.sourceMetadata}
-                  />
+                {isLongForm ? (
+                  <ContentCommentsLayer container={editorViewport} />
                 ) : null}
+                {document.geoWriterDraft ? <WriterExecute.Banner /> : null}
 
                 <ContentDetailMainDocument
                   contentId={contentId}
@@ -161,9 +158,6 @@ export function ContentDetailLoadedView({
                 <div className="h-24" />
               </div>
             </ContentCommentsGutter>
-            {isLongForm ? (
-              <ContentCommentsLayer container={editorViewport} />
-            ) : null}
           </div>
         </div>
       </WriterExecute.Root>

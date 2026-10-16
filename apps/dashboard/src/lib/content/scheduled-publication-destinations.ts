@@ -142,7 +142,7 @@ async function publishInNotra(
   return { kind: "published", result: {} };
 }
 
-async function githubRepositoryClient(
+export async function githubRepositoryClient(
   organizationId: string,
   repositoryId: string
 ) {

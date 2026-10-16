@@ -4,6 +4,7 @@ import { Popover } from "@base-ui/react/popover";
 import { useRef } from "react";
 import { useTranslations } from "use-intl";
 
+import { ContentCommentAvatar } from "@/components/content/inline-comments/content-comment-avatar";
 import { ContentCommentField } from "@/components/content/inline-comments/content-comment-field";
 import { useContentComments } from "@/components/content/inline-comments/content-comments-provider";
 import { commentMatchAnchor } from "@/utils/comment-anchor";
@@ -72,6 +73,14 @@ export function ContentCommentComposer() {
               canSubmit={canSubmit}
               error={error}
               label={t("composerLabel")}
+              leading={
+                discussion.user ? (
+                  <ContentCommentAvatar
+                    image={discussion.user.image}
+                    name={discussion.user.name}
+                  />
+                ) : null
+              }
               onChange={setDraftBody}
               onSubmit={submit}
               placeholder={t("composerPlaceholder")}

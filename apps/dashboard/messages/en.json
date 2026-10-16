@@ -6654,6 +6654,7 @@
         "reset": "Use publish date"
       },
       "source": {
+        "createdBy": "Created by",
         "label": "How it was made"
       },
       "recommendations": "Recommendations",
@@ -6769,7 +6770,13 @@
       "saved": "Saved",
       "unsaved": "Unsaved changes",
       "moreActions": "More actions",
-      "openPullRequest": "Open GitHub pull request",
+      "openPullRequest": "Open GitHub PR",
+      "pullRequestState": {
+        "open": "Open",
+        "draft": "Draft",
+        "merged": "Merged",
+        "closed": "Closed"
+      },
       "discardDescription": "Discard your unsaved changes and return to the last saved version?"
     },
     "comments": {

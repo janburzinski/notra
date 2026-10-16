@@ -92,8 +92,8 @@ export interface ContentCommentFieldProps {
   textarea: RefObject<HTMLTextAreaElement | null>;
   onFocus?: () => void;
   className?: string;
-  /** Single-row field for thread replies; the full composer has a toolbar row. */
-  compact?: boolean;
+  /** Shown before the input, e.g. the author's avatar on a new comment. */
+  leading?: ReactNode;
 }
 
 export interface ContentCommentPeekProps {

@@ -105,6 +105,7 @@ import { getEnabledDataPoints } from "@/lib/analytics/studio-events";
 import { assertActiveSubscription } from "@/lib/billing/subscription";
 import { getUtcDayRange } from "@/lib/content/content-calendar";
 import { getContentPublishingMetrics } from "@/lib/content/content-publishing-metrics.server";
+import { githubRepositoryClient } from "@/lib/content/scheduled-publication-destinations";
 import { afterResponse } from "@/lib/framework/after-response";
 import {
   addActiveGeneration,
@@ -115,6 +116,7 @@ import {
 } from "@/lib/generations/tracking";
 import { requestGeoRescanForPublishedPost } from "@/lib/geo/rescan";
 import { getTranslations } from "@/lib/i18n/server";
+import { getContentPullRequestState } from "@/lib/integrations/github/content-pull-request";
 import { publishSavedContentToGitHub } from "@/lib/integrations/github/publish-saved-content";
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { contentAuthorsRouter } from "@/lib/orpc/routers/content-authors";
@@ -745,6 +747,45 @@ export const contentRouter = {
             }
           : null,
       };
+    }),
+  pullRequestState: baseProcedure
+    .input(contentInputSchema)
+    .use(withOrganizationAccess)
+    .handler(async ({ input }) => {
+      const post = await db.query.posts.findFirst({
+        where: and(
+          eq(posts.id, input.contentId),
+          eq(posts.organizationId, input.organizationId)
+        ),
+        columns: { githubPublish: true },
+      });
+      const publish = postGitHubPublishSchema.safeParse(post?.githubPublish);
+      if (!(publish.success && publish.data)) {
+        return { status: null };
+      }
+      const { pullRequestNumber, repositoryId } = publish.data;
+      // No GitHub App, a revoked token or a deleted repository just falls
+      // back to a plain link.
+      const state = await githubRepositoryClient(
+        input.organizationId,
+        repositoryId
+      )
+        .then((client) =>
+          client
+            ? getContentPullRequestState(client.octokit, {
+                owner: client.owner,
+                repo: client.repo,
+                pullNumber: pullRequestNumber,
+              })
+            : null
+        )
+        .catch(() => null);
+      if (!state) {
+        return { status: null };
+      }
+      return {
+        status: state.status === "open" && state.draft ? "draft" : state.status,
+      } as const;
     }),
   create: baseProcedure
     .input(createPostInputSchema)

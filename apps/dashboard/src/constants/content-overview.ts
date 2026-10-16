@@ -1,4 +1,10 @@
-import { Tick02Icon } from "@hugeicons/core-free-icons";
+import {
+  GitMergeIcon,
+  GitPullRequestClosedIcon,
+  GitPullRequestDraftIcon,
+  GitPullRequestIcon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 import type { ContentResponse } from "@notra/schemas/dashboard/content";
 
 import type { SiteStatusBadgeConfig } from "@/types/sites";
@@ -28,6 +34,14 @@ export const CONTENT_STATUS_BADGES = {
   published: { variant: "success", icon: Tick02Icon, square: true },
   draft: { variant: "secondary" },
 } as const satisfies Record<ContentResponse["status"], SiteStatusBadgeConfig>;
+
+/** GitHub's own pull request colours: green open, grey draft, purple merged, red closed. */
+export const CONTENT_PULL_REQUEST_STATES = {
+  open: { icon: GitPullRequestIcon, className: "text-success" },
+  draft: { icon: GitPullRequestDraftIcon, className: "text-muted-foreground" },
+  merged: { icon: GitMergeIcon, className: "text-primary" },
+  closed: { icon: GitPullRequestClosedIcon, className: "text-destructive" },
+} as const;
 
 export const CONTENT_PANEL_TABS = [
   { id: "overview" },

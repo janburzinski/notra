@@ -23,3 +23,10 @@ export type ContentDetailImageActionsProps = Pick<
   ContentDetailToolbarProps,
   "content" | "contentId" | "document" | "organizationId"
 >;
+
+export type ContentPullRequestButtonProps = Pick<
+  ContentDetailToolbarProps,
+  "contentId" | "organizationId"
+> & {
+  githubPublish: NonNullable<ContentResponse["githubPublish"]>;
+};

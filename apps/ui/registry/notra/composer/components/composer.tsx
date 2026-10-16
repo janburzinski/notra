@@ -29,6 +29,7 @@ import {
   COMPOSER_NUDGE_TRANSITION,
   COMPOSER_SEND_ACTIVE,
   COMPOSER_SEND_BUTTON,
+  COMPOSER_SEND_BUTTON_SM,
   COMPOSER_SEND_INERT,
   COMPOSER_TOOLBAR_BUTTON,
   COMPOSER_TOOLBAR_BUTTON_LABEL,
@@ -81,6 +82,7 @@ export function ComposerFrame({
   nudge,
   connectedTop = false,
   flat = false,
+  size = "default",
   className,
 }: ComposerFrameProps) {
   const hasNudge = Boolean(nudge);
@@ -92,7 +94,11 @@ export function ComposerFrame({
         "flex w-full min-w-0 flex-col",
         COMPOSER_TRAY_TRANSITION,
         showTray ? "bg-muted p-1" : "bg-transparent",
-        flat ? "rounded-xl" : "rounded-[18px]",
+        flat
+          ? size === "sm"
+            ? "rounded-[22px]"
+            : "rounded-[28px]"
+          : "rounded-[18px]",
         connectedTop && "rounded-t-none",
         className
       )}
@@ -109,10 +115,12 @@ export function ComposerFrame({
         className={cn(
           "border-border/70 bg-background min-w-0 overflow-hidden border",
           flat
-            ? // pill input with a round send button
-              showTray
-              ? "rounded-lg"
-              : "rounded-3xl **:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full"
+            ? // pill input with a round send button; the radius is half the
+              // single-line height so wrapped lines keep the button concentric
+              cn(
+                "**:data-[slot=composer-send]:rounded-full **:data-[slot=composer-send]:[corner-shape:round] **:data-[slot=composer-send]:supports-[corner-shape:squircle]:rounded-full",
+                size === "sm" ? "rounded-[18px]" : "rounded-3xl"
+              )
             : "rounded-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_0_6px_rgba(255,255,255,0.8),0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_0_6px_rgba(255,255,255,0.03)]",
           connectedTop && !hasNudge && "rounded-t-none border-t-0"
         )}
@@ -292,6 +300,7 @@ export function ComposerSend({
   tooltip,
   busy = false,
   disabled = false,
+  size = "default",
   onClick,
 }: ComposerSendProps) {
   const isInert = disabled && !busy;
@@ -299,7 +308,7 @@ export function ComposerSend({
     "aria-busy": busy || undefined,
     "aria-label": label,
     className: cn(
-      COMPOSER_SEND_BUTTON,
+      size === "sm" ? COMPOSER_SEND_BUTTON_SM : COMPOSER_SEND_BUTTON,
       isInert ? COMPOSER_SEND_INERT : COMPOSER_SEND_ACTIVE
     ),
     disabled,
@@ -309,7 +318,11 @@ export function ComposerSend({
     variant: isInert ? "secondary" : "default",
   } satisfies ComponentProps<typeof Button>;
 
-  const content = busy ? <Spinner className="size-3.5" /> : children;
+  const content = busy ? (
+    <Spinner className={size === "sm" ? "size-3" : "size-3.5"} />
+  ) : (
+    children
+  );
 
   if (!tooltip) {
     return (

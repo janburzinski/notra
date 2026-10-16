@@ -10,7 +10,6 @@ import type {
   CONTENT_AUTHOR_LINK_FIELDS,
   CONTENT_PANEL_TABS,
 } from "@/constants/content-overview";
-
 export type ContentPanelTab = (typeof CONTENT_PANEL_TABS)[number]["id"];
 
 export type CoverSource = "upload" | "link" | "post";
@@ -57,6 +56,10 @@ export interface OverviewToggleRowProps {
   checked: boolean;
   disabled?: boolean;
   onCheckedChange: (checked: boolean) => void;
+}
+
+export interface OverviewCreatedByRowProps {
+  sourceMetadata: unknown;
 }
 
 export interface OverviewDisclosureProps {

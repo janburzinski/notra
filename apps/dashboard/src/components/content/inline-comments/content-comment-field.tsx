@@ -8,7 +8,7 @@ import { useId } from "react";
 
 import type { ContentCommentFieldProps } from "@/types/content/inline-comments";
 
-/** Chat-input styled composer shared by new comments and thread replies. */
+/** Single-line pill composer shared by new comments and thread replies. */
 export function ContentCommentField({
   value,
   onChange,
@@ -21,23 +21,12 @@ export function ContentCommentField({
   sendLabel,
   error,
   nudge,
+  leading,
   textarea,
   onFocus,
   className,
-  compact = false,
 }: ContentCommentFieldProps) {
   const errorId = useId();
-  const send = (
-    <Composer.Send
-      busy={busy}
-      disabled={!canSubmit}
-      label={sendLabel}
-      onClick={onSubmit}
-      tooltip={sendLabel}
-    >
-      <HugeiconsIcon className="size-4" icon={ArrowUp02Icon} />
-    </Composer.Send>
-  );
   return (
     <form
       className={cn("min-w-0", className)}
@@ -46,14 +35,19 @@ export function ContentCommentField({
         onSubmit();
       }}
     >
-      <Composer.Frame flat={compact} nudge={nudge}>
-        <div className={cn(compact && "flex items-end gap-1 p-1")}>
+      <Composer.Frame flat nudge={nudge} size="sm">
+        <div className="flex items-end gap-1 p-0.75">
+          {leading ? (
+            <div className="flex h-7 shrink-0 items-center self-start pl-0.75">
+              {leading}
+            </div>
+          ) : null}
           <Composer.Input
             aria-describedby={error ? errorId : undefined}
             aria-label={label}
             className={cn(
-              "field-sizing-content max-h-40 w-full",
-              compact ? "min-h-8 flex-1 px-2 py-1" : "min-h-10"
+              "field-sizing-content max-h-40 min-h-7 w-full flex-1 py-1 pr-1 leading-5",
+              leading ? "pl-1.5" : "pl-3"
             )}
             maxLength={10000}
             onChange={(event) => onChange(event.target.value)}
@@ -74,13 +68,17 @@ export function ContentCommentField({
             rows={1}
             value={value}
           />
-          {compact ? send : null}
+          <Composer.Send
+            busy={busy}
+            disabled={!canSubmit}
+            label={sendLabel}
+            onClick={onSubmit}
+            size="sm"
+            tooltip={sendLabel}
+          >
+            <HugeiconsIcon className="size-3.5" icon={ArrowUp02Icon} />
+          </Composer.Send>
         </div>
-        {compact ? null : (
-          <Composer.Toolbar className="justify-end pt-0 pb-1.5">
-            {send}
-          </Composer.Toolbar>
-        )}
         {error ? (
           <p
             className="text-destructive border-border/70 border-t px-3 py-2 text-xs text-pretty"

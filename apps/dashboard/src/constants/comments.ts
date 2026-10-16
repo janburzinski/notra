@@ -34,7 +34,8 @@ export const CONTENT_COMMENT_HIGHLIGHT_NAMES = [
   CONTENT_COMMENT_DRAFT_HIGHLIGHT_NAME,
 ] as const;
 export const CONTENT_COMMENT_CARD_GAP = 8;
-export const CONTENT_COMMENT_RAIL_WIDTH = 336;
+/** Viewport width at which the gutter padding reaches the full 22rem rail. */
+export const CONTENT_COMMENT_RAIL_BREAKPOINT_REM = 72;
 export const CONTENT_COMMENT_RAIL_OFFSET = 16;
 export const CONTENT_COMMENT_CARD_FALLBACK_HEIGHT = 160;
 export const CARET_NAVIGATION_KEYS = new Set([

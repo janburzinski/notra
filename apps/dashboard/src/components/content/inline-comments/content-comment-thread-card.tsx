@@ -134,7 +134,8 @@ function useContentCommentReply({
   "comments" | "comment" | "entries" | "replyTo" | "onClearReply"
 >) {
   const t = useTranslations("content.comments");
-  const submitting = useRef(false);
+  const submittingRef = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
   const [replyError, setReplyError] = useState(false);
   const { discussion, replyDrafts } = comments;
   const draft = replyDrafts[comment.id] ?? "";
@@ -150,10 +151,11 @@ function useContentCommentReply({
   const error =
     comments.blockedReason ?? (replyError ? t("replyFailed") : null);
   const submit = () => {
-    if (!canReply || !replyParent || submitting.current) {
+    if (!canReply || !replyParent || submittingRef.current) {
       return;
     }
-    submitting.current = true;
+    submittingRef.current = true;
+    setSubmitting(true);
     setReplyError(false);
     return discussion
       .createComment(draft.trim(), replyParent)
@@ -167,24 +169,25 @@ function useContentCommentReply({
       })
       .catch(() => setReplyError(true))
       .finally(() => {
-        submitting.current = false;
+        submittingRef.current = false;
+        setSubmitting(false);
       });
   };
-  return { draft, canReply, error, submit };
+  return { draft, canReply, error, submit, submitting };
 }
 
 function ContentCommentReplyForm(props: ContentCommentReplyFormProps) {
   const { comments, comment, replyTo, onClearReply, textarea } = props;
   const tComments = useTranslations("comments");
   const { discussion, activateThread } = comments;
-  const { draft, canReply, error, submit } = useContentCommentReply(props);
+  const { draft, canReply, error, submit, submitting } =
+    useContentCommentReply(props);
 
   return (
     <ContentCommentField
-      busy={discussion.busy}
+      busy={submitting}
       canSubmit={canReply}
       className="mt-1.5"
-      compact
       error={error}
       label={tComments("replyTo", { name: replyTo?.name ?? comment.name })}
       nudge={
@@ -221,7 +224,7 @@ function ContentCommentReplyForm(props: ContentCommentReplyFormProps) {
         void submit();
       }}
       placeholder={tComments("writeReplyPlaceholder")}
-      readOnly={discussion.busy || Boolean(comment.pending)}
+      readOnly={submitting || Boolean(comment.pending)}
       sendLabel={tComments("send")}
       textarea={textarea}
       value={draft}

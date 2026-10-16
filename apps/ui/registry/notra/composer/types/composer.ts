@@ -10,6 +10,8 @@ export interface ComposerFrameProps {
   connectedTop?: boolean;
   /** Tighter radius, no shadow and no tray until there is a nudge. For inline composers like comments. */
   flat?: boolean;
+  /** `sm` is a 36px single-line pill for dense inline composers. Pair it with `Composer.Send size="sm"`. Only applies with `flat`. */
+  size?: "default" | "sm";
   className?: string;
 }
 
@@ -54,5 +56,7 @@ export interface ComposerSendProps {
   tooltip?: ReactNode;
   busy?: boolean;
   disabled?: boolean;
+  /** `sm` is a 28px button for single-line inline composers. */
+  size?: "default" | "sm";
   onClick?: () => void;
 }
