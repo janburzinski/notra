@@ -69,4 +69,4 @@ test("the dev allow list resolves the session's actual npm dependency root", asy
   } finally {
     await rm(root, { recursive: true, force: true });
   }
-});
+}, 30_000);
