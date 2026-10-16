@@ -12,6 +12,7 @@ import { PageContainer } from "@/components/layout/container";
 
 const ENGINE_ROW_COUNT = 4;
 const PROVIDER_ROW_COUNT = 5;
+const TREND_AXIS_LABEL_COUNT = 6;
 
 export function GeoPageSkeleton() {
   const t = useTranslations("geo.pages.overview");
@@ -74,12 +75,22 @@ export function GeoPageSkeleton() {
             </InstrumentModule>
             <InstrumentModule
               action={<Skeleton className="h-7 w-[6.5rem] rounded-md" />}
-              bodyClassName="flex min-h-0 flex-1 flex-col px-4 pt-1 pb-4"
+              bodyClassName="flex min-h-0 flex-1 flex-col p-4"
               className="h-full @min-[44rem]/main:col-span-7"
               eyebrow={tTrend("eyebrow")}
               variant="table"
             >
-              <Skeleton className="min-h-64 w-full flex-1 rounded-xl" />
+              <div className="flex min-h-64 flex-1 flex-col gap-3">
+                <Skeleton className="w-full flex-1 rounded-xl" />
+                <div className="flex justify-between">
+                  {Array.from(
+                    { length: TREND_AXIS_LABEL_COUNT },
+                    (_, index) => (
+                      <Skeleton className="h-3 w-10" key={index} />
+                    )
+                  )}
+                </div>
+              </div>
             </InstrumentModule>
           </div>
           <GeoSectionSkeleton eyebrow={tGeoShared("whatChanged")}>
