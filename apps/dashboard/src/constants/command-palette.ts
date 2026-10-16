@@ -19,7 +19,6 @@ import {
   NoteIcon,
   Notification01Icon,
   Notification03Icon,
-  PencilEdit01Icon,
   PlugIcon,
   QuotesIcon,
   SearchList01Icon,
@@ -198,14 +197,6 @@ export const COMMAND_ROUTES: CommandRoute[] = [
     icon: ChartAnalysisIcon,
     section: "GEO",
     path: (slug) => `/${slug}/geo/competitors`,
-  },
-  {
-    id: "geo-write",
-    label: "Write",
-    keywords: ["geo", "ai", "write", "writer", "article", "blog", "brief"],
-    icon: PencilEdit01Icon,
-    section: "GEO",
-    path: (slug) => `/${slug}/geo/write`,
   },
   {
     id: "geo-settings-brand",

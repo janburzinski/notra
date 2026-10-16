@@ -3,7 +3,6 @@
 import { GEO_WRITER_BRIEF_POLL_INTERVAL_MS } from "@notra/geo-core/constants/geo";
 import type {
   GeoContentBriefDetail,
-  GeoContentBriefsResponse,
   GeoContentGapsResponse,
   GeoWriterPlanInput,
 } from "@notra/geo-core/types/geo";
@@ -19,6 +18,14 @@ import { withoutPromptGap, withRestoredPromptGap } from "@/utils/geo-gaps";
 import { getConflictRevision, isNotFoundError } from "@/utils/orpc-errors";
 
 import { dashboardOrpc } from "../orpc/query";
+import { useGeoSettings } from "./use-geo";
+import { useHasGeoFeature } from "./use-plan";
+
+export function useGeoWriterAvailable(organizationId: string) {
+  const { hasGeo } = useHasGeoFeature();
+  const { data } = useGeoSettings(organizationId);
+  return hasGeo && Boolean(data?.settings);
+}
 
 export function useGeoWriterGaps(organizationId: string) {
   const tToast = useTranslations("geo.toasts");
@@ -33,18 +40,6 @@ export function useGeoWriterGaps(organizationId: string) {
         ? GEO_CONTENT_GAPS_PREPARING_POLL_MS
         : false,
     meta: { errorMessage: tToast("loadContentGapsFailed") },
-  });
-}
-
-export function useGeoWriterBriefs(organizationId: string) {
-  const tToast = useTranslations("geo.toasts");
-  const { projectId } = useGeoProjectScope();
-  return useQuery<GeoContentBriefsResponse>({
-    ...dashboardOrpc.geo.writerBriefsList.queryOptions({
-      input: { organizationId, projectId },
-    }),
-    enabled: !!organizationId,
-    meta: { errorMessage: tToast("loadBriefsFailed") },
   });
 }
 

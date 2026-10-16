@@ -26,7 +26,6 @@ export type NavItemLabelKey =
   | "agentReadiness"
   | "competitors"
   | "personas"
-  | "write"
   | "geoSettings"
   | "skills"
   | "apiKeys";

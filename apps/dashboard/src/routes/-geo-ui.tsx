@@ -9,7 +9,6 @@ import PromptsLoading from "@/app/(dashboard)/[slug]/geo/prompts/loading";
 import ShelfLoading from "@/app/(dashboard)/[slug]/geo/shelf-space/loading";
 import { GeoPageSkeleton } from "@/app/(dashboard)/[slug]/geo/skeleton";
 import TrafficLoading from "@/app/(dashboard)/[slug]/geo/traffic/loading";
-import WriteLoading from "@/app/(dashboard)/[slug]/geo/write/loading";
 import { geoCompetitorDetailPath } from "@/utils/geo-competitors";
 import { withGeoProject } from "@/utils/geo-paths";
 import { lazyPage } from "@/utils/lazy-page";
@@ -44,9 +43,6 @@ const Prompts = lazyPage(
 );
 const Shelf = lazyPage(
   () => import("@/app/(dashboard)/[slug]/geo/shelf-space/page-client")
-);
-const Write = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/geo/write/page-client")
 );
 
 export function createGeoUiRoutes(parent: AnyRoute) {
@@ -158,10 +154,18 @@ export function createGeoUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "write",
-      title: { namespace: "geo.pages.write", key: "metaTitle" },
-      pendingComponent: WriteLoading,
-      preload: Write.preload,
-      component: ({ params }) => <Write organizationSlug={params.slug} />,
+      title: { namespace: "common", key: "labels.content" },
+      component: () => null,
+      loader: ({ params, searchParams }) => {
+        throw redirect({
+          href: withGeoProject(
+            `/${params.slug ?? ""}/content`,
+            typeof searchParams.project === "string"
+              ? searchParams.project
+              : undefined
+          ),
+        });
+      },
     }),
     createUiRoute({
       parent,

@@ -32,7 +32,7 @@ export const GEO_COMPETITOR_DETAIL_SURFACES = {
 export const GEO_WRITE_DIALOG_ENTRIES = {
   GAP: "gap",
   ENGINE_SHEET: "engine_sheet",
-  WRITE_PAGE: "write_page",
+  CONTENT_LIST: "content_list",
   NAV_PRIMARY: "nav_primary",
 } as const;
 

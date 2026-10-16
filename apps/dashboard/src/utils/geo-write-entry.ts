@@ -1,5 +1,4 @@
 import { GEO_WRITER_TRIGGER_ID } from "@notra/geo-core/constants/geo";
-import type { GeoContentBriefSummary } from "@notra/geo-core/types/geo";
 import { sourceMetadataSchema } from "@notra/schemas/dashboard/content";
 
 import type {
@@ -34,13 +33,6 @@ export function writeDialogStateFromGap(
 
 export function emptyWriteDialogState(): WriteDialogInitialState {
   return { sourceKind: "manual" };
-}
-
-export function briefDisplayTitle(
-  brief: Pick<GeoContentBriefSummary, "workingTitle" | "topic">
-): string {
-  const title = brief.workingTitle.trim();
-  return title || brief.topic;
 }
 
 export function parseGeoWriterDraft(sourceMetadata: unknown): {

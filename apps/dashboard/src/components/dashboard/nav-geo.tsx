@@ -6,11 +6,15 @@ import {
 } from "@notra/ui/components/ui/sidebar";
 import { useTranslations } from "use-intl";
 
-import { NAV_GEO_LINKS, NAV_GEO_VISIBILITY_LINKS } from "@/constants/nav";
+import {
+  NAV_GEO_IMPROVE_LINKS,
+  NAV_GEO_LINKS,
+  NAV_GEO_VISIBILITY_LINKS,
+} from "@/constants/nav";
 import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { useHasGeoFeature } from "@/lib/hooks/use-plan";
 import type { NavGeoProps } from "@/types/components/nav";
-import { resolveActiveNavLink, resolveGeoImproveLinks } from "@/utils/nav";
+import { resolveActiveNavLink } from "@/utils/nav";
 
 import { NavList } from "./nav-list";
 import { NavLockHint } from "./nav-lock-hint";
@@ -22,8 +26,6 @@ export function NavGeo({ slug, pathname, projectId }: NavGeoProps) {
   const visibility = useNavVisibility();
   const { isLocked: geoLocked } = useHasGeoFeature();
   const activeLink = resolveActiveNavLink(pathname, slug, NAV_GEO_LINKS);
-  const showWriteAction = !geoLocked;
-  const improveLinks = resolveGeoImproveLinks(showWriteAction);
 
   return (
     <>
@@ -48,7 +50,7 @@ export function NavGeo({ slug, pathname, projectId }: NavGeoProps) {
         <NavList
           activeLink={activeLink}
           geoLocked={geoLocked}
-          links={improveLinks}
+          links={NAV_GEO_IMPROVE_LINKS}
           projectId={projectId}
           slug={slug}
           visibility={visibility}

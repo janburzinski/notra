@@ -1,6 +1,10 @@
 "use client";
 
-import { AiMagicIcon, NoteAddIcon } from "@hugeicons/core-free-icons";
+import {
+  AiMagicIcon,
+  NoteAddIcon,
+  PencilEdit01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { useTranslations } from "use-intl";
@@ -12,8 +16,10 @@ export function CreateContentButtonGroup({
   disabled = false,
   onCreateContent,
   onCreatePost,
+  onCreateArticle,
   onPrefetchCreateContent,
   onPrefetchCreatePost,
+  onPrefetchCreateArticle,
 }: CreateContentButtonGroupProps) {
   const t = useTranslations("content.create.buttons");
   const tCommon = useTranslations("common");
@@ -33,6 +39,22 @@ export function CreateContentButtonGroup({
         />
         {tCommon("labels.newPost")}
       </Button>
+      {onCreateArticle ? (
+        <Button
+          disabled={disabled}
+          onClick={onCreateArticle}
+          onFocus={onPrefetchCreateArticle}
+          onMouseEnter={onPrefetchCreateArticle}
+          variant="outline"
+        >
+          <HugeiconsIcon
+            aria-hidden="true"
+            className="size-4"
+            icon={PencilEdit01Icon}
+          />
+          {t("writeArticle")}
+        </Button>
+      ) : null}
       <Button
         disabled={disabled}
         onClick={onCreateContent}

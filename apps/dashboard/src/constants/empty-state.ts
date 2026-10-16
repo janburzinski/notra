@@ -11,7 +11,6 @@ export const EMPTY_STATE_TABLE_COLUMNS = {
   engines: [180, 160, 100, 120],
   shareOfVoice: [180, 200, 80, 72],
   traffic: [128, 96, 72, 80, 88],
-  write: [220, 72, 88],
   gaps: [220, 72, 96, 88],
   changes: [140, 88, 220, 140, 120],
   shelf: [220, 72, 64, 88, 120],

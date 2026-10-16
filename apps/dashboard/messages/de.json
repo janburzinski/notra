@@ -3715,9 +3715,6 @@
       }
     },
     "writer": {
-      "briefHistory": {
-        "article": "Artikel"
-      },
       "pageGate": {
         "description": "Der Writer nutzt deine getrackten Prompts, Wettbewerber und deine Sitemap. Richte zuerst GEO-Tracking ein."
       },
@@ -4019,15 +4016,6 @@
         "emptyPathDescription": "Weder Menschen noch AI-Agents haben diese Seite im gewählten Zeitraum geöffnet.",
         "emptyPathReset": "Alle Seiten anzeigen",
         "emptyPathWiden": "Letzte 90 Tage anzeigen"
-      },
-      "write": {
-        "metaTitle": "GEO Writer",
-        "setupDescription": "Plane einen eigenen Artikel aus Prompt, Typ, Marke und Wettbewerbern",
-        "newArticle": "Neuer Artikel",
-        "emptyTitle": "Noch keine Artikel",
-        "emptyDescription": "Starte mit einem eigenen Thema. Nachdem du das Briefing freigegeben hast, öffnet sich der Entwurf in Inhalte.",
-        "description": "Plane einen eigenen Artikel aus Thema, Typ und Marke. Fragen, die KI-Engines bereits beantworten, findest du unter <link>Inhaltslücken</link>.",
-        "descriptionPlain": "Plane einen eigenen Artikel aus Thema, Typ und Marke. Fragen, die KI-Engines bereits beantworten, findest du unter Inhaltslücken."
       }
     },
     "toasts": {
@@ -5631,9 +5619,6 @@
       "measureVisibility": "Sichtbarkeit messen",
       "createContent": "Inhalte erstellen"
     },
-    "primaryActions": {
-      "newContent": "Neuer Inhalt"
-    },
     "geoUpgradeTooltip": "Upgrade deinen Tarif, um GEO zu nutzen",
     "recent": "Zuletzt",
     "recentItem": {
@@ -6021,7 +6006,8 @@
         }
       },
       "buttons": {
-        "generateContent": "Inhalte generieren"
+        "generateContent": "Inhalte generieren",
+        "writeArticle": "Artikel schreiben"
       },
       "formats": {
         "changelog": {

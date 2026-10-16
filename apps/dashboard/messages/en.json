@@ -3715,9 +3715,6 @@
       }
     },
     "writer": {
-      "briefHistory": {
-        "article": "Article"
-      },
       "pageGate": {
         "description": "The writer uses your tracked prompts, competitors and sitemap. Set up GEO tracking first."
       },
@@ -4019,15 +4016,6 @@
         "emptyPathDescription": "Neither people nor AI agents opened this page in the selected period.",
         "emptyPathReset": "Show all pages",
         "emptyPathWiden": "Try last 90 days"
-      },
-      "write": {
-        "metaTitle": "GEO Writer",
-        "setupDescription": "Plan a custom article from a prompt, type, brand and competitors",
-        "newArticle": "New article",
-        "emptyTitle": "No articles yet",
-        "emptyDescription": "Start from a custom topic. After you approve the brief, the draft opens in Content.",
-        "description": "Plan a custom article from a topic, type and brand. For questions engines already answer, see <link>Content Gaps</link>.",
-        "descriptionPlain": "Plan a custom article from a topic, type and brand. For questions engines already answer, see Content Gaps."
       }
     },
     "toasts": {
@@ -5631,9 +5619,6 @@
       "measureVisibility": "Measure visibility",
       "createContent": "Create content"
     },
-    "primaryActions": {
-      "newContent": "New content"
-    },
     "geoUpgradeTooltip": "Upgrade your plan to use GEO",
     "recent": "Recent",
     "recentItem": {
@@ -6021,7 +6006,8 @@
         }
       },
       "buttons": {
-        "generateContent": "Generate content"
+        "generateContent": "Generate content",
+        "writeArticle": "Write article"
       },
       "formats": {
         "changelog": {

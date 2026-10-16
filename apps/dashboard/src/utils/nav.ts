@@ -1,5 +1,3 @@
-import { GEO_WRITER_NAV_LINK } from "@notra/geo-core/constants/geo";
-
 import {
   ANALYTICS_NAV_LINK,
   DEFAULT_NAV_VISIBILITY,
@@ -136,15 +134,6 @@ export function resolveNavItems(
     ? withAnalytics
     : withAnalytics.filter((item) => item.link !== SITES_NAV_LINK);
   return filterIrisNavItems(withSites, visibility.iris);
-}
-
-export function resolveGeoImproveLinks(
-  writeAsPrimaryAction: boolean
-): readonly string[] {
-  if (!writeAsPrimaryAction) {
-    return NAV_GEO_IMPROVE_LINKS;
-  }
-  return NAV_GEO_IMPROVE_LINKS.filter((link) => link !== GEO_WRITER_NAV_LINK);
 }
 
 export function resolveActiveNavLink(

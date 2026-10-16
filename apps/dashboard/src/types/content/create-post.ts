@@ -30,8 +30,10 @@ export interface CreateContentButtonGroupProps {
   disabled?: boolean;
   onCreateContent: () => void;
   onCreatePost: () => void;
+  onCreateArticle?: () => void;
   onPrefetchCreateContent?: () => void;
   onPrefetchCreatePost?: () => void;
+  onPrefetchCreateArticle?: () => void;
 }
 
 export interface CreateContentActionsProps {

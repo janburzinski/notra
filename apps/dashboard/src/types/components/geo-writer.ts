@@ -2,7 +2,6 @@ import type { GeoContentSubtype } from "@notra/ai/types/geo-writer";
 import type {
   GeoCompetitor,
   GeoContentBriefDetail,
-  GeoContentBriefSummary,
   GeoWriterSourceKind,
 } from "@notra/geo-core/types/geo";
 import type { ReactNode } from "react";
@@ -10,14 +9,6 @@ import type { ReactNode } from "react";
 import type { GeoWriteDialogEntry } from "@/types/analytics/geo-events";
 import type { GeoProjectBrandIdentity } from "@/types/geo";
 import type { Sitemap } from "@/types/hooks/brand-sitemaps";
-
-export interface BriefHistoryProps {
-  briefs: GeoContentBriefSummary[];
-  activeBriefId?: string;
-  onOpen: (briefId: string) => void;
-  onHover?: (briefId: string) => void;
-  loading?: boolean;
-}
 
 export interface GeoWriterNeedsSetupProps {
   organizationId: string;

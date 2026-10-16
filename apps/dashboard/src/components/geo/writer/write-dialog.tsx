@@ -132,7 +132,7 @@ function WriteDialogForm({
     }
     openedRef.current = true;
     trackEvent(POSTHOG_EVENTS.GEO_WRITE_DIALOG_OPENED, {
-      entry: entry ?? GEO_WRITE_DIALOG_ENTRIES.WRITE_PAGE,
+      entry: entry ?? GEO_WRITE_DIALOG_ENTRIES.CONTENT_LIST,
       source_kind: initialSourceKind,
       has_topic: hasInitialTopic,
     });

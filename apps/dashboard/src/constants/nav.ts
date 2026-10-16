@@ -28,7 +28,6 @@ import {
   GEO_AGENT_READINESS_NAV_LINK,
   GEO_GAPS_NAV_LINK,
   GEO_PROMPTS_NAV_LINK,
-  GEO_WRITER_NAV_LINK,
 } from "@notra/geo-core/constants/geo";
 import { GEO_PERSONAS_NAV_LINK } from "@notra/geo-core/constants/geo-personas";
 import type { PostStatus } from "@notra/schemas/dashboard/content";
@@ -156,7 +155,6 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
     labelKey: "personas",
     badge: "beta",
   },
-  { link: GEO_WRITER_NAV_LINK, icon: PencilEdit01Icon, labelKey: "write" },
   {
     link: GEO_SETTINGS_NAV_LINK,
     icon: Settings01Icon,
@@ -178,7 +176,6 @@ export const NAV_GEO_IMPROVE_LINKS: readonly string[] = [
   GEO_GAPS_NAV_LINK,
   GEO_SHELF_SPACE_NAV_LINK,
   GEO_AGENT_READINESS_NAV_LINK,
-  GEO_WRITER_NAV_LINK,
   CONTENT_NAV_LINK,
   SCHEDULES_NAV_LINK,
 ];
@@ -247,11 +244,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     id: "improve",
     icon: SearchList01Icon,
     labelKey: "improve",
-    links: [
-      GEO_GAPS_NAV_LINK,
-      GEO_AGENT_READINESS_NAV_LINK,
-      GEO_WRITER_NAV_LINK,
-    ],
+    links: [GEO_GAPS_NAV_LINK, GEO_AGENT_READINESS_NAV_LINK],
   },
   {
     id: "content",
