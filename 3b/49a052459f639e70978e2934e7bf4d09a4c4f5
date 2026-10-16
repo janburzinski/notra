@@ -1,0 +1,9 @@
+apps/dashboard/src/components/geo/traffic-domain-select.tsx
+  ai_agent 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3b49a052459f639e70978e2934e7bf4d09a4c4f5",
+  "prompts": {}
+}
