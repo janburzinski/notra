@@ -1,10 +1,10 @@
 "use client";
 
+import { formatRelative } from "@notra/utils/format-relative";
 import { useLocale, useTranslations } from "use-intl";
 
 import { cn } from "@/lib/utils";
 import type { SiteRelativeTimeProps } from "@/types/components/sites";
-import { formatRelative } from "@/utils/format-relative";
 
 export function SiteRelativeTime({
   date,

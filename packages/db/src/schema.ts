@@ -4726,5 +4726,20 @@ export const siteDeploymentsRelations = relations(
       fields: [siteDeployments.siteId],
       references: [sites.id],
     }),
+    requestedByUser: one(users, {
+      fields: [siteDeployments.requestedByUserId],
+      references: [users.id],
+    }),
+    telemetry: one(siteBuildTelemetry),
+  })
+);
+
+export const siteBuildTelemetryRelations = relations(
+  siteBuildTelemetry,
+  ({ one }) => ({
+    deployment: one(siteDeployments, {
+      fields: [siteBuildTelemetry.deploymentId],
+      references: [siteDeployments.id],
+    }),
   })
 );

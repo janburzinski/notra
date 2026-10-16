@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        check: [lint, tests, build-web, build-dashboard, typecheck]
+        check: [lint, tests, build-web, build-dashboard, build-console, typecheck]
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
@@ -81,9 +81,9 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-            TURBO_SCM_BASE="$BASE_SHA" bun run test --force --log-order=stream --affected
+            TURBO_SCM_BASE="$BASE_SHA" bun run test --force --log-order=stream --affected --concurrency=2
           else
-            bun run test --force --log-order=stream
+            bun run test --force --log-order=stream --concurrency=2
           fi
 
       - name: Verify production markdown endpoints
@@ -100,6 +100,10 @@ jobs:
           VERCEL: "1"
         run: bun run build
 
+      - name: Verify console build
+        if: matrix.check == 'build-console'
+        run: bun run build --filter=console
+
       - name: Restore incremental TypeScript state
         if: matrix.check == 'typecheck'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
@@ -113,7 +117,7 @@ jobs:
 
       - name: Typecheck tested packages and UI docs
         if: matrix.check == 'typecheck'
-        run: bun run check-types --filter=@usenotra/geo --filter=@notra/agent --filter=@notra/ai --filter=@notra/geo-core --filter=dashboard --filter=ui --filter=web
+        run: bun run check-types --concurrency=2 --filter=@usenotra/geo --filter=@notra/agent --filter=@notra/ai --filter=@notra/db --filter=@notra/utils --filter=@notra/geo-core --filter=dashboard --filter=console --filter=ui --filter=web
 
   infrastructure:
     runs-on: ubuntu-26.04

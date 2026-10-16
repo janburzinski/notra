@@ -1,6 +1,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 import type { ExcalidrawScene } from "../types/excalidraw-diagram";
+import type { UploadIntegrationBrandingAssetParams } from "../types/integrations";
 
 interface R2Env {
   accessKeyId: string;
@@ -70,6 +71,29 @@ function getR2Client() {
   });
 
   return cachedClient;
+}
+
+export async function uploadIntegrationBrandingAsset(
+  params: UploadIntegrationBrandingAssetParams
+) {
+  const env = getR2Env();
+  const key = `organization/${params.organizationId}/integration-branding/${params.kind}-${crypto.randomUUID()}.${params.extension}`;
+
+  await getR2Client().send(
+    new PutObjectCommand({
+      Body: params.body,
+      Bucket: env.bucketName,
+      CacheControl: "public, max-age=31536000",
+      ContentLength: params.body.byteLength,
+      ContentType: params.contentType,
+      ...(params.contentType === "image/svg+xml"
+        ? { ContentDisposition: "attachment" }
+        : {}),
+      Key: key,
+    })
+  );
+
+  return `${env.publicUrl.replace(TRAILING_SLASHES_RE, "")}/${key}`;
 }
 
 async function uploadContentAsset(params: {

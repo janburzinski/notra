@@ -1,15 +1,13 @@
 import { describe, expect, test } from "bun:test";
 
+import { sanitizeReturnTo } from "@notra/utils/auth-redirect";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { os, type RouterClient } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 
 import { NON_DASHBOARD_PATH } from "../src/constants/auth-routes";
-import {
-  buildPostAuthRedirectPath,
-  sanitizeReturnTo,
-} from "../src/lib/auth/return-to";
+import { buildPostAuthRedirectPath } from "../src/lib/auth/return-to";
 import { buildSessionCorsHeaders } from "../src/lib/auth/session-cors";
 import { createDashboardHandlerPlugins } from "../src/lib/orpc/handler-plugins";
 import { createDashboardLinkPlugins } from "../src/lib/orpc/link-plugins";

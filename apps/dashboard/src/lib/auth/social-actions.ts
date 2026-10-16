@@ -11,6 +11,7 @@ export const startSocialSignInAction = (
 
 import { startSocialSignInInputSchema } from "@notra/schemas/dashboard/auth/social";
 import type { StartSocialSignInInput } from "@notra/schemas/types/dashboard/auth";
+import { sanitizeReturnTo } from "@notra/utils/auth-redirect";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { redirect } from "@tanstack/react-router";
 import { getRequestHeaders, setCookie } from "@tanstack/react-start/server";
@@ -22,7 +23,6 @@ import {
   SOCIAL_AUTH_STATE_COOKIE,
   SOCIAL_AUTH_STATE_MAX_AGE_SECONDS,
 } from "@/constants/social-auth";
-import { sanitizeReturnTo } from "@/lib/auth/return-to";
 import { getClientIpFromHeaders, ratelimit } from "@/utils/ratelimit";
 
 async function startSocialSignInActionImpl(rawInput: StartSocialSignInInput) {

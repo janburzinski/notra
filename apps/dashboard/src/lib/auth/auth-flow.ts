@@ -1,6 +1,7 @@
 import { POSTHOG_EVENTS, type PostHogEventName } from "@notra/posthog/events";
 import type { PostHogProperties } from "@notra/posthog/types/posthog";
 import type { AuthFlowResult } from "@notra/schemas/types/dashboard/auth";
+import { sanitizeReturnTo } from "@notra/utils/auth-redirect";
 import type { AuthenticationResponse } from "@workos-inc/node";
 import { Effect } from "effect";
 
@@ -14,7 +15,6 @@ import {
 } from "@/lib/auth/action-messages";
 import { UserSyncError, WorkOSAuthError } from "@/lib/auth/errors";
 import { resolveMfaFlow } from "@/lib/auth/mfa";
-import { sanitizeReturnTo } from "@/lib/auth/return-to";
 import { syncAuthenticatedUser } from "@/lib/auth/sync";
 import { saveAuthSession } from "@/lib/auth/workos";
 import { readWorkOSError } from "@/lib/auth/workos-error";

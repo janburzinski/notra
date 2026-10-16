@@ -1,4 +1,5 @@
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { isSameOriginPath } from "@notra/utils/auth-redirect";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { notFound, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
@@ -19,7 +20,6 @@ import {
 import { getLastActiveOrganization, getSession } from "@/lib/auth/actions";
 import { isSessionBanned } from "@/lib/auth/banned";
 import { readPendingMfaFlow } from "@/lib/auth/mfa-cookies";
-import { isSameOriginPath } from "@/lib/auth/return-to";
 import { demoThemeParser, serializeDemoTheme } from "@/lib/demo/theme-param";
 import { getTranslations } from "@/lib/i18n/server";
 import { resolveIntegrationConnectDeeplink } from "@/lib/integrations/deeplink-resolution";

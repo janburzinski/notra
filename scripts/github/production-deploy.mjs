@@ -23,6 +23,15 @@ const projects = [
     productionAlias: "notra-web-notra.vercel.app",
   },
   {
+    name: "notra-console",
+    directory: "apps/console",
+    productionAlias: "notra-console-notra.vercel.app",
+    initialDeployment: {
+      repositoryId: "1352247576",
+      sha: "c868f26714dd4e7daa31dd0ff489485b72b21648",
+    },
+  },
+  {
     name: "notra-ui",
     directory: "apps/ui",
     productionAlias: "notra-ui-notra.vercel.app",
@@ -390,6 +399,15 @@ export async function release({
     if (latest.link?.productionBranch !== "main") {
       throw new Error(`${project.name} production branch must remain main`);
     }
+    if (
+      project.initialDeployment &&
+      (Number(latest.link?.repoId) !== repositoryId ||
+        latest.rootDirectory !== project.directory)
+    ) {
+      throw new Error(
+        `${project.name}: connect the monorepo and set rootDirectory to ${project.directory} before releasing; no builds started`
+      );
+    }
     const alias = await request(
       "vercel",
       `/v4/aliases/${project.productionAlias}`
@@ -409,10 +427,22 @@ export async function release({
         `${project.name}: cannot identify the current production commit; no builds started`
       );
     }
-    await assertAheadOf(project.name, previousSha);
-    const changed = [project.directory, ...(project.alsoBuilds ?? [])].some(
-      (directory) => buildChanged(directory, previousSha, sha)
-    );
+    const importingStandalone =
+      project.initialDeployment?.sha === previousSha &&
+      project.initialDeployment.repositoryId ===
+        String(
+          production.gitSource?.repoId ??
+            production.meta?.githubCommitRepoId ??
+            ""
+        );
+    if (!importingStandalone) {
+      await assertAheadOf(project.name, previousSha);
+    }
+    const changed =
+      importingStandalone ||
+      [project.directory, ...(project.alsoBuilds ?? [])].some((directory) =>
+        buildChanged(directory, previousSha, sha)
+      );
     plans.push({ ...project, changed });
   }
 

@@ -1,3 +1,7 @@
+import type { MCP_STORE_CATEGORIES } from "../constants/mcp-store-categories";
+
+export type McpStoreCategory = (typeof MCP_STORE_CATEGORIES)[number];
+
 export interface ErrorWithStatus {
   status?: number;
 }
@@ -202,4 +206,17 @@ export interface UpdateMcpServerIntegrationParams {
   slug?: string | null;
   headers?: McpHeaderMap;
   enabled?: boolean;
+}
+export interface UploadIntegrationBrandingAssetParams {
+  organizationId: string;
+  kind: "logo-light" | "logo-dark" | "banner";
+  body: Buffer;
+  contentType: string;
+  extension: string;
+}
+
+export interface McpToolActionPhraseUpdate {
+  serverToolName: string;
+  actionPhrasePresent: string | null;
+  actionPhrasePast: string | null;
 }

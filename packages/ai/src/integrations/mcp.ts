@@ -3,7 +3,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { db } from "@notra/db/drizzle";
 import { mcpOAuthCredentials, mcpServerIntegrations } from "@notra/db/schema";
 import { assertPublicHttpUrlResolution } from "@notra/utils/url";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
 import type {
@@ -188,6 +188,97 @@ export function createMcpConnectionIntegration(
   return createMcpServerIntegration(params, "connection");
 }
 
+export function createMcpStoreListing(
+  params: CreateMcpServerIntegrationParams
+) {
+  return createMcpServerIntegration(params, "store_listing");
+}
+
+export function getMcpStoreListing(scope: McpServerIntegrationScope) {
+  return getMcpServerIntegration({ ...scope, resourceType: "store_listing" });
+}
+
+export async function getMcpStoreListingById(integrationId: string) {
+  return (
+    (await db.query.mcpServerIntegrations.findFirst({
+      where: and(
+        eq(mcpServerIntegrations.id, integrationId),
+        eq(mcpServerIntegrations.resourceType, "store_listing")
+      ),
+      with: integrationRelations,
+    })) ?? null
+  );
+}
+
+export function getMcpStoreListingsByOrganization(organizationId: string) {
+  return getMcpServerIntegrationsByOrganization(
+    organizationId,
+    "store_listing"
+  );
+}
+
+export function updateMcpStoreListing(
+  scope: McpServerIntegrationScope,
+  updates: UpdateMcpServerIntegrationParams
+) {
+  return updateMcpServerIntegration(scope, "store_listing", updates);
+}
+
+export function deleteMcpStoreListing(scope: McpServerIntegrationScope) {
+  return deleteMcpServerIntegration(scope, "store_listing");
+}
+
+export async function listMcpServerToolsPreview(input: {
+  url: string;
+  headers?: McpHeaderMap;
+}) {
+  const timeoutMs = 8000;
+  const client = new Client({ name: "notra-console", version: "0.0.1" });
+  const deadline = AbortSignal.timeout(timeoutMs);
+  try {
+    await assertPublicHttpUrlResolution(input.url);
+    await client.connect(
+      new StreamableHTTPClientTransport(new URL(input.url), {
+        fetch: publicMcpRuntimeFetch,
+        requestInit: { headers: input.headers ?? {}, redirect: "error" },
+      }),
+      { signal: deadline, timeout: timeoutMs }
+    );
+    let page = await client.listTools(
+      {},
+      {
+        signal: deadline,
+        timeout: timeoutMs,
+      }
+    );
+    const tools = [...page.tools];
+    let pages = 1;
+    while (page.nextCursor) {
+      if (pages++ >= 10 || tools.length >= 500) {
+        throw new Error("MCP tool preview exceeded its page or tool limit");
+      }
+      page = await client.listTools(
+        { cursor: page.nextCursor },
+        {
+          signal: deadline,
+          timeout: timeoutMs,
+        }
+      );
+      tools.push(...page.tools);
+    }
+    if (tools.length > 500) {
+      throw new Error("MCP tool preview exceeded its tool limit");
+    }
+    return tools.map((tool) => ({
+      name: tool.name,
+      title: tool.title ?? null,
+      description: tool.description ?? null,
+    }));
+  } finally {
+    await client.close().catch(() => undefined);
+  }
+}
+
 async function getMcpServerIntegration(scope: McpTypedServerIntegrationScope) {
   const integration = await db.query.mcpServerIntegrations.findFirst({
     where: and(
@@ -238,6 +329,15 @@ async function updateMcpServerIntegration(
     const [row] = await tx
       .update(mcpServerIntegrations)
       .set({
+        ...(resourceType === "store_listing" &&
+        Object.keys(updates).some((key) => key !== "enabled")
+          ? {
+              storeStatus: sql`case when ${mcpServerIntegrations.storeStatus} in ('live', 'pending_review') then 'pending_review' else ${mcpServerIntegrations.storeStatus} end`,
+              submittedAt: sql`case when ${mcpServerIntegrations.storeStatus} in ('live', 'pending_review') then greatest(date_trunc('milliseconds', clock_timestamp()), ${mcpServerIntegrations.submittedAt} + interval '1 millisecond') else ${mcpServerIntegrations.submittedAt} end`,
+              reviewedAt: null,
+              reviewNote: null,
+            }
+          : {}),
         ...(updates.name !== undefined ? { name: updates.name } : {}),
         ...(updates.url !== undefined ? { url: updates.url } : {}),
         ...(updates.description !== undefined

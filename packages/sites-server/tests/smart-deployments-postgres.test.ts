@@ -163,7 +163,11 @@ if (!databaseUrl) {
     }),
     getBranchHead: async () => ({ sha: branchHead }),
     changedPathsBetween: async () => comparePaths,
-    downloadRepositoryTarballEffect: () =>
+  }));
+  // The pipeline now downloads selected source directories through this
+  // boundary. Keep the database/CAS test isolated from GitHub for every root.
+  mock.module("../src/github-source", () => ({
+    downloadSiteSourceEffect: () =>
       Effect.sync(() => {
         downloadCalls++;
         return new Uint8Array([1]);

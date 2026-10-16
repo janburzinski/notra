@@ -56,7 +56,10 @@ function fixture({
         } else if (url.pathname.startsWith("/v9/projects/")) {
           data = {
             id: url.pathname.split("/").at(-1),
-            link: { productionBranch: "main" },
+            link: { productionBranch: "main", repoId: 123 },
+            rootDirectory: url.pathname.endsWith("/notra-console")
+              ? "apps/console"
+              : undefined,
           };
         } else if (url.pathname.startsWith("/v4/aliases/")) {
           const project = url.pathname
@@ -280,16 +283,23 @@ test("failed toolchain env update prevents every build", async () => {
   assert.equal(builds(calls).length, 0);
 });
 
-test("all five Vercel projects and three Railway services deploy the pinned SHA", async () => {
+test("all six Vercel projects and three Railway services deploy the pinned SHA", async () => {
   const { run, calls, sha, directories } = fixture();
   await run();
   const started = builds(calls);
-  assert.equal(started.length, 8);
+  assert.equal(started.length, 9);
   assert.deepEqual(
     started
       .filter(({ url }) => url.hostname === "api.vercel.com")
       .map(({ body }) => body.project),
-    ["notra", "notra-web", "notra-ui", "notra-agent", "notra-onboarding-agent"]
+    [
+      "notra",
+      "notra-web",
+      "notra-console",
+      "notra-ui",
+      "notra-agent",
+      "notra-onboarding-agent",
+    ]
   );
   for (const { url, body } of started) {
     if (url.hostname === "api.vercel.com") {
@@ -314,7 +324,7 @@ test("dry run validates every target without creating any builds", async () => {
   });
   await run();
   assert.equal(builds(calls).length, 0);
-  assert.equal(directories.length, 8);
+  assert.equal(directories.length, 9);
   assert.equal(toolchainBuilds.length, 0);
 });
 
@@ -439,7 +449,7 @@ test("Unkey discovers the verified production domain and deploys the pinned comm
     environment: "env_test",
     git: { branch: "main", commitSha: sha },
   });
-  assert.equal(directories.length, 10);
+  assert.equal(directories.length, 11);
   assert.equal(
     directories.filter((directory) => directory === "apps/api").length,
     3
@@ -633,7 +643,7 @@ for (const [name, path, data] of [
     await assert.rejects(run(), /unkey/);
     assert.equal(
       calls.filter(({ url }) => url.pathname === "/v13/deployments").length,
-      5
+      6
     );
     assert.ok(
       builds(calls).every(({ url }) => url.hostname === "api.vercel.com")

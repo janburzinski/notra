@@ -1,3 +1,4 @@
+import { sanitizeReturnTo } from "@notra/utils/auth-redirect";
 import {
   getConfig,
   getWorkOS,
@@ -10,7 +11,6 @@ import {
   getAuthKitContext,
 } from "@workos/authkit-tanstack-react-start";
 
-import { sanitizeReturnTo } from "@/lib/auth/return-to";
 import {
   clearHostAuthSessionCookie,
   markAuthSessionCleared,

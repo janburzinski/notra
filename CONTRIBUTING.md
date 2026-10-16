@@ -25,6 +25,7 @@ Notra is a Bun + Turborepo monorepo.
 |  |- ai-traffic-ingest/ # AI traffic collector (Bun, Railway)
 |  |- api/         # Hono API (Cloudflare Worker)
 |  |- dashboard/   # Main Notra product app (TanStack Start)
+|  |- console/     # Companion/admin app (Next.js, port 3003)
 |  |- docs/        # Product docs (Mintlify)
 |  |- web/         # Public marketing site (TanStack Start)
 |- packages/
@@ -115,6 +116,7 @@ bun dev --filter=dashboard
 bun dev --filter=api
 bun dev --filter=web
 bun dev --filter=docs
+bun dev --filter=console
 ```
 
 The dashboard runs Vite on `127.0.0.1:3000`. Build it with

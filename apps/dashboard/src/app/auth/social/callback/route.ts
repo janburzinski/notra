@@ -1,3 +1,4 @@
+import { sanitizeReturnTo } from "@notra/utils/auth-redirect";
 import { redirect } from "@tanstack/react-router";
 import { deleteCookie, getCookie } from "@tanstack/react-start/server";
 import { getWorkOS } from "@workos/authkit-session";
@@ -9,7 +10,6 @@ import { UserSyncError, WorkOSAuthError } from "@/lib/auth/errors";
 import { resolveMfaFlow } from "@/lib/auth/mfa";
 import { storePendingMfaFlow } from "@/lib/auth/mfa-cookies";
 import { authenticateResolvingOrgSelection } from "@/lib/auth/org-selection";
-import { sanitizeReturnTo } from "@/lib/auth/return-to";
 import { syncAuthenticatedUser } from "@/lib/auth/sync";
 import { saveAuthSession } from "@/lib/auth/workos";
 import { readWorkOSError } from "@/lib/auth/workos-error";

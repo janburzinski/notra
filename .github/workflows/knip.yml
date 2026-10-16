@@ -28,4 +28,4 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run Knip
-        run: bunx turbo run knip --filter=web --filter=dashboard --filter=api -- --reporter github-actions
+        run: bunx turbo run knip --filter=web --filter=dashboard --filter=api --filter=console -- --reporter github-actions

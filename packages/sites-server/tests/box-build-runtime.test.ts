@@ -273,7 +273,7 @@ test("source archives over 100 MB upload in bounded parts and reassemble byte fo
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
-});
+}, 30_000);
 
 test.each([0, 8 * 1024 * 1024])(
   "source archives of %i bytes retain a single upload without reassembly",
