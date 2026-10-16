@@ -144,7 +144,7 @@ export const PROFOUND: CompareCompetitor = {
     {
       question: "Does Notra track as many engines as Profound?",
       answer:
-        "Almost. Notra scans ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek, Meta AI and Mistral on every plan. Profound Enterprise also covers Copilot and Exa, which Notra does not.",
+        "Almost. Notra scans ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek and Meta AI on every plan. Profound Enterprise also covers Copilot and Exa, which Notra does not.",
     },
     {
       question: "Does Notra have prompt volume data like Profound?",

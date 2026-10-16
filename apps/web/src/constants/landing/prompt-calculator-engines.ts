@@ -5,7 +5,6 @@ import { Grok } from "@notra/ui/components/ui/svgs/grok";
 import { GrokDark } from "@notra/ui/components/ui/svgs/grokDark";
 import { Kimi } from "@notra/ui/components/ui/svgs/kimi";
 import { Meta } from "@notra/ui/components/ui/svgs/meta";
-import { Mistral } from "@notra/ui/components/ui/svgs/mistral";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
 import { Perplexity } from "@notra/ui/components/ui/svgs/perplexity";
@@ -96,14 +95,6 @@ export const PROMPT_CALCULATOR_ENGINES: PromptCalculatorEngine[] = [
       { id: "deepseek/deepseek-v4-pro", label: "DeepSeek V4 Pro" },
       { id: "deepseek/deepseek-v4-flash", label: "DeepSeek V4 Flash" },
     ],
-  },
-  {
-    id: "mistral",
-    name: "Mistral",
-    featured: false,
-    icon: Mistral,
-    defaultModel: "mistral/mistral-medium-3.5",
-    models: [{ id: "mistral/mistral-medium-3.5", label: "Mistral Medium 3.5" }],
   },
   {
     id: "meta",

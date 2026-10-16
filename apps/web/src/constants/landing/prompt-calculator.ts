@@ -16,7 +16,6 @@ export const PROMPT_CALCULATOR_ENGINE_IDS = [
   "grok",
   "kimi",
   "deepseek",
-  "mistral",
   "meta",
   "zai",
 ] as const;

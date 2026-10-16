@@ -138,7 +138,7 @@ export const ATHENA: CompareCompetitor = {
     {
       question: "Which engines does AthenaHQ track that Notra does not?",
       answer:
-        "Microsoft Copilot. Notra tracks ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek, Meta AI and Mistral.",
+        "Microsoft Copilot. Notra tracks ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek and Meta AI.",
     },
   ],
 };

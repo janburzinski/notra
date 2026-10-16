@@ -153,7 +153,7 @@ export const PROMPTWATCH: CompareCompetitor = {
     {
       question: "Which engines does Promptwatch track that Notra does not?",
       answer:
-        "Microsoft Copilot and Alexa. Notra tracks ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek, Meta AI and Mistral.",
+        "Microsoft Copilot and Alexa. Notra tracks ChatGPT, Claude, Gemini, Perplexity, Google AI, Grok, DeepSeek and Meta AI.",
     },
     {
       question: "How does prompt demand data compare?",

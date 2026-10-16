@@ -34,6 +34,45 @@ const catalog: GeoModelCatalog = {
 };
 
 describe("selected grounded engines", () => {
+  test("Mistral stays out of live and fallback catalogs and saved scan selections", () => {
+    const mistralModels = [
+      "mistral/mistral-large-4",
+      "mistral/mistral-medium-latest",
+      "mistral/mistral-medium-3.5",
+    ];
+    const live = buildGeoModelCatalogFromFeed([
+      ...mistralModels.map((id) => ({
+        id,
+        name: id,
+        owned_by: "mistral",
+        type: "language",
+        zdr: "all" as const,
+      })),
+      {
+        id: "openai/gpt-5.6-sol",
+        name: "GPT-5.6 Sol",
+        owned_by: "openai",
+        type: "language",
+        zdr: "all",
+      },
+    ]);
+
+    for (const available of [live, seedGeoModelCatalog()]) {
+      expect(
+        available.providers.some((provider) => provider.id === "mistral")
+      ).toBe(false);
+      expect(
+        available.models.some((model) => model.provider === "mistral")
+      ).toBe(false);
+      expect(
+        resolveTrackedEngines(available, [
+          ...mistralModels,
+          "openai/gpt-5.6-sol",
+        ])
+      ).toEqual(["openai/gpt-5.6-sol"]);
+    }
+  });
+
   test("batch transport variants are not separate models, even without a base in the feed", () => {
     const available = buildGeoModelCatalogFromFeed([
       {
