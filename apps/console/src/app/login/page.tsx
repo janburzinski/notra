@@ -2,6 +2,7 @@ import { sanitizeReturnTo } from "@notra/utils/auth-redirect";
 import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
+import { readPendingAuth } from "@/lib/auth/flow";
 import { getServerSession } from "@/lib/auth/session";
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -34,6 +35,7 @@ export default async function Login({
     <div className="flex min-h-svh items-center justify-center p-6">
       <div className="mx-auto w-full max-w-md rounded-md p-6 lg:px-8 lg:py-10">
         <LoginForm
+          initialPending={await readPendingAuth()}
           initialError={
             errorKey && Object.hasOwn(ERROR_MESSAGES, errorKey)
               ? ERROR_MESSAGES[errorKey]

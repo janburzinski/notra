@@ -1,4 +1,5 @@
 import type { users } from "@notra/db/schema";
+import type { PendingAuthStep } from "@notra/schemas/types/dashboard/auth";
 import type { CSSProperties } from "react";
 
 type SessionUser = typeof users.$inferSelect;
@@ -83,6 +84,17 @@ export interface UserMenuProps {
 export interface ConsoleLoginFormProps {
   returnTo?: string;
   initialError?: string;
+  initialPending?: PendingAuthStep;
+}
+
+export interface ConsoleSocialAttempt {
+  codeVerifier: string;
+  returnTo: string | null;
+}
+
+export interface ConsolePendingAuthContext {
+  identifier: string;
+  email: string;
 }
 
 export interface SignOutActionOptions {

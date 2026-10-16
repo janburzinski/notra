@@ -90,7 +90,7 @@ export function MfaChallengeForm({
   }
 
   async function handleBackupCode() {
-    if (isPending || !backupCodeReady) {
+    if (isPending || !backupCodeReady || !redeemBackupCode) {
       return;
     }
     const isCurrent = beginRequest();
@@ -231,7 +231,7 @@ export function MfaChallengeForm({
         </CtaButton>
       </form>
       <div className="flex flex-col items-center gap-1">
-        <Button
+        {redeemBackupCode && <Button
           className="text-muted-foreground"
           disabled={isPending}
           onClick={() => switchMode("backup")}
@@ -239,7 +239,7 @@ export function MfaChallengeForm({
           variant="link"
         >
           {l.useBackupCode}
-        </Button>
+        </Button>}
         {onBack && (
           <Button
             className="text-muted-foreground"

@@ -138,7 +138,7 @@ export interface MfaChallengeFormProps {
   onBack?: () => void;
   onRecovered: (email: string) => void;
   verifyMfaCode: VerifyMfaCode;
-  redeemBackupCode: RedeemBackupCode;
+  redeemBackupCode?: RedeemBackupCode;
   labels?: Partial<MfaChallengeFormLabels>;
 }
 
@@ -175,7 +175,7 @@ export interface AuthPendingStepProps {
   onRecovered: (email: string) => void;
   verifyEmailCode: VerifyEmailCode;
   verifyMfaCode: VerifyMfaCode;
-  redeemBackupCode: RedeemBackupCode;
+  redeemBackupCode?: RedeemBackupCode;
   labels?: Partial<AuthPendingStepLabels>;
 }
 
@@ -198,7 +198,7 @@ export interface LoginFormProps {
   signInWithPassword: SignInWithPassword;
   verifyEmailCode: VerifyEmailCode;
   verifyMfaCode: VerifyMfaCode;
-  redeemBackupCode: RedeemBackupCode;
+  redeemBackupCode?: RedeemBackupCode;
   startSocialSignIn: StartSocialSignIn;
   labels?: Partial<LoginFormLabels>;
 }

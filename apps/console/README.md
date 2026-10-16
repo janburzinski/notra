@@ -18,9 +18,14 @@ and `CONSOLE_WORKOS_REDIRECT_URI=http://localhost:3003/auth/callback`; register
 the callback with WorkOS. Shared database and authentication credentials are
 required for signed-in functionality. Never use production data for local tests.
 
-Sign-in uses hosted AuthKit for password, social sign-in, verification and MFA.
-Set the console's initiate-login URI to `/auth/sign-in`; all methods return to
-the single `/auth/callback` route. No separate social callback is required.
+Sign-in uses the shared Notra login UI with direct WorkOS password, social,
+email verification and TOTP challenge/enrollment adapters. Do not send normal
+sign-in through hosted AuthKit: this environment uses a separate external-OAuth
+login bridge that does not preserve User Management authorization sessions.
+Social sign-in returns to `/auth/social/callback`, as in the standalone console;
+register that existing callback for the console origin. `/auth/sign-in` is only
+a compatibility redirect to `/login`. Backup-code recovery and registration
+remain in the dashboard.
 Production requires the shared Upstash Redis configuration for sliding-window
 rate limiting; missing configuration fails closed.
 
@@ -72,7 +77,7 @@ hooks, motion tokens and styles from `@notra/ui`. Sites JSON types come from
 `@notra/sites-core`; GEO report types derive from the shared database contract.
 There are no app-local AI, database or registry UI copies.
 
-Next-specific AuthKit actions and hosted sign-in route adapters stay local;
+Next-specific AuthKit actions and direct sign-in adapters stay local;
 their visual primitives are shared. Store curation/review extends the common
 MCP implementation without changing dashboard connection semantics.
 
@@ -85,6 +90,7 @@ Builds and the anonymous login smoke check work without live credentials. Real
 WorkOS login and database-backed flows still require a local/test environment.
 Database integration tests skip when no test database is configured.
 
-The public sign-in entry point delegates PKCE, callback verification and MFA to
-AuthKit. Redirect destinations use the shared, regression-tested same-origin validator. Chart
+Social sign-in validates a short-lived, server-stored state and PKCE verifier;
+MFA is verified by WorkOS before a session is saved. Redirect destinations use
+the shared same-origin validator. Chart
 libraries remain static imports inside dynamically loaded chart components.

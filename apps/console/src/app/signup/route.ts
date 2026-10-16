@@ -1,15 +1,16 @@
 import { sanitizeReturnTo } from "@notra/utils/auth-redirect";
-import { getSignUpUrl } from "@workos-inc/authkit-nextjs";
 import { redirect } from "next/navigation";
-import type { NextRequest } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const returnTo = sanitizeReturnTo(
-    request.nextUrl.searchParams.get("returnTo")
+export function GET(request: Request) {
+  const url = new URL(
+    "/signup",
+    process.env.NOTRA_DASHBOARD_URL ?? "https://app.usenotra.com"
   );
-  const url = await getSignUpUrl({
-    returnTo: returnTo ?? "/dashboard",
-    redirectUri: process.env.CONSOLE_WORKOS_REDIRECT_URI,
-  });
-  redirect(url);
+  const returnTo = sanitizeReturnTo(
+    new URL(request.url).searchParams.get("returnTo")
+  );
+  if (returnTo) {
+    url.searchParams.set("returnTo", returnTo);
+  }
+  redirect(url.href);
 }
