@@ -1,0 +1,30 @@
+apps/dashboard/src/types/autopilot.ts
+  s_d23dc21c3bdc65::t_58817f061e370d 34-35
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_d23dc21c3bdc65::t_e551c3bafc578e 50,64-68,219,272-279,289-292,315-358
+apps/dashboard/src/lib/autopilot/hero-image.tsx
+  ai_agent 1
+  s_d23dc21c3bdc65::t_e047b7fee74ee8 2-173
+apps/dashboard/src/constants/autopilot.ts
+  s_d23dc21c3bdc65::t_58817f061e370d 288-303
+apps/dashboard/src/lib/autopilot/run.ts
+  s_d23dc21c3bdc65::t_58817f061e370d 163
+apps/dashboard/src/utils/autopilot-frontmatter.ts
+  s_d23dc21c3bdc65::t_e551c3bafc578e 1-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c7869c52fe4da01f5a82a7b65e590836f1b27ad5",
+  "prompts": {},
+  "sessions": {
+    "s_d23dc21c3bdc65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f6c123f-8e20-4369-bb4f-7c3b3b78269d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
