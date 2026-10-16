@@ -54,6 +54,7 @@ import { ProjectLogo } from "@/components/geo/project-logo";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
   COMMAND_PALETTE_ENTITY_ICONS,
+  COMMAND_PALETTE_SEARCH_MIN_LENGTH,
   COMMAND_PALETTE_SUGGESTED_ROUTES,
   COMMAND_PALETTE_THEME_SHORTCUT,
   COMMAND_ROUTE_LABEL_KEYS,
@@ -222,15 +223,16 @@ export function CommandPalette() {
     },
   });
 
-  const entityHitsBySection = useCommandPaletteEntitySearch({
-    open,
-    enabled: page === null && aiState.status === "idle",
-    organizationId,
-    projectId: activeProjectId,
-    isProjectResolved,
-    slug,
-    query,
-  });
+  const { entityHitsBySection, isSearchPending, isSearchError, retrySearch } =
+    useCommandPaletteEntitySearch({
+      open,
+      enabled: page === null && aiState.status === "idle",
+      organizationId,
+      projectId: activeProjectId,
+      isProjectResolved,
+      slug,
+      query,
+    });
 
   useEffect(() => {
     if (open && !wasOpenRef.current) {
@@ -345,6 +347,9 @@ export function CommandPalette() {
     aiModifierLabel: isApplePlatform ? "⌘" : "Ctrl",
     hasAiCredits,
     entityHitsBySection,
+    isSearchPending,
+    isSearchError,
+    retrySearch,
     recents,
     close,
     navigate,
@@ -587,7 +592,46 @@ function CommandPaletteEmpty({
   controller: CommandPaletteController;
 }) {
   const t = useTranslations("commandPalette");
+  const tCommon = useTranslations("common");
   const { trimmedQuery, aiState, aiModifierLabel } = controller;
+
+  if (trimmedQuery.length < COMMAND_PALETTE_SEARCH_MIN_LENGTH) {
+    return null;
+  }
+
+  if (controller.isSearchPending) {
+    return (
+      <CommandPrimitive.Empty>
+        <div
+          className="text-muted-foreground flex h-[14rem] items-center justify-center gap-2 text-sm"
+          role="status"
+        >
+          <BrailleSpinner />
+          {tCommon("states.loading")}
+        </div>
+      </CommandPrimitive.Empty>
+    );
+  }
+
+  if (controller.isSearchError) {
+    return (
+      <CommandPrimitive.Empty>
+        <div className="flex h-[14rem] flex-col items-center justify-center gap-3 text-sm">
+          <p className="text-muted-foreground" role="status">
+            {tCommon("states.error")}
+          </p>
+          <Button
+            onClick={controller.retrySearch}
+            size="sm"
+            variant="secondary"
+          >
+            {tCommon("actions.retry")}
+          </Button>
+        </div>
+      </CommandPrimitive.Empty>
+    );
+  }
+
   return (
     <CommandPrimitive.Empty>
       <Empty className="py-8 md:py-8">

@@ -220,6 +220,13 @@ export type CommandPaletteNavigatingLabelKey = "opening" | "openingChat";
 
 export type EntityHitsBySection = Record<EntityHitSection, EntityHit[]>;
 
+export interface CommandPaletteEntitySearchResult {
+  entityHitsBySection: EntityHitsBySection;
+  isSearchPending: boolean;
+  isSearchError: boolean;
+  retrySearch: () => void;
+}
+
 export type CommandPaletteAiState =
   | { status: "idle" }
   | { status: "loading" }
@@ -239,7 +246,10 @@ export interface CommandPaletteController {
   hasAiCredits: boolean;
   entityHitsBySection: EntityHitsBySection;
   recents: readonly CommandPaletteRecent[];
+  isSearchPending: boolean;
   close: () => void;
+  isSearchError: boolean;
+  retrySearch: () => void;
   navigate: (path: string) => void;
   selectRoute: (route: CommandRoute) => void;
   selectEntity: (hit: EntityHit) => void;

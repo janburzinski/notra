@@ -1,6 +1,7 @@
 import {
   COMMAND_PALETTE_ENTITY_ICONS,
   COMMAND_PALETTE_NAME_MATCH_MIN_LENGTH,
+  COMMAND_PALETTE_SEARCH_MIN_LENGTH,
   COMMAND_ROUTES,
 } from "@/constants/command-palette";
 import { GEO_PERSONA_DETAIL_QUERY_KEY } from "@/constants/geo-personas";
@@ -12,6 +13,18 @@ import type {
 } from "@/types/components/command-palette";
 import type { NavVisibility } from "@/types/components/nav";
 import { geoCompetitorDetailPath } from "@/utils/geo-competitors";
+
+export function isCommandPaletteSearchPending(
+  query: string,
+  debouncedQuery: string,
+  isWaitingForResults: boolean
+): boolean {
+  const trimmedQuery = query.trim();
+  return (
+    trimmedQuery.length >= COMMAND_PALETTE_SEARCH_MIN_LENGTH &&
+    (trimmedQuery !== debouncedQuery || isWaitingForResults)
+  );
+}
 
 export function isCommandRouteAvailable(
   route: CommandRoute,

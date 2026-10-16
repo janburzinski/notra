@@ -14,6 +14,7 @@ import {
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
+  CommandPaletteEntitySearchResult,
   CommandPaletteSearchData,
   CommandPaletteTranslator,
   EntityHit,
@@ -22,7 +23,10 @@ import type {
   UseCommandPaletteEntitySearchParams,
 } from "@/types/components/command-palette";
 import type { CommonTranslator } from "@/types/i18n";
-import { commandPaletteEntityPath } from "@/utils/command-palette";
+import {
+  commandPaletteEntityPath,
+  isCommandPaletteSearchPending,
+} from "@/utils/command-palette";
 import { truncateSnippet } from "@/utils/format";
 
 const URL_PROTOCOL_PATTERN = /^https?:\/\//;
@@ -319,7 +323,7 @@ export function useCommandPaletteEntitySearch({
   isProjectResolved,
   slug,
   query,
-}: UseCommandPaletteEntitySearchParams): EntityHitsBySection {
+}: UseCommandPaletteEntitySearchParams): CommandPaletteEntitySearchResult {
   const t = useTranslations("commandPalette");
   const tCommon = useTranslations("common");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -339,11 +343,9 @@ export function useCommandPaletteEntitySearch({
     }
   }, [open]);
 
+  const canSearch = open && enabled && organizationId.length > 0;
   const searchEnabled =
-    open &&
-    enabled &&
-    organizationId.length > 0 &&
-    debouncedQuery.length >= COMMAND_PALETTE_SEARCH_MIN_LENGTH;
+    canSearch && debouncedQuery.length >= COMMAND_PALETTE_SEARCH_MIN_LENGTH;
 
   const searchResults = useQuery({
     ...dashboardOrpc.search.global.queryOptions({
@@ -357,8 +359,11 @@ export function useCommandPaletteEntitySearch({
     staleTime: 15_000,
   });
 
+  const isCurrentQuery =
+    query.trim() === debouncedQuery &&
+    debouncedQuery.length >= COMMAND_PALETTE_SEARCH_MIN_LENGTH;
   const entityHits = collectEntityHits(
-    searchResults.data,
+    isCurrentQuery ? searchResults.data : undefined,
     slug,
     isProjectResolved,
     debouncedQuery,
@@ -366,7 +371,7 @@ export function useCommandPaletteEntitySearch({
     tCommon
   );
   const entityHitCount = entityHits.length;
-  const hasSearchData = searchResults.data !== undefined;
+  const hasSearchData = isCurrentQuery && searchResults.data !== undefined;
 
   useEffect(() => {
     if (
@@ -382,5 +387,20 @@ export function useCommandPaletteEntitySearch({
     });
   }, [debouncedQuery, entityHitCount, hasSearchData, searchEnabled]);
 
-  return groupEntityHits(entityHits);
+  return {
+    entityHitsBySection: groupEntityHits(entityHits),
+    isSearchError: searchEnabled && isCurrentQuery && searchResults.isError,
+    retrySearch: () => {
+      void searchResults.refetch();
+    },
+    isSearchPending:
+      canSearch &&
+      isCommandPaletteSearchPending(
+        query,
+        debouncedQuery,
+        !isProjectResolved ||
+          searchResults.isPending ||
+          searchResults.isFetching
+      ),
+  };
 }
