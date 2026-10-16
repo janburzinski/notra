@@ -1,0 +1,82 @@
+apps/dashboard/src/components/content/inline-comments/content-comment-thread-card.tsx
+  s_70da08a6fe7511::t_7a8fe5fd5553c6 137-138,154,157-158,172-173,176,183-184,188,227
+packages/ui/src/components/ui/composer.tsx
+  s_70da08a6fe7511::t_f7592c06ddc018 24,307,315,325-329
+  s_70da08a6fe7511::t_fd0ad2a50f799d 88,100-104,121-126
+apps/dashboard/src/constants/content-overview.ts
+  s_70da08a6fe7511::t_b9fcad62f246b4 1-7,38-44
+apps/dashboard/messages/de.json
+  s_70da08a6fe7511::t_b9fcad62f246b4 6783-6788
+  s_70da08a6fe7511::t_7faafdb922dc04 6782
+  s_70da08a6fe7511::t_b970faa9c6a0bf 6666
+apps/dashboard/src/types/content/inline-comments.ts
+  s_70da08a6fe7511::t_a34efab83039ad 95-96
+apps/dashboard/src/components/content/overview/content-overview.tsx
+  s_70da08a6fe7511::t_b970faa9c6a0bf 44,141,154-155,176-188
+packages/ui/src/constants/composer.ts
+  s_70da08a6fe7511::t_fd0ad2a50f799d 16
+  s_70da08a6fe7511::t_f7592c06ddc018 14-15,17
+apps/dashboard/src/components/content/content-detail-loaded-view.tsx
+  s_70da08a6fe7511::t_ba15eafce32803 136-137,139-140
+apps/dashboard/src/components/content/inline-comments/content-comments-layer.tsx
+  s_70da08a6fe7511::t_8fd44af0b4a40b 187
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_70da08a6fe7511::t_fd0ad2a50f799d 85,97-101,118-123
+  s_70da08a6fe7511::t_f7592c06ddc018 32,303,311,321-325
+apps/dashboard/src/components/content/content-detail-document-actions.tsx
+  s_70da08a6fe7511::t_b9fcad62f246b4 14-15,22-23,37-47,78-88,90-99
+  s_70da08a6fe7511::t_f520bfc64aba9c 3,68,74,89,135
+packages/ui/src/types/composer.ts
+  s_70da08a6fe7511::t_f7592c06ddc018 54
+  s_70da08a6fe7511::t_fd0ad2a50f799d 11-12,53
+apps/ui/registry/notra/composer/constants/composer.ts
+  s_70da08a6fe7511::t_f7592c06ddc018 20-21,23
+  s_70da08a6fe7511::t_fd0ad2a50f799d 22
+apps/dashboard/src/constants/comments.ts
+  s_70da08a6fe7511::t_ba15eafce32803 38
+  s_70da08a6fe7511::t_7ca1846466eaa1 37
+apps/dashboard/src/lib/content/scheduled-publication-destinations.ts
+  s_70da08a6fe7511::t_ed8188a10033b3 145
+apps/ui/registry/notra/composer/types/composer.ts
+  s_70da08a6fe7511::t_fd0ad2a50f799d 13-14,59
+  s_70da08a6fe7511::t_f7592c06ddc018 60
+apps/dashboard/src/components/content/inline-comments/content-comment-field.tsx
+  s_70da08a6fe7511::t_a34efab83039ad 11,24,38-40,42-44,49-50,71-80
+  s_70da08a6fe7511::t_088b10b250c827 41
+apps/dashboard/src/components/content/inline-comments/content-comment-composer.tsx
+  s_70da08a6fe7511::t_a34efab83039ad 7,76-83
+apps/dashboard/src/lib/hooks/use-discussion.ts
+  s_70da08a6fe7511::t_c247efca549f59 301-303
+  s_70da08a6fe7511::t_e2e9bd9965475f 30-33,52,65,69,71,74,113-116,122-124,156-161,207-208,284-300,304-319,326-340
+apps/dashboard/src/lib/hooks/use-content-comment-rail.ts
+  s_70da08a6fe7511::t_ba15eafce32803 9,35-45,47-50,65
+apps/dashboard/src/components/content/inline-comments/content-comments-gutter.tsx
+  s_70da08a6fe7511::t_7ca1846466eaa1 9-14,40
+  s_70da08a6fe7511::t_09647332eeb36d 4,22-34,38-39
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_70da08a6fe7511::t_52b46a1de3c2d4 766-769,771-782
+  s_70da08a6fe7511::t_f520bfc64aba9c 108,787
+  s_70da08a6fe7511::t_ed8188a10033b3 119,751-765,770,783-786,788
+apps/dashboard/messages/en.json
+  s_70da08a6fe7511::t_b9fcad62f246b4 6783-6788
+  s_70da08a6fe7511::t_b970faa9c6a0bf 6666
+  s_70da08a6fe7511::t_fe46d30400beb7 6782
+apps/dashboard/src/components/content/inline-comments/content-inline-comment.tsx
+  s_70da08a6fe7511::t_c247efca549f59 168,291
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d75de30269569d9aa1b478cf083a21ea11d02edf",
+  "prompts": {},
+  "sessions": {
+    "s_70da08a6fe7511": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3bbda86-e10c-4ba4-9774-19b5bd801343",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
