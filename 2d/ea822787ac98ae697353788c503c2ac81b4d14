@@ -1,0 +1,40 @@
+apps/dashboard/src/components/integrations/github/github-publishing-settings.tsx
+  s_5a01a3e585fe00::t_791729160fbb52 51-55,57-64
+apps/dashboard/src/components/integrations/github/github-repository-menu.tsx
+  s_f0eaa872c709a1::t_a6bb186d88f257 99
+apps/dashboard/src/components/integrations/github/github-app-section.tsx
+  s_5a01a3e585fe00::t_02752b560a49e6 52-72
+  s_a64a959749a3d0::t_af4bff0fa7e040 115-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2dea822787ac98ae697353788c503c2ac81b4d14",
+  "prompts": {},
+  "sessions": {
+    "s_5a01a3e585fe00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "87e75a38-9d5f-49e4-af41-e8a7e39c8229",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_a64a959749a3d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1f3993c-40cc-49d4-a92f-cebfad6744d6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_f0eaa872c709a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09545acf-c003-4c29-9060-55615c0eac6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
