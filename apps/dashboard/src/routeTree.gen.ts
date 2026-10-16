@@ -24,6 +24,7 @@ import { Route as SitesVercelDnsRouteImport } from './routes/sites.vercel-dns'
 import { Route as ApiAutumnSplatRouteImport } from './routes/api.autumn.$'
 import { Route as ApiBrandFontCssRouteImport } from './routes/api.brand-font.css'
 import { Route as ApiBrandFontFileRouteImport } from './routes/api.brand-font.file'
+import { Route as ApiC15tSplatRouteImport } from './routes/api.c15t.$'
 import { Route as ApiCommandPaletteNavigateRouteImport } from './routes/api.command-palette.navigate'
 import { Route as ApiCronBrewContactsRouteImport } from './routes/api.cron.brew-contacts'
 import { Route as ApiCronGeoContentGapsRouteImport } from './routes/api.cron.geo-content-gaps'
@@ -164,6 +165,11 @@ const ApiBrandFontCssRoute = ApiBrandFontCssRouteImport.update({
 const ApiBrandFontFileRoute = ApiBrandFontFileRouteImport.update({
   id: '/api/brand-font/file',
   path: '/api/brand-font/file',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiC15tSplatRoute = ApiC15tSplatRouteImport.update({
+  id: '/api/c15t/$',
+  path: '/api/c15t/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCommandPaletteNavigateRoute =
@@ -548,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/api/autumn/$': typeof ApiAutumnSplatRoute
   '/api/brand-font/css': typeof ApiBrandFontCssRoute
   '/api/brand-font/file': typeof ApiBrandFontFileRoute
+  '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/command-palette/navigate': typeof ApiCommandPaletteNavigateRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
@@ -630,6 +637,7 @@ export interface FileRoutesByTo {
   '/api/autumn/$': typeof ApiAutumnSplatRoute
   '/api/brand-font/css': typeof ApiBrandFontCssRoute
   '/api/brand-font/file': typeof ApiBrandFontFileRoute
+  '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/command-palette/navigate': typeof ApiCommandPaletteNavigateRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
@@ -713,6 +721,7 @@ export interface FileRoutesById {
   '/api/autumn/$': typeof ApiAutumnSplatRoute
   '/api/brand-font/css': typeof ApiBrandFontCssRoute
   '/api/brand-font/file': typeof ApiBrandFontFileRoute
+  '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/command-palette/navigate': typeof ApiCommandPaletteNavigateRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
@@ -797,6 +806,7 @@ export interface FileRouteTypes {
     | '/api/autumn/$'
     | '/api/brand-font/css'
     | '/api/brand-font/file'
+    | '/api/c15t/$'
     | '/api/command-palette/navigate'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
@@ -879,6 +889,7 @@ export interface FileRouteTypes {
     | '/api/autumn/$'
     | '/api/brand-font/css'
     | '/api/brand-font/file'
+    | '/api/c15t/$'
     | '/api/command-palette/navigate'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
@@ -961,6 +972,7 @@ export interface FileRouteTypes {
     | '/api/autumn/$'
     | '/api/brand-font/css'
     | '/api/brand-font/file'
+    | '/api/c15t/$'
     | '/api/command-palette/navigate'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
@@ -1044,6 +1056,7 @@ export interface RootRouteChildren {
   ApiAutumnSplatRoute: typeof ApiAutumnSplatRoute
   ApiBrandFontCssRoute: typeof ApiBrandFontCssRoute
   ApiBrandFontFileRoute: typeof ApiBrandFontFileRoute
+  ApiC15tSplatRoute: typeof ApiC15tSplatRoute
   ApiCommandPaletteNavigateRoute: typeof ApiCommandPaletteNavigateRoute
   ApiCronBrewContactsRoute: typeof ApiCronBrewContactsRoute
   ApiCronGeoContentGapsRoute: typeof ApiCronGeoContentGapsRoute
@@ -1203,6 +1216,13 @@ declare module '@tanstack/react-router' {
       path: '/api/brand-font/file'
       fullPath: '/api/brand-font/file'
       preLoaderRoute: typeof ApiBrandFontFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/c15t/$': {
+      id: '/api/c15t/$'
+      path: '/api/c15t/$'
+      fullPath: '/api/c15t/$'
+      preLoaderRoute: typeof ApiC15tSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/command-palette/navigate': {
@@ -1782,6 +1802,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAutumnSplatRoute: ApiAutumnSplatRoute,
   ApiBrandFontCssRoute: ApiBrandFontCssRoute,
   ApiBrandFontFileRoute: ApiBrandFontFileRoute,
+  ApiC15tSplatRoute: ApiC15tSplatRoute,
   ApiCommandPaletteNavigateRoute: ApiCommandPaletteNavigateRoute,
   ApiCronBrewContactsRoute: ApiCronBrewContactsRoute,
   ApiCronGeoContentGapsRoute: ApiCronGeoContentGapsRoute,

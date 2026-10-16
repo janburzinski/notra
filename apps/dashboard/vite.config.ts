@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
+import { consentManifest } from "c15t/tanstack-start/build";
 import { nitro } from "nitro/vite";
 import { defineConfig, loadEnv } from "vite";
 
@@ -69,6 +70,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       dashboardWorkflow(),
       tailwindcss(),
+      consentManifest({
+        backendURL: "https://notra-prod-notra.inth.app",
+      }),
       tanstackStart(),
       react({ compiler: true }),
       nitro(),

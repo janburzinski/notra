@@ -141,7 +141,7 @@ export function DemoApiConsole({ sandbox }: DemoApiConsoleProps) {
             {t("copy")}
           </Button>
         </div>
-        <code className="truncate font-mono text-xs">
+        <code className="ph-no-capture truncate font-mono text-xs">
           {`${sandbox.apiKey.slice(0, 16)}…`}
         </code>
         <p className="text-muted-foreground text-xs">

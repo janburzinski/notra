@@ -1,3 +1,4 @@
+import { isDemoModeClient } from "@notra/utils/demo-mode";
 import type { PostHogConfig } from "posthog-js";
 
 import {
@@ -6,8 +7,9 @@ import {
   resolvePostHogUiHost,
 } from "@/utils/posthog";
 
-export const POSTHOG_PROJECT_TOKEN =
-  process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+export const POSTHOG_PROJECT_TOKEN = isDemoModeClient()
+  ? undefined
+  : process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
 
 export const POSTHOG_INGEST_PATH = "/ingest";
 
@@ -23,19 +25,22 @@ export const POSTHOG_CONFIG = {
   capture_exceptions: true,
   capture_pageleave: true,
   capture_pageview: "history_change",
+  // Nothing is stored until the consent banner grants measurement; a refusal
+  // keeps counting the visitor with PostHog's server-side cookieless hash.
+  cookieless_mode: "on_reject",
   defaults: "2026-05-30",
   disable_capture_url_hashes: true,
-  disable_session_recording: true,
   disable_surveys: true,
-  enable_recording_console_log: false,
+  enable_recording_console_log: true,
   person_profiles: "identified_only",
   save_campaign_params: false,
   save_referrer: false,
+  // Replays only start after measurement consent. Sampling and canvas
+  // capture follow the PostHog project settings. Inputs stay masked; mark
+  // anything else that shows secrets with `ph-no-capture`.
   session_recording: {
-    blockSelector: "img, video, audio, canvas, iframe, object, embed",
     maskAllInputs: true,
     maskCapturedNetworkRequestFn: redactPostHogNetworkRequest,
-    maskTextSelector: "*",
     recordBody: false,
     recordHeaders: false,
   },

@@ -6,6 +6,7 @@ import type { PostHogProperties } from "@notra/posthog/types/posthog";
 import {
   abandonPendingPostHogInit,
   getPostHogInitGeneration,
+  reapplyPostHogMeasurementConsent,
   withPostHog,
 } from "@/lib/analytics/posthog-lazy";
 import { clearPostHogIdentity } from "@/utils/posthog";
@@ -67,5 +68,8 @@ export function trackClientException(
 
 /** Clears persisted user and group attribution after a successful sign-out. */
 export function resetPostHogIdentity(): void {
-  void withPostHog(clearPostHogIdentity).catch(() => undefined);
+  void withPostHog((posthog) => {
+    clearPostHogIdentity(posthog);
+    reapplyPostHogMeasurementConsent(posthog);
+  }).catch(() => undefined);
 }

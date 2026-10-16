@@ -173,7 +173,7 @@ export function McpServerCard({
             </Badge>
           </div>
           <p
-            className="text-muted-foreground truncate font-mono text-xs"
+            className="ph-no-capture text-muted-foreground truncate font-mono text-xs"
             title={server.url}
           >
             {server.url}

@@ -122,7 +122,8 @@ export function BackupCodesPanel({
         <p className="text-muted-foreground text-sm">{l.description}</p>
       </div>
 
-      <ul className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-xl bg-muted/50 px-5 py-4 font-mono text-sm tabular-nums select-all sm:grid-cols-2">
+      {/* ph-no-capture keeps the codes out of session replays. */}
+      <ul className="ph-no-capture grid grid-cols-2 gap-x-6 gap-y-2 rounded-xl bg-muted/50 px-5 py-4 font-mono text-sm tabular-nums select-all sm:grid-cols-2">
         {codes.map((code) => (
           <li className="text-center tracking-wider" key={code}>
             {code}

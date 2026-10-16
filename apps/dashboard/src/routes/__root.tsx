@@ -6,12 +6,21 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import {
+  ConsentBanner,
+  ConsentDialog,
+  ConsentRoot,
+  ConsentTheme,
+  offline,
+} from "c15t/tanstack-start";
 import { use } from "react";
 import { IntlProvider } from "use-intl";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/geist-mono";
 
 import { NotFoundContent } from "@/components/not-found-content";
+import { resolveDashboardConsent } from "@/lib/consent-manager/resolve";
+import { consentComponents, consentTheme } from "@/lib/consent-manager/theme";
 import {
   catalogPreloadLinks,
   getCatalog,
@@ -22,16 +31,18 @@ import { Providers } from "@/utils/providers";
 
 import styles from "@/styles/globals.css?url";
 
-const loadLocale = createServerFn({ method: "GET" }).handler(async () => ({
-  locale: await getLocale(),
-}));
+const loadRootState = createServerFn({ method: "GET" }).handler(async () => {
+  const locale = await getLocale();
+  const consent = await resolveDashboardConsent(locale);
+  return { locale, consent };
+});
 
 export const Route = createRootRoute({
   validateSearch: (search: Record<string, unknown>) => search,
   loader: async () => {
-    const { locale } = await loadLocale();
+    const { locale, consent } = await loadRootState();
     await loadCatalog(locale);
-    return { locale };
+    return { locale, consent };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -64,19 +75,43 @@ export const Route = createRootRoute({
 });
 
 function Root() {
-  const { locale } = Route.useLoaderData();
+  const { locale, consent } = Route.useLoaderData();
   const messages = getCatalog(locale) ?? use(loadCatalog(locale));
+  const app = (
+    <IntlProvider locale={locale} messages={messages} timeZone="UTC">
+      <Providers>
+        <Outlet />
+      </Providers>
+    </IntlProvider>
+  );
   return (
     <html className="dark:scheme-dark" lang={locale} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body className="antialiased">
-        <IntlProvider locale={locale} messages={messages} timeZone="UTC">
-          <Providers>
-            <Outlet />
-          </Providers>
-        </IntlProvider>
+        {consent === null ? (
+          app
+        ) : (
+          <>
+            <ConsentTheme theme={consentTheme} />
+            <ConsentRoot
+              options={{
+                consentCategories: ["necessary", "measurement"],
+                theme: consentTheme,
+                components: consentComponents,
+                ...(process.env.NODE_ENV === "production"
+                  ? {}
+                  : { mode: offline() }),
+              }}
+              state={consent}
+            >
+              {app}
+              <ConsentBanner />
+              <ConsentDialog />
+            </ConsentRoot>
+          </>
+        )}
         <Scripts />
       </body>
     </html>

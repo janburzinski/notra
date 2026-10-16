@@ -248,7 +248,7 @@ function ConnectionSummary({ connection }: McpConnectionSummaryProps) {
       </ConnectionDetail>
       <ConnectionDetail label={t("endpoint")}>
         <span
-          className="block max-w-64 truncate font-mono text-xs"
+          className="ph-no-capture block max-w-64 truncate font-mono text-xs"
           title={connection.url}
         >
           {connection.url}

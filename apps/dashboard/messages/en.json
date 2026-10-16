@@ -351,7 +351,10 @@
     "privacy": {
       "heading": "Privacy",
       "hidePersonalData": "Hide personal data",
-      "hidePersonalDataDescription": "Blur your email and name in the sidebar. Useful when sharing your screen."
+      "hidePersonalDataDescription": "Blur your email and name in the sidebar. Useful when sharing your screen.",
+      "cookies": "Cookie preferences",
+      "cookiesDescription": "Choose whether Notra may use analytics cookies and session recordings to improve the product.",
+      "manageCookies": "Manage"
     },
     "deleteAccount": {
       "heading": "Delete account",

@@ -20,6 +20,7 @@ type PostHogJsModule = typeof import("posthog-js");
 let clientPromise: Promise<PostHog | null> | null = null;
 let readyClient: PostHog | null = null;
 let initGeneration = 0;
+let measurementConsent: boolean | null = null;
 const readyWaiters: Array<(client: PostHog) => void> = [];
 const importPostHogJs = (): Promise<PostHogJsModule> => import("posthog-js");
 
@@ -39,8 +40,30 @@ async function loadAndInit(attempt: number): Promise<PostHog | null> {
     ...POSTHOG_CONFIG,
     tracing_headers: [hostname],
   });
+  reapplyPostHogMeasurementConsent(posthog);
 
   return posthog;
+}
+
+function applyMeasurementConsent(posthog: PostHog, granted: boolean): void {
+  if (granted) {
+    if (!posthog.has_opted_in_capturing()) {
+      posthog.opt_in_capturing({ captureEventName: false });
+    }
+    return;
+  }
+  // With `on_reject`, a pending status already reports as opted out, so check
+  // the explicit status; only a recorded refusal switches to cookieless capture.
+  if (posthog.get_explicit_consent_status() !== "denied") {
+    posthog.opt_out_capturing();
+  }
+}
+
+/** `posthog.reset()` also clears the stored consent, so re-apply it after. */
+export function reapplyPostHogMeasurementConsent(posthog: PostHog): void {
+  if (measurementConsent !== null) {
+    applyMeasurementConsent(posthog, measurementConsent);
+  }
 }
 
 function notifyReady(client: PostHog): void {
@@ -110,6 +133,17 @@ export function abandonPendingPostHogInit(attempt: number): void {
 
 export function getPostHogInitGeneration(): number {
   return initGeneration;
+}
+
+/**
+ * Mirrors the consent banner's measurement choice. Opting in after a refusal
+ * resets PostHog's identity, so callers must re-identify afterwards.
+ */
+export function setPostHogMeasurementConsent(granted: boolean): void {
+  measurementConsent = granted;
+  if (readyClient) {
+    applyMeasurementConsent(readyClient, granted);
+  }
 }
 
 /** Starts loading and initialising posthog-js if it has not started yet. */
