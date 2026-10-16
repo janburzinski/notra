@@ -1,8 +1,11 @@
+import type { WebhookConfig } from "@notra/ai/types/integrations";
 import type { createOctokit } from "@notra/ai/utils/octokit";
 import type { redis } from "@notra/ai/utils/redis";
 import { Data } from "effect";
 import type React from "react";
 import type { useTranslations } from "use-intl";
+
+import type { useGitHubWebhookActions } from "@/hooks/use-github-webhook-actions";
 
 import type messages from "../../../messages/en.json";
 import type { GitHubIntegration, GitHubRepository } from "../integrations";
@@ -18,8 +21,7 @@ export interface GitHubRepositoryRowProps {
 export interface GitHubRepositoryActionsProps {
   onMigrate: () => void;
   isMigrating: boolean;
-  onToggleWebhooks: () => void;
-  webhooksOpen: boolean;
+  webhook: GitHubWebhookActions | null;
   integration: GitHubIntegration;
   organizationId: string;
   onManageRepositories: () => void;
@@ -34,9 +36,29 @@ export interface GitHubRepositoryMenuProps extends GitHubRepositoryActionsProps 
   onDialog: (dialog: GitHubRepositoryDialog) => void;
 }
 
+export type GitHubWebhookAction = "setup" | "repair" | "rotate";
+
+export interface UseGitHubWebhookActionsOptions {
+  organizationId: string;
+  repository: GitHubRepository | undefined;
+}
+
+export type GitHubWebhookActions = ReturnType<typeof useGitHubWebhookActions>;
+
 export interface GitHubWebhookSettingsProps {
   repository: GitHubRepository;
-  organizationId: string;
+  webhook: GitHubWebhookActions;
+}
+
+export interface GitHubSettingRowProps {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  htmlFor?: string;
+  children?: React.ReactNode;
+}
+
+export interface GitHubWebhookCredentialsProps {
+  webhook: Pick<WebhookConfig, "webhookUrl" | "webhookSecret">;
 }
 
 export interface GitHubWebhookRotationDialogProps {
@@ -44,6 +66,15 @@ export interface GitHubWebhookRotationDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   isPending: boolean;
+}
+
+export interface GitHubWebhookRepairDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  isPending: boolean;
+  disabled: boolean;
+  error: Error | null;
 }
 
 export type GitHubClient = ReturnType<typeof createOctokit>;
@@ -165,10 +196,19 @@ export interface GitHubAccountCardProps {
   onDisconnect: () => void;
 }
 
+export interface GitHubPublishingEditor {
+  repositoryId: string;
+  contentType: GitHubPublishContentType;
+}
+
 export interface GitHubPublishingSettingsProps {
   organizationId: string;
   repository: GitHubRepository;
   disabled?: boolean;
+  openEditor: GitHubPublishingEditor | null;
+  onOpenEditorChange: React.Dispatch<
+    React.SetStateAction<GitHubPublishingEditor | null>
+  >;
 }
 
 export interface GitHubBranchPickerProps {
@@ -219,12 +259,13 @@ export interface GitHubContentPathMutationVariables {
 }
 
 export interface GitHubPublishingPathFieldsProps {
-  contentType: GitHubPublishContentType;
   contentPath: string | null;
   directory: string;
   disabled?: boolean;
   imagePath: string | null;
   isSaving?: boolean;
+  onCancel: () => void;
+  onDirtyChange: (dirty: boolean) => void;
   onSave: (paths: {
     contentPath: string | null;
     imagePath: string | null;

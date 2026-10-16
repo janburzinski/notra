@@ -4433,16 +4433,25 @@
         "limitNotice": "Showing {shown} of {total} repositories. Scroll for more."
       },
       "webhookSettings": {
+        "title": "Webhook",
+        "description": "Add this URL and secret to the repository's webhook in GitHub.",
+        "repair": "Repair",
+        "repairTitle": "Repair webhook",
+        "repaired": "Webhook updated in GitHub. Redeliver missed events there if needed.",
+        "repairDescription": "Update one active Notra webhook with this URL and secret. Requires GitHub webhook permissions. Past events aren't resent.",
+        "rowConfigured": "Secret created. View the URL and secret to add in GitHub.",
+        "rowNotConfigured": "No secret yet. Set one up to receive repository events.",
+        "view": "View",
+        "setUp": "Set up",
         "secretGenerated": "Webhook secret generated. Update it in GitHub.",
         "loading": "Loading webhook settings…",
-        "notConfigured": "No webhook configured.",
+        "notConfigured": "No webhook secret yet.",
         "generate": "Generate webhook secret",
         "urlCopied": "Webhook URL copied",
-        "hide": "Hide",
-        "show": "Show",
+        "hideSecret": "Hide secret",
+        "showSecret": "Show secret",
         "secretCopied": "Webhook secret copied",
-        "copySecret": "Copy secret",
-        "openGitHub": "Open GitHub webhooks"
+        "openGitHub": "Open in GitHub"
       },
       "rotationDialog": {
         "title": "Regenerate webhook secret?",
@@ -4465,7 +4474,14 @@
         "noResults": "No branches found."
       },
       "repositoryRow": {
-        "noRepository": "No repository configured. Choose Edit repository from the menu to finish setup."
+        "noRepository": "No repository configured. Choose Edit repository from the menu to finish setup.",
+        "viaApp": "Connected through the GitHub App",
+        "viaToken": "Connected with an access token",
+        "statusTitle": "Status",
+        "statusActive": "Active. Notra uses this repository for content and publishing.",
+        "statusPaused": "Paused. Notra won't use this repository until you turn it back on.",
+        "branchTitle": "Branch",
+        "branchDescription": "Notra publishes content to this branch."
       },
       "preview": {
         "blogPosts": "Blog posts"
@@ -4480,8 +4496,8 @@
         "updateToken": "Update access token",
         "switching": "Switching…",
         "switchToApp": "Switch to GitHub App",
-        "hideWebhooks": "Hide webhooks",
-        "webhookSettings": "Webhook settings",
+        "webhookSetup": "Set up webhook",
+        "repairWebhook": "Repair webhook",
         "pause": "Pause repository",
         "enable": "Enable repository",
         "remove": "Remove repository"
@@ -4490,9 +4506,9 @@
         "label": "{type, select, changelog {Changelog} blog_post {Blog post} other {Content}}"
       },
       "pathFields": {
+        "folder": "Folder",
         "contentPath": "Content file path",
         "imagePath": "Image file path",
-        "save": "Save {type, select, changelog {changelog} blog_post {blog post} other {content}} paths",
         "contentPathInvalid": "Use a repository-relative .md or .mdx path that includes :slug, for example blog/:slug.md",
         "imagePathInvalid": "Use a repository-relative path that includes :slug and has no file extension, for example public/blog/:slug/image"
       },
@@ -4500,7 +4516,10 @@
         "saveFolderFailed": "Failed to save {type, select, changelog {changelog} blog_post {blog post} other {content}} folder",
         "savePathsFailed": "Failed to save {type, select, changelog {changelog} blog_post {blog post} other {content}} paths",
         "publishAriaLabel": "Publish {type, select, changelog {changelogs} blog_post {blog posts} other {content}} to {repository}",
-        "loadFolderFailed": "Unable to load the {type, select, changelog {Changelog} blog_post {Blog post} other {content}} folder."
+        "loadFolderFailed": "Unable to load the {type, select, changelog {Changelog} blog_post {Blog post} other {content}} folder.",
+        "editPaths": "Edit paths",
+        "editPathsAriaLabel": "Edit {type, select, changelog {changelog} blog_post {blog post} other {content}} paths",
+        "unsavedChanges": "Unsaved changes"
       },
       "directoryPicker": {
         "createdOnPublish": "This folder will be created when you publish.",
@@ -4539,10 +4558,13 @@
         "save": "Save repositories"
       },
       "appSection": {
+        "connectedAccounts": "Connected accounts",
         "loadFailed": "Unable to load GitHub accounts.",
-        "connectedAccounts": "Connected GitHub accounts",
         "connectTitle": "Connect the GitHub App",
+        "connectDescription": "Install the app to choose repositories and publish through pull requests.",
         "connectWithToken": "Connect with access token",
+        "tokenTitle": "Access token",
+        "tokenDescription": "Connect a single repository with a personal access token instead.",
         "title": "GitHub App"
       }
     },

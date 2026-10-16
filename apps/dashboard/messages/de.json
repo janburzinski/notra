@@ -4245,7 +4245,7 @@
       "oauth": "OAuth",
       "regenerateSecret": "Secret neu erstellen",
       "youDoNotHaveAccess": "Du hast keinen Zugriff auf diese Organisation.",
-      "personalAccessToken": "Persönlicher Zugriffstoken",
+      "personalAccessToken": "Persönlicher Accesstoken",
       "addGithubAccount": "GitHub-Konto hinzufügen"
     },
     "githubForms": {
@@ -4255,9 +4255,9 @@
       "repoNameRequired": "Repository-Name ist erforderlich",
       "repoUrlRequired": "Repository-URL ist erforderlich",
       "repoUrlInvalid": "Ungültige GitHub-Repository-URL oder ungültiges Format. Verwende: https://github.com/owner/repo, git@github.com:owner/repo oder owner/repo",
-      "tokenRequired": "Persönlicher Zugriffstoken ist erforderlich",
-      "tokenTooLong": "Persönlicher Zugriffstoken ist zu lang",
-      "tokenInvalid": "Gib einen gültigen persönlichen GitHub-Zugriffstoken ein"
+      "tokenRequired": "Persönlicher Accesstoken ist erforderlich",
+      "tokenTooLong": "Persönlicher Accesstoken ist zu lang",
+      "tokenInvalid": "Gib einen gültigen persönlichen GitHub-Accesstoken ein"
     },
     "addRepository": {
       "private": "(Privat)",
@@ -4265,9 +4265,9 @@
       "invalidFormat": "Ungültiges Repository-Format",
       "added": "Repository erfolgreich hinzugefügt",
       "descriptionSelect": "Wähle ein Repository aus deinem GitHub-Konto aus, um Integrationen zu aktivieren.",
-      "descriptionManual": "Gib ein Repository als owner/repo ein (z. B. facebook/react) oder füge eine GitHub-URL ein. Für private Repositories braucht deine Integration einen gültigen Zugriffstoken.",
+      "descriptionManual": "Gib ein Repository als owner/repo ein (z. B. facebook/react) oder füge eine GitHub-URL ein. Für private Repositories braucht deine Integration einen gültigen Accesstoken.",
       "manualPlaceholder": "facebook/react oder https://github.com/facebook/react",
-      "noToken": "Kein Zugriffstoken verfügbar. Gib das Repository als owner/repo ein oder füge eine GitHub-URL ein."
+      "noToken": "Kein Accesstoken verfügbar. Gib das Repository als owner/repo ein oder füge eine GitHub-URL ein."
     },
     "affectedTriggers": {
       "schedulesLabel": "{count, plural, one {Dieser Zeitplan wird deaktiviert:} other {Diese Zeitpläne werden deaktiviert:}}",
@@ -4321,8 +4321,8 @@
       "noCredentials": "Keine gespeicherten Zugangsdaten. Verbinde die GitHub App, um zu veröffentlichen.",
       "addedBy": "Hinzugefügt von {name} am {date}",
       "createdOn": "Erstellt am {date}",
-      "addToken": "Persönlichen Zugriffstoken hinzufügen",
-      "editToken": "Persönlichen Zugriffstoken bearbeiten",
+      "addToken": "Persönlichen Accesstoken hinzufügen",
+      "editToken": "Persönlichen Accesstoken bearbeiten",
       "noRepositories": "Keine Repositories konfiguriert",
       "repositoriesConfigured": "{count, plural, one {# Repository konfiguriert} other {# Repositories konfiguriert}}",
       "enabledToast": "Integration aktiviert",
@@ -4342,13 +4342,13 @@
     },
     "legacy": {
       "editToken": {
-        "title": "Persönlichen Zugriffstoken aktualisieren",
+        "title": "Persönlichen Accesstoken aktualisieren",
         "descriptionWithRepo": "Ersetze den GitHub-Token, der für {repository} verwendet wird.",
         "description": "Ersetze den GitHub-Token, der für diese Integration verwendet wird.",
-        "label": "Persönlicher GitHub-Zugriffstoken",
+        "label": "Persönlicher GitHub-Accesstoken",
         "help": "<link>Erstelle einen Token auf GitHub</link> mit dem Scope <code>repo</code>.",
         "save": "Token speichern",
-        "updated": "Persönlicher Zugriffstoken aktualisiert"
+        "updated": "Persönlicher Accesstoken aktualisiert"
       },
       "add": {
         "title": "GitHub-Integration hinzufügen",
@@ -4360,7 +4360,7 @@
         "viewOnGitHub": "Auf GitHub ansehen",
         "defaultBranch": "Standard-Branch",
         "detecting": "Wird erkannt…",
-        "token": "Persönlicher Zugriffstoken",
+        "token": "Persönlicher Accesstoken",
         "privateWarning": "Dieses Repository scheint privat zu sein oder wurde nicht gefunden. Für den Zugriff ist ein Token erforderlich.",
         "publicHint": "Nur für private Repositories erforderlich. Öffentliche Repos funktionieren ohne Token.",
         "tokenPlaceholder": "ghp_... (leer lassen für öffentliche Repos)",
@@ -4433,16 +4433,25 @@
         "limitNotice": "{shown} von {total} Repositories werden angezeigt. Scrolle für mehr."
       },
       "webhookSettings": {
+        "title": "Webhook",
+        "description": "Trage URL und Secret im Webhook des Repositorys auf GitHub ein.",
+        "repair": "Reparieren",
+        "repairTitle": "Webhook reparieren",
+        "repaired": "Webhook in GitHub aktualisiert. Verpasste Events kannst du dort erneut senden.",
+        "repairDescription": "Aktualisiert einen aktiven Notra-Webhook mit URL und Secret. Erfordert GitHub-Webhook-Berechtigungen. Vergangene Events werden nicht erneut gesendet.",
+        "rowConfigured": "Secret erstellt. Zeig URL und Secret an, um sie in GitHub einzutragen.",
+        "rowNotConfigured": "Noch kein Secret. Richte eins ein, um Repository-Events zu empfangen.",
+        "view": "Anzeigen",
+        "setUp": "Einrichten",
         "secretGenerated": "Webhook-Secret erstellt. Aktualisiere es in GitHub.",
         "loading": "Webhook-Einstellungen werden geladen…",
-        "notConfigured": "Kein Webhook konfiguriert.",
+        "notConfigured": "Noch kein Webhook-Secret.",
         "generate": "Webhook-Secret erstellen",
         "urlCopied": "Webhook-URL kopiert",
-        "hide": "Verbergen",
-        "show": "Anzeigen",
+        "hideSecret": "Secret verbergen",
+        "showSecret": "Secret anzeigen",
         "secretCopied": "Webhook-Secret kopiert",
-        "copySecret": "Secret kopieren",
-        "openGitHub": "GitHub-Webhooks öffnen"
+        "openGitHub": "In GitHub öffnen"
       },
       "rotationDialog": {
         "title": "Webhook-Secret neu erstellen?",
@@ -4465,7 +4474,14 @@
         "noResults": "Keine Branches gefunden."
       },
       "repositoryRow": {
-        "noRepository": "Kein Repository konfiguriert. Wähle im Menü Repository bearbeiten, um die Einrichtung abzuschließen."
+        "noRepository": "Kein Repository konfiguriert. Wähle im Menü Repository bearbeiten, um die Einrichtung abzuschließen.",
+        "viaApp": "Über die GitHub App verbunden",
+        "viaToken": "Mit Accesstoken verbunden",
+        "statusTitle": "Status",
+        "statusActive": "Aktiv. Notra nutzt dieses Repository für Inhalte und Veröffentlichungen.",
+        "statusPaused": "Pausiert. Notra nutzt dieses Repository erst wieder, wenn du es aktivierst.",
+        "branchTitle": "Branch",
+        "branchDescription": "Notra veröffentlicht Inhalte in diesem Branch."
       },
       "preview": {
         "blogPosts": "Blogbeiträge"
@@ -4477,11 +4493,11 @@
         "ariaLabel": "{name} verwalten",
         "manageSelection": "Auswahl verwalten",
         "editRepository": "Repository bearbeiten",
-        "updateToken": "Zugriffstoken aktualisieren",
+        "updateToken": "Accesstoken aktualisieren",
         "switching": "Wird gewechselt…",
         "switchToApp": "Zur GitHub App wechseln",
-        "hideWebhooks": "Webhooks ausblenden",
-        "webhookSettings": "Webhook-Einstellungen",
+        "webhookSetup": "Webhook einrichten",
+        "repairWebhook": "Webhook reparieren",
         "pause": "Repository pausieren",
         "enable": "Repository aktivieren",
         "remove": "Repository entfernen"
@@ -4490,9 +4506,9 @@
         "label": "{type, select, changelog {Changelog} blog_post {Blogbeitrag} other {Inhalt}}"
       },
       "pathFields": {
+        "folder": "Ordner",
         "contentPath": "Dateipfad für Inhalte",
         "imagePath": "Dateipfad für Bilder",
-        "save": "Pfade für {type, select, changelog {Changelogs} blog_post {Blogbeiträge} other {Inhalte}} speichern",
         "contentPathInvalid": "Nutze einen Pfad relativ zum Repository mit .md oder .mdx und :slug, zum Beispiel blog/:slug.md",
         "imagePathInvalid": "Nutze einen Pfad relativ zum Repository mit :slug und ohne Dateiendung, zum Beispiel public/blog/:slug/image"
       },
@@ -4500,7 +4516,10 @@
         "saveFolderFailed": "Ordner für {type, select, changelog {Changelogs} blog_post {Blogbeiträge} other {Inhalte}} konnte nicht gespeichert werden",
         "savePathsFailed": "Pfade für {type, select, changelog {Changelogs} blog_post {Blogbeiträge} other {Inhalte}} konnten nicht gespeichert werden",
         "publishAriaLabel": "{type, select, changelog {Changelogs} blog_post {Blogbeiträge} other {Inhalte}} in {repository} veröffentlichen",
-        "loadFolderFailed": "Der Ordner für {type, select, changelog {Changelogs} blog_post {Blogbeiträge} other {Inhalte}} konnte nicht geladen werden."
+        "loadFolderFailed": "Der Ordner für {type, select, changelog {Changelogs} blog_post {Blogbeiträge} other {Inhalte}} konnte nicht geladen werden.",
+        "editPaths": "Pfade bearbeiten",
+        "editPathsAriaLabel": "Pfade für {type, select, changelog {Changelogs} blog_post {Blogbeiträge} other {Inhalte}} bearbeiten",
+        "unsavedChanges": "Nicht gespeichert"
       },
       "directoryPicker": {
         "createdOnPublish": "Dieser Ordner wird beim Veröffentlichen erstellt.",
@@ -4539,10 +4558,13 @@
         "save": "Repositories speichern"
       },
       "appSection": {
+        "connectedAccounts": "Verbundene Konten",
         "loadFailed": "GitHub-Konten konnten nicht geladen werden.",
-        "connectedAccounts": "Verbundene GitHub-Konten",
         "connectTitle": "GitHub App verbinden",
-        "connectWithToken": "Mit Zugriffstoken verbinden",
+        "connectDescription": "Installiere die App, um Repositories auszuwählen und über Pull Requests zu veröffentlichen.",
+        "connectWithToken": "Mit Accesstoken verbinden",
+        "tokenTitle": "Accesstoken",
+        "tokenDescription": "Verbinde stattdessen ein einzelnes Repository mit einem persönlichen Accesstoken.",
         "title": "GitHub App"
       }
     },

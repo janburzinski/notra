@@ -34,6 +34,7 @@ import {
   GitHubRequestError,
   GitHubRepositoryCacheError,
   GitHubResponseError,
+  GitHubWebhookRepairPreconditionError,
 } from "../schemas/github-operations";
 import type {
   GitHubAppPublishAccess,
@@ -60,6 +61,7 @@ import {
 } from "../utils/octokit";
 import { hasOrganizationAccess } from "../utils/organization-access";
 import { redis } from "../utils/redis";
+import { repairGitHubWebhook } from "../utils/repair-github-webhook";
 import { runGitHubEffect } from "../utils/run-github-effect";
 import { saveGitHubRepositorySelection } from "../utils/save-github-repository-selection";
 import { getConfiguredAppUrl } from "../utils/url";
@@ -1300,6 +1302,7 @@ export async function getRepositoryById(repositoryId: string) {
       organizationId: integration.organizationId,
       encryptedToken: integration.encryptedToken,
       enabled: integration.enabled,
+      githubAppInstallationId: integration.githubAppInstallationId,
     },
   };
 }
@@ -1829,6 +1832,46 @@ export async function getWebhookConfigForRepository(
     owner: repository.owner,
     repo: repository.repo,
   };
+}
+
+export async function repairWebhookForRepository(
+  repositoryId: string,
+  userId: string
+) {
+  const webhook = await getWebhookConfigForRepository(repositoryId, userId);
+  const repository = await getRepositoryById(repositoryId);
+  if (
+    !webhook ||
+    !repository?.enabled ||
+    !repository.integration.enabled ||
+    repository.integration.githubAppInstallationId
+  ) {
+    throw new GitHubWebhookRepairPreconditionError({
+      message: "An enabled repository webhook connection is required",
+    });
+  }
+  const token = await getTokenForIntegrationId(repositoryId, {
+    organizationId: repository.integration.organizationId,
+  });
+  if (!token) {
+    throw new GitHubWebhookRepairPreconditionError({
+      message: "A GitHub token with repository webhook permissions is required",
+    });
+  }
+  return repairGitHubWebhook({
+    octokit: createOctokit(token, {
+      requestTimeoutMs: GITHUB_INTERACTIVE_READ_TIMEOUT_MS,
+    }),
+    webhook,
+    organizationId: repository.integration.organizationId,
+    integrationExists: async (integrationId) =>
+      Boolean(
+        await db.query.githubIntegrations.findFirst({
+          where: eq(githubIntegrations.id, integrationId),
+          columns: { id: true },
+        })
+      ),
+  });
 }
 
 function buildWebhookUrl(

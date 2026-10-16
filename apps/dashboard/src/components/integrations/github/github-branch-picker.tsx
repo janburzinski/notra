@@ -97,12 +97,10 @@ export function GitHubBranchPicker({
               branch: repository.defaultBranch ?? t("notSelected"),
               repository: `${repository.owner}/${repository.repo}`,
             })}
-            className="text-muted-foreground h-7 max-w-52 min-w-0 gap-1.5 px-2 font-normal"
+            className="max-w-52 min-w-0 gap-1.5 font-normal"
             disabled={isPending}
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => event.stopPropagation()}
             size="sm"
-            variant="ghost"
+            variant="outline"
           />
         }
       >
@@ -119,9 +117,8 @@ export function GitHubBranchPicker({
         </span>
       </PopoverTrigger>
       <PopoverContent
-        align="start"
+        align="end"
         className="h-68 w-72 gap-0 overflow-hidden p-0"
-        onClick={(event) => event.stopPropagation()}
       >
         <GitHubBranchPanelTransition
           creating={creating}

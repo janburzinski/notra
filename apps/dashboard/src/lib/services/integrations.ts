@@ -40,6 +40,7 @@ const integrationFetchers = {
           repo: repo.repo,
           defaultBranch: repo.defaultBranch,
           enabled: repo.enabled,
+          hasWebhook: Boolean(repo.encryptedWebhookSecret),
           outputs: repo.outputs.map((output) => ({
             id: output.id,
             outputType: output.outputType,

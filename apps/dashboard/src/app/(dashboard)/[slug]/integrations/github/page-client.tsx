@@ -20,6 +20,7 @@ export default function PageClient({
   organizationSlug,
 }: GitHubSettingsPageProps) {
   const t = useTranslations("integrations.github.page");
+  const tApp = useTranslations("integrations.github.appSection");
   const tIntegrationsShared = useTranslations("integrations.shared");
   const settings = useGitHubSettings(organizationSlug);
   const {
@@ -41,9 +42,9 @@ export default function PageClient({
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-10 px-4 lg:px-6">
         <PageHeading title="GitHub">
-          {githubIntegrations.length > 0 ? (
+          <div className="flex max-w-full flex-wrap items-center gap-2">
             <Button
-              className="gap-1.5"
+              disabled={isLoading || isLoadingLegacyIntegrations}
               onClick={
                 isConnected ? () => handleOpenRepositories() : handleOpenConnect
               }
@@ -54,10 +55,17 @@ export default function PageClient({
                 : tIntegrationsShared("connectGithub")}
               <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
             </Button>
-          ) : null}
+            <Button
+              disabled={isLoading || isLoadingLegacyIntegrations}
+              onClick={() => settings.setLegacyOpen(true)}
+              variant="outline"
+            >
+              {tApp("connectWithToken")}
+            </Button>
+          </div>
         </PageHeading>
-        <GitHubRepositoriesSection {...settings} />
         {showGitHubAppSection ? <GitHubAppSection {...settings} /> : null}
+        <GitHubRepositoriesSection {...settings} />
       </div>
       <ConnectGitHubDialog
         isConnecting={false}

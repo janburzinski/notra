@@ -33,14 +33,8 @@ export function GitHubWebhookRotationDialog({
           <AlertDialogCancel disabled={isPending}>
             {tCommon("actions.cancel")}
           </AlertDialogCancel>
-          <Button
-            variant="destructive"
-            disabled={isPending}
-            onClick={onConfirm}
-          >
-            {isPending
-              ? tCommon("labels.regenerating")
-              : tIntegrationsShared("regenerateSecret")}
+          <Button variant="destructive" loading={isPending} onClick={onConfirm}>
+            {tIntegrationsShared("regenerateSecret")}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

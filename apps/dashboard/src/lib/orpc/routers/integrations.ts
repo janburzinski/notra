@@ -17,6 +17,7 @@ import {
   getTokenForIntegrationId,
   getWebhookConfigForRepository,
   listAvailableRepositories,
+  repairWebhookForRepository,
   setRepositoryOutputConfig,
   toggleOutput,
   updateGitHubIntegration,
@@ -71,6 +72,7 @@ import {
   GitHubInstallationMissingError,
   GitHubMultiRepositoryUnsupportedError,
   GitHubRepositoryAlreadyConnectedError,
+  GitHubWebhookRepairPreconditionError,
 } from "@notra/ai/schemas/github-operations";
 import type { GitHubConnectionMethod } from "@notra/ai/types/github-connection";
 import {
@@ -190,6 +192,7 @@ interface SerializableRepository {
   defaultBranch: string | null;
   enabled: boolean;
   encryptedWebhookSecret?: string | null;
+  hasWebhook?: boolean;
   outputs?: SerializableRepositoryOutput[];
 }
 
@@ -222,15 +225,20 @@ function serializeRepositoryOutput(
 function serializeRepository(
   repository: SerializableRepository
 ): GitHubRepository {
+  let hasWebhook: boolean | undefined;
+  if (repository.encryptedWebhookSecret !== undefined) {
+    hasWebhook = Boolean(repository.encryptedWebhookSecret);
+  } else if (typeof repository.hasWebhook === "boolean") {
+    hasWebhook = repository.hasWebhook;
+  }
+
   return {
     id: repository.id,
     owner: repository.owner,
     repo: repository.repo,
     defaultBranch: repository.defaultBranch,
     enabled: repository.enabled,
-    ...(repository.encryptedWebhookSecret !== undefined
-      ? { hasWebhook: Boolean(repository.encryptedWebhookSecret) }
-      : {}),
+    ...(hasWebhook === undefined ? {} : { hasWebhook }),
     ...(repository.outputs
       ? {
           outputs: repository.outputs.map(serializeRepositoryOutput),
@@ -1140,6 +1148,36 @@ export const integrationsRouter = {
         });
       }),
     webhook: {
+      repair: baseProcedure
+        .input(repositoryInputSchema)
+        .handler(async ({ context, input }) => {
+          assertNotDemo();
+          const auth = await assertOrganizationAccess({
+            headers: context.headers,
+            organizationId: input.organizationId,
+          });
+          await assertActiveSubscription(input.organizationId);
+          await requireRepositoryInOrganization(
+            input.organizationId,
+            input.repositoryId
+          );
+          try {
+            return await repairWebhookForRepository(
+              input.repositoryId,
+              auth.user.id
+            );
+          } catch (error) {
+            if (error instanceof GitHubWebhookRepairPreconditionError) {
+              throw badRequest(error.message);
+            }
+            if (hasGitHubStatus(error, 401) || hasGitHubStatus(error, 403)) {
+              throw forbidden(
+                "GitHub webhook access denied. Check your token permissions."
+              );
+            }
+            throw internalServerError("Webhook repair failed. Please retry.");
+          }
+        }),
       get: baseProcedure
         .input(repositoryInputSchema)
         .use(withOrganizationAccess)
