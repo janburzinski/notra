@@ -26,7 +26,7 @@ Reads the repo root `.env` (only `AI_GATEWAY_API_KEY` is needed). Runs are saved
 
 The content suites import the real dispatcher prompt, skills, user prompt and tool definitions from `@notra/ai`. Only the tools' `execute` functions are swapped for fixture data (`src/fixtures/content-scenarios.ts`), so nothing touches the DB, GitHub or Redis.
 
-Jev (`typesafe-ai/jev`) is the judge for generated text: typed questions, calibrated probabilities, ~300 ms per case.
+Jev (`typesafe-ai/jev-1.14.0`) is the judge for generated text: typed questions, calibrated probabilities, ~300 ms per case.
 
 ## Picking models
 

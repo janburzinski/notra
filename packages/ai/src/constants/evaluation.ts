@@ -1,4 +1,4 @@
-export const EVALUATION_MODEL_ID = "typesafe-ai/jev";
+export const EVALUATION_MODEL_ID = "typesafe-ai/jev-1.14.0";
 
 /** Set to `off`, `false` or `0` to route every classifier back to its LLM. */
 export const EVALUATION_FLAG_ENV = "NOTRA_JEV_CLASSIFIERS";

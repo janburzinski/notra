@@ -200,7 +200,7 @@ export const feedbackClassifierSuite: EvalSuite<
   cases: CASES,
   productionModel: EVALUATION_MODEL_ID,
   defaultContenders: [
-    "typesafe-ai/jev",
+    "typesafe-ai/jev-1.14.0",
     "openai/gpt-6-luna",
     "openai/gpt-5.4-nano",
   ],

@@ -99,7 +99,7 @@ if (!databaseUrl) {
                   probability: modelProbability,
                 },
               },
-              modelId: "typesafe-ai/jev",
+              modelId: "typesafe-ai/jev-1.14.0",
             };
       },
     }),
@@ -541,7 +541,7 @@ if (!databaseUrl) {
     expect((await runDeploymentPipeline(site, candidate)).kind).toBe("failed");
     const saved = await getDeployment(candidate.id);
     expect(saved?.smartDeploymentEvaluation).toMatchObject({
-      modelId: "typesafe-ai/jev",
+      modelId: "typesafe-ai/jev-1.14.0",
       inputsChanged: true,
       changeProbability: 0.96,
     });

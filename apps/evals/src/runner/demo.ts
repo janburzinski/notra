@@ -15,7 +15,7 @@ const DEFAULT_PROFILE: DemoProfile = {
 };
 
 const PROFILES: Record<string, Partial<DemoProfile>> = {
-  "typesafe-ai/jev": {
+  "typesafe-ai/jev-1.14.0": {
     skill: 0.93,
     medianMs: 300,
     errorRate: 0.01,

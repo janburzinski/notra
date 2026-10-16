@@ -37,7 +37,7 @@ context window. They bypass the chat classifier. The content-writer's model is
 unchanged.
 
 For chat, the root agent picks its model per turn with eve's `autoModel`
-(`agent/lib/utils/model.ts`), which asks the `typesafe-ai/jev` evaluation model
+(`agent/lib/utils/model.ts`), which asks the `typesafe-ai/jev-1.14.0` evaluation model
 to choose between the options in `ASSISTANT_AUTO_MODEL_OPTIONS`: a fast model
 for turns answered from general knowledge, the everyday model for anything
 touching the user's content or connected data, and a deep model for long-form

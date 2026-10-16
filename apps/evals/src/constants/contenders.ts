@@ -1,6 +1,6 @@
 import type { Contender } from "../types/eval";
 
-export const JEV_MODEL_ID = "typesafe-ai/jev";
+export const JEV_MODEL_ID = "typesafe-ai/jev-1.14.0";
 
 export const CONTENDER_CATALOG: readonly Contender[] = [
   { key: JEV_MODEL_ID, modelId: JEV_MODEL_ID, kind: "jev", label: "Jev" },
