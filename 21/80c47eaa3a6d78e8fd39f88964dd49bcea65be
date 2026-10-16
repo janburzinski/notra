@@ -1,0 +1,23 @@
+apps/dashboard/src/lib/autopilot/readiness.ts
+  s_d23dc21c3bdc65::t_9f463bcb8fc996 39,450-454
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_d23dc21c3bdc65::t_9f463bcb8fc996 195-215
+apps/dashboard/src/lib/autopilot/mentions.ts
+  s_d23dc21c3bdc65::t_9f463bcb8fc996 135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2180c47eaa3a6d78e8fd39f88964dd49bcea65be",
+  "prompts": {},
+  "sessions": {
+    "s_d23dc21c3bdc65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f6c123f-8e20-4369-bb4f-7c3b3b78269d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
