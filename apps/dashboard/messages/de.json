@@ -3424,6 +3424,12 @@
     },
     "scanActivityStatus": {
       "failed": "Der letzte Scan wurde {when} vorzeitig beendet.",
+      "running": "Scan läuft",
+      "starting": "Neuer Scan startet…",
+      "completed": "Letzter Scan {when}",
+      "answered": "{checks} von {total} beantwortet",
+      "summary": "{answers, plural, one {# Antwort} other {# Antworten}} · {mentions} erwähnt",
+      "progressLabel": "Scan-Fortschritt",
       "empty": {
         "title": "Noch keine Antworten",
         "description": "Die Antworten der KI-Engines erscheinen hier, sobald der erste Scan gelaufen ist."
@@ -3464,14 +3470,13 @@
         "mention": "Erwähnung"
       },
       "status": {
-        "running": "Antwort wird generiert…",
+        "running": "Wird generiert…",
+        "queued": "In Warteschlange",
         "missing": "Keine Antwort gespeichert"
       },
       "loadError": "Scan-Antworten konnten nicht geladen werden.",
       "unavailable": "Dieser Scan ist nicht mehr verfügbar.",
-      "waiting": "Warte auf die ersten Antworten. Sie erscheinen hier, sobald ein Batch fertig ist.",
       "empty": "Keine gespeicherten Antworten für diese Auswahl.",
-      "progress": "{checks} von {total} Antworten",
       "itemMissing": "fehlend",
       "itemAnswers": "Antworten",
       "viewLabel": "Scan-Ergebnistyp",

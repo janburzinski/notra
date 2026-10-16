@@ -3424,6 +3424,12 @@
     },
     "scanActivityStatus": {
       "failed": "The last scan stopped early {when}.",
+      "running": "Scanning",
+      "starting": "Starting a new scan…",
+      "completed": "Last scan {when}",
+      "answered": "{checks} of {total} answered",
+      "summary": "{answers, plural, one {# answer} other {# answers}} · {mentions} mentioned",
+      "progressLabel": "Scan progress",
       "empty": {
         "title": "No answers yet",
         "description": "Answers from each AI engine show up here after the first scan runs."
@@ -3464,14 +3470,13 @@
         "mention": "Mention"
       },
       "status": {
-        "running": "Generating answer…",
+        "running": "Generating…",
+        "queued": "Queued",
         "missing": "No answer saved"
       },
       "loadError": "Could not load scan answers.",
       "unavailable": "This scan is no longer available.",
-      "waiting": "Waiting for the first answers. They appear here as each batch finishes.",
       "empty": "No saved answers for this selection.",
-      "progress": "{checks} of {total} answers",
       "itemMissing": "missing",
       "itemAnswers": "answers",
       "viewLabel": "Scan result type",

@@ -9,6 +9,7 @@ import {
   GEO_SCAN_RUNS_PAGE_SIZE,
 } from "../constants/geo-scan-history";
 import type {
+  GeoLiveScanRowsInput,
   GeoScanRunInput,
   GeoScanRunsInput,
   GeoScanRunSummary,
@@ -91,6 +92,21 @@ const scanRunColumns = {
   plan: true,
 } as const;
 
+const resultColumns = {
+  id: geoMentionChecks.id,
+  prompt: geoMentionChecks.prompt,
+  engine: geoMentionChecks.engine,
+  mentioned: geoMentionChecks.mentioned,
+  position: geoMentionChecks.position,
+  language: geoMentionChecks.language,
+  turn: geoMentionChecks.turn,
+  sequenceId: geoMentionChecks.sequenceId,
+  sources: sql<number>`jsonb_array_length(${geoMentionChecks.sources})`.mapWith(
+    Number
+  ),
+  capturedAt: geoMentionChecks.capturedAt,
+};
+
 export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
   input: GeoScanRunInput
 ) {
@@ -127,26 +143,13 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
     input.engine ? eq(geoMentionChecks.engine, input.engine) : undefined
   );
   const tasks = scan.plan?.tasks ?? [];
+  const live = scan.status === "running" && tasks.length > 0;
   const [results, totals, saved] = yield* geoDb(
     "scan results lookup failed",
     () =>
       Promise.all([
         db
-          .select({
-            id: geoMentionChecks.id,
-            prompt: geoMentionChecks.prompt,
-            engine: geoMentionChecks.engine,
-            mentioned: geoMentionChecks.mentioned,
-            position: geoMentionChecks.position,
-            language: geoMentionChecks.language,
-            turn: geoMentionChecks.turn,
-            sequenceId: geoMentionChecks.sequenceId,
-            sources:
-              sql<number>`jsonb_array_length(${geoMentionChecks.sources})`.mapWith(
-                Number
-              ),
-            capturedAt: geoMentionChecks.capturedAt,
-          })
+          .select(resultColumns)
           .from(geoMentionChecks)
           .where(resultFilter)
           .orderBy(asc(geoMentionChecks.createdAt), asc(geoMentionChecks.id))
@@ -185,6 +188,17 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
       geoScanAnswerKey(row.promptId, row.engine, row.language, row.turn)
     )
   );
+  const liveRows = live
+    ? yield* loadLiveScanRows({
+        tasks: tasks.filter(
+          (task) => !input.engine || task.engine === input.engine
+        ),
+        offset: input.offset,
+        savedKeys,
+        taskStates: scan.plan?.taskStates ?? {},
+        scopeFilter,
+      })
+    : null;
   const pending = tasks
     .filter(
       (task) =>
@@ -226,6 +240,62 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
       capturedAt: row.capturedAt.toISOString(),
     })),
     total: totals[0]?.filtered ?? 0,
+    live: liveRows,
+  };
+});
+
+/**
+ * One page of a running scan in plan order: every planned answer is a row
+ * from the start, and fills in once its answer is saved, so a just-started
+ * prompt shows up at once and rows never jump while the scan runs.
+ */
+const loadLiveScanRows = Effect.fn("geo.liveScanRows")(function* ({
+  tasks,
+  offset,
+  savedKeys,
+  taskStates,
+  scopeFilter,
+}: GeoLiveScanRowsInput) {
+  const liveOffset = Math.min(
+    offset,
+    Math.max(0, Math.ceil(tasks.length / GEO_SCAN_RESULTS_PAGE_SIZE) - 1) *
+      GEO_SCAN_RESULTS_PAGE_SIZE
+  );
+  const page = tasks.slice(liveOffset, liveOffset + GEO_SCAN_RESULTS_PAGE_SIZE);
+  const answeredPromptIds = [
+    ...new Set(
+      page
+        .filter((task) => savedKeys.has(task.key))
+        .map((task) => task.promptId)
+    ),
+  ];
+  const answers = answeredPromptIds.length
+    ? yield* geoDb("live scan answers lookup failed", () =>
+        db
+          .select({ ...resultColumns, promptId: geoMentionChecks.promptId })
+          .from(geoMentionChecks)
+          .where(
+            and(
+              scopeFilter,
+              inArray(geoMentionChecks.promptId, answeredPromptIds)
+            )
+          )
+      )
+    : [];
+  const answersByKey = new Map(
+    answers.map(({ promptId, ...row }) => [
+      geoScanAnswerKey(promptId, row.engine, row.language, row.turn),
+      { ...row, capturedAt: row.capturedAt.toISOString() },
+    ])
+  );
+  return {
+    offset: liveOffset,
+    total: tasks.length,
+    rows: page.map((task) => ({
+      ...task,
+      status: taskStates[task.key] ?? ("queued" as const),
+      answer: answersByKey.get(task.key) ?? null,
+    })),
   };
 });
 
