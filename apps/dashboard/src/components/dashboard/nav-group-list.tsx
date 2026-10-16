@@ -15,12 +15,12 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
 } from "@notra/ui/components/ui/sidebar";
 import { useTranslations } from "use-intl";
 
 import { HOME_NAV_LINK } from "@/constants/nav";
 import { useHasGeoFeature } from "@/lib/hooks/use-plan";
+import { useSidebarCollapseSettled } from "@/lib/hooks/use-sidebar-collapse-settled";
 import { pickSidebarMode } from "@/lib/hooks/use-sidebar-mode";
 import { usePathname } from "@/lib/navigation";
 import type {
@@ -89,7 +89,7 @@ function NavGroupRow({
   const t = useTranslations("nav");
   const tLabels = useTranslations("common.labels");
   const { isLocked: geoLocked } = useHasGeoFeature();
-  const { state, isMobile } = useSidebar();
+  const collapseSettled = useSidebarCollapseSettled();
   const homeLinkProps = useHomeLinkProps();
   const [first, ...rest] = resolveNavItems(group.links, visibility);
   if (!first) {
@@ -100,7 +100,7 @@ function NavGroupRow({
   const { subRows, groupActive, ownPageActive, showSubRows, showOwnBadge } =
     resolveNavGroupRow(group, first, rest, activeLink);
 
-  if (state === "collapsed" && !isMobile && rest.length > 0) {
+  if (collapseSettled && rest.length > 0) {
     return (
       <SidebarMenuItem>
         <DropdownMenu>
@@ -168,15 +168,16 @@ function NavGroupRow({
       />
       {subRows.length > 0 ? (
         <div
-          className="duration-normal grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] ease-(--sidebar-ease) group-data-[collapsible=icon]:hidden data-[open=true]:grid-rows-[1fr] data-[open=true]:opacity-100 motion-reduce:transition-none"
+          className="duration-normal grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] ease-(--sidebar-ease) group-data-[collapsible=icon]:duration-(--sidebar-duration) data-[open=true]:grid-rows-[1fr] data-[open=true]:opacity-100 group-data-[collapsible=icon]:data-[open=true]:grid-rows-[0fr] group-data-[collapsible=icon]:data-[open=true]:opacity-0 motion-reduce:transition-none"
           data-open={showSubRows}
           inert={!showSubRows}
         >
           <div className="min-h-0 overflow-hidden">
-            <SidebarMenuSub>
+            <SidebarMenuSub className="group-data-[collapsible=icon]:flex">
               {subRows.map((item) => (
                 <SidebarMenuSubItem key={item.link}>
                   <SidebarMenuSubButton
+                    className="group-data-[collapsible=icon]:flex"
                     isActive={item.link === activeLink}
                     render={
                       <SidebarNavLink

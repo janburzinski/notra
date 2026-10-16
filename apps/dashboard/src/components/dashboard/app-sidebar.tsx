@@ -63,10 +63,26 @@ function SidebarBackButton({ onBack }: { onBack: () => void }) {
   );
 }
 
-function SidebarHeaderActions() {
+/**
+ * The toggle sits beside the switcher when expanded and below it when
+ * collapsed. It is positioned absolutely so both spots can be animated along
+ * with the sidebar width instead of reflowing the header in one frame.
+ */
+function JobsSidebarHeader() {
   const { isMobile } = useSidebar();
   // The mobile sheet closes through the topbar toggle instead.
-  return isMobile ? null : <SidebarToggle className="shrink-0" />;
+  if (isMobile) {
+    return <SidebarProjectSwitcher />;
+  }
+
+  return (
+    <div className="relative pr-8 transition-[padding] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:pr-0 group-data-[collapsible=icon]:pb-8 motion-reduce:transition-none">
+      <SidebarProjectSwitcher />
+      <div className="absolute top-2.5 left-[calc(100%-1.75rem)] flex transition-[left,top] duration-(--sidebar-duration) ease-(--sidebar-ease) group-data-[collapsible=icon]:top-13 group-data-[collapsible=icon]:left-0.75 motion-reduce:transition-none">
+        <SidebarToggle />
+      </div>
+    </div>
+  );
 }
 
 export function DashboardSidebar({
@@ -160,16 +176,7 @@ export function DashboardSidebar({
       )}
     >
       <SidebarHeader className="pt-px pb-0.5">
-        {jobsSidebar ? (
-          <div className="flex items-center gap-1 group-data-[collapsible=icon]:flex-col">
-            <div className="min-w-0 flex-1 group-data-[collapsible=icon]:flex-none">
-              <SidebarProjectSwitcher />
-            </div>
-            <SidebarHeaderActions />
-          </div>
-        ) : (
-          <SidebarProjectSwitcher />
-        )}
+        {jobsSidebar ? <JobsSidebarHeader /> : <SidebarProjectSwitcher />}
       </SidebarHeader>
       {jobsSidebar ? <SidebarTopQuickActions /> : null}
       <SidebarContent>
