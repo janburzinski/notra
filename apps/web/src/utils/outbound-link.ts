@@ -5,7 +5,7 @@ import {
   WWW_PREFIX_PATTERN,
 } from "@/constants/logo-link";
 
-export function getOutboundLinkDomain(href?: string) {
+function getOutboundLinkDomain(href?: string) {
   const url = href && URL.canParse(href) ? new URL(href) : null;
   if (!url?.protocol.startsWith("http")) {
     return null;

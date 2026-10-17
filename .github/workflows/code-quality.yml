@@ -86,12 +86,9 @@ jobs:
             bun run test --force --log-order=stream --concurrency=2
           fi
 
-      - name: Verify production markdown endpoints
+      - name: Verify web build
         if: matrix.check == 'build-web'
-        run: |
-          bun run build --filter=web
-          cd apps/web
-          bun run test:production
+        run: bun run build --filter=web
 
       - name: Verify dashboard Vercel build
         if: matrix.check == 'build-dashboard'

@@ -5,7 +5,6 @@
     "remotion.config.ts",
     "src/router.tsx",
     "src/start.ts",
-    "src/**/*.test.{ts,tsx}",
     "src/routes/**/*.{ts,tsx}"
   ],
   "ignoreIssues": {

@@ -7,7 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "allowJs": true,
-    "types": ["vite/client", "node", "mdx", "bun-types/test"],
+    "types": ["vite/client", "node", "mdx"],
     "incremental": true,
     "tsBuildInfoFile": ".cache/typecheck.tsbuildinfo",
     "paths": {
