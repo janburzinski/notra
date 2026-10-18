@@ -17,11 +17,7 @@ import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { NavGroupList } from "./nav-group-list";
 import { useActiveNavLink } from "./nav-jobs";
 import { SidebarLabel } from "./sidebar-label";
-import {
-  SidebarAskAgentButton,
-  SidebarSearchItem,
-  useSidebarSearchPlacement,
-} from "./sidebar-quick-actions";
+import { SidebarAskAgentButton } from "./sidebar-quick-actions";
 
 const DOCS_URL = "https://www.usenotra.com/docs";
 const WORKSPACE_GROUPS = [NAV_WORKSPACE_GROUP];
@@ -31,16 +27,10 @@ export function NavFooter({ slug }: { slug: string }) {
   const visibility = useNavVisibility();
   const [projectParam] = useGeoProjectQueryState();
   const activeLink = useActiveNavLink(slug);
-  const searchPlacement = useSidebarSearchPlacement();
   const docsLabel = tCommon("docs");
 
   return (
     <SidebarGroup>
-      {searchPlacement === "bottom" ? (
-        <SidebarMenu>
-          <SidebarSearchItem />
-        </SidebarMenu>
-      ) : null}
       <NavGroupList
         activeLink={activeLink}
         groups={WORKSPACE_GROUPS}

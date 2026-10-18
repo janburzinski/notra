@@ -3,7 +3,7 @@
 import { SearchIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@notra/ui/components/ui/button";
-import { Kbd, KbdGroup } from "@notra/ui/components/ui/kbd";
+import { Kbd } from "@notra/ui/components/ui/kbd";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -15,52 +15,29 @@ import { useTranslations } from "use-intl";
 import { useCommandPalette } from "@/components/command-palette/command-palette-context";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { AgentIcon } from "@/components/icons/agent-icon";
-import {
-  SIDEBAR_SEARCH_PLACEMENTS,
-  SIDEBAR_SEARCH_PLACEMENT_DEFAULT,
-} from "@/constants/nav";
 import { useDevVariant } from "@/lib/hooks/use-dev-variant";
 
 import { SidebarLabel } from "./sidebar-label";
 
-export function useSidebarSearchPlacement() {
-  return useDevVariant(
-    "sidebar-search",
-    SIDEBAR_SEARCH_PLACEMENTS,
-    SIDEBAR_SEARCH_PLACEMENT_DEFAULT
-  );
-}
-
-function SearchShortcut() {
-  const isApplePlatform = useIsApplePlatform();
-  return (
-    <KbdGroup className="ml-auto group-data-[collapsible=icon]:hidden">
-      <Kbd>{isApplePlatform ? "⌘" : "Ctrl"}</Kbd>
-      <Kbd>K</Kbd>
-    </KbdGroup>
-  );
-}
-
-export function SidebarSearchItem({ field = false }: { field?: boolean }) {
+function SidebarSearchField() {
   const t = useTranslations("common.actions");
   const { setOpen } = useCommandPalette();
+  const isApplePlatform = useIsApplePlatform();
   const label = t("search");
 
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
-        className={
-          field
-            ? "text-muted-foreground cursor-pointer group-data-[collapsible=icon]:shadow-none"
-            : "cursor-pointer"
-        }
+        aria-label={label}
+        className="border-sidebar-border text-muted-foreground hover:text-sidebar-foreground group-data-[collapsible=icon]:text-sidebar-foreground h-9 cursor-pointer rounded-lg border group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:border-transparent"
         onClick={() => setOpen(true)}
         tooltip={label}
-        variant={field ? "outline" : "default"}
       >
         <HugeiconsIcon icon={SearchIcon} />
-        <SidebarLabel>{field ? `${label}…` : label}</SidebarLabel>
-        <SearchShortcut />
+        <SidebarLabel>{`${label}…`}</SidebarLabel>
+        <Kbd className="border-sidebar-border ml-auto rounded-[5px] border bg-transparent px-1.5">
+          {isApplePlatform ? "⌘K" : "Ctrl K"}
+        </Kbd>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
@@ -91,16 +68,11 @@ export function SidebarAskAgentButton() {
   );
 }
 
-/** Search above the navigation, for the top placement. */
+/** Search field above the navigation, styled like an input. */
 export function SidebarTopQuickActions() {
-  const placement = useSidebarSearchPlacement();
-  if (placement === "bottom") {
-    return null;
-  }
-
   return (
     <SidebarMenu className="px-2 pt-1.5 pb-1">
-      <SidebarSearchItem field />
+      <SidebarSearchField />
     </SidebarMenu>
   );
 }

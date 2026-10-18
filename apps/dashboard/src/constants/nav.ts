@@ -287,12 +287,6 @@ export const NAV_WORKSPACE_GROUP: NavGroup = {
   ],
 };
 
-/** Where Search sits in the sidebar. */
-export const SIDEBAR_SEARCH_PLACEMENTS = ["bottom", "top-field"] as const;
-
-export const SIDEBAR_SEARCH_PLACEMENT_DEFAULT: (typeof SIDEBAR_SEARCH_PLACEMENTS)[number] =
-  "bottom";
-
 export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   iris: true,
   analytics: true,
