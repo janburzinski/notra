@@ -1,0 +1,23 @@
+apps/dashboard/src/components/dashboard/nav-footer.tsx
+  s_3a26be25f55be1::t_5ddeba03a59741 20
+apps/dashboard/src/components/dashboard/sidebar-quick-actions.tsx
+  s_3a26be25f55be1::t_5ddeba03a59741 6,22,71,75
+  s_3a26be25f55be1::t_fb687774fe8854 25,31,37-40
+  s_3a26be25f55be1::t_b68215a9853db6 32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b92d3cfc0175893ad1a1377e8b634aa4338a5f37",
+  "prompts": {},
+  "sessions": {
+    "s_3a26be25f55be1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3456076c-5ac5-41a7-8967-56764d4d034f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
