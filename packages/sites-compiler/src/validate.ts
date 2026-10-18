@@ -18,6 +18,7 @@ import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import { isCustomScriptPath } from "@notra/sites-core/utils/custom-scripts";
 import { filterSiteFiles } from "@notra/sites-core/utils/site-ignore";
+import { tagSlug } from "@notra/sites-core/utils/tags";
 import { Parser } from "acorn";
 
 import {
@@ -40,6 +41,7 @@ import type {
   SubstitutedSources,
 } from "./types/validate";
 import {
+  categoryWarnings,
   featuredSlugWarnings,
   unknownConfigKeyWarnings,
 } from "./utils/config-checks";
@@ -397,6 +399,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
   const entries: SiteEntry[] = [];
   const seenSlugs = new Map<string, string>();
   let unreadEntries = 0;
+  const blogTags = new Set<string>();
   for (const [path, content] of files) {
     const candidate = entryCandidate(path);
     if (!candidate || importedPaths.has(path)) {
@@ -428,9 +431,20 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
     }
     seenSlugs.set(key, path);
     const substituted = sources.get(path) ?? content;
-    diagnostics.push(
-      ...parseEntryFrontmatter(path, candidate.area, substituted).diagnostics
+    const frontmatter = parseEntryFrontmatter(
+      path,
+      candidate.area,
+      substituted
     );
+    diagnostics.push(...frontmatter.diagnostics);
+    if (candidate.area === "blog") {
+      for (const tag of frontmatter.data?.tags ?? []) {
+        const slug = tagSlug(tag);
+        if (slug) {
+          blogTags.add(slug);
+        }
+      }
+    }
     if (candidate.format === "md") {
       diagnostics.push(...blockedMarkdownHtml(path, substituted));
       if (substituted !== content) {
@@ -455,6 +469,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
       });
     }
     diagnostics.push(...featuredSlugWarnings(config, entries));
+    diagnostics.push(...categoryWarnings(config, blogTags));
   }
   entries.sort((a, b) => a.path.localeCompare(b.path));
   return {

@@ -138,7 +138,7 @@ An author object takes the same fields as an entry in `authors`, and only `name`
 
 Tags are optional. Leave them out and the site shows no tags and builds no tag pages. A section only gets tag pages once at least one of its entries has a tag.
 
-Tags show as links under each post and changelog entry, and on blog cards (the first three). Each section gets a page that lists all tags with their post count, at `/blog/tags`, and one page per tag, like `/blog/tags/product`. Notra builds the address from the tag, so `Product` and `product` share one page, which shows the spelling of the newest post.
+Tags show as links under each post and changelog entry, and on blog cards (the first three). Each section gets a page that lists all tags with their post count, at `/blog/tags`, and one page per tag, like `/blog/tags/product`. Notra builds the address from the tag, so `Product` and `product` share one page, which shows the spelling of the newest post. To filter the blog index by tag, turn on the [category bar](/sites/customize/layouts#category-bar).
 
 Like author pages, tag pages stay out of search engines and the sitemap unless you set `"seo": { "indexing": "all" }`.
 

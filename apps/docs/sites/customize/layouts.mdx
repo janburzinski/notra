@@ -26,6 +26,8 @@ The `blog` and `changelog` objects in `blog.json` set how the blog index, its po
   "layout": "grid",
   "hero": { "style": "wash", "eyebrow": "The Acme journal" },
   "featured": "latest",
+  "categories": false,
+  "search": false,
   "card": { "image": "auto", "excerpt": true, "author": true, "date": true, "readingTime": false },
   "post": { "toc": true, "authorCard": true, "readingTime": true, "pagination": true, "width": "wide", "header": "stacked", "cover": true },
   "authorPage": "inline"
@@ -43,8 +45,24 @@ The `blog` and `changelog` objects in `blog.json` set how the blog index, its po
 | `hero.eyebrow` | A short line above the title, up to 60 characters | none |
 | `hero.image` | Background for the `image` style, like `/images/hero.jpg` | none |
 | `featured` | `"latest"`, `"none"` or up to 6 post paths like `["2026/launch"]`, pinned on top | `"none"` |
+| `categories` | `true`, `false` or up to 12 tag names. See [Category bar](#category-bar) | `false` |
+| `search` | Show a search field for post titles, summaries and tags | `false` |
 
 With `featured` set to `"none"`, Notra pins posts that have `featured: true` in their [frontmatter](/sites/posts#blog-posts), up to the 6 newest. `"latest"` and a list of paths ignore that field. `magazine` features the latest post when nothing else is featured, and Notra skips a featured path that doesn't match a post and shows a warning in the build log.
+
+### Category bar
+
+`categories` adds a row of filters above the posts, with **All** first, a rounded background on the selected category and an RSS button on the right. A click on a category shows only the posts with that [tag](/sites/posts#tags), without reloading the page, and adds `?category=<tag>` to the address so the filtered view can be shared.
+
+| Value | Tabs |
+| --- | --- |
+| `false` | No category bar |
+| `true` | Every tag, the most used first |
+| A list like `["Product", "Engineering"]` | These tags in this order, up to 12. The tab shows the name as you wrote it |
+
+Notra matches names the same way as tag pages, so `"Product"` also picks up posts tagged `product`. A name no post uses is skipped, with a warning in the build log. In `grid` and `magazine`, featured posts stay above the bar, and a category also lists its featured posts.
+
+Set `"blog": { "search": true }` to add an optional search field beside RSS. Search matches post titles, summaries (the description or generated excerpt) and tags, ignoring case. It combines with the selected category and stores the query as `?q=<query>`. Search also works without categories. While searching, featured posts appear only among matching results. Both options default to `false`.
 
 A `cards` card shows the title, up to three lines of excerpt, and the first author's avatar and name with the date at the bottom. It has no cover image, so `card.image` doesn't apply.
 

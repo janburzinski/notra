@@ -2,6 +2,7 @@ import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
+import { tagSlug } from "@notra/sites-core/utils/tags";
 
 import type { SiteEntry } from "../types/entries";
 
@@ -68,5 +69,23 @@ export function featuredSlugWarnings(
       file: SITE_CONFIG_FILENAME,
       code: "featured_unknown",
       message: `blog.featured: no post at blog/${slug}. It is skipped.`,
+    }));
+}
+
+export function categoryWarnings(
+  config: SiteConfig,
+  blogTags: ReadonlySet<string>
+): SiteDiagnostic[] {
+  const categories = config.blog?.categories;
+  if (!Array.isArray(categories)) {
+    return [];
+  }
+  return categories
+    .filter((name) => !blogTags.has(tagSlug(name)))
+    .map((name) => ({
+      severity: "warning" as const,
+      file: SITE_CONFIG_FILENAME,
+      code: "category_unknown",
+      message: `blog.categories: no post is tagged "${name}". It is skipped.`,
     }));
 }

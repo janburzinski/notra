@@ -8,6 +8,7 @@ import {
   SITE_NAVBAR_LINK_TYPES,
   SITE_SOCIAL_PLATFORMS,
 } from "@notra/sites-core/constants/site-layout";
+import { SITE_BLOG_CATEGORY_LIMIT } from "@notra/sites-core/constants/tags";
 import { z } from "zod";
 
 export const sitePathSchema = z.string().trim().min(1).max(300);
@@ -230,6 +231,16 @@ export const siteBlogSchema = z.object({
       z.array(z.string().trim().min(1)).max(6),
     ])
     .default("none"),
+  categories: z
+    .union([
+      z.boolean(),
+      z
+        .array(z.string().trim().min(1).max(40))
+        .min(1)
+        .max(SITE_BLOG_CATEGORY_LIMIT),
+    ])
+    .default(false),
+  search: z.boolean().default(false),
   card: z
     .object({
       image: z.union([z.boolean(), z.literal("auto")]).default("auto"),

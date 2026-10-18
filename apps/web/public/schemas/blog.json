@@ -847,6 +847,28 @@
             }
           ]
         },
+        "categories": {
+          "default": false,
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "minItems": 1,
+              "maxItems": 12,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              }
+            }
+          ]
+        },
+        "search": {
+          "default": false,
+          "type": "boolean"
+        },
         "card": {
           "default": {
             "image": "auto",
