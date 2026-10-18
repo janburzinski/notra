@@ -1,0 +1,101 @@
+apps/agent/package.json
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 6,9,30,35,41-42
+apps/dashboard/messages/en.json
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 3468,3481,3484-3485
+.github/workflows/react-doctor.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 7-11,27,29,34
+apps/web/tsconfig.json
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 10
+packages/geo-core/src/geo/scan-history.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 141-143,146-147,169-170,174-177,250-254
+scripts/github/production-deploy.test.mjs
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 20,92-94,437-568
+.github/workflows/knip.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 7-16,27,30
+apps/dashboard/messages/de.json
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 3468,3481,3484-3485
+apps/sites-builder/compiler/dev-server.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 28,41,173,178-181
+.github/workflows/railway-iac.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 28,32,53,69
+apps/sites-builder/tests/packaged-dev.test.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 2,9-40,42-47,50,52-104,106-167,169,171-173
+examples/README.md
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 5-6
+examples/sites/default/blog.json
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-19
+.github/workflows/pr-triage.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 13,20
+examples/sites/default/blog/sharing-product-updates.mdx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-27
+packages/geo-core/src/schemas/geo-scan-history.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1,15-16
+apps/dashboard/src/components/geo/scan-activity-status.tsx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 9,60
+apps/dashboard/src/lib/hooks/use-geo-scan-history.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 29-30,48
+examples/sites/default/changelog/2026-10-16.mdx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-18
+apps/dashboard/src/types/geo-scan-activity.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 96,136,217
+.github/workflows/production-deploy.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 25,29
+apps/dashboard/src/components/dashboard/sidebar-quick-actions.tsx
+  ai_agent 6,22,25,31-32,37-40,71,75
+bun.lock
+  ai_agent 47,52,58-59
+apps/sites-builder/compiler/utils/astro-log.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-25
+.github/workflows/blog.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 16,19
+scripts/github/production-deploy.mjs
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 568-569,571-581,583-639,642-644,646-650,652,655
+apps/docs/sites/examples.mdx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 48-49
+apps/dashboard/src/utils/geo-scan-activity.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 29-35,50,57-58
+apps/dashboard/src/app/design-system/scan-filters/page-client.tsx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 22,108,111,114-117,121,129,140,147,154,165-167
+examples/sites/default/README.md
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-24
+apps/agent/agent/agent.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 17-25,30
+examples/sites/default/blog/writing-with-markdown.mdx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-48
+.github/workflows/code-quality.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 16-63,66-67,72,75,138,140,169-171,189,247-248,253,257,259
+apps/dashboard/src/components/geo/scan-run-detail.tsx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 13,39-43,539,549,559-563,574-576,578-592,678-679,802-831,833,842
+apps/sites-builder/compiler/build.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 25,30,70,72
+apps/dashboard/src/components/dashboard/nav-footer.tsx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 20
+apps/sites-builder/compiler/constants/build.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 8-10
+packages/sites-compiler/tests/default-example.test.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 2-3,5,7,9-22,24-28,30-43
+examples/sites/default/blog/welcome.mdx
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-37
+.github/workflows/sites-dev-release.yml
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-122
+apps/web/src/utils/outbound-link.ts
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 8
+apps/sites-builder/release.md
+  s_1f08c4fcc4cc5b::t_f48443d76cabdb 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "120698843e9c6bde6cbe88cb75c5741f14cca0dd",
+  "prompts": {},
+  "sessions": {
+    "s_1f08c4fcc4cc5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8c1e36c-e428-4210-bdba-88a00f9a5a9c",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
