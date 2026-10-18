@@ -1167,7 +1167,7 @@
         "layout": {
           "default": "default",
           "type": "string",
-          "enum": ["default", "author"]
+          "enum": ["default", "author", "article"]
         },
         "label": {
           "type": "string",

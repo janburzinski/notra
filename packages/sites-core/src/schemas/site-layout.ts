@@ -180,7 +180,7 @@ export const siteThumbnailsSchema = z
     appearance: z.enum(["light", "dark"]).default("light"),
     background: sitePathSchema.optional(),
     font: z.string().trim().max(80).optional(),
-    layout: z.enum(["default", "author"]).default("default"),
+    layout: z.enum(["default", "author", "article"]).default("default"),
     label: z.string().trim().min(1).max(40).optional(),
   })
   .default({ enabled: true, appearance: "light", layout: "default" });

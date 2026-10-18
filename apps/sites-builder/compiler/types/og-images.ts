@@ -50,4 +50,17 @@ export interface OgAuthorCardContent {
   background?: string;
 }
 
+export interface OgArticleCardContent {
+  date: string;
+  category: string;
+  title: string;
+  description?: string;
+  domain: string;
+  appearance: "light" | "dark";
+  accent: string;
+  logo?: string;
+  authors: OgAuthor[];
+  background?: string;
+}
+
 export type SatoriFont = Parameters<typeof satori>[1]["fonts"][number];

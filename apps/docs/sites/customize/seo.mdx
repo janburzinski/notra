@@ -66,6 +66,20 @@ Posts and entries without an `image` get a generated 1200×630 share image with 
 - Avatars come from the author's `avatar` in `public/` as PNG, JPEG or SVG. A WebP or remote avatar shows the logo instead.
 - In this layout, `background` spans the full width and the bottom half of the image, so a 1200×315 image fits exactly.
 
+### Article layout
+
+`"layout": "article"` puts the date and a category on top, the title below, and the post's description and authors at the bottom:
+
+```json blog.json
+"thumbnails": { "layout": "article" }
+```
+
+- The category is the post's first tag, else `label`, else the section title.
+- The date drops the year for posts from the current year.
+- All authors show with overlapping avatars. Authors without a usable avatar get their initial on your brand color.
+- Entries without authors, like changelog entries, show your logo and domain instead.
+- `background` covers the whole image.
+
 ## 404 page
 
 ```json blog.json

@@ -11,6 +11,7 @@ import satori from "satori";
 
 import { OG_MANIFEST_FILE } from "../src/constants/og";
 import { configuredAreaTitle, withSiteName } from "../src/utils/area-titles";
+import { OgArticleCard } from "./components/og-article-card";
 import { OgAuthorCard } from "./components/og-author-card";
 import { OgCard } from "./components/og-card";
 import {
@@ -53,6 +54,16 @@ function loadFonts(): Promise<SatoriFont[]> {
     );
   })();
   return fontsPromise;
+}
+
+function formatShortDate(date: Date, now: Date): string {
+  const sameYear = date.getUTCFullYear() === now.getUTCFullYear();
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    ...(sameYear ? {} : { year: "numeric" }),
+    timeZone: "UTC",
+  }).format(date);
 }
 
 function formatDate(date: Date): string {
@@ -111,14 +122,10 @@ type FrontmatterAuthor =
   | string
   | { id?: string; name: string; title?: string; avatar?: string };
 
-async function firstAuthor(
+async function resolveAuthor(
   params: WriteOgImagesParams,
-  value: FrontmatterAuthor | FrontmatterAuthor[] | undefined
+  ref: FrontmatterAuthor
 ): Promise<OgAuthor | undefined> {
-  const ref = Array.isArray(value) ? value[0] : value;
-  if (!ref) {
-    return undefined;
-  }
   const id = typeof ref === "string" ? ref : ref.id;
   const configured =
     id && Object.hasOwn(params.config.authors, id)
@@ -137,6 +144,17 @@ async function firstAuthor(
     title: configured?.title ?? inline?.title,
     avatar: await publicImage(params, configured?.avatar ?? inline?.avatar),
   };
+}
+
+async function resolveAuthors(
+  params: WriteOgImagesParams,
+  value: FrontmatterAuthor | FrontmatterAuthor[] | undefined
+): Promise<OgAuthor[]> {
+  const refs = value === undefined ? [] : [value].flat();
+  const authors = await Promise.all(
+    refs.map((ref) => resolveAuthor(params, ref))
+  );
+  return authors.filter((author) => author !== undefined);
 }
 
 function authorWithFallback(
@@ -191,6 +209,8 @@ export async function writeOgImages(
       appearance === "dark"
         ? (config.colors.light ?? config.colors.primary)
         : config.colors.primary;
+    const domain = new URL(params.publicOrigin).hostname.replace(/^www\./, "");
+    const now = new Date();
     await Promise.all(
       params.entries.map(async (entry) => {
         const source = await readFile(
@@ -207,41 +227,47 @@ export async function writeOgImages(
           return;
         }
         const version = "version" in data ? data.version : undefined;
-        const card =
-          config.thumbnails.layout === "author"
-            ? OgAuthorCard({
-                label:
-                  config.thumbnails.label ??
-                  configuredAreaTitle(config, entry.area),
-                title: data.title,
-                domain: new URL(params.publicOrigin).hostname.replace(
-                  /^www\./,
-                  ""
-                ),
-                appearance,
-                logo,
-                author: await authorWithFallback(
-                  "author" in data
-                    ? await firstAuthor(params, data.author)
-                    : undefined,
-                  logo
-                ),
-                background: background.dataUri,
-              })
-            : OgCard({
-                eyebrow: withSiteName(
-                  config.name,
-                  configuredAreaTitle(config, entry.area),
-                  " · "
-                ),
-                title: data.title,
-                footer: [version, formatDate(data.date)]
-                  .filter(Boolean)
-                  .join(" · "),
-                appearance,
-                accent,
-                background: background.dataUri,
-              });
+        const authors =
+          config.thumbnails.layout !== "default" && "author" in data
+            ? await resolveAuthors(params, data.author)
+            : [];
+        const areaTitle = configuredAreaTitle(config, entry.area);
+        let card: ReactElement;
+        if (config.thumbnails.layout === "article") {
+          card = OgArticleCard({
+            date: formatShortDate(data.date, now),
+            category: data.tags[0] ?? config.thumbnails.label ?? areaTitle,
+            title: data.title,
+            description: data.description,
+            domain,
+            appearance,
+            accent,
+            logo,
+            authors,
+            background: background.dataUri,
+          });
+        } else if (config.thumbnails.layout === "author") {
+          card = OgAuthorCard({
+            label: config.thumbnails.label ?? areaTitle,
+            title: data.title,
+            domain,
+            appearance,
+            logo,
+            author: authorWithFallback(authors[0], logo),
+            background: background.dataUri,
+          });
+        } else {
+          card = OgCard({
+            eyebrow: withSiteName(config.name, areaTitle, " · "),
+            title: data.title,
+            footer: [version, formatDate(data.date)]
+              .filter(Boolean)
+              .join(" · "),
+            appearance,
+            accent,
+            background: background.dataUri,
+          });
+        }
         const png = await renderPng(card, fonts);
         const urlPath = `/${OG_IMAGES_DIR}/${entry.area}/${entry.slug}.png`;
         await writeFileEnsured(
