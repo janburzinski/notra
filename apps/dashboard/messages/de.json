@@ -5751,6 +5751,11 @@
         "searchPlaceholder": "Modelle durchsuchen…",
         "empty": "Keine Modelle gefunden."
       },
+      "modelEffort": {
+        "label": "Modell und Aufwand",
+        "effort": "Aufwand",
+        "model": "Modell"
+      },
       "attach": {
         "imagesPdfs": "Bilder oder PDFs anhängen",
         "imagesPdfsText": "Bilder, PDFs oder Text anhängen"

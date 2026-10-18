@@ -2,7 +2,12 @@
 
 import { useChat } from "@ai-sdk/react";
 import { uiMessageSchema } from "@notra/ai/schemas/chat";
-import type { ChatAttachment, ChatSessionSummary } from "@notra/ai/types/chat";
+import type {
+  ChatAttachment,
+  ChatModel,
+  ChatSessionSummary,
+  ThinkingLevel,
+} from "@notra/ai/types/chat";
 import {
   dashboardAgentChatHistoryQueryKey,
   dashboardAgentChatSessionsQueryKey,
@@ -17,6 +22,7 @@ import {
 import { cn } from "@notra/ui/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DefaultChatTransport, isToolUIPart, type UIMessage } from "ai";
+import { nanoid } from "nanoid";
 import {
   useCallback,
   useEffect,
@@ -29,22 +35,37 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import ChatInput from "@/components/chat-input";
+import type { QueuedMessage } from "@/components/chat/chat-queue";
 import { ChatQuoteProvider } from "@/components/chat/chat-quote";
 import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { ContentChatActivityPanel } from "@/components/content/content-chat-activity-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import {
+  AVAILABLE_MODELS,
+  ZDR_AVAILABLE_MODELS,
+} from "@/constants/chat-models";
 import { DASHBOARD_AGENT_SUGGESTIONS } from "@/constants/chat-suggestions";
 import { localStorageKeys } from "@/constants/storage";
 import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
+import { useHasZdrEntitlement } from "@/lib/hooks/use-plan";
+import { useStoredChatPreferences } from "@/lib/hooks/use-stored-chat-preferences";
 import { usePathname, useRouter } from "@/lib/navigation";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
+import type { ContentChatInputHandle } from "@/types/components/chat-input";
 import type { DashboardAgentChatProps } from "@/types/components/dashboard-agent";
-import { shouldContinueAfterApprovalResponse } from "@/utils/chat-approvals";
+import {
+  hasPendingApproval,
+  shouldContinueAfterApprovalResponse,
+} from "@/utils/chat-approvals";
 import { handleStandaloneChatError } from "@/utils/chat-error";
 import { buildUserMessageParts } from "@/utils/chat-message-parts";
+import {
+  markQueuedMessageSteering,
+  shouldDrainQueueAfterFinish,
+} from "@/utils/chat-queue";
 import { dashboardAgentOpenChatPath } from "@/utils/dashboard-agent-chat-path";
 
 function DashboardAgentChat({
@@ -74,6 +95,37 @@ function DashboardAgentChat({
   const closeAfterNavigationRef = useRef(false);
   const { projectId: activeProjectId, isResolved: isProjectResolved } =
     useActiveProject();
+  const { canUseNonZdr } = useHasZdrEntitlement();
+  const availableModels = canUseNonZdr
+    ? AVAILABLE_MODELS
+    : ZDR_AVAILABLE_MODELS;
+  const { preferences, update: updatePreferences } = useStoredChatPreferences();
+  const { thinkingLevel } = preferences;
+  const effectiveModel = availableModels.some(
+    (option) => option.id === preferences.model
+  )
+    ? preferences.model
+    : "auto";
+  const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
+  const queuedMessagesRef = useRef<QueuedMessage[]>([]);
+  const steerAfterStopRef = useRef<QueuedMessage | null>(null);
+  // Steering sends only once the stop request has returned AND the old
+  // response has finished, so a late stop() can't abort the steered message.
+  const steerStopPendingRef = useRef(false);
+  // The queued message currently being sent; restored to the queue if it fails.
+  const inFlightQueuedRef = useRef<{
+    message: QueuedMessage;
+    messageCount: number;
+  } | null>(null);
+  const wasStoppedByUserRef = useRef(false);
+  const drainQueueRef = useRef<() => void>(() => {});
+  const flushSteerRef = useRef<() => void>(() => {});
+  const chatInputRef = useRef<ContentChatInputHandle | null>(null);
+
+  const updateQueue = useCallback((next: QueuedMessage[]) => {
+    queuedMessagesRef.current = next;
+    setQueuedMessages(next);
+  }, []);
 
   const sessionsQuery = useQuery<ChatSessionSummary[]>({
     queryKey: dashboardAgentChatSessionsQueryKey(organizationId),
@@ -103,8 +155,12 @@ function DashboardAgentChat({
               isProjectResolved && activeProjectId
                 ? activeProjectId
                 : undefined,
+            model: effectiveModel,
+            thinkingLevel,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            messages,
+            // A response stopped before its first chunk leaves an empty
+            // assistant message, which the request schema rejects.
+            messages: messages.filter((message) => message.parts.length > 0),
             surface: "dashboard-agent",
           },
         }),
@@ -130,7 +186,14 @@ function DashboardAgentChat({
           );
         },
       }),
-    [activeChatId, activeProjectId, isProjectResolved, organizationId]
+    [
+      activeChatId,
+      activeProjectId,
+      effectiveModel,
+      isProjectResolved,
+      organizationId,
+      thinkingLevel,
+    ]
   );
 
   const {
@@ -143,12 +206,21 @@ function DashboardAgentChat({
   } = useChat({
     transport,
     sendAutomaticallyWhen: shouldContinueAfterApprovalResponse,
-    onFinish: () => {
+    onFinish: ({
+      messages: finishedMessages,
+      isAbort,
+      isDisconnect,
+      isError,
+    }) => {
+      messagesRef.current = finishedMessages;
+      if (!isError) {
+        inFlightQueuedRef.current = null;
+      }
       emitAutumnRefresh();
       if (activeChatId) {
         queryClient.setQueryData(
           dashboardAgentChatHistoryQueryKey(organizationId, activeChatId),
-          messagesRef.current
+          finishedMessages
         );
       }
       Promise.all([
@@ -162,9 +234,29 @@ function DashboardAgentChat({
         console.error("Failed to refresh agent chat sessions", invalidateError);
       });
       isAgentBusyRef.current = false;
+      if (steerAfterStopRef.current) {
+        flushSteerRef.current();
+        return;
+      }
+      if (
+        shouldDrainQueueAfterFinish({
+          isAbort,
+          isError,
+          isDisconnect,
+          wasStoppedByUser: wasStoppedByUserRef.current,
+        })
+      ) {
+        drainQueueRef.current();
+      }
     },
     onError: (err) => {
       isAgentBusyRef.current = false;
+      const failed = inFlightQueuedRef.current;
+      if (failed) {
+        inFlightQueuedRef.current = null;
+        setMessages((current) => current.slice(0, failed.messageCount));
+        updateQueue([failed.message, ...queuedMessagesRef.current]);
+      }
       Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["chat-sessions", organizationId],
@@ -211,6 +303,14 @@ function DashboardAgentChat({
     isAgentBusyRef.current = isAgentBusy || isHydratingHistory;
   }, [isAgentBusy, isHydratingHistory, messages]);
 
+  const resetQueue = () => {
+    steerAfterStopRef.current = null;
+    steerStopPendingRef.current = false;
+    inFlightQueuedRef.current = null;
+    wasStoppedByUserRef.current = false;
+    updateQueue([]);
+  };
+
   const handleSelectChat = async (chatId: string) => {
     if (isAgentBusyRef.current || chatId === activeChatId) {
       return;
@@ -231,6 +331,7 @@ function DashboardAgentChat({
       });
       setChatInputValue("");
       setChatError(null);
+      resetQueue();
       setMessages(history);
       setActiveChatId(chatId);
     } catch {
@@ -246,6 +347,7 @@ function DashboardAgentChat({
     }
     setChatInputValue("");
     setChatError(null);
+    resetQueue();
     if (messagesRef.current.length === 0) {
       return;
     }
@@ -268,13 +370,10 @@ function DashboardAgentChat({
     });
   };
 
-  const handleSend = async (
+  const dispatchMessage = async (
     instruction: string,
     attachments: ChatAttachment[] = []
   ) => {
-    if (!activeChatId || isAgentBusyRef.current) {
-      return;
-    }
     for (const message of messagesRef.current) {
       if (message.role !== "assistant") {
         continue;
@@ -295,6 +394,7 @@ function DashboardAgentChat({
       }
     }
     isAgentBusyRef.current = true;
+    wasStoppedByUserRef.current = false;
     if (attachments.length > 0) {
       await sendMessage({
         role: "user",
@@ -305,7 +405,77 @@ function DashboardAgentChat({
     await sendMessage({ text: instruction });
   };
 
-  const handleStop = useCallback(async () => {
+  const handleSend = async (
+    instruction: string,
+    attachments: ChatAttachment[] = []
+  ) => {
+    if (!activeChatId) {
+      return;
+    }
+    if (isAgentBusyRef.current) {
+      updateQueue([
+        ...queuedMessagesRef.current,
+        {
+          id: nanoid(10),
+          text: instruction,
+          ...(attachments.length > 0 ? { attachments } : {}),
+        },
+      ]);
+      return;
+    }
+    await dispatchMessage(instruction, attachments);
+  };
+
+  const dispatchQueued = (message: QueuedMessage) => {
+    updateQueue(queuedMessagesRef.current.filter((m) => m.id !== message.id));
+    inFlightQueuedRef.current = {
+      message,
+      messageCount: messagesRef.current.length,
+    };
+    dispatchMessage(message.text, message.attachments).catch((error) => {
+      console.error("Failed to send queued agent message", error);
+      isAgentBusyRef.current = false;
+      if (inFlightQueuedRef.current?.message.id === message.id) {
+        inFlightQueuedRef.current = null;
+        updateQueue([message, ...queuedMessagesRef.current]);
+      }
+    });
+  };
+
+  const flushSteer = () => {
+    const steered = steerAfterStopRef.current;
+    if (!steered || steerStopPendingRef.current || isAgentBusyRef.current) {
+      return;
+    }
+    steerAfterStopRef.current = null;
+    const queued = queuedMessagesRef.current.find((m) => m.id === steered.id);
+    if (queued) {
+      dispatchQueued({ ...queued, steering: false });
+    }
+  };
+
+  useEffect(() => {
+    flushSteerRef.current = flushSteer;
+    drainQueueRef.current = () => {
+      const current = messagesRef.current;
+      if (
+        isAgentBusyRef.current ||
+        wasStoppedByUserRef.current ||
+        steerAfterStopRef.current ||
+        hasPendingApproval(current) ||
+        // The SDK resends on its own after an approval; draining now would double-submit.
+        shouldContinueAfterApprovalResponse({ messages: current })
+      ) {
+        return;
+      }
+      const next = queuedMessagesRef.current[0];
+      if (next) {
+        dispatchQueued(next);
+      }
+    };
+  });
+
+  const stopResponse = useCallback(async () => {
     const response = await fetch(
       `/api/organizations/${organizationId}/chat/${encodeURIComponent(activeChatId)}/stop`,
       { method: "POST" }
@@ -321,11 +491,87 @@ function DashboardAgentChat({
         );
       }
       toast.error(t("stopFailed"));
-      return;
+      return false;
     }
 
     stop();
+    return true;
   }, [activeChatId, organizationId, stop, t]);
+
+  const handleStop = async () => {
+    steerAfterStopRef.current = null;
+    steerStopPendingRef.current = false;
+    wasStoppedByUserRef.current = true;
+    updateQueue(
+      queuedMessagesRef.current.map((message) => ({
+        ...message,
+        steering: false,
+      }))
+    );
+    await stopResponse();
+  };
+
+  const handleRemoveQueued = (id: string) => {
+    if (steerAfterStopRef.current?.id === id) {
+      steerAfterStopRef.current = null;
+    }
+    updateQueue(queuedMessagesRef.current.filter((m) => m.id !== id));
+  };
+
+  const handleEditQueued = (message: QueuedMessage) => {
+    if (
+      message.attachments?.length &&
+      !chatInputRef.current?.setAttachments(message.attachments)
+    ) {
+      return;
+    }
+    if (steerAfterStopRef.current?.id === message.id) {
+      steerAfterStopRef.current = null;
+    }
+    updateQueue(queuedMessagesRef.current.filter((m) => m.id !== message.id));
+    setChatInputValue(message.text);
+  };
+
+  const handleSteerQueued = async (message: QueuedMessage) => {
+    if (
+      steerAfterStopRef.current ||
+      !queuedMessagesRef.current.some((queued) => queued.id === message.id)
+    ) {
+      return;
+    }
+    if (!isAgentBusyRef.current) {
+      // dispatchMessage discards a pending approval, which the drain would wait on.
+      dispatchQueued(message);
+      return;
+    }
+    updateQueue(
+      markQueuedMessageSteering(queuedMessagesRef.current, message.id)
+    );
+    steerAfterStopRef.current = message;
+    steerStopPendingRef.current = true;
+    const stopped = await stopResponse();
+    steerStopPendingRef.current = false;
+    if (stopped) {
+      flushSteer();
+      return;
+    }
+    steerAfterStopRef.current = null;
+    updateQueue(
+      queuedMessagesRef.current.map((queued) => ({
+        ...queued,
+        steering: false,
+      }))
+    );
+    drainQueueRef.current();
+  };
+
+  const handleModelChange = (model: ChatModel) => {
+    updatePreferences({ model });
+  };
+
+  const handleThinkingLevelChange = (level: ThinkingLevel) => {
+    updatePreferences({ thinkingLevel: level });
+  };
 
   const handleSuggestionSelect = (prompt: string) => {
     setChatInputValue(prompt);
@@ -403,8 +649,18 @@ function DashboardAgentChat({
               disabled={isChatDisabled}
               error={chatError}
               isLoading={isAgentBusy}
+              modelEffort={{
+                availableModels,
+                model: effectiveModel,
+                onModelChange: handleModelChange,
+                onThinkingLevelChange: handleThinkingLevelChange,
+                thinkingLevel,
+              }}
               onClearError={() => setChatError(null)}
+              onEditQueued={handleEditQueued}
+              onRemoveQueued={handleRemoveQueued}
               onSend={handleSend}
+              onSteerQueued={handleSteerQueued}
               onStop={handleStop}
               onValueChange={setChatInputValue}
               organizationId={organizationId}
@@ -414,6 +670,8 @@ function DashboardAgentChat({
                   : organizationSlug
               }
               placeholder={t("placeholder")}
+              queuedMessages={queuedMessages}
+              ref={chatInputRef}
               value={chatInputValue}
             />
           </div>

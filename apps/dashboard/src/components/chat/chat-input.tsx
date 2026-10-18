@@ -7,7 +7,6 @@ import {
   ArrowUp02Icon,
   AtIcon,
   File02Icon,
-  StopIcon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -84,6 +83,7 @@ import Link from "@/components/framework/link";
 import { McpIcon } from "@/components/integrations/mcp-icon";
 import { CHAT_COMPOSER_DRAFT_PERSIST_MS } from "@/constants/chat-composer";
 import { AVAILABLE_MODELS, LEGACY_CHAT_MODELS } from "@/constants/chat-models";
+import { COMPOSER_STOP_ICON } from "@/constants/composer";
 import { MAX_CHAT_HEIC_INPUT_BYTES } from "@/constants/content-image";
 import { useAutumnRefreshListener } from "@/lib/hooks/use-autumn-refresh-listener";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
@@ -365,7 +365,7 @@ function ChatComposerSendButton({
       ) : (
         <HugeiconsIcon
           className="size-4"
-          icon={send.icon === "stop" ? StopIcon : ArrowUp02Icon}
+          icon={send.icon === "stop" ? COMPOSER_STOP_ICON : ArrowUp02Icon}
           strokeWidth={send.icon === "send" ? 2 : undefined}
         />
       )}

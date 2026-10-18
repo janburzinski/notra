@@ -4,6 +4,7 @@ import type {
   ChatModel,
   ContextItem,
   TextSelection,
+  ThinkingLevel,
 } from "@notra/ai/types/chat";
 import type { Ref } from "react";
 
@@ -75,6 +76,16 @@ export interface ChatInputProps {
   onEditQueued?: (message: QueuedMessage) => void;
   onRemoveQueued?: (id: string) => void;
   onSteerQueued?: (message: QueuedMessage) => void;
+  modelEffort?: Omit<ChatModelEffortMenuProps, "disabled">;
+}
+
+export interface ChatModelEffortMenuProps {
+  availableModels: readonly ChatModelOption[];
+  disabled?: boolean;
+  model: ChatModel;
+  onModelChange: (model: ChatModel) => void;
+  onThinkingLevelChange: (level: ThinkingLevel) => void;
+  thinkingLevel: ThinkingLevel;
 }
 
 export type EnabledRepo = GitHubRepository & { integrationId: string };

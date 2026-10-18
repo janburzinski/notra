@@ -5,7 +5,6 @@ import {
   ArrowUp02Icon,
   AtIcon,
   File02Icon,
-  StopIcon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -41,11 +40,13 @@ import {
 import { ChatContextConnectSuggestions } from "@/components/chat/chat-context-connect-suggestions";
 import { ChatContextOptionContent } from "@/components/chat/chat-context-option-content";
 import { ChatInputContextRow } from "@/components/chat/chat-input-context-row";
+import { ChatModelEffortMenu } from "@/components/chat/chat-model-effort-menu";
 import { ChatQueue } from "@/components/chat/chat-queue";
 import { ChatQuotePreview, useChatQuote } from "@/components/chat/chat-quote";
 import { ChatSkillSlashMenu } from "@/components/chat/chat-skill-slash-menu";
 import { ChatSkillTagChips } from "@/components/chat/chat-skill-tag-chips";
 import Link from "@/components/framework/link";
+import { COMPOSER_STOP_ICON } from "@/constants/composer";
 import { useContentChatInput } from "@/lib/hooks/use-content-chat-input";
 import type {
   ChatInputComposerNudgeProps,
@@ -209,7 +210,7 @@ function ContentChatInputComposer(props: ChatInputProps) {
               aria-expanded={isSlashMenuOpen}
               aria-haspopup={isSlashMenuOpen ? "listbox" : undefined}
               aria-label={tChatShared("sendAMessage")}
-              className="field-sizing-fixed whitespace-pre-wrap"
+              className="field-sizing-fixed min-h-10 whitespace-pre-wrap"
               disabled={isInputLocked}
               onBlur={() => {
                 setIsFocused(false);
@@ -241,24 +242,32 @@ function ContentChatInputComposer(props: ChatInputProps) {
               value={value}
             />
             <Composer.Toolbar>
-              <div className="ml-auto flex items-center gap-1">
-                <ChatInputContextPicker
-                  contextOptions={contextOptions}
-                  contextPickerId={contextPickerId}
-                  disabledReason={contextPickerDisabledReason}
-                  isInContext={isInContext}
-                  isOpen={isContextPickerOpen}
-                  onOpenChange={setIsContextPickerOpen}
-                  organizationSlug={organizationSlug}
-                  toggleContextItem={toggleContextItem}
-                />
-                <ChatComposerAttachButton
-                  attachmentCount={attachments.length}
-                  disabled={isInputLocked}
-                  onAttach={onAttach}
-                  pendingUploadCount={pendingUploads.length}
-                  tooltip={attachmentTooltipText}
-                />
+              <ChatComposerAttachButton
+                attachmentCount={attachments.length}
+                disabled={isInputLocked}
+                onAttach={onAttach}
+                pendingUploadCount={pendingUploads.length}
+                tooltip={attachmentTooltipText}
+              />
+              <div className="ml-auto flex min-w-0 items-center gap-1">
+                {props.onAddContext ? (
+                  <ChatInputContextPicker
+                    contextOptions={contextOptions}
+                    contextPickerId={contextPickerId}
+                    disabledReason={contextPickerDisabledReason}
+                    isInContext={isInContext}
+                    isOpen={isContextPickerOpen}
+                    onOpenChange={setIsContextPickerOpen}
+                    organizationSlug={organizationSlug}
+                    toggleContextItem={toggleContextItem}
+                  />
+                ) : null}
+                {props.modelEffort ? (
+                  <ChatModelEffortMenu
+                    {...props.modelEffort}
+                    disabled={isInputLocked}
+                  />
+                ) : null}
                 <Composer.Send
                   disabled={sendDisabled}
                   label={sendLabel}
@@ -267,7 +276,7 @@ function ContentChatInputComposer(props: ChatInputProps) {
                 >
                   <HugeiconsIcon
                     className="size-4"
-                    icon={showStop ? StopIcon : ArrowUp02Icon}
+                    icon={showStop ? COMPOSER_STOP_ICON : ArrowUp02Icon}
                     strokeWidth={2}
                   />
                 </Composer.Send>

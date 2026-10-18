@@ -173,11 +173,11 @@ import {
 import { buildChatMinimapTurns } from "@/utils/chat-minimap";
 import { getChatPosts, parsePostReferenceValue } from "@/utils/chat-posts";
 import {
-  CHAT_PREFERENCES_STORAGE_KEY,
   DEFAULT_CHAT_PREFERENCES,
   parseStoredChatModel,
   parseStoredThinkingLevel,
   readStoredChatPreferences,
+  subscribeToStoredChatPreferences,
   writeStoredChatPreferences,
 } from "@/utils/chat-preferences";
 import {
@@ -991,25 +991,19 @@ function StandaloneChatPageClient({
       setThinkingLevel(storedPreferences.thinkingLevel);
     }
 
-    function handleStorage(event: StorageEvent) {
-      if (event.key !== CHAT_PREFERENCES_STORAGE_KEY) {
-        return;
-      }
-
-      syncChatPreferencesFromStorage();
-    }
-
     syncChatPreferencesFromStorage();
+    const unsubscribe = subscribeToStoredChatPreferences(
+      syncChatPreferencesFromStorage
+    );
     window.addEventListener("focus", syncChatPreferencesFromStorage);
-    window.addEventListener("storage", handleStorage);
     document.addEventListener(
       "visibilitychange",
       syncChatPreferencesFromStorage
     );
 
     return () => {
+      unsubscribe();
       window.removeEventListener("focus", syncChatPreferencesFromStorage);
-      window.removeEventListener("storage", handleStorage);
       document.removeEventListener(
         "visibilitychange",
         syncChatPreferencesFromStorage

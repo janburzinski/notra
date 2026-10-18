@@ -5751,6 +5751,11 @@
         "searchPlaceholder": "Search models…",
         "empty": "No models found."
       },
+      "modelEffort": {
+        "label": "Model and effort",
+        "effort": "Effort",
+        "model": "Model"
+      },
       "attach": {
         "imagesPdfs": "Attach images or PDFs",
         "imagesPdfsText": "Attach images, PDFs or text"
