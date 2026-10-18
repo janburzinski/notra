@@ -1,0 +1,25 @@
+packages/tools/src/researcher/scrape-pages.ts
+  s_6773fe390cbdf9::t_782abb59d07ee7 8,13,30-33,45-48
+packages/tools/src/utils/scrape.ts
+  s_6773fe390cbdf9::t_782abb59d07ee7 1-15
+packages/tools/src/constants/context-dev.ts
+  s_6773fe390cbdf9::t_782abb59d07ee7 5
+packages/tools/src/researcher/scrape-page.ts
+  s_6773fe390cbdf9::t_782abb59d07ee7 4-7,11,19-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e2dd7997d22f9fdd90548940b93100837d0dcd99",
+  "prompts": {},
+  "sessions": {
+    "s_6773fe390cbdf9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a5b18d9-93c9-4768-81d7-11c1c597c1da",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
