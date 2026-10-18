@@ -1,0 +1,116 @@
+apps/dashboard/src/types/onboarding.ts
+  s_d463670ee50a5d::t_172c51fd3050ab 24-31,90-91
+apps/dashboard/src/schemas/autopilot-github.ts
+  s_0fd61d311c5dfa::t_970e604c880a0a 11,23-24
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_d463670ee50a5d::t_ab73ea218e63d1 55-56
+apps/dashboard/src/components/onboarding/progress.tsx
+  s_d463670ee50a5d::t_62333bf40d2844 6,8-12,14-15,18,29-31,34-37,40-41,47
+apps/dashboard/src/lib/autopilot/github-events.test.ts
+  s_d463670ee50a5d::t_a10a83b92aea9f 135-138,171-172
+  s_0fd61d311c5dfa::t_2968cdc43701e8 1-134,139-170,173-347
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_0fd61d311c5dfa::t_c4f0075897fa6d 2-7,33,36,58,94-106,141,229-279,281-334,337-340,356
+  s_0fd61d311c5dfa::t_71551650c54a3e 341,346
+apps/dashboard/src/lib/autopilot/mentions.ts
+  s_0fd61d311c5dfa::t_b636ab0815feea 43,379-382,388-389,398-403,422,467,469
+  s_0fd61d311c5dfa::t_2936e89a60b2ec 390-397
+apps/dashboard/messages/en.json
+  s_d463670ee50a5d::t_172c51fd3050ab 1253
+apps/dashboard/messages/de.json
+  s_d463670ee50a5d::t_172c51fd3050ab 1253
+apps/dashboard/src/lib/autopilot/prompts.ts
+  s_dae80eeda955c7::t_062cc7fdf6f14c 60-64,74-78
+apps/dashboard/src/utils/onboarding-progress.ts
+  s_d463670ee50a5d::t_62333bf40d2844 3-10,29,32,35,41-47,55,57-66,68-75
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_d463670ee50a5d::t_ab73ea218e63d1 9,120,184-195,215-216
+  s_d463670ee50a5d::t_30284df7f6be4c 252-255
+apps/dashboard/public/badges/notra-autopilot-light.svg
+  s_36a370d4c36ded::t_98973400e957b4 1-13
+apps/dashboard/src/app/onboarding/autopilot/autopilot-step.tsx
+  s_d463670ee50a5d::t_ab73ea218e63d1 23,59
+apps/dashboard/src/lib/autopilot/suggestions.ts
+  s_dae80eeda955c7::t_076b7c16246b12 6-9,31-33
+apps/dashboard/src/types/autopilot.ts
+  s_d463670ee50a5d::t_ab73ea218e63d1 89-90,146
+  s_d463670ee50a5d::t_680bbda2fadd43 10
+  s_d463670ee50a5d::t_172c51fd3050ab 104-105
+apps/dashboard/src/constants/onboarding.ts
+  s_d463670ee50a5d::t_172c51fd3050ab 8-15
+apps/dashboard/src/lib/autopilot/run.ts
+  s_d463670ee50a5d::t_c0fe5a590d9198 125-128
+apps/dashboard/src/lib/autopilot/stale-findings.test.ts
+  s_dae80eeda955c7::t_691c943a59307d 112-116
+  s_dae80eeda955c7::t_40a42e7a8881be 179
+  s_dae80eeda955c7::t_f009dec4579fec 1-52,54-111,117-178,180-197
+  s_dae80eeda955c7::t_0395a139d1d4ed 53
+apps/dashboard/public/badges/notra-autopilot-dark.svg
+  s_36a370d4c36ded::t_98973400e957b4 1-13
+apps/dashboard/src/components/autopilot/autopilot-setup-form.tsx
+  s_d463670ee50a5d::t_ab73ea218e63d1 76,132-133
+apps/dashboard/src/lib/autopilot/findings.test.ts
+  s_0fd61d311c5dfa::t_8d475cb97a1771 1-5,7-30,34-107
+  s_d463670ee50a5d::t_a10a83b92aea9f 6,31-33
+apps/dashboard/src/routes/-onboarding-loaders.ts
+  s_d463670ee50a5d::t_f4f07ff675b557 143,172,186,201,204,218,239,242,249,263,301,308,326,329,336
+apps/dashboard/src/utils/onboarding-progress.test.ts
+  s_d463670ee50a5d::t_22d5d9bf56277a 1-88
+apps/dashboard/src/components/onboarding/progress.test.tsx
+  s_d463670ee50a5d::t_680bbda2fadd43 21-43,45-49
+  s_d463670ee50a5d::t_7e9d0f37155c33 1-20,44,50-58
+apps/dashboard/src/components/autopilot/autopilot-settings-sheet.tsx
+  s_d463670ee50a5d::t_ab73ea218e63d1 20,45
+apps/dashboard/src/lib/orpc/routers/autopilot.test.ts
+  s_d463670ee50a5d::t_a10a83b92aea9f 60,62
+  s_d463670ee50a5d::t_16c9686d986afa 1-59,61,63-141
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_dae80eeda955c7::t_691c943a59307d 453-455,688-693
+  s_dae80eeda955c7::t_065817b5a4ecc5 2,4-16,22,33-37,439-452,456-536
+  s_dae80eeda955c7::t_076b7c16246b12 659-664,683-687,694-695,697-704
+  s_0fd61d311c5dfa::t_4ac7b0eb4847fd 1,289-310,313-314,323,344-347,357-374
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_d463670ee50a5d::t_26c620911ec4da 28
+  s_d463670ee50a5d::t_c0fe5a590d9198 47,219,300
+  s_d463670ee50a5d::t_30284df7f6be4c 72-74,77,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8a8faa005a33b3f695c79f9333229bd292b63dc1",
+  "prompts": {},
+  "sessions": {
+    "s_0fd61d311c5dfa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "065a6cc5-5ec2-46b7-a246-7b969318d3f9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_36a370d4c36ded": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a222532f-7798-42e8-a8e3-2c6fedc86da0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_d463670ee50a5d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a67b432c-706b-4e3c-a467-7e37cac0abdc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    },
+    "s_dae80eeda955c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "78e51099-ab16-4d3e-98ad-49f8f043919e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
