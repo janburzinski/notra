@@ -5640,22 +5640,7 @@
     "badges": {
       "beta": "Beta"
     },
-    "groups": {
-      "improve": "Improve",
-      "utility": "Utility"
-    },
-    "modes": {
-      "measureVisibility": "Measure visibility",
-      "createContent": "Create content"
-    },
     "geoUpgradeTooltip": "Upgrade your plan to use GEO",
-    "recent": "Recent",
-    "recentItem": {
-      "openInNewTab": "Open in new tab",
-      "linkCopied": "Link copied",
-      "linkCopyFailed": "Failed to copy link",
-      "copyLink": "Copy link"
-    },
     "user": {
       "confirmSignOutUnsaved": "You have unsaved changes. Signing out will discard them. Sign out anyway?",
       "signingOut": "Signing out…"

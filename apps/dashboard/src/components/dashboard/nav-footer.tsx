@@ -30,7 +30,7 @@ export function NavFooter({ slug }: { slug: string }) {
   const docsLabel = tCommon("docs");
 
   return (
-    <SidebarGroup>
+    <SidebarGroup className="gap-1 pb-0">
       <NavGroupList
         activeLink={activeLink}
         groups={WORKSPACE_GROUPS}

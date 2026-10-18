@@ -48,7 +48,6 @@ import { useTranslations } from "use-intl";
 import { CreditBalanceMenuItem } from "@/components/billing/credit-balance-button";
 import { CreditTopupModal } from "@/components/billing/credit-topup-modal";
 import { useFeedback } from "@/components/dashboard/feedback-context";
-import { useJobsSidebar } from "@/components/providers/jobs-sidebar-provider";
 import { flushTrackEvent } from "@/lib/analytics/posthog-client";
 import { authClient } from "@/lib/auth/client";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
@@ -244,7 +243,6 @@ function OrgSelectorSignOut() {
 export function OrgSelector() {
   const t = useTranslations("nav.orgSelector");
   const tCommon2 = useTranslations("common");
-  const jobsSidebar = useJobsSidebar();
   const tCommon = useTranslations("common.actions");
   const isClient = useIsClient();
   const { isMobile, state } = useSidebar();
@@ -396,7 +394,7 @@ export function OrgSelector() {
               <Kbd className="ml-auto">D</Kbd>
             </DropdownMenuItem>
 
-            {jobsSidebar ? <OrgSelectorSignOut /> : null}
+            <OrgSelectorSignOut />
           </DropdownMenuContent>
         </DropdownMenu>
 

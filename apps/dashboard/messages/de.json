@@ -5640,22 +5640,7 @@
     "badges": {
       "beta": "Beta"
     },
-    "groups": {
-      "improve": "Verbessern",
-      "utility": "Tools"
-    },
-    "modes": {
-      "measureVisibility": "Sichtbarkeit messen",
-      "createContent": "Inhalte erstellen"
-    },
     "geoUpgradeTooltip": "Upgrade deinen Tarif, um GEO zu nutzen",
-    "recent": "Zuletzt",
-    "recentItem": {
-      "openInNewTab": "In neuem Tab öffnen",
-      "linkCopied": "Link kopiert",
-      "linkCopyFailed": "Link konnte nicht kopiert werden",
-      "copyLink": "Link kopieren"
-    },
     "user": {
       "confirmSignOutUnsaved": "Du hast ungespeicherte Änderungen. Beim Abmelden werden sie verworfen. Trotzdem abmelden?",
       "signingOut": "Wird abgemeldet…"

@@ -93,57 +93,6 @@ export interface NavVisibility {
   sites: boolean;
 }
 
-export interface NavListProps {
-  links: readonly string[];
-  slug: string;
-  activeLink: string | null;
-  projectId?: string;
-  geoLocked?: boolean;
-  visibility?: NavVisibility;
-}
-
-export interface NavModeSwitchProps {
-  mode: SidebarMode;
-  slug: string;
-  projectId?: string;
-  onModeChange: (mode: SidebarMode) => void;
-  /** Warm the destination before the click, e.g. Studio recents. */
-  onPrefetchMode?: (mode: SidebarMode) => void;
-}
-
-export interface NavGeoProps {
-  slug: string;
-  /** Route to resolve the active item against; may lead the real pathname. */
-  pathname: string;
-  projectId?: string;
-}
-
-export interface NavStudioProps {
-  slug: string;
-  organizationId: string;
-  /** Route to resolve the active item against; may lead the real pathname. */
-  pathname: string;
-  /** Skip fetching while hidden; pass true once Studio is shown or warmed. */
-  loadRecent?: boolean;
-}
-
-export interface NavModePrimaryActionProps {
-  mode: SidebarMode;
-  slug: string;
-  organizationId: string;
-  projectId?: string;
-}
-
-export interface NavRecentContentProps {
-  slug: string;
-  organizationId: string;
-  enabled?: boolean;
-}
-
-export interface NavUtilityProps {
-  slug: string;
-}
-
 export interface PendingSidebarMode {
   mode: SidebarMode;
   route: string | undefined;
@@ -176,17 +125,6 @@ export interface SidebarSwapProps {
   /** Keep every panel mounted. Use when both sides stay cheap to hold. */
   keepMounted?: boolean;
   className?: string;
-}
-
-export interface NavRecentContentItemProps {
-  href: string;
-  isActive: boolean;
-  post: {
-    id: string;
-    organizationId: string;
-    status: PostStatus;
-    title: string;
-  };
 }
 
 export interface NavSiteProps {

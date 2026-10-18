@@ -417,6 +417,24 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
     ).toHaveLength(20);
   });
 
+  test("workflow redelivery cannot reclaim an active or completed job", async () => {
+    jobs = [makeJob("redelivered")];
+    const claimed = await claimSiteJob("redelivered");
+    expect(claimed).not.toBeNull();
+    if (!claimed) {
+      throw new Error("Expected claimed job");
+    }
+
+    expect(await runSiteJob("redelivered")).toEqual({ status: "skipped" });
+    expect(jobs[0]?.status).toBe("running");
+    expect(jobs[0]?.attempts).toBe(1);
+
+    await completeSiteJob(claimed);
+    expect(await runSiteJob("redelivered")).toEqual({ status: "skipped" });
+    expect(jobs[0]?.status).toBe("done");
+    expect(jobs[0]?.attempts).toBe(1);
+  });
+
   test("expired claims obey capacity and an old attempt cannot complete or fail its replacement", async () => {
     jobs = [makeJob("job1")];
     const first = await claimSiteJob("job1");

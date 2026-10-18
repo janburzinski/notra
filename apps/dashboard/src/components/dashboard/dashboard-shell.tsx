@@ -19,11 +19,10 @@ import { useTranslations } from "use-intl";
 import { SubscriptionGate } from "@/components/billing/subscription-gate";
 import { DashboardSidebar } from "@/components/dashboard/app-sidebar";
 import { DashboardGlobalActions } from "@/components/dashboard/dashboard-global-actions";
-import { JobsSiteHeader, SiteHeader } from "@/components/dashboard/header";
+import { SiteHeader } from "@/components/dashboard/header";
 import { RestoreSidebarHome } from "@/components/dashboard/restore-sidebar-home";
 import { RightPanel } from "@/components/dashboard/right-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
-import { useJobsSidebar } from "@/components/providers/jobs-sidebar-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { EVE_BANNER_HEIGHT } from "@/constants/onboarding-agent";
 import { RIGHT_PANEL_PORTAL_ID } from "@/constants/right-panel";
@@ -243,7 +242,6 @@ export function DashboardShell({
   const shouldReduceMotion = useReducedMotion();
   const starting =
     runAgent.isPending && runAgent.variables?.organizationId === organizationId;
-  const jobsSidebar = useJobsSidebar();
   const demo = isDemoModeClient();
   const showDemoBanner = useDemoBannerVisible(demoBannerHidden);
   const shellStyle = dashboardShellStyle(showDemoBanner, visible);
@@ -334,7 +332,7 @@ export function DashboardShell({
             expanded && "hidden"
           )}
         >
-          {jobsSidebar ? <JobsSiteHeader /> : <SiteHeader />}
+          <SiteHeader />
           <RestoreSidebarHome />
           <DashboardPageViewport>
             <SubscriptionGate>{children}</SubscriptionGate>

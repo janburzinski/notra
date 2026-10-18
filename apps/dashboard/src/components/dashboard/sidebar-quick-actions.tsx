@@ -71,7 +71,7 @@ export function SidebarAskAgentButton() {
 /** Search field above the navigation, styled like an input. */
 export function SidebarTopQuickActions() {
   return (
-    <SidebarMenu className="px-2 pt-1.5 pb-1">
+    <SidebarMenu className="px-2 pt-2.5 pb-3">
       <SidebarSearchField />
     </SidebarMenu>
   );

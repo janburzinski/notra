@@ -8,10 +8,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@notra/ui/components/ui/breadcrumb";
-import { Kbd, KbdGroup } from "@notra/ui/components/ui/kbd";
 import { Separator } from "@notra/ui/components/ui/separator";
 import { useSidebar } from "@notra/ui/components/ui/sidebar";
-import { useIsApplePlatform } from "@notra/ui/hooks/use-is-apple-platform";
 import { cn } from "@notra/ui/lib/utils";
 import { parseAsString, useQueryState } from "nuqs";
 import { useId } from "react";
@@ -26,7 +24,6 @@ import {
 } from "@/components/dashboard/content-topbar-title";
 import { DashboardAgentButton } from "@/components/dashboard/dashboard-agent-button";
 import { HeaderActionsOutlet } from "@/components/dashboard/header-actions-portal";
-import { NavUser } from "@/components/dashboard/nav-user";
 import { SidebarToggle } from "@/components/dashboard/sidebar-toggle";
 import Link from "@/components/framework/link";
 import {
@@ -45,10 +42,7 @@ import {
   isBreadcrumbSegment,
   isGeoBreadcrumbSegment,
 } from "@/utils/dashboard-breadcrumbs";
-import {
-  isContentDetailPathname,
-  isRecordDetailPathname,
-} from "@/utils/dashboard-paths";
+import { isRecordDetailPathname } from "@/utils/dashboard-paths";
 import { withGeoProject } from "@/utils/geo-paths";
 import { toGeoTab } from "@/utils/geo-tabs";
 import { siteHref } from "@/utils/site-links";
@@ -60,74 +54,12 @@ const NON_CLICKABLE_SEGMENTS: ReadonlySet<string> = new Set([
   "brand",
 ]);
 
-export function SiteHeader() {
-  const tCommon = useTranslations("common");
-  const contentDetail = isContentDetailPathname(usePathname());
-  const { setOpen: setCommandPaletteOpen } = useCommandPalette();
-  const isApplePlatform = useIsApplePlatform();
-
-  return (
-    <header className="@container/topbar relative flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-      <div
-        className={cn(
-          "grid h-full w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-1 px-4 lg:gap-2 lg:px-6",
-          !contentDetail &&
-            "@4xl/topbar:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"
-        )}
-      >
-        <div className="flex min-w-0 items-center gap-1 overflow-hidden lg:gap-2">
-          <SidebarToggle className="-ml-1" />
-          <Separator
-            className="mx-2 h-4 self-center data-[orientation=vertical]:h-4 data-[orientation=vertical]:self-center"
-            orientation="vertical"
-          />
-          <DashboardHeaderBreadcrumbs />
-        </div>
-        {!contentDetail ? (
-          <button
-            aria-label={tCommon("actions.search")}
-            className="text-muted-foreground hover:bg-muted/50 @container/search hidden h-8 w-48 cursor-pointer items-center justify-center gap-2 rounded-lg border bg-transparent px-2 text-sm transition-colors @[8rem]/search:justify-start @[8rem]/search:px-3 @4xl/topbar:flex @5xl/topbar:w-64 @6xl/topbar:w-80"
-            onClick={() => setCommandPaletteOpen(true)}
-            type="button"
-          >
-            <HugeiconsIcon className="shrink-0" icon={SearchIcon} size={16} />
-            <span className="hidden min-w-0 flex-1 truncate text-left @[8rem]/search:block">
-              {tCommon("actions.search")}
-            </span>
-            <KbdGroup className="hidden shrink-0 @[14rem]/search:flex">
-              <Kbd>{isApplePlatform ? "⌘" : "Ctrl"}</Kbd>
-              <Kbd>K</Kbd>
-            </KbdGroup>
-          </button>
-        ) : null}
-        <div className="flex h-full min-w-0 items-center justify-end gap-1 sm:gap-2">
-          <HeaderActionsOutlet />
-          <div className="flex shrink-0 items-center gap-1">
-            {!contentDetail ? (
-              <button
-                aria-label={tCommon("actions.search")}
-                className="text-muted-foreground hover:bg-muted/50 hover:text-foreground inline-flex size-7 items-center justify-center rounded-lg @4xl/topbar:hidden"
-                onClick={() => setCommandPaletteOpen(true)}
-                type="button"
-              >
-                <HugeiconsIcon icon={SearchIcon} size={14} strokeWidth={1.8} />
-              </button>
-            ) : null}
-            <DashboardAgentButton />
-          </div>
-          <NavUser />
-        </div>
-      </div>
-    </header>
-  );
-}
-
 /**
- * Topbar for the jobs sidebar. Desktop pages title themselves and the sidebar
+ * Topbar. Desktop pages title themselves and the sidebar
  * carries search and the agent, so the bar only stays for record pages, which
  * need breadcrumbs, and on small screens, where it holds the sidebar toggle.
  */
-export function JobsSiteHeader() {
+export function SiteHeader() {
   const tCommon = useTranslations("common");
   const pathname = usePathname();
   const { isMobile } = useSidebar();

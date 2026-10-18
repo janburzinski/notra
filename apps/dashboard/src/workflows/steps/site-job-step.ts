@@ -5,4 +5,6 @@ export async function runSiteJobStep(jobId: string) {
   return await runSiteJob(jobId);
 }
 
-runSiteJobStep.maxRetries = 0;
+// A lost step_started response can consume an SDK attempt before the job runs.
+// Job leases and build retry limits are still enforced by runSiteJob.
+runSiteJobStep.maxRetries = 3;

@@ -88,15 +88,6 @@ export function resolveOrgRootRedirect(
   return query.size ? `${path}?${query}` : path;
 }
 
-/**
- * Studio home is the org root. Prefetching `/{slug}` while the sidebar cookie
- * is still `geo` follows `resolveOrgRootRedirect` and can cache GEO as that
- * URL, so the next Studio switch lands back on GEO.
- */
-export function canPrefetchSidebarModeHome(next: SidebarMode): boolean {
-  return next === "geo";
-}
-
 export function resolveNavGroupRow(
   group: NavGroup,
   first: NavMainItem,

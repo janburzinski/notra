@@ -45,12 +45,9 @@ import type {
   SidebarModeOption,
 } from "@/types/components/nav";
 
-/** Databuddy flag for the one-row-per-job sidebar. Off keeps the GEO/Studio sidebar. */
-export const JOBS_SIDEBAR_FLAG_KEY = "jobs-sidebar";
-
 export const HOME_NAV_LINK = "";
 export const CHAT_NAV_LINK = "/chat";
-export const CONTENT_NAV_LINK = "/content";
+const CONTENT_NAV_LINK = "/content";
 export const ANALYTICS_NAV_LINK = "/analytics";
 export const BRAND_IDENTITY_NAV_LINK = "/brand/identity";
 export const SCHEDULES_NAV_LINK = "/automation/schedules";
@@ -72,26 +69,6 @@ export const SIDEBAR_MIN_WIDTH = 240;
 export const SIDEBAR_MAX_WIDTH = 400;
 export const SIDEBAR_RESIZE_STEP = 8;
 export const SIDEBAR_WIDTH_COOKIE_NAME = "sidebar_width";
-
-export const SIDEBAR_MODES: SidebarModeOption[] = [
-  {
-    id: "geo",
-    label: "GEO",
-    descriptionKey: "measureVisibility",
-    icon: AiBrowserIcon,
-  },
-  {
-    id: "studio",
-    label: "Studio",
-    descriptionKey: "createContent",
-    icon: NoteIcon,
-  },
-];
-
-export const SIDEBAR_MODE_HOME_LINKS: Record<SidebarMode, string> = {
-  geo: GEO_OVERVIEW_NAV_LINK,
-  studio: HOME_NAV_LINK,
-};
 
 export const GEO_ROUTE_SECTIONS: ReadonlySet<string> = new Set(["geo"]);
 
@@ -166,52 +143,12 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
   { link: API_KEYS_NAV_LINK, icon: Key01Icon, labelKey: "apiKeys" },
 ];
 
-export const NAV_GEO_VISIBILITY_LINKS: readonly string[] = [
-  GEO_OVERVIEW_NAV_LINK,
-  GEO_TRAFFIC_NAV_LINK,
-  GEO_PROMPTS_NAV_LINK,
-  GEO_COMPETITORS_NAV_LINK,
-  GEO_PERSONAS_NAV_LINK,
-];
-
 export const NAV_GEO_IMPROVE_LINKS: readonly string[] = [
   GEO_GAPS_NAV_LINK,
   GEO_SHELF_SPACE_NAV_LINK,
   GEO_AGENT_READINESS_NAV_LINK,
   CONTENT_NAV_LINK,
   SCHEDULES_NAV_LINK,
-];
-
-export const NAV_GEO_LINKS: readonly string[] = [
-  ...NAV_GEO_VISIBILITY_LINKS,
-  ...NAV_GEO_IMPROVE_LINKS,
-];
-
-export const NAV_STUDIO_LINKS: readonly string[] = [
-  HOME_NAV_LINK,
-  CHAT_NAV_LINK,
-  CONTENT_NAV_LINK,
-  SITES_NAV_LINK,
-  ANALYTICS_NAV_LINK,
-  AGENT_FEEDBACK_NAV_LINK,
-  BRAND_IDENTITY_NAV_LINK,
-];
-
-export const NAV_AUTOMATION_LINKS: readonly string[] = [
-  IRIS_NAV_LINK,
-  SCHEDULES_NAV_LINK,
-  EVENTS_NAV_LINK,
-];
-
-export const NAV_STUDIO_ALL_LINKS: readonly string[] = [
-  ...NAV_STUDIO_LINKS,
-  ...NAV_AUTOMATION_LINKS,
-];
-
-export const NAV_UTILITY_LINKS: readonly string[] = [
-  INTEGRATIONS_NAV_LINK,
-  SKILLS_NAV_LINK,
-  API_KEYS_NAV_LINK,
 ];
 
 /**
@@ -293,12 +230,6 @@ export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
   sites: false,
 };
 
-export const NAV_PRIMARY_ACTIONS: Record<SidebarMode, NavPrimaryActionConfig> =
-  {
-    geo: { icon: PencilEdit01Icon },
-    studio: { icon: PlusSignIcon },
-  };
-
 const SIDEBAR_MODE_SWOOSH_IN = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 const SIDEBAR_MODE_SWOOSH_OUT = "ease-emphasized";
 const SIDEBAR_MODE_ENTER_TIMING = `duration-slow ${SIDEBAR_MODE_SWOOSH_IN}`;
@@ -306,29 +237,18 @@ const SIDEBAR_MODE_EXIT_TIMING = `duration-fast ${SIDEBAR_MODE_SWOOSH_OUT}`;
 
 export const SIDEBAR_MODE_EXIT_MS = DURATION.fast * 1000;
 
-export const SIDEBAR_MODE_FADE_CLASS =
-  "transition-[opacity,translate,filter] will-change-[opacity,translate,filter] motion-reduce:translate-x-0 motion-reduce:blur-none motion-reduce:transition-opacity";
-
 export const SIDEBAR_MODE_ENTER_CLASS = `z-10 translate-x-0 opacity-100 blur-[0px] ${SIDEBAR_MODE_ENTER_TIMING}`;
 
 export const SIDEBAR_MODE_EXIT_LEFT_CLASS = `pointer-events-none z-0 -translate-x-5 opacity-0 blur-[8px] ${SIDEBAR_MODE_EXIT_TIMING}`;
 
 export const SIDEBAR_MODE_EXIT_RIGHT_CLASS = `pointer-events-none z-0 translate-x-5 opacity-0 blur-[8px] ${SIDEBAR_MODE_EXIT_TIMING}`;
 
-export const SIDEBAR_MODE_PILL_CLASS = `pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-md bg-background ring-1 ring-border transition-[translate] will-change-[translate] duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
+const SIDEBAR_MODE_FADE_CLASS =
+  "transition-[opacity,translate,filter] will-change-[opacity,translate,filter] motion-reduce:translate-x-0 motion-reduce:blur-none motion-reduce:transition-opacity";
 
 export const SIDEBAR_MODE_PANEL_CLASS = `flex min-h-0 w-full flex-col ${SIDEBAR_MODE_FADE_CLASS}`;
 
-export const SIDEBAR_MODE_SLOT_CLASS = `grid transition-[grid-template-rows,opacity] duration-slow ${SIDEBAR_MODE_SWOOSH_IN} motion-reduce:transition-none`;
-
 export const NAV_RECENT_LIMIT = 3;
-export const NAV_RECENT_SKELETON_IDS = ["first", "second", "third"] as const;
-export const NAV_RECENT_TITLE_CLASS = "min-w-0 max-w-[8.5rem] flex-1 truncate";
-
-export const POST_STATUS_DOT_CLASS: Record<PostStatus, string> = {
-  draft: "bg-muted-foreground/50",
-  published: "bg-success",
-};
 
 export const ORG_SWITCH_STATIC_PAGE_SECTIONS: ReadonlySet<string> = new Set([
   "geo",
