@@ -25,7 +25,7 @@ import {
 
 import type { BuildParams } from "../src/types/build-params";
 import { astroBin } from "./build";
-import { AREA_PAGES_FILE, ASTRO_LOG_NOISE } from "./constants/build";
+import { AREA_PAGES_FILE } from "./constants/build";
 import {
   ASTRO_READY_SCAN_CHARS,
   ASTRO_READY_URL,
@@ -38,6 +38,7 @@ import {
   DEV_STOP_TIMEOUT_MS,
 } from "./constants/cli";
 import type { DevAreaServer, RunningDevArea } from "./types/dev-server";
+import { createAstroLogFilter } from "./utils/astro-log";
 import { isLocalDevHost } from "./utils/dev-host";
 import { devMarkdown } from "./utils/dev-markdown";
 
@@ -68,16 +69,6 @@ export function paramsForArea(
       area.mount
     ),
   };
-}
-
-function forwardOutput(text: string) {
-  const filtered = text
-    .split("\n")
-    .filter((line) => !ASTRO_LOG_NOISE.some((pattern) => pattern.test(line)))
-    .join("\n");
-  if (filtered.trim()) {
-    process.stderr.write(filtered);
-  }
 }
 
 export async function findFreePort(from: number): Promise<number> {
@@ -179,11 +170,15 @@ export async function startAstroDev(
     const port = await new Promise<number | null>((resolve, reject) => {
       const timer = setTimeout(() => resolve(null), DEV_READY_TIMEOUT_MS);
       let ready = false;
+      const filterOutput = createAstroLogFilter();
       const watch = (stream: NodeJS.ReadableStream) => {
         let tail = "";
         stream.on("data", (chunk: Buffer) => {
           const text = chunk.toString();
-          forwardOutput(text);
+          const filtered = filterOutput(text);
+          if (filtered.trim()) {
+            process.stderr.write(filtered);
+          }
           if (ready) {
             return;
           }

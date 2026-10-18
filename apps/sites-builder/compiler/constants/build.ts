@@ -5,3 +5,6 @@ export const ASTRO_LOG_NOISE: readonly RegExp[] = [
   /\[glob-loader\] The base directory .* does not exist/,
   /\[content\] The collection "(?:blog|changelog)" does not exist or is empty/,
 ];
+
+export const SHIKI_UNKNOWN_LANGUAGE =
+  /\[Shiki\] The language "([^"]+)" doesn't exist/;

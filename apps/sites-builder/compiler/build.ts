@@ -22,11 +22,12 @@ import {
 import type { BuildParams } from "../src/types/build-params";
 import { rewritePublicAssetUrls } from "../src/utils/public-assets";
 import { normalizeAgentInstructions, writeAgentFiles } from "./agent-files";
-import { AREA_PAGES_FILE, ASTRO_LOG_NOISE } from "./constants/build";
+import { AREA_PAGES_FILE } from "./constants/build";
 import { writeOgImages } from "./og-images";
 import { prepareSite } from "./prepare";
 import type { AreaPages } from "./types/agent-files";
 import type { AstroPackageJson, BuildSiteOptions } from "./types/build";
+import { createAstroLogFilter } from "./utils/astro-log";
 import { listFiles } from "./utils/fs";
 import { siteHeadScripts } from "./utils/head-scripts";
 import { inlineScriptHashes } from "./utils/inline-scripts";
@@ -66,14 +67,9 @@ export function runAstro(
         stdio: ["ignore", "pipe", "pipe"],
       }
     );
+    const filterOutput = createAstroLogFilter();
     const forward = (chunk: Buffer) => {
-      const text = chunk
-        .toString()
-        .split("\n")
-        .filter(
-          (line) => !ASTRO_LOG_NOISE.some((pattern) => pattern.test(line))
-        )
-        .join("\n");
+      const text = filterOutput(chunk.toString());
       if (text.trim()) {
         onOutput(text);
       }
