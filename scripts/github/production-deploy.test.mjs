@@ -17,6 +17,7 @@ function fixture({
   const calls = [];
   const directories = [];
   const published = new Map();
+  const deploymentCounts = new Map();
   const toolchainBuilds = [];
   const env = {
     GH_TOKEN: "test",
@@ -88,7 +89,9 @@ function fixture({
         } else if (url.pathname === "/v1/projects/notra/env/env-version") {
           data = { value: liveToolchain };
         } else if (url.pathname === "/v13/deployments") {
-          const id = `new-${body.project}`;
+          const count = (deploymentCounts.get(body.project) ?? 0) + 1;
+          deploymentCounts.set(body.project, count);
+          const id = `new-${body.project}${count > 1 ? `-${count}` : ""}`;
           published.set(body.project, id);
           data = { id, url: `${body.project}.vercel.app` };
         } else {
@@ -428,6 +431,141 @@ test("Vercel failures include the provider's error code and reason without retry
   );
   assert.ok(
     builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
+  );
+});
+
+test("Vercel OOM retries only the failed project at the pinned SHA before downstream releases", async () => {
+  const { run, calls, sha } = fixture({
+    api: true,
+    override: ({ url }) =>
+      url.pathname === "/v13/deployments/new-notra-agent"
+        ? { readyState: "ERROR", errorCode: "out_of_memory" }
+        : undefined,
+  });
+  await run();
+  const agentBuilds = builds(calls).filter(
+    ({ body }) => body.project === "notra-agent"
+  );
+  assert.equal(agentBuilds.length, 2);
+  assert.equal(agentBuilds[0].url.searchParams.has("forceNew"), false);
+  assert.equal(agentBuilds[1].url.searchParams.get("forceNew"), "1");
+  assert.deepEqual(agentBuilds[0].body, agentBuilds[1].body);
+  assert.equal(agentBuilds[1].body.gitSource.sha, sha);
+  assert.equal(builds(calls).length, 11);
+  const retryReady = calls.findIndex(
+    ({ url }) => url.pathname === "/v13/deployments/new-notra-agent-2"
+  );
+  const retryAlias = calls.findIndex(
+    ({ url }, index) =>
+      index > retryReady &&
+      url.pathname === "/v4/aliases/notra-agent-notra.vercel.app"
+  );
+  assert.ok(retryAlias > retryReady);
+  assert.ok(
+    calls.findIndex(
+      ({ url }) => url.pathname === "/v3/deployments.createDeployment"
+    ) > retryAlias
+  );
+});
+
+for (const failure of ["oom", "build error", "wrong commit", "canceled"]) {
+  test(`Vercel retry ${failure} fails closed without a third build`, async () => {
+    const { run, calls } = fixture({
+      api: true,
+      override: ({ url }) => {
+        if (url.pathname === "/v13/deployments/new-notra-agent") {
+          return { readyState: "ERROR", errorCode: "out_of_memory" };
+        }
+        if (url.pathname === "/v13/deployments/new-notra-agent-2") {
+          return failure === "wrong commit"
+            ? { readyState: "READY", gitSource: { sha: "wrong" } }
+            : {
+                readyState: failure === "canceled" ? "CANCELED" : "ERROR",
+                errorCode:
+                  failure === "build error" ? "BUILD_FAILED" : "out_of_memory",
+              };
+        }
+      },
+    });
+    await assert.rejects(
+      run(),
+      /notra-agent: (deployment ended|built a different commit)/
+    );
+    assert.equal(
+      builds(calls).filter(({ body }) => body.project === "notra-agent").length,
+      2
+    );
+    assert.ok(
+      builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
+    );
+  });
+}
+
+for (const waiting of ["build", "alias"]) {
+  test(`Vercel retry times out waiting for ${waiting} without a third build`, async () => {
+    const { run, calls } = fixture({
+      api: true,
+      override: ({ url }) => {
+        if (url.pathname === "/v13/deployments/new-notra-agent") {
+          return { readyState: "ERROR", errorCode: "out_of_memory" };
+        }
+        if (
+          waiting === "build" &&
+          url.pathname === "/v13/deployments/new-notra-agent-2"
+        ) {
+          return { readyState: "BUILDING" };
+        }
+        if (
+          waiting === "alias" &&
+          url.pathname === "/v4/aliases/notra-agent-notra.vercel.app"
+        ) {
+          return { projectId: "notra-agent", deploymentId: "live-notra-agent" };
+        }
+      },
+    });
+    await assert.rejects(
+      run(),
+      /notra-agent: deployment did not finish in 10 minutes/
+    );
+    assert.equal(
+      builds(calls).filter(({ body }) => body.project === "notra-agent").length,
+      2
+    );
+    assert.ok(
+      builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
+    );
+  });
+}
+
+test("Vercel creation errors are not retried", async () => {
+  const { run, calls } = fixture({
+    override: ({ url, body }) => {
+      if (
+        url.pathname === "/v13/deployments" &&
+        body.project === "notra-agent"
+      ) {
+        throw new Error("connection lost during deployment creation");
+      }
+    },
+  });
+  await assert.rejects(run(), /connection lost during deployment creation/);
+  assert.equal(
+    builds(calls).filter(({ body }) => body.project === "notra-agent").length,
+    1
+  );
+});
+
+test("Vercel cancellation is not retried even with an OOM error code", async () => {
+  const { run, calls } = fixture({
+    override: ({ url }) =>
+      url.pathname === "/v13/deployments/new-notra-agent"
+        ? { readyState: "CANCELED", errorCode: "out_of_memory" }
+        : undefined,
+  });
+  await assert.rejects(run(), /deployment ended CANCELED/);
+  assert.equal(
+    builds(calls).filter(({ body }) => body.project === "notra-agent").length,
+    1
   );
 });
 

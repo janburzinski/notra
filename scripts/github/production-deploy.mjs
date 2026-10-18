@@ -565,69 +565,94 @@ export async function release({
       continue;
     }
     try {
-      const deployment = await request("vercel", "/v13/deployments", {
-        name: project.name,
-        project: project.name,
-        target: "production",
-        gitSource: {
-          type: "github",
-          repoId: repositoryId,
-          ref: "main",
-          sha,
-        },
-      });
-      if (!deployment.id) {
-        throw new Error(`${project.name}: deployment creation returned no ID`);
-      }
-      await report(`${project.name}: started https://${deployment.url}`);
-      let completed = false;
-      const deadline = Date.now() + 10 * 60_000;
-      for (
-        let attempt = 0;
-        attempt < 60 && Date.now() < deadline;
-        attempt += 1
-      ) {
-        const status = await request(
+      for (let buildAttempt = 0; buildAttempt < 2; buildAttempt += 1) {
+        const deployment = await request(
           "vercel",
-          `/v13/deployments/${deployment.id}`
+          `/v13/deployments${buildAttempt > 0 ? "?forceNew=1" : ""}`,
+          {
+            name: project.name,
+            project: project.name,
+            target: "production",
+            gitSource: {
+              type: "github",
+              repoId: repositoryId,
+              ref: "main",
+              sha,
+            },
+          }
         );
-        if (status.readyState === "READY") {
-          if (deploymentSha(status) !== sha) {
-            throw new Error(`${project.name}: built a different commit`);
-          }
-          let alias;
-          try {
-            alias = await request(
-              "vercel",
-              `/v4/aliases/${project.productionAlias}`
-            );
-          } catch (error) {
-            await report(
-              `${project.name}: waiting for production alias (${error.message})`
-            );
-          }
-          if (alias?.deploymentId === deployment.id) {
-            await report(`${project.name}: READY https://${status.url}`);
-            completed = true;
-            break;
-          }
-        } else if (!activeStates.has(status.readyState)) {
-          const reason = [status.errorCode, status.readyStateReason]
-            .filter(Boolean)
-            .join(": ");
+        if (!deployment.id) {
           throw new Error(
-            `${project.name}: deployment ended ${status.readyState}${reason ? ` (${reason})` : ""}`
+            `${project.name}: deployment creation returned no ID`
           );
         }
-        const remaining = deadline - Date.now();
-        if (remaining > 0) {
-          await sleep(Math.min(10_000, remaining));
+        await report(`${project.name}: started https://${deployment.url}`);
+        let completed = false;
+        let retry = false;
+        const deadline = Date.now() + 10 * 60_000;
+        for (
+          let attempt = 0;
+          attempt < 60 && Date.now() < deadline;
+          attempt += 1
+        ) {
+          const status = await request(
+            "vercel",
+            `/v13/deployments/${deployment.id}`
+          );
+          if (status.readyState === "READY") {
+            if (deploymentSha(status) !== sha) {
+              throw new Error(`${project.name}: built a different commit`);
+            }
+            let alias;
+            try {
+              alias = await request(
+                "vercel",
+                `/v4/aliases/${project.productionAlias}`
+              );
+            } catch (error) {
+              await report(
+                `${project.name}: waiting for production alias (${error.message})`
+              );
+            }
+            if (alias?.deploymentId === deployment.id) {
+              await report(`${project.name}: READY https://${status.url}`);
+              completed = true;
+              break;
+            }
+          } else if (!activeStates.has(status.readyState)) {
+            if (
+              status.readyState === "ERROR" &&
+              status.errorCode === "out_of_memory" &&
+              buildAttempt === 0
+            ) {
+              await report(
+                `${project.name}: out_of_memory at https://${status.url ?? deployment.url}; retrying once at ${sha}`
+              );
+              await sleep(10_000);
+              retry = true;
+              break;
+            }
+            const reason = [status.errorCode, status.readyStateReason]
+              .filter(Boolean)
+              .join(": ");
+            throw new Error(
+              `${project.name}: deployment ended ${status.readyState}${reason ? ` (${reason})` : ""}`
+            );
+          }
+          const remaining = deadline - Date.now();
+          if (remaining > 0) {
+            await sleep(Math.min(10_000, remaining));
+          }
         }
-      }
-      if (!completed) {
-        throw new Error(
-          `${project.name}: deployment did not finish in 10 minutes`
-        );
+        if (retry) {
+          continue;
+        }
+        if (!completed) {
+          throw new Error(
+            `${project.name}: deployment did not finish in 10 minutes`
+          );
+        }
+        break;
       }
     } catch (error) {
       failures.push(error.message);
