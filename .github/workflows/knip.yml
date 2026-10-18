@@ -4,6 +4,16 @@ on:
   push:
     branches: ["main"]
   pull_request:
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "!apps/docs/**"
+      - "!**/*.md"
+      - "!**/*.mdx"
+      - "package.json"
+      - "bun.lock"
+      - "turbo.json"
+      - ".github/workflows/knip.yml"
 
 permissions:
   contents: read
