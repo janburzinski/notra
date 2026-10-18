@@ -5,10 +5,12 @@ import { defineTool } from "eve/tools";
 import {
   SCRAPE_BATCH_MIN_PAGE_LENGTH,
   SCRAPE_MARKDOWN_MAX_LENGTH,
+  SCRAPE_PAGE_TIMEOUT_MS,
 } from "../constants/context-dev";
 import { webpagesInputSchema } from "../schemas/research-tools";
 import { saveReferenceSnapshot } from "../utils/reference-snapshot";
 import { withTransientRetryEffect } from "../utils/retry";
+import { isRetryableScrapeError } from "../utils/scrape";
 
 export function createScrapePagesTool() {
   return defineTool({
@@ -25,7 +27,10 @@ export function createScrapePagesTool() {
           urls.map((url) =>
             withTransientRetryEffect(
               async () => {
-                const page = await fetchWebpage({ url });
+                const page = await fetchWebpage({
+                  timeoutMS: SCRAPE_PAGE_TIMEOUT_MS,
+                  url,
+                });
                 const snapshot = await saveReferenceSnapshot({
                   ctx,
                   markdown: page.markdown,
@@ -37,7 +42,10 @@ export function createScrapePagesTool() {
                   ...(snapshot ?? {}),
                 };
               },
-              { operationName: `Context.dev page scrape for ${url}` }
+              {
+                operationName: `Context.dev page scrape for ${url}`,
+                shouldRetry: isRetryableScrapeError,
+              }
             ).pipe(
               Effect.catch((error) =>
                 Effect.succeed({
