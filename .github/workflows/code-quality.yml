@@ -15,7 +15,7 @@ concurrency:
 jobs:
   checks:
     name: Quality (${{ matrix.check }})
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -117,7 +117,7 @@ jobs:
         run: bun run check-types --concurrency=2 --filter=@usenotra/geo --filter=@notra/agent --filter=@notra/ai --filter=@notra/db --filter=@notra/utils --filter=@notra/geo-core --filter=dashboard --filter=console --filter=ui --filter=web
 
   infrastructure:
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 10
     services:
       postgres:
@@ -194,7 +194,7 @@ jobs:
   quality:
     if: always()
     needs: [checks, infrastructure]
-    runs-on: ubuntu-26.04
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 1
     steps:
       - name: Require all quality checks
