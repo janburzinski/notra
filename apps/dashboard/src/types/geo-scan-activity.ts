@@ -93,7 +93,7 @@ export interface GeoScanViewCountProps {
   locale: string;
 }
 
-export type GeoScanRunView = "answers" | "pending";
+export type GeoScanRunView = "answers" | "mentioned" | "pending";
 
 export type GeoScanPendingAnswer = NonNullable<
   ReturnType<typeof useGeoScanRun>["data"]
@@ -133,6 +133,7 @@ export interface GeoScanRunFiltersProps {
   view: GeoScanRunView;
   onViewChange: (view: GeoScanRunView) => void;
   answerCount: number;
+  mentionedCount: number;
   pendingCount: number;
   running: boolean;
   engine: string;
@@ -213,6 +214,7 @@ export interface ScanRunDetailView {
   pendingOffset: number;
   total: number;
   answerCount: number;
+  mentionedCount: number;
 }
 
 export type ScanRunDetailTranslator = ReturnType<

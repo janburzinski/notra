@@ -3,17 +3,15 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Progress } from "@notra/ui/components/ui/progress";
 import { useLocale, useTranslations } from "use-intl";
 
-import { useFormatRelative } from "@/lib/hooks/use-format-relative";
 import type { GeoScanActivityStatusProps } from "@/types/geo-scan-activity";
 import { geoRunProgress } from "@/utils/geo-scan-activity";
 
-/** One line above the answers table: what this scan is and how far it got. */
+/** One line above the answers table while a scan is starting or running. */
 export function ScanActivityStatus({
   run,
   starting,
 }: GeoScanActivityStatusProps) {
   const t = useTranslations("geo.scanActivityStatus");
-  const formatRelative = useFormatRelative();
   const locale = useLocale();
   if (run.status === "running") {
     const total = run.plan?.totalChecks ?? null;
@@ -59,26 +57,5 @@ export function ScanActivityStatus({
       </p>
     );
   }
-  const when = formatRelative(run.finishedAt ?? run.startedAt);
-  if (run.status === "failed") {
-    return (
-      <p className="text-muted-foreground min-w-0 truncate text-sm">
-        {t("failed", { when })}
-      </p>
-    );
-  }
-  return (
-    <p className="min-w-0 truncate text-sm">
-      <span className="text-foreground font-medium">
-        {t("completed", { when })}
-      </span>
-      <span className="text-muted-foreground tabular-nums">
-        {" · "}
-        {t("summary", {
-          answers: run.checks,
-          mentions: run.mentions.toLocaleString(locale),
-        })}
-      </span>
-    </p>
-  );
+  return null;
 }

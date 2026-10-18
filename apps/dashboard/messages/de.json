@@ -3426,12 +3426,9 @@
       }
     },
     "scanActivityStatus": {
-      "failed": "Der letzte Scan wurde {when} vorzeitig beendet.",
       "running": "Scan läuft",
       "starting": "Neuer Scan startet…",
-      "completed": "Letzter Scan {when}",
       "answered": "{checks} von {total} beantwortet",
-      "summary": "{answers, plural, one {# Antwort} other {# Antworten}} · {mentions} erwähnt",
       "progressLabel": "Scan-Fortschritt",
       "empty": {
         "title": "Noch keine Antworten",
@@ -3468,6 +3465,7 @@
       "followProgress": "Verfolge den Fortschritt dieses Scans auf der Prompts-Seite."
     },
     "scanRunDetail": {
+      "title": "Letzter Scan",
       "turn": "Runde {turn}",
       "columns": {
         "mention": "Erwähnung"
@@ -3480,10 +3478,11 @@
       "loadError": "Scan-Antworten konnten nicht geladen werden.",
       "unavailable": "Dieser Scan ist nicht mehr verfügbar.",
       "empty": "Keine gespeicherten Antworten für diese Auswahl.",
-      "itemMissing": "fehlend",
+      "itemMissing": "fehlgeschlagen",
       "itemAnswers": "Antworten",
       "viewLabel": "Scan-Ergebnistyp",
-      "missing": "Fehlend",
+      "failed": "Fehlgeschlagen",
+      "failedHint": "Das Modell hatte einen Fehler oder Timeout, deshalb wurde für diese Prompts keine Antwort gespeichert.",
       "filterByModel": "Scan-Ergebnisse nach Modell filtern"
     },
     "searchConsoleCard": {

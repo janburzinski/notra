@@ -138,9 +138,13 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
     eq(geoMentionChecks.organizationId, scope.organizationId),
     eq(geoMentionChecks.projectId, scope.projectId)
   );
+  const engineFilter = input.engine
+    ? eq(geoMentionChecks.engine, input.engine)
+    : undefined;
   const resultFilter = and(
     scopeFilter,
-    input.engine ? eq(geoMentionChecks.engine, input.engine) : undefined
+    engineFilter,
+    input.mentioned ? eq(geoMentionChecks.mentioned, true) : undefined
   );
   const tasks = scan.plan?.tasks ?? [];
   const live = scan.status === "running" && tasks.length > 0;
@@ -162,11 +166,15 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
               sql<number>`count(*) filter (where ${geoMentionChecks.mentioned})`.mapWith(
                 Number
               ),
-            filtered: input.engine
-              ? sql<number>`count(*) filter (where ${geoMentionChecks.engine} = ${input.engine})`.mapWith(
+            engineChecks: engineFilter
+              ? sql<number>`count(*) filter (where ${engineFilter})`.mapWith(
                   Number
                 )
               : count(),
+            engineMentions: sql<number>`count(*) filter (where ${and(
+              engineFilter,
+              eq(geoMentionChecks.mentioned, true)
+            )})`.mapWith(Number),
           })
           .from(geoMentionChecks)
           .where(scopeFilter),
@@ -239,7 +247,11 @@ export const loadGeoScanRun = Effect.fn("geo.scanRun")(function* (
       ...row,
       capturedAt: row.capturedAt.toISOString(),
     })),
-    total: totals[0]?.filtered ?? 0,
+    total: input.mentioned
+      ? (totals[0]?.engineMentions ?? 0)
+      : (totals[0]?.engineChecks ?? 0),
+    answerTotal: totals[0]?.engineChecks ?? 0,
+    mentionedTotal: totals[0]?.engineMentions ?? 0,
     live: liveRows,
   };
 });

@@ -19,6 +19,7 @@ import {
   DESIGN_SYSTEM_SCAN_MODELS,
 } from "@/constants/design-system-scans";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
+import type { GeoScanRunView } from "@/types/geo-scan-activity";
 import { formatEngineFamily } from "@/utils/geo-charts";
 import { paginatedTableHeightFor } from "@/utils/table";
 
@@ -104,16 +105,20 @@ const missingColumns: TableColumn<
 ];
 
 export default function ScanFiltersDesignSystemClientPage() {
-  const [view, setView] = useState<"answers" | "pending">("answers");
+  const [view, setView] = useState<GeoScanRunView>("answers");
   const [engine, setEngine] = useState("");
   const [page, setPage] = useState(1);
-  const answers = DESIGN_SYSTEM_SCAN_ANSWERS.filter(
+  const engineAnswers = DESIGN_SYSTEM_SCAN_ANSWERS.filter(
     (row) => !engine || row.engine === engine
   );
+  const answers =
+    view === "mentioned"
+      ? engineAnswers.filter((row) => row.mentioned)
+      : engineAnswers;
   const missing = DESIGN_SYSTEM_SCAN_MISSING.filter(
     (row) => !engine || row.engine === engine
   );
-  const rows = view === "answers" ? answers : missing;
+  const rows = view === "pending" ? missing : answers;
   const pageRowCount = Math.min(
     GEO_SCAN_RESULTS_PAGE_SIZE,
     rows.length - (page - 1) * GEO_SCAN_RESULTS_PAGE_SIZE
@@ -121,7 +126,7 @@ export default function ScanFiltersDesignSystemClientPage() {
 
   return (
     <DesignSystemFrame
-      description="Try the Scans table with sample data. Choose Answers or Missing, filter by model, and paginate the results."
+      description="Try the Scans table with sample data. Choose Answers, Mentioned or Failed, filter by model, and paginate the results."
       title="Scans table"
     >
       <section className="space-y-3">
@@ -132,21 +137,21 @@ export default function ScanFiltersDesignSystemClientPage() {
           </p>
         </div>
         <DataTable
-          columns={view === "answers" ? answerColumns : missingColumns}
+          columns={view === "pending" ? missingColumns : answerColumns}
           data={rows}
           emptyState="No results for this model."
           pagination={{
             page,
             pageSize: GEO_SCAN_RESULTS_PAGE_SIZE,
             onPageChange: setPage,
-            itemLabel: view === "answers" ? "answers" : "missing",
+            itemLabel: view === "pending" ? "failed" : "answers",
           }}
           getRowId={(row) => row.id}
           height={paginatedTableHeightFor(pageRowCount)}
           rowHeight={TABLE_ROW_HEIGHT}
           toolbar={
             <ScanRunFilters
-              answerCount={answers.length}
+              answerCount={engineAnswers.length}
               engine={engine}
               engines={[...DESIGN_SYSTEM_SCAN_MODELS]}
               onEngineChange={(next) => {
@@ -157,6 +162,9 @@ export default function ScanFiltersDesignSystemClientPage() {
                 setView(next);
                 setPage(1);
               }}
+              mentionedCount={
+                engineAnswers.filter((row) => row.mentioned).length
+              }
               pendingCount={missing.length}
               running={false}
               view={view}

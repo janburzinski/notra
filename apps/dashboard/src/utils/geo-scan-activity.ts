@@ -26,7 +26,13 @@ export function scanRunDetailView(
   const results = input.data?.results ?? [];
   const running = input.run.status === "running";
   const showsPending = pendingTotal > 0 && !running;
-  const activeView = showsPending ? input.view : "answers";
+  const mentionedCount = input.data?.mentionedTotal ?? input.run.mentions;
+  let activeView: ScanRunDetailView["activeView"] = running
+    ? "answers"
+    : input.view;
+  if (activeView === "pending" && !showsPending) {
+    activeView = "answers";
+  }
   const engines = input.run.plan?.engines ?? [];
   const live = input.data?.live ?? null;
   const rowCount =
@@ -41,14 +47,15 @@ export function scanRunDetailView(
     activeView,
     showLanguage: (input.run.plan?.languages.length ?? 0) > 1,
     loading: input.isPending || input.isPlaceholderData,
-    hasFilters: showsPending || engines.length > 1,
+    hasFilters: !running || engines.length > 1,
     engines,
     height: paginatedTableHeightFor(
       input.isPending ? GEO_SCAN_RESULTS_PAGE_SIZE / 2 : rowCount
     ),
     pendingOffset: input.data?.pendingOffset ?? input.pendingOffset,
     total: input.data?.total ?? 0,
-    answerCount: input.data?.total ?? input.run.checks,
+    answerCount: input.data?.answerTotal ?? input.run.checks,
+    mentionedCount,
   };
 }
 

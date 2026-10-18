@@ -3426,12 +3426,9 @@
       }
     },
     "scanActivityStatus": {
-      "failed": "The last scan stopped early {when}.",
       "running": "Scanning",
       "starting": "Starting a new scan…",
-      "completed": "Last scan {when}",
       "answered": "{checks} of {total} answered",
-      "summary": "{answers, plural, one {# answer} other {# answers}} · {mentions} mentioned",
       "progressLabel": "Scan progress",
       "empty": {
         "title": "No answers yet",
@@ -3468,6 +3465,7 @@
       "followProgress": "Follow this scan's progress on the Prompts page."
     },
     "scanRunDetail": {
+      "title": "Latest scan",
       "turn": "Turn {turn}",
       "columns": {
         "mention": "Mention"
@@ -3480,10 +3478,11 @@
       "loadError": "Could not load scan answers.",
       "unavailable": "This scan is no longer available.",
       "empty": "No saved answers for this selection.",
-      "itemMissing": "missing",
+      "itemMissing": "failed",
       "itemAnswers": "answers",
       "viewLabel": "Scan result type",
-      "missing": "Missing",
+      "failed": "Failed",
+      "failedHint": "The model errored or timed out, so no answer was saved for these prompts.",
       "filterByModel": "Filter scan results by model"
     },
     "searchConsoleCard": {

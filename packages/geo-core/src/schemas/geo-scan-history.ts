@@ -1,4 +1,4 @@
-import { number, string } from "zod";
+import { boolean, number, string } from "zod";
 
 import { geoOrganizationInputSchema } from "./geo-scope";
 
@@ -12,4 +12,6 @@ export const geoScanRunInputSchema = geoOrganizationInputSchema.extend({
   scanId: string().min(1).optional(),
   offset: number().int().min(0).max(100_000).default(0),
   engine: string().min(1).optional(),
+  /** Only answers that named the brand. */
+  mentioned: boolean().optional(),
 });
