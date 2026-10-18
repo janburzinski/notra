@@ -21,12 +21,12 @@ jobs:
   react-doctor:
     runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: useblacksmith/checkout@v1
         with:
           fetch-depth: 0
 
       - name: Check out React Doctor action
-        uses: actions/checkout@v7
+        uses: useblacksmith/checkout@v1
         with:
           repository: millionco/react-doctor
           ref: v2
