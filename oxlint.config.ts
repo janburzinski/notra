@@ -253,12 +253,6 @@ export default defineConfig({
       },
     },
     {
-      files: ["packages/geo/src/index.ts", "packages/geo/src/feedback.ts"],
-      rules: {
-        "oxc/no-barrel-file": "off",
-      },
-    },
-    {
       files: ["apps/dashboard/src/**"],
       rules: {
         "no-restricted-imports": [

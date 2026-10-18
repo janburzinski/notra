@@ -39,7 +39,7 @@ Use Notra from your own applications and agents:
 
 - **REST API:** projects, prompts, scans, visibility, content gaps, briefs, readiness, and traffic. See the [OpenAPI specification](https://api.usenotra.com/openapi.json).
 - **MCP server:** connect AI clients at [`https://mcp.usenotra.com/mcp`](https://mcp.usenotra.com/mcp).
-- **Traffic SDK:** [`@usenotra/geo`](packages/geo), with Next.js, Nuxt, TanStack Start, Astro, SvelteKit, and Netlify integrations.
+- **Traffic SDK:** [`@usenotra/geo`](https://github.com/usenotra/geo-sdk), with Next.js, Nuxt, TanStack Start, Astro, SvelteKit, and Netlify integrations.
 
 See the [product documentation](https://www.usenotra.com/docs) for setup and authentication.
 
@@ -56,7 +56,6 @@ Notra is a Bun and Turborepo monorepo, built with TypeScript, React, Hono, Postg
 | `apps/docs` | Product documentation |
 | `apps/agent`, `apps/onboarding-agent` | Content and onboarding agents |
 | `apps/ui` | Blume UI app |
-| `packages/geo` | Published AI traffic capture SDK |
 | `packages/geo-core` | Shared GEO logic |
 | `packages/db` | Database schema and helpers |
 | `packages/ai`, `packages/content-generation`, `packages/tools` | Shared AI and content-generation functionality |

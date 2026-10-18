@@ -53,7 +53,7 @@ jobs:
           has web && checks="$checks,\"build-web\""
           has dashboard && checks="$checks,\"build-dashboard\""
           has console && checks="$checks,\"build-console\""
-          if jq -e 'any(.[]; IN("@usenotra/geo","@notra/agent","@notra/ai","@notra/db","@notra/utils","@notra/geo-core","dashboard","console","ui","web"))' <<< "$affected" > /dev/null; then checks="$checks,\"typecheck\""; fi
+          if jq -e 'any(.[]; IN("@notra/agent","@notra/ai","@notra/db","@notra/utils","@notra/geo-core","dashboard","console","ui","web"))' <<< "$affected" > /dev/null; then checks="$checks,\"typecheck\""; fi
           echo "checks=$checks]" >> "$GITHUB_OUTPUT"
           if grep -qE '^(packages/db|infra|\.railway)/|^(bun\.lock|package\.json)$' <<< "$files"; then
             echo infrastructure=true >> "$GITHUB_OUTPUT"
@@ -163,7 +163,7 @@ jobs:
 
       - name: Typecheck tested packages and UI docs
         if: matrix.check == 'typecheck'
-        run: bun run check-types --concurrency=2 --filter=@usenotra/geo --filter=@notra/agent --filter=@notra/ai --filter=@notra/db --filter=@notra/utils --filter=@notra/geo-core --filter=dashboard --filter=console --filter=ui --filter=web
+        run: bun run check-types --concurrency=2 --filter=@notra/agent --filter=@notra/ai --filter=@notra/db --filter=@notra/utils --filter=@notra/geo-core --filter=dashboard --filter=console --filter=ui --filter=web
 
   infrastructure:
     needs: changes

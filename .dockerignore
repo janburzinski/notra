@@ -58,8 +58,6 @@ apps/web/**
 
 packages/email/**
 !packages/email/package.json
-packages/geo/**
-!packages/geo/package.json
 packages/kiwi/**
 !packages/kiwi/package.json
 packages/tools/**

@@ -19,7 +19,6 @@ COPY packages/analytics/package.json ./packages/analytics/package.json
 COPY packages/content-generation/package.json ./packages/content-generation/package.json
 COPY packages/db/package.json ./packages/db/package.json
 COPY packages/email/package.json ./packages/email/package.json
-COPY packages/geo/package.json ./packages/geo/package.json
 COPY packages/geo-core/package.json ./packages/geo-core/package.json
 COPY packages/kiwi/package.json ./packages/kiwi/package.json
 COPY packages/posthog/package.json ./packages/posthog/package.json
