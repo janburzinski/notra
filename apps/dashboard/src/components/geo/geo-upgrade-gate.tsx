@@ -93,21 +93,23 @@ export function GeoUpgradeGate({
 
   if (isUnavailable) {
     return (
-      <PageContainer className="flex flex-1 flex-col gap-4 p-6">
-        <p className="text-muted-foreground text-sm" role="status">
-          {t("verifyFailed")}
-        </p>
-        <Button
-          className="w-fit"
-          disabled={isFetching}
-          onClick={() => {
-            void refetch();
-          }}
-          type="button"
-          variant="outline"
-        >
-          {tCommon("actions.tryAgain")}
-        </Button>
+      <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="w-full space-y-4 px-4 lg:px-6">
+          <p className="text-muted-foreground text-sm" role="status">
+            {t("verifyFailed")}
+          </p>
+          <Button
+            className="w-fit"
+            disabled={isFetching}
+            onClick={() => {
+              void refetch();
+            }}
+            type="button"
+            variant="outline"
+          >
+            {tCommon("actions.tryAgain")}
+          </Button>
+        </div>
       </PageContainer>
     );
   }

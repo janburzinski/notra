@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { useDateFnsLocale } from "@/lib/i18n/date-fns";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -81,7 +82,7 @@ function LinearIntegrationMissing() {
   const t = useTranslations("integrations.detailPage");
 
   return (
-    <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="rounded-xl border border-dashed p-12 text-center">
           <h3 className="text-lg font-medium">{t("notFoundTitle")}</h3>
@@ -90,7 +91,7 @@ function LinearIntegrationMissing() {
           </p>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
@@ -123,7 +124,7 @@ function LinearIntegrationLoaded({
     : tCommon("states.disabled");
 
   return (
-    <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="flex flex-col items-start gap-3 @min-[40rem]/main:flex-row @min-[40rem]/main:justify-between">
           <div className="min-w-0 space-y-1">
@@ -237,6 +238,6 @@ function LinearIntegrationLoaded({
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
