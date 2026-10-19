@@ -1,0 +1,30 @@
+apps/sites-e2e/src/worker.ts
+  s_44cf84a7c2985f::t_5de0b07b41ce3f 38,48-53,134-141,290,319,323,444,553,592
+  s_44cf84a7c2985f::t_e15e0e13cb288d 64
+  s_44cf84a7c2985f::t_efa7ab7dd13e74 571-591,594
+apps/sites-e2e/scripts/seed-r2.mjs
+  s_44cf84a7c2985f::t_84c691fb6d52b7 1-35
+apps/sites-e2e/src/utils/sites-worker.ts
+  s_44cf84a7c2985f::t_fd59ad2fb5eec5 1-7,9,12-15,17-18,22,25-31,33-45,47-70,72-90,92-97,101-104,106-132,134-141,143,145,147-176
+  s_44cf84a7c2985f::t_cc2d431986c5c5 98-100
+  s_44cf84a7c2985f::t_e15e0e13cb288d 11,19-21,32,105
+.github/workflows/sites-e2e.yml
+  ai_agent 104,181
+  s_44cf84a7c2985f::t_59cbc185107892 142-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "466860c8f05543cb92ca254f9e484e859428a570",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
