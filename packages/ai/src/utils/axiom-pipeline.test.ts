@@ -36,7 +36,7 @@ const server = createServer(async (request, response) => {
   if (delayMs) {
     await sleep(delayMs);
   }
-  response.writeHead(status);
+  response.writeHead(status, status === 307 ? { Location: "/redirected" } : {});
   response.end(reply);
 });
 server.listen(0, "127.0.0.1");
@@ -105,6 +105,17 @@ test("empty batches skip I/O; tiny payloads use JSON when gzip would be larger; 
     expect(new URL(request.url).pathname).toBe(
       path === "/" ? "/v1/ingest/edge" : "/custom"
     );
+  }
+});
+
+test("redirects reject without forwarding the batch", async () => {
+  const before = received.length;
+  status = 307;
+  try {
+    await expect(sendAxiomBatch(events, config)).rejects.toThrow();
+    expect(received.length - before).toBe(1);
+  } finally {
+    status = 200;
   }
 });
 
