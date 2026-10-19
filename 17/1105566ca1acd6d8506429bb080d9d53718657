@@ -1,0 +1,23 @@
+scripts/testing/cloud/run.ts
+  s_44cf84a7c2985f::t_a78a653fe7a74f 497-503
+apps/dashboard/src/utils/sites-test-access.test.ts
+  s_44cf84a7c2985f::t_a78a653fe7a74f 106-113
+scripts/testing/dashboard/verify.ts
+  s_44cf84a7c2985f::t_a78a653fe7a74f 26-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "171105566ca1acd6d8506429bb080d9d53718657",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
