@@ -22,7 +22,7 @@
       "panelId": 7,
       "refId": "A",
       "grouping": ["routeId"],
-      "baseline": "quantile_over_time(0.95, {service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json | event=\"api.request.completed\" | organizationId=~\"${organization:raw}\" | unwrap durationMs | __error__=\"\" [$__auto]) by (routeId)"
+      "baseline": "quantile_over_time(0.95, {service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json | event=\"api.request.completed\" | organizationId=~\"${organization:raw}\" | routeId!~\".*/stream\" | routeId!=\"/ping\" | routeId!=\"\" | unwrap durationMs | __error__=\"\" [$__auto]) by (routeId)"
     },
     {
       "dashboard": "notra-overview",

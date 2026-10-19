@@ -1,3 +1,5 @@
+import { setTimeout as delay } from "node:timers/promises";
+
 import { createGateway } from "@ai-sdk/gateway";
 import type { SharedV4ProviderMetadata } from "@ai-sdk/provider";
 import type {
@@ -82,14 +84,26 @@ export function createVercelAdapter(
         apiKey: config.apiKey,
         headers: config.headers,
         baseURL: config.baseURL,
-        fetch: (input, init) =>
-          (config.fetch ?? fetch)(input, {
-            ...init,
-            signal: AbortSignal.any([
-              AbortSignal.timeout(3000),
-              ...(init?.signal ? [init.signal] : []),
-            ]),
-          }),
+        async fetch(input, init) {
+          // Generation records are ingested asynchronously after completion.
+          // Retry only a not-yet-visible record, never auth or schema errors.
+          for (let attempt = 0; ; attempt += 1) {
+            const response = await (config.fetch ?? fetch)(input, {
+              ...init,
+              signal: AbortSignal.any([
+                AbortSignal.timeout(3000),
+                ...(init?.signal ? [init.signal] : []),
+              ]),
+            });
+            if (response.status !== 404 || attempt === 9) {
+              return response;
+            }
+            await response.body?.cancel();
+            await delay(2000, undefined, {
+              signal: init?.signal ?? undefined,
+            });
+          }
+        },
       }).getGenerationInfo({ id: generationId });
       const upstreamCost = generation.isByok
         ? generation.upstreamInferenceCost

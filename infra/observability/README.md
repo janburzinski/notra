@@ -88,7 +88,7 @@ telemetry was not activated. The region-only patch changed no application config
 secrets or domains. The post-migration IaC plan reports no changes. See
 [`the migration checklist`](../../.railway/README.md#us-east-migration).
 
-- Operations: <https://grafana.usenotra.com/d/notra-overview> (30-second refresh).
+- Operations: <https://grafana.usenotra.com/d/notra-overview> (five-minute refresh).
 - Usage accounting: <https://grafana.usenotra.com/d/notra-accounting> (no
   auto-refresh).
 - Vercel platform: <https://grafana.usenotra.com/d/notra-vercel> (five-minute refresh).
@@ -154,6 +154,47 @@ change streaming response lifetime. Global exception analytics do not infer a
 target organization from the active UI session.
 
 ### Dashboard scope
+
+#### Cost and latency correction (2026-10-19)
+
+Read-only seven-day telemetry aggregates exposed incomplete cost collection:
+45,162 completed Vercel calls, only 30 cost reports, 40,875 routed lookup failures
+and 4,144 direct-call lookup failures. These are event counts, not reconciled
+unique generations or a provider billing total. The failure messages in Axiom
+were normalized gateway errors; the old projection did not retain HTTP status,
+so it cannot establish which historical failures were 404s.
+
+The shared Vercel adapter now retries only HTTP 404 (up to ten attempts, two
+seconds apart), following the provider's asynchronous generation-ingestion
+contract. Each HTTP attempt retains its three-second timeout. Other failures
+still fail immediately. Direct gateway lifecycle enrichment now emits the same
+deduplicatable `ai.cost.reported` event used by routed accounting. Lookup failure
+events retain bounded HTTP status, and routed failures retain their authorized
+organization ID; neither adds raw errors to Loki.
+
+The overview marks cost totals and customer rankings as **partial observations**,
+shows reported generations alongside completed calls and lookup failures, and
+explains BYOK as inference billed through owned provider keys, not extra gateway
+charges. The frozen GEO panels are in a collapsed, dated archive row with an
+explicit range link, rather than masquerading as current activity. Retention
+still applies; the link does not restore expired historical records. Missing
+costs are not synthesized or extrapolated, and prior gaps require a separate
+provider reconciliation/backfill before matching provider totals is possible.
+
+Normal API p95 excludes `/ping`, missing routes and `/stream` routes; full stream
+duration has a separate panel. Both use a five-minute minimum query interval.
+Sparse p95 observations can still represent a single request, not a population.
+Overview refresh is five minutes rather than repeatedly rescanning seven days
+of cost logs every thirty seconds. The API/MCP detail panel explicitly labels
+its inclusive full-duration semantics. These source changes do not themselves
+deploy applications or backfill missing costs.
+
+Grafana-only deployment `65129522-4092-4869-a8aa-6ecb45dd4a61` reached `SUCCESS`.
+All four deployed dashboard template hashes match source, generated overview
+metadata confirms the archive row and five-minute refresh, and private Grafana
+health reports database `ok`. The monitoring IaC plan has no changes; no settings,
+volumes or application releases were applied. Browser rendering is not verified.
+The application cost fixes above remain source-only until the regular release.
 
 The `notra-overview` start page prioritizes AI spend, GEO and API latency: reported
 GEO scan usage value, separate live gateway/BYOK cards, customer cost rankings,

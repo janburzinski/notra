@@ -1,3 +1,4 @@
+import { GatewayError } from "@ai-sdk/gateway";
 import type { LanguageModelV4CallOptions } from "@ai-sdk/provider";
 import { ROUTER_METADATA_KEY } from "@notra/ai/constants/router";
 import { log } from "@notra/ai/evlog";
@@ -119,6 +120,11 @@ export function createModelCallTelemetry({
       if (enriched.costUsd !== undefined) {
         recordRequestAICost(generationId, enriched.costUsd);
       }
+      emit("info", "ai.cost.reported", {
+        ...enriched,
+        costId: `${route?.decision.gateway ?? request.gateway}:${generationId}`,
+        generationId,
+      });
       emit("info", "ai.call.cost_enriched", {
         ...enriched,
         generationId,
@@ -128,6 +134,7 @@ export function createModelCallTelemetry({
       emit("warn", "ai.call.cost_lookup_failed", {
         generationId,
         costSource: "unknown",
+        status: GatewayError.isInstance(error) ? error.statusCode : undefined,
         error: error instanceof Error ? error.message : String(error),
       });
     }

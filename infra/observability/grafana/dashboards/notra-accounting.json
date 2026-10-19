@@ -42,19 +42,19 @@
       "gridPos": { "x": 0, "y": 0, "w": 24, "h": 4 },
       "options": {
         "mode": "markdown",
-        "content": "**GEO history: selected-range intersection with the frozen 3–10 Oct 2026 snapshot.** [View the full snapshot](/d/notra-accounting?from=2026-10-03T11:35:08.391Z&to=2026-10-10T11:35:08.391Z&var-environment=${environment}&var-organization=${organization:percentencode}). Gateway/BYOK accounting awaits telemetry activation. Reported usage is not invoice cash paid; never add scan totals to individual checks. Missing data is not zero. [Customer rankings and API latency](/d/notra-overview?${__url_time_range}&var-environment=${environment}&var-organization=${organization:percentencode})."
+        "content": "**GEO history: selected-range intersection with the frozen 3–10 Oct 2026 snapshot, not current GEO activity.** [View the full snapshot](/d/notra-accounting?from=2026-10-03T11:35:08.391Z&to=2026-10-10T11:35:08.391Z&var-environment=${environment}&var-organization=${organization:percentencode}). Expand observed accounting below for application cost reports. **These are partial observations, not the Vercel billing total:** failed or missing generation lookups undercount spend. BYOK is inference billed via your own provider keys, not extra gateway charges. Reported usage is not invoice cash paid; never add scan totals to individual checks. Missing data is not zero. [Customer rankings, cost collection health and API latency](/d/notra-overview?${__url_time_range}&var-environment=${environment}&var-organization=${organization:percentencode})."
       }
     },
     {
       "id": 200,
-      "title": "Gateway, BYOK & balance · live collection pending",
+      "title": "Observed accounting · partial cost reports, not billing totals",
       "type": "row",
       "collapsed": true,
       "gridPos": { "x": 0, "y": 9, "w": 24, "h": 1 },
       "panels": [
         {
           "id": 10,
-          "title": "Gateway charges · collection pending",
+          "title": "Observed gateway charges · partial",
           "description": "Includes charges against free or purchased gateway credits; not cash payments. Deduplicates repeated generation lookups.",
           "type": "stat",
           "gridPos": { "x": 0, "y": 11, "w": 8, "h": 5 },
@@ -70,7 +70,7 @@
         },
         {
           "id": 11,
-          "title": "BYOK usage · collection pending",
+          "title": "Observed BYOK inference · partial",
           "description": "Provider-reported inference value, before provider credits, discounts and invoice adjustments. Not cash paid.",
           "type": "stat",
           "gridPos": { "x": 8, "y": 11, "w": 8, "h": 5 },
@@ -86,7 +86,7 @@
         },
         {
           "id": 12,
-          "title": "Gateway balance · collection pending",
+          "title": "Last observed gateway balance",
           "description": "Last observation per gateway in the selected range, not a live billing balance. Shared gateway balance is independent of the organization filter.",
           "type": "stat",
           "gridPos": { "x": 16, "y": 11, "w": 8, "h": 5 },
@@ -172,7 +172,7 @@
       "gridPos": { "x": 0, "y": 4, "w": 8, "h": 5 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
-        "defaults": { "unit": "short", "noValue": "History unavailable" }
+        "defaults": { "unit": "short", "noValue": "No archive data in range" }
       },
       "targets": [
         {
@@ -189,7 +189,10 @@
       "gridPos": { "x": 8, "y": 4, "w": 8, "h": 5 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
-        "defaults": { "unit": "currencyUSD", "noValue": "Unknown" }
+        "defaults": {
+          "unit": "currencyUSD",
+          "noValue": "No archive data in range"
+        }
       },
       "targets": [
         {
@@ -205,7 +208,9 @@
       "type": "stat",
       "gridPos": { "x": 16, "y": 4, "w": 8, "h": 5 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
-      "fieldConfig": { "defaults": { "unit": "short", "noValue": "Unknown" } },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "noValue": "No archive data in range" }
+      },
       "targets": [
         {
           "refId": "A",

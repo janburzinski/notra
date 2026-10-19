@@ -175,7 +175,9 @@
         },
         {
           "id": 3,
-          "title": "API completed-request p95 latency",
+          "title": "API p95 full request duration · includes streams",
+          "description": "Full completed-request duration, including long-lived streams. Not time to first token. Use the overview for non-stream API latency; sparse windows may represent a single request.",
+          "interval": "5m",
           "type": "timeseries",
           "gridPos": { "x": 12, "y": 19, "w": 12, "h": 7 },
           "datasource": { "type": "loki", "uid": "notra-loki" },

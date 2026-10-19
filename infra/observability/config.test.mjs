@@ -61,7 +61,7 @@ test("public monitoring ingress validates Access identity and OTLP auth, while p
 });
 
 test("dashboards keep pending data distinct from zero, customer filters and native-window semantics", () => {
-  assert.equal(dashboards[0].refresh, "30s");
+  assert.equal(dashboards[0].refresh, "5m");
   assert.equal(dashboards[1].refresh, "");
   for (const dashboard of dashboards) {
     assert.equal(dashboard.editable, false);
@@ -113,7 +113,11 @@ test("dashboards keep pending data distinct from zero, customer filters and nati
   }
   const overview = dashboards[0];
   for (const id of [107, 108, 104, 110, 111, 118, 7]) {
-    assert.ok(overview.panels.some((panel) => panel.id === id));
+    assert.ok(
+      overview.panels
+        .flatMap((panel) => panel.panels ?? [panel])
+        .some((panel) => panel.id === id)
+    );
   }
   const infrastructure = overview.panels.find((panel) => panel.id === 201);
   assert.equal(infrastructure.collapsed, true);
@@ -185,11 +189,16 @@ test("grouped instant gauges retain every customer/outcome series, names and cus
     const gauges = dashboard.panels
       .flatMap((panel) => panel.panels ?? [panel])
       .filter(({ type }) => type === "bargauge");
-    assert.equal(gauges.length, dashboard.uid === "notra-overview" ? 4 : 2);
+    assert.equal(gauges.length, dashboard.uid === "notra-overview" ? 6 : 2);
     for (const panel of gauges) {
       let label = "organizationId";
       if (panel.id === 115) {
         label = "outcome";
+      } else if (
+        dashboard.uid === "notra-overview" &&
+        [121, 122].includes(panel.id)
+      ) {
+        label = "gateway";
       } else if (dashboard.uid === "notra-surfaces" && panel.id === 9) {
         label = "userId";
       }

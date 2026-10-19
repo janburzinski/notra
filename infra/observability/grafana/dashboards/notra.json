@@ -4,7 +4,7 @@
   "schemaVersion": 39,
   "version": 2,
   "editable": false,
-  "refresh": "30s",
+  "refresh": "5m",
   "time": { "from": "now-7d", "to": "now" },
   "tags": ["notra", "spend", "geo", "api"],
   "links": [
@@ -56,21 +56,21 @@
       "gridPos": { "x": 0, "y": 0, "w": 24, "h": 4 },
       "options": {
         "mode": "markdown",
-        "content": "**GEO history: selected-range intersection with the frozen 3–10 Oct 2026 snapshot.** [View the full snapshot](/d/notra-overview?from=2026-10-03T11:35:08.391Z&to=2026-10-10T11:35:08.391Z&var-environment=${environment}&var-organization=${organization:percentencode}). Live AI spend and API latency show received application events; empty panels have no matching observations. Costs are reported usage values, not invoices. Missing data is not zero. Click a customer bar to drill down; configured organization names are display-only, with IDs as fallback."
+        "content": "**Costs are partial application observations, NOT your Vercel AI Gateway total.** Compare reported generations with completed calls; failed or missing cost lookups undercount spend. BYOK is inference billed through your own provider keys, not an extra gateway charge. Missing data is not zero. API latency excludes long-lived streams, which have a separate panel. **GEO history is archived below:** selected-range intersection with the frozen 3–10 Oct 2026 snapshot, not current GEO activity. [View the archive range](/d/notra-overview?from=2026-10-03T11:35:08.391Z&to=2026-10-10T11:35:08.391Z&var-environment=${environment}&var-organization=${organization:percentencode}) and expand the GEO archive row."
       }
     },
     {
-      "id": 107,
-      "title": "GEO AI usage value · history",
+      "id": 112,
+      "title": "AI generations with reported costs",
       "type": "stat",
-      "description": "Reported total per GEO scan, including unknown gateway/BYOK attribution. Not cash paid or total AI spend across the product. Replayed scan reports are deduplicated; missing costs are excluded, not zero. Imported 3–10 October 2026.",
+      "description": "Distinct generation cost IDs with a reported total. Compare with completed calls to detect incomplete cost collection. Reports may include failed charged calls, and lookups may arrive later; this is not an exact coverage percentage.",
       "gridPos": { "x": 0, "y": 4, "w": 6, "h": 4 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
         "defaults": {
-          "unit": "currencyUSD",
-          "decimals": 2,
-          "noValue": "Unknown",
+          "unit": "short",
+          "decimals": 0,
+          "noValue": "No cost reports",
           "color": { "mode": "fixed", "fixedColor": "blue" }
         }
       },
@@ -83,22 +83,22 @@
         {
           "refId": "A",
           "instant": true,
-          "expr": "sum(max by (costId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", costUsd=\"costUsd\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | costId!=\"\" | unwrap costUsd | __error__=\"\" [$__range])))"
+          "expr": "count(max by (costId) (max_over_time({service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", costUsd=\"costUsd\" | event=\"ai.cost.reported\" | organizationId=~\"${organization:raw}\" | costId!=\"\" | unwrap costUsd | __error__=\"\" [$__range])))"
         }
       ]
     },
     {
       "id": 110,
-      "title": "AI gateway charges · live",
+      "title": "Observed gateway charges · partial",
       "type": "stat",
-      "description": "Reported gateway charges, including promotional or purchased credits; not invoice cash paid. Does not include the separate GEO history card. Awaiting application telemetry activation.",
+      "description": "Only successfully reported application costs in the selected range. Includes Vercel and OpenRouter; NOT the Vercel dashboard total or invoice cash paid. Missing/failed lookups are excluded and can severely undercount spend.",
       "gridPos": { "x": 6, "y": 4, "w": 6, "h": 4 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
         "defaults": {
           "unit": "currencyUSD",
           "decimals": 2,
-          "noValue": "Awaiting telemetry"
+          "noValue": "No cost reports"
         }
       },
       "options": {
@@ -115,16 +115,16 @@
     },
     {
       "id": 111,
-      "title": "AI BYOK usage value · live",
+      "title": "Observed BYOK inference · partial",
       "type": "stat",
-      "description": "Provider-reported inference value for customer-owned keys. Separate from gateway charges and not invoice cash paid. Awaiting application telemetry activation.",
+      "description": "Inference value billed outside the gateway through your own provider keys (BYOK), not necessarily customer-owned keys. Not additional gateway charges or invoice cash paid. Only successful cost reports in the selected range.",
       "gridPos": { "x": 12, "y": 4, "w": 6, "h": 4 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
         "defaults": {
           "unit": "currencyUSD",
           "decimals": 2,
-          "noValue": "Awaiting telemetry"
+          "noValue": "No cost reports"
         }
       },
       "options": {
@@ -140,8 +140,8 @@
       ]
     },
     {
-      "id": 104,
-      "title": "GEO scans · history",
+      "id": 113,
+      "title": "Completed AI calls",
       "type": "stat",
       "gridPos": { "x": 18, "y": 4, "w": 6, "h": 4 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
@@ -149,62 +149,55 @@
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "noValue": "History unavailable"
+          "noValue": "No completed calls"
         }
       },
       "targets": [
         {
           "refId": "A",
           "instant": true,
-          "expr": "count(max by (callId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", callId=\"callId\", organizationId=\"organizationId\", weight=\"weight\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | unwrap weight | __error__=\"\" [$__range])))"
+          "expr": "sum(count_over_time({service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json event=\"event\", organizationId=\"organizationId\" | event=\"ai.call.completed\" | organizationId=~\"${organization:raw}\" | __error__=\"\" [$__range]))"
         }
       ]
     },
     {
-      "id": 108,
-      "title": "Which customers cost the most? · GEO history",
-      "type": "bargauge",
-      "description": "Top 10 customers by reported GEO scan usage value. Missing cost reports are excluded; this is not a gateway/BYOK split or an invoice. Click a bar to filter this dashboard to that customer.",
+      "id": 119,
+      "title": "Streaming requests · p95 full duration",
+      "type": "timeseries",
+      "description": "Full request duration for stream routes, not time to first token or ordinary API response latency. Long-lived streams can legitimately take minutes. Windows contain at least five minutes; sparse p95 samples can represent a single request.",
       "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
-      "transformations": [
-        { "id": "prepareTimeSeries", "options": { "format": "multi" } }
-      ],
+      "interval": "5m",
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
         "defaults": {
-          "displayName": "${__field.labels.organizationId}",
+          "displayName": "${__field.labels.routeId}",
           "min": 0,
-          "unit": "currencyUSD",
-          "decimals": 2,
-          "noValue": "Unknown",
-          "links": [
-            {
-              "title": "View this customer",
-              "url": "/d/notra-overview?${__url_time_range}&var-environment=${environment}&var-organization=${__field.labels.organizationId}"
-            }
-          ]
+          "unit": "ms",
+          "noValue": "No stream requests",
+          "custom": { "lineWidth": 2, "spanNulls": false }
         }
       },
       "options": {
-        "orientation": "horizontal",
-        "displayMode": "basic",
-        "showUnfilled": false,
-        "reduceOptions": { "calcs": ["lastNotNull"], "values": false }
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "max"]
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
         {
           "refId": "A",
-          "instant": true,
-          "legendFormat": "{{organizationId}}",
-          "expr": "topk(10, sum by (organizationId) (max by (costId,organizationId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", costUsd=\"costUsd\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | organizationId!=\"\" | costId!=\"\" | unwrap costUsd | __error__=\"\" [$__range]))))"
+          "legendFormat": "{{routeId}}",
+          "expr": "quantile_over_time(0.95, {service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json | keep event,organizationId,routeId,durationMs | event=\"api.request.completed\" | organizationId=~\"${organization:raw}\" | routeId=~\".*/stream\" | unwrap durationMs | __error__=\"\" [$__auto]) by (routeId)"
         }
       ]
     },
     {
       "id": 118,
-      "title": "Which customers cost the most? · live AI",
+      "title": "Customers · reported AI usage (partial)",
       "type": "bargauge",
-      "description": "Reported gateway charges plus BYOK inference value, not payments. Does not add GEO scan history. Awaiting application telemetry activation.",
+      "description": "Only generations with a reported total and customer attribution. Failed lookups and missing totals are excluded: this cannot reliably rank total customer spend until cost collection is complete. Gateway charges plus BYOK inference value, not payments or GEO scan history.",
       "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
       "transformations": [
         { "id": "prepareTimeSeries", "options": { "format": "multi" } }
@@ -241,10 +234,10 @@
       ]
     },
     {
-      "id": 109,
-      "title": "GEO cost trend · rolling 24h",
+      "id": 120,
+      "title": "Observed gateway charges · rolling 24h",
       "type": "timeseries",
-      "description": "Reported GEO scan usage value per customer over trailing 24-hour windows, not calendar-day totals. Frozen database history; original scan timestamps. Scan totals are never added to individual check costs.",
+      "description": "Partial reported charges by gateway over trailing 24-hour windows, not calendar-day totals or provider billing totals. A missing generation lookup is excluded, not free usage.",
       "gridPos": { "x": 0, "y": 24, "w": 12, "h": 7 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
@@ -270,16 +263,16 @@
       "targets": [
         {
           "refId": "A",
-          "legendFormat": "{{organizationId}}",
-          "expr": "sum by (organizationId) (max by (costId,organizationId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", costUsd=\"costUsd\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | organizationId!=\"\" | costId!=\"\" | unwrap costUsd | __error__=\"\" [1d])))"
+          "legendFormat": "{{gateway}}",
+          "expr": "sum by (gateway) (max by (costId,gateway) (max_over_time({service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", gateway=\"gateway\", gatewayCostUsd=\"gatewayCostUsd\" | event=\"ai.cost.reported\" | organizationId=~\"${organization:raw}\" | costId!=\"\" | unwrap gatewayCostUsd | __error__=\"\" [1d])))"
         }
       ]
     },
     {
-      "id": 115,
-      "title": "GEO scans · completed / failed / in progress",
+      "id": 121,
+      "title": "Cost lookup failures · selected range",
       "type": "bargauge",
-      "description": "Deduplicated scans by stored status observed at import, not a live queue. Missing statuses are excluded.",
+      "description": "Failed gateway lookups, grouped by gateway. These are attempts, not unique generations or lost dollars. A large count means the observed cost totals are incomplete.",
       "gridPos": { "x": 12, "y": 24, "w": 12, "h": 7 },
       "transformations": [
         { "id": "prepareTimeSeries", "options": { "format": "multi" } }
@@ -290,7 +283,7 @@
           "decimals": 0,
           "unit": "short",
           "min": 0,
-          "displayName": "${__field.labels.outcome}"
+          "displayName": "${__field.labels.gateway}"
         }
       },
       "options": {
@@ -303,16 +296,17 @@
         {
           "refId": "A",
           "instant": true,
-          "legendFormat": "{{outcome}}",
-          "expr": "count by (outcome) (max by (callId,outcome) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", callId=\"callId\", organizationId=\"organizationId\", outcome=\"outcome\", weight=\"weight\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | callId!=\"\" | outcome!=\"\" | unwrap weight | __error__=\"\" [$__range])))"
+          "legendFormat": "{{gateway}}",
+          "expr": "sum by (gateway) (count_over_time({service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json event=\"event\", organizationId=\"organizationId\", gateway=\"gateway\" | event=~\"ai.call.cost_lookup_failed|ai.router.generation_lookup_failed\" | organizationId=~\"${organization:raw}\" | __error__=\"\" [$__range]))"
         }
       ]
     },
     {
       "id": 7,
-      "title": "API latency · p95 by route",
+      "title": "API latency · p95 excluding streams",
       "type": "timeseries",
-      "description": "95th percentile of completed application requests, not synthetic probe latency. Awaiting application telemetry activation.",
+      "description": "Completed non-stream application requests, excluding /ping health checks. Long-lived /stream routes are shown separately. Minimum five-minute windows avoid tiny refresh-dependent buckets; sparse p95 samples may still represent a single request. Missing windows are not zero latency.",
+      "interval": "5m",
       "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
@@ -335,7 +329,7 @@
         {
           "refId": "A",
           "legendFormat": "{{routeId}}",
-          "expr": "quantile_over_time(0.95, {service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json | keep event,organizationId,routeId,durationMs | event=\"api.request.completed\" | organizationId=~\"${organization:raw}\" | unwrap durationMs | __error__=\"\" [$__auto]) by (routeId)"
+          "expr": "quantile_over_time(0.95, {service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json | keep event,organizationId,routeId,durationMs | event=\"api.request.completed\" | organizationId=~\"${organization:raw}\" | routeId!~\".*/stream\" | routeId!=\"/ping\" | routeId!=\"\" | unwrap durationMs | __error__=\"\" [$__auto]) by (routeId)"
         }
       ]
     },
@@ -343,7 +337,8 @@
       "id": 8,
       "title": "API errors · 5xx by route",
       "type": "timeseries",
-      "description": "Application request errors, not public uptime probes. Awaiting application telemetry activation.",
+      "description": "Application 5xx response rate, not public uptime probes. Minimum five-minute windows; gaps mean no matching observations, not measured zero errors.",
+      "interval": "5m",
       "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
@@ -363,8 +358,8 @@
       ]
     },
     {
-      "id": 117,
-      "title": "Who runs the most GEO scans? · history",
+      "id": 122,
+      "title": "Completed AI calls · by gateway",
       "type": "bargauge",
       "gridPos": { "x": 0, "y": 31, "w": 12, "h": 7 },
       "transformations": [
@@ -373,16 +368,10 @@
       "datasource": { "type": "loki", "uid": "notra-loki" },
       "fieldConfig": {
         "defaults": {
-          "displayName": "${__field.labels.organizationId}",
+          "displayName": "${__field.labels.gateway}",
           "min": 0,
           "unit": "short",
-          "decimals": 0,
-          "links": [
-            {
-              "title": "View this customer",
-              "url": "/d/notra-overview?${__url_time_range}&var-environment=${environment}&var-organization=${__field.labels.organizationId}"
-            }
-          ]
+          "decimals": 0
         }
       },
       "options": {
@@ -395,8 +384,8 @@
         {
           "refId": "A",
           "instant": true,
-          "legendFormat": "{{organizationId}}",
-          "expr": "topk(10, count by (organizationId) (max by (callId,organizationId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", callId=\"callId\", organizationId=\"organizationId\", weight=\"weight\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | organizationId!=\"\" | callId!=\"\" | unwrap weight | __error__=\"\" [$__range]))))"
+          "legendFormat": "{{gateway}}",
+          "expr": "sum by (gateway) (count_over_time({service_name=~\".+\", deployment_environment_name=\"${environment}\"} | json event=\"event\", organizationId=\"organizationId\", gateway=\"gateway\" | event=\"ai.call.completed\" | organizationId=~\"${organization:raw}\" | __error__=\"\" [$__range]))"
         }
       ]
     },
@@ -786,13 +775,202 @@
       ]
     },
     {
+      "id": 203,
+      "title": "GEO archive · 3–10 Oct 2026 only · select the archive range above",
+      "type": "row",
+      "collapsed": true,
+      "gridPos": { "x": 0, "y": 48, "w": 24, "h": 1 },
+      "panels": [
+        {
+          "id": 107,
+          "title": "GEO usage value · 3–10 Oct archive",
+          "type": "stat",
+          "description": "Frozen scan totals, not current spend. Select the archive range linked above. The selected range still filters original scan timestamps; missing history is never treated as zero.",
+          "gridPos": { "x": 0, "y": 50, "w": 12, "h": 4 },
+          "datasource": { "type": "loki", "uid": "notra-loki" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "currencyUSD",
+              "decimals": 2,
+              "noValue": "No archive data in range"
+            }
+          },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+            "graphMode": "none"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "instant": true,
+              "expr": "sum(max by (costId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", costUsd=\"costUsd\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | costId!=\"\" | unwrap costUsd | __error__=\"\" [$__range])))"
+            }
+          ]
+        },
+        {
+          "id": 104,
+          "title": "GEO scans · 3–10 Oct archive",
+          "type": "stat",
+          "gridPos": { "x": 12, "y": 50, "w": 12, "h": 4 },
+          "datasource": { "type": "loki", "uid": "notra-loki" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "decimals": 0,
+              "noValue": "No archive data in range"
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "instant": true,
+              "expr": "count(max by (callId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", callId=\"callId\", organizationId=\"organizationId\", weight=\"weight\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | unwrap weight | __error__=\"\" [$__range])))"
+            }
+          ]
+        },
+        {
+          "id": 108,
+          "title": "Customers · GEO cost in 3–10 Oct archive",
+          "type": "bargauge",
+          "description": "Top ten reported scan totals in the frozen snapshot, not a current customer spend ranking.",
+          "gridPos": { "x": 0, "y": 54, "w": 12, "h": 8 },
+          "transformations": [
+            { "id": "prepareTimeSeries", "options": { "format": "multi" } }
+          ],
+          "datasource": { "type": "loki", "uid": "notra-loki" },
+          "fieldConfig": {
+            "defaults": {
+              "displayName": "${__field.labels.organizationId}",
+              "min": 0,
+              "unit": "currencyUSD",
+              "decimals": 2,
+              "noValue": "No archive data in range",
+              "links": [
+                {
+                  "title": "View this customer",
+                  "url": "/d/notra-overview?${__url_time_range}&var-environment=${environment}&var-organization=${__field.labels.organizationId}"
+                }
+              ]
+            }
+          },
+          "options": {
+            "orientation": "horizontal",
+            "displayMode": "basic",
+            "showUnfilled": false,
+            "reduceOptions": { "calcs": ["lastNotNull"], "values": false }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "instant": true,
+              "legendFormat": "{{organizationId}}",
+              "expr": "topk(10, sum by (organizationId) (max by (costId,organizationId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", costUsd=\"costUsd\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | organizationId!=\"\" | costId!=\"\" | unwrap costUsd | __error__=\"\" [$__range]))))"
+            }
+          ]
+        },
+        {
+          "id": 117,
+          "title": "Customers · scan counts in 3–10 Oct archive",
+          "type": "bargauge",
+          "gridPos": { "x": 12, "y": 54, "w": 12, "h": 8 },
+          "transformations": [
+            { "id": "prepareTimeSeries", "options": { "format": "multi" } }
+          ],
+          "datasource": { "type": "loki", "uid": "notra-loki" },
+          "fieldConfig": {
+            "defaults": {
+              "displayName": "${__field.labels.organizationId}",
+              "min": 0,
+              "unit": "short",
+              "decimals": 0,
+              "noValue": "No archive data in range",
+              "links": [
+                {
+                  "title": "View this customer",
+                  "url": "/d/notra-overview?${__url_time_range}&var-environment=${environment}&var-organization=${__field.labels.organizationId}"
+                }
+              ]
+            }
+          },
+          "options": {
+            "orientation": "horizontal",
+            "displayMode": "basic",
+            "showUnfilled": false,
+            "reduceOptions": { "calcs": ["lastNotNull"], "values": false }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "instant": true,
+              "legendFormat": "{{organizationId}}",
+              "expr": "topk(10, count by (organizationId) (max by (callId,organizationId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", callId=\"callId\", organizationId=\"organizationId\", weight=\"weight\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | organizationId!=\"\" | callId!=\"\" | unwrap weight | __error__=\"\" [$__range]))))"
+            }
+          ]
+        },
+        {
+          "id": 109,
+          "title": "GEO archive · rolling 24h scan value",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 62, "w": 12, "h": 7 },
+          "datasource": { "type": "loki", "uid": "notra-loki" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "currencyUSD",
+              "min": 0,
+              "custom": { "lineWidth": 2, "spanNulls": false }
+            }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "legendFormat": "{{organizationId}}",
+              "expr": "sum by (organizationId) (max by (costId,organizationId) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", costId=\"costId\", organizationId=\"organizationId\", costUsd=\"costUsd\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | organizationId!=\"\" | costId!=\"\" | unwrap costUsd | __error__=\"\" [1d])))"
+            }
+          ]
+        },
+        {
+          "id": 115,
+          "title": "GEO archive · status at import, not live queue",
+          "type": "bargauge",
+          "gridPos": { "x": 12, "y": 62, "w": 12, "h": 7 },
+          "transformations": [
+            { "id": "prepareTimeSeries", "options": { "format": "multi" } }
+          ],
+          "datasource": { "type": "loki", "uid": "notra-loki" },
+          "fieldConfig": {
+            "defaults": {
+              "displayName": "${__field.labels.outcome}",
+              "min": 0,
+              "unit": "short",
+              "decimals": 0,
+              "noValue": "No archive data in range"
+            }
+          },
+          "options": {
+            "orientation": "horizontal",
+            "displayMode": "basic",
+            "showUnfilled": false,
+            "reduceOptions": { "calcs": ["lastNotNull"], "values": false }
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "instant": true,
+              "legendFormat": "{{outcome}}",
+              "expr": "count by (outcome) (max by (callId,outcome) (max_over_time({service_name=~\"notra-history-database-.+\", deployment_environment_name=\"${environment}\", history_snapshot=\"20261010T113508391Z\"} | json event=\"event\", callId=\"callId\", organizationId=\"organizationId\", outcome=\"outcome\", weight=\"weight\" | event=\"history.geo.scan\" | organizationId=~\"${organization:raw}\" | callId!=\"\" | outcome!=\"\" | unwrap weight | __error__=\"\" [$__range])))"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": 230,
       "title": "Workflow and telemetry delivery health \u00b7 global observations",
       "type": "row",
       "collapsed": true,
       "gridPos": {
         "x": 0,
-        "y": 48,
+        "y": 49,
         "w": 24,
         "h": 1
       },
@@ -804,7 +982,7 @@
           "type": "stat",
           "gridPos": {
             "x": 0,
-            "y": 49,
+            "y": 50,
             "w": 8,
             "h": 5
           },
@@ -850,7 +1028,7 @@
           "type": "stat",
           "gridPos": {
             "x": 8,
-            "y": 49,
+            "y": 50,
             "w": 8,
             "h": 5
           },
@@ -896,7 +1074,7 @@
           "type": "stat",
           "gridPos": {
             "x": 16,
-            "y": 49,
+            "y": 50,
             "w": 8,
             "h": 5
           },
@@ -942,7 +1120,7 @@
           "type": "timeseries",
           "gridPos": {
             "x": 0,
-            "y": 54,
+            "y": 55,
             "w": 12,
             "h": 8
           },
@@ -971,7 +1149,7 @@
           "type": "timeseries",
           "gridPos": {
             "x": 12,
-            "y": 54,
+            "y": 55,
             "w": 12,
             "h": 8
           },
@@ -1000,7 +1178,7 @@
           "type": "logs",
           "gridPos": {
             "x": 0,
-            "y": 62,
+            "y": 63,
             "w": 24,
             "h": 10
           },

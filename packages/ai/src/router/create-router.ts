@@ -1,3 +1,4 @@
+import { GatewayError } from "@ai-sdk/gateway";
 import type { SharedV4ProviderMetadata } from "@ai-sdk/provider";
 import {
   DEFAULT_CREDIT_CHECK_TTL_MS,
@@ -242,8 +243,12 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
       } catch (error) {
         try {
           logger.warn("ai.router.generation_lookup_failed", {
+            organizationId: metadata.organizationId,
             gateway: metadata.gateway,
             generationId: metadata.generationId,
+            status: GatewayError.isInstance(error)
+              ? error.statusCode
+              : undefined,
             error: error instanceof Error ? error.message : String(error),
           });
         } catch {
