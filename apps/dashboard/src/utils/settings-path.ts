@@ -24,7 +24,7 @@ export function settingsQuery(
   params.set(SETTINGS_QUERY_KEY, section);
   if (extra) {
     for (const [key, value] of Object.entries(extra)) {
-      if (value) {
+      if (value && key !== SETTINGS_QUERY_KEY) {
         params.set(key, value);
       }
     }

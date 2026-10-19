@@ -5,7 +5,10 @@ import type {
   API_KEY_GRANULAR_PERMISSIONS,
 } from "@notra/schemas/constants/dashboard/api-keys";
 import type { PermissionTone } from "@notra/ui/components/ui/permission-selector";
-import type { KeyResponseData } from "@unkey/api/models/components";
+import type {
+  KeyResponseData,
+  V2KeysCreateKeyResponseData,
+} from "@unkey/api/models/components";
 
 import type {
   API_KEY_PERMISSION_SUMMARY,
@@ -99,3 +102,27 @@ export interface ApiKeyStatusBadgeProps {
 export interface ApiKeyPermissionBadgeProps {
   permission: ApiKeyListItem["permission"];
 }
+
+export type CreateApiKeyResponse = V2KeysCreateKeyResponseData & {
+  name: string;
+};
+
+export interface ApiKeyMutationResponse {
+  success: boolean;
+}
+
+export interface UseApiKeyMutationsOptions {
+  organizationId: string | undefined;
+  onCreated: (data: CreateApiKeyResponse) => void;
+  onUpdated: () => void;
+  onDeleted: () => void;
+}
+
+export interface NewKeyConfigState {
+  name: string | null;
+  accessMode: ApiKeyAccessMode | null;
+  scopes: string[] | null;
+  expiration: ApiKeyExpiration | null;
+}
+
+export type ApiKeyCreateErrorField = "name" | "scopes" | "invalid";

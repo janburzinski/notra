@@ -26,8 +26,7 @@ export type NavItemLabelKey =
   | "competitors"
   | "personas"
   | "geoSettings"
-  | "skills"
-  | "apiKeys";
+  | "skills";
 
 export type NavBadgeKey = "beta";
 

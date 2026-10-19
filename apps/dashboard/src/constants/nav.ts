@@ -7,7 +7,6 @@ import {
   ChartAnalysisIcon,
   Comment01Icon,
   Home01Icon,
-  Key01Icon,
   Layers01Icon,
   MagicWand01Icon,
   Message01Icon,
@@ -53,7 +52,6 @@ export const BRAND_IDENTITY_NAV_LINK = "/brand/identity";
 export const AUTOMATIONS_NAV_LINK = "/automation";
 export const INTEGRATIONS_NAV_LINK = "/integrations";
 export const SKILLS_NAV_LINK = "/skills";
-export const API_KEYS_NAV_LINK = "/api-keys";
 export const GEO_OVERVIEW_NAV_LINK = "/geo";
 export const GEO_TRAFFIC_NAV_LINK = "/geo/traffic";
 export const GEO_COMPETITORS_NAV_LINK = "/geo/competitors";
@@ -142,7 +140,6 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
     labelKey: "geoSettings",
   },
   { link: SKILLS_NAV_LINK, icon: MagicWand01Icon, labelKey: "skills" },
-  { link: API_KEYS_NAV_LINK, icon: Key01Icon, labelKey: "apiKeys" },
 ];
 
 export const NAV_GEO_IMPROVE_LINKS: readonly string[] = [
@@ -218,12 +215,7 @@ export const NAV_WORKSPACE_GROUP: NavGroup = {
   icon: Building03Icon,
   labelKey: "workspace",
   listsOwnPage: true,
-  links: [
-    BRAND_IDENTITY_NAV_LINK,
-    INTEGRATIONS_NAV_LINK,
-    SKILLS_NAV_LINK,
-    API_KEYS_NAV_LINK,
-  ],
+  links: [BRAND_IDENTITY_NAV_LINK, INTEGRATIONS_NAV_LINK, SKILLS_NAV_LINK],
 };
 
 export const DEFAULT_NAV_VISIBILITY: NavVisibility = {

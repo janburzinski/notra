@@ -14,6 +14,9 @@
           "label": "Einstellungen",
           "description": "Design, Sprache, Chat und Datenschutz"
         },
+        "api-keys": {
+          "description": "Organisations- und Account-Schlüssel"
+        },
         "general": {
           "label": "Allgemein",
           "description": "Name, Logo und verbundene Konten"

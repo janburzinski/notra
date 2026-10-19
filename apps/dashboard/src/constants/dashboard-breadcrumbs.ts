@@ -1,7 +1,6 @@
 export const BREADCRUMB_SEGMENTS = [
   "accounts",
   "analytics",
-  "api-keys",
   "automation",
   "billing",
   "brand",

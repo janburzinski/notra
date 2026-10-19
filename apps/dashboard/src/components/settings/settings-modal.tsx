@@ -17,6 +17,7 @@ import { type ComponentType, useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { AccountSettingsPane } from "@/components/settings/panes/account-pane";
+import { ApiKeysSettingsPane } from "@/components/settings/panes/api-keys-pane";
 import { AppearanceSettingsPane } from "@/components/settings/panes/appearance-pane";
 import { AttachmentsSettingsPane } from "@/components/settings/panes/attachments-pane";
 import { BillingSettingsPane } from "@/components/settings/panes/billing-pane";
@@ -57,6 +58,7 @@ import {
 
 const STANDARD_SETTINGS_PANES = {
   account: AccountSettingsPane,
+  "api-keys": ApiKeysSettingsPane,
   appearance: AppearanceSettingsPane,
   attachments: AttachmentsSettingsPane,
   billing: BillingSettingsPane,

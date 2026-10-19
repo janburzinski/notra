@@ -14,6 +14,9 @@
           "label": "Preferences",
           "description": "Theme, language, chat and privacy"
         },
+        "api-keys": {
+          "description": "Organization and account keys"
+        },
         "general": {
           "label": "General",
           "description": "Name, logo and connected accounts"

@@ -44,10 +44,17 @@ if (!process.env.NOTRA_SETUP_LEGEND_TEST_WORKER) {
     }),
     Link: ({
       to,
+      search,
       children,
       className,
-    }: ComponentProps<"a"> & { to: string }) => (
-      <a className={className} href={to}>
+    }: ComponentProps<"a"> & {
+      to: string;
+      search?: Record<string, string>;
+    }) => (
+      <a
+        className={className}
+        href={search ? `${to}?${new URLSearchParams(search)}` : to}
+      >
         {children}
       </a>
     ),
@@ -103,7 +110,7 @@ if (!process.env.NOTRA_SETUP_LEGEND_TEST_WORKER) {
         expect(button.props.tabIndex).not.toBe(-1);
         expect(renderToStaticMarkup(button)).not.toContain("<a ");
       }
-      expect(markup).toContain('href="/acme/api-keys"');
+      expect(markup).toContain('href="/acme?settings=api-keys"');
       expect(markup).toContain('rel="noopener noreferrer"');
       expect(markup).toContain('target="_blank"');
       for (const row of setupControls(tree, "div")) {

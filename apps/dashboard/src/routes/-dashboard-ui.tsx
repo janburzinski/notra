@@ -74,9 +74,6 @@ const Chat = lazyPage(() =>
     import("@/components/dashboard/chat-history-nav"),
   ]).then(([page]) => page)
 );
-const ApiKeys = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/api-keys/page")
-);
 const Automations = lazyPage(
   () => import("@/app/(dashboard)/[slug]/automation/page-client")
 );
@@ -360,8 +357,19 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent: organization,
       path: "api-keys",
-      preload: ApiKeys.preload,
-      component: () => <ApiKeys />,
+      component: () => null,
+      loader: async ({ params, searchParams }) => {
+        throw redirect({
+          href: settingsPath(
+            params.slug ?? "",
+            "api-keys",
+            settingsQueryFromSearchParams(
+              searchParams,
+              Object.keys(searchParams)
+            )
+          ),
+        });
+      },
     }),
     createUiRoute({
       parent: organization,

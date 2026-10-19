@@ -11,7 +11,6 @@ export function useBreadcrumbLabels(): BreadcrumbLabels {
     segments: {
       accounts: tLabels("accounts"),
       analytics: tLabels("analytics"),
-      "api-keys": tLabels("apiKeys"),
       automation: tLabels("automations"),
       billing: tLabels("billing"),
       brand: tLabels("brand"),

@@ -32,6 +32,7 @@ import {
   marketingAttributionServerSearchParams,
   marketingAttributionServerUrlKeys,
 } from "@/utils/marketing-attribution.server";
+import { settingsPath } from "@/utils/settings-path";
 
 export const loadAppEntry = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput) => data)
@@ -153,7 +154,7 @@ export const loadLegacyApiKeys = createServerFn({ method: "GET" }).handler(
   async () => {
     const slug = getCookie(LAST_VISITED_ORGANIZATION_COOKIE);
     if (slug && ORGANIZATION_COOKIE_SLUG_PATTERN.test(slug)) {
-      throw redirect({ href: `/${slug}/api-keys` });
+      throw redirect({ href: settingsPath(slug, "api-keys") });
     }
     throw notFound();
   }

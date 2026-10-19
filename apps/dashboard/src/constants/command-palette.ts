@@ -294,8 +294,9 @@ export const COMMAND_ROUTES: CommandRoute[] = [
     label: "API Keys",
     keywords: ["tokens", "secrets", "credentials", "auth"],
     icon: Key01Icon,
-    section: "Manage",
-    path: (slug) => `/${slug}/api-keys`,
+    section: "Settings",
+    path: (slug) => `/${slug}?settings=api-keys`,
+    settingsSection: "api-keys",
   },
   {
     id: "integrations",

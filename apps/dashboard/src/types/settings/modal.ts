@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 export type SettingsSectionId =
   | "account"
   | "appearance"
+  | "api-keys"
   | "general"
   | "members"
   | "notifications"
