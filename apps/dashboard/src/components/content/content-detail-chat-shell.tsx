@@ -27,6 +27,7 @@ import {
   isContentPanelDismissed,
   setContentPanelDismissed,
   setContentPanelHasOverview,
+  setContentPanelHasPreview,
   useContentPanelTab,
 } from "@/lib/content-panel-tab";
 import type {
@@ -96,6 +97,7 @@ interface ContentDetailChatPanelProps {
   status: ChatStatus;
   composer: ContentDetailChatComposerProps;
   overview?: ReactNode;
+  preview?: ReactNode;
 }
 
 function ContentDetailChatComposerSlot({
@@ -113,11 +115,14 @@ function ContentDetailChatComposerSlot({
 export function ContentDetailChatPanel({
   composer,
   overview,
+  preview,
   ...panelProps
 }: ContentDetailChatPanelProps) {
   const tab = useContentPanelTab();
   const hasOverview = Boolean(overview);
+  const hasPreview = Boolean(preview);
   const showOverview = hasOverview && tab === "overview";
+  const showPreview = hasPreview && tab === "preview";
   const { openPanel } = useRightPanel();
   const openByDefault = useEffectEvent(() => {
     if (!isContentPanelDismissed()) {
@@ -133,6 +138,11 @@ export function ContentDetailChatPanel({
     return () => setContentPanelHasOverview(false);
   }, [hasOverview]);
 
+  useEffect(() => {
+    setContentPanelHasPreview(hasPreview);
+    return () => setContentPanelHasPreview(false);
+  }, [hasPreview]);
+
   const onClose = () => {
     if (hasOverview) {
       setContentPanelDismissed(true);
@@ -141,9 +151,9 @@ export function ContentDetailChatPanel({
   };
   return (
     <RightPanel id="content">
-      {showOverview ? (
+      {showOverview || showPreview ? (
         <ContentPanelOverview onClose={onClose}>
-          {overview}
+          {showPreview ? preview : overview}
         </ContentPanelOverview>
       ) : (
         <ContentChatActivityPanel

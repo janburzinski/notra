@@ -382,6 +382,11 @@ export const runSandboxBuildEffect = Effect.fn("Sites.Sandbox.build")(
             yield* uploadBytesEffect(apiKey, currentBoxId, files);
             sourceParts.push(path);
           }
+          for (const file of params.overlayFiles ?? []) {
+            yield* uploadBytesEffect(apiKey, currentBoxId, [
+              { path: `${BOX_WORKDIR}/overlay/${file.path}`, data: file.data },
+            ]);
+          }
         })
       );
 

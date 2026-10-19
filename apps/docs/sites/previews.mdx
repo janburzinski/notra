@@ -63,6 +63,23 @@ Every pull request into the production branch gets a preview at `https://pr-<num
 
 To preview a branch without opening a pull request, open **Deployments → Preview a branch**, enter the branch name and click **Create preview**. Every push to the branch that changes the site updates the preview, and branch previews stay until you remove them with **Delete preview**.
 
+## Post previews
+
+Open a post's **Preview** tab to build it on a Notra site without changing the
+repository or the live site. Choose **Open for** (1 hour, 1 day, 3 days, or 7
+days) and optionally set a password. **Update preview** replaces the build at
+the same link. Changing the password or lifetime does not rebuild the site.
+
+The link closes when its lifetime ends. The daily cleanup then removes the
+preview reference and its saved post files, including files left by failed
+builds. Unreferenced site builds are removed at the next cleanup after the
+24-hour build safety window. **Delete** closes the preview and removes its
+saved post files without waiting for expiry; site builds follow the same cleanup
+policy. The original post and repository files are not deleted.
+
+Expiry cleanup does not remove open branch or pull request previews, the live
+production deployment, or the last ten production builds retained for rollback.
+
 ## Who can open a preview
 
 Set this under **Settings → Previews**, or with the access button on the **Deployments** page, which shows the current mode, for example **Team only**:

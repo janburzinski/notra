@@ -6,6 +6,7 @@ import type {
   ProductionActivationResult,
 } from "@notra/sites-core/types/serving-state";
 import { hashBuildTarget } from "@notra/sites-core/utils/build-target";
+import { isPostPreviewKey } from "@notra/sites-core/utils/hosts";
 import { referencedDeploymentIds } from "@notra/sites-core/utils/serving-state";
 import { eq } from "drizzle-orm";
 
@@ -14,6 +15,7 @@ import {
   getProductionDeploymentHistory,
 } from "./deployments";
 import { SiteActivationContentionError, SiteInputError } from "./errors";
+import { readPostPreviewSource } from "./post-preview-source";
 import { r2GetText } from "./r2";
 import { reportOutcome } from "./reporting";
 import {
@@ -29,6 +31,7 @@ import type {
 } from "./types/deployments";
 import type { Site } from "./types/sites";
 import { invalidateSiteIngestCaches } from "./utils/ingest-cache";
+import { postPreviewPointerAccess } from "./utils/post-preview-access";
 import { withSiteStorageLock } from "./utils/site-storage-lock";
 import { buildTargetForDeployment } from "./utils/urls";
 
@@ -98,6 +101,19 @@ export async function activateDeployment(
       if (!deployment.previewKey) {
         throw new Error("Preview deployment without a preview key");
       }
+      // Read under the lock that access changes take, so they can't be lost.
+      let ownAccess = null;
+      if (isPostPreviewKey(deployment.previewKey)) {
+        const source = await readPostPreviewSource(
+          site.id,
+          deployment.previewKey
+        );
+        // A build finishing after expiry/cleanup must not recreate an open link.
+        if (!source || Date.parse(source.access.expiresAt) <= Date.now()) {
+          return "not_live";
+        }
+        ownAccess = source.access;
+      }
       return liveUnlessSuperseded(
         await activatePreviewDeployment(
           currentSite,
@@ -105,8 +121,9 @@ export async function activateDeployment(
           {
             deploymentId: deployment.id,
             sequence: deployment.generation,
-            visibility: currentSite.previewVisibility,
-            expiresAt: null,
+            ...(ownAccess
+              ? postPreviewPointerAccess(ownAccess)
+              : { visibility: currentSite.previewVisibility, expiresAt: null }),
           },
           tx
         )

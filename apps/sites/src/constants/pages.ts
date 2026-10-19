@@ -32,8 +32,8 @@ p{margin:0;color:var(--muted);text-wrap:pretty}
 .actions{margin-top:28px;display:grid;gap:12px;text-align:left}
 .button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:40px;padding:0 16px;border:1px solid transparent;border-radius:12px;font-family:inherit;font-size:14px;font-weight:500;line-height:1;text-decoration:none;cursor:pointer;transition:filter .15s ease-out,transform .15s ease-out,background-color .15s ease-out}
 .button:active{transform:scale(.97)}
-.primary{border-color:color-mix(in oklch,var(--primary) 60%,transparent);background:linear-gradient(to bottom,color-mix(in oklch,var(--primary) 85%,transparent),var(--primary));color:var(--primary-fg);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 1px 2px rgba(0,0,0,.18)}
-.primary:hover{filter:brightness(1.1)}
+.button.primary{border-color:color-mix(in oklch,var(--primary) 60%,transparent);background:linear-gradient(to bottom,color-mix(in oklch,var(--primary) 85%,transparent),var(--primary));color:var(--primary-fg);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 1px 2px rgba(0,0,0,.18)}
+.button.primary:hover{filter:brightness(1.1)}
 .chip{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;background:#fff;color:#1e1e1e;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),0 1px 1px rgba(0,0,0,.12)}.chip svg{display:block}
 .secondary{border-color:var(--border);background:var(--field);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.05)}
 .secondary:hover{background:var(--tile)}

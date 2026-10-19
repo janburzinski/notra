@@ -46,4 +46,5 @@ export const CONTENT_PULL_REQUEST_STATES = {
 export const CONTENT_PANEL_TABS = [
   { id: "overview" },
   { id: "agent" },
+  { id: "preview" },
 ] as const;

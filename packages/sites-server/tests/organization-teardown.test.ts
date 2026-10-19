@@ -204,7 +204,7 @@ if (!databaseUrl) {
         SITE_R2_KEYS.host(hostname),
         JSON.stringify({ version: 1, siteId: site.id, kind: "custom" })
       );
-      for (const root of ["deployments", "logs", "sites"]) {
+      for (const root of ["deployments", "logs", "previews", "sites"]) {
         objects.set(`${root}/${site.id}/artifact`, "synthetic");
       }
     }

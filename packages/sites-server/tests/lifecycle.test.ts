@@ -17,7 +17,7 @@ import { Effect } from "effect";
 
 import type { SiteDeployment } from "../src/types/deployments";
 import type { SiteJob } from "../src/types/jobs";
-import type { Site } from "../src/types/sites";
+import type { PostPreviewSource, Site } from "../src/types/sites";
 import { buildTargetForDeployment } from "../src/utils/urls";
 
 if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
@@ -94,11 +94,22 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
             .sort((a, b) => b.generation - a.generation)
             .slice(0, 10);
         }
-        if (table === siteDeployments && params[1] === "old") {
+        if (
+          table === siteDeployments &&
+          selection?.id === siteDeployments.id &&
+          condition &&
+          dialect.sqlToQuery(condition).sql.includes('"finished_at"')
+        ) {
+          const cutoff = new Date(String(params.at(-1)));
+          const id = params[1] === "queued" ? undefined : params[1];
           return deployments.filter(
             (deployment) =>
-              deployment.id === "old" &&
-              ["queued", "building", "uploading"].includes(deployment.status)
+              (!id || deployment.id === id) &&
+              (["queued", "building", "uploading"].includes(
+                deployment.status
+              ) ||
+                (deployment.status === "ready" &&
+                  (!deployment.finishedAt || deployment.finishedAt > cutoff)))
           );
         }
         if (table === siteDeployments && !selection) {
@@ -265,9 +276,17 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
       expect(etag).toBe("etag");
       objects.delete(key);
     },
-    r2ListPrefixes: async () => {
-      await onList();
-      return [`deployments/${site.id}/old/`];
+    r2ListPrefixes: async (root: string) => {
+      if (root.startsWith("deployments/")) {
+        await onList();
+      }
+      return [
+        ...new Set(
+          [...objects.keys()]
+            .filter((key) => key.startsWith(root))
+            .map((key) => `${root}${key.slice(root.length).split("/")[0]}/`)
+        ),
+      ];
     },
     r2DeletePrefix: async (prefix: string) => {
       for (const key of objects.keys()) {
@@ -591,6 +610,109 @@ if (process.env.NOTRA_SITES_LIFECYCLE_TEST_WORKER !== "1") {
     };
     expect((await cleanupSiteDeployments(site.id)).deleted).toEqual([]);
     expect(objects.has(SITE_R2_KEYS.manifest(site.id, "old"))).toBe(true);
+  });
+
+  test("cleanup expires post previews and orphan sources without pruning live previews or production history", async () => {
+    const past = new Date(Date.now() - 60_000).toISOString();
+    const future = new Date(Date.now() + 86_400_000).toISOString();
+    const state = createInitialServingState({
+      siteId: site.id,
+      slug: site.slug,
+      now: new Date(),
+    });
+    for (const [key, sourceExpiry, pointerExpiry, hasPointer] of [
+      ["post-expired", past, past, true],
+      ["post-active", future, future, true],
+      ["post-orphan", past, past, false],
+      ["post-extended", future, past, true],
+    ] as const) {
+      const deployment = await readyProduction(key, 5);
+      deployment.kind = "preview";
+      deployment.previewKey = key;
+      objects.set(
+        SITE_R2_KEYS.previewSource(site.id, key),
+        JSON.stringify({
+          generation: 4,
+          pagePath: "/blog/example",
+          files: [{ path: "blog/example.mdx", content: "c3ludGhldGlj" }],
+          access: { lifetime: "1d", expiresAt: sourceExpiry, password: null },
+        } satisfies PostPreviewSource)
+      );
+      if (hasPointer) {
+        state.previews[key] = {
+          deploymentId: key,
+          sequence: 5,
+          visibility: "protected",
+          activatedAt: new Date().toISOString(),
+          expiresAt: pointerExpiry,
+        };
+      }
+    }
+    const branch = await readyProduction("branch", 6);
+    branch.kind = "preview";
+    branch.previewKey = "pr-1";
+    state.previews["pr-1"] = {
+      deploymentId: branch.id,
+      sequence: 6,
+      visibility: "protected",
+      activatedAt: new Date().toISOString(),
+      expiresAt: null,
+    };
+    await readyProduction("production", 7);
+    objects.set(SITE_R2_KEYS.state(site.id), JSON.stringify(state));
+
+    expect((await cleanupSiteDeployments(site.id)).deleted.sort()).toEqual([
+      "post-expired",
+      "post-orphan",
+    ]);
+    const cleaned = JSON.parse(
+      objects.get(SITE_R2_KEYS.state(site.id)) ?? "{}"
+    );
+    expect(Object.keys(cleaned.previews).sort()).toEqual([
+      "post-active",
+      "post-extended",
+      "pr-1",
+    ]);
+    for (const key of ["post-expired", "post-orphan"]) {
+      expect(objects.has(SITE_R2_KEYS.previewSource(site.id, key))).toBe(false);
+      expect(objects.has(SITE_R2_KEYS.manifest(site.id, key))).toBe(false);
+    }
+    for (const key of [
+      "post-active",
+      "post-extended",
+      "branch",
+      "production",
+    ]) {
+      expect(objects.has(SITE_R2_KEYS.manifest(site.id, key))).toBe(true);
+    }
+    expect(
+      objects.has(SITE_R2_KEYS.previewSource(site.id, "post-extended"))
+    ).toBe(true);
+    expect((await cleanupSiteDeployments(site.id)).deleted).toEqual([]);
+  });
+
+  test("post builds cannot activate missing or expired sources as non-expiring previews", async () => {
+    const deployment = await readyProduction("post-build", 5);
+    deployment.kind = "preview";
+    deployment.previewKey = "post-example";
+    expect(await activateDeployment(site, deployment)).toBe("not_live");
+    objects.set(
+      SITE_R2_KEYS.previewSource(site.id, deployment.previewKey),
+      JSON.stringify({
+        generation: 4,
+        pagePath: "/blog/example",
+        files: [],
+        access: {
+          lifetime: "1h",
+          expiresAt: new Date(0).toISOString(),
+          password: null,
+        },
+      } satisfies PostPreviewSource)
+    );
+    expect(await activateDeployment(site, deployment)).toBe("not_live");
+    expect(
+      JSON.parse(objects.get(SITE_R2_KEYS.state(site.id)) ?? "{}").previews
+    ).toEqual({});
   });
 
   test("disabled previews reject creation, redeployment and central enqueue", async () => {

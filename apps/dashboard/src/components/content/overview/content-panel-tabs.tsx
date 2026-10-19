@@ -17,6 +17,7 @@ import {
   focusContentPanelTab,
   setContentPanelTab,
   takeContentPanelTabFocus,
+  useContentPanelHasPreview,
   useContentPanelTab,
 } from "@/lib/content-panel-tab";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,10 @@ import type {
 export function ContentPanelTabs() {
   const t = useTranslations("content.overview.tabs");
   const tab = useContentPanelTab();
+  const hasPreview = useContentPanelHasPreview();
+  const tabs = CONTENT_PANEL_TABS.filter(
+    ({ id }) => id !== "preview" || hasPreview
+  );
   useEffect(() => {
     if (takeContentPanelTabFocus()) {
       document.getElementById(`content-panel-tab-${tab}`)?.focus();
@@ -39,7 +44,7 @@ export function ContentPanelTabs() {
       className="-ms-1.5 flex items-center gap-1"
       role="tablist"
     >
-      {CONTENT_PANEL_TABS.map(({ id }) => {
+      {tabs.map(({ id }) => {
         const isActive = tab === id;
         return (
           <button
@@ -60,15 +65,9 @@ export function ContentPanelTabs() {
                 return;
               }
               event.preventDefault();
-              const index = CONTENT_PANEL_TABS.findIndex(
-                (item) => item.id === id
-              );
+              const index = tabs.findIndex((item) => item.id === id);
               const step = event.key === "ArrowRight" ? 1 : -1;
-              const next =
-                CONTENT_PANEL_TABS[
-                  (index + step + CONTENT_PANEL_TABS.length) %
-                    CONTENT_PANEL_TABS.length
-                ];
+              const next = tabs[(index + step + tabs.length) % tabs.length];
               if (next) {
                 focusContentPanelTab(next.id);
               }

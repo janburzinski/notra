@@ -23,6 +23,7 @@ import type {
   SiteDeploymentTrigger,
   SiteDomainChipStatus,
   SiteSectionConfig,
+  PostPreviewState,
   SiteStatusBadgeConfig,
 } from "@/types/sites";
 
@@ -66,6 +67,8 @@ export const SITE_TABLE_EMPTY_HEIGHT = 340;
 export const SITE_TABLE_COMPACT_EMPTY_HEIGHT = 300;
 export const SITE_SHORT_SHA_LENGTH = 7;
 export const SITE_SHARE_LINK_DAYS = 7;
+export const POST_PREVIEW_POLL_MS = 2000;
+export const POST_PREVIEW_LIFETIME_OPTIONS = ["1h", "1d", "3d", "7d"] as const;
 
 export const SITE_DEFAULT_BLOG_PATH = "/blog";
 export const SITE_DEFAULT_CHANGELOG_PATH = "/changelog";
@@ -130,6 +133,17 @@ export const SITE_STATUS_BADGES: Record<
   expired: { variant: "secondary" },
 };
 
+export const POST_PREVIEW_STATUS_BADGES: Record<
+  PostPreviewState,
+  SiteStatusBadgeConfig
+> = {
+  none: { variant: "secondary" },
+  building: { variant: "warning", icon: Loading03Icon, spin: true },
+  live: { variant: "success", icon: Tick02Icon, square: true },
+  expired: { variant: "secondary", icon: Clock01Icon },
+  failed: { variant: "destructive", icon: Cancel01Icon, square: true },
+};
+
 export const SITE_DEPLOYMENT_ROW_HEIGHT = 48;
 
 export const SITE_ENVIRONMENT_ICONS: Record<
@@ -174,7 +188,7 @@ export const SITES_ONLY_GITHUB_EVENTS: ReadonlySet<string> = new Set([
   "check_run",
 ]);
 
-export const SITE_PREVIEW_KEY_PATTERN = /^(?:pr|br)-[a-z0-9-]{1,40}$/;
+export const SITE_PREVIEW_KEY_PATTERN = /^(?:pr|br|post)-[a-z0-9-]{1,40}$/;
 
 export const SITES_PAGE_SKELETON_ROWS = 3;
 

@@ -1,3 +1,4 @@
+import type { PostMetadataColumns } from "@/types/content/overview";
 import type { GitHubPublishContentType } from "@/types/integrations/github";
 
 export interface SiteGitHubPublishTarget {
@@ -109,4 +110,21 @@ export interface SiteEntryMediaContext {
   organizationId: string;
   publicDirectory: string;
   slug: string;
+}
+
+export interface PrepareSiteEntryFilesParams {
+  post: PostMetadataColumns & {
+    title: string;
+    markdown: string;
+    createdAt: Date;
+    publishedAt: Date | null;
+  };
+  contentType: GitHubPublishContentType;
+  contentPath: string;
+  /** Configured image path; empty uses the site's public directory. */
+  imagePath?: string | null;
+  organizationId: string;
+  rootDirectory: string;
+  slug: string;
+  siteEntry: SiteEntryContext | null;
 }

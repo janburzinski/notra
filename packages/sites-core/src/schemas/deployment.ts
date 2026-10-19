@@ -73,14 +73,6 @@ export const siteServingPointerSchema = z.object({
   activatedAt: z.string(),
 });
 
-export const sitePreviewPointerSchema = z.object({
-  deploymentId: z.string(),
-  visibility: z.enum(SITE_PREVIEW_VISIBILITIES),
-  sequence: z.number().int().nonnegative(),
-  activatedAt: z.string(),
-  expiresAt: z.string().nullable(),
-});
-
 export const sitePreviewPasswordSchema = z.object({
   algorithm: z.literal(SITE_PREVIEW_PASSWORD_ALGORITHM),
   iterations: z.number().int().positive(),
@@ -88,6 +80,18 @@ export const sitePreviewPasswordSchema = z.object({
   hash: z.string().min(1),
   version: z.string().min(1),
   updatedAt: z.string(),
+});
+
+export const sitePreviewPointerSchema = z.object({
+  deploymentId: z.string(),
+  visibility: z.enum(SITE_PREVIEW_VISIBILITIES),
+  sequence: z.number().int().nonnegative(),
+  activatedAt: z.string(),
+  expiresAt: z.string().nullable(),
+  /** Set when the preview chose its own access instead of the site's. */
+  access: z
+    .object({ password: sitePreviewPasswordSchema.nullable() })
+    .optional(),
 });
 
 export const siteServingStateSchema = z.object({

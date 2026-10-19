@@ -18,6 +18,8 @@ export interface SandboxBuildResult {
 export interface SandboxBuildParams {
   sourceArchive: Uint8Array<ArrayBuffer>;
   rootDirectory: string;
+  /** Repository-relative files written over the source after extraction. */
+  overlayFiles?: SandboxUploadFile[];
   snapshotId?: string;
   target: SiteBuildRequestInput;
   onLog?: (log: string) => Promise<void>;

@@ -4,6 +4,7 @@ import {
   SITE_R2_KEYS,
 } from "@notra/sites-core/constants/sites";
 import type { SiteBuildMetrics } from "@notra/sites-core/types/build-metrics";
+import { isPostPreviewKey } from "@notra/sites-core/utils/hosts";
 import { Effect, Exit, Option } from "effect";
 
 import { activateDeployment } from "./activation";
@@ -23,6 +24,7 @@ import {
   siteRepositoryAccess,
 } from "./github";
 import { downloadSiteSourceEffect } from "./github-source";
+import { readPostPreviewSourceEffect } from "./post-preview-source";
 import { publishDeploymentFilesEffect } from "./publish";
 import { r2PutEffect } from "./r2";
 import { openCheckRun, reportOutcome } from "./reporting";
@@ -30,6 +32,7 @@ import {
   compareSmartDeployment,
   skipUnchangedDeployment,
 } from "./smart-deployments";
+import type { SandboxUploadFile } from "./types/build";
 import type { DeploymentOutcome, SiteDeployment } from "./types/deployments";
 import type { SiteRepositoryAccess } from "./types/github";
 import type { BuildAndPublishOutcome } from "./types/pipeline";
@@ -39,6 +42,7 @@ import { redactBuildLog } from "./utils/build-log";
 import { summarizeDiagnostics } from "./utils/diagnostics";
 import { errorMessage, isNotFoundError } from "./utils/errors";
 import { pathsTouchRootDirectory } from "./utils/push-paths";
+import { repositoryPath } from "./utils/root-directory";
 import { runSitesEffect } from "./utils/run-sites-effect";
 
 const writeBuildLog = Effect.fn("Sites.writeBuildLog")(function* (
@@ -49,6 +53,26 @@ const writeBuildLog = Effect.fn("Sites.writeBuildLog")(function* (
   yield* r2PutEffect(SITE_R2_KEYS.buildLog(siteId, deploymentId), log, {
     contentType: "text/plain; charset=utf-8",
   }).pipe(Effect.catch(() => Effect.void));
+});
+
+/** The post files a post preview lays over the production source. */
+const readPostPreviewFiles = Effect.fn("Sites.readPostPreviewFiles")(function* (
+  site: Site,
+  deployment: SiteDeployment
+) {
+  const { previewKey } = deployment;
+  if (!(previewKey && isPostPreviewKey(previewKey))) {
+    return [];
+  }
+  const source = yield* readPostPreviewSourceEffect(site.id, previewKey);
+  // A removal deleted it, which also cancels this build.
+  if (!source) {
+    return null;
+  }
+  return source.files.map((file): SandboxUploadFile => ({
+    path: repositoryPath(site.rootDirectory, file.path),
+    data: new Uint8Array(Buffer.from(file.content, "base64")),
+  }));
 });
 
 const currentBranchHead = Effect.fn("Sites.currentBranchHead")(function* (
@@ -167,7 +191,12 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
     );
     accessToken = access.token;
     let skipReason = yield* whyNotBuild(access, deployment, site.rootDirectory);
-    if (!skipReason) {
+    const overlayFiles = skipReason
+      ? []
+      : yield* readPostPreviewFiles(site, deployment);
+    if (overlayFiles === null) {
+      skipReason = "This preview was deleted.";
+    } else if (!skipReason && overlayFiles.length === 0) {
       smartComparison = yield* Effect.tryPromise({
         try: () => compareSmartDeployment(site, deployment, access),
         catch: (error) => error,
@@ -251,6 +280,7 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
     const build = yield* runSandboxBuildEffect({
       sourceArchive,
       rootDirectory: site.rootDirectory,
+      overlayFiles: overlayFiles ?? [],
       snapshotId: smartComparison?.snapshotId ?? undefined,
       target: {
         siteId: site.id,

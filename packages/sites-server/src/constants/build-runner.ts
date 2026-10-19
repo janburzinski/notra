@@ -16,6 +16,19 @@ function cpu() {
   return readNumber('/sys/fs/cgroup/cpu.stat', 'usage_usec', 1000)
     ?? readNumber('/sys/fs/cgroup/cpuacct/cpuacct.usage', null, 1000000);
 }
+// Lays post preview files over the source without following symlinks the
+// repository may contain, so no overlay path can land outside src.
+function copyOverlay(from, to) {
+  for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
+    const source = from + '/' + entry.name;
+    const target = to + '/' + entry.name;
+    if (fs.lstatSync(target, { throwIfNoEntry: false })?.isSymbolicLink()) throw new Error('Overlay path is a symlink: ' + target);
+    if (entry.isDirectory()) {
+      fs.mkdirSync(target, { recursive: true });
+      copyOverlay(source, target);
+    } else if (entry.isFile()) fs.copyFileSync(source, target);
+  }
+}
 function run(phase, command, args, options = {}) {
   const start = performance.now();
   try {
@@ -30,6 +43,7 @@ try {
   if (run('extract', 'tar', ['xzf', 'source.tgz', '-C', 'src', '--strip-components=1', '--no-same-owner', '--no-same-permissions']) !== 0) process.exitCode = 3;
   else {
     fs.unlinkSync('source.tgz');
+    if (fs.existsSync('overlay')) copyOverlay('overlay', 'src');
     exitCode = run('compile', 'timeout', [timeoutSeconds, 'node', 'dist/cli.mjs', 'build', '--source', sourceDir, '--target', '../target.json', '--out', '../out', '--result-file', '../result.json'], { cwd: 'toolchain' });
     if (fs.existsSync('out') && run('pack', 'tar', ['czf', 'out.tgz', '-C', 'out', '.']) !== 0) throw new Error('Packing build output failed');
   }

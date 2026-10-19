@@ -1,5 +1,9 @@
 import type { sites } from "@notra/db/schema";
+import type { POST_PREVIEW_LIFETIMES } from "@notra/sites-core/constants/sites";
 import type { SiteMounts } from "@notra/sites-core/types/deployment";
+import type { z } from "zod";
+
+import type { postPreviewSourceSchema } from "../schemas/post-preview";
 
 export type Site = typeof sites.$inferSelect;
 
@@ -51,6 +55,8 @@ export interface DeployBranchHeadOptions {
   userId?: string | null;
   branch?: string;
   previewKey?: string | null;
+  /** Shown instead of the head commit's message. */
+  commitMessage?: string;
 }
 
 export interface SiteSettingsPatch {
@@ -87,4 +93,33 @@ export interface UpdateSiteSettingsResult {
 
 export interface SiteCleanupResult {
   deleted: string[];
+}
+
+export interface PostPreviewFile {
+  /** Path inside the site's root directory. */
+  path: string;
+  contents: Uint8Array;
+}
+
+export type PostPreviewSource = z.infer<typeof postPreviewSourceSchema>;
+export type PostPreviewLifetime = keyof typeof POST_PREVIEW_LIFETIMES;
+
+export interface PostPreviewAccessInput {
+  lifetime: PostPreviewLifetime;
+  /** Null opens the preview to anyone with the link; undefined keeps the current one. */
+  password?: string | null;
+}
+
+export interface CreatePostPreviewInput extends PostPreviewAccessInput {
+  postId: string;
+  title: string;
+  pagePath: string;
+  files: PostPreviewFile[];
+  userId: string;
+}
+
+export interface UpdatePostPreviewAccessInput {
+  lifetime?: PostPreviewLifetime;
+  /** Undefined keeps the current password. */
+  password?: string | null;
 }

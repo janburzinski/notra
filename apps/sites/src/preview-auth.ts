@@ -15,6 +15,7 @@ import {
   signSitePreviewToken,
   verifySitePreviewToken,
 } from "@notra/sites-core/utils/preview-token";
+import { previewPassword } from "@notra/sites-core/utils/serving-state";
 
 import { PASSWORD_FORM_MAX_BYTES } from "./constants/preview-auth";
 import { previewLockedPage } from "./pages";
@@ -55,7 +56,7 @@ function previewGate(
   return html(
     previewLockedPage({
       signInUrl: previewSignInUrl(deps, siteId, previewKey, next),
-      passwordEnabled: state.previewPassword !== null,
+      passwordEnabled: previewPassword(state, previewKey) !== null,
       next,
       error,
     }),
@@ -83,10 +84,8 @@ function previewSessionAllows(
   if (claims.kind !== "password") {
     return true;
   }
-  return (
-    state.previewPassword !== null &&
-    claims.passwordVersion === state.previewPassword.version
-  );
+  const password = previewPassword(state, previewKey);
+  return password !== null && claims.passwordVersion === password.version;
 }
 
 async function acceptToken(
@@ -183,7 +182,7 @@ async function acceptPassword(
   context: PreviewRequestContext
 ): Promise<Response> {
   const { deps, request, url, origin, state, siteId, previewKey } = context;
-  const stored = state.previewPassword;
+  const stored = previewPassword(state, previewKey);
   if (!stored || isCrossOrigin(request, origin)) {
     return previewGate(context, "/", 403);
   }

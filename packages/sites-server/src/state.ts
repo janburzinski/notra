@@ -273,7 +273,9 @@ export async function activatePreviewDeployment(
           previewKey,
           {
             ...pointer,
-            visibility: access.previewVisibility ?? pointer.visibility,
+            visibility: pointer.access
+              ? pointer.visibility
+              : (access.previewVisibility ?? pointer.visibility),
           },
           new Date()
         )

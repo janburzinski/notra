@@ -36,9 +36,7 @@ import { nanoid } from "nanoid";
 import {
   DEFAULT_GITHUB_CONTENT_DIRECTORIES,
   DEFAULT_GITHUB_CONTENT_OUTPUT_ENABLED,
-  GITHUB_CONTENT_MAX_ASSET_BYTES,
 } from "@/constants/github";
-import { SiteEntryFrontmatterError } from "@/lib/errors/site-entry";
 import { getTranslations } from "@/lib/i18n/server";
 import {
   prepareR2GitHubContentAssets,
@@ -53,7 +51,7 @@ import {
   buildOpenInNotraBadgeUrls,
   resolveNotraBaseUrl,
 } from "@/lib/integrations/github/pull-request-body";
-import { prepareSiteEntryMetadata } from "@/lib/integrations/github/site-entry-metadata";
+import { prepareSiteEntryFiles } from "@/lib/integrations/github/site-entry-files";
 import {
   findSiteGitHubPublishTarget,
   resolveSiteEntryContext,
@@ -78,11 +76,8 @@ import type {
 import { toGitHubOperationOrpcError } from "@/utils/github-operation-error";
 import { getGitHubAppPermissionsRecovery } from "@/utils/github-publish-policy";
 import {
-  buildSiteEntryMarkdown,
   resolveSiteEntryDirectory,
   resolveSiteEntrySlug,
-  resolveSiteImagePathTemplate,
-  resolveSitePublicDirectory,
 } from "@/utils/site-github-publish";
 
 export async function publishSavedContentToGitHub(
@@ -282,13 +277,6 @@ export async function publishSavedContentToGitHub(
   const configuredImagePath = outputConfig.success
     ? outputConfig.data.imagePath
     : null;
-  const imagePath =
-    siteTarget && !configuredImagePath?.trim()
-      ? resolveSiteImagePathTemplate(
-          siteTarget.rootDirectory,
-          input.contentType
-        )
-      : configuredImagePath;
 
   const notraBaseUrl = resolveNotraBaseUrl();
   let publishInstallationId = integration.installationId ?? null;
@@ -400,22 +388,26 @@ export async function publishSavedContentToGitHub(
       ...(input.linkedOnly ? { requireLinkedPullRequest: true } : {}),
       ...(publisherLogin ? { publisherLogin } : {}),
       prepareContent: async (contentPath: string) => {
-        const imagePathTemplate = resolveGitHubImagePathTemplate(
-          contentPath,
-          imagePath
-        );
+        if (siteTarget) {
+          return await prepareSiteEntryFiles({
+            post: { ...post, markdown: savedMarkdown },
+            contentType: input.contentType,
+            contentPath,
+            imagePath: configuredImagePath,
+            organizationId: input.organizationId,
+            rootDirectory: siteTarget.rootDirectory,
+            slug: contentSlug,
+            siteEntry,
+          });
+        }
         const preparedContent = await prepareR2GitHubContentAssets({
           contentPath,
-          imagePathTemplate,
+          imagePathTemplate: resolveGitHubImagePathTemplate(
+            contentPath,
+            configuredImagePath
+          ),
           markdown: savedMarkdown,
           organizationId: input.organizationId,
-          ...(siteTarget
-            ? {
-                publicDirectory: resolveSitePublicDirectory(
-                  siteTarget.rootDirectory
-                ),
-              }
-            : {}),
           slug: contentSlug,
         });
         if (
@@ -426,60 +418,7 @@ export async function publishSavedContentToGitHub(
           const tErrors = await getTranslations("errors.content");
           throw badRequest(tErrors("imagePathTooLong"));
         }
-        if (!siteTarget) {
-          return preparedContent;
-        }
-        const entryMetadata = await prepareSiteEntryMetadata(post, {
-          contentPath,
-          contentType: input.contentType,
-          imagePathTemplate,
-          organizationId: input.organizationId,
-          publicDirectory: resolveSitePublicDirectory(siteTarget.rootDirectory),
-          slug: contentSlug,
-        });
-        const assets = [
-          ...new Map(
-            [...preparedContent.assets, ...entryMetadata.assets].map(
-              (asset) => [asset.path, asset]
-            )
-          ).values(),
-        ];
-        const assetBytes = assets.reduce(
-          (total, asset) => total + asset.contents.byteLength,
-          0
-        );
-        if (assetBytes > GITHUB_CONTENT_MAX_ASSET_BYTES) {
-          const tErrors = await getTranslations("errors.content");
-          throw badRequest(tErrors("assetsTooLarge"));
-        }
-        if (
-          assets.some(
-            (asset) => asset.path.length > GITHUB_CONTENT_PATH_MAX_LENGTH
-          )
-        ) {
-          const tErrors = await getTranslations("errors.content");
-          throw badRequest(tErrors("imagePathTooLong"));
-        }
-        let markdown: string;
-        try {
-          markdown = buildSiteEntryMarkdown({
-            author: siteEntry?.author,
-            contentType: input.contentType,
-            date: post.publishedAt ?? post.createdAt,
-            existingMarkdown: siteEntry?.existingMarkdown,
-            markdown: preparedContent.markdown,
-            metadata: entryMetadata.metadata,
-            title: post.title,
-            updated: siteEntry?.isLive ? new Date() : null,
-          });
-        } catch (error) {
-          if (error instanceof SiteEntryFrontmatterError) {
-            const tErrors = await getTranslations("errors.content");
-            throw badRequest(tErrors("invalidFrontmatter"));
-          }
-          throw error;
-        }
-        return { assets, markdown };
+        return preparedContent;
       },
       ...(notraBaseUrl && organization
         ? {

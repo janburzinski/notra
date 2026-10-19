@@ -7,6 +7,7 @@ import type { ContentPanelTab } from "@/types/content/overview";
 
 let activeTab: ContentPanelTab = "overview";
 let hasOverview = false;
+let hasPreview = false;
 let focusRequested = false;
 const listeners = new Set<() => void>();
 
@@ -69,6 +70,30 @@ export function useContentPanelHasOverview(): boolean {
   return useSyncExternalStore(
     subscribe,
     getContentPanelHasOverview,
+    () => false
+  );
+}
+
+/** Set by the post page while its panel offers the site preview tab. */
+export function setContentPanelHasPreview(value: boolean) {
+  if (value === hasPreview) {
+    return;
+  }
+  hasPreview = value;
+  if (!value && activeTab === "preview") {
+    activeTab = hasOverview ? "overview" : "agent";
+  }
+  notify();
+}
+
+function getContentPanelHasPreview() {
+  return hasPreview;
+}
+
+export function useContentPanelHasPreview(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    getContentPanelHasPreview,
     () => false
   );
 }

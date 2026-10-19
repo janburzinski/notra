@@ -54,6 +54,8 @@ if (process.env.NOTRA_SITES_TIMELINE_TEST_WORKER !== "1") {
   };
   mock.module("../src/r2", () => ({
     ...r2,
+    r2DeleteKey: async () => undefined,
+    r2GetTextEffect: () => Effect.succeed(null),
     r2PutEffect: (...args: Parameters<typeof r2.r2Put>) =>
       Effect.tryPromise({
         try: () => r2.r2Put(...args),

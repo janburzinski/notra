@@ -41,6 +41,13 @@ export const SITE_PREVIEW_SESSION_SECONDS = 60 * 60 * 12;
 export const SITE_PREVIEW_MEMBER_SESSION_SECONDS = 60 * 60;
 export const SITE_PREVIEW_MEMBER_RENEW_SECONDS = 60 * 60 * 24 * 7;
 export const SITE_PREVIEW_SHARE_LINK_SECONDS = 60 * 60 * 24 * 7;
+/** How long a post preview may stay open, chosen in the post's Preview tab. */
+export const POST_PREVIEW_LIFETIMES = {
+  "1h": 60 * 60,
+  "1d": 60 * 60 * 24,
+  "3d": 60 * 60 * 24 * 3,
+  "7d": 60 * 60 * 24 * 7,
+} as const;
 export const SITE_PREVIEW_SIGN_OUT_PATH = "/_notra/auth/sign-out";
 
 export const SITE_PREVIEW_PASSWORD_ALGORITHM = "PBKDF2-SHA256";
@@ -187,6 +194,9 @@ export const SITE_R2_KEYS = {
     `deployments/${siteId}/${deploymentId}/files${path}`,
   buildLog: (siteId: string, deploymentId: string) =>
     `logs/${siteId}/${deploymentId}.log`,
+  /** Files a post preview adds on top of the production source. */
+  previewSource: (siteId: string, previewKey: string) =>
+    `previews/${siteId}/${previewKey}/source.json`,
 } as const;
 
 /** Files below each mount that the worker answers for the analytics script. */

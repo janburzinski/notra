@@ -406,7 +406,7 @@ export async function deleteSite(
   await tx.delete(sites).where(eq(sites.id, site.id));
   await invalidateSiteIngestCaches(site);
   await Promise.all(
-    ["deployments", "logs", "sites"].map((root) =>
+    ["deployments", "logs", "previews", "sites"].map((root) =>
       r2DeletePrefix(`${root}/${site.id}/`)
     )
   );

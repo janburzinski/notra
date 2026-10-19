@@ -22,7 +22,7 @@ export async function deployBranchHead(
     trigger: options.trigger,
     branch,
     commitSha: head.sha,
-    commitMessage: head.message,
+    commitMessage: options.commitMessage ?? head.message,
     commitAuthor: head.author,
     requestedByUserId: options.userId ?? null,
   });

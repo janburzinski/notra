@@ -10,6 +10,10 @@ import {
 import { ContentDetailDocumentActions } from "@/components/content/content-detail-document-actions";
 import { ContentDetailLoadedView } from "@/components/content/content-detail-loaded-view";
 import { ContentDetailNotFound } from "@/components/content/content-detail-not-found";
+import {
+  ContentSitePreviewPanel,
+  ContentSitePreviewPrefetch,
+} from "@/components/content/content-site-preview-panel";
 import { ContentOverview } from "@/components/content/overview/content-overview";
 import { GeoProjectProvider } from "@/components/providers/geo-project-provider";
 import { useContentDetailChat } from "@/lib/hooks/use-content-detail-chat";
@@ -77,6 +81,12 @@ function ContentDetailPage({
       chatInputSection={
         <ChatQuoteProvider conversationId={chat.chatPanelProps.activeChatId}>
           {floatingChat}
+          {supportsPostSlug(data.content.contentType) ? (
+            <ContentSitePreviewPrefetch
+              contentId={contentId}
+              organizationId={organizationId}
+            />
+          ) : null}
           <ContentDetailChatPanel
             {...chat.chatPanelProps}
             overview={
@@ -94,6 +104,15 @@ function ContentDetailPage({
                     organizationSlug={organizationSlug}
                   />
                 </ContentOverview>
+              ) : undefined
+            }
+            preview={
+              supportsPostSlug(data.content.contentType) ? (
+                <ContentSitePreviewPanel
+                  contentId={contentId}
+                  document={document}
+                  organizationId={organizationId}
+                />
               ) : undefined
             }
           />

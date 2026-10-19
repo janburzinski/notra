@@ -1,5 +1,6 @@
 import { SITE_MAX_REMOVED_PREVIEWS } from "@notra/sites-core/constants/sites";
 import type {
+  SitePreviewPassword,
   SitePreviewPointer,
   SiteServingState,
 } from "@notra/sites-core/types/deployment";
@@ -140,9 +141,18 @@ export function setPreviewVisibilityInState(
 ): SiteServingState {
   const previews: SiteServingState["previews"] = {};
   for (const [key, pointer] of Object.entries(state.previews)) {
-    previews[key] = { ...pointer, visibility };
+    previews[key] = pointer.access ? pointer : { ...pointer, visibility };
   }
   return { ...state, previews, updatedAt: now.toISOString() };
+}
+
+/** The password guarding a preview: its own, or the site's. */
+export function previewPassword(
+  state: SiteServingState,
+  previewKey: string
+): SitePreviewPassword | null {
+  const access = state.previews[previewKey]?.access;
+  return access ? access.password : state.previewPassword;
 }
 
 export function isPreviewExpired(

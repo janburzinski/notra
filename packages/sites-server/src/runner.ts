@@ -1,5 +1,6 @@
 import { db } from "@notra/db/drizzle";
 import { siteJobs, sites } from "@notra/db/schema";
+import { isPostPreviewKey } from "@notra/sites-core/utils/hosts";
 import { and, eq, gt, sql } from "drizzle-orm";
 
 import { BUILDABLE_STATUSES } from "./constants/jobs";
@@ -19,6 +20,7 @@ import {
 } from "./jobs";
 import { publishSiteDeploymentChange } from "./live";
 import { failDeployment, runDeploymentPipeline } from "./pipeline";
+import { removePostPreviewSource } from "./post-preview-source";
 import { SandboxRequestError } from "./schemas/sandbox";
 import {
   reconcileProductionProjection,
@@ -74,6 +76,9 @@ async function runRemovePreviewJob(job: SiteJob): Promise<SiteJobOutcome> {
     }
     await removePreviewDeployment(site, previewKey, generation);
     await cancelPreviewBuilds(site.id, previewKey, generation);
+    if (isPostPreviewKey(previewKey)) {
+      await removePostPreviewSource(site.id, previewKey, generation);
+    }
   }
   await completeSiteJob(job);
   return { status: "done" };

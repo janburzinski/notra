@@ -1161,6 +1161,8 @@
       "tooManyPublishRequests": "Zu viele GitHub-Veröffentlichungen. Bitte versuch es gleich nochmal.",
       "contentTypeMismatch": "Der Inhaltstyp passt nicht zum gespeicherten Beitrag",
       "saveBeforePublishing": "Speichere den Inhalt, bevor du ihn auf GitHub veröffentlichst",
+      "sitePreviewUnsupported": "Nur Blogbeiträge und Changelogs lassen sich auf einer Site ansehen",
+      "sitePreviewNoSection": "Diese Site hat keinen Bereich für diese Art von Beitrag",
       "noDefaultBranch": "Das ausgewählte GitHub-Repository hat keinen Standard-Branch",
       "connectViaGithubApp": "Verbinde dieses Repository über die GitHub App, bevor du veröffentlichst.",
       "publishingPaused": "Das Veröffentlichen auf GitHub ist pausiert",
@@ -6344,6 +6346,51 @@
         "original": "Original"
       }
     },
+    "sitePreview": {
+      "site": "Site",
+      "status": "Status",
+      "link": "Link",
+      "expires": "Schließt",
+      "access": "Zugang",
+      "states": {
+        "none": "Noch keine",
+        "building": "Wird gebaut…",
+        "live": "Offen",
+        "expired": "Geschlossen",
+        "failed": "Build fehlgeschlagen"
+      },
+      "withPassword": "Passwort",
+      "anyoneWithLink": "Alle mit dem Link",
+      "validFor": "Offen für",
+      "validForHint": "Danach zeigt der Link eine geschlossene Seite. Höchstens 7 Tage.",
+      "lifetimes": {
+        "1h": "1 Stunde",
+        "1d": "1 Tag",
+        "3d": "3 Tage",
+        "7d": "7 Tage"
+      },
+      "password": "Passwort",
+      "passwordHint": "Besucher geben es ein, bevor sie den Beitrag sehen. Dein Team kommt ohne rein.",
+      "passwordPlaceholder": "Mindestens {min} Zeichen",
+      "savePassword": "Speichern",
+      "create": "Vorschau erstellen",
+      "update": "Vorschau aktualisieren",
+      "copyLink": "Link kopieren",
+      "open": "Öffnen",
+      "linkCopied": "Link kopiert",
+      "delete": "Löschen",
+      "deleted": "Vorschau gelöscht",
+      "deleteFailed": "Die Vorschau konnte nicht gelöscht werden",
+      "settingsSaved": "Vorschau aktualisiert",
+      "saveFailed": "Die Vorschau konnte nicht aktualisiert werden",
+      "saveFirst": "Speichere den Beitrag, bevor du ihn ansiehst",
+      "createFailed": "Die Vorschau konnte nicht gebaut werden",
+      "openFailed": "Die Vorschau konnte nicht geöffnet werden",
+      "failed": "Der Vorschau-Build ist fehlgeschlagen",
+      "loading": "Lädt…",
+      "noSite": "Füge eine Notra-Site mit Blog oder Changelog hinzu, um Beiträge darauf anzusehen.",
+      "newPasswordPlaceholder": "Neues Passwort eingeben"
+    },
     "githubPublish": {
       "trigger": "GitHub-PR erstellen",
       "saveBeforePublishing": "Speichere den {kind, select, changelog {Changelog} other {Blogbeitrag}}, bevor du ihn veröffentlichst",
@@ -6596,6 +6643,7 @@
     "overview": {
       "tabs": {
         "overview": "Übersicht",
+        "preview": "Vorschau",
         "agent": "Agent",
         "label": "Panel"
       },

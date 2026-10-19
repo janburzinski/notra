@@ -110,6 +110,8 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
   };
   mock.module("../src/r2", () => ({
     ...r2,
+    r2DeleteKey: async () => undefined,
+    r2GetTextEffect: () => Effect.succeed(null),
     r2PutEffect: (...args: Parameters<typeof r2.r2Put>) =>
       r2Defects
         ? Effect.die(logDefect)

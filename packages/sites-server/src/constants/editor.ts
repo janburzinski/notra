@@ -12,3 +12,5 @@ export const PULL_REQUEST_RULE_TYPES: ReadonlySet<string> = new Set([
   "non_fast_forward",
   "update",
 ]);
+/** Markdown plus images for one post; matches the GitHub publish asset budget. */
+export const MAX_POST_PREVIEW_BYTES = 12 * 1024 * 1024;

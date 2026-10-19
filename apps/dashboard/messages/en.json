@@ -1161,6 +1161,8 @@
       "tooManyPublishRequests": "Too many GitHub publish requests. Please try again shortly.",
       "contentTypeMismatch": "Content type does not match the saved post",
       "saveBeforePublishing": "Save the content before publishing it to GitHub",
+      "sitePreviewUnsupported": "Only blog posts and changelogs can be previewed on a site",
+      "sitePreviewNoSection": "This site has no section for this kind of post",
       "noDefaultBranch": "Selected GitHub repository does not have a default branch",
       "connectViaGithubApp": "Connect this repository through the GitHub App before publishing.",
       "publishingPaused": "GitHub content publishing is paused",
@@ -6344,6 +6346,51 @@
         "original": "Original"
       }
     },
+    "sitePreview": {
+      "site": "Site",
+      "status": "Status",
+      "link": "Link",
+      "expires": "Closes",
+      "access": "Access",
+      "states": {
+        "none": "Not created",
+        "building": "Building…",
+        "live": "Open",
+        "expired": "Closed",
+        "failed": "Build failed"
+      },
+      "withPassword": "Password",
+      "anyoneWithLink": "Anyone with the link",
+      "validFor": "Open for",
+      "validForHint": "After this, the link shows a closed page. Up to 7 days.",
+      "lifetimes": {
+        "1h": "1 hour",
+        "1d": "1 day",
+        "3d": "3 days",
+        "7d": "7 days"
+      },
+      "password": "Password",
+      "passwordHint": "Visitors enter it before they see the post. Your team gets in without it.",
+      "passwordPlaceholder": "At least {min} characters",
+      "savePassword": "Save",
+      "create": "Create preview",
+      "update": "Update preview",
+      "copyLink": "Copy link",
+      "open": "Open",
+      "linkCopied": "Link copied",
+      "delete": "Delete",
+      "deleted": "Preview deleted",
+      "deleteFailed": "Couldn't delete the preview",
+      "settingsSaved": "Preview updated",
+      "saveFailed": "Couldn't update the preview",
+      "saveFirst": "Save the post before previewing it",
+      "createFailed": "Couldn't build the preview",
+      "openFailed": "Couldn't open the preview",
+      "failed": "The preview build failed",
+      "loading": "Loading…",
+      "noSite": "Add a Notra site with a blog or changelog to preview posts on it.",
+      "newPasswordPlaceholder": "Enter a new password"
+    },
     "githubPublish": {
       "trigger": "Create GitHub PR",
       "saveBeforePublishing": "Save the {kind, select, changelog {changelog} other {blog post}} before publishing it",
@@ -6596,6 +6643,7 @@
     "overview": {
       "tabs": {
         "overview": "Overview",
+        "preview": "Preview",
         "agent": "Agent",
         "label": "Panel"
       },

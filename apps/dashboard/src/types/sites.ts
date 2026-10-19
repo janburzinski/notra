@@ -8,6 +8,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 import type { SITE_CREATE_STEP_IDS } from "@/constants/site-create";
 import type {
+  POST_PREVIEW_LIFETIME_OPTIONS,
   SITE_DETAIL_TABS,
   SITE_DOMAIN_CONNECT_OUTCOMES,
   SITE_NEW_FILE_FOLDERS,
@@ -329,3 +330,13 @@ export interface SiteStarterInput {
   branch: string;
   rootDirectory: string;
 }
+
+export type PostPreviewLifetime =
+  (typeof POST_PREVIEW_LIFETIME_OPTIONS)[number];
+
+export type PostPreviewState =
+  | "none"
+  | "building"
+  | "live"
+  | "expired"
+  | "failed";

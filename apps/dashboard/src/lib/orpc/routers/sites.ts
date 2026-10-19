@@ -19,10 +19,12 @@ import {
   connectSiteRepositoryInputSchema,
   createSiteInputSchema,
   createSitesInputSchema,
+  createPostPreviewInputSchema,
   repositorySuggestionsInputSchema,
   siteRepositorySuggestionsInputSchema,
   listSiteDeploymentsInputSchema,
   listSitesInputSchema,
+  postPreviewSitesInputSchema,
   publishSiteDraftsInputSchema,
   saveSiteDraftInputSchema,
   setSiteSuspendedInputSchema,
@@ -32,12 +34,14 @@ import {
   saveSiteIntegrationInputSchema,
   siteFilePathInputSchema,
   siteDraftMutationInputSchema,
+  sitePostPreviewInputSchema,
   sitePreviewAccessInputSchema,
   sitePreviewInputSchema,
   siteAnalyticsInputSchema,
   siteScopeInputSchema,
   siteSetPreviewPasswordInputSchema,
   siteStarterInputSchema,
+  updatePostPreviewAccessInputSchema,
   updateSiteInputSchema,
 } from "@notra/schemas/dashboard/sites";
 import {
@@ -46,6 +50,7 @@ import {
 } from "@notra/sites-core/constants/sites";
 import type { SiteServingState } from "@notra/sites-core/types/deployment";
 import { hashBuildTarget } from "@notra/sites-core/utils/build-target";
+import { postPreviewKey } from "@notra/sites-core/utils/hosts";
 import { getBuildTelemetry } from "@notra/sites-server/build-telemetry";
 import {
   deployBranchHead,
@@ -97,6 +102,7 @@ import {
 import {
   createBranchPreview,
   deletePreview,
+  updatePostPreviewAccess,
 } from "@notra/sites-server/previews";
 import { r2GetText } from "@notra/sites-server/r2";
 import { organizationRepositorySuggestions } from "@notra/sites-server/repositories";
@@ -140,11 +146,19 @@ import {
 import { toGeoOrpcError } from "@/lib/orpc/utils/geo-errors";
 import { assertSitesAccess } from "@/lib/sites/access";
 import { dispatchSiteJobs } from "@/lib/sites/dispatch";
-import { isSitesBulkImportEnabled } from "@/lib/sites/flag";
+import {
+  isSitesBulkImportEnabled,
+  isSitesEnabledForOrganization,
+} from "@/lib/sites/flag";
 import {
   bulkImportErrorMessage,
   toSitesOrpcError,
 } from "@/lib/sites/orpc-errors";
+import {
+  listPostPreviewSites,
+  postPreviewStatus,
+  previewPostOnSite,
+} from "@/lib/sites/post-preview";
 import {
   liveDeploymentsFromState,
   serializeDeployment,
@@ -712,6 +726,65 @@ export const sitesRouter = {
             site.mounts
           ),
         };
+      }),
+
+    // Loaded with every post, so an organization without Sites gets no sites
+    // instead of an error.
+    sitesForPost: authorizedProcedure
+      .input(postPreviewSitesInputSchema)
+      .handler(async ({ context, input }) => {
+        await assertOrganizationAccess({
+          headers: context.headers,
+          organizationId: input.organizationId,
+        });
+        if (
+          !(
+            isSitesConfigured() &&
+            (await isSitesEnabledForOrganization(input.organizationId))
+          )
+        ) {
+          return [];
+        }
+        return await listPostPreviewSites(input.organizationId, input.postId);
+      }),
+
+    createForPost: sitesProcedure
+      .input(createPostPreviewInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site, userId } = await requireSite(context, input);
+        const result = await previewPostOnSite({
+          site,
+          postId: input.postId,
+          userId,
+          lifetime: input.lifetime,
+          password: input.password,
+        });
+        dispatchLater([result.jobId]);
+        return { previewKey: result.previewKey, pagePath: result.pagePath };
+      }),
+
+    updatePostAccess: sitesProcedure
+      .input(updatePostPreviewAccessInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site } = await requireSite(context, input);
+        const access = await updatePostPreviewAccess(
+          site,
+          postPreviewKey(input.postId, site.slug),
+          { lifetime: input.lifetime, password: input.password }
+        );
+        return {
+          expiresAt: access.expiresAt,
+          hasPassword: access.password !== null,
+        };
+      }),
+
+    postStatus: sitesProcedure
+      .input(sitePostPreviewInputSchema)
+      .handler(async ({ context, input }) => {
+        const { site } = await requireSite(context, input);
+        return await postPreviewStatus(site, input.postId);
       }),
 
     delete: sitesProcedure

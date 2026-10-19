@@ -77,14 +77,27 @@ function shortHash(value: string): string {
   return (hash >>> 0).toString(36).padStart(7, "0").slice(0, 6);
 }
 
-export function branchPreviewKey(branch: string, siteSlug: string): string {
+function hashedPreviewKey(prefix: string, name: string, siteSlug: string) {
   const maxLength = Math.min(
     SITE_PREVIEW_KEY_MAX_LENGTH,
     DNS_LABEL_MAX_LENGTH - SITE_PREVIEW_HOST_SEPARATOR.length - siteSlug.length
   );
-  const full = `br-${dashCase(branch)}`;
-  const suffix = `-${shortHash(branch)}`;
+  const full = `${prefix}-${dashCase(name)}`;
+  const suffix = `-${shortHash(name)}`;
   return `${full.slice(0, maxLength - suffix.length).replace(/-+$/, "")}${suffix}`;
+}
+
+export function branchPreviewKey(branch: string, siteSlug: string): string {
+  return hashedPreviewKey("br", branch, siteSlug);
+}
+
+/** One preview per post and site, replaced each time the post is previewed. */
+export function postPreviewKey(postId: string, siteSlug: string): string {
+  return hashedPreviewKey("post", postId, siteSlug);
+}
+
+export function isPostPreviewKey(previewKey: string): boolean {
+  return previewKey.startsWith("post-");
 }
 
 export function sitePreviewHost(

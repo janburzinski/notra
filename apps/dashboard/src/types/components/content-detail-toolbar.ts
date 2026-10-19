@@ -1,6 +1,7 @@
 import type { ContentResponse } from "@notra/schemas/dashboard/content";
 
 import type { ContentDetailDocument } from "@/lib/hooks/use-content-detail-document";
+import type { usePostSitePreview } from "@/lib/hooks/use-post-site-preview";
 
 export interface ContentDetailToolbarProps {
   content: ContentResponse;
@@ -30,3 +31,18 @@ export type ContentPullRequestButtonProps = Pick<
 > & {
   githubPublish: NonNullable<ContentResponse["githubPublish"]>;
 };
+
+export type ContentSitePreviewProps = Pick<
+  ContentDetailToolbarProps,
+  "contentId" | "document" | "organizationId"
+>;
+
+export type PostSitePreviewModel = ReturnType<typeof usePostSitePreview>;
+
+export interface PostSitePreviewSectionProps {
+  model: PostSitePreviewModel;
+}
+
+export interface PostSitePreviewActionsProps extends PostSitePreviewSectionProps {
+  document: ContentDetailToolbarProps["document"];
+}

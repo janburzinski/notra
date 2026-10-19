@@ -119,7 +119,29 @@ export const siteBranchPreviewInputSchema = siteScopeInputSchema.extend({
 });
 
 export const sitePreviewInputSchema = siteScopeInputSchema.extend({
-  previewKey: z.string().regex(/^(?:pr|br)-[a-z0-9-]{1,40}$/),
+  previewKey: z.string().regex(/^(?:pr|br|post)-[a-z0-9-]{1,40}$/),
+});
+
+export const sitePostPreviewInputSchema = siteScopeInputSchema.extend({
+  postId: z.string().min(1).max(64),
+});
+
+const postPreviewLifetime = z.enum(["1h", "1d", "3d", "7d"]);
+
+export const createPostPreviewInputSchema = sitePostPreviewInputSchema.extend({
+  lifetime: postPreviewLifetime.default("7d"),
+  password: previewPassword.optional(),
+});
+
+export const updatePostPreviewAccessInputSchema =
+  sitePostPreviewInputSchema.extend({
+    lifetime: postPreviewLifetime.optional(),
+    password: previewPassword.optional(),
+  });
+
+export const postPreviewSitesInputSchema = z.object({
+  organizationId,
+  postId: z.string().min(1).max(64),
 });
 
 export const sitePreviewAccessInputSchema = sitePreviewInputSchema.extend({

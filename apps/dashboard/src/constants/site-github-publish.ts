@@ -6,6 +6,7 @@ export const SITE_ENTRY_DIRECTORIES = {
 } as const satisfies Record<GitHubPublishContentType, string>;
 
 export const SITE_PUBLIC_DIRECTORY = "public";
+export const SITE_ENTRY_EXTENSION = /\.mdx?$/i;
 export const SITE_IMAGE_DIRECTORY = "images";
 
 export const SITE_ENTRY_DESCRIPTION_MAX_LENGTH = 160;
