@@ -57,7 +57,19 @@ export function SidebarResizeHandle({
     }
     const nextWidth = clampSidebarWidth(draggedWidth);
     currentWidthRef.current = nextWidth;
-    onWidthChange(nextWidth);
+    const container = event.currentTarget.closest<HTMLElement>(
+      '[data-slot="sidebar-wrapper"]'
+    );
+    if (container) {
+      container.style.setProperty("--sidebar-width", `${nextWidth}px`);
+      event.currentTarget.setAttribute("aria-valuenow", String(nextWidth));
+      event.currentTarget.setAttribute(
+        "aria-valuetext",
+        t("widthPixels", { width: nextWidth })
+      );
+    } else {
+      onWidthChange(nextWidth);
+    }
     if (draggedWidth < SIDEBAR_MIN_WIDTH - 40) {
       finishResize(event);
       setOpen(false);

@@ -12,7 +12,7 @@ import {
 } from "echarts/components";
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import * as echarts from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
+import { CanvasRenderer, SVGRenderer } from "echarts/renderers";
 import { useLocale } from "use-intl";
 import { motion, useReducedMotion } from "motion/react";
 import { tween } from "@notra/ui/lib/motion";
@@ -114,6 +114,7 @@ echarts.use([
   DataZoomComponent,
   MarkLineComponent,
   CanvasRenderer,
+  SVGRenderer,
 ]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
@@ -185,6 +186,7 @@ export interface ChartRangeSelection {
 }
 
 export interface EChartsAreaChartProps<TData extends Record<string, unknown>> {
+  renderer?: "canvas" | "svg";
   data: TData[]; // rows rendered by the chart
   config: ChartConfig; // series colors + labels
   xDataKey?: keyof TData & string; // x category key — falls back to the <XAxis> dataKey / first free column
@@ -1842,6 +1844,7 @@ function createLiveState(): LiveState {
  * `react` and `echarts`.
  */
 export function EChartsAreaChart<TData extends Record<string, unknown>>({
+  renderer = "canvas",
   data,
   config,
   xDataKey,
@@ -2192,7 +2195,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    const chart = echarts.init(mount, undefined, { renderer });
     echartsRef.current = chart;
 
     const stopResizeObserver = observeChartResize(mount, chart, {
@@ -2724,7 +2727,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   useEffect(() => {
     const chart = echartsRef.current;
@@ -2794,6 +2797,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     config,
     seriesKeys,
     syncBrushOverlayNow,
+    renderer,
   ]);
 
   useEffect(() => {
@@ -2835,7 +2839,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       if (delayTimer !== undefined) clearTimeout(delayTimer);
       cancelAnimationFrame(raf);
     };
-  }, [live, areas, hasSelection, isLoading]);
+  }, [live, areas, hasSelection, isLoading, renderer]);
 
   useEffect(() => {
     const chart = echartsRef.current;
@@ -2887,7 +2891,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, loadingPoints, loadingData]);
+  }, [live, isLoading, loadingPoints, loadingData, renderer]);
 
   const legendStyle: CSSProperties = {
     position: "absolute",
