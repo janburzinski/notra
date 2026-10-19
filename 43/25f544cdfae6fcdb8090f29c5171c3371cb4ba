@@ -1,0 +1,25 @@
+apps/dashboard/src/utils/onboarding-suggestions.ts
+  s_99447b0ed17783::t_9cd56378944a24 4-7,32
+apps/onboarding-agent/agent/instructions.md
+  s_99447b0ed17783::t_9cd56378944a24 24
+packages/ai/src/schemas/onboarding-agent.ts
+  s_99447b0ed17783::t_9cd56378944a24 66
+apps/dashboard/src/components/automation/events/ignore-commit-patterns-field.tsx
+  s_99447b0ed17783::t_9cd56378944a24 190-207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4325f544cdfae6fcdb8090f29c5171c3371cb4ba",
+  "prompts": {},
+  "sessions": {
+    "s_99447b0ed17783": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "44fa4e53-d974-4c1f-afec-ba892ba5a471",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
