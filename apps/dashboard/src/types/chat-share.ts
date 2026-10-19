@@ -8,6 +8,7 @@ export interface ChatShareSummary {
 }
 
 export interface PublicChatShare {
+  shareId: string;
   title: string;
   messages: SharedChatMessage[];
   sharedAt: string;
@@ -15,3 +16,7 @@ export interface PublicChatShare {
 }
 
 export type ChatShareAccess = "team" | "public";
+
+export interface SharedChatContinueProps {
+  shareId: string;
+}

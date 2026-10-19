@@ -1,3 +1,7 @@
+import {
+  CODE_MODE_TOOL_NAME,
+  STANDALONE_CODE_MODE_TOOL_NAMES,
+} from "@notra/ai/constants/code-mode";
 import type { ChatUIMessage } from "@notra/ai/types/chat";
 import type {
   SharedChatMessage,
@@ -21,6 +25,25 @@ import {
 } from "@/utils/integration-reference";
 
 const LINE_BREAK_REGEX = /\r?\n/;
+const CODE_MODE_CALL_REGEX = /\btools\.([A-Za-z_$][\w$]*)\s*\(/g;
+const CODE_MODE_TOOLS: ReadonlySet<string> = new Set(
+  STANDALONE_CODE_MODE_TOOL_NAMES
+);
+
+/**
+ * The tools a code-mode script called, so the page can name them instead of
+ * a generic "Executed tools". Only known tool names pass, never the script.
+ */
+function codeModeToolNames(input: unknown): string[] {
+  const js =
+    input && typeof input === "object" && "js" in input ? input.js : undefined;
+  if (typeof js !== "string") {
+    return [];
+  }
+  return [...js.matchAll(CODE_MODE_CALL_REGEX)].flatMap(([, name]) =>
+    name && CODE_MODE_TOOLS.has(name) ? [name] : []
+  );
+}
 
 function quote(text: string) {
   return text
@@ -118,13 +141,21 @@ export function buildChatShareSnapshot(
         }
         continue;
       }
+      const calledNames =
+        name === CODE_MODE_TOOL_NAME ? codeModeToolNames(part.input) : [];
+      const names = calledNames.length > 0 ? calledNames : [name];
       const last = parts.at(-1);
-      if (last?.type === "tools") {
-        if (!last.names.includes(name)) {
-          last.names.push(name);
+      const group =
+        last?.type === "tools"
+          ? last
+          : { type: "tools" as const, names: [] as string[] };
+      if (group !== last) {
+        parts.push(group);
+      }
+      for (const toolName of names) {
+        if (!group.names.includes(toolName)) {
+          group.names.push(toolName);
         }
-      } else {
-        parts.push({ type: "tools", names: [name] });
       }
     }
     return parts.length > 0
@@ -139,6 +170,31 @@ export function buildChatShareSnapshot(
             })),
           },
         ]
+      : [];
+  });
+}
+
+/**
+ * Rebuilds a chat history from a share so a reader can continue it. Tool
+ * calls are dropped because the snapshot never kept their inputs or results,
+ * and saved posts come back as their markdown so the agent still sees them.
+ */
+export function chatShareSnapshotToMessages(
+  messages: readonly SharedChatMessage[]
+): ChatUIMessage[] {
+  return messages.flatMap((message): ChatUIMessage[] => {
+    const parts = message.parts.flatMap((part): ChatUIMessage["parts"] => {
+      if (part.type === "text") {
+        return [{ type: "text", text: part.text }];
+      }
+      if (part.type === "post") {
+        const heading = part.title ? `## ${part.title}\n\n` : "";
+        return [{ type: "text", text: `${heading}${part.markdown}` }];
+      }
+      return [];
+    });
+    return parts.length > 0
+      ? [{ id: crypto.randomUUID(), role: message.role, parts }]
       : [];
   });
 }

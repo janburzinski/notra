@@ -14,6 +14,11 @@ export function isContentDetailPathname(pathname: string | null): boolean {
   return segments[1] === "content" && segments.length >= 3;
 }
 
+/** A standalone chat already is the agent, so it skips the topbar agent button. */
+export function isChatPathname(pathname: string | null): boolean {
+  return pathname?.split("/").filter(Boolean)[1] === "chat";
+}
+
 /**
  * Pages that name a single record (chat, post, collection, brand identity,
  * site) and need the topbar breadcrumbs to say which one. Every other page

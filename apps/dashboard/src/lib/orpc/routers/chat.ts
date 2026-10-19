@@ -18,6 +18,7 @@ import {
 import {
   chatSessionInputSchema,
   createChatPostInputSchema,
+  forkChatShareInputSchema,
   listChatSessionsInputSchema,
   updateChatSessionInputSchema,
 } from "@notra/schemas/dashboard/chat";
@@ -27,6 +28,7 @@ import { nanoid } from "nanoid";
 
 import { loadChatHistoryPayload } from "@/lib/chat/history";
 import {
+  forkChatShare,
   getActiveChatShare,
   publishChatShare,
   revokeChatShare,
@@ -136,6 +138,21 @@ export const chatRouter = {
         const { organizationId } = context.auth;
         await revokeChatShare(organizationId, input.chatId);
         return { ok: true as const };
+      }),
+
+    fork: authorizedProcedure
+      .input(forkChatShareInputSchema)
+      .use(withOrganizationAccess)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const fork = await forkChatShare({
+          shareId: input.shareId,
+          organizationId: context.auth.organizationId,
+        });
+        if (!fork) {
+          throw notFound(CHAT_NOT_FOUND_MESSAGE);
+        }
+        return fork;
       }),
   },
 

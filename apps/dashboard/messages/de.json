@@ -6281,8 +6281,7 @@
     },
     "sharedPage": {
       "sharedBy": "Geteilt von {organization} am {date}",
-      "usedTools": "Verwendet: {tools}",
-      "readOnly": "Dies ist eine schreibgeschützte Kopie eines Chats in Notra.",
+      "readOnly": "Das ist eine schreibgeschützte Kopie. Setz den Chat in deinem Workspace fort.",
       "cta": "Notra ausprobieren",
       "untitled": "Ohne Titel",
       "showMore": "Mehr anzeigen",
@@ -6294,7 +6293,12 @@
         "linkedin_post": "LinkedIn-Beitrag",
         "twitter_post": "X-Beitrag",
         "fallback": "Beitrag"
-      }
+      },
+      "continue": "Chat fortsetzen",
+      "chooseWorkspace": "Fortsetzen in",
+      "signInToContinue": "Zum Fortsetzen anmelden",
+      "forkFailed": "Chat konnte nicht kopiert werden. Versuch es noch einmal.",
+      "moreTools": "{count, plural, one {# weiteres Tool} other {# weitere Tools}}"
     }
   },
   "content": {

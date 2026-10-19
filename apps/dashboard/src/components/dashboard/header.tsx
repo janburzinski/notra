@@ -42,7 +42,10 @@ import {
   isBreadcrumbSegment,
   isGeoBreadcrumbSegment,
 } from "@/utils/dashboard-breadcrumbs";
-import { isRecordDetailPathname } from "@/utils/dashboard-paths";
+import {
+  isChatPathname,
+  isRecordDetailPathname,
+} from "@/utils/dashboard-paths";
 import { withGeoProject } from "@/utils/geo-paths";
 import { toGeoTab } from "@/utils/geo-tabs";
 import { siteHref } from "@/utils/site-links";
@@ -93,7 +96,7 @@ export function SiteHeader() {
               <HugeiconsIcon icon={SearchIcon} size={14} strokeWidth={1.8} />
             </button>
           ) : null}
-          <DashboardAgentButton />
+          {isChatPathname(pathname) ? null : <DashboardAgentButton />}
         </div>
       </div>
     </header>

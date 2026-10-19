@@ -6281,8 +6281,7 @@
     },
     "sharedPage": {
       "sharedBy": "Shared from {organization} on {date}",
-      "usedTools": "Used {tools}",
-      "readOnly": "This is a read-only copy of a chat in Notra.",
+      "readOnly": "This is a read-only copy. Continue it in your own workspace.",
       "cta": "Try Notra",
       "untitled": "Untitled",
       "showMore": "Show more",
@@ -6294,7 +6293,12 @@
         "linkedin_post": "LinkedIn post",
         "twitter_post": "X post",
         "fallback": "Post"
-      }
+      },
+      "continue": "Continue chat",
+      "chooseWorkspace": "Continue in",
+      "signInToContinue": "Sign in to continue",
+      "forkFailed": "Couldn't copy this chat. Try again.",
+      "moreTools": "{count, plural, one {# more tool} other {# more tools}}"
     }
   },
   "content": {

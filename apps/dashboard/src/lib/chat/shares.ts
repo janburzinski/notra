@@ -1,4 +1,4 @@
-import { getChatHistorySnapshot } from "@notra/ai/chat/history";
+import { generateChatId, getChatHistorySnapshot } from "@notra/ai/chat/history";
 import { hydrateSavedChatPosts } from "@notra/ai/chat/posts";
 import type { ChatUIMessage } from "@notra/ai/types/chat";
 import { db } from "@notra/db/drizzle";
@@ -8,7 +8,10 @@ import { nanoid } from "nanoid";
 
 import { CHAT_SHARE_ID_LENGTH } from "@/constants/chat-share";
 import type { ChatShareSummary, PublicChatShare } from "@/types/chat-share";
-import { buildChatShareSnapshot } from "@/utils/chat-share-snapshot";
+import {
+  buildChatShareSnapshot,
+  chatShareSnapshotToMessages,
+} from "@/utils/chat-share-snapshot";
 
 const shareSummaryColumns = {
   shareId: chatShares.id,
@@ -146,9 +149,39 @@ export async function getPublicChatShare(
     return null;
   }
   return {
+    shareId,
     title: row.title,
     messages: row.messages,
     sharedAt: row.updatedAt.toISOString(),
     organizationName: row.organizationName,
   };
+}
+
+/**
+ * Copies a shared chat into the reader's organization as a new chat they own,
+ * so they can keep talking to it. Null when the link is gone.
+ */
+export async function forkChatShare({
+  shareId,
+  organizationId,
+}: {
+  shareId: string;
+  organizationId: string;
+}): Promise<{ chatId: string } | null> {
+  const share = await getPublicChatShare(shareId);
+  if (!share) {
+    return null;
+  }
+  const messages = chatShareSnapshotToMessages(share.messages);
+  if (messages.length === 0) {
+    return null;
+  }
+  const chatId = generateChatId();
+  await db.insert(chatSessions).values({
+    id: chatId,
+    organizationId,
+    title: share.title,
+    messages,
+  });
+  return { chatId };
 }

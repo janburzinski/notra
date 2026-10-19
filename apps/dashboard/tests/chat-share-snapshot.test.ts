@@ -142,3 +142,26 @@ test("labels tokens inside annotation passages and notes", () => {
   expect(serialized).not.toContain("int_9");
   expect(serialized).not.toContain("post_1");
 });
+
+test("names the known tools a code-mode script called, never the script", () => {
+  const snapshot = buildChatShareSnapshot([
+    {
+      id: "a1",
+      role: "assistant",
+      parts: [
+        {
+          type: "tool-code_mode",
+          toolCallId: "t1",
+          state: "output-available",
+          input: {
+            js: 'await tools.webSearch({ query: "acme internal" }); await tools.secretHelper();',
+          },
+          output: {},
+        },
+      ],
+    },
+  ] as unknown as ChatUIMessage[]);
+  expect(snapshot[0]?.parts).toEqual([
+    { id: "m0:0", type: "tools", names: ["webSearch"] },
+  ]);
+});
