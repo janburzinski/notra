@@ -1,0 +1,22 @@
+packages/ui/src/components/ui/textarea.tsx
+  s_8ff470b5e79e4a::t_c84932ae240b3f 10
+apps/dashboard/src/components/sites/site-design-editor.tsx
+  s_8ff470b5e79e4a::t_6e8096680f5a1d 182
+  s_8ff470b5e79e4a::t_572fff42445c3c 176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "47cd20b47df0ecff3e87fd50ded9f8702c147867",
+  "prompts": {},
+  "sessions": {
+    "s_8ff470b5e79e4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "04e358e8-8889-4650-9310-e338b0a5de3e",
+        "model": "unknown"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
