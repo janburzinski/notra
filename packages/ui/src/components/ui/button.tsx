@@ -86,6 +86,7 @@ function Button({
       )}
       data-loading={loading ? "" : undefined}
       data-slot="button"
+      data-variant={variant}
       disabled={disabled || busy}
       focusableWhenDisabled={focusableWhenDisabled ?? busy}
       {...props}

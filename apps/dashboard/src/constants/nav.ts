@@ -3,6 +3,7 @@ import {
   AiBrowserIcon,
   AiChat01Icon,
   Analytics01Icon,
+  Building03Icon,
   ChartAnalysisIcon,
   Comment01Icon,
   Home01Icon,
@@ -163,9 +164,9 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     labelKey: "overview",
     links: [
       GEO_OVERVIEW_NAV_LINK,
+      HOME_NAV_LINK,
       GEO_TRAFFIC_NAV_LINK,
       ANALYTICS_NAV_LINK,
-      HOME_NAV_LINK,
     ],
   },
   {
@@ -214,7 +215,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
 
 export const NAV_WORKSPACE_GROUP: NavGroup = {
   id: "workspace",
-  icon: Settings01Icon,
+  icon: Building03Icon,
   labelKey: "workspace",
   listsOwnPage: true,
   links: [
