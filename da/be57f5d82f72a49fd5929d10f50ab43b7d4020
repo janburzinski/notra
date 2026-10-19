@@ -1,0 +1,19 @@
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_84f60c700ee871::t_66554aca08642d 385-398
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dabe57f5d82f72a49fd5929d10f50ab43b7d4020",
+  "prompts": {},
+  "sessions": {
+    "s_84f60c700ee871": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf4afac3-1e00-4967-990e-e7c584030bb4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
