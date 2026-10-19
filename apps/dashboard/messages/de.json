@@ -328,7 +328,7 @@
       },
       "backupCodes": {
         "title": "Speichere deine Backup-Codes",
-        "description": "Jeder Code funktioniert einmal, falls du dein Gerät verlierst. Sie werden nicht erneut angezeigt.",
+        "description": "Jeder Code funktioniert einmal, falls du dein Gerät verlierst. Codes werden nicht erneut angezeigt.",
         "print": "Drucken",
         "copyError": "Kopieren fehlgeschlagen. Markiere die Codes und kopiere sie manuell.",
         "printBlocked": "Dein Browser hat das Druckfenster blockiert.",
@@ -370,7 +370,7 @@
       "deleteThisOrganization": "Diese Organisation löschen",
       "orgsWillBeDeleted": "Diese Organisationen werden gelöscht:",
       "onlyYou": "(nur du)",
-      "soleMemberNote": "Du bist das einzige Mitglied dieser Organisationen. Sie werden zusammen mit deinem Konto dauerhaft gelöscht.",
+      "soleMemberNote": "Du bist das einzige Mitglied dieser Organisationen. Organisationen werden zusammen mit deinem Konto dauerhaft gelöscht.",
       "noOrgsNote": "Dadurch wird dein Konto dauerhaft gelöscht und deine Daten werden von unseren Servern entfernt."
     },
     "membershipAction": {
@@ -723,7 +723,7 @@
       "trigger": "Einrichtung",
       "dialogDescription": "Füge das Feedback-Tool einem weiteren MCP-Server hinzu oder kopiere deine Feedback-URL.",
       "feedbackUrl": "Deine Feedback-URL",
-      "feedbackUrlDescription": "Agents senden JSON per POST an diese URL. Sie gilt nur für deine Organisation und braucht weder Token noch API-Schlüssel.",
+      "feedbackUrlDescription": "Agents senden JSON per POST an diese URL. URL gilt nur für deine Organisation und braucht weder Token noch API-Schlüssel.",
       "feedbackUrlLabel": "Feedback-URL",
       "addTool": "Tool zu deinem MCP-Server hinzufügen",
       "snippet": "Snippet",
@@ -973,7 +973,7 @@
       "trackingSettingsRejected": "Das kann mit deinen aktuellen Tracking-Einstellungen nicht hinzugefügt werden",
       "translationLimit": "In dieser Sprache werden schon {limit} Prompts gescannt. Entferne zuerst einen.",
       "translationLast": "Jede Sprache scannt mindestens einen Prompt. Um sie nicht mehr zu scannen, entferne die Sprache.",
-      "translationDeferred": "Übersetzungen sind gerade nicht möglich. Sie werden beim nächsten Scan erstellt.",
+      "translationDeferred": "Übersetzungen sind gerade nicht möglich. Wir erstellen sie beim nächsten Scan.",
       "translationUnavailable": "Dieser Prompt wird in dieser Sprache nicht gescannt.",
       "websiteDiscoveryFailed": "Wir konnten diese Website nicht analysieren. Prüfe die URL und versuche es erneut.",
       "writerPlanFailed": "Der Inhaltsplan konnte nicht erstellt oder gespeichert werden. Bitte versuche es erneut.",
@@ -2961,7 +2961,7 @@
         "cloudflare": {
           "requirements": "Ohne Codeänderungen. Deine Website kann überall gehostet sein, ihr Traffic muss aber über Cloudflare laufen (die orange Wolke am DNS-Eintrag). Logpush gibt es in jedem Cloudflare-Plan.",
           "destinationTitle": "Ziel-URL",
-          "destinationDescription": "Füge sie als HTTP-Ziel ein. Sie enthält deinen Token als Authorization-Header.",
+          "destinationDescription": "Füge die URL als HTTP-Ziel ein. Dein Token ist darin als Authorization-Header enthalten.",
           "fieldsTitle": "Felder",
           "stepOne": "Öffne in Cloudflare deine Domain, geh zu Analytics & Logs, dann Logpush, und lege einen Job mit HTTP-Ziel an.",
           "stepTwo": "Füge die Ziel-URL ein, wähle das Dataset HTTP requests und die Felder oben. Stell das Zeitformat auf RFC 3339.",
@@ -3226,7 +3226,7 @@
     },
     "personaPrompts": {
       "title": "Unterhaltungs-Prompts",
-      "description": "Jede KI-Engine erhält genau diese Nachrichten in derselben Reihenfolge. Sie werden aus Profil und Erinnerungen der Persona generiert.",
+      "description": "Jede KI-Engine erhält genau diese Nachrichten in derselben Reihenfolge. Nachrichten werden aus Profil und Erinnerungen der Persona generiert.",
       "message": "Nachricht {number}",
       "emptyDescription": "Diese Persona ist von neuen Scans ausgeschlossen, bis feste Prompts aus ihrem aktuellen Profil und ihren Erinnerungen generiert wurden."
     },
@@ -3250,7 +3250,7 @@
       "maxMessages": "Max. Nachrichten",
       "maxMessagesHint": "Obergrenze für Nachrichten, die diese Persona pro Scan an jede KI-Engine sendet, nicht bereits gesendete Nachrichten. Jede Antwort zählt als {multiplier} KI-Antworten.",
       "empty": "Noch keine Personas. Generiere ein Set, damit sie während der Scans deine Kategorie recherchieren",
-      "archiveDescription": "Diese Persona wird aus zukünftigen Scans entfernt. Ihr bisheriger Scan-Verlauf bleibt erhalten.",
+      "archiveDescription": "Diese Persona wird aus zukünftigen Scans entfernt. Bisheriger Scan-Verlauf der Persona bleibt erhalten.",
       "nounSingular": "Persona",
       "nounPlural": "Personas",
       "archiveTitle": "Persona archivieren?"
@@ -3992,7 +3992,7 @@
         "progress": "{label}, Schritt {step} von {total}",
         "setupDescription": "Richte zuerst das GEO-Tracking ein und generiere dann ein Persona-Set.",
         "emptyTitle": "Noch keine Personas",
-        "emptyDescription": "Generiere fünf Käufertypen aus deiner Website und Zielgruppe, jeweils mit eigenen Prioritäten, Tool-Stack und Kaufkriterien. Sie recherchieren deine Kategorie in deinen ausgewählten KI-Engines.",
+        "emptyDescription": "Generiere fünf Käufertypen aus deiner Website und Zielgruppe, jeweils mit eigenen Prioritäten, Tool-Stack und Kaufkriterien. Jeder Käufertyp recherchiert deine Kategorie in deinen ausgewählten KI-Engines.",
         "generationSteps": {
           "readingSite": "Deine Website wird gelesen",
           "writingProfiles": "Profile werden geschrieben",
@@ -5717,7 +5717,7 @@
       "points": {
         "availability": "Die Verfügbarkeit ist nicht für jedes Modell garantiert. ZDR gibt es nur, wenn das Gateway, über das wir leiten, eine Zero-Data-Retention-Vereinbarung mit dem Anbieter des Modells hat. Notra hat diese Vereinbarungen nicht direkt und kann sie nicht auf Modelle ausweiten, die nicht abgedeckt sind.",
         "newModels": "Neue Modelle starten meist ohne ZDR. Neu veröffentlichte Modelle sind oft ausgeschlossen, bis Anbieter und Gateway eine Zero-Data-Retention-Option hinzufügen.",
-        "skipped": "Modelle ohne ZDR-Host werden übersprungen. Sie sind in den GEO-Einstellungen markiert und laufen nur, wenn du jedes einzeln ausdrücklich freigibst. In diesem Fall kann der Anbieter Anfragedaten nach eigener Richtlinie speichern.",
+        "skipped": "Modelle ohne ZDR-Host werden übersprungen. Die Modelle sind in den GEO-Einstellungen markiert und laufen nur, wenn du jedes einzeln ausdrücklich freigibst. In diesem Fall kann der Anbieter Anfragedaten nach eigener Richtlinie speichern.",
         "termsChange": "Die Bedingungen von Gateways und Anbietern können sich ändern. Wird eine ZDR-Vereinbarung für ein Modell zurückgezogen, wird dieses Modell von deinen Scans ausgeschlossen, bis eine Alternative verfügbar ist."
       },
       "footnote": "Mit der Aktivierung bestätigst du, dass Zero Data Retention auf Grundlage von Gateway-Vereinbarungen Dritter bereitgestellt wird und nur für Modelle gilt, die zum Zeitpunkt der jeweiligen Anfrage abgedeckt sind.",
@@ -6001,7 +6001,7 @@
         "stopping": "Wird gestoppt…",
         "queuedPending": "Wird gesendet, sobald die Uploads fertig sind. Klicke zum Abbrechen.",
         "stopGenerating": "Generierung stoppen",
-        "queueHint": "Enter, um diese Nachricht einzureihen. Sie wird gesendet, sobald die KI fertig ist.",
+        "queueHint": "Enter, um diese Nachricht einzureihen. Nachricht wird gesendet, sobald die KI fertig ist.",
         "sendHint": "Enter zum Senden. Shift+Enter für eine neue Zeile.",
         "sendMessage": "Nachricht senden",
         "queueMessage": "Nachricht einreihen",
