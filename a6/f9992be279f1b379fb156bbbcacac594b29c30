@@ -1,0 +1,19 @@
+apps/dashboard/src/app/(dashboard)/[slug]/geo/prompts/skeleton.tsx
+  s_2a0c56ff02c64a::t_93ce52c04f0526 49-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a6f9992be279f1b379fb156bbbcacac594b29c30",
+  "prompts": {},
+  "sessions": {
+    "s_2a0c56ff02c64a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "530649db-2c43-41b8-87bc-fafe8d8b5b09",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
