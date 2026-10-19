@@ -12,7 +12,6 @@ export const BREADCRUMB_SEGMENTS = [
   "feedback",
   "identity",
   "integrations",
-  "iris",
   "leaderboard",
   "new",
   "runs",

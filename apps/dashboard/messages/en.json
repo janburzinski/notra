@@ -1185,9 +1185,6 @@
       "historyNotSupported": "Version history is available for articles and changelogs.",
       "historyUnavailable": "This version cannot be restored because its editable content or metadata is unavailable."
     },
-    "iris": {
-      "runInProgress": "Iris is already working on a run"
-    },
     "notifications": {
       "ownerOnly": "Only the organization owner can update notification settings"
     },
@@ -2185,7 +2182,6 @@
       "home": "Home",
       "traffic": "Traffic",
       "sendFeedback": "Send feedback",
-      "iris": "Iris",
       "default": "Default",
       "more": "More",
       "newChat": "New chat",
@@ -4896,151 +4892,6 @@
       "refreshFailed": "Failed to refresh account",
       "posted": "Posted to {platform} as @{username}",
       "connectPlatformFailed": "Failed to connect {platform} account"
-    }
-  },
-  "iris": {
-    "shared": {
-      "irisIsPaused": "Iris is paused",
-      "irisIsOnDuty": "Iris is on duty",
-      "waiting": "Waiting"
-    },
-    "pauseDialog": {
-      "title": "Pause Iris?",
-      "description": "Pausing stops scheduled runs and cancels pending Slack messages. You can resume at any time.",
-      "keepRunning": "Keep running",
-      "confirm": "Pause Iris"
-    },
-    "runCard": {
-      "fixSlack": "Fix Slack"
-    },
-    "running": {
-      "status": {
-        "retired": "Iris is retired",
-        "working": "Iris is working"
-      },
-      "tabs": {
-        "signals": "Recent signals"
-      },
-      "activityUnavailable": {
-        "title": "Activity is unavailable",
-        "description": "The activity feed could not be loaded. Refresh the page to try again."
-      },
-      "noRuns": {
-        "title": "No runs yet",
-        "description": "Iris is watching your sources. The first report shows up here as soon as something is worth announcing."
-      },
-      "signalsUnavailable": {
-        "title": "Signals are unavailable",
-        "description": "Recent signals could not be loaded. Refresh the page to try again."
-      }
-    },
-    "signals": {
-      "empty": "Nothing has come in yet. Iris starts watching as soon as you ship."
-    },
-    "start": {
-      "description": "Iris watches what you ship and does your marketing. It drafts changelogs, blog posts with images and social posts, then asks you on Slack before anything goes live.",
-      "start": "Start Iris",
-      "beforeYouStart": "Before you start",
-      "slackWarning": "Connect a Slack notification channel so Iris can report to you. You can still start now and connect it later. <link>Connect Slack</link>"
-    },
-    "explainer": {
-      "watch": {
-        "title": "Watches your sources",
-        "description": "Every release, merge and push you ship lands in front of Iris."
-      },
-      "draft": {
-        "title": "Drafts the story",
-        "description": "Changelogs, blog posts with images and social posts, written in your voice."
-      },
-      "ship": {
-        "title": "You say ship it",
-        "description": "Iris reports to Slack and waits for your go before anything goes live."
-      }
-    },
-    "stats": {
-      "runs": "Runs, last 30 days",
-      "artifacts": "Drafts, last 30 days",
-      "signals": "Signals waiting",
-      "lastRun": "Last run"
-    },
-    "unavailable": {
-      "title": "Iris is not available yet",
-      "description": "Iris is not available for this workspace yet."
-    },
-    "toasts": {
-      "startFailed": "Iris could not be started",
-      "runNow": "Iris is on it",
-      "runNowFailed": "Iris could not start a run",
-      "pauseFailed": "Iris could not be paused",
-      "resumed": "Iris is back on duty",
-      "resumeFailed": "Iris could not be resumed",
-      "notRunning": "Iris is not running"
-    },
-    "readiness": {
-      "sources": {
-        "label": "Sources connected",
-        "ready": "Iris can see what your team ships.",
-        "missing": "Connect a repository so Iris knows what you shipped."
-      },
-      "slack": {
-        "label": "Slack channel connected",
-        "ready": "Iris reports to your Slack notification channel.",
-        "missing": "Connect a Slack notification channel so Iris can report to you."
-      }
-    },
-    "relativeTime": {
-      "minutesAgo": "{count} min ago",
-      "hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
-      "daysAgo": "{count, plural, one {# day ago} other {# days ago}}"
-    },
-    "decision": {
-      "thinking": "Iris is thinking it over",
-      "reviewedSignals": "{count, plural, one {Reviewed # signal and decided to wait} other {Reviewed # signals and decided to wait}}",
-      "reviewedLatest": "Reviewed the latest activity and decided to wait",
-      "escalated": "Asked for your input on Slack",
-      "planNotFinishedWithTitle": "Plan did not finish: {title}",
-      "planNotFinished": "The plan did not finish",
-      "runCanceledWithTitle": "Run canceled: {title}",
-      "runCanceled": "Run canceled",
-      "planReady": "Iris put a plan together",
-      "planningFailed": "Planning failed",
-      "gettingToWork": "Iris is getting to work"
-    },
-    "outbox": {
-      "delivered": "Reported to Slack",
-      "needsSlackFix": "Iris could not post to Slack. Pick a notification channel and invite Iris to it.",
-      "failed": "Slack delivery failed",
-      "failedWithError": "Slack delivery failed: {error}",
-      "canceled": "Slack report canceled",
-      "reporting": "Reporting to Slack"
-    },
-    "capabilities": {
-      "repositoryRead": "Repository read",
-      "readSocialAnalytics": "Read social analytics",
-      "startAbTest": "Start A/B test",
-      "readAbTests": "Read A/B tests",
-      "socialPost": "Social post"
-    },
-    "signalKinds": {
-      "codePushed": "Code pushed",
-      "pullRequestMerged": "Pull request merged"
-    },
-    "triggers": {
-      "signal": "New activity",
-      "wake": "Scheduled check",
-      "repair": "Retry"
-    },
-    "runStatus": {
-      "executing": "Working",
-      "completed": "Completed"
-    },
-    "taskStatus": {
-      "running": "Running",
-      "completed": "Done"
-    },
-    "signalStatus": {
-      "coalesced": "Grouped",
-      "processed": "Reviewed"
     }
   },
   "analytics": {

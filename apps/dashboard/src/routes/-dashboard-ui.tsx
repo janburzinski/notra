@@ -16,7 +16,6 @@ import CollectionLoading from "@/app/(dashboard)/[slug]/collection/[id]/loading"
 import ContentDetailLoading from "@/app/(dashboard)/[slug]/content/[id]/loading";
 import ContentLoading from "@/app/(dashboard)/[slug]/content/loading";
 import FeedbackLoading from "@/app/(dashboard)/[slug]/feedback/loading";
-import IrisLoading from "@/app/(dashboard)/[slug]/iris/loading";
 import DashboardLoading from "@/app/(dashboard)/[slug]/loading";
 import SkillDetailLoading from "@/app/(dashboard)/[slug]/skills/[name]/loading";
 import SkillsLoading from "@/app/(dashboard)/[slug]/skills/loading";
@@ -94,9 +93,6 @@ const Brand = lazyPage(
 );
 const Feedback = lazyPage(
   () => import("@/app/(dashboard)/[slug]/feedback/page-client")
-);
-const Iris = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/iris/page-client")
 );
 const BillingSuccess = lazyPage(
   () => import("@/app/(dashboard)/[slug]/settings/billing/success/page")
@@ -429,14 +425,6 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
       pendingComponent: FeedbackLoading,
       preload: Feedback.preload,
       component: ({ params }) => <Feedback organizationSlug={params.slug} />,
-    }),
-    createUiRoute({
-      parent: organization,
-      path: "iris",
-      title: { title: "Iris" },
-      pendingComponent: IrisLoading,
-      preload: Iris.preload,
-      component: ({ params }) => <Iris organizationSlug={params.slug} />,
     }),
     createUiRoute({
       parent: organization,

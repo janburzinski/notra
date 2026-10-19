@@ -22,7 +22,6 @@ export function useBreadcrumbLabels(): BreadcrumbLabels {
       feedback: tLabels("feedback"),
       identity: tLabels("brandIdentityTitle"),
       integrations: tLabels("integrations"),
-      iris: tLabels("iris"),
       leaderboard: tLabels("leaderboard"),
       new: t("segments.new"),
       runs: t("segments.runs"),

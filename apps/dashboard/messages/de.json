@@ -1185,9 +1185,6 @@
       "historyNotSupported": "Der Versionsverlauf ist für Artikel und Changelogs verfügbar.",
       "historyUnavailable": "Diese Version kann nicht wiederhergestellt werden, weil ihr bearbeitbarer Inhalt oder ihre Metadaten nicht verfügbar sind."
     },
-    "iris": {
-      "runInProgress": "Iris arbeitet bereits an einem Durchlauf"
-    },
     "notifications": {
       "ownerOnly": "Nur der Organisationsinhaber kann die Benachrichtigungseinstellungen ändern"
     },
@@ -2185,7 +2182,6 @@
       "home": "Home",
       "traffic": "Traffic",
       "sendFeedback": "Feedback senden",
-      "iris": "Iris",
       "default": "Standard",
       "more": "Mehr",
       "newChat": "Neuer Chat",
@@ -4896,151 +4892,6 @@
       "refreshFailed": "Konto konnte nicht aktualisiert werden",
       "posted": "Auf {platform} als @{username} gepostet",
       "connectPlatformFailed": "{platform}-Konto konnte nicht verbunden werden"
-    }
-  },
-  "iris": {
-    "shared": {
-      "irisIsPaused": "Iris ist pausiert",
-      "irisIsOnDuty": "Iris ist im Einsatz",
-      "waiting": "Wartet"
-    },
-    "pauseDialog": {
-      "title": "Iris pausieren?",
-      "description": "Beim Pausieren werden geplante Durchläufe gestoppt und ausstehende Slack-Nachrichten abgebrochen. Du kannst jederzeit fortsetzen.",
-      "keepRunning": "Weiterlaufen lassen",
-      "confirm": "Iris pausieren"
-    },
-    "runCard": {
-      "fixSlack": "Slack reparieren"
-    },
-    "running": {
-      "status": {
-        "retired": "Iris ist im Ruhestand",
-        "working": "Iris arbeitet"
-      },
-      "tabs": {
-        "signals": "Neueste Signale"
-      },
-      "activityUnavailable": {
-        "title": "Aktivität ist nicht verfügbar",
-        "description": "Der Aktivitätsfeed konnte nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen."
-      },
-      "noRuns": {
-        "title": "Noch keine Durchläufe",
-        "description": "Iris beobachtet deine Quellen. Der erste Bericht erscheint hier, sobald es etwas Erwähnenswertes gibt."
-      },
-      "signalsUnavailable": {
-        "title": "Signale sind nicht verfügbar",
-        "description": "Die neuesten Signale konnten nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen."
-      }
-    },
-    "signals": {
-      "empty": "Bisher ist nichts eingegangen. Iris beginnt zu beobachten, sobald du etwas auslieferst."
-    },
-    "start": {
-      "description": "Iris beobachtet, was du auslieferst, und übernimmt dein Marketing. Iris entwirft Changelogs, Blogbeiträge mit Bildern und Social-Media-Beiträge und fragt dich in Slack, bevor etwas live geht.",
-      "start": "Iris starten",
-      "beforeYouStart": "Bevor du startest",
-      "slackWarning": "Verbinde einen Slack-Benachrichtigungskanal, damit Iris dir berichten kann. Du kannst trotzdem jetzt starten und ihn später verbinden. <link>Slack verbinden</link>"
-    },
-    "explainer": {
-      "watch": {
-        "title": "Beobachtet deine Quellen",
-        "description": "Jedes Release, jeder Merge und jeder Push landet bei Iris."
-      },
-      "draft": {
-        "title": "Entwirft die Story",
-        "description": "Changelogs, Blogbeiträge mit Bildern und Social-Media-Beiträge, in deinem Tonfall geschrieben."
-      },
-      "ship": {
-        "title": "Du gibst das Go",
-        "description": "Iris berichtet in Slack und wartet auf dein Go, bevor etwas live geht."
-      }
-    },
-    "stats": {
-      "runs": "Durchläufe, letzte 30 Tage",
-      "artifacts": "Entwürfe, letzte 30 Tage",
-      "signals": "Wartende Signale",
-      "lastRun": "Letzter Durchlauf"
-    },
-    "unavailable": {
-      "title": "Iris ist noch nicht verfügbar",
-      "description": "Iris ist für diesen Workspace noch nicht verfügbar."
-    },
-    "toasts": {
-      "startFailed": "Iris konnte nicht gestartet werden",
-      "runNow": "Iris kümmert sich darum",
-      "runNowFailed": "Iris konnte keinen Durchlauf starten",
-      "pauseFailed": "Iris konnte nicht pausiert werden",
-      "resumed": "Iris ist wieder im Einsatz",
-      "resumeFailed": "Iris konnte nicht fortgesetzt werden",
-      "notRunning": "Iris läuft nicht"
-    },
-    "readiness": {
-      "sources": {
-        "label": "Quellen verbunden",
-        "ready": "Iris sieht, was dein Team ausliefert.",
-        "missing": "Verbinde ein Repository, damit Iris weiß, was du ausgeliefert hast."
-      },
-      "slack": {
-        "label": "Slack-Kanal verbunden",
-        "ready": "Iris berichtet in deinem Slack-Benachrichtigungskanal.",
-        "missing": "Verbinde einen Slack-Benachrichtigungskanal, damit Iris dir berichten kann."
-      }
-    },
-    "relativeTime": {
-      "minutesAgo": "vor {count} Min.",
-      "hoursAgo": "{count, plural, one {vor # Stunde} other {vor # Stunden}}",
-      "daysAgo": "{count, plural, one {vor # Tag} other {vor # Tagen}}"
-    },
-    "decision": {
-      "thinking": "Iris denkt darüber nach",
-      "reviewedSignals": "{count, plural, one {# Signal geprüft und entschieden abzuwarten} other {# Signale geprüft und entschieden abzuwarten}}",
-      "reviewedLatest": "Neueste Aktivität geprüft und entschieden abzuwarten",
-      "escalated": "Hat dich in Slack um Input gebeten",
-      "planNotFinishedWithTitle": "Plan nicht abgeschlossen: {title}",
-      "planNotFinished": "Der Plan wurde nicht abgeschlossen",
-      "runCanceledWithTitle": "Durchlauf abgebrochen: {title}",
-      "runCanceled": "Durchlauf abgebrochen",
-      "planReady": "Iris hat einen Plan erstellt",
-      "planningFailed": "Planung fehlgeschlagen",
-      "gettingToWork": "Iris macht sich an die Arbeit"
-    },
-    "outbox": {
-      "delivered": "An Slack berichtet",
-      "needsSlackFix": "Iris konnte nicht in Slack posten. Wähle einen Benachrichtigungskanal und lade Iris dorthin ein.",
-      "failed": "Slack-Zustellung fehlgeschlagen",
-      "failedWithError": "Slack-Zustellung fehlgeschlagen: {error}",
-      "canceled": "Slack-Bericht abgebrochen",
-      "reporting": "Berichtet an Slack"
-    },
-    "capabilities": {
-      "repositoryRead": "Repository lesen",
-      "readSocialAnalytics": "Social Analytics lesen",
-      "startAbTest": "A/B-Test starten",
-      "readAbTests": "A/B-Tests lesen",
-      "socialPost": "Social-Media-Beitrag"
-    },
-    "signalKinds": {
-      "codePushed": "Code gepusht",
-      "pullRequestMerged": "Pull Request gemergt"
-    },
-    "triggers": {
-      "signal": "Neue Aktivität",
-      "wake": "Geplante Prüfung",
-      "repair": "Erneuter Versuch"
-    },
-    "runStatus": {
-      "executing": "Arbeitet",
-      "completed": "Abgeschlossen"
-    },
-    "taskStatus": {
-      "running": "Läuft",
-      "completed": "Erledigt"
-    },
-    "signalStatus": {
-      "coalesced": "Gruppiert",
-      "processed": "Geprüft"
     }
   },
   "analytics": {

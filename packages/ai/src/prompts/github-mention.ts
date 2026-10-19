@@ -5,7 +5,7 @@ import type {
   GitHubMentionReviewThread,
   GitHubMentionVoice,
 } from "@notra/ai/types/github-mention";
-import { sanitizeUntrustedText } from "@notra/ai/utils/iris-untrusted";
+import { sanitizeUntrustedText } from "@notra/ai/utils/untrusted-text";
 
 function clip(text: string, limit: number) {
   return text.length > limit ? `${text.slice(0, limit)}…` : text;

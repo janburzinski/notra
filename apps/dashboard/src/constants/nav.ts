@@ -16,7 +16,6 @@ import {
   PencilEdit01Icon,
   PlugIcon,
   PlusSignIcon,
-  RainbowIcon,
   Robot01Icon,
   SearchList01Icon,
   Settings01Icon,
@@ -34,7 +33,6 @@ import type { PostStatus } from "@notra/schemas/dashboard/content";
 import { DURATION } from "@notra/ui/lib/motion";
 
 import { AGENT_FEEDBACK_NAV_LINK } from "@/constants/agent-feedback";
-import { IRIS_NAV_LINK } from "@/constants/iris";
 import { SITES_NAV_LINK } from "@/constants/sites";
 import type {
   NavGroup,
@@ -83,7 +81,6 @@ export const STUDIO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
   "brand",
   "automation",
   "feedback",
-  "iris",
   "sites",
 ]);
 
@@ -104,7 +101,6 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
     icon: PaintBoardIcon,
     labelKey: "brandIdentityTitle",
   },
-  { link: IRIS_NAV_LINK, icon: RainbowIcon, labelKey: "iris" },
   {
     link: AUTOMATIONS_NAV_LINK,
     icon: WorkflowSquare03Icon,
@@ -197,7 +193,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     id: "content",
     icon: NoteIcon,
     labelKey: "content",
-    links: [CONTENT_NAV_LINK, CHAT_NAV_LINK, IRIS_NAV_LINK],
+    links: [CONTENT_NAV_LINK, CHAT_NAV_LINK],
   },
   {
     id: "sites",
@@ -227,7 +223,6 @@ export const NAV_WORKSPACE_GROUP: NavGroup = {
 };
 
 export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
-  iris: true,
   analytics: true,
   sites: false,
 };

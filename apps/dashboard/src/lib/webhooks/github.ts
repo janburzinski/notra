@@ -1,9 +1,5 @@
 import crypto from "node:crypto";
 
-import {
-  GITHUB_PULL_REQUEST_EVENT_TYPE,
-  GITHUB_PULL_REQUEST_MERGED_ACTION,
-} from "@notra/ai/constants/autonomy-signals";
 import { decryptToken } from "@notra/ai/crypto/token-encryption";
 import { getGitHubWebhookIntegrations } from "@notra/ai/integrations/github-webhooks";
 import { redis } from "@notra/ai/utils/redis";
@@ -17,9 +13,7 @@ import {
 } from "@notra/schemas/dashboard/github-webhook";
 import { and, eq, sql } from "drizzle-orm";
 
-import { GITHUB_PULL_REQUEST_CLOSED_ACTION } from "@/constants/github";
 import { checkLogRetention } from "@/lib/billing/check-log-retention";
-import { dispatchIrisGithubSignal } from "@/lib/iris/record-github-signal";
 import { dispatchEventTriggers } from "@/lib/webhooks/dispatch-event-triggers";
 import { appendWebhookLog } from "@/lib/webhooks/logging";
 import type {
@@ -49,19 +43,6 @@ async function markDeliveryProcessed(deliveryId: string) {
   }
   const key = `webhook:delivery:${deliveryId}`;
   await redis.set(key, "1", { ex: DELIVERY_TTL_SECONDS });
-}
-
-const IRIS_SIGNAL_RETRY_STATUS = 500;
-
-function buildIrisSignalRetryResponse(event: string, delivery: string | null) {
-  return Response.json(
-    {
-      message: "Failed to record the Iris signal for this delivery",
-      event,
-      delivery,
-    },
-    { status: IRIS_SIGNAL_RETRY_STATUS }
-  );
 }
 
 async function createMemoryEntry({
@@ -185,35 +166,6 @@ function processPushEvent(
             message: payload.head_commit.message,
           }
         : null,
-    },
-  };
-}
-
-function processPullRequestEvent(
-  action: string,
-  payload: GitHubWebhookPayload
-): GithubProcessedEvent | null {
-  if (action !== GITHUB_PULL_REQUEST_CLOSED_ACTION) {
-    return null;
-  }
-
-  const pullRequest = payload.pull_request;
-  if (!pullRequest?.merged) {
-    return null;
-  }
-
-  return {
-    type: GITHUB_PULL_REQUEST_EVENT_TYPE,
-    action: GITHUB_PULL_REQUEST_MERGED_ACTION,
-    data: {
-      number: pullRequest.number,
-      title: pullRequest.title,
-      body: pullRequest.body ?? null,
-      url: pullRequest.html_url,
-      mergedAt: pullRequest.merged_at ?? null,
-      mergeCommitSha: pullRequest.merge_commit_sha ?? null,
-      author: pullRequest.user?.login ?? null,
-      baseBranch: pullRequest.base?.ref ?? null,
     },
   };
 }
@@ -414,9 +366,6 @@ export async function handleGitHubWebhook(
     case "push":
       processedEvent = processPushEvent(payload);
       break;
-    case "pull_request":
-      processedEvent = processPullRequestEvent(action, payload);
-      break;
     default:
       await log({
         title: `Ignored ${event} event`,
@@ -479,43 +428,27 @@ export async function handleGitHubWebhook(
     retentionDays: logRetentionDays,
   });
 
-  const irisSignalRecorded = await dispatchIrisGithubSignal({
-    organizationId,
+  const matchingTriggers = await db
+    .select({
+      id: contentTriggers.id,
+      sourceConfig: contentTriggers.sourceConfig,
+    })
+    .from(contentTriggers)
+    .where(
+      and(
+        eq(contentTriggers.organizationId, organizationId),
+        eq(contentTriggers.sourceType, "github_webhook"),
+        eq(contentTriggers.enabled, true),
+        sql`(${contentTriggers.targets}->'repositoryIds') @> ${JSON.stringify([repositoryId])}::jsonb`
+      )
+    );
+
+  await dispatchEventTriggers({
+    triggers: matchingTriggers,
+    processedEvent,
     repositoryId,
-    repositoryName,
-    eventType: processedEvent.type,
-    eventAction: processedEvent.action,
-    eventData: processedEvent.data,
-    deliveryId: delivery,
+    deliveryId: delivery ?? undefined,
   });
-
-  if (processedEvent.type !== GITHUB_PULL_REQUEST_EVENT_TYPE) {
-    const matchingTriggers = await db
-      .select({
-        id: contentTriggers.id,
-        sourceConfig: contentTriggers.sourceConfig,
-      })
-      .from(contentTriggers)
-      .where(
-        and(
-          eq(contentTriggers.organizationId, organizationId),
-          eq(contentTriggers.sourceType, "github_webhook"),
-          eq(contentTriggers.enabled, true),
-          sql`(${contentTriggers.targets}->'repositoryIds') @> ${JSON.stringify([repositoryId])}::jsonb`
-        )
-      );
-
-    await dispatchEventTriggers({
-      triggers: matchingTriggers,
-      processedEvent,
-      repositoryId,
-      deliveryId: delivery ?? undefined,
-    });
-  }
-
-  if (!irisSignalRecorded) {
-    return buildIrisSignalRetryResponse(event, delivery);
-  }
 
   if (SHOULD_DEDUPE_DELIVERIES && delivery) {
     await markDeliveryProcessed(delivery);

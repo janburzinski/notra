@@ -1,4 +1,3 @@
-import { acquireClaim, releaseClaim } from "@notra/ai/autonomy/claims";
 import { chatWorkflowPayloadSchema } from "@notra/ai/schemas/chat";
 import { publicationSyncRepairSchema } from "@notra/ai/schemas/content-publication";
 import type { BrandGuidelinesWorkflowPayload } from "@notra/ai/types/brand-guidelines";
@@ -21,17 +20,9 @@ import {
   eventWorkflowPayloadSchema,
   scheduleWorkflowPayloadSchema,
 } from "@notra/schemas/dashboard/workflows";
-import {
-  type IrisWorkflowPayload,
-  irisWorkflowPayloadSchema,
-} from "@notra/schemas/dashboard/workflows/iris";
 import { onboardingAgentWorkflowPayloadSchema } from "@notra/schemas/dashboard/workflows/onboarding-agent-payload";
 import { start } from "workflow/api";
 
-import {
-  IRIS_START_CLAIM_SCOPE,
-  IRIS_START_CLAIM_TTL_SECONDS,
-} from "@/constants/iris";
 import {
   WORKFLOW_ANALYTICS_NAMES,
   WORKFLOW_TRIGGERS,
@@ -54,7 +45,6 @@ import { geoScanWorkflow } from "@/workflows/geo-scan";
 import { geoWriterWorkflow } from "@/workflows/geo-writer";
 import { githubMentionWorkflow } from "@/workflows/github-mention";
 import { gscSyncWorkflow } from "@/workflows/gsc-sync";
-import { irisControllerRun } from "@/workflows/iris-controller";
 import { onDemandContentWorkflow } from "@/workflows/on-demand-content";
 import { onboardingAgentWorkflow } from "@/workflows/onboarding-agent";
 import { scheduleContentWorkflow } from "@/workflows/schedule-content";
@@ -152,41 +142,6 @@ export async function startOnboardingAgentRun(
     organizationId: parsed.organizationId,
   });
   return { runId: run.runId };
-}
-
-export async function startIrisRun(
-  payload: IrisWorkflowPayload
-): Promise<{ runId: string | null }> {
-  const parsed = irisWorkflowPayloadSchema.parse(payload);
-  const dispatchToken = crypto.randomUUID();
-  const dispatch = await acquireClaim({
-    scope: IRIS_START_CLAIM_SCOPE,
-    claimKey: parsed.executionId,
-    ownerToken: dispatchToken,
-    ttlSeconds: IRIS_START_CLAIM_TTL_SECONDS,
-    organizationId: parsed.organizationId,
-  });
-  if (!dispatch.claimed) {
-    return { runId: null };
-  }
-  try {
-    const run = await start(irisControllerRun, [parsed]);
-    trackWorkflowStarted({
-      workflow: WORKFLOW_ANALYTICS_NAMES.IRIS_CONTROLLER,
-      runId: run.runId,
-      organizationId: parsed.organizationId,
-      trigger: parsed.trigger,
-      properties: { execution_id: parsed.executionId },
-    });
-    return { runId: run.runId };
-  } catch (error) {
-    await releaseClaim({
-      scope: IRIS_START_CLAIM_SCOPE,
-      claimKey: parsed.executionId,
-      ownerToken: dispatchToken,
-    });
-    throw error;
-  }
 }
 
 export async function startScheduleRun(payload: {

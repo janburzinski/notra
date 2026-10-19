@@ -16,7 +16,6 @@ import { isAnalyticsEnabledForOrganization } from "@/lib/analytics/flag";
 import { getServerSession } from "@/lib/auth/session";
 import { hasAiCreditsGrant } from "@/lib/billing/subscription";
 import { resolveNavigationWithJev } from "@/lib/command-palette/jev-navigation";
-import { isIrisEnabledForOrganization } from "@/lib/iris/flag";
 import { searchWorkspace } from "@/lib/search/workspace-search";
 import { isSitesEnabledForOrganization } from "@/lib/sites/flag";
 import type {
@@ -158,9 +157,8 @@ export async function POST(request: Request) {
   }
 
   const organizationId = member.organizationId;
-  const [hasAiCredits, iris, analytics, sites, searchData] = await Promise.all([
+  const [hasAiCredits, analytics, sites, searchData] = await Promise.all([
     hasAiCreditsGrant(organizationId).catch(() => false),
-    isIrisEnabledForOrganization(organizationId).catch(() => false),
     isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
     isSitesEnabledForOrganization(organizationId),
     searchWorkspace({
@@ -172,7 +170,6 @@ export async function POST(request: Request) {
   ]);
   const entities = toNavigationEntities(slug, searchData);
   const routes = commandRoutesForAI(slug, hasAiCredits, {
-    iris,
     analytics,
     sites,
   });

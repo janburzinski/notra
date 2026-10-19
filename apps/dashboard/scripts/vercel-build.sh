@@ -10,4 +10,7 @@ if [ "${VERCEL_ENV:-}" = "production" ]; then
   if [ -n "${TINYBIRD_TOKEN:-}" ] && [ -n "${TINYBIRD_BASE_URL:-}" ]; then
     (cd packages/analytics && bun run tinybird:deploy)
   fi
+  if [ -n "${QSTASH_TOKEN:-}" ]; then
+    bun apps/dashboard/scripts/retire-iris-schedules.ts || echo "Iris schedule retirement failed, continuing"
+  fi
 fi

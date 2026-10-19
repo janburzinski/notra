@@ -12,7 +12,6 @@ import { feedbackRouter } from "./routers/feedback";
 import { geoRouter } from "./routers/geo";
 import { githubRouter } from "./routers/github";
 import { integrationsRouter } from "./routers/integrations";
-import { irisRouter } from "./routers/iris";
 import { logsRouter } from "./routers/logs";
 import { notificationsRouter } from "./routers/notifications";
 import { onboardingRouter } from "./routers/onboarding";
@@ -41,7 +40,6 @@ export const dashboardRouter = {
   feedback: feedbackRouter,
   geo: geoRouter,
   github: githubRouter,
-  iris: irisRouter,
   sites: sitesRouter,
   integrations: integrationsRouter,
   logs: logsRouter,

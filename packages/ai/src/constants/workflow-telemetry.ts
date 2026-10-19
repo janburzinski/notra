@@ -73,7 +73,6 @@ export const WORKFLOW_TELEMETRY_ENUMS: Readonly<
     "brand-guidelines",
     "chat",
     "onboarding-agent",
-    "iris-controller",
     "schedule-content",
     "event-content",
     "social-analytics-sync",

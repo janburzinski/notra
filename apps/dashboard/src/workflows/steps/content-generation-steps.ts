@@ -1,11 +1,10 @@
-import { acquireClaim } from "@notra/ai/autonomy/claims";
-
 import "@/workflows/runtime";
 import {
   confirmContentBilling,
   releaseContentBilling,
   reserveContentBilling,
 } from "@notra/ai/billing/content-billing";
+import { redis } from "@notra/ai/utils/redis";
 import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
@@ -76,18 +75,30 @@ import type {
 } from "@/types/workflows/workflows";
 
 const EXECUTION_CLAIM_TTL_SECONDS = 60 * 60 * 24;
-const EXECUTION_CLAIM_SCOPE = "workflow-execution";
+
+async function acquireExecutionClaim(
+  input: ClaimWorkflowExecutionInput
+): Promise<{ claimed: boolean }> {
+  if (!redis) {
+    return { claimed: process.env.NODE_ENV === "development" };
+  }
+  const key = `workflow:claim:${input.executionId}`;
+  const claimed = await redis.set(key, input.claimToken, {
+    nx: true,
+    ex: EXECUTION_CLAIM_TTL_SECONDS,
+  });
+  if (claimed === "OK") {
+    return { claimed: true };
+  }
+  const holder = await redis.get(key);
+  return { claimed: holder === input.claimToken };
+}
 
 export async function claimWorkflowExecution(
   input: ClaimWorkflowExecutionInput
 ): Promise<{ claimed: boolean }> {
   "use step";
-  const claim = await acquireClaim({
-    scope: EXECUTION_CLAIM_SCOPE,
-    claimKey: input.executionId,
-    ownerToken: input.claimToken,
-    ttlSeconds: EXECUTION_CLAIM_TTL_SECONDS,
-  });
+  const claim = await acquireExecutionClaim(input);
   if (!claim.claimed) {
     await trackServerEventAndFlush({
       event: POSTHOG_EVENTS.WORKFLOW_DUPLICATE_REJECTED,

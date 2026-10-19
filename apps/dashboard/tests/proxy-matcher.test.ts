@@ -60,7 +60,6 @@ describe("native authentication middleware route boundaries", () => {
     "/api/cron/monitoring",
     "/api/cron/geo-scan",
     "/api/healthcheck",
-    "/api/workflows/iris",
     "/api/internal/workflows/geo-scan",
     "/api/internal/geo/sequence-run",
     "/.well-known/workflow/v1/step",

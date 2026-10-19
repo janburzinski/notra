@@ -43,7 +43,6 @@ import { Route as ApiUploadsContentImageRouteImport } from './routes/api.uploads
 import { Route as ApiUploadsConvertHeicRouteImport } from './routes/api.uploads.convert-heic'
 import { Route as ApiWebhooksWorkosRouteImport } from './routes/api.webhooks.workos'
 import { Route as ApiWorkflowsGscSyncRouteImport } from './routes/api.workflows.gsc-sync'
-import { Route as ApiWorkflowsIrisRouteImport } from './routes/api.workflows.iris'
 import { Route as ApiWorkflowsScheduleRouteImport } from './routes/api.workflows.schedule'
 import { Route as ApiWorkflowsScheduledPublicationWakeRouteImport } from './routes/api.workflows.scheduled-publication-wake'
 import { Route as ApiWorkflowsSocialAnalyticsSyncRouteImport } from './routes/api.workflows.social-analytics-sync'
@@ -263,11 +262,6 @@ const ApiWebhooksWorkosRoute = ApiWebhooksWorkosRouteImport.update({
 const ApiWorkflowsGscSyncRoute = ApiWorkflowsGscSyncRouteImport.update({
   id: '/api/workflows/gsc-sync',
   path: '/api/workflows/gsc-sync',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWorkflowsIrisRoute = ApiWorkflowsIrisRouteImport.update({
-  id: '/api/workflows/iris',
-  path: '/api/workflows/iris',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiWorkflowsScheduleRoute = ApiWorkflowsScheduleRouteImport.update({
@@ -573,7 +567,6 @@ export interface FileRoutesByFullPath {
   '/api/uploads/convert-heic': typeof ApiUploadsConvertHeicRoute
   '/api/webhooks/workos': typeof ApiWebhooksWorkosRoute
   '/api/workflows/gsc-sync': typeof ApiWorkflowsGscSyncRoute
-  '/api/workflows/iris': typeof ApiWorkflowsIrisRoute
   '/api/workflows/schedule': typeof ApiWorkflowsScheduleRoute
   '/api/workflows/scheduled-publication-wake': typeof ApiWorkflowsScheduledPublicationWakeRoute
   '/api/workflows/social-analytics-sync': typeof ApiWorkflowsSocialAnalyticsSyncRoute
@@ -656,7 +649,6 @@ export interface FileRoutesByTo {
   '/api/uploads/convert-heic': typeof ApiUploadsConvertHeicRoute
   '/api/webhooks/workos': typeof ApiWebhooksWorkosRoute
   '/api/workflows/gsc-sync': typeof ApiWorkflowsGscSyncRoute
-  '/api/workflows/iris': typeof ApiWorkflowsIrisRoute
   '/api/workflows/schedule': typeof ApiWorkflowsScheduleRoute
   '/api/workflows/scheduled-publication-wake': typeof ApiWorkflowsScheduledPublicationWakeRoute
   '/api/workflows/social-analytics-sync': typeof ApiWorkflowsSocialAnalyticsSyncRoute
@@ -740,7 +732,6 @@ export interface FileRoutesById {
   '/api/uploads/convert-heic': typeof ApiUploadsConvertHeicRoute
   '/api/webhooks/workos': typeof ApiWebhooksWorkosRoute
   '/api/workflows/gsc-sync': typeof ApiWorkflowsGscSyncRoute
-  '/api/workflows/iris': typeof ApiWorkflowsIrisRoute
   '/api/workflows/schedule': typeof ApiWorkflowsScheduleRoute
   '/api/workflows/scheduled-publication-wake': typeof ApiWorkflowsScheduledPublicationWakeRoute
   '/api/workflows/social-analytics-sync': typeof ApiWorkflowsSocialAnalyticsSyncRoute
@@ -825,7 +816,6 @@ export interface FileRouteTypes {
     | '/api/uploads/convert-heic'
     | '/api/webhooks/workos'
     | '/api/workflows/gsc-sync'
-    | '/api/workflows/iris'
     | '/api/workflows/schedule'
     | '/api/workflows/scheduled-publication-wake'
     | '/api/workflows/social-analytics-sync'
@@ -908,7 +898,6 @@ export interface FileRouteTypes {
     | '/api/uploads/convert-heic'
     | '/api/webhooks/workos'
     | '/api/workflows/gsc-sync'
-    | '/api/workflows/iris'
     | '/api/workflows/schedule'
     | '/api/workflows/scheduled-publication-wake'
     | '/api/workflows/social-analytics-sync'
@@ -991,7 +980,6 @@ export interface FileRouteTypes {
     | '/api/uploads/convert-heic'
     | '/api/webhooks/workos'
     | '/api/workflows/gsc-sync'
-    | '/api/workflows/iris'
     | '/api/workflows/schedule'
     | '/api/workflows/scheduled-publication-wake'
     | '/api/workflows/social-analytics-sync'
@@ -1075,7 +1063,6 @@ export interface RootRouteChildren {
   ApiUploadsConvertHeicRoute: typeof ApiUploadsConvertHeicRoute
   ApiWebhooksWorkosRoute: typeof ApiWebhooksWorkosRoute
   ApiWorkflowsGscSyncRoute: typeof ApiWorkflowsGscSyncRoute
-  ApiWorkflowsIrisRoute: typeof ApiWorkflowsIrisRoute
   ApiWorkflowsScheduleRoute: typeof ApiWorkflowsScheduleRoute
   ApiWorkflowsScheduledPublicationWakeRoute: typeof ApiWorkflowsScheduledPublicationWakeRoute
   ApiWorkflowsSocialAnalyticsSyncRoute: typeof ApiWorkflowsSocialAnalyticsSyncRoute
@@ -1349,13 +1336,6 @@ declare module '@tanstack/react-router' {
       path: '/api/workflows/gsc-sync'
       fullPath: '/api/workflows/gsc-sync'
       preLoaderRoute: typeof ApiWorkflowsGscSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/workflows/iris': {
-      id: '/api/workflows/iris'
-      path: '/api/workflows/iris'
-      fullPath: '/api/workflows/iris'
-      preLoaderRoute: typeof ApiWorkflowsIrisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/workflows/schedule': {
@@ -1821,7 +1801,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiUploadsConvertHeicRoute: ApiUploadsConvertHeicRoute,
   ApiWebhooksWorkosRoute: ApiWebhooksWorkosRoute,
   ApiWorkflowsGscSyncRoute: ApiWorkflowsGscSyncRoute,
-  ApiWorkflowsIrisRoute: ApiWorkflowsIrisRoute,
   ApiWorkflowsScheduleRoute: ApiWorkflowsScheduleRoute,
   ApiWorkflowsScheduledPublicationWakeRoute:
     ApiWorkflowsScheduledPublicationWakeRoute,

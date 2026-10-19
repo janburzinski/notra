@@ -20,7 +20,6 @@ import type {
 import type { SettingsUrlSearchParams } from "@/types/settings/modal";
 
 import { geoNavHref } from "./geo-paths";
-import { filterIrisNavItems } from "./iris-flag";
 
 const NAV_ITEMS_BY_LINK = new Map(
   NAV_MAIN_ITEMS.map((item) => [item.link, item])
@@ -121,10 +120,9 @@ export function resolveNavItems(
   const withAnalytics = visibility.analytics
     ? items
     : items.filter((item) => item.link !== ANALYTICS_NAV_LINK);
-  const withSites = visibility.sites
+  return visibility.sites
     ? withAnalytics
     : withAnalytics.filter((item) => item.link !== SITES_NAV_LINK);
-  return filterIrisNavItems(withSites, visibility.iris);
 }
 
 export function resolveActiveNavLink(

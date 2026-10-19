@@ -14,7 +14,6 @@ export type NavItemLabelKey =
   | "analytics"
   | "feedback"
   | "brandIdentityTitle"
-  | "iris"
   | "automations"
   | "integrations"
   | "overview"
@@ -88,7 +87,6 @@ export interface NavPrimaryActionConfig {
 }
 
 export interface NavVisibility {
-  iris: boolean;
   analytics: boolean;
   sites: boolean;
 }
