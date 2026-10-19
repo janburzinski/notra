@@ -994,6 +994,7 @@ export interface GeoTrafficGroupPage {
 }
 
 export interface TrafficSourceSheetProps {
+  open: boolean;
   group: GeoTrafficSourceGroup | null;
   series: { day: string; value: number }[];
   pages: readonly GeoTrafficPage[];

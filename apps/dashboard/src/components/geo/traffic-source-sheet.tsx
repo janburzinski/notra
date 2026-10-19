@@ -21,8 +21,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
-import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
 import { TrafficSheetHero } from "@/components/geo/traffic-sheet-hero";
@@ -124,7 +123,7 @@ function shareDelta(
   return share - previousShare;
 }
 
-function TrafficSourceSheetContent({
+const TrafficSourceSheetContent = memo(function TrafficSourceSheetContent({
   group,
   series,
   pages,
@@ -244,32 +243,24 @@ function TrafficSourceSheetContent({
       </div>
     </>
   );
-}
+});
 
 export function TrafficSourceSheet({
-  group: groupProp,
+  group,
+  open: isOpen,
   series,
   pages,
   onOpenChange,
 }: TrafficSourceSheetProps) {
-  const open = useMemo(
-    () => (groupProp === null ? null : { group: groupProp, series }),
-    [groupProp, series]
-  );
-  const [retained, release] = useRetainedValue(open);
-
   return (
-    <Sheet
-      onOpenChange={onOpenChange}
-      onOpenChangeComplete={release}
-      open={groupProp !== null}
-    >
-      <SheetContent variant="inset">
-        {retained ? (
+    <Sheet onOpenChange={onOpenChange} open={isOpen}>
+      {/* Prepare one reusable panel instead of mounting charts and tables on each click. */}
+      <SheetContent keepMounted variant="inset">
+        {group ? (
           <TrafficSourceSheetContent
-            group={retained.group}
+            group={group}
             pages={pages}
-            series={retained.series}
+            series={series}
           />
         ) : null}
       </SheetContent>

@@ -14,7 +14,7 @@ import {
   InstrumentEmpty,
   InstrumentSection,
 } from "@notra/ui/components/instrument/instrument-module";
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
 import { TrafficHero } from "@/components/geo/traffic-hero";
@@ -33,6 +33,9 @@ import {
   trafficGroupPathsAreLowerBound,
 } from "@/utils/ai-traffic-groups";
 
+const MemoTrafficHero = memo(TrafficHero);
+const MemoTrafficSourcesStack = memo(TrafficSourcesStack);
+
 export function AiTrafficCard({
   traffic,
   pages,
@@ -46,29 +49,41 @@ export function AiTrafficCard({
   const locale = useLocale();
   const { sources, totals, points, previousConversions } =
     traffic ?? GEO_EMPTY_TRAFFIC_RESPONSE;
-  const previousTotals = toGeoTrafficPreviousTotals(
-    sources,
-    previousConversions
+  const previousTotals = useMemo(
+    () => toGeoTrafficPreviousTotals(sources, previousConversions),
+    [sources, previousConversions]
   );
-  const groups = groupTrafficSources(sources).map((group) =>
-    group.key === GEO_TRAFFIC_OTHER_GROUP.key
-      ? { ...group, label: tCommon("labels.other") }
-      : group
+  const groups = useMemo(
+    () =>
+      groupTrafficSources(sources).map((group) =>
+        group.key === GEO_TRAFFIC_OTHER_GROUP.key
+          ? { ...group, label: tCommon("labels.other") }
+          : group
+      ),
+    [sources, tCommon]
   );
   const [collapsed, setCollapsed] = useState<ReadonlySet<GeoTrafficSourceBand>>(
     () => new Set()
   );
-  const toggleCollapsed = (band: GeoTrafficSourceBand) =>
-    setCollapsed((current) => {
-      const next = new Set(current);
-      if (next.has(band)) {
-        next.delete(band);
-      } else {
-        next.add(band);
-      }
-      return next;
-    });
+  const toggleCollapsed = useCallback(
+    (band: GeoTrafficSourceBand) =>
+      setCollapsed((current) => {
+        const next = new Set(current);
+        if (next.has(band)) {
+          next.delete(band);
+        } else {
+          next.add(band);
+        }
+        return next;
+      }),
+    []
+  );
   const [openGroupKey, setOpenGroupKey] = useState<string | null>(null);
+  const [sourceSheetOpen, setSourceSheetOpen] = useState(false);
+  const openSource = useCallback((group: GeoTrafficSourceGroup) => {
+    setOpenGroupKey(trafficGroupKey(group.band, group.key));
+    setSourceSheetOpen(true);
+  }, []);
   const sparklineDays = useMemo(
     () => trafficSparklineDays(points, range?.from, range?.to),
     [points, range?.from, range?.to]
@@ -96,7 +111,7 @@ export function AiTrafficCard({
 
   const openGroup =
     openGroupKey === null
-      ? null
+      ? (groups[0] ?? null)
       : (groups.find(
           (group) => trafficGroupKey(group.band, group.key) === openGroupKey
         ) ?? null);
@@ -134,7 +149,7 @@ export function AiTrafficCard({
   return (
     <div className="flex flex-col gap-6">
       {showHero ? (
-        <TrafficHero
+        <MemoTrafficHero
           groups={groups}
           points={points}
           previousTotals={previousTotals}
@@ -144,26 +159,27 @@ export function AiTrafficCard({
         />
       ) : null}
       <InstrumentSection eyebrow={tCommon("labels.sources")}>
-        <TrafficSourcesStack
+        <MemoTrafficSourcesStack
           collapsed={collapsed}
           columns={columns}
           groups={groups}
           loading={isPending}
-          onOpen={(group) =>
-            setOpenGroupKey(trafficGroupKey(group.band, group.key))
-          }
+          onOpen={openSource}
           onToggle={toggleCollapsed}
         />
       </InstrumentSection>
       <TrafficSourceSheet
         group={openGroup}
-        onOpenChange={(open) => {
-          if (!open) {
-            setOpenGroupKey(null);
-          }
-        }}
+        open={sourceSheetOpen && openGroup !== null}
+        onOpenChange={setSourceSheetOpen}
         pages={pages}
-        series={openGroupKey ? (seriesByGroup.get(openGroupKey) ?? []) : []}
+        series={
+          openGroup
+            ? (seriesByGroup.get(
+                trafficGroupKey(openGroup.band, openGroup.key)
+              ) ?? [])
+            : []
+        }
       />
     </div>
   );
