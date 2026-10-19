@@ -1,0 +1,42 @@
+packages/geo-core/tests/coding-agent-catalog.test.ts
+  s_be102f88eaf162::t_3b66a1738efe11 31,190-206
+packages/geo-core/tests/coding-agent-partial-integration.test.ts
+  s_be102f88eaf162::t_b8a6cc0262111e 60-65,67-68,79-82,129,141,173
+  s_be102f88eaf162::t_3b66a1738efe11 35,41,45-49,78,83-84
+packages/ai/src/utils/geo-opencode-box.ts
+  s_be102f88eaf162::t_2e8ec25e2dbc1c 200-204
+packages/ai/src/agents/geo-opencode.test.ts
+  s_be102f88eaf162::t_2e8ec25e2dbc1c 6,13,38,61-65,117,119,361,366-375
+packages/geo-core/src/constants/geo-coding-agents.ts
+  s_be102f88eaf162::t_2e8ec25e2dbc1c 32,36,40
+packages/geo-core/tests/coding-agent-scan.test.ts
+  s_be102f88eaf162::t_3b66a1738efe11 73-77
+CONTRIBUTING.md
+  s_be102f88eaf162::t_b48e70e311b5ec 373,379
+  s_be102f88eaf162::t_3b66a1738efe11 375-378
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_be102f88eaf162::t_2e8ec25e2dbc1c 635-638
+packages/geo-core/tests/token-usage.test.ts
+  s_be102f88eaf162::t_3b66a1738efe11 120
+packages/ai/src/constants/geo-opencode.ts
+  s_be102f88eaf162::t_2e8ec25e2dbc1c 27
+packages/ai/src/agents/geo-opencode.ts
+  s_be102f88eaf162::t_3b66a1738efe11 9
+  s_be102f88eaf162::t_2e8ec25e2dbc1c 47,69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9fa743bc09e19f0f4b7c8caa430b099132eb0b54",
+  "prompts": {},
+  "sessions": {
+    "s_be102f88eaf162": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1527f-e133-7493-b796-0e7d4086594a",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
