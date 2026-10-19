@@ -1,0 +1,57 @@
+apps/dashboard/src/constants/content-collections.ts
+  s_2a0c56ff02c64a::t_87e6a90b200370 1-2,7-14
+apps/dashboard/src/constants/schedule.ts
+  s_2a0c56ff02c64a::t_a4b947e4ed9bbb 2,29-39
+  s_2a0c56ff02c64a::t_87e6a90b200370 1
+apps/dashboard/src/app/(dashboard)/[slug]/geo/agent-readiness/skeleton.tsx
+  s_2a0c56ff02c64a::t_87e6a90b200370 8,16-21
+apps/ui/registry/notra/data-table/components/data-table.tsx
+  s_2a0c56ff02c64a::t_44693bdd148863 38,46-47,52
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/skeleton.tsx
+  s_2a0c56ff02c64a::t_87e6a90b200370 10,18-22
+  s_2a0c56ff02c64a::t_861bb9673b1660 74-78
+packages/ui/src/types/data-table.ts
+  s_2a0c56ff02c64a::t_44693bdd148863 196-200,202,205-206
+apps/dashboard/src/app/(dashboard)/[slug]/geo/gaps/skeleton.tsx
+  s_2a0c56ff02c64a::t_861bb9673b1660 3,12,26,39-45
+  s_2a0c56ff02c64a::t_a4b947e4ed9bbb 8
+  s_2a0c56ff02c64a::t_87e6a90b200370 15-21
+apps/dashboard/src/app/(dashboard)/[slug]/geo/shelf-space/skeleton.tsx
+  s_2a0c56ff02c64a::t_861bb9673b1660 9-10,22-27,29-32,38
+  s_2a0c56ff02c64a::t_a4b947e4ed9bbb 64-66
+apps/dashboard/src/lib/hooks/use-fill-height.ts
+  s_2a0c56ff02c64a::t_ddd50512d8f60b 1-71
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/skeleton.tsx
+  s_2a0c56ff02c64a::t_0ae41c33b0d65e 10,17,19,25-34,38,57-68,72,103-105
+  s_2a0c56ff02c64a::t_a4b947e4ed9bbb 73-102
+packages/ui/src/components/ui/data-table.tsx
+  s_2a0c56ff02c64a::t_44693bdd148863 40,48-49,54
+apps/dashboard/src/constants/event-triggers.ts
+  s_2a0c56ff02c64a::t_a4b947e4ed9bbb 3,24-34
+apps/dashboard/src/app/(dashboard)/[slug]/geo/prompts/skeleton.tsx
+  s_2a0c56ff02c64a::t_87e6a90b200370 10,18-23
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  s_2a0c56ff02c64a::t_87e6a90b200370 11,22-28
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_2a0c56ff02c64a::t_a4b947e4ed9bbb 78
+  s_2a0c56ff02c64a::t_ddd50512d8f60b 58
+apps/ui/registry/notra/data-table/types/data-table.ts
+  s_2a0c56ff02c64a::t_a4b947e4ed9bbb 220-223
+  s_2a0c56ff02c64a::t_44693bdd148863 217-219,224,226,229-230
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "88c2057fc9df80be6b4773536319077c580a0f05",
+  "prompts": {},
+  "sessions": {
+    "s_2a0c56ff02c64a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "530649db-2c43-41b8-87bc-fafe8d8b5b09",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
