@@ -18,6 +18,7 @@ export default defineMeta({
     "chat-minimap",
     "composer",
     "data-table",
+    "sidebar",
     "ai-search",
     "ai-chat",
     "coding-agents",

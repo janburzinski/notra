@@ -5,6 +5,8 @@
  * Missing or stale entries are harmless: Blume still settles to the measured height.
  */
 export const EXAMPLE_HEIGHTS: Record<string, number> = {
+  "app-sidebar/examples/app-sidebar-collapsed": 640,
+  "app-sidebar/examples/app-sidebar-demo": 640,
   "button/examples/button-sizes": 176,
   "button/examples/button-variants": 172,
   "chatgpt/examples/chatgpt-actions": 130,

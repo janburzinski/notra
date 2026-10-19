@@ -6,6 +6,13 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Matches the dashboard's `antialiased` body. Without it macOS renders light
+   text on dark surfaces noticeably heavier. */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Base UI injects this rule as a React-hoisted <style>, which Blume's
    client-side navigation drops from <head> and React never re-inserts, so
    ScrollArea viewports show native scrollbars after the first page change. */
