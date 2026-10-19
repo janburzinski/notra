@@ -1,0 +1,21 @@
+packages/sites-server/src/sites.ts
+  s_310f96e2f051d2::t_fd7ec6d744fca8 409
+packages/sites-server/tests/organization-teardown.test.ts
+  s_310f96e2f051d2::t_fd7ec6d744fca8 207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a907c3e3ae968051efb5b9aa1e48dd570ae85260",
+  "prompts": {},
+  "sessions": {
+    "s_310f96e2f051d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1f87219a-8042-4246-988e-fae34cf48e7e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
