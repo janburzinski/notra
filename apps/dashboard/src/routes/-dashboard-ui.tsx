@@ -113,12 +113,15 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
         shell: organizationShell,
       };
     }, [organizationShell]);
+    const { state, ...shell } = organizationShell;
     return (
-      <DashboardClientWrapper {...organizationShell}>
-        <Suspense fallback={<DashboardLoading />}>
-          <Outlet />
-        </Suspense>
-      </DashboardClientWrapper>
+      <HydrationBoundary state={state}>
+        <DashboardClientWrapper {...shell}>
+          <Suspense fallback={<DashboardLoading />}>
+            <Outlet />
+          </Suspense>
+        </DashboardClientWrapper>
+      </HydrationBoundary>
     );
   }
 

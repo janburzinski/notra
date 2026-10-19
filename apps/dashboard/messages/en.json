@@ -5923,7 +5923,9 @@
     "geoUpgradeTooltip": "Upgrade your plan to use GEO",
     "user": {
       "confirmSignOutUnsaved": "You have unsaved changes. Signing out will discard them. Sign out anyway?",
-      "signingOut": "Signing out…"
+      "signingOut": "Signing out…",
+      "myProfile": "My profile",
+      "theme": "Theme"
     },
     "upgrade": {
       "upgradeNow": "Upgrade now",
@@ -5949,7 +5951,12 @@
       "scheduleDemo": "Schedule a demo",
       "upgradeToGrowth": "Upgrade to Growth",
       "lightMode": "Light mode",
-      "darkMode": "Dark mode"
+      "darkMode": "Dark mode",
+      "createOrganization": "Create organization",
+      "billing": "Billing",
+      "inviteMembers": "Invite members",
+      "projectSettings": "Project settings",
+      "loadingProjects": "Loading projects"
     },
     "onboarding": {
       "steps": {

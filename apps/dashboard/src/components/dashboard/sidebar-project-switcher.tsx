@@ -21,8 +21,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSkeleton,
 } from "@notra/ui/components/ui/sidebar";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { Notra } from "@notra/ui/components/ui/svgs/notra";
 import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -38,19 +39,156 @@ import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useSiteDetail } from "@/lib/hooks/use-sites";
 import { usePathname, useRouter } from "@/lib/navigation";
+import type {
+  ProjectMenuListProps,
+  ProjectSwitcherTriggerProps,
+} from "@/types/components/sidebar-project-switcher";
 import { getWebsiteDomain } from "@/utils/brand";
 import { setLastVisitedProject } from "@/utils/cookies";
 import { isGeoDashboardPath } from "@/utils/geo-paths";
 import { resolveNavItems } from "@/utils/nav";
 import { siteIdFromPath } from "@/utils/site-links";
 
-import { SidebarBrandHeader } from "./sidebar-brand-header";
 import { SidebarLabel } from "./sidebar-label";
+import {
+  OrgActionItems,
+  OrgMenuDialogs,
+  OrgSwitcherSubmenu,
+  useOrgMenu,
+} from "./sidebar-org-menu";
 
 const GEO_SETTINGS_ITEM = resolveNavItems([GEO_SETTINGS_NAV_LINK]).at(0);
 
+function ProjectSwitcherTrigger({
+  project,
+  domain,
+  isLoading,
+  ...props
+}: ProjectSwitcherTriggerProps) {
+  const t = useTranslations("nav.orgSelector");
+  if (isLoading) {
+    return (
+      <SidebarMenuButton
+        aria-busy
+        aria-label={t("loadingProjects")}
+        className="data-popup-open:bg-sidebar-accent cursor-pointer [--sidebar-lg-icon:1.75rem]"
+        size="lg"
+        tooltip={t("loadingProjects")}
+        {...props}
+      >
+        <Skeleton className="size-7 shrink-0 rounded-lg" />
+        <Skeleton className="h-4 max-w-24 flex-1 group-data-[collapsible=icon]:hidden" />
+      </SidebarMenuButton>
+    );
+  }
+
+  if (!project) {
+    return (
+      <SidebarMenuButton
+        className="data-popup-open:bg-sidebar-accent cursor-pointer"
+        size="lg"
+        tooltip="Notra"
+        {...props}
+      >
+        <span className="bg-background flex size-7 shrink-0 items-center justify-center rounded-lg dark:bg-[#F6F3F1]">
+          <Notra className="size-7 dark:size-5" />
+        </span>
+        <SidebarLabel className="flex-1 text-base font-semibold">
+          Notra
+        </SidebarLabel>
+        <HugeiconsIcon
+          className="text-muted-foreground ml-auto"
+          icon={UnfoldMoreIcon}
+        />
+      </SidebarMenuButton>
+    );
+  }
+
+  return (
+    <SidebarMenuButton
+      className="data-popup-open:bg-sidebar-accent cursor-pointer [--sidebar-lg-icon:1.75rem]"
+      size="lg"
+      tooltip={project.name}
+      {...props}
+    >
+      <ProjectLogo
+        className="size-7 rounded-lg"
+        domain={domain}
+        fallbackClassName="bg-sidebar-accent rounded-lg"
+        name={project.name}
+      />
+      <div className="grid min-w-0 flex-1 leading-tight">
+        <SidebarLabel className="truncate text-sm font-medium">
+          {project.name}
+        </SidebarLabel>
+        {domain ? (
+          <SidebarLabel className="text-muted-foreground truncate text-xs">
+            {domain}
+          </SidebarLabel>
+        ) : null}
+      </div>
+      <HugeiconsIcon
+        className="text-muted-foreground ml-auto"
+        icon={UnfoldMoreIcon}
+      />
+    </SidebarMenuButton>
+  );
+}
+
+function ProjectMenuList({
+  projects,
+  activeProjectId,
+  projectDomain,
+  onSwitch,
+}: ProjectMenuListProps) {
+  const tCommon = useTranslations("common");
+  if (projects.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      <DropdownMenuGroup>
+        <DropdownMenuLabel>{tCommon("labels.projects")}</DropdownMenuLabel>
+        {projects.map((project) => {
+          const isSelected = activeProjectId === project.id;
+          return (
+            <DropdownMenuItem
+              className="cursor-pointer gap-2 py-1.5 pl-7"
+              key={project.id}
+              onClick={() => {
+                if (!isSelected) {
+                  trackEvent(POSTHOG_EVENTS.GEO_PROJECT_SWITCHED, {
+                    project_id: project.id,
+                    project_count: projects.length,
+                  });
+                  onSwitch(project.id);
+                }
+              }}
+            >
+              {isSelected ? (
+                <HugeiconsIcon
+                  className="text-muted-foreground absolute left-2 size-3.5"
+                  icon={Tick02Icon}
+                />
+              ) : null}
+              <ProjectLogo
+                domain={projectDomain(project.brandSettingsId)}
+                name={project.name}
+              />
+              <span className="min-w-0 flex-1 truncate">{project.name}</span>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuGroup>
+      <DropdownMenuSeparator />
+    </>
+  );
+}
+
 export function SidebarProjectSwitcher() {
   const tCommon = useTranslations("common");
+  const tOrg = useTranslations("nav.orgSelector");
   const pathname = usePathname();
   const router = useRouter();
   const { activeOrganization } = useOrganizationsContext();
@@ -69,6 +207,7 @@ export function SidebarProjectSwitcher() {
   };
   const { openSettings } = useSettingsModal();
   const [createOpen, setCreateOpen] = useState(false);
+  const orgMenu = useOrgMenu();
 
   const {
     projects: loadedProjects,
@@ -121,25 +260,16 @@ export function SidebarProjectSwitcher() {
       voices.find((voice) => voice.id === brandSettingsId)?.websiteUrl ?? null
     );
 
-  if (
+  // Only the project half waits for these; the org menu stays usable.
+  const isProjectLoading = Boolean(
     organizationId &&
     !activeScope.isError &&
     (!activeScope.isResolved || (siteId && siteDetail.isPending))
-  ) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <SidebarMenuSkeleton className="h-12" showIcon />
-        </SidebarMenuItem>
-      </SidebarMenu>
-    );
-  }
+  );
 
-  if (!activeProject) {
-    return <SidebarBrandHeader />;
-  }
-
-  const activeDomain = projectDomain(activeProject.brandSettingsId);
+  const activeDomain = activeProject
+    ? projectDomain(activeProject.brandSettingsId)
+    : null;
 
   return (
     <>
@@ -148,94 +278,46 @@ export function SidebarProjectSwitcher() {
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <SidebarMenuButton
-                  className="cursor-pointer [--sidebar-lg-icon:1.75rem]"
-                  size="lg"
-                  tooltip={activeProject.name}
-                >
-                  <ProjectLogo
-                    className="size-7 rounded-lg"
-                    domain={activeDomain}
-                    fallbackClassName="bg-sidebar-accent rounded-lg"
-                    name={activeProject.name}
-                  />
-                  <div className="grid min-w-0 flex-1 leading-tight">
-                    <SidebarLabel className="truncate text-sm font-medium">
-                      {activeProject.name}
-                    </SidebarLabel>
-                    {activeDomain ? (
-                      <SidebarLabel className="text-muted-foreground truncate text-xs">
-                        {activeDomain}
-                      </SidebarLabel>
-                    ) : null}
-                  </div>
-                  <HugeiconsIcon
-                    className="text-muted-foreground ml-auto"
-                    icon={UnfoldMoreIcon}
-                  />
-                </SidebarMenuButton>
+                <ProjectSwitcherTrigger
+                  domain={activeDomain}
+                  isLoading={isProjectLoading}
+                  project={activeProject}
+                />
               }
             />
-            <DropdownMenuContent
-              align="start"
-              className="min-w-56 rounded-lg"
-              sideOffset={4}
-            >
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  {tCommon("labels.projects")}
-                </DropdownMenuLabel>
-                {projects.map((project) => (
-                  <DropdownMenuItem
-                    className="cursor-pointer gap-2 pr-8"
-                    key={project.id}
-                    onClick={() => {
-                      if (project.id !== activeProject.id) {
-                        trackEvent(POSTHOG_EVENTS.GEO_PROJECT_SWITCHED, {
-                          project_id: project.id,
-                          project_count: projects.length,
-                        });
-                        switchProject(project.id);
-                      }
-                    }}
-                  >
-                    <ProjectLogo
-                      domain={projectDomain(project.brandSettingsId)}
-                      name={project.name}
-                    />
-                    <span className="min-w-0 flex-1 truncate">
-                      {project.name}
-                    </span>
-                    {activeProject.id === project.id ? (
-                      <HugeiconsIcon
-                        className="text-muted-foreground absolute right-2 size-4"
-                        icon={Tick02Icon}
-                      />
-                    ) : null}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
+            <DropdownMenuContent align="start" className="w-64" sideOffset={4}>
+              <OrgSwitcherSubmenu onCreate={orgMenu.openCreate} />
+              <ProjectMenuList
+                activeProjectId={activeProject?.id}
+                onSwitch={switchProject}
+                projectDomain={projectDomain}
+                projects={isProjectLoading ? [] : projects}
+              />
               <DropdownMenuItem
-                className="cursor-pointer gap-2"
+                className="cursor-pointer gap-2 py-1.5"
                 onClick={() => setCreateOpen(true)}
               >
                 <HugeiconsIcon icon={PlusSignIcon} />
                 {tCommon("labels.newProject")}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer gap-2"
-                onClick={() => openSettings("geo-brand")}
-              >
-                <HugeiconsIcon
-                  icon={GEO_SETTINGS_ITEM?.icon ?? Settings01Icon}
-                />
-                {tCommon("actions.settings")}
-              </DropdownMenuItem>
+              {activeProject && !isProjectLoading ? (
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2 py-1.5"
+                  onClick={() => openSettings("geo-brand")}
+                >
+                  <HugeiconsIcon
+                    icon={GEO_SETTINGS_ITEM?.icon ?? Settings01Icon}
+                  />
+                  {tOrg("projectSettings")}
+                </DropdownMenuItem>
+              ) : null}
+              <DropdownMenuSeparator />
+              <OrgActionItems onOpenTopup={orgMenu.openTopup} />
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarMenuItem>
       </SidebarMenu>
+      <OrgMenuDialogs menu={orgMenu} />
       <GeoProjectCreateDialog
         onCreated={switchProject}
         onOpenChange={setCreateOpen}

@@ -27,13 +27,13 @@ import { DeferredSidebarStatus } from "./deferred-sidebar-status";
 import { NavFooter } from "./nav-footer";
 import { NavJobs } from "./nav-jobs";
 import { NavSite } from "./nav-site";
-import { OrgSelector } from "./org-selector";
 import { SidebarLabel } from "./sidebar-label";
 import { SidebarProjectSwitcher } from "./sidebar-project-switcher";
 import { SidebarTopQuickActions } from "./sidebar-quick-actions";
 import { SidebarResizeHandle } from "./sidebar-resize-handle";
 import { SidebarSwap } from "./sidebar-swap";
 import { SidebarToggle } from "./sidebar-toggle";
+import { SidebarUserMenu } from "./sidebar-user-menu";
 
 const ChatHistoryNav = dynamic(
   () => import("./chat-history-nav").then((module) => module.ChatHistoryNav),
@@ -223,7 +223,7 @@ export function DashboardSidebar({
         )}
       </div>
       <SidebarFooter className="pt-1.75">
-        <OrgSelector />
+        <SidebarUserMenu />
       </SidebarFooter>
       <SidebarResizeHandle
         onWidthChange={onWidthChange}

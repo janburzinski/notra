@@ -10,7 +10,7 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 
 import { CollectionsView } from "@/components/content/collections-view";
 import { FeedbackProvider } from "@/components/dashboard/feedback-context";
-import { OrgSelector } from "@/components/dashboard/org-selector";
+import { SidebarUserMenu } from "@/components/dashboard/sidebar-user-menu";
 import { DesignSystemFrame } from "@/components/design-system/design-system-frame";
 import { SentimentBreakdown } from "@/components/geo/sentiment-breakdown";
 import { SentimentBreakdownPlaceholder } from "@/components/geo/sentiment-breakdown-placeholder";
@@ -274,15 +274,15 @@ function BreakUiSamples({ dataset }: { dataset: BreakUiDataset }) {
             </div>
           </Sample>
           <Sample
-            id="org-selector"
-            note={`Sidebar footer at the narrowest resizable width (${SIDEBAR_MIN_WIDTH}px). Click it to open the switcher.`}
-            title="Sidebar · Organization selector"
+            id="user-menu"
+            note={`Sidebar footer at the narrowest resizable width (${SIDEBAR_MIN_WIDTH}px). Click it to open the user menu.`}
+            title="Sidebar · User menu"
           >
             <SidebarProvider className="min-h-0!" defaultOpen>
               <FeedbackProvider>
                 <div className="bg-sidebar text-sidebar-foreground w-60 rounded-xl border">
                   <SidebarFooter>
-                    <OrgSelector />
+                    <SidebarUserMenu />
                   </SidebarFooter>
                 </div>
               </FeedbackProvider>

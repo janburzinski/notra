@@ -1,8 +1,7 @@
 import { getAuthIdentity, getAuthSession } from "@/lib/auth/server";
 import { buildSessionCorsHeaders } from "@/lib/auth/session-cors";
-import { readLocaleCookie, writeLocaleCookie } from "@/lib/i18n/locale-cookie";
-import type { ClientSessionData } from "@/types/auth/session";
-import { isDashboardLocale } from "@/utils/i18n";
+import { syncLocaleCookie } from "@/lib/i18n/locale-cookie";
+import { toClientSessionData } from "@/utils/client-session";
 
 export function OPTIONS(request: Request) {
   return new Response(null, {
@@ -28,28 +27,9 @@ export async function GET(request: Request) {
     return Response.json(null, { headers });
   }
 
-  const preference = isDashboardLocale(data.user.locale)
-    ? data.user.locale
-    : null;
-  if ((await readLocaleCookie()) !== preference) {
-    await writeLocaleCookie(preference);
-  }
+  await syncLocaleCookie(data.user.locale);
 
-  const payload: ClientSessionData = {
-    session: data.session,
-    user: {
-      id: data.user.id,
-      name: data.user.name,
-      email: data.user.email,
-      emailVerified: data.user.emailVerified,
-      image: data.user.image,
-      role: data.user.role,
-      hidePersonalData: data.user.hidePersonalData,
-      showAgentStats: data.user.showAgentStats,
-      locale: data.user.locale,
-      createdAt: data.user.createdAt,
-    },
-  };
+  const payload = toClientSessionData(data.session, data.user);
 
   return Response.json(payload, { headers });
 }

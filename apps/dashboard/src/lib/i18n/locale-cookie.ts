@@ -32,3 +32,11 @@ export async function writeLocaleCookie(preference: LocalePreference) {
 export async function clearLocaleCookie() {
   deleteCookie(LOCALE_COOKIE, { path: "/" });
 }
+
+/** Keeps the locale cookie in line with the user's saved language preference. */
+export async function syncLocaleCookie(userLocale: string | null) {
+  const preference = isDashboardLocale(userLocale) ? userLocale : null;
+  if ((await readLocaleCookie()) !== preference) {
+    await writeLocaleCookie(preference);
+  }
+}

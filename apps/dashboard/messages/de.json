@@ -5923,7 +5923,9 @@
     "geoUpgradeTooltip": "Upgrade deinen Tarif, um GEO zu nutzen",
     "user": {
       "confirmSignOutUnsaved": "Du hast ungespeicherte Änderungen. Beim Abmelden werden sie verworfen. Trotzdem abmelden?",
-      "signingOut": "Wird abgemeldet…"
+      "signingOut": "Wird abgemeldet…",
+      "myProfile": "Mein Profil",
+      "theme": "Design"
     },
     "upgrade": {
       "upgradeNow": "Jetzt upgraden",
@@ -5949,7 +5951,12 @@
       "scheduleDemo": "Demo vereinbaren",
       "upgradeToGrowth": "Upgrade auf Growth",
       "lightMode": "Heller Modus",
-      "darkMode": "Dunkler Modus"
+      "darkMode": "Dunkler Modus",
+      "createOrganization": "Organisation erstellen",
+      "billing": "Abrechnung",
+      "inviteMembers": "Mitglieder einladen",
+      "projectSettings": "Projekteinstellungen",
+      "loadingProjects": "Projekte werden geladen"
     },
     "onboarding": {
       "steps": {

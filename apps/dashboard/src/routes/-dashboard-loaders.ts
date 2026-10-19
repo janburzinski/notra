@@ -25,13 +25,24 @@ import { resolveOnboardingAgentRunState } from "@/utils/onboarding-agent-run";
 import { toOrganizationSummary } from "@/utils/organization-summary";
 import { getSidebarWidthFromCookie } from "@/utils/sidebar-width";
 
-export const loadOrganizationShell = createServerFn({ method: "GET" })
+export const loadOrganizationShell = createServerFn({
+  method: "GET",
+  strict: { output: false },
+})
   .validator((data: UiRouteInput) => data)
   .handler(async ({ data: { params } }) => {
-    const { organization } = await validateOrganizationAccess(
+    const { organization, user, member } = await validateOrganizationAccess(
       params.slug ?? ""
     );
+    const { dehydrateOrganizationShellQueries } =
+      await import("@/utils/organization-shell-prefetch.server");
+    const state = await dehydrateOrganizationShellQueries(
+      organization.id,
+      getRequestHeaders(),
+      member && { userId: user.id, id: member.id, role: member.role }
+    );
     return {
+      state,
       initialActiveOrganization: toOrganizationSummary(organization),
       initialSidebarOpen: getSidebarOpenFromCookie(
         getCookie(SIDEBAR_COOKIE_NAME)
