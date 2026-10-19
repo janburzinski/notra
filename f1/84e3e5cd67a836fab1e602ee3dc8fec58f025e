@@ -1,0 +1,387 @@
+apps/docs/sites/custom-scripts.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 74-85
+packages/tools/src/constants/context-dev.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 5-7
+packages/utils/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 37
+infra/observability/grafana/query-fixtures.json
+  s_b2263adfe8aa43::t_e6387246fc095b 25
+scripts/benchmarks/OPTIMIZATIONS.md
+  s_b2263adfe8aa43::t_e6387246fc095b 1-37
+apps/dashboard/src/types/components/content-detail-toolbar.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 4,34-48
+packages/sites-server/src/pipeline.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 7,27,35,45,58-77,194-199,283
+apps/web/vite.config.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 96-97
+packages/geo-core/tests/coding-agent-partial-integration.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 35,41,45-49,60-66,68-69,79-85,130,142,174
+packages/sites-server/src/box-build.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 385-389
+apps/docs/sites/reference/blog-json.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 89,226
+apps/dashboard/src/components/content/content-site-preview-panel.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-436
+apps/dashboard/tests/chart-download.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-167
+packages/sites-server/tests/organization-teardown.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 207
+apps/dashboard/src/app/(dashboard)/[slug]/geo/prompts/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 5,10,17-23,45-46,49-61
+packages/posthog/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 21
+apps/dashboard/src/components/geo/mention-trend-card.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 155
+apps/dashboard/src/components/content/content-detail-chat-shell.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 30,100,118,123,125,141-145,154,156
+apps/api/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 37
+apps/console/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 54-55
+apps/dashboard/tests/constants/sidebar-resize.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-120
+apps/docs/sites/repository.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 136
+apps/ui/registry/notra/app-sidebar/constants/app-sidebar.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-5
+apps/dashboard/src/constants/site-github-publish.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 9
+scripts/benchmarks/results/html.json
+  s_b2263adfe8aa43::t_e6387246fc095b 1-112
+apps/dashboard/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 115,118,123
+apps/dashboard/src/components/geo/gaps-table.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 58,78
+apps/web/scripts/blog-assets.test.mjs
+  s_b2263adfe8aa43::t_e6387246fc095b 1-3,5,7-9,12-45
+scripts/benchmarks/results/payloads.json
+  s_b2263adfe8aa43::t_e6387246fc095b 1-509
+apps/dashboard/src/app/(dashboard)/[slug]/geo/agent-readiness/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 4,6,8,12-21,25,29-57,60-62,64-85,91
+apps/dashboard/src/types/integrations/site-github-publish.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,114-129
+apps/ui/registry/notra/app-sidebar/components/sidebar-switcher.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-146
+apps/web/public/schemas/blog.json
+  s_b2263adfe8aa43::t_e6387246fc095b 249-250,280-284,1367-1368,1384-1388
+packages/tools/src/utils/reference-snapshot.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 5,17,77,91-113
+packages/sites-core/src/utils/content-security-policy.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 23
+infra/observability/config.test.mjs
+  s_b2263adfe8aa43::t_e6387246fc095b 64,116-120,192,197-201
+apps/dashboard/src/utils/post-site-preview.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,3,5-15,18-19,21,24-38
+scripts/benchmarks/http-payloads.mjs
+  s_b2263adfe8aa43::t_e6387246fc095b 1-5,7-29,31-34,36-53,55-74,76-81,83-84,86-124,126-128,130-144,146-147,149-153,156-168,171-185
+packages/ai/src/agents/geo-opencode.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 6,13,38,61-65,94,115-116,358,363-374
+apps/dashboard/src/app/(dashboard)/[slug]/collection/[id]/page-client.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 22,159
+apps/api/tests/compression.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-213
+apps/dashboard/src/app/(dashboard)/[slug]/page-client.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 94
+apps/dashboard/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 15,117,189,1847,2198,2730,2800,2842,2894
+apps/ui/registry/notra/app-sidebar/hooks/use-sidebar-settled.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-29
+package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 30,100
+apps/dashboard/src/types/brand-identity.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 296-300
+apps/dashboard/messages/en.json
+  s_b2263adfe8aa43::t_e6387246fc095b 1164-1165,6613-6657,6910
+apps/ui/registry/notra/data-table/components/data-table.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 38-39,46-47,52,56
+apps/web/src/content/blog/how-to-create-a-grok-bot-plugin.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 21,31,159
+infra/observability/grafana/dashboards/notra.json
+  s_b2263adfe8aa43::t_e6387246fc095b 7,59,63-64,66,71-73,86,92,94,101,118,120,127,143-144,152,159,164-167,169,173,175-177,181-186,191-192,198,200,237-238,240,266-267,272-273,275,286,299-300,306,308-309,332,340-341,361-362,371,374,387-388,777-965,973,985,1031,1077,1123,1152,1181
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 122-144
+packages/tools/src/types/reference-snapshot.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 19
+packages/ui/src/components/ui/data-table.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 40-41,48-49,54,58
+scripts/benchmarks/optimized-payloads.mjs
+  s_b2263adfe8aa43::t_e6387246fc095b 1-5,7-8,10-31,33-38,40-44,46-53,55-69,71-79,81-95,97-101,103-116
+apps/api/src/types/compression.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1
+packages/sites-server/src/constants/build-runner.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 19-31,46
+packages/sites-server/tests/lifecycle.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 20,97-104,107-112,279-289,615-715
+packages/tools/src/types/scrape.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-14
+apps/dashboard/messages/de.json
+  s_b2263adfe8aa43::t_e6387246fc095b 1164-1165,6613-6657,6910
+apps/sites/src/preview-auth.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 18,59,87-88,185
+packages/sites-core/src/schemas/site-config.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 156-161,163
+packages/sites-server/src/constants/editor.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 15-16
+apps/dashboard/src/app/(dashboard)/[slug]/content/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 5-9,12-18
+packages/sites-server/src/schemas/post-preview.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-17
+scripts/benchmarks/http-responses.mjs
+  s_b2263adfe8aa43::t_e6387246fc095b 1-5,7-62,64-77,80-81,83-85
+apps/web/src/content/blog/how-notra-uses-upstash-to-run-an-ai-content-pipeline.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 21
+packages/geo-core/tests/coding-agent-scan.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 73-77
+apps/web/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 10,56,67
+packages/ai/src/constants/geo-opencode.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,26
+scripts/benchmarks/results/synthetic.txt
+  s_b2263adfe8aa43::t_e6387246fc095b 1-19
+apps/onboarding-agent/agent/subagents/researcher/instructions.md
+  s_b2263adfe8aa43::t_e6387246fc095b 19
+apps/ui/registry/notra/app-sidebar/types/app-sidebar.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-8,11-18,21-33,36-38,40-41,44-51,54-66
+apps/dashboard/src/utils/content-list-preview.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,3-27,29-33,35-36,38-80,82-103
+packages/sites-server/src/deploy.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 25
+packages/db/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 33
+apps/dashboard/tests/echarts-renderer.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 2-3,5,7-25,27
+apps/docs/sites/previews.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 66-82
+packages/sites-server/tests/deployment-timeline.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 57-58
+scripts/benchmarks/results/entry.json
+  s_b2263adfe8aa43::t_e6387246fc095b 1-112
+README.md
+  s_b2263adfe8aa43::t_e6387246fc095b 42
+packages/ai/src/utils/axiom-pipeline.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 39,111-118
+apps/dashboard/src/app/(dashboard)/[slug]/content/loading.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 5,10-11,22-26,30
+apps/dashboard/src/app/(dashboard)/[slug]/geo/gaps/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 3,7-8,12,14-21,26,29,31-32,35-36,39-45,65
+apps/docs/sites/customize/design.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 88-97,111
+apps/ui/components/ui/sidebar.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-1071
+infra/observability/grafana/dashboards/notra-surfaces.json
+  s_b2263adfe8aa43::t_e6387246fc095b 178-180
+scripts/benchmarks/README.md
+  s_b2263adfe8aa43::t_e6387246fc095b 1-129
+bun.lock
+  ai_agent 77,112,172-173,280,283,288,496,507,639,677,701,714,791,874-875,888,933,969,2883,3239,3983,4427,5075,5325,5415,6489,6495,6499,6501,6505,6507,6827,6829,6831,6835,6977,7031,7091,7319
+apps/dashboard/src/app/(dashboard)/[slug]/content/[id]/page-client.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 13-16,84-89,109-115
+apps/dashboard/src/constants/content-collections.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-2,6-14
+apps/dashboard/tests/post-site-preview-polling.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-55
+packages/sites-core/src/utils/hosts.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 80,85-86,90-100
+packages/sites-core/src/utils/serving-state.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 3,144,149-155
+apps/dashboard/src/components/content/overview/content-panel-tabs.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 20,32-35,47,68,70
+packages/sites-core/src/constants/sites.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 44-50,114-115,197-199
+packages/sites-core/src/schemas/site-integrations.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 152-157,159-163
+packages/sites-server/src/previews.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-13,15-16,18,20-41,48,62-189,196-212
+apps/ui/src/styles/examples.css
+  s_b2263adfe8aa43::t_e6387246fc095b 17-23
+scripts/benchmarks/chat-payloads.py
+  s_b2263adfe8aa43::t_e6387246fc095b 1-125
+apps/ui/docs/components/meta.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 21
+apps/ai-traffic-ingest/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 17
+apps/sites-builder/astro.config.mjs
+  s_b2263adfe8aa43::t_e6387246fc095b 34-44,62
+packages/sites-server/src/constants/content-types.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 25-26
+apps/dashboard/src/app/design-system/geo-demo/page.dev.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1,35-48,50
+apps/dashboard/src/constants/content-overview.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 49
+apps/ui/docs/components/sidebar.mdx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-88
+apps/dashboard/src/app/(dashboard)/[slug]/geo/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 3-7,11,17,20-28,69-72,76-88,94,112-128
+apps/sites/src/constants/pages.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 35-36
+infra/observability/README.md
+  s_b2263adfe8aa43::t_e6387246fc095b 91,158-197
+.github/workflows/sites-dev-release.yml
+  s_b2263adfe8aa43::t_e6387246fc095b 46
+apps/dashboard/src/app/(dashboard)/[slug]/brand/identity/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 6,8-10,15-17,19,21-22,25-34,37-54,56-69,72-106,111-117
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 5,10,17-22,51,71-86
+apps/api/src/index.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 29,196
+apps/dashboard/src/app/(dashboard)/[slug]/geo/shelf-space/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 3-4,7,9-10,13,15-19,22-32,37-38,46-52,55-61,63-69
+apps/dashboard/tests/constants/echarts-renderer.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-64
+apps/api/src/middleware/compression.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-5,7-12,14,16-19,21-37,39-59,61-71,73-74,76-84,86-88,90,92-93,95-100,102
+apps/onboarding-agent/agent/instructions.md
+  s_b2263adfe8aa43::t_e6387246fc095b 31
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 22,27,37,44,53,105,149-152,157-161,731-787
+apps/ui/registry/notra/data-table/types/data-table.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 217-224,226,229-232
+packages/ai/src/router/create-router.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,246,249-251
+apps/dashboard/src/components/dashboard/sidebar-resize-handle.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 60-72
+packages/ai/src/utils/context-dev.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 36,441-442,444-453,469-488,490-502
+apps/ui/registry/notra/app-sidebar/constants/app-sidebar-demo.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-91
+apps/ui/registry/notra/app-sidebar/components/sidebar-user-menu.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-92
+packages/ai/src/constants/context-dev.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 5
+packages/ai/src/utils/model-call-telemetry.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,123-127,137
+packages/geo-core/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 35
+apps/dashboard/src/lib/hooks/use-fill-height.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,3-4,6-17,20-30,32-35,38-41,43-47,49-54,56-61,63-68,70
+packages/geo-core/tests/coding-agent-catalog.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 31,178,183-185,188-202
+packages/sites-server/src/runner.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 3,23,79-81
+scripts/benchmarks/results/http.json
+  s_b2263adfe8aa43::t_e6387246fc095b 1-162
+apps/dashboard/src/lib/integrations/github/publish-saved-content.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 54,391-402,405-408,421
+packages/sites-server/src/cleanup.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 2-7,13-14,20-22,24,27-66,102,104,129,131-134
+apps/api/src/constants/compression.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-3
+apps/ui/registry/notra/app-sidebar/components/sidebar-search.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-45
+apps/dashboard/src/utils/chart-download.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 161,179,181-191,195-229,247
+packages/ai/src/agents/geo-opencode.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 8,45,243
+packages/sites-core/tests/integrations.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 105,465,489-493,505-509,515-530,535-539
+packages/sites-server/src/utils/post-preview-access.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,3,5-12
+apps/dashboard/src/lib/hooks/use-post-site-preview.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-192
+apps/api/src/utils/accepts-gzip.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-2,5-9,11-17,20,22-23
+infra/observability/grafana/dashboards/notra-accounting.json
+  s_b2263adfe8aa43::t_e6387246fc095b 45,50,57,73,89,175,192-195,211-213
+packages/tools/src/researcher/scrape-page.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1,6,14-16
+apps/dashboard/src/types/content/preview.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 98-105
+packages/kiwi/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 24
+packages/sites-server/src/state.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 276-278
+apps/ui/registry/notra/app-sidebar/examples/app-sidebar-demo.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-157
+CONTRIBUTING.md
+  s_b2263adfe8aa43::t_e6387246fc095b 373-378
+packages/sites-server/src/sites.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 409
+apps/dashboard/src/constants/sites.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 26,70-71,136-146,191
+apps/ui/registry/notra/app-sidebar/examples/app-sidebar-collapsed.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-5
+apps/dashboard/src/types/sites.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 11,333-342
+apps/dashboard/src/components/design-system/geo-resize-preview.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1-56
+packages/geo-core/src/constants/geo-model-catalog.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 631,640-656
+packages/sites-core/src/schemas/deployment.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 85-94
+packages/geo-core/src/constants/geo-coding-agents.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 12,16,20,24,28,32,36,40
+apps/dashboard/src/utils/content-list-preview.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-8,10-17,19-22
+packages/geo-core/tests/token-usage.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 120
+packages/sites-server/src/post-preview-source.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-2,4-9,11-22,24-28,31-57
+packages/sites-server/src/activation.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 9,18,34,104-116,124-126
+packages/sites-server/src/types/build.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 21-22
+packages/tools/src/researcher/scrape-pages.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 6,10-11,19-21,24,26,28-29,37-39,44-53
+apps/ui/src/constants/example-heights.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 8-9
+packages/ai/src/router/adapters/vercel.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-2,87-106
+apps/dashboard/src/lib/content-panel-tab.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 10,77-96
+packages/ui/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 74-75
+apps/dashboard/src/lib/sites/post-preview.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-268
+apps/ui/src/styles/blocks.css
+  s_b2263adfe8aa43::t_e6387246fc095b 17-22,42-47,65-70
+packages/tools/src/utils/scrape.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-18,21,24-53,55
+packages/sites-server/package.json
+  s_b2263adfe8aa43::t_e6387246fc095b 27
+packages/sites-server/tests/build-telemetry-pipeline.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 113-114
+.github/workflows/code-quality.yml
+  s_b2263adfe8aa43::t_e6387246fc095b 56,166
+apps/dashboard/src/app/(dashboard)/[slug]/iris/skeleton.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 4,6,8,11-12,17-21,24-25,38-55
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 129,140,196,206-221,226,610,687,1395,1428
+packages/ui/src/types/data-table.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 196-200,202,205-208
+packages/ai/src/utils/geo-opencode-box.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 200-201
+apps/dashboard/tests/sidebar-resize-handle.test.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-3,5,7-31,33-35
+packages/sites-core/src/constants/hosts.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 3
+apps/dashboard/src/lib/hooks/use-collections.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 3,50
+apps/ui/registry/notra/app-sidebar/components/sidebar-nav.tsx
+  s_b2263adfe8aa43::t_e6387246fc095b 1,3,5-34,36-38,40,43-59,61-62,64-104,107-139,143-154,156-168
+apps/ui/registry.json
+  s_b2263adfe8aa43::t_e6387246fc095b 1217-1318
+apps/dashboard/src/lib/integrations/github/site-entry-files.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 1-91
+packages/sites-server/src/types/sites.ts
+  s_b2263adfe8aa43::t_e6387246fc095b 2,4-6,58-59,97-124
+scripts/benchmarks/results/optimized.json
+  s_b2263adfe8aa43::t_e6387246fc095b 2-28,30-41,43-47,49-60,62-65,67-70,72-75,77-80,82-85,87-90,92
+apps/ui/theme.css
+  s_b2263adfe8aa43::t_e6387246fc095b 9-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f184e3e5cd67a836fab1e602ee3dc8fec58f025e",
+  "prompts": {},
+  "sessions": {
+    "s_b2263adfe8aa43": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b19bc50-9f11-4ef7-a695-fdbe497a25a7",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
