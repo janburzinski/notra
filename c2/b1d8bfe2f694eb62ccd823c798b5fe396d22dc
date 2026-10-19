@@ -1,0 +1,19 @@
+apps/dashboard/src/utils/content-writer-availability.server.ts
+  s_8d6aef27367874::t_011ca5f8425299 2-3,5,20-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c2b1d8bfe2f694eb62ccd823c798b5fe396d22dc",
+  "prompts": {},
+  "sessions": {
+    "s_8d6aef27367874": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1b3ed59d-b2d2-4645-a7a1-e437b71092da",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
