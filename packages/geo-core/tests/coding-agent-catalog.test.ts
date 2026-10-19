@@ -28,6 +28,7 @@ import { CODING_AGENT_TARGETS } from "./constants/coding-agents";
 const envKeys = [
   "UPSTASH_BOX_API_KEY",
   "OPENROUTER_API_KEY",
+  "AI_GATEWAY_API_KEY",
   "CURSOR_API_KEY",
 ] as const;
 const originalEnv = envKeys.map((key) => process.env[key]);
@@ -174,16 +175,29 @@ describe("coding-agent catalog and paid-plan boundaries", () => {
     }
   );
 
-  test("OpenCode requires OpenRouter while native Claude Code and Codex do not", () => {
+  test("all Box engines use Gateway without requiring OpenRouter", () => {
     delete process.env.OPENROUTER_API_KEY;
     const catalog = seedGeoModelCatalog();
     expect(
       catalog.models.some((model) => model.id === GEO_OPENCODE_ENGINE_ID)
-    ).toBe(false);
-    for (const [engine, harness] of CODING_AGENT_TARGETS) {
-      expect(catalog.models.some((model) => model.id === engine)).toBe(
-        harness !== "opencode"
-      );
+    ).toBe(true);
+    for (const [engine] of CODING_AGENT_TARGETS) {
+      expect(catalog.models.some((model) => model.id === engine)).toBe(true);
     }
   });
+
+  test.each([undefined, " \n "])(
+    "hides Box models without a Gateway key (%s)",
+    (key) => {
+      if (key === undefined) {
+        delete process.env.AI_GATEWAY_API_KEY;
+      } else {
+        process.env.AI_GATEWAY_API_KEY = key;
+      }
+      const catalog = seedGeoModelCatalog();
+      for (const [engine] of CODING_AGENT_TARGETS) {
+        expect(catalog.models.some((model) => model.id === engine)).toBe(false);
+      }
+    }
+  );
 });

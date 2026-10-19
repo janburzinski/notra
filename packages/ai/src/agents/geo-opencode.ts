@@ -2,16 +2,15 @@ import {
   GEO_FX_HARNESS_PATH,
   GEO_FX_HARNESS_SOURCE,
   GEO_FX_INSTALL_COMMAND,
-  GEO_FX_MODEL_API_KEY_ENV,
   GEO_FX_USAGE_TOOL_ID,
 } from "@notra/ai/constants/geo-fx";
 import {
+  GEO_BOX_GATEWAY_API_KEY_ENV,
   GEO_CLAUDE_CODE_EFFORT,
   GEO_CODEX_REASONING_EFFORT,
   GEO_CODEX_WEB_SEARCH,
   GEO_OPENCODE_BOX_API_KEY_ENV,
   GEO_OPENCODE_BOX_MODEL_ID,
-  GEO_OPENCODE_MODEL_API_KEY_ENV,
   GEO_OPENCODE_REASONING_EFFORT,
   GEO_OPENCODE_RUN_TIMEOUT_MS,
   GEO_OPENCODE_SOURCE_LIMIT,
@@ -43,7 +42,7 @@ import type {
   OpenCodeAgentOptions,
   StreamRun,
 } from "@upstash/box";
-import { Agent, Box, BoxApiKey, BoxError } from "@upstash/box";
+import { Agent, Box, BoxError } from "@upstash/box";
 
 function boxAgentFromHarness(harness: GeoBoxHarness | undefined): Agent {
   if (harness === "fx") {
@@ -56,16 +55,6 @@ function boxAgentFromHarness(harness: GeoBoxHarness | undefined): Agent {
     return Agent.Codex;
   }
   return Agent.OpenCode;
-}
-
-function boxModelApiKey(agent: Agent) {
-  if (agent === Agent.Custom) {
-    return requireApiKey(GEO_FX_MODEL_API_KEY_ENV);
-  }
-  if (agent === Agent.OpenCode) {
-    return requireApiKey(GEO_OPENCODE_MODEL_API_KEY_ENV);
-  }
-  return BoxApiKey.UpstashKey;
 }
 
 function boxStreamOptions(agent: Agent) {
@@ -251,7 +240,7 @@ export async function askGeoOpenCodeConversation(
   }
   const agent = boxAgentFromHarness(harness);
   const boxApiKey = requireApiKey(GEO_OPENCODE_BOX_API_KEY_ENV);
-  const modelApiKey = boxModelApiKey(agent);
+  const modelApiKey = requireApiKey(GEO_BOX_GATEWAY_API_KEY_ENV);
   const boxName = createGeoOpenCodeBoxName();
   const createTimeoutMs = remainingRunTimeout(deadlineAtMs);
   const createOperation = operationSignal(signal, createTimeoutMs);

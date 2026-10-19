@@ -628,12 +628,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
   },
 ];
 
-const GEO_OPENCODE_ENGINE_ENV = [
-  "UPSTASH_BOX_API_KEY",
-  "OPENROUTER_API_KEY",
-] as const;
-const GEO_NATIVE_BOX_ENGINE_ENV = ["UPSTASH_BOX_API_KEY"] as const;
-const GEO_FX_ENGINE_ENV = [
+const GEO_BOX_ENGINE_ENV = [
   "UPSTASH_BOX_API_KEY",
   "AI_GATEWAY_API_KEY",
 ] as const;
@@ -642,23 +637,23 @@ export const GEO_STATIC_ENGINE_ENV: Readonly<
   Record<string, readonly string[]>
 > = {
   "cursor/composer-2.5": ["CURSOR_API_KEY"],
-  "opencode/gpt-6-astra": GEO_OPENCODE_ENGINE_ENV,
-  "opencode/gpt-6-luna": GEO_OPENCODE_ENGINE_ENV,
-  "opencode/gpt-6.1-sol-medium": GEO_OPENCODE_ENGINE_ENV,
-  "opencode/claude-sonnet-5.5": GEO_OPENCODE_ENGINE_ENV,
-  "opencode/claude-opus-5.5": GEO_OPENCODE_ENGINE_ENV,
-  "claude-code/claude-sonnet-5.5": GEO_NATIVE_BOX_ENGINE_ENV,
-  "claude-code/claude-opus-5.5": GEO_NATIVE_BOX_ENGINE_ENV,
-  "claude-code/claude-fable-5.1": GEO_NATIVE_BOX_ENGINE_ENV,
-  "codex/gpt-6.1-sol": GEO_NATIVE_BOX_ENGINE_ENV,
-  "codex/gpt-6-luna": GEO_NATIVE_BOX_ENGINE_ENV,
-  "codex/gpt-6-astra": GEO_NATIVE_BOX_ENGINE_ENV,
-  "fx/gpt-6.1-sol": GEO_FX_ENGINE_ENV,
-  "fx/gpt-5.4-mini": GEO_FX_ENGINE_ENV,
-  "fx/claude-opus-5.5": GEO_FX_ENGINE_ENV,
-  "fx/claude-sonnet-5.5": GEO_FX_ENGINE_ENV,
-  "fx/kimi-k3": GEO_FX_ENGINE_ENV,
-  "fx/grok-4.7": GEO_FX_ENGINE_ENV,
+  "opencode/gpt-6-astra": GEO_BOX_ENGINE_ENV,
+  "opencode/gpt-6-luna": GEO_BOX_ENGINE_ENV,
+  "opencode/gpt-6.1-sol-medium": GEO_BOX_ENGINE_ENV,
+  "opencode/claude-sonnet-5.5": GEO_BOX_ENGINE_ENV,
+  "opencode/claude-opus-5.5": GEO_BOX_ENGINE_ENV,
+  "claude-code/claude-sonnet-5.5": GEO_BOX_ENGINE_ENV,
+  "claude-code/claude-opus-5.5": GEO_BOX_ENGINE_ENV,
+  "claude-code/claude-fable-5.1": GEO_BOX_ENGINE_ENV,
+  "codex/gpt-6.1-sol": GEO_BOX_ENGINE_ENV,
+  "codex/gpt-6-luna": GEO_BOX_ENGINE_ENV,
+  "codex/gpt-6-astra": GEO_BOX_ENGINE_ENV,
+  "fx/gpt-6.1-sol": GEO_BOX_ENGINE_ENV,
+  "fx/gpt-5.4-mini": GEO_BOX_ENGINE_ENV,
+  "fx/claude-opus-5.5": GEO_BOX_ENGINE_ENV,
+  "fx/claude-sonnet-5.5": GEO_BOX_ENGINE_ENV,
+  "fx/kimi-k3": GEO_BOX_ENGINE_ENV,
+  "fx/grok-4.7": GEO_BOX_ENGINE_ENV,
   "google/ai-overview": ["SERPAPI_API_KEY"],
   "openai/chatgpt": [GEO_OLOSTEP_API_KEY_ENV],
   "perplexity/perplexity": [GEO_OLOSTEP_API_KEY_ENV],

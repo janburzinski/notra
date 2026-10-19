@@ -1,4 +1,3 @@
-export const GEO_FX_MODEL_API_KEY_ENV = "AI_GATEWAY_API_KEY";
 export const GEO_FX_DIRECTORY = "/workspace/home/notra-fx";
 export const GEO_FX_HARNESS_PATH = `${GEO_FX_DIRECTORY}/harness.mjs`;
 export const GEO_FX_USAGE_TOOL_ID = "notra-fx-usage";

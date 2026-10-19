@@ -3,13 +3,14 @@ import { setTimeout } from "node:timers/promises";
 
 import { GEO_OPENCODE_SOURCE_LIMIT } from "@notra/ai/constants/geo-opencode";
 import type { GeoBoxAnswer } from "@notra/ai/types/geo-opencode";
-import { Agent, BoxApiKey } from "@upstash/box";
+import { Agent } from "@upstash/box";
 
 import { askGeoOpenCode, askGeoOpenCodeConversation } from "./geo-opencode";
 
 const originalFetch = globalThis.fetch;
 const originalBoxKey = process.env.UPSTASH_BOX_API_KEY;
 const originalModelKey = process.env.OPENROUTER_API_KEY;
+const originalGatewayKey = process.env.AI_GATEWAY_API_KEY;
 const requests: { url: string; init?: RequestInit }[] = [];
 let streamResponse: () => Response | Promise<Response>;
 let deleteResponse: () => Response;
@@ -34,6 +35,7 @@ function completed(output = "A result https://answer.example/source") {
 beforeEach(() => {
   process.env.UPSTASH_BOX_API_KEY = "test-box-key";
   process.env.OPENROUTER_API_KEY = "test-model-key";
+  process.env.AI_GATEWAY_API_KEY = "test-gateway-key";
   requests.length = 0;
   streamResponse = () => completed();
   deleteResponse = () => new Response(null, { status: 204 });
@@ -56,6 +58,11 @@ beforeEach(() => {
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  if (originalGatewayKey === undefined) {
+    delete process.env.AI_GATEWAY_API_KEY;
+  } else {
+    process.env.AI_GATEWAY_API_KEY = originalGatewayKey;
+  }
   if (originalBoxKey === undefined) {
     delete process.env.UPSTASH_BOX_API_KEY;
   } else {
@@ -84,9 +91,7 @@ describe("GEO Box coding providers (real SDK, mocked HTTP)", () => {
   ] as const)(
     "routes %s credentials, model, and options",
     async (harness, agent, options) => {
-      if (harness !== "opencode") {
-        delete process.env.OPENROUTER_API_KEY;
-      }
+      delete process.env.OPENROUTER_API_KEY;
       const model = "test/provider-model";
       const observed: GeoBoxAnswer[] = [];
       const result = await askGeoOpenCode(
@@ -107,9 +112,8 @@ describe("GEO Box coding providers (real SDK, mocked HTTP)", () => {
         name: expect.stringMatching(/^notra-geo-[\da-f-]+$/u),
         runtime: "node",
         agent,
-        model,
-        agent_api_key:
-          harness === "opencode" ? "test-model-key" : BoxApiKey.UpstashKey,
+        model: `vercel/${model}`,
+        agent_api_key: "test-gateway-key",
       });
       expect(JSON.parse(String(requests[1]?.init?.body))).toEqual({
         prompt: "question",
@@ -351,11 +355,23 @@ describe("GEO Box coding providers (real SDK, mocked HTTP)", () => {
   test("does not need credentials or provision a box for no prompts", async () => {
     delete process.env.UPSTASH_BOX_API_KEY;
     delete process.env.OPENROUTER_API_KEY;
+    delete process.env.AI_GATEWAY_API_KEY;
     expect(await askGeoOpenCodeConversation([])).toEqual([]);
     expect(requests).toHaveLength(0);
   });
 
-  test.each(["UPSTASH_BOX_API_KEY", "OPENROUTER_API_KEY"])(
+  test.each(["opencode", "claude-code", "codex", "fx"] as const)(
+    "%s requires the Gateway key before provisioning even with a Box key",
+    async (harness) => {
+      process.env.AI_GATEWAY_API_KEY = " \n ";
+      await expect(
+        askGeoOpenCode("question", undefined, undefined, "test/model", harness)
+      ).rejects.toThrow("AI_GATEWAY_API_KEY is not configured");
+      expect(requests).toHaveLength(0);
+    }
+  );
+
+  test.each(["UPSTASH_BOX_API_KEY", "AI_GATEWAY_API_KEY"])(
     "fails before provisioning without %s",
     async (name) => {
       process.env[name] = "  ";

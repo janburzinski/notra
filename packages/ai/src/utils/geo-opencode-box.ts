@@ -197,7 +197,8 @@ export async function createGeoOpenCodeBox(
         name,
         runtime: "node",
         agent,
-        model,
+        // Box selects the model endpoint by prefix, independently of the key.
+        model: agent === Agent.Custom ? model : `vercel/${model}`,
         ...(agent === Agent.Custom
           ? {
               custom_runner: {

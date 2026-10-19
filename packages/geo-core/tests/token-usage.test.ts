@@ -117,7 +117,7 @@ describe("GEO billing usage", () => {
       },
       codexTarget.model
     );
-    expect(opus.modelId).toBe("anthropic/claude-opus-5-5");
+    expect(opus.modelId).toBe("anthropic/claude-opus-5.5");
     expect(codex.modelId).toBe("openai/gpt-6-astra");
     const sequence = addAgentTokenUsage(
       addAgentTokenUsage(EMPTY_AGENT_TOKEN_USAGE, opus),

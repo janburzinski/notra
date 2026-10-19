@@ -1,4 +1,4 @@
-export const GEO_OPENCODE_BOX_MODEL_ID = "openrouter/openai/gpt-6.1-sol";
+export const GEO_OPENCODE_BOX_MODEL_ID = "openai/gpt-6.1-sol";
 export const GEO_OPENCODE_REASONING_EFFORT = "medium" as const;
 export const GEO_CLAUDE_CODE_EFFORT = "medium" as const;
 export const GEO_CODEX_REASONING_EFFORT = "medium" as const;
@@ -23,4 +23,4 @@ export const GEO_OPENCODE_MARKDOWN_BOLD_AFFIX_PATTERN = /\*+$/u;
 export const GEO_OPENCODE_TRAILING_URL_PUNCTUATION_PATTERN = /[,.;:\]}]+$/u;
 
 export const GEO_OPENCODE_BOX_API_KEY_ENV = "UPSTASH_BOX_API_KEY";
-export const GEO_OPENCODE_MODEL_API_KEY_ENV = "OPENROUTER_API_KEY";
+export const GEO_BOX_GATEWAY_API_KEY_ENV = "AI_GATEWAY_API_KEY";

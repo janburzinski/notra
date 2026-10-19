@@ -70,7 +70,11 @@ const {
 const { claimGeoScanRun } = await import("../src/geo/scan-status");
 const { upsertGeoSettings } = await import("../src/geo/programs");
 const catalogModule = await import("../src/geo/model-catalog");
-const envKeys = ["UPSTASH_BOX_API_KEY", "OPENROUTER_API_KEY"] as const;
+const envKeys = [
+  "UPSTASH_BOX_API_KEY",
+  "OPENROUTER_API_KEY",
+  "AI_GATEWAY_API_KEY",
+] as const;
 const originalEnv = envKeys.map((key) => process.env[key]);
 
 beforeAll(async () => {

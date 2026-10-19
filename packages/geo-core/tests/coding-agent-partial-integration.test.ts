@@ -32,14 +32,21 @@ const { runGeoScanSequenceBatch, runGeoScanTaskBatch } =
   await import("../src/geo/scan");
 const originalFetch = globalThis.fetch;
 const originalBoxKey = process.env.UPSTASH_BOX_API_KEY;
+const originalGatewayKey = process.env.AI_GATEWAY_API_KEY;
 
 beforeAll(initializeDatabase, 30_000);
 beforeEach(async () => {
   await resetDatabase();
   process.env.UPSTASH_BOX_API_KEY = "test-only-never-sent";
+  process.env.AI_GATEWAY_API_KEY = "test-gateway-key";
 });
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  if (originalGatewayKey === undefined) {
+    delete process.env.AI_GATEWAY_API_KEY;
+  } else {
+    process.env.AI_GATEWAY_API_KEY = originalGatewayKey;
+  }
   if (originalBoxKey === undefined) {
     delete process.env.UPSTASH_BOX_API_KEY;
   } else {
@@ -50,14 +57,16 @@ afterAll(() => database.postgres.close());
 
 describe("real Box SDK partial answers in native scan persistence", () => {
   test.each([
-    "provider",
-    "truncated stream",
-    "cleanup",
-    "single cleanup",
-    "single empty",
+    ["provider", "codex/gpt-6-astra"],
+    ["truncated stream", "codex/gpt-6-astra"],
+    ["cleanup", "codex/gpt-6-astra"],
+    ["single cleanup", "codex/gpt-6-astra"],
+    ["single empty", "codex/gpt-6-astra"],
+    ["provider", "claude-code/claude-opus-5.5"],
+    ["provider", "opencode/claude-opus-5.5"],
   ])(
-    "%s failure does not erase completed answers or known usage",
-    async (failure) => {
+    "%s failure on %s does not erase completed answers or known usage",
+    async (failure, engine) => {
       const single = failure.startsWith("single");
       const scope = await seedProject("native-partial-integration");
       const scanId = "native-partial-integration-scan";
@@ -67,6 +76,13 @@ describe("real Box SDK partial answers in native scan persistence", () => {
       globalThis.fetch = mock<typeof fetch>(async (input, init) => {
         const url = String(input);
         if (url.endsWith("/v2/box") && init?.method === "POST") {
+          expect(JSON.parse(String(init.body))).toMatchObject({
+            model:
+              engine === "codex/gpt-6-astra"
+                ? "vercel/openai/gpt-6-astra"
+                : "vercel/anthropic/claude-opus-5.5",
+            agent_api_key: "test-gateway-key",
+          });
           return Response.json({
             ...JSON.parse(String(init.body)),
             id: "box-partial",
@@ -111,7 +127,7 @@ describe("real Box SDK partial answers in native scan persistence", () => {
       const effect = single
         ? runGeoScanTaskBatch(context, [
             {
-              engine: "codex/gpt-6-astra",
+              engine,
               prompt: { id: "single-question", text: "first question" },
               language: "English",
               groundedKey: null,
@@ -123,7 +139,7 @@ describe("real Box SDK partial answers in native scan persistence", () => {
               sequenceId: "sequence",
               steps: ["first question", "follow-up"],
               language: "English",
-              engine: "codex/gpt-6-astra",
+              engine,
               groundedKey: null,
               zdr: "none",
             },
@@ -155,7 +171,7 @@ describe("real Box SDK partial answers in native scan persistence", () => {
       expect(rows.map((row) => [row.prompt, row.engine, row.language])).toEqual(
         ["first question", "follow-up"]
           .slice(0, checks)
-          .map((prompt) => [prompt, "codex/gpt-6-astra", "English"])
+          .map((prompt) => [prompt, engine, "English"])
       );
       expect(turns).toBe(single ? 1 : 2);
       expect(deletes).toBe(1);

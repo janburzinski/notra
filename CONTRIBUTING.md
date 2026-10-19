@@ -370,6 +370,12 @@ Open an issue or start a discussion in the repo.
 
 Thanks for helping improve Notra.
 
+## GEO coding-agent credentials
+
+GEO's OpenCode, Claude Code, Codex, and FX engines require both `UPSTASH_BOX_API_KEY` for
+sandbox access and `AI_GATEWAY_API_KEY` for model calls through Vercel AI
+Gateway. They do not use Upstash's managed LLM key or its spending allowance.
+
 ## Production releases and Vercel build selection
 
 All five Vercel app configurations disable automatic Git deployments with

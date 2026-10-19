@@ -9,35 +9,35 @@ export const GEO_BOX_CODING_AGENT_TARGETS: Readonly<
 > = {
   "opencode/gpt-6-astra": {
     harness: "opencode",
-    model: "openrouter/openai/gpt-6-astra",
+    model: "openai/gpt-6-astra",
   },
   "opencode/gpt-6-luna": {
     harness: "opencode",
-    model: "openrouter/openai/gpt-6-luna",
+    model: "openai/gpt-6-luna",
   },
   "opencode/gpt-6.1-sol-medium": {
     harness: "opencode",
-    model: "openrouter/openai/gpt-6.1-sol",
+    model: "openai/gpt-6.1-sol",
   },
   "opencode/claude-sonnet-5.5": {
     harness: "opencode",
-    model: "openrouter/anthropic/claude-sonnet-5.5",
+    model: "anthropic/claude-sonnet-5.5",
   },
   "opencode/claude-opus-5.5": {
     harness: "opencode",
-    model: "openrouter/anthropic/claude-opus-5.5",
+    model: "anthropic/claude-opus-5.5",
   },
   "claude-code/claude-sonnet-5.5": {
     harness: "claude-code",
-    model: "anthropic/claude-sonnet-5-5",
+    model: "anthropic/claude-sonnet-5.5",
   },
   "claude-code/claude-opus-5.5": {
     harness: "claude-code",
-    model: "anthropic/claude-opus-5-5",
+    model: "anthropic/claude-opus-5.5",
   },
   "claude-code/claude-fable-5.1": {
     harness: "claude-code",
-    model: "anthropic/claude-fable-5-1",
+    model: "anthropic/claude-fable-5.1",
   },
   "codex/gpt-6.1-sol": {
     harness: "codex",
