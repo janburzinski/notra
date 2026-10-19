@@ -1285,6 +1285,128 @@
       "description": "Analytics providers for the live site. Notra installs their scripts automatically. Preview deployments and local development do not send provider events.",
       "type": "object",
       "properties": {
+        "databuddy": {
+          "type": "object",
+          "properties": {
+            "clientId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,64}$",
+              "description": "Public Databuddy Client ID from your website's tracking code (data-client-id). No API key is needed."
+            },
+            "scriptUrl": {
+              "description": "Tracker script URL. Defaults to https://cdn.databuddy.cc/databuddy.js; set it for a self-hosted or proxied script.",
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/(?!\\.{1,2}(?:\\/|$))[A-Za-z0-9._~-]+)+$"
+            },
+            "apiUrl": {
+              "description": "Event ingestion URL. Defaults to https://basket.databuddy.cc; set it for a self-hosted or proxied endpoint.",
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/[A-Za-z0-9._~-]+)*\\/*$"
+            },
+            "trackWebVitals": {
+              "description": "Send Core Web Vitals (LCP, CLS, INP, FCP, TTFB) for each page (default: false).",
+              "type": "boolean"
+            },
+            "trackErrors": {
+              "description": "Send uncaught JavaScript errors (default: false).",
+              "type": "boolean"
+            },
+            "trackOutgoingLinks": {
+              "description": "Send an event when visitors click links to other domains (default: false).",
+              "type": "boolean"
+            },
+            "trackInteractions": {
+              "description": "Send clicks, rage clicks and dead clicks (default: false).",
+              "type": "boolean"
+            },
+            "trackAttributes": {
+              "description": "Send a custom event when visitors click elements with a data-track attribute, using other data-* attributes as properties (default: false).",
+              "type": "boolean"
+            },
+            "trackHashChanges": {
+              "description": "Count URL hash changes as page views (default: false).",
+              "type": "boolean"
+            },
+            "samplingRate": {
+              "description": "Share of events to send, from 0 to 1 (default: 1).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "skipPatterns": {
+              "description": "Path globs that are never tracked, e.g. [\"/drafts/**\"].",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\/[^\\s\"'<>]{0,199}$"
+              }
+            },
+            "maskPatterns": {
+              "description": "Path globs whose matching segments are masked before sending, e.g. [\"/authors/*\"].",
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\/[^\\s\"'<>]{0,199}$"
+              }
+            },
+            "anonymizeVisitorIds": {
+              "description": "Anonymize visitor IDs before storage, or \"auto\" to let Databuddy decide (default: true).",
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "const": "auto"
+                }
+              ]
+            },
+            "ignoreBotDetection": {
+              "description": "Also track visits that look like bots (default: false).",
+              "type": "boolean"
+            },
+            "usePixel": {
+              "description": "Send events with a 1x1 image request instead of fetch (default: false).",
+              "type": "boolean"
+            },
+            "enableBatching": {
+              "description": "Send events in batches (default: true).",
+              "type": "boolean"
+            },
+            "batchSize": {
+              "description": "Events per batch, from 1 to 50 (default: 10).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "batchTimeout": {
+              "description": "Milliseconds before a partial batch is sent (default: 5000).",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 60000
+            },
+            "enableRetries": {
+              "description": "Retry failed requests (default: true).",
+              "type": "boolean"
+            },
+            "maxRetries": {
+              "description": "Retries per failed request (default: 3).",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "initialRetryDelay": {
+              "description": "Milliseconds before the first retry (default: 500).",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 60000
+            }
+          },
+          "required": ["clientId"],
+          "additionalProperties": false
+        },
         "ga4": {
           "type": "object",
           "properties": {

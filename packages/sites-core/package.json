@@ -19,6 +19,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@databuddy/sdk": "3.2.0",
     "@notra/typescript-config": "workspace:*",
     "bun-types": "catalog:",
     "typescript": "catalog:"

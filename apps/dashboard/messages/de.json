@@ -541,7 +541,7 @@
     "empty": "Noch keine API-Schlüssel",
     "quickStart": {
       "description": "Erstelle einen Schlüssel, der schon passend für deinen Einsatz der API konfiguriert ist.",
-      "viewDocs": "Doku ansehen",
+      "viewDocs": "Dokumentation ansehen",
       "presetDescription": "{id, select, mcp {Verbinde Claude, Cursor und andere MCP-Clients, um deine Inhalte zu lesen und zu schreiben.} sdk {Rufe deine Daten programmatisch mit den TypeScript- und Python-SDKs ab.} cli {Skripte und automatisiere deinen Workflow im Terminal mit vollem Zugriff.} other {}}",
       "createKey": "API-Schlüssel für {title} erstellen"
     },
@@ -2151,7 +2151,7 @@
       "output": "Ausgabe",
       "workspace": "Workspace",
       "improve": "Verbessern",
-      "docs": "Docs",
+      "docs": "Dokumentation",
       "off": "Aus",
       "resume": "Fortsetzen",
       "manageIntegration": "Integration verwalten",
@@ -2413,7 +2413,7 @@
       "scanningEngines": "KI-Engines werden gescannt…",
       "trackedCompetitor": "Getrackter Wettbewerber",
       "discoveredInAnswersNotTracked": "In Antworten entdeckt, noch nicht getrackt",
-      "docs": "Doku",
+      "docs": "Dokumentation",
       "generatePrompts": "Prompts generieren",
       "wOSearch": "ohne Suche",
       "search": "Suche",
@@ -6768,7 +6768,7 @@
       "openOn": "Auf {platform} öffnen",
       "postAs": "Als @{username} posten",
       "rejectsDuplicates": "{platform} lehnt doppelte Beiträge ab.",
-      "readDocs": "Zur {platform}-Dokumentation",
+      "readDocs": "Zur {platform} Dokumentation",
       "reconnectPrompt": "Hast du versucht, das Konto neu zu verbinden?",
       "reconnectInSettings": "In den Einstellungen neu verbinden",
       "addAsReference": "Als Referenz hinzufügen",
@@ -8561,14 +8561,15 @@
       "title": "Integrationen",
       "description": "Analytics für diese Seite. Gültige Einstellungen werden automatisch als blog.json-Entwurf gespeichert und beim Veröffentlichen übernommen.",
       "optional": "Optional",
+      "recommended": "Empfohlen",
       "remove": "Entfernen",
       "removed": "Integration entfernt",
       "savedDescription": "Bis du sie veröffentlichst, ist sie ein Entwurf von blog.json.",
       "saveFailed": "Integration konnte nicht gespeichert werden",
-      "docs": "{provider}-Doku",
+      "docs": "{provider} Dokumentation",
       "draftDescription": "blog.json hat Änderungen, die noch nicht live sind",
       "reviewAndPublish": "Prüfen und veröffentlichen",
-      "createPullRequest": "Create PR",
+      "createPullRequest": "PR erstellen",
       "preparePublishFailed": "Änderungen für den Pull Request konnten nicht geladen werden",
       "noDrafts": "Es gibt keine Änderungen für einen Pull Request.",
       "publishMessage": "Seite aktualisieren",
@@ -8576,12 +8577,20 @@
       "invalidTitle": "Ungültige blog.json-Konfiguration",
       "invalidDescription": "Das JSON oder die Integrationseinstellungen sind ungültig. Korrigiere sie im Editor und komm dann zurück.",
       "providers": {
-        "plausible": "Leichtgewichtige Analytics ohne Cookies.",
-        "posthog": "Product Analytics, Session Replay und Feature Flags.",
-        "umami": "Leichte Web-Analytics ohne Cookies.",
-        "ga4": "Die Web-Analytics von Google."
+        "databuddy": "Datenschutzfreundliche Analytics mit Web Vitals, Fehlern und Events.",
+        "plausible": "Einfache und datenschutzfreundliche Alternative zu Google Analytics.",
+        "posthog": "Product Analytics mit Session Replay und Feature Flags.",
+        "umami": "Open-Source-Analytics ohne Cookies.",
+        "ga4": "Web-Analytics von Google."
       },
       "fields": {
+        "databuddy": {
+          "clientId": "Client-ID",
+          "trackWebVitals": "Web Vitals",
+          "trackErrors": "Fehler",
+          "trackOutgoingLinks": "Ausgehende Links",
+          "trackInteractions": "Interaktionen"
+        },
         "plausible": {
           "domain": "Domain",
           "server": "Eigener Server"
@@ -8606,10 +8615,40 @@
       "configExample": "Konfiguration in blog.json",
       "copyConfig": "Konfiguration kopieren",
       "previewDescription": "Analytics-Integrationen laufen nur auf der Live-Seite. Previews und lokale Entwicklung senden keine Events.",
+      "loadFailedDescription": "Die blog.json dieser Seite konnte nicht gelesen werden. Versuch es gleich noch einmal.",
+      "dismissPreviewNote": "Hinweis ausblenden",
       "loadFailed": "Integrationen konnten nicht geladen werden",
       "retry": "Erneut versuchen",
       "openEditor": "Editor öffnen",
+      "fieldErrors": {
+        "databuddy": {
+          "clientId": "Kopiere die Client-ID aus deinen Website-Einstellungen in Databuddy"
+        },
+        "ga4": {
+          "measurementId": "Nutze die Mess-ID (G-…)"
+        },
+        "plausible": {
+          "domain": "Nutze die Domain, wie sie in Plausible eingetragen ist, z. B. acme.com",
+          "server": "Nutze einen Hostnamen mit optionalem Port, ohne https://, z. B. plausible.acme.com:8443"
+        },
+        "posthog": {
+          "apiKey": "Nutze den Projekt-API-Key (phc_…)",
+          "apiHost": "Nutze eine https://-URL ohne Query oder Hash"
+        },
+        "umami": {
+          "websiteId": "Kopiere die Website-ID aus dem Tracking-Code von Umami",
+          "scriptUrl": "Nutze die vollständige https://-Script-URL mit Pfad, ohne Query oder Hash",
+          "hostUrl": "Nutze eine https://-URL ohne Query oder Hash"
+        }
+      },
       "fieldDescriptions": {
+        "databuddy": {
+          "clientId": "Öffne deine Website in Databuddy und kopiere data-client-id aus dem Tracking-Code.",
+          "trackWebVitals": "Core Web Vitals für jede Seite senden.",
+          "trackErrors": "Nicht abgefangene JavaScript-Fehler senden.",
+          "trackOutgoingLinks": "Ein Event senden, wenn Besucher Links zu anderen Seiten klicken.",
+          "trackInteractions": "Klicks, Rage Clicks und Dead Clicks senden. Weitere Optionen wie Sampling und ausgeschlossene Pfade gibt es in blog.json."
+        },
         "plausible": {
           "domain": "Gib die Domain ein, die du in Plausible angelegt hast, ohne https://.",
           "server": "Gib für selbst gehostetes Plausible den Hostnamen mit optionalem Port ein (z. B. plausible.acme.com:8443), ohne https://. Leer lassen für plausible.io."
@@ -8632,8 +8671,6 @@
       "autosavePending": "Warten auf Speicherung…",
       "autosaveSaving": "Entwurf wird gespeichert…",
       "autosaveSaved": "Entwurf gespeichert. Erstelle einen Pull Request und merge ihn, um die Änderungen live zu schalten.",
-      "autosaveInvalid": "Gib gültige Einstellungen ein, um deine Änderungen zu speichern.",
-      "discardUnsaved": "Ungespeicherte Änderungen verwerfen",
       "removeFailedDescription": "Die Integration wurde nicht entfernt. Wiederhole das Entfernen oder verwirf die ungespeicherten Änderungen."
     },
     "analyticsPage": {

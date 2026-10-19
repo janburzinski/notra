@@ -1,3 +1,4 @@
+import type { DatabuddyConfig } from "@databuddy/sdk";
 import type {
   siteIntegrationUpdateSchema,
   siteIntegrationsSchema,
@@ -24,3 +25,12 @@ export interface SiteContentSecurityPolicyParams {
   security: SiteSecurity;
   scriptHashes: Iterable<string>;
 }
+
+type DatabuddyScriptOptions = Omit<
+  DatabuddyConfig,
+  "debug" | "disabled" | "filter" | "sdk" | "sdkVersion"
+>;
+
+export type DatabuddySchemaShape = {
+  [K in keyof DatabuddyScriptOptions]-?: z.ZodType<DatabuddyScriptOptions[K]>;
+};

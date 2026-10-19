@@ -1,3 +1,4 @@
+import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { GoogleAnalytics } from "@notra/ui/components/ui/svgs/googleAnalytics";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
 import { PostHog } from "@notra/ui/components/ui/svgs/posthog";
@@ -16,6 +17,20 @@ export const SITE_INTEGRATION_AUTOSAVE_MESSAGES = {
 } as const;
 
 export const SITE_INTEGRATION_PROVIDERS: readonly SiteIntegrationProvider[] = [
+  {
+    id: "databuddy",
+    name: "Databuddy",
+    logo: Databuddy,
+    docsUrl: "https://www.databuddy.cc/docs",
+    recommended: true,
+    fields: [
+      { key: "clientId", placeholder: "3ed1fce1-5a56-4cbc-a917-66864f6d18e3" },
+      { key: "trackWebVitals", type: "boolean", defaultValue: false },
+      { key: "trackErrors", type: "boolean", defaultValue: false },
+      { key: "trackOutgoingLinks", type: "boolean", defaultValue: false },
+      { key: "trackInteractions", type: "boolean", defaultValue: false },
+    ],
+  },
   {
     id: "ga4",
     name: "Google Analytics 4",

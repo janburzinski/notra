@@ -7,6 +7,7 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Badge } from "@notra/ui/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,7 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { SiteIntegrationLogo } from "@/components/sites/site-integration-logo";
+import { cn } from "@/lib/utils";
 import type { SiteIntegrationRowProps } from "@/types/components/sites";
 
 export function SiteIntegrationRow({
@@ -29,17 +31,29 @@ export function SiteIntegrationRow({
 }: SiteIntegrationRowProps) {
   const t = useTranslations("sites.integrationsPage");
   return (
-    <div className="group/integration hover:bg-muted/40 duration-fast relative flex items-center gap-4 rounded-xl p-3 transition-colors">
+    <div
+      className={cn(
+        "group/integration duration-fast relative flex items-center gap-4 rounded-xl p-3 transition-colors",
+        provider.recommended
+          ? "bg-primary/5 ring-primary/25 hover:bg-primary/10 ring-1 ring-inset"
+          : "hover:bg-muted/40"
+      )}
+    >
       <SiteIntegrationLogo className="size-11 rounded-xl" provider={provider} />
       <div className="min-w-0 flex-1">
-        <button
-          className="focus-visible:ring-ring/50 rounded-sm text-left text-sm font-medium outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:ring-[3px]"
-          onClick={onOpen}
-          disabled={disabled}
-          type="button"
-        >
-          {provider.name}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="focus-visible:ring-ring/50 cursor-pointer rounded-sm text-left text-sm font-medium outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:ring-[3px]"
+            onClick={onOpen}
+            disabled={disabled}
+            type="button"
+          >
+            {provider.name}
+          </button>
+          {provider.recommended ? (
+            <Badge size="sm">{t("recommended")}</Badge>
+          ) : null}
+        </div>
         <p className="text-muted-foreground truncate text-sm">
           {t(`providers.${provider.id}`)}
         </p>
@@ -50,7 +64,7 @@ export function SiteIntegrationRow({
             render={
               <Button
                 aria-label={t("more", { provider: provider.name })}
-                className="relative"
+                className="relative cursor-pointer"
                 size="icon-sm"
                 variant="ghost"
                 disabled={disabled}
@@ -82,7 +96,7 @@ export function SiteIntegrationRow({
       ) : (
         <Button
           aria-label={t("add", { provider: provider.name })}
-          className="relative"
+          className="relative cursor-pointer"
           onClick={onOpen}
           disabled={disabled}
           size="icon-sm"

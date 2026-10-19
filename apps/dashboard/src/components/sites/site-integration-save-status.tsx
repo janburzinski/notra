@@ -16,7 +16,7 @@ export function SiteIntegrationSaveStatus({
   const failed = state.status === "error";
   const messageKey =
     invalid && state.dirty
-      ? "autosaveInvalid"
+      ? null
       : SITE_INTEGRATION_AUTOSAVE_MESSAGES[state.status];
   const message = failed
     ? toErrorMessage(state.error, t("saveFailed"))

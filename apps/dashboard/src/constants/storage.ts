@@ -9,6 +9,8 @@ export const localStorageKeys = {
   contentView: "notra:content-view",
   contentPanelClosed: "notra:content-panel-closed",
   sidebarMode: "notra:sidebar-mode:v1",
+  siteIntegrationsPreviewNoteDismissed:
+    "notra:site-integrations-preview-note-dismissed",
   sidebarOnboardingCollapsed: (organizationId?: string) =>
     organizationId
       ? `onboarding-collapsed:${organizationId}`

@@ -1,12 +1,17 @@
 "use client";
 
-import { Alert02Icon } from "@hugeicons/core-free-icons";
+import {
+  Alert02Icon,
+  Cancel01Icon,
+  InformationCircleIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { siteIntegrationSchemas } from "@notra/sites-core/schemas/site-integrations";
 import type { SiteIntegrationName } from "@notra/sites-core/types/site-integrations";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   Alert,
+  AlertAction,
   AlertDescription,
   AlertTitle,
 } from "@notra/ui/components/ui/alert";
@@ -23,11 +28,14 @@ import { SiteIntegrationDialog } from "@/components/sites/site-integration-dialo
 import { SiteIntegrationRow } from "@/components/sites/site-integration-row";
 import { SitePublishDialog } from "@/components/sites/site-publish-dialog";
 import { SITE_INTEGRATION_PROVIDERS } from "@/constants/site-integrations";
+import { localStorageKeys } from "@/constants/storage";
 import {
   useSaveSiteIntegration,
   useSiteIntegrations,
 } from "@/lib/hooks/use-site-integrations";
+import { useStoredDismissal } from "@/lib/hooks/use-stored-dismissal";
 import { dashboardOrpc } from "@/lib/orpc/query";
+import { cn } from "@/lib/utils";
 import type { SiteEditorFiles } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 import { siteIntegrationSettings } from "@/utils/site-integrations";
@@ -45,6 +53,9 @@ export function SiteIntegrationsPage() {
     null
   );
   const [preparingPublish, setPreparingPublish] = useState(false);
+  const previewNote = useStoredDismissal(
+    localStorageKeys.siteIntegrationsPreviewNoteDismissed
+  );
   const open = SITE_INTEGRATION_PROVIDERS.find(
     (provider) => provider.id === openId
   );
@@ -78,13 +89,37 @@ export function SiteIntegrationsPage() {
     <div className="flex flex-1 flex-col gap-6" data-site-fill>
       <PageHeading description={t("description")} title={t("title")} />
 
-      <p className="text-muted-foreground text-sm">{t("previewDescription")}</p>
+      {previewNote.dismissed ? null : (
+        <Alert variant="info">
+          <HugeiconsIcon
+            aria-hidden="true"
+            icon={InformationCircleIcon}
+            strokeWidth={1.5}
+          />
+          <AlertDescription>{t("previewDescription")}</AlertDescription>
+          <AlertAction className="top-1/2 -translate-y-1/2">
+            <Button
+              aria-label={t("dismissPreviewNote")}
+              onClick={previewNote.dismiss}
+              size="icon-sm"
+              variant="ghost"
+            >
+              <HugeiconsIcon icon={Cancel01Icon} />
+            </Button>
+          </AlertAction>
+        </Alert>
+      )}
 
       {query.isError ? (
-        <Alert variant="destructive">
+        <Alert>
+          <HugeiconsIcon
+            aria-hidden="true"
+            icon={Alert02Icon}
+            strokeWidth={1.5}
+          />
           <AlertTitle>{t("loadFailed")}</AlertTitle>
           <AlertDescription>
-            <p>{toErrorMessage(query.error, t("loadFailed"))}</p>
+            <p>{t("loadFailedDescription")}</p>
             <Button
               disabled={query.isFetching}
               onClick={() => query.refetch()}
@@ -120,12 +155,25 @@ export function SiteIntegrationsPage() {
       <div className="grid grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2">
         {query.isPending
           ? SITE_INTEGRATION_PROVIDERS.map((provider) => (
-              <div className="flex items-center gap-4 p-3" key={provider.id}>
-                <Skeleton className="size-11 rounded-xl" />
-                <div className="min-w-0 flex-1 space-y-2">
-                  <Skeleton className="h-3.5 w-28" />
-                  <Skeleton className="h-3.5 w-56 max-w-full" />
+              <div
+                className={cn(
+                  "flex items-center gap-4 rounded-xl p-3",
+                  provider.recommended &&
+                    "bg-primary/5 ring-primary/25 ring-1 ring-inset"
+                )}
+                key={provider.id}
+              >
+                <Skeleton className="size-11 shrink-0 rounded-xl" />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div className="flex h-5 items-center gap-2">
+                    <Skeleton className="h-3.5 w-24" />
+                    {provider.recommended ? (
+                      <Skeleton className="h-4 w-16 rounded-full" />
+                    ) : null}
+                  </div>
+                  <Skeleton className="h-3.5 w-64 max-w-full" />
                 </div>
+                <Skeleton className="size-7 shrink-0 rounded-md" />
               </div>
             ))
           : SITE_INTEGRATION_PROVIDERS.map((provider) => (

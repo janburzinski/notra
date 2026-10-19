@@ -292,6 +292,7 @@
                 "icon": "chart-line",
                 "pages": [
                   "sites/integrations/analytics/overview",
+                  "sites/integrations/analytics/databuddy",
                   "sites/integrations/analytics/google-analytics",
                   "sites/integrations/analytics/posthog",
                   "sites/integrations/analytics/plausible",

@@ -1,24 +1,30 @@
 import type {
   SiteIntegrationName,
   SiteIntegrationUpdate,
+  SiteIntegrations,
 } from "@notra/sites-core/types/site-integrations";
 import type { ComponentType, SVGProps } from "react";
 
-interface SiteIntegrationField {
-  key: string;
+interface SiteIntegrationField<Key extends string = string> {
+  key: Key;
   placeholder?: string;
   optional?: boolean;
   type?: "text" | "boolean";
   defaultValue?: boolean;
 }
 
-export interface SiteIntegrationProvider {
-  id: SiteIntegrationName;
-  name: string;
-  logo: ComponentType<SVGProps<SVGSVGElement>> | null;
-  docsUrl: string;
-  fields: readonly SiteIntegrationField[];
-}
+export type SiteIntegrationProvider = {
+  [Id in SiteIntegrationName]: {
+    id: Id;
+    name: string;
+    logo: ComponentType<SVGProps<SVGSVGElement>> | null;
+    docsUrl: string;
+    recommended?: boolean;
+    fields: readonly SiteIntegrationField<
+      keyof NonNullable<SiteIntegrations[Id]> & string
+    >[];
+  };
+}[SiteIntegrationName];
 
 export type SiteIntegrationValues = Record<string, string | boolean>;
 

@@ -8561,6 +8561,7 @@
       "title": "Integrations",
       "description": "Analytics for this site. Valid settings save automatically to a blog.json draft and go live when you publish.",
       "optional": "Optional",
+      "recommended": "Recommended",
       "remove": "Remove",
       "removed": "Integration removed",
       "savedDescription": "It's a draft of blog.json until you publish it.",
@@ -8576,12 +8577,20 @@
       "invalidTitle": "Invalid blog.json configuration",
       "invalidDescription": "The JSON or integration settings are invalid. Fix them in the editor, then come back.",
       "providers": {
-        "plausible": "Lightweight, cookie-free analytics.",
-        "posthog": "Product analytics, session replay and feature flags.",
-        "umami": "Lightweight, cookie-free web analytics.",
-        "ga4": "Google's web analytics."
+        "databuddy": "Privacy-first analytics with web vitals, errors and events.",
+        "plausible": "Easy to use and privacy-friendly Google Analytics alternative.",
+        "posthog": "Product analytics with session replay and feature flags.",
+        "umami": "Open-source, cookie-free analytics.",
+        "ga4": "Web analytics from Google."
       },
       "fields": {
+        "databuddy": {
+          "clientId": "Client ID",
+          "trackWebVitals": "Web vitals",
+          "trackErrors": "Errors",
+          "trackOutgoingLinks": "Outgoing links",
+          "trackInteractions": "Interactions"
+        },
         "plausible": {
           "domain": "Domain",
           "server": "Self-hosted server"
@@ -8606,10 +8615,40 @@
       "configExample": "Configuration in blog.json",
       "copyConfig": "Copy configuration",
       "previewDescription": "Analytics integrations run on the live site only. Previews and local development do not send events.",
+      "loadFailedDescription": "This site's blog.json couldn't be read. Try again in a moment.",
+      "dismissPreviewNote": "Dismiss note",
       "loadFailed": "Couldn't load integrations",
       "retry": "Try again",
       "openEditor": "Open editor",
+      "fieldErrors": {
+        "databuddy": {
+          "clientId": "Copy the Client ID from your Databuddy website settings"
+        },
+        "ga4": {
+          "measurementId": "Use the measurement ID (G-…)"
+        },
+        "plausible": {
+          "domain": "Use the domain as added in Plausible, e.g. acme.com",
+          "server": "Use a hostname with an optional port, without https://, e.g. plausible.acme.com:8443"
+        },
+        "posthog": {
+          "apiKey": "Use the project API key (phc_…)",
+          "apiHost": "Use an https:// URL without query or hash"
+        },
+        "umami": {
+          "websiteId": "Copy the Website ID from Umami's tracking code",
+          "scriptUrl": "Use the full https:// script URL including its path, without query or hash",
+          "hostUrl": "Use an https:// URL without query or hash"
+        }
+      },
       "fieldDescriptions": {
+        "databuddy": {
+          "clientId": "In Databuddy, open your website and copy data-client-id from the tracking code.",
+          "trackWebVitals": "Send Core Web Vitals for every page.",
+          "trackErrors": "Send uncaught JavaScript errors.",
+          "trackOutgoingLinks": "Send an event when visitors click links to other sites.",
+          "trackInteractions": "Send clicks, rage clicks and dead clicks. More options like sampling and skipped paths are available in blog.json."
+        },
         "plausible": {
           "domain": "Use the domain you added to Plausible, without https://.",
           "server": "For self-hosted Plausible, enter its hostname and optional port (e.g. plausible.acme.com:8443), without https://. Leave empty for plausible.io."
@@ -8632,8 +8671,6 @@
       "autosavePending": "Waiting to save…",
       "autosaveSaving": "Saving draft…",
       "autosaveSaved": "Draft saved. Create a pull request, then merge it to go live.",
-      "autosaveInvalid": "Enter valid settings to save your changes.",
-      "discardUnsaved": "Discard unsaved changes",
       "removeFailedDescription": "The integration was not removed. Retry the removal or discard the unsaved changes."
     },
     "analyticsPage": {

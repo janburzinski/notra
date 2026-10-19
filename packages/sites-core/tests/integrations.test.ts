@@ -165,16 +165,6 @@ describe("integrations schema", () => {
     ).toEqual(["integrations.umami"]);
   });
 
-  test("removed provider names are rejected in configs and API updates", () => {
-    for (const provider of ["databuddy"]) {
-      expect(parse({ integrations: { [provider]: {} } }).success).toBe(false);
-      expect(
-        siteIntegrationUpdateSchema.safeParse({ provider, settings: null })
-          .success
-      ).toBe(false);
-    }
-  });
-
   test.each(["UA-123456-1", "GT-ABC123", "G-", "G-ABC<123", "G-ABC123?x=y"])(
     "rejects invalid GA4 measurement IDs: %s",
     (measurementId) => {

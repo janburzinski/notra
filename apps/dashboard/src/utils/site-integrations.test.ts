@@ -12,6 +12,13 @@ import {
 
 test("every dashboard provider submits the same shape accepted by the API", () => {
   const settings = {
+    databuddy: {
+      clientId: "3ed1fce1-5a56-4cbc-a917-66864f6d18e3",
+      trackWebVitals: true,
+      trackErrors: false,
+      trackOutgoingLinks: true,
+      trackInteractions: false,
+    },
     ga4: { measurementId: "G-ABC123XYZ9" },
     umami: {
       websiteId: "94db1cb1-74f4-4a40-ad6c-962362670409",
@@ -127,6 +134,7 @@ test("Umami Cloud needs only a Website ID and invalid inputs cannot autosave", (
     hostUrl: expect.any(String),
   });
   expect(SITE_INTEGRATION_PROVIDERS.map((entry) => entry.id).sort()).toEqual([
+    "databuddy",
     "ga4",
     "plausible",
     "posthog",

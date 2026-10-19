@@ -23,7 +23,7 @@ import {
   CHAT_SUGGESTIONS,
 } from "@/constants/chat-suggestions";
 import { localStorageKeys } from "@/constants/storage";
-import { useChatSuggestionsDismissal } from "@/lib/hooks/use-chat-suggestions-dismissal";
+import { useStoredDismissal } from "@/lib/hooks/use-stored-dismissal";
 import type {
   ChatSuggestionsProps,
   SuggestionCardProps,
@@ -148,7 +148,7 @@ export function ChatSuggestions({
 }: ChatSuggestionsProps) {
   const t = useTranslations("chat.suggestions");
   const shouldReduceMotion = useReducedMotion();
-  const { dismissed, dismiss } = useChatSuggestionsDismissal(dismissStorageKey);
+  const { dismissed, dismiss } = useStoredDismissal(dismissStorageKey);
   const [page, setPage] = useState(0);
   const isPointerInside = useRef(false);
   const isFocusInside = useRef(false);

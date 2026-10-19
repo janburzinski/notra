@@ -9,6 +9,19 @@ export const GOOGLE_ANALYTICS_CONNECT_ORIGINS = [
 ] as const;
 export const GA4_MEASUREMENT_ID = /^G-[A-Z0-9]{4,16}$/;
 
+export const DATABUDDY_SCRIPT_URL = "https://cdn.databuddy.cc/databuddy.js";
+export const DATABUDDY_API_URL = "https://basket.databuddy.cc";
+export const DATABUDDY_CLIENT_ID = /^[A-Za-z0-9_-]{8,64}$/;
+export const DATABUDDY_CLIENT_ID_MESSAGE =
+  "Copy the Client ID from your Databuddy website settings";
+export const DATABUDDY_PATH_PATTERN = /^\/[^\s"'<>]{0,199}$/;
+export const DATABUDDY_MAX_PATH_PATTERNS = 50;
+export const DATABUDDY_MAX_BATCH_SIZE = 50;
+export const DATABUDDY_MAX_RETRIES = 10;
+export const DATABUDDY_MAX_DELAY_MS = 60_000;
+export const CAMEL_CASE_BOUNDARY = /[A-Z]/g;
+export const TRAILING_SLASHES = /\/+$/;
+
 export const PLAUSIBLE_SCRIPT_URL = "https://plausible.io/js/script.js";
 
 export const POSTHOG_DEFAULT_API_HOST = "https://us.i.posthog.com";

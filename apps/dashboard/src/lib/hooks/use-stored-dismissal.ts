@@ -22,7 +22,7 @@ function readDismissed(key: string) {
   }
 }
 
-export function useChatSuggestionsDismissal(storageKey: string) {
+export function useStoredDismissal(storageKey: string) {
   const dismissed = useSyncExternalStore(
     subscribe,
     () => readDismissed(storageKey),

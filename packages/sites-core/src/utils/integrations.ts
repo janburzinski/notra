@@ -1,4 +1,6 @@
 import {
+  DATABUDDY_API_URL,
+  DATABUDDY_SCRIPT_URL,
   GOOGLE_ANALYTICS_CONNECT_ORIGINS,
   GOOGLE_TAG_ORIGIN,
   PLAUSIBLE_SCRIPT_URL,
@@ -13,6 +15,7 @@ import type {
   SiteHeadScript,
   SiteIntegrations,
 } from "@notra/sites-core/types/site-integrations";
+import { dataAttributes } from "@notra/sites-core/utils/data-attributes";
 
 export function inlineScriptLiteral(value: unknown): string {
   return JSON.stringify(value)
@@ -25,7 +28,19 @@ export function integrationHeadScripts(
   integrations: SiteIntegrations
 ): SiteHeadScript[] {
   const scripts: SiteHeadScript[] = [];
-  const { ga4, plausible, posthog, umami } = integrations;
+  const { databuddy, ga4, plausible, posthog, umami } = integrations;
+  if (databuddy) {
+    const { scriptUrl, ...options } = databuddy;
+    scripts.push({
+      kind: "external",
+      src: scriptUrl ?? DATABUDDY_SCRIPT_URL,
+      attributes: {
+        async: true,
+        crossorigin: "anonymous",
+        ...dataAttributes(options),
+      },
+    });
+  }
   if (ga4) {
     scripts.push(
       {
@@ -77,7 +92,11 @@ export function integrationCspSources(
 ): SiteCspSources {
   const scriptSrc: string[] = [];
   const connectSrc: string[] = [];
-  const { ga4, plausible, posthog, umami } = integrations;
+  const { databuddy, ga4, plausible, posthog, umami } = integrations;
+  if (databuddy) {
+    scriptSrc.push(new URL(databuddy.scriptUrl ?? DATABUDDY_SCRIPT_URL).origin);
+    connectSrc.push(new URL(databuddy.apiUrl ?? DATABUDDY_API_URL).origin);
+  }
   if (ga4) {
     scriptSrc.push(GOOGLE_TAG_ORIGIN);
     connectSrc.push(...GOOGLE_ANALYTICS_CONNECT_ORIGINS);
