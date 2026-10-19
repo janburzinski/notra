@@ -1,0 +1,81 @@
+apps/dashboard/src/utils/chat-input.ts
+  s_5f3de69fd837a5::t_4893f9232a7d58 275-281
+apps/dashboard/src/types/components/chat-draft-streaming-preview.ts
+  s_5f3de69fd837a5::t_1c209b26d6ca1c 1-4
+apps/dashboard/src/utils/group-assistant-message-parts.ts
+  s_5f3de69fd837a5::t_35caab0069eb0a 4,177-178
+  s_5f3de69fd837a5::t_e7d9dd4add3272 17,40-44
+apps/dashboard/src/types/components/chat-activity-group.ts
+  s_5f3de69fd837a5::t_35caab0069eb0a 11-12
+apps/dashboard/src/lib/upload/client.ts
+  s_5f3de69fd837a5::t_f3e20147a447fd 7,22-29,37-46,82-88,95-107
+apps/dashboard/src/types/upload/client.ts
+  s_5f3de69fd837a5::t_ad01188f8f760e 11-14
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_5f3de69fd837a5::t_b9e9944fb01773 71,2500,2502-2508,2511-2519
+packages/ai/src/router/router.test.ts
+  s_5f3de69fd837a5::t_99fa266392d89f 304
+apps/dashboard/src/lib/hooks/use-chat-composer-attachments.ts
+  s_5f3de69fd837a5::t_0870a04e020693 212-226
+apps/dashboard/messages/en.json
+  s_5f3de69fd837a5::t_ac204b0965c099 1122-1123,5770-5771
+  s_5f3de69fd837a5::t_35caab0069eb0a 7123-7124
+packages/ai/src/constants/geo-tools.ts
+  s_5f3de69fd837a5::t_a555812c171cfb 7-8
+packages/ai/src/model.ts
+  s_5f3de69fd837a5::t_c205e95fa3931e 37-41
+  s_5f3de69fd837a5::t_11fd03be0e9c8b 10
+packages/ai/src/orchestration/orchestrate-standalone.ts
+  s_5f3de69fd837a5::t_80cd0f41f26478 1-4,173-182,184-189
+packages/ai/src/orchestration/thinking.ts
+  s_5f3de69fd837a5::t_1e3ef80b0c2d57 19-22
+packages/schemas/src/schemas/dashboard/upload.ts
+  s_5f3de69fd837a5::t_ad01188f8f760e 85-88
+apps/dashboard/src/components/ai/chat-tool-block/tool-output-chart.tsx
+  s_5f3de69fd837a5::t_40650787af984f 41-42,54,118,141,143-144,173-174
+  s_5f3de69fd837a5::t_afa917c9b3b5c2 9,142,145-150
+apps/dashboard/src/lib/orpc/routers/upload.ts
+  s_5f3de69fd837a5::t_eb04bbc8f67df2 95
+packages/ai/src/router/provider-options.ts
+  s_5f3de69fd837a5::t_d9da9ac9178178 143
+packages/ai/src/tools/geo.ts
+  s_5f3de69fd837a5::t_a555812c171cfb 1,49,68,112
+apps/dashboard/src/components/ai/chat-activity-group.tsx
+  s_5f3de69fd837a5::t_42a8352bceb994 111-113
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_5f3de69fd837a5::t_0870a04e020693 1591-1605
+  s_5f3de69fd837a5::t_e6dc6a88cb7892 2647
+apps/dashboard/messages/de.json
+  s_5f3de69fd837a5::t_ac204b0965c099 1122-1123,5770-5771
+  s_5f3de69fd837a5::t_35caab0069eb0a 7123-7124
+apps/dashboard/src/lib/upload/server.ts
+  s_5f3de69fd837a5::t_64c23bdbe0d0b3 1-2,307
+  s_5f3de69fd837a5::t_eb04bbc8f67df2 3-7,10,17,20-23,45,105,111,147-149,165,174,180,187,190-204,256-263,284-306,308-309,342-349
+packages/ai/src/utils/geo-tool-model-output.ts
+  s_5f3de69fd837a5::t_a555812c171cfb 36-37
+  s_5f3de69fd837a5::t_71398cb511bd3d 1-35,38-132,135-136,138-144
+packages/ai/src/utils/relocate-memory-context.ts
+  s_5f3de69fd837a5::t_47c334ed5a3a7d 1-46,51
+  s_5f3de69fd837a5::t_11fd03be0e9c8b 47-50
+apps/dashboard/src/constants/attachments.ts
+  s_5f3de69fd837a5::t_ad01188f8f760e 11-14
+apps/dashboard/src/components/ai/chat-draft-streaming-preview.tsx
+  s_5f3de69fd837a5::t_2dc52aefbbbf16 4,9-10,34-39
+  s_5f3de69fd837a5::t_ec71c0372a9268 1-3,5-8,11-33,40-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "420ca3512638349bddccc8c9477cf408062a6895",
+  "prompts": {},
+  "sessions": {
+    "s_5f3de69fd837a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eacb1e8a-f871-4eca-9a79-b7e3b9859be3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
