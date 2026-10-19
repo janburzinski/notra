@@ -1,0 +1,55 @@
+apps/dashboard/src/lib/chat/shares.ts
+  s_91bff7390564d1::t_298c6357bd805a 1
+  s_91bff7390564d1::t_b801f4e3eea220 11-14,159-186
+  s_91bff7390564d1::t_f3748c755ee162 152
+apps/dashboard/tests/chat-share-snapshot.test.ts
+  s_91bff7390564d1::t_83ce1d551ba2d9 145-167
+apps/dashboard/messages/de.json
+  s_91bff7390564d1::t_d0d6552d052a0d 6284,6296-6301
+apps/dashboard/src/utils/chat-share-snapshot.ts
+  s_91bff7390564d1::t_9feeeec950b3ce 1-4,28-46,144-146,148-157
+  s_91bff7390564d1::t_b801f4e3eea220 176-200
+apps/dashboard/src/utils/chat-minimap.ts
+  s_91bff7390564d1::t_88059c18575bd8 1,7-8,17,29,33-37,45
+apps/dashboard/src/types/chat-share.ts
+  s_91bff7390564d1::t_f3748c755ee162 11,19-22
+apps/dashboard/src/lib/orpc/routers/chat.ts
+  s_91bff7390564d1::t_b801f4e3eea220 21,31,142-155
+apps/dashboard/src/components/chat/shared-chat-page.tsx
+  s_91bff7390564d1::t_d0d6552d052a0d 14-18,20-27,30,36-37,39-43,47,49-50,124-141,143-149,151-178,180-203,211,213,221-228,230,234,236,240-246,250-255,259-260,276,300,302,309,311,313-315,320-355,357
+  s_91bff7390564d1::t_d24537d88b55d0 5,261-273,277-278,280-281,284-285,288-289,292-293,304,316-319
+  s_91bff7390564d1::t_298c6357bd805a 32-35,44,179
+  s_91bff7390564d1::t_077780a0c05d77 290-291,294-299
+  s_91bff7390564d1::t_6698ece420b98c 312
+apps/dashboard/src/utils/dashboard-paths.ts
+  s_91bff7390564d1::t_57ff86d1451d64 17-21
+apps/dashboard/src/components/chat/shared-chat-continue.tsx
+  s_91bff7390564d1::t_f3748c755ee162 1-100,107-118
+  s_91bff7390564d1::t_d0d6552d052a0d 101-106
+apps/dashboard/src/types/chat-minimap.ts
+  s_91bff7390564d1::t_88059c18575bd8 1-7
+apps/dashboard/src/components/dashboard/header.tsx
+  s_91bff7390564d1::t_57ff86d1451d64 45-48,99
+apps/dashboard/messages/en.json
+  s_91bff7390564d1::t_d0d6552d052a0d 6284,6296-6301
+packages/schemas/src/schemas/dashboard/chat.ts
+  s_91bff7390564d1::t_c79f60d88ffa4c 21-24
+apps/dashboard/src/constants/chat-share.ts
+  s_91bff7390564d1::t_d0d6552d052a0d 13-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d250089feb439e7162c8dd555c956186ef911797",
+  "prompts": {},
+  "sessions": {
+    "s_91bff7390564d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4106b202-aa19-4968-bdde-c2d594f5df6c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
