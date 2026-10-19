@@ -979,7 +979,7 @@
       "writerPlanFailed": "Der Inhaltsplan konnte nicht erstellt oder gespeichert werden. Bitte versuche es erneut.",
       "promptAlreadyTracked": "Dieser Prompt wird bereits getrackt",
       "lastProjectDelete": "Du kannst dein letztes Projekt nicht löschen. Erstelle zuerst ein weiteres.",
-      "projectHasSitesDelete": "Dieses Projekt hat gehostete Sites. Lösche seine Sites, bevor du das Projekt löschst.",
+      "projectHasSitesDelete": "Dieses Projekt hat gehostete Seiten. Lösche seine Seiten, bevor du das Projekt löschst.",
       "createBrandIdentityFirst": "Erstelle zuerst eine Markenidentität",
       "noGroundedEngines": "Mit deinen Datenschutzeinstellungen sind keine KI-Engines mit Websuche verfügbar",
       "createConversationFailed": "Konversation konnte nicht erstellt werden",
@@ -1162,8 +1162,8 @@
       "tooManyPublishRequests": "Zu viele GitHub-Veröffentlichungen. Bitte versuch es gleich nochmal.",
       "contentTypeMismatch": "Der Inhaltstyp passt nicht zum gespeicherten Beitrag",
       "saveBeforePublishing": "Speichere den Inhalt, bevor du ihn auf GitHub veröffentlichst",
-      "sitePreviewUnsupported": "Nur Blogbeiträge und Changelogs lassen sich auf einer Site ansehen",
-      "sitePreviewNoSection": "Diese Site hat keinen Bereich für diese Art von Beitrag",
+      "sitePreviewUnsupported": "Nur Blogbeiträge und Changelogs lassen sich auf einer Seite ansehen",
+      "sitePreviewNoSection": "Diese Seite hat keinen Bereich für diese Art von Beitrag",
       "noDefaultBranch": "Das ausgewählte GitHub-Repository hat keinen Standard-Branch",
       "connectViaGithubApp": "Verbinde dieses Repository über die GitHub App, bevor du veröffentlichst.",
       "publishingPaused": "Das Veröffentlichen auf GitHub ist pausiert",
@@ -2243,7 +2243,7 @@
       "logOut": "Abmelden",
       "allPlatforms": "Alle Plattformen",
       "contentActivity": "Inhaltsaktivität",
-      "sites": "Sites",
+      "sites": "Seiten",
       "automations": "Automationen"
     },
     "messages": {
@@ -4651,7 +4651,7 @@
         },
         "use": {
           "title": "Auswählen, was importiert wird",
-          "description": "Durchsuche deine Beiträge im Plugin und wähle aus, welche in deine Framer-Site übernommen werden."
+          "description": "Durchsuche deine Beiträge im Plugin und wähle aus, welche in deine Framer-Seite übernommen werden."
         }
       }
     },
@@ -6660,7 +6660,7 @@
       }
     },
     "sitePreview": {
-      "site": "Site",
+      "site": "Seite",
       "status": "Status",
       "link": "Link",
       "expires": "Schließt",
@@ -6701,7 +6701,7 @@
       "openFailed": "Die Vorschau konnte nicht geöffnet werden",
       "failed": "Der Vorschau-Build ist fehlgeschlagen",
       "loading": "Lädt…",
-      "noSite": "Füge eine Notra-Site mit Blog oder Changelog hinzu, um Beiträge darauf anzusehen.",
+      "noSite": "Füge eine Notra-Seite mit Blog oder Changelog hinzu, um Beiträge darauf anzusehen.",
       "newPasswordPlaceholder": "Neues Passwort eingeben"
     },
     "githubPublish": {
@@ -6978,11 +6978,11 @@
       },
       "hidden": {
         "label": "Nur über Link erreichbar",
-        "hint": "Bleibt per direktem Link erreichbar, erscheint aber nicht in Site-Listen, Feeds, Suchmaschinen oder AI-Verzeichnissen. Jeder mit dem Link kann den Inhalt lesen. Ausschalten stellt die vorherige Einstellung für die Suche wieder her."
+        "hint": "Bleibt per direktem Link erreichbar, erscheint aber nicht in Seitenlisten, Feeds, Suchmaschinen oder AI-Verzeichnissen. Jeder mit dem Link kann den Inhalt lesen. Ausschalten stellt die vorherige Einstellung für die Suche wieder her."
       },
       "cover": {
         "label": "Cover",
-        "hint": "Erscheint auf der Blog-Karte, oben im Post und als Vorschaubild beim Teilen. Ohne Cover erzeugt die Site eins.",
+        "hint": "Erscheint auf der Blog-Karte, oben im Post und als Vorschaubild beim Teilen. Ohne Cover erzeugt die Seite eins.",
         "upload": "Hochladen",
         "link": "Link",
         "fromPost": "Aus dem Post",
@@ -7008,7 +7008,7 @@
       },
       "authors": {
         "label": "Autoren",
-        "hint": "Jeder Autor bekommt einen Avatar und eine eigene Seite auf der Site.",
+        "hint": "Jeder Autor bekommt einen Avatar und eine eigene Profilseite auf der Seite.",
         "placeholder": "Autoren wählen",
         "addMe": "Mich hinzufügen",
         "manage": "Verwalten",
@@ -7016,7 +7016,7 @@
       },
       "tags": {
         "label": "Tags",
-        "hint": "Tags bekommen eigene Übersichtsseiten auf der Site und landen im RSS-Feed.",
+        "hint": "Tags bekommen eigene Übersichtsseiten auf der Seite und landen im RSS-Feed.",
         "placeholder": "Tags hinzufügen",
         "remove": "{tag} entfernen",
         "add": "Tag hinzufügen",
@@ -7024,7 +7024,7 @@
       },
       "date": {
         "label": "Veröffentlicht am",
-        "hint": "Datum, das auf der Site steht. Standard ist der Tag der ersten Veröffentlichung.",
+        "hint": "Datum, das auf der Seite steht. Standard ist der Tag der ersten Veröffentlichung.",
         "auto": "Veröffentlichung",
         "reset": "Veröffentlichungsdatum verwenden"
       },
@@ -7041,7 +7041,7 @@
       },
       "authorDialog": {
         "title": "Autoren",
-        "description": "Autoren erscheinen an Posts und bekommen eine eigene Seite auf deiner Site.",
+        "description": "Autoren erscheinen an Posts und bekommen eine eigene Profilseite auf deiner Seite.",
         "new": "Neuer Autor",
         "edit": "Bearbeiten",
         "delete": "Löschen",
@@ -7728,28 +7728,28 @@
     }
   },
   "sites": {
-    "title": "Sites",
+    "title": "Seiten",
     "description": "Blogs und Changelogs, gebaut und gehostet aus deinem GitHub-Repository",
-    "newSite": "Neue Site",
+    "newSite": "Neue Seite",
     "projectRequired": {
       "title": "Wähle ein Projekt",
-      "description": "Erstelle oder wähle ein Projekt in der Seitenleiste, um seine Sites zu verwalten."
+      "description": "Erstelle oder wähle ein Projekt in der Seitenleiste, um seine Seiten zu verwalten."
     },
     "projectLoadFailed": {
       "title": "Projekte konnten nicht geladen werden",
       "description": "Lade die Seite neu, um es erneut zu versuchen."
     },
     "empty": {
-      "title": "Noch keine Sites",
+      "title": "Noch keine Seiten",
       "description": "Hoste Blog und Changelog aus einem GitHub-Repo. Jeder Push geht live, jeder Pull Request bekommt eine Vorschau."
     },
     "loadFailed": {
-      "title": "Sites konnten nicht geladen werden",
+      "title": "Seiten konnten nicht geladen werden",
       "description": "Lade die Seite neu, um es erneut zu versuchen."
     },
     "unavailable": {
-      "title": "Sites ist hier nicht verfügbar",
-      "description": "Notra Sites ist in dieser Umgebung noch nicht eingerichtet."
+      "title": "Seiten sind hier nicht verfügbar",
+      "description": "Seiten sind in dieser Umgebung noch nicht eingerichtet."
     },
     "list": {
       "visitors": "Besucher · 7 T",
@@ -7758,9 +7758,9 @@
       "deploymentCreated": "Deployment erstellt <time></time>",
       "actionsLabel": "Aktionen für {name}",
       "actions": {
-        "openSite": "Site öffnen",
-        "visitSite": "Live-Site besuchen",
-        "copyLink": "Site-Link kopieren"
+        "openSite": "Seite öffnen",
+        "visitSite": "Live-Seite besuchen",
+        "copyLink": "Link zur Seite kopieren"
       }
     },
     "status": {
@@ -7821,14 +7821,14 @@
       }
     },
     "new": {
-      "title": "Neue Site",
+      "title": "Neue Seite",
       "project": "Projekt: {name}",
       "projectLoading": "Projekt wird geladen…",
-      "projectRequired": "Erstelle oder wähle ein Projekt in der Seitenleiste, bevor du eine Site erstellst.",
+      "projectRequired": "Erstelle oder wähle ein Projekt in der Seitenleiste, bevor du eine Seite erstellst.",
       "projectLoadFailed": "Projekte konnten nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen.",
       "description": "Importiere ein Repository. Jeder Push auf den Produktions-Branch geht live.",
       "private": "Privates Repository",
-      "name": "Name der Site",
+      "name": "Name der Seite",
       "namePlaceholder": "Acme-Blog",
       "address": "Adresse",
       "addressInvalid": "Verwende 3 bis 40 Kleinbuchstaben, Ziffern und einzelne Bindestriche.",
@@ -7837,7 +7837,7 @@
       "rootDirectoryPlaceholder": "apps/blog",
       "publishMode": "Veröffentlichen aus dem Editor",
       "create": "Erstellen & deployen",
-      "createFailed": "Site konnte nicht erstellt werden",
+      "createFailed": "Seite konnte nicht erstellt werden",
       "noBranchMatch": "Kein passender Branch",
       "noDirectoryMatch": "Kein Ordner mit blog.json passt",
       "publishing": "Vorschauen und Veröffentlichen",
@@ -7850,13 +7850,13 @@
       "noRepositoryMatch": "Kein Repository passt.",
       "adjustAccess": "Repository fehlt? GitHub-App-Zugriff anpassen",
       "installTitle": "GitHub verbinden",
-      "installDescription": "Sites werden aus einem GitHub-Repository gebaut. Installiere die Notra-GitHub-App auf den Repositories, aus denen du veröffentlichen willst.",
+      "installDescription": "Seiten werden aus einem GitHub-Repository gebaut. Installiere die Notra-GitHub-App auf den Repositories, aus denen du veröffentlichen willst.",
       "installGitHub": "GitHub-App installieren",
       "installFailed": "GitHub-Installation konnte nicht gestartet werden",
       "stepRepository": "Repository",
       "stepConfigure": "Konfigurieren",
       "stepsLabel": "Schritte",
-      "stepRepositoryDescription": "Importiere das GitHub-Repository, aus dem Notra die Site baut.",
+      "stepRepositoryDescription": "Importiere das GitHub-Repository, aus dem Notra die Seite baut.",
       "stepConfigureDescription": "Aus {repository}.",
       "stepLabels": {
         "repository": "Repository importieren",
@@ -7868,12 +7868,12 @@
       "deploy": {
         "waiting": "Warte auf einen Builder…",
         "started": "Deployment vor {seconds} s gestartet…",
-        "ready": "Deine Site ist live. Gebaut in {duration}.",
+        "ready": "Deine Seite ist live. Gebaut in {duration}.",
         "failed": "Build fehlgeschlagen",
         "visit": "Öffnen",
-        "openSite": "Zur Site",
+        "openSite": "Zur Seite",
         "viewDeployment": "Deployment ansehen",
-        "configMissingRetry": "Dieser Build hat eine fehlende blog.json gemeldet. Starte das Deployment auf der Site erneut, um das Standardlayout und die Standardkonfiguration zu verwenden. Der Starter-Pull-Request ist optional.",
+        "configMissingRetry": "Dieser Build hat eine fehlende blog.json gemeldet. Starte das Deployment auf der Seite erneut, um das Standardlayout und die Standardkonfiguration zu verwenden. Der Starter-Pull-Request ist optional.",
         "editConfiguration": "Konfiguration bearbeiten",
         "retryDeployment": "Deployment erneut starten",
         "retryFailed": "Das Deployment konnte nicht gestartet werden. Versuche es erneut.",
@@ -7884,8 +7884,8 @@
         "notStarted": "Der erste Build konnte nicht starten."
       },
       "starter": {
-        "existingTitle": "Bestehende Site-Konfiguration gefunden",
-        "existingDescription": "Wähle eine bestehende Konfiguration oder behalte den gewählten Pfad für eine neue Site bei.",
+        "existingTitle": "Bestehende Seitenkonfiguration gefunden",
+        "existingDescription": "Wähle eine bestehende Konfiguration oder behalte den gewählten Pfad für eine neue Seite bei.",
         "useExisting": "Ordner verwenden: {path}",
         "useFolder": "Ordner verwenden",
         "selectedLocation": "Gewählte Konfiguration: {path} auf {branch}.",
@@ -7899,34 +7899,34 @@
         "optional": "Der Merge ist optional. Du kannst jetzt erstellen und deployen.",
         "failed": "Der Starter-Pull-Request konnte nicht geöffnet werden"
       },
-      "subdirectory": "Site liegt in einem Unterordner",
+      "subdirectory": "Seite liegt in einem Unterordner",
       "subdirectoryHint": "Einschalten, wenn die Seite in einem Ordner des Repositorys liegt.",
-      "rootDirectoryPath": "Ordner der Site",
-      "rootDirectoryPathHint": "Ordner für die Site, relativ zum Repository-Root. Eine blog.json ist optional.",
+      "rootDirectoryPath": "Ordner der Seite",
+      "rootDirectoryPathHint": "Ordner für die Seite, relativ zum Repository-Root. Eine blog.json ist optional.",
       "bulk": {
-        "toggle": "Alle {count} Sites importieren",
-        "toggleHint": "Jeder Ordner mit einer blog.json wird zu einer eigenen Site.",
+        "toggle": "Alle {count} Seiten importieren",
+        "toggleHint": "Jeder Ordner mit einer blog.json wird zu einer eigenen Seite.",
         "columns": {
-          "site": "Site",
+          "site": "Seite",
           "status": "Status"
         },
-        "selectAll": "Alle Sites auswählen",
+        "selectAll": "Alle Seiten auswählen",
         "select": "{folder} importieren",
         "nameLabel": "Name für {folder}",
         "addressLabel": "Adresse für {folder}",
         "rootFolder": "Repository-Root",
-        "duplicate": "Eine andere Site in diesem Import nutzt diese Adresse schon.",
+        "duplicate": "Eine andere Seite in diesem Import nutzt diese Adresse schon.",
         "previews": "Vorschauen",
-        "previewsHint": "Baut eine Vorschau für jeden Pull Request, der den Ordner einer Site ändert.",
-        "create": "{count, plural, one {# Site erstellen} other {# Sites erstellen}}",
-        "createFailed": "Sites konnten nicht erstellt werden",
-        "summary": "{created} von {total} Sites erstellt.",
+        "previewsHint": "Baut eine Vorschau für jeden Pull Request, der den Ordner einer Seite ändert.",
+        "create": "{count, plural, one {# Seite erstellen} other {# Seiten erstellen}}",
+        "createFailed": "Seiten konnten nicht erstellt werden",
+        "summary": "{created} von {total} Seiten erstellt.",
         "created": "Erstellt",
         "open": "Öffnen",
         "openSite": "{name} öffnen",
-        "edit": "Fehlgeschlagene Sites bearbeiten",
-        "retry": "{count, plural, one {Import für # Site wiederholen} other {Import für # Sites wiederholen}}",
-        "tooMany": "Wähle höchstens {max} Sites pro Import aus."
+        "edit": "Fehlgeschlagene Seiten bearbeiten",
+        "retry": "{count, plural, one {Import für # Seite wiederholen} other {Import für # Seiten wiederholen}}",
+        "tooMany": "Wähle höchstens {max} Seiten pro Import aus."
       }
     },
     "detail": {
@@ -7935,16 +7935,16 @@
       "deployQueued": "Deployment eingereiht",
       "deployFailed": "Deployment konnte nicht gestartet werden",
       "offline": "Offline",
-      "offlineDescription": "Diese Site ist offline. Besucher sehen eine „nicht verfügbar“-Seite, bis du sie wieder online nimmst.",
+      "offlineDescription": "Diese Seite ist offline. Besucher sehen eine „nicht verfügbar“-Seite, bis du sie wieder online nimmst.",
       "offlineAction": "In den Einstellungen verwalten",
       "statusAnnouncement": "Letztes Deployment: {status}",
-      "backToSites": "Zurück zu Sites",
+      "backToSites": "Zurück zu den Seiten",
       "notFound": {
-        "title": "Site nicht gefunden",
-        "description": "Sie wurde vielleicht gelöscht oder gehört zu einer anderen Organisation."
+        "title": "Seite nicht gefunden",
+        "description": "Die Seite wurde vielleicht gelöscht oder gehört zu einer anderen Organisation."
       },
       "loadFailed": {
-        "title": "Diese Site konnte nicht geladen werden",
+        "title": "Diese Seite konnte nicht geladen werden",
         "description": "Lade die Seite neu, um es erneut zu versuchen."
       },
       "tabs": {
@@ -7999,7 +7999,7 @@
       "statusAnnouncement": "Deployment-Status: {status}",
       "notFound": {
         "title": "Deployment nicht gefunden",
-        "description": "Es gehört vielleicht zu einer anderen Site."
+        "description": "Es gehört vielleicht zu einer anderen Seite."
       },
       "loadFailedTitle": "Dieses Deployment konnte nicht geladen werden",
       "loadFailed": "Lade die Seite neu, um es erneut zu versuchen."
@@ -8009,8 +8009,8 @@
       "warning": "Warnung"
     },
     "editor": {
-      "intro": "Änderungen werden als Entwürfe gespeichert und berühren die Live-Site erst, wenn du veröffentlichst.",
-      "validateFailed": "Site konnte nicht geprüft werden",
+      "intro": "Änderungen werden als Entwürfe gespeichert und berühren die Live-Seite erst, wenn du veröffentlichst.",
+      "validateFailed": "Seite konnte nicht geprüft werden",
       "problems": "{count, plural, one {# Problem} other {# Probleme}}",
       "dismiss": "Ausblenden",
       "filesFailed": "Dateien konnten nicht von GitHub geladen werden",
@@ -8058,7 +8058,7 @@
       "pullRequestDescription": "Öffnet einen Pull Request in {branch}. Er geht live, sobald er gemergt ist.",
       "pullRequestReviewDescription": "{count, plural, one {Prüfe den gespeicherten Entwurf} other {Prüfe alle # gespeicherten Entwürfe}}, bevor du den Pull Request erstellst.",
       "directDescription": "Committet auf {branch} und geht sofort live.",
-      "directDisabled": "Für diese Site ausgeschaltet. Ändere das in den Einstellungen.",
+      "directDisabled": "Für diese Seite ausgeschaltet. Ändere das in den Einstellungen.",
       "openPullRequest": "Pull Request öffnen",
       "commit": "Committen und deployen",
       "pullRequestOpened": "Pull Request geöffnet",
@@ -8077,54 +8077,54 @@
       "saveFailed": "Einstellungen konnten nicht gespeichert werden",
       "dangerZone": "Gefahrenzone",
       "offline": {
-        "title": "Site offline nehmen",
+        "title": "Seite offline nehmen",
         "description": "Besucher sehen eine „nicht verfügbar“-Seite. Deployments und Einstellungen bleiben erhalten.",
         "action": "Offline nehmen",
-        "confirmTitle": "Diese Site offline nehmen?",
+        "confirmTitle": "Diese Seite offline nehmen?",
         "confirmDescription": "Besucher sehen sofort eine „nicht verfügbar“-Seite, auf allen Domains. Du kannst sie jederzeit wieder online nehmen.",
-        "done": "Site ist offline",
-        "restoreTitle": "Site wieder online nehmen",
+        "done": "Seite ist offline",
+        "restoreTitle": "Seite wieder online nehmen",
         "restoreDescription": "Liefert das letzte Live-Deployment wieder aus.",
         "restore": "Wieder online nehmen",
-        "restored": "Site ist wieder online",
-        "failed": "Status der Site konnte nicht geändert werden"
+        "restored": "Seite ist wieder online",
+        "failed": "Status der Seite konnte nicht geändert werden"
       },
       "analytics": {
         "title": "Analytics ausschalten",
-        "description": "Keine Besucher und AI-Agents mehr auf dieser Site zählen.",
+        "description": "Keine Besucher und AI-Agents mehr auf dieser Seite zählen.",
         "action": "Ausschalten",
-        "confirmTitle": "Analytics für diese Site ausschalten?",
+        "confirmTitle": "Analytics für diese Seite ausschalten?",
         "confirmDescription": "Notra zählt ab sofort keine Besucher und AI-Agents mehr und entfernt das Mess-Script von allen Seiten. Bisher gesammelte Daten bleiben in Analytics, und solange Analytics aus ist, wird nichts aufgezeichnet. Du kannst es jederzeit wieder einschalten.",
         "done": "Analytics ist aus",
         "enableTitle": "Analytics einschalten",
-        "enableDescription": "Besucher, Zeit auf der Seite und AI-Agents auf dieser Site zählen.",
+        "enableDescription": "Besucher, Verweildauer und AI-Agents auf dieser Seite zählen.",
         "enable": "Einschalten",
-        "enableConfirmTitle": "Analytics für diese Site einschalten?",
+        "enableConfirmTitle": "Analytics für diese Seite einschalten?",
         "enableConfirmDescription": "Notra zählt Seitenaufrufe beim Ausliefern, ohne Cookies, und bindet ein kleines Script ein, das misst, wie lange jede Seite sichtbar ist. AI-Agents werden ebenfalls erfasst. Gezählt wird ab jetzt, die Zeit, in der Analytics aus war, bleibt leer.",
         "enabled": "Analytics ist an",
         "failed": "Analytics konnte nicht geändert werden"
       },
       "delete": {
-        "title": "Site löschen",
-        "summary": "Entfernt die Site, ihre Deployments und Domains. Dein Repository bleibt unverändert.",
-        "action": "Site löschen",
-        "description": "Das löscht die Site, alle Deployments, Vorschauen und Domains. Das lässt sich nicht rückgängig machen. Dein GitHub-Repository bleibt unberührt.",
+        "title": "Seite löschen",
+        "summary": "Entfernt die Seite, ihre Deployments und Domains. Dein Repository bleibt unverändert.",
+        "action": "Seite löschen",
+        "description": "Das löscht die Seite, alle Deployments, Vorschauen und Domains. Das lässt sich nicht rückgängig machen. Dein GitHub-Repository bleibt unberührt.",
         "confirmLabel": "Gib <code>{name}</code> ein, um zu bestätigen",
-        "confirm": "Site löschen",
+        "confirm": "Seite löschen",
         "done": "{name} gelöscht",
-        "failed": "Site konnte nicht gelöscht werden"
+        "failed": "Seite konnte nicht gelöscht werden"
       },
       "smartDeployments": "Smart deployments",
       "beta": "Beta",
-      "smartDeploymentsHint": "Automatische Deployments überspringen, wenn die Eingaben der veröffentlichten Site unverändert sind. Manuelle Redeploys werden immer gebaut.",
+      "smartDeploymentsHint": "Automatische Deployments überspringen, wenn die Eingaben der veröffentlichten Seite unverändert sind. Manuelle Redeploys werden immer gebaut.",
       "contentGroup": "Inhalte und Veröffentlichen",
       "visitors": "Analytics und Branding",
       "nameHint": "Wird im Dashboard angezeigt.",
       "repository": "Repository",
-      "repositoryHint": "Das GitHub-Repository, aus dem diese Site gebaut wird.",
+      "repositoryHint": "Das GitHub-Repository, aus dem diese Seite gebaut wird.",
       "noRepository": "Nicht verbunden",
       "rootDirectory": "Stammverzeichnis",
-      "rootDirectoryHint": "Wo die Site im Repository liegt.",
+      "rootDirectoryHint": "Wo die Seite im Repository liegt.",
       "publishModeHint": "Wie Änderungen aus dem Editor in dein Repository kommen.",
       "variablesHint": "Wiederverwendbare Werte wie Namen und Links, nutzbar als Platzhalter.",
       "variablesCount": "{count, plural, =0 {Noch keine} one {# Variable} other {# Variablen}}",
@@ -8133,15 +8133,15 @@
       "openOnGitHub": "Auf GitHub öffnen",
       "manageGitHub": "GitHub-Zugriff verwalten",
       "manageGitHubFailed": "GitHub konnte nicht geöffnet werden",
-      "repositoryChangeHint": "Für ein anderes Repository legst du eine neue Site an. Verwalte den Zugriff, falls Notra keinen Zugriff mehr auf dieses hat.",
+      "repositoryChangeHint": "Für ein anderes Repository legst du eine neue Seite an. Verwalte den Zugriff, falls Notra keinen Zugriff mehr auf dieses hat.",
       "rootDirectoryPlaceholder": "Repository-Stammverzeichnis",
-      "rootDirectoryFieldHint": "Relativ zum Repository. Leer lassen, wenn die Site im Stammverzeichnis liegt.",
-      "sectionsRowHint": "Wo Blog und Changelog auf deiner Site liegen.",
+      "rootDirectoryFieldHint": "Relativ zum Repository. Leer lassen, wenn die Seite im Stammverzeichnis liegt.",
+      "sectionsRowHint": "Wo Blog und Changelog auf deiner Seite liegen.",
       "branchFieldHint": "Jeder Push auf diesen Branch geht live. Änderungen gelten ab dem nächsten Deploy.",
       "optional": "Optional"
     },
     "previewFrame": {
-      "title": "Vorschau der Site",
+      "title": "Vorschau der Seite",
       "unavailable": "Keine Vorschau verfügbar"
     },
     "overviewPage": {
@@ -8174,7 +8174,7 @@
       "previewNothingLive": "Noch nichts live"
     },
     "deploymentsPage": {
-      "description": "Produktions- und Preview-Builds dieser Site, die neuesten zuerst",
+      "description": "Produktions- und Preview-Builds dieser Seite, die neuesten zuerst",
       "current": "Aktuell",
       "columns": {
         "deployment": "Deployment",
@@ -8262,7 +8262,7 @@
       "pullRequest": "#{number}",
       "preview": {
         "protected": "Diese Preview ist geschützt. Öffne sie, um dich anzumelden.",
-        "notLive": "Gerade nicht live. Die Site zeigt ein anderes Deployment.",
+        "notLive": "Gerade nicht live. Die Seite zeigt ein anderes Deployment.",
         "building": "Die Vorschau erscheint, sobald dieser Build live ist.",
         "failed": "Nichts zu sehen. Dieser Build wurde nicht fertig.",
         "expired": "Die Dateien dieses Deployments wurden aufgeräumt."
@@ -8272,7 +8272,7 @@
         "canceled": "Dieser Build wurde abgebrochen, bevor er fertig war.",
         "superseded": "Ein neuerer Commit hat diesen Build ersetzt, bevor er startete.",
         "expired": "Die Dateien dieses Deployments wurden aufgeräumt. Deploye den Commit neu, um ihn wieder zu bauen.",
-        "skipped": "Übersprungen, weil die Site-Eingaben mit der veröffentlichten Version übereinstimmen."
+        "skipped": "Übersprungen, weil die Eingaben der Seite mit der veröffentlichten Version übereinstimmen."
       },
       "log": {
         "title": "Build-Logs",
@@ -8366,15 +8366,15 @@
       "moreLabel": "Weitere Aktionen für {hostname}",
       "checkFailed": "Domain konnte nicht geprüft werden",
       "verified": "Domain verifiziert",
-      "verifiedRebuilding": "Domain verifiziert. Die Site wird für die neue Adresse neu gebaut…",
+      "verifiedRebuilding": "Domain verifiziert. Die Seite wird für die neue Adresse neu gebaut…",
       "notVerifiedYet": "Noch nicht verifiziert",
       "verifyNow": "Jetzt prüfen",
       "lastErrorTitle": "Details zur Domainprüfung:",
       "remove": "Entfernen",
       "removeConfirm": "Domain entfernen",
       "removeTitle": "Domain entfernen?",
-      "removeDescription": "{hostname} liefert diese Site dann nicht mehr aus.",
-      "removePrimaryDescription": "{hostname} liefert diese Site dann nicht mehr aus. Sie zieht zurück auf {alias} und wird neu gebaut.",
+      "removeDescription": "{hostname} liefert diese Seite dann nicht mehr aus.",
+      "removePrimaryDescription": "{hostname} liefert diese Seite dann nicht mehr aus. Die Seite zieht zurück auf {alias} und wird neu gebaut.",
       "removed": "Domain entfernt",
       "removeFailed": "Domain konnte nicht entfernt werden",
       "status": {
@@ -8407,7 +8407,7 @@
         "manualSetup": "Manuell einrichten",
         "description": "Leite <code>{paths}</code> und alles darunter an <code>{origin}</code> weiter, der Pfad bleibt gleich.",
         "platform": "Plattform",
-        "noCookies": "Leite keine Cookies oder Authorization-Header weiter. Die Site braucht sie nicht.",
+        "noCookies": "Leite keine Cookies oder Authorization-Header weiter. Die Seite braucht sie nicht.",
         "recipes": {
           "vercel": "Vercel",
           "next": "Next.js",
@@ -8421,18 +8421,18 @@
       },
       "add": {
         "title": "Domain hinzufügen",
-        "description": "Stell diese Site unter einer eigenen Domain bereit.",
+        "description": "Stell diese Seite unter einer eigenen Domain bereit.",
         "submit": "Domain hinzufügen",
         "added": "Domain hinzugefügt",
         "addFailed": "Domain konnte nicht hinzugefügt werden",
         "label": "Domain",
         "placeholder": "blog.acme.com oder acme.com/blog",
-        "hint": "Gib eine Subdomain wie blog.acme.com ein oder deine eigene Site wie acme.com/blog.",
+        "hint": "Gib eine Subdomain wie blog.acme.com ein oder deine eigene Seite wie acme.com/blog.",
         "useProxy": "Stattdessen meine Website behalten und Pfade weiterleiten",
         "useDns": "Stattdessen die ganze Domain auf Notra zeigen lassen",
-        "liveAt": "Deine Site ist dann erreichbar unter",
+        "liveAt": "Deine Seite ist dann erreichbar unter",
         "subdomainExplain": "{hostname} zeigt auf Notra. Du legst einen DNS-Eintrag (CNAME) dort an, wo du deine Domain verwaltest.",
-        "proxyExplain": "Deine Website auf {hostname} bleibt, wie sie ist. Sie leitet diese Pfade per Rewrite an Notra weiter."
+        "proxyExplain": "Deine Website auf {hostname} bleibt, wie sie ist, und leitet diese Pfade per Rewrite an Notra weiter."
       },
       "connectResult": {
         "success": "DNS-Einträge angelegt",
@@ -8526,10 +8526,10 @@
     },
     "settingsPage": {
       "title": "Einstellungen",
-      "description": "Repository, Bereiche, Previews und Veröffentlichen für diese Site",
+      "description": "Repository, Bereiche, Previews und Veröffentlichen für diese Seite",
       "brandingLabel": "Notra-Branding",
-      "brandingHint": "Zeigt ein kleines „Powered by Notra“-Badge im Footer. Eine Änderung baut die Site neu.",
-      "sectionsHint": "Pfade auf deiner Site. Eine Änderung baut die Site neu; die aktuelle Version bleibt live, bis der Build fertig ist."
+      "brandingHint": "Zeigt ein kleines „Powered by Notra“-Badge im Footer. Eine Änderung baut die Seite neu.",
+      "sectionsHint": "Pfade auf deiner Seite. Eine Änderung baut die Seite neu; die aktuelle Version bleibt live, bis der Build fertig ist."
     },
     "previewAccess": {
       "title": "Zugriff auf Vorschauen",
@@ -8556,7 +8556,7 @@
     },
     "integrationsPage": {
       "title": "Integrationen",
-      "description": "Analytics für diese Site. Gültige Einstellungen werden automatisch als blog.json-Entwurf gespeichert und beim Veröffentlichen übernommen.",
+      "description": "Analytics für diese Seite. Gültige Einstellungen werden automatisch als blog.json-Entwurf gespeichert und beim Veröffentlichen übernommen.",
       "optional": "Optional",
       "remove": "Entfernen",
       "removed": "Integration entfernt",
@@ -8568,7 +8568,7 @@
       "createPullRequest": "Create PR",
       "preparePublishFailed": "Änderungen für den Pull Request konnten nicht geladen werden",
       "noDrafts": "Es gibt keine Änderungen für einen Pull Request.",
-      "publishMessage": "Site aktualisieren",
+      "publishMessage": "Seite aktualisieren",
       "publishConflict": "Diese Entwürfe stehen im Konflikt mit Änderungen auf GitHub. Öffne den Editor, lade die Dateien neu und wende deine Änderungen erneut an.",
       "invalidTitle": "Ungültige blog.json-Konfiguration",
       "invalidDescription": "Das JSON oder die Integrationseinstellungen sind ungültig. Korrigiere sie im Editor und komm dann zurück.",
@@ -8602,7 +8602,7 @@
       "edit": "Bearbeiten",
       "configExample": "Konfiguration in blog.json",
       "copyConfig": "Konfiguration kopieren",
-      "previewDescription": "Analytics-Integrationen laufen nur auf der Live-Site. Previews und lokale Entwicklung senden keine Events.",
+      "previewDescription": "Analytics-Integrationen laufen nur auf der Live-Seite. Previews und lokale Entwicklung senden keine Events.",
       "loadFailed": "Integrationen konnten nicht geladen werden",
       "retry": "Erneut versuchen",
       "openEditor": "Editor öffnen",
@@ -8635,7 +8635,7 @@
     },
     "analyticsPage": {
       "title": "Analytics",
-      "description": "Menschen und AI-Agents auf dieser Site",
+      "description": "Menschen und AI-Agents auf dieser Seite",
       "emptyTitle": "Noch keine Besucher",
       "emptyDescription": "Besuche erscheinen hier etwa eine Minute, nachdem jemand die Seite öffnet.",
       "overviewTitle": "Letzte 7 Tage",
