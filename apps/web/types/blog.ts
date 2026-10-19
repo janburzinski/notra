@@ -54,6 +54,7 @@ export interface NotraBlogPost {
   excerpt: string;
   image: string | null;
   authors: NotraBlogAuthor[];
+  hidden: boolean;
 }
 
 interface BlogPageHeaderProps {

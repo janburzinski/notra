@@ -15,3 +15,7 @@ export const postSchema = z.object({
       "Unknown author slug"
     ),
 });
+
+export const blogPostSchema = postSchema.extend({
+  hidden: z.boolean().default(false),
+});

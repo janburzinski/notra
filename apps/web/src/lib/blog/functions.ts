@@ -8,6 +8,7 @@ import {
   getNotraBlogPostBySlug,
   getNotraBlogPostPagination,
   listNotraBlogPosts,
+  listVisibleNotraBlogPosts,
 } from "@/utils/blog";
 import { getReadingTimeMinutes } from "@/utils/reading-time";
 
@@ -30,7 +31,7 @@ export const getBlogPost = createServerFn({ method: "GET" })
   });
 
 export const getBlogCardItems = createServerFn({ method: "GET" }).handler(
-  async () => buildBlogCardItems(await listNotraBlogPosts())
+  async () => buildBlogCardItems(await listVisibleNotraBlogPosts())
 );
 
 export const getBlogAuthorPage = createServerFn({ method: "GET" })

@@ -42,7 +42,7 @@ import {
 } from "@/lib/state-of-ai-search/markdown";
 import { listSummaries, loadReport } from "@/lib/state-of-ai-search/reports";
 import type { BlogAuthorMarkdownPage } from "@/types/blog-author";
-import { listNotraBlogPosts } from "@/utils/blog";
+import { listNotraBlogPosts, listVisibleNotraBlogPosts } from "@/utils/blog";
 import {
   getChangelogPostHref,
   listNotraChangelogPosts,
@@ -215,7 +215,7 @@ function getMcpUseCaseEntries() {
 }
 
 async function buildBlogIndexMarkdown() {
-  const posts = await listNotraBlogPosts();
+  const posts = await listVisibleNotraBlogPosts();
   const list = posts
     .map(
       (post) =>
