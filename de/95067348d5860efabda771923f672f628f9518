@@ -1,0 +1,134 @@
+apps/dashboard/src/app/(dashboard)/[slug]/automation/page-client.tsx
+  s_99447b0ed17783::t_d8bb4e832f19a9 8-10,34-36,38,76-82,149-157,159-180,194,196-218,223,225-228
+  s_99447b0ed17783::t_c57dea567044b3 39,195,219-222
+  s_99447b0ed17783::t_16433fd699bb51 268-276
+  s_99447b0ed17783::t_7612a194675716 15,37,52
+apps/dashboard/src/types/automation/source-picker.ts
+  s_99447b0ed17783::t_1c861c5d41c497 1-3,5-7,10-19
+packages/ai/src/schemas/onboarding-agent.ts
+  s_99447b0ed17783::t_9a0cf082d66570 1-8,11-72
+apps/dashboard/src/types/components/tab-count.ts
+  s_99447b0ed17783::t_8f742dc125eaec 1-3
+packages/ui/src/components/ui/switch.tsx
+  s_99447b0ed17783::t_8cfa8cd27968c7 17
+apps/dashboard/src/utils/schedule-form.ts
+  s_99447b0ed17783::t_3c950377111b25 50-51,88
+apps/dashboard/src/components/automation/automations-table.tsx
+  s_99447b0ed17783::t_2755c1b5ba9e9c 32-37,92,99-106,108,111-116,153-156,175-176,178-180,203-208,238,342-344
+  s_99447b0ed17783::t_b3d04f0422b041 223-228
+  s_99447b0ed17783::t_bc94fa20277049 177,183-191
+  s_99447b0ed17783::t_1ebf1db5ebd135 15
+apps/dashboard/src/components/automation/events/event-trigger-form.tsx
+  s_99447b0ed17783::t_1c861c5d41c497 80
+  s_99447b0ed17783::t_741322c33b7ef5 15,75-79,81-85,130,133
+apps/dashboard/messages/de.json
+  s_99447b0ed17783::t_603eedbc21af58 5382-5385,5387-5388,5390
+  s_99447b0ed17783::t_efd8a03390b930 5195
+  s_99447b0ed17783::t_5df05207b59fb5 5318-5324
+  s_99447b0ed17783::t_7612a194675716 5396
+  s_99447b0ed17783::t_73b37363fde8d8 5605
+  s_99447b0ed17783::t_3f968c547009b4 5276-5282
+  s_99447b0ed17783::t_ea29d58513e092 5386
+  s_99447b0ed17783::t_3fab9a3538a00c 5616-5617
+  s_99447b0ed17783::t_7e3b87ec0eeae8 5588,5596
+  s_99447b0ed17783::t_741322c33b7ef5 5354-5365
+apps/dashboard/src/types/automation/schedule.ts
+  s_99447b0ed17783::t_3c950377111b25 20-21
+apps/dashboard/src/types/automation/event-trigger.ts
+  s_99447b0ed17783::t_741322c33b7ef5 55,60
+  s_99447b0ed17783::t_1c861c5d41c497 3,58
+apps/dashboard/src/app/(dashboard)/[slug]/geo/prompts/page-client.tsx
+  s_99447b0ed17783::t_7612a194675716 39
+  s_99447b0ed17783::t_00200fb4553309 22
+apps/dashboard/src/components/automation/events/ignore-commit-patterns-field.tsx
+  s_99447b0ed17783::t_ea29d58513e092 29,39-44,79,81-83,99,103-110,137,167
+  s_99447b0ed17783::t_e614c47bbfeebe 158
+  s_99447b0ed17783::t_cf1f0a661c3762 159-166
+  s_99447b0ed17783::t_58be6f9e4a6dce 4-7,10,15-19,45-46,64-68,78,80,85-89,91-96,98,100-102,114-125,127-136,138-148,150-156,168-221
+apps/onboarding-agent/agent/instructions.md
+  s_99447b0ed17783::t_9a0cf082d66570 24
+packages/tools/src/onboarding/add-suggestion.ts
+  s_99447b0ed17783::t_9a0cf082d66570 14,16,18-22
+apps/dashboard/src/types/automation/geo-alerts.ts
+  s_99447b0ed17783::t_3fab9a3538a00c 32-35
+apps/dashboard/src/components/tab-count.tsx
+  s_99447b0ed17783::t_8f742dc125eaec 3,5-6,8-13,15-17
+apps/dashboard/src/utils/onboarding-suggestions.ts
+  s_99447b0ed17783::t_3c950377111b25 1,3-4,27
+  s_99447b0ed17783::t_9be165ecf35eb3 49-50,64-67
+  s_99447b0ed17783::t_70234a3d28f3c4 2,6-26,28-48,51-63,68
+apps/dashboard/src/components/automation/schedules/schedule-form.tsx
+  s_99447b0ed17783::t_58b3738aa1a079 32,34,40
+  s_99447b0ed17783::t_2eda8b074986ba 243-251,254,312-342,395-418,465-468,471-481,484-489,492-493,495-501,506-507
+  s_99447b0ed17783::t_b303c4084bc313 3-7,543-546
+  s_99447b0ed17783::t_9be165ecf35eb3 166-170
+  s_99447b0ed17783::t_d1b3d147999f8f 16,49,242
+  s_99447b0ed17783::t_3c950377111b25 66,183,186
+apps/dashboard/src/components/automation/events/event-trigger-section.tsx
+  s_99447b0ed17783::t_741322c33b7ef5 1-7,14,17-20,25-26,28-30,32,34-35,38-40,44-46,49-68,70,72-112,124
+  s_99447b0ed17783::t_1c861c5d41c497 16,41-43,47-48
+  s_99447b0ed17783::t_603eedbc21af58 113-123
+apps/dashboard/src/app/(dashboard)/[slug]/automation/editor/page-client.tsx
+  s_99447b0ed17783::t_9be165ecf35eb3 8,27-30,34-37,194
+  s_99447b0ed17783::t_3c950377111b25 60-75,134-136,174,180,188,193,195
+apps/dashboard/src/components/automation/alerts/geo-alert-form.tsx
+  s_99447b0ed17783::t_cb9dbc222e177f 4
+  s_99447b0ed17783::t_3fab9a3538a00c 276-277,279,298-300
+  s_99447b0ed17783::t_b303c4084bc313 317-320
+  s_99447b0ed17783::t_73b37363fde8d8 301-303
+apps/dashboard/src/components/automation/events/event-trigger-dialog-footer.tsx
+  s_99447b0ed17783::t_b303c4084bc313 1-5,41-44
+apps/dashboard/src/components/automation/alerts/geo-alert-destinations.tsx
+  s_99447b0ed17783::t_3fab9a3538a00c 3-4,14,27-29,37-66
+apps/dashboard/src/components/automation/onboarding-suggestions.tsx
+  s_99447b0ed17783::t_f7d4c6f5d54fa2 10
+  s_99447b0ed17783::t_a8de9ee6b59b18 4,6,20,110-113,115-126,129,131-132,134-135,140-143
+  s_99447b0ed17783::t_16433fd699bb51 12,29-40,74,79,82-85,93,96-105,108,127,147
+  s_99447b0ed17783::t_2409b5f8ea6a16 94-95
+  s_99447b0ed17783::t_fe12a1d1220c7a 59,137-139
+apps/dashboard/src/components/dashboard/sidebar-user-menu.tsx
+  s_99447b0ed17783::t_2873a837ca6f66 8,58-62
+apps/dashboard/src/components/automation/events/event-trigger-rules-section.tsx
+  s_99447b0ed17783::t_e614c47bbfeebe 7,43-46,49-50,52-58,63
+apps/dashboard/src/components/automation/editor/source-picker.tsx
+  s_99447b0ed17783::t_1c861c5d41c497 3,5-19,21,23-26,35-39,42-59,62-64,67,70,73-75,80-120
+  s_99447b0ed17783::t_6a4d66db43e029 28-34,76-79
+  s_99447b0ed17783::t_60b62612560834 66,69
+apps/dashboard/src/components/automation/schedules/schedule-trigger-row.tsx
+  s_99447b0ed17783::t_a7b8f6f447db3b 91,174-186
+apps/dashboard/src/types/components/onboarding-suggestions.ts
+  s_99447b0ed17783::t_70234a3d28f3c4 8-9,11-12
+  s_99447b0ed17783::t_16433fd699bb51 1-2,5
+packages/tools/src/schemas/onboarding-tools.ts
+  s_99447b0ed17783::t_9a0cf082d66570 1,58
+apps/dashboard/messages/en.json
+  s_99447b0ed17783::t_3fab9a3538a00c 5616-5617
+  s_99447b0ed17783::t_5df05207b59fb5 5318-5324
+  s_99447b0ed17783::t_7612a194675716 5396
+  s_99447b0ed17783::t_741322c33b7ef5 5354-5365
+  s_99447b0ed17783::t_ea29d58513e092 5386
+  s_99447b0ed17783::t_efd8a03390b930 5195
+  s_99447b0ed17783::t_73b37363fde8d8 5605
+  s_99447b0ed17783::t_603eedbc21af58 5382-5385,5387-5390
+  s_99447b0ed17783::t_3f968c547009b4 5276-5282
+  s_99447b0ed17783::t_7e3b87ec0eeae8 5588,5596
+apps/dashboard/src/components/automation/automation-template-gallery.tsx
+  s_99447b0ed17783::t_f9acc31eeed060 13,108-119,124-164,174-175,180-185,190-191,195-196,198,203,205,210-226,228-233,235
+  s_99447b0ed17783::t_a8de9ee6b59b18 120-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "de95067348d5860efabda771923f672f628f9518",
+  "prompts": {},
+  "sessions": {
+    "s_99447b0ed17783": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "44fa4e53-d974-4c1f-afec-ba892ba5a471",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
