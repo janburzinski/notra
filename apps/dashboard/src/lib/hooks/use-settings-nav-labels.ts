@@ -5,7 +5,6 @@ import type { SettingsNavLabels } from "@/types/settings/modal";
 export function useSettingsNavLabels(): SettingsNavLabels {
   const t = useTranslations("settings");
   const tLabels = useTranslations("common.labels");
-  const tApiKeys = useTranslations("apiKeys");
   const brandDescription = t("shared.nameAliasesAndConversionPaths");
   const brandModalDescription = t("shared.howYourBrandIsIdentified");
   return {
@@ -27,10 +26,10 @@ export function useSettingsNavLabels(): SettingsNavLabels {
         description: t("nav.sections.appearance.description"),
         modalDescription: t("modal.descriptions.appearance"),
       },
-      "api-keys": {
+      "account-api-keys": {
         label: tLabels("apiKeys"),
-        description: t("nav.sections.api-keys.description"),
-        modalDescription: tApiKeys("description"),
+        description: t("nav.sections.account-api-keys.description"),
+        modalDescription: t("nav.sections.account-api-keys.description"),
       },
       general: {
         label: t("nav.sections.general.label"),

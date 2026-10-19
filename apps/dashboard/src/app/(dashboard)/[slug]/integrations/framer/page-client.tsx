@@ -9,7 +9,6 @@ import { useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
 import { PageContainer } from "@/components/layout/container";
-import { settingsPath } from "@/utils/settings-path";
 
 const STEPS = [
   {
@@ -110,7 +109,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                 {"internalLink" in step && step.internalLink ? (
                   <Link
                     className="text-primary ms-9 mt-1.5 inline-flex items-center gap-1 text-xs hover:underline"
-                    href={settingsPath(organizationSlug, "api-keys")}
+                    href={`/${organizationSlug}/api-keys`}
                   >
                     {tGuide("goToApiKeys")}
                     <HugeiconsIcon

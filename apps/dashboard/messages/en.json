@@ -7,15 +7,15 @@
         "dev": "Development"
       },
       "sections": {
+        "account-api-keys": {
+          "description": "Personal keys for all your organizations"
+        },
         "account": {
           "description": "Profile, login and connected accounts"
         },
         "appearance": {
           "label": "Preferences",
           "description": "Theme, language, chat and privacy"
-        },
-        "api-keys": {
-          "description": "Organization and account keys"
         },
         "general": {
           "label": "General",

@@ -8,7 +8,6 @@ import {
   Tick02Icon,
   ViewIcon,
 } from "@hugeicons/core-free-icons";
-import { API_KEY_DEFAULT_SCOPES } from "@notra/schemas/constants/dashboard/api-keys";
 import {
   API_READ_SCOPES,
   API_SCOPE_RESOURCES,
@@ -17,7 +16,7 @@ import {
   LEGACY_API_SCOPES,
 } from "@notra/utils/api-scopes";
 
-import type { ApiKeyCreateConfig, ApiKeyStatus } from "@/types/api-keys";
+import type { ApiKeyStatus } from "@/types/api-keys";
 import type { StatusBadgeAppearance } from "@/types/components/status-badge";
 
 export const API_KEY_PERMISSIONS = LEGACY_API_SCOPES;
@@ -134,11 +133,4 @@ export const API_KEY_PERMISSION_BADGES: Record<
   write: { variant: "warning", icon: Edit02Icon },
   geo: { variant: "secondary", icon: GlobalIcon },
   custom: { variant: "secondary", icon: Settings02Icon },
-};
-
-export const DEFAULT_NEW_KEY_CONFIG: ApiKeyCreateConfig = {
-  name: "",
-  accessMode: "restricted",
-  scopes: [...API_KEY_DEFAULT_SCOPES],
-  expiration: "never",
 };

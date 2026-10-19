@@ -25,6 +25,7 @@ import {
 } from "@notra/schemas/dashboard/api-keys";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { ConnectedCards } from "@notra/ui/components/shared/connected-cards";
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   ResponsiveDialog,
   ResponsiveDialogClose,
@@ -73,7 +74,8 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { useForm } from "@tanstack/react-form";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { V2KeysCreateKeyResponseData } from "@unkey/api/models/components";
 import {
   parseAsArrayOf,
   parseAsString,
@@ -91,7 +93,6 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 import * as z from "zod";
 
-import { AccountApiKeysSection } from "@/components/api-keys/account-api-keys-section";
 import { ApiKeyPermissionBadge } from "@/components/api-keys/api-key-permission-badge";
 import { ApiKeyRevealField } from "@/components/api-keys/api-key-reveal-field";
 import { ApiKeyStatusBadge } from "@/components/api-keys/api-key-status-badge";
@@ -99,23 +100,17 @@ import { ApiKeyPermissionSelector } from "@/components/api-keys/permission-selec
 import { TrackingTokenCard } from "@/components/api-keys/tracking-token-card";
 import { Button } from "@/components/button";
 import { DemoApiCallout } from "@/components/demo/demo-api-callout";
+import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { SettingsPane } from "@/components/settings/settings-pane";
 import { SiteRelativeTime } from "@/components/sites/site-relative-time";
 import {
   API_KEY_EXPIRATION_OPTIONS,
   API_KEYS_EMPTY_TABLE_HEIGHT,
 } from "@/constants/api-keys";
 import { inferApiKeyExpiration } from "@/lib/api-keys/expiration";
-import {
-  apiKeyCreateErrorField,
-  apiKeyCreateInput,
-  hasCompleteNewKeyConfig,
-} from "@/lib/api-keys/new-key-config";
 import { API_KEY_CARD_ITEMS, API_KEY_PRESETS } from "@/lib/api-keys/presets";
 import { expandLegacyApiKeyScopes } from "@/lib/api-keys/scopes";
 import { useApiKeyExpirationItems } from "@/lib/hooks/use-api-key-expiration-items";
-import { useApiKeyMutations } from "@/lib/hooks/use-api-key-mutations";
 import { useApiKeyStatusNow } from "@/lib/hooks/use-api-key-status-now";
 import { useHasActivePlan } from "@/lib/hooks/use-plan";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
@@ -136,6 +131,13 @@ const NEW_KEY_CONFIG_PARSERS = {
   ),
   scopes: parseAsArrayOf(parseAsString),
   expiration: parseAsStringLiteral(API_KEY_EXPIRATION_VALUES),
+};
+
+const DEFAULT_NEW_KEY_CONFIG: ApiKeyCreateConfig = {
+  name: "",
+  accessMode: "restricted",
+  scopes: [...API_KEY_DEFAULT_SCOPES],
+  expiration: "never",
 };
 
 const EDIT_FORM_DEFAULTS: ApiKeyFormValues = {
@@ -162,6 +164,14 @@ interface ApiKeyEditForm {
       };
     }) => ReactNode;
   }>;
+}
+
+type CreateApiKeyResponse = V2KeysCreateKeyResponseData & {
+  name: string;
+};
+
+interface ApiKeyMutationResponse {
+  success: boolean;
 }
 
 interface ApiKeysUiState {
@@ -223,36 +233,47 @@ function ApiKeysHeader({
   onCreate: () => void;
 }) {
   const t = useTranslations("apiKeys");
+  const tCommon2 = useTranslations("common");
   return (
-    <div className="flex items-center justify-end gap-2">
-      <Button className="gap-1.5" disabled={createDisabled} onClick={onCreate}>
-        <HugeiconsIcon className="size-4" icon={Add01Icon} />
-        {t("createKey")}
-        <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
-      </Button>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                onClick={() =>
-                  window.open(
-                    "https://www.usenotra.com/docs/api/getting-started",
-                    "_blank",
-                    "noopener,noreferrer"
-                  )
-                }
-                size="icon"
-                variant="outline"
-              />
-            }
-          >
-            <HugeiconsIcon className="size-4" icon={Book01Icon} />
-          </TooltipTrigger>
-          <TooltipContent>{t("viewDocs")}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+    <PageHeading
+      className="@min-[40rem]/main:items-center"
+      description={t("description")}
+      title={tCommon2("labels.apiKeys")}
+    >
+      <div className="flex items-center gap-2">
+        <Button
+          className="gap-1.5"
+          disabled={createDisabled}
+          onClick={onCreate}
+        >
+          <HugeiconsIcon className="size-4" icon={Add01Icon} />
+          {t("createKey")}
+          <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
+        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  onClick={() =>
+                    window.open(
+                      "https://www.usenotra.com/docs/api/getting-started",
+                      "_blank",
+                      "noopener,noreferrer"
+                    )
+                  }
+                  size="icon"
+                  variant="outline"
+                />
+              }
+            >
+              <HugeiconsIcon className="size-4" icon={Book01Icon} />
+            </TooltipTrigger>
+            <TooltipContent>{t("viewDocs")}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </PageHeading>
   );
 }
 
@@ -797,11 +818,12 @@ function DeleteApiKeyDialog({
   );
 }
 
-export function ApiKeysSettingsPane() {
+export default function ApiKeysPage() {
   const t = useTranslations("apiKeys");
   const tCommon2 = useTranslations("common");
   const { activeOrganization } = useOrganizationsContext();
   const organizationId = activeOrganization?.id;
+  const queryClient = useQueryClient();
   const [
     { dialogOpen, createdKey, createError, editDialogOpen, deletingKey },
     dispatchUi,
@@ -809,14 +831,17 @@ export function ApiKeysSettingsPane() {
   const [newKeyConfig, setNewKeyConfig] = useQueryStates(
     NEW_KEY_CONFIG_PARSERS
   );
-  const hasNewKeyConfig = hasCompleteNewKeyConfig(newKeyConfig);
+  const hasNewKeyConfig =
+    newKeyConfig.name !== null &&
+    newKeyConfig.scopes !== null &&
+    newKeyConfig.expiration !== null;
 
   const { isLocked: planLocked, isLoading: planLoading } = useHasActivePlan();
   const { openSettings } = useSettingsModal();
   const tMembers = useTranslations("members");
   const tBilling = useTranslations("errors.billing");
   const openCreateDialog = () => {
-    if (planLoading || !organizationId) {
+    if (planLoading) {
       return false;
     }
     if (planLocked) {
@@ -855,7 +880,18 @@ export function ApiKeysSettingsPane() {
   });
   const keys = loadedKeys ?? [];
 
-  const createInput = apiKeyCreateInput(newKeyConfig);
+  const newKeyName = newKeyConfig.name;
+  const newKeyAccessMode =
+    newKeyConfig.accessMode ?? DEFAULT_NEW_KEY_CONFIG.accessMode;
+  const newKeyScopes = newKeyConfig.scopes ?? DEFAULT_NEW_KEY_CONFIG.scopes;
+  const newKeyExpiration =
+    newKeyConfig.expiration ?? DEFAULT_NEW_KEY_CONFIG.expiration;
+  const createInput = {
+    name: newKeyName ?? DEFAULT_NEW_KEY_CONFIG.name,
+    accessMode: newKeyAccessMode,
+    scopes: newKeyScopes,
+    expiration: newKeyExpiration,
+  };
 
   const openPreconfiguredDialog = useEffectEvent(() => {
     openCreateDialog();
@@ -883,10 +919,14 @@ export function ApiKeysSettingsPane() {
     }
   };
 
-  const createErrorMessages = {
-    name: tCommon2("labels.nameIsRequired"),
-    scopes: t("validation.selectPermission"),
-    invalid: t("validation.invalidKey"),
+  const getCreateErrorMessage = (field: PropertyKey | undefined) => {
+    if (field === "name") {
+      return tCommon2("labels.nameIsRequired");
+    }
+    if (field === "scopes") {
+      return t("validation.selectPermission");
+    }
+    return t("validation.invalidKey");
   };
 
   const handleCreateSubmit = () => {
@@ -894,10 +934,7 @@ export function ApiKeysSettingsPane() {
     if (!result.success) {
       dispatchUi({
         type: "createErrorChanged",
-        createError:
-          createErrorMessages[
-            apiKeyCreateErrorField(result.error.issues[0]?.path[0])
-          ],
+        createError: getCreateErrorMessage(result.error.issues[0]?.path[0]),
       });
       return;
     }
@@ -917,23 +954,83 @@ export function ApiKeysSettingsPane() {
     },
   });
 
-  const {
-    create: mutation,
-    update: editMutation,
-    remove: deleteMutation,
-  } = useApiKeyMutations({
-    organizationId,
-    onCreated: (data) => {
+  const mutation = useMutation({
+    mutationFn: async (values: CreateApiKeyInput) => {
+      if (!organizationId) {
+        throw new Error(tCommon2("labels.organizationIdIsRequired"));
+      }
+
+      return dashboardOrpc.apiKeys.create.call({
+        organizationId,
+        ...values,
+      }) as Promise<CreateApiKeyResponse>;
+    },
+    onSuccess: (data) => {
       dispatchUi({ type: "createdKeyChanged", createdKey: data.key });
       dispatchUi({ type: "createErrorChanged", createError: null });
       setNewKeyConfig(null);
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.apiKeys.list.queryKey({
+          input: { organizationId: organizationId ?? "" },
+        }),
+      });
+      toast.success(t("toasts.created"));
     },
-    onUpdated: () => {
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const editMutation = useMutation({
+    mutationFn: async (values: UpdateApiKeyInput) => {
+      if (!organizationId) {
+        throw new Error(tCommon2("labels.organizationIdIsRequired"));
+      }
+
+      return dashboardOrpc.apiKeys.update.call({
+        organizationId,
+        keyIdParam: values.keyId,
+        payload: values,
+      }) as Promise<ApiKeyMutationResponse>;
+    },
+    onSuccess: () => {
       dispatchUi({ type: "editDialogChanged", open: false });
       editForm.reset();
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.apiKeys.list.queryKey({
+          input: { organizationId: organizationId ?? "" },
+        }),
+      });
+      toast.success(t("toasts.updated"));
     },
-    onDeleted: () => {
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (keyId: string) => {
+      if (!organizationId) {
+        throw new Error(tCommon2("labels.organizationIdIsRequired"));
+      }
+
+      return dashboardOrpc.apiKeys.delete.call({
+        organizationId,
+        keyIdParam: keyId,
+        payload: { keyId },
+      }) as Promise<ApiKeyMutationResponse>;
+    },
+    onSuccess: () => {
       dispatchUi({ type: "deletingKeyChanged", deletingKey: null });
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.apiKeys.list.queryKey({
+          input: { organizationId: organizationId ?? "" },
+        }),
+      });
+      toast.success(t("toasts.deleted"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
     },
   });
 
@@ -990,10 +1087,10 @@ export function ApiKeysSettingsPane() {
   };
 
   return (
-    <SettingsPane>
-      <div className="space-y-6">
+    <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+      <div className="w-full space-y-6 px-4 lg:px-6">
         <ApiKeysHeader
-          createDisabled={planLoading || !organizationId}
+          createDisabled={planLoading}
           onCreate={() => {
             openCreateDialog();
           }}
@@ -1003,7 +1100,7 @@ export function ApiKeysSettingsPane() {
 
         <ApiKeysTable
           actionsDisabled={editMutation.isPending || deleteMutation.isPending}
-          createDisabled={planLoading || !organizationId}
+          createDisabled={planLoading}
           isPending={isPending}
           keys={keys}
           onCreate={() => {
@@ -1018,16 +1115,14 @@ export function ApiKeysSettingsPane() {
           onEdit={openEditDialog}
         />
 
-        <AccountApiKeysSection />
+        {organizationId ? (
+          <TrackingTokenCard organizationId={organizationId} />
+        ) : null}
 
         <ApiKeyQuickStart
           onSelect={handlePresetSelect}
           organizationKeys={loadedKeys}
         />
-
-        {organizationId ? (
-          <TrackingTokenCard organizationId={organizationId} />
-        ) : null}
       </div>
 
       <CreateApiKeyDialog
@@ -1069,6 +1164,6 @@ export function ApiKeysSettingsPane() {
         }}
         onOpenChange={handleDeleteDialogClose}
       />
-    </SettingsPane>
+    </PageContainer>
   );
 }

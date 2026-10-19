@@ -38,15 +38,11 @@ export function getDashboardRedirect(request: Request): Response | undefined {
       );
     const slug = cookie?.slice(LAST_VISITED_ORGANIZATION_COOKIE.length + 1);
     if (slug && ORGANIZATION_COOKIE_SLUG_PATTERN.test(slug)) {
-      destination = `/${slug}`;
-      url.searchParams.set("settings", "api-keys");
+      destination = `/${slug}/api-keys`;
     }
   } else if (segments.length === 2) {
     const [slug, page] = segments;
-    if (page === "api-keys") {
-      destination = `/${slug}`;
-      url.searchParams.set("settings", "api-keys");
-    } else if (page === "settings" || page === "logs") {
+    if (page === "settings" || page === "logs") {
       destination = `/${slug}`;
       url.searchParams.set(
         "settings",

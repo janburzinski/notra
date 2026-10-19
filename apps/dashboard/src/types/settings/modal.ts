@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 
 export type SettingsSectionId =
   | "account"
+  | "account-api-keys"
   | "appearance"
-  | "api-keys"
   | "general"
   | "members"
   | "notifications"

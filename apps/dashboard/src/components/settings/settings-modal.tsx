@@ -16,8 +16,8 @@ import { cn } from "@notra/ui/lib/utils";
 import { type ComponentType, useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { AccountApiKeysSettingsPane } from "@/components/settings/panes/account-api-keys-pane";
 import { AccountSettingsPane } from "@/components/settings/panes/account-pane";
-import { ApiKeysSettingsPane } from "@/components/settings/panes/api-keys-pane";
 import { AppearanceSettingsPane } from "@/components/settings/panes/appearance-pane";
 import { AttachmentsSettingsPane } from "@/components/settings/panes/attachments-pane";
 import { BillingSettingsPane } from "@/components/settings/panes/billing-pane";
@@ -58,7 +58,7 @@ import {
 
 const STANDARD_SETTINGS_PANES = {
   account: AccountSettingsPane,
-  "api-keys": ApiKeysSettingsPane,
+  "account-api-keys": AccountApiKeysSettingsPane,
   appearance: AppearanceSettingsPane,
   attachments: AttachmentsSettingsPane,
   billing: BillingSettingsPane,
@@ -178,7 +178,7 @@ function SettingsModalSession({
 
   return (
     <SettingsHeaderProvider>
-      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
         <SettingsModalNav
           activeSection={activeSection}
           groups={groups}

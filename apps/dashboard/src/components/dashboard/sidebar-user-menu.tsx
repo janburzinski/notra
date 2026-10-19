@@ -5,6 +5,7 @@ import {
   Calendar03Icon,
   Logout01Icon,
   Message01Icon,
+  Settings01Icon,
   UserIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -113,6 +114,7 @@ export function SidebarUserMenu() {
   const t = useTranslations("nav.user");
   const tOrg = useTranslations("nav.orgSelector");
   const tCommon = useTranslations("common.labels");
+  const tSettings = useTranslations("settings.nav.sections");
   const { isMobile, state } = useSidebar();
   const { data: session, isPending } = authClient.useSession();
   const { setTheme, resolvedTheme } = useTheme();
@@ -199,6 +201,13 @@ export function SidebarUserMenu() {
                   <Kbd>{isApplePlatform ? "⌘" : "Ctrl"}</Kbd>
                   <Kbd>,</Kbd>
                 </KbdGroup>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={MENU_ITEM_CLASS}
+                onClick={() => openSettings("appearance")}
+              >
+                <HugeiconsIcon icon={Settings01Icon} />
+                {tSettings("appearance.label")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={MENU_ITEM_CLASS}

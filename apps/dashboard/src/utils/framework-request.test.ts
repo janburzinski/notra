@@ -14,7 +14,7 @@ describe("dashboard runtime redirects", () => {
     );
     expect(response?.status).toBe(307);
     expect(response?.headers.get("location")).toBe(
-      "/acme-team?source=settings&settings=api-keys"
+      "/acme-team/api-keys?source=settings"
     );
     for (const slug of ["", "//evil.example", "acme%2Fother", "acme.other"]) {
       expect(
