@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.20.5",
     "@types/tar-stream": "^3.1.5",
     "bun-types": "catalog:",
     "typescript": "catalog:"
