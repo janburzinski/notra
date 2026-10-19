@@ -246,7 +246,8 @@
     },
     "styling": {
       "default": {
-        "codeblocks": "system"
+        "codeblocks": "system",
+        "smartQuotes": true
       },
       "type": "object",
       "properties": {
@@ -276,6 +277,11 @@
               "required": ["light", "dark"]
             }
           ]
+        },
+        "smartQuotes": {
+          "default": true,
+          "description": "Turn straight quotes, apostrophes, dashes and ellipses into typographic ones. Set false to keep the characters exactly as written.",
+          "type": "boolean"
         }
       }
     },
@@ -1358,7 +1364,8 @@
     "security": {
       "default": {
         "contentSecurityPolicy": true,
-        "allowedOrigins": []
+        "allowedOrigins": [],
+        "webAssembly": false
       },
       "type": "object",
       "properties": {
@@ -1374,6 +1381,11 @@
             "type": "string",
             "pattern": "^(?:https|wss):\\/\\/(?:\\*\\.)?(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?$"
           }
+        },
+        "webAssembly": {
+          "default": false,
+          "description": "Let scripts compile WebAssembly, for runtimes like Rive or Lottie. Adds 'wasm-unsafe-eval' to script-src; JavaScript eval stays blocked.",
+          "type": "boolean"
         }
       },
       "additionalProperties": false

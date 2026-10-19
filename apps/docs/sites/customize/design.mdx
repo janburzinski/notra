@@ -85,6 +85,16 @@ To use your own font file, put it in `public/` and point `source` at it:
 
 `styling.codeblocks` picks the syntax theme. See [Code](/sites/components/code#syntax-theme).
 
+## Smart quotes
+
+Notra turns straight quotes and apostrophes into typographic ones as it builds your posts, so `"Hello"` becomes “Hello” and `it's` becomes it’s. `--` becomes an en dash and `...` an ellipsis. Code stays as written.
+
+If you move posts from another site and want the text to look exactly as before, turn it off:
+
+```json blog.json
+"styling": { "smartQuotes": false }
+```
+
 ## Your own CSS
 
 Every `.css` file in the site loads on every page after the theme, so it can override anything, whether it's `style.css`, `styles/brand.css` or `buttons.css` next to a component.
@@ -97,6 +107,8 @@ Every `.css` file in the site loads on every page after the theme, so it can ove
 The theme's colors are CSS variables that switch with light and dark mode, and you can use `--background`, `--foreground`, `--muted`, `--muted-foreground`, `--border`, `--accent`, `--card`, `--success`, `--warning`, `--info` and `--destructive`. `--accent` is your brand color for the current mode, while `--primary` always holds `colors.primary`. Use `html.dark` to style dark mode only.
 
 Tailwind classes also work in your MDX, header, footer and components.
+
+If you wrap your CSS in `@scope (.header)`, its rules apply to elements inside `.header` but not to `.header` itself, which is how `@scope` works in every browser. Style the root with `:scope { ... }` inside the block.
 
 ## Styling hooks
 

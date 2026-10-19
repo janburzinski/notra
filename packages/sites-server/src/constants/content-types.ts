@@ -22,5 +22,7 @@ export const CONTENT_TYPES: Record<string, string> = {
   mp4: "video/mp4",
   webm: "video/webm",
   pdf: "application/pdf",
+  wasm: "application/wasm",
+  riv: "application/octet-stream",
   map: JSON_CONTENT_TYPE,
 };

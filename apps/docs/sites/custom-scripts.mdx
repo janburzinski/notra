@@ -71,6 +71,18 @@ If your custom scripts or components load code from another host or call an API,
 
 Origins must start with `https://` or `wss://` and have no path, and `https://*.example.com` covers every subdomain. A `wss://` origin only allows connections rather than scripts, and you can list up to 32 origins.
 
+### WebAssembly
+
+Animation runtimes like [Rive](https://rive.app) compile WebAssembly, which the policy blocks by default. Allow it with `webAssembly`:
+
+```json blog.json
+{
+  "security": { "webAssembly": true }
+}
+```
+
+This adds `'wasm-unsafe-eval'` to the policy. JavaScript `eval` stays blocked. Put the `.wasm` and `.riv` files in `public/` so they load from your site, or add the runtime's CDN to `allowedOrigins`.
+
 To turn the policy off, set `contentSecurityPolicy` to `false`:
 
 ```json blog.json

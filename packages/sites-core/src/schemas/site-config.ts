@@ -153,8 +153,14 @@ export const siteConfigSchema = z.object({
           z.object({ light: shikiThemeName, dark: shikiThemeName }),
         ])
         .default("system"),
+      smartQuotes: z
+        .boolean()
+        .default(true)
+        .describe(
+          "Turn straight quotes, apostrophes, dashes and ellipses into typographic ones. Set false to keep the characters exactly as written."
+        ),
     })
-    .default({ codeblocks: "system" }),
+    .default({ codeblocks: "system", smartQuotes: true }),
   layout: siteLayoutSchema,
   banner: siteBannerSchema.optional(),
   navbar: siteNavbarSchema,

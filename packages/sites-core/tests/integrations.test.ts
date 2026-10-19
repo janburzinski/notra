@@ -102,6 +102,7 @@ describe("integrations schema", () => {
     expect(result.data?.security).toEqual({
       contentSecurityPolicy: true,
       allowedOrigins: [],
+      webAssembly: false,
     });
   });
 
@@ -461,6 +462,7 @@ describe("content security policy", () => {
       security: {
         contentSecurityPolicy: true,
         allowedOrigins: ["https://widget.example.com", "wss://ws.example.com"],
+        webAssembly: false,
       },
       scriptHashes: ["bbb=", "aaa=", "bbb="],
     });
@@ -484,7 +486,11 @@ describe("content security policy", () => {
             sessionRecording,
           },
         },
-        security: { contentSecurityPolicy: true, allowedOrigins: [] },
+        security: {
+          contentSecurityPolicy: true,
+          allowedOrigins: [],
+          webAssembly: false,
+        },
         scriptHashes: [],
       });
       expect(policy?.includes("worker-src 'self' blob: data:")).toBe(
@@ -496,17 +502,41 @@ describe("content security policy", () => {
     expect(
       buildSiteContentSecurityPolicy({
         integrations: {},
-        security: { contentSecurityPolicy: true, allowedOrigins: [] },
+        security: {
+          contentSecurityPolicy: true,
+          allowedOrigins: [],
+          webAssembly: false,
+        },
         scriptHashes: [],
       })
     ).not.toContain("worker-src");
+  });
+
+  test("WebAssembly is allowed only when blog.json opts in", () => {
+    for (const webAssembly of [false, true]) {
+      const policy = buildSiteContentSecurityPolicy({
+        integrations: {},
+        security: {
+          contentSecurityPolicy: true,
+          allowedOrigins: [],
+          webAssembly,
+        },
+        scriptHashes: [],
+      });
+      expect(policy?.includes("'wasm-unsafe-eval'")).toBe(webAssembly);
+      expect(policy).not.toContain("'unsafe-eval'");
+    }
   });
 
   test("turned off in blog.json", () => {
     expect(
       buildSiteContentSecurityPolicy({
         integrations: {},
-        security: { contentSecurityPolicy: false, allowedOrigins: [] },
+        security: {
+          contentSecurityPolicy: false,
+          allowedOrigins: [],
+          webAssembly: false,
+        },
         scriptHashes: ["aaa="],
       })
     ).toBeNull();

@@ -104,6 +104,8 @@ export const SITE_SOURCE_EXTENSIONS = [
   ".woff",
   ".woff2",
   ".css",
+  ".riv",
+  ".wasm",
 ] as const;
 
 export const SITE_INJECTED_REACT_HOOKS = [

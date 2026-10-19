@@ -20,6 +20,7 @@ export function buildSiteContentSecurityPolicy(
   ];
   const scriptSrc = [
     "'self'",
+    ...(params.security.webAssembly ? ["'wasm-unsafe-eval'"] : []),
     ...sortedUnique(params.scriptHashes).map((hash) => `'sha256-${hash}'`),
     ...sortedUnique(scriptOrigins),
   ];

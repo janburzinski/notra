@@ -149,5 +149,15 @@ export const siteSecuritySchema = z
       )
       .max(SITE_CSP_MAX_ALLOWED_ORIGINS)
       .default([]),
+    webAssembly: z
+      .boolean()
+      .default(false)
+      .describe(
+        "Let scripts compile WebAssembly, for runtimes like Rive or Lottie. Adds 'wasm-unsafe-eval' to script-src; JavaScript eval stays blocked."
+      ),
   })
-  .default({ contentSecurityPolicy: true, allowedOrigins: [] });
+  .default({
+    contentSecurityPolicy: true,
+    allowedOrigins: [],
+    webAssembly: false,
+  });

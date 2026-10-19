@@ -31,6 +31,17 @@ function shikiThemesFor(setting) {
     : setting;
 }
 const shikiThemes = shikiThemesFor(codeblocks);
+const smartQuotes = params.config.styling?.smartQuotes !== false;
+
+const markdownFeatures = {
+  name: "notra-markdown-features",
+  hooks: {
+    "astro:config:setup": ({ config }) => {
+      // Satteri reads its features lazily, so this covers .md and .mdx.
+      config.markdown.processor.options.features.smartPunctuation = smartQuotes;
+    },
+  },
+};
 
 export default defineConfig({
   site: params.publicOrigin,
@@ -48,6 +59,7 @@ export default defineConfig({
   devToolbar: { enabled: false },
   telemetry: false,
   integrations: [
+    markdownFeatures,
     mdx({ shikiConfig: { themes: shikiThemes, wrap: false } }),
     ...(params.hasReactComponents
       ? [(await import("@astrojs/react")).default()]

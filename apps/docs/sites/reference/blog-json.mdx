@@ -86,6 +86,7 @@ See [Design and CSS](/sites/customize/design).
 | `background.color` | `{ light?, dark? }` Colors | | Page color per mode |
 | `background.image` | Path, or `{ light, dark }` | | Page background image |
 | `styling.codeblocks` | `"system" \| "dark"`, a Shiki theme, or `{ light, dark }` | `"system"` | [Syntax theme](/sites/components/code#syntax-theme) |
+| `styling.smartQuotes` | boolean | `true` | Turn `"`, `'`, `--` and `...` into typographic quotes, dashes and ellipses. See [details](/sites/customize/design#smart-quotes) |
 | `layout.width` | 40 to 120 or `"full"` | `72` | Widest content column, in rem |
 
 ## Navigation
@@ -222,6 +223,7 @@ See [Content-Security-Policy](/sites/custom-scripts#content-security-policy).
 | --- | --- | --- | --- |
 | `security.contentSecurityPolicy` | boolean | `true` | Send a `Content-Security-Policy` header |
 | `security.allowedOrigins` | Up to 32 `https://` or `wss://` origins, `*.` wildcards allowed | `[]` | Extra hosts scripts may load from and connect to |
+| `security.webAssembly` | boolean | `false` | Let scripts compile WebAssembly, for runtimes like Rive. See [details](/sites/custom-scripts#webassembly) |
 
 ## Full example
 
