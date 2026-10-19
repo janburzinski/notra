@@ -42,6 +42,7 @@ import { APPEARANCE_OPTIONS } from "@/constants/appearance";
 import { flushTrackEvent } from "@/lib/analytics/posthog-client";
 import { authClient } from "@/lib/auth/client";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
+import { getUserAvatarUrl } from "@/utils/avatar";
 import { nameInitials } from "@/utils/name-initials";
 import { scheduleDemo } from "@/utils/schedule-demo";
 
@@ -155,7 +156,7 @@ export function SidebarUserMenu() {
                 <Avatar className="duration-normal size-8 shrink-0 rounded-lg transition-opacity group-data-[collapsible=icon]:group-hover/menu-button:opacity-80 group-data-[collapsible=icon]:group-data-popup-open/menu-button:opacity-80 after:rounded-lg">
                   <AvatarImage
                     className="rounded-lg"
-                    src={user.image || undefined}
+                    src={getUserAvatarUrl(user.image, user.email)}
                   />
                   <AvatarFallback className="bg-sidebar-accent rounded-lg">
                     {nameInitials(displayName, 1)}
