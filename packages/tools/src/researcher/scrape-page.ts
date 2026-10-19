@@ -1,14 +1,9 @@
-import { fetchWebpage } from "@notra/ai/utils/context-dev";
+import { Effect } from "effect";
 import { defineTool } from "eve/tools";
 
-import {
-  SCRAPE_MARKDOWN_MAX_LENGTH,
-  SCRAPE_PAGE_TIMEOUT_MS,
-} from "../constants/context-dev";
+import { SCRAPE_MARKDOWN_MAX_LENGTH } from "../constants/context-dev";
 import { webpageInputSchema } from "../schemas/research-tools";
-import { saveReferenceSnapshot } from "../utils/reference-snapshot";
-import { withTransientRetry } from "../utils/retry";
-import { isRetryableScrapeError } from "../utils/scrape";
+import { scrapePageEffect } from "../utils/scrape";
 
 export function createScrapePageTool() {
   return defineTool({
@@ -16,23 +11,9 @@ export function createScrapePageTool() {
       "Scrape a web page into clean markdown via context.dev. Use for company websites, blog posts, changelogs, and LinkedIn company pages.",
     inputSchema: webpageInputSchema,
     async execute({ url }, ctx) {
-      const page = await withTransientRetry(
-        () => fetchWebpage({ timeoutMS: SCRAPE_PAGE_TIMEOUT_MS, url }),
-        {
-          operationName: `Context.dev page scrape for ${url}`,
-          shouldRetry: isRetryableScrapeError,
-        }
+      return Effect.runPromise(
+        scrapePageEffect(url, ctx, SCRAPE_MARKDOWN_MAX_LENGTH)
       );
-      const snapshot = await saveReferenceSnapshot({
-        ctx,
-        markdown: page.markdown,
-      });
-      return {
-        url: page.url,
-        title: page.metadata?.title ?? null,
-        markdown: page.markdown.slice(0, SCRAPE_MARKDOWN_MAX_LENGTH),
-        ...(snapshot ?? {}),
-      };
     },
   });
 }

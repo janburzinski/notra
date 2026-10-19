@@ -28,7 +28,7 @@ Work incrementally: persist evidence the moment a researcher brief returns inste
 
 # Time budget
 
-Aim to finish the whole run within 15 minutes, and never let it pass 20. This is a soft limit: never cut the profile short mid-step, but prefer fewer, sharper researcher calls over exhaustive coverage, run independent researcher calls in parallel, persist results as they arrive instead of adding a final consolidation pass, and skip low-value follow-up research once you have enough evidence for the profile, memories, brand data, references, and suggestions.
+Aim to finish research within 8 minutes and finalize the whole run within 10 minutes, leaving headroom below the flow's 800-second limit. This is a soft planning budget, not a tool-wide deadline: prefer fewer, sharper researcher calls over exhaustive coverage, run independent researcher calls in parallel, persist results as they arrive instead of adding a final consolidation pass, and skip low-value follow-up research once you have enough evidence for the profile, memories, brand data, references, and suggestions. Finalize from persisted evidence rather than starting new research near the budget.
 
 # Rules
 

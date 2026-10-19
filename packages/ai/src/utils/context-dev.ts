@@ -33,6 +33,7 @@ import {
   BRAND_ANALYSIS_WWW_PREFIX,
   BRAND_SEARCH_TYPO_TOLERANCE,
   COMPETITORS_TIMEOUT_MS,
+  CONTEXT_DEV_FETCH_TIMEOUT_MS,
   CONTEXT_DEV_PARSE_TIMEOUT_MS,
 } from "../constants/context-dev";
 import { demoContextDevResponse } from "./demo-context-dev";
@@ -437,8 +438,19 @@ async function scrapeBrandAnalysisPages(urls: string[]) {
 }
 
 export async function fetchWebpage(
-  input: ContextDevFetchWebpageInput
+  input: ContextDevFetchWebpageInput,
+  options?: { signal?: AbortSignal }
 ): Promise<ContextDevFetchWebpageResponse> {
+  const timeoutMS = input.timeoutMS ?? CONTEXT_DEV_FETCH_TIMEOUT_MS;
+  if (
+    !Number.isSafeInteger(timeoutMS) ||
+    timeoutMS <= 0 ||
+    timeoutMS > 2_147_483_647
+  ) {
+    throw new RangeError(
+      "Webpage timeoutMS must be a positive finite timer duration"
+    );
+  }
   const url = normalizeContextDevWebsiteUrl(input.url);
   const params = new URLSearchParams({
     includeImages: String(input.includeImages ?? false),
@@ -454,22 +466,40 @@ export async function fetchWebpage(
   if (input.waitForMs !== undefined) {
     params.set("waitForMs", String(input.waitForMs));
   }
-  if (input.timeoutMS !== undefined) {
-    params.set("timeoutMS", String(input.timeoutMS));
+  params.set("timeoutMS", String(timeoutMS));
+  const controller = new AbortController();
+  const signal = options?.signal
+    ? AbortSignal.any([controller.signal, options.signal])
+    : controller.signal;
+  const timer = setTimeout(
+    () =>
+      controller.abort(
+        new DOMException("Webpage deadline exceeded", "TimeoutError")
+      ),
+    timeoutMS
+  );
+  try {
+    signal.throwIfAborted();
+    const response = await requestContextDev<{
+      markdown: string;
+      metadata?: ContextDevFetchWebpageResponse["metadata"];
+      url: string;
+    }>(`/web/scrape/markdown?${params.toString()}`, { method: "GET", signal });
+    signal.throwIfAborted();
+
+    return {
+      success: true,
+      markdown: response.markdown,
+      metadata: response.metadata,
+      url: response.url,
+    };
+  } catch (error) {
+    // Error-body decoding may otherwise replace cancellation with an HTTP error.
+    signal.throwIfAborted();
+    throw error;
+  } finally {
+    clearTimeout(timer);
   }
-
-  const response = await requestContextDev<{
-    markdown: string;
-    metadata?: ContextDevFetchWebpageResponse["metadata"];
-    url: string;
-  }>(`/web/scrape/markdown?${params.toString()}`, { method: "GET" });
-
-  return {
-    success: true,
-    markdown: response.markdown,
-    metadata: response.metadata,
-    url: response.url,
-  };
 }
 
 export async function crawlSitemap(
