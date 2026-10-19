@@ -5041,14 +5041,9 @@
       "defaultIdentity": "Default identity"
     },
     "suggestions": {
-      "reviewDescription": "Review the recommendation before creating this {kind, select, schedule {schedule} other {event automation}}.",
-      "whyThisFits": "Why this fits",
-      "create": "Create {kind, select, schedule {schedule} other {event automation}}",
       "dismissFailed": "Couldn't dismiss the suggestion",
       "dismissLabel": "Dismiss suggestion \"{title}\"",
-      "dismissTooltip": "Dismiss suggestion",
-      "viewDetails": "View details for \"{title}\"",
-      "clickToExpand": "Click to expand"
+      "dismissTooltip": "Dismiss suggestion"
     },
     "outputTypeLabels": {
       "blog_post": "Blog post",
@@ -5117,23 +5112,25 @@
         "description": "Pick a content type and a schedule. We'll handle the rest.",
         "nameHint": "Just for you, won't appear in any output.",
         "contentFormat": "Content format",
-        "contentFormatHint": "What should we generate?",
         "instructions": "Instructions",
         "instructionsHint": "Tell us what this schedule should write about. Brand voice still applies.",
         "instructionsPlaceholder": "e.g. Write a tutorial-style post that walks through one feature shipped in this window, with code samples.",
         "instructionsFooter": "Passed to the writer as extra guidance on every run.",
         "scheduleHint": "When should this run? Times use UTC.",
         "time": "Time",
-        "sourcesHint": "Pick which integrations we should pull activity from.",
         "searchIntegrations": "Search integrations",
         "noIntegrationsFound": "No integrations found.",
         "rules": "{type} rules",
         "rulesHint": "How far back we look and how the post should sound.",
-        "brandVoiceDescription": "Choose which brand voice to use for generated content.",
-        "brandVoiceDefaultDescription": "Use your default brand voice.",
         "autoPublish": "Auto-publish",
         "autoPublishHint": "When on, posts are published immediately instead of saved as drafts.",
-        "add": "Add schedule"
+        "add": "Add schedule",
+        "sentence": {
+          "draft": "Draft",
+          "from": "from"
+        },
+        "pickSources": "Pick sources",
+        "connectSource": "Connect a source"
       },
       "lookbackWindows": {
         "current_day": "Current day"
@@ -5169,6 +5166,13 @@
         "on": "on",
         "at": "at",
         "every": "every"
+      },
+      "frequencyShort": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "custom": "Every {days} days",
+        "notSet": "Not set"
       }
     },
     "events": {
@@ -5196,12 +5200,20 @@
         "description": "React to GitHub activity and generate content automatically.",
         "rulesHint": "Voice and publishing behavior for this trigger.",
         "add": "Add trigger",
-        "triggerEvent": "Trigger event",
-        "triggerEventHint": "When should this fire?",
         "includePreReleases": "Include pre-releases",
         "includePreReleasesHint": "When off, releases marked as pre-release on GitHub will not fire this trigger.",
-        "repositoriesHint": "Pick which repositories should fire this trigger.",
-        "noRepositories": "No GitHub repositories connected yet."
+        "trigger": "Trigger",
+        "triggerHint": "When it fires and what it drafts.",
+        "event": "Event",
+        "format": "Content format",
+        "repositories": "Repositories",
+        "pickRepositories": "Pick repositories",
+        "connectRepository": "Connect a repository",
+        "sentence": {
+          "when": "When",
+          "in": "in",
+          "draft": "draft"
+        }
       },
       "validation": {
         "repositoriesRequired": "Select at least one repository",
@@ -5218,23 +5230,21 @@
         }
       },
       "ignorePatterns": {
-        "typeToCheck": "Type a commit message to check it.",
-        "notSkipped": "Not skipped. Nothing matches.",
-        "skipped": "Skipped. Matches <code>{pattern}</code>.",
-        "label": "Ignore commits matching",
-        "addPrefix": "Add a prefix:",
-        "remove": "Remove {pattern}",
-        "add": "Add {pattern}",
-        "placeholder": "e.g. {example} (separated by comma)",
-        "hint": "If every commit in a push matches one of these, the push is skipped. Separate patterns with commas. Case doesn't matter.",
-        "tryLabel": "Try a commit message",
-        "tryPlaceholder": "e.g. chore: bump dependencies"
+        "label": "Skip pushes made only of",
+        "hint": "A push is skipped when every commit in it matches one of these. Prefixes match conventional commits like chore: or chore(deps):.",
+        "custom": "Custom patterns",
+        "placeholder": "e.g. {example}",
+        "skippedBy": "Skipped, matches <code>{pattern}</code>",
+        "notSkipped": "Not skipped, nothing matches",
+        "typeToCheck": "Type a commit message to test it",
+        "tryLabel": "Test a commit message",
+        "tryPlaceholder": "chore: bump dependencies"
       }
     },
     "metaTitle": "Automations",
     "page": {
       "title": "Automations",
-      "description": "Let Notra keep watch while you work: draft content when code ships, and get pinged the moment your AI visibility moves.",
+      "description": "Draft content when code ships and get alerted when your AI visibility moves.",
       "create": "New automation",
       "createMenu": {
         "alert": "GEO alert",
@@ -5274,7 +5284,6 @@
       "deleteTitle": "Delete automation?",
       "deleteDescription": "“{name}” stops running and is deleted. This can't be undone.",
       "delete": "Delete",
-      "createMore": "More ways to create",
       "filterLabel": "Filter automations",
       "empty": {
         "title": "No automations yet",
@@ -5427,7 +5436,7 @@
         "newTitle": "New GEO alert",
         "editTitle": "Edit GEO alert",
         "trigger": "Trigger",
-        "triggerHint": "When should this alert fire",
+        "triggerHint": "When should this alert fire?",
         "signal": "Signal",
         "atLeast": "at least",
         "project": "Project",
@@ -5435,7 +5444,7 @@
         "runsAfterScan": "Checked after every GEO scan, comparing it with the scan before.",
         "runsOnFailure": "Checked whenever a GEO scan stops without results.",
         "sendTo": "Send to",
-        "sendToHint": "Where the alert goes",
+        "sendToHint": "Where the alert goes.",
         "slackHint": "Posts to your Slack notification channel.",
         "slackMissing": "Slack isn't connected yet.",
         "connectSlack": "Connect Slack",
@@ -5444,7 +5453,7 @@
         "webhookHint": "{count, plural, one {Sends a POST request to 1 endpoint.} other {Sends a POST request to # endpoints.}}",
         "webhookMissing": "No webhook endpoint yet. Add one to receive alerts as POST requests.",
         "manageWebhooks": "Manage webhooks",
-        "pickDestination": "Pick at least one place to send the alert.",
+        "pickDestination": "Turn on at least one destination to create the alert.",
         "sendTest": "Send test",
         "testSent": "Test alert sent",
         "testFailed": "The test alert didn't reach any destination",
@@ -5455,7 +5464,8 @@
         "duplicate": "An alert for this signal and project already exists.",
         "decrease": "Decrease",
         "increase": "Increase",
-        "addEndpoint": "Add endpoint"
+        "addEndpoint": "Add endpoint",
+        "destinationsFailed": "Couldn't load where alerts can go."
       }
     },
     "templatesMetaTitle": "Automation templates",

@@ -12,6 +12,7 @@ import {
   Task01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { CUSTOM_SCHEDULE_DEFAULT_INTERVAL_DAYS } from "@notra/ai/constants/schedule-interval";
 import { GEO_ALERT_DEFAULT_THRESHOLDS } from "@notra/schemas/dashboard/automation/geo-alerts";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Badge } from "@notra/ui/components/ui/badge";
@@ -28,6 +29,12 @@ import {
 } from "@notra/ui/components/ui/dropdown-menu";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { Switch } from "@notra/ui/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@notra/ui/components/ui/tooltip";
+import { cn } from "@notra/ui/lib/utils";
 import type { ReactNode } from "react";
 import { useFormatter, useNow, useTranslations } from "use-intl";
 
@@ -82,17 +89,31 @@ export function AutomationsTable({
   const tAlerts = useTranslations("automation.alerts");
   const tEvents = useTranslations("automation.events.page");
   const tCommon = useTranslations("common");
+  const tFrequency = useTranslations("automation.schedules.frequencyShort");
   const format = useFormatter();
   const now = useNow({ updateInterval: 60_000 });
   const formatFrequency = useScheduleFrequencyLabel();
   const outputTypeLabel = useOutputTypeLabel();
   const nameOf = useAutomationRowName();
 
-  const triggerSummary = (row: AutomationRow) => {
+  // Paused rows stay readable but step back; the switch and menu keep full
+  // contrast so they still read as the way to turn the row back on.
+  const pausedClass = (row: AutomationRow) =>
+    rowEnabled(row) ? undefined : "opacity-50";
+
+  const triggerSummary = (
+    row: AutomationRow
+  ): { icon: IconSvgElement; label: string; detail?: string } => {
     if (row.kind === "schedule") {
+      const { cron } = row.trigger.sourceConfig;
       return {
         icon: Clock01Icon,
-        label: formatFrequency(row.trigger.sourceConfig.cron),
+        label: cron
+          ? tFrequency(cron.frequency, {
+              days: cron.intervalDays ?? CUSTOM_SCHEDULE_DEFAULT_INTERVAL_DAYS,
+            })
+          : tFrequency("notSet"),
+        detail: cron ? formatFrequency(cron) : undefined,
       };
     }
     if (row.kind === "event") {
@@ -129,7 +150,10 @@ export function AutomationsTable({
       minWidth: "12rem",
       cell: (row) => (
         <button
-          className="flex min-w-0 items-center gap-2.5 text-left outline-none focus-visible:underline"
+          className={cn(
+            "flex min-w-0 cursor-pointer items-center gap-2.5 text-left outline-none focus-visible:underline",
+            pausedClass(row)
+          )}
           onClick={() => onEdit(row)}
           type="button"
         >
@@ -148,11 +172,23 @@ export function AutomationsTable({
       header: t("columns.trigger"),
       width: "14rem",
       cell: (row) => {
-        const { icon, label } = triggerSummary(row);
+        const { icon, label, detail } = triggerSummary(row);
+        const badge = (
+          <Badge className="max-w-full" shape="rounded" variant="secondary">
+            <HugeiconsIcon icon={icon} />
+            <span className="truncate">{label}</span>
+          </Badge>
+        );
         return (
-          <span className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
-            <HugeiconsIcon className="size-4 shrink-0" icon={icon} />
-            <TruncateWithTooltip>{label}</TruncateWithTooltip>
+          <span className={cn("flex min-w-0", pausedClass(row))}>
+            {detail ? (
+              <Tooltip>
+                <TooltipTrigger render={badge} />
+                <TooltipContent>{detail}</TooltipContent>
+              </Tooltip>
+            ) : (
+              badge
+            )}
           </span>
         );
       },
@@ -164,7 +200,12 @@ export function AutomationsTable({
       cell: (row) => {
         const lastRun = lastRuns.get(row.id);
         return lastRun ? (
-          <span className="text-muted-foreground text-sm whitespace-nowrap tabular-nums">
+          <span
+            className={cn(
+              "text-muted-foreground text-sm whitespace-nowrap tabular-nums",
+              pausedClass(row)
+            )}
+          >
             {format.relativeTime(new Date(lastRun), latest(now, lastRun))}
           </span>
         ) : (
@@ -179,10 +220,12 @@ export function AutomationsTable({
       cell: (row) => {
         if (row.kind !== "alert") {
           return (
-            <Badge shape="rounded" variant="secondary">
-              <OutputTypeIcon outputType={row.trigger.outputType} />
-              {outputTypeLabel(row.trigger.outputType)}
-            </Badge>
+            <span className={cn("flex min-w-0", pausedClass(row))}>
+              <Badge shape="rounded" variant="secondary">
+                <OutputTypeIcon outputType={row.trigger.outputType} />
+                {outputTypeLabel(row.trigger.outputType)}
+              </Badge>
+            </span>
           );
         }
         const actions = (["slack", "email", "webhook"] as const).filter(
@@ -192,7 +235,7 @@ export function AutomationsTable({
         // icon-only with the name kept for hover and screen readers.
         const compact = actions.length > 1;
         return (
-          <span className="flex items-center gap-1">
+          <span className={cn("flex items-center gap-1", pausedClass(row))}>
             {actions.map((key) => {
               const label = tAlerts(`actionLabels.${key}`);
               return (
@@ -296,6 +339,9 @@ export function AutomationsTable({
       data={rows}
       emptyState={emptyState}
       getRowId={(row) => row.id}
+      onRowClick={onEdit}
+      // The name button already opens the row from the keyboard.
+      rowKeyboardActivation={false}
       height={
         rows.length === 0
           ? AUTOMATION_EMPTY_TABLE_HEIGHT

@@ -19,7 +19,7 @@ import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
-import { useLocale, useTranslations } from "use-intl";
+import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
@@ -36,6 +36,7 @@ import { PageContainer } from "@/components/layout/container";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { GeoScanControlsProvider } from "@/components/providers/geo-scan-controls-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { TabCount } from "@/components/tab-count";
 import {
   EMPTY_STATE_TABLE_COLUMNS,
   EMPTY_STATE_TABLE_ROWS,
@@ -55,26 +56,12 @@ import { useGeoRange } from "@/lib/hooks/use-geo-range";
 import { usePrefetchGeoLatestScanRun } from "@/lib/hooks/use-geo-scan-history";
 import { useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import type { PromptsPageTabCountProps } from "@/types/geo";
-import { formatCount } from "@/utils/format";
 import { withGeoProject } from "@/utils/geo-paths";
 
 import { GeoPromptsSkeleton } from "./skeleton";
 
 interface PageClientProps {
   organizationSlug: string;
-}
-
-function TabCount({ count }: PromptsPageTabCountProps) {
-  const locale = useLocale();
-  if (count === undefined || count === 0) {
-    return null;
-  }
-  return (
-    <span className="text-muted-foreground/70 text-xs font-normal tabular-nums">
-      {formatCount(count, locale)}
-    </span>
-  );
 }
 
 export default function PageClient({ organizationSlug }: PageClientProps) {

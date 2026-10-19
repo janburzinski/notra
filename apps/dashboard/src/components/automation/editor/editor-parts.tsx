@@ -131,22 +131,6 @@ export function EditorHeader({
   );
 }
 
-/** Single row inside an `EditorBox`: a hint on the left, an action on the right. */
-export function EditorRow({
-  children,
-  action,
-}: {
-  children: ReactNode;
-  action?: ReactNode;
-}) {
-  return (
-    <div className="flex min-h-12 items-center gap-3 px-4 py-3 text-sm">
-      <div className="text-muted-foreground min-w-0 flex-1">{children}</div>
-      {action}
-    </div>
-  );
-}
-
 /** Action bar at the end of the editor page. */
 export function EditorFooter({
   start,

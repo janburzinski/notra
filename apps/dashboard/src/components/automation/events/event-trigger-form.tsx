@@ -11,10 +11,8 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 import type { EventTriggerFormProps } from "@/types/automation/event-trigger";
 
 import { EventTriggerDialogFooter } from "./event-trigger-dialog-footer";
-import { EventTriggerEventSection } from "./event-trigger-event-section";
-import { EventTriggerFormatSection } from "./event-trigger-format-section";
-import { EventTriggerRepositoriesSection } from "./event-trigger-repositories-section";
 import { EventTriggerRulesSection } from "./event-trigger-rules-section";
+import { EventTriggerSection } from "./event-trigger-section";
 import { RepositoryConnectionDialogs } from "./repository-connection-dialogs";
 
 export function EventTriggerForm({
@@ -74,12 +72,17 @@ export function EventTriggerForm({
   const repos = githubIntegrations.flatMap((integration) =>
     integration.repositories.filter((repository) => repository.enabled)
   );
-  const integrationOptions = repos.map((repository) => ({
-    value: repository.id,
-    label: repository.defaultBranch
-      ? `${repository.owner}/${repository.repo} · ${repository.defaultBranch}`
-      : `${repository.owner}/${repository.repo}`,
-  }));
+  const integrationOptions = repos.map((repository) => {
+    const name = `${repository.owner}/${repository.repo}`;
+    return {
+      value: repository.id,
+      name,
+      type: "github" as const,
+      label: repository.defaultBranch
+        ? `${name} · ${repository.defaultBranch}`
+        : name,
+    };
+  });
   const githubIntegrationId = githubIntegrations[0]?.id;
 
   const formError = useStore(form.store, (state) => {
@@ -124,14 +127,13 @@ export function EventTriggerForm({
           onEnabledChange={setEnabled}
           title={isEditMode ? t("editTitle") : t("newTitle")}
         />
-        <EventTriggerEventSection form={form} kindPicker={kindPicker} />
-        <EventTriggerRepositoriesSection
+        <EventTriggerSection
           form={form}
           isLoading={isLoadingRepos}
+          kindPicker={kindPicker}
           onAddRepository={handleOpenAddRepoFlow}
           options={integrationOptions}
         />
-        <EventTriggerFormatSection form={form} />
         <EventTriggerRulesSection brandVoices={brandVoices} form={form} />
         <EventTriggerDialogFooter
           errorMessage={formError}

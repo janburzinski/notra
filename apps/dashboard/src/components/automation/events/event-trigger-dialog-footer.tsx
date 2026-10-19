@@ -1,4 +1,8 @@
-import { AlertCircleIcon } from "@hugeicons/core-free-icons";
+import {
+  Add01Icon,
+  AlertCircleIcon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useTranslations } from "use-intl";
 
@@ -26,7 +30,6 @@ export function EventTriggerDialogFooter({
       }
     >
       <Button
-        className="text-destructive hover:text-destructive"
         disabled={isPending}
         onClick={onCancel}
         type="button"
@@ -35,6 +38,10 @@ export function EventTriggerDialogFooter({
         {tCommon("cancel")}
       </Button>
       <Button loading={isPending} type="submit">
+        <HugeiconsIcon
+          className="size-4"
+          icon={isEditMode ? Tick02Icon : Add01Icon}
+        />
         {isEditMode ? tCommon("saveChanges") : t("add")}
       </Button>
     </EditorFooter>

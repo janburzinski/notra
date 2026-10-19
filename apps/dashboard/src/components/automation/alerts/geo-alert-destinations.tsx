@@ -1,5 +1,7 @@
 "use client";
 
+import { Alert02Icon, RefreshIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Label } from "@notra/ui/components/ui/label";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useTranslations } from "use-intl";
@@ -9,6 +11,7 @@ import {
   EditorBox,
   EditorSection,
 } from "@/components/automation/editor/editor-parts";
+import { Button } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import type {
@@ -21,12 +24,46 @@ export function GeoAlertDestinationsSection({
   destinations,
   onToggle,
   organizationSlug,
+  loadFailed,
+  onRetry,
+  retrying,
 }: GeoAlertDestinationsProps) {
   const t = useTranslations("automation.alerts");
   const tCommon = useTranslations("common");
   const { openSettings } = useSettingsModal();
   const slackBlocked = !destinations?.slackConnected;
   const webhookBlocked = !destinations?.webhookEndpointCount;
+
+  if (loadFailed) {
+    return (
+      <EditorSection hint={t("dialog.sendToHint")} label={t("dialog.sendTo")}>
+        <EditorBox>
+          <div
+            className="flex min-h-12 items-center gap-3 px-4 py-3"
+            role="alert"
+          >
+            <HugeiconsIcon
+              className="text-destructive size-4 shrink-0"
+              icon={Alert02Icon}
+            />
+            <p className="text-muted-foreground min-w-0 flex-1 text-sm">
+              {t("dialog.destinationsFailed")}
+            </p>
+            <Button
+              loading={retrying}
+              onClick={onRetry}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              <HugeiconsIcon className="size-3.5" icon={RefreshIcon} />
+              {tCommon("actions.tryAgain")}
+            </Button>
+          </div>
+        </EditorBox>
+      </EditorSection>
+    );
+  }
 
   return (
     <EditorSection hint={t("dialog.sendToHint")} label={t("dialog.sendTo")}>

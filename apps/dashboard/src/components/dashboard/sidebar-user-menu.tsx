@@ -5,6 +5,7 @@ import {
   Calendar03Icon,
   Logout01Icon,
   Message01Icon,
+  PaintBoardIcon,
   Settings01Icon,
   UserIcon,
 } from "@hugeicons/core-free-icons";
@@ -55,7 +56,11 @@ function ThemeMenuItem() {
   const { setTheme, theme } = useTheme();
 
   return (
-    <div className="flex items-center gap-2 py-0.5 pr-1 pl-2 text-sm">
+    <div className="flex min-h-8 items-center gap-2 py-0.5 pr-1 pl-2.5 text-sm">
+      <HugeiconsIcon
+        className="text-muted-foreground size-4 shrink-0"
+        icon={PaintBoardIcon}
+      />
       <span id="sidebar-theme-label">{t("theme")}</span>
       <MenuPrimitive.RadioGroup
         aria-labelledby="sidebar-theme-label"

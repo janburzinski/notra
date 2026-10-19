@@ -204,11 +204,6 @@ export interface WebhookSetupDialogProps {
   trigger?: React.ReactNode;
 }
 
-export interface AddRepositoryButtonProps {
-  onAdd?: () => void;
-  label?: string;
-}
-
 export interface CreateLinearIntegrationParams {
   organizationId: string;
   userId: string;

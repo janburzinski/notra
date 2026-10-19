@@ -29,6 +29,10 @@ export interface GeoAlertDestinationsProps {
   destinations?: GeoAlertDestinations;
   actions: GeoAlertActions;
   onToggle: (key: keyof GeoAlertActions, value: boolean) => void;
+  /** Loading the destinations failed; the rows would only guess. */
+  loadFailed?: boolean;
+  onRetry?: () => void;
+  retrying?: boolean;
 }
 
 export interface GeoAlertDestinationRowProps {

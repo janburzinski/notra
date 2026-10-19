@@ -5,14 +5,17 @@ import {
   AiBrowserIcon,
   Clock01Icon,
   GithubIcon,
+  ListViewIcon,
+  News01Icon,
+  PauseIcon,
   Task01Icon,
   ZapIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import type { IconSvgElement } from "@hugeicons/react";
 import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { Badge } from "@notra/ui/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,12 +30,13 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
-import { Kbd } from "@notra/ui/components/ui/kbd";
 import {
-  SplitButton,
-  SplitButtonTrigger,
-} from "@notra/ui/components/ui/split-button";
-import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Kbd } from "@notra/ui/components/ui/kbd";
+import { Tabs } from "@notra/ui/components/ui/tabs";
+import { cn } from "@notra/ui/lib/utils";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
@@ -45,6 +49,7 @@ import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { TabCount } from "@/components/tab-count";
 import {
   AUTOMATION_FILTERS,
   AUTOMATION_TEMPLATES,
@@ -67,6 +72,13 @@ import { AutomationPageSkeleton } from "./skeleton";
 interface PageClientProps {
   organizationSlug: string;
 }
+
+const FILTER_ICONS: Record<AutomationFilter, IconSvgElement> = {
+  all: ListViewIcon,
+  content: News01Icon,
+  alerts: AiBrowserIcon,
+  paused: PauseIcon,
+};
 
 function matchesFilter(row: AutomationRow, filter: AutomationFilter) {
   switch (filter) {
@@ -134,68 +146,38 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-8 px-4 lg:px-6">
         <PageHeading description={t("description")} title={t("title")}>
-          <div className="flex items-center gap-2">
-            <Link
-              className={buttonVariants({ variant: "outline" })}
-              href={`${basePath}/runs`}
-            >
-              <HugeiconsIcon className="size-4" icon={Task01Icon} />
-              {t("viewRuns")}
-            </Link>
-            <SplitButton>
-              <Button onClick={() => goToNew()}>
-                <HugeiconsIcon className="size-4" icon={Add01Icon} />
-                {t("create")}
-                <Kbd className="hidden sm:inline-flex">C</Kbd>
-              </Button>
-              <DropdownMenu
-                onOpenChange={setCreateMenuOpen}
-                open={createMenuOpen}
-              >
-                <SplitButtonTrigger label={t("createMore")} />
-                <DropdownMenuContent align="end" className="w-64">
-                  <CreateMenuItem
-                    description={t("createMenu.alertHint")}
-                    icon={AiBrowserIcon}
-                    label={t("createMenu.alert")}
-                    onClick={() => goToNew("?type=alert")}
-                  />
-                  <CreateMenuItem
-                    description={t("createMenu.scheduleHint")}
-                    icon={Clock01Icon}
-                    label={t("createMenu.schedule")}
-                    onClick={() => goToNew("?type=schedule")}
-                  />
-                  <CreateMenuItem
-                    description={t("createMenu.eventHint")}
-                    icon={GithubIcon}
-                    label={t("createMenu.event")}
-                    onClick={() => goToNew("?type=event")}
-                  />
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SplitButton>
-          </div>
+          <DropdownMenu onOpenChange={setCreateMenuOpen} open={createMenuOpen}>
+            <DropdownMenuTrigger
+              render={
+                <Button className="gap-1.5">
+                  <HugeiconsIcon className="size-4" icon={Add01Icon} />
+                  {t("create")}
+                  <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="end" className="w-64">
+              <CreateMenuItem
+                description={t("createMenu.alertHint")}
+                icon={AiBrowserIcon}
+                label={t("createMenu.alert")}
+                onClick={() => goToNew("?type=alert")}
+              />
+              <CreateMenuItem
+                description={t("createMenu.scheduleHint")}
+                icon={Clock01Icon}
+                label={t("createMenu.schedule")}
+                onClick={() => goToNew("?type=schedule")}
+              />
+              <CreateMenuItem
+                description={t("createMenu.eventHint")}
+                icon={GithubIcon}
+                label={t("createMenu.event")}
+                onClick={() => goToNew("?type=event")}
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </PageHeading>
-
-        {organizationId ? (
-          <>
-            <OnboardingSuggestions
-              onCreate={(suggestionId) => {
-                goToNew(`?type=schedule&suggestion=${suggestionId}`);
-              }}
-              organizationId={organizationId}
-              type="schedule_automation"
-            />
-            <OnboardingSuggestions
-              onCreate={(suggestionId) => {
-                goToNew(`?type=event&suggestion=${suggestionId}`);
-              }}
-              organizationId={organizationId}
-              type="event_automation"
-            />
-          </>
-        ) : null}
 
         {isPending ? <AutomationPageSkeleton /> : null}
 
@@ -209,23 +191,41 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
 
         {isPending || isError ? null : (
           <div className="space-y-3">
-            {rows.length === 0 ? null : (
-              <Tabs
-                onValueChange={(value) => setFilter(value as AutomationFilter)}
-                value={filter}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {rows.length === 0 ? null : (
+                <Tabs
+                  onValueChange={(value) =>
+                    setFilter(value as AutomationFilter)
+                  }
+                  value={filter}
+                >
+                  <IconTabsList aria-label={t("filterLabel")} value={filter}>
+                    {AUTOMATION_FILTERS.map((item) => (
+                      <IconTabsTrigger
+                        icon={
+                          <HugeiconsIcon icon={FILTER_ICONS[item]} size={15} />
+                        }
+                        key={item}
+                        value={item}
+                      >
+                        {t(`filters.${item}`)}
+                        <TabCount count={counts[item]} />
+                      </IconTabsTrigger>
+                    ))}
+                  </IconTabsList>
+                </Tabs>
+              )}
+              <Link
+                className={cn(
+                  buttonVariants({ size: "sm", variant: "outline" }),
+                  "ml-auto"
+                )}
+                href={`${basePath}/runs`}
               >
-                <TabsList aria-label={t("filterLabel")}>
-                  {AUTOMATION_FILTERS.map((item) => (
-                    <TabsTrigger key={item} value={item}>
-                      {t(`filters.${item}`)}
-                      <Badge size="sm" variant="secondary">
-                        {counts[item]}
-                      </Badge>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            )}
+                <HugeiconsIcon className="size-4" icon={Task01Icon} />
+                {t("viewRuns")}
+              </Link>
+            </div>
             <AutomationsTable
               busyId={busyId}
               lastRuns={lastRuns}
@@ -264,6 +264,16 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
             />
           </div>
         )}
+
+        {organizationId ? (
+          <OnboardingSuggestions
+            onCreate={(suggestionId, type) => {
+              const kind = type === "event_automation" ? "event" : "schedule";
+              goToNew(`?type=${kind}&suggestion=${suggestionId}`);
+            }}
+            organizationId={organizationId}
+          />
+        ) : null}
 
         <InstrumentSection
           action={

@@ -1,3 +1,4 @@
+import { onboardingSuggestionPresetSchema } from "@notra/ai/schemas/onboarding-agent";
 import { toneProfileSchema } from "@notra/ai/schemas/tone";
 import {
   applicablePlatformEnum,
@@ -54,6 +55,7 @@ export const addSuggestionInputSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1).optional(),
   evidence: z.string().min(1).optional(),
+  preset: onboardingSuggestionPresetSchema.optional(),
   data: z.record(z.string(), z.unknown()).optional(),
 });
 

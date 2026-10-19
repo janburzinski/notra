@@ -1,7 +1,6 @@
-import type { WebhookEventType } from "@notra/schemas/dashboard/integrations";
-
 import type { useEventTriggerForm } from "@/lib/hooks/use-event-trigger-form";
 import type { EventTriggerPreset } from "@/types/automation/automations";
+import type { SourceOption } from "@/types/automation/source-picker";
 import type { BrandSettings } from "@/types/hooks/brand-analysis";
 import type { Trigger } from "@/types/triggers/triggers";
 
@@ -17,12 +16,6 @@ export interface EventTriggerFormProps {
   preset?: EventTriggerPreset | null;
   /** Lets a new automation switch to another trigger kind. */
   kindPicker?: React.ReactNode;
-}
-
-export interface EventTypeCardProps {
-  eventType: WebhookEventType;
-  selected: boolean;
-  onSelect: () => void;
 }
 
 export interface TriggerSwitchRowProps {
@@ -59,16 +52,12 @@ export interface EventTriggerFormSectionProps {
   form: EventTriggerFormApi;
 }
 
-export interface RepositoryOption {
-  value: string;
-  label: string;
-}
-
-export interface EventTriggerRepositoriesSectionProps {
+export interface EventTriggerSectionProps {
   form: EventTriggerFormApi;
   isLoading: boolean;
-  options: RepositoryOption[];
+  options: SourceOption[];
   onAddRepository: () => void;
+  kindPicker?: React.ReactNode;
 }
 
 export interface EventTriggerRulesSectionProps {

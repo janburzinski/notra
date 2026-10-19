@@ -335,10 +335,6 @@ export interface PromptTagsDialogTarget {
   rows: GeoPromptTableRow[];
 }
 
-export interface PromptsPageTabCountProps {
-  count: number | undefined;
-}
-
 export interface ConversationRowActionsProps {
   sequence: GeoPromptSequence;
   isRunning: boolean;

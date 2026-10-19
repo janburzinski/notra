@@ -47,7 +47,8 @@ export function formatTimeValue(hour: number, minute: number): string {
 
 export function getDefaultScheduleValues(
   editTrigger?: Trigger,
-  presetId?: SchedulePresetId | null
+  presetId?: SchedulePresetId | null,
+  overrides?: Partial<ScheduleFormValues>
 ): ScheduleFormValues {
   if (editTrigger) {
     const supportedType: ScheduleOutputType =
@@ -84,6 +85,7 @@ export function getDefaultScheduleValues(
     lookbackWindow: preset?.lookbackWindow ?? "last_7_days",
     brandVoiceId: "",
     autoPublish: false,
+    ...overrides,
   };
 }
 

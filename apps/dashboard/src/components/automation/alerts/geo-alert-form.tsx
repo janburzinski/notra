@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Add01Icon,
   Layers01Icon,
   SentIcon,
   Tick02Icon,
@@ -272,7 +273,10 @@ function GeoAlertEditor({
       <GeoAlertDestinationsSection
         actions={actions}
         destinations={destinations}
+        loadFailed={destinationsQuery.isError}
+        onRetry={() => destinationsQuery.refetch()}
         onToggle={toggleAction}
+        retrying={destinationsQuery.isFetching}
         organizationSlug={organizationSlug}
       />
 
@@ -291,28 +295,18 @@ function GeoAlertEditor({
           ) : undefined
         }
         status={
-          destinationsQuery.isError ? (
-            <span className="text-destructive" role="alert">
-              {t("dialog.failed")}{" "}
-              <Button
-                disabled={destinationsQuery.isFetching}
-                onClick={() => destinationsQuery.refetch()}
-                size="sm"
-                type="button"
-                variant="link"
-              >
-                {tCommon("actions.tryAgain")}
-              </Button>
-            </span>
-          ) : hasAction || destinationsQuery.isPending ? null : (
-            <span className="text-destructive">
+          hasAction ||
+          destinationsQuery.isPending ||
+          destinationsQuery.isError ? null : (
+            // Guidance, not an error: the user only switched things off, and
+            // the disabled button already blocks saving.
+            <span className="text-muted-foreground">
               {t("dialog.pickDestination")}
             </span>
           )
         }
       >
         <Button
-          className="text-destructive hover:text-destructive"
           onClick={() => onOpenChange(false)}
           type="button"
           variant="outline"
@@ -320,6 +314,10 @@ function GeoAlertEditor({
           {tCommon("actions.cancel")}
         </Button>
         <Button disabled={!canSave} loading={save.isPending} type="submit">
+          <HugeiconsIcon
+            className="size-4"
+            icon={editAlert ? Tick02Icon : Add01Icon}
+          />
           {editAlert ? tCommon("actions.saveChanges") : t("dialog.create")}
         </Button>
       </EditorFooter>

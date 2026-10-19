@@ -5041,14 +5041,9 @@
       "defaultIdentity": "Standardidentität"
     },
     "suggestions": {
-      "reviewDescription": "Sieh dir die Empfehlung an, bevor du {kind, select, schedule {diesen Zeitplan} other {diese Event-Automatisierung}} erstellst.",
-      "whyThisFits": "Warum das passt",
-      "create": "{kind, select, schedule {Zeitplan} other {Event-Automatisierung}} erstellen",
       "dismissFailed": "Vorschlag konnte nicht verworfen werden",
       "dismissLabel": "Vorschlag „{title}“ verwerfen",
-      "dismissTooltip": "Vorschlag verwerfen",
-      "viewDetails": "Details zu „{title}“ ansehen",
-      "clickToExpand": "Zum Aufklappen klicken"
+      "dismissTooltip": "Vorschlag verwerfen"
     },
     "outputTypeLabels": {
       "blog_post": "Blogbeitrag",
@@ -5117,23 +5112,25 @@
         "description": "Wähle einen Inhaltstyp und einen Zeitplan. Den Rest erledigen wir.",
         "nameHint": "Nur für dich, erscheint in keiner Ausgabe.",
         "contentFormat": "Inhaltsformat",
-        "contentFormatHint": "Was sollen wir generieren?",
         "instructions": "Anweisungen",
         "instructionsHint": "Sag uns, worüber dieser Zeitplan schreiben soll. Die Markenstimme gilt weiterhin.",
         "instructionsPlaceholder": "z. B. Schreib einen Tutorial-Beitrag, der eine in diesem Zeitraum veröffentlichte Funktion mit Codebeispielen erklärt.",
         "instructionsFooter": "Wird bei jedem Durchlauf als zusätzliche Anweisung mitgegeben.",
         "scheduleHint": "Wann soll das laufen? Zeiten in UTC.",
         "time": "Uhrzeit",
-        "sourcesHint": "Wähle, aus welchen Integrationen wir Aktivität abrufen sollen.",
         "searchIntegrations": "Integrationen suchen",
         "noIntegrationsFound": "Keine Integrationen gefunden.",
         "rules": "Regeln für {type}",
         "rulesHint": "Wie weit wir zurückschauen und wie der Beitrag klingen soll.",
-        "brandVoiceDescription": "Wähle, welche Markenstimme für generierte Inhalte verwendet wird.",
-        "brandVoiceDefaultDescription": "Deine Standard-Markenstimme verwenden.",
         "autoPublish": "Automatisch veröffentlichen",
         "autoPublishHint": "Wenn aktiviert, werden Beiträge sofort veröffentlicht statt als Entwurf gespeichert.",
-        "add": "Zeitplan hinzufügen"
+        "add": "Zeitplan hinzufügen",
+        "sentence": {
+          "draft": "Erstelle",
+          "from": "aus"
+        },
+        "pickSources": "Quellen wählen",
+        "connectSource": "Quelle verbinden"
       },
       "lookbackWindows": {
         "current_day": "Aktueller Tag"
@@ -5169,6 +5166,13 @@
         "on": "am",
         "at": "um",
         "every": "alle"
+      },
+      "frequencyShort": {
+        "daily": "Täglich",
+        "weekly": "Wöchentlich",
+        "monthly": "Monatlich",
+        "custom": "Alle {days} Tage",
+        "notSet": "Nicht festgelegt"
       }
     },
     "events": {
@@ -5196,12 +5200,20 @@
         "description": "Reagiere auf GitHub-Aktivität und generiere Inhalte automatisch.",
         "rulesHint": "Stimme und Veröffentlichungsverhalten für diesen Trigger.",
         "add": "Trigger hinzufügen",
-        "triggerEvent": "Auslösendes Event",
-        "triggerEventHint": "Wann soll das ausgelöst werden?",
         "includePreReleases": "Pre-Releases einbeziehen",
         "includePreReleasesHint": "Wenn deaktiviert, lösen auf GitHub als Pre-Release markierte Releases diesen Trigger nicht aus.",
-        "repositoriesHint": "Wähle, welche Repositories diesen Trigger auslösen sollen.",
-        "noRepositories": "Noch keine GitHub-Repositories verbunden."
+        "trigger": "Trigger",
+        "triggerHint": "Wann er auslöst und was er erstellt.",
+        "event": "Ereignis",
+        "format": "Content-Format",
+        "repositories": "Repositories",
+        "pickRepositories": "Repositories wählen",
+        "connectRepository": "Repository verbinden",
+        "sentence": {
+          "when": "Wenn",
+          "in": "in",
+          "draft": "erstelle"
+        }
       },
       "validation": {
         "repositoriesRequired": "Wähle mindestens ein Repository aus",
@@ -5218,23 +5230,21 @@
         }
       },
       "ignorePatterns": {
-        "typeToCheck": "Gib eine Commit-Nachricht ein, um sie zu prüfen.",
-        "notSkipped": "Nicht übersprungen. Nichts passt.",
-        "skipped": "Übersprungen. Passt zu <code>{pattern}</code>.",
-        "label": "Commits ignorieren, die passen zu",
-        "addPrefix": "Präfix hinzufügen:",
-        "remove": "{pattern} entfernen",
-        "add": "{pattern} hinzufügen",
-        "placeholder": "z. B. {example} (durch Komma getrennt)",
-        "hint": "Wenn jeder Commit eines Pushs zu einem dieser Muster passt, wird der Push übersprungen. Trenne Muster mit Kommas. Groß- und Kleinschreibung spielt keine Rolle.",
+        "label": "Pushs überspringen, die nur enthalten",
+        "hint": "Ein Push wird übersprungen, wenn jeder Commit darin zu einem dieser Muster passt. Präfixe passen auf Conventional Commits wie chore: oder chore(deps):.",
+        "custom": "Eigene Muster",
+        "placeholder": "z. B. {example}",
+        "skippedBy": "Übersprungen, passt zu <code>{pattern}</code>",
+        "notSkipped": "Nicht übersprungen, nichts passt",
+        "typeToCheck": "Commit-Nachricht eingeben, um sie zu testen",
         "tryLabel": "Commit-Nachricht testen",
-        "tryPlaceholder": "z. B. chore: bump dependencies"
+        "tryPlaceholder": "chore: bump dependencies"
       }
     },
     "metaTitle": "Automationen",
     "page": {
       "title": "Automationen",
-      "description": "Notra passt auf, während du arbeitest: Inhalte entstehen, wenn Code live geht, und du erfährst sofort, wenn sich deine KI-Sichtbarkeit bewegt.",
+      "description": "Entwürfe, sobald Code live geht, und Alerts, wenn sich deine KI-Sichtbarkeit bewegt.",
       "create": "Neue Automation",
       "createMenu": {
         "alert": "GEO-Alert",
@@ -5274,7 +5284,6 @@
       "deleteTitle": "Automation löschen?",
       "deleteDescription": "„{name}“ wird gestoppt und gelöscht. Das kann nicht rückgängig gemacht werden.",
       "delete": "Löschen",
-      "createMore": "Weitere Optionen zum Erstellen",
       "filterLabel": "Automationen filtern",
       "empty": {
         "title": "Noch keine Automationen",
@@ -5427,7 +5436,7 @@
         "newTitle": "Neuer GEO-Alert",
         "editTitle": "GEO-Alert bearbeiten",
         "trigger": "Auslöser",
-        "triggerHint": "Wann soll der Alert auslösen",
+        "triggerHint": "Wann soll der Alert auslösen?",
         "signal": "Signal",
         "atLeast": "mindestens",
         "project": "Projekt",
@@ -5435,7 +5444,7 @@
         "runsAfterScan": "Wird nach jedem GEO-Scan geprüft, im Vergleich zum Scan davor.",
         "runsOnFailure": "Wird geprüft, wenn ein GEO-Scan ohne Ergebnis endet.",
         "sendTo": "Senden an",
-        "sendToHint": "Wohin der Alert geht",
+        "sendToHint": "Wohin der Alert geht.",
         "slackHint": "Postet in deinen Slack-Benachrichtigungskanal.",
         "slackMissing": "Slack ist noch nicht verbunden.",
         "connectSlack": "Slack verbinden",
@@ -5444,7 +5453,7 @@
         "webhookHint": "{count, plural, one {Sendet einen POST-Request an 1 Endpoint.} other {Sendet einen POST-Request an # Endpoints.}}",
         "webhookMissing": "Noch kein Webhook-Endpoint. Lege einen an, um Alerts als POST-Request zu erhalten.",
         "manageWebhooks": "Webhooks verwalten",
-        "pickDestination": "Wähle mindestens ein Ziel für den Alert.",
+        "pickDestination": "Schalte mindestens ein Ziel ein, um den Alert zu erstellen.",
         "sendTest": "Test senden",
         "testSent": "Test-Alert gesendet",
         "testFailed": "Der Test-Alert hat kein Ziel erreicht",
@@ -5455,7 +5464,8 @@
         "duplicate": "Für dieses Signal und Projekt gibt es schon einen Alert.",
         "decrease": "Verringern",
         "increase": "Erhöhen",
-        "addEndpoint": "Endpoint hinzufügen"
+        "addEndpoint": "Endpoint hinzufügen",
+        "destinationsFailed": "Konnte nicht laden, wohin Alerts gehen können."
       }
     },
     "templatesMetaTitle": "Automations-Vorlagen",

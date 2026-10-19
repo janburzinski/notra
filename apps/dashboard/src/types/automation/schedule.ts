@@ -17,6 +17,8 @@ export interface ScheduleFormProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   presetId?: SchedulePresetId | null;
+  /** Field values that win over the preset, e.g. from an agent suggestion. */
+  presetValues?: Partial<ScheduleFormValues>;
   /** Lets a new automation switch to another trigger kind. */
   kindPicker?: React.ReactNode;
 }
@@ -28,12 +30,6 @@ export interface ScheduleTriggerRowProps {
   onDayOfMonthChange: (day: number) => void;
   onIntervalDaysChange: (days: number | undefined) => void;
   onTimeChange: (hour: number, minute: number) => void;
-}
-
-export interface ScheduleIntegrationOption {
-  value: string;
-  label: string;
-  type: "github" | "linear";
 }
 
 export type SchedulePresetId =

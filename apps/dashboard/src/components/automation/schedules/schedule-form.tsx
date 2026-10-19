@@ -1,6 +1,10 @@
 "use client";
 
-import { AlertCircleIcon } from "@hugeicons/core-free-icons";
+import {
+  Add01Icon,
+  AlertCircleIcon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CUSTOM_SCHEDULE_DEFAULT_INTERVAL_DAYS } from "@notra/ai/constants/schedule-interval";
 import { toUtcDateString } from "@notra/ai/utils/schedule-interval";
@@ -9,31 +13,10 @@ import {
   LOOKBACK_WINDOWS,
   type LookbackWindow,
   MAX_SCHEDULE_INSTRUCTIONS_LENGTH,
+  type ScheduleOutputType,
   MAX_SCHEDULE_NAME_LENGTH,
 } from "@notra/schemas/dashboard/integrations";
-import {
-  Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-  useComboboxAnchor,
-} from "@notra/ui/components/ui/combobox";
-import { Label } from "@notra/ui/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@notra/ui/components/ui/select";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { Github } from "@notra/ui/components/ui/svgs/github";
-import { Linear } from "@notra/ui/components/ui/svgs/linear";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -43,19 +26,18 @@ import { useTranslations } from "use-intl";
 import {
   EditorBox,
   EditorFooter,
-  EditorRow,
   EditorHeader,
   EditorPad,
   EditorSection,
+  PickerSelect,
 } from "@/components/automation/editor/editor-parts";
-import { FormatPicker } from "@/components/automation/editor/format-picker";
+import { SourcePicker } from "@/components/automation/editor/source-picker";
 import { TriggerSwitchRow } from "@/components/automation/events/trigger-switch-row";
-import { BrandIdentityRadioGroup } from "@/components/brand-identity-radio-group";
 import { Button } from "@/components/button";
-import { AddRepositoryButton } from "@/components/integrations/add-repository-button";
 import { AddRepositoryDialog } from "@/components/integrations/add-repository-dialog";
 import { LegacyAddIntegrationDialog as AddIntegrationDialog } from "@/components/integrations/legacy/add-integration-dialog";
 import { OUTPUT_TYPE_LABEL_KEYS } from "@/constants/automation-output-types";
+import { FORMAT_ORDER } from "@/constants/content-formats";
 import { LOOKBACK_WINDOW_COMMON_LABEL_KEYS } from "@/constants/schedule";
 import { supportsAutoPublish } from "@/constants/schedule-output-types";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -63,8 +45,8 @@ import { createScheduleFormSchema } from "@/schemas/schedule-form";
 import type {
   ScheduleFormProps,
   ScheduleCron,
-  ScheduleIntegrationOption,
 } from "@/types/automation/schedule";
+import type { SourceOption } from "@/types/automation/source-picker";
 import type { Trigger } from "@/types/triggers/triggers";
 import { getOrpcErrorDataCode } from "@/utils/orpc-errors";
 import {
@@ -81,6 +63,7 @@ export function ScheduleForm({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   presetId,
+  presetValues,
   kindPicker,
 }: ScheduleFormProps) {
   const t = useTranslations("automation.schedules");
@@ -112,7 +95,6 @@ export function ScheduleForm({
 
   const [addRepoOpen, setAddRepoOpen] = useState(false);
   const [enabled, setEnabled] = useState(editTrigger?.enabled ?? true);
-  const comboboxAnchor = useComboboxAnchor();
 
   const mutation = useMutation<{ trigger: Trigger }, Error, ScheduleFormValues>(
     {
@@ -181,7 +163,11 @@ export function ScheduleForm({
   );
 
   const form = useForm({
-    defaultValues: getDefaultScheduleValues(editTrigger, presetId),
+    defaultValues: getDefaultScheduleValues(
+      editTrigger,
+      presetId,
+      presetValues
+    ),
     validators: {
       onSubmit: scheduleFormSchema,
     },
@@ -194,10 +180,10 @@ export function ScheduleForm({
 
   useEffect(() => {
     if (open) {
-      form.reset(getDefaultScheduleValues(editTrigger, presetId));
+      form.reset(getDefaultScheduleValues(editTrigger, presetId, presetValues));
       previousAutoNameRef.current = "";
     }
-  }, [open, editTrigger, presetId, form]);
+  }, [open, editTrigger, presetId, presetValues, form]);
 
   const outputType = useStore(form.store, (s) => s.values.outputType);
   const schedule = useStore(form.store, (s) => s.values.schedule);
@@ -253,16 +239,19 @@ export function ScheduleForm({
       i.repositories.filter((r) => r.enabled)
     );
 
-    const options: ScheduleIntegrationOption[] = [
-      ...repos.map((r) => ({
-        value: r.id,
-        label: r.defaultBranch
-          ? `${r.owner}/${r.repo} · ${r.defaultBranch}`
-          : `${r.owner}/${r.repo}`,
-        type: "github" as const,
-      })),
+    const options: SourceOption[] = [
+      ...repos.map((r) => {
+        const name = `${r.owner}/${r.repo}`;
+        return {
+          value: r.id,
+          name,
+          label: r.defaultBranch ? `${name} · ${r.defaultBranch}` : name,
+          type: "github" as const,
+        };
+      }),
       ...linearIntegrations.map((i) => ({
         value: `linear:${i.id}`,
+        name: i.displayName,
         label: i.displayName,
         type: "linear" as const,
       })),
@@ -320,6 +309,37 @@ export function ScheduleForm({
     return null;
   });
 
+  let sources = (
+    <form.Field name="repositoryIds">
+      {(field) => (
+        <SourcePicker
+          ariaLabel={tCommon("labels.sources")}
+          emptyLabel={t("dialog.noIntegrationsFound")}
+          invalid={field.state.meta.errors.length > 0}
+          onChange={field.handleChange}
+          options={integrationOptions}
+          placeholder={t("dialog.pickSources")}
+          searchPlaceholder={t("dialog.searchIntegrations")}
+          value={field.state.value}
+        />
+      )}
+    </form.Field>
+  );
+  if (isLoadingRepos) {
+    sources = <Skeleton className="h-8 w-40 rounded-lg" />;
+  } else if (integrationOptions.length === 0) {
+    sources = (
+      <button
+        className="bg-muted hover:bg-muted/70 duration-fast focus-visible:ring-ring/50 inline-flex h-8 items-center gap-2 rounded-lg px-3 text-sm transition-colors outline-none focus-visible:ring-[3px]"
+        onClick={() => setAddRepoOpen(true)}
+        type="button"
+      >
+        <HugeiconsIcon className="size-3.5" icon={Add01Icon} />
+        {t("dialog.connectSource")}
+      </button>
+    );
+  }
+
   return (
     <>
       <form
@@ -372,6 +392,30 @@ export function ScheduleForm({
                 schedule={schedule}
               />
             </EditorPad>
+            <div className="flex flex-wrap items-center gap-2 px-4 py-3 text-sm">
+              <span className="text-muted-foreground">
+                {t("dialog.sentence.draft")}
+              </span>
+              <form.Field name="outputType">
+                {(field) => (
+                  <PickerSelect
+                    ariaLabel={t("dialog.contentFormat")}
+                    onChange={(next) =>
+                      field.handleChange(next as ScheduleOutputType)
+                    }
+                    options={FORMAT_ORDER.map((type) => ({
+                      value: type,
+                      label: tCommon(`labels.${OUTPUT_TYPE_LABEL_KEYS[type]}`),
+                    }))}
+                    value={field.state.value}
+                  />
+                )}
+              </form.Field>
+              <span className="text-muted-foreground">
+                {t("dialog.sentence.from")}
+              </span>
+              {sources}
+            </div>
             {kindPicker}
           </EditorBox>
         </EditorSection>
@@ -412,187 +456,55 @@ export function ScheduleForm({
         </EditorSection>
 
         <EditorSection
-          hint={t("dialog.contentFormatHint")}
-          label={t("dialog.contentFormat")}
-        >
-          <EditorBox>
-            <form.Field name="outputType">
-              {(field) => (
-                <FormatPicker
-                  onChange={field.handleChange}
-                  value={field.state.value}
-                />
-              )}
-            </form.Field>
-          </EditorBox>
-        </EditorSection>
-
-        <EditorSection
-          hint={t("dialog.sourcesHint")}
-          label={tCommon("labels.sources")}
-        >
-          <EditorBox>
-            {!isLoadingRepos && integrationOptions.length === 0 ? (
-              <EditorRow
-                action={
-                  <AddRepositoryButton
-                    onAdd={() => {
-                      setAddRepoOpen(true);
-                    }}
-                  />
-                }
-              >
-                {tCommon("labels.noIntegrationsConnectedYet")}
-              </EditorRow>
-            ) : (
-              <EditorPad>
-                {isLoadingRepos && <Skeleton className="h-10 w-full" />}
-                {!isLoadingRepos && integrationOptions.length > 0 && (
-                  <form.Field name="repositoryIds">
-                    {(field) => (
-                      <div ref={comboboxAnchor}>
-                        <Combobox
-                          items={integrationOptions.map((o) => o.value)}
-                          multiple
-                          onValueChange={(value) =>
-                            field.handleChange(
-                              Array.isArray(value) ? value : []
-                            )
-                          }
-                          value={field.state.value}
-                        >
-                          <ComboboxChips>
-                            {field.state.value.map((id) => {
-                              const opt = integrationOptions.find(
-                                (o) => o.value === id
-                              );
-                              if (!opt) {
-                                return null;
-                              }
-                              return (
-                                <ComboboxChip
-                                  className="max-w-full"
-                                  key={opt.value}
-                                >
-                                  <span className="flex min-w-0 items-center gap-1.5">
-                                    {opt.type === "github" ? (
-                                      <Github className="size-3 shrink-0" />
-                                    ) : (
-                                      <Linear className="size-3 shrink-0" />
-                                    )}
-                                    <span
-                                      className="truncate"
-                                      title={opt.label}
-                                    >
-                                      {opt.label}
-                                    </span>
-                                  </span>
-                                </ComboboxChip>
-                              );
-                            })}
-                            <ComboboxChipsInput
-                              placeholder={t("dialog.searchIntegrations")}
-                            />
-                            <ComboboxTrigger className="ml-auto flex shrink-0 items-center self-center" />
-                          </ComboboxChips>
-                          <ComboboxContent anchor={comboboxAnchor.current}>
-                            <ComboboxEmpty>
-                              {t("dialog.noIntegrationsFound")}
-                            </ComboboxEmpty>
-                            <ComboboxList>
-                              {integrationOptions.map((opt) => (
-                                <ComboboxItem key={opt.value} value={opt.value}>
-                                  <span className="flex min-w-0 items-center gap-2">
-                                    {opt.type === "github" ? (
-                                      <Github className="size-3.5 shrink-0" />
-                                    ) : (
-                                      <Linear className="size-3.5 shrink-0" />
-                                    )}
-                                    <span
-                                      className="truncate"
-                                      title={opt.label}
-                                    >
-                                      {opt.label}
-                                    </span>
-                                  </span>
-                                </ComboboxItem>
-                              ))}
-                            </ComboboxList>
-                          </ComboboxContent>
-                        </Combobox>
-                      </div>
-                    )}
-                  </form.Field>
-                )}
-              </EditorPad>
-            )}
-          </EditorBox>
-        </EditorSection>
-
-        <EditorSection
           hint={t("dialog.rulesHint")}
           label={t("dialog.rules", {
             type: tCommon(`labels.${OUTPUT_TYPE_LABEL_KEYS[outputType]}`),
           })}
         >
           <EditorBox>
-            <EditorPad>
+            <div className="flex min-h-12 items-center justify-between gap-3 px-4 py-2.5">
+              <span className="text-sm font-medium">
+                {tCommon("labels.lookbackWindow")}
+              </span>
               <form.Field name="lookbackWindow">
                 {(field) => (
-                  <div className="space-y-2">
-                    <Label
-                      className="text-muted-foreground text-xs"
-                      htmlFor="schedule-lookback"
-                    >
-                      {tCommon("labels.lookbackWindow")}
-                    </Label>
-                    <Select
-                      onValueChange={(value) => {
-                        if (value) {
-                          field.handleChange(value as LookbackWindow);
-                        }
-                      }}
-                      value={field.state.value}
-                    >
-                      <SelectTrigger className="w-full" id="schedule-lookback">
-                        <SelectValue
-                          placeholder={tCommon("labels.lookbackWindow")}
-                        >
-                          <span>{lookbackLabel(field.state.value)}</span>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LOOKBACK_WINDOWS.map((window) => (
-                          <SelectItem key={window} value={window}>
-                            <span>{lookbackLabel(window)}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <PickerSelect
+                    ariaLabel={tCommon("labels.lookbackWindow")}
+                    onChange={(next) =>
+                      field.handleChange(next as LookbackWindow)
+                    }
+                    options={LOOKBACK_WINDOWS.map((window) => ({
+                      value: window,
+                      label: lookbackLabel(window),
+                    }))}
+                    value={field.state.value}
+                  />
                 )}
               </form.Field>
-
-              {brandVoices.length > 1 && (
+            </div>
+            {brandVoices.length > 1 && (
+              <div className="flex min-h-12 items-center justify-between gap-3 px-4 py-2.5">
+                <span className="text-sm font-medium">
+                  {tCommon("labels.brandVoice")}
+                </span>
                 <form.Field name="brandVoiceId">
                   {(field) => (
-                    <BrandIdentityRadioGroup
-                      description={t("dialog.brandVoiceDescription")}
-                      emptyOption={{
-                        label: defaultBrandVoiceLabel,
-                        description: t("dialog.brandVoiceDefaultDescription"),
-                        voice: defaultBrandVoice,
-                      }}
-                      id={field.name}
-                      label={tCommon("labels.brandVoice")}
+                    <PickerSelect
+                      ariaLabel={tCommon("labels.brandVoice")}
                       onChange={field.handleChange}
+                      options={[
+                        { value: "", label: defaultBrandVoiceLabel },
+                        ...nonDefaultBrandVoices.map((voice) => ({
+                          value: voice.id,
+                          label: voice.name,
+                        })),
+                      ]}
                       value={field.state.value}
-                      voices={nonDefaultBrandVoices}
                     />
                   )}
                 </form.Field>
-              )}
-            </EditorPad>
+              </div>
+            )}
             {supportsAutoPublish(outputType) && (
               <form.Field name="autoPublish">
                 {(field) => (
@@ -620,7 +532,6 @@ export function ScheduleForm({
           }
         >
           <Button
-            className="text-destructive hover:text-destructive"
             disabled={mutation.isPending}
             onClick={() => setOpen(false)}
             type="button"
@@ -629,6 +540,10 @@ export function ScheduleForm({
             {tCommon("actions.cancel")}
           </Button>
           <Button loading={mutation.isPending} type="submit">
+            <HugeiconsIcon
+              className="size-4"
+              icon={isEditMode ? Tick02Icon : Add01Icon}
+            />
             {isEditMode ? tCommon("actions.saveChanges") : t("dialog.add")}
           </Button>
         </EditorFooter>

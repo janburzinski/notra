@@ -88,7 +88,7 @@ export function ScheduleTriggerRow({
     frequency === "monthly" ? skipNoteKey(dayOfMonth ?? 1) : null;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
         <HugeiconsIcon
           className="text-muted-foreground size-4 shrink-0"
@@ -170,18 +170,20 @@ export function ScheduleTriggerRow({
           value={formatTimeValue(hour, minute)}
         />
         <span className="text-muted-foreground">UTC</span>
-        {nextRun && now ? (
-          <span className="text-muted-foreground ml-auto text-sm">
-            {t("summary.nextRun", {
-              date: nextRunDate(nextRun),
-              relative: relative(nextRun, now),
-            })}{" "}
-            <span className="text-muted-foreground/70">
-              · {getLocalTimezone()}
-            </span>
-          </span>
-        ) : null}
       </div>
+      {/* Own line, so it sits in the same place for every frequency instead
+          of wrapping whenever the controls above get wider. */}
+      {nextRun && now ? (
+        <p className="text-muted-foreground pl-6 text-xs">
+          {t("summary.nextRun", {
+            date: nextRunDate(nextRun),
+            relative: relative(nextRun, now),
+          })}{" "}
+          <span className="text-muted-foreground/70">
+            · {getLocalTimezone()}
+          </span>
+        </p>
+      ) : null}
       {skipNote ? (
         <p className="text-muted-foreground pl-6 text-xs">
           {t(`dayPicker.skipNotes.${skipNote}`)}
