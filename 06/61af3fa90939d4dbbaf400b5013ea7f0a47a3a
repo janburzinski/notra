@@ -1,0 +1,45 @@
+scripts/testing/dashboard/run.ts
+  s_44cf84a7c2985f::t_c931de2fb11478 31-33,36-43,78,80-84,220,223-227,230,237-245,247-248,252,403-410
+  s_44cf84a7c2985f::t_0e834479b63299 233-234
+  s_44cf84a7c2985f::t_499891cfea1f4f 20-24,79,221-222
+.github/workflows/sites-e2e.yml
+  s_44cf84a7c2985f::t_8fb1429243417e 22,42-43,70-72,74-75,78-84,109,116
+scripts/testing/dashboard/README.md
+  s_44cf84a7c2985f::t_3b3fdfa9b2fcea 37-78
+apps/sites-e2e/tests/utils/lifecycle-github.ts
+  s_44cf84a7c2985f::t_d84fb2d9771ad5 1-109
+apps/sites-e2e/README.md
+  s_44cf84a7c2985f::t_3b3fdfa9b2fcea 12-15,49-53
+apps/sites-e2e/tests/utils/lifecycle-compiler.ts
+  s_44cf84a7c2985f::t_fde3b05fa98e82 40-41,50-51,66
+scripts/testing/dashboard/utils/box-snapshot.ts
+  s_44cf84a7c2985f::t_c931de2fb11478 68-70
+  s_44cf84a7c2985f::t_499891cfea1f4f 8-10,26,72-96
+  s_44cf84a7c2985f::t_5c630295291cf4 1-7,11-25,27-67,71,97
+apps/sites-e2e/tests/connected-lifecycle-postgres.test.ts
+  s_44cf84a7c2985f::t_ef1485f22f8ff1 96,98
+  s_44cf84a7c2985f::t_e3d3c4ce1d89d6 452-456
+  s_44cf84a7c2985f::t_e4fa0896145343 11-14,18,21-30,57-66,89-95,97,99-100,121,134-147,186-189,444,543-544
+  s_44cf84a7c2985f::t_a763ba35db9794 468
+  s_44cf84a7c2985f::t_cf25824e6a3b89 178-183
+  s_44cf84a7c2985f::t_0bd45ecbcb7b40 34,47-48,54,198,296-297,438-443,445-451,457-467,469-507,529-542,545-546,550-559,574
+  s_44cf84a7c2985f::t_c00a0fabf869df 116-120,132-133
+apps/sites-builder/scripts/create-box-snapshot.ts
+  s_44cf84a7c2985f::t_44dd6f441d4f90 19-20,50,52,91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0661af3fa90939d4dbbaf400b5013ea7f0a47a3a",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
