@@ -2,16 +2,25 @@
 
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { PROMPTS_TABLE_ROW_HEIGHT } from "@notra/geo-core/constants/geo";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { PageContainer } from "@/components/layout/container";
 
 const PROMPT_ROW_COUNT = 6;
+/** Prompt, mentioned instead, presence, actions (after the checkbox). */
+const PROMPT_COLUMN_WIDTHS: readonly DataTableSkeletonColumn[] = [
+  { width: "1fr", minWidth: "10rem" },
+  { width: "16rem", minWidth: "10rem" },
+  { width: "10rem", minWidth: "10rem" },
+  { width: "3.5rem", minWidth: "3.5rem", align: "right" },
+];
 
 export function GeoPromptsSkeleton() {
   const t = useTranslations("geo.pages.prompts");
@@ -33,12 +42,23 @@ export function GeoPromptsSkeleton() {
           </div>
         </PageHeading>
         <div className="flex items-center justify-between gap-3">
-          <Skeleton className="h-8 w-md max-w-full rounded-lg" />
-          <Skeleton className="h-7 w-28 rounded-lg" />
+          <Skeleton className="h-8 w-[27.25rem] max-w-full rounded-lg" />
+          <Skeleton className="h-7 w-[8.625rem] rounded-md" />
         </div>
         <div className="space-y-3">
-          <Skeleton className="h-9 w-full rounded-md sm:max-w-72" />
-          <DataTableSkeleton rows={PROMPT_ROW_COUNT} />
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Skeleton className="h-8 w-full min-w-0 rounded-md sm:w-72" />
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Skeleton className="h-7 w-36 rounded-md" />
+              <Skeleton className="h-7 w-36 rounded-md" />
+            </div>
+          </div>
+          <DataTableSkeleton
+            columnWidths={PROMPT_COLUMN_WIDTHS}
+            rowHeight={PROMPTS_TABLE_ROW_HEIGHT}
+            rows={PROMPT_ROW_COUNT}
+            selectable
+          />
         </div>
       </div>
     </PageContainer>

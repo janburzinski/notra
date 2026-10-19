@@ -293,3 +293,8 @@ export interface GuidelinesActionButtonProps {
   label: string;
   onClick: () => void;
 }
+
+export interface BrandSkeletonFieldProps {
+  label: string;
+  tall?: boolean;
+}

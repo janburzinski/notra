@@ -2,8 +2,18 @@
 
 import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 
-import { COLLECTION_TABLE_SKELETON_ROWS } from "@/constants/content-collections";
+import {
+  COLLECTION_TABLE_ROW_HEIGHT,
+  COLLECTION_TABLE_SKELETON_COLUMNS,
+  COLLECTION_TABLE_SKELETON_ROWS,
+} from "@/constants/content-collections";
 
 export function CollectionsPageSkeleton() {
-  return <DataTableSkeleton rows={COLLECTION_TABLE_SKELETON_ROWS} />;
+  return (
+    <DataTableSkeleton
+      columnWidths={COLLECTION_TABLE_SKELETON_COLUMNS}
+      rowHeight={COLLECTION_TABLE_ROW_HEIGHT}
+      rows={COLLECTION_TABLE_SKELETON_ROWS}
+    />
+  );
 }

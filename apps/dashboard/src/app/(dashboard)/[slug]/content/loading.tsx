@@ -2,9 +2,12 @@ import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useTranslations } from "use-intl";
 
+import { CreateContentButtonGroup } from "@/components/content/create-content-button-group";
 import { PageContainer } from "@/components/layout/container";
 
 import { CollectionsPageSkeleton } from "./skeleton";
+
+function noop() {}
 
 export default function Loading() {
   const t = useTranslations("content.list");
@@ -16,14 +19,15 @@ export default function Loading() {
           description={t("description")}
           title={tCommon("labels.content")}
         >
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-9 w-[6.75rem] rounded-md" />
-            <Skeleton className="h-9 w-[11.75rem] rounded-md" />
-          </div>
+          <CreateContentButtonGroup
+            disabled
+            onCreateContent={noop}
+            onCreatePost={noop}
+          />
         </PageHeading>
         <div className="space-y-3">
           <div className="flex min-h-8 items-center">
-            <Skeleton className="h-8 w-56 rounded-md" />
+            <Skeleton className="h-8 w-[14.125rem] rounded-lg" />
           </div>
           <CollectionsPageSkeleton />
         </div>

@@ -37,22 +37,25 @@ function DataTableSkeleton({
   columnWidths = TABLE_SKELETON_COLUMN_WIDTHS,
   rows = TABLE_SKELETON_ROW_COUNT,
   rowHeight = TABLE_SKELETON_ROW_HEIGHT,
+  height,
+  selectable = false,
   toolbar,
   className,
 }: DataTableSkeletonProps) {
   return (
     <DataTableRoot
       className={className}
-      columns={columnWidths.map((width, index) => ({
+      columns={columnWidths.map((column, index) => ({
+        ...(typeof column === "string" ? { width: column } : column),
         key: `skeleton-column-${String(index)}`,
         header: <Skeleton className="h-3.5 w-16" />,
-        width,
       }))}
       data={[]}
-      height={(rows + 1) * rowHeight}
+      height={height ?? (rows + 1) * rowHeight}
       loading
       rowHeight={rowHeight}
       scrollFade={false}
+      selectable={selectable}
       toolbar={toolbar}
     />
   );

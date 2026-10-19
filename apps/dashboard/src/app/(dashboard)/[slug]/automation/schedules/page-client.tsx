@@ -58,6 +58,7 @@ import {
   EMPTY_STATE_TABLE_COLUMNS,
   EMPTY_STATE_TABLE_ROWS,
 } from "@/constants/empty-state";
+import { SCHEDULE_TABLE_ROW_HEIGHT } from "@/constants/schedule";
 import { useCreateFromSuggestion } from "@/lib/hooks/use-onboarding";
 import { useOutputTypeLabel } from "@/lib/hooks/use-output-type-label";
 import { useScheduleFrequencyLabel } from "@/lib/hooks/use-schedule-frequency-label";
@@ -652,8 +653,6 @@ function ScheduleDeleteDialog({
     />
   );
 }
-
-const SCHEDULE_TABLE_ROW_HEIGHT = 48;
 
 function ScheduleTable({
   triggers,

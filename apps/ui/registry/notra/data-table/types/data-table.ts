@@ -214,10 +214,22 @@ export interface HeaderCellRefs {
   current: Record<string, HTMLTableCellElement | null>;
 }
 
+/** Layout of one skeleton column: a CSS width, or the sizing fields of the real column. */
+export type DataTableSkeletonColumn =
+  | string
+  | Pick<
+      TableColumn<unknown>,
+      "width" | "minWidth" | "collapsePriority" | "align"
+    >;
+
 export interface DataTableSkeletonProps {
-  columnWidths?: readonly string[];
+  columnWidths?: readonly DataTableSkeletonColumn[];
   rows?: number;
   rowHeight?: number;
+  /** Fixed table height; defaults to the header plus `rows` rows. */
+  height?: number;
+  /** Reserve the checkbox column of a selectable table. */
+  selectable?: boolean;
   toolbar?: ReactNode;
   className?: string;
 }
