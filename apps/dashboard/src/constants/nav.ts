@@ -86,7 +86,7 @@ export const STUDIO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
 
 export const NAV_MAIN_ITEMS: NavMainItem[] = [
   { link: HOME_NAV_LINK, icon: Home01Icon, labelKey: "home" },
-  { link: CHAT_NAV_LINK, icon: Message01Icon, labelKey: "chat", badge: "beta" },
+  { link: CHAT_NAV_LINK, icon: Message01Icon, labelKey: "chat" },
   { link: CONTENT_NAV_LINK, icon: NoteIcon, labelKey: "content" },
   { link: SITES_NAV_LINK, icon: WebDesign01Icon, labelKey: "sites" },
   { link: ANALYTICS_NAV_LINK, icon: Analytics01Icon, labelKey: "analytics" },
@@ -94,7 +94,6 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
     link: AGENT_FEEDBACK_NAV_LINK,
     icon: Comment01Icon,
     labelKey: "feedback",
-    badge: "beta",
   },
   {
     link: BRAND_IDENTITY_NAV_LINK,
