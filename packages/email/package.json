@@ -13,6 +13,7 @@
     "./emails/workflow-paused": "./src/emails/workflow-paused.tsx",
     "./emails/weekly-summary": "./src/emails/weekly-summary.tsx",
     "./emails/visibility-drop": "./src/emails/visibility-drop.tsx",
+    "./emails/geo-alert": "./src/emails/geo-alert.tsx",
     "./emails/scheduled-publication-failed": "./src/emails/scheduled-publication-failed.tsx",
     "./types/ai-credits-depleted": "./src/types/ai-credits-depleted.ts",
     "./types/geo-recap": "./src/types/geo-recap.ts",

@@ -49,10 +49,7 @@ import { siteHref } from "@/utils/site-links";
 
 const NON_ORG_PATHS: string[] = [];
 
-const NON_CLICKABLE_SEGMENTS: ReadonlySet<string> = new Set([
-  "automation",
-  "brand",
-]);
+const NON_CLICKABLE_SEGMENTS: ReadonlySet<string> = new Set(["brand"]);
 
 /**
  * Topbar. Desktop pages title themselves and the sidebar
@@ -330,6 +327,12 @@ function genericHeaderBreadcrumbs({
     ? ["content", "collection"]
     : breadcrumbSegments;
 
+  const isAutomationEdit =
+    !isNonOrgPath &&
+    segments[1] === "automation" &&
+    segments.length === 3 &&
+    !["new", "runs", "templates"].includes(segments[2] ?? "");
+
   return displayBreadcrumbSegments.flatMap((segment, index) => {
     const href = (() => {
       if (isCollectionDetail && segment === "content") {
@@ -343,9 +346,12 @@ function genericHeaderBreadcrumbs({
         : `/${segments.slice(0, index + 2).join("/")}`;
     })();
     const isLast = index === displayBreadcrumbSegments.length - 1;
-    const label = isBreadcrumbSegment(segment)
+    let label = isBreadcrumbSegment(segment)
       ? labels.segments[segment]
       : fallbackSegmentLabel(segment);
+    if (isAutomationEdit && isLast) {
+      label = labels.segments.edit;
+    }
     const isClickable = !NON_CLICKABLE_SEGMENTS.has(segment);
     const isChatDetailLast = isChatDetail && isLast && chatDetailId;
     const isContentDetailLast = isContentDetail && isLast && contentDetailId;

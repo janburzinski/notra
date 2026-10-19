@@ -124,7 +124,7 @@ export function ContentCalendarItemChip({
                 "text-muted-foreground hover:bg-muted hover:text-foreground border-border border border-dashed",
                 inCell && BAR_ON_PHONES
               )}
-              href={`/${organizationSlug}/automation/schedules`}
+              href={`/${organizationSlug}/automation`}
             />
           }
         >

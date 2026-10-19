@@ -1,4 +1,3 @@
-import type { IconSvgElement } from "@hugeicons/react";
 import type {
   ScheduleCron,
   ScheduleFormValues,
@@ -11,36 +10,24 @@ export type {
   ScheduleFormValues,
 } from "@notra/schemas/dashboard/automation/schedule-form";
 
-export interface CreateScheduleDialogProps {
+export interface ScheduleFormProps {
   organizationId: string;
   onSuccess?: (trigger: Trigger) => void;
-  trigger?: React.ReactElement;
   editTrigger?: Trigger;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   presetId?: SchedulePresetId | null;
+  /** Lets a new automation switch to another trigger kind. */
+  kindPicker?: React.ReactNode;
 }
 
-export interface ScheduleFrequencyTabsProps {
-  value: ScheduleCron["frequency"];
-  onChange: (next: ScheduleCron["frequency"]) => void;
-}
-
-export interface ScheduleDayPickerProps {
-  frequency: ScheduleCron["frequency"];
-  dayOfWeek?: number;
-  dayOfMonth?: number;
+export interface ScheduleTriggerRowProps {
+  schedule: ScheduleCron;
+  onFrequencyChange: (next: ScheduleCron["frequency"]) => void;
   onDayOfWeekChange: (day: number) => void;
   onDayOfMonthChange: (day: number) => void;
-}
-
-export interface ScheduleIntervalPickerProps {
-  intervalDays?: number;
   onIntervalDaysChange: (days: number | undefined) => void;
-}
-
-export interface ScheduleSummaryCardProps {
-  schedule: ScheduleCron;
+  onTimeChange: (hour: number, minute: number) => void;
 }
 
 export interface ScheduleIntegrationOption {
@@ -62,10 +49,5 @@ export type SchedulePresetValues = Pick<
 
 export interface SchedulePreset {
   id: SchedulePresetId;
-  icon: IconSvgElement;
   values: SchedulePresetValues;
-}
-
-export interface ScheduleQuickStartProps {
-  onSelect: (presetId: SchedulePresetId) => void;
 }

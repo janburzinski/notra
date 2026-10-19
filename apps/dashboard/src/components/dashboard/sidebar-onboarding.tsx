@@ -98,7 +98,7 @@ export function SidebarOnboarding() {
     },
     {
       label: t("steps.schedule"),
-      href: `/${slug}/automation/schedules`,
+      href: `/${slug}/automation`,
       completed: data.hasSchedule,
     },
     {

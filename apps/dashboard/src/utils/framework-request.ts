@@ -7,6 +7,7 @@ import {
 } from "../constants/demo";
 import {
   DASHBOARD_SECURITY_HEADERS,
+  LEGACY_AUTOMATION_PAGES,
   ORGANIZATION_COOKIE_SLUG_PATTERN,
 } from "../constants/framework";
 
@@ -48,15 +49,15 @@ export function getDashboardRedirect(request: Request): Response | undefined {
         page === "settings" ? "general" : "logs"
       );
     } else if (page === "schedules") {
-      destination = `/${slug}/automation/schedules`;
+      destination = `/${slug}/automation`;
       status = 308;
     }
   } else if (
     segments.length === 3 &&
     segments[1] === "automation" &&
-    segments[2] === "schedule"
+    LEGACY_AUTOMATION_PAGES.has(segments[2] ?? "")
   ) {
-    destination = `/${segments[0]}/automation/schedules`;
+    destination = `/${segments[0]}/automation`;
     status = 308;
   }
 

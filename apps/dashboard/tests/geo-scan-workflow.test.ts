@@ -61,6 +61,9 @@ mock.module("../src/workflows/steps/start-geo-sentiment", () => ({
 mock.module("../src/workflows/steps/sync-geo-shelf-citations", () => ({
   syncGeoShelfCitationsStep: syncShelf,
 }));
+mock.module("../src/workflows/steps/geo-alert-steps", () => ({
+  evaluateGeoAlertsStep: async () => ({ fired: 0 }),
+}));
 mock.module("../src/workflows/steps/refresh-geo-content-gaps", () => ({
   refreshGeoContentGapsStep: refreshGaps,
 }));

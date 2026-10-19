@@ -1,6 +1,5 @@
 import { GitBranchIcon, Package01Icon } from "@hugeicons/core-free-icons";
 import type { WebhookEventType } from "@notra/schemas/dashboard/integrations";
-import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
 
 interface EventTypeMeta {
   icon: typeof GitBranchIcon;
@@ -19,16 +18,3 @@ export const EVENT_TYPE_META: Record<WebhookEventType, EventTypeMeta> = {
 };
 
 export const EVENT_TYPE_ORDER: WebhookEventType[] = ["release", "push"];
-
-/** Source, events, identity, output, sources, enabled, created, actions. */
-export const EVENT_TABLE_SKELETON_COLUMNS: readonly DataTableSkeletonColumn[] =
-  [
-    { width: "1fr", minWidth: "13rem" },
-    "8rem",
-    "12rem",
-    "10rem",
-    "8rem",
-    "7rem",
-    "10rem",
-    "5rem",
-  ];

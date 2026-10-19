@@ -26,7 +26,6 @@ import type {
   InitialOnboardingAgentRun,
   OnboardingRunSnapshot,
   OnboardingStatus,
-  PendingOnboardingSuggestion,
   UseOnboardingStatusOptions,
   UseOnboardingSuggestionsOptions,
 } from "@/types/hooks/onboarding";
@@ -217,56 +216,4 @@ export function useDismissOnboardingSuggestion() {
       },
     })
   );
-}
-
-export function useCreateFromSuggestion(organizationId: string | undefined) {
-  const [pending, setPending] = useState<PendingOnboardingSuggestion | null>(
-    null
-  );
-  const { mutate: dismissSuggestion } = useDismissOnboardingSuggestion();
-
-  const beginCreate = useCallback(
-    (suggestionId: string) => {
-      setPending(organizationId ? { organizationId, suggestionId } : null);
-    },
-    [organizationId]
-  );
-
-  const cancelCreate = useCallback(
-    (suggestion: PendingOnboardingSuggestion | null) => {
-      if (!suggestion) {
-        return;
-      }
-      setPending((current) =>
-        current?.organizationId === suggestion.organizationId &&
-        current.suggestionId === suggestion.suggestionId
-          ? null
-          : current
-      );
-    },
-    []
-  );
-
-  const handleCreateSuccess = useCallback(
-    (suggestion: PendingOnboardingSuggestion | null) => {
-      if (!suggestion || suggestion.organizationId !== organizationId) {
-        return;
-      }
-      dismissSuggestion(suggestion);
-      setPending((current) =>
-        current?.organizationId === suggestion.organizationId &&
-        current.suggestionId === suggestion.suggestionId
-          ? null
-          : current
-      );
-    },
-    [organizationId, dismissSuggestion]
-  );
-
-  return {
-    beginCreate,
-    cancelCreate,
-    handleCreateSuccess,
-    pendingSuggestion: pending,
-  };
 }

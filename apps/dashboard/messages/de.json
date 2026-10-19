@@ -2243,7 +2243,8 @@
       "logOut": "Abmelden",
       "allPlatforms": "Alle Plattformen",
       "contentActivity": "Inhaltsaktivität",
-      "sites": "Sites"
+      "sites": "Sites",
+      "automations": "Automationen"
     },
     "messages": {
       "yourAiCreditsHaveBeen": "Deine KI-Credits wurden aufgeladen und sind einsatzbereit.",
@@ -5179,8 +5180,6 @@
       "pausedCount": "Pausiert ({count})",
       "failedToUpdateTrigger": "Trigger konnte nicht aktualisiert werden"
     },
-    "schedulesMetaTitle": "Automatisierung: Zeitpläne",
-    "eventsMetaTitle": "Automatisierung: Events",
     "brandVoice": {
       "noIdentity": "Keine Identität",
       "noIdentityDescription": "Für diesen Workspace wurde noch keine Identität eingerichtet.",
@@ -5222,28 +5221,6 @@
         "more": "Mehr Tage",
         "days": "Tage",
         "invalid": "Wähle einen Wert zwischen {min} und {max} Tagen."
-      },
-      "quickStart": {
-        "description": "Starte mit einem gängigen Rhythmus und passe vor dem Speichern alles an.",
-        "presets": {
-          "weekly-changelog": {
-            "label": "Wöchentlicher Changelog",
-            "description": "Fasse die Aktivität der Woche jeden Montagmorgen zusammen."
-          },
-          "daily-twitter": {
-            "label": "Täglicher X-Beitrag",
-            "description": "Teile ein kurzes Update zur Aktivität von gestern."
-          },
-          "monthly-blog": {
-            "label": "Monatlicher Blogbeitrag",
-            "description": "Mach aus den Highlights des Monats einen ausführlichen Artikel."
-          },
-          "biweekly-linkedin": {
-            "label": "Zweiwöchentlicher LinkedIn-Beitrag",
-            "description": "Veröffentliche alle zwei Wochen ein professionelles Update."
-          }
-        },
-        "createSchedule": "Zeitplan {title} erstellen"
       },
       "summary": {
         "weekly": "Jeden {day} um {time}",
@@ -5302,8 +5279,7 @@
         "brandVoiceDefaultDescription": "Deine Standard-Markenstimme verwenden.",
         "autoPublish": "Automatisch veröffentlichen",
         "autoPublishHint": "Wenn aktiviert, werden Beiträge sofort veröffentlicht statt als Entwurf gespeichert.",
-        "add": "Zeitplan hinzufügen",
-        "sourcesSelected": "{count, plural, one {# Quelle ausgewählt} other {# Quellen ausgewählt}}"
+        "add": "Zeitplan hinzufügen"
       },
       "lookbackWindows": {
         "current_day": "Aktueller Tag"
@@ -5333,6 +5309,12 @@
         "monthly": "Monatlich - Tag {day} um {time}",
         "custom": "Alle {days} Tage um {time}",
         "daily": "Täglich um {time}"
+      },
+      "row": {
+        "frequency": "Häufigkeit",
+        "on": "am",
+        "at": "um",
+        "every": "alle"
       }
     },
     "events": {
@@ -5359,8 +5341,6 @@
         "newTitle": "Neuer Event-Trigger",
         "description": "Reagiere auf GitHub-Aktivität und generiere Inhalte automatisch.",
         "rulesHint": "Stimme und Veröffentlichungsverhalten für diesen Trigger.",
-        "noRepositoriesSelected": "Noch keine Repositories ausgewählt",
-        "repositoriesSelected": "{count, plural, one {# Repository ausgewählt} other {# Repositories ausgewählt}}",
         "add": "Trigger hinzufügen",
         "triggerEvent": "Auslösendes Event",
         "triggerEventHint": "Wann soll das ausgelöst werden?",
@@ -5395,6 +5375,300 @@
         "hint": "Wenn jeder Commit eines Pushs zu einem dieser Muster passt, wird der Push übersprungen. Trenne Muster mit Kommas. Groß- und Kleinschreibung spielt keine Rolle.",
         "tryLabel": "Commit-Nachricht testen",
         "tryPlaceholder": "z. B. chore: bump dependencies"
+      }
+    },
+    "metaTitle": "Automationen",
+    "page": {
+      "title": "Automationen",
+      "description": "Notra passt auf, während du arbeitest: Inhalte entstehen, wenn Code live geht, und du erfährst sofort, wenn sich deine KI-Sichtbarkeit bewegt.",
+      "create": "Neue Automation",
+      "createMenu": {
+        "alert": "GEO-Alert",
+        "alertHint": "Benachrichtigung, wenn sich deine KI-Sichtbarkeit ändert",
+        "schedule": "Geplante Inhalte",
+        "scheduleHint": "Inhalte nach festem Zeitplan entwerfen",
+        "event": "Inhalte bei GitHub-Events",
+        "eventHint": "Inhalte bei Push oder Release entwerfen"
+      },
+      "filters": {
+        "all": "Alle",
+        "content": "Inhalte",
+        "alerts": "Alerts",
+        "paused": "Pausiert"
+      },
+      "columns": {
+        "trigger": "Auslöser",
+        "action": "Aktion",
+        "automation": "Automation",
+        "lastRun": "Letzte Ausführung",
+        "enabled": "Aktiv"
+      },
+      "kinds": {
+        "schedule": "Zeitplan",
+        "event": "GitHub",
+        "alert": "GEO-Scan"
+      },
+      "onGithub": "Bei {events}",
+      "toggle": "{name} ein- oder ausschalten",
+      "emptyFilter": "Hier ist noch nichts.",
+      "integrationDeleted": "Kann nicht eingeschaltet werden, weil die Integration gelöscht wurde. Bearbeite die Automation und wähle eine andere Integration.",
+      "updateFailed": "Automation konnte nicht aktualisiert werden",
+      "removed": "Automation gelöscht",
+      "deleteFailed": "Automation konnte nicht gelöscht werden",
+      "triggered": "Läuft jetzt. Inhalte erscheinen in Kürze.",
+      "runFailed": "Automation konnte nicht gestartet werden",
+      "deleteTitle": "Automation löschen?",
+      "deleteDescription": "„{name}“ wird gestoppt und gelöscht. Das kann nicht rückgängig gemacht werden.",
+      "delete": "Löschen",
+      "createMore": "Weitere Optionen zum Erstellen",
+      "filterLabel": "Automationen filtern",
+      "empty": {
+        "title": "Noch keine Automationen",
+        "description": "Richte einen Alert oder einen geplanten Entwurf ein oder starte mit einer Vorlage unten."
+      },
+      "templatesTitle": "Vorlagen",
+      "more": "Mehr",
+      "eventRowName": "{event} → {output}",
+      "viewRuns": "Ausführungen ansehen"
+    },
+    "templates": {
+      "title": "Vorlagen",
+      "categories": {
+        "geo": {
+          "title": "GEO-Alerts",
+          "description": "Nach jedem Scan geprüft"
+        },
+        "content": {
+          "title": "Selbstaktualisierende Inhalte",
+          "description": "Entwürfe landen zur Prüfung unter Inhalte"
+        },
+        "webhooks": {
+          "title": "Webhooks",
+          "description": "Verbinde Notra mit deinem eigenen Stack"
+        }
+      },
+      "triggers": {
+        "schedule": "Geplant",
+        "github": "GitHub-Event",
+        "geo": "GEO-Scan",
+        "event": "Notra-Event"
+      },
+      "actions": {
+        "content": "Inhalt entwerfen",
+        "slack": "Slack",
+        "email": "E-Mail",
+        "webhook": "Webhook",
+        "alert": "Alert"
+      },
+      "items": {
+        "visibility-drop": {
+          "title": "Sichtbarkeit sinkt",
+          "description": "Meldet sich, wenn du in deutlich weniger KI-Antworten erwähnt wirst als im vorherigen Scan."
+        },
+        "competitor-gain": {
+          "title": "Konkurrenz überholt dich",
+          "description": "Zeigt Prompts, in denen dich ein Konkurrent verdrängt, ersetzt oder neu zitiert wird."
+        },
+        "mention-lost": {
+          "title": "Aus Antworten gefallen",
+          "description": "Listet die Prompts, die dich im letzten Scan erwähnt haben und jetzt nicht mehr."
+        },
+        "citation-lost": {
+          "title": "Zitat verloren",
+          "description": "Sagt dir, wenn KI-Antworten nicht mehr auf deine Website verlinken."
+        },
+        "scan-summary": {
+          "title": "Scan-Zusammenfassung",
+          "description": "Kurzer Überblick nach jedem Scan: Sichtbarkeit, Gewinne und Verluste."
+        },
+        "scan-failed": {
+          "title": "Scan fehlgeschlagen",
+          "description": "Meldet sich sofort, wenn ein GEO-Scan nicht durchläuft."
+        },
+        "code-changes": {
+          "title": "Aus Code-Änderungen aktualisieren",
+          "description": "Entwirft einen Changelog-Eintrag, sobald Code auf deinem Default-Branch landet."
+        },
+        "release-announcement": {
+          "title": "Releases ankündigen",
+          "description": "Schreibt bei jedem GitHub-Release einen LinkedIn-Post."
+        },
+        "weekly-changelog": {
+          "title": "Wöchentlicher Changelog",
+          "description": "Fasst jeden Montagmorgen die Aktivität der Woche zusammen."
+        },
+        "daily-twitter": {
+          "title": "Täglicher X-Post",
+          "description": "Teilt ein kurzes Update zur Aktivität von gestern."
+        },
+        "monthly-blog": {
+          "title": "Monatlicher Blogpost",
+          "description": "Macht aus den Highlights des Monats einen ausführlichen Artikel."
+        },
+        "biweekly-linkedin": {
+          "title": "LinkedIn-Post alle zwei Wochen",
+          "description": "Veröffentlicht alle zwei Wochen ein professionelles Update."
+        },
+        "webhooks": {
+          "title": "Events an deinen Endpoint senden",
+          "description": "Signierte Requests, wenn Posts veröffentlicht werden, Scans fertig sind oder ein Alert auslöst."
+        }
+      },
+      "active": "Aktiv",
+      "description": "Starte mit einem bewährten Ablauf und passe Auslöser und Ziele an."
+    },
+    "alerts": {
+      "enabled": "Alert eingeschaltet",
+      "paused": "Alert pausiert",
+      "actionLabels": {
+        "slack": "Slack",
+        "email": "E-Mail",
+        "webhook": "Webhook"
+      },
+      "signals": {
+        "visibility_drop": {
+          "label": "Sichtbarkeit sinkt",
+          "description": "Löst aus, wenn du in weniger KI-Antworten erwähnt wirst als im vorherigen Scan.",
+          "unit": "Pkt.",
+          "short": "Sichtbarkeit sinkt",
+          "shortWithValue": "Sichtbarkeit sinkt ≥ {value} Pkt."
+        },
+        "mention_lost": {
+          "label": "Aus Antworten gefallen",
+          "description": "Löst aus, wenn Prompts dich im letzten Scan erwähnt haben und jetzt nicht mehr.",
+          "unit": "Prompts",
+          "short": "Aus Antworten gefallen",
+          "shortWithValue": "Aus ≥ {value} Antworten gefallen"
+        },
+        "competitor_gain": {
+          "label": "Konkurrenz überholt dich",
+          "description": "Löst aus, wenn dich ein Konkurrent verdrängt, ersetzt oder in einer Antwort zitiert wird.",
+          "unit": "Prompts",
+          "short": "Konkurrenz legt zu",
+          "shortWithValue": "Konkurrenz legt in ≥ {value} Antworten zu"
+        },
+        "citation_lost": {
+          "label": "Zitat verloren",
+          "description": "Löst aus, wenn KI-Antworten nicht mehr auf deine Website verlinken.",
+          "unit": "Prompts",
+          "short": "Verlorene Zitate",
+          "shortWithValue": "≥ {value} verlorene Zitate"
+        },
+        "scan_summary": {
+          "label": "Scan-Zusammenfassung",
+          "description": "Schickt nach jedem abgeschlossenen Scan einen kurzen Überblick.",
+          "unit": "",
+          "short": "Nach jedem Scan",
+          "shortWithValue": "Nach jedem Scan"
+        },
+        "scan_failed": {
+          "label": "Scan fehlgeschlagen",
+          "description": "Löst aus, wenn ein GEO-Scan nicht durchläuft.",
+          "unit": "",
+          "short": "Wenn ein Scan fehlschlägt",
+          "shortWithValue": "Wenn ein Scan fehlschlägt"
+        }
+      },
+      "dialog": {
+        "newTitle": "Neuer GEO-Alert",
+        "editTitle": "GEO-Alert bearbeiten",
+        "trigger": "Auslöser",
+        "triggerHint": "Wann soll der Alert auslösen",
+        "signal": "Signal",
+        "atLeast": "mindestens",
+        "project": "Projekt",
+        "allProjects": "Alle Projekte",
+        "runsAfterScan": "Wird nach jedem GEO-Scan geprüft, im Vergleich zum Scan davor.",
+        "runsOnFailure": "Wird geprüft, wenn ein GEO-Scan ohne Ergebnis endet.",
+        "sendTo": "Senden an",
+        "sendToHint": "Wohin der Alert geht",
+        "slackHint": "Postet in deinen Slack-Benachrichtigungskanal.",
+        "slackMissing": "Slack ist noch nicht verbunden.",
+        "connectSlack": "Slack verbinden",
+        "emailHint": "{count, plural, one {Mailt dem Workspace-Owner.} other {Mailt allen # Workspace-Ownern.}}",
+        "webhook": "Webhook",
+        "webhookHint": "{count, plural, one {Sendet einen POST-Request an 1 Endpoint.} other {Sendet einen POST-Request an # Endpoints.}}",
+        "webhookMissing": "Noch kein Webhook-Endpoint. Lege einen an, um Alerts als POST-Request zu erhalten.",
+        "manageWebhooks": "Webhooks verwalten",
+        "pickDestination": "Wähle mindestens ein Ziel für den Alert.",
+        "sendTest": "Test senden",
+        "testSent": "Test-Alert gesendet",
+        "testFailed": "Der Test-Alert hat kein Ziel erreicht",
+        "create": "Alert erstellen",
+        "created": "Alert erstellt",
+        "updated": "Alert aktualisiert",
+        "failed": "Alert konnte nicht gespeichert werden",
+        "duplicate": "Für dieses Signal und Projekt gibt es schon einen Alert.",
+        "decrease": "Verringern",
+        "increase": "Erhöhen",
+        "addEndpoint": "Endpoint hinzufügen"
+      }
+    },
+    "templatesMetaTitle": "Automations-Vorlagen",
+    "editorMetaTitle": "Automation",
+    "editor": {
+      "back": "Automationen",
+      "notFound": "Diese Automation gibt es nicht mehr.",
+      "name": "Name",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "changeTrigger": "Auslöser ändern",
+      "searchTriggers": "Auslöser suchen…",
+      "noTriggers": "Keine Auslöser gefunden.",
+      "groups": {
+        "geo": "GEO",
+        "content": "Inhalte"
+      },
+      "tabs": {
+        "settings": "Einstellungen",
+        "runs": "Verlauf"
+      }
+    },
+    "loadError": {
+      "automations": {
+        "title": "Automationen konnten nicht geladen werden",
+        "description": "Deine Automationen sind noch da. Versuch es noch einmal."
+      },
+      "runs": {
+        "title": "Ausführungen konnten nicht geladen werden",
+        "description": "Dein Verlauf ist noch da. Versuch es noch einmal."
+      }
+    },
+    "runsMetaTitle": "Automation-Ausführungen",
+    "runs": {
+      "title": "Ausführungen",
+      "description": "Jede Ausführung einer Automation, neueste zuerst.",
+      "allAutomations": "Alle Automationen",
+      "allStatuses": "Alle Status",
+      "filterAutomation": "Nach Automation filtern",
+      "filterStatus": "Nach Status filtern",
+      "statuses": {
+        "running": "Läuft",
+        "success": "Erfolgreich",
+        "failed": "Fehlgeschlagen",
+        "skipped": "Übersprungen"
+      },
+      "columns": {
+        "status": "Status",
+        "automation": "Automation",
+        "result": "Ergebnis",
+        "when": "Wann",
+        "duration": "Dauer"
+      },
+      "results": {
+        "running": "Wird ausgeführt…",
+        "success": "Abgeschlossen",
+        "failed": "Nicht abgeschlossen",
+        "skipped": "Nichts erstellt"
+      },
+      "manual": "Manuell",
+      "openDraft": "Entwurf öffnen",
+      "deletedAutomation": "Gelöschte Automation",
+      "empty": {
+        "title": "Keine Ausführungen",
+        "description": "Ausführungen erscheinen hier, sobald eine Automation läuft.",
+        "filtered": "Passe deine Filter an, um mehr Ausführungen zu sehen",
+        "viewAll": "Alle Ausführungen ansehen"
       }
     }
   },
@@ -6962,7 +7236,10 @@
     "breadcrumbs": {
       "geo": "Geo",
       "segments": {
-        "collection": "Sammlungen"
+        "collection": "Sammlungen",
+        "new": "Neu",
+        "templates": "Vorlagen",
+        "runs": "Ausführungen"
       },
       "geoSegments": {
         "agent-readiness": "Agent Readiness",

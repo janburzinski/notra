@@ -1,5 +1,6 @@
 import type { FeedbackSentiment } from "@notra/email/types/feedback";
 import type {
+  GeoAlertEmailProps,
   VisibilityDropEmailProps,
   WeeklySummaryEmailProps,
 } from "@notra/email/types/geo-recap";
@@ -90,4 +91,10 @@ export interface SendWeeklySummaryEmailProps extends WeeklySummaryEmailProps {
 export interface SendVisibilityDropEmailProps extends VisibilityDropEmailProps {
   recipientEmail: string;
   dateKey: string;
+}
+
+export interface SendGeoAlertEmailProps extends GeoAlertEmailProps {
+  recipientEmail: string;
+  /** Dedupes the send, e.g. automation and scan. */
+  alertKey: string;
 }

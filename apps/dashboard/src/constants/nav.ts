@@ -3,7 +3,6 @@ import {
   AiBrowserIcon,
   AiChat01Icon,
   Analytics01Icon,
-  Calendar03Icon,
   ChartAnalysisIcon,
   Comment01Icon,
   Home01Icon,
@@ -12,7 +11,6 @@ import {
   MagicWand01Icon,
   Message01Icon,
   NoteIcon,
-  Notification03Icon,
   PaintBoardIcon,
   PencilEdit01Icon,
   PlugIcon,
@@ -23,6 +21,7 @@ import {
   Settings01Icon,
   UserGroupIcon,
   WebDesign01Icon,
+  WorkflowSquare03Icon,
 } from "@hugeicons/core-free-icons";
 import {
   GEO_AGENT_READINESS_NAV_LINK,
@@ -50,8 +49,7 @@ export const CHAT_NAV_LINK = "/chat";
 const CONTENT_NAV_LINK = "/content";
 export const ANALYTICS_NAV_LINK = "/analytics";
 export const BRAND_IDENTITY_NAV_LINK = "/brand/identity";
-export const SCHEDULES_NAV_LINK = "/automation/schedules";
-export const EVENTS_NAV_LINK = "/automation/events";
+export const AUTOMATIONS_NAV_LINK = "/automation";
 export const INTEGRATIONS_NAV_LINK = "/integrations";
 export const SKILLS_NAV_LINK = "/skills";
 export const API_KEYS_NAV_LINK = "/api-keys";
@@ -74,7 +72,7 @@ export const GEO_ROUTE_SECTIONS: ReadonlySet<string> = new Set(["geo"]);
 
 export const SHARED_ROUTE_PREFIXES: readonly string[] = [
   "content",
-  "automation/schedules",
+  "automation",
 ];
 
 export const STUDIO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
@@ -106,8 +104,11 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
     labelKey: "brandIdentityTitle",
   },
   { link: IRIS_NAV_LINK, icon: RainbowIcon, labelKey: "iris" },
-  { link: SCHEDULES_NAV_LINK, icon: Calendar03Icon, labelKey: "schedules" },
-  { link: EVENTS_NAV_LINK, icon: Notification03Icon, labelKey: "events" },
+  {
+    link: AUTOMATIONS_NAV_LINK,
+    icon: WorkflowSquare03Icon,
+    labelKey: "automations",
+  },
   { link: INTEGRATIONS_NAV_LINK, icon: PlugIcon, labelKey: "integrations" },
   { link: GEO_OVERVIEW_NAV_LINK, icon: AiBrowserIcon, labelKey: "overview" },
   { link: GEO_TRAFFIC_NAV_LINK, icon: Activity01Icon, labelKey: "traffic" },
@@ -148,7 +149,7 @@ export const NAV_GEO_IMPROVE_LINKS: readonly string[] = [
   GEO_SHELF_SPACE_NAV_LINK,
   GEO_AGENT_READINESS_NAV_LINK,
   CONTENT_NAV_LINK,
-  SCHEDULES_NAV_LINK,
+  AUTOMATIONS_NAV_LINK,
 ];
 
 /**
@@ -186,16 +187,16 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     links: [GEO_GAPS_NAV_LINK, GEO_AGENT_READINESS_NAV_LINK],
   },
   {
+    id: "automations",
+    icon: WorkflowSquare03Icon,
+    labelKey: "automations",
+    links: [AUTOMATIONS_NAV_LINK],
+  },
+  {
     id: "content",
     icon: NoteIcon,
     labelKey: "content",
-    links: [
-      CONTENT_NAV_LINK,
-      CHAT_NAV_LINK,
-      SCHEDULES_NAV_LINK,
-      EVENTS_NAV_LINK,
-      IRIS_NAV_LINK,
-    ],
+    links: [CONTENT_NAV_LINK, CHAT_NAV_LINK, IRIS_NAV_LINK],
   },
   {
     id: "sites",

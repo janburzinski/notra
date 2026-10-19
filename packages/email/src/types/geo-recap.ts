@@ -57,3 +57,14 @@ export interface VisibilityDropEmailProps {
   remainingCount: number;
   dashboardLink: string;
 }
+
+export interface GeoAlertEmailProps {
+  organizationName: string;
+  organizationSlug: string;
+  automationName: string;
+  headline: string;
+  summary: string;
+  items: readonly GeoRecapItem[];
+  remainingCount: number;
+  dashboardLink: string;
+}

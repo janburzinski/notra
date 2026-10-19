@@ -9,6 +9,7 @@ export interface TriggerHashSourceConfig {
 
 export interface TriggerHashTargets {
   repositoryIds: string[];
+  linearIntegrationIds?: string[];
 }
 
 export interface TriggerConfigInput {

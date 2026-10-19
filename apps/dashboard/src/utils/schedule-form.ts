@@ -59,7 +59,12 @@ export function getDefaultScheduleValues(
       outputType: supportedType,
       instructions: editTrigger.outputConfig?.instructions ?? "",
       schedule: editTrigger.sourceConfig.cron ?? DEFAULT_SCHEDULE,
-      repositoryIds: editTrigger.targets.repositoryIds,
+      repositoryIds: [
+        ...editTrigger.targets.repositoryIds,
+        ...(editTrigger.targets.linearIntegrationIds ?? []).map(
+          (id) => `linear:${id}`
+        ),
+      ],
       lookbackWindow: editTrigger.lookbackWindow ?? "last_7_days",
       brandVoiceId:
         editTrigger.outputConfig?.brandVoiceId &&

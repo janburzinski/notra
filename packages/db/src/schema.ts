@@ -41,6 +41,7 @@ import {
   AGENT_FEEDBACK_SOURCES,
   AGENT_FEEDBACK_STATUSES,
 } from "./constants/agent-feedback";
+import { AUTOMATION_RUN_STATUSES } from "./constants/automation-runs";
 import {
   BLOG_POST_SUBTYPES,
   CONTENT_PUBLICATION_STATUSES,
@@ -935,6 +936,46 @@ export const contentTriggers = pgTable(
     uniqueIndex("contentTriggers_organization_dedupe_uidx").on(
       table.organizationId,
       table.dedupeHash
+    ),
+  ]
+);
+
+export const automationRuns = pgTable(
+  "automation_runs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    automationId: text("automation_id")
+      .notNull()
+      .references(() => contentTriggers.id, { onDelete: "cascade" }),
+    status: text("status", { enum: AUTOMATION_RUN_STATUSES })
+      .notNull()
+      .default("running"),
+    manual: boolean("manual").notNull().default(false),
+    title: text("title"),
+    errorMessage: text("error_message"),
+    postId: text("post_id").references(() => posts.id, {
+      onDelete: "set null",
+    }),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    finishedAt: timestamp("finished_at"),
+  },
+  (table) => [
+    index("automationRuns_org_startedAt_idx").on(
+      table.organizationId,
+      table.startedAt,
+      table.id
+    ),
+    index("automationRuns_org_automation_startedAt_idx").on(
+      table.organizationId,
+      table.automationId,
+      table.startedAt
+    ),
+    check(
+      "automation_runs_status_check",
+      sql`${table.status} IN ('running', 'success', 'failed', 'skipped')`
     ),
   ]
 );

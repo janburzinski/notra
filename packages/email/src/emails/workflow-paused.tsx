@@ -30,7 +30,7 @@ export const WorkflowPausedEmail = ({
   organizationSlug = "acme",
   automationName = "Weekly Product Updates",
   reason = "workflow_errors",
-  settingsLink = `${EMAIL_CONFIG.getAppUrl()}/${organizationSlug}/automation/schedules`,
+  settingsLink = `${EMAIL_CONFIG.getAppUrl()}/${organizationSlug}/automation`,
 }: WorkflowPausedEmailProps) => {
   return (
     <EmailLayout

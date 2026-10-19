@@ -38,6 +38,7 @@ export const WEBHOOK_EVENTS = [
   "post.unpublished",
   "geo.scan.completed",
   "geo.scan.failed",
+  "geo.alert.triggered",
 ] as const satisfies readonly WebhookEventName[];
 
 export const WEBHOOK_STATUS_VARIANTS: Record<

@@ -21,7 +21,9 @@ import { getOrpcErrorDataCode } from "@/utils/orpc-errors";
 export function useEventTriggerForm({
   organizationId,
   editTrigger,
+  enabled,
   open,
+  preset,
   onSuccess,
   onClose,
 }: UseEventTriggerFormProps) {
@@ -58,7 +60,7 @@ export function useEventTriggerForm({
         outputConfig: {
           ...(value.brandVoiceId ? { brandVoiceId: value.brandVoiceId } : {}),
         },
-        enabled: true,
+        enabled,
         autoPublish: supportsAutoPublish(value.outputType)
           ? value.autoPublish
           : false,
@@ -69,7 +71,6 @@ export function useEventTriggerForm({
           return await dashboardOrpc.automation.events.update.call({
             triggerId: editTrigger.id,
             ...payload,
-            enabled: editTrigger.enabled,
           });
         }
         return await dashboardOrpc.automation.events.create.call(payload);
@@ -97,8 +98,17 @@ export function useEventTriggerForm({
     },
   });
 
+  // The form re-applies its default values whenever they change and nothing was
+  // touched, so the preset has to be part of them or it gets undone.
+  const initialValues = useMemo<EventTriggerFormValues>(
+    () => ({
+      ...getDefaultEventTriggerValues(editTrigger),
+      ...(editTrigger ? {} : preset),
+    }),
+    [editTrigger, preset]
+  );
   const form = useForm({
-    defaultValues: getDefaultEventTriggerValues(editTrigger),
+    defaultValues: initialValues,
     validators: {
       onSubmit: eventTriggerFormSchema,
     },
@@ -113,14 +123,16 @@ export function useEventTriggerForm({
       return;
     }
 
-    const resetKey = editTrigger?.id ?? "create";
+    const resetKey =
+      editTrigger?.id ??
+      `create:${preset?.eventType ?? ""}:${preset?.outputType ?? ""}`;
     if (lastResetKeyRef.current === resetKey) {
       return;
     }
 
-    form.reset(getDefaultEventTriggerValues(editTrigger));
+    form.reset(initialValues);
     lastResetKeyRef.current = resetKey;
-  }, [editTrigger, form, open]);
+  }, [editTrigger, form, initialValues, open, preset]);
 
   return { form, isPending: mutation.isPending };
 }

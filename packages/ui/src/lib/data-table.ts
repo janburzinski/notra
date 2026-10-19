@@ -8,6 +8,7 @@ import type {
 import type { ReactNode } from "react";
 
 import {
+  DATA_TABLE_HEADER_HEIGHT,
   HEADER_CH_BUFFER,
   HEADER_PAD_X_PX,
   HINT_ICON_PX,
@@ -274,7 +275,7 @@ export function tableLoadingOverlay(
 export function getTableViewportLayout({
   rowCount,
   rowHeight,
-  headerHeight = rowHeight,
+  headerHeight = DATA_TABLE_HEADER_HEIGHT,
   rowSizing,
   height,
   minHeight,

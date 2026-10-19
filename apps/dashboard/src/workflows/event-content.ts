@@ -1,5 +1,8 @@
 import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
-import { getContentBillingLimitLabel } from "@notra/ai/utils/content-billing-messages";
+import {
+  describeContentBillingDenial,
+  getContentBillingLimitLabel,
+} from "@notra/ai/utils/content-billing-messages";
 import { eventWorkflowPayloadSchema } from "@notra/schemas/dashboard/workflows";
 import { flattenError } from "zod";
 
@@ -7,6 +10,10 @@ import { WORKFLOW_ANALYTICS_NAMES } from "@/constants/workflow-analytics";
 import type { EventContentWorkflowResult } from "@/types/workflows/event-generation";
 import { resolveContentLimitPauseReason } from "@/utils/content-billing";
 
+import {
+  recordAutomationRunFinish,
+  recordAutomationRunStart,
+} from "./steps/automation-run-history";
 import {
   appendAutomationLog,
   claimWorkflowExecution,
@@ -75,13 +82,33 @@ export async function eventContentWorkflow(payload: {
   const { trigger, lookbackWindow } = await fetchEventTrigger(triggerId);
   if (!trigger) {
     console.log(`[Event] Trigger ${triggerId} not found, canceling`);
+    if (manual) {
+      await recordAutomationRunFinish({
+        id: resolvedExecutionId,
+        status: "failed",
+        errorMessage: "The automation could not be loaded",
+      });
+    }
     return { status: "trigger_not_found" };
   }
   if (!trigger.enabled) {
     console.log(`[Event] Trigger ${triggerId} is disabled, canceling`);
+    if (manual) {
+      await recordAutomationRunFinish({
+        id: resolvedExecutionId,
+        status: "skipped",
+        errorMessage: "The automation is turned off",
+      });
+    }
     return { status: "trigger_disabled" };
   }
   const automationName = trigger.name.trim() || `${eventType} event`;
+  await recordAutomationRunStart({
+    id: resolvedExecutionId,
+    organizationId: trigger.organizationId,
+    automationId: triggerId,
+    manual,
+  });
 
   const gate = await gateContentBilling({
     organizationId: trigger.organizationId,
@@ -106,6 +133,11 @@ export async function eventContentWorkflow(payload: {
         });
       }
     }
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status: "skipped",
+      errorMessage: describeContentBillingDenial(gate),
+    });
     return { status: "credits_exhausted" };
   }
 
@@ -133,6 +165,11 @@ export async function eventContentWorkflow(payload: {
     ]);
   } catch (error) {
     await releaseBilling();
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status: "failed",
+      errorMessage: "Unexpected workflow error",
+    });
     throw error;
   }
 
@@ -141,6 +178,11 @@ export async function eventContentWorkflow(payload: {
       `[Event] Repository ${repositoryId} not found for trigger ${triggerId}, canceling`
     );
     await releaseBilling();
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status: "failed",
+      errorMessage: "The repository is no longer connected",
+    });
     return { status: "repository_not_found" };
   }
 
@@ -155,11 +197,18 @@ export async function eventContentWorkflow(payload: {
     repositoryCount: 1,
   };
 
-  const finish = (
+  const finish = async (
     status: "success" | "failed" | "skipped",
-    detail: { reason?: string; title?: string }
-  ) =>
-    finishGeneration({
+    { postId, ...detail }: { reason?: string; title?: string; postId?: string }
+  ) => {
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status,
+      title: detail.title,
+      errorMessage: detail.reason,
+      postId,
+    });
+    await finishGeneration({
       organizationId: trigger.organizationId,
       runId,
       workflow: WORKFLOW_ANALYTICS_NAMES.EVENT_CONTENT,
@@ -170,6 +219,7 @@ export async function eventContentWorkflow(payload: {
       status,
       ...detail,
     });
+  };
   const cleanupCollection = () =>
     cleanupEmptyCollection({
       collectionId,
@@ -301,7 +351,7 @@ export async function eventContentWorkflow(payload: {
         ? primaryPost.title
         : `${createdPosts.length} ${trigger.outputType.replaceAll("_", " ")} drafts`;
 
-    await finish("success", { title: contentTitle });
+    await finish("success", { title: contentTitle, postId });
 
     await finalizeContentBilling({
       reservation: gate,

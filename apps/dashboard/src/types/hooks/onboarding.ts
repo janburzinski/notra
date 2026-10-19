@@ -33,8 +33,3 @@ export interface InitialOnboardingAgentRun {
   organizationId: string;
   state: OnboardingAgentRunState;
 }
-
-export interface PendingOnboardingSuggestion {
-  organizationId: string;
-  suggestionId: string;
-}

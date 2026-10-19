@@ -13,6 +13,7 @@ export const webhookEventTypeSchema = z.enum([
   "post.unpublished",
   "geo.scan.completed",
   "geo.scan.failed",
+  "geo.alert.triggered",
 ]);
 export const webhookStatusFilterSchema = z.enum([
   "all",

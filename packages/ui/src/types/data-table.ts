@@ -110,7 +110,7 @@ export interface DataTableProps<T> {
   onColumnResize?: (key: string, width: number) => void;
   /** Fixed row height in px — required for virtualization. */
   rowHeight?: number;
-  /** Header row height in px; defaults to `rowHeight`. */
+  /** Header row height in px; defaults to `DATA_TABLE_HEADER_HEIGHT`. */
   headerHeight?: number;
   /** Content-sized rows wrap and render without virtualization. Use for bounded detail lists. */
   rowSizing?: "fixed" | "content";

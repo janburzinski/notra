@@ -733,9 +733,9 @@ test("real deliver signs the exact stored bytes and identity of every new lifecy
   );
 });
 
-test("API subscriptions accept all twelve events and reject unknown, empty and oversized lists", () => {
+test("API subscriptions accept all thirteen events and reject unknown, empty and oversized lists", () => {
   const types = WEBHOOK_EVENT_FIXTURES.map((event) => event.type);
-  expect(types).toHaveLength(12);
+  expect(types).toHaveLength(13);
   expect(webhookEventTypeSchema.options).toEqual(types);
   expect(
     createWebhookRequestSchema.safeParse({

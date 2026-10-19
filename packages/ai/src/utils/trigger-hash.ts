@@ -40,7 +40,10 @@ export function scheduleDedupeHashes(input: ScheduleHashInput) {
     )
     .digest("hex");
 
-  return [canonical, legacy] as const;
+  // Legacy hashes do not encode a Linear selection and must not match one.
+  return input.targets.linearIntegrationIds === undefined
+    ? [canonical, legacy]
+    : [canonical];
 }
 
 export function normalizeTriggerConfig({
@@ -66,6 +69,9 @@ export function normalizeTriggerConfig({
     },
     targets: {
       repositoryIds,
+      ...(targets.linearIntegrationIds !== undefined
+        ? { linearIntegrationIds: [...targets.linearIntegrationIds].sort() }
+        : {}),
     },
   };
 }

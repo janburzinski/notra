@@ -8,8 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { Suspense, useEffect } from "react";
 
-import EventsLoading from "@/app/(dashboard)/[slug]/automation/events/loading";
-import SchedulesLoading from "@/app/(dashboard)/[slug]/automation/schedules/loading";
+import AutomationsLoading from "@/app/(dashboard)/[slug]/automation/loading";
 import BrandLoading from "@/app/(dashboard)/[slug]/brand/identity/loading";
 import ChatLoading from "@/app/(dashboard)/[slug]/chat/loading";
 import NewChatLoading from "@/app/(dashboard)/[slug]/chat/new-loading";
@@ -78,11 +77,17 @@ const Chat = lazyPage(() =>
 const ApiKeys = lazyPage(
   () => import("@/app/(dashboard)/[slug]/api-keys/page")
 );
-const Events = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/automation/events/page-client")
+const Automations = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/automation/page-client")
 );
-const Schedules = lazyPage(
-  () => import("@/app/(dashboard)/[slug]/automation/schedules/page-client")
+const AutomationTemplates = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/automation/templates/page-client")
+);
+const AutomationRuns = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/automation/runs/page-client")
+);
+const AutomationEditor = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/automation/editor/page-client")
 );
 const Brand = lazyPage(
   () => import("@/app/(dashboard)/[slug]/brand/identity/page-client")
@@ -360,19 +365,51 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
     }),
     createUiRoute({
       parent: organization,
-      path: "automation/events",
-      title: { namespace: "automation", key: "eventsMetaTitle" },
-      pendingComponent: EventsLoading,
-      preload: Events.preload,
-      component: ({ params }) => <Events organizationSlug={params.slug} />,
+      path: "automation",
+      title: { namespace: "automation", key: "metaTitle" },
+      pendingComponent: AutomationsLoading,
+      preload: Automations.preload,
+      component: ({ params }) => <Automations organizationSlug={params.slug} />,
     }),
     createUiRoute({
       parent: organization,
-      path: "automation/schedules",
-      title: { namespace: "automation", key: "schedulesMetaTitle" },
-      pendingComponent: SchedulesLoading,
-      preload: Schedules.preload,
-      component: ({ params }) => <Schedules organizationSlug={params.slug} />,
+      path: "automation/templates",
+      title: { namespace: "automation", key: "templatesMetaTitle" },
+      preload: AutomationTemplates.preload,
+      component: ({ params }) => (
+        <AutomationTemplates organizationSlug={params.slug} />
+      ),
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "automation/runs",
+      title: { namespace: "automation", key: "runsMetaTitle" },
+      preload: AutomationRuns.preload,
+      component: ({ params }) => (
+        <AutomationRuns organizationSlug={params.slug} />
+      ),
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "automation/new",
+      title: { namespace: "automation", key: "editorMetaTitle" },
+      preload: AutomationEditor.preload,
+      component: ({ params }) => (
+        <AutomationEditor organizationSlug={params.slug} />
+      ),
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "automation/$id",
+      title: { namespace: "automation", key: "editorMetaTitle" },
+      preload: AutomationEditor.preload,
+      component: ({ params }) => (
+        <AutomationEditor
+          key={params.id}
+          organizationSlug={params.slug}
+          triggerId={params.id}
+        />
+      ),
     }),
     createUiRoute({
       parent: organization,
@@ -460,28 +497,26 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
         throw redirect({ href: settingsPath(params.slug ?? "", "general") });
       },
     }),
-    createUiRoute({
-      parent: organization,
-      path: "schedules",
-      component: () => null,
-      loader: async ({ params }) => {
-        throw redirect({
-          href: `/${params.slug}/automation/schedules`,
-          statusCode: 308,
-        });
-      },
-    }),
-    createUiRoute({
-      parent: organization,
-      path: "automation/schedule",
-      component: () => null,
-      loader: async ({ params }) => {
-        throw redirect({
-          href: `/${params.slug}/automation/schedules`,
-          statusCode: 308,
-        });
-      },
-    }),
+    ...(
+      [
+        "schedules",
+        "automation/schedule",
+        "automation/schedules",
+        "automation/events",
+      ] as const
+    ).map((path) =>
+      createUiRoute({
+        parent: organization,
+        path,
+        component: () => null,
+        loader: async ({ params }) => {
+          throw redirect({
+            href: `/${params.slug}/automation`,
+            statusCode: 308,
+          });
+        },
+      })
+    ),
     createUiRoute({
       parent: organization,
       path: "logs",

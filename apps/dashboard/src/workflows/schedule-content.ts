@@ -1,5 +1,8 @@
 import { CONTENT_AGENT_MODEL } from "@notra/ai/constants/models";
-import { getContentBillingLimitLabel } from "@notra/ai/utils/content-billing-messages";
+import {
+  describeContentBillingDenial,
+  getContentBillingLimitLabel,
+} from "@notra/ai/utils/content-billing-messages";
 import { isCustomIntervalDue } from "@notra/ai/utils/schedule-interval";
 import { scheduleWorkflowPayloadSchema } from "@notra/schemas/dashboard/workflows";
 import { sleep } from "workflow";
@@ -16,6 +19,10 @@ import type { ScheduleContentWorkflowResult } from "@/types/workflows/schedule-g
 import { resolveContentLimitPauseReason } from "@/utils/content-billing";
 import { parseCustomIntervalCron } from "@/utils/schedule-interval";
 
+import {
+  recordAutomationRunFinish,
+  recordAutomationRunStart,
+} from "./steps/automation-run-history";
 import {
   appendAutomationLog,
   claimWorkflowExecution,
@@ -82,10 +89,24 @@ export async function scheduleContentWorkflow(payload: {
     await fetchScheduleTriggerContext(triggerId);
   if (!trigger) {
     console.log(`[Schedule] Trigger ${triggerId} not found, canceling`);
+    if (manual) {
+      await recordAutomationRunFinish({
+        id: resolvedExecutionId,
+        status: "failed",
+        errorMessage: "The automation could not be loaded",
+      });
+    }
     return { status: "trigger_not_found" };
   }
   if (!trigger.enabled) {
     console.log(`[Schedule] Trigger ${triggerId} is disabled, canceling`);
+    if (manual) {
+      await recordAutomationRunFinish({
+        id: resolvedExecutionId,
+        status: "skipped",
+        errorMessage: "The automation is turned off",
+      });
+    }
     return { status: "trigger_disabled" };
   }
   const customInterval = parseCustomIntervalCron(trigger.sourceConfig);
@@ -96,6 +117,12 @@ export async function scheduleContentWorkflow(payload: {
     return { status: "not_due" };
   }
   const automationName = trigger.name.trim() || trigger.outputType;
+  await recordAutomationRunStart({
+    id: resolvedExecutionId,
+    organizationId: trigger.organizationId,
+    automationId: triggerId,
+    manual,
+  });
 
   const gate = await gateContentBilling({
     organizationId: trigger.organizationId,
@@ -121,6 +148,11 @@ export async function scheduleContentWorkflow(payload: {
         });
       }
     }
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status: "skipped",
+      errorMessage: describeContentBillingDenial(gate),
+    });
     return { status: "credits_exhausted" };
   }
   const releaseBilling = () =>
@@ -138,6 +170,7 @@ export async function scheduleContentWorkflow(payload: {
       fetchScheduleSources({
         organizationId: trigger.organizationId,
         repositoryIds: trigger.targets.repositoryIds,
+        linearIntegrationIds: trigger.targets.linearIntegrationIds,
       }),
       fetchBrandSettingsData({
         organizationId: trigger.organizationId,
@@ -147,6 +180,11 @@ export async function scheduleContentWorkflow(payload: {
     ]);
   } catch (error) {
     await releaseBilling();
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status: "failed",
+      errorMessage: "Unexpected workflow error",
+    });
     throw error;
   }
   const { repositories, linearIntegrationRefs } = sources;
@@ -156,6 +194,11 @@ export async function scheduleContentWorkflow(payload: {
       `[Schedule] No valid data sources for trigger ${triggerId}, canceling`
     );
     await releaseBilling();
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status: "skipped",
+      errorMessage: "No connected data sources",
+    });
     return { status: "no_sources" };
   }
 
@@ -170,11 +213,18 @@ export async function scheduleContentWorkflow(payload: {
     repositoryCount: repositories.length,
   };
 
-  const finish = (
+  const finish = async (
     status: "success" | "failed" | "skipped",
-    detail: { reason?: string; title?: string }
-  ) =>
-    finishGeneration({
+    { postId, ...detail }: { reason?: string; title?: string; postId?: string }
+  ) => {
+    await recordAutomationRunFinish({
+      id: resolvedExecutionId,
+      status,
+      title: detail.title,
+      errorMessage: detail.reason,
+      postId,
+    });
+    await finishGeneration({
       organizationId: trigger.organizationId,
       runId,
       workflow: WORKFLOW_ANALYTICS_NAMES.SCHEDULE_CONTENT,
@@ -185,6 +235,7 @@ export async function scheduleContentWorkflow(payload: {
       status,
       ...detail,
     });
+  };
   const cleanupCollection = () =>
     cleanupEmptyCollection({
       collectionId,
@@ -367,7 +418,7 @@ export async function scheduleContentWorkflow(payload: {
         ? primaryPost.title
         : `${createdPosts.length} ${trigger.outputType.replaceAll("_", " ")} drafts`;
 
-    await finish("success", { title: contentTitle });
+    await finish("success", { title: contentTitle, postId });
 
     await finalizeContentBilling({
       reservation: gate,

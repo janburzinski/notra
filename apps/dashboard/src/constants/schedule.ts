@@ -1,5 +1,3 @@
-import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
-
 import type { ScheduleCron } from "@/types/automation/schedule";
 
 export const DEFAULT_SCHEDULE: ScheduleCron = {
@@ -23,17 +21,3 @@ export const LOOKBACK_WINDOW_COMMON_LABEL_KEYS = {
   last_14_days: "last14Days",
   last_30_days: "last30Days",
 } as const;
-
-export const SCHEDULE_TABLE_ROW_HEIGHT = 48;
-/** Name, schedule, identity, output, sources, status, created, actions. */
-export const SCHEDULE_TABLE_SKELETON_COLUMNS: readonly DataTableSkeletonColumn[] =
-  [
-    { width: "1fr", minWidth: "4rem" },
-    "10rem",
-    "5.5rem",
-    "8.5rem",
-    "5.5rem",
-    "5rem",
-    "6.5rem",
-    { width: "3.5rem", minWidth: "3.5rem", align: "right" },
-  ];

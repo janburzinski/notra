@@ -1972,6 +1972,14 @@ export interface GeoChangesResponse {
   events: GeoChangeEvent[];
 }
 
+export interface GeoScanDiff {
+  previousScanId: string | null;
+  currentScanId: string | null;
+  previous: GeoScanCheckSnapshot[];
+  current: GeoScanCheckSnapshot[];
+  events: GeoChangeEvent[];
+}
+
 /** Stored state of one prompt in one translated language. */
 export interface GeoPromptTranslationRecord {
   promptId: string;

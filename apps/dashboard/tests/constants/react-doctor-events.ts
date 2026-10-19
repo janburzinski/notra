@@ -5,6 +5,7 @@ export const reactDoctorEventWorker = String.raw`
   import { dirname, resolve } from "node:path";
   import * as react from "react";
   import { ORPCError } from "@orpc/server";
+  import { resolveGeoAlertFormActions } from "./src/utils/geo-alert-form";
 
   globalThis.fetch = () => { throw new Error("Unexpected network access"); };
   const [file, component, mode] = process.argv.slice(1);
@@ -15,6 +16,7 @@ export const reactDoctorEventWorker = String.raw`
     UserMessageEditor: "UserMessageEditor",
     CompetitorSynonymsField: "CompetitorSynonymsField",
     toKnownIntegrationError: "toKnownIntegrationError",
+    GeoAlertEditor: "GeoAlertEditor",
   };
   if (privateExports[component]) {
     Bun.plugin({
@@ -47,6 +49,10 @@ export const reactDoctorEventWorker = String.raw`
     RenameCollectionDialog: ["Renamed collection"],
   };
   const action = () => { actions++; };
+  const destinationsQuery = {
+    data: { slackConnected: true, ownerCount: 1, webhookEndpointCount: 1 },
+    isSuccess: true, isError: false,
+  };
   const noop = () => {};
   const t = (key) => key;
   t.rich = (key) => key;
@@ -106,6 +112,10 @@ export const reactDoctorEventWorker = String.raw`
     useRenameContentCollection: () => queryMutation,
     useUpdateContentCollection: () => queryMutation,
     useMutation: () => queryMutation,
+    useQuery: () => destinationsQuery,
+    useGeoProjectsDb: () => ({ projects: [] }),
+    useInvalidateAutomationRuns: () => noop,
+    resolveGeoAlertFormActions,
     getRegistrableHost: () => "example.com",
     isUrlWithinBrandHost: () => true,
     normalizeSitemapUrl: (url) => url,
@@ -207,6 +217,47 @@ export const reactDoctorEventWorker = String.raw`
         }
       }
     }
+  } else if (mode === "alert") {
+    const props = {
+      organizationId: "org-a", organizationSlug: "org-a", open: true,
+      onOpenChange: noop,
+      editAlert: {
+        id: "alert-a", name: "Saved name", enabled: true,
+        sourceConfig: { signal: "visibility_drop", threshold: 5 },
+        actions: { slack: true, email: true, webhook: true },
+      },
+    };
+    const findNode = (node, property) => {
+      if (!node || typeof node !== "object") return undefined;
+      if (node.props && property in node.props) return node;
+      for (const value of Object.values(node.props ?? node)) {
+        for (const child of Array.isArray(value) ? value : [value]) {
+          const found = findNode(child, property);
+          if (found) return found;
+        }
+      }
+    };
+    const tree = render(props);
+    find(tree, "onNameChange")[0]("Unsaved name");
+    find(tree, "onToggle")[0]("slack", false);
+    for (const { index, update } of pending.splice(0)) {
+      states[index] = typeof update === "function" ? update(states[index]) : update;
+    }
+    const refetched = { ...props, editAlert: { ...props.editAlert, name: "Server changed name" } };
+    const rerendered = render(refetched);
+    assert.equal(findNode(rerendered, "onNameChange").props.name, "Unsaved name");
+    assert.equal(findNode(rerendered, "onToggle").props.actions.slack, false);
+    assert.equal(module.GeoAlertForm(props).key, module.GeoAlertForm(refetched).key);
+    assert.notEqual(module.GeoAlertForm(props).key, module.GeoAlertForm({ ...props, editAlert: { ...props.editAlert, id: "alert-b" } }).key);
+    assert.equal(module.GeoAlertForm({ ...props, open: false }), null);
+    actions = 0;
+    find(rerendered, "onSubmit")[0]({ preventDefault: noop });
+    assert.equal(actions, 1, "successful destination lookup allows saving");
+    destinationsQuery.isSuccess = false;
+    destinationsQuery.isError = true;
+    actions = 0;
+    find(render(refetched), "onSubmit")[0]({ preventDefault: noop });
+    assert.equal(actions, 0, "failed destination lookup cannot silently overwrite saved channels");
   } else if (mode === "chart") {
     const props = { data: [], config: {}, xDataKey: "x", defaultSelectedDataKey: "initial", onSelectionChange: (value) => notifications.push(value) };
     const tree = render(props);
@@ -237,6 +288,11 @@ export const reactDoctorEventWorker = String.raw`
 `;
 
 export const reactDoctorEventCases = [
+  [
+    "components/automation/alerts/geo-alert-form.tsx",
+    "GeoAlertEditor",
+    "alert",
+  ],
   [
     "app/(dashboard)/[slug]/brand/identity/components/add-reference-dialog.tsx",
     "TweetUrlStep",

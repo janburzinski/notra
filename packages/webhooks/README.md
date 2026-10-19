@@ -100,7 +100,7 @@ Creation body:
 }
 ```
 
-An endpoint accepts one to twelve event types:
+An endpoint accepts one to thirteen event types:
 
 | Event | Data |
 | --- | --- |
@@ -116,6 +116,7 @@ An endpoint accepts one to twelve event types:
 | `post.unpublished` | `postId` |
 | `geo.scan.completed` | `scanId`, `projectId`, `runId`, `checksTotal`, `checksFailed`, `mentions`, `durationMs` |
 | `geo.scan.failed` | `scanId`, `projectId`, `errorCode`, `error`, `failedStage`, `retryable` |
+| `geo.alert.triggered` | `automationId`, `automationName`, `signal`, `projectId`, `scanId`, `title`, `summary`, `url`, `changes` |
 
 Generation events require a **tracked generation job**. A completed job requires a
 post ID or brand identity ID. The first terminal event for a job wins, even if a
@@ -143,6 +144,11 @@ Completed payloads contain `runId` (`string | null`) and `checksTotal`,
 contain `errorCode`, `error`, `failedStage` (each `string | null`) and `retryable`
 (`boolean | null`). All fields are required; unavailable values are `null`.
 Failure text is bounded to 256 characters for `errorCode` and 4096 for `error`.
+
+GEO alert events are published by the dashboard when an alert automation with the
+webhook action fires, at most once per automation and scan. `scanId` is `null` for
+test alerts; `changes` lists up to 20 prompts with `prompt`, `engine`, `kind` and
+`competitors`.
 
 Post and GEO outbox rows and subscription snapshots commit in the source
 transaction. A failing event insert rolls back the source change. New events use

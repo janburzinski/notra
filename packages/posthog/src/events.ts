@@ -185,6 +185,7 @@ export const POSTHOG_EVENTS = {
   SCHEDULE_TOGGLED: "schedule_toggled",
   SCHEDULE_DELETED: "schedule_deleted",
   SCHEDULE_RUN_NOW: "schedule_run_now",
+  GEO_ALERT_DELETED: "geo_alert_deleted",
   INTEGRATION_CONNECT_STARTED: "integration_connect_started",
   INTEGRATION_CONNECTED: "integration_connected",
   INTEGRATION_CONNECT_FAILED: "integration_connect_failed",

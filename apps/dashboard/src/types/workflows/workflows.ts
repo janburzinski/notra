@@ -21,7 +21,7 @@ export interface WorkflowTriggerData {
 export interface ScheduleTriggerData extends WorkflowTriggerData {
   sourceType: string;
   sourceConfig: unknown;
-  targets: { repositoryIds: string[] };
+  targets: { repositoryIds: string[]; linearIntegrationIds?: string[] };
 }
 
 export interface WorkflowRepositoryData {

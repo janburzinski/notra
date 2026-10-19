@@ -57,6 +57,8 @@ export const DEFAULT_MIN_COLUMN_WIDTH = 64;
 export const HEADER_CH_BUFFER = 1;
 
 export const DATA_TABLE_ROW_HEIGHT = 48;
+/** Column header band; slimmer than a row so the labels do not float in grey. */
+export const DATA_TABLE_HEADER_HEIGHT = 36;
 export const DATA_TABLE_HEIGHT = 440;
 export const DATA_TABLE_OVERSCAN = 10;
 export const DATA_TABLE_SKELETON_ROWS = 3;

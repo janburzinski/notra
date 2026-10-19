@@ -8,6 +8,7 @@ import { useTranslations } from "use-intl";
 import { EVENT_TYPE_META } from "@/constants/event-triggers";
 import type { EventTypeCardProps } from "@/types/automation/event-trigger";
 
+/** One selectable row inside the trigger-event box. */
 export function EventTypeCard({
   eventType,
   selected,
@@ -21,45 +22,41 @@ export function EventTypeCard({
     <button
       aria-pressed={selected}
       className={cn(
-        "group bg-card relative flex flex-col gap-3 rounded-xl border p-4 text-left transition-colors",
-        "hover:border-foreground/30",
-        selected ? "border-foreground bg-muted/50" : "border-border"
+        "group duration-fast focus-visible:bg-muted/50 flex min-h-12 w-full items-center gap-3 px-4 py-3 text-left transition-colors outline-none",
+        selected ? "bg-muted/40" : "hover:bg-muted/30"
       )}
       onClick={onSelect}
       type="button"
     >
-      <div className="flex items-start justify-between">
+      <span className="bg-background ring-foreground/10 flex size-8 shrink-0 items-center justify-center rounded-lg ring-1">
         <HugeiconsIcon
-          className={cn("size-5", meta.iconClass)}
+          className={cn("size-4", meta.iconClass)}
           icon={meta.icon}
+          strokeWidth={1.75}
         />
-        <div
-          className={cn(
-            "flex size-5 shrink-0 items-center justify-center rounded-full transition-colors",
-            selected
-              ? "bg-foreground text-background"
-              : "border-muted-foreground/30 group-hover:border-muted-foreground/50 border"
-          )}
-        >
-          {selected && (
-            <HugeiconsIcon
-              className="size-3"
-              icon={Tick01Icon}
-              strokeWidth={3}
-            />
-          )}
-        </div>
-      </div>
-      <div className="space-y-1">
-        <p className="text-sm font-medium">
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-medium">
           {eventType === "release"
             ? tLabels("releasePublished")
             : t(`${eventType}.label`)}
-        </p>
-        <p className="text-muted-foreground text-xs leading-relaxed">
+        </span>
+        <span className="text-muted-foreground block text-sm">
           {t(`${eventType}.description`)}
-        </p>
-      </div>
+        </span>
+      </span>
+      <span
+        className={cn(
+          "flex size-5 shrink-0 items-center justify-center rounded-full transition-colors",
+          selected
+            ? "bg-foreground text-background"
+            : "border-muted-foreground/30 group-hover:border-muted-foreground/50 border"
+        )}
+      >
+        {selected && (
+          <HugeiconsIcon className="size-3" icon={Tick01Icon} strokeWidth={3} />
+        )}
+      </span>
     </button>
   );
 }

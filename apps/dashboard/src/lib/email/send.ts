@@ -1,5 +1,6 @@
 import { AiCreditsDepletedEmail } from "@notra/email/emails/ai-credits-depleted";
 import { FeedbackEmail } from "@notra/email/emails/feedback";
+import { GeoAlertEmail } from "@notra/email/emails/geo-alert";
 import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-content-created";
 import { ScheduledContentFailedEmail } from "@notra/email/emails/schedule-content-failed";
 import { ScheduledContentSkippedEmail } from "@notra/email/emails/schedule-content-skipped";
@@ -17,6 +18,7 @@ import type {
   SendVisibilityDropEmailProps,
   SendWeeklySummaryEmailProps,
   SendFeedbackEmailProps,
+  SendGeoAlertEmailProps,
   SendScheduledContentCreatedEmailProps,
   SendScheduledContentFailedEmailProps,
   SendScheduledContentSkippedEmailProps,
@@ -29,7 +31,7 @@ export function getAppUrl() {
 }
 
 function getSchedulesLink(organizationSlug: string) {
-  return `${getAppUrl()}/${organizationSlug}/automation/schedules`;
+  return `${getAppUrl()}/${organizationSlug}/automation`;
 }
 
 export async function sendWelcomeEmail({ userEmail }: { userEmail: string }) {
@@ -254,5 +256,19 @@ export async function sendVisibilityDropEmail({
     subject: `AI visibility dropped for ${props.organizationName}`,
     react: VisibilityDropEmail(props),
     idempotencyKey: `${recipientEmail}:${props.organizationSlug}:drop:${dateKey}`,
+  });
+}
+
+export async function sendGeoAlertEmail({
+  recipientEmail,
+  alertKey,
+  ...props
+}: SendGeoAlertEmailProps) {
+  return sendBrewEmail({
+    category: "daily-summary",
+    to: recipientEmail,
+    subject: props.headline,
+    react: GeoAlertEmail(props),
+    idempotencyKey: `${recipientEmail}:${props.organizationSlug}:alert:${alertKey}`,
   });
 }

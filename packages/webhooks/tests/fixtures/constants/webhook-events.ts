@@ -41,4 +41,26 @@ export const WEBHOOK_EVENT_FIXTURES = [
       retryable: null,
     },
   },
+  {
+    type: "geo.alert.triggered",
+    data: {
+      automationId: "automation-one",
+      automationName: "Visibility drops",
+      signal: "visibility_drop",
+      projectId: "project-one",
+      scanId: "scan-one",
+      title: "AI visibility dropped 20 pts for Acme",
+      summary:
+        "Mentioned in 40% of answers, down from 60% in the previous scan.",
+      url: "https://app.usenotra.com/acme/geo",
+      changes: [
+        {
+          prompt: "best issue tracker",
+          engine: "openai/gpt-5",
+          kind: "lost_mention",
+          competitors: [],
+        },
+      ],
+    },
+  },
 ] as const;

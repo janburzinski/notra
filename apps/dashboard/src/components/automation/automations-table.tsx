@@ -1,0 +1,307 @@
+"use client";
+
+import {
+  AiBrowserIcon,
+  Clock01Icon,
+  Delete02Icon,
+  Edit02Icon,
+  GithubIcon,
+  MoreVerticalIcon,
+  PlayCircleIcon,
+  SentIcon,
+  Task01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { GEO_ALERT_DEFAULT_THRESHOLDS } from "@notra/schemas/dashboard/automation/geo-alerts";
+import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
+import { Badge } from "@notra/ui/components/ui/badge";
+import {
+  DataTable,
+  type TableColumn,
+} from "@notra/ui/components/ui/data-table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@notra/ui/components/ui/dropdown-menu";
+import { Spinner } from "@notra/ui/components/ui/spinner";
+import { Switch } from "@notra/ui/components/ui/switch";
+import type { ReactNode } from "react";
+import { useFormatter, useNow, useTranslations } from "use-intl";
+
+import { AutomationActionIcon } from "@/components/automation/action-icon";
+import { Button } from "@/components/button";
+import {
+  AUTOMATION_EMPTY_TABLE_HEIGHT,
+  TABLE_ROW_HEIGHT,
+} from "@/constants/table";
+import { useAutomationRowName } from "@/lib/hooks/use-automation-row-name";
+import { useOutputTypeLabel } from "@/lib/hooks/use-output-type-label";
+import { useScheduleFrequencyLabel } from "@/lib/hooks/use-schedule-frequency-label";
+import type { AutomationRow } from "@/types/automation/automations";
+import { rowEnabled } from "@/utils/automation-rows";
+import { latest } from "@/utils/latest-date";
+import { OutputTypeIcon } from "@/utils/output-types";
+import { tableHeightFor } from "@/utils/table";
+
+interface AutomationsTableProps {
+  rows: AutomationRow[];
+  busyId?: string;
+  emptyState: ReactNode;
+  onEdit: (row: AutomationRow) => void;
+  onToggle: (row: AutomationRow, enabled: boolean) => void;
+  onDelete: (row: AutomationRow) => void;
+  onRunNow: (row: AutomationRow) => void;
+  onSendTest: (row: AutomationRow) => void;
+  onViewRuns: (row: AutomationRow) => void;
+  /** Newest run per automation ID. */
+  lastRuns: Map<string, string>;
+}
+
+const KIND_ICONS: Record<AutomationRow["kind"], IconSvgElement> = {
+  alert: AiBrowserIcon,
+  schedule: Clock01Icon,
+  event: GithubIcon,
+};
+
+export function AutomationsTable({
+  rows,
+  busyId,
+  emptyState,
+  onEdit,
+  onToggle,
+  onDelete,
+  onRunNow,
+  onSendTest,
+  onViewRuns,
+  lastRuns,
+}: AutomationsTableProps) {
+  const t = useTranslations("automation.page");
+  const tAlerts = useTranslations("automation.alerts");
+  const tEvents = useTranslations("automation.events.page");
+  const tCommon = useTranslations("common");
+  const format = useFormatter();
+  const now = useNow({ updateInterval: 60_000 });
+  const formatFrequency = useScheduleFrequencyLabel();
+  const outputTypeLabel = useOutputTypeLabel();
+  const nameOf = useAutomationRowName();
+
+  const triggerSummary = (row: AutomationRow) => {
+    if (row.kind === "schedule") {
+      return {
+        icon: Clock01Icon,
+        label: formatFrequency(row.trigger.sourceConfig.cron),
+      };
+    }
+    if (row.kind === "event") {
+      const events = row.trigger.sourceConfig.eventTypes ?? [];
+      return {
+        icon: GithubIcon,
+        label: t("onGithub", {
+          events: events
+            .map((event) =>
+              event === "release"
+                ? tCommon("labels.release")
+                : tEvents("eventNames.push")
+            )
+            .join(", "),
+        }),
+      };
+    }
+    const { signal, threshold } = row.alert.sourceConfig;
+    const value = threshold ?? GEO_ALERT_DEFAULT_THRESHOLDS[signal];
+    return {
+      icon: AiBrowserIcon,
+      label:
+        value === undefined
+          ? tAlerts(`signals.${signal}.short`)
+          : tAlerts(`signals.${signal}.shortWithValue`, { value }),
+    };
+  };
+
+  const columns: TableColumn<AutomationRow>[] = [
+    {
+      key: "name",
+      header: t("columns.automation"),
+      width: "1fr",
+      minWidth: "12rem",
+      cell: (row) => (
+        <button
+          className="flex min-w-0 items-center gap-2.5 text-left outline-none focus-visible:underline"
+          onClick={() => onEdit(row)}
+          type="button"
+        >
+          <HugeiconsIcon
+            className="text-muted-foreground size-4 shrink-0"
+            icon={KIND_ICONS[row.kind]}
+          />
+          <TruncateWithTooltip className="text-sm font-medium">
+            {nameOf(row)}
+          </TruncateWithTooltip>
+        </button>
+      ),
+    },
+    {
+      key: "trigger",
+      header: t("columns.trigger"),
+      width: "14rem",
+      cell: (row) => {
+        const { icon, label } = triggerSummary(row);
+        return (
+          <span className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
+            <HugeiconsIcon className="size-4 shrink-0" icon={icon} />
+            <TruncateWithTooltip>{label}</TruncateWithTooltip>
+          </span>
+        );
+      },
+    },
+    {
+      key: "lastRun",
+      header: t("columns.lastRun"),
+      width: "9.5rem",
+      cell: (row) => {
+        const lastRun = lastRuns.get(row.id);
+        return lastRun ? (
+          <span className="text-muted-foreground text-sm whitespace-nowrap tabular-nums">
+            {format.relativeTime(new Date(lastRun), latest(now, lastRun))}
+          </span>
+        ) : (
+          <span className="text-muted-foreground/60 text-sm">—</span>
+        );
+      },
+    },
+    {
+      key: "action",
+      header: t("columns.action"),
+      width: "11rem",
+      cell: (row) => {
+        if (row.kind !== "alert") {
+          return (
+            <Badge shape="rounded" variant="secondary">
+              <OutputTypeIcon outputType={row.trigger.outputType} />
+              {outputTypeLabel(row.trigger.outputType)}
+            </Badge>
+          );
+        }
+        const actions = (["slack", "email", "webhook"] as const).filter(
+          (key) => row.alert.actions[key]
+        );
+        // Several destinations don't fit as labelled badges, so they go
+        // icon-only with the name kept for hover and screen readers.
+        const compact = actions.length > 1;
+        return (
+          <span className="flex items-center gap-1">
+            {actions.map((key) => {
+              const label = tAlerts(`actionLabels.${key}`);
+              return (
+                <Badge
+                  key={key}
+                  shape="rounded"
+                  title={compact ? label : undefined}
+                  variant="secondary"
+                >
+                  <AutomationActionIcon kind={key} />
+                  {compact ? <span className="sr-only">{label}</span> : label}
+                </Badge>
+              );
+            })}
+          </span>
+        );
+      },
+    },
+    {
+      key: "enabled",
+      header: t("columns.enabled"),
+      width: "5.5rem",
+      cell: (row) => (
+        <Switch
+          aria-label={t("toggle", { name: nameOf(row) })}
+          checked={rowEnabled(row)}
+          disabled={busyId === row.id}
+          onCheckedChange={(enabled) => onToggle(row, enabled)}
+        />
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      width: "3rem",
+      minWidth: "3rem",
+      cell: (row) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                aria-label={tCommon("labels.actionsForName", {
+                  name: nameOf(row),
+                })}
+                disabled={busyId === row.id}
+                size="icon"
+                variant="ghost"
+              >
+                {busyId === row.id ? (
+                  <Spinner />
+                ) : (
+                  <HugeiconsIcon
+                    className="text-muted-foreground size-4"
+                    icon={MoreVerticalIcon}
+                  />
+                )}
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit(row)}>
+              <HugeiconsIcon className="size-4" icon={Edit02Icon} />
+              {tCommon("actions.edit")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewRuns(row)}>
+              <HugeiconsIcon className="size-4" icon={Task01Icon} />
+              {t("viewRuns")}
+            </DropdownMenuItem>
+            {row.kind === "alert" ? (
+              <DropdownMenuItem onClick={() => onSendTest(row)}>
+                <HugeiconsIcon className="size-4" icon={SentIcon} />
+                {tAlerts("dialog.sendTest")}
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                disabled={!rowEnabled(row)}
+                onClick={() => onRunNow(row)}
+              >
+                <HugeiconsIcon className="size-4" icon={PlayCircleIcon} />
+                {tCommon("labels.runNow")}
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => onDelete(row)}
+              variant="destructive"
+            >
+              <HugeiconsIcon className="size-4" icon={Delete02Icon} />
+              {tCommon("actions.delete")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+
+  return (
+    <DataTable
+      columns={columns}
+      data={rows}
+      emptyState={emptyState}
+      getRowId={(row) => row.id}
+      height={
+        rows.length === 0
+          ? AUTOMATION_EMPTY_TABLE_HEIGHT
+          : tableHeightFor(rows.length, TABLE_ROW_HEIGHT)
+      }
+      rowHeight={TABLE_ROW_HEIGHT}
+    />
+  );
+}

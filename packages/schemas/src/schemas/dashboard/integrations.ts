@@ -471,7 +471,20 @@ export const configureEventTriggerBodySchema =
     outputType: z.enum(SUPPORTED_AUTOMATION_OUTPUT_TYPES),
   });
 
+export const scheduleTargetsSchema = z
+  .object({
+    repositoryIds: z.array(z.string().min(1)),
+    linearIntegrationIds: z.array(z.string().min(1)).optional(),
+  })
+  .refine(
+    (targets) =>
+      targets.repositoryIds.length > 0 ||
+      (targets.linearIntegrationIds?.length ?? 0) > 0,
+    { message: "Select at least one data source" }
+  );
+
 export const configureScheduleBodySchema = configureTriggerBodySchema.extend({
+  targets: scheduleTargetsSchema,
   name: z.string().trim().min(1).max(MAX_SCHEDULE_NAME_LENGTH),
   sourceType: z.literal("cron"),
   sourceConfig: z.object({

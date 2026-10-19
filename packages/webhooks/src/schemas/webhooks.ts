@@ -25,6 +25,7 @@ export const EventType = Schema.Literals([
   "post.unpublished",
   "geo.scan.completed",
   "geo.scan.failed",
+  "geo.alert.triggered",
 ]);
 const jobId = Schema.NonEmptyString;
 export const EventData = Schema.Union([
@@ -92,6 +93,27 @@ export const EventData = Schema.Union([
       error: Schema.NullOr(Schema.String),
       failedStage: Schema.NullOr(Schema.String),
       retryable: Schema.NullOr(Schema.Boolean),
+    }),
+  }),
+  Schema.Struct({
+    type: Schema.tag("geo.alert.triggered"),
+    data: Schema.Struct({
+      automationId: Schema.NonEmptyString,
+      automationName: Schema.String,
+      signal: Schema.NonEmptyString,
+      projectId: Schema.NonEmptyString,
+      scanId: Schema.NullOr(Schema.String),
+      title: Schema.String,
+      summary: Schema.String,
+      url: Schema.String,
+      changes: Schema.Array(
+        Schema.Struct({
+          prompt: Schema.String,
+          engine: Schema.String,
+          kind: Schema.String,
+          competitors: Schema.Array(Schema.String),
+        })
+      ),
     }),
   }),
 ]).pipe(Schema.toTaggedUnion("type"));

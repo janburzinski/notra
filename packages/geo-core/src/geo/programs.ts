@@ -64,6 +64,7 @@ import type { DbTransaction } from "../types/db";
 import type {
   AiTrafficResponse,
   GeoChangesResponse,
+  GeoScanDiff,
   GeoChangeScan,
   GeoCompetitorDomainFillInput,
   GeoCompetitorIgnoreInput,
@@ -1089,11 +1090,13 @@ export const loadGeoChanges = Effect.fn("geo.changes")(function* (
     ],
     { concurrency: "unbounded" }
   );
-  const events = diffScanChecks(
-    comparison.previous.map(toGeoScanCheckSnapshot),
-    comparison.current.map(toGeoScanCheckSnapshot),
-    competitors
-  );
+  const events = comparison.previousScan
+    ? diffScanChecks(
+        comparison.previous.map(toGeoScanCheckSnapshot),
+        comparison.current.map(toGeoScanCheckSnapshot),
+        competitors
+      )
+    : [];
 
   const response: GeoChangesResponse = {
     previousScan: toGeoChangeScan(comparison.previousScan),
@@ -1102,6 +1105,34 @@ export const loadGeoChanges = Effect.fn("geo.changes")(function* (
     events: events.slice(0, GEO_CHANGES_LIMIT),
   };
   return response;
+});
+
+/** Every change between the two latest completed scans, unsliced. */
+export const loadGeoScanDiff = Effect.fn("geo.scanDiff")(function* (
+  input: GeoScopeInput
+) {
+  const scope = yield* requireGeoProject(input);
+  const [comparison, competitors] = yield* Effect.all(
+    [
+      geoDb("scan comparison query failed", () =>
+        queryGeoScanComparison({ projectId: scope.projectId })
+      ),
+      loadCompetitorsByProject(scope.projectId),
+    ],
+    { concurrency: "unbounded" }
+  );
+  const previous = comparison.previous.map(toGeoScanCheckSnapshot);
+  const current = comparison.current.map(toGeoScanCheckSnapshot);
+  const diff: GeoScanDiff = {
+    previousScanId: comparison.previousScan?.id ?? null,
+    currentScanId: comparison.currentScan?.id ?? null,
+    previous,
+    current,
+    events: comparison.previousScan
+      ? diffScanChecks(previous, current, competitors)
+      : [],
+  };
+  return diff;
 });
 
 export const loadGeoCompetitorShare = Effect.fn("geo.competitorShare")(

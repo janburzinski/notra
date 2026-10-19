@@ -4,7 +4,6 @@ import {
   AiChat01Icon,
   Analytics01Icon,
   AnalyticsUpIcon,
-  Calendar03Icon,
   ChartAnalysisIcon,
   Comment01Icon,
   CorporateIcon,
@@ -18,7 +17,6 @@ import {
   Message01Icon,
   NoteIcon,
   Notification01Icon,
-  Notification03Icon,
   PlugIcon,
   QuotesIcon,
   SearchList01Icon,
@@ -27,6 +25,7 @@ import {
   UserGroupIcon,
   Wallet01Icon,
   WebDesign01Icon,
+  WorkflowSquare03Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 
@@ -56,8 +55,7 @@ export const COMMAND_ROUTE_LABEL_KEYS = {
   sites: "sites",
   "brand-company-info": "companyInfo",
   "brand-references": "references",
-  "automation-schedules": "schedules",
-  "automation-events": "events",
+  automations: "automations",
   "api-keys": "apiKeys",
   integrations: "integrations",
   "github-integration": "github",
@@ -275,20 +273,21 @@ export const COMMAND_ROUTES: CommandRoute[] = [
     path: (slug) => `/${slug}/brand/identity?view=references`,
   },
   {
-    id: "automation-schedules",
-    label: "Schedules",
-    keywords: ["cron", "recurring", "automation", "calendar"],
-    icon: Calendar03Icon,
+    id: "automations",
+    label: "Automations",
+    keywords: [
+      "schedules",
+      "cron",
+      "recurring",
+      "events",
+      "triggers",
+      "alerts",
+      "webhooks",
+      "slack",
+    ],
+    icon: WorkflowSquare03Icon,
     section: "Automation",
-    path: (slug) => `/${slug}/automation/schedules`,
-  },
-  {
-    id: "automation-events",
-    label: "Events",
-    keywords: ["triggers", "webhooks", "automation"],
-    icon: Notification03Icon,
-    section: "Automation",
-    path: (slug) => `/${slug}/automation/events`,
+    path: (slug) => `/${slug}/automation`,
   },
   {
     id: "api-keys",
@@ -416,7 +415,7 @@ export const COMMAND_PALETTE_RECENTS_LIMIT = 5;
 
 export const COMMAND_PALETTE_SUGGESTED_ROUTES = {
   geo: ["geo", "geo-prompts", "geo-gaps", "geo-competitors"],
-  studio: ["home", "content", "chat", "automation-schedules"],
+  studio: ["home", "content", "chat", "automations"],
 } as const satisfies Record<string, readonly CommandRouteId[]>;
 
 export const COMMAND_PALETTE_ENTITY_ICONS = {

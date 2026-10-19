@@ -15,9 +15,11 @@ import {
   contentTriggerLookbackWindows,
   contentTriggers,
   githubIntegrations,
+  linearIntegrations,
 } from "@notra/db/schema";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
+import { listAutomationRunsInputSchema } from "@notra/schemas/dashboard/automation/runs";
 import {
   configureEventTriggerBodySchema,
   configureScheduleBodySchema,
@@ -31,9 +33,14 @@ import { customAlphabet } from "nanoid";
 
 import { DEFAULT_LOOKBACK_WINDOW } from "@/constants/workflows";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
+import {
+  listAutomationRuns,
+  listLatestAutomationRuns,
+} from "@/lib/automation/runs";
 import { assertActiveSubscription } from "@/lib/billing/subscription";
 import { getTranslations } from "@/lib/i18n/server";
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
+import { automationAlertsRouter } from "@/lib/orpc/routers/automation-alerts";
 import {
   ManualTriggerRunError,
   triggerManualAutomationRun,
@@ -69,24 +76,43 @@ async function ensureTriggerInOrganization(
 
 async function ensureScheduleTargetsExist(
   organizationId: string,
-  repositoryIds: string[]
+  repositoryIds: string[],
+  linearIntegrationIds: string[] = []
 ) {
-  if (repositoryIds.length === 0) {
+  if (repositoryIds.length === 0 && linearIntegrationIds.length === 0) {
     return;
   }
 
-  const targetIntegrations = await db.query.githubIntegrations.findMany({
-    where: and(
-      eq(githubIntegrations.organizationId, organizationId),
-      inArray(githubIntegrations.id, repositoryIds)
-    ),
-    columns: { id: true },
-  });
+  const [targetIntegrations, targetLinearIntegrations] = await Promise.all([
+    db.query.githubIntegrations.findMany({
+      where: and(
+        eq(githubIntegrations.organizationId, organizationId),
+        inArray(githubIntegrations.id, repositoryIds)
+      ),
+      columns: { id: true },
+    }),
+    linearIntegrationIds.length === 0
+      ? Promise.resolve([])
+      : db.query.linearIntegrations.findMany({
+          where: and(
+            eq(linearIntegrations.organizationId, organizationId),
+            eq(linearIntegrations.enabled, true),
+            inArray(linearIntegrations.id, linearIntegrationIds)
+          ),
+          columns: { id: true },
+        }),
+  ]);
 
   const existingIds = new Set(
     targetIntegrations.map((integration) => integration.id)
   );
-  const missingIds = repositoryIds.filter((id) => !existingIds.has(id));
+  const existingLinearIds = new Set(
+    targetLinearIntegrations.map((integration) => integration.id)
+  );
+  const missingIds = [
+    ...repositoryIds.filter((id) => !existingIds.has(id)),
+    ...linearIntegrationIds.filter((id) => !existingLinearIds.has(id)),
+  ];
 
   if (missingIds.length > 0) {
     const tErrors = await getTranslations("errors.automation");
@@ -244,6 +270,19 @@ const deleteTrigger = baseProcedure
   });
 
 export const automationRouter = {
+  alerts: automationAlertsRouter,
+  runs: {
+    list: baseProcedure
+      .input(listAutomationRunsInputSchema)
+      .use(withOrganizationAccess)
+      .handler(({ input }) => listAutomationRuns(input)),
+    latest: baseProcedure
+      .input(organizationIdInputSchema)
+      .use(withOrganizationAccess)
+      .handler(async ({ input }) => ({
+        lastRunAt: await listLatestAutomationRuns(input.organizationId),
+      })),
+  },
   events: {
     list: baseProcedure
       .input(schedulesListInputSchema)
@@ -583,7 +622,8 @@ export const automationRouter = {
         if (input.enabled === true) {
           await ensureScheduleTargetsExist(
             input.organizationId,
-            normalized.targets.repositoryIds
+            normalized.targets.repositoryIds,
+            normalized.targets.linearIntegrationIds
           );
         }
 
@@ -737,7 +777,8 @@ export const automationRouter = {
         if (input.enabled === true) {
           await ensureScheduleTargetsExist(
             input.organizationId,
-            normalized.targets.repositoryIds
+            normalized.targets.repositoryIds,
+            normalized.targets.linearIntegrationIds
           );
         }
 

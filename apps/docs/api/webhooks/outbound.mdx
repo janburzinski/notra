@@ -24,6 +24,7 @@ deliveries, while members can see the delivery history.
 | `post.unpublished` | `postId` |
 | `geo.scan.completed` | `scanId`, `projectId`, `runId`, `checksTotal`, `checksFailed`, `mentions`, `durationMs` |
 | `geo.scan.failed` | `scanId`, `projectId`, `errorCode`, `error`, `failedStage`, `retryable` |
+| `geo.alert.triggered` | `automationId`, `automationName`, `signal`, `projectId`, `scanId`, `title`, `summary`, `url`, `changes` |
 
 You get `post.generation.*` events for tracked post generation jobs, including the
 ones you start with `POST /v1/posts/generate`, and the first terminal result for
@@ -59,6 +60,16 @@ field is always present, with `null` for unavailable values. Notra writes the ev
 in the same transaction as the scan result. Failure text is bounded, with `errorCode`
 limited to 256 characters and `error` to 4096 characters. Polling remains available
 for scan progress.
+
+### GEO alerts
+
+`geo.alert.triggered` fires when a GEO alert automation with the webhook action
+matches a scan, for example when visibility drops or a competitor takes your spot
+in an answer. `signal` is one of `visibility_drop`, `mention_lost`,
+`competitor_gain`, `citation_lost`, `scan_failed` or `scan_summary`. `scanId` is
+`null` for test alerts. `changes` lists up to 20 affected prompts, each with
+`prompt`, `engine`, `kind` and `competitors`. Each automation fires at most once
+per scan.
 
 ### Payload version
 

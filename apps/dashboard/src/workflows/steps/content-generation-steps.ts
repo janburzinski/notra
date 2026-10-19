@@ -188,6 +188,7 @@ export async function clearWorkflowPause(input: {
 export async function fetchScheduleSources(input: {
   organizationId: string;
   repositoryIds: string[];
+  linearIntegrationIds?: string[];
 }): Promise<{
   repositories: ScheduleRepositoryData[];
   linearIntegrationRefs: Array<{ integrationId: string; teamName?: string }>;
@@ -219,7 +220,10 @@ export async function fetchScheduleSources(input: {
       .where(
         and(
           eq(linearIntegrations.organizationId, input.organizationId),
-          eq(linearIntegrations.enabled, true)
+          eq(linearIntegrations.enabled, true),
+          input.linearIntegrationIds !== undefined
+            ? inArray(linearIntegrations.id, input.linearIntegrationIds)
+            : undefined
         )
       ),
   ]);

@@ -1328,9 +1328,13 @@ export async function queryGeoScanComparison(
   const currentScan = scanGroups[0]?.[0] ?? null;
   const previousScan =
     (input.window ? scanGroups[1]?.[0] : scanGroups[0]?.[1]) ?? null;
-  if (!currentScan || !previousScan) {
+  if (!currentScan) {
     return { previousScan: null, currentScan, previous: [], current: [] };
   }
+  // The first scan has nothing to compare against but still has its checks.
+  const scanIds = previousScan
+    ? [currentScan.id, previousScan.id]
+    : [currentScan.id];
 
   const rows = await db
     .select({
@@ -1361,7 +1365,7 @@ export async function queryGeoScanComparison(
     .where(
       and(
         eq(geoMentionChecks.projectId, input.projectId),
-        inArray(geoMentionChecks.scanId, [currentScan.id, previousScan.id]),
+        inArray(geoMentionChecks.scanId, scanIds),
         eq(geoMentionChecks.turn, 0),
         isNull(geoMentionChecks.sequenceId),
         isNull(geoMentionChecks.personaId),
@@ -1386,8 +1390,7 @@ export async function queryGeoScanComparison(
     };
     if (row.scanId === currentScan.id) {
       current.push(mapped);
-    }
-    if (row.scanId === previousScan.id) {
+    } else {
       previous.push(mapped);
     }
   }

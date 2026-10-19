@@ -12,6 +12,7 @@ export type TriggerSourceType =
 
 export interface TriggerTarget {
   repositoryIds: string[];
+  linearIntegrationIds?: string[];
 }
 
 export interface TriggerSourceConfig {

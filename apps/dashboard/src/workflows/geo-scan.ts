@@ -49,6 +49,7 @@ import {
   appendAutomationLogBestEffort,
   fetchLogRetention,
 } from "./steps/content-generation-steps";
+import { evaluateGeoAlertsStep } from "./steps/geo-alert-steps";
 import {
   collectGeoOlostepResultsStep,
   finalizeGeoScanProjectStep,
@@ -284,6 +285,8 @@ async function finalizeProjectRun(
   claimedAt: string,
   options: {
     retried: boolean;
+    /** The workflow retries this project, so alerts wait for that attempt. */
+    willRetry?: boolean;
     failureReason?: string;
     failure?: GeoScanFailureMetadata;
     retentionDays?: LogRetentionDays;
@@ -346,6 +349,26 @@ async function finalizeProjectRun(
         { scanId: context.scanId }
       );
     }
+  }
+  try {
+    if (!options.willRetry) {
+      await evaluateGeoAlertsStep({
+        organizationId: context.organizationId,
+        projectId: context.projectId,
+        scanId: context.scanId,
+        companyName: context.companyName,
+        status,
+        ...(options.failureReason
+          ? { failureReason: options.failureReason }
+          : {}),
+      });
+    }
+  } catch (error) {
+    await logFollowUpFailure(
+      `GEO alerts could not run for ${context.companyName}`,
+      error,
+      { scanId: context.scanId }
+    );
   }
   const errorMessage =
     status === "failed"
@@ -477,6 +500,7 @@ async function runGeoScanProjectRun(
   } catch (error) {
     await finalizeProjectRun(plan, totals, "failed", state.claimedAt, {
       retried: options.retried,
+      willRetry: !options.retried && totals.checks === 0 && planned > 0,
       failureReason: describeGeoScanFailure(error),
       failure: classifyGeoScanExecutionFailure(error),
       ...(retentionDays ? { retentionDays } : {}),
@@ -494,6 +518,7 @@ async function runGeoScanProjectRun(
   if (totals.checks === 0 && attempted > 0) {
     await finalizeProjectRun(plan, totals, "failed", state.claimedAt, {
       retried: options.retried,
+      willRetry: !options.retried,
       ...(retentionDays ? { retentionDays } : {}),
     });
     return { totals, attempted, noSuccessfulChecks: true };

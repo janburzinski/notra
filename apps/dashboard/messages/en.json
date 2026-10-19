@@ -2243,7 +2243,8 @@
       "logOut": "Log out",
       "allPlatforms": "All platforms",
       "contentActivity": "Content activity",
-      "sites": "Sites"
+      "sites": "Sites",
+      "automations": "Automations"
     },
     "messages": {
       "yourAiCreditsHaveBeen": "Your AI credits have been topped up and are ready to use.",
@@ -5179,8 +5180,6 @@
       "pausedCount": "Paused ({count})",
       "failedToUpdateTrigger": "Failed to update trigger"
     },
-    "schedulesMetaTitle": "Automation schedules",
-    "eventsMetaTitle": "Automation events",
     "brandVoice": {
       "noIdentity": "No identity",
       "noIdentityDescription": "No identity has been configured for this workspace yet.",
@@ -5222,28 +5221,6 @@
         "more": "More days",
         "days": "days",
         "invalid": "Pick between {min} and {max} days."
-      },
-      "quickStart": {
-        "description": "Start from a common cadence, then tweak anything before saving.",
-        "presets": {
-          "weekly-changelog": {
-            "label": "Weekly changelog",
-            "description": "Summarize the week's activity every Monday morning."
-          },
-          "daily-twitter": {
-            "label": "Daily X post",
-            "description": "Share a short update from yesterday's activity."
-          },
-          "monthly-blog": {
-            "label": "Monthly blog post",
-            "description": "Turn the month's highlights into a long-form article."
-          },
-          "biweekly-linkedin": {
-            "label": "Bi-weekly LinkedIn post",
-            "description": "Post a professional update every two weeks."
-          }
-        },
-        "createSchedule": "Create {title} schedule"
       },
       "summary": {
         "weekly": "Every {day} at {time}",
@@ -5302,8 +5279,7 @@
         "brandVoiceDefaultDescription": "Use your default brand voice.",
         "autoPublish": "Auto-publish",
         "autoPublishHint": "When on, posts are published immediately instead of saved as drafts.",
-        "add": "Add schedule",
-        "sourcesSelected": "{count, plural, one {# source selected} other {# sources selected}}"
+        "add": "Add schedule"
       },
       "lookbackWindows": {
         "current_day": "Current day"
@@ -5333,6 +5309,12 @@
         "monthly": "Monthly - Day {day} @ {time}",
         "custom": "Every {days} days @ {time}",
         "daily": "Daily @ {time}"
+      },
+      "row": {
+        "frequency": "Frequency",
+        "on": "on",
+        "at": "at",
+        "every": "every"
       }
     },
     "events": {
@@ -5359,8 +5341,6 @@
         "newTitle": "New event trigger",
         "description": "React to GitHub activity and generate content automatically.",
         "rulesHint": "Voice and publishing behavior for this trigger.",
-        "noRepositoriesSelected": "No repositories selected yet",
-        "repositoriesSelected": "{count, plural, one {# repository selected} other {# repositories selected}}",
         "add": "Add trigger",
         "triggerEvent": "Trigger event",
         "triggerEventHint": "When should this fire?",
@@ -5395,6 +5375,300 @@
         "hint": "If every commit in a push matches one of these, the push is skipped. Separate patterns with commas. Case doesn't matter.",
         "tryLabel": "Try a commit message",
         "tryPlaceholder": "e.g. chore: bump dependencies"
+      }
+    },
+    "metaTitle": "Automations",
+    "page": {
+      "title": "Automations",
+      "description": "Let Notra keep watch while you work: draft content when code ships, and get pinged the moment your AI visibility moves.",
+      "create": "New automation",
+      "createMenu": {
+        "alert": "GEO alert",
+        "alertHint": "Get notified when your AI visibility changes",
+        "schedule": "Scheduled content",
+        "scheduleHint": "Draft content on a recurring schedule",
+        "event": "Content on GitHub events",
+        "eventHint": "Draft content when you push or release"
+      },
+      "filters": {
+        "all": "All",
+        "content": "Content",
+        "alerts": "Alerts",
+        "paused": "Paused"
+      },
+      "columns": {
+        "trigger": "Trigger",
+        "action": "Does",
+        "automation": "Automation",
+        "lastRun": "Last run",
+        "enabled": "Enabled"
+      },
+      "kinds": {
+        "schedule": "Schedule",
+        "event": "GitHub",
+        "alert": "GEO scan"
+      },
+      "onGithub": "On {events}",
+      "toggle": "Turn {name} on or off",
+      "emptyFilter": "Nothing here yet.",
+      "integrationDeleted": "Can't turn this on because its integration was deleted. Edit it and pick another integration.",
+      "updateFailed": "Couldn't update the automation",
+      "removed": "Automation deleted",
+      "deleteFailed": "Couldn't delete the automation",
+      "triggered": "Running now. Content will show up shortly.",
+      "runFailed": "Couldn't run the automation",
+      "deleteTitle": "Delete automation?",
+      "deleteDescription": "“{name}” stops running and is deleted. This can't be undone.",
+      "delete": "Delete",
+      "createMore": "More ways to create",
+      "filterLabel": "Filter automations",
+      "empty": {
+        "title": "No automations yet",
+        "description": "Set up an alert or a scheduled draft, or start from a template below."
+      },
+      "templatesTitle": "Templates",
+      "more": "More",
+      "eventRowName": "{event} → {output}",
+      "viewRuns": "View runs"
+    },
+    "templates": {
+      "title": "Templates",
+      "categories": {
+        "geo": {
+          "title": "GEO alerts",
+          "description": "Checked after every scan"
+        },
+        "content": {
+          "title": "Self-updating content",
+          "description": "Drafts land in Content for review"
+        },
+        "webhooks": {
+          "title": "Webhooks",
+          "description": "Wire Notra into your own stack"
+        }
+      },
+      "triggers": {
+        "schedule": "Scheduled",
+        "github": "GitHub event",
+        "geo": "GEO scan",
+        "event": "Notra event"
+      },
+      "actions": {
+        "content": "Draft content",
+        "slack": "Slack",
+        "email": "Email",
+        "webhook": "Webhook",
+        "alert": "Alert"
+      },
+      "items": {
+        "visibility-drop": {
+          "title": "Visibility drops",
+          "description": "Alerts you when you're mentioned in noticeably fewer AI answers than in the previous scan."
+        },
+        "competitor-gain": {
+          "title": "Competitor takes your spot",
+          "description": "Flags prompts where a competitor pushed you down, replaced you or started getting cited."
+        },
+        "mention-lost": {
+          "title": "Dropped out of answers",
+          "description": "Lists the prompts that mentioned you last scan and no longer do."
+        },
+        "citation-lost": {
+          "title": "Lost a citation",
+          "description": "Tells you when AI answers stop linking to your site."
+        },
+        "scan-summary": {
+          "title": "Scan digest",
+          "description": "Posts a short summary after every scan: visibility, wins and losses."
+        },
+        "scan-failed": {
+          "title": "Scan failed",
+          "description": "Lets you know right away when a GEO scan can't finish."
+        },
+        "code-changes": {
+          "title": "Update from code changes",
+          "description": "Drafts a changelog entry whenever code lands on your default branch."
+        },
+        "release-announcement": {
+          "title": "Announce releases",
+          "description": "Writes a LinkedIn post every time you publish a GitHub release."
+        },
+        "weekly-changelog": {
+          "title": "Weekly changelog",
+          "description": "Summarizes the week's activity every Monday morning."
+        },
+        "daily-twitter": {
+          "title": "Daily X post",
+          "description": "Shares a short update from yesterday's activity."
+        },
+        "monthly-blog": {
+          "title": "Monthly blog post",
+          "description": "Turns the month's highlights into a long-form article."
+        },
+        "biweekly-linkedin": {
+          "title": "Bi-weekly LinkedIn post",
+          "description": "Posts a professional update every two weeks."
+        },
+        "webhooks": {
+          "title": "Send events to your endpoint",
+          "description": "Get signed requests when posts publish, scans finish or an alert fires."
+        }
+      },
+      "active": "Active",
+      "description": "Start from a proven workflow, then tailor its trigger and destinations."
+    },
+    "alerts": {
+      "enabled": "Alert turned on",
+      "paused": "Alert paused",
+      "actionLabels": {
+        "slack": "Slack",
+        "email": "Email",
+        "webhook": "Webhook"
+      },
+      "signals": {
+        "visibility_drop": {
+          "label": "Visibility drops",
+          "description": "Fires when you're mentioned in fewer AI answers than in the previous scan.",
+          "unit": "pts",
+          "short": "Visibility drops",
+          "shortWithValue": "Visibility drops ≥ {value} pts"
+        },
+        "mention_lost": {
+          "label": "Dropped out of answers",
+          "description": "Fires when prompts that mentioned you last scan no longer do.",
+          "unit": "prompts",
+          "short": "Dropped out of answers",
+          "shortWithValue": "Dropped out of ≥ {value} answers"
+        },
+        "competitor_gain": {
+          "label": "Competitor takes your spot",
+          "description": "Fires when a competitor pushes you down, replaces you or gets cited in an answer.",
+          "unit": "prompts",
+          "short": "Competitor gains",
+          "shortWithValue": "Competitor gains in ≥ {value} answers"
+        },
+        "citation_lost": {
+          "label": "Lost a citation",
+          "description": "Fires when AI answers stop linking to your site.",
+          "unit": "prompts",
+          "short": "Lost citations",
+          "shortWithValue": "≥ {value} lost citations"
+        },
+        "scan_summary": {
+          "label": "Scan digest",
+          "description": "Sends a short summary after every completed scan.",
+          "unit": "",
+          "short": "After every scan",
+          "shortWithValue": "After every scan"
+        },
+        "scan_failed": {
+          "label": "Scan failed",
+          "description": "Fires when a GEO scan can't finish.",
+          "unit": "",
+          "short": "When a scan fails",
+          "shortWithValue": "When a scan fails"
+        }
+      },
+      "dialog": {
+        "newTitle": "New GEO alert",
+        "editTitle": "Edit GEO alert",
+        "trigger": "Trigger",
+        "triggerHint": "When should this alert fire",
+        "signal": "Signal",
+        "atLeast": "at least",
+        "project": "Project",
+        "allProjects": "All projects",
+        "runsAfterScan": "Checked after every GEO scan, comparing it with the scan before.",
+        "runsOnFailure": "Checked whenever a GEO scan stops without results.",
+        "sendTo": "Send to",
+        "sendToHint": "Where the alert goes",
+        "slackHint": "Posts to your Slack notification channel.",
+        "slackMissing": "Slack isn't connected yet.",
+        "connectSlack": "Connect Slack",
+        "emailHint": "{count, plural, one {Emails the workspace owner.} other {Emails all # workspace owners.}}",
+        "webhook": "Webhook",
+        "webhookHint": "{count, plural, one {Sends a POST request to 1 endpoint.} other {Sends a POST request to # endpoints.}}",
+        "webhookMissing": "No webhook endpoint yet. Add one to receive alerts as POST requests.",
+        "manageWebhooks": "Manage webhooks",
+        "pickDestination": "Pick at least one place to send the alert.",
+        "sendTest": "Send test",
+        "testSent": "Test alert sent",
+        "testFailed": "The test alert didn't reach any destination",
+        "create": "Create alert",
+        "created": "Alert created",
+        "updated": "Alert updated",
+        "failed": "Couldn't save the alert",
+        "duplicate": "An alert for this signal and project already exists.",
+        "decrease": "Decrease",
+        "increase": "Increase",
+        "addEndpoint": "Add endpoint"
+      }
+    },
+    "templatesMetaTitle": "Automation templates",
+    "editorMetaTitle": "Automation",
+    "editor": {
+      "back": "Automations",
+      "notFound": "This automation doesn't exist anymore.",
+      "name": "Name",
+      "active": "Active",
+      "inactive": "Inactive",
+      "changeTrigger": "Change trigger",
+      "searchTriggers": "Search triggers…",
+      "noTriggers": "No triggers found.",
+      "groups": {
+        "geo": "GEO",
+        "content": "Content"
+      },
+      "tabs": {
+        "settings": "Settings",
+        "runs": "Run history"
+      }
+    },
+    "loadError": {
+      "automations": {
+        "title": "Couldn't load automations",
+        "description": "Your automations are still there. Try loading them again."
+      },
+      "runs": {
+        "title": "Couldn't load runs",
+        "description": "Your run history is still there. Try loading it again."
+      }
+    },
+    "runsMetaTitle": "Automation runs",
+    "runs": {
+      "title": "Runs",
+      "description": "Every time an automation ran, newest first.",
+      "allAutomations": "All automations",
+      "allStatuses": "All statuses",
+      "filterAutomation": "Filter by automation",
+      "filterStatus": "Filter by status",
+      "statuses": {
+        "running": "Running",
+        "success": "Succeeded",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      },
+      "columns": {
+        "status": "Status",
+        "automation": "Automation",
+        "result": "Result",
+        "when": "When",
+        "duration": "Duration"
+      },
+      "results": {
+        "running": "Working on it…",
+        "success": "Finished",
+        "failed": "Didn't finish",
+        "skipped": "Nothing was created"
+      },
+      "manual": "Manual",
+      "openDraft": "Open draft",
+      "deletedAutomation": "Deleted automation",
+      "empty": {
+        "title": "No automation runs",
+        "description": "Runs show up here once an automation fires.",
+        "filtered": "Try adjusting your filters to see more runs",
+        "viewAll": "View all runs"
       }
     }
   },
@@ -6962,7 +7236,10 @@
     "breadcrumbs": {
       "geo": "Geo",
       "segments": {
-        "collection": "Collections"
+        "collection": "Collections",
+        "new": "New",
+        "templates": "Templates",
+        "runs": "Runs"
       },
       "geoSegments": {
         "agent-readiness": "Agent readiness",

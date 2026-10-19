@@ -85,3 +85,10 @@ export const SERVER_ONLY_PACKAGES = [
   "undici",
   "workflow",
 ];
+
+/** Pre-"Automations" pages under `/{slug}/automation/…`, redirected to it. */
+export const LEGACY_AUTOMATION_PAGES: ReadonlySet<string> = new Set([
+  "schedule",
+  "schedules",
+  "events",
+]);
