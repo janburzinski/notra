@@ -1,0 +1,9 @@
+apps/dashboard/src/components/automation/editor/source-picker.tsx
+  ai_agent 55,94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c274ba2d498760e4ae3f813a3bf2225d88550591",
+  "prompts": {}
+}
