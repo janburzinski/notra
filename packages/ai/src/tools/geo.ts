@@ -1,3 +1,4 @@
+import { GEO_TOOL_TABLE_NOTE } from "@notra/ai/constants/geo-tools";
 import {
   getGeoCompetitorShareInputSchema,
   getGeoOverviewInputSchema,
@@ -45,8 +46,7 @@ export function createGetGeoOverviewTool(config: OrganizationToolConfig): Tool {
         "Gets the organization's GEO (AI visibility) status: how often AI engines like ChatGPT, Claude, and Gemini mention the company, per-engine mention rates and average positions, and which competitors the engines recommend instead.",
       whenToUse:
         "Use when the user asks about GEO performance, AI visibility, brand mentions in AI answers, engine performance, or competing brands in AI search.",
-      usageNotes:
-        "Choose a trailing window from 1 to 365 days. Omit projectId for all projects, or use an ID from listGeoProjects. mention_rate and visibility_rate are fractions from 0 to 1; multiply by 100 when displaying percentages. Data may be empty if no scans have run yet.",
+      usageNotes: `Choose a trailing window from 1 to 365 days. Omit projectId for all projects, or use an ID from listGeoProjects. mention_rate and visibility_rate are fractions from 0 to 1; multiply by 100 when displaying percentages. Data may be empty if no scans have run yet. ${GEO_TOOL_TABLE_NOTE}`,
     }),
     inputSchema: getGeoOverviewInputSchema,
     execute: ({ projectId, days }) =>
@@ -65,8 +65,7 @@ export function createGetGeoTimeseriesTool(
         "Returns daily GEO performance per AI engine, including checks, mentions, mention rate, and average position.",
       whenToUse:
         "Use when the user asks whether AI visibility is improving or declining, requests a trend, or wants to compare engine performance over time.",
-      usageNotes:
-        "Choose a trailing window from 1 to 365 days. Omit projectId for all projects, or use an ID from listGeoProjects. Model-facing points use columns and rows; match each value to its column name. mention_rate and visibility_rate are fractions from 0 to 1; multiply by 100 when displaying percentages.",
+      usageNotes: `Choose a trailing window from 1 to 365 days. Omit projectId for all projects, or use an ID from listGeoProjects. mention_rate and visibility_rate are fractions from 0 to 1; multiply by 100 when displaying percentages. ${GEO_TOOL_TABLE_NOTE}`,
     }),
     inputSchema: getGeoTimeseriesInputSchema,
     execute: ({ projectId, days }) =>
@@ -110,8 +109,7 @@ export function createGetGeoCompetitorShareTool(
         "Ranks competitor brands by how often AI engines mentioned them in tracked GEO answers.",
       whenToUse:
         "Use when the user asks which competitors dominate AI answers, who is recommended instead of the brand, or which competitor deserves closer analysis.",
-      usageNotes:
-        "Choose a trailing window and result limit. Omit projectId for all projects, or use an ID from listGeoProjects.",
+      usageNotes: `Choose a trailing window and result limit. Omit projectId for all projects, or use an ID from listGeoProjects. ${GEO_TOOL_TABLE_NOTE}`,
     }),
     inputSchema: getGeoCompetitorShareInputSchema,
     execute: ({ projectId, days, limit }) =>

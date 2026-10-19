@@ -8,7 +8,8 @@ export type AssistantActivityStep =
   | "waitingForApproval"
   | "searchingWeb"
   | "executingTools"
-  | "runningTool";
+  | "runningTool"
+  | "writingDraft";
 
 export interface ChatActivityStatusProps {
   children?: ReactNode;

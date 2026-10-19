@@ -301,7 +301,7 @@ describe("RoutedLanguageModel", () => {
         },
         anthropic: {
           thinking: { type: "adaptive" },
-          output_config: { effort: "high" },
+          effort: "high",
         },
       })
     );

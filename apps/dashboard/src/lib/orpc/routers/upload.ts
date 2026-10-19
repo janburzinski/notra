@@ -92,6 +92,7 @@ export const uploadRouter = {
         fileSize: input.fileSize,
         fileType: input.fileType,
         headers: context.headers,
+        sha256: input.type === "chat" ? input.sha256 : undefined,
         type: input.type,
       });
     }),
@@ -113,6 +114,7 @@ export const uploadRouter = {
         key: input.key,
         filename: input.filename,
         mediaType: input.mediaType,
+        sha256: input.sha256,
         size: input.size,
       });
 

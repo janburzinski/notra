@@ -1,6 +1,7 @@
 import type { ChatMessageMetadata } from "@notra/ai/types/chat";
 import { getToolName, isToolUIPart } from "ai";
 
+import { CHAT_CREATE_TOOL_TYPES } from "@/constants/chat-posts";
 import type {
   AssistantActivityStackItem,
   AssistantMessagePart,
@@ -13,6 +14,7 @@ import {
   isSearchToolPart,
   isStackableSearchPart,
 } from "@/utils/chat-search-activity";
+import { parseToolOutputChart } from "@/utils/chat-tool-chart";
 import { isFailedToolOutput } from "@/utils/chat-tool-output";
 
 function isSkippablePart(part: AssistantMessagePart): boolean {
@@ -33,6 +35,13 @@ function isActivityPart(
     return true;
   }
   if (!isToolUIPart(part)) {
+    return false;
+  }
+  // A finished chart is part of the answer, not the work log that collapses.
+  if (
+    part.state === "output-available" &&
+    parseToolOutputChart(part.output) !== undefined
+  ) {
     return false;
   }
   return !isStandaloneTool?.(part);
@@ -164,6 +173,9 @@ export function getAssistantActivityStep(
       ) {
         if (isSearchToolPart(part)) {
           return "searchingWeb";
+        }
+        if (part.type in CHAT_CREATE_TOOL_TYPES) {
+          return "writingDraft";
         }
         return getToolName(part) === "code_mode"
           ? "executingTools"

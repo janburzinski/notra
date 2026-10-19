@@ -1119,7 +1119,8 @@
       "fileTypeNotAllowed": "This file type isn't supported here",
       "noOrganizationAccess": "You do not have access to this organization",
       "logoSourceNotAllowed": "Logo source is not allowed",
-      "logoFetchFailed": "Could not fetch the logo image"
+      "logoFetchFailed": "Could not fetch the logo image",
+      "contentMismatch": "The uploaded file did not match its checksum. Try again."
     },
     "brandGuidelinePdf": {
       "generateFirst": "Generate your brand guidelines before adding a PDF",
@@ -5768,7 +5769,8 @@
         "unsupportedType": "Unsupported file type: {name}",
         "tooLarge": "{name} exceeds the {size}MB limit.",
         "failed": "Failed to upload {name}: {message}",
-        "someFailed": "Some attachments failed to upload. Remove or retry them before sending."
+        "someFailed": "Some attachments failed to upload. Remove or retry them before sending.",
+        "duplicate": "{name} is already attached."
       },
       "editor": {
         "placeholder": "Send a message… (type @ for tools, / for skills)"
@@ -7166,7 +7168,8 @@
         "waitingForApproval": "Waiting for approval",
         "searchingWeb": "Searching web",
         "executingTools": "Executing tools",
-        "runningTool": "Running tool"
+        "runningTool": "Running tool",
+        "writingDraft": "Writing draft"
       },
       "worked": "Worked",
       "workedFor": "Worked for {duration}",

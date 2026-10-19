@@ -117,6 +117,10 @@ import {
   prependComposerPrefix,
   toChatDisplayLabel,
 } from "@/utils/chat-annotations";
+import {
+  attachedContentHashes,
+  splitDuplicateChatFiles,
+} from "@/utils/chat-attachment-dedupe";
 import { hasIncludedChatPlan } from "@/utils/chat-billing";
 import {
   contextItemKey,
@@ -1435,6 +1439,7 @@ export function ChatInputAdvanced({
     : null;
   const attachmentsRef = useRef(attachments);
   const pendingUploadsRef = useRef(pendingUploads);
+  const pendingHashesRef = useRef(new Map<string, string>());
 
   useEffect(() => {
     attachmentsRef.current = attachments;
@@ -1521,7 +1526,7 @@ export function ChatInputAdvanced({
       }
 
       const accepted: File[] = [];
-      for (const file of files.slice(0, remainingSlots)) {
+      for (const file of files) {
         if (
           !isAllowedChatMimeType(file.type, model) &&
           !/\.heic$/i.test(file.name) &&
@@ -1554,21 +1559,56 @@ export function ChatInputAdvanced({
         return false;
       }
 
-      const placeholders = accepted.map((file) => ({
+      const { unique, duplicates } = await splitDuplicateChatFiles(
+        accepted,
+        attachedContentHashes(
+          attachmentsRef.current,
+          pendingHashesRef.current.values()
+        )
+      );
+      for (const file of duplicates) {
+        toast.info(t("upload.duplicate", { name: file.name }));
+      }
+      const openSlots =
+        MAX_CHAT_ATTACHMENTS -
+        attachmentsRef.current.length -
+        pendingUploadsRef.current.length;
+      if (unique.length > openSlots) {
+        toast.error(t("upload.maxAttachments", { max: MAX_CHAT_ATTACHMENTS }));
+      }
+      const candidates = unique.slice(0, Math.max(0, openSlots));
+      if (candidates.length === 0) {
+        return duplicates.length > 0;
+      }
+
+      const placeholders = candidates.map(({ file, sha256 }) => ({
         id: crypto.randomUUID(),
         filename: file.name,
+        sha256,
       }));
-      updatePendingUploads([...pendingUploadsRef.current, ...placeholders]);
+      for (const placeholder of placeholders) {
+        if (placeholder.sha256) {
+          pendingHashesRef.current.set(placeholder.id, placeholder.sha256);
+        }
+      }
+      updatePendingUploads([
+        ...pendingUploadsRef.current,
+        ...placeholders.map(({ id, filename }) => ({ id, filename })),
+      ]);
 
       const results = await Promise.all(
-        accepted.map(async (file, index) => {
+        candidates.map(async ({ file, sha256 }, index) => {
           const placeholder = placeholders[index];
           if (!placeholder) {
             return false;
           }
           try {
             const readyFile = await prepareChatImage(file);
-            const result = await uploadFile({ file: readyFile, type: "chat" });
+            const result = await uploadFile({
+              file: readyFile,
+              sha256: readyFile === file ? sha256 : undefined,
+              type: "chat",
+            });
             const uploadedAttachment = {
               url: result.url,
               key: result.key,
@@ -1586,6 +1626,21 @@ export function ChatInputAdvanced({
                 )
               );
               return false;
+            }
+
+            // Identical files share a content-addressed key; keep one chip.
+            if (
+              attachmentsRef.current.some(
+                (attachment) => attachment.key === result.key
+              )
+            ) {
+              toast.info(t("upload.duplicate", { name: file.name }));
+              updatePendingUploads(
+                pendingUploadsRef.current.filter(
+                  (pending) => pending.id !== placeholder.id
+                )
+              );
+              return true;
             }
 
             const nextAttachments = [
@@ -1615,6 +1670,9 @@ export function ChatInputAdvanced({
           }
         })
       );
+      for (const placeholder of placeholders) {
+        pendingHashesRef.current.delete(placeholder.id);
+      }
       return results.every(Boolean);
     },
     [cleanupChatUpload, currentModel.label, model, t, updatePendingUploads]
@@ -2629,7 +2687,7 @@ export function ChatInputAdvanced({
 
     sendSnapshot(
       pendingSend.value,
-      [...pendingSend.attachments, ...resolvedAttachments],
+      mergeChatAttachments(pendingSend.attachments, resolvedAttachments),
       pendingSend.annotationIds
     );
   }, [isUploading, pendingSend, sendSnapshot, t]);

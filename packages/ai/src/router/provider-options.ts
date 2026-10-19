@@ -140,8 +140,7 @@ function deriveOpenRouterReasoning(
     return { max_tokens: thinking.budgetTokens };
   }
   if (thinking.type === "adaptive") {
-    const outputConfig = asObject(anthropic.output_config);
-    const effort = outputConfig.effort;
+    const effort = anthropic.effort;
     if (typeof effort === "string" && OPENROUTER_EFFORTS.has(effort)) {
       return { effort };
     }

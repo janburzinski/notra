@@ -82,6 +82,10 @@ const uploadChatSchema = z.object({
     .max(MAX_CHAT_FILE_SIZE, {
       message: `Chat attachment must be less than ${MAX_CHAT_FILE_SIZE / 1024 / 1024}MB`,
     }),
+  sha256: z
+    .string()
+    .regex(/^[0-9a-f]{64}$/)
+    .optional(),
 });
 
 export const uploadSchema = z.union([
@@ -113,6 +117,10 @@ export const recordChatAttachmentSchema = z.object({
     }),
   filename: z.string().min(1).max(512),
   mediaType: z.enum(ALLOWED_CHAT_MIME_TYPES),
+  sha256: z
+    .string()
+    .regex(/^[0-9a-f]{64}$/)
+    .optional(),
   size: z.coerce.number().int().positive().max(MAX_CHAT_FILE_SIZE),
 });
 

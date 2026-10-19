@@ -7,6 +7,7 @@ import {
 } from "@notra/ai/observability";
 import type { GatewayArgs, GatewayResult } from "@notra/ai/types/gateway";
 import type { SupermemoryOptions } from "@notra/ai/types/model";
+import { relocateMemoryContextMiddleware } from "@notra/ai/utils/relocate-memory-context";
 import { withSupermemory } from "@supermemory/tools/ai-sdk";
 import { type LanguageModelMiddleware, wrapLanguageModel } from "ai";
 
@@ -33,7 +34,11 @@ export function createModel(
 
   // @supermemory/tools is typed against AI SDK 5/6, but its wrapper is a Proxy
   // that forwards the V4 model spec and stream parts unchanged.
-  const model = withSupermemory(base as never, {
+  const cacheStableBase = wrapLanguageModel({
+    model: base,
+    middleware: relocateMemoryContextMiddleware,
+  });
+  const model = withSupermemory(cacheStableBase as never, {
     apiKey: supermemoryApiKey,
     mode: "full",
     addMemory: "always",

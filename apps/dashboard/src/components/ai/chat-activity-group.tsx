@@ -108,7 +108,9 @@ export function ChatActivityGroup({
     step === "waitingForApproval" || settledStep === "waitingForApproval"
       ? step
       : settledStep;
-  const [isOpen, setIsOpen] = useState(forceOpen);
+  // A live group starts open so streamed reasoning is readable while it
+  // happens; the auto-close below folds it once the step finishes.
+  const [isOpen, setIsOpen] = useState(forceOpen || isStreaming);
   const [hasInteracted, setHasInteracted] = useState(false);
 
   if (forceOpen && !isOpen) {

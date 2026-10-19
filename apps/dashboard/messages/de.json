@@ -1119,7 +1119,8 @@
       "fileTypeNotAllowed": "Dieser Dateityp wird hier nicht unterstützt",
       "noOrganizationAccess": "Du hast keinen Zugriff auf diese Organisation",
       "logoSourceNotAllowed": "Diese Logo-Quelle ist nicht erlaubt",
-      "logoFetchFailed": "Das Logo konnte nicht abgerufen werden"
+      "logoFetchFailed": "Das Logo konnte nicht abgerufen werden",
+      "contentMismatch": "Die hochgeladene Datei passt nicht zu ihrer Prüfsumme. Versuche es erneut."
     },
     "brandGuidelinePdf": {
       "generateFirst": "Generiere zuerst deine Brand Guidelines, bevor du ein PDF hinzufügst",
@@ -5768,7 +5769,8 @@
         "unsupportedType": "Nicht unterstützter Dateityp: {name}",
         "tooLarge": "{name} überschreitet das Limit von {size} MB.",
         "failed": "Upload von {name} fehlgeschlagen: {message}",
-        "someFailed": "Einige Anhänge konnten nicht hochgeladen werden. Entferne sie oder versuche es erneut, bevor du sendest."
+        "someFailed": "Einige Anhänge konnten nicht hochgeladen werden. Entferne sie oder versuche es erneut, bevor du sendest.",
+        "duplicate": "{name} ist bereits angehängt."
       },
       "editor": {
         "placeholder": "Nachricht senden… (@ für Tools, / für Skills)"
@@ -7166,7 +7168,8 @@
         "waitingForApproval": "Warte auf Genehmigung",
         "searchingWeb": "Suche im Web",
         "executingTools": "Führe Tools aus",
-        "runningTool": "Führe Tool aus"
+        "runningTool": "Führe Tool aus",
+        "writingDraft": "Schreibe Entwurf"
       },
       "worked": "Gearbeitet",
       "workedFor": "{duration} gearbeitet",

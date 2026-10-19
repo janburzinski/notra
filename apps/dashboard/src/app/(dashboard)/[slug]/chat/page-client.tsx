@@ -68,6 +68,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { ChatActivityStatus } from "@/components/ai/chat-activity-status";
 import { ChatAssistantParts } from "@/components/ai/chat-assistant-parts";
+import { ChatDraftStreamingPreview } from "@/components/ai/chat-draft-streaming-preview";
 import { ChatReasoningBlock } from "@/components/ai/chat-reasoning-block";
 import { ChatSubagentToolPart } from "@/components/ai/chat-subagent-tool-part";
 import { ChatTodoList } from "@/components/ai/chat-todo-list";
@@ -2496,14 +2497,26 @@ function StandaloneChatPageClient({
               </CompletedToolTimer>
             );
           }
+          const hasDraftText = Boolean(input?.title || markdown);
           if (chatActivity.hasInlineActivity) {
-            return null;
+            return hasDraftText ? (
+              <ChatDraftStreamingPreview
+                key={toolPart.toolCallId}
+                markdown={markdown}
+                title={input?.title}
+              />
+            ) : null;
           }
           return (
-            <CreateToolPendingIndicator
-              key={toolPart.toolCallId}
-              toolCallId={toolPart.toolCallId}
-            />
+            <div className="flex flex-col gap-2" key={toolPart.toolCallId}>
+              <CreateToolPendingIndicator toolCallId={toolPart.toolCallId} />
+              {hasDraftText ? (
+                <ChatDraftStreamingPreview
+                  markdown={markdown}
+                  title={input?.title}
+                />
+              ) : null}
+            </div>
           );
         }
 

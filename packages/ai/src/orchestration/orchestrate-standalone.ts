@@ -1,3 +1,7 @@
+import {
+  CODE_MODE_TOOL_NAME,
+  STANDALONE_CODE_MODE_TOOL_NAMES,
+} from "@notra/ai/constants/code-mode";
 import { CODE_RESEARCHER_TOOL_NAME } from "@notra/ai/constants/code-research";
 import { getEnabledMcpServerCount } from "@notra/ai/integrations/mcp-tool-index";
 import { createModel } from "@notra/ai/model";
@@ -166,9 +170,23 @@ export async function orchestrateStandaloneChat(
     surface === "dashboard-agent"
       ? `${NOTRA_TOOLING_DESCRIPTION} This is the GEO dashboard: call the GEO chart tools directly for AI Traffic, visibility, trend, engine, and competitor questions, and use code_mode for prompt-level results and project context.`
       : NOTRA_TOOLING_DESCRIPTION;
+  // Naming the direct tools stops the model from first trying them inside
+  // code_mode, which fails with "Unknown tool" and costs a full extra step.
+  const codeModeOnlyToolNames = new Set<string>(
+    STANDALONE_CODE_MODE_TOOL_NAMES
+  );
+  const directToolNames = notraToolNames.filter(
+    (toolName) =>
+      toolName !== CODE_MODE_TOOL_NAME && !codeModeOnlyToolNames.has(toolName)
+  );
+  const directToolsDescription = `Call these tools directly; they are not available inside code_mode: ${directToolNames.join(", ")}.`;
   const descriptions = lazyMcpRuntime
-    ? [toolingDescription, ...lazyMcpRuntime.descriptions]
-    : [toolingDescription];
+    ? [
+        toolingDescription,
+        directToolsDescription,
+        ...lazyMcpRuntime.descriptions,
+      ]
+    : [toolingDescription, directToolsDescription];
 
   const hasGitHubToolsActive = notraToolNames.some(isGitHubToolName);
   const hasLinearToolsActive = notraToolNames.some(isLinearToolName);

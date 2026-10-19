@@ -272,6 +272,12 @@ export function mergeChatAttachments(
   const keys = new Set(current.map((attachment) => attachment.key));
   return [
     ...current,
-    ...next.filter((attachment) => !keys.has(attachment.key)),
+    ...next.filter((attachment) => {
+      if (keys.has(attachment.key)) {
+        return false;
+      }
+      keys.add(attachment.key);
+      return true;
+    }),
   ];
 }
