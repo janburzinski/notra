@@ -164,9 +164,7 @@ export function SidebarProjectSwitcher() {
                       {activeProject.name}
                     </SidebarLabel>
                     {activeDomain ? (
-                      <SidebarLabel
-                        className="text-muted-foreground truncate text-xs"
-                      >
+                      <SidebarLabel className="text-muted-foreground truncate text-xs">
                         {activeDomain}
                       </SidebarLabel>
                     ) : null}
