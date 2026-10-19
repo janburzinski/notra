@@ -49,13 +49,13 @@ jobs:
           echo "Affected packages: $affected"
           has() { jq -e --arg p "$1" 'index($p) != null' <<< "$affected" > /dev/null; }
           checks='["lint"'
-          if [ "$affected" != "[]" ] || grep -qE '^(scripts/github|\.railway|infra)/' <<< "$files"; then checks="$checks,\"tests\""; fi
+          if [ "$affected" != "[]" ] || grep -qE '^scripts/github/' <<< "$files"; then checks="$checks,\"tests\""; fi
           has web && checks="$checks,\"build-web\""
           has dashboard && checks="$checks,\"build-dashboard\""
           has console && checks="$checks,\"build-console\""
           if jq -e 'any(.[]; IN("@notra/agent","@notra/ai","@notra/db","@notra/utils","@notra/geo-core","dashboard","console","ui","web"))' <<< "$affected" > /dev/null; then checks="$checks,\"typecheck\""; fi
           echo "checks=$checks]" >> "$GITHUB_OUTPUT"
-          if grep -qE '^(packages/db|infra|\.railway)/|^(bun\.lock|package\.json)$' <<< "$files"; then
+          if grep -qE '^packages/db/|^(bun\.lock|package\.json)$' <<< "$files"; then
             echo infrastructure=true >> "$GITHUB_OUTPUT"
           else
             echo infrastructure=false >> "$GITHUB_OUTPUT"
@@ -226,21 +226,6 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notra_migrations
         run: bun test ./tests/post-history.test.ts
-
-      - name: Test observability configuration and dashboard regressions
-        run: bun test --isolate infra/observability
-
-      - name: Typecheck Railway infrastructure
-        run: bunx --no-install tsc --project .railway/tsconfig.json
-
-      - name: Typecheck Vercel metric exporter
-        run: bunx --no-install tsc --project infra/observability/vercel/tsconfig.json
-
-      - name: Validate observability configuration with pinned native binaries
-        run: node infra/observability/validate-config.mjs
-
-      - name: Evaluate dashboard queries against disposable pinned Loki fixtures
-        run: node infra/observability/check-queries.mjs
 
   quality:
     if: always()

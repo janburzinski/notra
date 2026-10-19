@@ -64,10 +64,13 @@ See `.env.example` in this directory for the service-specific variables.
 ## Railway configuration
 
 The existing `notra-prod` / `production` service is described in
-[`../../.railway/ai-traffic.ts`](../../.railway/ai-traffic.ts). Reuse that service,
+`.railway/ai-traffic.ts` in the private
+[`usenotra/infra`](https://github.com/usenotra/infra/blob/main/.railway/ai-traffic.ts)
+repository. Reuse that service,
 its two Virginia replicas, and the existing shared database, Upstash, and Tinybird
 configuration; do not provision replacements. See the
-[Railway IaC guide](../../.railway/README.md) for read-only plans and adoption.
+[Railway IaC guide](https://github.com/usenotra/infra/blob/main/.railway/README.md)
+for plans and applies.
 The repository's scheduled release owns deployments and keeps watch patterns
 unset; the manual setup below is for a new standalone installation.
 

@@ -34,8 +34,6 @@ coverage
 .workflow-data
 .openlogs
 .github
-.railway
-.railway-plans
 scripts
 
 .DS_Store
