@@ -95,3 +95,11 @@ export interface ReleaseSelection {
 }
 
 export type EventType = "Commit" | "PR" | "Release" | "LinearIssue";
+
+export interface ContentListPreviewInput {
+  content: string;
+  markdown: string | null;
+  contentType: string;
+}
+
+export type ContentListPreviewVariant = "dashboard" | "collection";

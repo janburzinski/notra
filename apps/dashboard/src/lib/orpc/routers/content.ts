@@ -126,6 +126,7 @@ import { startOnDemandRun } from "@/lib/workflows/start";
 import type { PostMetadataColumns } from "@/types/content/overview";
 import type {
   CommitPreview,
+  ContentListPreviewVariant,
   LinearIntegrationPreviewItem,
   PullRequestPreview,
   ReleasePreview,
@@ -136,6 +137,7 @@ import type {
   ContentUpdateDataInput,
   ContentUpdatePost,
 } from "@/types/content/update";
+import { getContentListPreview } from "@/utils/content-list-preview";
 import { resolveLookbackRange } from "@/utils/lookback";
 import { ratelimit } from "@/utils/ratelimit";
 
@@ -181,8 +183,6 @@ const postReadColumns = {
   updatedAt: true,
 } as const;
 
-const POST_LIST_MARKDOWN_PREVIEW_CHARS = 2000;
-
 const postListColumns = {
   id: true,
   title: true,
@@ -193,6 +193,7 @@ const postListColumns = {
   createdAt: true,
   status: true,
   updatedAt: true,
+  markdown: true,
 } as const;
 
 const postListExtras = {
@@ -200,33 +201,30 @@ const postListExtras = {
     sql<string>`case when ${posts.contentType} = 'image' then ${posts.content} else '' end`.as(
       "content"
     ),
-  markdown: sql<
-    string | null
-  >`case when ${posts.contentType} = 'image' then ${posts.markdown} else left(${posts.markdown}, ${POST_LIST_MARKDOWN_PREVIEW_CHARS}) end`.as(
-    "markdown"
-  ),
 };
 
-function serializePost(post: {
-  content: string;
-  contentType: string;
-  contentSubtype: BlogPostSubtype | null;
-  createdAt: Date;
-  htmlUrl: string | null;
-  id: string;
-  markdown: string | null;
-  slug: string | null;
-  status: "draft" | "published";
-  title: string;
-  updatedAt: Date;
-}): PostsResponse["posts"][number] {
+function serializePost(
+  post: {
+    content: string;
+    contentType: string;
+    contentSubtype: BlogPostSubtype | null;
+    createdAt: Date;
+    htmlUrl: string | null;
+    id: string;
+    markdown: string | null;
+    slug: string | null;
+    status: "draft" | "published";
+    title: string;
+    updatedAt: Date;
+  },
+  variant: ContentListPreviewVariant = "collection"
+) {
   return {
     id: post.id,
     title: post.title,
     slug: post.slug,
-    content: post.content,
+    ...getContentListPreview(post, variant),
     htmlUrl: post.contentType === "image" ? post.htmlUrl : null,
-    markdown: post.markdown,
     contentType:
       post.contentType as PostsResponse["posts"][number]["contentType"],
     contentSubtype: post.contentSubtype,
@@ -609,7 +607,7 @@ export const contentRouter = {
         });
 
         return {
-          posts: items.map(serializePost),
+          posts: items.map((post) => serializePost(post, "dashboard")),
         };
       }),
   },
@@ -686,7 +684,7 @@ export const contentRouter = {
       const totalPages = Math.max(1, Math.ceil(totalCount / input.pageSize));
 
       return {
-        posts: items.map(serializePost),
+        posts: items.map((post) => serializePost(post)),
         pagination: {
           page: input.page,
           pageSize: input.pageSize,
@@ -1387,7 +1385,6 @@ export const contentRouter = {
               columns: {
                 id: true,
                 title: true,
-                content: true,
                 markdown: true,
                 contentType: true,
                 contentSubtype: true,
@@ -1395,6 +1392,7 @@ export const contentRouter = {
                 createdAt: true,
                 updatedAt: true,
               },
+              extras: postListExtras,
               orderBy: [asc(posts.createdAt), asc(posts.id)],
             },
           },
@@ -1427,8 +1425,7 @@ export const contentRouter = {
             posts: collection.posts.map((post) => ({
               id: post.id,
               title: post.title,
-              content: post.content,
-              markdown: post.markdown,
+              ...getContentListPreview(post),
               contentType: normalizeContentType(post.contentType),
               contentSubtype: post.contentSubtype,
               status: post.status,

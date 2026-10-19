@@ -19,7 +19,7 @@ import { EMPTY_STATE_CARD_COUNT } from "@/constants/empty-state";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useCollection } from "@/lib/hooks/use-collections";
 import type { CollectionDetailPageClientProps } from "@/types/content/collection";
-import { formatLongDate, getMarkdownPreview } from "@/utils/content-preview";
+import { formatLongDate } from "@/utils/content-preview";
 import { resolveImagePreviewSrc } from "@/utils/markdown-image";
 
 import { GroupDetailSkeleton } from "./skeleton";
@@ -156,7 +156,7 @@ export default function PageClient({
                 }
                 key={post.id}
                 organizationId={organizationId}
-                preview={getMarkdownPreview(post.markdown ?? "")}
+                preview={post.preview}
                 status={post.status}
                 title={post.title}
               />

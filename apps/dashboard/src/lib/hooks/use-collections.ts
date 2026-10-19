@@ -1,9 +1,6 @@
 "use client";
 
-import type {
-  PostCollectionDetail,
-  PostCollectionListResponse,
-} from "@notra/schemas/dashboard/content";
+import type { PostCollectionListResponse } from "@notra/schemas/dashboard/content";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "use-intl";
 
@@ -50,7 +47,7 @@ export function useCollections(
 
 export function useCollection(organizationId: string, collectionId: string) {
   const tToast = useTranslations("content.toasts");
-  return useQuery<{ collection: PostCollectionDetail }>({
+  return useQuery({
     ...dashboardOrpc.content.collections.get.queryOptions({
       input: { organizationId, collectionId },
     }),

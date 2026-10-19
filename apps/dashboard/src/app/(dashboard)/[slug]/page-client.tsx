@@ -22,7 +22,6 @@ import { EMPTY_STATE_CARD_COUNT } from "@/constants/empty-state";
 import { useActiveGenerations } from "@/lib/hooks/use-active-generations";
 import { useDashboardHomeContent } from "@/lib/hooks/use-posts";
 import type { DashboardHomePageClientProps } from "@/types/dashboard/home";
-import { getDashboardPostPreview } from "@/utils/content-preview";
 import { resolveImagePreviewSrc } from "@/utils/markdown-image";
 
 export default function PageClient({
@@ -92,7 +91,7 @@ export default function PageClient({
                     : null
                 }
                 organizationId={organizationId}
-                preview={getDashboardPostPreview(post.markdown ?? "")}
+                preview={post.preview}
                 status={post.status as PostStatus}
                 title={post.title}
               />

@@ -26,6 +26,7 @@ import { DEMO_API_URL } from "./constants/demo";
 import { API_MAX_BODY_BYTES } from "./constants/request-limits";
 import { apiAnalyticsMiddleware } from "./middleware/analytics";
 import { authMiddleware } from "./middleware/auth";
+import { apiCompressionMiddleware } from "./middleware/compression";
 import { demoRequestLogMiddleware } from "./middleware/demo-request-log";
 import {
   geoContextMiddleware,
@@ -192,6 +193,7 @@ const securityHeadersMiddleware = async (
 };
 
 app.use("*", apiObservabilityMiddleware);
+app.use("*", apiCompressionMiddleware);
 app.use("/v1/*", securityHeadersMiddleware);
 app.use("/v2/*", securityHeadersMiddleware);
 

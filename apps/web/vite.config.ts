@@ -93,6 +93,8 @@ export default defineConfig(({ command }) => ({
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     nitro({
+      compressPublicAssets:
+        process.env.VERCEL === "1" ? false : { gzip: true, brotli: true },
       traceDeps: ["sharp", "react", "react-dom"],
       rolldownConfig: {
         external: ["@remotion/bundler", "@remotion/renderer"],
