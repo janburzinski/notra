@@ -1,4 +1,5 @@
 import { supportsPostSlug } from "@notra/ai/schemas/post";
+import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import {
   appendContentGenerationJobEvent,
   createContentGenerationJob,
@@ -350,7 +351,7 @@ export const createPost = Effect.fn("posts.create")(function* (
     return yield* new PostSlugNotSupportedError();
   }
 
-  const markdown = body.markdown ?? "";
+  const markdown = stripLeadingFrontmatter(body.markdown ?? "");
   const content =
     markdown.length > 0
       ? yield* Effect.tryPromise({
@@ -448,7 +449,7 @@ export const preparePatchPost = Effect.fn("posts.preparePatch")(function* (
   }
 
   if (body.markdown !== undefined) {
-    const markdown = body.markdown;
+    const markdown = stripLeadingFrontmatter(body.markdown);
     const renderedContent = yield* Effect.tryPromise({
       try: () => renderMarkdownToHtml(markdown),
       catch: () => new PostInvalidMarkdownError(),

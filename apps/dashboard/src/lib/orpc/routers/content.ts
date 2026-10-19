@@ -13,6 +13,7 @@ import {
   getLinearIssuePreviews,
 } from "@notra/ai/utils/linear";
 import { createOctokit } from "@notra/ai/utils/octokit";
+import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import {
   isPostSlugConflict,
   listOrganizationTags,
@@ -348,16 +349,15 @@ export async function buildContentUpdateData(
   }
 
   if (input.markdown !== undefined) {
-    const titleMatch = input.markdown.match(TITLE_REGEX);
-    updateData.markdown = input.markdown;
+    const markdown = stripLeadingFrontmatter(input.markdown);
+    const titleMatch = markdown.match(TITLE_REGEX);
+    updateData.markdown = markdown;
 
     if (input.title === undefined) {
       updateData.title = titleMatch?.[1] ?? existingPost.title;
     }
 
-    updateData.content = sanitizeMarkdownHtml(
-      await marked.parse(input.markdown)
-    );
+    updateData.content = sanitizeMarkdownHtml(await marked.parse(markdown));
   }
 
   if (input.status !== undefined) {
@@ -807,7 +807,7 @@ export const contentRouter = {
       const now = new Date();
       const collectionId = nanoid();
       const contentId = nanoid();
-      const markdown = input.markdown ?? "";
+      const markdown = stripLeadingFrontmatter(input.markdown ?? "");
       const content =
         markdown.length > 0
           ? sanitizeMarkdownHtml(await marked.parse(markdown))

@@ -7,6 +7,7 @@ import {
 } from "@notra/ai/chat/history";
 import { maybeGenerateCollectionTitle } from "@notra/ai/jobs/collection-title";
 import { supportsPostSlug } from "@notra/ai/schemas/post";
+import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import { sanitizeMarkdownHtml } from "@notra/ai/utils/sanitize";
 import { db } from "@notra/db/drizzle";
 import { postCollections, posts } from "@notra/db/schema";
@@ -144,8 +145,8 @@ export const chatRouter = {
       .use(withOrganizationAccess)
       .handler(async ({ context, input }) => {
         const { organizationId } = context.auth;
-        const { chatId, toolCallId, title, contentType, markdown, status } =
-          input;
+        const { chatId, toolCallId, title, contentType, status } = input;
+        const markdown = stripLeadingFrontmatter(input.markdown);
         const slug =
           supportsPostSlug(contentType) && input.slug ? input.slug : null;
         const content = sanitizeMarkdownHtml(await marked.parse(markdown));

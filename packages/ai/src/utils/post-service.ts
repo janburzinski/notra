@@ -11,6 +11,7 @@ import type {
   UpdatePostRecordResult,
   UpdatePostSiteMetadataParams,
 } from "@notra/ai/types/post-service";
+import { stripLeadingFrontmatter } from "@notra/ai/utils/post-markdown";
 import { sanitizeMarkdownHtml } from "@notra/ai/utils/sanitize";
 import { db } from "@notra/db/drizzle";
 import { postCollections, posts } from "@notra/db/schema";
@@ -119,7 +120,8 @@ export async function createPostRecord(
   params: CreatePostRecordParams
 ): Promise<CreatePostRecordResult> {
   const id = params.postId ?? generatePostId();
-  const content = sanitizeMarkdownHtml(await marked.parse(params.markdown));
+  const markdown = stripLeadingFrontmatter(params.markdown);
+  const content = sanitizeMarkdownHtml(await marked.parse(markdown));
   const baseSlug = params.slug ?? null;
   const hasSiteMetadata = supportsPostSlug(params.contentType);
   const tags =
@@ -140,7 +142,7 @@ export async function createPostRecord(
           title: params.title,
           slug,
           content,
-          markdown: params.markdown,
+          markdown,
           recommendations: params.recommendations ?? null,
           contentType: params.contentType,
           contentSubtype: params.contentSubtype ?? null,
@@ -223,8 +225,9 @@ export async function updatePostRecord(
     updates.slug = params.slug;
   }
   if (params.markdown !== undefined) {
-    updates.content = sanitizeMarkdownHtml(await marked.parse(params.markdown));
-    updates.markdown = params.markdown;
+    const markdown = stripLeadingFrontmatter(params.markdown);
+    updates.content = sanitizeMarkdownHtml(await marked.parse(markdown));
+    updates.markdown = markdown;
   }
   if (params.recommendations !== undefined) {
     updates.recommendations = params.recommendations;
