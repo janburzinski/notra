@@ -1,0 +1,30 @@
+packages/db/src/types/chat-shares.ts
+  s_7f4caaf388959a::t_112381bb5f22e8 12-13
+  s_7f4caaf388959a::t_21e2a577a72551 1
+apps/dashboard/src/components/chat/chat-share-popover.tsx
+  s_7f4caaf388959a::t_0b643e358f9502 94-99,175
+apps/dashboard/tests/chat-share-snapshot.test.ts
+  s_7f4caaf388959a::t_6931ca4cc485cd 139
+  s_7f4caaf388959a::t_d30684afb4979f 63,65,76,78,84,124-138,140-141
+apps/dashboard/src/components/chat/shared-chat-page.tsx
+  s_7f4caaf388959a::t_112381bb5f22e8 137-138,142-143,152-153
+apps/dashboard/src/utils/chat-share-snapshot.ts
+  s_7f4caaf388959a::t_21e2a577a72551 4,135-138
+  s_7f4caaf388959a::t_112381bb5f22e8 38-39,46-56,85,131-134,139-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d735c39cbec20ef2e728ba38c26bcdfe48fc6de8",
+  "prompts": {},
+  "sessions": {
+    "s_7f4caaf388959a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b3977c9c-6fa9-400c-9269-1f6191358e77",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
