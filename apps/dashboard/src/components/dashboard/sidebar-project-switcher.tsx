@@ -163,12 +163,13 @@ export function SidebarProjectSwitcher() {
                     <SidebarLabel className="truncate text-sm font-medium">
                       {activeProject.name}
                     </SidebarLabel>
-                    <SidebarLabel
-                      aria-hidden={activeDomain ? undefined : true}
-                      className="text-muted-foreground min-h-4 truncate text-xs"
-                    >
-                      {activeDomain ?? "\u00a0"}
-                    </SidebarLabel>
+                    {activeDomain ? (
+                      <SidebarLabel
+                        className="text-muted-foreground truncate text-xs"
+                      >
+                        {activeDomain}
+                      </SidebarLabel>
+                    ) : null}
                   </div>
                   <HugeiconsIcon
                     className="text-muted-foreground ml-auto"
