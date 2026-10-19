@@ -27,6 +27,7 @@ import {
   loadLogin,
 } from "./-entry-loaders";
 import { loadInvitation } from "./-invitation-loaders";
+import { loadSharedChat } from "./-share-loaders";
 import { createUiRoute } from "./-ui-route";
 
 const Signup = lazyPage(() => import("@/app/(auth)/signup/page"));
@@ -38,6 +39,11 @@ const ResetPassword = lazyPage(
 );
 const Banned = lazyPage(() => import("@/app/auth/banned/page"));
 const Linkedin = lazyPage(() => import("@/app/connect/linkedin/page"));
+const SharedChat = lazyPage(() =>
+  import("@/components/chat/shared-chat-page").then((module) => ({
+    default: module.SharedChatPage,
+  }))
+);
 
 export function createEntryUiRoutes(parent: AnyRoute) {
   const guest = createRoute({
@@ -143,6 +149,16 @@ export function createEntryUiRoutes(parent: AnyRoute) {
           <InvitationConfirm data={data} />
         </AuthSplitShell>
       ),
+    }),
+    createUiRoute({
+      parent,
+      path: "share/$id",
+      noindex: true,
+      pendingComponent: () => <div className="bg-background min-h-svh" />,
+      preload: SharedChat.preload,
+      loader: (input) => loadSharedChat({ data: input }),
+      pageTitle: (data) => data.title,
+      component: ({ data }) => <SharedChat share={data} />,
     }),
     createUiRoute({
       parent,

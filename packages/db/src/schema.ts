@@ -63,6 +63,7 @@ import type {
   AgentReadinessIssue,
   AgentReadinessScoreBreakdown,
 } from "./types/agent-readiness";
+import type { SharedChatMessage } from "./types/chat-shares";
 import type { DemoAffectedEntity, DemoPersonalization } from "./types/demo";
 import type { DiscussionCommentAnchor } from "./types/discussion-comments";
 import type { GeoCheckGrounding } from "./types/geo-checks";
@@ -221,6 +222,47 @@ export const chatSessions = pgTable(
       .where(
         sql`${table.externalChannelSource} IN ('discord', 'slack') AND ${table.externalChannelId} IS NOT NULL AND ${table.deletedAt} IS NULL`
       ),
+  ]
+);
+
+/**
+ * Public, unlisted read-only copies of a chat. `messages` is a sanitized
+ * snapshot taken when the link was created or refreshed, so later turns in
+ * the chat never leak through the link. One active link per chat.
+ */
+export const chatShares = pgTable(
+  "chat_shares",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => chatSessions.id, { onDelete: "cascade" }),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    messages: jsonb("messages")
+      .$type<SharedChatMessage[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    revokedAt: timestamp("revoked_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("chatShares_organizationId_chatId_idx").on(
+      table.organizationId,
+      table.chatId
+    ),
+    uniqueIndex("chatShares_active_chatId_uidx")
+      .on(table.chatId)
+      .where(sql`${table.revokedAt} IS NULL`),
   ]
 );
 

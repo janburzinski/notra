@@ -5974,6 +5974,43 @@
       "show": "Annotation {index} im Beitrag zeigen",
       "count": "{count, plural, one {# Annotation} other {# Annotationen}}",
       "limit": "Höchstens {max} Annotationen pro Nachricht. Sende oder entferne zuerst welche."
+    },
+    "share": {
+      "button": "Teilen",
+      "title": "Chat teilen",
+      "accessLabel": "Wer den Link öffnen kann",
+      "access": {
+        "team": "Nur {organization}",
+        "public": "Alle mit dem Link"
+      },
+      "linkLabel": "Chat-Link",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "update": "Aktualisieren",
+      "snapshotInfo": "Stand vom {date}",
+      "createdAndCopied": "Öffentlicher Link erstellt und kopiert",
+      "created": "Öffentlicher Link erstellt",
+      "updated": "Öffentlicher Link aktualisiert",
+      "revoked": "Jetzt kann nur noch dein Team diesen Chat öffnen",
+      "publishFailed": "Öffentlicher Link konnte nicht erstellt werden",
+      "revokeFailed": "Öffentlicher Link konnte nicht deaktiviert werden"
+    },
+    "sharedPage": {
+      "sharedBy": "Geteilt von {organization} am {date}",
+      "usedTools": "Verwendet: {tools}",
+      "readOnly": "Dies ist eine schreibgeschützte Kopie eines Chats in Notra.",
+      "cta": "Notra ausprobieren",
+      "untitled": "Ohne Titel",
+      "showMore": "Mehr anzeigen",
+      "showLess": "Weniger anzeigen",
+      "contentTypes": {
+        "blog_post": "Blogbeitrag",
+        "changelog": "Changelog",
+        "investor_update": "Investoren-Update",
+        "linkedin_post": "LinkedIn-Beitrag",
+        "twitter_post": "X-Beitrag",
+        "fallback": "Beitrag"
+      }
     }
   },
   "content": {

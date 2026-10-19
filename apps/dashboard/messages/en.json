@@ -5974,6 +5974,43 @@
       "show": "Show annotation {index} in the post",
       "count": "{count, plural, one {# annotation} other {# annotations}}",
       "limit": "Up to {max} annotations per message. Send or remove some first."
+    },
+    "share": {
+      "button": "Share",
+      "title": "Share chat",
+      "accessLabel": "Who can open the link",
+      "access": {
+        "team": "Only {organization}",
+        "public": "Anyone with the link"
+      },
+      "linkLabel": "Chat link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "update": "Update",
+      "snapshotInfo": "Snapshot from {date}",
+      "createdAndCopied": "Public link created and copied",
+      "created": "Public link created",
+      "updated": "Public link updated",
+      "revoked": "Only your team can open this chat now",
+      "publishFailed": "Couldn't create the public link",
+      "revokeFailed": "Couldn't disable the public link"
+    },
+    "sharedPage": {
+      "sharedBy": "Shared from {organization} on {date}",
+      "usedTools": "Used {tools}",
+      "readOnly": "This is a read-only copy of a chat in Notra.",
+      "cta": "Try Notra",
+      "untitled": "Untitled",
+      "showMore": "Show more",
+      "showLess": "Show less",
+      "contentTypes": {
+        "blog_post": "Blog post",
+        "changelog": "Changelog",
+        "investor_update": "Investor update",
+        "linkedin_post": "LinkedIn post",
+        "twitter_post": "X post",
+        "fallback": "Post"
+      }
     }
   },
   "content": {

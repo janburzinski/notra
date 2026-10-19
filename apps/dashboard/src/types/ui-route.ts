@@ -45,6 +45,8 @@ export interface UiRouteOptions<T> {
   pendingComponent?: RouteComponent;
   title?: UiRouteTitle;
   pageTitle?: (data: T) => string;
+  /** Keeps the page out of search indexes, for unlisted public pages. */
+  noindex?: boolean;
   /**
    * Stream the page data into the first server-rendered document: the shell
    * and `pendingComponent` flush before `loader` resolves. Gated client

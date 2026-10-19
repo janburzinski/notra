@@ -25,9 +25,18 @@ import { marked } from "marked";
 import { nanoid } from "nanoid";
 
 import { loadChatHistoryPayload } from "@/lib/chat/history";
+import {
+  getActiveChatShare,
+  publishChatShare,
+  revokeChatShare,
+} from "@/lib/chat/shares";
 import { afterResponse } from "@/lib/framework/after-response";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
-import { internalServerError, notFound } from "@/lib/orpc/utils/errors";
+import {
+  assertNotDemo,
+  internalServerError,
+  notFound,
+} from "@/lib/orpc/utils/errors";
 
 const CHAT_NOT_FOUND_MESSAGE = "Chat not found";
 
@@ -88,6 +97,43 @@ export const chatRouter = {
         if (!deleted) {
           throw notFound(CHAT_NOT_FOUND_MESSAGE);
         }
+        return { ok: true as const };
+      }),
+  },
+
+  shares: {
+    get: authorizedProcedure
+      .input(chatSessionInputSchema)
+      .use(withOrganizationAccess)
+      .handler(async ({ context, input }) => {
+        const { organizationId } = context.auth;
+        const share = await getActiveChatShare(organizationId, input.chatId);
+        return { share };
+      }),
+
+    publish: authorizedProcedure
+      .input(chatSessionInputSchema)
+      .use(withOrganizationAccess)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { organizationId } = context.auth;
+        const share = await publishChatShare({
+          organizationId,
+          chatId: input.chatId,
+          userId: context.user.id,
+        });
+        if (!share) {
+          throw notFound(CHAT_NOT_FOUND_MESSAGE);
+        }
+        return { share };
+      }),
+
+    revoke: authorizedProcedure
+      .input(chatSessionInputSchema)
+      .use(withOrganizationAccess)
+      .handler(async ({ context, input }) => {
+        const { organizationId } = context.auth;
+        await revokeChatShare(organizationId, input.chatId);
         return { ok: true as const };
       }),
   },

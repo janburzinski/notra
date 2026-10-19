@@ -79,6 +79,7 @@ export function createUiRoute<T = undefined>({
   pendingComponent,
   title,
   pageTitle,
+  noindex,
   stream,
   gate,
   preload,
@@ -136,6 +137,9 @@ export function createUiRoute<T = undefined>({
                   content: metadata.description,
                 },
               ]
+            : []),
+          ...(noindex
+            ? [{ name: "robots", content: "noindex, nofollow" }]
             : []),
         ],
       };

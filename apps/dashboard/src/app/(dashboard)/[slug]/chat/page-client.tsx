@@ -92,6 +92,7 @@ import {
   useChatQuote,
 } from "@/components/chat/chat-quote";
 import { ChatScrollOnSend } from "@/components/chat/chat-scroll-on-send";
+import { ChatSharePopover } from "@/components/chat/chat-share-popover";
 import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { renderTextWithIntegrationReferences } from "@/components/chat/integration-reference";
 import { MessageAuthorAvatar } from "@/components/chat/message-author-avatar";
@@ -100,6 +101,7 @@ import {
   UserMessageActions,
   UserMessageTextBubble,
 } from "@/components/chat/user-message-actions";
+import { HeaderActionsPortal } from "@/components/dashboard/header-actions-portal";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { CHAT_ACTIVE_STREAM_POLL_INTERVAL_MS } from "@/constants/chat-active-stream";
@@ -2977,6 +2979,11 @@ function StandaloneChatPageClient({
     <>
       <LazyMotion features={loadMotionFeatures} strict>
         <div className="@container/chat relative flex min-w-0 flex-1 flex-col overflow-hidden">
+          {visibleMessages.length > 0 ? (
+            <HeaderActionsPortal>
+              <ChatSharePopover chatId={stableChatId} />
+            </HeaderActionsPortal>
+          ) : null}
           {chatPosts.length > 0 && !isPreviewOpen ? (
             <ChatContentPanelToggle
               count={chatPosts.length}
