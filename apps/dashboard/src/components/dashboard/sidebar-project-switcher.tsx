@@ -231,9 +231,7 @@ export function SidebarProjectSwitcher() {
                 <HugeiconsIcon
                   icon={GEO_SETTINGS_ITEM?.icon ?? Settings01Icon}
                 />
-                {tCommon(
-                  `labels.${GEO_SETTINGS_ITEM?.labelKey ?? "geoSettings"}`
-                )}
+                {tCommon("actions.settings")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
