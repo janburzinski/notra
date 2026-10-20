@@ -6,6 +6,7 @@ import {
   ingestWebPageViews,
 } from "@notra/analytics/tinybird/client";
 import { db } from "@notra/db/drizzle";
+import { retainDatabaseConnections } from "@notra/db/utils/retain-database-connections";
 import { GEO_DRAIN_MAX_BODY_BYTES } from "@notra/geo-core/constants/ingest";
 import {
   createEventBatcher,
@@ -27,7 +28,6 @@ import {
 } from "./constants/server";
 import { createIngestApp } from "./http";
 import { missingIngestEnvironment } from "./utils/config";
-import { retainIngestDatabaseConnections } from "./utils/retain-database-connections";
 
 const pending = new Set<Promise<void>>();
 const active = new Set<Promise<Response>>();
@@ -38,7 +38,7 @@ if (missing.length > 0) {
 
 const databasePool = process.env.DATABASE_URL ? db.$client : null;
 if (databasePool) {
-  retainIngestDatabaseConnections(databasePool);
+  retainDatabaseConnections(databasePool);
 }
 
 const batcher = createGeoEventBatcher({

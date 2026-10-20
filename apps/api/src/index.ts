@@ -2,7 +2,8 @@ import "./tcc";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { flushLogs } from "@notra/ai/evlog";
 import { registerDemoSocialAnalytics } from "@notra/ai/utils/demo-social";
-import { createDb } from "@notra/db/drizzle";
+import { createDb, db } from "@notra/db/drizzle";
+import { retainDatabaseConnections } from "@notra/db/utils/retain-database-connections";
 import { registerGeoDemoTraffic } from "@notra/geo-core/geo/demo-traffic";
 import { shutdownPostHogServer } from "@notra/posthog/server";
 import { publicStatusResponseSchema } from "@notra/schemas/api/status";
@@ -152,6 +153,7 @@ function getAllowedOrigin(origin: string | undefined): string | null {
 }
 
 assertRequiredEnv();
+retainDatabaseConnections(db.$client);
 
 if (IS_DEMO) {
   registerGeoDemoTraffic();

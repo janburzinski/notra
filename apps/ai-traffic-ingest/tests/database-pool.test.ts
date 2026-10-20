@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 
 import { createDb } from "@notra/db/drizzle";
+import { retainDatabaseConnections } from "@notra/db/utils/retain-database-connections";
 
 import {
   INGEST_DATABASE_CLOSE_TIMEOUT_MS,
@@ -8,7 +9,6 @@ import {
   INGEST_EVENTS_FLUSH_TIMEOUT_MS,
   INGEST_FLUSH_TIMEOUT_MS,
 } from "../src/constants/server";
-import { retainIngestDatabaseConnections } from "../src/utils/retain-database-connections";
 
 test("retains worker connections without changing shared pool defaults or safety limits", async () => {
   const worker = createDb(
@@ -19,7 +19,7 @@ test("retains worker connections without changing shared pool defaults or safety
   ).$client;
   const maximum = worker.options.max;
   try {
-    retainIngestDatabaseConnections(worker);
+    retainDatabaseConnections(worker);
     expect(worker.options.idleTimeoutMillis).toBe(0);
     expect(worker.options.max).toBe(maximum);
     expect(worker.options.connectionTimeoutMillis).toBe(10_000);
