@@ -14,6 +14,7 @@ import type {
 } from "@notra/ai/types/router";
 import { getEvlogRuntime } from "@notra/ai/utils/evlog-runtime";
 import { getOperationalContext } from "@notra/ai/utils/operational-context";
+import { promptCacheTelemetry } from "@notra/ai/utils/prompt-cache-telemetry";
 import {
   recordRequestAICost,
   recordRequestAIUsage,
@@ -28,6 +29,8 @@ export function createModelCallTelemetry({
   operation,
   signal,
   providerOptions,
+  prompt,
+  tools,
   lookupRouteMetadata,
 }: ModelCallTelemetryOptions): ModelCallTelemetry {
   const callId = crypto.randomUUID();
@@ -140,7 +143,16 @@ export function createModelCallTelemetry({
     }
   }
 
-  emit("info", "ai.call.started");
+  try {
+    emit(
+      "info",
+      "ai.call.started",
+      prompt ? promptCacheTelemetry({ prompt, tools }) : {}
+    );
+  } catch {
+    // Hashing is diagnostic only and must not prevent a provider call.
+    emit("info", "ai.call.started");
+  }
   signal?.addEventListener("abort", abort, { once: true });
   if (signal?.aborted) {
     abort();

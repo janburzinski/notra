@@ -1,4 +1,5 @@
 import type {
+  LanguageModelV4CallOptions,
   LanguageModelV4FinishReason,
   LanguageModelV4Usage,
   SharedV4ProviderMetadata,
@@ -17,6 +18,8 @@ export interface ModelCallTelemetryOptions {
   operation: "generate" | "stream" | "evaluate";
   signal?: AbortSignal;
   providerOptions?: SharedV4ProviderOptions;
+  prompt?: LanguageModelV4CallOptions["prompt"];
+  tools?: LanguageModelV4CallOptions["tools"];
   lookupRouteMetadata?: GatewayAdapter["lookupRouteMetadata"];
 }
 

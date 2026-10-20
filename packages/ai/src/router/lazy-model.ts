@@ -299,6 +299,8 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       operation: "generate",
       signal: options.abortSignal,
       providerOptions: options.providerOptions,
+      prompt: options.prompt,
+      tools: options.tools,
     });
     try {
       const result = await this.execute(options, async (route, params) => {
@@ -331,6 +333,8 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       operation: "stream",
       signal: options.abortSignal,
       providerOptions: options.providerOptions,
+      prompt: options.prompt,
+      tools: options.tools,
     });
     try {
       return await this.execute(options, async (route, params) => {

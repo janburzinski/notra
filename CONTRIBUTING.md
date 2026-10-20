@@ -158,6 +158,21 @@ If a new workspace adds Effect, include its source directory in `check:effect`.
 Keep `@effect/tsgo`, TypeScript, Oxlint, and `oxlint-tsgolint` pinned to mutually
 supported versions; the installed `@effect/tsgo/README.md` lists compatibility.
 
+## AI prompt-cache diagnostics
+
+Chat prompts put reusable rules in the first system message with an ephemeral
+cache breakpoint, followed by workspace, date, skills, and integration context.
+Keep request-specific data out of the first block. Tool definitions also form
+part of the provider's cached prefix, so different tool sets do not share it.
+
+Routed model calls log `firstSystemMessageHash`, `toolDefinitionsHash`,
+`promptMessageCount`, and `assistantMessageCount` on `ai.call.started`, without
+logging prompt contents. Join to `ai.call.completed` by `callId` to compare cache
+read/write tokens and latency for matching prompt/tool hashes, model, gateway,
+and upstream provider. Also compare total cost and calls per task: a higher cache
+hit rate alone does not establish savings. Provider token thresholds, cache
+lifetime, and routing still determine whether a matching prefix is reused.
+
 ## QStash Local Workflows
 
 If you're testing webhooks or workflows with QStash, set `NEXT_PUBLIC_APP_URL` to a public URL. `localhost` will not work for external callbacks.

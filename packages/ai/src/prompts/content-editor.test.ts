@@ -27,7 +27,9 @@ describe("content editor image context", () => {
     const prompt = getContentEditorChatPrompt({
       contentType: "image",
       imageContext,
-    });
+    })
+      .map((message) => message.content)
+      .join("\n\n");
 
     expect(prompt).toContain(JSON.stringify(imageContext));
     expect(prompt).toContain("Prefer it over earlier tool outputs");
@@ -48,14 +50,18 @@ describe("content editor image context", () => {
     const prompt = getContentEditorChatPrompt({
       contentType: "image",
       imageContext,
-    });
+    })
+      .map((message) => message.content)
+      .join("\n\n");
 
     expect(prompt).toContain('"diagramSpec":null');
     expect(prompt).toContain("do not claim to see details of the image");
   });
 
   test("keeps non-image editing unchanged", () => {
-    const prompt = getContentEditorChatPrompt({ contentType: "blog_post" });
+    const prompt = getContentEditorChatPrompt({ contentType: "blog_post" })
+      .map((message) => message.content)
+      .join("\n\n");
 
     expect(prompt).toContain("ALWAYS call getMarkdown first");
     expect(prompt).not.toContain("## Current Image");

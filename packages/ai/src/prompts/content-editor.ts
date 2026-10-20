@@ -1,4 +1,5 @@
 import type { ContentEditorChatPromptParams } from "@notra/ai/types/prompts";
+import { cachedInstructions } from "@notra/ai/utils/cached-instructions";
 import { formatCurrentDate } from "@notra/ai/utils/current-date";
 import dedent from "dedent";
 
@@ -94,12 +95,9 @@ export function getContentEditorChatPrompt(
   const { formatted: currentDate, timezone: resolvedTimezone } =
     formatCurrentDate(timezone);
 
-  return (
+  return cachedInstructions(
     dedent`
     You are a content editor assistant. Help users ${documentMode === "plan" ? "refine content plans" : "edit content"}.
-
-    ## Current Date
-    Today is ${currentDate} (${resolvedTimezone}). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
 
     ## Working in the Open
     The user sees your full activity in a side panel: your reasoning, every tool call with its inputs and results, and your text responses. Work in the open:
@@ -112,7 +110,12 @@ export function getContentEditorChatPrompt(
 
     ## Content Guidelines
     - Never use em dashes (—) or en dashes (–) in any content. Use hyphens (-) or rewrite the sentence instead.
-    ${capabilitiesSection}${linkedInSection}${twitterSection}${imageSection}${planSection}${githubSection}${linearSection}${selectionContext}
-  ` + imageContextSection
+    ${linkedInSection}${twitterSection}${imageSection}${planSection}
+  `,
+    dedent`
+      ## Current Date
+      Today is ${currentDate} (${resolvedTimezone}). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
+      ${capabilitiesSection}${githubSection}${linearSection}${selectionContext}
+    ` + imageContextSection
   );
 }

@@ -5,6 +5,7 @@ import {
 } from "@notra/ai/constants/chat-workspace";
 import { renderSkillGuidance } from "@notra/ai/skills/functions/guidance";
 import type { StandaloneChatPromptParams } from "@notra/ai/types/prompts";
+import { cachedInstructions } from "@notra/ai/utils/cached-instructions";
 import { sanitizeChatWorkspaceLabel } from "@notra/ai/utils/chat-workspace";
 import { formatCurrentDate } from "@notra/ai/utils/current-date";
 import dedent from "dedent";
@@ -57,12 +58,8 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
   const skillsSection = renderSkillGuidance(skillSummaries);
   const workspaceSection = formatWorkspaceSection(workspace);
 
-  return dedent`
+  const shared = dedent`
     You are Notra, an AI assistant for content teams. You help users create, edit, and manage content posts, and gather information about brand identities, integrations, GitHub, and Linear.
-
-    ## Current Date
-    Today is ${currentDate} (${resolvedTimezone}). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
-    ${workspaceSection}${skillsSection ? `\n${skillsSection}` : ""}
 
     ## Tool Workflow
     - Read-only Notra data tools (skills, integrations, posts, brand references, schedules, GitHub, Linear, Granola, web search, webpage fetch, GEO projects, prompt results, and project context) are only available inside code_mode. Write one program that calls them as tools.<name>(input), run independent calls with Promise.all, and return only the fields you need.
@@ -103,8 +100,17 @@ export function getStandaloneChatPrompt(params: StandaloneChatPromptParams) {
 
     ## GEO Analytics
     When the user asks how GEO, AI visibility, or mention rate is going, call getGeoOverview and getGeoTimeseries. Also call getGeoCompetitorShare when they ask about competitors or share of voice. Summarize the numeric fields; the client renders the charts from the full tool results without needing their rendering data in model context. Do not invent metrics when the tools return empty data. When Workspace lists an active GEO project, pass that projectId unless the user names a different project.
-    ${capabilitiesSection}${integrationResolutionSection}${githubSection}${codeResearchSection}${linearSection}${mcpSection}
   `;
+
+  return cachedInstructions(
+    shared,
+    dedent`
+      ## Current Date
+      Today is ${currentDate} (${resolvedTimezone}). Use this when users reference relative dates like "today", "yesterday", "this week", or "last month".
+      ${workspaceSection}${skillsSection ? `\n${skillsSection}` : ""}
+      ${capabilitiesSection}${integrationResolutionSection}${githubSection}${codeResearchSection}${linearSection}${mcpSection}
+    `
+  );
 }
 
 function formatWorkspaceSection(
