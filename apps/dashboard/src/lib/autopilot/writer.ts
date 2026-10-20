@@ -64,6 +64,7 @@ export async function writeBlogPost(params: {
   const { ctx, log, brief } = params;
   const existing = params.existing ?? null;
   const existingPaths = new Set(params.paths);
+  const language = ctx.brand?.language ?? "English";
   let reads = 0;
 
   const tools = {
@@ -124,7 +125,10 @@ export async function writeBlogPost(params: {
         ]
       : [
           "Leave out any image, cover or hero field in the frontmatter; Notra adds the hero image itself.",
-          "Write in the brand's language and match the frontmatter format, field names and style of the sample post exactly. If there is no sample, use YAML frontmatter with title, description and date.",
+          // Topics come from search queries and prompts in any tracked
+          // language; the site should still read as one language.
+          `Write the whole post in ${language}: slug, title, description, headings and body. The topic, query and evidence may be in another language; translate the topic into ${language} instead of switching languages.`,
+          "Match the frontmatter format, field names and style of the sample post exactly. If there is no sample, use YAML frontmatter with title, description and date.",
           "Use today's date where a date is needed. 900 to 1500 words.",
         ]),
     ctx.brand?.customInstructions
@@ -139,7 +143,7 @@ export async function writeBlogPost(params: {
     `Website: ${ctx.brand?.websiteUrl ?? ""}`,
     `About: ${ctx.brand?.description ?? ""}`,
     ctx.brand?.audience ? `Audience: ${ctx.brand.audience}` : "",
-    `Language: ${ctx.brand?.language ?? "English"}`,
+    `Language: ${language}`,
     `Today: ${new Date().toISOString().slice(0, 10)}`,
     "",
     `Topic: ${brief.topic}`,
