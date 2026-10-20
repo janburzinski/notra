@@ -36,5 +36,6 @@ export function analyticsScriptTag(
     : {
         scriptSrc: joinMountPath(mount, SITE_ANALYTICS_SCRIPT_FILE),
         eventPath: joinMountPath(mount, SITE_ANALYTICS_EVENT_FILE),
+        consent: loaded.manifest.analyticsConsent === true,
       };
 }

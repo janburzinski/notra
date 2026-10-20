@@ -2197,6 +2197,36 @@ export const geoAgentReadinessReports = pgTable(
   ]
 );
 
+export const inthIntegrations = pgTable(
+  "inth_integrations",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    encryptedAccessToken: text("encrypted_access_token").notNull(),
+    encryptedRefreshToken: text("encrypted_refresh_token").notNull(),
+    accessTokenExpiresAt: timestamp("access_token_expires_at").notNull(),
+    status: text("status", { enum: ["active", "reauth_required"] })
+      .notNull()
+      .default("active"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("inthIntegrations_organizationId_uidx").on(
+      table.organizationId
+    ),
+    index("inthIntegrations_createdByUserId_idx").on(table.createdByUserId),
+  ]
+);
+
 export const googleSearchConsoleIntegrations = pgTable(
   "google_search_console_integrations",
   {

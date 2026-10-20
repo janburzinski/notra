@@ -864,3 +864,9 @@ body {
     transform: translateY(-4px) scale(0.98);
   }
 }
+
+[data-testid*="-legal-link-"] {
+  margin-inline-start: 0.35em;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}

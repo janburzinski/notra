@@ -215,6 +215,8 @@ For step-by-step setup in the dashboard or repository, see [Analytics integratio
 | `integrations.posthog.sessionRecording` | Boolean, defaults to `true`. Set to `false` to disable recording while keeping analytics |
 | `integrations.umami.websiteId` | Public Website ID as a UUID from Umami's Tracking code |
 | `integrations.umami.scriptUrl` | Optional full HTTPS script URL. Defaults to `https://cloud.umami.is/script.js`; supports self-hosted script paths and ports |
+| `integrations.c15t.backendURL` | Your Inth project URL or self-hosted c15t backend, as an `https://` URL. Turns on the cookie banner. See [c15t cookie banner](/sites/integrations/consent/c15t) for every `c15t` option |
+| `integrations.c15t.scripts` | Object that maps custom script paths, like `scripts/hotjar.js`, to `measurement`, `marketing`, `functionality` or `experience`. Listed scripts load only after the visitor allows that category |
 | `integrations.umami.hostUrl` | Optional HTTPS collection base URL, corresponding to `data-host-url`. Leave empty unless events should go to a different endpoint |
 
 ## Security

@@ -46,6 +46,7 @@ export interface ServeFileParams {
 export interface AnalyticsScriptTag {
   scriptSrc: string;
   eventPath: string;
+  consent: boolean;
 }
 
 export interface RedirectMatch {

@@ -29,6 +29,10 @@ You set up a provider in the dashboard or add it under `integrations` in `blog.j
   Analytics integrations are disabled on preview deployments and during local development. Custom scripts still run there, so if you install analytics through a [custom script](/sites/custom-scripts), you control when it sends events.
 </Note>
 
+## Consent
+
+To ask visitors before analytics loads, turn on the [c15t cookie banner](/sites/integrations/consent/c15t). Every provider below then waits until a visitor allows the measurement category, and Notra's own visitor analytics follow the same choice. AI agent tracking keeps working without consent.
+
 ## Supported providers
 
 <CardGroup cols={2}>

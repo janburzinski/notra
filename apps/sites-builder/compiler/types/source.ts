@@ -26,11 +26,16 @@ export interface PrepareSiteParams {
   incremental?: boolean;
 }
 
+export interface PreparedCustomScript {
+  path: string;
+  fileName: string;
+}
+
 export interface PreparedSite {
   validation: SiteValidationResult;
   collectDiagnostics: SiteDiagnostic[];
   publicFiles: string[];
-  customScripts: string[];
+  customScripts: PreparedCustomScript[];
   fontStylesheet?: string;
 }
 

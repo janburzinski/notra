@@ -2,6 +2,11 @@ import type { IconSvgElement } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
 import type {
+  InthConsent,
+  InthConsentStatus,
+  InthOAuthErrorCode,
+} from "@/types/site-consent";
+import type {
   SiteIntegrationProvider,
   SiteIntegrationAutosaveState,
 } from "@/types/site-integrations";
@@ -614,17 +619,30 @@ export interface SiteSuggestInputProps {
   disabled?: boolean;
 }
 
+export type SiteIntegrationBrand = Pick<
+  SiteIntegrationProvider,
+  "logo" | "name" | "recommended"
+> & { fill?: boolean };
+
 export interface SiteIntegrationLogoProps {
-  provider: SiteIntegrationProvider;
+  provider: SiteIntegrationBrand;
   className?: string;
 }
 
 export interface SiteIntegrationRowProps {
-  provider: SiteIntegrationProvider;
+  provider: SiteIntegrationBrand;
+  description: string;
   isSetUp: boolean;
+  loading?: boolean;
   disabled: boolean;
   onOpen: () => void;
-  onRemove: () => void;
+  onRemove?: () => void;
+}
+
+export interface SiteConsentSectionProps {
+  isSetUp: boolean;
+  loading: boolean;
+  disabled: boolean;
 }
 
 export interface SiteIntegrationDialogProps {
@@ -740,4 +758,25 @@ export interface SiteRootDirectoryToggleProps {
 export interface SitesLiveProviderProps {
   organizationSlug: string;
   children: ReactNode;
+}
+
+export interface SiteConfigExampleProps {
+  value: string;
+}
+
+export interface SiteInthDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  isSetUp: boolean;
+  oauthError: InthOAuthErrorCode | null;
+}
+
+export interface SiteInthManagedPanelProps {
+  inth: InthConsent;
+  authorizeHref: string;
+}
+
+export interface SiteInthProjectSettingsProps {
+  inth: InthConsent;
+  status: InthConsentStatus;
 }

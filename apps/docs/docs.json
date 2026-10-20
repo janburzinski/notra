@@ -301,6 +301,11 @@
                   "sites/integrations/analytics/plausible",
                   "sites/integrations/analytics/umami"
                 ]
+              },
+              {
+                "group": "Consent",
+                "icon": "cookie-bite",
+                "pages": ["sites/integrations/consent/c15t"]
               }
             ]
           },

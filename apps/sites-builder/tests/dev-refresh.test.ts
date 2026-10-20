@@ -18,7 +18,9 @@ function prepared(name = "Original"): PreparedSite {
     },
     collectDiagnostics: [],
     publicFiles: ["/logo.svg"],
-    customScripts: ["custom-scripts-first.js"],
+    customScripts: [
+      { path: "scripts/first.js", fileName: "custom-scripts-first.js" },
+    ],
   };
 }
 
@@ -110,7 +112,9 @@ test("config, public assets, scripts and OG files refresh the full startup snaps
     expect(await owner.refresh()).toBe(true);
     state.source = prepared("Updated");
     state.source.publicFiles = ["/new-logo.svg", "/download.pdf"];
-    state.source.customScripts = ["custom-scripts-second.js"];
+    state.source.customScripts = [
+      { path: "scripts/second.js", fileName: "custom-scripts-second.js" },
+    ];
     state.ogFiles = ["/_notra/og/blog/new.png"];
     expect(await owner.refresh()).toBe(true);
     const latest = state.starts.at(-1);

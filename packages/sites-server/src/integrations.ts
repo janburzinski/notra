@@ -9,6 +9,7 @@ import {
 } from "./editor";
 import type {
   SaveSiteIntegrationsInput,
+  SiteIntegrationConfigUpdate,
   SiteIntegrationsState,
 } from "./types/integrations";
 import type { Site } from "./types/sites";
@@ -50,10 +51,39 @@ export async function saveSiteIntegration(
   site: Site,
   input: SaveSiteIntegrationsInput
 ): Promise<SiteIntegrationsState> {
+  return await saveSiteIntegrationUpdate(site, () => input, input.userId);
+}
+
+export async function saveSiteC15tBackend(
+  site: Site,
+  backendURL: string,
+  userId: string
+): Promise<SiteIntegrationsState> {
+  return await saveSiteIntegrationUpdate(
+    site,
+    (integrations) => ({
+      provider: "c15t",
+      settings: {
+        ...(isRecord(integrations.c15t) ? integrations.c15t : {}),
+        backendURL,
+      },
+    }),
+    userId
+  );
+}
+
+async function saveSiteIntegrationUpdate(
+  site: Site,
+  toUpdate: (
+    integrations: Record<string, unknown>
+  ) => SiteIntegrationConfigUpdate,
+  userId: string
+): Promise<SiteIntegrationsState> {
   const { file, draft, content } = await currentConfig(site);
+  const config = parseSiteIntegrationConfig(content);
   const { integrations, content: next } = updateSiteIntegrationConfig(
     content,
-    input
+    toUpdate(isRecord(config?.integrations) ? config.integrations : {})
   );
   const observed = {
     path: SITE_CONFIG_FILENAME,
@@ -73,7 +103,7 @@ export async function saveSiteIntegration(
     content: next,
     baseBlobSha: draft ? draft.baseBlobSha : (file?.sha ?? null),
     baseCommitSha: draft?.baseCommitSha ?? null,
-    userId: input.userId,
+    userId,
   });
   return { integrations, hasDraft: true, invalid: false };
 }

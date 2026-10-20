@@ -12,6 +12,7 @@
     "test": "bun test tests"
   },
   "dependencies": {
+    "@c15t/core": "3.0.0",
     "@notra/sites-core": "workspace:*",
     "effect": "catalog:"
   },

@@ -1,5 +1,6 @@
 import type { DatabuddyConfig } from "@databuddy/sdk";
 import type {
+  siteIntegrationSchemas,
   siteIntegrationUpdateSchema,
   siteIntegrationsSchema,
   siteSecuritySchema,
@@ -7,7 +8,8 @@ import type {
 import type { z } from "zod";
 
 export type SiteIntegrations = z.infer<typeof siteIntegrationsSchema>;
-export type SiteIntegrationName = keyof SiteIntegrations;
+export type SiteIntegrationName = keyof typeof siteIntegrationSchemas;
+export type SiteC15t = NonNullable<SiteIntegrations["c15t"]>;
 export type SiteIntegrationUpdate = z.infer<typeof siteIntegrationUpdateSchema>;
 type SiteSecurity = z.infer<typeof siteSecuritySchema>;
 

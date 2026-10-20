@@ -164,7 +164,7 @@ export async function prepareSite(
           join(params.workDir, "site", "public", SITE_ASSETS_DIR, fileName),
           source
         );
-        return fileName;
+        return { path, fileName };
       }
     )
   );

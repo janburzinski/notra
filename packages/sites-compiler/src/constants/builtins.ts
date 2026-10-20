@@ -25,6 +25,7 @@ export const BUILTIN_COMPONENTS = [
   "YouTube",
   "ThemeToggle",
   "SiteAreas",
+  "PrivacySettings",
 ] as const;
 
 export const BUILTIN_COMPONENT_NAMES = new Set<string>(BUILTIN_COMPONENTS);

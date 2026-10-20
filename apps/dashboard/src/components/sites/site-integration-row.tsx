@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -24,7 +25,9 @@ import type { SiteIntegrationRowProps } from "@/types/components/sites";
 
 export function SiteIntegrationRow({
   provider,
+  description,
   isSetUp,
+  loading,
   disabled,
   onOpen,
   onRemove,
@@ -54,11 +57,10 @@ export function SiteIntegrationRow({
             <Badge size="sm">{t("recommended")}</Badge>
           ) : null}
         </div>
-        <p className="text-muted-foreground truncate text-sm">
-          {t(`providers.${provider.id}`)}
-        </p>
+        <p className="text-muted-foreground truncate text-sm">{description}</p>
       </div>
-      {isSetUp ? (
+      {loading ? <Skeleton className="size-7 shrink-0 rounded-md" /> : null}
+      {!loading && isSetUp ? (
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
@@ -86,14 +88,23 @@ export function SiteIntegrationRow({
               />
               {t("edit")}
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onRemove} variant="destructive">
-              <HugeiconsIcon icon={Delete02Icon} size={14} strokeWidth={1.5} />
-              {t("remove")}
-            </DropdownMenuItem>
+            {onRemove ? (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onRemove} variant="destructive">
+                  <HugeiconsIcon
+                    icon={Delete02Icon}
+                    size={14}
+                    strokeWidth={1.5}
+                  />
+                  {t("remove")}
+                </DropdownMenuItem>
+              </>
+            ) : null}
           </DropdownMenuContent>
         </DropdownMenu>
-      ) : (
+      ) : null}
+      {loading || isSetUp ? null : (
         <Button
           aria-label={t("add", { provider: provider.name })}
           className="relative cursor-pointer"

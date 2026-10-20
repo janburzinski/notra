@@ -94,6 +94,6 @@ export async function serveFile(params: ServeFileParams): Promise<Response> {
     headers,
   });
   return analytics && request.method !== "HEAD"
-    ? injectAnalyticsScript(response, analytics.scriptSrc, analytics.eventPath)
+    ? injectAnalyticsScript(response, analytics)
     : response;
 }

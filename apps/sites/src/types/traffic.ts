@@ -23,6 +23,7 @@ export interface TrafficPayload {
     prefetch: boolean;
     tracing: boolean;
   };
+  visitorConsent?: boolean;
 }
 
 export interface TrafficReport {
@@ -33,6 +34,15 @@ export interface TrafficReport {
   publicUrl: string;
   proxied: boolean;
   status: number;
+  consentBackendURL?: string;
+}
+
+export interface VisitorConsentCheck {
+  fetch: (url: string, init: RequestInit) => Promise<Response>;
+  backendURL: string;
+  headers: Headers;
+  country?: string;
+  region?: string;
 }
 
 export interface AnalyticsEvent {

@@ -1,3 +1,4 @@
+import type { InthErrorCode } from "./types/inth";
 import type { SiteInputField } from "./types/sites";
 
 export class SitesNotConfiguredError extends Error {
@@ -45,3 +46,13 @@ export class SitePermanentBuildError extends Error {
 }
 
 export class UnsafeArchiveError extends SitePermanentBuildError {}
+
+export class InthError extends Error {
+  readonly name = "InthError";
+  readonly code: InthErrorCode;
+
+  constructor(code: InthErrorCode, message: string) {
+    super(message);
+    this.code = code;
+  }
+}

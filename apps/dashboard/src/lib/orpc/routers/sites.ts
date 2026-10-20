@@ -43,6 +43,7 @@ import {
   siteStarterInputSchema,
   updatePostPreviewAccessInputSchema,
   updateSiteInputSchema,
+  connectSiteInthProjectInputSchema,
 } from "@notra/schemas/dashboard/sites";
 import {
   SITE_CONFIG_FILENAME,
@@ -95,6 +96,12 @@ import {
   readSiteIntegrations,
   saveSiteIntegration,
 } from "@notra/sites-server/integrations";
+import {
+  connectSiteToInthProject,
+  disconnectInth,
+  getInthConsentStatus,
+  listInthProjects,
+} from "@notra/sites-server/inth";
 import {
   previewAccessUrl,
   setSitePreviewPassword,
@@ -1033,5 +1040,40 @@ export const sitesRouter = {
           userId,
         });
       }),
+
+    inth: {
+      status: sitesProcedure
+        .input(siteScopeInputSchema)
+        .handler(async ({ context, input }) => {
+          const { site } = await requireSite(context, input);
+          return await getInthConsentStatus(site);
+        }),
+
+      projects: sitesProcedure
+        .input(siteScopeInputSchema)
+        .handler(async ({ context, input }) => {
+          const { site } = await requireSite(context, input);
+          return await listInthProjects(site.organizationId);
+        }),
+
+      connect: sitesProcedure
+        .input(connectSiteInthProjectInputSchema)
+        .handler(async ({ context, input }) => {
+          assertNotDemo();
+          const { site, userId } = await requireSite(context, input, {
+            admin: true,
+          });
+          return await connectSiteToInthProject(site, input.projectId, userId);
+        }),
+
+      disconnect: sitesProcedure
+        .input(siteScopeInputSchema)
+        .handler(async ({ context, input }) => {
+          assertNotDemo();
+          const { site } = await requireSite(context, input, { admin: true });
+          await disconnectInth(site.organizationId);
+          return { disconnected: true };
+        }),
+    },
   },
 };

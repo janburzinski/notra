@@ -6,7 +6,10 @@ import {
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { siteIntegrationSchemas } from "@notra/sites-core/schemas/site-integrations";
+import {
+  c15tSchema,
+  siteIntegrationSchemas,
+} from "@notra/sites-core/schemas/site-integrations";
 import type { SiteIntegrationName } from "@notra/sites-core/types/site-integrations";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
@@ -23,6 +26,7 @@ import { useTranslations } from "use-intl";
 
 import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
+import { SiteConsentSection } from "@/components/sites/site-consent-section";
 import { useSite } from "@/components/sites/site-context";
 import { SiteIntegrationDialog } from "@/components/sites/site-integration-dialog";
 import { SiteIntegrationRow } from "@/components/sites/site-integration-row";
@@ -56,6 +60,9 @@ export function SiteIntegrationsPage() {
   const previewNote = useStoredDismissal(
     localStorageKeys.siteIntegrationsPreviewNoteDismissed
   );
+  const consentSetUp = c15tSchema.safeParse(
+    query.data?.integrations.c15t
+  ).success;
   const open = SITE_INTEGRATION_PROVIDERS.find(
     (provider) => provider.id === openId
   );
@@ -88,27 +95,6 @@ export function SiteIntegrationsPage() {
   return (
     <div className="flex flex-1 flex-col gap-6" data-site-fill>
       <PageHeading description={t("description")} title={t("title")} />
-
-      {previewNote.dismissed ? null : (
-        <Alert variant="info">
-          <HugeiconsIcon
-            aria-hidden="true"
-            icon={InformationCircleIcon}
-            strokeWidth={1.5}
-          />
-          <AlertDescription>{t("previewDescription")}</AlertDescription>
-          <AlertAction className="top-1/2 -translate-y-1/2">
-            <Button
-              aria-label={t("dismissPreviewNote")}
-              onClick={previewNote.dismiss}
-              size="icon-sm"
-              variant="ghost"
-            >
-              <HugeiconsIcon icon={Cancel01Icon} />
-            </Button>
-          </AlertAction>
-        </Alert>
-      )}
 
       {query.isError ? (
         <Alert>
@@ -152,57 +138,67 @@ export function SiteIntegrationsPage() {
         </Alert>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2">
-        {query.isPending
-          ? SITE_INTEGRATION_PROVIDERS.map((provider) => (
-              <div
-                className={cn(
-                  "flex items-center gap-4 rounded-xl p-3",
-                  provider.recommended &&
-                    "bg-primary/5 ring-primary/25 ring-1 ring-inset"
-                )}
-                key={provider.id}
+      <section className="space-y-3" aria-labelledby="site-analytics-heading">
+        <h2 className="font-medium" id="site-analytics-heading">
+          {t("analyticsTitle")}
+        </h2>
+        {previewNote.dismissed ? null : (
+          <Alert variant="info">
+            <HugeiconsIcon
+              aria-hidden="true"
+              icon={InformationCircleIcon}
+              strokeWidth={1.5}
+            />
+            <AlertDescription>{t("previewDescription")}</AlertDescription>
+            <AlertAction className="top-1/2 -translate-y-1/2">
+              <Button
+                aria-label={t("dismissPreviewNote")}
+                onClick={previewNote.dismiss}
+                size="icon-sm"
+                variant="ghost"
               >
-                <Skeleton className="size-11 shrink-0 rounded-xl" />
-                <div className="min-w-0 flex-1 space-y-1.5">
-                  <div className="flex h-5 items-center gap-2">
-                    <Skeleton className="h-3.5 w-24" />
-                    {provider.recommended ? (
-                      <Skeleton className="h-4 w-16 rounded-full" />
-                    ) : null}
-                  </div>
-                  <Skeleton className="h-3.5 w-64 max-w-full" />
-                </div>
-                <Skeleton className="size-7 shrink-0 rounded-md" />
-              </div>
-            ))
-          : SITE_INTEGRATION_PROVIDERS.map((provider) => (
-              <SiteIntegrationRow
-                isSetUp={
-                  siteIntegrationSchemas[provider.id].safeParse(
-                    query.data?.integrations[provider.id]
-                  ).success
-                }
-                disabled={query.isError || save.isPending || preparingPublish}
-                key={provider.id}
-                onOpen={() => setOpenId(provider.id)}
-                onRemove={() =>
-                  save.mutate(
-                    { provider: provider.id, settings: null },
-                    {
-                      onSuccess: () =>
-                        toast.success(t("removed"), {
-                          description: t("savedDescription"),
-                        }),
-                      onError: (error) =>
-                        toast.error(toErrorMessage(error, t("saveFailed"))),
-                    }
-                  )
-                }
-                provider={provider}
-              />
-            ))}
-      </div>
+                <HugeiconsIcon icon={Cancel01Icon} />
+              </Button>
+            </AlertAction>
+          </Alert>
+        )}
+        <div className="grid grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2">
+          {SITE_INTEGRATION_PROVIDERS.map((provider) => (
+            <SiteIntegrationRow
+              description={t(`providers.${provider.id}`)}
+              loading={query.isPending}
+              isSetUp={
+                siteIntegrationSchemas[provider.id].safeParse(
+                  query.data?.integrations[provider.id]
+                ).success
+              }
+              disabled={query.isError || save.isPending || preparingPublish}
+              key={provider.id}
+              onOpen={() => setOpenId(provider.id)}
+              onRemove={() =>
+                save.mutate(
+                  { provider: provider.id, settings: null },
+                  {
+                    onSuccess: () =>
+                      toast.success(t("removed"), {
+                        description: t("savedDescription"),
+                      }),
+                    onError: (error) =>
+                      toast.error(toErrorMessage(error, t("saveFailed"))),
+                  }
+                )
+              }
+              provider={provider}
+            />
+          ))}
+        </div>
+      </section>
+
+      <SiteConsentSection
+        disabled={query.isPending || query.isError}
+        isSetUp={consentSetUp}
+        loading={query.isPending}
+      />
 
       {query.data?.hasDraft ? (
         <div className="pointer-events-none sticky bottom-4 z-10 mt-auto flex justify-center">

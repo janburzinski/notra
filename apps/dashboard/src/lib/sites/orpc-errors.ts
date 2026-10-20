@@ -1,4 +1,5 @@
 import {
+  InthError,
   SiteHostConflictError,
   SiteInputError,
   SiteNotBuildableError,
@@ -8,8 +9,10 @@ import {
 } from "@notra/sites-server/errors";
 
 import {
+  badGateway,
   badRequest,
   conflict,
+  notFound,
   serviceUnavailable,
 } from "@/lib/orpc/utils/errors";
 
@@ -31,6 +34,20 @@ export function toSitesOrpcError(error: unknown): unknown {
   }
   if (error instanceof SiteHostConflictError) {
     return conflict(error.message);
+  }
+  if (error instanceof InthError) {
+    switch (error.code) {
+      case "not_configured":
+        return serviceUnavailable(error.message);
+      case "project_not_found":
+        return notFound(error.message);
+      case "no_backend":
+        return badRequest(error.message, { code: error.code });
+      case "api_error":
+        return badGateway(error.message);
+      default:
+        return conflict(error.message, { code: error.code });
+    }
   }
   if (error instanceof SitesNotConfiguredError) {
     return serviceUnavailable(

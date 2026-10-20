@@ -59,6 +59,8 @@ import { Route as ApiGeoDrainsProviderRouteImport } from './routes/api.geo.drain
 import { Route as ApiIntegrationsGithubCallbackRouteImport } from './routes/api.integrations.github.callback'
 import { Route as ApiIntegrationsGoogleSearchConsoleAuthorizeRouteImport } from './routes/api.integrations.google-search-console.authorize'
 import { Route as ApiIntegrationsGoogleSearchConsoleCallbackRouteImport } from './routes/api.integrations.google-search-console.callback'
+import { Route as ApiIntegrationsInthAuthorizeRouteImport } from './routes/api.integrations.inth.authorize'
+import { Route as ApiIntegrationsInthCallbackRouteImport } from './routes/api.integrations.inth.callback'
 import { Route as ApiIntegrationsLinearAuthorizeRouteImport } from './routes/api.integrations.linear.authorize'
 import { Route as ApiIntegrationsLinearCallbackRouteImport } from './routes/api.integrations.linear.callback'
 import { Route as ApiIntegrationsSlackAuthorizeRouteImport } from './routes/api.integrations.slack.authorize'
@@ -353,6 +355,18 @@ const ApiIntegrationsGoogleSearchConsoleCallbackRoute =
     path: '/api/integrations/google-search-console/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiIntegrationsInthAuthorizeRoute =
+  ApiIntegrationsInthAuthorizeRouteImport.update({
+    id: '/api/integrations/inth/authorize',
+    path: '/api/integrations/inth/authorize',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiIntegrationsInthCallbackRoute =
+  ApiIntegrationsInthCallbackRouteImport.update({
+    id: '/api/integrations/inth/callback',
+    path: '/api/integrations/inth/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiIntegrationsLinearAuthorizeRoute =
   ApiIntegrationsLinearAuthorizeRouteImport.update({
     id: '/api/integrations/linear/authorize',
@@ -596,6 +610,8 @@ export interface FileRoutesByFullPath {
   '/api/integrations/github/callback': typeof ApiIntegrationsGithubCallbackRoute
   '/api/integrations/google-search-console/authorize': typeof ApiIntegrationsGoogleSearchConsoleAuthorizeRoute
   '/api/integrations/google-search-console/callback': typeof ApiIntegrationsGoogleSearchConsoleCallbackRoute
+  '/api/integrations/inth/authorize': typeof ApiIntegrationsInthAuthorizeRoute
+  '/api/integrations/inth/callback': typeof ApiIntegrationsInthCallbackRoute
   '/api/integrations/linear/authorize': typeof ApiIntegrationsLinearAuthorizeRoute
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
@@ -680,6 +696,8 @@ export interface FileRoutesByTo {
   '/api/integrations/github/callback': typeof ApiIntegrationsGithubCallbackRoute
   '/api/integrations/google-search-console/authorize': typeof ApiIntegrationsGoogleSearchConsoleAuthorizeRoute
   '/api/integrations/google-search-console/callback': typeof ApiIntegrationsGoogleSearchConsoleCallbackRoute
+  '/api/integrations/inth/authorize': typeof ApiIntegrationsInthAuthorizeRoute
+  '/api/integrations/inth/callback': typeof ApiIntegrationsInthCallbackRoute
   '/api/integrations/linear/authorize': typeof ApiIntegrationsLinearAuthorizeRoute
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
@@ -765,6 +783,8 @@ export interface FileRoutesById {
   '/api/integrations/github/callback': typeof ApiIntegrationsGithubCallbackRoute
   '/api/integrations/google-search-console/authorize': typeof ApiIntegrationsGoogleSearchConsoleAuthorizeRoute
   '/api/integrations/google-search-console/callback': typeof ApiIntegrationsGoogleSearchConsoleCallbackRoute
+  '/api/integrations/inth/authorize': typeof ApiIntegrationsInthAuthorizeRoute
+  '/api/integrations/inth/callback': typeof ApiIntegrationsInthCallbackRoute
   '/api/integrations/linear/authorize': typeof ApiIntegrationsLinearAuthorizeRoute
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
@@ -851,6 +871,8 @@ export interface FileRouteTypes {
     | '/api/integrations/github/callback'
     | '/api/integrations/google-search-console/authorize'
     | '/api/integrations/google-search-console/callback'
+    | '/api/integrations/inth/authorize'
+    | '/api/integrations/inth/callback'
     | '/api/integrations/linear/authorize'
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
@@ -935,6 +957,8 @@ export interface FileRouteTypes {
     | '/api/integrations/github/callback'
     | '/api/integrations/google-search-console/authorize'
     | '/api/integrations/google-search-console/callback'
+    | '/api/integrations/inth/authorize'
+    | '/api/integrations/inth/callback'
     | '/api/integrations/linear/authorize'
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
@@ -1019,6 +1043,8 @@ export interface FileRouteTypes {
     | '/api/integrations/github/callback'
     | '/api/integrations/google-search-console/authorize'
     | '/api/integrations/google-search-console/callback'
+    | '/api/integrations/inth/authorize'
+    | '/api/integrations/inth/callback'
     | '/api/integrations/linear/authorize'
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
@@ -1098,6 +1124,8 @@ export interface RootRouteChildren {
   ApiIntegrationsGithubCallbackRoute: typeof ApiIntegrationsGithubCallbackRoute
   ApiIntegrationsGoogleSearchConsoleAuthorizeRoute: typeof ApiIntegrationsGoogleSearchConsoleAuthorizeRoute
   ApiIntegrationsGoogleSearchConsoleCallbackRoute: typeof ApiIntegrationsGoogleSearchConsoleCallbackRoute
+  ApiIntegrationsInthAuthorizeRoute: typeof ApiIntegrationsInthAuthorizeRoute
+  ApiIntegrationsInthCallbackRoute: typeof ApiIntegrationsInthCallbackRoute
   ApiIntegrationsLinearAuthorizeRoute: typeof ApiIntegrationsLinearAuthorizeRoute
   ApiIntegrationsLinearCallbackRoute: typeof ApiIntegrationsLinearCallbackRoute
   ApiIntegrationsSlackAuthorizeRoute: typeof ApiIntegrationsSlackAuthorizeRoute
@@ -1475,6 +1503,20 @@ declare module '@tanstack/react-router' {
       path: '/api/integrations/google-search-console/callback'
       fullPath: '/api/integrations/google-search-console/callback'
       preLoaderRoute: typeof ApiIntegrationsGoogleSearchConsoleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/integrations/inth/authorize': {
+      id: '/api/integrations/inth/authorize'
+      path: '/api/integrations/inth/authorize'
+      fullPath: '/api/integrations/inth/authorize'
+      preLoaderRoute: typeof ApiIntegrationsInthAuthorizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/integrations/inth/callback': {
+      id: '/api/integrations/inth/callback'
+      path: '/api/integrations/inth/callback'
+      fullPath: '/api/integrations/inth/callback'
+      preLoaderRoute: typeof ApiIntegrationsInthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/integrations/linear/authorize': {
@@ -1855,6 +1897,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiIntegrationsGoogleSearchConsoleAuthorizeRoute,
   ApiIntegrationsGoogleSearchConsoleCallbackRoute:
     ApiIntegrationsGoogleSearchConsoleCallbackRoute,
+  ApiIntegrationsInthAuthorizeRoute: ApiIntegrationsInthAuthorizeRoute,
+  ApiIntegrationsInthCallbackRoute: ApiIntegrationsInthCallbackRoute,
   ApiIntegrationsLinearAuthorizeRoute: ApiIntegrationsLinearAuthorizeRoute,
   ApiIntegrationsLinearCallbackRoute: ApiIntegrationsLinearCallbackRoute,
   ApiIntegrationsSlackAuthorizeRoute: ApiIntegrationsSlackAuthorizeRoute,
@@ -1895,13 +1939,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

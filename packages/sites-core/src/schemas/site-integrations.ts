@@ -1,4 +1,15 @@
 import {
+  C15T_ACTION_DIRECTIONS,
+  C15T_BAR_POSITIONS,
+  C15T_COLOR_TOKENS,
+  C15T_FLOATING_POSITIONS,
+  C15T_LOCALES,
+  C15T_RADII,
+  C15T_SCRIPT_CATEGORIES,
+  C15T_SCRIPT_PATH,
+  C15T_STORAGE_MAX_EXPIRY_DAYS,
+  C15T_UI_PROFILES,
+  C15T_WIDGET_POSITIONS,
   CSP_ORIGIN,
   DATABUDDY_CLIENT_ID,
   DATABUDDY_CLIENT_ID_MESSAGE,
@@ -16,6 +27,10 @@ import {
   TRAILING_SLASHES,
 } from "@notra/sites-core/constants/integrations";
 import { SITE_CSP_MAX_ALLOWED_ORIGINS } from "@notra/sites-core/constants/security";
+import {
+  SITE_HEX_COLOR,
+  SITE_LINK_HREF,
+} from "@notra/sites-core/constants/site-config";
 import type { DatabuddySchemaShape } from "@notra/sites-core/types/site-integrations";
 import { z } from "zod";
 
@@ -102,6 +117,172 @@ const umamiSchema = z.strictObject({
   ),
 });
 
+const c15tSurfaceSchema = {
+  direction: z
+    .enum(C15T_ACTION_DIRECTIONS)
+    .optional()
+    .describe("Lay the buttons out in a row (default) or a column."),
+  uiProfile: z
+    .enum(C15T_UI_PROFILES)
+    .optional()
+    .describe(
+      "compact (default) sizes buttons to their labels; balanced and strict stretch every button to full width."
+    ),
+};
+
+const c15tPromptSchema = z
+  .discriminatedUnion("variant", [
+    z.strictObject({
+      variant: z.literal("floating"),
+      position: z.enum(C15T_FLOATING_POSITIONS).optional(),
+      blocking: z.boolean().optional(),
+      ...c15tSurfaceSchema,
+    }),
+    z.strictObject({
+      variant: z.literal("bar"),
+      position: z.enum(C15T_BAR_POSITIONS).optional(),
+      blocking: z.boolean().optional(),
+      ...c15tSurfaceSchema,
+    }),
+    z.strictObject({
+      variant: z.literal("widget"),
+      position: z.enum(C15T_WIDGET_POSITIONS).optional(),
+      blocking: z.boolean().optional(),
+      ...c15tSurfaceSchema,
+    }),
+    z.strictObject({ variant: z.literal("wall"), ...c15tSurfaceSchema }),
+  ])
+  .describe(
+    "Shape and position of the consent banner. floating is a card, bar spans the viewport edge, widget is a compact corner card, wall blocks the page until the visitor chooses."
+  );
+
+const c15tLegalLinkSchema = z.strictObject({
+  href: z
+    .string()
+    .trim()
+    .regex(SITE_LINK_HREF, "Use an absolute https:// URL or a path"),
+  label: z
+    .string()
+    .trim()
+    .min(1)
+    .max(80)
+    .optional()
+    .describe("Link text. Defaults to the translated name of the link."),
+});
+
+const c15tColorsSchema = z.partialRecord(
+  z.enum(C15T_COLOR_TOKENS),
+  z.string().regex(SITE_HEX_COLOR, "Use a hex color like #8B5CF6")
+);
+
+export const c15tSchema = z
+  .strictObject({
+    backendURL: z
+      .string({
+        error:
+          "Use your Inth project URL or self-hosted c15t backend, e.g. https://acme.inth.app",
+      })
+      .trim()
+      .regex(HTTPS_BASE_URL, "Use an https:// URL without query or hash")
+      .overwrite((value) => value.replace(/\/+$/, ""))
+      .describe(
+        "Your Inth project URL (https://your-project.inth.app) or the URL of your self-hosted c15t backend, including any path prefix. Visitors save consent there."
+      ),
+    scripts: z
+      .record(
+        z
+          .string()
+          .regex(
+            C15T_SCRIPT_PATH,
+            "Use the script's path in your repository, like scripts/hotjar.js"
+          ),
+        z.enum(C15T_SCRIPT_CATEGORIES)
+      )
+      .optional()
+      .describe(
+        'Custom scripts that load only after the visitor allows a category, keyed by their path, like { "scripts/hotjar.js": "measurement" }. Scripts you leave out load on every page.'
+      ),
+    prompt: c15tPromptSchema.optional(),
+    preferences: z
+      .strictObject({
+        blocking: z
+          .boolean()
+          .optional()
+          .describe("Dim the page and trap focus while open (default: true)."),
+        ...c15tSurfaceSchema,
+      })
+      .optional()
+      .describe("Layout of the privacy settings dialog."),
+    legalLinks: z
+      .strictObject({
+        privacyPolicy: c15tLegalLinkSchema.optional(),
+        cookiePolicy: c15tLegalLinkSchema.optional(),
+        termsOfService: c15tLegalLinkSchema.optional(),
+      })
+      .optional()
+      .describe("Legal pages linked from the banner and the dialog."),
+    locale: z
+      .enum(C15T_LOCALES)
+      .optional()
+      .describe(
+        "Force the banner language. Omit to follow the visitor's browser language."
+      ),
+    crossSubdomain: z
+      .boolean()
+      .optional()
+      .describe(
+        "Share the consent cookie with every subdomain of the site's domain (default: false)."
+      ),
+    expiryDays: z
+      .number()
+      .int()
+      .min(1)
+      .max(C15T_STORAGE_MAX_EXPIRY_DAYS)
+      .optional()
+      .describe("Days until the stored choice expires (default: 365)."),
+    disableAnimation: z
+      .boolean()
+      .optional()
+      .describe("Show the banner and dialog without animations."),
+    theme: z
+      .strictObject({
+        colors: c15tColorsSchema
+          .optional()
+          .describe(
+            "Light mode colors as hex values. Unset colors follow your site's theme."
+          ),
+        dark: c15tColorsSchema
+          .optional()
+          .describe(
+            "Dark mode colors as hex values. Unset colors follow your site's dark theme."
+          ),
+        radius: z
+          .enum(C15T_RADII)
+          .optional()
+          .describe(
+            "Corner rounding of the banner, dialog and buttons (default: medium)."
+          ),
+      })
+      .optional()
+      .describe(
+        "Banner and dialog styling. By default they use your site's colors, fonts and dark mode."
+      ),
+    hideBranding: z
+      .boolean()
+      .optional()
+      .describe(
+        "Hide the 'Secured by c15t' badge on the banner. Check that your Inth plan allows it."
+      ),
+    devTools: z
+      .boolean()
+      .default(true)
+      .describe(
+        "Show the c15t DevTools panel during local development with notra-sites dev (default: true). Never included in previews or the live site."
+      ),
+  })
+  .describe(
+    "c15t cookie banner and privacy settings, backed by Inth or your self-hosted c15t backend. Live deployments only; previews and local development show the banner without saving consent."
+  );
 const databuddyPathPatternsSchema = z
   .array(
     z
@@ -241,10 +422,11 @@ export const siteIntegrationsSchema = z
     plausible: plausibleSchema.optional(),
     posthog: posthogSchema.optional(),
     umami: umamiSchema.optional(),
+    c15t: c15tSchema.optional(),
   })
   .default({})
   .describe(
-    "Analytics providers for the live site. Notra installs their scripts automatically. Preview deployments and local development do not send provider events."
+    "Analytics providers and the c15t consent banner for the live site. Notra installs their scripts automatically. Preview deployments and local development do not send provider events."
   );
 
 export const siteSecuritySchema = z

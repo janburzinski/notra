@@ -12,6 +12,7 @@ import type {
   SiteDiagnostic,
 } from "@notra/sites-core/types/build";
 import { buildSiteContentSecurityPolicy } from "@notra/sites-core/utils/content-security-policy";
+import { analyticsGatedByConsent } from "@notra/sites-core/utils/integrations";
 import {
   joinMountPath,
   listMountedAreas,
@@ -28,6 +29,7 @@ import { prepareSite } from "./prepare";
 import type { AreaPages } from "./types/agent-files";
 import type { AstroPackageJson, BuildSiteOptions } from "./types/build";
 import { createAstroLogFilter } from "./utils/astro-log";
+import { consentScriptDiagnostics, siteConsent } from "./utils/consent";
 import { listFiles } from "./utils/fs";
 import { siteHeadScripts } from "./utils/head-scripts";
 import { inlineScriptHashes } from "./utils/inline-scripts";
@@ -119,6 +121,11 @@ export async function buildSite(
     ...prepared.validation.diagnostics,
   ];
   const config = prepared.validation.config;
+  if (config) {
+    diagnostics.push(
+      ...consentScriptDiagnostics(config, prepared.customScripts)
+    );
+  }
   if (hasErrors(diagnostics) || !(prepared.validation.ok && config)) {
     return failedBuild(diagnostics);
   }
@@ -149,6 +156,12 @@ export async function buildSite(
   const publicFiles = new Set(publicFileList);
   const areas: SiteBuildResult["areas"] = [];
   const areaPages: AreaPages[] = [];
+  const consent = siteConsent(
+    config,
+    prepared.customScripts,
+    options.target.analytics,
+    false
+  );
   const pageHtml = new Map<string, string>();
   for (const { area, mount } of listMountedAreas(mounts)) {
     const paramsPath = join(workDir, `params.${area}.json`);
@@ -173,6 +186,7 @@ export async function buildSite(
         prepared.customScripts,
         options.target.analytics
       ),
+      consent,
     });
     const started = Date.now();
     let log = "";
@@ -281,6 +295,8 @@ export async function buildSite(
     totalBytes: sizes.reduce((sum, size) => sum + size, 0),
     redirects: config.redirects,
     contentSecurityPolicy,
+    analyticsConsent: analyticsGatedByConsent(config.integrations),
+    consentBackendURL: config.integrations.c15t?.backendURL,
   };
 }
 

@@ -108,6 +108,11 @@ export const ratelimit = {
     prefix: "ratelimit:slack-oauth",
     limiter: Ratelimit.slidingWindow(10, "10m"),
   }),
+  inthOAuth: new Ratelimit({
+    redis,
+    prefix: "ratelimit:inth-oauth",
+    limiter: Ratelimit.slidingWindow(10, "10m"),
+  }),
   gscOAuth: new Ratelimit({
     redis,
     prefix: "ratelimit:gsc-oauth",

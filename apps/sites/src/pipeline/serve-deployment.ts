@@ -44,6 +44,7 @@ export const serveDeployment = Effect.fn("Sites.serveDeployment")(function* (
         publicUrl: new URL(`${url.pathname}${url.search}`, publicOrigin).href,
         proxied: new URL(publicOrigin).hostname !== host,
         status: response.status,
+        consentBackendURL: loaded.manifest.consentBackendURL,
       })
     );
   }

@@ -1,8 +1,8 @@
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import { siteIntegrationsSchema } from "@notra/sites-core/schemas/site-integrations";
-import type { SiteIntegrationUpdate } from "@notra/sites-core/types/site-integrations";
 
 import { SiteInputError } from "../errors";
+import type { SiteIntegrationConfigUpdate } from "../types/integrations";
 import { isRecord, safeJson } from "./json";
 
 export function parseSiteIntegrationConfig(
@@ -14,7 +14,7 @@ export function parseSiteIntegrationConfig(
 
 export function updateSiteIntegrationConfig(
   content: string | undefined,
-  update: SiteIntegrationUpdate
+  update: SiteIntegrationConfigUpdate
 ) {
   const config = parseSiteIntegrationConfig(content);
   if (!config) {
@@ -42,13 +42,16 @@ export function updateSiteIntegrationConfig(
       `integrations${issue?.path.length ? `.${issue.path.join(".")}` : ""}: ${issue?.message ?? "Check the integration settings"}`
     );
   }
-  if (Object.keys(parsed.data).length > 0) {
-    config.integrations = parsed.data;
+  if (update.settings !== null && update.provider !== "c15t") {
+    current[update.provider] = parsed.data[update.provider];
+  }
+  if (Object.keys(current).length > 0) {
+    config.integrations = current;
   } else {
     delete config.integrations;
   }
   return {
-    integrations: parsed.data,
+    integrations: current,
     content: `${JSON.stringify(config, null, 2)}\n`,
   };
 }

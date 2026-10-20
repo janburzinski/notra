@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 const SRC = join(import.meta.dir, "..", "src");
 const RUNTIME_WORKSPACE_IMPORT =
-  /^import\s+(?!type\b)[^;]*?from\s+"@notra\/(?!builtins|custom-css)[^"]+"/ms;
+  /^import\s+(?!type\b)[^;]*?from\s+"@notra\/(?!builtins|custom-css|consent)[^"]+"/ms;
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {

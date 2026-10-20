@@ -1,4 +1,5 @@
 import type { DevRefreshOptions } from "../types/dev-refresh";
+import { consentScriptDiagnostics, siteConsent } from "./consent";
 import { cleanDevGeneratedAssets } from "./dev-generated-assets";
 import { siteHeadScripts } from "./head-scripts";
 import { hasReactComponents } from "./react";
@@ -67,6 +68,7 @@ export function createDevRefresh(options: DevRefreshOptions) {
       ...prepared.collectDiagnostics,
       ...prepared.validation.diagnostics,
       ...ogImages.diagnostics,
+      ...consentScriptDiagnostics(config, prepared.customScripts),
     ]);
     const params = {
       ...options.params,
@@ -85,13 +87,14 @@ export function createDevRefresh(options: DevRefreshOptions) {
         prepared.customScripts,
         false
       ),
+      consent: siteConsent(config, prepared.customScripts, false, true),
     };
     const snapshot = JSON.stringify(params);
     if (snapshot === published && active) {
       await cleanDevGeneratedAssets(
         params.workDir,
         params.publicFiles,
-        prepared.customScripts
+        prepared.customScripts.map((script) => script.fileName)
       );
       return;
     }
@@ -120,7 +123,7 @@ export function createDevRefresh(options: DevRefreshOptions) {
       await cleanDevGeneratedAssets(
         params.workDir,
         params.publicFiles,
-        prepared.customScripts
+        prepared.customScripts.map((script) => script.fileName)
       );
     }
   };

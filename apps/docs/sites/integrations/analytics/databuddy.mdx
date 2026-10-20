@@ -16,6 +16,8 @@ docolin:
 
 Notra loads the Databuddy script on every live page and allows Databuddy's script and ingestion hosts in the CSP. Every option you set in `blog.json` is passed to the tracker, so you can turn on web vitals, error tracking and custom events, skip or mask paths and tune batching without writing a custom script.
 
+With the [c15t cookie banner](/sites/integrations/consent/c15t) on, Databuddy loads through c15t instead, only after a visitor allows the measurement category, and keeps every option below.
+
 <Steps>
   <Step title="Copy your Client ID">
     In [Databuddy](https://www.databuddy.cc), open your website and copy the `data-client-id` value from its tracking code. It's a public ID, so no API key is needed.

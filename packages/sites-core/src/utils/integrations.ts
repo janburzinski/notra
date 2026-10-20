@@ -87,12 +87,21 @@ export function integrationHeadScripts(
   return scripts;
 }
 
+export function analyticsGatedByConsent(
+  integrations: SiteIntegrations
+): boolean {
+  return integrations.c15t !== undefined;
+}
+
 export function integrationCspSources(
   integrations: SiteIntegrations
 ): SiteCspSources {
   const scriptSrc: string[] = [];
   const connectSrc: string[] = [];
-  const { databuddy, ga4, plausible, posthog, umami } = integrations;
+  const { c15t, databuddy, ga4, plausible, posthog, umami } = integrations;
+  if (c15t) {
+    connectSrc.push(new URL(c15t.backendURL).origin);
+  }
   if (databuddy) {
     scriptSrc.push(new URL(databuddy.scriptUrl ?? DATABUDDY_SCRIPT_URL).origin);
     connectSrc.push(new URL(databuddy.apiUrl ?? DATABUDDY_API_URL).origin);

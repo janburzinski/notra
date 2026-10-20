@@ -515,6 +515,7 @@ export const geoRequestPayloadSchema = object({
     tracing: boolean(),
     prefetch: boolean().optional(),
   }).optional(),
+  visitorConsent: boolean().optional(),
 });
 
 export const webEngagementPayloadSchema = object({

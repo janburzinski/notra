@@ -64,6 +64,8 @@ export const siteManifestSchema = z.object({
   files: z.array(siteManifestFileSchema),
   redirects: z.array(siteRedirectRuleSchema),
   contentSecurityPolicy: siteContentSecurityPolicySchema.optional(),
+  analyticsConsent: z.boolean().optional(),
+  consentBackendURL: z.url().optional(),
 });
 
 export const siteServingPointerSchema = z.object({

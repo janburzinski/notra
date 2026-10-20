@@ -1282,7 +1282,7 @@
     },
     "integrations": {
       "default": {},
-      "description": "Analytics providers for the live site. Notra installs their scripts automatically. Preview deployments and local development do not send provider events.",
+      "description": "Analytics providers and the c15t consent banner for the live site. Notra installs their scripts automatically. Preview deployments and local development do not send provider events.",
       "type": "object",
       "properties": {
         "databuddy": {
@@ -1479,6 +1479,365 @@
           },
           "required": ["websiteId"],
           "additionalProperties": false
+        },
+        "c15t": {
+          "type": "object",
+          "properties": {
+            "backendURL": {
+              "type": "string",
+              "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/[A-Za-z0-9._~-]+)*\\/*$",
+              "description": "Your Inth project URL (https://your-project.inth.app) or the URL of your self-hosted c15t backend, including any path prefix. Visitors save consent there."
+            },
+            "scripts": {
+              "description": "Custom scripts that load only after the visitor allows a category, keyed by their path, like { \"scripts/hotjar.js\": \"measurement\" }. Scripts you leave out load on every page.",
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^(?!\\/)(?!.*\\.\\.)[\\w./-]+\\.js$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "enum": [
+                  "measurement",
+                  "marketing",
+                  "functionality",
+                  "experience"
+                ]
+              }
+            },
+            "prompt": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "variant": {
+                      "type": "string",
+                      "const": "floating"
+                    },
+                    "position": {
+                      "type": "string",
+                      "enum": [
+                        "bottom-left",
+                        "bottom-right",
+                        "top-left",
+                        "top-right",
+                        "bottom-center",
+                        "top-center"
+                      ]
+                    },
+                    "blocking": {
+                      "type": "boolean"
+                    },
+                    "direction": {
+                      "description": "Lay the buttons out in a row (default) or a column.",
+                      "type": "string",
+                      "enum": ["row", "column"]
+                    },
+                    "uiProfile": {
+                      "description": "compact (default) sizes buttons to their labels; balanced and strict stretch every button to full width.",
+                      "type": "string",
+                      "enum": ["compact", "balanced", "strict"]
+                    }
+                  },
+                  "required": ["variant"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "variant": {
+                      "type": "string",
+                      "const": "bar"
+                    },
+                    "position": {
+                      "type": "string",
+                      "enum": ["top", "bottom"]
+                    },
+                    "blocking": {
+                      "type": "boolean"
+                    },
+                    "direction": {
+                      "description": "Lay the buttons out in a row (default) or a column.",
+                      "type": "string",
+                      "enum": ["row", "column"]
+                    },
+                    "uiProfile": {
+                      "description": "compact (default) sizes buttons to their labels; balanced and strict stretch every button to full width.",
+                      "type": "string",
+                      "enum": ["compact", "balanced", "strict"]
+                    }
+                  },
+                  "required": ["variant"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "variant": {
+                      "type": "string",
+                      "const": "widget"
+                    },
+                    "position": {
+                      "type": "string",
+                      "enum": [
+                        "bottom-left",
+                        "bottom-right",
+                        "top-left",
+                        "top-right"
+                      ]
+                    },
+                    "blocking": {
+                      "type": "boolean"
+                    },
+                    "direction": {
+                      "description": "Lay the buttons out in a row (default) or a column.",
+                      "type": "string",
+                      "enum": ["row", "column"]
+                    },
+                    "uiProfile": {
+                      "description": "compact (default) sizes buttons to their labels; balanced and strict stretch every button to full width.",
+                      "type": "string",
+                      "enum": ["compact", "balanced", "strict"]
+                    }
+                  },
+                  "required": ["variant"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "variant": {
+                      "type": "string",
+                      "const": "wall"
+                    },
+                    "direction": {
+                      "description": "Lay the buttons out in a row (default) or a column.",
+                      "type": "string",
+                      "enum": ["row", "column"]
+                    },
+                    "uiProfile": {
+                      "description": "compact (default) sizes buttons to their labels; balanced and strict stretch every button to full width.",
+                      "type": "string",
+                      "enum": ["compact", "balanced", "strict"]
+                    }
+                  },
+                  "required": ["variant"],
+                  "additionalProperties": false
+                }
+              ],
+              "description": "Shape and position of the consent banner. floating is a card, bar spans the viewport edge, widget is a compact corner card, wall blocks the page until the visitor chooses."
+            },
+            "preferences": {
+              "description": "Layout of the privacy settings dialog.",
+              "type": "object",
+              "properties": {
+                "blocking": {
+                  "description": "Dim the page and trap focus while open (default: true).",
+                  "type": "boolean"
+                },
+                "direction": {
+                  "description": "Lay the buttons out in a row (default) or a column.",
+                  "type": "string",
+                  "enum": ["row", "column"]
+                },
+                "uiProfile": {
+                  "description": "compact (default) sizes buttons to their labels; balanced and strict stretch every button to full width.",
+                  "type": "string",
+                  "enum": ["compact", "balanced", "strict"]
+                }
+              },
+              "additionalProperties": false
+            },
+            "legalLinks": {
+              "description": "Legal pages linked from the banner and the dialog.",
+              "type": "object",
+              "properties": {
+                "privacyPolicy": {
+                  "type": "object",
+                  "properties": {
+                    "href": {
+                      "type": "string",
+                      "pattern": "^(?:\\/(?!\\/)|https?:\\/\\/|mailto:)"
+                    },
+                    "label": {
+                      "description": "Link text. Defaults to the translated name of the link.",
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  },
+                  "required": ["href"],
+                  "additionalProperties": false
+                },
+                "cookiePolicy": {
+                  "type": "object",
+                  "properties": {
+                    "href": {
+                      "type": "string",
+                      "pattern": "^(?:\\/(?!\\/)|https?:\\/\\/|mailto:)"
+                    },
+                    "label": {
+                      "description": "Link text. Defaults to the translated name of the link.",
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  },
+                  "required": ["href"],
+                  "additionalProperties": false
+                },
+                "termsOfService": {
+                  "type": "object",
+                  "properties": {
+                    "href": {
+                      "type": "string",
+                      "pattern": "^(?:\\/(?!\\/)|https?:\\/\\/|mailto:)"
+                    },
+                    "label": {
+                      "description": "Link text. Defaults to the translated name of the link.",
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  },
+                  "required": ["href"],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "locale": {
+              "description": "Force the banner language. Omit to follow the visitor's browser language.",
+              "type": "string",
+              "enum": [
+                "bg",
+                "cs",
+                "cy",
+                "da",
+                "de",
+                "el",
+                "en",
+                "es",
+                "et",
+                "fi",
+                "fr",
+                "ga",
+                "gu",
+                "he",
+                "hi",
+                "hr",
+                "hu",
+                "id",
+                "is",
+                "it",
+                "lb",
+                "lt",
+                "lv",
+                "mt",
+                "nb",
+                "nl",
+                "nn",
+                "pl",
+                "pt",
+                "rm",
+                "ro",
+                "sk",
+                "sl",
+                "sv",
+                "zh"
+              ]
+            },
+            "crossSubdomain": {
+              "description": "Share the consent cookie with every subdomain of the site's domain (default: false).",
+              "type": "boolean"
+            },
+            "expiryDays": {
+              "description": "Days until the stored choice expires (default: 365).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 730
+            },
+            "disableAnimation": {
+              "description": "Show the banner and dialog without animations.",
+              "type": "boolean"
+            },
+            "theme": {
+              "description": "Banner and dialog styling. By default they use your site's colors, fonts and dark mode.",
+              "type": "object",
+              "properties": {
+                "colors": {
+                  "description": "Light mode colors as hex values. Unset colors follow your site's theme.",
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "primary",
+                      "primaryHover",
+                      "textOnPrimary",
+                      "surface",
+                      "surfaceHover",
+                      "border",
+                      "borderHover",
+                      "text",
+                      "textMuted",
+                      "overlay",
+                      "switchTrack",
+                      "switchTrackActive",
+                      "switchThumb"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "string",
+                    "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+                  }
+                },
+                "dark": {
+                  "description": "Dark mode colors as hex values. Unset colors follow your site's dark theme.",
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "primary",
+                      "primaryHover",
+                      "textOnPrimary",
+                      "surface",
+                      "surfaceHover",
+                      "border",
+                      "borderHover",
+                      "text",
+                      "textMuted",
+                      "overlay",
+                      "switchTrack",
+                      "switchTrackActive",
+                      "switchThumb"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "string",
+                    "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+                  }
+                },
+                "radius": {
+                  "description": "Corner rounding of the banner, dialog and buttons (default: medium).",
+                  "type": "string",
+                  "enum": ["none", "small", "medium", "large"]
+                }
+              },
+              "additionalProperties": false
+            },
+            "hideBranding": {
+              "description": "Hide the 'Secured by c15t' badge on the banner. Check that your Inth plan allows it.",
+              "type": "boolean"
+            },
+            "devTools": {
+              "default": true,
+              "description": "Show the c15t DevTools panel during local development with notra-sites dev (default: true). Never included in previews or the live site.",
+              "type": "boolean"
+            }
+          },
+          "required": ["backendURL"],
+          "additionalProperties": false,
+          "description": "c15t cookie banner and privacy settings, backed by Inth or your self-hosted c15t backend. Live deployments only; previews and local development show the banner without saving consent."
         }
       },
       "additionalProperties": false

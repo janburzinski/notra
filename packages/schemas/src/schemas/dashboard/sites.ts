@@ -191,6 +191,10 @@ export const saveSiteIntegrationInputSchema = siteScopeInputSchema.and(
   siteIntegrationUpdateSchema
 );
 
+export const connectSiteInthProjectInputSchema = siteScopeInputSchema.extend({
+  projectId: z.string().trim().min(1).max(100),
+});
+
 export const connectSiteRepositoryInputSchema = z.object({
   organizationId,
   githubRepositoryId: z.string().trim().min(1).max(40),

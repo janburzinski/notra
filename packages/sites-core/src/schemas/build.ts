@@ -53,4 +53,6 @@ export const siteBuildResultSchema = z.object({
   contentSecurityPolicy: siteContentSecurityPolicySchema
     .nullable()
     .default(null),
+  analyticsConsent: z.boolean().optional(),
+  consentBackendURL: z.url().optional(),
 });

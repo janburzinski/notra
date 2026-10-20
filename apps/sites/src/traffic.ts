@@ -4,6 +4,7 @@ import {
 } from "./constants/traffic";
 import type { TrafficPayload, TrafficReport } from "./types/traffic";
 import { postToIngest } from "./utils/ingest";
+import { countsHumanVisitor } from "./utils/visitor-consent";
 
 function header(headers: Headers, name: string): string | undefined {
   return headers.get(name) ?? undefined;
@@ -115,11 +116,21 @@ function buildPayload(report: TrafficReport): TrafficPayload {
 }
 
 export async function reportTraffic(report: TrafficReport): Promise<void> {
+  const payload = buildPayload(report);
+  const visitorConsent = report.consentBackendURL
+    ? await countsHumanVisitor({
+        fetch: report.fetch,
+        backendURL: report.consentBackendURL,
+        headers: report.request.headers,
+        country: payload.geo?.country,
+        region: payload.geo?.region,
+      })
+    : undefined;
   await postToIngest({
     fetch: report.fetch,
     ingestUrl: report.ingestUrl,
     token: report.token,
     kind: "traffic",
-    buildBody: () => buildPayload(report),
+    buildBody: () => ({ ...payload, visitorConsent }),
   });
 }

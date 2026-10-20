@@ -44,3 +44,84 @@ export const CSP_ORIGIN = new RegExp(
 );
 
 export const POSTHOG_API_KEY = /^phc_[A-Za-z0-9]{20,64}$/;
+
+export const C15T_ANALYTICS_CATEGORY = "measurement";
+export const C15T_OPT_IN_MODEL = "opt-in";
+export const C15T_SCRIPT_CATEGORIES = [
+  "measurement",
+  "marketing",
+  "functionality",
+  "experience",
+] as const;
+export const C15T_SCRIPT_PATH = /^(?!\/)(?!.*\.\.)[\w./-]+\.js$/i;
+export const C15T_LOCALES = [
+  "bg",
+  "cs",
+  "cy",
+  "da",
+  "de",
+  "el",
+  "en",
+  "es",
+  "et",
+  "fi",
+  "fr",
+  "ga",
+  "gu",
+  "he",
+  "hi",
+  "hr",
+  "hu",
+  "id",
+  "is",
+  "it",
+  "lb",
+  "lt",
+  "lv",
+  "mt",
+  "nb",
+  "nl",
+  "nn",
+  "pl",
+  "pt",
+  "rm",
+  "ro",
+  "sk",
+  "sl",
+  "sv",
+  "zh",
+] as const;
+export const C15T_ACTION_DIRECTIONS = ["row", "column"] as const;
+export const C15T_UI_PROFILES = ["compact", "balanced", "strict"] as const;
+export const C15T_FLOATING_POSITIONS = [
+  "bottom-left",
+  "bottom-right",
+  "top-left",
+  "top-right",
+  "bottom-center",
+  "top-center",
+] as const;
+export const C15T_BAR_POSITIONS = ["top", "bottom"] as const;
+export const C15T_WIDGET_POSITIONS = [
+  "bottom-left",
+  "bottom-right",
+  "top-left",
+  "top-right",
+] as const;
+export const C15T_STORAGE_MAX_EXPIRY_DAYS = 730;
+export const C15T_COLOR_TOKENS = [
+  "primary",
+  "primaryHover",
+  "textOnPrimary",
+  "surface",
+  "surfaceHover",
+  "border",
+  "borderHover",
+  "text",
+  "textMuted",
+  "overlay",
+  "switchTrack",
+  "switchTrackActive",
+  "switchThumb",
+] as const;
+export const C15T_RADII = ["none", "small", "medium", "large"] as const;

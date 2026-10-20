@@ -159,7 +159,9 @@ test("successful refreshes prune obsolete generated assets without touching curr
         defaultConfig: createDefaultSiteConfig("Generated assets"),
       });
       if (prepared.validation.ok) {
-        currentScripts = prepared.customScripts;
+        currentScripts = prepared.customScripts.map(
+          (script) => script.fileName
+        );
         if (generatedEnabled) {
           for (const path of fontPaths(generation)) {
             await writeFileEnsured(join(publicDir, path), "Current font asset");

@@ -7,7 +7,7 @@ import type { PreparedSite } from "./source";
 export interface DevRefreshOptions {
   params: Omit<
     BuildParams,
-    "config" | "publicFiles" | "headScripts" | "hasReactComponents"
+    "config" | "publicFiles" | "headScripts" | "consent" | "hasReactComponents"
   >;
   prepare: () => Promise<PreparedSite>;
   writeOgImages: (params: WriteOgImagesParams) => Promise<OgImagesResult>;

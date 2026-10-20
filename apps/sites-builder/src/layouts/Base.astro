@@ -4,6 +4,7 @@ import type { SitePageContext } from "../types/site-files";
 import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import "../styles/global.css";
 import "@notra/custom-css";
+import Consent from "@notra/consent";
 import Banner from "../components/Banner.astro";
 import CodeBlocks from "../components/CodeBlocks.astro";
 import CustomChrome from "../components/CustomChrome.astro";
@@ -94,6 +95,7 @@ const pageContext: SitePageContext = { page, area: params.area, path: canonicalP
       const mode = stored === "light" || stored === "dark" || stored === "system" ? stored : appearance.default;
       const dark = mode === "dark" || (mode === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
       document.documentElement.classList.toggle("dark", dark);
+      document.documentElement.classList.toggle("c15t-dark", dark);
       document.documentElement.dataset.themeMode = mode;
       document.documentElement.dataset.themeStorageKey = appearance.storageKey;
     </script>
@@ -107,6 +109,7 @@ const pageContext: SitePageContext = { page, area: params.area, path: canonicalP
       )
     }
     <slot name="head" />
+    <Consent part="head" />
     {
       params.headScripts.map((script) =>
         script.kind === "external" ? <script is:inline src={script.src} {...script.attributes} /> : <script is:inline set:html={script.code} />
@@ -123,5 +126,6 @@ const pageContext: SitePageContext = { page, area: params.area, path: canonicalP
     </main>
     {customFooter ? <CustomChrome part="footer" context={pageContext} /> : <Footer />}
     <CodeBlocks />
+    <Consent part="body" />
   </body>
 </html>

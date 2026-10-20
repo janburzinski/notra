@@ -381,6 +381,7 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
   const isAi = isTrackedGeoVisitorType(classification.visitorType);
   const countsVisitors =
     identity.site !== undefined &&
+    payload.visitorConsent !== false &&
     isHumanPageView({ classification, payload, url });
   if (!(isAi || countsVisitors)) {
     return droppedResult(identity, classification.visitorType, "visitor_type");

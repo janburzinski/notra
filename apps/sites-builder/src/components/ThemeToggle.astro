@@ -22,7 +22,9 @@ import Icon from "./Icon.astro";
   const options = () => [...document.querySelectorAll<HTMLButtonElement>("[data-theme-option]")];
   const apply = (mode: string) => {
     root.dataset.themeMode = mode;
-    root.classList.toggle("dark", mode === "dark" || (mode === "system" && media.matches));
+    const dark = mode === "dark" || (mode === "system" && media.matches);
+    root.classList.toggle("dark", dark);
+    root.classList.toggle("c15t-dark", dark);
     for (const option of options()) {
       const checked = option.dataset.themeOption === mode;
       option.setAttribute("aria-checked", String(checked));

@@ -10,12 +10,12 @@ export function SiteIntegrationLogo({
     <span
       aria-hidden="true"
       className={cn(
-        "bg-background flex size-9 shrink-0 items-center justify-center rounded-lg border",
+        "bg-background flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border",
         className
       )}
     >
       {Logo ? (
-        <Logo className="size-4.5" />
+        <Logo className={provider.fill ? "size-full" : "size-4.5"} />
       ) : (
         <span className="text-sm font-semibold">{provider.name.charAt(0)}</span>
       )}

@@ -1,4 +1,5 @@
 ---
+import Consent from "@notra/consent";
 import { footerColumns, footerFlatLinks, footerSocials } from "../lib/navigation";
 import { config, href, params } from "../lib/params";
 import LinkIcon from "./LinkIcon.astro";
@@ -45,6 +46,7 @@ const year = new Date().getUTCFullYear();
         ))
       }
       <a href={href("feed.xml")} class="transition-colors hover:text-foreground">RSS</a>
+      <Consent part="link" />
     </div>
     <div class="max-sm:order-last sm:justify-self-center">
       <ThemeToggle />

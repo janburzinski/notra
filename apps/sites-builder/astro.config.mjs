@@ -1,4 +1,4 @@
-import { readFileSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,6 +13,7 @@ if (!paramsPath) {
   );
 }
 const params = JSON.parse(readFileSync(paramsPath, "utf8"));
+const ASTRO_VIRTUAL_MODULE = /\.astro\?astro&/;
 const srcDir = process.env.NOTRA_DEV_ROOT
   ? resolve(process.env.NOTRA_DEV_ROOT, "src")
   : fileURLToPath(new URL("src", import.meta.url));
@@ -31,6 +32,31 @@ function shikiThemesFor(setting) {
     : setting;
 }
 const shikiThemes = shikiThemesFor(codeblocks);
+const consent = params.consent;
+async function consentIntegrations() {
+  if (!consent) {
+    return [];
+  }
+  const { default: c15t, hosted, offline } = await import("@c15t/astro");
+  const assets = `${params.mount.replace(/\/$/, "")}/_notra/assets`;
+  return [
+    c15t({
+      ...consent.options,
+      mode: consent.backendURL
+        ? hosted({ backendURL: consent.backendURL })
+        : offline(),
+      scripts: consent.scripts.map((script) => ({
+        id: `notra-script-${script.fileName}`,
+        src: `${assets}/${script.fileName}`,
+        category: script.category,
+        defer: true,
+      })),
+      ...(consent.analytics && {
+        clientEntrypoint: resolve(srcDir, "c15t.client.ts"),
+      }),
+    }),
+  ];
+}
 const smartQuotes = params.config.styling?.smartQuotes !== false;
 
 const markdownFeatures = {
@@ -61,9 +87,10 @@ export default defineConfig({
   integrations: [
     markdownFeatures,
     mdx({ shikiConfig: { themes: shikiThemes, wrap: false } }),
-    ...(params.hasReactComponents
+    ...(params.hasReactComponents || consent
       ? [(await import("@astrojs/react")).default()]
       : []),
+    ...(await consentIntegrations()),
   ],
   markdown: {
     shikiConfig: {
@@ -74,6 +101,23 @@ export default defineConfig({
   vite: {
     plugins: [
       tailwindcss(),
+      ...(process.env.NOTRA_DEV_ROOT
+        ? [
+            {
+              name: "notra-dev-external-astro",
+              enforce: "pre",
+              resolveId(id) {
+                const file = id.split("?")[0];
+                const outsideRoot =
+                  ASTRO_VIRTUAL_MODULE.test(id) &&
+                  !file.startsWith("/@fs/") &&
+                  !file.startsWith(realpathSync(process.env.NOTRA_DEV_ROOT)) &&
+                  existsSync(file);
+                return outsideRoot ? `/@fs${id}` : null;
+              },
+            },
+          ]
+        : []),
       ...(process.env.NOTRA_DEV_HMR_TOKEN
         ? [
             {
@@ -117,6 +161,9 @@ export default defineConfig({
         : []),
     ],
     ssr: { noExternal: ["@astrojs/react"] },
+    define: {
+      __NOTRA_CONSENT_ANALYTICS__: JSON.stringify(consent?.analytics ?? {}),
+    },
     build: {
       rollupOptions: {
         onwarn(warning, warn) {
@@ -140,6 +187,18 @@ export default defineConfig({
         ),
         "@notra/builtins": resolve(srcDir, "builtins"),
         "@notra/custom-css": resolve(workDir, "custom.css"),
+        "@notra/consent-devtools": resolve(
+          srcDir,
+          consent?.devTools
+            ? "components/ConsentDevTools.astro"
+            : "components/ConsentDisabled.astro"
+        ),
+        "@notra/consent": resolve(
+          srcDir,
+          consent
+            ? "components/Consent.astro"
+            : "components/ConsentDisabled.astro"
+        ),
       },
     },
     server: {
@@ -147,9 +206,10 @@ export default defineConfig({
         allow: [
           workDir,
           resolve("."),
-          process.env.NOTRA_DEV_MODULES
-            ? realpathSync(process.env.NOTRA_DEV_MODULES)
-            : resolve("../../node_modules"),
+          resolve("../../node_modules"),
+          ...(process.env.NOTRA_DEV_MODULES
+            ? [realpathSync(process.env.NOTRA_DEV_MODULES)]
+            : []),
         ],
       },
     },

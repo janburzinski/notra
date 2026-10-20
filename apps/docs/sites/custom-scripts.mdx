@@ -47,12 +47,16 @@ for (const link of document.querySelectorAll("main a[href^='http']")) {
 }
 ```
 
+## Consent
+
+With the [c15t cookie banner](/sites/integrations/consent/c15t) on, list tracking scripts under `integrations.c15t.scripts` so they wait until a visitor allows them. Scripts you don't list keep loading on every page.
+
 ## Content-Security-Policy
 
 Notra builds a `Content-Security-Policy` header for every page from your repository, and it decides where scripts can load from and which servers they can connect to.
 
 - **Scripts** can come from your site, the analytics integrations you turned on and your `allowedOrigins`. Notra hashes every inline script that was on the page at build time into the policy, so the browser blocks any inline script injected later.
-- **Connections** from `fetch`, beacons and WebSockets may go to your site, your integrations and your `allowedOrigins`.
+- **Connections** from `fetch`, beacons and WebSockets may go to your site, your integrations, your [c15t](/sites/integrations/consent/c15t) backend and your `allowedOrigins`.
 - The policy doesn't limit images, styles, fonts, videos and embeds, so posts can still show images and videos from anywhere.
 
 If your custom scripts or components load code from another host or call an API, add that origin:

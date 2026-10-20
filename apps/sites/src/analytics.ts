@@ -1,3 +1,4 @@
+import { C15T_ANALYTICS_CATEGORY } from "@notra/sites-core/constants/integrations";
 import {
   SITE_ANALYTICS_EVENT_FILE,
   SITE_ENGAGEMENT_VIEW_ID_PATTERN,
@@ -8,6 +9,7 @@ import {
   ANALYTICS_SCRIPT,
   ANALYTICS_SCRIPT_CACHE_CONTROL,
 } from "./constants/analytics";
+import type { AnalyticsScriptTag } from "./types/serving";
 import type { AnalyticsEvent, EngagementReport } from "./types/traffic";
 import { escapeHtml } from "./utils/html";
 import { postToIngest } from "./utils/ingest";
@@ -28,10 +30,12 @@ export function analyticsScriptResponse(): Response {
 
 export function injectAnalyticsScript(
   response: Response,
-  scriptSrc: string,
-  eventPath: string
+  analytics: AnalyticsScriptTag
 ): Response {
-  const tag = `<script src="${escapeHtml(scriptSrc)}" data-endpoint="${escapeHtml(eventPath)}" defer></script>`;
+  const consent = analytics.consent
+    ? ` type="text/plain" data-c15t-category="${C15T_ANALYTICS_CATEGORY}"`
+    : "";
+  const tag = `<script${consent} src="${escapeHtml(analytics.scriptSrc)}" data-endpoint="${escapeHtml(analytics.eventPath)}" defer></script>`;
   return new HTMLRewriter()
     .on("body", {
       element(element) {
