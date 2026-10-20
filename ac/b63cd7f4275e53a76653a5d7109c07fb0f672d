@@ -1,0 +1,19 @@
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client.tsx
+  s_ac6983bee9ed3e::t_a568b2bd848e30 145-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "acb63cd7f4275e53a76653a5d7109c07fb0f672d",
+  "prompts": {},
+  "sessions": {
+    "s_ac6983bee9ed3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96bf1f06-c006-4edb-bb2b-514fa804cccc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
