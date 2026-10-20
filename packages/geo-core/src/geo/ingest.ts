@@ -325,6 +325,20 @@ function buildSvelteKitSnippet(appUrl: string): string {
   ].join("\n");
 }
 
+function buildReactRouterSnippet(appUrl: string): string {
+  return [
+    'import { createGeoMiddleware } from "@usenotra/geo/react-router";',
+    'import type { Route } from "./+types/root";',
+    "",
+    "const geo = createGeoMiddleware({",
+    `  token: ${PROCESS_TOKEN_EXPR},`,
+    `  endpoint: "${appUrl}",`,
+    "});",
+    "",
+    "export const middleware: Route.MiddlewareFunction[] = [geo];",
+  ].join("\n");
+}
+
 function buildGeoSnippets(appUrl: string): GeoIngestSnippets {
   return {
     next: buildNextSnippet(appUrl),
@@ -333,6 +347,7 @@ function buildGeoSnippets(appUrl: string): GeoIngestSnippets {
     tanstack: buildTanStackSnippet(appUrl),
     astro: buildAstroSnippet(appUrl),
     sveltekit: buildSvelteKitSnippet(appUrl),
+    reactRouter: buildReactRouterSnippet(appUrl),
   };
 }
 

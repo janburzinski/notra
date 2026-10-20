@@ -66,6 +66,11 @@ export function geoIngestAgentPrompt(
       '4. Serve pages from an Astro server adapter (`output: "server"` or hybrid). A static build has no request to capture after deploy.'
     );
   }
+  if (framework === "reactRouter") {
+    lines.push(
+      "4. On React Router 7, upgrade to 7.9 or later and set `future: { v8_middleware: true }` in react-router.config.ts. React Router 8 always runs middleware."
+    );
+  }
   return [...lines, "", NOTRA_AGENT_FEEDBACK_PROMPT].join("\n");
 }
 

@@ -600,6 +600,7 @@ export const GEO_INGEST_FRAMEWORK_OPTIONS = [
   { value: "tanstack", label: "TanStack Start", file: "src/start.ts" },
   { value: "astro", label: "Astro", file: "src/middleware.ts" },
   { value: "sveltekit", label: "SvelteKit", file: "src/hooks.server.ts" },
+  { value: "reactRouter", label: "React Router", file: "app/root.tsx" },
   {
     value: "netlify",
     label: "Netlify",

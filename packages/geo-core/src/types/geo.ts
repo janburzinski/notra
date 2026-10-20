@@ -1241,7 +1241,8 @@ export type GeoIngestFramework =
   | "netlify"
   | "tanstack"
   | "astro"
-  | "sveltekit";
+  | "sveltekit"
+  | "reactRouter";
 
 export type GeoIngestPackageManager = "bun" | "pnpm" | "yarn" | "npm";
 

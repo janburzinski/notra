@@ -255,6 +255,7 @@ const ingestSetupFieldsSchema = z.object({
     tanstack: z.string(),
     astro: z.string(),
     sveltekit: z.string(),
+    reactRouter: z.string(),
   }),
   drainUrls: z
     .object({

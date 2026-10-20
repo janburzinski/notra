@@ -22,6 +22,7 @@ docolin:
 | `sample` | `1` | Fraction of eligible requests to send, 0 to 1 |
 | `onError` | none | Called with anything that goes wrong. The SDK never throws |
 | `fetch` | global `fetch` | Injectable fetch, for tests |
+| `waitUntil` | none | React Router only. Keeps the send alive after the response on serverless hosts |
 
 When you omit `endpoint`, the SDK posts directly to `https://ingest.usenotra.com` and does not retry through the dashboard. To use the dashboard ingestion route, set `endpoint: "https://app.usenotra.com"` and redeploy your site. Self-hosted installations must set `endpoint` to their own ingestion origin.
 
@@ -47,7 +48,7 @@ curl -X POST "https://api.usenotra.com/v1/geo/ingest/token?projectId=$PROJECT_ID
   -H "Authorization: Bearer $NOTRA_API_KEY"
 ```
 
-Both return `ingestUrl`, `snippet` (the Next.js snippet), `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit` and `netlify` keys and `drainUrls` with the `vercel` and `cloudflare` log drain endpoints. The token endpoint also returns `token`. The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier, so install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
+Both return `ingestUrl`, `snippet` (the Next.js snippet), `snippets` with `next`, `nuxt`, `tanstack`, `astro`, `sveltekit`, `reactRouter` and `netlify` keys and `drainUrls` with the `vercel` and `cloudflare` log drain endpoints. The token endpoint also returns `token`. The ingest routes are organization-level, so pass `projectId` to bind the token to one project or omit it to track the whole organization. Issuing a token does not invalidate tokens issued earlier, so install the same project token on every domain the project tracks, and add extra hostnames under **Tracked domains** in GEO settings.
 
 </Visibility>
 

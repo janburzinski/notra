@@ -336,6 +336,7 @@
               "ai-traffic/install/nuxt",
               "ai-traffic/install/astro",
               "ai-traffic/install/sveltekit",
+              "ai-traffic/install/react-router",
               "ai-traffic/install/netlify",
               "ai-traffic/install/vercel-log-drain",
               "ai-traffic/install/cloudflare-logpush"
