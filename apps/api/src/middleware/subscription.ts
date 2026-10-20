@@ -6,7 +6,7 @@ import type { Context, Next } from "hono";
 import { API_PAYWALL_FEATURES } from "../constants/analytics";
 import { RESTRICTED_BILLING_METHODS } from "../constants/billing";
 import { ORGANIZATION_SCOPED_API_KEY_ERROR } from "../constants/skills";
-import { BillingService, billingLayer } from "../lib/billing";
+import { BillingService, getBillingLayer } from "../lib/billing";
 import { isIngestAuth } from "../types/auth";
 import { trackApiPaywalled } from "../utils/analytics";
 import { getOrganizationId } from "../utils/auth";
@@ -49,7 +49,7 @@ export function subscriptionMiddleware() {
           });
         }).pipe(
           Effect.withSpan("billing.checkSubscriptionAccess"),
-          Effect.provide(billingLayer(secretKey))
+          Effect.provide(getBillingLayer(secretKey))
         )
       )
     );

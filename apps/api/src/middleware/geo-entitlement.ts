@@ -5,7 +5,7 @@ import type { Context, Next } from "hono";
 import { API_PAYWALL_FEATURES } from "../constants/analytics";
 import { GEO_PLAN_REQUIRED_MESSAGE } from "../constants/geo";
 import { ORGANIZATION_SCOPED_API_KEY_ERROR } from "../constants/skills";
-import { billingLayer } from "../lib/billing";
+import { getBillingLayer } from "../lib/billing";
 import { checkGeoEntitlement } from "../programs/geo-entitlement";
 import { trackApiPaywalled } from "../utils/analytics";
 import { getOrganizationId } from "../utils/auth";
@@ -28,12 +28,10 @@ import { logError } from "../utils/logging";
  * Positive checks are reused for at most 30 seconds, including during an outage.
  * Denials and failures are not cached. Once a grant expires, an Autumn outage
  * fails closed with 503. Plan revocations can therefore take up to 30 seconds.
- * Credit consumption and subscription checks are not cached.
+ * Credit consumption is not cached. Subscription checks share the same
+ * 30 second positive cache.
  */
 export function geoEntitlementMiddleware() {
-  let currentSecretKey: string | undefined;
-  let currentLayer: ReturnType<typeof billingLayer> | undefined;
-
   return async (c: Context, next: Next) => {
     const secretKey = c.env.AUTUMN_SECRET_KEY as string | undefined;
     if (!secretKey) {
@@ -57,16 +55,10 @@ export function geoEntitlementMiddleware() {
       return c.json({ error: ORGANIZATION_SCOPED_API_KEY_ERROR }, 403);
     }
 
-    const layer =
-      currentLayer && currentSecretKey === secretKey
-        ? currentLayer
-        : billingLayer(secretKey);
-    currentLayer = layer;
-    currentSecretKey = secretKey;
     const entitlement = await Effect.runPromise(
       Effect.result(
         checkGeoEntitlement({ organizationId: orgId, secretKey }).pipe(
-          Effect.provide(layer)
+          Effect.provide(getBillingLayer(secretKey))
         )
       )
     );

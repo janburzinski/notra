@@ -89,7 +89,7 @@ The header format is `Authorization: Bearer <credential>`, and the scheme name i
     Expiration is one of **No expiry**, **7 days**, **30 days**, **60 days** or **90 days**. Permissions use one of three access modes: **Full Access** (every scope), **GEO Access** (read and write on the GEO resources only) or **Restricted**, which shows a **None / Read / Write** selector for each resource.
   </Step>
   <Step title="Copy the key">
-    The dashboard shows the key once, right after creation, so store it server-side. Later you can rename a key, change its expiration or adjust its permissions from the same page, and you can delete it at any time.
+    The dashboard shows the key once, right after creation, so store it server-side. Later you can rename a key, change its expiration or adjust its permissions from the same page, and you can delete it at any time. Changes to permissions, as well as disabling or deleting a key, can take up to 30 seconds to reach every request, because the API briefly caches successful key checks.
   </Step>
 </Steps>
 
@@ -358,4 +358,4 @@ try {
   Grant the smallest set of scopes a workflow needs and set an expiration on keys used in CI or short-lived scripts. Create one key per integration so you can revoke it without affecting anything else.
 </Tip>
 
-If a key is exposed, delete it from the **API Keys** page, where deletion takes effect immediately. For OAuth tokens, call the [revocation endpoint](#revocation).
+If a key is exposed, delete it from the **API Keys** page. The key stops working within 30 seconds, because the API caches successful key checks for that long. For OAuth tokens, call the [revocation endpoint](#revocation).

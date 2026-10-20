@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import type { createDb } from "@notra/db/drizzle";
 import { members, organizations, users } from "@notra/db/schema";
 import { parseAccountApiKeyUserId } from "@notra/utils/account-api-key";
@@ -60,6 +62,12 @@ const SCOPE_SEPARATOR_REGEX = /\s+/;
 const WORKOS_ID_CACHE_MAX_SIZE = 1000;
 const WORKOS_ID_CACHE_TTL_MS = 5 * 60 * 1000;
 const workosIdCache = new Map<string, { localId: string; expiresAt: number }>();
+const UNKEY_VERIFY_CACHE_MAX_SIZE = 5000;
+const UNKEY_VERIFY_CACHE_TTL_MS = 30 * 1000;
+const unkeyVerifyCache = new Map<
+  string,
+  { data: V2KeysVerifyKeyResponseData; expiresAt: number }
+>();
 const remoteJwksByUrl = new Map<
   string,
   ReturnType<typeof createRemoteJWKSet>
@@ -447,6 +455,44 @@ function getRecovery(status: AuthFailureStatus) {
   return "The authentication service is temporarily unavailable. Retry with exponential backoff.";
 }
 
+async function verifyUnkeyKey(
+  rootKey: string,
+  apiKey: string,
+  permissions: string | undefined
+): Promise<V2KeysVerifyKeyResponseData> {
+  const cacheKey = createHash("sha256")
+    .update(`${permissions ?? ""}\n${apiKey}`)
+    .digest("base64url");
+  const cached = unkeyVerifyCache.get(cacheKey);
+  if (cached && Date.now() < cached.expiresAt) {
+    return cached.data;
+  }
+  unkeyVerifyCache.delete(cacheKey);
+
+  const { data } = await new Unkey({ rootKey }).keys.verifyKey({
+    key: apiKey,
+    ...(permissions ? { permissions } : {}),
+  });
+
+  if (data.valid && data.credits === undefined && !data.ratelimits?.length) {
+    if (unkeyVerifyCache.size >= UNKEY_VERIFY_CACHE_MAX_SIZE) {
+      const oldestKey = unkeyVerifyCache.keys().next().value;
+      if (oldestKey !== undefined) {
+        unkeyVerifyCache.delete(oldestKey);
+      }
+    }
+    unkeyVerifyCache.set(cacheKey, {
+      data,
+      expiresAt: Math.min(
+        Date.now() + UNKEY_VERIFY_CACHE_TTL_MS,
+        data.expires ?? Number.POSITIVE_INFINITY
+      ),
+    });
+  }
+
+  return data;
+}
+
 function getRequestedOrganizationId(c: Context): string | null {
   for (const header of ACCOUNT_API_KEY_ORGANIZATION_HEADERS) {
     const value = c.req.header(header)?.trim();
@@ -579,29 +625,25 @@ async function verifyRequestAuth(
   }
 
   try {
-    const unkey = new Unkey({ rootKey: c.env.UNKEY_ROOT_KEY });
-    const permissions = unkeyPermissions(
-      options.permissions,
-      options.legacyPermissions
+    const data = await verifyUnkeyKey(
+      c.env.UNKEY_ROOT_KEY,
+      apiKey,
+      unkeyPermissions(options.permissions, options.legacyPermissions)
     );
-    const result = await unkey.keys.verifyKey({
-      key: apiKey,
-      ...(permissions ? { permissions } : {}),
-    });
 
-    if (!result.data.valid) {
+    if (!data.valid) {
       const failure =
-        UNKEY_AUTH_FAILURES[result.data.code] ?? DEFAULT_UNKEY_AUTH_FAILURE;
+        UNKEY_AUTH_FAILURES[data.code] ?? DEFAULT_UNKEY_AUTH_FAILURE;
       return {
         success: false,
         error: failure.error,
         status: failure.status,
         kind: API_AUTH_KINDS.UNKEY,
-        code: result.data.code,
+        code: data.code,
       };
     }
 
-    const verifiedIdentity = result.data.identity;
+    const verifiedIdentity = data.identity;
     if (!verifiedIdentity?.externalId) {
       return {
         success: false,
@@ -615,7 +657,7 @@ async function verifyRequestAuth(
     if (accountUserId) {
       return await resolveAccountKeyAuth(
         c,
-        { ...result.data, identity: verifiedIdentity },
+        { ...data, identity: verifiedIdentity },
         accountUserId
       );
     }
@@ -628,8 +670,8 @@ async function verifyRequestAuth(
       return mismatch;
     }
 
-    c.set("auth", result.data);
-    return { success: true, auth: result.data };
+    c.set("auth", data);
+    return { success: true, auth: data };
   } catch {
     return {
       success: false,

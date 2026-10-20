@@ -12,6 +12,12 @@ const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const dbByUrl = new Map<string, Database>();
 
+function createQueryCache(url: string, token: string) {
+  const cache = upstashCache({ url, token, global: false });
+  cache.onMutate = async () => {};
+  return cache;
+}
+
 export function createDb(
   databaseUrl: string,
   maximumConnections?: number
@@ -33,11 +39,7 @@ export function createDb(
     },
     cache:
       upstashUrl && upstashToken
-        ? upstashCache({
-            url: upstashUrl,
-            token: upstashToken,
-            global: false,
-          })
+        ? createQueryCache(upstashUrl, upstashToken)
         : undefined,
     schema,
   });
