@@ -160,7 +160,13 @@ Otherwise add `demo.usenotra.com` to that widget. Do not rotate the existing key
 or change the website's variables. A dedicated widget should use **Managed** mode
 with pre-clearance off. No DNS, proxy, WAF rule, or additional Worker is required.
 
-The frontend uses action `turnstile-spin-v2`. Missing configuration, missing or
+The frontend uses action `turnstile-spin-v2`, automatic execution, and
+`appearance: interaction-only`: normal visitors enter without clicking anything,
+while Cloudflare can still request an interactive check when needed. The fraction
+requiring interaction depends on Cloudflare's risk assessment, not an application
+guarantee.
+
+Missing configuration, missing or
 replayed tokens, wrong action/hostname, and verification outages fail closed:
 they cannot allocate workspaces. Configure keys **before** releasing the code or
 new visitors will be unable to enter; existing sessions continue to work. The

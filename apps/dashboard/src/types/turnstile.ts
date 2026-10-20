@@ -6,6 +6,8 @@ interface TurnstileApi {
     options: {
       sitekey: string;
       action: string;
+      appearance: "interaction-only";
+      execution: "render";
       size: "flexible";
       callback: (token: string) => void;
       "expired-callback": () => void;

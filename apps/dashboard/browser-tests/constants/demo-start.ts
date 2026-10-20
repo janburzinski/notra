@@ -10,9 +10,16 @@ let container;
 let options;
 window.turnstile = {
   render(element, config) {
+    if (config.appearance !== "interaction-only" || config.execution !== "render") {
+      throw new Error("Demo verification must run automatically and only display interactive challenges");
+    }
     container = element;
     container.style.minWidth = "300px";
     options = config;
+    if (location.search.includes("automatic")) {
+      queueMicrotask(() => options.callback("synthetic-token-" + ++counter));
+      return "synthetic-widget";
+    }
     const button = document.createElement("button");
     button.textContent = "Verify demo access";
     button.onclick = () => options.callback("synthetic-token-" + ++counter);

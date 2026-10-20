@@ -31,7 +31,6 @@ export function DemoStart({ returnTo, turnstileSiteKey }: DemoStartProps) {
   const t = useTranslations("demo.start");
   const [failed, setFailed] = useState(false);
   const [token, setToken] = useState("");
-  const [pending, setPending] = useState(false);
   const inFlight = useRef(false);
   const humanCheck = useRef<TurnstileHandle>(null);
 
@@ -40,7 +39,6 @@ export function DemoStart({ returnTo, turnstileSiteKey }: DemoStartProps) {
       return;
     }
     inFlight.current = true;
-    setPending(true);
     setFailed(false);
     createSandbox(token)
       .then(({ slug }) => {
@@ -48,7 +46,6 @@ export function DemoStart({ returnTo, turnstileSiteKey }: DemoStartProps) {
       })
       .catch(() => {
         setFailed(true);
-        setPending(false);
         inFlight.current = false;
         humanCheck.current?.reset();
       });
@@ -79,26 +76,16 @@ export function DemoStart({ returnTo, turnstileSiteKey }: DemoStartProps) {
             <p className="text-muted-foreground text-sm">
               {t("errorDescription")}
             </p>
-            <Button
-              disabled={!token || pending}
-              onClick={start}
-              variant="outline"
-            >
+            <Button disabled={!token} onClick={start} variant="outline">
               {t("retry")}
             </Button>
           </>
         ) : null}
         {turnstileSiteKey && !failed ? (
           <>
-            {pending ? (
-              <Spinner className="text-muted-foreground size-5" />
-            ) : null}
-            <h1 className="text-lg font-semibold">
-              {t(pending ? "title" : "verificationTitle")}
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              {t(pending ? "description" : "verificationDescription")}
-            </p>
+            <Spinner className="text-muted-foreground size-5" />
+            <h1 className="text-lg font-semibold">{t("title")}</h1>
+            <p className="text-muted-foreground text-sm">{t("description")}</p>
           </>
         ) : null}
       </div>

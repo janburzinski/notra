@@ -87,6 +87,48 @@ test("waits for verification, supports keyboard entry, and submits once under St
   );
 });
 
+test("normal visitors enter automatically without a visible challenge or any interaction", async () => {
+  const page = await browser.newPage();
+  const tokens: string[] = [];
+  let markSubmitted!: () => void;
+  let allowResponse!: () => void;
+  const submitted = new Promise<void>((resolve) => {
+    markSubmitted = resolve;
+  });
+  const proceed = new Promise<void>((resolve) => {
+    allowResponse = resolve;
+  });
+  await page.route("https://challenges.cloudflare.com/**", (route) =>
+    route.fulfill({ contentType: "text/javascript", body: DEMO_TURNSTILE_STUB })
+  );
+  await page.route("**/api/demo/sandbox", async (route) => {
+    tokens.push(route.request().postDataJSON()["cf-turnstile-response"]);
+    markSubmitted();
+    await proceed;
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({ slug: "demo-synthetic" }),
+    });
+  });
+  await page.route("**/finished", (route) =>
+    route.fulfill({ contentType: "text/html", body: "Demo workspace" })
+  );
+  await page.goto(`${baseUrl}?automatic`);
+  await submitted;
+  expect(
+    await page.getByRole("heading", { name: "Opening the demo…" }).count()
+  ).toBe(1);
+  expect(await page.getByRole("button").count()).toBe(0);
+  allowResponse();
+  await page.waitForURL("**/finished");
+  expect(tokens).toEqual(["synthetic-token-1"]);
+  expect(await page.getByRole("button").count()).toBe(0);
+  expect(await page.getByText("One quick check before the demo").count()).toBe(
+    0
+  );
+});
+
 test("a busy response requires a fresh token and an explicit retry without an automatic loop", async () => {
   const page = await browser.newPage();
   const tokens: string[] = [];

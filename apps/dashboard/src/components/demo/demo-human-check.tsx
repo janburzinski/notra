@@ -38,6 +38,8 @@ export function DemoHumanCheck({
         widgetId.current = window.turnstile.render(container.current, {
           sitekey: siteKey,
           action: DEMO_TURNSTILE_ACTION,
+          appearance: "interaction-only",
+          execution: "render",
           size: "flexible",
           callback: (token) => {
             setFailed(false);
