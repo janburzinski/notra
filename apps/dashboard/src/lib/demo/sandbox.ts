@@ -1,5 +1,5 @@
 import { redis } from "@notra/ai/utils/redis";
-import { logError } from "@notra/ai/utils/server-log";
+import { logError, logWarn } from "@notra/ai/utils/server-log";
 import {
   DEMO_ORG_SLUG_PREFIX,
   DEMO_SEEDING_GRACE_MINUTES,
@@ -169,10 +169,18 @@ async function createDemoOrganization(input: DemoOrganizationInput) {
           hashtextextended(${DEMO_STORAGE_LOCK_KEY}, 0)
         ) as locked
       `);
-      if (
-        !rows[0]?.locked ||
-        (await countDemoSandboxes(undefined, tx)) >= DEMO_MAX_ACTIVE_SANDBOXES
-      ) {
+      if (!rows[0]?.locked) {
+        logWarn("[demo] Workspace reservation lock is busy", {
+          reason: "reservation_lock_busy",
+        });
+        return false;
+      }
+      const sandboxCount = await countDemoSandboxes(undefined, tx);
+      if (sandboxCount >= DEMO_MAX_ACTIVE_SANDBOXES) {
+        logWarn("[demo] Workspace capacity is full", {
+          reason: "capacity_full",
+          sandboxCount,
+        });
         return false;
       }
     }
@@ -358,7 +366,7 @@ async function seedDemoSandbox(
  * anonymousId and shifts its data to the present. Null when the pool is
  * empty.
  */
-export async function claimPooledSandbox(
+async function claimPooledSandbox(
   input: CreateDemoSandboxInput
 ): Promise<CreatedDemoSandbox | null> {
   const anonymousId = createAnonymousId();

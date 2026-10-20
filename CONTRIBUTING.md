@@ -135,6 +135,46 @@ The dashboard runs Vite on `127.0.0.1:3000`. Build it with
 perform the full TypeScript check. Existing `NEXT_PUBLIC_*`
 deployment variable names remain supported; they are not framework dependencies.
 
+## Demo human verification
+
+New demo workspaces require Cloudflare Turnstile. `GET /api/demo/enter` only
+redirects: it never claims a pooled workspace or triggers seeding. The demo start
+page sends a single-use token to `POST /api/demo/sandbox`, which calls Siteverify
+and checks both the action and the exact request hostname before claiming or
+creating a workspace. Existing signed demo sessions do not need another check.
+Reset/customize still require a signed session and retain their shared reset
+budget; they do not grant a new anonymous session.
+
+Before deploying this protection, configure the Railway **dashboard** service in
+**notra-demo / production**:
+
+| Variable | Value |
+| --- | --- |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | The existing website widget's public site key, or a dedicated demo widget's key |
+| `TURNSTILE_SECRET` | The matching widget secret; keep it in Railway's secret configuration |
+| `TURNSTILE_HOSTNAMES` | `demo.usenotra.com` (exact hostnames, comma-separated if needed) |
+
+In Cloudflare **Turnstile**, reuse the website widget if its hostname list already
+allows `usenotra.com` (which also covers subdomains) or `demo.usenotra.com`.
+Otherwise add `demo.usenotra.com` to that widget. Do not rotate the existing key
+or change the website's variables. A dedicated widget should use **Managed** mode
+with pre-clearance off. No DNS, proxy, WAF rule, or additional Worker is required.
+
+The frontend uses action `turnstile-spin-v2`. Missing configuration, missing or
+replayed tokens, wrong action/hostname, and verification outages fail closed:
+they cannot allocate workspaces. Configure keys **before** releasing the code or
+new visitors will be unable to enter; existing sessions continue to work. The
+50-workspace storage cap is unchanged. Monitor `reason` fields including
+`turnstile_unconfigured`, `turnstile_invalid_token`, `turnstile_rejected`,
+`turnstile_unavailable`, `invalid_admission`, `rate_limited`,
+`reservation_lock_busy`, and `capacity_full` (with `sandboxCount`).
+
+For local browser checks, use Cloudflare's test site key and matching test secret,
+with `TURNSTILE_HOSTNAMES=127.0.0.1,localhost`, on loopback only. Never use test
+keys or local authentication impersonation on a public deployment. Unit and
+browser fixtures use synthetic tokens and stub verification; they do not contact
+production services.
+
 ## Effect diagnostics
 
 `bun install` patches TypeScript 7 and Oxlint with `@effect/tsgo`. Its native

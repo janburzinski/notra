@@ -7495,6 +7495,11 @@
     "start": {
       "title": "Demo wird geöffnet…",
       "description": "Einen Moment.",
+      "verificationTitle": "Eine kurze Prüfung vor der Demo",
+      "verificationDescription": "Bestätige, dass du ein Mensch bist, um deinen eigenen Demo-Workspace zu öffnen.",
+      "verificationFailed": "Die Prüfung konnte nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen.",
+      "verificationUnavailableTitle": "Die Demo ist vorübergehend nicht verfügbar",
+      "verificationUnavailableDescription": "Die Sicherheitsprüfung ist noch nicht eingerichtet. Bitte versuch es später erneut.",
       "errorTitle": "Der Demo-Workspace konnte nicht erstellt werden",
       "errorDescription": "Bitte versuch es gleich noch einmal.",
       "retry": "Erneut versuchen"

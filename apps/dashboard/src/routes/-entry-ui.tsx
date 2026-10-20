@@ -134,8 +134,11 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       path: "auth/demo",
       loader: (input) => loadDemoEntry({ data: input }),
       component: ({ data }) => (
-        <div className="flex min-h-screen items-center justify-center p-6">
-          <DemoStart returnTo={data.returnTo} />
+        <div className="flex min-h-screen items-center justify-center px-2 py-6 sm:px-6">
+          <DemoStart
+            returnTo={data.returnTo}
+            turnstileSiteKey={data.turnstileSiteKey}
+          />
         </div>
       ),
     }),

@@ -47,6 +47,11 @@ export interface DemoSandboxCreateResponse {
   slug: string;
 }
 
+export interface DemoStartProps {
+  returnTo: string | null;
+  turnstileSiteKey: string | null;
+}
+
 // A type alias (not an interface) so it satisfies drizzle's row constraint.
 export type DemoTimestampColumnRow = {
   table_name: string;

@@ -7495,6 +7495,11 @@
     "start": {
       "title": "Opening the demo…",
       "description": "Just a moment.",
+      "verificationTitle": "One quick check before the demo",
+      "verificationDescription": "Verify you're human to open your own demo workspace.",
+      "verificationFailed": "The verification couldn't load. Please reload the page to try again.",
+      "verificationUnavailableTitle": "The demo is temporarily unavailable",
+      "verificationUnavailableDescription": "Human verification isn't configured yet. Please try again later.",
       "errorTitle": "The demo workspace couldn't be created",
       "errorDescription": "Please try again in a moment.",
       "retry": "Try again"

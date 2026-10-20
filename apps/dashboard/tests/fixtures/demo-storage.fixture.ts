@@ -15,6 +15,7 @@ import {
 import { demoPoolSize } from "../../src/utils/demo-limits";
 
 const originalPoolSize = process.env.NOTRA_DEMO_POOL_SIZE;
+const logWarn = mock();
 let total = 300;
 let pooled = 3;
 let activeVisitors = 0;
@@ -286,7 +287,10 @@ const mockedDb = {
 };
 mock.module("@notra/db/drizzle", () => ({ db: mockedDb }));
 mock.module("@notra/ai/utils/redis", () => ({ redis: null }));
-mock.module("@notra/ai/utils/server-log", () => ({ logError: mock() }));
+mock.module("@notra/ai/utils/server-log", () => ({
+  logError: mock(),
+  logWarn,
+}));
 mock.module("@/lib/demo/api-key", () => ({
   createDemoApiKey,
   deleteDemoApiKey,
@@ -320,6 +324,7 @@ beforeEach(() => {
   expiredRows = [];
   reservations.clear();
   seedDemoWorkspace.mockClear();
+  logWarn.mockClear();
   deleteDemoApiKey.mockClear();
   createDemoApiKey.mockClear();
   transaction.mockClear();
@@ -432,6 +437,9 @@ test("parallel no-pool creation reserves the last slot before seeding", async ()
     )
   );
   expect(created.filter(Boolean)).toHaveLength(1);
+  expect(logWarn).toHaveBeenCalledWith(expect.any(String), {
+    reason: "reservation_lock_busy",
+  });
   expect(total).toBe(DEMO_MAX_ACTIVE_SANDBOXES);
   expect(reservations.size).toBe(0);
   expect(seedDemoWorkspace).toHaveBeenCalledTimes(1);
@@ -445,6 +453,10 @@ test("in-flight seeds cannot be evicted to make room for another seed", async ()
     reservations.set(`seed_${index}`, { organizationId: `pending-${index}` });
   }
   expect(await createDemoSandbox({ timeZone: null, ipHash: null })).toBeNull();
+  expect(logWarn).toHaveBeenCalledWith(expect.any(String), {
+    reason: "capacity_full",
+    sandboxCount: 50,
+  });
   expect(total).toBe(DEMO_MAX_ACTIVE_SANDBOXES);
   expect(deleteOrganization).not.toHaveBeenCalled();
   expect(seedDemoWorkspace).not.toHaveBeenCalled();
@@ -538,11 +550,14 @@ test("busy capacity responds with Retry-After without issuing a session", async 
       demoSandboxCreate: { limit: async () => ({ success: true }) },
     },
   }));
+  mock.module("@/lib/demo/human-check", () => ({
+    verifyDemoHumanCheck: async () => true,
+  }));
   const { POST } = await import("../../src/app/api/demo/sandbox/route");
   const response = await POST(
     new Request("http://localhost/api/demo/sandbox", {
       method: "POST",
-      body: "{}",
+      body: JSON.stringify({ "cf-turnstile-response": "synthetic-token" }),
     })
   );
   expect(response.status).toBe(503);

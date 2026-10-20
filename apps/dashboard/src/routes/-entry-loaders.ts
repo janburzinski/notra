@@ -134,7 +134,11 @@ export const loadDemoEntry = createServerFn({ method: "GET" })
     if (await getCurrentDemoSandbox()) {
       throw redirect({ href: target ?? "/" });
     }
-    return { returnTo: target };
+    return {
+      returnTo: target,
+      turnstileSiteKey:
+        process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || null,
+    };
   });
 
 export const loadIntegrationEntry = createServerFn({ method: "GET" })
