@@ -1,0 +1,38 @@
+apps/dashboard/src/components/content/content-detail-loaded-view.tsx
+  s_be3beb30168802::t_b4e1317129910d 191,193,195-197,229-232
+  s_be3beb30168802::t_f094ef7cba03c1 7,70-74,76-82,250-257,259
+  s_be3beb30168802::t_c0597d7a315275 198
+  s_be3beb30168802::t_97cf10ac3a2d84 31,87,192,200-212,214-216,219-224,227-228
+  s_be3beb30168802::t_a1e91c710cca18 69,190,243,249,258
+  s_be3beb30168802::t_46d42fe7a3117f 13
+  s_be3beb30168802::t_3a0454ed263f41 19,248
+  s_be3beb30168802::t_2d2735b911e7cf 86,88-89,95,98-100,110-113,115-121
+  s_be3beb30168802::t_021ec7f51d407f 213,217-218
+  s_be3beb30168802::t_bf07fb85ca84bb 75,83,194
+  s_be3beb30168802::t_3e285a951cd187 6,14,34-35,84-85,90-94,96-97,101-109,114,122,199
+  s_be3beb30168802::t_f6c02d23b8e0a6 225-226
+apps/dashboard/src/components/content/content-plan-read-view.tsx
+  s_be3beb30168802::t_3a0454ed263f41 1-149
+apps/dashboard/messages/en.json
+  s_be3beb30168802::t_f094ef7cba03c1 6548-6550
+  s_be3beb30168802::t_bf07fb85ca84bb 6551
+apps/dashboard/messages/de.json
+  s_be3beb30168802::t_f094ef7cba03c1 6548-6550
+  s_be3beb30168802::t_bf07fb85ca84bb 6551
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8a61b9e2478c08813a7e758c601be4234c6e5fd5",
+  "prompts": {},
+  "sessions": {
+    "s_be3beb30168802": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "565cb91f-1e42-4dfd-a186-9ed15a46557c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
