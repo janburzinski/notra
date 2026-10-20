@@ -295,7 +295,9 @@ function EditPlatformsDialog({
           <Button onClick={() => onOpenChange(false)} variant="outline">
             {tCommon("cancel")}
           </Button>
-          <Button onClick={handleSave}>{tCommon("save")}</Button>
+          <Button data-dialog-confirm onClick={handleSave}>
+            {tCommon("save")}
+          </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
     </ResponsiveDialog>

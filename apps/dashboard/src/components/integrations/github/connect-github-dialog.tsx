@@ -71,7 +71,12 @@ export function ConnectGitHubDialog({
           >
             {tCommon("actions.cancel")}
           </ResponsiveDialogClose>
-          <Button className="gap-2" loading={isConnecting} onClick={onConnect}>
+          <Button
+            data-dialog-confirm
+            className="gap-2"
+            loading={isConnecting}
+            onClick={onConnect}
+          >
             <Github className="size-4" />
             {t("install")}
           </Button>

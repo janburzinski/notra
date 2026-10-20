@@ -135,6 +135,16 @@ jobs:
             bun run test --force --log-order=stream --concurrency=2
           fi
 
+      - name: Install browser test runtime
+        if: matrix.check == 'tests'
+        working-directory: apps/dashboard
+        run: bunx --no-install playwright install --with-deps --only-shell chromium
+
+      - name: Run dashboard browser regressions
+        if: matrix.check == 'tests'
+        working-directory: apps/dashboard
+        run: bun run test:browser
+
       - name: Verify web build
         if: matrix.check == 'build-web'
         run: bun run build --filter=web

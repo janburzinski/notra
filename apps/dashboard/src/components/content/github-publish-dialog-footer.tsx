@@ -87,6 +87,7 @@ export function GitHubPublishDialogFooter({
             isPublishing || !hasSelectedRepository || !selectedPublishingEnabled
           }
           type="submit"
+          data-dialog-confirm
         >
           {submitLabel}
         </Button>

@@ -428,7 +428,7 @@ export function GuidelinesAssetEditDialog({
           >
             {tCommon("cancel")}
           </Button>
-          <Button disabled={saving} onClick={handleSave}>
+          <Button data-dialog-confirm disabled={saving} onClick={handleSave}>
             {saving ? tCommon("saving") : tCommon("save")}
           </Button>
         </ResponsiveDialogFooter>

@@ -561,6 +561,7 @@ export function LegacyAddIntegrationDialog({
                 {([canSubmit]) => (
                   <Button
                     disabled={!canSubmit || mutation.isPending}
+                    data-dialog-confirm
                     onClick={(e) => {
                       e.preventDefault();
                       setHasAttemptedSubmit(true);

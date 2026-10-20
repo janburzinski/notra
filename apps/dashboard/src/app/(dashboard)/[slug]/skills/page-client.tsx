@@ -467,6 +467,7 @@ function CreateSkillFormDialog({
                 onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&
+                    !(e.metaKey || e.ctrlKey) &&
                     !quickstartError &&
                     quickstartUrl.trim() &&
                     !importPending
@@ -574,7 +575,11 @@ function CreateSkillFormDialog({
             disabled={createPending}
             render={<Button variant="outline">{tCommon("cancel")}</Button>}
           />
-          <Button disabled={createPending} onClick={onSubmit}>
+          <Button
+            data-dialog-confirm
+            disabled={createPending}
+            onClick={onSubmit}
+          >
             {createPending ? tCommon("creating") : tSkillsShared("createSkill")}
           </Button>
         </ResponsiveDialogFooter>

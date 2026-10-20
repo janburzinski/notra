@@ -193,7 +193,11 @@ export function InvitationActions({ invitation }: InvitationActionsProps) {
             >
               {tCommon("actions.cancel")}
             </ResponsiveDialogClose>
-            <Button disabled={isResending} onClick={handleResendInvitation}>
+            <Button
+              data-dialog-confirm
+              disabled={isResending}
+              onClick={handleResendInvitation}
+            >
               {isResending
                 ? t("resending")
                 : tMembersShared("resendInvitation")}

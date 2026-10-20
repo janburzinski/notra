@@ -10,7 +10,9 @@
     "scripts/*.ts",
     "tests/fixtures/*.fixture.{ts,tsx}",
     "src/**/*.test.{ts,tsx}",
-    "tests/**/*.test.{ts,tsx}"
+    "tests/**/*.test.{ts,tsx}",
+    "browser-tests/**/*.test.ts",
+    "browser-tests/fixtures/*.tsx"
   ],
   "paths": {
     "@/*": ["./src/*"]

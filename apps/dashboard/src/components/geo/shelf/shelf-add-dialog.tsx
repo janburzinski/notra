@@ -382,6 +382,7 @@ export function ShelfAddDialog({
                     !(canSubmit && isAllowedShelfUrl(url)) || isServerDuplicate
                   }
                   type="submit"
+                  data-dialog-confirm
                 >
                   {tGeoShared("addShelf")}
                 </Button>

@@ -298,6 +298,7 @@ export function CreatePostDialog({
                   }
                   loading={mutation.isPending}
                   type="submit"
+                  data-dialog-confirm
                 >
                   {t("submit")}
                 </Button>

@@ -114,7 +114,7 @@ export function PromptTagsDialog({
           >
             {tCommon("cancel")}
           </Button>
-          <Button form={formId} type="submit">
+          <Button data-dialog-confirm form={formId} type="submit">
             {confirmLabel}
           </Button>
         </ResponsiveDialogFooter>

@@ -250,6 +250,7 @@ function CompetitorSynonymsField({
                   ) {
                     return;
                   }
+                  // Modified Enter must commit the draft, not submit without it.
                   if (event.key === "Enter") {
                     event.preventDefault();
                     commitDraft();
@@ -539,7 +540,7 @@ export function CompetitorEditForm({
             {tCommon("cancel")}
           </Button>
         )}
-        <Button type="submit">
+        <Button data-dialog-confirm type="submit">
           {competitor ? tCommon("saveChanges") : tGeoShared("addCompetitor")}
         </Button>
       </div>

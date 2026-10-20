@@ -106,7 +106,7 @@ export function RenameCollectionDialog({
               ) {
                 return;
               }
-              if (event.key === "Enter") {
+              if (event.key === "Enter" && !(event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
                 handleSubmit();
               }
@@ -127,6 +127,7 @@ export function RenameCollectionDialog({
             disabled={!canSubmit}
             loading={rename.isPending}
             onClick={handleSubmit}
+            data-dialog-confirm
           >
             {tCommon("save")}
           </Button>

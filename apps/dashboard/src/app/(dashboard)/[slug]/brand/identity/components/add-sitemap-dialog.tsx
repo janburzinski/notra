@@ -88,7 +88,11 @@ export function AddSitemapDialog({
     if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) {
       return;
     }
-    if (event.key === "Enter" && !createSitemap.isPending) {
+    if (
+      event.key === "Enter" &&
+      !(event.metaKey || event.ctrlKey) &&
+      !createSitemap.isPending
+    ) {
       event.preventDefault();
       handleSubmit();
     }
@@ -159,6 +163,7 @@ export function AddSitemapDialog({
             disabled={!trimmedUrl || isOffHost}
             loading={createSitemap.isPending}
             onClick={handleSubmit}
+            data-dialog-confirm
           >
             {tBrandShared("addSitemap")}
           </Button>

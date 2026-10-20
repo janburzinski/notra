@@ -303,6 +303,7 @@ export function MemberActions({ member }: MemberActionsProps) {
             <Button
               disabled={isChangingRole || newRole === member.role}
               onClick={handleChangeRole}
+              data-dialog-confirm
               type="button"
             >
               {isChangingRole ? tCommon("labels.updating") : t("updateRole")}

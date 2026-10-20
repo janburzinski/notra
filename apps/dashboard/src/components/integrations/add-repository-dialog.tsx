@@ -354,6 +354,7 @@ export function AddRepositoryDialog({
               {([canSubmit]) => (
                 <Button
                   disabled={!canSubmit || mutation.isPending || loadingRepos}
+                  data-dialog-confirm
                   onClick={(e) => {
                     e.preventDefault();
                     form.handleSubmit();

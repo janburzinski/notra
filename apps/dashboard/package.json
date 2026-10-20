@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "test": "bun test src && bun test tests"
+    "test": "bun test ./src && bun test ./tests",
+    "test:browser": "bun test ./browser-tests"
   },
   "dependencies": {
     "@ai-sdk/code-mode": "1.0.86",
@@ -148,6 +149,7 @@
     "knip": "^6.12.1",
     "nitro": "3.0.260903-beta",
     "oxc-transform-react": "0.145.0",
+    "playwright": "1.58.2",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "8.3.3"

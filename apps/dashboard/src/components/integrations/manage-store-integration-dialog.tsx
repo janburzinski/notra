@@ -347,7 +347,13 @@ function CredentialEditor({
           <HugeiconsIcon icon={PlusSignIcon} />
           {t("addHeader")}
         </Button>
-        <Button disabled={updating} onClick={onUpdate} size="sm" type="button">
+        <Button
+          data-dialog-confirm
+          disabled={updating}
+          onClick={onUpdate}
+          size="sm"
+          type="button"
+        >
           {updating ? tCommon2("labels.updating") : t("updateCredentials")}
         </Button>
       </div>

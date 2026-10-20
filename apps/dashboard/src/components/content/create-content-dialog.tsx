@@ -158,13 +158,19 @@ function CreateContentDialogFooter({
             disabled={!isProjectResolved}
             loading={isPending}
             onClick={onCreate}
+            data-dialog-confirm
             type="button"
           >
             {identityButtonLabel}
             <HugeiconsIcon className="size-3.5" icon={ArrowRight01Icon} />
           </Button>
         ) : (
-          <Button disabled={isPending} onClick={onNext} type="button">
+          <Button
+            data-dialog-confirm
+            disabled={isPending}
+            onClick={onNext}
+            type="button"
+          >
             {tCommon("actions.continue")}
             <HugeiconsIcon className="size-3.5" icon={ArrowRight01Icon} />
           </Button>

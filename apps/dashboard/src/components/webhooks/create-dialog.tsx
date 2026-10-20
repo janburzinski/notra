@@ -170,6 +170,7 @@ export function WebhookCreateDialogView({
               </Button>
               <Button
                 type="submit"
+                data-dialog-confirm
                 form="create-webhook"
                 disabled={pending || events.length === 0}
               >

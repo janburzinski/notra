@@ -195,6 +195,7 @@ export function DiagramEditorDialog({
               disabled={!(sceneQuery.data && editorReady)}
               loading={saveMutation.isPending}
               onClick={() => saveMutation.mutate()}
+              data-dialog-confirm
             >
               {t("save")}
             </Button>

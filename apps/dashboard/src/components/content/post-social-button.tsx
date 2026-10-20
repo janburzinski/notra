@@ -354,6 +354,7 @@ export function PostSocialButton({
                 disabled={!draft.trim() || isOverCharLimit || videoPending}
                 loading={publishMutation.isPending}
                 onClick={handlePublish}
+                data-dialog-confirm
               >
                 {t("postAs", { username: selectedAccount.username })}
               </Button>

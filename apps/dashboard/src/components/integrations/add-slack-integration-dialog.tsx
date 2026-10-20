@@ -63,6 +63,7 @@ export function AddSlackIntegrationDialog({
             {tCommon("actions.cancel")}
           </ResponsiveDialogClose>
           <Button
+            data-dialog-confirm
             onClick={() => {
               void flushTrackEvent(POSTHOG_EVENTS.INTEGRATION_CONNECT_STARTED, {
                 provider: INTEGRATION_PROVIDERS.SLACK,

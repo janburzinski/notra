@@ -344,7 +344,12 @@ function GeoCsvImportDialog<TRow>({
           >
             {tCommon("cancel")}
           </Button>
-          <Button disabled={!canImport} onClick={handleImport} type="button">
+          <Button
+            data-dialog-confirm
+            disabled={!canImport}
+            onClick={handleImport}
+            type="button"
+          >
             {isPending ? <Spinner className="size-3.5" /> : null}
             {rows.length > 0
               ? t(`kinds.${kind}.importCount`, { count: rows.length })

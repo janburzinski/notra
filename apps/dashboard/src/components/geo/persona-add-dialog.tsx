@@ -80,7 +80,11 @@ export function PersonaAddDialog({
             >
               {tCommon("cancel")}
             </Button>
-            <Button type="submit" disabled={isPending || atLimit}>
+            <Button
+              data-dialog-confirm
+              type="submit"
+              disabled={isPending || atLimit}
+            >
               {isPending ? tCommon2("labels.starting") : t("generate")}
             </Button>
           </ResponsiveDialogFooter>

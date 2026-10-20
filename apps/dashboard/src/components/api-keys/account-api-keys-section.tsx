@@ -558,7 +558,11 @@ export function AccountApiKeysSection() {
                     </Button>
                   }
                 />
-                <Button disabled={createMutation.isPending} type="submit">
+                <Button
+                  data-dialog-confirm
+                  disabled={createMutation.isPending}
+                  type="submit"
+                >
                   {createMutation.isPending
                     ? tCommon("actions.creating")
                     : t("create.submit")}
@@ -658,7 +662,11 @@ export function AccountApiKeysSection() {
                   <Button variant="outline">{tCommon("actions.cancel")}</Button>
                 }
               />
-              <Button disabled={updateMutation.isPending} type="submit">
+              <Button
+                data-dialog-confirm
+                disabled={updateMutation.isPending}
+                type="submit"
+              >
                 {updateMutation.isPending
                   ? tCommon("actions.saving")
                   : tCommon("actions.saveChanges")}

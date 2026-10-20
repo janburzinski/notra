@@ -225,7 +225,7 @@ export function GuidelinesColorEditDialog({
           >
             {tCommon("cancel")}
           </Button>
-          <Button disabled={isPending} onClick={handleSave}>
+          <Button data-dialog-confirm disabled={isPending} onClick={handleSave}>
             {isPending ? tCommon("saving") : tCommon("save")}
           </Button>
         </ResponsiveDialogFooter>

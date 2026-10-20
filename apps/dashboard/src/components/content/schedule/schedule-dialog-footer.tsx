@@ -92,7 +92,7 @@ export function ScheduleDialogFooter({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : null}
-      <Button disabled={!canSubmit} type="submit">
+      <Button data-dialog-confirm disabled={!canSubmit} type="submit">
         {submitLabel}
       </Button>
     </ResponsiveDialogFooter>

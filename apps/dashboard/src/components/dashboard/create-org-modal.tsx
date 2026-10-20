@@ -263,7 +263,7 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps) {
             >
               {tCommon("cancel")}
             </Button>
-            <Button disabled={isCreating} type="submit">
+            <Button data-dialog-confirm disabled={isCreating} type="submit">
               {isCreating
                 ? tCommon("creating")
                 : tNavShared("createOrganization")}

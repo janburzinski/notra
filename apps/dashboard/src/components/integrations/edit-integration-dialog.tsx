@@ -290,6 +290,7 @@ export function EditIntegrationDialog({
                 {([canSubmit]) => (
                   <Button
                     disabled={!canSubmit || mutation.isPending}
+                    data-dialog-confirm
                     onClick={(e) => {
                       e.preventDefault();
                       form.handleSubmit();

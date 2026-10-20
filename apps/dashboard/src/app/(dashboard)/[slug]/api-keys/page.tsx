@@ -637,7 +637,7 @@ function CreateApiKeyDialog({
                     </Button>
                   }
                 />
-                <Button disabled={isPending} type="submit">
+                <Button data-dialog-confirm disabled={isPending} type="submit">
                   {isPending ? tCommon("actions.creating") : t("create.submit")}
                 </Button>
               </ResponsiveDialogFooter>
@@ -777,7 +777,7 @@ function EditApiKeyDialog({
                 <Button variant="outline">{tCommon("actions.cancel")}</Button>
               }
             />
-            <Button disabled={isPending} type="submit">
+            <Button data-dialog-confirm disabled={isPending} type="submit">
               {isPending
                 ? tCommon("actions.saving")
                 : tCommon("actions.saveChanges")}

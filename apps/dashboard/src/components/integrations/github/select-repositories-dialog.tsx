@@ -126,6 +126,7 @@ export function SelectRepositoriesDialog({
           <Button
             disabled={isSaving || isLoading || Boolean(error)}
             onClick={() => onSave(selected)}
+            data-dialog-confirm
           >
             {isSaving ? tCommon("actions.saving") : t("save")}
           </Button>

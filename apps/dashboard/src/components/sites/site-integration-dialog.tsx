@@ -345,6 +345,7 @@ export function SiteIntegrationDialog({
             <Button
               disabled={busy || removalFailed}
               loading={publishing}
+              data-dialog-confirm
               onClick={() => {
                 void publish();
               }}

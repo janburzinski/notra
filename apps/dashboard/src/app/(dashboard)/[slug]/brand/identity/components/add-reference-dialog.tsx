@@ -315,7 +315,7 @@ function TweetUrlStep({
     if (e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) {
       return;
     }
-    if (e.key === "Enter" && !isPending) {
+    if (e.key === "Enter" && !(e.metaKey || e.ctrlKey) && !isPending) {
       e.preventDefault();
       handleSubmit();
     }
@@ -349,6 +349,7 @@ function TweetUrlStep({
           disabled={!url.trim() || remaining === 0}
           loading={isPending}
           onClick={handleSubmit}
+          data-dialog-confirm
         >
           {tBrandShared("addReference")}
         </Button>
@@ -743,6 +744,7 @@ function CustomTextStep({
         <Button
           disabled={createReference.isPending || !content.trim()}
           onClick={handleSave}
+          data-dialog-confirm
         >
           {createReference.isPending ? tCommon("saving") : t("custom.submit")}
         </Button>

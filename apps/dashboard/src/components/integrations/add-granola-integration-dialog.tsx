@@ -195,7 +195,11 @@ export function AddGranolaIntegrationDialog({
           >
             {tCommon("actions.cancel")}
           </ResponsiveDialogClose>
-          <Button loading={createMutation.isPending} onClick={handleSubmit}>
+          <Button
+            data-dialog-confirm
+            loading={createMutation.isPending}
+            onClick={handleSubmit}
+          >
             {tIntegrationsShared("addIntegration")}
           </Button>
         </ResponsiveDialogFooter>

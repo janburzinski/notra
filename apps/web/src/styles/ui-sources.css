@@ -189,6 +189,7 @@
 @source "../../../../packages/ui/src/constants/claude-chat-models.ts";
 @source "../../../../packages/ui/src/constants/codex-skin.ts";
 @source "../../../../packages/ui/src/constants/command-tabs.ts";
+@source "../../../../packages/ui/src/constants/dialog-confirm.ts";
 @source "../../../../packages/ui/src/constants/dropdown.ts";
 @source "../../../../packages/ui/src/constants/framework-image.ts";
 @source "../../../../packages/ui/src/constants/gemini-models.ts";
@@ -217,6 +218,7 @@
 @source "../../../../packages/ui/src/lib/chatgpt-model.ts";
 @source "../../../../packages/ui/src/lib/claude-chat-model.ts";
 @source "../../../../packages/ui/src/lib/data-table.ts";
+@source "../../../../packages/ui/src/lib/dialog-confirm.ts";
 @source "../../../../packages/ui/src/lib/framework-image.ts";
 @source "../../../../packages/ui/src/lib/gemini-model.ts";
 @source "../../../../packages/ui/src/lib/geo-answer-font.ts";

@@ -229,7 +229,11 @@ function AuthorForm({
         <Button onClick={onDone} type="button" variant="ghost">
           {t("back")}
         </Button>
-        <Button disabled={pending || uploading} type="submit">
+        <Button
+          data-dialog-confirm
+          disabled={pending || uploading}
+          type="submit"
+        >
           {t("save")}
         </Button>
       </ResponsiveDialogFooter>

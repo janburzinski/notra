@@ -125,7 +125,9 @@ export function OnboardingAgentBanner({
                 <ResponsiveDialogClose render={<Button variant="outline" />}>
                   {tCommon("cancel")}
                 </ResponsiveDialogClose>
-                <Button onClick={handleConfirm}>{t("start")}</Button>
+                <Button data-dialog-confirm onClick={handleConfirm}>
+                  {t("start")}
+                </Button>
               </ResponsiveDialogFooter>
             </ResponsiveDialogContent>
           </ResponsiveDialog>

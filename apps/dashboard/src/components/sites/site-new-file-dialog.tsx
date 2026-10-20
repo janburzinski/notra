@@ -120,6 +120,7 @@ export function SiteNewFileDialog({
             form={`${id}-form`}
             loading={isCreating}
             type="submit"
+            data-dialog-confirm
           >
             {tCommon("actions.create")}
           </Button>

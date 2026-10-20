@@ -564,7 +564,12 @@ export function GitHubDirectoryPicker({
           >
             {tCommon("actions.cancel")}
           </ResponsiveDialogClose>
-          <Button disabled={isSaving} onClick={handleSave} type="button">
+          <Button
+            data-dialog-confirm
+            disabled={isSaving}
+            onClick={handleSave}
+            type="button"
+          >
             {isSaving ? tCommon("actions.saving") : t("useFolder")}
           </Button>
         </ResponsiveDialogFooter>

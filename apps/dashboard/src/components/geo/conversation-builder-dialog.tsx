@@ -179,7 +179,12 @@ export function ConversationBuilderDialog({
           </div>
         </div>
         <ResponsiveDialogFooter>
-          <Button disabled={!canSave} onClick={handleSave} type="button">
+          <Button
+            data-dialog-confirm
+            disabled={!canSave}
+            onClick={handleSave}
+            type="button"
+          >
             {sequence ? tCommon("saveChanges") : t("create")}
           </Button>
         </ResponsiveDialogFooter>

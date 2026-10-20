@@ -140,7 +140,11 @@ export function GuidelinesScreenshotEditDialog({
           >
             {tCommon("cancel")}
           </Button>
-          <Button disabled={update.isPending} onClick={handleSave}>
+          <Button
+            data-dialog-confirm
+            disabled={update.isPending}
+            onClick={handleSave}
+          >
             {update.isPending ? tCommon("saving") : tCommon("save")}
           </Button>
         </ResponsiveDialogFooter>

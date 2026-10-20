@@ -5,6 +5,7 @@ import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useUiLabels } from "@notra/ui/components/shared/ui-labels-provider";
 import { Button } from "@notra/ui/components/ui/button";
+import { handleDialogConfirm } from "@notra/ui/lib/dialog-confirm";
 import type * as React from "react";
 import { cn } from "@notra/ui/lib/utils";
 
@@ -46,6 +47,7 @@ function DialogContent({
   keepMounted = false,
   showCloseButton = true,
   closeLabel,
+  onKeyDown,
   ...props
 }: DialogPrimitive.Popup.Props & {
   keepMounted?: boolean;
@@ -65,6 +67,10 @@ function DialogContent({
         )}
         data-slot="dialog-content"
         {...props}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          handleDialogConfirm(event);
+        }}
       >
         {children}
         {showCloseButton && (

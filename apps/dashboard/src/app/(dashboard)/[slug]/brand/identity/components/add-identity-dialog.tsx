@@ -160,6 +160,7 @@ export function AddIdentityDialog({
               className="w-full justify-center sm:w-auto"
               disabled={!name.trim() || !url.trim() || isSubmitting}
               type="submit"
+              data-dialog-confirm
             >
               {isSubmitting
                 ? tCommon("creating")

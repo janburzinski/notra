@@ -6,6 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useUiLabels } from "@notra/ui/components/shared/ui-labels-provider";
 import { Button } from "@notra/ui/components/ui/button";
 import { useComposedRefs } from "@notra/ui/hooks/compose-refs";
+import { handleDialogConfirm } from "@notra/ui/lib/dialog-confirm";
 import * as React from "react";
 import { cn } from "@notra/ui/lib/utils";
 
@@ -86,6 +87,7 @@ function SheetContent({
   variant = "default",
   showCloseButton = true,
   closeLabel,
+  onKeyDown,
   ref,
   ...props
 }: SheetPrimitive.Popup.Props & {
@@ -132,6 +134,10 @@ function SheetContent({
         data-slot="sheet-content"
         ref={popupRef}
         {...props}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          handleDialogConfirm(event);
+        }}
       >
         {children}
         {showCloseButton && (

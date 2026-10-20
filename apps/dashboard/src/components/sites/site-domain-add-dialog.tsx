@@ -48,7 +48,12 @@ export function SiteDomainAddDialog({
               >
                 {tCommon("actions.cancel")}
               </Button>
-              <Button disabled={!canSubmit} loading={pending} type="submit">
+              <Button
+                data-dialog-confirm
+                disabled={!canSubmit}
+                loading={pending}
+                type="submit"
+              >
                 {t("submit")}
               </Button>
             </ResponsiveDialogFooter>

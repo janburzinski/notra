@@ -122,7 +122,11 @@ export function DemoCustomizeDialog({
             >
               {t("cancel")}
             </Button>
-            <Button disabled={!parsed.success || saving} type="submit">
+            <Button
+              data-dialog-confirm
+              disabled={!parsed.success || saving}
+              type="submit"
+            >
               {saving ? t("saving") : t("submit")}
             </Button>
           </ResponsiveDialogFooter>

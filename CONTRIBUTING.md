@@ -578,6 +578,11 @@ being tested. Reset database/emulator state between scenarios and close servers
 in teardown. Import only `bun-types/test` in TypeScript configuration so Bun's
 global `fetch` extensions do not change the application runtime types.
 
+Dashboard browser regressions run separately with `bun run test:browser` from
+`apps/dashboard`. Install Chromium once with `bunx playwright install --only-shell chromium`.
+The suite mounts local UI fixtures without application credentials; CI installs
+the browser and runs it in the Code quality test job.
+
 These are not deployed end-to-end tests. PGlite serializes database requests,
 so overlapping-call tests do not reproduce separate Postgres connections.
 Workflow orchestration tests replace steps and `sleep`; they do not verify

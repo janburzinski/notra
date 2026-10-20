@@ -202,6 +202,7 @@ export function VoiceSelector({
                 className="w-full justify-center sm:w-auto"
                 disabled={!identityName.trim() || updateMutation.isPending}
                 type="submit"
+                data-dialog-confirm
               >
                 {updateMutation.isPending ? tCommon("saving") : tCommon("save")}
               </Button>

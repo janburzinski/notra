@@ -208,15 +208,6 @@ export function PromptAddDialog({
                     keywords={searchConsoleKeywords}
                     maxLength={GEO_PROMPT_MAX_LENGTH}
                     onChange={(event) => setDraft(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (
-                        event.key === "Enter" &&
-                        (event.metaKey || event.ctrlKey)
-                      ) {
-                        event.preventDefault();
-                        handleAdd();
-                      }
-                    }}
                     className="field-sizing-fixed h-28 resize-none"
                     placeholder={t("questionPlaceholder")}
                     ref={promptRef}
@@ -299,11 +290,21 @@ export function PromptAddDialog({
             {tCommon("cancel")}
           </Button>
           {writeMode ? (
-            <Button disabled={!canAdd} form={formId} type="submit">
+            <Button
+              data-dialog-confirm
+              disabled={!canAdd}
+              form={formId}
+              type="submit"
+            >
               {tGeoShared("addPrompt")}
             </Button>
           ) : (
-            <Button disabled={!canGenerate} form={formId} type="submit">
+            <Button
+              data-dialog-confirm
+              disabled={!canGenerate}
+              form={formId}
+              type="submit"
+            >
               {generate.isPending ? <Spinner className="size-3.5" /> : null}
               {tGeoShared("generatePrompts")}
             </Button>

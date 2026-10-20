@@ -55,6 +55,7 @@ export function AddGoogleSearchConsoleIntegrationDialog({
             {tCommon("actions.cancel")}
           </ResponsiveDialogClose>
           <Button
+            data-dialog-confirm
             onClick={() => {
               void flushTrackEvent(POSTHOG_EVENTS.GSC_CONNECT_STARTED, {
                 is_reconnect: reauth,

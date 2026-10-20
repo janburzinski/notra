@@ -195,6 +195,7 @@ export function SitePublishDialog({
             form={`${id}-form`}
             loading={publishMutation.isPending}
             type="submit"
+            data-dialog-confirm
           >
             <HugeiconsIcon
               aria-hidden="true"

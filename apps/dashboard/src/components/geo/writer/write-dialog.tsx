@@ -520,6 +520,7 @@ function WriteDialogFooter({
         </WriteActionButton>
         <WriteActionButton
           action="write"
+          data-dialog-confirm
           disabled={!canSubmit}
           onClick={() => onSubmit("write")}
           pendingAction={pendingAction}

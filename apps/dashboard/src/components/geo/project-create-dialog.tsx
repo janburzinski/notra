@@ -255,6 +255,7 @@ export function GeoProjectCreateDialog({
               disabled={!brandQuery.isSuccess}
               loading={isSubmitting}
               type="submit"
+              data-dialog-confirm
             >
               {t("create")}
             </Button>

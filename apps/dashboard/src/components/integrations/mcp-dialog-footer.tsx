@@ -50,7 +50,11 @@ export function McpDialogFooter({
       >
         {tCommon("actions.cancel")}
       </ResponsiveDialogClose>
-      <Button disabled={!canSubmit || isPending} type="submit">
+      <Button
+        data-dialog-confirm
+        disabled={!canSubmit || isPending}
+        type="submit"
+      >
         {submitLabel}
       </Button>
     </>

@@ -103,6 +103,7 @@ function PreviewBranchDialog({
             form={`${id}-form`}
             loading={createMutation.isPending}
             type="submit"
+            data-dialog-confirm
           >
             {t("createPreview")}
           </Button>

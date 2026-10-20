@@ -271,7 +271,11 @@ export function ScanPreflightDialog({
           >
             {tCommon("actions.cancel")}
           </Button>
-          <Button disabled={isPending || !canRun} onClick={runScan}>
+          <Button
+            data-dialog-confirm
+            disabled={isPending || !canRun}
+            onClick={runScan}
+          >
             <HugeiconsIcon aria-hidden="true" icon={PlayIcon} size={14} />
             {isPending ? tCommon("labels.starting") : tGeoShared("runScan")}
           </Button>

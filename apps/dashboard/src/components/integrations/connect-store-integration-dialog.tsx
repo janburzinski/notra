@@ -63,7 +63,7 @@ export function ConnectStoreIntegrationDialog({
           >
             {tCommon("actions.cancel")}
           </Button>
-          <Button disabled={connecting} onClick={onConnect}>
+          <Button data-dialog-confirm disabled={connecting} onClick={onConnect}>
             {connecting ? t("connecting") : tCommon("actions.connect")}
           </Button>
         </ResponsiveDialogFooter>
