@@ -1,0 +1,21 @@
+apps/dashboard/src/constants/autopilot.ts
+  s_38877c59943128::t_f4c4b3e896f287 75-78,80,82
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_38877c59943128::t_75e8058d2fd2f4 265
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6fda226dad574313bc42991439228ede3c41c32b",
+  "prompts": {},
+  "sessions": {
+    "s_38877c59943128": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8faba7f6-8b16-441d-98eb-2ba8925c714d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
