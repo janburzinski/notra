@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { GeoWriterPlanError } from "@notra/geo-core/geo/errors";
 import {
   loadGeoContentGaps,
   refreshGeoContentGapsBestEffort,
@@ -7,7 +8,12 @@ import {
   approveAndStartGeoWriter,
   getGeoContentBrief,
   listGeoContentBriefs,
+  updateGeoContentBrief,
 } from "@notra/geo-core/geo/writer";
+import {
+  geoBriefToMarkdown,
+  markdownToGeoBrief,
+} from "@notra/geo-core/utils/geo-writer-brief-markdown";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   approveBriefResponseSchema,
@@ -17,6 +23,7 @@ import {
   listBriefsResponseSchema,
   planBriefRequestSchema,
   planBriefResponseSchema,
+  updateBriefRequestSchema,
 } from "@notra/schemas/api/geo-content";
 import { projectParamsSchema } from "@notra/schemas/api/geo-params";
 import { Effect } from "effect";
@@ -34,6 +41,7 @@ import {
   geoErrorResponse,
   geoOutcomeResponse,
   geoRemoteErrorResponse,
+  refreshGeoGapsAfter,
 } from "../utils/geo";
 import { getInternalWorkflowUrl } from "../utils/internal-workflow";
 import { createOpenApiApp } from "../utils/openapi-app";
@@ -86,6 +94,30 @@ const getBriefRoute = createRoute({
   responses: {
     200: {
       description: "Brief fetched successfully",
+      content: { "application/json": { schema: briefResponseSchema } },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
+const updateBriefRoute = createRoute({
+  method: "patch",
+  path: "/projects/{projectId}/geo/briefs/{briefId}",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "updateGeoContentBrief",
+  summary: "Update a content brief",
+  description:
+    "Edits the brief's outline and planning fields. Omitted fields keep their current value; list fields replace the whole list. Only briefs in `draft` or `failed` can be edited, and the draft post's plan is updated with them. Anything else returns 409. Editing drops research notes such as the baseline and recommended angle, as the dashboard editor does.",
+  request: {
+    params: briefParamsSchema,
+    body: {
+      required: true,
+      content: { "application/json": { schema: updateBriefRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "Brief updated successfully",
       content: { "application/json": { schema: briefResponseSchema } },
     },
     ...GEO_COMMON_ERROR_RESPONSES,
@@ -177,6 +209,55 @@ geoBriefsRoutes.openapi(getBriefRoute, async (c) => {
       { organizationId: base.organizationId, projectId },
       briefId
     ).pipe(Effect.map((brief) => ({ brief })))
+  );
+  return geoOutcomeResponse(c, outcome, 200);
+});
+
+geoBriefsRoutes.openapi(updateBriefRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId, briefId } = c.req.valid("param");
+  const { expectedUpdatedAt, ...changes } = c.req.valid("json");
+  const scope = { organizationId: base.organizationId, projectId };
+
+  const outcome = await runGeoEffect(
+    "briefUpdate",
+    getGeoContentBrief(scope, briefId).pipe(
+      Effect.flatMap((current) => {
+        const next = {
+          targetPrompt: changes.targetPrompt ?? current.brief.targetPrompt,
+          intent: changes.intent ?? current.brief.intent,
+          contentSubtype: current.brief.contentSubtype,
+          workingTitle: changes.workingTitle ?? current.brief.workingTitle,
+          audience: changes.audience ?? current.brief.audience,
+          jobToBeDone: changes.jobToBeDone ?? current.brief.jobToBeDone,
+          sections: changes.sections ?? current.brief.sections,
+          questionsToAnswer:
+            changes.questionsToAnswer ?? current.brief.questionsToAnswer,
+          internalLinks: changes.internalLinks ?? current.brief.internalLinks,
+          acceptanceChecklist:
+            changes.acceptanceChecklist ?? current.brief.acceptanceChecklist,
+        };
+        const markdown = geoBriefToMarkdown(next);
+        const roundTripped = markdownToGeoBrief(markdown, next);
+        if (JSON.stringify(roundTripped) !== JSON.stringify(next)) {
+          return Effect.fail(
+            new GeoWriterPlanError({
+              message:
+                'Some values cannot be saved as written. Avoid text that starts with "- " or "##", headings named FAQ, Internal links or Acceptance checklist, and placeholders such as "(none listed)".',
+            })
+          );
+        }
+        return updateGeoContentBrief({
+          ...scope,
+          briefId,
+          expectedUpdatedAt: expectedUpdatedAt ?? current.updatedAt,
+          markdown,
+          workingTitle: next.workingTitle,
+        });
+      }),
+      refreshGeoGapsAfter(scope),
+      Effect.map((brief) => ({ brief }))
+    )
   );
   return geoOutcomeResponse(c, outcome, 200);
 });

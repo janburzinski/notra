@@ -94,6 +94,12 @@ function toGeoFailure(failure: GeoFailureWire): GeoFailure {
         status: 402,
         error: failure.message ?? "AI credits are exhausted",
       };
+    case "GeoContentBriefConflictError":
+      return {
+        status: 409,
+        error:
+          "Content brief changed since expectedUpdatedAt. Fetch it again and retry.",
+      };
     case "GeoContentBriefStateError":
       return {
         status: 409,
