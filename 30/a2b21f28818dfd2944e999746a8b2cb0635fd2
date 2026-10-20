@@ -1,0 +1,78 @@
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_a6bc913cf4c60e::t_3b668cbd9fdaf7 33,130-137
+apps/dashboard/src/components/sites/site-create-step-list.tsx
+  s_a6bc913cf4c60e::t_e70259e8cb08c4 8,11
+apps/dashboard/src/types/components/sites.ts
+  s_a6bc913cf4c60e::t_e70259e8cb08c4 668-670
+apps/dashboard/src/components/autopilot/autopilot-automation-choices.tsx
+  s_a6bc913cf4c60e::t_12f65dbe8174dd 1,3-5,7-12,14-30,32-41,43-45,47
+  s_a6bc913cf4c60e::t_c1d1451140f5f1 31
+apps/dashboard/src/components/autopilot/autopilot-setup-flow.tsx
+  s_a6bc913cf4c60e::t_9bba80e7642d1c 1-2,4,6,9-16,18-27,29-32,44-53,55-59,64-66,77-88,120,122,129-130,134,136-138,140-141,143-149,152,159-164
+  s_a6bc913cf4c60e::t_a18efa1f41e146 3
+  s_a6bc913cf4c60e::t_3b668cbd9fdaf7 5,33-36,38-43,54
+  s_a6bc913cf4c60e::t_c1d1451140f5f1 7,123-124,126-128,135,142
+  s_a6bc913cf4c60e::t_680db923d45d1c 8,121,125,131-133,139,150-151,153-158
+  s_a6bc913cf4c60e::t_12fd41df562f1c 17,28,37,89-99,101,107-108,110-119
+  s_a6bc913cf4c60e::t_288d01dc7254a3 60,62-63
+  s_a6bc913cf4c60e::t_970ba01be46dcb 67-76
+  s_a6bc913cf4c60e::t_259ec09c0f1ed7 100,102-106,109
+apps/dashboard/src/types/autopilot.ts
+  s_a6bc913cf4c60e::t_1c36b4a0197f2a 10-14,210,214-233,395
+apps/dashboard/src/components/sites/site-create-stage.tsx
+  s_a6bc913cf4c60e::t_d127ce9224c970 85-92
+apps/dashboard/src/types/onboarding.ts
+  s_a6bc913cf4c60e::t_0908753c6ec02f 24
+apps/dashboard/src/constants/onboarding.ts
+  s_a6bc913cf4c60e::t_0908753c6ec02f 3,7
+apps/dashboard/src/components/autopilot/autopilot-page-shell.tsx
+  s_a6bc913cf4c60e::t_3b668cbd9fdaf7 71
+apps/dashboard/src/components/onboarding/progress.tsx
+  s_a6bc913cf4c60e::t_0908753c6ec02f 4,8-11,13-14,17,30,33-34,40
+apps/dashboard/src/constants/autopilot-ui.ts
+  s_a6bc913cf4c60e::t_6af89f040cef8c 4,13,44,47-51,55-59
+  s_a6bc913cf4c60e::t_a18efa1f41e146 7,71
+  s_a6bc913cf4c60e::t_12fd41df562f1c 45-46,52-53,60-63,65-70,72-77,80-84,87,92
+  s_a6bc913cf4c60e::t_e2385bf15ef04b 54,64
+  s_a6bc913cf4c60e::t_20986ccb8f47dc 78-79,89,94-99
+  s_a6bc913cf4c60e::t_4a8bac1fd4cb36 85,90-91
+  s_a6bc913cf4c60e::t_c1d1451140f5f1 86
+  s_a6bc913cf4c60e::t_f15fa2e487c69f 88,93
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_a6bc913cf4c60e::t_997cf1d9a1f712 23,43,55-64,145-157,159,172-174
+apps/dashboard/src/components/autopilot/autopilot-repository-list.tsx
+  s_a6bc913cf4c60e::t_4934b0cd257171 1-66,68-71,73,75-117
+  s_a6bc913cf4c60e::t_4a8bac1fd4cb36 72,74
+apps/dashboard/src/components/autopilot/autopilot-setup-rows.tsx
+  s_a6bc913cf4c60e::t_680db923d45d1c 3
+  s_a6bc913cf4c60e::t_0bd648d1cf3616 4,6-12,14-19,21,30-41,44,48-86,88-127
+  s_a6bc913cf4c60e::t_288d01dc7254a3 23-28
+apps/dashboard/src/components/autopilot/autopilot-repository-picker.tsx
+  s_a6bc913cf4c60e::t_423446c6005ab4 1-60,66,68,76,85-92
+  s_a6bc913cf4c60e::t_8ed30f3d2f7d2d 61-64
+  s_a6bc913cf4c60e::t_288d01dc7254a3 65
+  s_a6bc913cf4c60e::t_e0d73db8382df5 67,69-75,77-84
+apps/dashboard/src/routes/-onboarding-loaders.ts
+  s_a6bc913cf4c60e::t_0908753c6ec02f 140,196,232,250,275
+apps/dashboard/src/utils/onboarding-progress.ts
+  s_a6bc913cf4c60e::t_0908753c6ec02f 20,23,26,40-45,47-55
+apps/dashboard/src/lib/hooks/use-autopilot-setup.ts
+  s_a6bc913cf4c60e::t_e8f22ab68d2b94 7,11,81,104,107
+  s_a6bc913cf4c60e::t_a8b6eba0395d70 10,14-15,21,24-25,27-29,51,95-103,108-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "30a2b21f28818dfd2944e999746a8b2cb0635fd2",
+  "prompts": {},
+  "sessions": {
+    "s_a6bc913cf4c60e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c0dec1a8-4966-4bf5-9b31-7a4cd58bb461",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
