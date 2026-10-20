@@ -6,6 +6,7 @@ export const SLACK_BOT_SCOPES = [
   "chat:write",
   "channels:history",
   "channels:read",
+  "channels:manage",
   "groups:history",
   "groups:read",
   "im:history",

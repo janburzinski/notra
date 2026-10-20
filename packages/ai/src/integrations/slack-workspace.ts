@@ -34,6 +34,7 @@ export async function createSlackIntegration(
     throw new Error("User does not have access to this organization.");
   }
 
+  const encryptedBotToken = encryptToken(botToken);
   const [integration] = await db
     .insert(slackIntegrations)
     .values({
@@ -41,13 +42,29 @@ export async function createSlackIntegration(
       organizationId,
       createdByUserId: userId,
       displayName,
-      encryptedBotToken: encryptToken(botToken),
+      encryptedBotToken,
       slackTeamId,
       slackTeamName: slackTeamName ?? null,
       slackBotUserId: slackBotUserId ?? null,
     })
+    .onConflictDoUpdate({
+      target: slackIntegrations.slackTeamId,
+      set: {
+        enabled: true,
+        encryptedBotToken,
+        slackTeamName: slackTeamName ?? null,
+        slackBotUserId: slackBotUserId ?? null,
+      },
+      // Reauthorization must never move a workspace between organizations.
+      setWhere: eq(slackIntegrations.organizationId, organizationId),
+    })
     .returning();
 
+  if (!integration) {
+    throw new Error(
+      "This Slack workspace is connected to another organization."
+    );
+  }
   return integration;
 }
 

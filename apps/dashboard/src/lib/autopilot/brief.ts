@@ -11,7 +11,7 @@ import { postAutopilotSlackMessage } from "@/lib/autopilot/slack";
 import type { AutopilotFindingRow as FindingRow } from "@/types/autopilot-runtime";
 import type { SlackBlock } from "@/types/autopilot-slack";
 import { autopilotSlackMessageId } from "@/utils/autopilot-delivery";
-import { escapeSlackText } from "@/utils/autopilot-slack";
+import { compactSlackText } from "@/utils/autopilot-slack";
 
 function findingUrl(slug: string, findingId: string, action?: string) {
   const base = `${getAppUrl() ?? ""}/${slug}${AUTOPILOT_NAV_LINK}`;
@@ -52,18 +52,36 @@ function findingBlocks(slug: string, finding: FindingRow): SlackBlock[] {
     url: findingUrl(slug, finding.id, "dismiss"),
     action_id: `autopilot_dismiss_${finding.id}`,
   });
+  const title = compactSlackText(
+    finding.title
+      .replace(/^Blog post(?: for |: )/i, "")
+      .replace(/^"(.*)"$/, "$1"),
+    100
+  );
+  const target = finding.evidence.target;
+  const summary = compactSlackText(
+    target?.kind === "prompt"
+      ? `Your brand appears in ${Math.round(target.before * 100)}% of AI answers for this question.${finding.evidence.competitors?.length ? ` Competing with ${finding.evidence.competitors.slice(0, 3).join(", ")}.` : ""}`
+      : finding.kind === "commits"
+        ? "A blog post based on your recently shipped changes."
+        : finding.summary,
+    180
+  );
   return [
     {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*${escapeSlackText(finding.title).slice(0, 300)}*\n${escapeSlackText(finding.summary).slice(0, 2000)}${finding.status === "suggested" ? "\nDismiss this idea to prevent automatic writing." : ""}${finding.pullRequestUrl ? `\n<${finding.pullRequestUrl}|${finding.repository}#${finding.pullRequestNumber}>` : ""}`,
+        text: `*${title}*\n${summary}`,
       },
     },
     {
       type: "context",
       elements: [
-        { type: "mrkdwn", text: AUTOPILOT_SLACK_KIND_LABELS[finding.kind] },
+        {
+          type: "mrkdwn",
+          text: `${AUTOPILOT_SLACK_KIND_LABELS[finding.kind]}${finding.pullRequestUrl ? ` · <${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>` : ""}${finding.status === "suggested" ? " · Writes automatically unless dismissed" : ""}`,
+        },
       ],
     },
     { type: "actions", elements: buttons },
@@ -76,7 +94,7 @@ export function buildAutopilotBrief(params: {
   suggested?: FindingRow[];
   merged: FindingRow[];
   insights: string[];
-}): { text: string; blocks: SlackBlock[] } | null {
+}): { text: string; blocks: SlackBlock[]; findingIds: string[] } | null {
   const {
     organizationSlug,
     proposed,
@@ -92,23 +110,67 @@ export function buildAutopilotBrief(params: {
   ) {
     return null;
   }
-  const headline =
-    proposed.length > 0
-      ? `Good morning. ${proposed.length === 1 ? "One change is" : `${proposed.length} changes are`} ready to merge.`
-      : "Good morning. Nothing new to merge today.";
+  const headline = `Autopilot · ${
+    [
+      proposed.length > 0 ? `${proposed.length} ready to merge` : null,
+      suggested.length > 0
+        ? `${suggested.length} ${suggested.length === 1 ? "idea" : "ideas"}`
+        : null,
+      merged.length > 0 ? `${merged.length} merged` : null,
+    ]
+      .filter(Boolean)
+      .join(" · ") || "Daily insights"
+  }`;
   const blocks: SlackBlock[] = [
-    { type: "section", text: { type: "mrkdwn", text: headline } },
+    {
+      type: "header",
+      text: { type: "plain_text", text: "Autopilot daily brief" },
+    },
+    { type: "context", elements: [{ type: "mrkdwn", text: headline }] },
   ];
-  // Keep below Slack's 50-block message limit; the dashboard lists the rest.
-  for (const finding of [...proposed, ...suggested].slice(0, 10)) {
-    blocks.push(
-      { type: "divider" },
-      ...findingBlocks(organizationSlug, finding)
-    );
+  // Keep the digest short; the dashboard lists the rest.
+  const visible = [...proposed, ...suggested].slice(0, 5);
+  for (const [index, finding] of visible.entries()) {
+    if (index === 0 || finding.status !== visible[index - 1]?.status) {
+      blocks.push(
+        { type: "divider" },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text:
+              finding.status === "suggested"
+                ? "*Ideas for your next post*"
+                : "*Ready to merge*",
+          },
+        }
+      );
+    } else {
+      blocks.push({ type: "divider" });
+    }
+    blocks.push(...findingBlocks(organizationSlug, finding));
   }
   const footer = [
-    ...merged.map((finding) => `Merged since the last brief: ${finding.title}`),
-    ...insights,
+    ...(merged.length > 0
+      ? [
+          `*Merged since your last brief*\n${merged
+            .slice(0, 3)
+            .map((finding) => `• ${compactSlackText(finding.title, 100)}`)
+            .join(
+              "\n"
+            )}${merged.length > 3 ? `\n+${merged.length - 3} more in Notra` : ""}`,
+        ]
+      : []),
+    ...(insights.length > 0
+      ? [
+          `*Insights*\n${insights
+            .slice(0, 3)
+            .map((insight) => `• ${compactSlackText(insight, 180)}`)
+            .join(
+              "\n"
+            )}${insights.length > 3 ? `\n+${insights.length - 3} more in Notra` : ""}`,
+        ]
+      : []),
   ];
   if (footer.length > 0) {
     blocks.push(
@@ -116,25 +178,25 @@ export function buildAutopilotBrief(params: {
       {
         type: "context",
         // A context block permits at most ten elements and 3,000 chars per text.
-        elements: [
-          {
-            type: "mrkdwn",
-            text: escapeSlackText(footer.join("\n")).slice(0, 2800),
-          },
-        ],
+        elements: footer.map((text) => ({ type: "mrkdwn", text })),
       }
     );
   }
+  const remaining = proposed.length + suggested.length - visible.length;
   blocks.push({
     type: "context",
     elements: [
       {
         type: "mrkdwn",
-        text: `<${getAppUrl() ?? ""}/${organizationSlug}${AUTOPILOT_NAV_LINK}|Open Autopilot in Notra>`,
+        text: `${remaining > 0 ? `+${remaining} more ${remaining === 1 ? "item" : "items"} · ` : ""}<${getAppUrl() ?? ""}/${organizationSlug}${AUTOPILOT_NAV_LINK}|Open Autopilot in Notra>`,
       },
     ],
   });
-  return { text: headline, blocks };
+  return {
+    text: headline,
+    blocks,
+    findingIds: visible.map((finding) => finding.id),
+  };
 }
 
 /** Posts to the Slack channel picked for Autopilot; returns null when none is set. */

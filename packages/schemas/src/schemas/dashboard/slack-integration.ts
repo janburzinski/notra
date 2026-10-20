@@ -52,6 +52,26 @@ export const slackListChannelsOptionsSchema = z.object({
   refresh: z.boolean().optional(),
 });
 
+export const slackCreateChannelBodySchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(80)
+    .regex(
+      /^[a-z0-9_-]+$/,
+      "Use lowercase letters, numbers, hyphens, or underscores"
+    ),
+});
+
+export const slackCreateChannelResponseSchema = z.looseObject({
+  ok: z.boolean(),
+  error: z.string().optional(),
+  channel: z
+    .looseObject({ id: z.string().min(1), name: z.string().min(1) })
+    .optional(),
+});
+
 export const slackChannelListResponseSchema = z.looseObject({
   ok: z.boolean(),
   error: z.string().optional(),

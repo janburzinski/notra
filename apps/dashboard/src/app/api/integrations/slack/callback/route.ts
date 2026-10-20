@@ -174,11 +174,8 @@ export async function GET(request: Request) {
     const { access_token, team, bot_user_id } = tokenParse.data;
 
     const existing = await getSlackIntegrationByTeamId(team.id);
-    if (existing) {
-      const existingErrorCode =
-        existing.organizationId === oauthState.organizationId
-          ? "workspace_already_connected"
-          : "workspace_connected_elsewhere";
+    if (existing && existing.organizationId !== oauthState.organizationId) {
+      const existingErrorCode = "workspace_connected_elsewhere";
       trackFailed(existingErrorCode, oauthState);
       return redirectResponse(
         buildCallbackUrl(baseUrl, oauthState.callbackPath, {

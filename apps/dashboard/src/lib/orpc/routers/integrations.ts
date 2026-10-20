@@ -121,6 +121,7 @@ import {
 import { updateLinearIntegrationBodySchema } from "@notra/schemas/dashboard/linear";
 import {
   slackChannelListResponseSchema,
+  slackCreateChannelBodySchema,
   slackListChannelsOptionsSchema,
   updateSlackIntegrationBodySchema,
 } from "@notra/schemas/dashboard/slack-integration";
@@ -150,6 +151,7 @@ import {
   getCachedSlackChannels,
   setCachedSlackChannels,
 } from "@/lib/integrations/slack/channel-cache";
+import { createSlackChannel } from "@/lib/integrations/slack/create-channel";
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { getIntegrationsByOrganization } from "@/lib/services/integrations";
 import type {
@@ -1376,6 +1378,32 @@ export const integrationsRouter = {
       }),
   },
   slack: {
+    createChannel: baseProcedure
+      .input(integrationInputSchema.and(slackCreateChannelBodySchema))
+      .use(withOrganizationAccess)
+      .handler(async ({ input }) => {
+        assertNotDemo();
+        await assertActiveSubscription(input.organizationId);
+        const integration = await getSlackIntegrationById(
+          input.organizationId,
+          input.integrationId
+        );
+        if (!integration?.enabled) {
+          throw notFound("Active Slack integration not found");
+        }
+        const channel = await createSlackChannel(
+          getSlackIntegrationBotToken(integration),
+          input.name
+        );
+        await clearCachedSlackChannels(input.integrationId).catch((error) => {
+          logError(
+            "Failed to clear Slack channel cache after channel creation",
+            error,
+            { integrationId: input.integrationId }
+          );
+        });
+        return { channel };
+      }),
     list: baseProcedure
       .input(organizationIdInputSchema)
       .use(withOrganizationAccess)

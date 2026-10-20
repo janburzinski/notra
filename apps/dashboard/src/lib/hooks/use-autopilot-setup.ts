@@ -113,6 +113,7 @@ export function useAutopilotSetup({
   });
 
   return {
+    organizationId,
     ...connections,
     repositoryKey,
     setRepositoryKey,

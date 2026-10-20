@@ -70,6 +70,12 @@ Everyone in your workspace can use the agent, but people outside your workspace,
 
 Choose a channel where the agent posts activity updates, or set it to none to turn notifications off.
 
+### Autopilot daily brief
+
+When setting up Autopilot, choose an existing channel or select **Create a channel** to create a public channel. The default name is `notra-autopilot`, and you can change it before creating it. Notra joins automatically; you and your team can join the channel in Slack. Save the Autopilot setup to use it for daily briefs.
+
+Existing Slack connections may need to reconnect to grant the `channels:manage` permission. If your workspace restricts channel creation, ask a Slack admin or choose an existing channel and invite Notra to it.
+
 ### Enable, disable, delete
 
 From the workspace card menu you can disable the integration (the agent stops responding), re-enable it or delete it. Deleting removes the stored bot token from Notra, so to revoke access in Slack you also need to remove the app there.
@@ -84,6 +90,7 @@ The Slack app requests these bot scopes:
 | `chat:write`                       | Reply in threads and post notifications                                        |
 | `channels:history`, `groups:history` | Read the thread the agent was mentioned in, in public and private channels   |
 | `channels:read`, `groups:read`     | Resolve channel names and visibility for the channel picker and mirroring     |
+| `channels:manage`                  | Create a public channel during Autopilot setup                                 |
 | `im:history`                       | Read direct messages sent to the app                                           |
 | `files:read`                       | Read attachments shared with the agent                                         |
 | `files:write`                      | Upload chart images to the conversation                                        |
@@ -93,7 +100,7 @@ The agent only reads a thread once it is mentioned or messaged in it. It does no
 
 ## Limits
 
-- One connection per Slack workspace, and a workspace can belong to only one Notra organization. Connecting it again shows "This Slack workspace is already connected".
+- One connection per Slack workspace, and a workspace can belong to only one Notra organization. Reconnecting within the same organization refreshes its permissions without changing channel settings.
 - Slack conversations count against your organization's agent usage like dashboard chat does.
 - Slack is a chat channel for the agent rather than a data source for schedules, so use GitHub, Linear or Granola for that.
 

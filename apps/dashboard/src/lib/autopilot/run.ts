@@ -355,9 +355,13 @@ export async function deliverAutopilotBrief(params: {
         if (!recorded.length) {
           throw new Error("The run lost its delivery lease");
         }
+        const visibleFindingIds = new Set(brief.findingIds);
         for (const status of ["suggested", "proposed"] as const) {
           const ids = findings
-            .filter((finding) => finding.status === status)
+            .filter(
+              (finding) =>
+                finding.status === status && visibleFindingIds.has(finding.id)
+            )
             .map((finding) => finding.id);
           if (!ids.length) {
             continue;
