@@ -40,6 +40,7 @@ import {
 } from "./middleware/observability";
 import { subscriptionMiddleware } from "./middleware/subscription";
 import { agentChatsRoutes } from "./routes/agent-chats";
+import { brandColorsRoutes } from "./routes/brand-colors";
 import { brandIdentitiesRoutes } from "./routes/brand-identities";
 import { chatsRoutes } from "./routes/chats";
 import { eventTriggersRoutes } from "./routes/event-triggers";
@@ -362,6 +363,7 @@ app.route("/v1", postsRoutes);
 app.route("/v1", webhooksRoutes);
 app.route("/v1", postSchedulesRoutes);
 app.route("/v1", brandIdentitiesRoutes);
+app.route("/v1", brandColorsRoutes);
 app.route("/v1", integrationsRoutes);
 app.route("/v1", schedulesRoutes);
 app.route("/v1", eventTriggersRoutes);
