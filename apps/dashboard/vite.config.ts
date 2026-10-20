@@ -21,7 +21,10 @@ export default defineConfig(({ mode }) => {
   );
 
   return {
-    build: { reportCompressedSize: false },
+    build: {
+      reportCompressedSize: false,
+      rolldownOptions: { checks: { moduleLevelDirective: false } },
+    },
     define,
     environments: {
       client: {
