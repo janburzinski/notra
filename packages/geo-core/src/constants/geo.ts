@@ -48,7 +48,6 @@ export const GEO_OPENAI_API_KEY_ENV = "OPENAI_API_KEY";
 export const GEO_ANTHROPIC_API_KEY_ENV = "ANTHROPIC_API_KEY";
 export const GEO_PERPLEXITY_API_KEY_ENV = "PERPLEXITY_API_KEY";
 export const GEO_CURSOR_API_KEY_ENV = "CURSOR_API_KEY";
-export const GEO_SERPAPI_API_KEY_ENV = "SERPAPI_API_KEY";
 
 /** Catalog id of the Cursor engine; the SDK model id is the slug part. */
 export const GEO_CURSOR_ENGINE_ID = "cursor/composer-2.5";
@@ -89,11 +88,9 @@ export const GEO_PAID_CODING_AGENT_ENGINE_IDS: readonly string[] = [
   GEO_CURSOR_ENGINE_ID,
   ...GEO_CODING_AGENT_ENGINE_IDS,
 ];
-export const GEO_AI_OVERVIEW_ENGINE_ID = "google/ai-overview";
 export const GEO_PROVIDER_TIMEOUT_MS = 120_000;
 export const GEO_ANSWER_TIMEOUT_MS = 180_000;
 export const GEO_CURSOR_TIMEOUT_MS = GEO_ANSWER_TIMEOUT_MS;
-export const GEO_AI_OVERVIEW_TIMEOUT_MS = GEO_ANSWER_TIMEOUT_MS;
 export const GEO_FLAG_CACHE_TTL_MS = 60_000;
 export const GEO_FLAG_STALE_TIME_MS = 30_000;
 export const GEO_FLAG_ERROR_REASON = "ERROR";

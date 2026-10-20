@@ -12,7 +12,8 @@ const geoOlostepQuerySchema = object({ query: string() });
 
 /**
  * Fields shared by Olostep's GEO parsers (ChatGPT, Perplexity, Gemini,
- * Copilot, Google AI Mode). Engine-specific modules are ignored.
+ * Copilot, Google AI Mode and AI Overview). Engine-specific modules are
+ * ignored.
  */
 export const geoOlostepAnswerSchema = object({
   answer_markdown: string().nullish(),
@@ -22,6 +23,7 @@ export const geoOlostepAnswerSchema = object({
   network_search_calls: object({
     search_queries: array(geoOlostepQuerySchema).nullish(),
   }).nullish(),
+  message: string().nullish(),
 });
 
 export const geoOlostepBatchSchema = object({

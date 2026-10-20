@@ -27,8 +27,6 @@ import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { Effect } from "effect";
 
 import {
-  GEO_AI_OVERVIEW_ENGINE_ID,
-  GEO_AI_OVERVIEW_TIMEOUT_MS,
   GEO_ANSWER_TIMEOUT_MS,
   GEO_CODING_AGENT_ENGINE_IDS,
   GEO_CURSOR_TIMEOUT_MS,
@@ -104,7 +102,7 @@ import {
   geoLogWarn,
   logGeoSkip,
 } from "../utils/geo-log";
-import { isGeoOlostepEngine } from "../utils/geo-olostep";
+import { isGeoOlostepConversationEngine } from "../utils/geo-olostep";
 import { hasOwnedSourceCitation } from "../utils/geo-owned-source";
 import {
   interleaveGeoScanItemsByKey,
@@ -129,7 +127,6 @@ import {
   geoCheckWriteUsage,
   snapshotUsageByRole,
 } from "../utils/token-usage";
-import { fetchGoogleAiOverview } from "./ai-overview";
 import { judgeAnswer, requireAnswerText } from "./check-evaluation";
 import { requireGeoCodingAgentAccess } from "./coding-agent-access";
 import { runGeoConversation } from "./conversation";
@@ -395,58 +392,12 @@ const askCursorEngineEffect = Effect.fn("geo.askCursorEngine")(function* (
   return answer;
 });
 
-/**
- * Google AI Overview is a SERP, not an LLM. A missing overview is stored as a
- * not-mentioned check rather than dropped as an empty engine answer.
- */
-const askAiOverviewEngineEffect = Effect.fn("geo.askAiOverviewEngine")(
-  function* (engine: string, promptText: string, language: string) {
-    const result = yield* fetchGoogleAiOverview(promptText, language).pipe(
-      Effect.mapError(
-        (cause) =>
-          new GeoScanError({
-            message: `Engine ${engine} failed to answer`,
-            cause,
-          })
-      ),
-      Effect.timeoutOrElse({
-        duration: GEO_AI_OVERVIEW_TIMEOUT_MS,
-        orElse: () =>
-          Effect.fail(
-            new GeoScanError({
-              message: `Engine ${engine} timed out after ${GEO_AI_OVERVIEW_TIMEOUT_MS}ms`,
-              timedOut: true,
-            })
-          ),
-      })
-    );
-    const overviewSources = result.sources.slice(
-      0,
-      GEO_CHECK_GROUNDING_MAX_SOURCES
-    );
-    const sources = overviewSources.map(({ title, url }) => ({ title, url }));
-    const answer: GeoEngineAnswer = {
-      text: result.present ? result.text : "",
-      grounding: {
-        queries: [promptText],
-        sources: overviewSources,
-      },
-      sources,
-      finishReason: result.present ? "stop" : null,
-      zdrEnforced: false,
-      absent: !result.present,
-    };
-    return answer;
-  }
-);
-
 const askEngine = Effect.fn("geo.askEngine")(function* (
   organizationId: string,
   engine: string,
   promptText: string,
   zdr: GeoZdrMode,
   gatewayPin: GeoModelGateway | undefined,
-  language: string,
   logContext: GatewayModelOptions["logContext"],
   olostepRetrieveId?: string
 ) {
@@ -461,9 +412,6 @@ const askEngine = Effect.fn("geo.askEngine")(function* (
   }
   if (gatewayPin === "box") {
     return yield* askOpenCodeEngineEffect(engine, promptText);
-  }
-  if (gatewayPin === "serpapi" || engine === GEO_AI_OVERVIEW_ENGINE_ID) {
-    return yield* askAiOverviewEngineEffect(engine, promptText, language);
   }
   const models = yield* GeoModelService;
   return yield* models.answer({
@@ -505,7 +453,6 @@ const runGeoCheck = Effect.fn("geo.runCheck")(function* (
       task.prompt.text,
       task.zdr,
       resolveGeoEngineGateway(context.catalog, task.engine),
-      task.language,
       logContext,
       task.olostepRetrieveId
     ));
@@ -1084,7 +1031,7 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
         engine === GEO_OPENCODE_ENGINE_ID || isGeoBoxCodingAgent(engine)
     );
     const olostepEngines = rawEngines.filter(({ engine }) =>
-      isGeoOlostepEngine(engine)
+      isGeoOlostepConversationEngine(engine)
     );
     const sequences: GeoScanPlannedSequence[] =
       scanSourceLanguage || scopedSequenceIds.length > 0

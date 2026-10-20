@@ -8,7 +8,7 @@ import type {
 } from "../types/geo";
 import { resolveGeoZdrMode } from "../utils/geo-engines";
 import { geoLogWarn } from "../utils/geo-log";
-import { isGeoOlostepEngine } from "../utils/geo-olostep";
+import { isGeoOlostepConversationEngine } from "../utils/geo-olostep";
 import { geoSkip } from "./effect";
 import { startGeoScanScoped } from "./programs";
 
@@ -24,7 +24,7 @@ export const resolveGeoManualOlostepEngines = Effect.fn(
   const allowed: string[] = [];
   for (const engine of engines) {
     if (
-      !isGeoOlostepEngine(engine) ||
+      !isGeoOlostepConversationEngine(engine) ||
       !catalog.models.some((model) => model.id === engine)
     ) {
       continue;

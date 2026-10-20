@@ -1,5 +1,4 @@
 import {
-  GEO_AI_OVERVIEW_ENGINE_ID,
   GEO_DIRECT_GROUNDED_PROVIDERS,
   GEO_OPENCODE_ENGINE_ID,
   GEO_PAID_CODING_AGENT_ENGINE_IDS,
@@ -96,8 +95,8 @@ export function isPartialGeoScanEngineScope(
 }
 
 /**
- * Bare catalog calls that still search the web: Google AI Overview (SerpApi),
- * consumer apps scraped through Olostep, and Box coding agents. Cursor is
+ * Bare catalog calls that still search the web: consumer apps and Google AI
+ * Overview scraped through Olostep, and Box coding agents. Cursor is
  * excluded — it runs with no tools.
  */
 export function isGeoNativeSearchEngine(
@@ -105,7 +104,7 @@ export function isGeoNativeSearchEngine(
   engine: string
 ): boolean {
   const gateway = resolveGeoEngineGateway(catalog, engine);
-  return gateway === "serpapi" || gateway === "box" || gateway === "olostep";
+  return gateway === "box" || gateway === "olostep";
 }
 
 /** Whether a catalog model runs with web search: grounded route or native search. */
@@ -124,7 +123,6 @@ export function isGeoWebSearchEngine(
 export function geoEngineUsedWebSearch(engine: string): boolean {
   return (
     engineModelOf(engine) !== engine ||
-    engine === GEO_AI_OVERVIEW_ENGINE_ID ||
     isGeoOlostepEngine(engine) ||
     engine === GEO_OPENCODE_ENGINE_ID ||
     isGeoBoxCodingAgent(GEO_MODEL_REPLACED_IDS[engine] ?? engine)

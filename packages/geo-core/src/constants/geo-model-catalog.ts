@@ -404,10 +404,9 @@ export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
 /**
  * Models that do not run through the Notra AI router. They are appended to the
  * catalog instead of coming from the gateway feed. `zdr: "none"` because
- * neither Cursor, Box, SerpApi, nor Olostep exposes an enforceable ZDR route;
- * under enforced ZDR each engine therefore needs explicit approval before it
- * is scanned. Google AI Overview is fetched through SerpApi and is also
- * non-ZDR.
+ * neither Cursor, Box, nor Olostep exposes an enforceable ZDR route; under
+ * enforced ZDR each engine therefore needs explicit approval before it is
+ * scanned.
  */
 export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
   {
@@ -525,7 +524,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     zdr: "none",
     released: "2026-09-05",
     default: false,
-    gateways: ["serpapi"],
+    gateways: ["olostep"],
   },
   {
     id: "openai/chatgpt",
@@ -654,7 +653,7 @@ export const GEO_STATIC_ENGINE_ENV: Readonly<
   "fx/claude-sonnet-5.5": GEO_BOX_ENGINE_ENV,
   "fx/kimi-k3": GEO_BOX_ENGINE_ENV,
   "fx/grok-4.7": GEO_BOX_ENGINE_ENV,
-  "google/ai-overview": ["SERPAPI_API_KEY"],
+  "google/ai-overview": [GEO_OLOSTEP_API_KEY_ENV],
   "openai/chatgpt": [GEO_OLOSTEP_API_KEY_ENV],
   "perplexity/perplexity": [GEO_OLOSTEP_API_KEY_ENV],
   "google/gemini": [GEO_OLOSTEP_API_KEY_ENV],

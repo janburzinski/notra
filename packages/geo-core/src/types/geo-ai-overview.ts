@@ -1,6 +1,6 @@
 import type { GeoAnswerSource } from "./geo";
 
-/** Locale pair SerpApi's Google engine expects (`hl` language, `gl` country). */
+/** Google locale pair (`hl` language, `gl` country). */
 export interface GeoAiOverviewLocale {
   hl: string;
   gl: string;
@@ -29,9 +29,3 @@ export type GeoAiOverviewParse =
       status: "invalid";
       reason: string;
     };
-
-export interface GeoAiOverviewResult {
-  present: boolean;
-  text: string;
-  sources: GeoAiOverviewSource[];
-}

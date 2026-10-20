@@ -1471,16 +1471,14 @@ type GeoModelZdr = "all" | "some" | "none";
 
 /**
  * Where a model is served. `cursor` runs through the Cursor SDK, `box`
- * through OpenCode, Claude Code, Codex, and fx in Upstash Box, and `serpapi`
- * through SerpApi's Google AI Overview endpoint — none of those go through
- * the AI router.
+ * through OpenCode, Claude Code, Codex, and fx in Upstash Box, and `olostep`
+ * through Olostep's hosted browsers — none of those go through the AI router.
  */
 export type GeoModelGateway =
   | "vercel"
   | "openrouter"
   | "cursor"
   | "box"
-  | "serpapi"
   | "olostep";
 
 export interface GeoModelProvider {

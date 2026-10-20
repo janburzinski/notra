@@ -6,6 +6,11 @@ import type { GeoScanProjectPlan } from "./geo";
 export interface GeoOlostepEngine {
   parser: string;
   url: (query: string) => string;
+  /**
+   * Chat apps also run sequences and personas. A search page has no chat, so
+   * a SERP engine only answers tracked prompts.
+   */
+  conversational: boolean;
 }
 
 export type GeoOlostepAnswerPayload = output<typeof geoOlostepAnswerSchema>;

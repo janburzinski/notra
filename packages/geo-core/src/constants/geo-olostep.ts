@@ -15,35 +15,48 @@ export const GEO_OLOSTEP_ITEMS_PAGE_LIMIT = 100;
 export const GEO_OLOSTEP_TERMINAL_BATCH_STATUSES: ReadonlySet<string> = new Set(
   ["completed", "failed", "cancelled"]
 );
+/** What the AI Overview parser reports when Google showed no overview. */
+export const GEO_OLOSTEP_NO_AI_OVERVIEW_MESSAGE = "no-ai-overview-found";
 /** Keeps the persona intro short enough for a prompt URL. */
 export const GEO_OLOSTEP_PERSONA_INTRO_MAX_CHARS = 600;
 
 /**
- * Consumer AI apps queried through Olostep's hosted browsers instead of the
- * model APIs. Each engine id maps to its parser and the URL that submits the
+ * Consumer AI apps and Google's AI Overview queried through Olostep's hosted
+ * browsers instead of the model APIs. Each engine id maps to its parser and the URL that submits the
  * prompt.
  */
 export const GEO_OLOSTEP_ENGINES: Readonly<Record<string, GeoOlostepEngine>> = {
   "openai/chatgpt": {
     parser: "@olostep/chatgpt-results",
     url: (query) => `https://chatgpt.com/?q=${encodeURIComponent(query)}`,
+    conversational: true,
   },
   "perplexity/perplexity": {
     parser: "@olostep/perplexity-results",
     url: (query) => `https://www.perplexity.ai/?q=${encodeURIComponent(query)}`,
+    conversational: true,
   },
   "google/gemini": {
     parser: "@olostep/gemini-results",
     url: (query) => `https://gemini.google.com/?q=${encodeURIComponent(query)}`,
+    conversational: true,
   },
   "google/ai-mode": {
     parser: "@olostep/google-aimode-results",
     url: (query) =>
       `https://www.google.com/aimode?q=${encodeURIComponent(query)}`,
+    conversational: true,
+  },
+  "google/ai-overview": {
+    parser: "@olostep/google-ai-overview-results",
+    url: (query) =>
+      `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+    conversational: false,
   },
   "microsoft/copilot": {
     parser: "@olostep/microsoft-copilot-results",
     url: (query) =>
       `https://copilot.microsoft.com/chats?q=${encodeURIComponent(query)}`,
+    conversational: true,
   },
 };

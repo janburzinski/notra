@@ -4,6 +4,7 @@ import {
 } from "@notra/db/constants/geo-checks";
 import type { GeoCheckSource } from "@notra/db/types/geo-checks";
 
+import { GEO_OLOSTEP_NO_AI_OVERVIEW_MESSAGE } from "../constants/geo-olostep";
 import type { GeoEngineAnswer } from "../types/geo";
 import type {
   GeoOlostepAnswerPayload,
@@ -33,6 +34,8 @@ function uniqueSources(sources: readonly GeoOlostepSource[]): GeoCheckSource[] {
  * list: every reader of `grounding.sources` shows it as the answer's sources,
  * so uncited search candidates would read as citations. The search queries
  * remain as the search evidence.
+ *
+ * Google showing no AI Overview is a miss to store, not an engine failure.
  */
 export function geoOlostepAnswer(
   payload: GeoOlostepAnswerPayload
@@ -58,5 +61,6 @@ export function geoOlostepAnswer(
     sources: cited.map(({ title, url }) => ({ title, url })),
     finishReason: text ? "stop" : null,
     zdrEnforced: false,
+    absent: payload.message === GEO_OLOSTEP_NO_AI_OVERVIEW_MESSAGE,
   };
 }

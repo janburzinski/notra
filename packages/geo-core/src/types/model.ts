@@ -29,9 +29,7 @@ export interface GeoModelServiceShape {
     logContext?: GatewayModelOptions["logContext"];
     prompt: string;
     zdr: GeoZdrMode;
-    gateway:
-      | Exclude<GeoModelGateway, "cursor" | "box" | "serpapi" | "olostep">
-      | undefined;
+    gateway: Exclude<GeoModelGateway, "cursor" | "box" | "olostep"> | undefined;
   }) => Effect.Effect<GeoEngineAnswer, GeoScanError>;
   readonly groundedAnswer: (input: {
     organizationId: string;

@@ -491,11 +491,9 @@ describe("released consumer apps", () => {
   test("only ChatGPT and Gemini ship, even from stale settings", () => {
     const previous = {
       olostep: process.env.GEO_OLOSTEP_API_KEY_ENV,
-      serpapi: process.env.SERPAPI_API_KEY,
     };
     try {
       process.env.GEO_OLOSTEP_API_KEY_ENV = "test-key";
-      process.env.SERPAPI_API_KEY = "test-key";
       const feed = unreleased.map((id) => ({
         id,
         name: id,
@@ -510,9 +508,9 @@ describe("released consumer apps", () => {
         const ids = available.models.map((model) => model.id);
         expect(ids.filter(isGeoOlostepEngine)).toEqual([
           "openai/chatgpt",
+          "google/ai-overview",
           "google/gemini",
         ]);
-        expect(ids).toContain("google/ai-overview");
         expect(
           resolveTrackedEngines(available, [...unreleased, "openai/chatgpt"])
         ).toEqual(["openai/chatgpt"]);
@@ -541,7 +539,6 @@ describe("released consumer apps", () => {
     } finally {
       for (const [key, value] of [
         ["GEO_OLOSTEP_API_KEY_ENV", previous.olostep],
-        ["SERPAPI_API_KEY", previous.serpapi],
       ] as const) {
         if (value === undefined) {
           delete process.env[key];
