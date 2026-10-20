@@ -12,6 +12,9 @@
     "eyebrows": "breadcrumbs",
     "codeblocks": "system"
   },
+  "thumbnails": {
+    "preset": "headline"
+  },
   "favicon": "/favicon.svg",
   "redirects": [
     {
