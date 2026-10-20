@@ -209,6 +209,22 @@ export function useCreateGuidelineColor(
   });
 }
 
+export function useDeleteGuidelineColor(
+  organizationId: string,
+  voiceId: string
+) {
+  return useGuidelineMutation<string>({
+    mutationFn: (colorId) =>
+      dashboardOrpc.brand.guidelines.deleteColor.call({
+        organizationId,
+        voiceId,
+        colorId,
+      }),
+    organizationId,
+    voiceId,
+  });
+}
+
 export function useCreateGuidelineAsset(
   organizationId: string,
   voiceId: string

@@ -1579,6 +1579,8 @@
         "added": "Color added",
         "updated": "Color updated",
         "saveFailed": "Failed to save color",
+        "deleted": "Color deleted",
+        "deleteFailed": "Failed to delete color",
         "editTitle": "Edit color",
         "addDescription": "Add a brand color and how it is used.",
         "editDescription": "Update this brand color and how it is used.",

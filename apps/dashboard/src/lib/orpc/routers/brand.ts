@@ -940,6 +940,33 @@ export const brandRouter = {
 
         return getBrandGuidelines(input.voiceId);
       }),
+    deleteColor: baseProcedure
+      .input(
+        voiceInputSchema.and(updateGuidelineColorSchema.pick({ colorId: true }))
+      )
+      .use(withOrganizationAccess)
+      .handler(async ({ input }) => {
+        const guidelineId = await getEditableGuidelineId(
+          input.organizationId,
+          input.voiceId
+        );
+
+        const deleted = await db
+          .delete(brandGuidelineColors)
+          .where(
+            and(
+              eq(brandGuidelineColors.id, input.colorId),
+              eq(brandGuidelineColors.guidelineId, guidelineId)
+            )
+          )
+          .returning({ id: brandGuidelineColors.id });
+
+        if (deleted.length === 0) {
+          throw notFound("Color not found");
+        }
+
+        return getBrandGuidelines(input.voiceId);
+      }),
     createAsset: baseProcedure
       .input(voiceInputSchema.and(createGuidelineAssetSchema))
       .use(withOrganizationAccess)

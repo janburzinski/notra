@@ -1579,6 +1579,8 @@
         "added": "Farbe hinzugefügt",
         "updated": "Farbe aktualisiert",
         "saveFailed": "Farbe konnte nicht gespeichert werden",
+        "deleted": "Farbe gelöscht",
+        "deleteFailed": "Farbe konnte nicht gelöscht werden",
         "editTitle": "Farbe bearbeiten",
         "addDescription": "Füge eine Markenfarbe hinzu und lege fest, wie sie verwendet wird.",
         "editDescription": "Aktualisiere diese Markenfarbe und wie sie verwendet wird.",

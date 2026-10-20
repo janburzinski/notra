@@ -36,10 +36,6 @@ export function GuidelinesColorsSection({
   const [creatingRole, setCreatingRole] =
     useState<BrandGuidelineColorRole | null>(null);
 
-  if (colors.length === 0) {
-    return null;
-  }
-
   const missingRoles = EXPECTED_COLOR_ROLES.filter(
     (role) => !colors.some((color) => color.role === role)
   );
