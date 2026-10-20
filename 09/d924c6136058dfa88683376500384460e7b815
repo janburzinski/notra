@@ -1,0 +1,23 @@
+scripts/testing/dashboard/run.ts
+  s_44cf84a7c2985f::t_a6666bb1130360 4-10,358-362
+apps/sites-e2e/tests/connected-lifecycle-postgres.test.ts
+  s_44cf84a7c2985f::t_a6666bb1130360 168,172-182,832-845
+apps/sites-e2e/tests/utils/lifecycle-journal.ts
+  s_44cf84a7c2985f::t_a6666bb1130360 70,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "09d924c6136058dfa88683376500384460e7b815",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
