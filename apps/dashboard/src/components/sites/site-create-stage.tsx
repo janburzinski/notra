@@ -21,6 +21,8 @@ export function SiteCreateStage({
     offset: number;
     top: number;
     resized: boolean;
+    /** Set when the active card is taller than the track, so it isn't clipped. */
+    minHeight: number | null;
   } | null>(null);
 
   useLayoutEffect(() => {
@@ -34,8 +36,9 @@ export function SiteCreateStage({
       if (!card) {
         return;
       }
+      // >= so the min height set below keeps the card counted as tall.
       const tall =
-        card.offsetHeight > track.clientHeight - SITE_CREATE_STAGE_EDGE_PX * 2;
+        card.offsetHeight >= track.clientHeight - SITE_CREATE_STAGE_EDGE_PX * 2;
       let offset =
         track.clientHeight / 2 - (card.offsetTop + card.offsetHeight / 2);
       if (activeIndex === 0) {
@@ -43,7 +46,14 @@ export function SiteCreateStage({
       } else if (tall) {
         offset = SITE_CREATE_STAGE_EDGE_PX - card.offsetTop;
       }
-      setPosition({ offset, top: offset + card.offsetTop, resized });
+      setPosition({
+        offset,
+        top: offset + card.offsetTop,
+        resized,
+        minHeight: tall
+          ? card.offsetHeight + SITE_CREATE_STAGE_EDGE_PX * 2
+          : null,
+      });
     };
     measure(false);
     const observer = new ResizeObserver(() => measure(true));
@@ -82,8 +92,18 @@ export function SiteCreateStage({
         </div>
       </div>
       <div
-        className="relative max-w-xl min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_4%,black_90%,transparent)]"
+        className={cn(
+          "relative max-w-xl min-w-0 flex-1 overflow-hidden",
+          // The first card sits at the top edge, so only fade above once a
+          // previous card has scrolled out.
+          activeIndex === 0
+            ? "[mask-image:linear-gradient(to_bottom,black_90%,transparent)]"
+            : "[mask-image:linear-gradient(to_bottom,transparent,black_4%,black_90%,transparent)]"
+        )}
         ref={trackRef}
+        style={
+          position?.minHeight ? { minHeight: position.minHeight } : undefined
+        }
       >
         <div
           className={cn(

@@ -18,7 +18,6 @@ import { eq } from "drizzle-orm";
 
 import {
   ONBOARDING_STEP_COMPETITORS,
-  ONBOARDING_STEP_AUTOPILOT,
   ONBOARDING_STEP_PRICING,
   ONBOARDING_STEP_VISIBILITY,
   ONBOARDING_STEP_WORKSPACE,
@@ -28,7 +27,6 @@ import {
   getSession,
   validateOrganizationAccess,
 } from "@/lib/auth/actions";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { hasPaidSubscriptionHistory } from "@/lib/billing/subscription";
 import { redirectIfAnyOrganizationHasPaidHistory } from "@/lib/onboarding/billing-gate";
 import { redirectIfOnboardingDismissed } from "@/lib/onboarding/dismissal";
@@ -38,7 +36,6 @@ import {
   geoDashboardPath,
   geoOnboardingCompetitorsPath,
   geoOnboardingPath,
-  geoOnboardingAutopilotPath,
   geoOnboardingPricingPath,
   geoOnboardingWorkspacePath,
   withGeoProject,
@@ -140,7 +137,7 @@ export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
       projectId,
       replay
     );
-    const [brand, existingOrg, notificationSettings, stage, user, autopilot] =
+    const [brand, existingOrg, notificationSettings, stage, user] =
       await Promise.all([
         db.query.brandSettings.findFirst({
           where: eq(brandSettings.organizationId, organization.id),
@@ -169,7 +166,6 @@ export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
           where: eq(users.id, userId),
           columns: { marketingOptInAt: true },
         }),
-        isAutopilotEnabledForOrganization(organization.id),
       ]);
     return {
       existingOrg: existingOrg
@@ -183,7 +179,6 @@ export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
         : undefined,
       progressHrefs: onboardingProgressHrefs({
         current: ONBOARDING_STEP_WORKSPACE,
-        autopilot,
         hasOrganization: true,
         hasBrand: Boolean(brand),
         projectId,
@@ -198,10 +193,9 @@ export const loadOnboardingVisibility = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { organization, projectId, replay, brand } =
       await onboardingBrandContext(data);
-    const [{ stage, languages }, paid, autopilot] = await Promise.all([
+    const [{ stage, languages }, paid] = await Promise.all([
       getGeoOnboardingSnapshot(organization.id, projectId),
       hasPaidSubscriptionHistory(organization.id),
-      isAutopilotEnabledForOrganization(organization.id),
     ]);
     const inOnboardingFlow = replay || !paid;
     return {
@@ -215,7 +209,6 @@ export const loadOnboardingVisibility = createServerFn({ method: "GET" })
       organizationId: organization.id,
       progressHrefs: onboardingProgressHrefs({
         current: ONBOARDING_STEP_VISIBILITY,
-        autopilot,
         hasBrand: true,
         hasOrganization: true,
         projectId,
@@ -236,60 +229,17 @@ export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { organization, projectId, replay, brand } =
       await onboardingBrandContext(data);
-    const [stage, paid, autopilot] = await Promise.all([
+    const [stage, paid] = await Promise.all([
       getGeoOnboardingStage(organization.id, projectId),
       hasPaidSubscriptionHistory(organization.id),
-      isAutopilotEnabledForOrganization(organization.id),
     ]);
     const inOnboardingFlow = replay || !paid;
     if (!replay && stage === "brand") {
       throw redirect({ href: geoOnboardingPath(projectId) });
     }
-    // The Autopilot step only exists for workspaces that have the flag.
-    const nextOnboardingHref = autopilot
-      ? geoOnboardingAutopilotPath(projectId)
-      : geoOnboardingPricingPath(projectId);
     return {
       companyName: brand.companyName ?? "",
       domain: normalizeCompetitorDomain(brand.websiteUrl),
-      inOnboardingFlow,
-      nextHref:
-        inOnboardingFlow && !replay
-          ? nextOnboardingHref
-          : geoDashboardPath(organization.slug, projectId),
-      organizationId: organization.id,
-      progressHrefs: onboardingProgressHrefs({
-        current: ONBOARDING_STEP_COMPETITORS,
-        autopilot,
-        hasBrand: true,
-        hasOrganization: true,
-        projectId,
-        replay,
-        stage,
-      }),
-      projectId,
-    };
-  });
-
-export const loadOnboardingAutopilot = createServerFn({ method: "GET" })
-  .validator((data: UiRouteInput) => data)
-  .handler(async ({ data }) => {
-    const { organization, projectId, replay } =
-      await onboardingBrandContext(data);
-    const [stage, paid, autopilot] = await Promise.all([
-      getGeoOnboardingStage(organization.id, projectId),
-      hasPaidSubscriptionHistory(organization.id),
-      isAutopilotEnabledForOrganization(organization.id),
-    ]);
-    const inOnboardingFlow = replay || !paid;
-    if (!replay && stage === "brand") {
-      throw redirect({ href: geoOnboardingPath(projectId) });
-    }
-    if (!autopilot) {
-      throw redirect({ href: geoOnboardingPricingPath(projectId, replay) });
-    }
-    return {
-      callbackPath: geoOnboardingAutopilotPath(projectId, replay),
       inOnboardingFlow,
       nextHref:
         inOnboardingFlow && !replay
@@ -297,8 +247,7 @@ export const loadOnboardingAutopilot = createServerFn({ method: "GET" })
           : geoDashboardPath(organization.slug, projectId),
       organizationId: organization.id,
       progressHrefs: onboardingProgressHrefs({
-        current: ONBOARDING_STEP_AUTOPILOT,
-        autopilot,
+        current: ONBOARDING_STEP_COMPETITORS,
         hasBrand: true,
         hasOrganization: true,
         projectId,
@@ -323,17 +272,15 @@ export const loadOnboardingPricing = createServerFn({ method: "GET" })
       projectId,
       replay
     );
-    const [stage, { member }, autopilot] = await Promise.all([
+    const [stage, { member }] = await Promise.all([
       getGeoOnboardingStage(organization.id, projectId),
       validateOrganizationAccess(organization.slug),
-      isAutopilotEnabledForOrganization(organization.id),
     ]);
     return {
       canSkipOnboarding: member?.role === "owner" || member?.role === "admin",
       closeHref: withGeoProject(`/${organization.slug}`, projectId),
       progressHrefs: onboardingProgressHrefs({
         current: ONBOARDING_STEP_PRICING,
-        autopilot,
         hasBrand: true,
         hasOrganization: true,
         projectId,

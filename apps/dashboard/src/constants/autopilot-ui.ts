@@ -1,13 +1,16 @@
 import {
   AiMagicIcon,
   Cancel01Icon,
+  Clock01Icon,
   FilterIcon,
   GitBranchIcon,
+  GitPullRequestIcon,
   Image02Icon,
   MinusSignCircleIcon,
   PencilEdit02Icon,
   Robot01Icon,
   Search01Icon,
+  SlackIcon,
   Tick02Icon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
@@ -37,6 +40,62 @@ export const AUTOPILOT_PAGE_TABS = [
   "runs",
   "settings",
 ] as const;
+
+/** What Autopilot does, as the boxes of the first setup step. */
+export const AUTOPILOT_SETUP_HIGHLIGHTS = [
+  {
+    icon: Clock01Icon,
+    title: "Every morning",
+    description: "Runs once a day, at your time.",
+  },
+  {
+    icon: GitPullRequestIcon,
+    title: "Draft pull requests",
+    description: "Fixes and new posts.",
+  },
+  {
+    icon: SlackIcon,
+    title: "Daily brief",
+    description: "A short summary in Slack.",
+  },
+  {
+    icon: Tick02Icon,
+    title: "You decide",
+    description: "Nothing ships without a merge.",
+  },
+] as const satisfies readonly {
+  icon: IconSvgElement;
+  title: string;
+  description: string;
+}[];
+
+/** Steps of the first setup on the Autopilot page, in order. */
+export const AUTOPILOT_SETUP_STEP_IDS = [
+  "intro",
+  "automations",
+  "connect",
+] as const;
+
+export const AUTOPILOT_SETUP_STEPS = {
+  intro: {
+    label: "Overview",
+    title: "Let Notra work for you every day",
+    description: "Autopilot checks your site every morning and does the work.",
+  },
+  automations: {
+    label: "Automations",
+    title: "Automations",
+    description: "Pick what Autopilot does for you.",
+  },
+  connect: {
+    label: "Connect",
+    title: "Connect",
+    description: "Your repo for pull requests, Slack for the brief.",
+  },
+} as const satisfies Record<
+  (typeof AUTOPILOT_SETUP_STEP_IDS)[number],
+  { label: string; title: string; description: string }
+>;
 
 /** What a Slack brief button asks the Autopilot page to do with ?finding=…&action=… */
 export const AUTOPILOT_LINK_ACTIONS = ["merge", "dismiss"] as const;

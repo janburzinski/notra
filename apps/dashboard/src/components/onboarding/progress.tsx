@@ -1,21 +1,20 @@
 import { useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
+import { ONBOARDING_STEP_COUNT } from "@/constants/onboarding";
 import { cn } from "@/lib/utils";
 import type { OnboardingProgressProps } from "@/types/onboarding";
-import { onboardingSteps } from "@/utils/onboarding-progress";
 
-// Before a workspace exists its flags are unknown, so show the base flow.
-const FALLBACK_STEPS = onboardingSteps(false).map((step) => ({
-  step,
-  href: null,
-}));
+const STEPS = Array.from(
+  { length: ONBOARDING_STEP_COUNT },
+  (_, index) => index + 1
+);
 
-function getStepClasses(position: number, current: number) {
-  if (position === current) {
+function getStepClasses(step: number, current: number) {
+  if (step === current) {
     return "w-6 bg-primary";
   }
-  if (position < current) {
+  if (step < current) {
     return "w-1.5 bg-primary/60";
   }
   return "w-1.5 bg-muted-foreground/30";
@@ -26,25 +25,19 @@ export function OnboardingProgress({
   hrefs,
 }: OnboardingProgressProps) {
   const t = useTranslations("onboarding.progress");
-  const steps = hrefs ?? FALLBACK_STEPS;
-  const currentPosition =
-    steps.findIndex((entry) => entry.step === current) + 1;
   return (
     <nav
-      aria-label={t("label", {
-        current: currentPosition,
-        total: steps.length,
-      })}
+      aria-label={t("label", { current, total: STEPS.length })}
       className="flex items-center"
     >
-      {steps.map(({ step, href }, index) => {
-        const position = index + 1;
+      {STEPS.map((step) => {
+        const href = hrefs?.[step - 1];
         const pill = (
           <span
             aria-current={step === current ? "step" : undefined}
             className={cn(
               "block h-1.5 rounded-full transition-all",
-              getStepClasses(position, currentPosition)
+              getStepClasses(step, current)
             )}
           />
         );

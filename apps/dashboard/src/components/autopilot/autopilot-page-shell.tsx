@@ -68,7 +68,7 @@ export function AutopilotPageShell({
   }
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full space-y-6 px-4 lg:px-6">
+      <div className="w-full space-y-6 px-4 has-[[data-autopilot-fill]]:flex has-[[data-autopilot-fill]]:flex-1 has-[[data-autopilot-fill]]:flex-col lg:px-6">
         {children({ organizationId, overview })}
       </div>
     </PageContainer>

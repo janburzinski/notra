@@ -50,13 +50,6 @@ export function geoOnboardingCompetitorsPath(
   return onboardingPath(base, projectId, replay);
 }
 
-export function geoOnboardingAutopilotPath(
-  projectId?: string,
-  replay = false
-): string {
-  return onboardingPath("/onboarding/autopilot", projectId, replay);
-}
-
 export function geoOnboardingPricingPath(
   projectId?: string,
   replay = false

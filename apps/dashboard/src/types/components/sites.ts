@@ -665,9 +665,9 @@ export interface SiteCreateStepProps {
   children: ReactNode;
 }
 
-export interface SiteCreateStepListProps {
-  steps: { id: SiteCreateStepId; label: string; state: SiteCreateStepState }[];
-  onSelect: (id: SiteCreateStepId) => void;
+export interface SiteCreateStepListProps<Id extends string = SiteCreateStepId> {
+  steps: { id: Id; label: string; state: SiteCreateStepState }[];
+  onSelect: (id: Id) => void;
 }
 
 export interface SiteCreateScrollListProps {

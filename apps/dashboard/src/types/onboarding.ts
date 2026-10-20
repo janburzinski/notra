@@ -21,14 +21,7 @@ export interface CompanyLogoResult {
   url: string | null;
 }
 
-export interface OnboardingProgressStep {
-  /** Stable step id from `ONBOARDING_STEP_*`, not the position in the flow. */
-  step: number;
-  href: string | null;
-}
-
-/** Visible steps in order; its length is the flow's step count. */
-export type OnboardingProgressHrefs = readonly OnboardingProgressStep[];
+export type OnboardingProgressHrefs = readonly (string | null)[];
 
 export interface PricingClientProps {
   canSkipOnboarding: boolean;
@@ -87,8 +80,6 @@ export interface OnboardingProgressHrefInput {
   stage: GeoOnboardingStage | null;
   projectId?: string;
   replay?: boolean;
-  /** Whether the workspace has the Autopilot flag, which adds its step. */
-  autopilot: boolean;
 }
 
 export interface VisibilityFormProps {

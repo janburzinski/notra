@@ -7,12 +7,15 @@ import type { InferRouterOutputs } from "@orpc/server";
 import type { ReactNode } from "react";
 import type * as z from "zod";
 
-import type { AUTOPILOT_PAGE_TABS } from "@/constants/autopilot-ui";
+import type {
+  AUTOPILOT_PAGE_TABS,
+  AUTOPILOT_SETUP_STEP_IDS,
+} from "@/constants/autopilot-ui";
+import type { useAutopilotSetup } from "@/lib/hooks/use-autopilot-setup";
 import type { DashboardRouter } from "@/lib/orpc/router";
 import type { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
 import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
-import type { OnboardingProgressHrefs } from "@/types/onboarding";
 
 export interface AutopilotRepository {
   owner: string;
@@ -117,15 +120,6 @@ export interface AutopilotPageClientProps {
   organizationSlug: string;
 }
 
-export interface AutopilotOnboardingStepProps {
-  organizationId: string;
-  callbackPath: string;
-  nextHref: string;
-  inOnboardingFlow: boolean;
-  progressHrefs: OnboardingProgressHrefs;
-  projectId?: string;
-}
-
 type AutopilotRunEventView =
   InferRouterOutputs<DashboardRouter>["autopilot"]["runEvents"][number];
 
@@ -213,8 +207,29 @@ export interface AutopilotFindingCandidate {
 export interface AutopilotSetupRowProps {
   icon: ReactNode;
   title: string;
+  description?: string;
   children: ReactNode;
 }
+
+export type AutopilotRepositoryOption =
+  InferRouterOutputs<DashboardRouter>["autopilot"]["repositories"][number];
+
+export interface AutopilotRepositoryPickerProps {
+  id?: string;
+  repositories: AutopilotRepositoryOption[];
+  /** owner/name of the chosen repository. */
+  value: string | null;
+  onChange: (repository: AutopilotRepositoryOption) => void;
+  className?: string;
+}
+
+export type AutopilotSetupState = ReturnType<typeof useAutopilotSetup>;
+
+export interface AutopilotSetupRowsProps {
+  setup: AutopilotSetupState;
+}
+
+export type AutopilotSetupStepId = (typeof AUTOPILOT_SETUP_STEP_IDS)[number];
 
 export interface AutopilotRunPageClientProps {
   organizationSlug: string;
@@ -377,6 +392,7 @@ export interface AutopilotPullRequestsTableProps {
 export interface AutopilotSettingsRowProps {
   icon: IconSvgElement;
   label: string;
+  description?: string;
   htmlFor: string;
   children: ReactNode;
 }

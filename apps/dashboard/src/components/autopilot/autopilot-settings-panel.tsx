@@ -20,6 +20,7 @@ import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { AutopilotRepositoryPicker } from "@/components/autopilot/autopilot-repository-picker";
 import { AutopilotRulesSection } from "@/components/autopilot/autopilot-rules-section";
 import { Button } from "@/components/button";
 import {
@@ -39,6 +40,7 @@ import { toErrorMessage } from "@/utils/error-message";
 function SettingsRow({
   icon,
   label,
+  description,
   htmlFor,
   children,
 }: AutopilotSettingsRowProps) {
@@ -50,9 +52,16 @@ function SettingsRow({
         icon={icon}
         strokeWidth={1.75}
       />
-      <label className="min-w-0 flex-1 text-sm font-medium" htmlFor={htmlFor}>
-        {label}
-      </label>
+      <div className="min-w-0 flex-1">
+        <label className="text-sm font-medium" htmlFor={htmlFor}>
+          {label}
+        </label>
+        {description ? (
+          <p className="text-muted-foreground text-xs text-pretty">
+            {description}
+          </p>
+        ) : null}
+      </div>
       <div className="flex shrink-0 items-center">{children}</div>
     </div>
   );
@@ -133,41 +142,21 @@ export function AutopilotSettingsPanel({
             label="Repository"
           >
             {githubConnected ? (
-              <Select
-                items={repositories.map((repository) => ({
-                  value: repository.fullName,
-                  label: repository.fullName,
-                }))}
-                onValueChange={(value) => {
-                  const repository = repositories.find(
-                    (row) => row.fullName === value
-                  );
-                  if (repository) {
-                    save.mutate({
-                      repository: {
-                        owner: repository.owner,
-                        name: repository.name,
-                        branch: repository.defaultBranch,
-                      },
-                    });
-                  }
-                }}
+              <AutopilotRepositoryPicker
+                className="w-64"
+                id="autopilot-repository"
+                onChange={(repository) =>
+                  save.mutate({
+                    repository: {
+                      owner: repository.owner,
+                      name: repository.name,
+                      branch: repository.defaultBranch,
+                    },
+                  })
+                }
+                repositories={repositories}
                 value={repositoryKey}
-              >
-                <SelectTrigger className="w-64" id="autopilot-repository">
-                  <SelectValue placeholder="Choose a repository" />
-                </SelectTrigger>
-                <SelectContent align="end">
-                  {repositories.map((repository) => (
-                    <SelectItem
-                      key={repository.fullName}
-                      value={repository.fullName}
-                    >
-                      {repository.fullName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             ) : (
               <Button
                 loading={installing}
@@ -180,6 +169,9 @@ export function AutopilotSettingsPanel({
             )}
           </SettingsRow>
           <SettingsRow
+            description={
+              slackIntegration ? AUTOPILOT_SLACK_CHANNEL_HINT : undefined
+            }
             htmlFor="autopilot-slack-channel"
             icon={SlackIcon}
             label="Brief channel"
@@ -226,11 +218,6 @@ export function AutopilotSettingsPanel({
               </Button>
             )}
           </SettingsRow>
-          {slackIntegration ? (
-            <p className="text-muted-foreground px-4 pb-3 text-xs">
-              {AUTOPILOT_SLACK_CHANNEL_HINT}
-            </p>
-          ) : null}
           <SettingsRow
             htmlFor="autopilot-brief-hour"
             icon={Clock01Icon}

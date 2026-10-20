@@ -9,7 +9,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   IconTabsList,
@@ -31,7 +30,7 @@ import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-s
 import { AutopilotPullRequestsTable } from "@/components/autopilot/autopilot-pull-requests-table";
 import { AutopilotRunsTable } from "@/components/autopilot/autopilot-runs-table";
 import { AutopilotSettingsPanel } from "@/components/autopilot/autopilot-settings-panel";
-import { AutopilotSetupForm } from "@/components/autopilot/autopilot-setup-form";
+import { AutopilotSetupFlow } from "@/components/autopilot/autopilot-setup-flow";
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { TabCount } from "@/components/tab-count";
@@ -128,20 +127,14 @@ function AutopilotOverviewPage({
       <>
         <PageHeading title="Autopilot" />
         {canManage ? (
-          <InstrumentModule
-            bodyClassName="p-6"
-            eyebrow="Let Notra work for you every day"
-            variant="table"
-          >
-            <AutopilotSetupForm
-              callbackPath={basePath}
-              onSaved={() => runNow.mutate()}
-              organizationId={organizationId}
-              overview={overview}
-              projectId={projectId}
-              submitLabel="Turn on Autopilot"
-            />
-          </InstrumentModule>
+          <AutopilotSetupFlow
+            callbackPath={basePath}
+            onSaved={() => runNow.mutate()}
+            organizationId={organizationId}
+            overview={overview}
+            projectId={projectId}
+            submitLabel="Turn on Autopilot"
+          />
         ) : (
           <EmptyState
             description="Ask a workspace admin to turn on Autopilot."

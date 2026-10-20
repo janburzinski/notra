@@ -5,10 +5,10 @@ import { useTranslations } from "use-intl";
 import { cn } from "@/lib/utils";
 import type { SiteCreateStepListProps } from "@/types/components/sites";
 
-export function SiteCreateStepList({
+export function SiteCreateStepList<Id extends string>({
   steps,
   onSelect,
-}: SiteCreateStepListProps) {
+}: SiteCreateStepListProps<Id>) {
   const t = useTranslations("sites.new");
   return (
     <nav aria-label={t("stepsLabel")}>
