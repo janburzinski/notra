@@ -1,3 +1,5 @@
+import { hasErrors } from "@notra/sites-compiler/utils/diagnostics";
+
 import type { DevRefreshOptions } from "../types/dev-refresh";
 import { consentScriptDiagnostics, siteConsent } from "./consent";
 import { cleanDevGeneratedAssets } from "./dev-generated-assets";
@@ -64,12 +66,19 @@ export function createDevRefresh(options: DevRefreshOptions) {
     if (closed || current !== revision) {
       return;
     }
+    const consentDiagnostics = consentScriptDiagnostics(
+      config,
+      prepared.customScripts
+    );
     options.printDiagnostics([
       ...prepared.collectDiagnostics,
       ...prepared.validation.diagnostics,
       ...ogImages.diagnostics,
-      ...consentScriptDiagnostics(config, prepared.customScripts),
+      ...consentDiagnostics,
     ]);
+    if (hasErrors(consentDiagnostics)) {
+      return;
+    }
     const params = {
       ...options.params,
       config,
