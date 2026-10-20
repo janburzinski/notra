@@ -1,3 +1,6 @@
+import { getTrackingIds } from "@databuddy/sdk";
+
+import { DATABUDDY_DASHBOARD_WEBSITE_ID } from "@/constants/databuddy";
 import {
   getFirstPathSegment,
   maskOrganizationPathname,
@@ -51,4 +54,19 @@ export function normalizeDatabuddyEventPath(event: DatabuddyFilterEvent) {
 
   event.path = normalizeDatabuddyPath(event.path);
   return true;
+}
+
+export function getDatabuddyPaymentMetadata(): Record<string, string> {
+  const { anonId, sessionId } = getTrackingIds();
+  const metadata: Record<string, string> = {};
+  if (DATABUDDY_DASHBOARD_WEBSITE_ID) {
+    metadata.databuddy_client_id = DATABUDDY_DASHBOARD_WEBSITE_ID;
+  }
+  if (sessionId) {
+    metadata.databuddy_session_id = sessionId;
+  }
+  if (anonId) {
+    metadata.databuddy_anonymous_id = anonId;
+  }
+  return metadata;
 }

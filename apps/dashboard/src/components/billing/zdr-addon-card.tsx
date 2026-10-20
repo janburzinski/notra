@@ -24,6 +24,7 @@ import {
   getProductPrice,
   zdrAddonPlanId,
 } from "@/utils/billing-plans";
+import { getDatabuddyPaymentMetadata } from "@/utils/databuddy";
 
 export function ZdrAddonCard() {
   const t = useTranslations("billing.zdrAddon");
@@ -66,6 +67,7 @@ export function ZdrAddonCard() {
     try {
       const result = await attach({
         planId: addonPlanId,
+        metadata: getDatabuddyPaymentMetadata(),
         redirectMode: "if_required",
         successUrl,
       });

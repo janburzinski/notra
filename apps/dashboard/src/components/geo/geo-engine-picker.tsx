@@ -47,6 +47,7 @@ import {
   findActivePlanSubscription,
   zdrAddonPlanId,
 } from "@/utils/billing-plans";
+import { getDatabuddyPaymentMetadata } from "@/utils/databuddy";
 import { removedLegacyGeoModels } from "@/utils/geo-legacy-models";
 
 const ROW_CLASS = "flex items-center justify-between gap-3 px-3 py-2";
@@ -368,6 +369,7 @@ export function GeoEnginePicker({
     try {
       const result = await attach({
         planId: addonPlanId,
+        metadata: getDatabuddyPaymentMetadata(),
         redirectMode: "if_required",
         successUrl: successUrl?.toString(),
       });
