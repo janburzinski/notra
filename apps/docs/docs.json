@@ -428,7 +428,8 @@
             "pages": [
               "api/getting-started",
               "api/authentication",
-              "api/rate-limits"
+              "api/rate-limits",
+              "api/versioning"
             ],
             "icon": "rocket"
           },

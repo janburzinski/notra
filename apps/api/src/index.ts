@@ -65,6 +65,7 @@ import { webhooksRoutes } from "./routes/webhooks";
 import { workspaceRoutes } from "./routes/workspaces";
 import type { ApiEnv } from "./types/env";
 import type { ApiServerControl } from "./types/shutdown";
+import type { PublicStatusResponse } from "./types/status";
 import {
   API_URL,
   AUTH_GUIDE_URL,
@@ -80,6 +81,8 @@ import {
   isPublicFeedbackIngestRequest,
 } from "./utils/feedback";
 import { logError } from "./utils/logging";
+import { rateLimitResponse } from "./utils/openapi-responses";
+import { enforceRatelimit, RATE_LIMITS, ratelimit } from "./utils/ratelimit";
 import { createApiShutdown } from "./utils/shutdown";
 
 const FRAMER_PLUGIN_ID = "8d4wmwtko6960jsu3ojmalvqm";
@@ -100,7 +103,8 @@ const PRODUCTION_SERVER = {
 };
 const DEMO_SERVER = {
   url: DEMO_API_URL,
-  description: "Public demo with sample data. Get a key at demo.usenotra.com",
+  description:
+    "Sandbox with sample data. Get a free sandbox key at demo.usenotra.com, no signup needed",
 };
 
 const publicStatusRoute = createRoute({
@@ -120,6 +124,11 @@ const publicStatusRoute = createRoute({
         },
       },
     },
+    429: rateLimitResponse(
+      RATE_LIMITS.publicStatus.requests,
+      RATE_LIMITS.publicStatus.window,
+      "IP address"
+    ),
   },
 });
 
@@ -219,18 +228,27 @@ if (IS_DEMO) {
   app.use("/v2/*", demoRequestLogMiddleware);
 }
 
+app.use(
+  "/v1/status",
+  async (c, next) =>
+    (await enforceRatelimit(c, ratelimit.publicStatus, "ip")) ?? next()
+);
+
 app.openapi(publicStatusRoute, (c) => {
-  return c.json({
-    status: "ok",
-    service: "Notra API",
-    version: "1.0.0",
-    public: true,
-    authentication: {
-      type: "bearer",
-      resource_metadata: RESOURCE_METADATA_URL,
-      guide: AUTH_GUIDE_URL,
+  return c.json<PublicStatusResponse, 200>(
+    {
+      status: "ok",
+      service: "Notra API",
+      version: "1.0.0",
+      public: true,
+      authentication: {
+        type: "bearer",
+        resource_metadata: RESOURCE_METADATA_URL,
+        guide: AUTH_GUIDE_URL,
+      },
     },
-  });
+    200
+  );
 });
 
 const oauthScopeMiddleware = async (c: Context, next: () => Promise<void>) => {
@@ -390,9 +408,15 @@ app.get("/openapi.json", (c) => {
         title: "Notra API",
         version: "1.0.0",
         description:
-          "OpenAPI schema for Notra content endpoints. Use GET /v1/status for public reachability. Error responses include recovery guidance.",
+          "OpenAPI schema for Notra content endpoints. Use GET /v1/status for public reachability. Error responses include recovery guidance. Breaking changes ship under a new major path; deprecated operations send Deprecation and Sunset headers at least 90 days before removal.",
       },
-      servers: IS_DEMO ? [DEMO_SERVER, PRODUCTION_SERVER] : [PRODUCTION_SERVER],
+      externalDocs: {
+        description: "Notra API versioning and deprecation policy",
+        url: "https://www.usenotra.com/docs/api/versioning",
+      },
+      servers: IS_DEMO
+        ? [DEMO_SERVER, PRODUCTION_SERVER]
+        : [PRODUCTION_SERVER, DEMO_SERVER],
       security: [{ BearerAuth: [] }],
       tags: [...API_OPENAPI_TAGS],
     })

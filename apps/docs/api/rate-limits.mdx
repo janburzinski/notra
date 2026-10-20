@@ -21,6 +21,7 @@ docolin:
     - retry-after
     - RateLimit headers
   prev: ./authentication.mdx
+  next: ./versioning.mdx
 ---
 
 The Notra API rate limits the endpoints that start model runs, scans or other expensive work. Plain reads (listing posts, visibility data, feedback, schedules and so on) and deletes are not rate limited.
@@ -65,6 +66,12 @@ Notra keys each limit in one of three ways:
 | `POST /v1/projects/{projectId}/geo/agent-readiness/scan` | 10 requests / hour | per organization |
 
 GEO limits apply across all projects in the organization, so four scans per hour is the total across every project, not four per project.
+
+### Discovery
+
+| Endpoint | Limit | Keyed |
+| --- | --- | --- |
+| `GET /v1/status` | 120 requests / minute | per IP |
 
 ### Feedback
 

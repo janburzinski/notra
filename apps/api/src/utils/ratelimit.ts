@@ -44,6 +44,7 @@ export const RATE_LIMITS = {
   writerPlan: { requests: 10, window: "10 minutes" },
   writerApprove: { requests: 20, window: "10 minutes" },
   agentReadinessScan: { requests: 10, window: "1 hour" },
+  publicStatus: { requests: 120, window: "1 minute" },
 } as const;
 
 export const ratelimit = {
@@ -150,6 +151,11 @@ export const ratelimit = {
       RATE_LIMITS.agentReadinessScan.requests,
       "1h"
     ),
+  }),
+  publicStatus: new Ratelimit({
+    redis,
+    prefix: "ratelimit:api:public-status",
+    limiter: Ratelimit.slidingWindow(RATE_LIMITS.publicStatus.requests, "1m"),
   }),
 };
 

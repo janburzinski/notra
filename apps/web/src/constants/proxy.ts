@@ -48,3 +48,5 @@ export const DYNAMIC_PAGE_CACHE_CONTROL =
 export const GEO_INGEST_ENDPOINT = "https://ingest.usenotra.com";
 
 export const DOCS_PROXY_ORIGIN = "https://notra.mintlify.site";
+
+export const OAUTH_ISSUER_ORIGIN = "https://oauth.usenotra.com";

@@ -26,6 +26,7 @@ import {
 } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useIsClient } from "@/components/landing/hero-headline";
 import { NavbarCompactPanel } from "@/components/navbar-compact-panel";
 import { NavbarChevron, NavbarMenuToggle } from "@/components/navbar-glyphs";
 import { NavbarHref } from "@/components/navbar-href";
@@ -247,6 +248,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
   const triggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const panelRef = useRef<HTMLDivElement>(null);
   const measureRefs = useRef(new Map<string, HTMLDivElement>());
+  const isClient = useIsClient();
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const setActiveGroup = useCallback((next: string | null) => {
@@ -378,7 +380,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
       observer.observe(node);
     }
     return () => observer.disconnect();
-  }, []);
+  }, [isClient]);
 
   const activeGroupData = groups.find((group) => group.label === activeGroup);
   const activeSize = activeGroup ? panelSizes.get(activeGroup) : undefined;
@@ -588,26 +590,28 @@ export function Navbar({ variant }: NavbarProps = {}) {
                   );
                 })}
 
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none invisible absolute top-full left-0 -z-10 size-0 overflow-hidden"
-                >
-                  {groups.map((group) => (
-                    <div
-                      className="w-max"
-                      key={group.label}
-                      ref={(node) => {
-                        if (node) {
-                          measureRefs.current.set(group.label, node);
-                        } else {
-                          measureRefs.current.delete(group.label);
-                        }
-                      }}
-                    >
-                      <MegaPanel group={group} onSelect={closePanel} />
-                    </div>
-                  ))}
-                </div>
+                {isClient && (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none invisible absolute top-full left-0 -z-10 size-0 overflow-hidden"
+                  >
+                    {groups.map((group) => (
+                      <div
+                        className="w-max"
+                        key={group.label}
+                        ref={(node) => {
+                          if (node) {
+                            measureRefs.current.set(group.label, node);
+                          } else {
+                            measureRefs.current.delete(group.label);
+                          }
+                        }}
+                      >
+                        <MegaPanel group={group} onSelect={closePanel} />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <AnimatePresence>
                   {activeGroupData && (

@@ -10,7 +10,7 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 import * as sourceConfig from "./source.config";
-import { DOCS_PROXY_ORIGIN } from "./src/constants/proxy";
+import { DOCS_PROXY_ORIGIN, OAUTH_ISSUER_ORIGIN } from "./src/constants/proxy";
 import { buildSecurityHeaders } from "./src/utils/security-headers";
 
 const SERVER_ONLY_PACKAGES = [
@@ -111,6 +111,10 @@ export default defineConfig(({ command }) => ({
           version: 3,
           routes: [
             { src: "^/docs(/.*)?$", dest: `${DOCS_PROXY_ORIGIN}/docs$1` },
+            {
+              src: "^/\\.well-known/(oauth-authorization-server|openid-configuration)$",
+              dest: `${OAUTH_ISSUER_ORIGIN}/.well-known/$1`,
+            },
           ],
         },
       },
