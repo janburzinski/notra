@@ -1,8 +1,14 @@
 import {
   AiMagicIcon,
+  Cancel01Icon,
+  FilterIcon,
   GitBranchIcon,
+  Image02Icon,
+  MinusSignCircleIcon,
+  PencilEdit02Icon,
   Robot01Icon,
   Search01Icon,
+  Tick02Icon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
@@ -14,6 +20,10 @@ import type {
 import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 
 import { CONTENT_PULL_REQUEST_STATES } from "@/constants/content-overview";
+import type {
+  AutopilotRunSectionState,
+  AutopilotTranscriptStepKind,
+} from "@/types/autopilot";
 import type {
   AutopilotAutomationKind,
   AutopilotMetricsDays,
@@ -47,6 +57,34 @@ export const AUTOPILOT_KIND_META: Record<
   commits: { label: "Releases", icon: GitBranchIcon },
   prompts: { label: "Prompts", icon: AiMagicIcon },
   competitors: { label: "Competitors", icon: UserGroupIcon },
+};
+
+/** How one automation in a run ended, as the run panel's section badge. */
+export const AUTOPILOT_RUN_SECTION_BADGES: Record<
+  AutopilotRunSectionState,
+  { label: string; appearance: StatusBadgeAppearance }
+> = {
+  running: { label: "Running", appearance: { variant: "secondary" } },
+  done: { label: "Done", appearance: { variant: "success" } },
+  skipped: { label: "Skipped", appearance: { variant: "secondary" } },
+  failed: { label: "Failed", appearance: { variant: "destructive" } },
+};
+
+/** What a run section made, e.g. its pull request, inside the run panel. */
+export const AUTOPILOT_RUN_RESULT_CLASS =
+  "bg-muted/40 animate-in fade-in flex max-w-3xl items-center gap-3 rounded-lg border px-3 py-2.5 duration-300 motion-reduce:animate-none";
+
+export const AUTOPILOT_TRANSCRIPT_STEP_ICONS: Record<
+  AutopilotTranscriptStepKind,
+  IconSvgElement
+> = {
+  gather: FilterIcon,
+  lookup: Search01Icon,
+  draft: PencilEdit02Icon,
+  image: Image02Icon,
+  skip: MinusSignCircleIcon,
+  error: Cancel01Icon,
+  other: Tick02Icon,
 };
 
 /**

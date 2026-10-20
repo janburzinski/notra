@@ -17,7 +17,7 @@ import { AutopilotBackLink } from "@/components/autopilot/autopilot-back-link";
 import { AutopilotFact } from "@/components/autopilot/autopilot-fact";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
 import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding-status";
-import { AutopilotFindingSteps } from "@/components/autopilot/autopilot-finding-steps";
+import { AutopilotFindingTranscript } from "@/components/autopilot/autopilot-finding-transcript";
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
 import { Button } from "@/components/button";
@@ -38,6 +38,7 @@ import type {
   AutopilotFindingPageProps,
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
+import { runEventsRefetchInterval } from "@/utils/autopilot-events";
 import { describeFindingReason } from "@/utils/autopilot-findings";
 import { describeImpact } from "@/utils/autopilot-impact";
 import { tableHeightFor } from "@/utils/table";
@@ -96,6 +97,9 @@ function FindingPage({
       input: { organizationId, runId: finding.runId ?? "" },
     }),
     enabled: Boolean(finding.runId),
+    refetchInterval: runEventsRefetchInterval(
+      overview.runs.find((run) => run.id === finding.runId)
+    ),
   });
   const kindEvents = (events.data ?? []).filter(
     (event) => event.job === finding.kind
@@ -136,6 +140,32 @@ function FindingPage({
       ),
     },
   ];
+
+  const why = (
+    <>
+      <p className="text-foreground">
+        {describeFindingReason(finding, formatDate)}
+      </p>
+      <p>{evidence.detail ?? finding.summary}</p>
+      {evidence.updatePage ? (
+        <p>
+          Rewrites the existing page{" "}
+          <a
+            className="text-foreground underline-offset-4 hover:underline"
+            href={evidence.updatePage.url}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {evidence.updatePage.title}
+          </a>{" "}
+          instead of adding a new post.
+        </p>
+      ) : null}
+      {finding.errorMessage ? (
+        <p className="text-destructive">{finding.errorMessage}</p>
+      ) : null}
+    </>
+  );
 
   return (
     <div className="space-y-6">
@@ -201,34 +231,45 @@ function FindingPage({
         </dl>
       </div>
 
-      <section aria-labelledby="finding-why" className="space-y-3">
-        <h2 className="text-sm font-medium" id="finding-why">
-          Why
-        </h2>
-        <div className="text-muted-foreground max-w-3xl space-y-2 text-sm text-pretty">
-          <p className="text-foreground">
-            {describeFindingReason(finding, formatDate)}
-          </p>
-          <p>{evidence.detail ?? finding.summary}</p>
-          {evidence.updatePage ? (
-            <p>
-              Rewrites the existing page{" "}
-              <a
-                className="text-foreground underline-offset-4 hover:underline"
-                href={evidence.updatePage.url}
-                rel="noreferrer"
-                target="_blank"
-              >
-                {evidence.updatePage.title}
-              </a>{" "}
-              instead of adding a new post.
+      {finding.runId ? (
+        <section aria-labelledby="finding-run" className="space-y-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-sm font-medium" id="finding-run">
+              Run
+            </h2>
+            <Link
+              className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+              href={`/${organizationSlug}${AUTOPILOT_NAV_LINK}/runs/${finding.runId}${from ? `?${AUTOPILOT_FROM_PARAM}=${encodeURIComponent(from)}` : ""}`}
+            >
+              View run
+            </Link>
+          </div>
+          {events.isPending ? <Skeleton className="h-32 rounded-2xl" /> : null}
+          {!events.isPending && kindEvents.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              {finding.status === "open"
+                ? "Starting…"
+                : "Steps are no longer available."}
             </p>
           ) : null}
-          {finding.errorMessage ? (
-            <p className="text-destructive">{finding.errorMessage}</p>
-          ) : null}
-        </div>
-      </section>
+          {events.isPending || kindEvents.length === 0 ? null : (
+            <AutopilotFindingTranscript events={kindEvents} finding={finding}>
+              {why}
+            </AutopilotFindingTranscript>
+          )}
+        </section>
+      ) : null}
+
+      {finding.runId && kindEvents.length > 0 ? null : (
+        <section aria-labelledby="finding-why" className="space-y-3">
+          <h2 className="text-sm font-medium" id="finding-why">
+            Why
+          </h2>
+          <div className="text-muted-foreground max-w-3xl space-y-2 text-sm text-pretty">
+            {why}
+          </div>
+        </section>
+      )}
 
       {considered.length > 1 ? (
         <section aria-labelledby="finding-considered" className="space-y-3">
@@ -249,39 +290,6 @@ function FindingPage({
             height={tableHeightFor(considered.length)}
             rowHeight={TABLE_ROW_HEIGHT}
           />
-        </section>
-      ) : null}
-
-      {finding.runId ? (
-        <section aria-labelledby="finding-log" className="space-y-3">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-sm font-medium" id="finding-log">
-              Steps
-            </h2>
-            <Link
-              className="text-muted-foreground hover:text-foreground text-xs transition-colors"
-              href={`/${organizationSlug}${AUTOPILOT_NAV_LINK}/runs/${finding.runId}${from ? `?${AUTOPILOT_FROM_PARAM}=${encodeURIComponent(from)}` : ""}`}
-            >
-              View run
-            </Link>
-          </div>
-          <div className={TABLE_FRAME_CLASS}>
-            <div className="bg-background overflow-hidden rounded-xl border">
-              {events.isPending ? (
-                <Skeleton className="m-4 h-24 rounded-lg" />
-              ) : null}
-              {!events.isPending && kindEvents.length === 0 ? (
-                <p className="text-muted-foreground py-8 text-center text-sm">
-                  {finding.status === "open"
-                    ? "Starting…"
-                    : "Steps are no longer available."}
-                </p>
-              ) : null}
-              {events.isPending || kindEvents.length === 0 ? null : (
-                <AutopilotFindingSteps events={kindEvents} />
-              )}
-            </div>
-          </div>
         </section>
       ) : null}
 

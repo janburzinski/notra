@@ -237,8 +237,88 @@ export interface AutopilotRunTimelineProps {
   events: AutopilotRunEventView[];
 }
 
-export interface AutopilotFindingStepsProps {
+export interface AutopilotFindingTranscriptProps {
+  finding: AutopilotFindingView;
   events: AutopilotRunEventView[];
+  /** Why Autopilot made it, as the agent's answer below its steps. */
+  children: ReactNode;
+}
+
+export type AutopilotRunSectionState =
+  | "running"
+  | "done"
+  | "skipped"
+  | "failed";
+
+export interface AutopilotRunSectionProps {
+  id: string;
+  /** The automation's name, e.g. "Write about releases". */
+  label: string;
+  events: AutopilotRunEventView[];
+  /** Still running: new steps slide in and the duration counts up. */
+  live: boolean;
+  /** More of what the agent concluded, after what it decided. */
+  children?: ReactNode;
+  /** What it made, e.g. the pull request. */
+  result?: ReactNode;
+}
+
+export interface AutopilotRunSectionHeaderProps {
+  id: string;
+  label: string;
+  state: AutopilotRunSectionState;
+  /** Null hides the duration: skipped, or live before the clock is known. */
+  seconds: number | null;
+}
+
+export interface AutopilotRunStepProps {
+  step: AutopilotTranscriptStep;
+  active: boolean;
+}
+
+export interface AutopilotRunPanelProps {
+  children: ReactNode;
+}
+
+export interface AutopilotLookupsStackProps {
+  queries: string[];
+  active: boolean;
+}
+
+export interface AutopilotReadsStackProps {
+  targets: string[];
+  active: boolean;
+}
+
+/** What a step did, for its icon. */
+export type AutopilotTranscriptStepKind =
+  | "gather"
+  | "lookup"
+  | "draft"
+  | "image"
+  | "skip"
+  | "error"
+  | "other";
+
+/** One line of a run read as an agent turn; consecutive reads fold into one. */
+export type AutopilotTranscriptStep =
+  | { type: "reads"; id: string; targets: string[] }
+  | { type: "lookups"; id: string; queries: string[] }
+  | {
+      type: "step";
+      id: string;
+      kind: AutopilotTranscriptStepKind;
+      label: string;
+      createdAt: Date;
+    };
+
+export interface AutopilotTranscript {
+  steps: AutopilotTranscriptStep[];
+  /** The pick and how sure Jev was, said by the agent rather than listed. */
+  verdict: string | null;
+  credits: number | null;
+  startedAt: Date | null;
+  durationMs: number;
 }
 
 export interface AutopilotTableEmptyProps {

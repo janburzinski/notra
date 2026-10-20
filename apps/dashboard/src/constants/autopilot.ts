@@ -59,6 +59,8 @@ export const AUTOPILOT_FINDING_CLAIM_LEASE_MS = 30 * 60 * 1000;
 export const AUTOPILOT_RUN_LEASE_MS = 2 * 60 * 60 * 1000;
 export const AUTOPILOT_LEASE_RENEW_INTERVAL_MS = 60_000;
 export const AUTOPILOT_TRACE_DETAIL_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+/** How often a page polls the steps of a run that is still going, so they read as live. */
+export const AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS = 1500;
 
 export const AUTOPILOT_COMMITS_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS = 30;

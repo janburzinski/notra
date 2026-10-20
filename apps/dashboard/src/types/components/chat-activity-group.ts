@@ -20,6 +20,8 @@ export interface ChatActivityStatusProps {
 
 export interface ChatActivityGroupProps {
   children: ReactNode;
+  /** Starts open and stays open until the reader folds it. */
+  defaultOpen?: boolean;
   durationMs?: number;
   elapsedSeconds?: number;
   forceOpen?: boolean;

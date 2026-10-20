@@ -1,11 +1,28 @@
 import type {
+  AutopilotEventLevel,
   AutopilotJobKind,
   AutopilotRunEventData,
 } from "@notra/db/types/autopilot";
 
-import { AUTOPILOT_EVENT_DATA_LABELS } from "@/constants/autopilot";
+import {
+  AUTOPILOT_EVENT_DATA_LABELS,
+  AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS,
+} from "@/constants/autopilot";
+import type {
+  AutopilotRunSectionState,
+  AutopilotTranscript,
+  AutopilotTranscriptStepKind,
+} from "@/types/autopilot";
 
 const CAMEL_BOUNDARY = /([a-z])([A-Z])/g;
+const READ_STEP = /^Read (\S+)$/;
+const CANDIDATES_STEP = /^\d+ candidates? from /;
+const LOOKUP_STEP = /^Looked up /;
+const LOOKUP_QUERY_STEP = /^Looked up site pages matching "(.+)"$/;
+const OPENED_PULL_REQUEST_STEP = /^Opened pull request #/;
+const WWW_PREFIX = /^www\./;
+/** Server and browser clocks drift; poll this long past the run's end. */
+const RUN_EVENTS_SETTLE_MS = 5000;
 const LOG_INLINE_LIST_MAX = 100;
 
 export function formatAutopilotPercent(value: number) {
@@ -154,4 +171,164 @@ export function formatRunLog(
     }
   }
   return lines.join("\n");
+}
+
+function transcriptStepKind(
+  level: AutopilotEventLevel,
+  label: string
+): AutopilotTranscriptStepKind {
+  if (level === "error") {
+    return "error";
+  }
+  if (level === "skip") {
+    return "skip";
+  }
+  if (CANDIDATES_STEP.test(label)) {
+    return "gather";
+  }
+  if (LOOKUP_STEP.test(label)) {
+    return "lookup";
+  }
+  if (label === "Generated a draft") {
+    return "draft";
+  }
+  if (label === "Created the cover image") {
+    return "image";
+  }
+  return "other";
+}
+
+/**
+ * A run's events as one agent turn: the steps it took (reads in a row fold
+ * into one), what it decided, and what it cost. The pull request itself comes
+ * from the finding, so its event is left out.
+ */
+export function toAutopilotTranscript(
+  events: {
+    id: string;
+    level: AutopilotEventLevel;
+    message: string;
+    data: AutopilotRunEventData | null;
+    createdAt: Date | string;
+  }[]
+): AutopilotTranscript {
+  const transcript: AutopilotTranscript = {
+    steps: [],
+    verdict: null,
+    credits: null,
+    startedAt: null,
+    durationMs: 0,
+  };
+  for (const event of events) {
+    const { data, level, message } = event;
+    if (level === "decision" && typeof data?.confidence === "number") {
+      transcript.verdict = message;
+      continue;
+    }
+    if (level === "action" && typeof data?.credits === "number") {
+      transcript.credits = (transcript.credits ?? 0) + data.credits;
+      continue;
+    }
+    if (level === "action" && OPENED_PULL_REQUEST_STEP.test(message)) {
+      continue;
+    }
+    const read = READ_STEP.exec(message)?.[1];
+    const query = LOOKUP_QUERY_STEP.exec(message)?.[1];
+    const previous = transcript.steps.at(-1);
+    if (query && previous?.type === "lookups") {
+      previous.queries.push(query);
+      continue;
+    }
+    if (query) {
+      transcript.steps.push({
+        type: "lookups",
+        id: event.id,
+        queries: [query],
+      });
+      continue;
+    }
+    if (read && previous?.type === "reads") {
+      previous.targets.push(read);
+      continue;
+    }
+    if (read) {
+      transcript.steps.push({ type: "reads", id: event.id, targets: [read] });
+      continue;
+    }
+    const label = findingStepLabel(message);
+    transcript.steps.push({
+      type: "step",
+      id: event.id,
+      kind: transcriptStepKind(level, label),
+      label,
+      createdAt: new Date(event.createdAt),
+    });
+  }
+  const first = events.at(0);
+  const last = events.at(-1);
+  if (first && last) {
+    transcript.startedAt = new Date(first.createdAt);
+    transcript.durationMs =
+      new Date(last.createdAt).getTime() - transcript.startedAt.getTime();
+  }
+  return transcript;
+}
+
+/** "usenotra.com/features" for a URL; repository paths stay as they are. */
+export function shortReadTarget(target: string) {
+  if (!URL.canParse(target)) {
+    return target;
+  }
+  const url = new URL(target);
+  const host = url.hostname.replace(WWW_PREFIX, "");
+  return url.pathname === "/" ? host : `${host}${url.pathname}`;
+}
+
+/**
+ * Polls a run's steps while it runs and until one fetch lands after it
+ * finished, so the last steps (pull request, credits) are never missed.
+ */
+export function runEventsRefetchInterval(
+  run: { status: string; finishedAt: Date | string | null } | undefined
+) {
+  return (query: { state: { dataUpdatedAt: number } }) => {
+    if (!run) {
+      return false;
+    }
+    if (run.status === "running" || !run.finishedAt) {
+      return AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS;
+    }
+    const settledAt = new Date(run.finishedAt).getTime() + RUN_EVENTS_SETTLE_MS;
+    return query.state.dataUpdatedAt < settledAt
+      ? AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS
+      : false;
+  };
+}
+
+/** How one automation in a run ended: by its last step, not its first. */
+export function runSectionState(
+  transcript: AutopilotTranscript,
+  live: boolean
+): AutopilotRunSectionState {
+  if (live) {
+    return "running";
+  }
+  const steps = transcript.steps.flatMap((step) =>
+    step.type === "step" ? [step] : []
+  );
+  if (steps.some((step) => step.kind === "error")) {
+    return "failed";
+  }
+  const last = transcript.steps.at(-1);
+  return last?.type === "step" && last.kind === "skip" ? "skipped" : "done";
+}
+
+/** Keys that stay unique when the same item comes up more than once. */
+export function occurrenceKeys(items: string[]) {
+  const seen = new Map<string, number>();
+  return items.map((item) => {
+    const count = seen.get(item) ?? 0;
+    seen.set(item, count + 1);
+    return { item, key: `${item}#${count}` };
+  });
 }

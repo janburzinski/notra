@@ -1,5 +1,7 @@
 "use client";
 
+import { GitPullRequestIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
@@ -8,20 +10,25 @@ import { useQuery } from "@tanstack/react-query";
 import { useFormatter } from "use-intl";
 
 import { AutopilotBackLink } from "@/components/autopilot/autopilot-back-link";
-import { AutopilotFact } from "@/components/autopilot/autopilot-fact";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
+import {
+  AutopilotRunPanel,
+  AutopilotRunSection,
+} from "@/components/autopilot/autopilot-run-panel";
 import { AutopilotRunTimeline } from "@/components/autopilot/autopilot-run-timeline";
 import { EmptyState } from "@/components/empty-state";
 import { SiteBuildLogs } from "@/components/sites/site-build-logs";
 import {
   AUTOPILOT_CREDITS_CHARGED_EVENT,
-  AUTOPILOT_POLL_INTERVAL_MS,
   AUTOPILOT_RUN_LOG_TAGS,
+  AUTOPILOT_RUN_SECTIONS,
   AUTOPILOT_RUN_STATUS_BADGES,
   AUTOPILOT_RUN_TRIGGER_LABELS,
 } from "@/constants/autopilot";
+import { AUTOPILOT_RUN_RESULT_CLASS } from "@/constants/autopilot-ui";
 import { SITE_DEPLOYMENT_LOG_SURFACE_CLASS } from "@/constants/sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
+import { cn } from "@/lib/utils";
 import type {
   AutopilotRunPageClientProps,
   AutopilotRunPageProps,
@@ -29,6 +36,7 @@ import type {
 import {
   formatDuration,
   formatRunLog,
+  runEventsRefetchInterval,
   sumEventTokens,
 } from "@/utils/autopilot-events";
 
@@ -70,10 +78,26 @@ function RunPage({
   const query = useQuery(
     dashboardOrpc.autopilot.runEvents.queryOptions({
       input: { organizationId, runId: run.id },
-      refetchInterval: running ? AUTOPILOT_POLL_INTERVAL_MS : false,
+      refetchInterval: runEventsRefetchInterval(run),
     })
   );
   const events = query.data ?? [];
+  const turns = AUTOPILOT_RUN_SECTIONS.flatMap((section) => {
+    const own = events.filter((event) => event.job === section.job);
+    const first = own[0];
+    return first
+      ? [
+          {
+            job: section.job,
+            label: section.label,
+            events: own,
+            startedAt: first.createdAt,
+          },
+        ]
+      : [];
+  }).sort(
+    (a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
+  );
   const tokens = sumEventTokens(events);
   const credits = events.reduce(
     (total, event) =>
@@ -85,6 +109,7 @@ function RunPage({
   );
   const startedAt = new Date(run.startedAt);
   const status = AUTOPILOT_RUN_STATUS_BADGES[run.status];
+  const proposed = run.summary?.proposed ?? 0;
 
   return (
     <div className="space-y-6">
@@ -100,31 +125,29 @@ function RunPage({
           })}
           title={AUTOPILOT_RUN_TRIGGER_LABELS[run.trigger]}
         />
-      </div>
-
-      <div className={TABLE_FRAME_CLASS}>
-        <dl className="bg-background shadow-lift grid gap-x-8 gap-y-5 rounded-[14px] border p-5 sm:grid-cols-3 lg:grid-cols-6">
-          <AutopilotFact label="Status">
+        <ul
+          aria-label="Run summary"
+          className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm tabular-nums"
+        >
+          <li>
             <StatusBadge appearance={status.appearance} label={status.label} />
-          </AutopilotFact>
-          <AutopilotFact label="Started">
-            {format.dateTime(startedAt, { hour: "2-digit", minute: "2-digit" })}
-          </AutopilotFact>
-          <AutopilotFact label="Took">
-            {run.finishedAt
-              ? formatDuration(
-                  new Date(run.finishedAt).getTime() - startedAt.getTime()
-                )
-              : "Running"}
-          </AutopilotFact>
-          <AutopilotFact label="Pull requests">
-            {run.summary?.proposed ?? 0}
-          </AutopilotFact>
-          <AutopilotFact label="Model tokens">
-            {format.number(tokens, { notation: "compact" })}
-          </AutopilotFact>
-          <AutopilotFact label="Credits">{credits}</AutopilotFact>
-        </dl>
+          </li>
+          {run.finishedAt ? (
+            <li>
+              Took{" "}
+              {formatDuration(
+                new Date(run.finishedAt).getTime() - startedAt.getTime()
+              )}
+            </li>
+          ) : null}
+          <li>
+            {proposed} pull request{proposed === 1 ? "" : "s"}
+          </li>
+          <li>{format.number(tokens, { notation: "compact" })} tokens</li>
+          <li>
+            {credits} credit{credits === 1 ? "" : "s"}
+          </li>
+        </ul>
       </div>
 
       {run.errorMessage ? (
@@ -133,7 +156,73 @@ function RunPage({
         </p>
       ) : null}
 
-      <section aria-label="Run log">
+      <section aria-labelledby="run-activity" className="space-y-3">
+        <h2 className="text-sm font-medium" id="run-activity">
+          Activity
+        </h2>
+        {query.isPending ? <Skeleton className="h-32 rounded-2xl" /> : null}
+        {query.isPending || (turns.length === 0 && !running) ? null : (
+          <AutopilotRunPanel>
+            {turns.length === 0 ? (
+              <AutopilotRunSection
+                events={[]}
+                id={`${run.id}-start`}
+                label="Autopilot"
+                live
+              />
+            ) : null}
+            {turns.map((turn, index) => {
+              const opened = turn.events.findLast(
+                (event) =>
+                  event.level === "action" &&
+                  typeof event.data?.url === "string"
+              );
+              const url = opened?.data?.url;
+              const title = opened?.data?.title;
+              return (
+                <AutopilotRunSection
+                  events={turn.events}
+                  id={`${run.id}-${turn.job ?? "run"}`}
+                  key={turn.job ?? "run"}
+                  label={turn.label}
+                  live={running && index === turns.length - 1}
+                  result={
+                    opened && typeof url === "string" ? (
+                      <a
+                        className={cn(
+                          AUTOPILOT_RUN_RESULT_CLASS,
+                          "hover:bg-muted/70 transition-colors"
+                        )}
+                        href={url}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        <HugeiconsIcon
+                          aria-hidden="true"
+                          className="text-muted-foreground size-4 shrink-0"
+                          icon={GitPullRequestIcon}
+                          strokeWidth={1.5}
+                        />
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                          {typeof title === "string" ? title : opened.message}
+                        </span>
+                        <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+                          {opened.message.replace("Opened pull request ", "")}
+                        </span>
+                      </a>
+                    ) : null
+                  }
+                />
+              );
+            })}
+          </AutopilotRunPanel>
+        )}
+      </section>
+
+      <section aria-labelledby="run-log" className="space-y-3">
+        <h2 className="text-sm font-medium" id="run-log">
+          Log
+        </h2>
         <div className={TABLE_FRAME_CLASS}>
           <div className={SITE_DEPLOYMENT_LOG_SURFACE_CLASS}>
             {events.length > 0 ? (

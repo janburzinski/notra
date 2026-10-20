@@ -80,6 +80,7 @@ function useWorkedDurationSeconds(
 
 export function ChatActivityGroup({
   children,
+  defaultOpen = false,
   durationMs,
   elapsedSeconds,
   forceOpen = false,
@@ -110,7 +111,7 @@ export function ChatActivityGroup({
       : settledStep;
   // A live group starts open so streamed reasoning is readable while it
   // happens; the auto-close below folds it once the step finishes.
-  const [isOpen, setIsOpen] = useState(forceOpen || isStreaming);
+  const [isOpen, setIsOpen] = useState(forceOpen || isStreaming || defaultOpen);
   const [hasInteracted, setHasInteracted] = useState(false);
 
   if (forceOpen && !isOpen) {
@@ -118,14 +119,14 @@ export function ChatActivityGroup({
   }
 
   useEffect(() => {
-    if (isLoading || forceOpen || hasInteracted) {
+    if (isLoading || forceOpen || defaultOpen || hasInteracted) {
       return;
     }
     const closeTimer = window.setTimeout(() => {
       setIsOpen(false);
     }, ACTIVITY_AUTO_CLOSE_DELAY_MS);
     return () => window.clearTimeout(closeTimer);
-  }, [forceOpen, hasInteracted, isLoading]);
+  }, [defaultOpen, forceOpen, hasInteracted, isLoading]);
 
   const workedLabel =
     durationSeconds && durationSeconds > 0
@@ -184,7 +185,7 @@ export function ChatActivityGroup({
   );
 }
 
-function SearchFavicon({ domain }: { domain?: string }) {
+export function SearchFavicon({ domain }: { domain?: string }) {
   const [failed, setFailed] = useState(false);
   if (!isPublicSearchDomain(domain) || failed) {
     return (
