@@ -32,7 +32,7 @@ COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/utils/package.json ./packages/utils/package.json
 COPY packages/webhooks/package.json ./packages/webhooks/package.json
 
-RUN bun install --ignore-scripts
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --ignore-scripts --filter api
 
 FROM deps AS builder
 
