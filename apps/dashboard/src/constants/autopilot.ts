@@ -74,10 +74,14 @@ export const AUTOPILOT_COMMITS_MAX_PULL_REQUESTS = 30;
 export const AUTOPILOT_COMMITS_SKIP_TITLE =
   /^(?:(?:chore|ci|build|test|tests|style|deps|revert)(?:\([^)]*\))?!?:|bump |merge |release )/i;
 
+/**
+ * "User-facing" alone let redesigns and setup-flow PRs through at 96%: the bar
+ * is something new users need explained, whatever the description sounds like.
+ */
 export const AUTOPILOT_COMMITS_JEV_INSTRUCTIONS =
-  "Which merged pull request deserves a blog post for this brand's users? Worth it: a user-facing feature, a meaningful improvement or an interesting engineering story. Not worth it: chores, dependency bumps, refactors, CI, internal tooling and small fixes.";
+  "Which pull request would this brand announce to its users in a blog post? Only one that gives users something new: a capability they could not use before, a new integration or data source, or a substantial change to how a workflow works that users need explained. Not worth it, even when the description sounds user-facing: redesigns, restyled, reorganized or renamed screens, menus, settings and setup flows, UI polish, copy and translation changes, performance work, fixes, chores, dependency bumps, refactors, CI and internal tooling.";
 export const AUTOPILOT_COMMITS_JEV_NONE =
-  "No post: every pull request is a chore, refactor, small fix or internal change";
+  "No post: a redesign, reorganized screen or setup flow, UI polish, fix, performance work, refactor or other change that users would not need announced";
 
 /** Jev decides whether a candidate is worth a post before any writer tokens are spent. */
 export const AUTOPILOT_JEV_MODEL_ID = "typesafe-ai/jev-1.14.0";

@@ -262,7 +262,7 @@ async function proposeAndComment(params: {
       ctx,
       log,
       event,
-      body: `**Should I write a post about this?** It looks like something your users would want to hear about (${percent(verdict.confidence)} sure). Reply \`@notra write a post\` and I'll draft it now, or react with 👎 and I'll skip it. Otherwise I draft it in ${AUTOPILOT_IDEA_AUTO_WRITE_DAYS} days.`,
+      body: `**Should I write a post about this?** It looks like something your users would want to hear about (${percent(verdict.confidence)} sure). Reply \`@notra write a post\` and I'll draft it now, or reply \`@notra no\` (or react with 👎) and I'll skip it. Otherwise I draft it in ${AUTOPILOT_IDEA_AUTO_WRITE_DAYS} days.`,
     });
   }
   if (comment && "findingId" in outcome && outcome.findingId) {
