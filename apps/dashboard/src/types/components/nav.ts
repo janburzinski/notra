@@ -14,6 +14,7 @@ export type NavItemLabelKey =
   | "analytics"
   | "feedback"
   | "brandIdentityTitle"
+  | "autopilot"
   | "automations"
   | "integrations"
   | "overview"
@@ -31,6 +32,7 @@ export type NavItemLabelKey =
 export type NavBadgeKey = "beta";
 
 export type NavGroupLabelKey =
+  | "autopilot"
   | "overview"
   | "prompts"
   | "competitors"
@@ -87,6 +89,7 @@ export interface NavPrimaryActionConfig {
 }
 
 export interface NavVisibility {
+  autopilot: boolean;
   analytics: boolean;
   sites: boolean;
 }

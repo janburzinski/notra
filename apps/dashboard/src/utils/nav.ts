@@ -1,3 +1,4 @@
+import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import {
   ANALYTICS_NAV_LINK,
   DEFAULT_NAV_VISIBILITY,
@@ -120,9 +121,12 @@ export function resolveNavItems(
   const withAnalytics = visibility.analytics
     ? items
     : items.filter((item) => item.link !== ANALYTICS_NAV_LINK);
-  return visibility.sites
+  const withSites = visibility.sites
     ? withAnalytics
     : withAnalytics.filter((item) => item.link !== SITES_NAV_LINK);
+  return visibility.autopilot
+    ? withSites
+    : withSites.filter((item) => item.link !== AUTOPILOT_NAV_LINK);
 }
 
 export function resolveActiveNavLink(

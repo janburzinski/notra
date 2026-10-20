@@ -1253,7 +1253,7 @@
     },
     "progress": {
       "label": "Step {current} of {total}",
-      "goTo": "{step, select, 1 {Go to Workspace} 2 {Go to Visibility} 3 {Go to Competitors} other {Go to Pricing}}"
+      "goTo": "{step, select, 1 {Go to Workspace} 2 {Go to Visibility} 3 {Go to Competitors} 4 {Go to Autopilot} other {Go to Pricing}}"
     },
     "actions": {
       "invalidAttribution": "Invalid attribution details",
@@ -2135,6 +2135,7 @@
       "contentGaps": "Content Gaps",
       "personas": "Personas",
       "shelfSpace": "Shelf Space",
+      "autopilot": "Autopilot",
       "repository": "Repository",
       "repositories": "Repositories",
       "noRepositoriesFound": "No repositories found.",
@@ -4208,6 +4209,16 @@
       "trackNamed": "Track {brand}",
       "dismissNamed": "Dismiss {brand}",
       "dismiss": "Dismiss suggestion"
+    },
+    "autopilotPromptSuggestions": {
+      "eyebrow": "Autopilot suggests",
+      "readout": "Prompts that don't measure anything",
+      "pause": "Pause",
+      "keep": "Keep",
+      "paused": "Prompt paused",
+      "pauseFailed": "Could not pause the prompt",
+      "keepFailed": "Could not keep the prompt",
+      "reasonNoBrands": "In {answers} answers over the last {days} days, no engine named any brand, so this prompt doesn't measure your visibility."
     }
   },
   "integrations": {

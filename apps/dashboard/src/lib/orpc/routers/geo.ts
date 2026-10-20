@@ -147,6 +147,7 @@ import {
   acceptSuggestion,
   acceptAllSuggestions,
   dismissSuggestion,
+  listAutopilotPromptSuggestions,
   listSuggestions,
 } from "@notra/geo-core/geo/suggestions";
 import { loadWebAnalytics } from "@notra/geo-core/geo/web-analytics";
@@ -285,6 +286,7 @@ import {
 } from "@/lib/analytics/geo-server-events";
 import { identifyProjectGroup } from "@/lib/analytics/posthog-server";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
+import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import {
   assertActiveSubscription,
   assertGeoEntitlement,
@@ -2250,6 +2252,19 @@ export const geoRouter = {
         return await runOrpcEffect(listSuggestions(input), toGeoOrpcError);
       }
     ),
+  autopilotPromptSuggestionsList: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(async ({ context, input }) => {
+      await assertGeoAccess(accessParams({ context, input }));
+      const result = await runOrpcEffect(
+        listAutopilotPromptSuggestions(input),
+        toGeoOrpcError
+      );
+      // Behind the Autopilot flag, like everything else Autopilot made.
+      return (await isAutopilotEnabledForOrganization(input.organizationId))
+        ? result
+        : { ...result, suggestions: [] };
+    }),
   suggestionAccept: authorizedProcedure
     .input(geoSuggestionIdInputSchema)
     .handler(async ({ context, input }): Promise<GeoTrackedPrompt> => {
@@ -2264,6 +2279,21 @@ export const geoRouter = {
         refreshGeoContentGapsBestEffort(input),
         toGeoOrpcError
       );
+      if (suggestion.action === "pause") {
+        trackGeoRouterEvent({
+          context,
+          input,
+          event: POSTHOG_EVENTS.GEO_SUGGESTION_ACCEPTED,
+          projectId,
+          properties: {
+            count: 1,
+            suggestion_id: suggestion.id,
+            source: suggestion.source,
+            action: suggestion.action,
+          },
+        });
+        return accepted;
+      }
       const keywordSummary = summarizeSuggestionKeywords(
         suggestion.sourceKeywords
       );

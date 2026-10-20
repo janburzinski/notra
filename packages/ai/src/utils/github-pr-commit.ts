@@ -47,6 +47,13 @@ async function getTrustedParentCommitBody(
   return body || undefined;
 }
 
+/** Binary files arrive base64-encoded; text is committed as UTF-8. */
+function fileBytes(file: CommitFilesToPullRequestParams["files"][number]) {
+  return file.encoding === "base64"
+    ? Buffer.from(file.contents, "base64")
+    : Buffer.from(file.contents, "utf8");
+}
+
 export async function commitFilesToPullRequest(
   params: CommitFilesToPullRequestParams
 ) {
@@ -56,7 +63,7 @@ export async function commitFilesToPullRequest(
   }
 
   for (const file of params.files) {
-    const bytes = Buffer.byteLength(file.contents, "utf8");
+    const bytes = fileBytes(file).length;
     if (bytes > GITHUB_MENTION_FILE_CONTENT_MAX_BYTES) {
       throw new Error(
         `File ${file.path} is ${bytes} bytes and exceeds the ${GITHUB_MENTION_FILE_CONTENT_MAX_BYTES} byte limit`
@@ -82,7 +89,7 @@ export async function commitFilesToPullRequest(
         fileChanges: {
           additions: params.files.map((file) => ({
             path: file.path,
-            contents: Buffer.from(file.contents).toString("base64"),
+            contents: fileBytes(file).toString("base64"),
           })),
           deletions: deletions.map((path) => ({ path })),
         },

@@ -240,7 +240,9 @@ export interface GitHubMentionToolState extends GitHubMentionWriteState {
 
 export interface GitHubMentionFileChange {
   path: string;
+  /** Text, or base64 when `encoding` is "base64" (images and other binary files). */
   contents: string;
+  encoding?: "utf8" | "base64";
 }
 
 export interface GitHubMentionContentFinding {

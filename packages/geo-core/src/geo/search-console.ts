@@ -103,18 +103,18 @@ const commitGscSuggestionSync = Effect.fn("geo.searchConsole.commit")(
               throw projectChanged;
             }
 
-            await tx
-              .delete(geoPromptSuggestions)
-              .where(
-                and(
-                  eq(
-                    geoPromptSuggestions.organizationId,
-                    integration.organizationId
-                  ),
-                  eq(geoPromptSuggestions.projectId, projectId),
-                  eq(geoPromptSuggestions.status, "pending")
-                )
-              );
+            await tx.delete(geoPromptSuggestions).where(
+              and(
+                eq(
+                  geoPromptSuggestions.organizationId,
+                  integration.organizationId
+                ),
+                eq(geoPromptSuggestions.projectId, projectId),
+                eq(geoPromptSuggestions.status, "pending"),
+                // Autopilot's suggestions are not part of the GSC set.
+                eq(geoPromptSuggestions.source, "search_console")
+              )
+            );
             if (outcome.suggestions.length === 0) {
               return 0;
             }

@@ -14,6 +14,7 @@ import { createRequestLogger } from "evlog";
 
 import { isAnalyticsEnabledForOrganization } from "@/lib/analytics/flag";
 import { getServerSession } from "@/lib/auth/session";
+import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { hasAiCreditsGrant } from "@/lib/billing/subscription";
 import { resolveNavigationWithJev } from "@/lib/command-palette/jev-navigation";
 import { searchWorkspace } from "@/lib/search/workspace-search";
@@ -157,19 +158,22 @@ export async function POST(request: Request) {
   }
 
   const organizationId = member.organizationId;
-  const [hasAiCredits, analytics, sites, searchData] = await Promise.all([
-    hasAiCreditsGrant(organizationId).catch(() => false),
-    isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
-    isSitesEnabledForOrganization(organizationId),
-    searchWorkspace({
-      organizationId,
-      projectId,
-      query,
-      limit: NAVIGATION_SEARCH_LIMIT,
-    }),
-  ]);
+  const [hasAiCredits, autopilot, analytics, sites, searchData] =
+    await Promise.all([
+      hasAiCreditsGrant(organizationId).catch(() => false),
+      isAutopilotEnabledForOrganization(organizationId),
+      isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
+      isSitesEnabledForOrganization(organizationId),
+      searchWorkspace({
+        organizationId,
+        projectId,
+        query,
+        limit: NAVIGATION_SEARCH_LIMIT,
+      }),
+    ]);
   const entities = toNavigationEntities(slug, searchData);
   const routes = commandRoutesForAI(slug, hasAiCredits, {
+    autopilot,
     analytics,
     sites,
   });

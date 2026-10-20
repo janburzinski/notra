@@ -40,6 +40,7 @@ export const ONBOARDING_STEPS = {
   WORKSPACE: "workspace",
   VISIBILITY: "visibility",
   COMPETITORS: "competitors",
+  AUTOPILOT: "autopilot",
   PRICING: "pricing",
 } as const;
 

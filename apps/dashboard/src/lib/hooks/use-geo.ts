@@ -1518,6 +1518,70 @@ export function useGeoSuggestionsAcceptAll(
   });
 }
 
+export function useGeoAutopilotPromptSuggestions(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  return useQuery({
+    ...dashboardOrpc.geo.autopilotPromptSuggestionsList.queryOptions({
+      input: { organizationId, projectId },
+    }),
+    enabled: !!organizationId,
+  });
+}
+
+/** Accepting pauses the prompt; dismissing keeps it and stops the suggestion. */
+export function useGeoAutopilotPromptSuggestionAction(organizationId: string) {
+  const t = useTranslations("geo.autopilotPromptSuggestions");
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  const invalidate = () =>
+    Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.geo.autopilotPromptSuggestionsList.queryKey({
+          input: { organizationId, projectId },
+        }),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.geo.promptsList.queryKey({
+          input: { organizationId, projectId },
+        }),
+      }),
+      // The prompts table reads the geo-db collection, not the oRPC list.
+      queryClient.invalidateQueries({
+        queryKey: geoDbOrgQueryKey("prompts", organizationId),
+      }),
+    ]);
+  return useMutation({
+    mutationFn: async ({
+      suggestionId,
+      action,
+    }: {
+      suggestionId: string;
+      action: "pause" | "keep";
+    }) => {
+      const input = { suggestionId, organizationId, projectId };
+      if (action === "pause") {
+        await dashboardOrpc.geo.suggestionAccept.call(input);
+      } else {
+        await dashboardOrpc.geo.suggestionDismiss.call(input);
+      }
+    },
+    onSuccess: async (_, { action }) => {
+      await invalidate();
+      if (action === "pause") {
+        toast.success(t("paused"));
+      }
+    },
+    onError: (error, { action }) => {
+      toast.error(
+        toErrorMessage(
+          error,
+          action === "pause" ? t("pauseFailed") : t("keepFailed")
+        )
+      );
+    },
+  });
+}
+
 export function useGeoSuggestionDismiss(organizationId: string) {
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();

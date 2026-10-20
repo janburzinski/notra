@@ -43,11 +43,23 @@ import {
 } from "./constants/agent-feedback";
 import { AUTOMATION_RUN_STATUSES } from "./constants/automation-runs";
 import {
+  AUTOPILOT_EVENT_LEVELS,
+  AUTOPILOT_RULE_SOURCES,
+  AUTOPILOT_FINDING_STATUSES,
+  AUTOPILOT_JOB_KINDS,
+  AUTOPILOT_RUN_STATUSES,
+  AUTOPILOT_RUN_TRIGGERS,
+} from "./constants/autopilot";
+import {
   BLOG_POST_SUBTYPES,
   CONTENT_PUBLICATION_STATUSES,
 } from "./constants/content";
 import { DEMO_REQUEST_SOURCES } from "./constants/demo";
 import { GEO_PERSONA_MEMORY_KINDS } from "./constants/geo-personas";
+import {
+  GEO_PROMPT_SUGGESTION_ACTIONS,
+  GEO_PROMPT_SUGGESTION_SOURCES,
+} from "./constants/geo-prompt-suggestions";
 import { GEO_PROSPECT_REPORT_STATUSES } from "./constants/geo-prospect-reports";
 import {
   GEO_CONTENT_BRIEF_STATUSES,
@@ -64,6 +76,13 @@ import type {
   AgentReadinessIssue,
   AgentReadinessScoreBreakdown,
 } from "./types/agent-readiness";
+import type {
+  AutopilotFindingEvidence,
+  AutopilotJobs,
+  AutopilotRunEventData,
+  AutopilotRunSummary,
+  AutopilotTraceDetail,
+} from "./types/autopilot";
 import type { SharedChatMessage } from "./types/chat-shares";
 import type { DemoAffectedEntity, DemoPersonalization } from "./types/demo";
 import type { DiscussionCommentAnchor } from "./types/discussion-comments";
@@ -72,6 +91,7 @@ import type {
   GeoPersonaProfile,
   GeoPersonaSnapshot,
 } from "./types/geo-personas";
+import type { GeoPromptSuggestionReasonData } from "./types/geo-prompt-suggestions";
 import type { GeoProspectReportJson } from "./types/geo-prospect-report";
 import {
   GEO_SCAN_EVENT_STATUSES,
@@ -2231,9 +2251,21 @@ export const geoPromptSuggestions = pgTable(
     }),
     prompt: text("prompt").notNull(),
     title: text("title"),
-    source: text("source", { enum: ["search_console"] })
+    source: text("source", { enum: GEO_PROMPT_SUGGESTION_SOURCES })
       .notNull()
       .default("search_console"),
+    /** track adds the prompt; pause stops scanning targetPromptId. */
+    action: text("action", { enum: GEO_PROMPT_SUGGESTION_ACTIONS })
+      .notNull()
+      .default("track"),
+    /** Custom prompt id or auto prompt slug the suggestion acts on. */
+    targetPromptId: text("target_prompt_id"),
+    /** Why the suggestion was made, in English, for logs and the API. */
+    reason: text("reason"),
+    /** Numbers behind the reason, so the dashboard can render it translated. */
+    reasonData: jsonb(
+      "reason_data"
+    ).$type<GeoPromptSuggestionReasonData | null>(),
     sourceKeywords: jsonb("source_keywords")
       .$type<
         {
@@ -2267,8 +2299,12 @@ export const geoPromptSuggestions = pgTable(
       table.projectId,
       table.status
     ),
-    uniqueIndex("geoPromptSuggestions_projectId_prompt_uidx").on(
+    // Per source and action: an accepted GSC suggestion must not block
+    // Autopilot from later suggesting to pause the same prompt.
+    uniqueIndex("geoPromptSuggestions_projectId_source_action_prompt_uidx").on(
       table.projectId,
+      table.source,
+      table.action,
       table.prompt
     ),
   ]
@@ -4255,4 +4291,185 @@ export const siteBuildTelemetryRelations = relations(
       references: [siteDeployments.id],
     }),
   })
+);
+
+export const autopilotSettings = pgTable("autopilot_settings", {
+  organizationId: text("organization_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  enabled: boolean("enabled").notNull().default(false),
+  projectId: text("project_id").references(() => projects.id, {
+    onDelete: "set null",
+  }),
+  repositoryOwner: text("repository_owner"),
+  repositoryName: text("repository_name"),
+  repositoryBranch: text("repository_branch"),
+  contentPath: text("content_path"),
+  slackIntegrationId: text("slack_integration_id").references(
+    () => slackIntegrations.id,
+    { onDelete: "set null" }
+  ),
+  slackChannelId: text("slack_channel_id"),
+  slackChannelName: text("slack_channel_name"),
+  briefHour: integer("brief_hour").notNull().default(9),
+  timezone: text("timezone").notNull().default("Europe/Berlin"),
+  jobs: jsonb("jobs")
+    .$type<AutopilotJobs>()
+    .notNull()
+    .default(
+      sql`'{"readiness":true,"keywords":true,"commits":true,"competitors":true}'::jsonb`
+    ),
+  maxOpenPullRequests: integer("max_open_pull_requests").notNull().default(3),
+  /** Drafts nobody touched for this many days are closed; null keeps them open. */
+  stalePullRequestDays: integer("stale_pull_request_days").default(14),
+  lastRunAt: timestamp("last_run_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const autopilotRuns = pgTable(
+  "autopilot_runs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    trigger: text("trigger", { enum: AUTOPILOT_RUN_TRIGGERS }).notNull(),
+    status: text("status", { enum: AUTOPILOT_RUN_STATUSES })
+      .notNull()
+      .default("running"),
+    summary: jsonb("summary").$type<AutopilotRunSummary | null>().default(null),
+    slackMessageTs: text("slack_message_ts"),
+    errorMessage: text("error_message"),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    finishedAt: timestamp("finished_at"),
+    /** Renewed while a worker is alive; startedAt remains the actual start time. */
+    heartbeatAt: timestamp("heartbeat_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("autopilotRuns_organizationId_startedAt_idx").on(
+      table.organizationId,
+      table.startedAt
+    ),
+    uniqueIndex("autopilotRuns_organizationId_running_uidx")
+      .on(table.organizationId)
+      .where(
+        sql`${table.status} = 'running' AND ${table.trigger} IN ('manual', 'cron', 'onboarding')`
+      ),
+  ]
+);
+
+export const autopilotFindings = pgTable(
+  "autopilot_findings",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    runId: text("run_id").references(() => autopilotRuns.id, {
+      onDelete: "set null",
+    }),
+    kind: text("kind", { enum: AUTOPILOT_JOB_KINDS }).notNull(),
+    fingerprint: text("fingerprint").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    evidence: jsonb("evidence")
+      .$type<AutopilotFindingEvidence>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    status: text("status", { enum: AUTOPILOT_FINDING_STATUSES })
+      .notNull()
+      .default("open"),
+    repository: text("repository"),
+    pullRequestNumber: integer("pull_request_number"),
+    pullRequestUrl: text("pull_request_url"),
+    branch: text("branch"),
+    headSha: text("head_sha"),
+    postId: text("post_id").references(() => posts.id, {
+      onDelete: "set null",
+    }),
+    errorMessage: text("error_message"),
+    /** Whoever is writing this finding right now; writes and status changes require it. */
+    claimToken: text("claim_token"),
+    claimedAt: timestamp("claimed_at"),
+    mergedAt: timestamp("merged_at"),
+    /** When it was closed without a merge, by a person or as stale. */
+    dismissedAt: timestamp("dismissed_at"),
+    /** When its pull request was opened; an idea can wait days before that. */
+    openedAt: timestamp("opened_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("autopilotFindings_organizationId_fingerprint_uidx").on(
+      table.organizationId,
+      table.fingerprint
+    ),
+    index("autopilotFindings_organizationId_status_idx").on(
+      table.organizationId,
+      table.status
+    ),
+  ]
+);
+
+/**
+ * Things a workspace told Autopilot to skip, in plain words ("never write
+ * posts about framework upgrades"). Every decision reads all of them.
+ */
+export const autopilotRules = pgTable(
+  "autopilot_rules",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    text: text("text").notNull(),
+    source: text("source", { enum: AUTOPILOT_RULE_SOURCES }).notNull(),
+    /** The comment or page the rule came from. */
+    sourceUrl: text("source_url"),
+    /** GitHub login or dashboard user who said it. */
+    createdBy: text("created_by"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("autopilotRules_organizationId_createdAt_idx").on(
+      table.organizationId,
+      table.createdAt
+    ),
+  ]
+);
+
+/** Step-by-step trace of what Autopilot looked at and decided during a run. */
+export const autopilotRunEvents = pgTable(
+  "autopilot_run_events",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    runId: text("run_id")
+      .notNull()
+      .references(() => autopilotRuns.id, { onDelete: "cascade" }),
+    job: text("job", { enum: AUTOPILOT_JOB_KINDS }),
+    level: text("level", { enum: AUTOPILOT_EVENT_LEVELS }).notNull(),
+    message: text("message").notNull(),
+    data: jsonb("data").$type<AutopilotRunEventData | null>().default(null),
+    /** Admin-only events (per-candidate drops, raw model calls); never sent to users. */
+    internal: boolean("internal").notNull().default(false),
+    /** Admin-only payload: prompts, model inputs and outputs, tool calls. */
+    detail: jsonb("detail").$type<AutopilotTraceDetail | null>().default(null),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("autopilotRunEvents_runId_createdAt_idx").on(
+      table.runId,
+      table.createdAt
+    ),
+  ]
 );

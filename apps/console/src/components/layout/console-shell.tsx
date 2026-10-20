@@ -5,6 +5,7 @@ import {
   GlobeIcon,
   Logout01Icon,
   PlugSocketIcon,
+  Robot01Icon,
   SecurityCheckIcon,
   Tick02Icon,
   UnfoldMoreIcon,
@@ -194,6 +195,7 @@ function ConsoleNavigation({
             label: "Sites",
             icon: GlobeIcon,
           },
+          { href: `/${slug}/autopilot`, label: "Autopilot", icon: Robot01Icon },
         ]
       : []),
   ];

@@ -227,7 +227,7 @@ if (!process.env.NOTRA_SITES_FLAG_TEST_WORKER) {
     ).toEqual({ configured: true, hostingDomain: "hosting.example" });
   });
   test("navigation and AI discovery expose Sites only when enabled", () => {
-    const off = { analytics: true, sites: false };
+    const off = { autopilot: false, analytics: true, sites: false };
     const on = { ...off, sites: true };
     expect(resolveNavItems(["/sites"], off)).toEqual([]);
     expect(resolveNavItems(["/sites"], on)).toHaveLength(1);

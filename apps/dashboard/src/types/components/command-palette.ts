@@ -17,6 +17,7 @@ export type CommandRouteId =
   | "home"
   | "chat"
   | "analytics"
+  | "autopilot"
   | "geo"
   | "geo-traffic"
   | "geo-prompts"

@@ -553,3 +553,5 @@ export type ContentPullRequestState =
   | { status: "merged"; mergedAt: Date | null }
   | { status: "closed" }
   | { status: "open"; draft: boolean; nodeId: string };
+
+export type GitHubMergeMethod = "squash" | "merge" | "rebase";

@@ -146,7 +146,11 @@ export async function renderHtmlToImages(htmlSource: string) {
   const safeHtml = injectDisplayFlexInHtml(htmlSource);
   const rawTree = parseHtml(safeHtml);
   enforceSatoriDisplay(rawTree);
-  const tree = toReactNode(rawTree);
+  return await renderElementToImages(toReactNode(rawTree));
+}
+
+/** Renders a ready element tree (fixed templates), skipping the HTML parser. */
+export async function renderElementToImages(tree: ReactNode) {
   const fonts = await loadAllFonts();
 
   const svg = await satori(tree, {

@@ -44,11 +44,18 @@ if (process.env.NOTRA_MENTION_WORKFLOW_TEST !== "1") {
     buildAcceptedMentionWebhookLog: () => ({ status: "pending" }),
     buildMentionResultWebhookLog: ({ result }: { result: unknown }) => result,
   }));
+  mock.module("@/lib/autopilot/mentions", () => ({
+    handleAutopilotMention: async () => null,
+  }));
+  mock.module("@/lib/autopilot/pull-request-events", () => ({
+    handleAutopilotPullRequestEvent: async () => undefined,
+  }));
   mock.module("@/lib/webhooks/github-mention-log", () => ({
     writeMentionWebhookLog: writeLog,
   }));
   mock.module("@/lib/workflows/start", () => ({
     startGitHubMentionRun: startRun,
+    startAutopilotPullRequestWorkflowRun: async () => undefined,
     startContentPublicationSyncRepair: async () => undefined,
   }));
   mock.module("workflow", () => ({

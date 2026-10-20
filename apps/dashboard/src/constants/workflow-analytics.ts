@@ -11,6 +11,7 @@ export const WORKFLOW_ANALYTICS_NAMES = {
   GEO_SCAN: "geo-scan",
   GEO_WRITER: "geo-writer",
   AGENT_READINESS: "agent-readiness",
+  AUTOPILOT: "autopilot",
   GSC_SYNC: "gsc-sync",
   ON_DEMAND_CONTENT: "on-demand-content",
   CONTENT_EMAIL_DIGEST: "content-email-digest",

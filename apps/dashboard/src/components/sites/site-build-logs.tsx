@@ -84,6 +84,7 @@ function BuildLogCopyButton({ log }: SiteBuildLogCopyButtonProps) {
 export function SiteBuildLogs({
   log,
   heading,
+  title,
   inProgress,
   queued,
   startAtEnd = false,
@@ -228,7 +229,7 @@ export function SiteBuildLogs({
       data-timestamps={offsets.size > 0}
     >
       <div className="flex min-h-7 min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
-        <h2 className="me-auto text-sm font-medium">{t("title")}</h2>
+        <h2 className="me-auto text-sm font-medium">{title ?? t("title")}</h2>
         {controls}
       </div>
       <div className="bg-muted/20 relative min-w-0 overflow-hidden rounded-md border">

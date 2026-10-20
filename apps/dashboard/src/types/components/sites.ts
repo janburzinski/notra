@@ -332,6 +332,8 @@ export interface SiteBuildLogCopyButtonProps {
 export interface SiteBuildLogsProps {
   log: string | null;
   heading?: ReactNode;
+  /** Overrides "Build logs" when the log shows something other than a build. */
+  title?: string;
   inProgress: boolean;
   queued: boolean;
   startAtEnd?: boolean;

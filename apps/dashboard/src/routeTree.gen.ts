@@ -26,6 +26,7 @@ import { Route as ApiBrandFontCssRouteImport } from './routes/api.brand-font.css
 import { Route as ApiBrandFontFileRouteImport } from './routes/api.brand-font.file'
 import { Route as ApiC15tSplatRouteImport } from './routes/api.c15t.$'
 import { Route as ApiCommandPaletteNavigateRouteImport } from './routes/api.command-palette.navigate'
+import { Route as ApiCronAutopilotRouteImport } from './routes/api.cron.autopilot'
 import { Route as ApiCronBrewContactsRouteImport } from './routes/api.cron.brew-contacts'
 import { Route as ApiCronGeoContentGapsRouteImport } from './routes/api.cron.geo-content-gaps'
 import { Route as ApiCronGeoRecapRouteImport } from './routes/api.cron.geo-recap'
@@ -62,6 +63,7 @@ import { Route as ApiIntegrationsLinearAuthorizeRouteImport } from './routes/api
 import { Route as ApiIntegrationsLinearCallbackRouteImport } from './routes/api.integrations.linear.callback'
 import { Route as ApiIntegrationsSlackAuthorizeRouteImport } from './routes/api.integrations.slack.authorize'
 import { Route as ApiIntegrationsSlackCallbackRouteImport } from './routes/api.integrations.slack.callback'
+import { Route as ApiInternalAutopilotAdminRouteImport } from './routes/api.internal.autopilot.admin'
 import { Route as ApiInternalContentScheduledPublicationAttemptRouteImport } from './routes/api.internal.content.scheduled-publication-attempt'
 import { Route as ApiInternalContentSyncGithubRouteImport } from './routes/api.internal.content.sync-github'
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
@@ -177,6 +179,11 @@ const ApiCommandPaletteNavigateRoute =
     path: '/api/command-palette/navigate',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCronAutopilotRoute = ApiCronAutopilotRouteImport.update({
+  id: '/api/cron/autopilot',
+  path: '/api/cron/autopilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCronBrewContactsRoute = ApiCronBrewContactsRouteImport.update({
   id: '/api/cron/brew-contacts',
   path: '/api/cron/brew-contacts',
@@ -370,6 +377,12 @@ const ApiIntegrationsSlackCallbackRoute =
     path: '/api/integrations/slack/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalAutopilotAdminRoute =
+  ApiInternalAutopilotAdminRouteImport.update({
+    id: '/api/internal/autopilot/admin',
+    path: '/api/internal/autopilot/admin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalContentScheduledPublicationAttemptRoute =
   ApiInternalContentScheduledPublicationAttemptRouteImport.update({
     id: '/api/internal/content/scheduled-publication-attempt',
@@ -550,6 +563,7 @@ export interface FileRoutesByFullPath {
   '/api/brand-font/file': typeof ApiBrandFontFileRoute
   '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/command-palette/navigate': typeof ApiCommandPaletteNavigateRoute
+  '/api/cron/autopilot': typeof ApiCronAutopilotRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
@@ -586,6 +600,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
+  '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -632,6 +647,7 @@ export interface FileRoutesByTo {
   '/api/brand-font/file': typeof ApiBrandFontFileRoute
   '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/command-palette/navigate': typeof ApiCommandPaletteNavigateRoute
+  '/api/cron/autopilot': typeof ApiCronAutopilotRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
@@ -668,6 +684,7 @@ export interface FileRoutesByTo {
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
+  '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -715,6 +732,7 @@ export interface FileRoutesById {
   '/api/brand-font/file': typeof ApiBrandFontFileRoute
   '/api/c15t/$': typeof ApiC15tSplatRoute
   '/api/command-palette/navigate': typeof ApiCommandPaletteNavigateRoute
+  '/api/cron/autopilot': typeof ApiCronAutopilotRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
@@ -751,6 +769,7 @@ export interface FileRoutesById {
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
+  '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -799,6 +818,7 @@ export interface FileRouteTypes {
     | '/api/brand-font/file'
     | '/api/c15t/$'
     | '/api/command-palette/navigate'
+    | '/api/cron/autopilot'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
     | '/api/cron/geo-recap'
@@ -835,6 +855,7 @@ export interface FileRouteTypes {
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
+    | '/api/internal/autopilot/admin'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -881,6 +902,7 @@ export interface FileRouteTypes {
     | '/api/brand-font/file'
     | '/api/c15t/$'
     | '/api/command-palette/navigate'
+    | '/api/cron/autopilot'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
     | '/api/cron/geo-recap'
@@ -917,6 +939,7 @@ export interface FileRouteTypes {
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
+    | '/api/internal/autopilot/admin'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -963,6 +986,7 @@ export interface FileRouteTypes {
     | '/api/brand-font/file'
     | '/api/c15t/$'
     | '/api/command-palette/navigate'
+    | '/api/cron/autopilot'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
     | '/api/cron/geo-recap'
@@ -999,6 +1023,7 @@ export interface FileRouteTypes {
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
+    | '/api/internal/autopilot/admin'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -1046,6 +1071,7 @@ export interface RootRouteChildren {
   ApiBrandFontFileRoute: typeof ApiBrandFontFileRoute
   ApiC15tSplatRoute: typeof ApiC15tSplatRoute
   ApiCommandPaletteNavigateRoute: typeof ApiCommandPaletteNavigateRoute
+  ApiCronAutopilotRoute: typeof ApiCronAutopilotRoute
   ApiCronBrewContactsRoute: typeof ApiCronBrewContactsRoute
   ApiCronGeoContentGapsRoute: typeof ApiCronGeoContentGapsRoute
   ApiCronGeoRecapRoute: typeof ApiCronGeoRecapRoute
@@ -1076,6 +1102,7 @@ export interface RootRouteChildren {
   ApiIntegrationsLinearCallbackRoute: typeof ApiIntegrationsLinearCallbackRoute
   ApiIntegrationsSlackAuthorizeRoute: typeof ApiIntegrationsSlackAuthorizeRoute
   ApiIntegrationsSlackCallbackRoute: typeof ApiIntegrationsSlackCallbackRoute
+  ApiInternalAutopilotAdminRoute: typeof ApiInternalAutopilotAdminRoute
   ApiInternalContentScheduledPublicationAttemptRoute: typeof ApiInternalContentScheduledPublicationAttemptRoute
   ApiInternalContentSyncGithubRoute: typeof ApiInternalContentSyncGithubRoute
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
@@ -1217,6 +1244,13 @@ declare module '@tanstack/react-router' {
       path: '/api/command-palette/navigate'
       fullPath: '/api/command-palette/navigate'
       preLoaderRoute: typeof ApiCommandPaletteNavigateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/autopilot': {
+      id: '/api/cron/autopilot'
+      path: '/api/cron/autopilot'
+      fullPath: '/api/cron/autopilot'
+      preLoaderRoute: typeof ApiCronAutopilotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/cron/brew-contacts': {
@@ -1469,6 +1503,13 @@ declare module '@tanstack/react-router' {
       path: '/api/integrations/slack/callback'
       fullPath: '/api/integrations/slack/callback'
       preLoaderRoute: typeof ApiIntegrationsSlackCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/internal/autopilot/admin': {
+      id: '/api/internal/autopilot/admin'
+      path: '/api/internal/autopilot/admin'
+      fullPath: '/api/internal/autopilot/admin'
+      preLoaderRoute: typeof ApiInternalAutopilotAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/internal/content/scheduled-publication-attempt': {
@@ -1784,6 +1825,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBrandFontFileRoute: ApiBrandFontFileRoute,
   ApiC15tSplatRoute: ApiC15tSplatRoute,
   ApiCommandPaletteNavigateRoute: ApiCommandPaletteNavigateRoute,
+  ApiCronAutopilotRoute: ApiCronAutopilotRoute,
   ApiCronBrewContactsRoute: ApiCronBrewContactsRoute,
   ApiCronGeoContentGapsRoute: ApiCronGeoContentGapsRoute,
   ApiCronGeoRecapRoute: ApiCronGeoRecapRoute,
@@ -1817,6 +1859,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIntegrationsLinearCallbackRoute: ApiIntegrationsLinearCallbackRoute,
   ApiIntegrationsSlackAuthorizeRoute: ApiIntegrationsSlackAuthorizeRoute,
   ApiIntegrationsSlackCallbackRoute: ApiIntegrationsSlackCallbackRoute,
+  ApiInternalAutopilotAdminRoute: ApiInternalAutopilotAdminRoute,
   ApiInternalContentScheduledPublicationAttemptRoute:
     ApiInternalContentScheduledPublicationAttemptRoute,
   ApiInternalContentSyncGithubRoute: ApiInternalContentSyncGithubRoute,

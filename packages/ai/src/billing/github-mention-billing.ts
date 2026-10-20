@@ -162,17 +162,18 @@ export async function reserveGitHubMentionBilling(input: {
 }
 
 /**
- * Deducts what the run actually cost. Without usage the run still spent model
- * calls somewhere, so it pays the minimum rather than nothing.
+ * Deducts what the run actually cost and returns the credits charged (0 when
+ * unmetered). Without usage the run still spent model calls somewhere, so it
+ * pays the minimum rather than nothing.
  */
 export async function confirmGitHubMentionBilling(input: {
   reservation: GitHubMentionBillingReservation;
   usage: AgentTokenUsage | null;
   properties?: Record<string, string | number | boolean>;
-}): Promise<void> {
+}): Promise<number> {
   const { reservation } = input;
   if (!(autumn && reservation.lockId)) {
-    return;
+    return 0;
   }
   const cost = input.usage
     ? calculateAiCreditCostCents(
@@ -195,6 +196,7 @@ export async function confirmGitHubMentionBilling(input: {
     ...(input.usage ? { total_tokens: input.usage.totalTokens } : {}),
     ...input.properties,
   });
+  return costCents;
 }
 
 /** Gives the hold back when the run never reached the model. */

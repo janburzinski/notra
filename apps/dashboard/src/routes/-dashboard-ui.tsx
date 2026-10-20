@@ -94,6 +94,18 @@ const Brand = lazyPage(
 const Feedback = lazyPage(
   () => import("@/app/(dashboard)/[slug]/feedback/page-client")
 );
+const Autopilot = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/autopilot/page-client")
+);
+const AutopilotRun = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/autopilot/runs/[id]/page-client")
+);
+const AutopilotFinding = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client")
+);
+const AutopilotAutomation = lazyPage(
+  () => import("@/app/(dashboard)/[slug]/autopilot/[automation]/page-client")
+);
 const BillingSuccess = lazyPage(
   () => import("@/app/(dashboard)/[slug]/settings/billing/success/page")
 );
@@ -425,6 +437,46 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
       pendingComponent: FeedbackLoading,
       preload: Feedback.preload,
       component: ({ params }) => <Feedback organizationSlug={params.slug} />,
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "autopilot",
+      title: { title: "Autopilot" },
+      preload: Autopilot.preload,
+      component: ({ params }) => <Autopilot organizationSlug={params.slug} />,
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "autopilot/runs/$id",
+      title: { title: "Autopilot run" },
+      preload: AutopilotRun.preload,
+      component: ({ params }) => (
+        <AutopilotRun organizationSlug={params.slug} runId={params.id} />
+      ),
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "autopilot/findings/$id",
+      title: { title: "Autopilot" },
+      preload: AutopilotFinding.preload,
+      component: ({ params }) => (
+        <AutopilotFinding
+          findingId={params.id}
+          organizationSlug={params.slug}
+        />
+      ),
+    }),
+    createUiRoute({
+      parent: organization,
+      path: "autopilot/$name",
+      title: { title: "Autopilot" },
+      preload: AutopilotAutomation.preload,
+      component: ({ params }) => (
+        <AutopilotAutomation
+          automation={params.name}
+          organizationSlug={params.slug}
+        />
+      ),
     }),
     createUiRoute({
       parent: organization,

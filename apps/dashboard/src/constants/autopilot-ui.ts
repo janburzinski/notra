@@ -1,0 +1,171 @@
+import {
+  AiMagicIcon,
+  GitBranchIcon,
+  Robot01Icon,
+  Search01Icon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
+import type { IconSvgElement } from "@hugeicons/react";
+import type {
+  AutopilotEventLevel,
+  AutopilotFindingStatus,
+  AutopilotJobKind,
+} from "@notra/db/types/autopilot";
+import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
+
+import { CONTENT_PULL_REQUEST_STATES } from "@/constants/content-overview";
+import type {
+  AutopilotAutomationKind,
+  AutopilotMetricsDays,
+} from "@/types/autopilot-metrics";
+import type { GitHubMergeMethod } from "@/types/integrations/github";
+
+/** Tabs of the Autopilot page, in order; the first is the default. */
+export const AUTOPILOT_PAGE_TABS = [
+  "automations",
+  "pull-requests",
+  "runs",
+  "settings",
+] as const;
+
+/** What a Slack brief button asks the Autopilot page to do with ?finding=…&action=… */
+export const AUTOPILOT_LINK_ACTIONS = ["merge", "dismiss"] as const;
+
+export const AUTOPILOT_METRIC_RANGES = [
+  { days: 7, label: "Last 7 days" },
+  { days: 30, label: "Last 30 days" },
+  { days: 90, label: "Last 90 days" },
+] as const satisfies readonly { days: AutopilotMetricsDays; label: string }[];
+
+/** Short labels for anything Autopilot did, e.g. the automation of a pull request. */
+export const AUTOPILOT_KIND_META: Record<
+  AutopilotJobKind,
+  { label: string; icon: typeof Robot01Icon }
+> = {
+  readiness: { label: "Agent readiness", icon: Robot01Icon },
+  keywords: { label: "Content gaps", icon: Search01Icon },
+  commits: { label: "Releases", icon: GitBranchIcon },
+  prompts: { label: "Prompts", icon: AiMagicIcon },
+  competitors: { label: "Competitors", icon: UserGroupIcon },
+};
+
+/**
+ * The automations as the dashboard explains them: what each does, what it
+ * reads, what it hands you, and what besides the daily run starts it.
+ */
+export const AUTOPILOT_AUTOMATIONS: Record<
+  AutopilotAutomationKind,
+  {
+    name: string;
+    description: string;
+    source: string;
+    output: string;
+    /** What the waiting pull request is, in "the next … opens". */
+    noun: string;
+    alsoOn: string | null;
+  }
+> = {
+  readiness: {
+    name: "Fix agent readiness",
+    description:
+      "Rescans your site and opens a pull request for llms.txt, AI crawler rules and structured data.",
+    source: "Your Agent Readiness scan",
+    output: "Opens a pull request",
+    noun: "fix",
+    alsoOn: null,
+  },
+  keywords: {
+    name: "Write for content gaps",
+    description:
+      "Drafts a post for prompts and searches where competitors show up and you don't.",
+    source: "Prompts and searches you lose",
+    output: "Writes a post",
+    noun: "post",
+    alsoOn: null,
+  },
+  commits: {
+    name: "Write about releases",
+    description:
+      "Drafts a post when you ship something worth telling users about.",
+    source: "Pull requests you ship",
+    output: "Writes a post",
+    noun: "post",
+    alsoOn: "And when a pull request ships",
+  },
+};
+
+/** One automation's outcome in a run, by the level it was logged at. */
+export const AUTOPILOT_JOB_DECISION_BADGES: Record<
+  AutopilotEventLevel,
+  { label: string; appearance: StatusBadgeAppearance }
+> = {
+  info: { label: "Noted", appearance: { variant: "secondary" } },
+  skip: { label: "Skipped", appearance: { variant: "secondary" } },
+  decision: { label: "Decided", appearance: { variant: "info" } },
+  action: { label: "Opened", appearance: { variant: "success" } },
+  error: { label: "Failed", appearance: { variant: "destructive" } },
+};
+
+/** URL segment of each automation's page under /autopilot. */
+export const AUTOPILOT_AUTOMATION_SLUGS: Record<
+  AutopilotAutomationKind,
+  string
+> = {
+  readiness: "agent-readiness",
+  keywords: "content-gaps",
+  commits: "releases",
+};
+
+/** GitHub's merge buttons, in GitHub's words; squash is the default. */
+export const AUTOPILOT_MERGE_METHOD_LABELS: Record<GitHubMergeMethod, string> =
+  {
+    squash: "Squash and merge",
+    merge: "Create a merge commit",
+    rebase: "Rebase and merge",
+  };
+export const AUTOPILOT_MERGE_METHODS = Object.keys(
+  AUTOPILOT_MERGE_METHOD_LABELS
+) as GitHubMergeMethod[];
+
+/**
+ * The GitHub state icon for a finding with a pull request, in GitHub's
+ * colours. An auto-closed draft is closed too, just in grey: nobody said no.
+ */
+export const AUTOPILOT_PULL_REQUEST_STATES: Partial<
+  Record<
+    AutopilotFindingStatus,
+    {
+      icon: IconSvgElement;
+      variant: StatusBadgeAppearance["variant"];
+      /** Merged has no soft badge colour of its own; GitHub shows it purple. */
+      className?: string;
+      label: string;
+    }
+  >
+> = {
+  proposed: {
+    icon: CONTENT_PULL_REQUEST_STATES.open.icon,
+    variant: "success",
+    label: "Open",
+  },
+  merged: {
+    icon: CONTENT_PULL_REQUEST_STATES.merged.icon,
+    variant: "secondary",
+    className:
+      "bg-primary/10 text-primary dark:bg-primary/20 [a]:hover:bg-primary/20",
+    label: "Merged",
+  },
+  dismissed: {
+    icon: CONTENT_PULL_REQUEST_STATES.closed.icon,
+    variant: "destructive",
+    label: "Closed",
+  },
+  expired: {
+    icon: CONTENT_PULL_REQUEST_STATES.closed.icon,
+    variant: "secondary",
+    label: "Closed automatically because nobody touched it",
+  },
+};
+
+/** Room for an empty table's icon, title and text; a one-row table would clip them. */
+export const AUTOPILOT_EMPTY_TABLE_HEIGHT = 300;

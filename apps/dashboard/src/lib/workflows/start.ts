@@ -28,10 +28,20 @@ import {
   WORKFLOW_TRIGGERS,
 } from "@/constants/workflow-analytics";
 import { trackWorkflowStarted } from "@/lib/analytics/workflow-lifecycle";
+import { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
+import type {
+  AutopilotWorkflowPayload,
+  AutopilotSuggestionWorkflowPayload,
+  AutopilotPullRequestWorkflowPayload,
+} from "@/types/autopilot";
 import type { BrandAnalysisPayload } from "@/types/brand-analysis";
 import type { ScheduledPublicationWorkflowInput } from "@/types/content/scheduled-publications";
 import type { SiteJobRunHandle } from "@/types/sites-server";
+import { autopilotPullRequestMoment } from "@/utils/autopilot-github";
 import { agentReadinessWorkflow } from "@/workflows/agent-readiness";
+import { autopilotWorkflow } from "@/workflows/autopilot";
+import { autopilotPullRequestWorkflow } from "@/workflows/autopilot-pull-request";
+import { autopilotSuggestionWorkflow } from "@/workflows/autopilot-suggestion";
 import {
   brandAnalysisPayloadSchema,
   brandAnalysisWorkflow,
@@ -253,6 +263,44 @@ export async function startAgentReadinessRun(
     projectId: parsed.projectId,
     properties: { report_id: parsed.reportId },
   });
+  return { runId: run.runId };
+}
+
+export async function startAutopilotWorkflowRun(
+  payload: AutopilotWorkflowPayload & { previousRunAt: string | null }
+): Promise<{ runId: string }> {
+  const run = await start(autopilotWorkflow, [payload]);
+  trackWorkflowStarted({
+    workflow: WORKFLOW_ANALYTICS_NAMES.AUTOPILOT,
+    runId: run.runId,
+    organizationId: payload.organizationId,
+    properties: { autopilot_run_id: payload.runId },
+  });
+  return { runId: run.runId };
+}
+
+export async function startAutopilotSuggestionWorkflowRun(
+  payload: AutopilotSuggestionWorkflowPayload
+): Promise<{ runId: string }> {
+  const run = await start(autopilotSuggestionWorkflow, [payload]);
+  return { runId: run.runId };
+}
+
+export async function startAutopilotPullRequestWorkflowRun(
+  payload: AutopilotPullRequestWorkflowPayload
+): Promise<{ runId: string } | null> {
+  if (!payload.deliveryId) {
+    throw new Error("GitHub delivery ID is required");
+  }
+  const parsed = autopilotPullRequestEventSchema.safeParse(
+    JSON.parse(payload.rawBody)
+  );
+  if (!parsed.success || !autopilotPullRequestMoment(parsed.data)) {
+    return null;
+  }
+  const run = await start(autopilotPullRequestWorkflow, [
+    { deliveryId: payload.deliveryId, rawBody: JSON.stringify(parsed.data) },
+  ]);
   return { runId: run.runId };
 }
 

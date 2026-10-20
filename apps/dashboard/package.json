@@ -135,6 +135,7 @@
   },
   "devDependencies": {
     "@ai-sdk/devtools": "catalog:",
+    "@electric-sql/pglite": "catalog:",
     "@notra/typescript-config": "workspace:*",
     "@tailwindcss/vite": "4.3.3",
     "@types/node": "^20",

@@ -647,7 +647,9 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
           and(
             eq(geoPromptSuggestions.organizationId, scope.organizationId),
             eq(geoPromptSuggestions.projectId, projectId),
-            eq(geoPromptSuggestions.status, "pending")
+            eq(geoPromptSuggestions.status, "pending"),
+            // Autopilot's pause suggestions are not writing opportunities.
+            eq(geoPromptSuggestions.source, "search_console")
           )
         )
         .orderBy(desc(geoPromptSuggestions.createdAt))
@@ -752,6 +754,14 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
       opportunity: won ? 0 : score.opportunity,
       won,
       brief: toBriefRef(briefBySource.get(sourceKey("gap", id))),
+      recommendation: recommendSearchGapAction({
+        matches: scoreContentCollisions(
+          { prompt, title, queries: entry.searchQueriesByEngine.flat() },
+          collisionCandidates
+        ),
+        impressions: null,
+        clicks: null,
+      }),
     });
   };
   forEachMissingMajorityGap(

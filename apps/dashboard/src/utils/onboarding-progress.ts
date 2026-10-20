@@ -1,10 +1,19 @@
 import type { GeoOnboardingStage } from "@notra/geo-core/types/geo";
 
+import {
+  ONBOARDING_STEP_AUTOPILOT,
+  ONBOARDING_STEP_COMPETITORS,
+  ONBOARDING_STEP_ORDER,
+  ONBOARDING_STEP_PRICING,
+  ONBOARDING_STEP_VISIBILITY,
+  ONBOARDING_STEP_WORKSPACE,
+} from "@/constants/onboarding";
 import type {
   OnboardingProgressHrefInput,
   OnboardingProgressHrefs,
 } from "@/types/onboarding";
 import {
+  geoOnboardingAutopilotPath,
   geoOnboardingCompetitorsPath,
   geoOnboardingPath,
   geoOnboardingPricingPath,
@@ -17,16 +26,23 @@ function isStepReachable(
   hasBrand: boolean,
   stage: GeoOnboardingStage | null
 ): boolean {
-  if (step === 1) {
+  if (step === ONBOARDING_STEP_WORKSPACE) {
     return hasOrganization;
   }
-  if (step === 2) {
+  if (step === ONBOARDING_STEP_VISIBILITY) {
     return hasBrand;
   }
-  if (step === 3) {
+  if (step === ONBOARDING_STEP_COMPETITORS) {
     return stage === "competitors" || stage === "complete";
   }
   return stage === "complete";
+}
+
+/** Step ids shown in the progress bar, in order. */
+export function onboardingSteps(autopilot: boolean): number[] {
+  return ONBOARDING_STEP_ORDER.filter(
+    (step) => autopilot || step !== ONBOARDING_STEP_AUTOPILOT
+  );
 }
 
 export function onboardingProgressHrefs({
@@ -36,21 +52,25 @@ export function onboardingProgressHrefs({
   stage,
   projectId,
   replay = false,
+  autopilot,
 }: OnboardingProgressHrefInput): OnboardingProgressHrefs {
-  const paths = [
-    geoOnboardingWorkspacePath(projectId, replay),
-    geoOnboardingPath(projectId, replay),
-    geoOnboardingCompetitorsPath(projectId, replay),
-    geoOnboardingPricingPath(projectId, replay),
-  ];
+  const paths: Record<number, string> = {
+    [ONBOARDING_STEP_WORKSPACE]: geoOnboardingWorkspacePath(projectId, replay),
+    [ONBOARDING_STEP_VISIBILITY]: geoOnboardingPath(projectId, replay),
+    [ONBOARDING_STEP_COMPETITORS]: geoOnboardingCompetitorsPath(
+      projectId,
+      replay
+    ),
+    [ONBOARDING_STEP_AUTOPILOT]: geoOnboardingAutopilotPath(projectId, replay),
+    [ONBOARDING_STEP_PRICING]: geoOnboardingPricingPath(projectId, replay),
+  };
 
-  return paths.map((path, index) => {
-    const step = index + 1;
-    if (step === current) {
-      return null;
-    }
-    return isStepReachable(step, hasOrganization, hasBrand, stage)
-      ? path
-      : null;
-  });
+  return onboardingSteps(autopilot).map((step) => ({
+    step,
+    href:
+      step !== current &&
+      isStepReachable(step, hasOrganization, hasBrand, stage)
+        ? (paths[step] ?? null)
+        : null,
+  }));
 }

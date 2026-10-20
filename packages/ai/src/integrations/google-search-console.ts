@@ -276,7 +276,8 @@ export async function upsertGscIntegration(
         .where(
           and(
             eq(geoPromptSuggestions.organizationId, params.organizationId),
-            eq(geoPromptSuggestions.status, "pending")
+            eq(geoPromptSuggestions.status, "pending"),
+            eq(geoPromptSuggestions.source, "search_console")
           )
         );
       await tx
@@ -475,7 +476,8 @@ export async function deleteGscIntegration(
       .where(
         and(
           eq(geoPromptSuggestions.organizationId, integration.organizationId),
-          eq(geoPromptSuggestions.status, "pending")
+          eq(geoPromptSuggestions.status, "pending"),
+          eq(geoPromptSuggestions.source, "search_console")
         )
       );
     await tx

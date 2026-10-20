@@ -7,7 +7,10 @@ import {
 import { SITES_ONLY_GITHUB_EVENTS } from "@/constants/sites";
 import { afterResponse } from "@/lib/framework/after-response";
 import { writeMentionWebhookLog } from "@/lib/webhooks/github-mention-log";
-import { startGitHubMentionRun } from "@/lib/workflows/start";
+import {
+  startGitHubMentionRun,
+  startAutopilotPullRequestWorkflowRun,
+} from "@/lib/workflows/start";
 
 export const POST = withEvlog(async (request: Request) => {
   const rawBody = await request.text();
@@ -64,6 +67,18 @@ export const POST = withEvlog(async (request: Request) => {
 
   if (result.context) {
     await startGitHubMentionRun(result.context);
+  }
+
+  // Signature checked by the ingest above; ready, merged and closed PRs get Autopilot's look.
+  if (event === "pull_request" && result.httpStatus < 400) {
+    if (!deliveryId) {
+      return Response.json(
+        { error: "GitHub delivery ID is required" },
+        { status: 400 }
+      );
+    }
+    // Await durable enqueue: a queue failure must remain retryable by GitHub.
+    await startAutopilotPullRequestWorkflowRun({ rawBody, deliveryId });
   }
 
   if (result.log && !result.context) {

@@ -15,6 +15,7 @@ import {
   brandSettings,
   geoCompetitors,
   geoPrompts,
+  geoPromptSuggestions,
   geoScans,
   geoSettings,
 } from "@notra/db/schema";
@@ -1949,6 +1950,19 @@ export const deleteGeoPrompt = Effect.fn("geo.promptsDelete")(function* (
   promptId: string
 ) {
   const scope = yield* requireGeoProject(input);
+  // Autopilot suggestions about this prompt have nothing left to act on.
+  yield* geoDb("retire prompt suggestions failed", () =>
+    db
+      .update(geoPromptSuggestions)
+      .set({ status: "dismissed" })
+      .where(
+        and(
+          eq(geoPromptSuggestions.projectId, scope.projectId),
+          eq(geoPromptSuggestions.targetPromptId, promptId),
+          eq(geoPromptSuggestions.status, "pending")
+        )
+      )
+  );
   const rows = yield* geoDb("prompt delete failed", () =>
     db
       .delete(geoPrompts)

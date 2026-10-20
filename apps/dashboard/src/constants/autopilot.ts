@@ -1,0 +1,352 @@
+import type {
+  AutopilotEventLevel,
+  AutopilotFindingStatus,
+  AutopilotJobKind,
+  AutopilotRunStatus,
+} from "@notra/db/types/autopilot";
+import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
+
+export const AUTOPILOT_FLAG_KEY = "autopilot";
+export const AUTOPILOT_GITHUB_DELIVERY_PREFIX = "autopilot:";
+
+/**
+ * The automations the dashboard lists: the jobs that open pull requests.
+ * prompts suggests pauses on the Prompts page and competitors is a line in
+ * the brief, so neither has pull requests or merges to count.
+ */
+export const AUTOPILOT_AUTOMATION_KINDS = [
+  "readiness",
+  "keywords",
+  "commits",
+] as const satisfies readonly AutopilotJobKind[];
+export const AUTOPILOT_NAV_LINK = "/autopilot";
+
+export const AUTOPILOT_BRANCH_PREFIX = "notra/autopilot";
+export const AUTOPILOT_MARKDOWN_FILE = /\.mdx?$/;
+export const AUTOPILOT_BLOG_SLUG_MAX_CHARS = 60;
+
+export const AUTOPILOT_PULL_REQUEST_FOOTER =
+  '<a href="https://www.usenotra.com"><picture>' +
+  '<source media="(prefers-color-scheme: dark)" srcset="https://app.usenotra.com/badges/notra-autopilot-dark.svg">' +
+  '<source media="(prefers-color-scheme: light)" srcset="https://app.usenotra.com/badges/notra-autopilot-light.svg">' +
+  '<img src="https://app.usenotra.com/badges/notra-autopilot-light.svg" alt="Drafted by Notra Autopilot" height="44">' +
+  "</picture></a>";
+
+/** Readiness reports older than this are refreshed before proposing fixes. */
+export const AUTOPILOT_READINESS_MAX_AGE_MS = 20 * 60 * 60 * 1000;
+export const AUTOPILOT_READINESS_SCAN_WAIT_MS = 4 * 60 * 1000;
+export const AUTOPILOT_READINESS_SCAN_POLL_MS = 5000;
+
+/**
+ * A draft Autopilot closed as stale may come back once this has passed; until
+ * then it counts as settled so the next run doesn't reopen the same thing.
+ */
+export const AUTOPILOT_EXPIRED_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+/** Pages of 100 pull request events read before assuming a draft was closed once. */
+export const AUTOPILOT_PULL_REQUEST_EVENT_PAGES = 10;
+export const AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS = [7, 14, 30] as const;
+export const AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS = 14;
+
+/** "Now" in a pull request's impact is measured over at most this many days after the merge. */
+export const AUTOPILOT_IMPACT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+/** Matches what the overview lists, so every row it shows can get a value. */
+export const AUTOPILOT_IMPACT_MAX_FINDINGS = 100;
+
+/** An open finding whose writer stopped this long ago may be taken over. */
+export const AUTOPILOT_FINDING_CLAIM_LEASE_MS = 30 * 60 * 1000;
+
+/** A run still marked running after this long is treated as abandoned. */
+export const AUTOPILOT_RUN_LEASE_MS = 2 * 60 * 60 * 1000;
+export const AUTOPILOT_LEASE_RENEW_INTERVAL_MS = 60_000;
+export const AUTOPILOT_TRACE_DETAIL_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+
+export const AUTOPILOT_COMMITS_LOOKBACK_DAYS = 7;
+export const AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS = 30;
+export const AUTOPILOT_COMMITS_MAX_REPOSITORIES = 5;
+export const AUTOPILOT_COMMITS_MAX_PULL_REQUESTS = 30;
+/**
+ * Pull request titles that are pure noise (CI, tests, bumps, merges). refactor
+ * and docs stay in: "refactor: 3x faster dashboard" can be worth a post, and
+ * Jev decides that, not the title.
+ */
+export const AUTOPILOT_COMMITS_SKIP_TITLE =
+  /^(?:(?:chore|ci|build|test|tests|style|deps|revert)(?:\([^)]*\))?!?:|bump |merge |release )/i;
+
+export const AUTOPILOT_COMMITS_JEV_INSTRUCTIONS =
+  "Which merged pull request deserves a blog post for this brand's users? Worth it: a user-facing feature, a meaningful improvement or an interesting engineering story. Not worth it: chores, dependency bumps, refactors, CI, internal tooling and small fixes.";
+export const AUTOPILOT_COMMITS_JEV_NONE =
+  "No post: every pull request is a chore, refactor, small fix or internal change";
+
+/** Jev decides whether a candidate is worth a post before any writer tokens are spent. */
+export const AUTOPILOT_JEV_MODEL_ID = "typesafe-ai/jev-1.14.0";
+/**
+ * Confidence lanes: at or above AUTO_PROPOSE Autopilot opens a pull request,
+ * from MIN_CONFIDENCE up it only suggests the post on the dashboard, below that
+ * the candidate is dropped. Merge and dismiss outcomes are the labels to tune them.
+ */
+export const AUTOPILOT_JEV_MIN_CONFIDENCE = 0.6;
+export const AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE = 0.85;
+/**
+ * An idea nobody dismissed in this many days is written by the daily run, so
+ * the pipeline never waits on a click. Dismissing it is the way to say no.
+ */
+export const AUTOPILOT_IDEA_AUTO_WRITE_DAYS = 3;
+/** Failed writes of one finding before the daily run stops retrying it. */
+export const AUTOPILOT_FINDING_MAX_FAILURES = 3;
+
+/**
+ * On a product pull request: from OFFER Notra asks "should I write about
+ * this?" in a comment, from AUTO_WRITE it drafts the post right away.
+ */
+export const AUTOPILOT_PR_OFFER_CONFIDENCE = 0.85;
+export const AUTOPILOT_PR_AUTO_WRITE_CONFIDENCE = 0.95;
+
+/** Rules are short and few, so every decision can read all of them. */
+export const AUTOPILOT_RULES_MAX = 50;
+export const AUTOPILOT_RULE_MAX_CHARS = 300;
+/** Recently dismissed topics Jev sees next to the rules, as examples of "no". */
+export const AUTOPILOT_DECISION_DISMISSED_EXAMPLES = 20;
+/** How far back the daily run checks Notra's comments for a thumbs down. */
+export const AUTOPILOT_REACTION_LOOKBACK_DAYS = 7;
+export const AUTOPILOT_JEV_MAX_CANDIDATES = 8;
+/** Dropped candidates listed in the run log; the admin trace keeps all of them. */
+export const AUTOPILOT_LOG_DROPPED_MAX = 12;
+export const AUTOPILOT_JEV_NONE_CHOICE = "none";
+
+/** Admin trace strings (prompts, model outputs) are clipped to this length. */
+export const AUTOPILOT_TRACE_TEXT_MAX_CHARS = 16_000;
+
+/** What an @notra comment on a pull request can ask Autopilot for. */
+export const AUTOPILOT_MENTION_INTENTS = {
+  assess:
+    "Asks whether this pull request is worth a blog post, announcement or other content",
+  write:
+    "Asks Notra to write, draft or create a blog post, announcement or other content about this pull request",
+  decline:
+    "Tells Notra not to write about this pull request, or never about this kind of change, or rejects its offer",
+  other:
+    "Anything else: code review, edits to files in this pull request, questions or chat",
+} as const;
+
+/** Prompt gaps where you already show up in more answers than this are left alone. */
+export const AUTOPILOT_KEYWORD_MAX_MENTION_RATE = 0.34;
+
+/**
+ * A tracked prompt is dead when, over the lookback, it ran in enough scans and
+ * no answer named any brand at all. It measures nothing.
+ */
+export const AUTOPILOT_PROMPT_LOOKBACK_DAYS = 30;
+export const AUTOPILOT_PROMPT_DEAD_MIN_SCANS = 3;
+export const AUTOPILOT_PROMPT_DEAD_MIN_ANSWERS = 6;
+export const AUTOPILOT_PROMPT_MAX_SUGGESTIONS = 5;
+export const AUTOPILOT_SEARCH_GAP_MIN_IMPRESSIONS = 100;
+
+export const AUTOPILOT_TREE_MAX_PATHS = 600;
+export const AUTOPILOT_TREE_SUMMARY_MAX_LINES = 120;
+export const AUTOPILOT_CONTEXT_FILE_MAX_CHARS = 12_000;
+export const AUTOPILOT_FIX_MAX_FILES = 6;
+export const AUTOPILOT_READINESS_AGENT_MAX_STEPS = 16;
+
+/** The writer researches in a few steps, then writes; the last step is the post. */
+export const AUTOPILOT_WRITER_MAX_STEPS = 8;
+export const AUTOPILOT_WRITER_MAX_READS = 6;
+/** Steps that may call tools; the steps after them can only write. */
+export const AUTOPILOT_WRITER_RESEARCH_STEPS = 3;
+export const AUTOPILOT_WRITER_MAX_POST_PATHS = 200;
+export const AUTOPILOT_WRITER_MAX_OUTPUT_TOKENS = 12_000;
+/** One fresh rewrite for incomplete output, never an unbounded continuation. */
+export const AUTOPILOT_WRITER_MAX_ATTEMPTS = 2;
+
+/**
+ * Readiness checks a website pull request can't fix because they need API,
+ * auth, product or rendering work. They are logged, never sent to the agent.
+ * content-no-js is here because the agent "fixed" it by padding homepage copy.
+ */
+export const AUTOPILOT_READINESS_OFF_REPO_ISSUES: readonly string[] = [
+  "api-schema-analysis",
+  "api-versioning-policy",
+  "cli-tool",
+  "content-no-js",
+  "function-calling-compat",
+  "json-error-responses",
+  "mcp-resource-listing",
+  "mcp-resource-quality",
+  "mcp-server",
+  "oauth-support",
+  "onboarding-friction",
+  "openapi-spec",
+  "rate-limit-headers",
+  "scoped-permissions",
+];
+
+/** Files the readiness fixer must never touch. */
+export const AUTOPILOT_PROTECTED_PATH_PATTERNS = [
+  /(^|\/)package\.json$/,
+  /(^|\/)(bun\.lockb?|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/,
+  /(^|\/)\.env/,
+  /(^|\/)\.github\//,
+  /(^|\/)node_modules\//,
+];
+
+export const AUTOPILOT_BLOG_DIRECTORY_HINTS = [
+  "content/blog",
+  "src/content/blog",
+  "posts",
+  "blog",
+  "content/posts",
+  "src/pages/blog",
+  "app/blog",
+  "src/app/blog",
+  "_posts",
+];
+
+export const AUTOPILOT_DEFAULT_JOBS = {
+  readiness: true,
+  keywords: true,
+  commits: true,
+  prompts: true,
+  competitors: true,
+} as const;
+
+export const AUTOPILOT_FLAG_TIMEOUT_MS = 2000;
+export const AUTOPILOT_RUNS_PAGE_SIZE = 20;
+export const AUTOPILOT_ADMIN_RUNS_DEFAULT_LIMIT = 50;
+
+export const AUTOPILOT_POLL_INTERVAL_MS = 5000;
+export const AUTOPILOT_PULL_REQUEST_CREATED_EVENT = "pull_request_created";
+export const AUTOPILOT_CREDITS_CHARGED_EVENT = "credits_charged";
+export const AUTOPILOT_LEGACY_PR_CREATED_MESSAGE_PATTERN =
+  "Opened pull request #%";
+
+export const AUTOPILOT_STALE_OPTIONS = [
+  ...AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS.map((days) => ({
+    value: String(days),
+    label: `After ${days} days`,
+  })),
+  { value: "never", label: "Never" },
+];
+
+/** Recent runs searched for one automation's outcomes, and how many are shown. */
+export const AUTOPILOT_JOB_DECISION_RUNS = 30;
+export const AUTOPILOT_JOB_DECISION_LIMIT = 8;
+
+/** Query param on run and pull request pages naming the automation they were opened from. */
+export const AUTOPILOT_FROM_PARAM = "from";
+
+export const AUTOPILOT_HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => ({
+  value: String(hour),
+  label: `${String(hour).padStart(2, "0")}:00`,
+}));
+
+/**
+ * Pull request states as GitHub would name them; dismissed PRs were closed.
+ * Plain colored badges, like the log and webhook tables.
+ */
+export const AUTOPILOT_FINDING_STATUS_BADGES: Record<
+  AutopilotFindingStatus,
+  { label: string; appearance: StatusBadgeAppearance }
+> = {
+  suggested: { label: "Idea", appearance: { variant: "secondary" } },
+  open: { label: "Writing", appearance: { variant: "secondary" } },
+  proposed: { label: "Open", appearance: { variant: "info" } },
+  merged: { label: "Merged", appearance: { variant: "success" } },
+  dismissed: { label: "Closed", appearance: { variant: "secondary" } },
+  expired: { label: "Auto-closed", appearance: { variant: "secondary" } },
+  failed: { label: "Failed", appearance: { variant: "destructive" } },
+};
+
+export const AUTOPILOT_RUN_STATUS_BADGES: Record<
+  AutopilotRunStatus,
+  { label: string; appearance: StatusBadgeAppearance }
+> = {
+  running: { label: "Running", appearance: { variant: "secondary" } },
+  completed: { label: "Completed", appearance: { variant: "success" } },
+  failed: { label: "Failed", appearance: { variant: "destructive" } },
+};
+
+export const AUTOPILOT_RUN_TRIGGER_LABELS = {
+  manual: "Manual run",
+  cron: "Daily run",
+  onboarding: "First run",
+  github: "From GitHub",
+  suggestion: "Suggestion written",
+} as const;
+
+/** Short job names at the start of each run log line. */
+export const AUTOPILOT_RUN_LOG_TAGS: Record<string, string> = {
+  readiness: "readiness",
+  keywords: "content-gaps",
+  commits: "releases",
+  prompts: "prompts",
+  competitors: "competitors",
+  run: "run",
+};
+
+/** Phase order in the run timeline; null is cleanup and the brief. */
+export const AUTOPILOT_RUN_SECTIONS: {
+  job: AutopilotJobKind | null;
+  label: string;
+}[] = [
+  { job: "readiness", label: "Fix agent readiness" },
+  { job: "keywords", label: "Write for content gaps" },
+  { job: "commits", label: "Write about releases" },
+  { job: "prompts", label: "Prompt cleanup" },
+  { job: "competitors", label: "Competitors" },
+  { job: null, label: "Cleanup and brief" },
+];
+
+export const AUTOPILOT_EVENT_DATA_LABELS: Record<string, string> = {
+  url: "Link",
+  scannedAt: "Scanned",
+  fixable: "Fixable here",
+  needsProductWork: "Needs product work",
+  previouslyDismissed: "Dismissed before",
+  files: "Files",
+  chars: "Characters",
+  truncated: "Truncated",
+  reason: "Reason",
+  issueIds: "Issues",
+  model: "Model",
+  steps: "Steps",
+  staged: "Files staged",
+  inputTokens: "Input tokens",
+  outputTokens: "Output tokens",
+  durationMs: "Took",
+  error: "Error",
+  candidates: "Candidates",
+  dropped: "Left out",
+  choice: "Picked",
+  confidence: "Confidence",
+  ranking: "Odds",
+  next: "Next",
+  promptGaps: "AI answer gaps",
+  promptGapsQualified: "AI gaps that qualify",
+  searchGaps: "Search gaps",
+  searchGapsQualified: "Search gaps that qualify",
+  alreadyHandled: "Already handled",
+  closed: "Closed pull requests",
+  mergedRecently: "Merged in the window",
+  lookbackDays: "Days looked back",
+  byBotsOrAutopilot: "From bots or Autopilot",
+  choreTitles: "Chores and bumps",
+  repositories: "Repositories",
+  unreadableRepositories: "Unreadable repositories",
+  title: "Title",
+  path: "Path",
+};
+
+/** Hero/OG image Autopilot commits with every post: 1200x630, like og:image. */
+export const AUTOPILOT_HERO_IMAGE_FALLBACK_ACCENT = "#7c3aed";
+export const AUTOPILOT_HERO_IMAGE_BACKGROUND = "#0b0b10";
+export const AUTOPILOT_HERO_LOGO_MAX_BYTES = 300_000;
+export const AUTOPILOT_HERO_LOGO_TIMEOUT_MS = 5000;
+/** Frontmatter keys posts commonly use for a cover image, in preference order. */
+export const AUTOPILOT_IMAGE_FRONTMATTER_KEYS = [
+  "image",
+  "cover",
+  "coverImage",
+  "heroImage",
+  "ogImage",
+  "featuredImage",
+  "thumbnail",
+] as const;

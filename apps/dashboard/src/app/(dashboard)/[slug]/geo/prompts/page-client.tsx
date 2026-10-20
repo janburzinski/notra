@@ -24,6 +24,7 @@ import { useTranslations } from "use-intl";
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
+import { AutopilotPromptSuggestions } from "@/components/geo/autopilot-prompt-suggestions";
 import { ConversationsCard } from "@/components/geo/conversations-card";
 import { PromptsCsvImportDialog } from "@/components/geo/geo-csv-import-dialog";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
@@ -225,7 +226,8 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                 ref={setTabActionsSlot}
               />
             </div>
-            <TabsContent className="mt-4" value="prompts">
+            <TabsContent className="mt-4 space-y-4" value="prompts">
+              <AutopilotPromptSuggestions organizationId={organizationId} />
               <PromptsTable
                 isScanning={isScanning}
                 onAddPrompt={() => setAddOpen(true)}

@@ -25,6 +25,7 @@ import {
   UserGroupIcon,
   Wallet01Icon,
   WebDesign01Icon,
+  Rocket01Icon,
   WorkflowSquare03Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
@@ -40,6 +41,7 @@ export const COMMAND_ROUTE_LABEL_KEYS = {
   home: "home",
   chat: "chat",
   analytics: "analytics",
+  autopilot: "autopilot",
   geo: "overview",
   "geo-traffic": "traffic",
   "geo-prompts": "prompts",
@@ -94,6 +96,15 @@ export const COMMAND_ROUTES: CommandRoute[] = [
     icon: Message01Icon,
     section: "Navigation",
     path: (slug) => `/${slug}/chat`,
+  },
+  {
+    id: "autopilot",
+    label: "Autopilot",
+    keywords: ["pull requests", "prs", "daily", "brief", "proactive", "merge"],
+    icon: Rocket01Icon,
+    section: "Navigation",
+    path: (slug) => `/${slug}/autopilot`,
+    flag: "autopilot",
   },
   {
     id: "analytics",

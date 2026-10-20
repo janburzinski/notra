@@ -4,10 +4,15 @@ import type {
   ContentPullRequestRef,
   ContentPullRequestState,
   GitHubClient,
+  GitHubMergeMethod,
 } from "@/types/integrations/github";
 import { hasGitHubStatus } from "@/utils/github-publish-failure";
 
-const GITHUB_MERGE_METHODS = ["squash", "merge", "rebase"] as const;
+const GITHUB_MERGE_METHODS: readonly GitHubMergeMethod[] = [
+  "squash",
+  "merge",
+  "rebase",
+];
 const MARK_READY_FOR_REVIEW_MUTATION = `
   mutation MarkReadyForReview($pullRequestId: ID!) {
     markPullRequestReadyForReview(input: { pullRequestId: $pullRequestId }) {
@@ -42,7 +47,7 @@ export async function getContentPullRequestState(
   return { status: "open", draft: Boolean(data.draft), nodeId: data.node_id };
 }
 
-function isMergeMethodNotAllowed(error: unknown) {
+export function isMergeMethodNotAllowed(error: unknown) {
   return (
     hasGitHubStatus(error, 405) &&
     error instanceof Error &&
@@ -51,16 +56,18 @@ function isMergeMethodNotAllowed(error: unknown) {
 }
 
 /**
- * Merges an open content pull request with the first merge method the
- * repository allows. With `headSha` the merge is pinned to that commit, so a
- * later push is never merged. Notra opens drafts, which GitHub refuses to
- * merge; merging is the go-ahead to leave draft. Throws the GitHub error.
+ * Merges an open content pull request with `method`, or without one with the
+ * first merge method the repository allows. With `headSha` the merge is
+ * pinned to that commit, so a later push is never merged. Notra opens drafts,
+ * which GitHub refuses to merge; merging is the go-ahead to leave draft.
+ * Throws the GitHub error.
  */
 export async function mergeContentPullRequest(
   octokit: GitHubClient,
   ref: ContentPullRequestRef,
   pullRequest: { draft: boolean; nodeId: string },
-  headSha: string | null
+  headSha: string | null,
+  method?: GitHubMergeMethod
 ): Promise<void> {
   if (pullRequest.draft) {
     await octokit.graphql(MARK_READY_FOR_REVIEW_MUTATION, {
@@ -68,7 +75,7 @@ export async function mergeContentPullRequest(
     });
   }
   let lastError: unknown = null;
-  for (const mergeMethod of GITHUB_MERGE_METHODS) {
+  for (const mergeMethod of method ? [method] : GITHUB_MERGE_METHODS) {
     try {
       await octokit.request(
         "PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge",

@@ -16,6 +16,7 @@ import {
   PencilEdit01Icon,
   PlugIcon,
   PlusSignIcon,
+  Rocket01Icon,
   Robot01Icon,
   SearchList01Icon,
   Settings01Icon,
@@ -33,6 +34,7 @@ import type { PostStatus } from "@notra/schemas/dashboard/content";
 import { DURATION } from "@notra/ui/lib/motion";
 
 import { AGENT_FEEDBACK_NAV_LINK } from "@/constants/agent-feedback";
+import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import { SITES_NAV_LINK } from "@/constants/sites";
 import type {
   NavGroup,
@@ -82,6 +84,7 @@ export const STUDIO_ROUTE_SECTIONS: ReadonlySet<string> = new Set([
   "automation",
   "feedback",
   "sites",
+  "autopilot",
 ]);
 
 export const NAV_MAIN_ITEMS: NavMainItem[] = [
@@ -100,6 +103,7 @@ export const NAV_MAIN_ITEMS: NavMainItem[] = [
     icon: PaintBoardIcon,
     labelKey: "brandIdentityTitle",
   },
+  { link: AUTOPILOT_NAV_LINK, icon: Rocket01Icon, labelKey: "autopilot" },
   {
     link: AUTOMATIONS_NAV_LINK,
     icon: WorkflowSquare03Icon,
@@ -206,6 +210,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     labelKey: "feedback",
     links: [AGENT_FEEDBACK_NAV_LINK],
   },
+  // Behind the autopilot flag; resolveNavItems drops it when the flag is off.
+  {
+    id: "autopilot",
+    icon: Rocket01Icon,
+    labelKey: "autopilot",
+    links: [AUTOPILOT_NAV_LINK],
+  },
 ];
 
 export const NAV_WORKSPACE_GROUP: NavGroup = {
@@ -222,6 +233,7 @@ export const NAV_WORKSPACE_GROUP: NavGroup = {
 };
 
 export const DEFAULT_NAV_VISIBILITY: NavVisibility = {
+  autopilot: false,
   analytics: true,
   sites: false,
 };

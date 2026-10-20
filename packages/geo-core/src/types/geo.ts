@@ -1794,6 +1794,8 @@ export interface GeoPromptGapRow {
   opportunity: number;
   won: boolean;
   brief: GeoGapBriefRef | null;
+  /** Whether an existing page already covers the prompt; absent in older snapshots. */
+  recommendation?: GeoSearchGapRecommendation;
 }
 
 export interface GeoSearchGapRow {

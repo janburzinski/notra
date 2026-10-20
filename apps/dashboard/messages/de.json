@@ -1253,7 +1253,7 @@
     },
     "progress": {
       "label": "Schritt {current} von {total}",
-      "goTo": "{step, select, 1 {Zu Workspace} 2 {Zu Sichtbarkeit} 3 {Zu Wettbewerbern} other {Zu Preisen}}"
+      "goTo": "{step, select, 1 {Zu Workspace} 2 {Zu Sichtbarkeit} 3 {Zu Wettbewerbern} 4 {Zu Autopilot} other {Zu Preisen}}"
     },
     "actions": {
       "invalidAttribution": "Ungültige Angaben zur Herkunft",
@@ -2135,6 +2135,7 @@
       "contentGaps": "Inhaltslücken",
       "personas": "Personas",
       "shelfSpace": "Shelf Space",
+      "autopilot": "Autopilot",
       "repository": "Repository",
       "repositories": "Repositories",
       "noRepositoriesFound": "Keine Repositories gefunden.",
@@ -4208,6 +4209,16 @@
       "trackNamed": "{brand} tracken",
       "dismissNamed": "{brand} ausblenden",
       "dismiss": "Vorschlag ausblenden"
+    },
+    "autopilotPromptSuggestions": {
+      "eyebrow": "Autopilot schlägt vor",
+      "readout": "Prompts, die nichts messen",
+      "pause": "Pausieren",
+      "keep": "Behalten",
+      "paused": "Prompt pausiert",
+      "pauseFailed": "Prompt konnte nicht pausiert werden",
+      "keepFailed": "Prompt konnte nicht behalten werden",
+      "reasonNoBrands": "In {answers} Antworten der letzten {days} Tage hat keine Engine eine Marke genannt. Dieser Prompt misst deine Sichtbarkeit also nicht."
     }
   },
   "integrations": {

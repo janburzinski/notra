@@ -3,6 +3,7 @@ import { analyticsRouter } from "./routers/analytics";
 import { apiKeysRouter } from "./routers/api-keys";
 import { attachmentsRouter } from "./routers/attachments";
 import { automationRouter } from "./routers/automation";
+import { autopilotRouter } from "./routers/autopilot";
 import { brandRouter } from "./routers/brand";
 import { chatRouter } from "./routers/chat";
 import { commentsRouter } from "./routers/comments";
@@ -40,6 +41,7 @@ export const dashboardRouter = {
   feedback: feedbackRouter,
   geo: geoRouter,
   github: githubRouter,
+  autopilot: autopilotRouter,
   sites: sitesRouter,
   integrations: integrationsRouter,
   logs: logsRouter,

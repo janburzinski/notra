@@ -14,6 +14,7 @@ import {
 } from "@notra/ai/utils/github-mention-log";
 import { processGitHubMention } from "@notra/ai/utils/github-mention-process";
 
+import { handleAutopilotMention } from "@/lib/autopilot/mentions";
 import { writeMentionWebhookLog } from "@/lib/webhooks/github-mention-log";
 import { startContentPublicationSyncRepair } from "@/lib/workflows/start";
 
@@ -34,6 +35,11 @@ export async function processGitHubMentionStep(context: GitHubMentionContext) {
     buildAcceptedMentionWebhookLog(context),
     context.deliveryId
   );
+  // Content questions on product PRs go to Autopilot; everything else to the agent.
+  const autopilot = await handleAutopilotMention(context);
+  if (autopilot) {
+    return autopilot;
+  }
   return await processGitHubMention(context, startContentPublicationSyncRepair);
 }
 

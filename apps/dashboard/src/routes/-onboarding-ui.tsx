@@ -13,6 +13,7 @@ import { ONBOARDING_STEPS } from "@/constants/analytics-events";
 import { lazyPage } from "@/utils/lazy-page";
 
 import {
+  loadOnboardingAutopilot,
   loadOnboardingCompetitors,
   loadOnboardingEntry,
   loadOnboardingLayout,
@@ -35,6 +36,11 @@ const Visibility = lazyPage(() =>
 const Competitors = lazyPage(() =>
   import("@/app/onboarding/competitors/competitors-form").then((module) => ({
     default: module.CompetitorsForm,
+  }))
+);
+const Autopilot = lazyPage(() =>
+  import("@/app/onboarding/autopilot/autopilot-step").then((module) => ({
+    default: module.AutopilotOnboardingStep,
   }))
 );
 const Pricing = lazyPage(() =>
@@ -103,6 +109,18 @@ export function createOnboardingUiRoutes(parent: AnyRoute) {
         component: ({ data }) => (
           <OnboardingSplitLayout step={ONBOARDING_STEPS.COMPETITORS}>
             <Competitors {...data} />
+          </OnboardingSplitLayout>
+        ),
+      }),
+      createUiRoute({
+        parent: onboarding,
+        path: "autopilot",
+        title: { title: "Autopilot" },
+        loader: (input) => loadOnboardingAutopilot({ data: input }),
+        preload: Autopilot.preload,
+        component: ({ data }) => (
+          <OnboardingSplitLayout step={ONBOARDING_STEPS.AUTOPILOT}>
+            <Autopilot {...data} />
           </OnboardingSplitLayout>
         ),
       }),
