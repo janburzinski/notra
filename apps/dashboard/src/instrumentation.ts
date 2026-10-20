@@ -1,9 +1,10 @@
+import { log, register as registerLogs } from "@notra/ai/evlog";
+import { captureServerException } from "@notra/posthog/server";
 import { isDemoMode } from "@notra/utils/demo-mode";
 
 let registration: Promise<void> | undefined;
 
 async function initialize() {
-  const { register: registerLogs } = await import("@notra/ai/evlog");
   await registerLogs();
 
   if (isDemoMode()) {
@@ -42,12 +43,7 @@ export function register() {
 }
 
 export async function onRequestError(error: unknown, request: Request) {
-  const [{ log }, { captureServerException }, { getPostHogRequestContext }] =
-    await Promise.all([
-      import("@notra/ai/evlog"),
-      import("@notra/posthog/server"),
-      import("@notra/posthog/request"),
-    ]);
+  const { getPostHogRequestContext } = await import("@notra/posthog/request");
   const requestContext = getPostHogRequestContext(request.headers);
   const path = new URL(request.url).pathname;
   log.error({
