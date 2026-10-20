@@ -145,7 +145,17 @@ export const AUTOPILOT_TREE_MAX_PATHS = 600;
 export const AUTOPILOT_TREE_SUMMARY_MAX_LINES = 120;
 export const AUTOPILOT_CONTEXT_FILE_MAX_CHARS = 12_000;
 export const AUTOPILOT_FIX_MAX_FILES = 6;
-export const AUTOPILOT_READINESS_AGENT_MAX_STEPS = 16;
+/**
+ * The readiness agent is bounded by the input tokens it has spent, since every
+ * step resends the whole conversation. Past the wrap-up mark it can only stage
+ * or skip; past the budget it has to answer. The step cap only stops loops.
+ */
+export const AUTOPILOT_READINESS_AGENT_INPUT_TOKEN_BUDGET = 1_200_000;
+export const AUTOPILOT_READINESS_AGENT_WRAP_UP_SHARE = 0.75;
+export const AUTOPILOT_READINESS_AGENT_MAX_STEPS = 40;
+/** Steps before the cap that switch to wrap-up, and the last one that answers. */
+export const AUTOPILOT_READINESS_AGENT_WRAP_UP_STEPS = 4;
+export const AUTOPILOT_READINESS_FIND_MAX_PATHS = 100;
 
 /** The writer researches in a few steps, then writes; the last step is the post. */
 export const AUTOPILOT_WRITER_MAX_STEPS = 8;

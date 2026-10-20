@@ -10,7 +10,10 @@ import type {
 import type { AgentReadinessReportView } from "@notra/geo-core/types/agent-readiness";
 import type * as z from "zod";
 
-import type { blogFileSchema } from "@/schemas/autopilot";
+import type {
+  blogFileSchema,
+  readinessAgentOutputSchema,
+} from "@/schemas/autopilot";
 import type { MergedPullRequest } from "@/types/autopilot";
 
 export type AutopilotOctokit = ReturnType<typeof createOctokit>;
@@ -26,6 +29,7 @@ export type AutopilotReadinessReport = AgentReadinessReportView & {
 export type AutopilotRunTrigger =
   (typeof autopilotRuns.$inferInsert)["trigger"];
 export type BlogFile = z.infer<typeof blogFileSchema>;
+export type ReadinessAgentOutput = z.infer<typeof readinessAgentOutputSchema>;
 export type AutopilotPullRequestMoment = "ready" | "merged" | "closed";
 
 export interface AutopilotAdminRunFilters {

@@ -16,7 +16,14 @@ import {
 } from "@notra/geo-core/geo/agent-readiness";
 import { requireGeoProject } from "@notra/geo-core/geo/projects";
 import { buildAgentReadinessAllFixesPrompt } from "@notra/geo-core/utils/agent-readiness";
-import { isStepCount, Output, ToolLoopAgent, tool } from "ai";
+import {
+  isStepCount,
+  NoObjectGeneratedError,
+  NoOutputGeneratedError,
+  Output,
+  ToolLoopAgent,
+  tool,
+} from "ai";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 import * as z from "zod";
@@ -27,7 +34,11 @@ import {
   AUTOPILOT_FIX_MAX_FILES,
   AUTOPILOT_PROTECTED_PATH_PATTERNS,
   AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
+  AUTOPILOT_READINESS_AGENT_INPUT_TOKEN_BUDGET,
   AUTOPILOT_READINESS_AGENT_MAX_STEPS,
+  AUTOPILOT_READINESS_AGENT_WRAP_UP_SHARE,
+  AUTOPILOT_READINESS_AGENT_WRAP_UP_STEPS,
+  AUTOPILOT_READINESS_FIND_MAX_PATHS,
   AUTOPILOT_READINESS_MAX_AGE_MS,
   AUTOPILOT_READINESS_OFF_REPO_ISSUES,
   AUTOPILOT_READINESS_SCAN_POLL_MS,
@@ -35,7 +46,11 @@ import {
   AUTOPILOT_TREE_MAX_PATHS,
   AUTOPILOT_TREE_SUMMARY_MAX_LINES,
 } from "@/constants/autopilot";
-import { READINESS_AGENT_INSTRUCTIONS } from "@/constants/autopilot-readiness";
+import {
+  READINESS_AGENT_FINAL_NOTE,
+  READINESS_AGENT_INSTRUCTIONS,
+  READINESS_AGENT_WRAP_UP_NOTE,
+} from "@/constants/autopilot-readiness";
 import { withAutopilotDraftBilling } from "@/lib/autopilot/billing";
 import {
   claimFinding,
@@ -72,6 +87,7 @@ import type {
   AutopilotReadinessReport,
   AutopilotStagedFile,
   FindingClaim,
+  ReadinessAgentOutput,
 } from "@/types/autopilot-runtime";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
 import {
@@ -155,6 +171,50 @@ function isProtectedPath(path: string) {
   );
 }
 
+/**
+ * Explore while the budget lasts, then only stage or skip, then answer with no
+ * tools left, so the run always ends with an answer instead of a cut-off loop.
+ */
+function readinessAgentPhase(
+  steps: readonly { usage: { inputTokens?: number | undefined } }[],
+  stepNumber: number
+) {
+  const spent = steps.reduce(
+    (sum, step) => sum + (step.usage.inputTokens ?? 0),
+    0
+  );
+  if (
+    spent >= AUTOPILOT_READINESS_AGENT_INPUT_TOKEN_BUDGET ||
+    stepNumber >= AUTOPILOT_READINESS_AGENT_MAX_STEPS - 1
+  ) {
+    return { phase: "answer" as const, spent };
+  }
+  if (
+    spent >=
+      AUTOPILOT_READINESS_AGENT_INPUT_TOKEN_BUDGET *
+        AUTOPILOT_READINESS_AGENT_WRAP_UP_SHARE ||
+    stepNumber >=
+      AUTOPILOT_READINESS_AGENT_MAX_STEPS -
+        AUTOPILOT_READINESS_AGENT_WRAP_UP_STEPS
+  ) {
+    return { phase: "wrap-up" as const, spent };
+  }
+  return { phase: "explore" as const, spent };
+}
+
+/** Used when the agent staged files but its final answer is missing or invalid. */
+function fallbackReadinessOutput(
+  files: AutopilotStagedFile[]
+): ReadinessAgentOutput {
+  return {
+    framework: "unknown",
+    pullRequestTitle: "Improve agent readiness",
+    pullRequestBody: files
+      .map((file) => `- \`${file.path}\`: ${file.reason}`)
+      .join("\n"),
+  };
+}
+
 /** Explores the repository with read-only tools and stages complete files; every call is logged. */
 async function runReadinessAgent(params: {
   ctx: AutopilotRunContext;
@@ -176,6 +236,25 @@ async function runReadinessAgent(params: {
   const skipped: { issueId: string; reason: string }[] = [];
 
   const tools = {
+    findFiles: tool({
+      description:
+        "Find repository files whose path contains the query, ignoring case, e.g. robots, sitemap, llms or layout.",
+      inputSchema: z.object({ query: z.string().min(1) }),
+      execute: async ({ query }) => {
+        const needle = query.toLowerCase();
+        const matches = paths.filter((path) =>
+          path.toLowerCase().includes(needle)
+        );
+        await log.info(`Searched for "${query}"`, { files: matches.length });
+        const shown = matches.slice(0, AUTOPILOT_READINESS_FIND_MAX_PATHS);
+        if (shown.length === 0) {
+          return "(no files)";
+        }
+        return matches.length > shown.length
+          ? `${shown.join("\n")}\n(${matches.length - shown.length} more, narrow the query)`
+          : shown.join("\n");
+      },
+    }),
     listFiles: tool({
       description:
         "List repository files under a directory. Use an empty string for the whole repository.",
@@ -281,6 +360,7 @@ async function runReadinessAgent(params: {
     }),
   };
 
+  let loggedPhase: ReturnType<typeof readinessAgentPhase>["phase"] = "explore";
   const agent = new ToolLoopAgent({
     model: gateway(AGENT_DEFAULT_MODEL, {
       organizationId: ctx.organizationId,
@@ -293,6 +373,31 @@ async function runReadinessAgent(params: {
     tools,
     output: Output.object({ schema: readinessAgentOutputSchema }),
     stopWhen: isStepCount(AUTOPILOT_READINESS_AGENT_MAX_STEPS),
+    prepareStep: async ({ steps, stepNumber }) => {
+      const { phase, spent } = readinessAgentPhase(steps, stepNumber);
+      if (phase !== loggedPhase) {
+        loggedPhase = phase;
+        await log.info(
+          phase === "answer"
+            ? "Writing the pull request description"
+            : "Done exploring, staging the fix",
+          { inputTokens: spent, step: stepNumber + 1 }
+        );
+      }
+      if (phase === "answer") {
+        return {
+          activeTools: [],
+          instructions: `${READINESS_AGENT_INSTRUCTIONS} ${READINESS_AGENT_FINAL_NOTE}`,
+        };
+      }
+      if (phase === "wrap-up") {
+        return {
+          activeTools: ["writeFile", "skipIssue"],
+          instructions: `${READINESS_AGENT_INSTRUCTIONS} ${READINESS_AGENT_WRAP_UP_NOTE}`,
+        };
+      }
+      return undefined;
+    },
     ...buildTelemetryOptions({
       feature: "autopilot",
       organizationId: ctx.organizationId,
@@ -319,47 +424,71 @@ async function runReadinessAgent(params: {
     instructions: READINESS_AGENT_INSTRUCTIONS,
     prompt,
   });
-  const result = await agent.generate({
-    prompt,
-    onStepEnd: async (step) => {
-      stepNumber += 1;
-      await log.trace(`Agent step ${stepNumber}`, {
-        text: step.text,
-        reasoning: step.reasoningText ?? null,
-        toolCalls: step.toolCalls.map((call) => ({
-          tool: call.toolName,
-          input: call.input,
-        })),
-        toolResults: step.toolResults.map((toolResult) => ({
-          tool: toolResult.toolName,
-          output: toolResult.output,
-        })),
-        inputTokens: step.usage.inputTokens ?? null,
-        outputTokens: step.usage.outputTokens ?? null,
+  const result = await agent
+    .generate({
+      prompt,
+      onStepEnd: async (step) => {
+        stepNumber += 1;
+        await log.trace(`Agent step ${stepNumber}`, {
+          text: step.text,
+          reasoning: step.reasoningText ?? null,
+          toolCalls: step.toolCalls.map((call) => ({
+            tool: call.toolName,
+            input: call.input,
+          })),
+          toolResults: step.toolResults.map((toolResult) => ({
+            tool: toolResult.toolName,
+            output: toolResult.output,
+          })),
+          inputTokens: step.usage.inputTokens ?? null,
+          outputTokens: step.usage.outputTokens ?? null,
+        });
+      },
+    })
+    .catch((error: unknown) => {
+      // Staged files are the work; a broken final answer shouldn't throw them away.
+      if (!(NoObjectGeneratedError.isInstance(error) && staged.size > 0)) {
+        throw error;
+      }
+      params.onUsage({
+        ...toAgentTokenUsage(error.usage),
+        modelId: AGENT_DEFAULT_MODEL,
       });
-    },
-  });
-  params.onUsage({
-    ...toAgentTokenUsage(result.totalUsage),
-    modelId: AGENT_DEFAULT_MODEL,
-  });
+      return null;
+    });
+  let output: ReadinessAgentOutput | null = null;
+  if (result) {
+    params.onUsage({
+      ...toAgentTokenUsage(result.totalUsage),
+      modelId: AGENT_DEFAULT_MODEL,
+    });
+    try {
+      output = result.output;
+    } catch (error) {
+      if (!(NoOutputGeneratedError.isInstance(error) && staged.size > 0)) {
+        throw error;
+      }
+    }
+  }
+  const files = [...staged.values()];
   await log.action(
     `Agent finished with ${AGENT_DEFAULT_MODEL}`,
     {
       model: AGENT_DEFAULT_MODEL,
-      steps: result.steps.length,
-      inputTokens: result.totalUsage.inputTokens ?? null,
-      outputTokens: result.totalUsage.outputTokens ?? null,
+      steps: result?.steps.length ?? stepNumber,
+      inputTokens: result?.totalUsage.inputTokens ?? null,
+      outputTokens: result?.totalUsage.outputTokens ?? null,
       durationMs: Date.now() - startedAt,
       staged: staged.size,
+      answered: output !== null,
     },
-    { output: result.output, skipped }
+    { output, skipped }
   );
   return {
     octokit,
     baseSha,
-    output: result.output,
-    files: [...staged.values()],
+    output: output ?? fallbackReadinessOutput(files),
+    files,
     skipped,
   };
 }
