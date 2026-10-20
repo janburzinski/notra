@@ -26,6 +26,12 @@ export interface GeoCheckSource {
 export interface GeoCheckGrounding {
   queries: string[];
   sources: GeoCheckSource[];
+  /** Capture provenance stays with the stored answer when its engine keeps the same id. */
+  capture?: {
+    provider: "context.dev";
+    parserVersion: number;
+    requestId: string;
+  };
 }
 
 export interface GeoCheckWrite {

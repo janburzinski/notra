@@ -5,6 +5,7 @@ import type {
   GeoGroundedEngine,
   GeoSequenceCheckOutcome,
 } from "./geo";
+import type { GeoContextConversationEngine } from "./geo-context";
 import type { GeoOlostepConversationEngine } from "./geo-olostep";
 
 export interface GeoConversationReplayInput {
@@ -40,7 +41,8 @@ export interface GeoPlannedPersonaOutcome extends GeoConversationOutcome {
   omitted?: boolean;
 }
 
-/** What a conversation talks to: a search-grounded route or Olostep results. */
+/** What a conversation talks to: a grounded route or a consumer-app capture. */
 export type GeoConversationEngine =
   | GeoGroundedEngine
+  | GeoContextConversationEngine
   | GeoOlostepConversationEngine;

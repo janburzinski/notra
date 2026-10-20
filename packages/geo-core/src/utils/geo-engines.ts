@@ -17,6 +17,7 @@ import type {
   GeoZdrPolicy,
 } from "../types/geo";
 import { isGeoBoxCodingAgent } from "./geo-coding-agents";
+import { isGeoContextEngine } from "./geo-context";
 import { engineModelOf } from "./geo-engine-family";
 import {
   geoDefaultEngines,
@@ -96,7 +97,7 @@ export function isPartialGeoScanEngineScope(
 
 /**
  * Bare catalog calls that still search the web: consumer apps and Google AI
- * Overview scraped through Olostep, and Box coding agents. Cursor is
+ * Overview scraped through Context or Olostep, and Box coding agents. Cursor is
  * excluded — it runs with no tools.
  */
 export function isGeoNativeSearchEngine(
@@ -104,7 +105,7 @@ export function isGeoNativeSearchEngine(
   engine: string
 ): boolean {
   const gateway = resolveGeoEngineGateway(catalog, engine);
-  return gateway === "box" || gateway === "olostep";
+  return gateway === "box" || gateway === "olostep" || gateway === "context";
 }
 
 /** Whether a catalog model runs with web search: grounded route or native search. */
@@ -124,6 +125,7 @@ export function geoEngineUsedWebSearch(engine: string): boolean {
   return (
     engineModelOf(engine) !== engine ||
     isGeoOlostepEngine(engine) ||
+    isGeoContextEngine(engine) ||
     engine === GEO_OPENCODE_ENGINE_ID ||
     isGeoBoxCodingAgent(GEO_MODEL_REPLACED_IDS[engine] ?? engine)
   );

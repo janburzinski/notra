@@ -81,7 +81,11 @@ import {
   geoBoxAgentForEngine,
   isGeoBoxCodingAgent,
 } from "../utils/geo-coding-agents";
-import { resolveGeoConversationEngine } from "../utils/geo-conversation-engine";
+import { isGeoContextEngine } from "../utils/geo-context";
+import {
+  isGeoConsumerConversationEngine,
+  resolveGeoConversationEngine,
+} from "../utils/geo-conversation-engine";
 import { engineModelOf } from "../utils/geo-engine-family";
 import {
   geoScanEmptyEngineSkipReason,
@@ -102,7 +106,6 @@ import {
   geoLogWarn,
   logGeoSkip,
 } from "../utils/geo-log";
-import { isGeoOlostepConversationEngine } from "../utils/geo-olostep";
 import { hasOwnedSourceCitation } from "../utils/geo-owned-source";
 import {
   interleaveGeoScanItemsByKey,
@@ -129,6 +132,7 @@ import {
 } from "../utils/token-usage";
 import { judgeAnswer, requireAnswerText } from "./check-evaluation";
 import { requireGeoCodingAgentAccess } from "./coding-agent-access";
+import { askGeoContextAnswer } from "./context";
 import { runGeoConversation } from "./conversation";
 import { runGeoConversationReplay } from "./conversation-replay";
 import { askCursorEngine } from "./cursor";
@@ -399,8 +403,12 @@ const askEngine = Effect.fn("geo.askEngine")(function* (
   zdr: GeoZdrMode,
   gatewayPin: GeoModelGateway | undefined,
   logContext: GatewayModelOptions["logContext"],
-  olostepRetrieveId?: string
+  olostepRetrieveId?: string,
+  language = DEFAULT_LANGUAGE
 ) {
+  if (gatewayPin === "context") {
+    return yield* askGeoContextAnswer(engine, promptText, language);
+  }
   if (gatewayPin === "olostep") {
     return yield* askGeoOlostepAnswer(engine, olostepRetrieveId);
   }
@@ -454,7 +462,8 @@ const runGeoCheck = Effect.fn("geo.runCheck")(function* (
       task.zdr,
       resolveGeoEngineGateway(context.catalog, task.engine),
       logContext,
-      task.olostepRetrieveId
+      task.olostepRetrieveId,
+      task.language
     ));
   const baseRow = {
     organizationId: context.organizationId,
@@ -1030,8 +1039,8 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
       ({ engine }) =>
         engine === GEO_OPENCODE_ENGINE_ID || isGeoBoxCodingAgent(engine)
     );
-    const olostepEngines = rawEngines.filter(({ engine }) =>
-      isGeoOlostepConversationEngine(engine)
+    const consumerEngines = rawEngines.filter(({ engine }) =>
+      isGeoConsumerConversationEngine(engine)
     );
     const sequences: GeoScanPlannedSequence[] =
       scanSourceLanguage || scopedSequenceIds.length > 0
@@ -1044,7 +1053,7 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
               groundedKey: grounded.key,
               zdr,
             })),
-            ...olostepEngines.map(({ engine, zdr }) => ({
+            ...consumerEngines.map(({ engine, zdr }) => ({
               sequenceId: sequence.id,
               steps: sequence.steps,
               language: sourceLanguage,
@@ -1111,7 +1120,7 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
                     groundedKey: grounded.key,
                     zdr,
                   })),
-                  ...olostepEngines.map(({ engine, zdr }) => ({
+                  ...consumerEngines.map(({ engine, zdr }) => ({
                     personaId: persona.id,
                     prompts: snapshot.conversationPrompts,
                     snapshot,
@@ -1302,7 +1311,10 @@ const runGeoScanTaskBatchBody = Effect.fn("geo.runScanTaskBatch.body")(
               Effect.retry({
                 times: 1,
                 while: (error) =>
-                  error._tag === "GeoScanError" && error.timedOut === true,
+                  // Re-running a Context check submits another paid consumer prompt.
+                  !isGeoContextEngine(task.engine) &&
+                  error._tag === "GeoScanError" &&
+                  error.timedOut === true,
               }),
               Effect.catchTag("GeoEmptyAnswerError", (error) =>
                 Effect.sync(() => droppedCheckOutcome(fields, error))

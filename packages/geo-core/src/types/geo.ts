@@ -1471,15 +1471,16 @@ type GeoModelZdr = "all" | "some" | "none";
 
 /**
  * Where a model is served. `cursor` runs through the Cursor SDK, `box`
- * through OpenCode, Claude Code, Codex, and fx in Upstash Box, and `olostep`
- * through Olostep's hosted browsers — none of those go through the AI router.
+ * through OpenCode, Claude Code, Codex, and fx in Upstash Box. `olostep` and
+ * `context` capture consumer surfaces in hosted browsers, outside the AI router.
  */
 export type GeoModelGateway =
   | "vercel"
   | "openrouter"
   | "cursor"
   | "box"
-  | "olostep";
+  | "olostep"
+  | "context";
 
 export interface GeoModelProvider {
   id: GeoModelProviderId;

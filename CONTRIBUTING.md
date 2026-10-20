@@ -81,6 +81,15 @@ cp .env.example .env
 - OAuth provider credentials
 - Any provider keys needed for the area you're working on
 
+GEO captures Gemini and Google AI Overview through `CONTEXT_DEV_API_KEY` using
+Context.dev's paid browser actions. ChatGPT keeps its Olostep batch route through
+`GEO_OLOSTEP_API_KEY_ENV`. Both capture methods remain non-ZDR and require explicit
+approval on enforced-ZDR projects. Context captures reject challenge pages,
+unfinished answers, and missing citation metadata instead of recording a brand
+miss; only a verified completed Google results page can report no Overview.
+Stored Context answers include the provider, parser version, and request ID in
+`grounding.capture`. Model API routes and existing engine IDs are unchanged.
+
 Helpful provider docs:
 
 - WorkOS AuthKit: https://workos.com/docs/authkit

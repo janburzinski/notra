@@ -8,6 +8,7 @@ import { MAX_JUDGE_COMPETITORS } from "../constants/geo-conversations";
 import { GeoModelService } from "../deps";
 import type {
   GeoCheckContext,
+  GeoEngineAnswer,
   GeoGroundedEngine,
   GeoSkipFields,
   GeoZdrMode,
@@ -18,7 +19,9 @@ import type {
   GeoConversationSource,
 } from "../types/geo-conversations";
 import { normalizePosition } from "../utils/geo-check-evaluation";
+import { geoContextConversationPrompt } from "../utils/geo-context";
 import { geoLogWarn, logGeoSkip } from "../utils/geo-log";
+import { geoOlostepPersonaQuery } from "../utils/geo-olostep-plan";
 import { hasOwnedSourceCitation } from "../utils/geo-owned-source";
 import {
   addAgentTokenUsage,
@@ -27,13 +30,14 @@ import {
   geoCheckWriteUsage,
 } from "../utils/token-usage";
 import { judgeAnswer, requireAnswerText } from "./check-evaluation";
+import { askGeoContextAnswer } from "./context";
 import { GeoScanError } from "./errors";
 import { askGeoOlostepAnswer } from "./olostep";
 
 /**
  * Owns the transcript, deadline and partial results for both kinds of
- * conversation. Olostep engines read each turn from its batch result instead
- * of continuing the transcript, since every scraped prompt is a fresh chat.
+ * conversation. Context builds fresh question-only context; Olostep reads
+ * preplanned results. Neither pretends to continue a consumer UI session.
  */
 export const runGeoConversation = Effect.fn("geo.runConversation")(function* (
   context: GeoCheckContext,
@@ -81,15 +85,27 @@ export const runGeoConversation = Effect.fn("geo.runConversation")(function* (
         );
         continue;
       }
-      const answer = olostep
-        ? yield* askGeoOlostepAnswer(engine.key, olostepRetrieveId)
-        : yield* models.groundedAnswer({
-            organizationId: context.organizationId,
-            engine,
-            messages,
-            zdr,
-            logContext,
-          });
+      let answer: GeoEngineAnswer;
+      if (olostep) {
+        answer = yield* askGeoOlostepAnswer(engine.key, olostepRetrieveId);
+      } else if ("context" in engine) {
+        const question = geoContextConversationPrompt(source.prompts, index);
+        answer = yield* askGeoContextAnswer(
+          engine.key,
+          source.snapshot
+            ? geoOlostepPersonaQuery(source.snapshot, question)
+            : question,
+          language
+        );
+      } else {
+        answer = yield* models.groundedAnswer({
+          organizationId: context.organizationId,
+          engine,
+          messages,
+          zdr,
+          logContext,
+        });
+      }
       engineUsage = addAgentTokenUsage(
         engineUsage,
         agentTokenUsageFrom(answer.usage)

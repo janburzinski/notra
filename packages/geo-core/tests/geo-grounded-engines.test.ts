@@ -491,9 +491,11 @@ describe("released consumer apps", () => {
   test("only ChatGPT and Gemini ship, even from stale settings", () => {
     const previous = {
       olostep: process.env.GEO_OLOSTEP_API_KEY_ENV,
+      context: process.env.CONTEXT_DEV_API_KEY,
     };
     try {
       process.env.GEO_OLOSTEP_API_KEY_ENV = "test-key";
+      process.env.CONTEXT_DEV_API_KEY = "test-key";
       const feed = unreleased.map((id) => ({
         id,
         name: id,
@@ -506,11 +508,9 @@ describe("released consumer apps", () => {
         buildGeoModelCatalogFromFeed(feed),
       ]) {
         const ids = available.models.map((model) => model.id);
-        expect(ids.filter(isGeoOlostepEngine)).toEqual([
-          "openai/chatgpt",
-          "google/ai-overview",
-          "google/gemini",
-        ]);
+        expect(ids.filter(isGeoOlostepEngine)).toEqual(["openai/chatgpt"]);
+        expect(ids).toContain("google/gemini");
+        expect(ids).toContain("google/ai-overview");
         expect(
           resolveTrackedEngines(available, [...unreleased, "openai/chatgpt"])
         ).toEqual(["openai/chatgpt"]);
@@ -539,6 +539,7 @@ describe("released consumer apps", () => {
     } finally {
       for (const [key, value] of [
         ["GEO_OLOSTEP_API_KEY_ENV", previous.olostep],
+        ["CONTEXT_DEV_API_KEY", previous.context],
       ] as const) {
         if (value === undefined) {
           delete process.env[key];

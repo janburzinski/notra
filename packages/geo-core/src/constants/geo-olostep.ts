@@ -21,7 +21,7 @@ export const GEO_OLOSTEP_NO_AI_OVERVIEW_MESSAGE = "no-ai-overview-found";
 export const GEO_OLOSTEP_PERSONA_INTRO_MAX_CHARS = 600;
 
 /**
- * Consumer AI apps and Google's AI Overview queried through Olostep's hosted
+ * Consumer AI apps still queried through Olostep's hosted
  * browsers instead of the model APIs. Each engine id maps to its parser and the URL that submits the
  * prompt.
  */
@@ -36,22 +36,11 @@ export const GEO_OLOSTEP_ENGINES: Readonly<Record<string, GeoOlostepEngine>> = {
     url: (query) => `https://www.perplexity.ai/?q=${encodeURIComponent(query)}`,
     conversational: true,
   },
-  "google/gemini": {
-    parser: "@olostep/gemini-results",
-    url: (query) => `https://gemini.google.com/?q=${encodeURIComponent(query)}`,
-    conversational: true,
-  },
   "google/ai-mode": {
     parser: "@olostep/google-aimode-results",
     url: (query) =>
       `https://www.google.com/aimode?q=${encodeURIComponent(query)}`,
     conversational: true,
-  },
-  "google/ai-overview": {
-    parser: "@olostep/google-ai-overview-results",
-    url: (query) =>
-      `https://www.google.com/search?q=${encodeURIComponent(query)}`,
-    conversational: false,
   },
   "microsoft/copilot": {
     parser: "@olostep/microsoft-copilot-results",

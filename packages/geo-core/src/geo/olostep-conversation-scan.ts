@@ -6,9 +6,9 @@ import type {
   GeoSkipFields,
   GeoZdrPolicy,
 } from "../types/geo";
+import { isGeoConsumerConversationEngine } from "../utils/geo-conversation-engine";
 import { resolveGeoZdrMode } from "../utils/geo-engines";
 import { geoLogWarn } from "../utils/geo-log";
-import { isGeoOlostepConversationEngine } from "../utils/geo-olostep";
 import { geoSkip } from "./effect";
 import { startGeoScanScoped } from "./programs";
 
@@ -24,7 +24,7 @@ export const resolveGeoManualOlostepEngines = Effect.fn(
   const allowed: string[] = [];
   for (const engine of engines) {
     if (
-      !isGeoOlostepConversationEngine(engine) ||
+      !isGeoConsumerConversationEngine(engine) ||
       !catalog.models.some((model) => model.id === engine)
     ) {
       continue;
@@ -44,7 +44,7 @@ export const resolveGeoManualOlostepEngines = Effect.fn(
 });
 
 /**
- * Consumer apps answer through Olostep batches that can take half an hour, so
+ * Consumer apps use Context captures or Olostep batches that can take half an hour, so
  * a manual run hands them to a scan scoped to this conversation instead of
  * holding the request open. The scan takes the slot claim, billing and
  * finalize like any other, and runs while automatic scans are paused just like

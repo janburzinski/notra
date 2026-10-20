@@ -1,5 +1,5 @@
 import { DEFAULT_LANGUAGE } from "@notra/ai/constants/languages";
-import type { GeoPersonaSnapshotV2 } from "@notra/db/types/geo-personas";
+import type { GeoPersonaSnapshot } from "@notra/db/types/geo-personas";
 
 import { GEO_SEQUENCE_MAX_TURNS } from "../constants/geo";
 import { GEO_OLOSTEP_PERSONA_INTRO_MAX_CHARS } from "../constants/geo-olostep";
@@ -29,8 +29,8 @@ function geoOlostepFollowUpQuery(
  * A logged-out app has no memory of the persona, so each persona prompt opens
  * with who is asking.
  */
-function geoOlostepPersonaQuery(
-  snapshot: GeoPersonaSnapshotV2,
+export function geoOlostepPersonaQuery(
+  snapshot: GeoPersonaSnapshot,
   prompt: string
 ): string {
   const { persona, memories } = snapshot;

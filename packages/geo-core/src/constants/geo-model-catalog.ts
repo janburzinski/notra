@@ -1,4 +1,5 @@
 import type { GeoModelCatalogEntry, GeoModelProvider } from "../types/geo";
+import { GEO_CONTEXT_API_KEY_ENV } from "./geo-context";
 import { GEO_OLOSTEP_API_KEY_ENV } from "./geo-olostep";
 
 /**
@@ -524,7 +525,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     zdr: "none",
     released: "2026-09-05",
     default: false,
-    gateways: ["olostep"],
+    gateways: ["context"],
   },
   {
     id: "openai/chatgpt",
@@ -551,7 +552,7 @@ export const GEO_MODEL_CATALOG_STATIC: readonly GeoModelCatalogEntry[] = [
     zdr: "none",
     released: "2026-10-11",
     default: false,
-    gateways: ["olostep"],
+    gateways: ["context"],
   },
   {
     id: "google/ai-mode",
@@ -653,10 +654,10 @@ export const GEO_STATIC_ENGINE_ENV: Readonly<
   "fx/claude-sonnet-5.5": GEO_BOX_ENGINE_ENV,
   "fx/kimi-k3": GEO_BOX_ENGINE_ENV,
   "fx/grok-4.7": GEO_BOX_ENGINE_ENV,
-  "google/ai-overview": [GEO_OLOSTEP_API_KEY_ENV],
+  "google/ai-overview": [GEO_CONTEXT_API_KEY_ENV],
   "openai/chatgpt": [GEO_OLOSTEP_API_KEY_ENV],
   "perplexity/perplexity": [GEO_OLOSTEP_API_KEY_ENV],
-  "google/gemini": [GEO_OLOSTEP_API_KEY_ENV],
+  "google/gemini": [GEO_CONTEXT_API_KEY_ENV],
   "google/ai-mode": [GEO_OLOSTEP_API_KEY_ENV],
   "microsoft/copilot": [GEO_OLOSTEP_API_KEY_ENV],
 };
