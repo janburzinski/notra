@@ -6545,6 +6545,10 @@
       "diff": {
         "noChanges": "Keine Änderungen vorhanden",
         "original": "Original"
+      },
+      "tabs": {
+        "post": "Beitrag",
+        "outline": "Gliederung"
       }
     },
     "sitePreview": {

@@ -13,6 +13,8 @@ import { useTranslations } from "use-intl";
 
 import { ContentDetailMainDocument } from "@/components/content/content-detail-main-document";
 import { ContentDetailToolbar } from "@/components/content/content-detail-toolbar";
+import { ContentDocumentTabs } from "@/components/content/content-document-tabs";
+import { ContentPlanReadView } from "@/components/content/content-plan-read-view";
 import { ContentCommentComposer } from "@/components/content/inline-comments/content-comment-composer";
 import { ContentCommentsGutter } from "@/components/content/inline-comments/content-comments-gutter";
 import { ContentCommentsLayer } from "@/components/content/inline-comments/content-comments-layer";
@@ -23,6 +25,7 @@ import { HeaderActionsPortal } from "@/components/dashboard/header-actions-porta
 import Link from "@/components/framework/link";
 import { WriterExecute } from "@/components/geo/writer/writer-execute";
 import type { ContentDetailDocument } from "@/lib/hooks/use-content-detail-document";
+import { useContentDocumentTab } from "@/lib/hooks/use-content-document-tab";
 import { useSearchParams } from "@/lib/navigation";
 import type { ContentApiResponse } from "@/types/hooks/content";
 
@@ -59,6 +62,8 @@ export function ContentDetailLoadedView({
     ? `/${organizationSlug}/collection/${collection.id}`
     : `/${organizationSlug}/content`;
   const backLabel = fromCollection ? t("backToCollection") : t("backToContent");
+  const { outline, tab, setTab, visibleOutline } =
+    useContentDocumentTab(document);
 
   return (
     <ContentCommentsProvider
@@ -126,6 +131,11 @@ export function ContentDetailLoadedView({
               </div>
             </div>
           )}
+          <ContentDocumentTabs
+            enabled={outline !== undefined}
+            onValueChange={setTab}
+            value={tab}
+          />
           <div
             className="@container/editor relative min-h-0 flex-1 scrollbar-thin overflow-y-auto overscroll-contain py-4 md:py-6"
             data-content-scroll-viewport
@@ -136,20 +146,26 @@ export function ContentDetailLoadedView({
                 className={`relative mx-auto w-full space-y-6 px-4 lg:px-6 ${isLongForm ? "max-w-3xl" : "max-w-5xl"}`}
                 data-comment-column
               >
-                {isLongForm ? (
-                  <ContentCommentsLayer container={editorViewport} />
-                ) : null}
                 {document.geoWriterDraft ? <WriterExecute.Banner /> : null}
 
-                <ContentDetailMainDocument
-                  contentId={contentId}
-                  data={data}
-                  document={document}
-                  onSelectionChange={onSelectionChange}
-                  organizationId={organizationId}
-                  selectedExcerpt={selectedExcerpt}
-                />
-                <ContentDetachedComments />
+                <ContentPlanReadView brief={visibleOutline} />
+                <div
+                  className="space-y-6"
+                  hidden={visibleOutline !== undefined}
+                >
+                  {isLongForm ? (
+                    <ContentCommentsLayer container={editorViewport} />
+                  ) : null}
+                  <ContentDetailMainDocument
+                    contentId={contentId}
+                    data={data}
+                    document={document}
+                    onSelectionChange={onSelectionChange}
+                    organizationId={organizationId}
+                    selectedExcerpt={selectedExcerpt}
+                  />
+                  <ContentDetachedComments />
+                </div>
 
                 {document.isGeoWriterPlanMode || isLongForm ? null : (
                   <RecommendationsSection value={content.recommendations} />

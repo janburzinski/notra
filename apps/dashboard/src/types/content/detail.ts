@@ -1,5 +1,6 @@
 import type { PostGitHubPublish } from "@notra/db/types/post-github-publish";
 
+import type { CONTENT_DOCUMENT_TABS } from "@/constants/content-detail";
 import type { GitHubRepository } from "@/types/integrations";
 import type {
   GitHubPublishContentType,
@@ -109,4 +110,12 @@ export interface ParsedSourceMetadata {
   lookbackWindow: string;
   repositories: Array<{ owner: string; repo: string }>;
   triggerSourceType: string;
+}
+
+export type ContentDocumentTab = (typeof CONTENT_DOCUMENT_TABS)[number];
+
+export interface ContentDocumentTabsProps {
+  enabled: boolean;
+  value: ContentDocumentTab;
+  onValueChange: (value: ContentDocumentTab) => void;
 }

@@ -6545,6 +6545,10 @@
       "diff": {
         "noChanges": "No changes to display",
         "original": "Original"
+      },
+      "tabs": {
+        "post": "Post",
+        "outline": "Outline"
       }
     },
     "sitePreview": {
