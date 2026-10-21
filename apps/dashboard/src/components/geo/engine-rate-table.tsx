@@ -71,9 +71,9 @@ function VisibilityCell({
     family.family
   );
   return (
-    <span className="flex min-w-0 items-center justify-end gap-2">
+    <span className="grid grid-cols-[2.75rem_minmax(4.5rem,max-content)] items-center justify-end justify-items-start gap-2">
       <FadeSwap
-        className="text-sm font-medium tabular-nums"
+        className="justify-self-end text-sm font-medium tabular-nums"
         swapKey={formatMentionRate(totals.rate)}
         value={totals.rate}
       >
