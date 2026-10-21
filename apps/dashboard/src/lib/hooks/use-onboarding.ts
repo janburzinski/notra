@@ -44,7 +44,13 @@ export function useOnboardingStatus(
     dashboardOrpc.onboarding.get.queryOptions({
       input: { organizationId },
       enabled: !!organizationId,
-      refetchInterval: options?.refetchInterval,
+      refetchInterval: (query) => {
+        const status = query.state.data;
+        if (status?.onboardingCompleted || status?.onboardingDismissed) {
+          return false;
+        }
+        return options?.refetchInterval ?? false;
+      },
     })
   );
 }

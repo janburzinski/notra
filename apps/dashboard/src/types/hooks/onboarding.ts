@@ -1,8 +1,8 @@
 export interface OnboardingStatus {
-  hasBrandIdentity: boolean;
-  hasIntegration: boolean;
-  hasSchedule: boolean;
-  hasGeoTracking: boolean;
+  hasPrompt: boolean;
+  hasCompetitor: boolean;
+  hasScan: boolean;
+  hasAgentReadiness: boolean;
   onboardingCompleted: boolean;
   onboardingDismissed: boolean;
 }

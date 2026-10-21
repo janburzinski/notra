@@ -1,10 +1,10 @@
 import { retrieveBrand, searchBrands } from "@notra/ai/utils/context-dev";
 import { db } from "@notra/db/drizzle";
 import {
-  brandSettings,
-  contentTriggers,
-  geoSettings,
-  githubIntegrations,
+  geoAgentReadinessReports,
+  geoCompetitors,
+  geoPrompts,
+  geoScans,
   onboardingSuggestions,
   organizations,
 } from "@notra/db/schema";
@@ -119,23 +119,24 @@ export const onboardingRouter = {
         .select({
           onboardingCompleted: organizations.onboardingCompleted,
           onboardingDismissed: organizations.onboardingDismissed,
-          hasBrandIdentity: sql<boolean>`exists (select 1 from ${brandSettings} where ${brandSettings.organizationId} = ${organizationId})`,
-          hasIntegration: sql<boolean>`exists (select 1 from ${githubIntegrations} where ${githubIntegrations.organizationId} = ${organizationId})`,
-          hasSchedule: sql<boolean>`exists (select 1 from ${contentTriggers} where ${contentTriggers.organizationId} = ${organizationId} and ${contentTriggers.sourceType} = 'cron')`,
-          hasGeoTracking: sql<boolean>`exists (select 1 from ${geoSettings} where ${geoSettings.organizationId} = ${organizationId})`,
+          hasPrompt: sql<boolean>`exists (select 1 from ${geoPrompts} where ${geoPrompts.organizationId} = ${organizationId})`,
+          hasCompetitor: sql<boolean>`exists (select 1 from ${geoCompetitors} where ${geoCompetitors.organizationId} = ${organizationId})`,
+          hasScan: sql<boolean>`exists (select 1 from ${geoScans} where ${geoScans.organizationId} = ${organizationId} and ${geoScans.status} = 'completed')`,
+          hasAgentReadiness: sql<boolean>`exists (select 1 from ${geoAgentReadinessReports} where ${geoAgentReadinessReports.organizationId} = ${organizationId} and ${geoAgentReadinessReports.status} = 'completed')`,
         })
         .from(organizations)
         .where(eq(organizations.id, input.organizationId))
         .limit(1);
 
-      const hasBrandIdentity = org?.hasBrandIdentity ?? false;
-      const hasIntegration = org?.hasIntegration ?? false;
-      const hasSchedule = org?.hasSchedule ?? false;
-      const hasGeoTracking = org?.hasGeoTracking ?? false;
+      const hasPrompt = org?.hasPrompt ?? false;
+      const hasCompetitor = org?.hasCompetitor ?? false;
+      const hasScan = org?.hasScan ?? false;
+      const hasAgentReadiness = org?.hasAgentReadiness ?? false;
       const onboardingCompleted = org?.onboardingCompleted ?? false;
       const onboardingDismissed = org?.onboardingDismissed ?? false;
 
-      const setupComplete = hasBrandIdentity && hasIntegration && hasSchedule;
+      const setupComplete =
+        hasPrompt && hasCompetitor && hasScan && hasAgentReadiness;
 
       if (setupComplete && !onboardingCompleted) {
         await db
@@ -145,10 +146,10 @@ export const onboardingRouter = {
       }
 
       return {
-        hasBrandIdentity,
-        hasIntegration,
-        hasSchedule,
-        hasGeoTracking,
+        hasPrompt,
+        hasCompetitor,
+        hasScan,
+        hasAgentReadiness,
         onboardingCompleted: setupComplete || onboardingCompleted,
         onboardingDismissed,
       };

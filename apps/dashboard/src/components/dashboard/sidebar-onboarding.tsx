@@ -12,14 +12,16 @@ import { useTranslations } from "use-intl";
 
 import { AgentLoader } from "@/components/icons/agent-loader";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { AGENT_RUN_REFETCH_INTERVAL_MS } from "@/constants/onboarding-agent";
+import {
+  AGENT_RUN_REFETCH_INTERVAL_MS,
+  ONBOARDING_STATUS_REFETCH_INTERVAL_MS,
+} from "@/constants/onboarding-agent";
 import { localStorageKeys } from "@/constants/storage";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import {
   useOnboardingAgentRun,
   useOnboardingStatus,
 } from "@/lib/hooks/use-onboarding";
-import { geoOnboardingPath } from "@/utils/geo-paths";
 
 const collapsedListeners = new Set<() => void>();
 
@@ -48,11 +50,17 @@ export function SidebarOnboarding() {
 
   const { data: agentRun } = useOnboardingAgentRun(orgId);
   const agentRunning = agentRun?.running ?? false;
-  const { data } = useOnboardingStatus(orgId, {
-    refetchInterval: agentRunning ? AGENT_RUN_REFETCH_INTERVAL_MS : false,
-  });
   const { data: customer } = useBillingCustomer({
     expand: ["subscriptions.plan"],
+  });
+  const hasActiveSubscription = customer?.subscriptions.some(
+    (subscription) => !subscription.addOn && subscription.status === "active"
+  );
+  const checklistHidden = !!customer && !hasActiveSubscription;
+  const { data } = useOnboardingStatus(orgId, {
+    refetchInterval: agentRunning
+      ? AGENT_RUN_REFETCH_INTERVAL_MS
+      : !checklistHidden && ONBOARDING_STATUS_REFETCH_INTERVAL_MS,
   });
 
   const storageKey = localStorageKeys.sidebarOnboardingCollapsed(orgId);
@@ -62,10 +70,10 @@ export function SidebarOnboarding() {
     () => null
   );
   const hasCompletedStep =
-    data?.hasBrandIdentity ||
-    data?.hasIntegration ||
-    data?.hasSchedule ||
-    data?.hasGeoTracking;
+    data?.hasPrompt ||
+    data?.hasCompetitor ||
+    data?.hasScan ||
+    data?.hasAgentReadiness;
   const collapsed =
     storedCollapsed === null ? !!hasCompletedStep : storedCollapsed === "true";
 
@@ -73,38 +81,34 @@ export function SidebarOnboarding() {
     setStoredCollapsed(storageKey, !collapsed);
   };
 
-  const hasActiveSubscription = customer?.subscriptions.some(
-    (subscription) => !subscription.addOn && subscription.status === "active"
-  );
-
   if (!data || data.onboardingCompleted || data.onboardingDismissed) {
     return null;
   }
 
-  if (customer && !hasActiveSubscription) {
+  if (checklistHidden) {
     return null;
   }
 
   const steps = [
     {
-      label: t("steps.brandIdentity"),
-      href: `/${slug}/brand/identity`,
-      completed: data.hasBrandIdentity,
+      label: t("steps.prompt"),
+      href: `/${slug}/geo/prompts`,
+      completed: data.hasPrompt,
     },
     {
-      label: t("steps.integration"),
-      href: `/${slug}/integrations`,
-      completed: data.hasIntegration,
+      label: t("steps.competitor"),
+      href: `/${slug}/geo/competitors`,
+      completed: data.hasCompetitor,
     },
     {
-      label: t("steps.schedule"),
-      href: `/${slug}/automation`,
-      completed: data.hasSchedule,
+      label: t("steps.scan"),
+      href: `/${slug}/geo`,
+      completed: data.hasScan,
     },
     {
-      label: t("steps.geoTracking"),
-      href: geoOnboardingPath(),
-      completed: data.hasGeoTracking,
+      label: t("steps.agentReadiness"),
+      href: `/${slug}/geo/agent-readiness`,
+      completed: data.hasAgentReadiness,
     },
   ];
 

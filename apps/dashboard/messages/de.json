@@ -5838,10 +5838,10 @@
     },
     "onboarding": {
       "steps": {
-        "brandIdentity": "Markenidentität einrichten",
-        "integration": "Integration hinzufügen",
-        "schedule": "Zeitplan erstellen",
-        "geoTracking": "KI-Sichtbarkeit tracken"
+        "prompt": "Ersten Prompt hinzufügen",
+        "competitor": "Wettbewerber hinzufügen",
+        "scan": "Ersten Scan starten",
+        "agentReadiness": "Agent-Readiness prüfen"
       },
       "expand": "Erste Schritte aufklappen",
       "expandShort": "Aufklappen",
