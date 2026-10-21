@@ -1,0 +1,23 @@
+apps/dashboard/src/utils/geo-write-entry.ts
+  s_294615cc1975f7::t_492f500275a2f9 79-83
+apps/api/src/utils/posts.ts
+  s_294615cc1975f7::t_2ba6dc3db8dbc7 4-9,12,103-129
+apps/api/src/routes/posts.ts
+  s_294615cc1975f7::t_2ba6dc3db8dbc7 57,496
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b79dcc5870f07d4c06d0d6e38af1a34bceec1778",
+  "prompts": {},
+  "sessions": {
+    "s_294615cc1975f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6df90424-7fc4-4d74-9264-9f4f82a17ccb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
