@@ -54,6 +54,7 @@ import {
   resolveRequestOrganization,
 } from "../utils/organizations";
 import {
+  postPatchLogFields,
   respondToPostFailure,
   runPostProgram,
   serializePost,
@@ -492,6 +493,7 @@ postsRoutes.openapi(patchPostRoute, async (c) => {
   }
 
   const { post, authors, previousStatus } = result.success;
+  c.get("log").set(postPatchLogFields(body, post));
 
   if (post.status === "published" && previousStatus !== "published") {
     void runGeoEffect(

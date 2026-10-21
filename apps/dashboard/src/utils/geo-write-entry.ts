@@ -66,19 +66,25 @@ export function getGeoWriterDocumentState(
   const hasBriefError = briefError !== null && briefError !== undefined;
   const isBriefMissing = hasBriefError && isNotFoundError(briefError);
   const isBriefError = hasBriefError && !isBriefMissing;
-  const isPlanReviewable = isGeoWriterPlanReviewable(briefStatus);
+  const isBriefReviewable = isGeoWriterPlanReviewable(briefStatus);
   return {
     isBriefError,
     isBriefMissing,
     isChatLocked:
       hasDraft &&
       !isBriefMissing &&
-      !isPlanReviewable &&
+      !isBriefReviewable &&
       briefStatus !== "completed",
     isPlanMode:
       hasDraft &&
-      (isPostStillPlan || (!isBriefMissing && briefStatus !== "completed")),
-    isPlanReviewable,
+      (isPostStillPlan ||
+        (!isBriefMissing &&
+          (briefStatus === undefined ||
+            briefStatus === "approved" ||
+            briefStatus === "writing"))),
+    // An article saved over the outline (e.g. through the API) leaves the
+    // brief in draft; it must be edited as an article, not as a plan.
+    isPlanReviewable: isBriefReviewable && isPostStillPlan,
   };
 }
 

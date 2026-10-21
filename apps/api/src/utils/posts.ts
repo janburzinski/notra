@@ -1,9 +1,15 @@
 import { supportsPostSlug } from "@notra/ai/schemas/post";
 import { posts } from "@notra/db/schema";
 import { extractImageArtifactHtml } from "@notra/db/utils/post-image-artifacts";
-import type { ALL_POST_CONTENT_TYPES } from "@notra/schemas/api/content";
+import { GEO_WRITER_TRIGGER_ID } from "@notra/geo-core/constants/geo";
+import { isGeoBriefMarkdown } from "@notra/geo-core/utils/geo-writer-brief-markdown";
+import type {
+  ALL_POST_CONTENT_TYPES,
+  patchPostRequestSchema,
+} from "@notra/schemas/api/content";
 import { Effect } from "effect";
 import type { Context } from "hono";
+import type { z } from "zod";
 
 import type { PostDatabaseError } from "../errors/posts";
 import type { PostAuthorsById, PostDomainError, PostRow } from "../types/posts";
@@ -91,6 +97,36 @@ export function serializePost(
     status: post.status,
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString(),
+  };
+}
+
+function geoWriterBriefId(sourceMetadata: unknown): string | null {
+  if (typeof sourceMetadata !== "object" || sourceMetadata === null) {
+    return null;
+  }
+  const { triggerId, briefId } = sourceMetadata as Record<string, unknown>;
+  return triggerId === GEO_WRITER_TRIGGER_ID && typeof briefId === "string"
+    ? briefId
+    : null;
+}
+
+/** Wide-event fields for a post update. Never includes the content itself. */
+export function postPatchLogFields(
+  body: z.infer<typeof patchPostRequestSchema>,
+  post: PostRow
+) {
+  const briefId = geoWriterBriefId(post.sourceMetadata);
+  return {
+    postId: post.id,
+    postContentType: post.contentType,
+    postStatus: post.status,
+    postFieldsUpdated: Object.keys(body).sort().join(","),
+    postMarkdownChars: body.markdown?.length,
+    geoBriefId: briefId ?? undefined,
+    geoBriefMarkdownIsOutline:
+      briefId && post.markdown !== null
+        ? isGeoBriefMarkdown(post.markdown)
+        : undefined,
   };
 }
 
