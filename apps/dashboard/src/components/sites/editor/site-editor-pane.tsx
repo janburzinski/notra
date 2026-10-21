@@ -19,7 +19,11 @@ import { useSiteCodeHighlighter } from "@/lib/hooks/use-site-code-highlighter";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SiteEditorPaneProps } from "@/types/components/site-editor";
 import type { SiteEditorMode } from "@/types/site-editor";
-import { siteEditorHasDraft, siteEditStateKey } from "@/utils/site-editor";
+import {
+  siteEditorHasDraft,
+  siteEditStateKey,
+  siteRecordSourceContext,
+} from "@/utils/site-editor";
 
 export function SiteEditorPane({
   organizationId,
@@ -69,10 +73,7 @@ export function SiteEditorPane({
     baseCommitSha,
     draftId: document?.draftId ?? null,
     draftRevision: document?.draftRevision ?? null,
-    sourceContext: document?.sourceContext ?? {
-      productionBranch: site.productionBranch,
-      rootDirectory: site.rootDirectory,
-    },
+    sourceContext: document?.sourceContext ?? siteRecordSourceContext(site),
   });
 
   const cancelPending = () => {

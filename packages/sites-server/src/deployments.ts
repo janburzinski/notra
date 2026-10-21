@@ -161,6 +161,14 @@ async function insertDeployment(
   if (input.kind === "preview" && !site.previewsEnabled) {
     throw new SiteNotBuildableError("Previews are turned off for this site");
   }
+  if (
+    input.githubRepositoryId &&
+    input.githubRepositoryId !== site.githubRepositoryId
+  ) {
+    throw new SiteNotBuildableError(
+      "This build came from a repository the site no longer builds from"
+    );
+  }
   const buildBudgetReserved = !(
     site.smartDeployments && ["push", "pull_request"].includes(input.trigger)
   );
@@ -184,6 +192,9 @@ async function insertDeployment(
       status: "queued",
       buildBudgetReserved,
       generation: site.lastGeneration,
+      githubRepositoryId: site.githubRepositoryId,
+      repositoryOwner: site.repositoryOwner,
+      repositoryName: site.repositoryName,
       branch: input.branch,
       commitSha: input.commitSha,
       commitMessage: input.commitMessage ?? null,
@@ -278,21 +289,27 @@ export async function startDeploymentBuild(
     ) {
       return false;
     }
+    const repositoryChanged = Boolean(
+      site &&
+      current.githubRepositoryId &&
+      current.githubRepositoryId !== site.githubRepositoryId
+    );
     if (
       !site ||
       site.status !== "active" ||
+      repositoryChanged ||
       (current.kind === "preview" && !site.previewsEnabled)
     ) {
+      let errorMessage = "The site is offline.";
+      if (site?.status === "active") {
+        errorMessage = repositoryChanged
+          ? "The site now builds from a different repository."
+          : "Previews are turned off for this site.";
+      }
       await transitionDeployment(
         current.id,
         "canceled",
-        {
-          finishedAt: new Date(),
-          errorMessage:
-            site?.status === "active"
-              ? "Previews are turned off for this site."
-              : "The site is offline.",
-        },
+        { finishedAt: new Date(), errorMessage },
         tx
       );
       return false;

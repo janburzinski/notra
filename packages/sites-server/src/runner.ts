@@ -158,6 +158,7 @@ async function runSettingsJob(job: SiteJob): Promise<SiteJobOutcome> {
           commitMessage: head.message,
           commitAuthor: head.author,
           requestedByUserId,
+          githubRepositoryId: repository.githubRepositoryId,
         },
         job
       );

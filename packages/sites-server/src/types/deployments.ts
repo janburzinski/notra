@@ -29,6 +29,8 @@ export interface EnqueueDeploymentInput {
   commitAuthor?: string | null;
   pullRequestNumber?: number | null;
   requestedByUserId?: string | null;
+  /** Rejects the build when the site no longer builds from this repository. */
+  githubRepositoryId?: string | null;
 }
 
 export interface EnqueuedDeployment {

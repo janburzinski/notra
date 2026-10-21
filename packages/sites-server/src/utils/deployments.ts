@@ -18,5 +18,6 @@ export function redeploymentInput(
     commitAuthor: previous.commitAuthor,
     pullRequestNumber: previous.pullRequestNumber,
     requestedByUserId,
+    githubRepositoryId: previous.githubRepositoryId,
   };
 }

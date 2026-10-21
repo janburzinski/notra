@@ -25,6 +25,7 @@ export async function deployBranchHead(
     commitMessage: options.commitMessage ?? head.message,
     commitAuthor: head.author,
     requestedByUserId: options.userId ?? null,
+    githubRepositoryId: repository.githubRepositoryId,
   });
   return jobId;
 }

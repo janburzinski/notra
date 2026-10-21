@@ -4052,6 +4052,9 @@ export const siteDeployments = pgTable(
       .notNull()
       .default("queued"),
     generation: integer("generation").notNull(),
+    githubRepositoryId: text("github_repository_id"),
+    repositoryOwner: text("repository_owner"),
+    repositoryName: text("repository_name"),
     branch: text("branch").notNull(),
     commitSha: text("commit_sha").notNull(),
     commitMessage: text("commit_message"),

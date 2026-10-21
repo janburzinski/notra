@@ -147,6 +147,7 @@ if (!databaseUrl) {
     draftId,
     draftRevision,
     sourceContext: {
+      repositoryId: site.githubRepositoryId ?? "",
       productionBranch: site.productionBranch,
       rootDirectory: site.rootDirectory,
     },

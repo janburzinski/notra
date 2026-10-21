@@ -30,7 +30,10 @@ import { useInvalidateSites } from "@/lib/hooks/use-sites";
 import { useWarnBeforeUnload } from "@/lib/hooks/use-warn-before-unload";
 import type { SiteEditorJump } from "@/types/site-editor";
 import type { SiteDiagnostic } from "@/types/sites";
-import { siteEditorLanguage } from "@/utils/site-editor";
+import {
+  siteEditorLanguage,
+  siteRecordSourceContext,
+} from "@/utils/site-editor";
 import { createSiteEditor } from "@/utils/site-editor-factory";
 
 export function SiteEditorPage() {
@@ -116,10 +119,7 @@ export function SiteEditorPage() {
     organizationId,
     siteId,
     baseCommitSha,
-    sourceContext: data?.sourceContext ?? {
-      productionBranch: site.productionBranch,
-      rootDirectory: site.rootDirectory,
-    },
+    sourceContext: data?.sourceContext ?? siteRecordSourceContext(site),
     refreshDrafts,
     onSaved: () => setNewFileOpen(false),
     onCreated: openFile,

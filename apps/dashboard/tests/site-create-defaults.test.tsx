@@ -31,7 +31,7 @@ if (!process.env.NOTRA_SITE_DEFAULTS_TEST_WORKER) {
     projectId: "project",
     name: "Example blog",
     liveUrl: "https://site.example",
-    repository: { owner: "example", name: "blog" },
+    repository: { id: "1", owner: "example", name: "blog" },
     productionBranch: "main",
     rootDirectory: "",
   };

@@ -249,6 +249,21 @@ export async function updateSiteSettings(
         ? null
         : await hashPreviewPassword(patch.previewPassword);
   }
+  if (
+    patch.repositoryId !== undefined &&
+    patch.repositoryId !== site.repositoryId
+  ) {
+    const { integration, repository } = await requireOrganizationRepository(
+      site.organizationId,
+      patch.repositoryId
+    );
+    values.repositoryId = integration.id;
+    values.githubInstallationId = repository.installationId;
+    values.githubRepositoryId = repository.githubRepositoryId;
+    values.repositoryOwner = repository.owner;
+    values.repositoryName = repository.repo;
+    values.productionBranch ??= integration.defaultBranch || "main";
+  }
   const name = patch.name?.trim();
   if (name !== undefined && name !== site.name) {
     if (userId === null) {
@@ -271,7 +286,13 @@ export async function updateSiteSettings(
     if (!current) {
       throw new SiteInputError("Site not found");
     }
+    const repositoryChanged =
+      values.githubRepositoryId !== undefined &&
+      (values.githubRepositoryId !== current.githubRepositoryId ||
+        values.repositoryOwner !== current.repositoryOwner ||
+        values.repositoryName !== current.repositoryName);
     if (
+      repositoryChanged ||
       (values.productionBranch !== undefined &&
         values.productionBranch !== current.productionBranch) ||
       (values.rootDirectory !== undefined &&
@@ -284,15 +305,18 @@ export async function updateSiteSettings(
         .limit(1);
       if (draft) {
         throw new SiteInputError(
-          "Publish or discard this site's drafts before changing its branch or root directory"
+          "Publish or discard this site's drafts before changing its repository, branch or root directory"
         );
       }
     }
+    // Previews belong to the old repository's branches and pull requests.
     const removePreviewsThrough =
-      current.previewsEnabled && values.previewsEnabled === false
+      repositoryChanged ||
+      (current.previewsEnabled && values.previewsEnabled === false)
         ? current.lastGeneration + 1
         : null;
     const rebuilding = Boolean(
+      repositoryChanged ||
       (values.mounts &&
         JSON.stringify(values.mounts) !== JSON.stringify(current.mounts)) ||
       (values.productionBranch &&

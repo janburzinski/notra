@@ -269,6 +269,7 @@ async function lockSourceContext(
     .for("update");
   if (
     !current ||
+    (current.githubRepositoryId ?? "") !== input.sourceContext.repositoryId ||
     current.productionBranch !== input.sourceContext.productionBranch ||
     current.rootDirectory !== input.sourceContext.rootDirectory
   ) {

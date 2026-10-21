@@ -88,6 +88,7 @@ export const createSitesInputSchema = z.object({
 
 export const updateSiteInputSchema = siteScopeInputSchema.extend({
   name: z.string().trim().min(1).max(80).optional(),
+  repositoryId: z.string().min(1).optional(),
   productionBranch: z.string().trim().min(1).max(250).optional(),
   rootDirectory: z.string().trim().max(200).optional(),
   mounts: siteMountsInputSchema.optional(),
@@ -170,6 +171,7 @@ export const siteDraftMutationInputSchema = siteFilePathInputSchema.extend({
   draftId: z.string().min(1).nullable(),
   draftRevision: z.number().int().nonnegative().nullable(),
   sourceContext: z.object({
+    repositoryId: z.string(),
     productionBranch: z.string().min(1),
     rootDirectory: z.string(),
   }),

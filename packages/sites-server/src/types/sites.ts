@@ -61,6 +61,7 @@ export interface DeployBranchHeadOptions {
 
 export interface SiteSettingsPatch {
   name?: string;
+  repositoryId?: string;
   productionBranch?: string;
   rootDirectory?: string;
   mounts?: SiteMounts;

@@ -69,6 +69,9 @@ export async function activateDeployment(
       if (
         !currentSite ||
         currentSite.status !== "active" ||
+        // A build of the previous repository must not replace the switch.
+        (deployment.githubRepositoryId !== null &&
+          deployment.githubRepositoryId !== currentSite.githubRepositoryId) ||
         (deployment.kind === "preview" && !currentSite.previewsEnabled) ||
         !(await hasStoredFiles(currentSite, deployment))
       ) {

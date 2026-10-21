@@ -19,6 +19,7 @@ import {
   parseSiteIntegrationConfig,
   updateSiteIntegrationConfig,
 } from "./utils/site-integration-config";
+import { siteSourceContext } from "./utils/source-context";
 
 async function currentConfig(site: Site) {
   const [file, drafts] = await Promise.all([
@@ -89,10 +90,7 @@ async function saveSiteIntegrationUpdate(
     path: SITE_CONFIG_FILENAME,
     draftId: draft?.id ?? null,
     draftRevision: draft?.revision ?? null,
-    sourceContext: {
-      productionBranch: site.productionBranch,
-      rootDirectory: site.rootDirectory,
-    },
+    sourceContext: siteSourceContext(site),
   };
   if (file && next === file.content) {
     await discardSiteDraft(site, observed);

@@ -38,7 +38,11 @@ export function serializeSite(
     suspendedReason: site.suspendedReason,
     repository:
       site.repositoryOwner && site.repositoryName
-        ? { owner: site.repositoryOwner, name: site.repositoryName }
+        ? {
+            id: site.githubRepositoryId,
+            owner: site.repositoryOwner,
+            name: site.repositoryName,
+          }
         : null,
     productionBranch: site.productionBranch,
     rootDirectory: site.rootDirectory,
@@ -74,6 +78,14 @@ export function serializeDeployment(
     live: live.has(deployment.id),
     liveSince: live.get(deployment.id) ?? null,
     generation: deployment.generation,
+    repository:
+      deployment.repositoryOwner && deployment.repositoryName
+        ? {
+            id: deployment.githubRepositoryId,
+            owner: deployment.repositoryOwner,
+            name: deployment.repositoryName,
+          }
+        : null,
     branch: deployment.branch,
     commitSha: deployment.commitSha,
     commitMessage: deployment.commitMessage,

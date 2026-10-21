@@ -85,7 +85,7 @@ export function SiteDeploymentSummary({
     deployment.status === "ready" || inProgress
       ? formatBuildDuration(deploymentElapsedMs(deployment, now))
       : null;
-  const repository = detail.site.repository;
+  const repository = deployment.repository ?? detail.site.repository;
   const branchUrl = githubBranchUrl(repository, deployment.branch);
   const protectedPreview = isDeploymentProtected(deployment, detail);
 

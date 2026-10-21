@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { useSite } from "@/components/sites/site-context";
 import { SiteDeploymentMenu } from "@/components/sites/site-deployment-menu";
 import { SiteEnvironmentBadge } from "@/components/sites/site-environment-badge";
 import { SitePreviewDeleteDialog } from "@/components/sites/site-preview-delete-dialog";
@@ -35,6 +36,7 @@ import {
   deploymentElapsedMs,
   formatBuildDuration,
   hasDeploymentInProgress,
+  isFromSiteRepository,
   isPinnedLiveDeployment,
   shortSha,
 } from "@/utils/site-deployments";
@@ -59,6 +61,7 @@ export function SiteDeploymentsTable({
   const tDeployments = useTranslations("sites.deployments");
   const router = useRouter();
   const scope = { organizationId, siteId };
+  const { detail } = useSite();
   const redeploy = useRedeployDeployment(scope);
   const promote = usePromoteDeployment(scope);
   const { openPreview, copyShareLink } = useSitePreviewLinks(scope);
@@ -230,6 +233,7 @@ export function SiteDeploymentsTable({
               canRollback={deployment.canRollback}
               canPromote={deployment.canPromote}
               canUndoRollback={deployment.canUndoRollback}
+              canRedeploy={isFromSiteRepository(deployment, detail.site)}
               deployment={deployment}
               detailHref={href(deployment)}
               onRedeploy={() => redeploy.mutate(deployment.id)}

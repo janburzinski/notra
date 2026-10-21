@@ -166,7 +166,7 @@ if (!process.env.NOTRA_DEPLOYMENTS_SURFACE_TEST_WORKER) {
     (withDiagnostics) => {
       const site = {
         name: "Example blog",
-        repository: { owner: "example", name: "blog" },
+        repository: { id: "1", owner: "example", name: "blog" },
         productionBranch: "main",
         rootDirectory: "apps/blog",
       };

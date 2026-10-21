@@ -168,6 +168,7 @@ async function handlePush(payload: PushPayload): Promise<string[]> {
       siteId: site.id,
       kind: previewKey ? "preview" : "production",
       previewKey,
+      githubRepositoryId: String(payload.repository.id),
     });
     if (jobId) {
       jobIds.push(jobId);
@@ -245,6 +246,7 @@ async function handlePullRequest(
       commitMessage: payload.pull_request.title,
       commitAuthor: payload.pull_request.user?.login ?? null,
       pullRequestNumber: payload.number,
+      githubRepositoryId: String(payload.repository.id),
     });
     if (jobId) {
       jobIds.push(jobId);

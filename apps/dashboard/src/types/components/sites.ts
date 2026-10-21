@@ -353,6 +353,7 @@ export interface SiteDeploymentMenuProps {
   canRollback: boolean;
   canPromote: boolean;
   canUndoRollback: boolean;
+  canRedeploy: boolean;
   detailHref?: string;
   redeployPending: boolean;
   onRedeploy: () => void;
@@ -671,6 +672,10 @@ export interface SiteImportListProps {
   isLoading: boolean;
   importingId: string | null;
   onImport: (repository: SiteImportableRepository) => void;
+  callbackPath?: string;
+  actionLabel?: string;
+  actionAriaLabel?: (repository: string) => string;
+  currentRepository?: { owner: string; name: string } | null;
 }
 
 export type SiteCreateStepState = "active" | "done" | "locked";

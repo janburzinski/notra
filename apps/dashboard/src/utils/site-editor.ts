@@ -287,3 +287,14 @@ export function focusSiteEditorLine(
     ?.shadowRoot?.querySelector(`[data-line="${line}"]`)
     ?.scrollIntoView({ block: "center" });
 }
+
+/** Matches the server's source context until the editor's own copy loads. */
+export function siteRecordSourceContext(
+  site: Pick<SiteRecord, "repository" | "productionBranch" | "rootDirectory">
+): SiteEditorDocument["sourceContext"] {
+  return {
+    repositoryId: site.repository?.id ?? "",
+    productionBranch: site.productionBranch,
+    rootDirectory: site.rootDirectory,
+  };
+}

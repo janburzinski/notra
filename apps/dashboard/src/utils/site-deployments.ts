@@ -18,6 +18,7 @@ import type {
   SiteDeploymentStatus,
   SiteDeploymentStatusFilter,
   SiteDetail,
+  SiteRecord,
 } from "@/types/sites";
 import { hostFromOrigin } from "@/utils/site-links";
 
@@ -220,4 +221,15 @@ export function isDeploymentStatusFilter(
   value: string | null
 ): value is SiteDeploymentStatusFilter | "all" {
   return SITE_DEPLOYMENT_STATUS_FILTERS.some((option) => option === value);
+}
+
+/** Builds from a repository the site no longer uses can't be rebuilt. */
+export function isFromSiteRepository(
+  deployment: Pick<SiteDeploymentRecord, "repository">,
+  site: Pick<SiteRecord, "repository">
+): boolean {
+  return (
+    !deployment.repository?.id ||
+    deployment.repository.id === site.repository?.id
+  );
 }

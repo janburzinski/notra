@@ -47,6 +47,7 @@ export interface SaveSiteDraftInput {
 }
 
 export interface SiteEditorSourceContext {
+  repositoryId: string;
   productionBranch: string;
   rootDirectory: string;
 }

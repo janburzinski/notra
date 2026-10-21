@@ -167,6 +167,7 @@ export interface SiteCreateTarget {
 
 export interface SiteSettingsPatch {
   name?: string;
+  repositoryId?: string;
   productionBranch?: string;
   rootDirectory?: string;
   mounts?: { blog?: string; changelog?: string };

@@ -58,7 +58,7 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
     id: "site",
     name: "Example blog",
     liveUrl: "https://site.example",
-    repository: { owner: "example", name: "blog" },
+    repository: { id: "1", owner: "example", name: "blog" },
     productionBranch: "main",
     rootDirectory: "apps/blog",
     projectId: "project",
@@ -391,7 +391,7 @@ if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
       site: {
         ...site,
         name: payload,
-        repository: { owner: payload, name: payload },
+        repository: { id: "1", owner: payload, name: payload },
         productionBranch: payload,
         rootDirectory: payload,
       },

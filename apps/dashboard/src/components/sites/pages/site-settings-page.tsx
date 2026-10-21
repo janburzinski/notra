@@ -40,8 +40,9 @@ import { useId, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
-import { Button, buttonVariants } from "@/components/button";
+import { buttonVariants } from "@/components/button";
 import { useSite } from "@/components/sites/site-context";
+import { SiteImportList } from "@/components/sites/site-import-list";
 import { SitePreviewAccessForm } from "@/components/sites/site-preview-access-control";
 import { SiteSettingsDangerZone } from "@/components/sites/site-settings-danger-zone";
 import { SiteSettingsEditor } from "@/components/sites/site-settings-editor";
@@ -63,11 +64,14 @@ import {
   useGitHubCallbackErrorToast,
   useResumeGitHubInstall,
 } from "@/hooks/use-github-install-callbacks";
+import {
+  useConnectSiteRepository,
+  useImportableRepositories,
+} from "@/lib/hooks/use-importable-repositories";
 import { useRepositorySuggestions } from "@/lib/hooks/use-repository-suggestions";
 import { useSitePublishModeOptions } from "@/lib/hooks/use-site-publish-mode-options";
 import { useInvalidateSites } from "@/lib/hooks/use-sites";
 import { useUpdateSiteSettings } from "@/lib/hooks/use-update-site-settings";
-import { startGitHubInstall } from "@/lib/integrations/github/install";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   SiteBranchFieldProps,
@@ -75,7 +79,12 @@ import type {
   SiteSectionFieldProps,
   SiteSettingsToggleProps,
 } from "@/types/components/site-settings";
-import type { SitePublishMode, SiteSettingsRowKey } from "@/types/sites";
+import type {
+  SiteImportableRepository,
+  SitePublishMode,
+  SiteRepository,
+  SiteSettingsRowKey,
+} from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 import { githubRepositoryUrl, siteHref } from "@/utils/site-links";
 import { sitePreviewAccessMode } from "@/utils/site-preview-access";
@@ -136,7 +145,7 @@ function SiteSettingsContent() {
             </SiteSettingsValue>
           }
         >
-          <RepositoryPanel />
+          <RepositoryPanel onDone={closeRow("repository")} />
         </SiteSettingsItem>
         <SiteSettingsItem
           {...row("branch")}
@@ -313,62 +322,90 @@ function SiteSettingsContent() {
   );
 }
 
-function RepositoryPanel() {
+function RepositoryPanel({ onDone }: { onDone: () => void }) {
   const t = useTranslations("sites.settings");
   const { organizationId, organizationSlug, siteId, detail } = useSite();
   const { repository } = detail.site;
-  const [installing, setInstalling] = useState(false);
-  const manageAccess = async () => {
-    setInstalling(true);
-    const result = await startGitHubInstall({
-      organizationId,
-      callbackPath: siteHref(organizationSlug, siteId, "settings"),
-    });
-    if (!result.started) {
-      setInstalling(false);
-      toast.error(
-        result.reason === "install-start-failed" && result.message
-          ? result.message
-          : t("manageGitHubFailed")
+  const importable = useImportableRepositories(organizationId);
+  const connect = useConnectSiteRepository(organizationId);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [target, setTarget] = useState<SiteRepository | null>(null);
+  const save = useUpdateSiteSettings({
+    onSaved: () => {
+      setTarget(null);
+      onDone();
+    },
+  });
+  const pick = async (candidate: SiteImportableRepository) => {
+    setPendingId(candidate.githubRepositoryId);
+    try {
+      setTarget(
+        candidate.integrationId
+          ? {
+              id: candidate.integrationId,
+              owner: candidate.owner,
+              repo: candidate.repo,
+              defaultBranch: candidate.defaultBranch,
+              private: candidate.private,
+            }
+          : await connect.mutateAsync(candidate.githubRepositoryId)
       );
+    } catch (error) {
+      toast.error(toErrorMessage(error, t("switchRepositoryFailed")));
     }
+    setPendingId(null);
   };
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <p className="text-muted-foreground max-w-md text-sm text-pretty">
-        {t("repositoryChangeHint")}
-      </p>
-      <div className="flex items-center gap-2">
-        {repository ? (
-          <a
-            className={buttonVariants({ size: "sm", variant: "ghost" })}
-            href={githubRepositoryUrl(repository)}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {t("openOnGitHub")}
-            <HugeiconsIcon
-              aria-hidden="true"
-              data-icon="inline-end"
-              icon={ArrowUpRight01Icon}
-            />
-          </a>
-        ) : null}
-        <Button
-          loading={installing}
-          onClick={manageAccess}
-          size="sm"
-          type="button"
-          variant="outline"
+    <div className="space-y-3">
+      <SiteImportList
+        actionAriaLabel={(name) => t("useRepository", { repository: name })}
+        actionLabel={t("use")}
+        callbackPath={siteHref(organizationSlug, siteId, "settings")}
+        currentRepository={repository}
+        importingId={pendingId}
+        installed={importable.data?.installed ?? false}
+        isLoading={importable.isPending}
+        onImport={pick}
+        organizationId={organizationId}
+        organizationSlug={organizationSlug}
+        repositories={importable.data?.repositories ?? []}
+      />
+      {repository ? (
+        <a
+          className={buttonVariants({ size: "sm", variant: "ghost" })}
+          href={githubRepositoryUrl(repository)}
+          rel="noopener noreferrer"
+          target="_blank"
         >
+          {t("openOnGitHub")}
           <HugeiconsIcon
             aria-hidden="true"
-            data-icon="inline-start"
-            icon={GithubIcon}
+            data-icon="inline-end"
+            icon={ArrowUpRight01Icon}
           />
-          {t("manageGitHub")}
-        </Button>
-      </div>
+        </a>
+      ) : null}
+      <ConfirmDialog
+        confirmLabel={t("switchRepositoryConfirm")}
+        description={t("switchRepositoryDescription", {
+          branch: target?.defaultBranch || "main",
+        })}
+        onConfirm={() => {
+          if (target) {
+            save.mutate({ repositoryId: target.id });
+          }
+        }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setTarget(null);
+          }
+        }}
+        open={target !== null}
+        pending={save.isPending}
+        title={t("switchRepositoryTitle", {
+          repository: target ? `${target.owner}/${target.repo}` : "",
+        })}
+      />
     </div>
   );
 }

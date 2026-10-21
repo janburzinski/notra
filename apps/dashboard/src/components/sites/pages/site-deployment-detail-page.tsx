@@ -47,6 +47,7 @@ import {
   commitTitle,
   deploymentServedUrls,
   isDeploymentInProgress,
+  isFromSiteRepository,
   shortSha,
 } from "@/utils/site-deployments";
 import { siteDeploymentHref, siteHref } from "@/utils/site-links";
@@ -256,7 +257,7 @@ function DeploymentActions({
           {t(deployment.canUndoRollback ? "undoRollback" : "promote")}
         </Button>
       ) : null}
-      {inProgress ? null : (
+      {inProgress || !isFromSiteRepository(deployment, detail.site) ? null : (
         <Button
           loading={redeploy.isPending}
           onClick={() => redeploy.mutate(deployment.id)}

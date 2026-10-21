@@ -25,7 +25,11 @@ function input(content: string): SiteEditorDraftInput {
     baseCommitSha: "commit",
     draftId: null,
     draftRevision: null,
-    sourceContext: { productionBranch: "main", rootDirectory: "" },
+    sourceContext: {
+      repositoryId: "1",
+      productionBranch: "main",
+      rootDirectory: "",
+    },
   };
 }
 

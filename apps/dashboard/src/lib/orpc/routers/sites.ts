@@ -126,6 +126,7 @@ import {
 import { readServingState } from "@notra/sites-server/state";
 import type { Site } from "@notra/sites-server/types/sites";
 import { defaultSiteConfigContent } from "@notra/sites-server/utils/default-config";
+import { siteSourceContext } from "@notra/sites-server/utils/source-context";
 import {
   buildTargetForDeployment,
   primaryMountUrl,
@@ -912,10 +913,7 @@ export const sitesRouter = {
         }
         return {
           commitSha: source.commitSha,
-          sourceContext: {
-            productionBranch: site.productionBranch,
-            rootDirectory: site.rootDirectory,
-          },
+          sourceContext: siteSourceContext(site),
           files,
           drafts: drafts.map((draft) => ({
             path: draft.path,
@@ -953,10 +951,7 @@ export const sitesRouter = {
           hasDraft: Boolean(draft),
           draftId: draft?.id ?? null,
           draftRevision: draft?.revision ?? null,
-          sourceContext: {
-            productionBranch: site.productionBranch,
-            rootDirectory: site.rootDirectory,
-          },
+          sourceContext: siteSourceContext(site),
         };
       }),
 

@@ -34,6 +34,7 @@ export function SiteDeploymentMenu({
   canRollback,
   canPromote,
   canUndoRollback,
+  canRedeploy,
   detailHref,
   redeployPending,
   onRedeploy,
@@ -111,7 +112,7 @@ export function SiteDeploymentMenu({
         {finished && (detailHref || deployment.live) ? (
           <DropdownMenuSeparator />
         ) : null}
-        {finished ? (
+        {finished && canRedeploy ? (
           <DropdownMenuItem disabled={redeployPending} onClick={onRedeploy}>
             <HugeiconsIcon icon={RefreshIcon} size={14} strokeWidth={1.75} />
             {t("redeploy")}

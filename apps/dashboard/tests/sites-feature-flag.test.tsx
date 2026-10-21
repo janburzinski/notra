@@ -201,7 +201,11 @@ if (!process.env.NOTRA_SITES_FLAG_TEST_WORKER) {
           baseCommitSha: null,
           draftId: null,
           draftRevision: null,
-          sourceContext: { productionBranch: "main", rootDirectory: "" },
+          sourceContext: {
+            repositoryId: "demo-repo",
+            productionBranch: "main",
+            rootDirectory: "",
+          },
         },
         client
       )

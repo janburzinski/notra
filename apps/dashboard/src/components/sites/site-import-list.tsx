@@ -12,6 +12,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
+import { Badge } from "@notra/ui/components/ui/badge";
 import {
   InputGroup,
   InputGroupAddon,
@@ -65,8 +66,17 @@ export function SiteImportList({
   isLoading,
   importingId,
   onImport,
+  callbackPath,
+  actionLabel,
+  actionAriaLabel,
+  currentRepository = null,
 }: SiteImportListProps) {
   const t = useTranslations("sites.new");
+  const tSettings = useTranslations("sites.settings");
+  const isCurrent = (repository: { owner: string; repo: string }) =>
+    currentRepository !== null &&
+    repository.owner.toLowerCase() === currentRepository.owner.toLowerCase() &&
+    repository.repo.toLowerCase() === currentRepository.name.toLowerCase();
   const owners = [
     ...new Set(repositories.map((repository) => repository.owner)),
   ];
@@ -80,6 +90,7 @@ export function SiteImportList({
   const visible = repositories
     .toSorted(
       (a, b) =>
+        Number(isCurrent(b)) - Number(isCurrent(a)) ||
         Number(b.integrationId !== null) - Number(a.integrationId !== null) ||
         a.repo.localeCompare(b.repo)
     )
@@ -108,7 +119,7 @@ export function SiteImportList({
     setInstalling(true);
     const result = await startGitHubInstall({
       organizationId,
-      callbackPath: `/${organizationSlug}/sites/new`,
+      callbackPath: callbackPath ?? `/${organizationSlug}/sites/new`,
     });
     if (!result.started) {
       setInstalling(false);
@@ -242,17 +253,26 @@ export function SiteImportList({
                         />
                       ) : null}
                     </span>
-                    <Button
-                      aria-label={t("importRepository", {
-                        repository: repository.repo,
-                      })}
-                      disabled={importingId !== null && !isImporting}
-                      loading={isImporting}
-                      onClick={() => onImport(repository)}
-                      size="sm"
-                    >
-                      {t("import")}
-                    </Button>
+                    {isCurrent(repository) ? (
+                      <Badge variant="secondary">
+                        {tSettings("currentRepository")}
+                      </Badge>
+                    ) : (
+                      <Button
+                        aria-label={
+                          actionAriaLabel?.(repository.repo) ??
+                          t("importRepository", {
+                            repository: repository.repo,
+                          })
+                        }
+                        disabled={importingId !== null && !isImporting}
+                        loading={isImporting}
+                        onClick={() => onImport(repository)}
+                        size="sm"
+                      >
+                        {actionLabel ?? t("import")}
+                      </Button>
+                    )}
                   </li>
                 );
               })}
