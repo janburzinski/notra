@@ -25,6 +25,7 @@ import type { ReactNode } from "react";
 import NotFound from "@/components/not-found-page";
 import { ThemeProvider } from "@/components/theme-provider";
 import { consentScripts } from "@/consent-scripts";
+import { DUB_CLEAR_ON_REVOCATION } from "@/constants/dub";
 import { consentComponents, consentTheme } from "@/lib/consent-manager/theme";
 import { RSS_FEED_PATH, RSS_FEED_TITLE } from "@/utils/constants";
 import { buildNavbarSessionScript } from "@/utils/navbar-session";
@@ -111,6 +112,7 @@ function RootDocument({ children }: { children: ReactNode }) {
           <ConsentTheme theme={consentTheme} />
           <ConsentRoot
             state={consent}
+            clearOnRevocation={DUB_CLEAR_ON_REVOCATION}
             scripts={consentScripts}
             options={{
               consentCategories: ["necessary", "measurement", "marketing"],

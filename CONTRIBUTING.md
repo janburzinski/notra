@@ -181,6 +181,43 @@ keys or local authentication impersonation on a public deployment. Unit and
 browser fixtures use synthetic tokens and stub verification; they do not contact
 production services.
 
+## Dub conversion tracking
+
+Dub attributes signups and Stripe sales to Dub links. The analytics script runs
+on both `usenotra.com` (`apps/web`) and `app.usenotra.com` (`apps/dashboard`)
+behind the c15t `measurement` consent category. It stores the click ID in a
+`dub_id` cookie scoped to `.usenotra.com`, so a link can land on either site and
+the dashboard still sees the click.
+
+The dashboard tracks the rest on the server. Creating a workspace sends a
+`Sign Up` lead to Dub with the organization ID as `customerExternalId`, because
+the organization is the Autumn and Stripe customer. The lead is sent after the
+response with `waitUntil`, and only when the visitor's current c15t decision
+still grants `measurement`, so a stale `dub_id` cookie is never enough on its
+own. Both sites also delete `dub_*` cookies on `.usenotra.com` when measurement
+is denied or withdrawn. Every Autumn `attach` and
+`multiAttach` request gets `dubCustomerExternalId` added to its Stripe Checkout
+metadata in `/api/autumn/[...all]`, and the Dub Stripe app records the sale and
+later renewals from Stripe's webhooks.
+
+A Dub customer is a workspace, not a user. Dub records one lead per workspace,
+so a user who creates a second workspace after clicking a link shows up as a
+second customer with its own lead.
+
+The script stays behind consent for privacy reasons, so visitors who decline
+measurement cookies are never attributed and Dub undercounts referrals. Partners
+are told this in the Dub program description. A partner who can show that a
+customer signed up through their link, for example with a screenshot, an email
+thread or a matching signup date and email, can contact support and we credit
+the commission manually in Dub. Do not switch the script to `alwaysLoad` to
+recover these signups; the privacy policy says Dub only loads with consent.
+
+Set `DUB_API_KEY` on the dashboard deployment. Without it, or without a `dub_id`
+cookie, lead tracking is skipped. In the Dub workspace, `usenotra.com` and
+`app.usenotra.com` must be listed under Allowed Hostnames, and the Dub Stripe app
+must be connected to the Stripe account Autumn uses. The cookie domain means
+attribution cannot be tested on `localhost`.
+
 ## Effect diagnostics
 
 `bun install` patches TypeScript 7 and Oxlint with `@effect/tsgo`. Its native

@@ -16,11 +16,11 @@ export function buildSecurityHeaders(isDevelopment: boolean) {
     "X-DNS-Prefetch-Control": "on",
     "Content-Security-Policy": [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' databuddy.cc *.databuddy.cc https://challenges.cloudflare.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' databuddy.cc *.databuddy.cc https://challenges.cloudflare.com www.dubcdn.com",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self'",
       "img-src 'self' data: blob: databuddy.cc *.databuddy.cc avatars.githubusercontent.com www.google.com *.gstatic.com cdn.contentport.io media.brand.dev logos.context.dev *.r2.dev cdn.usenotra.com pbs.twimg.com abs.twimg.com",
-      `connect-src 'self' databuddy.cc *.databuddy.cc *.inth.app *.c15t.com *.c15t.dev ${dashboardSessionOrigin}`,
+      `connect-src 'self' databuddy.cc *.databuddy.cc api.dub.co *.inth.app *.c15t.com *.c15t.dev ${dashboardSessionOrigin}`,
       "frame-src https://challenges.cloudflare.com",
       "frame-ancestors 'none'",
       "object-src 'none'",

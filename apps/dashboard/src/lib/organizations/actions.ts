@@ -38,6 +38,7 @@ import {
 } from "@/lib/actions/errors";
 import { runAction } from "@/lib/actions/run-action";
 import { validateActionInput } from "@/lib/actions/validate-input";
+import { trackDubLead } from "@/lib/analytics/dub";
 import {
   identifyOrganizationGroup,
   trackServerEvent,
@@ -399,6 +400,12 @@ export async function createOrganization(
           )
         );
       }
+
+      yield* trackDubLead({
+        customerExternalId: organizationId,
+        customerName: session.user.name,
+        customerEmail: session.user.email,
+      });
 
       yield* trackOrganizationEvent({
         event: POSTHOG_EVENTS.WORKSPACE_CREATED,

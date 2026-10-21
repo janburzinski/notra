@@ -19,6 +19,10 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/geist-mono";
 
 import { NotFoundContent } from "@/components/not-found-content";
+import {
+  DUB_ANALYTICS_SCRIPTS,
+  DUB_CLEAR_ON_REVOCATION,
+} from "@/constants/dub";
 import { resolveDashboardConsent } from "@/lib/consent-manager/resolve";
 import { consentComponents, consentTheme } from "@/lib/consent-manager/theme";
 import {
@@ -104,6 +108,8 @@ function Root() {
                   ? {}
                   : { mode: offline() }),
               }}
+              clearOnRevocation={DUB_CLEAR_ON_REVOCATION}
+              scripts={DUB_ANALYTICS_SCRIPTS}
               state={consent}
             >
               {app}
