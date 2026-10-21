@@ -4,12 +4,12 @@ import { cn } from "cn";
 import type * as React from "react";
 
 const TABLE_CARD_CELLS_CLASS = [
-  "[&>tbody>tr>td]:bg-background [&>tbody>tr>td]:border-border/60 [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
-  "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--background))]",
-  "[&>tbody>tr:first-child>td]:border-t-border [&>tbody>tr:first-child>td]:border-t",
-  "[&>tbody>tr:last-child>td]:border-b-border",
-  "[&>tbody>tr>td:first-child]:border-l-border [&>tbody>tr>td:first-child]:border-l",
-  "[&>tbody>tr>td:last-child]:border-r-border [&>tbody>tr>td:last-child]:border-r",
+  "[&>tbody>tr>td]:bg-table-card [&>tbody>tr>td]:border-table-row-border [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
+  "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--table-card))]",
+  "[&>tbody>tr:first-child>td]:border-t-table-card-border [&>tbody>tr:first-child>td]:border-t",
+  "[&>tbody>tr:last-child>td]:border-b-table-card-border",
+  "[&>tbody>tr>td:first-child]:border-l-table-card-border [&>tbody>tr>td:first-child]:border-l",
+  "[&>tbody>tr>td:last-child]:border-r-table-card-border [&>tbody>tr>td:last-child]:border-r",
   "[&>tbody>tr:first-child>td:first-child]:rounded-tl-[14px] [&>tbody>tr:first-child>td:last-child]:rounded-tr-[14px]",
   "[&>tbody>tr:last-child>td:first-child]:rounded-bl-[14px] [&>tbody>tr:last-child>td:last-child]:rounded-br-[14px]",
 ].join(" ");
@@ -17,7 +17,7 @@ const TABLE_CARD_CELLS_CLASS = [
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
-      className="border-shell-border bg-shell relative w-full min-w-0 rounded-2xl border p-0.5"
+      className="border-table-shell-border bg-table-shell relative w-full min-w-0 rounded-2xl border p-0.5"
       data-slot="table-container"
     >
       <div className="w-full overflow-x-auto rounded-[14px]">

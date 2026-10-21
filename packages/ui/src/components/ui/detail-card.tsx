@@ -34,7 +34,7 @@ export function DetailCardContent({
           </span>
         ) : null}
       </div>
-      <div className="border-border bg-popover rounded-[14px] border">
+      <div className="border-table-card-border bg-table-card shadow-table-card rounded-[14px] border">
         <div className="max-h-72 overflow-y-auto py-1">{children}</div>
       </div>
     </HoverCardContent>

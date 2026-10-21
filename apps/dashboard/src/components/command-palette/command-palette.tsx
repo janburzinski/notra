@@ -430,7 +430,7 @@ function CommandPaletteBody({
       filter={commandPaletteFilter}
       shouldFilter={aiState.status === "idle"}
     >
-      <div className="border-border bg-popover m-0.5 mb-0 overflow-hidden rounded-[14px] border">
+      <div className="border-table-card-border bg-table-card shadow-table-card m-0.5 mb-0 overflow-hidden rounded-[14px] border">
         <div className="border-border/60 flex h-12 items-center gap-2.5 border-b px-4">
           <HugeiconsIcon
             className="text-muted-foreground size-4 shrink-0"

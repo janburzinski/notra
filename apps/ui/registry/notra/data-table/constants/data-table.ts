@@ -3,25 +3,25 @@ import type { CSSProperties } from "react";
 import type { DataTableLabels } from "../types/data-table";
 
 export const TABLE_FRAME_CLASS =
-  "rounded-2xl border border-shell-border bg-shell p-0.5";
+  "rounded-2xl border border-table-shell-border bg-table-shell p-0.5";
 
 export const TABLE_BODY_CLASS =
-  "rounded-[14px] border border-border bg-background shadow-lift";
+  "rounded-[14px] border border-table-card-border bg-table-card shadow-table-card";
 
 export const TABLE_CARD_CELLS_CLASS = [
-  "[&>tbody>tr>td]:bg-background [&>tbody>tr>td]:border-border/60 [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
-  "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--background))]",
-  "[&>tbody>tr:first-child>td]:border-t-border [&>tbody>tr:first-child>td]:border-t",
-  "[&>tbody>tr:last-child>td]:border-b-border",
-  "[&>tbody>tr>td:first-child]:border-l-border [&>tbody>tr>td:first-child]:border-l",
-  "[&>tbody>tr>td:last-child]:border-r-border [&>tbody>tr>td:last-child]:border-r",
+  "[&>tbody>tr>td]:bg-table-card [&>tbody>tr>td]:border-table-row-border [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
+  "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--table-card))]",
+  "[&>tbody>tr:first-child>td]:border-t-table-card-border [&>tbody>tr:first-child>td]:border-t",
+  "[&>tbody>tr:last-child>td]:border-b-table-card-border",
+  "[&>tbody>tr>td:first-child]:border-l-table-card-border [&>tbody>tr>td:first-child]:border-l",
+  "[&>tbody>tr>td:last-child]:border-r-table-card-border [&>tbody>tr>td:last-child]:border-r",
   "[&>tbody>tr:first-child>td:first-child]:rounded-tl-[14px] [&>tbody>tr:first-child>td:last-child]:rounded-tr-[14px]",
   "[&>tbody>tr:last-child>td:first-child]:rounded-bl-[14px] [&>tbody>tr:last-child>td:last-child]:rounded-br-[14px]",
 ].join(" ");
 
 export const TABLE_INNER_RADIUS_CLASS = "rounded-[14px]";
 
-export const TABLE_ROW_BORDER_CLASS = "border-border/60 border-b";
+export const TABLE_ROW_BORDER_CLASS = "border-table-row-border border-b";
 
 export const TABLE_CELL_INNER_CLASS =
   "w-full min-w-0 truncate [&>*]:min-w-0 [&>*]:max-w-full";

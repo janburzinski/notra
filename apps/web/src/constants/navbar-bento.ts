@@ -6,25 +6,25 @@ export const NAVBAR_BENTO_CLASSES = {
   featureHeader: "flex flex-col gap-1 px-3.5 pt-3 pb-3",
   heading: "flex items-center gap-2",
   surface:
-    "pointer-events-none relative overflow-hidden rounded-[0.875rem] border border-border bg-card shadow-lift",
+    "pointer-events-none relative overflow-hidden rounded-[0.875rem] border border-table-card-border bg-table-card shadow-table-card",
   mockArea: "flex-1",
   mockStage:
     "absolute top-3.5 left-3.5 flex origin-top-left scale-75 transition-transform duration-slow ease-out group-hover:-translate-y-1.5",
   mockFade:
-    "pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-linear-to-t from-card to-transparent",
+    "pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-linear-to-t from-table-card to-transparent",
   linkTile: "h-20 basis-0 items-stretch",
   linkCopy: "flex shrink-0 flex-col justify-center px-3.5",
   linkMockArea: "grow",
   linkMockStage:
     "absolute inset-0 left-3 origin-top-left scale-75 transition-transform duration-slow ease-out group-hover:-translate-x-1.5",
   linkMockFade:
-    "pointer-events-none absolute inset-y-0 right-0 w-20 bg-linear-to-l from-card to-transparent",
+    "pointer-events-none absolute inset-y-0 right-0 w-20 bg-linear-to-l from-table-card to-transparent",
   icon: "flex size-5 shrink-0 items-center justify-center rounded-md",
   title: "text-foreground font-sans text-sm/5 font-semibold tracking-[-0.01em]",
   description: "text-muted-foreground font-sans text-[0.8125rem]/4.5",
   mockSlot: "flex",
   mockCard:
-    "flex shrink-0 flex-col overflow-clip rounded-2xl border border-border bg-card shadow-lift",
+    "flex shrink-0 flex-col overflow-clip rounded-2xl border border-table-card-border bg-table-card shadow-table-card",
   mockHeader:
     "flex items-center justify-between border-b border-[#EFEFEF] px-5 py-4 dark:border-white/10",
   mockTitle:

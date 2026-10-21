@@ -27,7 +27,7 @@ export function SiteCreateStep({
       <div className="inert:select-none" inert={!isActive}>
         <div
           className={cn(
-            "bg-background m-0.5 rounded-[14px] border p-5",
+            "border-table-card-border bg-table-card shadow-table-card m-0.5 rounded-[14px] border p-5",
             footer ? "mb-0" : null
           )}
         >

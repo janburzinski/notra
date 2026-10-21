@@ -133,7 +133,7 @@ export function ChatTodoList({
           {t("stopped")}
         </span>
       </header>
-      <div className="border-border bg-background overflow-hidden rounded-[14px] border">
+      <div className="border-table-card-border bg-table-card shadow-table-card overflow-hidden rounded-[14px] border">
         <ol
           className={cn(
             "relative flex max-h-36 scrollbar-none flex-col gap-1.5 overflow-y-auto overscroll-contain px-3 py-2.5",
