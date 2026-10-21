@@ -7,7 +7,6 @@ import {
   buildBlogCardItems,
   getNotraBlogPostBySlug,
   getNotraBlogPostPagination,
-  listNotraBlogPosts,
   listVisibleNotraBlogPosts,
 } from "@/utils/blog";
 import { getReadingTimeMinutes } from "@/utils/reading-time";
@@ -42,7 +41,7 @@ export const getBlogAuthorPage = createServerFn({ method: "GET" })
       throw notFound();
     }
 
-    const posts = await listNotraBlogPosts();
+    const posts = await listVisibleNotraBlogPosts();
     const authorPosts = filterPostsByAuthorSlug(posts, slug);
 
     return {

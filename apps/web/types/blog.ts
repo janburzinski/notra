@@ -160,6 +160,7 @@ export interface TocSection extends TocEntry {
 export interface BlogPostSidebarProps {
   authors: NotraBlogAuthor[];
   toc: TOCItemType[];
+  updatedAt: string;
 }
 
 export interface ResolvedSocialLink {

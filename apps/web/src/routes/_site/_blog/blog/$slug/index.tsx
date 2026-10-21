@@ -8,6 +8,7 @@ import browserCollections from "@/../.source/browser";
 import { BlogArticle } from "@/components/blog-article";
 import { BlogCopyArticle } from "@/components/blog-copy-article";
 import { getBlogMDXComponents } from "@/components/blog-mdx-components";
+import { BlogPostMobileToc } from "@/components/blog-post-mobile-toc";
 import { BlogPostPagination } from "@/components/blog-post-pagination";
 import { BlogPostSidebar } from "@/components/blog-post-sidebar";
 import { CtaBanner } from "@/components/landing/cta-banner";
@@ -52,7 +53,7 @@ const blogContent = browserCollections.blog.createClientLoader({
     ]);
 
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch px-4 pt-24 sm:px-6 sm:pt-28 md:px-8 md:pt-32">
+      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch px-4 pt-8 sm:px-6 sm:pt-28 md:px-8 md:pt-32">
         <script
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
           type="application/ld+json"
@@ -74,7 +75,7 @@ const blogContent = browserCollections.blog.createClientLoader({
           <header className="col-span-2 min-w-0 lg:col-span-1 lg:col-start-1 lg:row-start-1">
             <ViewTransition name="blog-back-button">
               <Link
-                className="group mb-6 inline-flex items-center gap-2 font-mono text-sm text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-50"
+                className="group mb-4 inline-flex items-center gap-2 font-mono text-sm text-neutral-500 transition-colors hover:text-neutral-900 sm:mb-6 dark:text-neutral-400 dark:hover:text-neutral-50"
                 to="/blog"
               >
                 <HugeiconsIcon
@@ -103,15 +104,20 @@ const blogContent = browserCollections.blog.createClientLoader({
             </div>
 
             <ViewTransition name={blogPostTitleTransitionName(slug)}>
-              <h1 className="font-display mt-6 max-w-3xl text-4xl leading-[1.05] font-medium tracking-[-0.02em] text-balance text-[#1E1E1E] sm:text-5xl dark:text-white">
+              <h1 className="font-display mt-4 max-w-3xl text-[2.5rem] leading-[1.05] font-medium tracking-[-0.03em] text-balance wrap-break-word text-[#1E1E1E] sm:mt-6 sm:text-5xl sm:tracking-[-0.02em] dark:text-white">
                 {post.title}
               </h1>
             </ViewTransition>
           </header>
 
-          <BlogPostSidebar authors={post.authors} toc={toc} />
+          <BlogPostSidebar
+            authors={post.authors}
+            toc={toc}
+            updatedAt={post.updatedAt}
+          />
 
           <div className="border-border col-span-2 min-w-0 border-t pt-6 lg:col-span-1 lg:col-start-1 lg:row-start-2">
+            <BlogPostMobileToc toc={toc} />
             <BlogArticle>
               <MDX components={getBlogMDXComponents()} />
             </BlogArticle>
