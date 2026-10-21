@@ -80,6 +80,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     getContentPullRequestState: async () => {
       throw new Error("Network is forbidden in the sandbox");
     },
+    markContentPullRequestReady: async () => undefined,
     mergeContentPullRequest: async () => undefined,
   }));
   const {

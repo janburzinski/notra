@@ -47,6 +47,18 @@ export async function getContentPullRequestState(
   return { status: "open", draft: Boolean(data.draft), nodeId: data.node_id };
 }
 
+/** Takes a draft content pull request out of draft so it can be reviewed. */
+export async function markContentPullRequestReady(
+  octokit: GitHubClient,
+  pullRequest: { draft: boolean; nodeId: string }
+): Promise<void> {
+  if (pullRequest.draft) {
+    await octokit.graphql(MARK_READY_FOR_REVIEW_MUTATION, {
+      pullRequestId: pullRequest.nodeId,
+    });
+  }
+}
+
 export function isMergeMethodNotAllowed(error: unknown) {
   return (
     hasGitHubStatus(error, 405) &&
@@ -69,11 +81,7 @@ export async function mergeContentPullRequest(
   headSha: string | null,
   method?: GitHubMergeMethod
 ): Promise<void> {
-  if (pullRequest.draft) {
-    await octokit.graphql(MARK_READY_FOR_REVIEW_MUTATION, {
-      pullRequestId: pullRequest.nodeId,
-    });
-  }
+  await markContentPullRequestReady(octokit, pullRequest);
   let lastError: unknown = null;
   for (const mergeMethod of method ? [method] : GITHUB_MERGE_METHODS) {
     try {

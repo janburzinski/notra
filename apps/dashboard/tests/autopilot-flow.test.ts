@@ -277,6 +277,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   mock.module("@/lib/integrations/github/content-pull-request", () => ({
     isMergeMethodNotAllowed: () => false,
     getContentPullRequestState: async () => ({ status: "open" }),
+    markContentPullRequestReady: async () => undefined,
     mergeContentPullRequest: async () => undefined,
   }));
   mock.module("@/lib/autopilot/slack", () => ({

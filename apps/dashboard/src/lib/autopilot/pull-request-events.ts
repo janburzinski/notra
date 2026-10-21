@@ -36,6 +36,10 @@ import {
   createItemAutopilotRun,
   finishAutopilotRun,
 } from "@/lib/autopilot/run";
+import {
+  getContentPullRequestState,
+  markContentPullRequestReady,
+} from "@/lib/integrations/github/content-pull-request";
 import { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
 import type {
   AutopilotJobResult,
@@ -273,7 +277,7 @@ async function proposeAndComment(params: {
   }
 }
 
-/** The feature shipped: tell the waiting draft it can go live now. */
+/** The feature shipped: take the waiting draft out of draft and say so. */
 async function notifyDraftReady(
   organizationId: string,
   finding: NonNullable<Awaited<ReturnType<typeof findFindingByFingerprint>>>,
@@ -288,12 +292,21 @@ async function notifyDraftReady(
       owner,
       name: repo,
     });
+    const state = await getContentPullRequestState(octokit, {
+      owner,
+      repo,
+      pullNumber: finding.pullRequestNumber,
+    });
+    if (state.status !== "open") {
+      return;
+    }
+    await markContentPullRequestReady(octokit, state);
     await postGitHubIssueComment({
       octokit,
       owner,
       repo,
       issueNumber: finding.pullRequestNumber,
-      body: `${pull.url} was merged, so this post is ready to publish.`,
+      body: `${pull.url} was merged, so I marked this post ready for review. Merge it to publish.`,
     });
   } catch {
     // A missed nudge is harmless; the draft is still on the dashboard.
