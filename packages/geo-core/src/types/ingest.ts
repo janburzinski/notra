@@ -133,7 +133,7 @@ export type GeoIngestResult =
       host?: string;
     };
 
-export type GeoIngestRuntime = "railway" | "vercel" | "local";
+export type GeoIngestRuntime = "unkey" | "railway" | "vercel" | "local";
 
 export interface BatchedRow {
   organization_id: string;

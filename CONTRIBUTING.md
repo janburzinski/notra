@@ -22,7 +22,7 @@ Notra is a Bun + Turborepo monorepo.
 ```text
 /
 |- apps/
-|  |- ai-traffic-ingest/ # AI traffic collector (Bun, Railway)
+|  |- ai-traffic-ingest/ # Bun collector (Unkey Compute ready; Railway transition)
 |  |- api/         # Hono API (Cloudflare Worker)
 |  |- dashboard/   # Main Notra product app (TanStack Start)
 |  |- console/     # Companion/admin app (Next.js, port 3003)
@@ -535,9 +535,10 @@ every project. Each project's existing build command, environment, migrations,
 and build cache remain in use. The workflow waits for `READY`, verifies the built
 SHA and that the production alias points to the new deployment, and reports
 failures in the Actions summary. Polling is limited to ten minutes
-per project. Five sequential Vercel builds, the 20-minute Unkey phase, and the
-20-minute Railway phase can take up to 90 minutes when the API release is enabled,
-excluding API overhead, within the workflow's 120-minute job limit.
+per project. Each enabled Unkey service has a 20-minute polling limit, followed
+by a 20-minute Railway phase. All phases, preflight and local builds share the
+workflow's 120-minute job limit; that limit can expire before every provider's
+individual polling allowance is exhausted when both Unkey services are enabled.
 Projects deploy independently; a failed project does not roll back another
 project's successful deployment.
 Deployment creation is not automatically retried, since a timed-out request may
@@ -545,7 +546,8 @@ already have started a build.
 
 The same release also deploys the Railway services `dashboard` and `demo-api`
 (project notra-demo, serving demo.usenotra.com) and `ai-traffic-ingest`
-(project notra-prod). Their main-branch deployment triggers are removed, so
+(project notra-prod), unless the optional Unkey ingest release below is enabled.
+Their main-branch deployment triggers are removed, so
 pushes to `main` no longer deploy them; keep the GitHub repository connected so
 the API can build the pinned commit. Add a GitHub Actions secret named
 `RAILWAY_TOKEN` containing a Railway workspace token for the Notra workspace
@@ -604,6 +606,41 @@ commit skips the duplicate build. It then polls for up to 20 minutes until that 
 failure prevents Railway deployments. Deployment creation is not retried, and no
 provider settings are changed by the workflow. The release is not atomic: an API
 failure does not roll back Vercel projects that have already published.
+
+AI traffic ingestion is also prepared for **Unkey Compute hosting**, separately
+from Unkey API-key management. The operator must create and initially deploy the
+ingest app, set its runtime variables, validate an isolated origin and the host's
+termination grace, and switch/verify `ingest.usenotra.com` before enabling its
+scheduled release. Follow the [ingest deployment and rollback runbook](apps/ai-traffic-ingest/README.md).
+This repository change does not perform the provider migration or alter DNS.
+
+Add `UNKEY_INGEST_DEPLOY_ROOT_KEY` as a GitHub Actions secret to opt ingest into
+the same guarded Compute release path. It discovers the exact verified
+`ingest.usenotra.com` domain rather than using a hardcoded app ID, checks the
+connected repository/main/production environment, rollback and active-deployment
+state, current live commit and history, then pins the selected SHA in a v3
+deployment request. The target is rechecked after Vercel and the workflow waits
+for that deployment to be ready and current on the expected target and SHA.
+Inaccessible or invalid configuration fails closed, without falling back to Railway.
+
+The API and ingest keys are independent: either, both, or neither may be enabled.
+The same Compute-workspace deployment root key may fill both secrets if granted
+read access to both apps, environments, domains and deployments and deployment-create
+access to both targets. Keep these CI-only secrets separate from runtime keys;
+they do not need Turbo environment declarations. No runtime `.env` additions are
+needed for release automation. With no ingest secret, Railway ingest preflight
+and deployment remain unchanged. With it, **only** `ai-traffic-ingest` is removed
+from the Railway release list; demo dashboard and demo API are unchanged.
+
+Preflight runs before CI's local builds, again before provider builds, and each
+Unkey target is rechecked immediately before its deployment. A failed Unkey
+preflight prevents all builds. A later Unkey failure prevents Railway releases
+but cannot undo already published Vercel or Unkey deployments. To activate ingest,
+first run a read-only `dry_run` while its existing trigger remains enabled; only
+when that succeeds and the replacement schedule is ready, disable ingest's
+production **Auto deploy** and verify a manual real workflow run. Keep Railway
+alive for domain rollback during the transition. Without opting in, continue
+manual Unkey deployment management and retain the existing release arrangement.
 
 For an urgent release, open **Actions → Production deploy → Run workflow**, select
 `main`, and leave `dry_run` unchecked. This uses the same CI and change checks.

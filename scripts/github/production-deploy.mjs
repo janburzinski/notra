@@ -70,6 +70,20 @@ const railwayServices = [
     serviceId: "2d259982-cccc-488d-b2ba-77b12fd3e854",
   },
 ];
+const unkeyServices = [
+  {
+    name: "API",
+    domain: "api.usenotra.com",
+    directory: "apps/api",
+    key: "UNKEY_DEPLOY_ROOT_KEY",
+  },
+  {
+    name: "ai-traffic-ingest",
+    domain: "ingest.usenotra.com",
+    directory: "apps/ai-traffic-ingest",
+    key: "UNKEY_INGEST_DEPLOY_ROOT_KEY",
+  },
+];
 // Site builds run the toolchain baked into an Upstash Box snapshot, not the
 // dashboard's code. The dashboard must only go live with a snapshot built from
 // the same commit, or new site settings fail validation inside the sandbox.
@@ -142,6 +156,7 @@ export async function release({
   buildToolchain = buildSitesToolchain,
   execFile = execFileSync,
   sleep = delay,
+  preflightOnly = false,
 } = {}) {
   for (const key of [
     "GH_TOKEN",
@@ -270,11 +285,11 @@ export async function release({
   await requireReleaseCI({ env, sha, fetchImpl, sleep, report });
   await report(`Release commit: \`${sha}\``);
 
-  const unkey = async (path, body) => {
+  const unkey = async (service, path, body) => {
     const response = await fetchImpl(`https://api.unkey.com/${path}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${env.UNKEY_DEPLOY_ROOT_KEY}`,
+        Authorization: `Bearer ${env[service.key]}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
@@ -298,17 +313,17 @@ export async function release({
     "finalizing",
     "awaiting_approval",
   ];
-  const planApiRelease = async () => {
-    const domains = await unkey("v2/domains.listDomains", {
-      search: "api.usenotra.com",
+  const planUnkeyRelease = async (service) => {
+    const domains = await unkey(service, "v2/domains.listDomains", {
+      search: service.domain,
       limit: 100,
     });
     const matches = domains.filter(
-      (domain) => domain.domain === "api.usenotra.com"
+      (domain) => domain.domain === service.domain
     );
     if (matches.length !== 1 || matches[0].status !== "verified") {
       throw new Error(
-        "unkey: cannot identify verified api.usenotra.com domain"
+        `unkey: cannot identify verified ${service.domain} domain`
       );
     }
     const domain = matches[0];
@@ -317,11 +332,15 @@ export async function release({
       app: domain.appId,
       environment: domain.environmentId,
     };
-    const app = await unkey("v2/apps.getApp", {
+    const app = await unkey(service, "v2/apps.getApp", {
       project: target.project,
       app: target.app,
     });
-    const environment = await unkey("v2/environments.getEnvironment", target);
+    const environment = await unkey(
+      service,
+      "v2/environments.getEnvironment",
+      target
+    );
     if (
       app.id !== target.app ||
       app.git?.repository !== env.GITHUB_REPOSITORY ||
@@ -331,7 +350,7 @@ export async function release({
       environment.kind !== "production"
     ) {
       throw new Error(
-        "unkey: API must track this repository's main in production without rollback"
+        `unkey: ${service.name} must track this repository's main in production without rollback`
       );
     }
     if (environment.build?.autoDeploy !== false) {
@@ -344,18 +363,22 @@ export async function release({
         "unkey: disable production auto deploy before enabling real releases"
       );
     }
-    const active = await unkey("v2/deployments.listDeployments", {
+    const active = await unkey(service, "v2/deployments.listDeployments", {
       ...target,
       status: unkeyActiveStates,
       limit: 1,
     });
     if (active.length > 0) {
-      throw new Error("unkey: API already has an active production deployment");
+      throw new Error(
+        `unkey: ${service.name} already has an active production deployment`
+      );
     }
     if (!app.currentDeploymentId) {
-      throw new Error("unkey: API has no current production deployment");
+      throw new Error(
+        `unkey: ${service.name} has no current production deployment`
+      );
     }
-    const live = await unkey("v2/deployments.getDeployment", {
+    const live = await unkey(service, "v2/deployments.getDeployment", {
       deploymentId: app.currentDeploymentId,
     });
     if (
@@ -366,24 +389,28 @@ export async function release({
       live.environment !== environment.slug ||
       !live.git?.commitSha
     ) {
-      throw new Error("unkey: cannot identify API's live production commit");
+      throw new Error(
+        `unkey: cannot identify ${service.name}'s live production commit`
+      );
     }
-    await assertAheadOf("unkey API", live.git.commitSha);
+    await assertAheadOf(`unkey ${service.name}`, live.git.commitSha);
     return {
       target,
       live,
       changed:
         live.git.commitSha !== sha &&
-        buildChanged("apps/api", live.git.commitSha, sha),
+        buildChanged(service.directory, live.git.commitSha, sha),
     };
   };
-  let apiPlan;
-  if (env.UNKEY_DEPLOY_ROOT_KEY) {
-    apiPlan = await planApiRelease();
-  } else {
-    await report(
-      "unkey: API release disabled; configure UNKEY_DEPLOY_ROOT_KEY to enable"
-    );
+  const unkeyPlans = [];
+  for (const service of unkeyServices) {
+    if (env[service.key]) {
+      unkeyPlans.push({ service, ...(await planUnkeyRelease(service)) });
+    } else {
+      await report(
+        `unkey: ${service.name} release disabled; configure ${service.key} to enable`
+      );
+    }
   }
 
   const plans = [];
@@ -448,6 +475,9 @@ export async function release({
 
   const railwayPlans = [];
   for (const service of railwayServices) {
+    if (unkeyPlans.some((plan) => plan.service.name === service.name)) {
+      continue;
+    }
     if (await latestRailwayDeployment(service, railwayActiveStates)) {
       throw new Error(
         `${service.name} already has an active Railway deployment`
@@ -463,6 +493,11 @@ export async function release({
     await assertAheadOf(service.name, previousSha);
     const changed = buildChanged(service.directory, previousSha, sha);
     railwayPlans.push({ ...service, changed });
+  }
+
+  if (preflightOnly) {
+    await report("Production preflight passed; no builds started");
+    return;
   }
 
   if (env.DRY_RUN === "true") {
@@ -664,33 +699,43 @@ export async function release({
     throw new Error(failures.join("\n"));
   }
 
-  if (apiPlan) {
+  for (const initialPlan of unkeyPlans) {
+    const { service } = initialPlan;
+    let plan = initialPlan;
     if (env.DRY_RUN !== "true") {
-      const refreshed = await planApiRelease();
+      const refreshed = await planUnkeyRelease(service);
       if (
-        Object.keys(apiPlan.target).some(
-          (key) => apiPlan.target[key] !== refreshed.target[key]
+        Object.keys(plan.target).some(
+          (key) => plan.target[key] !== refreshed.target[key]
         )
       ) {
         throw new Error(
           "unkey: production domain target changed during Vercel releases"
         );
       }
-      apiPlan = refreshed;
+      plan = refreshed;
     }
-    if (!apiPlan.changed) {
-      await report("unkey: skipped, no API build changes since production");
+    if (!plan.changed) {
+      await report(
+        `unkey: skipped, no ${service.name} build changes since production`
+      );
     } else if (env.DRY_RUN === "true") {
-      await report(`unkey: would deploy API at ${sha}`);
+      await report(`unkey: would deploy ${service.name} at ${sha}`);
     } else {
-      const deployment = await unkey("v3/deployments.createDeployment", {
-        ...apiPlan.target,
-        git: { branch: "main", commitSha: sha },
-      });
+      const deployment = await unkey(
+        service,
+        "v3/deployments.createDeployment",
+        {
+          ...plan.target,
+          git: { branch: "main", commitSha: sha },
+        }
+      );
       if (!deployment.deploymentId) {
         throw new Error("unkey: deployment creation returned no ID");
       }
-      await report(`unkey: started API deployment ${deployment.deploymentId}`);
+      await report(
+        `unkey: started ${service.name} deployment ${deployment.deploymentId}`
+      );
       const deadline = Date.now() + 20 * 60_000;
       let completed = false;
       for (
@@ -698,28 +743,30 @@ export async function release({
         attempt < 120 && Date.now() < deadline;
         attempt += 1
       ) {
-        const status = await unkey("v2/deployments.getDeployment", {
+        const status = await unkey(service, "v2/deployments.getDeployment", {
           deploymentId: deployment.deploymentId,
         });
         if (
           status.id !== deployment.deploymentId ||
-          status.app !== apiPlan.live.app ||
-          status.project !== apiPlan.live.project ||
-          status.environment !== apiPlan.live.environment
+          status.app !== plan.live.app ||
+          status.project !== plan.live.project ||
+          status.environment !== plan.live.environment
         ) {
-          throw new Error("unkey: API deployment target changed");
+          throw new Error(`unkey: ${service.name} deployment target changed`);
         }
         if (status.status === "ready") {
           if (status.git?.commitSha !== sha) {
-            throw new Error("unkey: API built a different commit");
+            throw new Error(`unkey: ${service.name} built a different commit`);
           }
           if (status.isCurrent === true) {
-            await report(`unkey: API ready and current at ${sha}`);
+            await report(`unkey: ${service.name} ready and current at ${sha}`);
             completed = true;
             break;
           }
         } else if (!unkeyActiveStates.includes(status.status)) {
-          throw new Error(`unkey: API deployment ended ${status.status}`);
+          throw new Error(
+            `unkey: ${service.name} deployment ended ${status.status}`
+          );
         }
         const remaining = deadline - Date.now();
         if (remaining > 0) {
@@ -728,7 +775,7 @@ export async function release({
       }
       if (!completed) {
         throw new Error(
-          "unkey: API deployment did not become current in 20 minutes"
+          `unkey: ${service.name} deployment did not become current in 20 minutes`
         );
       }
     }
@@ -816,5 +863,5 @@ if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  await release();
+  await release({ preflightOnly: process.argv.includes("--preflight") });
 }

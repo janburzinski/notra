@@ -1,6 +1,8 @@
 # AI traffic ingestion
 
-Hono HTTP service on Bun for `POST /api/geo/ingest`, deployed on Railway.
+Hono HTTP service on Bun for `POST /api/geo/ingest`. This runbook prepares
+hosting on Unkey Compute; the existing Railway service remains the transition
+and rollback target until an operator completes and verifies the cutover.
 Hono handles routing and HTTP responses. The Effect processing pipeline lives
 in `packages/geo-core/src/ingest` and is also used by the dashboard's
 compatibility handler. `Effect.runPromise` is the boundary between Hono and
@@ -59,9 +61,126 @@ bun run --filter=ai-traffic-ingest check-types
 ```
 
 The root dev command loads the root `.env`. The default local port is `3101`.
-See `.env.example` in this directory for the service-specific variables.
+See the environment table below for the service-specific variables.
 
-## Railway configuration
+## Unkey Compute configuration
+
+Create a Compute app connected to `usenotra/notra`, branch `main`. This is
+application hosting, not Unkey API-key management. Configure its production
+environment manually; this repository does not provision it or change DNS.
+
+| Setting | Value |
+| --- | --- |
+| Build root / context | `.` (repository root, not the app directory) |
+| Dockerfile | `apps/ai-traffic-ingest/Dockerfile` |
+| Container port | `3000` (`PORT=3000`) |
+| Protocol | `http1` |
+| Readiness probe | `GET /readyz` |
+| Replicas | 2 in the same region, near the existing Postgres and Upstash |
+| Start command | Keep the image CMD: `bun dist/index.js` |
+
+Use the existing Dockerfile and its pinned Bun 1.4.0 image. It builds shared
+workspace packages from the root and needs no build-time credentials or database
+migration. Do not replace its CMD with a development server.
+
+Set the required runtime variables below using the operator's secret-management
+workflow. Never put them in build arguments, source, logs, or a deployment root
+key. Unkey injects `UNKEY_DEPLOYMENT_ID`, `UNKEY_INSTANCE_ID`, and `UNKEY_REGION`;
+do not invent or manually set these IDs. Runtime detection uses the deployment
+ID and logs the injected region and instance ID when available.
+
+Leave gateway authentication policies unset: ingestion bearer tokens are Notra
+tracking tokens, not Unkey API keys. With no policy, the gateway is passthrough;
+do not add an Unkey API-key policy. The gateway documentation specifies no body-size
+cap; keep the service's existing per-route limits (including larger drain batches),
+rather than adding a new gateway cap. Never log Authorization headers or request
+bodies at the gateway or service.
+
+### Termination prerequisite
+
+Before sending production traffic, verify Unkey Compute's actual SIGTERM delivery
+and termination grace for this app with an isolated test deployment. Shutdown
+allows 35 seconds for active/background work, then stops the three independent
+batchers concurrently with a 12-second deadline each, then allows 2 seconds to
+close Postgres and 10 seconds to flush logs: a nominal 59-second budget plus
+runtime overhead. Do not assume Unkey provides Railway's configured 60-second
+grace. Confirm adequate host grace and test replacement/shutdown under load.
+Deadlines do not make queued events durable; forced termination or failed writes
+can lose buffered events. Do not cut over if the host's grace is inadequate.
+
+### Safe local container checks
+
+From the repository root, without a real `.env` or credentials:
+
+```sh
+docker build -f apps/ai-traffic-ingest/Dockerfile -t notra-ai-traffic-ingest .
+docker run --rm -d --name notra-ingest-check -p 127.0.0.1:3101:3000 notra-ai-traffic-ingest
+curl -i http://127.0.0.1:3101/healthz
+curl -i http://127.0.0.1:3101/readyz
+curl -i -X POST http://127.0.0.1:3101/api/geo/ingest
+docker stop --time 70 notra-ingest-check
+```
+
+Expect liveness `200`, readiness `503`, and ingestion `503` with missing
+configuration. The worker tests use synthetic localhost-only dependency URLs
+to verify configured readiness and token rejection without contacting production.
+
+## Cut over to Unkey Compute
+
+1. Keep Railway running with its current configuration. Create and **initially
+   deploy the Unkey app manually**, before enabling scheduled domain discovery.
+   A new app without a verified domain and current deployment cannot pass CI's
+   preflight. Auto deploy may remain enabled during this setup.
+2. First test a dedicated Unkey origin with isolated test Postgres, Redis,
+   Tinybird, and a test signer/token. Verify `/healthz`, `/readyz`, real tracked
+   requests, drain routes, rate limiting, Tinybird arrival, and telemetry. Test
+   shutdown and the host-grace prerequisite above. Readiness alone is not proof
+   that dependencies or credentials work. Do not use customer traffic as a test.
+3. Have the operator set the existing shared production runtime configuration,
+   including the exact dashboard signing secret. Add `ingest.usenotra.com` to
+   the ingest app's production environment and follow Unkey's domain verification
+   and DNS instructions. Switch the stable domain only after origin validation;
+   check HTTPS, route forwarding, token handling, and ingestion after the switch.
+4. Audit `GEO_INGEST_URL` in dashboard and public API environments. Prefer
+   `https://ingest.usenotra.com`, not a provider-specific origin, and redeploy
+   those apps if changed. Existing dashboard routes proxy to that configured
+   origin. The SDK already defaults to `https://ingest.usenotra.com`, so moving
+   that stable domain requires no customer configuration or token rotation.
+   Explicit provider-specific client endpoints still need a separate audit.
+5. For optional scheduled releases, add the GitHub Actions secret
+   `UNKEY_INGEST_DEPLOY_ROOT_KEY` and run **Production deploy** with `dry_run`
+   checked. Grant read access to the ingest app, production environment, domains,
+   and deployments, plus deployment-create access. The API's Compute-workspace
+   deployment key can also be used if it has the ingest grants; runtime API-key
+   management keys are unrelated. No environment-variable read/write grants are
+   needed. Only after a successful dry-run and when scheduled releases are ready,
+   disable production **Auto deploy**, preserving the GitHub connection, and
+   verify a manual real workflow run. Without the new secret, Railway ingest
+   remains in the schedule unchanged. With it, only ingest leaves Railway's
+   release/preflight list; demo services stay there. A Unkey error never falls
+   back to Railway. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
+
+Manual Unkey deployments remain available if scheduled ingest releases are not
+enabled. Do not disable the current deployment trigger before its replacement
+is ready. This preparation does not establish that a live migration occurred.
+
+### Roll back the provider cutover
+
+Keep the Railway service alive throughout the observation window. If needed,
+route `ingest.usenotra.com` back to the retained Railway service using the
+operator's reviewed domain/DNS configuration, and verify TLS, readiness and
+tracked event delivery after DNS propagation. Keeping the same public domain
+avoids customer endpoint changes; DNS caches can temporarily send traffic to
+both providers, so keep their shared signer, Redis and data configuration aligned.
+Remove/disable `UNKEY_INGEST_DEPLOY_ROOT_KEY` to restore Railway ingest to the
+scheduled workflow before running it again. Check the live Railway commit and
+history first; provider rollback does not bypass the release history guard.
+
+Removing `GEO_INGEST_URL` is a different rollback: it restores the dashboard's
+local compatibility handler but does not redirect SDK clients using the stable
+ingest domain. Use the legacy fallback procedure below only when that is intended.
+
+## Transitional Railway configuration
 
 The existing `notra-prod` / `production` service is described in
 `.railway/ai-traffic.ts` in the private
@@ -110,9 +229,10 @@ build-time credentials, or database migration is required. Build locally with:
 docker build -f apps/ai-traffic-ingest/Dockerfile -t notra-ai-traffic-ingest .
 ```
 
-### Environment variables
+## Environment variables
 
-Copy these values from the existing dashboard configuration into the service:
+For production, copy these values from the existing dashboard configuration into
+the service. Use isolated equivalents for origin testing, never production data:
 
 | Variable | Purpose |
 | --- | --- |
@@ -121,14 +241,16 @@ Copy these values from the existing dashboard configuration into the service:
 | `UPSTASH_REDIS_REST_TOKEN` | Existing Redis credentials |
 | `TINYBIRD_TOKEN` | Existing token with ingestion permissions |
 | `GEO_INGEST_SECRET` | The exact signing secret used by the dashboard |
-| `TINYBIRD_BASE_URL` | Existing Tinybird endpoint, especially for a non-default region |
+| `TINYBIRD_BASE_URL` | Optional existing Tinybird endpoint, especially for a non-default region |
 
 `BEACON_INGEST_SECRET` is supported when `GEO_INGEST_SECRET` is unset.
 `TINYBIRD_URL` remains a supported alias for the Tinybird base URL.
 Optional telemetry variables are `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`,
 `NEXT_PUBLIC_POSTHOG_HOST`, `AXIOM_TOKEN`, and `AXIOM_ORG_ID`. Logs go to the
 `notra-geo-scan` dataset by default; set `AXIOM_GEO_DATASET` only to override it.
-Set `PORT=3000` in Railway to match the configured public target port.
+Optional OTLP telemetry uses `NOTRA_OTLP_ENDPOINT`, `NOTRA_OTLP_TOKEN`, and
+`NOTRA_TELEMETRY_SERVICE_NAME` when used by the existing shared logger.
+Set `PORT=3000` on the host to match the configured public target port.
 
 Without required configuration, the process starts but rejects ingestion with
 `503`. `GET /healthz` checks process liveness and returns `200`.
@@ -137,7 +259,7 @@ Readiness checks configuration only, not external connectivity or credential
 validity. Check a real AI request and its appearance in the dashboard before
 switching production traffic.
 
-## Switch traffic
+## Legacy standalone Railway installation
 
 1. Add the shared credentials in Railway, redeploy, and verify `/readyz`.
 2. Send an AI request through a site with a valid project token and confirm
@@ -157,7 +279,7 @@ explicitly; they do not inherit the dashboard's `GEO_INGEST_URL`.
 Leave `GEO_INGEST_URL` unset until Railway is ready. The existing dashboard
 endpoint continues using the shared pipeline locally.
 
-### Roll back
+### Dashboard fallback (legacy)
 
 1. Unset `GEO_INGEST_URL` and redeploy the dashboard and API. This restores the
    dashboard's local handler and makes newly generated snippets use its origin.
@@ -177,8 +299,9 @@ The standalone worker also emits `geo.ingest.runtime` once per minute with
 process RSS, JS heap and external memory (bytes), active requests, background
 tasks, buffered events, and total/idle/waiting database connections. Use these
 counters to distinguish retained process memory from growing queues; RSS alone
-does not establish a JS memory leak. Railway replica and deployment IDs separate
-the processes and restarts. These events contain no request payloads.
+does not establish a JS memory leak. Unkey instance/deployment IDs or Railway
+replica/deployment IDs separate processes and restarts. These events contain no
+request payloads.
 
 ```kusto
 ['notra-geo-scan'] | where event == 'geo.ingest.runtime'
@@ -187,11 +310,11 @@ the processes and restarts. These events contain no request payloads.
     by bin(_time, 1m), tostring(replicaId), tostring(deploymentId)
 ```
 
-Every ingest request, on Railway and on the dashboard fallback, emits one
+Every ingest request, on Unkey, Railway and the dashboard fallback, emits one
 `geo.ingest` event to the `notra-geo-scan` dataset with `outcome`
 (`ingested`, `dropped`, `rejected`, `failed`), `reason`, `status`,
 `durationMs`, `ingestMs` (Tinybird write), `visitorType`, `source`, `agent`,
-`organizationId`, `projectId`, `runtime` (`railway`, `vercel`, `local`),
+`organizationId`, `projectId`, `runtime` (`unkey`, `railway`, `vercel`, `local`),
 `region` and `weight`. Dropped human traffic is sampled at 5%, so always count
 with `sum(weight)` instead of `count()`.
 

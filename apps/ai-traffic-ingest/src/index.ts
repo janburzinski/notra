@@ -28,6 +28,7 @@ import {
 } from "./constants/server";
 import { createIngestApp } from "./http";
 import { missingIngestEnvironment } from "./utils/config";
+import { stopIngestBatchers, withDeadline } from "./utils/shutdown";
 
 const pending = new Set<Promise<void>>();
 const active = new Set<Promise<Response>>();
@@ -94,8 +95,9 @@ const runtimeLogTimer = setInterval(() => {
     event: "geo.ingest.runtime",
     runtime: getGeoIngestRuntime(),
     region: getGeoIngestRegion(),
-    replicaId: process.env.RAILWAY_REPLICA_ID,
-    deploymentId: process.env.RAILWAY_DEPLOYMENT_ID,
+    replicaId: process.env.UNKEY_INSTANCE_ID ?? process.env.RAILWAY_REPLICA_ID,
+    deploymentId:
+      process.env.UNKEY_DEPLOYMENT_ID ?? process.env.RAILWAY_DEPLOYMENT_ID,
     uptimeSeconds: Math.round(process.uptime()),
     rssBytes: memory.rss,
     heapUsedBytes: memory.heapUsed,
@@ -119,26 +121,6 @@ async function drain() {
   await Promise.allSettled(pending);
 }
 
-async function withDeadline(
-  task: () => Promise<void>,
-  timeoutMs: number
-): Promise<boolean> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      task().then(() => true),
-      new Promise<false>((resolve) => {
-        timer = setTimeout(() => resolve(false), timeoutMs);
-      }),
-    ]);
-  } catch (error) {
-    console.error("[geo-ingest] Shutdown step failed", error);
-    return false;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 let shuttingDown = false;
 
 async function shutdown() {
@@ -153,16 +135,12 @@ async function shutdown() {
     );
     server.stop(true);
   }
-  const webFlushed = await withDeadline(
-    () => webBatcher.stop(),
-    INGEST_EVENTS_FLUSH_TIMEOUT_MS
-  );
-  const engagementFlushed = await withDeadline(
-    () => engagementBatcher.stop(),
-    INGEST_EVENTS_FLUSH_TIMEOUT_MS
-  );
-  const flushed = await withDeadline(
-    () => batcher.stop(),
+  const [webFlushed, engagementFlushed, flushed] = await stopIngestBatchers(
+    [
+      () => webBatcher.stop(),
+      () => engagementBatcher.stop(),
+      () => batcher.stop(),
+    ],
     INGEST_EVENTS_FLUSH_TIMEOUT_MS
   );
   if (!flushed || batcher.size() > 0) {
