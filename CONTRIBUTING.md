@@ -614,33 +614,43 @@ termination grace, and switch/verify `ingest.usenotra.com` before enabling its
 scheduled release. Follow the [ingest deployment and rollback runbook](apps/ai-traffic-ingest/README.md).
 This repository change does not perform the provider migration or alter DNS.
 
-Add `UNKEY_INGEST_DEPLOY_ROOT_KEY` as a GitHub Actions secret to opt ingest into
-the same guarded Compute release path. It discovers the exact verified
-`ingest.usenotra.com` domain rather than using a hardcoded app ID, checks the
+Set the GitHub Actions repository **variable** `UNKEY_INGEST_ENABLED=true` to opt
+ingest into the same guarded Compute release path, using the existing
+`UNKEY_DEPLOY_ROOT_KEY` repository secret. No second deployment secret is needed.
+It discovers the exact verified `ingest.usenotra.com` domain rather than using a
+hardcoded app ID, checks the
 connected repository/main/production environment, rollback and active-deployment
 state, current live commit and history, then pins the selected SHA in a v3
 deployment request. The target is rechecked after Vercel and the workflow waits
 for that deployment to be ready and current on the expected target and SHA.
 Inaccessible or invalid configuration fails closed, without falling back to Railway.
 
-The API and ingest keys are independent: either, both, or neither may be enabled.
-The same Compute-workspace deployment root key may fill both secrets if granted
+The API remains opt-in through `UNKEY_DEPLOY_ROOT_KEY`, independently of the ingest
+flag. Merely configuring this existing API deployment key does not migrate ingest.
+When ingest is enabled, grant that same Compute-workspace deployment root key
 read access to both apps, environments, domains and deployments and deployment-create
-access to both targets. Keep these CI-only secrets separate from runtime keys;
-they do not need Turbo environment declarations. No runtime `.env` additions are
-needed for release automation. With no ingest secret, Railway ingest preflight
-and deployment remain unchanged. With it, **only** `ai-traffic-ingest` is removed
+access to both targets. Permission failures stop the release without fallback.
+Keep this CI-only key separate from runtime keys; neither it nor the CI-only flag
+needs a Turbo environment declaration or runtime `.env` addition.
+
+An unset/empty ingest variable or exact `false` leaves Railway ingest preflight
+and deployment unchanged. Exact `true` selects Unkey ingest and requires the
+shared deployment key; a missing key or malformed nonempty flag aborts before
+any provider requests or builds. Enabling ingest removes **only** `ai-traffic-ingest`
 from the Railway release list; demo dashboard and demo API are unchanged.
 
 Preflight runs before CI's local builds, again before provider builds, and each
 Unkey target is rechecked immediately before its deployment. A failed Unkey
 preflight prevents all builds. A later Unkey failure prevents Railway releases
 but cannot undo already published Vercel or Unkey deployments. To activate ingest,
-first run a read-only `dry_run` while its existing trigger remains enabled; only
-when that succeeds and the replacement schedule is ready, disable ingest's
+first complete the initial app deployment and domain verification, then set the
+repository variable and run a read-only `dry_run` while its existing trigger
+remains enabled; only when that succeeds and the replacement schedule is ready, disable ingest's
 production **Auto deploy** and verify a manual real workflow run. Keep Railway
-alive for domain rollback during the transition. Without opting in, continue
-manual Unkey deployment management and retain the existing release arrangement.
+alive for domain rollback during the transition. Set `UNKEY_INGEST_ENABLED=false`
+to restore Railway ingest scheduling; this does not change DNS or move traffic.
+Without opting in, continue manual Unkey deployment management and retain the
+existing release arrangement.
 
 For an urgent release, open **Actions → Production deploy → Run workflow**, select
 `main`, and leave `dry_run` unchecked. This uses the same CI and change checks.

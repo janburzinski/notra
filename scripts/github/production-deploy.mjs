@@ -75,13 +75,11 @@ const unkeyServices = [
     name: "API",
     domain: "api.usenotra.com",
     directory: "apps/api",
-    key: "UNKEY_DEPLOY_ROOT_KEY",
   },
   {
     name: "ai-traffic-ingest",
     domain: "ingest.usenotra.com",
     directory: "apps/ai-traffic-ingest",
-    key: "UNKEY_INGEST_DEPLOY_ROOT_KEY",
   },
 ];
 // Site builds run the toolchain baked into an Upstash Box snapshot, not the
@@ -158,6 +156,17 @@ export async function release({
   sleep = delay,
   preflightOnly = false,
 } = {}) {
+  if (
+    env.UNKEY_INGEST_ENABLED &&
+    !["true", "false"].includes(env.UNKEY_INGEST_ENABLED)
+  ) {
+    throw new Error("UNKEY_INGEST_ENABLED must be true, false, or unset");
+  }
+  if (env.UNKEY_INGEST_ENABLED === "true" && !env.UNKEY_DEPLOY_ROOT_KEY) {
+    throw new Error(
+      "UNKEY_DEPLOY_ROOT_KEY is required when UNKEY_INGEST_ENABLED=true"
+    );
+  }
   for (const key of [
     "GH_TOKEN",
     "VERCEL_TOKEN",
@@ -285,11 +294,11 @@ export async function release({
   await requireReleaseCI({ env, sha, fetchImpl, sleep, report });
   await report(`Release commit: \`${sha}\``);
 
-  const unkey = async (service, path, body) => {
+  const unkey = async (path, body) => {
     const response = await fetchImpl(`https://api.unkey.com/${path}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${env[service.key]}`,
+        Authorization: `Bearer ${env.UNKEY_DEPLOY_ROOT_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
@@ -314,7 +323,7 @@ export async function release({
     "awaiting_approval",
   ];
   const planUnkeyRelease = async (service) => {
-    const domains = await unkey(service, "v2/domains.listDomains", {
+    const domains = await unkey("v2/domains.listDomains", {
       search: service.domain,
       limit: 100,
     });
@@ -332,15 +341,11 @@ export async function release({
       app: domain.appId,
       environment: domain.environmentId,
     };
-    const app = await unkey(service, "v2/apps.getApp", {
+    const app = await unkey("v2/apps.getApp", {
       project: target.project,
       app: target.app,
     });
-    const environment = await unkey(
-      service,
-      "v2/environments.getEnvironment",
-      target
-    );
+    const environment = await unkey("v2/environments.getEnvironment", target);
     if (
       app.id !== target.app ||
       app.git?.repository !== env.GITHUB_REPOSITORY ||
@@ -363,7 +368,7 @@ export async function release({
         "unkey: disable production auto deploy before enabling real releases"
       );
     }
-    const active = await unkey(service, "v2/deployments.listDeployments", {
+    const active = await unkey("v2/deployments.listDeployments", {
       ...target,
       status: unkeyActiveStates,
       limit: 1,
@@ -378,7 +383,7 @@ export async function release({
         `unkey: ${service.name} has no current production deployment`
       );
     }
-    const live = await unkey(service, "v2/deployments.getDeployment", {
+    const live = await unkey("v2/deployments.getDeployment", {
       deploymentId: app.currentDeploymentId,
     });
     if (
@@ -404,11 +409,20 @@ export async function release({
   };
   const unkeyPlans = [];
   for (const service of unkeyServices) {
-    if (env[service.key]) {
+    if (
+      service.name === "ai-traffic-ingest" &&
+      env.UNKEY_INGEST_ENABLED !== "true"
+    ) {
+      await report(
+        "unkey: ai-traffic-ingest release disabled; set UNKEY_INGEST_ENABLED=true to enable"
+      );
+      continue;
+    }
+    if (env.UNKEY_DEPLOY_ROOT_KEY) {
       unkeyPlans.push({ service, ...(await planUnkeyRelease(service)) });
     } else {
       await report(
-        `unkey: ${service.name} release disabled; configure ${service.key} to enable`
+        `unkey: ${service.name} release disabled; configure UNKEY_DEPLOY_ROOT_KEY to enable`
       );
     }
   }
@@ -722,14 +736,10 @@ export async function release({
     } else if (env.DRY_RUN === "true") {
       await report(`unkey: would deploy ${service.name} at ${sha}`);
     } else {
-      const deployment = await unkey(
-        service,
-        "v3/deployments.createDeployment",
-        {
-          ...plan.target,
-          git: { branch: "main", commitSha: sha },
-        }
-      );
+      const deployment = await unkey("v3/deployments.createDeployment", {
+        ...plan.target,
+        git: { branch: "main", commitSha: sha },
+      });
       if (!deployment.deploymentId) {
         throw new Error("unkey: deployment creation returned no ID");
       }
@@ -743,7 +753,7 @@ export async function release({
         attempt < 120 && Date.now() < deadline;
         attempt += 1
       ) {
-        const status = await unkey(service, "v2/deployments.getDeployment", {
+        const status = await unkey("v2/deployments.getDeployment", {
           deploymentId: deployment.deploymentId,
         });
         if (
