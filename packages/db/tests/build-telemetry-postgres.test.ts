@@ -79,6 +79,7 @@ if (!databaseUrl) {
         "../migrations/0112_sites.sql",
         "../migrations/0113_site_preview_comments.sql",
         "../migrations/0114_site_smart_deployments.sql",
+        "../migrations/0127_site_deployment_repository.sql",
         "fixtures/sites-tenant-integrity-seed.sql",
       ]) {
         await pool.query(
