@@ -1,6 +1,10 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { preload } from "react-dom";
 
-import { DEMO_TURNSTILE_ACTION } from "@/constants/turnstile";
+import {
+  DEMO_TURNSTILE_ACTION,
+  TURNSTILE_SCRIPT_SRC,
+} from "@/constants/turnstile";
 import { loadTurnstileScript } from "@/lib/turnstile/load-script";
 import type { DemoHumanCheckProps } from "@/types/turnstile";
 
@@ -10,6 +14,8 @@ export function DemoHumanCheck({
   onToken,
   ref,
 }: DemoHumanCheckProps) {
+  preload(TURNSTILE_SCRIPT_SRC, { as: "script" });
+
   const container = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const [failed, setFailed] = useState(false);

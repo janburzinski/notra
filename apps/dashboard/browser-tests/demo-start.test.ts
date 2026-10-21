@@ -7,8 +7,11 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { type Browser, chromium } from "playwright";
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
 
 import { DEMO_START_HTML, DEMO_TURNSTILE_STUB } from "./constants/demo-start";
+import { DemoStartApp } from "./fixtures/demo-start-app";
 
 let browser: Browser;
 let server: ReturnType<typeof createServer>;
@@ -35,7 +38,21 @@ beforeAll(async () => {
       "content-type",
       javascript ? "text/javascript" : "text/html"
     );
-    response.end(javascript ? script : DEMO_START_HTML);
+    response.end(
+      javascript
+        ? script
+        : DEMO_START_HTML.replace(
+            '<main id="root"></main>',
+            `<main id="root">${renderToString(
+              createElement(DemoStartApp, {
+                returnTo: "/finished",
+                turnstileSiteKey: request.url?.includes("unconfigured")
+                  ? null
+                  : "synthetic-site-key",
+              })
+            )}</main>`
+          )
+    );
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
@@ -90,6 +107,7 @@ test("waits for verification, supports keyboard entry, and submits once under St
 test("normal visitors enter automatically without a visible challenge or any interaction", async () => {
   const page = await browser.newPage();
   const tokens: string[] = [];
+  let scriptRequests = 0;
   let markSubmitted!: () => void;
   let allowResponse!: () => void;
   const submitted = new Promise<void>((resolve) => {
@@ -98,9 +116,13 @@ test("normal visitors enter automatically without a visible challenge or any int
   const proceed = new Promise<void>((resolve) => {
     allowResponse = resolve;
   });
-  await page.route("https://challenges.cloudflare.com/**", (route) =>
-    route.fulfill({ contentType: "text/javascript", body: DEMO_TURNSTILE_STUB })
-  );
+  await page.route("https://challenges.cloudflare.com/**", (route) => {
+    scriptRequests += 1;
+    return route.fulfill({
+      contentType: "text/javascript",
+      body: DEMO_TURNSTILE_STUB,
+    });
+  });
   await page.route("**/api/demo/sandbox", async (route) => {
     tokens.push(route.request().postDataJSON()["cf-turnstile-response"]);
     markSubmitted();
@@ -116,6 +138,12 @@ test("normal visitors enter automatically without a visible challenge or any int
   );
   await page.goto(`${baseUrl}?automatic`);
   await submitted;
+  expect(scriptRequests).toBe(1);
+  expect(
+    await page.evaluate(
+      () => performance.getEntriesByName("demo-widget-created").length
+    )
+  ).toBe(1);
   expect(
     await page.getByRole("heading", { name: "Opening the demo…" }).count()
   ).toBe(1);
@@ -159,9 +187,11 @@ test("missing configuration and script failure never submit", async () => {
   for (const unconfigured of [true, false]) {
     const page = await browser.newPage();
     let submissions = 0;
-    await page.route("https://challenges.cloudflare.com/**", (route) =>
-      route.abort()
-    );
+    let scriptRequests = 0;
+    await page.route("https://challenges.cloudflare.com/**", (route) => {
+      scriptRequests += 1;
+      return route.abort();
+    });
     await page.route("**/api/demo/sandbox", (route) => {
       submissions += 1;
       return route.abort();
@@ -175,5 +205,43 @@ test("missing configuration and script failure never submit", async () => {
       )
       .waitFor();
     expect(submissions).toBe(0);
+    if (unconfigured) {
+      expect(scriptRequests).toBe(0);
+      expect(
+        await page.locator('link[rel="preload"][as="script"]').count()
+      ).toBe(0);
+    }
   }
+});
+
+test("script failure remains fail-closed and a reload retries successfully", async () => {
+  const page = await browser.newPage();
+  const tokens: string[] = [];
+  let fail = true;
+  await page.route("https://challenges.cloudflare.com/**", (route) =>
+    fail
+      ? route.abort()
+      : route.fulfill({
+          contentType: "text/javascript",
+          body: DEMO_TURNSTILE_STUB,
+        })
+  );
+  await page.route("**/api/demo/sandbox", async (route) => {
+    tokens.push(route.request().postDataJSON()["cf-turnstile-response"]);
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({ slug: "demo-synthetic" }),
+    });
+  });
+  await page.route("**/finished", (route) =>
+    route.fulfill({ contentType: "text/html", body: "Demo workspace" })
+  );
+  await page.goto(`${baseUrl}?automatic`);
+  await page.getByRole("alert").waitFor();
+  expect(tokens).toEqual([]);
+  fail = false;
+  await page.reload();
+  await page.waitForURL("**/finished");
+  expect(tokens).toEqual(["synthetic-token-1"]);
 });

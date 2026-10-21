@@ -10,6 +10,7 @@ let container;
 let options;
 window.turnstile = {
   render(element, config) {
+    performance.mark("demo-widget-created");
     if (config.appearance !== "interaction-only" || config.execution !== "render") {
       throw new Error("Demo verification must run automatically and only display interactive challenges");
     }
