@@ -18,6 +18,7 @@ if (databaseUrl) {
   expect(url.search).toBe("");
   expect(
     url.pathname.startsWith("/notra_sites_branches_") ||
+      url.pathname === "/notra_server_audit" ||
       url.pathname === "/notra_migrations"
   ).toBe(true);
 }
@@ -29,6 +30,7 @@ if (!databaseUrl) {
     expect(["127.0.0.1", "localhost"]).toContain(url.hostname);
     expect(
       url.pathname.startsWith("/notra_sites_branches_") ||
+        url.pathname === "/notra_server_audit" ||
         url.pathname === "/notra_migrations"
     ).toBe(true);
     const result = spawnSync(
@@ -722,7 +724,7 @@ if (!databaseUrl) {
     fake.state.branches.set(branch, "initial");
     const draft = await save(branch);
     fake.state.loseRenameResponse = true;
-    expect(await branches.renameSiteBranch(site, branch, "Recovered")).toEqual({
+    expect(await branches.renameSiteBranch(site, branch, "recovered")).toEqual({
       branch: renamedBranch,
     });
     expect(fake.state.branches.has(branch)).toBe(false);
@@ -757,7 +759,7 @@ if (!databaseUrl) {
     const draft = await save(branch);
     fake.state.loseRenameResponse = true;
     const outcome = await branches
-      .renameSiteBranch(site, branch, "Already exists")
+      .renameSiteBranch(site, branch, "already exists")
       .catch((error: unknown) => error);
     expect(outcome).toBeInstanceOf(Error);
     expect(fake.state.branches.has(branch)).toBe(true);
@@ -1292,7 +1294,7 @@ if (!databaseUrl) {
     const branch = "notra/site-edit-rename-failure";
     fake.state.branches.set(branch, "initial");
     const draft = await save(branch);
-    const target = "notra/site-edit-target";
+    const target = "notra/site-edit-Target";
     await db
       .insert(siteBranchDrafts)
       .values({ ...draft, id: `drf_${crypto.randomUUID()}`, branch: target });
@@ -1309,7 +1311,7 @@ if (!databaseUrl) {
     const fn = `branch_rename_${crypto.randomUUID().replaceAll("-", "")}`;
     await db.execute(
       sql.raw(
-        `CREATE FUNCTION ${fn}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.site_id = '${site.id}' AND NEW.branch = 'notra/site-edit-target' THEN RAISE EXCEPTION 'Synthetic DB move failure'; END IF; RETURN NEW; END; $$; CREATE TRIGGER ${fn} BEFORE UPDATE ON site_branch_drafts FOR EACH ROW EXECUTE FUNCTION ${fn}()`
+        `CREATE FUNCTION ${fn}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.site_id = '${site.id}' AND NEW.branch = 'notra/site-edit-Target' THEN RAISE EXCEPTION 'Synthetic DB move failure'; END IF; RETURN NEW; END; $$; CREATE TRIGGER ${fn} BEFORE UPDATE ON site_branch_drafts FOR EACH ROW EXECUTE FUNCTION ${fn}()`
       )
     );
     try {

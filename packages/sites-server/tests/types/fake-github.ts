@@ -5,6 +5,7 @@ export interface FakePullRequest {
   html_url: string;
   url: string;
   title: string;
+  body?: string;
   state: "open" | "closed";
   draft: boolean;
   merged_at: string | null;
@@ -15,6 +16,7 @@ export interface FakePullRequest {
   reviewDecision: "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | null;
 }
 export interface FakeGitHubState {
+  comments: FakeGitHubComment[];
   commitDelayMs: number;
   commitMetadataError: boolean;
   beforeCommitMetadata: (sha: string) => Promise<void>;
@@ -44,4 +46,17 @@ export interface FakeGitHubState {
   mergeMethod: string | null;
   beforeRead: (path: string) => Promise<void>;
   beforeCommit: () => Promise<void>;
+}
+
+export interface FakeGitHubComment {
+  id: number;
+  issueNumber: number;
+  body: string;
+  user: { type: string };
+  performed_via_github_app: { id: number };
+}
+
+export interface FakeGitHubCommitMetadata {
+  message: string;
+  parentSha: string;
 }

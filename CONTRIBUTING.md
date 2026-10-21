@@ -356,6 +356,11 @@ unique index compatible with the running app; feature-branch drafts use a
 separate table. The CI branch-workflow step also tests writes from both app
 versions.
 
+Content Git publishing uses `0129_content_git_publishing`, after
+`0128_sites_branch_workflow`. It adds the review-process default and allows
+terminal direct publications without pull-request fields. CI tests both empty
+and populated tables, old writers, and repeated application of the migration.
+
 The obsolete SQL files `0019_add_post_recommendations`, `0036_lovely_wallop`, and
 `0090_user_auth_security` were unjournaled and have been removed. Their active
 schema changes are covered by `0019_medical_peter_parker`, `0000_baseline`, and

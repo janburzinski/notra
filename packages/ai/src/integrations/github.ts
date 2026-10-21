@@ -1360,6 +1360,7 @@ export async function setRepositoryOutputConfig(
   params: SetRepositoryOutputConfigParams
 ) {
   const config = {
+    ...(params.siteId !== undefined ? { siteId: params.siteId } : {}),
     ...(params.directory !== undefined ? { directory: params.directory } : {}),
     ...(params.contentPath !== undefined
       ? { contentPath: params.contentPath }
@@ -1383,10 +1384,16 @@ export async function setRepositoryOutputConfig(
       enabled:
         params.outputType === "changelog" || params.outputType === "blog_post",
       config,
+      ...(params.reviewProcess ? { reviewProcess: params.reviewProcess } : {}),
     })
     .onConflictDoUpdate({
       target: [repositoryOutputs.repositoryId, repositoryOutputs.outputType],
-      set: { config: mergedConfig },
+      set: {
+        config: mergedConfig,
+        ...(params.reviewProcess
+          ? { reviewProcess: params.reviewProcess }
+          : {}),
+      },
     })
     .returning();
 

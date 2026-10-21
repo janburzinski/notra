@@ -12,9 +12,7 @@ import {
 import { Textarea } from "@notra/ui/components/ui/textarea";
 import { cn } from "@notra/ui/lib/utils";
 import { slugify } from "@notra/utils/slugify";
-import { useQueryClient } from "@tanstack/react-query";
 import { useId, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -32,16 +30,12 @@ import { OverviewTagsInput } from "@/components/content/overview/overview-tags-i
 import { RecommendationsSection } from "@/components/content/recommendations-section";
 import { SITE_ENTRY_DIRECTORIES } from "@/constants/site-github-publish";
 import { useContentMetadata } from "@/lib/hooks/use-content-metadata";
-import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   ContentOverviewProps,
   OverviewCreatedByRowProps,
   OverviewDisclosureProps,
-  UpdatePullRequestHintProps,
 } from "@/types/content/overview";
-import type { ContentApiResponse } from "@/types/hooks/content";
 import { parseSourceMetadata } from "@/utils/content-detail";
-import { toErrorMessage } from "@/utils/error-message";
 import { formatSnakeCaseLabel } from "@/utils/format";
 import { extractMarkdownExcerpt } from "@/utils/site-github-publish";
 
@@ -81,79 +75,6 @@ function OverviewCreatedByRow({ sourceMetadata }: OverviewCreatedByRowProps) {
           fallback: formatSnakeCaseLabel(source.triggerSourceType),
         })}
       </span>
-    </div>
-  );
-}
-
-function UpdatePullRequestHint({
-  organizationId,
-  contentId,
-  content,
-  flushPending,
-}: UpdatePullRequestHintProps) {
-  const t = useTranslations("content.overview.updatePr");
-  const queryClient = useQueryClient();
-  const [pending, setPending] = useState(false);
-  const githubPublish = content.githubPublish;
-  if (
-    !githubPublish ||
-    (content.contentType !== "blog_post" && content.contentType !== "changelog")
-  ) {
-    return null;
-  }
-  const contentType = content.contentType;
-  const updatePullRequest = async () => {
-    setPending(true);
-    try {
-      await flushPending();
-      const result = await dashboardOrpc.content.publishChangelogToGitHub.call({
-        organizationId,
-        contentId,
-        contentType,
-        repositoryId: githubPublish.repositoryId,
-        linkedOnly: true,
-      });
-      queryClient.setQueryData<ContentApiResponse>(
-        dashboardOrpc.content.get.queryKey({
-          input: { organizationId, contentId },
-        }),
-        (current) =>
-          current
-            ? {
-                ...current,
-                content: {
-                  ...current.content,
-                  githubPublish: {
-                    ...githubPublish,
-                    branchName: result.branchName,
-                    path: result.path,
-                    pullRequestNumber: result.pullRequestNumber,
-                    pullRequestUrl: result.pullRequestUrl,
-                  },
-                },
-              }
-            : current
-      );
-      toast.success(t("done"));
-    } catch (error) {
-      toast.error(toErrorMessage(error, t("failed")));
-    }
-    setPending(false);
-  };
-  return (
-    <div className="bg-muted/60 flex items-center justify-between gap-3 rounded-lg px-3 py-2">
-      <p className="text-muted-foreground text-xs">{t("hint")}</p>
-      <Button
-        className="shrink-0"
-        loading={pending}
-        onClick={() => {
-          void updatePullRequest();
-        }}
-        size="xs"
-        variant="secondary"
-      >
-        {t("action")}
-      </Button>
     </div>
   );
 }
@@ -306,8 +227,6 @@ export function ContentOverview(props: ContentOverviewProps) {
           value={metadata.displayDate}
         />
       </OverviewField>
-
-      <UpdatePullRequestHint {...props} flushPending={api.flushPending} />
 
       {hasSource || hasRecommendations ? (
         <>

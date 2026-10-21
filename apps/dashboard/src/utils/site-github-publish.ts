@@ -314,7 +314,7 @@ export function buildSiteEntryMarkdown(
   const date = String(document.get("date") ?? "");
   if (params.updated) {
     const updated = formatSiteEntryDate(params.updated);
-    if (updated > date) {
+    if (updated >= date) {
       write("updated", plainScalar(updated));
     }
   }

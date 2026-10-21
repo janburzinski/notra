@@ -7,6 +7,14 @@ export interface ScheduledPublicationPost {
   markdown: string | null;
   githubPublish: unknown;
   sourceMetadata: unknown;
+  coverImage?: unknown;
+  tags?: string[];
+  excerpt?: string | null;
+  authorIds?: string[];
+  featured?: boolean;
+  hidden?: boolean;
+  noindex?: boolean;
+  displayDate?: Date | null;
 }
 
 /** A pull request a scheduled GitHub destination pushed. */

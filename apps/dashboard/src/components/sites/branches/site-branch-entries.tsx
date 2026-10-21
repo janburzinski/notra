@@ -1,6 +1,6 @@
 import { MoreHorizontalIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { SITE_EDIT_BRANCH_PREFIX } from "@notra/sites-core/constants/sites";
+import { NOTRA_BRANCH_PREFIX } from "@notra/sites-core/constants/sites";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
   DropdownMenuItem,
@@ -32,7 +32,8 @@ function SiteBranchEntryItem({
   const locale = useLocale();
   const live = entry.name === productionBranch;
   const active = entry.name === current;
-  const label = siteBranchLabel(entry.name, locale, t("editLabel"));
+  const label =
+    entry.title ?? siteBranchLabel(entry.name, locale, t("editLabel"));
   return (
     <div className="flex items-center gap-1">
       <DropdownMenuItem
@@ -55,7 +56,7 @@ function SiteBranchEntryItem({
           </Badge>
         ) : null}
       </DropdownMenuItem>
-      {!live && entry.name.startsWith(SITE_EDIT_BRANCH_PREFIX) ? (
+      {!live && entry.name.startsWith(NOTRA_BRANCH_PREFIX) ? (
         <DropdownMenuSub>
           <DropdownMenuSubTrigger
             aria-label={t("rowActions", { branch: label })}
@@ -114,8 +115,8 @@ export function SiteBranchEntries(props: SiteBranchMenuProps) {
     (entry) =>
       entry.exists &&
       (entry.name === props.productionBranch ||
-        (entry.name.startsWith(SITE_EDIT_BRANCH_PREFIX) &&
-          `${entry.name} ${siteBranchLabel(entry.name, locale, t("editLabel"))}`
+        (entry.name.startsWith(NOTRA_BRANCH_PREFIX) &&
+          `${entry.name} ${entry.title ?? ""} ${siteBranchLabel(entry.name, locale, t("editLabel"))}`
             .toLocaleLowerCase(locale)
             .includes(search)))
   );

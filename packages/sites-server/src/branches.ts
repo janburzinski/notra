@@ -1,7 +1,10 @@
 import { GITHUB_API_VERSION_HEADERS } from "@notra/ai/constants/github";
 import { db } from "@notra/db/drizzle";
 import { siteBranchDrafts as siteDrafts } from "@notra/db/schema";
-import { SITE_EDIT_BRANCH_PREFIX } from "@notra/sites-core/constants/sites";
+import {
+  SITE_EDIT_BRANCH_PREFIX,
+  NOTRA_BRANCH_PREFIX,
+} from "@notra/sites-core/constants/sites";
 import { and, eq } from "drizzle-orm";
 
 import {
@@ -34,6 +37,7 @@ import {
   withSiteBranchLock,
 } from "./utils/site-branch-lock";
 import {
+  assertSiteContentBranch,
   assertSiteFeatureBranch,
   assertSiteEditableBranch,
   siteEditBranchName,
@@ -135,6 +139,7 @@ export async function listSiteBranches(site: Site, search = "") {
       name: string;
       status: "draft" | "open" | "merged" | "closed" | null;
       exists: boolean;
+      title?: string;
     }
   >();
   branches.set(site.productionBranch, {
@@ -164,7 +169,11 @@ export async function listSiteBranches(site: Site, search = "") {
         continue;
       }
       const name = pr.head.ref;
-      if (!name.startsWith(SITE_EDIT_BRANCH_PREFIX)) {
+      if (
+        !name.startsWith(NOTRA_BRANCH_PREFIX) ||
+        name === site.productionBranch ||
+        (!name.startsWith(SITE_EDIT_BRANCH_PREFIX) && pr.state !== "open")
+      ) {
         continue;
       }
       const existing = branches.get(name);
@@ -173,7 +182,8 @@ export async function listSiteBranches(site: Site, search = "") {
       }
       branches.set(name, {
         name,
-        exists: existing?.exists ?? false,
+        title: pr.title.replace(/^docs: (add|update) /, ""),
+        exists: existing?.exists ?? pr.state === "open",
         status: pr.merged_at
           ? "merged"
           : pr.state === "closed"
@@ -220,7 +230,7 @@ export async function createSiteBranch(
   input: CreateSiteBranchInput
 ) {
   const source = input.branch ?? site.productionBranch;
-  assertSiteEditableBranch(site, source);
+  await assertSiteContentBranch(site, source);
   const branch = siteEditBranchName(input.title);
   const { repository, token } = await siteRepositoryAccess(site, {
     contents: "write",
@@ -272,6 +282,7 @@ export async function renameSiteBranch(
   title: string
 ) {
   assertSiteFeatureBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const name = siteEditBranchName(title);
   const { repository, token } = await siteRepositoryAccess(site, {
     contents: "write",
@@ -390,6 +401,7 @@ export async function renameSiteBranch(
 
 export async function deleteSiteBranch(site: Site, branch: string) {
   assertSiteFeatureBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const { repository, token } = await siteRepositoryAccess(site, {
     contents: "write",
     pull_requests: "write",
@@ -437,6 +449,7 @@ export async function deleteSiteBranch(site: Site, branch: string) {
 
 export async function requestSiteBranchReview(site: Site, branch: string) {
   assertSiteFeatureBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const { repository, token } = await siteRepositoryAccess(site, {
     contents: "read",
     pull_requests: "write",
@@ -455,6 +468,7 @@ export async function requestSiteBranchReview(site: Site, branch: string) {
 
 export async function mergeSiteBranch(site: Site, branch: string) {
   assertSiteFeatureBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   if (branch === site.productionBranch) {
     throw new SiteInputError("Choose a feature branch");
   }
@@ -547,6 +561,7 @@ export async function discardDeletedSiteBranchDrafts(
   branch: string
 ) {
   assertSiteFeatureBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const { repository, token } = await siteRepositoryAccess(site, {
     contents: "read",
   });

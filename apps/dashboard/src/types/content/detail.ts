@@ -19,6 +19,7 @@ export interface PublishContentToGitHubDialogProps {
   contentType: GitHubPublishContentType;
   githubPublish: PostGitHubPublish | null;
   onSave: () => Promise<boolean>;
+  onPublished?: () => Promise<boolean>;
   organizationId: string;
   organizationSlug: string;
   title: string;
@@ -94,6 +95,7 @@ export interface GitHubPublishRecoveryAlertProps {
 }
 
 export interface GitHubPublishDialogFooterProps {
+  onPublish: () => void;
   hasSelectedRepository: boolean;
   isPublishing: boolean;
   organizationSlug: string;
@@ -110,6 +112,18 @@ export interface ParsedSourceMetadata {
   lookbackWindow: string;
   repositories: Array<{ owner: string; repo: string }>;
   triggerSourceType: string;
+}
+
+export interface GitHubPublishDialogCopyParams {
+  direct?: boolean;
+  operation?: "created" | "updated";
+  title: string;
+  description: string;
+  directDescription: string;
+  createdTitle: string;
+  createdDescription: string;
+  updatedTitle: string;
+  updatedDescription: string;
 }
 
 export type ContentDocumentTab = (typeof CONTENT_DOCUMENT_TABS)[number];

@@ -1006,9 +1006,16 @@ export const repositoryOutputs = pgTable(
     outputType: text("output_type").notNull(),
     enabled: boolean("enabled").default(true).notNull(),
     config: jsonb("config"),
+    reviewProcess: text("review_process", { enum: ["pull_request", "direct"] })
+      .default("pull_request")
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
+    check(
+      "repositoryOutputs_reviewProcess_check",
+      sql`${table.reviewProcess} IN ('pull_request', 'direct')`
+    ),
     uniqueIndex("repositoryOutputs_repository_outputType_uidx").on(
       table.repositoryId,
       table.outputType
@@ -2696,8 +2703,8 @@ export const contentPublications = pgTable(
     repo: text("repo").notNull(),
     path: text("path").notNull(),
     branch: text("branch").notNull(),
-    pullRequestNumber: integer("pull_request_number").notNull(),
-    pullRequestUrl: text("pull_request_url").notNull(),
+    pullRequestNumber: integer("pull_request_number"),
+    pullRequestUrl: text("pull_request_url"),
     headSha: text("head_sha"),
     status: text("status", { enum: CONTENT_PUBLICATION_STATUSES })
       .notNull()

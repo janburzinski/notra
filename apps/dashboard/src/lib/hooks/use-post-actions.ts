@@ -46,10 +46,10 @@ export function usePostActions(organizationId: string) {
   );
 
   const deletePost = useCallback(
-    (contentId: string) => {
+    (contentId: string, removeFromRepository = false) => {
       setIsDeleting(true);
       return dashboardOrpc.content.delete
-        .call({ organizationId, contentId })
+        .call({ organizationId, contentId, removeFromRepository })
         .then(async () => {
           toast.success(tToast("postDeleted"));
           await invalidateLists();

@@ -206,4 +206,6 @@ export const SITE_ENGAGEMENT_MAX_VISIBLE_MS = 30 * 60 * 1000;
 export const SITE_ENGAGEMENT_VIEW_ID_PATTERN = /^[a-z0-9]{16,32}$/;
 export const SITES_LIVE_CHANNEL_PREFIX = "sites";
 
+export const NOTRA_BRANCH_PREFIX = "notra/";
+
 export const SITE_EDIT_BRANCH_PREFIX = "notra/site-edit-";

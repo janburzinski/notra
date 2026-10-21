@@ -62,6 +62,9 @@ export interface SiteMarkdownNode {
 
 export interface FindSiteGitHubPublishTargetParams {
   organizationId: string;
+  projectId?: string | null;
+  siteId?: string | null;
+  existingPublication?: { siteId?: string; baseBranch?: string; path: string };
   contentType: GitHubPublishContentType;
   repository: {
     id: string;

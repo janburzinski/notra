@@ -21,6 +21,7 @@ import type {
 
 import { GitHubDirectoryPicker } from "./github-directory-picker";
 import { GitHubPublishingPathFields } from "./github-publishing-path-fields";
+import { GitHubReviewProcess } from "./github-review-process";
 import { GitHubSettingRow } from "./github-setting-row";
 
 function GitHubContentPublishingSettings({
@@ -149,6 +150,15 @@ function GitHubContentPublishingSettings({
           )}
         </Field>
 
+        {directoryQuery.data ? (
+          <GitHubReviewProcess
+            organizationId={organizationId}
+            repository={repository}
+            contentType={contentType}
+            disabled={disabled}
+            config={directoryQuery.data}
+          />
+        ) : null}
         <GitHubPublishingPathFields
           contentPath={publishing.contentPath}
           directory={publishing.directory}

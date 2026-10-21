@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         );
       }
     }
-    await publishSavedContentToGitHub(
+    const published = await publishSavedContentToGitHub(
       {
         organizationId,
         contentId: postId,
@@ -68,7 +68,10 @@ export async function POST(request: Request) {
       },
       { publisherUserId: actorId }
     );
-    return Response.json({ success: true });
+    return Response.json({
+      success: true,
+      skipped: published.skipped ?? false,
+    });
   } catch (error) {
     logError("Failed to sync saved post to GitHub", error, { postId });
     return Response.json(

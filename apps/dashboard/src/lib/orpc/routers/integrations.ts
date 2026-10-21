@@ -82,10 +82,16 @@ import {
 import { logError } from "@notra/ai/utils/server-log";
 import { getAppUrl } from "@notra/ai/utils/url";
 import { db } from "@notra/db/drizzle";
-import { contentTriggers, repositoryOutputs } from "@notra/db/schema";
+import {
+  posts,
+  githubIntegrations,
+  contentTriggers,
+  repositoryOutputs,
+} from "@notra/db/schema";
 import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
+import { postGitHubPublishSchema } from "@notra/schemas/dashboard/content";
 import {
   createGranolaIntegrationRequestSchema,
   updateGranolaIntegrationBodySchema,
@@ -125,6 +131,7 @@ import {
   slackListChannelsOptionsSchema,
   updateSlackIntegrationBodySchema,
 } from "@notra/schemas/dashboard/slack-integration";
+import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { PublicUrlValidationError } from "@notra/utils/url";
 import { ORPCError } from "@orpc/server";
@@ -146,6 +153,10 @@ import { assertActiveSubscription } from "@/lib/billing/subscription";
 import { getTranslations } from "@/lib/i18n/server";
 import { toMcpIntegrationAuthKind } from "@/lib/integrations/auth-kind";
 import { clearGitHubPublishFailures } from "@/lib/integrations/github/github-publish-failure-state";
+import {
+  findSiteGitHubPublishTarget,
+  listSiteGitHubPublishTargets,
+} from "@/lib/integrations/github/site-publish-target";
 import {
   clearCachedSlackChannels,
   getCachedSlackChannels,
@@ -422,20 +433,103 @@ async function getInteractiveRepositoryToken(input: {
 
 async function readContentDirectoryConfig(
   repositoryId: string,
-  contentType: string
+  contentType: "blog_post" | "changelog",
+  contentId?: string
 ) {
   const output = await db.query.repositoryOutputs.findFirst({
     where: and(
       eq(repositoryOutputs.repositoryId, repositoryId),
       eq(repositoryOutputs.outputType, contentType)
     ),
-    columns: { config: true },
+    columns: { config: true, reviewProcess: true },
   });
   const config = repositoryContentDirectoryConfigSchema.safeParse(
     output?.config
   );
 
+  const repository = await db.query.githubIntegrations.findFirst({
+    where: eq(githubIntegrations.id, repositoryId),
+    columns: {
+      id: true,
+      organizationId: true,
+      owner: true,
+      repo: true,
+      githubRepositoryId: true,
+    },
+  });
+  const post =
+    contentId && repository
+      ? await db.query.posts.findFirst({
+          where: and(
+            eq(posts.id, contentId),
+            eq(posts.organizationId, repository.organizationId)
+          ),
+          with: { collection: { columns: { projectId: true } } },
+          columns: { id: true, githubPublish: true },
+        })
+      : null;
+  const stored = postGitHubPublishSchema.safeParse(post?.githubPublish).data;
+  const connectedSites =
+    repository?.owner && repository.repo
+      ? await listSiteGitHubPublishTargets({
+          organizationId: repository.organizationId,
+          projectId:
+            stored?.repositoryId === repositoryId
+              ? undefined
+              : post?.collection.projectId,
+          contentType,
+          repository: {
+            ...repository,
+            owner: repository.owner,
+            repo: repository.repo,
+          },
+        })
+      : [];
+  let savedSiteId =
+    stored?.repositoryId === repositoryId ? stored.siteId : undefined;
+  if (
+    stored?.repositoryId === repositoryId &&
+    repository?.owner &&
+    repository.repo
+  ) {
+    let baseBranch = stored.baseBranch;
+    if (stored.pullRequestNumber) {
+      const token = await getInteractiveRepositoryToken({
+        organizationId: repository.organizationId,
+        repositoryId,
+      });
+      const pr = await createOctokit(token ?? undefined)
+        .request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+          owner: repository.owner,
+          repo: repository.repo,
+          pull_number: stored.pullRequestNumber,
+        })
+        .catch(() => null);
+      baseBranch = pr?.data.base.ref ?? baseBranch;
+    }
+    const target = await findSiteGitHubPublishTarget({
+      organizationId: repository.organizationId,
+      contentType,
+      existingPublication: { ...stored, baseBranch },
+      repository: {
+        ...repository,
+        owner: repository.owner,
+        repo: repository.repo,
+      },
+    }).catch(() => null);
+    savedSiteId = target?.siteId;
+  }
+  if (stored?.repositoryId !== repositoryId) {
+    savedSiteId ??= config.success
+      ? (config.data.siteId ?? undefined)
+      : undefined;
+  }
   return {
+    sites: connectedSites,
+    reviewProcess: output?.reviewProcess ?? "pull_request",
+    siteId: connectedSites.some((site) => site.id === savedSiteId)
+      ? savedSiteId
+      : null,
     directory: config.success ? (config.data.directory ?? null) : null,
     contentPath: config.success ? (config.data.contentPath ?? null) : null,
     imagePath: config.success ? (config.data.imagePath ?? null) : null,
@@ -578,6 +672,19 @@ export const integrationsRouter = {
       const effectiveOwner = input.owner ?? repository?.owner ?? "";
       const effectiveRepo = input.repo ?? repository?.repo ?? "";
 
+      if (normalizedBranch !== undefined) {
+        if (integration.repositories.length !== 1) {
+          throw badRequest(
+            (await getTranslations("errors.integrations"))(
+              "branchSingleRepoOnly"
+            )
+          );
+        }
+        if (!repository) {
+          throw notFound("Repository not found");
+        }
+      }
+
       try {
         if (isRenaming) {
           const conflictingRepo = await findConflictingRepositoryInOrganization(
@@ -611,16 +718,7 @@ export const integrationsRouter = {
           await updateGitHubIntegrationToken(input.integrationId, input.token);
         }
 
-        if (normalizedBranch !== undefined) {
-          if (integration.repositories.length !== 1) {
-            const tErrors = await getTranslations("errors.integrations");
-            throw badRequest(tErrors("branchSingleRepoOnly"));
-          }
-
-          if (!repository) {
-            throw notFound("Repository not found");
-          }
-
+        if (normalizedBranch !== undefined && repository) {
           if (normalizedBranch) {
             await validateRepositoryBranchExists({
               owner: effectiveOwner,
@@ -687,7 +785,7 @@ export const integrationsRouter = {
         input.integrationId
       );
 
-      for (const schedule of affectedSchedules) {
+      await mapWithConcurrency(affectedSchedules, 4, async (schedule) => {
         if (schedule.qstashScheduleId) {
           await deleteQstashSchedule(schedule.qstashScheduleId).catch(
             (error) => {
@@ -706,7 +804,7 @@ export const integrationsRouter = {
             updatedAt: new Date(),
           })
           .where(eq(contentTriggers.id, schedule.id));
-      }
+      });
 
       await deleteGitHubIntegration(input.integrationId);
 
@@ -838,16 +936,12 @@ export const integrationsRouter = {
             });
           }
 
-          const updated = await updateRepository(input.repositoryId, {
+          await updateRepository(input.repositoryId, {
             ...(input.enabled !== undefined ? { enabled: input.enabled } : {}),
             ...(normalizedDefaultBranch !== undefined
               ? { defaultBranch: normalizedDefaultBranch }
               : {}),
           });
-
-          if (!updated) {
-            throw notFound("Repository not found");
-          }
 
           const refreshed = await requireRepositoryInOrganization(
             input.organizationId,
@@ -1001,7 +1095,8 @@ export const integrationsRouter = {
 
           return await readContentDirectoryConfig(
             input.repositoryId,
-            input.contentType
+            input.contentType,
+            input.contentId
           );
         }),
       update: baseProcedure
@@ -1017,9 +1112,35 @@ export const integrationsRouter = {
             input.repositoryId
           );
 
+          if (input.siteId) {
+            const repository = await db.query.githubIntegrations.findFirst({
+              where: eq(githubIntegrations.id, input.repositoryId),
+            });
+            const candidates =
+              repository?.owner && repository.repo
+                ? await listSiteGitHubPublishTargets({
+                    organizationId: input.organizationId,
+                    contentType: input.contentType,
+                    repository: {
+                      ...repository,
+                      owner: repository.owner,
+                      repo: repository.repo,
+                    },
+                  })
+                : [];
+            if (!candidates.some((site) => site.id === input.siteId)) {
+              throw badRequest(
+                (await getTranslations("errors.content"))(
+                  "publishingSiteUnavailable"
+                )
+              );
+            }
+          }
           await setRepositoryOutputConfig({
             repositoryId: input.repositoryId,
             outputType: input.contentType,
+            reviewProcess: input.reviewProcess,
+            siteId: input.siteId,
             ...(input.directory !== undefined
               ? { directory: input.directory }
               : {}),
@@ -1033,7 +1154,8 @@ export const integrationsRouter = {
 
           return await readContentDirectoryConfig(
             input.repositoryId,
-            input.contentType
+            input.contentType,
+            input.contentId
           );
         }),
     },

@@ -420,8 +420,13 @@ export interface GitHubPublishPullRequestResult {
   branchName: string;
   operation: GitHubPullRequestOperation;
   path: string;
-  pullRequestNumber: number;
-  pullRequestUrl: string;
+  pullRequestNumber: number | null;
+  pullRequestUrl: string | null;
+  headSha: string;
+  assetPaths?: string[];
+  direct?: boolean;
+  fallbackReason?: "protected" | "draft" | "changed";
+  skipped?: boolean;
 }
 
 export interface GitHubCreateCommitOnBranchResult {
@@ -436,6 +441,11 @@ export interface OpenInNotraBadgeUrls {
 }
 
 export interface PublishContentDraftPullRequestParams {
+  direct?: boolean;
+  ownedPaths?: string[];
+  writtenBlobs?: Record<string, string>;
+  previousHeadSha?: string | null;
+  deletions?: string[];
   contentId: string;
   contentType: GitHubPublishContentType;
   owner: string;
@@ -554,4 +564,15 @@ export type ContentPullRequestState =
   | { status: "closed" }
   | { status: "open"; draft: boolean; nodeId: string };
 
+export interface GitHubReviewProcessProps extends Pick<
+  GitHubContentPublishingSettingsProps,
+  "organizationId" | "repository" | "contentType" | "disabled"
+> {
+  config: import("@/types/content/git-publishing").ContentPublishingConfig;
+}
+
+export interface GitHubReviewProcessUpdate {
+  reviewProcess?: "pull_request" | "direct";
+  siteId?: string;
+}
 export type GitHubMergeMethod = "squash" | "merge" | "rebase";

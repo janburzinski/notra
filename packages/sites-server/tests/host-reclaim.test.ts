@@ -19,7 +19,7 @@ if (!databaseUrl) {
   test("verified host reclaim with PostgreSQL and conditional synthetic R2", () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(["55439", "55447", "5432"]).toContain(url.port);
+    expect(["55447", "55439", "5432"]).toContain(url.port);
     expect([
       "/notra_server_audit",
       "/notra_sites_branches_fix_20261019",

@@ -9,43 +9,21 @@ import { Button } from "@/components/button";
 import Link from "@/components/framework/link";
 import type { GitHubPublishDialogFooterProps } from "@/types/content/detail";
 
-export function GitHubPublishDialogFooter({
-  hasSelectedRepository,
-  isPublishing,
-  organizationSlug,
+function RecoveryActions({
   publishRecovery,
-  pullRequest,
-  selectedPublishingEnabled,
+  organizationSlug,
 }: GitHubPublishDialogFooterProps) {
   const t = useTranslations("content.githubPublish");
-  const tCommon = useTranslations("common.actions");
+  if (!publishRecovery) {
+    return null;
+  }
   const permissionsUrl =
-    publishRecovery?.code === "github_app_permissions_required"
+    publishRecovery.code === "github_app_permissions_required"
       ? publishRecovery.permissionsUrl
       : undefined;
-  const showIntegrationRecovery = Boolean(
-    publishRecovery &&
-    (publishRecovery.publishingPaused ||
-      publishRecovery.code !== "github_app_permissions_required" ||
-      !publishRecovery.permissionsUrl)
-  );
-  const publishingPaused = Boolean(publishRecovery?.publishingPaused);
-  let submitLabel = t("createDraftPr");
-  if (isPublishing) {
-    submitLabel = t("creatingDraftPr");
-  } else if (publishRecovery) {
-    submitLabel = tCommon("tryAgain");
-  }
-
   return (
     <>
-      <ResponsiveDialogClose
-        disabled={isPublishing}
-        render={<Button variant="outline" />}
-      >
-        {tCommon("close")}
-      </ResponsiveDialogClose>
-      {showIntegrationRecovery ? (
+      {publishRecovery.publishingPaused || !permissionsUrl ? (
         <Button
           nativeButton={false}
           render={
@@ -66,7 +44,42 @@ export function GitHubPublishDialogFooter({
           }
         />
       ) : null}
-      {!publishRecovery && pullRequest ? (
+    </>
+  );
+}
+
+export function GitHubPublishDialogFooter(
+  props: GitHubPublishDialogFooterProps
+) {
+  const {
+    onPublish,
+    hasSelectedRepository,
+    isPublishing,
+    publishRecovery,
+    pullRequest,
+    selectedPublishingEnabled,
+  } = props;
+  const t = useTranslations("content.githubPublish");
+  const common = useTranslations("common.actions");
+  const git = useTranslations("content.gitPublishing");
+  let label = git("publish");
+  if (isPublishing) {
+    label = git("publishing");
+  }
+  if (publishRecovery) {
+    label = common("tryAgain");
+  }
+  const canSubmit = !pullRequest && !publishRecovery?.publishingPaused;
+  return (
+    <>
+      <ResponsiveDialogClose
+        disabled={isPublishing}
+        render={<Button variant="outline" />}
+      >
+        {common("close")}
+      </ResponsiveDialogClose>
+      <RecoveryActions {...props} />
+      {pullRequest?.pullRequestUrl ? (
         <Button
           nativeButton={false}
           render={
@@ -81,17 +94,18 @@ export function GitHubPublishDialogFooter({
           }
         />
       ) : null}
-      {pullRequest || publishingPaused ? null : (
+      {canSubmit ? (
         <Button
           disabled={
             isPublishing || !hasSelectedRepository || !selectedPublishingEnabled
           }
-          type="submit"
           data-dialog-confirm
+          onClick={onPublish}
+          type="button"
         >
-          {submitLabel}
+          {label}
         </Button>
-      )}
+      ) : null}
     </>
   );
 }

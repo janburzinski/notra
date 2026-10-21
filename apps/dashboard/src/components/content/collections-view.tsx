@@ -26,6 +26,7 @@ import {
   CollectionActionsMenu,
   CollectionMenuItems,
 } from "@/components/content/collection-menu-items";
+import { ContentDeleteDialog } from "@/components/content/content-delete-dialog";
 import Link from "@/components/framework/link";
 import {
   COLLECTION_JUST_NOW_MS,
@@ -165,7 +166,8 @@ export function CollectionsView({
     organizationId,
     scheduleTarget?.singlePost?.id ?? ""
   );
-  const { deleteCollection, isDeleting } = usePostActions(organizationId);
+  const { deleteCollection, deletePost, isDeleting } =
+    usePostActions(organizationId);
   const menuProps = {
     organizationSlug,
     disabled: isDeleting || isOpeningSchedule,
@@ -189,46 +191,69 @@ export function CollectionsView({
       setIsOpeningSchedule(false);
     },
   };
-  const deleteDialog = (
-    <ConfirmDialog
-      confirmLabel={tCommon("actions.delete")}
-      description={
-        deleteTarget?.postCount === 1
-          ? tCommon("messages.thisWillPermanentlyDeleteTitle", {
-              title: collectionTitle(deleteTarget),
-            })
-          : t("actions.deleteDescription", {
-              title: deleteTarget ? collectionTitle(deleteTarget) : "",
-              count: deleteTarget?.postCount ?? 0,
-            })
-      }
-      onConfirm={async () => {
-        if (!deleteTarget) {
-          return;
-        }
-        const deleted = await deleteCollection(deleteTarget.id);
-        if (deleted) {
-          setDeleteTarget(null);
-          if (collections.length === 1 && pagination.page > 1) {
-            void pagination.setPage(pagination.page - 1);
+  const deleteDialog =
+    deleteTarget?.postCount === 1 && deleteTarget.singlePost ? (
+      <ContentDeleteDialog
+        contentId={deleteTarget.singlePost.id}
+        organizationId={organizationId}
+        title={collectionTitle(deleteTarget)}
+        open={true}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null);
           }
+        }}
+        pending={isDeleting}
+        onConfirm={async (remove) => {
+          if (
+            deleteTarget.singlePost &&
+            (await deletePost(deleteTarget.singlePost.id, remove))
+          ) {
+            await deleteCollection(deleteTarget.id);
+            setDeleteTarget(null);
+          }
+        }}
+      />
+    ) : (
+      <ConfirmDialog
+        confirmLabel={tCommon("actions.delete")}
+        description={
+          deleteTarget?.postCount === 1
+            ? tCommon("messages.thisWillPermanentlyDeleteTitle", {
+                title: collectionTitle(deleteTarget),
+              })
+            : t("actions.deleteDescription", {
+                title: deleteTarget ? collectionTitle(deleteTarget) : "",
+                count: deleteTarget?.postCount ?? 0,
+              })
         }
-      }}
-      onOpenChange={(open) => {
-        if (!open) {
-          setDeleteTarget(null);
+        onConfirm={async () => {
+          if (!deleteTarget) {
+            return;
+          }
+          const deleted = await deleteCollection(deleteTarget.id);
+          if (deleted) {
+            setDeleteTarget(null);
+            if (collections.length === 1 && pagination.page > 1) {
+              void pagination.setPage(pagination.page - 1);
+            }
+          }
+        }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null);
+          }
+        }}
+        open={deleteTarget !== null}
+        pending={isDeleting}
+        title={
+          deleteTarget?.postCount === 1
+            ? tCommon("labels.deletePost")
+            : t("actions.deleteTitle")
         }
-      }}
-      open={deleteTarget !== null}
-      pending={isDeleting}
-      title={
-        deleteTarget?.postCount === 1
-          ? tCommon("labels.deletePost")
-          : t("actions.deleteTitle")
-      }
-      variant="destructive"
-    />
-  );
+        variant="destructive"
+      />
+    );
   const dateFnsLocale = useDateFnsLocale();
   const formatDate = useLocalDateFormat();
   const now = useNow({ updateInterval: 60_000 });

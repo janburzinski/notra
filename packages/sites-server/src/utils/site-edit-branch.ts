@@ -1,9 +1,15 @@
-import { SITE_EDIT_BRANCH_PREFIX } from "@notra/sites-core/constants/sites";
+import {
+  SITE_EDIT_BRANCH_PREFIX,
+  NOTRA_BRANCH_PREFIX,
+} from "@notra/sites-core/constants/sites";
 import { isValidGitBranch } from "@notra/sites-core/utils/git-branch";
 
 import { SiteInputError } from "../errors";
+import { siteRepositoryAccess } from "../github";
+import type { SiteRepositoryAccess } from "../types/github";
 import type { Site } from "../types/sites";
 import { timestampedBranchName } from "./branch-name";
+import { branchPullRequest } from "./branch-pull-request";
 
 export function assertSiteFeatureBranch(site: Site, branch: string) {
   if (branch === site.productionBranch) {
@@ -11,13 +17,8 @@ export function assertSiteFeatureBranch(site: Site, branch: string) {
       "The deployment branch cannot be renamed or deleted"
     );
   }
-  if (
-    !branch.startsWith(SITE_EDIT_BRANCH_PREFIX) ||
-    !isValidGitBranch(branch)
-  ) {
-    throw new SiteInputError(
-      "Only Notra site edit branches can be renamed or deleted"
-    );
+  if (!branch.startsWith(NOTRA_BRANCH_PREFIX) || !isValidGitBranch(branch)) {
+    throw new SiteInputError("Only Notra branches can be renamed or deleted");
   }
 }
 
@@ -25,7 +26,7 @@ export function assertSiteEditableBranch(site: Site, branch: string) {
   if (
     !isValidGitBranch(branch) ||
     (branch !== site.productionBranch &&
-      !branch.startsWith(SITE_EDIT_BRANCH_PREFIX))
+      !branch.startsWith(NOTRA_BRANCH_PREFIX))
   ) {
     throw new SiteInputError("Branch not found");
   }
@@ -37,8 +38,7 @@ export function siteEditBranchName(title: string) {
   }
   const slug = title
     .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/[^a-zA-Z0-9-]+/g, "-")
     .replace(/^-+|-+$/g, "");
   if (!slug) {
     throw new SiteInputError(
@@ -50,4 +50,33 @@ export function siteEditBranchName(title: string) {
     throw new SiteInputError("Enter a valid branch name");
   }
   return name;
+}
+
+export async function assertSiteContentBranch(
+  site: Site,
+  branch: string,
+  access?: SiteRepositoryAccess
+) {
+  assertSiteEditableBranch(site, branch);
+  if (
+    branch === site.productionBranch ||
+    branch.startsWith(SITE_EDIT_BRANCH_PREFIX)
+  ) {
+    return;
+  }
+  const { repository, token } =
+    access ??
+    (await siteRepositoryAccess(site, {
+      contents: "read",
+      pull_requests: "read",
+    }));
+  const pr = await branchPullRequest(
+    repository,
+    token,
+    branch,
+    site.productionBranch
+  );
+  if (pr?.state !== "OPEN") {
+    throw new SiteInputError("Branch not found");
+  }
 }

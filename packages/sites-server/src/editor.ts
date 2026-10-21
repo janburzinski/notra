@@ -59,7 +59,10 @@ import {
   withSiteBranchLock,
 } from "./utils/site-branch-lock";
 import { siteDraftTable } from "./utils/site-draft-table";
-import { assertSiteEditableBranch } from "./utils/site-edit-branch";
+import {
+  assertSiteEditableBranch,
+  assertSiteContentBranch,
+} from "./utils/site-edit-branch";
 
 // createCommitOnBranch rejects a stale expectedHeadOid with "Expected branch to
 // point to "<oid>" but it did not". Anything else is a real failure.
@@ -94,6 +97,7 @@ export async function listSiteSourceFiles(
   commitSha?: string
 ): Promise<SiteSourceListing> {
   assertSiteEditableBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const { repository, token } = access ?? (await readAccess(site));
   const headSha =
     commitSha ?? (await getBranchHead(repository, token, branch)).sha;
@@ -158,6 +162,7 @@ export async function readSiteSourceFile(
 ): Promise<SiteSourceFileContent | null> {
   if (!access) {
     assertSiteEditableBranch(site, ref);
+    await assertSiteContentBranch(site, ref);
   }
   assertEditablePath(path);
   const { repository, token } = access ?? (await readAccess(site));
@@ -351,6 +356,7 @@ export async function saveSiteDraft(
   }
   const branch = input.branch ?? site.productionBranch;
   assertSiteEditableBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const siteDrafts = siteDraftTable(branch, site.productionBranch);
   const access =
     branch === site.productionBranch ? null : await readAccess(site);
@@ -488,6 +494,7 @@ export async function rebaseSiteDraft(
   userId: string
 ): Promise<SiteDraft | null> {
   assertSiteEditableBranch(site, input.branch ?? site.productionBranch);
+  await assertSiteContentBranch(site, input.branch ?? site.productionBranch);
   const siteDrafts = siteDraftTable(
     input.branch ?? site.productionBranch,
     site.productionBranch
@@ -538,6 +545,7 @@ export async function discardSiteDraft(
 ): Promise<void> {
   const branch = input.branch ?? site.productionBranch;
   assertSiteEditableBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const siteDrafts = siteDraftTable(branch, site.productionBranch);
   await db.transaction(async (tx) => {
     await lockSiteBranchEdits(tx, site.id, branch, true);
@@ -694,6 +702,7 @@ export async function flushSiteDrafts(
 ): Promise<PublishSiteDraftsResult> {
   const branch = input.branch ?? site.productionBranch;
   assertSiteEditableBranch(site, branch);
+  await assertSiteContentBranch(site, branch);
   const siteDrafts = siteDraftTable(branch, site.productionBranch);
   const access = await siteRepositoryAccess(site, {
     contents: "write",

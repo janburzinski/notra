@@ -242,6 +242,11 @@ jobs:
           SITES_BRANCH_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notra_migrations
         run: bun test packages/sites-server/tests/branch-workflow.test.ts packages/db/tests/sites-branch-migration.test.ts
 
+      - name: Test content Git publishing migration 0129 rolling compatibility
+        env:
+          SITES_BRANCH_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notra_migrations
+        run: bun test packages/db/tests/content-git-publishing-migration.test.ts
+
   quality:
     if: always()
     needs: [changes, checks, infrastructure]

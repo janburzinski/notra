@@ -341,24 +341,30 @@ export const repositoryImagePathTemplateSchema = repositoryRelativePathSchema
   );
 
 export const repositoryContentDirectoryConfigSchema = z.looseObject({
+  siteId: z.string().min(1).nullable().optional(),
   directory: repositoryContentDirectorySchema.optional(),
   contentPath: repositoryContentPathTemplateSchema.nullable().optional(),
   imagePath: repositoryImagePathTemplateSchema.nullable().optional(),
 });
 
 export const repositoryContentDirectoryInputSchema = z.object({
+  contentId: z.string().min(1).optional(),
   contentType: z.enum(GITHUB_PUBLISH_CONTENT_TYPES),
 });
 
 export const updateRepositoryContentDirectoryBodySchema =
   repositoryContentDirectoryInputSchema
     .extend({
+      reviewProcess: z.enum(["pull_request", "direct"]).optional(),
+      siteId: z.string().min(1).nullable().optional(),
       directory: repositoryContentDirectorySchema.optional(),
       contentPath: repositoryContentPathTemplateSchema.nullable().optional(),
       imagePath: repositoryImagePathTemplateSchema.nullable().optional(),
     })
     .refine(
       (value) =>
+        value.reviewProcess !== undefined ||
+        value.siteId !== undefined ||
         value.directory !== undefined ||
         value.contentPath !== undefined ||
         value.imagePath !== undefined,

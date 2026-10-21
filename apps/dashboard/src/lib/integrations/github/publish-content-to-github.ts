@@ -9,7 +9,11 @@ import {
   fallbackContentCommitHeadline,
   generateContentCommitHeadline,
 } from "@notra/ai/utils/content-commit-message";
-import { createGitHubContentExportMarker } from "@notra/ai/utils/github-content-export";
+import {
+  createGitHubContentExportMarker,
+  isGitHubContentExport,
+} from "@notra/ai/utils/github-content-export";
+import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
 import { slugify } from "@notra/utils/slugify";
 
 import {
@@ -24,6 +28,7 @@ import type {
   GitHubContentCommitMetadata,
   GitHubCreateCommitOnBranchResult,
   GitHubPublishContentType,
+  GitHubPublishPullRequestResult,
   GitHubPullRequestOperation,
   GitHubPullRequestSummary,
   PublishContentDraftPullRequestParams,
@@ -46,7 +51,7 @@ export class GitHubContentBranchConflictError extends Error {
 
   constructor(branchName: string, path: string) {
     super(
-      `Branch ${branchName} contains changes that do not belong to ${path}`
+      `The entry ${path} on ${branchName} changed on GitHub. Resolve the changes before updating; Notra has not overwritten the file.`
     );
     this.name = "GitHubContentBranchConflictError";
     this.branchName = branchName;
@@ -173,9 +178,11 @@ function buildGitHubContentAdditions(
 function buildGitHubContentFileChanges(
   params: PublishContentDraftPullRequestParams
 ) {
-  const deletions = (params.assetPathsToDelete ?? []).map((path) => ({ path }));
+  const deletions = (params.deletions ?? params.assetPathsToDelete ?? []).map(
+    (path) => ({ path })
+  );
   return {
-    additions: buildGitHubContentAdditions(params),
+    additions: params.deletions ? [] : buildGitHubContentAdditions(params),
     ...(deletions.length > 0 ? { deletions } : {}),
   };
 }
@@ -778,44 +785,163 @@ async function assertContentCommitIsBranchHead(params: {
   throw new GitHubContentBranchConflictError(params.branchName, params.path);
 }
 
+async function readContentBlobSha(
+  octokit: GitHubClient,
+  params: { owner: string; repo: string; path: string; ref: string }
+) {
+  try {
+    const { data } = await octokit.request(
+      "GET /repos/{owner}/{repo}/contents/{path}",
+      params
+    );
+    if (Array.isArray(data) || data.type !== "file") {
+      throw new Error("Expected a GitHub file");
+    }
+    return data.sha;
+  } catch (error) {
+    if (hasGitHubStatus(error, 404)) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+async function ownedContentChanged(
+  octokit: GitHubClient,
+  params: PublishContentDraftPullRequestParams,
+  paths: readonly string[],
+  ref: string
+) {
+  const ownedPaths = new Set(params.ownedPaths);
+  const changed = await mapWithConcurrency(
+    paths.filter((path) => ownedPaths.has(path)),
+    4,
+    async (path) => {
+      const expected =
+        params.writtenBlobs?.[path] ??
+        (params.previousHeadSha
+          ? await readContentBlobSha(octokit, {
+              owner: params.owner,
+              repo: params.repo,
+              path,
+              ref: params.previousHeadSha,
+            })
+          : null);
+      const current = await readContentBlobSha(octokit, {
+        owner: params.owner,
+        repo: params.repo,
+        path,
+        ref,
+      });
+      return !expected || current !== expected ? path : null;
+    }
+  );
+  return changed.find((path) => path !== null) ?? null;
+}
+
+async function recoverDirectContentPublication(
+  octokit: GitHubClient,
+  params: Awaited<ReturnType<typeof resolveGitHubPublishParams>>,
+  ref: string
+) {
+  if (!params.organizationId || params.deletions) {
+    return null;
+  }
+  for (let page = 1; ; page++) {
+    const { data: commits } = await octokit.request(
+      "GET /repos/{owner}/{repo}/commits",
+      {
+        owner: params.owner,
+        repo: params.repo,
+        sha: ref,
+        path: params.path,
+        page,
+        per_page: 100,
+        headers: GITHUB_API_VERSION_HEADERS,
+      }
+    );
+    for (const commit of commits) {
+      const metadata = parseContentCommitMetadata(commit.commit.message);
+      const parentSha = commit.parents[0]?.sha;
+      if (metadata?.contentPath !== params.path || !parentSha) {
+        continue;
+      }
+      const markdown = await readGitHubContentFile(octokit, {
+        owner: params.owner,
+        repo: params.repo,
+        path: params.path,
+        ref: commit.sha,
+      });
+      if (
+        markdown !== null &&
+        isGitHubContentExport(commit.commit.message, {
+          organizationId: params.organizationId,
+          postId: params.contentId,
+          owner: params.owner,
+          repo: params.repo,
+          path: params.path,
+          parentSha,
+          markdown,
+        })
+      ) {
+        return {
+          ...params,
+          ownedPaths: [params.path, ...metadata.assetPaths],
+          previousHeadSha: commit.sha,
+          writtenBlobs: undefined,
+        };
+      }
+    }
+    if (commits.length < 100) {
+      break;
+    }
+  }
+  return null;
+}
+
 async function assertContentDestinationsMissing(
   octokit: GitHubClient,
   params: PublishContentDraftPullRequestParams,
   paths: readonly string[],
   ref: string
 ) {
-  for (const path of paths) {
-    let destinationMissing = false;
-    try {
-      await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-        owner: params.owner,
-        repo: params.repo,
-        path,
-        ref,
-        headers: GITHUB_API_VERSION_HEADERS,
-      });
-    } catch (error) {
-      if (!hasGitHubStatus(error, 404)) {
-        throw new GitHubContentPublishError(
-          "Failed to check the destination path",
-          error
+  const ownedPaths = new Set(params.ownedPaths);
+  await mapWithConcurrency(
+    paths.filter((path) => !ownedPaths.has(path)),
+    4,
+    async (path) => {
+      let destinationMissing = false;
+      try {
+        await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+          owner: params.owner,
+          repo: params.repo,
+          path,
+          ref,
+          headers: GITHUB_API_VERSION_HEADERS,
+        });
+      } catch (error) {
+        if (!hasGitHubStatus(error, 404)) {
+          throw new GitHubContentPublishError(
+            "Failed to check the destination path",
+            error
+          );
+        }
+        destinationMissing = true;
+      }
+
+      if (!destinationMissing) {
+        throw new GitHubContentTargetExistsError(
+          `${path} already exists in ${params.owner}/${params.repo}`
         );
       }
-      destinationMissing = true;
     }
-
-    if (!destinationMissing) {
-      throw new GitHubContentTargetExistsError(
-        `${path} already exists in ${params.owner}/${params.repo}`
-      );
-    }
-  }
+  );
 }
 
 export async function publishContentDraftPullRequest(
   octokit: GitHubClient,
   requestedParams: PublishContentDraftPullRequestParams
-) {
+): Promise<GitHubPublishPullRequestResult> {
   let baseSha: string;
 
   try {
@@ -847,6 +973,7 @@ export async function publishContentDraftPullRequest(
     requestedParams.contentId
   );
   let existingPullRequest: GitHubPullRequestSummary | undefined;
+  let closedUnmerged = false;
   const linkedPullRequest = requestedParams.linkedPullRequest;
 
   if (linkedPullRequest) {
@@ -857,6 +984,7 @@ export async function publishContentDraftPullRequest(
         pullRequestNumber: linkedPullRequest.number,
         repo: requestedParams.repo,
       });
+      closedUnmerged = linked.state === "closed" && !linked.merged_at;
       const headRepository = linked.head.repo?.full_name.toLowerCase();
       const expectedRepository =
         `${requestedParams.owner}/${requestedParams.repo}`.toLowerCase();
@@ -882,8 +1010,10 @@ export async function publishContentDraftPullRequest(
     }
   }
 
-  if (requestedParams.requireLinkedPullRequest && !existingPullRequest) {
-    throw new GitHubLinkedPullRequestUnavailableError();
+  if (linkedPullRequest && !existingPullRequest) {
+    // A completed publication gets a fresh branch. Never revive or reset the
+    // old review branch, which may contain human edits after it was closed.
+    branchName = `${branchName}-${crypto.randomUUID().slice(0, 8)}`;
   }
 
   if (!existingPullRequest) {
@@ -926,6 +1056,109 @@ export async function publishContentDraftPullRequest(
     }
   }
 
+  if (
+    requestedParams.requireLinkedPullRequest &&
+    (closedUnmerged ||
+      (!existingPullRequest &&
+        (!requestedParams.direct ||
+          !requestedParams.ownedPaths?.includes(requestedParams.path))))
+  ) {
+    return {
+      branchName:
+        linkedPullRequest?.branchName ?? requestedParams.defaultBranch,
+      path: requestedParams.path,
+      headSha: baseSha,
+      operation: "updated",
+      pullRequestNumber: linkedPullRequest?.number ?? null,
+      pullRequestUrl: null,
+      skipped: true,
+    };
+  }
+  if (requestedParams.direct && !existingPullRequest) {
+    let params = await resolveGitHubPublishParams(
+      requestedParams,
+      requestedParams.path
+    );
+    const touchedPaths = params.deletions ?? [
+      params.path,
+      ...(params.assets ?? []).map((asset) => asset.path),
+    ];
+    let changed = await ownedContentChanged(
+      octokit,
+      params,
+      touchedPaths,
+      baseSha
+    );
+    if (changed || !params.ownedPaths?.includes(params.path)) {
+      const recovered = await recoverDirectContentPublication(
+        octokit,
+        params,
+        baseSha
+      );
+      if (recovered) {
+        params = recovered;
+        changed = await ownedContentChanged(
+          octokit,
+          params,
+          touchedPaths,
+          baseSha
+        );
+        if (!changed && (await isContentOnDefaultBranch(octokit, params))) {
+          return {
+            branchName: params.defaultBranch,
+            operation: "updated",
+            path: params.path,
+            pullRequestNumber: null,
+            pullRequestUrl: null,
+            headSha: baseSha,
+            direct: true,
+            assetPaths: (params.assets ?? []).map((asset) => asset.path),
+          };
+        }
+      }
+    }
+    if (changed) {
+      if (params.requireLinkedPullRequest) {
+        throw new GitHubContentBranchConflictError(
+          params.defaultBranch,
+          changed
+        );
+      }
+      return {
+        ...(await publishContentDraftPullRequest(octokit, {
+          ...requestedParams,
+          ownedPaths: params.ownedPaths,
+          previousHeadSha: params.previousHeadSha,
+          writtenBlobs: params.writtenBlobs,
+          direct: false,
+        })),
+        fallbackReason: "changed",
+      };
+    }
+    await assertContentDestinationsMissing(
+      octokit,
+      params,
+      touchedPaths,
+      baseSha
+    );
+    const headSha = await commitContentToBranch(
+      octokit,
+      params,
+      params.defaultBranch,
+      baseSha,
+      false
+    );
+    return {
+      branchName: params.defaultBranch,
+      operation: "updated" as const,
+      path: params.path,
+      pullRequestNumber: null,
+      pullRequestUrl: null,
+      headSha,
+      direct: true,
+      assetPaths: (params.assets ?? []).map((asset) => asset.path),
+    };
+  }
   let createdBranch = false;
   if (!existingPullRequest) {
     let branchExists = true;
@@ -946,7 +1179,11 @@ export async function publishContentDraftPullRequest(
       }
       branchExists = false;
     }
-    if (!branchExists && hashOnlyBranchName !== branchName) {
+    if (
+      !linkedPullRequest &&
+      !branchExists &&
+      hashOnlyBranchName !== branchName
+    ) {
       try {
         await getBranchHeadSha(
           octokit,
@@ -1045,10 +1282,19 @@ export async function publishContentDraftPullRequest(
       )
       .map(({ filename }) => filename)
   );
-  const ownedAssetPaths = recordedAssetPaths.filter((path) =>
-    addedAssetPaths.has(path)
-  );
+  const ownedAssetPaths = [
+    ...new Set([
+      ...recordedAssetPaths,
+      ...(requestedParams.ownedPaths ?? []).filter(
+        (path) => path !== contentPath
+      ),
+    ]),
+  ].filter((path) => addedAssetPaths.has(path));
   if (
+    !(
+      linkedPullRequest &&
+      existingPullRequest?.number === linkedPullRequest.number
+    ) &&
     !isRecoverableContentFileSet({
       aheadBy: contentBranch.aheadBy,
       contentPath,
@@ -1078,18 +1324,45 @@ export async function publishContentDraftPullRequest(
     params.path,
     ...(params.assets ?? []).map(({ path }) => path),
   ];
+  if (existingPullRequest) {
+    const changed = await ownedContentChanged(
+      octokit,
+      {
+        ...params,
+        ownedPaths: [
+          contentPath,
+          ...(params.ownedPaths ?? []),
+          ...ownedAssetPaths,
+        ],
+      },
+      [...destinationPaths, ...(params.deletions ?? params.assetPathsToDelete)],
+      branchHeadSha
+    );
+    if (
+      changed ||
+      (!params.writtenBlobs?.[contentPath] &&
+        !params.previousHeadSha &&
+        commitMetadata?.contentPath !== contentPath)
+    ) {
+      throw new GitHubContentBranchConflictError(
+        branchName,
+        changed ?? contentPath
+      );
+    }
+  }
   await assertContentDestinationsMissing(
     octokit,
     params,
     destinationPaths,
     baseSha
   );
+  const ownedAssets = new Set(ownedAssetPaths);
   await assertContentDestinationsMissing(
     octokit,
     params,
     (params.assets ?? [])
       .map(({ path }) => path)
-      .filter((path) => !ownedAssetPaths.includes(path)),
+      .filter((path) => !ownedAssets.has(path)),
     branchHeadSha
   );
 

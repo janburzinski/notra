@@ -8,7 +8,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { BlogPostSubtype } from "@notra/db/types/content";
-import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Button } from "@notra/ui/components/ui/button";
 import {
@@ -21,6 +20,7 @@ import {
 import { memo, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { ContentDeleteDialog } from "@/components/content/content-delete-dialog";
 import Image from "@/components/framework/image";
 import Link from "@/components/framework/link";
 import { useBlogPostSubtypeLabels } from "@/lib/hooks/use-blog-post-subtype-labels";
@@ -136,8 +136,8 @@ const ContentCard = memo(function ContentCard({
   const { deletePost, isDeleting, isTogglingStatus, togglePostStatus } =
     usePostActions(organizationId);
 
-  async function handleDelete() {
-    const deleted = await deletePost(id);
+  async function handleDelete(remove: boolean) {
+    const deleted = await deletePost(id, remove);
     if (deleted) {
       setShowDeleteDialog(false);
     }
@@ -156,18 +156,24 @@ const ContentCard = memo(function ContentCard({
         className
       )}
     >
+      {href ? (
+        <Link
+          href={href}
+          aria-label={title}
+          className="focus-visible:ring-ring absolute inset-0 z-10 rounded-xl focus-visible:ring-2 focus-visible:outline-none"
+        />
+      ) : null}
       <div className="border-border/60 bg-background flex min-h-28 flex-1 flex-col overflow-hidden rounded-lg border">
         <div className="flex items-start justify-between gap-2 px-3 pt-2.5 pb-1.5">
           <p className="line-clamp-2 min-w-0 text-sm leading-snug font-medium wrap-anywhere">
             {title}
           </p>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="relative z-20 flex shrink-0 items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
                   <Button
                     className="text-muted-foreground hover:text-foreground -mt-0.5 -mr-1 size-7 p-0"
-                    onClick={(e) => e.preventDefault()}
                     variant="ghost"
                   >
                     <span className="sr-only">
@@ -180,8 +186,7 @@ const ContentCard = memo(function ContentCard({
               <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem
                   disabled={isTogglingStatus}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     togglePostStatus(id, status);
                   }}
                 >
@@ -196,8 +201,7 @@ const ContentCard = memo(function ContentCard({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   disabled={isDeleting}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     setShowDeleteDialog(true);
                   }}
                   variant="destructive"
@@ -235,28 +239,16 @@ const ContentCard = memo(function ContentCard({
 
   return (
     <>
-      {href ? (
-        <Link
-          className="focus-visible:ring-ring block h-full w-full min-w-0 rounded-lg focus-visible:ring-2 focus-visible:outline-none"
-          href={href}
-        >
-          {cardContent}
-        </Link>
-      ) : (
-        cardContent
-      )}
+      {cardContent}
 
-      <ConfirmDialog
-        confirmLabel={tCommon("delete")}
-        description={tCommon2("messages.thisWillPermanentlyDeleteTitle", {
-          title,
-        })}
+      <ContentDeleteDialog
+        contentId={id}
+        organizationId={organizationId}
         onConfirm={handleDelete}
         onOpenChange={setShowDeleteDialog}
         open={showDeleteDialog}
         pending={isDeleting}
-        title={tCommon2("labels.deletePost")}
-        variant="destructive"
+        title={title}
       />
     </>
   );

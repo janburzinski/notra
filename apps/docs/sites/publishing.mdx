@@ -17,6 +17,16 @@ docolin:
 
 Notra deploys a site when you push, merge or publish from the editor, and keeps the live version online until the new build is ready. This page covers what triggers a deploy, how to follow it, how to edit in Notra and how to roll back, take offline or delete a site.
 
+## Publishing from Content
+
+Choose **Publish** or **Update** in Content to publish a blog post or changelog to GitHub. A connected site uses its production branch and site folder. Existing publications keep their target when their project or the repository's site list changes. New publications ask you to choose a site when more than one matches. This choice belongs to the post; change the default site in the integration settings.
+
+The integration's **Review process** controls how changes reach that branch. **Open a pull request** creates a draft pull request for review. **Publish directly** commits to the target branch. Scheduled direct publications commit at their scheduled time, including schedules without a merge step. Protected branches, pending Sites drafts and files changed on GitHub fall back to a pull request when you explicitly publish.
+
+Saving updates an open content pull request. In direct mode, saving updates an already-live file when GitHub still has the version Notra last wrote. Metadata edits share a 600 ms save delay, so rapid changes are saved and synced together. Saving never opens a new pull request after the previous one closes; use **Update** to start another review. Edits to the entry on the review branch must be resolved before Notra can update it. Sites Design can still add changes to other files in the same pull request.
+
+Deleting a post keeps its repository files by default. Choose the removal switch to remove its recorded entry and images through the review process. Images referenced by another post's publication are kept.
+
 ## What triggers a deploy
 
 With automatic publishing on, production builds go live as described below.

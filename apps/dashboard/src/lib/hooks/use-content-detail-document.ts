@@ -45,6 +45,7 @@ import type { ContentApiResponse } from "@/types/hooks/content";
 import { isContentSaveConflict } from "@/utils/content-document-save";
 import { createContentIdleCheckpoint } from "@/utils/content-idle-checkpoint";
 import {
+  getContentArticleLoadingState,
   getGeoWriterDocumentState,
   parseGeoWriterDraft,
 } from "@/utils/geo-write-entry";
@@ -109,7 +110,8 @@ export function useContentDetailDocument({
   >(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
-  const [pendingGitHubSave, setPendingGitHubSave] = useState(false);
+  const [hasUnsyncedGitHubChanges, setHasUnsyncedGitHubChanges] =
+    useState(false);
   const [hasSaveConflict, setHasSaveConflict] = useState(false);
   const saveConflictRef = useRef(false);
   const savingRef = useRef(false);
@@ -141,24 +143,18 @@ export function useContentDetailDocument({
     string | null
   >(null);
   const geoWriterBriefId = geoWriterDraft?.briefId;
-  const isCompletedArticleStale =
-    briefStatus === "completed" &&
-    isPostStillPlan &&
-    loadedArticleBriefId !== geoWriterBriefId;
-  if (
-    geoWriterBriefId &&
-    briefStatus &&
-    (briefStatus !== "completed" || isCompletedArticleStale) &&
-    pendingArticleBriefId !== geoWriterBriefId
-  ) {
+  const { shouldLoadArticle, isGeoArticleLoading } =
+    getContentArticleLoadingState({
+      briefId: geoWriterBriefId,
+      briefStatus,
+      isPostStillPlan,
+      loadedArticleBriefId,
+      pendingArticleBriefId,
+      hasDraft: Boolean(geoWriterDraft),
+    });
+  if (shouldLoadArticle && geoWriterBriefId) {
     setPendingArticleBriefId(geoWriterBriefId);
   }
-  const isGeoArticleLoading = Boolean(
-    geoWriterDraft &&
-    briefStatus === "completed" &&
-    pendingArticleBriefId === geoWriterDraft.briefId &&
-    loadedArticleBriefId !== geoWriterDraft.briefId
-  );
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
   const editorRef = useRef<EditorRefHandle | null>(null);
@@ -265,7 +261,7 @@ export function useContentDetailDocument({
     resolvedEditedMarkdown !== resolvedOriginalMarkdown;
   const hasDocumentChanges =
     hasMarkdownChanges || hasTitleChanges || hasSlugChanges;
-  const hasChanges = hasDocumentChanges || pendingGitHubSave;
+  const hasChanges = hasDocumentChanges || hasUnsyncedGitHubChanges;
 
   useLayoutEffect(() => {
     const previous = observedContentRef.current;
@@ -295,7 +291,7 @@ export function useContentDetailDocument({
         editedMarkdown !== (originalMarkdown ?? previous.markdown ?? "")) ||
       hasTitleChanges ||
       hasSlugChanges ||
-      pendingGitHubSave;
+      hasUnsyncedGitHubChanges;
     if (draftDirty || savingRef.current) {
       needsNormalizationRef.current = false;
       saveConflictRef.current = true;
@@ -320,7 +316,7 @@ export function useContentDetailDocument({
     originalMarkdown,
     hasTitleChanges,
     hasSlugChanges,
-    pendingGitHubSave,
+    hasUnsyncedGitHubChanges,
     setEditingTitleState,
     setEditingSlugState,
     setPersistedTitle,
@@ -329,7 +325,7 @@ export function useContentDetailDocument({
 
   const applyFetchedDocument = useCallback(
     (content: ContentResponse) => {
-      setPendingGitHubSave(false);
+      setHasUnsyncedGitHubChanges(false);
       const markdown = content.markdown ?? "";
       needsNormalizationRef.current = true;
       setEditedMarkdown(markdown);
@@ -612,7 +608,7 @@ export function useContentDetailDocument({
             title: titleToSave,
             editingSlug: slugToSave,
             editedMarkdown:
-              hasMarkdownChanges || resolveConflict || pendingGitHubSave
+              hasMarkdownChanges || resolveConflict || hasUnsyncedGitHubChanges
                 ? markdownToSave
                 : null,
             autosave: silent,
@@ -695,7 +691,7 @@ export function useContentDetailDocument({
           (data?.content?.contentType === "changelog" ||
             data?.content?.contentType === "blog_post")
         ) {
-          setPendingGitHubSave(true);
+          setHasUnsyncedGitHubChanges(true);
           if (options?.syncGitHub === false) {
             return true;
           }
@@ -708,6 +704,10 @@ export function useContentDetailDocument({
                 repositoryId: linkedGitHubPublish.repositoryId,
                 linkedOnly: true,
               });
+            if (result.skipped) {
+              // The linked PR was closed or merged; keep the edits marked as not on GitHub.
+              return true;
+            }
             queryClient.setQueryData<ContentApiResponse>(
               dashboardOrpc.content.get.queryKey({
                 input: { organizationId, contentId },
@@ -751,7 +751,7 @@ export function useContentDetailDocument({
               setSaveFailed(true);
               return false;
             }
-            setPendingGitHubSave(false);
+            setHasUnsyncedGitHubChanges(false);
             toast.success(tContentShared("pullRequestUpdated"), {
               position: CONTENT_SAVE_TOAST_POSITION,
             });
@@ -772,7 +772,7 @@ export function useContentDetailDocument({
             return false;
           }
         } else {
-          setPendingGitHubSave(false);
+          setHasUnsyncedGitHubChanges(false);
           if (!silent) {
             toast.success(tToast("contentSaved"), {
               position: CONTENT_SAVE_TOAST_POSITION,
@@ -821,7 +821,7 @@ export function useContentDetailDocument({
       hasMarkdownChanges,
       hasTitleChanges,
       hasSlugChanges,
-      pendingGitHubSave,
+      hasUnsyncedGitHubChanges,
       editingSlug,
       title,
       resolvedEditedMarkdown,

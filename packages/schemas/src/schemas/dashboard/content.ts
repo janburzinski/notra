@@ -96,8 +96,14 @@ export const postGitHubPublishSchema = z.object({
   branchName: z.string().trim().min(1).max(255),
   owner: z.string().trim().min(1).max(39),
   path: z.string().trim().min(1).max(GITHUB_CONTENT_PATH_MAX_LENGTH),
-  pullRequestNumber: z.number().int().positive(),
-  pullRequestUrl: githubHostSchema,
+  pullRequestNumber: z.number().int().positive().nullable(),
+  pullRequestUrl: githubHostSchema.nullable(),
+  siteId: z.string().optional(),
+  baseBranch: z.string().optional(),
+  direct: z.boolean().optional(),
+  assetPaths: z.array(z.string()).optional(),
+  writtenBlobs: z.record(z.string(), z.string()).optional(),
+  headSha: z.string().optional(),
   repo: z.string().trim().min(1).max(100),
   repositoryId: z.string().trim().min(1).max(64),
 }) satisfies z.ZodType<PostGitHubPublish>;
@@ -405,11 +411,16 @@ const githubMarkdownPathSchema = repositoryRelativePathSchema
   .transform((path) => (/\.(?:md|mdx)$/i.test(path) ? path : `${path}.md`))
   .pipe(repositoryContentFilePathSchema);
 
+export const deleteContentInputSchema = contentInputSchema.extend({
+  removeFromRepository: z.boolean().default(false),
+});
+
 export const publishContentToGitHubSchema = z.object({
   contentType: z.enum(GITHUB_PUBLISH_CONTENT_TYPES).default("changelog"),
   repositoryId: z.string().min(1, "Repository is required"),
   path: githubMarkdownPathSchema.optional(),
-  /** Update the stored open pull request. Do not open a new draft. */
+  siteId: z.string().min(1).optional(),
+  /** Reuse the publication destination when updating saved content. */
   linkedOnly: z.boolean().optional(),
 });
 

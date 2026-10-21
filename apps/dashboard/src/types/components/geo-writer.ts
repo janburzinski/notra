@@ -150,3 +150,12 @@ export interface WriterExecuteState {
 export interface WriterExecuteActions {
   execute: () => void;
 }
+
+export interface ContentArticleLoadingInput {
+  briefId: string | undefined;
+  briefStatus: string | undefined;
+  isPostStillPlan: boolean;
+  loadedArticleBriefId: string | null;
+  pendingArticleBriefId: string | null;
+  hasDraft: boolean;
+}

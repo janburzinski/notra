@@ -55,6 +55,8 @@ export interface ConfigureOutputParams {
 }
 
 export interface SetRepositoryOutputConfigParams {
+  siteId?: string | null;
+  reviewProcess?: "pull_request" | "direct";
   contentPath?: string | null;
   directory?: string;
   imagePath?: string | null;

@@ -22,6 +22,8 @@ import { sanitizeMarkdownHtml } from "@notra/ai/utils/sanitize";
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import {
+  siteDeployments,
+  sites,
   contentAuthors,
   githubIntegrations,
   postCollections,
@@ -58,6 +60,7 @@ import type {
 } from "@notra/schemas/dashboard/content";
 import {
   contentInputSchema,
+  deleteContentInputSchema,
   contentOrganizationIdInputSchema,
   contentPreviewRequestSchema,
   createPostCollectionInputSchema,
@@ -75,6 +78,7 @@ import {
 import { saveContentDocumentSchema } from "@notra/schemas/dashboard/content-history";
 import { clearCompletedGenerationSchema } from "@notra/schemas/dashboard/generations";
 import type { PostMetadata } from "@notra/schemas/shared/post-metadata";
+import { primaryMountUrl } from "@notra/sites-server/utils/urls";
 import { slugify } from "@notra/utils/slugify";
 import {
   and,
@@ -117,8 +121,11 @@ import {
 } from "@/lib/generations/tracking";
 import { requestGeoRescanForPublishedPost } from "@/lib/geo/rescan";
 import { getTranslations } from "@/lib/i18n/server";
+import { assertContentPublishAllowed } from "@/lib/integrations/github/assert-content-publish";
+import { withContentPublicationLock } from "@/lib/integrations/github/content-publication-lock";
 import { getContentPullRequestState } from "@/lib/integrations/github/content-pull-request";
 import { publishSavedContentToGitHub } from "@/lib/integrations/github/publish-saved-content";
+import { removePublishedContent } from "@/lib/integrations/github/remove-published-content";
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { contentAuthorsRouter } from "@/lib/orpc/routers/content-authors";
 import { contentHistoryRouter } from "@/lib/orpc/routers/content-history";
@@ -149,7 +156,6 @@ import {
   internalServerError,
   notFound,
   paymentRequired,
-  tooManyRequests,
 } from "../utils/errors";
 
 const TITLE_REGEX = /^#\s+(.+)$/m;
@@ -290,16 +296,14 @@ function serializeContent(
 }
 
 function normalizeContentTypes(contentTypes: string[]): ContentType[] {
-  const normalized: ContentType[] = [];
-
+  const normalized = new Set<ContentType>();
   for (const contentType of contentTypes) {
     const parsed = contentTypeSchema.safeParse(contentType);
-    if (parsed.success && !normalized.includes(parsed.data)) {
-      normalized.push(parsed.data);
+    if (parsed.success) {
+      normalized.add(parsed.data);
     }
   }
-
-  return normalized;
+  return [...normalized];
 }
 
 function normalizeContentType(contentType: string): ContentType {
@@ -759,9 +763,42 @@ export const contentRouter = {
       });
       const publish = postGitHubPublishSchema.safeParse(post?.githubPublish);
       if (!(publish.success && publish.data)) {
-        return { status: null };
+        return { status: null, siteName: null, previewUrl: null };
       }
       const { pullRequestNumber, repositoryId } = publish.data;
+      const site = publish.data.siteId
+        ? await db.query.sites.findFirst({
+            where: and(
+              eq(sites.id, publish.data.siteId),
+              eq(sites.organizationId, input.organizationId)
+            ),
+            columns: { name: true },
+          })
+        : null;
+      const deployment =
+        pullRequestNumber && publish.data.siteId
+          ? await db.query.siteDeployments.findFirst({
+              where: and(
+                eq(siteDeployments.siteId, publish.data.siteId),
+                eq(siteDeployments.pullRequestNumber, pullRequestNumber),
+                eq(siteDeployments.status, "ready")
+              ),
+              orderBy: [desc(siteDeployments.createdAt)],
+              columns: { target: true },
+            })
+          : null;
+      const details = {
+        siteName: site?.name ?? null,
+        previewUrl: deployment
+          ? primaryMountUrl(
+              deployment.target.publicOrigin,
+              deployment.target.mounts
+            )
+          : null,
+      };
+      if (!pullRequestNumber) {
+        return { status: "merged" as const, ...details };
+      }
       // No GitHub App, a revoked token or a deleted repository just falls
       // back to a plain link.
       const state = await githubRepositoryClient(
@@ -779,9 +816,10 @@ export const contentRouter = {
         )
         .catch(() => null);
       if (!state) {
-        return { status: null };
+        return { status: null, ...details };
       }
       return {
+        ...details,
         status: state.status === "open" && state.draft ? "draft" : state.status,
       } as const;
     }),
@@ -1178,7 +1216,35 @@ export const contentRouter = {
       if (!updated) {
         throw notFound("Content not found");
       }
-      return { content: serializeContent(updated) };
+      const linked = postGitHubPublishSchema.safeParse(updated.githubPublish);
+      let githubSyncError: string | null = null;
+      if (
+        linked.success &&
+        (updated.contentType === "blog_post" ||
+          updated.contentType === "changelog")
+      ) {
+        try {
+          await assertContentPublishAllowed(auth.user.id, input.organizationId);
+          await publishSavedContentToGitHub(
+            {
+              organizationId: input.organizationId,
+              contentId: input.contentId,
+              contentType: updated.contentType,
+              repositoryId: linked.data.repositoryId,
+              linkedOnly: true,
+            },
+            { publisherUserId: auth.user.id }
+          );
+        } catch (error) {
+          logError("Metadata saved, but GitHub sync failed", error, {
+            contentId: input.contentId,
+          });
+          githubSyncError = (await getTranslations("content.gitPublishing"))(
+            "savedSyncFailed"
+          );
+        }
+      }
+      return { content: serializeContent(updated), githubSyncError };
     }),
   authors: contentAuthorsRouter,
   tagSuggestions: baseProcedure
@@ -1198,27 +1264,14 @@ export const contentRouter = {
     .handler(async ({ context, input }) => {
       const { auth } = context;
       await assertActiveSubscription(input.organizationId);
-      assertNotDemo();
-
-      if (
-        process.env.UPSTASH_REDIS_REST_URL &&
-        process.env.UPSTASH_REDIS_REST_TOKEN
-      ) {
-        const { success: withinLimit } = await ratelimit.githubPublish.limit(
-          `${auth.user.id}:${input.organizationId}`
-        );
-        if (!withinLimit) {
-          const tErrors = await getTranslations("errors.content");
-          throw tooManyRequests(tErrors("tooManyPublishRequests"));
-        }
-      }
+      await assertContentPublishAllowed(auth.user.id, input.organizationId);
 
       return publishSavedContentToGitHub(input, {
         publisherUserId: auth.user.id,
       });
     }),
   delete: baseProcedure
-    .input(contentInputSchema)
+    .input(deleteContentInputSchema)
     .use(withOrganizationAccess)
     .handler(async ({ context, input }) => {
       const { auth } = context;
@@ -1237,14 +1290,24 @@ export const contentRouter = {
         throw notFound("Content not found");
       }
 
-      await db
-        .delete(posts)
-        .where(
-          and(
-            eq(posts.id, input.contentId),
-            eq(posts.organizationId, input.organizationId)
-          )
-        );
+      await withContentPublicationLock(
+        input.organizationId,
+        input.contentId,
+        async () => {
+          if (input.removeFromRepository) {
+            assertNotDemo();
+            await removePublishedContent(input.organizationId, input.contentId);
+          }
+          await db
+            .delete(posts)
+            .where(
+              and(
+                eq(posts.id, input.contentId),
+                eq(posts.organizationId, input.organizationId)
+              )
+            );
+        }
+      );
 
       trackServerEvent({
         event: POSTHOG_EVENTS.CONTENT_DELETED,
@@ -1402,12 +1465,9 @@ export const contentRouter = {
           throw notFound("Post collection not found");
         }
 
-        const postTypes: string[] = [];
-        for (const post of collection.posts) {
-          if (!postTypes.includes(post.contentType)) {
-            postTypes.push(post.contentType);
-          }
-        }
+        const postTypes = [
+          ...new Set(collection.posts.map((post) => post.contentType)),
+        ];
         return {
           collection: {
             id: collection.id,

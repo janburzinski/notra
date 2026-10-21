@@ -42,6 +42,7 @@ if (!databaseUrl) {
     sites,
     users,
     siteJobs,
+    siteDeployments,
     siteWebhookDeliveries,
   } = await import("@notra/db/schema");
   const { eq, inArray } = await import("drizzle-orm");
@@ -241,6 +242,56 @@ if (!databaseUrl) {
       siteRepositoryAccess(snapshot, { contents: "read" })
     ).rejects.toThrow();
     expect(mint).not.toHaveBeenCalled();
+  });
+
+  test("signed content pull request deliveries target the production branch and enqueue previews", async () => {
+    await db
+      .update(sites)
+      .set({ productionBranch: "release", previewsEnabled: true })
+      .where(eq(sites.id, snapshot.id));
+    const secret = "synthetic-content-preview-secret";
+    for (const base of ["main", "release"]) {
+      const rawBody = JSON.stringify({
+        action: "opened",
+        number: 42,
+        repository: { id: 500 },
+        installation: { id: 100 },
+        pull_request: {
+          head: {
+            sha: "b".repeat(40),
+            ref: "notra/blog-post-synthetic",
+            repo: { id: 500 },
+          },
+          base: { ref: base },
+          title: "Synthetic article",
+          draft: true,
+        },
+      });
+      const deliveryId = crypto.randomUUID();
+      deliveries.push(deliveryId);
+      const result = await handleSitesWebhook({
+        event: "pull_request",
+        deliveryId,
+        rawBody,
+        secret,
+        signature: `sha256=${createHmac("sha256", secret).update(rawBody).digest("hex")}`,
+      });
+      expect(result?.jobIds).toHaveLength(base === "release" ? 1 : 0);
+    }
+    const [job] = await db
+      .select()
+      .from(siteJobs)
+      .where(eq(siteJobs.siteId, snapshot.id));
+    expect(job?.deploymentId).toBeTruthy();
+    const [deployment] = await db
+      .select()
+      .from(siteDeployments)
+      .where(eq(siteDeployments.siteId, snapshot.id));
+    expect(deployment).toMatchObject({
+      branch: "notra/blog-post-synthetic",
+      kind: "preview",
+      pullRequestNumber: 42,
+    });
   });
 
   test("signed push deliveries do not schedule disconnected or disabled sites", async () => {

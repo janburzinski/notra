@@ -67,6 +67,9 @@ export function useContentMetadata(
             ...target,
             metadata: patch,
           });
+          if (result.githubSyncError) {
+            toast.error(result.githubSyncError);
+          }
           const queryKey = dashboardOrpc.content.get.queryKey({
             input: target,
           });
@@ -81,6 +84,12 @@ export function useContentMetadata(
               request !== latestRequest.current || pending.current !== null
             )
           );
+          void queryClient.invalidateQueries({ queryKey });
+          void queryClient.invalidateQueries({
+            queryKey: dashboardOrpc.content.pullRequestState.queryKey({
+              input: target,
+            }),
+          });
         } catch (error) {
           toast.error(toErrorMessage(error, t("saveFailed")));
           void queryClient.invalidateQueries({
@@ -105,16 +114,6 @@ export function useContentMetadata(
       ? write(next.target, next.patch)
       : (queue.current ?? Promise.resolve());
   }, [write]);
-
-  const update = useCallback(
-    (patch: PostMetadataPatch) => {
-      const target = { organizationId, contentId };
-      setMetadataFor(target, (metadata) => applyMetadataPatch(metadata, patch));
-      void flush();
-      void write(target, patch);
-    },
-    [contentId, flush, organizationId, setMetadataFor, write]
-  );
 
   const updateDebounced = useCallback(
     (patch: PostMetadataPatch) => {
@@ -144,7 +143,7 @@ export function useContentMetadata(
 
   return {
     metadata: params.content.metadata,
-    update,
+    update: updateDebounced,
     updateDebounced,
     flushPending: flush,
   };

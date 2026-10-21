@@ -349,7 +349,7 @@ function ContentDetailSaveActions({
   const tCommon = useTranslations("common.actions");
   const updatesLinkedPullRequest = Boolean(content.githubPublish);
   let saveLabel = tCommon("saveChanges");
-  if (updatesLinkedPullRequest) {
+  if (content.githubPublish?.pullRequestNumber) {
     saveLabel = document.isSaving ? t("updatingPr") : t("saveAndUpdatePr");
   } else if (document.isSaving) {
     saveLabel = tCommon("saving");
@@ -428,7 +428,7 @@ function ContentDetailHeaderActions(props: ContentDetailToolbarProps) {
         >
           <HugeiconsIcon aria-hidden="true" icon={FloppyDiskIcon} />
           <span className="@max-4xl/topbar:sr-only">
-            {content.githubPublish
+            {content.githubPublish?.pullRequestNumber
               ? t("saveAndUpdatePr")
               : tActions("saveChanges")}
           </span>

@@ -904,6 +904,13 @@
       "when": 1792600609279,
       "tag": "0128_sites_branch_workflow",
       "breakpoints": true
+    },
+    {
+      "idx": 129,
+      "version": "7",
+      "when": 1792600878219,
+      "tag": "0129_content_git_publishing",
+      "breakpoints": true
     }
   ]
 }

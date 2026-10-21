@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 import { SCHEDULED_PUBLICATION_ERROR_CODES } from "@notra/ai/constants/scheduled-publications";
 import { getGitHubPublishToken } from "@notra/ai/integrations/github-publish-auth";
 import type {
@@ -13,7 +11,7 @@ import {
   recordScheduledPullRequest,
 } from "@notra/ai/utils/scheduled-publications";
 import { db } from "@notra/db/drizzle";
-import { githubIntegrations, posts } from "@notra/db/schema";
+import { githubIntegrations, posts, repositoryOutputs } from "@notra/db/schema";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { postGitHubPublishSchema } from "@notra/schemas/dashboard/content";
 import { ORPCError } from "@orpc/server";
@@ -39,6 +37,10 @@ import {
   classifyGitHubPublishFailure,
   hasGitHubStatus,
 } from "@/utils/github-publish-failure";
+import {
+  postContentHash,
+  matchesPostContentHash,
+} from "@/utils/scheduled-post-content-hash";
 import { getSocialVideoUrls } from "@/utils/social-video";
 
 const GITHUB_MERGE_NEEDS_PERSON_REGEX = /is failing|not up to date/i;
@@ -57,16 +59,6 @@ function errorMessage(error: unknown, fallback: string) {
 }
 
 const SCHEDULED_SOCIAL_RESULT_POLL_ATTEMPTS = 15;
-
-function postContentHash(post: {
-  slug: string | null;
-  title: string;
-  markdown: string | null;
-}) {
-  return createHash("sha256")
-    .update(JSON.stringify([post.slug, post.title, post.markdown]))
-    .digest("hex");
-}
 
 function publicErrorMessage(error: unknown, fallback: string) {
   return error instanceof ORPCError && error.message ? error.message : fallback;
@@ -248,7 +240,13 @@ async function findMergedLinkedPullRequest(
   post: ScheduledPublicationPost
 ) {
   const linked = postGitHubPublishSchema.safeParse(post.githubPublish);
-  if (!(linked.success && linked.data.repositoryId === repositoryId)) {
+  if (
+    !(
+      linked.success &&
+      linked.data.pullRequestNumber &&
+      linked.data.repositoryId === repositoryId
+    )
+  ) {
     return null;
   }
   const state = await getContentPullRequestState(client.octokit, {
@@ -291,7 +289,7 @@ async function publishToGitHub(
   const previous = attempt.result;
   const pushedIsStale =
     previous?.contentHash !== undefined &&
-    previous.contentHash !== postContentHash(post);
+    !matchesPostContentHash(previous.contentHash, post);
   if (!pushedIsStale) {
     const merged = config.merge
       ? await findMergedLinkedPullRequest(
@@ -306,8 +304,8 @@ async function publishToGitHub(
         kind: "published",
         result: {
           merged: true,
-          pullRequestNumber: merged.pullRequestNumber,
-          pullRequestUrl: merged.pullRequestUrl,
+          pullRequestNumber: merged.pullRequestNumber ?? undefined,
+          pullRequestUrl: merged.pullRequestUrl ?? undefined,
         },
       };
     }
@@ -340,6 +338,16 @@ async function publishToGitHub(
       isRetryablePublishError(error)
     );
   }
+  if (!published.pullRequestNumber || !published.pullRequestUrl) {
+    return {
+      kind: "published",
+      result: {
+        merged: true,
+        headSha: published.headSha,
+        contentHash: postContentHash(post),
+      },
+    };
+  }
   return completePullRequest(client, config.merge, {
     pullRequestNumber: published.pullRequestNumber,
     pullRequestUrl: published.pullRequestUrl,
@@ -366,6 +374,14 @@ export async function openScheduledPullRequestAhead(params: {
         markdown: true,
         slug: true,
         title: true,
+        coverImage: true,
+        tags: true,
+        excerpt: true,
+        authorIds: true,
+        featured: true,
+        hidden: true,
+        noindex: true,
+        displayDate: true,
       },
       where: and(
         eq(posts.id, params.postId),
@@ -379,14 +395,39 @@ export async function openScheduledPullRequestAhead(params: {
     ) {
       return;
     }
+    const output = await db.query.repositoryOutputs.findFirst({
+      where: and(
+        eq(repositoryOutputs.repositoryId, params.repositoryId),
+        eq(repositoryOutputs.outputType, post.contentType)
+      ),
+      columns: { reviewProcess: true },
+    });
+    if (output?.reviewProcess === "direct") {
+      return;
+    }
     const published = await publishSavedContentToGitHub({
       organizationId: params.organizationId,
       contentId: params.postId,
       contentType: post.contentType,
       repositoryId: params.repositoryId,
     });
+    if (!published.pullRequestNumber || !published.pullRequestUrl) {
+      return;
+    }
     const after = await db.query.posts.findFirst({
-      columns: { markdown: true, slug: true, title: true },
+      columns: {
+        markdown: true,
+        slug: true,
+        title: true,
+        coverImage: true,
+        tags: true,
+        excerpt: true,
+        authorIds: true,
+        featured: true,
+        hidden: true,
+        noindex: true,
+        displayDate: true,
+      },
       where: and(
         eq(posts.id, params.postId),
         eq(posts.organizationId, params.organizationId)
@@ -516,6 +557,14 @@ export async function publishScheduledDestination(
       markdown: true,
       githubPublish: true,
       sourceMetadata: true,
+      coverImage: true,
+      tags: true,
+      excerpt: true,
+      authorIds: true,
+      featured: true,
+      hidden: true,
+      noindex: true,
+      displayDate: true,
     },
     where: and(
       eq(posts.id, attempt.postId),

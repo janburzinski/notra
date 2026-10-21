@@ -15,8 +15,11 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { ContentCollaboration } from "@/components/content/content-collaboration";
-import { ContentPullRequestButton } from "@/components/content/content-pull-request-button";
+import { ContentDeleteDialog } from "@/components/content/content-delete-dialog";
+import { ContentGitStatus } from "@/components/content/content-git-status";
 import { PublishContentToGitHubDialog } from "@/components/content/publish-content-to-github-dialog";
+import { usePostActions } from "@/lib/hooks/use-post-actions";
+import { useRouter } from "@/lib/navigation";
 import type { ContentDetailToolbarProps } from "@/types/components/content-detail-toolbar";
 
 export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
@@ -27,6 +30,9 @@ export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
   const tCollaboration = useTranslations("content.collaboration");
   const tHeader = useTranslations("content.header");
   const tGitHub = useTranslations("content.githubPublish");
+  const router = useRouter();
+  const { deletePost, isDeleting } = usePostActions(organizationId);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [githubOpen, setGithubOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
@@ -51,25 +57,27 @@ export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
         >
           {tCollaboration("history")}
         </Button>
-        {githubPublish ? (
-          <ContentPullRequestButton
-            contentId={contentId}
-            githubPublish={githubPublish}
-            organizationId={organizationId}
-          />
-        ) : (
-          <Button
-            className="min-w-0"
-            disabled={blocked || !document.currentMarkdown.trim()}
-            onClick={() => setGithubOpen(true)}
-            size="sm"
-            variant="outline"
-          >
-            <Github aria-hidden="true" />
-            <span className="min-w-0 truncate">{tGitHub("trigger")}</span>
-          </Button>
-        )}
+
+        <Button
+          className="min-w-0"
+          disabled={blocked || !document.currentMarkdown.trim()}
+          onClick={() => setGithubOpen(true)}
+          size="sm"
+          variant="outline"
+        >
+          <Github aria-hidden="true" />
+          <span className="min-w-0 truncate">
+            {githubPublish ? tActions("update") : tGitHub("trigger")}
+          </span>
+        </Button>
       </div>
+      {githubPublish ? (
+        <ContentGitStatus
+          contentId={contentId}
+          organizationId={organizationId}
+          githubPublish={githubPublish}
+        />
+      ) : null}
       {document.hasDocumentChanges && !document.hasSaveConflict ? (
         <Button
           className="w-full justify-start"
@@ -81,19 +89,40 @@ export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
           {t("discardChanges")}
         </Button>
       ) : null}
+      <Button
+        variant="ghost"
+        size="sm"
+        disabled={blocked}
+        onClick={() => setDeleteOpen(true)}
+      >
+        {tActions("delete")}
+      </Button>
+      <ContentDeleteDialog
+        contentId={contentId}
+        organizationId={organizationId}
+        title={content.title}
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        pending={isDeleting}
+        onConfirm={async (remove) => {
+          if (await deletePost(contentId, remove)) {
+            router.push(`/${organizationSlug}/content`);
+          }
+        }}
+      />
       <ContentCollaboration
         {...props}
         open={historyOpen}
         onOpenChange={setHistoryOpen}
       />
-      {!githubPublish &&
-      (content.contentType === "blog_post" ||
-        content.contentType === "changelog") ? (
+      {content.contentType === "blog_post" ||
+      content.contentType === "changelog" ? (
         <PublishContentToGitHubDialog
           contentId={contentId}
           contentType={content.contentType}
-          githubPublish={null}
-          onSave={document.handleSave}
+          githubPublish={githubPublish}
+          onSave={() => document.handleSave({ syncGitHub: false })}
+          onPublished={document.resolveSaveConflictLoadLatest}
           open={githubOpen}
           onOpenChange={setGithubOpen}
           organizationId={organizationId}

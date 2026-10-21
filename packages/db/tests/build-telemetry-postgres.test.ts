@@ -13,7 +13,7 @@ if (!databaseUrl) {
   test("build telemetry persists independently of artifacts and cascades on PostgreSQL", () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(["55447", "5432"]).toContain(url.port);
+    expect(["55447", "55439", "5432"]).toContain(url.port);
     expect([
       "/notra_server_audit",
       "/notra_sites_branches_fix_20261019",
@@ -32,7 +32,7 @@ if (!databaseUrl) {
   test("upsert, artifact cleanup, missing row and deployment/site/organization cascades", async () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(["55447", "5432"]).toContain(url.port);
+    expect(["55447", "55439", "5432"]).toContain(url.port);
     expect([
       "/notra_server_audit",
       "/notra_sites_branches_fix_20261019",

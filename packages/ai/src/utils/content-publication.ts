@@ -45,8 +45,8 @@ function toPublication(
     repo: string;
     path: string;
     branch: string;
-    pullRequestNumber: number;
-    pullRequestUrl: string;
+    pullRequestNumber: number | null;
+    pullRequestUrl: string | null;
     headSha: string | null;
     status: ContentPublication["status"];
   },
@@ -56,8 +56,13 @@ function toPublication(
     markdown: string | null;
   } | null
 ): ContentPublication {
+  if (row.pullRequestNumber === null || row.pullRequestUrl === null) {
+    throw new Error("An open content publication must have a pull request");
+  }
   return {
     ...row,
+    pullRequestNumber: row.pullRequestNumber,
+    pullRequestUrl: row.pullRequestUrl,
     contentType:
       (post?.contentType as ContentPublication["contentType"]) ?? null,
     title: post?.title ?? null,
@@ -109,7 +114,8 @@ export async function recordContentPublication(
         gt(contentPublications.createdAt, new Date(publishedAt)),
         or(
           ne(contentPublications.repositoryId, params.repositoryId),
-          ne(contentPublications.pullRequestNumber, params.pullRequestNumber)
+          // Direct publications have no PR number, and NULL <> n is never true.
+          sql`${contentPublications.pullRequestNumber} is distinct from ${params.pullRequestNumber}`
         )
       ),
       columns: { id: true },

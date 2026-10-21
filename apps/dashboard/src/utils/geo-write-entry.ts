@@ -2,6 +2,7 @@ import { GEO_WRITER_TRIGGER_ID } from "@notra/geo-core/constants/geo";
 import { sourceMetadataSchema } from "@notra/schemas/dashboard/content";
 
 import type {
+  ContentArticleLoadingInput,
   GeoGapsWriteEntry,
   WriteDialogInitialState,
 } from "@/types/components/geo-writer";
@@ -78,5 +79,28 @@ export function getGeoWriterDocumentState(
       hasDraft &&
       (isPostStillPlan || (!isBriefMissing && briefStatus !== "completed")),
     isPlanReviewable,
+  };
+}
+
+export function getContentArticleLoadingState(
+  input: ContentArticleLoadingInput
+) {
+  const completedArticleStale =
+    input.briefStatus === "completed" &&
+    input.isPostStillPlan &&
+    input.loadedArticleBriefId !== input.briefId;
+  return {
+    shouldLoadArticle: Boolean(
+      input.briefId &&
+      input.briefStatus &&
+      (input.briefStatus !== "completed" || completedArticleStale) &&
+      input.pendingArticleBriefId !== input.briefId
+    ),
+    isGeoArticleLoading: Boolean(
+      input.hasDraft &&
+      input.briefStatus === "completed" &&
+      input.pendingArticleBriefId === input.briefId &&
+      input.loadedArticleBriefId !== input.briefId
+    ),
   };
 }

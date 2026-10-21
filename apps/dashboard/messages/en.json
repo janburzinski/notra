@@ -1183,7 +1183,9 @@
       "concurrentEdit": "This document changed in another editor. Your draft is preserved; load the latest version or explicitly save your draft.",
       "historyNotFound": "The document or version could not be found.",
       "historyNotSupported": "Version history is available for articles and changelogs.",
-      "historyUnavailable": "This version cannot be restored because its editable content or metadata is unavailable."
+      "historyUnavailable": "This version cannot be restored because its editable content or metadata is unavailable.",
+      "choosePublishingSite": "Choose a site for this repository before publishing.",
+      "publishingSiteUnavailable": "The selected site is not connected to this repository and project."
     },
     "notifications": {
       "ownerOnly": "Only the organization owner can update notification settings"
@@ -7063,6 +7065,32 @@
       "replyFailed": "Could not send the reply. Your draft is preserved.",
       "peekReplies": "{count, plural, one {# reply} other {# replies}}",
       "peekOpen": "Open comment thread"
+    },
+    "gitPublishing": {
+      "reviewProcess": "Review process",
+      "pullRequest": "Open a pull request",
+      "direct": "Publish directly",
+      "site": "Site",
+      "chooseSite": "Choose a site",
+      "opensPullRequest": "Opens a pull request",
+      "publishesDirectly": "Publishes directly to {branch}",
+      "publishedDirectly": "Published to {branch}",
+      "protectedFallback": "{branch} is protected. Opened a pull request instead.",
+      "draftFallback": "Sites has a pending draft for this file. Opened a pull request instead.",
+      "live": "Live on {target}",
+      "update": "Update",
+      "preview": "Preview",
+      "removeTitle": "Also remove it from {target}?",
+      "removeDescription": "Remove the entry and images published by Notra through the repository review process.",
+      "keepFiles": "Keep files",
+      "removeFiles": "Remove files",
+      "publish": "Publish",
+      "publishing": "Publishing…",
+      "directHint": "Commit to the target branch. Scheduled posts commit at their scheduled time, including schedules without a merge step.",
+      "pullRequestHint": "Review changes in a pull request before publishing.",
+      "pullRequestDescription": "Notra adds your content as Markdown and opens a draft pull request against {branch}.",
+      "changedFallback": "The published file changed on GitHub. Opened a pull request instead.",
+      "savedSyncFailed": "Saved in Notra, but GitHub sync failed. Check the linked publication before retrying."
     }
   },
   "charts": {

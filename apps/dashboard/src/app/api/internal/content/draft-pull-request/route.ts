@@ -58,12 +58,16 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const result = await publishSavedContentToGitHub({
-      organizationId,
-      contentId: postId,
-      contentType: post.contentType,
-      repositoryId: integrationId,
-    });
+    // Agent output always goes through review, even on direct-publish repositories.
+    const result = await publishSavedContentToGitHub(
+      {
+        organizationId,
+        contentId: postId,
+        contentType: post.contentType,
+        repositoryId: integrationId,
+      },
+      { requirePullRequest: true }
+    );
     return Response.json(createContentPullRequestResultSchema.parse(result));
   } catch (error) {
     if (error instanceof ORPCError && error.status < 500) {

@@ -8,6 +8,8 @@ import { sites, users } from "@notra/db/schema";
 import { and, asc, eq, or, sql } from "drizzle-orm";
 
 import { SITE_ENTRY_DIRECTORIES } from "@/constants/site-github-publish";
+import { getTranslations } from "@/lib/i18n/server";
+import { badRequest } from "@/lib/orpc/utils/errors";
 import type {
   SiteGitHubPublishTarget,
   FindSiteGitHubPublishTargetParams,
@@ -24,13 +26,14 @@ import {
   resolveSiteConfigPath,
 } from "@/utils/site-github-publish";
 
-export async function findSiteGitHubPublishTarget(
+export async function listSiteGitHubPublishTargets(
   params: FindSiteGitHubPublishTargetParams
-): Promise<SiteGitHubPublishTarget | null> {
+) {
   const { repository } = params;
-  const candidates = await db
+  return await db
     .select({
       id: sites.id,
+      name: sites.name,
       rootDirectory: sites.rootDirectory,
       productionBranch: sites.productionBranch,
       mounts: sites.mounts,
@@ -39,6 +42,9 @@ export async function findSiteGitHubPublishTarget(
     .where(
       and(
         eq(sites.organizationId, params.organizationId),
+        params.projectId && !params.existingPublication
+          ? eq(sites.projectId, params.projectId)
+          : undefined,
         or(
           eq(sites.repositoryId, repository.id),
           repository.githubRepositoryId
@@ -52,21 +58,61 @@ export async function findSiteGitHubPublishTarget(
       )
     )
     .orderBy(asc(sites.createdAt));
+}
+
+export async function findSiteGitHubPublishTarget(
+  params: FindSiteGitHubPublishTargetParams
+): Promise<SiteGitHubPublishTarget | null> {
+  const candidates = await listSiteGitHubPublishTargets(params);
+  const previous = params.existingPublication;
+  const previousSite = candidates.find((site) => site.id === previous?.siteId);
+  const stale = Boolean(previous?.siteId && !previousSite);
+  const matchingTarget = previous?.baseBranch
+    ? candidates
+        .filter((site) => {
+          const root = normalizeSiteRootDirectory(site.rootDirectory);
+          return (
+            site.productionBranch === previous.baseBranch &&
+            (!root || previous.path.startsWith(`${root}/`))
+          );
+        })
+        .sort((a, b) => b.rootDirectory.length - a.rootDirectory.length)
+    : [];
+  const recovered =
+    matchingTarget.length === 1 ||
+    (matchingTarget[0] &&
+      matchingTarget[0].rootDirectory.length >
+        (matchingTarget[1]?.rootDirectory.length ?? -1))
+      ? matchingTarget[0]
+      : undefined;
+  const selected =
+    previousSite ??
+    (stale ? undefined : recovered) ??
+    candidates.find((site) => site.id === params.siteId);
+  // A deleted/moved site ID cannot poison every subsequent save. Ask for a
+  // new explicit destination, rather than silently choosing another site.
+  if (
+    (stale && !selected) ||
+    (params.siteId && !selected) ||
+    (candidates.length > 1 && !selected)
+  ) {
+    throw badRequest(
+      (await getTranslations("errors.content"))("choosePublishingSite")
+    );
+  }
   if (candidates.length === 0) {
     return null;
   }
 
   const section = SITE_ENTRY_DIRECTORIES[params.contentType];
-  const site =
-    candidates.find((candidate) => Boolean(candidate.mounts[section])) ??
-    candidates[0];
+  const site = selected ?? candidates[0];
   if (!site) {
     return null;
   }
   return {
     siteId: site.id,
     rootDirectory: normalizeSiteRootDirectory(site.rootDirectory),
-    productionBranch: site.productionBranch,
+    productionBranch: previous?.baseBranch ?? site.productionBranch,
     sectionMounted: Boolean(site.mounts[section]),
   };
 }

@@ -1183,7 +1183,9 @@
       "concurrentEdit": "Dieses Dokument wurde in einem anderen Editor geändert. Dein Entwurf bleibt erhalten; lade die aktuelle Version oder speichere deinen Entwurf ausdrücklich.",
       "historyNotFound": "Das Dokument oder die Version wurde nicht gefunden.",
       "historyNotSupported": "Der Versionsverlauf ist für Artikel und Changelogs verfügbar.",
-      "historyUnavailable": "Diese Version kann nicht wiederhergestellt werden, weil ihr bearbeitbarer Inhalt oder ihre Metadaten nicht verfügbar sind."
+      "historyUnavailable": "Diese Version kann nicht wiederhergestellt werden, weil ihr bearbeitbarer Inhalt oder ihre Metadaten nicht verfügbar sind.",
+      "choosePublishingSite": "Wähle vor der Veröffentlichung eine Website für dieses Repository aus.",
+      "publishingSiteUnavailable": "Die ausgewählte Website ist nicht mit diesem Repository und Projekt verbunden."
     },
     "notifications": {
       "ownerOnly": "Nur der Organisationsinhaber kann die Benachrichtigungseinstellungen ändern"
@@ -7063,6 +7065,32 @@
       "replyFailed": "Die Antwort konnte nicht gesendet werden. Dein Entwurf bleibt erhalten.",
       "peekReplies": "{count, plural, one {# Antwort} other {# Antworten}}",
       "peekOpen": "Kommentar-Thread öffnen"
+    },
+    "gitPublishing": {
+      "reviewProcess": "Review-Prozess",
+      "pullRequest": "Pull Request öffnen",
+      "direct": "Direkt veröffentlichen",
+      "site": "Website",
+      "chooseSite": "Website auswählen",
+      "opensPullRequest": "Öffnet einen Pull Request",
+      "publishesDirectly": "Veröffentlicht direkt auf {branch}",
+      "publishedDirectly": "Auf {branch} veröffentlicht",
+      "protectedFallback": "{branch} ist geschützt. Stattdessen wurde ein Pull Request geöffnet.",
+      "draftFallback": "Sites hat einen ausstehenden Entwurf für diese Datei. Stattdessen wurde ein Pull Request geöffnet.",
+      "live": "Live auf {target}",
+      "update": "Aktualisieren",
+      "preview": "Vorschau",
+      "removeTitle": "Auch aus {target} entfernen?",
+      "removeDescription": "Entfernt den von Notra veröffentlichten Beitrag und seine Bilder über den Review-Prozess des Repositorys.",
+      "keepFiles": "Dateien behalten",
+      "removeFiles": "Dateien entfernen",
+      "publish": "Veröffentlichen",
+      "publishing": "Wird veröffentlicht…",
+      "directHint": "Direkt in den Zielbranch committen. Geplante Beiträge werden zum geplanten Zeitpunkt committet, auch ohne Merge-Schritt.",
+      "pullRequestHint": "Änderungen vor der Veröffentlichung in einem Pull Request prüfen.",
+      "pullRequestDescription": "Notra fügt den Inhalt als Markdown hinzu und öffnet einen Pull-Request-Entwurf für {branch}.",
+      "changedFallback": "Die veröffentlichte Datei wurde auf GitHub geändert. Stattdessen wurde ein Pull Request geöffnet.",
+      "savedSyncFailed": "In Notra gespeichert, aber die GitHub-Synchronisierung ist fehlgeschlagen. Prüfe die verknüpfte Veröffentlichung vor einem erneuten Versuch."
     }
   },
   "charts": {

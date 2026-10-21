@@ -1,10 +1,16 @@
 import { createHash } from "node:crypto";
 import { createServer } from "node:http";
 
-import type { FakeGitHubState, FakePullRequest } from "../types/fake-github";
+import type {
+  FakeGitHubCommitMetadata,
+  FakeGitHubState,
+  FakePullRequest,
+} from "../types/fake-github";
 
-export async function startFakeGitHub(port = 0) {
+export async function startFakeGitHub(port = 0, repositoryName = "blog") {
+  const commitMetadata = new Map<string, FakeGitHubCommitMetadata>();
   const state: FakeGitHubState = {
+    comments: [],
     commitDelayMs: 0,
     commitMetadataError: false,
     beforeCommitMetadata: async () => {},
@@ -47,13 +53,20 @@ export async function startFakeGitHub(port = 0) {
   };
   const json = (body: unknown, status = 200) => Response.json(body, { status });
   const blob = (content: string) =>
-    createHash("sha1").update(content).digest("hex");
+    createHash("sha1")
+      .update(`blob ${Buffer.byteLength(content)}\0`)
+      .update(content)
+      .digest("hex");
   const push = (branch: string, path: string, content: string) => {
     const previous = state.branches.get(branch);
     const files = new Map(state.commits.get(previous ?? ""));
     files.set(path, content);
     const sha = `commit-${++state.commitCount}`;
     state.commits.set(sha, files);
+    commitMetadata.set(sha, {
+      message: "Synthetic commit\nDetails",
+      parentSha: previous ?? "initial",
+    });
     state.branches.set(branch, sha);
     return sha;
   };
@@ -115,6 +128,7 @@ export async function startFakeGitHub(port = 0) {
                   isDraft: pr.draft,
                   state: pr.merged_at ? "MERGED" : pr.state.toUpperCase(),
                   merged: Boolean(pr.merged_at),
+                  base: { ...pr.base, repo: { id: 500 } },
                   mergeable: pr.mergeable,
                   mergeStateStatus: pr.mergeStateStatus,
                   reviewDecision: pr.reviewDecision,
@@ -124,8 +138,13 @@ export async function startFakeGitHub(port = 0) {
           },
         });
       }
-      if (query.includes("SiteRequestReview")) {
-        const pr = state.prs.find((entry) => entry.id === variables.id);
+      if (
+        query.includes("SiteRequestReview") ||
+        query.includes("MarkReadyForReview")
+      ) {
+        const pr = state.prs.find(
+          (entry) => entry.id === (variables.id ?? variables.pullRequestId)
+        );
         if (!pr) {
           return json({ errors: [{ message: "Missing pull request" }] });
         }
@@ -158,14 +177,18 @@ export async function startFakeGitHub(port = 0) {
           });
         }
         const files = new Map(state.commits.get(input.expectedHeadOid));
-        for (const file of input.fileChanges.additions) {
+        for (const file of input.fileChanges.additions ?? []) {
           files.set(file.path, Buffer.from(file.contents, "base64").toString());
         }
-        for (const file of input.fileChanges.deletions) {
+        for (const file of input.fileChanges.deletions ?? []) {
           files.delete(file.path);
         }
         const sha = `commit-${++state.commitCount}`;
         state.commits.set(sha, files);
+        commitMetadata.set(sha, {
+          message: `${input.message.headline}\n${input.message.body ?? ""}`,
+          parentSha: input.expectedHeadOid,
+        });
         state.branches.set(branch, sha);
         return json({
           data: { createCommitOnBranch: { commit: { oid: sha } } },
@@ -173,14 +196,45 @@ export async function startFakeGitHub(port = 0) {
       }
       return json({ errors: [{ message: "Unexpected GraphQL query" }] });
     }
-    const repo = "/repos/synthetic/blog";
+    const repo = `/repos/synthetic/${repositoryName}`;
     if (path === repo) {
       return json({
-        full_name: "synthetic/blog",
+        full_name: `synthetic/${repositoryName}`,
         default_branch: "main",
         allow_squash_merge: true,
         allow_merge_commit: true,
         allow_rebase_merge: true,
+      });
+    }
+    if (path === "/user") {
+      return json({ login: "notra[bot]" });
+    }
+    if (path.startsWith(`${repo}/git/ref/heads/`)) {
+      const branch = path.slice(`${repo}/git/ref/heads/`.length);
+      const sha = state.branches.get(branch);
+      return sha
+        ? json({ ref: `refs/heads/${branch}`, object: { sha } })
+        : json({ message: "Not found" }, 404);
+    }
+    if (path.startsWith(`${repo}/compare/`)) {
+      const [base, head] = path.slice(`${repo}/compare/`.length).split("...");
+      const baseSha = state.branches.get(base ?? "") ?? base ?? "";
+      const headSha = state.branches.get(head ?? "") ?? head ?? "";
+      const before = state.commits.get(baseSha) ?? new Map<string, string>();
+      const after = state.commits.get(headSha) ?? new Map<string, string>();
+      const paths = new Set([...before.keys(), ...after.keys()]);
+      return json({
+        ahead_by: baseSha === headSha ? 0 : 1,
+        files: [...paths]
+          .filter((path) => before.get(path) !== after.get(path))
+          .map((filename) => ({
+            filename,
+            status: !before.has(filename)
+              ? "added"
+              : !after.has(filename)
+                ? "removed"
+                : "modified",
+          })),
       });
     }
     if (path === `${repo}/branches`) {
@@ -304,6 +358,30 @@ export async function startFakeGitHub(port = 0) {
             sha: blob(content),
           });
     }
+    if (path === `${repo}/commits`) {
+      const commits = [];
+      let sha = url.searchParams.get("sha") ?? "main";
+      sha = state.branches.get(sha) ?? sha;
+      const contentPath = url.searchParams.get("path");
+      while (commitMetadata.has(sha)) {
+        const metadata = commitMetadata.get(sha)!;
+        if (
+          !contentPath ||
+          state.commits.get(sha)?.get(contentPath) !==
+            state.commits.get(metadata.parentSha)?.get(contentPath)
+        ) {
+          commits.push({
+            sha,
+            commit: { message: metadata.message },
+            parents: [{ sha: metadata.parentSha }],
+          });
+        }
+        sha = metadata.parentSha;
+      }
+      const page = Number(url.searchParams.get("page") ?? 1);
+      const perPage = Number(url.searchParams.get("per_page") ?? 30);
+      return json(commits.slice((page - 1) * perPage, page * perPage));
+    }
     if (path.startsWith(`${repo}/commits/`)) {
       const sha = path.slice(`${repo}/commits/`.length);
       await state.beforeCommitMetadata(sha);
@@ -313,9 +391,13 @@ export async function startFakeGitHub(port = 0) {
       return state.commits.has(sha)
         ? json({
             sha,
+            author: { login: "notra[bot]" },
+            parents: [{ sha: commitMetadata.get(sha)?.parentSha ?? "initial" }],
             commit: {
-              message: "Synthetic commit\nDetails",
+              message:
+                commitMetadata.get(sha)?.message ?? "Synthetic commit\nDetails",
               author: { name: "Synthetic author" },
+              verification: { verified: true },
             },
           })
         : json({ message: "Not found" }, 404);
@@ -351,7 +433,7 @@ export async function startFakeGitHub(port = 0) {
           id: `PR_${number}`,
           node_id: `PR_${number}`,
           number,
-          html_url: new URL(`/pull/${number}`, url.origin).href,
+          html_url: `https://github.com/synthetic/${repositoryName}/pull/${number}`,
           url: new URL(`/pull/${number}`, url.origin).href,
           title: body.title,
           state: "open",
@@ -360,7 +442,7 @@ export async function startFakeGitHub(port = 0) {
           head: {
             ref: body.head,
             sha: state.branches.get(body.head) ?? "",
-            repo: { full_name: "synthetic/blog" },
+            repo: { full_name: `synthetic/${repositoryName}` },
           },
           base: { ref: body.base },
           mergeable: "MERGEABLE",
@@ -389,6 +471,43 @@ export async function startFakeGitHub(port = 0) {
               .slice(0, Number(url.searchParams.get("per_page") ?? 30))
       );
     }
+    const issueComments = new RegExp(`^${repo}/issues/(\\d+)/comments$`).exec(
+      path
+    );
+    if (issueComments) {
+      const issueNumber = Number(issueComments[1]);
+      if (request.method === "GET") {
+        return json(
+          state.comments.filter(
+            (comment) => comment.issueNumber === issueNumber
+          )
+        );
+      }
+      const comment = {
+        id: state.comments.length + 1,
+        issueNumber,
+        body: body.body,
+        user: { type: "Bot" },
+        performed_via_github_app: {
+          id: Number(process.env.GITHUB_APP_ID) || 999000,
+        },
+      };
+      state.comments.push(comment);
+      return json(comment, 201);
+    }
+    const commentUpdate = new RegExp(`^${repo}/issues/comments/(\\d+)$`).exec(
+      path
+    );
+    if (commentUpdate) {
+      const comment = state.comments.find(
+        (entry) => entry.id === Number(commentUpdate[1])
+      );
+      if (!comment) {
+        return json({ message: "Not found" }, 404);
+      }
+      comment.body = body.body;
+      return json(comment);
+    }
     if (path.startsWith(`${repo}/pulls/`)) {
       const number = Number(path.slice(`${repo}/pulls/`.length).split("/")[0]);
       const pr = state.prs.find((entry) => entry.number === number);
@@ -410,9 +529,23 @@ export async function startFakeGitHub(port = 0) {
         return json({ merged: true, sha });
       }
       if (request.method === "PATCH") {
-        pr.state = body.state;
+        if (body.state) {
+          pr.state = body.state;
+        }
+        if (body.body !== undefined) {
+          pr.body = body.body;
+        }
       }
-      return json(pr);
+      return json({
+        ...pr,
+        merged: Boolean(pr.merged_at),
+        base: { ...pr.base, repo: { id: 500 } },
+        head: {
+          ...pr.head,
+          repo: { ...pr.head.repo, id: 500 },
+          sha: state.branches.get(pr.head.ref) ?? pr.head.sha,
+        },
+      });
     }
     return json(
       { message: `Unexpected fake route ${request.method} ${path}` },

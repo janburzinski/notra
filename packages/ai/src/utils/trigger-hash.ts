@@ -8,7 +8,9 @@ import type {
   TriggerHashInput,
 } from "../types/trigger-hash";
 
-export function scheduleDedupeHashes(input: ScheduleHashInput) {
+export function scheduleDedupeHashes(
+  input: ScheduleHashInput
+): [string, ...string[]] {
   const canonical = hashTrigger({
     sourceType: input.sourceType,
     sourceConfig: input.sourceConfig,

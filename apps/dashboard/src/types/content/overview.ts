@@ -151,7 +151,3 @@ export interface PendingMetadataPatch {
   target: ContentMetadataTarget;
   patch: PostMetadataPatch;
 }
-
-export interface UpdatePullRequestHintProps extends ContentOverviewProps {
-  flushPending: () => Promise<void>;
-}

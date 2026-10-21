@@ -24,6 +24,7 @@ import {
 } from "@notra/ui/components/ui/select";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { TooltipProvider } from "@notra/ui/components/ui/tooltip";
+import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
 import { useFormatter, useTranslations } from "use-intl";
@@ -404,6 +405,33 @@ function PreviewActions({ model, document }: PostSitePreviewActionsProps) {
 export function ContentSitePreviewPanel(props: ContentSitePreviewProps) {
   const t = useTranslations("content.sitePreview");
   const model = usePostSitePreview(props);
+  const git = useTranslations("content.gitPublishing");
+  const publication = useQuery(
+    dashboardOrpc.content.pullRequestState.queryOptions({
+      input: {
+        organizationId: props.organizationId,
+        contentId: props.contentId,
+      },
+    })
+  );
+  if (publication.data?.previewUrl) {
+    return (
+      <div className="p-4">
+        <Button
+          nativeButton={false}
+          render={
+            <a
+              href={publication.data.previewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {git("preview")}
+            </a>
+          }
+        />
+      </div>
+    );
+  }
   if (!(model.loading || model.site)) {
     return (
       <div className="p-4">
