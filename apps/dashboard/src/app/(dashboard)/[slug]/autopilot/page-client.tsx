@@ -16,6 +16,7 @@ import {
 } from "@notra/ui/components/ui/icon-tabs";
 import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import {
+  parseAsBoolean,
   parseAsString,
   parseAsStringLiteral,
   useQueryState,
@@ -54,6 +55,14 @@ import type {
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
 import { isListedFinding } from "@/utils/autopilot-findings";
 
+import {
+  AutopilotCreateButton,
+  AutopilotTemplateEditorView,
+  AutopilotTemplatesPage,
+  AutopilotTemplatesSection,
+  useTemplateEditorOpen,
+} from "./_variants";
+
 export default function PageClient({
   organizationSlug,
 }: AutopilotPageClientProps) {
@@ -85,6 +94,11 @@ function AutopilotOverviewPage({
       .withDefault("automations")
       .withOptions({ clearOnDefault: true })
   );
+  const [templatesView, setTemplatesView] = useQueryState(
+    "templates",
+    parseAsBoolean
+  );
+  const templateEditorOpen = useTemplateEditorOpen();
   const [days, setDays] = useState<AutopilotMetricsDays>(30);
   const [pending, setPending] = useState<AutopilotPendingFindingAction | null>(
     null
@@ -145,19 +159,51 @@ function AutopilotOverviewPage({
     );
   }
 
+  const templateActions = {
+    jobs: settings.jobs,
+    onAddBuiltIn: (kind: (typeof AUTOPILOT_AUTOMATION_KINDS)[number]) =>
+      setJob.mutate({ kind, enabled: true }),
+    onOpenBuiltIn: (kind: (typeof AUTOPILOT_AUTOMATION_KINDS)[number]) =>
+      router.push(`${basePath}/${AUTOPILOT_AUTOMATION_SLUGS[kind]}`),
+  };
+
+  if (
+    process.env.NODE_ENV === "development" &&
+    canManage &&
+    templateEditorOpen
+  ) {
+    return <AutopilotTemplateEditorView />;
+  }
+
+  if (process.env.NODE_ENV === "development" && canManage && templatesView) {
+    return (
+      <AutopilotTemplatesPage
+        {...templateActions}
+        onBack={() => {
+          void setTemplatesView(null);
+        }}
+      />
+    );
+  }
+
   return (
     <>
       <PageHeading title="Autopilot">
         {canManage ? (
-          <Button
-            disabled={isRunning}
-            loading={runNow.isPending || isRunning}
-            onClick={() => runNow.mutate()}
-            size="sm"
-          >
-            <HugeiconsIcon icon={PlayIcon} size={16} />
-            Run now
-          </Button>
+          <div className="flex items-center gap-2">
+            {process.env.NODE_ENV === "development" ? (
+              <AutopilotCreateButton />
+            ) : null}
+            <Button
+              disabled={isRunning}
+              loading={runNow.isPending || isRunning}
+              onClick={() => runNow.mutate()}
+              size="sm"
+            >
+              <HugeiconsIcon icon={PlayIcon} size={16} />
+              Run now
+            </Button>
+          </div>
         ) : null}
       </PageHeading>
 
@@ -229,6 +275,14 @@ function AutopilotOverviewPage({
             }
             organizationId={organizationId}
           />
+          {process.env.NODE_ENV === "development" && canManage ? (
+            <AutopilotTemplatesSection
+              {...templateActions}
+              onMore={() => {
+                void setTemplatesView(true);
+              }}
+            />
+          ) : null}
         </TabsContent>
         <TabsContent className="mt-4" value="pull-requests">
           <AutopilotPullRequestsTable
