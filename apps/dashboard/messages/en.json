@@ -3374,6 +3374,7 @@
     },
     "promptSuggestionSheet": {
       "noQueryData": "No query-level data for this prompt.",
+      "question": "Question",
       "suggestedPrompt": "Suggested prompt",
       "lookback": "Across the last {days} days of Google Search queries that informed this prompt."
     },
@@ -3381,7 +3382,8 @@
       "trackAll": "Track all",
       "dismissTitle": "Remove suggestion?",
       "dismissDescription": "\"{prompt}\" won't be suggested again.",
-      "empty": "No Google Search suggestions yet"
+      "empty": "No Google Search suggestions yet",
+      "askedOnGoogle": "Asked on Google: “{question}”"
     },
     "promptTagsActionDialog": {
       "editDescription": "Tags group prompts so you can filter and save views.",

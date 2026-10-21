@@ -40,6 +40,7 @@ export interface SuggestionColumnsOptions {
     clicks: string;
     position: string;
     openDetails: (prompt: string) => string;
+    askedOnGoogle: (question: string) => string;
   };
 }
 

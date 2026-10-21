@@ -658,6 +658,21 @@ export async function queryGscTopQueries(
       dimensions: ["query"],
       type: "web",
       rowLimit: Math.min(params.rowLimit, GSC_MAX_ROW_LIMIT),
+      ...(params.queryPattern
+        ? {
+            dimensionFilterGroups: [
+              {
+                filters: [
+                  {
+                    dimension: "query",
+                    operator: "includingRegex",
+                    expression: params.queryPattern,
+                  },
+                ],
+              },
+            ],
+          }
+        : {}),
     }),
   });
 

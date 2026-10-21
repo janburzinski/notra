@@ -1,6 +1,10 @@
 "use client";
 
-import { Delete02Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import {
+  Delete02Icon,
+  HelpCircleIcon,
+  PlusSignIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import {
@@ -34,7 +38,10 @@ import type {
 } from "@/types/components/geo";
 import type { GeoPromptSuggestion } from "@/types/geo";
 import { formatCount, formatOneDecimal } from "@/utils/format";
-import { suggestionKeywordTotals } from "@/utils/geo-prompt-suggestions";
+import {
+  suggestionKeywordTotals,
+  suggestionQuestion,
+} from "@/utils/geo-prompt-suggestions";
 import { isSearchConsoleSynced } from "@/utils/gsc-site-url";
 import { tableHeightFor } from "@/utils/table";
 
@@ -130,18 +137,34 @@ function suggestionColumns({
       minWidth: "16rem",
       sortable: true,
       width: "1fr",
-      cell: (row) => (
-        <button
-          aria-label={labels.openDetails(row.prompt)}
-          className="focus-visible:ring-ring flex min-h-8 w-full min-w-0 items-center rounded-sm text-left hover:underline focus-visible:ring-2"
-          onClick={() => onOpen(row)}
-          type="button"
-        >
-          <span className="text-sm leading-snug font-medium wrap-anywhere">
-            {row.prompt}
-          </span>
-        </button>
-      ),
+      cell: (row) => {
+        const question = suggestionQuestion(row.keywords);
+        return (
+          <button
+            aria-label={labels.openDetails(row.prompt)}
+            className="group focus-visible:ring-ring flex min-h-8 w-full min-w-0 flex-col items-start justify-center gap-0.5 rounded-sm py-1 text-left focus-visible:ring-2"
+            onClick={() => onOpen(row)}
+            type="button"
+          >
+            <span className="text-sm leading-snug font-medium wrap-anywhere group-hover:underline">
+              {row.prompt}
+            </span>
+            {question ? (
+              <span className="text-muted-foreground flex min-w-0 items-start gap-1 text-xs leading-snug">
+                <HugeiconsIcon
+                  aria-hidden
+                  className="mt-px size-3 shrink-0"
+                  icon={HelpCircleIcon}
+                  strokeWidth={2}
+                />
+                <span className="wrap-anywhere">
+                  {labels.askedOnGoogle(question.query)}
+                </span>
+              </span>
+            ) : null}
+          </button>
+        );
+      },
     },
     {
       key: "impressions",
@@ -412,6 +435,7 @@ export function PromptSuggestions({
       clicks: tCommon2("labels.clicks"),
       position: tCommon2("labels.position"),
       openDetails: (prompt) => tGeoShared("openDetailsPrompt", { prompt }),
+      askedOnGoogle: (question) => t("askedOnGoogle", { question }),
     },
   });
 

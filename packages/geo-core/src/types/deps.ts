@@ -25,6 +25,11 @@ export interface GeoSearchConsoleServiceShape {
     integration: GscIntegrationRow,
     siteUrl: string
   ) => Effect.Effect<GscQueryRow[], GeoSearchConsoleError>;
+  /** Queries phrased as questions, which the click-sorted pull mostly misses. */
+  readonly questionQueries: (
+    integration: GscIntegrationRow,
+    siteUrl: string
+  ) => Effect.Effect<GscQueryRow[], GeoSearchConsoleError>;
 }
 
 export interface GeoWorkflowServiceShape {

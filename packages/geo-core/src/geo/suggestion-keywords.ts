@@ -3,10 +3,13 @@ import type { GscQueryRow } from "@notra/ai/types/google-search-console";
 import {
   GSC_QUERY_CLUSTER_CAP,
   GSC_QUERY_CLUSTER_WORDS,
+  GSC_QUESTION_MIN_IMPRESSIONS,
   GSC_SYNC_MAX_KEYWORDS_FOR_MODEL,
+  GSC_SYNC_MAX_QUESTIONS_FOR_MODEL,
   GSC_SYNC_MIN_IMPRESSIONS,
 } from "../constants/google-search-console";
 import type { GeoSuggestionKeyword } from "../types/geo";
+import { isQuestionQuery } from "../utils/gsc-question";
 
 const MIN_BRAND_TERM_LENGTH = 3;
 const REGEXP_ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
@@ -122,10 +125,26 @@ function clusterKey(query: string): string {
     .join(" ");
 }
 
+/** Both pulls can return the same query; the first row wins. */
+export function mergeQueryRows(
+  ...sources: readonly GscQueryRow[][]
+): GscQueryRow[] {
+  const byQuery = new Map<string, GscQueryRow>();
+  for (const row of sources.flat()) {
+    const key = normalizeSuggestionKey(row.query);
+    if (!byQuery.has(key)) {
+      byQuery.set(key, row);
+    }
+  }
+  return [...byQuery.values()];
+}
+
 /**
  * Ranks queries the site shows up for but does not win. Google's own response
  * is click-sorted, so a page already at position 1 would otherwise fill the
- * prompt budget and the actual gaps never reach the model.
+ * prompt budget and the actual gaps never reach the model. Questions get
+ * their own slots first: they are long tail and would lose on volume, yet
+ * they are already worded like a prompt.
  */
 export function selectKeywordsForModel(
   rows: GscQueryRow[],
@@ -134,7 +153,10 @@ export function selectKeywordsForModel(
   const ranked = rows
     .filter(
       (row) =>
-        row.impressions >= GSC_SYNC_MIN_IMPRESSIONS &&
+        row.impressions >=
+          (isQuestionQuery(row.query)
+            ? GSC_QUESTION_MIN_IMPRESSIONS
+            : GSC_SYNC_MIN_IMPRESSIONS) &&
         !promptMentionsBrand(row.query, brandTerms) &&
         !isNavigationalQuery(row.query)
     )
@@ -144,11 +166,25 @@ export function selectKeywordsForModel(
         right.impressions - left.impressions
     );
 
-  const picked: GscQueryRow[] = [];
+  const picked = new Set<GscQueryRow>();
+  for (const row of ranked) {
+    if (picked.size >= GSC_SYNC_MAX_QUESTIONS_FOR_MODEL) {
+      break;
+    }
+    // No clustering: "how do i …" questions share their opener, not their intent.
+    if (isQuestionQuery(row.query)) {
+      picked.add(row);
+    }
+  }
+
   const perCluster = new Map<string, number>();
   for (const row of ranked) {
-    if (picked.length >= GSC_SYNC_MAX_KEYWORDS_FOR_MODEL) {
+    if (picked.size >= GSC_SYNC_MAX_KEYWORDS_FOR_MODEL) {
       break;
+    }
+    // Questions past their quota stay out, so head terms keep the rest.
+    if (picked.has(row) || isQuestionQuery(row.query)) {
+      continue;
     }
     const key = clusterKey(row.query);
     const count = perCluster.get(key) ?? 0;
@@ -156,9 +192,9 @@ export function selectKeywordsForModel(
       continue;
     }
     perCluster.set(key, count + 1);
-    picked.push(row);
+    picked.add(row);
   }
-  return picked;
+  return ranked.filter((row) => picked.has(row));
 }
 
 /**

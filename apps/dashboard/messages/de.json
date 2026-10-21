@@ -3374,6 +3374,7 @@
     },
     "promptSuggestionSheet": {
       "noQueryData": "Keine Daten auf Suchanfragen-Ebene für diesen Prompt.",
+      "question": "Frage",
       "suggestedPrompt": "Vorgeschlagener Prompt",
       "lookback": "Über die letzten {days} Tage der Google-Suchanfragen, auf denen dieser Prompt basiert."
     },
@@ -3381,7 +3382,8 @@
       "trackAll": "Alle tracken",
       "dismissTitle": "Vorschlag entfernen?",
       "dismissDescription": "„{prompt}“ wird nicht mehr vorgeschlagen.",
-      "empty": "Noch keine Vorschläge aus der Google-Suche"
+      "empty": "Noch keine Vorschläge aus der Google-Suche",
+      "askedOnGoogle": "Auf Google gefragt: „{question}“"
     },
     "promptTagsActionDialog": {
       "editDescription": "Tags gruppieren Prompts, damit du filtern und Ansichten speichern kannst.",

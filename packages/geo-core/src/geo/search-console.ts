@@ -35,6 +35,7 @@ import { geoDb } from "./effect";
 import { requireGeoProject } from "./projects";
 import {
   buildBrandTerms,
+  mergeQueryRows,
   normalizeSuggestionKey,
   promptMentionsBrand,
   resolveSourceKeywords,
@@ -323,7 +324,8 @@ const runSync = Effect.fn("geo.searchConsole.generateSuggestions")(function* (
   const google = yield* GeoSearchConsoleService;
 
   const [
-    rows,
+    topRows,
+    questionRows,
     settingsRow,
     brandRow,
     competitorRows,
@@ -332,6 +334,7 @@ const runSync = Effect.fn("geo.searchConsole.generateSuggestions")(function* (
   ] = yield* Effect.all(
     [
       google.topQueries(integration, siteUrl),
+      google.questionQueries(integration, siteUrl),
       geoDb("read suggestion settings", () =>
         db.query.geoSettings.findFirst({
           where: and(
@@ -378,6 +381,7 @@ const runSync = Effect.fn("geo.searchConsole.generateSuggestions")(function* (
     { concurrency: "unbounded" }
   );
 
+  const rows = mergeQueryRows(topRows, questionRows);
   const brandTerms = buildBrandTerms(settingsRow);
   const keywords = selectKeywordsForModel(rows, brandTerms);
   if (keywords.length === 0) {

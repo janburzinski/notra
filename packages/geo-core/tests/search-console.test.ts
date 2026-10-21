@@ -56,6 +56,7 @@ describe("Search Console Effect sync", () => {
         }),
         Effect.provideService(GeoSearchConsoleService, {
           topQueries: () => Effect.succeed([]),
+          questionQueries: () => Effect.succeed([]),
         })
       )
     );
