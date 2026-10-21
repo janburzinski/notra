@@ -1,0 +1,95 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useTranslations } from "use-intl";
+
+import { dashboardOrpc } from "@/lib/orpc/query";
+import type {
+  SiteBranchControlsProps,
+  SiteBranchEditInput,
+  SiteBranchDialogProps,
+} from "@/types/site-branches";
+import { toErrorMessage } from "@/utils/error-message";
+import { invalidateSiteBranch } from "@/utils/invalidate-site-branch";
+
+export function useSiteBranchActions(
+  props: SiteBranchControlsProps,
+  action: SiteBranchDialogProps["action"],
+  onClose: () => void
+) {
+  const { organizationId, siteId, branch, onSwitch, onFlush } = props;
+  const client = useQueryClient();
+  const t = useTranslations("sites.branches");
+  const invalidate = async () => {
+    await Promise.all([
+      invalidateSiteBranch(client, { organizationId, siteId, branch }),
+      client.invalidateQueries({
+        queryKey: dashboardOrpc.sites.branches.list.key({
+          input: { organizationId, siteId },
+        }),
+      }),
+    ]);
+  };
+  const onError = (error: unknown) =>
+    toast.error(toErrorMessage(error, t("actionFailed")));
+  const edit = useMutation({
+    mutationFn: async (input: SiteBranchEditInput) => {
+      if (!action) {
+        return;
+      }
+      const scope = { organizationId, siteId, branch: action.branch };
+      if (action.kind === "create") {
+        const created = await dashboardOrpc.sites.branches.create.call({
+          ...scope,
+          ...input,
+        });
+        await onSwitch(created.branch);
+        if (created.flushError) {
+          toast.error(created.flushError);
+        }
+      } else if (action.kind === "rename") {
+        const renamed = await dashboardOrpc.sites.branches.rename.call({
+          ...scope,
+          title: input.title,
+        });
+        if (action.branch === branch) {
+          await onSwitch(renamed.branch);
+        }
+      } else if (action.kind === "discardDeleted") {
+        await dashboardOrpc.sites.branches.discardDeletedDrafts.call(scope);
+      } else {
+        await dashboardOrpc.sites.branches.delete.call(scope);
+        if (action.branch === branch) {
+          await onSwitch(props.productionBranch);
+        }
+      }
+    },
+    onSuccess: async () => {
+      onClose();
+      await invalidate();
+    },
+    onError,
+  });
+  const review = useMutation({
+    mutationFn: async (merge: boolean) => {
+      await onFlush();
+      const scope = {
+        organizationId,
+        siteId,
+        branch: branch ?? props.productionBranch,
+      };
+      if (merge) {
+        const result =
+          await dashboardOrpc.sites.branches.mergeAndPublish.call(scope);
+        await onSwitch(result.branch);
+        if (result.deployPending) {
+          toast.success(t("deployPending"));
+        }
+      } else {
+        await dashboardOrpc.sites.branches.requestReview.call(scope);
+      }
+    },
+    onSuccess: invalidate,
+    onError,
+  });
+  return { edit, review };
+}

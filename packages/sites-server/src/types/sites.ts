@@ -40,7 +40,6 @@ export interface CreateSiteInput {
   rootDirectory?: string;
   mounts?: SiteMounts;
   previewVisibility?: Site["previewVisibility"];
-  publishMode?: Site["publishMode"];
   previewsEnabled?: boolean;
 }
 
@@ -51,6 +50,7 @@ export interface RepositorySuggestionsParams {
 }
 
 export interface DeployBranchHeadOptions {
+  commitSha?: string;
   trigger: "manual" | "config" | "redeploy";
   userId?: string | null;
   branch?: string;
@@ -69,7 +69,6 @@ export interface SiteSettingsPatch {
   smartDeployments?: boolean;
   previewCommentsEnabled?: boolean;
   previewVisibility?: Site["previewVisibility"];
-  publishMode?: Site["publishMode"];
   showBranding?: boolean;
   analyticsEnabled?: boolean;
   previewPassword?: string | null;

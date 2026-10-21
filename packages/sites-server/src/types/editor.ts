@@ -2,8 +2,6 @@ import type { siteDrafts } from "@notra/db/schema";
 
 export type SiteDraft = typeof siteDrafts.$inferSelect;
 
-export type SiteDraftPublishMode = "direct" | "pull_request";
-
 export interface SiteSourceEntry {
   path: string;
   sha: string;
@@ -35,6 +33,7 @@ export interface CreateCommitOnBranchResponse {
 }
 
 export interface SaveSiteDraftInput {
+  branch?: string;
   path: string;
   content: string;
   baseBlobSha: string | null;
@@ -53,6 +52,7 @@ export interface SiteEditorSourceContext {
 }
 
 export interface SiteDraftMutationInput {
+  branch?: string;
   path: string;
   draftId: string | null;
   draftRevision: number | null;
@@ -60,13 +60,13 @@ export interface SiteDraftMutationInput {
 }
 
 export interface PublishSiteDraftsInput {
+  skipIfBusy?: boolean;
   message: string;
-  mode: SiteDraftPublishMode;
+  branch?: string;
   userId: string;
 }
 
 export interface PublishSiteDraftsResult {
-  mode: SiteDraftPublishMode;
   commitSha: string;
   pullRequestUrl: string | null;
 }
@@ -84,4 +84,5 @@ export interface RepositoryPullRequestInput {
   head: string;
   base: string;
   body: string;
+  draft?: boolean;
 }

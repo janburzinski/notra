@@ -19,6 +19,7 @@ export type DeploymentTransitionValues = Partial<
 >;
 
 export interface EnqueueDeploymentInput {
+  deduplicateCommit?: boolean;
   siteId: string;
   kind: "production" | "preview";
   previewKey: string | null;

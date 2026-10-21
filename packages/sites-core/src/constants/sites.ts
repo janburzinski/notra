@@ -173,7 +173,6 @@ export const SITE_DEPLOYMENT_TRIGGERS = [
 ] as const;
 
 export const SITE_PREVIEW_VISIBILITIES = ["public", "protected"] as const;
-export const SITE_PUBLISH_MODES = ["pull_request", "direct"] as const;
 export const SITE_STATUSES = ["active", "suspended"] as const;
 export const SITE_DOMAIN_KINDS = ["subdomain", "proxy"] as const;
 export const SITE_DOMAIN_STATUSES = [
@@ -206,3 +205,5 @@ export const SITE_ANALYTICS_EVENT_FILE = "_notra/e";
 export const SITE_ENGAGEMENT_MAX_VISIBLE_MS = 30 * 60 * 1000;
 export const SITE_ENGAGEMENT_VIEW_ID_PATTERN = /^[a-z0-9]{16,32}$/;
 export const SITES_LIVE_CHANNEL_PREFIX = "sites";
+
+export const SITE_EDIT_BRANCH_PREFIX = "notra/site-edit-";

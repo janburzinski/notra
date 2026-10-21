@@ -1,6 +1,6 @@
 "use client";
 
-import { GitCommitIcon, GitPullRequestIcon } from "@hugeicons/core-free-icons";
+import { GitCommitIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ResponsiveDialog,
@@ -12,49 +12,68 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Input } from "@notra/ui/components/ui/input";
 import { Label } from "@notra/ui/components/ui/label";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { SitePublishChange } from "@/components/sites/editor/site-publish-change";
-import { SiteChoiceGroup } from "@/components/sites/site-form-fields";
 import { SITE_PUBLISH_MESSAGE_MAX_LENGTH } from "@/constants/site-publish";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SitePublishDialogProps } from "@/types/components/sites";
-import type { SitePublishMode } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
+import { siteDraftVersion } from "@/utils/site-draft-version";
 import { publishConflictPaths, siteDraftChange } from "@/utils/site-editor";
+import { siteValidationReady } from "@/utils/site-validation-ready";
 
 export function SitePublishDialog({
   organizationId,
   siteId,
   open,
   onOpenChange,
-  site,
   draftCount,
   drafts,
   sourcePaths,
   onPublished,
   onConflict,
   unsaved = false,
-  pullRequestOnly = false,
   initialMessage = "",
 }: SitePublishDialogProps) {
   const t = useTranslations("sites.publish");
-  const tModes = useTranslations("sites.publishModes");
   const tCommon = useTranslations("common");
   const tChanges = useTranslations("sites.editorPage.publishDialog");
   const id = useId();
-  const directAllowed = !pullRequestOnly && site.publishMode === "direct";
   const [message, setMessage] = useState(initialMessage);
-  const [mode, setMode] = useState<SitePublishMode>(
-    directAllowed ? "direct" : "pull_request"
-  );
-  const effectiveMode = directAllowed ? mode : "pull_request";
   const trimmed = message.trim();
-  const canPublish = trimmed.length > 0 && draftCount > 0 && !unsaved;
+  const client = useQueryClient();
+  const draftVersion = siteDraftVersion(drafts);
+  const validationOptions = dashboardOrpc.sites.editor.validate.queryOptions({
+    input: { organizationId, siteId },
+    enabled: open,
+    staleTime: 0,
+  });
+  const validation = useQuery({
+    ...validationOptions,
+    queryKey: [...validationOptions.queryKey, draftVersion],
+  });
+  const statusOptions = dashboardOrpc.sites.branches.status.queryOptions({
+    input: { organizationId, siteId },
+    enabled: open,
+    staleTime: 0,
+  });
+  const status = useQuery({
+    ...statusOptions,
+    queryKey: [...statusOptions.queryKey, draftVersion],
+  });
+  const canPublish =
+    trimmed.length > 0 &&
+    draftCount > 0 &&
+    !unsaved &&
+    siteValidationReady(validation) &&
+    status.isSuccess &&
+    !status.isPlaceholderData &&
+    status.data.canPublishDirect;
 
   const publishMutation = useMutation({
     mutationFn: () =>
@@ -62,24 +81,13 @@ export function SitePublishDialog({
         organizationId,
         siteId,
         message: trimmed,
-        mode: effectiveMode,
       }),
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
+      await client.invalidateQueries({ queryKey: dashboardOrpc.sites.key() });
       setMessage("");
       onOpenChange(false);
       onPublished();
-      const pullRequestUrl = result.pullRequestUrl;
-      if (result.mode === "pull_request" && pullRequestUrl) {
-        toast.success(t("pullRequestOpened"), {
-          action: {
-            label: t("viewPullRequest"),
-            onClick: () =>
-              window.open(pullRequestUrl, "_blank", "noopener,noreferrer"),
-          },
-        });
-        return;
-      }
-      toast.success(t("committed"));
+      toast.success(result.deployPending ? t("deployPending") : t("committed"));
     },
     onError: (error) => {
       const paths = publishConflictPaths(error);
@@ -103,23 +111,15 @@ export function SitePublishDialog({
     >
       <ResponsiveDialogContent className="flex max-h-[85svh] flex-col overflow-hidden sm:max-w-2xl">
         <ResponsiveDialogHeader className="shrink-0">
-          <ResponsiveDialogTitle>
-            {pullRequestOnly ? t("openPullRequest") : t("title")}
-          </ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>{t("title")}</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            {t(
-              pullRequestOnly ? "pullRequestReviewDescription" : "description",
-              {
-                count: draftCount,
-              }
-            )}
+            {t("description", { count: draftCount })}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <form
           className="min-h-0 min-w-0 space-y-4 overflow-y-auto"
           id={`${id}-form`}
-          onSubmit={(event) => {
-            event.preventDefault();
+          action={() => {
             if (canPublish && !publishMutation.isPending) {
               publishMutation.mutate();
             }
@@ -153,34 +153,6 @@ export function SitePublishDialog({
               value={message}
             />
           </div>
-          {pullRequestOnly ? (
-            <p className="text-muted-foreground text-sm">
-              {t("pullRequestDescription", { branch: site.productionBranch })}
-            </p>
-          ) : (
-            <SiteChoiceGroup
-              label={t("mode")}
-              onValueChange={setMode}
-              options={[
-                {
-                  value: "pull_request",
-                  title: tModes("pull_request.title"),
-                  description: t("pullRequestDescription", {
-                    branch: site.productionBranch,
-                  }),
-                },
-                {
-                  value: "direct",
-                  title: tModes("direct.title"),
-                  description: directAllowed
-                    ? t("directDescription", { branch: site.productionBranch })
-                    : t("directDisabled"),
-                  disabled: !directAllowed,
-                },
-              ]}
-              value={effectiveMode}
-            />
-          )}
         </form>
         <ResponsiveDialogFooter className="shrink-0">
           <Button
@@ -200,16 +172,10 @@ export function SitePublishDialog({
             <HugeiconsIcon
               aria-hidden="true"
               data-icon="inline-start"
-              icon={
-                effectiveMode === "pull_request"
-                  ? GitPullRequestIcon
-                  : GitCommitIcon
-              }
+              icon={GitCommitIcon}
               strokeWidth={1.5}
             />
-            {effectiveMode === "pull_request"
-              ? t("openPullRequest")
-              : t("commit")}
+            {t("commit")}
           </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

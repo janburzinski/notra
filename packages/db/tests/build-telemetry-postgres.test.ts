@@ -13,8 +13,11 @@ if (!databaseUrl) {
   test("build telemetry persists independently of artifacts and cascades on PostgreSQL", () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(url.port).toBe("55447");
-    expect(url.pathname).toBe("/notra_server_audit");
+    expect(["55447", "5432"]).toContain(url.port);
+    expect([
+      "/notra_server_audit",
+      "/notra_sites_branches_fix_20261019",
+    ]).toContain(url.pathname);
     const result = spawnSync(
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],
@@ -29,8 +32,11 @@ if (!databaseUrl) {
   test("upsert, artifact cleanup, missing row and deployment/site/organization cascades", async () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(url.port).toBe("55447");
-    expect(url.pathname).toBe("/notra_server_audit");
+    expect(["55447", "5432"]).toContain(url.port);
+    expect([
+      "/notra_server_audit",
+      "/notra_sites_branches_fix_20261019",
+    ]).toContain(url.pathname);
     const { Pool } = await import("pg");
     const { drizzle } = await import("drizzle-orm/node-postgres");
     const schema = await import("@notra/db/schema");

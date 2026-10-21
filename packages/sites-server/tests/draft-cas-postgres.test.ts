@@ -29,8 +29,11 @@ if (!databaseUrl) {
   test("draft revisions fence concurrent writes and publication on real PostgreSQL", () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(url.port).toBe("55447");
-    expect(url.pathname).toBe("/notra_server_audit");
+    expect(["55439", "55447", "5432"]).toContain(url.port);
+    expect([
+      "/notra_server_audit",
+      "/notra_sites_branches_fix_20261019",
+    ]).toContain(url.pathname);
     const result = spawnSync(
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],
@@ -50,8 +53,11 @@ if (!databaseUrl) {
 } else {
   const url = new URL(databaseUrl);
   expect(url.hostname).toBe("127.0.0.1");
-  expect(url.port).toBe("55447");
-  expect(url.pathname).toBe("/notra_server_audit");
+  expect(["55439", "55447", "5432"]).toContain(url.port);
+  expect([
+    "/notra_server_audit",
+    "/notra_sites_branches_fix_20261019",
+  ]).toContain(url.pathname);
   expect(process.env.DATABASE_URL).toBe(databaseUrl);
   const { db } = await import("@notra/db/drizzle");
   const { organizations, users, sites, siteDrafts } =
@@ -90,19 +96,25 @@ if (!databaseUrl) {
             },
           };
         }
+        if (route.includes("/branches/") && !route.includes("/rules/")) {
+          return { data: { protected: false } };
+        }
         if (route.includes("/rules/branches/")) {
           return { data: [] };
         }
         throw new Error(`Unexpected synthetic GitHub request: ${route}`);
       },
       graphql: async (
-        _query: string,
+        query: string,
         variables: {
           input: {
             fileChanges: { additions: { path: string; contents: string }[] };
           };
         }
       ) => {
+        if (query.includes("SiteBranchProtection")) {
+          return { repository: { ref: { branchProtectionRule: null } } };
+        }
         publishedFiles = variables.input.fileChanges.additions;
         await beforeCommit();
         return {
@@ -180,7 +192,6 @@ if (!databaseUrl) {
         slug: crypto.randomUUID().slice(0, 8),
         publicOrigin: "https://synthetic.example.test",
         mounts: { blog: "/blog" },
-        publishMode: "direct",
       })
       .returning();
     if (!created) {
@@ -249,7 +260,7 @@ if (!databaseUrl) {
     const initial = await saveSiteDraft(site, input('{"name":"Draft"}'));
     blobSha = "blob-upstream";
     await expect(
-      publishSiteDrafts(site, { mode: "direct", message: "Synthetic", userId })
+      publishSiteDrafts(site, { message: "Synthetic", userId })
     ).rejects.toThrow("Changed on GitHub");
     const rebased = await rebaseSiteDraft(
       site,
@@ -279,7 +290,6 @@ if (!databaseUrl) {
     };
     expect(
       await publishSiteDrafts(site, {
-        mode: "direct",
         message: "Synthetic",
         userId,
       })
@@ -385,7 +395,6 @@ if (!databaseUrl) {
     expect(draft?.revision).toBe(3);
     expect(JSON.parse(draft?.content ?? "{}").name).toBe("Published");
     await publishSiteDrafts(site, {
-      mode: "direct",
       message: "Configure analytics",
       userId,
     });

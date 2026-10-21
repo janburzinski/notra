@@ -3,6 +3,7 @@ import {
   listGitHubAppRepositoriesEffect,
   setSelectedGitHubAppRepositoriesEffect,
 } from "@notra/ai/integrations/github";
+import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
 import { db } from "@notra/db/drizzle";
 import {
   githubIntegrations,
@@ -15,6 +16,12 @@ import { loadSiteAnalytics } from "@notra/geo-core/geo/web-analytics";
 import { geoWindow } from "@notra/geo-core/geo/window";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import {
+  siteEditorScopeInputSchema,
+  siteBranchesListInputSchema,
+  siteBranchInputSchema,
+  siteBranchFlushInputSchema,
+  siteBranchCreateInputSchema,
+  siteBranchRenameInputSchema,
   addSiteDomainInputSchema,
   connectSiteRepositoryInputSchema,
   createSiteInputSchema,
@@ -52,6 +59,16 @@ import {
 import type { SiteServingState } from "@notra/sites-core/types/deployment";
 import { hashBuildTarget } from "@notra/sites-core/utils/build-target";
 import { postPreviewKey } from "@notra/sites-core/utils/hosts";
+import {
+  createSiteBranch,
+  discardDeletedSiteBranchDrafts,
+  deleteSiteBranch,
+  listSiteBranches,
+  mergeSiteBranch,
+  renameSiteBranch,
+  requestSiteBranchReview,
+  siteBranchStatus,
+} from "@notra/sites-server/branches";
 import { getBuildTelemetry } from "@notra/sites-server/build-telemetry";
 import {
   deployBranchHead,
@@ -72,6 +89,7 @@ import {
   removeSiteDomain,
 } from "@notra/sites-server/domains";
 import {
+  flushSiteDrafts,
   discardSiteDraft,
   listSiteDrafts,
   listSiteSourceFiles,
@@ -87,6 +105,7 @@ import {
   isSitesConfigured,
   siteCnameTarget,
 } from "@notra/sites-server/env";
+import { SiteInputError } from "@notra/sites-server/errors";
 import {
   getRepositorySuggestions,
   getSiteRepositoryOverview,
@@ -212,6 +231,24 @@ function dispatchLater(jobIds: Array<string | null>) {
   const ids = jobIds.filter((id): id is string => Boolean(id));
   if (ids.length > 0) {
     afterResponse(() => dispatchSiteJobs(ids));
+  }
+}
+
+async function deployPublishedCommit(
+  site: Site,
+  commitSha: string,
+  userId: string
+): Promise<boolean> {
+  try {
+    dispatchLater([
+      await deployBranchHead(site, { trigger: "manual", userId, commitSha }),
+    ]);
+    return false;
+  } catch {
+    getOpenRequestLogger()?.set({
+      sitesPublish: { siteId: site.id, commitSha, deployPending: true },
+    });
+    return true;
   }
 }
 
@@ -526,7 +563,6 @@ export const sitesRouter = {
         rootDirectory: input.rootDirectory,
         mounts: input.mounts,
         previewVisibility: input.previewVisibility,
-        publishMode: input.publishMode,
       });
       dispatchLater([result.jobId]);
       return {
@@ -892,14 +928,95 @@ export const sitesRouter = {
       }),
   },
 
+  branches: {
+    list: sitesProcedure
+      .input(siteBranchesListInputSchema)
+      .handler(async ({ context, input }) => {
+        const { site } = await requireSite(context, input);
+        return await listSiteBranches(site, input.search);
+      }),
+    status: sitesProcedure
+      .input(siteEditorScopeInputSchema)
+      .handler(async ({ context, input }) => {
+        const { site } = await requireSite(context, input);
+        return await siteBranchStatus(site, input.branch);
+      }),
+    create: sitesProcedure
+      .input(siteBranchCreateInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site, userId } = await requireSite(context, input);
+        return await createSiteBranch(site, { ...input, userId });
+      }),
+    rename: sitesProcedure
+      .input(siteBranchRenameInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site } = await requireSite(context, input);
+        return await renameSiteBranch(site, input.branch, input.title);
+      }),
+    delete: sitesProcedure
+      .input(siteBranchInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site } = await requireSite(context, input);
+        await deleteSiteBranch(site, input.branch);
+        return { ok: true };
+      }),
+    discardDeletedDrafts: sitesProcedure
+      .input(siteBranchInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site } = await requireSite(context, input);
+        await discardDeletedSiteBranchDrafts(site, input.branch);
+        return { ok: true };
+      }),
+    requestReview: sitesProcedure
+      .input(siteBranchInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site } = await requireSite(context, input);
+        await requestSiteBranchReview(site, input.branch);
+        return { ok: true };
+      }),
+    mergeAndPublish: sitesProcedure
+      .input(siteBranchInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site, userId } = await requireSite(context, input);
+        const result = await mergeSiteBranch(site, input.branch);
+        const deployPending = await deployPublishedCommit(
+          site,
+          result.commitSha,
+          userId
+        );
+        return { ...result, deployPending };
+      }),
+    flush: sitesProcedure
+      .input(siteBranchFlushInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site, userId } = await requireSite(context, input);
+        if (input.branch === site.productionBranch) {
+          throw new SiteInputError("Use Publish on the deployment branch");
+        }
+        return await flushSiteDrafts(site, {
+          branch: input.branch,
+          message: "Update site content",
+          skipIfBusy: input.skipIfBusy,
+          userId,
+        });
+      }),
+  },
+
   editor: {
     files: sitesProcedure
-      .input(siteScopeInputSchema)
+      .input(siteEditorScopeInputSchema)
       .handler(async ({ context, input }) => {
         const { site } = await requireSite(context, input);
         const [source, drafts] = await Promise.all([
-          listSiteSourceFiles(site),
-          listSiteDrafts(site.id),
+          listSiteSourceFiles(site, input.branch),
+          listSiteDrafts(site.id, input.branch ?? site.productionBranch),
         ]);
         const files = [...source.files];
         if (!files.some((file) => file.path === SITE_CONFIG_FILENAME)) {
@@ -931,8 +1048,8 @@ export const sitesRouter = {
       .handler(async ({ context, input }) => {
         const { site } = await requireSite(context, input);
         const [file, drafts] = await Promise.all([
-          readSiteSourceFile(site, input.path),
-          listSiteDrafts(site.id),
+          readSiteSourceFile(site, input.path, input.branch),
+          listSiteDrafts(site.id, input.branch ?? site.productionBranch),
         ]);
         const draft =
           drafts.find((candidate) => candidate.path === input.path) ?? null;
@@ -961,6 +1078,7 @@ export const sitesRouter = {
         assertNotDemo();
         const { site, userId } = await requireSite(context, input);
         const draft = await saveSiteDraft(site, {
+          branch: input.branch,
           path: input.path,
           content: input.content,
           baseBlobSha: input.baseBlobSha,
@@ -997,10 +1115,10 @@ export const sitesRouter = {
       }),
 
     validate: sitesProcedure
-      .input(siteScopeInputSchema)
+      .input(siteEditorScopeInputSchema)
       .handler(async ({ context, input }) => {
         const { site } = await requireSite(context, input);
-        const result = await validateSiteDrafts(site);
+        const result = await validateSiteDrafts(site, input.branch);
         return { ok: result.ok, diagnostics: result.diagnostics };
       }),
 
@@ -1009,17 +1127,23 @@ export const sitesRouter = {
       .handler(async ({ context, input }) => {
         assertNotDemo();
         const { site, userId } = await requireSite(context, input);
-        return await publishSiteDrafts(site, {
+        const result = await publishSiteDrafts(site, {
           message: input.message,
-          mode: input.mode,
+          branch: input.branch,
           userId,
         });
+        const deployPending = await deployPublishedCommit(
+          site,
+          result.commitSha,
+          userId
+        );
+        return { ...result, deployPending };
       }),
   },
 
   integrations: {
     get: sitesProcedure
-      .input(siteScopeInputSchema)
+      .input(siteEditorScopeInputSchema)
       .handler(async ({ context, input }) => {
         const { site } = await requireSite(context, input);
         return await readSiteIntegrations(site);

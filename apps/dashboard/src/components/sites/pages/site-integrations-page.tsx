@@ -37,10 +37,10 @@ import {
   useSaveSiteIntegration,
   useSiteIntegrations,
 } from "@/lib/hooks/use-site-integrations";
+import { useSitePublishFiles } from "@/lib/hooks/use-site-publish-files";
 import { useStoredDismissal } from "@/lib/hooks/use-stored-dismissal";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
-import type { SiteEditorFiles } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 import { siteIntegrationSettings } from "@/utils/site-integrations";
 import { siteHref } from "@/utils/site-links";
@@ -53,10 +53,12 @@ export function SiteIntegrationsPage() {
   const query = useSiteIntegrations(scope);
   const save = useSaveSiteIntegration(scope);
   const [openId, setOpenId] = useState<SiteIntegrationName | null>(null);
-  const [publishFiles, setPublishFiles] = useState<SiteEditorFiles | null>(
-    null
-  );
-  const [preparingPublish, setPreparingPublish] = useState(false);
+  const publish = useSitePublishFiles({
+    noDrafts: t("noDrafts"),
+    failed: t("preparePublishFailed"),
+  });
+  const publishFiles = publish.files;
+  const preparingPublish = publish.preparing;
   const previewNote = useStoredDismissal(
     localStorageKeys.siteIntegrationsPreviewNoteDismissed
   );
@@ -67,29 +69,10 @@ export function SiteIntegrationsPage() {
     (provider) => provider.id === openId
   );
 
-  const openPublish = () => {
-    setPreparingPublish(true);
-    return queryClient
-      .fetchQuery({
-        ...dashboardOrpc.sites.editor.files.queryOptions({ input: scope }),
-        staleTime: 0,
-      })
-      .then(
-        (files) => {
-          if (files.drafts.length === 0) {
-            toast.error(t("noDrafts"));
-            return false;
-          }
-          setPublishFiles(files);
-          setOpenId(null);
-          return true;
-        },
-        (error: unknown) => {
-          toast.error(toErrorMessage(error, t("preparePublishFailed")));
-          return false;
-        }
-      )
-      .finally(() => setPreparingPublish(false));
+  const openPublish = async () => {
+    if (await publish.open()) {
+      setOpenId(null);
+    }
   };
 
   return (
@@ -225,7 +208,7 @@ export function SiteIntegrationsPage() {
                 }}
                 size="sm"
               >
-                {t("createPullRequest")}
+                {t("reviewChanges")}
               </Button>
             </div>
           </div>
@@ -253,12 +236,12 @@ export function SiteIntegrationsPage() {
           drafts={publishFiles.drafts}
           initialMessage={t("publishMessage")}
           onConflict={() => {
-            setPublishFiles(null);
+            publish.close();
             toast.error(t("publishConflict"));
           }}
           onOpenChange={(next) => {
             if (!next) {
-              setPublishFiles(null);
+              publish.close();
             }
           }}
           onPublished={() => {
@@ -268,8 +251,6 @@ export function SiteIntegrationsPage() {
           }}
           open
           organizationId={organizationId}
-          pullRequestOnly
-          site={detail.site}
           siteId={siteId}
           sourcePaths={new Set(publishFiles.files.map((file) => file.path))}
         />

@@ -9,7 +9,6 @@ import {
   Folder01Icon,
   GitBranchIcon,
   GithubIcon,
-  GitPullRequestIcon,
   Layers01Icon,
   PlugSocketIcon,
   SparklesIcon,
@@ -28,13 +27,6 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@notra/ui/components/ui/input-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@notra/ui/components/ui/select";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
@@ -71,7 +63,6 @@ import {
   useImportableRepositories,
 } from "@/lib/hooks/use-importable-repositories";
 import { useRepositorySuggestions } from "@/lib/hooks/use-repository-suggestions";
-import { useSitePublishModeOptions } from "@/lib/hooks/use-site-publish-mode-options";
 import { useInvalidateSites } from "@/lib/hooks/use-sites";
 import { useUpdateSiteSettings } from "@/lib/hooks/use-update-site-settings";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -83,7 +74,6 @@ import type {
 } from "@/types/components/site-settings";
 import type {
   SiteImportableRepository,
-  SitePublishMode,
   SiteRepository,
   SiteSettingsRowKey,
 } from "@/types/sites";
@@ -253,12 +243,6 @@ function SiteSettingsContent() {
               )}
             </SiteSettingsEditor>
           </SiteSettingsItem>
-          <SiteSettingsItem
-            description={t("publishModeHint")}
-            icon={GitPullRequestIcon}
-            title={tNew("publishMode")}
-            value={<PublishModeSelect />}
-          />
           <SiteSettingsItem
             {...row("variables")}
             description={t("variablesHint")}
@@ -567,48 +551,6 @@ function SiteSectionField({
         value={path}
       />
     </Field>
-  );
-}
-
-function PublishModeSelect() {
-  const tNew = useTranslations("sites.new");
-  const { site } = useSite().detail;
-  const options = useSitePublishModeOptions();
-  const save = useUpdateSiteSettings();
-  const value =
-    save.isPending && save.variables.publishMode
-      ? save.variables.publishMode
-      : site.publishMode;
-  return (
-    <Select
-      disabled={save.isPending}
-      onValueChange={(next: SitePublishMode | null) => {
-        if (next && next !== site.publishMode) {
-          save.mutate({ publishMode: next });
-        }
-      }}
-      value={value}
-    >
-      <SelectTrigger aria-label={tNew("publishMode")} className="shrink-0">
-        <SelectValue>
-          {(current: SitePublishMode) =>
-            options.find((option) => option.value === current)?.title
-          }
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent align="end" alignItemWithTrigger={false} className="w-72">
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            <span className="flex flex-col">
-              <span>{option.title}</span>
-              <span className="text-muted-foreground text-xs">
-                {option.description}
-              </span>
-            </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
   );
 }
 

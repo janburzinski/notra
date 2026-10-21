@@ -1,9 +1,10 @@
 import { selectProductionDeployment } from "./activation";
 import { enqueueSiteDeployment, getDeployment } from "./deployments";
 import { SiteInputError } from "./errors";
-import { getBranchHead, siteRepositoryAccess } from "./github";
+import { getBranchHead, getCommitHead, siteRepositoryAccess } from "./github";
 import type { DeployBranchHeadOptions, Site } from "./types/sites";
 import { redeploymentInput } from "./utils/deployments";
+import { errorMessage } from "./utils/errors";
 
 export async function deployBranchHead(
   site: Site,
@@ -13,20 +14,41 @@ export async function deployBranchHead(
     contents: "read",
   });
   const branch = options.branch ?? site.productionBranch;
-  const head = await getBranchHead(repository, token, branch);
+  const commitSha = options.commitSha;
+  const head = commitSha
+    ? await getCommitHead(repository, token, commitSha).catch(
+        (error: unknown) => {
+          console.warn("sites.commit_metadata_failed", errorMessage(error));
+          return { sha: commitSha, message: "", author: "" };
+        }
+      )
+    : await getBranchHead(repository, token, branch);
   const previewKey = options.previewKey ?? null;
-  const { jobId } = await enqueueSiteDeployment({
-    siteId: site.id,
-    kind: previewKey ? "preview" : "production",
-    previewKey,
-    trigger: options.trigger,
-    branch,
-    commitSha: head.sha,
-    commitMessage: options.commitMessage ?? head.message,
-    commitAuthor: head.author,
-    requestedByUserId: options.userId ?? null,
-    githubRepositoryId: repository.githubRepositoryId,
-  });
+  const { jobId } = await enqueueSiteDeployment(
+    {
+      deduplicateCommit: Boolean(options.commitSha),
+      siteId: site.id,
+      kind: previewKey ? "preview" : "production",
+      previewKey,
+      trigger: options.trigger,
+      branch,
+      commitSha: head.sha,
+      commitMessage: options.commitMessage ?? head.message,
+      commitAuthor: head.author,
+      requestedByUserId: options.userId ?? null,
+      githubRepositoryId: repository.githubRepositoryId,
+    },
+    options.trigger === "redeploy"
+      ? undefined
+      : async () => {
+          const current = await getBranchHead(repository, token, branch);
+          if (current.sha !== head.sha) {
+            throw new SiteInputError(
+              "The branch moved while publishing. Publish its latest changes instead."
+            );
+          }
+        }
+  );
   return jobId;
 }
 

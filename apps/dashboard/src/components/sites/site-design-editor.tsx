@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -88,7 +88,9 @@ export function SiteDesignEditor<T>(props: SiteDesignEditorProps<T>) {
         config={config}
         document={query.data}
         key={`${siteId}:${query.data.content}:${query.data.draftRevision}`}
-        onPublish={publish.open}
+        onPublish={async () => {
+          await publish.open();
+        }}
         preparingPublish={publish.preparing}
       />
       {publish.files ? (
@@ -112,7 +114,6 @@ export function SiteDesignEditor<T>(props: SiteDesignEditorProps<T>) {
           }}
           open
           organizationId={organizationId}
-          site={detail.site}
           siteId={siteId}
           sourcePaths={new Set(publish.files.files.map((file) => file.path))}
         />
@@ -171,6 +172,12 @@ function SiteDesignSaveBar({
   onPublish,
 }: SiteDesignSaveBarProps) {
   const t = useTranslations("sites.design");
+  const { organizationId, siteId } = useSite();
+  const status = useQuery(
+    dashboardOrpc.sites.branches.status.queryOptions({
+      input: { organizationId, siteId },
+    })
+  );
   const busy = saving || preparingPublish;
   return (
     <div className="bg-background/95 supports-backdrop-filter:bg-background/80 shadow-lift sticky bottom-4 z-10 mx-auto flex w-fit max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl border py-2 pr-2 pl-3.5 backdrop-blur">
@@ -213,7 +220,9 @@ function SiteDesignSaveBar({
           size="sm"
           type="button"
         >
-          {t("publish")}
+          {t(
+            status.data?.canPublishDirect === false ? "openEditor" : "publish"
+          )}
         </Button>
       </div>
     </div>

@@ -350,6 +350,12 @@ against the PR base or previous main commit to enforce append-only history. Run
 replays the full journal on an empty Postgres database and runs it again to check
 rerun safety.
 
+Sites branch workflow uses `0128_sites_branch_workflow`, after
+`0127_site_deployment_repository`. It keeps deployment drafts and their legacy
+unique index compatible with the running app; feature-branch drafts use a
+separate table. The CI branch-workflow step also tests writes from both app
+versions.
+
 The obsolete SQL files `0019_add_post_recommendations`, `0036_lovely_wallop`, and
 `0090_user_auth_security` were unjournaled and have been removed. Their active
 schema changes are covered by `0019_medical_peter_parker`, `0000_baseline`, and

@@ -19,7 +19,6 @@ import type {
   SiteBuildLogEntry,
   SiteBuildLogFold,
   SiteBuildLogLine,
-  SiteChoiceOption,
   SiteCreateFieldErrors,
   SiteCreateFormValues,
   SiteCreateSectionPlan,
@@ -39,7 +38,6 @@ import type {
   SiteNewFileFolder,
   SitePreviewRow,
   SitePreviewVisibility,
-  SitePublishMode,
   SiteRecord,
   SiteRepository,
   SiteScope,
@@ -192,15 +190,6 @@ export interface SiteAddressInputProps {
   describedBy?: string;
   disabled?: boolean;
   onBlur?: () => void;
-}
-
-export interface SiteChoiceGroupProps<T extends string> {
-  label: string;
-  value: T;
-  options: SiteChoiceOption<T>[];
-  onValueChange: (value: T) => void;
-  disabled?: boolean;
-  hideLabel?: boolean;
 }
 
 export interface SiteDeleteDialogProps extends SiteScope {
@@ -496,12 +485,10 @@ export interface SiteSettingsDangerZoneProps extends SiteScope {
 }
 
 export interface SitePublishDialogProps extends SiteScope {
-  pullRequestOnly?: boolean;
   initialMessage?: string;
   unsaved?: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  site: SiteRecord;
   draftCount: number;
   drafts: SiteEditorDraft[];
   sourcePaths: ReadonlySet<string>;
@@ -649,7 +636,7 @@ export interface SiteIntegrationDialogProps {
   settings: Record<string, unknown> | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onPublish: () => Promise<boolean>;
+  onPublish: () => Promise<void>;
 }
 
 export interface SiteIntegrationSaveStatusProps {

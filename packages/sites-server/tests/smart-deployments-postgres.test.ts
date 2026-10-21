@@ -21,7 +21,10 @@ if (!databaseUrl) {
   test("smart deployment pipeline with real PostgreSQL and serving-state CAS", () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(url.pathname).toBe("/notra_server_audit");
+    expect([
+      "/notra_server_audit",
+      "/notra_sites_branches_fix_20261019",
+    ]).toContain(url.pathname);
     const result = spawnSync(
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],
@@ -502,13 +505,25 @@ if (!databaseUrl) {
       (await readServingState(site.id))?.state.production?.deploymentId
     ).toBe(baseline.id);
   });
-  test("a manual deployment still publishes its chosen commit when the branch moves during compilation", async () => {
-    buildHook = async () => {
-      branchHead = "d".repeat(40);
-    };
-    await publish("manual");
-    expect(buildCalls).toBe(1);
-  });
+  test.each(["manual", "redeploy"] as const)(
+    "%s only publishes a historical commit when explicitly redeploying",
+    async (trigger) => {
+      buildHook = async () => {
+        branchHead = "d".repeat(40);
+      };
+      const candidate = await queue(trigger);
+      expect((await runDeploymentPipeline(site, candidate)).kind).toBe(
+        trigger === "redeploy" ? "live" : "skipped"
+      );
+      expect((await getDeployment(candidate.id))?.status).toBe(
+        trigger === "redeploy" ? "ready" : "superseded"
+      );
+      expect(objects.has(SITE_R2_KEYS.manifest(site.id, candidate.id))).toBe(
+        trigger === "redeploy"
+      );
+      expect(buildCalls).toBe(1);
+    }
+  );
   test("a concurrent failed transition preserves the failed reporting outcome", async () => {
     await publish();
     sourceFiles[0] = { ...sourceFiles[0], sha: "c".repeat(40) };

@@ -3,17 +3,20 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useSite } from "@/components/sites/site-context";
+import { useRouter } from "@/lib/navigation";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SitePublishFilesState } from "@/types/hooks/sites";
 import type { SiteScope } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
+import { siteHref } from "@/utils/site-links";
 
 /** Loads the site's drafts so the publish dialog can list them. */
 export function useSitePublishFiles(messages: {
   noDrafts: string;
   failed: string;
 }) {
-  const { organizationId, siteId } = useSite();
+  const { organizationId, organizationSlug, siteId } = useSite();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const scope = useMemo(
     () => ({ organizationId, siteId }),
@@ -27,41 +30,58 @@ export function useSitePublishFiles(messages: {
       activeScope.current = null;
     };
   }, [scope]);
+  const current = () => activeScope.current === scope;
+  const fail = (error: unknown) => {
+    if (current()) {
+      toast.error(toErrorMessage(error, messages.failed));
+    }
+    return null;
+  };
 
-  const open = () => {
-    if (activeScope.current !== scope) {
-      return;
+  const open = async () => {
+    if (!current()) {
+      return false;
     }
     setState({ scope, files: null, preparing: true });
-    return queryClient
+    const finish = () => {
+      if (current()) {
+        setState((value) => value && { ...value, preparing: false });
+      }
+      return false;
+    };
+    const status = await queryClient
+      .fetchQuery({
+        ...dashboardOrpc.sites.branches.status.queryOptions({
+          input: { organizationId, siteId },
+        }),
+        staleTime: 0,
+      })
+      .catch(fail);
+    if (!(status && current())) {
+      return finish();
+    }
+    if (!status.canPublishDirect) {
+      finish();
+      router.push(siteHref(organizationSlug, siteId, "editor"));
+      return false;
+    }
+    const loaded = await queryClient
       .fetchQuery({
         ...dashboardOrpc.sites.editor.files.queryOptions({
           input: { organizationId, siteId },
         }),
         staleTime: 0,
       })
-      .then(
-        (loaded) => {
-          if (activeScope.current !== scope) {
-            return;
-          }
-          if (loaded.drafts.length === 0) {
-            toast.error(messages.noDrafts);
-            return;
-          }
-          setState({ scope, files: loaded, preparing: false });
-        },
-        (error: unknown) => {
-          if (activeScope.current === scope) {
-            toast.error(toErrorMessage(error, messages.failed));
-          }
-        }
-      )
-      .then(() => {
-        if (activeScope.current === scope) {
-          setState((current) => current && { ...current, preparing: false });
-        }
-      });
+      .catch(fail);
+    if (!(loaded && current())) {
+      return finish();
+    }
+    if (loaded.drafts.length === 0) {
+      toast.error(messages.noDrafts);
+      return finish();
+    }
+    setState({ scope, files: loaded, preparing: false });
+    return true;
   };
 
   return {

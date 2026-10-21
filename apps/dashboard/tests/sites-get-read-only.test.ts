@@ -56,7 +56,6 @@ if (process.env.NOTRA_SITES_GET_READ_ONLY_TEST_WORKER !== "1") {
     smartDeployments: true,
     previewCommentsEnabled: true,
     previewVisibility: "protected",
-    publishMode: "pull_request",
     showBranding: true,
     analyticsEnabled: true,
     previewPassword: {
@@ -237,10 +236,35 @@ if (process.env.NOTRA_SITES_GET_READ_ONLY_TEST_WORKER !== "1") {
     siteCnameTarget: () => "cname.hosting.example",
   }));
   const { isGeoIngestConfigured } = await import("@notra/geo-core/geo/ingest");
+  const editor = await import("@notra/sites-server/editor");
+  mock.module("@notra/sites-server/editor", () => ({
+    ...editor,
+    publishSiteDrafts: async () => ({
+      commitSha: "synthetic-published",
+      pullRequestUrl: null,
+    }),
+  }));
+  const branches = await import("@notra/sites-server/branches");
+  mock.module("@notra/sites-server/branches", () => ({
+    ...branches,
+    mergeSiteBranch: async () => ({
+      branch: "main",
+      commitSha: "synthetic-merged",
+    }),
+  }));
+  const deploy = await import("@notra/sites-server/deploy");
+  const failedDeploy = mock(async () => {
+    throw new Error("Synthetic deployment enqueue failure");
+  });
+  mock.module("@notra/sites-server/deploy", () => ({
+    ...deploy,
+    deployBranchHead: failedDeploy,
+  }));
   const { sitesRouter } = await import("../src/lib/orpc/routers/sites");
   const { createORPCContext } = await import("../src/lib/orpc/context");
   beforeEach(() => {
     write.mockClear();
+    failedDeploy.mockClear();
     deferred.mockClear();
     limits.length = 0;
     references.length = 0;
@@ -312,4 +336,50 @@ if (process.env.NOTRA_SITES_GET_READ_ONLY_TEST_WORKER !== "1") {
       expect(JSON.stringify(state)).toBe(before);
     }
   );
+  test("publish returns success with deploy pending after the commit landed and enqueue failed", async () => {
+    const context = await createORPCContext({ headers: new Headers() });
+    const result = await call(
+      sitesRouter.editor.publish,
+      {
+        organizationId: site.organizationId,
+        siteId: site.id,
+        message: "Publish",
+      },
+      { context }
+    );
+    expect(result).toEqual({
+      commitSha: "synthetic-published",
+      pullRequestUrl: null,
+      deployPending: true,
+    });
+    expect(failedDeploy).toHaveBeenCalledWith(site, {
+      trigger: "manual",
+      userId: "user-readonly",
+      commitSha: "synthetic-published",
+    });
+    expect(deferred).not.toHaveBeenCalled();
+  });
+  test("merge returns success with deploy pending after GitHub merged and enqueue failed", async () => {
+    const context = await createORPCContext({ headers: new Headers() });
+    const result = await call(
+      sitesRouter.branches.mergeAndPublish,
+      {
+        organizationId: site.organizationId,
+        siteId: site.id,
+        branch: "notra/site-edit-synthetic",
+      },
+      { context }
+    );
+    expect(result).toEqual({
+      branch: "main",
+      commitSha: "synthetic-merged",
+      deployPending: true,
+    });
+    expect(failedDeploy).toHaveBeenCalledWith(site, {
+      trigger: "manual",
+      userId: "user-readonly",
+      commitSha: "synthetic-merged",
+    });
+    expect(deferred).not.toHaveBeenCalled();
+  });
 }

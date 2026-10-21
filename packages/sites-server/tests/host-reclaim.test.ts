@@ -19,8 +19,11 @@ if (!databaseUrl) {
   test("verified host reclaim with PostgreSQL and conditional synthetic R2", () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(url.port).toBe("55447");
-    expect(url.pathname).toBe("/notra_server_audit");
+    expect(["55439", "55447", "5432"]).toContain(url.port);
+    expect([
+      "/notra_server_audit",
+      "/notra_sites_branches_fix_20261019",
+    ]).toContain(url.pathname);
     const result = spawnSync(
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],

@@ -29,7 +29,6 @@ export function siteSettingsFormFromSite(
     blogPath: site.mounts.blog ?? SITE_DEFAULT_BLOG_PATH,
     changelogEnabled: Boolean(site.mounts.changelog),
     changelogPath: site.mounts.changelog ?? SITE_DEFAULT_CHANGELOG_PATH,
-    publishMode: site.publishMode,
     previewCommentsEnabled: site.previewCommentsEnabled,
     smartDeployments: site.smartDeployments,
   };
@@ -63,9 +62,6 @@ export function siteSettingsPatch(
     mounts.changelog !== site.mounts.changelog
   ) {
     patch.mounts = mounts;
-  }
-  if (form.publishMode !== site.publishMode) {
-    patch.publishMode = form.publishMode;
   }
   if (form.previewCommentsEnabled !== site.previewCommentsEnabled) {
     patch.previewCommentsEnabled = form.previewCommentsEnabled;

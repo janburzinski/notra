@@ -1579,8 +1579,6 @@
         "added": "Farbe hinzugefügt",
         "updated": "Farbe aktualisiert",
         "saveFailed": "Farbe konnte nicht gespeichert werden",
-        "deleted": "Farbe gelöscht",
-        "deleteFailed": "Farbe konnte nicht gelöscht werden",
         "editTitle": "Farbe bearbeiten",
         "addDescription": "Füge eine Markenfarbe hinzu und lege fest, wie sie verwendet wird.",
         "editDescription": "Aktualisiere diese Markenfarbe und wie sie verwendet wird.",
@@ -1591,7 +1589,9 @@
         "darkPlaceholder": "Optionaler dunkler Wert",
         "namePlaceholder": "Optionaler Name",
         "usage": "Verwendung",
-        "usagePlaceholder": "z. B. primäre Buttons"
+        "usagePlaceholder": "z. B. primäre Buttons",
+        "deleted": "Farbe gelöscht",
+        "deleteFailed": "Farbe konnte nicht gelöscht werden"
       },
       "fontDialog": {
         "updated": "Schrift aktualisiert",
@@ -3374,9 +3374,9 @@
     },
     "promptSuggestionSheet": {
       "noQueryData": "Keine Daten auf Suchanfragen-Ebene für diesen Prompt.",
-      "question": "Frage",
       "suggestedPrompt": "Vorgeschlagener Prompt",
-      "lookback": "Über die letzten {days} Tage der Google-Suchanfragen, auf denen dieser Prompt basiert."
+      "lookback": "Über die letzten {days} Tage der Google-Suchanfragen, auf denen dieser Prompt basiert.",
+      "question": "Frage"
     },
     "promptSuggestions": {
       "trackAll": "Alle tracken",
@@ -7494,12 +7494,12 @@
     "start": {
       "title": "Demo wird geöffnet…",
       "description": "Einen Moment.",
-      "verificationFailed": "Die Prüfung konnte nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen.",
-      "verificationUnavailableTitle": "Die Demo ist vorübergehend nicht verfügbar",
-      "verificationUnavailableDescription": "Die Sicherheitsprüfung ist noch nicht eingerichtet. Bitte versuch es später erneut.",
       "errorTitle": "Der Demo-Workspace konnte nicht erstellt werden",
       "errorDescription": "Bitte versuch es gleich noch einmal.",
-      "retry": "Erneut versuchen"
+      "retry": "Erneut versuchen",
+      "verificationFailed": "Die Prüfung konnte nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen.",
+      "verificationUnavailableTitle": "Die Demo ist vorübergehend nicht verfügbar",
+      "verificationUnavailableDescription": "Die Sicherheitsprüfung ist noch nicht eingerichtet. Bitte versuch es später erneut."
     },
     "banner": {
       "title": "Entdecke die Notra-Demo.",
@@ -7699,17 +7699,6 @@
         "title": "Öffentlich"
       }
     },
-    "publishModes": {
-      "recommended": "Empfohlen",
-      "pull_request": {
-        "title": "Pull Request",
-        "description": "Änderungen öffnen einen Pull Request."
-      },
-      "direct": {
-        "title": "Direkter Commit",
-        "description": "Änderungen gehen direkt auf den Branch."
-      }
-    },
     "new": {
       "title": "Neue Seite",
       "project": "Projekt: {name}",
@@ -7725,7 +7714,6 @@
       "addressReserved": "{slug} ist reserviert. Ergänze die Adresse um weitere Wörter.",
       "branch": "Produktions-Branch",
       "rootDirectoryPlaceholder": "apps/blog",
-      "publishMode": "Veröffentlichen aus dem Editor",
       "create": "Erstellen & deployen",
       "createFailed": "Seite konnte nicht erstellt werden",
       "noBranchMatch": "Kein passender Branch",
@@ -7946,17 +7934,10 @@
       "description": "{count, plural, one {# geänderte Datei geht} other {# geänderte Dateien gehen}} als ein Commit zu GitHub.",
       "message": "Commit-Nachricht",
       "messagePlaceholder": "Blogbeiträge aktualisieren",
-      "mode": "Art der Veröffentlichung",
-      "pullRequestDescription": "Öffnet einen Pull Request in {branch}. Er geht live, sobald er gemergt ist.",
-      "pullRequestReviewDescription": "{count, plural, one {Prüfe den gespeicherten Entwurf} other {Prüfe alle # gespeicherten Entwürfe}}, bevor du den Pull Request erstellst.",
-      "directDescription": "Committet auf {branch} und geht sofort live.",
-      "directDisabled": "Für diese Seite ausgeschaltet. Ändere das in den Einstellungen.",
-      "openPullRequest": "Pull Request öffnen",
-      "commit": "Committen und deployen",
-      "pullRequestOpened": "Pull Request geöffnet",
-      "viewPullRequest": "Ansehen",
+      "commit": "Veröffentlichen",
       "committed": "Veröffentlicht. Wird jetzt deployt.",
-      "failed": "Veröffentlichen fehlgeschlagen"
+      "failed": "Veröffentlichen fehlgeschlagen",
+      "deployPending": "Veröffentlicht, Deployment ausstehend"
     },
     "settings": {
       "previews": "Vorschauen",
@@ -8017,7 +7998,6 @@
       "noRepository": "Nicht verbunden",
       "rootDirectory": "Stammverzeichnis",
       "rootDirectoryHint": "Wo die Seite im Repository liegt.",
-      "publishModeHint": "Wie Änderungen aus dem Editor in dein Repository kommen.",
       "variablesHint": "Wiederverwendbare Werte wie Namen und Links, nutzbar als Platzhalter.",
       "variablesCount": "{count, plural, =0 {Noch keine} one {# Variable} other {# Variablen}}",
       "analyticsLabel": "Analytics",
@@ -8399,7 +8379,8 @@
       },
       "changes": {
         "none": "Noch keine Änderungen. Deine Bearbeitungen erscheinen hier neben der veröffentlichten Version."
-      }
+      },
+      "branchNotFound": "Branch nicht gefunden, zu {branch} gewechselt"
     },
     "variables": {
       "title": "Content-Variablen",
@@ -8465,9 +8446,8 @@
       "docs": "{provider} Dokumentation",
       "draftDescription": "blog.json hat Änderungen, die noch nicht live sind",
       "reviewAndPublish": "Prüfen und veröffentlichen",
-      "createPullRequest": "PR erstellen",
-      "preparePublishFailed": "Änderungen für den Pull Request konnten nicht geladen werden",
-      "noDrafts": "Es gibt keine Änderungen für einen Pull Request.",
+      "preparePublishFailed": "Ausstehende Änderungen konnten nicht geladen werden",
+      "noDrafts": "Keine unveröffentlichten Änderungen.",
       "publishMessage": "Seite aktualisieren",
       "publishConflict": "Diese Entwürfe stehen im Konflikt mit Änderungen auf GitHub. Öffne den Editor, lade die Dateien neu und wende deine Änderungen erneut an.",
       "invalidTitle": "Ungültige blog.json-Konfiguration",
@@ -8566,8 +8546,11 @@
       "close": "Schließen",
       "autosavePending": "Warten auf Speicherung…",
       "autosaveSaving": "Entwurf wird gespeichert…",
-      "autosaveSaved": "Entwurf gespeichert. Erstelle einen Pull Request und merge ihn, um die Änderungen live zu schalten.",
+      "autosaveSaved": "Entwurf gespeichert. Prüfe deine Änderungen, um sie zu veröffentlichen.",
+      "autosaveInvalid": "Gib gültige Einstellungen ein, um deine Änderungen zu speichern.",
+      "discardUnsaved": "Ungespeicherte Änderungen verwerfen",
       "removeFailedDescription": "Die Integration wurde nicht entfernt. Wiederhole das Entfernen oder verwirf die ungespeicherten Änderungen.",
+      "reviewChanges": "Änderungen prüfen",
       "consent": {
         "title": "Cookie-Banner",
         "description": "Cookie-Banner und Einwilligungsnachweise, auf Basis von c15t.",
@@ -8802,6 +8785,45 @@
           "body": "Fließtext"
         }
       }
+    },
+    "branches": {
+      "newBranch": "Neuer Branch",
+      "rename": "Branch umbenennen",
+      "delete": "Branch löschen",
+      "deleteDescription": "{branch} und seine unveröffentlichten Änderungen dauerhaft löschen? Ein offener Pull Request wird dabei geschlossen.",
+      "discardDeletedDescription": "Die unveröffentlichten Änderungen des gelöschten Branches {branch} dauerhaft verwerfen?",
+      "nameHint": "Optionaler Titel. Ohne Titel wird das aktuelle Datum verwendet. Branch-Namen beginnen mit notra/site-edit-.",
+      "title": "Branch-Titel",
+      "pending": "{count, plural, =0 {Keine ausstehenden Änderungen} one {# ausstehende Änderung} other {# ausstehende Änderungen}}",
+      "bring": "Auf diesen Branch mitnehmen",
+      "leave": "Zurücklassen",
+      "originalKeepsChanges": "Der ursprüngliche Branch behält seine ausstehenden Änderungen in beiden Fällen.",
+      "create": "Branch erstellen",
+      "current": "Aktueller Branch: {branch}",
+      "find": "Branch suchen",
+      "loading": "Branches werden geladen…",
+      "options": "Optionen für {branch}",
+      "moreOptions": "Weitere Optionen",
+      "branches": "Branches",
+      "saveNow": "Jetzt speichern",
+      "requestReview": "Review anfordern",
+      "merge": "Zusammenführen und veröffentlichen",
+      "mergeConflicts": "Löse die Merge-Konflikte auf GitHub vor dem Zusammenführen.",
+      "openPullRequest": "Pull Request öffnen",
+      "publish": "Veröffentlichen",
+      "saveFailed": "Branch-Änderungen konnten nicht gespeichert werden. Deine Entwürfe bleiben erhalten.",
+      "actionFailed": "Der Branch konnte nicht aktualisiert werden.",
+      "statusFailed": "Der Branch-Schutz konnte nicht geprüft werden.",
+      "status": {
+        "draft": "Entwurf",
+        "open": "Offen",
+        "merged": "Zusammengeführt",
+        "closed": "Geschlossen"
+      },
+      "deployPending": "Veröffentlicht, Deployment ausstehend",
+      "discardDeleted": "Entwürfe für gelöschten Branch verwerfen",
+      "renameFor": "Branch {branch} umbenennen",
+      "deleteFor": "Branch {branch} löschen"
     }
   }
 }

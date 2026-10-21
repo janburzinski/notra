@@ -18,6 +18,9 @@ import {
 
 export function toSitesOrpcError(error: unknown): unknown {
   if (error instanceof SiteInputError) {
+    if (error.message === "Branch not found") {
+      return notFound(error.message);
+    }
     return badRequest(
       error.message,
       error.field ? { field: error.field } : undefined

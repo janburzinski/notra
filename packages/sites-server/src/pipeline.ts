@@ -115,10 +115,8 @@ const whyNotBuild = Effect.fn("Sites.whyNotBuild")(function* (
     return null;
   }
   const head = yield* currentBranchHead(access, deployment.branch);
-  const fromWebhook =
-    deployment.trigger === "push" || deployment.trigger === "pull_request";
   if (
-    fromWebhook &&
+    deployment.trigger !== "redeploy" &&
     head !== deployment.commitSha &&
     !(yield* headMatchesForFolder(access, deployment, head, rootDirectory))
   ) {

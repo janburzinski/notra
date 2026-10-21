@@ -13,7 +13,6 @@ const site: SiteSettingsSource = {
   productionBranch: "main",
   rootDirectory: "docs",
   mounts: { blog: "/blog" },
-  publishMode: "pull_request",
   previewCommentsEnabled: true,
   smartDeployments: true,
 };

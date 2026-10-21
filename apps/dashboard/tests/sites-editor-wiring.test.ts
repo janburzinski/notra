@@ -27,7 +27,16 @@ test("file switching does not reset the page's pending-save state", () => {
   expect(openFile).not.toContain("setSaveState");
   expect(openFile).not.toContain("saves.reset");
   expect(page).toContain("const unsaved = saves.unsaved");
-  expect(page).toContain("saveQueue={saves.getQueue(selectedPath)}");
+  const surface = readFileSync(
+    resolve(
+      import.meta.dirname,
+      "../src/components/sites/editor/site-editor-surface.tsx"
+    ),
+    "utf8"
+  );
+  expect(surface).toContain(
+    "saveQueue={saves.getQueue(selectedPath, editorEpoch)}"
+  );
   const pane = readFileSync(
     resolve(
       import.meta.dirname,
@@ -108,8 +117,11 @@ test("an already-open publish dialog blocks submission while any file has unsave
   );
   expect(dialog).toContain("draftCount > 0");
   expect(dialog).toContain("!unsaved");
+  expect(dialog).toContain("siteValidationReady(validation)");
+  expect(dialog).toContain("status.isSuccess");
+  expect(dialog).toContain("!status.isPlaceholderData");
   expect(dialog).toContain(
-    "const canPublish = trimmed.length > 0 && draftCount > 0 && !unsaved;"
+    "queryKey: [...validationOptions.queryKey, draftVersion]"
   );
   expect(dialog).toContain("disabled={!canPublish}");
   const page = readFileSync(
@@ -146,7 +158,14 @@ test("rebasing waits for saved files and freezes the editor independently of its
   expect(page).toContain("inert={rebaseMutation.isPending}");
   expect(banner).toContain("disabled={!canRebase}");
   expect(banner).toContain("loading={isRebasing}");
-  expect(page).toMatch(
+  const surface = readFileSync(
+    resolve(
+      import.meta.dirname,
+      "../src/components/sites/editor/site-editor-surface.tsx"
+    ),
+    "utf8"
+  );
+  expect(surface).toMatch(
     /key=\{`\$\{organizationId\}:\$\{siteId\}:\$\{selectedPath\}:\$\{editorEpoch\}`\}/
   );
 });

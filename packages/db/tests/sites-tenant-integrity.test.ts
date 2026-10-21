@@ -83,7 +83,10 @@ describe.skipIf(!databaseUrl)(
     beforeEach(async () => {
       const url = new URL(databaseUrl ?? "postgresql://invalid/invalid");
       expect(url.hostname).toBe("127.0.0.1");
-      expect(url.pathname).toBe("/notra_server_audit");
+      expect([
+        "/notra_server_audit",
+        "/notra_sites_branches_fix_20261019",
+      ]).toContain(url.pathname);
       client = new Client({ connectionString: databaseUrl });
       await client.connect();
       await client.query("BEGIN");

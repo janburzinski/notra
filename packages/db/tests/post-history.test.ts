@@ -8,7 +8,11 @@ import { expectConstraint } from "./utils/expect-constraint";
 // migration applied (CI replays them into notra_migrations). Everything happens
 // inside a transaction that is rolled back.
 const allowedHosts = new Set(["127.0.0.1", "localhost", "[::1]"]);
-const allowedDatabases = new Set(["/notra_migrations", "/notra_history_test"]);
+const allowedDatabases = new Set([
+  "/notra_migrations",
+  "/notra_history_test",
+  "/notra_sites_branches_fix_20261019",
+]);
 const candidateUrl = process.env.DATABASE_URL;
 const databaseUrl =
   candidateUrl &&

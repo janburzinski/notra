@@ -12,7 +12,8 @@
     "./utils/*": "./src/utils/*.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo"
+    "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
+    "test": "bun test tests"
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.2",

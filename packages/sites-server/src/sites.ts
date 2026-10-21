@@ -3,6 +3,7 @@ import {
   organizations,
   projects,
   siteDomains,
+  siteBranchDrafts,
   siteDrafts,
   siteJobs,
   sites,
@@ -19,7 +20,7 @@ import {
 } from "@notra/sites-core/utils/hosts";
 import { normalizeSiteMounts } from "@notra/sites-core/utils/mounts";
 import { hashPreviewPassword } from "@notra/sites-core/utils/preview-password";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray, sql, or, isNull } from "drizzle-orm";
 
 import { deleteCustomHostnameQuietly } from "./cloudflare-saas";
 import {
@@ -166,7 +167,6 @@ export async function createSite(
         publicOrigin: siteAliasOrigin(slug),
         mounts,
         previewVisibility: input.previewVisibility ?? "protected",
-        publishMode: input.publishMode ?? "pull_request",
         previewsEnabled: input.previewsEnabled ?? true,
         createdByUserId: input.userId,
       })
@@ -235,7 +235,6 @@ export async function updateSiteSettings(
     smartDeployments: patch.smartDeployments,
     previewCommentsEnabled: patch.previewCommentsEnabled,
     previewVisibility: patch.previewVisibility,
-    publishMode: patch.publishMode,
     showBranding: patch.showBranding,
     analyticsEnabled: patch.analyticsEnabled,
     publicOrigin:
@@ -286,24 +285,58 @@ export async function updateSiteSettings(
     if (!current) {
       throw new SiteInputError("Site not found");
     }
+    const changingBranch =
+      values.productionBranch !== undefined &&
+      values.productionBranch !== current.productionBranch;
     const repositoryChanged =
       values.githubRepositoryId !== undefined &&
       (values.githubRepositoryId !== current.githubRepositoryId ||
         values.repositoryOwner !== current.repositoryOwner ||
         values.repositoryName !== current.repositoryName);
-    if (
+    // A new repository or root directory invalidates drafts on every branch.
+    const changingRoot =
       repositoryChanged ||
-      (values.productionBranch !== undefined &&
-        values.productionBranch !== current.productionBranch) ||
       (values.rootDirectory !== undefined &&
-        values.rootDirectory !== current.rootDirectory)
-    ) {
+        values.rootDirectory !== current.rootDirectory);
+    if (changingBranch || changingRoot) {
+      const affectedBranches = [
+        current.productionBranch,
+        values.productionBranch ?? current.productionBranch,
+      ];
       const [draft] = await tx
         .select({ id: siteDrafts.id })
         .from(siteDrafts)
-        .where(eq(siteDrafts.siteId, current.id))
+        .where(
+          and(
+            eq(siteDrafts.siteId, current.id),
+            // Changing root directories invalidates drafts on every branch.
+            changingRoot
+              ? undefined
+              : inArray(siteDrafts.branch, affectedBranches),
+            or(
+              isNull(siteDrafts.committedRevision),
+              sql`${siteDrafts.revision} > ${siteDrafts.committedRevision}`
+            )
+          )
+        )
         .limit(1);
-      if (draft) {
+      const featureDrafts = await tx
+        .select({ id: siteBranchDrafts.id })
+        .from(siteBranchDrafts)
+        .where(
+          and(
+            eq(siteBranchDrafts.siteId, current.id),
+            changingRoot
+              ? undefined
+              : inArray(siteBranchDrafts.branch, affectedBranches),
+            or(
+              isNull(siteBranchDrafts.committedRevision),
+              sql`${siteBranchDrafts.revision} > ${siteBranchDrafts.committedRevision}`
+            )
+          )
+        )
+        .limit(1);
+      if (draft || featureDrafts.length) {
         throw new SiteInputError(
           "Publish or discard this site's drafts before changing its repository, branch or root directory"
         );

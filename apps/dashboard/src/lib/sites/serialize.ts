@@ -55,7 +55,6 @@ export function serializeSite(
     previewCommentsEnabled: site.previewCommentsEnabled,
     previewVisibility: site.previewVisibility,
     previewPasswordSetAt: site.previewPassword?.updatedAt ?? null,
-    publishMode: site.publishMode,
     showBranding: site.showBranding,
     analyticsEnabled: site.analyticsEnabled,
     liveDeploymentId: state?.production?.deploymentId ?? null,

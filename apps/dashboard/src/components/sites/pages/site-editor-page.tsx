@@ -3,22 +3,22 @@
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { EditProvider } from "@pierre/diffs/react";
 import { parseAsString, useQueryState } from "nuqs";
-import { type ReactNode, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslations } from "use-intl";
 
+import { Button } from "@/components/button";
+import { SiteBranchControls } from "@/components/sites/editor/site-branch-controls";
 import { SiteEditorConflictBanner } from "@/components/sites/editor/site-editor-conflict-banner";
-import { SiteEditorEmptyState } from "@/components/sites/editor/site-editor-empty-state";
 import { SiteEditorFilePicker } from "@/components/sites/editor/site-editor-file-picker";
-import { SiteEditorFilesError } from "@/components/sites/editor/site-editor-files-error";
-import { SiteEditorHeaderActions } from "@/components/sites/editor/site-editor-header-actions";
-import { SiteEditorPane } from "@/components/sites/editor/site-editor-pane";
 import { SiteEditorProblems } from "@/components/sites/editor/site-editor-problems";
 import { SiteEditorStatusBar } from "@/components/sites/editor/site-editor-status-bar";
+import { SiteEditorSurface } from "@/components/sites/editor/site-editor-surface";
 import { SiteFileTree } from "@/components/sites/editor/site-file-tree";
 import { useSite } from "@/components/sites/site-context";
 import { SiteNewFileDialog } from "@/components/sites/site-new-file-dialog";
 import { SitePublishDialog } from "@/components/sites/site-publish-dialog";
 import { SITE_NEW_FILE_FOLDERS } from "@/constants/sites";
+import { useSiteEditorBranch } from "@/lib/hooks/use-site-editor-branch";
 import {
   useCreateSiteFile,
   useRebaseSiteDrafts,
@@ -28,8 +28,10 @@ import {
 import { useSiteEditorSaves } from "@/lib/hooks/use-site-editor-saves";
 import { useInvalidateSites } from "@/lib/hooks/use-sites";
 import { useWarnBeforeUnload } from "@/lib/hooks/use-warn-before-unload";
+import type { SiteBranchEditorProps } from "@/types/site-branches";
 import type { SiteEditorJump } from "@/types/site-editor";
 import type { SiteDiagnostic } from "@/types/sites";
+import { siteDraftVersion } from "@/utils/site-draft-version";
 import {
   siteEditorLanguage,
   siteRecordSourceContext,
@@ -37,6 +39,22 @@ import {
 import { createSiteEditor } from "@/utils/site-editor-factory";
 
 export function SiteEditorPage() {
+  const [branch, setBranch] = useQueryState(
+    "branch",
+    parseAsString.withOptions({ history: "replace" })
+  );
+  return (
+    <SiteBranchEditor
+      key={branch ?? "deployment"}
+      branch={branch ?? undefined}
+      onSwitch={async (next) => {
+        await setBranch(next);
+      }}
+    />
+  );
+}
+
+function SiteBranchEditor({ branch, onSwitch }: SiteBranchEditorProps) {
   const { organizationId, siteId, detail } = useSite();
   const t = useTranslations("sites.editorPage");
   const invalidateSites = useInvalidateSites();
@@ -51,13 +69,13 @@ export function SiteEditorPage() {
     baseCommitSha,
     refreshDrafts,
     applyDraftChange,
-  } = useSiteEditorFiles({ organizationId, siteId });
+  } = useSiteEditorFiles({ organizationId, siteId, branch });
   const [selectedParam, setSelectedParam] = useQueryState(
     "file",
     parseAsString.withOptions({ history: "replace" })
   );
   const saves = useSiteEditorSaves(
-    { organizationId, siteId },
+    { organizationId, siteId, branch },
     applyDraftChange
   );
   useWarnBeforeUnload(saves.unsaved);
@@ -72,7 +90,11 @@ export function SiteEditorPage() {
 
   const selectedPath =
     selectedParam && editablePaths.has(selectedParam) ? selectedParam : null;
-  const draftCount = data ? drafts.length : detail.draftCount;
+  const draftCount = data
+    ? drafts.length
+    : branch && branch !== site.productionBranch
+      ? 0
+      : detail.draftCount;
   const mountedFolders = SITE_NEW_FILE_FOLDERS.filter((folder) =>
     Boolean(site.mounts[folder])
   );
@@ -97,6 +119,7 @@ export function SiteEditorPage() {
   const rebaseMutation = useRebaseSiteDrafts({
     organizationId,
     siteId,
+    branch,
     onSettled: (paths) => {
       const replaced = saves.resetClean(paths);
       if (selectedPath && replaced.includes(selectedPath)) {
@@ -110,6 +133,7 @@ export function SiteEditorPage() {
   const validateMutation = useValidateSiteDrafts({
     organizationId,
     siteId,
+    branch,
     onValidated: (next) => {
       setDiagnostics(next);
       setProblemsOpen(true);
@@ -118,11 +142,32 @@ export function SiteEditorPage() {
   const createMutation = useCreateSiteFile({
     organizationId,
     siteId,
+    branch,
     baseCommitSha,
     sourceContext: data?.sourceContext ?? siteRecordSourceContext(site),
     refreshDrafts,
     onSaved: () => setNewFileOpen(false),
     onCreated: openFile,
+  });
+
+  const resetCommitted = () => {
+    const replaced = saves.resetClean(treeFiles.map((file) => file.path));
+    if (selectedPath && replaced.includes(selectedPath)) {
+      setEditorEpoch((epoch) => epoch + 1);
+    }
+  };
+  const { branchStatus, flush, switchBranch } = useSiteEditorBranch({
+    organizationId,
+    siteId,
+    branch,
+    productionBranch: site.productionBranch,
+    filesError: filesQuery.error,
+    draftVersion: siteDraftVersion(drafts),
+    draftCount,
+    saves,
+    onFlushed: resetCommitted,
+    onConflict: setConflicts,
+    onSwitch,
   });
 
   const selectDiagnostic = (diagnostic: SiteDiagnostic) => {
@@ -151,53 +196,31 @@ export function SiteEditorPage() {
     />
   );
 
-  let editorSurface: ReactNode;
-  if (filesQuery.isError) {
-    editorSurface = (
-      <SiteEditorFilesError
-        error={filesQuery.error}
-        onRetry={() => {
-          void filesQuery.refetch();
-        }}
-      />
-    );
-  } else if (selectedPath) {
-    editorSurface = (
-      <SiteEditorPane
-        baseCommitSha={baseCommitSha}
-        diagnostics={fileDiagnostics}
-        jump={jump?.path === selectedPath ? jump : null}
-        key={`${organizationId}:${siteId}:${selectedPath}:${editorEpoch}`}
-        onOpenFilePicker={() => setPickerOpen(true)}
-        saveQueue={saves.getQueue(selectedPath)}
-        organizationId={organizationId}
-        path={selectedPath}
-        site={site}
-        siteId={siteId}
-      />
-    );
-  } else {
-    editorSurface = (
-      <SiteEditorEmptyState
-        canCreateFile={canCreateFile}
-        filesLoading={filesQuery.isPending}
-        onChooseFile={() => setPickerOpen(true)}
-        onNewFile={() => setNewFileOpen(true)}
-      />
-    );
-  }
-
   return (
     <EditProvider createEditor={createSiteEditor}>
       <PageHeading description={t("description")} title={t("title")}>
         <div inert={rebaseMutation.isPending}>
-          <SiteEditorHeaderActions
-            canCreateFile={canCreateFile}
-            draftCount={draftCount}
-            onNewFile={() => setNewFileOpen(true)}
-            onPublish={() => setPublishOpen(true)}
-            unsaved={unsaved}
-          />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              disabled={!canCreateFile}
+              onClick={() => setNewFileOpen(true)}
+            >
+              {t("newFile")}
+            </Button>
+            <SiteBranchControls
+              organizationId={organizationId}
+              siteId={siteId}
+              branch={branch}
+              productionBranch={site.productionBranch}
+              draftCount={draftCount}
+              draftVersion={siteDraftVersion(drafts)}
+              unsaved={unsaved}
+              onPublish={() => setPublishOpen(true)}
+              onFlush={flush}
+              onSwitch={switchBranch}
+            />
+          </div>
         </div>
       </PageHeading>
 
@@ -223,14 +246,29 @@ export function SiteEditorPage() {
       <div
         className="border-shell-border bg-shell flex min-h-112 flex-1 basis-0 flex-col rounded-2xl border p-0.5"
         data-site-editor=""
-        inert={rebaseMutation.isPending}
+        inert={rebaseMutation.isPending || branchStatus.data?.canEdit === false}
       >
         <div className="flex min-h-0 flex-1 gap-0.5">
           <aside className="hidden w-60 shrink-0 flex-col md:flex lg:w-72">
             {fileTree}
           </aside>
           <div className="bg-table-card shadow-table-card border-table-card-border flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px] border">
-            {editorSurface}
+            <SiteEditorSurface
+              filesQuery={filesQuery}
+              selectedPath={selectedPath}
+              branch={branch}
+              site={site}
+              siteId={siteId}
+              organizationId={organizationId}
+              baseCommitSha={baseCommitSha}
+              diagnostics={fileDiagnostics}
+              jump={jump}
+              editorEpoch={editorEpoch}
+              saves={saves}
+              canCreateFile={canCreateFile}
+              onChooseFile={() => setPickerOpen(true)}
+              onNewFile={() => setNewFileOpen(true)}
+            />
             {problemsOpen && diagnostics ? (
               <SiteEditorProblems
                 diagnostics={diagnostics}
@@ -274,7 +312,6 @@ export function SiteEditorPage() {
         }}
         open={publishOpen}
         organizationId={organizationId}
-        site={site}
         siteId={siteId}
         sourcePaths={sourcePaths}
         unsaved={unsaved}

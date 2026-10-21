@@ -22,7 +22,6 @@ export const SITE_CREATE_FORM_DEFAULTS: SiteCreateFormValues = {
   blogPath: null,
   changelogPath: null,
   previewVisibility: "protected",
-  publishMode: "pull_request",
 };
 
 export const SITE_CREATE_INPUT_FIELDS: readonly SiteInputField[] = [

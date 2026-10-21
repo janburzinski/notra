@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ArrowUpRight01Icon,
-  GitPullRequestIcon,
-} from "@hugeicons/core-free-icons";
+import { ArrowUpRight01Icon, Rocket01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { siteIntegrationSchemas } from "@notra/sites-core/schemas/site-integrations";
 import {
@@ -354,10 +351,10 @@ export function SiteIntegrationDialog({
               <HugeiconsIcon
                 aria-hidden="true"
                 data-icon="inline-start"
-                icon={GitPullRequestIcon}
+                icon={Rocket01Icon}
                 strokeWidth={1.5}
               />
-              {t("createPullRequest")}
+              {t("reviewChanges")}
             </Button>
           </div>
         </ResponsiveDialogFooter>

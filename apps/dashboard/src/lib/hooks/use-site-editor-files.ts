@@ -17,10 +17,14 @@ import type { SiteScope } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 import { listSiteEditorFiles } from "@/utils/site-editor";
 
-export function useSiteEditorFiles({ organizationId, siteId }: SiteScope) {
+export function useSiteEditorFiles({
+  organizationId,
+  siteId,
+  branch,
+}: SiteScope) {
   const queryClient = useQueryClient();
   const filesOptions = dashboardOrpc.sites.editor.files.queryOptions({
-    input: { organizationId, siteId },
+    input: { organizationId, siteId, branch },
     refetchOnWindowFocus: false,
   });
   const filesQuery = useQuery(filesOptions);
@@ -37,6 +41,9 @@ export function useSiteEditorFiles({ organizationId, siteId }: SiteScope) {
   const refreshDrafts = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: filesOptions.queryKey }),
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.sites.editor.validate.key(),
+      }),
       queryClient.invalidateQueries({
         queryKey: dashboardOrpc.sites.get.key(),
       }),
@@ -77,6 +84,9 @@ export function useSiteEditorFiles({ organizationId, siteId }: SiteScope) {
       };
     });
     void queryClient.invalidateQueries({
+      queryKey: dashboardOrpc.sites.editor.validate.key(),
+    });
+    void queryClient.invalidateQueries({
       queryKey: dashboardOrpc.sites.get.key(),
     });
   };
@@ -97,6 +107,7 @@ export function useSiteEditorFiles({ organizationId, siteId }: SiteScope) {
 export function useRebaseSiteDrafts({
   organizationId,
   siteId,
+  branch,
   onRebased,
   onSettled,
 }: UseRebaseSiteDraftsParams) {
@@ -105,7 +116,7 @@ export function useRebaseSiteDrafts({
   return useMutation({
     mutationFn: async (paths: string[]) => {
       const filesOptions = dashboardOrpc.sites.editor.files.queryOptions({
-        input: { organizationId, siteId },
+        input: { organizationId, siteId, branch },
       });
       const files = queryClient.getQueryData(filesOptions.queryKey);
       if (!files) {
@@ -117,6 +128,7 @@ export function useRebaseSiteDrafts({
           return dashboardOrpc.sites.editor.rebaseDraft.call({
             organizationId,
             siteId,
+            branch,
             path,
             draftId: draft?.id ?? null,
             draftRevision: draft?.revision ?? null,
@@ -126,7 +138,7 @@ export function useRebaseSiteDrafts({
       );
       const readOptions = paths.map((path) =>
         dashboardOrpc.sites.editor.read.queryOptions({
-          input: { organizationId, siteId, path },
+          input: { organizationId, siteId, branch, path },
         })
       );
       await Promise.all(
@@ -141,6 +153,9 @@ export function useRebaseSiteDrafts({
           queryClient.fetchQuery({ ...options, staleTime: Infinity })
         ),
         queryClient.fetchQuery({ ...filesOptions, staleTime: Infinity }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.sites.editor.validate.key(),
+        }),
         queryClient.invalidateQueries({
           queryKey: dashboardOrpc.sites.get.key(),
         }),
@@ -166,12 +181,17 @@ export function useRebaseSiteDrafts({
 export function useValidateSiteDrafts({
   organizationId,
   siteId,
+  branch,
   onValidated,
 }: UseValidateSiteDraftsParams) {
   const t = useTranslations("sites.editor");
   return useMutation({
     mutationFn: () =>
-      dashboardOrpc.sites.editor.validate.call({ organizationId, siteId }),
+      dashboardOrpc.sites.editor.validate.call({
+        organizationId,
+        siteId,
+        branch,
+      }),
     onSuccess: (result) => onValidated(result.diagnostics),
     onError: (error) => {
       toast.error(toErrorMessage(error, t("validateFailed")));
@@ -182,6 +202,7 @@ export function useValidateSiteDrafts({
 export function useCreateSiteFile({
   organizationId,
   siteId,
+  branch,
   baseCommitSha,
   sourceContext,
   refreshDrafts,
@@ -194,6 +215,7 @@ export function useCreateSiteFile({
       dashboardOrpc.sites.editor.saveDraft.call({
         organizationId,
         siteId,
+        branch,
         path: file.path,
         content: file.content,
         baseBlobSha: null,

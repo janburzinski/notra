@@ -55,7 +55,7 @@ jobs:
           has console && checks="$checks,\"build-console\""
           if jq -e 'any(.[]; IN("@notra/agent","@notra/ai","@notra/db","@notra/utils","@notra/geo-core","dashboard","console","ui","web"))' <<< "$affected" > /dev/null; then checks="$checks,\"typecheck\""; fi
           echo "checks=$checks]" >> "$GITHUB_OUTPUT"
-          if grep -qE '^packages/db/|^(bun\.lock|package\.json)$' <<< "$files"; then
+          if grep -qE '^(packages/db|packages/sites-server|packages/schemas)/|^(bun\.lock|package\.json)$' <<< "$files"; then
             echo infrastructure=true >> "$GITHUB_OUTPUT"
           else
             echo infrastructure=false >> "$GITHUB_OUTPUT"
@@ -236,6 +236,11 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notra_migrations
         run: bun test ./tests/post-history.test.ts
+
+      - name: Test Sites branch workflow and migration 0128 rolling compatibility
+        env:
+          SITES_BRANCH_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/notra_migrations
+        run: bun test packages/sites-server/tests/branch-workflow.test.ts packages/db/tests/sites-branch-migration.test.ts
 
   quality:
     if: always()

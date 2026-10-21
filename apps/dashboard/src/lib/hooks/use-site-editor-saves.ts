@@ -25,10 +25,10 @@ export function useSiteEditorSaves(
   const t = useTranslations("sites.editor");
   const [states, setStates] = useState<Record<string, SiteEditorSaveState>>({});
   const queues = useRef(new Map<string, SiteEditorSaveQueue>()).current;
-  const scopeKey = `${scope.organizationId}:${scope.siteId}:`;
+  const scopeKey = `${scope.organizationId}:${scope.siteId}:${scope.branch ?? ""}:`;
 
-  const getQueue = (path: string) => {
-    const key = `${scopeKey}${path}`;
+  const getQueue = (path: string, generation = 0) => {
+    const key = `${scopeKey}${path}:${generation}`;
     const existing = queues.get(key);
     if (existing) {
       return existing;
@@ -85,6 +85,17 @@ export function useSiteEditorSaves(
 
   return {
     getQueue,
+    flush: async () => {
+      const active = [...queues.entries()]
+        .filter(([key]) => key.startsWith(scopeKey))
+        .map(([, queue]) => queue);
+      await Promise.all(active.map((queue) => queue.flush()));
+      if (
+        active.some((queue) => isSiteEditorUnsaved(queue.getSnapshot().state))
+      ) {
+        throw new Error(t("saveFailed"));
+      }
+    },
     unsaved: Object.entries(states).some(
       ([key, state]) => key.startsWith(scopeKey) && isSiteEditorUnsaved(state)
     ),
@@ -94,19 +105,31 @@ export function useSiteEditorSaves(
     },
     resetClean: (paths: readonly string[]) => {
       const removed = paths.filter((path) => {
-        const key = `${scopeKey}${path}`;
-        const queue = queues.get(key);
-        if (!queue || isSiteEditorUnsaved(queue.getSnapshot().state)) {
+        const entries = [...queues].filter(([key]) =>
+          key.startsWith(`${scopeKey}${path}:`)
+        );
+        if (
+          entries.length === 0 ||
+          entries.some(([, queue]) =>
+            isSiteEditorUnsaved(queue.getSnapshot().state)
+          )
+        ) {
           return false;
         }
-        queues.delete(key);
+        for (const [key] of entries) {
+          queues.delete(key);
+        }
         return true;
       });
       if (removed.length > 0) {
         setStates((current) => {
           const next = { ...current };
           for (const path of removed) {
-            delete next[`${scopeKey}${path}`];
+            for (const key of Object.keys(next)) {
+              if (key.startsWith(`${scopeKey}${path}:`)) {
+                delete next[key];
+              }
+            }
           }
           return next;
         });

@@ -5,7 +5,6 @@ import {
   SITE_DOMAIN_KINDS,
   SITE_DOMAIN_STATUSES,
   SITE_PREVIEW_VISIBILITIES,
-  SITE_PUBLISH_MODES,
   SITE_STATUSES,
 } from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
@@ -3883,6 +3882,7 @@ export const webhookAttempts = pgTable(
   ]
 );
 
+// The physical publish_mode column is dropped in a follow-up migration.
 export const sites = pgTable(
   "sites",
   {
@@ -3919,9 +3919,6 @@ export const sites = pgTable(
     })
       .notNull()
       .default("protected"),
-    publishMode: text("publish_mode", { enum: SITE_PUBLISH_MODES })
-      .notNull()
-      .default("pull_request"),
     showBranding: boolean("show_branding").notNull().default(true),
     analyticsEnabled: boolean("analytics_enabled").notNull().default(true),
     previewPassword: jsonb("preview_password").$type<SitePreviewPassword>(),
@@ -3972,10 +3969,6 @@ export const sites = pgTable(
     check(
       "sites_previewVisibility_check",
       sql`${table.previewVisibility} IN ('public', 'protected')`
-    ),
-    check(
-      "sites_publishMode_check",
-      sql`${table.publishMode} IN ('pull_request', 'direct')`
     ),
     check("sites_lastGeneration_check", sql`${table.lastGeneration} >= 0`),
   ]
@@ -4220,12 +4213,14 @@ export const siteDrafts = pgTable(
     siteId: text("site_id")
       .notNull()
       .references(() => sites.id, { onDelete: "cascade" }),
+    branch: text("branch").notNull().default(""),
     path: text("path").notNull(),
     content: text("content").notNull(),
     baseBlobSha: text("base_blob_sha"),
     baseCommitSha: text("base_commit_sha"),
     deleted: boolean("deleted").notNull().default(false),
     revision: integer("revision").notNull().default(0),
+    committedRevision: integer("committed_revision"),
     updatedByUserId: text("updated_by_user_id").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -4237,6 +4232,44 @@ export const siteDrafts = pgTable(
   },
   (table) => [
     uniqueIndex("siteDrafts_site_path_uidx").on(table.siteId, table.path),
+    uniqueIndex("siteDrafts_site_branch_path_uidx").on(
+      table.siteId,
+      table.branch,
+      table.path
+    ),
+  ]
+);
+
+export const siteBranchDrafts = pgTable(
+  "site_branch_drafts",
+  {
+    id: text("id").primaryKey(),
+    siteId: text("site_id")
+      .notNull()
+      .references(() => sites.id, { onDelete: "cascade" }),
+    branch: text("branch").notNull(),
+    path: text("path").notNull(),
+    content: text("content").notNull(),
+    baseBlobSha: text("base_blob_sha"),
+    baseCommitSha: text("base_commit_sha"),
+    deleted: boolean("deleted").notNull().default(false),
+    revision: integer("revision").notNull().default(0),
+    committedRevision: integer("committed_revision"),
+    updatedByUserId: text("updated_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("siteBranchDrafts_site_branch_path_uidx").on(
+      table.siteId,
+      table.branch,
+      table.path
+    ),
   ]
 );
 

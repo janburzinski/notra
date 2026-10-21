@@ -37,7 +37,6 @@ export function siteCreateInput(
       changelog: sections.changelogPath.trim() || undefined,
     },
     previewVisibility: form.previewVisibility,
-    publishMode: form.publishMode,
     projectId,
   };
 }

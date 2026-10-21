@@ -26,7 +26,7 @@ import {
   GITHUB_PULL_REQUEST_MAX_FILES,
   MAX_TARBALL_BYTES,
 } from "./constants/github";
-import { SitePermanentBuildError } from "./errors";
+import { SiteInputError, SitePermanentBuildError } from "./errors";
 import { SiteProviderRequestError } from "./schemas/provider-error";
 import type {
   BranchHead,
@@ -248,22 +248,55 @@ export async function getBranchHead(
   token: string,
   branch: string
 ): Promise<BranchHead> {
-  const octokit = createOctokit(token);
-  const { data } = await octokit.request(
-    "GET /repos/{owner}/{repo}/branches/{branch}",
-    {
+  const octokit = createOctokit(token, {
+    requestTimeoutMs: GITHUB_INTERACTIVE_READ_TIMEOUT_MS,
+  });
+  const { data } = await octokit
+    .request("GET /repos/{owner}/{repo}/branches/{branch}", {
       owner: repository.owner,
       repo: repository.repo,
       branch,
       headers: GITHUB_API_VERSION_HEADERS,
-    }
-  );
+    })
+    .catch((error: unknown) => {
+      if (error instanceof Error && Reflect.get(error, "status") === 404) {
+        const missing = new SiteInputError("Branch not found");
+        Object.assign(missing, { status: 404 });
+        throw missing;
+      }
+      throw error;
+    });
   return {
     sha: data.commit.sha,
     protected: data.protected,
     message: data.commit.commit.message.split("\n")[0] ?? null,
     author:
       data.commit.commit.author?.name ?? data.commit.author?.login ?? null,
+  };
+}
+
+/** Resolve metadata for the exact commit being deployed, even if its branch moved. */
+export async function getCommitHead(
+  repository: SiteRepository,
+  token: string,
+  commitSha: string
+): Promise<Omit<BranchHead, "protected">> {
+  const octokit = createOctokit(token, {
+    requestTimeoutMs: GITHUB_INTERACTIVE_READ_TIMEOUT_MS,
+  });
+  const { data } = await octokit.request(
+    "GET /repos/{owner}/{repo}/commits/{ref}",
+    {
+      owner: repository.owner,
+      repo: repository.repo,
+      ref: commitSha,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+  return {
+    sha: data.sha,
+    message: data.commit.message.split("\n")[0] ?? null,
+    author: data.commit.author?.name ?? data.author?.login ?? null,
   };
 }
 

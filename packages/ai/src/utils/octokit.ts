@@ -5,10 +5,9 @@ import { Octokit } from "@octokit/core";
 import { demoGitHubFetch } from "./demo-github";
 
 /**
- * Budget for GitHub reads that a user is waiting on (repo probe, repository
- * listings). Publishing, uploads and recursive tree reads stay unbounded: an
- * aborted write can leave a half-applied commit, and large trees legitimately
- * take longer than an interactive request.
+ * Interactive GitHub requests use this budget. Bulk transfers may omit it.
+ * Branch editing also bounds writes while a lock is held. A timed-out write
+ * may have landed, so only explicitly opted-in idempotent reads are retried.
  */
 export const GITHUB_INTERACTIVE_READ_TIMEOUT_MS = 15_000;
 
@@ -64,8 +63,35 @@ function requestFetch(options?: {
 
 export function createOctokit(
   auth?: string,
-  options?: { requestTimeoutMs?: number; avoidStaleSockets?: boolean }
+  options?: {
+    requestTimeoutMs?: number;
+    avoidStaleSockets?: boolean;
+    baseUrl?: string;
+    retryReads?: boolean;
+  }
 ) {
   const fetch = requestFetch(options);
-  return new Octokit({ auth, ...(fetch ? { request: { fetch } } : {}) });
+  const octokit = new Octokit({
+    auth,
+    baseUrl: options?.baseUrl,
+    ...(fetch ? { request: { fetch } } : {}),
+  });
+  if (options?.retryReads) {
+    octokit.hook.wrap("request", async (request, requestOptions) => {
+      try {
+        return await request(requestOptions);
+      } catch (error) {
+        const status =
+          error instanceof Error ? Reflect.get(error, "status") : undefined;
+        if (
+          requestOptions.method !== "GET" ||
+          ![500, 502, 503, 504].includes(status)
+        ) {
+          throw error;
+        }
+        return await request(requestOptions);
+      }
+    });
+  }
+  return octokit;
 }

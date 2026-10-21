@@ -47,6 +47,8 @@ export type SiteFileDiffProps = {
 );
 
 export interface SiteEditorPaneProps {
+  editEpoch?: number;
+  branch?: string;
   organizationId: string;
   siteId: string;
   site: SiteRecord;
@@ -67,14 +69,6 @@ export interface SiteEditorPaneBodyProps {
   value: string;
   published: string | null;
   children: ReactNode;
-}
-
-export interface SiteEditorHeaderActionsProps {
-  canCreateFile: boolean;
-  unsaved: boolean;
-  draftCount: number;
-  onNewFile: () => void;
-  onPublish: () => void;
 }
 
 export interface SiteEditorEmptyStateProps {
@@ -141,4 +135,25 @@ export interface SitePublishChangeProps {
   path: string;
   change: SiteDraftChange;
   defaultOpen: boolean;
+}
+
+export interface SiteEditorSurfaceProps {
+  filesQuery: ReturnType<
+    typeof import("@/lib/hooks/use-site-editor-files").useSiteEditorFiles
+  >["filesQuery"];
+  selectedPath: string | null;
+  branch?: string;
+  site: SiteRecord;
+  siteId: string;
+  organizationId: string;
+  baseCommitSha: string | null;
+  diagnostics: SiteDiagnostic[];
+  jump: SiteEditorJump | null;
+  editorEpoch: number;
+  saves: ReturnType<
+    typeof import("@/lib/hooks/use-site-editor-saves").useSiteEditorSaves
+  >;
+  canCreateFile: boolean;
+  onChooseFile: () => void;
+  onNewFile: () => void;
 }

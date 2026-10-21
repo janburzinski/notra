@@ -1579,8 +1579,6 @@
         "added": "Color added",
         "updated": "Color updated",
         "saveFailed": "Failed to save color",
-        "deleted": "Color deleted",
-        "deleteFailed": "Failed to delete color",
         "editTitle": "Edit color",
         "addDescription": "Add a brand color and how it is used.",
         "editDescription": "Update this brand color and how it is used.",
@@ -1591,7 +1589,9 @@
         "darkPlaceholder": "Optional dark value",
         "namePlaceholder": "Optional name",
         "usage": "Usage",
-        "usagePlaceholder": "e.g. Primary buttons"
+        "usagePlaceholder": "e.g. Primary buttons",
+        "deleted": "Color deleted",
+        "deleteFailed": "Failed to delete color"
       },
       "fontDialog": {
         "updated": "Font updated",
@@ -3374,9 +3374,9 @@
     },
     "promptSuggestionSheet": {
       "noQueryData": "No query-level data for this prompt.",
-      "question": "Question",
       "suggestedPrompt": "Suggested prompt",
-      "lookback": "Across the last {days} days of Google Search queries that informed this prompt."
+      "lookback": "Across the last {days} days of Google Search queries that informed this prompt.",
+      "question": "Question"
     },
     "promptSuggestions": {
       "trackAll": "Track all",
@@ -7494,12 +7494,12 @@
     "start": {
       "title": "Opening the demo…",
       "description": "Just a moment.",
-      "verificationFailed": "The verification couldn't load. Please reload the page to try again.",
-      "verificationUnavailableTitle": "The demo is temporarily unavailable",
-      "verificationUnavailableDescription": "Human verification isn't configured yet. Please try again later.",
       "errorTitle": "The demo workspace couldn't be created",
       "errorDescription": "Please try again in a moment.",
-      "retry": "Try again"
+      "retry": "Try again",
+      "verificationFailed": "The verification couldn't load. Please reload the page to try again.",
+      "verificationUnavailableTitle": "The demo is temporarily unavailable",
+      "verificationUnavailableDescription": "Human verification isn't configured yet. Please try again later."
     },
     "banner": {
       "title": "Explore the Notra demo.",
@@ -7699,17 +7699,6 @@
         "title": "Public"
       }
     },
-    "publishModes": {
-      "recommended": "Recommended",
-      "pull_request": {
-        "title": "Pull request",
-        "description": "Edits open a pull request."
-      },
-      "direct": {
-        "title": "Direct commit",
-        "description": "Edits go straight to the branch."
-      }
-    },
     "new": {
       "title": "New site",
       "project": "Project: {name}",
@@ -7725,7 +7714,6 @@
       "addressReserved": "{slug} is reserved. Add more words to the address.",
       "branch": "Production branch",
       "rootDirectoryPlaceholder": "apps/blog",
-      "publishMode": "Publishing from the editor",
       "create": "Create & deploy",
       "createFailed": "Couldn't create the site",
       "noBranchMatch": "No matching branch",
@@ -7946,17 +7934,10 @@
       "description": "{count, plural, one {# changed file goes} other {# changed files go}} to GitHub as one commit.",
       "message": "Commit message",
       "messagePlaceholder": "Update blog posts",
-      "mode": "How to publish",
-      "pullRequestDescription": "Opens a pull request into {branch}. It goes live when merged.",
-      "pullRequestReviewDescription": "{count, plural, one {Review the saved draft} other {Review all # saved drafts}} before opening the pull request.",
-      "directDescription": "Commits to {branch} and goes live right away.",
-      "directDisabled": "Turned off for this site. Change it in settings.",
-      "openPullRequest": "Open pull request",
-      "commit": "Commit and deploy",
-      "pullRequestOpened": "Pull request opened",
-      "viewPullRequest": "View",
+      "commit": "Publish",
       "committed": "Published. Deploying now.",
-      "failed": "Couldn't publish"
+      "failed": "Couldn't publish",
+      "deployPending": "Published, deploy pending"
     },
     "settings": {
       "previews": "Previews",
@@ -8017,7 +7998,6 @@
       "noRepository": "Not connected",
       "rootDirectory": "Root directory",
       "rootDirectoryHint": "Where the site lives in the repository.",
-      "publishModeHint": "How changes from the editor reach your repository.",
       "variablesHint": "Reusable values like names and links, available as placeholders.",
       "variablesCount": "{count, plural, =0 {None yet} one {# variable} other {# variables}}",
       "analyticsLabel": "Analytics",
@@ -8399,7 +8379,8 @@
       },
       "changes": {
         "none": "No changes yet. Your edits show up here next to the published version."
-      }
+      },
+      "branchNotFound": "Branch not found, switched to {branch}"
     },
     "variables": {
       "title": "Content variables",
@@ -8465,9 +8446,8 @@
       "docs": "{provider} docs",
       "draftDescription": "blog.json has changes that aren't live yet",
       "reviewAndPublish": "Review and publish",
-      "createPullRequest": "Create PR",
-      "preparePublishFailed": "Couldn't load changes for the pull request",
-      "noDrafts": "There are no changes to include in a pull request.",
+      "preparePublishFailed": "Couldn't load pending changes",
+      "noDrafts": "There are no pending changes.",
       "publishMessage": "Update site",
       "publishConflict": "These drafts conflict with changes on GitHub. Open the editor to reload the files and reapply your changes.",
       "invalidTitle": "Invalid blog.json configuration",
@@ -8566,8 +8546,11 @@
       "close": "Close",
       "autosavePending": "Waiting to save…",
       "autosaveSaving": "Saving draft…",
-      "autosaveSaved": "Draft saved. Create a pull request, then merge it to go live.",
+      "autosaveSaved": "Draft saved. Review your changes to publish them.",
+      "autosaveInvalid": "Enter valid settings to save your changes.",
+      "discardUnsaved": "Discard unsaved changes",
       "removeFailedDescription": "The integration was not removed. Retry the removal or discard the unsaved changes.",
+      "reviewChanges": "Review changes",
       "consent": {
         "title": "Cookie banner",
         "description": "Cookie banner and consent records, built on c15t.",
@@ -8802,6 +8785,45 @@
           "body": "Body"
         }
       }
+    },
+    "branches": {
+      "newBranch": "New branch",
+      "rename": "Rename branch",
+      "delete": "Delete branch",
+      "deleteDescription": "Permanently delete {branch} and its unpublished changes? Any open pull request will be closed.",
+      "discardDeletedDescription": "Permanently discard the unpublished changes for the deleted branch {branch}?",
+      "nameHint": "Optional title. Leave it empty to use the current date. Branch names start with notra/site-edit-.",
+      "title": "Branch title",
+      "pending": "{count, plural, =0 {No pending changes} one {# pending change} other {# pending changes}}",
+      "bring": "Bring them to this branch",
+      "leave": "Leave them behind",
+      "originalKeepsChanges": "The original branch keeps its pending changes either way.",
+      "create": "Create branch",
+      "current": "Current branch: {branch}",
+      "find": "Find a branch",
+      "loading": "Loading branches…",
+      "options": "Options for {branch}",
+      "moreOptions": "More options",
+      "branches": "Branches",
+      "saveNow": "Save now",
+      "requestReview": "Request review",
+      "merge": "Merge and publish",
+      "mergeConflicts": "Resolve the merge conflicts on GitHub before merging.",
+      "openPullRequest": "Open pull request",
+      "publish": "Publish",
+      "saveFailed": "Could not save branch changes. Your drafts are kept.",
+      "actionFailed": "Could not update the branch.",
+      "statusFailed": "Could not check branch protection.",
+      "status": {
+        "draft": "Draft",
+        "open": "Open",
+        "merged": "Merged",
+        "closed": "Closed"
+      },
+      "deployPending": "Published, deploy pending",
+      "discardDeleted": "Discard drafts for deleted branch",
+      "renameFor": "Rename branch {branch}",
+      "deleteFor": "Delete branch {branch}"
     }
   }
 }

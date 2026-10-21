@@ -26,8 +26,10 @@ import {
 } from "@/utils/site-editor";
 
 export function SiteEditorPane({
+  editEpoch = 0,
   organizationId,
   siteId,
+  branch,
   site,
   path,
   baseCommitSha,
@@ -39,7 +41,7 @@ export function SiteEditorPane({
   const t = useTranslations("sites.editor");
   const tPage = useTranslations("sites.editorPage");
   const readOptions = dashboardOrpc.sites.editor.read.queryOptions({
-    input: { organizationId, siteId, path },
+    input: { organizationId, siteId, branch, path },
     refetchOnWindowFocus: false,
   });
   const readQuery = useQuery(readOptions);
@@ -67,6 +69,7 @@ export function SiteEditorPane({
   const saveInput = (text: string) => ({
     organizationId,
     siteId,
+    branch,
     path,
     content: text,
     baseBlobSha: document?.blobSha ?? null,
@@ -138,7 +141,7 @@ export function SiteEditorPane({
         >
           <SiteCodeEditor
             diagnostics={diagnostics}
-            editStateKey={`${siteEditStateKey(siteId, path)}:${revision}`}
+            editStateKey={`${siteEditStateKey(`${siteId}:${branch ?? ""}`, path)}:${editEpoch}:${revision}`}
             initialValue={value}
             jump={jump}
             key={revision}

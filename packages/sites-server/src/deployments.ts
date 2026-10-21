@@ -6,18 +6,7 @@ import {
   SITE_DEPLOYMENT_TRANSITIONS,
 } from "@notra/sites-core/constants/sites";
 import { hashBuildTarget } from "@notra/sites-core/utils/build-target";
-import {
-  and,
-  desc,
-  eq,
-  gt,
-  inArray,
-  lte,
-  ne,
-  notInArray,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, desc, eq, gt, inArray, lte, ne, or, sql } from "drizzle-orm";
 
 import { ROLLBACK_HISTORY } from "./constants/deployments";
 import { SiteNotBuildableError } from "./errors";
@@ -132,12 +121,56 @@ export async function cancelPreviewBuilds(
 }
 
 export async function enqueueSiteDeployment(
-  input: EnqueueDeploymentInput
+  input: EnqueueDeploymentInput,
+  assertCurrentHead?: () => Promise<void>
 ): Promise<EnqueuedDeployment> {
   const enqueued = await db.transaction(async (tx) => {
     const organizationId = await lockSiteOrganization(tx, input.siteId);
     if (!organizationId) {
       throw new SiteNotBuildableError("Site workspace not found");
+    }
+    if (input.deduplicateCommit) {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtextextended(${JSON.stringify(["sites-deploy-commit", input.siteId, input.kind, input.previewKey, input.commitSha])}, 0))`
+      );
+      const [existing] = await tx
+        .select({ deployment: siteDeployments, jobId: siteJobs.id })
+        .from(siteDeployments)
+        .innerJoin(
+          siteJobs,
+          and(
+            eq(siteJobs.deploymentId, siteDeployments.id),
+            eq(siteJobs.kind, "build")
+          )
+        )
+        .where(
+          and(
+            eq(siteDeployments.siteId, input.siteId),
+            eq(siteDeployments.commitSha, input.commitSha),
+            eq(siteDeployments.kind, input.kind),
+            eq(siteDeployments.branch, input.branch),
+            inArray(siteDeployments.status, [
+              "queued",
+              "building",
+              "uploading",
+            ]),
+            inArray(siteJobs.status, ["pending", "running"]),
+            sql`${siteDeployments.previewKey} is not distinct from ${input.previewKey}`
+          )
+        )
+        .limit(1);
+      if (existing) {
+        return existing;
+      }
+    }
+    if (assertCurrentHead) {
+      // Keep head verification and generation allocation in the same admission order.
+      await tx
+        .select({ id: sites.id })
+        .from(sites)
+        .where(eq(sites.id, input.siteId))
+        .for("update");
+      await assertCurrentHead();
     }
     return await insertDeployment(tx, input, organizationId);
   });
@@ -451,7 +484,7 @@ export async function hasNewerDeployment(
         ]),
         branchHead
           ? or(
-              notInArray(siteDeployments.trigger, ["push", "pull_request"]),
+              eq(siteDeployments.trigger, "redeploy"),
               eq(siteDeployments.commitSha, branchHead)
             )
           : undefined

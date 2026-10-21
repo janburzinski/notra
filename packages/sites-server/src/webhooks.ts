@@ -164,6 +164,7 @@ async function handlePush(payload: PushPayload): Promise<string[]> {
       continue;
     }
     const jobId = await enqueueOrSkip({
+      deduplicateCommit: !previewKey,
       ...commit,
       siteId: site.id,
       kind: previewKey ? "preview" : "production",

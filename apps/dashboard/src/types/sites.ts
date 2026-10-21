@@ -4,6 +4,7 @@ import type { RepositoryContentCount } from "@notra/sites-server/types/github";
 import type { SiteInputField } from "@notra/sites-server/types/sites";
 import type { Badge } from "@notra/ui/components/ui/badge";
 import type { InferRouterInputs, InferRouterOutputs } from "@orpc/server";
+import type { UseQueryResult } from "@tanstack/react-query";
 import type { ComponentProps, ReactNode } from "react";
 
 import type { SITE_CREATE_STEP_IDS } from "@/constants/site-create";
@@ -72,7 +73,6 @@ export interface SiteSectionConfig {
 export type SiteNewFileFolder = (typeof SITE_NEW_FILE_FOLDERS)[number];
 export type SiteProxyRecipeId = (typeof SITE_PROXY_RECIPES)[number];
 export type SitePreviewVisibility = SiteRecord["previewVisibility"];
-export type SitePublishMode = SiteRecord["publishMode"];
 export type SiteMounts = SiteRecord["mounts"];
 export type SiteDomainKind = SiteDomain["kind"];
 
@@ -97,6 +97,7 @@ export interface SiteDomainConnectRouteContext {
 }
 
 export interface SiteScope {
+  branch?: string;
   organizationId: string;
   siteId: string;
 }
@@ -129,7 +130,6 @@ export interface SiteSettingsForm {
   blogPath: string;
   changelogEnabled: boolean;
   changelogPath: string;
-  publishMode: SitePublishMode;
   previewCommentsEnabled: boolean;
   smartDeployments: boolean;
 }
@@ -140,7 +140,6 @@ export type SiteSettingsSource = Pick<
   | "productionBranch"
   | "rootDirectory"
   | "mounts"
-  | "publishMode"
   | "previewCommentsEnabled"
   | "smartDeployments"
 >;
@@ -154,7 +153,6 @@ export interface SiteCreateFormValues {
   blogPath: string | null;
   changelogPath: string | null;
   previewVisibility: SitePreviewVisibility;
-  publishMode: SitePublishMode;
 }
 
 export type SiteCreateFieldErrors = Partial<Record<SiteInputField, string>>;
@@ -171,7 +169,6 @@ export interface SiteSettingsPatch {
   productionBranch?: string;
   rootDirectory?: string;
   mounts?: { blog?: string; changelog?: string };
-  publishMode?: SitePublishMode;
   previewCommentsEnabled?: boolean;
   smartDeployments?: boolean;
   showBranding?: boolean;
@@ -200,14 +197,6 @@ export type SiteDomainChipStatus =
   | "proxyRequired"
   | "verifying"
   | "failed";
-
-export interface SiteChoiceOption<T extends string> {
-  value: T;
-  title: string;
-  description: string;
-  badge?: string;
-  disabled?: boolean;
-}
 
 export type SiteBuildLogTone =
   | "default"
@@ -341,3 +330,8 @@ export type PostPreviewState =
   | "live"
   | "expired"
   | "failed";
+
+export type SiteValidationQuery = Pick<
+  UseQueryResult<{ ok: boolean }>,
+  "data" | "isPlaceholderData" | "isSuccess"
+>;

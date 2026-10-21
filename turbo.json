@@ -3,6 +3,8 @@
   "ui": "tui",
   "globalDependencies": [".npmrc", "bunfig.toml", "scripts/prepare-effect.sh"],
   "globalEnv": [
+    "SITES_BRANCH_TEST_DATABASE_URL",
+    "SITES_TEST_DATABASE_URL",
     "SITES_R2_ACCOUNT_ID",
     "SITES_R2_ACCESS_KEY_ID",
     "SITES_R2_SECRET_ACCESS_KEY",

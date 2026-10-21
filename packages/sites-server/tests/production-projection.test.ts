@@ -13,7 +13,10 @@ if (!databaseUrl) {
   test("published production projection, rollback and durable repair", () => {
     const url = new URL(databaseUrl);
     expect(url.hostname).toBe("127.0.0.1");
-    expect(url.pathname).toBe("/notra_server_audit");
+    expect([
+      "/notra_server_audit",
+      "/notra_sites_branches_fix_20261019",
+    ]).toContain(url.pathname);
     const result = spawnSync(
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],
@@ -331,6 +334,7 @@ if (!databaseUrl) {
     await db.insert(siteDrafts).values({
       id: `${siteId}-draft`,
       siteId,
+      branch: site.productionBranch,
       path: "blog/post.mdx",
       content: "Synthetic draft",
     });

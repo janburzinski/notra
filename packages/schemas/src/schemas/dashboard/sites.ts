@@ -3,6 +3,7 @@ import {
   SITE_PREVIEW_PASSWORD_MIN_LENGTH,
 } from "@notra/sites-core/constants/sites";
 import { siteIntegrationUpdateSchema } from "@notra/sites-core/schemas/site-integrations";
+import { isValidGitBranch } from "@notra/sites-core/utils/git-branch";
 import z from "zod";
 
 import { SITE_BULK_IMPORT_MAX_SITES } from "../../constants/dashboard/sites";
@@ -25,6 +26,12 @@ const siteMountsInputSchema = z
   .refine((mounts) => Boolean(mounts.blog ?? mounts.changelog), {
     message: "Enable the blog, the changelog, or both",
   });
+
+export const siteBranchNameSchema = z
+  .string()
+  .min(1)
+  .max(250)
+  .refine(isValidGitBranch, "Invalid Git branch name");
 
 export const siteScopeInputSchema = z.object({ organizationId, siteId });
 
@@ -59,11 +66,10 @@ export const createSiteInputSchema = z.object({
   name: z.string().trim().min(1).max(80),
   slug: z.string().trim().toLowerCase().max(40).optional(),
   repositoryId: z.string().min(1),
-  productionBranch: z.string().trim().min(1).max(250).optional(),
+  productionBranch: siteBranchNameSchema.optional(),
   rootDirectory: z.string().trim().max(200).optional(),
   mounts: siteMountsInputSchema,
   previewVisibility: z.enum(["public", "protected"]).default("protected"),
-  publishMode: z.enum(["pull_request", "direct"]).default("pull_request"),
   projectId: z.string().min(1),
 });
 
@@ -71,7 +77,7 @@ export const createSitesInputSchema = z.object({
   organizationId,
   projectId: z.string().min(1),
   repositoryId: z.string().min(1),
-  productionBranch: z.string().trim().min(1).max(250).optional(),
+  productionBranch: siteBranchNameSchema.optional(),
   previewsEnabled: z.boolean().default(false),
   sites: z
     .array(
@@ -89,14 +95,13 @@ export const createSitesInputSchema = z.object({
 export const updateSiteInputSchema = siteScopeInputSchema.extend({
   name: z.string().trim().min(1).max(80).optional(),
   repositoryId: z.string().min(1).optional(),
-  productionBranch: z.string().trim().min(1).max(250).optional(),
+  productionBranch: siteBranchNameSchema.optional(),
   rootDirectory: z.string().trim().max(200).optional(),
   mounts: siteMountsInputSchema.optional(),
   previewsEnabled: z.boolean().optional(),
   smartDeployments: z.boolean().optional(),
   previewCommentsEnabled: z.boolean().optional(),
   previewVisibility: z.enum(["public", "protected"]).optional(),
-  publishMode: z.enum(["pull_request", "direct"]).optional(),
   showBranding: z.boolean().optional(),
   analyticsEnabled: z.boolean().optional(),
   previewPassword: previewPassword.optional(),
@@ -116,7 +121,7 @@ export const listSiteDeploymentsInputSchema = siteScopeInputSchema.extend({
 });
 
 export const siteBranchPreviewInputSchema = siteScopeInputSchema.extend({
-  branch: z.string().trim().min(1).max(250),
+  branch: siteBranchNameSchema,
 });
 
 export const sitePreviewInputSchema = siteScopeInputSchema.extend({
@@ -163,7 +168,48 @@ export const siteDomainInputSchema = siteScopeInputSchema.extend({
   domainId: z.string().startsWith("dom_"),
 });
 
-export const siteFilePathInputSchema = siteScopeInputSchema.extend({
+export const siteEditorScopeInputSchema = siteScopeInputSchema.extend({
+  branch: siteBranchNameSchema.optional(),
+});
+
+export const siteBranchInputSchema = siteEditorScopeInputSchema.extend({
+  branch: siteBranchNameSchema,
+});
+
+export const siteBranchFlushInputSchema = siteBranchInputSchema.extend({
+  skipIfBusy: z.boolean().default(false),
+});
+
+export const siteBranchesListInputSchema = siteScopeInputSchema.extend({
+  search: z.string().trim().max(250).default(""),
+});
+
+export const siteBranchCreateInputSchema = siteEditorScopeInputSchema.extend({
+  title: z
+    .string()
+    .trim()
+    .max(100)
+    .refine(
+      (title) => !title || isValidGitBranch(title.replaceAll(" ", "-")),
+      "Invalid branch title"
+    )
+    .default(""),
+  bringChanges: z.boolean(),
+});
+
+export const siteBranchRenameInputSchema = siteBranchInputSchema.extend({
+  title: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .refine(
+      (title) => isValidGitBranch(title.replaceAll(" ", "-")),
+      "Invalid branch title"
+    ),
+});
+
+export const siteFilePathInputSchema = siteEditorScopeInputSchema.extend({
   path: z.string().trim().min(1).max(400),
 });
 
@@ -184,9 +230,8 @@ export const saveSiteDraftInputSchema = siteDraftMutationInputSchema.extend({
   deleted: z.boolean().optional(),
 });
 
-export const publishSiteDraftsInputSchema = siteScopeInputSchema.extend({
+export const publishSiteDraftsInputSchema = siteEditorScopeInputSchema.extend({
   message: z.string().trim().min(1).max(200),
-  mode: z.enum(["direct", "pull_request"]),
 });
 
 export const saveSiteIntegrationInputSchema = siteScopeInputSchema.and(
