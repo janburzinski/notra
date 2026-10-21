@@ -168,7 +168,7 @@ export function AutomationCard({
     "group/card border-shell-border bg-shell focus-visible:ring-ring/50 flex h-full flex-col rounded-2xl border px-0.5 pt-0.5 text-left outline-none focus-visible:ring-[3px]";
   const content = (
     <>
-      <div className="border-border bg-background shadow-lift group-hover/card:bg-muted/30 duration-fast flex flex-1 flex-col gap-3 rounded-[14px] border p-4 transition-colors">
+      <div className="border-table-card-border bg-table-card shadow-table-card group-hover/card:bg-muted/30 duration-fast flex flex-1 flex-col gap-3 rounded-[14px] border p-4 transition-colors">
         <span className="bg-background text-muted-foreground ring-foreground/10 flex size-9 shrink-0 items-center justify-center rounded-lg ring-1">
           <HugeiconsIcon
             className={cn("size-4.5", TONE_CLASSES[tone])}

@@ -84,7 +84,7 @@ function TitleCard({
           <div className="flex shrink-0 items-center gap-2">{action}</div>
         )}
       </div>
-      <div className="flex flex-1 flex-col overflow-hidden rounded-[14px] border border-border bg-background shadow-lift">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-[14px] border border-table-card-border bg-table-card shadow-table-card">
         <div className={cn("flex-1 px-4 py-3", contentClassName)}>
           {children}
         </div>

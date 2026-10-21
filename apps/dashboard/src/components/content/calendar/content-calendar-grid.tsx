@@ -32,10 +32,10 @@ export function ContentCalendarGrid({
           ))}
         </div>
       </div>
-      <div className="border-border bg-background shadow-lift relative -mt-5 overflow-hidden rounded-2xl border">
-        <div className="bg-border grid grid-cols-7 gap-px">
+      <div className="border-table-card-border bg-table-card shadow-table-card relative -mt-5 overflow-hidden rounded-2xl border">
+        <div className="bg-table-row-border grid grid-cols-7 gap-px">
           {days.map((day) => (
-            <div className="bg-background" key={calendarDayKey(day)}>
+            <div className="bg-table-card" key={calendarDayKey(day)}>
               <ContentCalendarDay
                 day={day}
                 items={itemsByDay.get(calendarDayKey(day)) ?? []}

@@ -229,7 +229,7 @@ export function SiteEditorPage() {
           <aside className="hidden w-60 shrink-0 flex-col md:flex lg:w-72">
             {fileTree}
           </aside>
-          <div className="bg-background shadow-lift flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px] border">
+          <div className="bg-table-card shadow-table-card border-table-card-border flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px] border">
             {editorSurface}
             {problemsOpen && diagnostics ? (
               <SiteEditorProblems

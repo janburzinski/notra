@@ -306,7 +306,7 @@ function TemplateCard({
       onClick={onSelect}
       type="button"
     >
-      <div className="border-border bg-background shadow-lift group-hover/card:bg-muted/30 duration-fast flex w-full flex-1 flex-col gap-3 rounded-[14px] border p-4 transition-colors">
+      <div className="border-table-card-border bg-table-card shadow-table-card group-hover/card:bg-muted/30 duration-fast flex w-full flex-1 flex-col gap-3 rounded-[14px] border p-4 transition-colors">
         <span className="bg-background text-muted-foreground ring-foreground/10 flex size-9 shrink-0 items-center justify-center rounded-lg ring-1">
           <HugeiconsIcon
             className={cn(

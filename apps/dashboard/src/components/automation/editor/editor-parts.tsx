@@ -63,7 +63,7 @@ export function EditorBox({ className, ...props }: ComponentProps<"div">) {
     <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
       <div
         className={cn(
-          "divide-border shadow-lift bg-background divide-y overflow-hidden rounded-[14px] border",
+          "divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border",
           className
         )}
         {...props}

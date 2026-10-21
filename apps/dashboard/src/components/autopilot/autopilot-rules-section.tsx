@@ -44,7 +44,7 @@ export function AutopilotRulesSection({
       <h3 className="px-1 text-sm font-medium">What Autopilot skips</h3>
       {rules.length > 0 ? (
         <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
-          <ul className="divide-border shadow-lift bg-background divide-y overflow-hidden rounded-[14px] border">
+          <ul className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
             {rules.map((rule) => (
               <li className="flex items-start gap-3 px-4 py-2.5" key={rule.id}>
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">

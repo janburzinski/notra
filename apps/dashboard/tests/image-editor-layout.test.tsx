@@ -37,7 +37,7 @@ test.each([
     if (format === "diagram") {
       expect(html).toContain("<h1");
       expect(html).not.toContain("border-shell-border");
-      expect(html).not.toContain("shadow-lift");
+      expect(html).not.toContain("shadow-table-card");
     } else {
       expect(html).toContain("border-shell-border");
     }

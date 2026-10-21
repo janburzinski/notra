@@ -51,7 +51,7 @@ export function AgentFeedbackEmpty({
           />
         </div>
         <AgentFeedbackSetup
-          className="border-border bg-card shadow-lift relative -mt-5 rounded-2xl border p-4 text-left sm:p-5"
+          className="border-table-card-border bg-table-card shadow-table-card relative -mt-5 rounded-2xl border p-4 text-left sm:p-5"
           setup={setup}
           showPromptAction={false}
         />

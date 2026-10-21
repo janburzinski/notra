@@ -31,7 +31,7 @@ export function SplitModalPane({
   return (
     <section
       className={cn(
-        "md:border-border md:bg-card md:shadow-lift flex min-h-0 min-w-0 flex-1 flex-col md:rounded-[21px] md:border",
+        "md:border-table-card-border md:bg-table-card md:shadow-table-card flex min-h-0 min-w-0 flex-1 flex-col md:rounded-[21px] md:border",
         className
       )}
       {...props}

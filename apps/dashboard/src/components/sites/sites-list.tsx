@@ -116,7 +116,7 @@ function SiteListCard({
             <li className="border-shell-border bg-shell relative isolate min-w-0 overflow-hidden rounded-2xl border px-0.5 pt-0.5" />
           }
         >
-          <div className="border-border bg-background shadow-lift grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 rounded-[14px] border px-4 py-3 sm:flex sm:flex-wrap sm:gap-x-4">
+          <div className="border-table-card-border bg-table-card shadow-table-card grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 rounded-[14px] border px-4 py-3 sm:flex sm:flex-wrap sm:gap-x-4">
             <div className="col-start-1 row-start-1 min-w-0 flex-1 space-y-1 sm:basis-56">
               <h2 className="text-sm font-medium">
                 <Link

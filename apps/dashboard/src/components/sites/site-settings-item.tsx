@@ -69,7 +69,7 @@ export function SiteSettingsValue({ children, mono }: SiteSettingsValueProps) {
 export function SiteSettingsList({ children }: SiteSettingsListProps) {
   return (
     <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
-      <div className="divide-border shadow-lift bg-background divide-y overflow-hidden rounded-[14px] border">
+      <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
         {children}
       </div>
     </div>

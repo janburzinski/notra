@@ -37,8 +37,8 @@
   --destructive-foreground: hsl(0 0% 98%);
   --border: hsl(0 0% 89.8%);
   --input: hsl(0 0% 89.8%);
-  --shell: hsl(240 6% 94.5%);
-  --shell-border: hsl(240 5% 87%);
+  --shell: var(--table-shell);
+  --shell-border: var(--table-shell-border);
   --table-shell: #f3f3f2;
   --table-shell-border: #e7e7e5;
   --table-card: #ffffff;
@@ -119,8 +119,8 @@
   --destructive-foreground: hsl(0 0% 99%);
   --border: oklch(0.275 0.006 270);
   --input: oklch(0.3 0.006 270);
-  --shell: oklch(0.22 0.006 270);
-  --shell-border: oklch(0.275 0.006 270);
+  --shell: var(--table-shell);
+  --shell-border: var(--table-shell-border);
   --table-shell: #161616;
   --table-shell-border: #232323;
   --table-card: #1f1f1f;

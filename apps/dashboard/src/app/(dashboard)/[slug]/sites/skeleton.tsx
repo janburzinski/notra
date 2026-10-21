@@ -20,7 +20,7 @@ export function SitesPageSkeleton() {
             className="border-shell-border bg-shell overflow-hidden rounded-2xl border px-0.5 pt-0.5"
             key={index}
           >
-            <div className="border-border bg-background shadow-lift flex items-center rounded-[14px] border px-4 py-3">
+            <div className="border-table-card-border bg-table-card shadow-table-card flex items-center rounded-[14px] border px-4 py-3">
               <div className="flex flex-1 flex-col gap-1">
                 <Skeleton className="h-5 w-32" />
                 <Skeleton className="h-4 w-40" />
