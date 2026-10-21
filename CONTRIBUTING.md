@@ -606,8 +606,8 @@ pool cleanup happen on visitor requests, not through a Railway/Vercel cron.
    entry, seeded GEO data, sandbox reset, a generated demo API key, a real
    request from the API console, request-log updates, and one streaming chat
    or content-generation run. A green liveness probe alone is not sufficient.
-5. Keep Railway available for rollback until those checks pass. Only explicit
-   activation below removes its two demo services from the scheduled release;
+5. Keep Railway available for rollback until those checks pass. Configuring the
+   shared deployment key removes its two demo services from the Railway release;
    it does **not** delete them or modify DNS. Disable any old independent deployment triggers
    and update the private infra repository before eventually retiring them.
 
@@ -615,19 +615,15 @@ For scheduled releases, use the existing GitHub Actions secret `UNKEY_DEPLOY_ROO
 with read access to every enabled Unkey app, its production environment, domains and
 deployments, and write access to its deployment collection. All Unkey releases use
 this single shared CI credential, separate from runtime `UNKEY_ROOT_KEY`.
-After both custom domains are verified and have a current healthy deployment,
-set GitHub Actions repository **variable** `UNKEY_DEMO_ENABLED=true` and
+After all four Unkey custom domains are verified and have current healthy deployments,
 run **Production deploy** with `dry_run` checked. Then disable production
 **Auto deploy** on both demo apps (keep their GitHub connection) and run a real
-release. The script checks both targets before any builds, deploys demo API
-before dashboard, and verifies the exact checked commit is current. Without
-explicit activation (unset, empty, or exact `false`), both Railway demo releases
-remain unchanged, even when the shared key exists. Exact `true` requires the shared
-key and releases both demo apps on Unkey instead of Railway; invalid flags or a
-missing key fail before HTTP requests or builds. Inaccessible Unkey targets fail
-closed, without permission-error fallback. The ingest flag is independent.
-Keep this CI-only variable out of runtime `.env` and Turbo configuration.
-To roll back release routing, unset the demo variable or set it to `false`; this
+release. The script checks all targets before any builds, deploys demo API
+before dashboard, and verifies the exact checked commit is current. The shared
+`UNKEY_DEPLOY_ROOT_KEY` enables all four Unkey releases; no additional flags are
+needed. Without the key, the legacy Railway release path remains in use.
+Inaccessible Unkey targets fail closed, without permission-error fallback.
+Provider rollback requires an explicit release-routing change; it
 does not switch DNS, move data, or roll back a running deployment. Restore and
 verify the intended provider/domain separately using only demo/test credentials.
 
@@ -705,9 +701,9 @@ project's successful deployment.
 Deployment creation is not automatically retried, since a timed-out request may
 already have started a build.
 
-The same release also deploys Railway's demo dashboard and demo API (project
-notra-demo), unless `UNKEY_DEMO_ENABLED=true`, and `ai-traffic-ingest`
-(project notra-prod), unless the optional Unkey ingest release below is enabled.
+Without `UNKEY_DEPLOY_ROOT_KEY`, the same release deploys Railway's demo dashboard
+and demo API (project notra-demo), and `ai-traffic-ingest` (project notra-prod).
+With the shared key configured, all three deploy to Unkey instead.
 Their main-branch deployment triggers are removed, so
 pushes to `main` no longer deploy them; keep the GitHub repository connected so
 the API can build the pinned commit. Add a GitHub Actions secret named
@@ -744,7 +740,7 @@ prevent all new builds; the script does not fall back to an unrelated project.
 Give the Compute-workspace root key read access to this app, its production
 environment, domains and deployments, and write access to its deployment
 collection. It does not need environment-variable access, environment-setting
-write access; extend the same key to other apps only when enabling their releases. See the
+write access. The same key must cover all four Unkey apps. See the
 [root-key permission reference](https://unkey.com/docs/platform/root-keys/permission-reference).
 
 To activate after merging, add the secret and run **Production deploy** with
@@ -775,9 +771,9 @@ termination grace, and switch/verify `ingest.usenotra.com` before enabling its
 scheduled release. Follow the [ingest deployment and rollback runbook](apps/ai-traffic-ingest/README.md).
 This repository change does not perform the provider migration or alter DNS.
 
-Set the GitHub Actions repository **variable** `UNKEY_INGEST_ENABLED=true` to opt
-ingest into the same guarded Compute release path, using the existing
-`UNKEY_DEPLOY_ROOT_KEY` repository secret. No second deployment secret is needed.
+Ingest uses the same guarded Compute release path whenever the existing
+`UNKEY_DEPLOY_ROOT_KEY` repository secret is configured. No additional variable
+or deployment secret is needed.
 It discovers the exact verified `ingest.usenotra.com` domain rather than using a
 hardcoded app ID, checks the
 connected repository/main/production environment, rollback and active-deployment
@@ -786,32 +782,25 @@ deployment request. The target is rechecked after Vercel and the workflow waits
 for that deployment to be ready and current on the expected target and SHA.
 Inaccessible or invalid configuration fails closed, without falling back to Railway.
 
-The API remains opt-in through `UNKEY_DEPLOY_ROOT_KEY`, independently of the ingest
-flag. Merely configuring this existing API deployment key does not migrate ingest.
-When ingest is enabled, grant that same Compute-workspace deployment root key
-read access to both apps, environments, domains and deployments and deployment-create
-access to both targets. Permission failures stop the release without fallback.
-Keep this CI-only key separate from runtime keys; neither it nor the CI-only flag
-needs a Turbo environment declaration or runtime `.env` addition.
-
-An unset/empty ingest variable or exact `false` leaves Railway ingest preflight
-and deployment unchanged. Exact `true` selects Unkey ingest and requires the
-shared deployment key; a missing key or malformed nonempty flag aborts before
-any provider requests or builds. Enabling ingest removes **only** `ai-traffic-ingest`
-from the Railway release list; `UNKEY_DEMO_ENABLED` separately controls both demo services.
+Grant the shared Compute-workspace deployment root key read access to all four
+apps, environments, domains and deployments and deployment-create access to all
+targets. Permission failures stop the release without fallback. Keep this CI-only
+key separate from runtime keys; it needs no Turbo environment declaration or
+runtime `.env` addition. Configuring the key selects Unkey for API, ingest and both
+demo services, removing the latter three from Railway preflight and deployment.
 
 Preflight runs before CI's local builds, again before provider builds, and each
 Unkey target is rechecked immediately before its deployment. A failed Unkey
 preflight prevents all builds. A later Unkey failure prevents Railway releases
 but cannot undo already published Vercel or Unkey deployments. To activate ingest,
-first complete the initial app deployment and domain verification, then set the
-repository variable and run a read-only `dry_run` while its existing trigger
+first complete the initial app deployment and domain verification, then configure
+the shared key and run a read-only `dry_run` while its existing trigger
 remains enabled; only when that succeeds and the replacement schedule is ready, disable ingest's
 production **Auto deploy** and verify a manual real workflow run. Keep Railway
-alive for domain rollback during the transition. Set `UNKEY_INGEST_ENABLED=false`
-to restore Railway ingest scheduling; this does not change DNS or move traffic.
-Without opting in, continue manual Unkey deployment management and retain the
-existing release arrangement.
+alive for domain rollback during the transition. Restoring Railway ingest
+scheduling requires an explicit release-routing change; it does not change DNS
+or move traffic. Removing the shared key disables all four Unkey releases, not
+just ingest.
 
 For an urgent release, open **Actions → Production deploy → Run workflow**, select
 `main`, and leave `dry_run` unchecked. This uses the same CI and change checks.

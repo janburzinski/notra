@@ -56,8 +56,6 @@ jobs:
           VERCEL_TEAM_ID: team_J0UtPqQdb8AdDMRkyvJuR8kM
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           UNKEY_DEPLOY_ROOT_KEY: ${{ secrets.UNKEY_DEPLOY_ROOT_KEY }}
-          UNKEY_INGEST_ENABLED: ${{ vars.UNKEY_INGEST_ENABLED }}
-          UNKEY_DEMO_ENABLED: ${{ vars.UNKEY_DEMO_ENABLED }}
           DRY_RUN: ${{ inputs.dry_run || false }}
           RELEASE_SHA: ${{ steps.release.outputs.sha }}
 
@@ -114,7 +112,5 @@ jobs:
           VERCEL_TEAM_ID: team_J0UtPqQdb8AdDMRkyvJuR8kM
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           UNKEY_DEPLOY_ROOT_KEY: ${{ secrets.UNKEY_DEPLOY_ROOT_KEY }}
-          UNKEY_INGEST_ENABLED: ${{ vars.UNKEY_INGEST_ENABLED }}
-          UNKEY_DEMO_ENABLED: ${{ vars.UNKEY_DEMO_ENABLED }}
           DRY_RUN: ${{ inputs.dry_run || false }}
           RELEASE_SHA: ${{ steps.release.outputs.sha }}

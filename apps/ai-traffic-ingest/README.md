@@ -147,23 +147,20 @@ to verify configured readiness and token rejection without contacting production
    origin. The SDK already defaults to `https://ingest.usenotra.com`, so moving
    that stable domain requires no customer configuration or token rotation.
    Explicit provider-specific client endpoints still need a separate audit.
-5. After the initial deployment and domain verification, opt into scheduled
-   releases by setting the GitHub Actions repository **variable** (not secret)
-   `UNKEY_INGEST_ENABLED=true`. Reuse the existing `UNKEY_DEPLOY_ROOT_KEY`
+5. After the initial deployment and domain verification, scheduled releases use
+   the existing `UNKEY_DEPLOY_ROOT_KEY`
    repository secret used for API deployments; no second key secret is needed.
-   Grant that key read access to both apps, production environments, domains and
-   deployments, plus deployment-create access for both targets. Runtime API-key
+   Grant that key read access to all four Unkey apps, production environments, domains and
+   deployments, plus deployment-create access for all targets. Runtime API-key
    management keys are unrelated; environment-variable read/write grants are not
    needed. Run **Production deploy** with `dry_run` checked. Only after a successful
    dry-run and when scheduled releases are ready, disable production **Auto deploy**
    for ingest, preserving the GitHub connection, and verify a manual real workflow
-   run. An unset/empty flag or exact `false` keeps Railway ingest in the schedule
-   unchanged, even when the API deployment key exists. Exact `true` selects Unkey
-   ingest and requires that key; a missing key or malformed nonempty flag aborts
-   before any provider requests or builds. Only ingest leaves Railway's release/
-   preflight list; demo services stay there. A permission failure or other Unkey
-   error never falls back to Railway. The API's existing key-based opt-in is
-   unchanged. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
+   run. No additional release flags are needed: the shared key selects Unkey for
+   API, ingest and both demo apps. Ingest and both demo services leave Railway's
+   release/preflight list. A permission failure or other Unkey error never falls
+   back to Railway. Without the shared key, the legacy Railway schedule remains
+   in use. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 Manual Unkey deployments remain available if scheduled ingest releases are not
 enabled. Do not disable the current deployment trigger before its replacement
@@ -177,10 +174,10 @@ operator's reviewed domain/DNS configuration, and verify TLS, readiness and
 tracked event delivery after DNS propagation. Keeping the same public domain
 avoids customer endpoint changes; DNS caches can temporarily send traffic to
 both providers, so keep their shared signer, Redis and data configuration aligned.
-Set the repository variable `UNKEY_INGEST_ENABLED=false` to restore Railway ingest
-to the scheduled workflow before running it again. Leave the shared deployment
-key in place for the API. Changing this flag only changes scheduling, not DNS or
-traffic routing. Check the live Railway commit and history first; provider
+Restoring Railway ingest to the scheduled workflow requires an explicit
+release-routing change before running it again. Removing the shared deployment
+key disables all four Unkey releases, not just ingest. Scheduling changes do not
+change DNS or traffic routing. Check the live Railway commit and history first; provider
 rollback does not bypass the release history guard.
 
 Removing `GEO_INGEST_URL` is a different rollback: it restores the dashboard's

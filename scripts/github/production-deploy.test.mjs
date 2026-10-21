@@ -38,8 +38,6 @@ function fixture({
     CLOUDFLARE_API_TOKEN: "test-cloudflare",
     CLOUDFLARE_ACCOUNT_ID: "test-account",
     ...(api || demo || ingest ? { UNKEY_DEPLOY_ROOT_KEY: "test-unkey" } : {}),
-    ...(demo ? { UNKEY_DEMO_ENABLED: "true" } : {}),
-    ...(ingest ? { UNKEY_INGEST_ENABLED: "true" } : {}),
     ...envOverrides,
   };
   const fetchImpl = async (input, options) => {
@@ -603,68 +601,6 @@ test("Unkey is opt-in and does not call its API without a deployment key", async
   assert.ok(calls.every(({ url }) => url.hostname !== "api.unkey.com"));
 });
 
-for (const demoFlag of [undefined, "", "false", "true"]) {
-  for (const ingest of [false, true]) {
-    test(`shared key keeps demo=${String(demoFlag)} independent of ingest=${ingest}`, async () => {
-      const { run, calls } = fixture({
-        api: true,
-        ingest,
-        envOverrides: { UNKEY_DEMO_ENABLED: demoFlag },
-      });
-      await run();
-      assert.deepEqual(
-        [
-          ...new Set(
-            calls
-              .filter(({ url }) => url.pathname === "/v2/domains.listDomains")
-              .map(({ body }) => body.search)
-          ),
-        ],
-        [
-          "api.usenotra.com",
-          ...(ingest ? ["ingest.usenotra.com"] : []),
-          ...(demoFlag === "true"
-            ? ["demo-api.usenotra.com", "demo.usenotra.com"]
-            : []),
-        ]
-      );
-      const railwayIds = builds(calls)
-        .filter(({ url }) => url.hostname === "backboard.railway.com")
-        .map(({ body }) => body.variables.serviceId);
-      assert.equal(
-        railwayIds.includes("9cb261a4-7d94-446f-8523-84a4b75cbb3d"),
-        demoFlag !== "true"
-      );
-      assert.equal(
-        railwayIds.includes("17ba5ec0-ec2e-412d-aa2c-61b23f37b40a"),
-        demoFlag !== "true"
-      );
-      assert.equal(
-        railwayIds.includes("2d259982-cccc-488d-b2ba-77b12fd3e854"),
-        !ingest
-      );
-    });
-  }
-}
-
-for (const flag of ["UNKEY_DEMO_ENABLED", "UNKEY_INGEST_ENABLED"]) {
-  for (const value of ["true", "TRUE", "0", " false "]) {
-    test(`${flag}=${value} rejects invalid or missing-key activation before HTTP or builds`, async () => {
-      const { run, calls, toolchainBuilds } = fixture({
-        envOverrides: { [flag]: value },
-      });
-      await assert.rejects(
-        run(),
-        value === "true"
-          ? new RegExp(`UNKEY_DEPLOY_ROOT_KEY is required when ${flag}=true`)
-          : new RegExp(`${flag} must be true, false, or unset`)
-      );
-      assert.equal(calls.length, 0);
-      assert.equal(toolchainBuilds.length, 0);
-    });
-  }
-}
-
 test("demo apps deploy to Unkey, never Railway, with the shared deployment key", async () => {
   const { run, calls, sha } = fixture({ demo: true });
   await run();
@@ -673,7 +609,7 @@ test("demo apps deploy to Unkey, never Railway, with the shared deployment key",
   );
   assert.deepEqual(
     deployments.map(({ body }) => body.app),
-    ["app_test", "app_demo-api", "app_demo-dashboard"]
+    ["app_test", "app_ai-traffic-ingest", "app_demo-api", "app_demo-dashboard"]
   );
   for (const { body } of deployments) {
     assert.deepEqual(body.git, { branch: "main", commitSha: sha });
@@ -681,14 +617,7 @@ test("demo apps deploy to Unkey, never Railway, with the shared deployment key",
   const railwayCalls = calls.filter(
     ({ url }) => url.hostname === "backboard.railway.com"
   );
-  assert.ok(railwayCalls.length > 0);
-  for (const { body } of railwayCalls) {
-    const serviceId =
-      body.variables.serviceId ?? body.variables.input?.serviceId;
-    if (serviceId) {
-      assert.equal(serviceId, "2d259982-cccc-488d-b2ba-77b12fd3e854");
-    }
-  }
+  assert.equal(railwayCalls.length, 0);
   assert.ok(calls.indexOf(deployments[0]) < calls.indexOf(deployments[1]));
   assert.ok(calls.indexOf(deployments[1]) < calls.indexOf(deployments[2]));
 });
@@ -700,7 +629,12 @@ test("demo dry run validates both domains without starting builds", async () => 
     calls
       .filter(({ url }) => url.pathname === "/v2/domains.listDomains")
       .map(({ body }) => body.search),
-    ["api.usenotra.com", "demo-api.usenotra.com", "demo.usenotra.com"]
+    [
+      "api.usenotra.com",
+      "ingest.usenotra.com",
+      "demo-api.usenotra.com",
+      "demo.usenotra.com",
+    ]
   );
   assert.equal(builds(calls).length, 0);
   assert.equal(toolchainUpserts(calls).length, 0);
@@ -794,17 +728,12 @@ test("Unkey discovers the verified production domain and deploys the pinned comm
     environment: "env_test",
     git: { branch: "main", commitSha: sha },
   });
-  assert.equal(directories.length, 11);
+  assert.equal(directories.length, 14);
   assert.equal(
     directories.filter((directory) => directory === "apps/api").length,
-    3
+    4
   );
-  const apiIndex = calls.indexOf(deployment);
-  assert.ok(
-    calls.findIndex(({ body }) =>
-      body?.query?.includes("serviceInstanceDeployV2")
-    ) > apiIndex
-  );
+  assert.ok(calls.every(({ url }) => url.hostname !== "backboard.railway.com"));
 });
 
 test("Unkey dry run can inspect auto-deploy configuration without creating builds", async () => {
@@ -833,7 +762,9 @@ test("unchanged API skips the Unkey build", async () => {
   await run();
   assert.ok(
     calls.every(
-      ({ url }) => url.pathname !== "/v3/deployments.createDeployment"
+      ({ url, body }) =>
+        url.pathname !== "/v3/deployments.createDeployment" ||
+        !["app_test", "app_demo-api"].includes(body.app)
     )
   );
 });
@@ -979,8 +910,12 @@ for (const [name, path, data] of [
     let reads = 0;
     const { run, calls } = fixture({
       api: true,
-      override: ({ url }) => {
-        if (url.pathname === path && ++reads === 2) {
+      override: ({ url, body }) => {
+        if (
+          url.pathname === path &&
+          (body.app === "app_test" || body.search === "api.usenotra.com") &&
+          ++reads === 2
+        ) {
           return data;
         }
       },
@@ -1051,11 +986,16 @@ test("Unkey intervening release of the selected SHA skips duplicate API creation
   await run();
   assert.ok(
     calls.every(
-      ({ url }) => url.pathname !== "/v3/deployments.createDeployment"
+      ({ url, body }) =>
+        url.pathname !== "/v3/deployments.createDeployment" ||
+        body.app !== "app_test"
     )
   );
   assert.ok(
-    builds(calls).some(({ url }) => url.hostname === "backboard.railway.com")
+    builds(calls).some(
+      ({ url, body }) =>
+        url.hostname === "api.unkey.com" && body.app === "app_ai-traffic-ingest"
+    )
   );
 });
 

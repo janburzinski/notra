@@ -166,14 +166,6 @@ export async function release({
   sleep = delay,
   preflightOnly = false,
 } = {}) {
-  for (const flag of ["UNKEY_INGEST_ENABLED", "UNKEY_DEMO_ENABLED"]) {
-    if (env[flag] && !["true", "false"].includes(env[flag])) {
-      throw new Error(`${flag} must be true, false, or unset`);
-    }
-    if (env[flag] === "true" && !env.UNKEY_DEPLOY_ROOT_KEY) {
-      throw new Error(`UNKEY_DEPLOY_ROOT_KEY is required when ${flag}=true`);
-    }
-  }
   for (const key of [
     "GH_TOKEN",
     "VERCEL_TOKEN",
@@ -416,21 +408,6 @@ export async function release({
   };
   const unkeyPlans = [];
   for (const service of unkeyServices) {
-    if (service.name.startsWith("demo-") && env.UNKEY_DEMO_ENABLED !== "true") {
-      await report(
-        `unkey: ${service.name} release disabled; set UNKEY_DEMO_ENABLED=true to enable`
-      );
-      continue;
-    }
-    if (
-      service.name === "ai-traffic-ingest" &&
-      env.UNKEY_INGEST_ENABLED !== "true"
-    ) {
-      await report(
-        "unkey: ai-traffic-ingest release disabled; set UNKEY_INGEST_ENABLED=true to enable"
-      );
-      continue;
-    }
     if (env.UNKEY_DEPLOY_ROOT_KEY) {
       unkeyPlans.push({ service, ...(await planUnkeyRelease(service)) });
     } else {
