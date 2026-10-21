@@ -1,0 +1,53 @@
+apps/dashboard/src/components/automation/automation-template-gallery.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 171
+apps/dashboard/src/components/sites/sites-list.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 119
+packages/ui/src/constants/instrument.ts
+  s_86b8c6244e106c::t_2e189b07597633 6,11,16
+packages/ui/src/components/ui/title-card.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 87
+apps/dashboard/src/components/content/calendar/content-calendar-grid.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 35
+apps/dashboard/src/components/autopilot/autopilot-rules-section.tsx
+  ai_agent 47
+apps/dashboard/src/constants/geo-traffic-hero.ts
+  s_86b8c6244e106c::t_ee88e50e2174ee 12
+apps/dashboard/src/components/sites/pages/site-editor-page.tsx
+  ai_agent 232
+packages/ui/src/styles/globals.css
+  s_86b8c6244e106c::t_2e189b07597633 40-41,122-123
+apps/dashboard/public/design.md
+  s_86b8c6244e106c::t_8b9da803297efc 14-15,51,65-66,68,91-92
+apps/dashboard/src/components/agent-feedback/feedback-empty.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 54
+apps/dashboard/tests/image-editor-layout.test.tsx
+  s_86b8c6244e106c::t_b8d1b877b35b77 40
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/_variants/index.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 309
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  ai_agent 138
+apps/dashboard/src/components/sites/site-settings-item.tsx
+  ai_agent 72
+apps/dashboard/src/components/automation/editor/editor-parts.tsx
+  ai_agent 66
+apps/dashboard/src/app/(dashboard)/[slug]/sites/skeleton.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 23
+packages/ui/src/components/shared/split-modal.tsx
+  s_86b8c6244e106c::t_ee88e50e2174ee 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8833677aec50f9f898cc2ac72f96fc23c2cbbe11",
+  "prompts": {},
+  "sessions": {
+    "s_86b8c6244e106c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "482a8ab5-176d-48be-865d-5f117389650b",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
