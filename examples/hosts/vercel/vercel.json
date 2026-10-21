@@ -1,9 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
-    { "source": "/blog", "destination": "https://quillstack-vercel.notra.site/blog" },
-    { "source": "/blog/:path*", "destination": "https://quillstack-vercel.notra.site/blog/:path*" },
-    { "source": "/changelog", "destination": "https://quillstack-vercel.notra.site/changelog" },
-    { "source": "/changelog/:path*", "destination": "https://quillstack-vercel.notra.site/changelog/:path*" }
-  ]
-}

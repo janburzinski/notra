@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-
-# Replace www.example.com with your domain.
-Sitemap: https://www.example.com/blog/sitemap.xml
-Sitemap: https://www.example.com/changelog/sitemap.xml

@@ -7,7 +7,7 @@ import { createDefaultSiteConfig } from "@notra/sites-core/utils/default-config"
 import { validateSite } from "../src/validate";
 
 test("the default example validates and preserves the platform theme defaults", async () => {
-  const root = new URL("../../../examples/sites/default/", import.meta.url);
+  const root = new URL("fixtures/default-site/", import.meta.url);
   const paths = await readdir(root, { recursive: true, withFileTypes: true });
   const files = new Map<string, string>();
   for (const entry of paths) {

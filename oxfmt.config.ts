@@ -10,7 +10,6 @@ export default defineConfig({
     "apps/dashboard/src/components/evilcharts/**",
     "packages/db/migrations/**",
     ".temp/**",
-    "examples/**",
     "**/*.{astro,md,mdx,yaml,yml}",
   ],
 });

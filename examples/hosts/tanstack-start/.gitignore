@@ -1,8 +1,0 @@
-node_modules/
-.output/
-.nitro/
-.tanstack/
-.vercel/
-.env
-bun.lock
-src/routeTree.gen.ts
