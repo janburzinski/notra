@@ -67,6 +67,7 @@ import { Route as ApiIntegrationsSlackAuthorizeRouteImport } from './routes/api.
 import { Route as ApiIntegrationsSlackCallbackRouteImport } from './routes/api.integrations.slack.callback'
 import { Route as ApiInternalAutopilotAdminRouteImport } from './routes/api.internal.autopilot.admin'
 import { Route as ApiInternalContentDraftPullRequestRouteImport } from './routes/api.internal.content.draft-pull-request'
+import { Route as ApiInternalContentPreviewRouteImport } from './routes/api.internal.content.preview'
 import { Route as ApiInternalContentScheduledPublicationAttemptRouteImport } from './routes/api.internal.content.scheduled-publication-attempt'
 import { Route as ApiInternalContentSyncGithubRouteImport } from './routes/api.internal.content.sync-github'
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
@@ -404,6 +405,12 @@ const ApiInternalContentDraftPullRequestRoute =
     path: '/api/internal/content/draft-pull-request',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalContentPreviewRoute =
+  ApiInternalContentPreviewRouteImport.update({
+    id: '/api/internal/content/preview',
+    path: '/api/internal/content/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalContentScheduledPublicationAttemptRoute =
   ApiInternalContentScheduledPublicationAttemptRouteImport.update({
     id: '/api/internal/content/scheduled-publication-attempt',
@@ -625,6 +632,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
+  '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -712,6 +720,7 @@ export interface FileRoutesByTo {
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
+  '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -800,6 +809,7 @@ export interface FileRoutesById {
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
+  '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -889,6 +899,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/callback'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
+    | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -976,6 +987,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/callback'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
+    | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -1063,6 +1075,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/callback'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
+    | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -1145,6 +1158,7 @@ export interface RootRouteChildren {
   ApiIntegrationsSlackCallbackRoute: typeof ApiIntegrationsSlackCallbackRoute
   ApiInternalAutopilotAdminRoute: typeof ApiInternalAutopilotAdminRoute
   ApiInternalContentDraftPullRequestRoute: typeof ApiInternalContentDraftPullRequestRoute
+  ApiInternalContentPreviewRoute: typeof ApiInternalContentPreviewRoute
   ApiInternalContentScheduledPublicationAttemptRoute: typeof ApiInternalContentScheduledPublicationAttemptRoute
   ApiInternalContentSyncGithubRoute: typeof ApiInternalContentSyncGithubRoute
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
@@ -1575,6 +1589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalContentDraftPullRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/content/preview': {
+      id: '/api/internal/content/preview'
+      path: '/api/internal/content/preview'
+      fullPath: '/api/internal/content/preview'
+      preLoaderRoute: typeof ApiInternalContentPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/content/scheduled-publication-attempt': {
       id: '/api/internal/content/scheduled-publication-attempt'
       path: '/api/internal/content/scheduled-publication-attempt'
@@ -1927,6 +1948,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalAutopilotAdminRoute: ApiInternalAutopilotAdminRoute,
   ApiInternalContentDraftPullRequestRoute:
     ApiInternalContentDraftPullRequestRoute,
+  ApiInternalContentPreviewRoute: ApiInternalContentPreviewRoute,
   ApiInternalContentScheduledPublicationAttemptRoute:
     ApiInternalContentScheduledPublicationAttemptRoute,
   ApiInternalContentSyncGithubRoute: ApiInternalContentSyncGithubRoute,
@@ -1962,3 +1984,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

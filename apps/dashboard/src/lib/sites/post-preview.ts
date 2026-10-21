@@ -146,7 +146,7 @@ export async function previewPostOnSite(
   params: {
     site: Site;
     postId: string;
-    userId: string;
+    userId?: string;
   } & PostPreviewAccessInput
 ) {
   const { site } = params;

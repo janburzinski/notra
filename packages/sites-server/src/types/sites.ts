@@ -116,7 +116,7 @@ export interface CreatePostPreviewInput extends PostPreviewAccessInput {
   title: string;
   pagePath: string;
   files: PostPreviewFile[];
-  userId: string;
+  userId?: string;
 }
 
 export interface UpdatePostPreviewAccessInput {
