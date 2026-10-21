@@ -8,6 +8,8 @@ import SiteAreas from "./SiteAreas.astro";
 import NavbarItem from "./NavbarItem.astro";
 
 const lightLogo = logoFor("light");
+const darkLogo = logoFor("dark");
+const hasDarkLogo = Boolean(darkLogo && darkLogo !== lightLogo);
 const logoHref = typeof config.logo === "object" && config.logo.href ? config.logo.href : href();
 const sections = await navbarAreas();
 const hasSections = sections.length > 0;
@@ -25,7 +27,15 @@ const hasMenu = links.length > 0 || Boolean(cta) || Boolean(primary);
   <div class="site-container flex h-14 items-center gap-3">
     <a href={logoHref} class="flex min-w-0 items-center gap-2 rounded-md text-[0.9375rem] font-semibold tracking-[-0.01em]">
       {
-        lightLogo && (
+        lightLogo && hasDarkLogo && (
+          <>
+            <img src={lightLogo} alt="" width="24" height="24" class="size-6 shrink-0 rounded-md object-contain dark:hidden" />
+            <img src={darkLogo} alt="" width="24" height="24" class="hidden size-6 shrink-0 rounded-md object-contain dark:block" />
+          </>
+        )
+      }
+      {
+        lightLogo && !hasDarkLogo && (
           <img src={lightLogo} alt="" width="24" height="24" class="size-6 shrink-0 rounded-md object-contain dark:box-content dark:bg-white dark:p-1" />
         )
       }

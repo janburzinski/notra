@@ -16,6 +16,7 @@ import { useId } from "react";
 import { SITE_SETTINGS_PANEL_CLASSNAME } from "@/constants/sites";
 import { cn } from "@/lib/utils";
 import type {
+  SiteSettingsBlockProps,
   SiteSettingsGroupProps,
   SiteSettingsHintProps,
   SiteSettingsIconTileProps,
@@ -79,21 +80,43 @@ export function SiteSettingsList({ children }: SiteSettingsListProps) {
 export function SiteSettingsGroup({
   icon,
   title,
+  action,
   children,
 }: SiteSettingsGroupProps) {
   return (
     <section className="space-y-3">
-      <h2 className="flex items-center gap-2.5 px-1 text-sm font-medium">
-        <HugeiconsIcon
-          aria-hidden="true"
-          className="text-muted-foreground size-4"
-          icon={icon}
-          strokeWidth={1.5}
-        />
-        {title}
-      </h2>
+      <div className="flex min-h-8 items-center justify-between gap-3 px-1">
+        <h2 className="flex items-center gap-2.5 text-sm font-medium">
+          <HugeiconsIcon
+            aria-hidden="true"
+            className="text-muted-foreground size-4"
+            icon={icon}
+            strokeWidth={1.5}
+          />
+          {title}
+        </h2>
+        {action}
+      </div>
       {children}
     </section>
+  );
+}
+
+/** A row whose control spans the full width below the text, e.g. a list. */
+export function SiteSettingsBlock({
+  icon,
+  title,
+  description,
+  children,
+}: SiteSettingsBlockProps) {
+  return (
+    <div className="space-y-4 px-4 py-4 sm:px-5">
+      <div className="flex items-center gap-4">
+        <IconTile icon={icon} />
+        <ItemText description={description} title={title} />
+      </div>
+      <div className="sm:pl-13">{children}</div>
+    </div>
   );
 }
 

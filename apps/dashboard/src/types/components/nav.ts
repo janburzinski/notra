@@ -127,7 +127,3 @@ export interface SidebarSwapProps {
   keepMounted?: boolean;
   className?: string;
 }
-
-export interface NavSiteProps {
-  slug: string;
-}

@@ -107,21 +107,27 @@ export function SiteOverviewPage() {
 
       <InstrumentSection
         action={
-          <Button
-            disabled={suspended}
-            loading={deployLatest.isPending}
-            onClick={() => deployLatest.mutate()}
-            size="sm"
-            variant="outline"
-          >
-            <HugeiconsIcon
-              aria-hidden="true"
-              data-icon="inline-start"
-              icon={RefreshIcon}
-              strokeWidth={1.5}
+          <div className="flex flex-wrap items-center gap-2">
+            <ViewAllLink
+              href={siteHref(organizationSlug, siteId, "deployments")}
+              label={tSites("list.viewDeployments")}
             />
-            {tDetail("deployLatest")}
-          </Button>
+            <Button
+              disabled={suspended}
+              loading={deployLatest.isPending}
+              onClick={() => deployLatest.mutate()}
+              size="sm"
+              variant="outline"
+            >
+              <HugeiconsIcon
+                aria-hidden="true"
+                data-icon="inline-start"
+                icon={RefreshIcon}
+                strokeWidth={1.5}
+              />
+              {tDetail("deployLatest")}
+            </Button>
+          </div>
         }
         eyebrow={t("activity")}
       >

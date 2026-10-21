@@ -29,6 +29,7 @@ import {
   SiteDeploymentSkeleton,
   SiteSectionSkeleton,
 } from "./site-page-skeleton";
+import { SitePageTabs } from "./site-page-tabs";
 import { SitesPageShell } from "./sites-page-shell";
 import { SitesUnavailableState } from "./sites-unavailable-state";
 
@@ -67,46 +68,59 @@ export function SiteLayout({
     ) ?? null;
 
   return (
-    <SkeletonCrossfade
-      loading={!ready || !detail}
-      skeleton={
-        <SitesPageShell>
-          {deploymentId ? <SiteDeploymentSkeleton /> : <SiteSectionSkeleton />}
-        </SitesPageShell>
-      }
-    >
-      {ready && detail ? (
-        <SiteContext
-          value={{
-            organizationId,
-            organizationSlug,
-            siteId,
-            detail,
-            liveDeployment,
-          }}
-        >
-          <SitesPageShell>
-            {detail.site.status === "suspended" ? (
-              <Alert role="status">
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  icon={CloudOffIcon}
-                  strokeWidth={1.5}
-                />
-                <AlertTitle>{t("offline")}</AlertTitle>
-                <AlertDescription>
-                  {t("offlineDescription")}{" "}
-                  <Link href={siteHref(organizationSlug, siteId, "settings")}>
-                    {t("offlineAction")}
-                  </Link>
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            {children}
-          </SitesPageShell>
-        </SiteContext>
+    <>
+      {detail ? (
+        <SitePageTabs
+          organizationId={organizationId}
+          site={detail.site}
+          slug={organizationSlug}
+        />
       ) : null}
-    </SkeletonCrossfade>
+      <SkeletonCrossfade
+        loading={!ready || !detail}
+        skeleton={
+          <SitesPageShell>
+            {deploymentId ? (
+              <SiteDeploymentSkeleton />
+            ) : (
+              <SiteSectionSkeleton />
+            )}
+          </SitesPageShell>
+        }
+      >
+        {ready && detail ? (
+          <SiteContext
+            value={{
+              organizationId,
+              organizationSlug,
+              siteId,
+              detail,
+              liveDeployment,
+            }}
+          >
+            <SitesPageShell>
+              {detail.site.status === "suspended" ? (
+                <Alert role="status">
+                  <HugeiconsIcon
+                    aria-hidden="true"
+                    icon={CloudOffIcon}
+                    strokeWidth={1.5}
+                  />
+                  <AlertTitle>{t("offline")}</AlertTitle>
+                  <AlertDescription>
+                    {t("offlineDescription")}{" "}
+                    <Link href={siteHref(organizationSlug, siteId, "settings")}>
+                      {t("offlineAction")}
+                    </Link>
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+              {children}
+            </SitesPageShell>
+          </SiteContext>
+        ) : null}
+      </SkeletonCrossfade>
+    </>
   );
 }
 

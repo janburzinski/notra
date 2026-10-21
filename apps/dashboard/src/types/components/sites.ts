@@ -62,6 +62,17 @@ export interface SiteCreateProjectProps {
   organizationId: string;
 }
 
+export interface SitePageTabsProps {
+  slug: string;
+  organizationId: string;
+  site: SiteRecord;
+}
+
+export interface SiteSwitcherProps extends SitePageTabsProps {
+  /** Page to open on the picked site. */
+  section: SiteSection;
+}
+
 export interface SiteLoadErrorProps {
   organizationSlug: string;
   error: unknown;
@@ -222,21 +233,6 @@ export interface SitePreviewFrameProps {
   url: string | null;
   className?: string;
   fallback?: ReactNode;
-}
-
-export interface SiteTopbarTitleProps {
-  siteId: string;
-  href: string | null;
-}
-
-export interface DeploymentTopbarTitleProps {
-  siteId: string;
-  deploymentId: string;
-}
-
-export interface SiteSectionTopbarTitleProps {
-  section: SiteSection;
-  href: string | null;
 }
 
 export interface SiteOverviewInfoRowProps {

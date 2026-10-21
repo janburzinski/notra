@@ -2,9 +2,7 @@
 
 import { Add01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import { Input } from "@notra/ui/components/ui/input";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -12,7 +10,10 @@ import { useTranslations } from "use-intl";
 import { Button } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useSite } from "@/components/sites/site-context";
-import { dashboardOrpc } from "@/lib/orpc/query";
+import {
+  useSaveSiteConfigDraft,
+  useSiteConfigDocument,
+} from "@/lib/hooks/use-site-config-document";
 import type {
   SiteVariableRow,
   SiteVariablesFormProps,
@@ -24,16 +25,6 @@ import {
   readSiteVariablesConfig,
   siteVariablesFromRows,
 } from "@/utils/site-variables";
-
-function useSiteConfigDocument() {
-  const { organizationId, siteId } = useSite();
-  return useQuery(
-    dashboardOrpc.sites.editor.read.queryOptions({
-      input: { organizationId, siteId, path: SITE_CONFIG_FILENAME },
-      refetchOnWindowFocus: false,
-    })
-  );
-}
 
 export function useSiteVariablesCount(): number | null {
   const query = useSiteConfigDocument();
@@ -97,9 +88,8 @@ function emptyRow(): SiteVariableRow {
 }
 
 function SiteVariablesForm({ document }: SiteVariablesFormProps) {
-  const { organizationId, organizationSlug, siteId } = useSite();
+  const { organizationSlug, siteId } = useSite();
   const t = useTranslations("sites.variables");
-  const queryClient = useQueryClient();
   const initial = readSiteVariablesConfig(document.content).variables;
   const initialRows = (): SiteVariableRow[] => {
     const existing = Object.entries(initial).map(([name, value]) => ({
@@ -119,35 +109,15 @@ function SiteVariablesForm({ document }: SiteVariablesFormProps) {
     setRows((current) =>
       current.map((item) => (item.id === rowId ? { ...item, ...patch } : item))
     );
-  const save = useMutation({
-    mutationFn: () =>
-      dashboardOrpc.sites.editor.saveDraft.call({
-        organizationId,
-        siteId,
-        path: SITE_CONFIG_FILENAME,
-        content: patchSiteVariables(document.content, filled),
-        baseBlobSha: document.blobSha,
-        baseCommitSha: null,
-        draftId: document.draftId,
-        draftRevision: document.draftRevision,
-        sourceContext: document.sourceContext,
+  const saveDraft = useSaveSiteConfigDraft(document);
+  const save = {
+    isPending: saveDraft.isPending,
+    mutate: () =>
+      saveDraft.mutate(patchSiteVariables(document.content, filled), {
+        onSuccess: () => toast.success(t("saved")),
+        onError: (cause) => setError(toErrorMessage(cause, t("saveFailed"))),
       }),
-    onSuccess: async () => {
-      toast.success(t("saved"));
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.sites.editor.read.key(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.sites.editor.files.key(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.sites.get.key(),
-        }),
-      ]);
-    },
-    onError: (cause) => setError(toErrorMessage(cause, t("saveFailed"))),
-  });
+  };
 
   return (
     <form
@@ -221,7 +191,7 @@ function SiteVariablesForm({ document }: SiteVariablesFormProps) {
                 onChange={(event) =>
                   updateRow(row.id, { name: event.target.value })
                 }
-                pattern="[A-Za-z][A-Za-z0-9_-]{0,39}"
+                pattern="[A-Za-z][A-Za-z0-9_\-]{0,39}"
                 placeholder="product_name"
                 spellCheck={false}
                 value={row.name}

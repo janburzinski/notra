@@ -5,7 +5,7 @@ import type { DashboardLinkProps } from "@/types/framework";
 import { modalNavigationOptions } from "@/utils/route-modal";
 
 const Link = forwardRef<HTMLAnchorElement, DashboardLinkProps>(function Link(
-  { href, prefetch, replace, scroll, children, ...props },
+  { href, prefetch, replace, scroll, exact, children, ...props },
   ref
 ) {
   const location = useLocation();
@@ -27,6 +27,7 @@ const Link = forwardRef<HTMLAnchorElement, DashboardLinkProps>(function Link(
     <RouterLink
       {...props}
       {...navigation}
+      activeOptions={exact ? { exact: true } : undefined}
       preload={prefetch === false ? false : "intent"}
       ref={ref}
       replace={replace}

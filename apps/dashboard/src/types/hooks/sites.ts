@@ -1,7 +1,18 @@
 import type { SiteIntegrationUpdate } from "@notra/sites-core/types/site-integrations";
 
 import type { dashboardOrpc } from "@/lib/orpc/query";
-import type { SiteDiagnostic, SiteDomain, SiteScope } from "@/types/sites";
+import type {
+  SiteDiagnostic,
+  SiteDomain,
+  SiteEditorFiles,
+  SiteScope,
+} from "@/types/sites";
+
+export interface SitePublishFilesState {
+  scope: SiteScope;
+  files: SiteEditorFiles | null;
+  preparing: boolean;
+}
 
 export interface SitePollingQuery<TData> {
   state: { data?: TData };

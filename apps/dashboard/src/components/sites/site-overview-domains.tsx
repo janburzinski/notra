@@ -34,22 +34,35 @@ export function SiteOverviewDomains({
       </>
     );
   }
-  return domains.map((domain) => (
-    <span className="inline-flex min-w-0 items-center gap-2" key={domain.id}>
-      <SiteOverviewExternalLink
-        href={
-          domain.isPrimary
-            ? liveUrl
-            : siteUrlOnOrigin(`https://${domain.hostname}`, liveUrl)
-        }
-      >
-        {domain.isPrimary ? displayUrl(liveUrl) : domain.hostname}
-      </SiteOverviewExternalLink>
-      {domain.status === "active" ? null : (
-        <span className="text-muted-foreground shrink-0 text-xs">
-          {tDomainStatus(domain.status)}
+  return (
+    <>
+      {domains.map((domain) => (
+        <span
+          className="inline-flex min-w-0 items-center gap-2"
+          key={domain.id}
+        >
+          <SiteOverviewExternalLink
+            href={
+              domain.isPrimary
+                ? liveUrl
+                : siteUrlOnOrigin(`https://${domain.hostname}`, liveUrl)
+            }
+          >
+            {domain.isPrimary ? displayUrl(liveUrl) : domain.hostname}
+          </SiteOverviewExternalLink>
+          {domain.status === "active" ? null : (
+            <span className="text-muted-foreground shrink-0 text-xs">
+              {tDomainStatus(domain.status)}
+            </span>
+          )}
         </span>
-      )}
-    </span>
-  ));
+      ))}
+      <Link
+        className={cn(SITE_OVERVIEW_LINK_CLASS, "text-muted-foreground")}
+        href={siteHref(organizationSlug, siteId, "domains")}
+      >
+        {t("manageDomains")}
+      </Link>
+    </>
+  );
 }

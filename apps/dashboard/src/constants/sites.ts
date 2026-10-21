@@ -12,6 +12,7 @@ import {
   Cancel01Icon,
   Clock01Icon,
   Loading03Icon,
+  PaintBoardIcon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
@@ -23,6 +24,7 @@ import type {
   SiteDeploymentStatus,
   SiteDeploymentTrigger,
   SiteDomainChipStatus,
+  SiteSection,
   SiteSectionConfig,
   PostPreviewState,
   SiteStatusBadgeConfig,
@@ -48,18 +50,29 @@ export const SITE_DETAIL_TABS = [
   "domains",
   "editor",
   "integrations",
+  "design",
   "settings",
 ] as const;
 
 export const SITE_SECTIONS: readonly SiteSectionConfig[] = [
   { section: "overview", path: "", icon: DashboardSquare01Icon },
+  { section: "editor", path: "/editor", icon: FileEditIcon },
   { section: "analytics", path: "/analytics", icon: Analytics01Icon },
+  { section: "design", path: "/design", icon: PaintBoardIcon },
   { section: "deployments", path: "/deployments", icon: Rocket01Icon },
   { section: "domains", path: "/domains", icon: Globe02Icon },
-  { section: "editor", path: "/editor", icon: FileEditIcon },
   { section: "integrations", path: "/integrations", icon: PlugSocketIcon },
   { section: "settings", path: "/settings", icon: Settings01Icon },
 ];
+
+/** Pages with a tab above every site page; the rest are linked from them. */
+export const SITE_NAV_SECTIONS: ReadonlySet<SiteSection> = new Set([
+  "overview",
+  "editor",
+  "analytics",
+  "design",
+  "settings",
+]);
 
 export const SITE_RECENT_DEPLOYMENTS_LIMIT = 5;
 export const SITE_DEPLOYMENTS_PAGE_SIZE = 20;

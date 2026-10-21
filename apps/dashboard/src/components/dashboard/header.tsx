@@ -5,14 +5,10 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@notra/ui/components/ui/breadcrumb";
 import { Separator } from "@notra/ui/components/ui/separator";
 import { useSidebar } from "@notra/ui/components/ui/sidebar";
-import { cn } from "@notra/ui/lib/utils";
-import { parseAsString, useQueryState } from "nuqs";
-import { useId } from "react";
 import { useTranslations } from "use-intl";
 
 import { useCommandPalette } from "@/components/command-palette/command-palette-context";
@@ -26,46 +22,25 @@ import { DashboardAgentButton } from "@/components/dashboard/dashboard-agent-but
 import { HeaderActionsOutlet } from "@/components/dashboard/header-actions-portal";
 import { SidebarToggle } from "@/components/dashboard/sidebar-toggle";
 import Link from "@/components/framework/link";
-import {
-  DeploymentTopbarTitle,
-  SiteSectionTopbarTitle,
-  SiteTopbarTitle,
-} from "@/components/sites/site-topbar-title";
-import { SITE_SECTIONS } from "@/constants/sites";
-import { useBreadcrumbLabels } from "@/lib/hooks/use-breadcrumb-labels";
-import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
-import { useNavVisibility } from "@/lib/hooks/use-nav-visibility";
 import { usePathname } from "@/lib/navigation";
-import type { BreadcrumbLabels } from "@/types/dashboard/breadcrumbs";
-import {
-  fallbackSegmentLabel,
-  isBreadcrumbSegment,
-  isGeoBreadcrumbSegment,
-} from "@/utils/dashboard-breadcrumbs";
 import {
   isChatPathname,
   isRecordDetailPathname,
 } from "@/utils/dashboard-paths";
-import { withGeoProject } from "@/utils/geo-paths";
-import { toGeoTab } from "@/utils/geo-tabs";
-import { siteHref } from "@/utils/site-links";
-
-const NON_ORG_PATHS: string[] = [];
-
-const NON_CLICKABLE_SEGMENTS: ReadonlySet<string> = new Set(["brand"]);
 
 /**
- * Topbar. Desktop pages title themselves and the sidebar
- * carries search and the agent, so the bar only stays for record pages, which
- * need breadcrumbs, and on small screens, where it holds the sidebar toggle.
+ * Topbar. Pages title themselves and the sidebar carries search and the
+ * agent, so the bar only stays where it holds controls: posts, chats and
+ * brand identity, plus small screens, where it holds the sidebar toggle.
  */
 export function SiteHeader() {
   const tCommon = useTranslations("common");
   const pathname = usePathname();
   const { isMobile } = useSidebar();
   const { setOpen: setCommandPaletteOpen } = useCommandPalette();
+  const hasControls = isRecordDetailPathname(pathname);
 
-  if (!(isMobile || isRecordDetailPathname(pathname))) {
+  if (!(isMobile || hasControls)) {
     return null;
   }
 
@@ -73,16 +48,14 @@ export function SiteHeader() {
     <header className="@container/topbar relative flex h-12 shrink-0 items-center gap-2 border-b">
       <div className="flex h-full w-full min-w-0 items-center justify-between gap-2 px-4 lg:px-6">
         <div className="flex min-w-0 items-center gap-1 overflow-hidden lg:gap-2">
-          {isMobile ? (
-            <>
-              <SidebarToggle className="-ml-1" />
-              <Separator
-                className="mx-2 h-4 self-center data-[orientation=vertical]:h-4 data-[orientation=vertical]:self-center"
-                orientation="vertical"
-              />
-            </>
+          {isMobile ? <SidebarToggle className="-ml-1" /> : null}
+          {isMobile && hasControls ? (
+            <Separator
+              className="mx-2 h-4 self-center data-[orientation=vertical]:h-4 data-[orientation=vertical]:self-center"
+              orientation="vertical"
+            />
           ) : null}
-          <DashboardHeaderBreadcrumbs />
+          {hasControls ? <DashboardHeaderBreadcrumbs /> : null}
         </div>
         <div className="flex min-w-0 items-center gap-1">
           <HeaderActionsOutlet />
@@ -105,388 +78,51 @@ export function SiteHeader() {
 
 function DashboardHeaderBreadcrumbs() {
   const pathname = usePathname();
-  const [geoTabParam] = useQueryState("tab", parseAsString);
-  const [geoProjectParam] = useGeoProjectQueryState();
-  const id = useId();
-  const labels = useBreadcrumbLabels();
-  const visibility = useNavVisibility();
+  const [slug, section, detail] = pathname.split("/").filter(Boolean);
+  const tLabels = useTranslations("common.labels");
   const tUi = useTranslations("ui");
+  const isBrandIdentity = section === "brand";
+  const isContentDetail = section === "content";
+  const label = isBrandIdentity
+    ? tLabels("brandIdentityTitle")
+    : isContentDetail
+      ? tLabels("content")
+      : tLabels("chat");
 
   return (
     <Breadcrumb aria-label={tUi("breadcrumb")} className="min-w-0">
       <BreadcrumbList className="text-foreground min-w-0 flex-nowrap gap-2 text-sm font-medium">
-        {headerBreadcrumbItems(
-          pathname,
-          geoTabParam,
-          geoProjectParam,
-          id,
-          labels,
-          visibility.sites
-        )}
+        <BreadcrumbItem className="shrink-0 whitespace-nowrap hover:underline">
+          <BreadcrumbLink
+            render={
+              <Link
+                href={
+                  isBrandIdentity
+                    ? `/${slug}/brand/identity`
+                    : `/${slug}/${section}`
+                }
+              >
+                {label}
+              </Link>
+            }
+          />
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <HugeiconsIcon icon={ArrowRight01Icon} />
+        </BreadcrumbSeparator>
+        {isContentDetail && detail ? (
+          <ContentTopbarCollection contentId={detail} />
+        ) : null}
+        <BreadcrumbItem className="min-w-0">
+          {isBrandIdentity ? (
+            <BrandTopbarIdentitySelector slug={slug ?? ""} />
+          ) : isContentDetail && detail ? (
+            <ContentTopbarTitle contentId={detail} />
+          ) : detail ? (
+            <ChatTopbarTitle chatId={detail} />
+          ) : null}
+        </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
   );
-}
-
-function headerBreadcrumbItems(
-  pathname: string,
-  geoTabParam: string | null,
-  geoProjectParam: string | null,
-  id: string,
-  labels: BreadcrumbLabels,
-  sitesEnabled: boolean
-) {
-  const segments = pathname.split("/").filter(Boolean);
-  const slug = segments[0];
-  const isNonOrgPath = NON_ORG_PATHS.some((path) => pathname.startsWith(path));
-  const breadcrumbSegments = isNonOrgPath ? segments : segments.slice(1);
-  if (!sitesEnabled && breadcrumbSegments[0] === "sites") {
-    return [];
-  }
-  const isChatDetail =
-    !isNonOrgPath &&
-    breadcrumbSegments[0] === "chat" &&
-    breadcrumbSegments.length >= 2;
-  const chatDetailId = isChatDetail ? (breadcrumbSegments[1] ?? null) : null;
-  const isCollectionDetail =
-    !isNonOrgPath &&
-    breadcrumbSegments[0] === "collection" &&
-    breadcrumbSegments.length >= 2;
-  const isContentDetail =
-    !isNonOrgPath &&
-    breadcrumbSegments[0] === "content" &&
-    breadcrumbSegments.length >= 2;
-  const contentDetailId = isContentDetail
-    ? (breadcrumbSegments[1] ?? null)
-    : null;
-  const isBrandIdentity =
-    !isNonOrgPath &&
-    breadcrumbSegments[0] === "brand" &&
-    breadcrumbSegments[1] === "identity";
-  const isGeo = !isNonOrgPath && breadcrumbSegments[0] === "geo";
-  const isSiteDetail =
-    !isNonOrgPath &&
-    breadcrumbSegments[0] === "sites" &&
-    (breadcrumbSegments[1]?.startsWith("site_") ?? false);
-
-  if (isBrandIdentity) {
-    return brandIdentityHeaderBreadcrumbs(id, slug, labels);
-  }
-  if (isSiteDetail) {
-    return sitesHeaderBreadcrumbs(breadcrumbSegments, id, slug, labels);
-  }
-  if (isGeo) {
-    return geoHeaderBreadcrumbs({
-      breadcrumbSegments,
-      geoProjectId: geoProjectParam ?? undefined,
-      geoTabParam,
-      id,
-      segments,
-      slug,
-      labels,
-    });
-  }
-  return genericHeaderBreadcrumbs({
-    breadcrumbSegments,
-    chatDetailId,
-    contentDetailId,
-    id,
-    isChatDetail,
-    isCollectionDetail,
-    isContentDetail,
-    isNonOrgPath,
-    segments,
-    slug,
-    labels,
-  });
-}
-
-function brandIdentityHeaderBreadcrumbs(
-  id: string,
-  slug: string | undefined,
-  labels: BreadcrumbLabels
-) {
-  return [
-    <BreadcrumbItem
-      className="shrink-0 whitespace-nowrap hover:underline"
-      key={`${id}-brand-identity-link`}
-    >
-      <BreadcrumbLink
-        render={
-          <Link href={`/${slug}/brand/identity`}>
-            {labels.segments.identity}
-          </Link>
-        }
-      />
-    </BreadcrumbItem>,
-    <BreadcrumbSeparator key={`${id}-brand-identity-sep`}>
-      <HugeiconsIcon icon={ArrowRight01Icon} />
-    </BreadcrumbSeparator>,
-    <BreadcrumbItem className="min-w-0" key={`${id}-brand-identity-selector`}>
-      <BrandTopbarIdentitySelector slug={slug ?? ""} />
-    </BreadcrumbItem>,
-  ];
-}
-
-function sitesHeaderBreadcrumbs(
-  breadcrumbSegments: string[],
-  id: string,
-  slug: string | undefined,
-  labels: BreadcrumbLabels
-) {
-  const siteId = breadcrumbSegments[1] ?? "";
-  const section = SITE_SECTIONS.find(
-    (item) => item.path === `/${breadcrumbSegments[2] ?? ""}`
-  )?.section;
-  const deploymentId =
-    section === "deployments" ? breadcrumbSegments[3] : undefined;
-  const siteSlug = slug ?? "";
-  const separator = (key: string) => (
-    <BreadcrumbSeparator key={`${id}-sites-sep-${key}`}>
-      <HugeiconsIcon icon={ArrowRight01Icon} />
-    </BreadcrumbSeparator>
-  );
-  return [
-    <BreadcrumbItem
-      className="shrink-0 hover:underline"
-      key={`${id}-sites-root`}
-    >
-      <BreadcrumbLink
-        render={<Link href={`/${slug}/sites`}>{labels.segments.sites}</Link>}
-      />
-    </BreadcrumbItem>,
-    separator("site"),
-    <BreadcrumbItem
-      className={cn("min-w-0", section && "hover:underline")}
-      key={`${id}-sites-site`}
-    >
-      <SiteTopbarTitle
-        href={section ? siteHref(siteSlug, siteId) : null}
-        siteId={siteId}
-      />
-    </BreadcrumbItem>,
-    ...(section
-      ? [
-          <BreadcrumbSeparator
-            className={cn(deploymentId && "max-sm:hidden")}
-            key={`${id}-sites-sep-section`}
-          >
-            <HugeiconsIcon icon={ArrowRight01Icon} />
-          </BreadcrumbSeparator>,
-          <BreadcrumbItem
-            className={cn(
-              "shrink-0",
-              deploymentId && "hover:underline max-sm:hidden"
-            )}
-            key={`${id}-sites-section`}
-          >
-            <SiteSectionTopbarTitle
-              href={deploymentId ? siteHref(siteSlug, siteId, section) : null}
-              section={section}
-            />
-          </BreadcrumbItem>,
-        ]
-      : []),
-    ...(deploymentId
-      ? [
-          separator("deployment"),
-          <BreadcrumbItem className="min-w-0" key={`${id}-sites-deployment`}>
-            <DeploymentTopbarTitle
-              deploymentId={deploymentId}
-              siteId={siteId}
-            />
-          </BreadcrumbItem>,
-        ]
-      : []),
-  ];
-}
-
-function genericHeaderBreadcrumbs({
-  breadcrumbSegments,
-  chatDetailId,
-  contentDetailId,
-  id,
-  isChatDetail,
-  isCollectionDetail,
-  isContentDetail,
-  isNonOrgPath,
-  segments,
-  slug,
-  labels,
-}: {
-  breadcrumbSegments: string[];
-  chatDetailId: string | null;
-  contentDetailId: string | null;
-  id: string;
-  isChatDetail: boolean;
-  isCollectionDetail: boolean;
-  isContentDetail: boolean;
-  isNonOrgPath: boolean;
-  segments: string[];
-  slug: string | undefined;
-  labels: BreadcrumbLabels;
-}) {
-  const displayBreadcrumbSegments = isCollectionDetail
-    ? ["content", "collection"]
-    : breadcrumbSegments;
-
-  const isAutomationEdit =
-    !isNonOrgPath &&
-    segments[1] === "automation" &&
-    segments.length === 3 &&
-    !["new", "runs", "templates"].includes(segments[2] ?? "");
-
-  return displayBreadcrumbSegments.flatMap((segment, index) => {
-    const href = (() => {
-      if (isCollectionDetail && segment === "content") {
-        return `/${slug}/content`;
-      }
-      if (isCollectionDetail && segment === "collection") {
-        return `/${slug}/content`;
-      }
-      return isNonOrgPath
-        ? `/${segments.slice(0, index + 1).join("/")}`
-        : `/${segments.slice(0, index + 2).join("/")}`;
-    })();
-    const isLast = index === displayBreadcrumbSegments.length - 1;
-    let label = isBreadcrumbSegment(segment)
-      ? labels.segments[segment]
-      : fallbackSegmentLabel(segment);
-    if (isAutomationEdit && isLast) {
-      label = labels.segments.edit;
-    }
-    const isClickable = !NON_CLICKABLE_SEGMENTS.has(segment);
-    const isChatDetailLast = isChatDetail && isLast && chatDetailId;
-    const isContentDetailLast = isContentDetail && isLast && contentDetailId;
-    const content = (() => {
-      if (isChatDetailLast) {
-        return <ChatTopbarTitle chatId={chatDetailId} />;
-      }
-
-      if (isContentDetailLast) {
-        return <ContentTopbarTitle contentId={contentDetailId} />;
-      }
-
-      if (isCollectionDetail && isLast) {
-        return <BreadcrumbPage className="font-medium">{label}</BreadcrumbPage>;
-      }
-
-      if (isClickable) {
-        return <BreadcrumbLink render={<Link href={href}>{label}</Link>} />;
-      }
-
-      if (isLast) {
-        return <BreadcrumbPage className="font-medium">{label}</BreadcrumbPage>;
-      }
-
-      return <span>{label}</span>;
-    })();
-
-    const item = (
-      <BreadcrumbItem
-        className={cn(
-          (isChatDetailLast || isContentDetailLast) && "min-w-0",
-          isClickable &&
-            !(isChatDetailLast || isCollectionDetail || isContentDetailLast) &&
-            "hover:underline"
-        )}
-        key={`${id}-item-${segment}`}
-      >
-        {content}
-      </BreadcrumbItem>
-    );
-
-    if (isLast) {
-      return [item];
-    }
-
-    return [
-      item,
-      <BreadcrumbSeparator key={`${id}-separator-${segment}`}>
-        <HugeiconsIcon icon={ArrowRight01Icon} />
-      </BreadcrumbSeparator>,
-      ...(isContentDetail && contentDetailId && index === 0
-        ? [
-            <ContentTopbarCollection
-              contentId={contentDetailId}
-              key={`${id}-content-collection`}
-            />,
-          ]
-        : []),
-    ];
-  });
-}
-
-function geoHeaderBreadcrumbs({
-  breadcrumbSegments,
-  geoProjectId,
-  geoTabParam,
-  id,
-  segments,
-  slug,
-  labels,
-}: {
-  breadcrumbSegments: string[];
-  geoProjectId: string | undefined;
-  geoTabParam: string | null;
-  id: string;
-  segments: string[];
-  slug: string | undefined;
-  labels: BreadcrumbLabels;
-}) {
-  const geoSectionSegments = breadcrumbSegments.slice(1);
-  const geoTabLabel = labels.geoTabs[toGeoTab(geoTabParam)];
-
-  const geoSectionBreadcrumbs =
-    geoSectionSegments.length > 0
-      ? geoSectionSegments.flatMap((segment, index) => {
-          const isLast = index === geoSectionSegments.length - 1;
-          const href = withGeoProject(
-            `/${segments.slice(0, index + 3).join("/")}`,
-            geoProjectId
-          );
-          const label = isGeoBreadcrumbSegment(segment)
-            ? labels.geoSegments[segment]
-            : fallbackSegmentLabel(segment);
-          return [
-            <BreadcrumbSeparator key={`${id}-geo-sep-${segment}`}>
-              <HugeiconsIcon icon={ArrowRight01Icon} />
-            </BreadcrumbSeparator>,
-            <BreadcrumbItem
-              className={cn(isLast && "min-w-0", !isLast && "hover:underline")}
-              key={`${id}-geo-item-${segment}`}
-            >
-              {isLast ? (
-                <BreadcrumbPage className="block truncate font-medium">
-                  {label}
-                </BreadcrumbPage>
-              ) : (
-                <BreadcrumbLink render={<Link href={href}>{label}</Link>} />
-              )}
-            </BreadcrumbItem>,
-          ];
-        })
-      : [
-          <BreadcrumbSeparator key={`${id}-geo-tab-sep`}>
-            <HugeiconsIcon icon={ArrowRight01Icon} />
-          </BreadcrumbSeparator>,
-          <BreadcrumbItem className="min-w-0" key={`${id}-geo-tab`}>
-            <BreadcrumbPage className="block truncate font-medium">
-              {geoTabLabel}
-            </BreadcrumbPage>
-          </BreadcrumbItem>,
-        ];
-
-  return [
-    <BreadcrumbItem className="hover:underline" key={`${id}-geo-link`}>
-      <BreadcrumbLink
-        render={
-          <Link href={withGeoProject(`/${slug}/geo`, geoProjectId)}>
-            {labels.geo}
-          </Link>
-        }
-      />
-    </BreadcrumbItem>,
-    ...geoSectionBreadcrumbs,
-  ];
 }

@@ -56,9 +56,17 @@ if (!databaseUrl) {
     mock.module("../../sites-server/src/activation", () => ({
       readLiveDeployments: async () => ({ ids: new Set(), previews: {} }),
     }));
+    const r2 = await import("../../sites-server/src/r2");
     mock.module("../../sites-server/src/r2", () => ({
-      r2ListPrefixes: async () => [...artifacts],
+      ...r2,
+      r2ListPrefixes: async (root: string) =>
+        [...artifacts].filter((key) => key.startsWith(root)),
       r2DeletePrefix: async (prefix: string) => artifacts.delete(prefix),
+    }));
+    const state = await import("../../sites-server/src/state");
+    mock.module("../../sites-server/src/state", () => ({
+      ...state,
+      readServingState: async () => null,
     }));
     const { saveBuildTelemetry, getBuildTelemetry } =
       await import("../../sites-server/src/build-telemetry");

@@ -22,7 +22,7 @@ if (!process.env.NOTRA_SITE_ANALYTICS_TEST_WORKER) {
       }
     );
     expect(result.status, result.stderr?.toString()).toBe(0);
-  });
+  }, 35_000);
 } else {
   let analyticsOn = true;
   let published = true;

@@ -6,6 +6,8 @@ import type { SiteSettingsForm, SiteSettingsToggleField } from "@/types/sites";
 export interface SiteSettingsGroupProps {
   icon: IconSvgElement;
   title: ReactNode;
+  /** Control at the right of the group title, e.g. a mode switch. */
+  action?: ReactNode;
   children: ReactNode;
 }
 
@@ -17,6 +19,10 @@ export interface SiteSettingsItemBaseProps {
   icon: IconSvgElement;
   title: ReactNode;
   description?: ReactNode;
+}
+
+export interface SiteSettingsBlockProps extends SiteSettingsItemBaseProps {
+  children: ReactNode;
 }
 
 export interface SiteSettingsItemProps extends SiteSettingsItemBaseProps {

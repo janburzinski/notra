@@ -101,7 +101,7 @@ if (!process.env.NOTRA_VARIABLES_SURFACE_WORKER) {
       expect(html).toContain("{{product_name}}");
       expect(html).toContain('value="Acme Flow"');
       expect(html).toContain('value="https://example.com/signup"');
-      expect(html).toContain('pattern="[A-Za-z][A-Za-z0-9_-]{0,39}"');
+      expect(html).toContain('pattern="[A-Za-z][A-Za-z0-9_\\-]{0,39}"');
       expect(html).toContain('maxLength="500"');
       expect(html).toContain(messages.sites.variables.reviewAndPublish);
       expect(html).toContain('type="submit"');

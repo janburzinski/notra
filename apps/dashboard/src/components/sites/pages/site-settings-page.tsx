@@ -11,6 +11,7 @@ import {
   GithubIcon,
   GitPullRequestIcon,
   Layers01Icon,
+  PlugSocketIcon,
   SparklesIcon,
   Tag01Icon,
   ViewIcon,
@@ -40,7 +41,8 @@ import { useId, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
-import { buttonVariants } from "@/components/button";
+import { Button, buttonVariants } from "@/components/button";
+import Link from "@/components/framework/link";
 import { useSite } from "@/components/sites/site-context";
 import { SiteImportList } from "@/components/sites/site-import-list";
 import { SitePreviewAccessForm } from "@/components/sites/site-preview-access-control";
@@ -107,6 +109,7 @@ function SiteSettingsContent() {
   const tSections = useTranslations("sites.sections");
   const tPreview = useTranslations("sites.previewAccess");
   const tVariables = useTranslations("sites.variables");
+  const tIntegrations = useTranslations("sites.integrationsPage");
   const variablesCount = useSiteVariablesCount();
   const [openRow, setOpenRow] = useState<SiteSettingsRowKey | null>(null);
   const { site } = detail;
@@ -271,6 +274,19 @@ function SiteSettingsContent() {
           >
             <SiteVariablesSettings />
           </SiteSettingsItem>
+          <SiteSettingsItem
+            description={t("integrationsHint")}
+            icon={PlugSocketIcon}
+            title={tIntegrations("title")}
+            value={
+              <Link
+                className={buttonVariants({ size: "sm", variant: "outline" })}
+                href={siteHref(organizationSlug, siteId, "integrations")}
+              >
+                {t("manage")}
+              </Link>
+            }
+          />
         </SiteSettingsList>
       </SiteSettingsGroup>
 

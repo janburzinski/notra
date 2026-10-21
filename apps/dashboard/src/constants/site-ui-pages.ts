@@ -26,6 +26,11 @@ const Integrations = lazyPage(() =>
     default: module.SiteIntegrationsPage,
   }))
 );
+const Design = lazyPage(() =>
+  import("@/components/sites/pages/site-design-page").then((module) => ({
+    default: module.SiteDesignPage,
+  }))
+);
 const Settings = lazyPage(() =>
   import("@/components/sites/pages/site-settings-page").then((module) => ({
     default: module.SiteSettingsPage,
@@ -38,5 +43,6 @@ export const SITE_SECTION_PAGES: readonly SiteSectionUiPage[] = [
   { section: "domains", page: Domains },
   { section: "editor", page: Editor },
   { section: "integrations", page: Integrations },
+  { section: "design", page: Design },
   { section: "settings", page: Settings },
 ];

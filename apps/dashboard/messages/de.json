@@ -7128,18 +7128,11 @@
       "feedbackDescription": "Teile deine Gedanken mit uns."
     },
     "breadcrumbs": {
-      "geo": "Geo",
       "segments": {
         "collection": "Sammlungen",
         "new": "Neu",
         "templates": "Vorlagen",
         "runs": "Ausführungen"
-      },
-      "geoSegments": {
-        "agent-readiness": "Agent Readiness",
-        "directions": "Richtungen",
-        "gaps": "Lücken",
-        "shelf-space": "Shelf Space"
       }
     },
     "agent": {
@@ -7852,7 +7845,9 @@
         "domains": "Domains",
         "editor": "Editor",
         "settings": "Einstellungen",
-        "integrations": "Integrationen"
+        "integrations": "Integrationen",
+        "design": "Design",
+        "label": "Site-Seiten"
       }
     },
     "deployments": {
@@ -8039,7 +8034,9 @@
       "rootDirectoryFieldHint": "Relativ zum Repository. Leer lassen, wenn die Seite im Stammverzeichnis liegt.",
       "sectionsRowHint": "Wo Blog und Changelog auf deiner Seite liegen.",
       "branchFieldHint": "Jeder Push auf diesen Branch geht live. Änderungen gelten ab dem nächsten Deploy.",
-      "optional": "Optional"
+      "optional": "Optional",
+      "integrationsHint": "Analytics und Tracking-Skripte für diese Site.",
+      "manage": "Verwalten"
     },
     "previewFrame": {
       "title": "Vorschau der Seite",
@@ -8057,6 +8054,7 @@
       "domains": "Domains",
       "notraAddress": "Notra-Adresse",
       "addCustomDomain": "Eigene Domain hinzufügen",
+      "manageDomains": "Domains verwalten",
       "repository": "Repository",
       "noRepository": "Kein Repository verbunden",
       "productionBranch": "Produktions-Branch",
@@ -8632,6 +8630,178 @@
       "emptyRangeDescription": "Wähl einen längeren Zeitraum.",
       "notPublishedTitle": "Noch nicht veröffentlicht",
       "notPublishedDescription": "Besucher erscheinen hier, sobald das erste Deployment live ist."
+    },
+    "switcher": {
+      "label": "Site wechseln, aktuell: {name}",
+      "newSite": "Neue Site"
+    },
+    "design": {
+      "title": "Design",
+      "description": "Name, Logo, Farben, Schriften und Navigation deiner Site. Wird in blog.json gespeichert.",
+      "loading": "blog.json wird geladen…",
+      "loadFailed": "blog.json konnte nicht geladen werden. Versuche es erneut.",
+      "retry": "Erneut versuchen",
+      "invalidConfig": "blog.json ist kein gültiges JSON. Korrigiere es im Editor, um das Design hier zu bearbeiten.",
+      "openEditor": "Editor öffnen",
+      "saved": "Als Entwurf gespeichert",
+      "saveFailed": "Speichern fehlgeschlagen. Versuche es erneut.",
+      "unsaved": "Ungespeicherte Änderungen",
+      "invalidValue": "Speichern nicht möglich: {path} in blog.json hat einen ungültigen Wert.",
+      "draftPending": "blog.json hat unveröffentlichte Änderungen",
+      "reset": "Zurücksetzen",
+      "saveDraft": "Entwurf speichern",
+      "publish": "Veröffentlichen",
+      "publishMessage": "Site-Design aktualisieren",
+      "publishConflict": "blog.json wurde auf GitHub geändert. Prüfe es im Editor.",
+      "noDrafts": "Es gibt noch nichts zu veröffentlichen.",
+      "preparePublishFailed": "Deine Änderungen konnten nicht geladen werden. Versuche es erneut.",
+      "brandHint": "Logo, Farben und Schriften aus der Brand Identity dieses Projekts übernehmen.",
+      "applyBrand": "Brand Identity übernehmen",
+      "pickColor": "Farbe für {name} wählen",
+      "lightMode": "{title} im Light Mode",
+      "darkMode": "{title} im Dark Mode",
+      "appearances": {
+        "system": "System",
+        "light": "Hell",
+        "dark": "Dunkel"
+      },
+      "weights": {
+        "100": "Thin",
+        "200": "Extra Light",
+        "300": "Light",
+        "400": "Regular",
+        "500": "Medium",
+        "600": "Semibold",
+        "700": "Bold",
+        "800": "Extra Bold",
+        "900": "Black"
+      },
+      "groups": {
+        "general": "Allgemein",
+        "branding": "Branding",
+        "styling": "Styling",
+        "typography": "Typografie",
+        "navbar": "Navigation"
+      },
+      "general": {
+        "name": "Name",
+        "nameHint": "Erscheint im Browser-Tab, in Suchergebnissen und ohne Logo in der Navigation.",
+        "description": "Beschreibung",
+        "descriptionHint": "Worum es auf der Site geht. Wird für SEO und KI-Antworten genutzt.",
+        "descriptionPlaceholder": "Produkt-Updates und Engineering-Notizen von Acme"
+      },
+      "branding": {
+        "logo": "Logo",
+        "logoHint": "Pfad im Repository oder eine https://-URL.",
+        "separateLogos": "Getrennte Logos für Hell und Dunkel",
+        "logoHref": "Logo-Link",
+        "logoHrefHint": "Wohin das Logo führt. Standard ist die Startseite deiner Site.",
+        "favicon": "Favicon",
+        "faviconHint": "SVG, PNG oder ICO, erscheint in Browser-Tabs.",
+        "separateFavicons": "Getrennte Favicons für Hell und Dunkel"
+      },
+      "styling": {
+        "primary": "Primärfarbe",
+        "primaryHint": "Links, Hervorhebungen und Akzente im Light Mode.",
+        "lightColor": "Helle Farbe",
+        "lightColorHint": "Wird im Dark Mode als Primärfarbe genutzt.",
+        "darkColor": "Dunkle Farbe",
+        "darkColorHint": "Für Buttons und Hover-Zustände.",
+        "sameAsPrimary": "Wie Primärfarbe",
+        "backgroundLight": "Hintergrundfarbe hell",
+        "backgroundLightHint": "Seitenhintergrund im Light Mode.",
+        "backgroundDark": "Hintergrundfarbe dunkel",
+        "backgroundDarkHint": "Seitenhintergrund im Dark Mode.",
+        "backgroundImage": "Hintergrundbild",
+        "backgroundImageHint": "Bild hinter dem Seiteninhalt.",
+        "separateBackgroundImages": "Getrennte Hintergrundbilder für Hell und Dunkel",
+        "decoration": "Hintergrund-Dekoration",
+        "decorationHint": "Ein dezentes Muster hinter dem Seiteninhalt.",
+        "decorations": {
+          "none": "Keine",
+          "grid": "Raster",
+          "dots": "Punkte",
+          "gradient": "Verlauf"
+        },
+        "appearance": "Standardmodus",
+        "appearanceHint": "Der Modus, den Besucher sehen, bevor sie selbst wählen.",
+        "modeToggle": "Hell/Dunkel-Schalter",
+        "modeToggleHint": "Ausschalten, damit alle den Standardmodus sehen.",
+        "codeMode": "Code-Theme",
+        "codeModeHint": "Syntax-Highlighting für Codeblöcke.",
+        "codeModes": {
+          "system": "Wie Site-Modus",
+          "dark": "Immer dunkel",
+          "custom": "Eigene Themes"
+        },
+        "codeLight": "Code-Theme im Light Mode",
+        "codeDark": "Code-Theme im Dark Mode"
+      },
+      "typography": {
+        "modeLabel": "Schrift-Setup",
+        "modes": {
+          "single": "Eine Schrift",
+          "pair": "Überschrift & Text"
+        },
+        "default": "Standard",
+        "custom": "Eigene…",
+        "customFamily": "Name der Schriftfamilie",
+        "source": "URL der eigenen Schrift",
+        "sourceHint": "Pfad oder URL einer selbst gehosteten Schriftdatei, z. B. /fonts/custom.woff2. Leer lassen, um die Familie von Google Fonts zu laden.",
+        "format": "Schriftformat",
+        "formatHint": "Dateiformat der selbst gehosteten Schrift.",
+        "formatAuto": "Aus Dateiname",
+        "font": "Schrift",
+        "fontHint": "Jede Google-Fonts-Familie oder eine eigene Schrift mit URL.",
+        "fontWeight": "Schriftstärke",
+        "fontWeightHint": "Meist 400 für normalen Text.",
+        "heading": "Schrift für Überschriften",
+        "headingHint": "Titel und Abschnittsüberschriften.",
+        "headingWeight": "Stärke der Überschriften",
+        "headingWeightHint": "Meist 600 oder 700.",
+        "body": "Schrift für Fließtext",
+        "bodyHint": "Absätze, Navigation und alles andere.",
+        "bodyWeight": "Stärke des Fließtexts",
+        "bodyWeightHint": "Meist 400."
+      },
+      "navbar": {
+        "button": "Navigations-Button",
+        "buttonHint": "Der wichtigste Call to Action in der Navigation.",
+        "buttons": {
+          "none": "Keiner",
+          "button": "Button",
+          "github": "GitHub",
+          "discord": "Discord",
+          "x": "X",
+          "linkedin": "LinkedIn",
+          "youtube": "YouTube",
+          "slack": "Slack"
+        },
+        "buttonLabel": "Button-Text",
+        "buttonLabelPlaceholder": "Dashboard",
+        "buttonHref": "Button-URL",
+        "links": "Links in der Navigation",
+        "linksHint": "Links neben dem Navigations-Button.",
+        "linkLabel": "Text von Link {number}",
+        "linkHref": "URL von Link {number}",
+        "removeLink": "Link {number} entfernen",
+        "linkLabelPlaceholder": "Support",
+        "addLink": "Link hinzufügen"
+      },
+      "brandDialog": {
+        "title": "Brand Identity übernehmen?",
+        "description": "Diese Felder werden aus der Brand Identity dieses Projekts gefüllt. Gespeichert wird erst, wenn du den Entwurf speicherst.",
+        "confirm": "Übernehmen",
+        "notSet": "Nicht gesetzt",
+        "becomes": "wird zu",
+        "fields": {
+          "primary": "Primärfarbe",
+          "logoLight": "Logo",
+          "logoDark": "Logo im Dark Mode",
+          "heading": "Überschriften",
+          "body": "Fließtext"
+        }
+      }
     }
   }
 }

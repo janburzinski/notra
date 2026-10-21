@@ -7128,18 +7128,11 @@
       "feedbackDescription": "Share your thoughts with us."
     },
     "breadcrumbs": {
-      "geo": "Geo",
       "segments": {
         "collection": "Collections",
         "new": "New",
         "templates": "Templates",
         "runs": "Runs"
-      },
-      "geoSegments": {
-        "agent-readiness": "Agent readiness",
-        "directions": "Directions",
-        "gaps": "Gaps",
-        "shelf-space": "Shelf space"
       }
     },
     "agent": {
@@ -7852,7 +7845,9 @@
         "domains": "Domains",
         "editor": "Editor",
         "settings": "Settings",
-        "integrations": "Integrations"
+        "integrations": "Integrations",
+        "design": "Design",
+        "label": "Site pages"
       }
     },
     "deployments": {
@@ -8039,7 +8034,9 @@
       "rootDirectoryFieldHint": "Relative to the repository root. Leave empty when the site is at the root.",
       "sectionsRowHint": "Where the blog and changelog live on your site.",
       "branchFieldHint": "Every push to this branch goes live. Changes apply on the next deploy.",
-      "optional": "Optional"
+      "optional": "Optional",
+      "integrationsHint": "Analytics and tracking scripts for this site.",
+      "manage": "Manage"
     },
     "previewFrame": {
       "title": "Site preview",
@@ -8057,6 +8054,7 @@
       "domains": "Domains",
       "notraAddress": "Notra address",
       "addCustomDomain": "Add custom domain",
+      "manageDomains": "Manage domains",
       "repository": "Repository",
       "noRepository": "No repository connected",
       "productionBranch": "Production branch",
@@ -8632,6 +8630,178 @@
       "emptyRangeDescription": "Try a longer date range.",
       "notPublishedTitle": "Not published yet",
       "notPublishedDescription": "Visitors show up here once the first deployment is live."
+    },
+    "switcher": {
+      "label": "Switch site, current: {name}",
+      "newSite": "New site"
+    },
+    "design": {
+      "title": "Design",
+      "description": "Name, logo, colors, fonts and navbar of your site. Saved to blog.json.",
+      "loading": "Loading blog.json…",
+      "loadFailed": "Unable to load blog.json. Try again.",
+      "retry": "Try again",
+      "invalidConfig": "blog.json isn't valid JSON. Fix it in the editor to edit the design here.",
+      "openEditor": "Open editor",
+      "saved": "Saved as a draft",
+      "saveFailed": "Unable to save. Try again.",
+      "unsaved": "Unsaved changes",
+      "invalidValue": "Can't save: {path} in blog.json has an invalid value.",
+      "draftPending": "blog.json has unpublished changes",
+      "reset": "Reset",
+      "saveDraft": "Save draft",
+      "publish": "Publish",
+      "publishMessage": "Update site design",
+      "publishConflict": "blog.json changed on GitHub. Review it in the editor.",
+      "noDrafts": "There's nothing to publish yet.",
+      "preparePublishFailed": "Unable to load your changes. Try again.",
+      "brandHint": "Use the logo, colors and fonts from this project's brand identity.",
+      "applyBrand": "Use brand identity",
+      "pickColor": "Pick a color for {name}",
+      "lightMode": "{title} in light mode",
+      "darkMode": "{title} in dark mode",
+      "appearances": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "weights": {
+        "100": "Thin",
+        "200": "Extra light",
+        "300": "Light",
+        "400": "Regular",
+        "500": "Medium",
+        "600": "Semibold",
+        "700": "Bold",
+        "800": "Extra bold",
+        "900": "Black"
+      },
+      "groups": {
+        "general": "General",
+        "branding": "Branding",
+        "styling": "Styling",
+        "typography": "Typography",
+        "navbar": "Navbar"
+      },
+      "general": {
+        "name": "Name",
+        "nameHint": "Shown in the browser tab, in search results and in the navbar without a logo.",
+        "description": "Description",
+        "descriptionHint": "What the site is about. Used for SEO and for AI answers.",
+        "descriptionPlaceholder": "Product updates and engineering notes from Acme"
+      },
+      "branding": {
+        "logo": "Logo",
+        "logoHint": "Path in your repository or an https:// URL.",
+        "separateLogos": "Separate light and dark logos",
+        "logoHref": "Logo link",
+        "logoHrefHint": "Where the logo points. Defaults to your site's home page.",
+        "favicon": "Favicon",
+        "faviconHint": "SVG, PNG or ICO, shown in browser tabs.",
+        "separateFavicons": "Separate light and dark favicons"
+      },
+      "styling": {
+        "primary": "Primary color",
+        "primaryHint": "Links, highlights and accents in light mode.",
+        "lightColor": "Light color",
+        "lightColorHint": "Used as the primary color in dark mode.",
+        "darkColor": "Dark color",
+        "darkColorHint": "Used for buttons and hover states.",
+        "sameAsPrimary": "Same as primary",
+        "backgroundLight": "Light background color",
+        "backgroundLightHint": "Page background in light mode.",
+        "backgroundDark": "Dark background color",
+        "backgroundDarkHint": "Page background in dark mode.",
+        "backgroundImage": "Background image",
+        "backgroundImageHint": "Image behind the page content.",
+        "separateBackgroundImages": "Separate light and dark background images",
+        "decoration": "Background decoration",
+        "decorationHint": "A subtle pattern behind the page content.",
+        "decorations": {
+          "none": "None",
+          "grid": "Grid",
+          "dots": "Dots",
+          "gradient": "Gradient"
+        },
+        "appearance": "Default mode",
+        "appearanceHint": "The mode visitors see before they pick one.",
+        "modeToggle": "Light and dark mode toggle",
+        "modeToggleHint": "Turn off to show every visitor the default mode.",
+        "codeMode": "Code block theme",
+        "codeModeHint": "Syntax highlighting for code blocks.",
+        "codeModes": {
+          "system": "Match site mode",
+          "dark": "Always dark",
+          "custom": "Custom themes"
+        },
+        "codeLight": "Code theme in light mode",
+        "codeDark": "Code theme in dark mode"
+      },
+      "typography": {
+        "modeLabel": "Font setup",
+        "modes": {
+          "single": "Single font",
+          "pair": "Heading & body"
+        },
+        "default": "Default",
+        "custom": "Custom…",
+        "customFamily": "Font family name",
+        "source": "Custom font source URL",
+        "sourceHint": "Path or URL of a self-hosted font file, like /fonts/custom.woff2. Leave empty to load the family from Google Fonts.",
+        "format": "Font format",
+        "formatHint": "File format of the self-hosted font.",
+        "formatAuto": "From file name",
+        "font": "Font",
+        "fontHint": "Any Google Fonts family, or a custom font with a source URL.",
+        "fontWeight": "Font weight",
+        "fontWeightHint": "Typically 400 for regular text.",
+        "heading": "Heading font",
+        "headingHint": "Titles and section headings.",
+        "headingWeight": "Heading font weight",
+        "headingWeightHint": "Typically 600 or 700.",
+        "body": "Body font",
+        "bodyHint": "Paragraphs, navigation and everything else.",
+        "bodyWeight": "Body font weight",
+        "bodyWeightHint": "Typically 400."
+      },
+      "navbar": {
+        "button": "Navbar button",
+        "buttonHint": "The main call to action in the navbar.",
+        "buttons": {
+          "none": "None",
+          "button": "Button",
+          "github": "GitHub",
+          "discord": "Discord",
+          "x": "X",
+          "linkedin": "LinkedIn",
+          "youtube": "YouTube",
+          "slack": "Slack"
+        },
+        "buttonLabel": "Button label",
+        "buttonLabelPlaceholder": "Dashboard",
+        "buttonHref": "Button URL",
+        "links": "Navbar links",
+        "linksHint": "Links next to the navbar button.",
+        "linkLabel": "Label of link {number}",
+        "linkHref": "URL of link {number}",
+        "removeLink": "Remove link {number}",
+        "linkLabelPlaceholder": "Support",
+        "addLink": "Add navbar link"
+      },
+      "brandDialog": {
+        "title": "Use brand identity?",
+        "description": "These fields will be filled from this project's brand identity. Nothing is saved until you save the draft.",
+        "confirm": "Apply",
+        "notSet": "Not set",
+        "becomes": "becomes",
+        "fields": {
+          "primary": "Primary color",
+          "logoLight": "Logo",
+          "logoDark": "Logo in dark mode",
+          "heading": "Headings",
+          "body": "Body"
+        }
+      }
     }
   }
 }

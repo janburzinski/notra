@@ -20,9 +20,9 @@ export function isChatPathname(pathname: string | null): boolean {
 }
 
 /**
- * Pages that name a single record (chat, post, collection, brand identity,
- * site) and need the topbar breadcrumbs to say which one. Every other page
- * titles itself.
+ * Pages whose topbar does more than repeat breadcrumbs: a post (its actions),
+ * a chat (rename, pin, delete) and brand identity (the identity picker).
+ * Every other page titles itself and gets no topbar on desktop.
  */
 export function isRecordDetailPathname(pathname: string | null): boolean {
   if (!pathname) {
@@ -36,11 +36,5 @@ export function isRecordDetailPathname(pathname: string | null): boolean {
   if (section === "brand") {
     return detail === "identity";
   }
-  if (section === "sites") {
-    return Boolean(detail?.startsWith("site_"));
-  }
-  return (
-    (section === "chat" || section === "content" || section === "collection") &&
-    Boolean(detail)
-  );
+  return (section === "chat" || section === "content") && Boolean(detail);
 }

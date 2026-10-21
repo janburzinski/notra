@@ -5,6 +5,8 @@ export interface DashboardLinkProps extends AnchorHTMLAttributes<HTMLAnchorEleme
   prefetch?: boolean | null;
   replace?: boolean;
   scroll?: boolean;
+  /** Only mark the link current on its exact path, not on nested paths. */
+  exact?: boolean;
 }
 
 export interface LazyComponentOptions {
