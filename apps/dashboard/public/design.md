@@ -68,7 +68,7 @@ A dualtone block is two stacked surfaces. The shell is `bg-shell` and holds the 
 - The shell has a 1px `border-shell-border` and no bottom border. The body has a 1px `border-border` and `shadow-lift`, which lifts it off the shell. The body is `rounded-2xl`, so it reads as a card in a tray.
 - One dualtone per group. Do not nest a dualtone block inside another.
 - A block with no label band is a flat card: `rounded-xl`, `bg-card`, and `ring-1 ring-foreground/10`. Do not add a muted tray to it.
-- Every table uses the same frame: a `bg-shell` shell with a 1px `border-shell-border` and a 2px rim on all four sides (`TABLE_FRAME_CLASS`), around a lifted white body (`TABLE_BODY_CLASS`). Headers sit on the shell, body cells on `bg-background`, hover uses `bg-muted/50`.
+- Every table uses the same frame: a `bg-table-shell` shell with a 1px `border-table-shell-border` and a 2px rim on all four sides (`TABLE_FRAME_CLASS`), around a lighter body (`TABLE_BODY_CLASS`, `bg-table-card` with a `border-table-card-border` edge; in dark mode the shell is darker than the card). Headers sit on the shell, body cells on `bg-table-card`, hover uses `bg-muted/50`.
 - Use `DataTable` for bounded or paged lists and `InfiniteDataTable` for lists that load the next page on scroll. Use `DataTableSkeleton` while they load. The shadcn `Table` primitives render the same frame for one-off tables such as chat markdown. Do not restyle the frame with `className`.
 - Table and flat eyebrows are `text-sm font-medium capitalize`. Panel titles are `text-base font-medium` and stay as written. Readouts are `text-xs text-muted-foreground`. Aligned numbers use `tabular-nums`.
 

@@ -16,7 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
-import { TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { TRANSITION } from "@notra/ui/lib/motion";
 import {
   AnimatePresence,
@@ -210,7 +210,7 @@ export function AutopilotRunPanel({ children }: AutopilotRunPanelProps) {
   return (
     <div className={TABLE_FRAME_CLASS}>
       <LazyMotion features={domMax}>
-        <div className="bg-background shadow-lift divide-y overflow-hidden rounded-[14px] border">
+        <div className={cn(TABLE_BODY_CLASS, "divide-y overflow-hidden")}>
           {children}
         </div>
       </LazyMotion>

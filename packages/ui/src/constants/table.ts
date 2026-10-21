@@ -2,11 +2,11 @@ import type { CSSProperties } from "react";
 
 /** Grey shell around every table: 1px outer border plus a 2px rim on all sides. */
 export const TABLE_FRAME_CLASS =
-  "rounded-2xl border border-shell-border bg-shell p-0.5";
+  "rounded-2xl border border-table-shell-border bg-table-shell p-0.5";
 
 /** The lifted white card inside the shell that holds the rows. */
 export const TABLE_BODY_CLASS =
-  "rounded-[14px] border border-border bg-background shadow-lift";
+  "rounded-[14px] border border-table-card-border bg-table-card shadow-table-card";
 
 /**
  * Dualtone chrome for a single `<table>`: the header sits on the grey shell,
@@ -14,12 +14,13 @@ export const TABLE_BODY_CLASS =
  * because row borders and radii only render on cells in that model.
  */
 export const TABLE_CARD_CELLS_CLASS = [
-  "[&>tbody>tr>td]:bg-background [&>tbody>tr>td]:border-border/60 [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
-  "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--background))]",
-  "[&>tbody>tr:first-child>td]:border-t-border [&>tbody>tr:first-child>td]:border-t",
-  "[&>tbody>tr:last-child>td]:border-b-border",
-  "[&>tbody>tr>td:first-child]:border-l-border [&>tbody>tr>td:first-child]:border-l",
-  "[&>tbody>tr>td:last-child]:border-r-border [&>tbody>tr>td:last-child]:border-r",
+  "[&>tbody>tr>td]:bg-table-card [&>tbody>tr>td]:border-table-row-border [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
+  "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--table-card))]",
+  "[&>tbody>tr:first-child>td]:border-t-table-card-border [&>tbody>tr:first-child>td]:border-t",
+  "[&>tbody>tr:first-child>td]:shadow-[inset_0_1px_0_hsl(0_0%_100%/0.05)]",
+  "[&>tbody>tr:last-child>td]:border-b-table-card-border",
+  "[&>tbody>tr>td:first-child]:border-l-table-card-border [&>tbody>tr>td:first-child]:border-l",
+  "[&>tbody>tr>td:last-child]:border-r-table-card-border [&>tbody>tr>td:last-child]:border-r",
   "[&>tbody>tr:first-child>td:first-child]:rounded-tl-[14px] [&>tbody>tr:first-child>td:last-child]:rounded-tr-[14px]",
   "[&>tbody>tr:last-child>td:first-child]:rounded-bl-[14px] [&>tbody>tr:last-child>td:last-child]:rounded-br-[14px]",
 ].join(" ");
@@ -28,7 +29,7 @@ export const TABLE_CARD_CELLS_CLASS = [
 export const TABLE_INNER_RADIUS_CLASS = "rounded-[14px]";
 
 /** Row separator inside the white card. */
-export const TABLE_ROW_BORDER_CLASS = "border-border/60 border-b";
+export const TABLE_ROW_BORDER_CLASS = "border-table-row-border border-b";
 
 /** Inner box for table cells. Gives children a real used width so truncate /
  * max-width:100% resolve against the column, not the td's max-w-0 hack. */

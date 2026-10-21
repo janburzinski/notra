@@ -12,7 +12,7 @@ import { GEO_SCAN_RESULTS_PAGE_SIZE } from "@notra/geo-core/constants/geo-scan-h
 import type { GeoScanResultSummary } from "@notra/geo-core/types/geo-scan-history";
 import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
-import { Badge } from "@notra/ui/components/ui/badge";
+import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
   DataTableSkeleton,
   DataTable,
@@ -121,13 +121,14 @@ function mentionCell(
   // Fades in when a live row fills.
   return (
     <span className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-500">
-      <Badge variant={row.mentioned ? "success" : "secondary"}>
-        <HugeiconsIcon
-          aria-hidden="true"
-          icon={row.mentioned ? Tick02Icon : MinusSignIcon}
-        />
-        {row.mentioned ? tShared("mentioned") : tShared("notMentioned")}
-      </Badge>
+      <StatusBadge
+        appearance={
+          row.mentioned
+            ? { variant: "success", icon: Tick02Icon }
+            : { variant: "secondary", icon: MinusSignIcon }
+        }
+        label={row.mentioned ? tShared("mentioned") : tShared("notMentioned")}
+      />
     </span>
   );
 }
@@ -218,7 +219,7 @@ function liveColumns(
     {
       key: "mentioned",
       header: t("columns.mention"),
-      width: "10.5rem",
+      width: "11rem",
       cell: (row) =>
         row.answer ? (
           mentionCell(row.answer, tShared)
@@ -285,7 +286,7 @@ function answerColumns(
     {
       key: "mentioned",
       header: t("columns.mention"),
-      width: "10.5rem",
+      width: "11rem",
       cell: (row) => mentionCell(row, tShared),
     },
     {

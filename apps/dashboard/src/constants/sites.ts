@@ -15,6 +15,7 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
+import { TABLE_BODY_CLASS } from "@notra/ui/constants/table";
 
 import type {
   SiteDeploymentFilters,
@@ -219,10 +220,8 @@ export const SITE_VERCEL_PROVIDER_PATTERN = /vercel/i;
 
 export const SITES_CLEANUP_CONCURRENCY = 4;
 
-export const SITE_DEPLOYMENT_SUMMARY_SURFACE_CLASS =
-  "bg-background shadow-lift grid gap-6 rounded-[14px] border p-5 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]";
-export const SITE_DEPLOYMENT_LOG_SURFACE_CLASS =
-  "bg-background shadow-lift overflow-hidden rounded-[14px] border";
+export const SITE_DEPLOYMENT_SUMMARY_SURFACE_CLASS = `${TABLE_BODY_CLASS} grid gap-6 p-5 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]`;
+export const SITE_DEPLOYMENT_LOG_SURFACE_CLASS = `${TABLE_BODY_CLASS} overflow-hidden`;
 
 export const SITE_SETTINGS_PANEL_CLASSNAME =
   "h-[var(--collapsible-panel-height)] overflow-hidden outline-none transition-[height,opacity] duration-normal ease-emphasized motion-reduce:transition-none data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0";

@@ -8,34 +8,40 @@ import {
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import { TrendBadge } from "@notra/ui/components/trend-badge";
 import { Badge } from "@notra/ui/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@notra/ui/components/ui/table";
 
 export function BadgeShowcase() {
   return (
     <div className="space-y-6">
-      <div className="border-border overflow-hidden rounded-lg border">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-muted/50 text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3 font-medium" scope="col">Environment</th>
-              <th className="px-4 py-3 font-medium" scope="col">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-border divide-y">
-            <tr>
-              <td className="px-4 py-4"><StatusBadge appearance={{ variant: "secondary", icon: Rocket01Icon }} label="Production" /></td>
-              <td className="px-4 py-4"><div className="flex items-center gap-2"><StatusBadge appearance={{ variant: "success", icon: Tick02Icon, square: true }} label="Successful" /><span className="text-muted-foreground tabular-nums">11s</span></div></td>
-            </tr>
-            <tr>
-              <td className="px-4 py-4"><StatusBadge appearance={{ variant: "secondary", icon: Rocket01Icon }} label="Production" /></td>
-              <td className="px-4 py-4"><StatusBadge appearance={{ variant: "secondary" }} label="Superseded" /></td>
-            </tr>
-            <tr>
-              <td className="px-4 py-4"><StatusBadge appearance={{ variant: "secondary", icon: Rocket01Icon }} label="Production" /></td>
-              <td className="px-4 py-4"><StatusBadge appearance={{ variant: "secondary" }} label="Skipped" /></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead scope="col">Environment</TableHead>
+            <TableHead scope="col">Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell><StatusBadge appearance={{ variant: "secondary", icon: Rocket01Icon }} label="Production" /></TableCell>
+            <TableCell><div className="flex items-center gap-2"><StatusBadge appearance={{ variant: "success", icon: Tick02Icon, square: true }} label="Successful" /><span className="text-muted-foreground tabular-nums">11s</span></div></TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><StatusBadge appearance={{ variant: "secondary", icon: Rocket01Icon }} label="Production" /></TableCell>
+            <TableCell><StatusBadge appearance={{ variant: "secondary" }} label="Superseded" /></TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><StatusBadge appearance={{ variant: "secondary", icon: Rocket01Icon }} label="Production" /></TableCell>
+            <TableCell><StatusBadge appearance={{ variant: "secondary" }} label="Skipped" /></TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
       <div className="space-y-3">
         <p className="text-muted-foreground text-sm">Status variants</p>
         <div className="flex flex-wrap gap-2">

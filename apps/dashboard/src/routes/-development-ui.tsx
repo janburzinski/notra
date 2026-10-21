@@ -50,6 +50,7 @@ export function createDevelopmentUiRoutes(parent: AnyRoute) {
   const ScanFilters = lazyPage(
     () => import("@/app/design-system/scan-filters/page.dev")
   );
+  const Tables = lazyPage(() => import("@/app/design-system/tables/page.dev"));
   const Webhooks = lazyPage(
     () => import("@/app/design-system/webhooks/page.dev")
   );
@@ -145,6 +146,12 @@ export function createDevelopmentUiRoutes(parent: AnyRoute) {
         path: "scan-filters",
         preload: ScanFilters.preload,
         component: () => <ScanFilters />,
+      }),
+      createUiRoute({
+        parent: preview,
+        path: "tables",
+        preload: Tables.preload,
+        component: () => <Tables />,
       }),
       createUiRoute({
         parent: preview,

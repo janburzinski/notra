@@ -152,6 +152,7 @@ export const DESIGN_SYSTEM_PAGES: DesignSystemPageLink[] = [
   { href: "/design-system/code-research", label: "Code research" },
   { href: "/design-system/geo-traffic", label: "GEO traffic" },
   { href: "/design-system/scan-filters", label: "Scans table" },
+  { href: "/design-system/tables", label: "Tables" },
   { href: "/design-system/webhooks", label: "Webhooks" },
   { href: "/design-system/break-ui", label: "Break UI" },
 ];

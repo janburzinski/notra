@@ -7,7 +7,7 @@ import {
   type TableColumn,
 } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
@@ -211,7 +211,8 @@ function FindingPage({
       <div className={TABLE_FRAME_CLASS}>
         <dl
           className={cn(
-            "bg-background shadow-lift grid gap-x-8 gap-y-5 rounded-[14px] border p-5",
+            TABLE_BODY_CLASS,
+            "grid gap-x-8 gap-y-5 p-5",
             impact ? "sm:grid-cols-3" : "sm:grid-cols-2"
           )}
         >

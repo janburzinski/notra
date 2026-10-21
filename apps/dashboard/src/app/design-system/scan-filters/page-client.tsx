@@ -1,9 +1,8 @@
 "use client";
 
 import { MinusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_SCAN_RESULTS_PAGE_SIZE } from "@notra/geo-core/constants/geo-scan-history";
-import { Badge } from "@notra/ui/components/ui/badge";
+import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
   DataTable,
   type TableColumn,
@@ -61,15 +60,16 @@ const answerColumns: TableColumn<
   {
     key: "mention",
     header: "Mention",
-    width: "9.5rem",
+    width: "11rem",
     cell: (row) => (
-      <Badge variant={row.mentioned ? "success" : "secondary"}>
-        <HugeiconsIcon
-          aria-hidden="true"
-          icon={row.mentioned ? Tick02Icon : MinusSignIcon}
-        />
-        {row.mentioned ? "Mentioned" : "Not mentioned"}
-      </Badge>
+      <StatusBadge
+        appearance={
+          row.mentioned
+            ? { variant: "success", icon: Tick02Icon }
+            : { variant: "secondary", icon: MinusSignIcon }
+        }
+        label={row.mentioned ? "Mentioned" : "Not mentioned"}
+      />
     ),
   },
   {
