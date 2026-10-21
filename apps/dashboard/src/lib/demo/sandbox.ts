@@ -135,7 +135,10 @@ async function lockNextPooledSandbox(
         anchoredAfter ? gt(demoSandboxes.anchorAt, anchoredAfter) : undefined
       )
     )
-    .orderBy(asc(demoSandboxes.createdAt))
+    .orderBy(
+      sql`${demoSandboxes.anchorAt} > ${new Date(now.getTime() - DEMO_POOL_FRESH_MS)} desc`,
+      asc(demoSandboxes.createdAt)
+    )
     .limit(1)
     .for("update", { of: demoSandboxes, skipLocked: true });
   return pooled ?? null;
