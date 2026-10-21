@@ -436,6 +436,7 @@ export function buildBrandMarkdown() {
     markdownSection("Assets", [
       `- [Brand kit (zip)](${SITE_URL}${BRAND_ASSETS.zip})`,
       `- Logo: [SVG](${SITE_URL}${BRAND_ASSETS.mark.svg}) / [PNG](${SITE_URL}${BRAND_ASSETS.mark.png})`,
+      `- Logo for dark surfaces: [SVG](${SITE_URL}${BRAND_ASSETS.markDark.svg}) / [PNG](${SITE_URL}${BRAND_ASSETS.markDark.png})`,
       `- Wordmark: [SVG](${SITE_URL}${BRAND_ASSETS.wordmark.svg}) / [PNG](${SITE_URL}${BRAND_ASSETS.wordmark.png})`,
       `- Wordmark for dark surfaces: [SVG](${SITE_URL}${BRAND_ASSETS.wordmarkDark.svg}) / [PNG](${SITE_URL}${BRAND_ASSETS.wordmarkDark.png})`,
     ]),

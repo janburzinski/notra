@@ -5,6 +5,10 @@ export const BRAND_ASSETS: BrandAssetPaths = {
     svg: "/brand/notra-mark.svg",
     png: "/brand/notra-mark.png",
   },
+  markDark: {
+    svg: "/brand/notra-mark-dark.svg",
+    png: "/brand/notra-mark-dark.png",
+  },
   wordmark: {
     svg: "/brand/notra-wordmark.svg",
     png: "/brand/notra-wordmark.png",

@@ -4,7 +4,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BrandAssetCard } from "@/components/brand-asset-card";
 import { BrandColorSwatch } from "@/components/brand-color-swatch";
 import { MarketingHeroWash } from "@/components/marketing-hero-wash";
-import { NotraMark } from "@/components/notra-mark";
 import {
   BRAND_ASSETS,
   BRAND_COLORS,
@@ -94,7 +93,8 @@ function BrandPage() {
             </h2>
             <p className="text-muted-foreground text-sm leading-6">
               Keep the Notra mark on a light surface with clear space around it.
-              Hover a card to download the logo as SVG or PNG.
+              On dark surfaces, use the version on a cream tile. Hover a card to
+              download the logo as SVG or PNG.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -102,20 +102,18 @@ function BrandPage() {
               asset={BRAND_ASSETS.mark}
               copyLabel="Copy logo as SVG"
               downloadName="notra-mark"
+              previewAlt="Notra logo"
+              previewClassName="size-20"
               variant="light"
-            >
-              <NotraMark className="size-20 shrink-0" />
-            </BrandAssetCard>
+            />
             <BrandAssetCard
-              asset={BRAND_ASSETS.mark}
+              asset={BRAND_ASSETS.markDark}
               copyLabel="Copy logo as SVG"
-              downloadName="notra-mark"
+              downloadName="notra-mark-dark"
+              previewAlt="Notra logo on a cream tile"
+              previewClassName="size-24"
               variant="dark"
-            >
-              <span className="flex size-24 items-center justify-center rounded-2xl bg-[#F6F3F1]">
-                <NotraMark className="size-14 shrink-0" />
-              </span>
-            </BrandAssetCard>
+            />
           </div>
         </section>
 
@@ -135,28 +133,18 @@ function BrandPage() {
               asset={BRAND_ASSETS.wordmark}
               copyLabel="Copy wordmark as SVG"
               downloadName="notra-wordmark"
+              previewAlt="Notra wordmark"
+              previewClassName="h-12 w-auto"
               variant="light"
-            >
-              <span className="flex items-center gap-3">
-                <NotraMark className="size-10 shrink-0" />
-                <span className="text-3xl font-semibold text-neutral-950">
-                  Notra
-                </span>
-              </span>
-            </BrandAssetCard>
+            />
             <BrandAssetCard
               asset={BRAND_ASSETS.wordmarkDark}
               copyLabel="Copy wordmark as SVG"
               downloadName="notra-wordmark-dark"
+              previewAlt="Notra wordmark for dark surfaces"
+              previewClassName="h-14 w-auto"
               variant="dark"
-            >
-              <span className="flex items-center gap-3">
-                <span className="flex size-14 items-center justify-center rounded-xl bg-[#F6F3F1]">
-                  <NotraMark className="size-10 shrink-0" />
-                </span>
-                <span className="text-3xl font-semibold text-white">Notra</span>
-              </span>
-            </BrandAssetCard>
+            />
           </div>
         </section>
 
