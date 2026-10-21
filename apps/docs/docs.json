@@ -608,6 +608,7 @@
                     "expanded": true,
                     "pages": [
                       "GET /v1/projects/{projectId}/geo/settings",
+                      "GET /v1/projects/{projectId}/geo/engines",
                       "PATCH /v1/projects/{projectId}/geo/settings"
                     ]
                   },

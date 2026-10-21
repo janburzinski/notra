@@ -68,7 +68,7 @@ curl -X PATCH https://api.usenotra.com/v1/projects/$PROJECT_ID/geo/settings \
   1 to 4 supported language codes. The API rejects an unknown code with `400`.
 </ParamField>
 <ParamField body="engines" type="string[]" required>
-  1 to 64 model ids from the catalog this organization can see (the ids `GET /geo/settings` returns). The API rejects an unknown id with `400`. Engines not visible to the caller keep their stored selection.
+  1 to 64 engine ids from `GET /v1/projects/{projectId}/geo/engines`, which lists the model APIs plus consumer surfaces like `google/ai-overview` (Google AI Overview), `google/gemini` (the Gemini app) and `openai/chatgpt` (the ChatGPT app). The API rejects an unknown id with `400`. Engines not visible to the caller keep their stored selection.
 </ParamField>
 <ParamField body="enforceZdr" type="boolean" required>
   Forced off without the ZDR add-on.

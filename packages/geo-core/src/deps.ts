@@ -45,6 +45,11 @@ export class GeoEntitlementService extends Context.Service<
   GeoEntitlementServiceShape
 >()("@notra/geo-core/GeoEntitlementService") {}
 
+export const GeoEngineCredentialsRequired = Context.Reference<boolean>(
+  "@notra/geo-core/GeoEngineCredentialsRequired",
+  { defaultValue: () => true }
+);
+
 export class GeoCodingAgentAccessService extends Context.Service<
   GeoCodingAgentAccessService,
   GeoCodingAgentAccessServiceShape

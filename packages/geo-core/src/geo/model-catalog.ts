@@ -7,6 +7,7 @@ import {
   GEO_MODEL_FEED_URL,
   GEO_MODEL_NO_SEARCH_VISIBLE,
 } from "../constants/geo-model-catalog";
+import { GeoEngineCredentialsRequired } from "../deps";
 import { geoModelFeedSchema } from "../schemas/geo-model-feed";
 import type {
   GeoModelCatalog,
@@ -33,9 +34,14 @@ const STATIC_ENGINE_IDS = new Set(
   GEO_MODEL_CATALOG_STATIC.map((entry) => entry.id)
 );
 
-let cached: { catalog: GeoModelCatalog; expiresAt: number } | null = null;
+const cachedByCredentials = new Map<
+  boolean,
+  { catalog: GeoModelCatalog; expiresAt: number }
+>();
 
-async function fetchGeoModelCatalog(): Promise<GeoModelCatalog> {
+async function fetchGeoModelCatalog(
+  requireCredentials: boolean
+): Promise<GeoModelCatalog> {
   const init: NextRevalidateRequestInit = {
     next: { revalidate: GEO_MODEL_FEED_REVALIDATE_SECONDS },
   };
@@ -44,23 +50,26 @@ async function fetchGeoModelCatalog(): Promise<GeoModelCatalog> {
     throw new Error(`Model feed responded with ${response.status}`);
   }
   const feed = geoModelFeedSchema.parse(await response.json());
-  const catalog = buildGeoModelCatalogFromFeed(feed.data);
+  const catalog = buildGeoModelCatalogFromFeed(feed.data, requireCredentials);
   if (catalog.models.length === 0) {
     throw new Error("Model feed returned no eligible models");
   }
   return catalog;
 }
 
-async function loadSharedGeoModelCatalog(): Promise<GeoModelCatalog> {
+async function loadSharedGeoModelCatalog(
+  requireCredentials: boolean
+): Promise<GeoModelCatalog> {
+  const cached = cachedByCredentials.get(requireCredentials) ?? null;
   if (cached && cached.expiresAt > Date.now()) {
     return cached.catalog;
   }
   try {
-    const catalog = await fetchGeoModelCatalog();
-    cached = {
+    const catalog = await fetchGeoModelCatalog(requireCredentials);
+    cachedByCredentials.set(requireCredentials, {
       catalog,
       expiresAt: Date.now() + GEO_MODEL_FEED_REVALIDATE_SECONDS * MS_PER_SECOND,
-    };
+    });
     return catalog;
   } catch (error) {
     logGeoFailure(
@@ -69,16 +78,17 @@ async function loadSharedGeoModelCatalog(): Promise<GeoModelCatalog> {
       error,
       { hasCachedCatalog: cached !== null }
     );
-    return cached?.catalog ?? seedGeoModelCatalog();
+    return cached?.catalog ?? seedGeoModelCatalog(requireCredentials);
   }
 }
 
 export const loadGeoModelCatalog = Effect.fn("geo.modelCatalog")(function* (
   organizationId: string
 ) {
+  const requireCredentials = yield* GeoEngineCredentialsRequired;
   const [catalog, codingAgentsAllowed] = yield* Effect.all(
     [
-      Effect.promise(loadSharedGeoModelCatalog),
+      Effect.promise(() => loadSharedGeoModelCatalog(requireCredentials)),
       loadGeoCodingAgentAccess(organizationId),
     ],
     { concurrency: "unbounded" }

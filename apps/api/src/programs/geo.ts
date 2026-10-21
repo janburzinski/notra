@@ -86,6 +86,25 @@ interface GeoProjectScopeInput {
   readonly projectId: string;
 }
 
+export const listGeoEngines = Effect.fn("geo.engines.list")(function* (
+  input: GeoProjectScopeInput
+) {
+  const scope = yield* requireGeoProject(input);
+  const catalog = yield* loadGeoModelCatalog(scope.organizationId);
+  return {
+    engines: catalog.models
+      .filter((model) => !model.hidden)
+      .map((model) => ({
+        id: model.id,
+        label: model.label,
+        provider: model.provider,
+        zdr: model.zdr,
+        default: model.default,
+        supportsGroundedChecks: model.supportsGroundedChecks,
+      })),
+  };
+});
+
 export const getGeoAgentReadiness = Effect.fn("geo.agentReadiness.get")(
   function* (input: GeoProjectScopeInput) {
     const scope = yield* requireGeoProject(input);

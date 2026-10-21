@@ -5,6 +5,7 @@ import {
 import { checkContentBilling } from "@notra/ai/billing/content-billing";
 import { FEATURES } from "@notra/ai/billing/features";
 import {
+  GeoEngineCredentialsRequired,
   GeoEntitlementService,
   GeoGenerationService,
   GeoWorkflowService,
@@ -118,7 +119,13 @@ const generationLayer = Layer.succeed(GeoGenerationService, {
   ),
 });
 
+const engineCredentialsLayer = Layer.succeed(
+  GeoEngineCredentialsRequired,
+  false
+);
+
 export const geoCoreApiLayer = Layer.mergeAll(
+  engineCredentialsLayer,
   agentReadinessNetworkLayer,
   geoModelLayer,
   geoSearchConsoleLive,

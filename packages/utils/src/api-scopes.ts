@@ -163,7 +163,10 @@ export const API_SCOPE_RESOURCES = [
   {
     id: "geo-settings",
     paths: [],
-    pathPatterns: ["/projects/{projectId}/geo/settings"],
+    pathPatterns: [
+      "/projects/{projectId}/geo/settings",
+      "/projects/{projectId}/geo/engines",
+    ],
     label: "GEO settings",
     description: "Read and manage a project's GEO tracking configuration",
     openApiTag: "GEO",

@@ -82,18 +82,20 @@ function isGeoStaticEngineAvailable(entry: GeoModelCatalogEntry): boolean {
 }
 
 function staticEntriesForProvider(
-  providerId: GeoModelProviderId
+  providerId: GeoModelProviderId,
+  requireCredentials: boolean
 ): GeoModelCatalogEntry[] {
   return GEO_MODEL_CATALOG_STATIC.filter(
     (entry) =>
       entry.provider === providerId &&
       !GEO_MODEL_EXCLUDED_IDS.has(entry.id) &&
-      isGeoStaticEngineAvailable(entry)
+      (!requireCredentials || isGeoStaticEngineAvailable(entry))
   );
 }
 
 export function buildGeoModelCatalogFromFeed(
-  feed: readonly GeoGatewayModel[]
+  feed: readonly GeoGatewayModel[],
+  requireCredentials = true
 ): GeoModelCatalog {
   const models: GeoModelCatalogEntry[] = [];
   for (const provider of GEO_MODEL_PROVIDERS) {
@@ -117,7 +119,7 @@ export function buildGeoModelCatalogFromFeed(
         : [];
     models.push(
       ...markHiddenGeoModels([...entries, ...fallback]),
-      ...staticEntriesForProvider(provider.id)
+      ...staticEntriesForProvider(provider.id, requireCredentials)
     );
   }
   const providers = GEO_MODEL_PROVIDERS.filter((provider) =>
@@ -187,7 +189,9 @@ function markHiddenGeoModels(
   });
 }
 
-export function seedGeoModelCatalog(): GeoModelCatalog {
+export function seedGeoModelCatalog(
+  requireCredentials = true
+): GeoModelCatalog {
   const models: GeoModelCatalogEntry[] = [];
   for (const provider of GEO_MODEL_PROVIDERS) {
     models.push(
@@ -198,7 +202,7 @@ export function seedGeoModelCatalog(): GeoModelCatalog {
             !GEO_MODEL_EXCLUDED_IDS.has(entry.id)
         )
       ),
-      ...staticEntriesForProvider(provider.id)
+      ...staticEntriesForProvider(provider.id, requireCredentials)
     );
   }
   const providers = GEO_MODEL_PROVIDERS.filter((provider) =>
