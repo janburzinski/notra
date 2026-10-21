@@ -11,6 +11,7 @@ import {
   POST_TO_X_ACCOUNT_ACTION_PREFIX,
   POST_TO_X_CANCEL_ACTION_PREFIX,
   POST_TO_X_PENDING_TTL_SECONDS,
+  POST_TO_X_PUBLISH_ACTION_PREFIX,
 } from "../constants/slack-post-x";
 import type { PendingPostToX, PostToXOutcome } from "../types/slack";
 
@@ -80,7 +81,7 @@ export async function readPendingPostToXForOrganization(
 }
 
 export function buildPostToXConfirmCard(input: {
-  requestId: string;
+  requestId?: string;
   callId: string;
   username: string;
   accounts: readonly LinkedTwitterAccount[];
@@ -138,16 +139,18 @@ export function buildPostToXConfirmCard(input: {
         elements: [
           {
             type: "button",
-            action_id: `eve_input:${input.requestId}:button:7`,
+            action_id: input.requestId
+              ? `eve_input:${input.requestId}:button:7`
+              : `${POST_TO_X_PUBLISH_ACTION_PREFIX}:${input.callId}`,
             text: plainText("Yes, post to X"),
             style: "danger",
-            value: "post_to_x",
+            value: input.requestId ? "post_to_x" : input.callId,
           },
           {
             type: "button",
-            action_id: `${POST_TO_X_CANCEL_ACTION_PREFIX}:${input.requestId}`,
+            action_id: `${POST_TO_X_CANCEL_ACTION_PREFIX}:${input.requestId ?? input.callId}`,
             text: plainText("Cancel"),
-            value: input.requestId,
+            value: input.requestId ?? input.callId,
           },
         ],
       },
@@ -216,7 +219,7 @@ export async function dismissPostToXConfirmCard(
 
 export function parsePostToXConfirmValue(
   value: string | undefined
-): { requestId: string; callId: string; username: string } | null {
+): { requestId?: string; callId: string; username: string } | null {
   if (!value) {
     return null;
   }
@@ -225,15 +228,14 @@ export function parsePostToXConfirmValue(
     if (
       typeof parsed === "object" &&
       parsed !== null &&
-      "requestId" in parsed &&
-      typeof parsed.requestId === "string" &&
+      (!("requestId" in parsed) || typeof parsed.requestId === "string") &&
       "callId" in parsed &&
       typeof parsed.callId === "string" &&
       "username" in parsed &&
       typeof parsed.username === "string"
     ) {
       return {
-        requestId: parsed.requestId,
+        ...("requestId" in parsed ? { requestId: parsed.requestId } : {}),
         callId: parsed.callId,
         username: parsed.username,
       };

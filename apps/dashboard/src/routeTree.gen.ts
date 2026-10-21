@@ -66,6 +66,7 @@ import { Route as ApiIntegrationsLinearCallbackRouteImport } from './routes/api.
 import { Route as ApiIntegrationsSlackAuthorizeRouteImport } from './routes/api.integrations.slack.authorize'
 import { Route as ApiIntegrationsSlackCallbackRouteImport } from './routes/api.integrations.slack.callback'
 import { Route as ApiInternalAutopilotAdminRouteImport } from './routes/api.internal.autopilot.admin'
+import { Route as ApiInternalContentDraftPullRequestRouteImport } from './routes/api.internal.content.draft-pull-request'
 import { Route as ApiInternalContentScheduledPublicationAttemptRouteImport } from './routes/api.internal.content.scheduled-publication-attempt'
 import { Route as ApiInternalContentSyncGithubRouteImport } from './routes/api.internal.content.sync-github'
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
@@ -397,6 +398,12 @@ const ApiInternalAutopilotAdminRoute =
     path: '/api/internal/autopilot/admin',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalContentDraftPullRequestRoute =
+  ApiInternalContentDraftPullRequestRouteImport.update({
+    id: '/api/internal/content/draft-pull-request',
+    path: '/api/internal/content/draft-pull-request',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalContentScheduledPublicationAttemptRoute =
   ApiInternalContentScheduledPublicationAttemptRouteImport.update({
     id: '/api/internal/content/scheduled-publication-attempt',
@@ -617,6 +624,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
+  '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -703,6 +711,7 @@ export interface FileRoutesByTo {
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
+  '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -790,6 +799,7 @@ export interface FileRoutesById {
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
+  '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
@@ -878,6 +888,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
     | '/api/internal/autopilot/admin'
+    | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -964,6 +975,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
     | '/api/internal/autopilot/admin'
+    | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -1050,6 +1062,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
     | '/api/internal/autopilot/admin'
+    | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
     | '/api/internal/geo/sequence-run'
@@ -1131,6 +1144,7 @@ export interface RootRouteChildren {
   ApiIntegrationsSlackAuthorizeRoute: typeof ApiIntegrationsSlackAuthorizeRoute
   ApiIntegrationsSlackCallbackRoute: typeof ApiIntegrationsSlackCallbackRoute
   ApiInternalAutopilotAdminRoute: typeof ApiInternalAutopilotAdminRoute
+  ApiInternalContentDraftPullRequestRoute: typeof ApiInternalContentDraftPullRequestRoute
   ApiInternalContentScheduledPublicationAttemptRoute: typeof ApiInternalContentScheduledPublicationAttemptRoute
   ApiInternalContentSyncGithubRoute: typeof ApiInternalContentSyncGithubRoute
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
@@ -1554,6 +1568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalAutopilotAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/content/draft-pull-request': {
+      id: '/api/internal/content/draft-pull-request'
+      path: '/api/internal/content/draft-pull-request'
+      fullPath: '/api/internal/content/draft-pull-request'
+      preLoaderRoute: typeof ApiInternalContentDraftPullRequestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/content/scheduled-publication-attempt': {
       id: '/api/internal/content/scheduled-publication-attempt'
       path: '/api/internal/content/scheduled-publication-attempt'
@@ -1904,6 +1925,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIntegrationsSlackAuthorizeRoute: ApiIntegrationsSlackAuthorizeRoute,
   ApiIntegrationsSlackCallbackRoute: ApiIntegrationsSlackCallbackRoute,
   ApiInternalAutopilotAdminRoute: ApiInternalAutopilotAdminRoute,
+  ApiInternalContentDraftPullRequestRoute:
+    ApiInternalContentDraftPullRequestRoute,
   ApiInternalContentScheduledPublicationAttemptRoute:
     ApiInternalContentScheduledPublicationAttemptRoute,
   ApiInternalContentSyncGithubRoute: ApiInternalContentSyncGithubRoute,

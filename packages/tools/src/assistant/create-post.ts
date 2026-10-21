@@ -23,10 +23,6 @@ export function createCreatePostTool(contentType: ContentType) {
     inputSchema: withSlug
       ? createPostWithSlugInputSchema
       : createPostInputSchema,
-    approval: (ctx) =>
-      getSessionAttribute(ctx, "surface") === "task"
-        ? "approved"
-        : "user-approval",
     async execute(input, ctx) {
       const organizationId = requireOrganizationId(ctx);
       const surface = getSessionAttribute(ctx, "surface");

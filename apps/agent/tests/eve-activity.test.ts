@@ -220,7 +220,28 @@ startRoot("turn_7");
 complete("task-0"); complete("task-1"); await report();
 assert.equal(phase("turn_0"), "completed"); assert.equal(phase("turn_1"), "completed");
 assert.equal(phase("turn_7"), "running");
-assert.equal(selectSlackActivityStatus(snapshot), "Working…");
+assert.equal(selectSlackActivityStatus(snapshot), "On it…");
+`);
+  });
+
+  test("rotates casual loading messages without replacing specific waiting states", () => {
+    runNativeActivity(`
+startRoot("turn_7");
+complete("task-0"); complete("task-1"); await report();
+const { buildSlackActivityRenderers, experimental_slackActivityStatus } = await import(native("public/channels/slack/activity"));
+const requests = [];
+globalThis.fetch = async (_url, init) => {
+  requests.push(Object.fromEntries(new URLSearchParams(String(init.body))));
+  return Response.json({ ok: true });
+};
+const [renderer] = buildSlackActivityRenderers({ botToken: "fixture-token", renderers: [experimental_slackActivityStatus()] });
+const destination = { channelId: "C-room", threadTs: "1.0", installationTeamId: "T-install" };
+await renderer.render({ destination, snapshot, state: undefined });
+assert.deepEqual(JSON.parse(requests[0].loading_messages), ["On it…", "Working…", "Getting it ready…", "Doing overtime…"]);
+const blocker = { id: "approval-1", kind: "approval", phase: "blocked", startedAt: "2026-10-13T12:05:00.000Z" };
+await renderer.render({ destination, snapshot: { ...snapshot, blockers: { "approval-1": blocker } }, state: undefined });
+assert.equal(requests[1].status, "Waiting for approval…");
+assert.deepEqual(JSON.parse(requests[1].loading_messages), ["Waiting for approval…"]);
 `);
   });
 

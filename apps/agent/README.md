@@ -116,6 +116,10 @@ Stop buttons are scoped to the displayed request's activity cohort, including re
 
 Tool approval cards in shared channels are collaborative: any Slack member who can see the card can act on it for the bound organization. Use `SLACK_AGENT_ALLOWED_CHANNEL_IDS` to limit the bot to channels whose members are trusted to approve those actions.
 
+Content drafts are saved without approval, including blog posts, changelogs, and social posts. Updating an open content PR also does not require confirmation. Publishing to X remains a separate, explicitly confirmed action after saving the tweet draft. Approval details and buttons are posted separately so large tool inputs are not echoed in Slack's interactive callback payload.
+
+The `create_content_pull_request` tool exports a saved blog post or changelog to a draft GitHub PR and returns its link. It calls the dashboard's internal `/api/internal/content/draft-pull-request` endpoint using the existing `INTERNAL_WORKFLOW_SECRET` and app URL configuration. The same publisher as the UI enforces repository ownership, enabled content outputs, configured paths, site metadata, image handling, and PR recovery on retries. It does not merge or publish to the live site.
+
 `SLACK_AGENT_BOT_TOKEN` is intentionally separate from the onboarding workflow's `SLACK_BOT_TOKEN`. The Slack route runs outside the dashboard/API proxy: usage hooks still meter the bound organization and public-channel Slack conversations are mirrored into read-only dashboard `chat_sessions`, but proxy rate limits, credit preflight checks, and `agent_sessions` do not apply. This is a proper workspace-installed bot bound to Notra; it is not yet a publicly installable multi-workspace implementation. Public distribution requires an OAuth install callback, encrypted per-workspace installation storage, team-aware token selection, Slack workspace-to-organization and Slack-user-to-Notra-user mappings, plus equivalent entitlement and rate-limit checks.
 
 ## Local development

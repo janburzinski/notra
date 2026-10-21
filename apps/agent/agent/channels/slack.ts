@@ -1,5 +1,6 @@
 import { disableSlackIntegrationByTeamId } from "@notra/ai/integrations/slack-workspace";
 import { logError } from "@notra/ai/utils/server-log";
+import { getSessionAttribute } from "@notra/tools/utils/session";
 import { getLinkedTwitterAccounts } from "@notra/tools/utils/social-accounts";
 import { Effect } from "effect";
 import {
@@ -18,6 +19,7 @@ import {
   POST_TO_X_ACCOUNT_ACTION_PREFIX,
   POST_TO_X_CANCEL_ACTION_PREFIX,
   POST_TO_X_CONFIRM_ACTION_PREFIX,
+  POST_TO_X_PUBLISH_ACTION_PREFIX,
 } from "../lib/constants/slack-post-x";
 import {
   mirrorAssistantDelta,
@@ -35,7 +37,10 @@ import {
   parseSlackControlMessage,
 } from "../lib/utils/slack-controls";
 import { createSlackAgentCredentials } from "../lib/utils/slack-credentials";
-import { handleSlackInputRequested } from "../lib/utils/slack-input-request";
+import {
+  handleSlackInputRequested,
+  offerSavedTweetPublishing,
+} from "../lib/utils/slack-input-request";
 import {
   evictSlackInstallation,
   isChannelAllowed,
@@ -102,7 +107,7 @@ const onSlackMessage: NonNullable<SlackChannelConfig["onAppMention"]> = async (
       await handleSlackControl(control, ctx);
       return null;
     }
-    await ctx.thread.startTyping("Thinking...");
+    await ctx.thread.startTyping("On it…");
     const chatId = await Effect.runPromise(
       mirrorPublicSlackThread(ctx, message, installation.organizationId)
     );
@@ -162,7 +167,7 @@ const onSlackInteraction: NonNullable<
       return;
     }
     const installation = await resolveSlackInstallation(teamId);
-    if (!installation) {
+    if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
       return;
     }
     const pending = await readPendingPostToXForOrganization(
@@ -180,7 +185,7 @@ const onSlackInteraction: NonNullable<
         buildPostToXConfirmCard({
           requestId: parsed.requestId,
           callId: parsed.callId,
-          username: parsed.username,
+          username: pending.username,
           accounts,
         })
       )
@@ -188,11 +193,40 @@ const onSlackInteraction: NonNullable<
     return;
   }
 
+  if (action.actionId.startsWith(`${POST_TO_X_PUBLISH_ACTION_PREFIX}:`)) {
+    const callId = action.value;
+    const installation = ctx.slack.installationTeamId
+      ? await resolveSlackInstallation(ctx.slack.installationTeamId)
+      : null;
+    if (
+      !callId ||
+      !installation ||
+      !isChannelAllowed(installation, ctx.slack.channelId)
+    ) {
+      return;
+    }
+    if (
+      !(await readPendingPostToXForOrganization(
+        callId,
+        installation.organizationId
+      ))
+    ) {
+      return;
+    }
+    await runWithSlackInstallation(installation, async () => {
+      const outcome = await publishPendingPostToX(callId, callId);
+      if (outcome) {
+        await ctx.thread.post(getPostToXCompletionMessage(outcome, callId));
+      }
+    });
+    return;
+  }
+
   if (action.actionId.startsWith(POST_TO_X_ACCOUNT_ACTION_PREFIX)) {
     const installation = ctx.slack.installationTeamId
       ? await resolveSlackInstallation(ctx.slack.installationTeamId)
       : null;
-    if (!installation) {
+    if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
       return;
     }
     await switchPendingPostToXAccount(
@@ -254,6 +288,18 @@ export default slackChannel({
       const state = getNotraSlackState(channel.state);
 
       if (
+        result.kind === "tool-result" &&
+        result.toolName === "create_content_pull_request"
+      ) {
+        state.notraContentPullRequestTurnIds = [
+          ...new Set([
+            ...(state.notraContentPullRequestTurnIds ?? []),
+            data.turnId,
+          ]),
+        ];
+      }
+
+      if (
         data.status === "rejected" &&
         result.kind === "tool-result" &&
         result.toolName === "create_twitter_post" &&
@@ -306,13 +352,33 @@ export default slackChannel({
         turnId: data.turnId,
       };
       await notifySlackDraftCreated(ctx, result.toolName);
+      if (
+        result.toolName === "create_twitter_post" &&
+        typeof result.output === "object" &&
+        result.output !== null &&
+        "postId" in result.output &&
+        typeof result.output.postId === "string"
+      ) {
+        const organizationId = getSessionAttribute(ctx, "organizationId");
+        const postId = result.output.postId;
+        if (organizationId) {
+          await runWithSlackTeam(channel.state.installationTeamId, () =>
+            offerSavedTweetPublishing(
+              channel,
+              organizationId,
+              postId,
+              result.callId
+            )
+          );
+        }
+      }
     },
     "message.appended": async (data, _channel, ctx) => {
       await mirrorAssistantDelta(ctx, data);
     },
-    "input.requested": (data, channel, ctx) =>
+    "input.requested": (data, channel, ctx, defaultDeliver) =>
       runWithSlackTeam(channel.state.installationTeamId, async () => {
-        await handleSlackInputRequested(data, channel);
+        await handleSlackInputRequested(data, channel, defaultDeliver);
         await mirrorToolApprovals(ctx, data);
         await mirrorSessionStatus(ctx, "idle");
       }),
@@ -335,6 +401,12 @@ export default slackChannel({
           );
         }
         const completion = state.notraDraftCompletion;
+        const hasContentPullRequestResult =
+          state.notraContentPullRequestTurnIds?.includes(data.turnId) ?? false;
+        state.notraContentPullRequestTurnIds =
+          state.notraContentPullRequestTurnIds?.filter(
+            (turnId) => turnId !== data.turnId
+          );
         const postToXTurnId = state.notraPostToXTurnId;
         const referenceCompletionTurnId = state.notraReferenceCompletionTurnId;
         state.notraDraftCompletion = undefined;
@@ -346,15 +418,23 @@ export default slackChannel({
             getPostToXCompletionMessage(state.notraPostToXOutcome, data.turnId)
           );
           state.notraPostToXOutcome = undefined;
-          return;
+          if (!hasContentPullRequestResult) {
+            return;
+          }
         }
 
-        if (referenceCompletionTurnId === data.turnId) {
+        if (
+          !hasContentPullRequestResult &&
+          referenceCompletionTurnId === data.turnId
+        ) {
           await channel.thread.post("Saved as a reference.");
           return;
         }
 
-        if (completion?.turnId === data.turnId) {
+        if (
+          !hasContentPullRequestResult &&
+          completion?.turnId === data.turnId
+        ) {
           await channel.thread.post(
             completion.count === 1
               ? "Saved as a draft."

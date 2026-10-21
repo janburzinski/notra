@@ -31,9 +31,15 @@ import { createHmac } from "node:crypto";
 import { Effect } from "effect";
 const scenario = ${JSON.stringify(scenario)};
 const runtimePath = ${JSON.stringify(runtime)};
-if (scenario === "chart-failure-with-publish") {
+if (scenario === "chart-failure-with-publish" || scenario === "approval-payload" || scenario === "draft-pr-completion") {
   mock.module(runtimePath + "/context/build-callback-context.js", () => ({
     buildCallbackContext: () => ({ session: { id: "session-1", auth: { current: null, initiator: null } } }),
+  }));
+}
+if (scenario === "draft-pr-completion") {
+  mock.module(${JSON.stringify(resolve(import.meta.dir, "../agent/lib/utils/chat-mirror.ts"))}, () => ({
+    mirrorToolResult: async () => {}, mirrorSessionStatus: async () => {},
+    mirrorAssistantDelta: async () => {}, mirrorToolApprovals: async () => {},
   }));
 }
 process.env.SLACK_AGENT_SIGNING_SECRET = "fixture-signing-secret";
@@ -70,7 +76,10 @@ const published = [];
 mock.module("@notra/tools/utils/social-publish", () => ({
   publishTwitterPost: (params) => Effect.sync(() => { published.push(params); return { postUrl: "https://x.com/example/status/1", confirmed: true }; }),
 }));
-mock.module("@notra/db/drizzle", () => ({ db: { select: () => ({ from: () => ({ where: () => ({ limit: async () => [{ slug: "example" }] }) }) }) } }));
+mock.module("@notra/db/drizzle", () => ({ db: {
+  select: () => ({ from: () => ({ where: () => ({ limit: async () => [{ slug: "example" }] }) }) }),
+  query: { posts: { findFirst: async () => ({ markdown: "Saved tweet" }) } },
+} }));
 let enterMirror;
 let releaseMirror;
 const mirrorEntered = new Promise((resolve) => { enterMirror = resolve; });
@@ -94,6 +103,7 @@ let resets = 0;
 const exactSends = [];
 const created = [];
 let addressSends = 0;
+const continuationSends = [];
 const runtime = {
   resolveContinuation: async () => owner ? { sessionId: owner } : undefined,
   dispatchSession: async ({ sessionId, command }) => {
@@ -104,6 +114,7 @@ const runtime = {
   },
   dispatchContinuation: async ({ command }) => {
     addressSends++;
+    continuationSends.push(command);
     return owner ? { status: "accepted", sessionId: owner, deliveryId: "fixture-delivery" } : { status: "session_not_active" };
   },
   createSession: async (input) => { created.push(input); owner = "replacement-session"; return { sessionId: owner }; },
@@ -134,7 +145,106 @@ async function message(text, mention = false) {
   await request({ type: "event_callback", team_id: "T-install", api_app_id: "A-notra", event_id: "event-" + (++eventId), authorizations: [{ is_bot: true, team_id: "T-install", user_id: "U-notra" }],
     event: { type: mention ? "app_mention" : "message", channel: "C-room", ...(scenario === "initial-status" ? {} : { thread_ts: "1.0" }), ts: "2." + eventId, user: "U-human", text } });
 }
-if (scenario === "initial-status") {
+if (scenario === "draft-pr-completion") {
+  for (const isError of [false, true]) {
+   for (const order of ["draft-first", "pr-first"]) {
+    const messages = [];
+    const state = { installationTeamId: "T-install" };
+    const eventChannel = { state, thread: { post: async (text) => messages.push(text) } };
+    const pr = {
+      turnId: "turn-1", status: "completed",
+      result: { kind: "tool-result", toolName: "create_content_pull_request", callId: "call-1", output: {}, isError },
+    };
+    const draft = {
+      turnId: "turn-1", status: "completed",
+      result: { kind: "tool-result", toolName: "create_linkedin_post", callId: "draft-1", output: {}, isError: false },
+    };
+    for (const result of order === "draft-first" ? [draft, pr] : [pr, draft]) {
+      await channel.adapter["action.result"](result, eventChannel);
+    }
+    await channel.adapter["message.completed"]({ turnId: "turn-1", finishReason: "tool-calls", message: "" }, eventChannel);
+    assert.deepEqual(state.notraContentPullRequestTurnIds, ["turn-1"]);
+    const text = isError ? "The draft was saved, but PR creation failed." : "Draft PR: https://github.com/example/repo/pull/42";
+    await channel.adapter["message.completed"]({ turnId: "turn-1", finishReason: "stop", message: text }, eventChannel);
+    assert.deepEqual(messages, [text]);
+    assert.deepEqual(state.notraContentPullRequestTurnIds, []);
+    await channel.adapter["action.result"]({ ...draft, turnId: "turn-2" }, eventChannel);
+    await channel.adapter["message.completed"]({ turnId: "turn-2", finishReason: "stop", message: "Draft text" }, eventChannel);
+    assert.equal(messages.at(-1), "Saved as a draft.");
+   }
+  }
+} else if (scenario === "draft-approval") {
+  mock.module("@notra/ai/utils/post-service", () => ({
+    ensureChatPostCollection: async () => "collection-1",
+    createPostRecord: async () => ({ postId: "saved-post", deduplicated: false }),
+  }));
+  const { createCreatePostTool } = await import("@notra/tools/assistant/create-post");
+  for (const type of ["blog_post", "changelog", "twitter_post", "linkedin_post", "investor_update"]) {
+    const tool = createCreatePostTool(type);
+    assert.equal(tool.approval, undefined);
+    const result = await tool.execute({ title: "A draft", markdown: "Draft body", slug: "a-draft" }, {
+      session: { id: "session-1", turn: { id: "turn-1" }, auth: { current: { attributes: { organizationId: "org-install", surface: "standalone-chat" } } } },
+    });
+    assert.equal(result.postId, "saved-post");
+    assert.equal(result.status, "created");
+  }
+} else if (scenario === "approval-payload") {
+  const { handleSlackInputRequested } = await import(${JSON.stringify(resolve(import.meta.dir, "../agent/lib/utils/slack-input-request.ts"))});
+  const { defaultInputRequestedHandler } = await import(runtimePath + "/public/channels/slack/defaults.js");
+  const details = "Large blog draft & Unicode ü\\n".repeat(3000);
+  const data = { turnId: "turn-1", requests: [{
+    requestId: "req-1", kind: "tool-approval", display: "confirmation", prompt: "Approve publishing?",
+    action: { kind: "tool-call", toolName: "publish_content", callId: "call-1", input: { markdown: details } },
+    options: [{ id: "approve", label: "Approve" }, { id: "deny", label: "Cancel" }],
+  }] };
+  const eventChannel = { ...binding, state: { installationTeamId: "T-install", channelId: "C-room" } };
+  const deliver = defaultInputRequestedHandler();
+  await handleSlackInputRequested(data, eventChannel, (requests) => deliver(requests, eventChannel, { session: { auth: { current: null } } }));
+  const posts = outbound.filter((call) => call.url.endsWith("chat.postMessage"));
+  assert(posts.length >= 2);
+  const controls = posts.find((call) => call.body.blocks?.includes("eve_input:"));
+  assert(controls);
+  assert(!controls.body.blocks.includes("Large blog draft"));
+  assert(Buffer.byteLength(controls.raw) < 5000);
+  assert(posts.some((call) => call.body.blocks?.includes("Large blog draft")));
+  const blocks = JSON.parse(controls.body.blocks);
+  const buttons = blocks.flatMap((block) => block.elements ?? block.actions ?? []).filter((element) => element.type === "button");
+  assert.equal(buttons.length, 2);
+  for (const button of buttons) {
+    await request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: "T-install" },
+      channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0", blocks }, actions: [button] }, true);
+  }
+  await Promise.all(tasks);
+  assert.equal(continuationSends.length, 2);
+  assert(continuationSends.every((command) => JSON.stringify(command).includes("req-1")));
+  assert(JSON.stringify(continuationSends[0]).includes("approve"));
+  assert(JSON.stringify(continuationSends[1]).includes("deny"));
+} else if (scenario === "saved-tweet-publish") {
+  const { buildPostToXConfirmCard } = await import(${JSON.stringify(postToXPath)});
+  const { offerSavedTweetPublishing } = await import(${JSON.stringify(resolve(import.meta.dir, "../agent/lib/utils/slack-input-request.ts"))});
+  await offerSavedTweetPublishing({ ...binding, state: { installationTeamId: "T-install" } }, "org-install", "saved-post", "saved-call");
+  const draftPosts = outbound.filter((call) => call.url.endsWith("chat.postMessage"));
+  assert.equal(draftPosts.length, 2);
+  assert(JSON.stringify(draftPosts[0].body).includes("Saved tweet"));
+  assert(!draftPosts[1].body.blocks.includes("Saved tweet"));
+  assert(draftPosts[1].body.blocks.includes("notra_post_x_confirm:"));
+  assert(!draftPosts[1].body.blocks.includes("eve_input:"));
+  const click = (action) => request({ type: "block_actions", app_installed_team_id: "T-install", team: { id: "T-install" }, user: { id: "U-human", team_id: "T-actor" },
+    channel: { id: "C-room" }, message: { ts: "card-1", thread_ts: "1.0" }, actions: [action] }, true);
+  await click({ action_id: "notra_post_x_confirm:saved-call", value: JSON.stringify({ callId: "saved-call", username: "notra" }) });
+  await Promise.all(tasks);
+  assert.equal(published.length, 0);
+  const card = buildPostToXConfirmCard({ callId: "saved-call", username: "notra", accounts: [] });
+  const button = card.blocks.at(-1).elements[0];
+  assert(button.action_id.startsWith("notra_post_x_publish:"));
+  await click(button);
+  await Promise.all(tasks);
+  await click(button);
+  await Promise.all(tasks);
+  assert.equal(published.length, 1);
+  assert.equal(published[0].content, "Saved tweet");
+  assert.equal(exactSends.length, 0);
+} else if (scenario === "initial-status") {
   owner = undefined;
   await message("<@U-notra> chart our GEO performance", true);
   await mirrorEntered;
@@ -143,7 +253,7 @@ if (scenario === "initial-status") {
   assert.equal(statuses[0].authorization, "Bearer fixture-install");
   assert.equal(statuses[0].body.channel_id, "C-room");
   assert.equal(statuses[0].body.thread_ts, "2.1");
-  assert.equal(statuses[0].body.status, "Thinking...");
+  assert.equal(statuses[0].body.status, "On it…");
   assert.equal(created.length, 0);
   releaseMirror();
   await Promise.all(tasks);
@@ -251,6 +361,14 @@ if (scenario === "initial-status") {
 }
 
 describe("Slack native channel boundaries", () => {
+  test("saving a draft does not hide a subsequent PR link or PR failure", () =>
+    runSlackChannel("draft-pr-completion"));
+  test("content drafts save without approval", () =>
+    runSlackChannel("draft-approval"));
+  test("large approval details stay outside button callbacks and both decisions are delivered", () =>
+    runSlackChannel("approval-payload"));
+  test("saved tweets only publish after explicit confirmation, at most once", () =>
+    runSlackChannel("saved-tweet-publish"));
   test("the first top-level mention sets native status before preparing the session", () =>
     runSlackChannel("initial-status"));
   test("a chart failure does not hide successful publishing or draft creation", () =>
