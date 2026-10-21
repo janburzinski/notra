@@ -1,0 +1,38 @@
+apps/docs/logo/notra-wordmark.svg
+  s_abe946f356d747::t_3a8bd7110da063 1-7
+apps/web/src/components/brand-asset-card.tsx
+  s_abe946f356d747::t_2e9a69441f1137 14,23-29
+apps/web/public/brand/notra-wordmark-dark.svg
+  s_abe946f356d747::t_3a8bd7110da063 1-8
+apps/web/src/lib/brand/constants.ts
+  s_abe946f356d747::t_94d587ec77d2cc 8-11
+apps/web/src/routes/_site/brand.tsx
+  s_abe946f356d747::t_2e9a69441f1137 96-97,105,107,109,111-112,114,134,136,141,143
+apps/web/public/brand/notra-wordmark.svg
+  s_abe946f356d747::t_3a8bd7110da063 1-7
+apps/docs/logo/notra-wordmark-dark.svg
+  s_abe946f356d747::t_3a8bd7110da063 1-8
+apps/web/src/utils/site-markdown.ts
+  s_abe946f356d747::t_94d587ec77d2cc 439
+apps/web/public/brand/notra-mark-dark.svg
+  s_abe946f356d747::t_3a8bd7110da063 1,7
+  s_abe946f356d747::t_6df802cca2468a 2-6
+apps/web/types/brand.ts
+  s_abe946f356d747::t_94d587ec77d2cc 27,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a805ba5036333244b08a1b0187b4113387e9e0a1",
+  "prompts": {},
+  "sessions": {
+    "s_abe946f356d747": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0dd87387-af14-4967-9e15-7c903126a6f5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
