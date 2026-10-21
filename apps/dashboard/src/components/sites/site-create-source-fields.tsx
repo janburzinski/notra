@@ -15,6 +15,7 @@ import {
 import { Input } from "@notra/ui/components/ui/input";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { m } from "motion/react";
+import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { SiteAddressInput } from "@/components/sites/site-address-input";
@@ -45,7 +46,11 @@ export function SiteCreateSourceFields({
   const slugInvalidMessage = isReservedSiteSlug(slug)
     ? t("addressReserved", { slug })
     : t("addressInvalid");
-  const slugMessage = errors.slug ?? (slugInvalid ? slugInvalidMessage : null);
+  // Format errors wait for the first blur so typing a stray character
+  // doesn't shift the layout mid-word; after that they track live.
+  const [slugTouched, setSlugTouched] = useState(false);
+  const slugMessage =
+    errors.slug ?? (slugTouched && slugInvalid ? slugInvalidMessage : null);
   const subdirectory = useSiteRootDirectoryToggle(form.rootDirectory, (value) =>
     update("rootDirectory", value)
   );
@@ -78,6 +83,7 @@ export function SiteCreateSourceFields({
             hostingDomain={hostingDomain}
             id={`${id}-slug`}
             invalid={Boolean(slugMessage)}
+            onBlur={() => setSlugTouched(true)}
             onValueChange={(value) => update("slug", value)}
             placeholder={slugifySiteName(form.name) || "acme"}
             value={form.slug}

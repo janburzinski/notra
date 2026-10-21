@@ -19,6 +19,7 @@ export function SiteAddressInput({
   hostingDomain,
   describedBy,
   disabled,
+  onBlur,
 }: SiteAddressInputProps) {
   return (
     <InputGroup>
@@ -30,6 +31,7 @@ export function SiteAddressInput({
         disabled={disabled}
         id={id}
         maxLength={SITE_SLUG_MAX_LENGTH}
+        onBlur={onBlur}
         onChange={(event) => onValueChange(event.target.value)}
         placeholder={placeholder}
         spellCheck={false}

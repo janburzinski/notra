@@ -17,6 +17,7 @@ import {
 import { Input } from "@notra/ui/components/ui/input";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { m } from "motion/react";
+import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { SiteAddressInput } from "@/components/sites/site-address-input";
@@ -50,6 +51,9 @@ export function SiteCreateBulkFields({
 }: SiteCreateBulkFieldsProps) {
   const t = useTranslations("sites.new");
   const tSections = useTranslations("sites.sections");
+  const [touchedSlugs, setTouchedSlugs] = useState<ReadonlySet<string>>(
+    () => new Set()
+  );
   const selectedCount = rows.filter((row) => row.selected).length;
   const allSelected = rows.length > 0 && selectedCount === rows.length;
 
@@ -65,10 +69,12 @@ export function SiteCreateBulkFields({
     if (issue === "duplicate") {
       return t("bulk.duplicate");
     }
-    if (issue === "reserved") {
+    // Format errors wait for the first blur so typing doesn't shift the row.
+    const touched = touchedSlugs.has(row.rootDirectory);
+    if (touched && issue === "reserved") {
       return t("addressReserved", { slug: row.slug.trim().toLowerCase() });
     }
-    if (issue === "invalid") {
+    if (touched && issue === "invalid") {
       return t("addressInvalid");
     }
     return row.result && "error" in row.result ? row.result.error : null;
@@ -172,6 +178,13 @@ export function SiteCreateBulkFields({
               hostingDomain={hostingDomain}
               id={rowId(row, "slug")}
               invalid={Boolean(error)}
+              onBlur={() =>
+                setTouchedSlugs((prev) =>
+                  prev.has(row.rootDirectory)
+                    ? prev
+                    : new Set(prev).add(row.rootDirectory)
+                )
+              }
               onValueChange={(value) =>
                 onRowChange(row.rootDirectory, { slug: value })
               }

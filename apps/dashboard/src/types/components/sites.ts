@@ -180,6 +180,7 @@ export interface SiteAddressInputProps {
   hostingDomain: string | null;
   describedBy?: string;
   disabled?: boolean;
+  onBlur?: () => void;
 }
 
 export interface SiteChoiceGroupProps<T extends string> {
