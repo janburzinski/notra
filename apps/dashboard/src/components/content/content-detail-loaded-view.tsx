@@ -131,17 +131,18 @@ export function ContentDetailLoadedView({
               </div>
             </div>
           )}
-          <ContentDocumentTabs
-            enabled={outline !== undefined}
-            onValueChange={setTab}
-            value={tab}
-          />
           <div
             className="@container/editor relative min-h-0 flex-1 scrollbar-thin overflow-y-auto overscroll-contain py-4 md:py-6"
             data-content-scroll-viewport
             ref={editorViewport}
           >
             <ContentCommentsGutter>
+              <ContentDocumentTabs
+                columnClassName={isLongForm ? "max-w-3xl" : "max-w-5xl"}
+                enabled={outline !== undefined}
+                onValueChange={setTab}
+                value={tab}
+              />
               <div
                 className={`relative mx-auto w-full space-y-6 px-4 lg:px-6 ${isLongForm ? "max-w-3xl" : "max-w-5xl"}`}
                 data-comment-column

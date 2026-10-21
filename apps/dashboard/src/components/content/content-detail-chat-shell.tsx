@@ -12,6 +12,7 @@ import {
   type RefObject,
   useEffect,
   useEffectEvent,
+  useLayoutEffect,
 } from "react";
 
 import ChatInput from "@/components/chat-input";
@@ -130,12 +131,14 @@ export function ContentDetailChatPanel({
     }
   });
 
-  useEffect(() => {
+  // Layout effect: the header button appears in the same frame as the
+  // toolbar this page portals into the header.
+  useLayoutEffect(() => {
     setContentPanelHasOverview(hasOverview);
     if (hasOverview) {
       openByDefault();
     }
-    return () => setContentPanelHasOverview(false);
+    return () => setContentPanelHasOverview(null);
   }, [hasOverview]);
 
   useEffect(() => {

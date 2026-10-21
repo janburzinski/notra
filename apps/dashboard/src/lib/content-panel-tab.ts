@@ -6,7 +6,8 @@ import { localStorageKeys } from "@/constants/storage";
 import type { ContentPanelTab } from "@/types/content/overview";
 
 let activeTab: ContentPanelTab = "overview";
-let hasOverview = false;
+/** Null while no post page is mounted. */
+let hasOverview: boolean | null = null;
 let hasPreview = false;
 let focusRequested = false;
 const listeners = new Set<() => void>();
@@ -54,7 +55,7 @@ export function useContentPanelTab(): ContentPanelTab {
 }
 
 /** Set by the post page while its panel offers the overview tab. */
-export function setContentPanelHasOverview(value: boolean) {
+export function setContentPanelHasOverview(value: boolean | null) {
   if (value === hasOverview) {
     return;
   }
@@ -66,11 +67,12 @@ function getContentPanelHasOverview() {
   return hasOverview;
 }
 
-export function useContentPanelHasOverview(): boolean {
+/** Null until the post page mounts, so the header can wait for it. */
+export function useContentPanelHasOverview(): boolean | null {
   return useSyncExternalStore(
     subscribe,
     getContentPanelHasOverview,
-    () => false
+    () => null
   );
 }
 

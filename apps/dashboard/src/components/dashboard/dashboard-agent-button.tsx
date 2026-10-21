@@ -22,14 +22,20 @@ export function DashboardAgentButton() {
   const pathname = usePathname();
   const { active, togglePanel } = useRightPanel();
   const hasOverview = useContentPanelHasOverview();
-  const panelId: RightPanelId = isContentDetailPathname(pathname)
-    ? "content"
-    : "agent";
+  const isContentDetail = isContentDetailPathname(pathname);
+  const panelId: RightPanelId = isContentDetail ? "content" : "agent";
   const open = active === panelId;
-  const isDetails = panelId === "content" && hasOverview;
+  // Posts with an overview swap this for "Details". The post page reports
+  // that once it mounts; until then nothing renders, so the button never
+  // flashes "Ask agent" and lands together with the page's header toolbar.
+  const isDetails = isContentDetail && hasOverview === true;
   const label = isDetails
     ? tOverview("detailsButton")
     : tCommon("labels.askAgent");
+
+  if (isContentDetail && hasOverview === null) {
+    return null;
+  }
 
   return (
     <Button

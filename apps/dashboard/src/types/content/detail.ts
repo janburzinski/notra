@@ -129,6 +129,8 @@ export interface GitHubPublishDialogCopyParams {
 export type ContentDocumentTab = (typeof CONTENT_DOCUMENT_TABS)[number];
 
 export interface ContentDocumentTabsProps {
+  /** Width of the article column, so the sticky tabs line up with it. */
+  columnClassName: string;
   enabled: boolean;
   value: ContentDocumentTab;
   onValueChange: (value: ContentDocumentTab) => void;
