@@ -1,0 +1,35 @@
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_1248bffa7c1dbe::t_44faee1ef26b8f 433
+apps/ui/components/ui/table.tsx
+  s_1248bffa7c1dbe::t_8462ae85cf7e75 7-12,20
+packages/ui/src/components/ui/detail-card.tsx
+  s_1248bffa7c1dbe::t_44faee1ef26b8f 37
+apps/dashboard/src/components/sites/site-create-step.tsx
+  s_1248bffa7c1dbe::t_44faee1ef26b8f 30
+apps/ui/registry/notra/data-table/constants/data-table.ts
+  s_1248bffa7c1dbe::t_8462ae85cf7e75 6,9,12-17,24
+apps/dashboard/src/components/ai/chat-todo-list.tsx
+  s_1248bffa7c1dbe::t_44faee1ef26b8f 136
+apps/ui/registry.json
+  s_1248bffa7c1dbe::t_8462ae85cf7e75 1080-1085,1088-1093,1096-1101
+apps/ui/src/styles/blocks.css
+  s_1248bffa7c1dbe::t_8462ae85cf7e75 13-21,45-54,79-84
+apps/web/src/constants/navbar-bento.ts
+  s_1248bffa7c1dbe::t_450ffd3c08861e 9,14,21,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5ff50d7e27c26bc99135c6db7e9047dc08815db4",
+  "prompts": {},
+  "sessions": {
+    "s_1248bffa7c1dbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "829eb596-685c-4026-a2f0-764ce0c9903e",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
