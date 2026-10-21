@@ -34,6 +34,7 @@ export function SiteBrandingFields({
       <SiteSettingsItem
         description={t("logoHrefHint")}
         icon={LinkSquare02Icon}
+        errorPath="logo.href"
         title={t("logoHref")}
         value={
           <Input

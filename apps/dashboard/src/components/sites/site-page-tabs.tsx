@@ -15,11 +15,13 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { cn } from "@notra/ui/lib/utils";
+import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
 import { ProjectLogo } from "@/components/geo/project-logo";
+import { SiteHeaderActions } from "@/components/sites/site-header-actions";
 import {
   SITE_NAV_SECTIONS,
   SITE_SECTIONS,
@@ -133,6 +135,7 @@ export function SitePageTabs({
 }: SitePageTabsProps) {
   const t = useTranslations("sites.detail.tabs");
   const pathname = usePathname();
+  const [branch] = useQueryState("branch", parseAsString);
   const rest = pathname.slice(siteHref(slug, site.id).length);
   const current =
     SITE_SECTIONS.find(
@@ -155,7 +158,7 @@ export function SitePageTabs({
   }, [section]);
   return (
     <div className="bg-background sticky top-0 z-20 border-b">
-      <div className="flex h-12 items-stretch gap-2 px-4 lg:px-5">
+      <div className="flex min-h-12 flex-wrap items-stretch gap-2 px-4 lg:px-5">
         <div className="flex shrink-0 items-center">
           <SiteSwitcher
             organizationId={organizationId}
@@ -170,7 +173,7 @@ export function SitePageTabs({
         />
         <nav
           aria-label={t("label")}
-          className="relative -mb-px flex min-w-0 scrollbar-none overflow-x-auto"
+          className="relative -mb-px flex min-h-12 min-w-0 flex-1 scrollbar-none overflow-x-auto"
           ref={navRef}
         >
           {TAB_SECTIONS.map((item) => {
@@ -185,7 +188,7 @@ export function SitePageTabs({
                     : "text-muted-foreground hover:text-foreground"
                 )}
                 exact={item.section === "overview"}
-                href={siteHref(slug, site.id, item.section)}
+                href={`${siteHref(slug, site.id, item.section)}${branch ? `?branch=${encodeURIComponent(branch)}` : ""}`}
                 key={item.section}
               >
                 <span className="group-hover:bg-muted group-focus-visible:ring-ring/50 rounded-md px-2.5 py-1 transition-colors group-focus-visible:ring-3">
@@ -195,6 +198,7 @@ export function SitePageTabs({
             );
           })}
         </nav>
+        <SiteHeaderActions />
       </div>
     </div>
   );

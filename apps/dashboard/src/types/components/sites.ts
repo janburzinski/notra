@@ -1,5 +1,5 @@
 import type { IconSvgElement } from "@hugeicons/react";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 import type {
   InthConsent,
@@ -35,7 +35,6 @@ import type {
   SiteEditorDraft,
   SiteListItem,
   SiteMounts,
-  SiteNewFileFolder,
   SitePreviewRow,
   SitePreviewVisibility,
   SiteRecord,
@@ -485,6 +484,10 @@ export interface SiteSettingsDangerZoneProps extends SiteScope {
 }
 
 export interface SitePublishDialogProps extends SiteScope {
+  conflicts?: readonly string[];
+  onRebase?: () => void;
+  rebasePending?: boolean;
+  branchControls?: import("@/types/site-branches").SiteBranchControlsProps;
   initialMessage?: string;
   unsaved?: boolean;
   open: boolean;
@@ -494,33 +497,6 @@ export interface SitePublishDialogProps extends SiteScope {
   sourcePaths: ReadonlySet<string>;
   onPublished: () => void;
   onConflict: (paths: string[]) => void;
-}
-
-export interface SiteNewFileDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  existingPaths: ReadonlySet<string>;
-  folders: readonly SiteNewFileFolder[];
-  isCreating: boolean;
-  onCreate: (path: string, content: string) => void;
-}
-
-export interface SiteNewFileFolderTabsProps {
-  folders: readonly SiteNewFileFolder[];
-  value: SiteNewFileFolder;
-  onValueChange: (folder: SiteNewFileFolder) => void;
-}
-
-export interface SiteNewFileNameFieldProps {
-  id: string;
-  folder: SiteNewFileFolder;
-  value: string;
-  onValueChange: (value: string) => void;
-  placeholder: string;
-  slug: string;
-  slugValid: boolean;
-  exists: boolean;
-  path: string;
 }
 
 export interface SiteProxySetupProps {
@@ -625,6 +601,7 @@ export interface SiteIntegrationRowProps {
 }
 
 export interface SiteConsentSectionProps {
+  branch?: string;
   isSetUp: boolean;
   loading: boolean;
   disabled: boolean;
@@ -636,7 +613,6 @@ export interface SiteIntegrationDialogProps {
   settings: Record<string, unknown> | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onPublish: () => Promise<void>;
 }
 
 export interface SiteIntegrationSaveStatusProps {
@@ -754,6 +730,7 @@ export interface SiteConfigExampleProps {
 }
 
 export interface SiteInthDialogProps {
+  branch?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   isSetUp: boolean;

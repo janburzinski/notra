@@ -3,285 +3,96 @@
 import { Add01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Input } from "@notra/ui/components/ui/input";
-import { Fragment, useState } from "react";
-import { toast } from "sonner";
+import { Fragment } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
-import Link from "@/components/framework/link";
-import { useSite } from "@/components/sites/site-context";
-import {
-  useSaveSiteConfigDraft,
-  useSiteConfigDocument,
-} from "@/lib/hooks/use-site-config-document";
-import type {
-  SiteVariableRow,
-  SiteVariablesFormProps,
-} from "@/types/site-variables";
-import { toErrorMessage } from "@/utils/error-message";
-import { siteHref } from "@/utils/site-links";
-import {
-  patchSiteVariables,
-  readSiteVariablesConfig,
-  siteVariablesFromRows,
-} from "@/utils/site-variables";
-
-export function useSiteVariablesCount(): number | null {
-  const query = useSiteConfigDocument();
-  if (!query.data) {
-    return null;
-  }
-  try {
-    return Object.keys(readSiteVariablesConfig(query.data.content).variables)
-      .length;
-  } catch {
-    return null;
-  }
-}
+import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
 
 export function SiteVariablesSettings() {
-  const { organizationSlug, siteId } = useSite();
+  const state = useSiteWorkspace();
   const t = useTranslations("sites.variables");
-  const query = useSiteConfigDocument();
-  if (query.isPending) {
+  const workspace = useTranslations("sites.design.workspace");
+  if (!state) {
     return (
-      <div className="space-y-3 text-sm">
-        <p aria-busy="true">{t("loading")}</p>
-      </div>
+      <p aria-busy="true" className="text-muted-foreground py-4 text-sm">
+        {workspace("loading")}
+      </p>
     );
   }
-  if (query.isError) {
-    return (
-      <div className="space-y-3 text-sm">
-        <p role="alert">{toErrorMessage(query.error, t("loadFailed"))}</p>
-        <Button onClick={() => query.refetch()} type="button" variant="outline">
-          {t("retry")}
-        </Button>
-      </div>
-    );
-  }
-  try {
-    readSiteVariablesConfig(query.data.content);
-  } catch {
-    return (
-      <div className="space-y-3 text-sm">
-        <p role="alert">{t("invalidConfig")}</p>
-        <Link
-          className="text-sm underline underline-offset-4"
-          href={siteHref(organizationSlug, siteId, "editor")}
-        >
-          {t("openEditor")}
-        </Link>
-      </div>
-    );
-  }
+  const { variableRows: rows, updateVariables } = state;
   return (
-    <SiteVariablesForm
-      document={query.data}
-      key={`${siteId}:${query.data.content}:${query.data.draftRevision}`}
-    />
-  );
-}
-
-function emptyRow(): SiteVariableRow {
-  return { id: crypto.randomUUID(), name: "", value: "" };
-}
-
-function SiteVariablesForm({ document }: SiteVariablesFormProps) {
-  const { organizationSlug, siteId } = useSite();
-  const t = useTranslations("sites.variables");
-  const initial = readSiteVariablesConfig(document.content).variables;
-  const initialRows = (): SiteVariableRow[] => {
-    const existing = Object.entries(initial).map(([name, value]) => ({
-      id: name,
-      name,
-      value,
-    }));
-    return existing.length > 0 ? existing : [emptyRow()];
-  };
-  const [rows, setRows] = useState<SiteVariableRow[]>(initialRows);
-  const [error, setError] = useState<string | null>(null);
-  const filled = rows.filter((row) => row.name.trim() || row.value);
-  const dirty =
-    JSON.stringify(filled.map(({ name, value }) => [name.trim(), value])) !==
-    JSON.stringify(Object.entries(initial));
-  const updateRow = (rowId: string, patch: Partial<SiteVariableRow>) =>
-    setRows((current) =>
-      current.map((item) => (item.id === rowId ? { ...item, ...patch } : item))
-    );
-  const saveDraft = useSaveSiteConfigDraft(document);
-  const save = {
-    isPending: saveDraft.isPending,
-    mutate: () =>
-      saveDraft.mutate(patchSiteVariables(document.content, filled), {
-        onSuccess: () => toast.success(t("saved")),
-        onError: (cause) => setError(toErrorMessage(cause, t("saveFailed"))),
-      }),
-  };
-
-  return (
-    <form
-      className="space-y-3"
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!dirty || save.isPending) {
-          return;
-        }
-        try {
-          siteVariablesFromRows(filled);
-        } catch (cause) {
-          setError(
-            cause instanceof Error && cause.message === "duplicate"
-              ? t("duplicate")
-              : t("invalid")
-          );
-          const names = filled.map((row) => row.name.trim());
-          const duplicate = names.findIndex(
-            (name, position) => names.indexOf(name) !== position
-          );
-          const target = filled[Math.max(duplicate, 0)];
-          if (target) {
-            event.currentTarget
-              .querySelector<HTMLInputElement>(
-                `[data-variable-name="${target.id}"]`
-              )
-              ?.focus();
-          }
-          return;
-        }
-        setError(null);
-        save.mutate();
-      }}
+    <div
+      className="space-y-3 py-4"
+      inert={state.readOnly}
+      aria-busy={state.readOnly}
     >
-      <fieldset className="max-w-2xl" disabled={save.isPending}>
-        <legend className="sr-only">{t("title")}</legend>
-        <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_2rem] items-center gap-x-2 gap-y-2">
-          <span
-            aria-hidden="true"
-            className="text-muted-foreground px-1 text-xs"
-          >
-            {t("name")}
-          </span>
-          <span
-            aria-hidden="true"
-            className="text-muted-foreground px-1 text-xs"
-          >
-            {t("value")}
-          </span>
-          <span />
-          {rows.map((row, index) => (
-            <Fragment key={row.id}>
-              <Input
-                aria-invalid={
-                  error &&
-                  row.name.trim() &&
-                  filled.some(
-                    (other) =>
-                      other.id !== row.id &&
-                      other.name.trim() === row.name.trim()
+      <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_2rem] items-start gap-2">
+        {rows.map((row, index) => (
+          <Fragment key={row.id}>
+            <Input
+              aria-label={t("nameLabel", { number: index + 1 })}
+              autoComplete="off"
+              value={row.name}
+              placeholder="product_name"
+              maxLength={40}
+              onChange={(event) =>
+                updateVariables(
+                  rows.map((item) =>
+                    item.id === row.id
+                      ? { ...item, name: event.target.value }
+                      : item
                   )
-                    ? true
-                    : undefined
-                }
-                aria-label={t("nameLabel", { number: index + 1 })}
-                autoCapitalize="none"
-                autoComplete="off"
-                data-variable-name={row.id}
-                maxLength={40}
-                onChange={(event) =>
-                  updateRow(row.id, { name: event.target.value })
-                }
-                pattern="[A-Za-z][A-Za-z0-9_\-]{0,39}"
-                placeholder="product_name"
-                spellCheck={false}
-                value={row.name}
-              />
-              <Input
-                aria-label={t("valueLabel", { number: index + 1 })}
-                maxLength={500}
-                onChange={(event) =>
-                  updateRow(row.id, { value: event.target.value })
-                }
-                placeholder="Acme"
-                value={row.value}
-              />
-              <Button
-                aria-label={t("removeLabel", { number: index + 1 })}
-                onClick={() =>
-                  setRows((current) => {
-                    const next = current.filter((item) => item.id !== row.id);
-                    return next.length > 0 ? next : [emptyRow()];
-                  })
-                }
-                size="icon-sm"
-                type="button"
-                variant="ghost"
-              >
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  icon={Delete02Icon}
-                  strokeWidth={1.75}
-                />
-              </Button>
-            </Fragment>
-          ))}
-        </div>
-        <Button
-          className="mt-2"
-          onClick={() => setRows((current) => [...current, emptyRow()])}
-          size="sm"
-          type="button"
-          variant="ghost"
-        >
-          <HugeiconsIcon
-            aria-hidden="true"
-            data-icon="inline-start"
-            icon={Add01Icon}
-            strokeWidth={1.75}
-          />
-          {t("add")}
-        </Button>
-      </fieldset>
-      {error ? (
-        <p className="text-destructive text-sm" role="alert">
-          {error}
+                )
+              }
+            />
+            <Input
+              aria-label={t("valueLabel", { number: index + 1 })}
+              value={row.value}
+              placeholder="Acme"
+              maxLength={500}
+              onChange={(event) =>
+                updateVariables(
+                  rows.map((item) =>
+                    item.id === row.id
+                      ? { ...item, value: event.target.value }
+                      : item
+                  )
+                )
+              }
+            />
+            <Button
+              aria-label={t("removeLabel", { number: index + 1 })}
+              size="icon-sm"
+              variant="ghost"
+              onClick={() =>
+                updateVariables(rows.filter((item) => item.id !== row.id))
+              }
+            >
+              <HugeiconsIcon aria-hidden="true" icon={Delete02Icon} />
+            </Button>
+          </Fragment>
+        ))}
+      </div>
+      {state.variableError ? (
+        <p role="alert" className="text-destructive text-xs">
+          {t(state.variableError)}
         </p>
       ) : null}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-muted-foreground text-xs">{t("hint")}</p>
-        <div className="flex items-center gap-2">
-          {document.hasDraft && !dirty && !save.isPending ? (
-            <Link
-              className="text-sm underline underline-offset-4"
-              href={siteHref(organizationSlug, siteId, "editor")}
-            >
-              {t("reviewAndPublish")}
-            </Link>
-          ) : null}
-          {dirty ? (
-            <Button
-              disabled={save.isPending}
-              onClick={() => {
-                setRows(initialRows());
-                setError(null);
-              }}
-              size="sm"
-              type="button"
-              variant="ghost"
-            >
-              {t("reset")}
-            </Button>
-          ) : null}
-          <Button
-            disabled={!dirty}
-            loading={save.isPending}
-            size="sm"
-            type="submit"
-          >
-            {t("saveDraft")}
-          </Button>
-        </div>
-      </div>
-    </form>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() =>
+          updateVariables([
+            ...rows,
+            { id: crypto.randomUUID(), name: "", value: "" },
+          ])
+        }
+      >
+        <HugeiconsIcon aria-hidden="true" icon={Add01Icon} />
+        {t("add")}
+      </Button>
+      <p className="text-muted-foreground text-xs">{t("hint")}</p>
+    </div>
   );
 }

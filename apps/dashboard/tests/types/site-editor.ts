@@ -1,7 +1,7 @@
-import type { useSiteEditorSaves } from "../../src/lib/hooks/use-site-editor-saves";
+import type { useSiteDraftSaves } from "../../src/lib/hooks/use-site-draft-saves";
 
 export interface SiteEditorQueueHarnessProps {
-  onReady: (saves: ReturnType<typeof useSiteEditorSaves>) => void;
+  onReady: (saves: ReturnType<typeof useSiteDraftSaves>) => void;
 }
 
 export interface DefaultEditorDraft {

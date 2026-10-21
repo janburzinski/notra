@@ -16,16 +16,6 @@ const Domains = lazyPage(() =>
     default: module.SiteDomainsPage,
   }))
 );
-const Editor = lazyPage(() =>
-  import("@/components/sites/pages/site-editor-page").then((module) => ({
-    default: module.SiteEditorPage,
-  }))
-);
-const Integrations = lazyPage(() =>
-  import("@/components/sites/pages/site-integrations-page").then((module) => ({
-    default: module.SiteIntegrationsPage,
-  }))
-);
 const Design = lazyPage(() =>
   import("@/components/sites/pages/site-design-page").then((module) => ({
     default: module.SiteDesignPage,
@@ -41,8 +31,6 @@ export const SITE_SECTION_PAGES: readonly SiteSectionUiPage[] = [
   { section: "analytics", page: Analytics },
   { section: "deployments", page: Deployments },
   { section: "domains", page: Domains },
-  { section: "editor", page: Editor },
-  { section: "integrations", page: Integrations },
   { section: "design", page: Design },
   { section: "settings", page: Settings },
 ];

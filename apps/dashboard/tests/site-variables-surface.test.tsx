@@ -1,9 +1,7 @@
-import { describe, expect, mock, test } from "bun:test";
+import { expect, mock, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type { ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { IntlProvider } from "use-intl";
 
@@ -11,126 +9,63 @@ import de from "../messages/de.json";
 import en from "../messages/en.json";
 
 if (!process.env.NOTRA_VARIABLES_SURFACE_WORKER) {
-  test("content variables settings surface", () => {
-    const result = spawnSync(
-      process.execPath,
-      ["test", fileURLToPath(import.meta.url)],
-      {
-        cwd: fileURLToPath(new URL("../../..", import.meta.url)),
-        env: { ...process.env, NOTRA_VARIABLES_SURFACE_WORKER: "1" },
-        timeout: 30_000,
-      }
-    );
-    expect(result.status, result.stderr?.toString()).toBe(0);
-  });
-} else {
-  let unsaved = false;
-  const react = await import("react");
-  const useState = react.useState;
-  mock.module("react", () => ({
-    ...react,
-    useState: (initial: unknown) => {
-      if (unsaved && typeof initial === "function") {
-        const value = initial();
-        if (Array.isArray(value) && value[0]?.name === "product_name") {
-          return useState(
-            value.map((row) => ({ ...row, value: "Unsaved value" }))
-          );
+  for (const locale of ["en", "de"]) {
+    test(`variables use shared draft form in ${locale}`, () => {
+      const result = spawnSync(
+        process.execPath,
+        ["test", fileURLToPath(import.meta.url)],
+        {
+          env: { ...process.env, NOTRA_VARIABLES_SURFACE_WORKER: locale },
+          timeout: 30000,
         }
-      }
-      return useState(initial);
-    },
+      );
+      expect(result.status, result.stderr?.toString()).toBe(0);
+    });
+  }
+} else {
+  let ready = true;
+  mock.module("../src/components/sites/site-workspace-context", () => ({
+    useSiteWorkspace: () =>
+      ready
+        ? {
+            variableRows: [{ id: "one", name: "product_name", value: "Acme" }],
+            updateVariables: () => {},
+            variableError: null,
+          }
+        : null,
   }));
-  let content = JSON.stringify({
-    name: "Acme",
-    variables: {
-      product_name: "Acme Flow",
-      signup_url: "https://example.com/signup",
-    },
-  });
-  mock.module("../src/components/sites/site-context", () => ({
-    useSite: () => ({
-      organizationId: "test-org",
-      organizationSlug: "test",
-      siteId: "test-site",
-    }),
-  }));
-  mock.module("../src/components/framework/link", () => ({
-    default: ({ children, ...props }: ComponentProps<"a">) => (
-      <a {...props}>{children}</a>
-    ),
-  }));
-  mock.module("../src/lib/orpc/query", () => ({
-    dashboardOrpc: {
-      sites: {
-        editor: { read: { queryOptions: () => ({ queryKey: ["variables"] }) } },
-      },
-    },
+  const locale =
+    process.env.NOTRA_VARIABLES_SURFACE_WORKER === "de" ? "de" : "en";
+  const messages = locale === "de" ? de : en;
+  const { createTranslator } = await import("use-intl/core");
+  const actualIntl = await import("use-intl");
+  mock.module("use-intl", () => ({
+    ...actualIntl,
+    useTranslations: (
+      namespace: "sites.variables" | "sites.design.workspace"
+    ) => createTranslator({ locale, messages, namespace }),
   }));
   const { SiteVariablesSettings } =
     await import("../src/components/sites/site-variables-settings");
-  describe.each([
-    ["en", en],
-    ["de", de],
-  ] as const)("%s content variables", (locale, messages) => {
-    const render = () => {
-      const client = new QueryClient();
-      client.setQueryData(["variables"], {
-        content,
-        hasDraft: true,
-        draftRevision: 1,
-      });
-      return renderToStaticMarkup(
-        <QueryClientProvider client={client}>
-          <IntlProvider locale={locale} messages={messages}>
-            <SiteVariablesSettings />
-          </IntlProvider>
-        </QueryClientProvider>
-      );
-    };
-    test("labels controls, warns that values are public and links to publication", () => {
-      content = JSON.stringify({
-        name: "Acme",
-        variables: {
-          product_name: "Acme Flow",
-          signup_url: "https://example.com/signup",
-        },
-      });
-      const html = render();
-      expect(html).toContain(messages.sites.variables.title);
-      expect(html).toContain("{{product_name}}");
-      expect(html).toContain('value="Acme Flow"');
-      expect(html).toContain('value="https://example.com/signup"');
-      expect(html).toContain('pattern="[A-Za-z][A-Za-z0-9_\\-]{0,39}"');
-      expect(html).toContain('maxLength="500"');
-      expect(html).toContain(messages.sites.variables.reviewAndPublish);
-      expect(html).toContain('type="submit"');
-      expect(html).toContain("disabled");
-    });
-    test("unsaved edits cannot navigate to an older draft", () => {
-      content = JSON.stringify({
-        name: "Acme",
-        variables: { product_name: "Acme Flow" },
-      });
-      unsaved = true;
-      try {
-        const html = render();
-        expect(html).toContain('value="Unsaved value"');
-        expect(html).not.toContain(messages.sites.variables.reviewAndPublish);
-        expect(html).toContain(messages.sites.variables.saveDraft);
-        expect(html).toContain(messages.sites.variables.reset);
-      } finally {
-        unsaved = false;
-      }
-    });
-
-    test("malformed config cannot be edited or replaced", () => {
-      content = "{";
-      const html = render();
-      expect(html).toContain(messages.sites.variables.invalidConfig);
-      expect(html).toContain('role="alert"');
-      expect(html).not.toContain("<input");
-      expect(html).not.toContain('type="submit"');
-    });
+  test("missing workspace renders a quiet loading state", () => {
+    ready = false;
+    const html = renderToStaticMarkup(<SiteVariablesSettings />);
+    ready = true;
+    expect(html).toContain('aria-busy="true"');
+    expect(html).toContain(messages.sites.design.workspace.loading);
+    expect(html).not.toContain("<input");
+  });
+  test("labels values and uses automatic saving", () => {
+    const html = renderToStaticMarkup(
+      <IntlProvider locale={locale} messages={messages}>
+        <SiteVariablesSettings />
+      </IntlProvider>
+    );
+    expect(html).toContain('value="product_name"');
+    expect(html).toContain('value="Acme"');
+    expect(html).toContain("{{product_name}}");
+    expect(html).toContain(messages.sites.variables.add);
+    expect(html).not.toContain('type="submit"');
+    expect(html).not.toContain("/editor");
   });
 }

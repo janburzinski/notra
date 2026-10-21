@@ -7618,6 +7618,53 @@
     }
   },
   "sites": {
+    "writing": {
+      "source": "Source",
+      "title": "Article title",
+      "description": "Add a description",
+      "updated": "Updated",
+      "image": "Cover image URL",
+      "hidden": "Hidden from navigation",
+      "appearance": "Appearance",
+      "saving": "Saving…",
+      "saveFailed": "Changes not saved",
+      "branchState": {
+        "draft": "Draft",
+        "open": "In review",
+        "merged": "Merged",
+        "closed": "Closed",
+        "deleted": "Deleted"
+      },
+      "publishTo": "Publish to {branch}",
+      "checksBehind": "Update this branch on GitHub before merging",
+      "checksFailed": "Some checks failed",
+      "statusUnavailable": "Couldn't check publishing rules. Retry before publishing.",
+      "author": "Author ID",
+      "branchCommits": "{count, plural, one {# commit on this branch} other {# commits on this branch}}",
+      "checksPassed": "Ready to merge",
+      "checksBlocked": "Checks or branch rules are blocking the merge",
+      "checksConflict": "Resolve merge conflicts",
+      "checksPending": "Waiting for GitHub status",
+      "reviewApproved": "Approved",
+      "reviewRequired": "Review required",
+      "reviewChangesRequested": "Changes requested",
+      "reviewPending": "No review decision",
+      "noChanges": "No saved changes to publish.",
+      "settings": "Site design",
+      "back": "Back to editor",
+      "live": "Live",
+      "saved": "Draft saved",
+      "saveFirst": "Save pending changes before publishing.",
+      "retrySave": "Retry save",
+      "retry": "Try again",
+      "noBranches": "No branches match your search.",
+      "copyBranch": "Copy branch name",
+      "branchCopied": "Branch name copied",
+      "conflict": "The repository changed. Update the draft base before publishing.",
+      "rebase": "Update draft base",
+      "requestReviewHint": "Mark the pull request as ready so your team can review it.",
+      "mergeHint": "Merge this branch into {branch} and publish the site."
+    },
     "title": "Sites",
     "description": "Blogs and changelogs, built and hosted from your GitHub repository",
     "newSite": "New site",
@@ -7831,7 +7878,6 @@
         "deployments": "Deployments",
         "previews": "Previews",
         "domains": "Domains",
-        "editor": "Editor",
         "settings": "Settings",
         "integrations": "Integrations",
         "design": "Design",
@@ -7888,56 +7934,23 @@
       "error": "Error",
       "warning": "Warning"
     },
-    "editor": {
-      "intro": "Changes save as drafts and never touch the live site until you publish.",
-      "validateFailed": "Couldn't validate the site",
-      "problems": "{count, plural, one {# problem} other {# problems}}",
-      "dismiss": "Dismiss",
-      "filesFailed": "Couldn't load the files from GitHub",
-      "noFiles": "No editable files yet. Create one to get started.",
-      "newFile": "New file",
-      "loadFailed": "Couldn't load this file",
-      "saveFailed": "Couldn't save the draft",
-      "discarded": "Draft discarded",
-      "discardFailed": "Couldn't discard the draft",
-      "createFailed": "Couldn't create the file",
-      "status": {
-        "unsaved": "Unsaved changes",
-        "saving": "Saving…",
-        "saved": "Draft saved",
-        "draft": "Draft",
-        "published": "Published version"
-      },
-      "conflict": {
-        "title": "These files changed on GitHub",
-        "description": "Someone pushed changes after you started editing. Keep your edits on top of the latest version, compare them with the published file, then publish again.",
-        "rebase": "Keep my edits on the latest version",
-        "rebased": "Drafts now build on the latest version. Review them before publishing.",
-        "rebaseFailed": "Couldn't update the drafts"
-      }
-    },
-    "newFile": {
-      "title": "New file",
-      "description": "Starts as a draft with frontmatter filled in.",
-      "section": "Section",
-      "postTitle": "Title",
-      "blogPlaceholder": "Introducing our new API",
-      "changelogPlaceholder": "Faster exports",
-      "fileName": "File name",
-      "fileNamePlaceholder": "my-post",
-      "pathHint": "Creates {path}",
-      "invalidName": "Use lowercase letters, digits and dashes.",
-      "exists": "{path} already exists."
-    },
     "publish": {
       "title": "Publish changes",
       "description": "{count, plural, one {# changed file goes} other {# changed files go}} to GitHub as one commit.",
       "message": "Commit message",
+      "messageDesign": "Update site design",
+      "messagePosts": "Update blog posts",
+      "messageSite": "Update site",
       "messagePlaceholder": "Update blog posts",
       "commit": "Publish",
       "committed": "Published. Deploying now.",
       "failed": "Couldn't publish",
-      "deployPending": "Published, deploy pending"
+      "deployPending": "Published, deploy pending",
+      "changesList": {
+        "changes": "Changes",
+        "added": "New",
+        "deleted": "Deleted"
+      }
     },
     "settings": {
       "previews": "Previews",
@@ -8038,8 +8051,8 @@
       "repository": "Repository",
       "noRepository": "No repository connected",
       "productionBranch": "Production branch",
-      "drafts": "Editor drafts",
-      "draftsHint": "{count, plural, one {# unpublished change} other {# unpublished changes}} in the editor",
+      "drafts": "Unpublished changes",
+      "draftsHint": "{count, plural, one {# change} other {# changes}} ready to publish",
       "activity": "Deployments",
       "viewAll": "View all",
       "noCommitMessage": "No commit message",
@@ -8325,71 +8338,12 @@
       "connectTitle": "Connect your domain",
       "connectSubmit": "Continue"
     },
-    "editorPage": {
-      "title": "Editor",
-      "description": "Edit your posts as drafts. Nothing goes live until you publish.",
-      "newFile": "New file",
-      "publish": "Publish",
-      "publishLabel": "{count, plural, =0 {Publish, no drafts} one {Publish # draft} other {Publish # drafts}}",
-      "retry": "Try again",
-      "empty": {
-        "title": "Pick a file or create one",
-        "description": "Changes save as drafts and stay off the live site until you publish.",
-        "chooseFile": "Choose file"
-      },
-      "tree": {
-        "title": "Files",
-        "label": "Site files",
-        "filter": "Filter files",
-        "clearFilter": "Clear filter",
-        "noMatches": "No files match",
-        "noFiles": "No files yet"
-      },
-      "file": {
-        "contentLabel": "Contents of {path}",
-        "discard": "Discard draft",
-        "copyPath": "Copy path",
-        "pathCopied": "Path copied",
-        "openOnGithub": "Open on GitHub",
-        "viewOnSite": "View on site",
-        "view": "View",
-        "edit": "Edit",
-        "changes": "Changes",
-        "more": "More actions",
-        "discardNew": "Discard new file"
-      },
-      "state": {
-        "error": "Couldn't save"
-      },
-      "status": {
-        "check": "Check for problems",
-        "checking": "Checking…",
-        "noProblems": "No problems",
-        "problems": "{errors, plural, one {# error} other {# errors}}, {warnings, plural, one {# warning} other {# warnings}}"
-      },
-      "problems": {
-        "title": "Problems",
-        "close": "Close problems",
-        "none": "No problems found"
-      },
-      "publishDialog": {
-        "changes": "Changes",
-        "added": "New",
-        "deleted": "Deleted"
-      },
-      "changes": {
-        "none": "No changes yet. Your edits show up here next to the published version."
-      },
-      "branchNotFound": "Branch not found, switched to {branch}"
-    },
     "variables": {
       "title": "Content variables",
-      "openEditor": "Open editor",
       "reset": "Reset changes",
       "loading": "Loading variables…",
       "loadFailed": "Unable to load variables. Try again.",
       "retry": "Try again",
-      "invalidConfig": "Fix blog.json in the editor to manage variables here.",
       "name": "Name",
       "value": "Value",
       "add": "Add variable",
@@ -8434,169 +8388,6 @@
       "saved": "Preview access updated",
       "saveFailed": "Couldn't update preview access"
     },
-    "integrationsPage": {
-      "title": "Integrations",
-      "description": "Analytics and the cookie banner for this site. Valid settings save automatically to a blog.json draft and go live when you publish.",
-      "optional": "Optional",
-      "recommended": "Recommended",
-      "remove": "Remove",
-      "removed": "Integration removed",
-      "savedDescription": "It's a draft of blog.json until you publish it.",
-      "saveFailed": "Couldn't save the integration",
-      "docs": "{provider} docs",
-      "draftDescription": "blog.json has changes that aren't live yet",
-      "reviewAndPublish": "Review and publish",
-      "preparePublishFailed": "Couldn't load pending changes",
-      "noDrafts": "There are no pending changes.",
-      "publishMessage": "Update site",
-      "publishConflict": "These drafts conflict with changes on GitHub. Open the editor to reload the files and reapply your changes.",
-      "invalidTitle": "Invalid blog.json configuration",
-      "invalidDescription": "The JSON or integration settings are invalid. Fix them in the editor, then come back.",
-      "providers": {
-        "databuddy": "Privacy-first analytics with web vitals, errors and events.",
-        "plausible": "Easy to use and privacy-friendly Google Analytics alternative.",
-        "posthog": "Product analytics with session replay and feature flags.",
-        "umami": "Open-source, cookie-free analytics.",
-        "ga4": "Web analytics from Google."
-      },
-      "fields": {
-        "databuddy": {
-          "clientId": "Client ID",
-          "trackWebVitals": "Web vitals",
-          "trackErrors": "Errors",
-          "trackOutgoingLinks": "Outgoing links",
-          "trackInteractions": "Interactions"
-        },
-        "plausible": {
-          "domain": "Domain",
-          "server": "Self-hosted server"
-        },
-        "posthog": {
-          "apiKey": "Project API key",
-          "apiHost": "API host",
-          "sessionRecording": "Session recording"
-        },
-        "umami": {
-          "websiteId": "Website ID",
-          "scriptUrl": "Script URL",
-          "hostUrl": "Collection URL"
-        },
-        "ga4": {
-          "measurementId": "Measurement ID"
-        }
-      },
-      "add": "Add {provider}",
-      "more": "{provider} options",
-      "edit": "Edit",
-      "configExample": "Configuration in blog.json",
-      "copyConfig": "Copy configuration",
-      "previewDescription": "Analytics integrations run on the live site only. Previews and local development do not send events.",
-      "loadFailedDescription": "This site's blog.json couldn't be read. Try again in a moment.",
-      "dismissPreviewNote": "Dismiss note",
-      "loadFailed": "Couldn't load integrations",
-      "retry": "Try again",
-      "openEditor": "Open editor",
-      "fieldErrors": {
-        "databuddy": {
-          "clientId": "Copy the Client ID from your Databuddy website settings"
-        },
-        "ga4": {
-          "measurementId": "Use the measurement ID (G-…)"
-        },
-        "plausible": {
-          "domain": "Use the domain as added in Plausible, e.g. acme.com",
-          "server": "Use a hostname with an optional port, without https://, e.g. plausible.acme.com:8443"
-        },
-        "posthog": {
-          "apiKey": "Use the project API key (phc_…)",
-          "apiHost": "Use an https:// URL without query or hash"
-        },
-        "umami": {
-          "websiteId": "Copy the Website ID from Umami's tracking code",
-          "scriptUrl": "Use the full https:// script URL including its path, without query or hash",
-          "hostUrl": "Use an https:// URL without query or hash"
-        }
-      },
-      "fieldDescriptions": {
-        "databuddy": {
-          "clientId": "In Databuddy, open your website and copy data-client-id from the tracking code.",
-          "trackWebVitals": "Send Core Web Vitals for every page.",
-          "trackErrors": "Send uncaught JavaScript errors.",
-          "trackOutgoingLinks": "Send an event when visitors click links to other sites.",
-          "trackInteractions": "Send clicks, rage clicks and dead clicks. More options like sampling and skipped paths are available in blog.json."
-        },
-        "plausible": {
-          "domain": "Use the domain you added to Plausible, without https://.",
-          "server": "For self-hosted Plausible, enter its hostname and optional port (e.g. plausible.acme.com:8443), without https://. Leave empty for plausible.io."
-        },
-        "posthog": {
-          "apiKey": "Copy the public project API key from your PostHog project settings.",
-          "apiHost": "Leave empty for US Cloud. Use https://eu.i.posthog.com for EU Cloud or your own HTTPS endpoint.",
-          "sessionRecording": "Record visitor sessions when recording is enabled for this domain in PostHog."
-        },
-        "umami": {
-          "websiteId": "In Umami, edit your website and copy data-website-id from Tracking code.",
-          "scriptUrl": "Leave empty for Umami Cloud. For self-hosting, copy the full HTTPS script URL from your tracking code.",
-          "hostUrl": "Usually empty. Set an HTTPS base URL only when events should go to a different endpoint, such as a reverse proxy."
-        },
-        "ga4": {
-          "measurementId": "In Google Analytics, open Admin → Data streams → your web stream and copy the Measurement ID."
-        }
-      },
-      "close": "Close",
-      "autosavePending": "Waiting to save…",
-      "autosaveSaving": "Saving draft…",
-      "autosaveSaved": "Draft saved. Review your changes to publish them.",
-      "autosaveInvalid": "Enter valid settings to save your changes.",
-      "discardUnsaved": "Discard unsaved changes",
-      "removeFailedDescription": "The integration was not removed. Retry the removal or discard the unsaved changes.",
-      "reviewChanges": "Review changes",
-      "consent": {
-        "title": "Cookie banner",
-        "description": "Cookie banner and consent records, built on c15t.",
-        "connect": "Connect Inth account",
-        "reconnect": "Reconnect Inth",
-        "reauthTitle": "Inth needs you to sign in again",
-        "reauthDescription": "Notra can't reach your Inth projects until you reconnect.",
-        "missingOriginsTitle": "Some of this site's domains aren't trusted in Inth",
-        "missingOriginsDescription": "Visitors on {origins} can't save their choice until these domains are trusted.",
-        "addOrigins": "Trust these domains",
-        "project": "Inth project",
-        "useProject": "Use project",
-        "disconnect": "Disconnect",
-        "noProjects": "Your Inth account has no projects yet. Create one in Inth, then come back.",
-        "noBackend": "This project has no consent backend yet. Turn on Consent for it in Inth first.",
-        "projectsFailed": "Couldn't load your Inth projects.",
-        "loadFailed": "Couldn't load the consent settings.",
-        "connected": "Consent banner set up",
-        "connectedDescription": "Notra trusted this site's domains in Inth and saved the backend to blog.json. Publish the change to turn the banner on.",
-        "connectFailed": "Couldn't set up the consent banner.",
-        "disconnectFailed": "Couldn't disconnect Inth.",
-        "notConfigured": "Connecting Inth isn't available on this environment. Use a self-hosted c15t backend instead.",
-        "oauthFailed": "Couldn't connect Inth",
-        "errors": {
-          "inth_not_configured": "Connecting Inth isn't available on this environment.",
-          "inth_access_denied": "You declined access in Inth.",
-          "inth_auth_failed": "Something went wrong while connecting. Try again.",
-          "inth_expired_state": "The sign-in took too long. Try again.",
-          "inth_session_mismatch": "You signed in to Notra as someone else while connecting. Try again.",
-          "inth_rate_limited": "Too many attempts. Wait a few minutes and try again.",
-          "inth_forbidden": "Only owners and admins can connect Inth.",
-          "inth_invalid_callback": "Inth sent back an incomplete response. Try again."
-        },
-        "managedTab": "Managed by Inth",
-        "selfHostedTab": "Self-hosted c15t",
-        "managedDescription": "Inth hosts your consent records. Connect your account and Notra trusts your site's domains and saves the backend URL to blog.json.",
-        "selfHostedDescription": "Run @c15t/backend on your own server over HTTPS and allow your site's domains in its CORS settings. Then set backendURL in blog.json to your backend's URL, including any path prefix.",
-        "connectTitle": "Connect your Inth account",
-        "projectDescription": "Notra trusts your site's domains in this project and saves its backend URL to blog.json.",
-        "activeProject": "Active project",
-        "domains": "Domains",
-        "domainsTrusted": "All trusted",
-        "note": "With a cookie banner, analytics and Notra's visitor analytics load only after visitors allow them. AI agent tracking keeps working without consent."
-      },
-      "analyticsTitle": "Analytics"
-    },
     "analyticsPage": {
       "title": "Analytics",
       "description": "People and AI agents on this site",
@@ -8624,8 +8415,6 @@
       "loading": "Loading blog.json…",
       "loadFailed": "Unable to load blog.json. Try again.",
       "retry": "Try again",
-      "invalidConfig": "blog.json isn't valid JSON. Fix it in the editor to edit the design here.",
-      "openEditor": "Open editor",
       "saved": "Saved as a draft",
       "saveFailed": "Unable to save. Try again.",
       "unsaved": "Unsaved changes",
@@ -8635,7 +8424,6 @@
       "saveDraft": "Save draft",
       "publish": "Publish",
       "publishMessage": "Update site design",
-      "publishConflict": "blog.json changed on GitHub. Review it in the editor.",
       "noDrafts": "There's nothing to publish yet.",
       "preparePublishFailed": "Unable to load your changes. Try again.",
       "brandHint": "Use the logo, colors and fonts from this project's brand identity.",
@@ -8784,20 +8572,62 @@
           "heading": "Headings",
           "body": "Body"
         }
+      },
+      "workspace": {
+        "saved": "Saved",
+        "saving": "Saving…",
+        "invalid": "Check fields",
+        "saveFailed": "Save failed",
+        "loading": "Loading design…",
+        "retry": "Retry save",
+        "unpublished": "Unpublished changes",
+        "invalidField": "Enter a valid value.",
+        "publishError": "Review issues",
+        "tryAgain": "Try again",
+        "keepChanges": "Keep my changes",
+        "discardChanges": "Discard my changes",
+        "conflict": "The draft or repository changed. Your changes are kept locally. Keep them to replace the latest draft, or discard them to load it.",
+        "malformed": "blog.json could not be read. Open the repository in Site settings to repair it. Your file has not been changed."
+      },
+      "sections": {
+        "navigation": "Design sections",
+        "titles": {
+          "general": "General",
+          "styling": "Styling",
+          "branding": "Branding",
+          "typography": "Typography",
+          "navbar": "Navbar",
+          "integrations": "Integrations"
+        },
+        "hints": {
+          "general": "The name and description readers see.",
+          "styling": "Colors, backgrounds and code block themes.",
+          "branding": "Your logos, favicon and logo link.",
+          "typography": "Fonts for headings and body text.",
+          "navbar": "Links and actions in the site navigation.",
+          "integrations": "Analytics and the cookie banner for this site."
+        }
       }
     },
     "branches": {
+      "optionalTitle": "Branch name (optional)",
+      "confirmCreate": "Create",
+      "editLabel": "Edit",
+      "rowActions": "Actions for {branch}",
+      "deletedDrafts": "{count, plural, one {# deleted branch has unsaved drafts} other {# deleted branches have unsaved drafts}}",
+      "discard": "Discard",
+      "discardDeletedManyDescription": "Permanently discard the unpublished changes for {count, plural, one {# deleted branch} other {# deleted branches}}?",
       "newBranch": "New branch",
       "rename": "Rename branch",
       "delete": "Delete branch",
       "deleteDescription": "Permanently delete {branch} and its unpublished changes? Any open pull request will be closed.",
       "discardDeletedDescription": "Permanently discard the unpublished changes for the deleted branch {branch}?",
-      "nameHint": "Optional title. Leave it empty to use the current date. Branch names start with notra/site-edit-.",
+      "nameHint": "Leave it empty to use today's date.",
       "title": "Branch title",
       "pending": "{count, plural, =0 {No pending changes} one {# pending change} other {# pending changes}}",
       "bring": "Bring them to this branch",
       "leave": "Leave them behind",
-      "originalKeepsChanges": "The original branch keeps its pending changes either way.",
+      "originalKeepsChanges": "Changes brought to the new branch are removed from the original after they are committed.",
       "create": "Create branch",
       "current": "Current branch: {branch}",
       "find": "Find a branch",
@@ -8823,7 +8653,171 @@
       "deployPending": "Published, deploy pending",
       "discardDeleted": "Discard drafts for deleted branch",
       "renameFor": "Rename branch {branch}",
-      "deleteFor": "Delete branch {branch}"
+      "deleteFor": "Delete branch {branch}",
+      "search": "Find a branch…",
+      "reviewIssues": "Review issues",
+      "branchNotFound": "Branch not found, switched to {branch}"
+    },
+    "drafts": {
+      "saveFailed": "Couldn't save the draft",
+      "loadFailed": "Couldn't load this file",
+      "conflict": {
+        "title": "These files changed on GitHub",
+        "description": "Someone pushed changes after you started editing. Keep your edits on top of the latest version, compare them with the published file, then publish again.",
+        "rebase": "Keep my edits on the latest version",
+        "rebased": "Drafts now build on the latest version. Review them before publishing.",
+        "rebaseFailed": "Couldn't update the drafts"
+      }
+    },
+    "integrationsPage": {
+      "optional": "Optional",
+      "recommended": "Recommended",
+      "remove": "Remove",
+      "removed": "Integration removed",
+      "savedDescription": "It's a draft of blog.json until you publish it.",
+      "saveFailed": "Couldn't save the integration",
+      "docs": "{provider} docs",
+      "invalidTitle": "Invalid blog.json configuration",
+      "invalidDescription": "Fix the integrations in blog.json on GitHub, then come back.",
+      "providers": {
+        "databuddy": "Privacy-first analytics with web vitals, errors and events.",
+        "plausible": "Easy to use and privacy-friendly Google Analytics alternative.",
+        "posthog": "Product analytics with session replay and feature flags.",
+        "umami": "Open-source, cookie-free analytics.",
+        "ga4": "Web analytics from Google."
+      },
+      "fields": {
+        "databuddy": {
+          "clientId": "Client ID",
+          "trackWebVitals": "Web vitals",
+          "trackErrors": "Errors",
+          "trackOutgoingLinks": "Outgoing links",
+          "trackInteractions": "Interactions"
+        },
+        "plausible": {
+          "domain": "Domain",
+          "server": "Self-hosted server"
+        },
+        "posthog": {
+          "apiKey": "Project API key",
+          "apiHost": "API host",
+          "sessionRecording": "Session recording"
+        },
+        "umami": {
+          "websiteId": "Website ID",
+          "scriptUrl": "Script URL",
+          "hostUrl": "Collection URL"
+        },
+        "ga4": {
+          "measurementId": "Measurement ID"
+        }
+      },
+      "add": "Add {provider}",
+      "more": "{provider} options",
+      "edit": "Edit",
+      "configExample": "Configuration in blog.json",
+      "copyConfig": "Copy configuration",
+      "loadFailedDescription": "This site's blog.json couldn't be read. Try again in a moment.",
+      "loadFailed": "Couldn't load integrations",
+      "retry": "Try again",
+      "fieldErrors": {
+        "databuddy": {
+          "clientId": "Copy the Client ID from your Databuddy website settings"
+        },
+        "ga4": {
+          "measurementId": "Use the measurement ID (G-…)"
+        },
+        "plausible": {
+          "domain": "Use the domain as added in Plausible, e.g. acme.com",
+          "server": "Use a hostname with an optional port, without https://, e.g. plausible.acme.com:8443"
+        },
+        "posthog": {
+          "apiKey": "Use the project API key (phc_…)",
+          "apiHost": "Use an https:// URL without query or hash"
+        },
+        "umami": {
+          "websiteId": "Copy the Website ID from Umami's tracking code",
+          "scriptUrl": "Use the full https:// script URL including its path, without query or hash",
+          "hostUrl": "Use an https:// URL without query or hash"
+        }
+      },
+      "fieldDescriptions": {
+        "databuddy": {
+          "clientId": "In Databuddy, open your website and copy data-client-id from the tracking code.",
+          "trackWebVitals": "Send Core Web Vitals for every page.",
+          "trackErrors": "Send uncaught JavaScript errors.",
+          "trackOutgoingLinks": "Send an event when visitors click links to other sites.",
+          "trackInteractions": "Send clicks, rage clicks and dead clicks. More options like sampling and skipped paths are available in blog.json."
+        },
+        "plausible": {
+          "domain": "Use the domain you added to Plausible, without https://.",
+          "server": "For self-hosted Plausible, enter its hostname and optional port (e.g. plausible.acme.com:8443), without https://. Leave empty for plausible.io."
+        },
+        "posthog": {
+          "apiKey": "Copy the public project API key from your PostHog project settings.",
+          "apiHost": "Leave empty for US Cloud. Use https://eu.i.posthog.com for EU Cloud or your own HTTPS endpoint.",
+          "sessionRecording": "Record visitor sessions when recording is enabled for this domain in PostHog."
+        },
+        "umami": {
+          "websiteId": "In Umami, edit your website and copy data-website-id from Tracking code.",
+          "scriptUrl": "Leave empty for Umami Cloud. For self-hosting, copy the full HTTPS script URL from your tracking code.",
+          "hostUrl": "Usually empty. Set an HTTPS base URL only when events should go to a different endpoint, such as a reverse proxy."
+        },
+        "ga4": {
+          "measurementId": "In Google Analytics, open Admin → Data streams → your web stream and copy the Measurement ID."
+        }
+      },
+      "close": "Close",
+      "autosavePending": "Waiting to save…",
+      "autosaveSaving": "Saving draft…",
+      "autosaveSaved": "Draft saved. Review your changes to publish them.",
+      "autosaveInvalid": "Enter valid settings to save your changes.",
+      "discardUnsaved": "Discard unsaved changes",
+      "removeFailedDescription": "The integration was not removed. Retry the removal or discard the unsaved changes.",
+      "consent": {
+        "title": "Cookie banner",
+        "description": "Cookie banner and consent records, built on c15t.",
+        "connect": "Connect Inth account",
+        "reconnect": "Reconnect Inth",
+        "reauthTitle": "Inth needs you to sign in again",
+        "reauthDescription": "Notra can't reach your Inth projects until you reconnect.",
+        "missingOriginsTitle": "Some of this site's domains aren't trusted in Inth",
+        "missingOriginsDescription": "Visitors on {origins} can't save their choice until these domains are trusted.",
+        "addOrigins": "Trust these domains",
+        "project": "Inth project",
+        "useProject": "Use project",
+        "disconnect": "Disconnect",
+        "noProjects": "Your Inth account has no projects yet. Create one in Inth, then come back.",
+        "noBackend": "This project has no consent backend yet. Turn on Consent for it in Inth first.",
+        "projectsFailed": "Couldn't load your Inth projects.",
+        "loadFailed": "Couldn't load the consent settings.",
+        "connected": "Consent banner set up",
+        "connectedDescription": "Notra trusted this site's domains in Inth and saved the backend to blog.json. Publish the change to turn the banner on.",
+        "connectFailed": "Couldn't set up the consent banner.",
+        "disconnectFailed": "Couldn't disconnect Inth.",
+        "notConfigured": "Connecting Inth isn't available on this environment. Use a self-hosted c15t backend instead.",
+        "oauthFailed": "Couldn't connect Inth",
+        "errors": {
+          "inth_not_configured": "Connecting Inth isn't available on this environment.",
+          "inth_access_denied": "You declined access in Inth.",
+          "inth_auth_failed": "Something went wrong while connecting. Try again.",
+          "inth_expired_state": "The sign-in took too long. Try again.",
+          "inth_session_mismatch": "You signed in to Notra as someone else while connecting. Try again.",
+          "inth_rate_limited": "Too many attempts. Wait a few minutes and try again.",
+          "inth_forbidden": "Only owners and admins can connect Inth.",
+          "inth_invalid_callback": "Inth sent back an incomplete response. Try again."
+        },
+        "managedTab": "Managed by Inth",
+        "selfHostedTab": "Self-hosted c15t",
+        "managedDescription": "Inth hosts your consent records. Connect your account and Notra trusts your site's domains and saves the backend URL to blog.json.",
+        "selfHostedDescription": "Run @c15t/backend on your own server over HTTPS and allow your site's domains in its CORS settings. Then set backendURL in blog.json to your backend's URL, including any path prefix.",
+        "connectTitle": "Connect your Inth account",
+        "projectDescription": "Notra trusts your site's domains in this project and saves its backend URL to blog.json.",
+        "activeProject": "Active project",
+        "domains": "Domains",
+        "domainsTrusted": "All trusted"
+      },
+      "analyticsTitle": "Analytics"
     }
   }
 }

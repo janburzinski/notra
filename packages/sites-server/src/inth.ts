@@ -398,8 +398,11 @@ function missingOrigins(project: InthProject, origins: string[]): string[] {
   );
 }
 
-async function currentBackendUrl(site: Site): Promise<string | null> {
-  const { integrations } = await readSiteIntegrations(site);
+async function currentBackendUrl(
+  site: Site,
+  branch?: string
+): Promise<string | null> {
+  const { integrations } = await readSiteIntegrations(site, branch);
   const c15t = integrations.c15t;
   return isRecord(c15t) && typeof c15t.backendURL === "string"
     ? c15t.backendURL.replace(/\/+$/, "")
@@ -407,7 +410,8 @@ async function currentBackendUrl(site: Site): Promise<string | null> {
 }
 
 export async function getInthConsentStatus(
-  site: Site
+  site: Site,
+  branch?: string
 ): Promise<InthConsentStatus> {
   const empty = { project: null, missingOrigins: [] };
   if (!getInthOAuthCredentials()) {
@@ -435,7 +439,7 @@ export async function getInthConsentStatus(
       ...empty,
     };
   }
-  const backendUrl = await currentBackendUrl(site);
+  const backendUrl = await currentBackendUrl(site, branch);
   try {
     const project = backendUrl
       ? (await listProjects(integration)).find(
@@ -468,7 +472,8 @@ export async function getInthConsentStatus(
 export async function connectSiteToInthProject(
   site: Site,
   projectId: string,
-  userId: string
+  userId: string,
+  branch?: string
 ): Promise<SiteIntegrationsState> {
   const integration = await requireIntegration(site.organizationId);
   const origins = await siteConsentOrigins(site);
@@ -499,5 +504,5 @@ export async function connectSiteToInthProject(
     }
     return url;
   });
-  return await saveSiteC15tBackend(site, backendUrl, userId);
+  return await saveSiteC15tBackend(site, backendUrl, userId, branch);
 }

@@ -7,6 +7,7 @@ export const BRANCH_PROTECTION_QUERY = `query SiteBranchProtection($owner: Strin
 export const BRANCH_PULL_REQUEST_QUERY = `query SiteBranchPullRequest($id: ID!) {
   node(id: $id) { ... on PullRequest {
     id number url isDraft state merged mergeable mergeStateStatus reviewDecision headRefOid
+    commits { totalCount }
   } }
 }`;
 export const READY_FOR_REVIEW_MUTATION = `mutation SiteRequestReview($id: ID!) {

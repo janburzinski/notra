@@ -10,7 +10,6 @@ import {
   GitBranchIcon,
   GithubIcon,
   Layers01Icon,
-  PlugSocketIcon,
   SparklesIcon,
   Tag01Icon,
   ViewIcon,
@@ -49,10 +48,7 @@ import {
   SiteSettingsValue,
 } from "@/components/sites/site-settings-item";
 import { SiteSuggestInput } from "@/components/sites/site-suggest-input";
-import {
-  SiteVariablesSettings,
-  useSiteVariablesCount,
-} from "@/components/sites/site-variables-settings";
+import { SiteVariablesSettings } from "@/components/sites/site-variables-settings";
 import { SITE_NAME_MAX_LENGTH } from "@/constants/sites-form";
 import {
   useGitHubCallbackErrorToast,
@@ -96,11 +92,9 @@ function SiteSettingsContent() {
   const t = useTranslations("sites.settings");
   const tPage = useTranslations("sites.settingsPage");
   const tNew = useTranslations("sites.new");
+  const tVariables = useTranslations("sites.variables");
   const tSections = useTranslations("sites.sections");
   const tPreview = useTranslations("sites.previewAccess");
-  const tVariables = useTranslations("sites.variables");
-  const tIntegrations = useTranslations("sites.integrationsPage");
-  const variablesCount = useSiteVariablesCount();
   const [openRow, setOpenRow] = useState<SiteSettingsRowKey | null>(null);
   const { site } = detail;
 
@@ -243,35 +237,14 @@ function SiteSettingsContent() {
               )}
             </SiteSettingsEditor>
           </SiteSettingsItem>
-          <SiteSettingsItem
-            {...row("variables")}
-            description={t("variablesHint")}
-            icon={CodeIcon}
-            title={tVariables("title")}
-            value={
-              variablesCount === null ? null : (
-                <SiteSettingsValue>
-                  {t("variablesCount", { count: variablesCount })}
-                </SiteSettingsValue>
-              )
-            }
-          >
-            <SiteVariablesSettings />
-          </SiteSettingsItem>
-          <SiteSettingsItem
-            description={t("integrationsHint")}
-            icon={PlugSocketIcon}
-            title={tIntegrations("title")}
-            value={
-              <Link
-                className={buttonVariants({ size: "sm", variant: "outline" })}
-                href={siteHref(organizationSlug, siteId, "integrations")}
-              >
-                {t("manage")}
-              </Link>
-            }
-          />
         </SiteSettingsList>
+      </SiteSettingsGroup>
+
+      <SiteSettingsGroup icon={CodeIcon} title={tVariables("title")}>
+        <p className="text-muted-foreground px-1 text-sm">
+          {tVariables("hint")}
+        </p>
+        <SiteVariablesSettings />
       </SiteSettingsGroup>
 
       <SiteSettingsGroup icon={ViewIcon} title={t("previews")}>
@@ -483,8 +456,7 @@ function SiteNameField() {
   return (
     <form
       className="w-full sm:w-64 sm:shrink-0"
-      onSubmit={(event) => {
-        event.preventDefault();
+      action={() => {
         if (dirty && !save.isPending) {
           save.mutate({ name: next });
         }

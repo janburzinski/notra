@@ -1146,7 +1146,7 @@ export const sitesRouter = {
       .input(siteEditorScopeInputSchema)
       .handler(async ({ context, input }) => {
         const { site } = await requireSite(context, input);
-        return await readSiteIntegrations(site);
+        return await readSiteIntegrations(site, input.branch);
       }),
 
     save: sitesProcedure
@@ -1162,10 +1162,10 @@ export const sitesRouter = {
 
     inth: {
       status: sitesProcedure
-        .input(siteScopeInputSchema)
+        .input(siteEditorScopeInputSchema)
         .handler(async ({ context, input }) => {
           const { site } = await requireSite(context, input);
-          return await getInthConsentStatus(site);
+          return await getInthConsentStatus(site, input.branch);
         }),
 
       projects: sitesProcedure
@@ -1182,7 +1182,12 @@ export const sitesRouter = {
           const { site, userId } = await requireSite(context, input, {
             admin: true,
           });
-          return await connectSiteToInthProject(site, input.projectId, userId);
+          return await connectSiteToInthProject(
+            site,
+            input.projectId,
+            userId,
+            input.branch
+          );
         }),
 
       disconnect: sitesProcedure

@@ -145,7 +145,7 @@ export function SiteOverviewHero() {
             <InfoRow icon={FileEditIcon} label={t("drafts")}>
               <Link
                 className="text-muted-foreground hover:text-foreground group inline-flex min-w-0 items-center gap-1 transition-colors duration-150"
-                href={siteHref(organizationSlug, siteId, "editor")}
+                href={siteHref(organizationSlug, siteId, "design")}
               >
                 <span className="truncate">
                   {t("draftsHint", { count: detail.draftCount })}

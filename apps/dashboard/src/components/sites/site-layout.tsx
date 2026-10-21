@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/empty-state";
 import Link from "@/components/framework/link";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
+import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useSiteDetail, useSitesOrganizationId } from "@/lib/hooks/use-sites";
 import { useParams } from "@/lib/navigation";
 import type {
@@ -30,6 +31,7 @@ import {
   SiteSectionSkeleton,
 } from "./site-page-skeleton";
 import { SitePageTabs } from "./site-page-tabs";
+import { SiteWorkspace } from "./site-workspace";
 import { SitesPageShell } from "./sites-page-shell";
 import { SitesUnavailableState } from "./sites-unavailable-state";
 
@@ -43,7 +45,9 @@ export function SiteLayout({
   const detailQuery = useSiteDetail(organizationId, siteId);
   const [projectParam, setProjectParam] = useGeoProjectQueryState();
   const owningProjectId = detailQuery.data?.site.projectId;
-  const ready = Boolean(detailQuery.data) && projectParam === owningProjectId;
+  const hydrated = useIsClient();
+  const ready =
+    hydrated && Boolean(detailQuery.data) && projectParam === owningProjectId;
   const { deploymentId } = useParams<{ deploymentId?: string }>();
 
   useEffect(() => {
@@ -69,13 +73,6 @@ export function SiteLayout({
 
   return (
     <>
-      {detail ? (
-        <SitePageTabs
-          organizationId={organizationId}
-          site={detail.site}
-          slug={organizationSlug}
-        />
-      ) : null}
       <SkeletonCrossfade
         loading={!ready || !detail}
         skeleton={
@@ -98,25 +95,34 @@ export function SiteLayout({
               liveDeployment,
             }}
           >
-            <SitesPageShell>
-              {detail.site.status === "suspended" ? (
-                <Alert role="status">
-                  <HugeiconsIcon
-                    aria-hidden="true"
-                    icon={CloudOffIcon}
-                    strokeWidth={1.5}
-                  />
-                  <AlertTitle>{t("offline")}</AlertTitle>
-                  <AlertDescription>
-                    {t("offlineDescription")}{" "}
-                    <Link href={siteHref(organizationSlug, siteId, "settings")}>
-                      {t("offlineAction")}
-                    </Link>
-                  </AlertDescription>
-                </Alert>
-              ) : null}
-              {children}
-            </SitesPageShell>
+            <SiteWorkspace>
+              <SitePageTabs
+                organizationId={organizationId}
+                site={detail.site}
+                slug={organizationSlug}
+              />
+              <SitesPageShell>
+                {detail.site.status === "suspended" ? (
+                  <Alert role="status">
+                    <HugeiconsIcon
+                      aria-hidden="true"
+                      icon={CloudOffIcon}
+                      strokeWidth={1.5}
+                    />
+                    <AlertTitle>{t("offline")}</AlertTitle>
+                    <AlertDescription>
+                      {t("offlineDescription")}{" "}
+                      <Link
+                        href={siteHref(organizationSlug, siteId, "settings")}
+                      >
+                        {t("offlineAction")}
+                      </Link>
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+                {children}
+              </SitesPageShell>
+            </SiteWorkspace>
           </SiteContext>
         ) : null}
       </SkeletonCrossfade>

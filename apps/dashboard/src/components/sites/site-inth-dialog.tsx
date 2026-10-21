@@ -35,14 +35,19 @@ import {
   INTH_PROVIDER,
 } from "@/constants/site-consent";
 import { useInthConsent } from "@/lib/hooks/use-site-consent";
-import { usePathname } from "@/lib/navigation";
+import { usePathname, useSearchParams } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import type { SiteInthDialogProps } from "@/types/components/sites";
 import type { ConsentHostingMode } from "@/types/site-consent";
 import { toErrorMessage } from "@/utils/error-message";
-import { c15tConfigExample, inthAuthorizeHref } from "@/utils/site-consent";
+import {
+  c15tConfigExample,
+  inthAuthorizeHref,
+  inthCallbackPath,
+} from "@/utils/site-consent";
 
 export function SiteInthDialog({
+  branch,
   open,
   onOpenChange,
   isSetUp,
@@ -52,7 +57,8 @@ export function SiteInthDialog({
   const tPage = useTranslations("sites.integrationsPage");
   const { organizationId, siteId } = useSite();
   const pathname = usePathname();
-  const inth = useInthConsent({ organizationId, siteId });
+  const searchParams = useSearchParams();
+  const inth = useInthConsent({ organizationId, siteId, branch });
   const { status, connected, projects, connect, disconnect, selected } = inth;
   const [pickedMode, setPickedMode] = useState<ConsentHostingMode | null>(null);
   const mode =
@@ -114,7 +120,10 @@ export function SiteInthDialog({
                 ) : null}
                 <div className="flex-1">
                   <SiteInthManagedPanel
-                    authorizeHref={inthAuthorizeHref(organizationId, pathname)}
+                    authorizeHref={inthAuthorizeHref(
+                      organizationId,
+                      inthCallbackPath(pathname, searchParams)
+                    )}
                     inth={inth}
                   />
                 </div>

@@ -19,22 +19,38 @@ export function useSiteBranchActions(
   const { organizationId, siteId, branch, onSwitch, onFlush } = props;
   const client = useQueryClient();
   const t = useTranslations("sites.branches");
-  const invalidate = async () => {
-    await Promise.all([
-      invalidateSiteBranch(client, { organizationId, siteId, branch }),
-      client.invalidateQueries({
-        queryKey: dashboardOrpc.sites.branches.list.key({
-          input: { organizationId, siteId },
-        }),
-      }),
-    ]);
-  };
+  const invalidate = () =>
+    invalidateSiteBranch(client, { organizationId, siteId });
   const onError = (error: unknown) =>
     toast.error(toErrorMessage(error, t("actionFailed")));
+  const create = useMutation({
+    mutationFn: async (title: string) => {
+      await onFlush();
+      const created = await dashboardOrpc.sites.branches.create.call({
+        organizationId,
+        siteId,
+        branch,
+        title,
+        bringChanges: true,
+      });
+      await onSwitch(created.branch);
+      if (created.flushError) {
+        toast.error(created.flushError);
+      }
+    },
+    onSuccess: async () => {
+      onClose();
+      await invalidate();
+    },
+    onError,
+  });
   const edit = useMutation({
     mutationFn: async (input: SiteBranchEditInput) => {
       if (!action) {
         return;
+      }
+      if (action.kind !== "discardDeleted") {
+        await onFlush();
       }
       const scope = { organizationId, siteId, branch: action.branch };
       if (action.kind === "create") {
@@ -55,7 +71,14 @@ export function useSiteBranchActions(
           await onSwitch(renamed.branch);
         }
       } else if (action.kind === "discardDeleted") {
-        await dashboardOrpc.sites.branches.discardDeletedDrafts.call(scope);
+        await Promise.all(
+          (action.branches ?? [action.branch]).map((deleted) =>
+            dashboardOrpc.sites.branches.discardDeletedDrafts.call({
+              ...scope,
+              branch: deleted,
+            })
+          )
+        );
       } else {
         await dashboardOrpc.sites.branches.delete.call(scope);
         if (action.branch === branch) {
@@ -91,5 +114,5 @@ export function useSiteBranchActions(
     onSuccess: invalidate,
     onError,
   });
-  return { edit, review };
+  return { create, edit, review };
 }

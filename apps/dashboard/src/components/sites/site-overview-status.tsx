@@ -37,15 +37,17 @@ function ProductionBuild({ deployment }: SiteProductionBuildProps) {
       href={siteDeploymentHref(organizationSlug, siteId, deployment.id)}
     >
       <SiteStatusBadge duration={duration} status={deployment.status} />
-      <span className="text-muted-foreground group-hover:text-foreground inline-flex items-center gap-1 transition-colors duration-150 max-sm:hidden">
-        {inProgress ? t("followBuild") : t("viewLogs")}
-        <HugeiconsIcon
-          aria-hidden="true"
-          className="size-3.5 transition-transform duration-150 group-hover:translate-x-0.5"
-          icon={ArrowRight01Icon}
-          strokeWidth={1.5}
-        />
-      </span>
+      {!inProgress && (
+        <span className="text-muted-foreground group-hover:text-foreground inline-flex items-center gap-1 transition-colors duration-150 max-sm:hidden">
+          {t("viewLogs")}
+          <HugeiconsIcon
+            aria-hidden="true"
+            className="size-3.5 transition-transform duration-150 group-hover:translate-x-0.5"
+            icon={ArrowRight01Icon}
+            strokeWidth={1.5}
+          />
+        </span>
+      )}
     </Link>
   );
 }

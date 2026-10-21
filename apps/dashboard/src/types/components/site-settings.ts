@@ -16,6 +16,7 @@ export interface SiteSettingsListProps {
 }
 
 export interface SiteSettingsItemBaseProps {
+  errorPath?: string;
   icon: IconSvgElement;
   title: ReactNode;
   description?: ReactNode;

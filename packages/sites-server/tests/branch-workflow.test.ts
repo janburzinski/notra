@@ -287,7 +287,7 @@ if (!databaseUrl) {
     await save("main", "{");
     await expect(flush()).rejects.toThrow("Fix the errors first");
   });
-  test("bring commits copied changes and opens a draft PR while original changes remain; leave copies none", async () => {
+  test("bring moves committed changes and opens a draft PR; leave preserves source drafts", async () => {
     await save();
     const brought = await branches.createSiteBranch(site, {
       title: "Bring changes",
@@ -300,7 +300,9 @@ if (!databaseUrl) {
     expect(await editor.listSiteDrafts(site.id, brought.branch)).toHaveLength(
       0
     );
-    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
+    expect(brought.flushError).toBeNull();
+    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(0);
+    await save();
     const left = await branches.createSiteBranch(site, {
       title: "Leave changes",
       bringChanges: false,
@@ -309,6 +311,75 @@ if (!databaseUrl) {
     expect(fake.state.branches.get(left.branch)).toBe("initial");
     expect(fake.state.prs).toHaveLength(1);
     expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
+  });
+  test("bringing changes preserves every source draft when a newer edit races the commit", async () => {
+    const original = await save();
+    await editor.saveSiteDraft(site, {
+      ...input(),
+      path: "blog/hello.md",
+      content: "---\ntitle: Moved post\ndate: 2026-10-19\n---\nMoved post.",
+      baseBlobSha: fake.blob(
+        "---\ntitle: Hello\ndate: 2026-10-19\ndescription: Synthetic\n---\nHello world."
+      ),
+    });
+    fake.state.beforeCommit = async () => {
+      fake.state.beforeCommit = async () => {};
+      await editor.saveSiteDraft(site, {
+        ...input("main", '{"name":"Newer main edit"}'),
+        draftId: original.id,
+        draftRevision: original.revision,
+      });
+    };
+    const result = await branches.createSiteBranch(site, {
+      title: "Racing move",
+      bringChanges: true,
+      userId,
+    });
+    expect(result.flushError).toContain("original branch changed meanwhile");
+    const remaining = await editor.listSiteDrafts(site.id, "main");
+    expect(remaining).toHaveLength(2);
+    expect(remaining.find((draft) => draft.id === original.id)?.content).toBe(
+      '{"name":"Newer main edit"}'
+    );
+    expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(0);
+    expect(fake.state.prs).toHaveLength(1);
+  });
+  test("source cleanup rolls back earlier deletes if the database rejects a later draft", async () => {
+    const original = await save();
+    const post = await editor.saveSiteDraft(site, {
+      ...input(),
+      path: "blog/hello.md",
+      content: "Updated post",
+      baseBlobSha: fake.blob(
+        "---\ntitle: Hello\ndate: 2026-10-19\ndescription: Synthetic\n---\nHello world."
+      ),
+    });
+    const fn = `reject_cleanup_${crypto.randomUUID().replaceAll("-", "")}`;
+    await db.execute(
+      sql.raw(
+        `CREATE FUNCTION ${fn}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF OLD.id = '${post.id}' THEN RAISE EXCEPTION 'Synthetic cleanup failure'; END IF; RETURN OLD; END; $$; CREATE TRIGGER ${fn} BEFORE DELETE ON site_drafts FOR EACH ROW EXECUTE FUNCTION ${fn}()`
+      )
+    );
+    try {
+      const result = await branches.createSiteBranch(site, {
+        title: "Cleanup failure",
+        bringChanges: true,
+        userId,
+      });
+      expect(result.flushError).not.toBeNull();
+      expect(
+        (await editor.listSiteDrafts(site.id, "main"))
+          .map((draft) => draft.id)
+          .sort()
+      ).toEqual([original.id, post.id].sort());
+      expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(
+        0
+      );
+    } finally {
+      await db.execute(
+        sql.raw(`DROP TRIGGER ${fn} ON site_drafts; DROP FUNCTION ${fn}()`)
+      );
+    }
   });
   test("bringing a newer draft from a previously committed feature branch preserves pending content", async () => {
     const branch = "notra/site-edit-bring-newer";
@@ -322,7 +393,7 @@ if (!databaseUrl) {
     });
     const created = await branches.createSiteBranch(site, {
       branch,
-      title: "Copied newer",
+      title: "Moved newer",
       bringChanges: true,
       userId,
     });
@@ -332,6 +403,7 @@ if (!databaseUrl) {
         .get(fake.state.branches.get(created.branch) ?? "")
         ?.get("blog.json")
     ).toBe('{"name":"Newer branch content"}');
+    expect(await editor.listSiteDrafts(site.id, branch)).toHaveLength(0);
   });
   test("feature commits always flush and draft creation falls back after 422", async () => {
     const branch = "notra/site-edit-test";
@@ -638,9 +710,11 @@ if (!databaseUrl) {
     await expect(branches.renameSiteBranch(site, "main", "no")).rejects.toThrow(
       "deployment branch"
     );
-    expect((await branches.listSiteBranches(site, "renamed"))[0]?.status).toBe(
-      "closed"
-    );
+    expect(
+      (await branches.listSiteBranches(site, "renamed")).find(
+        (entry) => entry.name === renamed.branch
+      )?.status
+    ).toBe("closed");
   });
   test("rename repairs draft mapping when GitHub commits the rename but drops its response", async () => {
     const branch = "notra/site-edit-lost-response";
@@ -1107,7 +1181,11 @@ if (!databaseUrl) {
   test("foreign branches cannot be listed, read, saved, flushed, renamed, deleted or used as a source", async () => {
     const branch = "feature/external";
     fake.state.branches.set(branch, "initial");
-    expect(await branches.listSiteBranches(site, "external")).toEqual([]);
+    expect(
+      (await branches.listSiteBranches(site, "external")).map(
+        (entry) => entry.name
+      )
+    ).toEqual([site.productionBranch]);
     const calls = fake.state.calls.length;
     for (const run of [
       () => branches.renameSiteBranch(site, branch, "Imported"),
@@ -1171,6 +1249,7 @@ if (!databaseUrl) {
       userId,
     });
     expect(result.flushError).toContain("moved while publishing");
+    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
     expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(1);
     fake.state.staleCommit = false;
     await flush(result.branch);
@@ -1179,6 +1258,19 @@ if (!databaseUrl) {
         (call) => call === "POST /repos/synthetic/blog/git/refs"
       )
     ).toHaveLength(1);
+  });
+  test("a PR failure after committing the moved files keeps the source drafts", async () => {
+    await save();
+    fake.state.failPR = true;
+    const result = await branches.createSiteBranch(site, {
+      title: "PR failure",
+      bringChanges: true,
+      userId,
+    });
+    expect(result.flushError).not.toBeNull();
+    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
+    expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(1);
+    expect(fake.state.commitCount).toBe(1);
   });
   test("only the unsupported draft 422 retries PR creation; no-commits has its own error", async () => {
     const branch = "notra/site-edit-invalid-pr";
@@ -1295,6 +1387,11 @@ if (!databaseUrl) {
     const branch = "notra/site-edit-orphan";
     fake.state.branches.set(branch, "initial");
     await save(branch);
+    expect(
+      (await branches.listSiteBranches(site)).find(
+        (entry) => entry.name === branch
+      )
+    ).toMatchObject({ exists: true, hasDraft: true });
     await expect(
       branches.discardDeletedSiteBranchDrafts(site, branch)
     ).rejects.toThrow("still exists");
@@ -1302,8 +1399,8 @@ if (!databaseUrl) {
     expect(
       (await branches.listSiteBranches(site)).find(
         (entry) => entry.name === branch
-      )?.exists
-    ).toBe(false);
+      )
+    ).toMatchObject({ exists: false, hasDraft: true });
     await branches.discardDeletedSiteBranchDrafts(site, branch);
     expect(await editor.listSiteDrafts(site.id, branch)).toHaveLength(0);
   });

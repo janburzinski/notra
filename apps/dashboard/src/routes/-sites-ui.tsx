@@ -17,7 +17,7 @@ import {
 } from "@/components/sites/site-page-skeleton";
 import { SITE_SECTION_PAGES } from "@/constants/site-ui-pages";
 import { lazyPage } from "@/utils/lazy-page";
-import { sitePreviewDeploymentsHref } from "@/utils/site-links";
+import { siteHref, sitePreviewDeploymentsHref } from "@/utils/site-links";
 
 import { loadSitesEnabled } from "./-sites-loaders";
 import { createUiRoute } from "./-ui-route";
@@ -79,6 +79,45 @@ export function createSitesUiRoutes(organization: AnyRoute) {
   });
 
   const siteRoutes = [
+    createRoute({
+      getParentRoute: () => site,
+      path: "integrations",
+      beforeLoad: ({ params, search }) => {
+        // Keeps project, branch and Inth OAuth results from older links and in-flight sign-ins.
+        const query = new URLSearchParams();
+        for (const [key, value] of Object.entries(search)) {
+          if (
+            typeof value === "string" ||
+            typeof value === "number" ||
+            typeof value === "boolean"
+          ) {
+            query.set(key, String(value));
+          }
+        }
+        query.set("section", "integrations");
+        throw redirect({
+          href: `${siteHref(params.slug, params.siteId, "design")}?${query}`,
+          replace: true,
+        });
+      },
+    }),
+    createRoute({
+      getParentRoute: () => site,
+      path: "editor",
+      beforeLoad: ({ params, search }) => {
+        const query = new URLSearchParams();
+        if (typeof search.project === "string") {
+          query.set("project", search.project);
+        }
+        if (typeof search.branch === "string") {
+          query.set("branch", search.branch);
+        }
+        throw redirect({
+          href: `${siteHref(params.slug, params.siteId)}${query.size ? `?${query}` : ""}`,
+          replace: true,
+        });
+      },
+    }),
     createRoute({
       getParentRoute: () => site,
       path: "previews",

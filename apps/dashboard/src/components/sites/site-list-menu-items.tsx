@@ -4,7 +4,7 @@ import {
   Copy01Icon,
   DashboardSquare01Icon,
   Delete02Icon,
-  FileEditIcon,
+  PaintBoardIcon,
   LinkSquare02Icon,
   RefreshIcon,
   Rocket01Icon,
@@ -109,16 +109,16 @@ export function SiteListMenuItems({
       <Item
         render={
           <Link
-            href={siteHref(organizationSlug, site.id, "editor", site.projectId)}
+            href={siteHref(organizationSlug, site.id, "design", site.projectId)}
           />
         }
       >
         <HugeiconsIcon
           aria-hidden="true"
-          icon={FileEditIcon}
+          icon={PaintBoardIcon}
           strokeWidth={1.5}
         />
-        {tTabs("editor")}
+        {tTabs("design")}
       </Item>
       <Item
         render={

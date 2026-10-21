@@ -42,11 +42,12 @@ export function SiteStylingFields({
   const t = useTranslations("sites.design.styling");
   const tModes = useTranslations("sites.design.appearances");
   return (
-    <div className="space-y-3">
+    <div>
       <SiteSettingsList>
         <SiteSettingsItem
           description={t("primaryHint")}
           icon={PaintBrush01Icon}
+          errorPath="colors.primary"
           title={t("primary")}
           value={
             <SiteColorInput
@@ -60,6 +61,7 @@ export function SiteStylingFields({
         <SiteSettingsItem
           description={t("lightColorHint")}
           icon={Moon02Icon}
+          errorPath="colors.light"
           title={t("lightColor")}
           value={
             <SiteColorInput
@@ -75,6 +77,7 @@ export function SiteStylingFields({
         <SiteSettingsItem
           description={t("darkColorHint")}
           icon={ColorsIcon}
+          errorPath="colors.dark"
           title={t("darkColor")}
           value={
             <SiteColorInput
@@ -93,6 +96,7 @@ export function SiteStylingFields({
         <SiteSettingsItem
           description={t("backgroundLightHint")}
           icon={Sun03Icon}
+          errorPath="background.color.light"
           title={t("backgroundLight")}
           value={
             <SiteColorInput
@@ -108,6 +112,7 @@ export function SiteStylingFields({
         <SiteSettingsItem
           description={t("backgroundDarkHint")}
           icon={Moon02Icon}
+          errorPath="background.color.dark"
           title={t("backgroundDark")}
           value={
             <SiteColorInput
@@ -197,10 +202,10 @@ export function SiteStylingFields({
           <>
             <SiteSettingsItem
               icon={Sun03Icon}
+              errorPath="styling.codeblocks.light"
               title={t("codeLight")}
               value={
                 <SiteOptionSelect
-                  className="w-56"
                   label={t("codeLight")}
                   onChange={(value) => update("codeLight", value)}
                   options={CODE_THEME_OPTIONS}
@@ -210,10 +215,10 @@ export function SiteStylingFields({
             />
             <SiteSettingsItem
               icon={Moon02Icon}
+              errorPath="styling.codeblocks.dark"
               title={t("codeDark")}
               value={
                 <SiteOptionSelect
-                  className="w-56"
                   label={t("codeDark")}
                   onChange={(value) => update("codeDark", value)}
                   options={CODE_THEME_OPTIONS}

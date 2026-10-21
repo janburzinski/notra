@@ -4,22 +4,31 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SaveSiteIntegrationInput } from "@/types/hooks/sites";
 import type { SiteScope } from "@/types/sites";
 
-export function useSiteIntegrations({ organizationId, siteId }: SiteScope) {
+export function useSiteIntegrations({
+  organizationId,
+  siteId,
+  branch,
+}: SiteScope) {
   return useQuery(
     dashboardOrpc.sites.integrations.get.queryOptions({
-      input: { organizationId, siteId },
+      input: { organizationId, siteId, branch },
       enabled: organizationId.length > 0,
     })
   );
 }
 
-export function useSaveSiteIntegration({ organizationId, siteId }: SiteScope) {
+export function useSaveSiteIntegration({
+  organizationId,
+  siteId,
+  branch,
+}: SiteScope) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: SaveSiteIntegrationInput) =>
       dashboardOrpc.sites.integrations.save.call({
         organizationId,
         siteId,
+        branch,
         ...input,
       }),
     onSuccess: async () => {

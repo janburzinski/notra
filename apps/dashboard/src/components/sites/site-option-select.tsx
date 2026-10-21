@@ -27,7 +27,7 @@ export function SiteOptionSelect<T extends string>({
       }}
       value={value}
     >
-      <SelectTrigger aria-label={label} className={cn("w-44", className)}>
+      <SelectTrigger aria-label={label} className={cn("w-full", className)}>
         <SelectValue>
           {(current: T) =>
             options.find((option) => option.value === current)?.label

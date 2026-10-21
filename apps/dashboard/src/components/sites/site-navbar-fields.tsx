@@ -66,6 +66,7 @@ export function SiteNavbarFields({
       {form.navbarButton === "button" ? (
         <SiteSettingsItem
           icon={Tag01Icon}
+          errorPath="navbar.cta.label"
           title={t("buttonLabel")}
           value={
             <Input
@@ -85,6 +86,7 @@ export function SiteNavbarFields({
       {form.navbarButton === "none" ? null : (
         <SiteSettingsItem
           icon={Link01Icon}
+          errorPath="navbar"
           title={t("buttonHref")}
           value={
             <Input
@@ -104,6 +106,7 @@ export function SiteNavbarFields({
       <SiteSettingsBlock
         description={t("linksHint")}
         icon={Menu01Icon}
+        errorPath="navbar.links"
         title={t("links")}
       >
         <div className="space-y-2">

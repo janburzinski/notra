@@ -1,8 +1,5 @@
 "use client";
 
-import { InformationCircleIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Alert, AlertDescription } from "@notra/ui/components/ui/alert";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -14,6 +11,7 @@ import type { SiteConsentSectionProps } from "@/types/components/sites";
 import { inthOAuthError } from "@/utils/site-consent";
 
 export function SiteConsentSection({
+  branch,
   isSetUp,
   loading,
   disabled,
@@ -30,14 +28,6 @@ export function SiteConsentSection({
       <h2 className="font-medium" id="site-consent-heading">
         {t("title")}
       </h2>
-      <Alert variant="info">
-        <HugeiconsIcon
-          aria-hidden="true"
-          icon={InformationCircleIcon}
-          strokeWidth={1.5}
-        />
-        <AlertDescription>{t("note")}</AlertDescription>
-      </Alert>
       <div className="grid grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2">
         <SiteIntegrationRow
           description={t("description")}
@@ -49,6 +39,7 @@ export function SiteConsentSection({
         />
       </div>
       <SiteInthDialog
+        branch={branch}
         isSetUp={isSetUp}
         oauthError={oauthError}
         onOpenChange={setOpen}

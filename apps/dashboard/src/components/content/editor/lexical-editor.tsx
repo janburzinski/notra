@@ -52,6 +52,7 @@ interface LexicalEditorProps {
   theme?: EditorThemeClasses;
   className?: string;
   cleanReviewMarks?: boolean;
+  mediaUploads?: boolean;
 }
 
 export function LexicalEditor({
@@ -64,6 +65,7 @@ export function LexicalEditor({
   theme = editorTheme,
   className,
   cleanReviewMarks = false,
+  mediaUploads = true,
 }: LexicalEditorProps) {
   const isProgrammaticUpdateRef = useRef(false);
   const [floatingAnchorElem, setFloatingAnchorElem] =
@@ -119,7 +121,7 @@ export function LexicalEditor({
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="lexical-editor relative" ref={onRef}>
-        <ImageUploadPlugin />
+        {mediaUploads && <ImageUploadPlugin />}
         <RichTextPlugin
           contentEditable={
             <ContentEditable
@@ -140,7 +142,7 @@ export function LexicalEditor({
           <MarkdownShortcutPlugin transformers={EDITOR_TRANSFORMERS} />
         )}
         {editable && <EditorAutoLinkPlugin />}
-        {editable && <ComponentPickerPlugin />}
+        {editable && <ComponentPickerPlugin mediaUploads={mediaUploads} />}
         <ClickableLinkPlugin newTab />
         <TabFocusPlugin />
         <MarkdownSyncPlugin

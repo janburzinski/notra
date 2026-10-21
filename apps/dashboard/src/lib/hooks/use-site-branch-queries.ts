@@ -1,14 +1,10 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SiteBranchControlsProps } from "@/types/site-branches";
-import {
-  serverSiteBranchVisibility,
-  siteBranchVisibility,
-  subscribeSiteBranchVisibility,
-} from "@/utils/site-branch-visibility";
-import { siteValidationReady } from "@/utils/site-validation-ready";
+import { siteDraftValidationOptions } from "@/utils/site-draft-validation-options";
+import { siteValidationBlocksReview } from "@/utils/site-validation-ready";
 
 /** Branch status, validation and the branch list behind the editor's branch controls. */
 export function useSiteBranchQueries({
@@ -26,59 +22,33 @@ export function useSiteBranchQueries({
     refetchIntervalInBackground: false,
     staleTime: 30_000,
   });
-  const status = useQuery({
-    ...statusOptions,
-    queryKey: [...statusOptions.queryKey, draftVersion],
-  });
-  const validationOptions = dashboardOrpc.sites.editor.validate.queryOptions({
-    input: scope,
-    enabled: !unsaved,
-    staleTime: 0,
-  });
-  const validation = useQuery({
-    ...validationOptions,
-    queryKey: [...validationOptions.queryKey, draftVersion],
-  });
+  const status = useQuery(statusOptions);
+  // Autosave already debounces edits. Validate each acknowledged revision
+  // immediately, without reusing the result for an older draft.
+  const validation = useQuery(
+    siteDraftValidationOptions(scope, draftVersion, !unsaved)
+  );
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(timer);
-  }, [search]);
   const branches = useQuery(
     dashboardOrpc.sites.branches.list.queryOptions({
-      input: { organizationId, siteId, search: debouncedSearch },
+      input: { organizationId, siteId },
       enabled: menuOpen,
-      placeholderData: keepPreviousData,
       staleTime: 30_000,
     })
-  );
-  const showBranches = useSyncExternalStore(
-    subscribeSiteBranchVisibility,
-    siteBranchVisibility,
-    serverSiteBranchVisibility
   );
   const feature = Boolean(branch && branch !== productionBranch);
   return {
     status,
+    validation,
+    validating: !unsaved && validation.isPending,
     branches,
     search,
     setSearch,
     menuOpen,
     setMenuOpen,
-    showBranches,
     feature,
     current: branch ?? productionBranch,
-    invalid:
-      unsaved ||
-      !siteValidationReady(validation) ||
-      !status.isSuccess ||
-      status.isPlaceholderData,
-    canShow:
-      feature ||
-      showBranches ||
-      Boolean(status.data?.hasFeatureBranches) ||
-      !status.data?.canPublishDirect,
+    invalid: siteValidationBlocksReview(validation) || status.isError,
   };
 }

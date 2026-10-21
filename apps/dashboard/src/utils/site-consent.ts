@@ -13,6 +13,18 @@ export function inthAuthorizeHref(
   }).toString()}`;
 }
 
+/** Returns to the same page, section and branch, without a previous OAuth result. */
+export function inthCallbackPath(
+  pathname: string,
+  searchParams: URLSearchParams
+): string {
+  const query = new URLSearchParams(searchParams);
+  query.delete("error");
+  query.delete("inthConnected");
+  const search = query.toString();
+  return search ? `${pathname}?${search}` : pathname;
+}
+
 export function inthOAuthError(
   value: string | null
 ): InthOAuthErrorCode | null {

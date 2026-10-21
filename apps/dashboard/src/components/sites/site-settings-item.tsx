@@ -13,6 +13,7 @@ import {
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useId } from "react";
 
+import { SiteDesignError } from "@/components/sites/site-design-error";
 import { SITE_SETTINGS_PANEL_CLASSNAME } from "@/constants/sites";
 import { cn } from "@/lib/utils";
 import type {
@@ -29,7 +30,7 @@ import type {
 
 function IconTile({ icon }: SiteSettingsIconTileProps) {
   return (
-    <span className="bg-background text-muted-foreground ring-foreground/10 flex size-9 shrink-0 items-center justify-center rounded-lg ring-1">
+    <span className="text-muted-foreground flex size-5 shrink-0 items-center justify-center">
       <HugeiconsIcon
         aria-hidden="true"
         className="size-4.5"
@@ -68,13 +69,7 @@ export function SiteSettingsValue({ children, mono }: SiteSettingsValueProps) {
 }
 
 export function SiteSettingsList({ children }: SiteSettingsListProps) {
-  return (
-    <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
-      <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
-        {children}
-      </div>
-    </div>
-  );
+  return <div className="w-full">{children}</div>;
 }
 
 export function SiteSettingsGroup({
@@ -104,23 +99,28 @@ export function SiteSettingsGroup({
 
 /** A row whose control spans the full width below the text, e.g. a list. */
 export function SiteSettingsBlock({
+  errorPath,
   icon,
   title,
   description,
   children,
 }: SiteSettingsBlockProps) {
   return (
-    <div className="space-y-4 px-4 py-4 sm:px-5">
+    <div className="space-y-4 border-b px-4 py-4 sm:px-5">
       <div className="flex items-center gap-4">
         <IconTile icon={icon} />
         <ItemText description={description} title={title} />
       </div>
-      <div className="sm:pl-13">{children}</div>
+      <div className="sm:pl-9">
+        {children}
+        <SiteDesignError path={errorPath} />
+      </div>
     </div>
   );
 }
 
 export function SiteSettingsItem({
+  errorPath,
   icon,
   title,
   description,
@@ -131,18 +131,18 @@ export function SiteSettingsItem({
 }: SiteSettingsItemProps) {
   if (!children) {
     return (
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-4 sm:flex-nowrap sm:px-5">
+      <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 border-b px-4 py-4 sm:grid-cols-[1.25rem_minmax(0,1fr)_15rem] sm:px-5">
         <IconTile icon={icon} />
         <ItemText description={description} title={title} />
-        <div className="w-full pl-13 sm:w-auto sm:shrink-0 sm:pl-0">
+        <div className="col-start-2 flex min-w-0 flex-col items-end sm:col-start-auto [&>*]:w-full [&>[data-slot=switch]]:w-8">
           {value}
+          <SiteDesignError path={errorPath} />
         </div>
-        <span aria-hidden="true" className="hidden size-4 shrink-0 sm:block" />
       </div>
     );
   }
   return (
-    <Collapsible onOpenChange={onOpenChange} open={open}>
+    <Collapsible className="border-b" onOpenChange={onOpenChange} open={open}>
       <CollapsibleTrigger
         render={
           <button
@@ -178,17 +178,19 @@ export function SiteSettingsSwitchItem({
 }: SiteSettingsSwitchItemProps) {
   const id = useId();
   return (
-    <div className="flex items-center gap-4 px-4 py-4 sm:px-5">
+    <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 border-b px-4 py-4 sm:grid-cols-[1.25rem_minmax(0,1fr)_15rem] sm:px-5">
       <IconTile icon={icon} />
       <label className="min-w-0 flex-1" htmlFor={id}>
         <ItemText description={description} title={title} />
       </label>
-      <Switch
-        checked={checked}
-        disabled={disabled}
-        id={id}
-        onCheckedChange={onCheckedChange}
-      />
+      <div className="col-start-2 flex justify-end sm:col-start-auto">
+        <Switch
+          checked={checked}
+          disabled={disabled}
+          id={id}
+          onCheckedChange={onCheckedChange}
+        />
+      </div>
     </div>
   );
 }

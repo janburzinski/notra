@@ -26,6 +26,7 @@ import type { Site } from "./types/sites";
 import { createSiteBranchOctokit as createOctokit } from "./utils/branch-octokit";
 import { requiresPullRequest } from "./utils/branch-protection";
 import { branchPullRequest, canMergeBranch } from "./utils/branch-pull-request";
+import { consumeMovedSiteDrafts } from "./utils/consume-moved-site-drafts";
 import { errorMessage, isNotFoundError } from "./utils/errors";
 import { moveSiteBranchDrafts } from "./utils/move-site-branch-drafts";
 import {
@@ -196,7 +197,15 @@ export async function listSiteBranches(site: Site, search = "") {
     }
   }
   return [...branches.values()]
-    .filter((entry) => entry.name.toLowerCase().includes(search.toLowerCase()))
+    .map((entry) => ({
+      ...entry,
+      hasDraft: orphaned.some(({ branch }) => branch === entry.name),
+    }))
+    .filter(
+      (entry) =>
+        entry.name === site.productionBranch ||
+        entry.name.toLowerCase().includes(search.toLowerCase())
+    )
     .sort((a, b) =>
       a.name === site.productionBranch
         ? -1
@@ -217,7 +226,7 @@ export async function createSiteBranch(
     contents: "write",
     pull_requests: "write",
   });
-  await withSiteBranchLock(site.id, source, async (tx) => {
+  const copied = await withSiteBranchLock(site.id, source, async (tx) => {
     const head = await getBranchHead(repository, token, source);
     const drafts = input.bringChanges
       ? await listSiteDrafts(site.id, source, tx)
@@ -238,8 +247,9 @@ export async function createSiteBranch(
         }))
       );
     }
+    return drafts;
   });
-  // The copy is durable before flushing. A failed GitHub write leaves recoverable drafts on both branches.
+  // Keep the source until the new branch commit and draft PR are durable.
   let flushError: string | null = null;
   if (input.bringChanges) {
     try {
@@ -248,6 +258,7 @@ export async function createSiteBranch(
         message: "Update site content",
         userId: input.userId,
       });
+      await consumeMovedSiteDrafts(site, source, copied);
     } catch (error) {
       flushError = errorMessage(error);
     }

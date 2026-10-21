@@ -57,7 +57,7 @@ function VersionLoading() {
 
 const SiteFileDiff = lazyComponent(
   () =>
-    import("@/components/sites/editor/site-file-diff").then((module) => ({
+    import("@/components/sites/site-file-diff").then((module) => ({
       default: module.SiteFileDiff,
     })),
   { loading: VersionLoading }

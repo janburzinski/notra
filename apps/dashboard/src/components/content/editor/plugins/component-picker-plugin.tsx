@@ -201,7 +201,11 @@ function ComponentPickerMenu({
   );
 }
 
-export function ComponentPickerPlugin() {
+export function ComponentPickerPlugin({
+  mediaUploads = true,
+}: {
+  mediaUploads?: boolean;
+}) {
   const t = useTranslations("content.editor.blocks");
   const tCommon = useTranslations("common");
   const [editor] = useLexicalComposerContext();
@@ -354,12 +358,17 @@ export function ComponentPickerPlugin() {
         )
       : baseOptions;
     const groups = Object.keys(BLOCK_PICKER_GROUP_LABELS);
-    return matches.toSorted(
-      (a, b) =>
-        groups.indexOf(BLOCK_PICKER_GROUPS[a.kind]) -
-        groups.indexOf(BLOCK_PICKER_GROUPS[b.kind])
-    );
-  }, [baseOptions, queryString]);
+    return matches
+      .filter(
+        (option) =>
+          mediaUploads || (option.kind !== "image" && option.kind !== "video")
+      )
+      .toSorted(
+        (a, b) =>
+          groups.indexOf(BLOCK_PICKER_GROUPS[a.kind]) -
+          groups.indexOf(BLOCK_PICKER_GROUPS[b.kind])
+      );
+  }, [baseOptions, mediaUploads, queryString]);
 
   const onSelectOption = useCallback(
     (

@@ -28,6 +28,13 @@ export function SiteSeparateAssetRows({
   return (
     <>
       <SiteSettingsItem
+        errorPath={
+          id === "site-logo"
+            ? "logo"
+            : id === "site-favicon"
+              ? "favicon"
+              : "background.image"
+        }
         description={description}
         icon={Sun03Icon}
         title={separate ? t("lightMode", { title }) : title}

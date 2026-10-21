@@ -84,19 +84,24 @@ function DropdownMenuLabel({
 function DropdownMenuItem({
   className,
   inset,
+  active,
   variant = "default",
   ...props
 }: MenuPrimitive.Item.Props & {
   inset?: boolean;
+  /** Marks the item that is currently in use, such as the selected branch. */
+  active?: boolean;
   variant?: "default" | "destructive";
 }) {
   return (
     <MenuPrimitive.Item
+      aria-current={active || undefined}
       className={cn(
         DROPDOWN_ITEM_CLASS_NAME,
-        "group/dropdown-menu-item data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/10 data-[variant=destructive]:data-highlighted:text-destructive data-[variant=destructive]:*:[svg]:text-destructive",
+        "group/dropdown-menu-item data-[active]:bg-foreground/[0.05] data-[active]:text-foreground data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/10 data-[variant=destructive]:data-highlighted:text-destructive data-[variant=destructive]:*:[svg]:text-destructive dark:data-[active]:bg-foreground/[0.07]",
         className
       )}
+      data-active={active || undefined}
       data-inset={inset || undefined}
       data-slot="dropdown-menu-item"
       data-variant={variant}

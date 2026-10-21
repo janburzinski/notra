@@ -12,7 +12,6 @@ import type {
   POST_PREVIEW_LIFETIME_OPTIONS,
   SITE_DETAIL_TABS,
   SITE_DOMAIN_CONNECT_OUTCOMES,
-  SITE_NEW_FILE_FOLDERS,
   SITE_PROXY_RECIPES,
 } from "@/constants/sites";
 import type { DashboardRouter } from "@/lib/orpc/router";
@@ -38,7 +37,6 @@ export type SiteCreateStepId = (typeof SITE_CREATE_STEP_IDS)[number];
 export type SiteImportableRepository =
   SitesOutputs["importableRepositories"]["repositories"][number];
 export type SiteEditorFiles = SitesOutputs["editor"]["files"];
-export type SiteEditorFile = SiteEditorFiles["files"][number];
 export type SiteEditorDraft = SiteEditorFiles["drafts"][number];
 export type SiteEditorDocument = SitesOutputs["editor"]["read"];
 export type SiteDiagnostic = SiteDeploymentRecord["diagnostics"][number];
@@ -70,7 +68,6 @@ export interface SiteSectionConfig {
   path: string;
   icon: IconSvgElement;
 }
-export type SiteNewFileFolder = (typeof SITE_NEW_FILE_FOLDERS)[number];
 export type SiteProxyRecipeId = (typeof SITE_PROXY_RECIPES)[number];
 export type SitePreviewVisibility = SiteRecord["previewVisibility"];
 export type SiteMounts = SiteRecord["mounts"];
@@ -334,4 +331,9 @@ export type PostPreviewState =
 export type SiteValidationQuery = Pick<
   UseQueryResult<{ ok: boolean }>,
   "data" | "isPlaceholderData" | "isSuccess"
+>;
+
+export type SiteValidationReviewQuery = Pick<
+  UseQueryResult<{ ok: boolean }>,
+  "data" | "isError"
 >;

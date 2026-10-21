@@ -1,48 +1,19 @@
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { parseAsString, useQueryState } from "nuqs";
 
 import { useSite } from "@/components/sites/site-context";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import type { SiteEditorDocument } from "@/types/sites";
 
-export function useSiteConfigDocument() {
+export function useSiteConfigDocument(branchOverride?: string, enabled = true) {
   const { organizationId, siteId } = useSite();
+  const [selectedBranch] = useQueryState("branch", parseAsString);
+  const branch = branchOverride ?? selectedBranch ?? undefined;
   return useQuery(
     dashboardOrpc.sites.editor.read.queryOptions({
-      input: { organizationId, siteId, path: SITE_CONFIG_FILENAME },
+      input: { organizationId, siteId, branch, path: SITE_CONFIG_FILENAME },
       refetchOnWindowFocus: false,
+      enabled,
     })
   );
-}
-
-/** Saves a new blog.json as an editor draft; publishing stays in the editor. */
-export function useSaveSiteConfigDraft(document: SiteEditorDocument) {
-  const { organizationId, siteId } = useSite();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (content: string) =>
-      dashboardOrpc.sites.editor.saveDraft.call({
-        organizationId,
-        siteId,
-        path: SITE_CONFIG_FILENAME,
-        content,
-        baseBlobSha: document.blobSha,
-        baseCommitSha: null,
-        draftId: document.draftId,
-        draftRevision: document.draftRevision,
-        sourceContext: document.sourceContext,
-      }),
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.sites.editor.read.key(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.sites.editor.files.key(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: dashboardOrpc.sites.get.key(),
-        }),
-      ]),
-  });
 }

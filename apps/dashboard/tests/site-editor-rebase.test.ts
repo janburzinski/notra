@@ -15,11 +15,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import type { DashboardORPCClient } from "../src/lib/orpc/client";
 import type {
-  SiteEditorDraftInput,
-  SiteEditorDraftReference,
-  SiteEditorDraftResult,
-} from "../src/types/site-editor";
-import { createSiteEditorSaveQueue } from "../src/utils/site-editor-save-queue";
+  SiteDraftInput,
+  SiteDraftReference,
+  SiteDraftResult,
+} from "../src/types/site-drafts";
+import { createSiteDraftSaveQueue } from "../src/utils/site-draft-save-queue";
 import {
   partialRebasePaths,
   scope,
@@ -52,13 +52,11 @@ if (!process.env.NOTRA_SITE_EDITOR_REBASE_TEST_WORKER) {
   let client: QueryClient;
   let rebase: (path: string) => Promise<void>;
   let read: (path: string) => Promise<void>;
-  let persist: (input: SiteEditorDraftInput) => Promise<SiteEditorDraftResult>;
-  let remove: (
-    input: SiteEditorDraftReference & { path: string }
-  ) => Promise<void>;
+  let persist: (input: SiteDraftInput) => Promise<SiteDraftResult>;
+  let remove: (input: SiteDraftReference & { path: string }) => Promise<void>;
   let readRevision: (path: string) => number;
-  const saveCalls: SiteEditorDraftInput[] = [];
-  const discardCalls: (SiteEditorDraftReference & { path: string })[] = [];
+  const saveCalls: SiteDraftInput[] = [];
+  const discardCalls: (SiteDraftReference & { path: string })[] = [];
   const onSettled = mock();
   const readCalls: string[] = [];
   const rpc = createORPCClient<DashboardORPCClient>({
@@ -95,12 +93,12 @@ if (!process.env.NOTRA_SITE_EDITOR_REBASE_TEST_WORKER) {
             drafts: [],
           };
         case "sites.editor.saveDraft": {
-          const draft = input as SiteEditorDraftInput;
+          const draft = input as SiteDraftInput;
           saveCalls.push(draft);
           return await persist(draft);
         }
         case "sites.editor.discardDraft": {
-          const draft = input as SiteEditorDraftReference & { path: string };
+          const draft = input as SiteDraftReference & { path: string };
           discardCalls.push(draft);
           await remove(draft);
           return { ok: true };
@@ -130,13 +128,13 @@ if (!process.env.NOTRA_SITE_EDITOR_REBASE_TEST_WORKER) {
     },
   }));
   const { useRebaseSiteDrafts } =
-    await import("../src/lib/hooks/use-site-editor-files");
-  const { useSiteEditorSaves } =
-    await import("../src/lib/hooks/use-site-editor-saves");
+    await import("../src/lib/hooks/use-rebase-site-drafts");
+  const { useSiteDraftSaves } =
+    await import("../src/lib/hooks/use-site-draft-saves");
   const createSaves = () => {
-    let saves: ReturnType<typeof useSiteEditorSaves> | undefined;
+    let saves: ReturnType<typeof useSiteDraftSaves> | undefined;
     function Harness({ onReady }: SiteEditorQueueHarnessProps) {
-      const queues = useSiteEditorSaves(scope, () => {});
+      const queues = useSiteDraftSaves(scope, () => {});
       onReady(queues);
       return null;
     }
@@ -189,10 +187,7 @@ if (!process.env.NOTRA_SITE_EDITOR_REBASE_TEST_WORKER) {
       sourceContext,
     });
   };
-  const documentInput = (
-    path: string,
-    content: string
-  ): SiteEditorDraftInput => {
+  const documentInput = (path: string, content: string): SiteDraftInput => {
     const document = client.getQueryData(readOptions(path).queryKey);
     if (!document) {
       throw new Error("Expected authoritative document");
@@ -326,13 +321,13 @@ if (!process.env.NOTRA_SITE_EDITOR_REBASE_TEST_WORKER) {
     });
     const observer = new QueryObserver(client, readOptions("blog/active.mdx"));
     const unsubscribe = observer.subscribe(() => {});
-    const saved: SiteEditorDraftInput[] = [];
+    const saved: SiteDraftInput[] = [];
     const onRebased = mock(() => {
       for (const path of ["blog/active.mdx", "blog/inactive.mdx"]) {
         const document = client.getQueryData(readOptions(path).queryKey);
         expect(document?.blobSha).toBe(`new:${path}`);
         expect(document?.published).toBe(`upstream:${path}`);
-        const queue = createSiteEditorSaveQueue({
+        const queue = createSiteDraftSaveQueue({
           save: async (input) => {
             saved.push(input);
             return {

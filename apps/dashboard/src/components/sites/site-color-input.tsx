@@ -23,7 +23,7 @@ export function SiteColorInput({
   const shown = value || fallback || "";
   const invalid = value !== "" && !SITE_HEX_COLOR.test(value);
   return (
-    <InputGroup className="w-full sm:w-44">
+    <InputGroup className="w-full">
       <InputGroupAddon>
         <label
           className="ring-foreground/15 relative block size-4.5 cursor-pointer overflow-hidden rounded-[5px] ring-1"

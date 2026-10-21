@@ -25,7 +25,7 @@ export function SiteAssetField({
   const [failed, setFailed] = useState<string | null>(null);
   const showImage = src !== null && failed !== src;
   return (
-    <InputGroup className="w-full sm:w-80">
+    <InputGroup className="w-full">
       <InputGroupAddon>
         <span className="bg-muted/60 ring-foreground/10 flex size-5 items-center justify-center overflow-hidden rounded-[5px] ring-1">
           {showImage ? (

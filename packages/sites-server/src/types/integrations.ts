@@ -16,4 +16,5 @@ export interface SiteIntegrationsState {
 
 export type SaveSiteIntegrationsInput = SiteIntegrationUpdate & {
   userId: string;
+  branch?: string;
 };

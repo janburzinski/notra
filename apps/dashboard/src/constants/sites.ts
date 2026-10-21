@@ -2,7 +2,6 @@ import {
   Alert02Icon,
   Analytics01Icon,
   DashboardSquare01Icon,
-  FileEditIcon,
   PlugSocketIcon,
   GitPullRequestIcon,
   Globe02Icon,
@@ -48,7 +47,6 @@ export const SITE_DETAIL_TABS = [
   "analytics",
   "deployments",
   "domains",
-  "editor",
   "integrations",
   "design",
   "settings",
@@ -56,9 +54,8 @@ export const SITE_DETAIL_TABS = [
 
 export const SITE_SECTIONS: readonly SiteSectionConfig[] = [
   { section: "overview", path: "", icon: DashboardSquare01Icon },
-  { section: "editor", path: "/editor", icon: FileEditIcon },
-  { section: "analytics", path: "/analytics", icon: Analytics01Icon },
   { section: "design", path: "/design", icon: PaintBoardIcon },
+  { section: "analytics", path: "/analytics", icon: Analytics01Icon },
   { section: "deployments", path: "/deployments", icon: Rocket01Icon },
   { section: "domains", path: "/domains", icon: Globe02Icon },
   { section: "integrations", path: "/integrations", icon: PlugSocketIcon },
@@ -68,9 +65,8 @@ export const SITE_SECTIONS: readonly SiteSectionConfig[] = [
 /** Pages with a tab above every site page; the rest are linked from them. */
 export const SITE_NAV_SECTIONS: ReadonlySet<SiteSection> = new Set([
   "overview",
-  "editor",
-  "analytics",
   "design",
+  "analytics",
   "settings",
 ]);
 
@@ -87,14 +83,7 @@ export const POST_PREVIEW_LIFETIME_OPTIONS = ["1h", "1d", "3d", "7d"] as const;
 export const SITE_DEFAULT_BLOG_PATH = "/blog";
 export const SITE_DEFAULT_CHANGELOG_PATH = "/changelog";
 
-export const SITE_EDITOR_AUTOSAVE_MS = 1200;
 export const SITE_CONFIG_FILENAME = "blog.json";
-export const SITE_NEW_FILE_FOLDERS = ["blog", "changelog"] as const;
-export const SITE_NEW_FILE_EXTENSION = ".mdx";
-export const SITE_NEW_FILE_SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*$/;
-
-export const SITE_EDITABLE_FILE_PATTERN =
-  /(?:^\.notraignore$|\.(?:mdx?|jsx?|json|css)$)/i;
 
 export const SITE_PROXY_RECIPES = [
   "vercel",

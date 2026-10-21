@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight01Icon, Rocket01Icon } from "@hugeicons/core-free-icons";
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { siteIntegrationSchemas } from "@notra/sites-core/schemas/site-integrations";
 import {
@@ -47,7 +47,6 @@ export function SiteIntegrationDialog({
   settings,
   open,
   onOpenChange,
-  onPublish,
 }: SiteIntegrationDialogProps) {
   const t = useTranslations("sites.integrationsPage");
   const tCommon = useTranslations("common");
@@ -58,7 +57,6 @@ export function SiteIntegrationDialog({
   const [showErrors, setShowErrors] = useState(false);
   const [closing, setClosing] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const [publishing, setPublishing] = useState(false);
   const [removalFailed, setRemovalFailed] = useState(false);
   const autosave = useSiteIntegrationAutosave(
     scope,
@@ -84,7 +82,7 @@ export function SiteIntegrationDialog({
     2
   );
   const connected = settings !== null || autosave.state.hasIntegration;
-  const busy = closing || removing || publishing;
+  const busy = closing || removing;
 
   const change = (key: string, value: string | boolean) => {
     setRemovalFailed(false);
@@ -124,22 +122,6 @@ export function SiteIntegrationDialog({
       toast.success(t("removed"), { description: t("savedDescription") });
       onOpenChange(false);
     }
-  };
-
-  const publish = async () => {
-    if (busy || removalFailed) {
-      return;
-    }
-    if (hasErrors) {
-      setShowErrors(true);
-      return;
-    }
-    setPublishing(true);
-    const saved = !autosave.state.dirty || (await autosave.flush());
-    if (saved) {
-      await onPublish();
-    }
-    setPublishing(false);
   };
 
   const discard = async () => {
@@ -335,26 +317,9 @@ export function SiteIntegrationDialog({
               form={`${id}-form`}
               loading={closing}
               type="submit"
-              variant="outline"
+              data-dialog-confirm
             >
               {t("close")}
-            </Button>
-            <Button
-              disabled={busy || removalFailed}
-              loading={publishing}
-              data-dialog-confirm
-              onClick={() => {
-                void publish();
-              }}
-              type="button"
-            >
-              <HugeiconsIcon
-                aria-hidden="true"
-                data-icon="inline-start"
-                icon={Rocket01Icon}
-                strokeWidth={1.5}
-              />
-              {t("reviewChanges")}
             </Button>
           </div>
         </ResponsiveDialogFooter>

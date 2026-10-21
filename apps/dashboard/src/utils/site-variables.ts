@@ -25,3 +25,17 @@ export function patchSiteVariables(
   config.variables = siteVariablesFromRows(rows);
   return `${JSON.stringify(config, null, 2)}\n`;
 }
+
+export function validateVariableRows(rows: readonly SiteVariableRow[]) {
+  try {
+    return { variables: siteVariablesFromRows(rows), error: null };
+  } catch (cause) {
+    return {
+      variables: {},
+      error:
+        cause instanceof Error && cause.message === "duplicate"
+          ? ("duplicate" as const)
+          : ("invalid" as const),
+    };
+  }
+}

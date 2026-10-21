@@ -1,4 +1,7 @@
+import type { ReactNode } from "react";
+
 import type { dashboardOrpc } from "@/lib/orpc/query";
+import type { SiteDraftSaveState } from "@/types/site-drafts";
 import type { SiteScope } from "@/types/sites";
 
 export type SiteBranchStatus = Awaited<
@@ -9,6 +12,8 @@ export type SiteBranchEntry = Awaited<
 >[number];
 
 export interface SiteBranchControlsProps extends SiteScope {
+  saveState?: SiteDraftSaveState;
+  commitStatus?: "idle" | "pending" | "success" | "error";
   productionBranch: string;
   draftCount: number;
   draftVersion: string;
@@ -18,16 +23,24 @@ export interface SiteBranchControlsProps extends SiteScope {
   onFlush: () => Promise<void>;
 }
 
-export interface SiteBranchOptionsMenuProps {
-  disabled: boolean;
-  showBranches: boolean;
-  onNewBranch: () => void;
+export type SiteBranchController = ReturnType<
+  typeof import("@/lib/hooks/use-site-branch-controls").useSiteBranchControls
+>;
+
+export interface SiteBranchControllerProps {
+  controller: SiteBranchController;
+}
+
+export interface SiteBranchSwitcherProps extends SiteBranchControllerProps {
+  /** Only one mounted switcher (sidebar or Files sheet) may own the open menu. */
+  menuActive: boolean;
 }
 
 export interface SiteBranchDialogProps {
   action: {
     kind: "create" | "rename" | "delete" | "discardDeleted";
     branch: string;
+    branches?: string[];
   } | null;
   draftCount: number;
   loading: boolean;
@@ -35,7 +48,25 @@ export interface SiteBranchDialogProps {
   onConfirm: (title: string, bringChanges: boolean) => void;
 }
 
+export interface SiteBranchDialogDescriptionProps {
+  action: SiteBranchDialogProps["action"];
+}
+
+export interface SiteBranchBringFieldsProps {
+  name: string;
+  draftCount: number;
+  bring: boolean;
+  onBringChange: (bring: boolean) => void;
+}
+
 export interface SiteBranchMenuProps {
+  pullRequest?: SiteBranchStatus["pullRequest"];
+  actions?: ReactNode;
+  error?: boolean;
+  onRetry?: () => void;
+  onCreate: (title: string) => void;
+  creating: boolean;
+  onStartCreate: () => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   current: string;
@@ -49,12 +80,15 @@ export interface SiteBranchMenuProps {
   onAction: (action: NonNullable<SiteBranchDialogProps["action"]>) => void;
 }
 
-export interface SiteBranchEditorProps {
+export interface SiteWorkingBranchProps {
   branch?: string;
   onSwitch: (branch: string | null) => Promise<void>;
 }
 
 export interface SiteBranchPrimaryActionProps {
+  checking?: boolean;
+  error?: boolean;
+  describedBy?: string;
   feature: boolean;
   status?: SiteBranchStatus;
   busy: boolean;
@@ -77,3 +111,37 @@ export interface SiteBranchPrimaryState {
   disabled: boolean;
   showSave: boolean;
 }
+
+export interface SiteBranchPublishActionsProps {
+  describedBy?: string;
+  controls: SiteBranchControlsProps;
+  status?: SiteBranchStatus;
+  invalid: boolean;
+}
+
+export interface SiteBranchBadgeProps {
+  live: boolean;
+  pullRequest?: SiteBranchStatus["pullRequest"];
+}
+export interface SiteBranchEntryProps extends Pick<
+  SiteBranchMenuProps,
+  "current" | "productionBranch" | "onSelect" | "onAction"
+> {
+  entry: SiteBranchEntry;
+}
+
+export interface SiteBranchScrollListProps {
+  count: number;
+  children: ReactNode;
+}
+
+export interface SiteBranchCreateFormProps {
+  loading: boolean;
+  onCreate: (title: string) => void;
+}
+
+export type SitePullRequestTone =
+  | "success"
+  | "warning"
+  | "destructive"
+  | "muted";

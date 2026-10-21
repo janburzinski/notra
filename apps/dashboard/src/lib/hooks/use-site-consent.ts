@@ -19,7 +19,7 @@ export function useInthConsentStatus(scope: SiteScope) {
 export function useInthProjects(scope: SiteScope, enabled: boolean) {
   return useQuery(
     dashboardOrpc.sites.integrations.inth.projects.queryOptions({
-      input: scope,
+      input: { organizationId: scope.organizationId, siteId: scope.siteId },
       enabled,
     })
   );
@@ -45,7 +45,10 @@ export function useDisconnectInth(scope: SiteScope) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () =>
-      dashboardOrpc.sites.integrations.inth.disconnect.call(scope),
+      dashboardOrpc.sites.integrations.inth.disconnect.call({
+        organizationId: scope.organizationId,
+        siteId: scope.siteId,
+      }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: dashboardOrpc.sites.key(),

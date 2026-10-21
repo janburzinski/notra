@@ -1,5 +1,4 @@
 import type { SITE_NAVBAR_LINK_TYPES } from "@notra/sites-core/constants/site-layout";
-import type { ReactNode } from "react";
 
 import type {
   SITE_APPEARANCE_MODES,
@@ -9,7 +8,6 @@ import type {
   SITE_FONT_WEIGHTS,
   SITE_TYPOGRAPHY_MODES,
 } from "@/constants/site-design";
-import type { SiteEditorDocument } from "@/types/sites";
 
 export type SiteAppearanceMode = (typeof SITE_APPEARANCE_MODES)[number];
 export type SiteBackgroundDecoration =
@@ -77,40 +75,6 @@ export interface SiteDesignForm {
 }
 
 type SiteDesignFormUpdate<T> = <K extends keyof T>(key: K, value: T[K]) => void;
-
-export interface SiteDesignEditorProps<T> {
-  read: (config: SiteRawConfig) => T;
-  patch: (config: SiteRawConfig, form: T, initial: T) => SiteRawConfig;
-  children: (form: T, update: SiteDesignFormUpdate<T>) => ReactNode;
-  /** Fills the form from the project's brand identity. */
-  applyBrand: (brand: SiteBrandDefaults, form: T) => T;
-  /** What applying the brand identity would change, for the confirm dialog. */
-  describeBrand: (brand: SiteBrandDefaults, form: T) => SiteBrandChange[];
-}
-
-export interface SiteDesignFormProps<T> extends SiteDesignEditorProps<T> {
-  document: SiteEditorDocument;
-  config: SiteRawConfig;
-  onPublish: () => void | Promise<void>;
-  preparingPublish: boolean;
-}
-
-export interface SiteBrandHintProps<T> extends Pick<
-  SiteDesignEditorProps<T>,
-  "applyBrand" | "describeBrand"
-> {
-  form: T;
-  setForm: (form: T) => void;
-}
-
-export interface SiteDesignSaveBarProps {
-  dirty: boolean;
-  error: string | null;
-  saving: boolean;
-  preparingPublish: boolean;
-  onReset: () => void;
-  onPublish: () => void;
-}
 
 export interface SiteColorInputProps {
   id: string;

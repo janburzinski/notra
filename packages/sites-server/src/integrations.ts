@@ -21,10 +21,10 @@ import {
 } from "./utils/site-integration-config";
 import { siteSourceContext } from "./utils/source-context";
 
-async function currentConfig(site: Site) {
+async function currentConfig(site: Site, branch = site.productionBranch) {
   const [file, drafts] = await Promise.all([
-    readSiteSourceFile(site, SITE_CONFIG_FILENAME),
-    listSiteDrafts(site.id),
+    readSiteSourceFile(site, SITE_CONFIG_FILENAME, branch),
+    listSiteDrafts(site.id, branch),
   ]);
   const draft = drafts.find((entry) => entry.path === SITE_CONFIG_FILENAME);
   const content =
@@ -35,9 +35,10 @@ async function currentConfig(site: Site) {
 }
 
 export async function readSiteIntegrations(
-  site: Site
+  site: Site,
+  branch?: string
 ): Promise<SiteIntegrationsState> {
-  const { content, draft } = await currentConfig(site);
+  const { content, draft } = await currentConfig(site, branch);
   const config = parseSiteIntegrationConfig(content);
   return {
     integrations: isRecord(config?.integrations) ? config.integrations : {},
@@ -52,13 +53,19 @@ export async function saveSiteIntegration(
   site: Site,
   input: SaveSiteIntegrationsInput
 ): Promise<SiteIntegrationsState> {
-  return await saveSiteIntegrationUpdate(site, () => input, input.userId);
+  return await saveSiteIntegrationUpdate(
+    site,
+    () => input,
+    input.userId,
+    input.branch
+  );
 }
 
 export async function saveSiteC15tBackend(
   site: Site,
   backendURL: string,
-  userId: string
+  userId: string,
+  branch?: string
 ): Promise<SiteIntegrationsState> {
   return await saveSiteIntegrationUpdate(
     site,
@@ -69,7 +76,8 @@ export async function saveSiteC15tBackend(
         backendURL,
       },
     }),
-    userId
+    userId,
+    branch
   );
 }
 
@@ -78,15 +86,17 @@ async function saveSiteIntegrationUpdate(
   toUpdate: (
     integrations: Record<string, unknown>
   ) => SiteIntegrationConfigUpdate,
-  userId: string
+  userId: string,
+  branch = site.productionBranch
 ): Promise<SiteIntegrationsState> {
-  const { file, draft, content } = await currentConfig(site);
+  const { file, draft, content } = await currentConfig(site, branch);
   const config = parseSiteIntegrationConfig(content);
   const { integrations, content: next } = updateSiteIntegrationConfig(
     content,
     toUpdate(isRecord(config?.integrations) ? config.integrations : {})
   );
   const observed = {
+    branch,
     path: SITE_CONFIG_FILENAME,
     draftId: draft?.id ?? null,
     draftRevision: draft?.revision ?? null,

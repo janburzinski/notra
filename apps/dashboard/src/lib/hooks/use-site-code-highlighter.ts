@@ -3,7 +3,10 @@
 import { preloadHighlighter } from "@pierre/diffs";
 import { useQuery } from "@tanstack/react-query";
 
-import { SITE_CODE_LANGUAGES, SITE_CODE_THEME } from "@/constants/site-editor";
+import {
+  SITE_CODE_LANGUAGES,
+  SITE_CODE_THEME,
+} from "@/constants/site-publish-diff";
 
 export function useSiteCodeHighlighter(): boolean {
   const query = useQuery({

@@ -12,7 +12,7 @@ import type { SiteScope } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 import { flushSiteBranchOnLeave } from "@/utils/flush-site-branch-on-leave";
 import { invalidateSiteBranch } from "@/utils/invalidate-site-branch";
-import { publishConflictPaths } from "@/utils/site-editor";
+import { publishConflictPaths } from "@/utils/site-drafts";
 
 export function useSiteBranchAutosave(
   scope: SiteScope,

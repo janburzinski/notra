@@ -60,8 +60,7 @@ export function SiteSettingsEditor({
   return (
     <form
       className="space-y-4"
-      onSubmit={(event) => {
-        event.preventDefault();
+      action={() => {
         if (canSave) {
           save.mutate(patch);
         }

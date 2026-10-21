@@ -9,6 +9,7 @@ export interface BranchPullRequest {
   mergeStateStatus: string;
   reviewDecision: "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | null;
   headRefOid: string;
+  commits?: { totalCount: number };
 }
 
 export interface BranchPullRequestResponse {
