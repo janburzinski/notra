@@ -14,7 +14,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "test": "bun test ./src && bun test ./tests",
-    "test:browser": "bun test ./browser-tests"
+    "test:browser": "bun test ./browser-tests",
+    "test:demo-production": "node --test scripts/demo-production.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/code-mode": "1.0.86",

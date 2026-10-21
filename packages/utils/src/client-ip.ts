@@ -132,14 +132,20 @@ export function ipNetworkKey(ip: ParsedIp): string {
 }
 
 /**
- * The visitor's address on Railway. Railway's edge sets `X-Real-IP` to the
+ * The visitor's address behind Unkey or Railway. Unkey replaces
+ * `X-Forwarded-For` with one client IP; only trust it when the runtime sets
+ * UNKEY_DEPLOYMENT_ID. Railway's edge sets `X-Real-IP` to the
  * TCP peer it saw (https://docs.railway.com/networking/public-networking/specs-and-limits),
  * so it can't be forged; `X-Forwarded-For` keeps whatever the client sent.
  * The origin is also reachable on *.up.railway.app without Cloudflare, so
  * `cf-connecting-ip` only counts when that peer is a Cloudflare edge.
  */
-export function getRailwayClientIp(headers: Headers): ParsedIp | null {
-  const peer = parseIp(headers.get("x-real-ip") ?? "");
+export function getProxyClientIp(headers: Headers): ParsedIp | null {
+  const peer = parseIp(
+    headers.get(
+      process.env.UNKEY_DEPLOYMENT_ID ? "x-forwarded-for" : "x-real-ip"
+    ) ?? ""
+  );
   if (!peer) {
     return null;
   }

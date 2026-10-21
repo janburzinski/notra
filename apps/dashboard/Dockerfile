@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 FROM oven/bun:1.4.0-slim AS bun
 
 FROM node:24.11.1-bookworm-slim AS base
@@ -16,8 +18,11 @@ ARG NEXT_PUBLIC_NOTRA_DEMO_MODE
 ARG NEXT_PUBLIC_NOTRA_DEMO_API_URL
 ARG NEXT_PUBLIC_DATABUDDY_DEMO_DASHBOARD_WEBSITE_ID
 ARG WORKFLOW_BASE_URL
+ARG UNKEY_SECRETS_ID=notra-build-env
 ENV NITRO_PRESET=node-server
-RUN bunx turbo run build --filter=dashboard
+RUN --mount=type=secret,id=${UNKEY_SECRETS_ID},target=/run/secrets/.env \
+    set -a && if [ -f /run/secrets/.env ]; then . /run/secrets/.env; fi && set +a \
+    && bunx turbo run build --filter=dashboard
 
 FROM builder AS migrator
 RUN mkdir -p /migrate \
@@ -31,6 +36,7 @@ FROM base AS runner
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
+ENV WORKFLOW_LOCAL_DATA_DIR=/tmp/notra-workflows
 COPY --from=builder /app/apps/dashboard/.output /app/apps/dashboard/.output
 COPY --from=migrator /migrate /migrate
 WORKDIR /app/apps/dashboard

@@ -1,14 +1,14 @@
 import { createHmac } from "node:crypto";
 
 import {
-  getRailwayClientIp,
+  getProxyClientIp,
   ipNetworkKey,
   parseIp,
 } from "@notra/utils/client-ip";
 
 /**
  * The visitor's network for demo rate limits. The demo is self-hosted behind
- * Cloudflare and Railway, where the shared ratelimit helper (Vercel only)
+ * Cloudflare and Unkey, where the shared ratelimit helper (Vercel only)
  * would hand every request a fresh random key. `x-vercel-forwarded-for` is
  * only trusted on Vercel: elsewhere any client could send it through
  * Cloudflare to dodge the per-network limit. IPv6 visitors are grouped by
@@ -19,7 +19,7 @@ export function getDemoClientIp(headersList: Headers): string {
     process.env.VERCEL === "1"
       ? parseIp(headersList.get("x-vercel-forwarded-for") ?? "")
       : null;
-  const ip = vercelIp ?? getRailwayClientIp(headersList);
+  const ip = vercelIp ?? getProxyClientIp(headersList);
   return ip ? ipNetworkKey(ip) : "unknown";
 }
 

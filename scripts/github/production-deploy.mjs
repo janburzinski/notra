@@ -81,6 +81,16 @@ const unkeyServices = [
     domain: "ingest.usenotra.com",
     directory: "apps/ai-traffic-ingest",
   },
+  {
+    name: "demo-api",
+    domain: "demo-api.usenotra.com",
+    directory: "apps/api",
+  },
+  {
+    name: "demo-dashboard",
+    domain: "demo.usenotra.com",
+    directory: "apps/dashboard",
+  },
 ];
 // Site builds run the toolchain baked into an Upstash Box snapshot, not the
 // dashboard's code. The dashboard must only go live with a snapshot built from
@@ -156,16 +166,13 @@ export async function release({
   sleep = delay,
   preflightOnly = false,
 } = {}) {
-  if (
-    env.UNKEY_INGEST_ENABLED &&
-    !["true", "false"].includes(env.UNKEY_INGEST_ENABLED)
-  ) {
-    throw new Error("UNKEY_INGEST_ENABLED must be true, false, or unset");
-  }
-  if (env.UNKEY_INGEST_ENABLED === "true" && !env.UNKEY_DEPLOY_ROOT_KEY) {
-    throw new Error(
-      "UNKEY_DEPLOY_ROOT_KEY is required when UNKEY_INGEST_ENABLED=true"
-    );
+  for (const flag of ["UNKEY_INGEST_ENABLED", "UNKEY_DEMO_ENABLED"]) {
+    if (env[flag] && !["true", "false"].includes(env[flag])) {
+      throw new Error(`${flag} must be true, false, or unset`);
+    }
+    if (env[flag] === "true" && !env.UNKEY_DEPLOY_ROOT_KEY) {
+      throw new Error(`UNKEY_DEPLOY_ROOT_KEY is required when ${flag}=true`);
+    }
   }
   for (const key of [
     "GH_TOKEN",
@@ -409,6 +416,12 @@ export async function release({
   };
   const unkeyPlans = [];
   for (const service of unkeyServices) {
+    if (service.name.startsWith("demo-") && env.UNKEY_DEMO_ENABLED !== "true") {
+      await report(
+        `unkey: ${service.name} release disabled; set UNKEY_DEMO_ENABLED=true to enable`
+      );
+      continue;
+    }
     if (
       service.name === "ai-traffic-ingest" &&
       env.UNKEY_INGEST_ENABLED !== "true"

@@ -97,6 +97,7 @@
         "@notra/webhooks": "workspace:*",
         "@opentelemetry/api": "^1.9.1",
         "@opentelemetry/sdk-node": "^0.220.0",
+        "@resvg/resvg-js": "^2.6.2",
         "@unkey/api": "^2.3.0",
         "@upstash/ratelimit": "catalog:",
         "@upstash/redis": "catalog:",

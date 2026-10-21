@@ -15,7 +15,7 @@ function originOf(value: string | undefined): string | null {
  * The demo session cookie is SameSite=None (the demo runs in an iframe), so
  * the browser attaches it to cross-site posts too. State-changing demo
  * routes only accept requests the demo's own pages sent. `request.url`
- * carries the bind address behind Railway, so the public host comes from
+ * can carry the bind address behind a reverse proxy, so the public host comes from
  * the forwarded headers; requests without either header (curl) pass, since
  * they can't carry a victim's cookie.
  */

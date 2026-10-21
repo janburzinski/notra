@@ -5,9 +5,13 @@ import { release } from "./production-deploy.mjs";
 
 function fixture({
   dryRun = false,
+  preflightOnly = false,
   changed = () => true,
   override,
   api = false,
+  demo = false,
+  ingest = false,
+  envOverrides = {},
   apiStatus = 200,
   liveToolchain = "toolchain-1",
   toolchain = { version: "toolchain-1", snapshotId: null },
@@ -33,7 +37,10 @@ function fixture({
     UPSTASH_BOX_API_KEY: "test-box",
     CLOUDFLARE_API_TOKEN: "test-cloudflare",
     CLOUDFLARE_ACCOUNT_ID: "test-account",
-    ...(api ? { UNKEY_DEPLOY_ROOT_KEY: "test-unkey" } : {}),
+    ...(api || demo || ingest ? { UNKEY_DEPLOY_ROOT_KEY: "test-unkey" } : {}),
+    ...(demo ? { UNKEY_DEMO_ENABLED: "true" } : {}),
+    ...(ingest ? { UNKEY_INGEST_ENABLED: "true" } : {}),
+    ...envOverrides,
   };
   const fetchImpl = async (input, options) => {
     const url = new URL(input);
@@ -104,26 +111,45 @@ function fixture({
           };
         }
       } else if (url.hostname === "api.unkey.com") {
+        let demoApp;
+        if (body.search === "demo.usenotra.com") {
+          demoApp = "demo-dashboard";
+        } else if (body.search === "demo-api.usenotra.com") {
+          demoApp = "demo-api";
+        } else if (body.search === "ingest.usenotra.com") {
+          demoApp = "ai-traffic-ingest";
+        } else if (body.app === "app_ai-traffic-ingest") {
+          demoApp = "ai-traffic-ingest";
+        } else if (body.app?.startsWith("app_demo-")) {
+          demoApp = body.app.slice(4);
+        } else {
+          demoApp =
+            /^(?:live|new)-(demo-api|demo-dashboard|ai-traffic-ingest)$/.exec(
+              body.deploymentId ?? ""
+            )?.[1];
+        }
+        const suffix = demoApp ?? "test";
+        const slug = demoApp ?? "api";
         assert.equal(options.headers.Authorization, "Bearer test-unkey");
         switch (url.pathname) {
           case "/v2/domains.listDomains":
             data = [
               {
-                domain: "api.usenotra.com",
+                domain: body.search,
                 status: "verified",
                 projectId: "proj_test",
-                appId: "app_test",
+                appId: `app_${suffix}`,
                 environmentId: "env_test",
               },
             ];
             break;
           case "/v2/apps.getApp":
             data = {
-              id: "app_test",
-              slug: "api",
+              id: `app_${suffix}`,
+              slug,
               git: { repository: "usenotra/notra", defaultBranch: "main" },
               isRolledBack: false,
-              currentDeploymentId: "live-api",
+              currentDeploymentId: `live-${slug}`,
             };
             break;
           case "/v2/environments.getEnvironment":
@@ -138,7 +164,7 @@ function fixture({
             data = [];
             break;
           case "/v3/deployments.createDeployment":
-            data = { deploymentId: "new-api" };
+            data = { deploymentId: `new-${slug}` };
             break;
           case "/v2/deployments.getDeployment":
             data = {
@@ -146,10 +172,11 @@ function fixture({
               status: "ready",
               isCurrent: true,
               project: "notra",
-              app: "api",
+              app: slug,
               environment: "production",
               git: {
-                commitSha: body.deploymentId === "new-api" ? sha : previousSha,
+                commitSha:
+                  body.deploymentId === `new-${slug}` ? sha : previousSha,
               },
             };
             break;
@@ -192,6 +219,7 @@ function fixture({
     run: () =>
       release({
         env,
+        preflightOnly,
         fetchImpl,
         sleep: async () => {},
         execFile: () => {},
@@ -574,6 +602,185 @@ test("Unkey is opt-in and does not call its API without a deployment key", async
   await run();
   assert.ok(calls.every(({ url }) => url.hostname !== "api.unkey.com"));
 });
+
+for (const demoFlag of [undefined, "", "false", "true"]) {
+  for (const ingest of [false, true]) {
+    test(`shared key keeps demo=${String(demoFlag)} independent of ingest=${ingest}`, async () => {
+      const { run, calls } = fixture({
+        api: true,
+        ingest,
+        envOverrides: { UNKEY_DEMO_ENABLED: demoFlag },
+      });
+      await run();
+      assert.deepEqual(
+        [
+          ...new Set(
+            calls
+              .filter(({ url }) => url.pathname === "/v2/domains.listDomains")
+              .map(({ body }) => body.search)
+          ),
+        ],
+        [
+          "api.usenotra.com",
+          ...(ingest ? ["ingest.usenotra.com"] : []),
+          ...(demoFlag === "true"
+            ? ["demo-api.usenotra.com", "demo.usenotra.com"]
+            : []),
+        ]
+      );
+      const railwayIds = builds(calls)
+        .filter(({ url }) => url.hostname === "backboard.railway.com")
+        .map(({ body }) => body.variables.serviceId);
+      assert.equal(
+        railwayIds.includes("9cb261a4-7d94-446f-8523-84a4b75cbb3d"),
+        demoFlag !== "true"
+      );
+      assert.equal(
+        railwayIds.includes("17ba5ec0-ec2e-412d-aa2c-61b23f37b40a"),
+        demoFlag !== "true"
+      );
+      assert.equal(
+        railwayIds.includes("2d259982-cccc-488d-b2ba-77b12fd3e854"),
+        !ingest
+      );
+    });
+  }
+}
+
+for (const flag of ["UNKEY_DEMO_ENABLED", "UNKEY_INGEST_ENABLED"]) {
+  for (const value of ["true", "TRUE", "0", " false "]) {
+    test(`${flag}=${value} rejects invalid or missing-key activation before HTTP or builds`, async () => {
+      const { run, calls, toolchainBuilds } = fixture({
+        envOverrides: { [flag]: value },
+      });
+      await assert.rejects(
+        run(),
+        value === "true"
+          ? new RegExp(`UNKEY_DEPLOY_ROOT_KEY is required when ${flag}=true`)
+          : new RegExp(`${flag} must be true, false, or unset`)
+      );
+      assert.equal(calls.length, 0);
+      assert.equal(toolchainBuilds.length, 0);
+    });
+  }
+}
+
+test("demo apps deploy to Unkey, never Railway, with the shared deployment key", async () => {
+  const { run, calls, sha } = fixture({ demo: true });
+  await run();
+  const deployments = builds(calls).filter(
+    ({ url }) => url.hostname === "api.unkey.com"
+  );
+  assert.deepEqual(
+    deployments.map(({ body }) => body.app),
+    ["app_test", "app_demo-api", "app_demo-dashboard"]
+  );
+  for (const { body } of deployments) {
+    assert.deepEqual(body.git, { branch: "main", commitSha: sha });
+  }
+  const railwayCalls = calls.filter(
+    ({ url }) => url.hostname === "backboard.railway.com"
+  );
+  assert.ok(railwayCalls.length > 0);
+  for (const { body } of railwayCalls) {
+    const serviceId =
+      body.variables.serviceId ?? body.variables.input?.serviceId;
+    if (serviceId) {
+      assert.equal(serviceId, "2d259982-cccc-488d-b2ba-77b12fd3e854");
+    }
+  }
+  assert.ok(calls.indexOf(deployments[0]) < calls.indexOf(deployments[1]));
+  assert.ok(calls.indexOf(deployments[1]) < calls.indexOf(deployments[2]));
+});
+
+test("demo dry run validates both domains without starting builds", async () => {
+  const { run, calls, toolchainBuilds } = fixture({ demo: true, dryRun: true });
+  await run();
+  assert.deepEqual(
+    calls
+      .filter(({ url }) => url.pathname === "/v2/domains.listDomains")
+      .map(({ body }) => body.search),
+    ["api.usenotra.com", "demo-api.usenotra.com", "demo.usenotra.com"]
+  );
+  assert.equal(builds(calls).length, 0);
+  assert.equal(toolchainUpserts(calls).length, 0);
+  assert.equal(toolchainBuilds.length, 0);
+});
+
+test("demo preflight checks both targets before local builds and never falls back on permission failure", async () => {
+  const { run, calls, toolchainBuilds } = fixture({
+    demo: true,
+    preflightOnly: true,
+    apiStatus: ({ body }) => (body?.search === "demo.usenotra.com" ? 403 : 200),
+  });
+  await assert.rejects(run(), /unkey v2\/domains.listDomains: HTTP 403/);
+  assert.equal(builds(calls).length, 0);
+  assert.equal(toolchainBuilds.length, 0);
+  assert.ok(calls.every(({ url }) => url.hostname !== "backboard.railway.com"));
+});
+
+test("unchanged demo apps do not create Unkey deployments", async () => {
+  const { run, calls } = fixture({ demo: true, changed: () => false });
+  await run();
+  assert.equal(builds(calls).length, 0);
+});
+
+for (const app of ["demo-api", "demo-dashboard"]) {
+  test(`${app} invalid domain blocks all builds`, async () => {
+    const { run, calls } = fixture({
+      demo: true,
+      override: ({ url, body }) =>
+        url.pathname === "/v2/domains.listDomains" &&
+        body.search ===
+          (app === "demo-api" ? "demo-api.usenotra.com" : "demo.usenotra.com")
+          ? []
+          : undefined,
+    });
+    await assert.rejects(run(), /cannot identify verified/);
+    assert.equal(builds(calls).length, 0);
+  });
+
+  test(`${app} wrong repository blocks all builds`, async () => {
+    const { run, calls } = fixture({
+      demo: true,
+      override: ({ url, body }) =>
+        url.pathname === "/v2/apps.getApp" && body.app === `app_${app}`
+          ? {
+              id: body.app,
+              git: { repository: "other/repo", defaultBranch: "main" },
+            }
+          : undefined,
+    });
+    await assert.rejects(run(), /must track this repository/);
+    assert.equal(builds(calls).length, 0);
+  });
+
+  test(`${app} failed deployment prevents subsequent provider deployments`, async () => {
+    const { run, calls } = fixture({
+      demo: true,
+      override: ({ url, body }) =>
+        url.pathname === "/v2/deployments.getDeployment" &&
+        body.deploymentId === `new-${app}`
+          ? {
+              id: body.deploymentId,
+              app,
+              project: "notra",
+              environment: "production",
+              status: "failed",
+            }
+          : undefined,
+    });
+    await assert.rejects(run(), new RegExp(`${app} deployment ended failed`));
+    assert.ok(
+      builds(calls).every(({ url }) => url.hostname !== "backboard.railway.com")
+    );
+    if (app === "demo-api") {
+      assert.ok(
+        builds(calls).every(({ body }) => body.app !== "app_demo-dashboard")
+      );
+    }
+  });
+}
 
 test("Unkey discovers the verified production domain and deploys the pinned commit", async () => {
   const { run, calls, sha, directories } = fixture({ api: true });

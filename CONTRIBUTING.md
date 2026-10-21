@@ -483,6 +483,156 @@ GEO's OpenCode, Claude Code, Codex, and FX engines require both `UPSTASH_BOX_API
 sandbox access and `AI_GATEWAY_API_KEY` for model calls through Vercel AI
 Gateway. They do not use Upstash's managed LLM key or its spending allowance.
 
+## Demo deployments on Unkey Compute
+
+The demo has two **separate** Unkey Compute apps. Both use this monorepo as
+their source; neither should use automatic language detection.
+
+| Setting | Demo dashboard | Demo API |
+| --- | --- | --- |
+| Repository / branch | `usenotra/notra` / `main` | `usenotra/notra` / `main` |
+| Root directory (Docker build context) | `.` | `.` |
+| Dockerfile | `apps/dashboard/Dockerfile` | `apps/api/Dockerfile` |
+| Port | `3000` | `3000` |
+| Health check | `GET /api/healthcheck` | `GET /ping` |
+| Custom domain | `demo.usenotra.com` | `demo-api.usenotra.com` |
+
+Leave the runtime command unset to use each Dockerfile's exec-form `CMD`.
+Both servers honor Unkey's injected `PORT`; do not set `NITRO_PORT` or
+`NITRO_HOST` overrides. Start the dashboard with one replica in one region,
+without scale-to-zero. It retains the existing file-backed Workflow Local
+World: files go to `/tmp/notra-workflows`, not a persistent disk. In-flight
+workflows/streams can be lost on restart or deployment. Database-backed demo
+sandboxes survive, but this is **not** a durable multi-replica workflow setup.
+Use a shared production Workflow World before enabling multiple dashboard
+replicas or requiring jobs to survive deployments. Unkey's ephemeral disk
+does not solve cross-instance workflow storage.
+
+### Environment and database
+
+Import the **demo-only** configuration separately into each app's production
+environment. Do not import the main product's `.env` or WorkOS credentials.
+`isDemoMode()` intentionally returns false if `WORKOS_API_KEY` is set. Leave
+`WORKOS_API_KEY` and `DEV_AUTH_ENABLED` unset on both apps, and do not share
+production Postgres, Redis, or API-management credentials with the demo.
+
+Both apps need:
+
+```dotenv
+NOTRA_DEMO_MODE=true
+DATABASE_URL=postgresql://...demo-only-database...
+UPSTASH_REDIS_REST_URL=https://...demo-only-redis...
+UPSTASH_REDIS_REST_TOKEN=...
+UNKEY_ROOT_KEY=...demo-api-management-root-key...
+UNKEY_API_ID=...demo-keyspace-id...
+INTEGRATION_ENCRYPTION_KEY=...demo-only-key...
+WORKFLOW_BASE_URL=https://demo.usenotra.com
+```
+
+The dashboard also needs:
+
+```dotenv
+NEXT_PUBLIC_NOTRA_DEMO_MODE=true
+NEXT_PUBLIC_NOTRA_DEMO_API_URL=https://demo-api.usenotra.com
+APP_URL=https://demo.usenotra.com
+NEXT_PUBLIC_APP_URL=https://demo.usenotra.com
+NEXT_PUBLIC_SITE_URL=https://www.usenotra.com
+WORKOS_COOKIE_PASSWORD=...random-demo-only-secret-at-least-32-characters...
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=...demo-widget-site-key...
+TURNSTILE_SECRET=...matching-demo-widget-secret...
+TURNSTILE_HOSTNAMES=demo.usenotra.com
+```
+
+The API also needs `NOTRA_DEMO_DASHBOARD_ORIGIN=https://demo.usenotra.com`
+for CORS and `NOTRA_DEMO_API_URL=https://demo-api.usenotra.com`. Its current
+startup validation also requires `AUTUMN_SECRET_KEY` and `QSTASH_TOKEN`; use
+demo/test credentials, not production credentials. Keep any optional services
+the demo uses (for example logging, object storage, QStash signing keys) scoped
+to demo as well. The dashboard's optional
+`NEXT_PUBLIC_DATABUDDY_DEMO_DASHBOARD_WEBSITE_ID` is a public build value.
+
+Unkey provides these variables at build time via its BuildKit secret mount.
+The dashboard Dockerfile declares `UNKEY_SECRETS_ID` and sources that file in
+the build step. `NEXT_PUBLIC_*` values are compiled into browser assets;
+redeploy after changing them. Never put secrets in public variables or Docker
+build arguments. The API reads its configuration at runtime.
+
+Both apps must point at the **same dedicated demo Postgres database**. Use
+the existing demo database if retaining sessions, or initialize a new empty
+one with the committed migrations **before starting either app**. From a
+trusted shell with only the demo connection exported:
+
+```bash
+# DATABASE_URL must point to the demo database, never the main product database.
+bun run db:migrate
+```
+
+Alternatively, run `/migrate/run.sh` as an entrypoint override on the built
+dashboard image with `MIGRATION_DATABASE_URL` set to a direct demo connection.
+Do not run migrations during image builds or on every replica's startup.
+The scheduled release does not run demo migrations; apply new compatible
+migrations before releasing changes that need them. Sandbox seeding and
+pool cleanup happen on visitor requests, not through a Railway/Vercel cron.
+
+### First deployment and cutover
+
+1. Create both Unkey apps with the settings and demo environment above.
+   Leave gateway API-key authentication policies **off**: the dashboard is
+   anonymous, and the API performs its own key checks. Do not add a gateway
+   policy that blocks public probes, CORS preflights, or streaming responses.
+2. Apply demo migrations, deploy the API, then deploy the dashboard. Verify
+   both probes on their Unkey domains before touching DNS. For a functional
+   test before cutover, use the temporary Unkey dashboard/API URLs consistently
+   in the environment above (including the API's dashboard origin), rebuild,
+   then restore the custom-domain URLs and rebuild for cutover.
+3. Attach and verify the two custom domains using the DNS records Unkey gives
+   you. Keep any Cloudflare proxy configuration consistent with the demo's
+   embedding and streaming requirements. Client-IP limits use Unkey's
+   overwritten `X-Forwarded-For`, and only trust `CF-Connecting-IP` when that
+   peer is a Cloudflare edge. Do not override `UNKEY_DEPLOYMENT_ID` yourself.
+4. Check `/api/healthcheck` (including `commitSha`) and `/ping`, then open
+   the demo directly and inside the landing-page iframe. Verify anonymous
+   entry, seeded GEO data, sandbox reset, a generated demo API key, a real
+   request from the API console, request-log updates, and one streaming chat
+   or content-generation run. A green liveness probe alone is not sufficient.
+5. Keep Railway available for rollback until those checks pass. Only explicit
+   activation below removes its two demo services from the scheduled release;
+   it does **not** delete them or modify DNS. Disable any old independent deployment triggers
+   and update the private infra repository before eventually retiring them.
+
+For scheduled releases, use the existing GitHub Actions secret `UNKEY_DEPLOY_ROOT_KEY`
+with read access to every enabled Unkey app, its production environment, domains and
+deployments, and write access to its deployment collection. All Unkey releases use
+this single shared CI credential, separate from runtime `UNKEY_ROOT_KEY`.
+After both custom domains are verified and have a current healthy deployment,
+set GitHub Actions repository **variable** `UNKEY_DEMO_ENABLED=true` and
+run **Production deploy** with `dry_run` checked. Then disable production
+**Auto deploy** on both demo apps (keep their GitHub connection) and run a real
+release. The script checks both targets before any builds, deploys demo API
+before dashboard, and verifies the exact checked commit is current. Without
+explicit activation (unset, empty, or exact `false`), both Railway demo releases
+remain unchanged, even when the shared key exists. Exact `true` requires the shared
+key and releases both demo apps on Unkey instead of Railway; invalid flags or a
+missing key fail before HTTP requests or builds. Inaccessible Unkey targets fail
+closed, without permission-error fallback. The ingest flag is independent.
+Keep this CI-only variable out of runtime `.env` and Turbo configuration.
+To roll back release routing, unset the demo variable or set it to `false`; this
+does not switch DNS, move data, or roll back a running deployment. Restore and
+verify the intended provider/domain separately using only demo/test credentials.
+
+References: [Docker build secrets](https://www.unkey.com/docs/compute/build/build-secrets),
+[runtime variables](https://www.unkey.com/docs/compute/configure/environment-variables),
+and [proxy headers](https://www.unkey.com/docs/compute/networking/request-lifecycle).
+
+After a node-server demo build, run `bun run test:demo-production` from
+`apps/dashboard`. It boots a copy of only `.output` from a temporary directory
+without credentials or a database, and checks the injected port, health commit,
+HTTPS proxy redirects, and graceful shutdown. It does not replace the functional
+checks against dedicated demo services above.
+For the API, run `bun run build && bun run test:production` from `apps/api`.
+The build packages the external SVG renderer and its native binding in `dist`;
+the test verifies those imports from an isolated copy without credentials.
+
 ## Production releases and Vercel build selection
 
 All five Vercel app configurations disable automatic Git deployments with
@@ -538,14 +688,14 @@ failures in the Actions summary. Polling is limited to ten minutes
 per project. Each enabled Unkey service has a 20-minute polling limit, followed
 by a 20-minute Railway phase. All phases, preflight and local builds share the
 workflow's 120-minute job limit; that limit can expire before every provider's
-individual polling allowance is exhausted when both Unkey services are enabled.
+individual polling allowance is exhausted when multiple Unkey services are enabled.
 Projects deploy independently; a failed project does not roll back another
 project's successful deployment.
 Deployment creation is not automatically retried, since a timed-out request may
 already have started a build.
 
-The same release also deploys the Railway services `dashboard` and `demo-api`
-(project notra-demo, serving demo.usenotra.com) and `ai-traffic-ingest`
+The same release also deploys Railway's demo dashboard and demo API (project
+notra-demo), unless `UNKEY_DEMO_ENABLED=true`, and `ai-traffic-ingest`
 (project notra-prod), unless the optional Unkey ingest release below is enabled.
 Their main-branch deployment triggers are removed, so
 pushes to `main` no longer deploy them; keep the GitHub repository connected so
@@ -563,12 +713,12 @@ unless each deployment reaches `SUCCESS` with the release SHA. Railway watch
 patterns must stay unset: a deployment skipped by them would leave a service
 behind production and fails the release.
 
-Railway service settings for demo, ingest and the monitoring stack live as
+Railway service settings for ingest, legacy demo services and the monitoring stack live as
 infrastructure as code in the private `usenotra/infra` repository. It does not
 apply on merge or replace this release workflow.
 
 The production API at `api.usenotra.com` is hosted on Unkey Compute, not the
-Railway `demo-api` service. Its scheduled release is opt-in: add the GitHub Actions
+demo API. Its scheduled release is opt-in: add the GitHub Actions
 secret `UNKEY_DEPLOY_ROOT_KEY` to enable it. Without that secret, the workflow
 reports that the API remains outside the scheduled release and continues releasing
 the other services. Use a separate deployment root key from the API's runtime
@@ -583,7 +733,7 @@ prevent all new builds; the script does not fall back to an unrelated project.
 Give the Compute-workspace root key read access to this app, its production
 environment, domains and deployments, and write access to its deployment
 collection. It does not need environment-variable access, environment-setting
-write access, or permissions to other apps. See the
+write access; extend the same key to other apps only when enabling their releases. See the
 [root-key permission reference](https://unkey.com/docs/platform/root-keys/permission-reference).
 
 To activate after merging, add the secret and run **Production deploy** with
@@ -637,7 +787,7 @@ An unset/empty ingest variable or exact `false` leaves Railway ingest preflight
 and deployment unchanged. Exact `true` selects Unkey ingest and requires the
 shared deployment key; a missing key or malformed nonempty flag aborts before
 any provider requests or builds. Enabling ingest removes **only** `ai-traffic-ingest`
-from the Railway release list; demo dashboard and demo API are unchanged.
+from the Railway release list; `UNKEY_DEMO_ENABLED` separately controls both demo services.
 
 Preflight runs before CI's local builds, again before provider builds, and each
 Unkey target is rechecked immediately before its deployment. A failed Unkey

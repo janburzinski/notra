@@ -9,9 +9,13 @@ COPY patches ./patches
 COPY apps/agent/package.json ./apps/agent/package.json
 COPY apps/ai-traffic-ingest/package.json ./apps/ai-traffic-ingest/package.json
 COPY apps/api/package.json ./apps/api/package.json
+COPY apps/console/package.json ./apps/console/package.json
 COPY apps/dashboard/package.json ./apps/dashboard/package.json
 COPY apps/docs/package.json ./apps/docs/package.json
+COPY apps/evals/package.json ./apps/evals/package.json
 COPY apps/onboarding-agent/package.json ./apps/onboarding-agent/package.json
+COPY apps/sites/package.json ./apps/sites/package.json
+COPY apps/sites-builder/package.json ./apps/sites-builder/package.json
 COPY apps/ui/package.json ./apps/ui/package.json
 COPY apps/web/package.json ./apps/web/package.json
 COPY packages/ai/package.json ./packages/ai/package.json
@@ -32,7 +36,7 @@ COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/utils/package.json ./packages/utils/package.json
 COPY packages/webhooks/package.json ./packages/webhooks/package.json
 
-RUN --mount=type=cache,target=/root/.bun/install/cache bun install --ignore-scripts --filter api
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --ignore-scripts --filter api
 
 FROM deps AS builder
 
@@ -56,7 +60,7 @@ FROM oven/bun:1.4.0-alpine@sha256:07235578f79ef8c6f97d94aee7938e76f5cdba5f21ae5d
 
 WORKDIR /app
 
-COPY --from=builder /app/apps/api/dist/index.mjs ./dist/index.mjs
+COPY --from=builder /app/apps/api/dist ./dist
 
 USER bun
 

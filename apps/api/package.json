@@ -3,10 +3,11 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=development bun --watch src/index.ts",
-    "build": "tsup",
+    "build": "tsup && bun scripts/copy-runtime-deps.mjs",
     "start": "node dist/index.mjs",
     "check-types": "bunx tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
     "test": "bun test tests",
+    "test:production": "bun test scripts/production-artifact.test.ts",
     "knip": "knip"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "@notra/webhooks": "workspace:*",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/sdk-node": "^0.220.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@unkey/api": "^2.3.0",
     "@upstash/ratelimit": "catalog:",
     "@upstash/redis": "catalog:",
