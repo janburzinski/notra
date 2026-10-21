@@ -1,6 +1,7 @@
 import type { ClearOnRevocationConfig, Script } from "c15t";
 
 const DUB_COOKIE_DOMAIN = ".usenotra.com";
+const DUB_REFERRAL_DOMAIN = "affiliate.usenotra.com";
 
 export const DUB_CLICK_ID_COOKIE = "dub_id";
 export const DUB_CUSTOMER_EXTERNAL_ID_METADATA_KEY = "dubCustomerExternalId";
@@ -17,6 +18,7 @@ export const DUB_ANALYTICS_SCRIPTS: Script[] = [
     attributes: {
       "data-publishable-key": "dub_pk_m49orh8wTqG4U3ZdNLXOcCUH",
       "data-cookie-options": JSON.stringify({ domain: DUB_COOKIE_DOMAIN }),
+      "data-domains": JSON.stringify({ refer: DUB_REFERRAL_DOMAIN }),
     },
   },
 ];
