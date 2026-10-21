@@ -86,6 +86,11 @@ const LEGAL_PAGES = [
     filename: "terms.mdx",
   },
   {
+    pattern: "/partner-terms",
+    title: "Partner Terms and Conditions",
+    filename: "partner-terms.mdx",
+  },
+  {
     pattern: "/legal",
     title: "Legal Notice",
     filename: "legal.mdx",

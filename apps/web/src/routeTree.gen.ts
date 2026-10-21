@@ -63,6 +63,7 @@ import { Route as V1StatusRouteImport } from './routes/v1/status'
 import { Route as DotwellKnownMcpIndexRouteImport } from './routes/[.]well-known/mcp/index'
 import { Route as DotwellKnownMcpServerCardDotjsonRouteImport } from './routes/[.]well-known/mcp/server-card[.]json'
 import { Route as SiteLegalLegalRouteImport } from './routes/_site/_legal/legal'
+import { Route as SiteLegalPartnerTermsRouteImport } from './routes/_site/_legal/partner-terms'
 import { Route as SiteLegalPrivacyRouteImport } from './routes/_site/_legal/privacy'
 import { Route as SiteLegalTermsRouteImport } from './routes/_site/_legal/terms'
 import { Route as SiteCompareIndexRouteImport } from './routes/_site/compare/index'
@@ -384,6 +385,11 @@ const DotwellKnownMcpServerCardDotjsonRoute =
 const SiteLegalLegalRoute = SiteLegalLegalRouteImport.update({
   id: '/legal',
   path: '/legal',
+  getParentRoute: () => SiteLegalRoute,
+} as any)
+const SiteLegalPartnerTermsRoute = SiteLegalPartnerTermsRouteImport.update({
+  id: '/partner-terms',
+  path: '/partner-terms',
   getParentRoute: () => SiteLegalRoute,
 } as any)
 const SiteLegalPrivacyRoute = SiteLegalPrivacyRouteImport.update({
@@ -708,6 +714,7 @@ export interface FileRoutesByFullPath {
   '/v1/': typeof V1IndexRoute
   '/.well-known/mcp/server-card.json': typeof DotwellKnownMcpServerCardDotjsonRoute
   '/legal': typeof SiteLegalLegalRoute
+  '/partner-terms': typeof SiteLegalPartnerTermsRoute
   '/privacy': typeof SiteLegalPrivacyRoute
   '/terms': typeof SiteLegalTermsRoute
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
@@ -809,6 +816,7 @@ export interface FileRoutesByTo {
   '/v1': typeof V1IndexRoute
   '/.well-known/mcp/server-card.json': typeof DotwellKnownMcpServerCardDotjsonRoute
   '/legal': typeof SiteLegalLegalRoute
+  '/partner-terms': typeof SiteLegalPartnerTermsRoute
   '/privacy': typeof SiteLegalPrivacyRoute
   '/terms': typeof SiteLegalTermsRoute
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
@@ -916,6 +924,7 @@ export interface FileRoutesById {
   '/v1/': typeof V1IndexRoute
   '/.well-known/mcp/server-card.json': typeof DotwellKnownMcpServerCardDotjsonRoute
   '/_site/_legal/legal': typeof SiteLegalLegalRoute
+  '/_site/_legal/partner-terms': typeof SiteLegalPartnerTermsRoute
   '/_site/_legal/privacy': typeof SiteLegalPrivacyRoute
   '/_site/_legal/terms': typeof SiteLegalTermsRoute
   '/_site/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
@@ -1019,6 +1028,7 @@ export interface FileRouteTypes {
     | '/v1/'
     | '/.well-known/mcp/server-card.json'
     | '/legal'
+    | '/partner-terms'
     | '/privacy'
     | '/terms'
     | '/contributors/opengraph-image'
@@ -1120,6 +1130,7 @@ export interface FileRouteTypes {
     | '/v1'
     | '/.well-known/mcp/server-card.json'
     | '/legal'
+    | '/partner-terms'
     | '/privacy'
     | '/terms'
     | '/contributors/opengraph-image'
@@ -1226,6 +1237,7 @@ export interface FileRouteTypes {
     | '/v1/'
     | '/.well-known/mcp/server-card.json'
     | '/_site/_legal/legal'
+    | '/_site/_legal/partner-terms'
     | '/_site/_legal/privacy'
     | '/_site/_legal/terms'
     | '/_site/contributors/opengraph-image'
@@ -1708,6 +1720,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteLegalLegalRouteImport
       parentRoute: typeof SiteLegalRoute
     }
+    '/_site/_legal/partner-terms': {
+      id: '/_site/_legal/partner-terms'
+      path: '/partner-terms'
+      fullPath: '/partner-terms'
+      preLoaderRoute: typeof SiteLegalPartnerTermsRouteImport
+      parentRoute: typeof SiteLegalRoute
+    }
     '/_site/_legal/privacy': {
       id: '/_site/_legal/privacy'
       path: '/privacy'
@@ -2119,12 +2138,14 @@ const SiteChangelogRouteWithChildren = SiteChangelogRoute._addFileChildren(
 
 interface SiteLegalRouteChildren {
   SiteLegalLegalRoute: typeof SiteLegalLegalRoute
+  SiteLegalPartnerTermsRoute: typeof SiteLegalPartnerTermsRoute
   SiteLegalPrivacyRoute: typeof SiteLegalPrivacyRoute
   SiteLegalTermsRoute: typeof SiteLegalTermsRoute
 }
 
 const SiteLegalRouteChildren: SiteLegalRouteChildren = {
   SiteLegalLegalRoute: SiteLegalLegalRoute,
+  SiteLegalPartnerTermsRoute: SiteLegalPartnerTermsRoute,
   SiteLegalPrivacyRoute: SiteLegalPrivacyRoute,
   SiteLegalTermsRoute: SiteLegalTermsRoute,
 }

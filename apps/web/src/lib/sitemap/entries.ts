@@ -235,6 +235,10 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },
     {
+      url: `${SITE_URL}/partner-terms`,
+      lastModified: STATIC_PAGE_LAST_MODIFIED,
+    },
+    {
       url: `${SITE_URL}/legal`,
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },
