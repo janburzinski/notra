@@ -183,7 +183,6 @@ export const userBackupCodes = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    index("user_backup_codes_userId_idx").on(table.userId),
     uniqueIndex("user_backup_codes_userId_codeHash_uidx").on(
       table.userId,
       table.codeHash
@@ -219,7 +218,6 @@ export const chatSessions = pgTable(
       .notNull(),
   },
   (table) => [
-    index("chatSessions_organizationId_idx").on(table.organizationId),
     index("chatSessions_organizationId_deletedAt_idx").on(
       table.organizationId,
       table.deletedAt
@@ -367,7 +365,6 @@ export const socialConnections = pgTable(
       table.userId,
       table.provider
     ),
-    index("socialConnections_userId_idx").on(table.userId),
     index("socialConnections_provider_providerAccountId_idx").on(
       table.provider,
       table.providerAccountId
@@ -411,7 +408,6 @@ export const members = pgTable(
     createdAt: timestamp("created_at").notNull(),
   },
   (table) => [
-    index("members_organizationId_idx").on(table.organizationId),
     index("members_userId_idx").on(table.userId),
     uniqueIndex("members_organizationId_userId_uidx").on(
       table.organizationId,
@@ -445,7 +441,6 @@ export const githubAppInstallations = pgTable(
       .notNull(),
   },
   (table) => [
-    index("githubAppInstallations_organizationId_idx").on(table.organizationId),
     index("githubAppInstallations_createdByUserId_idx").on(
       table.createdByUserId
     ),
@@ -491,7 +486,6 @@ export const githubIntegrations = pgTable(
       .notNull(),
   },
   (table) => [
-    index("githubIntegrations_organizationId_idx").on(table.organizationId),
     index("githubIntegrations_createdByUserId_idx").on(table.createdByUserId),
     uniqueIndex("githubIntegrations_organization_owner_repo_uidx").on(
       table.organizationId,
@@ -538,7 +532,6 @@ export const linearIntegrations = pgTable(
       .notNull(),
   },
   (table) => [
-    index("linearIntegrations_organizationId_idx").on(table.organizationId),
     index("linearIntegrations_createdByUserId_idx").on(table.createdByUserId),
     uniqueIndex("linearIntegrations_org_linearOrg_team_uidx").on(
       table.organizationId,
@@ -682,7 +675,6 @@ export const mcpServerIntegrations = pgTable(
     ),
     index("mcpServerIntegrations_resourceType_idx").on(table.resourceType),
     index("mcpServerIntegrations_storeStatus_idx").on(table.storeStatus),
-    index("mcpServerIntegrations_organizationId_idx").on(table.organizationId),
     index("mcpServerIntegrations_createdByUserId_idx").on(
       table.createdByUserId
     ),
@@ -914,11 +906,6 @@ export const mcpSessionToolActivations = pgTable(
       table.surface,
       table.mcpToolIndexId
     ),
-    index("mcpSessionToolActivations_session_idx").on(
-      table.organizationId,
-      table.sessionId,
-      table.surface
-    ),
     index("mcpSessionToolActivations_expiresAt_idx").on(table.expiresAt),
     foreignKey({
       columns: [table.organizationId, table.mcpToolIndexId],
@@ -952,7 +939,6 @@ export const contentTriggers = pgTable(
       .notNull(),
   },
   (table) => [
-    index("contentTriggers_organizationId_idx").on(table.organizationId),
     uniqueIndex("contentTriggers_organization_dedupe_uidx").on(
       table.organizationId,
       table.dedupeHash
@@ -1024,7 +1010,6 @@ export const repositoryOutputs = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    index("repositoryOutputs_repositoryId_idx").on(table.repositoryId),
     uniqueIndex("repositoryOutputs_repository_outputType_uidx").on(
       table.repositoryId,
       table.outputType
@@ -1067,7 +1052,6 @@ export const brandSettings = pgTable(
     uniqueIndex("brandSettings_org_default_uidx")
       .on(table.organizationId)
       .where(sql`${table.isDefault} = true`),
-    index("brandSettings_organizationId_idx").on(table.organizationId),
   ]
 );
 
@@ -1174,7 +1158,6 @@ export const brandReferences = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandReferences_brandSettingsId_idx").on(table.brandSettingsId),
     index("brandReferences_brandSettingsId_sourceUrl_idx").on(
       table.brandSettingsId,
       table.sourceUrl
@@ -1232,7 +1215,6 @@ export const brandGuidelineColors = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandGuidelineColors_guidelineId_idx").on(table.guidelineId),
     index("brandGuidelineColors_guideline_role_idx").on(
       table.guidelineId,
       table.role
@@ -1261,7 +1243,6 @@ export const brandGuidelineFonts = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandGuidelineFonts_guidelineId_idx").on(table.guidelineId),
     index("brandGuidelineFonts_guideline_role_idx").on(
       table.guidelineId,
       table.role
@@ -1289,7 +1270,6 @@ export const brandGuidelineTokens = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandGuidelineTokens_guidelineId_idx").on(table.guidelineId),
     index("brandGuidelineTokens_guideline_type_idx").on(
       table.guidelineId,
       table.type
@@ -1323,11 +1303,6 @@ export const brandGuidelineAssets = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandGuidelineAssets_guidelineId_idx").on(table.guidelineId),
-    index("brandGuidelineAssets_guideline_kind_idx").on(
-      table.guidelineId,
-      table.kind
-    ),
     uniqueIndex("brandGuidelineAssets_guideline_kind_variant_uidx").on(
       table.guidelineId,
       table.kind,
@@ -1360,7 +1335,6 @@ export const brandGuidelineScreenshots = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandGuidelineScreenshots_guidelineId_idx").on(table.guidelineId),
     uniqueIndex("brandGuidelineScreenshots_guideline_kind_uidx").on(
       table.guidelineId,
       table.kind
@@ -1393,7 +1367,6 @@ export const brandSitemaps = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandSitemaps_brandSettingsId_idx").on(table.brandSettingsId),
     uniqueIndex("brandSitemaps_brandSettings_url_uidx").on(
       table.brandSettingsId,
       table.url
@@ -1426,11 +1399,6 @@ export const brandSitemapPages = pgTable(
       .notNull(),
   },
   (table) => [
-    index("brandSitemapPages_sitemapId_idx").on(table.sitemapId),
-    index("brandSitemapPages_sitemap_category_idx").on(
-      table.sitemapId,
-      table.category
-    ),
     index("brandSitemapPages_sitemap_category_wordCount_idx").on(
       table.sitemapId,
       table.category,
@@ -1464,9 +1432,6 @@ export const connectedSocialAccounts = pgTable(
       .notNull(),
   },
   (table) => [
-    index("connectedSocialAccounts_organizationId_idx").on(
-      table.organizationId
-    ),
     uniqueIndex("connectedSocialAccounts_org_provider_account_uidx").on(
       table.organizationId,
       table.provider,
@@ -1496,7 +1461,6 @@ export const trackedSocialAccounts = pgTable(
       .notNull(),
   },
   (table) => [
-    index("trackedSocialAccounts_organizationId_idx").on(table.organizationId),
     uniqueIndex("trackedSocialAccounts_org_provider_account_uidx").on(
       table.organizationId,
       table.provider,
@@ -1570,7 +1534,6 @@ export const projects = pgTable(
       .notNull(),
   },
   (table) => [
-    index("projects_organizationId_idx").on(table.organizationId),
     uniqueIndex("projects_org_id_uidx").on(table.organizationId, table.id),
     uniqueIndex("projects_organizationId_sample_uidx")
       .on(table.organizationId)
@@ -1744,7 +1707,6 @@ export const geoPrompts = pgTable(
   },
   (table) => [
     index("geoPrompts_organizationId_idx").on(table.organizationId),
-    index("geoPrompts_projectId_idx").on(table.projectId),
     index("geoPrompts_projectId_createdAt_idx").on(
       table.projectId,
       table.createdAt.desc()
@@ -1904,7 +1866,6 @@ export const geoCompetitors = pgTable(
   },
   (table) => [
     index("geoCompetitors_organizationId_idx").on(table.organizationId),
-    index("geoCompetitors_projectId_idx").on(table.projectId),
     uniqueIndex("geoCompetitors_projectId_name_uidx").on(
       table.projectId,
       table.name
@@ -2109,7 +2070,6 @@ export const geoMentionChecks = pgTable(
     index("geoMentionChecks_sequence_turn_engine_captured_idx")
       .on(table.sequenceId, table.turn, table.engine, table.capturedAt.desc())
       .where(sql`${table.sequenceId} IS NOT NULL`),
-    index("geoMentionChecks_scanId_idx").on(table.scanId),
     index("geoMentionChecks_personaId_capturedAt_idx").on(
       table.personaId,
       table.capturedAt
@@ -2750,7 +2710,6 @@ export const contentPublications = pgTable(
       .notNull(),
   },
   (table) => [
-    index("contentPublications_organizationId_idx").on(table.organizationId),
     index("contentPublications_postId_idx").on(table.postId),
     uniqueIndex("contentPublications_repository_pullRequest_uidx").on(
       table.repositoryId,
@@ -2799,7 +2758,6 @@ export const skills = pgTable(
       .notNull(),
   },
   (table) => [
-    index("skills_organizationId_idx").on(table.organizationId),
     uniqueIndex("skills_org_name_uidx").on(table.organizationId, table.name),
   ]
 );
@@ -3985,7 +3943,6 @@ export const sites = pgTable(
       .notNull(),
   },
   (table): PgTableExtraConfigValue[] => [
-    index("sites_organizationId_idx").on(table.organizationId),
     index("sites_org_project_idx").on(table.organizationId, table.projectId),
     uniqueIndex("sites_slug_uidx").on(table.slug),
     index("sites_githubRepositoryId_idx").on(table.githubRepositoryId),
@@ -4054,7 +4011,6 @@ export const siteDomains = pgTable(
       .notNull(),
   },
   (table) => [
-    index("siteDomains_siteId_idx").on(table.siteId),
     uniqueIndex("siteDomains_site_hostname_uidx").on(
       table.siteId,
       table.hostname
@@ -4445,6 +4401,10 @@ export const autopilotFindings = pgTable(
       table.organizationId,
       table.status
     ),
+    index("autopilotFindings_organizationId_updatedAt_idx").on(
+      table.organizationId,
+      table.updatedAt
+    ),
   ]
 );
 
@@ -4499,6 +4459,10 @@ export const autopilotRunEvents = pgTable(
   (table) => [
     index("autopilotRunEvents_runId_createdAt_idx").on(
       table.runId,
+      table.createdAt
+    ),
+    index("autopilotRunEvents_organizationId_createdAt_idx").on(
+      table.organizationId,
       table.createdAt
     ),
   ]
