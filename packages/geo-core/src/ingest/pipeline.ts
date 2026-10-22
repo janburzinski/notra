@@ -362,6 +362,9 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
   defer: GeoIngestDefer,
   buffer?: GeoIngestBuffer
 ) {
+  if (identity.legacySecret) {
+    defer(() => notifyGeoIngestLegacySecret(identity));
+  }
   const payloadResult = yield* Effect.result(readPayload(body));
   if (payloadResult._tag === "Failure") {
     return yield* failWithAuthPrecedence(identity, payloadResult.failure);
@@ -412,11 +415,6 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     ],
     { concurrency: "unbounded" }
   );
-  if (identity.legacySecret) {
-    defer(() =>
-      notifyGeoIngestLegacySecret(identity.organizationId, identity.projectId)
-    );
-  }
   if (!identity.projectId && allowedHosts === null) {
     return yield* Effect.fail(
       new GeoIngestFailedError({

@@ -6,6 +6,7 @@ import { sendBrewEmail } from "@notra/email/utils/brew";
 import { and, eq, inArray } from "drizzle-orm";
 
 import {
+  GEO_INGEST_LEGACY_SECRET_CHECK_INTERVAL_SECONDS,
   GEO_INGEST_LEGACY_SECRET_DEADLINE,
   GEO_INGEST_LEGACY_SECRET_EMAILED_KEY_PREFIX,
   GEO_INGEST_LEGACY_SECRET_EMAILED_TTL_SECONDS,
@@ -13,8 +14,12 @@ import {
   GEO_INGEST_LEGACY_SECRET_SEEN_KEY_PREFIX,
   GEO_INGEST_LEGACY_SECRET_SEEN_TTL_SECONDS,
 } from "../constants/ingest";
+import { getGeoIngestTokenGeneration } from "../geo/ingest";
+import type { GeoIngestIdentity } from "../types/geo";
 import { logGeoFailure } from "../utils/geo-log";
 import { geoIngestRedis } from "./ratelimit";
+
+const recentlyChecked = new Map<string, number>();
 
 async function claim(key: string, ttlSeconds: number): Promise<boolean> {
   const result = await geoIngestRedis.set(key, 1, {
@@ -24,14 +29,7 @@ async function claim(key: string, ttlSeconds: number): Promise<boolean> {
   return result === "OK";
 }
 
-async function emailOrganization(organizationId: string): Promise<void> {
-  const emailedKey = `${GEO_INGEST_LEGACY_SECRET_EMAILED_KEY_PREFIX}:${organizationId}`;
-  if (
-    !(await claim(emailedKey, GEO_INGEST_LEGACY_SECRET_EMAILED_TTL_SECONDS))
-  ) {
-    return;
-  }
-
+async function sendRotationEmails(organizationId: string): Promise<boolean> {
   const [organization, recipients] = await Promise.all([
     db.query.organizations.findFirst({
       where: eq(organizations.id, organizationId),
@@ -45,8 +43,13 @@ async function emailOrganization(organizationId: string): Promise<void> {
       with: { users: { columns: { email: true } } },
     }),
   ]);
-  if (!organization) {
-    return;
+  if (!organization || recipients.length === 0) {
+    geoLog.warn({
+      event: "geo.ingest.legacy_secret_no_recipients",
+      organizationId,
+      organizationFound: Boolean(organization),
+    });
+    return true;
   }
 
   const results = await Promise.all(
@@ -64,36 +67,77 @@ async function emailOrganization(organizationId: string): Promise<void> {
       })
     )
   );
-  const failed = results.filter((result) => result.error);
-  if (failed.length > 0) {
-    await geoIngestRedis.del(emailedKey);
+  const errors = results.flatMap((result) =>
+    result.error ? [result.error] : []
+  );
+  const [firstError] = errors;
+  if (firstError) {
     logGeoFailure(
       "geo.ingest.legacy_secret_email_failed",
       "Token rotation email failed",
-      failed[0]?.error,
-      { organizationId, failed: failed.length }
+      new Error(`${firstError.name}: ${firstError.message}`),
+      { organizationId, failed: errors.length, status: firstError.status }
     );
+  }
+  return errors.length === 0;
+}
+
+async function emailOrganization(organizationId: string): Promise<void> {
+  const emailedKey = `${GEO_INGEST_LEGACY_SECRET_EMAILED_KEY_PREFIX}:${organizationId}`;
+  if (
+    !(await claim(emailedKey, GEO_INGEST_LEGACY_SECRET_EMAILED_TTL_SECONDS))
+  ) {
+    return;
+  }
+  let sent = false;
+  try {
+    sent = await sendRotationEmails(organizationId);
+  } finally {
+    if (!sent) {
+      await geoIngestRedis.del(emailedKey);
+    }
   }
 }
 
 /**
- * Logs at most hourly per organization that its token still verifies against
- * a previous ingest secret, and emails owners and admins once to rotate it.
+ * Emails owners and admins once when an active token still verifies against a
+ * previous ingest secret, retrying failed sends within a minute, and logs it at
+ * most hourly per token scope. Revoked tokens stay silent.
  */
-export async function notifyGeoIngestLegacySecret(
-  organizationId: string,
-  projectId: string | null
-): Promise<void> {
+export async function notifyGeoIngestLegacySecret({
+  organizationId,
+  projectId,
+  generation,
+}: GeoIngestIdentity): Promise<void> {
+  const scope = `${organizationId}:${projectId ?? ""}:${generation}`;
+  const now = Date.now();
+  if ((recentlyChecked.get(scope) ?? 0) > now) {
+    return;
+  }
+  recentlyChecked.set(
+    scope,
+    now + GEO_INGEST_LEGACY_SECRET_CHECK_INTERVAL_SECONDS * 1000
+  );
   try {
-    const seenKey = `${GEO_INGEST_LEGACY_SECRET_SEEN_KEY_PREFIX}:${organizationId}`;
-    if (!(await claim(seenKey, GEO_INGEST_LEGACY_SECRET_SEEN_TTL_SECONDS))) {
+    const activeGeneration = await getGeoIngestTokenGeneration(
+      organizationId,
+      projectId
+    );
+    if (activeGeneration !== generation) {
       return;
     }
-    geoLog.warn({
-      event: "geo.ingest.legacy_secret",
-      organizationId,
-      projectId,
-    });
+    if (
+      await claim(
+        `${GEO_INGEST_LEGACY_SECRET_SEEN_KEY_PREFIX}:${scope}`,
+        GEO_INGEST_LEGACY_SECRET_SEEN_TTL_SECONDS
+      )
+    ) {
+      geoLog.warn({
+        event: "geo.ingest.legacy_secret",
+        organizationId,
+        projectId,
+      });
+    }
     await emailOrganization(organizationId);
   } catch (error) {
     logGeoFailure(
