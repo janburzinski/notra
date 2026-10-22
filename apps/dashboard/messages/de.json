@@ -8534,7 +8534,25 @@
           "custom": "Eigene Themes"
         },
         "codeLight": "Code-Theme im Light Mode",
-        "codeDark": "Code-Theme im Dark Mode"
+        "codeDark": "Code-Theme im Dark Mode",
+        "previews": {
+          "decorations": {
+            "none": "Ein schlichter Hintergrund in deiner Hintergrundfarbe.",
+            "grid": "Feine Linien in einem quadratischen Raster hinter dem Inhalt.",
+            "dots": "Ein ruhiges Feld kleiner Punkte hinter dem Inhalt.",
+            "gradient": "Ein sanfter Schimmer in deiner Primärfarbe oben auf der Seite."
+          },
+          "appearances": {
+            "system": "Folgt der Geräteeinstellung jedes Besuchers.",
+            "light": "Startet hell, bis Besucher umschalten.",
+            "dark": "Startet dunkel, bis Besucher umschalten."
+          },
+          "codeModes": {
+            "system": "Helle Codeblöcke im hellen Modus, dunkle im dunklen Modus.",
+            "dark": "Dunkle Codeblöcke in beiden Modi.",
+            "custom": "Wähle für hell und dunkel jeweils ein eigenes Theme."
+          }
+        }
       },
       "typography": {
         "modeLabel": "Schrift-Setup",

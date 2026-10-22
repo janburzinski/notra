@@ -12,6 +12,11 @@ import {
 import { useTranslations } from "use-intl";
 
 import { SiteColorInput } from "@/components/sites/site-color-input";
+import {
+  SiteAppearancePreview,
+  SiteCodeModePreview,
+  SiteDecorationPreview,
+} from "@/components/sites/site-design-preview";
 import { SiteOptionSelect } from "@/components/sites/site-option-select";
 import { SiteSeparateAssetRows } from "@/components/sites/site-separate-asset-rows";
 import {
@@ -41,6 +46,11 @@ export function SiteStylingFields({
 }: SiteDesignFieldsProps<SiteDesignForm>) {
   const t = useTranslations("sites.design.styling");
   const tModes = useTranslations("sites.design.appearances");
+  const previewColors = {
+    primary: form.primary,
+    backgroundLight: form.backgroundLight,
+    backgroundDark: form.backgroundDark,
+  };
   return (
     <div>
       <SiteSettingsList>
@@ -146,12 +156,19 @@ export function SiteStylingFields({
           title={t("decoration")}
           value={
             <SiteOptionSelect
+              describe={(value) => t(`previews.decorations.${value}`)}
               label={t("decoration")}
               onChange={(value) => update("decoration", value)}
               options={SITE_BACKGROUND_DECORATIONS.map((value) => ({
                 value,
                 label: t(`decorations.${value}`),
               }))}
+              preview={(value) => (
+                <SiteDecorationPreview
+                  colors={previewColors}
+                  decoration={value}
+                />
+              )}
               value={form.decoration}
             />
           }
@@ -165,12 +182,19 @@ export function SiteStylingFields({
           title={t("appearance")}
           value={
             <SiteOptionSelect
+              describe={(value) => t(`previews.appearances.${value}`)}
               label={t("appearance")}
               onChange={(value) => update("appearance", value)}
               options={SITE_APPEARANCE_MODES.map((value) => ({
                 value,
                 label: tModes(value),
               }))}
+              preview={(value) => (
+                <SiteAppearancePreview
+                  appearance={value}
+                  colors={previewColors}
+                />
+              )}
               value={form.appearance}
             />
           }
@@ -188,12 +212,16 @@ export function SiteStylingFields({
           title={t("codeMode")}
           value={
             <SiteOptionSelect
+              describe={(value) => t(`previews.codeModes.${value}`)}
               label={t("codeMode")}
               onChange={(value) => update("codeMode", value)}
               options={SITE_CODE_THEME_MODES.map((value) => ({
                 value,
                 label: t(`codeModes.${value}`),
               }))}
+              preview={(value) => (
+                <SiteCodeModePreview codeMode={value} colors={previewColors} />
+              )}
               value={form.codeMode}
             />
           }

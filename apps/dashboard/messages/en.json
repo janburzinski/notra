@@ -8534,7 +8534,25 @@
           "custom": "Custom themes"
         },
         "codeLight": "Code theme in light mode",
-        "codeDark": "Code theme in dark mode"
+        "codeDark": "Code theme in dark mode",
+        "previews": {
+          "decorations": {
+            "none": "A plain background in your background color.",
+            "grid": "Thin lines in a square grid behind the content.",
+            "dots": "A quiet field of small dots behind the content.",
+            "gradient": "A soft glow in your primary color at the top of the page."
+          },
+          "appearances": {
+            "system": "Follows each visitor's device setting.",
+            "light": "Opens in light mode until a visitor switches.",
+            "dark": "Opens in dark mode until a visitor switches."
+          },
+          "codeModes": {
+            "system": "Light code blocks in light mode, dark ones in dark mode.",
+            "dark": "Dark code blocks in both modes.",
+            "custom": "Pick a separate theme for light and dark mode."
+          }
+        }
       },
       "typography": {
         "modeLabel": "Font setup",

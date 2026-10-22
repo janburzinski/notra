@@ -1,4 +1,5 @@
 import type { SITE_NAVBAR_LINK_TYPES } from "@notra/sites-core/constants/site-layout";
+import type { ReactNode } from "react";
 
 import type {
   SITE_APPEARANCE_MODES,
@@ -140,6 +141,10 @@ export interface SiteOptionSelectProps<T extends string> {
   options: readonly { value: T; label: string }[];
   onChange: (value: T) => void;
   className?: string;
+  /** Skeleton of an option, shown beside the open list for the highlighted one. */
+  preview?: (value: T) => ReactNode;
+  /** One-line explanation under the preview. */
+  describe?: (value: T) => string;
 }
 
 export type SiteBrandField =
@@ -167,3 +172,19 @@ export interface SiteBrandValueProps {
   change: SiteBrandChange;
   value: string;
 }
+
+export interface SiteDesignPreviewColors {
+  primary: string;
+  backgroundLight: string;
+  backgroundDark: string;
+}
+
+export interface SiteMiniPageProps {
+  colors: SiteDesignPreviewColors;
+  tone: SiteDesignPreviewTone;
+  decoration?: SiteBackgroundDecoration;
+  code?: SiteDesignPreviewTone | "accent";
+  className?: string;
+}
+
+export type SiteDesignPreviewTone = "light" | "dark";

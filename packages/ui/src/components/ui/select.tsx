@@ -87,19 +87,26 @@ function SelectContent({
   align = "start",
   alignOffset = 0,
   alignItemWithTrigger = false,
+  aside,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
     SelectPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
-  >) {
+  > & {
+    /** Panel rendered beside the popup, e.g. a preview of the highlighted item. */
+    aside?: React.ReactNode;
+  }) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
         align={align}
         alignItemWithTrigger={alignItemWithTrigger}
         alignOffset={alignOffset}
-        className="isolate z-50"
+        className={cn(
+          "isolate z-50",
+          aside && "flex flex-row-reverse items-start gap-2"
+        )}
         collisionAvoidance={SELECT_COLLISION_AVOIDANCE}
         side={side}
         sideOffset={sideOffset}
@@ -117,6 +124,7 @@ function SelectContent({
           <SelectPrimitive.List className="p-1">{children}</SelectPrimitive.List>
           <SelectScrollDownButton />
         </SelectPrimitive.Popup>
+        {aside}
       </SelectPrimitive.Positioner>
     </SelectPrimitive.Portal>
   );
