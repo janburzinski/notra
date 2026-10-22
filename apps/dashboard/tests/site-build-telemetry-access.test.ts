@@ -99,6 +99,11 @@ if (process.env.NOTRA_BUILD_TELEMETRY_ACCESS_WORKER !== "1") {
   mock.module("../src/lib/sites/access", () => ({
     assertSitesAccess: async () => {},
   }));
+  mock.module("../src/lib/sites/dispatch", () => ({
+    dispatchSiteJobs: async () => {
+      throw new Error("GET attempted to dispatch a site job");
+    },
+  }));
   const { sitesRouter } = await import("../src/lib/orpc/routers/sites");
   const { createORPCContext } = await import("../src/lib/orpc/context");
   const read = async (organizationId = "org") =>
