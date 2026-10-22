@@ -20,10 +20,16 @@ export async function requiresPullRequest(
   try {
     const [head, rules] = await Promise.all([
       octokit.request("GET /repos/{owner}/{repo}/branches/{branch}", params),
-      octokit.request(
-        "GET /repos/{owner}/{repo}/rules/branches/{branch}",
-        params
-      ),
+      octokit
+        .request("GET /repos/{owner}/{repo}/rules/branches/{branch}", params)
+        .catch((error: unknown) => {
+          // Private repos on GitHub Free cannot have rulesets, so the endpoint
+          // answers 403 instead of an empty list.
+          if (isRulesetsUnavailable(error)) {
+            return { data: [] };
+          }
+          throw error;
+        }),
     ]);
     if (
       typeof head.data?.protected !== "boolean" ||
@@ -60,4 +66,12 @@ export async function requiresPullRequest(
   } catch {
     return true;
   }
+}
+
+function isRulesetsUnavailable(error: unknown) {
+  return (
+    error instanceof Error &&
+    Reflect.get(error, "status") === 403 &&
+    error.message.includes("Upgrade to GitHub Pro")
+  );
 }

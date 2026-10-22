@@ -12,15 +12,13 @@ export function SiteHeaderActions() {
   if (!state) {
     return null;
   }
-  const { controller, setPublishOpen, invalid, unsaved, saves } = state;
+  const { controller, setPublishOpen, invalid, unsaved } = state;
   const { queries } = controller;
   const error =
-    saves.state.status === "error" ||
     controller.props.commitStatus === "error" ||
     queries.status.isError ||
     queries.validation.isError ||
-    queries.validation.data?.ok === false ||
-    state.conflicts.length > 0;
+    queries.validation.data?.ok === false;
   return (
     <div
       className="ms-auto flex items-center gap-3 self-center py-2 max-lg:w-full max-lg:justify-end"

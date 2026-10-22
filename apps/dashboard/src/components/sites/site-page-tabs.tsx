@@ -21,6 +21,7 @@ import { useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";
 import { ProjectLogo } from "@/components/geo/project-logo";
+import { SiteChangesBanner } from "@/components/sites/site-changes-banner";
 import { SiteHeaderActions } from "@/components/sites/site-header-actions";
 import {
   SITE_NAV_SECTIONS,
@@ -200,6 +201,7 @@ export function SitePageTabs({
         </nav>
         <SiteHeaderActions />
       </div>
+      <SiteChangesBanner />
     </div>
   );
 }

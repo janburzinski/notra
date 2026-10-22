@@ -208,6 +208,17 @@ if (!databaseUrl) {
       ).toBe(true);
     }
     fake.state.protectionError = false;
+    fake.state.protectionRules = null;
+    fake.state.rulesetsUnavailable = true;
+    expect(
+      await requiresPullRequest(access.repository, access.token, "main")
+    ).toBe(false);
+    fake.state.otherProtection = true;
+    expect(
+      await requiresPullRequest(access.repository, access.token, "main")
+    ).toBe(true);
+    fake.state.otherProtection = false;
+    fake.state.rulesetsUnavailable = false;
     fake.state.omitProtected = true;
     expect(
       await requiresPullRequest(access.repository, access.token, "main")

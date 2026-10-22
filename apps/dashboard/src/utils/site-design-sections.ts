@@ -1,10 +1,7 @@
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 
 import type { SiteRawConfig } from "@/types/site-design";
-import type {
-  SiteDesignIssue,
-  SiteDesignSaveStatusInput,
-} from "@/types/site-design-sections";
+import type { SiteDesignIssue } from "@/types/site-design-sections";
 import { parseSiteConfig } from "@/utils/site-design";
 
 export function parseDesignSource(source: string): SiteRawConfig {
@@ -110,14 +107,4 @@ export function configSectionChanged(
       JSON.stringify(configValue(config, path)) !==
       JSON.stringify(configValue(published, path))
   );
-}
-
-export function siteDesignSaveStatus(state: SiteDesignSaveStatusInput) {
-  if (state.invalid) {
-    return "invalid";
-  }
-  if (state.saves.state.status === "error") {
-    return "saveFailed";
-  }
-  return state.unsaved ? "saving" : "saved";
 }

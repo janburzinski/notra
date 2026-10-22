@@ -8620,19 +8620,28 @@
         }
       },
       "workspace": {
-        "saved": "Gespeichert",
-        "saving": "Wird gespeichert…",
-        "invalid": "Felder prüfen",
-        "saveFailed": "Speichern fehlgeschlagen",
+        "banner": {
+          "unpublishedTitle": "{count, plural, one {Unveröffentlichte Änderungen in # Bereich} other {Unveröffentlichte Änderungen in # Bereichen}}",
+          "unpublishedFilesTitle": "{count, plural, one {Unveröffentlichte Änderungen in # Datei} other {Unveröffentlichte Änderungen in # Dateien}}",
+          "unpublished": "Änderungen an {sections} erscheinen erst nach dem Veröffentlichen auf deiner Seite.",
+          "unpublishedFiles": "Deine Änderungen erscheinen erst nach dem Veröffentlichen auf deiner Seite.",
+          "unpublishedBranch": "Änderungen an {sections} erscheinen auf deiner Seite, sobald {branch} gemergt ist.",
+          "unpublishedBranchFiles": "Deine Änderungen erscheinen auf deiner Seite, sobald {branch} gemergt ist.",
+          "saveFailedTitle": "Deine letzten Änderungen sind nicht gespeichert",
+          "saveFailed": "Sie bleiben in diesem Tab erhalten, bis das Speichern wieder klappt.",
+          "invalidTitle": "Einige Felder müssen korrigiert werden",
+          "invalid": "Änderungen werden gespeichert, sobald alle Felder gültig sind.",
+          "conflictTitle": "Die Seite wurde während deiner Bearbeitung geändert",
+          "conflict": "Behalte deine Änderungen, um die neueste Version zu ersetzen, oder verwirf sie, um sie zu laden.",
+          "retry": "Erneut versuchen"
+        },
         "loading": "Design wird geladen…",
-        "retry": "Erneut speichern",
         "unpublished": "Unveröffentlichte Änderungen",
         "invalidField": "Gib einen gültigen Wert ein.",
         "publishError": "Probleme ansehen",
         "tryAgain": "Erneut versuchen",
         "keepChanges": "Meine Änderungen behalten",
         "discardChanges": "Meine Änderungen verwerfen",
-        "conflict": "Der Entwurf oder das Repository wurde geändert. Deine Änderungen bleiben lokal erhalten. Behalte sie, um den aktuellen Entwurf zu ersetzen, oder verwirf sie, um ihn zu laden.",
         "malformed": "blog.json konnte nicht gelesen werden. Öffne das Repository in den Seiteneinstellungen, um die Datei zu korrigieren. Die Datei wurde nicht verändert."
       },
       "sections": {

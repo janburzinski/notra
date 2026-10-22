@@ -297,7 +297,7 @@ test.each([true, false])(
     await page.getByRole("button", { name: "Flush", exact: true }).click();
     await browserExpect(page.getByTestId("status")).toHaveText("error");
     await browserExpect(page.getByRole("alert")).toContainText(
-      "Your changes are kept locally"
+      "This site changed while you were editing"
     );
     await page.getByRole("button", { name: "Navigate away" }).click();
     await browserExpect(page.getByTestId("navigation")).toHaveText("blocked");

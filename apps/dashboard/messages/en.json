@@ -8620,19 +8620,28 @@
         }
       },
       "workspace": {
-        "saved": "Saved",
-        "saving": "Saving…",
-        "invalid": "Check fields",
-        "saveFailed": "Save failed",
+        "banner": {
+          "unpublishedTitle": "{count, plural, one {Unpublished changes in # section} other {Unpublished changes in # sections}}",
+          "unpublishedFilesTitle": "{count, plural, one {Unpublished changes in # file} other {Unpublished changes in # files}}",
+          "unpublished": "Edits to {sections} reach your live site only after you publish.",
+          "unpublishedFiles": "Your edits reach your live site only after you publish.",
+          "unpublishedBranch": "Edits to {sections} reach your live site after {branch} is merged.",
+          "unpublishedBranchFiles": "Your edits reach your live site after {branch} is merged.",
+          "saveFailedTitle": "Your latest changes aren't saved",
+          "saveFailed": "They stay in this tab until saving works again.",
+          "invalidTitle": "Some fields need fixing",
+          "invalid": "Changes save once every field has a valid value.",
+          "conflictTitle": "This site changed while you were editing",
+          "conflict": "Keep your changes to replace the latest version, or discard them to load it.",
+          "retry": "Retry"
+        },
         "loading": "Loading design…",
-        "retry": "Retry save",
         "unpublished": "Unpublished changes",
         "invalidField": "Enter a valid value.",
         "publishError": "Review issues",
         "tryAgain": "Try again",
         "keepChanges": "Keep my changes",
         "discardChanges": "Discard my changes",
-        "conflict": "The draft or repository changed. Your changes are kept locally. Keep them to replace the latest draft, or discard them to load it.",
         "malformed": "blog.json could not be read. Open the repository in Site settings to repair it. Your file has not been changed."
       },
       "sections": {

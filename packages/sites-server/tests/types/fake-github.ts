@@ -27,6 +27,8 @@ export interface FakeGitHubState {
   treeDelayMs: number;
   protectionRules: string[] | null;
   protectionError: boolean | number;
+  /** Answers the rules endpoint like a private repo on GitHub Free. */
+  rulesetsUnavailable: boolean;
   omitProtected: boolean;
   rejectedMergeMethods: string[];
   prErrorMessage: string;

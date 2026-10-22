@@ -44,8 +44,3 @@ export interface SiteDesignErrorProps {
 export interface SiteDesignAppearanceProps {
   section: string;
 }
-
-export type SiteDesignSaveStatusInput = Pick<
-  import("@/types/site-workspace").SiteWorkspaceValue,
-  "invalid" | "saves" | "unsaved"
->;

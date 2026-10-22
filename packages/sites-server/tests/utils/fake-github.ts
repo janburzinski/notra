@@ -20,6 +20,7 @@ export async function startFakeGitHub(port = 0, repositoryName = "blog") {
     treeDelayMs: 0,
     protectionRules: null,
     protectionError: false,
+    rulesetsUnavailable: false,
     omitProtected: false,
     rejectedMergeMethods: [],
     prErrorMessage: "",
@@ -268,6 +269,15 @@ export async function startFakeGitHub(port = 0, repositoryName = "blog") {
       );
     }
     if (path.startsWith(`${repo}/rules/branches/`)) {
+      if (state.rulesetsUnavailable) {
+        return json(
+          {
+            message:
+              "Upgrade to GitHub Pro or make this repository public to enable this feature.",
+          },
+          403
+        );
+      }
       if (state.protectionError) {
         return json(
           { message: "Synthetic protection outage" },

@@ -10,6 +10,7 @@ import type {
   SiteIntegrationProvider,
   SiteIntegrationAutosaveState,
 } from "@/types/site-integrations";
+import type { SiteWorkspaceValue } from "@/types/site-workspace";
 import type {
   RepositorySuggestionsResult,
   SiteBuildAgentPromptInput,
@@ -745,4 +746,14 @@ export interface SiteInthManagedPanelProps {
 export interface SiteInthProjectSettingsProps {
   inth: InthConsent;
   status: InthConsentStatus;
+}
+
+export interface SiteChangesStripProps {
+  tone: "info" | "warning" | "destructive";
+  title: ReactNode;
+  description: ReactNode;
+  children?: ReactNode;
+}
+export interface SiteChangesStripStateProps {
+  state: SiteWorkspaceValue;
 }

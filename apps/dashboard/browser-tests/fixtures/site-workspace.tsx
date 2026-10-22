@@ -11,6 +11,7 @@ import { IntlProvider } from "use-intl";
 
 import messages from "../../messages/en.json";
 import { SiteDesignPage } from "../../src/components/sites/pages/site-design-page";
+import { SiteChangesBanner } from "../../src/components/sites/site-changes-banner";
 import { SiteContext } from "../../src/components/sites/site-context";
 import { SiteVariablesSettings } from "../../src/components/sites/site-variables-settings";
 import { SiteWorkspace } from "../../src/components/sites/site-workspace";
@@ -235,6 +236,7 @@ function WorkspaceFields() {
       <SiteVariablesSettings />
       {state ? (
         <>
+          <SiteChangesBanner />
           <SiteDesignPage />
           <button
             type="button"
