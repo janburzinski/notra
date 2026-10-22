@@ -91,7 +91,7 @@ function SiteSwitcher({
               key={item.id}
               onClick={() => {
                 if (item.id !== site.id) {
-                  router.push(siteHref(slug, item.id, section));
+                  router.push(siteHref(slug, item.id, section, item.projectId));
                 }
               }}
             >
@@ -188,7 +188,7 @@ export function SitePageTabs({
                     : "text-muted-foreground hover:text-foreground"
                 )}
                 exact={item.section === "overview"}
-                href={`${siteHref(slug, site.id, item.section)}${branch ? `?branch=${encodeURIComponent(branch)}` : ""}`}
+                href={`${siteHref(slug, site.id, item.section, site.projectId)}${branch ? `&branch=${encodeURIComponent(branch)}` : ""}`}
                 key={item.section}
               >
                 <span className="group-hover:bg-muted group-focus-visible:ring-ring/50 rounded-md px-2.5 py-1 transition-colors group-focus-visible:ring-3">
