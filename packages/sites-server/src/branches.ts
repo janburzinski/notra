@@ -5,7 +5,7 @@ import {
   SITE_EDIT_BRANCH_PREFIX,
   NOTRA_BRANCH_PREFIX,
 } from "@notra/sites-core/constants/sites";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 import {
   BRANCH_PROTECTION_CACHE_MS,
@@ -14,7 +14,6 @@ import {
 } from "./constants/branches";
 import {
   createRepositoryBranch,
-  flushSiteDrafts,
   listSiteDrafts,
   validateSiteDrafts,
 } from "./editor";
@@ -29,13 +28,17 @@ import type { Site } from "./types/sites";
 import { createSiteBranchOctokit as createOctokit } from "./utils/branch-octokit";
 import { requiresPullRequest } from "./utils/branch-protection";
 import { branchPullRequest, canMergeBranch } from "./utils/branch-pull-request";
-import { consumeMovedSiteDrafts } from "./utils/consume-moved-site-drafts";
-import { errorMessage, isNotFoundError } from "./utils/errors";
+import { isNotFoundError } from "./utils/errors";
 import { moveSiteBranchDrafts } from "./utils/move-site-branch-drafts";
 import {
   lockSiteBranchEdits,
   withSiteBranchLock,
 } from "./utils/site-branch-lock";
+import {
+  forgetSiteBranchWritable,
+  siteBranchWritable,
+} from "./utils/site-branch-writable";
+import { siteDraftTable } from "./utils/site-draft-table";
 import {
   assertSiteContentBranch,
   assertSiteFeatureBranch,
@@ -50,10 +53,35 @@ export async function siteBranchStatus(
   branch = site.productionBranch
 ) {
   assertSiteEditableBranch(site, branch);
-  const { repository, token } = await siteRepositoryAccess(site, {
+  const access = await siteRepositoryAccess(site, {
     contents: "read",
     pull_requests: "read",
   });
+  const { repository, token } = access;
+  const production = branch === site.productionBranch;
+  const cacheKey = JSON.stringify([
+    site.id,
+    site.repositoryId,
+    site.productionBranch,
+  ]);
+  const cached = protectionCache.get(cacheKey);
+  const fresh = cached && cached.expires > Date.now() ? cached : null;
+  // Every read below is independent, so the slowest one sets the latency
+  // instead of all of them adding up.
+  const productionCheck =
+    !fresh || (production && fresh.allowed)
+      ? requiresPullRequest(repository, token, site.productionBranch)
+      : null;
+  const pullRequest = production
+    ? null
+    : branchPullRequest(repository, token, branch, site.productionBranch);
+  const editable = production ? true : siteBranchWritable(site, access, branch);
+  const featureRefs = octokitFeatureRefs(repository, token);
+  for (const pending of [productionCheck, pullRequest, editable, featureRefs]) {
+    if (pending instanceof Promise) {
+      pending.catch(() => undefined);
+    }
+  }
   let head;
   try {
     head = await getBranchHead(repository, token, branch);
@@ -72,52 +100,26 @@ export async function siteBranchStatus(
       hasFeatureBranches: false,
     };
   }
-  const cacheKey = JSON.stringify([
-    site.id,
-    site.repositoryId,
-    site.productionBranch,
-  ]);
-  const cached = protectionCache.get(cacheKey);
   const allowed =
-    cached &&
-    cached.expires > Date.now() &&
-    !(
-      branch === site.productionBranch &&
-      head.protected !== false &&
-      cached.allowed
-    )
-      ? cached.allowed
-      : !(await requiresPullRequest(repository, token, site.productionBranch));
+    fresh && !(production && head.protected !== false && fresh.allowed)
+      ? fresh.allowed
+      : !(await productionCheck);
   if (protectionCache.size > 1000) {
     protectionCache.clear();
   }
   protectionCache.set(cacheKey, {
     allowed,
-    expires:
-      cached && cached.expires > Date.now()
-        ? cached.expires
-        : Date.now() + BRANCH_PROTECTION_CACHE_MS,
+    expires: fresh ? fresh.expires : Date.now() + BRANCH_PROTECTION_CACHE_MS,
   });
-  const pr =
-    branch === site.productionBranch
-      ? null
-      : await branchPullRequest(
-          repository,
-          token,
-          branch,
-          site.productionBranch
-        );
+  const pr = await pullRequest;
   return {
     branch,
     canPublishDirect: allowed,
-    canEdit:
-      branch === site.productionBranch ||
-      !(await requiresPullRequest(repository, token, branch)),
+    canEdit: await editable,
     protected: head.protected,
     pullRequest: pr,
     canMerge: canMergeBranch(pr),
-    hasFeatureBranches:
-      (await octokitFeatureRefs(repository, token)).length > 0,
+    hasFeatureBranches: (await featureRefs).length > 0,
   };
 }
 
@@ -225,6 +227,11 @@ export async function listSiteBranches(site: Site, search = "") {
     );
 }
 
+/**
+ * Creating a branch only moves drafts in Postgres and adds one ref on GitHub.
+ * The commit and the draft pull request follow with the next autosave, so the
+ * editor can switch right away.
+ */
 export async function createSiteBranch(
   site: Site,
   input: CreateSiteBranchInput
@@ -234,46 +241,46 @@ export async function createSiteBranch(
   const branch = siteEditBranchName(input.title);
   const { repository, token } = await siteRepositoryAccess(site, {
     contents: "write",
-    pull_requests: "write",
   });
-  const copied = await withSiteBranchLock(site.id, source, async (tx) => {
-    const head = await getBranchHead(repository, token, source);
-    const drafts = input.bringChanges
-      ? await listSiteDrafts(site.id, source, tx)
-      : [];
-    await createRepositoryBranch(repository, token, {
-      name: branch,
-      sha: head.sha,
-    });
-    if (drafts.length > 0) {
-      await tx.insert(siteDrafts).values(
-        drafts.map((draft) => ({
-          ...draft,
-          id: `drf_${crypto.randomUUID()}`,
-          branch,
-          revision: 0,
-          committedRevision: null,
-          updatedByUserId: input.userId,
-        }))
-      );
-    }
-    return drafts;
-  });
-  // Keep the source until the new branch commit and draft PR are durable.
-  let flushError: string | null = null;
-  if (input.bringChanges) {
-    try {
-      await flushSiteDrafts(site, {
-        branch,
-        message: "Update site content",
-        userId: input.userId,
+  const sourceDrafts = siteDraftTable(source, site.productionBranch);
+  await withSiteBranchLock(
+    site.id,
+    source,
+    async (tx) => {
+      const head = await getBranchHead(repository, token, source);
+      const drafts = input.bringChanges
+        ? await listSiteDrafts(site.id, source, tx)
+        : [];
+      if (drafts.length > 0) {
+        await tx.insert(siteDrafts).values(
+          drafts.map((draft) => ({
+            ...draft,
+            id: `drf_${crypto.randomUUID()}`,
+            branch,
+            revision: 0,
+            committedRevision: null,
+            updatedByUserId: input.userId,
+          }))
+        );
+        await tx.delete(sourceDrafts).where(
+          and(
+            eq(sourceDrafts.siteId, site.id),
+            inArray(
+              sourceDrafts.id,
+              drafts.map((draft) => draft.id)
+            )
+          )
+        );
+      }
+      // Create the ref last: if moving the drafts fails, GitHub is untouched.
+      await createRepositoryBranch(repository, token, {
+        name: branch,
+        sha: head.sha,
       });
-      await consumeMovedSiteDrafts(site, source, copied);
-    } catch (error) {
-      flushError = errorMessage(error);
-    }
-  }
-  return { branch, flushError };
+    },
+    true
+  );
+  return { branch };
 }
 
 export async function renameSiteBranch(
@@ -281,6 +288,15 @@ export async function renameSiteBranch(
   branch: string,
   title: string
 ) {
+  try {
+    return await renameSiteBranchRef(site, branch, title);
+  } finally {
+    // Saves to the old name must hit GitHub again and find it gone.
+    forgetSiteBranchWritable(site, branch);
+  }
+}
+
+async function renameSiteBranchRef(site: Site, branch: string, title: string) {
   assertSiteFeatureBranch(site, branch);
   await assertSiteContentBranch(site, branch);
   const name = siteEditBranchName(title);
@@ -445,6 +461,7 @@ export async function deleteSiteBranch(site: Site, branch: string) {
     },
     true
   );
+  forgetSiteBranchWritable(site, branch);
 }
 
 export async function requestSiteBranchReview(site: Site, branch: string) {

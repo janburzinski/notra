@@ -127,6 +127,7 @@ export interface SiteBranchEntryProps extends Pick<
   "current" | "productionBranch" | "onSelect" | "onAction"
 > {
   entry: SiteBranchEntry;
+  label: string;
 }
 
 export interface SiteBranchScrollListProps {

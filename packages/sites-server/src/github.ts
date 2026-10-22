@@ -25,6 +25,8 @@ import {
   GITHUB_PAGE_SIZE,
   GITHUB_PULL_REQUEST_MAX_FILES,
   MAX_TARBALL_BYTES,
+  REPOSITORY_TOKEN_CACHE_LIMIT,
+  REPOSITORY_TOKEN_CACHE_MS,
 } from "./constants/github";
 import { SiteInputError, SitePermanentBuildError } from "./errors";
 import { SiteProviderRequestError } from "./schemas/provider-error";
@@ -35,6 +37,7 @@ import type {
   PreviewCommentParams,
   RepositoryContentCount,
   RepositorySuggestions,
+  RepositoryTokenCacheEntry,
   RepositoryTreeScan,
   SiteRepository,
   SiteRepositoryAccess,
@@ -44,6 +47,8 @@ import type {
 } from "./types/github";
 import { readBodyUpToEffect } from "./utils/read-body";
 import { runSitesEffect } from "./utils/run-sites-effect";
+
+const repositoryTokens = new Map<string, RepositoryTokenCacheEntry>();
 
 export function requireSiteRepository(
   site: SiteRepositoryColumns
@@ -134,13 +139,34 @@ export async function siteRepositoryToken(
       "This site's GitHub repository is no longer approved by this workspace"
     );
   }
-  return await createScopedGitHubAppInstallationToken(
+  // Consent is checked on every call above; only the GitHub mint is reused.
+  const key = JSON.stringify([
+    repository.integrationId,
+    repository.installationId,
+    repository.repo,
+    permissions.contents ?? null,
+    permissions.checks ?? null,
+    permissions.pull_requests ?? null,
+  ]);
+  const cached = repositoryTokens.get(key);
+  if (cached && cached.expires > Date.now()) {
+    return cached.token;
+  }
+  const token = await createScopedGitHubAppInstallationToken(
     repository.installationId,
     {
       repositories: [repository.repo],
       permissions: { metadata: "read", ...permissions },
     }
   );
+  if (repositoryTokens.size >= REPOSITORY_TOKEN_CACHE_LIMIT) {
+    repositoryTokens.clear();
+  }
+  repositoryTokens.set(key, {
+    token,
+    expires: Date.now() + REPOSITORY_TOKEN_CACHE_MS,
+  });
+  return token;
 }
 
 export const downloadRepositoryTarballEffect = Effect.fn(

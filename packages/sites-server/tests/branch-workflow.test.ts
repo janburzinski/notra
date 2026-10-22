@@ -232,7 +232,7 @@ if (!databaseUrl) {
     fake.state.protectionRules = null;
     fake.state.rulesPR = true;
     await save();
-    await expect(flush()).rejects.toThrow("requires a new branch");
+    await expect(flush()).rejects.toThrow("Create a new branch");
     expect(fake.state.commitCount).toBe(0);
   });
   test("unexplained protected refs fail closed when classic rules are hidden", async () => {
@@ -300,21 +300,26 @@ if (!databaseUrl) {
     await save("main", "{");
     await expect(flush()).rejects.toThrow("Fix the errors first");
   });
-  test("bring moves committed changes and opens a draft PR; leave preserves source drafts", async () => {
+  test("bring moves drafts without a commit; the first flush commits and opens a draft PR", async () => {
     await save();
     const brought = await branches.createSiteBranch(site, {
       title: "Bring changes",
       bringChanges: true,
       userId,
     });
+    expect(fake.state.commitCount).toBe(0);
+    expect(fake.state.prs).toHaveLength(0);
+    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(0);
+    expect(await editor.listSiteDrafts(site.id, brought.branch)).toHaveLength(
+      1
+    );
+    await flush(brought.branch);
     expect(fake.state.prs).toHaveLength(1);
     expect(fake.state.prs[0]?.draft).toBe(true);
     expect(fake.state.prs[0]?.head.ref).toBe(brought.branch);
     expect(await editor.listSiteDrafts(site.id, brought.branch)).toHaveLength(
       0
     );
-    expect(brought.flushError).toBeNull();
-    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(0);
     await save();
     const left = await branches.createSiteBranch(site, {
       title: "Leave changes",
@@ -325,39 +330,7 @@ if (!databaseUrl) {
     expect(fake.state.prs).toHaveLength(1);
     expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
   });
-  test("bringing changes preserves every source draft when a newer edit races the commit", async () => {
-    const original = await save();
-    await editor.saveSiteDraft(site, {
-      ...input(),
-      path: "blog/hello.md",
-      content: "---\ntitle: Moved post\ndate: 2026-10-19\n---\nMoved post.",
-      baseBlobSha: fake.blob(
-        "---\ntitle: Hello\ndate: 2026-10-19\ndescription: Synthetic\n---\nHello world."
-      ),
-    });
-    fake.state.beforeCommit = async () => {
-      fake.state.beforeCommit = async () => {};
-      await editor.saveSiteDraft(site, {
-        ...input("main", '{"name":"Newer main edit"}'),
-        draftId: original.id,
-        draftRevision: original.revision,
-      });
-    };
-    const result = await branches.createSiteBranch(site, {
-      title: "Racing move",
-      bringChanges: true,
-      userId,
-    });
-    expect(result.flushError).toContain("original branch changed meanwhile");
-    const remaining = await editor.listSiteDrafts(site.id, "main");
-    expect(remaining).toHaveLength(2);
-    expect(remaining.find((draft) => draft.id === original.id)?.content).toBe(
-      '{"name":"Newer main edit"}'
-    );
-    expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(0);
-    expect(fake.state.prs).toHaveLength(1);
-  });
-  test("source cleanup rolls back earlier deletes if the database rejects a later draft", async () => {
+  test("a failed draft move rolls back every row and creates no branch", async () => {
     const original = await save();
     const post = await editor.saveSiteDraft(site, {
       ...input(),
@@ -374,19 +347,26 @@ if (!databaseUrl) {
       )
     );
     try {
-      const result = await branches.createSiteBranch(site, {
-        title: "Cleanup failure",
-        bringChanges: true,
-        userId,
-      });
-      expect(result.flushError).not.toBeNull();
+      await expect(
+        branches.createSiteBranch(site, {
+          title: "Cleanup failure",
+          bringChanges: true,
+          userId,
+        })
+      ).rejects.toThrow();
       expect(
         (await editor.listSiteDrafts(site.id, "main"))
           .map((draft) => draft.id)
           .sort()
       ).toEqual([original.id, post.id].sort());
-      expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(
-        0
+      expect(
+        await db
+          .select()
+          .from(siteBranchDrafts)
+          .where(eq(siteBranchDrafts.siteId, site.id))
+      ).toHaveLength(0);
+      expect(fake.state.calls).not.toContain(
+        "POST /repos/synthetic/blog/git/refs"
       );
     } finally {
       await db.execute(
@@ -410,7 +390,7 @@ if (!databaseUrl) {
       bringChanges: true,
       userId,
     });
-    expect(created.flushError).toBeNull();
+    await flush(created.branch);
     expect(
       fake.state.commits
         .get(fake.state.branches.get(created.branch) ?? "")
@@ -1253,37 +1233,27 @@ if (!databaseUrl) {
         ?.get("blog.json")
     ).toBe(next.content);
   });
-  test("bring changes reports its new branch after a flush failure, and retry creates no second branch", async () => {
+  test("a failed first flush keeps the moved drafts on the new branch, and retry creates no second branch", async () => {
     await save();
-    fake.state.staleCommit = true;
     const result = await branches.createSiteBranch(site, {
       title: "Recover bring",
       bringChanges: true,
       userId,
     });
-    expect(result.flushError).toContain("moved while publishing");
-    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
+    fake.state.staleCommit = true;
+    await expect(flush(result.branch)).rejects.toThrow(
+      "moved while publishing"
+    );
+    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(0);
     expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(1);
     fake.state.staleCommit = false;
     await flush(result.branch);
+    expect(fake.state.commitCount).toBe(1);
     expect(
       fake.state.calls.filter(
         (call) => call === "POST /repos/synthetic/blog/git/refs"
       )
     ).toHaveLength(1);
-  });
-  test("a PR failure after committing the moved files keeps the source drafts", async () => {
-    await save();
-    fake.state.failPR = true;
-    const result = await branches.createSiteBranch(site, {
-      title: "PR failure",
-      bringChanges: true,
-      userId,
-    });
-    expect(result.flushError).not.toBeNull();
-    expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
-    expect(await editor.listSiteDrafts(site.id, result.branch)).toHaveLength(1);
-    expect(fake.state.commitCount).toBe(1);
   });
   test("only the unsupported draft 422 retries PR creation; no-commits has its own error", async () => {
     const branch = "notra/site-edit-invalid-pr";
@@ -1436,9 +1406,29 @@ if (!databaseUrl) {
     const branch = "notra/site-edit-protected";
     fake.state.branches.set(branch, "initial");
     fake.state.protectedFeatures = true;
-    await expect(save(branch)).rejects.toThrow("requires a new branch");
+    await expect(save(branch)).rejects.toThrow("exclude notra/**");
     expect((await branches.siteBranchStatus(site, branch)).canEdit).toBe(false);
-    await expect(flush(branch)).rejects.toThrow("requires a new branch");
+    await expect(flush(branch)).rejects.toThrow("exclude notra/**");
+  });
+  test("repeated feature saves skip protection reads but still reject a branch deleted on GitHub", async () => {
+    const branch = "notra/site-edit-cached";
+    fake.state.branches.set(branch, "initial");
+    const rules = () =>
+      fake.state.calls.filter((call) =>
+        call.startsWith("GET /repos/synthetic/blog/rules/branches/")
+      ).length;
+    const first = await save(branch);
+    await editor.saveSiteDraft(site, {
+      ...input(branch, '{"name":"Second save"}'),
+      draftId: first.id,
+      draftRevision: first.revision,
+    });
+    await flush(branch);
+    expect(rules()).toBe(1);
+    fake.state.branches.delete(branch);
+    await expect(save(branch, '{"name":"Third save"}')).rejects.toThrow(
+      "Branch not found"
+    );
   });
   test("branch lock wait is bounded with an actionable retry error", async () => {
     let release = () => {};

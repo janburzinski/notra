@@ -48,3 +48,7 @@ export const GITHUB_LFS_POINTER_HEADER =
 // The compare API lists at most 300 changed files for a whole comparison
 // (per_page only pages its commits), so 300 files may mean a cut-off list.
 export const GITHUB_COMPARE_MAX_FILES = 300;
+
+/** Installation tokens live for an hour; reuse them for half of that. */
+export const REPOSITORY_TOKEN_CACHE_MS = 30 * 60 * 1000;
+export const REPOSITORY_TOKEN_CACHE_LIMIT = 500;

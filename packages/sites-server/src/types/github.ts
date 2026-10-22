@@ -35,6 +35,11 @@ export interface SiteRepositoryPermissions {
   pull_requests?: "read" | "write";
 }
 
+export interface RepositoryTokenCacheEntry {
+  token: string;
+  expires: number;
+}
+
 export interface BranchHead {
   sha: string;
   protected: boolean;

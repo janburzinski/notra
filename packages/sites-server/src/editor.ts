@@ -48,7 +48,6 @@ import type {
 import type { SiteRepositoryAccess, SiteRepository } from "./types/github";
 import type { Site } from "./types/sites";
 import { createSiteBranchOctokit as createOctokit } from "./utils/branch-octokit";
-import { requiresPullRequest } from "./utils/branch-protection";
 import { branchPullRequest } from "./utils/branch-pull-request";
 import { mapWithConcurrency } from "./utils/concurrency";
 import { errorMessage, isNotFoundError } from "./utils/errors";
@@ -58,6 +57,7 @@ import {
   lockSiteBranchEdits,
   withSiteBranchLock,
 } from "./utils/site-branch-lock";
+import { assertSiteBranchWritable } from "./utils/site-branch-writable";
 import { siteDraftTable } from "./utils/site-draft-table";
 import {
   assertSiteEditableBranch,
@@ -363,12 +363,7 @@ export async function saveSiteDraft(
   return await db.transaction(async (tx) => {
     await lockSiteBranchEdits(tx, site.id, branch);
     if (access) {
-      await getBranchHead(access.repository, access.token, branch);
-      if (await requiresPullRequest(access.repository, access.token, branch)) {
-        throw new SiteInputError(
-          "This branch requires a new branch before editing can be published."
-        );
-      }
+      await assertSiteBranchWritable(site, access, branch);
     }
     // A flush can consume this exact revision while the UPDATE waits for its
     // row lock. Keep its content so recreation can prove GitHub accepted it.
@@ -729,16 +724,12 @@ export async function flushSiteDrafts(
       const production = branch === site.productionBranch;
       const { repository, token } = access;
       const head = await getBranchHead(repository, token, branch);
-      if (await requiresPullRequest(repository, token, branch)) {
-        throw new SiteInputError(
-          `${branch} requires a new branch before editing can be published.`
-        );
-      }
+      await assertSiteBranchWritable(site, access, branch, head);
       const drafts = await listSiteDrafts(site.id, branch, tx);
       if (drafts.length === 0) {
         return { commitSha: head.sha, pullRequestUrl: null };
       }
-      const source = await listSiteSourceFiles(site, branch, access);
+      const source = await listSiteSourceFiles(site, branch, access, head.sha);
       if (production) {
         const validation = await validateWithDrafts(
           site,

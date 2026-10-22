@@ -18,10 +18,11 @@ import type {
   SiteBranchMenuProps,
   SiteBranchScrollListProps,
 } from "@/types/site-branches";
-import { siteBranchLabel } from "@/utils/site-branch-label";
+import { siteBranchLabels } from "@/utils/site-branch-label";
 
 function SiteBranchEntryItem({
   entry,
+  label,
   current,
   productionBranch,
   onSelect,
@@ -29,12 +30,8 @@ function SiteBranchEntryItem({
 }: SiteBranchEntryProps) {
   const t = useTranslations("sites.branches");
   const writing = useTranslations("sites.writing");
-  const locale = useLocale();
   const live = entry.name === productionBranch;
   const active = entry.name === current;
-  const label =
-    entry.title ??
-    siteBranchLabel(entry.name, locale, (date) => t("draftFrom", { date }));
   return (
     <div className="flex items-center gap-1">
       <DropdownMenuItem
@@ -112,14 +109,21 @@ export function SiteBranchEntries(props: SiteBranchMenuProps) {
     );
   }
   const search = props.search.trim().toLocaleLowerCase(locale);
-  const entries = props.entries.filter(
+  const visible = props.entries.filter(
     (entry) =>
       entry.exists &&
       (entry.name === props.productionBranch ||
-        (entry.name.startsWith(NOTRA_BRANCH_PREFIX) &&
-          `${entry.name} ${entry.title ?? ""} ${siteBranchLabel(entry.name, locale, (date) => t("draftFrom", { date }))}`
-            .toLocaleLowerCase(locale)
-            .includes(search)))
+        entry.name.startsWith(NOTRA_BRANCH_PREFIX))
+  );
+  const labels = siteBranchLabels(visible, locale, (date) =>
+    t("draftFrom", { date })
+  );
+  const entries = visible.filter(
+    (entry) =>
+      entry.name === props.productionBranch ||
+      `${entry.name} ${labels.get(entry.name)}`
+        .toLocaleLowerCase(locale)
+        .includes(search)
   );
   if (!entries.length) {
     return (
@@ -131,7 +135,12 @@ export function SiteBranchEntries(props: SiteBranchMenuProps) {
   return (
     <SiteBranchScrollList count={entries.length}>
       {entries.map((entry) => (
-        <SiteBranchEntryItem {...props} key={entry.name} entry={entry} />
+        <SiteBranchEntryItem
+          {...props}
+          key={entry.name}
+          entry={entry}
+          label={labels.get(entry.name) ?? entry.name}
+        />
       ))}
     </SiteBranchScrollList>
   );

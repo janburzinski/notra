@@ -22,7 +22,7 @@ import { Button } from "@/components/button";
 import { SiteBranchBadge } from "@/components/sites/branches/site-branch-badge";
 import { SiteBranchEntries } from "@/components/sites/branches/site-branch-entries";
 import type { SiteBranchMenuProps } from "@/types/site-branches";
-import { siteBranchLabel } from "@/utils/site-branch-label";
+import { siteBranchLabels } from "@/utils/site-branch-label";
 
 export function SiteBranchMenu(props: SiteBranchMenuProps) {
   const t = useTranslations("sites.branches");
@@ -59,9 +59,18 @@ export function SiteBranchMenu(props: SiteBranchMenuProps) {
           className="max-w-52 min-w-0 truncate text-start"
           title={props.current}
         >
-          {siteBranchLabel(props.current, locale, (date) =>
-            t("draftFrom", { date })
-          )}
+          {siteBranchLabels(
+            [
+              props.entries.find((entry) => entry.name === props.current) ?? {
+                name: props.current,
+              },
+              ...props.entries.filter(
+                (entry) => entry.exists && entry.name !== props.current
+              ),
+            ],
+            locale,
+            (date) => t("draftFrom", { date })
+          ).get(props.current)}
         </span>
         <SiteBranchBadge
           live={props.current === props.productionBranch}

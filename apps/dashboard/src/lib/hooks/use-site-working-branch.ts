@@ -69,7 +69,9 @@ export function useSiteWorkingBranch({
     },
     switchBranch: async (next: string) => {
       autoCommit.suppressLeave();
-      await invalidateSiteBranch(client, { organizationId, siteId });
+      // Mark the data stale without refetching the branch being left; the
+      // next branch loads its own queries as it mounts.
+      void invalidateSiteBranch(client, { organizationId, siteId }, "none");
       await onSwitch(next === productionBranch ? null : next);
     },
   };

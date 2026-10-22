@@ -10,6 +10,7 @@ import type {
 } from "@/types/site-branches";
 import { toErrorMessage } from "@/utils/error-message";
 import { invalidateSiteBranch } from "@/utils/invalidate-site-branch";
+import { seedCreatedSiteBranch } from "@/utils/seed-created-site-branch";
 
 export function useSiteBranchActions(
   props: SiteBranchControlsProps,
@@ -21,6 +22,15 @@ export function useSiteBranchActions(
   const t = useTranslations("sites.branches");
   const invalidate = () =>
     invalidateSiteBranch(client, { organizationId, siteId });
+  const openCreated = async (created: string, bringChanges: boolean) => {
+    seedCreatedSiteBranch(
+      client,
+      { organizationId, siteId, branch },
+      created,
+      bringChanges && props.draftCount > 0
+    );
+    await onSwitch(created);
+  };
   const onError = (error: unknown) =>
     toast.error(toErrorMessage(error, t("actionFailed")));
   const create = useMutation({
@@ -33,14 +43,11 @@ export function useSiteBranchActions(
         title,
         bringChanges: true,
       });
-      await onSwitch(created.branch);
-      if (created.flushError) {
-        toast.error(created.flushError);
-      }
+      await openCreated(created.branch, true);
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       onClose();
-      await invalidate();
+      void invalidate();
     },
     onError,
   });
@@ -58,10 +65,7 @@ export function useSiteBranchActions(
           ...scope,
           ...input,
         });
-        await onSwitch(created.branch);
-        if (created.flushError) {
-          toast.error(created.flushError);
-        }
+        await openCreated(created.branch, input.bringChanges);
       } else if (action.kind === "rename") {
         const renamed = await dashboardOrpc.sites.branches.rename.call({
           ...scope,
