@@ -51,6 +51,7 @@ import { buildGeoTrafficEvent, toCapturedDate } from "./event";
 import { loadIngestAllowedHosts } from "./hosts";
 import { assertGeoIngestIdentityActive } from "./identity";
 import { resolveJourneyId } from "./journey";
+import { notifyGeoIngestLegacySecret } from "./legacy-secret";
 import { announceGeoTrafficEvent, expediteForLiveViewers } from "./live";
 import {
   geoIngestAdmissionRatelimit,
@@ -411,6 +412,11 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
     ],
     { concurrency: "unbounded" }
   );
+  if (identity.legacySecret) {
+    defer(() =>
+      notifyGeoIngestLegacySecret(identity.organizationId, identity.projectId)
+    );
+  }
   if (!identity.projectId && allowedHosts === null) {
     return yield* Effect.fail(
       new GeoIngestFailedError({

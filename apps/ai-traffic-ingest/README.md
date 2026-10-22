@@ -248,6 +248,11 @@ the service. Use isolated equivalents for origin testing, never production data:
 | `TINYBIRD_BASE_URL` | Optional existing Tinybird endpoint, especially for a non-default region |
 
 `BEACON_INGEST_SECRET` is supported when `GEO_INGEST_SECRET` is unset.
+Tokens signed with `GEO_INGEST_SECRET_PREVIOUS` or `BEACON_INGEST_SECRET` still
+verify, so the signing secret can be rotated without breaking installed tokens.
+The first request each hour from a workspace still on an old secret logs
+`geo.ingest.legacy_secret`, and the first one overall emails its owners and
+admins to rotate, which needs `BREW_API_KEY` (and `BREW_BRAND_ID` when used).
 `TINYBIRD_URL` remains a supported alias for the Tinybird base URL.
 Optional telemetry variables are `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`,
 `NEXT_PUBLIC_POSTHOG_HOST`, `AXIOM_TOKEN`, and `AXIOM_ORG_ID`. Logs go to the

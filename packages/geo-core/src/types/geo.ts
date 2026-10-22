@@ -1259,6 +1259,8 @@ export interface GeoIngestIdentity {
   projectId: string | null;
   generation: number;
   site?: GeoIngestSiteScope;
+  /** Signed with a previous ingest secret that is still accepted. */
+  legacySecret?: boolean;
 }
 
 interface GeoIngestSiteScope {

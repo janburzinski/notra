@@ -1,6 +1,7 @@
 {
   "extends": "@notra/typescript-config/base.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strictNullChecks": true,

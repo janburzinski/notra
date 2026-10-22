@@ -31,6 +31,7 @@ RUN bun install --frozen-lockfile --ignore-scripts
 COPY packages/ai ./packages/ai
 COPY packages/analytics ./packages/analytics
 COPY packages/db ./packages/db
+COPY packages/email ./packages/email
 COPY packages/geo-core ./packages/geo-core
 COPY packages/posthog ./packages/posthog
 COPY packages/schemas ./packages/schemas

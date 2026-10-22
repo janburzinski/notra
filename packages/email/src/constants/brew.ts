@@ -54,6 +54,7 @@ export const BREW_EMAIL_TRIGGERS: Record<BrewEmailCategory, string> = {
   "schedule-content-failed": "hiNXrpnX6BD141tryFm-C",
   "schedule-content-skipped": "rKk15uBNuX4u538jGTofd",
   "daily-summary": "ZNAUEsBwkQIE5XQzFaWpJ",
+  "geo-token-rotation": "T8zpK2X23V8kefjVeBIhN",
 };
 
 /** Contact fields kept in sync by the app; created by `bun run brew:setup`. */

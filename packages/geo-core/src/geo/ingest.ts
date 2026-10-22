@@ -10,6 +10,7 @@ import {
   GEO_INGEST_PATH,
   GEO_INGEST_SECRET_ENV,
   GEO_INGEST_SECRET_FALLBACK_ENV,
+  GEO_INGEST_SECRET_PREVIOUS_ENV,
   GEO_INGEST_SITE_TOKEN_PREFIX,
   GEO_INGEST_SITE_TOKEN_SIGNING_DOMAIN,
   GEO_INGEST_TOKEN_ENV,
@@ -109,6 +110,24 @@ export function getGeoIngestSecret(): string | null {
   return secret && secret.length > 0 ? secret : null;
 }
 
+function getGeoIngestVerificationSecrets(): string[] {
+  const secrets = [
+    getGeoIngestSecret(),
+    process.env[GEO_INGEST_SECRET_PREVIOUS_ENV],
+    process.env[GEO_INGEST_SECRET_FALLBACK_ENV],
+  ].filter((secret): secret is string => Boolean(secret));
+  return [...new Set(secrets)];
+}
+
+function findMatchingSecret(
+  signature: string,
+  payload: string
+): string | undefined {
+  return getGeoIngestVerificationSecrets().find((secret) =>
+    signaturesMatch(signature, sign(payload, secret))
+  );
+}
+
 export function isGeoIngestConfigured(): boolean {
   return getGeoIngestSecret() !== null;
 }
@@ -164,8 +183,7 @@ export function isGeoIngestSiteToken(token: string): boolean {
 }
 
 export function verifyGeoIngestSiteToken(token: string): string | null {
-  const secret = getGeoIngestSecret();
-  if (!(secret && isGeoIngestSiteToken(token))) {
+  if (!isGeoIngestSiteToken(token)) {
     return null;
   }
   const body = token.slice(GEO_INGEST_SITE_TOKEN_PREFIX.length);
@@ -174,21 +192,15 @@ export function verifyGeoIngestSiteToken(token: string): string | null {
     return null;
   }
   const siteId = body.slice(0, separatorIndex);
-  const expected = sign(
-    `${GEO_INGEST_SITE_TOKEN_SIGNING_DOMAIN}${siteId}`,
-    secret
-  );
-  return signaturesMatch(body.slice(separatorIndex + 1), expected)
+  return findMatchingSecret(
+    body.slice(separatorIndex + 1),
+    `${GEO_INGEST_SITE_TOKEN_SIGNING_DOMAIN}${siteId}`
+  )
     ? siteId
     : null;
 }
 
 export function verifyGeoIngestToken(token: string): GeoIngestIdentity | null {
-  const secret = getGeoIngestSecret();
-  if (!secret) {
-    return null;
-  }
-
   const separatorIndex = token.lastIndexOf(GEO_INGEST_TOKEN_SEPARATOR);
   if (separatorIndex <= 0) {
     return null;
@@ -196,7 +208,8 @@ export function verifyGeoIngestToken(token: string): GeoIngestIdentity | null {
 
   const payload = token.slice(0, separatorIndex);
   const signature = token.slice(separatorIndex + 1);
-  if (!signaturesMatch(signature, sign(payload, secret))) {
+  const secret = findMatchingSecret(signature, payload);
+  if (!secret) {
     return null;
   }
 
@@ -213,7 +226,12 @@ export function verifyGeoIngestToken(token: string): GeoIngestIdentity | null {
     return null;
   }
 
-  return { organizationId, projectId: projectId || null, generation };
+  return {
+    organizationId,
+    projectId: projectId || null,
+    generation,
+    legacySecret: secret !== getGeoIngestSecret(),
+  };
 }
 
 function buildGeoAppUrl(): string {

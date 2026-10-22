@@ -677,6 +677,7 @@
         "@notra/ai": "workspace:*",
         "@notra/analytics": "workspace:*",
         "@notra/db": "workspace:*",
+        "@notra/email": "workspace:*",
         "@notra/posthog": "workspace:*",
         "@notra/sites-core": "workspace:*",
         "@notra/utils": "workspace:*",

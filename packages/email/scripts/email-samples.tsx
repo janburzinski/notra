@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import { AiCreditsDepletedEmail } from "../src/emails/ai-credits-depleted";
 import { ContactMessageEmail } from "../src/emails/contact";
 import { FeedbackEmail } from "../src/emails/feedback";
+import { GeoTokenRotationEmail } from "../src/emails/geo-token-rotation";
 import { ScheduledContentCreatedEmail } from "../src/emails/schedule-content-created";
 import { ScheduledContentFailedEmail } from "../src/emails/schedule-content-failed";
 import { ScheduledContentSkippedEmail } from "../src/emails/schedule-content-skipped";
@@ -43,6 +44,10 @@ export const EMAIL_SAMPLES: Record<BrewEmailCategory, [string, ReactElement]> =
       `Weekly GEO recap for ${WeeklySummaryEmail.PreviewProps.organizationName}, ${WeeklySummaryEmail.PreviewProps.weekLabel}`,
       WeeklySummaryEmail(WeeklySummaryEmail.PreviewProps),
     ],
+    "geo-token-rotation": [
+      "Please rotate your Notra tracking token",
+      GeoTokenRotationEmail({}),
+    ],
   };
 
 /** Names used for the Brew triggers, automations and preview designs. */
@@ -56,4 +61,5 @@ export const EMAIL_LABELS: Record<BrewEmailCategory, string> = {
   "schedule-content-failed": "Scheduled content failed",
   "schedule-content-skipped": "Scheduled content skipped",
   "daily-summary": "Daily GEO summary",
+  "geo-token-rotation": "GEO tracking token rotation",
 };

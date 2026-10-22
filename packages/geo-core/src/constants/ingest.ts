@@ -36,3 +36,11 @@ export const GEO_DRAIN_EPOCH_THRESHOLDS = {
   milliseconds: 1e11,
 } as const;
 export const GEO_DRAIN_NUMERIC_TIMESTAMP_PATTERN = /^\d+(\.\d+)?$/;
+export const GEO_INGEST_LEGACY_SECRET_SEEN_KEY_PREFIX =
+  "geo:legacy-secret:seen:v1";
+export const GEO_INGEST_LEGACY_SECRET_SEEN_TTL_SECONDS = 60 * 60;
+export const GEO_INGEST_LEGACY_SECRET_EMAILED_KEY_PREFIX =
+  "geo:legacy-secret:emailed:v1";
+export const GEO_INGEST_LEGACY_SECRET_EMAILED_TTL_SECONDS = 14 * 24 * 60 * 60;
+export const GEO_INGEST_LEGACY_SECRET_RECIPIENT_ROLES = ["owner", "admin"];
+export const GEO_INGEST_LEGACY_SECRET_DEADLINE = "October 25";
