@@ -66,7 +66,7 @@ export function TableScrollFade({
     <div
       aria-hidden="true"
       className={cn(
-        "from-background pointer-events-none sticky left-0 z-10 h-8 to-transparent transition-opacity duration-200 motion-reduce:transition-none",
+        "from-table-card pointer-events-none sticky left-0 z-10 h-8 to-transparent transition-opacity duration-200 motion-reduce:transition-none",
         edge === "top"
           ? "top-0 -mb-8 bg-linear-to-b"
           : "bottom-0 -mt-8 bg-linear-to-t",

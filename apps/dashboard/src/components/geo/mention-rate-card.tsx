@@ -343,7 +343,7 @@ export function MentionRateCard({
                 <div
                   aria-hidden="true"
                   className={cn(
-                    "from-card pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t to-transparent transition-opacity duration-200 motion-reduce:transition-none",
+                    "from-table-card pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t to-transparent transition-opacity duration-200 motion-reduce:transition-none",
                     atEnd ? "opacity-0" : "opacity-100"
                   )}
                   style={{ height: `${GEO_MENTION_FADE_HEIGHT_REM}rem` }}
