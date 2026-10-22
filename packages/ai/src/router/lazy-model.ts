@@ -33,12 +33,9 @@ import { createModelCallTelemetry } from "@notra/ai/utils/model-call-telemetry";
 import { observeModelStream } from "@notra/ai/utils/observe-model-stream";
 import { withUsageAttribution } from "@notra/ai/utils/usage-attribution";
 
-import { GatewayUnavailableError } from "./errors";
-import { otherGateway } from "./policy";
-import {
-  splitRouterOptions,
-  stripForeignGatewayOptions,
-} from "./provider-options";
+import { GatewayUnavailableError, NoCompliantRouteError } from "./errors";
+import { fallbackGateways } from "./policy";
+import { splitRouterOptions } from "./provider-options";
 
 function readStatusCode(error: unknown): number | undefined {
   if (typeof error !== "object" || error === null) {
@@ -94,6 +91,9 @@ function readIsRetryable(error: unknown): boolean {
 export function classifyUpstreamFailure(
   error: unknown
 ): FallbackReason | undefined {
+  if (error instanceof NoCompliantRouteError) {
+    return "non-compliant";
+  }
   if (error instanceof Error && error.name === "AbortError") {
     return undefined;
   }
@@ -407,7 +407,8 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     const { router, rest } = splitRouterOptions(options.providerOptions);
     const providerOptions = route.adapter.buildProviderOptions({
       organizationId: this.context.request.organizationId,
-      providerOptions: stripForeignGatewayOptions(route.decision.gateway, rest),
+      // Adapters translate explicit privacy constraints before stripping foreign blocks.
+      providerOptions: rest,
       router,
       allowNonZdr: this.context.policy.allowNonZdr,
       relaxZdr: this.zdrRelaxed || route.decision.zdrRelaxed === true,
@@ -422,18 +423,18 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       params: LanguageModelV4CallOptions
     ) => Promise<T>
   ): Promise<T> {
-    const route = await this.getRoute();
-    try {
-      return await run(route, this.buildParams(route, options));
-    } catch (error) {
-      const fallback = await this.tryFallbackRoute(route, error);
-      if (!fallback) {
-        throw error;
-      }
+    let route = await this.getRoute();
+    const attempted = new Set<GatewayId>();
+    for (;;) {
+      attempted.add(route.decision.gateway);
       try {
-        return await run(fallback, this.buildParams(fallback, options));
-      } catch (fallbackError) {
-        throw this.classifyFallbackFailure(fallback, fallbackError);
+        return await run(route, this.buildParams(route, options));
+      } catch (error) {
+        const fallback = await this.tryFallbackRoute(route, error, attempted);
+        if (!fallback) {
+          throw error;
+        }
+        route = fallback;
       }
     }
   }
@@ -471,7 +472,9 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     adapter
       .getBalance()
       .then(({ balance }) => {
-        this.context.credits.record(gateway, balance);
+        if (balance !== null) {
+          this.context.credits.record(gateway, balance);
+        }
         this.context.logger.info("ai.router.credits_verified", {
           gateway,
           balance,
@@ -520,29 +523,10 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     return false;
   }
 
-  private classifyFallbackFailure(
-    route: ResolvedRoute,
-    error: unknown
-  ): unknown {
-    const reason = classifyUpstreamFailure(error);
-    if (!reason) {
-      return error;
-    }
-    if (this.recordUpstreamFailure(route, reason, error)) {
-      this.routePromise = undefined;
-    }
-    if (reason === "auth-failure") {
-      return new GatewayUnavailableError(
-        route.decision.gateway,
-        "authentication failed"
-      );
-    }
-    return error;
-  }
-
   private async tryFallbackRoute(
     route: ResolvedRoute,
-    error: unknown
+    error: unknown,
+    attempted: Set<GatewayId>
   ): Promise<ResolvedRoute | undefined> {
     const reason = classifyUpstreamFailure(error);
     if (!reason) {
@@ -550,7 +534,12 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     }
     const marked = this.recordUpstreamFailure(route, reason, error);
 
-    const crossGateway = this.crossGatewayRoute(route, reason, error);
+    const crossGateway = this.crossGatewayRoute(
+      route,
+      reason,
+      error,
+      attempted
+    );
     if (crossGateway) {
       return crossGateway;
     }
@@ -572,7 +561,8 @@ export class RoutedLanguageModel implements LanguageModelV4 {
   private crossGatewayRoute(
     route: ResolvedRoute,
     reason: FallbackReason,
-    error: unknown
+    error: unknown,
+    attempted: Set<GatewayId>
   ): ResolvedRoute | undefined {
     if (
       !this.context.policy.crossGatewayFallback ||
@@ -581,64 +571,78 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       return undefined;
     }
 
-    const target = otherGateway(route.decision.gateway);
-    const adapter = this.context.adapters[target];
-    const status = readStatusCode(error);
-    const errorName = error instanceof Error ? error.name : typeof error;
+    for (const target of fallbackGateways(route.decision.gateway)) {
+      if (attempted.has(target)) {
+        continue;
+      }
+      const adapter = this.context.adapters[target];
+      const status = readStatusCode(error);
+      const errorName = error instanceof Error ? error.name : typeof error;
 
-    if (!adapter?.supportsModel(route.decision.requestedModelId)) {
-      this.context.logger.warn("ai.router.fallback_unavailable", {
-        from: route.decision.gateway,
-        to: target,
-        fallbackReason: reason,
-        errorName,
-        status,
-      });
-      return undefined;
-    }
-    const targetUnavailable = this.context.credits.unavailableReason(
-      target,
-      route.decision.requestedModelId
-    );
-    if (targetUnavailable) {
-      this.context.logger.warn("ai.router.fallback_unavailable", {
-        from: route.decision.gateway,
-        to: target,
-        fallbackReason: reason,
-        targetReason: targetUnavailable,
-        errorName,
-        status,
-      });
-      return undefined;
-    }
-    if (!(adapter.enforcesZdr || this.context.policy.allowNonZdr)) {
-      this.context.logger.error("ai.router.no_compliant_route", {
-        from: route.decision.gateway,
-        to: target,
-        fallbackReason: reason,
-        errorName,
-        status,
-      });
-      return undefined;
-    }
+      if (!adapter?.supportsModel(route.decision.requestedModelId)) {
+        this.context.logger.warn("ai.router.fallback_unavailable", {
+          from: route.decision.gateway,
+          to: target,
+          fallbackReason: reason,
+          errorName,
+          status,
+        });
+        continue;
+      }
+      const targetUnavailable = this.context.credits.unavailableReason(
+        target,
+        route.decision.requestedModelId
+      );
+      if (targetUnavailable) {
+        this.context.logger.warn("ai.router.fallback_unavailable", {
+          from: route.decision.gateway,
+          to: target,
+          fallbackReason: reason,
+          targetReason: targetUnavailable,
+          errorName,
+          status,
+        });
+        continue;
+      }
+      if (
+        !(
+          adapter.enforcesZdr ||
+          this.context.policy.allowNonZdr ||
+          route.decision.zdr === "none"
+        )
+      ) {
+        this.context.logger.error("ai.router.no_compliant_route", {
+          from: route.decision.gateway,
+          to: target,
+          fallbackReason: reason,
+          errorName,
+          status,
+        });
+        continue;
+      }
 
-    const decision: RouteDecision = {
-      ...route.decision,
-      gateway: target,
-      modelId: adapter.mapModelId(route.decision.requestedModelId),
-      reason: "fallback",
-      fallbackFrom: route.decision.gateway,
-      fallbackReason: reason,
-      zdrEnforced: adapter.enforcesZdr && !this.zdrRelaxed,
-      zdrRelaxed: this.zdrRelaxed,
-    };
-    this.context.logger.warn("ai.router.fallback", {
-      ...decisionLogFields(decision),
-      errorName,
-      status,
-    });
-    const fallbackRoute = this.materialize(decision);
-    this.routePromise = Promise.resolve(fallbackRoute);
-    return fallbackRoute;
+      const decision: RouteDecision = {
+        ...route.decision,
+        gateway: target,
+        modelId: adapter.mapModelId(route.decision.requestedModelId),
+        reason: "fallback",
+        fallbackFrom: route.decision.gateway,
+        fallbackReason: reason,
+        zdrEnforced:
+          adapter.enforcesZdr &&
+          !this.zdrRelaxed &&
+          route.decision.zdr !== "none",
+        zdrRelaxed: this.zdrRelaxed || route.decision.zdr === "none",
+      };
+      this.context.logger.warn("ai.router.fallback", {
+        ...decisionLogFields(decision),
+        errorName,
+        status,
+      });
+      const fallbackRoute = this.materialize(decision);
+      this.routePromise = Promise.resolve(fallbackRoute);
+      return fallbackRoute;
+    }
+    return undefined;
   }
 }

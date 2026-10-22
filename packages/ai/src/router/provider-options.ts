@@ -12,6 +12,7 @@ import type {
   RouterProviderOptions,
 } from "@notra/ai/types/router";
 
+import { NoCompliantRouteError } from "./errors";
 import { toOpenRouterModelId, toVercelModelId } from "./model-ids";
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -44,10 +45,22 @@ function resolveZdrFlag(
   allowNonZdr: boolean,
   requested: unknown
 ): boolean {
-  if (relaxZdr) {
-    return false;
-  }
-  return allowNonZdr ? requested === true : true;
+  return requested === true || !(relaxZdr || allowNonZdr);
+}
+
+function explicitPrivacyRequirements(providerOptions: SharedV4ProviderOptions) {
+  const gateway = asObject(providerOptions[VERCEL_OPTIONS_KEY]);
+  const provider = asObject(
+    asObject(providerOptions[OPENROUTER_OPTIONS_KEY]).provider
+  );
+  const zdr = gateway.zeroDataRetention === true || provider.zdr === true;
+  return {
+    zdr,
+    noTraining:
+      zdr ||
+      gateway.disallowPromptTraining === true ||
+      provider.data_collection === "deny",
+  };
 }
 
 export function splitRouterOptions(providerOptions?: SharedV4ProviderOptions): {
@@ -72,13 +85,42 @@ export function stripForeignGatewayOptions(
   gateway: GatewayId,
   providerOptions: SharedV4ProviderOptions
 ): SharedV4ProviderOptions {
-  const foreignKey =
-    gateway === "vercel" ? OPENROUTER_OPTIONS_KEY : VERCEL_OPTIONS_KEY;
-  if (!(foreignKey in providerOptions)) {
-    return providerOptions;
+  return Object.fromEntries(
+    Object.entries(providerOptions).filter(
+      ([key]) =>
+        (key !== VERCEL_OPTIONS_KEY || gateway === "vercel") &&
+        (key !== OPENROUTER_OPTIONS_KEY || gateway === "openrouter") &&
+        (key !== "neon" || gateway === "neon")
+    )
+  );
+}
+
+export function buildNeonProviderOptions(
+  input: BuildProviderOptionsInput
+): SharedV4ProviderOptions {
+  const privacy = explicitPrivacyRequirements(input.providerOptions);
+  if (privacy.zdr || privacy.noTraining) {
+    throw new NoCompliantRouteError(
+      "neon",
+      "Neon cannot enforce explicit privacy restrictions"
+    );
   }
-  const { [foreignKey]: _removed, ...rest } = providerOptions;
-  return rest;
+  const options = stripForeignGatewayOptions("neon", input.providerOptions);
+  const existing = asObject(options.neon);
+  const openai = asObject(options.openai);
+  const anthropic = asObject(options.anthropic);
+  const effort =
+    input.router.reasoning?.effort ??
+    existing.reasoningEffort ??
+    openai.reasoningEffort ??
+    anthropic.effort;
+  return {
+    ...options,
+    neon: {
+      ...existing,
+      ...(typeof effort === "string" ? { reasoningEffort: effort } : {}),
+    } as JSONObject,
+  };
 }
 
 export function buildVercelProviderOptions(
@@ -86,20 +128,17 @@ export function buildVercelProviderOptions(
 ): SharedV4ProviderOptions {
   const { providerOptions, router, allowNonZdr, relaxZdr = false } = input;
   const existing = asObject(providerOptions[VERCEL_OPTIONS_KEY]);
+  const privacy = explicitPrivacyRequirements(providerOptions);
   const fallbackModels = resolveFallbackModels(
     router,
     existing.models,
     toVercelModelId
   );
 
-  const zeroDataRetention = resolveZdrFlag(
-    relaxZdr,
-    allowNonZdr,
-    existing.zeroDataRetention
-  );
-  const disallowPromptTraining = relaxZdr
-    ? existing.disallowPromptTraining === true
-    : !(allowNonZdr && existing.disallowPromptTraining === false);
+  const zeroDataRetention = resolveZdrFlag(relaxZdr, allowNonZdr, privacy.zdr);
+  const disallowPromptTraining =
+    privacy.noTraining ||
+    (!relaxZdr && !(allowNonZdr && existing.disallowPromptTraining === false));
 
   const { zeroDataRetention: _ignoredZdr, ...existingWithoutZdr } = existing;
   const gatewayOptions: Record<string, unknown> = {
@@ -165,11 +204,13 @@ export function buildOpenRouterProviderOptions(
   const { providerOptions, router, allowNonZdr, relaxZdr = false } = input;
   const existing = asObject(providerOptions[OPENROUTER_OPTIONS_KEY]);
   const existingProvider = asObject(existing.provider);
+  const privacy = explicitPrivacyRequirements(providerOptions);
 
-  const zdr = resolveZdrFlag(relaxZdr, allowNonZdr, existingProvider.zdr);
+  const zdr = resolveZdrFlag(relaxZdr, allowNonZdr, privacy.zdr);
   const dataCollection =
-    (relaxZdr && existingProvider.data_collection !== "deny") ||
-    (allowNonZdr && existingProvider.data_collection === "allow")
+    !privacy.noTraining &&
+    ((relaxZdr && existingProvider.data_collection !== "deny") ||
+      (allowNonZdr && existingProvider.data_collection === "allow"))
       ? "allow"
       : "deny";
 

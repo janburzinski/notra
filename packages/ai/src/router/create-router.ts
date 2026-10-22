@@ -3,6 +3,7 @@ import type { SharedV4ProviderMetadata } from "@ai-sdk/provider";
 import {
   DEFAULT_CREDIT_CHECK_TTL_MS,
   DEFAULT_PLAN_CACHE_TTL_MS,
+  GATEWAY_FALLBACK_ORDER,
   ORGANIZATION_LOOKUP_CACHE_CAPACITY,
   ORGANIZATION_LOOKUP_FAILURE_TTL_MS,
   ROUTER_METADATA_KEY,
@@ -25,7 +26,6 @@ import { createCreditTracker } from "./credits";
 import { GatewayCreditBalanceError } from "./errors";
 import { RoutedLanguageModel } from "./lazy-model";
 import { createOrganizationLookup } from "./organization-cache";
-import { otherGateway } from "./policy";
 import { resolveRoute } from "./resolve";
 
 const noopLogger: RouterLogger = {
@@ -33,8 +33,6 @@ const noopLogger: RouterLogger = {
   warn: () => undefined,
   error: () => undefined,
 };
-
-const GATEWAY_COUNT = 2;
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -100,31 +98,36 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
 
   const resolve = (request: RouteRequest) => resolveRoute(context, request);
 
-  const fetchBalance = (gateway: GatewayId) =>
-    Effect.promise(async () => {
-      const adapter = config.adapters[gateway];
-      if (!adapter) {
-        return;
-      }
-      try {
-        const { balance } = await adapter.getBalance();
-        credits.record(gateway, balance);
-        logger.info("ai.router.credits", { gateway, balance });
-      } catch (error) {
-        logger.warn("ai.router.credits_check_failed", {
-          gateway,
-          error: errorMessage(error),
-        });
-        credits.record(gateway, null);
-      }
-    });
+  const fetchBalance = Effect.fn("ai.router.fetchBalance")(function* (
+    gateway: GatewayId
+  ) {
+    const adapter = config.adapters[gateway];
+    if (!adapter) {
+      return;
+    }
+    yield* Effect.tryPromise(() => adapter.getBalance()).pipe(
+      Effect.match({
+        onSuccess: ({ balance }) => {
+          credits.record(gateway, balance);
+          logger.info("ai.router.credits", { gateway, balance });
+        },
+        onFailure: (error) => {
+          logger.warn("ai.router.credits_check_failed", {
+            gateway,
+            error: errorMessage(error.cause),
+          });
+          credits.record(gateway, null);
+        },
+      })
+    );
+  });
 
   // Shares one in-flight balance check per gateway between concurrent
   // requests. Freshness stays with the credit tracker, so nothing is kept
   // once the check settles.
   const balanceChecks = Effect.runSync(
     Cache.makeWith(fetchBalance, {
-      capacity: GATEWAY_COUNT,
+      capacity: GATEWAY_FALLBACK_ORDER.length,
       timeToLive: () => 0,
     })
   );
@@ -142,30 +145,23 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
   const assertRouteHasCredits = async (
     request: RouteRequest
   ): Promise<RouteDecision> => {
-    const decision = await resolve(request);
-    await refreshBalance(decision);
-    if (!credits.isExhausted(decision.gateway)) {
-      return decision;
+    for (let attempt = 0; ; attempt += 1) {
+      const decision = await resolve(request);
+      await refreshBalance(decision);
+      if (!credits.isExhausted(decision.gateway)) {
+        return decision;
+      }
+      if (
+        !config.policy.crossGatewayFallback ||
+        request.gateway ||
+        attempt === GATEWAY_FALLBACK_ORDER.length - 1
+      ) {
+        throw new GatewayCreditBalanceError(
+          credits.snapshot(decision.gateway)?.balance ?? 0,
+          decision.gateway
+        );
+      }
     }
-
-    const balance = credits.snapshot(decision.gateway)?.balance ?? 0;
-    const canFallback =
-      config.policy.crossGatewayFallback &&
-      !request.gateway &&
-      config.adapters[otherGateway(decision.gateway)] !== undefined;
-    if (!canFallback) {
-      throw new GatewayCreditBalanceError(balance, decision.gateway);
-    }
-
-    const fallback = await resolve(request);
-    await refreshBalance(fallback);
-    if (credits.isExhausted(fallback.gateway)) {
-      throw new GatewayCreditBalanceError(
-        credits.snapshot(fallback.gateway)?.balance ?? 0,
-        fallback.gateway
-      );
-    }
-    return fallback;
   };
 
   return {

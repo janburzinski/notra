@@ -12,6 +12,32 @@ export const DEFAULT_CREDIT_CHECK_TTL_MS = 30_000;
 export const DEFAULT_UNAVAILABLE_TTL_MS = 5 * 60_000;
 export const ROUTE_USAGE_LOOKUP_CONCURRENCY = 4;
 
+export const GATEWAY_FALLBACK_ORDER: readonly GatewayId[] = [
+  "neon",
+  "vercel",
+  "openrouter",
+];
+
+/** Verified chat-completions IDs from https://neon.com/docs/ai-gateway/overview. */
+export const NEON_MODEL_ALIASES: Readonly<Record<string, string>> = {
+  "anthropic/claude-sonnet-5": "claude-sonnet-5",
+  "anthropic/claude-sonnet-5.5": "claude-sonnet-5-5",
+  "anthropic/claude-opus-5.5": "claude-opus-5-5",
+  "anthropic/claude-sonnet-4.6": "claude-sonnet-4-6",
+  "anthropic/claude-opus-4.6": "claude-opus-4-6",
+  "anthropic/claude-haiku-4.5": "claude-haiku-4-5",
+  "openai/gpt-6-luna": "gpt-6-luna",
+  "openai/gpt-6-sol": "gpt-6-sol",
+  "openai/gpt-6.1-sol": "gpt-6-1-sol",
+  "openai/gpt-5.5": "gpt-5-5",
+  "openai/gpt-5.4-mini": "gpt-5-4-mini",
+  "openai/gpt-5-mini": "gpt-5-mini",
+  "google/gemini-3-flash": "gemini-3-flash",
+};
+
+export const NEON_SERVED_MODEL_PREFIX_PATTERN =
+  /^(?:databricks-|global\.anthropic\.)/;
+
 export const DEFAULT_OPENROUTER_ACCOUNT_BASE_URL =
   "https://openrouter.ai/api/v1";
 
@@ -131,9 +157,9 @@ export const RETRYABLE_STATUS_CODES: ReadonlySet<number> = new Set([
 ]);
 
 export const ROUTER_POLICY = {
-  defaultGateway: "openrouter",
-  paidGateway: "vercel",
-  freeGateway: "openrouter",
+  defaultGateway: "neon",
+  paidGateway: "neon",
+  freeGateway: "neon",
   allowNonZdr: process.env.NODE_ENV === "development",
   crossGatewayFallback: true,
 } satisfies RouterPolicyConfig;

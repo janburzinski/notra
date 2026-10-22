@@ -42,6 +42,7 @@
     "@ai-sdk/code-mode": "1.0.86",
     "@ai-sdk/gateway": "catalog:",
     "@ai-sdk/mcp": "2.0.68",
+    "@ai-sdk/openai-compatible": "3.0.68",
     "@ai-sdk/provider": "4.0.23",
     "@aws-sdk/client-s3": "catalog:",
     "@databuddy/sdk": "catalog:",

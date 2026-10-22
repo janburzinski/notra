@@ -1,5 +1,7 @@
 import { MODEL_PRICING } from "@notra/ai/billing/token-pricing";
 import {
+  NEON_MODEL_ALIASES,
+  NEON_SERVED_MODEL_PREFIX_PATTERN,
   OPENROUTER_MODEL_ALIASES,
   OPENROUTER_UNSUPPORTED_MODELS,
   VERCEL_NAMESPACE_PREFIX,
@@ -54,8 +56,25 @@ export function fromVercelServedModelId(modelId: string): string {
 
 export function isModelSupported(gateway: GatewayId, modelId: string): boolean {
   const neutral = stripVercelNamespace(modelId);
+  if (gateway === "neon") {
+    return Object.hasOwn(NEON_MODEL_ALIASES, neutral);
+  }
   if (gateway === "vercel") {
     return !VERCEL_UNSUPPORTED_MODELS.has(neutral);
   }
   return !OPENROUTER_UNSUPPORTED_MODELS.has(neutral);
+}
+
+export function toNeonModelId(modelId: string): string {
+  const neutral = stripVercelNamespace(modelId);
+  return NEON_MODEL_ALIASES[neutral] ?? neutral;
+}
+
+export function fromNeonModelId(modelId: string): string {
+  const short = modelId.replace(NEON_SERVED_MODEL_PREFIX_PATTERN, "");
+  return (
+    Object.entries(NEON_MODEL_ALIASES).find(
+      ([, id]) => id === short || `${id}-preview` === short
+    )?.[0] ?? modelId
+  );
 }

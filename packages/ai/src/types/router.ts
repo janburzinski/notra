@@ -8,7 +8,7 @@ import type { OperationalContext } from "@notra/ai/types/operational-log";
 import type { ProviderMetadata } from "ai";
 import type * as z from "zod";
 
-export type GatewayId = "vercel" | "openrouter";
+export type GatewayId = "neon" | "vercel" | "openrouter";
 
 export type Plan = "free" | "paid";
 
@@ -149,8 +149,8 @@ export interface GatewayAdapter {
   mapModelId(modelId: string): string;
   createModel(modelId: string): LanguageModelV4;
   /**
-   * Translate neutral provider options into the gateway-specific block. The
-   * router removes the other gateway's block before delegating.
+   * Translate neutral options and explicit privacy constraints into the
+   * gateway-specific block, then strip foreign gateway blocks.
    */
   buildProviderOptions(
     input: BuildProviderOptionsInput
@@ -254,6 +254,12 @@ export interface UnavailableMark {
 export interface OrganizationLookupResult<T> {
   value: T;
   source: "resolver" | "cache";
+}
+
+export interface OrganizationLookupEntry<T> {
+  value: T;
+  fromStore: boolean;
+  claimed: boolean;
 }
 
 /** Resolves to `undefined` when the lookup failed; callers pick a fallback. */
@@ -367,6 +373,13 @@ export interface VercelAdapterConfig {
   apiKey?: string;
   headers?: Record<string, string>;
   baseURL?: string;
+  fetch?: typeof fetch;
+}
+
+export interface NeonAdapterConfig {
+  apiKey: string;
+  /** Bare branch gateway host, or its /v1 chat-completions base URL. */
+  baseURL: string;
   fetch?: typeof fetch;
 }
 

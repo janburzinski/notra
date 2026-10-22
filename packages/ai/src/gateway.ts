@@ -4,6 +4,7 @@ import { resolveOrganizationZdrMode } from "@notra/ai/billing/zdr";
 import { AGENT_DEFAULT_MODEL } from "@notra/ai/constants/models";
 import { ROUTER_POLICY } from "@notra/ai/constants/router";
 import { log } from "@notra/ai/evlog";
+import { createNeonAdapter } from "@notra/ai/router/adapters/neon";
 import { createOpenRouterAdapter } from "@notra/ai/router/adapters/openrouter";
 import { createVercelAdapter } from "@notra/ai/router/adapters/vercel";
 import { createModelRouter } from "@notra/ai/router/create-router";
@@ -52,6 +53,17 @@ const routerLogger: RouterLogger = {
 
 function buildAdapters(): Partial<Record<GatewayId, GatewayAdapter>> {
   const adapters: Partial<Record<GatewayId, GatewayAdapter>> = {};
+
+  const neonApiKey =
+    process.env.NEON_AI_GATEWAY_API_KEY?.trim() ||
+    process.env.NEON_AI_GATEWAY_TOKEN?.trim();
+  const neonBaseURL = process.env.NEON_AI_GATEWAY_BASE_URL?.trim();
+  if (neonApiKey && neonBaseURL) {
+    adapters.neon = createNeonAdapter({
+      apiKey: neonApiKey,
+      baseURL: neonBaseURL,
+    });
+  }
 
   // On Vercel the gateway also authenticates via OIDC without an explicit key.
   const vercelApiKey = process.env.AI_GATEWAY_API_KEY?.trim();
@@ -115,7 +127,7 @@ export function resolveModelRoute(
 /**
  * Route-aware credit check. Resolves the route the given request would take
  * and verifies the selected gateway still has credits. Falls back to the
- * other gateway when allowed and throws `GatewayCreditBalanceError` when no
+ * remaining gateways when allowed and throws `GatewayCreditBalanceError` when no
  * funded route exists.
  */
 export function assertRouteHasCredits(
@@ -125,6 +137,8 @@ export function assertRouteHasCredits(
     modelId: options.modelId ?? AGENT_DEFAULT_MODEL,
     organizationId: options.organizationId,
     gateway: options.gateway,
+    zdr: options.zdr,
+    logContext: options.logContext,
   });
 }
 

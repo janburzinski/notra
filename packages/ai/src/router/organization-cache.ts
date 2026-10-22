@@ -1,8 +1,9 @@
 import type {
   OrganizationLookup,
+  OrganizationLookupEntry,
   OrganizationLookupOptions,
 } from "@notra/ai/types/router";
-import { Cache, Clock, Effect, Exit } from "effect";
+import { Cache, type Cause, Clock, Effect, Exit } from "effect";
 
 /**
  * Effect clock driven by the router's `now`, so cache expiry follows the
@@ -21,12 +22,6 @@ export function clockFromNow(now: () => number): Clock.Clock {
   };
 }
 
-interface LookupEntry<T> {
-  value: T;
-  fromStore: boolean;
-  claimed: boolean;
-}
-
 /**
  * Per-organization lookup cache. Concurrent misses share one resolver call,
  * the cache is capacity bounded, and failures are kept only briefly so an
@@ -41,21 +36,32 @@ export function createOrganizationLookup<T>(
 
   // A failed lookup is cached as `undefined` so it expires on the short
   // failure TTL instead of being retried by every request.
-  const load = (organizationId: string) =>
-    Effect.promise(async (): Promise<LookupEntry<T> | undefined> => {
-      try {
-        const stored = await store?.get(organizationId);
-        if (stored !== undefined) {
-          return { value: stored, fromStore: true, claimed: false };
-        }
-        const value = await resolve(organizationId);
-        await store?.set(organizationId, value, ttlMs);
-        return { value, fromStore: false, claimed: false };
-      } catch (error) {
-        onFailure(organizationId, error);
-        return undefined;
+  const load = Effect.fn("ai.router.organizationLookup")(
+    function* (
+      organizationId: string
+    ): Effect.fn.Return<OrganizationLookupEntry<T>, Cause.UnknownError> {
+      const stored = store
+        ? yield* Effect.tryPromise(() => store.get(organizationId))
+        : undefined;
+      if (stored !== undefined) {
+        return { value: stored, fromStore: true, claimed: false };
       }
-    });
+      const value = yield* Effect.tryPromise(() => resolve(organizationId));
+      if (store) {
+        yield* Effect.tryPromise(() => store.set(organizationId, value, ttlMs));
+      }
+      return { value, fromStore: false, claimed: false };
+    },
+    (effect, organizationId) =>
+      effect.pipe(
+        Effect.catch((error) =>
+          Effect.sync(() => {
+            onFailure(organizationId, error.cause);
+            return undefined;
+          })
+        )
+      )
+  );
 
   const cache = Effect.runSync(
     Cache.makeWith(load, {

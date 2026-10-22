@@ -1,6 +1,6 @@
 # Model router
 
-Plan-aware routing between the Vercel AI Gateway and OpenRouter, exposed to
+Privacy-aware routing between Neon AI Gateway, Vercel AI Gateway and OpenRouter, exposed to
 the rest of the monorepo through `@notra/ai/gateway`:
 
 ```ts
@@ -22,9 +22,21 @@ const grounded = gateway("openai/gpt-5.4", { organizationId, gateway: "vercel" }
 | situation                   | gateway                |
 | --------------------------- | ---------------------- |
 | pinned via `gateway` option | as pinned, no fallback |
-| no organization context     | openrouter             |
-| paid plan                   | vercel                 |
-| free plan                   | openrouter             |
+| no organization context     | neon, subject to privacy |
+| paid plan                   | neon, subject to privacy |
+| free plan                   | neon, subject to privacy |
+
+Neon is preferred for supported models when privacy allows it (`zdr: "none"`,
+or the existing development-only bypass). Fallback order is Neon → Vercel →
+OpenRouter, skipping the current gateway and any unavailable routes. Explicit
+pins remain pinned. Missing Neon configuration does not disable other gateways.
+
+Configure `NEON_AI_GATEWAY_API_KEY` (or Neon's standard
+`NEON_AI_GATEWAY_TOKEN`) and `NEON_AI_GATEWAY_BASE_URL`. The URL is the branch
+gateway host from Connect → AI Gateway; a trailing `/v1` is also accepted.
+Neon uses the OpenAI-compatible chat-completions endpoint. Only verified catalog
+IDs in `NEON_MODEL_ALIASES` are routed there; other models fall back. Neon does
+not receive Vercel/OpenRouter routing or automatic model-fallback options.
 
 The plan is resolved once per organization through `resolvePlan`
 (`@notra/ai/billing/plan` → Autumn) and cached for 60 s. Concurrent misses
@@ -39,6 +51,10 @@ Strict requests (`zdr: "required"`) enforce zero data retention and no training:
 
 - OpenRouter: `provider: { zdr: true, data_collection: "deny" }`.
 - Vercel: `gateway: { zeroDataRetention: true, disallowPromptTraining: true }`.
+- Neon: not ZDR-capable. [Neon's retention policy](https://neon.com/docs/ai-gateway/data-retention)
+  permits temporary input/output storage for abuse monitoring (up to 30 days).
+  Strict requests skip Neon; `preferred` requests use a compliant route first.
+  Explicit caller privacy restrictions are never silently discarded for Neon.
 
 If no compliant route is available, strict requests fail closed.
 
@@ -51,6 +67,10 @@ error. The result is logged as `ai.router.zdr_bypassed` with `zdrEnforced: false
 Requests with `zdr: "none"` relax both defaults immediately. These modes work
 outside development and do not depend on the development-only `allowNonZdr`
 policy. Explicit caller no-training restrictions remain in effect.
+
+Explicit positive privacy flags are translated across gateways before foreign
+option blocks are stripped. A deny/no-training or ZDR requirement wins over
+relaxed defaults and conflicting allow flags, including on runtime fallback.
 
 OpenRouter receives `zdr: false` on relaxed calls to override the strict
 provider and model defaults.
@@ -67,8 +87,8 @@ to a catalog.
 
 ## Upstream failures
 
-`classifyUpstreamFailure()` decides whether a failed call may retry once on
-the other gateway: credit exhaustion (402), rejected credentials (401), a
+`classifyUpstreamFailure()` decides whether a failed call may retry on
+another gateway (each gateway at most once per call, plus a preferred-privacy retry): credit exhaustion (402), rejected credentials (401), a
 missing ZDR host or no-training provider (`non-compliant`), an unknown model
 (404) and transient upstream errors (5xx, 408/409/425/429, network
 failures). Rejected credentials mark the whole gateway unavailable for
@@ -105,6 +125,12 @@ Anthropic thinking / OpenAI reasoning settings are mapped to
 
 ## Extraction
 
+Organization and credit lookups use named `Effect.fn` operations with
+`Effect.tryPromise`, so SDK failures stay in the typed error channel rather than
+becoming defects. Existing Effect caches still deduplicate concurrent lookups
+and retain the short failure TTL. Public methods remain Promise/AI-SDK APIs;
+model generation and Web Streams do not need an additional Effect runtime.
+
 `packages/ai/src/router/**` has no `process.env` reads; gateways, plan and
 ZDR lookups and the logger are injected through `createModelRouter(config)`. The
 Notra-specific glue (fixed policy, Autumn plan lookup, evlog logger, singleton)
@@ -112,3 +138,6 @@ lives in `packages/ai/src/constants/router.ts` and `packages/ai/src/gateway.ts`.
 
 Live smoke test: `bun packages/ai/evals/router/live-check.ts` (uses the keys
 from `.env`, fake plan resolver).
+
+Neon does not expose a documented balance endpoint for inference credentials, so
+its balance stays unknown; a 402 triggers fallback rather than a made-up balance.

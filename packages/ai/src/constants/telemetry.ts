@@ -165,8 +165,8 @@ export const TELEMETRY_ENUM_FIELDS: Readonly<
     "other",
     "unknown",
   ]),
-  gateway: new Set(["vercel", "openrouter", "direct"]),
-  fallbackFrom: new Set(["vercel", "openrouter"]),
+  gateway: new Set(["neon", "vercel", "openrouter", "direct"]),
+  fallbackFrom: new Set(["neon", "vercel", "openrouter"]),
   fallbackReason: new Set([
     "not-configured",
     "unsupported-model",

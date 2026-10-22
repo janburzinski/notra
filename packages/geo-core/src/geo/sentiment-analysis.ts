@@ -118,6 +118,9 @@ export const loadGeoSentimentAnalysis = Effect.fn("geo.sentimentAnalysis")(
         !(
           process.env.AI_GATEWAY_API_KEY ||
           process.env.OPENROUTER_API_KEY ||
+          ((process.env.NEON_AI_GATEWAY_API_KEY?.trim() ||
+            process.env.NEON_AI_GATEWAY_TOKEN?.trim()) &&
+            process.env.NEON_AI_GATEWAY_BASE_URL?.trim()) ||
           process.env.VERCEL_OIDC_TOKEN ||
           process.env.VERCEL === "1" ||
           isDemoMode()
