@@ -1,6 +1,5 @@
 import {
   decodeIntegrationEncryptionKey,
-  decodePreviousIntegrationEncryptionKey,
   decryptIntegrationSecret,
   encryptIntegrationSecret,
 } from "@notra/db/utils/integration-encryption";
@@ -14,13 +13,5 @@ export function encryptToken(token: string) {
 }
 
 export function decryptToken(encryptedToken: string) {
-  try {
-    return decryptIntegrationSecret(encryptedToken, getEncryptionKey());
-  } catch (error) {
-    const previousKey = decodePreviousIntegrationEncryptionKey();
-    if (!previousKey) {
-      throw error;
-    }
-    return decryptIntegrationSecret(encryptedToken, previousKey);
-  }
+  return decryptIntegrationSecret(encryptedToken, getEncryptionKey());
 }

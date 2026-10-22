@@ -23,13 +23,6 @@ export function decodeIntegrationEncryptionKey(
   return decodedKey;
 }
 
-export function decodePreviousIntegrationEncryptionKey() {
-  const key = process.env.INTEGRATION_ENCRYPTION_KEY_PREVIOUS;
-  return key
-    ? decodeIntegrationEncryptionKey(key, "INTEGRATION_ENCRYPTION_KEY_PREVIOUS")
-    : null;
-}
-
 export function encryptIntegrationSecret(value: string, key: Buffer) {
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);

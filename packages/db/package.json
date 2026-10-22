@@ -13,7 +13,6 @@
   },
   "scripts": {
     "check:migrations": "bun run src/scripts/check-migrations.ts",
-    "rotate:integration-key": "bun run src/scripts/rotate-integration-encryption-key.ts",
     "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
     "test": "bun test tests",
     "seed:brand-identity": "bun run src/scripts/seed-brand-identity.ts",
