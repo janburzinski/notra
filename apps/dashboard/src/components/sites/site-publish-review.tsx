@@ -99,7 +99,9 @@ export function SitePublishPullRequest({
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className="min-w-0 truncate font-medium">
-        {siteBranchLabel(props.branch ?? "", locale, branches("editLabel"))}
+        {siteBranchLabel(props.branch ?? "", locale, (date) =>
+          branches("draftFrom", { date })
+        )}
       </span>
       <Badge
         shape="rounded"

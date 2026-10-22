@@ -1,6 +1,10 @@
 import { SITE_EDIT_BRANCH_PREFIX } from "@notra/sites-core/constants/sites";
 
-export function siteBranchLabel(name: string, locale: string, edit: string) {
+export function siteBranchLabel(
+  name: string,
+  locale: string,
+  draftFrom: (date: string) => string
+) {
   const content =
     /^notra\/(?:blog-post|changelog)-(.+?)-[a-f0-9]{16}(?:-[a-f0-9]{8})?$/.exec(
       name
@@ -22,10 +26,12 @@ export function siteBranchLabel(name: string, locale: string, edit: string) {
       `${year}-${month}-${day}T${hour}:${minute}:${second}Z`
     );
     if (!Number.isNaN(date.getTime())) {
-      return `${edit} · ${new Intl.DateTimeFormat(locale, {
-        month: "short",
-        day: "numeric",
-      }).format(date)}`;
+      return draftFrom(
+        new Intl.DateTimeFormat(locale, {
+          month: "short",
+          day: "numeric",
+        }).format(date)
+      );
     }
   }
   const label = title

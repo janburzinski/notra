@@ -12,14 +12,14 @@ export function SiteBranchSwitcher({
   controller,
   menuActive,
 }: SiteBranchSwitcherProps) {
-  const { props, queries, busy, switchTo, create, setAction } = controller;
+  const { props, queries, busy, switchTo, setAction } = controller;
   const { productionBranch } = props;
   const { status, current } = queries;
   return (
     <div className="max-w-72 min-w-0" data-site-branch-box="">
       <SiteBranchMenu
         open={menuActive && queries.menuOpen}
-        onOpenChange={controller.setMenuOpen}
+        onOpenChange={queries.setMenuOpen}
         current={current}
         productionBranch={productionBranch}
         pullRequest={status.data?.pullRequest}
@@ -30,7 +30,6 @@ export function SiteBranchSwitcher({
         onSearch={queries.setSearch}
         onSelect={switchTo}
         onAction={setAction}
-        onCreate={create}
         creating={controller.creating}
         onStartCreate={controller.startCreate}
         error={queries.branches.isError}

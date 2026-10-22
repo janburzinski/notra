@@ -17,10 +17,8 @@ export function useSiteBranchControls(props: SiteBranchControlsProps) {
   const queries = useSiteBranchQueries(props);
   const [action, setAction] = useState<SiteBranchDialogProps["action"]>(null);
   const [switching, setSwitching] = useState(false);
-  const [creating, setCreating] = useState(false);
   const mutations = useSiteBranchActions(props, action, () => {
     setAction(null);
-    setCreating(false);
     queries.setMenuOpen(false);
   });
   const busy =
@@ -38,17 +36,7 @@ export function useSiteBranchControls(props: SiteBranchControlsProps) {
       )
       .then(() => setSwitching(false));
   };
-  const startCreate = () => {
-    setCreating(true);
-    queries.setMenuOpen(true);
-  };
-  const create = (title: string) => mutations.create.mutate(title.trim());
-  const setMenuOpen = (open: boolean) => {
-    queries.setMenuOpen(open);
-    if (!open) {
-      setCreating(false);
-    }
-  };
+  const startCreate = () => mutations.create.mutate("");
   const retrySave = () => {
     void props
       .onFlush()
@@ -64,10 +52,8 @@ export function useSiteBranchControls(props: SiteBranchControlsProps) {
     setAction,
     busy,
     switchTo,
-    create,
     startCreate,
-    creating,
-    setMenuOpen,
+    creating: mutations.create.isPending,
     retrySave,
   } as const;
 }

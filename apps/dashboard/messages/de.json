@@ -8638,9 +8638,7 @@
       }
     },
     "branches": {
-      "optionalTitle": "Branchname (optional)",
-      "confirmCreate": "Erstellen",
-      "editLabel": "Änderung",
+      "draftFrom": "Entwurf vom {date}",
       "rowActions": "Aktionen für {branch}",
       "deletedDrafts": "{count, plural, one {# gelöschter Branch hat ungespeicherte Entwürfe} other {# gelöschte Branches haben ungespeicherte Entwürfe}}",
       "discard": "Verwerfen",

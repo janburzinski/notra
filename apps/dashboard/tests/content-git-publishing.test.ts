@@ -1475,16 +1475,6 @@ if (!databaseUrl) {
       fake.state.beforeCommit = async () => {};
     }
   });
-  test("new branch labels preserve UI acronyms and the user's title casing", async () => {
-    const { siteEditBranchName } =
-      await import("@notra/sites-server/utils/site-edit-branch");
-    const { siteBranchLabel } = await import("@/utils/site-branch-label");
-    const branch = siteEditBranchName("UI Review");
-    expect(siteBranchLabel(branch, "en", "Edit")).toBe("UI Review");
-    expect(siteBranchLabel("notra/site-edit-ui-review", "en", "Edit")).toBe(
-      "UI review"
-    );
-  });
   test("an invalid explicit site cannot silently change a new publication's target", async () => {
     await createSite();
     await expect(

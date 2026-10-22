@@ -64,7 +64,6 @@ export interface SiteBranchMenuProps {
   actions?: ReactNode;
   error?: boolean;
   onRetry?: () => void;
-  onCreate: (title: string) => void;
   creating: boolean;
   onStartCreate: () => void;
   open: boolean;
@@ -133,11 +132,6 @@ export interface SiteBranchEntryProps extends Pick<
 export interface SiteBranchScrollListProps {
   count: number;
   children: ReactNode;
-}
-
-export interface SiteBranchCreateFormProps {
-  loading: boolean;
-  onCreate: (title: string) => void;
 }
 
 export type SitePullRequestTone =

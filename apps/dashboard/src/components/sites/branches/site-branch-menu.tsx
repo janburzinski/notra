@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { Input } from "@notra/ui/components/ui/input";
+import { Spinner } from "@notra/ui/components/ui/spinner";
 import { useEffect, useRef } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { SiteBranchBadge } from "@/components/sites/branches/site-branch-badge";
-import { SiteBranchCreateForm } from "@/components/sites/branches/site-branch-create-form";
 import { SiteBranchEntries } from "@/components/sites/branches/site-branch-entries";
 import type { SiteBranchMenuProps } from "@/types/site-branches";
 import { siteBranchLabel } from "@/utils/site-branch-label";
@@ -45,7 +45,7 @@ export function SiteBranchMenu(props: SiteBranchMenuProps) {
           <Button
             variant="secondary"
             disabled={props.disabled}
-            className="h-8 max-w-full min-w-0 justify-start gap-2 px-2.5 text-sm font-normal"
+            className="h-8 max-w-full min-w-0 justify-start gap-2 px-2.5 text-sm font-normal active:scale-100"
           />
         }
       >
@@ -59,7 +59,9 @@ export function SiteBranchMenu(props: SiteBranchMenuProps) {
           className="max-w-52 min-w-0 truncate text-start"
           title={props.current}
         >
-          {siteBranchLabel(props.current, locale, t("editLabel"))}
+          {siteBranchLabel(props.current, locale, (date) =>
+            t("draftFrom", { date })
+          )}
         </span>
         <SiteBranchBadge
           live={props.current === props.productionBranch}
@@ -73,63 +75,59 @@ export function SiteBranchMenu(props: SiteBranchMenuProps) {
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-88 max-w-[90vw]">
-        {props.creating ? (
-          <SiteBranchCreateForm
-            loading={props.disabled}
-            onCreate={props.onCreate}
+        <div className="p-1">
+          <Input
+            ref={input}
+            aria-label={t("search")}
+            placeholder={t("search")}
+            value={props.search}
+            onChange={(event) => props.onSearch(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== "Escape" && event.key !== "ArrowDown") {
+                event.stopPropagation();
+              }
+            }}
           />
-        ) : (
-          <>
-            <div className="p-1">
-              <Input
-                ref={input}
-                aria-label={t("search")}
-                placeholder={t("search")}
-                value={props.search}
-                onChange={(event) => props.onSearch(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key !== "Escape" && event.key !== "ArrowDown") {
-                    event.stopPropagation();
-                  }
-                }}
-              />
-            </div>
-            <SiteBranchEntries {...props} />
-            <DropdownMenuSeparator />
+        </div>
+        <SiteBranchEntries {...props} />
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          closeOnClick={false}
+          disabled={props.disabled}
+          onClick={props.onStartCreate}
+        >
+          {props.creating ? (
+            <Spinner />
+          ) : (
+            <HugeiconsIcon aria-hidden="true" icon={Add01Icon} size={16} />
+          )}
+          {t("create")}
+        </DropdownMenuItem>
+        {deleted.length > 0 ? (
+          <div className="text-muted-foreground flex items-center gap-1 border-t px-2 py-2 text-xs">
+            <span className="flex-1">
+              {t("deletedDrafts", { count: deleted.length })}
+            </span>
             <DropdownMenuItem
-              closeOnClick={false}
-              onClick={props.onStartCreate}
+              className="min-h-7 px-1 text-xs underline underline-offset-2"
+              onClick={() =>
+                props.onAction({
+                  kind: "discardDeleted",
+                  branch: deleted[0]!.name,
+                  branches: deleted.map((entry) => entry.name),
+                })
+              }
             >
-              <HugeiconsIcon aria-hidden="true" icon={Add01Icon} size={16} />
-              {t("create")}
+              {t("discard")}
             </DropdownMenuItem>
-            {deleted.length > 0 ? (
-              <div className="text-muted-foreground flex items-center gap-1 border-t px-2 py-2 text-xs">
-                <span className="flex-1">
-                  {t("deletedDrafts", { count: deleted.length })}
-                </span>
-                <DropdownMenuItem
-                  className="min-h-7 px-1 text-xs underline underline-offset-2"
-                  onClick={() =>
-                    props.onAction({
-                      kind: "discardDeleted",
-                      branch: deleted[0]!.name,
-                      branches: deleted.map((entry) => entry.name),
-                    })
-                  }
-                >
-                  {t("discard")}
-                </DropdownMenuItem>
-              </div>
-            ) : null}
-            {props.actions ? (
-              <>
-                <DropdownMenuSeparator />
-                {props.actions}
-              </>
-            ) : null}
+          </div>
+        ) : null}
+        {props.actions ? (
+          <>
+            <DropdownMenuSeparator />
+            {props.actions}
           </>
-        )}
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

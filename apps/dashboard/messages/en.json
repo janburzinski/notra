@@ -8638,9 +8638,7 @@
       }
     },
     "branches": {
-      "optionalTitle": "Branch name (optional)",
-      "confirmCreate": "Create",
-      "editLabel": "Edit",
+      "draftFrom": "Draft from {date}",
       "rowActions": "Actions for {branch}",
       "deletedDrafts": "{count, plural, one {# deleted branch has unsaved drafts} other {# deleted branches have unsaved drafts}}",
       "discard": "Discard",

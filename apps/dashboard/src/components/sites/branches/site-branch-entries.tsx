@@ -33,7 +33,8 @@ function SiteBranchEntryItem({
   const live = entry.name === productionBranch;
   const active = entry.name === current;
   const label =
-    entry.title ?? siteBranchLabel(entry.name, locale, t("editLabel"));
+    entry.title ??
+    siteBranchLabel(entry.name, locale, (date) => t("draftFrom", { date }));
   return (
     <div className="flex items-center gap-1">
       <DropdownMenuItem
@@ -116,7 +117,7 @@ export function SiteBranchEntries(props: SiteBranchMenuProps) {
       entry.exists &&
       (entry.name === props.productionBranch ||
         (entry.name.startsWith(NOTRA_BRANCH_PREFIX) &&
-          `${entry.name} ${entry.title ?? ""} ${siteBranchLabel(entry.name, locale, t("editLabel"))}`
+          `${entry.name} ${entry.title ?? ""} ${siteBranchLabel(entry.name, locale, (date) => t("draftFrom", { date }))}`
             .toLocaleLowerCase(locale)
             .includes(search)))
   );

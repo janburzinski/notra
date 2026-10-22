@@ -10,7 +10,7 @@ export function SiteBranchBadge({ live, pullRequest }: SiteBranchBadgeProps) {
   const t = useTranslations("sites.writing");
   if (!live) {
     return (
-      <Badge shape="rounded" variant="secondary">
+      <Badge shape="rounded" variant="outline">
         {t(`branchState.${siteBranchStateKey(pullRequest)}`)}
       </Badge>
     );
