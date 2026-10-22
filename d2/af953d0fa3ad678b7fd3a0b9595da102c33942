@@ -1,0 +1,9 @@
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  ai_agent 304-308,310-314,317,321-333
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d2af953d0fa3ad678b7fd3a0b9595da102c33942",
+  "prompts": {}
+}
