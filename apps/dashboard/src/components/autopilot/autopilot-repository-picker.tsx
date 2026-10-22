@@ -26,6 +26,8 @@ export function AutopilotRepositoryPicker({
   value,
   onChange,
   className,
+  label = "Website repository",
+  placeholder = "Choose a repository",
 }: AutopilotRepositoryPickerProps) {
   const selected =
     repositories.find((repository) => repository.fullName === value) ?? null;
@@ -43,7 +45,7 @@ export function AutopilotRepositoryPicker({
       value={selected}
     >
       <ComboboxPrimitive.Trigger
-        aria-label="Website repository"
+        aria-label={label}
         className={cn(
           buttonVariants({ variant: "secondary", size: "sm" }),
           "justify-between font-normal active:scale-100",
@@ -52,7 +54,7 @@ export function AutopilotRepositoryPicker({
         )}
         id={id}
       >
-        <span className="truncate">{value ?? "Choose a repository"}</span>
+        <span className="truncate">{value ?? placeholder}</span>
         <HugeiconsIcon
           className="text-muted-foreground size-4 shrink-0"
           icon={UnfoldMoreIcon}

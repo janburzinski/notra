@@ -39,6 +39,7 @@ import type {
   AutopilotRunContext,
 } from "@/types/autopilot";
 import type { AutopilotRunTrigger } from "@/types/autopilot-runtime";
+import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { toErrorMessage } from "@/utils/error-message";
 
 class AutopilotNotConfiguredError extends Error {
@@ -184,6 +185,7 @@ export async function buildAutopilotRunContext(
     jobs: { ...AUTOPILOT_DEFAULT_JOBS, ...settings.jobs },
     maxOpenPullRequests: settings.maxOpenPullRequests,
     stalePullRequestDays: settings.stalePullRequestDays,
+    commitFilters: toAutopilotCommitFilters(settings.commitFilters),
     brand: brand
       ? {
           name: brand.companyName ?? brand.name,

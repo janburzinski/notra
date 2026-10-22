@@ -14,6 +14,18 @@ function isValidTimezone(timezone: string) {
 }
 
 const GITHUB_NAME_PATTERN = /^[A-Za-z0-9_.-]+$/;
+/** A GitHub user or app login; app logins end in [bot]. */
+const GITHUB_LOGIN_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})(?:\[bot\])?$/;
+const GITHUB_FULL_NAME_PATTERN = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+/** Repository-relative: no leading slash, no "..", no backslashes. */
+const REPOSITORY_PATH_PATTERN = /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[^\\\0]+$/;
+const AUTOPILOT_MAX_EXCLUDED_AUTHORS = 50;
+const AUTOPILOT_MAX_PATH_FILTER_REPOSITORIES = 50;
+const AUTOPILOT_MAX_PATHS_PER_REPOSITORY = 20;
+
+function uniqueLowercase(values: string[]) {
+  return [...new Set(values.map((value) => value.toLowerCase()))];
+}
 
 export const autopilotOrganizationInputSchema = z.object({
   organizationId: organizationIdSchema,
@@ -105,6 +117,57 @@ export const autopilotSaveInputSchema = autopilotOrganizationInputSchema.extend(
       .optional(),
   }
 );
+
+export const autopilotGitHubLoginSchema = z
+  .string()
+  .trim()
+  .regex(GITHUB_LOGIN_PATTERN, "Use a GitHub login");
+
+/** A path prefix or glob inside a repository, like apps/web or docs/**. */
+export const autopilotRepositoryPathSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(200)
+  .regex(REPOSITORY_PATH_PATTERN, "Use a path inside the repository");
+
+/** Author and path filters for the pull requests "Write about releases" reads. */
+export const autopilotCommitFiltersSchema = z.object({
+  excludedAuthors: z
+    .array(autopilotGitHubLoginSchema)
+    .max(AUTOPILOT_MAX_EXCLUDED_AUTHORS)
+    .transform(uniqueLowercase),
+  paths: z
+    .record(
+      z.string().max(201).regex(GITHUB_FULL_NAME_PATTERN, "Use owner/name"),
+      z
+        .array(autopilotRepositoryPathSchema)
+        .max(AUTOPILOT_MAX_PATHS_PER_REPOSITORY)
+        .transform((values) => [...new Set(values)])
+    )
+    .refine(
+      (paths) =>
+        Object.keys(paths).length <= AUTOPILOT_MAX_PATH_FILTER_REPOSITORIES,
+      "Too many repositories"
+    )
+    // Keys are matched lowercase; a repository without paths has no filter.
+    .transform((paths) => {
+      const merged: Record<string, string[]> = {};
+      for (const [repository, values] of Object.entries(paths)) {
+        const key = repository.toLowerCase();
+        merged[key] = [...new Set([...(merged[key] ?? []), ...values])];
+      }
+      return Object.fromEntries(
+        Object.entries(merged).filter(([, values]) => values.length > 0)
+      );
+    }),
+});
+
+/** Replaces the commit filters as a whole, like a job toggle. */
+export const autopilotSetCommitFiltersInputSchema =
+  autopilotOrganizationInputSchema.extend({
+    filters: autopilotCommitFiltersSchema,
+  });
 
 /** Turns one job on or off without resending the whole settings form. */
 export const autopilotSetJobInputSchema =

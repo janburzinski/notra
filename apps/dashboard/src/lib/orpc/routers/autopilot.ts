@@ -22,6 +22,7 @@ import {
   autopilotRunInputSchema,
   autopilotRunNowInputSchema,
   autopilotSaveInputSchema,
+  autopilotSetCommitFiltersInputSchema,
   autopilotSetJobInputSchema,
 } from "@notra/schemas/dashboard/autopilot";
 import { os } from "@orpc/server";
@@ -35,6 +36,7 @@ import {
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
+import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
 import {
   dismissFinding,
   listFindings,
@@ -67,6 +69,7 @@ import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { badRequest, forbidden } from "@/lib/orpc/utils/errors";
 import { startAutopilotSuggestionWorkflowRun } from "@/lib/workflows/start";
 import type { ORPCContext } from "@/types/orpc/context";
+import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { normalizeRepositoryDirectory } from "@/utils/autopilot-paths";
 
 /**
@@ -198,6 +201,7 @@ export const autopilotRouter = {
           briefHour: settings?.briefHour ?? 9,
           timezone: settings?.timezone ?? "Europe/Berlin",
           jobs: { ...AUTOPILOT_DEFAULT_JOBS, ...settings?.jobs },
+          commitFilters: toAutopilotCommitFilters(settings?.commitFilters),
           maxOpenPullRequests: settings?.maxOpenPullRequests ?? 3,
           stalePullRequestDays: settings
             ? settings.stalePullRequestDays
@@ -255,6 +259,17 @@ export const autopilotRouter = {
         defaultBranch: repository.defaultBranch,
         private: repository.private,
       }));
+    }),
+
+  /** Recent pull request authors in the watched repositories, for the skip list. */
+  authorSuggestions: authorizedProcedure
+    .input(autopilotOrganizationInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(({ input, context }) => {
+      // Admins only: the list names people from private repositories.
+      assertCanManageAutopilot(context);
+      return listRecentPullRequestAuthors(input.organizationId);
     }),
 
   save: authorizedProcedure
@@ -334,6 +349,23 @@ export const autopilotRouter = {
         .set({
           jobs: sql`${autopilotSettings.jobs} || jsonb_build_object(${input.kind}::text, ${input.enabled}::boolean)`,
         })
+        .where(eq(autopilotSettings.organizationId, input.organizationId))
+        .returning({ organizationId: autopilotSettings.organizationId });
+      if (!updated) {
+        throw badRequest("Set up Autopilot first.");
+      }
+      return { success: true as const };
+    }),
+
+  setCommitFilters: authorizedProcedure
+    .input(autopilotSetCommitFiltersInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      const [updated] = await db
+        .update(autopilotSettings)
+        .set({ commitFilters: input.filters })
         .where(eq(autopilotSettings.organizationId, input.organizationId))
         .returning({ organizationId: autopilotSettings.organizationId });
       if (!updated) {

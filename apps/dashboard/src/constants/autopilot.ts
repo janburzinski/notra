@@ -1,4 +1,5 @@
 import type {
+  AutopilotCommitFilters,
   AutopilotEventLevel,
   AutopilotFindingStatus,
   AutopilotJobKind,
@@ -81,6 +82,37 @@ export const AUTOPILOT_COMMITS_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS = 30;
 export const AUTOPILOT_COMMITS_MAX_REPOSITORIES = 5;
 export const AUTOPILOT_COMMITS_MAX_PULL_REQUESTS = 30;
+/**
+ * Changed files read per pull request for a path filter, at 100 a page. A
+ * bigger pull request with no match in what was read is kept: unknown is not
+ * "outside the paths".
+ */
+export const AUTOPILOT_PULL_REQUEST_FILES_MAX_PAGES = 3;
+/**
+ * The bots most repositories have, by their exact GitHub App logins. Skipped
+ * by default and offered as presets when a repository shows no bots of its own.
+ */
+export const AUTOPILOT_WELL_KNOWN_BOTS = [
+  "dependabot[bot]",
+  "renovate[bot]",
+  "github-actions[bot]",
+];
+/** Mirrors the commit_filters column default in packages/db. */
+export const AUTOPILOT_DEFAULT_COMMIT_FILTERS: AutopilotCommitFilters = {
+  excludedAuthors: AUTOPILOT_WELL_KNOWN_BOTS,
+  paths: {},
+};
+/** Recent pull request authors are read this far back for suggestions. */
+export const AUTOPILOT_AUTHOR_SUGGESTION_DAYS = 90;
+export const AUTOPILOT_AUTHOR_SUGGESTION_MAX = 100;
+export const AUTOPILOT_AUTHOR_SUGGESTION_CACHE_SECONDS = 60 * 60;
+export const AUTOPILOT_AUTHOR_SUGGESTION_STALE_MS = 10 * 60 * 1000;
+/** Paths may contain spaces, so only commas (and Enter) separate them. */
+export const AUTOPILOT_PATH_SEPARATOR = /,+/;
+/** An author is offered as a preset when most of their pull requests are chores. */
+export const AUTOPILOT_CHORE_AUTHOR_MIN_PULL_REQUESTS = 2;
+export const AUTOPILOT_CHORE_AUTHOR_MIN_SHARE = 0.6;
+export const AUTOPILOT_AUTHOR_PRESETS_SHOWN = 8;
 /**
  * Pull request titles that are pure noise (CI, tests, bumps, merges). refactor
  * and docs stay in: "refactor: 3x faster dashboard" can be worth a post, and
@@ -360,8 +392,11 @@ export const AUTOPILOT_EVENT_DATA_LABELS: Record<string, string> = {
   closed: "Closed pull requests",
   mergedRecently: "Merged in the window",
   lookbackDays: "Days looked back",
+  // Runs logged before bots became a removable skip-list entry.
   byBotsOrAutopilot: "From bots or Autopilot",
+  byAutopilot: "From Autopilot",
   choreTitles: "Chores and bumps",
+  byFilters: "Outside your filters",
   repositories: "Repositories",
   unreadableRepositories: "Unreadable repositories",
   title: "Title",

@@ -16,7 +16,8 @@ import {
   slackIntegrations,
   users,
 } from "@notra/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { Effect } from "effect";
 
 import { createAutopilotSandbox } from "./utils/autopilot-sandbox";
 
@@ -67,6 +68,14 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     imageCollision: false,
     fallbackImageCollision: false,
     reviewersRefused: false,
+    closedPulls: [] as {
+      number: number;
+      title: string;
+      login: string;
+      type?: string;
+      headRef?: string;
+    }[],
+    changedFiles: {} as Record<number, string[]>,
   };
   const comments: string[] = [];
   const feedback: unknown[] = [];
@@ -92,6 +101,26 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     route: string,
     params?: Record<string, unknown>
   ) => {
+    if (route === "GET /repos/{owner}/{repo}/pulls/{pull_number}/files") {
+      const files =
+        params?.page === 1
+          ? (state.changedFiles[Number(params.pull_number)] ?? [])
+          : [];
+      return { data: files.map((filename) => ({ filename })) };
+    }
+    if (route === "GET /repos/{owner}/{repo}/pulls") {
+      return {
+        data: state.closedPulls.map((pull) => ({
+          number: pull.number,
+          title: pull.title,
+          body: "A sandbox release",
+          html_url: `https://github.com/sandbox/app/pull/${pull.number}`,
+          merged_at: new Date().toISOString(),
+          head: { ref: pull.headRef ?? "feature" },
+          user: { login: pull.login, type: pull.type ?? "User" },
+        })),
+      };
+    }
     if (route === "GET /repos/{owner}/{repo}/pulls/{pull_number}") {
       return {
         data: {
@@ -185,6 +214,20 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => state.flag,
+  }));
+  const githubIntegration = await import("@notra/ai/integrations/github");
+  mock.module("@notra/ai/integrations/github", () => ({
+    ...githubIntegration,
+    listGitHubAppRepositoriesEffect: () =>
+      Effect.succeed([
+        {
+          owner: "sandbox",
+          name: "app",
+          fullName: "sandbox/app",
+          defaultBranch: "main",
+          private: false,
+        },
+      ]),
   }));
   mock.module("@/workflows/runtime", () => ({}));
   mock.module("@/lib/geo/configure", () => ({ geoCoreDashboardLayer: {} }));
@@ -431,6 +474,10 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await import("../src/workflows/autopilot-suggestion");
   const { autopilotDraftBranchSlug } =
     await import("../src/utils/autopilot-branches");
+  const { listRecentPullRequestAuthors } =
+    await import("../src/lib/autopilot/authors");
+  const { autopilotAuthorPresets } =
+    await import("../src/utils/autopilot-commit-filters");
   const now = new Date();
   await db.insert(organizations).values({
     id: "sandbox-org",
@@ -504,6 +551,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.imageCollision = false;
     state.fallbackImageCollision = false;
     state.reviewersRefused = false;
+    state.closedPulls = [];
+    state.changedFiles = {};
     reviewers.length = 0;
     writtenFiles.length = 0;
     comments.length = 0;
@@ -520,10 +569,14 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       .where(eq(members.organizationId, "sandbox-org"));
     await db
       .update(autopilotSettings)
-      .set({ maxOpenPullRequests: 3, enabled: true })
+      .set({
+        maxOpenPullRequests: 3,
+        enabled: true,
+        commitFilters: sql`DEFAULT`,
+      })
       .where(eq(autopilotSettings.organizationId, "sandbox-org"));
   });
-  const event = (number = 1, association = "MEMBER") =>
+  const event = (number = 1, association = "MEMBER", login = "sandbox-dev") =>
     JSON.stringify({
       action: "opened",
       installation: { id: 1 },
@@ -541,7 +594,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         html_url: `https://github.com/sandbox/app/pull/${number}`,
         draft: false,
         head: { ref: "feature" },
-        user: { type: "User", login: "sandbox-dev" },
+        user: { type: "User", login },
         author_association: association,
       },
     });
@@ -717,6 +770,15 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         ...input,
         pull_request: { ...input.pull_request, user: { type: "Bot" } },
       })
+    ).toBe("ready");
+    expect(
+      autopilotPullRequestMoment({
+        ...input,
+        pull_request: {
+          ...input.pull_request,
+          user: { type: "Bot", login: "notra[bot]" },
+        },
+      })
     ).toBeNull();
     expect(
       autopilotPullRequestMoment({
@@ -744,6 +806,123 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         pull_request: { ...input.pull_request, merged: false },
       })
     ).toBe("closed");
+  });
+
+  test("release filters drop excluded authors and changes outside the paths before Jev", async () => {
+    const settings = await db.query.autopilotSettings.findFirst({
+      columns: { commitFilters: true },
+    });
+    // The well-known bots are on the list by default, as visible entries.
+    expect(settings?.commitFilters.excludedAuthors).toEqual([
+      "dependabot[bot]",
+      "renovate[bot]",
+      "github-actions[bot]",
+    ]);
+    await db
+      .update(autopilotSettings)
+      .set({
+        commitFilters: {
+          excludedAuthors: [
+            ...(settings?.commitFilters.excludedAuthors ?? []),
+            "excluded-dev",
+          ],
+          paths: { "sandbox/app": ["apps/web"] },
+        },
+      })
+      .where(eq(autopilotSettings.organizationId, "sandbox-org"));
+    state.changedFiles = {
+      8: ["docs/readme.md"],
+      9: ["docs/readme.md", "apps/web/src/page.tsx"],
+      21: ["apps/api/src/index.ts"],
+      22: ["apps/web/src/exports.tsx"],
+    };
+
+    // The webhook: filtered pull requests cost no Jev call and no run.
+    await handleAutopilotPullRequestEvent(event(7, "MEMBER", "Excluded-Dev"));
+    await handleAutopilotPullRequestEvent(event(8));
+    expect(classificationInputs).toHaveLength(0);
+    expect(await db.query.autopilotRuns.findMany()).toHaveLength(0);
+    await handleAutopilotPullRequestEvent(event(9));
+    expect(classificationInputs).toHaveLength(1);
+    expect(opened).toHaveLength(1);
+
+    // The daily job: the same filters, logged as skips in the run.
+    classificationInputs.length = 0;
+    state.closedPulls = [
+      { number: 20, title: "feat: excluded", login: "excluded-dev" },
+      { number: 21, title: "feat: api only", login: "sandbox-dev" },
+      { number: 22, title: "feat: web exports", login: "sandbox-dev" },
+      { number: 23, title: "feat: app bot", login: "helper[bot]", type: "Bot" },
+      {
+        number: 26,
+        title: "feat: bot release",
+        login: "dependabot[bot]",
+        type: "Bot",
+      },
+      {
+        number: 27,
+        title: "feat: own draft",
+        login: "sandbox-dev",
+        headRef: "notra/autopilot/blog",
+      },
+    ];
+    state.changedFiles[23] = ["apps/web/src/bot.ts"];
+    await db.insert(autopilotRuns).values({
+      id: "daily-filters",
+      organizationId: "sandbox-org",
+      trigger: "cron",
+    });
+    const ctx = await buildAutopilotRunContext("sandbox-org", "daily-filters");
+    await runAutopilotJob(ctx, "commits");
+    const events = await db.query.autopilotRunEvents.findMany({
+      where: (row, { eq: equals }) => equals(row.runId, "daily-filters"),
+    });
+    expect(
+      events
+        .filter((row) => row.level === "skip")
+        .map((row) => row.message)
+        .toSorted()
+    ).toEqual([
+      "Skipped sandbox/app#20: author excluded-dev is excluded",
+      "Skipped sandbox/app#21: no changed files under apps/web",
+      "Skipped sandbox/app#26: author dependabot[bot] is excluded",
+    ]);
+    const asked = JSON.stringify(classificationInputs);
+    expect(classificationInputs).toHaveLength(1);
+    // A bot nobody listed is judged like anyone; Notra's own drafts never are.
+    expect(asked).toContain("sandbox/app#22");
+    expect(asked).toContain("sandbox/app#23");
+    for (const number of [20, 21, 26, 27]) {
+      expect(asked).not.toContain(`sandbox/app#${number}`);
+    }
+
+    // Skip-list suggestions: recent authors and bots, chores counted.
+    state.closedPulls.push(
+      { number: 24, title: "chore: bump deps", login: "Deps-Person" },
+      { number: 25, title: "ci: cache", login: "deps-person" }
+    );
+    const authors = await listRecentPullRequestAuthors("sandbox-org");
+    expect(authors.find((author) => author.login === "helper[bot]")?.bot).toBe(
+      true
+    );
+    expect(authors.map((author) => author.login)).not.toContain("notra[bot]");
+    expect(authors.find((author) => author.login === "deps-person")).toEqual({
+      login: "deps-person",
+      bot: false,
+      pullRequests: 2,
+      chores: 2,
+    });
+    // Repository bots first, then chore-heavy people; listed ones drop out.
+    expect(
+      autopilotAuthorPresets(authors, ["dependabot[bot]", "excluded-dev"])
+    ).toEqual(["helper[bot]", "deps-person"]);
+    // Without bots of its own, the well-known ones are offered.
+    expect(
+      autopilotAuthorPresets(
+        authors.filter((author) => !author.bot),
+        ["renovate[bot]"]
+      )
+    ).toEqual(["dependabot[bot]", "github-actions[bot]", "deps-person"]);
   });
 
   for (const publicAssets of [true, false]) {

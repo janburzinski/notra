@@ -75,6 +75,7 @@ import type {
   AgentReadinessScoreBreakdown,
 } from "./types/agent-readiness";
 import type {
+  AutopilotCommitFilters,
   AutopilotFindingEvidence,
   AutopilotJobs,
   AutopilotRunEventData,
@@ -4360,6 +4361,16 @@ export const autopilotSettings = pgTable("autopilot_settings", {
     .notNull()
     .default(
       sql`'{"readiness":true,"keywords":true,"commits":true,"competitors":true}'::jsonb`
+    ),
+  /**
+   * Author and path filters for the pull requests the commits job reads. The
+   * well-known bots are skipped by default, as removable entries.
+   */
+  commitFilters: jsonb("commit_filters")
+    .$type<AutopilotCommitFilters>()
+    .notNull()
+    .default(
+      sql`'{"excludedAuthors":["dependabot[bot]","renovate[bot]","github-actions[bot]"],"paths":{}}'::jsonb`
     ),
   maxOpenPullRequests: integer("max_open_pull_requests").notNull().default(3),
   /** Drafts nobody touched for this many days are closed; null keeps them open. */

@@ -1,5 +1,6 @@
 import type { IconSvgElement } from "@hugeicons/react";
 import type {
+  AutopilotCommitFilters,
   AutopilotFindingEvidence,
   AutopilotJobKind,
 } from "@notra/db/types/autopilot";
@@ -34,6 +35,8 @@ export interface AutopilotRunContext {
   maxOpenPullRequests: number;
   /** Untouched drafts are closed after this many days; null keeps them. */
   stalePullRequestDays: number | null;
+  /** Which product pull requests the commits job reads. */
+  commitFilters: AutopilotCommitFilters;
   brand: {
     name: string;
     websiteUrl: string;
@@ -223,6 +226,9 @@ export interface AutopilotRepositoryPickerProps {
   value: string | null;
   onChange: (repository: AutopilotRepositoryOption) => void;
   className?: string;
+  /** Defaults to the website repository's label and prompt. */
+  label?: string;
+  placeholder?: string;
 }
 
 export type AutopilotSetupState = ReturnType<typeof useAutopilotSetup>;
@@ -417,6 +423,38 @@ export interface AutopilotSettingsPanelProps {
   organizationId: string;
   callbackPath: string;
   overview: AutopilotOverview;
+}
+
+/** Someone who opened pull requests in the watched repositories lately. */
+export interface AutopilotAuthorSuggestion {
+  login: string;
+  /** A GitHub App or bot account. */
+  bot: boolean;
+  pullRequests: number;
+  /** How many of them had a chore, CI or bump title. */
+  chores: number;
+}
+
+export interface AutopilotTagInputProps {
+  id?: string;
+  values: string[];
+  onChange: (values: string[]) => void;
+  /** The entry as stored, or null when it is not valid. */
+  parse: (value: string) => string | null;
+  placeholder?: string;
+  label: string;
+  disabled?: boolean;
+  /** Offered while typing, matched by prefix; added values are left out. */
+  suggestions?: string[];
+  /** Splits pasted or typed text into entries; whitespace and commas by default. */
+  separator?: RegExp;
+}
+
+export interface AutopilotReleaseFiltersSectionProps {
+  organizationId: string;
+  githubConnected: boolean;
+  filters: AutopilotCommitFilters;
+  repositories: AutopilotRepositoryOption[];
 }
 
 export interface AutopilotRulesSectionProps {

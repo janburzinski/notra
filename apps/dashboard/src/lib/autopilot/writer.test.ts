@@ -84,6 +84,7 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
       },
       maxOpenPullRequests: 3,
       stalePullRequestDays: null,
+      commitFilters: { excludedAuthors: [], paths: {} },
       brand: null,
     },
     log: {

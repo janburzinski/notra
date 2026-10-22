@@ -28,6 +28,7 @@ import {
   AUTOPILOT_PULL_REQUEST_CREATED_EVENT,
 } from "@/constants/autopilot";
 import { withAutopilotDraftBilling } from "@/lib/autopilot/billing";
+import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
 import {
   claimFinding,
   claimSuggestedFinding,
@@ -102,7 +103,7 @@ import {
   commitFingerprint,
   describePullRequest,
   pullRequestLabel,
-  isHumanPullRequest,
+  isNotraPullRequest,
   isPostCandidateTitle,
   toMergedPullRequest,
 } from "@/utils/autopilot-github";
@@ -1066,7 +1067,8 @@ async function commitsLookbackDays(ctx: AutopilotRunContext) {
 
 async function listRecentMergedPullRequests(
   ctx: AutopilotRunContext,
-  lookbackDays: number
+  lookbackDays: number,
+  handled: Set<string>
 ) {
   const repositories = await Effect.runPromise(
     listGitHubAppRepositoriesEffect(ctx.organizationId)
@@ -1108,13 +1110,15 @@ async function listRecentMergedPullRequests(
       const recent = data.filter(
         (pull) => pull.merged_at && new Date(pull.merged_at).getTime() >= since
       );
-      const authored = recent.filter((pull) =>
-        isHumanPullRequest({
-          headRef: pull.head.ref,
-          authorType: pull.user?.type ?? null,
-        })
+      // Other bots go through the workspace's author list like anyone else.
+      const authored = recent.filter(
+        (pull) =>
+          !isNotraPullRequest({
+            headRef: pull.head.ref,
+            login: pull.user?.login ?? null,
+          })
       );
-      const pulls = authored
+      const titled = authored
         .filter((pull) => isPostCandidateTitle(pull.title))
         .map((pull) =>
           toMergedPullRequest(repository.fullName, {
@@ -1125,6 +1129,24 @@ async function listRecentMergedPullRequests(
             author: pull.user?.login ?? null,
           })
         );
+      // Settled ones drop out later anyway, so they cost no file read.
+      const skipReasons = await Promise.all(
+        titled.map((pull) =>
+          handled.has(commitFingerprint(pull))
+            ? null
+            : commitFilterSkipReason({
+                filters: ctx.commitFilters,
+                repository,
+                pull,
+                getOctokit: async () => octokit,
+              })
+        )
+      );
+      const pulls = titled.filter((_, index) => !skipReasons[index]);
+      const filtered = titled.flatMap((pull, index) => {
+        const reason = skipReasons[index];
+        return reason ? [{ pull, reason }] : [];
+      });
       const label = (pull: { number: number; title: string }) =>
         `${repository.fullName}#${pull.number} ${pull.title}`;
       const dropped = [
@@ -1140,7 +1162,7 @@ async function listRecentMergedPullRequests(
           .filter((pull) => !authored.includes(pull))
           .map((pull) => ({
             pullRequest: label(pull),
-            reason: "Opened by a bot or by Autopilot",
+            reason: "Opened by Autopilot",
           })),
         ...authored
           .filter((pull) => !isPostCandidateTitle(pull.title))
@@ -1148,14 +1170,20 @@ async function listRecentMergedPullRequests(
             pullRequest: label(pull),
             reason: "Title marks it as CI, tests, a bump or a merge",
           })),
+        ...filtered.map((row) => ({
+          pullRequest: label(row.pull),
+          reason: `Filtered out: ${row.reason}`,
+        })),
       ];
       return {
         pulls,
         dropped,
+        filtered,
         closed: data.length,
         mergedRecently: recent.length,
-        byBotsOrAutopilot: recent.length - authored.length,
-        choreTitles: authored.length - pulls.length,
+        byAutopilot: recent.length - authored.length,
+        choreTitles: authored.length - titled.length,
+        byFilters: filtered.length,
       };
     })
   );
@@ -1178,19 +1206,26 @@ async function listRecentMergedPullRequests(
       : [{ name: repository.fullName, error: "No access to this account" }];
   });
   const sum = (
-    key: "closed" | "mergedRecently" | "byBotsOrAutopilot" | "choreTitles"
+    key:
+      | "closed"
+      | "mergedRecently"
+      | "byAutopilot"
+      | "choreTitles"
+      | "byFilters"
   ) => read.reduce((total, entry) => total + entry[key], 0);
   return {
     pullRequests: read.flatMap((entry) => entry.pulls),
     dropped: read.flatMap((entry) => entry.dropped),
+    filtered: read.flatMap((entry) => entry.filtered),
     unreadable,
     counts: {
       repositories: read.length,
       unreadableRepositories: selected.length - read.length,
       closed: sum("closed"),
       mergedRecently: sum("mergedRecently"),
-      byBotsOrAutopilot: sum("byBotsOrAutopilot"),
+      byAutopilot: sum("byAutopilot"),
       choreTitles: sum("choreTitles"),
+      byFilters: sum("byFilters"),
     },
   };
 }
@@ -1219,11 +1254,11 @@ export async function runCommitsJob(
   if (await writeWaitingIdea({ ctx, log, result, kind: "commits" })) {
     return result;
   }
-  const lookbackDays = await commitsLookbackDays(ctx);
-  const [merged, settled] = await Promise.all([
-    listRecentMergedPullRequests(ctx, lookbackDays),
+  const [lookbackDays, settled] = await Promise.all([
+    commitsLookbackDays(ctx),
     listSettledFingerprints(ctx.organizationId, "commits"),
   ]);
+  const merged = await listRecentMergedPullRequests(ctx, lookbackDays, settled);
   const fresh = merged.pullRequests.filter(
     (pull) => !settled.has(commitFingerprint(pull))
   );
@@ -1244,6 +1279,14 @@ export async function runCommitsJob(
     ],
     kept: pullRequests,
   });
+  // Before the tally, so the tally stays the job's outcome for the run. One
+  // at a time: the timeline orders events by when they were written.
+  for (const row of merged.filtered.slice(0, AUTOPILOT_LOG_DROPPED_MAX)) {
+    await log.skip(
+      `Skipped ${row.pull.repository}#${row.pull.number}: ${row.reason}`,
+      { title: row.pull.title, url: row.pull.url }
+    );
+  }
   await log.decision(
     `${pullRequests.length} candidates from ${merged.counts.closed} closed pull requests in ${merged.counts.repositories} ${merged.counts.repositories === 1 ? "repository" : "repositories"}`,
     {

@@ -6,6 +6,7 @@ import { postGitHubIssueComment } from "@notra/ai/utils/github-pr-comments";
 import { logInfo } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { autopilotSettings } from "@notra/db/schema";
+import type { AutopilotCommitFilters } from "@notra/db/types/autopilot";
 import { eq } from "drizzle-orm";
 
 import {
@@ -20,13 +21,17 @@ import {
   assessPullRequestForPost,
   proposeCommitPost,
 } from "@/lib/autopilot/blog";
+import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
 import {
   dismissFinding,
   findFindingByFingerprint,
   rememberOfferComment,
 } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
-import { getRepositoryOctokit } from "@/lib/autopilot/github";
+import {
+  getInstallationOctokit,
+  getRepositoryOctokit,
+} from "@/lib/autopilot/github";
 import {
   createAutopilotLogger,
   silentAutopilotLogger,
@@ -48,6 +53,7 @@ import type {
   MergedPullRequest,
 } from "@/types/autopilot";
 import type { AutopilotLogger } from "@/types/autopilot-runtime";
+import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { formatAutopilotPercent as percent } from "@/utils/autopilot-events";
 import {
   commitFingerprint,
@@ -68,12 +74,15 @@ async function listEligibleOrganizations(params: {
   const organizations = await listOrganizationsForGitHubInstallation(
     params.installationId
   );
-  const eligible: string[] = [];
+  const eligible: {
+    organizationId: string;
+    commitFilters: AutopilotCommitFilters;
+  }[] = [];
   for (const { organizationId } of organizations) {
     const [available, settings, integration] = await Promise.all([
       isAutopilotEnabledForOrganization(organizationId),
       db.query.autopilotSettings.findFirst({
-        columns: { enabled: true, jobs: true },
+        columns: { enabled: true, jobs: true, commitFilters: true },
         where: eq(autopilotSettings.organizationId, organizationId),
       }),
       // "@notra write a post" only works where mentions are connected.
@@ -86,7 +95,10 @@ async function listEligibleOrganizations(params: {
     ]);
     const jobs = { ...AUTOPILOT_DEFAULT_JOBS, ...settings?.jobs };
     if (available && settings?.enabled && jobs.commits && integration) {
-      eligible.push(organizationId);
+      eligible.push({
+        organizationId,
+        commitFilters: toAutopilotCommitFilters(settings.commitFilters),
+      });
     }
   }
   return eligible;
@@ -117,10 +129,11 @@ export async function handleAutopilotPullRequestEvent(rawBody: string) {
     repo: event.repository.name,
   });
   // One look per pull request even when several workspaces share the install.
-  const organizationId = organizations[0];
-  if (!organizationId) {
+  const eligible = organizations[0];
+  if (!eligible) {
     return;
   }
+  const { organizationId } = eligible;
   const pull = toMergedPullRequest(event.repository.full_name, {
     number: pr.number,
     title: pr.title,
@@ -161,6 +174,26 @@ export async function handleAutopilotPullRequestEvent(rawBody: string) {
     return;
   }
   if (!isPostCandidateTitle(pr.title)) {
+    return;
+  }
+  const skipped = await commitFilterSkipReason({
+    filters: eligible.commitFilters,
+    repository: {
+      owner: event.repository.owner.login,
+      name: event.repository.name,
+      fullName: event.repository.full_name,
+    },
+    pull,
+    getOctokit: () =>
+      getInstallationOctokit(organizationId, event.repository.owner.login),
+  });
+  if (skipped) {
+    // Like a chore title: a filtered pull request never becomes a run.
+    logInfo("autopilot.pull_request_filtered", {
+      organizationId,
+      pullRequest: `${pull.repository}#${pull.number}`,
+      reason: skipped,
+    });
     return;
   }
   await assessAndAct({ organizationId, event, pull, moment });

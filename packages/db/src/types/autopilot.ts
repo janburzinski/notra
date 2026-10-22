@@ -14,6 +14,17 @@ export type AutopilotRunStatus = (typeof AUTOPILOT_RUN_STATUSES)[number];
 
 export type AutopilotJobs = Record<AutopilotJobKind, boolean>;
 
+/** Which product pull requests "Write about releases" looks at. */
+export interface AutopilotCommitFilters {
+  /** Lowercase GitHub logins whose pull requests never become a post. */
+  excludedAuthors: string[];
+  /**
+   * Lowercase owner/name to path prefixes or globs. A pull request in a listed
+   * repository counts only when one of its changed files matches.
+   */
+  paths: Record<string, string[]>;
+}
+
 export interface AutopilotFindingEvidence {
   sourceUrl?: string | null;
   score?: number | null;

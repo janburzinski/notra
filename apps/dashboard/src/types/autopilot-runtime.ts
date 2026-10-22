@@ -42,7 +42,7 @@ export interface AutopilotAdminRunFilters {
 
 export interface AutopilotPullRequestAuthor {
   headRef: string;
-  authorType: string | null;
+  login?: string | null;
 }
 
 export type AutopilotPullRequestSummary = Pick<

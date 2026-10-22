@@ -1,4 +1,5 @@
 import { GITHUB_MENTION_TRUSTED_AUTHOR_ASSOCIATIONS } from "@notra/ai/constants/github-mention";
+import { getGitHubMentionAppHandles } from "@notra/ai/utils/github-mention";
 
 import {
   AUTOPILOT_COMMITS_SKIP_TITLE,
@@ -28,9 +29,21 @@ export function pullRequestLabel(pull: MergedPullRequest) {
   return `${pull.repository}#${pull.number} ${pull.title}`;
 }
 
-/** Excludes bot authors and Autopilot's own branches, not untrusted humans. */
-export function isHumanPullRequest(pull: AutopilotPullRequestAuthor) {
-  return !pull.headRef.startsWith("notra/") && pull.authorType !== "Bot";
+/**
+ * Autopilot's own drafts and anything Notra's app opened: never a release.
+ * Other bots are skipped only through the workspace's author list.
+ */
+export function isNotraPullRequest(pull: AutopilotPullRequestAuthor) {
+  const login = pull.login?.toLowerCase();
+  return (
+    pull.headRef.startsWith("notra/") ||
+    getGitHubMentionAppHandles().some((handle) => login === `${handle}[bot]`)
+  );
+}
+
+/** A GitHub App's login ends in [bot] even where the payload omits its type. */
+export function isBotAuthor(user: { type?: string | null; login: string }) {
+  return user.type === "Bot" || user.login.toLowerCase().endsWith("[bot]");
 }
 
 export function isPostCandidateTitle(title: string) {
@@ -56,9 +69,9 @@ export function autopilotPullRequestMoment(
     !GITHUB_MENTION_TRUSTED_AUTHOR_ASSOCIATIONS.some(
       (association) => association === pr.author_association
     ) ||
-    !isHumanPullRequest({
+    isNotraPullRequest({
       headRef: pr.head.ref,
-      authorType: pr.user?.type ?? null,
+      login: pr.user?.login ?? null,
     })
   ) {
     return null;

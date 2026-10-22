@@ -20,6 +20,7 @@ import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { AutopilotReleaseFiltersSection } from "@/components/autopilot/autopilot-release-filters-section";
 import { AutopilotRepositoryPicker } from "@/components/autopilot/autopilot-repository-picker";
 import { AutopilotRulesSection } from "@/components/autopilot/autopilot-rules-section";
 import { Button } from "@/components/button";
@@ -299,6 +300,12 @@ export function AutopilotSettingsPanel({
           </SettingsRow>
         </div>
       </div>
+      <AutopilotReleaseFiltersSection
+        filters={settings.commitFilters}
+        githubConnected={githubConnected}
+        organizationId={organizationId}
+        repositories={repositories}
+      />
       <AutopilotRulesSection
         organizationId={organizationId}
         rules={overview.rules}
