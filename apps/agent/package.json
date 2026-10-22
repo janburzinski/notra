@@ -16,12 +16,12 @@
     "@ai-sdk/devtools": "catalog:",
     "@ai-sdk/gateway": "catalog:",
     "@aws-sdk/client-s3": "catalog:",
-    "@linear/sdk": "^80.0.0",
+    "@linear/sdk": "^80.1.0",
     "@notra/ai": "workspace:*",
     "@notra/db": "workspace:*",
     "@notra/posthog": "workspace:*",
     "@notra/tools": "workspace:*",
-    "@octokit/core": "^7.0.6",
+    "@octokit/core": "^7.0.8",
     "@resvg/resvg-js": "^2.6.2",
     "@upstash/box": "~0.5.5",
     "@upstash/redis": "catalog:",
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",
-    "@types/node": "^24.0.15",
+    "@types/node": "^24.19.2",
     "dotenv-cli": "catalog:",
     "microsandbox": "~0.6.18",
     "typescript": "catalog:"

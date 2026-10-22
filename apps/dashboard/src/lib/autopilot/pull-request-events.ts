@@ -306,7 +306,7 @@ async function proposeAndComment(params: {
   if (comment && "findingId" in outcome && outcome.findingId) {
     await rememberOfferComment(outcome.findingId, {
       repository: event.repository.full_name,
-      id: comment.id,
+      id: Number(comment.id),
     });
   }
 }

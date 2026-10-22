@@ -36,7 +36,7 @@ export async function createGitHubMentionCheckRun(params: {
       headers: GITHUB_API_VERSION_HEADERS,
     }
   );
-  return { id: data.id };
+  return { id: Number(data.id) };
 }
 
 export async function completeGitHubMentionCheckRun(params: {

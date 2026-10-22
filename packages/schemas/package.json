@@ -16,7 +16,7 @@
     "test": "bun test tests"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^1.2.2",
+    "@hono/zod-openapi": "^1.6.3",
     "@notra/ai": "workspace:*",
     "@notra/content-generation": "workspace:*",
     "@notra/db": "workspace:*",

@@ -421,12 +421,12 @@ export async function syncOfferReactionFeedback(
                 continue;
               }
               const auth = await resolveGitHubMentionAuth({
-                githubUserId: reaction.user.id,
+                githubUserId: Number(reaction.user.id),
                 organizationId,
               });
               if (auth) {
                 votes.push({
-                  user: reaction.user.id,
+                  user: Number(reaction.user.id),
                   content: reaction.content,
                 });
               }

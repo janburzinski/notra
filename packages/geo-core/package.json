@@ -23,7 +23,7 @@
     "@ai-sdk/openai": "4.0.85",
     "@ai-sdk/perplexity": "4.0.52",
     "@ai-sdk/xai": "5.0.2",
-    "@cursor/sdk": "~1.0.36",
+    "@cursor/sdk": "~1.0.37",
     "@notra/ai": "workspace:*",
     "@notra/analytics": "workspace:*",
     "@notra/db": "workspace:*",
@@ -44,7 +44,7 @@
   "devDependencies": {
     "@electric-sql/pglite": "catalog:",
     "@notra/typescript-config": "workspace:*",
-    "@types/node": "^20",
+    "@types/node": "^20.19.43",
     "drizzle-kit": "0.31.11",
     "typescript": "catalog:"
   }

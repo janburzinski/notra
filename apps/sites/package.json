@@ -17,10 +17,10 @@
     "effect": "catalog:"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.0.0",
+    "@cloudflare/workers-types": "^5.20261015.1",
     "@notra/typescript-config": "workspace:*",
     "bun-types": "catalog:",
     "typescript": "catalog:",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.151.0"
   }
 }

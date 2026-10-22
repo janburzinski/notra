@@ -20,10 +20,10 @@
     "seed:persona-visibility": "bun run src/scripts/seed-persona-visibility.ts"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
+    "@neondatabase/serverless": "^1.2.0",
     "@notra/sites-core": "workspace:*",
     "@upstash/redis": "catalog:",
-    "@vercel/functions": "^3.7.7",
+    "@vercel/functions": "^3.10.1",
     "drizzle-orm": "catalog:",
     "pg": "^8.23.1",
     "zod": "catalog:"
