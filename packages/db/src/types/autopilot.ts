@@ -22,7 +22,13 @@ export interface AutopilotFindingEvidence {
   issueIds?: string[];
   keyword?: string | null;
   competitors?: string[];
-  pullRequests?: { number: number; title: string; url: string }[];
+  pullRequests?: {
+    number: number;
+    title: string;
+    url: string;
+    /** GitHub login of who opened it; asked to review the draft. */
+    author?: string | null;
+  }[];
   detail?: string | null;
   /** Jev's confidence that this is worth a post, 0 to 1. */
   confidence?: number | null;

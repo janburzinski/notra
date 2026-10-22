@@ -208,6 +208,23 @@ export async function closeAutopilotPullRequest(
     .catch(() => undefined);
 }
 
+export async function requestAutopilotReviewers(
+  octokit: AutopilotOctokit,
+  repository: AutopilotRepository,
+  pullNumber: number,
+  reviewers: string[]
+) {
+  await octokit.request(
+    "POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers",
+    {
+      owner: repository.owner,
+      repo: repository.name,
+      pull_number: pullNumber,
+      reviewers,
+    }
+  );
+}
+
 export async function openAutopilotPullRequest(params: {
   octokit: AutopilotOctokit;
   repository: AutopilotRepository;

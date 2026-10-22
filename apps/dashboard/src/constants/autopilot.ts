@@ -22,6 +22,8 @@ export const AUTOPILOT_AUTOMATION_KINDS = [
 export const AUTOPILOT_NAV_LINK = "/autopilot";
 
 export const AUTOPILOT_BRANCH_PREFIX = "notra/autopilot";
+/** Source pull request authors asked to review a draft. */
+export const AUTOPILOT_MAX_REVIEWERS = 5;
 export const AUTOPILOT_MARKDOWN_FILE = /\.mdx?$/;
 export const AUTOPILOT_BLOG_SLUG_MAX_CHARS = 60;
 

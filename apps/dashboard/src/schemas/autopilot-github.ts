@@ -19,7 +19,10 @@ export const autopilotPullRequestEventSchema = z.object({
     merged: z.boolean().nullable().optional(),
     draft: z.boolean().nullable().optional(),
     head: z.object({ ref: z.string() }),
-    user: z.object({ type: z.string() }).nullable().optional(),
+    user: z
+      .object({ type: z.string(), login: z.string().optional() })
+      .nullable()
+      .optional(),
     // Missing reads as untrusted: only the repository's own people start Autopilot.
     author_association: z.string().optional(),
   }),

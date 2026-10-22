@@ -126,6 +126,7 @@ export async function handleAutopilotPullRequestEvent(rawBody: string) {
     title: pr.title,
     url: pr.html_url,
     body: pr.body ?? null,
+    author: pr.user?.login ?? null,
   });
   const existing = await findFindingByFingerprint(
     organizationId,

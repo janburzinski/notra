@@ -63,6 +63,7 @@ const pullRequestSchema = z.object({
   merged: z.boolean().nullable().optional(),
   head: pullRequestRefSchema,
   base: pullRequestRefSchema,
+  user: senderSchema.nullable().optional(),
 });
 
 const installationSchema = z.object({

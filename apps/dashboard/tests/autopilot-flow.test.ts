@@ -53,6 +53,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     publicAssets: false,
     imageCollision: false,
     fallbackImageCollision: false,
+    reviewersRefused: false,
   };
   const comments: string[] = [];
   const deliveries: string[] = [];
@@ -60,6 +61,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const opened: string[] = [];
   const writtenFiles: { path: string; contents?: string }[][] = [];
   const closed: number[] = [];
+  const reviewers: string[][] = [];
   const charges: unknown[] = [];
   const holds: string[] = [];
   const release = mock(async () => undefined);
@@ -273,6 +275,17 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ) => {
       closed.push(pull.number);
     },
+    requestAutopilotReviewers: async (
+      _octokit: unknown,
+      _repo: unknown,
+      _pullNumber: number,
+      logins: string[]
+    ) => {
+      if (state.reviewersRefused) {
+        throw new Error("Reviews may only be requested from collaborators");
+      }
+      reviewers.push(logins);
+    },
   }));
   mock.module("@/lib/integrations/github/content-pull-request", () => ({
     isMergeMethodNotAllowed: () => false,
@@ -374,6 +387,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.publicAssets = false;
     state.imageCollision = false;
     state.fallbackImageCollision = false;
+    state.reviewersRefused = false;
+    reviewers.length = 0;
     writtenFiles.length = 0;
     comments.length = 0;
     deliveries.length = 0;
@@ -406,7 +421,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         html_url: `https://github.com/sandbox/app/pull/${number}`,
         draft: false,
         head: { ref: "feature" },
-        user: { type: "User" },
+        user: { type: "User", login: "sandbox-dev" },
         author_association: association,
       },
     });
@@ -438,6 +453,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       headRepoFullName: "sandbox/app",
       baseRef: "main",
       draft: false,
+      authorLogin: "sandbox-dev",
     },
     destination: {
       mode: "reply_only",
@@ -493,6 +509,25 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(holds).toHaveLength(1);
     expect(holds[0]).toStartWith("autopilot-draft:");
     expect(release).not.toHaveBeenCalled();
+  });
+
+  test("drafts ask the source author for review, and a refusal keeps the draft", async () => {
+    expect((await handleAutopilotMention(mentionContext(1)))?.status).toBe(
+      "replied"
+    );
+    await handleAutopilotPullRequestEvent(event(2));
+    expect(reviewers).toEqual([["sandbox-dev"], ["sandbox-dev"]]);
+    state.reviewersRefused = true;
+    await handleAutopilotPullRequestEvent(event(3));
+    expect(opened).toHaveLength(3);
+    const findings = await db.query.autopilotFindings.findMany({
+      columns: { status: true },
+    });
+    expect(findings.map((finding) => finding.status)).toEqual([
+      "proposed",
+      "proposed",
+      "proposed",
+    ]);
   });
 
   test("event thresholds still offer at 85 percent and write only from 95 percent", async () => {

@@ -47,7 +47,7 @@ export interface AutopilotPullRequestAuthor {
 
 export type AutopilotPullRequestSummary = Pick<
   MergedPullRequest,
-  "number" | "title" | "url"
+  "number" | "title" | "url" | "author"
 > & { body: string | null };
 
 /** A held finding: only the token holder may write it or move it on. */

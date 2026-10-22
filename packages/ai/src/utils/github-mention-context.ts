@@ -148,6 +148,7 @@ export async function resolveGitHubMentionContext(params: {
           headRepoFullName: payloadPullRequest.head.repo?.full_name ?? null,
           baseRef: payloadPullRequest.base.ref,
           draft: Boolean(payloadPullRequest.draft),
+          authorLogin: payloadPullRequest.user?.login ?? null,
         };
       } else {
         const token = await getGitHubPublishToken(integrationId, {

@@ -67,6 +67,8 @@ export interface MergedPullRequest {
   url: string;
   /** Whitespace-collapsed and clipped for prompts. */
   body: string;
+  /** GitHub login of who opened it. */
+  author: string | null;
 }
 
 export interface AutopilotJobResult {

@@ -1,6 +1,9 @@
 import { GITHUB_MENTION_TRUSTED_AUTHOR_ASSOCIATIONS } from "@notra/ai/constants/github-mention";
 
-import { AUTOPILOT_COMMITS_SKIP_TITLE } from "@/constants/autopilot";
+import {
+  AUTOPILOT_COMMITS_SKIP_TITLE,
+  AUTOPILOT_MAX_REVIEWERS,
+} from "@/constants/autopilot";
 import type {
   MergedPullRequest,
   AutopilotPullRequestEvent,
@@ -82,5 +85,19 @@ export function toMergedPullRequest(
     title: pull.title,
     url: pull.url,
     body: (pull.body ?? "").replace(/\s+/g, " ").slice(0, 600),
+    author: pull.author,
   };
+}
+
+/**
+ * Who reviews a draft: the people whose pull requests it is about. Bots never
+ * do, and that includes Notra's app, which opens every draft.
+ */
+export function autopilotReviewers(
+  pullRequests: { author?: string | null }[] | undefined
+) {
+  const logins = (pullRequests ?? []).flatMap((pull) =>
+    pull.author && !pull.author.endsWith("[bot]") ? [pull.author] : []
+  );
+  return [...new Set(logins)].slice(0, AUTOPILOT_MAX_REVIEWERS);
 }

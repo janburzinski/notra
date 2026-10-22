@@ -300,6 +300,7 @@ export async function handleAutopilotMention(
       title: pullRequest.title,
       url: pullRequest.htmlUrl,
       body: pullRequest.body,
+      author: pullRequest.authorLogin,
     });
     await log.info(
       `@${context.sender.login} asked on ${pull.repository}#${pull.number}`,

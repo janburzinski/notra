@@ -51,6 +51,7 @@ import {
   openAutopilotPullRequest,
   readRepositoryFile,
   repositoryPathExists,
+  requestAutopilotReviewers,
 } from "@/lib/autopilot/github";
 import { renderPostHeroImage } from "@/lib/autopilot/hero-image";
 import {
@@ -64,6 +65,7 @@ import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import type {
   AutopilotJobResult,
   AutopilotProposal,
+  AutopilotRepository,
   AutopilotRunContext,
   MergedPullRequest,
 } from "@/types/autopilot";
@@ -92,6 +94,7 @@ import {
   setFrontmatterFields,
 } from "@/utils/autopilot-frontmatter";
 import {
+  autopilotReviewers,
   commitFingerprint,
   describePullRequest,
   pullRequestLabel,
@@ -175,6 +178,43 @@ async function loadPageToUpdate(params: {
   return { path, content };
 }
 
+/**
+ * Asks the authors of the source pull requests to review the draft. They are
+ * often not collaborators on the website repository, so a refusal is expected
+ * and never fails the draft.
+ */
+async function requestSourceReviewers(params: {
+  claim: FindingClaim;
+  log: AutopilotLogger;
+  octokit: AutopilotOctokit;
+  repository: AutopilotRepository;
+  pullNumber: number;
+}) {
+  const reviewers = autopilotReviewers(
+    params.claim.finding.evidence.pullRequests
+  );
+  if (reviewers.length === 0) {
+    return;
+  }
+  try {
+    await requestAutopilotReviewers(
+      params.octokit,
+      params.repository,
+      params.pullNumber,
+      reviewers
+    );
+    await params.log.action(
+      `Requested review from ${reviewers.map((login) => `@${login}`).join(", ")}`,
+      { reviewers }
+    );
+  } catch (error) {
+    await params.log.skip("Could not request review from the source authors", {
+      reviewers,
+      error: toErrorMessage(error, String(error)),
+    });
+  }
+}
+
 /** Commits the rewritten page over the original file. */
 async function openPageUpdate(params: {
   ctx: AutopilotRunContext;
@@ -220,6 +260,13 @@ async function openPageUpdate(params: {
     title: post.title,
     path: existing.path,
     updated: true,
+  });
+  await requestSourceReviewers({
+    claim,
+    log,
+    octokit,
+    repository: ctx.repository,
+    pullNumber: pullRequest.number,
   });
   return pullRequest;
 }
@@ -370,6 +417,13 @@ async function writeBlogPullRequest(params: {
     url: pullRequest.url,
     title: post.title,
     path,
+  });
+  await requestSourceReviewers({
+    claim,
+    log,
+    octokit,
+    repository: ctx.repository,
+    pullNumber: pullRequest.number,
   });
   return pullRequest;
 }
@@ -1029,6 +1083,7 @@ async function listRecentMergedPullRequests(
             title: pull.title,
             url: pull.html_url,
             body: pull.body ?? null,
+            author: pull.user?.login ?? null,
           })
         );
       const label = (pull: { number: number; title: string }) =>
@@ -1257,7 +1312,12 @@ export function proposeCommitPost(params: {
       summary: `${pull.repository}#${pull.number} ${pull.title}`,
       evidence: {
         pullRequests: [
-          { number: pull.number, title: pull.title, url: pull.url },
+          {
+            number: pull.number,
+            title: pull.title,
+            url: pull.url,
+            author: pull.author,
+          },
         ],
         detail: `Merged in ${pull.repository}#${pull.number}.`,
       },

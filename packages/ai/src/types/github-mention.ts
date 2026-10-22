@@ -53,6 +53,7 @@ export interface GitHubMentionPullRequest {
   headRepoFullName: string | null;
   baseRef: string;
   draft: boolean;
+  authorLogin: string | null;
 }
 
 export interface GitHubMentionPublication extends ContentPublication {}
