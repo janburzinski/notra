@@ -1,10 +1,14 @@
 import {
   AiMagicIcon,
   AlertCircleIcon,
+  Archive02Icon,
+  BulbIcon,
   Cancel01Icon,
   Clock01Icon,
   FilterIcon,
   GitBranchIcon,
+  GitMergeIcon,
+  GitPullRequestClosedIcon,
   GitPullRequestIcon,
   Idea01Icon,
   Image02Icon,
@@ -32,6 +36,8 @@ import type {
 import type {
   AutopilotAutomationKind,
   AutopilotMetricsDays,
+  AutopilotOutcomeKey,
+  AutopilotRunTrigger,
 } from "@/types/autopilot-metrics";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
 
@@ -40,6 +46,7 @@ export const AUTOPILOT_PAGE_TABS = [
   "automations",
   "pull-requests",
   "runs",
+  "analytics",
   "settings",
 ] as const;
 
@@ -107,6 +114,89 @@ export const AUTOPILOT_METRIC_RANGES = [
   { days: 30, label: "Last 30 days" },
   { days: 90, label: "Last 90 days" },
 ] as const satisfies readonly { days: AutopilotMetricsDays; label: string }[];
+
+/** Where the ideas of a period ended up, in the Analytics tab's order. */
+export const AUTOPILOT_OUTCOMES = [
+  {
+    key: "merged",
+    label: "Merged",
+    icon: GitMergeIcon,
+    iconClassName: "text-primary",
+    className: "bg-primary",
+  },
+  {
+    key: "inReview",
+    label: "In review",
+    icon: GitPullRequestIcon,
+    iconClassName: "text-success",
+    className: "bg-success",
+  },
+  {
+    key: "suggested",
+    label: "Suggested",
+    icon: BulbIcon,
+    iconClassName: "text-info",
+    className: "bg-info",
+  },
+  {
+    key: "dismissed",
+    label: "Dismissed",
+    icon: GitPullRequestClosedIcon,
+    iconClassName: "text-destructive",
+    className: "bg-destructive/70",
+  },
+  {
+    key: "expired",
+    label: "Auto-closed",
+    icon: Archive02Icon,
+    iconClassName: "text-muted-foreground",
+    className: "bg-muted-foreground/40",
+  },
+  {
+    key: "failed",
+    label: "Failed",
+    icon: AlertCircleIcon,
+    iconClassName: "text-warning",
+    className: "bg-warning",
+  },
+] as const satisfies readonly {
+  key: AutopilotOutcomeKey;
+  label: string;
+  icon: IconSvgElement;
+  iconClassName: string;
+  className: string;
+}[];
+
+/** The Analytics tab's stat strip, in order; shown as skeletons while loading. */
+export const AUTOPILOT_ANALYTICS_STAT_LABELS = [
+  "PRs opened",
+  "PRs merged",
+  "Merge rate",
+  "Median time to merge",
+] as const;
+
+/** Legend of the Pull requests chart; matches CHART_PRIMARY/SECONDARY_COLOR. */
+export const AUTOPILOT_ACTIVITY_LEGEND = [
+  {
+    key: "opened",
+    label: "Opened",
+    className: "bg-[#8B5CF6] dark:bg-[#9C87E3]",
+  },
+  {
+    key: "merged",
+    label: "Merged",
+    className: "bg-[#18929F] dark:bg-[#20ABBA]",
+  },
+] as const;
+
+/** Segment colors of the Runs breakdown, busiest trigger first in practice. */
+export const AUTOPILOT_TRIGGER_COLORS: Record<AutopilotRunTrigger, string> = {
+  cron: "bg-primary",
+  github: "bg-[#18929F] dark:bg-[#20ABBA]",
+  suggestion: "bg-primary/45",
+  manual: "bg-muted-foreground/40",
+  onboarding: "bg-muted-foreground/25",
+};
 
 /** Short labels for anything Autopilot did, e.g. the automation of a pull request. */
 export const AUTOPILOT_KIND_META: Record<

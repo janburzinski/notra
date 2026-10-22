@@ -6,6 +6,8 @@ import type {
 } from "@notra/db/types/autopilot";
 import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 
+import type { AutopilotOutcomeKey } from "@/types/autopilot-metrics";
+
 export const AUTOPILOT_FLAG_KEY = "autopilot";
 export const AUTOPILOT_GITHUB_DELIVERY_PREFIX = "autopilot:";
 
@@ -20,6 +22,17 @@ export const AUTOPILOT_AUTOMATION_KINDS = [
   "commits",
 ] as const satisfies readonly AutopilotJobKind[];
 export const AUTOPILOT_NAV_LINK = "/autopilot";
+
+/** The Analytics tab's outcome bucket for each finding status. */
+export const AUTOPILOT_OUTCOME_BY_STATUS = {
+  merged: "merged",
+  open: "inReview",
+  proposed: "inReview",
+  suggested: "suggested",
+  dismissed: "dismissed",
+  expired: "expired",
+  failed: "failed",
+} as const satisfies Record<AutopilotFindingStatus, AutopilotOutcomeKey>;
 
 export const AUTOPILOT_BRANCH_PREFIX = "notra/autopilot";
 /** Source pull request authors asked to review a draft. */

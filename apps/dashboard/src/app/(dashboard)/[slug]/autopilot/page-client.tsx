@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Analytics01Icon,
   Clock01Icon,
   GitPullRequestIcon,
   PlayIcon,
@@ -24,6 +25,7 @@ import {
 } from "nuqs";
 import { useEffect, useState } from "react";
 
+import { AutopilotAnalyticsPanel } from "@/components/autopilot/autopilot-analytics-panel";
 import { AutopilotAutomationsOverview } from "@/components/autopilot/autopilot-automations-overview";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
 import { AutopilotFindingTables } from "@/components/autopilot/autopilot-finding-tables";
@@ -243,6 +245,12 @@ function AutopilotOverviewPage({
               >
                 Runs
               </IconTabsTrigger>
+              <IconTabsTrigger
+                icon={<HugeiconsIcon icon={Analytics01Icon} size={15} />}
+                value="analytics"
+              >
+                Analytics
+              </IconTabsTrigger>
               {canManage ? (
                 <IconTabsTrigger
                   icon={<HugeiconsIcon icon={Settings01Icon} size={15} />}
@@ -253,7 +261,7 @@ function AutopilotOverviewPage({
               ) : null}
             </IconTabsList>
           </div>
-          {tab === "automations" ? (
+          {tab === "automations" || tab === "analytics" ? (
             <AutopilotPeriodSelect onChange={setDays} value={days} />
           ) : null}
         </div>
@@ -313,6 +321,12 @@ function AutopilotOverviewPage({
           <AutopilotRunsTable
             onSelect={(run) => router.push(`${basePath}/runs/${run.id}`)}
             runs={runs}
+          />
+        </TabsContent>
+        <TabsContent className="mt-4" value="analytics">
+          <AutopilotAnalyticsPanel
+            days={days}
+            organizationId={organizationId}
           />
         </TabsContent>
         <TabsContent className="mt-4" value="settings">

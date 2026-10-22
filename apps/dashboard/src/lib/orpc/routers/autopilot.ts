@@ -34,6 +34,7 @@ import {
   AUTOPILOT_IMPACT_MAX_FINDINGS,
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
+import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import {
   dismissFinding,
   listFindings,
@@ -99,6 +100,22 @@ function errorMessage(error: unknown) {
 }
 
 export const autopilotRouter = {
+  analytics: authorizedProcedure
+    .input(autopilotMetricsInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input }) => {
+      const now = new Date();
+      const [current, previous] = await Promise.all([
+        loadAutopilotAnalytics(input.organizationId, input.days, now),
+        loadAutopilotAnalytics(
+          input.organizationId,
+          input.days,
+          new Date(now.getTime() - input.days * 24 * 60 * 60 * 1000)
+        ),
+      ]);
+      return { ...current, previous: previous.summary };
+    }),
   metrics: authorizedProcedure
     .input(autopilotMetricsInputSchema)
     .use(withOrganizationAccess)

@@ -1,3 +1,4 @@
+import type { AUTOPILOT_RUN_TRIGGERS } from "@notra/db/constants/autopilot";
 import type { AutopilotJobKind } from "@notra/db/types/autopilot";
 import type { autopilotMetricsDaysSchema } from "@notra/schemas/dashboard/autopilot";
 import type * as z from "zod";
@@ -5,6 +6,8 @@ import type * as z from "zod";
 import type { AUTOPILOT_AUTOMATION_KINDS } from "@/constants/autopilot";
 
 export type AutopilotMetricsDays = z.infer<typeof autopilotMetricsDaysSchema>;
+
+export type AutopilotRunTrigger = (typeof AUTOPILOT_RUN_TRIGGERS)[number];
 
 export type AutopilotAutomationKind =
   (typeof AUTOPILOT_AUTOMATION_KINDS)[number];
@@ -48,4 +51,61 @@ export interface AutopilotAutomationsOverviewProps {
 export interface AutopilotPeriodSelectProps {
   value: AutopilotMetricsDays;
   onChange: (days: AutopilotMetricsDays) => void;
+}
+
+/** Where the ideas found in the period ended up. */
+export type AutopilotOutcomeKey =
+  | "merged"
+  | "inReview"
+  | "suggested"
+  | "dismissed"
+  | "expired"
+  | "failed";
+
+export interface AutopilotAnalyticsSummary {
+  /** Ideas (findings) Autopilot came up with. */
+  ideas: number;
+  /** Of those ideas, the ones that got a pull request. */
+  ideasWithPullRequest: number;
+  pullRequests: number;
+  merged: number;
+  /** Pull requests closed without a merge, by a person or as stale. */
+  closed: number;
+  /** merged / (merged + closed); null before anything was decided. */
+  mergeRate: number | null;
+  medianHoursToMerge: number | null;
+  runs: number;
+  /** completed / (completed + failed); running runs count for neither. */
+  runSuccessRate: number | null;
+  averageRunSeconds: number | null;
+  credits: number;
+}
+
+export interface AutopilotAnalyticsDay {
+  /** YYYY-MM-DD, UTC. */
+  day: string;
+  opened: number;
+  merged: number;
+}
+
+export interface AutopilotAnalyticsAutomation {
+  kind: AutopilotAutomationKind;
+  ideas: number;
+  pullRequests: number;
+  merged: number;
+  mergeRate: number | null;
+}
+
+export interface AutopilotAnalytics {
+  days: AutopilotMetricsDays;
+  summary: AutopilotAnalyticsSummary;
+  series: AutopilotAnalyticsDay[];
+  outcomes: Record<AutopilotOutcomeKey, number>;
+  triggers: { trigger: AutopilotRunTrigger; runs: number }[];
+  automations: AutopilotAnalyticsAutomation[];
+}
+
+export interface AutopilotAnalyticsPanelProps {
+  organizationId: string;
+  days: AutopilotMetricsDays;
 }
