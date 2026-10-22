@@ -840,6 +840,39 @@ Root install configuration and the prepare script remain declared in
 `turbo.json#globalDependencies` for build cache invalidation. Declare any new
 shared build inputs there too.
 
+## Rotating the integration encryption key
+
+`INTEGRATION_ENCRYPTION_KEY` encrypts every stored integration credential, so
+a rotation runs in two phases with the old key kept as
+`INTEGRATION_ENCRYPTION_KEY_PREVIOUS` in between. Readers try the current key
+first and fall back to the previous one, while every new write uses the current
+key.
+
+1. Set `GITHUB_CONTENT_EXPORT_SIGNING_KEY` to the current key on every project
+   that publishes content to GitHub. Commit messages from earlier exports are
+   signed with that key and can't be rewritten, so it stays in place after the
+   rotation.
+2. Generate the new key with `openssl rand -base64 32`. On the API, agent and
+   console projects, set `INTEGRATION_ENCRYPTION_KEY` to the new key and
+   `INTEGRATION_ENCRYPTION_KEY_PREVIOUS` to the old one, then deploy them
+   before the dashboard. The keys must be available to production builds as
+   well as at runtime.
+3. Apply the same two values to the dashboard and deploy it to production.
+   `apps/dashboard/scripts/vercel-build.sh` runs `rotate:integration-key` after
+   the migrations whenever the previous key is set. The command re-encrypts
+   every `encrypted_*` column in one transaction and fails the build without
+   writing anything if a value matches neither key.
+4. The previous deployment keeps serving with only the old key until the new
+   one is promoted, so it can still write old-key values after the scan. Once
+   no instance runs with the old configuration, run
+   `bun run rotate:integration-key --dry-run` from `packages/db` with
+   production credentials and both keys. Retire the previous key only when
+   every table reports `0` rows re-encrypted. Otherwise run the command without
+   `--dry-run` and check again.
+5. Remove `INTEGRATION_ENCRYPTION_KEY_PREVIOUS` from every project and redeploy.
+   Pending tool approvals and open GEO sentiment cursors derived from the old
+   key stop working at that point.
+
 ## Automated tests
 
 Run the complete suite from the repository root:
