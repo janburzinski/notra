@@ -1,0 +1,33 @@
+apps/dashboard/src/types/autopilot.ts
+  s_8a49709711c886::t_143db26a92ad5b 396-399
+  s_8a49709711c886::t_35d85f5dfe341d 382-383,400-403
+apps/dashboard/src/components/autopilot/autopilot-pull-requests-table.tsx
+  s_8a49709711c886::t_35d85f5dfe341d 50,121
+  s_8a49709711c886::t_143db26a92ad5b 135-138
+  s_8a49709711c886::t_3a63b561b8d205 122,124-134,139-141,148-149
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/[automation]/page-client.tsx
+  s_8a49709711c886::t_143db26a92ad5b 12,180
+  s_8a49709711c886::t_3a63b561b8d205 159-179,181-182
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/page-client.tsx
+  s_8a49709711c886::t_143db26a92ad5b 29,56
+  s_8a49709711c886::t_3a63b561b8d205 288-310
+apps/dashboard/src/components/autopilot/autopilot-finding-tables.tsx
+  s_8a49709711c886::t_35d85f5dfe341d 1-4,6-16,25-49
+  s_8a49709711c886::t_143db26a92ad5b 5,17-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "37b96cbc22f9dceecf63ba92b1fbf10152976bcb",
+  "prompts": {},
+  "sessions": {
+    "s_8a49709711c886": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "35462f9b-2798-496a-aeba-07ac8d3cf9f0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
