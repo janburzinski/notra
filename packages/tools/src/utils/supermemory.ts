@@ -29,16 +29,23 @@ export function getOrganizationContainerTag(organizationId: string) {
 }
 
 export const requestSupermemoryEffect = Effect.fn("requestSupermemory")(
-  function* (path: string, body: unknown) {
+  function* (
+    path: string,
+    body: unknown,
+    method: "GET" | "POST" | "PATCH" | "DELETE" = "POST",
+    signal?: AbortSignal
+  ) {
     const operationName = `Supermemory request to ${path}`;
     const headers = yield* getSupermemoryHeaders();
     const response = yield* Effect.tryPromise({
-      try: (signal) =>
+      try: (interruptionSignal) =>
         fetch(`${SUPERMEMORY_BASE_URL}${path}`, {
-          body: JSON.stringify(body),
+          ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
           headers,
-          method: "POST",
-          signal,
+          method,
+          signal: signal
+            ? AbortSignal.any([signal, interruptionSignal])
+            : interruptionSignal,
         }),
       catch: (cause) =>
         new ToolOperationError({

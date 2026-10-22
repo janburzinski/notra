@@ -67,6 +67,7 @@ if (process.env.NOTRA_AUTOPILOT_WRITER_TEST !== "1") {
   const rejected = mock(noop);
   const repository = { owner: "sandbox", name: "website", branch: "main" };
   const params = {
+    decisionMemory: { rules: [], feedback: [] },
     ctx: {
       organizationId: "sandbox",
       organizationSlug: "sandbox",

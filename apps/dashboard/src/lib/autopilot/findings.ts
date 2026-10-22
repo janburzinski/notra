@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { resolveGitHubMentionAuth } from "@notra/ai/utils/github-mention-auth";
 import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
@@ -37,6 +39,7 @@ import {
 } from "@/constants/autopilot-findings";
 import { AUTOPILOT_MERGE_METHOD_LABELS } from "@/constants/autopilot-ui";
 import { getRepositoryOctokit } from "@/lib/autopilot/github";
+import { rememberFeedback } from "@/lib/autopilot/memory";
 import {
   getContentPullRequestState,
   isMergeMethodNotAllowed,
@@ -358,69 +361,198 @@ export async function dismissSuggestedFinding(
 }
 
 /**
- * GitHub sends no webhook for reactions, so the daily run reads them: a thumbs
- * down on Notra's offer comment from someone linked to the workspace dismisses
- * the suggestion it offered. A draft already open is never closed this way.
+ * GitHub sends no reaction webhook. The cron syncs current member votes to
+ * Supermemory and edits the offer with a single acknowledgment. Only a thumbs
+ * down can dismiss a suggestion; neither vote changes an existing draft.
  */
-export async function dismissThumbsDownOffers(
+export async function syncOfferReactionFeedback(
   organizationId: string,
   since: Date
 ) {
   const offered = await db.query.autopilotFindings.findMany({
     where: and(
       eq(autopilotFindings.organizationId, organizationId),
-      eq(autopilotFindings.status, "suggested"),
-      gte(autopilotFindings.createdAt, since),
+      or(
+        gte(autopilotFindings.createdAt, since),
+        sql`${autopilotFindings.evidence}->>'feedbackPending' = 'true'`
+      ),
       sql`${autopilotFindings.evidence} ? 'offerComment'`
     ),
   });
   const dismissed: string[] = [];
-  for (const finding of offered) {
-    const offer = finding.evidence.offerComment;
-    const [owner, repo] = offer?.repository.split("/") ?? [];
-    if (!(offer && owner && repo)) {
-      continue;
-    }
+  let failures = 0;
+  for (const candidate of offered) {
     try {
-      const octokit = await getRepositoryOctokit(organizationId, {
-        owner,
-        name: repo,
+      const failed = await db.transaction(async (tx) => {
+        // The candidate list is only discovery. Lock and reread before GitHub so
+        // overlapping cron/job instances cannot apply an older vote snapshot last.
+        const [finding] = await tx
+          .select()
+          .from(autopilotFindings)
+          .where(
+            and(
+              eq(autopilotFindings.organizationId, organizationId),
+              eq(autopilotFindings.id, candidate.id)
+            )
+          )
+          .for("update");
+        const offer = finding?.evidence.offerComment;
+        const [owner, repo] = offer?.repository.split("/") ?? [];
+        if (!(finding && offer && owner && repo)) {
+          return false;
+        }
+        try {
+          const octokit = await getRepositoryOctokit(organizationId, {
+            owner,
+            name: repo,
+          });
+          const votes = [];
+          for (let page = 1; ; page += 1) {
+            const { data } = await octokit.request(
+              "GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions",
+              { owner, repo, comment_id: offer.id, per_page: 100, page }
+            );
+            for (const reaction of data) {
+              if (
+                !reaction.user ||
+                reaction.user.type === "Bot" ||
+                (reaction.content !== "+1" && reaction.content !== "-1")
+              ) {
+                continue;
+              }
+              const auth = await resolveGitHubMentionAuth({
+                githubUserId: reaction.user.id,
+                organizationId,
+              });
+              if (auth) {
+                votes.push({
+                  user: reaction.user.id,
+                  content: reaction.content,
+                });
+              }
+            }
+            if (data.length < 100) {
+              break;
+            }
+          }
+          votes.sort(
+            (a, b) => a.user - b.user || a.content.localeCompare(b.content)
+          );
+          const receipt = createHash("sha256")
+            .update(JSON.stringify(votes))
+            .digest("hex");
+          if (
+            (!finding.evidence.feedbackPending &&
+              receipt === finding.evidence.feedbackReceipt) ||
+            (!finding.evidence.feedbackPending &&
+              !votes.length &&
+              !finding.evidence.feedbackReceipt)
+          ) {
+            return false;
+          }
+          const sourceUrl = finding.evidence.pullRequests?.[0]?.url;
+          if (!sourceUrl) {
+            return false;
+          }
+          if (votes.some((vote) => vote.content === "-1")) {
+            const rows = await tx
+              .update(autopilotFindings)
+              .set({
+                status: "dismissed",
+                dismissedAt: new Date(),
+                claimToken: null,
+              })
+              .where(
+                and(
+                  eq(autopilotFindings.id, finding.id),
+                  eq(autopilotFindings.status, "suggested")
+                )
+              )
+              .returning({ id: autopilotFindings.id });
+            if (rows.length) {
+              dismissed.push(finding.title);
+            }
+          }
+          // Replace the current snapshot, including retractions. No historical vote is a rule.
+          await tx
+            .update(autopilotFindings)
+            .set({
+              evidence: sql`${autopilotFindings.evidence} || '{"feedbackPending":true}'::jsonb`,
+            })
+            .where(
+              and(
+                eq(autopilotFindings.organizationId, organizationId),
+                eq(autopilotFindings.id, finding.id)
+              )
+            );
+          await rememberFeedback({
+            organizationId,
+            id: `autopilot-reactions-${finding.id}`,
+            sourceUrl: `${sourceUrl}#issuecomment-${offer.id}`,
+            createdBy: "workspace members",
+            text: `${finding.title}\n${finding.summary}\nCurrent member reactions: ${JSON.stringify(votes)}. A thumbs up is positive interest, not permission to write. A thumbs down rejects this suggestion only. No reactions means prior feedback was retracted.`,
+          });
+          const { data: comment } = await octokit.request(
+            "GET /repos/{owner}/{repo}/issues/comments/{comment_id}",
+            { owner, repo, comment_id: offer.id }
+          );
+          const body = (comment.body ?? "").split(
+            "\n\n<!-- autopilot-feedback -->"
+          )[0];
+          await octokit.request(
+            "PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}",
+            {
+              owner,
+              repo,
+              comment_id: offer.id,
+              body: `${body}\n\n<!-- autopilot-feedback -->\nFeedback noted: ${votes.filter((vote) => vote.content === "+1").length} 👍, ${votes.filter((vote) => vote.content === "-1").length} 👎. ${votes.some((vote) => vote.content === "-1") ? "Only an unwritten suggestion is dismissed; existing drafts are unchanged." : "This does not authorize a draft or reopen a dismissed suggestion."} Reply with \`@notra\` and your reasoning to help me learn.`,
+            }
+          );
+          await tx
+            .update(autopilotFindings)
+            .set({
+              evidence: sql`${autopilotFindings.evidence} || ${JSON.stringify({ feedbackReceipt: receipt, feedbackPending: false })}::jsonb`,
+            })
+            .where(
+              and(
+                eq(autopilotFindings.organizationId, organizationId),
+                eq(autopilotFindings.id, finding.id)
+              )
+            );
+          return false;
+        } catch (cause) {
+          if (
+            cause instanceof Error &&
+            cause.name === "HttpError" &&
+            "status" in cause &&
+            (cause.status === 404 || cause.status === 410)
+          ) {
+            return false;
+          }
+          // Commit pending even on remote failures so offers retry beyond the age
+          // window. All finding writes use tx; a nested db write would deadlock.
+          await tx
+            .update(autopilotFindings)
+            .set({
+              evidence: sql`${autopilotFindings.evidence} || '{"feedbackPending":true}'::jsonb`,
+            })
+            .where(eq(autopilotFindings.id, finding.id));
+          return true;
+        }
       });
-      const { data } = await octokit.request(
-        "GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions",
-        { owner, repo, comment_id: offer.id, content: "-1" }
-      );
-      if (
-        (await hasWorkspaceReaction(organizationId, data)) &&
-        (await dismissSuggestedFinding(organizationId, finding.id))
-      ) {
-        dismissed.push(finding.title);
+      if (failed) {
+        failures += 1;
       }
     } catch {
-      // A deleted comment or lost access just means no signal.
+      failures += 1;
     }
+  }
+  if (failures) {
+    throw new Error(
+      `Could not process feedback for ${failures} Autopilot offers`
+    );
   }
   return dismissed;
-}
-
-/** Only people linked to the workspace speak for it, like "@notra no" does. */
-async function hasWorkspaceReaction(
-  organizationId: string,
-  reactions: { user: { id: number; type?: string } | null }[]
-) {
-  for (const reaction of reactions) {
-    if (!reaction.user || reaction.user.type === "Bot") {
-      continue;
-    }
-    const auth = await resolveGitHubMentionAuth({
-      githubUserId: reaction.user.id,
-      organizationId,
-    });
-    if (auth) {
-      return true;
-    }
-  }
-  return false;
 }
 
 /** True while one of these jobs still has a pull request waiting for review. */

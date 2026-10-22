@@ -1,6 +1,10 @@
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
-import { members, organizations } from "@notra/db/schema";
+import {
+  autopilotNamespaceDeletions,
+  members,
+  organizations,
+} from "@notra/db/schema";
 import {
   deleteWithTransfersSchema,
   organizationMembershipActionSchema,
@@ -207,6 +211,12 @@ export const userRouter = {
 
             await deleteOrganizationSites(input.organizationId, tx);
             await tx
+              .insert(autopilotNamespaceDeletions)
+              .values({
+                organizationId: input.organizationId,
+              })
+              .onConflictDoNothing();
+            await tx
               .delete(organizations)
               .where(eq(organizations.id, input.organizationId));
 
@@ -332,6 +342,12 @@ export const userRouter = {
           }
 
           await deleteOrganizationSites(transfer.orgId, tx);
+          await tx
+            .insert(autopilotNamespaceDeletions)
+            .values({
+              organizationId: transfer.orgId,
+            })
+            .onConflictDoNothing();
           await tx
             .delete(organizations)
             .where(eq(organizations.id, transfer.orgId));

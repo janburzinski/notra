@@ -2,6 +2,8 @@ import { db } from "@notra/db/drizzle";
 import { autopilotSettings } from "@notra/db/schema";
 import { eq } from "drizzle-orm";
 
+import { AUTOPILOT_REACTION_LOOKBACK_DAYS } from "@/constants/autopilot";
+import { syncOfferReactionFeedback } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { purgeExpiredAutopilotTraceDetails } from "@/lib/autopilot/log";
 import { startAutopilot } from "@/lib/autopilot/start";
@@ -17,10 +19,19 @@ export async function runDueAutopilots() {
   let failed = 0;
   for (const row of rows) {
     try {
-      if (!isAutopilotDue(row, now)) {
+      if (!(await isAutopilotEnabledForOrganization(row.organizationId))) {
         continue;
       }
-      if (!(await isAutopilotEnabledForOrganization(row.organizationId))) {
+      try {
+        await syncOfferReactionFeedback(
+          row.organizationId,
+          new Date(now.getTime() - AUTOPILOT_REACTION_LOOKBACK_DAYS * 86400000)
+        );
+      } catch {
+        // Feedback retries must not block unrelated daily work.
+        failed += 1;
+      }
+      if (!isAutopilotDue(row, now)) {
         continue;
       }
       const claim = await startAutopilot(row.organizationId, "cron");

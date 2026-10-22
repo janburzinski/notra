@@ -37,3 +37,12 @@ export const ruleSchema = z.object({
       "One short imperative rule starting with 'Never', or null when the message only declines this one item"
     ),
 });
+
+export const autopilotFeedbackSchema = z.object({
+  reply: z.string().max(700),
+  learning: z.string().max(1000).nullable(),
+  rule: z.string().max(AUTOPILOT_RULE_MAX_CHARS).nullable(),
+  removeRuleId: z.string().nullable(),
+});
+
+export const autopilotRuleComplianceSchema = z.object({ allowed: z.boolean() });

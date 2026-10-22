@@ -1,4 +1,5 @@
 import { isAuthorizedCron } from "@/lib/auth/cron";
+import { cleanupAutopilotNamespaces } from "@/lib/autopilot/namespace-deletions";
 import { runDueAutopilots } from "@/lib/autopilot/schedule";
 
 export async function GET(request: Request) {
@@ -6,6 +7,12 @@ export async function GET(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  const cleanup = await cleanupAutopilotNamespaces();
   const result = await runDueAutopilots();
-  return Response.json(result, { status: result.failed > 0 ? 500 : 200 });
+  return Response.json(
+    { ...result, cleanup },
+    {
+      status: result.failed > 0 || cleanup.failed > 0 ? 500 : 200,
+    }
+  );
 }

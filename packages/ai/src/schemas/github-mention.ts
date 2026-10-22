@@ -23,6 +23,7 @@ const repositorySchema = z.object({
 
 const commentSchema = z.object({
   id: z.number(),
+  updated_at: z.iso.datetime().optional(),
   body: z.string(),
   html_url: z.string(),
   user: senderSchema.optional(),

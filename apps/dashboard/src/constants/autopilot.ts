@@ -112,9 +112,7 @@ export const AUTOPILOT_PR_AUTO_WRITE_CONFIDENCE = 0.95;
 /** Rules are short and few, so every decision can read all of them. */
 export const AUTOPILOT_RULES_MAX = 50;
 export const AUTOPILOT_RULE_MAX_CHARS = 300;
-/** Recently dismissed topics Jev sees next to the rules, as examples of "no". */
-export const AUTOPILOT_DECISION_DISMISSED_EXAMPLES = 20;
-/** How far back the daily run checks Notra's comments for a thumbs down. */
+/** Recent offers checked for reactions every five minutes; pending deliveries retry beyond this window. */
 export const AUTOPILOT_REACTION_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_JEV_MAX_CANDIDATES = 8;
 /** Dropped candidates listed in the run log; the admin trace keeps all of them. */
@@ -129,9 +127,11 @@ export const AUTOPILOT_MENTION_INTENTS = {
   assess:
     "Asks whether this pull request is worth a blog post, announcement or other content",
   write:
-    "Asks Notra to write, draft or create a blog post, announcement or other content about this pull request",
+    "Explicitly asks Notra to write, draft or create a blog post, announcement or other content about this pull request. A reaction, yes, approval or more like this without an explicit writing request is feedback, not write authorization",
   decline:
     "Tells Notra not to write about this pull request, or never about this kind of change, or rejects its offer",
+  feedback:
+    "Discusses Notra's suggested post, explains a reaction, gives editorial feedback (too technical, more like this), corrects or retracts earlier feedback, or asks a follow-up about the suggestion. Does not request file edits or writing.",
   other:
     "Anything else: code review, edits to files in this pull request, questions or chat",
 } as const;
@@ -227,6 +227,8 @@ export const AUTOPILOT_DEFAULT_JOBS = {
 } as const;
 
 export const AUTOPILOT_FLAG_TIMEOUT_MS = 2000;
+/** One budget for the whole outbox drain, leaving cron time for daily runs. */
+export const AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS = 5000;
 export const AUTOPILOT_RUNS_PAGE_SIZE = 20;
 export const AUTOPILOT_ADMIN_RUNS_DEFAULT_LIMIT = 50;
 

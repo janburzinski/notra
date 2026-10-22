@@ -146,6 +146,7 @@ export async function ingestGitHubAppMentionWebhook(params: {
   signature: string | null;
   deliveryId: string | null;
   rawBody: string;
+  allowEditedFeedback?: boolean;
 }): Promise<{
   httpStatus: number;
   body: Record<string, unknown>;
@@ -198,6 +199,7 @@ export async function ingestGitHubAppMentionWebhook(params: {
 }
 
 async function finishIngest(params: {
+  allowEditedFeedback?: boolean;
   event: string;
   deliveryId: string | null;
   rawBody: string;
@@ -252,6 +254,7 @@ async function finishIngest(params: {
   }
 
   const resolved = await resolveGitHubMentionContext({
+    allowEditedFeedback: params.allowEditedFeedback,
     payload: payload.data,
     deliveryId: params.deliveryId,
   });

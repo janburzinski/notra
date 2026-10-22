@@ -42,7 +42,7 @@
     },
     {
       "path": "/api/cron/autopilot",
-      "schedule": "5 * * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 }

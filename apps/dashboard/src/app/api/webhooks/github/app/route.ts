@@ -59,6 +59,7 @@ export const POST = withEvlog(async (request: Request) => {
   }
 
   const result = await ingestGitHubAppMentionWebhook({
+    allowEditedFeedback: true,
     event,
     signature,
     deliveryId,

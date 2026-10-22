@@ -18,6 +18,7 @@ if (process.env.NOTRA_MENTION_WORKFLOW_TEST !== "1") {
   const context = {
     deliveryId: "delivery-1",
     organizationId: "org-1",
+    comment: { edited: false },
   } as never;
   const claim = mock(async () => true);
   const complete = mock(async () => undefined);
@@ -110,6 +111,19 @@ if (process.env.NOTRA_MENTION_WORKFLOW_TEST !== "1") {
     expect(claim).toHaveBeenLastCalledWith("delivery-1", "run-1");
     expect(processMention).toHaveBeenCalledTimes(1);
     expect(complete).toHaveBeenCalledWith("delivery-1", "run-1");
+  });
+
+  test("edited comments never fall through to the repository-writing agent", async () => {
+    const edited = {
+      deliveryId: "delivery-edited",
+      organizationId: "org-1",
+      comment: { edited: true },
+    } as never;
+    expect(await processGitHubMentionStep(edited)).toEqual({
+      status: "ignored",
+      reason: "edited_feedback_only",
+    });
+    expect(processMention).not.toHaveBeenCalled();
   });
 
   test("an interrupted processing attempt retains its claim and is not retried", async () => {

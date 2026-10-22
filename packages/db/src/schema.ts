@@ -43,7 +43,6 @@ import {
 import { AUTOMATION_RUN_STATUSES } from "./constants/automation-runs";
 import {
   AUTOPILOT_EVENT_LEVELS,
-  AUTOPILOT_RULE_SOURCES,
   AUTOPILOT_FINDING_STATUSES,
   AUTOPILOT_JOB_KINDS,
   AUTOPILOT_RUN_STATUSES,
@@ -4322,6 +4321,20 @@ export const siteBuildTelemetryRelations = relations(
   })
 );
 
+// Deliberately no organization FK: cleanup must survive the organization cascade.
+export const autopilotNamespaceDeletions = pgTable(
+  "autopilot_namespace_deletions",
+  {
+    organizationId: text("organization_id").primaryKey(),
+    nextAttemptAt: timestamp("next_attempt_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("autopilotNamespaceDeletions_nextAttemptAt_idx").on(
+      table.nextAttemptAt
+    ),
+  ]
+);
+
 export const autopilotSettings = pgTable("autopilot_settings", {
   organizationId: text("organization_id")
     .primaryKey()
@@ -4447,33 +4460,6 @@ export const autopilotFindings = pgTable(
     index("autopilotFindings_organizationId_updatedAt_idx").on(
       table.organizationId,
       table.updatedAt
-    ),
-  ]
-);
-
-/**
- * Things a workspace told Autopilot to skip, in plain words ("never write
- * posts about framework upgrades"). Every decision reads all of them.
- */
-export const autopilotRules = pgTable(
-  "autopilot_rules",
-  {
-    id: text("id").primaryKey(),
-    organizationId: text("organization_id")
-      .notNull()
-      .references(() => organizations.id, { onDelete: "cascade" }),
-    text: text("text").notNull(),
-    source: text("source", { enum: AUTOPILOT_RULE_SOURCES }).notNull(),
-    /** The comment or page the rule came from. */
-    sourceUrl: text("source_url"),
-    /** GitHub login or dashboard user who said it. */
-    createdBy: text("created_by"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => [
-    index("autopilotRules_organizationId_createdAt_idx").on(
-      table.organizationId,
-      table.createdAt
     ),
   ]
 );

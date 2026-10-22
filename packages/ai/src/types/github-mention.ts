@@ -37,6 +37,9 @@ export interface GitHubMentionReviewThread {
 }
 
 export interface GitHubMentionComment {
+  /** Edits can update Autopilot feedback, but must never trigger repository writes. */
+  edited?: boolean;
+  updatedAt?: string;
   id: number;
   body: string;
   htmlUrl: string;

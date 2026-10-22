@@ -58,6 +58,7 @@
     "@notra/schemas": "workspace:*",
     "@notra/sites-core": "workspace:*",
     "@notra/sites-server": "workspace:*",
+    "@notra/tools": "workspace:*",
     "@notra/ui": "workspace:*",
     "@notra/utils": "workspace:*",
     "@notra/webhooks": "workspace:*",

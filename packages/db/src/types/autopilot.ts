@@ -32,8 +32,13 @@ export interface AutopilotFindingEvidence {
   detail?: string | null;
   /** Jev's confidence that this is worth a post, 0 to 1. */
   confidence?: number | null;
-  /** Notra's comment offering the post; a thumbs down on it dismisses the finding. */
+  /** Notra's offer comment; reactions provide feedback and can dismiss an unwritten suggestion. */
   offerComment?: { repository: string; id: number } | null;
+  /** Delivery receipt only; preference content lives exclusively in Supermemory. */
+  feedbackReceipt?: string;
+  feedbackPending?: boolean;
+  /** Ordering receipts only; feedback content remains in Supermemory. */
+  feedbackVersions?: Record<string, { commentId: number; updatedAt: string }>;
   /** What the writer gets; stored so a suggestion can be written later. */
   brief?: { topic: string; angle: string; evidence: string } | null;
   /** What a merged pull request is measured on, with the value before it. */

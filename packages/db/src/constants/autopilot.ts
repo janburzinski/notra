@@ -58,5 +58,3 @@ export const AUTOPILOT_EVENT_LEVELS = [
   "action",
   "error",
 ] as const;
-
-export const AUTOPILOT_RULE_SOURCES = ["github", "dashboard"] as const;

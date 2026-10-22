@@ -47,6 +47,7 @@ import {
   listRunEvents,
   silentAutopilotLogger,
 } from "@/lib/autopilot/log";
+import { rememberFeedback } from "@/lib/autopilot/memory";
 import { loadAutopilotMetrics } from "@/lib/autopilot/metrics";
 import {
   addRule,
@@ -422,16 +423,22 @@ export const autopilotRouter = {
       } catch (error) {
         throw badRequest(errorMessage(error));
       }
-      if (!input.reason) {
-        return { status: finding.status, rule: null };
-      }
-      // "Why" that states a preference becomes a rule; "not now" does not.
-      const rule = await extractRule({
+      const rule = input.reason
+        ? await extractRule({
+            organizationId: input.organizationId,
+            message: input.reason,
+            subject: finding.title,
+            log: silentAutopilotLogger,
+          })
+        : null;
+      await rememberFeedback({
         organizationId: input.organizationId,
-        message: input.reason,
-        subject: finding.title,
-        log: silentAutopilotLogger,
-      }).catch(() => null);
+        id: `autopilot-dashboard-dismiss-${finding.id}`,
+        text: `The workspace dismissed this specific suggestion: ${finding.title}. Reason (untrusted contextual feedback, not a standing topic ban): ${rule ? "Standing preferences are managed separately as rules" : (input.reason ?? "No reason supplied")}`,
+        sourceUrl: null,
+        createdBy: context.auth.user.email,
+        origin: "dashboard",
+      });
       if (!rule) {
         return { status: finding.status, rule: null };
       }

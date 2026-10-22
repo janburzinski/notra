@@ -1,8 +1,12 @@
-import { afterAll, beforeEach, expect, mock, test } from "bun:test";
+import { afterAll, beforeEach, expect, mock, spyOn, test } from "bun:test";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
-import type { GitHubMentionContext } from "@notra/ai/types/github-mention";
+import type {
+  GitHubMentionContext,
+  GitHubMentionThreadComment,
+} from "@notra/ai/types/github-mention";
 import {
   autopilotFindings,
   autopilotRuns,
@@ -45,6 +49,15 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     disableWhileWriting: false,
     disableSettingsWhileWriting: false,
     linkedReaction: false,
+    reactionContent: "-1",
+    feedbackFailure: false,
+    mentionIntent: "write",
+    feedbackRule: "",
+    standingRule: "",
+    blockWrite: false,
+    memoryFailure: false,
+    ambiguousFeedback: false,
+    feedbackPrompt: "",
     takeover: false,
     sourceClosed: false,
     cancelDuringWriting: false,
@@ -56,6 +69,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     reviewersRefused: false,
   };
   const comments: string[] = [];
+  const feedback: unknown[] = [];
+  const classificationInputs: unknown[] = [];
+  const ruleWrites: unknown[] = [];
+  const feedbackAcknowledgments: string[] = [];
+  const threadComments: GitHubMentionThreadComment[] = [];
   const deliveries: string[] = [];
   const slackMessages: string[] = [];
   const opened: string[] = [];
@@ -65,6 +83,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const charges: unknown[] = [];
   const holds: string[] = [];
   const release = mock(async () => undefined);
+  const readReactions = mock(async () => ({
+    data: state.reactionContent
+      ? [{ content: state.reactionContent, user: { id: 42, type: "User" } }]
+      : [],
+  }));
   const githubRequest = async (
     route: string,
     params?: Record<string, unknown>
@@ -83,8 +106,72 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ) {
       closed.push(Number(params.pull_number));
     }
-    return { data: [{ content: "-1", user: { id: 42, type: "User" } }] };
+    if (route === "GET /repos/{owner}/{repo}/issues/comments/{comment_id}") {
+      return { data: { body: "Offer" } };
+    }
+    if (route === "PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}") {
+      feedbackAcknowledgments.push(String(params?.body));
+      return { data: {} };
+    }
+    return readReactions();
   };
+
+  mock.module("@/lib/autopilot/memory", () => ({
+    getAutopilotMemory: async () => null,
+    listAutopilotMemory: async (_org: string, category: string) => {
+      if (state.memoryFailure) {
+        throw new Error("Supermemory unavailable");
+      }
+      return category === "rule" && state.standingRule
+        ? [
+            {
+              id: "standing-rule",
+              metadata: {
+                text: state.standingRule,
+                origin: "dashboard",
+                sourceUrl: null,
+                createdBy: "admin",
+                createdAt: new Date().toISOString(),
+              },
+            },
+          ]
+        : [];
+    },
+    removeAutopilotMemory: async () => undefined,
+    requestAutopilotMemory: async (
+      _org: string,
+      path: string,
+      body: unknown
+    ) => {
+      if (path === "search") {
+        return { results: [] };
+      }
+      ruleWrites.push(body);
+      return { id: "rule", status: "done" };
+    },
+    rememberFeedback: async (input: unknown) => {
+      if (state.feedbackFailure) {
+        throw new Error("Supermemory unavailable");
+      }
+      feedback.push(input);
+    },
+  }));
+  mock.module("@/lib/autopilot/llm", () => ({
+    generateAutopilotObject: async (input: { tag: string; prompt: string }) => {
+      state.feedbackPrompt = input.prompt;
+      return input.tag === "write-rules"
+        ? { allowed: !state.blockWrite }
+        : {
+            reply:
+              "Would you prefer less implementation detail for this audience?",
+            learning: state.ambiguousFeedback
+              ? null
+              : "This suggestion is too technical for the intended audience",
+            rule: state.feedbackRule || null,
+            removeRuleId: null,
+          };
+    },
+  }));
 
   mock.module("@notra/ai/utils/github-mention-auth", () => ({
     listOrganizationsForGitHubInstallation: async () => [
@@ -103,19 +190,25 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   mock.module("@/lib/geo/configure", () => ({ geoCoreDashboardLayer: {} }));
   mock.module("@notra/ai/evaluation/client", () => ({
     getEvaluationClient: () => ({
-      tryEvaluate: async () => ({
-        answers: {
-          intent: { choice: "write", probabilities: { write: 0.99 } },
-          pick: {
-            choice: "option_0",
-            probabilities: {
-              option_0: state.confidence,
-              none: 1 - state.confidence,
+      tryEvaluate: async (input: unknown) => {
+        classificationInputs.push(input);
+        return {
+          answers: {
+            intent: {
+              choice: state.mentionIntent,
+              probabilities: { [state.mentionIntent]: 0.99 },
+            },
+            pick: {
+              choice: "option_0",
+              probabilities: {
+                option_0: state.confidence,
+                none: 1 - state.confidence,
+              },
             },
           },
-        },
-        confidence: { pick: state.confidence },
-      }),
+          confidence: { pick: state.confidence },
+        };
+      },
     }),
   }));
   mock.module("@notra/ai/billing/github-mention-billing", () => ({
@@ -142,6 +235,12 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     },
   }));
   mock.module("@notra/ai/utils/github-pr-comments", () => ({
+    listGitHubIssueComments: async () => threadComments,
+    listGitHubReviewComments: async () => threadComments,
+    replyToGitHubReviewThread: async () => ({
+      id: 1,
+      htmlUrl: "https://github.com/sandbox/app/pull/1#comment",
+    }),
     addGitHubCommentReaction: async () => undefined,
     postGitHubIssueComment: async (input: { body: string }) => {
       comments.push(input.body);
@@ -316,10 +415,12 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await import("../src/lib/autopilot/pull-request-events");
   const { handleAutopilotMention } =
     await import("../src/lib/autopilot/mentions");
+  const { applyFeedbackInOrder } =
+    await import("../src/lib/autopilot/feedback");
   const { buildAutopilotRunContext, deliverAutopilotBrief, runAutopilotJob } =
     await import("../src/lib/autopilot/run");
   const {
-    dismissThumbsDownOffers,
+    syncOfferReactionFeedback,
     claimFinding,
     markFindingProposed,
     dismissFinding,
@@ -379,6 +480,21 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.disableSettingsWhileWriting = false;
     holds.length = 0;
     state.linkedReaction = false;
+    state.reactionContent = "-1";
+    state.feedbackFailure = false;
+    state.mentionIntent = "write";
+    state.feedbackRule = "";
+    state.standingRule = "";
+    state.blockWrite = false;
+    state.memoryFailure = false;
+    state.ambiguousFeedback = false;
+    state.feedbackPrompt = "";
+    threadComments.length = 0;
+    ruleWrites.length = 0;
+    feedback.length = 0;
+    classificationInputs.length = 0;
+    readReactions.mockClear();
+    feedbackAcknowledgments.length = 0;
     state.takeover = false;
     state.sourceClosed = false;
     state.cancelDuringWriting = false;
@@ -398,6 +514,10 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     charges.length = 0;
     release.mockClear();
     await sandbox.postgres.exec('TRUNCATE "autopilot_runs" CASCADE');
+    await db
+      .update(members)
+      .set({ role: "owner" })
+      .where(eq(members.organizationId, "sandbox-org"));
     await db
       .update(autopilotSettings)
       .set({ maxOpenPullRequests: 3, enabled: true })
@@ -1161,15 +1281,349 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       "proposed",
       "suggested",
     ]);
-    expect(await dismissThumbsDownOffers("sandbox-org", new Date(0))).toEqual(
+    expect(await syncOfferReactionFeedback("sandbox-org", new Date(0))).toEqual(
       []
     );
     expect(closed).toHaveLength(0);
     state.linkedReaction = true;
     expect(
-      await dismissThumbsDownOffers("sandbox-org", new Date(0))
+      await syncOfferReactionFeedback("sandbox-org", new Date(0))
     ).toHaveLength(1);
     expect(closed).toHaveLength(0);
+  });
+
+  test("positive reactions learn and acknowledge once without authorizing a draft; retractions replace feedback", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    state.linkedReaction = true;
+    state.reactionContent = "+1";
+    await syncOfferReactionFeedback("sandbox-org", new Date(0));
+    await syncOfferReactionFeedback("sandbox-org", new Date(0));
+    expect(opened).toHaveLength(0);
+    expect(feedback).toHaveLength(1);
+    expect(feedbackAcknowledgments).toHaveLength(1);
+    expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
+      "suggested"
+    );
+    state.reactionContent = "";
+    await syncOfferReactionFeedback("sandbox-org", new Date(0));
+    expect(feedback).toHaveLength(2);
+    expect(opened).toHaveLength(0);
+  });
+
+  test("failed memory after a negative vote retries even after dismissal, without a false acknowledgment", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    state.linkedReaction = true;
+    state.feedbackFailure = true;
+    await expect(
+      syncOfferReactionFeedback("sandbox-org", new Date(0))
+    ).rejects.toThrow("Could not process feedback");
+    expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
+      "dismissed"
+    );
+    expect(feedbackAcknowledgments).toHaveLength(0);
+    state.feedbackFailure = false;
+    // Pending failures must remain discoverable after the normal lookback.
+    await syncOfferReactionFeedback("sandbox-org", new Date(Date.now() + 1));
+    expect(feedback).toHaveLength(1);
+    expect(feedbackAcknowledgments).toHaveLength(1);
+    expect(closed).toHaveLength(0);
+  });
+
+  test("overlapping reaction syncs lock before GitHub reads and finish with the latest snapshot", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    state.linkedReaction = true;
+    let startedReading = () => {};
+    const reading = new Promise<void>((resolve) => {
+      startedReading = resolve;
+    });
+    let resumeReading = () => {};
+    const resume = new Promise<void>((resolve) => {
+      resumeReading = resolve;
+    });
+    readReactions.mockImplementationOnce(async () => {
+      const snapshot = [{ content: "-1", user: { id: 42, type: "User" } }];
+      startedReading();
+      await resume;
+      return { data: snapshot };
+    });
+    const transaction = spyOn(db, "transaction");
+    const first = syncOfferReactionFeedback("sandbox-org", new Date(0));
+    await reading;
+    state.reactionContent = "";
+    const second = syncOfferReactionFeedback("sandbox-org", new Date(0));
+    try {
+      expect(transaction).toHaveBeenCalledTimes(1);
+      expect(readReactions).toHaveBeenCalledTimes(1);
+    } finally {
+      resumeReading();
+      await Promise.all([first, second]);
+      expect(transaction).toHaveBeenCalledTimes(2);
+      transaction.mockRestore();
+    }
+    expect(readReactions).toHaveBeenCalledTimes(2);
+    expect(feedback).toHaveLength(2);
+    expect(feedback.at(-1)).toEqual(
+      expect.objectContaining({
+        text: expect.stringContaining("Current member reactions: []"),
+      })
+    );
+    const finding = await db.query.autopilotFindings.findFirst();
+    expect(finding?.status).toBe("dismissed"); // Retraction does not reopen an already processed dismissal.
+    expect(finding?.evidence).toEqual(
+      expect.objectContaining({
+        feedbackReceipt: createHash("sha256").update("[]").digest("hex"),
+        feedbackPending: false,
+      })
+    );
+    await Promise.all([
+      syncOfferReactionFeedback("sandbox-org", new Date(0)),
+      syncOfferReactionFeedback("sandbox-org", new Date(0)),
+    ]);
+    expect(feedback).toHaveLength(2);
+    expect(feedbackAcknowledgments).toHaveLength(2);
+    expect(feedbackAcknowledgments.at(-1)).toContain("0 👍, 0 👎");
+    expect(opened).toHaveLength(0);
+  });
+
+  test("directed editorial follow-up learns context without writing or saving a hard rule", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    state.mentionIntent = "feedback";
+    const context = mentionContext(200);
+    context.comment.body = "@notra too technical";
+    const response = await handleAutopilotMention(context);
+    expect(response?.reply).toContain("contextual feedback");
+    expect(feedback).toHaveLength(1);
+    expect(opened).toHaveLength(0);
+  });
+
+  for (const kind of ["issue", "review"] as const) {
+    test(`${kind} feedback prompts share the newest five directed comments in chronological order`, async () => {
+      state.confidence = 0.9;
+      await handleAutopilotPullRequestEvent(event());
+      state.mentionIntent = "feedback";
+      const finding = await db.query.autopilotFindings.findFirst();
+      const own: GitHubMentionThreadComment = {
+        id: 10,
+        kind,
+        createdAt: "2026-10-21T00:00:00Z",
+        threadRootId: kind === "review" ? 1000 : null,
+        authorLogin: "sandbox-user",
+        authorIsBot: false,
+        authorIsTrusted: true,
+        body: "@notra older preference",
+      };
+      const directed = Array.from({ length: 8 }, (_, index) => ({
+        ...own,
+        id: 10 + index,
+        body: `@notra correction ${index}`,
+      }));
+      threadComments.push(
+        { ...own, id: 0, body: "@notra before the offer" },
+        ...directed,
+        { ...own, id: 30, authorLogin: "another-member" },
+        { ...own, id: 31, authorIsBot: true },
+        { ...own, id: 32, body: "undirected chatter" },
+        { ...own, id: 60, body: "@notra future comment" }
+      );
+      if (kind === "review") {
+        threadComments.push({ ...own, id: 33, threadRootId: 1001 });
+        threadComments.reverse(); // GitHub's review endpoint returns newest first.
+      }
+      const originalOrder = threadComments.map((comment) => comment.id);
+      const context = mentionContext(50);
+      context.comment.body = "@notra now use the latest correction";
+      if (kind === "review") {
+        context.comment.review = {
+          path: "file.ts",
+          line: 1,
+          startLine: null,
+          commitSha: null,
+          diffHunk: null,
+          rootCommentId: 1000,
+        };
+      }
+      expect((await handleAutopilotMention(context))?.status).toBe("replied");
+      const expected = directed.slice(-5).map((comment) => comment.body);
+      expect(JSON.parse(state.feedbackPrompt).priorDirectedComments).toEqual(
+        expected
+      );
+      expect(classificationInputs.at(-1)).toEqual(
+        expect.objectContaining({
+          state: expect.objectContaining({
+            subject: JSON.stringify({
+              title: context.pullRequest?.title,
+              offer: finding?.evidence.brief,
+              prior: expected,
+            }),
+          }),
+        })
+      );
+      expect(threadComments.map((comment) => comment.id)).toEqual(
+        originalOrder
+      );
+      feedback.length = 0;
+      context.comment.edited = true;
+      expect(await handleAutopilotMention(context)).toEqual({
+        status: "ignored",
+        reason: "superseded_feedback_edit",
+      });
+      expect(feedback).toHaveLength(0);
+      expect(opened).toHaveLength(0);
+    });
+  }
+
+  test("review threads keep independent feedback documents", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    state.mentionIntent = "feedback";
+    for (const rootCommentId of [100, 200]) {
+      const context = mentionContext(rootCommentId + 1);
+      context.comment.review = {
+        path: "file.ts",
+        line: 1,
+        startLine: null,
+        commitSha: null,
+        diffHunk: null,
+        rootCommentId,
+      };
+      await handleAutopilotMention(context);
+    }
+    expect(feedback).toHaveLength(2);
+    expect(
+      new Set(feedback.map((row) => (row as { id: string }).id)).size
+    ).toBe(2);
+  });
+
+  test("delayed comments and older edits cannot overwrite a newer feedback receipt", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    const finding = await db.query.autopilotFindings.findFirst();
+    if (!finding) {
+      throw new Error("Missing finding");
+    }
+    const applied: number[] = [];
+    const write = (id: number, updatedAt: string, fail = false) => {
+      const context = mentionContext(id);
+      context.comment.updatedAt = updatedAt;
+      return applyFeedbackInOrder({
+        context,
+        findingId: finding.id,
+        apply: async () => {
+          if (fail) {
+            throw new Error("Remote write failed");
+          }
+          applied.push(id);
+        },
+      });
+    };
+    expect(await write(302, "2026-10-21T07:00:00Z")).toBe(true);
+    expect(await write(301, "2026-10-21T07:01:00Z")).toBe(false);
+    expect(await write(302, "2026-10-21T06:59:00Z")).toBe(false);
+    expect(await write(302, "2026-10-21T07:02:00Z")).toBe(true);
+    await expect(write(303, "2026-10-21T07:03:00Z", true)).rejects.toThrow();
+    expect(await write(303, "2026-10-21T07:03:00Z")).toBe(true);
+    expect(applied).toEqual([302, 302, 303]);
+  });
+
+  test("members can give contextual feedback but cannot save standing rules or authorize writing", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    await db
+      .update(members)
+      .set({ role: "member" })
+      .where(eq(members.organizationId, "sandbox-org"));
+    state.mentionIntent = "feedback";
+    state.feedbackRule = "Always avoid implementation details";
+    const context = mentionContext(201);
+    context.comment.body = "@notra always avoid implementation details";
+    expect((await handleAutopilotMention(context))?.reply).toContain(
+      "Only workspace admins"
+    );
+    expect(feedback).toHaveLength(1);
+    expect(ruleWrites).toHaveLength(0);
+    state.mentionIntent = "write";
+    expect(
+      (await handleAutopilotMention(mentionContext(202)))?.reply
+    ).toContain("Only workspace admins");
+    expect(opened).toHaveLength(0);
+  });
+
+  test("an admin can explicitly save a lasting rule; edited feedback never starts a writer", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    state.mentionIntent = "feedback";
+    state.feedbackRule = "Always explain the user benefit";
+    expect(
+      (await handleAutopilotMention(mentionContext(203)))?.reply
+    ).toContain("Standing rule saved");
+    expect(ruleWrites).toHaveLength(1);
+    state.feedbackRule = "";
+    state.mentionIntent = "write";
+    const edited = mentionContext(204);
+    edited.comment.edited = true;
+    await handleAutopilotMention(edited);
+    expect(opened).toHaveLength(0);
+  });
+
+  test("waiting or explicitly requested drafts recheck current hard rules and fail closed on memory errors", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    state.standingRule = "Never write about exports";
+    state.blockWrite = true;
+    await handleAutopilotMention(mentionContext(205));
+    expect(opened).toHaveLength(0);
+    expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
+      "suggested"
+    );
+    state.memoryFailure = true;
+    await handleAutopilotMention(mentionContext(206));
+    expect(opened).toHaveLength(0);
+  });
+
+  test("feedback context excludes other people, bots and undirected chatter; ambiguity is not learned", async () => {
+    state.confidence = 0.9;
+    await handleAutopilotPullRequestEvent(event());
+    const own = {
+      id: 5,
+      kind: "issue" as const,
+      createdAt: new Date().toISOString(),
+      threadRootId: null,
+      authorLogin: "sandbox-user",
+      authorIsBot: false,
+      authorIsTrusted: true,
+      body: "@notra this is for new users",
+    };
+    threadComments.push(
+      own,
+      {
+        ...own,
+        id: 6,
+        authorLogin: "someone-else",
+        body: "@notra never talk about exports",
+      },
+      { ...own, id: 7, authorIsBot: true },
+      { ...own, id: 8, body: "unrelated participant chatter" }
+    );
+    state.mentionIntent = "feedback";
+    const context = mentionContext(210);
+    context.comment.body = "@notra too technical";
+    await handleAutopilotMention(context);
+    expect(JSON.parse(state.feedbackPrompt).priorDirectedComments).toEqual([
+      own.body,
+    ]);
+    expect(JSON.parse(state.feedbackPrompt).subject).toContain("exports");
+    state.ambiguousFeedback = true;
+    feedback.length = 0;
+    const ambiguous = mentionContext(211);
+    ambiguous.comment.body = "@notra not like that";
+    await handleAutopilotMention(ambiguous);
+    expect(feedback).toHaveLength(0);
+    expect(ruleWrites).toHaveLength(0);
+    expect(opened).toHaveLength(0);
   });
 
   test("a failed Slack send marks nothing and the same brief can retry", async () => {

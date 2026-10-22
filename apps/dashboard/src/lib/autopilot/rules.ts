@@ -1,51 +1,83 @@
+import { createHash } from "node:crypto";
+
 import { UTILITY_MODEL_ID } from "@notra/ai/constants/models";
-import { db } from "@notra/db/drizzle";
-import { autopilotFindings, autopilotRules } from "@notra/db/schema";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
-import { nanoid } from "nanoid";
 
 import {
-  AUTOPILOT_DECISION_DISMISSED_EXAMPLES,
   AUTOPILOT_RULE_MAX_CHARS,
   AUTOPILOT_RULES_MAX,
 } from "@/constants/autopilot";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
+import {
+  getAutopilotMemory,
+  listAutopilotMemory,
+  removeAutopilotMemory,
+  requestAutopilotMemory,
+} from "@/lib/autopilot/memory";
 import { ruleSchema } from "@/schemas/autopilot";
+import {
+  autopilotMemoryWriteSchema,
+  autopilotMemorySearchSchema,
+} from "@/schemas/autopilot-memory";
 import type { AutopilotLogger } from "@/types/autopilot-runtime";
 
 const TRAILING_PUNCTUATION = /[.\s]+$/;
 
-export function listRules(organizationId: string) {
-  return db.query.autopilotRules.findMany({
-    where: eq(autopilotRules.organizationId, organizationId),
-    orderBy: [asc(autopilotRules.createdAt)],
-  });
+export async function listRules(organizationId: string) {
+  return (await listAutopilotMemory(organizationId, "rule")).map(
+    ({ id, metadata }) => ({
+      id,
+      organizationId,
+      text: metadata.text,
+      source: metadata.origin,
+      sourceUrl: metadata.sourceUrl,
+      createdBy: metadata.createdBy,
+      createdAt: new Date(metadata.createdAt),
+    })
+  );
 }
 
 /**
  * What every Jev decision gets besides the candidates: the workspace's rules
- * and the topics it dismissed lately, as examples of what it does not want.
+ * and relevant contextual feedback, read only from Supermemory.
  */
-export async function loadDecisionMemory(organizationId: string) {
-  const [rules, dismissed] = await Promise.all([
+export async function loadDecisionMemory(
+  organizationId: string,
+  query: string
+) {
+  const [rules, search] = await Promise.all([
     listRules(organizationId),
-    db
-      .select({ title: autopilotFindings.title })
-      .from(autopilotFindings)
-      .where(
-        and(
-          eq(autopilotFindings.organizationId, organizationId),
-          eq(autopilotFindings.status, "dismissed"),
-          // Readiness fixes with nothing to change are not a "no" to a topic.
-          sql`${autopilotFindings.kind} <> 'readiness'`
-        )
-      )
-      .orderBy(desc(autopilotFindings.updatedAt))
-      .limit(AUTOPILOT_DECISION_DISMISSED_EXAMPLES),
+    requestAutopilotMemory(organizationId, "search", {
+      query: query.slice(0, 4000),
+      searchMode: "chunks",
+      limit: 20,
+      include: { documents: true },
+      filter: {
+        operator: "and",
+        operands: [
+          { field: "source", operator: "eq", value: "autopilot" },
+          { field: "category", operator: "eq", value: "feedback" },
+        ],
+      },
+    }),
   ]);
+  const relevant = new Set(
+    autopilotMemorySearchSchema
+      .parse(search)
+      .results.flatMap((result) =>
+        result.included?.document ? [result.included.document.id] : []
+      )
+  );
+  const feedback = await Promise.all(
+    [...relevant]
+      .slice(0, 20)
+      .map((id) => getAutopilotMemory(organizationId, id))
+  );
   return {
     rules: rules.map((rule) => rule.text),
-    recentlyDismissed: dismissed.map((row) => row.title),
+    // Read canonical metadata, not stale indexed chunks or extracted superseded memories.
+    feedback: feedback.flatMap((row) =>
+      row?.metadata.category === "feedback" ? [row.metadata.text] : []
+    ),
   };
 }
 
@@ -100,27 +132,40 @@ export async function addRule(params: {
   if (existing.length >= AUTOPILOT_RULES_MAX) {
     return { status: "full" as const };
   }
-  const [rule] = await db
-    .insert(autopilotRules)
-    .values({
-      id: nanoid(),
-      organizationId: params.organizationId,
-      text,
-      source: params.source,
-      sourceUrl: params.sourceUrl ?? null,
-      createdBy: params.createdBy ?? null,
+  const rule = {
+    id: `autopilot-rule-${createHash("sha256").update(text.toLowerCase()).digest("hex")}`,
+    organizationId: params.organizationId,
+    text,
+    source: params.source,
+    sourceUrl: params.sourceUrl ?? null,
+    createdBy: params.createdBy ?? null,
+    createdAt: new Date(),
+  };
+  autopilotMemoryWriteSchema.parse(
+    await requestAutopilotMemory(params.organizationId, "document", {
+      id: rule.id,
+      content: text,
+      metadata: {
+        source: "autopilot",
+        category: "rule",
+        text,
+        origin: rule.source,
+        sourceUrl: rule.sourceUrl,
+        createdBy: rule.createdBy,
+        createdAt: rule.createdAt.toISOString(),
+      },
+      // Rules are read deterministically from canonical documents, never inferred memories.
+      taskType: "superrag",
+      dreaming: "instant",
     })
-    .returning();
+  );
   return { status: "added" as const, rule };
 }
 
 export async function deleteRule(organizationId: string, ruleId: string) {
-  await db
-    .delete(autopilotRules)
-    .where(
-      and(
-        eq(autopilotRules.organizationId, organizationId),
-        eq(autopilotRules.id, ruleId)
-      )
-    );
+  // Verify both namespace and category; arbitrary document IDs are not rules.
+  const rules = await listRules(organizationId);
+  if (rules.some((rule) => rule.id === ruleId)) {
+    await removeAutopilotMemory(organizationId, ruleId);
+  }
 }

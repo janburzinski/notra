@@ -911,6 +911,20 @@
       "when": 1792600878219,
       "tag": "0129_content_git_publishing",
       "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1792600878220,
+      "tag": "0130_remove_autopilot_rules",
+      "breakpoints": true
+    },
+    {
+      "idx": 131,
+      "version": "7",
+      "when": 1792600878221,
+      "tag": "0131_autopilot_namespace_deletions",
+      "breakpoints": true
     }
   ]
 }

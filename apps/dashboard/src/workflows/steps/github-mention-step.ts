@@ -40,6 +40,9 @@ export async function processGitHubMentionStep(context: GitHubMentionContext) {
   if (autopilot) {
     return autopilot;
   }
+  if (context.comment.edited) {
+    return { status: "ignored" as const, reason: "edited_feedback_only" };
+  }
   return await processGitHubMention(context, startContentPublicationSyncRepair);
 }
 
