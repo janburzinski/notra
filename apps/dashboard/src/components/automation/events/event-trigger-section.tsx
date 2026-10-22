@@ -11,6 +11,7 @@ import { useTranslations } from "use-intl";
 import {
   EditorBox,
   EditorSection,
+  PICKER_CHIP_CLASS,
   PickerSelect,
 } from "@/components/automation/editor/editor-parts";
 import { SourcePicker } from "@/components/automation/editor/source-picker";
@@ -56,7 +57,7 @@ export function EventTriggerSection({
   } else if (options.length === 0) {
     repositories = (
       <button
-        className="bg-muted hover:bg-muted/70 duration-fast focus-visible:ring-ring/50 inline-flex h-8 items-center gap-2 rounded-lg px-3 text-sm transition-colors outline-none focus-visible:ring-[3px]"
+        className={PICKER_CHIP_CLASS}
         onClick={onAddRepository}
         type="button"
       >

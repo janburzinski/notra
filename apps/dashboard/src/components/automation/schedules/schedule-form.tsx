@@ -29,6 +29,7 @@ import {
   EditorHeader,
   EditorPad,
   EditorSection,
+  PICKER_CHIP_CLASS,
   PickerSelect,
 } from "@/components/automation/editor/editor-parts";
 import { SourcePicker } from "@/components/automation/editor/source-picker";
@@ -330,7 +331,7 @@ export function ScheduleForm({
   } else if (integrationOptions.length === 0) {
     sources = (
       <button
-        className="bg-muted hover:bg-muted/70 duration-fast focus-visible:ring-ring/50 inline-flex h-8 items-center gap-2 rounded-lg px-3 text-sm transition-colors outline-none focus-visible:ring-[3px]"
+        className={PICKER_CHIP_CLASS}
         onClick={() => setAddRepoOpen(true)}
         type="button"
       >

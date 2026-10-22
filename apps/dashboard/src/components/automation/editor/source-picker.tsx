@@ -20,6 +20,7 @@ import { Linear } from "@notra/ui/components/ui/svgs/linear";
 import { cn } from "@notra/ui/lib/utils";
 import { useState } from "react";
 
+import { PICKER_CHIP_CLASS } from "@/components/automation/editor/editor-parts";
 import type {
   SourceOption,
   SourcePickerProps,
@@ -67,7 +68,8 @@ export function SourcePicker({
             data-invalid={invalid || undefined}
             aria-label={ariaLabel}
             className={cn(
-              "bg-muted hover:bg-muted/70 duration-fast focus-visible:ring-ring/50 data-invalid:ring-destructive/40 inline-flex h-8 max-w-full items-center gap-2 rounded-lg px-3 text-sm transition-colors outline-none focus-visible:ring-[3px] data-invalid:ring-[3px]",
+              PICKER_CHIP_CLASS,
+              "data-invalid:ring-destructive/40 max-w-full data-invalid:ring-[3px]",
               value.length === 0 && "text-muted-foreground"
             )}
             type="button"

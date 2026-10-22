@@ -174,7 +174,12 @@ export function AutomationsTable({
       cell: (row) => {
         const { icon, label, detail } = triggerSummary(row);
         const badge = (
-          <Badge className="max-w-full" shape="rounded" variant="secondary">
+          <Badge
+            className="max-w-full"
+            shape="rounded"
+            size="md"
+            variant="secondary"
+          >
             <HugeiconsIcon icon={icon} />
             <span className="truncate">{label}</span>
           </Badge>
@@ -221,7 +226,7 @@ export function AutomationsTable({
         if (row.kind !== "alert") {
           return (
             <span className={cn("flex min-w-0", pausedClass(row))}>
-              <Badge shape="rounded" variant="secondary">
+              <Badge shape="rounded" size="md" variant="secondary">
                 <OutputTypeIcon outputType={row.trigger.outputType} />
                 {outputTypeLabel(row.trigger.outputType)}
               </Badge>
@@ -242,6 +247,7 @@ export function AutomationsTable({
                 <Badge
                   key={key}
                   shape="rounded"
+                  size="md"
                   title={compact ? label : undefined}
                   variant="secondary"
                 >

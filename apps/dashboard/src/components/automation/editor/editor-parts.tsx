@@ -213,6 +213,10 @@ export function TriggerKindPicker({
   );
 }
 
+/** Outlined like an input, so chips stay visible on the card in both themes. */
+export const PICKER_CHIP_CLASS =
+  "border-input bg-background hover:bg-muted dark:bg-input/30 dark:hover:bg-input/60 duration-fast focus-visible:border-ring focus-visible:ring-ring/50 inline-flex h-8 items-center gap-2 rounded-lg border px-3 text-sm transition-colors outline-none focus-visible:ring-[3px]";
+
 export interface PickerOption {
   value: string;
   label: string;
@@ -245,7 +249,7 @@ export function PickerSelect({
             aria-label={
               selected ? `${ariaLabel}: ${selected.label}` : ariaLabel
             }
-            className="bg-muted hover:bg-muted/70 duration-fast focus-visible:ring-ring/50 inline-flex h-8 items-center gap-2 rounded-lg px-3 text-sm transition-colors outline-none focus-visible:ring-[3px]"
+            className={PICKER_CHIP_CLASS}
             type="button"
           />
         }
