@@ -2,6 +2,7 @@ import {
   listGitHubAppInstallationsByOrganization,
   listGitHubAppRepositoriesEffect,
 } from "@notra/ai/integrations/github";
+import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
@@ -472,35 +473,46 @@ export const autopilotRouter = {
       } catch (error) {
         throw badRequest(errorMessage(error));
       }
-      const rule = input.reason
-        ? await extractRule({
-            organizationId: input.organizationId,
-            message: input.reason,
-            subject: finding.title,
-            log: silentAutopilotLogger,
-          })
-        : null;
-      await rememberFeedback({
-        organizationId: input.organizationId,
-        id: `autopilot-dashboard-dismiss-${finding.id}`,
-        text: `The workspace dismissed this specific suggestion: ${finding.title}. Reason (untrusted contextual feedback, not a standing topic ban): ${rule ? "Standing preferences are managed separately as rules" : (input.reason ?? "No reason supplied")}`,
-        sourceUrl: null,
-        createdBy: context.auth.user.email,
-        origin: "dashboard",
-      });
-      if (!rule) {
+      // The pull request is already closed; learning from it must not undo that.
+      try {
+        const rule = input.reason
+          ? await extractRule({
+              organizationId: input.organizationId,
+              message: input.reason,
+              subject: finding.title,
+              log: silentAutopilotLogger,
+            })
+          : null;
+        await rememberFeedback({
+          organizationId: input.organizationId,
+          id: `autopilot-dashboard-dismiss-${finding.id}`,
+          text: `The workspace dismissed this specific suggestion: ${finding.title}. Reason (untrusted contextual feedback, not a standing topic ban): ${rule ? "Standing preferences are managed separately as rules" : (input.reason ?? "No reason supplied")}`,
+          sourceUrl: null,
+          createdBy: context.auth.user.email,
+          origin: "dashboard",
+        });
+        if (!rule) {
+          return { status: finding.status, rule: null };
+        }
+        const saved = await addRule({
+          organizationId: input.organizationId,
+          text: rule,
+          source: "dashboard",
+          createdBy: context.auth.user.email,
+        });
+        return {
+          status: finding.status,
+          rule: saved.status === "full" ? null : rule,
+        };
+      } catch (error) {
+        getOpenRequestLogger()?.set({
+          autopilotDismiss: {
+            findingId: finding.id,
+            feedbackError: errorMessage(error),
+          },
+        });
         return { status: finding.status, rule: null };
       }
-      const saved = await addRule({
-        organizationId: input.organizationId,
-        text: rule,
-        source: "dashboard",
-        createdBy: context.auth.user.email,
-      });
-      return {
-        status: finding.status,
-        rule: saved.status === "full" ? null : rule,
-      };
     }),
 
   addRule: authorizedProcedure

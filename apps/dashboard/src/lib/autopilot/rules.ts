@@ -150,8 +150,9 @@ export async function addRule(params: {
         category: "rule",
         text,
         origin: rule.source,
-        sourceUrl: rule.sourceUrl,
-        createdBy: rule.createdBy,
+        // Supermemory rejects null metadata values.
+        ...(rule.sourceUrl ? { sourceUrl: rule.sourceUrl } : {}),
+        ...(rule.createdBy ? { createdBy: rule.createdBy } : {}),
         createdAt: rule.createdAt.toISOString(),
       },
       // Rules are read deterministically from canonical documents, never inferred memories.

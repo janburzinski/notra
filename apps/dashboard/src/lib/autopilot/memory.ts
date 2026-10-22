@@ -126,7 +126,8 @@ export async function rememberFeedback(params: AutopilotFeedbackInput) {
       category: "feedback",
       text: params.text,
       origin: params.origin ?? "github",
-      sourceUrl: params.sourceUrl,
+      // Supermemory rejects null metadata values.
+      ...(params.sourceUrl ? { sourceUrl: params.sourceUrl } : {}),
       createdBy: params.createdBy,
       createdAt: new Date().toISOString(),
     },

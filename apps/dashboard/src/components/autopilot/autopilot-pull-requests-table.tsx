@@ -167,7 +167,7 @@ export function AutopilotPullRequestsTable({
         if (!actionable) {
           return null;
         }
-        // Dismissing lives on the row's page, where there is room for a why.
+        // Closing lives on the row's page, where there is room for a why.
         return (
           <span className="flex items-center justify-end">
             {finding.status === "proposed" ? (

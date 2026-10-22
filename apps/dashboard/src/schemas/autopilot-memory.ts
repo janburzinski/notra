@@ -5,8 +5,8 @@ export const autopilotMemoryMetadataSchema = z.object({
   category: z.enum(["rule", "feedback"]),
   text: z.string(),
   origin: z.enum(["github", "dashboard"]),
-  sourceUrl: z.string().nullable(),
-  createdBy: z.string().nullable(),
+  sourceUrl: z.string().nullable().default(null),
+  createdBy: z.string().nullable().default(null),
   createdAt: z.string(),
 });
 

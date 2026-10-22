@@ -11,7 +11,7 @@ import type { AutopilotFindingConfirmDialogProps } from "@/types/autopilot";
 import { toErrorMessage } from "@/utils/error-message";
 
 /**
- * Confirms dismissing a pull request or idea, and merging from a Slack link.
+ * Confirms closing a pull request or idea, and merging from a Slack link.
  * Merges on the page go through the merge menu instead.
  */
 export function AutopilotFindingConfirmDialog({
@@ -42,8 +42,8 @@ export function AutopilotFindingConfirmDialog({
         });
         toast.success(
           result.rule
-            ? `Dismissed. Autopilot will remember: "${result.rule}"`
-            : "Dismissed. Autopilot won't suggest this again."
+            ? `Closed. Autopilot will remember: "${result.rule}"`
+            : "Closed. Autopilot won't suggest this again."
         );
       }
       onClose();
@@ -58,7 +58,7 @@ export function AutopilotFindingConfirmDialog({
 
   return (
     <ConfirmDialog
-      confirmLabel={pending?.kind === "merge" ? "Merge" : "Dismiss"}
+      confirmLabel={pending?.kind === "merge" ? "Merge" : "Close"}
       description={
         pending?.kind === "merge"
           ? `This merges ${pending.finding.repository}#${pending.finding.pullRequestNumber} into ${branch ?? "your default branch"}.`

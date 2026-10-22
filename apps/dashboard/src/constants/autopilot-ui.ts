@@ -140,7 +140,7 @@ export const AUTOPILOT_OUTCOMES = [
   },
   {
     key: "dismissed",
-    label: "Dismissed",
+    label: "Closed",
     icon: GitPullRequestClosedIcon,
     iconClassName: "text-destructive",
     className: "bg-destructive/70",

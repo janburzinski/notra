@@ -183,7 +183,7 @@ function FindingPage({
                 size="sm"
                 variant="outline"
               >
-                Dismiss
+                Close
               </Button>
               {finding.status === "proposed" ? (
                 <AutopilotMergeMenu
