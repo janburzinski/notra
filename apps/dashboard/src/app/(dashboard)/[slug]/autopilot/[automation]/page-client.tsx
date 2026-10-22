@@ -9,10 +9,10 @@ import { AutopilotAutomationFacts } from "@/components/autopilot/autopilot-autom
 import { AutopilotAutomationStatus } from "@/components/autopilot/autopilot-automation-status";
 import { AutopilotBackLink } from "@/components/autopilot/autopilot-back-link";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
+import { AutopilotFindingTables } from "@/components/autopilot/autopilot-finding-tables";
 import { AutopilotJobDecisions } from "@/components/autopilot/autopilot-job-decisions";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
-import { AutopilotPullRequestsTable } from "@/components/autopilot/autopilot-pull-requests-table";
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTrend } from "@/components/autopilot/autopilot-trend";
 import { EmptyState } from "@/components/empty-state";
@@ -34,7 +34,6 @@ import type {
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
 import { automationKindFromSlug } from "@/utils/autopilot-automations";
-import { isListedFinding } from "@/utils/autopilot-findings";
 
 export default function PageClient({
   organizationSlug,
@@ -157,35 +156,30 @@ function AutomationPage({
         </div>
         <AutopilotStatStrip busy={metricsQuery.isPending} stats={stats} />
       </section>
-      <section aria-labelledby="automation-pull-requests" className="space-y-3">
-        <h2 className="px-1 text-sm font-medium" id="automation-pull-requests">
-          Pull requests
-        </h2>
-        <AutopilotPullRequestsTable
-          findings={findings.filter(isListedFinding)}
-          mergingId={
-            merge.isPending ? (merge.variables?.findingId ?? null) : null
-          }
-          onMerge={(row, method) => merge.mutate({ findingId: row.id, method })}
-          onOpen={(row) =>
-            router.push(
-              `/${organizationSlug}${AUTOPILOT_NAV_LINK}/findings/${row.id}?${AUTOPILOT_FROM_PARAM}=${AUTOPILOT_AUTOMATION_SLUGS[kind]}`
-            )
-          }
-          onWrite={
-            overview.settings.enabled
-              ? (row) => writeSuggestion.mutate(row.id)
-              : undefined
-          }
-          readOnly={!overview.canManage}
-          showAutomation={false}
-          writingId={
-            writeSuggestion.isPending
-              ? (writeSuggestion.variables ?? null)
-              : null
-          }
-        />
-      </section>
+      <AutopilotFindingTables
+        findings={findings}
+        idPrefix="automation"
+        mergingId={
+          merge.isPending ? (merge.variables?.findingId ?? null) : null
+        }
+        onMerge={(row, method) => merge.mutate({ findingId: row.id, method })}
+        onOpen={(row) =>
+          router.push(
+            `/${organizationSlug}${AUTOPILOT_NAV_LINK}/findings/${row.id}?${AUTOPILOT_FROM_PARAM}=${AUTOPILOT_AUTOMATION_SLUGS[kind]}`
+          )
+        }
+        onWrite={
+          overview.settings.enabled
+            ? (row) => writeSuggestion.mutate(row.id)
+            : undefined
+        }
+        readOnly={!overview.canManage}
+        settings={overview.settings}
+        showAutomation={false}
+        writingId={
+          writeSuggestion.isPending ? (writeSuggestion.variables ?? null) : null
+        }
+      />
       <AutopilotJobDecisions
         kind={kind}
         organizationId={organizationId}

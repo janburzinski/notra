@@ -7,6 +7,18 @@ import { formatAutopilotPercent as percent } from "@/utils/autopilot-events";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+const BLOG_TITLE_PREFIX = /^Blog post(?: for |: )/i;
+const WRAPPING_QUOTES = /^"(.*)"$/;
+
+/** The title without the "Blog post:" prefix the table and Slack already imply. */
+export function findingDisplayTitle(
+  finding: Pick<AutopilotFindingView, "title">
+) {
+  return finding.title
+    .replace(BLOG_TITLE_PREFIX, "")
+    .replace(WRAPPING_QUOTES, "$1");
+}
+
 /** Has a pull request, or is being written into one by a run. */
 function isPullRequestFinding(finding: AutopilotFindingView) {
   return (
@@ -16,24 +28,23 @@ function isPullRequestFinding(finding: AutopilotFindingView) {
 }
 
 /** Worth a post but not sure enough for a pull request, or being written from a click. */
-function isIdeaFinding(finding: AutopilotFindingView) {
+export function isIdeaFinding(finding: AutopilotFindingView) {
   return (
     finding.status === "suggested" ||
     (finding.status === "open" && Boolean(finding.evidence.brief))
   );
 }
 
-/** Everything the pull requests tab lists: drafts, ideas and writes that failed. */
-export function isListedFinding(finding: AutopilotFindingView) {
+/** Everything the pull requests tab lists: drafts and writes that failed. */
+export function isListedPullRequest(finding: AutopilotFindingView) {
   return (
-    isPullRequestFinding(finding) ||
-    isIdeaFinding(finding) ||
-    finding.status === "failed"
+    (isPullRequestFinding(finding) || finding.status === "failed") &&
+    !isIdeaFinding(finding)
   );
 }
 
 /** From when the daily run writes an idea nobody dismissed. */
-function ideaAutoWriteAt(finding: AutopilotFindingView) {
+export function ideaAutoWriteAt(finding: AutopilotFindingView) {
   return new Date(
     new Date(finding.createdAt).getTime() +
       AUTOPILOT_IDEA_AUTO_WRITE_DAYS * DAY_MS

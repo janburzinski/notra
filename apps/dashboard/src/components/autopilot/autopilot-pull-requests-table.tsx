@@ -1,7 +1,13 @@
 "use client";
 
-import { GitPullRequestIcon } from "@hugeicons/core-free-icons";
+import {
+  GitPullRequestIcon,
+  Idea01Icon,
+  PencilEdit02Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
+import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
   DataTable,
   type TableColumn,
@@ -12,15 +18,22 @@ import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
 import { Button } from "@/components/button";
+import { AUTOPILOT_FINDING_STATUS_BADGES } from "@/constants/autopilot";
 import {
   AUTOPILOT_EMPTY_TABLE_HEIGHT,
+  AUTOPILOT_FINDING_ICONS,
   AUTOPILOT_KIND_META,
 } from "@/constants/autopilot-ui";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
+import { cn } from "@/lib/utils";
 import type {
   AutopilotFindingView,
   AutopilotPullRequestsTableProps,
 } from "@/types/autopilot";
+import {
+  findingDisplayTitle,
+  ideaAutoWriteAt,
+} from "@/utils/autopilot-findings";
 import { tableHeightFor } from "@/utils/table";
 
 /** Ideas written later open their pull request days after the finding. */
@@ -28,11 +41,13 @@ const openedAt = (finding: AutopilotFindingView) =>
   new Date(finding.openedAt ?? finding.createdAt);
 
 /**
- * Every pull request Autopilot opened or is writing, and the ideas waiting
- * for one, newest first. A row opens the page that explains it.
+ * Every pull request Autopilot opened or is writing, or (`view="ideas"`) the
+ * ideas waiting for one, newest first. A row opens the page that explains it.
  */
 export function AutopilotPullRequestsTable({
   findings,
+  view = "pull-requests",
+  isPaused,
   readOnly,
   showAutomation = true,
   writingId,
@@ -59,22 +74,34 @@ export function AutopilotPullRequestsTable({
       header: "Title",
       width: "1fr",
       minWidth: "14rem",
-      cell: (finding) => (
-        <span className="flex min-w-0 flex-col gap-0.5">
-          <TruncateWithTooltip className="text-sm font-medium">
-            {finding.title}
-          </TruncateWithTooltip>
-          {finding.status === "failed" && finding.errorMessage ? (
-            <TruncateWithTooltip className="text-destructive text-xs">
-              {finding.errorMessage}
-            </TruncateWithTooltip>
-          ) : null}
-        </span>
-      ),
+      cell: (finding) => {
+        const { icon, className } = AUTOPILOT_FINDING_ICONS[finding.status];
+        return (
+          <span className="flex min-w-0 items-center gap-2.5">
+            <HugeiconsIcon
+              aria-hidden="true"
+              className={cn("shrink-0", className)}
+              icon={icon}
+              size={16}
+              strokeWidth={1.75}
+            />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <TruncateWithTooltip className="text-sm font-medium">
+                {findingDisplayTitle(finding)}
+              </TruncateWithTooltip>
+              {finding.status === "failed" && finding.errorMessage ? (
+                <TruncateWithTooltip className="text-destructive text-xs">
+                  {finding.errorMessage}
+                </TruncateWithTooltip>
+              ) : null}
+            </span>
+          </span>
+        );
+      },
     },
     {
       key: "openedAt",
-      header: "Date",
+      header: view === "ideas" ? "Found" : "Date",
       width: "7rem",
       sortable: true,
       collapsePriority: 1,
@@ -88,16 +115,49 @@ export function AutopilotPullRequestsTable({
       ),
       sortValue: (finding) => openedAt(finding).getTime(),
     },
-    {
-      key: "status",
-      header: "Status",
-      width: "8rem",
-      cell: (finding) => <AutopilotFindingStatus finding={finding} />,
-    },
+    view === "ideas"
+      ? {
+          key: "autoWrite",
+          header: "Auto-writes after",
+          width: "9.5rem",
+          collapsePriority: 2,
+          cell: (finding) => {
+            if (finding.status !== "suggested") {
+              return (
+                <StatusBadge
+                  appearance={AUTOPILOT_FINDING_STATUS_BADGES.open.appearance}
+                  label={AUTOPILOT_FINDING_STATUS_BADGES.open.label}
+                />
+              );
+            }
+            if (isPaused?.(finding)) {
+              return (
+                <StatusBadge
+                  appearance={{ variant: "secondary" }}
+                  label="Paused"
+                />
+              );
+            }
+            return (
+              <span className="text-muted-foreground whitespace-nowrap tabular-nums">
+                {format.dateTime(ideaAutoWriteAt(finding), {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            );
+          },
+        }
+      : {
+          key: "status",
+          header: "Status",
+          width: "8rem",
+          cell: (finding) => <AutopilotFindingStatus finding={finding} />,
+        },
     {
       key: "actions",
       header: <span className="sr-only">Actions</span>,
-      width: "7.5rem",
+      width: "8.5rem",
       align: "right",
       cell: (finding) => {
         const actionable =
@@ -116,8 +176,13 @@ export function AutopilotPullRequestsTable({
                 onMerge={(method) => onMerge(finding, method)}
               />
             ) : onWrite ? (
-              <Button onClick={() => onWrite(finding)} size="xs">
-                Write
+              <Button
+                onClick={() => onWrite(finding)}
+                size="xs"
+                variant="outline"
+              >
+                <HugeiconsIcon icon={PencilEdit02Icon} size={14} />
+                Open PR
               </Button>
             ) : null}
           </span>
@@ -135,11 +200,19 @@ export function AutopilotPullRequestsTable({
       data={findings}
       defaultSort={{ key: "openedAt", direction: "desc" }}
       emptyState={
-        <AutopilotTableEmpty
-          description="Autopilot opens one when it finds something worth writing about or fixing on your site."
-          icon={GitPullRequestIcon}
-          title="No pull requests yet"
-        />
+        view === "ideas" ? (
+          <AutopilotTableEmpty
+            description="Posts Autopilot isn't sure enough about to write on its own land here. Write one now, or it writes itself after a few days."
+            icon={Idea01Icon}
+            title="No ideas waiting"
+          />
+        ) : (
+          <AutopilotTableEmpty
+            description="Autopilot opens one when it finds something worth writing about or fixing on your site."
+            icon={GitPullRequestIcon}
+            title="No pull requests yet"
+          />
+        )
       }
       getRowId={(finding) => finding.id}
       height={

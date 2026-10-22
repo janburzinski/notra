@@ -1,10 +1,12 @@
 import {
   AiMagicIcon,
+  AlertCircleIcon,
   Cancel01Icon,
   Clock01Icon,
   FilterIcon,
   GitBranchIcon,
   GitPullRequestIcon,
+  Idea01Icon,
   Image02Icon,
   MinusSignCircleIcon,
   PencilEdit02Icon,
@@ -223,6 +225,23 @@ export const AUTOPILOT_MERGE_METHOD_LABELS: Record<GitHubMergeMethod, string> =
 export const AUTOPILOT_MERGE_METHODS = Object.keys(
   AUTOPILOT_MERGE_METHOD_LABELS
 ) as GitHubMergeMethod[];
+
+/** The icon in front of a finding's title: its GitHub state, or what it is before it has one. */
+export const AUTOPILOT_FINDING_ICONS: Record<
+  AutopilotFindingStatus,
+  { icon: IconSvgElement; className: string }
+> = {
+  suggested: { icon: Idea01Icon, className: "text-muted-foreground" },
+  open: { icon: PencilEdit02Icon, className: "text-muted-foreground" },
+  proposed: CONTENT_PULL_REQUEST_STATES.open,
+  merged: CONTENT_PULL_REQUEST_STATES.merged,
+  dismissed: CONTENT_PULL_REQUEST_STATES.closed,
+  expired: {
+    icon: CONTENT_PULL_REQUEST_STATES.closed.icon,
+    className: "text-muted-foreground",
+  },
+  failed: { icon: AlertCircleIcon, className: "text-destructive" },
+};
 
 /**
  * The GitHub state icon for a finding with a pull request, in GitHub's

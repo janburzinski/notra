@@ -11,6 +11,7 @@ import { postAutopilotSlackMessage } from "@/lib/autopilot/slack";
 import type { AutopilotFindingRow as FindingRow } from "@/types/autopilot-runtime";
 import type { SlackBlock } from "@/types/autopilot-slack";
 import { autopilotSlackMessageId } from "@/utils/autopilot-delivery";
+import { findingDisplayTitle } from "@/utils/autopilot-findings";
 import { compactSlackText } from "@/utils/autopilot-slack";
 
 function findingUrl(slug: string, findingId: string, action?: string) {
@@ -52,12 +53,7 @@ function findingBlocks(slug: string, finding: FindingRow): SlackBlock[] {
     url: findingUrl(slug, finding.id, "dismiss"),
     action_id: `autopilot_dismiss_${finding.id}`,
   });
-  const title = compactSlackText(
-    finding.title
-      .replace(/^Blog post(?: for |: )/i, "")
-      .replace(/^"(.*)"$/, "$1"),
-    100
-  );
+  const title = compactSlackText(findingDisplayTitle(finding), 100);
   const target = finding.evidence.target;
   const summary = compactSlackText(
     target?.kind === "prompt"

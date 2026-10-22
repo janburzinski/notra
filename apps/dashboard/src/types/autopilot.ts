@@ -379,6 +379,10 @@ export interface AutopilotPageShellProps {
 
 export interface AutopilotPullRequestsTableProps {
   findings: AutopilotFindingView[];
+  /** Ideas swap the status for when the idea writes itself. */
+  view?: "pull-requests" | "ideas";
+  /** An idea whose automation is off never writes itself, so it shows paused. */
+  isPaused?: (finding: AutopilotFindingView) => boolean;
   readOnly: boolean;
   /** Off on an automation's own page, where every row has the same one. */
   showAutomation?: boolean;
@@ -389,6 +393,16 @@ export interface AutopilotPullRequestsTableProps {
   mergingId: string | null;
   onMerge: (finding: AutopilotFindingView, method: GitHubMergeMethod) => void;
   onWrite?: (finding: AutopilotFindingView) => void;
+}
+
+export interface AutopilotFindingTablesProps extends Omit<
+  AutopilotPullRequestsTableProps,
+  "findings" | "view" | "isPaused"
+> {
+  findings: AutopilotFindingView[];
+  settings: Pick<AutopilotOverview["settings"], "enabled" | "jobs">;
+  /** Prefix for the section heading ids, unique per page. */
+  idPrefix: string;
 }
 
 export interface AutopilotSettingsRowProps {

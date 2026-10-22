@@ -26,9 +26,9 @@ import { useEffect, useState } from "react";
 
 import { AutopilotAutomationsOverview } from "@/components/autopilot/autopilot-automations-overview";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
+import { AutopilotFindingTables } from "@/components/autopilot/autopilot-finding-tables";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
-import { AutopilotPullRequestsTable } from "@/components/autopilot/autopilot-pull-requests-table";
 import { AutopilotRunsTable } from "@/components/autopilot/autopilot-runs-table";
 import { AutopilotSettingsPanel } from "@/components/autopilot/autopilot-settings-panel";
 import { AutopilotSetupFlow } from "@/components/autopilot/autopilot-setup-flow";
@@ -53,7 +53,7 @@ import type {
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
-import { isListedFinding } from "@/utils/autopilot-findings";
+import { isListedPullRequest } from "@/utils/autopilot-findings";
 
 import {
   AutopilotCreateButton,
@@ -109,7 +109,7 @@ function AutopilotOverviewPage({
   });
   const { settings, findings, runs, canManage } = overview;
   const basePath = `/${organizationSlug}${AUTOPILOT_NAV_LINK}`;
-  const pullRequests = findings.filter(isListedFinding);
+  const pullRequests = findings.filter(isListedPullRequest);
 
   // Slack brief buttons link here with ?finding=…&action=merge|dismiss. The
   // params are dropped once read, so a reload doesn't ask again.
@@ -285,8 +285,9 @@ function AutopilotOverviewPage({
           ) : null}
         </TabsContent>
         <TabsContent className="mt-4" value="pull-requests">
-          <AutopilotPullRequestsTable
-            findings={pullRequests}
+          <AutopilotFindingTables
+            findings={findings}
+            idPrefix="autopilot"
             mergingId={
               merge.isPending ? (merge.variables?.findingId ?? null) : null
             }
@@ -295,11 +296,12 @@ function AutopilotOverviewPage({
             }
             onOpen={(row) => router.push(`${basePath}/findings/${row.id}`)}
             onWrite={
-              overview.settings.enabled
+              settings.enabled
                 ? (row) => writeSuggestion.mutate(row.id)
                 : undefined
             }
             readOnly={!canManage}
+            settings={settings}
             writingId={
               writeSuggestion.isPending
                 ? (writeSuggestion.variables ?? null)
