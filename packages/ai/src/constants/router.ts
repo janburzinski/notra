@@ -14,8 +14,8 @@ export const ROUTE_USAGE_LOOKUP_CONCURRENCY = 4;
 
 export const GATEWAY_FALLBACK_ORDER: readonly GatewayId[] = [
   "neon",
-  "vercel",
   "openrouter",
+  "vercel",
 ];
 
 /** Prefixes Neon/Databricks put on served ids, e.g. `global.xai.grok-4.7`. */

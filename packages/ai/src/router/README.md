@@ -27,8 +27,8 @@ const grounded = gateway("openai/gpt-5.4", { organizationId, gateway: "vercel" }
 | free plan                   | neon, subject to privacy |
 
 Neon is preferred for supported models when privacy allows it (`zdr: "none"`,
-or the existing development-only bypass). Fallback order is Neon → Vercel →
-OpenRouter, skipping the current gateway and any unavailable routes. Explicit
+or the existing development-only bypass). Fallback order is Neon → OpenRouter →
+Vercel, skipping the current gateway and any unavailable routes. Explicit
 pins remain pinned. Missing Neon configuration does not disable other gateways.
 
 Configure `NEON_AI_GATEWAY_API_KEY` (or Neon's standard
@@ -50,8 +50,9 @@ so billing finds the price; Neon reports no cost, so steps are priced from
 `MODEL_PRICING` (`neon/…` entries where Neon's list price differs).
 
 Neon's default account limits are 200k tokens per minute and a $20 daily spend
-cap (429 `REQUEST_LIMIT_EXCEEDED`). Any 429 falls back to Vercel for that call;
-the daily cap additionally skips Neon for `DEFAULT_UNAVAILABLE_TTL_MS`.
+cap (429 `REQUEST_LIMIT_EXCEEDED`). Any 429 falls back to OpenRouter, then Vercel,
+for that call; the daily cap additionally skips Neon for
+`DEFAULT_UNAVAILABLE_TTL_MS`.
 
 ## Provider-defined tools
 
