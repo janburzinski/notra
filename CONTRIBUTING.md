@@ -734,8 +734,11 @@ without credentials or a database, and checks the injected port, health commit,
 HTTPS proxy redirects, and graceful shutdown. It does not replace the functional
 checks against dedicated demo services above.
 For the API, run `bun run build && bun run test:production` from `apps/api`.
-The build packages the external SVG renderer and its native binding in `dist`;
-the test verifies those imports from an isolated copy without credentials.
+The build traces the external `@resvg/resvg-js`, `sharp`, and `wawoff2` runtimes
+into `dist`, including their native bindings and WASM assets. The production
+artifact check renders and resizes an image, exercises the font decoder, and
+boots `/ping` from an isolated copy with synthetic configuration. CI runs this
+check inside the API's Alpine Linux amd64 image without external network access.
 
 ## Production releases and Vercel build selection
 
