@@ -7,7 +7,7 @@ export const DEFAULT_AXIOM_AI_DATASET = "ai-logs";
 export const DEFAULT_AXIOM_GEO_DATASET = "notra-geo-scan";
 export const GEO_LOG_EVENT_PREFIX = "geo.";
 export const GATEWAY_LIMIT_ALERT = {
-  dedupeSeconds: 5 * 60,
+  dedupeSeconds: 60 * 60,
   timeoutMs: 5000,
 };
 export const GATEWAY_LIMIT_DESCRIPTIONS = {

@@ -7,7 +7,7 @@ import {
 import { gatewayLimitMessage } from "@notra/ai/utils/gateway-limit-message";
 import type { WideEvent } from "evlog";
 
-/** Share the operational Slack webhook, with one alert per gateway/status/limit/window. */
+/** Alert once per gateway/status/limit incident; failures extend the quiet period. */
 export async function alertGatewayLimit(event: WideEvent): Promise<void> {
   const webhook = process.env.GEO_SCAN_ALERT_WEBHOOK_URL;
   if (
@@ -28,11 +28,12 @@ export async function alertGatewayLimit(event: WideEvent): Promise<void> {
     process.env.NODE_ENV ??
     "unknown";
   const key = `ai:gateway-limit-alert:${environment}:${event.gateway}:${event.status}:${event.limitType ?? "unknown"}`;
-  const claimed = await redis.set(key, "sent", {
-    nx: true,
+  // SET GET EX atomically returns the previous marker and refreshes its expiry.
+  const previous = await redis.set(key, "sent", {
+    get: true,
     ex: GATEWAY_LIMIT_ALERT.dedupeSeconds,
   });
-  if (!claimed) {
+  if (previous !== null) {
     return;
   }
   try {

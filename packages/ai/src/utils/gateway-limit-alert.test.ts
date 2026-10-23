@@ -5,11 +5,9 @@ import { TELEMETRY_TEST_EVENT } from "@notra/ai/constants/telemetry-test";
 test("Slack receives limit details and dedupes daily caps separately from rate limits without a real webhook", async () => {
   const claims = new Set<string>();
   const set = mock((key: string) => {
-    if (claims.has(key)) {
-      return Promise.resolve(null);
-    }
+    const previous = claims.has(key) ? "sent" : null;
     claims.add(key);
-    return Promise.resolve("OK");
+    return Promise.resolve(previous);
   });
   const del = mock((key: string) => {
     claims.delete(key);

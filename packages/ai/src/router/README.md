@@ -151,9 +151,13 @@ Anthropic thinking / OpenAI reasoning settings are mapped to
   fallback.
 - These events also notify the existing `GEO_SCAN_ALERT_WEBHOOK_URL` Slack
   destination when Redis is configured. Redis deduplicates alerts per environment,
-  gateway, status and limit type for five minutes, including across instances, so
-  a rate-limit alert does not hide a daily-cap alert. Messages include the cause,
-  reported timing and a recovery action, without claiming fallback succeeded.
+  gateway, status and limit type across instances. Only the first failure posts a
+  message; every matching failure atomically refreshes a one-hour quiet period.
+  A new message is allowed only after an hour without that failure, rather than
+  every five minutes during a continuing outage. Different gateways/statuses and
+  limit types still alert independently, so a rate-limit alert does not hide a
+  daily-cap alert. Full logs and model fallback are unaffected. Messages include
+  the cause, reported timing and a recovery action, without claiming fallback succeeded.
   Alerts run in the background and are awaited by `flushLogs`, independently of
   OTLP delivery.
   Failed deliveries release the deduplication key so the next limit hit can retry;

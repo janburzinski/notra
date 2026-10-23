@@ -44,6 +44,6 @@ export function gatewayLimitMessage(
     ...(event.organizationId ? [`Organization: ${event.organizationId}`] : []),
     ...(event.projectId ? [`Project: ${event.projectId}`] : []),
     "Fallback may still succeed; this alert does not confirm recovery.",
-    `Further alerts for this gateway/status/limit type are muted for ${GATEWAY_LIMIT_ALERT.dedupeSeconds / 60} minutes.`,
+    `Repeated alerts for this gateway/status/limit type stay muted until there have been ${GATEWAY_LIMIT_ALERT.dedupeSeconds / 60} minutes without another matching failure. Full logs are retained.`,
   ].join("\n");
 }
