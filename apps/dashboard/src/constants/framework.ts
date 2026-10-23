@@ -6,11 +6,12 @@ export const DASHBOARD_SECURITY_HEADERS = {
   "X-DNS-Prefetch-Control": "on",
 };
 
+// Workflow routes belong to the SDK builder. Nitro rules at those paths copy
+// the entire dashboard server into the SDK's functions before it bundles them.
 export const DASHBOARD_FUNCTION_RULES = {
   "/api/organizations/*/chat": { maxDuration: 1800 },
   "/api/organizations/*/dashboard-agent/chat": { maxDuration: 1800 },
   "/api/organizations/*/agent/**": { maxDuration: 800 },
-  "/.well-known/workflow/v1/step": { maxDuration: 800 },
 };
 
 export const WORKFLOW_ESBUILD_IDLE_STOP_MS = 5000;
