@@ -61,7 +61,7 @@ export const tooltipVariantClass: Record<TooltipVariant, string> = {
 };
 
 export function tooltipIndicatorHtml(key: string, colorsCount: number): string {
-  return `<div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicatorBackground(key, colorsCount)}"></div>`;
+  return `<div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${escapeHtml(indicatorBackground(key, colorsCount))}"></div>`;
 }
 
 export function tooltipColorSwatchHtml(color: string): string {
