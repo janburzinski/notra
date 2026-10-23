@@ -1303,15 +1303,6 @@
       "readFailed": "{host} konnte nicht gelesen werden. Prüfe die Adresse oder gib unten einfach deinen Markennamen ein.",
       "languagesHint": "Fragen werden auf {language} geschrieben. Weitere Sprachen übersetzen wir beim Scan."
     },
-    "pricing": {
-      "freeTrial": "Kostenlose Testphase",
-      "startFreeTrial": "Kostenlos testen",
-      "selectPlan": "Tarif {plan} auswählen",
-      "title": "Wähle deinen Tarif",
-      "description": "Wähle einen Plan für KI-Sichtbarkeits-Tracking und Content oder schließe das hier und sieh dich erst um.",
-      "close": "Schließen und zum Dashboard",
-      "renews": "{interval, select, year {Dein Tarif verlängert sich jedes Jahr automatisch, bis du kündigst.} other {Dein Tarif verlängert sich jeden Monat automatisch, bis du kündigst.}}"
-    },
     "workspace": {
       "slugStatus": {
         "checking": "Slug-Verfügbarkeit wird geprüft",
@@ -5553,6 +5544,7 @@
     },
     "features": {
       "team_members": "Teammitglieder",
+      "ai_traffic_events": "KI-Traffic-Events",
       "long_form_posts": "Langform-Beiträge",
       "social_posts": "Social-Media-Beiträge",
       "image_generations": "Bildgenerierungen",
@@ -5690,6 +5682,8 @@
       "tierDescription": "{tier, select, starter {Für Gründer, die ihre ersten Prompts tracken.} growth {Für Teams, die Prompts über Engines und Sprachen hinweg tracken.} scale {Für Agenturen und Teams mit mehreren Marken.} other {}}",
       "features": {
         "aiAnswers": "{count, number} getrackte KI-Antworten / Monat",
+        "aiTrafficEvents": "{count, number} KI-Traffic-Events / Monat",
+        "aiTrafficEventsDetail": "Kostenlose KI-Traffic-Analyse und Agent-Feedback",
         "imageGenerations": "{count, number} Bildgenerierungen / Monat",
         "longFormPosts": "{count, number} Langform-Beiträge / Monat",
         "unlimitedSocialPosts": "Unbegrenzte Social-Beiträge",

@@ -1303,15 +1303,6 @@
       "readFailed": "Could not read {host}. Check the address, or just type your brand name below.",
       "languagesHint": "Questions are written in {language}. Other languages are translated when we scan."
     },
-    "pricing": {
-      "freeTrial": "Free trial",
-      "startFreeTrial": "Start free trial",
-      "selectPlan": "Select {plan}",
-      "title": "Choose your plan",
-      "description": "Pick a plan to unlock AI visibility tracking and content, or close this and look around first.",
-      "close": "Close and go to dashboard",
-      "renews": "{interval, select, year {Your plan renews automatically every year until you cancel.} other {Your plan renews automatically every month until you cancel.}}"
-    },
     "workspace": {
       "slugStatus": {
         "checking": "Checking slug availability",
@@ -5553,6 +5544,7 @@
     },
     "features": {
       "team_members": "Team members",
+      "ai_traffic_events": "AI traffic events",
       "long_form_posts": "Long-form posts",
       "social_posts": "Social posts",
       "image_generations": "Image generations",
@@ -5690,6 +5682,8 @@
       "tierDescription": "{tier, select, starter {For founders tracking their first prompts.} growth {For teams tracking prompts across engines and languages.} scale {For agencies and teams running several brands.} other {}}",
       "features": {
         "aiAnswers": "{count, number} AI answers tracked / mo",
+        "aiTrafficEvents": "{count, number} AI traffic events / mo",
+        "aiTrafficEventsDetail": "Free AI traffic analytics and agent feedback",
         "imageGenerations": "{count, number} image generations / mo",
         "longFormPosts": "{count, number} long-form posts / mo",
         "unlimitedSocialPosts": "Unlimited social posts",

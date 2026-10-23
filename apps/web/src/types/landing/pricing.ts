@@ -2,6 +2,7 @@ import type { ComponentType, SVGProps } from "react";
 
 export type PricingIconKey =
   | "tracking"
+  | "traffic"
   | "images"
   | "content"
   | "social"

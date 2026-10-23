@@ -3,6 +3,7 @@ export const FEATURES = {
   AI_CREDITS: "ai_credits",
   PULL_REQUEST_CREDITS: "pull_request_credits",
   AI_ANSWERS: "ai_answers",
+  AI_TRAFFIC_EVENTS: "ai_traffic_events",
   LONG_FORM_POSTS: "long_form_posts",
   SOCIAL_POSTS: "social_posts",
   IMAGE_GENERATIONS: "image_generations",

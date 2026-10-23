@@ -1,8 +1,9 @@
 "use client";
 
 import { GeoUpgradeGate } from "@/components/geo/geo-upgrade-gate";
-import { useParams } from "@/lib/navigation";
+import { useParams, usePathname } from "@/lib/navigation";
 import type { GeoPageGateProps } from "@/types/components/geo";
+import { isGeoPaywalledPath } from "@/utils/geo-paths";
 
 export function GeoPageGate({
   children,
@@ -10,6 +11,11 @@ export function GeoPageGate({
   fallback,
 }: GeoPageGateProps) {
   const { slug } = useParams<{ slug: string }>();
+  const pathname = usePathname();
+
+  if (!isGeoPaywalledPath(pathname)) {
+    return children;
+  }
 
   return (
     <GeoUpgradeGate entitled={entitled} fallback={fallback} slug={slug}>

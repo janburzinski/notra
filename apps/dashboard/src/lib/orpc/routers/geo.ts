@@ -1149,7 +1149,7 @@ export const geoRouter = {
   aiTraffic: authorizedProcedure
     .input(aiTrafficInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadAiTraffic(
           input,
           geoWindow(input),
@@ -1162,14 +1162,14 @@ export const geoRouter = {
   webAnalytics: authorizedProcedure
     .input(webAnalyticsInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadWebAnalytics(input, geoWindow(input), input.host, input.path)
       )
     ),
   trafficLog: authorizedProcedure
     .input(geoTrafficLogInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadGeoTrafficLog(
           input,
           input.limit,
@@ -1183,26 +1183,26 @@ export const geoRouter = {
   trafficJourneys: authorizedProcedure
     .input(geoTrafficJourneysInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadGeoTrafficJourneys(input, geoWindow(input), input.limit)
       )
     ),
   journeyStats: authorizedProcedure
     .input(geoJourneyStatsInputSchema)
     .handler(
-      geoHandler((input) => loadGeoJourneyStats(input, geoWindow(input)))
+      geoOpenHandler((input) => loadGeoJourneyStats(input, geoWindow(input)))
     ),
   journeyDetail: authorizedProcedure
     .input(geoJourneyDetailInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadGeoJourneyDetail(input, input.journeyId, geoWindow(input))
       )
     ),
   trafficPages: authorizedProcedure
     .input(geoTrafficPagesInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadGeoTrafficPages(
           input,
           geoWindow(input),

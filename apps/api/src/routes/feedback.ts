@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { trackAiTrafficEvent } from "@notra/ai/billing/ai-traffic-events";
 import {
   feedbackOrganizationParamsSchema,
   feedbackParamsSchema,
@@ -16,6 +17,7 @@ import { API_FEEDBACK_VIA } from "../constants/analytics";
 import {
   FEEDBACK_NOT_FOUND_ERROR,
   FEEDBACK_ORGANIZATION_NOT_FOUND_ERROR,
+  FEEDBACK_QUOTA_EXCEEDED_ERROR,
   FEEDBACK_PROJECT_NOT_FOUND_ERROR,
 } from "../constants/feedback";
 import { ORGANIZATION_SCOPED_API_KEY_ERROR } from "../constants/skills";
@@ -88,6 +90,7 @@ const submitOrganizationFeedbackRoute = createRoute({
   responses: {
     202: feedbackAcceptedResponse,
     400: errorResponse("Invalid request body"),
+    402: errorResponse(FEEDBACK_QUOTA_EXCEEDED_ERROR),
     404: errorResponse(FEEDBACK_ORGANIZATION_NOT_FOUND_ERROR),
     429: publicFeedbackRateLimitedResponse,
   },
@@ -108,6 +111,7 @@ const submitFeedbackRoute = createRoute({
     202: feedbackAcceptedResponse,
     400: errorResponse("Invalid request body"),
     401: errorResponse("Missing or invalid credentials"),
+    402: errorResponse(FEEDBACK_QUOTA_EXCEEDED_ERROR),
     403: errorResponse("Forbidden"),
     404: errorResponse(FEEDBACK_PROJECT_NOT_FOUND_ERROR),
     429: feedbackRateLimitedResponse,
@@ -198,10 +202,16 @@ async function submitFeedbackHandler(
     })
   );
   if (result._tag === "Failure") {
+    if (result.failure._tag === "FeedbackQuotaExceededError") {
+      return c.json({ error: FEEDBACK_QUOTA_EXCEEDED_ERROR }, 402);
+    }
     return respondToFeedbackFailure(c, result.failure);
   }
 
   const { deduplicated } = result.success;
+  if (!deduplicated) {
+    void trackAiTrafficEvent(organizationId);
+  }
   const feedback = serializeFeedback(result.success.feedback);
   trackFeedbackReceived(c, { organizationId, feedback, deduplicated, via });
 

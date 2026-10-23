@@ -13,6 +13,7 @@ export function useUsageFeatureName() {
     ai_credits: tLabels("credits"),
     pull_request_credits: t("shared.pullRequestCredits"),
     ai_answers: tBillingShared("aiAnswers"),
+    ai_traffic_events: t("features.ai_traffic_events"),
     long_form_posts: t("features.long_form_posts"),
     social_posts: t("features.social_posts"),
     image_generations: t("features.image_generations"),

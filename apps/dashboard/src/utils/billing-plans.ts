@@ -74,10 +74,21 @@ export function getProductPrice(
 
 function tierFeatures(
   limits: PlanTierLimits,
-  t: BillingTranslator
+  t: BillingTranslator,
+  aiTrafficEvents: number | undefined
 ): ProductFeature[] {
   return [
     { text: t("plans.features.aiAnswers", { count: limits.aiAnswers }) },
+    ...(aiTrafficEvents
+      ? [
+          {
+            text: t("plans.features.aiTrafficEvents", {
+              count: aiTrafficEvents,
+            }),
+            overageText: t("plans.features.aiTrafficEventsDetail"),
+          },
+        ]
+      : []),
     {
       text: t("plans.features.imageGenerations", {
         count: limits.imageGenerations,
@@ -120,7 +131,12 @@ export function getProductFeatures(
   const tier = planTierId(plan?.id);
   const limits = tier ? PLAN_TIER_LIMITS[tier] : undefined;
   if (limits) {
-    return tierFeatures(limits, t);
+    return tierFeatures(
+      limits,
+      t,
+      plan?.items?.find((item) => item.featureId === FEATURES.AI_TRAFFIC_EVENTS)
+        ?.included
+    );
   }
 
   if (!plan?.items) {

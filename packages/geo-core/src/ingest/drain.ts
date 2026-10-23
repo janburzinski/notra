@@ -177,10 +177,16 @@ export const runGeoDrainIngest = Effect.fn("geoDrain.run")(function* (
     enqueue: (event) => collected.push(event) > 0,
     expedite: () => undefined,
   };
+  const pending: Parameters<GeoIngestDefer>[0][] = [];
+  const recordDefer: GeoIngestDefer = buffer
+    ? defer
+    : (task) => {
+        pending.push(task);
+      };
   const claimed: string[] = [];
   const results = yield* Effect.forEach(
     aiRecords,
-    (record) => ingestRecord(identity, record, defer, target, claimed),
+    (record) => ingestRecord(identity, record, recordDefer, target, claimed),
     { concurrency: GEO_DRAIN_CONCURRENCY }
   );
 
@@ -194,6 +200,11 @@ export const runGeoDrainIngest = Effect.fn("geoDrain.run")(function* (
       defer(async () => announceGeoTrafficRows(collected))
     );
   }
+  yield* Effect.sync(() => {
+    for (const task of pending) {
+      defer(task);
+    }
+  });
 
   const retryable = results.filter(isRetryable).length;
   if (retryable > 0) {

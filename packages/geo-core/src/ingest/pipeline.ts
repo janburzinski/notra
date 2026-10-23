@@ -1,4 +1,8 @@
 import {
+  hasAiTrafficEventsQuota,
+  trackAiTrafficEvent,
+} from "@notra/ai/billing/ai-traffic-events";
+import {
   ingestGeoTrafficEvents,
   ingestWebPageEngagement,
   ingestWebPageViews,
@@ -460,6 +464,14 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
   if (!isAi) {
     return webOnlyResult(identity, classification.visitorType);
   }
+  if (!(yield* hasAiTrafficEventsQuota(identity.organizationId))) {
+    return droppedResult(
+      identity,
+      classification.visitorType,
+      "quota",
+      url.hostname
+    );
+  }
 
   const journey = resolveJourneyId({
     url,
@@ -493,6 +505,7 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
         buffered && buffer
           ? expediteForLiveViewers(buffer, event.organization_id)
           : announceGeoTrafficEvent(event.organization_id, event.project_id);
+      const tracked = trackAiTrafficEvent(event.organization_id);
       try {
         await Effect.runPromise(trackGeoIngestAnalytics({ identity, event }));
       } catch (error) {
@@ -506,7 +519,7 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
           }
         );
       }
-      await announced;
+      await Promise.all([announced, tracked]);
     })
   );
 

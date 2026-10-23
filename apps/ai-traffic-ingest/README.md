@@ -245,6 +245,7 @@ the service. Use isolated equivalents for origin testing, never production data:
 | `UPSTASH_REDIS_REST_TOKEN` | Existing Redis credentials |
 | `TINYBIRD_TOKEN` | Existing token with ingestion permissions |
 | `GEO_INGEST_SECRET` | The exact signing secret used by the dashboard |
+| `AUTUMN_SECRET_KEY` | Existing billing key; meters and limits `ai_traffic_events`. Without it, events are accepted unmetered and a warning is logged |
 | `TINYBIRD_BASE_URL` | Optional existing Tinybird endpoint, especially for a non-default region |
 
 `BEACON_INGEST_SECRET` is supported when `GEO_INGEST_SECRET` is unset.

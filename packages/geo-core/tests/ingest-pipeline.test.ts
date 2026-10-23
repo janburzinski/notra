@@ -49,6 +49,8 @@ const ingestWebPageViews = mock(async (_rows: WebPageViewRow[]) => ({
   quarantined_rows: 0,
 }));
 const webRatelimitLimit = mock(async () => ({ success: true }));
+const hasAiTrafficEventsQuota = mock(() => Effect.succeed(true));
+const trackAiTrafficEvent = mock(async (_organizationId: string) => {});
 const ingestWebPageEngagement = mock(async (_rows: unknown[]) => ({
   successful_rows: 1,
   quarantined_rows: 0,
@@ -74,6 +76,10 @@ mock.module("@notra/geo-core/geo/ingest", () => ({
   getGeoIngestTokenGeneration,
   geoIngestHostsCacheKey: () => "hosts:key",
   getGeoIngestSecret: () => "test-secret",
+}));
+mock.module("@notra/ai/billing/ai-traffic-events", () => ({
+  hasAiTrafficEventsQuota,
+  trackAiTrafficEvent,
 }));
 mock.module("../src/ingest/hosts", () => ({
   loadIngestAllowedHosts,
@@ -140,9 +146,12 @@ describe("runGeoIngest ordering", () => {
       webRatelimitLimit,
       verifyGeoIngestToken,
       resolveJourneyId,
+      hasAiTrafficEventsQuota,
+      trackAiTrafficEvent,
     ]) {
       m.mockClear();
     }
+    hasAiTrafficEventsQuota.mockImplementation(() => Effect.succeed(true));
     webRatelimitLimit.mockImplementation(async () => ({ success: true }));
     verifyGeoIngestToken.mockImplementation(() => ({
       organizationId: "org_1",
@@ -251,6 +260,19 @@ describe("runGeoIngest ordering", () => {
     const outcome = await run(ingestRequest());
 
     expect(outcome._tag).toBe("Success");
+    expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+  });
+
+  test("drops tracked events once the AI traffic events quota is used up", async () => {
+    hasAiTrafficEventsQuota.mockImplementation(() => Effect.succeed(false));
+
+    const outcome = await run(ingestRequest());
+
+    expect(outcome).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "dropped", reason: "quota" },
+    });
+    expect(hasAiTrafficEventsQuota).toHaveBeenCalledWith("org_1");
     expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
   });
 

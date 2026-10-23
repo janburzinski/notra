@@ -41,7 +41,7 @@ export const PRICING_HEADING =
   "Simple pricing that scales with what you track.";
 
 export const PRICING_SUBHEADING =
-  "Every plan comes with prompt tracking, traffic attribution and the writer. Plans differ in how many answers you track a month, and you can cancel anytime.";
+  "Every plan comes with prompt tracking, traffic attribution and the writer. AI traffic analytics and agent feedback are free on every account up to a monthly event limit. Plans differ in how many answers you track a month, and you can cancel anytime.";
 
 const SIGNUP_URL = "https://app.usenotra.com/signup";
 const ENTERPRISE_MAIL_URL = "mailto:hello@usenotra.com";
@@ -65,6 +65,11 @@ export const PRICING_PLANS: PricingPlan[] = [
     },
     features: [
       { label: "2,000 AI answers tracked / mo", icon: "tracking" },
+      {
+        label: "AI traffic analytics + agent feedback",
+        subtitle: "free within your monthly event limit",
+        icon: "traffic",
+      },
       { label: "8 image generations / mo", icon: "images" },
       { label: "10 long-form posts / mo", icon: "content" },
       { label: "Unlimited social posts", icon: "social" },
@@ -96,6 +101,11 @@ export const PRICING_PLANS: PricingPlan[] = [
     },
     features: [
       { label: "6,000 AI answers tracked / mo", icon: "tracking" },
+      {
+        label: "AI traffic analytics + agent feedback",
+        subtitle: "free within your monthly event limit",
+        icon: "traffic",
+      },
       { label: "20 image generations / mo", icon: "images" },
       { label: "25 long-form posts / mo", icon: "content" },
       { label: "Unlimited social posts", icon: "social" },
@@ -127,6 +137,11 @@ export const PRICING_PLANS: PricingPlan[] = [
     },
     features: [
       { label: "12,000 AI answers tracked / mo", icon: "tracking" },
+      {
+        label: "AI traffic analytics + agent feedback",
+        subtitle: "free within your monthly event limit",
+        icon: "traffic",
+      },
       { label: "45 image generations / mo", icon: "images" },
       { label: "50 long-form posts / mo", icon: "content" },
       { label: "Unlimited social posts", icon: "social" },
@@ -156,6 +171,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     },
     features: [
       { label: "Unlimited AI answers tracked", icon: "tracking" },
+      { label: "Unlimited AI traffic events", icon: "traffic" },
       { label: "Unlimited image generations", icon: "images" },
       { label: "Unlimited long-form posts", icon: "content" },
       { label: "Unlimited social posts", icon: "social" },

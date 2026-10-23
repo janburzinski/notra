@@ -1,4 +1,5 @@
 const GEO_DASHBOARD_PATH_PATTERN = /(?:^|\/)geo(?:\/|\?|$)/;
+const GEO_TRAFFIC_PATH_PATTERN = /(?:^|\/)geo\/traffic(?:\/|\?|$)/;
 
 export function geoDashboardPath(
   organizationSlug: string,
@@ -19,6 +20,10 @@ export function withGeoProject(path: string, projectId?: string): string {
 
 export function isGeoDashboardPath(path: string): boolean {
   return GEO_DASHBOARD_PATH_PATTERN.test(path);
+}
+
+export function isGeoPaywalledPath(path: string): boolean {
+  return isGeoDashboardPath(path) && !GEO_TRAFFIC_PATH_PATTERN.test(path);
 }
 
 export function geoNavHref(
@@ -48,13 +53,6 @@ export function geoOnboardingCompetitorsPath(
 ): string {
   const base = "/onboarding/competitors";
   return onboardingPath(base, projectId, replay);
-}
-
-export function geoOnboardingPricingPath(
-  projectId?: string,
-  replay = false
-): string {
-  return onboardingPath("/onboarding/pricing", projectId, replay);
 }
 
 function onboardingPath(

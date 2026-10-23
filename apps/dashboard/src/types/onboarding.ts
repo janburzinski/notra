@@ -23,13 +23,6 @@ export interface CompanyLogoResult {
 
 export type OnboardingProgressHrefs = readonly (string | null)[];
 
-export interface PricingClientProps {
-  canSkipOnboarding: boolean;
-  closeHref: string;
-  slug: string;
-  progressHrefs?: OnboardingProgressHrefs;
-}
-
 export interface OnboardingExistingOrg {
   heardAboutNotraOther: string | null;
   heardAboutNotraSource: string | null;

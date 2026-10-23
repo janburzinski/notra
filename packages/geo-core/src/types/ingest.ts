@@ -112,7 +112,8 @@ export type GeoIngestDropReason =
   | "host"
   | "site"
   | "not_site"
-  | "web_rate_limited";
+  | "web_rate_limited"
+  | "quota";
 
 export type GeoIngestResult =
   | {

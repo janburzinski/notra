@@ -1,3 +1,4 @@
+import { hasAiTrafficEventsQuota } from "@notra/ai/billing/ai-traffic-events";
 import { classifyAgentFeedback } from "@notra/ai/jobs/feedback-classifier";
 import { agentFeedback, organizations, projects } from "@notra/db/schema";
 import { and, count, desc, eq } from "drizzle-orm";
@@ -9,6 +10,7 @@ import {
   FeedbackNotFoundError,
   FeedbackOrganizationNotFoundError,
   FeedbackProjectNotFoundError,
+  FeedbackQuotaExceededError,
 } from "../errors/feedback";
 import type {
   ListFeedbackProgramInput,
@@ -197,6 +199,10 @@ export const submitFeedback = Effect.fn("feedback.submit")(function* ({
         deduplicated: true,
       } satisfies SubmitFeedbackProgramSuccess;
     }
+  }
+
+  if (!(yield* hasAiTrafficEventsQuota(organizationId))) {
+    return yield* new FeedbackQuotaExceededError();
   }
 
   const projectId =

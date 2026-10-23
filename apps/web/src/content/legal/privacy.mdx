@@ -2,7 +2,7 @@
 title: Privacy Policy
 ---
 
-**Last updated: October 21, 2026**
+**Last updated: October 22, 2026**
 
 ## 1. Privacy Statement
 
@@ -56,6 +56,8 @@ We collect the following types of information:
 
 Feedback is routed to the receiving organization's inbox and is accessible to its authorized users. Feedback sent to Notra's own inbox is used by our team to investigate issues, respond to requests, and improve the product. We may process the message, title, related URL, and agent context through our AI classification and evaluation providers to suggest a title, category, or sentiment. Send only information relevant to the feedback, and do not include credentials, payment-card details, health records, or other sensitive personal records. The fields available through an individual assistant tool may be narrower than those supported by the feedback API.
 
+**AI Traffic Data:** When you install Notra's AI traffic tracking on your website or connect a log drain, we receive request logs for visits from AI agents, crawlers, and assistants. These logs can include the requested host and path, request method, timestamp, user-agent, sanitized referrer, approximate country, preferred language, request ID, and the agent and purpose we classify from the request. We use IP addresses only transiently to group requests into journeys and do not store them with these logs. Ordinary human visits are dropped unless you separately enable visitor analytics for a Notra-hosted site.
+
 **Email Data:** To send account, notification, and (if you opted in) marketing emails, we share your email address, name, sign-up date, internal user ID, your email notification preferences, and, if you opted into marketing emails, when and how you gave that consent with our email provider [Brew](https://brew.new). Brew also records delivery, open, click, bounce, and unsubscribe events for the emails we send you.
 
 **Payment Data:** If you subscribe to a paid plan, payment processing is handled by our billing provider [Autumn](https://useautumn.com) (powered by Stripe). We do not store your credit card details directly. When you sign up, we create an Autumn customer profile to enable usage tracking. If you later initiate a payment and a Stripe customer does not already exist, we may create one to process the transaction.
@@ -77,6 +79,7 @@ We use the following third-party services to operate and improve the Service:
 - **[Brew](https://brew.new)** — Email delivery, email contact management (email address, name, user ID, sign-up date, and email preferences), and email delivery and engagement tracking
 - **[PostHog](https://posthog.com/privacy)** — Product and MCP usage analytics, account and workspace analytics, error tracking, and session replay where enabled, as described above
 - **Upstash** — Redis database and message queues
+- **Tinybird** — Storage and analysis of AI traffic logs
 - **[Autumn](https://useautumn.com)** — Subscription billing (powered by Stripe)
 - **[databuddy](https://databuddy.cc)** — Cookie-free, GDPR-compliant analytics and signup attribution
 - **[Dub](https://dub.co/legal/privacy)** — Partner referral attribution and commission tracking
@@ -90,6 +93,8 @@ Each of these services has its own privacy policy governing the data they proces
 We retain your personal data for as long as your account is active or as needed to provide you with the Service. If you request deletion of your account, we will delete your personal data within 30 days, except where we are required to retain certain information for legal or regulatory purposes.
 
 Contact messages forwarded to our team are retained as needed to handle the inquiry. We do not save contact-form messages classified as spam. Notra Feedback entries, their classification and submission metadata, and triage status are stored in the receiving organization’s inbox and fall under the retention and deletion provisions in this section. For feedback sent to another organization, contact that organization to request deletion or exercise your data rights.
+
+AI traffic logs are retained to power your traffic reports. We may also keep these logs, in aggregated or de-identified form where practical, for research and product improvement as described in section 9, including after the reporting period shown in your dashboard.
 
 When you delete your account, we also delete your contact record at our email provider Brew.
 
@@ -109,6 +114,7 @@ We use the information we collect for the following purposes:
 - **AI content generation:** To process your connected data through AI models and generate content drafts on your behalf
 - **Contact inquiries and spam prevention:** To handle contact-form submissions and classify message text for spam before forwarding inquiries
 - **Notra Feedback:** To collect and classify product feedback, investigate reports, and track their resolution
+- **Research and product improvement:** To analyze AI traffic logs, including aggregated patterns across customers, so we can understand how AI agents and crawlers behave and improve the Service, such as agent classification and traffic insights. We do not use these logs to identify individual human visitors
 - **Analytics and troubleshooting:** To understand product and workflow usage, diagnose errors, and improve the user experience; session replay, where enabled, helps investigate interaction problems
 
 We do not sell your personal data to third parties.

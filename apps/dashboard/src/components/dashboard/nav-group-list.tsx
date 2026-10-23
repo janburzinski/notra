@@ -28,8 +28,9 @@ import type {
   NavMainItem,
   NavVisibility,
 } from "@/types/components/nav";
-import { geoNavHref, isGeoDashboardPath } from "@/utils/geo-paths";
+import { geoNavHref, isGeoPaywalledPath } from "@/utils/geo-paths";
 import {
+  promoteFreeNavItem,
   resolveNavGroupRow,
   resolveNavItems,
   sidebarRouteFromPathname,
@@ -91,7 +92,10 @@ function NavGroupRow({
   const { isLocked: geoLocked } = useHasGeoFeature();
   const collapseSettled = useSidebarCollapseSettled();
   const homeLinkProps = useHomeLinkProps();
-  const [first, ...rest] = resolveNavItems(group.links, visibility);
+  const [first, ...rest] = promoteFreeNavItem(
+    resolveNavItems(group.links, visibility),
+    geoLocked
+  );
   if (!first) {
     return null;
   }
@@ -133,7 +137,7 @@ function NavGroupRow({
                 <HugeiconsIcon icon={item.icon} />
                 <span>{tLabels(item.labelKey)}</span>
                 <NavBadge item={item} />
-                {geoLocked && isGeoDashboardPath(item.link) ? (
+                {geoLocked && isGeoPaywalledPath(item.link) ? (
                   <NavLockHint message={t("geoUpgradeTooltip")} />
                 ) : null}
               </DropdownMenuItem>
@@ -159,7 +163,7 @@ function NavGroupRow({
             <HugeiconsIcon icon={group.icon} />
             <SidebarLabel>{label}</SidebarLabel>
             {showOwnBadge ? <NavBadge item={first} /> : null}
-            {geoLocked && isGeoDashboardPath(first.link) ? (
+            {geoLocked && isGeoPaywalledPath(first.link) ? (
               <NavLockHint message={t("geoUpgradeTooltip")} />
             ) : null}
           </SidebarNavLink>
@@ -189,6 +193,9 @@ function NavGroupRow({
                       >
                         <span>{tLabels(item.labelKey)}</span>
                         <NavBadge item={item} />
+                        {geoLocked && isGeoPaywalledPath(item.link) ? (
+                          <NavLockHint message={t("geoUpgradeTooltip")} />
+                        ) : null}
                       </SidebarNavLink>
                     }
                   />

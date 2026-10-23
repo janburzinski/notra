@@ -18,7 +18,6 @@ import { eq } from "drizzle-orm";
 
 import {
   ONBOARDING_STEP_COMPETITORS,
-  ONBOARDING_STEP_PRICING,
   ONBOARDING_STEP_VISIBILITY,
   ONBOARDING_STEP_WORKSPACE,
 } from "@/constants/onboarding";
@@ -36,7 +35,6 @@ import {
   geoDashboardPath,
   geoOnboardingCompetitorsPath,
   geoOnboardingPath,
-  geoOnboardingPricingPath,
   geoOnboardingWorkspacePath,
   withGeoProject,
 } from "@/utils/geo-paths";
@@ -119,7 +117,9 @@ export const loadOnboardingEntry = createServerFn({ method: "GET" })
     if (stage === "competitors") {
       throw redirect({ href: geoOnboardingCompetitorsPath(projectId, replay) });
     }
-    throw redirect({ href: geoOnboardingPricingPath(projectId, replay) });
+    throw redirect({
+      href: withGeoProject(`/${organization.slug}`, projectId),
+    });
   });
 
 export const loadOnboardingWorkspace = createServerFn({ method: "GET" })
@@ -218,7 +218,7 @@ export const loadOnboardingVisibility = createServerFn({ method: "GET" })
       projectId,
       skipHref:
         inOnboardingFlow && !replay
-          ? geoOnboardingPricingPath(projectId)
+          ? withGeoProject(`/${organization.slug}`, projectId)
           : geoDashboardPath(organization.slug, projectId),
       websiteUrl: brand.websiteUrl,
     };
@@ -243,7 +243,7 @@ export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
       inOnboardingFlow,
       nextHref:
         inOnboardingFlow && !replay
-          ? geoOnboardingPricingPath(projectId)
+          ? withGeoProject(`/${organization.slug}`, projectId)
           : geoDashboardPath(organization.slug, projectId),
       organizationId: organization.id,
       progressHrefs: onboardingProgressHrefs({
@@ -255,38 +255,5 @@ export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
         stage,
       }),
       projectId,
-    };
-  });
-
-export const loadOnboardingPricing = createServerFn({ method: "GET" })
-  .validator((data: UiRouteInput) => data)
-  .handler(async ({ data }) => {
-    const { organization, projectId, replay } = await onboardingContext(data);
-    if (!organization) {
-      await redirectIfAnyOrganizationHasPaidHistory();
-      throw redirect({ href: "/onboarding/workspace" });
-    }
-    await redirectIfOnboardingDismissed(
-      organization.id,
-      organization.slug,
-      projectId,
-      replay
-    );
-    const [stage, { member }] = await Promise.all([
-      getGeoOnboardingStage(organization.id, projectId),
-      validateOrganizationAccess(organization.slug),
-    ]);
-    return {
-      canSkipOnboarding: member?.role === "owner" || member?.role === "admin",
-      closeHref: withGeoProject(`/${organization.slug}`, projectId),
-      progressHrefs: onboardingProgressHrefs({
-        current: ONBOARDING_STEP_PRICING,
-        hasBrand: true,
-        hasOrganization: true,
-        projectId,
-        replay,
-        stage,
-      }),
-      slug: organization.slug,
     };
   });

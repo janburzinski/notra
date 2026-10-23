@@ -245,6 +245,7 @@ export const TELEMETRY_GEO_INGEST_REASONS = new Set([
   "site",
   "not_site",
   "web_rate_limited",
+  "quota",
 ]);
 
 const GEO_INGEST_RUNTIMES = new Set(["railway", "vercel", "local"]);

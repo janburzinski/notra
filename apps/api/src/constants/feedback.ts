@@ -1,5 +1,7 @@
 export const FEEDBACK_NOT_FOUND_ERROR = "Feedback not found";
 export const FEEDBACK_PROJECT_NOT_FOUND_ERROR = "Project not found";
+export const FEEDBACK_QUOTA_EXCEEDED_ERROR =
+  "AI traffic event limit reached for this billing period";
 export const FEEDBACK_ORGANIZATION_NOT_FOUND_ERROR =
   "Feedback endpoint not found";
 export const FEEDBACK_TOKEN_INVALID_ERROR = "Invalid feedback token";

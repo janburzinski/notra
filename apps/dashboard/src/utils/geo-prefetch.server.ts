@@ -143,9 +143,8 @@ async function dehydrateGeoTraffic(
   search: Record<string, string | string[] | undefined>,
   requestHeaders: Headers
 ) {
-  if (!(await canPrefetchGeoQueries(organizationId, requestHeaders))) {
-    return dehydrate(getGeoServerQueryClient());
-  }
+  await createORPCContext({ headers: requestHeaders });
+  await assertOrganizationAccess({ organizationId, headers: requestHeaders });
   const input = geoTrafficHydrationInputs(organizationId, projectId, search);
   const client = createRouterClient(
     { geo: geoRouter },

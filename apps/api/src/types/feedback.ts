@@ -11,6 +11,7 @@ import type {
   FeedbackNotFoundError,
   FeedbackOrganizationNotFoundError,
   FeedbackProjectNotFoundError,
+  FeedbackQuotaExceededError,
 } from "../errors/feedback";
 import type { DbClient } from "./db";
 
@@ -21,7 +22,8 @@ type SubmitFeedbackBody = z.infer<typeof submitFeedbackRequestSchema>;
 export type FeedbackDomainError =
   | FeedbackOrganizationNotFoundError
   | FeedbackProjectNotFoundError
-  | FeedbackNotFoundError;
+  | FeedbackNotFoundError
+  | FeedbackQuotaExceededError;
 
 export interface ResolveOrganizationIdBySlugInput {
   db: DbClient;

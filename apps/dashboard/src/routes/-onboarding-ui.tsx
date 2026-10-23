@@ -16,7 +16,6 @@ import {
   loadOnboardingCompetitors,
   loadOnboardingEntry,
   loadOnboardingLayout,
-  loadOnboardingPricing,
   loadOnboardingVisibility,
   loadOnboardingWorkspace,
 } from "./-onboarding-loaders";
@@ -35,11 +34,6 @@ const Visibility = lazyPage(() =>
 const Competitors = lazyPage(() =>
   import("@/app/onboarding/competitors/competitors-form").then((module) => ({
     default: module.CompetitorsForm,
-  }))
-);
-const Pricing = lazyPage(() =>
-  import("@/app/onboarding/pricing-client").then((module) => ({
-    default: module.PricingClient,
   }))
 );
 
@@ -105,13 +99,6 @@ export function createOnboardingUiRoutes(parent: AnyRoute) {
             <Competitors {...data} />
           </OnboardingSplitLayout>
         ),
-      }),
-      createUiRoute({
-        parent: onboarding,
-        path: "pricing",
-        loader: (input) => loadOnboardingPricing({ data: input }),
-        preload: Pricing.preload,
-        component: ({ data }) => <Pricing {...data} />,
       }),
     ]),
   ];
