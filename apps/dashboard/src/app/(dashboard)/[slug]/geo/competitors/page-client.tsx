@@ -28,6 +28,7 @@ import {
   useGeoCompetitorShare,
   useGeoSettings,
   useIsGeoScanning,
+  usePrefetchGeoCompetitorEngineMatrix,
 } from "@/lib/hooks/use-geo";
 import { useGeoActiveProject } from "@/lib/hooks/use-geo-active-project";
 import { useGeoCompetitorDomainBackfill } from "@/lib/hooks/use-geo-competitor-domain-backfill";
@@ -39,11 +40,20 @@ import dynamic from "@/utils/lazy-component";
 
 import { GeoCompetitorsSkeleton } from "./skeleton";
 
+const loadEngineMatrixCard = () =>
+  import("@/components/geo/competitor-engine-matrix-card");
+const loadShareCard = () => import("@/components/geo/competitor-share-card");
+
+// Both cards render on every visit; fetch their chart chunks with the page
+// instead of after it mounts.
+if (typeof window !== "undefined") {
+  void loadEngineMatrixCard().catch(() => undefined);
+  void loadShareCard().catch(() => undefined);
+}
+
 const CompetitorEngineMatrixCard = dynamic(
   () =>
-    import("@/components/geo/competitor-engine-matrix-card").then(
-      (module) => module.CompetitorEngineMatrixCard
-    ),
+    loadEngineMatrixCard().then((module) => module.CompetitorEngineMatrixCard),
   {
     loading: () => <Skeleton className="h-96 w-full rounded-2xl" />,
     ssr: false,
@@ -51,10 +61,7 @@ const CompetitorEngineMatrixCard = dynamic(
 );
 
 const CompetitorShareCard = dynamic(
-  () =>
-    import("@/components/geo/competitor-share-card").then(
-      (module) => module.CompetitorShareCard
-    ),
+  () => loadShareCard().then((module) => module.CompetitorShareCard),
   {
     loading: () => <Skeleton className="h-96 w-full rounded-2xl" />,
     ssr: false,
@@ -81,6 +88,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   const { data: settingsData, isPending } = useGeoSettings(organizationId);
   const { data: competitorShare, isPending: isSharePending } =
     useGeoCompetitorShare(organizationId, geoRange.query);
+  usePrefetchGeoCompetitorEngineMatrix(organizationId, geoRange.query);
   const { competitors } = useGeoCompetitorsDb(organizationId);
   const { domain: ownDomain } = useGeoActiveProject(organizationId);
   const isScanning = useIsGeoScanning(organizationId);

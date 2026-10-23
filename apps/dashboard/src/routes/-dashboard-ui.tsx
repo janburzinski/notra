@@ -22,7 +22,6 @@ import SkillsLoading from "@/app/(dashboard)/[slug]/skills/loading";
 import { AnalyticsProvider } from "@/components/analytics/analytics-context";
 import { AnalyticsShell } from "@/components/analytics/analytics-shell";
 import { DashboardClientWrapper } from "@/components/dashboard/dashboard-client-wrapper";
-import { StudioFreeHome } from "@/components/dashboard/studio-free-home";
 import { GeoCompetitorSheetHost } from "@/components/geo/competitor-sheet-host";
 import { GeoCatalogWarmer } from "@/components/geo/geo-catalog-warmer";
 import { GeoPageGate } from "@/components/geo/geo-page-gate";
@@ -52,6 +51,11 @@ import { UiModalProvider } from "./-ui-modal";
 import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
 const Home = lazyPage(() => import("@/app/(dashboard)/[slug]/page-client"));
+const StudioFreeHome = lazyPage(() =>
+  import("@/components/dashboard/studio-free-home").then((module) => ({
+    default: module.StudioFreeHome,
+  }))
+);
 const Content = lazyPage(
   () => import("@/app/(dashboard)/[slug]/content/page-client")
 );
@@ -231,7 +235,12 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
       gate: (input) => gateDashboardHome({ data: input }),
       stream: true,
       pendingComponent: DashboardLoading,
-      preload: Home.preload,
+      // Free plans render StudioFreeHome inside the same streamed Suspense
+      // fallback, so start its chunk without making paid plans wait for it.
+      preload: () => {
+        void StudioFreeHome.preload().catch(() => undefined);
+        return Home.preload();
+      },
       component: ({ params, data }) =>
         data.hasAccess ? (
           <HydrationBoundary state={data.state}>

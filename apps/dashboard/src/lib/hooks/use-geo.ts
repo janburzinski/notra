@@ -62,7 +62,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
@@ -511,6 +511,16 @@ export function useGeoCompetitorShare(
   });
 }
 
+function competitorEngineMatrixOptions(
+  organizationId: string,
+  projectId: string | undefined,
+  range?: GeoRangeQuery
+) {
+  return dashboardOrpc.geo.competitorEngineMatrix.queryOptions({
+    input: { organizationId, projectId, ...toGeoWindowInput(range) },
+  });
+}
+
 export function useGeoCompetitorEngineMatrix(
   organizationId: string,
   range?: GeoRangeQuery
@@ -518,13 +528,34 @@ export function useGeoCompetitorEngineMatrix(
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
   return useQuery<GeoCompetitorEngineMatrixResponse>({
-    ...dashboardOrpc.geo.competitorEngineMatrix.queryOptions({
-      input: { organizationId, projectId, ...toGeoWindowInput(range) },
-    }),
+    ...competitorEngineMatrixOptions(organizationId, projectId, range),
     enabled: !!organizationId,
     placeholderData: keepPreviousData,
     meta: { errorMessage: tToast("loadCompetitorShareFailed") },
   });
+}
+
+/** Starts the matrix query with the page instead of when its card mounts. */
+export function usePrefetchGeoCompetitorEngineMatrix(
+  organizationId: string,
+  range?: GeoRangeQuery
+) {
+  const queryClient = useQueryClient();
+  const { projectId } = useGeoProjectScope();
+  const options = competitorEngineMatrixOptions(
+    organizationId,
+    projectId,
+    range
+  );
+  const key = JSON.stringify(options.queryKey);
+  const prefetch = useEffectEvent(() => {
+    void queryClient.prefetchQuery(options);
+  });
+  useEffect(() => {
+    if (organizationId) {
+      prefetch();
+    }
+  }, [organizationId, key]);
 }
 
 export function useGeoCompetitorDetail(
