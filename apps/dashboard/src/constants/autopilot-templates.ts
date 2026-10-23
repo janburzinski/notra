@@ -14,42 +14,23 @@ import {
   TranslateIcon,
   Unlink02Icon,
 } from "@hugeicons/core-free-icons";
-import type { IconSvgElement } from "@hugeicons/react";
 
-import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
+import type {
+  AutopilotTemplate,
+  AutopilotTemplateCategory,
+} from "@/types/autopilot-templates";
 
-export type VariantCategory = "site" | "content" | "releases";
-export type VariantOutput = "pull_request" | "post";
-export type VariantTrigger = "run" | "merge" | "weekly" | "drop";
-
-export interface VariantTemplate {
-  id: string;
-  name: string;
-  description: string;
-  /** What the agent is told, shown when a template is opened or remixed. */
-  instructions: string;
-  category: VariantCategory;
-  icon: IconSvgElement;
-  source: string;
-  output: VariantOutput;
-  trigger: VariantTrigger;
-  /** Set for the three built-in jobs that exist today. */
-  kind?: AutopilotAutomationKind;
-  /** Custom ones saved in this workspace. */
-  custom?: boolean;
-  author?: string;
-  /** Path scope a custom template was saved with. */
-  paths?: string;
-}
-
-export const VARIANT_CATEGORIES: Record<VariantCategory, string> = {
+export const AUTOPILOT_TEMPLATE_CATEGORIES: Record<
+  AutopilotTemplateCategory,
+  string
+> = {
   site: "Site fixes",
   content: "Self-updating content",
   releases: "Releases and docs",
 };
 
 /** Same six-card row as the Automations page; the rest live behind "More". */
-export const FEATURED_VARIANT_TEMPLATE_IDS = [
+export const AUTOPILOT_FEATURED_TEMPLATE_IDS = [
   "readiness",
   "keywords",
   "commits",
@@ -58,7 +39,7 @@ export const FEATURED_VARIANT_TEMPLATE_IDS = [
   "docs-drift",
 ];
 
-export const VARIANT_TONES: Record<
+export const AUTOPILOT_TEMPLATE_TONES: Record<
   string,
   "destructive" | "info" | "success" | "warning"
 > = {
@@ -78,19 +59,7 @@ export const VARIANT_TONES: Record<
   "monthly-recap": "info",
 };
 
-export const VARIANT_OUTPUTS: Record<VariantOutput, string> = {
-  pull_request: "Pull request",
-  post: "Draft post",
-};
-
-export const VARIANT_TRIGGERS: Record<VariantTrigger, string> = {
-  run: "Daily run",
-  merge: "GitHub merge",
-  weekly: "Weekly",
-  drop: "GEO scan",
-};
-
-export const VARIANT_TEMPLATES: VariantTemplate[] = [
+export const AUTOPILOT_TEMPLATES: AutopilotTemplate[] = [
   {
     id: "readiness",
     kind: "readiness",
@@ -275,24 +244,5 @@ export const VARIANT_TEMPLATES: VariantTemplate[] = [
     source: "Pull requests you ship",
     output: "post",
     trigger: "weekly",
-  },
-];
-
-/** What a workspace would have saved after a few weeks. */
-export const VARIANT_CUSTOM_TEMPLATES: VariantTemplate[] = [
-  {
-    id: "custom-pricing",
-    custom: true,
-    author: "Dominik",
-    name: "Keep pricing page in sync",
-    description:
-      "Updates the pricing page whenever plan limits change in the billing config.",
-    instructions:
-      "When packages/billing/plans.ts changes, update the limits table on apps/web/pricing to match. Don't touch copy outside the table.",
-    category: "site",
-    icon: Tag01Icon,
-    source: "Pull requests you ship",
-    output: "pull_request",
-    trigger: "merge",
   },
 ];

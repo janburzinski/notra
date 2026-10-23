@@ -32,6 +32,10 @@ import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell"
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
 import { AutopilotSettingsPanel } from "@/components/autopilot/autopilot-settings-panel";
 import { AutopilotSetupFlow } from "@/components/autopilot/autopilot-setup-flow";
+import {
+  AutopilotTemplatesPage,
+  AutopilotTemplatesSection,
+} from "@/components/autopilot/autopilot-templates";
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { TabCount } from "@/components/tab-count";
@@ -54,14 +58,6 @@ import type {
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
 import { isListedPullRequest } from "@/utils/autopilot-findings";
-
-import {
-  AutopilotCreateButton,
-  AutopilotTemplateEditorView,
-  AutopilotTemplatesPage,
-  AutopilotTemplatesSection,
-  useTemplateEditorOpen,
-} from "./_variants";
 
 export default function PageClient({
   organizationSlug,
@@ -98,7 +94,6 @@ function AutopilotOverviewPage({
     "templates",
     parseAsBoolean
   );
-  const templateEditorOpen = useTemplateEditorOpen();
   const [days, setDays] = useState<AutopilotMetricsDays>(30);
   const [pending, setPending] = useState<AutopilotPendingFindingAction | null>(
     null
@@ -160,6 +155,8 @@ function AutopilotOverviewPage({
   }
 
   const templateActions = {
+    canManage,
+    isAdding: setJob.isPending,
     jobs: settings.jobs,
     onAddBuiltIn: (kind: (typeof AUTOPILOT_AUTOMATION_KINDS)[number]) =>
       setJob.mutate({ kind, enabled: true }),
@@ -167,15 +164,7 @@ function AutopilotOverviewPage({
       router.push(`${basePath}/${AUTOPILOT_AUTOMATION_SLUGS[kind]}`),
   };
 
-  if (
-    process.env.NODE_ENV === "development" &&
-    canManage &&
-    templateEditorOpen
-  ) {
-    return <AutopilotTemplateEditorView />;
-  }
-
-  if (process.env.NODE_ENV === "development" && canManage && templatesView) {
+  if (templatesView) {
     return (
       <AutopilotTemplatesPage
         {...templateActions}
@@ -190,20 +179,15 @@ function AutopilotOverviewPage({
     <>
       <PageHeading title="Autopilot">
         {canManage ? (
-          <div className="flex items-center gap-2">
-            {process.env.NODE_ENV === "development" ? (
-              <AutopilotCreateButton />
-            ) : null}
-            <Button
-              disabled={isRunning}
-              loading={runNow.isPending || isRunning}
-              onClick={() => runNow.mutate()}
-              size="sm"
-            >
-              <HugeiconsIcon icon={PlayIcon} size={16} />
-              Run now
-            </Button>
-          </div>
+          <Button
+            disabled={isRunning}
+            loading={runNow.isPending || isRunning}
+            onClick={() => runNow.mutate()}
+            size="sm"
+          >
+            <HugeiconsIcon icon={PlayIcon} size={16} />
+            Run now
+          </Button>
         ) : null}
       </PageHeading>
 
@@ -275,14 +259,12 @@ function AutopilotOverviewPage({
             }
             organizationId={organizationId}
           />
-          {process.env.NODE_ENV === "development" && canManage ? (
-            <AutopilotTemplatesSection
-              {...templateActions}
-              onMore={() => {
-                void setTemplatesView(true);
-              }}
-            />
-          ) : null}
+          <AutopilotTemplatesSection
+            {...templateActions}
+            onMore={() => {
+              void setTemplatesView(true);
+            }}
+          />
         </TabsContent>
         <TabsContent className="mt-4" value="pull-requests">
           <AutopilotFindingTables
