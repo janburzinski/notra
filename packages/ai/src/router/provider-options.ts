@@ -116,6 +116,15 @@ export function buildNeonProviderOptions(
     anthropic.effort;
   return {
     ...options,
+    // Claude runs on Neon's native Messages endpoint; top-level cache_control
+    // mirrors Vercel's `caching: "auto"` so agent loops read the prefix.
+    anthropic: {
+      cacheControl: { type: "ephemeral" },
+      ...anthropic,
+    } as JSONObject,
+    // OpenAI runs on Neon's Responses endpoint, which stores generations by
+    // default; nothing here chains on previous response ids.
+    openai: { store: false, ...openai } as JSONObject,
     neon: {
       ...existing,
       ...(typeof effort === "string" ? { reasoningEffort: effort } : {}),

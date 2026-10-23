@@ -32,6 +32,18 @@ import {
 } from "./test-helpers";
 
 describe("resolveRoute", () => {
+  test("an empty gateway allowlist rejects without sending a request", async () => {
+    const { router, vercel, openrouter } = createTestRouter({ plans });
+    const request = { modelId: MODEL, gateways: [] };
+    await assert.rejects(router.resolveRoute(request), /No gateways allowed/);
+    await assert.rejects(
+      async () => await router.model(MODEL, request).doGenerate(callOptions()),
+      /No gateways allowed/
+    );
+    assert.equal(vercel?.calls.length, 0);
+    assert.equal(openrouter?.calls.length, 0);
+  });
+
   test("paid organization → vercel, free organization → openrouter", async () => {
     const { router } = createTestRouter({ plans });
     const paid = await router.resolveRoute({
@@ -198,6 +210,30 @@ describe("resolveRoute", () => {
     });
     assert.equal(decision.gateway, "vercel");
     assert.equal(decision.fallbackReason, "unsupported-model");
+  });
+
+  test("allowed gateways override the policy and limit fallback", async () => {
+    const { router } = createTestRouter({ plans });
+    const decision = await router.resolveRoute({
+      modelId: MODEL,
+      organizationId: FREE_ORG,
+      gateways: ["vercel"],
+    });
+    assert.equal(decision.gateway, "vercel");
+
+    const vercel = createFakeAdapter({
+      id: "vercel",
+      supportedModels: () => false,
+    });
+    const restricted = createTestRouter({ plans, vercel });
+    await assert.rejects(
+      restricted.router.resolveRoute({
+        modelId: MODEL,
+        organizationId: FREE_ORG,
+        gateways: ["vercel"],
+      }),
+      UnsupportedModelError
+    );
   });
 
   test("model unsupported everywhere throws UnsupportedModelError", async () => {
@@ -607,6 +643,31 @@ describe("RoutedLanguageModel", () => {
     });
     assert.equal(next.gateway, "vercel");
     assert.equal(next.fallbackReason, "auth-failure");
+  });
+
+  test("a daily-limit 429 skips the gateway for later routes, a per-minute 429 does not", async () => {
+    for (const [message, skipped] of [
+      ["ai gateway daily token limit exceeded", true],
+      ["ai gateway account token rate limit exceeded", false],
+    ] as const) {
+      const openrouter = createFakeAdapter({
+        id: "openrouter",
+        onCall: () => {
+          throw httpError(429, message);
+        },
+      });
+      const { router, vercel } = createTestRouter({ plans, openrouter });
+      const result = await router
+        .model(MODEL, { organizationId: FREE_ORG })
+        .doGenerate(callOptions());
+      assert.equal(vercel?.calls.length, 1);
+      assert.equal(metadataOf(result)?.gateway, "vercel");
+      const next = await router.resolveRoute({
+        modelId: MODEL,
+        organizationId: FREE_ORG,
+      });
+      assert.equal(next.gateway, skipped ? "vercel" : "openrouter");
+    }
   });
 
   test("a 401 without an eligible fallback throws GatewayUnavailableError", async () => {

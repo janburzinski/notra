@@ -26,17 +26,41 @@ export const NEON_MODEL_ALIASES: Readonly<Record<string, string>> = {
   "anthropic/claude-sonnet-4.6": "claude-sonnet-4-6",
   "anthropic/claude-opus-4.6": "claude-opus-4-6",
   "anthropic/claude-haiku-4.5": "claude-haiku-4-5",
+  "anthropic/claude-haiku-5.5": "claude-haiku-5-5",
+  "anthropic/claude-opus-5": "claude-opus-5",
+  "anthropic/claude-fable-5": "claude-fable-5",
+  "anthropic/claude-fable-5.1": "claude-fable-5-1",
   "openai/gpt-6-luna": "gpt-6-luna",
   "openai/gpt-6-sol": "gpt-6-sol",
   "openai/gpt-6.1-sol": "gpt-6-1-sol",
+  "openai/gpt-6-astra": "gpt-6-astra",
+  "openai/gpt-5.6-luna": "gpt-5-6-luna",
+  "openai/gpt-5.6-sol": "gpt-5-6-sol",
+  "openai/gpt-5.6-terra": "gpt-5-6-terra",
   "openai/gpt-5.5": "gpt-5-5",
+  "openai/gpt-5.4": "gpt-5-4",
   "openai/gpt-5.4-mini": "gpt-5-4-mini",
+  "openai/gpt-5.4-nano": "gpt-5-4-nano",
   "openai/gpt-5-mini": "gpt-5-mini",
+  "openai/gpt-oss-120b": "gpt-oss-120b",
+  "openai/gpt-oss-20b": "gpt-oss-20b",
   "google/gemini-3-flash": "gemini-3-flash",
+  "google/gemini-3.5-flash": "gemini-3-5-flash",
+  "google/gemini-3.8-flash": "gemini-3-8-flash",
+  "google/gemini-3.1-pro-preview": "gemini-3-1-pro",
+  "spacexai/grok-4.7": "grok-4-7",
+  "moonshotai/kimi-k3": "kimi-k3",
+  "zai/glm-5.3": "glm-5-3",
+  "meta/llama-4-maverick": "llama-4-maverick",
 };
 
+/** Prefixes Neon/Databricks put on served ids, e.g. `global.xai.grok-4.7`. */
 export const NEON_SERVED_MODEL_PREFIX_PATTERN =
-  /^(?:databricks-|global\.anthropic\.)/;
+  /^(?:databricks-|global\.[a-z]+\.)/;
+
+/** Snapshot suffixes on served ids, e.g. `gpt-5.4-nano-2026-03-17`, `gpt-oss-120b-080525`. */
+export const NEON_SERVED_MODEL_SUFFIX_PATTERN =
+  /-(?:\d{4}-\d{2}-\d{2}|\d{6,8})$/;
 
 export const DEFAULT_OPENROUTER_ACCOUNT_BASE_URL =
   "https://openrouter.ai/api/v1";
@@ -163,6 +187,13 @@ export const ROUTER_POLICY = {
   allowNonZdr: process.env.NODE_ENV === "development",
   crossGatewayFallback: true,
 } satisfies RouterPolicyConfig;
+
+/**
+ * Neon answers 429 `REQUEST_LIMIT_EXCEEDED` once the account's daily spend
+ * cap is hit ("ai gateway daily token limit exceeded"); it lasts until the
+ * day resets, unlike the per-minute token limit.
+ */
+export const DAILY_LIMIT_ERROR_PATTERN = /\bdaily\b[^.]*limit exceeded/i;
 
 export const NO_TRAINING_PROVIDER_ERROR_PATTERN =
   /No providers that disallow prompt training available for model:/i;

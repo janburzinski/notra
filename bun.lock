@@ -467,7 +467,6 @@
       "name": "web",
       "version": "0.1.0",
       "dependencies": {
-        "@ai-sdk/gateway": "catalog:",
         "@ai-sdk/openai": "4.0.85",
         "@c15t/integrations": "3.0.0",
         "@databuddy/sdk": "catalog:",
@@ -548,9 +547,12 @@
       "name": "@notra/ai",
       "version": "0.0.1",
       "dependencies": {
+        "@ai-sdk/anthropic": "4.0.73",
         "@ai-sdk/code-mode": "1.0.86",
         "@ai-sdk/gateway": "catalog:",
+        "@ai-sdk/google": "4.0.89",
         "@ai-sdk/mcp": "2.0.68",
+        "@ai-sdk/openai": "4.0.85",
         "@ai-sdk/openai-compatible": "3.0.68",
         "@ai-sdk/provider": "4.0.23",
         "@aws-sdk/client-s3": "catalog:",

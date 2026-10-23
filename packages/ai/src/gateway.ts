@@ -137,6 +137,7 @@ export function assertRouteHasCredits(
     modelId: options.modelId ?? AGENT_DEFAULT_MODEL,
     organizationId: options.organizationId,
     gateway: options.gateway,
+    gateways: options.gateways,
     zdr: options.zdr,
     logContext: options.logContext,
   });

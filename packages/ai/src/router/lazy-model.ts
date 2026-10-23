@@ -8,9 +8,11 @@ import type {
   SharedV4ProviderMetadata,
 } from "@ai-sdk/provider";
 import {
+  DAILY_LIMIT_ERROR_PATTERN,
   HTTP_NOT_FOUND,
   HTTP_PAYMENT_REQUIRED,
   HTTP_SERVER_ERROR_MIN,
+  HTTP_TOO_MANY_REQUESTS,
   HTTP_UNAUTHORIZED,
   OPENROUTER_NO_ZDR_ENDPOINT_PATTERN,
   NO_TRAINING_PROVIDER_ERROR_PATTERN,
@@ -151,9 +153,10 @@ function buildRouteMetadata(
   providerMetadata: SharedV4ProviderMetadata | undefined,
   servedModelId?: string
 ): RouteMetadata {
+  // Without a served id (e.g. Gemini) map the id we sent back to the neutral one.
   const extracted = adapter.extractRouteMetadata(
     providerMetadata,
-    servedModelId
+    servedModelId ?? decision.modelId
   );
   return {
     gateway: decision.gateway,
@@ -495,6 +498,25 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       this.verifyExhaustion(route.decision.gateway);
       return true;
     }
+    if (
+      reason === "upstream-error" &&
+      readStatusCode(error) === HTTP_TOO_MANY_REQUESTS &&
+      DAILY_LIMIT_ERROR_PATTERN.test(readMessage(error))
+    ) {
+      // A daily cap holds until the day resets: skip the gateway for the
+      // unavailable TTL instead of paying a rejected request per call.
+      this.context.credits.markUnavailable(
+        route.decision.gateway,
+        "no-credits"
+      );
+      this.context.logger.warn("ai.router.daily_limit", {
+        gateway: route.decision.gateway,
+        requestedModel: route.decision.requestedModelId,
+        organizationId: route.decision.organizationId,
+        message: readMessage(error),
+      });
+      return true;
+    }
     if (reason === "auth-failure") {
       this.context.credits.markUnavailable(route.decision.gateway, reason);
       this.context.logger.error("ai.router.auth_rejected", {
@@ -571,7 +593,10 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       return undefined;
     }
 
-    for (const target of fallbackGateways(route.decision.gateway)) {
+    for (const target of fallbackGateways(
+      route.decision.gateway,
+      this.context.request.gateways
+    )) {
       if (attempted.has(target)) {
         continue;
       }

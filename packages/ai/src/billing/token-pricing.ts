@@ -241,6 +241,85 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
     cacheReadPerMillionTokens: 0.03,
     cacheWritePerMillionTokens: 0,
   },
+  // Neon AI Gateway list prices (GET /v1/models, 2026-10-22).
+  "anthropic/claude-haiku-5.5": {
+    inputPerMillionTokens: 0.1,
+    outputPerMillionTokens: 0.5,
+    cacheReadPerMillionTokens: 0.01,
+    cacheWritePerMillionTokens: 0.125,
+  },
+  "neon/anthropic/claude-opus-4.6": {
+    inputPerMillionTokens: 5.0,
+    outputPerMillionTokens: 25.0,
+    cacheReadPerMillionTokens: 0.5,
+    cacheWritePerMillionTokens: 6.25,
+  },
+  "openai/gpt-5-mini": {
+    inputPerMillionTokens: 0.25,
+    outputPerMillionTokens: 2.0,
+    cacheReadPerMillionTokens: 0.025,
+    cacheWritePerMillionTokens: 0,
+  },
+  "openai/gpt-oss-20b": {
+    inputPerMillionTokens: 0.07,
+    outputPerMillionTokens: 0.3,
+    cacheReadPerMillionTokens: 0,
+    cacheWritePerMillionTokens: 0,
+  },
+  "neon/google/gemini-3-flash": {
+    inputPerMillionTokens: 0.5,
+    outputPerMillionTokens: 3.0,
+    cacheReadPerMillionTokens: 0.05,
+    cacheWritePerMillionTokens: 0,
+  },
+  "google/gemini-3.5-flash": {
+    inputPerMillionTokens: 1.5,
+    outputPerMillionTokens: 9.0,
+    cacheReadPerMillionTokens: 0.15,
+    cacheWritePerMillionTokens: 0,
+  },
+  "google/gemini-3.1-pro-preview": {
+    inputPerMillionTokens: 2.0,
+    outputPerMillionTokens: 12.0,
+    cacheReadPerMillionTokens: 0.2,
+    cacheWritePerMillionTokens: 0,
+  },
+  "spacexai/grok-4.7": {
+    inputPerMillionTokens: 2.5,
+    outputPerMillionTokens: 7.5,
+    cacheReadPerMillionTokens: 0.5,
+    cacheWritePerMillionTokens: 0,
+  },
+  "zai/glm-5.3": {
+    inputPerMillionTokens: 1.4,
+    outputPerMillionTokens: 4.4,
+    cacheReadPerMillionTokens: 0.26,
+    cacheWritePerMillionTokens: 0,
+  },
+  "meta/llama-4-maverick": {
+    inputPerMillionTokens: 0.5,
+    outputPerMillionTokens: 1.5,
+    cacheReadPerMillionTokens: 0,
+    cacheWritePerMillionTokens: 0,
+  },
+  "neon/openai/gpt-5.6-sol": {
+    inputPerMillionTokens: 5.0,
+    outputPerMillionTokens: 30.0,
+    cacheReadPerMillionTokens: 0.5,
+    cacheWritePerMillionTokens: 6.25,
+  },
+  "neon/google/gemini-3.8-flash": {
+    inputPerMillionTokens: 1.5,
+    outputPerMillionTokens: 7.5,
+    cacheReadPerMillionTokens: 0.15,
+    cacheWritePerMillionTokens: 0,
+  },
+  "neon/openai/gpt-oss-120b": {
+    inputPerMillionTokens: 0.15,
+    outputPerMillionTokens: 0.6,
+    cacheReadPerMillionTokens: 0,
+    cacheWritePerMillionTokens: 0,
+  },
 };
 
 const DEFAULT_PRICING: ModelPricing = {

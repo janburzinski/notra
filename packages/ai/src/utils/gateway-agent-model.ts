@@ -1,3 +1,4 @@
+import { ROUTED_MODEL_PROVIDER } from "@notra/ai/constants/router";
 import { createGatewayCallTelemetry } from "@notra/ai/utils/model-call-telemetry";
 import { observeModelStream } from "@notra/ai/utils/observe-model-stream";
 import { withUsageAttribution } from "@notra/ai/utils/usage-attribution";
@@ -7,6 +8,9 @@ export function withGatewayAgentOptions(
   model: Parameters<typeof wrapLanguageModel>[0]["model"],
   tag: string
 ): ReturnType<typeof wrapLanguageModel> {
+  // Routed models already log their own call lifecycle with the real gateway.
+  const routed =
+    typeof model === "object" && model.provider === ROUTED_MODEL_PROVIDER;
   return wrapLanguageModel({
     model,
     middleware: {
@@ -36,6 +40,9 @@ export function withGatewayAgentOptions(
         }),
       }),
       wrapGenerate: async ({ doGenerate, params }) => {
+        if (routed) {
+          return doGenerate();
+        }
         const telemetry = createGatewayCallTelemetry(
           model.modelId,
           params,
@@ -55,6 +62,9 @@ export function withGatewayAgentOptions(
         }
       },
       wrapStream: async ({ doStream, params }) => {
+        if (routed) {
+          return doStream();
+        }
         const telemetry = createGatewayCallTelemetry(
           model.modelId,
           params,

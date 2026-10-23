@@ -29,6 +29,15 @@ export const OFFERING_CHECK_HERO_SUBTITLE =
 
 export const OFFERING_CHECK_MODEL = "openai/gpt-6-luna";
 
+/**
+ * Public, anonymous tool without customer data: Neon first (it serves OpenAI
+ * web search natively), Vercel as fallback, never OpenRouter.
+ */
+export const OFFERING_CHECK_GATEWAY_OPTIONS = {
+  gateways: ["neon", "vercel"],
+  zdr: "none",
+} as const;
+
 export const OFFERING_TURNSTILE_HEADER = "x-turnstile-token";
 
 export const OFFERING_CHECK_GATEWAY_TAG = "offering-check";

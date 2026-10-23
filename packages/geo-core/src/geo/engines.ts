@@ -22,18 +22,24 @@ export function buildGroundedInvocation(
   engine: GeoGroundedEngine,
   options: GeoGroundedInvocationOptions = {}
 ): GeoGroundedInvocation {
-  // Provider-defined web search tools are only available through the Vercel
-  // AI Gateway, so grounded engines are pinned to it.
+  // Provider-defined web search tools need a gateway that serves them: Neon
+  // runs OpenAI and Gemini search natively, everything else is pinned to Vercel.
   const groundedGateway = {
     organizationId: options.organizationId,
     gateway: "vercel",
     zdr: options.zdr,
     logContext: options.logContext,
   } as const;
+  const neonGroundedGateway = {
+    organizationId: options.organizationId,
+    gateways: ["neon", "vercel"],
+    zdr: options.zdr,
+    logContext: options.logContext,
+  } as const;
   switch (engine.provider) {
     case "gateway-openai":
       return {
-        model: gateway(engine.model, groundedGateway),
+        model: gateway(engine.model, neonGroundedGateway),
         tools: { web_search: openai.tools.webSearch({}) },
       };
     case "gateway-anthropic":
@@ -48,7 +54,7 @@ export function buildGroundedInvocation(
       };
     case "gateway-google":
       return {
-        model: gateway(engine.model, groundedGateway),
+        model: gateway(engine.model, neonGroundedGateway),
         tools: { google_search: google.tools.googleSearch({}) },
       };
     case "gateway-perplexity":

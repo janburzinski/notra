@@ -181,6 +181,7 @@ export async function resolveRoute(
     organizationId,
     plan: planLookup?.plan,
     pinned: request.gateway,
+    allowed: request.gateways,
   });
 
   const primary = getUsableAdapter(
@@ -213,10 +214,18 @@ export async function resolveRoute(
     throwUnavailable(decision.gateway, modelId, primary.unavailable);
   }
 
-  const alternatives = fallbackGateways(decision.gateway).map((gateway) => ({
-    gateway,
-    candidate: getUsableAdapter(context, gateway, modelId, organizationId, zdr),
-  }));
+  const alternatives = fallbackGateways(decision.gateway, request.gateways).map(
+    (gateway) => ({
+      gateway,
+      candidate: getUsableAdapter(
+        context,
+        gateway,
+        modelId,
+        organizationId,
+        zdr
+      ),
+    })
+  );
   for (const { candidate } of alternatives) {
     if ("adapter" in candidate) {
       context.logger.info("ai.router.fallback", {

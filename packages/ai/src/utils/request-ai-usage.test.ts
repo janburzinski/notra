@@ -8,6 +8,7 @@ import {
   createFakeAdapter,
   createTestRouter,
 } from "@notra/ai/router/test-helpers";
+import type { GatewayRouteMetadata } from "@notra/ai/types/router";
 import type { WideEvent } from "evlog";
 
 import {
@@ -75,7 +76,11 @@ test("final real request totals distinguish incomplete costs, measured zero and 
 test("existing Vercel enrichment resolves pending costs once, including zero, and cannot change a closed request", async () => {
   for (const costUsd of [0, 0.5]) {
     const adapter = createFakeAdapter({ id: "vercel" });
-    adapter.lookupRouteMetadata = async () => ({ costUsd, model: MODEL });
+    let resolveLookup!: (metadata: GatewayRouteMetadata) => void;
+    const lookup = new Promise<GatewayRouteMetadata>((resolve) => {
+      resolveLookup = resolve;
+    });
+    adapter.lookupRouteMetadata = () => lookup;
     const { router } = createTestRouter({ vercel: adapter });
     const events: WideEvent[] = [];
     const request = evlogRequestIntegration.start(undefined, {
@@ -94,7 +99,9 @@ test("existing Vercel enrichment resolves pending costs once, including zero, an
       assert.ok(isRecord(before));
       assert.equal(before.costUsd, undefined);
       recordRequestAICost("unrelated_generation", 100);
-      await router.enrichRouteMetadata(metadata);
+      const enrichment = router.enrichRouteMetadata(metadata);
+      resolveLookup({ costUsd, model: MODEL });
+      await enrichment;
       await router.enrichRouteMetadata(metadata);
       await request.finish({ status: 200 });
       recordRequestAICost("gen_test", 100);

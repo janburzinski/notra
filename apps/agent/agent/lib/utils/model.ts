@@ -1,5 +1,6 @@
 import { devToolsMiddleware } from "@ai-sdk/devtools";
 import { EVALUATION_MODEL_ID } from "@notra/ai/constants/evaluation";
+import { gateway as routedModel } from "@notra/ai/gateway";
 import { readEnvSwitch } from "@notra/ai/utils/env-switch";
 import { withGatewayAgentOptions } from "@notra/ai/utils/gateway-agent-model";
 import { withGatewayEvaluationTelemetry } from "@notra/ai/utils/gateway-evaluation-model";
@@ -22,9 +23,13 @@ import {
 
 export function createAgentModel(
   modelId: string,
-  tag = "agent-chat"
+  tag = "agent-chat",
+  organizationId?: string | null
 ): LanguageModel {
-  const tagged = withGatewayAgentOptions(gateway(modelId), tag);
+  const tagged = withGatewayAgentOptions(
+    routedModel(modelId, { organizationId: organizationId ?? undefined }),
+    tag
+  );
   if (process.env.AI_SDK_DEVTOOLS !== "true") {
     return tagged;
   }
@@ -77,21 +82,24 @@ function isModelSelection(
 }
 
 export function createAssistantModel() {
-  const autoOptions = Object.fromEntries(
-    Object.entries(ASSISTANT_AUTO_MODEL_OPTIONS).map(
-      ([modelId, { description, reasoning }]) => [
-        modelId,
-        { model: createAgentModel(modelId), description, reasoning },
-      ]
-    )
-  );
-  const fallbackModel = createAgentModel(ASSISTANT_MODEL_ID);
-  const taskModel = createAgentModel(ASSISTANT_TASK_MODEL_ID, "agent-task");
-
   return defineDynamic({
     events: {
       "step.started": async (event, ctx) => {
         const organizationId = getOrganizationId(ctx);
+        // Models are built per step so the router sees the organization's
+        // plan and ZDR entitlement.
+        const autoOptions = Object.fromEntries(
+          Object.entries(ASSISTANT_AUTO_MODEL_OPTIONS).map(
+            ([modelId, { description, reasoning }]) => [
+              modelId,
+              {
+                model: createAgentModel(modelId, "agent-chat", organizationId),
+                description,
+                reasoning,
+              },
+            ]
+          )
+        );
         const turnId = getStepTurnId(event);
         const providerOptions = {
           gateway: gatewayAttributionOptions({
@@ -112,7 +120,11 @@ export function createAssistantModel() {
             }));
           }
           return {
-            model: taskModel,
+            model: createAgentModel(
+              ASSISTANT_TASK_MODEL_ID,
+              "agent-task",
+              organizationId
+            ),
             reasoning: "low" as const,
             modelContextWindowTokens: GPT_6_SOL_CONTEXT_WINDOW_TOKENS,
             modelOptions,
@@ -127,7 +139,11 @@ export function createAssistantModel() {
             }));
           }
           return {
-            model: fallbackModel,
+            model: createAgentModel(
+              ASSISTANT_MODEL_ID,
+              "agent-chat",
+              organizationId
+            ),
             modelContextWindowTokens: SONNET_5_CONTEXT_WINDOW_TOKENS,
             modelOptions,
           };

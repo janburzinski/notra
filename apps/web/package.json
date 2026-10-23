@@ -18,7 +18,6 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "@ai-sdk/gateway": "catalog:",
     "@ai-sdk/openai": "4.0.85",
     "@c15t/integrations": "3.0.0",
     "@databuddy/sdk": "catalog:",

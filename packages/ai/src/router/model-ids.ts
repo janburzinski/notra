@@ -2,6 +2,7 @@ import { MODEL_PRICING } from "@notra/ai/billing/token-pricing";
 import {
   NEON_MODEL_ALIASES,
   NEON_SERVED_MODEL_PREFIX_PATTERN,
+  NEON_SERVED_MODEL_SUFFIX_PATTERN,
   OPENROUTER_MODEL_ALIASES,
   OPENROUTER_UNSUPPORTED_MODELS,
   VERCEL_NAMESPACE_PREFIX,
@@ -71,7 +72,13 @@ export function toNeonModelId(modelId: string): string {
 }
 
 export function fromNeonModelId(modelId: string): string {
-  const short = modelId.replace(NEON_SERVED_MODEL_PREFIX_PATTERN, "");
+  if (Object.hasOwn(NEON_MODEL_ALIASES, modelId)) {
+    return modelId;
+  }
+  const short = modelId
+    .replace(NEON_SERVED_MODEL_PREFIX_PATTERN, "")
+    .replace(NEON_SERVED_MODEL_SUFFIX_PATTERN, "")
+    .replaceAll(".", "-");
   return (
     Object.entries(NEON_MODEL_ALIASES).find(
       ([, id]) => id === short || `${id}-preview` === short

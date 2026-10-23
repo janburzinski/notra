@@ -34,9 +34,27 @@ pins remain pinned. Missing Neon configuration does not disable other gateways.
 Configure `NEON_AI_GATEWAY_API_KEY` (or Neon's standard
 `NEON_AI_GATEWAY_TOKEN`) and `NEON_AI_GATEWAY_BASE_URL`. The URL is the branch
 gateway host from Connect → AI Gateway; a trailing `/v1` is also accepted.
-Neon uses the OpenAI-compatible chat-completions endpoint. Only verified catalog
-IDs in `NEON_MODEL_ALIASES` are routed there; other models fall back. Neon does
-not receive Vercel/OpenRouter routing or automatic model-fallback options.
+Only verified catalog IDs in `NEON_MODEL_ALIASES` are routed to Neon; other
+models fall back. Neon does not receive Vercel/OpenRouter routing or automatic
+model-fallback options. Each model family uses Neon's native endpoint, because
+chat completions rejects OpenAI function tools with reasoning, Claude
+structured output, Gemini tool schemas and provider web search: OpenAI →
+Responses (`/openai/v1`), Claude → Messages (`/anthropic/v1`, with top-level
+`cache_control` like Vercel's auto caching), Gemini → `/gemini/v1beta`, and
+everything else (gpt-oss, Grok, Kimi, GLM, Llama) → chat completions (`/v1`).
+OpenAI and Gemini web search work on Neon; Claude and Grok search do not.
+OpenAI calls default to `store: false` on Neon. Served ids such as
+`gpt-5.4-nano-2026-03-17` or `global.xai.grok-4.7` map back to the neutral id
+so billing finds the price; Neon reports no cost, so steps are priced from
+`MODEL_PRICING` (`neon/…` entries where Neon's list price differs).
+
+Neon's default account limits are 200k tokens per minute and a $20 daily spend
+cap (429 `REQUEST_LIMIT_EXCEEDED`). Any 429 falls back to Vercel for that call;
+the daily cap additionally skips Neon for `DEFAULT_UNAVAILABLE_TTL_MS`.
+
+Pass `gateways: ["neon", "vercel"]` to restrict a call to gateways that can
+serve it (routing and fallback); GEO's OpenAI and Gemini grounded engines use
+this, the other grounded engines stay pinned to Vercel.
 
 The plan is resolved once per organization through `resolvePlan`
 (`@notra/ai/billing/plan` → Autumn) and cached for 60 s. Concurrent misses

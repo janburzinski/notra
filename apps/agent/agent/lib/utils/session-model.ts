@@ -9,22 +9,24 @@ export function createSessionAgentModel(
   tag: string,
   modelContextWindowTokens: number
 ) {
-  const model = createAgentModel(modelId, tag);
   return defineDynamic({
     events: {
-      "step.started": (event, ctx) => ({
-        model,
-        modelContextWindowTokens,
-        modelOptions: {
-          providerOptions: {
-            gateway: gatewayAttributionOptions({
-              organizationId: getOrganizationId(ctx),
-              sessionId: ctx.session.id,
-              turnId: getStepTurnId(event),
-            }),
+      "step.started": (event, ctx) => {
+        const organizationId = getOrganizationId(ctx);
+        return {
+          model: createAgentModel(modelId, tag, organizationId),
+          modelContextWindowTokens,
+          modelOptions: {
+            providerOptions: {
+              gateway: gatewayAttributionOptions({
+                organizationId,
+                sessionId: ctx.session.id,
+                turnId: getStepTurnId(event),
+              }),
+            },
           },
-        },
-      }),
+        };
+      },
     },
   });
 }

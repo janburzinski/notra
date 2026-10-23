@@ -56,6 +56,11 @@ export interface RouteRequest {
   organizationId?: string;
   /** Pin the request to a specific gateway (e.g. provider-defined tools). */
   gateway?: GatewayId;
+  /**
+   * Restrict routing and fallback to these gateways, e.g. provider-defined
+   * tools that only some gateways can serve. Ignored when `gateway` is pinned.
+   */
+  gateways?: readonly GatewayId[];
   zdr?: ZdrMode;
   logContext?: Partial<OperationalContext>;
 }
@@ -300,6 +305,7 @@ export interface ModelRouterConfig {
 export interface RoutedModelOptions {
   organizationId?: string;
   gateway?: GatewayId;
+  gateways?: readonly GatewayId[];
   zdr?: ZdrMode;
   logContext?: Partial<OperationalContext>;
 }
@@ -324,6 +330,7 @@ export interface DecideGatewayInput {
   organizationId?: string;
   plan?: Plan;
   pinned?: GatewayId;
+  allowed?: readonly GatewayId[];
 }
 
 export interface GatewayDecision {

@@ -116,7 +116,8 @@ export function createModelCallTelemetry({
 
   async function enrichCost(generationId: string) {
     try {
-      const enriched = await lookupRouteMetadata?.(generationId);
+      const lookup = lookupRouteMetadata ?? route?.adapter.lookupRouteMetadata;
+      const enriched = await lookup?.(generationId);
       if (!enriched) {
         return;
       }
@@ -271,7 +272,7 @@ export function createModelCallTelemetry({
         }
       );
       if (
-        lookupRouteMetadata &&
+        (lookupRouteMetadata ?? route?.adapter.lookupRouteMetadata) &&
         typeof generationId === "string" &&
         generationId.length > 0 &&
         routeMetadata?.costSource !== "reported"

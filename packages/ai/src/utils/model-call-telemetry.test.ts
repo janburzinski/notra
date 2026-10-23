@@ -11,10 +11,13 @@ import {
   createFakeAdapter,
   createPolicy,
   createTestRouter,
+  httpError,
   readStreamParts,
 } from "@notra/ai/router/test-helpers";
 
 import { evlogRequestIntegration } from "./evlog-request";
+import { getEvlogRuntime } from "./evlog-runtime";
+import { withGatewayAgentOptions } from "./gateway-agent-model";
 import { isRecord } from "./unknown-record";
 
 test("real OpenRouter usage survives a later error and is accounted once", async () => {
@@ -195,6 +198,49 @@ test("OpenRouter telemetry and billing distinguish absent/null BYOK measurement 
 });
 
 for (const operation of ["generate", "stream"] as const) {
+  test(`routed agent ${operation} enriches the final gateway cost once without duplicate lifecycle logs`, async () => {
+    const openrouter = createFakeAdapter({
+      id: "openrouter",
+      onCall: () => {
+        throw httpError(503);
+      },
+    });
+    const vercel = createFakeAdapter({ id: "vercel" });
+    const lookups: string[] = [];
+    vercel.lookupRouteMetadata = async (generationId) => {
+      lookups.push(generationId);
+      return { model: MODEL, costUsd: 0.25, costSource: "reported" };
+    };
+    const { router, logger } = createTestRouter({ openrouter, vercel });
+    const model = withGatewayAgentOptions(
+      router.model(MODEL),
+      "content-writer-agent"
+    );
+    if (operation === "generate") {
+      await model.doGenerate(callOptions());
+    } else {
+      await readStreamParts(await model.doStream(callOptions()));
+    }
+    await Promise.all(getEvlogRuntime().pendingAIUsage ?? []);
+    assert.deepEqual(lookups, ["gen_test"]);
+    for (const event of [
+      "ai.call.started",
+      "ai.call.completed",
+      "ai.cost.reported",
+      "ai.call.cost_enriched",
+    ]) {
+      assert.equal(
+        logger.entries.filter((entry) => entry.event === event).length,
+        1
+      );
+    }
+    const cost = logger.entries.find(
+      (entry) => entry.event === "ai.cost.reported"
+    );
+    assert.equal(cost?.fields?.gateway, "vercel");
+    assert.equal(cost?.fields?.costUsd, 0.25);
+  });
+
   test(`direct adapter ${operation} models keep ordinary evlog usage inside a request`, async () => {
     const request = evlogRequestIntegration.start(undefined);
     await request.runWith(async () => {

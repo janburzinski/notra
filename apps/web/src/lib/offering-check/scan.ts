@@ -1,8 +1,9 @@
-import { gateway } from "@ai-sdk/gateway";
 import { openai } from "@ai-sdk/openai";
+import { gateway } from "@notra/ai/gateway";
 import { generateText, Output, streamText } from "ai";
 
 import {
+  OFFERING_CHECK_GATEWAY_OPTIONS,
   OFFERING_CHECK_MAX_OTHER_OFFERINGS,
   OFFERING_CHECK_MAX_OUTPUT_TOKENS,
   OFFERING_CHECK_MAX_QUERIES,
@@ -43,7 +44,7 @@ async function answerQuestion(
 ): Promise<OfferingAnsweredQuestion> {
   const { kind } = question;
   const stream = streamText({
-    model: gateway(OFFERING_CHECK_MODEL),
+    model: gateway(OFFERING_CHECK_MODEL, OFFERING_CHECK_GATEWAY_OPTIONS),
     instructions: input.webSearch
       ? OFFERING_ANSWER_SEARCH_SYSTEM_PROMPT
       : OFFERING_ANSWER_OFFLINE_SYSTEM_PROMPT,
@@ -134,7 +135,7 @@ export async function runOfferingCheck(
   });
 
   const { output: judged } = await generateText({
-    model: gateway(OFFERING_CHECK_MODEL),
+    model: gateway(OFFERING_CHECK_MODEL, OFFERING_CHECK_GATEWAY_OPTIONS),
     instructions: OFFERING_JUDGE_SYSTEM_PROMPT,
     prompt: buildOfferingJudgePrompt(input, answered),
     output: Output.object({ schema: offeringJudgeSchema }),

@@ -9,7 +9,6 @@ export function offeringGatewayOptions(step: string, runId?: string) {
             OFFERING_CHECK_GATEWAY_TAG,
             `${OFFERING_CHECK_GATEWAY_TAG}-${step}`,
           ],
-          disallowPromptTraining: true,
         },
       },
       { runId }
