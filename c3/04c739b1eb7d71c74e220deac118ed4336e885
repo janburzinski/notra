@@ -1,0 +1,19 @@
+apps/dashboard/src/lib/workflows/internal-auth.ts
+  s_eba39e9a0f8071::t_1a9e04e3e495f6 59-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c304c739b1eb7d71c74e220deac118ed4336e885",
+  "prompts": {},
+  "sessions": {
+    "s_eba39e9a0f8071": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97b4841e-e30e-43ae-8a89-ded91c131bb3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
