@@ -1,0 +1,38 @@
+apps/dashboard/messages/en.json
+  s_d2eb16dde85eb8::t_0f130bd1a7cf6d 8618-8638,8690,8699
+apps/dashboard/src/components/sites/site-banner-fields.tsx
+  s_d2eb16dde85eb8::t_c3b698e94d83af 1-11,13-30,32-134
+  s_d2eb16dde85eb8::t_16b6c8e044b977 12,31
+apps/dashboard/src/utils/site-design.ts
+  s_d2eb16dde85eb8::t_f9f1b65c4f6f2c 12,83-91,285-286,337-343,496-512,514-517,572-573
+  s_d2eb16dde85eb8::t_074825f4e21bfc 513
+apps/dashboard/src/constants/site-design.ts
+  s_d2eb16dde85eb8::t_f9f1b65c4f6f2c 14-21
+apps/dashboard/src/constants/site-design-sections.ts
+  s_d2eb16dde85eb8::t_f9f1b65c4f6f2c 4,22
+apps/dashboard/src/types/site-design.ts
+  s_d2eb16dde85eb8::t_f9f1b65c4f6f2c 8,22,79-84
+apps/dashboard/tests/site-design.test.ts
+  s_d2eb16dde85eb8::t_2005a56f7243ee 152-179,190-198
+apps/dashboard/src/components/sites/site-design-appearance.tsx
+  s_d2eb16dde85eb8::t_16b6c8e044b977 8,115-116
+  s_d2eb16dde85eb8::t_0da92c4b0a4960 38-41
+apps/dashboard/messages/de.json
+  s_d2eb16dde85eb8::t_0f130bd1a7cf6d 8618-8638,8690,8699
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d5bd50408832977b70c792440283a6fcb25d8045",
+  "prompts": {},
+  "sessions": {
+    "s_d2eb16dde85eb8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f0811fe1-0be1-4b9f-b7bc-9b6d9e03b25f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
