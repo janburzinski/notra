@@ -757,3 +757,9 @@ export interface SiteChangesStripProps {
 export interface SiteChangesStripStateProps {
   state: SiteWorkspaceValue;
 }
+
+export interface SiteHeaderMenuProps {
+  branch: string;
+  /** Hides the Branches toggle where the selector cannot be turned off. */
+  branchesRequired: boolean;
+}

@@ -7725,7 +7725,8 @@
       "actions": {
         "openSite": "Open site",
         "visitSite": "Visit live site",
-        "copyLink": "Copy site link"
+        "copyLink": "Copy site link",
+        "viewOnGitHub": "View on GitHub"
       }
     },
     "status": {
