@@ -5,10 +5,12 @@ import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import { SiteBannerFields } from "@/components/sites/site-banner-fields";
 import { SiteBrandDialog } from "@/components/sites/site-brand-dialog";
 import { SiteBrandingFields } from "@/components/sites/site-branding-fields";
 import { SiteGeneralFields } from "@/components/sites/site-general-fields";
 import { SiteNavbarFields } from "@/components/sites/site-navbar-fields";
+import { SiteSettingsList } from "@/components/sites/site-settings-item";
 import { SiteStylingFields } from "@/components/sites/site-styling-fields";
 import { SiteTypographyFields } from "@/components/sites/site-typography-fields";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
@@ -34,7 +36,21 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
   const t = useTranslations("sites.design");
   if (snapshot !== state.document && !state.unsaved) {
     setSnapshot(state.document);
-    setForm(readDesignForm(state.config));
+    const next = readDesignForm(state.config);
+    // An empty banner isn't saved, so keep its settings while the text is empty.
+    const emptyBanner = form.bannerEnabled && !form.bannerContent.trim();
+    setForm(
+      emptyBanner
+        ? {
+            ...next,
+            bannerEnabled: true,
+            bannerDismissible: form.bannerDismissible,
+            bannerType: form.bannerType,
+            bannerLight: form.bannerLight,
+            bannerDark: form.bannerDark,
+          }
+        : next
+    );
   }
   const change = (next: SiteDesignForm) => {
     if (state.readOnly) {
@@ -64,7 +80,9 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
             </Button>
           </div>
         ) : null}
-        <SiteBrandingFields form={form} update={update} />
+        <SiteSettingsList>
+          <SiteBrandingFields form={form} update={update} />
+        </SiteSettingsList>
         {brand ? (
           <SiteBrandDialog
             open={brandOpen}
@@ -104,12 +122,29 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
             <TabsTrigger value="pair">{t("typography.modes.pair")}</TabsTrigger>
           </TabsList>
         </Tabs>
-        <SiteTypographyFields form={form} update={update} />
+        <SiteSettingsList>
+          <SiteTypographyFields form={form} update={update} />
+        </SiteSettingsList>
       </>
     );
   }
-  if (section === "navbar") {
-    return <SiteNavbarFields form={form} update={update} />;
+  if (section === "banner") {
+    return (
+      <SiteSettingsList>
+        <SiteBannerFields form={form} update={update} />
+      </SiteSettingsList>
+    );
   }
-  return <SiteGeneralFields form={form} update={update} />;
+  if (section === "navbar") {
+    return (
+      <SiteSettingsList>
+        <SiteNavbarFields form={form} update={update} />
+      </SiteSettingsList>
+    );
+  }
+  return (
+    <SiteSettingsList>
+      <SiteGeneralFields form={form} update={update} />
+    </SiteSettingsList>
+  );
 }

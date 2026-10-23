@@ -11,6 +11,14 @@ export const SITE_CODE_THEME_MODES = ["system", "dark", "custom"] as const;
 
 export const SITE_TYPOGRAPHY_MODES = ["single", "pair"] as const;
 
+export const SITE_BANNER_TYPES = ["info", "warning", "critical"] as const;
+
+/** Hex approximations of the sites-builder banner presets, for swatches. */
+export const SITE_BANNER_PRESET_COLORS = {
+  warning: { light: "#9A5505", dark: "#864900" },
+  critical: { light: "#C51E21", dark: "#AC1A1C" },
+} as const;
+
 export const SITE_FONT_FORMATS = ["woff2", "woff"] as const;
 
 /** Select value for a family that isn't in the preset list. */

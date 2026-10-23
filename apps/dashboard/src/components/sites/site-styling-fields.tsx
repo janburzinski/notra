@@ -52,7 +52,7 @@ export function SiteStylingFields({
     backgroundDark: form.backgroundDark,
   };
   return (
-    <div>
+    <div className="space-y-4">
       <SiteSettingsList>
         <SiteSettingsItem
           description={t("primaryHint")}

@@ -69,7 +69,13 @@ export function SiteSettingsValue({ children, mono }: SiteSettingsValueProps) {
 }
 
 export function SiteSettingsList({ children }: SiteSettingsListProps) {
-  return <div className="w-full">{children}</div>;
+  return (
+    <div className="border-shell-border bg-shell w-full rounded-2xl border p-0.5">
+      <div className="border-table-card-border bg-table-card shadow-table-card overflow-hidden rounded-[14px] border [&>*:last-child]:border-b-0">
+        {children}
+      </div>
+    </div>
+  );
 }
 
 export function SiteSettingsGroup({

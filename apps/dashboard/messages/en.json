@@ -8615,6 +8615,27 @@
         "linkLabelPlaceholder": "Support",
         "addLink": "Add navbar link"
       },
+      "banner": {
+        "enabled": "Show banner",
+        "enabledHint": "An announcement bar across the top of every page.",
+        "content": "Banner content",
+        "contentHint": "Supports links, bold and italic text in Markdown, like [Read more](/changelog).",
+        "contentPlaceholder": "We just shipped v2. [Read the changelog](/changelog)",
+        "dismissible": "Dismissible",
+        "dismissibleHint": "Readers can close the banner. It comes back when you change the text.",
+        "type": "Banner type",
+        "typeHint": "<code>info</code> uses your brand color, <code>warning</code> amber, <code>critical</code> red.",
+        "types": {
+          "info": "Info",
+          "warning": "Warning",
+          "critical": "Critical"
+        },
+        "lightColor": "Light mode color",
+        "lightColorHint": "Overrides the type's background color. Text turns white.",
+        "darkColor": "Dark mode color",
+        "darkColorHint": "Background in dark mode.",
+        "sameAsLight": "Same as light mode"
+      },
       "brandDialog": {
         "title": "Use brand identity?",
         "description": "These fields will be filled from this project's brand identity. Nothing is saved until you save the draft.",
@@ -8666,6 +8687,7 @@
           "branding": "Branding",
           "typography": "Typography",
           "navbar": "Navbar",
+          "banner": "Banner",
           "integrations": "Integrations"
         },
         "hints": {
@@ -8674,6 +8696,7 @@
           "branding": "Your logos, favicon and logo link.",
           "typography": "Fonts for headings and body text.",
           "navbar": "Links and actions in the site navigation.",
+          "banner": "An announcement bar at the top of every page.",
           "integrations": "Analytics and the cookie banner for this site."
         }
       }

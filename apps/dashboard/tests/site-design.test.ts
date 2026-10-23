@@ -149,6 +149,34 @@ const VARIANTS: [string, FormPatch][] = [
     `navbar ${type} button`,
     { navbarButton: type, navbarButtonHref: `https://${type}.com/acme` },
   ]),
+  [
+    "dismissible info banner",
+    {
+      bannerEnabled: true,
+      bannerContent: "Shipped **v2**. [Read more](/changelog)",
+      bannerDismissible: true,
+    },
+  ],
+  [
+    "critical banner with one color",
+    {
+      bannerEnabled: true,
+      bannerContent: "Incident",
+      bannerType: "critical",
+      bannerLight: "#7C3AED",
+    },
+  ],
+  [
+    "warning banner with light and dark colors",
+    {
+      bannerEnabled: true,
+      bannerContent: "Maintenance",
+      bannerType: "warning",
+      bannerLight: "#7C3AED",
+      bannerDark: "#5B21B6",
+    },
+  ],
+  ["banner switched off", { bannerEnabled: false, bannerContent: "Hidden" }],
 ];
 
 /** Hidden fields keep their old values in the form but aren't written. */
@@ -159,6 +187,15 @@ function written(form: SiteDesignForm): SiteDesignForm {
       form.navbarButton === "button" ? form.navbarButtonLabel : "",
     navbarButtonHref: form.navbarButton === "none" ? "" : form.navbarButtonHref,
     font: form.typographyMode === "pair" ? EMPTY_FONT : form.font,
+    ...(form.bannerEnabled
+      ? {}
+      : {
+          bannerContent: "",
+          bannerDismissible: false,
+          bannerType: "info",
+          bannerLight: "",
+          bannerDark: "",
+        }),
   };
 }
 
@@ -412,6 +449,41 @@ describe("site design form", () => {
       }
     }
   );
+
+  test("switching off an existing banner removes it", () => {
+    const source = {
+      ...SOURCE,
+      banner: { content: "Shipped", type: "warning", dismissible: true },
+    };
+    const initial = readDesignForm(source);
+    const config = patchDesign(
+      source,
+      { ...initial, bannerEnabled: false },
+      initial
+    );
+    expect(config.banner).toBeUndefined();
+    expect(siteConfigIssue(config)).toBeNull();
+  });
+
+  test("a dark banner color alone keeps the type's light color", () => {
+    const initial = readDesignForm(SOURCE);
+    const config = patchDesign(
+      SOURCE,
+      {
+        ...initial,
+        bannerEnabled: true,
+        bannerContent: "Incident",
+        bannerType: "critical",
+        bannerDark: "#5b21b6",
+      },
+      initial
+    );
+    expect((config.banner as SiteRawConfig).color).toEqual({
+      light: "#C51E21",
+      dark: "#5B21B6",
+    });
+    expect(siteConfigIssue(config)).toBeNull();
+  });
 
   test("an untouched form writes the source back unchanged", () => {
     const initial = readDesignForm(SOURCE);

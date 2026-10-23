@@ -8615,6 +8615,27 @@
         "linkLabelPlaceholder": "Support",
         "addLink": "Link hinzufügen"
       },
+      "banner": {
+        "enabled": "Banner anzeigen",
+        "enabledHint": "Eine Ankündigungsleiste oben auf jeder Seite.",
+        "content": "Banner-Text",
+        "contentHint": "Unterstützt Links, fett und kursiv in Markdown, z. B. [Mehr lesen](/changelog).",
+        "contentPlaceholder": "Version 2 ist da. [Zum Changelog](/changelog)",
+        "dismissible": "Schließbar",
+        "dismissibleHint": "Leser können das Banner schließen. Es erscheint wieder, wenn du den Text änderst.",
+        "type": "Banner-Typ",
+        "typeHint": "<code>info</code> nutzt deine Markenfarbe, <code>warning</code> Orange, <code>critical</code> Rot.",
+        "types": {
+          "info": "Info",
+          "warning": "Warnung",
+          "critical": "Kritisch"
+        },
+        "lightColor": "Farbe im hellen Modus",
+        "lightColorHint": "Ersetzt die Hintergrundfarbe des Typs. Der Text wird weiß.",
+        "darkColor": "Farbe im dunklen Modus",
+        "darkColorHint": "Hintergrund im dunklen Modus.",
+        "sameAsLight": "Wie im hellen Modus"
+      },
       "brandDialog": {
         "title": "Brand Identity übernehmen?",
         "description": "Diese Felder werden aus der Brand Identity dieses Projekts gefüllt. Gespeichert wird erst, wenn du den Entwurf speicherst.",
@@ -8666,6 +8687,7 @@
           "branding": "Marke",
           "typography": "Typografie",
           "navbar": "Navigation",
+          "banner": "Banner",
           "integrations": "Integrationen"
         },
         "hints": {
@@ -8674,6 +8696,7 @@
           "branding": "Deine Logos, dein Favicon und der Logo-Link.",
           "typography": "Schriften für Überschriften und Fließtext.",
           "navbar": "Links und Aktionen in der Seitennavigation.",
+          "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",
           "integrations": "Analytics und Cookie-Banner für diese Seite."
         }
       }

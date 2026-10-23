@@ -1,6 +1,7 @@
 import {
   Globe02Icon,
   Image01Icon,
+  Megaphone01Icon,
   Menu01Icon,
   PaintBoardIcon,
   Plug01Icon,
@@ -18,5 +19,6 @@ export const SITE_DESIGN_SECTIONS = [
   { id: "branding", icon: Image01Icon, paths: ["logo", "favicon"] },
   { id: "typography", icon: TextFontIcon, paths: ["fonts"] },
   { id: "navbar", icon: Menu01Icon, paths: ["navbar"] },
+  { id: "banner", icon: Megaphone01Icon, paths: ["banner"] },
   { id: "integrations", icon: Plug01Icon, paths: ["integrations"] },
 ] as const;

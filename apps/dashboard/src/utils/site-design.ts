@@ -9,6 +9,8 @@ import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 import {
   SITE_APPEARANCE_MODES,
   SITE_BACKGROUND_DECORATIONS,
+  SITE_BANNER_PRESET_COLORS,
+  SITE_BANNER_TYPES,
   SITE_DEFAULT_CODE_DARK_THEME,
   SITE_DEFAULT_CODE_LIGHT_THEME,
   SITE_FONT_FORMATS,
@@ -77,6 +79,15 @@ const NAVBAR_BUTTON_KEYS: readonly SiteDesignKey[] = [
 const NAVBAR_KEYS: readonly SiteDesignKey[] = [
   ...NAVBAR_BUTTON_KEYS,
   "navbarLinks",
+];
+
+const BANNER_KEYS: readonly SiteDesignKey[] = [
+  "bannerEnabled",
+  "bannerContent",
+  "bannerDismissible",
+  "bannerType",
+  "bannerLight",
+  "bannerDark",
 ];
 
 const EMPTY_FONT: SiteFontSpecForm = {
@@ -272,6 +283,8 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
   const navbar = record(config.navbar);
   const navbarButton = readNavbarButton(navbar);
   const links = Array.isArray(navbar.links) ? navbar.links : [];
+  const banner = record(config.banner);
+  const bannerColor = byMode(banner.color);
   return {
     name: text(config.name),
     description: text(config.description),
@@ -322,6 +335,13 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
         href: text(link.href),
       };
     }),
+    bannerEnabled: text(banner.content) !== "",
+    bannerContent: text(banner.content),
+    bannerDismissible: banner.dismissible === true,
+    bannerType:
+      SITE_BANNER_TYPES.find((item) => item === banner.type) ?? "info",
+    bannerLight: bannerColor.light,
+    bannerDark: hasSeparateModes(banner.color) ? bannerColor.dark : "",
   };
 }
 
@@ -474,6 +494,46 @@ function patchNavbar(
   navbar.links = [...links, ...edited.values()];
 }
 
+/** Colors the site uses for the banner type when no custom color is set. */
+export function bannerPresetColors(form: SiteDesignForm): {
+  light: string;
+  dark: string;
+} {
+  if (form.bannerType !== "info") {
+    return SITE_BANNER_PRESET_COLORS[form.bannerType];
+  }
+  const brand = form.button || form.primary;
+  return { light: brand, dark: brand };
+}
+
+/** A dark color alone keeps the type's light color instead of applying to both modes. */
+function bannerColor(form: SiteDesignForm): string | SiteRawConfig | undefined {
+  const light = hex(form.bannerLight);
+  const dark = hex(form.bannerDark);
+  if (!light && dark) {
+    return { light: hex(bannerPresetColors(form).light), dark };
+  }
+  return writeByMode(true, light ?? "", dark ?? "");
+}
+
+/** blog.json has no off switch: a banner without content is no banner. */
+function patchBanner(config: SiteRawConfig, form: SiteDesignForm) {
+  const content = form.bannerContent.trim();
+  if (!form.bannerEnabled || !content) {
+    delete config.banner;
+    return;
+  }
+  const banner: SiteRawConfig = { ...record(config.banner), content };
+  assign(banner, "dismissible", form.bannerDismissible || undefined);
+  assign(
+    banner,
+    "type",
+    form.bannerType === "info" ? undefined : form.bannerType
+  );
+  assign(banner, "color", bannerColor(form));
+  config.banner = banner;
+}
+
 /** Writes only the sections the form changed, so untouched JSON stays as is. */
 export function patchDesign(
   source: SiteRawConfig,
@@ -527,6 +587,9 @@ export function patchDesign(
   }
   if (changed(form, initial, NAVBAR_KEYS)) {
     patchNavbar(config, form, initial);
+  }
+  if (changed(form, initial, BANNER_KEYS)) {
+    patchBanner(config, form);
   }
   return config;
 }

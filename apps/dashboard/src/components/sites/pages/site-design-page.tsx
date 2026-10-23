@@ -6,7 +6,6 @@ import { SiteDesignAppearance } from "@/components/sites/site-design-appearance"
 import { SiteDesignError } from "@/components/sites/site-design-error";
 import { SiteDesignIntegrations } from "@/components/sites/site-design-integrations";
 import { SiteDesignNavigation } from "@/components/sites/site-design-navigation";
-import { SiteSettingsList } from "@/components/sites/site-settings-item";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
 import { useSiteDesignSection } from "@/lib/hooks/use-site-design-section";
 
@@ -48,12 +47,10 @@ export function SiteDesignPage() {
           {active.id === "integrations" ? (
             <SiteDesignIntegrations key={state.scope.branch ?? "production"} />
           ) : (
-            <SiteSettingsList>
-              <SiteDesignAppearance
-                key={`${active.id}:${state.scope.branch ?? "production"}:${state.document.publishedBlobSha}`}
-                section={active.id}
-              />
-            </SiteSettingsList>
+            <SiteDesignAppearance
+              key={`${active.id}:${state.scope.branch ?? "production"}:${state.document.publishedBlobSha}`}
+              section={active.id}
+            />
           )}
           {active.id === "typography" ? <SiteDesignError path="fonts" /> : null}
         </div>

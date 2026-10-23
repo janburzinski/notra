@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import type {
   SITE_APPEARANCE_MODES,
   SITE_BACKGROUND_DECORATIONS,
+  SITE_BANNER_TYPES,
   SITE_CODE_THEME_MODES,
   SITE_FONT_FORMATS,
   SITE_FONT_WEIGHTS,
@@ -18,6 +19,7 @@ export type SiteCodeThemeMode = (typeof SITE_CODE_THEME_MODES)[number];
 export type SiteFontWeight = (typeof SITE_FONT_WEIGHTS)[number];
 export type SiteFontFormat = (typeof SITE_FONT_FORMATS)[number];
 export type SiteTypographyMode = (typeof SITE_TYPOGRAPHY_MODES)[number];
+export type SiteBannerType = (typeof SITE_BANNER_TYPES)[number];
 export type SiteNavbarButton =
   | "none"
   | "button"
@@ -74,6 +76,12 @@ export interface SiteDesignForm {
   navbarButtonLabel: string;
   navbarButtonHref: string;
   navbarLinks: SiteNavbarLinkForm[];
+  bannerEnabled: boolean;
+  bannerContent: string;
+  bannerDismissible: boolean;
+  bannerType: SiteBannerType;
+  bannerLight: string;
+  bannerDark: string;
 }
 
 type SiteDesignFormUpdate<T> = <K extends keyof T>(key: K, value: T[K]) => void;
