@@ -93,12 +93,6 @@ export function WebVisitorsSection({
   );
 
   const showPageHost = new Set(web.pages.map((page) => page.host)).size > 1;
-  const pageSeconds = new Map(
-    (engagement?.pages ?? []).map((page) => [
-      `${page.host}${page.path}`,
-      page.avgSeconds,
-    ])
-  );
   const pageRows: WebBreakdownRow[] = web.pages
     .slice(0, WEB_LIST_LIMIT)
     .map((page) => {
@@ -119,7 +113,6 @@ export function WebVisitorsSection({
         value: page.views,
         previous: page.previousViews,
         fromAi: page.aiVisitors,
-        avgSeconds: pageSeconds.get(url) ?? null,
       };
     });
   const sourceRows: WebBreakdownRow[] = web.sources
@@ -236,7 +229,6 @@ export function WebVisitorsSection({
           height={topHeight}
           nameHeader={t("page")}
           rows={pageRows}
-          showAvgTime={engagement !== undefined}
           showFromAi
           title={t("topPages")}
           valueHeader={t("columnViews")}
