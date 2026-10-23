@@ -1,0 +1,28 @@
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_fae55c74d964d8::t_8edd0b6e558756 50
+apps/dashboard/browser-tests/utils/build-site-workspace.mjs
+  s_fae55c74d964d8::t_259e1c21daad7a 13
+apps/dashboard/src/components/sites/branches/site-branch-primary-action.tsx
+  s_fae55c74d964d8::t_8edd0b6e558756 12-39,50-51
+apps/dashboard/browser-tests/fixtures/site-workspace.tsx
+  s_fae55c74d964d8::t_259e1c21daad7a 178-180
+  s_fae55c74d964d8::t_c9ff347f35b350 8,156-168
+apps/dashboard/browser-tests/site-workspace.test.ts
+  s_fae55c74d964d8::t_14b57c48024f52 255-256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9066d4abb4dd54fb2ea187a902e210ad98d488f1",
+  "prompts": {},
+  "sessions": {
+    "s_fae55c74d964d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7ab1a59-7cb1-4271-bcbc-b41a9a41ad36",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
