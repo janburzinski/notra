@@ -4,9 +4,10 @@ import {
   HTTP_PAYMENT_REQUIRED,
   HTTP_TOO_MANY_REQUESTS,
 } from "@notra/ai/constants/router";
+import { gatewayLimitMessage } from "@notra/ai/utils/gateway-limit-message";
 import type { WideEvent } from "evlog";
 
-/** Share the operational Slack webhook, with one alert per gateway/status/window. */
+/** Share the operational Slack webhook, with one alert per gateway/status/limit/window. */
 export async function alertGatewayLimit(event: WideEvent): Promise<void> {
   const webhook = process.env.GEO_SCAN_ALERT_WEBHOOK_URL;
   if (
@@ -26,7 +27,7 @@ export async function alertGatewayLimit(event: WideEvent): Promise<void> {
     process.env.RAILWAY_ENVIRONMENT_NAME ??
     process.env.NODE_ENV ??
     "unknown";
-  const key = `ai:gateway-limit-alert:${environment}:${event.gateway}:${event.status}`;
+  const key = `ai:gateway-limit-alert:${environment}:${event.gateway}:${event.status}:${event.limitType ?? "unknown"}`;
   const claimed = await redis.set(key, "sent", {
     nx: true,
     ex: GATEWAY_LIMIT_ALERT.dedupeSeconds,
@@ -35,19 +36,7 @@ export async function alertGatewayLimit(event: WideEvent): Promise<void> {
     return;
   }
   try {
-    const text = [
-      "AI gateway limit hit",
-      `Environment: ${environment}`,
-      `Gateway: ${event.gateway}`,
-      `HTTP status: ${event.status}`,
-      `Model: ${event.model}`,
-      `Call: ${event.callId}`,
-      ...(event.organizationId
-        ? [`Organization: ${event.organizationId}`]
-        : []),
-      ...(event.projectId ? [`Project: ${event.projectId}`] : []),
-      "Fallback may still succeed. Further alerts for this gateway/status are muted for 5 minutes.",
-    ].join("\n");
+    const text = gatewayLimitMessage(event, environment);
     const response = await fetch(webhook, {
       method: "POST",
       headers: { "content-type": "application/json" },

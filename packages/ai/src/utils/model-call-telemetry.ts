@@ -18,6 +18,7 @@ import type {
   VercelAdapterConfig,
 } from "@notra/ai/types/router";
 import { getEvlogRuntime } from "@notra/ai/utils/evlog-runtime";
+import { readGatewayLimitDetails } from "@notra/ai/utils/gateway-limit-details";
 import { getOperationalContext } from "@notra/ai/utils/operational-context";
 import { promptCacheTelemetry } from "@notra/ai/utils/prompt-cache-telemetry";
 import {
@@ -131,7 +132,10 @@ export function createModelCallTelemetry({
         status === HTTP_TOO_MANY_REQUESTS
       ) {
         limitRecorded = true;
-        emit("warn", "ai.call.limit_hit", { status });
+        emit("warn", "ai.call.limit_hit", {
+          status,
+          ...readGatewayLimitDetails(error),
+        });
       }
     } catch {
       // Diagnostic extraction must not change fallback or error propagation.

@@ -97,7 +97,8 @@ export const ROUTER_POLICY = {
  * cap is hit ("ai gateway daily token limit exceeded"); it lasts until the
  * day resets, unlike the per-minute token limit.
  */
-export const DAILY_LIMIT_ERROR_PATTERN = /\bdaily\b[^.]*limit exceeded/i;
+export const DAILY_LIMIT_ERROR_PATTERN =
+  /\bdaily\b[^.]*(?:limit exceeded|(?:spend|token) limit)/i;
 
 export const NO_TRAINING_PROVIDER_ERROR_PATTERN =
   /No providers that disallow prompt training available for model:/i;

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+import { APICallError } from "@ai-sdk/provider";
 import { FREE_ORG, MODEL } from "@notra/ai/constants/router-test";
 import { wrapModelWithObservability } from "@notra/ai/observability";
 import { createOpenRouterAdapter } from "@notra/ai/router/adapters/openrouter";
@@ -198,6 +199,57 @@ test("OpenRouter telemetry and billing distinguish absent/null BYOK measurement 
 });
 
 for (const operation of ["generate", "stream"] as const) {
+  test(`Neon daily-limit ${operation} logs actionable details once and still completes through fallback`, async () => {
+    const neon = createFakeAdapter({
+      id: "neon",
+      onCall: () => {
+        throw new APICallError({
+          message: "You've reached your AI Gateway daily spend limit.",
+          url: "https://neon.example.test",
+          requestBodyValues: { input: "private-prompt" },
+          statusCode: 429,
+          responseHeaders: { "retry-after": "3600" },
+        });
+      },
+    });
+    const vercel = createFakeAdapter({ id: "vercel" });
+    const logger = createCaptureLogger();
+    const router = createModelRouter({
+      adapters: { neon, vercel },
+      policy: createPolicy({ defaultGateway: "neon" }),
+      resolvePlan: async () => "free",
+      logger,
+    });
+    const model = router.model(MODEL);
+    if (operation === "generate") {
+      await model.doGenerate(callOptions());
+    } else {
+      await readStreamParts(await model.doStream(callOptions()));
+    }
+    const limits = logger.entries.filter(
+      ({ event }) => event === "ai.call.limit_hit"
+    );
+    assert.equal(limits.length, 1);
+    assert.equal(limits[0]?.fields?.gateway, "neon");
+    assert.equal(limits[0]?.fields?.limitType, "daily-spend");
+    assert.equal(limits[0]?.fields?.retryAfterSeconds, 3600);
+    assert.doesNotMatch(JSON.stringify(limits), /private-prompt/);
+    assert.equal(
+      logger.entries.filter(({ event }) => event === "ai.call.completed")
+        .length,
+      1
+    );
+    assert.equal(
+      logger.entries.find(({ event }) => event === "ai.call.completed")?.fields
+        ?.gateway,
+      "vercel"
+    );
+    assert.equal(
+      logger.entries.filter(({ event }) => event === "ai.call.failed").length,
+      0
+    );
+  });
+
   test(`routed agent ${operation} enriches the final gateway cost once without duplicate lifecycle logs`, async () => {
     const openrouter = createFakeAdapter({
       id: "openrouter",

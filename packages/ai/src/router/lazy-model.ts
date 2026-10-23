@@ -23,6 +23,7 @@ import type {
   RoutedModelContext,
   RouteMetadata,
 } from "@notra/ai/types/router";
+import { readGatewayLimitDetails } from "@notra/ai/utils/gateway-limit-details";
 import { createModelCallTelemetry } from "@notra/ai/utils/model-call-telemetry";
 import { observeModelStream } from "@notra/ai/utils/observe-model-stream";
 import { withUsageAttribution } from "@notra/ai/utils/usage-attribution";
@@ -433,7 +434,7 @@ export class RoutedLanguageModel implements LanguageModelV4 {
         gateway: route.decision.gateway,
         requestedModel: route.decision.requestedModelId,
         organizationId: route.decision.organizationId,
-        message: readMessage(error),
+        ...readGatewayLimitDetails(error),
       });
       return true;
     }

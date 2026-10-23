@@ -1,3 +1,8 @@
+import type {
+  GatewayLimitDescription,
+  GatewayLimitType,
+} from "@notra/ai/types/gateway-limit";
+
 export const DEFAULT_AXIOM_AI_DATASET = "ai-logs";
 export const DEFAULT_AXIOM_GEO_DATASET = "notra-geo-scan";
 export const GEO_LOG_EVENT_PREFIX = "geo.";
@@ -5,6 +10,38 @@ export const GATEWAY_LIMIT_ALERT = {
   dedupeSeconds: 5 * 60,
   timeoutMs: 5000,
 };
+export const GATEWAY_LIMIT_DESCRIPTIONS = {
+  "daily-spend": {
+    name: "Daily spend limit",
+    reason:
+      "The provider reports that the account's daily spend limit has been reached.",
+    recovery:
+      "Wait for the provider's daily reset or request a higher spend limit.",
+  },
+  "daily-tokens": {
+    name: "Daily token limit",
+    reason:
+      "The provider reports that the account's daily token limit has been reached.",
+    recovery:
+      "Wait for the provider's daily reset or request a higher token limit.",
+  },
+  "credit-balance": {
+    name: "Credit balance",
+    reason: "The provider requires a positive credit balance (HTTP 402).",
+    recovery: "Add credits or check the provider's billing settings.",
+  },
+  "rate-limit": {
+    name: "Rate limit",
+    reason: "The provider reports a request or token rate limit.",
+    recovery: "Wait before retrying or reduce request/token throughput.",
+  },
+  unknown: {
+    name: "Unspecified rate or quota limit",
+    reason:
+      "The provider returned HTTP 429 without an identifiable limit type.",
+    recovery: "Check the provider's usage and limits settings.",
+  },
+} satisfies Record<GatewayLimitType, GatewayLimitDescription>;
 export const REQUEST_AI_USAGE_FIELDS = new Set([
   "calls",
   "model",

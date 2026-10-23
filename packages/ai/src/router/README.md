@@ -139,14 +139,23 @@ Anthropic thinking / OpenAI reasoning settings are mapped to
 - `ai.call.limit_hit` (warning) records HTTP 402/429 on every failed attempt,
   even when fallback succeeds or the gateway is pinned. Fields include `gateway`,
   `status`, model, `callId`, attempt count and request context. Stream errors
-  with HTTP status codes use the same event. Logging checks only the status code,
-  without parsing or adding response bodies, prompts, headers or credentials.
-  A 429 alone does not distinguish a token-rate limit from a daily spend cap.
-  This is diagnostic only; existing fallback and cooldown behavior is unchanged.
+  with HTTP status codes use the same event. `limitType` and `limitReason`
+  distinguish daily spend/token caps, credit balance and rate limits; an
+  unidentified 429 remains `unknown`. Classification inspects the error but never
+  emits raw error bodies, prompts, headers or credentials. Numeric request/token
+  allowances and `Retry-After` guidance are included when supplied by the provider,
+  including headers on wrapped SDK errors. Retry times are not confirmed resets;
+  a rate-window reset is not used as a daily-cap reset. Missing cap amounts and
+  reset times are explicitly unknown. Neon's "reached ... daily spend limit"
+  response now also activates the existing daily-limit cooldown without disabling
+  fallback.
 - These events also notify the existing `GEO_SCAN_ALERT_WEBHOOK_URL` Slack
   destination when Redis is configured. Redis deduplicates alerts per environment,
-  gateway and status for five minutes, including across instances. Alerts run in
-  the background and are awaited by `flushLogs`, independently of OTLP delivery.
+  gateway, status and limit type for five minutes, including across instances, so
+  a rate-limit alert does not hide a daily-cap alert. Messages include the cause,
+  reported timing and a recovery action, without claiming fallback succeeded.
+  Alerts run in the background and are awaited by `flushLogs`, independently of
+  OTLP delivery.
   Failed deliveries release the deduplication key so the next limit hit can retry;
   delivery failures never affect model calls. No prompt or response body is sent.
 - evlog events: `ai.router.route`, `ai.router.fallback`,

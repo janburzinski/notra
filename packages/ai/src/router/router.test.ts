@@ -711,6 +711,10 @@ describe("RoutedLanguageModel", () => {
   test("a daily-limit 429 skips the gateway for later routes, a per-minute 429 does not", async () => {
     for (const [message, skipped] of [
       ["ai gateway daily token limit exceeded", true],
+      [
+        "You've reached your AI Gateway daily spend limit. You can retry after it resets.",
+        true,
+      ],
       ["ai gateway account token rate limit exceeded", false],
     ] as const) {
       const openrouter = createFakeAdapter({
