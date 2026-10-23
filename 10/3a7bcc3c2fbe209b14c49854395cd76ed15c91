@@ -1,0 +1,25 @@
+apps/dashboard/src/app/(dashboard)/[slug]/geo/components/geo-tabs.tsx
+  s_e4f427a10e11ab::t_dce81e6adeec5c 58,177
+apps/dashboard/src/components/geo/journeys-tab.tsx
+  s_e4f427a10e11ab::t_dce81e6adeec5c 5,92,99-105,168
+apps/dashboard/src/types/geo.ts
+  s_e4f427a10e11ab::t_dce81e6adeec5c 488-489,890
+apps/dashboard/src/utils/geo-overview-page.ts
+  s_e4f427a10e11ab::t_dce81e6adeec5c 143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "103a7bcc3c2fbe209b14c49854395cd76ed15c91",
+  "prompts": {},
+  "sessions": {
+    "s_e4f427a10e11ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b2d3348-6c53-4044-bf02-e284ef8d62e4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
