@@ -62,6 +62,8 @@ if (process.env.NOTRA_DEFAULT_EDITOR_TEST_WORKER !== "1") {
     readSiteSourceFile: async () =>
       config === null ? null : { content: config, sha: "blob-config" },
     listSiteDrafts: async () => (draft ? [draft] : []),
+    listSiteDraftSummaries: async () => (draft ? [draft] : []),
+    readSiteDraft: async () => draft,
     saveSiteDraft: async (
       _site: unknown,
       input: DefaultEditorSaveDraftInput

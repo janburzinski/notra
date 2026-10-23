@@ -1,4 +1,5 @@
 import type { SITE_NAVBAR_LINK_TYPES } from "@notra/sites-core/constants/site-layout";
+import type { SiteImageUploadKind } from "@notra/sites-core/types/uploads";
 import type { ReactNode } from "react";
 
 import type {
@@ -102,6 +103,7 @@ export interface SiteFontRowsProps {
 
 export interface SiteSeparateAssetRowsProps {
   id: string;
+  kind: SiteImageUploadKind;
   title: string;
   description: string;
   separateLabel: string;
@@ -114,8 +116,15 @@ export interface SiteSeparateAssetRowsProps {
   placeholder: string;
 }
 
+/** An image an asset field just uploaded, shown before its draft is fetched. */
+export interface SiteImageUploadPreview {
+  path: string;
+  url: string;
+}
+
 export interface SiteAssetFieldProps {
   id: string;
+  kind: SiteImageUploadKind;
   label: string;
   value: string;
   onChange: (value: string) => void;

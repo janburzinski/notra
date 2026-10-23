@@ -11,24 +11,31 @@ import {
   SITE_IGNORE_MAX_BYTES,
 } from "@notra/sites-core/constants/source";
 import { createDefaultSiteConfig } from "@notra/sites-core/utils/default-config";
+import { isSiteImageDraftPath } from "@notra/sites-core/utils/image-drafts";
 import { createSiteIgnore } from "@notra/sites-core/utils/site-ignore";
 import {
   isCollectedSiteSourcePath,
   isSiteSourcePath,
 } from "@notra/sites-core/utils/source-files";
-import { and, eq, sql, or, isNull } from "drizzle-orm";
+import { and, eq, getTableColumns, sql, or, isNull } from "drizzle-orm";
 
 import {
   DEFAULT_PUBLISH_HEADLINE,
   EDITABLE_PATH_SEGMENT,
   EDITABLE_TEXT_FILE,
-  MAX_DRAFT_BYTES,
+  MAX_PUBLISH_BYTES,
   MAX_PUBLISH_HEADLINE_LENGTH,
   SITE_EDITOR_READ_CONCURRENCY,
   VALIDATED_SOURCE_FILE,
 } from "./constants/editor";
 import { SiteInputError, SitePublishConflictError } from "./errors";
 import { getBranchHead, siteRepositoryAccess } from "./github";
+import {
+  commitRepositoryFiles,
+  openRepositoryPullRequest,
+  readRepositoryBlobSha,
+  readRepositoryFile,
+} from "./repository";
 import type { SiteStorageTransaction } from "./types/deployments";
 import type {
   CreateCommitOnBranchResponse,
@@ -41,7 +48,9 @@ import type {
   SaveSiteDraftInput,
   SiteDraftMutationInput,
   SiteDraft,
+  SiteDraftSummary,
   SiteSourceEntry,
+  SitePublishedFile,
   SiteSourceFileContent,
   SiteSourceListing,
 } from "./types/editor";
@@ -58,11 +67,13 @@ import {
   withSiteBranchLock,
 } from "./utils/site-branch-lock";
 import { assertSiteBranchWritable } from "./utils/site-branch-writable";
+import { siteDraftCodec } from "./utils/site-draft-codec";
 import { siteDraftTable } from "./utils/site-draft-table";
 import {
   assertSiteEditableBranch,
   assertSiteContentBranch,
 } from "./utils/site-edit-branch";
+import { pruneUnreferencedUploads } from "./utils/unreferenced-uploads";
 
 // createCommitOnBranch rejects a stale expectedHeadOid with "Expected branch to
 // point to "<oid>" but it did not". Anything else is a real failure.
@@ -74,7 +85,7 @@ function assertEditablePath(path: string): void {
   }
   const editable =
     isSiteSourcePath(path) &&
-    EDITABLE_TEXT_FILE.test(path) &&
+    (EDITABLE_TEXT_FILE.test(path) || isSiteImageDraftPath(path)) &&
     path
       .split("/")
       .every(
@@ -84,6 +95,25 @@ function assertEditablePath(path: string): void {
   if (!editable) {
     throw new SiteInputError(`${path} is not an editable site file`);
   }
+}
+
+/** Drafts with changes GitHub hasn't received yet. */
+function pendingDrafts(siteDrafts: ReturnType<typeof siteDraftTable>) {
+  return or(
+    isNull(siteDrafts.committedRevision),
+    sql`${siteDrafts.revision} > ${siteDrafts.committedRevision}`
+  );
+}
+
+/** Whether the published file already holds this draft's content. */
+function draftMatchesFile(
+  draft: Pick<SiteDraft, "path" | "content" | "deleted">,
+  file: SitePublishedFile | null
+): boolean {
+  if (draft.deleted || !file) {
+    return draft.deleted && !file;
+  }
+  return siteDraftCodec(draft.path).matches(draft.content, file);
 }
 
 function readAccess(site: Site) {
@@ -172,123 +202,65 @@ export async function readSiteSourceFile(
   });
 }
 
-export async function readRepositoryFile(
-  repository: SiteRepository,
-  token: string,
-  file: RepositoryFileRef
-): Promise<SiteSourceFileContent | null> {
-  const octokit = createOctokit(token);
-  try {
-    const { data } = await octokit.request(
-      "GET /repos/{owner}/{repo}/contents/{path}",
-      {
-        owner: repository.owner,
-        repo: repository.repo,
-        path: file.path,
-        ref: file.ref,
-        headers: GITHUB_API_VERSION_HEADERS,
-      }
-    );
-    if (Array.isArray(data) || data.type !== "file" || !("content" in data)) {
-      return null;
-    }
-    return {
-      content: Buffer.from(data.content, "base64").toString("utf8"),
-      sha: data.sha,
-    };
-  } catch (error) {
-    if (isNotFoundError(error)) {
-      return null;
-    }
-    throw error;
-  }
-}
-
-export async function createRepositoryBranch(
-  repository: SiteRepository,
-  token: string,
-  branch: RepositoryBranchInput
-): Promise<void> {
-  await createOctokit(token).request("POST /repos/{owner}/{repo}/git/refs", {
-    owner: repository.owner,
-    repo: repository.repo,
-    ref: `refs/heads/${branch.name}`,
-    sha: branch.sha,
-    headers: GITHUB_API_VERSION_HEADERS,
-  });
-}
-
-export async function commitRepositoryFiles(
-  repository: SiteRepository,
-  token: string,
-  commit: RepositoryCommitInput
+/** The config committed at `ref`; empty when the repository has none. */
+export async function publishedConfig(
+  site: Site,
+  ref: string,
+  access: SiteRepositoryAccess
 ): Promise<string> {
-  const result = await createOctokit(
-    token
-  ).graphql<CreateCommitOnBranchResponse>(
-    GITHUB_CREATE_COMMIT_ON_BRANCH_MUTATION,
-    {
-      input: {
-        branch: {
-          repositoryNameWithOwner: `${repository.owner}/${repository.repo}`,
-          branchName: commit.branch,
-        },
-        message: { headline: commit.headline },
-        expectedHeadOid: commit.expectedHeadOid,
-        fileChanges: {
-          additions: commit.additions.map((file) => ({
-            path: file.path,
-            contents: Buffer.from(file.content).toString("base64"),
-          })),
-          deletions: commit.deletions.map((path) => ({ path })),
-        },
-      },
-    }
+  return (
+    (await readSiteSourceFile(site, SITE_CONFIG_FILENAME, ref, access))
+      ?.content ?? ""
   );
-  return result.createCommitOnBranch.commit.oid;
 }
 
-export async function openRepositoryPullRequest(
-  repository: SiteRepository,
-  token: string,
-  pullRequest: RepositoryPullRequestInput
-): Promise<string> {
-  const octokit = createOctokit(token);
-  const params = {
-    owner: repository.owner,
-    repo: repository.repo,
-    title: pullRequest.title,
-    head: pullRequest.head,
-    base: pullRequest.base,
-    body: pullRequest.body,
-    headers: GITHUB_API_VERSION_HEADERS,
-  };
-  try {
-    const { data } = await octokit.request("POST /repos/{owner}/{repo}/pulls", {
-      ...params,
-      draft: pullRequest.draft ?? false,
-    });
-    return data.html_url;
-  } catch (error) {
-    if (
-      !pullRequest.draft ||
-      !(error instanceof Error) ||
-      Reflect.get(error, "status") !== 422 ||
-      !/draft pull requests? (?:are |is )?not supported/i.test(error.message)
-    ) {
-      if (error instanceof Error && /no commits between/i.test(error.message)) {
-        throw new SiteInputError(
-          "No commits between this branch and the deployment branch. Save a change before opening a pull request."
-        );
-      }
-      throw error;
-    }
-    const { data } = await octokit.request(
-      "POST /repos/{owner}/{repo}/pulls",
-      params
-    );
-    return data.html_url;
+/** The published file in the form its draft codec compares against. */
+export async function readPublishedFile(
+  site: Site,
+  path: string,
+  ref = site.productionBranch,
+  access?: SiteRepositoryAccess
+): Promise<SitePublishedFile | null> {
+  if (siteDraftCodec(path).published === "content") {
+    return await readSiteSourceFile(site, path, ref, access);
   }
+  if (!access) {
+    assertSiteEditableBranch(site, ref);
+    await assertSiteContentBranch(site, ref);
+  }
+  assertEditablePath(path);
+  const { repository, token } = access ?? (await readAccess(site));
+  const sha = await readRepositoryBlobSha(repository, token, {
+    path: repositoryPath(site.rootDirectory, path),
+    ref,
+  });
+  return sha ? { sha, content: null } : null;
+}
+
+/** The draft table and filter for a site branch's pending drafts. */
+async function pendingDraftScope(
+  storage: Pick<typeof db, "select">,
+  siteId: string,
+  branch?: string
+) {
+  const [site] = await storage
+    .select({ productionBranch: sites.productionBranch })
+    .from(sites)
+    .where(eq(sites.id, siteId))
+    .limit(1);
+  if (!site) {
+    return null;
+  }
+  const activeBranch = branch ?? site.productionBranch;
+  const siteDrafts = siteDraftTable(activeBranch, site.productionBranch);
+  return {
+    siteDrafts,
+    where: and(
+      eq(siteDrafts.siteId, siteId),
+      eq(siteDrafts.branch, activeBranch),
+      pendingDrafts(siteDrafts)
+    ),
+  };
 }
 
 export async function listSiteDrafts(
@@ -296,29 +268,48 @@ export async function listSiteDrafts(
   branch?: string,
   storage: Pick<typeof db, "select"> = db
 ): Promise<SiteDraft[]> {
-  const [site] = await storage
-    .select({ productionBranch: sites.productionBranch })
-    .from(sites)
-    .where(eq(sites.id, siteId))
-    .limit(1);
-  if (!site) {
+  const scope = await pendingDraftScope(storage, siteId, branch);
+  return scope
+    ? await storage.select().from(scope.siteDrafts).where(scope.where)
+    : [];
+}
+
+/** Draft rows without their content; image drafts can be megabytes. */
+export async function listSiteDraftSummaries(
+  siteId: string,
+  branch?: string,
+  storage: Pick<typeof db, "select"> = db
+): Promise<SiteDraftSummary[]> {
+  const scope = await pendingDraftScope(storage, siteId, branch);
+  if (!scope) {
     return [];
   }
-  const activeBranch = branch ?? site.productionBranch;
-  const siteDrafts = siteDraftTable(activeBranch, site.productionBranch);
+  const { content: _content, ...columns } = getTableColumns(scope.siteDrafts);
   return await storage
+    .select(columns)
+    .from(scope.siteDrafts)
+    .where(scope.where);
+}
+
+export async function readSiteDraft(
+  site: Site,
+  path: string,
+  branch = site.productionBranch
+): Promise<SiteDraft | null> {
+  const siteDrafts = siteDraftTable(branch, site.productionBranch);
+  const [draft] = await db
     .select()
     .from(siteDrafts)
     .where(
       and(
-        eq(siteDrafts.siteId, siteId),
-        eq(siteDrafts.branch, activeBranch),
-        or(
-          isNull(siteDrafts.committedRevision),
-          sql`${siteDrafts.revision} > ${siteDrafts.committedRevision}`
-        )
+        eq(siteDrafts.siteId, site.id),
+        eq(siteDrafts.branch, branch),
+        eq(siteDrafts.path, path),
+        pendingDrafts(siteDrafts)
       )
-    );
+    )
+    .limit(1);
+  return draft ?? null;
 }
 
 async function lockSourceContext(
@@ -351,8 +342,8 @@ export async function saveSiteDraft(
   rebase = false
 ): Promise<SiteDraft> {
   assertEditablePath(input.path);
-  if (Buffer.byteLength(input.content, "utf8") > MAX_DRAFT_BYTES) {
-    throw new SiteInputError("This file is too large to edit in the browser");
+  if (!input.deleted) {
+    siteDraftCodec(input.path).assertValid(input.path, input.content);
   }
   const branch = input.branch ?? site.productionBranch;
   assertSiteEditableBranch(site, branch);
@@ -395,6 +386,10 @@ export async function saveSiteDraft(
       baseCommitSha: input.baseCommitSha,
       deleted: input.deleted ?? false,
       updatedByUserId: input.userId,
+      // Always written from here: the column has no time zone, and the
+      // database default would use the server's local time instead of UTC.
+      // Pruning uploads compares these timestamps across rows.
+      updatedAt: new Date(),
     };
     let [draft] =
       input.draftId === null
@@ -416,7 +411,6 @@ export async function saveSiteDraft(
                 ...values,
                 branch,
                 revision: sql`${siteDrafts.revision} + 1`,
-                updatedAt: new Date(),
               },
               setWhere: eq(siteDrafts.revision, siteDrafts.committedRevision),
             })
@@ -430,7 +424,6 @@ export async function saveSiteDraft(
                 ? input.baseCommitSha
                 : siteDrafts.baseCommitSha,
               revision: sql`${siteDrafts.revision} + 1`,
-              updatedAt: new Date(),
             })
             .where(
               and(
@@ -445,7 +438,7 @@ export async function saveSiteDraft(
     if (!draft && observed) {
       const access = await readAccess(site);
       const head = await getBranchHead(access.repository, access.token, branch);
-      const published = await readSiteSourceFile(
+      const published = await readPublishedFile(
         site,
         input.path,
         head.sha,
@@ -453,9 +446,7 @@ export async function saveSiteDraft(
       );
       if (
         head.sha !== observed.baseCommitSha &&
-        (observed.deleted
-          ? published === null
-          : published?.content === observed.content)
+        draftMatchesFile(observed, published)
       ) {
         [draft] = await tx
           .insert(siteDrafts)
@@ -653,7 +644,10 @@ async function validateWithDrafts(
     if (draft.deleted) {
       files.delete(draft.path);
     } else {
-      files.set(draft.path, draft.content);
+      files.set(
+        draft.path,
+        siteDraftCodec(draft.path).toValidator(draft.content)
+      );
     }
   }
   return validateSite({
@@ -725,7 +719,13 @@ export async function flushSiteDrafts(
       const { repository, token } = access;
       const head = await getBranchHead(repository, token, branch);
       await assertSiteBranchWritable(site, access, branch, head);
-      const drafts = await listSiteDrafts(site.id, branch, tx);
+      const drafts = await pruneUnreferencedUploads(
+        site,
+        branch,
+        await listSiteDrafts(site.id, branch, tx),
+        tx,
+        () => publishedConfig(site, head.sha, access)
+      );
       if (drafts.length === 0) {
         return { commitSha: head.sha, pullRequestUrl: null };
       }
@@ -756,14 +756,9 @@ export async function flushSiteDrafts(
           pending.push(draft);
           continue;
         }
-        const file = await readSiteSourceFile(
-          site,
-          draft.path,
-          headSha,
-          access
-        );
+        const file = await readPublishedFile(site, draft.path, headSha, access);
         // A previous attempt may have committed successfully before opening its PR failed.
-        if (draft.deleted ? file !== null : file?.content !== draft.content) {
+        if (!draftMatchesFile(draft, file)) {
           conflicts.push(draft.path);
         }
       }
@@ -771,6 +766,17 @@ export async function flushSiteDrafts(
         throw new SitePublishConflictError(
           conflicts,
           `Changed on GitHub since you started editing: ${conflicts.join(", ")}. Reload them and re-apply your edits.`
+        );
+      }
+      const additions = pending.filter((draft) => !draft.deleted);
+      const bytes = additions.reduce(
+        (total, draft) =>
+          total + siteDraftCodec(draft.path).byteSize(draft.content),
+        0
+      );
+      if (bytes > MAX_PUBLISH_BYTES) {
+        throw new SiteInputError(
+          `These changes are larger than ${MAX_PUBLISH_BYTES / 1024 / 1024} MB. Publish some of them separately.`
         );
       }
       const headline =
@@ -783,12 +789,10 @@ export async function flushSiteDrafts(
             branch,
             headline,
             expectedHeadOid: headSha,
-            additions: pending
-              .filter((draft) => !draft.deleted)
-              .map((draft) => ({
-                path: repositoryPath(site.rootDirectory, draft.path),
-                content: draft.content,
-              })),
+            additions: additions.map((draft) => ({
+              path: repositoryPath(site.rootDirectory, draft.path),
+              contents: siteDraftCodec(draft.path).toCommit(draft.content),
+            })),
             deletions: pending
               .filter((draft) => draft.deleted)
               .map((draft) => repositoryPath(site.rootDirectory, draft.path)),
@@ -830,7 +834,9 @@ export async function flushSiteDrafts(
         committed.files.map((file) => [file.path, file.sha])
       );
       for (const draft of drafts) {
-        if (production) {
+        // Feature branches keep committed text drafts; images would only hold
+        // megabytes the branch already has, so they go like on production.
+        if (production || isSiteImageDraftPath(draft.path)) {
           await tx
             .delete(siteDrafts)
             .where(

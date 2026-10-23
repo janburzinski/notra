@@ -2,6 +2,7 @@ import {
   SITE_BUILD_LIMITS,
   SITE_R2_KEYS,
 } from "@notra/sites-core/constants/sites";
+import { SITE_IMAGE_UPLOAD_OUTPUT_PATH } from "@notra/sites-core/constants/uploads";
 import type {
   SiteManifest,
   SiteManifestFile,
@@ -16,7 +17,14 @@ import { readTarGz } from "./tar";
 import type { PublishDeploymentFilesParams } from "./types/deployments";
 import { mapWithConcurrencyEffect } from "./utils/concurrency";
 import { contentTypeForPath } from "./utils/content-types";
+import { gitBlobSha } from "./utils/image-type";
 import { runSitesEffect } from "./utils/run-sites-effect";
+
+/** Uploads are named after their blob SHA; only trust names that match. */
+function isContentAddressed(path: string, data: Uint8Array): boolean {
+  const hash = SITE_IMAGE_UPLOAD_OUTPUT_PATH.exec(path)?.[1];
+  return Boolean(hash && gitBlobSha(data).startsWith(hash));
+}
 
 export const publishDeploymentFilesEffect = Effect.fn(
   "Sites.publishDeploymentFiles"
@@ -52,6 +60,7 @@ export const publishDeploymentFilesEffect = Effect.fn(
             catch: (error) => error,
           }),
           contentType,
+          ...(isContentAddressed(path, file.data) ? { immutable: true } : {}),
         } satisfies SiteManifestFile;
       })
   );

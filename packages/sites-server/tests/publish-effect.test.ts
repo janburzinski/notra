@@ -29,6 +29,7 @@ if (!process.env.NOTRA_SITES_PUBLISH_EFFECT_TEST_WORKER) {
     r2PutEffect: (key: string, body: Uint8Array | string) => upload(key, body),
   }));
   const { publishDeploymentFilesEffect } = await import("../src/publish");
+  const { gitBlobSha } = await import("../src/utils/image-type");
   const archive = createSiteArchive(["z.html", "a.html"]);
   const params = { ...publishFixture, archive };
   const manifestKey = SITE_R2_KEYS.manifest(
@@ -58,6 +59,31 @@ if (!process.env.NOTRA_SITES_PUBLISH_EFFECT_TEST_WORKER) {
     expect(manifest.target).toEqual(params.deployment.target);
     expect(manifest.configHash).toBe(params.deployment.configHash);
     expect(JSON.parse(storedManifest)).toEqual(manifest);
+  });
+
+  test("only uploads whose name matches their blob SHA are immutable", async () => {
+    upload = () => Effect.succeed("etag");
+    // Every file in the fixture archive holds "x".
+    const hash = gitBlobSha(Buffer.from("x")).slice(0, 10);
+    const manifest = await Effect.runPromise(
+      publishDeploymentFilesEffect({
+        ...params,
+        archive: createSiteArchive([
+          `blog/images/hero-${hash}.png`,
+          "blog/images/hero-0123456789.png",
+          "blog/index.html",
+        ]),
+      })
+    );
+    expect(
+      Object.fromEntries(
+        manifest.files.map((file) => [file.path, file.immutable ?? false])
+      )
+    ).toEqual({
+      [`/blog/images/hero-${hash}.png`]: true,
+      "/blog/images/hero-0123456789.png": false,
+      "/blog/index.html": false,
+    });
   });
 
   test("publisher failure interrupts sibling uploads before returning and never writes a manifest", async () => {

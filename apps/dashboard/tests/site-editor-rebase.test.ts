@@ -177,6 +177,7 @@ if (!process.env.NOTRA_SITE_EDITOR_REBASE_TEST_WORKER) {
     );
     client.setQueryData(readOptions(path).queryKey, {
       path,
+      encoding: "utf8",
       content: `draft:${path}`,
       published: `old:${path}`,
       blobSha: `old:${path}`,
@@ -310,6 +311,7 @@ if (!process.env.NOTRA_SITE_EDITOR_REBASE_TEST_WORKER) {
     });
     client.setQueryData(otherKey, {
       path: otherScope.path,
+      encoding: "utf8",
       content: "other",
       published: "other",
       blobSha: "other",

@@ -13,12 +13,14 @@ import {
   READY_FOR_REVIEW_MUTATION,
 } from "./constants/branches";
 import {
-  createRepositoryBranch,
   listSiteDrafts,
+  listSiteDraftSummaries,
+  publishedConfig,
   validateSiteDrafts,
 } from "./editor";
 import { SiteInputError } from "./errors";
 import { getBranchHead, siteRepositoryAccess } from "./github";
+import { createRepositoryBranch } from "./repository";
 import type {
   BranchProtectionCacheEntry,
   CreateSiteBranchInput,
@@ -45,6 +47,7 @@ import {
   assertSiteEditableBranch,
   siteEditBranchName,
 } from "./utils/site-edit-branch";
+import { pruneUnreferencedUploads } from "./utils/unreferenced-uploads";
 
 const protectionCache = new Map<string, BranchProtectionCacheEntry>();
 
@@ -249,7 +252,13 @@ export async function createSiteBranch(
     async (tx) => {
       const head = await getBranchHead(repository, token, source);
       const drafts = input.bringChanges
-        ? await listSiteDrafts(site.id, source, tx)
+        ? await pruneUnreferencedUploads(
+            site,
+            source,
+            await listSiteDrafts(site.id, source, tx),
+            tx,
+            () => publishedConfig(site, head.sha, { repository, token })
+          )
         : [];
       if (drafts.length > 0) {
         await tx.insert(siteDrafts).values(
@@ -502,7 +511,14 @@ export async function mergeSiteBranch(site: Site, branch: string) {
     site.id,
     branch,
     async (tx) => {
-      if ((await listSiteDrafts(site.id, branch, tx)).length > 0) {
+      const drafts = await pruneUnreferencedUploads(
+        site,
+        branch,
+        await listSiteDraftSummaries(site.id, branch, tx),
+        tx,
+        () => publishedConfig(site, validatedHead.sha, { repository, token })
+      );
+      if (drafts.length > 0) {
         throw new SiteInputError(
           "Wait for all branch changes to save before merging"
         );

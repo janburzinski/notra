@@ -22,15 +22,15 @@ import {
   STARTER_PULL_REQUEST_TITLE,
   STARTER_USER_AGENT,
 } from "./constants/starter";
+import { SiteInputError } from "./errors";
+import { getBranchHead, getDefaultBranch, siteRepositoryToken } from "./github";
+import { requireOrganizationRepository } from "./repositories";
 import {
   commitRepositoryFiles,
   createRepositoryBranch,
   openRepositoryPullRequest,
   readRepositoryFile,
-} from "./editor";
-import { SiteInputError } from "./errors";
-import { getBranchHead, getDefaultBranch, siteRepositoryToken } from "./github";
-import { requireOrganizationRepository } from "./repositories";
+} from "./repository";
 import type { SiteRepository, SiteRepositoryPermissions } from "./types/github";
 import type {
   LandingPageFacts,
@@ -308,7 +308,7 @@ export async function createSiteStarter(
     .filter((_, index) => existing[index] === null)
     .map((file) => ({
       path: repositoryPath(rootDirectory, file.path),
-      content: file.content,
+      contents: Buffer.from(file.content).toString("base64"),
     }));
 
   const starterBranch = timestampedBranchName(STARTER_BRANCH_PREFIX, now);

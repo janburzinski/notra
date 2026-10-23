@@ -32,6 +32,8 @@ export const siteManifestFileSchema = z.object({
   size: z.number().int().nonnegative(),
   sha256: z.string().length(64),
   contentType: z.string(),
+  /** Content-hashed name: the bytes at this path can never change. */
+  immutable: z.boolean().optional(),
 });
 
 export const siteRedirectRuleSchema = z.object({

@@ -3,7 +3,7 @@ import { siteIntegrationsSchema } from "@notra/sites-core/schemas/site-integrati
 
 import {
   discardSiteDraft,
-  listSiteDrafts,
+  readSiteDraft,
   readSiteSourceFile,
   saveSiteDraft,
 } from "./editor";
@@ -22,11 +22,10 @@ import {
 import { siteSourceContext } from "./utils/source-context";
 
 async function currentConfig(site: Site, branch = site.productionBranch) {
-  const [file, drafts] = await Promise.all([
+  const [file, draft] = await Promise.all([
     readSiteSourceFile(site, SITE_CONFIG_FILENAME, branch),
-    listSiteDrafts(site.id, branch),
+    readSiteDraft(site, SITE_CONFIG_FILENAME, branch),
   ]);
-  const draft = drafts.find((entry) => entry.path === SITE_CONFIG_FILENAME);
   const content =
     draft && !draft.deleted
       ? draft.content

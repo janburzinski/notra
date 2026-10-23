@@ -1,4 +1,5 @@
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
+import type { SiteImageUploadKind } from "@notra/sites-core/types/uploads";
 import { useBlocker } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -8,6 +9,8 @@ import { useSiteBranchControls } from "@/lib/hooks/use-site-branch-controls";
 import { useSiteDraftSaves } from "@/lib/hooks/use-site-draft-saves";
 import { useSiteWorkingBranch } from "@/lib/hooks/use-site-working-branch";
 import { useWarnBeforeUnload } from "@/lib/hooks/use-warn-before-unload";
+import { readFileAsDataUrl } from "@/lib/onboarding/logo-file";
+import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SiteRawConfig } from "@/types/site-design";
 import type { SiteVariableRow } from "@/types/site-variables";
 import type { SiteWorkspaceReadyProps } from "@/types/site-workspace";
@@ -143,6 +146,29 @@ export function useSiteWorkspaceState({
       sourceContext: snapshot.sourceContext,
     });
   };
+  /** Saves the image as a draft in public/images and returns its site path. */
+  const uploadImage = async (
+    file: File,
+    kind: SiteImageUploadKind
+  ): Promise<string> => {
+    const dataUrl = await readFileAsDataUrl(file);
+    const result = await dashboardOrpc.sites.editor.uploadImage.call({
+      ...scope,
+      fileName: file.name,
+      kind,
+      data: dataUrl.slice(dataUrl.indexOf(",") + 1),
+      baseCommitSha: files.commitSha,
+      sourceContext: snapshot.sourceContext,
+    });
+    if (result.draft) {
+      onDraftChange(
+        result.draft.path,
+        new Date(result.draft.updatedAt),
+        result.draft
+      );
+    }
+    return result.path;
+  };
   const updateVariables = (rows: SiteVariableRow[]) => {
     if (readOnly) {
       return;
@@ -219,6 +245,7 @@ export function useSiteWorkspaceState({
     resolveConflict,
     scope,
     files,
+    uploadImage,
     document,
     resetPublished: () => {
       saves.resetClean([SITE_CONFIG_FILENAME]);

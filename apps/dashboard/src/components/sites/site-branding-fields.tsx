@@ -22,6 +22,7 @@ export function SiteBrandingFields({
         dark={form.logoDark}
         description={t("logoHint")}
         id="site-logo"
+        kind="logo"
         light={form.logoLight}
         onDarkChange={(value) => update("logoDark", value)}
         onLightChange={(value) => update("logoLight", value)}
@@ -52,6 +53,7 @@ export function SiteBrandingFields({
         dark={form.faviconDark}
         description={t("faviconHint")}
         id="site-favicon"
+        kind="favicon"
         light={form.faviconLight}
         onDarkChange={(value) => update("faviconDark", value)}
         onLightChange={(value) => update("faviconLight", value)}

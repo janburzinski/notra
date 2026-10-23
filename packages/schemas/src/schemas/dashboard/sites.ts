@@ -2,6 +2,10 @@ import {
   SITE_PREVIEW_PASSWORD_MAX_LENGTH,
   SITE_PREVIEW_PASSWORD_MIN_LENGTH,
 } from "@notra/sites-core/constants/sites";
+import {
+  SITE_IMAGE_UPLOAD_KINDS,
+  SITE_IMAGE_UPLOAD_MAX_BYTES,
+} from "@notra/sites-core/constants/uploads";
 import { siteIntegrationUpdateSchema } from "@notra/sites-core/schemas/site-integrations";
 import { isValidGitBranch } from "@notra/sites-core/utils/git-branch";
 import z from "zod";
@@ -228,6 +232,18 @@ export const saveSiteDraftInputSchema = siteDraftMutationInputSchema.extend({
   baseBlobSha: z.string().nullable(),
   baseCommitSha: z.string().nullable(),
   deleted: z.boolean().optional(),
+});
+
+export const uploadSiteImageInputSchema = siteEditorScopeInputSchema.extend({
+  fileName: z.string().trim().min(1).max(200),
+  kind: z.enum(SITE_IMAGE_UPLOAD_KINDS),
+  /** Base64 file bytes; the server checks the decoded size and type. */
+  data: z
+    .string()
+    .min(1)
+    .max(Math.ceil((SITE_IMAGE_UPLOAD_MAX_BYTES * 4) / 3) + 4),
+  baseCommitSha: z.string().nullable(),
+  sourceContext: siteDraftMutationInputSchema.shape.sourceContext,
 });
 
 export const publishSiteDraftsInputSchema = siteEditorScopeInputSchema.extend({

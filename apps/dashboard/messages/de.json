@@ -8457,6 +8457,16 @@
       "brandHint": "Logo, Farben und Schriften aus der Brand Identity dieses Projekts übernehmen.",
       "applyBrand": "Brand Identity übernehmen",
       "pickColor": "Farbe für {name} wählen",
+      "asset": {
+        "upload": "Hochladen",
+        "uploadLabel": "{label} hochladen",
+        "uploading": "Wird hochgeladen…",
+        "tooLarge": "Bilder dürfen höchstens {size} MB groß sein.",
+        "notImage": "Wähle ein PNG-, JPEG-, WebP-, AVIF-, GIF-, SVG- oder ICO-Bild.",
+        "uploadAbandoned": "Du hast das Feld verlassen, bevor das Bild fertig hochgeladen war. Es wurde nicht übernommen, lade es erneut hoch.",
+        "uploadFailed": "Das Bild konnte nicht hochgeladen werden.",
+        "uploaded": "Bild hochgeladen. Es geht mit dem nächsten Veröffentlichen live."
+      },
       "lightMode": "{title} im Light Mode",
       "darkMode": "{title} im Dark Mode",
       "appearances": {

@@ -18,7 +18,7 @@ function fileCacheControl(file: SiteManifestFile, isPreview: boolean): string {
   if (isPreview) {
     return PREVIEW_CACHE_CONTROL;
   }
-  return file.path.includes(ASSET_SEGMENT)
+  return file.immutable || file.path.includes(ASSET_SEGMENT)
     ? IMMUTABLE_CACHE_CONTROL
     : REVALIDATE_CACHE_CONTROL;
 }
@@ -29,7 +29,9 @@ async function readFileBody(
   deploymentId: string,
   file: SiteManifestFile
 ): Promise<ReadableStream | null> {
-  const cacheKey = `${EDGE_CACHE_ORIGIN}/${siteId}/${deploymentId}${file.path}`;
+  // Keyed by content, so files a redeploy or another area didn't change stay
+  // warm. The site ID keeps tenants from probing each other's cache.
+  const cacheKey = `${EDGE_CACHE_ORIGIN}/${siteId}/${file.sha256}`;
   const cached = await deps.cache?.match(cacheKey);
   if (cached?.body) {
     return cached.body;

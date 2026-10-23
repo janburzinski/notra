@@ -58,3 +58,53 @@ describe("content security policy", () => {
     expect(page.headers.get("Content-Security-Policy")).toBeNull();
   });
 });
+
+describe("caching", () => {
+  test("content-hashed uploads are immutable, other public files revalidate", async () => {
+    const image = file("/blog/images/hero-0123456789.webp", "image/webp");
+    expect(
+      (await serve({ ...image, immutable: true })).headers.get("Cache-Control")
+    ).toBe("public, max-age=31536000, immutable");
+    expect((await serve(image)).headers.get("Cache-Control")).toBe(
+      "public, max-age=0, must-revalidate"
+    );
+  });
+
+  test("the edge cache is keyed by content, so redeploys reuse it", async () => {
+    const stored = new Map<string, Response>();
+    let reads = 0;
+    const cachingDeps = {
+      bucket: {
+        get: async () => {
+          reads += 1;
+          return { body: new Response("body").body };
+        },
+      },
+      cache: {
+        match: async (key: string) => stored.get(key)?.clone(),
+        put: async (key: string, response: Response) => {
+          stored.set(key, new Response(await response.text(), response));
+        },
+      },
+      waitUntil: (promise: Promise<unknown>) => promise,
+    } as unknown as SitesDeps;
+    const pending: Promise<unknown>[] = [];
+    const request = (deploymentId: string, path: string) =>
+      serveFile({
+        deps: {
+          ...cachingDeps,
+          waitUntil: (promise: Promise<unknown>) => pending.push(promise),
+        },
+        request: new Request(`https://acme.notra.site${path}`),
+        siteId: "site_a",
+        deploymentId,
+        file: file(path, "image/webp"),
+        status: 200,
+        isPreview: false,
+      }).then((response) => response.text());
+    expect(await request("dep_a", "/blog/images/a.webp")).toBe("body");
+    await Promise.all(pending);
+    expect(await request("dep_b", "/changelog/images/a.webp")).toBe("body");
+    expect(reads).toBe(1);
+  });
+});

@@ -8457,6 +8457,16 @@
       "brandHint": "Use the logo, colors and fonts from this project's brand identity.",
       "applyBrand": "Use brand identity",
       "pickColor": "Pick a color for {name}",
+      "asset": {
+        "upload": "Upload",
+        "uploadLabel": "Upload {label}",
+        "uploading": "Uploading…",
+        "tooLarge": "Images can be at most {size} MB.",
+        "notImage": "Choose a PNG, JPEG, WebP, AVIF, GIF, SVG or ICO image.",
+        "uploadAbandoned": "You left the field before the image finished uploading, so it wasn't applied. Upload it again.",
+        "uploadFailed": "Couldn't upload the image.",
+        "uploaded": "Image uploaded. It goes live when you publish."
+      },
       "lightMode": "{title} in light mode",
       "darkMode": "{title} in dark mode",
       "appearances": {

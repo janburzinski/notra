@@ -13,6 +13,7 @@ import type { SiteSeparateAssetRowsProps } from "@/types/site-design";
 /** One image for both modes, or a light and a dark one when split. */
 export function SiteSeparateAssetRows({
   id,
+  kind,
   title,
   description,
   separateLabel,
@@ -28,19 +29,14 @@ export function SiteSeparateAssetRows({
   return (
     <>
       <SiteSettingsItem
-        errorPath={
-          id === "site-logo"
-            ? "logo"
-            : id === "site-favicon"
-              ? "favicon"
-              : "background.image"
-        }
+        errorPath={kind === "background" ? "background.image" : kind}
         description={description}
         icon={Sun03Icon}
         title={separate ? t("lightMode", { title }) : title}
         value={
           <SiteAssetField
             id={`${id}-light`}
+            kind={kind}
             label={title}
             onChange={onLightChange}
             placeholder={placeholder}
@@ -55,6 +51,7 @@ export function SiteSeparateAssetRows({
           value={
             <SiteAssetField
               id={`${id}-dark`}
+              kind={kind}
               label={t("darkMode", { title })}
               onChange={onDarkChange}
               placeholder={placeholder}

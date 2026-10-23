@@ -1,6 +1,10 @@
 "use client";
 
-import { ArrowRight01Icon, File01Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowRight01Icon,
+  File01Icon,
+  Image01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Collapsible,
@@ -28,16 +32,17 @@ export function SitePublishChange({
   const t = useTranslations("sites.publish.changesList");
   const tEditor = useTranslations("sites.drafts");
   const writing = useTranslations("sites.writing");
-  const { readQuery, highlighterReady, fileDiff, counts } = useSitePublishDiff({
-    organizationId,
-    siteId,
-    branch,
-    path,
-    change,
-    defaultOpen,
-  });
+  const { readQuery, highlighterReady, fileDiff, counts, binary, image } =
+    useSitePublishDiff({
+      organizationId,
+      siteId,
+      branch,
+      path,
+      change,
+      defaultOpen,
+    });
   let diff: ReactNode;
-  if (readQuery.isPending || !highlighterReady) {
+  if (readQuery.isPending || (!binary && !highlighterReady)) {
     diff = (
       <div aria-busy="true" className="space-y-2.5 px-4 py-3">
         <Skeleton className="h-3 w-2/3" />
@@ -50,6 +55,16 @@ export function SitePublishChange({
         {toErrorMessage(readQuery.error, tEditor("loadFailed"))}
       </p>
     );
+  } else if (binary) {
+    diff = image ? (
+      <div className="bg-muted/40 flex justify-center p-3">
+        <img
+          alt=""
+          className="max-h-60 max-w-full rounded-md object-contain outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10"
+          src={image}
+        />
+      </div>
+    ) : null;
   } else {
     diff = fileDiff ? <SiteFileDiff fileDiff={fileDiff} /> : null;
   }
@@ -67,7 +82,7 @@ export function SitePublishChange({
         <HugeiconsIcon
           aria-hidden="true"
           className="text-muted-foreground shrink-0"
-          icon={File01Icon}
+          icon={binary ? Image01Icon : File01Icon}
           size={15}
           strokeWidth={1.5}
         />

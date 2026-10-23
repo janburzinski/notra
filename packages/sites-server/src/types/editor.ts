@@ -1,6 +1,7 @@
 import type { siteDrafts } from "@notra/db/schema";
 
 export type SiteDraft = typeof siteDrafts.$inferSelect;
+export type SiteDraftSummary = Omit<SiteDraft, "content">;
 
 export interface SiteSourceEntry {
   path: string;
@@ -23,6 +24,24 @@ export interface RepositoryFileRef {
   ref: string;
 }
 
+/** A published file as a draft compares against it; binaries only read their SHA. */
+export interface SitePublishedFile {
+  sha: string;
+  content: string | null;
+}
+
+export interface SiteDraftCodec {
+  /** Whether comparing needs the published content or only its blob SHA. */
+  published: "content" | "sha";
+  assertValid(path: string, content: string): void;
+  /** Whether the published file already holds this content. */
+  matches(content: string, file: SitePublishedFile): boolean;
+  /** Base64 for GitHub's createCommitOnBranch. */
+  toCommit(content: string): string;
+  toValidator(content: string): string | null;
+  byteSize(content: string): number;
+}
+
 export interface RepositoryBranchInput {
   name: string;
   sha: string;
@@ -42,6 +61,15 @@ export interface SaveSiteDraftInput {
   userId: string;
   draftId: string | null;
   draftRevision: number | null;
+  sourceContext: SiteEditorSourceContext;
+}
+
+export interface SaveSiteImageDraftInput {
+  branch?: string;
+  fileName: string;
+  bytes: Uint8Array;
+  baseCommitSha: string | null;
+  userId: string;
   sourceContext: SiteEditorSourceContext;
 }
 
@@ -75,7 +103,8 @@ export interface RepositoryCommitInput {
   branch: string;
   headline: string;
   expectedHeadOid: string;
-  additions: Array<{ path: string; content: string }>;
+  /** `contents` is base64, as createCommitOnBranch expects. */
+  additions: Array<{ path: string; contents: string }>;
   deletions: string[];
 }
 

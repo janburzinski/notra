@@ -60,6 +60,7 @@ function record(scope: SiteScope) {
     value = {
       document: {
         path: "blog.json",
+        encoding: "utf8" as const,
         content,
         published: content,
         blobSha: "blob-1",

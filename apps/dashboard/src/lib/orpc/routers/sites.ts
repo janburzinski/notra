@@ -50,6 +50,7 @@ import {
   siteStarterInputSchema,
   updatePostPreviewAccessInputSchema,
   updateSiteInputSchema,
+  uploadSiteImageInputSchema,
   connectSiteInthProjectInputSchema,
 } from "@notra/schemas/dashboard/sites";
 import {
@@ -59,6 +60,7 @@ import {
 import type { SiteServingState } from "@notra/sites-core/types/deployment";
 import { hashBuildTarget } from "@notra/sites-core/utils/build-target";
 import { postPreviewKey } from "@notra/sites-core/utils/hosts";
+import { isSiteImageDraftPath } from "@notra/sites-core/utils/image-drafts";
 import {
   createSiteBranch,
   discardDeletedSiteBranchDrafts,
@@ -91,10 +93,10 @@ import {
 import {
   flushSiteDrafts,
   discardSiteDraft,
-  listSiteDrafts,
   listSiteSourceFiles,
   publishSiteDrafts,
-  readSiteSourceFile,
+  readPublishedFile,
+  readSiteDraft,
   rebaseSiteDraft,
   saveSiteDraft,
   validateSiteDrafts,
@@ -111,6 +113,10 @@ import {
   getSiteRepositoryOverview,
   siteRepositoryAccess,
 } from "@notra/sites-server/github";
+import {
+  listPendingSiteDraftSummaries,
+  saveSiteImageDraft,
+} from "@notra/sites-server/image-drafts";
 import {
   readSiteIntegrations,
   saveSiteIntegration,
@@ -162,10 +168,12 @@ import {
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { afterResponse } from "@/lib/framework/after-response";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
+import { getTranslations } from "@/lib/i18n/server";
 import { authorizedProcedure } from "@/lib/orpc/base";
 import { runOrpcEffect } from "@/lib/orpc/effect";
 import {
   assertNotDemo,
+  badRequest,
   forbidden,
   notFound,
   serviceUnavailable,
@@ -193,6 +201,7 @@ import {
   serializePreviews,
   serializeSite,
 } from "@/lib/sites/serialize";
+import { SvgSanitizationError } from "@/lib/upload/sanitize-svg";
 import type { SiteScope } from "@/types/sites";
 import type {
   CreateSitesResult,
@@ -201,6 +210,10 @@ import type {
   SiteRequestContext,
 } from "@/types/sites-server";
 import { toGitHubOperationOrpcError } from "@/utils/github-operation-error";
+import {
+  prepareSiteImage,
+  SiteImageInputError,
+} from "@/utils/prepare-site-image";
 import {
   canUndoSiteRollback,
   siteDeploymentActions,
@@ -493,10 +506,10 @@ export const sitesRouter = {
     .input(siteScopeInputSchema)
     .handler(async ({ context, input }) => {
       const { site, canManageDeployments } = await requireSite(context, input);
-      const [domains, state, drafts] = await Promise.all([
+      const [domains, state, draftCount] = await Promise.all([
         db.select().from(siteDomains).where(eq(siteDomains.siteId, site.id)),
         servingState(site.id),
-        listSiteDrafts(site.id),
+        listPendingSiteDraftSummaries(site).then((drafts) => drafts.length),
       ]);
       const live = liveDeploymentsFromState(state);
       const deployments = await listSiteDeployments(
@@ -515,7 +528,7 @@ export const sitesRouter = {
           canManageDeployments
         )),
         previews: serializePreviews(site, state, deployments),
-        draftCount: drafts.length,
+        draftCount,
       };
     }),
 
@@ -1016,7 +1029,7 @@ export const sitesRouter = {
         const { site } = await requireSite(context, input);
         const [source, drafts] = await Promise.all([
           listSiteSourceFiles(site, input.branch),
-          listSiteDrafts(site.id, input.branch ?? site.productionBranch),
+          listPendingSiteDraftSummaries(site, input.branch),
         ]);
         const files = [...source.files];
         if (!files.some((file) => file.path === SITE_CONFIG_FILENAME)) {
@@ -1047,14 +1060,16 @@ export const sitesRouter = {
       .input(siteFilePathInputSchema)
       .handler(async ({ context, input }) => {
         const { site } = await requireSite(context, input);
-        const [file, drafts] = await Promise.all([
-          readSiteSourceFile(site, input.path, input.branch),
-          listSiteDrafts(site.id, input.branch ?? site.productionBranch),
+        const [file, draft] = await Promise.all([
+          readPublishedFile(site, input.path, input.branch),
+          readSiteDraft(site, input.path, input.branch),
         ]);
-        const draft =
-          drafts.find((candidate) => candidate.path === input.path) ?? null;
         return {
           path: input.path,
+          // Image drafts are base64; published images are only read by SHA.
+          encoding: isSiteImageDraftPath(input.path)
+            ? ("base64" as const)
+            : ("utf8" as const),
           content:
             draft && !draft.deleted
               ? draft.content
@@ -1076,6 +1091,10 @@ export const sitesRouter = {
       .input(saveSiteDraftInputSchema)
       .handler(async ({ context, input }) => {
         assertNotDemo();
+        // Images only arrive through uploadImage, which sniffs and sanitizes them.
+        if (isSiteImageDraftPath(input.path) && !input.deleted) {
+          throw badRequest("Upload images instead of saving them as drafts");
+        }
         const { site, userId } = await requireSite(context, input);
         const draft = await saveSiteDraft(site, {
           branch: input.branch,
@@ -1094,6 +1113,50 @@ export const sitesRouter = {
           updatedAt: draft.updatedAt,
           draftId: draft.id,
           draftRevision: draft.revision,
+        };
+      }),
+
+    uploadImage: sitesProcedure
+      .input(uploadSiteImageInputSchema)
+      .handler(async ({ context, input }) => {
+        assertNotDemo();
+        const { site, userId } = await requireSite(context, input);
+        let bytes: Uint8Array;
+        try {
+          bytes = await prepareSiteImage(
+            Buffer.from(input.data, "base64"),
+            input.kind
+          );
+        } catch (error) {
+          if (error instanceof SvgSanitizationError) {
+            const tErrors = await getTranslations("errors.upload");
+            throw badRequest(tErrors("svgInvalid"));
+          }
+          if (error instanceof SiteImageInputError) {
+            throw badRequest(error.message);
+          }
+          throw error;
+        }
+        const { path, draft } = await saveSiteImageDraft(site, {
+          branch: input.branch,
+          fileName: input.fileName,
+          bytes,
+          baseCommitSha: input.baseCommitSha,
+          sourceContext: input.sourceContext,
+          userId,
+        });
+        return {
+          path,
+          draft: draft
+            ? {
+                path: draft.path,
+                updatedAt: draft.updatedAt,
+                draftId: draft.id,
+                draftRevision: draft.revision,
+                deleted: draft.deleted,
+                baseBlobSha: draft.baseBlobSha,
+              }
+            : null,
         };
       }),
 

@@ -13,3 +13,5 @@ export const PULL_REQUEST_RULE_TYPES: ReadonlySet<string> = new Set([
 ]);
 /** Markdown plus images for one post; matches the GitHub publish asset budget. */
 export const MAX_POST_PREVIEW_BYTES = 12 * 1024 * 1024;
+/** GitHub's createCommitOnBranch rejects payloads around 20 MB. */
+export const MAX_PUBLISH_BYTES = 12 * 1024 * 1024;

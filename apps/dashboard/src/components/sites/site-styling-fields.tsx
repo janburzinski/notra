@@ -139,6 +139,7 @@ export function SiteStylingFields({
           dark={form.backgroundImageDark}
           description={t("backgroundImageHint")}
           id="site-background-image"
+          kind="background"
           light={form.backgroundImageLight}
           onDarkChange={(value) => update("backgroundImageDark", value)}
           onLightChange={(value) => update("backgroundImageLight", value)}

@@ -413,6 +413,25 @@ if (!databaseUrl) {
       )
     ).toHaveLength(2);
   });
+  test("feature commits drop committed image drafts but keep committed text drafts", async () => {
+    const branch = "notra/site-edit-image";
+    fake.state.branches.set(branch, "initial");
+    await editor.saveSiteDraft(site, {
+      ...input(branch),
+      path: "public/images/logo.png",
+      // 1×1 transparent PNG.
+      content:
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+      baseBlobSha: null,
+    });
+    await save(branch);
+    await flush(branch);
+    const rows = await db
+      .select({ path: siteBranchDrafts.path })
+      .from(siteBranchDrafts)
+      .where(eq(siteBranchDrafts.branch, branch));
+    expect(rows.map((row) => row.path)).toEqual(["blog.json"]);
+  });
   test("PR creation failure keeps drafts and retries without duplicating the commit", async () => {
     const branch = "notra/site-edit-retry";
     fake.state.branches.set(branch, "initial");
