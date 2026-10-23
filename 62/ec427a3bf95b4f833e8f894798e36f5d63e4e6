@@ -1,0 +1,26 @@
+apps/dashboard/src/components/geo/what-changed-card.tsx
+  s_828ba004165813::t_40e1e7c9cd2fa2 434-435
+.gitignore
+  s_828ba004165813::t_b942c5c92b0ba4 59-61
+apps/dashboard/src/components/settings/panes/billing-pane.tsx
+  s_828ba004165813::t_d145d082032802 37,93,176-177
+scripts/performance/layout-shift.mjs
+  s_828ba004165813::t_d66f6cdf62a79c 61-62
+  s_828ba004165813::t_0338a43f7c8aa3 242-245
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "62ec427a3bf95b4f833e8f894798e36f5d63e4e6",
+  "prompts": {},
+  "sessions": {
+    "s_828ba004165813": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1395a824-0112-4dac-824b-1b9f2a32f29e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
