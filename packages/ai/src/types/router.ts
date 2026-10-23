@@ -165,7 +165,10 @@ export interface GatewayAdapter {
     providerMetadata: SharedV4ProviderMetadata | undefined,
     servedModelId?: string
   ): GatewayRouteMetadata & Pick<Partial<RouteMetadata>, "generationId">;
-  lookupRouteMetadata?(generationId: string): Promise<GatewayRouteMetadata>;
+  lookupRouteMetadata?(
+    generationId: string,
+    signal?: AbortSignal
+  ): Promise<GatewayRouteMetadata>;
 }
 
 export interface BuildProviderOptionsInput {
@@ -308,7 +311,10 @@ export interface ModelRouter {
   getRouteMetadata(
     providerMetadata: SharedV4ProviderMetadata | undefined
   ): RouteMetadata | undefined;
-  enrichRouteMetadata(metadata: RouteMetadata): Promise<RouteMetadata>;
+  enrichRouteMetadata(
+    metadata: RouteMetadata,
+    signal?: AbortSignal
+  ): Promise<RouteMetadata>;
   readonly adapters: Partial<Record<GatewayId, GatewayAdapter>>;
   readonly policy: RouterPolicyConfig;
 }

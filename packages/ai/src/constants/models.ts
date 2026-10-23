@@ -1,4 +1,5 @@
 export const AGENT_DEFAULT_MODEL = "anthropic/claude-sonnet-5";
+export const OG_DESIGN_MODEL = "anthropic/claude-opus-5.5";
 export const UTILITY_MODEL_ID = "openai/gpt-6-luna";
 export const CONTENT_AGENT_MODEL = "openai/gpt-6-luna";
 

@@ -92,6 +92,7 @@ export default defineConfig(({ mode }) => {
         "@ai-sdk/code-mode",
         "run",
         "sharp",
+        "wawoff2",
       ],
     },
   };

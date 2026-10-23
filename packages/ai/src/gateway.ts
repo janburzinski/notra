@@ -149,7 +149,8 @@ export function getRouteMetadata(
 }
 
 export function enrichRouteMetadata(
-  metadata: RouteMetadata
+  metadata: RouteMetadata,
+  signal?: AbortSignal
 ): Promise<RouteMetadata> {
-  return getModelRouter().enrichRouteMetadata(metadata);
+  return getModelRouter().enrichRouteMetadata(metadata, signal);
 }

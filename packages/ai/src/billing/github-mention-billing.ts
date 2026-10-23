@@ -12,7 +12,7 @@ import { calculateAiCreditCostCents } from "./ai-credit-cost";
 import { allowUnmeteredAiInDevelopment, autumn } from "./autumn";
 import { checkAutumnFeature, finalizeAutumnLock } from "./autumn-locks";
 import { FEATURES } from "./features";
-import { shouldApplyMarkup } from "./token-pricing";
+import { shouldApplyMarkup, calculateTokenCostUsd } from "./token-pricing";
 
 const UNMETERED_RESERVATION: GitHubMentionBillingReservation = {
   allowed: true,
@@ -29,7 +29,13 @@ export function createGitHubMentionUsageCollector() {
   return {
     add(next: AgentTokenUsage) {
       const previousCost = usage?.tokenCostUsd ?? usage?.totalUsd;
-      const nextCost = next.tokenCostUsd ?? next.totalUsd;
+      const nextModel = next.route?.model ?? next.modelId;
+      const nextCost =
+        next.totalUsd ??
+        next.tokenCostUsd ??
+        (nextModel
+          ? calculateTokenCostUsd(next, nextModel, next.route?.gateway)
+          : undefined);
       const totalCost =
         previousCost === undefined || nextCost === undefined
           ? undefined
@@ -56,7 +62,7 @@ export function createGitHubMentionUsageCollector() {
             totalUsd: totalCost,
             route: next.route ?? usage.route,
           }
-        : { ...next };
+        : { ...next, tokenCostUsd: nextCost, totalUsd: nextCost };
     },
     get(): AgentTokenUsage | null {
       return usage;

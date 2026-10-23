@@ -21,6 +21,7 @@ import {
   type PgTableExtraConfigValue,
   boolean,
   check,
+  doublePrecision,
   foreignKey,
   index,
   integer,
@@ -101,6 +102,7 @@ import {
 } from "./types/geo-scan";
 import type { GeoContentBriefJson } from "./types/geo-writer";
 import type { GoogleSearchConsoleQuery } from "./types/google-search-console";
+import type { OgDesignRunStatus, OgDesignCallStatus } from "./types/og-image";
 import type { PostGitHubPublish } from "./types/post-github-publish";
 import type { PostHistoryMetadata } from "./types/post-history";
 import type { PostCoverImage } from "./types/post-metadata";
@@ -1199,6 +1201,73 @@ export const brandGuidelines = pgTable(
     ),
     index("brandGuidelines_status_idx").on(table.status),
   ]
+);
+
+export const brandOgTemplates = pgTable("brand_og_templates", {
+  brandSettingsId: text("brand_settings_id")
+    .primaryKey()
+    .references(() => brandSettings.id, { onDelete: "cascade" }),
+  sourceHash: text("source_hash").notNull(),
+  document: jsonb("document").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const brandOgDesignRuns = pgTable(
+  "brand_og_design_runs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    brandSettingsId: text("brand_settings_id")
+      .notNull()
+      .references(() => brandSettings.id, { onDelete: "cascade" }),
+    sourceHash: text("source_hash").notNull(),
+    status: text("status")
+      .$type<OgDesignRunStatus>()
+      .notNull()
+      .default("running"),
+    leaseExpiresAt: timestamp("lease_expires_at").notNull(),
+    retryAfter: timestamp("retry_after"),
+    error: text("error"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    finishedAt: timestamp("finished_at"),
+  },
+  (table) => [
+    uniqueIndex("brandOgDesignRuns_active_uidx")
+      .on(table.brandSettingsId)
+      .where(sql`${table.status} = 'running'`),
+    index("brandOgDesignRuns_brand_hash_idx").on(
+      table.brandSettingsId,
+      table.sourceHash
+    ),
+  ]
+);
+
+export const brandOgDesignCalls = pgTable(
+  "brand_og_design_calls",
+  {
+    id: text("id").primaryKey(),
+    runId: text("run_id")
+      .notNull()
+      .references(() => brandOgDesignRuns.id, { onDelete: "cascade" }),
+    stage: text("stage").notNull(),
+    requestedModel: text("requested_model").notNull(),
+    status: text("status")
+      .$type<OgDesignCallStatus>()
+      .notNull()
+      .default("running"),
+    usage: jsonb("usage"),
+    route: jsonb("route"),
+    estimatedCostUsd: doublePrecision("estimated_cost_usd"),
+    reportedCostUsd: doublePrecision("reported_cost_usd"),
+    costCheckedAt: timestamp("cost_checked_at"),
+    error: text("error"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    finishedAt: timestamp("finished_at"),
+  },
+  (table) => [index("brandOgDesignCalls_run_idx").on(table.runId)]
 );
 
 export const brandGuidelineColors = pgTable(

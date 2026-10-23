@@ -79,7 +79,7 @@ export function createVercelAdapter(
         ...(model ? { model: fromVercelServedModelId(model) } : {}),
       };
     },
-    async lookupRouteMetadata(generationId) {
+    async lookupRouteMetadata(generationId, signal) {
       const generation = await createGateway({
         apiKey: config.apiKey,
         headers: config.headers,
@@ -93,6 +93,7 @@ export function createVercelAdapter(
               signal: AbortSignal.any([
                 AbortSignal.timeout(3000),
                 ...(init?.signal ? [init.signal] : []),
+                ...(signal ? [signal] : []),
               ]),
             });
             if (response.status !== 404 || attempt === 9) {
@@ -100,7 +101,7 @@ export function createVercelAdapter(
             }
             await response.body?.cancel();
             await delay(2000, undefined, {
-              signal: init?.signal ?? undefined,
+              signal: signal ?? init?.signal ?? undefined,
             });
           }
         },

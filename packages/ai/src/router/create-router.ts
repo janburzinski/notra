@@ -189,14 +189,15 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
       const value = providerMetadata?.[ROUTER_METADATA_KEY];
       return isRouteMetadata(value) ? value : undefined;
     },
-    async enrichRouteMetadata(metadata) {
+    async enrichRouteMetadata(metadata, signal) {
       const adapter = config.adapters[metadata.gateway];
       if (!metadata.generationId || !adapter?.lookupRouteMetadata) {
         return metadata;
       }
       try {
         const enriched = await adapter.lookupRouteMetadata(
-          metadata.generationId
+          metadata.generationId,
+          signal
         );
         try {
           if (enriched.costUsd !== undefined) {

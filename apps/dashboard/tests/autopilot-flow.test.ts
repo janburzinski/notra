@@ -349,7 +349,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   mock.module("@/lib/autopilot/hero-image", () => ({
     renderPostHeroImage: async () => {
       if (state.renderHero) {
-        return "c2FuZGJveA==";
+        return {
+          pngBase64: "c2FuZGJveA==",
+          templateSource: "cached",
+          warnings: [],
+        };
       }
       throw new Error("No external image service in the sandbox");
     },

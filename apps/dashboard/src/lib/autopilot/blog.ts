@@ -389,6 +389,7 @@ async function writeBlogPullRequest(params: {
     content: post.content,
     sample: sample ?? null,
     location: imageLocation,
+    onUsage: params.onUsage,
   });
   if (!(await sourcePullRequestAllowsPost(claim))) {
     return null;
@@ -446,14 +447,15 @@ async function buildHeroImage(params: {
   content: string;
   sample: string | null;
   location: { path: string; url: string };
+  onUsage?: (usage: AgentTokenUsage) => void;
 }) {
   try {
     const startedAt = Date.now();
-    const pngBase64 = await renderPostHeroImage({
+    const image = await renderPostHeroImage({
       title: params.title,
-      brandName: params.ctx.brand?.name ?? "",
-      websiteUrl: params.ctx.brand?.websiteUrl ?? null,
-      brandSettingsId: params.ctx.brand?.settingsId ?? null,
+      organizationId: params.ctx.organizationId,
+      brandIdentityId: params.ctx.brand?.settingsId,
+      onUsage: params.onUsage,
     });
     const fields = imageFrontmatterFields(params.sample);
     const content = setFrontmatterFields(params.content, {
@@ -464,12 +466,14 @@ async function buildHeroImage(params: {
       path: params.location.path,
       field: fields.image,
       durationMs: Date.now() - startedAt,
+      templateSource: image.templateSource,
+      warnings: image.warnings,
     });
     return {
       content,
       file: {
         path: params.location.path,
-        contents: pngBase64,
+        contents: image.pngBase64,
         encoding: "base64" as const,
       },
     };

@@ -29,11 +29,13 @@ export default defineConfig({
     // makes the builder glob and scan every source file on each dev start.
     dirs: ["src/workflows", "src/lib/workflows"],
     runtime: "nodejs24.x",
-    externalPackages: ["@resvg/resvg-js", "@cursor/sdk"],
+    externalPackages: ["@resvg/resvg-js", "@cursor/sdk", "sharp", "wawoff2"],
   } satisfies ModuleOptions,
   traceDeps: [
     "@resvg/resvg-js",
     "@cursor/sdk*",
+    "sharp",
+    "wawoff2",
     "autumn-js",
     "react",
     "react-dom",

@@ -21,6 +21,7 @@ import {
   createGetGranolaNoteTool,
 } from "@notra/ai/tools/granola";
 import { createImageTool } from "@notra/ai/tools/image";
+import { createGenerateOgImageTool } from "@notra/ai/tools/og-image";
 import {
   createGetAvailableIntegrationsTool,
   createGetBrandIdentityTool,
@@ -77,6 +78,7 @@ export function getStandaloneApprovalToolNames(): Set<string> {
   const toolNames = new Set<string>([
     "addBrandReference",
     "createImage",
+    "generateOgImage",
     "createSchedule",
     "createSkill",
     "editPost",
@@ -101,12 +103,21 @@ export function buildStandaloneToolSet(
     organizationId,
     userId,
     useMarkup,
+    chargeAiCredits,
     validatedIntegrations,
     postResult,
   } = params;
 
   const tools: Record<string, Tool> = {};
   const descriptions: string[] = [];
+  tools.generateOgImage = createGenerateOgImageTool({
+    organizationId,
+    useMarkup,
+    chargeAiCredits,
+  });
+  descriptions.push(
+    "**OG Images**: Use generateOgImage for a blog hero or Open Graph image. It researches the selected brand autonomously and reuses its saved template. No repository is required. Return its imageUrl and disclose any fallback warnings."
+  );
 
   for (const contentType of contentTypeSchema.options) {
     if (contentType === "image") {

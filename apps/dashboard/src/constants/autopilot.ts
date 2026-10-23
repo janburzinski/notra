@@ -404,10 +404,6 @@ export const AUTOPILOT_EVENT_DATA_LABELS: Record<string, string> = {
 };
 
 /** Hero/OG image Autopilot commits with every post: 1200x630, like og:image. */
-export const AUTOPILOT_HERO_IMAGE_FALLBACK_ACCENT = "#7c3aed";
-export const AUTOPILOT_HERO_IMAGE_BACKGROUND = "#0b0b10";
-export const AUTOPILOT_HERO_LOGO_MAX_BYTES = 300_000;
-export const AUTOPILOT_HERO_LOGO_TIMEOUT_MS = 5000;
 /** Frontmatter keys posts commonly use for a cover image, in preference order. */
 export const AUTOPILOT_IMAGE_FRONTMATTER_KEYS = [
   "image",

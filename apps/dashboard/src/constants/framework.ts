@@ -10,6 +10,7 @@ export const DASHBOARD_FUNCTION_RULES = {
   "/api/organizations/*/chat": { maxDuration: 1800 },
   "/api/organizations/*/dashboard-agent/chat": { maxDuration: 1800 },
   "/api/organizations/*/agent/**": { maxDuration: 800 },
+  "/.well-known/workflow/v1/step": { maxDuration: 800 },
 };
 
 export const WORKFLOW_ESBUILD_IDLE_STOP_MS = 5000;
@@ -83,6 +84,7 @@ export const SERVER_ONLY_PACKAGES = [
   "satori-html",
   "sharp",
   "undici",
+  "wawoff2",
   "workflow",
 ];
 

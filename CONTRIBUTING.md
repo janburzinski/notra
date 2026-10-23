@@ -376,6 +376,97 @@ Seed helpers:
 bun run db:seed
 ```
 
+## Brand OG images
+
+Autopilot and the `generateOgImage` agent tool share
+`packages/ai/src/utils/og-image.ts`. On first use, the pipeline researches the
+publishing brand's public website, designs a structured template, renders two
+probe titles, and scores the PNGs for brand fidelity, typography and composition.
+It stops at the first approved design within a three-attempt repair budget and saves it in
+`brand_og_templates`. Subsequent titles render without model calls. Templates
+expire after 30 days, generator revisions or saved brand guideline changes. Failed refreshes
+use the last working template; first-use failures return a plain fallback with
+warnings rather than caching a generic design.
+Design calls use Opus 5.5; visual approval uses Sonnet. Each call is priced before
+Autopilot aggregates usage across models. A cold design has a three-minute budget.
+A short PostgreSQL transaction claims a durable per-brand lease; research, model
+calls and rendering never hold that transaction open. Contending requests return
+the last-good/plain fallback without waiting. Quality failures and exhausted design
+budgets back off for six hours across workers and deployments. Infrastructure
+failures, expired leases and caller cancellations after a model call starts have
+a one-minute cooldown; failures before any call starts have no cooldown. Explicit
+caller cancellation still cancels the request, and stale owners cannot save.
+`brand_og_design_runs` records ownership/outcomes; `brand_og_design_calls` records
+each call before spending, with token estimates separate from gateway-reported
+costs. Missing usage remains unknown, never zero. The authenticated monitoring cron
+retries pending gateway generation IDs for seven days, in bounded batches ordered
+by their last check time, without delaying image generation. The first lookup is
+eligible after one minute; unresolved IDs retry at most hourly. SDK-level model
+retries are disabled to avoid stacking them on the router's bounded gateway fallback.
+This reconciles cost
+history, not credit charges; provider failures without generation IDs remain unknown.
+A title that does
+not fit a fresh cached template uses the plain fallback without a paid redesign.
+Unsupported characters fail explicitly rather than silently producing glyph boxes.
+
+Apply the committed migration with `bun run db:migrate` before deploying. The
+pipeline uses the existing AI gateway and `CONTEXT_DEV_API_KEY`; agent image
+uploads use the existing R2 configuration. Autopilot attaches PNG bytes directly
+to its generated pull request. WOFF2 fonts are converted at runtime; unsupported
+or unavailable brand fonts use Inter and report a warning.
+
+Run the opt-in live check from `packages/ai` with development provider credentials:
+
+```bash
+bun --no-env-file scripts/og-image-smoke.ts /path/to/dev.env /path/to/output [domain ...]
+```
+
+For offline durability verification (no provider keys or paid inference), run
+`bun --no-env-file scripts/og-image-durability-smoke.ts` from `packages/ai`.
+It replays the migrations and checks leases, interruption, stale owners, backoff,
+ambiguous save commits, usage delivery failures and delayed cost reconciliation.
+The normal AI package test command also runs this smoke check, including saved
+font download discovery and preservation of explicitly selected brand choices.
+
+It replays all committed migrations in an isolated in-memory PostgreSQL instance,
+seeds synthetic brands, lets a real agent call the tool, then checks Autopilot
+reuses the template for a longer title. Only AI/context provider keys are loaded
+from the supplied file, never its database, billing or storage credentials.
+The real S3 upload client writes to a loopback test server with dummy credentials,
+and the returned image URL is fetched back and checked. No real R2 bucket is used.
+The output includes PNGs, a gallery, per-brand research evidence, source hashes
+and a JSON report with research timing and model-reported usage per call. Input
+usage separates uncached, cache-read and cache-write tokens; include all three
+when comparing total prompt size. Outer agent usage is reported separately.
+Fallback images fail the smoke check. Pass domains to select test brands.
+The reviewer inspects isolated placed assets as well as the two finished cards,
+rejecting partial wordmarks and accidental raster-patch seams. Standalone
+wordmarks must remain uncropped and use `contain`.
+Do not redistribute downloaded font files in
+fixtures; confirm your brand's font licensing permits server-side rendering.
+
+For a visual benchmark, run the smoke check on the baseline and candidate revisions
+into separate output directories, then compare them with a different model family:
+
+```bash
+bun --no-env-file scripts/og-image-benchmark.ts /path/to/dev.env /baseline /candidate /comparison
+```
+
+The evaluator sees anonymous A/B pairs with both title lengths and the same brand
+references, twice with reversed order. `review.json` preserves scores, defects and
+preferences; these are model judgments, not objective design-quality measurements.
+Both directories must contain the same selected brands. Failed/fallback results
+remain in the visual comparison and are labeled in its JSON; missing saved
+templates are explicitly skipped for warm-render timing. Captured baseline
+research supplies the common evaluator references when available.
+Smoke reports include first-generation and cached-render wall time. Inspect the
+actual images too. No images, downloaded fonts or benchmark logs belong in git.
+`render-timings.json` measures each saved template with the current renderer:
+one warm-up, then ten alternating short/long-title renders, reporting median and p95.
+Model-only logo/art previews are downsized without changing cached render assets.
+Research compacts repeated font URLs while retaining their supported weights;
+stable design evidence precedes attempt-specific feedback for prompt caching.
+
 ## Making Changes
 
 1. Create a branch:

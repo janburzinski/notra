@@ -643,7 +643,8 @@ export async function parsePdfDocument(
 }
 
 export async function retrieveStyleguide(
-  domain: string
+  domain: string,
+  options?: { signal?: AbortSignal }
 ): Promise<ContextDevStyleguideResponse> {
   const params = new URLSearchParams({
     domain,
@@ -652,12 +653,13 @@ export async function retrieveStyleguide(
 
   return requestContextDev<ContextDevStyleguideResponse>(
     `/web/styleguide?${params.toString()}`,
-    { method: "GET" }
+    { method: "GET", signal: options?.signal }
   );
 }
 
 export async function captureScreenshot(
-  input: ContextDevScreenshotInput
+  input: ContextDevScreenshotInput,
+  options?: { signal?: AbortSignal }
 ): Promise<ContextDevScreenshotResponse> {
   const { directUrl, domain } = input;
   const hasDomain = domain !== undefined;
@@ -707,7 +709,7 @@ export async function captureScreenshot(
 
   return requestContextDev<ContextDevScreenshotResponse>(
     `/web/screenshot?${params.toString()}`,
-    { method: "GET" }
+    { method: "GET", signal: options?.signal }
   );
 }
 

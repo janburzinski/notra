@@ -1,5 +1,6 @@
 import { flushLogs } from "@notra/ai/evlog";
 import { getEvlogRuntime } from "@notra/ai/utils/evlog-runtime";
+import { sweepOgDesignCosts } from "@notra/ai/utils/og-design-store";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import { Effect, Result } from "effect";
 
@@ -37,6 +38,16 @@ export async function GET(request: Request) {
     });
   }
   const telemetry = getEvlogRuntime();
+  try {
+    await Effect.runPromise(sweepOgDesignCosts());
+  } catch (error) {
+    logWorkflowTelemetry({
+      event: "monitoring.operation.failed",
+      operation: "og.cost.sweep",
+      outcome: "error",
+      errorName: error instanceof Error ? error.name : "UnknownError",
+    });
+  }
   if (!telemetry.aiDrain && !telemetry.otlpDrain) {
     scheduleRequestErrorTelemetry(flushLogs);
     return Response.json({ skipped: "telemetry_not_configured" });
