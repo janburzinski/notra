@@ -29,6 +29,7 @@ function SiteWorkspaceReady(props: SiteWorkspaceReadyProps) {
       !saves.unsaved ||
       invalid ||
       state.readOnly ||
+      state.discardOpen ||
       state.conflicts.length > 0 ||
       saves.state.status === "error"
     ) {
@@ -42,6 +43,7 @@ function SiteWorkspaceReady(props: SiteWorkspaceReadyProps) {
     state.config,
     invalid,
     state.readOnly,
+    state.discardOpen,
     state.conflicts.length,
   ]);
   return (

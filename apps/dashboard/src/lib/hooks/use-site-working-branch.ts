@@ -17,6 +17,7 @@ export function useSiteWorkingBranch({
   filesError,
   draftVersion,
   draftCount,
+  paused = false,
   saves,
   onFlushed,
   onConflict,
@@ -49,7 +50,7 @@ export function useSiteWorkingBranch({
   );
   const autoCommit = useSiteBranchAutosave(
     { organizationId, siteId, branch },
-    feature,
+    feature && !paused,
     draftVersion,
     draftCount,
     saves.unsaved,

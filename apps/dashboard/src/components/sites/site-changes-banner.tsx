@@ -1,9 +1,23 @@
 "use client";
 
-import { Alert02Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
+import {
+  Alert02Icon,
+  Delete02Icon,
+  InformationCircleIcon,
+  Rocket01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
-import { useMemo } from "react";
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogTrigger,
+} from "@notra/ui/components/shared/responsive-dialog";
+import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -45,7 +59,9 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
         <p className="opacity-90">{description}</p>
       </div>
       {children ? (
-        <div className="flex shrink-0 items-center gap-2">{children}</div>
+        <div className="flex w-full shrink-0 items-center justify-end gap-2 pl-7 sm:w-auto sm:pl-0">
+          {children}
+        </div>
       ) : null}
     </div>
   );
@@ -64,7 +80,80 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
   const t = useTranslations("sites.design.workspace");
   const banner = useTranslations("sites.design.workspace.banner");
   const unpublished = useUnpublishedSummary(state);
-  const busy = state.readOnly || state.saves.state.status === "saving";
+  const common = useTranslations("common");
+  const branches = useTranslations("sites.branches");
+  const { discardOpen, setDiscardOpen } = state;
+  const [discardError, setDiscardError] = useState(false);
+  const busy =
+    state.readOnly ||
+    state.uploading ||
+    state.saves.state.status === "saving" ||
+    state.controller.props.commitStatus === "pending";
+  const discard = (
+    <ResponsiveDialog
+      open={discardOpen}
+      onOpenChange={(open) => {
+        if (!state.readOnly) {
+          setDiscardOpen(open);
+          setDiscardError(false);
+        }
+      }}
+    >
+      <ResponsiveDialogTrigger
+        render={<Button disabled={busy} size="sm" variant="secondary" />}
+      >
+        <HugeiconsIcon
+          aria-hidden="true"
+          data-icon="inline-start"
+          icon={Delete02Icon}
+          strokeWidth={2}
+        />
+        {branches("discard")}
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>
+            {banner("discardTitle")}
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            {banner("discardDescription")}
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+        {discardError ? <p role="alert">{banner("discardFailed")}</p> : null}
+        <ResponsiveDialogFooter>
+          <Button
+            variant="outline"
+            disabled={state.readOnly}
+            onClick={() => setDiscardOpen(false)}
+          >
+            {common("actions.cancel")}
+          </Button>
+          <Button
+            variant="destructive"
+            loading={state.readOnly}
+            disabled={busy}
+            onClick={async () => {
+              setDiscardError(false);
+              try {
+                await state.discardChanges();
+                setDiscardOpen(false);
+              } catch {
+                setDiscardError(true);
+              }
+            }}
+          >
+            <HugeiconsIcon
+              aria-hidden="true"
+              data-icon="inline-start"
+              icon={Delete02Icon}
+              strokeWidth={2}
+            />
+            {banner("discardAction")}
+          </Button>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
   if (state.conflicts.length > 0) {
     return (
       <Strip
@@ -109,6 +198,7 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
         >
           {banner("retry")}
         </Button>
+        {discard}
       </Strip>
     );
   }
@@ -118,10 +208,29 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
         description={banner("invalid")}
         title={banner("invalidTitle")}
         tone="warning"
-      />
+      >
+        {discard}
+      </Strip>
     );
   }
-  return unpublished ? <Strip tone="info" {...unpublished} /> : null;
+  return unpublished ? (
+    <Strip tone="info" {...unpublished}>
+      {state.files.drafts.length > 0 || state.unsaved ? discard : null}
+      <Button
+        disabled={busy || state.invalid || state.unsaved}
+        size="sm"
+        onClick={() => state.setPublishOpen(true)}
+      >
+        <HugeiconsIcon
+          aria-hidden="true"
+          data-icon="inline-start"
+          icon={Rocket01Icon}
+          strokeWidth={2}
+        />
+        {branches("publish")}
+      </Button>
+    </Strip>
+  ) : null;
 }
 
 function useUnpublishedSummary(state: SiteWorkspaceValue) {

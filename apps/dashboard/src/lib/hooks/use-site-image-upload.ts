@@ -46,7 +46,8 @@ export function useSiteImageUpload(
       mounted.current = false;
     };
   }, []);
-  const enabled = Boolean(workspace) && !workspace?.readOnly;
+  const enabled =
+    Boolean(workspace) && !workspace?.readOnly && !workspace?.discardOpen;
 
   const upload = async (file: File | undefined) => {
     if (!file || !workspace || !enabled || uploading) {
@@ -64,6 +65,7 @@ export function useSiteImageUpload(
       tooLarge();
       return;
     }
+    const finishUpload = workspace.beginImageUpload();
     setUploading(true);
     try {
       const prepared = await shrinkSiteImage(file, kind);
@@ -75,21 +77,22 @@ export function useSiteImageUpload(
         // callback after unmount could overwrite edits made in another section.
         if (!mounted.current) {
           toast.error(t("uploadAbandoned"));
-          return;
+        } else {
+          // Show the local file instead of downloading the draft again. SVGs are
+          // sanitized server-side, so those still come from the draft.
+          setPreview(
+            prepared.type === "image/svg+xml"
+              ? null
+              : { path, url: URL.createObjectURL(prepared) }
+          );
+          latestOnChange.current(path);
+          toast.success(t("uploaded"));
         }
-        // Show the local file instead of downloading the draft again. SVGs are
-        // sanitized server-side, so those still come from the draft.
-        setPreview(
-          prepared.type === "image/svg+xml"
-            ? null
-            : { path, url: URL.createObjectURL(prepared) }
-        );
-        latestOnChange.current(path);
-        toast.success(t("uploaded"));
       }
     } catch (error) {
       toast.error(toErrorMessage(error, t("uploadFailed")));
     }
+    finishUpload();
     setUploading(false);
   };
 

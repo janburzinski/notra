@@ -7,6 +7,7 @@ export interface UseSiteWorkingBranchParams extends SiteScope {
   filesError: unknown;
   draftVersion: string;
   draftCount: number;
+  paused?: boolean;
   saves: ReturnType<typeof useSiteDraftSaves>;
   onFlushed: () => void;
   onConflict: (paths: string[]) => void;

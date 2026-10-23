@@ -1,7 +1,7 @@
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import type { SiteImageUploadKind } from "@notra/sites-core/types/uploads";
 import { useBlocker } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useSite } from "@/components/sites/site-context";
 import { useRebaseSiteDrafts } from "@/lib/hooks/use-rebase-site-drafts";
@@ -37,6 +37,9 @@ export function useSiteWorkspaceState({
   const scope = { organizationId, siteId, branch };
   const [conflicts, setConflicts] = useState<string[]>([]);
   const [recovering, setRecovering] = useState(false);
+  const uploads = useRef(0);
+  const [pendingUploads, setPendingUploads] = useState(0);
+  const uploading = pendingUploads > 0;
   const saves = useSiteDraftSaves(scope, onDraftChange, setConflicts);
   const [buffer, setBuffer] = useState<SiteRawConfig | null>(null);
   const [snapshot, setSnapshot] = useState(document);
@@ -49,11 +52,12 @@ export function useSiteWorkspaceState({
     "invalid" | "duplicate" | null
   >(null);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [discardOpen, setDiscardOpen] = useState(false);
   const malformed = !validDesignSource(document.content);
   const config = buffer ?? parseDesignSource(document.content);
   const issues = designIssues(config);
   const invalid = issues.length > 0 || variableError !== null;
-  const unsaved = saves.unsaved || invalid;
+  const unsaved = saves.unsaved || invalid || uploading;
   const drafts = files.drafts;
   const draftVersion = siteDraftVersion(drafts);
   const branchState = useSiteWorkingBranch({
@@ -62,6 +66,7 @@ export function useSiteWorkspaceState({
     filesError: null,
     draftVersion,
     draftCount: drafts.length,
+    paused: recovering || discardOpen || uploading,
     saves: { ...saves, unsaved },
     onFlushed: () => {
       if (saves.resetClean([SITE_CONFIG_FILENAME]).length > 0) {
@@ -71,12 +76,12 @@ export function useSiteWorkspaceState({
     onConflict: setConflicts,
     onSwitch,
   });
-  useWarnBeforeUnload(unsaved);
+  useWarnBeforeUnload(unsaved || recovering);
   useBlocker({
-    disabled: !unsaved,
+    disabled: !unsaved && !recovering,
     enableBeforeUnload: false,
     shouldBlockFn: async () => {
-      if (invalid || conflicts.length > 0 || readOnly) {
+      if (invalid || uploading || conflicts.length > 0 || readOnly) {
         return true;
       }
       return saves.flush().then(
@@ -95,7 +100,12 @@ export function useSiteWorkspaceState({
     commitStatus: branchState.commitStatus,
     onSwitch: branchState.switchBranch,
     onFlush: async () => {
-      if (invalid || conflicts.length > 0 || (readOnly && unsaved)) {
+      if (
+        invalid ||
+        uploading ||
+        conflicts.length > 0 ||
+        (readOnly && unsaved)
+      ) {
         throw new Error("Invalid site configuration");
       }
       if (!readOnly) {
@@ -221,7 +231,86 @@ export function useSiteWorkspaceState({
     }
     setRecovering(false);
   };
+  const discardChanges = async () => {
+    if (
+      readOnly ||
+      uploads.current > 0 ||
+      branchState.commitStatus === "pending"
+    ) {
+      return;
+    }
+    setRecovering(true);
+    try {
+      const paths = new Set(drafts.map((draft) => draft.path));
+      if (buffer !== null || variableError !== null || saves.unsaved) {
+        paths.add(SITE_CONFIG_FILENAME);
+      }
+      const attemptedPaths = [...paths];
+      const results = await Promise.allSettled(
+        attemptedPaths.map((path) => {
+          const draft = drafts.find((entry) => entry.path === path);
+          return saves.getQueue(path).discard({
+            draftId: draft?.id ?? null,
+            draftRevision: draft?.revision ?? null,
+            sourceContext: files.sourceContext,
+          });
+        })
+      );
+      const discarded = new Set(
+        attemptedPaths.filter(
+          (_, index) => results[index]?.status === "fulfilled"
+        )
+      );
+      if (
+        !paths.has(SITE_CONFIG_FILENAME) ||
+        discarded.has(SITE_CONFIG_FILENAME)
+      ) {
+        saves.reset();
+      } else {
+        saves.resetClean([...discarded]);
+      }
+      if (discarded.has(SITE_CONFIG_FILENAME)) {
+        setSnapshot({
+          ...document,
+          content: document.published ?? "",
+          hasDraft: false,
+          draftId: null,
+          draftRevision: null,
+          blobSha: document.publishedBlobSha,
+        });
+        setBuffer(null);
+        setVariableError(null);
+        setVariableRows(
+          Object.entries(
+            parseDesignSource(document.published ?? "").variables ?? {}
+          ).map(([name, value]) => ({ id: name, name, value: String(value) }))
+        );
+      }
+      setConflicts((current) => current.filter((path) => !discarded.has(path)));
+      await onRefresh();
+      const failed = results.find((result) => result.status === "rejected");
+      if (failed) {
+        await Promise.reject(failed.reason);
+      }
+    } catch (error) {
+      setRecovering(false);
+      throw error;
+    }
+    setRecovering(false);
+  };
   return {
+    uploading,
+    beginImageUpload: () => {
+      uploads.current += 1;
+      setPendingUploads(uploads.current);
+      return () => {
+        uploads.current -= 1;
+        setPendingUploads(uploads.current);
+      };
+    },
+    discardChanges,
+    discardOpen,
+    setDiscardOpen,
     readOnly,
     rebase,
     malformed,
