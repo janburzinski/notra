@@ -140,6 +140,7 @@ export function toGeoOverviewReadyPage(input: {
       journeyStats: input.journeyStats ?? null,
       journeyStatsFailed: input.journeyStatsFailed,
       journeysLoading: input.journeysLoading,
+      journeyRange: input.geoRange.query,
       organizationId: input.organizationId,
     },
     scanMenu: input.scanMenu,

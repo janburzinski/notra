@@ -2,8 +2,10 @@
 
 import { GEO_JOURNEY_OVERVIEW_ROWS } from "@notra/geo-core/constants/geo";
 import type { GeoJourney } from "@notra/geo-core/types/geo";
+import { trafficSparklineDays } from "@notra/geo-core/utils/ai-traffic";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { InstrumentGrid } from "@notra/ui/components/instrument/instrument-grid";
+import { InstrumentEmpty } from "@notra/ui/components/instrument/instrument-module";
 import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useMemo, useState } from "react";
@@ -14,32 +16,44 @@ import { JourneyGroupSheet } from "@/components/geo/journey-group-sheet";
 import { JourneyOverviewCard } from "@/components/geo/journey-overview-card";
 import { JourneyPathsCard } from "@/components/geo/journey-paths-card";
 import { JourneysCard } from "@/components/geo/journeys-card";
+import { JourneysHero } from "@/components/geo/journeys-hero";
 import { GeoSectionSkeleton } from "@/components/geo/skeleton-parts";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
+import {
+  TRAFFIC_HERO_CHART_SURFACE_CLASS,
+  TRAFFIC_HERO_FRAME_CLASS,
+  TRAFFIC_HERO_METRIC_CELL_CLASS,
+  TRAFFIC_HERO_METRICS_GRID_CLASS,
+  TRAFFIC_HERO_METRICS_SURFACE_CLASS,
+} from "@/constants/geo-traffic-hero";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { usePrefetchGeoJourneyDetail } from "@/lib/hooks/use-geo";
+import { cn } from "@/lib/utils";
 import type { GeoJourneyGroupSelection, JourneysTabProps } from "@/types/geo";
-import { journeyTrendDays } from "@/utils/geo-journey";
 
 const JOURNEY_TABLE_SKELETON_ROWS = 6;
-const STAT_SKELETON_KEYS = ["a", "b", "c"] as const;
+const HERO_SKELETON_KEYS = ["a", "b", "c", "d"] as const;
 
-function JourneyStatCardSkeleton({ eyebrow }: { eyebrow: string }) {
+function JourneysHeroSkeleton() {
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex h-7 items-center">
-        <p className="text-sm font-medium">{eyebrow}</p>
-      </div>
-      <Skeleton className="h-9 w-32" />
-      <div className="grid grid-cols-3 gap-3">
-        {STAT_SKELETON_KEYS.map((key) => (
-          <div className="space-y-1.5" key={key}>
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-4 w-12" />
+    <div className={TRAFFIC_HERO_FRAME_CLASS}>
+      <div
+        className={cn(
+          TRAFFIC_HERO_METRICS_GRID_CLASS,
+          TRAFFIC_HERO_METRICS_SURFACE_CLASS
+        )}
+      >
+        {HERO_SKELETON_KEYS.map((key) => (
+          <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={key}>
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-8 w-20" />
           </div>
         ))}
       </div>
-      <DataTableSkeleton rows={GEO_JOURNEY_OVERVIEW_ROWS} />
+      <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
+        <Skeleton className="mb-3 h-4 w-28" />
+        <Skeleton className="h-52 w-full @md/hero:h-64" />
+      </div>
     </div>
   );
 }
@@ -51,9 +65,14 @@ function JourneysTabSkeleton() {
   return (
     <div aria-busy="true" className="mt-6 flex flex-col gap-6">
       <span className="sr-only">{t("loading")}</span>
-      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
-        <JourneyStatCardSkeleton eyebrow={tCommon("labels.journeys")} />
-        <JourneyStatCardSkeleton eyebrow={tGeoShared("fetchedPages")} />
+      <JourneysHeroSkeleton />
+      <div className="grid grid-cols-1 gap-4 @min-[44rem]/main:grid-cols-2">
+        <GeoSectionSkeleton eyebrow={tCommon("labels.sources")}>
+          <DataTableSkeleton rows={GEO_JOURNEY_OVERVIEW_ROWS} />
+        </GeoSectionSkeleton>
+        <GeoSectionSkeleton eyebrow={tGeoShared("fetchedPages")}>
+          <DataTableSkeleton rows={GEO_JOURNEY_OVERVIEW_ROWS} />
+        </GeoSectionSkeleton>
       </div>
       <GeoSectionSkeleton eyebrow={tGeoShared("agentJourneys")}>
         <DataTableSkeleton rows={JOURNEY_TABLE_SKELETON_ROWS} />
@@ -70,15 +89,23 @@ export function JourneysTab({
   loading,
   organizationId,
   organizationSlug,
+  range,
 }: JourneysTabProps) {
+  const t = useTranslations("geo.journeysTab");
   const showSkeleton = loading && journeys.length === 0;
   const sources = journeyStats?.sources ?? [];
   const pages = journeyStats?.pages ?? [];
   const days = useMemo(
-    () => journeyTrendDays(journeyStats?.sources ?? []),
-    [journeyStats]
+    () =>
+      trafficSparklineDays(
+        (journeyStats?.sources ?? []).flatMap((row) => row.daily),
+        range.from,
+        range.to
+      ),
+    [journeyStats, range.from, range.to]
   );
   const activeSources = sources.filter((row) => row.journeys > 0).length;
+  const hasStats = !journeyStatsFailed && activeSources > 0;
   const [group, setGroup] = useState<GeoJourneyGroupSelection | null>(null);
   const [selectedJourney, setSelectedJourney] = useState<GeoJourney | null>(
     null
@@ -107,44 +134,52 @@ export function JourneysTab({
       skeleton={<JourneysTabSkeleton />}
     >
       <div className="mt-6 flex flex-col gap-6">
-        <InstrumentGrid className="grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
-          <div className="flex h-full min-w-0 flex-col">
-            <JourneyOverviewCard
-              failed={journeyStatsFailed}
-              loading={loading}
-              onOpenSource={(row) =>
-                setGroup({
-                  kind: "source",
-                  source: row.source,
-                  visitorType: row.visitorType,
-                })
-              }
-              previewRows={previewRows}
-              sources={sources}
-            />
-          </div>
-          <div className="flex h-full min-w-0 flex-col">
-            <JourneyPathsCard
-              failed={journeyStatsFailed}
-              loading={loading}
-              onOpenPath={(row) => setGroup({ kind: "page", path: row.path })}
-              pages={pages}
-              previewRows={previewRows}
+        {hasStats ? (
+          <>
+            <JourneysHero
+              days={days}
               previousTotalPages={journeyStats?.previousTotalPages ?? 0}
+              sources={sources}
               totalPages={journeyStats?.totalPages ?? 0}
             />
-          </div>
-        </InstrumentGrid>
-        <div className="flex min-w-0 flex-col">
-          <JourneysCard
-            failed={journeysFailed}
-            journeys={journeys}
-            loading={loading}
-            organizationSlug={organizationSlug}
-            onOpenJourney={openJourney}
-            onPrefetchJourney={prefetchJourney}
+            <InstrumentGrid className="grid-cols-1 items-stretch gap-4 @min-[44rem]/main:grid-cols-2">
+              <JourneyOverviewCard
+                loading={loading}
+                onOpenSource={(row) =>
+                  setGroup({
+                    kind: "source",
+                    source: row.source,
+                    visitorType: row.visitorType,
+                  })
+                }
+                previewRows={previewRows}
+                sources={sources}
+              />
+              <JourneyPathsCard
+                loading={loading}
+                onOpenPath={(row) => setGroup({ kind: "page", path: row.path })}
+                pages={pages}
+                previewRows={previewRows}
+                totalPages={journeyStats?.totalPages ?? 0}
+              />
+            </InstrumentGrid>
+          </>
+        ) : null}
+        {journeyStatsFailed ? (
+          <InstrumentEmpty
+            className="min-h-40"
+            message={t("loadFailed")}
+            seed="geo-journey-stats-error"
           />
-        </div>
+        ) : null}
+        <JourneysCard
+          failed={journeysFailed}
+          journeys={journeys}
+          loading={loading}
+          organizationSlug={organizationSlug}
+          onOpenJourney={openJourney}
+          onPrefetchJourney={prefetchJourney}
+        />
         <JourneyGroupSheet
           days={days}
           journeys={journeys}

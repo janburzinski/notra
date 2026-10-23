@@ -55,6 +55,7 @@ export function GeoTabs({
   journeyStats,
   journeyStatsFailed,
   journeysLoading,
+  journeyRange,
   organizationId,
 }: GeoTabsProps) {
   const t = useTranslations("geo.pages.tabs");
@@ -173,6 +174,7 @@ export function GeoTabs({
           loading={journeysLoading}
           organizationId={organizationId}
           organizationSlug={organizationSlug}
+          range={journeyRange}
         />
       ) : null}
     </div>

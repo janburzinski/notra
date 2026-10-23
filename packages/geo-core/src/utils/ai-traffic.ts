@@ -53,9 +53,14 @@ function lookupLabel(
   return typeof label === "string" ? label : fallback;
 }
 
+/** Product name for a source; bot names fall back to their vendor spelling. */
 export function formatGeoSource(source: string): string {
   const trimmed = source.trim();
-  return lookupLabel(GEO_SOURCE_LABELS, trimmed.toLowerCase(), trimmed);
+  return lookupLabel(
+    GEO_SOURCE_LABELS,
+    trimmed.toLowerCase(),
+    formatGeoAgent(trimmed)
+  );
 }
 
 const SIGNATURE_AGENT_NAMES: Record<string, string> = Object.fromEntries(

@@ -3108,15 +3108,6 @@
         "ofAllJourneys": "Aller Journeys"
       }
     },
-    "journeyOverviewCard": {
-      "caption": "{count, plural, one {Journey} other {Journeys}}",
-      "loadFailed": "Agent-Journeys konnten nicht geladen werden",
-      "empty": "Noch keine Journeys",
-      "emptyDescription": "Sieh dir an, welche Wege KI-Agenten durch deine Website nehmen.",
-      "stats": {
-        "singleFetch": "Einzelabruf"
-      }
-    },
     "journeyPathSummary": {
       "morePages": "+{count, plural, one {# Seite} other {# Seiten}}"
     },
@@ -3124,22 +3115,22 @@
       "fetchedTimes": "{count} Mal abgerufen",
       "noPages": "Für diese Journey wurden keine Seiten erfasst."
     },
+    "journeyOverviewCard": {
+      "sourceCount": "{count, plural, one {# Quelle} other {# Quellen}}"
+    },
     "journeyPathsCard": {
-      "caption": "{count, plural, one {Seite} other {Seiten}}",
-      "captionSampled": "{count, plural, one {Seite} other {Seiten}} (Top {shown} angezeigt)",
-      "loadFailed": "Abgerufene Seiten konnten nicht geladen werden",
-      "empty": "Noch keine Seiten abgerufen",
-      "emptyDescription": "Von KI-Agenten abgerufene Seiten erscheinen hier."
+      "topShown": "Top {shown} von {count}"
     },
     "journeysCard": {
-      "openJourney": "{source}-Journey vom {time} öffnen",
       "loadFailed": "Agent-Journeys konnten nicht geladen werden. Lade die Seite neu.",
       "viewAiTraffic": "KI-Traffic ansehen",
       "emptyDescription": "Journeys erscheinen, sobald KI-Traffic deine Website erreicht.",
       "emptyTitle": "Sieh dir an, wie KI-Agenten deine Website erkunden"
     },
     "journeysTab": {
-      "loading": "Agent-Journeys werden geladen"
+      "loading": "Agent-Journeys werden geladen",
+      "loadFailed": "Journey-Statistiken konnten nicht geladen werden. Lade die Seite neu.",
+      "activity": "Journey-Aktivität"
     },
     "languagePerformanceCard": {
       "addLanguageAria": "{language} hinzufügen",

@@ -3108,15 +3108,6 @@
         "ofAllJourneys": "Of all journeys"
       }
     },
-    "journeyOverviewCard": {
-      "caption": "{count, plural, one {journey} other {journeys}}",
-      "loadFailed": "Could not load agent journeys",
-      "empty": "No journeys yet",
-      "emptyDescription": "See the paths AI agents take through your site.",
-      "stats": {
-        "singleFetch": "Single fetch"
-      }
-    },
     "journeyPathSummary": {
       "morePages": "+{count, plural, one {# page} other {# pages}}"
     },
@@ -3124,22 +3115,22 @@
       "fetchedTimes": "Fetched {count} times",
       "noPages": "No pages captured for this journey."
     },
+    "journeyOverviewCard": {
+      "sourceCount": "{count, plural, one {# source} other {# sources}}"
+    },
     "journeyPathsCard": {
-      "caption": "{count, plural, one {page} other {pages}}",
-      "captionSampled": "{count, plural, one {page} other {pages}} (top {shown} shown)",
-      "loadFailed": "Could not load fetched pages",
-      "empty": "No pages fetched yet",
-      "emptyDescription": "Pages fetched by AI agents will appear here."
+      "topShown": "Top {shown} of {count}"
     },
     "journeysCard": {
-      "openJourney": "Open {source} journey from {time}",
       "loadFailed": "Could not load agent journeys. Try refreshing the page.",
       "viewAiTraffic": "View AI traffic",
       "emptyDescription": "Journeys appear when AI traffic reaches your site.",
       "emptyTitle": "See how AI agents explore your site"
     },
     "journeysTab": {
-      "loading": "Loading agent journeys"
+      "loading": "Loading agent journeys",
+      "loadFailed": "Could not load journey stats. Try refreshing the page.",
+      "activity": "Journey activity"
     },
     "languagePerformanceCard": {
       "addLanguageAria": "Add {language}",

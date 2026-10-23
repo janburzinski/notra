@@ -55,18 +55,17 @@ export function JourneysCard({
       width: "1fr",
       sortable: true,
       cell: (row) => (
-        <button
-          aria-label={t("openJourney", {
-            source: formatGeoSource(row.source),
-            time: formatAiTrafficTimestamp(row.lastSeenAt, locale),
-          })}
-          className="focus-visible:ring-ring flex min-h-8 w-full min-w-0 items-center gap-2 rounded-sm text-left text-sm hover:underline focus-visible:ring-2"
-          onClick={() => onOpenJourney(row)}
-          type="button"
-        >
+        <span className="flex min-w-0 items-center gap-2 text-sm">
           <EngineIcon engine={row.source} />
-          <span className="truncate">{formatGeoSource(row.source)}</span>
-        </button>
+          <span className="max-w-full shrink-0 truncate">
+            {formatGeoSource(row.source)}
+          </span>
+          <span className="text-muted-foreground min-w-0 truncate text-xs">
+            {row.visitorType === "crawler"
+              ? tGeoShared("crawler")
+              : tGeoShared("aiReferral")}
+          </span>
+        </span>
       ),
       sortValue: (row) => formatGeoSource(row.source),
     },
@@ -74,6 +73,7 @@ export function JourneysCard({
       key: "pages",
       header: tGeoShared("pages"),
       width: "5.625rem",
+      align: "right",
       sortable: true,
       cell: (row) => <span className="text-sm tabular-nums">{row.pages}</span>,
     },
@@ -83,7 +83,7 @@ export function JourneysCard({
       width: "9.375rem",
       sortable: true,
       cell: (row) => (
-        <span className="text-muted-foreground text-[0.6875rem] whitespace-nowrap tabular-nums">
+        <span className="text-muted-foreground text-sm whitespace-nowrap tabular-nums">
           {formatAiTrafficTimestamp(row.lastSeenAt, locale)}
         </span>
       ),

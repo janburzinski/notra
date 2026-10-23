@@ -485,6 +485,8 @@ export interface GeoJourneyTreeNode extends GeoJourneyPathNode {
 }
 
 export interface JourneysTabProps {
+  /** Selected range; the activity chart fills its quiet days with zero. */
+  range: GeoRangeQuery;
   journeys: GeoJourney[];
   journeysFailed: boolean;
   journeyStats: GeoJourneyStatsResponse | null;
@@ -546,11 +548,6 @@ export type JourneyGroupSheetStat =
     }
   | { key: "avgDepth"; depth: number };
 
-export interface JourneyPageKindStat {
-  kind: "docs" | "blog" | "other";
-  pages: number;
-}
-
 export interface JourneyGroupContentProps {
   selection: GeoJourneyGroupSelection;
   journeys: readonly GeoJourney[];
@@ -583,18 +580,19 @@ export interface JourneyPathSummaryProps {
   distinctPaths: number;
 }
 
-export interface JourneyStatCardProps {
-  eyebrow: string;
-  total: number;
-  caption: string;
+export interface JourneysHeroProps {
+  sources: GeoJourneySourceStats[];
+  days: readonly string[];
+  totalPages: number;
+  previousTotalPages: number;
+}
+
+export interface JourneysHeroMetric {
+  key: string;
+  label: string;
+  value: number | string;
   /** Percent change vs the previous window; omitted when there is no comparison. */
   delta?: number | null;
-  stats: { label: string; value: string }[];
-  emptyMessage: string;
-  emptyDescription?: string;
-  emptyMedia?: ReactNode;
-  emptySeed: string;
-  children: ReactNode;
 }
 
 export interface JourneyEmptyProps {
@@ -607,8 +605,6 @@ export interface JourneyEmptyProps {
 
 export interface JourneyOverviewCardProps {
   sources: GeoJourneySourceStats[];
-  /** Renders the failure copy instead of the empty state. */
-  failed: boolean;
   previewRows: number;
   onOpenSource: (row: GeoJourneySourceStats) => void;
   loading?: boolean;
@@ -616,11 +612,8 @@ export interface JourneyOverviewCardProps {
 
 export interface JourneyPathsCardProps {
   pages: GeoJourneyPageStats[];
-  /** Renders the failure copy instead of the empty state. */
-  failed: boolean;
   loading?: boolean;
   totalPages: number;
-  previousTotalPages: number;
   previewRows: number;
   onOpenPath: (row: GeoJourneyPageStats) => void;
 }
@@ -894,6 +887,7 @@ export interface GeoTabsProps {
   journeyStats: GeoJourneyStatsResponse | null;
   journeyStatsFailed: boolean;
   journeysLoading: boolean;
+  journeyRange: GeoRangeQuery;
   organizationId: string;
 }
 

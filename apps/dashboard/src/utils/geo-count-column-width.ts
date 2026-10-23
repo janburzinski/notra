@@ -28,5 +28,5 @@ export function geoCountColumnWidth(
   }
   // Tabular digits use ch; the remaining space covers cell/badge padding,
   // the trend icon and the gap. Badge text is smaller than the table's digits.
-  return `max(${GEO_COUNT_COLUMN_WIDTH}, calc(${characters}ch + 4rem))`;
+  return `max(${GEO_COUNT_COLUMN_WIDTH}, calc(${characters}ch + 5rem))`;
 }
