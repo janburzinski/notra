@@ -1,8 +1,13 @@
 import { GatewayError } from "@ai-sdk/gateway";
 import type { LanguageModelV4CallOptions } from "@ai-sdk/provider";
-import { ROUTER_METADATA_KEY } from "@notra/ai/constants/router";
+import {
+  HTTP_PAYMENT_REQUIRED,
+  HTTP_TOO_MANY_REQUESTS,
+  ROUTER_METADATA_KEY,
+} from "@notra/ai/constants/router";
 import { log } from "@notra/ai/evlog";
 import { createVercelAdapter } from "@notra/ai/router/adapters/vercel";
+import { readStatusCode } from "@notra/ai/router/upstream-failure";
 import type {
   ModelCallTelemetry,
   ModelCallTelemetryOptions,
@@ -48,6 +53,7 @@ export function createModelCallTelemetry({
   let msToFirstChunk: number | undefined;
   let finished = false;
   let completionRecorded = false;
+  let limitRecorded = false;
 
   const currentModel = () =>
     servedModelId ?? route?.decision.modelId ?? request.modelId;
@@ -114,6 +120,24 @@ export function createModelCallTelemetry({
     finish("warn", "ai.call.aborted");
   }
 
+  function recordLimit(error: unknown) {
+    if (finished || limitRecorded || signal?.aborted) {
+      return;
+    }
+    try {
+      const status = readStatusCode(error);
+      if (
+        status === HTTP_PAYMENT_REQUIRED ||
+        status === HTTP_TOO_MANY_REQUESTS
+      ) {
+        limitRecorded = true;
+        emit("warn", "ai.call.limit_hit", { status });
+      }
+    } catch {
+      // Diagnostic extraction must not change fallback or error propagation.
+    }
+  }
+
   async function enrichCost(generationId: string) {
     try {
       const lookup = lookupRouteMetadata ?? route?.adapter.lookupRouteMetadata;
@@ -165,7 +189,9 @@ export function createModelCallTelemetry({
         route = nextRoute;
       }
       attemptCount += 1;
+      limitRecorded = false;
     },
+    attemptFailed: recordLimit,
     firstChunk() {
       msToFirstChunk ??= Math.round(performance.now() - startedAt);
     },
@@ -293,6 +319,7 @@ export function createModelCallTelemetry({
         abort();
         return;
       }
+      recordLimit(error);
       finish(
         "error",
         "ai.call.failed",

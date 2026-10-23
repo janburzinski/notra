@@ -8,6 +8,7 @@ import {
   useRequestLogger,
 } from "@notra/ai/utils/evlog-request";
 import { getEvlogRuntime } from "@notra/ai/utils/evlog-runtime";
+import { alertGatewayLimit } from "@notra/ai/utils/gateway-limit-alert";
 import { createLogFlushScheduler } from "@notra/ai/utils/log-flush-scheduler";
 import {
   getOperationalContext,
@@ -31,7 +32,10 @@ export function setLogFlushScheduler(scheduler: LogFlushScheduler): void {
 }
 
 export async function flushLogs(): Promise<void> {
-  await Promise.all(runtime.pendingAIUsage ?? []);
+  await Promise.all([
+    ...(runtime.pendingAIUsage ?? []),
+    ...(runtime.pendingAlerts ?? []),
+  ]);
   await Promise.all([
     runtime.aiDrain?.flush(),
     runtime.geoDrain?.flush(),
@@ -40,6 +44,15 @@ export async function flushLogs(): Promise<void> {
 }
 
 function routeDrain(ctx: DrainContext) {
+  if (ctx.event.event === "ai.call.limit_hit") {
+    runtime.pendingAlerts ??= new Set();
+    const pending = runtime.pendingAlerts;
+    const alert = alertGatewayLimit(ctx.event).catch(() => {
+      console.warn("[ai.gateway.alert] Slack delivery failed");
+    });
+    pending.add(alert);
+    void alert.finally(() => pending.delete(alert));
+  }
   runtime.otlpDrain?.(ctx);
   if (isGeoLogEvent(ctx.event)) {
     runtime.geoDrain?.(ctx);
@@ -54,7 +67,10 @@ function routeDrain(ctx: DrainContext) {
 }
 
 const drain: EvlogDrain | undefined =
-  runtime.aiDrain || runtime.geoDrain || runtime.otlpDrain
+  runtime.aiDrain ||
+  runtime.geoDrain ||
+  runtime.otlpDrain ||
+  process.env.GEO_SCAN_ALERT_WEBHOOK_URL
     ? routeDrain
     : undefined;
 

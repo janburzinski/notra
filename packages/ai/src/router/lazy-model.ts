@@ -13,6 +13,7 @@ import {
   ROUTED_MODEL_PROVIDER,
   ROUTER_METADATA_KEY,
 } from "@notra/ai/constants/router";
+import type { ModelCallTelemetry } from "@notra/ai/types/model-call-telemetry";
 import type {
   FallbackReason,
   GatewayAdapter,
@@ -198,18 +199,22 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       tools: options.tools,
     });
     try {
-      const result = await this.execute(options, async (route, params) => {
-        telemetry.attempt(route);
-        const generated = await route.model.doGenerate(params);
-        return {
-          ...generated,
-          providerMetadata: annotateProviderMetadata(
-            generated.providerMetadata,
-            route,
-            generated.response?.modelId
-          ),
-        };
-      });
+      const result = await this.execute(
+        options,
+        telemetry,
+        async (route, params) => {
+          telemetry.attempt(route);
+          const generated = await route.model.doGenerate(params);
+          return {
+            ...generated,
+            providerMetadata: annotateProviderMetadata(
+              generated.providerMetadata,
+              route,
+              generated.response?.modelId
+            ),
+          };
+        }
+      );
       telemetry.complete({ ...result, responseId: result.response?.id });
       return result;
     } catch (error) {
@@ -232,7 +237,7 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       tools: options.tools,
     });
     try {
-      return await this.execute(options, async (route, params) => {
+      return await this.execute(options, telemetry, async (route, params) => {
         telemetry.attempt(route);
         const result = await route.model.doStream(params);
         return {
@@ -322,6 +327,7 @@ export class RoutedLanguageModel implements LanguageModelV4 {
 
   private async execute<T>(
     options: LanguageModelV4CallOptions,
+    telemetry: ModelCallTelemetry,
     run: (
       route: ResolvedRoute,
       params: LanguageModelV4CallOptions
@@ -335,6 +341,7 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       try {
         return await run(route, this.buildParams(route, options));
       } catch (error) {
+        telemetry.attemptFailed(error);
         const fallback = await this.tryFallbackRoute(
           route,
           error,

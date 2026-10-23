@@ -32,6 +32,7 @@ export interface ModelCallCompletion {
 
 export interface ModelCallTelemetry {
   attempt(route?: ResolvedRoute): void;
+  attemptFailed(error: unknown): void;
   firstChunk(): void;
   complete(result: ModelCallCompletion): void;
   fail(error: unknown): void;
