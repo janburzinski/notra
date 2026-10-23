@@ -1,0 +1,272 @@
+apps/dashboard/src/lib/autopilot/memory.ts
+  s_ed0837d744d10b::t_67c0cf95e84b40 16
+  s_ed0837d744d10b::t_5c2b367e3e22c7 2-10,13-14,17,20-26,28-32,34,37-59,63,67-71
+  s_ed0837d744d10b::t_382a9d13760c9a 72
+  s_ed0837d744d10b::t_d6a49b82d5b86c 60-62
+packages/db/src/types/autopilot.ts
+  s_ed0837d744d10b::t_a685106165efbe 65-66
+  s_ed0837d744d10b::t_0362d9901a6997 48,51,61,63-64,67-68
+packages/tools/src/onboarding/save-memory.ts
+  s_ed0837d744d10b::t_2dfb13e9e34b8d 1-6,10-14,16,21,25-28,30-66,69
+apps/evals/src/types/autopilot-planner.ts
+  s_ed0837d744d10b::t_7efa2258d137b6 1-41,44-92
+packages/tools/src/constants/references.ts
+  s_ed0837d744d10b::t_fa71e2aa5a44b7 2
+packages/memory/package.json
+  s_ed0837d744d10b::t_9b14ace1daf569 1-21
+apps/dashboard/src/lib/autopilot/blog.ts
+  s_ed0837d744d10b::t_ba83cbbd17621b 19,607,722-723,734,794-795,875,885,887,1162,1172,1174,1234
+  s_ed0837d744d10b::t_703c22d4becebd 910-931,933-940,1207-1216,1268-1273,1275,1297
+  s_ed0837d744d10b::t_4d61bd8271a711 117-118,484-487,489,517,520,523
+packages/ai/src/orchestration/orchestrate.ts
+  s_ed0837d744d10b::t_33f194fb004c82 116
+  s_ed0837d744d10b::t_9a6e39ec753f11 71
+packages/ai/src/agents/github-mention.ts
+  s_ed0837d744d10b::t_564a64cc4ab93e 102
+packages/ai/src/utils/autopilot-planner.ts
+  s_ed0837d744d10b::t_62caef7cf530c7 18,242
+  s_ed0837d744d10b::t_1e55f4265e9880 210-212
+  s_ed0837d744d10b::t_2accbf9dd9c942 286-287,303-307,353
+  s_ed0837d744d10b::t_105dc261c9e606 4-5,11,108-112,114-209,213-232,347-352,354
+  s_ed0837d744d10b::t_f0e170189b22b5 402-403,435-438
+  s_ed0837d744d10b::t_d42b2e0e303e35 1-3,6-10,12-17,19-37,43-46,50-107,113,233-241,243-285,288-302,308-346,355-401,404-434,439-463
+  s_ed0837d744d10b::t_d6a49b82d5b86c 38-42,47-49
+packages/tools/src/onboarding/search-memory.ts
+  s_ed0837d744d10b::t_2dfb13e9e34b8d 1-2,5-8,10,12,17,21-41,45-50
+apps/dashboard/package.json
+  s_ed0837d744d10b::t_d6a49b82d5b86c 57
+packages/memory/src/stores/code-storage.ts
+  s_ed0837d744d10b::t_2623605398868a 1-170,173,186,196-198
+  s_ed0837d744d10b::t_382a9d13760c9a 171-172,174-185,187-195
+packages/memory/src/utils/access.ts
+  s_ed0837d744d10b::t_a923194f0501b6 1-63
+packages/db/src/constants/brand-reference-memory.ts
+  s_ed0837d744d10b::t_9e574bca48ef38 4
+  s_ed0837d744d10b::t_492095ae7520f5 1-3
+packages/memory/src/constants/memory.ts
+  s_ed0837d744d10b::t_d6a49b82d5b86c 33-34
+  s_ed0837d744d10b::t_553cf7e96fe197 1-32,35-36
+packages/tools/src/utils/knowledge.ts
+  s_ed0837d744d10b::t_9a6e39ec753f11 39-40
+  s_ed0837d744d10b::t_fa71e2aa5a44b7 1-6,8-38,41
+  s_ed0837d744d10b::t_2dfb13e9e34b8d 7
+.env.example
+  s_ed0837d744d10b::t_3cd8b2249393ab 54-57
+packages/db/src/schemas/brand-reference-memory.ts
+  s_ed0837d744d10b::t_492095ae7520f5 1-5
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_ed0837d744d10b::t_a685106165efbe 163-167,183,596-598,612-613
+  s_ed0837d744d10b::t_f0e170189b22b5 370,595,599-600,602,604-611,614-616,619-625,630-656
+  s_ed0837d744d10b::t_d6a49b82d5b86c 626-628
+apps/dashboard/src/utils/autopilot-findings.ts
+  s_ed0837d744d10b::t_d6a49b82d5b86c 55
+  s_ed0837d744d10b::t_21e148889b4624 1-2,59,61-63,66-69
+packages/memory/src/stores/in-memory.ts
+  s_ed0837d744d10b::t_a923194f0501b6 1-36,38-91
+  s_ed0837d744d10b::t_d6a49b82d5b86c 37
+apps/dashboard/tests/fixtures/user-organization-teardown.fixture.ts
+  s_ed0837d744d10b::t_d6a49b82d5b86c 405-468,470
+  s_ed0837d744d10b::t_0bcc70ab9f7893 9-10,37-38,47-57,59,62,67-68
+packages/memory/tsconfig.json
+  s_ed0837d744d10b::t_9b14ace1daf569 1-10
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_ed0837d744d10b::t_d8b0507b896f0a 70-73
+packages/ai/src/tools/code-researcher.ts
+  s_ed0837d744d10b::t_564a64cc4ab93e 177
+turbo.json
+  s_ed0837d744d10b::t_3cd8b2249393ab 82-83
+packages/ai/src/orchestration/orchestrate-standalone.ts
+  s_ed0837d744d10b::t_9a6e39ec753f11 121,290
+  s_ed0837d744d10b::t_33f194fb004c82 246
+apps/dashboard/src/lib/autopilot/pull-request-events.ts
+  s_ed0837d744d10b::t_2ce2d4c1ff0aef 210-211,261-262,271,274
+  s_ed0837d744d10b::t_c56e9c5f7506cf 276-284
+apps/evals/src/models/gateway.ts
+  s_ed0837d744d10b::t_c6a09fbe30df66 137,153
+apps/evals/src/box-entry.ts
+  s_ed0837d744d10b::t_aaaecc263c7d7f 1-16
+apps/dashboard/src/types/autopilot-memory.ts
+  s_ed0837d744d10b::t_199b6006345ae4 2-3
+packages/ai/src/model.ts
+  s_ed0837d744d10b::t_02550a8a667452 18
+packages/memory/src/types/memory.ts
+  s_ed0837d744d10b::t_382a9d13760c9a 51-52
+  s_ed0837d744d10b::t_553cf7e96fe197 1-50,53-70
+packages/ai/src/agents/background-gen.ts
+  s_ed0837d744d10b::t_564a64cc4ab93e 95
+packages/ai/src/constants/autopilot-planner.ts
+  s_ed0837d744d10b::t_1d8c641ede9356 1-9,15,17-21,25-31
+  s_ed0837d744d10b::t_105dc261c9e606 10-14,16,22-24
+apps/dashboard/src/components/autopilot/autopilot-pull-requests-table.tsx
+  s_ed0837d744d10b::t_4e01dcf03eaa4d 117-119,139,143-144
+  s_ed0837d744d10b::t_d6a49b82d5b86c 33,140-142
+packages/db/src/types/memory-search.ts
+  s_ed0837d744d10b::t_492095ae7520f5 1-5
+packages/ai/src/agents/geo-writer.ts
+  s_ed0837d744d10b::t_9a6e39ec753f11 216,562
+apps/evals/package.json
+  s_ed0837d744d10b::t_b4ea9a38b3f133 16
+packages/memory/src/memory.ts
+  s_ed0837d744d10b::t_82632c091c2b92 59
+  s_ed0837d744d10b::t_6e082b705f96a8 1-58,60-146,148,153-161
+  s_ed0837d744d10b::t_382a9d13760c9a 147,149-152
+apps/evals/src/harness/autopilot-planner.ts
+  s_ed0837d744d10b::t_116133818b6c1b 189-190,215-220,231-233
+  s_ed0837d744d10b::t_bac958892d3df2 225-230,234-244
+  s_ed0837d744d10b::t_dc91ff4b529ddf 492
+  s_ed0837d744d10b::t_844c2cd17d40c4 19,22-23
+  s_ed0837d744d10b::t_573e927ba6cd33 40-43,482-489,574,580,594-595
+  s_ed0837d744d10b::t_d6f5860f27750d 1-18,20-21,24-39,44-164,169-188,191-205,207-208,210-214,221-224,245-368,371-481,490-491,493-573,575-579,581-584,586-593,596-605
+packages/db/src/schema.ts
+  s_ed0837d744d10b::t_4c00eae505905b 1139
+apps/dashboard/tests/autopilot-live.test.ts
+  s_ed0837d744d10b::t_46819ca7bde213 1-20,22-71,75-97,101-129,135-183,191-209,219-304,319-324,328-350,352-373,377-393
+  s_ed0837d744d10b::t_cd670d3c3219c1 72-74,215-217,325-327,374-376
+  s_ed0837d744d10b::t_d99b8f6f5eee75 305-318,351
+  s_ed0837d744d10b::t_e2967a28ddb21e 184-190
+  s_ed0837d744d10b::t_9da56abf5f08a1 21,98-100,210-214,218
+  s_ed0837d744d10b::t_1436093b140ee5 130-134
+packages/tools/src/utils/references.ts
+  s_ed0837d744d10b::t_6c0f6016b02c4e 12-15,85,113
+packages/ai/src/types/autopilot-planner.ts
+  s_ed0837d744d10b::t_1d8c641ede9356 5-99
+  s_ed0837d744d10b::t_62caef7cf530c7 1-4,100
+  s_ed0837d744d10b::t_d6a49b82d5b86c 101-103
+apps/evals/README.md
+  s_ed0837d744d10b::t_d5577c50f11411 12,27,31-32,40-45
+packages/ai/src/schemas/autopilot-planner.ts
+  s_ed0837d744d10b::t_1d8c641ede9356 1-42
+packages/tools/package.json
+  s_ed0837d744d10b::t_2dfb13e9e34b8d 17
+apps/dashboard/src/lib/autopilot/writer.test.ts
+  s_ed0837d744d10b::t_d9e4908f76db83 70
+packages/db/src/types/brand-reference-memory.ts
+  s_ed0837d744d10b::t_492095ae7520f5 1-22
+packages/memory/src/utils/errors.ts
+  s_ed0837d744d10b::t_553cf7e96fe197 1-15
+packages/db/tests/brand-reference-memory.test.ts
+  s_ed0837d744d10b::t_a892e33361828a 1-67
+packages/ai/src/router/README.md
+  s_ed0837d744d10b::t_86385a46a8f318 17-18
+apps/dashboard/src/types/hooks/brand-references.ts
+  s_ed0837d744d10b::t_ef071f84669c5b 14-15
+packages/ai/src/tools/brand-references.ts
+  s_ed0837d744d10b::t_3a4dd452887795 18-19,157,163,187-188,190,206,372-377
+apps/dashboard/tests/autopilot-memory.test.ts
+  s_ed0837d744d10b::t_0913cd33929161 3-6,8-16,18,20-23,25-27,29-34,36-57,59-72,74-75,78,80-81,83-87,89-96,98-118
+apps/evals/src/scoring/autopilot-planner.ts
+  s_ed0837d744d10b::t_573e927ba6cd33 18-23,29-31,126,137-138,140,161-163,224,252-257
+  s_ed0837d744d10b::t_31122fc1f04567 228-229,231-232
+  s_ed0837d744d10b::t_569bc0a4ae0d5c 1-17,24-28,32-125,127-136,139,141-160,164-223,225-227,230,233-251,258-323
+packages/ai/src/prompts/autopilot-planner.ts
+  s_ed0837d744d10b::t_eff61f54cfe13b 1-89
+apps/agent/README.md
+  s_ed0837d744d10b::t_3cd8b2249393ab 86
+apps/evals/src/index.tsx
+  s_ed0837d744d10b::t_fa4409c88f8f08 14,73,76-78,81-84,86
+apps/dashboard/src/constants/autopilot.ts
+  s_ed0837d744d10b::t_ba83cbbd17621b 135,149,152-153
+  s_ed0837d744d10b::t_ca302e6a4b958d 142
+packages/memory/src/types/records.ts
+  s_ed0837d744d10b::t_0ed56ff2ac5088 1-9
+apps/evals/src/fixtures/autopilot-scenarios.ts
+  s_ed0837d744d10b::t_573e927ba6cd33 359-363
+  s_ed0837d744d10b::t_218434d237995e 1-358,364-664,668-688
+apps/onboarding-agent/README.md
+  s_ed0837d744d10b::t_3cd8b2249393ab 47,96
+apps/dashboard/src/lib/autopilot/rules.ts
+  s_ed0837d744d10b::t_d6a49b82d5b86c 29-36,162-164
+  s_ed0837d744d10b::t_ace28f44078fbc 150-152,165,169,172,176-178
+  s_ed0837d744d10b::t_199b6006345ae4 4-7,15,20-28,37-45,49-53,55-56,59-64,67-70,110-131,153-161,166-168,170-171,173-175,182-196
+packages/ai/src/jobs/autopilot-planner.ts
+  s_ed0837d744d10b::t_6080e0d9331acf 1-75
+apps/dashboard/src/types/autopilot.ts
+  s_ed0837d744d10b::t_bf56f92687d37f 89
+  s_ed0837d744d10b::t_d6a49b82d5b86c 2
+  s_ed0837d744d10b::t_0362d9901a6997 82-88
+packages/tools/src/types/knowledge.ts
+  s_ed0837d744d10b::t_fa71e2aa5a44b7 1-6
+packages/tools/src/schemas/onboarding-tools.ts
+  s_ed0837d744d10b::t_2dfb13e9e34b8d 12
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_ed0837d744d10b::t_4affd3d942a318 1-2,4-10,12-16,18,21-22,25-28,30-32,35-56,64-130,132-211,213-235,246-287,291-298,306-308,315-322,334-336,338-342,344-345,350-353,355-356,358-363,365-367,369-378,392-394,401-402
+  s_ed0837d744d10b::t_1e55f4265e9880 19-20,23-24,131,309-314,323,337,349,354,379,381-391
+  s_ed0837d744d10b::t_f0e170189b22b5 17,299-302,305,368,380
+  s_ed0837d744d10b::t_4d61bd8271a711 3,29,33-34,357
+  s_ed0837d744d10b::t_d6a49b82d5b86c 60-61,237-245,303-304,324-333,346-348,364,395-400
+  s_ed0837d744d10b::t_bf56f92687d37f 11,57-59,62-63,212,236,288-290,343
+apps/evals/src/suites/autopilot-planner.ts
+  s_ed0837d744d10b::t_8c7b162d58bbb9 1-42,44-53
+  s_ed0837d744d10b::t_573e927ba6cd33 43
+apps/evals/src/suites/registry.ts
+  s_ed0837d744d10b::t_8c7b162d58bbb9 2,16
+apps/dashboard/src/lib/autopilot/namespace-deletions.ts
+  s_ed0837d744d10b::t_ace28f44078fbc 7,44
+packages/db/src/utils/memory-search.ts
+  s_ed0837d744d10b::t_1b12b66d5f9c92 1-58
+packages/db/package.json
+  s_ed0837d744d10b::t_4c00eae505905b 24
+apps/dashboard/src/lib/orpc/routers/brand.ts
+  s_ed0837d744d10b::t_ef071f84669c5b 28-31,208-209,213,249,312-313,331-332,1133,1135,1138-1140,1142-1145,1171-1176,1235-1236,1249-1254,1256-1257,1260,1263-1273,1290-1291,1296-1303,1573-1577,1579,1584-1585,1587,1589-1597
+apps/evals/src/constants/box.ts
+  s_ed0837d744d10b::t_aaaecc263c7d7f 1-24
+packages/db/src/utils/brand-reference-memory.ts
+  s_ed0837d744d10b::t_9e574bca48ef38 1-3,6-10,13,15-16,20-28,31-36,39-135,139-162,166-169,173,176-184,186,193-199,201,203-204,214-217,220,227
+  s_ed0837d744d10b::t_9a6e39ec753f11 136-138
+packages/tools/src/content-writer/search-brand-references.ts
+  s_ed0837d744d10b::t_6c0f6016b02c4e 1,15,31-32,34,52
+packages/tools/src/constants/knowledge.ts
+  s_ed0837d744d10b::t_2dfb13e9e34b8d 6-8
+  s_ed0837d744d10b::t_fa71e2aa5a44b7 1-5
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_ed0837d744d10b::t_39f396cc45e0a0 1094
+  s_ed0837d744d10b::t_0769b55156ff63 375
+  s_ed0837d744d10b::t_a7006635e2cb3d 1108-1116
+  s_ed0837d744d10b::t_1d3dcbc19e504f 1542,1554-1567,1569-1575,1577,1585-1589,1591,1593-1594,1600,1602-1605,1622-1645,1647-1662,1664,1669-1670,1672-1683,1695-1740,1748,1754-1796,1798-1805
+  s_ed0837d744d10b::t_63e41e8d60d2cc 1607-1610,1612-1619
+  s_ed0837d744d10b::t_4b1622b9c0c50b 1581-1584,1590,1592,1595-1599,1601,1606,1611
+  s_ed0837d744d10b::t_42d84a163ed95b 534-540
+  s_ed0837d744d10b::t_013cc18a65dd5b 1179,1183-1185,1187-1189,1192-1193,1195-1201,1208,1250
+  s_ed0837d744d10b::t_ce14e2adc76e02 1741-1746,1749-1753
+  s_ed0837d744d10b::t_1a11c1069a9d5e 1029
+  s_ed0837d744d10b::t_9f2ed8cb9ac570 225,227-228,231,238-243
+  s_ed0837d744d10b::t_e8102bf4318af1 782-785,802-803,805,861,1576,1578-1580
+  s_ed0837d744d10b::t_2bf38ab9a3daff 105-170
+  s_ed0837d744d10b::t_49a1c5a9d4d42a 1065
+  s_ed0837d744d10b::t_c849fe1bceb58f 1814-1816,1818,2101,2156,2188,2216,2250
+  s_ed0837d744d10b::t_1fd351f382a228 612-614,617-620
+  s_ed0837d744d10b::t_141d079c9263ea 12-14,24-28
+  s_ed0837d744d10b::t_a9f1cb07b4068d 290-302
+  s_ed0837d744d10b::t_201d047d320055 722-781,786-801,804,806-839,841-860,862-878,880-881,883-890,893,896,901-905,908-909,912,917-920,927,930
+  s_ed0837d744d10b::t_77ffa1628975b9 1152,1174
+  s_ed0837d744d10b::t_fb0b2cd0242dab 68-70
+apps/evals/src/runner/box.ts
+  s_ed0837d744d10b::t_a1ea6e284ed2f8 1-72,74,76-113,115-116,118-122,129,131-138,140-156
+  s_ed0837d744d10b::t_fa4409c88f8f08 117,123-128
+  s_ed0837d744d10b::t_db13d5385d6c5d 139
+  s_ed0837d744d10b::t_573e927ba6cd33 73,75,114,130
+packages/memory/tests/memory.test.ts
+  s_ed0837d744d10b::t_a8ec7974a4eb4a 1-97
+packages/memory/src/utils/records.ts
+  s_ed0837d744d10b::t_d6a49b82d5b86c 79-83
+  s_ed0837d744d10b::t_0ed56ff2ac5088 1-78,84-88
+packages/db/src/constants/memory-search.ts
+  s_ed0837d744d10b::t_492095ae7520f5 1-48
+  s_ed0837d744d10b::t_1b12b66d5f9c92 49-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e21105a0d642d3338bec9de110b28d8002ac07da",
+  "prompts": {},
+  "sessions": {
+    "s_ed0837d744d10b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0620c616-3e4c-4b3f-a010-95a6e321ffa0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
