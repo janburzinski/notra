@@ -123,6 +123,8 @@ export const brandSitemapsRouter = {
     .input(deleteSitemapSchema)
     .use(withOrganizationAccess)
     .handler(async ({ input }) => {
+      await assertSitemapBrandIdentity(input.organizationId, input.voiceId);
+
       let deleted: boolean;
       try {
         deleted = await deleteStoredSitemap({
