@@ -1,0 +1,27 @@
+apps/dashboard/src/components/evilcharts/charts/echarts-line-chart.tsx
+  s_b155f4c124eae1::t_fdd7755302559b 76-79,1725
+apps/dashboard/src/components/evilcharts/charts/echarts-area-chart.tsx
+  s_b155f4c124eae1::t_fdd7755302559b 83-86,2760
+apps/dashboard/src/components/evilcharts/charts/echarts-pie-chart.tsx
+  s_b155f4c124eae1::t_fdd7755302559b 49-52,1048
+apps/dashboard/src/utils/chart-tooltip-size.ts
+  s_b155f4c124eae1::t_fdd7755302559b 8-99,102,126-128
+apps/dashboard/src/components/evilcharts/charts/echarts-bar-chart.tsx
+  s_b155f4c124eae1::t_fdd7755302559b 69-72,1945
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e366a75581830b148852fe83ce4947dd82c287fa",
+  "prompts": {},
+  "sessions": {
+    "s_b155f4c124eae1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d0dcbfe-d34a-480f-9704-14f11f84f604",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
