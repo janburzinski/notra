@@ -10,7 +10,7 @@ const result = await Bun.build({
         builder.onResolve(
           {
             filter:
-              /^(nuqs|@tanstack\/react-router|@\/lib\/orpc\/query|@\/lib\/hooks\/(use-site-working-branch|use-site-branch-controls|use-site-brand-defaults|use-site-design-section)|@\/components\/sites\/(site-publish-dialog|site-design-integrations|branches\/site-branch-controls))$/,
+              /^(nuqs|@tanstack\/react-router|@\/lib\/orpc\/query|@\/lib\/hooks\/(use-site-working-branch|use-site-branch-controls|use-site-brand-defaults|use-site-design-section|use-site-nav-section)|@\/components\/sites\/(site-publish-dialog|site-design-integrations|branches\/site-branch-controls))$/,
           },
           () => ({ path: fixture })
         );

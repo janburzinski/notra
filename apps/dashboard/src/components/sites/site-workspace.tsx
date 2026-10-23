@@ -2,13 +2,14 @@
 
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useEffectEvent, useState } from "react";
-import { useTranslations } from "use-intl";
 
-import { Button } from "@/components/button";
 import { SiteBranchActionDialog } from "@/components/sites/branches/site-branch-controls";
 import { useSite } from "@/components/sites/site-context";
 import { SitePublishDialog } from "@/components/sites/site-publish-dialog";
-import { SiteWorkspaceContext } from "@/components/sites/site-workspace-context";
+import {
+  SiteWorkspaceContext,
+  SiteWorkspaceLoadContext,
+} from "@/components/sites/site-workspace-context";
 import { useSiteConfigDocument } from "@/lib/hooks/use-site-config-document";
 import { useSiteDrafts } from "@/lib/hooks/use-site-drafts";
 import { useSiteWorkspaceState } from "@/lib/hooks/use-site-workspace-state";
@@ -99,7 +100,6 @@ function SiteWorkspaceBranch({ children }: SiteWorkspaceProps) {
   ) {
     setPrevious({ document: currentDocument, files: currentFiles });
   }
-  const t = useTranslations("sites.design");
   useEffect(() => {
     if (
       branch &&
@@ -110,8 +110,16 @@ function SiteWorkspaceBranch({ children }: SiteWorkspaceProps) {
     }
   }, [branch, document.error, files.query.error, setBranch]);
   const loadFailed = document.isError || files.query.isError;
+  const load = {
+    failed: loadFailed,
+    retrying: document.isFetching || files.query.isFetching,
+    retry: () => {
+      void document.refetch();
+      void files.query.refetch();
+    },
+  };
   return (
-    <>
+    <SiteWorkspaceLoadContext value={load}>
       {currentDocument && currentFiles ? (
         <SiteWorkspaceReady
           document={currentDocument}
@@ -141,25 +149,7 @@ function SiteWorkspaceBranch({ children }: SiteWorkspaceProps) {
       ) : (
         children
       )}
-      {loadFailed ? (
-        <div className="flex items-center gap-3 px-5">
-          <p role="alert" className="text-destructive text-sm">
-            {t("loadFailed")}
-          </p>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={document.isFetching || files.query.isFetching}
-            onClick={() => {
-              void document.refetch();
-              void files.query.refetch();
-            }}
-          >
-            {t("workspace.tryAgain")}
-          </Button>
-        </div>
-      ) : null}
-    </>
+    </SiteWorkspaceLoadContext>
   );
 }
 

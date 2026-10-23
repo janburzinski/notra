@@ -28,7 +28,7 @@ export function SiteHeaderActions() {
     queries.feature || queries.status.data?.canPublishDirect === false;
   return (
     <div
-      className="ms-auto flex items-center gap-3 self-center py-2 max-lg:w-full max-lg:justify-end"
+      className="ms-auto flex items-center gap-2 self-center py-2 max-sm:w-full max-sm:justify-end"
       data-site-actions
     >
       {required || visibility.show ? (
@@ -37,6 +37,7 @@ export function SiteHeaderActions() {
       <SiteHeaderMenu branch={queries.current} branchesRequired={required} />
       <div className="shrink-0" title={error ? t("publishError") : undefined}>
         <SiteBranchPrimaryAction
+          showPublished
           error={error}
           {...controller.props}
           feature={queries.feature}

@@ -91,4 +91,6 @@ export interface UiModalProviderProps {
 export interface SiteSectionUiPage {
   section: Exclude<SiteSection, "overview">;
   page: ReturnType<typeof lazyPage>;
+  /** Pending view while the page chunk loads; defaults to the generic section skeleton. */
+  skeleton?: RouteComponent;
 }

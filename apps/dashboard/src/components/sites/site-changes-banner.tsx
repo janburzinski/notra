@@ -4,7 +4,6 @@ import {
   Alert02Icon,
   Delete02Icon,
   InformationCircleIcon,
-  Rocket01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
@@ -22,8 +21,12 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { useSite } from "@/components/sites/site-context";
-import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
+import {
+  useSiteWorkspace,
+  useSiteWorkspaceLoad,
+} from "@/components/sites/site-workspace-context";
 import { SITE_DESIGN_SECTIONS } from "@/constants/site-design-sections";
+import { useSiteNavSection } from "@/lib/hooks/use-site-nav-section";
 import { cn } from "@/lib/utils";
 import type {
   SiteChangesStripProps,
@@ -33,17 +36,18 @@ import type { SiteWorkspaceValue } from "@/types/site-workspace";
 import { siteBranchLabel } from "@/utils/site-branch-label";
 import { configSectionChanged } from "@/utils/site-design-sections";
 
+// Tints sit on an opaque base because the strip sticks over scrolling content.
 const TONES = {
-  info: "bg-info/10 text-info",
-  warning: "bg-warning/10 text-warning",
-  destructive: "bg-destructive/10 text-destructive",
+  info: "from-info/10 to-info/10 text-info",
+  warning: "from-warning/10 to-warning/10 text-warning",
+  destructive: "from-destructive/10 to-destructive/10 text-destructive",
 } as const;
 
 function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-x-3 gap-y-2 border-t px-4 py-2.5 lg:px-5",
+        "bg-background z-10 flex flex-wrap items-center gap-x-3 gap-y-2 border-b bg-linear-to-b px-4 py-2.5 sm:sticky sm:top-12 lg:px-5",
         TONES[tone]
       )}
       role={tone === "info" ? "status" : "alert"}
@@ -67,13 +71,41 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   );
 }
 
-/** Unpublished edits, save failures and conflicts, shown once under the site header. */
+/** Unpublished edits, save failures and conflicts, shown once above the page content. Publish lives in the site header. */
 export function SiteChangesBanner() {
   const state = useSiteWorkspace();
+  const load = useSiteWorkspaceLoad();
+  const { organizationSlug, detail } = useSite();
+  const { current } = useSiteNavSection(organizationSlug, detail.site.id);
+  // Without a workspace the Design page shows the failure in place of its form.
+  if (load.failed && (state || current !== "design")) {
+    return <SiteLoadFailedStrip />;
+  }
   if (!state || state.malformed) {
     return null;
   }
   return <SiteChangesStrip state={state} />;
+}
+
+function SiteLoadFailedStrip() {
+  const t = useTranslations("sites.design");
+  const load = useSiteWorkspaceLoad();
+  return (
+    <Strip
+      description={t("errors.loadDescription")}
+      title={t("errors.loadTitle")}
+      tone="destructive"
+    >
+      <Button
+        loading={load.retrying}
+        size="sm"
+        variant="outline"
+        onClick={load.retry}
+      >
+        {t("workspace.tryAgain")}
+      </Button>
+    </Strip>
+  );
 }
 
 function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
@@ -216,19 +248,6 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
   return unpublished ? (
     <Strip tone="info" {...unpublished}>
       {state.files.drafts.length > 0 || state.unsaved ? discard : null}
-      <Button
-        disabled={busy || state.invalid || state.unsaved}
-        size="sm"
-        onClick={() => state.setPublishOpen(true)}
-      >
-        <HugeiconsIcon
-          aria-hidden="true"
-          data-icon="inline-start"
-          icon={Rocket01Icon}
-          strokeWidth={2}
-        />
-        {branches("publish")}
-      </Button>
     </Strip>
   ) : null;
 }

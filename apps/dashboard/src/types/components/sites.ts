@@ -60,13 +60,13 @@ export interface SiteCreateProjectProps {
   organizationId: string;
 }
 
-export interface SitePageTabsProps {
+export interface SiteHeaderProps {
   slug: string;
   organizationId: string;
   site: SiteRecord;
 }
 
-export interface SiteSwitcherProps extends SitePageTabsProps {
+export interface SiteSwitcherProps extends SiteHeaderProps {
   /** Page to open on the picked site. */
   section: SiteSection;
 }

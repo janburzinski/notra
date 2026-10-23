@@ -252,18 +252,14 @@ test.each(["read", "files"])(
     await page
       .getByRole("button", { name: `Fail ${kind}`, exact: true })
       .click();
-    await browserExpect(page.getByRole("alert")).toHaveText(
-      "Unable to load blog.json. Try again."
+    await browserExpect(page.getByRole("alert")).toContainText(
+      "Couldn't load your site design"
     );
     await browserExpect(page.locator("[inert]")).toHaveCount(2);
     for (const label of ["Settings", "Choose branch", "Design"]) {
       await page.getByRole("button", { name: label, exact: true }).click();
       await browserExpect(page.getByTestId("navigation")).toHaveText(label);
     }
-    await page
-      .getByRole("navigation", { name: "Design sections" })
-      .getByRole("button", { name: "General", exact: true })
-      .click();
     await page.getByRole("button", { name: "Attempt edits" }).click();
     await browserExpect(name).toHaveValue("site-a");
     await browserExpect(page.getByLabel("Value of variable 1")).toHaveValue(

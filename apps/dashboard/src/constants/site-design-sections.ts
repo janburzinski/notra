@@ -1,8 +1,8 @@
 import {
   Globe02Icon,
   Image01Icon,
+  LayoutTopIcon,
   Megaphone01Icon,
-  Menu01Icon,
   PaintBoardIcon,
   Plug01Icon,
   TextFontIcon,
@@ -18,7 +18,17 @@ export const SITE_DESIGN_SECTIONS = [
   },
   { id: "branding", icon: Image01Icon, paths: ["logo", "favicon"] },
   { id: "typography", icon: TextFontIcon, paths: ["fonts"] },
-  { id: "navbar", icon: Menu01Icon, paths: ["navbar"] },
+  { id: "navbar", icon: LayoutTopIcon, paths: ["navbar"] },
   { id: "banner", icon: Megaphone01Icon, paths: ["banner"] },
   { id: "integrations", icon: Plug01Icon, paths: ["integrations"] },
+] as const;
+
+/** Labelled groups of Design sections in the site sidebar. */
+export const SITE_DESIGN_GROUPS = [
+  {
+    id: "appearance",
+    sections: ["general", "styling", "branding", "typography"],
+  },
+  { id: "layout", sections: ["navbar", "banner"] },
+  { id: "configuration", sections: ["integrations"] },
 ] as const;

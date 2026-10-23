@@ -8681,7 +8681,11 @@
         "malformed": "blog.json konnte nicht gelesen werden. Öffne das Repository in den Seiteneinstellungen, um die Datei zu korrigieren. Die Datei wurde nicht verändert."
       },
       "sections": {
-        "navigation": "Designbereiche",
+        "groups": {
+          "appearance": "Darstellung",
+          "layout": "Layout",
+          "configuration": "Konfiguration"
+        },
         "titles": {
           "general": "Allgemein",
           "styling": "Stil",
@@ -8700,6 +8704,12 @@
           "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",
           "integrations": "Analytics und Cookie-Banner für diese Seite."
         }
+      },
+      "errors": {
+        "loadTitle": "Design konnte nicht geladen werden",
+        "loadDescription": "Notra konnte blog.json nicht von GitHub lesen. Prüfe, ob die GitHub-App noch Zugriff auf das Repository hat, und versuche es erneut.",
+        "malformedTitle": "blog.json kann nicht gelesen werden",
+        "openSettings": "Site-Einstellungen öffnen"
       }
     },
     "branches": {
@@ -8747,7 +8757,8 @@
       "deleteFor": "Branch {branch} löschen",
       "search": "Branch suchen…",
       "reviewIssues": "Probleme ansehen",
-      "branchNotFound": "Branch nicht gefunden, zu {branch} gewechselt"
+      "branchNotFound": "Branch nicht gefunden, zu {branch} gewechselt",
+      "published": "Veröffentlicht"
     },
     "drafts": {
       "saveFailed": "Entwurf konnte nicht gespeichert werden",

@@ -3,6 +3,7 @@
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 
+import { SiteSettingsList } from "@/components/sites/site-settings-item";
 import { SitesPageShell } from "@/components/sites/sites-page-shell";
 import {
   SITE_DEPLOYMENT_LOG_SURFACE_CLASS,
@@ -18,6 +19,39 @@ export function SiteSectionSkeleton() {
       </div>
       <Skeleton className="h-64 w-full rounded-2xl" />
       <Skeleton className="h-72 w-full rounded-2xl" />
+    </div>
+  );
+}
+
+const DESIGN_ROW_KEYS = ["a", "b", "c", "d"] as const;
+
+/** Mirrors the Design page: section heading, then setting rows. */
+export function SiteDesignSkeleton() {
+  return (
+    <div
+      aria-busy="true"
+      className="mx-auto w-full max-w-3xl space-y-5"
+      data-page-skeleton=""
+    >
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-4 w-64 max-w-full" />
+      </div>
+      <SiteSettingsList>
+        {DESIGN_ROW_KEYS.map((key) => (
+          <div
+            className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 border-b px-4 py-4 sm:grid-cols-[1.25rem_minmax(0,1fr)_15rem] sm:px-5"
+            key={key}
+          >
+            <Skeleton className="size-4.5 rounded-md" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-3.5 w-72 max-w-full" />
+            </div>
+            <Skeleton className="col-start-2 h-8 w-full rounded-lg sm:col-start-auto" />
+          </div>
+        ))}
+      </SiteSettingsList>
     </div>
   );
 }

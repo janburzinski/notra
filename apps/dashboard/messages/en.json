@@ -8681,7 +8681,11 @@
         "malformed": "blog.json could not be read. Open the repository in Site settings to repair it. Your file has not been changed."
       },
       "sections": {
-        "navigation": "Design sections",
+        "groups": {
+          "appearance": "Appearance",
+          "layout": "Layout",
+          "configuration": "Configuration"
+        },
         "titles": {
           "general": "General",
           "styling": "Styling",
@@ -8700,6 +8704,12 @@
           "banner": "An announcement bar at the top of every page.",
           "integrations": "Analytics and the cookie banner for this site."
         }
+      },
+      "errors": {
+        "loadTitle": "Couldn't load your site design",
+        "loadDescription": "Notra couldn't read blog.json from GitHub. Check that the GitHub app still has access to the repository, then try again.",
+        "malformedTitle": "blog.json can't be read",
+        "openSettings": "Open site settings"
       }
     },
     "branches": {
@@ -8747,7 +8757,8 @@
       "deleteFor": "Delete branch {branch}",
       "search": "Find a branch…",
       "reviewIssues": "Review issues",
-      "branchNotFound": "Branch not found, switched to {branch}"
+      "branchNotFound": "Branch not found, switched to {branch}",
+      "published": "Published"
     },
     "drafts": {
       "saveFailed": "Couldn't save the draft",

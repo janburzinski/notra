@@ -1,3 +1,4 @@
+import { SiteDesignSkeleton } from "@/components/sites/site-page-skeleton";
 import type { SiteSectionUiPage } from "@/types/ui-route";
 import { lazyPage } from "@/utils/lazy-page";
 
@@ -31,6 +32,6 @@ export const SITE_SECTION_PAGES: readonly SiteSectionUiPage[] = [
   { section: "analytics", page: Analytics },
   { section: "deployments", page: Deployments },
   { section: "domains", page: Domains },
-  { section: "design", page: Design },
+  { section: "design", page: Design, skeleton: SiteDesignSkeleton },
   { section: "settings", page: Settings },
 ];

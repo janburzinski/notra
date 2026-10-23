@@ -5,7 +5,7 @@ import {
   QueryClientProvider,
   useIsFetching,
 } from "@tanstack/react-query";
-import { useState } from "react";
+import { type ComponentProps, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { IntlProvider } from "use-intl";
 
@@ -153,6 +153,20 @@ export const parseAsString = null;
 export function useQueryState() {
   return [null, async () => {}] as const;
 }
+export function useLocation() {
+  return { pathname: "/", search: {}, hash: "" };
+}
+export function Link({
+  to,
+  children,
+  ...props
+}: { to: string } & ComponentProps<"a">) {
+  return (
+    <a {...props} href={to}>
+      {children}
+    </a>
+  );
+}
 export function useBlocker(options: WorkspaceFixtureBlocker) {
   blockNavigation = options.disabled
     ? async () => false
@@ -160,6 +174,9 @@ export function useBlocker(options: WorkspaceFixtureBlocker) {
 }
 export function useSiteDesignSection() {
   return { active: SITE_DESIGN_SECTIONS[0], select: () => {} };
+}
+export function useSiteNavSection() {
+  return { current: "design", section: "design", branch: null } as const;
 }
 export function useSiteBrandDefaults() {
   return null;

@@ -25,12 +25,14 @@ import type {
 } from "@/types/components/sites";
 import { siteHref } from "@/utils/site-links";
 
+import { SiteChangesBanner } from "./site-changes-banner";
 import { SiteContext } from "./site-context";
+import { SiteHeader } from "./site-header";
 import {
   SiteDeploymentSkeleton,
   SiteSectionSkeleton,
 } from "./site-page-skeleton";
-import { SitePageTabs } from "./site-page-tabs";
+import { SiteMobileNav, SiteSidebar } from "./site-sidebar";
 import { SiteWorkspace } from "./site-workspace";
 import { SitesPageShell } from "./sites-page-shell";
 import { SitesUnavailableState } from "./sites-unavailable-state";
@@ -96,32 +98,45 @@ export function SiteLayout({
             }}
           >
             <SiteWorkspace>
-              <SitePageTabs
-                organizationId={organizationId}
-                site={detail.site}
-                slug={organizationSlug}
-              />
-              <SitesPageShell>
-                {detail.site.status === "suspended" ? (
-                  <Alert role="status">
-                    <HugeiconsIcon
-                      aria-hidden="true"
-                      icon={CloudOffIcon}
-                      strokeWidth={1.5}
-                    />
-                    <AlertTitle>{t("offline")}</AlertTitle>
-                    <AlertDescription>
-                      {t("offlineDescription")}{" "}
-                      <Link
-                        href={siteHref(organizationSlug, siteId, "settings")}
-                      >
-                        {t("offlineAction")}
-                      </Link>
-                    </AlertDescription>
-                  </Alert>
-                ) : null}
-                {children}
-              </SitesPageShell>
+              <div className="flex flex-1 flex-col" data-site-frame="">
+                <SiteHeader
+                  organizationId={organizationId}
+                  site={detail.site}
+                  slug={organizationSlug}
+                />
+                <div className="flex flex-1">
+                  <SiteSidebar />
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <SiteMobileNav />
+                    <SiteChangesBanner />
+                    <SitesPageShell>
+                      {detail.site.status === "suspended" ? (
+                        <Alert role="status">
+                          <HugeiconsIcon
+                            aria-hidden="true"
+                            icon={CloudOffIcon}
+                            strokeWidth={1.5}
+                          />
+                          <AlertTitle>{t("offline")}</AlertTitle>
+                          <AlertDescription>
+                            {t("offlineDescription")}{" "}
+                            <Link
+                              href={siteHref(
+                                organizationSlug,
+                                siteId,
+                                "settings"
+                              )}
+                            >
+                              {t("offlineAction")}
+                            </Link>
+                          </AlertDescription>
+                        </Alert>
+                      ) : null}
+                      {children}
+                    </SitesPageShell>
+                  </div>
+                </div>
+              </div>
             </SiteWorkspace>
           </SiteContext>
         ) : null}

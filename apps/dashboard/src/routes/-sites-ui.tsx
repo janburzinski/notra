@@ -141,12 +141,12 @@ export function createSitesUiRoutes(organization: AnyRoute) {
       preload: Overview.preload,
       component: () => <Overview />,
     }),
-    ...SITE_SECTION_PAGES.map(({ section, page: Page }) =>
+    ...SITE_SECTION_PAGES.map(({ section, page: Page, skeleton }) =>
       createUiRoute({
         parent: site,
         path: section,
         title: { namespace: "sites.detail.tabs", key: section },
-        pendingComponent: SiteSectionLoading,
+        pendingComponent: skeleton ?? SiteSectionLoading,
         preload: Page.preload,
         component: () => <Page />,
       })
