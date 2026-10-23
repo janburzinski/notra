@@ -1,0 +1,21 @@
+packages/ai/src/utils/context-dev.test.ts
+  s_9b873a5c6fa961::t_0d9c35f7525787 72-94
+packages/ai/src/utils/context-dev.ts
+  s_9b873a5c6fa961::t_0d9c35f7525787 406-411
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a81f8982f75488c2066e053788ccde0c0084bc55",
+  "prompts": {},
+  "sessions": {
+    "s_9b873a5c6fa961": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dcf3f4f9-ad42-46aa-b2d3-4b33e6cf1b47",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
