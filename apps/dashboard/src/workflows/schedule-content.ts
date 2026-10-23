@@ -435,6 +435,11 @@ export async function scheduleContentWorkflow(payload: {
         markup_applied: gate.useMarkup,
       },
       logPrefix: LOG_PREFIX,
+    }).catch((billingError) => {
+      console.error(
+        `[${LOG_PREFIX}] Billing confirmation failed for run ${runId}; content remains created`,
+        billingError
+      );
     });
 
     try {

@@ -429,6 +429,9 @@ export const GEO_SCAN_MAX_INTERVAL_HOURS =
 export const GEO_SCAN_CUSTOM_INTERVAL_VALUE = "custom";
 export const GEO_SCAN_NO_RESULTS_RETRY_DELAY = "5m";
 export const GEO_SCAN_STALE_MS = 2 * 60 * 60 * 1000;
+// Scan claims renew, so the stale threshold is not a total runtime limit.
+// ponytail: scans over 24h need lock renewal or per-batch billing settlement.
+export const GEO_SCAN_BILLING_LOCK_TTL_MS = 24 * 60 * 60 * 1000;
 export const GEO_SCAN_START_RETRY_WINDOW_MS = 12 * 60 * 60 * 1000;
 /**
  * How long a cron sweep owns a due schedule row before another sweep may

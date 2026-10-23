@@ -19,6 +19,7 @@ import {
   GEO_SEQUENCE_PAIR_TIMEOUT_MS,
   GEO_SEQUENCE_MAX_TURNS,
   GEO_PAID_CODING_AGENT_ENGINE_IDS,
+  GEO_SCAN_BILLING_LOCK_TTL_MS,
 } from "../src/constants/geo";
 import {
   GeoContentBillingService,
@@ -725,7 +726,11 @@ describe("coding-agent planning and billing", () => {
         engines: ["codex/gpt-6-astra"],
       }).pipe(
         Effect.provideService(GeoContentBillingService, {
-          gateContentBilling: () => Effect.succeed(testBillingGate),
+          gateContentBilling: (input) => {
+            expect(input.lockTtlMs).toBe(GEO_SCAN_BILLING_LOCK_TTL_MS);
+            expect(input.lockTtlMs).toBe(24 * 60 * 60 * 1000);
+            return Effect.succeed(testBillingGate);
+          },
           finalizeContentBilling: (input) =>
             Effect.sync(() => {
               finalized.push(input);

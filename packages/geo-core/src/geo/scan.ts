@@ -36,6 +36,7 @@ import {
   GEO_OPENCODE_ANSWER_SYSTEM_PROMPT,
   GEO_OPENCODE_ENGINE_ID,
   GEO_PAID_CODING_AGENT_ENGINE_IDS,
+  GEO_SCAN_BILLING_LOCK_TTL_MS,
   GEO_SCAN_CONCURRENCY,
   GEO_SEQUENCE_PAIR_TIMEOUT_MS,
   GEO_SEQUENCE_MAX_TURNS,
@@ -730,6 +731,7 @@ export const prepareGeoScanProject = Effect.fn("geo.prepareScanProject")(
         executionId: runId,
         outputType: null,
         quotaFeatureId: FEATURES.AI_ANSWERS,
+        lockTtlMs: GEO_SCAN_BILLING_LOCK_TTL_MS,
       })
       .pipe(
         Effect.mapError(
