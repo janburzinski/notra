@@ -67,7 +67,7 @@ export function GeoStatDelta({
             aria-label={
               label ? `${label} ${formatted} ${hint}` : `${formatted} ${hint}`
             }
-            className="inline-flex cursor-help"
+            className="inline-flex shrink-0 cursor-help"
             type="button"
           />
         }

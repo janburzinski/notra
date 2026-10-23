@@ -12,14 +12,14 @@ import {
   DataTable,
   type TableColumn,
 } from "@notra/ui/components/ui/data-table";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { GeoCountCell } from "@/components/geo/geo-count-cell";
 import { JourneyStatCard } from "@/components/geo/journey-stat-card";
-import { GEO_COUNT_COLUMN_WIDTH } from "@/constants/geo-table";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type { JourneyOverviewCardProps } from "@/types/geo";
+import { geoCountColumnWidth } from "@/utils/geo-count-column-width";
 import {
   formatJourneyShare,
   journeyAverageDepth,
@@ -38,6 +38,7 @@ export function JourneyOverviewCard({
   loading = false,
 }: JourneyOverviewCardProps) {
   const t = useTranslations("geo.journeyOverviewCard");
+  const locale = useLocale();
   const tCommon = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
   const totals = journeyTotals(sources);
@@ -63,7 +64,14 @@ export function JourneyOverviewCard({
     {
       key: "journeys",
       header: tCommon("labels.journeys"),
-      width: GEO_COUNT_COLUMN_WIDTH,
+      width: geoCountColumnWidth(
+        sources.map((row) => ({
+          value: row.journeys,
+          previousValue: row.previousJourneys,
+        })),
+        locale,
+        tCommon("labels.new")
+      ),
       align: "right",
       sortable: true,
       cell: (row) => (

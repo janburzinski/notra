@@ -9,10 +9,10 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { GeoCountCell } from "@/components/geo/geo-count-cell";
 import { WebAnalyticsEmpty } from "@/components/geo/web-analytics-empty";
-import { GEO_COUNT_COLUMN_WIDTH } from "@/constants/geo-table";
 import { WEB_TABLE_ROW_HEIGHT } from "@/constants/web-analytics";
 import type { WebBreakdownRow, WebBreakdownTableProps } from "@/types/geo";
 import { formatChartInteger } from "@/utils/geo-charts";
+import { geoCountColumnWidth } from "@/utils/geo-count-column-width";
 import { formatVisibleDuration, webTableHeight } from "@/utils/web-analytics";
 
 export function WebBreakdownTable({
@@ -25,6 +25,7 @@ export function WebBreakdownTable({
   showAvgTime = false,
 }: WebBreakdownTableProps) {
   const t = useTranslations("geo.webVisitors");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const tableHeight = height ?? webTableHeight(rows.length);
   const columns: TableColumn<WebBreakdownRow>[] = [
@@ -76,7 +77,11 @@ export function WebBreakdownTable({
   columns.push({
     key: "value",
     header: valueHeader,
-    width: GEO_COUNT_COLUMN_WIDTH,
+    width: geoCountColumnWidth(
+      rows.map((row) => ({ value: row.value, previousValue: row.previous })),
+      locale,
+      tCommon("labels.new")
+    ),
     align: "right",
     sortable: true,
     cell: (row) => (

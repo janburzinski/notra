@@ -10,13 +10,13 @@ import {
   type TableColumn,
 } from "@notra/ui/components/ui/data-table";
 import { useMemo } from "react";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 
 import { GeoCountCell } from "@/components/geo/geo-count-cell";
 import { JourneyStatCard } from "@/components/geo/journey-stat-card";
-import { GEO_COUNT_COLUMN_WIDTH } from "@/constants/geo-table";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type { JourneyPageKindStat, JourneyPathsCardProps } from "@/types/geo";
+import { geoCountColumnWidth } from "@/utils/geo-count-column-width";
 import {
   journeyPageKindCounts,
   journeyPageKindStats,
@@ -35,6 +35,7 @@ export function JourneyPathsCard({
   loading = false,
 }: JourneyPathsCardProps) {
   const t = useTranslations("geo.journeyPathsCard");
+  const locale = useLocale();
   const tGeoShared = useTranslations("geo.shared");
   const tCommon = useTranslations("common");
   const kindLabels: Record<JourneyPageKindStat["kind"], string> = {
@@ -59,7 +60,14 @@ export function JourneyPathsCard({
     {
       key: "journeys",
       header: tCommon("labels.journeys"),
-      width: GEO_COUNT_COLUMN_WIDTH,
+      width: geoCountColumnWidth(
+        pages.map((row) => ({
+          value: row.journeys,
+          previousValue: row.previousJourneys,
+        })),
+        locale,
+        tCommon("labels.new")
+      ),
       align: "right",
       sortable: true,
       cell: (row) => (

@@ -19,12 +19,11 @@ import {
 } from "@notra/ui/components/ui/data-table";
 import { Input } from "@notra/ui/components/ui/input";
 import { parseAsString, useQueryState } from "nuqs";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 
 import { GeoCountCell } from "@/components/geo/geo-count-cell";
 import { TrafficPageSourcesCell } from "@/components/geo/traffic-page-sources-cell";
 import {
-  GEO_COUNT_COLUMN_WIDTH,
   PAGE_COLUMN_WIDTH,
   PAGE_SKELETON_ROWS,
   SOURCE_COLUMN_WIDTH,
@@ -43,10 +42,12 @@ import {
   filterTrafficPageGroupsByHost,
   groupTrafficPages,
 } from "@/utils/ai-traffic-pages";
+import { geoCountColumnWidth } from "@/utils/geo-count-column-width";
 import { tableHeightFor } from "@/utils/table";
 
 function trafficPageColumns(
-  labels: TrafficPageColumnLabels
+  labels: TrafficPageColumnLabels,
+  countColumnWidth: string
 ): TableColumn<GeoTrafficPageGroup>[] {
   return [
     {
@@ -75,7 +76,7 @@ function trafficPageColumns(
     {
       key: "visits",
       header: labels.visits,
-      width: GEO_COUNT_COLUMN_WIDTH,
+      width: countColumnWidth,
       align: "right",
       sortable: true,
       cell: (row) => (
@@ -144,6 +145,7 @@ export function TrafficPagesCard({
   pages,
   isPending = false,
 }: TrafficPagesCardProps) {
+  const locale = useLocale();
   const tGeoShared = useTranslations("geo.shared");
   const tCommon = useTranslations("common");
   const [pathQuery, setPathQuery] = useQueryState(
@@ -184,11 +186,21 @@ export function TrafficPagesCard({
       eyebrow={tGeoShared("topPagesByAiSource")}
     >
       <TrafficPagesResults
-        columns={trafficPageColumns({
-          page: tGeoShared("page"),
-          sources: tCommon("labels.sources"),
-          visits: tGeoShared("visits"),
-        })}
+        columns={trafficPageColumns(
+          {
+            page: tGeoShared("page"),
+            sources: tCommon("labels.sources"),
+            visits: tGeoShared("visits"),
+          },
+          geoCountColumnWidth(
+            filteredGroups.map((row) => ({
+              value: row.visits,
+              previousValue: row.previousVisits,
+            })),
+            locale,
+            tCommon("labels.new")
+          )
+        )}
         filteredGroups={filteredGroups}
         isPending={isPending}
       />
