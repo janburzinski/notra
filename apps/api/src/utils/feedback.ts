@@ -16,6 +16,7 @@ import type {
 
 const PUBLIC_FEEDBACK_INGEST_PATH_REGEX = /^\/v1\/feedback\/[^/]+\/?$/;
 const FEEDBACK_API_PATH_REGEX = /^\/v1\/feedback(?:\/|$)/;
+const FEEDBACK_SUBMISSION_PATH_REGEX = /^\/v1\/feedback\/?$/;
 
 export function serializeFeedback(
   row: AgentFeedbackRow
@@ -41,6 +42,13 @@ export function isPublicFeedbackIngestRequest(
   method: string
 ): boolean {
   return method === "POST" && PUBLIC_FEEDBACK_INGEST_PATH_REGEX.test(pathname);
+}
+
+export function isFeedbackSubmissionRequest(
+  pathname: string,
+  method: string
+): boolean {
+  return method === "POST" && FEEDBACK_SUBMISSION_PATH_REGEX.test(pathname);
 }
 
 export function isFeedbackApiRequest(pathname: string): boolean {
