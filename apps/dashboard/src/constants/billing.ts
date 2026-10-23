@@ -136,3 +136,11 @@ export const USAGE_ANSWERS_CHART_CONFIG = {
     color: "var(--primary)",
   },
 } satisfies ChartConfig;
+
+export const AUTUMN_READ_ROUTES: ReadonlySet<string> = new Set([
+  "aggregateEvents",
+  "getEntity",
+  "getOrCreateCustomer",
+  "listEvents",
+  "listPlans",
+]);

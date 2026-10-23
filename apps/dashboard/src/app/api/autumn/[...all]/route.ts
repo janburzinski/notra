@@ -1,7 +1,7 @@
 import { autumnHandler } from "autumn-js/fetch";
 
 import { getAuthSession } from "@/lib/auth/server";
-import { withDubCheckoutMetadata } from "@/lib/billing/dub-checkout-metadata";
+import { prepareAutumnRequest } from "@/lib/billing/autumn-request";
 import { resolveBillingOrganizationId } from "@/lib/billing/resolve-billing-organization";
 import { createDevelopmentAutumnHandler } from "@/utils/development-autumn";
 
@@ -47,10 +47,14 @@ const autumnRouteHandler = autumnHandler({
 
 const handler: RouteHandler =
   developmentHandler ??
-  (async (request) =>
-    autumnRouteHandler(
-      await withDubCheckoutMetadata(request, () => resolveCustomerId(request))
-    ));
+  (async (request) => {
+    const prepared = await prepareAutumnRequest(request, () =>
+      resolveCustomerId(request)
+    );
+    return prepared instanceof Response
+      ? prepared
+      : autumnRouteHandler(prepared);
+  });
 
 export const GET = handler;
 export const POST = handler;
