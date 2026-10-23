@@ -1,0 +1,94 @@
+packages/db/src/utils/brand-reference-search.ts
+  s_ed0837d744d10b::t_1ee575f5a15d26 4-7,12
+  s_ed0837d744d10b::t_f383f2b8efb6a6 1
+apps/evals/src/constants/autopilot-planner.ts
+  s_ed0837d744d10b::t_795337e9f7e7f3 1-5
+packages/memory/src/stores/code-storage.ts
+  ai_agent 89-91
+  s_ed0837d744d10b::t_ed45e91fc663c7 9,11,18,25
+  s_ed0837d744d10b::t_820e29cf3badf8 12,100,109,149-152,158
+  s_ed0837d744d10b::t_af9d5479cb3827 48-59,66-75,77-78,84-88,92-99,101-103
+apps/evals/src/harness/autopilot-planner.ts
+  s_ed0837d744d10b::t_795337e9f7e7f3 38-40,65,79,201,342
+  s_ed0837d744d10b::t_a3388024a0eb82 3,109-112,361-364
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_ed0837d744d10b::t_c5b0239c176e8f 1604-1605
+apps/dashboard/src/lib/autopilot/rules.ts
+  s_ed0837d744d10b::t_4e62bb3845640b 11-12,104,124
+packages/ai/src/types/autopilot-planner.ts
+  s_ed0837d744d10b::t_ed45e91fc663c7 3,104-106
+packages/db/src/schema.ts
+  s_ed0837d744d10b::t_00591707a2d205 1139-1140
+apps/evals/src/fixtures/autopilot-scenarios.ts
+  s_ed0837d744d10b::t_795337e9f7e7f3 230
+packages/ai/src/utils/autopilot-planner.ts
+  s_ed0837d744d10b::t_a3388024a0eb82 46-48,370-371
+  s_ed0837d744d10b::t_68de4d5db3c5d3 5-6,11-12,36-37
+  s_ed0837d744d10b::t_08d23b52194804 248-256,289-308,332,334-335,340-343,345-347,351,379,415-416,420,424-426
+packages/tools/src/utils/knowledge.ts
+  s_ed0837d744d10b::t_1ee575f5a15d26 8,10-11,20-21,23
+  s_ed0837d744d10b::t_a3388024a0eb82 3
+apps/evals/src/types/autopilot-planner.ts
+  s_ed0837d744d10b::t_795337e9f7e7f3 9-10,92-96
+apps/onboarding-agent/README.md
+  s_ed0837d744d10b::t_00591707a2d205 47
+packages/memory/src/constants/search.ts
+  s_ed0837d744d10b::t_f383f2b8efb6a6 51-53
+packages/memory/src/utils/records.ts
+  s_ed0837d744d10b::t_ed45e91fc663c7 3-6,14,59
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_ed0837d744d10b::t_98814a6c53d9e6 373-374
+  s_ed0837d744d10b::t_a3388024a0eb82 214-216
+  s_ed0837d744d10b::t_2c32ab75aec146 192-205,311-312,319-320,325-326,351-355,375
+  s_ed0837d744d10b::t_4e62bb3845640b 4
+packages/db/src/constants/brand-reference-search.ts
+  s_ed0837d744d10b::t_1ee575f5a15d26 2-3
+packages/ai/src/constants/autopilot-planner.ts
+  s_ed0837d744d10b::t_68de4d5db3c5d3 28-33
+packages/memory/src/stores/in-memory.ts
+  s_ed0837d744d10b::t_ed45e91fc663c7 4,15
+apps/dashboard/src/constants/autopilot.ts
+  s_ed0837d744d10b::t_4e62bb3845640b 150-155
+apps/evals/src/scoring/autopilot-planner.ts
+  s_ed0837d744d10b::t_795337e9f7e7f3 7,58,89,123,152,270
+  s_ed0837d744d10b::t_a3388024a0eb82 11,206-209
+packages/memory/src/constants/memory.ts
+  s_ed0837d744d10b::t_ed45e91fc663c7 39-43
+  s_ed0837d744d10b::t_820e29cf3badf8 11-17
+apps/dashboard/src/lib/autopilot/brief.ts
+  s_ed0837d744d10b::t_00591707a2d205 79
+packages/tools/src/constants/knowledge.ts
+  s_ed0837d744d10b::t_1ee575f5a15d26 9-11
+apps/dashboard/src/utils/autopilot-findings.ts
+  s_ed0837d744d10b::t_00591707a2d205 62,66-67
+packages/tools/src/onboarding/search-memory.ts
+  s_ed0837d744d10b::t_a3388024a0eb82 2
+packages/ai/src/prompts/autopilot-planner.ts
+  s_ed0837d744d10b::t_00591707a2d205 77
+packages/memory/src/types/memory.ts
+  s_ed0837d744d10b::t_ed45e91fc663c7 61-64
+  s_ed0837d744d10b::t_f383f2b8efb6a6 65-70
+apps/dashboard/src/lib/autopilot/memory.ts
+  s_ed0837d744d10b::t_4e62bb3845640b 10-13
+  s_ed0837d744d10b::t_a3388024a0eb82 17-21
+packages/ai/src/jobs/autopilot-planner.ts
+  s_ed0837d744d10b::t_ed45e91fc663c7 9,34
+packages/memory/src/utils/search.ts
+  s_ed0837d744d10b::t_f383f2b8efb6a6 3,5,7-9,13,28,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6e6d7ba411dbea105d2a1368c6d90c3a3a961bf6",
+  "prompts": {},
+  "sessions": {
+    "s_ed0837d744d10b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0620c616-3e4c-4b3f-a010-95a6e321ffa0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
