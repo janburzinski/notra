@@ -70,10 +70,10 @@ export function AutopilotTagInput({
   };
 
   return (
-    <div className="border-input focus-within:border-ring focus-within:ring-ring/50 has-aria-invalid:border-destructive has-aria-invalid:ring-destructive/20 dark:bg-input/30 flex min-h-8 w-full flex-wrap items-center gap-1 rounded-lg border bg-transparent px-1 py-1 text-sm transition-colors focus-within:ring-3 has-aria-invalid:ring-3">
+    <div className="border-input focus-within:border-ring focus-within:ring-ring/50 has-aria-invalid:border-destructive has-aria-invalid:ring-destructive/20 dark:bg-background/60 flex min-h-8 w-full flex-wrap items-center gap-1 rounded-lg border bg-transparent px-1 py-1 text-sm transition-colors focus-within:ring-3 has-aria-invalid:ring-3">
       {values.map((value) => (
         <span
-          className="bg-muted text-foreground flex h-[calc(--spacing(5.25))] items-center gap-1 rounded-sm pl-1.5 font-mono text-xs"
+          className="bg-muted text-foreground flex h-[calc(--spacing(5.25))] items-center gap-1 rounded-sm pl-1.5 font-mono text-xs dark:bg-white/10"
           key={value}
         >
           {value}

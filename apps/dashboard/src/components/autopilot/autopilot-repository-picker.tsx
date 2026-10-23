@@ -49,7 +49,7 @@ export function AutopilotRepositoryPicker({
         className={cn(
           buttonVariants({ variant: "secondary", size: "sm" }),
           "justify-between font-normal active:scale-100",
-          !selected && "text-muted-foreground",
+          !selected && "text-foreground/70",
           className
         )}
         id={id}
