@@ -154,7 +154,7 @@ jobs:
         working-directory: apps/dashboard
         env:
           VERCEL: "1"
-        run: bun run build
+        run: bun run build && bun run test:workflow-production
 
       - name: Verify console build
         if: matrix.check == 'build-console'

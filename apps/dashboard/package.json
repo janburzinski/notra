@@ -15,7 +15,8 @@
     "db:studio": "drizzle-kit studio",
     "test": "bun test ./src && bun test ./tests",
     "test:browser": "bun test ./browser-tests",
-    "test:demo-production": "node --test scripts/demo-production.test.mjs"
+    "test:demo-production": "node --test scripts/demo-production.test.mjs",
+    "test:workflow-production": "node --test scripts/workflow-production.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/code-mode": "1.0.86",

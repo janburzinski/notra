@@ -316,6 +316,12 @@ after `Deployment completed`; it is not additional time until the app is live.
 Both projects use filtered Turbo build commands and skip unaffected projects.
 Preserve those settings when changing the Vercel configuration.
 
+Dashboard workflow steps use CommonJS on Vercel. Keep their external packages in
+`WORKFLOW_EXTERNAL_PACKAGES` so Nitro traces the `require` entries as well as its
+ESM imports. After `VERCEL=1 bun run build` in `apps/dashboard`, run
+`bun run test:workflow-production` to check the isolated function's dependencies
+and native image processing. CI runs this check after the dashboard Vercel build.
+
 Standalone `check-types` scripts that run `tsc` enable incremental checking in
 their TypeScript configuration or with command-line flags, and write to
 `.cache/typecheck.tsbuildinfo` within each package. Run them through

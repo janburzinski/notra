@@ -16,6 +16,13 @@ export const DASHBOARD_FUNCTION_RULES = {
 
 export const WORKFLOW_ESBUILD_IDLE_STOP_MS = 5000;
 
+export const WORKFLOW_EXTERNAL_PACKAGES = [
+  "@resvg/resvg-js",
+  "@cursor/sdk",
+  "sharp",
+  "wawoff2",
+];
+
 export const WORKFLOW_DEV_HANDLER_IDS = [
   "#workflow/steps.mjs",
   "#workflow/workflows.mjs",
