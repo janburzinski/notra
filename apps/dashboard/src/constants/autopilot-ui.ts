@@ -3,6 +3,7 @@ import {
   AlertCircleIcon,
   Archive02Icon,
   BulbIcon,
+  Calendar03Icon,
   Cancel01Icon,
   Clock01Icon,
   FilterIcon,
@@ -10,11 +11,14 @@ import {
   GitMergeIcon,
   GitPullRequestClosedIcon,
   GitPullRequestIcon,
+  Github01Icon,
   Idea01Icon,
   Image02Icon,
   MinusSignCircleIcon,
   PencilEdit02Icon,
+  PlayIcon,
   Robot01Icon,
+  Rocket01Icon,
   Search01Icon,
   SlackIcon,
   Tick02Icon,
@@ -45,7 +49,6 @@ import type { GitHubMergeMethod } from "@/types/integrations/github";
 export const AUTOPILOT_PAGE_TABS = [
   "automations",
   "pull-requests",
-  "runs",
   "analytics",
   "settings",
 ] as const;
@@ -196,6 +199,18 @@ export const AUTOPILOT_TRIGGER_COLORS: Record<AutopilotRunTrigger, string> = {
   suggestion: "bg-primary/45",
   manual: "bg-muted-foreground/40",
   onboarding: "bg-muted-foreground/25",
+};
+
+/** What started a run, at the front of its row in the runs table. */
+export const AUTOPILOT_TRIGGER_ICONS: Record<
+  AutopilotRunTrigger,
+  IconSvgElement
+> = {
+  cron: Calendar03Icon,
+  github: Github01Icon,
+  suggestion: Idea01Icon,
+  manual: PlayIcon,
+  onboarding: Rocket01Icon,
 };
 
 /** Short labels for anything Autopilot did, e.g. the automation of a pull request. */

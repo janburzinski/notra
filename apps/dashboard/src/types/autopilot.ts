@@ -133,6 +133,11 @@ export interface AutopilotRunsTableProps {
   onSelect: (run: AutopilotRunView) => void;
 }
 
+export interface AutopilotRunResult {
+  tone: "running" | "failed" | "error" | "pull-request" | "ideas" | "quiet";
+  text: string;
+}
+
 export interface AutopilotPendingFindingAction {
   kind: "merge" | "dismiss";
   finding: AutopilotFindingView;

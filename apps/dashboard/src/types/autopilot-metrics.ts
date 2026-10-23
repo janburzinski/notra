@@ -4,6 +4,7 @@ import type { autopilotMetricsDaysSchema } from "@notra/schemas/dashboard/autopi
 import type * as z from "zod";
 
 import type { AUTOPILOT_AUTOMATION_KINDS } from "@/constants/autopilot";
+import type { AutopilotRunView } from "@/types/autopilot";
 
 export type AutopilotMetricsDays = z.infer<typeof autopilotMetricsDaysSchema>;
 
@@ -108,4 +109,7 @@ export interface AutopilotAnalytics {
 export interface AutopilotAnalyticsPanelProps {
   organizationId: string;
   days: AutopilotMetricsDays;
+  /** The latest runs, whatever the period. */
+  runs: AutopilotRunView[];
+  onSelectRun: (run: AutopilotRunView) => void;
 }

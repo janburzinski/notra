@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { CSSProperties } from "react";
 import { useLocale } from "use-intl";
 
+import { AutopilotRunsTable } from "@/components/autopilot/autopilot-runs-table";
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTrend } from "@/components/autopilot/autopilot-trend";
 import { Button } from "@/components/button";
@@ -70,6 +71,8 @@ const CHART_CONFIG: ChartConfig = {
 export function AutopilotAnalyticsPanel({
   organizationId,
   days,
+  runs,
+  onSelectRun,
 }: AutopilotAnalyticsPanelProps) {
   const locale = useLocale();
   const query = useQuery(
@@ -80,26 +83,24 @@ export function AutopilotAnalyticsPanel({
   const data = query.data;
   const stats = buildStats(data?.summary, data?.previous);
 
-  if (query.isError) {
-    return (
-      <div className="flex flex-wrap items-center gap-3 text-sm" role="alert">
-        <p>Could not load the numbers.</p>
-        <Button
-          disabled={query.isFetching}
-          onClick={() => query.refetch()}
-          size="sm"
-          variant="outline"
-        >
-          Try again
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
-      <AutopilotStatStrip busy={query.isPending} stats={stats} />
-      {data ? (
+      {query.isError ? (
+        <div className="flex flex-wrap items-center gap-3 text-sm" role="alert">
+          <p>Could not load the numbers.</p>
+          <Button
+            disabled={query.isFetching}
+            onClick={() => query.refetch()}
+            size="sm"
+            variant="outline"
+          >
+            Try again
+          </Button>
+        </div>
+      ) : (
+        <AutopilotStatStrip busy={query.isPending} stats={stats} />
+      )}
+      {query.isError ? null : data ? (
         <>
           <PullRequestActivity locale={locale} series={data.series} />
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -117,6 +118,12 @@ export function AutopilotAnalyticsPanel({
           </div>
         </>
       )}
+      <section aria-labelledby="autopilot-recent-runs" className="space-y-3">
+        <h2 className="text-sm font-medium" id="autopilot-recent-runs">
+          Recent runs
+        </h2>
+        <AutopilotRunsTable onSelect={onSelectRun} runs={runs} />
+      </section>
     </div>
   );
 }

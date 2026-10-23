@@ -2,7 +2,6 @@
 
 import {
   Analytics01Icon,
-  Clock01Icon,
   GitPullRequestIcon,
   PlayIcon,
   Settings01Icon,
@@ -31,7 +30,6 @@ import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-
 import { AutopilotFindingTables } from "@/components/autopilot/autopilot-finding-tables";
 import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell";
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
-import { AutopilotRunsTable } from "@/components/autopilot/autopilot-runs-table";
 import { AutopilotSettingsPanel } from "@/components/autopilot/autopilot-settings-panel";
 import { AutopilotSetupFlow } from "@/components/autopilot/autopilot-setup-flow";
 import { Button } from "@/components/button";
@@ -240,12 +238,6 @@ function AutopilotOverviewPage({
                 <TabCount count={pullRequests.length} />
               </IconTabsTrigger>
               <IconTabsTrigger
-                icon={<HugeiconsIcon icon={Clock01Icon} size={15} />}
-                value="runs"
-              >
-                Runs
-              </IconTabsTrigger>
-              <IconTabsTrigger
                 icon={<HugeiconsIcon icon={Analytics01Icon} size={15} />}
                 value="analytics"
               >
@@ -317,16 +309,12 @@ function AutopilotOverviewPage({
             }
           />
         </TabsContent>
-        <TabsContent className="mt-4" value="runs">
-          <AutopilotRunsTable
-            onSelect={(run) => router.push(`${basePath}/runs/${run.id}`)}
-            runs={runs}
-          />
-        </TabsContent>
         <TabsContent className="mt-4" value="analytics">
           <AutopilotAnalyticsPanel
             days={days}
+            onSelectRun={(run) => router.push(`${basePath}/runs/${run.id}`)}
             organizationId={organizationId}
+            runs={runs}
           />
         </TabsContent>
         <TabsContent className="mt-4" value="settings">

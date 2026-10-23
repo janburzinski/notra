@@ -3,6 +3,7 @@ import {
   listGitHubAppRepositoriesEffect,
 } from "@notra/ai/integrations/github";
 import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
+import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
@@ -47,6 +48,7 @@ import {
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { loadFindingImpacts } from "@/lib/autopilot/impact";
 import {
+  describeItemRuns,
   listJobDecisions,
   listRunEvents,
   silentAutopilotLogger,
@@ -180,6 +182,18 @@ export const autopilotRouter = {
             : [],
           enabled ? listRules(organizationId) : [],
         ]);
+      // Scheduled runs are told apart by their summary; item runs by their log.
+      const described = await describeItemRuns(
+        organizationId,
+        runs
+          .filter(
+            (run) =>
+              !(AUTOPILOT_SCHEDULED_TRIGGERS as readonly string[]).includes(
+                run.trigger
+              )
+          )
+          .map((run) => run.id)
+      );
       return {
         available: enabled,
         canManage: canManageAutopilot(context.auth.membership.role),
@@ -214,7 +228,11 @@ export const autopilotRouter = {
         },
         slack: { integrations: slackRows },
         findings,
-        runs,
+        runs: runs.map((run) => ({
+          ...run,
+          headline: described.get(run.id)?.headline ?? null,
+          outcome: described.get(run.id)?.outcome ?? null,
+        })),
         rules,
       };
     }),

@@ -111,6 +111,61 @@ export function listRunEvents(organizationId: string, runId: string) {
 const OPENED_PULL_REQUEST = /^Opened pull request #/;
 
 /**
+ * What each item run (a mention, a pull request event, a written suggestion)
+ * was about and what it came to, read from its log. Item runs log a handful
+ * of events, so reading them all stays cheap.
+ */
+export async function describeItemRuns(
+  organizationId: string,
+  runIds: string[]
+) {
+  const described = new Map<
+    string,
+    {
+      headline: string | null;
+      outcome: { level: AutopilotEventLevel; message: string } | null;
+    }
+  >();
+  if (runIds.length === 0) {
+    return described;
+  }
+  const events = await db
+    .select({
+      runId: autopilotRunEvents.runId,
+      level: autopilotRunEvents.level,
+      message: autopilotRunEvents.message,
+    })
+    .from(autopilotRunEvents)
+    .where(
+      and(
+        inArray(autopilotRunEvents.runId, runIds),
+        eq(autopilotRunEvents.organizationId, organizationId),
+        eq(autopilotRunEvents.internal, false)
+      )
+    )
+    .orderBy(asc(autopilotRunEvents.createdAt));
+  const byRun = new Map<string, typeof events>();
+  for (const event of events) {
+    byRun.set(event.runId, [...(byRun.get(event.runId) ?? []), event]);
+  }
+  for (const [runId, runEvents] of byRun) {
+    const [first, ...rest] = runEvents;
+    const choices = rest.filter((event) => event.level !== "info");
+    const outcome =
+      rest.find((event) => OPENED_PULL_REQUEST.test(event.message)) ??
+      choices.findLast((event) => event.level === "error") ??
+      choices.at(-1);
+    described.set(runId, {
+      headline: first?.message ?? null,
+      outcome: outcome
+        ? { level: outcome.level, message: outcome.message }
+        : null,
+    });
+  }
+  return described;
+}
+
+/**
  * What one automation came to in each recent run, newest first: the pull
  * request it opened, else its last error, else its last skip or decision.
  */

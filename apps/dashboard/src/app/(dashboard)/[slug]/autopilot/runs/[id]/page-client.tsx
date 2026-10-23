@@ -56,7 +56,7 @@ export default function PageClient({
           />
         ) : (
           <>
-            <AutopilotBackLink slug={organizationSlug} tab="runs" />
+            <AutopilotBackLink slug={organizationSlug} tab="analytics" />
             <EmptyState
               description="This run is older than the runs Autopilot keeps on the page."
               title="Run not found"
@@ -114,16 +114,21 @@ function RunPage({
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <AutopilotBackLink slug={organizationSlug} tab="runs" />
+        <AutopilotBackLink slug={organizationSlug} tab="analytics" />
         <PageHeading
-          description={format.dateTime(startedAt, {
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-          title={AUTOPILOT_RUN_TRIGGER_LABELS[run.trigger]}
+          description={[
+            run.headline ? AUTOPILOT_RUN_TRIGGER_LABELS[run.trigger] : null,
+            format.dateTime(startedAt, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+          title={run.headline ?? AUTOPILOT_RUN_TRIGGER_LABELS[run.trigger]}
         />
         <ul
           aria-label="Run summary"

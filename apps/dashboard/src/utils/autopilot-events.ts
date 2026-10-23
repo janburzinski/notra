@@ -9,7 +9,9 @@ import {
   AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS,
 } from "@/constants/autopilot";
 import type {
+  AutopilotRunResult,
   AutopilotRunSectionState,
+  AutopilotRunView,
   AutopilotTranscript,
   AutopilotTranscriptStepKind,
 } from "@/types/autopilot";
@@ -331,4 +333,48 @@ export function occurrenceKeys(items: string[]) {
     seen.set(item, count + 1);
     return { item, key: `${item}#${count}` };
   });
+}
+
+const plural = (count: number, noun: string) =>
+  `${count} ${noun}${count === 1 ? "" : "s"}`;
+
+/** What a run came to, in one line for the runs table. */
+export function describeRunResult(run: AutopilotRunView): AutopilotRunResult {
+  if (run.status === "running") {
+    return { tone: "running", text: "Running" };
+  }
+  if (run.status === "failed") {
+    return { tone: "failed", text: run.errorMessage ?? "Failed" };
+  }
+  // Item runs (a mention, a pull request event) are decided by one log line.
+  if (run.outcome) {
+    const { level, message } = run.outcome;
+    if (OPENED_PULL_REQUEST_STEP.test(message)) {
+      return { tone: "pull-request", text: message };
+    }
+    return { tone: level === "error" ? "error" : "quiet", text: message };
+  }
+  const proposed = run.summary?.proposed ?? 0;
+  const failed = run.summary?.failed ?? 0;
+  const ideas = (run.summary?.findings ?? 0) - proposed - failed;
+  const parts = [
+    ideas > 0 ? plural(ideas, "idea") : null,
+    failed > 0 ? `${plural(failed, "draft")} failed` : null,
+  ].filter((part) => part !== null);
+  if (proposed > 0) {
+    return {
+      tone: "pull-request",
+      text: [`Opened ${plural(proposed, "pull request")}`, ...parts].join(", "),
+    };
+  }
+  if (ideas > 0) {
+    return { tone: "ideas", text: `Found ${parts.join(", ")}` };
+  }
+  if (failed > 0) {
+    return { tone: "error", text: `${plural(failed, "draft")} failed` };
+  }
+  return {
+    tone: "quiet",
+    text: run.summary?.insights?.[0] ?? "Nothing new",
+  };
 }
