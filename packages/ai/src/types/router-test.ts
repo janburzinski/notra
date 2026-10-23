@@ -18,8 +18,9 @@ export interface FakeAdapterOptions {
   id: GatewayId;
   enforcesZdr?: boolean;
   supportedModels?: (modelId: string) => boolean;
+  supportedTools?: (modelId: string, toolIds: readonly string[]) => boolean;
   balance?: number | null;
-  onCall?: (call: RecordedRouterCall) => void;
+  onCall?: (call: RecordedRouterCall) => void | Promise<void>;
   upstreamProvider?: string;
 }
 

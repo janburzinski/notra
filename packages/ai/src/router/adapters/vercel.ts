@@ -49,6 +49,8 @@ export function createVercelAdapter(
     id: "vercel",
     enforcesZdr: true,
     supportsModel: (modelId) => isModelSupported("vercel", modelId),
+    // Vercel forwards provider-defined tools to the model's own provider.
+    supportsTools: () => true,
     mapModelId: toVercelModelId,
     createModel: (modelId) => getClient()(toVercelModelId(modelId)),
     buildProviderOptions: buildVercelProviderOptions,

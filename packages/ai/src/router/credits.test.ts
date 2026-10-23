@@ -9,7 +9,6 @@ import {
 } from "@notra/ai/constants/router-test";
 
 import { GatewayCreditBalanceError } from "./errors";
-import { classifyUpstreamFailure } from "./lazy-model";
 import {
   callOptions,
   createFakeAdapter,
@@ -17,6 +16,7 @@ import {
   httpError,
   metadataOf,
 } from "./test-helpers";
+import { classifyUpstreamFailure } from "./upstream-failure";
 
 describe("assertRouteHasCredits", () => {
   test("a failed balance lookup allows traffic, caches unknown balance, and retries at expiry", async () => {

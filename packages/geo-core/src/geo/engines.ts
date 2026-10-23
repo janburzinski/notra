@@ -22,29 +22,22 @@ export function buildGroundedInvocation(
   engine: GeoGroundedEngine,
   options: GeoGroundedInvocationOptions = {}
 ): GeoGroundedInvocation {
-  // Provider-defined web search tools need a gateway that serves them: Neon
-  // runs OpenAI and Gemini search natively, everything else is pinned to Vercel.
-  const groundedGateway = {
+  // The router sends provider-defined search tools only to a gateway that
+  // serves them for the model (Neon: OpenAI and Gemini search, else Vercel).
+  const routed = {
     organizationId: options.organizationId,
-    gateway: "vercel",
-    zdr: options.zdr,
-    logContext: options.logContext,
-  } as const;
-  const neonGroundedGateway = {
-    organizationId: options.organizationId,
-    gateways: ["neon", "vercel"],
     zdr: options.zdr,
     logContext: options.logContext,
   } as const;
   switch (engine.provider) {
     case "gateway-openai":
       return {
-        model: gateway(engine.model, neonGroundedGateway),
+        model: gateway(engine.model, routed),
         tools: { web_search: openai.tools.webSearch({}) },
       };
     case "gateway-anthropic":
       return {
-        model: gateway(engine.model, groundedGateway),
+        model: gateway(engine.model, routed),
         tools: {
           web_search: geoAnthropicWebSearch(
             engine.model,
@@ -54,23 +47,27 @@ export function buildGroundedInvocation(
       };
     case "gateway-google":
       return {
-        model: gateway(engine.model, neonGroundedGateway),
+        model: gateway(engine.model, routed),
         tools: { google_search: google.tools.googleSearch({}) },
       };
     case "gateway-perplexity":
-      return { model: gateway(engine.model, groundedGateway), tools: {} };
+      // Sonar searches on its own and has no tool to route by.
+      return {
+        model: gateway(engine.model, { ...routed, gateway: "vercel" }),
+        tools: {},
+      };
     case "gateway-meta":
       // Meta accepts the OpenAI-compatible search tool, but rejects it under ZDR.
       if (options.zdr === "required") {
         throw new Error("Meta web search does not support zero data retention");
       }
       return {
-        model: gateway(engine.model, { ...groundedGateway, zdr: "none" }),
+        model: gateway(engine.model, { ...routed, zdr: "none" }),
         tools: { web_search: openai.tools.webSearch({}) },
       };
     case "gateway-spacexai":
       return {
-        model: gateway(engine.model, groundedGateway),
+        model: gateway(engine.model, routed),
         tools: { web_search: xai.tools.webSearch({}) },
       };
     case "direct-openai": {

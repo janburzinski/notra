@@ -9,18 +9,9 @@ import type {
 } from "@ai-sdk/provider";
 import {
   DAILY_LIMIT_ERROR_PATTERN,
-  HTTP_NOT_FOUND,
-  HTTP_PAYMENT_REQUIRED,
-  HTTP_SERVER_ERROR_MIN,
   HTTP_TOO_MANY_REQUESTS,
-  HTTP_UNAUTHORIZED,
-  OPENROUTER_NO_ZDR_ENDPOINT_PATTERN,
-  NO_TRAINING_PROVIDER_ERROR_PATTERN,
-  RETRYABLE_STATUS_CODES,
   ROUTED_MODEL_PROVIDER,
   ROUTER_METADATA_KEY,
-  ZDR_ERROR_PATTERN,
-  ZDR_REJECTION_STATUS_CODES,
 } from "@notra/ai/constants/router";
 import type {
   FallbackReason,
@@ -35,116 +26,27 @@ import { createModelCallTelemetry } from "@notra/ai/utils/model-call-telemetry";
 import { observeModelStream } from "@notra/ai/utils/observe-model-stream";
 import { withUsageAttribution } from "@notra/ai/utils/usage-attribution";
 
-import { GatewayUnavailableError, NoCompliantRouteError } from "./errors";
+import { GatewayUnavailableError } from "./errors";
 import { fallbackGateways } from "./policy";
 import { splitRouterOptions } from "./provider-options";
+import { getUsableAdapter } from "./resolve";
+import {
+  classifyUpstreamFailure,
+  readMessage,
+  readStatusCode,
+} from "./upstream-failure";
 
-function readStatusCode(error: unknown): number | undefined {
-  if (typeof error !== "object" || error === null) {
-    return undefined;
-  }
-  const record = error as Record<string, unknown>;
-  const candidate = record.statusCode ?? record.status;
-  return typeof candidate === "number" ? candidate : undefined;
+/** Copy only the fields that are set, so metadata stays JSON without undefined. */
+function definedFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([, value]) => value !== undefined)
+  ) as Partial<T>;
 }
 
-function readBodyText(value: unknown): string {
-  if (typeof value === "string") {
-    return value;
-  }
-  if (typeof value !== "object" || value === null) {
-    return "";
-  }
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return "";
-  }
-}
-
-function readMessage(error: unknown): string {
-  if (typeof error === "string") {
-    return error;
-  }
-  if (typeof error !== "object" || error === null) {
-    return "";
-  }
-  const record = error as Record<string, unknown>;
-  const parts = [
-    error instanceof Error ? error.message : "",
-    readBodyText(record.response),
-    readBodyText(record.responseBody),
-  ];
-  return parts.filter((part) => part.length > 0).join(" ");
-}
-
-function readIsRetryable(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) {
-    return false;
-  }
-  return (error as Record<string, unknown>).isRetryable === true;
-}
-
-/**
- * Decide whether a failed upstream call may be retried on the other gateway
- * and why. Returns undefined for errors that must surface to the caller
- * (validation errors, aborts, prompt-level client errors, ...).
- */
-export function classifyUpstreamFailure(
-  error: unknown
-): FallbackReason | undefined {
-  if (error instanceof NoCompliantRouteError) {
-    return "non-compliant";
-  }
-  if (error instanceof Error && error.name === "AbortError") {
-    return undefined;
-  }
-  const status = readStatusCode(error);
-  if (status === HTTP_PAYMENT_REQUIRED) {
-    return "no-credits";
-  }
-  if (status === HTTP_UNAUTHORIZED) {
-    // Rejected credentials (expired/revoked key) fail every model on the
-    // gateway account: try the other gateway instead of surfacing the 401.
-    return "auth-failure";
-  }
-  if (NO_TRAINING_PROVIDER_ERROR_PATTERN.test(readMessage(error))) {
-    return "non-compliant";
-  }
-  if (
-    status !== undefined &&
-    ZDR_REJECTION_STATUS_CODES.has(status) &&
-    ZDR_ERROR_PATTERN.test(readMessage(error))
-  ) {
-    // The gateway refused to honour the zero-data-retention requirement:
-    // Vercel answers 400 when no ZDR provider serves the model and 403 when
-    // the team plan lacks ZDR. Either way the route is not compliant.
-    return "non-compliant";
-  }
-  if (
-    status === HTTP_NOT_FOUND &&
-    OPENROUTER_NO_ZDR_ENDPOINT_PATTERN.test(readMessage(error))
-  ) {
-    // OpenRouter found the model but no host satisfies the ZDR data policy.
-    return "non-compliant";
-  }
-  if (status === HTTP_NOT_FOUND) {
-    return "unsupported-model";
-  }
-  if (
-    status !== undefined &&
-    (status >= HTTP_SERVER_ERROR_MIN || RETRYABLE_STATUS_CODES.has(status))
-  ) {
-    return "upstream-error";
-  }
-  if (readIsRetryable(error)) {
-    return "upstream-error";
-  }
-  if (status === undefined && error instanceof TypeError) {
-    // fetch() network failures surface as TypeError without a status.
-    return "upstream-error";
-  }
-  return undefined;
+function providerToolIds(options: LanguageModelV4CallOptions): string[] {
+  return (options.tools ?? [])
+    .flatMap((tool) => (tool.type === "provider" ? [tool.id] : []))
+    .sort();
 }
 
 function buildRouteMetadata(
@@ -160,35 +62,23 @@ function buildRouteMetadata(
   );
   return {
     gateway: decision.gateway,
-    ...(decision.organizationId
-      ? { organizationId: decision.organizationId }
-      : {}),
     requestedModel: decision.requestedModelId,
     model: extracted.model ?? decision.modelId,
     reason: decision.reason,
-    ...(decision.plan ? { plan: decision.plan } : {}),
-    ...(extracted.generationId ? { generationId: extracted.generationId } : {}),
-    ...(extracted.upstreamProvider
-      ? { upstreamProvider: extracted.upstreamProvider }
-      : {}),
-    ...(extracted.costUsd === undefined ? {} : { costUsd: extracted.costUsd }),
-    ...(extracted.gatewayCostUsd === undefined
-      ? {}
-      : { gatewayCostUsd: extracted.gatewayCostUsd }),
-    ...(extracted.upstreamInferenceCostUsd === undefined
-      ? {}
-      : { upstreamInferenceCostUsd: extracted.upstreamInferenceCostUsd }),
-    ...(extracted.isByok === undefined ? {} : { isByok: extracted.isByok }),
-    ...(extracted.costSource === undefined
-      ? {}
-      : { costSource: extracted.costSource }),
-    ...(extracted.byokInferenceCostUsd === undefined
-      ? {}
-      : { byokInferenceCostUsd: extracted.byokInferenceCostUsd }),
-    ...(decision.fallbackFrom ? { fallbackFrom: decision.fallbackFrom } : {}),
-    ...(decision.fallbackReason
-      ? { fallbackReason: decision.fallbackReason }
-      : {}),
+    ...definedFields({
+      organizationId: decision.organizationId || undefined,
+      plan: decision.plan,
+      generationId: extracted.generationId || undefined,
+      upstreamProvider: extracted.upstreamProvider || undefined,
+      costUsd: extracted.costUsd,
+      gatewayCostUsd: extracted.gatewayCostUsd,
+      upstreamInferenceCostUsd: extracted.upstreamInferenceCostUsd,
+      isByok: extracted.isByok,
+      costSource: extracted.costSource,
+      byokInferenceCostUsd: extracted.byokInferenceCostUsd,
+      fallbackFrom: decision.fallbackFrom,
+      fallbackReason: decision.fallbackReason,
+    }),
     zdrEnforced: decision.zdrEnforced,
   };
 }
@@ -276,6 +166,8 @@ export class RoutedLanguageModel implements LanguageModelV4 {
 
   private readonly context: RoutedModelContext;
   private routePromise: Promise<ResolvedRoute> | undefined;
+  /** Provider tools the cached route was resolved for. */
+  private routeToolIds: readonly string[] = [];
   private zdrRelaxed = false;
 
   constructor(context: RoutedModelContext) {
@@ -286,7 +178,7 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     this.supportedUrls = {
       // biome-ignore lint/suspicious/noThenProperty: intentional lazy thenable so wrappers can read supportedUrls without triggering resolution
       then: (onFulfilled, onRejected) =>
-        this.getRoute()
+        this.getRoute(this.routeToolIds)
           .then((route) => route.model.supportedUrls)
           .then(onFulfilled, onRejected),
     };
@@ -357,9 +249,13 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     }
   }
 
-  private getRoute(): Promise<ResolvedRoute> {
+  private getRoute(toolIds: readonly string[]): Promise<ResolvedRoute> {
+    if (toolIds.join() !== this.routeToolIds.join()) {
+      this.routeToolIds = toolIds;
+      this.routePromise = undefined;
+    }
     if (!this.routePromise) {
-      const promise = this.resolvePrimary();
+      const promise = this.resolvePrimary(toolIds);
       this.routePromise = promise;
       promise.catch(() => {
         if (this.routePromise === promise) {
@@ -370,8 +266,13 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     return this.routePromise;
   }
 
-  private async resolvePrimary(): Promise<ResolvedRoute> {
-    const decision = await this.context.resolve(this.context.request);
+  private async resolvePrimary(
+    toolIds: readonly string[]
+  ): Promise<ResolvedRoute> {
+    const decision = await this.context.resolve({
+      ...this.context.request,
+      toolIds,
+    });
     const route = this.materialize(decision);
     this.context.logger.info("ai.router.route", decisionLogFields(decision));
     return route;
@@ -426,14 +327,20 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       params: LanguageModelV4CallOptions
     ) => Promise<T>
   ): Promise<T> {
-    let route = await this.getRoute();
+    const toolIds = providerToolIds(options);
+    let route = await this.getRoute(toolIds);
     const attempted = new Set<GatewayId>();
     for (;;) {
       attempted.add(route.decision.gateway);
       try {
         return await run(route, this.buildParams(route, options));
       } catch (error) {
-        const fallback = await this.tryFallbackRoute(route, error, attempted);
+        const fallback = await this.tryFallbackRoute(
+          route,
+          error,
+          attempted,
+          toolIds
+        );
         if (!fallback) {
           throw error;
         }
@@ -450,7 +357,11 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     );
   }
 
-  private relaxZdr(route: ResolvedRoute, error: unknown): ResolvedRoute {
+  private relaxZdr(
+    route: ResolvedRoute,
+    error: unknown,
+    toolIds: readonly string[]
+  ): ResolvedRoute {
     this.zdrRelaxed = true;
     const decision: RouteDecision = {
       ...route.decision,
@@ -463,7 +374,9 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       message: readMessage(error),
     });
     const relaxedRoute: ResolvedRoute = { ...route, decision };
-    this.routePromise = Promise.resolve(relaxedRoute);
+    if (toolIds.join() === this.routeToolIds.join()) {
+      this.routePromise = Promise.resolve(relaxedRoute);
+    }
     return relaxedRoute;
   }
 
@@ -548,7 +461,8 @@ export class RoutedLanguageModel implements LanguageModelV4 {
   private async tryFallbackRoute(
     route: ResolvedRoute,
     error: unknown,
-    attempted: Set<GatewayId>
+    attempted: Set<GatewayId>,
+    toolIds: readonly string[]
   ): Promise<ResolvedRoute | undefined> {
     const reason = classifyUpstreamFailure(error);
     if (!reason) {
@@ -560,13 +474,14 @@ export class RoutedLanguageModel implements LanguageModelV4 {
       route,
       reason,
       error,
-      attempted
+      attempted,
+      toolIds
     );
     if (crossGateway) {
       return crossGateway;
     }
     if (reason === "non-compliant" && this.canRelaxZdr(route)) {
-      return this.relaxZdr(route, error);
+      return this.relaxZdr(route, error, toolIds);
     }
     if (marked) {
       this.routePromise = undefined;
@@ -584,7 +499,8 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     route: ResolvedRoute,
     reason: FallbackReason,
     error: unknown,
-    attempted: Set<GatewayId>
+    attempted: Set<GatewayId>,
+    toolIds: readonly string[]
   ): ResolvedRoute | undefined {
     if (
       !this.context.policy.crossGatewayFallback ||
@@ -592,72 +508,49 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     ) {
       return undefined;
     }
+    const status = readStatusCode(error);
+    const errorName = error instanceof Error ? error.name : typeof error;
 
-    for (const target of fallbackGateways(
-      route.decision.gateway,
-      this.context.request.gateways
-    )) {
+    for (const target of fallbackGateways(route.decision.gateway)) {
       if (attempted.has(target)) {
         continue;
       }
-      const adapter = this.context.adapters[target];
-      const status = readStatusCode(error);
-      const errorName = error instanceof Error ? error.name : typeof error;
-
-      if (!adapter?.supportsModel(route.decision.requestedModelId)) {
-        this.context.logger.warn("ai.router.fallback_unavailable", {
-          from: route.decision.gateway,
-          to: target,
-          fallbackReason: reason,
-          errorName,
-          status,
-        });
-        continue;
-      }
-      const targetUnavailable = this.context.credits.unavailableReason(
+      const candidate = getUsableAdapter(
+        this.context,
         target,
-        route.decision.requestedModelId
+        {
+          modelId: route.decision.requestedModelId,
+          organizationId: route.decision.organizationId,
+          toolIds,
+        },
+        route.decision.zdr
       );
-      if (targetUnavailable) {
-        this.context.logger.warn("ai.router.fallback_unavailable", {
+      if ("unavailable" in candidate) {
+        const fields = {
           from: route.decision.gateway,
           to: target,
           fallbackReason: reason,
-          targetReason: targetUnavailable,
+          targetReason: candidate.unavailable,
           errorName,
           status,
-        });
-        continue;
-      }
-      if (
-        !(
-          adapter.enforcesZdr ||
-          this.context.policy.allowNonZdr ||
-          route.decision.zdr === "none"
-        )
-      ) {
-        this.context.logger.error("ai.router.no_compliant_route", {
-          from: route.decision.gateway,
-          to: target,
-          fallbackReason: reason,
-          errorName,
-          status,
-        });
+        };
+        if (candidate.unavailable === "non-compliant") {
+          this.context.logger.error("ai.router.no_compliant_route", fields);
+        } else {
+          this.context.logger.warn("ai.router.fallback_unavailable", fields);
+        }
         continue;
       }
 
       const decision: RouteDecision = {
         ...route.decision,
         gateway: target,
-        modelId: adapter.mapModelId(route.decision.requestedModelId),
+        modelId: candidate.adapter.mapModelId(route.decision.requestedModelId),
         reason: "fallback",
         fallbackFrom: route.decision.gateway,
         fallbackReason: reason,
-        zdrEnforced:
-          adapter.enforcesZdr &&
-          !this.zdrRelaxed &&
-          route.decision.zdr !== "none",
-        zdrRelaxed: this.zdrRelaxed || route.decision.zdr === "none",
+        zdrEnforced: candidate.zdrEnforced && !this.zdrRelaxed,
+        zdrRelaxed: this.zdrRelaxed || candidate.zdrRelaxed === true,
       };
       this.context.logger.warn("ai.router.fallback", {
         ...decisionLogFields(decision),
@@ -665,7 +558,9 @@ export class RoutedLanguageModel implements LanguageModelV4 {
         status,
       });
       const fallbackRoute = this.materialize(decision);
-      this.routePromise = Promise.resolve(fallbackRoute);
+      if (toolIds.join() === this.routeToolIds.join()) {
+        this.routePromise = Promise.resolve(fallbackRoute);
+      }
       return fallbackRoute;
     }
     return undefined;

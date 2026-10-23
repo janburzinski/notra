@@ -10,6 +10,19 @@ import type * as z from "zod";
 
 export type GatewayId = "neon" | "vercel" | "openrouter";
 
+/** Neon's native endpoints: OpenAI Responses, Claude Messages, Gemini, chat completions. */
+export type NeonEndpoint = "responses" | "messages" | "gemini" | "chat";
+
+export interface ModelRoute {
+  /** Neon catalog id (default endpoint per family); only listed models route to Neon. */
+  neon?: string | { id: string; endpoint: NeonEndpoint };
+  /** OpenRouter id when it differs from the neutral id, `false` when unsupported. */
+  openrouter?: string | false;
+  vercel?: false;
+  /** Short ids Vercel reports as the served model. */
+  vercelServed?: readonly string[];
+}
+
 export type Plan = "free" | "paid";
 
 export type PlanSource = "resolver" | "cache" | "override" | "default";
@@ -24,6 +37,7 @@ export type RouteReason =
 export type FallbackReason =
   | "not-configured"
   | "unsupported-model"
+  | "unsupported-tool"
   | "no-credits"
   | "auth-failure"
   | "upstream-error"
@@ -56,13 +70,13 @@ export interface RouteRequest {
   organizationId?: string;
   /** Pin the request to a specific gateway (e.g. provider-defined tools). */
   gateway?: GatewayId;
-  /**
-   * Restrict routing and fallback to these gateways, e.g. provider-defined
-   * tools that only some gateways can serve. Ignored when `gateway` is pinned.
-   */
-  gateways?: readonly GatewayId[];
   zdr?: ZdrMode;
   logContext?: Partial<OperationalContext>;
+  /**
+   * Provider-defined tools of the call (e.g. `openai.web_search`). Routing
+   * skips gateways that cannot serve them for the model.
+   */
+  toolIds?: readonly string[];
 }
 
 export interface RouteDecision {
@@ -151,6 +165,8 @@ export interface GatewayAdapter {
    */
   readonly enforcesZdr: boolean;
   supportsModel(modelId: string): boolean;
+  /** Whether the gateway serves these provider-defined tools for the model. */
+  supportsTools(modelId: string, toolIds: readonly string[]): boolean;
   mapModelId(modelId: string): string;
   createModel(modelId: string): LanguageModelV4;
   /**
@@ -305,7 +321,6 @@ export interface ModelRouterConfig {
 export interface RoutedModelOptions {
   organizationId?: string;
   gateway?: GatewayId;
-  gateways?: readonly GatewayId[];
   zdr?: ZdrMode;
   logContext?: Partial<OperationalContext>;
 }
@@ -330,13 +345,17 @@ export interface DecideGatewayInput {
   organizationId?: string;
   plan?: Plan;
   pinned?: GatewayId;
-  allowed?: readonly GatewayId[];
 }
 
 export interface GatewayDecision {
   gateway: GatewayId;
   reason: RouteReason;
 }
+
+export type GatewayCheckContext = Pick<
+  ResolverContext,
+  "adapters" | "policy" | "logger" | "credits"
+>;
 
 export interface ResolverContext {
   adapters: Partial<Record<GatewayId, GatewayAdapter>>;

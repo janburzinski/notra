@@ -173,7 +173,6 @@ export function createModelRouter(config: ModelRouterConfig): ModelRouter {
           modelId,
           organizationId: options?.organizationId,
           gateway: options?.gateway,
-          gateways: options?.gateways,
           zdr: options?.zdr,
           logContext: options?.logContext,
         },

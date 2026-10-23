@@ -18,42 +18,6 @@ export const GATEWAY_FALLBACK_ORDER: readonly GatewayId[] = [
   "openrouter",
 ];
 
-/** Verified chat-completions IDs from https://neon.com/docs/ai-gateway/overview. */
-export const NEON_MODEL_ALIASES: Readonly<Record<string, string>> = {
-  "anthropic/claude-sonnet-5": "claude-sonnet-5",
-  "anthropic/claude-sonnet-5.5": "claude-sonnet-5-5",
-  "anthropic/claude-opus-5.5": "claude-opus-5-5",
-  "anthropic/claude-sonnet-4.6": "claude-sonnet-4-6",
-  "anthropic/claude-opus-4.6": "claude-opus-4-6",
-  "anthropic/claude-haiku-4.5": "claude-haiku-4-5",
-  "anthropic/claude-haiku-5.5": "claude-haiku-5-5",
-  "anthropic/claude-opus-5": "claude-opus-5",
-  "anthropic/claude-fable-5": "claude-fable-5",
-  "anthropic/claude-fable-5.1": "claude-fable-5-1",
-  "openai/gpt-6-luna": "gpt-6-luna",
-  "openai/gpt-6-sol": "gpt-6-sol",
-  "openai/gpt-6.1-sol": "gpt-6-1-sol",
-  "openai/gpt-6-astra": "gpt-6-astra",
-  "openai/gpt-5.6-luna": "gpt-5-6-luna",
-  "openai/gpt-5.6-sol": "gpt-5-6-sol",
-  "openai/gpt-5.6-terra": "gpt-5-6-terra",
-  "openai/gpt-5.5": "gpt-5-5",
-  "openai/gpt-5.4": "gpt-5-4",
-  "openai/gpt-5.4-mini": "gpt-5-4-mini",
-  "openai/gpt-5.4-nano": "gpt-5-4-nano",
-  "openai/gpt-5-mini": "gpt-5-mini",
-  "openai/gpt-oss-120b": "gpt-oss-120b",
-  "openai/gpt-oss-20b": "gpt-oss-20b",
-  "google/gemini-3-flash": "gemini-3-flash",
-  "google/gemini-3.5-flash": "gemini-3-5-flash",
-  "google/gemini-3.8-flash": "gemini-3-8-flash",
-  "google/gemini-3.1-pro-preview": "gemini-3-1-pro",
-  "spacexai/grok-4.7": "grok-4-7",
-  "moonshotai/kimi-k3": "kimi-k3",
-  "zai/glm-5.3": "glm-5-3",
-  "meta/llama-4-maverick": "llama-4-maverick",
-};
-
 /** Prefixes Neon/Databricks put on served ids, e.g. `global.xai.grok-4.7`. */
 export const NEON_SERVED_MODEL_PREFIX_PATTERN =
   /^(?:databricks-|global\.[a-z]+\.)/;
@@ -71,66 +35,6 @@ export const OPENROUTER_PRIVACY_PROVIDER_ROUTING = {
 } as const;
 
 export const VERCEL_NAMESPACE_PREFIX = "vercel/";
-
-export const VERCEL_SERVED_MODEL_ALIASES: Readonly<Record<string, string>> = {
-  "gpt-5.4": "openai/gpt-5.4",
-  "gpt-5.4-mini": "openai/gpt-5.4-mini",
-  "gpt-5.4-nano": "openai/gpt-5.4-nano",
-  "gpt-5.6-sol": "openai/gpt-5.6-sol",
-  "gpt-6-luna": "openai/gpt-6-luna",
-  "claude-sonnet-4-6": "anthropic/claude-sonnet-4.6",
-  "claude-opus-4-6": "anthropic/claude-opus-4.6",
-  "claude-haiku-4-5": "anthropic/claude-haiku-4.5",
-  "claude-sonnet-5": "anthropic/claude-sonnet-5",
-  "claude-opus-5-5": "anthropic/claude-opus-5.5",
-  "claude-opus-5.5": "anthropic/claude-opus-5.5",
-};
-
-export const OPENROUTER_MODEL_ALIASES: Readonly<Record<string, string>> = {
-  "google/gemini-3-flash": "google/gemini-3-flash-preview",
-  "meta/llama-4-maverick": "meta-llama/llama-4-maverick",
-  "meta/llama-4-scout": "meta-llama/llama-4-scout",
-  "meta/llama-3.3-70b": "meta-llama/llama-3.3-70b-instruct",
-  "meta/llama-3.1-70b": "meta-llama/llama-3.1-70b-instruct",
-  "meta/llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct",
-  "mistral/mistral-medium-3.5": "mistralai/mistral-medium-3-5",
-  "mistral/mistral-large-3": "mistralai/mistral-large-2512",
-  "spacexai/grok-4.7": "x-ai/grok-4.7",
-  "spacexai/grok-4.6": "x-ai/grok-4.6",
-  "spacexai/grok-4.5": "x-ai/grok-4.5",
-  "spacexai/grok-build-0.1": "x-ai/grok-build-0.1",
-  "spacexai/grok-4.3": "x-ai/grok-4.3",
-  "spacexai/grok-4.20-multi-agent": "x-ai/grok-4.20-multi-agent",
-  "zai/glm-5.3-flash": "z-ai/glm-5.3-flash",
-  "zai/glm-5.3": "z-ai/glm-5.3",
-  "zai/glm-5.2": "z-ai/glm-5.2",
-  "zai/glm-5.1": "z-ai/glm-5.1",
-  "zai/glm-5v-turbo": "z-ai/glm-5v-turbo",
-  "zai/glm-5-turbo": "z-ai/glm-5-turbo",
-  "zai/glm-5": "z-ai/glm-5",
-  "zai/glm-4.7-flash": "z-ai/glm-4.7-flash",
-};
-
-const RETIRED_MODELS = ["mistral/magistral-medium"];
-
-export const OPENROUTER_UNSUPPORTED_MODELS: ReadonlySet<string> = new Set([
-  "moonshotai/kimi-k2.7-code-highspeed",
-  "zai/glm-5.3-promo-50",
-  "zai/glm-4.7-flashx",
-  "spacexai/grok-4.20-non-reasoning",
-  "spacexai/grok-4.20-reasoning",
-  "spacexai/grok-4.1-fast-non-reasoning",
-  "spacexai/grok-4.1-fast-reasoning",
-  "deepseek/deepseek-v3.2-thinking",
-  "deepseek/deepseek-v3.1",
-  "mistral/mistral-medium",
-  "mistral/mistral-small",
-  ...RETIRED_MODELS,
-]);
-
-export const VERCEL_UNSUPPORTED_MODELS: ReadonlySet<string> = new Set(
-  RETIRED_MODELS
-);
 
 export const VERCEL_OPTIONS_KEY = "gateway";
 export const OPENROUTER_OPTIONS_KEY = "openrouter";

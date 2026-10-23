@@ -72,6 +72,8 @@ export function createOpenRouterAdapter(
     id: "openrouter",
     enforcesZdr: true,
     supportsModel: (modelId) => isModelSupported("openrouter", modelId),
+    // The OpenRouter provider only sends function tools.
+    supportsTools: (_modelId, toolIds) => toolIds.length === 0,
     mapModelId: toOpenRouterModelId,
     createModel: (modelId) =>
       getClient().chat(toOpenRouterModelId(modelId), {

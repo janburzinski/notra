@@ -3,10 +3,19 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import type { LanguageModelV4 } from "@ai-sdk/provider";
-import { VERCEL_NAMESPACE_PREFIX } from "@notra/ai/constants/router";
-import type { GatewayAdapter, NeonAdapterConfig } from "@notra/ai/types/router";
+import type {
+  GatewayAdapter,
+  NeonAdapterConfig,
+  NeonEndpoint,
+} from "@notra/ai/types/router";
 
-import { fromNeonModelId, isModelSupported, toNeonModelId } from "../model-ids";
+import {
+  fromNeonModelId,
+  isModelSupported,
+  neonEndpointOf,
+  neonSupportsTools,
+  toNeonModelId,
+} from "../model-ids";
 import { buildNeonProviderOptions } from "../provider-options";
 
 export function createNeonAdapter(config: NeonAdapterConfig): GatewayAdapter {
@@ -40,21 +49,11 @@ export function createNeonAdapter(config: NeonAdapterConfig): GatewayAdapter {
     headers: bearer,
     fetch: config.fetch,
   });
-
-  const createModel = (modelId: string): LanguageModelV4 => {
-    const neonModelId = toNeonModelId(modelId);
-    const family = modelId.replace(VERCEL_NAMESPACE_PREFIX, "").split("/")[0];
-    // gpt-oss is only served on chat completions.
-    if (family === "openai" && !neonModelId.startsWith("gpt-oss")) {
-      return openai.responses(neonModelId);
-    }
-    if (family === "anthropic") {
-      return anthropic(neonModelId);
-    }
-    if (family === "google") {
-      return google(neonModelId);
-    }
-    return chat.chatModel(neonModelId);
+  const endpoints: Record<NeonEndpoint, (id: string) => LanguageModelV4> = {
+    responses: (id) => openai.responses(id),
+    messages: (id) => anthropic(id),
+    gemini: (id) => google(id),
+    chat: (id) => chat.chatModel(id),
   };
 
   return {
@@ -63,8 +62,10 @@ export function createNeonAdapter(config: NeonAdapterConfig): GatewayAdapter {
     // https://neon.com/docs/ai-gateway/data-retention
     enforcesZdr: false,
     supportsModel: (modelId) => isModelSupported("neon", modelId),
+    supportsTools: neonSupportsTools,
     mapModelId: toNeonModelId,
-    createModel,
+    createModel: (modelId) =>
+      endpoints[neonEndpointOf(modelId)](toNeonModelId(modelId)),
     buildProviderOptions: buildNeonProviderOptions,
     // No documented inference-token balance/health endpoint. Do not invent a
     // funded balance or send the inference credential to the management API.

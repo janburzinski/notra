@@ -1,5 +1,6 @@
 import type {
   FallbackReason,
+  GatewayCheckContext,
   GatewayId,
   PlanLookup,
   ResolverContext,
@@ -49,19 +50,27 @@ async function lookupZdrMode(
   return result?.value ?? "required";
 }
 
-function getUsableAdapter(
-  context: ResolverContext,
+/**
+ * Whether `gateway` can serve the request: configured, serves the model and
+ * its provider-defined tools, not marked unavailable, and privacy compliant.
+ * Shared by route resolution and the runtime fallback after a failed call.
+ */
+export function getUsableAdapter(
+  context: GatewayCheckContext,
   gateway: GatewayId,
-  modelId: string,
-  organizationId: string | undefined,
+  request: Pick<RouteRequest, "modelId" | "organizationId" | "toolIds">,
   zdr: ZdrMode
 ): UsableAdapter | { unavailable: FallbackReason } {
+  const { modelId, organizationId } = request;
   const adapter = context.adapters[gateway];
   if (!adapter) {
     return { unavailable: "not-configured" };
   }
   if (!adapter.supportsModel(modelId)) {
     return { unavailable: "unsupported-model" };
+  }
+  if (!adapter.supportsTools(modelId, request.toolIds ?? [])) {
+    return { unavailable: "unsupported-tool" };
   }
   const unavailableReason = context.credits.unavailableReason(gateway, modelId);
   if (unavailableReason) {
@@ -90,14 +99,17 @@ function getUsableAdapter(
 function getRelaxedAdapter(
   context: ResolverContext,
   gateway: GatewayId,
-  modelId: string,
+  request: RouteRequest,
   unavailable: FallbackReason
 ): UsableAdapter | undefined {
   const adapter = context.adapters[gateway];
   if (unavailable !== "non-compliant" || !adapter) {
     return undefined;
   }
-  if (!adapter.supportsModel(modelId)) {
+  if (
+    !adapter.supportsModel(request.modelId) ||
+    !adapter.supportsTools(request.modelId, request.toolIds ?? [])
+  ) {
     return undefined;
   }
   const reason = context.credits.unavailableReason(gateway);
@@ -144,7 +156,7 @@ function throwUnavailable(
   if (reason === "not-configured") {
     throw new GatewayNotConfiguredError(gateway);
   }
-  if (reason === "unsupported-model") {
+  if (reason === "unsupported-model" || reason === "unsupported-tool") {
     throw new UnsupportedModelError(gateway, modelId);
   }
   if (reason === "no-credits") {
@@ -181,16 +193,9 @@ export async function resolveRoute(
     organizationId,
     plan: planLookup?.plan,
     pinned: request.gateway,
-    allowed: request.gateways,
   });
 
-  const primary = getUsableAdapter(
-    context,
-    decision.gateway,
-    modelId,
-    organizationId,
-    zdr
-  );
+  const primary = getUsableAdapter(context, decision.gateway, request, zdr);
   if ("adapter" in primary) {
     return toDecision(primary, request, planLookup, zdr, decision.reason);
   }
@@ -203,7 +208,7 @@ export async function resolveRoute(
       ? getRelaxedAdapter(
           context,
           decision.gateway,
-          modelId,
+          request,
           primary.unavailable
         )
       : undefined;
@@ -214,18 +219,10 @@ export async function resolveRoute(
     throwUnavailable(decision.gateway, modelId, primary.unavailable);
   }
 
-  const alternatives = fallbackGateways(decision.gateway, request.gateways).map(
-    (gateway) => ({
-      gateway,
-      candidate: getUsableAdapter(
-        context,
-        gateway,
-        modelId,
-        organizationId,
-        zdr
-      ),
-    })
-  );
+  const alternatives = fallbackGateways(decision.gateway).map((gateway) => ({
+    gateway,
+    candidate: getUsableAdapter(context, gateway, request, zdr),
+  }));
   for (const { candidate } of alternatives) {
     if ("adapter" in candidate) {
       context.logger.info("ai.router.fallback", {
@@ -253,7 +250,7 @@ export async function resolveRoute(
       const relaxed = getRelaxedAdapter(
         context,
         gateway,
-        modelId,
+        request,
         candidate.unavailable
       );
       if (relaxed) {

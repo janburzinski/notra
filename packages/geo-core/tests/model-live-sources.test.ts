@@ -121,7 +121,7 @@ mock.module("@notra/ai/gateway", () => ({
 
 const { geoModelLive } = await import("../src/geo/model-live");
 
-test("Grok sends native web search through Vercel and retains queries and citations", async () => {
+test("Grok delegates native search routing and retains queries and citations", async () => {
   const engine = resolveGroundedEngineByKey("spacexai/grok-4.7-grounded");
   if (!engine) {
     throw new Error("Grok should have a grounded route");
@@ -145,8 +145,9 @@ test("Grok sends native web search through Vercel and retains queries and citati
     );
     expect(routedModel).toHaveBeenCalledWith(
       "spacexai/grok-4.7",
-      expect.objectContaining({ gateway: "vercel", zdr: "required" })
+      expect.objectContaining({ organizationId: "test-org", zdr: "required" })
     );
+    expect(routedModel.mock.calls[0]?.[1]?.gateway).toBeUndefined();
     expect(model.doGenerateCalls[0]?.tools).toContainEqual(
       expect.objectContaining({
         type: "provider",

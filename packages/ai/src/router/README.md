@@ -34,7 +34,7 @@ pins remain pinned. Missing Neon configuration does not disable other gateways.
 Configure `NEON_AI_GATEWAY_API_KEY` (or Neon's standard
 `NEON_AI_GATEWAY_TOKEN`) and `NEON_AI_GATEWAY_BASE_URL`. The URL is the branch
 gateway host from Connect → AI Gateway; a trailing `/v1` is also accepted.
-Only verified catalog IDs in `NEON_MODEL_ALIASES` are routed to Neon; other
+Only models with a `neon` entry in `MODEL_ROUTES` are routed to Neon; other
 models fall back. Neon does not receive Vercel/OpenRouter routing or automatic
 model-fallback options. Each model family uses Neon's native endpoint, because
 chat completions rejects OpenAI function tools with reasoning, Claude
@@ -42,8 +42,9 @@ structured output, Gemini tool schemas and provider web search: OpenAI →
 Responses (`/openai/v1`), Claude → Messages (`/anthropic/v1`, with top-level
 `cache_control` like Vercel's auto caching), Gemini → `/gemini/v1beta`, and
 everything else (gpt-oss, Grok, Kimi, GLM, Llama) → chat completions (`/v1`).
-OpenAI and Gemini web search work on Neon; Claude and Grok search do not.
-OpenAI calls default to `store: false` on Neon. Served ids such as
+OpenAI calls default to `store: false` on Neon. Neon rejects
+`service_tier: "flex"` (400), so the Vercel-only `gateway.serviceTier` option
+is dropped there and the call runs at standard price. Served ids such as
 `gpt-5.4-nano-2026-03-17` or `global.xai.grok-4.7` map back to the neutral id
 so billing finds the price; Neon reports no cost, so steps are priced from
 `MODEL_PRICING` (`neon/…` entries where Neon's list price differs).
@@ -52,9 +53,15 @@ Neon's default account limits are 200k tokens per minute and a $20 daily spend
 cap (429 `REQUEST_LIMIT_EXCEEDED`). Any 429 falls back to Vercel for that call;
 the daily cap additionally skips Neon for `DEFAULT_UNAVAILABLE_TTL_MS`.
 
-Pass `gateways: ["neon", "vercel"]` to restrict a call to gateways that can
-serve it (routing and fallback); GEO's OpenAI and Gemini grounded engines use
-this, the other grounded engines stay pinned to Vercel.
+## Provider-defined tools
+
+Routing reads the provider-defined tools of each call (e.g.
+`openai.web_search`) and skips gateways that cannot serve them for the model
+(`fallbackReason: unsupported-tool`). Neon serves OpenAI web search on
+Responses and Google search on Gemini (`NEON_ENDPOINT_TOOLS`); Vercel serves
+all of them; OpenRouter none. Callers therefore do not pin gateways for
+search: `gateway(model, { organizationId })` with `tools` is enough. Pin only
+when the model itself depends on a gateway (Perplexity Sonar).
 
 The plan is resolved once per organization through `resolvePlan`
 (`@notra/ai/billing/plan` → Autumn) and cached for 60 s. Concurrent misses
@@ -93,15 +100,15 @@ relaxed defaults and conflicting allow flags, including on runtime fallback.
 OpenRouter receives `zdr: false` on relaxed calls to override the strict
 provider and model defaults.
 
-## Gateway coverage
+## Model catalog
 
-`isModelSupported()` (`router/model-ids.ts`) consults
-`VERCEL_UNSUPPORTED_MODELS` / `OPENROUTER_UNSUPPORTED_MODELS`
-(`@notra/ai/constants/router`). A model that only exists on OpenRouter goes
-there directly (`fallbackReason: unsupported-model`) instead of burning a
-request on Vercel first. Add OpenRouter-only ids (and an alias in
-`OPENROUTER_MODEL_ALIASES` when the OpenRouter id differs) when you add them
-to a catalog.
+`MODEL_ROUTES` (`@notra/ai/constants/model-routes`) is the one place to touch
+when a model is added: its Neon id (and endpoint when it differs from the
+family default), its OpenRouter id when it differs or `false` when OpenRouter
+lacks it, `vercel: false` for retired models, and the short ids Vercel reports
+back. `router/model-ids.ts` derives every lookup from it. Prices stay in
+`MODEL_PRICING`. A model a gateway lacks is skipped
+(`fallbackReason: unsupported-model`) instead of burning a request first.
 
 ## Upstream failures
 

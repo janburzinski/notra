@@ -16,12 +16,12 @@ import {
   GEO_WRITER_MODEL,
   UTILITY_MODEL_ID,
 } from "@notra/ai/constants/models";
-import { VERCEL_SERVED_MODEL_ALIASES } from "@notra/ai/constants/router";
 import { summarizeRouteUsage } from "@notra/ai/utils/route-usage";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
 
 import { setModelRouter } from "../../gateway";
 import { createModelRouter } from "../create-router";
+import { VERCEL_SERVED_MODEL_ALIASES } from "../model-ids";
 import {
   callOptions,
   createCaptureLogger,
@@ -239,7 +239,7 @@ test("current vendor aliases resolve to owned canonical pricing entries", async 
     assert.equal(Object.hasOwn(MODEL_PRICING, canonical), true);
     assert.equal(adapter.extractRouteMetadata(undefined, raw).model, canonical);
   }
-  for (const canonical of Object.values(VERCEL_SERVED_MODEL_ALIASES)) {
+  for (const canonical of VERCEL_SERVED_MODEL_ALIASES.values()) {
     assert.equal(
       Object.hasOwn(MODEL_PRICING, canonical),
       canonical !== "anthropic/claude-opus-4.6"

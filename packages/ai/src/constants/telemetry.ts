@@ -170,6 +170,7 @@ export const TELEMETRY_ENUM_FIELDS: Readonly<
   fallbackReason: new Set([
     "not-configured",
     "unsupported-model",
+    "unsupported-tool",
     "no-credits",
     "auth-failure",
     "upstream-error",

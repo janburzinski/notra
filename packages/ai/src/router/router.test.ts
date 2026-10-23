@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import type { LanguageModelV4StreamPart } from "@ai-sdk/provider";
+import type {
+  LanguageModelV4CallOptions,
+  LanguageModelV4StreamPart,
+} from "@ai-sdk/provider";
 import {
   ORGANIZATION_LOOKUP_FAILURE_TTL_MS,
   ROUTER_METADATA_KEY,
@@ -32,18 +35,6 @@ import {
 } from "./test-helpers";
 
 describe("resolveRoute", () => {
-  test("an empty gateway allowlist rejects without sending a request", async () => {
-    const { router, vercel, openrouter } = createTestRouter({ plans });
-    const request = { modelId: MODEL, gateways: [] };
-    await assert.rejects(router.resolveRoute(request), /No gateways allowed/);
-    await assert.rejects(
-      async () => await router.model(MODEL, request).doGenerate(callOptions()),
-      /No gateways allowed/
-    );
-    assert.equal(vercel?.calls.length, 0);
-    assert.equal(openrouter?.calls.length, 0);
-  });
-
   test("paid organization → vercel, free organization → openrouter", async () => {
     const { router } = createTestRouter({ plans });
     const paid = await router.resolveRoute({
@@ -212,28 +203,24 @@ describe("resolveRoute", () => {
     assert.equal(decision.fallbackReason, "unsupported-model");
   });
 
-  test("allowed gateways override the policy and limit fallback", async () => {
-    const { router } = createTestRouter({ plans });
-    const decision = await router.resolveRoute({
-      modelId: MODEL,
-      organizationId: FREE_ORG,
-      gateways: ["vercel"],
+  test("provider tools route to a gateway that serves them", async () => {
+    const openrouter = createFakeAdapter({
+      id: "openrouter",
+      supportedTools: (_modelId, toolIds) => toolIds.length === 0,
     });
-    assert.equal(decision.gateway, "vercel");
+    const { router } = createTestRouter({ plans, openrouter });
+    const model = router.model(MODEL, { organizationId: FREE_ORG });
+    const search = await model.doGenerate({
+      ...callOptions(),
+      tools: [
+        { type: "provider", id: "openai.web_search", name: "web", args: {} },
+      ],
+    });
+    assert.equal(metadataOf(search)?.gateway, "vercel");
+    assert.equal(metadataOf(search)?.fallbackReason, "unsupported-tool");
 
-    const vercel = createFakeAdapter({
-      id: "vercel",
-      supportedModels: () => false,
-    });
-    const restricted = createTestRouter({ plans, vercel });
-    await assert.rejects(
-      restricted.router.resolveRoute({
-        modelId: MODEL,
-        organizationId: FREE_ORG,
-        gateways: ["vercel"],
-      }),
-      UnsupportedModelError
-    );
+    const plain = await model.doGenerate(callOptions());
+    assert.equal(metadataOf(plain)?.gateway, "openrouter");
   });
 
   test("model unsupported everywhere throws UnsupportedModelError", async () => {
@@ -325,6 +312,82 @@ describe("resolveRoute", () => {
 });
 
 describe("RoutedLanguageModel", () => {
+  for (const operation of ["generate", "stream"] as const) {
+    test(`overlapping ${operation} fallback cannot replace a cached search route`, async () => {
+      let start!: () => void;
+      let unblock!: () => void;
+      const started = new Promise<void>((resolve) => {
+        start = resolve;
+      });
+      const release = new Promise<void>((resolve) => {
+        unblock = resolve;
+      });
+      const vercel = createFakeAdapter({
+        id: "vercel",
+        onCall: async ({ options }) => {
+          if (!options.tools?.length) {
+            start();
+            await release;
+            throw httpError(503);
+          }
+        },
+      });
+      const openrouter = createFakeAdapter({
+        id: "openrouter",
+        supportedTools: (_modelId, toolIds) => toolIds.length === 0,
+      });
+      const { router } = createTestRouter({
+        vercel,
+        openrouter,
+        policy: { defaultGateway: "vercel" },
+      });
+      const model = router.model(MODEL, { zdr: "none" });
+      const plain =
+        operation === "generate"
+          ? model.doGenerate(callOptions())
+          : model.doStream(callOptions());
+      await started;
+      const searchOptions: LanguageModelV4CallOptions = {
+        ...callOptions(),
+        tools: [
+          {
+            type: "provider" as const,
+            id: "openai.web_search",
+            name: "web",
+            args: {},
+          },
+        ],
+      };
+      if (operation === "generate") {
+        await model.doGenerate(searchOptions);
+      } else {
+        await readStreamParts(await model.doStream(searchOptions));
+      }
+      unblock();
+      const plainResult = await plain;
+      if ("stream" in plainResult) {
+        await readStreamParts(plainResult);
+      }
+      if (operation === "generate") {
+        assert.equal(
+          metadataOf(await model.doGenerate(searchOptions))?.gateway,
+          "vercel"
+        );
+      } else {
+        const parts = await readStreamParts(
+          await model.doStream(searchOptions)
+        );
+        assert.equal(
+          metadataOf(parts.find((part) => part.type === "finish") ?? {})
+            ?.gateway,
+          "vercel"
+        );
+      }
+      assert.equal(openrouter.calls.length, 1);
+      assert.equal(vercel.calls.length, 3);
+    });
+  }
+
   test("openrouter calls carry ZDR provider options and no vercel block", async () => {
     const { router, openrouter } = createTestRouter({ plans });
     const model = router.model(MODEL, { organizationId: FREE_ORG });

@@ -70,8 +70,9 @@ test("Muse search retains queries and citations without enabling ZDR or prompt t
   );
   expect(routedModel).toHaveBeenCalledWith(
     "meta/muse-wonder-1.0",
-    expect.objectContaining({ gateway: "vercel", zdr: "none" })
+    expect.objectContaining({ organizationId: "test-org", zdr: "none" })
   );
+  expect(routedModel.mock.calls[0]?.[1]?.gateway).toBeUndefined();
   expect(model.doGenerateCalls[0]?.tools).toContainEqual(
     expect.objectContaining({
       type: "provider",
