@@ -1,0 +1,28 @@
+apps/evals/src/scoring/autopilot-planner.ts
+  s_ed0837d744d10b::t_f7f75a299a63d1 54,56,69-70,79-83,85,169,171
+apps/evals/src/harness/autopilot-planner.ts
+  s_ed0837d744d10b::t_f7f75a299a63d1 450,454
+apps/evals/src/runner/box.ts
+  s_ed0837d744d10b::t_f7f75a299a63d1 136,138,140-142,144
+  s_ed0837d744d10b::t_ac7e116792a8eb 137,139
+apps/dashboard/src/lib/autopilot/planner.ts
+  s_ed0837d744d10b::t_f7f75a299a63d1 133-134,138-140,142-144,303
+packages/ai/src/utils/autopilot-planner.ts
+  s_ed0837d744d10b::t_f7f75a299a63d1 70-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5615a4b587bfde765c80310354674f41485a4c64",
+  "prompts": {},
+  "sessions": {
+    "s_ed0837d744d10b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0620c616-3e4c-4b3f-a010-95a6e321ffa0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
