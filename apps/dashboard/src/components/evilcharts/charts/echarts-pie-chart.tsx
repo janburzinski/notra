@@ -46,7 +46,10 @@ import {
   resolveTooltipPosition,
   tooltipShell,
 } from "@/components/evilcharts/ui/echarts-tooltip";
-import { withTooltipSizeMotion } from "@/utils/chart-tooltip-size";
+import {
+  keepTooltipContentMounted,
+  withTooltipSizeMotion,
+} from "@/utils/chart-tooltip-size";
 import type {
   ChartConfig,
   TooltipBodyItem,
@@ -1042,6 +1045,7 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
         animationDurationUpdate: 0,
       });
       chart.setOption(merged as EChartsOption, { notMerge: true });
+      keepTooltipContentMounted(chart);
     };
 
     if (isLoading) live.hasRevealed = false;

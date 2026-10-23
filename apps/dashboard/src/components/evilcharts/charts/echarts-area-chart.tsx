@@ -80,7 +80,10 @@ import {
   tooltipItemsFromRow,
   tooltipShell,
 } from "@/components/evilcharts/ui/echarts-tooltip";
-import { withTooltipSizeMotion } from "@/utils/chart-tooltip-size";
+import {
+  keepTooltipContentMounted,
+  withTooltipSizeMotion,
+} from "@/utils/chart-tooltip-size";
 import type {
   ChartConfig,
   ChartMarker,
@@ -2754,6 +2757,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         stateAnimation: { duration: HOVER_DOT_STATE_MS, easing: "cubicOut" },
       });
       chart.setOption(merged as EChartsOption, { notMerge: true });
+      keepTooltipContentMounted(chart);
       syncBrushOverlayNow();
       if (live.scrubIndex !== null && live.scrubTarget === 1) {
         chart.setOption(
