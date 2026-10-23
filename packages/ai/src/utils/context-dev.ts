@@ -370,31 +370,56 @@ export async function scrapeWebsiteForBrandAnalysis(
   const websiteUrl = normalizeContextDevWebsiteUrl(url);
 
   try {
-    const sitemapResult = await crawlSitemap({
-      domain: new URL(websiteUrl).hostname,
-      maxLinks: BRAND_ANALYSIS_SITEMAP_MAX_LINKS,
-      timeoutMS: BRAND_ANALYSIS_SITEMAP_TIMEOUT_MS,
-    }).catch(() => null);
-
-    const urls = pickBrandAnalysisUrls(websiteUrl, sitemapResult?.urls ?? []);
-    const scrapeResult = await scrapeBrandAnalysisPages(
-      urls.length > 0 ? urls : [websiteUrl]
-    );
-    const { pages } = scrapeResult;
-
-    if (pages.length === 0) {
-      return scrapeResult.firstError
-        ? mapContextDevError(scrapeResult.firstError)
-        : {
-            success: false,
-            error: "Failed to scrape website",
-            fatal: false,
-          };
+    const entryHost = new URL(websiteUrl).hostname;
+    const [entryPageResult, entrySitemap] = await Promise.all([
+      fetchBrandAnalysisPage(websiteUrl).then(
+        (page) => ({ page }),
+        (error: unknown) => ({ error })
+      ),
+      crawlBrandAnalysisSitemap(entryHost),
+    ]);
+    if ("error" in entryPageResult) {
+      // A slow or blocked homepage should not sink the analysis when the
+      // site's other pages are still readable.
+      const fallbackUrls = pickBrandAnalysisUrls(
+        websiteUrl,
+        entrySitemap
+      ).filter((pageUrl) => !isSameUrl(pageUrl, websiteUrl));
+      const { pages } = await scrapeBrandAnalysisPages(
+        fallbackUrls,
+        websiteUrl
+      );
+      return pages.length > 0
+        ? {
+            success: true,
+            content: truncateContent(formatScrapedPagesForBrandAnalysis(pages)),
+          }
+        : mapContextDevError(entryPageResult.error);
     }
+    const entryPage = entryPageResult.page;
+
+    // Rebranded or moved sites (getcargo.io -> getcargo.ai) redirect the
+    // entry URL to another domain. Treat the redirect target as the site so
+    // its sitemap and subpages are analyzed instead of failing every page.
+    const siteUrl = getFinalPageUrl(entryPage);
+    const siteHost = new URL(siteUrl).hostname;
+    // Page ranking only keeps URLs on the final host, so any host change,
+    // including to a subdomain, needs that host's own sitemap.
+    const sitemapUrls =
+      normalizeBrandHostname(siteHost) === normalizeBrandHostname(entryHost)
+        ? entrySitemap
+        : await crawlBrandAnalysisSitemap(siteHost);
+
+    const urls = pickBrandAnalysisUrls(siteUrl, sitemapUrls).filter(
+      (pageUrl) => !isSameUrl(pageUrl, siteUrl)
+    );
+    const { pages } = await scrapeBrandAnalysisPages(urls, siteUrl);
 
     return {
       success: true,
-      content: truncateContent(formatScrapedPagesForBrandAnalysis(pages)),
+      content: truncateContent(
+        formatScrapedPagesForBrandAnalysis([entryPage, ...pages])
+      ),
     };
   } catch (error) {
     logError("[context.dev] Error scraping website", undefined, {
@@ -404,33 +429,61 @@ export async function scrapeWebsiteForBrandAnalysis(
   }
 }
 
-async function scrapeBrandAnalysisPages(urls: string[]) {
+async function crawlBrandAnalysisSitemap(domain: string): Promise<string[]> {
+  const result = await crawlSitemap({
+    domain,
+    maxLinks: BRAND_ANALYSIS_SITEMAP_MAX_LINKS,
+    timeoutMS: BRAND_ANALYSIS_SITEMAP_TIMEOUT_MS,
+  }).catch(() => null);
+  return result?.urls ?? [];
+}
+
+function fetchBrandAnalysisPage(pageUrl: string) {
+  return fetchWebpage({
+    includeImages: false,
+    includeLinks: true,
+    onlyMainContent: true,
+    timeoutMS: 20_000,
+    url: pageUrl,
+  });
+}
+
+function getFinalPageUrl(page: ContextDevFetchWebpageResponse): string {
+  return new URL(page.metadata?.finalUrl ?? page.url, page.url).toString();
+}
+
+function isSameBrandHost(host: string, siteHost: string): boolean {
+  const normalizedHost = normalizeBrandHostname(host);
+  const normalizedSiteHost = normalizeBrandHostname(siteHost);
+  return (
+    normalizedHost === normalizedSiteHost ||
+    normalizedHost.endsWith(`.${normalizedSiteHost}`)
+  );
+}
+
+function isSameUrl(a: string, b: string): boolean {
+  try {
+    return getCanonicalUrlKey(a) === getCanonicalUrlKey(b);
+  } catch {
+    return false;
+  }
+}
+
+async function scrapeBrandAnalysisPages(urls: string[], siteUrl: string) {
+  const siteHost = new URL(siteUrl).hostname;
   const settledPages = await Promise.allSettled(
     urls.map(async (pageUrl) => {
-      const page = await fetchWebpage({
-        includeImages: false,
-        includeLinks: true,
-        onlyMainContent: true,
-        timeoutMS: 20_000,
-        url: pageUrl,
-      });
-      const sourceHost = normalizeBrandHostname(new URL(pageUrl).hostname);
-      const finalHost = normalizeBrandHostname(
-        new URL(page.metadata?.finalUrl ?? page.url, page.url).hostname
-      );
-      if (finalHost !== sourceHost && !finalHost.endsWith(`.${sourceHost}`)) {
+      const page = await fetchBrandAnalysisPage(pageUrl);
+      // Subpages that leave the site (e.g. to a parked or partner domain)
+      // would mix another brand into the analysis.
+      if (!isSameBrandHost(new URL(getFinalPageUrl(page)).hostname, siteHost)) {
         throw new Error("Scraped page redirected to a different website");
       }
       return page;
     })
   );
 
-  const firstError = settledPages.find(
-    (result) => result.status === "rejected"
-  )?.reason;
-
   return {
-    firstError,
     pages: settledPages.flatMap((result) =>
       result.status === "fulfilled" ? [result.value] : []
     ),
