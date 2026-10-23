@@ -1,0 +1,21 @@
+packages/sites-server/tests/branch-workflow.test.ts
+  s_69c6b08f0d57d2::t_448e60413edbd3 436-454
+packages/sites-server/src/editor.ts
+  s_69c6b08f0d57d2::t_6077a491921559 846-848
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ff113fd1e0db64eaa421300ddc543160c39131ea",
+  "prompts": {},
+  "sessions": {
+    "s_69c6b08f0d57d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb0e469f-88c0-4467-bf21-359bc543ea5f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
