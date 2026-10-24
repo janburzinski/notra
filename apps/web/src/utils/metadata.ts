@@ -19,6 +19,13 @@ export const DEFAULT_SOCIAL_IMAGE = {
   alt: "Notra social preview image",
 } as const;
 
+const DEFAULT_SOCIAL_VIDEO = {
+  url: "/video/notra-og.mp4",
+  width: 1200,
+  height: 630,
+  type: "video/mp4",
+} as const;
+
 const SOCIAL_IMAGE_WIDTH = 1200;
 const SOCIAL_IMAGE_HEIGHT = 630;
 
@@ -163,6 +170,7 @@ export const ROOT_METADATA: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: [DEFAULT_SOCIAL_IMAGE],
+    videos: [DEFAULT_SOCIAL_VIDEO],
   },
   twitter: {
     card: "summary_large_image",
