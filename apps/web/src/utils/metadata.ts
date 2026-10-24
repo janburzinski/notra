@@ -20,7 +20,7 @@ export const DEFAULT_SOCIAL_IMAGE = {
 } as const;
 
 const DEFAULT_SOCIAL_VIDEO = {
-  url: "/video/notra-og.mp4",
+  url: "/video/notra-og-v2.mp4",
   width: 1200,
   height: 630,
   type: "video/mp4",
