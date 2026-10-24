@@ -1,0 +1,31 @@
+apps/dashboard/src/lib/geo/persona-generation.ts
+  s_e2161acad6cba8::t_78726e7583c3d7 23-25
+  s_e2161acad6cba8::t_4082d6783a6840 21-22,26,70
+apps/dashboard/src/lib/orpc/routers/content-recents.ts
+  s_e2161acad6cba8::t_f986be9135ac00 1-40
+apps/dashboard/src/lib/orpc/router.ts
+  s_e2161acad6cba8::t_ee8713ad310458 1,7,10-13,15-18,20,23,26-29,31-34,36,39,42,45-48,50,53,56,59,62,65-68,70,73-88,91,94-97,99,102-105,107
+  s_e2161acad6cba8::t_64cfccb50d2fad 3-5,8-9,14,19,21-22,24-25,30,35,37-38,40-41,43-44,49,51-52,54-55,57-58,60-61,63-64,69,71-72,89-90,92-93,98,100-101,106,108-109
+apps/dashboard/src/lib/auth/sync.ts
+  s_e2161acad6cba8::t_678c103e76fea1 210-214,274,280-283,288-290,388-390
+apps/dashboard/src/lib/orpc/routers/content.ts
+  s_e2161acad6cba8::t_f986be9135ac00 131,618
+apps/dashboard/src/utils/geo-prefetch.server.ts
+  s_e2161acad6cba8::t_f6277254bc15c0 10,55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "24cff1966660d8e087ec978c82bfe18a312c75c0",
+  "prompts": {},
+  "sessions": {
+    "s_e2161acad6cba8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "94762150-389c-4bf1-b3b7-1c15fc96fd50",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
