@@ -2,8 +2,6 @@ import type { ContributorsData } from "~types/github";
 
 import { CONTRIBUTORS_DATA } from "@/constants/contributors-data";
 
-export const GITHUB_REPO_URL = "https://github.com/usenotra/notra";
-
 export function fetchContributorsData(): Promise<ContributorsData> {
   return Promise.resolve(CONTRIBUTORS_DATA);
 }
@@ -16,8 +14,4 @@ export function formatContributionCount(count: number): string {
     return `${thousands.toFixed(thousands >= 10 ? 0 : 1).replace(TRAILING_ZERO_DECIMAL, "")}k`;
   }
   return count.toString();
-}
-
-export function formatNotraAiPrCountLabel(prCount: number): string {
-  return `${prCount} pull request${prCount === 1 ? "" : "s"}`;
 }

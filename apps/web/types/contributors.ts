@@ -9,10 +9,6 @@ export interface ContributorsGridProps {
   contributors: GitHubUser[];
 }
 
-export interface NotraAiCalloutProps {
-  prCount: number;
-}
-
 export interface ContributorsContentProps {
   data: ContributorsData;
 }

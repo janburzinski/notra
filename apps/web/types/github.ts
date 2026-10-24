@@ -21,7 +21,6 @@ export interface GitHubRepo {
 
 export interface ContributorsData {
   contributors: GitHubUser[];
-  notraAiPrCount: number;
 }
 
 export interface OgContributor extends GitHubUser {

@@ -1,14 +1,11 @@
 import type { ContributorsContentProps } from "~types/contributors";
 
 import { ContributorsGrid } from "@/components/contributors/contributors-grid";
-import { NotraAiCallout } from "@/components/contributors/notra-ai-callout";
 import { ContributorsSectionHeader } from "@/components/contributors/section-header";
-import { Sponsors } from "@/components/contributors/sponsors";
 import {
   CONTRIBUTORS_HEADING,
   CONTRIBUTORS_SUBCOPY,
 } from "@/constants/contributors";
-import { SPONSORS } from "@/lib/sponsors/constants";
 
 export function ContributorsContent({ data }: ContributorsContentProps) {
   return (
@@ -19,10 +16,7 @@ export function ContributorsContent({ data }: ContributorsContentProps) {
           title={CONTRIBUTORS_HEADING}
         />
         <ContributorsGrid contributors={data.contributors} />
-        <NotraAiCallout prCount={data.notraAiPrCount} />
       </section>
-
-      <Sponsors sponsors={SPONSORS} />
     </div>
   );
 }

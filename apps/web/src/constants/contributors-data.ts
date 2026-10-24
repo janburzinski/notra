@@ -196,5 +196,4 @@ export const CONTRIBUTORS_DATA: ContributorsData = {
       type: "User",
     },
   ],
-  notraAiPrCount: 7,
 };
