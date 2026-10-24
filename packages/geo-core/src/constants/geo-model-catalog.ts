@@ -728,9 +728,8 @@ export const GEO_MODEL_EXCLUDED_IDS: ReadonlySet<string> = new Set([
   "meta/muse-glimmer-30b",
   "meta/muse-spark-1.1",
   "spacexai/grok-4.6",
-  // Olostep consumer apps not released yet; only ChatGPT and Gemini ship.
+  // Olostep consumer apps not released yet.
   "perplexity/perplexity",
-  "google/ai-mode",
   "microsoft/copilot",
 ]);
 /** Optional replacements for retired ids in saved selections and scans. */

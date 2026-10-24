@@ -482,13 +482,9 @@ describe("selected grounded engines", () => {
 });
 
 describe("released consumer apps", () => {
-  const unreleased = [
-    "perplexity/perplexity",
-    "google/ai-mode",
-    "microsoft/copilot",
-  ];
+  const unreleased = ["perplexity/perplexity", "microsoft/copilot"];
 
-  test("only ChatGPT and Gemini ship, even from stale settings", () => {
+  test("unreleased apps stay hidden, even from stale settings", () => {
     const previous = {
       olostep: process.env.GEO_OLOSTEP_API_KEY_ENV,
       context: process.env.CONTEXT_DEV_API_KEY,
@@ -508,7 +504,10 @@ describe("released consumer apps", () => {
         buildGeoModelCatalogFromFeed(feed),
       ]) {
         const ids = available.models.map((model) => model.id);
-        expect(ids.filter(isGeoOlostepEngine)).toEqual(["openai/chatgpt"]);
+        expect(ids.filter(isGeoOlostepEngine)).toEqual([
+          "openai/chatgpt",
+          "google/ai-mode",
+        ]);
         expect(ids).toContain("google/gemini");
         expect(ids).toContain("google/ai-overview");
         expect(
