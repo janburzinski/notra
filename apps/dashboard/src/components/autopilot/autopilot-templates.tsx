@@ -6,10 +6,16 @@ import { InstrumentSection } from "@notra/ui/components/instrument/instrument-mo
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import { cn } from "@notra/ui/lib/utils";
+import {
+  AnimatePresence,
+  LazyMotion,
+  domMax,
+  m,
+  useReducedMotion,
+} from "motion/react";
 
 import { Button } from "@/components/button";
 import {
-  AUTOPILOT_FEATURED_TEMPLATE_IDS,
   AUTOPILOT_TEMPLATE_CATEGORIES,
   AUTOPILOT_TEMPLATE_TONES,
   AUTOPILOT_TEMPLATES,
@@ -24,6 +30,18 @@ export function AutopilotTemplatesSection({
   onMore,
   ...actions
 }: AutopilotTemplateActions & { onMore: () => void }) {
+  const reduceMotion = useReducedMotion();
+  // Automations that are already on live in the table above.
+  const templates = AUTOPILOT_TEMPLATES.filter(
+    (template) => !actions.jobs[template.kind]
+  );
+  const transition = {
+    duration: reduceMotion ? 0 : 0.25,
+    ease: [0.23, 1, 0.32, 1] as const,
+  };
+  if (templates.length === 0) {
+    return null;
+  }
   return (
     <InstrumentSection
       action={
@@ -34,14 +52,24 @@ export function AutopilotTemplatesSection({
       className="pt-6"
       eyebrow="Templates"
     >
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {AUTOPILOT_FEATURED_TEMPLATE_IDS.map((id) => {
-          const template = AUTOPILOT_TEMPLATES.find((row) => row.id === id);
-          return template ? (
-            <AutopilotTemplateCard key={id} template={template} {...actions} />
-          ) : null;
-        })}
-      </div>
+      <LazyMotion features={domMax} strict>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <AnimatePresence initial={false} mode="popLayout">
+            {templates.map((template) => (
+              <m.div
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
+                initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.96 }}
+                key={template.id}
+                layout={!reduceMotion}
+                transition={transition}
+              >
+                <AutopilotTemplateCard template={template} {...actions} />
+              </m.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </LazyMotion>
     </InstrumentSection>
   );
 }
@@ -59,8 +87,7 @@ export function AutopilotTemplatesPage({
         </Button>
         <PageHeading title="Templates" />
         <p className="text-muted-foreground text-sm text-pretty">
-          Enable a template to include it in Autopilot runs. Templates marked
-          “Not yet available” cannot be enabled.
+          Enable a template to include it in Autopilot runs.
         </p>
         {!actions.canManage ? (
           <p className="text-muted-foreground text-sm">
@@ -103,7 +130,7 @@ function AutopilotTemplateCard({
   onOpenBuiltIn,
 }: AutopilotTemplateCardProps) {
   const { kind } = template;
-  const active = kind ? jobs[kind] === true : false;
+  const active = jobs[kind] === true;
   return (
     <article className="border-shell-border bg-shell flex h-full flex-col rounded-2xl border px-0.5 pt-0.5">
       <div className="border-border bg-background shadow-lift flex flex-1 flex-col gap-3 rounded-[14px] border p-4">
@@ -131,34 +158,28 @@ function AutopilotTemplateCard({
         </div>
       </div>
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-2 px-3.5 py-2 text-xs">
-        {kind ? (
-          <>
-            {active ? (
-              <StatusBadge appearance={{ variant: "success" }} label="Active" />
-            ) : (
-              <span className="text-muted-foreground">
-                {canManage ? "Available" : "Admin access required"}
-              </span>
-            )}
-            <Button
-              aria-label={`${active ? "Open automation" : "Enable template"}: ${template.name}`}
-              disabled={!active && (!canManage || isAdding)}
-              onClick={() => {
-                if (active) {
-                  onOpenBuiltIn(kind);
-                } else if (canManage && !isAdding) {
-                  onAddBuiltIn(kind);
-                }
-              }}
-              size="sm"
-              variant="ghost"
-            >
-              {active ? "Open automation" : "Enable template"}
-            </Button>
-          </>
-        ) : (
-          <span className="text-muted-foreground">Not yet available</span>
-        )}
+        {active ? (
+          <StatusBadge appearance={{ variant: "success" }} label="Active" />
+        ) : null}
+        {!active && !canManage ? (
+          <span className="text-muted-foreground">Admin access required</span>
+        ) : null}
+        <Button
+          className="ml-auto"
+          aria-label={`${active ? "Open automation" : "Enable template"}: ${template.name}`}
+          disabled={!active && (!canManage || isAdding)}
+          onClick={() => {
+            if (active) {
+              onOpenBuiltIn(kind);
+            } else if (canManage && !isAdding) {
+              onAddBuiltIn(kind);
+            }
+          }}
+          size="sm"
+          variant="ghost"
+        >
+          {active ? "Open automation" : "Enable template"}
+        </Button>
       </div>
     </article>
   );

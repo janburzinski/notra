@@ -14,8 +14,7 @@ export interface AutopilotTemplate {
   source: string;
   output: "pull_request" | "post";
   trigger: "run" | "merge" | "weekly" | "drop";
-  /** Only templates backed by an existing job can be enabled. */
-  kind?: AutopilotAutomationKind;
+  kind: AutopilotAutomationKind;
 }
 
 export interface AutopilotTemplateActions {

@@ -181,7 +181,6 @@ export function AutopilotAutomationsOverview({
             title="No automations on"
           />
         }
-        footer={enabled.length > 0 ? addMenu : null}
         getRowId={(row) => row.kind}
         height={
           rows.length > 0
