@@ -25,6 +25,8 @@ eve agent (this package, separate Vercel project)
 
 Tool implementations live in `@notra/tools` (`src/assistant`, `src/content-writer`, `src/image`); this app only holds one-line adapter files, the channel, hooks, and instructions. Business logic (post persistence, image post persistence) is shared with the legacy AI SDK path via `@notra/ai/utils/post-service` and `@notra/ai/utils/image-post-service`.
 
+The root agent's `generate_og_image` tool reuses the shared brand OG pipeline for title-based 1200x630 blog heroes and Open Graph PNGs without a GitHub integration or sandbox. It inherits tenant scope and billing flags from the authenticated session, passes cancellation through, and returns the uploaded asset URL and fallback warnings. It does not create a post, attach the image to an article, or publish content. Custom marketing assets and diagrams still use the image-designer subagent.
+
 The content-writer loads `unslop` for a final editing pass before saving. Its seeded text matches the harness skill. Existing organizations receive the skill when their catalog is read, and can edit it like other system skills. The legacy background generator uses the same final pass.
 
 Automated content tasks use the blocking `generate_content` workflow tool to await the writer with `ctx.agent`. Direct subagent calls return a background `working` receipt, not the final result. Ending a task-mode root session with a progress acknowledgement fails its output schema and cancels the pending writer.
