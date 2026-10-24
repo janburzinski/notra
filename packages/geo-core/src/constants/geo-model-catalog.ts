@@ -104,6 +104,15 @@ export const GEO_MODEL_PROVIDERS: readonly GeoModelProvider[] = [
 
 export const GEO_MODEL_CATALOG_SEED: readonly GeoModelCatalogEntry[] = [
   {
+    id: "anthropic/claude-haiku-5.5",
+    provider: "anthropic",
+    label: "Claude Haiku 5.5",
+    zdr: "all",
+    released: "2026-10-07",
+    default: false,
+    gateways: ["vercel", "openrouter"],
+  },
+  {
     id: "anthropic/claude-opus-5.5",
     provider: "anthropic",
     label: "Claude Opus 5.5",

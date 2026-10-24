@@ -52,6 +52,16 @@ import { removedLegacyGeoModels } from "@/utils/geo-legacy-models";
 
 const ROW_CLASS = "flex items-center justify-between gap-3 px-3 py-2";
 const BATCH_LABEL = /\(batch\)$/i;
+const CONSUMER_APP_GATEWAYS: ReadonlySet<string> = new Set([
+  "olostep",
+  "context",
+]);
+const PROVIDER_PREFERRED_ENGINES: ReadonlySet<string> = new Set([
+  "anthropic/claude-haiku-5.5",
+]);
+const PROVIDER_COMPANION_ENGINES: ReadonlySet<string> = new Set([
+  "google/ai-overview",
+]);
 
 function GeoModelRow({
   approved,
@@ -208,9 +218,18 @@ export function GeoEnginePicker({
           (model) => model.zdr !== "none" || approvedNonZdrIds.has(model.id)
         )
       : candidates;
-    const pick = eligible.find((model) => model.default) ?? eligible[0];
+    const pick =
+      eligible.find((model) => PROVIDER_PREFERRED_ENGINES.has(model.id)) ??
+      eligible.find((model) =>
+        model.gateways.some((gateway) => CONSUMER_APP_GATEWAYS.has(gateway))
+      ) ??
+      eligible.find((model) => model.default) ??
+      eligible[0];
     if (pick) {
-      select([pick.id]);
+      const companions = eligible
+        .filter((model) => PROVIDER_COMPANION_ENGINES.has(model.id))
+        .map((model) => model.id);
+      select([pick.id, ...companions]);
       return;
     }
     const first = candidates[0];
