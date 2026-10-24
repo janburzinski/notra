@@ -1,0 +1,29 @@
+apps/dashboard/src/lib/autopilot/llm.ts
+  s_ed0837d744d10b::t_9944847db41a01 47-53
+packages/ai/src/utils/autopilot-planner.ts
+  s_ed0837d744d10b::t_9944847db41a01 47-48,51-54,76-80,89-90,92,94,98,110
+  s_ed0837d744d10b::t_2b0ebbcd5b38e9 49-50
+packages/memory/src/stores/code-storage.ts
+  s_ed0837d744d10b::t_9944847db41a01 171-186
+apps/dashboard/src/components/autopilot/autopilot-pull-requests-table.tsx
+  s_ed0837d744d10b::t_9944847db41a01 193
+apps/dashboard/src/types/autopilot.ts
+  s_ed0837d744d10b::t_2b0ebbcd5b38e9 418
+  s_ed0837d744d10b::t_9944847db41a01 402
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "658f0b64e385499d3d225aba208e1b3f4f3249c5",
+  "prompts": {},
+  "sessions": {
+    "s_ed0837d744d10b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0620c616-3e4c-4b3f-a010-95a6e321ffa0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
