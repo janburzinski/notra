@@ -18,14 +18,6 @@ import { withoutPromptGap, withRestoredPromptGap } from "@/utils/geo-gaps";
 import { getConflictRevision, isNotFoundError } from "@/utils/orpc-errors";
 
 import { dashboardOrpc } from "../orpc/query";
-import { useGeoSettings } from "./use-geo";
-import { useHasGeoFeature } from "./use-plan";
-
-export function useGeoWriterAvailable(organizationId: string) {
-  const { hasGeo } = useHasGeoFeature();
-  const { data } = useGeoSettings(organizationId);
-  return hasGeo && Boolean(data?.settings);
-}
 
 export function useGeoWriterGaps(organizationId: string) {
   const tToast = useTranslations("geo.toasts");

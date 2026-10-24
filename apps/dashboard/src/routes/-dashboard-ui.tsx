@@ -266,6 +266,7 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
       component: ({ params, data }) => (
         <HydrationBoundary state={data.state}>
           <Content
+            articleAvailable={data.articleAvailable}
             initialProjectId={data.projectId ?? null}
             organizationSlug={params.slug}
           />

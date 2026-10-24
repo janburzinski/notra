@@ -34,6 +34,7 @@ import { trackEvent } from "@/lib/analytics/posthog-client";
 import { attachPlanWithAddons } from "@/lib/billing/attach-plan";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import { useHasZdrEntitlement } from "@/lib/hooks/use-plan";
+import { useRouter } from "@/lib/navigation";
 import type { BillingPlanGroup, PlanCardButton } from "@/types/billing/plan";
 import {
   findZdrAddonPlan,
@@ -89,6 +90,7 @@ export function BillingSettingsPane() {
   const tCommon = useTranslations("common");
   const tBilling = useTranslations("billing");
   const locale = useLocale();
+  const router = useRouter();
   const { activeOrganization } = useOrganizationsContext();
   const { data: plans, isLoading: plansLoading } = useListPlans();
   const {
@@ -171,6 +173,8 @@ export function BillingSettingsPane() {
         window.location.assign(result.paymentUrl);
       } else {
         await refetch();
+        // Loaders resolve plan-gated actions such as Write article.
+        router.refresh();
       }
     } catch (err) {
       console.error("Attach error:", err);

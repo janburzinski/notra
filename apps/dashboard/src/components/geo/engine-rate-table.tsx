@@ -45,7 +45,7 @@ import {
   keepTrackedFamilies,
   mentionRateSparkline,
 } from "@/utils/geo-charts";
-import { tableHeightFor } from "@/utils/table";
+import { GEO_VISIBILITY_TABLE_HEIGHT } from "@/utils/table";
 
 const NOT_SCANNED_RATE = -1;
 
@@ -275,36 +275,42 @@ export function EngineRateTable({
       hint={t("hint")}
       readout={readout}
     >
-      {families.length === 0 ? (
-        <InstrumentEmpty
-          busy={isScanning}
-          className="h-40"
-          message={isScanning ? tGeoShared("scanningEngines") : t("empty")}
-          preview={
-            <div className="px-6 pt-2">
-              <EmptyStateTablePreview
-                columns={EMPTY_STATE_TABLE_COLUMNS.engines}
-                rows={3}
-              />
-            </div>
-          }
-          seed={t("emptySeed")}
-        />
-      ) : (
-        <div className="flex flex-col gap-2">
-          <DataTable
-            columns={columns}
-            data={filtered}
-            defaultSort={{ key: "rate", direction: "desc" }}
-            emptyState={t("noMatches")}
-            getRowId={(row) => row.family}
-            height={tableHeightFor(filtered.length)}
-            onRowClick={setSelected}
-            resizable
-            rowHeight={TABLE_ROW_HEIGHT}
+      <div
+        style={{ minHeight: GEO_VISIBILITY_TABLE_HEIGHT }}
+        className="flex flex-col [&>*]:flex-1"
+      >
+        {families.length === 0 ? (
+          <InstrumentEmpty
+            busy={isScanning}
+            className="h-full"
+            message={isScanning ? tGeoShared("scanningEngines") : t("empty")}
+            preview={
+              <div className="px-6 pt-2">
+                <EmptyStateTablePreview
+                  columns={EMPTY_STATE_TABLE_COLUMNS.engines}
+                  rows={3}
+                />
+              </div>
+            }
+            seed={t("emptySeed")}
           />
-        </div>
-      )}
+        ) : (
+          <div className="flex flex-col gap-2">
+            <DataTable
+              columns={columns}
+              data={filtered}
+              defaultSort={{ key: "rate", direction: "desc" }}
+              emptyState={t("noMatches")}
+              getRowId={(row) => row.family}
+              height={GEO_VISIBILITY_TABLE_HEIGHT}
+              minHeight={GEO_VISIBILITY_TABLE_HEIGHT}
+              onRowClick={setSelected}
+              resizable
+              rowHeight={TABLE_ROW_HEIGHT}
+            />
+          </div>
+        )}
+      </div>
       <EngineFamilySheet
         aliases={aliases}
         companyName={companyName}

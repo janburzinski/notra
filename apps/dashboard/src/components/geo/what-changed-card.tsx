@@ -7,7 +7,6 @@ import {
   GEO_CHANGES_COMPETITOR_STACK_LIMIT,
   GEO_CHANGES_EMPTY_DETAIL,
   GEO_CHANGES_LABEL,
-  GEO_CHANGES_SKELETON_ROWS,
   GEO_CHANGES_SUMMARY_GROUPS,
   GEO_EMPTY_COMPETITORS,
   GEO_EMPTY_PROMPT_RESULTS,
@@ -72,7 +71,7 @@ import {
 } from "@/utils/geo-changes";
 import { withGeoProject } from "@/utils/geo-paths";
 import { promptTableRowForId } from "@/utils/geo-prompts";
-import { tableHeightFor } from "@/utils/table";
+import { GEO_CHANGES_TABLE_HEIGHT } from "@/utils/table";
 
 const POSITION_ARROW_SIZE = 12;
 
@@ -350,7 +349,7 @@ function ChangesEmpty({
   return (
     <InstrumentEmpty
       busy={isScanning}
-      className="h-40"
+      className="h-full"
       message={isScanning ? tGeoShared("scanningEngines") : t(reason)}
       preview={
         <div className="px-6 pt-2">
@@ -418,30 +417,32 @@ export function WhatChangedCard({
     );
   }
 
-  let body = (
+  const body = (
     <DataTable
       columns={columns}
       data={events}
       defaultSort={CHANGES_DEFAULT_SORT}
+      emptyState={
+        <ChangesEmpty
+          isScanning={isScanning}
+          reason={data?.previousScan ? "noChanges" : "needsScans"}
+        />
+      }
       getRowId={changeRowId}
-      height={tableHeightFor(
-        events.length === 0 ? GEO_CHANGES_SKELETON_ROWS : events.length
-      )}
-      loading={isPending || isFetching}
+      height={GEO_CHANGES_TABLE_HEIGHT}
+      minHeight={GEO_CHANGES_TABLE_HEIGHT}
+      // A background refetch keeps the empty state instead of flashing skeleton rows.
+      loading={isPending || (isFetching && events.length > 0)}
       onRowClick={openEvent}
       resizable
       rowHeight={TABLE_ROW_HEIGHT}
-      toolbar={data ? <SummaryToolbar summary={data.summary} /> : undefined}
+      toolbar={
+        <div className="flex h-17 items-center @min-[32rem]/instrument:h-11">
+          {data ? <SummaryToolbar summary={data.summary} /> : null}
+        </div>
+      }
     />
   );
-  if (!isPending && data && (!data.previousScan || events.length === 0)) {
-    body = (
-      <ChangesEmpty
-        isScanning={isScanning}
-        reason={data.previousScan ? "noChanges" : "needsScans"}
-      />
-    );
-  }
 
   return (
     <>

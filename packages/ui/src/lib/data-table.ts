@@ -272,6 +272,18 @@ export function tableLoadingOverlay(
 }
 
 
+export function getTableScrollbarHeight(
+  offsetHeight: number,
+  clientHeight: number,
+  borderTopWidth: string,
+  borderBottomWidth: string
+): number {
+  const borders =
+    (Number.parseFloat(borderTopWidth) || 0) +
+    (Number.parseFloat(borderBottomWidth) || 0);
+  return Math.max(0, offsetHeight - clientHeight - borders);
+}
+
 export function getTableViewportLayout({
   rowCount,
   rowHeight,

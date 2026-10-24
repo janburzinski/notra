@@ -29,6 +29,7 @@ const ContentCalendarView = dynamic(
 export default function PageClient({
   organizationSlug,
   initialProjectId,
+  articleAvailable,
 }: ContentListPageClientProps) {
   const t = useTranslations("content.list");
   const tCommon2 = useTranslations("common");
@@ -57,7 +58,9 @@ export default function PageClient({
           title={tCommon2("labels.content")}
         >
           <LazyCreateContentDialog
+            articleAvailable={articleAvailable}
             entry="content_list"
+            initialProjectId={initialProjectId}
             organizationId={organizationId}
             organizationSlug={organizationSlug}
           />

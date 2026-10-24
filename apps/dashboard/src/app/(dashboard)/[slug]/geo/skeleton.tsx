@@ -1,23 +1,29 @@
 "use client";
 
-import { GEO_CHANGES_SKELETON_ROWS } from "@notra/geo-core/constants/geo";
+import { ArrowDown01Icon, PlayIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  GEO_CHANGES_SKELETON_ROWS,
+  GEO_VISIBILITY_TABLE_ROWS,
+} from "@notra/geo-core/constants/geo";
 import {
   InstrumentModule,
   InstrumentSection,
 } from "@notra/ui/components/instrument/instrument-module";
 import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
-import { Kbd } from "@notra/ui/components/ui/kbd";
+import {
+  PermissionRow,
+  PermissionOption,
+} from "@notra/ui/components/ui/permission-selector";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
-import { GeoSectionSkeleton } from "@/components/geo/skeleton-parts";
 import { PageContainer } from "@/components/layout/container";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 
-const ENGINE_ROW_COUNT = 4;
-const PROVIDER_ROW_COUNT = 4;
+const PROVIDER_ROW_COUNT = 5;
 /** Change, engine, prompt, position, competitors. */
 const CHANGE_COLUMN_WIDTHS: readonly DataTableSkeletonColumn[] = [
   "14rem",
@@ -26,13 +32,13 @@ const CHANGE_COLUMN_WIDTHS: readonly DataTableSkeletonColumn[] = [
   { width: "14rem", collapsePriority: 2 },
   { width: "1fr", collapsePriority: 3 },
 ];
-const TREND_AXIS_LABEL_COUNT = 6;
 
 export function GeoPageSkeleton() {
   const t = useTranslations("geo.pages.overview");
   const tGeoShared = useTranslations("geo.shared");
   const tCommon = useTranslations("common");
   const tTrend = useTranslations("geo.mentionTrendCard");
+  const tTabs = useTranslations("geo.pages.tabs");
   const tWhatChanged = useTranslations("geo.whatChangedCard");
   return (
     <PageContainer
@@ -42,109 +48,105 @@ export function GeoPageSkeleton() {
     >
       <div className="w-full space-y-6 px-4 lg:px-6">
         <header className="space-y-1">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-col items-start justify-between gap-3 @min-[24rem]/main:flex-row @min-[24rem]/main:items-center">
             <h1 className="text-3xl font-bold tracking-tight">GEO</h1>
             <div className="flex min-w-0 flex-wrap items-center gap-2">
               <Skeleton className="h-8 w-[8.625rem] rounded-md" />
               <Button className="w-fit gap-2" disabled size="sm">
+                <HugeiconsIcon icon={PlayIcon} size={14} />
                 {tGeoShared("runScan")}
-                <Kbd className="hidden sm:inline-flex">R</Kbd>
+                <HugeiconsIcon icon={ArrowDown01Icon} size={14} />
               </Button>
             </div>
           </div>
           <p className="text-muted-foreground">{t("descriptionFallback")}</p>
         </header>
-        <div className="bg-muted/40 flex w-fit shrink-0 items-center gap-0.5 rounded-lg border p-0.5">
-          {Array.from({ length: 3 }, (_, index) => (
-            <Skeleton className="h-7 w-24 rounded-md" key={index} />
-          ))}
-        </div>
-        <div className="mt-6 flex flex-col gap-6">
-          <div className="grid grid-cols-1 items-stretch gap-4 @min-[44rem]/main:grid-cols-12">
-            <InstrumentModule
-              className="h-full @min-[44rem]/main:col-span-5"
-              eyebrow={tCommon("labels.visibility")}
-              variant="table"
-            >
-              <div className="flex flex-1 flex-col gap-4">
-                <Skeleton className="h-[1.875rem] w-12" />
-                <div className="flex flex-col gap-1">
-                  <div className="flex h-5 items-center justify-between">
-                    <Skeleton className="h-3.5 w-16" />
-                    <Skeleton className="h-3.5 w-16" />
-                  </div>
-                  <div>
-                    {Array.from({ length: PROVIDER_ROW_COUNT }, (_, index) => (
-                      <div
-                        className="border-border/60 flex h-11 items-center gap-3 border-b last:border-b-0"
-                        key={index}
-                      >
-                        <Skeleton className="size-3.5" />
-                        <Skeleton className="size-4 rounded-full" />
-                        <Skeleton className="h-3.5 w-24" />
-                        <Skeleton className="ml-auto h-3.5 w-6" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </InstrumentModule>
-            <InstrumentModule
-              action={<Skeleton className="h-7 w-[6.5rem] rounded-md" />}
-              bodyClassName="flex min-h-0 flex-1 flex-col px-4 pt-1 pb-4"
-              className="h-full @min-[44rem]/main:col-span-7"
-              eyebrow={tTrend("eyebrow")}
-              variant="table"
-            >
-              <div className="flex min-h-64 flex-1 flex-col gap-3">
-                <Skeleton className="w-full flex-1 rounded-xl" />
-                <div className="flex justify-between">
-                  {Array.from(
-                    { length: TREND_AXIS_LABEL_COUNT },
-                    (_, index) => (
-                      <Skeleton className="h-3 w-10" key={index} />
-                    )
-                  )}
-                </div>
-              </div>
-            </InstrumentModule>
-          </div>
-          <InstrumentSection
-            description={tWhatChanged("subline")}
-            eyebrow={tGeoShared("whatChanged")}
+        <div className="flex min-w-0 flex-col">
+          <PermissionRow
+            className="w-fit shrink-0"
+            label={tTabs("label")}
+            layout="compact"
+            value="visibility"
+            disabled
           >
-            <DataTableSkeleton
-              columnWidths={CHANGE_COLUMN_WIDTHS}
-              rowHeight={TABLE_ROW_HEIGHT}
-              rows={GEO_CHANGES_SKELETON_ROWS}
-              toolbar={
-                <div className="flex min-h-11 flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
-                  <Skeleton className="h-5 w-36 rounded-md" />
-                  <Skeleton className="h-5 w-32 rounded-md" />
-                  <Skeleton className="h-5 w-32 rounded-md" />
+            <PermissionOption value="visibility">
+              {tCommon("labels.visibility")}
+            </PermissionOption>
+            <PermissionOption value="brand-sentiment">
+              {tCommon("labels.brandSentiment")}
+            </PermissionOption>
+            <PermissionOption value="journeys">
+              {tCommon("labels.journeys")}
+            </PermissionOption>
+          </PermissionRow>
+          <div className="mt-6 flex flex-col gap-6">
+            <div className="grid grid-cols-1 items-stretch gap-4 @min-[44rem]/main:grid-cols-12">
+              <InstrumentModule
+                className="h-full @min-[44rem]/main:col-span-5"
+                eyebrow={tCommon("labels.visibility")}
+                variant="table"
+              >
+                <div className="flex flex-col gap-4">
+                  <Skeleton className="h-[1.875rem] w-12" />
+                  <div className="flex flex-col gap-1">
+                    <div className="flex h-5 items-center justify-between">
+                      <Skeleton className="h-3.5 w-16" />
+                      <Skeleton className="h-3.5 w-16" />
+                    </div>
+                    <div className="h-63">
+                      {Array.from(
+                        { length: PROVIDER_ROW_COUNT },
+                        (_, index) => (
+                          <div
+                            className="border-border/60 flex h-11 items-center gap-3 border-t"
+                            key={index}
+                          >
+                            <Skeleton className="size-3.5" />
+                            <Skeleton className="size-4 rounded-full" />
+                            <Skeleton className="h-3.5 w-24" />
+                            <Skeleton className="ml-auto h-3.5 w-6" />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
                 </div>
-              }
-            />
-          </InstrumentSection>
-          <GeoSectionSkeleton
-            action={<Skeleton className="h-7 w-40 rounded-md" />}
-            eyebrow={tGeoShared("engines")}
-          >
-            <DataTableSkeleton rows={ENGINE_ROW_COUNT} />
-          </GeoSectionSkeleton>
-          <div className="grid grid-cols-1 gap-4 @min-[44rem]/main:grid-cols-2">
-            <GeoSectionSkeleton
-              action={<Skeleton className="h-3.5 w-8" />}
-              eyebrow={tGeoShared("shareOfVoice")}
+              </InstrumentModule>
+              <InstrumentModule
+                action={<Skeleton className="h-7 w-[6.5rem] rounded-md" />}
+                bodyClassName="flex min-h-0 flex-1 flex-col px-4 pt-1 pb-4"
+                className="h-full @min-[44rem]/main:col-span-7"
+                eyebrow={tTrend("eyebrow")}
+                variant="table"
+              >
+                <Skeleton className="min-h-64 w-full flex-1 rounded-xl" />
+              </InstrumentModule>
+            </div>
+            <InstrumentSection
+              eyebrow={tGeoShared("whatChanged")}
+              description={tWhatChanged("subline")}
             >
-              <Skeleton className="h-64 w-full rounded-xl" />
-            </GeoSectionSkeleton>
-            <GeoSectionSkeleton
-              action={<Skeleton className="h-3.5 w-8" />}
-              eyebrow={tGeoShared("performanceByLanguage")}
+              <DataTableSkeleton
+                columnWidths={CHANGE_COLUMN_WIDTHS}
+                rowHeight={TABLE_ROW_HEIGHT}
+                rows={GEO_CHANGES_SKELETON_ROWS}
+                toolbar={<div className="h-17 @min-[32rem]/instrument:h-11" />}
+              />
+            </InstrumentSection>
+            <InstrumentSection
+              action={<Skeleton className="h-7 w-full sm:w-56" />}
+              eyebrow={tGeoShared("engines")}
             >
-              <Skeleton className="h-64 w-full rounded-xl" />
-            </GeoSectionSkeleton>
+              <DataTableSkeleton rows={GEO_VISIBILITY_TABLE_ROWS} />
+            </InstrumentSection>
+            <div className="grid grid-cols-1 gap-4 @min-[44rem]/main:grid-cols-2">
+              <InstrumentSection eyebrow={tGeoShared("shareOfVoice")}>
+                <DataTableSkeleton rows={GEO_VISIBILITY_TABLE_ROWS} />
+              </InstrumentSection>
+              <InstrumentSection eyebrow={tGeoShared("performanceByLanguage")}>
+                <DataTableSkeleton rows={GEO_VISIBILITY_TABLE_ROWS} />
+              </InstrumentSection>
+            </div>
           </div>
         </div>
       </div>

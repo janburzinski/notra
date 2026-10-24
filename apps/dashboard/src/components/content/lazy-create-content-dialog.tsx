@@ -7,7 +7,6 @@ import { CreateContentButtonGroup } from "@/components/content/create-content-bu
 import { GeoProjectProvider } from "@/components/providers/geo-project-provider";
 import { GEO_WRITE_DIALOG_ENTRIES } from "@/constants/geo-analytics";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
-import { useGeoWriterAvailable } from "@/lib/hooks/use-geo-writer";
 import type { ContentCreateEntry } from "@/types/analytics/studio-events";
 import type { CreateContentActionsProps } from "@/types/content/create-post";
 import dynamic from "@/utils/lazy-component";
@@ -30,7 +29,10 @@ const WriteDialog = dynamic(loadWriteDialog, { ssr: false });
 const CreatePostDialog = dynamic(loadCreatePostDialog, { ssr: false });
 
 export function LazyCreateContentDialog(props: CreateContentActionsProps) {
-  const { projectId } = useActiveProject();
+  const activeProject = useActiveProject();
+  const projectId = activeProject.isResolved
+    ? activeProject.projectId
+    : props.initialProjectId;
   return (
     <GeoProjectProvider projectId={projectId ?? undefined}>
       <CreateContentActions {...props} />
@@ -42,12 +44,11 @@ function CreateContentActions({
   organizationId,
   organizationSlug,
   entry,
+  articleAvailable = false,
 }: CreateContentActionsProps) {
   const [open, setOpen] = useState(false);
   const [postOpen, setPostOpen] = useState(false);
   const [articleOpen, setArticleOpen] = useState(false);
-  const geoWriterAvailable = useGeoWriterAvailable(organizationId);
-  const articleAvailable = geoWriterAvailable && entry === "content_list";
   const [openEntry, setOpenEntry] = useState<ContentCreateEntry>(entry);
 
   useHotkey(
@@ -70,7 +71,9 @@ function CreateContentActions({
           setOpen(true);
         }}
         onCreateArticle={
-          articleAvailable ? () => setArticleOpen(true) : undefined
+          articleAvailable && entry === "content_list"
+            ? () => setArticleOpen(true)
+            : undefined
         }
         onCreatePost={() => setPostOpen(true)}
         onPrefetchCreateContent={() => {

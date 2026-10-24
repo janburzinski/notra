@@ -24,7 +24,7 @@ export function CreateContentButtonGroup({
   const t = useTranslations("content.create.buttons");
   const tCommon = useTranslations("common");
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="grid grid-cols-[max-content_max-content] items-center gap-2 sm:flex sm:flex-wrap">
       <Button
         disabled={disabled}
         onClick={onCreatePost}
@@ -56,6 +56,7 @@ export function CreateContentButtonGroup({
         </Button>
       ) : null}
       <Button
+        className="col-span-2 col-start-1 row-start-2 justify-self-start"
         disabled={disabled}
         onClick={onCreateContent}
         onFocus={onPrefetchCreateContent}

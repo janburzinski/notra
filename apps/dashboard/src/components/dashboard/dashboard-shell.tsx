@@ -297,7 +297,15 @@ export function DashboardShell({
       data-dashboard-shell
       style={shellStyle}
     >
-      {demo ? <DashboardDemoChrome showBanner={showDemoBanner} /> : null}
+      {demo ? (
+        <div
+          className={
+            showDemoBanner ? "h-(--demo-banner-height) shrink-0" : "contents"
+          }
+        >
+          <DashboardDemoChrome showBanner={showDemoBanner} />
+        </div>
+      ) : null}
       <DashboardOnboardingBanner
         available={bannerAvailable}
         dismissing={dismissing}

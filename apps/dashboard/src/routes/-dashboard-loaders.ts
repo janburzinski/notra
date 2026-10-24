@@ -167,16 +167,23 @@ export const loadOrganizationPage = createServerFn({
     const page =
       Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
     let state: DehydratedState | undefined;
+    let articleAvailable = false;
     if (kind === "content") {
-      const { dehydrateContentListQueries } =
-        await import("@/utils/dashboard-list-prefetch.server");
-      state = await dehydrateContentListQueries(
-        organization.id,
-        projectId,
-        page,
-        requestHeaders,
-        membership
-      );
+      const [{ dehydrateContentListQueries }, { canWriteContentArticle }] =
+        await Promise.all([
+          import("@/utils/dashboard-list-prefetch.server"),
+          import("@/utils/content-writer-availability.server"),
+        ]);
+      [state, articleAvailable] = await Promise.all([
+        dehydrateContentListQueries(
+          organization.id,
+          projectId,
+          page,
+          requestHeaders,
+          membership
+        ),
+        canWriteContentArticle(organization.id, projectId, requestHeaders),
+      ]);
     } else if (kind === "content-detail") {
       const { dehydrateContentDetailQueries } =
         await import("@/utils/content-prefetch.server");
@@ -212,7 +219,12 @@ export const loadOrganizationPage = createServerFn({
         membership
       );
     }
-    return { organizationId: organization.id, projectId, state };
+    return {
+      organizationId: organization.id,
+      projectId,
+      state,
+      articleAvailable,
+    };
   });
 
 export const loadGeoScope = createServerFn({ method: "GET" })

@@ -65,7 +65,7 @@ import { loadMotionFeatures } from "@/utils/load-motion-features";
 
 const ROW_STYLE = { height: `${GEO_MENTION_ROW_HEIGHT_REM}rem` } as const;
 const LIST_STYLE = {
-  maxHeight: `${GEO_MENTION_SUMMARY_VISIBLE * GEO_MENTION_ROW_HEIGHT_REM + GEO_MENTION_FADE_HEIGHT_REM}rem`,
+  height: `${GEO_MENTION_SUMMARY_VISIBLE * GEO_MENTION_ROW_HEIGHT_REM + GEO_MENTION_FADE_HEIGHT_REM}rem`,
   scrollbarWidth: "none",
 } as const;
 
@@ -277,7 +277,7 @@ export function MentionRateCard({
         {ranked.length === 0 || !totals ? (
           <InstrumentEmpty
             busy={isScanning}
-            className="h-40"
+            className="min-h-[20.125rem]"
             message={
               isScanning
                 ? tGeoShared("scanningEngines")

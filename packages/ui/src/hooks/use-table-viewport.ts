@@ -7,7 +7,10 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { UseTableViewportOptions } from "@notra/ui/types/data-table";
-import { getTableViewportLayout } from "@notra/ui/lib/data-table";
+import {
+  getTableScrollbarHeight,
+  getTableViewportLayout,
+} from "@notra/ui/lib/data-table";
 
 export function useTableViewport<T>({
   rows,
@@ -127,11 +130,13 @@ export function useTableViewport<T>({
     }
     const measure = () => {
       const styles = getComputedStyle(element);
-      const borders =
-        Number.parseFloat(styles.borderTopWidth) +
-        Number.parseFloat(styles.borderBottomWidth);
       setHorizontalScrollbarHeight(
-        Math.max(0, element.offsetHeight - element.clientHeight - borders)
+        getTableScrollbarHeight(
+          element.offsetHeight,
+          element.clientHeight,
+          styles.borderTopWidth,
+          styles.borderBottomWidth
+        )
       );
     };
     measure();
