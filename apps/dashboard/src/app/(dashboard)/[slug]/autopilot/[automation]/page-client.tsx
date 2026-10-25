@@ -174,7 +174,6 @@ function AutomationPage({
             : undefined
         }
         readOnly={!overview.canManage}
-        settings={overview.settings}
         showAutomation={false}
         writingId={
           writeSuggestion.isPending ? (writeSuggestion.variables ?? null) : null

@@ -1,4 +1,5 @@
 import type { IconSvgElement } from "@hugeicons/react";
+import type { AutopilotObservation } from "@notra/ai/types/autopilot-planner";
 import type {
   AutopilotCommitFilters,
   AutopilotFindingEvidence,
@@ -78,6 +79,14 @@ export interface AutopilotJobResult {
   findingIds: string[];
   /** Lines worth showing in the brief. */
   insights: string[];
+  /** What keywords and commits noticed; the planner decides what to do with it. */
+  observations?: AutopilotRunObservation[];
+}
+
+/** An observation plus what Autopilot needs to act on it later in the run. */
+export interface AutopilotRunObservation extends AutopilotObservation {
+  proposal: AutopilotProposal;
+  brief: NonNullable<AutopilotFindingEvidence["brief"]>;
 }
 
 export interface AutopilotWorkflowPayload {
@@ -431,10 +440,8 @@ export interface AutopilotPageShellProps {
 
 export interface AutopilotPullRequestsTableProps {
   findings: AutopilotFindingView[];
-  /** Ideas swap the status for when the idea writes itself. */
+  /** Ideas show that they wait for someone instead of the pull request status. */
   view?: "pull-requests" | "ideas";
-  /** An idea whose automation is off never writes itself, so it shows paused. */
-  isPaused?: (finding: AutopilotFindingView) => boolean;
   readOnly: boolean;
   /** Off on an automation's own page, where every row has the same one. */
   showAutomation?: boolean;
@@ -449,10 +456,9 @@ export interface AutopilotPullRequestsTableProps {
 
 export interface AutopilotFindingTablesProps extends Omit<
   AutopilotPullRequestsTableProps,
-  "findings" | "view" | "isPaused"
+  "findings" | "view"
 > {
   findings: AutopilotFindingView[];
-  settings: Pick<AutopilotOverview["settings"], "enabled" | "jobs">;
   /** Prefix for the section heading ids, unique per page. */
   idPrefix: string;
 }

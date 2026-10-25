@@ -118,12 +118,7 @@ export async function orchestrateStandaloneChat(
   );
   const autoThinkingLevel = routingDecision.thinkingLevel;
 
-  const modelWithMemory = createModel(
-    organizationId,
-    routingDecision.model,
-    { supermemory: { customId: chatId } },
-    log
-  );
+  const model = createModel(organizationId, routingDecision.model, log);
 
   const postResult: PostToolsResult = {};
 
@@ -248,7 +243,7 @@ export async function orchestrateStandaloneChat(
 
   let firstChunkFired = false;
   const stream = streamText({
-    model: modelWithMemory,
+    model,
     instructions: systemPrompt,
     messages: modelMessages,
     tools,
@@ -292,12 +287,7 @@ export async function orchestrateStandaloneChat(
         const schema = await inputSchema({ toolName: toolCall.toolName });
         abortSignal?.throwIfAborted();
         const { output: repairedInput } = await generateText({
-          model: createModel(
-            organizationId,
-            routingDecision.model,
-            { disableMemory: true },
-            log
-          ),
+          model: createModel(organizationId, routingDecision.model, log),
           abortSignal,
           providerOptions: {
             gateway: { tags: ["standalone-chat-tool-repair"] },

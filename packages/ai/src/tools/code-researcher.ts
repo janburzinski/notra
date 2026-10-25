@@ -174,9 +174,7 @@ export function createCodeResearcherTool(params: {
       });
 
       const agent = new ToolLoopAgent({
-        model: createModel(params.organizationId, AGENT_DEFAULT_MODEL, {
-          disableMemory: true,
-        }),
+        model: createModel(params.organizationId, AGENT_DEFAULT_MODEL),
         providerOptions: withRouterDefaults(
           { gateway: { tags: ["code-research"] } },
           { modelId: AGENT_DEFAULT_MODEL }

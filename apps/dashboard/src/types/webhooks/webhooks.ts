@@ -104,17 +104,6 @@ export interface DispatchEventTriggersProps {
   deliveryId?: string;
 }
 
-export type GithubMemoryEventType = Exclude<GitHubEventType, "ping">;
-
-export interface GithubCreateMemoryEntryProps {
-  organizationId: string;
-  eventType: GithubMemoryEventType;
-  repository: string;
-  action: string;
-  data: Record<string, unknown>;
-  customId: string;
-}
-
 export interface WebhookLogInput {
   organizationId: string;
   integrationId: string;

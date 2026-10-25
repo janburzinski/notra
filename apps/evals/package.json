@@ -10,8 +10,10 @@
   "dependencies": {
     "@ai-sdk/gateway": "catalog:",
     "@notra/ai": "workspace:*",
+    "@notra/memory": "workspace:*",
     "@opentui/core": "0.5.14",
     "@opentui/react": "0.5.14",
+    "@upstash/box": "~0.5.5",
     "ai": "catalog:",
     "react": "^19.3.1",
     "zod": "catalog:"

@@ -16,9 +16,7 @@ import {
   AUTOPILOT_COMMITS_MAX_REPOSITORIES,
   AUTOPILOT_CONTEXT_FILE_MAX_CHARS,
   AUTOPILOT_FINDING_MAX_FAILURES,
-  AUTOPILOT_IDEA_AUTO_WRITE_DAYS,
-  AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE,
-  AUTOPILOT_JEV_MAX_CANDIDATES,
+  AUTOPILOT_MAX_OBSERVATIONS,
   AUTOPILOT_JEV_MIN_CONFIDENCE,
   AUTOPILOT_JEV_MODEL_ID,
   AUTOPILOT_JEV_NONE_CHOICE,
@@ -31,9 +29,7 @@ import { withAutopilotDraftBilling } from "@/lib/autopilot/billing";
 import { commitFilterSkipReason } from "@/lib/autopilot/commit-filters";
 import {
   claimFinding,
-  claimSuggestedFinding,
   syncOfferReactionFeedback,
-  findWaitingIdea,
   findLatestProposal,
   listSettledFingerprints,
   markFindingFailed,
@@ -41,7 +37,6 @@ import {
   reserveDraftSlot,
   markFindingProposed,
   markFindingSuggested,
-  markIdeaAutoWritten,
   returnFindingToSuggested,
 } from "@/lib/autopilot/findings";
 import {
@@ -119,8 +114,8 @@ function loadGaps(ctx: AutopilotRunContext) {
   );
 }
 
-/** Slugs of the posts already in the repo, so Jev can skip covered topics. */
-async function listBlogPostPaths(ctx: AutopilotRunContext) {
+/** Slugs of the posts already in the repo, so covered topics are skipped. */
+export async function listBlogPostPaths(ctx: AutopilotRunContext) {
   if (!ctx.repository) {
     return [];
   }
@@ -486,11 +481,12 @@ async function buildHeroImage(params: {
 }
 
 /**
- * Opens a draft post when Jev is sure enough, otherwise leaves it as a
- * suggestion on the dashboard. A null confidence is an explicit request
- * (an @notra mention or a click) and always writes; suggestOnly never writes.
+ * Opens a draft post, or with suggestOnly leaves it as an idea on the
+ * dashboard. Whether to act is decided before: by the planner's gate, a
+ * pull request event or a person. A null confidence is an explicit request
+ * (an @notra mention or a click) and ignores the draft limit.
  */
-async function proposeBlog(params: {
+export async function proposeBlog(params: {
   ctx: AutopilotRunContext;
   proposal: AutopilotProposal;
   brief: PostBrief;
@@ -518,19 +514,13 @@ async function proposeBlog(params: {
     return { status: "settled" as const };
   }
   params.result.findingIds.push(claim.finding.id);
-  if (
-    params.suggestOnly ||
-    (confidence !== null && confidence < AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE)
-  ) {
+  if (params.suggestOnly) {
     await markFindingSuggested(claim);
     await log.decision(
-      `Saved "${params.brief.topic}" as an idea instead of a pull request${confidence === null ? "" : ` (${Math.round(confidence * 100)}% sure)`}`,
+      `Saved "${params.brief.topic}" as an idea instead of a pull request`,
       {
         confidence,
-        reason: params.suggestOnly
-          ? "Offered on GitHub; it waits for a reply or a click"
-          : `Pull requests need ${Math.round(AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE * 100)}%`,
-        next: `Written in ${AUTOPILOT_IDEA_AUTO_WRITE_DAYS} days unless dismissed`,
+        next: "Waits for a reply on GitHub or a click on the dashboard",
       }
     );
     return { status: "suggested" as const, findingId: claim.finding.id };
@@ -614,10 +604,7 @@ export async function writeFindingPost(params: {
 }) {
   const { claim, log } = params;
   try {
-    const decisionMemory = await loadDecisionMemory(
-      params.ctx.organizationId,
-      `${params.brief.topic}\n${params.brief.angle}`
-    );
+    const decisionMemory = await loadDecisionMemory(params.ctx.organizationId);
     if (decisionMemory.rules.length) {
       const compliance = await generateAutopilotObject({
         organizationId: params.ctx.organizationId,
@@ -684,64 +671,6 @@ export async function writeFindingPost(params: {
 }
 
 /**
- * Writes the oldest idea of this kind nobody dismissed in time, so the
- * pipeline never waits on a click. Returns true when it used the job's slot.
- */
-async function writeWaitingIdea(params: {
-  ctx: AutopilotRunContext;
-  log: AutopilotLogger;
-  result: AutopilotJobResult;
-  kind: "keywords" | "commits";
-}) {
-  const { ctx, log } = params;
-  const idea = await findWaitingIdea(
-    ctx.organizationId,
-    params.kind,
-    new Date(Date.now() - AUTOPILOT_IDEA_AUTO_WRITE_DAYS * 24 * 60 * 60 * 1000)
-  );
-  const brief = idea?.evidence.brief;
-  if (!(idea && brief)) {
-    return false;
-  }
-  const claim = await claimSuggestedFinding(
-    ctx.organizationId,
-    idea.id,
-    ctx.runId
-  );
-  if (!claim) {
-    return false;
-  }
-  params.result.findingIds.push(idea.id);
-  await markIdeaAutoWritten(claim);
-  await log.decision(
-    `Writing the idea "${brief.topic}": nobody dismissed it in ${AUTOPILOT_IDEA_AUTO_WRITE_DAYS} days`,
-    { confidence: idea.evidence.confidence ?? null }
-  );
-  const billed = await withAutopilotDraftBilling<
-    Awaited<ReturnType<typeof writeFindingPost>>
-  >({
-    claim,
-    log,
-    onReservationFailure: "suggest",
-    opened: (outcome) => outcome.status === "proposed",
-    run: (onUsage) =>
-      writeFindingPost({
-        ctx,
-        log,
-        claim,
-        brief,
-        onUsage,
-        onFailure: "fail",
-        draftLimit: ctx.maxOpenPullRequests,
-      }),
-  });
-  if (!billed.allowed) {
-    await markFindingSuggested(claim);
-  }
-  return true;
-}
-
-/**
  * One Jev choice over the candidates plus "none". The index is null when Jev
  * is unsure or says none is worth a post; the result is null when Jev is down.
  */
@@ -790,8 +719,8 @@ async function pickWithJev(params: {
     return null;
   }
   const { choice, probabilities } = result.answers.pick;
-  // Good candidates split the probability between them, so "is any of these
-  // worth a post" is 1 - P(none), and the post is the likeliest option.
+  // The confidence is the picked option's own probability, never 1 - P(none):
+  // that only says some option is interesting, not that this one is.
   const ranked = params.options
     .map((_, optionIndex) => ({
       index: optionIndex,
@@ -802,7 +731,7 @@ async function pickWithJev(params: {
   const index = probabilities ? (ranked[0]?.index ?? -1) : fallbackIndex;
   let confidence = result.confidence.pick ?? 0;
   if (probabilities) {
-    confidence = 1 - (probabilities[AUTOPILOT_JEV_NONE_CHOICE] ?? 0);
+    confidence = ranked[0]?.share ?? 0;
   } else if (choice === AUTOPILOT_JEV_NONE_CHOICE) {
     confidence = 0;
   }
@@ -862,8 +791,8 @@ async function pickWithJev(params: {
  * What Jev knows about the workspace for a decision: the brand, the rules the
  * team gave ("never write posts about X") and what it dismissed lately.
  */
-async function decisionState(ctx: AutopilotRunContext, candidates: string) {
-  const memory = await loadDecisionMemory(ctx.organizationId, candidates);
+async function decisionState(ctx: AutopilotRunContext) {
+  const memory = await loadDecisionMemory(ctx.organizationId);
   return {
     brand: ctx.brand?.name ?? "",
     about: ctx.brand?.description ?? "",
@@ -882,9 +811,6 @@ export async function runKeywordsJob(
   const log = createAutopilotLogger(ctx, "keywords");
   if (!ctx.repository) {
     await log.skip("No website repository connected");
-    return result;
-  }
-  if (await writeWaitingIdea({ ctx, log, result, kind: "keywords" })) {
     return result;
   }
   const [gaps, settled] = await Promise.all([
@@ -946,7 +872,7 @@ export async function runKeywordsJob(
   const fresh = qualified.filter(
     (candidate) => !settled.has(keywordFingerprint(candidate.key))
   );
-  const candidates = fresh.slice(0, AUTOPILOT_JEV_MAX_CANDIDATES);
+  const candidates = fresh.slice(0, AUTOPILOT_MAX_OBSERVATIONS);
   await log.trace("Keyword filter: every gap and why it was dropped", {
     dropped: [
       ...dropped,
@@ -956,9 +882,9 @@ export async function runKeywordsJob(
           gap: candidate.key,
           reason: "Already proposed, merged or dismissed",
         })),
-      ...fresh.slice(AUTOPILOT_JEV_MAX_CANDIDATES).map((candidate) => ({
+      ...fresh.slice(AUTOPILOT_MAX_OBSERVATIONS).map((candidate) => ({
         gap: candidate.key,
-        reason: `Beyond the top ${AUTOPILOT_JEV_MAX_CANDIDATES} sent to Jev`,
+        reason: `Beyond the top ${AUTOPILOT_MAX_OBSERVATIONS} sent to the planner`,
       })),
     ],
     kept: candidates,
@@ -981,67 +907,37 @@ export async function runKeywordsJob(
     return result;
   }
 
-  const posts = await listBlogPostPaths(ctx);
-  const label = (candidate: KeywordCandidate) =>
-    candidate.updatePage
-      ? `Update "${candidate.updatePage.title}" for ${candidate.topic}`
-      : candidate.topic;
-  const picked = await pickWithJev({
-    ctx,
-    log,
-    feature: "autopilot-keywords",
-    instructions:
-      "Which topic deserves a new blog post, or an update to the existing page named in it, from this brand? Pick a topic that fits what the brand sells. A new post must not repeat an existing post. Pick none if no topic fits.",
-    none: "Nothing to write: every topic is off-brand or already covered",
-    state: {
-      ...(await decisionState(ctx, JSON.stringify(gaps))),
-      existingPosts: posts,
-    },
-    options: candidates.map((candidate) =>
-      candidate.updatePage
-        ? `Update the existing page "${candidate.updatePage.title}" for ${candidate.topic}. ${candidate.evidence}`
-        : `${candidate.topic}. ${candidate.evidence}`
-    ),
-    labels: candidates.map(label),
-  });
-  const candidate =
-    picked?.index === null || picked === null ? null : candidates[picked.index];
-  if (!candidate) {
-    return result;
-  }
-  await proposeBlog({
-    ctx,
-    log,
-    result,
-    confidence: picked?.confidence ?? null,
-    decision: {
-      considered: picked?.considered ?? [],
-      threshold: AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE,
-      filteredOut:
-        gaps.promptGaps.length + gaps.searchGaps.length - candidates.length,
-    },
-    proposal: {
-      kind: "keywords",
-      fingerprint: keywordFingerprint(candidate.key),
-      title: candidate.updatePage
-        ? `Update "${candidate.updatePage.title}" for "${candidate.topic}"`
-        : `Blog post for "${candidate.topic}"`,
-      summary: candidate.evidence,
-      evidence: {
-        keyword: candidate.key,
-        competitors: candidate.competitors.slice(0, 5),
-        detail: candidate.evidence,
-        target: candidate.target,
-        updatePage: candidate.updatePage,
+  result.observations = candidates.map((candidate) => {
+    const title = candidate.updatePage
+      ? `Update "${candidate.updatePage.title}" for "${candidate.topic}"`
+      : `Blog post for "${candidate.topic}"`;
+    return {
+      id: keywordFingerprint(candidate.key),
+      source: "keywords" as const,
+      title: candidate.topic,
+      detail: candidate.evidence,
+      updatePage: candidate.updatePage,
+      proposal: {
+        kind: "keywords" as const,
+        fingerprint: keywordFingerprint(candidate.key),
+        title,
+        summary: candidate.evidence,
+        evidence: {
+          keyword: candidate.key,
+          competitors: candidate.competitors.slice(0, 5),
+          detail: candidate.evidence,
+          target: candidate.target,
+          updatePage: candidate.updatePage,
+        },
       },
-    },
-    brief: {
-      topic: candidate.topic,
-      angle: candidate.updatePage
-        ? `Update the existing page so it wins the answer for "${candidate.key}"`
-        : `Win the AI answer for "${candidate.key}"`,
-      evidence: candidate.evidence,
-    },
+      brief: {
+        topic: candidate.topic,
+        angle: candidate.updatePage
+          ? `Update the existing page so it wins the answer for "${candidate.key}"`
+          : `Win the AI answer for "${candidate.key}"`,
+        evidence: candidate.evidence,
+      },
+    };
   });
   return result;
 }
@@ -1255,9 +1151,6 @@ export async function runCommitsJob(
       { posts: dismissedOffers }
     );
   }
-  if (await writeWaitingIdea({ ctx, log, result, kind: "commits" })) {
-    return result;
-  }
   const [lookbackDays, settled] = await Promise.all([
     commitsLookbackDays(ctx),
     listSettledFingerprints(ctx.organizationId, "commits"),
@@ -1266,7 +1159,7 @@ export async function runCommitsJob(
   const fresh = merged.pullRequests.filter(
     (pull) => !settled.has(commitFingerprint(pull))
   );
-  const pullRequests = fresh.slice(0, AUTOPILOT_JEV_MAX_CANDIDATES);
+  const pullRequests = fresh.slice(0, AUTOPILOT_MAX_OBSERVATIONS);
   await log.trace("Commit filter: every pull request and why it was dropped", {
     dropped: [
       ...merged.dropped,
@@ -1276,9 +1169,9 @@ export async function runCommitsJob(
           pullRequest: `${pull.repository}#${pull.number} ${pull.title}`,
           reason: "Already proposed, suggested, merged or dismissed",
         })),
-      ...fresh.slice(AUTOPILOT_JEV_MAX_CANDIDATES).map((pull) => ({
+      ...fresh.slice(AUTOPILOT_MAX_OBSERVATIONS).map((pull) => ({
         pullRequest: `${pull.repository}#${pull.number} ${pull.title}`,
-        reason: `Beyond the top ${AUTOPILOT_JEV_MAX_CANDIDATES} sent to Jev`,
+        reason: `Beyond the top ${AUTOPILOT_MAX_OBSERVATIONS} sent to the planner`,
       })),
     ],
     kept: pullRequests,
@@ -1311,37 +1204,16 @@ export async function runCommitsJob(
   if (pullRequests.length === 0) {
     return result;
   }
-  const picked = await pickWithJev({
-    ctx,
-    log,
-    feature: "autopilot-commits",
-    instructions: AUTOPILOT_COMMITS_JEV_INSTRUCTIONS,
-    none: AUTOPILOT_COMMITS_JEV_NONE,
-    state: await decisionState(
-      ctx,
-      pullRequests.map(describePullRequest).join("\n")
-    ),
-    options: pullRequests.map(describePullRequest),
-    labels: pullRequests.map(pullRequestLabel),
-  });
-  const pull =
-    picked?.index === null || picked === null
-      ? null
-      : pullRequests[picked.index];
-  if (!pull) {
-    return result;
-  }
-  await proposeCommitPost({
-    ctx,
-    log,
-    result,
-    pull,
-    confidence: picked?.confidence ?? null,
-    decision: {
-      considered: picked?.considered ?? [],
-      threshold: AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE,
-      filteredOut: merged.counts.closed - pullRequests.length,
-    },
+  result.observations = pullRequests.map((pull) => {
+    const proposal = commitProposal(pull);
+    return {
+      id: proposal.proposal.fingerprint,
+      source: "commits" as const,
+      title: `${pull.repository}#${pull.number} ${pull.title}`,
+      detail: describePullRequest(pull),
+      updatePage: null,
+      ...proposal,
+    };
   });
   return result;
 }
@@ -1359,7 +1231,7 @@ export async function assessPullRequestForPost(params: {
     feature: "autopilot-commits",
     instructions: AUTOPILOT_COMMITS_JEV_INSTRUCTIONS,
     none: AUTOPILOT_COMMITS_JEV_NONE,
-    state: await decisionState(params.ctx, describePullRequest(params.pull)),
+    state: await decisionState(params.ctx),
     options: [describePullRequest(params.pull)],
     labels: [pullRequestLabel(params.pull)],
     minConfidence: params.minConfidence,
@@ -1385,7 +1257,6 @@ export function proposeCommitPost(params: {
   suggestOnly?: boolean;
   onUsage?: (usage: AgentTokenUsage) => void;
 }) {
-  const { pull } = params;
   return proposeBlog({
     ctx: params.ctx,
     log: params.log,
@@ -1394,8 +1265,14 @@ export function proposeCommitPost(params: {
     decision: params.decision,
     suggestOnly: params.suggestOnly,
     onUsage: params.onUsage,
+    ...commitProposal(params.pull),
+  });
+}
+
+function commitProposal(pull: MergedPullRequest) {
+  return {
     proposal: {
-      kind: "commits",
+      kind: "commits" as const,
       fingerprint: commitFingerprint(pull),
       title: `Blog post: ${pull.title}`,
       summary: `${pull.repository}#${pull.number} ${pull.title}`,
@@ -1417,7 +1294,7 @@ export function proposeCommitPost(params: {
         "Explain what changed for users, why it matters and how to use it.",
       evidence: `Based on ${pull.repository}#${pull.number}: ${pull.title}\n\n${pull.body}`,
     },
-  });
+  };
 }
 
 /** Summarizes which competitors win the prompts you lose, for the brief. */

@@ -1137,6 +1137,8 @@ export const brandGuidelineScreenshotKindEnum = pgEnum(
   ["desktop_hero", "desktop_full_page", "mobile_hero"]
 );
 
+// The physical supermemory_* columns are intentionally undeclared; a later
+// migration drops them.
 export const brandReferences = pgTable(
   "brand_references",
   {
@@ -1152,10 +1154,6 @@ export const brandReferences = pgTable(
     sourceCapturedAt: timestamp("source_captured_at"),
     metadata: jsonb("metadata"),
     note: text("note"),
-    supermemoryDocumentId: text("supermemory_document_id"),
-    supermemoryMemoryId: text("supermemory_memory_id"),
-    supermemorySyncedAt: timestamp("supermemory_synced_at"),
-    supermemoryLastSyncError: text("supermemory_last_sync_error"),
     applicableTo: applicablePlatformEnum("applicable_to")
       .array()
       .default(sql`ARRAY['all']::applicable_platform[]`)

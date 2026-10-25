@@ -1,5 +1,6 @@
 "use client";
 
+import { AUTOPILOT_ACTION_MIN_CONFIDENCE } from "@notra/ai/constants/autopilot-planner";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
@@ -26,7 +27,6 @@ import { EmptyState } from "@/components/empty-state";
 import Link from "@/components/framework/link";
 import {
   AUTOPILOT_FROM_PARAM,
-  AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE,
   AUTOPILOT_NAV_LINK,
 } from "@/constants/autopilot";
 import { AUTOPILOT_KIND_META } from "@/constants/autopilot-ui";
@@ -44,10 +44,7 @@ import {
   formatAutopilotPercent,
   runEventsRefetchInterval,
 } from "@/utils/autopilot-events";
-import {
-  describeFindingReason,
-  ideaAutoWriteAt,
-} from "@/utils/autopilot-findings";
+import { describeFindingReason } from "@/utils/autopilot-findings";
 import { describeImpact } from "@/utils/autopilot-impact";
 import { tableHeightFor } from "@/utils/table";
 
@@ -119,7 +116,7 @@ function FindingPage({
     evidence.decision?.considered ?? []
   ).map((row, index) => ({ ...row, picked: index === 0 }));
   const idea = finding.status === "suggested";
-  const factCount = 2 + Number(Boolean(impact)) + Number(idea);
+  const factCount = 2 + Number(Boolean(impact));
   const canAct =
     overview.canManage &&
     !(writeSuggestion.isPending && writeSuggestion.variables === finding.id);
@@ -241,16 +238,11 @@ function FindingPage({
                 · pull requests need{" "}
                 {formatAutopilotPercent(
                   evidence.decision?.threshold ??
-                    AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE
+                    AUTOPILOT_ACTION_MIN_CONFIDENCE
                 )}
               </span>
             ) : null}
           </AutopilotFact>
-          {idea ? (
-            <AutopilotFact label="Writes itself">
-              After {formatDate(ideaAutoWriteAt(finding))}
-            </AutopilotFact>
-          ) : null}
           {impact ? (
             <AutopilotFact label="Before → now">
               {describeImpact(impact, finding.status === "merged").text}

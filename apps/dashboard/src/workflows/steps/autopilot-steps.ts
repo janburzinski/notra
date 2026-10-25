@@ -6,9 +6,13 @@ import {
   buildAutopilotRunContext,
   deliverAutopilotBrief,
   finishAutopilotRun,
+  planAutopilot,
   runAutopilotJob,
 } from "@/lib/autopilot/run";
-import type { AutopilotJobResult } from "@/types/autopilot";
+import type {
+  AutopilotJobResult,
+  AutopilotRunObservation,
+} from "@/types/autopilot";
 
 export async function closeStalePullRequestsStep(
   organizationId: string,
@@ -27,6 +31,16 @@ export async function runAutopilotJobStep(
   "use step";
   const ctx = await buildAutopilotRunContext(organizationId, runId);
   return runAutopilotJob(ctx, kind);
+}
+
+export async function planAutopilotStep(
+  organizationId: string,
+  runId: string,
+  observations: AutopilotRunObservation[]
+): Promise<AutopilotJobResult> {
+  "use step";
+  const ctx = await buildAutopilotRunContext(organizationId, runId);
+  return planAutopilot(ctx, observations);
 }
 
 export async function deliverAutopilotBriefStep(

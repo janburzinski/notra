@@ -3,7 +3,7 @@ import { withRouterDefaults } from "@notra/ai/provider-options";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
 import { buildTelemetryOptions } from "@notra/ai/utils/tcc";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
-import { generateText, Output } from "ai";
+import { generateText, NoObjectGeneratedError, Output } from "ai";
 import type * as z from "zod";
 
 import type { AutopilotLogger } from "@/types/autopilot-runtime";
@@ -21,21 +21,41 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
   onUsage?: (usage: AgentTokenUsage) => void;
 }): Promise<z.infer<T>> {
   const startedAt = Date.now();
-  const { output, usage } = await generateText({
-    model: gateway(params.modelId, { organizationId: params.organizationId }),
-    output: Output.object({ schema: params.schema }),
-    instructions: params.instructions,
-    prompt: params.prompt,
-    maxOutputTokens: params.maxOutputTokens,
-    providerOptions: withRouterDefaults(
-      { gateway: { tags: ["autopilot", params.tag] } },
-      { modelId: params.modelId }
-    ),
-    ...buildTelemetryOptions({
-      feature: "autopilot",
-      organizationId: params.organizationId,
-      routeName: `autopilot/${params.tag}`,
-    }),
+  const generate = () =>
+    generateText({
+      model: gateway(params.modelId, { organizationId: params.organizationId }),
+      output: Output.object({ schema: params.schema }),
+      instructions: params.instructions,
+      prompt: params.prompt,
+      maxOutputTokens: params.maxOutputTokens,
+      providerOptions: withRouterDefaults(
+        { gateway: { tags: ["autopilot", params.tag] } },
+        { modelId: params.modelId }
+      ),
+      ...buildTelemetryOptions({
+        feature: "autopilot",
+        organizationId: params.organizationId,
+        routeName: `autopilot/${params.tag}`,
+      }),
+    });
+  // Models occasionally loop inside a JSON string until the token limit; a
+  // fresh sample almost always parses.
+  const { output, usage } = await generate().catch(async (error: unknown) => {
+    if (!NoObjectGeneratedError.isInstance(error)) {
+      throw error;
+    }
+    // The failed attempt was paid for too.
+    if (error.usage) {
+      params.onUsage?.({
+        ...toAgentTokenUsage(error.usage),
+        modelId: params.modelId,
+      });
+    }
+    await params.log.action(`Retrying ${params.modelId} (${params.tag})`, {
+      reason: "The response was not valid JSON",
+      outputTokens: error.usage?.outputTokens ?? null,
+    });
+    return generate();
   });
   params.onUsage?.({ ...toAgentTokenUsage(usage), modelId: params.modelId });
   await params.log.action(

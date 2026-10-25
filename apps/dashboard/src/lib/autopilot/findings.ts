@@ -161,7 +161,11 @@ export async function claimFinding(
   return updated ? { finding: updated, token } : null;
 }
 
-/** Takes a dashboard suggestion for writing; null when someone else has it. */
+/**
+ * Takes a suggestion for writing on someone's request (a click or a reply);
+ * null when someone else has it. Marked requested, so it never counts against
+ * the budget for pull requests Autopilot opens on its own.
+ */
 export async function claimSuggestedFinding(
   organizationId: string,
   findingId: string,
@@ -177,6 +181,7 @@ export async function claimSuggestedFinding(
       errorMessage: null,
       claimToken: token,
       claimedAt: now,
+      evidence: sql`${autopilotFindings.evidence} || '{"requested":true}'::jsonb`,
     })
     .where(
       and(
@@ -363,7 +368,7 @@ export async function dismissSuggestedFinding(
 
 /**
  * GitHub sends no reaction webhook. The cron syncs current member votes to
- * Supermemory and edits the offer with a single acknowledgment. Only a thumbs
+ * the workspace memory and edits the offer with a single acknowledgment. Only a thumbs
  * down can dismiss a suggestion; neither vote changes an existing draft.
  */
 export async function syncOfferReactionFeedback(
@@ -593,31 +598,68 @@ export function findLatestProposal(
   });
 }
 
-/** The oldest idea of a kind that waited since before the cutoff without being dismissed. */
-export function findWaitingIdea(
+/**
+ * Pull requests the planner opened on its own since the cutoff. Explicit
+ * requests do not count: a direct mention has no topic, and a clicked or
+ * answered idea is marked requested.
+ */
+export async function countAutonomousProposals(
   organizationId: string,
-  kind: FindingRow["kind"],
-  before: Date
+  since: Date
 ) {
-  return db.query.autopilotFindings.findFirst({
-    where: and(
-      eq(autopilotFindings.organizationId, organizationId),
-      eq(autopilotFindings.kind, kind),
-      eq(autopilotFindings.status, "suggested"),
-      lt(autopilotFindings.createdAt, before)
-    ),
-    orderBy: [asc(autopilotFindings.createdAt)],
-  });
+  const rows = await db
+    .select({ id: autopilotFindings.id })
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, organizationId),
+        inArray(autopilotFindings.kind, ["keywords", "commits"]),
+        gte(autopilotFindings.openedAt, since),
+        sql`${autopilotFindings.evidence} ? 'topic'`,
+        sql`coalesce((${autopilotFindings.evidence}->>'requested')::boolean, false) = false`
+      )
+    );
+  return rows.length;
 }
 
-/** Notes on a held idea that the daily run, not a person, started writing it. */
-export async function markIdeaAutoWritten(claim: FindingClaim) {
-  await db
-    .update(autopilotFindings)
-    .set({
-      evidence: sql`${autopilotFindings.evidence} || '{"autoWritten":true}'::jsonb`,
+/** Posts being written, waiting as ideas or open as drafts: the planner must not double them. */
+export function listActiveBlogFindings(organizationId: string) {
+  return db
+    .select({
+      id: autopilotFindings.id,
+      title: autopilotFindings.title,
+      status: autopilotFindings.status,
+      topicSlug: sql<
+        string | null
+      >`${autopilotFindings.evidence}->'topic'->>'slug'`,
     })
-    .where(heldBy(claim));
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, organizationId),
+        inArray(autopilotFindings.kind, ["keywords", "commits"]),
+        inArray(autopilotFindings.status, ["open", "suggested", "proposed"])
+      )
+    );
+}
+
+export function listFindingStatuses(organizationId: string, ids: string[]) {
+  if (ids.length === 0) {
+    return Promise.resolve([]);
+  }
+  return db
+    .select({
+      id: autopilotFindings.id,
+      status: autopilotFindings.status,
+      pullRequestUrl: autopilotFindings.pullRequestUrl,
+    })
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, organizationId),
+        inArray(autopilotFindings.id, ids)
+      )
+    );
 }
 
 /** Fingerprints a job must not propose again, so it can skip them before spending tokens. */

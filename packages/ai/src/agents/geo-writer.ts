@@ -213,12 +213,7 @@ async function generateGeoContentBriefWithContext(
     modelId: GEO_WRITER_PLANNER_MODEL,
   });
 
-  const model = createModel(
-    organizationId,
-    GEO_WRITER_PLANNER_MODEL,
-    { disableMemory: true },
-    log
-  );
+  const model = createModel(organizationId, GEO_WRITER_PLANNER_MODEL, log);
   const system = buildGeoPlannerSystem();
   const basePrompt = buildGeoPlannerPrompt(input);
 
@@ -401,9 +396,6 @@ async function humanizeMarkdown(
   const model = createModel(
     options.organizationId,
     GEO_WRITER_MODEL,
-    {
-      disableMemory: true,
-    },
     options.log
   );
 
@@ -567,14 +559,7 @@ async function runGeoWriterWithContext(
 
   await assertRouteHasCredits({ organizationId, modelId: GEO_WRITER_MODEL });
 
-  const model = createModel(
-    organizationId,
-    GEO_WRITER_MODEL,
-    {
-      disableMemory: true,
-    },
-    log
-  );
+  const model = createModel(organizationId, GEO_WRITER_MODEL, log);
 
   const guidelineDocument =
     await loadBrandGuidelineSourceInstructions(brandSettingsId);

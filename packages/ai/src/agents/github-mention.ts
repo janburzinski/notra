@@ -99,9 +99,7 @@ export async function runGitHubMentionAgent(params: {
     ]);
 
   const agent = new ToolLoopAgent({
-    model: createModel(params.context.organizationId, AGENT_DEFAULT_MODEL, {
-      disableMemory: true,
-    }),
+    model: createModel(params.context.organizationId, AGENT_DEFAULT_MODEL),
     providerOptions: withRouterDefaults(
       {
         gateway: { tags: ["github-mention"] },

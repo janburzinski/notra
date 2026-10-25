@@ -4,7 +4,7 @@ import { autopilotNamespaceDeletions } from "@notra/db/schema";
 import { and, asc, eq, lte } from "drizzle-orm";
 
 import { AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS } from "@/constants/autopilot";
-import { deleteAutopilotNamespace } from "@/lib/autopilot/memory";
+import { deleteAutopilotMemory } from "@/lib/autopilot/memory";
 
 /** Only committed organization deletions are visible here, even after account deletion. */
 export async function cleanupAutopilotNamespaces(
@@ -41,7 +41,7 @@ export async function cleanupAutopilotNamespaces(
         }
         try {
           signal.throwIfAborted();
-          await deleteAutopilotNamespace(row.organizationId, signal);
+          await deleteAutopilotMemory(row.organizationId, signal);
         } catch (error) {
           logError("[Autopilot] Namespace cleanup will retry", error, {
             organizationId: row.organizationId,

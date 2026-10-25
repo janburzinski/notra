@@ -11,6 +11,7 @@ const HELP = `notra evals: compare models on the content harness
   bun run evals list                 list suites
   bun run evals runs                 list saved runs
   bun run evals run <suite> [opts]   headless run (CI / agents)
+  bun run evals box <suite> [opts]   headless run inside an Upstash Box
   bun run evals pick [--tolerance n] cheapest model per stage from saved runs
 
 options
@@ -69,15 +70,20 @@ if (values.help) {
     tolerancePts,
     json: values.json ?? false,
   });
-} else if (command === "run") {
-  const { runHeadless } = await import("./headless");
+} else if (command === "run" || command === "box") {
   const suiteId = positionals[1];
   if (!suiteId) {
-    console.error("Usage: bun run evals run <suite> [--models a,b] [--demo]");
+    console.error(
+      `Usage: bun run evals ${command} <suite> [--models a,b] [--demo]`
+    );
     process.exit(1);
   }
+  const run =
+    command === "box"
+      ? (await import("./runner/box")).runInBox
+      : (await import("./headless")).runHeadless;
   process.exit(
-    await runHeadless({
+    await run({
       suiteId,
       models: list(values.models),
       repeats: Math.max(1, Number(values.repeats) || 1),

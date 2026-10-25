@@ -10,6 +10,7 @@ import {
   closeStalePullRequestsStep,
   deliverAutopilotBriefStep,
   finishAutopilotRunStep,
+  planAutopilotStep,
   runAutopilotJobStep,
 } from "./steps/autopilot-steps";
 
@@ -26,6 +27,14 @@ export async function autopilotWorkflow(
     for (const kind of AUTOPILOT_JOB_KINDS) {
       results.push(await runAutopilotJobStep(organizationId, runId, kind));
     }
+    // Keywords and commits only observe; one planning step links and acts.
+    results.push(
+      await planAutopilotStep(
+        organizationId,
+        runId,
+        results.flatMap((result) => result.observations ?? [])
+      )
+    );
     const slackMessageTs = await deliverAutopilotBriefStep(
       organizationId,
       runId,

@@ -14,8 +14,8 @@ const grounded = gateway("openai/gpt-5.4", { organizationId, gateway: "vercel" }
 
 `gateway()` stays synchronous. It returns a lazy `LanguageModelV4`
 (`RoutedLanguageModel`) that resolves its route on the first
-`doGenerate`/`doStream`, so it composes with `withSupermemory`,
-`wrapLanguageModel`, evlog and devtools exactly like the old Vercel-only model.
+`doGenerate`/`doStream`, so it composes with `wrapLanguageModel`, evlog and
+devtools exactly like the old Vercel-only model.
 
 ## Policy
 

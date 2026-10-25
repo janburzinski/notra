@@ -30,10 +30,7 @@ import type {
   AutopilotFindingView,
   AutopilotPullRequestsTableProps,
 } from "@/types/autopilot";
-import {
-  findingDisplayTitle,
-  ideaAutoWriteAt,
-} from "@/utils/autopilot-findings";
+import { findingDisplayTitle } from "@/utils/autopilot-findings";
 import { tableHeightFor } from "@/utils/table";
 
 /** Ideas written later open their pull request days after the finding. */
@@ -47,7 +44,6 @@ const openedAt = (finding: AutopilotFindingView) =>
 export function AutopilotPullRequestsTable({
   findings,
   view = "pull-requests",
-  isPaused,
   readOnly,
   showAutomation = true,
   writingId,
@@ -117,9 +113,9 @@ export function AutopilotPullRequestsTable({
     },
     view === "ideas"
       ? {
-          key: "autoWrite",
-          header: "Auto-writes after",
-          width: "9.5rem",
+          key: "ideaStatus",
+          header: "Status",
+          width: "8rem",
           collapsePriority: 2,
           cell: (finding) => {
             if (finding.status !== "suggested") {
@@ -130,21 +126,13 @@ export function AutopilotPullRequestsTable({
                 />
               );
             }
-            if (isPaused?.(finding)) {
-              return (
-                <StatusBadge
-                  appearance={{ variant: "secondary" }}
-                  label="Paused"
-                />
-              );
-            }
             return (
-              <span className="text-muted-foreground whitespace-nowrap tabular-nums">
-                {format.dateTime(ideaAutoWriteAt(finding), {
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
+              <StatusBadge
+                appearance={
+                  AUTOPILOT_FINDING_STATUS_BADGES.suggested.appearance
+                }
+                label="Waiting for you"
+              />
             );
           },
         }
@@ -202,7 +190,7 @@ export function AutopilotPullRequestsTable({
       emptyState={
         view === "ideas" ? (
           <AutopilotTableEmpty
-            description="Posts Autopilot isn't sure enough about to write on its own land here. Write one now, or it writes itself after a few days."
+            description="Posts Autopilot won't open on its own land here. They wait until you write one."
             icon={Idea01Icon}
             title="No ideas waiting"
           />

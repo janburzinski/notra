@@ -25,9 +25,7 @@ import {
   connectedSocialAccounts,
   contentTriggers,
 } from "@notra/db/schema";
-import type { BrandReferenceMemoryLink } from "@notra/db/types/supermemory";
 import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
-import { deleteBrandReferenceMemory } from "@notra/db/utils/supermemory";
 import { invalidateGeoIngestHostsCacheForBrand } from "@notra/geo-core/geo/ingest";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
@@ -99,11 +97,6 @@ import type {
   TwitterTweet,
   TwitterUser,
 } from "@/types/services/twitter";
-import {
-  type ReferenceMemoryRecord,
-  removeBrandReferenceMemory,
-  syncBrandReferenceMemory,
-} from "@/utils/brand-reference-memory";
 import { ratelimit } from "@/utils/ratelimit";
 import {
   fetchTweet,
@@ -208,29 +201,6 @@ async function getReferenceById(referenceId: string, voiceId: string) {
   });
 }
 
-function memoryLinkColumns(link: BrandReferenceMemoryLink) {
-  return {
-    supermemoryDocumentId: link.documentId,
-    supermemoryMemoryId: link.memoryId,
-    supermemorySyncedAt: new Date(),
-    supermemoryLastSyncError: null,
-  };
-}
-
-async function deleteMemoryDocumentQuietly(
-  documentId: string | null,
-  failureMessage: string
-) {
-  if (!documentId) {
-    return;
-  }
-  try {
-    await deleteBrandReferenceMemory({ documentId });
-  } catch (cleanupError) {
-    logError(failureMessage, cleanupError);
-  }
-}
-
 function isOriginalTweet(tweet: TwitterTweet) {
   return !tweet.referenced_tweets?.some(
     (reference) =>
@@ -252,30 +222,6 @@ function trackReferenceLimitReached(
     event: POSTHOG_EVENTS.QUOTA_EXCEEDED,
     properties: { feature: REFERENCE_QUOTA_FEATURE },
   });
-}
-
-interface MemorySyncFields {
-  applicableTo?: string[] | null;
-  content?: string;
-  note?: string | null;
-  sourceUrl?: string | null;
-}
-
-/** Only fields the client sent with a different value force a Supermemory re-sync. */
-function hasMemorySyncFieldChange(
-  existing: MemorySyncFields,
-  update: MemorySyncFields
-) {
-  const applicableToChanged =
-    update.applicableTo !== undefined &&
-    JSON.stringify(update.applicableTo) !==
-      JSON.stringify(existing.applicableTo ?? null);
-  return (
-    applicableToChanged ||
-    (update.content !== undefined && update.content !== existing.content) ||
-    (update.note !== undefined && update.note !== existing.note) ||
-    (update.sourceUrl !== undefined && update.sourceUrl !== existing.sourceUrl)
-  );
 }
 
 function serializeBrandVoice(voice: {
@@ -324,10 +270,6 @@ function serializeBrandReference(reference: {
   sourceContentHash: string | null;
   sourceSnapshotKey: string | null;
   sourceUrl: string | null;
-  supermemoryDocumentId: string | null;
-  supermemoryLastSyncError: string | null;
-  supermemoryMemoryId: string | null;
-  supermemorySyncedAt: Date | null;
   type: "custom" | "twitter_post" | "linkedin_post" | "blog_post";
   updatedAt: Date;
 }): BrandReferenceOutput {
@@ -345,10 +287,6 @@ function serializeBrandReference(reference: {
     sourceContentHash: reference.sourceContentHash,
     sourceSnapshotKey: reference.sourceSnapshotKey,
     sourceUrl: reference.sourceUrl,
-    supermemoryDocumentId: reference.supermemoryDocumentId,
-    supermemoryMemoryId: reference.supermemoryMemoryId,
-    supermemorySyncedAt: reference.supermemorySyncedAt?.toISOString() ?? null,
-    supermemoryLastSyncError: reference.supermemoryLastSyncError,
     applicableTo: reference.applicableTo,
     createdAt: reference.createdAt.toISOString(),
     updatedAt: reference.updatedAt.toISOString(),
@@ -1148,64 +1086,21 @@ export const brandRouter = {
           throw internalServerError("Reference was not created");
         }
 
-        let createdDocumentId: string | null = null;
+        trackServerEvent({
+          event: POSTHOG_EVENTS.BRAND_REFERENCE_ADDED,
+          headers: context.headers,
+          userId: auth.user.id,
+          organizationId: input.organizationId,
+          properties: {
+            voice_id: input.voiceId,
+            reference_id: reference.id,
+            source: referenceSource,
+            type: input.type,
+            count: 1,
+          },
+        });
 
-        try {
-          const link = await syncBrandReferenceMemory({
-            organizationId: input.organizationId,
-            voiceId: input.voiceId,
-            reference: reference as ReferenceMemoryRecord,
-          });
-          createdDocumentId = link.documentId;
-
-          const [syncedReference] = await db
-            .update(brandReferences)
-            .set(memoryLinkColumns(link))
-            .where(eq(brandReferences.id, reference.id))
-            .returning();
-
-          if (!syncedReference) {
-            throw internalServerError("Reference was not created");
-          }
-
-          trackServerEvent({
-            event: POSTHOG_EVENTS.BRAND_REFERENCE_ADDED,
-            headers: context.headers,
-            userId: auth.user.id,
-            organizationId: input.organizationId,
-            properties: {
-              voice_id: input.voiceId,
-              reference_id: syncedReference.id,
-              source: referenceSource,
-              type: input.type,
-              count: 1,
-            },
-          });
-
-          return { reference: serializeBrandReference(syncedReference) };
-        } catch (error) {
-          await db
-            .delete(brandReferences)
-            .where(eq(brandReferences.id, reference.id));
-
-          await deleteMemoryDocumentQuietly(
-            createdDocumentId,
-            "Error cleaning up failed Supermemory reference"
-          );
-
-          if (autumn && chargesReferenceQuota) {
-            await autumn.track({
-              customerId: input.organizationId,
-              featureId: FEATURES.REFERENCES,
-              value: -1,
-            });
-          }
-
-          throw internalServerError(
-            "Failed to sync reference to memory",
-            error
-          );
-        }
+        return { reference: serializeBrandReference(reference) };
       }),
     update: baseProcedure
       .input(referenceInputSchema.and(updateReferenceSchema))
@@ -1247,91 +1142,7 @@ export const brandRouter = {
           throw internalServerError("Reference update failed");
         }
 
-        // A previously failed or missing sync retries on any save.
-        const memoryOutOfSync =
-          existing.supermemoryDocumentId === null ||
-          existing.supermemoryLastSyncError !== null;
-        if (
-          !memoryOutOfSync &&
-          !hasMemorySyncFieldChange(existing, {
-            content: input.content,
-            note: input.note,
-            sourceUrl: input.sourceUrl,
-            applicableTo: input.applicableTo,
-          })
-        ) {
-          return { reference: serializeBrandReference(reference) };
-        }
-
-        let createdDocumentId: string | null = null;
-
-        try {
-          const link = await syncBrandReferenceMemory({
-            organizationId: input.organizationId,
-            voiceId: input.voiceId,
-            reference: reference as ReferenceMemoryRecord,
-          });
-          createdDocumentId = link.documentId;
-
-          await db
-            .update(brandReferences)
-            .set(memoryLinkColumns(link))
-            .where(eq(brandReferences.id, input.referenceId));
-
-          if (
-            existing.supermemoryDocumentId &&
-            existing.supermemoryDocumentId !== link.documentId
-          ) {
-            try {
-              await removeBrandReferenceMemory(
-                existing as ReferenceMemoryRecord
-              );
-            } catch (cleanupError) {
-              logError("Error deleting stale reference memory", cleanupError);
-
-              await db
-                .update(brandReferences)
-                .set({
-                  supermemoryLastSyncError:
-                    "Reference updated, but the previous Supermemory document could not be deleted.",
-                })
-                .where(eq(brandReferences.id, input.referenceId));
-            }
-          }
-
-          const refreshedReference = await getReferenceById(
-            input.referenceId,
-            input.voiceId
-          );
-
-          if (!refreshedReference) {
-            throw internalServerError("Reference update refresh failed");
-          }
-
-          return { reference: serializeBrandReference(refreshedReference) };
-        } catch (error) {
-          logError("Error syncing updated reference to Supermemory", error);
-
-          await deleteMemoryDocumentQuietly(
-            createdDocumentId,
-            "Error cleaning up failed updated Supermemory reference"
-          );
-
-          await db
-            .update(brandReferences)
-            .set({
-              supermemoryLastSyncError:
-                error instanceof Error
-                  ? error.message
-                  : "Supermemory sync failed",
-            })
-            .where(eq(brandReferences.id, input.referenceId));
-
-          throw internalServerError(
-            "Reference updated, but memory sync failed",
-            error
-          );
-        }
+        return { reference: serializeBrandReference(reference) };
       }),
     delete: baseProcedure
       .input(referenceInputSchema)
@@ -1346,12 +1157,6 @@ export const brandRouter = {
 
         if (!existing) {
           throw notFound("Reference not found");
-        }
-
-        try {
-          await removeBrandReferenceMemory(existing as ReferenceMemoryRecord);
-        } catch (error) {
-          logError("Error deleting reference memory", error);
         }
 
         await db
@@ -1623,69 +1428,17 @@ export const brandRouter = {
           .values(values)
           .returning();
 
-        let syncedCount = 0;
-        let syncedBillableCount = 0;
+        const billableCount = inserted.filter(
+          (reference) => !isUnmeteredReference(reference.metadata)
+        ).length;
 
-        for (const reference of inserted) {
-          let createdDocumentId: string | null = null;
-
-          try {
-            const link = await syncBrandReferenceMemory({
-              organizationId: input.organizationId,
-              voiceId: input.voiceId,
-              reference: reference as ReferenceMemoryRecord,
-            });
-            createdDocumentId = link.documentId;
-
-            await db
-              .update(brandReferences)
-              .set(memoryLinkColumns(link))
-              .where(eq(brandReferences.id, reference.id));
-            syncedCount += 1;
-            if (!isUnmeteredReference(reference.metadata)) {
-              syncedBillableCount += 1;
-            }
-          } catch (error) {
-            logError("Error syncing imported tweet to Supermemory", error);
-
-            await deleteMemoryDocumentQuietly(
-              createdDocumentId,
-              "Error cleaning up imported Supermemory reference"
-            );
-
-            // Unsynced imports are never billed, so deleting them must not refund.
-            await db
-              .update(brandReferences)
-              .set({
-                metadata: withReferenceBillingFlag(reference.metadata, {
-                  metered: false,
-                }),
-                supermemoryLastSyncError:
-                  error instanceof Error
-                    ? error.message
-                    : "Supermemory sync failed during import",
-              })
-              .where(eq(brandReferences.id, reference.id));
-          }
-        }
-
-        if (autumn && syncedBillableCount > 0) {
+        if (autumn && billableCount > 0) {
           await autumn.track({
             customerId: input.organizationId,
             featureId: FEATURES.REFERENCES,
-            value: syncedBillableCount,
+            value: billableCount,
           });
         }
-
-        const syncedReferences = await db.query.brandReferences.findMany({
-          where: and(
-            eq(brandReferences.brandSettingsId, input.voiceId),
-            sql`${brandReferences.id} = ANY(ARRAY[${sql.join(
-              inserted.map((reference) => sql`${reference.id}`),
-              sql`, `
-            )}]::text[])`
-          ),
-        });
 
         trackServerEvent({
           event: POSTHOG_EVENTS.BRAND_REFERENCE_IMPORT_TWEETS,
@@ -1696,17 +1449,16 @@ export const brandRouter = {
             voice_id: input.voiceId,
             account_id: input.accountId,
             source: BRAND_REFERENCE_SOURCES.TWEET,
-            count: syncedReferences.length,
-            synced_count: syncedCount,
+            count: inserted.length,
             free_count: freeImportCount,
-            billable_count: syncedBillableCount,
+            billable_count: billableCount,
             max_results: maxResults,
           },
         });
 
         return {
-          count: syncedReferences.length,
-          references: syncedReferences.map(serializeBrandReference),
+          count: inserted.length,
+          references: inserted.map(serializeBrandReference),
         };
       }),
     fetchTweet: baseProcedure

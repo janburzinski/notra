@@ -45,10 +45,10 @@ export interface AutopilotFindingEvidence {
   confidence?: number | null;
   /** Notra's offer comment; reactions provide feedback and can dismiss an unwritten suggestion. */
   offerComment?: { repository: string; id: number } | null;
-  /** Delivery receipt only; preference content lives exclusively in Supermemory. */
+  /** Delivery receipt only; the note itself lives in the workspace memory (feedback.md). */
   feedbackReceipt?: string;
   feedbackPending?: boolean;
-  /** Ordering receipts only; feedback content remains in Supermemory. */
+  /** Ordering receipts only; the notes live in the workspace memory (feedback.md). */
   feedbackVersions?: Record<string, { commentId: number; updatedAt: string }>;
   /** What the writer gets; stored so a suggestion can be written later. */
   brief?: { topic: string; angle: string; evidence: string } | null;
@@ -58,8 +58,14 @@ export interface AutopilotFindingEvidence {
   updatePage?: { url: string; title: string } | null;
   /** How Jev chose this over the other candidates of the same run. */
   decision?: AutopilotFindingDecision | null;
-  /** Written by the daily run because nobody dismissed the idea in time. */
+  /** Written by the daily run because nobody dismissed the idea in time (before the planner). */
   autoWritten?: boolean;
+  /** The planner topic this came from and how many independent signals it had. */
+  topic?: { slug: string; title: string; signals: number } | null;
+  /** Written because someone asked (a click or a reply), not by the planner alone. */
+  requested?: boolean;
+  /** Each gate check the planner ran before acting. */
+  gate?: { name: string; ok: boolean; detail: string }[] | null;
   /** Failed writes so far; Autopilot gives up after a few. */
   failures?: number;
   /** Claim token holding an automatic draft slot; inert once the claim settles. */

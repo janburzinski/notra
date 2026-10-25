@@ -3,10 +3,15 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
+import type { AutopilotPlannerOutput } from "@notra/ai/types/autopilot-planner";
 import type {
   GitHubMentionContext,
   GitHubMentionThreadComment,
 } from "@notra/ai/types/github-mention";
+import {
+  parsePlannerState,
+  renderPlannerState,
+} from "@notra/ai/utils/autopilot-planner";
 import {
   autopilotFindings,
   autopilotRuns,
@@ -16,7 +21,11 @@ import {
   slackIntegrations,
   users,
 } from "@notra/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { MEMORY_PATHS } from "@notra/memory/constants/memory";
+import { setMemoryStore } from "@notra/memory/memory";
+import { createInMemoryStore } from "@notra/memory/stores/in-memory";
+import { renderRecords } from "@notra/memory/utils/records";
+import { and, eq, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { createAutopilotSandbox } from "./utils/autopilot-sandbox";
@@ -54,9 +63,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     feedbackFailure: false,
     mentionIntent: "write",
     feedbackRule: "",
-    standingRule: "",
     blockWrite: false,
     memoryFailure: false,
+    memoryCommitFailure: false,
+    act: 0.9,
+    plan: null as AutopilotPlannerOutput | null,
     ambiguousFeedback: false,
     feedbackPrompt: "",
     takeover: false,
@@ -91,6 +102,72 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const reviewers: string[][] = [];
   const charges: unknown[] = [];
   const holds: string[] = [];
+  const writerCalls: string[] = [];
+  const actionEvaluations: unknown[] = [];
+  // The workspace memory is a real in-memory repository; only failures are injected.
+  const memory = createInMemoryStore();
+  const memoryCommits: { message: string; paths: string[] }[] = [];
+  const unavailable = () => {
+    if (state.memoryFailure) {
+      throw new Error("Memory unavailable");
+    }
+  };
+  setMemoryStore({
+    ...memory,
+    head: async (organizationId) => {
+      unavailable();
+      return memory.head(organizationId);
+    },
+    read: async (organizationId, path, ref) => {
+      unavailable();
+      return memory.read(organizationId, path, ref);
+    },
+    commit: async (organizationId, input) => {
+      if (state.memoryCommitFailure) {
+        throw new Error("Memory commit failed");
+      }
+      const sha = await memory.commit(organizationId, input);
+      memoryCommits.push({
+        message: input.message,
+        paths: Object.keys(input.files),
+      });
+      if (MEMORY_PATHS.rules in input.files) {
+        ruleWrites.push(input.files[MEMORY_PATHS.rules]);
+      }
+      return sha;
+    },
+  });
+  const readMemory = async (path: string) => {
+    const head = await memory.head("sandbox-org");
+    return head ? memory.read("sandbox-org", path, head) : null;
+  };
+  /** Writes like a person editing the repository: no recorded commit. */
+  const seedMemory = async (files: Record<string, string>) => {
+    await memory.commit("sandbox-org", {
+      expectedHeadSha: await memory.head("sandbox-org"),
+      message: "Seed",
+      files,
+    });
+  };
+  const seedStandingRule = (text: string) =>
+    seedMemory({
+      [MEMORY_PATHS.rules]: renderRecords({
+        title: "Rules",
+        intro: "Standing rules for Autopilot.",
+        records: [
+          {
+            id: "standing-rule",
+            title: text,
+            body: "",
+            meta: {
+              source: "dashboard",
+              createdBy: "admin",
+              createdAt: new Date().toISOString(),
+            },
+          },
+        ],
+      }),
+    });
   const release = mock(async () => undefined);
   const readReactions = mock(async () => ({
     data: state.reactionContent
@@ -145,48 +222,25 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     return readReactions();
   };
 
+  // Feedback is recorded here so its failures and replacements stay observable.
   mock.module("@/lib/autopilot/memory", () => ({
-    getAutopilotMemory: async () => null,
-    listAutopilotMemory: async (_org: string, category: string) => {
-      if (state.memoryFailure) {
-        throw new Error("Supermemory unavailable");
-      }
-      return category === "rule" && state.standingRule
-        ? [
-            {
-              id: "standing-rule",
-              metadata: {
-                text: state.standingRule,
-                origin: "dashboard",
-                sourceUrl: null,
-                createdBy: "admin",
-                createdAt: new Date().toISOString(),
-              },
-            },
-          ]
-        : [];
-    },
-    removeAutopilotMemory: async () => undefined,
-    requestAutopilotMemory: async (
-      _org: string,
-      path: string,
-      body: unknown
-    ) => {
-      if (path === "search") {
-        return { results: [] };
-      }
-      ruleWrites.push(body);
-      return { id: "rule", status: "done" };
-    },
+    renderFeedback: () => "",
+    deleteAutopilotMemory: async () => undefined,
     rememberFeedback: async (input: unknown) => {
       if (state.feedbackFailure) {
-        throw new Error("Supermemory unavailable");
+        throw new Error("Memory unavailable");
       }
       feedback.push(input);
     },
   }));
   mock.module("@/lib/autopilot/llm", () => ({
     generateAutopilotObject: async (input: { tag: string; prompt: string }) => {
+      if (input.tag === "planner") {
+        if (!state.plan) {
+          throw new Error("No planner output in this test");
+        }
+        return state.plan;
+      }
       state.feedbackPrompt = input.prompt;
       return input.tag === "write-rules"
         ? { allowed: !state.blockWrite }
@@ -233,7 +287,19 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   mock.module("@/lib/geo/configure", () => ({ geoCoreDashboardLayer: {} }));
   mock.module("@notra/ai/evaluation/client", () => ({
     getEvaluationClient: () => ({
-      tryEvaluate: async (input: unknown) => {
+      tryEvaluate: async (input: { feature?: string }) => {
+        if (input.feature === "autopilot-action") {
+          actionEvaluations.push(input);
+          return {
+            answers: {
+              act: {
+                choice: state.act >= 0.5 ? "open" : "wait",
+                probabilities: { open: state.act, wait: 1 - state.act },
+              },
+            },
+            confidence: { act: state.act },
+          };
+        }
         classificationInputs.push(input);
         return {
           answers: {
@@ -306,6 +372,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   }));
   mock.module("@/lib/autopilot/writer", () => ({
     writeBlogPost: async (input: { onUsage?: (usage: unknown) => void }) => {
+      writerCalls.push("write");
       if (state.cancelDuringWriting) {
         state.sourceClosed = true;
         await handleAutopilotPullRequestEvent(
@@ -464,8 +531,12 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await import("../src/lib/autopilot/mentions");
   const { applyFeedbackInOrder } =
     await import("../src/lib/autopilot/feedback");
-  const { buildAutopilotRunContext, deliverAutopilotBrief, runAutopilotJob } =
-    await import("../src/lib/autopilot/run");
+  const {
+    buildAutopilotRunContext,
+    deliverAutopilotBrief,
+    planAutopilot,
+    runAutopilotJob,
+  } = await import("../src/lib/autopilot/run");
   const {
     syncOfferReactionFeedback,
     claimFinding,
@@ -535,11 +606,17 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.feedbackFailure = false;
     state.mentionIntent = "write";
     state.feedbackRule = "";
-    state.standingRule = "";
     state.blockWrite = false;
     state.memoryFailure = false;
+    state.memoryCommitFailure = false;
+    state.act = 0.9;
+    state.plan = null;
     state.ambiguousFeedback = false;
     state.feedbackPrompt = "";
+    await memory.deleteRepo("sandbox-org");
+    memoryCommits.length = 0;
+    writerCalls.length = 0;
+    actionEvaluations.length = 0;
     threadComments.length = 0;
     ruleWrites.length = 0;
     feedback.length = 0;
@@ -641,61 +718,213 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     publication: null,
   });
 
-  test("a failed automatic credit check releases its claim for an immediate event retry", async () => {
-    state.billingCrash = true;
-    await handleAutopilotPullRequestEvent(event());
-    const finding = await db.query.autopilotFindings.findFirst();
-    expect(finding?.status).toBe("failed");
-    expect(finding?.claimToken).toBeNull();
-    expect(finding?.evidence.failures ?? 0).toBe(0);
-    expect((await db.query.autopilotRuns.findFirst())?.status).toBe("failed");
+  /** An admin's `@notra write a post` on a source pull request: the explicit request. */
+  const askToWrite = (number = 1, commentId = number * 1000) => {
+    const context = mentionContext(commentId);
+    context.issueNumber = number;
+    if (context.pullRequest) {
+      context.pullRequest = {
+        ...context.pullRequest,
+        number,
+        htmlUrl: `https://github.com/sandbox/app/pull/${number}`,
+      };
+    }
+    return handleAutopilotMention(context);
+  };
+
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const fingerprint = (number: number) => `commits:sandbox/app#${number}`;
+
+  /** What the planner model answers: every observation linked into one topic. */
+  const plannerOutput = (
+    observationIds: string[],
+    options: {
+      slug?: string;
+      title?: string;
+      action?: "none" | "write_post";
+      summary?: string;
+    } = {}
+  ): AutopilotPlannerOutput => {
+    const slug = options.slug ?? "exports";
+    const title = options.title ?? "Exports";
+    const action = options.action ?? "write_post";
+    return {
+      assignments: observationIds.map((observationId) => ({
+        observationId,
+        topicSlug: slug,
+        newTopicTitle: title,
+      })),
+      topics: [
+        {
+          slug,
+          status: "ready",
+          summary: options.summary ?? `${title} keep coming up`,
+          openQuestions: [],
+          nextStep: "",
+        },
+      ],
+      action: {
+        type: action,
+        topicSlug: action === "none" ? null : slug,
+        reason: `${title} shipped and users ask about it`,
+        brief:
+          action === "none"
+            ? null
+            : { topic: title, angle: `What ${title} changes for users` },
+      },
+    };
+  };
+
+  /**
+   * A topic an earlier run linked to a content gap, so the merged pull request
+   * that ships its answer is the second independent signal that makes it ripe.
+   */
+  const seedTopic = async (slug: string, title: string, number: number) => {
+    const current = parsePlannerState(await readMemory(MEMORY_PATHS.planner));
+    const seenAt = new Date(Date.now() - DAY_MS).toISOString();
+    await seedMemory({
+      [MEMORY_PATHS.planner]: renderPlannerState({
+        ...current,
+        topics: [
+          ...current.topics,
+          {
+            slug,
+            title,
+            status: "watching",
+            summary: "",
+            openQuestions: [],
+            nextStep: "",
+            signals: [
+              {
+                observationId: `keywords:${slug}`,
+                source: "keywords",
+                title,
+                detail: `AI answers about ${title} miss the brand`,
+                runId: `earlier-${slug}`,
+                seenAt,
+              },
+            ],
+            findingId: null,
+            pullRequestUrl: null,
+            updatedAt: seenAt,
+          },
+        ],
+      }),
+    });
+  };
+
+  /**
+   * One scheduled run: the commits job observes the merged pull requests and
+   * the planner step plans on them. The model's answer is the only fake.
+   */
+  const dailyRun = async (
+    id: string,
+    pulls: { number: number; title: string }[],
+    output: (observationIds: string[]) => AutopilotPlannerOutput = (ids) =>
+      plannerOutput(ids)
+  ) => {
+    await db
+      .update(autopilotRuns)
+      .set({ status: "completed" })
+      .where(
+        and(
+          eq(autopilotRuns.organizationId, "sandbox-org"),
+          eq(autopilotRuns.status, "running")
+        )
+      );
+    state.closedPulls = pulls.map((pull) => ({
+      ...pull,
+      login: "sandbox-dev",
+    }));
+    await db
+      .insert(autopilotRuns)
+      .values({ id, organizationId: "sandbox-org", trigger: "cron" });
+    const ctx = await buildAutopilotRunContext("sandbox-org", id);
+    const observations =
+      (await runAutopilotJob(ctx, "commits")).observations ?? [];
+    state.plan = output(observations.map((observation) => observation.id));
+    const result = await planAutopilot(ctx, observations);
+    return { ctx, observations, result };
+  };
+  const plannerState = async () =>
+    parsePlannerState(await readMemory(MEMORY_PATHS.planner));
+  const runMessages = async (runId: string) =>
+    (
+      await db.query.autopilotRunEvents.findMany({
+        where: (row, { eq: equals }) => equals(row.runId, runId),
+      })
+    ).map((row) => `${row.level}: ${row.message}`);
+  const exportsPull = { number: 40, title: "feat: add exports" };
+  const exportsFollowUp = { number: 42, title: "feat: export reports to CSV" };
+  const importsPull = { number: 41, title: "feat: add imports" };
+
+  test("events only offer, never write", async () => {
+    state.confidence = 0.84;
+    await handleAutopilotPullRequestEvent(event(84));
+    expect(comments).toHaveLength(0);
+    expect(await db.query.autopilotFindings.findMany()).toHaveLength(0);
+    expect(await db.query.autopilotRuns.findMany()).toHaveLength(0);
+    for (const confidence of [0.85, 0.99]) {
+      state.confidence = confidence;
+      await handleAutopilotPullRequestEvent(
+        event(Math.round(confidence * 100))
+      );
+      expect(comments.at(-1)).toContain("Should I write a post");
+      expect(comments.at(-1)).toContain("I won't write it without a reply");
+    }
+    expect(comments).toHaveLength(2);
     expect(opened).toHaveLength(0);
+    expect(writerCalls).toHaveLength(0);
+    expect(holds).toHaveLength(0);
     expect(charges).toHaveLength(0);
-    expect(release).not.toHaveBeenCalled();
-    const firstHold = holds.at(-1);
-    state.billingCrash = false;
-    await handleAutopilotPullRequestEvent(event());
-    expect(opened).toHaveLength(1);
-    expect(charges).toHaveLength(1);
-    expect(holds.at(-1)).not.toBe(firstHold);
+    const findings = await db.query.autopilotFindings.findMany();
+    expect(findings.map((finding) => finding.status)).toEqual([
+      "suggested",
+      "suggested",
+    ]);
+    expect(findings.every((finding) => finding.evidence.offerComment)).toBe(
+      true
+    );
   });
 
-  test("failed event retries preserve counted failures and stop at the limit", async () => {
+  test("failed explicit writes count failures and stop at the limit", async () => {
     state.crash = true;
     for (let attempt = 1; attempt <= 3; attempt++) {
-      await handleAutopilotPullRequestEvent(event());
+      await askToWrite(1, attempt);
       expect(
         (await db.query.autopilotFindings.findFirst())?.evidence.failures
       ).toBe(attempt);
     }
-    const reservations = holds.length;
-    await handleAutopilotPullRequestEvent(event());
-    expect(holds).toHaveLength(reservations);
-    expect(reservations).toBe(3);
+    await askToWrite(1, 4);
+    expect(writerCalls).toHaveLength(3);
+    expect(
+      (await db.query.autopilotFindings.findFirst())?.evidence.failures
+    ).toBe(3);
     expect(opened).toHaveLength(0);
     expect(charges).toHaveLength(0);
+    // Every mention's hold is given back; nothing is charged for a failure.
+    expect(release).toHaveBeenCalledTimes(4);
   });
 
-  test("concurrent events for one source PR hold and settle only the winning claim", async () => {
+  test("concurrent events for one source PR leave one idea and one offer", async () => {
     await Promise.all([
       handleAutopilotPullRequestEvent(event()),
       handleAutopilotPullRequestEvent(event()),
     ]);
-    expect(opened).toHaveLength(1);
-    expect(charges).toHaveLength(1);
-    expect(holds).toHaveLength(1);
-    expect(holds[0]).toStartWith("autopilot-draft:");
-    expect(release).not.toHaveBeenCalled();
+    expect(await db.query.autopilotFindings.findMany()).toHaveLength(1);
+    expect(comments).toHaveLength(1);
+    expect(opened).toHaveLength(0);
+    expect(holds).toHaveLength(0);
   });
 
   test("drafts ask the source author for review, and a refusal keeps the draft", async () => {
     expect((await handleAutopilotMention(mentionContext(1)))?.status).toBe(
       "replied"
     );
-    await handleAutopilotPullRequestEvent(event(2));
+    await askToWrite(2);
     expect(reviewers).toEqual([["sandbox-dev"], ["sandbox-dev"]]);
     state.reviewersRefused = true;
-    await handleAutopilotPullRequestEvent(event(3));
+    await askToWrite(3);
     expect(opened).toHaveLength(3);
     const findings = await db.query.autopilotFindings.findMany({
       columns: { status: true },
@@ -705,24 +934,6 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       "proposed",
       "proposed",
     ]);
-  });
-
-  test("event thresholds still offer at 85 percent and write only from 95 percent", async () => {
-    for (const confidence of [0.85, 0.94]) {
-      state.confidence = confidence;
-      await handleAutopilotPullRequestEvent(
-        event(Math.round(confidence * 100))
-      );
-      expect(comments.at(-1)).toContain("Should I write a post");
-      expect(opened).toHaveLength(0);
-      expect(holds).toHaveLength(0);
-    }
-    state.confidence = 0.95;
-    await handleAutopilotPullRequestEvent(event(95));
-    expect(opened).toHaveLength(1);
-    expect(charges).toHaveLength(1);
-    expect(holds).toHaveLength(1);
-    expect(comments.at(-1)).toContain("I drafted a post");
   });
 
   test("new and existing mention replies never disclose the private output repository", async () => {
@@ -812,7 +1023,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ).toBe("closed");
   });
 
-  test("release filters drop excluded authors and changes outside the paths before Jev", async () => {
+  test("release filters drop excluded authors and changes outside the paths before Jev or the planner", async () => {
     const settings = await db.query.autopilotSettings.findFirst({
       columns: { commitFilters: true },
     });
@@ -848,7 +1059,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(await db.query.autopilotRuns.findMany()).toHaveLength(0);
     await handleAutopilotPullRequestEvent(event(9));
     expect(classificationInputs).toHaveLength(1);
-    expect(opened).toHaveLength(1);
+    expect(comments).toHaveLength(1);
 
     // The daily job: the same filters, logged as skips in the run.
     classificationInputs.length = 0;
@@ -877,7 +1088,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       trigger: "cron",
     });
     const ctx = await buildAutopilotRunContext("sandbox-org", "daily-filters");
-    await runAutopilotJob(ctx, "commits");
+    const observed = await runAutopilotJob(ctx, "commits");
     const events = await db.query.autopilotRunEvents.findMany({
       where: (row, { eq: equals }) => equals(row.runId, "daily-filters"),
     });
@@ -891,14 +1102,15 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       "Skipped sandbox/app#21: no changed files under apps/web",
       "Skipped sandbox/app#26: author dependabot[bot] is excluded",
     ]);
-    const asked = JSON.stringify(classificationInputs);
-    expect(classificationInputs).toHaveLength(1);
-    // A bot nobody listed is judged like anyone; Notra's own drafts never are.
-    expect(asked).toContain("sandbox/app#22");
-    expect(asked).toContain("sandbox/app#23");
-    for (const number of [20, 21, 26, 27]) {
-      expect(asked).not.toContain(`sandbox/app#${number}`);
-    }
+    // The job only observes; the planner judges. A bot nobody listed is
+    // observed like anyone, Notra's own drafts never are.
+    expect(classificationInputs).toHaveLength(0);
+    expect(
+      (observed.observations ?? [])
+        .map((observation) => observation.id)
+        .toSorted()
+    ).toEqual([fingerprint(22), fingerprint(23)]);
+    expect(await db.query.autopilotFindings.findMany()).toHaveLength(1);
 
     // Skip-list suggestions: recent authors and bots, chores counted.
     state.closedPulls.push(
@@ -934,7 +1146,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       state.renderHero = true;
       state.publicAssets = publicAssets;
       state.imageCollision = true;
-      await handleAutopilotPullRequestEvent(event());
+      await askToWrite();
       const finding = await db.query.autopilotFindings.findFirst();
       const slug = `sandbox-exports-${finding?.id}`;
       const imagePath = publicAssets
@@ -956,57 +1168,41 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     state.renderHero = true;
     state.imageCollision = true;
     state.fallbackImageCollision = true;
-    await handleAutopilotPullRequestEvent(event());
+    await askToWrite();
     expect(opened).toHaveLength(0);
     expect(charges).toHaveLength(0);
   });
 
-  test("a replay produces one draft, one comment and one usage confirmation", async () => {
+  test("replays produce one offer, then one draft and one usage confirmation", async () => {
     await handleAutopilotPullRequestEvent(event());
     await handleAutopilotPullRequestEvent(event());
-    expect(opened).toHaveLength(1);
     expect(comments).toHaveLength(1);
+    expect(holds).toHaveLength(0);
+    expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
+      "suggested"
+    );
+    // The same mention delivered twice writes once.
+    await askToWrite(1, 7);
+    await askToWrite(1, 7);
+    expect(opened).toHaveLength(1);
     expect(charges).toHaveLength(1);
-    expect(comments[0]).not.toContain("sandbox/website");
+    for (const comment of comments) {
+      expect(comment).not.toContain("sandbox/website");
+    }
     const finding = await db.query.autopilotFindings.findFirst();
     expect(finding?.status).toBe("proposed");
-    expect((await db.query.autopilotRuns.findFirst())?.status).toBe(
-      "completed"
-    );
-  });
-
-  test("concurrent automatic writers reserve one slot while an explicit write can bypass the cap", async () => {
-    await db
-      .update(autopilotSettings)
-      .set({ maxOpenPullRequests: 1 })
-      .where(eq(autopilotSettings.organizationId, "sandbox-org"));
-    await Promise.all([
-      handleAutopilotPullRequestEvent(event(1)),
-      handleAutopilotPullRequestEvent(event(2)),
-    ]);
-    expect(opened).toHaveLength(1);
-    expect(charges).toHaveLength(1);
-    const findings = await db.query.autopilotFindings.findMany();
     expect(
-      findings.filter((finding) => finding.status === "proposed")
-    ).toHaveLength(1);
-    const idea = findings.find((finding) => finding.status === "suggested");
-    if (!idea) {
-      throw new Error("Expected the capped writer to leave an idea");
-    }
-    await autopilotSuggestionWorkflow({
-      organizationId: "sandbox-org",
-      findingId: idea.id,
-    });
-    expect(opened).toHaveLength(2);
-    expect(charges).toHaveLength(2);
+      (await db.query.autopilotRuns.findMany()).every(
+        (run) => run.status === "completed"
+      )
+    ).toBe(true);
   });
 
   for (const duringWriting of [true, false]) {
     test(`a canceled source ${duringWriting ? "during writing" : "before the claim"} leaves no post or charge`, async () => {
       state.cancelDuringWriting = duringWriting;
       state.sourceClosed = !duringWriting;
-      await handleAutopilotPullRequestEvent(event());
+      await askToWrite();
       expect(opened).toHaveLength(0);
       expect(charges).toHaveLength(0);
       expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
@@ -1048,8 +1244,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("the daily brief includes item drafts and ideas once per state, not only its own results", async () => {
-    await handleAutopilotPullRequestEvent(event(1));
-    state.credits = false;
+    await askToWrite(1);
     await handleAutopilotPullRequestEvent(event(2));
     const findings = await db.query.autopilotFindings.findMany();
     const idea = findings.find((finding) => finding.status === "suggested");
@@ -1098,7 +1293,6 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       .update(autopilotRuns)
       .set({ status: "completed" })
       .where(eq(autopilotRuns.id, "brief-two"));
-    state.credits = true;
     await autopilotSuggestionWorkflow({
       organizationId: "sandbox-org",
       findingId: idea.id,
@@ -1138,13 +1332,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("two queued suggestion workflows produce only one draft and charge", async () => {
-    state.credits = false;
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
       throw new Error("Expected a suggestion");
     }
-    state.credits = true;
     const payload = { organizationId: "sandbox-org", findingId: idea.id };
     const results = await Promise.allSettled([
       autopilotSuggestionWorkflow(payload),
@@ -1159,14 +1351,12 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("a revoked flag is rechecked by the queued worker before credits or writes", async () => {
-    state.credits = false;
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
       throw new Error("Expected a suggestion");
     }
     state.flag = false;
-    state.credits = true;
     await expect(
       autopilotSuggestionWorkflow({
         organizationId: "sandbox-org",
@@ -1179,13 +1369,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("revoking the flag during generation prevents a PR and releases credits", async () => {
-    state.credits = false;
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
       throw new Error("Expected a suggestion");
     }
-    state.credits = true;
     state.disableWhileWriting = true;
     await expect(
       autopilotSuggestionWorkflow({
@@ -1202,13 +1390,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("a failed queued writer returns the idea and marks its run failed", async () => {
-    state.credits = false;
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
       throw new Error("Expected a suggestion");
     }
-    state.credits = true;
     state.billingCrash = true;
     await expect(
       autopilotSuggestionWorkflow({
@@ -1248,13 +1434,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("turning off settings during generation prevents a PR and releases credits", async () => {
-    state.credits = false;
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
       throw new Error("Expected a suggestion");
     }
-    state.credits = true;
     state.disableSettingsWhileWriting = true;
     await expect(
       autopilotSuggestionWorkflow({
@@ -1268,7 +1452,6 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("paused workspaces reject a suggestion before claiming or reserving credits", async () => {
-    state.credits = false;
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
@@ -1299,7 +1482,6 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
 
   for (const status of ["failed", "running"] as const) {
     test(`a ${status === "failed" ? "canceled" : "stale"} queued run cannot claim or spend when it eventually starts`, async () => {
-      state.credits = false;
       await handleAutopilotPullRequestEvent(event());
       const idea = await db.query.autopilotFindings.findFirst();
       if (!idea) {
@@ -1313,7 +1495,6 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         heartbeatAt: new Date(0),
       });
       const previousHolds = holds.length;
-      state.credits = true;
       await expect(
         autopilotSuggestionWorkflow({
           organizationId: "sandbox-org",
@@ -1331,13 +1512,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   }
 
   test("a retry after releasing a draft hold gets a fresh billing key", async () => {
-    state.credits = false;
     await handleAutopilotPullRequestEvent(event());
     const idea = await db.query.autopilotFindings.findFirst();
     if (!idea) {
       throw new Error("Expected a suggestion");
     }
-    state.credits = true;
     state.crash = true;
     const payload = { organizationId: "sandbox-org", findingId: idea.id };
     await expect(autopilotSuggestionWorkflow(payload)).rejects.toThrow(
@@ -1357,7 +1536,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
 
   test("an unspent writer failure releases the credit hold and settles its run", async () => {
     state.crash = true;
-    await handleAutopilotPullRequestEvent(event());
+    await askToWrite();
     expect(opened).toHaveLength(0);
     expect(charges).toHaveLength(0);
     expect(release).toHaveBeenCalledTimes(1);
@@ -1369,101 +1548,207 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     );
   });
 
-  test("an open release post does not block another topic, but the workspace cap still applies", async () => {
-    await db
-      .update(autopilotSettings)
-      .set({ maxOpenPullRequests: 2 })
-      .where(eq(autopilotSettings.organizationId, "sandbox-org"));
-    await handleAutopilotPullRequestEvent(event(1));
-    await handleAutopilotPullRequestEvent(event(2));
-    await handleAutopilotPullRequestEvent(event(1));
-    expect(opened).toHaveLength(2);
-    expect(charges).toHaveLength(2);
-    await handleAutopilotPullRequestEvent(event(3));
-    expect(opened).toHaveLength(2);
-    expect(charges).toHaveLength(2);
-    const findings = await db.query.autopilotFindings.findMany();
-    expect(findings.map((finding) => finding.status).sort()).toEqual([
-      "proposed",
-      "proposed",
-      "suggested",
+  test("the planner waits on one weak observation and opens one PR once the topic is seen again", async () => {
+    const day1 = await dailyRun("planner-day-1", [exportsPull]);
+    expect(day1.observations.map((row) => row.id)).toEqual([fingerprint(40)]);
+    expect(opened).toHaveLength(0);
+    expect(await db.query.autopilotFindings.findMany()).toHaveLength(0);
+    const watched = await plannerState();
+    expect(watched.lastRunId).toBe("planner-day-1");
+    expect(watched.topics).toEqual([
+      expect.objectContaining({
+        slug: "exports",
+        title: "Exports",
+        findingId: null,
+        signals: [expect.objectContaining({ observationId: fingerprint(40) })],
+      }),
     ]);
+    expect(await readMemory(MEMORY_PATHS.planner)).toContain(
+      "Exports keep coming up"
+    );
+    expect(await runMessages("planner-day-1")).toContainEqual(
+      'decision: Not acting on "Exports" yet'
+    );
+
+    // The same pull request seen again is still one signal.
+    state.act = 0.9;
+    await dailyRun("planner-day-2", [exportsPull]);
+    expect(opened).toHaveLength(0);
+    // A second pull request about the same feature is the independent signal.
+    const day3 = await dailyRun("planner-day-3", [
+      exportsPull,
+      exportsFollowUp,
+    ]);
+    expect(opened).toHaveLength(1);
+    expect(charges).toHaveLength(1);
+    expect(holds).toEqual([expect.stringMatching(/^autopilot-draft:/)]);
+    const finding = await db.query.autopilotFindings.findFirst();
+    expect(finding).toMatchObject({
+      fingerprint: fingerprint(42),
+      status: "proposed",
+      runId: "planner-day-3",
+    });
+    expect(finding?.evidence.confidence).toBe(0.9);
+    expect(finding?.evidence.topic).toMatchObject({
+      slug: "exports",
+      signals: 2,
+    });
+    expect(day3.result.findingIds).toEqual(finding ? [finding.id] : []);
+    const acted = await plannerState();
+    expect(acted.lastRunId).toBe("planner-day-3");
+    expect(acted.topics[0]).toMatchObject({
+      status: "in_progress",
+      findingId: finding?.id,
+    });
+    // One signal per observation: the pull request seen on three days is one.
+    expect(acted.topics[0]?.signals).toHaveLength(2);
+    // Autonomous runs only ever write their own notes, one commit per run.
+    expect(memoryCommits.map((commit) => commit.message)).toEqual([
+      "Autopilot run planner-day-1",
+      "Autopilot run planner-day-2",
+      "Autopilot run planner-day-3",
+    ]);
+    expect(
+      memoryCommits.every((commit) => commit.paths.join() === "planner.md")
+    ).toBe(true);
   });
 
-  for (const kind of ["commits", "keywords"] as const) {
-    test(`the daily ${kind} job writes a waiting idea despite an existing PR of the same kind`, async () => {
-      await handleAutopilotPullRequestEvent(event(1));
-      state.credits = false;
-      await handleAutopilotPullRequestEvent(event(2));
-      const findings = await db.query.autopilotFindings.findMany();
-      const idea = findings.find((finding) => finding.status === "suggested");
-      if (!idea) {
-        throw new Error("Expected a waiting idea");
-      }
-      await db
-        .update(autopilotFindings)
-        .set({ kind })
-        .where(eq(autopilotFindings.organizationId, "sandbox-org"));
-      await db
-        .update(autopilotFindings)
-        .set({ createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) })
-        .where(eq(autopilotFindings.id, idea.id));
-      state.credits = true;
-      await db.insert(autopilotRuns).values({
-        id: "daily",
-        organizationId: "sandbox-org",
-        trigger: "cron",
-      });
-      const ctx = await buildAutopilotRunContext("sandbox-org", "daily");
-      state.billingCrash = true;
-      await runAutopilotJob(ctx, kind);
-      const waiting = await db.query.autopilotFindings.findFirst({
-        where: eq(autopilotFindings.id, idea.id),
-      });
-      expect(waiting?.status).toBe("suggested");
-      expect(waiting?.claimToken).toBeNull();
-      expect(waiting?.evidence.failures ?? 0).toBe(0);
-      expect(opened).toHaveLength(1);
-      expect(charges).toHaveLength(1);
-      state.billingCrash = false;
-      await db
-        .update(autopilotRuns)
-        .set({ status: "completed" })
-        .where(eq(autopilotRuns.id, "daily"));
-      await db.insert(autopilotRuns).values({
-        id: "daily-retry",
-        organizationId: "sandbox-org",
-        trigger: "cron",
-      });
-      const retryCtx = await buildAutopilotRunContext(
-        "sandbox-org",
-        "daily-retry"
-      );
-      const result = await runAutopilotJob(retryCtx, kind);
-      expect(result.findingIds).toContain(idea.id);
-      expect(opened).toHaveLength(2);
-      expect(charges).toHaveLength(2);
-      expect(
-        (await db.query.autopilotFindings.findMany()).every(
-          (finding) => finding.status === "proposed"
-        )
-      ).toBe(true);
+  test("the autonomous budget turns a second ripe topic into an idea, and an explicit write still goes through", async () => {
+    await seedTopic("exports", "Exports", 40);
+    await dailyRun("planner-budget-1", [exportsPull]);
+    expect(opened).toHaveLength(1);
+    await seedTopic("imports", "Imports", 41);
+    await dailyRun("planner-budget-2", [exportsPull, importsPull], (ids) =>
+      plannerOutput(ids, { slug: "imports", title: "Imports" })
+    );
+    expect(opened).toHaveLength(1);
+    const idea = await db.query.autopilotFindings.findFirst({
+      where: eq(autopilotFindings.fingerprint, fingerprint(41)),
     });
-  }
+    expect(idea?.status).toBe("suggested");
+    expect(
+      (await plannerState()).topics.find((topic) => topic.slug === "imports")
+    ).toMatchObject({ status: "ready", findingId: idea?.id });
+    expect(await runMessages("planner-budget-2")).toContainEqual(
+      'decision: Saved "Imports" as an idea: no room for an automatic pull request'
+    );
+    if (!idea) {
+      throw new Error("Expected an idea");
+    }
+    await autopilotSuggestionWorkflow({
+      organizationId: "sandbox-org",
+      findingId: idea.id,
+    });
+    expect(opened).toHaveLength(2);
+  });
 
-  test("the open-draft cap falls back to suggesting, and strangers cannot veto it", async () => {
+  test("a full draft limit keeps a ripe topic as an idea", async () => {
     await db
       .update(autopilotSettings)
       .set({ maxOpenPullRequests: 1 })
       .where(eq(autopilotSettings.organizationId, "sandbox-org"));
-    await handleAutopilotPullRequestEvent(event(1));
-    await handleAutopilotPullRequestEvent(event(2));
+    // An explicit request bypasses the cap and does not use the autonomous budget.
+    await askToWrite(1);
     expect(opened).toHaveLength(1);
-    const findings = await db.query.autopilotFindings.findMany();
-    expect(findings.map((finding) => finding.status).sort()).toEqual([
-      "proposed",
-      "suggested",
+    await seedTopic("exports", "Exports", 40);
+    await dailyRun("planner-capped", [exportsPull]);
+    expect(opened).toHaveLength(1);
+    expect(
+      (
+        await db.query.autopilotFindings.findFirst({
+          where: eq(autopilotFindings.fingerprint, fingerprint(40)),
+        })
+      )?.status
+    ).toBe("suggested");
+  });
+
+  test("a replayed planner step opens no second PR and writes no second commit", async () => {
+    await seedTopic("exports", "Exports", 40);
+    const { ctx, observations } = await dailyRun("planner-replay", [
+      exportsPull,
     ]);
+    expect(opened).toHaveLength(1);
+    const commits = memory.commits("sandbox-org").length;
+    const replayed = await planAutopilot(ctx, observations);
+    expect(opened).toHaveLength(1);
+    expect(holds).toHaveLength(1);
+    expect(replayed.findingIds).toHaveLength(1);
+    expect(memory.commits("sandbox-org")).toHaveLength(commits);
+
+    // A run that decided to wait is replay-safe through its planner state.
+    state.act = 0.7;
+    await seedTopic("imports", "Imports", 41);
+    const waiting = await dailyRun(
+      "planner-replay-wait",
+      [importsPull],
+      (ids) => plannerOutput(ids, { slug: "imports", title: "Imports" })
+    );
+    const afterWait = memory.commits("sandbox-org").length;
+    await planAutopilot(waiting.ctx, waiting.observations);
+    expect(memory.commits("sandbox-org")).toHaveLength(afterWait);
+    expect(actionEvaluations).toHaveLength(2);
+    expect(await runMessages("planner-replay-wait")).toContainEqual(
+      "skip: This run already planned"
+    );
+  });
+
+  test("a failed memory commit after the PR is logged and never redoes the action", async () => {
+    await seedTopic("exports", "Exports", 40);
+    const before = await readMemory(MEMORY_PATHS.planner);
+    state.memoryCommitFailure = true;
+    const { ctx, observations } = await dailyRun("planner-lost-notes", [
+      exportsPull,
+    ]);
+    expect(opened).toHaveLength(1);
+    expect(await runMessages("planner-lost-notes")).toContainEqual(
+      "error: Could not update the workspace memory"
+    );
+    expect(await readMemory(MEMORY_PATHS.planner)).toBe(before);
+    state.memoryCommitFailure = false;
+    await planAutopilot(ctx, observations);
+    expect(opened).toHaveLength(1);
+    expect(charges).toHaveLength(1);
+    // The next day the stale notes still think the topic is waiting. Another
+    // pull request on the same topic sees the open draft and is not written,
+    // nor even kept as an idea.
+    await dailyRun("planner-next-day", [
+      exportsPull,
+      { number: 42, title: "feat: export to CSV" },
+    ]);
+    expect(opened).toHaveLength(1);
+    expect(
+      (await db.query.autopilotFindings.findMany()).map(
+        (row) => row.fingerprint
+      )
+    ).toEqual([fingerprint(40)]);
+  });
+
+  test("a failed credit check for a planned draft releases its claim and the next run retries", async () => {
+    await seedTopic("exports", "Exports", 40);
+    state.billingCrash = true;
+    await dailyRun("planner-billing-down", [exportsPull]);
+    const failed = await db.query.autopilotFindings.findFirst();
+    expect(failed?.status).toBe("failed");
+    expect(failed?.claimToken).toBeNull();
+    expect(failed?.evidence.failures ?? 0).toBe(0);
+    expect(opened).toHaveLength(0);
+    expect(release).not.toHaveBeenCalled();
+    expect(await runMessages("planner-billing-down")).toContainEqual(
+      "error: Planning failed"
+    );
+    const firstHold = holds.at(-1);
+    state.billingCrash = false;
+    await dailyRun("planner-billing-back", [exportsPull]);
+    expect(opened).toHaveLength(1);
+    expect(charges).toHaveLength(1);
+    expect(holds.at(-1)).not.toBe(firstHold);
+  });
+
+  test("strangers cannot veto an offer; a linked member's thumbs down dismisses it without closing anything", async () => {
+    await handleAutopilotPullRequestEvent(event(1));
+    expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
+      "suggested"
+    );
     expect(await syncOfferReactionFeedback("sandbox-org", new Date(0))).toEqual(
       []
     );
@@ -1472,7 +1757,11 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(
       await syncOfferReactionFeedback("sandbox-org", new Date(0))
     ).toHaveLength(1);
+    expect((await db.query.autopilotFindings.findFirst())?.status).toBe(
+      "dismissed"
+    );
     expect(closed).toHaveLength(0);
+    expect(opened).toHaveLength(0);
   });
 
   test("positive reactions learn and acknowledge once without authorizing a draft; retractions replace feedback", async () => {
@@ -1755,7 +2044,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   test("waiting or explicitly requested drafts recheck current hard rules and fail closed on memory errors", async () => {
     state.confidence = 0.9;
     await handleAutopilotPullRequestEvent(event());
-    state.standingRule = "Never write about exports";
+    await seedStandingRule("Never write about exports");
     state.blockWrite = true;
     await handleAutopilotMention(mentionContext(205));
     expect(opened).toHaveLength(0);
@@ -1810,7 +2099,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("a failed Slack send marks nothing and the same brief can retry", async () => {
-    await handleAutopilotPullRequestEvent(event());
+    await askToWrite();
     await db.insert(autopilotRuns).values({
       id: "slack-retry",
       organizationId: "sandbox-org",
@@ -1842,7 +2131,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   });
 
   test("a daily brief records its delivery immediately and a replay does not post again", async () => {
-    await handleAutopilotPullRequestEvent(event());
+    await askToWrite();
     const finding = await db.query.autopilotFindings.findFirst();
     if (!finding) {
       throw new Error("Expected a proposed draft");
@@ -1870,7 +2159,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
 
   test("an expired writer can be recovered and restarted through the actual suggestion flow", async () => {
     state.crash = true;
-    await handleAutopilotPullRequestEvent(event());
+    await askToWrite();
     const finding = await db.query.autopilotFindings.findFirst();
     if (!finding?.runId) {
       throw new Error("Expected interrupted finding");
@@ -1904,7 +2193,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
 
   test("cleanup by a replaced writer closes only its own PR, never its successor's", async () => {
     state.takeover = true;
-    await handleAutopilotPullRequestEvent(event());
+    await askToWrite();
     expect(closed).toEqual([1]);
     const finding = await db.query.autopilotFindings.findFirst();
     expect(finding?.status).toBe("proposed");

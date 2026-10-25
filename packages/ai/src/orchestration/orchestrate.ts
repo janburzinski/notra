@@ -32,7 +32,6 @@ export async function orchestrateChat(
 ): Promise<OrchestrateResult> {
   const {
     organizationId,
-    chatId,
     messages,
     currentMarkdown,
     contentType,
@@ -69,12 +68,7 @@ export async function orchestrateChat(
       routeAutoModel(messages, hasGitHub || hasLinear, log, telemetryMetadata)
   );
 
-  const modelWithMemory = createModel(
-    organizationId,
-    routingDecision.model,
-    { supermemory: { customId: chatId } },
-    log
-  );
+  const model = createModel(organizationId, routingDecision.model, log);
 
   const { tools, descriptions } = buildToolSet(
     {
@@ -119,7 +113,7 @@ export async function orchestrateChat(
     routingDecision.thinkingLevel ?? "low"
   );
   const stream = streamText({
-    model: modelWithMemory,
+    model,
     instructions: systemPrompt,
     messages: await convertToModelMessages(messagesForModel, {
       tools,

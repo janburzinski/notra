@@ -17,6 +17,7 @@ COPY packages/db/package.json ./packages/db/package.json
 COPY packages/email/package.json ./packages/email/package.json
 COPY packages/geo-core/package.json ./packages/geo-core/package.json
 COPY packages/kiwi/package.json ./packages/kiwi/package.json
+COPY packages/memory/package.json ./packages/memory/package.json
 COPY packages/posthog/package.json ./packages/posthog/package.json
 COPY packages/schemas/package.json ./packages/schemas/package.json
 COPY packages/sites-compiler/package.json ./packages/sites-compiler/package.json
@@ -33,6 +34,7 @@ COPY packages/analytics ./packages/analytics
 COPY packages/db ./packages/db
 COPY packages/email ./packages/email
 COPY packages/geo-core ./packages/geo-core
+COPY packages/memory ./packages/memory
 COPY packages/posthog ./packages/posthog
 COPY packages/schemas ./packages/schemas
 COPY packages/sites-core ./packages/sites-core

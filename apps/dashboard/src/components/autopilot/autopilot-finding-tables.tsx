@@ -7,7 +7,6 @@ import { isIdeaFinding, isListedPullRequest } from "@/utils/autopilot-findings";
 /** Pull requests, then the open ideas below them when there are any. */
 export function AutopilotFindingTables({
   findings,
-  settings,
   idPrefix,
   ...tableProps
 }: AutopilotFindingTablesProps) {
@@ -36,9 +35,6 @@ export function AutopilotFindingTables({
           </h2>
           <AutopilotPullRequestsTable
             findings={ideas}
-            isPaused={(finding) =>
-              !(settings.enabled && settings.jobs[finding.kind])
-            }
             view="ideas"
             {...tableProps}
           />

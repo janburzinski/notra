@@ -14,6 +14,7 @@ import { nanoid } from "nanoid";
 
 import {
   AUTOPILOT_DEFAULT_JOBS,
+  AUTOPILOT_PULL_REQUEST_JOBS,
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
 import {
@@ -32,11 +33,13 @@ import {
   renewAutopilotRunLease,
 } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import { runAutopilotPlanner } from "@/lib/autopilot/planner";
 import { runPromptsJob } from "@/lib/autopilot/prompts";
 import { runReadinessJob } from "@/lib/autopilot/readiness";
 import type {
   AutopilotJobResult,
   AutopilotRunContext,
+  AutopilotRunObservation,
 } from "@/types/autopilot";
 import type { AutopilotRunTrigger } from "@/types/autopilot-runtime";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
@@ -211,13 +214,6 @@ const JOB_RUNNERS: Record<
   competitors: runCompetitorsJob,
 };
 
-/** Pull-request producing jobs stop once the open pull request budget is used up. */
-const PULL_REQUEST_JOBS = new Set<AutopilotJobKind>([
-  "readiness",
-  "keywords",
-  "commits",
-]);
-
 export async function runAutopilotJob(
   ctx: AutopilotRunContext,
   kind: AutopilotJobKind
@@ -233,7 +229,7 @@ export async function runAutopilotJob(
     await log.skip("Turned off in settings");
     return empty;
   }
-  if (PULL_REQUEST_JOBS.has(kind)) {
+  if (AUTOPILOT_PULL_REQUEST_JOBS.has(kind)) {
     // A replayed step returns what it already proposed instead of picking another candidate.
     const claimed = await db
       .select({ id: autopilotFindings.id })
@@ -278,6 +274,29 @@ export async function runAutopilotJob(
     return await withAutopilotRunLease(ctx, () => JOB_RUNNERS[kind](ctx));
   } catch (error) {
     await log.error("Job failed", {
+      error: toErrorMessage(error, String(error)),
+    });
+    return empty;
+  }
+}
+
+/** Plans on what this run observed; a failure only skips today's action. */
+export async function planAutopilot(
+  ctx: AutopilotRunContext,
+  observations: AutopilotRunObservation[]
+): Promise<AutopilotJobResult> {
+  const empty: AutopilotJobResult = { findingIds: [], insights: [] };
+  const log = createAutopilotLogger(ctx, null);
+  if (!(await renewAutopilotRunLease(ctx))) {
+    await log.skip("This run no longer owns its lease");
+    return empty;
+  }
+  try {
+    return await withAutopilotRunLease(ctx, () =>
+      runAutopilotPlanner(ctx, observations)
+    );
+  } catch (error) {
+    await log.error("Planning failed", {
       error: toErrorMessage(error, String(error)),
     });
     return empty;

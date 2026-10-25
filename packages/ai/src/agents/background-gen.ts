@@ -92,7 +92,7 @@ async function runBackgroundGenWithContext(
 
   await assertRouteHasCredits({ organizationId, modelId: CONTENT_AGENT_MODEL });
 
-  const model = createModel(organizationId, CONTENT_AGENT_MODEL, {}, log);
+  const model = createModel(organizationId, CONTENT_AGENT_MODEL, log);
 
   const prompt = getUserPrompt(contentLabel, promptInput);
 

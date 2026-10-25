@@ -76,7 +76,7 @@ function findingBlocks(slug: string, finding: FindingRow): SlackBlock[] {
       elements: [
         {
           type: "mrkdwn",
-          text: `${AUTOPILOT_SLACK_KIND_LABELS[finding.kind]}${finding.pullRequestUrl ? ` · <${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>` : ""}${finding.status === "suggested" ? " · Writes automatically unless dismissed" : ""}`,
+          text: `${AUTOPILOT_SLACK_KIND_LABELS[finding.kind]}${finding.pullRequestUrl ? ` · <${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>` : ""}${finding.status === "suggested" ? " · Waiting for you" : ""}`,
         },
       ],
     },

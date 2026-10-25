@@ -67,6 +67,10 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     runReadinessJob: emptyJob,
   }));
   mock.module("@/lib/autopilot/prompts", () => ({ runPromptsJob: emptyJob }));
+  // Planning is covered by autopilot-flow; here the jobs observe nothing.
+  mock.module("@/lib/autopilot/planner", () => ({
+    runAutopilotPlanner: emptyJob,
+  }));
   mock.module("@notra/ai/utils/github-mention-auth", () => ({
     resolveGitHubMentionAuth: async () => null,
   }));

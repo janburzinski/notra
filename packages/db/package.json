@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
+    "@notra/memory": "workspace:*",
     "@notra/sites-core": "workspace:*",
     "@upstash/redis": "catalog:",
     "@vercel/functions": "^3.10.1",

@@ -1,4 +1,6 @@
 export interface AutopilotDecisionMemory {
+  /** The memory commit the decision read; null before the first write. */
+  sha: string | null;
   rules: string[];
   feedback: string[];
 }

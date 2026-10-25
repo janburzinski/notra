@@ -64,7 +64,6 @@ export const SERVER_ONLY_PACKAGES = [
   "@octokit/core",
   "@openrouter/ai-sdk-provider",
   "@resvg/resvg-js",
-  "@supermemory/tools",
   "@tinybirdco/sdk",
   "@unkey/api",
   "@upstash/box",

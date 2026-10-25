@@ -283,7 +283,6 @@ function AutopilotOverviewPage({
                 : undefined
             }
             readOnly={!canManage}
-            settings={settings}
             writingId={
               writeSuggestion.isPending
                 ? (writeSuggestion.variables ?? null)

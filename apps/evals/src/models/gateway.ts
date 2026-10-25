@@ -134,6 +134,7 @@ export interface ObjectCallParams<SCHEMA extends z.ZodType> {
   messages?: ModelMessage[];
   abortSignal: AbortSignal;
   temperature?: number;
+  maxOutputTokens?: number;
   providerOptions?: Record<string, Record<string, unknown>>;
 }
 
@@ -149,6 +150,7 @@ export async function callObject<SCHEMA extends z.ZodType>(
     output: Output.object({ schema: params.schema }),
     abortSignal: params.abortSignal,
     temperature: params.temperature,
+    maxOutputTokens: params.maxOutputTokens,
     maxRetries: 0,
     providerOptions: {
       ...gatewayProviderOptions(params.feature),

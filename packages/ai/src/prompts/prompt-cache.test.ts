@@ -9,7 +9,6 @@ import {
   createPolicy,
 } from "@notra/ai/router/test-helpers";
 import { promptCacheTelemetry } from "@notra/ai/utils/prompt-cache-telemetry";
-import { relocateMemoryContext } from "@notra/ai/utils/relocate-memory-context";
 import { generateText, streamText } from "ai";
 
 import { getContentEditorChatPrompt } from "./content-editor";
@@ -291,30 +290,5 @@ describe("cacheable chat instructions", () => {
     expect(
       promptCacheTelemetry({ prompt: [] }).firstSystemMessageHash
     ).toBeUndefined();
-  });
-
-  test("memory relocation preserves both system blocks and their cache metadata", () => {
-    const instructions = getContentEditorChatPrompt({
-      contentType: "blog_post",
-    });
-    const shared = instructions[0];
-    const context = instructions[1];
-    expect(shared).toBeDefined();
-    expect(context).toBeDefined();
-    if (!(shared && context)) {
-      throw new Error("Missing system instructions");
-    }
-    const memory =
-      '<supermemory context="user-memories" readonly>Fixture memory</supermemory>';
-    const relocated = relocateMemoryContext([
-      { ...shared, content: `${shared.content}\n${memory}` },
-      context,
-      { role: "user", content: [{ type: "text", text: "Fixture request" }] },
-    ]);
-    expect(relocated.slice(0, 2)).toEqual(instructions);
-    expect(relocated[2]?.content).toEqual([
-      { type: "text", text: "Fixture request" },
-      { type: "text", text: memory },
-    ]);
   });
 });

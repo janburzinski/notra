@@ -9,8 +9,8 @@ import {
 import { z } from "zod";
 
 import { BRAND_PROFILE_FIELDS, MAX_BRAND_COLORS } from "../constants/brand";
+import { MEMORY_SEARCH_DEFAULT_LIMIT } from "../constants/knowledge";
 import { SHA256_HEX_REGEX } from "../constants/reference-snapshot";
-import { MEMORY_SEARCH_DEFAULT_LIMIT } from "../constants/supermemory";
 
 export const referenceInputSchema = z
   .object({

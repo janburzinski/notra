@@ -12,9 +12,6 @@ import { eq } from "drizzle-orm";
 import {
   AUTOPILOT_DEFAULT_JOBS,
   AUTOPILOT_FINDING_MAX_FAILURES,
-  AUTOPILOT_IDEA_AUTO_WRITE_DAYS,
-  AUTOPILOT_JEV_MIN_CONFIDENCE,
-  AUTOPILOT_PR_AUTO_WRITE_CONFIDENCE,
   AUTOPILOT_PR_OFFER_CONFIDENCE,
 } from "@/constants/autopilot";
 import {
@@ -57,7 +54,6 @@ import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { formatAutopilotPercent as percent } from "@/utils/autopilot-events";
 import {
   commitFingerprint,
-  describeAutopilotDraftLocation,
   autopilotPullRequestMoment,
   isPostCandidateTitle,
   toMergedPullRequest,
@@ -211,7 +207,8 @@ async function assessAndAct(params: {
     ctx: preview,
     log: silentAutopilotLogger,
     pull,
-    minConfidence: AUTOPILOT_JEV_MIN_CONFIDENCE,
+    // Below the offer bar the daily planner sees the merge like any other.
+    minConfidence: AUTOPILOT_PR_OFFER_CONFIDENCE,
   });
   // Most pull requests end here; they become a run only when they lead somewhere.
   logInfo("autopilot.pull_request_check", {
@@ -261,11 +258,8 @@ async function proposeAndComment(params: {
   verdict: { confidence: number };
 }) {
   const { ctx, log, result, event, pull, verdict } = params;
-  const canAutoWrite =
-    verdict.confidence >= AUTOPILOT_PR_AUTO_WRITE_CONFIDENCE &&
-    Boolean(ctx.repository);
-  // The common writer claims the finding before reserving claim-scoped credits.
-  // A competing event that loses the claim must never hold or release its credits.
+  // Only ever an offer: a pull request event never writes on its own. A
+  // reply asking for the post is the explicit request that writes it.
   const outcome = await proposeCommitPost({
     ctx,
     log,
@@ -274,35 +268,20 @@ async function proposeAndComment(params: {
     confidence: verdict.confidence,
     decision: {
       considered: [],
-      threshold: AUTOPILOT_PR_AUTO_WRITE_CONFIDENCE,
+      threshold: AUTOPILOT_PR_OFFER_CONFIDENCE,
       filteredOut: 0,
     },
-    suggestOnly: !canAutoWrite,
+    suggestOnly: true,
   });
-  let comment: Awaited<ReturnType<typeof commentOnPullRequest>> = null;
-  if (outcome.status === "proposed") {
-    // A public pull request must not reveal the private website repository.
-    const where = describeAutopilotDraftLocation(
-      outcome.url,
-      event.repository.private === true
-    );
-    comment = await commentOnPullRequest({
-      ctx,
-      log,
-      event,
-      body: `**I drafted a post about this change** (${percent(verdict.confidence)} sure it's worth telling your users)${where}\n\nNothing is published until you merge the draft. If this pull request is closed without merging, I close the draft too.`,
-    });
-  } else if (
-    outcome.status === "suggested" &&
-    verdict.confidence >= AUTOPILOT_PR_OFFER_CONFIDENCE
-  ) {
-    comment = await commentOnPullRequest({
-      ctx,
-      log,
-      event,
-      body: `**Should I write a post about this?** It looks like something your users would want to hear about (${percent(verdict.confidence)} sure). Reply \`@notra write a post\` and I'll draft it now, or reply \`@notra no\` (or react with 👎) and I'll skip it. Otherwise I draft it in ${AUTOPILOT_IDEA_AUTO_WRITE_DAYS} days.`,
-    });
-  }
+  const comment =
+    outcome.status === "suggested"
+      ? await commentOnPullRequest({
+          ctx,
+          log,
+          event,
+          body: `**Should I write a post about this?** It looks like something your users would want to hear about (${percent(verdict.confidence)} sure). Reply \`@notra write a post\` and I'll draft it now, or reply \`@notra no\` (or react with 👎) and I'll skip it. I won't write it without a reply.`,
+        })
+      : null;
   if (comment && "findingId" in outcome && outcome.findingId) {
     await rememberOfferComment(outcome.findingId, {
       repository: event.repository.full_name,

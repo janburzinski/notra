@@ -6,6 +6,8 @@ import {
   organizations,
   users,
 } from "@notra/db/schema";
+import { setMemoryStore } from "@notra/memory/memory";
+import { createInMemoryStore } from "@notra/memory/stores/in-memory";
 import { call, os } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import { Effect } from "effect";
@@ -24,7 +26,6 @@ let failTeardown = false;
 let failMemoryCleanup = false;
 let failWorkos = false;
 let stalledRequest = 0;
-let stallBody = false;
 let expireCleanupBudget = () => {};
 let abortedRequests = 0;
 let activeRequests = 0;
@@ -33,63 +34,38 @@ const teardown = mock(async () => {
     throw new Error("Synthetic teardown failure");
   }
 });
-process.env.SUPERMEMORY_API_KEY = "synthetic-memory-key";
-const deleteNamespace = spyOn(globalThis, "fetch").mockImplementation(
-  async (input, init) => {
-    const organizationId = decodeURIComponent(
-      new URL(String(input)).pathname.split("/").at(-1) ?? ""
-    );
-    expect(init?.method).toBe("DELETE");
+const deleteNamespace = mock(
+  async (organizationId: string, signal?: AbortSignal) => {
     if (
       stalledRequest > 0 &&
       deleteNamespace.mock.calls.length === stalledRequest
     ) {
-      const signal = init?.signal;
       if (!signal) {
         throw new Error("Cleanup must provide a deadline signal");
       }
       activeRequests += 1;
-      const response = stallBody
-        ? new Response(
-            new ReadableStream({
-              start(controller) {
-                signal.addEventListener(
-                  "abort",
-                  () => {
-                    abortedRequests += 1;
-                    activeRequests -= 1;
-                    controller.error(signal.reason);
-                  },
-                  { once: true }
-                );
-              },
-            })
-          )
-        : new Promise<Response>((_resolve, reject) => {
-            signal.addEventListener(
-              "abort",
-              () => {
-                abortedRequests += 1;
-                activeRequests -= 1;
-                reject(signal.reason);
-              },
-              { once: true }
-            );
-          });
+      const stalled = new Promise<void>((_resolve, reject) => {
+        signal.addEventListener(
+          "abort",
+          () => {
+            abortedRequests += 1;
+            activeRequests -= 1;
+            reject(signal.reason);
+          },
+          { once: true }
+        );
+      });
       expireCleanupBudget();
-      return response;
+      return stalled;
     }
     if (failMemoryCleanup) {
-      return Response.json(
-        { error: "Synthetic memory cleanup failure" },
-        { status: 503 }
-      );
+      throw new Error("Synthetic memory cleanup failure");
     }
     memory.delete(organizationId);
-    return Response.json({ status: "deleted", namespace: organizationId });
   }
 );
-afterAll(() => deleteNamespace.mockRestore());
+setMemoryStore({ ...createInMemoryStore(), deleteRepo: deleteNamespace });
+afterAll(() => setMemoryStore(null));
 
 mock.module("@notra/db/drizzle", () => ({ db }));
 mock.module("@notra/sites-server/organization", () => ({
@@ -193,7 +169,6 @@ beforeEach(async () => {
   failMemoryCleanup = false;
   failWorkos = false;
   stalledRequest = 0;
-  stallBody = false;
   abortedRequests = 0;
   activeRequests = 0;
   runDueAutopilots.mockClear();
@@ -427,76 +402,69 @@ test("cron reports remote cleanup failure and retries on the next due sweep", as
   expect(memory.has("workspace")).toBe(false);
 });
 
-test.each([false, true])(
-  "one overall cleanup deadline aborts stalled transport (body: %s), preserves partial progress and starts daily runs",
-  async (body) => {
-    process.env.CRON_SECRET = "synthetic-cron-secret";
-    const now = new Date();
-    await db.insert(autopilotNamespaceDeletions).values(
-      Array.from({ length: 5 }, (_, index) => ({
-        organizationId: `deleted-${index}`,
-        nextAttemptAt: new Date(now.getTime() - 5000 + index),
-      }))
-    );
-    const deadline = new AbortController();
-    const timeout = spyOn(AbortSignal, "timeout").mockReturnValue(
-      deadline.signal
-    );
-    // Two requests succeed before the single batch deadline expires on request three.
-    stalledRequest = 3;
-    stallBody = body;
-    expireCleanupBudget = () =>
-      deadline.abort(new DOMException("Synthetic deadline", "TimeoutError"));
-    const request = () =>
-      new Request("https://example.test/api/cron/autopilot", {
-        headers: { authorization: "Bearer synthetic-cron-secret" },
-      });
-    try {
-      expect(
-        (await GET(new Request("https://example.test/api/cron/autopilot")))
-          .status
-      ).toBe(401);
-      expect(timeout).not.toHaveBeenCalled();
-      expect(runDueAutopilots).not.toHaveBeenCalled();
-      const response = await GET(request());
-      expect(response.status).toBe(500);
-      expect(await response.json()).toEqual({
-        checked: 0,
-        started: 0,
-        failed: 0,
-        cleanup: { checked: 5, failed: 1 },
-      });
-      expect(timeout).toHaveBeenCalledTimes(1);
-      expect(timeout).toHaveBeenCalledWith(
-        AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS
-      );
-      expect(deleteNamespace).toHaveBeenCalledTimes(3);
-      expect(abortedRequests).toBe(1);
-      expect(activeRequests).toBe(0);
-      expect(runDueAutopilots).toHaveBeenCalledTimes(1);
-      const pending = await db.select().from(autopilotNamespaceDeletions);
-      expect(pending.map((row) => row.organizationId).sort()).toEqual([
-        "deleted-2",
-        "deleted-3",
-        "deleted-4",
-      ]);
-      expect(
-        pending
-          .find((row) => row.organizationId === "deleted-2")
-          ?.nextAttemptAt.getTime()
-      ).toBeGreaterThan(now.getTime());
-      // A new transaction can claim the retained row; no background deletion survives return.
-      await db
-        .update(autopilotNamespaceDeletions)
-        .set({ nextAttemptAt: new Date(0) });
-      timeout.mockRestore();
-      stalledRequest = 0;
-      expect((await GET(request())).status).toBe(200);
-      expect(await db.select().from(autopilotNamespaceDeletions)).toEqual([]);
-      expect(deleteNamespace).toHaveBeenCalledTimes(6);
-      expect(activeRequests).toBe(0);
-    } finally {
-      timeout.mockRestore();
-    }
+test("one overall cleanup deadline aborts a stalled deletion, preserves partial progress and starts daily runs", async () => {
+  process.env.CRON_SECRET = "synthetic-cron-secret";
+  const now = new Date();
+  await db.insert(autopilotNamespaceDeletions).values(
+    Array.from({ length: 5 }, (_, index) => ({
+      organizationId: `deleted-${index}`,
+      nextAttemptAt: new Date(now.getTime() - 5000 + index),
+    }))
+  );
+  const deadline = new AbortController();
+  const timeout = spyOn(AbortSignal, "timeout").mockReturnValue(
+    deadline.signal
+  );
+  // Two requests succeed before the single batch deadline expires on request three.
+  stalledRequest = 3;
+  expireCleanupBudget = () =>
+    deadline.abort(new DOMException("Synthetic deadline", "TimeoutError"));
+  const request = () =>
+    new Request("https://example.test/api/cron/autopilot", {
+      headers: { authorization: "Bearer synthetic-cron-secret" },
+    });
+  try {
+    expect(
+      (await GET(new Request("https://example.test/api/cron/autopilot"))).status
+    ).toBe(401);
+    expect(timeout).not.toHaveBeenCalled();
+    expect(runDueAutopilots).not.toHaveBeenCalled();
+    const response = await GET(request());
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({
+      checked: 0,
+      started: 0,
+      failed: 0,
+      cleanup: { checked: 5, failed: 1 },
+    });
+    expect(timeout).toHaveBeenCalledTimes(1);
+    expect(timeout).toHaveBeenCalledWith(AUTOPILOT_NAMESPACE_CLEANUP_BUDGET_MS);
+    expect(deleteNamespace).toHaveBeenCalledTimes(3);
+    expect(abortedRequests).toBe(1);
+    expect(activeRequests).toBe(0);
+    expect(runDueAutopilots).toHaveBeenCalledTimes(1);
+    const pending = await db.select().from(autopilotNamespaceDeletions);
+    expect(pending.map((row) => row.organizationId).sort()).toEqual([
+      "deleted-2",
+      "deleted-3",
+      "deleted-4",
+    ]);
+    expect(
+      pending
+        .find((row) => row.organizationId === "deleted-2")
+        ?.nextAttemptAt.getTime()
+    ).toBeGreaterThan(now.getTime());
+    // A new transaction can claim the retained row; no background deletion survives return.
+    await db
+      .update(autopilotNamespaceDeletions)
+      .set({ nextAttemptAt: new Date(0) });
+    timeout.mockRestore();
+    stalledRequest = 0;
+    expect((await GET(request())).status).toBe(200);
+    expect(await db.select().from(autopilotNamespaceDeletions)).toEqual([]);
+    expect(deleteNamespace).toHaveBeenCalledTimes(6);
+    expect(activeRequests).toBe(0);
+  } finally {
+    timeout.mockRestore();
   }
-);
+});

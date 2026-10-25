@@ -17,8 +17,6 @@ import { checkLogRetention } from "@/lib/billing/check-log-retention";
 import { dispatchEventTriggers } from "@/lib/webhooks/dispatch-event-triggers";
 import { appendWebhookLog } from "@/lib/webhooks/logging";
 import type {
-  GithubCreateMemoryEntryProps,
-  GithubMemoryEventType,
   GithubProcessedEvent,
   WebhookContext,
   WebhookLogInput,
@@ -43,49 +41,6 @@ async function markDeliveryProcessed(deliveryId: string) {
   }
   const key = `webhook:delivery:${deliveryId}`;
   await redis.set(key, "1", { ex: DELIVERY_TTL_SECONDS });
-}
-
-async function createMemoryEntry({
-  organizationId,
-  eventType,
-  repository,
-  action,
-  data,
-  customId,
-}: GithubCreateMemoryEntryProps) {
-  const apiKey = process.env.SUPERMEMORY_API_KEY;
-  if (!apiKey) {
-    return null;
-  }
-
-  const content = JSON.stringify({ eventType, repository, action, data });
-  const context = `GitHub ${eventType} event for ${repository} (${action}).`;
-
-  const response = await fetch("https://api.supermemory.ai/v3/documents", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      content,
-      context,
-      containerTag: organizationId,
-      customId,
-      metadata: {
-        source: "github_webhook",
-        eventType,
-        repository,
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Failed to add memory: ${errorBody}`);
-  }
-
-  return response.json();
 }
 
 function verifySignature(payload: string, signature: string, secret: string) {
@@ -397,22 +352,6 @@ export async function handleGitHubWebhook(
       event,
       action,
       filtered: true,
-    });
-  }
-
-  const repositoryName = payload.repository?.full_name ?? "unknown";
-  const shouldPersistMemory =
-    processedEvent.type === "release" || processedEvent.type === "push";
-
-  if (shouldPersistMemory) {
-    const customId = `github:${repositoryId}:${delivery ?? crypto.randomUUID()}`;
-    await createMemoryEntry({
-      organizationId,
-      eventType: processedEvent.type as GithubMemoryEventType,
-      repository: repositoryName,
-      action: processedEvent.action,
-      data: processedEvent.data,
-      customId,
     });
   }
 
