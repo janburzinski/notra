@@ -11,7 +11,7 @@ import {
 export function AnnouncementBanner() {
   return (
     <Link
-      className="group bg-primary text-primary-foreground hover:bg-primary-hover flex h-10 w-full items-center justify-center gap-1.5 px-4 font-sans text-[0.8125rem] leading-none font-medium tracking-[-0.01em] transition-colors sm:text-sm"
+      className="group bg-primary-hover text-primary-foreground hover:bg-primary-hover/90 flex h-10 w-full items-center justify-center gap-1.5 px-4 font-sans text-[0.8125rem] leading-none font-medium tracking-[-0.01em] transition-colors sm:text-sm"
       to={ANNOUNCEMENT_HREF}
     >
       <span className="truncate sm:hidden">{ANNOUNCEMENT_TEXT_MOBILE}</span>
