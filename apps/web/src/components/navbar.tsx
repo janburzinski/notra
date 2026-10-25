@@ -405,8 +405,12 @@ export function Navbar({ variant }: NavbarProps = {}) {
     morphTransition,
     shellTransition,
   } = getNavbarMotion(Boolean(reduceMotion), instantMenuMotion);
-  const mutedNavClass =
-    "-mx-3 rounded-full px-3 py-1.5 text-[#1E1E1EA6] hover:bg-[#1E1E1E1F] hover:text-[#1E1E1E] dark:text-neutral-400 dark:hover:bg-white/14 dark:hover:text-white";
+  const mutedNavClass = cn(
+    "-mx-3 rounded-full px-3 py-1.5 hover:bg-[#1E1E1E1F] hover:text-[#1E1E1E] dark:hover:bg-white/14 dark:hover:text-white",
+    chrome
+      ? "text-[#1E1E1EA6] dark:text-neutral-400"
+      : "font-medium text-[#1E1E1E] dark:text-neutral-100"
+  );
 
   return (
     <LazyMotion features={domAnimation}>
@@ -786,7 +790,7 @@ function NavbarKbd({ children, onLight = false }: NavbarKbdProps) {
         "h-5 min-w-5 rounded-md font-sans text-[0.6875rem] font-medium",
         onLight
           ? "bg-[#1E1E1E0F] text-[#1E1E1E99]"
-          : "bg-[#1E1E1E0F] text-[#1E1E1E99] dark:bg-white/10 dark:text-white/50"
+          : "bg-[#1E1E1E1A] text-[#1E1E1EB3] dark:bg-white/10 dark:text-white/50"
       )}
     >
       {children}
