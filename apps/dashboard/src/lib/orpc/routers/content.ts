@@ -51,7 +51,6 @@ import {
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   contentListQuerySchema,
-  contentRecentsQuerySchema,
   dashboardHomeContentQuerySchema,
 } from "@notra/schemas/dashboard/api-params";
 import type {
@@ -129,6 +128,7 @@ import { removePublishedContent } from "@/lib/integrations/github/remove-publish
 import { baseProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { contentAuthorsRouter } from "@/lib/orpc/routers/content-authors";
 import { contentHistoryRouter } from "@/lib/orpc/routers/content-history";
+import { contentRecentsProcedure } from "@/lib/orpc/routers/content-recents";
 import { isOwnSocialVideo } from "@/lib/social-connect/media-urls";
 import { startOnDemandRun } from "@/lib/workflows/start";
 import type { PostMetadataColumns } from "@/types/content/overview";
@@ -615,32 +615,7 @@ export const contentRouter = {
         };
       }),
   },
-  recents: baseProcedure
-    .input(contentOrganizationIdInputSchema.and(contentRecentsQuerySchema))
-    .use(withOrganizationAccess)
-    .handler(async ({ input }) => {
-      const filters = [eq(posts.organizationId, input.organizationId)];
-      const collectionIds = projectScopedCollectionIds(
-        input.organizationId,
-        input.projectId
-      );
-      if (collectionIds) {
-        filters.push(inArray(posts.collectionId, collectionIds));
-      }
-
-      const items = await db.query.posts.findMany({
-        where: and(...filters),
-        orderBy: [desc(posts.createdAt), desc(posts.id)],
-        limit: input.limit,
-        columns: {
-          id: true,
-          title: true,
-          status: true,
-        },
-      });
-
-      return { posts: items };
-    }),
+  recents: contentRecentsProcedure,
   list: baseProcedure
     .input(contentOrganizationIdInputSchema.and(contentListQuerySchema))
     .use(withOrganizationAccess)

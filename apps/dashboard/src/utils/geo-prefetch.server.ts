@@ -7,7 +7,7 @@ import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { resolveGeoEntitlement } from "@/lib/billing/subscription";
 import { createORPCContext } from "@/lib/orpc/context";
 import { dashboardOrpc } from "@/lib/orpc/query";
-import { contentRouter } from "@/lib/orpc/routers/content";
+import { contentRecentsProcedure } from "@/lib/orpc/routers/content-recents";
 import { geoRouter } from "@/lib/orpc/routers/geo";
 import { prefetchRecentPostsQuery } from "@/utils/content-recents-prefetch.server";
 import {
@@ -52,7 +52,7 @@ async function dehydrateGeoOverview(
   }
   const input = geoHydrationInputs(organizationId, projectId, search);
   const client = createRouterClient(
-    { content: contentRouter, geo: geoRouter },
+    { content: { recents: contentRecentsProcedure }, geo: geoRouter },
     { context: () => createORPCContext({ headers: requestHeaders }) }
   );
   const queryClient = getGeoServerQueryClient();

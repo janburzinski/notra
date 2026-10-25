@@ -5,8 +5,6 @@ import type { User } from "@workos-inc/node";
 import { getWorkOS } from "@workos/authkit-session";
 import { and, eq, inArray } from "drizzle-orm";
 import { Effect } from "effect";
-import { isFreeEmail } from "free-email-domains-list";
-import { isValid as isNotDisposableEmail } from "mailchecker";
 
 import { FIRST_LOGIN_WINDOW_MS } from "@/constants/analytics-events";
 import { runAfterResponse } from "@/lib/after-response";
@@ -19,8 +17,6 @@ import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { SocialConnectionError, UserSyncError } from "@/lib/auth/errors";
 import { upsertMembership } from "@/lib/auth/membership-upsert";
 import { isWorkOSNotFound } from "@/lib/auth/workos-error";
-import { syncBrewContacts } from "@/lib/email/brew-contacts";
-import { sendWelcomeEmail } from "@/lib/email/send";
 import type {
   OAuthProviderTokens,
   SyncAuthenticatedUserInput,
@@ -211,6 +207,11 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
       return linked ?? byEmail;
     }
 
+    // Signup-only dependencies (multi-MB domain lists, email templates) load
+    // here, not with the module: every request's auth path imports this file.
+    const { isValid: isNotDisposableEmail } = yield* Effect.promise(
+      () => import("mailchecker")
+    );
     if (!isNotDisposableEmail(workosUser.email)) {
       return yield* Effect.fail(
         new UserSyncError({
@@ -270,18 +271,23 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
     yield* linkWorkOSExternalId(workosUser.id, created.id);
     yield* Effect.sync(() => {
       runAfterResponse("[Signup] Welcome email failed", async () => {
+        const { sendWelcomeEmail } = await import("@/lib/email/send");
         const { error } = await sendWelcomeEmail({ userEmail: created.email });
         if (error) {
           throw new Error(`${error.name}: ${error.message}`);
         }
       });
-      runAfterResponse("[BrewContacts] Sync failed", () =>
-        syncBrewContacts([created.id])
-      );
+      runAfterResponse("[BrewContacts] Sync failed", async () => {
+        const { syncBrewContacts } = await import("@/lib/email/brew-contacts");
+        await syncBrewContacts([created.id]);
+      });
     });
 
     const signupMethod = toAnalyticsAuthMethod(authenticationMethod);
     const requestHeaders = yield* Effect.promise(readRequestHeaders);
+    const { isFreeEmail } = yield* Effect.promise(
+      () => import("free-email-domains-list")
+    );
     yield* Effect.sync(() => {
       trackServerEvent({
         event: POSTHOG_EVENTS.SIGNUP_COMPLETED,
