@@ -6,11 +6,11 @@ import {
   CLOUDFLARE_REQUEST_TIMEOUT_MS,
 } from "./constants/cloudflare-saas";
 import { CLOUDFLARE_ZONES_API } from "./constants/domains";
+import { SiteProviderRequestError } from "./errors/provider";
 import {
   cloudflareApiResponseSchema,
   cloudflareCustomHostnameSchema,
 } from "./schemas/cloudflare-saas";
-import { SiteProviderRequestError } from "./schemas/provider-error";
 import type { CloudflareSaasConfig } from "./types/cloudflare-saas";
 import { readBodyUpToEffect } from "./utils/read-body";
 import { runSitesEffect } from "./utils/run-sites-effect";

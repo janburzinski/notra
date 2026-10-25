@@ -14,14 +14,15 @@ import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
-import { SITE_BRANCH_DIALOG_TITLES } from "@/constants/site-branches";
+import {
+  SITE_BRANCH_DESTRUCTIVE_DIALOG_KINDS,
+  SITE_BRANCH_DIALOG_TITLES,
+} from "@/constants/site-branches";
 import type {
   SiteBranchBringFieldsProps,
   SiteBranchDialogDescriptionProps,
   SiteBranchDialogProps,
 } from "@/types/site-branches";
-
-const DESTRUCTIVE_KINDS = new Set(["delete", "discardDeleted"]);
 
 function SiteBranchDialogDescription({
   action,
@@ -89,7 +90,7 @@ export function SiteBranchDialog({
   const [title, setTitle] = useState("");
   const [bring, setBring] = useState(true);
   const kind = action?.kind ?? "create";
-  const destructive = DESTRUCTIVE_KINDS.has(kind);
+  const destructive = SITE_BRANCH_DESTRUCTIVE_DIALOG_KINDS.has(kind);
   return (
     <ResponsiveDialog
       open={action !== null}

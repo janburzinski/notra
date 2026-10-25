@@ -11,8 +11,8 @@ import { Effect, Option, Stream } from "effect";
 
 import { R2_READ_TIMEOUT } from "./constants/r2";
 import { getSitesR2Env } from "./env";
-import { R2PreconditionFailedError } from "./errors";
-import { R2DeleteFailedError } from "./schemas/r2";
+import { R2DeleteFailedError } from "./errors/r2";
+import { R2PreconditionFailedError } from "./errors/sites";
 import type { R2PutOptions, R2TextObject } from "./types/r2";
 import { runSitesEffect } from "./utils/run-sites-effect";
 

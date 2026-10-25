@@ -41,3 +41,15 @@ export type InthErrorCode =
   | "project_not_found"
   | "no_backend"
   | "api_error";
+
+export interface ExchangeInthAuthorizationCodeParams {
+  code: string;
+  redirectUri: string;
+  codeVerifier: string;
+}
+
+export interface SaveInthIntegrationParams {
+  organizationId: string;
+  userId: string;
+  tokens: InthTokens;
+}

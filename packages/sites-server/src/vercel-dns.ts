@@ -15,7 +15,7 @@ import {
   VERCEL_NAMESERVER_SUFFIX,
 } from "./constants/vercel-dns";
 import { getDashboardUrl } from "./env";
-import { SiteProviderRequestError } from "./schemas/provider-error";
+import { SiteProviderRequestError } from "./errors/provider";
 import { VercelTokenResponse } from "./schemas/vercel-dns";
 import type { DomainConnectCallbackClaims } from "./types/domain-connect";
 import type {

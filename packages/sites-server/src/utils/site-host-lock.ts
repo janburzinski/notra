@@ -2,7 +2,7 @@ import { db } from "@notra/db/drizzle";
 import { organizations } from "@notra/db/schema";
 import { eq, sql } from "drizzle-orm";
 
-import { SiteInputError } from "../errors";
+import { SiteInputError } from "../errors/sites";
 import type { SiteStorageTransaction } from "../types/deployments";
 import type { SiteHostLockOptions } from "../types/site-host-lock";
 

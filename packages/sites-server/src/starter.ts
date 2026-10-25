@@ -22,7 +22,7 @@ import {
   STARTER_PULL_REQUEST_TITLE,
   STARTER_USER_AGENT,
 } from "./constants/starter";
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import { getBranchHead, getDefaultBranch, siteRepositoryToken } from "./github";
 import { requireOrganizationRepository } from "./repositories";
 import {

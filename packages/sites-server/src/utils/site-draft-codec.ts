@@ -2,11 +2,10 @@ import { SITE_IMAGE_UPLOAD_MAX_BYTES } from "@notra/sites-core/constants/uploads
 import { isSiteImageDraftPath } from "@notra/sites-core/utils/image-drafts";
 
 import { MAX_DRAFT_BYTES } from "../constants/editor";
-import { SiteInputError } from "../errors";
+import { BASE64 } from "../constants/site-draft-codec";
+import { SiteInputError } from "../errors/sites";
 import type { SiteDraftCodec } from "../types/editor";
 import { gitBlobSha, sniffSiteImageExtension } from "./image-type";
-
-const BASE64 = /^[A-Za-z0-9+/]*={0,2}$/;
 
 /** Decoded bytes, or null when the content isn't canonical base64. */
 function base64Bytes(content: string): Buffer | null {

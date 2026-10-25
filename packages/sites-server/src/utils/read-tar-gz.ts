@@ -1,8 +1,8 @@
 import { gunzipSync } from "node:zlib";
 
-import { TAR_BLOCK_SIZE } from "./constants/build";
-import { UnsafeArchiveError } from "./errors";
-import type { ArchiveFile, ArchiveLimits } from "./types/tar";
+import { TAR_BLOCK_SIZE } from "../constants/build";
+import { UnsafeArchiveError } from "../errors/sites";
+import type { ArchiveFile, ArchiveLimits } from "../types/tar";
 
 const decoder = new TextDecoder();
 

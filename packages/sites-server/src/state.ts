@@ -30,7 +30,10 @@ import { Effect } from "effect";
 import { JSON_CONTENT_TYPE } from "./constants/content-types";
 import { R2_CONTROL_CACHE_CONTROL } from "./constants/r2";
 import { SERVING_STATE_RETRY_SCHEDULE } from "./constants/state";
-import { R2PreconditionFailedError, SiteHostConflictError } from "./errors";
+import {
+  R2PreconditionFailedError,
+  SiteHostConflictError,
+} from "./errors/sites";
 import {
   r2DeleteKey,
   r2GetText,

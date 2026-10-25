@@ -16,10 +16,10 @@ import {
   GITHUB_SOURCE_METADATA_MAX_BYTES,
   GITHUB_METADATA_ATTRIBUTE_LINE,
 } from "./constants/github";
-import { SitePermanentBuildError } from "./errors";
+import { SiteProviderRequestError } from "./errors/provider";
+import { SitePermanentBuildError } from "./errors/sites";
 import { downloadRepositoryTarballEffect } from "./github";
 import { githubSourceTreeSchema } from "./schemas/github-source";
-import { SiteProviderRequestError } from "./schemas/provider-error";
 import type { SiteRepository } from "./types/github";
 import type { GithubSourceEntry } from "./types/github-source";
 import { isGitLfsPointer } from "./utils/git-lfs";

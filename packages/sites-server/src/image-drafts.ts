@@ -11,7 +11,7 @@ import {
   readSiteDraft,
   saveSiteDraft,
 } from "./editor";
-import { SiteInputError, SitePublishConflictError } from "./errors";
+import { SiteInputError, SitePublishConflictError } from "./errors/sites";
 import type {
   SaveSiteImageDraftInput,
   SiteDraft,

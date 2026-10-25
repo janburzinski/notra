@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 
-import { serveFile } from "../responses";
+import { serveFile } from "../serve-file";
 import type { ManifestRouteContext } from "../types/routes";
 import { markdownPageHeaders } from "../utils/markdown-headers";
 

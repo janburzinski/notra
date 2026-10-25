@@ -32,12 +32,13 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
-import { SITE_IMPORT_SKELETON_KEYS } from "@/constants/site-create";
+import {
+  SITE_IMPORT_SCROLL_END_TOLERANCE_PX,
+  SITE_IMPORT_SKELETON_KEYS,
+} from "@/constants/site-create";
 import { startGitHubInstall } from "@/lib/integrations/github/install";
 import { cn } from "@/lib/utils";
 import type { SiteImportListProps } from "@/types/components/sites";
-
-const SCROLL_END_TOLERANCE_PX = 4;
 
 function githubAvatarUrl(owner: string) {
   return `https://github.com/${encodeURIComponent(owner)}.png?size=64`;
@@ -107,7 +108,7 @@ export function SiteImportList({
     }
     setHasMoreBelow(
       list.scrollHeight - list.scrollTop - list.clientHeight >
-        SCROLL_END_TOLERANCE_PX
+        SITE_IMPORT_SCROLL_END_TOLERANCE_PX
     );
   }, []);
 

@@ -1,5 +1,5 @@
-import type { InthErrorCode } from "./types/inth";
-import type { SiteInputField } from "./types/sites";
+import type { InthErrorCode } from "../types/inth";
+import type { SiteInputField } from "../types/sites";
 
 export class SitesNotConfiguredError extends Error {
   readonly name = "SitesNotConfiguredError";

@@ -11,7 +11,7 @@ import {
   getCustomHostnameEffect,
 } from "../src/cloudflare-saas";
 import { CLOUDFLARE_REQUEST_TIMEOUT_MS } from "../src/constants/cloudflare-saas";
-import { SiteProviderRequestError } from "../src/schemas/provider-error";
+import { SiteProviderRequestError } from "../src/errors/provider";
 import { runSitesEffect } from "../src/utils/run-sites-effect";
 import {
   cloudflareConfig,

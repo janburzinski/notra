@@ -16,7 +16,7 @@ import { MAX_POST_PREVIEW_BYTES } from "./constants/editor";
 import { SANDBOX_UPLOAD_CHUNK_BYTES } from "./constants/sandbox";
 import { deployBranchHead } from "./deploy";
 import { allocateGeneration, enqueuePreviewRemoval } from "./deployments";
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import {
   readPostPreviewSource,
   writePostPreviewSource,

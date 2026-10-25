@@ -27,7 +27,7 @@ import {
   enqueueSiteDeployment,
   getDeployment,
 } from "./deployments";
-import { SiteNotBuildableError } from "./errors";
+import { SiteNotBuildableError } from "./errors/sites";
 import { pullRequestChangedPaths, siteRepositoryAccess } from "./github";
 import type { EnqueueDeploymentInput } from "./types/deployments";
 import type { Site } from "./types/sites";

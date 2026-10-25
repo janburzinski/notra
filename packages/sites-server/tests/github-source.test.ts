@@ -14,9 +14,9 @@ import {
   GITHUB_SOURCE_DOWNLOAD_CONCURRENCY,
   GITHUB_SOURCE_DOWNLOAD_MAX_FILES,
 } from "../src/constants/github";
-import { SitePermanentBuildError } from "../src/errors";
+import { SitePermanentBuildError } from "../src/errors/sites";
 import { downloadSiteSourceEffect } from "../src/github-source";
-import { readTarGz } from "../src/tar";
+import { readTarGz } from "../src/utils/read-tar-gz";
 import { runSitesEffect } from "../src/utils/run-sites-effect";
 import { githubRepository } from "./constants/provider-effect";
 

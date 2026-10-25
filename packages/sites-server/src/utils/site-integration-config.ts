@@ -1,7 +1,7 @@
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import { siteIntegrationsSchema } from "@notra/sites-core/schemas/site-integrations";
 
-import { SiteInputError } from "../errors";
+import { SiteInputError } from "../errors/sites";
 import type { SiteIntegrationConfigUpdate } from "../types/integrations";
 import { isRecord, safeJson } from "./json";
 

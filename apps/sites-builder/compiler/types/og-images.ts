@@ -64,3 +64,7 @@ export interface OgArticleCardContent {
 }
 
 export type SatoriFont = Parameters<typeof satori>[1]["fonts"][number];
+
+export type FrontmatterAuthor =
+  | string
+  | { id?: string; name: string; title?: string; avatar?: string };

@@ -28,8 +28,8 @@ import {
   REPOSITORY_TOKEN_CACHE_LIMIT,
   REPOSITORY_TOKEN_CACHE_MS,
 } from "./constants/github";
-import { SiteInputError, SitePermanentBuildError } from "./errors";
-import { SiteProviderRequestError } from "./schemas/provider-error";
+import { SiteProviderRequestError } from "./errors/provider";
+import { SiteInputError, SitePermanentBuildError } from "./errors/sites";
 import type {
   BranchHead,
   CompleteCheckRunParams,

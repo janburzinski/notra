@@ -26,7 +26,7 @@ import {
   SANDBOX_LOG_TAIL_SCRIPT,
 } from "../src/constants/sandbox";
 import * as env from "../src/env";
-import { SandboxRequestError } from "../src/schemas/sandbox";
+import { SandboxRequestError } from "../src/errors/sandbox";
 import type {
   SandboxBuildParams,
   SandboxBuildResult,

@@ -1,3 +1,4 @@
+import type { AlertCircleIcon } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import type { ReactElement, ReactNode } from "react";
 
@@ -762,4 +763,11 @@ export interface SiteHeaderMenuProps {
   branch: string;
   /** Hides the Branches toggle where the selector cannot be turned off. */
   branchesRequired: boolean;
+}
+
+export interface SiteWorkspaceErrorStateProps {
+  icon: typeof AlertCircleIcon;
+  title: string;
+  description: string;
+  children: ReactNode;
 }

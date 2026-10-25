@@ -2,15 +2,14 @@
 import type { ReactElement } from "react";
 
 import {
+  OG_AUTHOR_AVATAR_SIZE,
+  OG_AUTHOR_LOGO_SIZE,
   OG_FONT_FAMILY,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
   OG_THEME,
 } from "../constants/og-images";
 import type { OgAuthorCardContent } from "../types/og-images";
-
-const AVATAR_SIZE = 64;
-const LOGO_SIZE = 56;
 
 export function OgAuthorCard(content: OgAuthorCardContent): ReactElement {
   const colors = OG_THEME[content.appearance];
@@ -43,11 +42,16 @@ export function OgAuthorCard(content: OgAuthorCardContent): ReactElement {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          height: LOGO_SIZE,
+          height: OG_AUTHOR_LOGO_SIZE,
         }}
       >
         {content.logo ? (
-          <img alt="" height={LOGO_SIZE} src={content.logo} width={LOGO_SIZE} />
+          <img
+            alt=""
+            height={OG_AUTHOR_LOGO_SIZE}
+            src={content.logo}
+            width={OG_AUTHOR_LOGO_SIZE}
+          />
         ) : (
           <div style={{ display: "flex" }} />
         )}
@@ -100,10 +104,13 @@ export function OgAuthorCard(content: OgAuthorCardContent): ReactElement {
             {author.avatar ? (
               <img
                 alt=""
-                height={AVATAR_SIZE}
+                height={OG_AUTHOR_AVATAR_SIZE}
                 src={author.avatar}
-                style={{ borderRadius: AVATAR_SIZE / 2, objectFit: "cover" }}
-                width={AVATAR_SIZE}
+                style={{
+                  borderRadius: OG_AUTHOR_AVATAR_SIZE / 2,
+                  objectFit: "cover",
+                }}
+                width={OG_AUTHOR_AVATAR_SIZE}
               />
             ) : null}
             <div style={{ display: "flex", flexDirection: "column" }}>

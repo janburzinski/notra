@@ -2,7 +2,7 @@ import { siteBranchDrafts } from "@notra/db/schema";
 import { and, eq, notExists } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-import { SiteInputError } from "../errors";
+import { SiteInputError } from "../errors/sites";
 import type { SiteStorageTransaction } from "../types/deployments";
 
 /** Caller holds both edit locks. Preserve conflicting target content rather than overwrite it. */

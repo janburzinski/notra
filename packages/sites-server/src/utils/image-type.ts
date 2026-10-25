@@ -1,7 +1,6 @@
 import { createHash } from "node:crypto";
 
-const SVG_START =
-  /^\s*(?:<\?xml[^>]*>\s*)?(?:<!--[\s\S]*?-->\s*)*(?:<!doctype svg[^>]*>\s*)?<svg[\s>]/i;
+import { SVG_START } from "../constants/image-type";
 
 function startsWith(bytes: Uint8Array, signature: readonly number[]) {
   return signature.every((byte, index) => bytes[index] === byte);

@@ -9,7 +9,7 @@ import { Deferred, Effect, Fiber } from "effect";
 import { TestClock } from "effect/testing";
 
 import { CAS_ATTEMPTS, CAS_BACKOFF_MS } from "../src/constants/state";
-import { R2PreconditionFailedError } from "../src/errors";
+import { R2PreconditionFailedError } from "../src/errors/sites";
 import type { R2PutOptions } from "../src/types/r2";
 import type { ServingAccess } from "../src/types/state";
 

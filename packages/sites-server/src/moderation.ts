@@ -9,7 +9,7 @@ import {
   SITE_RESERVED_BRAND_SLUGS,
 } from "./constants/moderation";
 import { SITE_SLUG_RETIRED_NOTE } from "./constants/sites";
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import type { SiteNameRejection, SiteNameRejectionParams } from "./types/sites";
 import { reservedSlugMessage } from "./utils/moderation";
 

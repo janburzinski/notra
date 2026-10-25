@@ -19,11 +19,11 @@ import {
   DNS_RESOLVER_TIMEOUT_MS,
 } from "./constants/domains";
 import { getDashboardUrl, siteCnameTarget } from "./env";
+import { SiteProviderRequestError } from "./errors/provider";
 import {
   domainConnectSettingsSchema,
   domainConnectTemplateSchema,
 } from "./schemas/domain-connect";
-import { SiteProviderRequestError } from "./schemas/provider-error";
 import type {
   BuildApplyUrlParams,
   DomainConnectConfig,

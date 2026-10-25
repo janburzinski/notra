@@ -23,3 +23,6 @@ export const PULL_REQUEST_RULE_TYPES: ReadonlySet<string> = new Set([
 export const MAX_POST_PREVIEW_BYTES = 12 * 1024 * 1024;
 /** GitHub's createCommitOnBranch rejects payloads around 20 MB. */
 export const MAX_PUBLISH_BYTES = 12 * 1024 * 1024;
+// createCommitOnBranch rejects a stale expectedHeadOid with "Expected branch to
+// point to "<oid>" but it did not". Anything else is a real failure.
+export const STALE_HEAD_ERROR_PATTERN = /expected branch to point to/i;

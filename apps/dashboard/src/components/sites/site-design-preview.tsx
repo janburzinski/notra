@@ -2,6 +2,12 @@
 
 import type { CSSProperties, ReactNode } from "react";
 
+import {
+  SITE_DESIGN_PREVIEW_DARK_FOREGROUND,
+  SITE_DESIGN_PREVIEW_DECORATION_CLASS_NAMES,
+  SITE_DESIGN_PREVIEW_LIGHT_FOREGROUND,
+  SITE_DESIGN_PREVIEW_NEUTRAL_CODE_CLASS_NAMES,
+} from "@/constants/site-design";
 import { cn } from "@/lib/utils";
 import type {
   SiteAppearanceMode,
@@ -10,26 +16,6 @@ import type {
   SiteDesignPreviewColors,
   SiteMiniPageProps,
 } from "@/types/site-design";
-
-const LIGHT_FOREGROUND = "#09090B";
-const DARK_FOREGROUND = "#FAFAFA";
-
-const DECORATION_CLASS_NAMES: Record<SiteBackgroundDecoration, string> = {
-  none: "",
-  grid: "bg-[linear-gradient(to_right,color-mix(in_oklab,var(--mini-fg)_9%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--mini-fg)_9%,transparent)_1px,transparent_1px)] bg-size-[10px_10px]",
-  dots: "bg-[radial-gradient(color-mix(in_oklab,var(--mini-fg)_22%,transparent)_0.75px,transparent_0.75px)] bg-size-[6px_6px]",
-  gradient:
-    "bg-[radial-gradient(120%_70%_at_50%_-10%,color-mix(in_oklab,var(--mini-accent)_32%,transparent),transparent_70%)] bg-no-repeat",
-};
-
-const NEUTRAL_CODE_CLASS_NAMES: Record<
-  NonNullable<SiteMiniPageProps["code"]>,
-  string
-> = {
-  light: "bg-black/20",
-  dark: "bg-white/30",
-  accent: "bg-[color-mix(in_oklab,var(--mini-fg)_25%,transparent)]",
-};
 
 function Bar({ className }: { className?: string }) {
   return (
@@ -63,7 +49,7 @@ function CodeLines({ tone }: { tone: NonNullable<SiteMiniPageProps["code"]> }) {
         <span
           className={cn(
             "block h-1 w-2/5 rounded-full",
-            NEUTRAL_CODE_CLASS_NAMES[tone]
+            SITE_DESIGN_PREVIEW_NEUTRAL_CODE_CLASS_NAMES[tone]
           )}
         />
       </span>
@@ -77,7 +63,7 @@ function CodeLines({ tone }: { tone: NonNullable<SiteMiniPageProps["code"]> }) {
         <span
           className={cn(
             "block h-1 w-1/3 rounded-full",
-            NEUTRAL_CODE_CLASS_NAMES[tone]
+            SITE_DESIGN_PREVIEW_NEUTRAL_CODE_CLASS_NAMES[tone]
           )}
         />
       </span>
@@ -99,14 +85,17 @@ function MiniPage({
       : colors.backgroundDark || "#09090B";
   const style = {
     "--mini-bg": background,
-    "--mini-fg": tone === "light" ? LIGHT_FOREGROUND : DARK_FOREGROUND,
+    "--mini-fg":
+      tone === "light"
+        ? SITE_DESIGN_PREVIEW_LIGHT_FOREGROUND
+        : SITE_DESIGN_PREVIEW_DARK_FOREGROUND,
     "--mini-accent": colors.primary || "#6366F1",
   } as CSSProperties;
   return (
     <div
       className={cn(
         "flex min-w-0 flex-col gap-1.5 bg-(--mini-bg) p-2.5",
-        DECORATION_CLASS_NAMES[decoration],
+        SITE_DESIGN_PREVIEW_DECORATION_CLASS_NAMES[decoration],
         className
       )}
       style={style}

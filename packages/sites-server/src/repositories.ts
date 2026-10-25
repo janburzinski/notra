@@ -2,7 +2,7 @@ import { db } from "@notra/db/drizzle";
 import { githubAppInstallations, githubIntegrations } from "@notra/db/schema";
 import { and, eq } from "drizzle-orm";
 
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import { getRepositorySuggestions, siteRepositoryToken } from "./github";
 import type {
   OrganizationRepository,

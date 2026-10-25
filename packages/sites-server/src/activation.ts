@@ -14,7 +14,7 @@ import {
   allocateGeneration,
   getProductionDeploymentHistory,
 } from "./deployments";
-import { SiteActivationContentionError, SiteInputError } from "./errors";
+import { SiteActivationContentionError, SiteInputError } from "./errors/sites";
 import { readPostPreviewSource } from "./post-preview-source";
 import { r2GetText } from "./r2";
 import { reportOutcome } from "./reporting";

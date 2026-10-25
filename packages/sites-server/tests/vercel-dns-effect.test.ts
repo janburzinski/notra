@@ -3,7 +3,7 @@ import { expect, spyOn, test } from "bun:test";
 import { Deferred, Effect, Fiber } from "effect";
 import { TestClock } from "effect/testing";
 
-import { SiteProviderRequestError } from "../src/schemas/provider-error";
+import { SiteProviderRequestError } from "../src/errors/provider";
 import {
   applyVercelDnsRecords,
   applyVercelDnsRecordsEffect,

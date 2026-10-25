@@ -3,7 +3,7 @@ import {
   GITHUB_API_VERSION_HEADERS,
 } from "@notra/ai/constants/github";
 
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import type {
   CreateCommitOnBranchResponse,
   RepositoryBranchInput,

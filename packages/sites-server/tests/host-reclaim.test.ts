@@ -46,7 +46,7 @@ if (!databaseUrl) {
     await import("@notra/db/schema");
   const { eq, inArray } = await import("drizzle-orm");
   const { SITE_R2_KEYS } = await import("@notra/sites-core/constants/sites");
-  const { R2PreconditionFailedError } = await import("../src/errors");
+  const { R2PreconditionFailedError } = await import("../src/errors/sites");
   let organizationId = "";
   let otherOrganizationId = "";
   let oldSite: Site;

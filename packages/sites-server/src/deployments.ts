@@ -9,7 +9,7 @@ import { hashBuildTarget } from "@notra/sites-core/utils/build-target";
 import { and, desc, eq, gt, inArray, lte, ne, or, sql } from "drizzle-orm";
 
 import { ROLLBACK_HISTORY } from "./constants/deployments";
-import { SiteNotBuildableError } from "./errors";
+import { SiteNotBuildableError } from "./errors/sites";
 import { publishSiteDeploymentChange } from "./live";
 import type {
   DeploymentExecutor,

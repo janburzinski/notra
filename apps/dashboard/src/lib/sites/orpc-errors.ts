@@ -6,7 +6,7 @@ import {
   SitePermanentBuildError,
   SitePublishConflictError,
   SitesNotConfiguredError,
-} from "@notra/sites-server/errors";
+} from "@notra/sites-server/errors/sites";
 
 import {
   badGateway,

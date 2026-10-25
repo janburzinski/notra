@@ -4,7 +4,7 @@ import {
 } from "@notra/sites-core/constants/sites";
 import { isValidGitBranch } from "@notra/sites-core/utils/git-branch";
 
-import { SiteInputError } from "../errors";
+import { SiteInputError } from "../errors/sites";
 import { siteRepositoryAccess } from "../github";
 import type { SiteRepositoryAccess } from "../types/github";
 import type { Site } from "../types/sites";

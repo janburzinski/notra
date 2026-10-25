@@ -26,6 +26,7 @@ import {
   useSiteWorkspaceLoad,
 } from "@/components/sites/site-workspace-context";
 import { SITE_DESIGN_SECTIONS } from "@/constants/site-design-sections";
+import { SITE_CHANGES_STRIP_TONES } from "@/constants/sites";
 import { useSiteNavSection } from "@/lib/hooks/use-site-nav-section";
 import { cn } from "@/lib/utils";
 import type {
@@ -36,19 +37,12 @@ import type { SiteWorkspaceValue } from "@/types/site-workspace";
 import { siteBranchLabel } from "@/utils/site-branch-label";
 import { configSectionChanged } from "@/utils/site-design-sections";
 
-// Tints sit on an opaque base because the strip sticks over scrolling content.
-const TONES = {
-  info: "from-info/10 to-info/10 text-info",
-  warning: "from-warning/10 to-warning/10 text-warning",
-  destructive: "from-destructive/10 to-destructive/10 text-destructive",
-} as const;
-
 function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   return (
     <div
       className={cn(
         "bg-background z-10 flex flex-wrap items-center gap-x-3 gap-y-2 border-b bg-linear-to-b px-4 py-2.5 sm:sticky sm:top-12 lg:px-5",
-        TONES[tone]
+        SITE_CHANGES_STRIP_TONES[tone]
       )}
       role={tone === "info" ? "status" : "alert"}
     >

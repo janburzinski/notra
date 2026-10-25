@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 
-import { SiteInputError } from "../src/errors";
+import { SiteInputError } from "../src/errors/sites";
 import { updateSiteIntegrationConfig } from "../src/utils/site-integration-config";
 
 test("saving normalizes provider settings while preserving the rest of blog.json", () => {

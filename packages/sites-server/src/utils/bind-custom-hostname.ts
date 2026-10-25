@@ -9,7 +9,7 @@ import {
   SiteHostConflictError,
   SiteInputError,
   SitesNotConfiguredError,
-} from "../errors";
+} from "../errors/sites";
 import type {
   CloudflareCustomHostname,
   CloudflareSaasConfig,

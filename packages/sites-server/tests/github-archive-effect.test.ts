@@ -7,7 +7,7 @@ import {
   GITHUB_ARCHIVE_TIMEOUT_MS,
   MAX_TARBALL_BYTES,
 } from "../src/constants/github";
-import { SitePermanentBuildError } from "../src/errors";
+import { SitePermanentBuildError } from "../src/errors/sites";
 import {
   downloadRepositoryTarball,
   downloadRepositoryTarballEffect,

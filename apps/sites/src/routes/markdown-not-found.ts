@@ -2,8 +2,8 @@ import { joinMountPath } from "@notra/sites-core/utils/mounts";
 import { Effect, Option } from "effect";
 
 import { PREVIEW_CACHE_CONTROL } from "../constants/responses";
-import { serveFile } from "../responses";
 import { markdownNotFound } from "../responses/markdown-not-found";
+import { serveFile } from "../serve-file";
 import type { ManifestRouteContext } from "../types/routes";
 
 export const markdownNotFoundRoute = Effect.fn("Sites.route.markdownNotFound")(

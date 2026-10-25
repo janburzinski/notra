@@ -19,7 +19,7 @@ import {
   INTH_REQUEST_TIMEOUT_MS,
 } from "./constants/inth";
 import { getSitesHostingDomain } from "./env";
-import { InthError } from "./errors";
+import { InthError } from "./errors/sites";
 import { readSiteIntegrations, saveSiteC15tBackend } from "./integrations";
 import {
   inthProjectListResponseSchema,
@@ -29,12 +29,14 @@ import {
 } from "./schemas/inth";
 import type { SiteIntegrationsState } from "./types/integrations";
 import type {
+  ExchangeInthAuthorizationCodeParams,
   InthConsentStatus,
   InthIntegrationRow,
   InthOAuthCredentials,
   InthProject,
   InthProjectSummary,
   InthTokens,
+  SaveInthIntegrationParams,
 } from "./types/inth";
 import type { Site } from "./types/sites";
 import { withInthProjectLock } from "./utils/inth-project-lock";
@@ -116,11 +118,9 @@ async function requestTokens(
   };
 }
 
-export async function exchangeInthAuthorizationCode(params: {
-  code: string;
-  redirectUri: string;
-  codeVerifier: string;
-}): Promise<InthTokens> {
+export async function exchangeInthAuthorizationCode(
+  params: ExchangeInthAuthorizationCodeParams
+): Promise<InthTokens> {
   return await requestTokens({
     grant_type: "authorization_code",
     code: params.code,
@@ -140,11 +140,9 @@ export async function getInthIntegration(
   return row ?? null;
 }
 
-export async function saveInthIntegration(params: {
-  organizationId: string;
-  userId: string;
-  tokens: InthTokens;
-}): Promise<void> {
+export async function saveInthIntegration(
+  params: SaveInthIntegrationParams
+): Promise<void> {
   const values = {
     encryptedAccessToken: encryptToken(params.tokens.accessToken),
     encryptedRefreshToken: encryptToken(params.tokens.refreshToken),

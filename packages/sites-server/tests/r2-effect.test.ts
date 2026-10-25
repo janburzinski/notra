@@ -19,7 +19,8 @@ import {
 import { Deferred, Effect, Fiber } from "effect";
 import { TestClock } from "effect/testing";
 
-import { R2PreconditionFailedError } from "../src/errors";
+import { R2DeleteFailedError } from "../src/errors/r2";
+import { R2PreconditionFailedError } from "../src/errors/sites";
 import {
   r2DeleteKey,
   r2DeletePrefix,
@@ -29,7 +30,6 @@ import {
   r2Put,
   r2PutEffect,
 } from "../src/r2";
-import { R2DeleteFailedError } from "../src/schemas/r2";
 
 const send =
   mock<

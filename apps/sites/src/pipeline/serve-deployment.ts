@@ -1,9 +1,10 @@
 import { Effect, Option } from "effect";
 
 import { DEPLOYMENT_ROUTES } from "../constants/routes";
-import { loadManifest, StateUnavailableError } from "../loaders";
+import { loadManifest } from "../loaders";
 import { isReportablePageView, reportTraffic } from "../traffic";
 import type { ResolvedDeployment, SiteRequestContext } from "../types/serving";
+import { StateUnavailableError } from "../utils/errors";
 import { runRoutes } from "../utils/run-routes";
 import { serveManifest } from "./serve-manifest";
 

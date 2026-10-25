@@ -23,6 +23,7 @@ import {
   OG_IMAGES_DIR,
 } from "./constants/og-images";
 import type {
+  FrontmatterAuthor,
   OgAuthor,
   OgBackgroundResult,
   OgImagesResult,
@@ -117,10 +118,6 @@ async function publicImage(
   );
   return `data:${mimeType};base64,${bytes.toString("base64")}`;
 }
-
-type FrontmatterAuthor =
-  | string
-  | { id?: string; name: string; title?: string; avatar?: string };
 
 async function resolveAuthor(
   params: WriteOgImagesParams,

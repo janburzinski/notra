@@ -36,7 +36,7 @@ import {
 } from "./constants/sites";
 import { deployBranchHead } from "./deploy";
 import { getSitesHostingDomain } from "./env";
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import { assertSiteNameAllowed } from "./moderation";
 import { r2DeletePrefix } from "./r2";
 import { requireOrganizationRepository } from "./repositories";

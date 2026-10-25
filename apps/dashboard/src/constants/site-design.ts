@@ -1,3 +1,8 @@
+import type {
+  SiteBackgroundDecoration,
+  SiteMiniPageProps,
+} from "@/types/site-design";
+
 export const SITE_APPEARANCE_MODES = ["system", "light", "dark"] as const;
 
 export const SITE_BACKGROUND_DECORATIONS = [
@@ -101,3 +106,26 @@ export const SITE_CODE_THEMES = [
 
 export const SITE_DEFAULT_CODE_LIGHT_THEME = "github-light";
 export const SITE_DEFAULT_CODE_DARK_THEME = "github-dark";
+
+export const SITE_DESIGN_PREVIEW_LIGHT_FOREGROUND = "#09090B";
+export const SITE_DESIGN_PREVIEW_DARK_FOREGROUND = "#FAFAFA";
+
+export const SITE_DESIGN_PREVIEW_DECORATION_CLASS_NAMES: Record<
+  SiteBackgroundDecoration,
+  string
+> = {
+  none: "",
+  grid: "bg-[linear-gradient(to_right,color-mix(in_oklab,var(--mini-fg)_9%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--mini-fg)_9%,transparent)_1px,transparent_1px)] bg-size-[10px_10px]",
+  dots: "bg-[radial-gradient(color-mix(in_oklab,var(--mini-fg)_22%,transparent)_0.75px,transparent_0.75px)] bg-size-[6px_6px]",
+  gradient:
+    "bg-[radial-gradient(120%_70%_at_50%_-10%,color-mix(in_oklab,var(--mini-accent)_32%,transparent),transparent_70%)] bg-no-repeat",
+};
+
+export const SITE_DESIGN_PREVIEW_NEUTRAL_CODE_CLASS_NAMES: Record<
+  NonNullable<SiteMiniPageProps["code"]>,
+  string
+> = {
+  light: "bg-black/20",
+  dark: "bg-white/30",
+  accent: "bg-[color-mix(in_oklab,var(--mini-fg)_25%,transparent)]",
+};

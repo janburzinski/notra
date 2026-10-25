@@ -2,6 +2,8 @@
 import type { CSSProperties, ReactElement } from "react";
 
 import {
+  OG_ARTICLE_AVATAR_SIZE,
+  OG_ARTICLE_MAX_AVATARS,
   OG_FONT_FAMILY,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_WIDTH,
@@ -10,9 +12,6 @@ import {
 import type { OgArticleCardContent } from "../types/og-images";
 import { titleSize } from "../utils/og-card";
 
-const AVATAR_SIZE = 50;
-const MAX_AVATARS = 4;
-
 export function OgArticleCard(content: OgArticleCardContent): ReactElement {
   const colors = OG_THEME[content.appearance];
   const { authors } = content;
@@ -20,10 +19,10 @@ export function OgArticleCard(content: OgArticleCardContent): ReactElement {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
+    width: OG_ARTICLE_AVATAR_SIZE,
+    height: OG_ARTICLE_AVATAR_SIZE,
     marginLeft: index === 0 ? 0 : -12,
-    borderRadius: AVATAR_SIZE / 2,
+    borderRadius: OG_ARTICLE_AVATAR_SIZE / 2,
     border: `3px solid ${colors.background}`,
     backgroundColor: fill,
     color: "#ffffff",
@@ -94,15 +93,15 @@ export function OgArticleCard(content: OgArticleCardContent): ReactElement {
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         {authors.length > 0 ? (
           <div style={{ display: "flex" }}>
-            {authors.slice(0, MAX_AVATARS).map((author, index) =>
+            {authors.slice(0, OG_ARTICLE_MAX_AVATARS).map((author, index) =>
               author.avatar ? (
                 <img
                   alt=""
-                  height={AVATAR_SIZE}
+                  height={OG_ARTICLE_AVATAR_SIZE}
                   key={author.name}
                   src={author.avatar}
                   style={avatar(index, colors.background)}
-                  width={AVATAR_SIZE}
+                  width={OG_ARTICLE_AVATAR_SIZE}
                 />
               ) : (
                 <div key={author.name} style={avatar(index, content.accent)}>

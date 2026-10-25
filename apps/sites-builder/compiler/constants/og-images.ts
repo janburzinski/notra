@@ -32,3 +32,9 @@ export const OG_TITLE_SIZES = [
   { maxLength: 70, size: 60 },
   { maxLength: Number.POSITIVE_INFINITY, size: 50 },
 ] as const;
+
+export const OG_ARTICLE_AVATAR_SIZE = 50;
+export const OG_ARTICLE_MAX_AVATARS = 4;
+
+export const OG_AUTHOR_AVATAR_SIZE = 64;
+export const OG_AUTHOR_LOGO_SIZE = 56;

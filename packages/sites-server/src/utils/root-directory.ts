@@ -1,5 +1,5 @@
 import { ROOT_DIRECTORY, EDGE_SLASHES } from "../constants/root-directory";
-import { SiteInputError } from "../errors";
+import { SiteInputError } from "../errors/sites";
 
 export function isSafeRootDirectory(rootDirectory: string): boolean {
   return (

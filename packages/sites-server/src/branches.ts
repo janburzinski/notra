@@ -18,7 +18,7 @@ import {
   publishedConfig,
   validateSiteDrafts,
 } from "./editor";
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import { getBranchHead, siteRepositoryAccess } from "./github";
 import { createRepositoryBranch } from "./repository";
 import type {

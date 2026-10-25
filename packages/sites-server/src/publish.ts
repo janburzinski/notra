@@ -13,11 +13,11 @@ import { Clock, Effect } from "effect";
 import { UPLOAD_CONCURRENCY } from "./constants/build";
 import { JSON_CONTENT_TYPE } from "./constants/content-types";
 import { r2PutEffect } from "./r2";
-import { readTarGz } from "./tar";
 import type { PublishDeploymentFilesParams } from "./types/deployments";
 import { mapWithConcurrencyEffect } from "./utils/concurrency";
 import { contentTypeForPath } from "./utils/content-types";
 import { gitBlobSha } from "./utils/image-type";
+import { readTarGz } from "./utils/read-tar-gz";
 import { runSitesEffect } from "./utils/run-sites-effect";
 
 /** Uploads are named after their blob SHA; only trust names that match. */

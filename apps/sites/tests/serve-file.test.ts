@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import type { SiteManifestFile } from "@notra/sites-core/types/deployment";
 
-import { serveFile } from "../src/responses";
+import { serveFile } from "../src/serve-file";
 import type { SitesDeps } from "../src/types/worker";
 
 const POLICY = "script-src 'self' 'sha256-abc='; object-src 'none'";

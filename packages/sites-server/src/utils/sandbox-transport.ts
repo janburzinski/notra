@@ -14,10 +14,8 @@ import {
   SANDBOX_MAX_RESPONSE_BYTES,
   SANDBOX_REQUEST_TIMEOUT_MS,
 } from "../constants/sandbox";
-import {
-  sandboxAllocationSchema,
-  SandboxRequestError,
-} from "../schemas/sandbox";
+import { SandboxRequestError } from "../errors/sandbox";
+import { sandboxAllocationSchema } from "../schemas/sandbox";
 import { boundBuildLog } from "./bound-build-log";
 import { redactBuildLog } from "./build-log";
 import { readBodyUpToEffect } from "./read-body";

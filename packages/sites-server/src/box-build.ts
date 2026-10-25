@@ -23,12 +23,12 @@ import {
   SANDBOX_UPLOAD_CHUNK_BYTES,
 } from "./constants/sandbox";
 import { getBoxApiKey, getSitesBuilderSnapshotId } from "./env";
+import { SandboxRequestError } from "./errors/sandbox";
 import { guestBuildTelemetrySchema } from "./schemas/build-telemetry";
 import {
   sandboxAllocationSchema,
   sandboxExecutionSchema,
   sandboxFileSchema,
-  SandboxRequestError,
 } from "./schemas/sandbox";
 import type {
   SandboxBuildEffectParams,

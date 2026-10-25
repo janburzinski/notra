@@ -10,7 +10,8 @@ import {
   getDeployment,
   getSite,
 } from "./deployments";
-import { SitePermanentBuildError } from "./errors";
+import { SandboxRequestError } from "./errors/sandbox";
+import { SitePermanentBuildError } from "./errors/sites";
 import { getBranchHead, siteRepositoryAccess } from "./github";
 import {
   claimSiteJob,
@@ -21,7 +22,6 @@ import {
 import { publishSiteDeploymentChange } from "./live";
 import { failDeployment, runDeploymentPipeline } from "./pipeline";
 import { removePostPreviewSource } from "./post-preview-source";
-import { SandboxRequestError } from "./schemas/sandbox";
 import {
   reconcileProductionProjection,
   removePreviewDeployment,

@@ -1,7 +1,7 @@
 import { db } from "@notra/db/drizzle";
 import { sql } from "drizzle-orm";
 
-import { SiteInputError } from "../errors";
+import { SiteInputError } from "../errors/sites";
 import type { SiteStorageTransaction } from "../types/deployments";
 
 export async function withSiteBranchLock<T>(

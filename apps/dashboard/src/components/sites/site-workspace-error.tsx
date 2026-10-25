@@ -14,13 +14,13 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
-import type { ReactNode } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useSite } from "@/components/sites/site-context";
 import { useSiteWorkspaceLoad } from "@/components/sites/site-workspace-context";
+import type { SiteWorkspaceErrorStateProps } from "@/types/components/sites";
 import { githubRepositoryUrl, siteHref } from "@/utils/site-links";
 
 function WorkspaceErrorState({
@@ -28,12 +28,7 @@ function WorkspaceErrorState({
   title,
   description,
   children,
-}: {
-  icon: typeof AlertCircleIcon;
-  title: string;
-  description: string;
-  children: ReactNode;
-}) {
+}: SiteWorkspaceErrorStateProps) {
   return (
     <Empty className="mx-auto w-full max-w-3xl" role="alert">
       <EmptyHeader>

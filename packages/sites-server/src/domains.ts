@@ -30,7 +30,7 @@ import {
   SITE_MAX_DOMAINS,
 } from "./constants/domains";
 import { getSitesHostingDomain, siteCnameTarget } from "./env";
-import { SiteHostConflictError, SiteInputError } from "./errors";
+import { SiteHostConflictError, SiteInputError } from "./errors/sites";
 import { setSitePublicOrigin } from "./sites";
 import { releaseHostRecord } from "./state";
 import type {

@@ -9,16 +9,3 @@ export const sandboxExecutionSchema = Schema.Struct({
   error: Schema.optional(Schema.NullOr(Schema.String)),
   exit_code: Schema.Number,
 });
-
-const taggedError = Schema.TaggedError;
-
-export class SandboxRequestError extends taggedError<SandboxRequestError>()(
-  "SandboxRequestError",
-  {
-    operation: Schema.String,
-    status: Schema.NullOr(Schema.Number),
-    message: Schema.String,
-    responseBody: Schema.optional(Schema.String),
-    requestId: Schema.optional(Schema.String),
-  }
-) {}

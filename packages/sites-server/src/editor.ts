@@ -29,10 +29,11 @@ import {
   SITE_VALIDATE_MAX_FILE_BYTES,
   SITE_VALIDATE_MAX_FILES,
   SITE_VALIDATE_MAX_TOTAL_BYTES,
+  STALE_HEAD_ERROR_PATTERN,
   VALIDATED_MARKDOWN_FILE,
   VALIDATED_SOURCE_FILE,
 } from "./constants/editor";
-import { SiteInputError, SitePublishConflictError } from "./errors";
+import { SiteInputError, SitePublishConflictError } from "./errors/sites";
 import { getBranchHead, siteRepositoryAccess } from "./github";
 import {
   commitRepositoryFiles,
@@ -79,10 +80,6 @@ import {
   assertSiteContentBranch,
 } from "./utils/site-edit-branch";
 import { pruneUnreferencedUploads } from "./utils/unreferenced-uploads";
-
-// createCommitOnBranch rejects a stale expectedHeadOid with "Expected branch to
-// point to "<oid>" but it did not". Anything else is a real failure.
-const STALE_HEAD_ERROR_PATTERN = /expected branch to point to/i;
 
 function assertEditablePath(path: string): void {
   if (path === SITE_IGNORE_FILENAME) {

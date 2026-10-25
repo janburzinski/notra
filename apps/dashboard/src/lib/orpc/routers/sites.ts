@@ -107,7 +107,7 @@ import {
   isSitesConfigured,
   siteCnameTarget,
 } from "@notra/sites-server/env";
-import { SiteInputError } from "@notra/sites-server/errors";
+import { SiteInputError } from "@notra/sites-server/errors/sites";
 import {
   getRepositorySuggestions,
   getSiteRepositoryOverview,

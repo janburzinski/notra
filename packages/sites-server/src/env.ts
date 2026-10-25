@@ -1,4 +1,4 @@
-import { SitesNotConfiguredError } from "./errors";
+import { SitesNotConfiguredError } from "./errors/sites";
 
 function required(name: string): string {
   const value = process.env[name]?.trim();

@@ -17,6 +17,7 @@ import {
 } from "./constants/cache";
 import type { LoadedManifest, TimedCacheEntry } from "./types/serving";
 import type { SiteBucketObject, SitesDeps } from "./types/worker";
+import { StateUnavailableError } from "./utils/errors";
 
 const hostCache = new Map<string, TimedCacheEntry<SiteHostRecord | null>>();
 const stateCache = new Map<string, TimedCacheEntry<SiteServingState | null>>();
@@ -32,10 +33,6 @@ export function resetCachesForTests() {
   hostLoads.clear();
   stateLoads.clear();
   manifestLoads.clear();
-}
-
-export class StateUnavailableError extends Error {
-  readonly name = "StateUnavailableError";
 }
 
 async function readJson(deps: SitesDeps, key: string): Promise<unknown> {

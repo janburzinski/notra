@@ -1,6 +1,6 @@
 import { selectProductionDeployment } from "./activation";
 import { enqueueSiteDeployment, getDeployment } from "./deployments";
-import { SiteInputError } from "./errors";
+import { SiteInputError } from "./errors/sites";
 import { getBranchHead, getCommitHead, siteRepositoryAccess } from "./github";
 import type { DeployBranchHeadOptions, Site } from "./types/sites";
 import { redeploymentInput } from "./utils/deployments";

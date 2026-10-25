@@ -1,7 +1,7 @@
 import { joinMountPath } from "@notra/sites-core/utils/mounts";
 import { Effect, Option } from "effect";
 
-import { serveFile } from "../responses";
+import { serveFile } from "../serve-file";
 import type { ManifestRouteContext } from "../types/routes";
 
 export const htmlNotFoundRoute = Effect.fn("Sites.route.htmlNotFound")(

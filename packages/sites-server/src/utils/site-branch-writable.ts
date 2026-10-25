@@ -5,7 +5,7 @@ import {
   SITE_BRANCH_WRITABLE_CACHE_MS,
   SITE_EDIT_BRANCH_BLOCKED_MESSAGE,
 } from "../constants/branches";
-import { SiteInputError } from "../errors";
+import { SiteInputError } from "../errors/sites";
 import { getBranchHead } from "../github";
 import type { BranchHead, SiteRepositoryAccess } from "../types/github";
 import type { Site } from "../types/sites";

@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { SitePublishChange } from "@/components/sites/site-publish-change";
-import type { SitePullRequestTone } from "@/types/site-branches";
+import { SITE_PULL_REQUEST_TONE_BADGES } from "@/constants/site-publish";
 import type { SitePublishReviewProps } from "@/types/site-publish-review";
 import { siteBranchLabel } from "@/utils/site-branch-label";
 import { siteDraftChange } from "@/utils/site-drafts";
@@ -75,13 +75,6 @@ export function SitePublishProblems({ review, props }: SitePublishReviewProps) {
   );
 }
 
-const TONE_BADGE = {
-  success: "success",
-  warning: "warning",
-  destructive: "destructive",
-  muted: "secondary",
-} as const satisfies Record<SitePullRequestTone, string>;
-
 export function SitePublishPullRequest({
   review,
   props,
@@ -105,7 +98,9 @@ export function SitePublishPullRequest({
       </span>
       <Badge
         shape="rounded"
-        variant={TONE_BADGE[pr.isDraft ? "muted" : status.tone]}
+        variant={
+          SITE_PULL_REQUEST_TONE_BADGES[pr.isDraft ? "muted" : status.tone]
+        }
       >
         {pr.isDraft ? t("branchState.draft") : t(status.checks)}
       </Badge>

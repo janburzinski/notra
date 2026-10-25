@@ -52,7 +52,7 @@ if (!databaseUrl) {
   const { eq } = await import("drizzle-orm");
   const { SITE_R2_KEYS, SITE_BUILD_LIMITS } =
     await import("@notra/sites-core/constants/sites");
-  const { R2PreconditionFailedError } = await import("../src/errors");
+  const { R2PreconditionFailedError } = await import("../src/errors/sites");
   const objects = new Map<string, { text: string; etag: string }>();
   let sourceFiles: SiteGitTreeEntry[] = [];
   let truncated = false;

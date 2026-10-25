@@ -11,8 +11,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 
-import { UnsafeArchiveError } from "../src/errors";
-import { readTarGz } from "../src/tar";
+import { UnsafeArchiveError } from "../src/errors/sites";
+import { readTarGz } from "../src/utils/read-tar-gz";
 
 const limits = {
   maxFiles: 100,

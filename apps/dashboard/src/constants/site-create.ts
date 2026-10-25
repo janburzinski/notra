@@ -106,3 +106,4 @@ export const SITE_BULK_IMPORT_MIN_DIRECTORIES = 2;
 export const SITE_BULK_ROW_HEIGHT = 84;
 
 export const SITE_BULK_FOLDER_WORD_SEPARATOR = /[-_.\s]+/;
+export const SITE_IMPORT_SCROLL_END_TOLERANCE_PX = 4;

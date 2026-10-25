@@ -14,7 +14,7 @@ import {
   SiteInputError,
   SiteNotBuildableError,
   SitePermanentBuildError,
-} from "@notra/sites-server/errors";
+} from "@notra/sites-server/errors/sites";
 import { setSiteSuspended } from "@notra/sites-server/sites";
 import { Effect } from "effect";
 
