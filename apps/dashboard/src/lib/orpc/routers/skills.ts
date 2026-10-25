@@ -238,7 +238,8 @@ export const skillsRouter = {
       let sourceHost: string;
       try {
         const sourceUrl = new URL(input.url);
-        pathname = sourceUrl.pathname.replace(/^\/+|\/+$/g, "");
+        // Linear split instead of /\/+$/, which backtracks on long slash runs.
+        pathname = sourceUrl.pathname.split("/").filter(Boolean).join("/");
         sourceHost = sourceUrl.hostname;
       } catch {
         const tErrors = await getTranslations("errors.skills");

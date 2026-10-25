@@ -173,6 +173,9 @@ export const KIBO_CODE_BLOCK: MultilineElementTransformer = {
 
 const TABLE_ROW_REGEX = /^\|(.*)\|\s*$/;
 const TABLE_SEPARATOR_REGEX = /^\|(\s*:?-+:?\s*\|)+\s*$/;
+// Every body row gets one cell per header column, so a wide header with many
+// short rows multiplies into editor nodes. Tables past this budget stay text.
+const MAX_TABLE_CELLS = 10_000;
 const LEADING_PIPE_REGEX = /^\|/;
 const TRAILING_PIPE_REGEX = /\|\s*$/;
 
@@ -287,6 +290,9 @@ export const TABLE_MARKDOWN: MultilineElementTransformer = {
     }
 
     const headerCells = parsePipeCells(headerLine);
+    if (headerCells.length > MAX_TABLE_CELLS) {
+      return null;
+    }
 
     const dataRows: string[][] = [];
     let lastLineIndex = startLineIndex + 1;
@@ -298,6 +304,9 @@ export const TABLE_MARKDOWN: MultilineElementTransformer = {
       }
       dataRows.push(parsePipeCells(line));
       lastLineIndex = i;
+      if ((dataRows.length + 1) * headerCells.length > MAX_TABLE_CELLS) {
+        return null;
+      }
     }
 
     const tableNode = buildTableNode(headerCells, dataRows);

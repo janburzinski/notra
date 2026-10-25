@@ -19,6 +19,7 @@ const skillImportUrlSchema = z
   .string()
   .trim()
   .min(1, "URL is required")
+  .max(2048)
   .refine((value) => {
     try {
       const url = new URL(value);

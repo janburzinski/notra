@@ -10,7 +10,6 @@ import {
 import type { AutopilotAuthorSuggestion } from "@/types/autopilot";
 
 const GLOB_CHARACTERS = /[*?]/;
-const REGEXP_SPECIAL = /[.+^${}()|[\]\\]/g;
 
 /** Saved filters with the defaults filled in, for rows written before them. */
 export function toAutopilotCommitFilters(
@@ -38,23 +37,47 @@ export function repositoryPathFilter(
   return patterns && patterns.length > 0 ? patterns : null;
 }
 
-function patternToRegExp(pattern: string) {
-  let source = "";
+/**
+ * Glob match in O(pattern × path): one boolean row per token instead of a
+ * backtracking regex, so repeated wildcards can't blow up on long paths.
+ * ** followed by / is an optional run of folders, ** alone is anything,
+ * * stays inside one folder and ? is one character other than /.
+ */
+function matchesGlob(path: string, pattern: string) {
+  let reachable = Array.from({ length: path.length + 1 }, (_, i) => i === 0);
   for (let index = 0; index < pattern.length; index++) {
     const character = pattern[index] ?? "";
+    const next = Array.from({ length: path.length + 1 }, () => false);
     if (character === "*" && pattern[index + 1] === "*") {
       const slash = pattern[index + 2] === "/";
-      source += slash ? "(?:.*/)?" : ".*";
+      let seen = false;
+      for (let position = 0; position <= path.length; position++) {
+        const atFolder = !slash || path[position - 1] === "/";
+        next[position] = (reachable[position] ?? false) || (seen && atFolder);
+        seen ||= reachable[position] ?? false;
+      }
       index += slash ? 2 : 1;
     } else if (character === "*") {
-      source += "[^/]*";
-    } else if (character === "?") {
-      source += "[^/]";
+      for (let position = 0; position <= path.length; position++) {
+        next[position] =
+          (reachable[position] ?? false) ||
+          (position > 0 &&
+            (next[position - 1] ?? false) &&
+            path[position - 1] !== "/");
+      }
     } else {
-      source += character.replace(REGEXP_SPECIAL, "\\$&");
+      for (let position = 0; position < path.length; position++) {
+        const pathCharacter = path[position];
+        next[position + 1] =
+          (reachable[position] ?? false) &&
+          (character === "?"
+            ? pathCharacter !== "/"
+            : pathCharacter === character);
+      }
     }
+    reachable = next;
   }
-  return new RegExp(`^${source}$`);
+  return reachable[path.length] ?? false;
 }
 
 /**
@@ -69,7 +92,7 @@ export function matchesRepositoryPath(path: string, pattern: string) {
   if (!GLOB_CHARACTERS.test(clean)) {
     return path === clean || path.startsWith(`${clean}/`);
   }
-  return patternToRegExp(clean).test(path);
+  return matchesGlob(path, clean);
 }
 
 export function matchesAnyRepositoryPath(paths: string[], patterns: string[]) {

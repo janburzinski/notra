@@ -34,7 +34,9 @@ export async function fetchSiteText(domain: string) {
     }
     return html
       .replace(
-        /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>/g,
+        // Unterminated blocks end at EOF and tags stop at the next "<", so
+        // malformed pages can't make each "<" rescan the rest of the body.
+        /<script(?=[\s/>])[\s\S]*?(?:<\/script>|$)|<style(?=[\s/>])[\s\S]*?(?:<\/style>|$)|<[^<>]+>/g,
         " "
       )
       .replace(/\s+/g, " ")

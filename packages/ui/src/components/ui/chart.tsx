@@ -96,7 +96,9 @@ ${colorConfig
 }
 `
           )
-          .join("\n"),
+          .join("\n")
+          // CSS-escape "<" so a value can never close the <style> element.
+          .replaceAll("<", "\\3c "),
       }}
     />
   )
