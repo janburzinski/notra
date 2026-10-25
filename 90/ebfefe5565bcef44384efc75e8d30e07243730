@@ -1,0 +1,21 @@
+apps/web/src/components/navbar.tsx
+  s_94b1ad271e5b16::t_e80c44960959ed 793
+  s_94b1ad271e5b16::t_49e8b1496e0fa3 408-411,413
+  s_94b1ad271e5b16::t_f5c0e52b8f155a 412
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "90ebfefe5565bcef44384efc75e8d30e07243730",
+  "prompts": {},
+  "sessions": {
+    "s_94b1ad271e5b16": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a99ab58f-a99d-49fd-94ce-652dfcacea60",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
