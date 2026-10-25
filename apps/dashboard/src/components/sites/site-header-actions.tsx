@@ -15,7 +15,7 @@ export function SiteHeaderActions() {
   if (!state) {
     return null;
   }
-  const { controller, setPublishOpen, invalid, unsaved } = state;
+  const { controller, setPublishOpen, invalid, unsaved, saving } = state;
   const { queries } = controller;
   const error =
     controller.props.commitStatus === "error" ||
@@ -42,8 +42,11 @@ export function SiteHeaderActions() {
           feature={queries.feature}
           status={queries.status.data}
           busy={controller.busy}
-          checking={queries.validating}
-          invalid={invalid || unsaved || queries.invalid}
+          saving={saving}
+          // Production publishing re-validates on the server, so background
+          // checks only hold the button on review branches.
+          checking={queries.feature && queries.validating}
+          invalid={invalid || (unsaved && !saving) || queries.invalid}
           onCreate={controller.startCreate}
           onPublish={() => setPublishOpen(true)}
           onReview={() => setPublishOpen(true)}

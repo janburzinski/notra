@@ -37,6 +37,8 @@ export function useSiteWorkspaceState({
   const scope = { organizationId, siteId, branch };
   const [conflicts, setConflicts] = useState<string[]>([]);
   const [recovering, setRecovering] = useState(false);
+  // After a publish the cached document still points at the deleted draft.
+  const [settling, setSettling] = useState(false);
   const uploads = useRef(0);
   const [pendingUploads, setPendingUploads] = useState(0);
   const uploading = pendingUploads > 0;
@@ -58,6 +60,9 @@ export function useSiteWorkspaceState({
   const issues = designIssues(config);
   const invalid = issues.length > 0 || variableError !== null;
   const unsaved = saves.unsaved || invalid || uploading;
+  /** Edits autosave will still push; Publish flushes them instead of waiting. */
+  const saving =
+    saves.unsaved && !invalid && !uploading && saves.state.status !== "error";
   const drafts = files.drafts;
   const draftVersion = siteDraftVersion(drafts);
   const branchState = useSiteWorkingBranch({
@@ -123,7 +128,7 @@ export function useSiteWorkspaceState({
       }
     },
   });
-  const readOnly = refreshing || rebase.isPending || recovering;
+  const readOnly = refreshing || rebase.isPending || recovering || settling;
   if (snapshot !== document && !unsaved) {
     setSnapshot(document);
     setBuffer(null);
@@ -325,6 +330,7 @@ export function useSiteWorkspaceState({
     update,
     saves,
     unsaved,
+    saving,
     invalid,
     controller,
     publishOpen,
@@ -337,8 +343,14 @@ export function useSiteWorkspaceState({
     uploadImage,
     document,
     resetPublished: () => {
-      saves.resetClean([SITE_CONFIG_FILENAME]);
-      setBuffer(null);
+      setSettling(true);
+      void onRefresh()
+        .catch(() => undefined)
+        .then(() => {
+          saves.resetClean([SITE_CONFIG_FILENAME]);
+          setBuffer(null);
+          setSettling(false);
+        });
     },
   };
 }

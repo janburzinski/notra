@@ -247,7 +247,7 @@ export const uploadSiteImageInputSchema = siteEditorScopeInputSchema.extend({
 });
 
 export const publishSiteDraftsInputSchema = siteEditorScopeInputSchema.extend({
-  message: z.string().trim().min(1).max(200),
+  message: z.string().trim().min(1).max(200).optional(),
 });
 
 export const saveSiteIntegrationInputSchema = siteEditorScopeInputSchema.and(

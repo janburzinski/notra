@@ -94,6 +94,8 @@ export interface SiteBranchPrimaryActionProps {
   invalid: boolean;
   draftCount: number;
   unsaved: boolean;
+  /** Pending autosave counts as a change Publish can pick up. */
+  saving?: boolean;
   onCreate: () => void;
   onPublish: () => void;
   onFlush: () => void;

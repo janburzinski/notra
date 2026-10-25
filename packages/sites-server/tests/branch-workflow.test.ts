@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import type { Site } from "../src/types/sites";
 import { canMergeBranch } from "../src/utils/branch-pull-request";
+import { clearSourceBlobCache } from "../src/utils/source-blob-cache";
 import { deferred } from "./utils/deferred";
 import { startFakeGitHub } from "./utils/fake-github";
 import { seedSiteProject } from "./utils/site-project";
@@ -96,6 +97,7 @@ if (!databaseUrl) {
   });
   const projectId = await seedSiteProject(organizationId);
   beforeEach(async () => {
+    clearSourceBlobCache();
     await db.delete(sites).where(eq(sites.organizationId, organizationId));
     const [created] = await db
       .insert(sites)

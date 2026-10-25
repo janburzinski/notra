@@ -7967,11 +7967,6 @@
     "publish": {
       "title": "Änderungen veröffentlichen",
       "description": "{count, plural, one {# geänderte Datei geht} other {# geänderte Dateien gehen}} als ein Commit zu GitHub.",
-      "message": "Commit-Nachricht",
-      "messageDesign": "Website-Design aktualisieren",
-      "messagePosts": "Blogbeiträge aktualisieren",
-      "messageSite": "Website aktualisieren",
-      "messagePlaceholder": "Blogbeiträge aktualisieren",
       "commit": "Veröffentlichen",
       "committed": "Veröffentlicht. Wird jetzt deployt.",
       "failed": "Veröffentlichen fehlgeschlagen",

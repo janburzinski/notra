@@ -7967,11 +7967,6 @@
     "publish": {
       "title": "Publish changes",
       "description": "{count, plural, one {# changed file goes} other {# changed files go}} to GitHub as one commit.",
-      "message": "Commit message",
-      "messageDesign": "Update site design",
-      "messagePosts": "Update blog posts",
-      "messageSite": "Update site",
-      "messagePlaceholder": "Update blog posts",
       "commit": "Publish",
       "committed": "Published. Deploying now.",
       "failed": "Couldn't publish",

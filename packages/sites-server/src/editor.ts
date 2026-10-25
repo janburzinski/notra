@@ -1,7 +1,10 @@
+import { setTimeout as delay } from "node:timers/promises";
+
 import {
   GITHUB_CREATE_COMMIT_ON_BRANCH_MUTATION,
   GITHUB_API_VERSION_HEADERS,
 } from "@notra/ai/constants/github";
+import { generateSiteCommitHeadline } from "@notra/ai/utils/content-commit-message";
 import { db } from "@notra/db/drizzle";
 import { sites } from "@notra/db/schema";
 import { validateSite } from "@notra/sites-compiler/validate";
@@ -20,10 +23,11 @@ import {
 import { and, eq, getTableColumns, sql, or, isNull } from "drizzle-orm";
 
 import {
-  DEFAULT_PUBLISH_HEADLINE,
   EDITABLE_PATH_SEGMENT,
+  GENERATED_HEADLINE_DEADLINE_MS,
   EDITABLE_TEXT_FILE,
   MAX_PUBLISH_BYTES,
+  MAX_GENERATED_HEADLINE_FILES,
   MAX_PUBLISH_HEADLINE_LENGTH,
   SITE_EDITOR_READ_CONCURRENCY,
   SITE_VALIDATE_MAX_FILE_BYTES,
@@ -79,6 +83,10 @@ import {
   assertSiteEditableBranch,
   assertSiteContentBranch,
 } from "./utils/site-edit-branch";
+import {
+  cacheSourceBlob,
+  readCachedSourceBlob,
+} from "./utils/source-blob-cache";
 import { pruneUnreferencedUploads } from "./utils/unreferenced-uploads";
 
 function assertEditablePath(path: string): void {
@@ -679,7 +687,7 @@ async function validateWithDrafts(
   const contents = await mapWithConcurrency(
     needsContent,
     SITE_EDITOR_READ_CONCURRENCY,
-    (entry) => readSiteSourceFile(site, entry.path, commitSha, access)
+    (entry) => readSourceEntry(site, entry, commitSha, access)
   );
   for (const [index, entry] of needsContent.entries()) {
     files.set(entry.path, contents[index]?.content ?? null);
@@ -700,6 +708,24 @@ async function validateWithDrafts(
   });
 }
 
+/** A listed source file, served from the blob cache when this instance has read it before. */
+async function readSourceEntry(
+  site: Site,
+  entry: SiteSourceEntry,
+  ref: string,
+  access: SiteRepositoryAccess
+) {
+  const cached = readCachedSourceBlob(access.repository, entry.sha);
+  if (cached) {
+    return cached;
+  }
+  const file = await readSiteSourceFile(site, entry.path, ref, access);
+  if (file?.sha === entry.sha) {
+    cacheSourceBlob(access.repository, file);
+  }
+  return file;
+}
+
 export async function validateSiteDrafts(
   site: Site,
   branch = site.productionBranch,
@@ -716,6 +742,61 @@ export async function validateSiteDrafts(
     access,
     source
   );
+}
+
+function fallbackPublishHeadline(drafts: readonly SiteDraft[]) {
+  if (drafts.every(({ path }) => path === SITE_CONFIG_FILENAME)) {
+    return "style: update site design";
+  }
+  if (drafts.every(({ path }) => /\.mdx?$/.test(path))) {
+    return "docs: update blog posts";
+  }
+  return "chore: update site";
+}
+
+async function generatePublishHeadline(
+  site: Site,
+  drafts: readonly SiteDraft[],
+  ref: string,
+  access: SiteRepositoryAccess
+) {
+  const fallback = fallbackPublishHeadline(drafts);
+  if (drafts.length === 0) {
+    return fallback;
+  }
+  const changes = await mapWithConcurrency(
+    drafts.slice(0, MAX_GENERATED_HEADLINE_FILES),
+    SITE_EDITOR_READ_CONCURRENCY,
+    async (draft) => {
+      if (siteDraftCodec(draft.path).published !== "content") {
+        return { path: draft.path, deleted: draft.deleted };
+      }
+      const previous = draft.baseBlobSha
+        ? await readSourceEntry(
+            site,
+            { path: draft.path, sha: draft.baseBlobSha, size: 0 },
+            ref,
+            access
+          ).catch(() => null)
+        : null;
+      return {
+        path: draft.path,
+        deleted: draft.deleted,
+        previous: previous?.content ?? null,
+        next: draft.deleted ? null : draft.content,
+      };
+    }
+  );
+  return await generateSiteCommitHeadline({
+    organizationId: site.organizationId,
+    changes: [
+      ...changes,
+      ...drafts
+        .slice(MAX_GENERATED_HEADLINE_FILES)
+        .map((draft) => ({ path: draft.path, deleted: draft.deleted })),
+    ],
+    fallback,
+  });
 }
 
 export async function publishSiteDrafts(
@@ -773,6 +854,18 @@ export async function flushSiteDrafts(
       if (drafts.length === 0) {
         return { commitSha: head.sha, pullRequestUrl: null };
       }
+      // Written while the checks below run; both wait on GitHub.
+      const headlinePending = input.message?.trim()
+        ? Promise.resolve(
+            input.message.trim().slice(0, MAX_PUBLISH_HEADLINE_LENGTH)
+          )
+        : Promise.race([
+            generatePublishHeadline(site, drafts, head.sha, access),
+            delay(GENERATED_HEADLINE_DEADLINE_MS, undefined, { ref: false }),
+          ]).then(
+            (headline) => headline ?? fallbackPublishHeadline(drafts),
+            () => fallbackPublishHeadline(drafts)
+          );
       const source = await listSiteSourceFiles(site, branch, access, head.sha);
       if (production) {
         const validation = await validateWithDrafts(
@@ -823,9 +916,7 @@ export async function flushSiteDrafts(
           `These changes are larger than ${MAX_PUBLISH_BYTES / 1024 / 1024} MB. Publish some of them separately.`
         );
       }
-      const headline =
-        input.message.trim().slice(0, MAX_PUBLISH_HEADLINE_LENGTH) ||
-        DEFAULT_PUBLISH_HEADLINE;
+      const headline = await headlinePending;
       let commitSha = headSha;
       if (pending.length > 0) {
         try {

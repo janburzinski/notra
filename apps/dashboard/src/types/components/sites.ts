@@ -490,8 +490,9 @@ export interface SitePublishDialogProps extends SiteScope {
   onRebase?: () => void;
   rebasePending?: boolean;
   branchControls?: import("@/types/site-branches").SiteBranchControlsProps;
-  initialMessage?: string;
   unsaved?: boolean;
+  /** Pending autosave; Publish flushes it first. */
+  saving?: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   draftCount: number;

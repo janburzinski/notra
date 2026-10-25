@@ -36,7 +36,7 @@ function SiteWorkspaceReady(props: SiteWorkspaceReadyProps) {
     ) {
       return;
     }
-    const timer = setTimeout(flush, 800);
+    const timer = setTimeout(flush, state.publishOpen ? 0 : 800);
     return () => clearTimeout(timer);
   }, [
     saves.unsaved,
@@ -46,6 +46,7 @@ function SiteWorkspaceReady(props: SiteWorkspaceReadyProps) {
     state.readOnly,
     state.discardOpen,
     state.conflicts.length,
+    state.publishOpen,
   ]);
   return (
     <SiteWorkspaceContext value={state}>
@@ -66,7 +67,8 @@ function SiteWorkspaceReady(props: SiteWorkspaceReadyProps) {
         draftCount={props.files.drafts.length}
         drafts={props.files.drafts}
         sourcePaths={new Set(props.files.files.map((file) => file.path))}
-        unsaved={state.unsaved}
+        unsaved={state.unsaved && !state.saving}
+        saving={state.saving}
         onConflict={state.setConflicts}
         onPublished={state.resetPublished}
       />

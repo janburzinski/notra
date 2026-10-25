@@ -10,6 +10,7 @@ export function siteBranchPrimaryState({
   invalid,
   draftCount,
   unsaved,
+  saving,
 }: SiteBranchPrimaryActionProps): SiteBranchPrimaryState {
   // Hold the expected action while the status loads instead of flashing
   // Create branch on a branch that may well be editable.
@@ -27,7 +28,10 @@ export function siteBranchPrimaryState({
     return {
       action: "publish",
       disabled:
-        busy || invalid || draftCount === 0 || !status?.canPublishDirect,
+        busy ||
+        invalid ||
+        (draftCount === 0 && !saving) ||
+        !status?.canPublishDirect,
       showSave: false,
     };
   }

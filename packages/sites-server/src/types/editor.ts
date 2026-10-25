@@ -94,7 +94,8 @@ export interface SiteDraftMutationInput {
 
 export interface PublishSiteDraftsInput {
   skipIfBusy?: boolean;
-  message: string;
+  /** Generated from the pending drafts when omitted. */
+  message?: string;
   branch?: string;
   userId: string;
 }

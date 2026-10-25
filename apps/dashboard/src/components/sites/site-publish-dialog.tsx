@@ -7,9 +7,6 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
-import { Input } from "@notra/ui/components/ui/input";
-import { Label } from "@notra/ui/components/ui/label";
-import { useId } from "react";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
@@ -19,7 +16,6 @@ import {
   SitePublishProblems,
   SitePublishPullRequest,
 } from "@/components/sites/site-publish-review";
-import { SITE_PUBLISH_MESSAGE_MAX_LENGTH } from "@/constants/site-publish";
 import { useSitePublishReview } from "@/lib/hooks/use-site-publish-review";
 import type { SitePublishDialogProps } from "@/types/components/sites";
 
@@ -29,7 +25,6 @@ export function SitePublishDialog(props: SitePublishDialogProps) {
   const common = useTranslations("common");
   const writing = useTranslations("sites.writing");
   const review = useSitePublishReview(props);
-  const id = useId();
   return (
     <ResponsiveDialog
       open={props.open}
@@ -65,17 +60,6 @@ export function SitePublishDialog(props: SitePublishDialogProps) {
           <SitePublishProblems review={review} props={props} />
           <SitePublishDrafts review={review} props={props} />
           <SitePublishPullRequest review={review} props={props} />
-          {review.direct ? (
-            <div className="space-y-2">
-              <Label htmlFor={id}>{t("message")}</Label>
-              <Input
-                id={id}
-                maxLength={SITE_PUBLISH_MESSAGE_MAX_LENGTH}
-                value={review.message}
-                onChange={(event) => review.setMessage(event.target.value)}
-              />
-            </div>
-          ) : null}
         </div>
         <div className="flex shrink-0 justify-end gap-2 pt-2">
           <Button

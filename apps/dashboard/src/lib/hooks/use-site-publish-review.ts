@@ -1,31 +1,32 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useTranslations } from "use-intl";
+import { useQuery } from "@tanstack/react-query";
 
+import { useSitePublishMutation } from "@/lib/hooks/use-site-publish-mutation";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SitePublishDialogProps } from "@/types/components/sites";
-import { toErrorMessage } from "@/utils/error-message";
 import { siteDraftValidationOptions } from "@/utils/site-draft-validation-options";
 import { siteDraftVersion } from "@/utils/site-draft-version";
-import { publishConflictPaths } from "@/utils/site-drafts";
-import { sitePublishMessageKey } from "@/utils/site-publish-message";
-import { siteValidationReady } from "@/utils/site-validation-ready";
+import {
+  siteValidationBlocksReview,
+  siteValidationReady,
+} from "@/utils/site-validation-ready";
 
 export function useSitePublishReview(props: SitePublishDialogProps) {
-  const { organizationId, siteId, branch, drafts, draftCount, open, unsaved } =
-    props;
-  const t = useTranslations("sites.publish");
-  const [customMessage, setMessage] = useState<string | null>(null);
-  const message =
-    customMessage ?? (props.initialMessage || t(sitePublishMessageKey(drafts)));
-  const client = useQueryClient();
+  const {
+    organizationId,
+    siteId,
+    branch,
+    drafts,
+    draftCount,
+    open,
+    unsaved,
+    saving,
+  } = props;
   const version = siteDraftVersion(drafts);
   const validation = useQuery(
     siteDraftValidationOptions(
       { organizationId, siteId, branch },
       version,
-      open && !unsaved
+      open && !unsaved && !saving
     )
   );
   const statusOptions = dashboardOrpc.sites.branches.status.queryOptions({
@@ -43,41 +44,20 @@ export function useSitePublishReview(props: SitePublishDialogProps) {
   const direct = !feature && status.data?.canPublishDirect === true;
   const ready =
     !unsaved &&
+    !saving &&
     siteValidationReady(validation) &&
     status.isSuccess &&
     !status.isPlaceholderData;
+  // The server re-validates before committing, so a running check never
+  // blocks the click; only a known failure does.
   const canPublish =
-    direct && ready && message.trim().length > 0 && draftCount > 0;
-  const publish = useMutation({
-    mutationFn: () =>
-      dashboardOrpc.sites.editor.publish.call({
-        organizationId,
-        siteId,
-        branch,
-        message: message.trim(),
-      }),
-    onSuccess: async (result) => {
-      await client.invalidateQueries({
-        queryKey: dashboardOrpc.sites.key(),
-        refetchType: "all",
-      });
-      setMessage(null);
-      props.onOpenChange(false);
-      props.onPublished();
-      toast.success(result.deployPending ? t("deployPending") : t("committed"));
-    },
-    onError: (error) => {
-      const paths = publishConflictPaths(error);
-      if (paths && paths.length > 0) {
-        props.onConflict(paths);
-        return;
-      }
-      toast.error(toErrorMessage(error, t("failed")));
-    },
-  });
+    direct &&
+    !unsaved &&
+    status.isSuccess &&
+    !siteValidationBlocksReview(validation) &&
+    (draftCount > 0 || Boolean(saving));
+  const publish = useSitePublishMutation(props);
   return {
-    message,
-    setMessage,
     validation,
     status,
     feature,
