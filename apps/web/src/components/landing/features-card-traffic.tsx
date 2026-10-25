@@ -1,8 +1,8 @@
-import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { PurposeBadge } from "@notra/ui/components/geo/purpose-badge";
 import { StatTiles } from "@notra/ui/components/geo/stat-tiles";
 import { cn } from "@notra/ui/lib/utils";
 
+import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
 import { MockFrame } from "@/components/landing/mock-frame";
 import {
   Table,
@@ -72,7 +72,7 @@ export function FeaturesCardTraffic() {
             <TableRow key={row.id}>
               <TableCell className="min-w-0 overflow-hidden py-3">
                 <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
-                  <EngineIcon className="shrink-0" engine={row.engine} />
+                  <LandingEngineIcon className="shrink-0" engine={row.engine} />
                   <span className="truncate">{row.source}</span>
                 </span>
               </TableCell>

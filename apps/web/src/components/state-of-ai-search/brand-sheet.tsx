@@ -13,13 +13,13 @@ import {
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
 import { useState } from "react";
 
+import { EngineLabel } from "@/components/state-of-ai-search/engine-label";
 import { PromptSheet } from "@/components/state-of-ai-search/prompt-sheet";
 import {
   ReportBlock,
   ReportPanel,
 } from "@/components/state-of-ai-search/report-section";
 import {
-  EngineLabel,
   MutedText,
   PercentBar,
   ReportList,

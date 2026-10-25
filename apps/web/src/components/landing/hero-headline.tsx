@@ -1,4 +1,3 @@
-import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { tween } from "@notra/ui/lib/motion";
 import { cn } from "@notra/ui/lib/utils";
 import Scritto from "@scritto/react";
@@ -11,6 +10,7 @@ import {
 } from "motion/react";
 import { createElement, useSyncExternalStore, type ReactNode } from "react";
 
+import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
 import {
   HERO_HEADLINE_LINE_ONE,
   HERO_HEADLINE_LINE_TWO_PREFIX,
@@ -71,7 +71,7 @@ function EngineMark({
 }: Pick<HeroCycleWord, "engine"> & { animated: boolean }) {
   return (
     <CycleMark animated={animated} markKey={engine}>
-      <EngineIcon className="size-full" engine={engine} />
+      <LandingEngineIcon className="size-full" engine={engine} />
     </CycleMark>
   );
 }

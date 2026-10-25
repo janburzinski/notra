@@ -1,9 +1,9 @@
-import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { PromptOutcomeIcon } from "@notra/ui/components/geo/prompt-outcome-icon";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { cn } from "@notra/ui/lib/utils";
 
 import { DeferredAnswerDemo } from "@/components/landing/deferred-answer-demo";
+import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
 import {
   Table,
   TableBody,
@@ -59,7 +59,7 @@ function ResultsTable() {
             <TableRow key={row.id}>
               <TableCell className="py-3">
                 <span className="flex items-center gap-2 text-sm font-medium whitespace-nowrap">
-                  <EngineIcon engine={row.id} />
+                  <LandingEngineIcon engine={row.id} />
                   {GEO_ENGINE_NAMES[row.id]}
                 </span>
               </TableCell>

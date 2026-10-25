@@ -3,7 +3,6 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CompetitorLogo } from "@notra/ui/components/geo/competitor-logo";
-import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import {
   Table,
@@ -17,10 +16,7 @@ import { cn } from "@notra/ui/lib/utils";
 import type { KeyboardEvent, ReactNode } from "react";
 
 import { ReportPanel } from "@/components/state-of-ai-search/report-section";
-import type {
-  StateOfAiSearchEngine,
-  StateOfAiSearchRankingRow,
-} from "@/types/state-of-ai-search";
+import type { StateOfAiSearchRankingRow } from "@/types/state-of-ai-search";
 import { brandColor, formatPercent } from "@/utils/state-of-ai-search";
 
 const PERCENT_MAX = 100;
@@ -59,15 +55,6 @@ export function PercentBar({
       <span className="w-10 text-right font-medium tabular-nums">
         {formatPercent(value)}
       </span>
-    </span>
-  );
-}
-
-export function EngineLabel({ engine }: { engine: StateOfAiSearchEngine }) {
-  return (
-    <span className="flex items-center gap-2.5">
-      <EngineIcon engine={engine.model} />
-      {engine.label}
     </span>
   );
 }

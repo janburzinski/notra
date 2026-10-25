@@ -14,6 +14,7 @@ import { CtaBanner } from "@/components/landing/cta-banner";
 import { MarketingHeroWash } from "@/components/marketing-hero-wash";
 import { AiOverviewPanel } from "@/components/state-of-ai-search/ai-overview-card";
 import { BrandSheet } from "@/components/state-of-ai-search/brand-sheet";
+import { EngineLabel } from "@/components/state-of-ai-search/engine-label";
 import {
   AnswerViewer,
   PromptSheet,
@@ -31,7 +32,6 @@ import {
   SourcesTable,
 } from "@/components/state-of-ai-search/report-tables";
 import {
-  EngineLabel,
   MutedText,
   ReportList,
 } from "@/components/state-of-ai-search/report-ui";

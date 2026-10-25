@@ -1,10 +1,10 @@
-import { EngineIcon } from "@notra/ui/components/geo/engine-icon";
 import { GapMeter } from "@notra/ui/components/geo/gap-meter";
 import { LogoStack } from "@notra/ui/components/geo/logo-stack";
 import { Button } from "@notra/ui/components/ui/button";
 import { GEO_GAPS_METER_STEPS } from "@notra/ui/constants/geo";
 import { cn } from "@notra/ui/lib/utils";
 
+import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
 import { MockFrame } from "@/components/landing/mock-frame";
 import {
   Table,
@@ -82,7 +82,10 @@ export function FeaturesCardGaps() {
                     key: engine,
                     label: GEO_ENGINE_NAMES[engine],
                     renderIcon: (className) => (
-                      <EngineIcon className={className} engine={engine} />
+                      <LandingEngineIcon
+                        className={className}
+                        engine={engine}
+                      />
                     ),
                   }))}
                 />
