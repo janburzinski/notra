@@ -20,6 +20,7 @@ import type { Context } from "hono";
 
 import { ORGANIZATION_SCOPED_API_KEY_ERROR } from "../constants/skills";
 import { createAgentClient, isAgentApiEnabled } from "../lib/agent/client";
+import { isAccountKeyAuth, isOAuthAuth } from "../types/auth";
 import { checkAgentAiCredits } from "../utils/agent-credits";
 import { getOrganizationId } from "../utils/auth";
 import { createOpenApiApp } from "../utils/openapi-app";
@@ -70,7 +71,18 @@ async function requireAgentContext(c: Context) {
   if (rateLimited) {
     return { ok: false as const, response: rateLimited };
   }
-  return { ok: true as const, organizationId };
+  const auth = c.get("auth");
+  const userId =
+    auth && (isAccountKeyAuth(auth) || isOAuthAuth(auth)) ? auth.userId : null;
+  return { ok: true as const, organizationId, userId };
+}
+
+/** Dashboard sessions belong to their user; org keys only see unowned ones. */
+function canAccessSession(
+  mapping: { userId: string | null },
+  userId: string | null
+) {
+  return !mapping.userId || mapping.userId === userId;
 }
 
 agentChatsRoutes.openAPIRegistry.registerPath(
@@ -128,6 +140,7 @@ agentChatsRoutes.post("/eve/v1/session", async (c) => {
   try {
     const client = await createAgentClient({
       organizationId: context.organizationId,
+      userId: context.userId ?? undefined,
       useMarkup: credits.useMarkup,
       chargeAiCredits: credits.chargeAiCredits,
     });
@@ -135,6 +148,7 @@ agentChatsRoutes.post("/eve/v1/session", async (c) => {
       fetchUpstream: (path, init) => client.fetch(path, init),
       scope: {
         organizationId: context.organizationId,
+        userId: context.userId ?? undefined,
         surface: "standalone-chat",
       },
       message: parsed.data.message,
@@ -215,7 +229,7 @@ agentChatsRoutes.post("/eve/v1/session/:sessionId", async (c) => {
     context.organizationId,
     sessionId
   );
-  if (!mapping) {
+  if (!(mapping && canAccessSession(mapping, context.userId))) {
     return c.json({ error: "Session not found" }, 404);
   }
 
@@ -295,7 +309,7 @@ agentChatsRoutes.get("/eve/v1/session/:sessionId/stream", async (c) => {
     context.organizationId,
     sessionId
   );
-  if (!mapping) {
+  if (!(mapping && canAccessSession(mapping, context.userId))) {
     return c.json({ error: "Session not found" }, 404);
   }
 
@@ -336,7 +350,8 @@ agentChatsRoutes.openapi(listAgentChatsRoute, async (c) => {
   const { limit } = c.req.valid("query");
   const sessions = await listAgentSessionMappings(
     context.organizationId,
-    limit
+    limit,
+    context.userId
   );
   return c.json(
     {

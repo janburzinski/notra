@@ -8,6 +8,7 @@ import type {
 import type { IngestTokenIdentity } from "@notra/utils/types/ingest-token";
 
 import type {
+  FeedbackIdempotencyConflictError,
   FeedbackNotFoundError,
   FeedbackOrganizationNotFoundError,
   FeedbackProjectNotFoundError,
@@ -23,6 +24,7 @@ export type FeedbackDomainError =
   | FeedbackOrganizationNotFoundError
   | FeedbackProjectNotFoundError
   | FeedbackNotFoundError
+  | FeedbackIdempotencyConflictError
   | FeedbackQuotaExceededError;
 
 export interface ResolveOrganizationIdBySlugInput {

@@ -15,6 +15,7 @@ import type { z } from "zod";
 
 import { API_FEEDBACK_VIA } from "../constants/analytics";
 import {
+  FEEDBACK_IDEMPOTENCY_CONFLICT_ERROR,
   FEEDBACK_NOT_FOUND_ERROR,
   FEEDBACK_ORGANIZATION_NOT_FOUND_ERROR,
   FEEDBACK_QUOTA_EXCEEDED_ERROR,
@@ -92,6 +93,7 @@ const submitOrganizationFeedbackRoute = createRoute({
     400: errorResponse("Invalid request body"),
     402: errorResponse(FEEDBACK_QUOTA_EXCEEDED_ERROR),
     404: errorResponse(FEEDBACK_ORGANIZATION_NOT_FOUND_ERROR),
+    409: errorResponse(FEEDBACK_IDEMPOTENCY_CONFLICT_ERROR),
     429: publicFeedbackRateLimitedResponse,
   },
 });
@@ -114,6 +116,7 @@ const submitFeedbackRoute = createRoute({
     402: errorResponse(FEEDBACK_QUOTA_EXCEEDED_ERROR),
     403: errorResponse("Forbidden"),
     404: errorResponse(FEEDBACK_PROJECT_NOT_FOUND_ERROR),
+    409: errorResponse(FEEDBACK_IDEMPOTENCY_CONFLICT_ERROR),
     429: feedbackRateLimitedResponse,
     503: errorResponse("Authentication service unavailable"),
   },
@@ -204,6 +207,9 @@ async function submitFeedbackHandler(
   if (result._tag === "Failure") {
     if (result.failure._tag === "FeedbackQuotaExceededError") {
       return c.json({ error: FEEDBACK_QUOTA_EXCEEDED_ERROR }, 402);
+    }
+    if (result.failure._tag === "FeedbackIdempotencyConflictError") {
+      return c.json({ error: FEEDBACK_IDEMPOTENCY_CONFLICT_ERROR }, 409);
     }
     return respondToFeedbackFailure(c, result.failure);
   }

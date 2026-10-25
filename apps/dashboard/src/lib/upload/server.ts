@@ -315,7 +315,8 @@ async function publishStagedChatUpload(stagingKey: string, sha256: string) {
       .send(new DeleteObjectCommand({ Bucket: bucketName, Key: stagingKey }))
       .catch(() => undefined);
 
-  if (!(await objectMatchesHash(stagingKey, sha256))) {
+  const verifiedETag = await verifiedObjectETag(stagingKey, sha256);
+  if (!verifiedETag) {
     await removeStaging();
     throw new ORPCError("BAD_REQUEST", {
       message: (await getTranslations("errors.upload"))("contentMismatch"),
@@ -324,13 +325,29 @@ async function publishStagedChatUpload(stagingKey: string, sha256: string) {
 
   const contentKey = chatContentKey(stagingKey, sha256);
   if (!(await objectExists(contentKey))) {
-    await r2Client.send(
-      new CopyObjectCommand({
-        Bucket: bucketName,
-        CopySource: `${bucketName}/${stagingKey}`,
-        Key: contentKey,
-      })
-    );
+    const copied = await r2Client
+      .send(
+        new CopyObjectCommand({
+          Bucket: bucketName,
+          CopySource: `${bucketName}/${stagingKey}`,
+          // The presigned PUT stays valid, so only copy the bytes just hashed.
+          CopySourceIfMatch: verifiedETag,
+          Key: contentKey,
+        })
+      )
+      .then(() => true)
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === "PreconditionFailed") {
+          return false;
+        }
+        throw error;
+      });
+    if (!copied) {
+      await removeStaging();
+      throw new ORPCError("BAD_REQUEST", {
+        message: (await getTranslations("errors.upload"))("contentMismatch"),
+      });
+    }
   }
   await removeStaging();
   return {
@@ -339,16 +356,19 @@ async function publishStagedChatUpload(stagingKey: string, sha256: string) {
   };
 }
 
-async function objectMatchesHash(key: string, sha256: string) {
+/** Returns the object's ETag when its bytes hash to `sha256`, else null. */
+async function verifiedObjectETag(key: string, sha256: string) {
   const { client: r2Client, bucketName } = getR2Config();
   const object = await r2Client
     .send(new GetObjectCommand({ Bucket: bucketName, Key: key }))
     .catch(() => null);
   const bytes = await object?.Body?.transformToByteArray();
-  if (!bytes || bytes.byteLength > MAX_CHAT_FILE_SIZE) {
-    return false;
+  if (!(bytes && object?.ETag) || bytes.byteLength > MAX_CHAT_FILE_SIZE) {
+    return null;
   }
-  return createHash("sha256").update(bytes).digest("hex") === sha256;
+  return createHash("sha256").update(bytes).digest("hex") === sha256
+    ? object.ETag
+    : null;
 }
 
 export async function recordChatAttachment({

@@ -11,6 +11,7 @@ import {
 } from "@notra/schemas/dashboard/api-keys";
 import { organizationIdInputSchema } from "@notra/schemas/dashboard/auth/organization";
 import { toAccountApiKeyExternalId } from "@notra/utils/account-api-key";
+import { getApiScopeId } from "@notra/utils/api-scopes";
 import { isDemoMode } from "@notra/utils/demo-mode";
 import type {
   KeyResponseData,
@@ -124,6 +125,32 @@ async function requireKeyByExternalId(
     throw notFound("API key not found");
   }
   return key;
+}
+
+const WEBHOOKS_WRITE_SCOPE = getApiScopeId("webhooks", "write");
+
+/**
+ * Organization keys carry no issuer, so the API cannot re-check the member's
+ * role later. Only owners and admins may hand out webhook management, matching
+ * the dashboard's webhook mutations. Keeping an already granted scope is fine.
+ */
+function assertCanGrantWebhookWrite(
+  role: string,
+  permissions: readonly string[],
+  currentPermissions: readonly string[] = []
+) {
+  if (role === "owner" || role === "admin") {
+    return;
+  }
+  const grants =
+    expandLegacyApiKeyScopes(permissions).includes(WEBHOOKS_WRITE_SCOPE);
+  const alreadyGranted =
+    expandLegacyApiKeyScopes(currentPermissions).includes(WEBHOOKS_WRITE_SCOPE);
+  if (grants && !alreadyGranted) {
+    throw forbidden(
+      "Only organization owners and admins can grant webhook write access"
+    );
+  }
 }
 
 async function createUnkeyKey(
@@ -260,6 +287,10 @@ export const apiKeysRouter = {
     .input(organizationIdInputSchema.extend(createApiKeySchema.shape))
     .use(withOrganizationAccess)
     .handler(async ({ context, input }) => {
+      assertCanGrantWebhookWrite(
+        context.auth.membership.role,
+        getApiKeyPermissionsForAccessMode(input.accessMode, input.scopes)
+      );
       await assertActiveSubscription(input.organizationId);
 
       const { apiId, client } = await requireUnkeyConfig();
@@ -313,6 +344,11 @@ export const apiKeysRouter = {
           expiration: input.payload.expiration,
           scopes: input.payload.scopes,
         });
+      assertCanGrantWebhookWrite(
+        context.auth.membership.role,
+        permissions,
+        stringPermissions(key)
+      );
 
       await client.keys.updateKey({
         expires,

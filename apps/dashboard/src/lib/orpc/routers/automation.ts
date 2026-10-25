@@ -540,7 +540,12 @@ export const automationRouter = {
                   defaultBranch: githubIntegrations.defaultBranch,
                 })
                 .from(githubIntegrations)
-                .where(inArray(githubIntegrations.id, allRepositoryIds))
+                .where(
+                  and(
+                    eq(githubIntegrations.organizationId, input.organizationId),
+                    inArray(githubIntegrations.id, allRepositoryIds)
+                  )
+                )
             : [],
         ]);
 

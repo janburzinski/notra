@@ -18,6 +18,7 @@ import { ORPCError } from "@orpc/server";
 import { and, eq } from "drizzle-orm";
 import { Effect } from "effect";
 
+import { DEFAULT_GITHUB_CONTENT_OUTPUT_ENABLED } from "@/constants/github";
 import { trackServerEventAndFlush } from "@/lib/analytics/posthog-server";
 import { resolveAiProductAccess } from "@/lib/billing/subscription";
 import { requestGeoRescanForPublishedPost } from "@/lib/geo/rescan";
@@ -223,6 +224,38 @@ async function mergePullRequest(
   }
 }
 
+/**
+ * Same pause rules as publishSavedContentToGitHub, for runs that only merge a
+ * pull request opened earlier and so never pass through that check.
+ */
+async function isGitHubPublishingEnabled(
+  organizationId: string,
+  repositoryId: string,
+  contentType: keyof typeof DEFAULT_GITHUB_CONTENT_OUTPUT_ENABLED
+) {
+  const [repository, output] = await Promise.all([
+    db.query.githubIntegrations.findFirst({
+      columns: { enabled: true, repositoryEnabled: true },
+      where: and(
+        eq(githubIntegrations.id, repositoryId),
+        eq(githubIntegrations.organizationId, organizationId)
+      ),
+    }),
+    db.query.repositoryOutputs.findFirst({
+      columns: { enabled: true },
+      where: and(
+        eq(repositoryOutputs.repositoryId, repositoryId),
+        eq(repositoryOutputs.outputType, contentType)
+      ),
+    }),
+  ]);
+  return Boolean(
+    repository?.enabled &&
+    repository.repositoryEnabled &&
+    (output?.enabled ?? DEFAULT_GITHUB_CONTENT_OUTPUT_ENABLED[contentType])
+  );
+}
+
 function completePullRequest(
   client: GitHubRepositoryClient,
   merge: boolean,
@@ -314,6 +347,21 @@ async function publishToGitHub(
       previous.pullRequestUrl &&
       !previous.merged
     ) {
+      if (
+        config.merge &&
+        !(await isGitHubPublishingEnabled(
+          attempt.organizationId,
+          config.repositoryId,
+          post.contentType
+        ))
+      ) {
+        return failure(
+          SCHEDULED_PUBLICATION_ERROR_CODES.GITHUB_PUBLISH_FAILED,
+          "Publishing to this GitHub repository is paused.",
+          false,
+          previous
+        );
+      }
       return completePullRequest(client, config.merge, {
         pullRequestNumber: previous.pullRequestNumber,
         pullRequestUrl: previous.pullRequestUrl,

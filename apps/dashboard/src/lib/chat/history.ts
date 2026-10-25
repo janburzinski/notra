@@ -31,7 +31,7 @@ export async function loadChatHistoryPayload(
       : null;
   const [hydratedMessages, slackThreadUrl] = await Promise.all([
     hydrateSavedChatPosts(organizationId, chatId, messages),
-    target ? getSlackThreadPermalink(target) : null,
+    target ? getSlackThreadPermalink(target, organizationId) : null,
   ]);
 
   return {

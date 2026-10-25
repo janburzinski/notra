@@ -7,6 +7,7 @@ import { nanoid } from "nanoid";
 
 import {
   FeedbackDatabaseError,
+  FeedbackIdempotencyConflictError,
   FeedbackNotFoundError,
   FeedbackOrganizationNotFoundError,
   FeedbackProjectNotFoundError,
@@ -179,6 +180,22 @@ export const updateFeedback = Effect.fn("feedback.update")(function* ({
   return updated;
 });
 
+/**
+ * Submissions are often unauthenticated, so a replayed idempotency key only
+ * returns the stored row for the same message. Otherwise a guessed key would
+ * read someone else's feedback and its triage state.
+ */
+const deduplicatedSubmission = (
+  existing: SubmitFeedbackProgramSuccess["feedback"],
+  body: SubmitFeedbackProgramInput["body"]
+) =>
+  existing.message === body.message
+    ? Effect.succeed({
+        feedback: existing,
+        deduplicated: true,
+      } satisfies SubmitFeedbackProgramSuccess)
+    : Effect.fail(new FeedbackIdempotencyConflictError());
+
 export const submitFeedback = Effect.fn("feedback.submit")(function* ({
   db,
   organizationId,
@@ -194,10 +211,7 @@ export const submitFeedback = Effect.fn("feedback.submit")(function* ({
       idempotencyKey
     );
     if (existing) {
-      return {
-        feedback: existing,
-        deduplicated: true,
-      } satisfies SubmitFeedbackProgramSuccess;
+      return yield* deduplicatedSubmission(existing, body);
     }
   }
 
@@ -278,8 +292,5 @@ export const submitFeedback = Effect.fn("feedback.submit")(function* ({
     return yield* new FeedbackNotFoundError();
   }
 
-  return {
-    feedback: existing,
-    deduplicated: true,
-  } satisfies SubmitFeedbackProgramSuccess;
+  return yield* deduplicatedSubmission(existing, body);
 });

@@ -9,6 +9,8 @@ export const DELIVERY_CONCURRENCY = 5;
 export const RETENTION_DAYS = 30;
 export const SIGNATURE_TOLERANCE_SECONDS = 300;
 export const PAGE_SIZE = 25;
+// Every endpoint gets its own delivery per event, so cap the fanout per tenant.
+export const MAX_ENDPOINTS_PER_ORGANIZATION = 25;
 export const MAX_PAYLOAD_BYTES = 65_536;
 export const API_VERSION = "2026-10-06";
 export const RETRY_DELAYS_SECONDS: readonly number[] = [

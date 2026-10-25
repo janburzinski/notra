@@ -12,3 +12,5 @@ export const FEEDBACK_TOKEN_UNAVAILABLE_ERROR =
   "Feedback ingestion unavailable";
 export const FEEDBACK_INGEST_SCOPE = "feedback.write";
 export const FEEDBACK_TOKEN_GENERATION_MISSING = "missing";
+export const FEEDBACK_IDEMPOTENCY_CONFLICT_ERROR =
+  "This idempotencyKey was already used for different feedback";

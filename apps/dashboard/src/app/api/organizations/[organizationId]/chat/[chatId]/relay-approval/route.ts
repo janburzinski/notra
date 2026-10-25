@@ -76,6 +76,7 @@ export async function POST(
     requestId: bodyParse.data.requestId,
     approved: bodyParse.data.approved,
     userName,
+    organizationId,
   });
 
   if (!delivered) {

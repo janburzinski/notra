@@ -14,7 +14,10 @@ import { sql as drizzleSql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 import { Effect, Layer, Redacted, Schema } from "effect";
 
-import { DUE_DELIVERIES_PER_SWEEP } from "../src/constants/delivery";
+import {
+  DUE_DELIVERIES_PER_SWEEP,
+  MAX_ENDPOINTS_PER_ORGANIZATION,
+} from "../src/constants/delivery";
 import { publishEventInTransaction } from "../src/drizzle";
 import { WebhookQueueError, WebhookStorageError } from "../src/errors/webhooks";
 import {
@@ -539,6 +542,24 @@ test("a delivery insert failure rolls back the event and can be retried", () =>
       yield* sql("DROP FUNCTION reject_test_delivery()");
       yield* publish();
       expect(yield* listDeliveries(org)).toHaveLength(1);
+    }).pipe(Effect.provide(layers))
+  ));
+
+test("caps active webhook subscriptions per organization", () =>
+  Effect.runPromise(
+    Effect.gen(function* () {
+      yield* Effect.all(
+        Array.from({ length: MAX_ENDPOINTS_PER_ORGANIZATION }, () => endpoint())
+      );
+      const rejected = yield* Effect.flip(endpoint());
+      expect(rejected._tag).toBe("WebhookValidationError");
+      yield* endpoint(otherOrg);
+      const [first] = yield* listEndpoints(org);
+      if (!first) {
+        return yield* Effect.die("missing endpoint");
+      }
+      yield* deleteEndpoint(org, first.id);
+      yield* endpoint();
     }).pipe(Effect.provide(layers))
   ));
 

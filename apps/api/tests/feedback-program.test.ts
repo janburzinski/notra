@@ -3,7 +3,10 @@ import { describe, expect, mock, test } from "bun:test";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { Effect } from "effect";
 
-import { FeedbackProjectNotFoundError } from "../src/errors/feedback";
+import {
+  FeedbackIdempotencyConflictError,
+  FeedbackProjectNotFoundError,
+} from "../src/errors/feedback";
 import { listFeedback, submitFeedback } from "../src/programs/feedback";
 import type { AgentFeedbackRow } from "../src/types/feedback";
 
@@ -67,7 +70,7 @@ describe("feedback programs", () => {
         db,
         organizationId: "org_a",
         body: {
-          message: "New message",
+          message: "Already filed",
           source: "api",
           idempotencyKey: "idem-1",
           kind: "bug",
@@ -78,6 +81,42 @@ describe("feedback programs", () => {
     );
 
     expect(result).toEqual({ feedback: existing, deduplicated: true });
+    expect(db.insert).not.toHaveBeenCalled();
+  });
+
+  test("submitFeedback does not return another submission for a reused idempotency key", async () => {
+    const db = {
+      query: {
+        agentFeedback: {
+          findFirst: mock(async () => feedbackRow()),
+        },
+        projects: {
+          findFirst: mock(async () => undefined),
+        },
+      },
+      insert: mock(() => {
+        throw new Error("insert should not run");
+      }),
+    };
+
+    const failure = await Effect.runPromise(
+      Effect.flip(
+        submitFeedback({
+          db,
+          organizationId: "org_a",
+          body: {
+            message: "Guessing someone else's key",
+            source: "api",
+            idempotencyKey: "idem-1",
+            kind: "bug",
+            sentiment: "negative",
+            title: "Provided title",
+          },
+        })
+      )
+    );
+
+    expect(failure).toBeInstanceOf(FeedbackIdempotencyConflictError);
     expect(db.insert).not.toHaveBeenCalled();
   });
 
