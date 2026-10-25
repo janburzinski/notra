@@ -1,0 +1,567 @@
+apps/dashboard/src/utils/autopilot-findings.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5-9,16-25,97-196
+apps/dashboard/src/components/sites/site-workspace-error.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 23,31
+apps/docs/docs.json
+  s_44cf84a7c2985f::t_333eb8df7d1c89 740
+packages/ai/src/tools/post.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 194-195,234-240
+apps/sites-builder/compiler/types/og-images.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 67-70
+packages/sites-server/src/utils/site-branch-writable.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 8
+packages/sites-server/src/utils/site-edit-branch.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 7
+apps/sites/tests/preview-access.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14,77,79,153-158,170,177,186,200,204-206,212,474-493,527-550
+packages/sites-server/tests/cloudflare-effect.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14
+apps/dashboard/src/components/sites/site-header-actions.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 18,45-49
+apps/dashboard/src/utils/autopilot-github.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 24-27,29,104-109
+packages/ai/src/tools/tool-cache.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-2,89-93,97-104
+packages/ai/src/tools/edit-markdown.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 23-41,43,92,94-98
+apps/dashboard/src/utils/autopilot-commit-filters.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 40-47,50,53-58,61-67,69-76,78,80,95
+packages/ai/src/tools/github-mention.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 11,23-26,44,46,118-119,660-745
+packages/sites-server/tests/vercel-dns-effect.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6
+apps/web/src/utils/site-markdown.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 66-69
+packages/sites-server/src/deployments.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 19,29,43-50,121-122,159-161,228,238-247,249-253,262
+apps/dashboard/src/components/sites/site-workspace.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 39,49,70-71
+packages/ai/src/schemas/github-mention.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 156-171
+apps/web/src/lib/consent-manager/theme.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 27-32
+packages/sites-server/src/utils/move-site-branch-drafts.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5
+apps/sites-builder/fixtures/demo/blog.json
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14
+packages/sites-server/src/constants/image-type.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-2
+apps/dashboard/src/lib/upload/server.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 318-319,328-350,359-360,366-367,369-371
+apps/dashboard/src/utils/billing-plans.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 31-41
+apps/sites/tests/serve-file.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5,21-24,28,114-141
+apps/web/src/constants/compare/competitors/scrunch.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 21
+apps/web/src/components/halloween/halloween.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-5,30-31,257-276,278-296
+apps/dashboard/src/lib/hooks/use-site-publish-mutation.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-52
+packages/sites-server/src/vercel-dns.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17
+packages/ai/src/utils/github-mention-content-policy.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 408-432
+packages/db/migrations/meta/_journal.json
+  ai_agent 942-948
+packages/sites-server/src/editor.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-2,7,27,30,33-37,40,62,86-89,604-632,667-685,690,711-728,747-801,857-868,919
+apps/dashboard/src/lib/organizations/actions.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 50,60,63,85,183-185,768-777,883-891
+packages/schemas/src/schemas/dashboard/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 250
+apps/web/src/content/notra-changelog/async-api-write-scoped-keys-framer-integration.mdx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 43
+apps/dashboard/src/utils/local-dev-auth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 142-158
+apps/sites/src/utils/routing.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 80-85
+apps/sites/src/routes/static-file.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3
+apps/dashboard/src/components/sites/site-import-list.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 35-38,111
+apps/dashboard/src/routes/-entry-loaders.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 11,24,37,68-71,78-83,85,226-230,237-240,245-248
+apps/dashboard/src/lib/auth/webhook-sync.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 100-135,137,185-222
+apps/docs/integrations/github.mdx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 138-139
+apps/web/src/routes/__root.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 26,139
+apps/dashboard/src/utils/site-proxy-recipes.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 118-122
+packages/sites-server/src/constants/editor.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 2-11,15,17-20,31-33
+packages/sites-server/src/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 9,17,19,28,34,39,62,77-81,91,99,109-121,150,157-161,174-209,237-238,241-266,516-537
+packages/sites-server/src/webhooks.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 30
+apps/dashboard/src/lib/slack/relay.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 34-42,45-47,54-58,71-74,120-121,124,214,216-219
+packages/ai/src/tools/granola.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 87,157,210
+apps/sites/src/routes/markdown-twin.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3
+packages/sites-core/src/constants/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 35-60,203
+apps/sites/src/types/worker.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 22,38
+packages/sites-server/src/env.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1
+packages/ai/src/tools/mcp-lazy.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 363-371
+packages/sites-server/src/image-drafts.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14
+apps/sites/src/responses/analytics-rejected.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-6
+apps/web/src/utils/constants.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 43-53,64-67,87-90,110-113,130,169-184
+packages/ai/src/utils/github-mention-voice.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 27
+packages/ai/src/integrations/mcp-oauth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 31-32,66-81,179-187
+packages/sites-server/tests/host-reclaim.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 51
+packages/sites-server/src/utils/site-integration-config.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4
+packages/ai/src/utils/parse-github-mention-content.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 126-127,187-191
+apps/dashboard/src/lib/organizations/workos-sync.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 182-184,220-230,250-255,281-289
+packages/ai/src/schemas/code-research-tools.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 19
+apps/api/src/routes/agent-chats.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 23,74-85,143,151,232,312,353-354
+apps/console/src/constants/site-deployments.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4-5,7
+packages/ai/src/agents/background-gen.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 167-169
+packages/db/migrations/meta/0134_snapshot.json
+  ai_agent 1-15596
+apps/dashboard/src/routes/-dashboard-loaders.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 11,15,28,30,37,41-49
+packages/sites-server/src/utils/image-type.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3
+apps/dashboard/src/constants/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 232-238
+apps/ui/registry.json
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4
+apps/web/src/utils/social-links.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4
+apps/dashboard/src/components/autopilot/autopilot-finding-source.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-250
+packages/sites-server/src/runner.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 13-14
+apps/sites-builder/compiler/components/og-author-card.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5-6,45,49-54,107,109-113
+packages/sites-server/src/utils/sandbox-transport.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 16-17
+apps/web/src/components/tracked-signup-link.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 8,37,39
+apps/dashboard/src/lib/sites/serialize.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 39
+apps/web/src/content/notra-changelog/on-demand-content-generation-with-fine-grained-control.mdx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 37-41,45-47,53,57-59
+packages/ai/src/constants/github-mention.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 37-41
+apps/web/src/components/app-link-tracking.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-27
+packages/sites-server/src/utils/read-tar-gz.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3-5,72,128-133
+packages/ai/src/types/github-mention.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 95-96
+packages/ai/src/constants/mcp-tool-index.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6-8
+packages/ai/src/tools/linear.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 57,127,213
+packages/sites-core/src/utils/hosts.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 15,50,54,58-65
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 29,45
+packages/sites-server/src/cloudflare-saas.ts
+  ai_agent 8
+apps/onboarding-agent/agent/channels/eve.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 93-101,105-107
+apps/dashboard/src/lib/hooks/use-site-publish-review.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1,3,8-11,14-23,29,47,51-52,54-59
+apps/dashboard/src/lib/chat/history.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 34
+apps/api/src/errors/feedback.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 18-22
+apps/sites/src/utils/client-ip.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-35
+apps/web/src/components/landing/prompt-calculator.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 80,780
+apps/dashboard/src/middleware/auth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 16,68-74
+apps/dashboard/src/components/sites/site-settings-danger-zone.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 47,78,98-109
+apps/docs/sites/domains/cloudflare.mdx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 43-47
+apps/web/src/lib/auth/use-navbar-auth-hotkeys.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 11,22,32
+apps/api/src/routes/webhooks.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 32-36,40
+packages/kiwi/src/codecs/kiwi.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 122-124
+packages/sites-server/src/repositories.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5
+apps/dashboard/src/lib/content/scheduled-publication-destinations.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 21,227-258,350-364
+apps/web/src/utils/navbar-presentation.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 22,52,55-56,103
+packages/sites-server/src/utils/site-branch-lock.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4
+apps/dashboard/src/routes/-entry-ui.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 31,52-54
+packages/ai/src/utils/mcp-oauth-fetch.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 2,9-12
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 22
+packages/sites-server/src/publish.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 20
+packages/webhooks/tests/webhooks.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17-20,548-562
+apps/sites-builder/compiler/og-images.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 26
+packages/sites-server/src/activation.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17
+apps/sites/src/analytics.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 21-38
+apps/dashboard/src/constants/cookies.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 13-14
+apps/ui/pages/index.astro
+  s_44cf84a7c2985f::t_333eb8df7d1c89 10
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 57
+apps/dashboard/tests/sites-get-read-only.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 71
+apps/web/src/types/navbar.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 70
+packages/ai/src/utils/github-mention-path-policy.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3-21
+packages/sites-compiler/src/utils/variables.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 9,25-57,105,127
+packages/db/migrations/0134_sites_suspension_slug_retirement.sql
+  ai_agent 1-8
+apps/web/src/types/landing/pricing.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6,54-57
+apps/dashboard/src/lib/auth/mfa-cookies.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 29-30,52-76,92-94,103,110,128,132
+apps/web/src/components/navbar.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 248-250,399,412-417,432,434,624-626,656-657,669-671,802
+apps/sites/src/serve-file.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 7,17,44,47,50-63
+apps/sites/src/routes/markdown-file.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3
+packages/sites-server/src/utils/site-draft-codec.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5-6
+packages/sites-server/tests/github-archive-effect.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 10
+apps/dashboard/src/types/components/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1,494-495,768-773
+apps/sites/src/preview-auth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 28-29,69,181-206,215-216,267-287,289-290
+packages/sites-server/src/box-build.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 26
+packages/sites-server/src/deploy.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3
+apps/sites/src/routes/markdown-not-found.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6
+apps/dashboard/src/lib/autopilot/findings.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 55,458,475,502-505,512-514
+packages/ai/src/agents/github-mention.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 118
+packages/sites-core/src/utils/preview-path.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 11-13
+packages/ai/src/utils/github-mention-path-policy.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 2,33,45-64
+packages/sites-server/src/utils/landing-page.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 140-141,172-174,179-181,265
+packages/sites-server/tests/github-source.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17,19
+apps/dashboard/src/components/sites/site-publish-review.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 10,101-103
+apps/web/src/routes/_site/pricing.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 28,36-49
+packages/sites-server/README.md
+  s_44cf84a7c2985f::t_333eb8df7d1c89 191
+packages/sites-server/src/errors/r2.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-8
+packages/sites-server/src/utils/bind-custom-hostname.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12
+apps/dashboard/src/lib/sites/orpc-errors.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 9
+packages/sites-core/src/types/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-4,7
+packages/sites-server/src/errors/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-2
+packages/sites-server/src/state.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 33-36
+packages/sites-server/tests/box-build-runtime.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 29
+apps/sites/src/utils/errors.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-3
+packages/sites-server/src/moderation.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 11-12,37,40-46
+apps/web/src/utils/signup.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4-5,21,28-39
+apps/api/src/utils/webhooks.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1,8,11,13,51-85
+packages/sites-server/src/domains.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3,10,30,33,179-191
+apps/dashboard/src/constants/site-branches.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12-15
+packages/sites-server/src/utils/site-host-lock.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5
+packages/ui/src/constants/message-table.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 10-14
+packages/ai/src/utils/code-research-commands.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12,19,45,112-133,465-563,573,577-578,672-674
+apps/dashboard/src/constants/billing.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 147-148
+apps/sites/wrangler.jsonc
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17-21,46-49
+packages/sites-core/tests/preview-password.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 61-62
+packages/sites-server/src/previews.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 19
+packages/sites-server/tests/integration-config.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3
+apps/dashboard/src/utils/autopilot-feedback.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 2,13-39
+packages/sites-server/src/constants/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 13-14
+packages/sites-server/src/repository.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6
+apps/dashboard/src/lib/orpc/routers/automation.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 543-548
+packages/ai/src/constants/github-mention-content-policy.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 7
+packages/sites-server/src/github-source.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 20-21
+packages/sites-server/src/utils/html.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 46-88,90,92,94-126,128-129,144-145,147
+packages/ai/src/utils/code-research-commands.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 13,122-145,165-173
+apps/dashboard/src/app/api/webhooks/workos/route.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 9,16
+apps/dashboard/src/lib/orpc/routers/api-keys.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14,130-155,290-293,347-351
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/relay-approval/route.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 79
+apps/web/src/components/landing/announcement-banner.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14
+packages/sites-server/src/errors/sandbox.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-14
+apps/web/src/utils/app-tracking.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-50
+apps/sites/src/loaders.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 20
+apps/dashboard/src/components/sites/branches/site-branch-dialog.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17-20,93
+packages/sites-server/PRIVATE_BETA.md
+  s_44cf84a7c2985f::t_333eb8df7d1c89 119
+apps/agent/agent/channels/slack.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 246-257,474
+apps/dashboard/src/types/billing/checkout.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-11
+apps/sites/src/pipeline/serve-deployment.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4,7
+packages/ai/src/constants/code-research.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 118-120
+packages/ai/src/utils/github-pr-commit.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6-9,70-74,76
+packages/ai/src/utils/agent-proxy.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17,150-153,156-157,160-168
+apps/dashboard/src/types/autopilot.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 211-251
+packages/sites-server/src/utils/verified-host-claim.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 8
+apps/api/src/constants/feedback.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 15-16
+apps/dashboard/src/utils/site-create.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1,47
+packages/sites-server/tests/branch-workflow.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 7,100
+packages/sites-server/src/constants/site-draft-codec.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1
+apps/dashboard/src/lib/billing/checkout-plan-cookie.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-5,7-11,13-22,24-29,31
+apps/web/src/constants/landing/pricing-icons.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3,19
+apps/api/src/programs/feedback.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 10,183-198,214,295
+apps/docs/api/rate-limits.mdx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 130
+apps/dashboard/src/constants/site-design.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-5,109-131
+apps/web/src/constants/app-tracking.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-15
+packages/ai/src/utils/content-commit-message.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 39-40,53,119-177
+packages/sites-compiler/src/utils/paths.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 61-77,79,81-88,91-92
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 110,169,181,219,271-289,769-787,853-854
+apps/dashboard/messages/de.json
+  s_44cf84a7c2985f::t_333eb8df7d1c89 946,5687,5707-5721,5811,8001-8002,8758
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1570
+packages/sites-server/src/utils/root-directory.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 2
+packages/ai/src/utils/github-mention-published-file.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 8-11
+packages/kiwi/src/constants/svg-clip.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6-9
+packages/sites-server/tests/state-effect.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12
+apps/dashboard/src/constants/databuddy.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6-21
+apps/web/src/constants/landing/pricing.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4,45,50-67,88-89,124-125,160-161
+packages/ai/src/integrations/mcp-tool-index.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 2,30-31,33,790-791,802-807,818,820,822-823,827-830,833-842,844-859
+apps/agent/agent/lib/utils/slack-installation.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 71
+packages/ui/src/components/ui/chart.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 99-101
+packages/webhooks/src/constants/delivery.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12-13
+packages/sites-server/src/domain-connect.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 22
+apps/dashboard/src/utils/site-branch-primary-state.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 13,31-34
+packages/sites-server/tests/r2-effect.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 22-23
+apps/web/src/components/landing/hero-section.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 53
+packages/sites-server/tests/tar.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14-15,85-99
+apps/dashboard/src/types/site-branches.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 97-98
+packages/sites-server/src/types/inth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 44-55
+packages/sites-server/src/utils/source-blob-cache.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-52
+apps/dashboard/src/constants/site-publish.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-8
+apps/dashboard/src/components/sites/site-design-preview.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5-10,52,66,88-91,98
+apps/dashboard/src/lib/social-connect/connect.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3,242-258
+apps/dashboard/src/components/settings/panes/billing-pane.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 10-11,15,25,40,44,54,114-118,131,154,160,196-200,204-213,282,285,370-371
+apps/sites/src/constants/preview-auth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 2-5
+apps/sites-builder/scripts/package-cli.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 37
+packages/ai/src/prompts/github-mention.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 157,178
+packages/db/src/schema.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 9,4004,4052-4055,4277-4281
+packages/sites-server/src/types/editor.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12-16,97-98
+packages/sites-server/src/inth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 22,32,39,121-123,143-145
+apps/web/src/constants/compare/competitors/promptwatch.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 24
+packages/ai/src/tools/github.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 127,232,371,385-401,439-453,508-510
+packages/ai/src/utils/remove-html-comments.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3-5,10-11,16-20
+apps/dashboard/src/app/api/internal/sites/admin/route.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 17,83
+apps/dashboard/src/utils/tracking-params.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-3,5-11,14-27
+packages/sites-server/src/github.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 32-33,627-628,641,643,661-665
+packages/webhooks/src/programs/endpoints.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 3,7,28-39,41-51,53-55
+apps/sites/src/constants/responses.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5-8
+apps/web/src/constants/compare/competitors/profound.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 25,50,52
+apps/sites-builder/compiler/components/og-article-card.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 5-6,22-23,25,96,100,104
+apps/api/src/routes/feedback.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 18,96,119,211-212
+apps/dashboard/src/lib/hooks/use-site-workspace-state.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 40-41,63-65,131,333,346-353
+scripts/benchmarks/README.md
+  s_44cf84a7c2985f::t_333eb8df7d1c89 95
+apps/api/tests/feedback-program.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6-9,73,87-119
+apps/web/src/components/landing/pricing-icons.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 41-49
+apps/sites/src/routes/analytics-endpoints.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 6,11,18-25,42-50
+packages/sites-server/src/starter.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 25
+packages/sites-server/src/errors/provider.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-18
+packages/sites-server/src/constants/domains.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 19-20
+apps/sites/tests/handler.test.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 10,148,493-505,708-745,993,1025,1039,1050
+apps/web/src/components/landing/pricing-section.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 23,37,231-234,327-375,418-420
+apps/console/src/lib/geo-reports/site-text.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 37-39
+apps/dashboard/src/components/billing/free-plan-card.tsx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-116
+apps/sites/src/index.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 23
+apps/sites/src/utils/verified-body.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-39
+apps/dashboard/src/utils/databuddy.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 60-62
+packages/sites-server/src/r2.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 14-15
+apps/web/src/constants/compare/competitors/athena.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 43,130
+apps/dashboard/src/lib/hooks/use-resume-checkout-plan.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-38
+apps/sites/src/utils/cookies.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 1-23,26,28,32-35,38
+apps/dashboard/src/constants/site-create.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 109
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 241-242
+apps/sites-builder/compiler/constants/og-images.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 35-40
+apps/dashboard/messages/en.json
+  s_44cf84a7c2985f::t_333eb8df7d1c89 946,5687,5707-5721,5811,8001-8002,8758
+packages/sites-server/src/branches.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 21
+apps/agent/agent/lib/utils/slack-auth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 9-16,22-26
+apps/api/src/types/feedback.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 11,27
+apps/dashboard/src/lib/workflows/internal-auth.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 12,66-68
+apps/dashboard/src/components/content/editor/markdown-transformers.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 176-178,293-295,307-309
+apps/web/src/content/notra-changelog/integration-api-billing-and-analytics.mdx
+  s_44cf84a7c2985f::t_333eb8df7d1c89 33
+apps/sites/src/routes/html-not-found.ts
+  s_44cf84a7c2985f::t_333eb8df7d1c89 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "99c3e7c13d12148c87afadcbe1f331f5312be6f5",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
