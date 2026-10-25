@@ -191,7 +191,8 @@ export function createCreatePostTool(
 
 export function createUpdatePostTool(
   config: PostToolsConfig,
-  result: PostToolsResult
+  result: PostToolsResult,
+  options: { onlyRunPosts?: boolean } = {}
 ): Tool {
   const withSlug = supportsPostSlug(config.contentType);
 
@@ -230,6 +231,13 @@ export function createUpdatePostTool(
     markdown?: string;
     recommendations?: string | null;
   }) => {
+    if (
+      options.onlyRunPosts &&
+      !result.posts?.some((entry) => entry.postId === input.postId)
+    ) {
+      return { postId: input.postId, status: "not_found" as const };
+    }
+
     const { status } = await updatePostRecord({
       organizationId: config.organizationId,
       postId: input.postId,

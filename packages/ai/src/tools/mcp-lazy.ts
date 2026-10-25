@@ -360,12 +360,15 @@ function createRuntimeMcpTool({
           }
 
           try {
-            const latestTool =
-              (await getIndexedMcpToolByRuntimeName({
-                organizationId,
-                runtimeToolName: indexedTool.runtimeToolName,
-              })) ?? indexedTool;
-            if (latestTool.status !== "active" || !latestTool.serverEnabled) {
+            const latestTool = await getIndexedMcpToolByRuntimeName({
+              organizationId,
+              runtimeToolName: indexedTool.runtimeToolName,
+            });
+            if (
+              !latestTool ||
+              latestTool.status !== "active" ||
+              !latestTool.serverEnabled
+            ) {
               throw new Error(
                 `MCP tool ${indexedTool.runtimeToolName} is no longer available. Search and activate the tool again before retrying.`
               );

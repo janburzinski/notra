@@ -123,6 +123,8 @@ function inspectHtml(
       const name = node.tagName?.toLowerCase() ?? "";
       if (name === "script") {
         constructs.push({ reason: REASONS.script, source: elementSource });
+      } else if (name === "base" || name === "meta") {
+        constructs.push({ reason: REASONS.base, source: elementSource });
       } else if (GITHUB_MENTION_UNSAFE_HTML_ELEMENTS.has(name)) {
         constructs.push({ reason: REASONS.embed, source: elementSource });
       }
@@ -182,6 +184,11 @@ export function parseGitHubMentionContent(
         let expressionAlreadyBlocked = false;
         if (name === "script") {
           constructs.push({ reason: REASONS.script, source: nodeSource });
+        } else if (
+          name.toLowerCase() === "base" ||
+          name.toLowerCase() === "meta"
+        ) {
+          constructs.push({ reason: REASONS.base, source: nodeSource });
         } else if (
           GITHUB_MENTION_UNSAFE_HTML_ELEMENTS.has(name.toLowerCase())
         ) {

@@ -164,7 +164,9 @@ async function runBackgroundGenWithContext(
       listAvailableSkills: listAvailableSkills({ organizationId }),
       getSkillByName: getSkillByName({ organizationId }),
       createPost: createCreatePostTool(postToolsConfig, postToolsResult),
-      updatePost: createUpdatePostTool(postToolsConfig, postToolsResult),
+      updatePost: createUpdatePostTool(postToolsConfig, postToolsResult, {
+        onlyRunPosts: true,
+      }),
       viewPost: createViewPostTool(postToolsConfig),
       skip: createSkipTool(postToolsResult),
       fail: createFailTool(postToolsResult),

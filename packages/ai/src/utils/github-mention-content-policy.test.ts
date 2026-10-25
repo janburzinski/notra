@@ -405,6 +405,31 @@ describe("findNewActiveContent", () => {
     }
   });
 
+  test("a new base element cannot retarget an existing relative script", () => {
+    const script = '<script src="/trusted.js"></script>';
+    for (const extension of ["md", "mdx"]) {
+      expect(
+        reasons(
+          `docs/guide.${extension}`,
+          script,
+          `<base href="https://evil.example/" />\n\n${script}`
+        )
+      ).toEqual(["adds a base or meta element"]);
+    }
+  });
+
+  test("a new meta refresh is blocked", () => {
+    for (const extension of ["md", "mdx"]) {
+      expect(
+        reasons(
+          `docs/guide.${extension}`,
+          "# Guide",
+          '# Guide\n\n<meta http-equiv="refresh" content="0;url=https://evil.example" />'
+        )
+      ).toEqual(["adds a base or meta element"]);
+    }
+  });
+
   test("existing constructs may move but not multiply", () => {
     const construct = '<script src="/trusted.js"></script>';
     expect(

@@ -124,6 +124,7 @@ export function createGetPullRequestsTool(
   const cached = getAICachedTools({
     organizationId: config?.organizationId,
     namespace: "github",
+    scope: config,
   });
   const resolveIntegrationContext = createIntegrationContextResolver(
     config,
@@ -228,6 +229,7 @@ export function createGetReleaseByTagTool(
   const cached = getAICachedTools({
     organizationId: config?.organizationId,
     namespace: "github",
+    scope: config,
   });
   const resolveIntegrationContext = createIntegrationContextResolver(
     config,
@@ -366,6 +368,7 @@ export function createGetCommitsByTimeframeTool(
   const cached = getAICachedTools({
     organizationId: config?.organizationId,
     namespace: "github",
+    scope: config,
   });
   const resolveIntegrationContext = createIntegrationContextResolver(
     config,
@@ -379,6 +382,23 @@ export function createGetCommitsByTimeframeTool(
             .filter((value) => value.length > 0)
         )
       : undefined;
+  const enforcedWindow = config?.enforcedCommitWindow;
+  // The enforced window bounds the request; tool arguments may only narrow it.
+  const clampToCommitWindow = (since?: string, until?: string) => {
+    if (!enforcedWindow) {
+      return { since, until };
+    }
+    return {
+      since:
+        since && Date.parse(since) > Date.parse(enforcedWindow.since)
+          ? since
+          : enforcedWindow.since,
+      until:
+        until && Date.parse(until) < Date.parse(enforcedWindow.until)
+          ? until
+          : enforcedWindow.until,
+    };
+  };
 
   return cached(
     tool({
@@ -416,14 +436,21 @@ export function createGetCommitsByTimeframeTool(
         const resolved = await resolveIntegrationContext(integrationId);
 
         const octokit = createOctokit(resolved.token);
-        const effectiveSince =
-          since ??
-          config?.enforcedCommitWindow?.since ??
-          getISODateFromDaysAgo(days ?? 7);
-        const effectiveUntil =
-          until ??
-          config?.enforcedCommitWindow?.until ??
-          new Date().toISOString();
+        const window = clampToCommitWindow(since, until);
+        const effectiveSince = window.since ?? getISODateFromDaysAgo(days ?? 7);
+        const effectiveUntil = window.until ?? new Date().toISOString();
+        // A request outside the enforced window clamps to an empty range.
+        if (Date.parse(effectiveSince) > Date.parse(effectiveUntil)) {
+          return {
+            commits: [],
+            pagination: {
+              page,
+              perPage: 100,
+              hasNextPage: false,
+              nextPage: null,
+            },
+          };
+        }
         const response = await withGitHubRateLimitHandling(() =>
           octokit.request("GET /repos/{owner}/{repo}/commits", {
             owner: resolved.owner,
@@ -478,10 +505,9 @@ export function createGetCommitsByTimeframeTool(
           days?: number;
           page?: number;
         };
-        const cacheSince =
-          since ?? config?.enforcedCommitWindow?.since ?? "auto";
-        const cacheUntil =
-          until ?? config?.enforcedCommitWindow?.until ?? "auto";
+        const window = clampToCommitWindow(since, until);
+        const cacheSince = window.since ?? "auto";
+        const cacheUntil = window.until ?? "auto";
         return `get_commits_by_timeframe:integration=${integrationId}:since=${cacheSince}:until=${cacheUntil}:days=${String(days ?? "none")}:page=${String(page ?? 1)}`;
       },
     }

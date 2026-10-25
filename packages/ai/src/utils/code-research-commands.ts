@@ -9,12 +9,14 @@ import {
   CODE_RESEARCH_ENV_SECRET_PATTERN,
   CODE_RESEARCH_EXIT_MARKER,
   CODE_RESEARCH_FALLBACK_DEPTH,
+  CODE_RESEARCH_FILENAME_MAX_LENGTH,
   CODE_RESEARCH_FULL_SHA_PATTERN,
   CODE_RESEARCH_HISTORY_DAYS,
   CODE_RESEARCH_LINE_MAX_CHARS,
   CODE_RESEARCH_LIST_SCAN_LIMIT,
   CODE_RESEARCH_OVERVIEW_COMMITS,
   CODE_RESEARCH_OVERVIEW_MANIFESTS,
+  CODE_RESEARCH_PATH_MAX_LENGTH,
   CODE_RESEARCH_QUOTED_SECRET_PATTERN,
   CODE_RESEARCH_README_MAX_LINES,
   CODE_RESEARCH_UNQUOTED_SECRET_PATTERN,
@@ -40,6 +42,7 @@ const FIELD_SEPARATOR = "\u001f";
 const COMMIT_FORMAT = "%H%x1f%an%x1f%aI%x1f%s";
 const GITHUB_NAME_PATTERN = /^[A-Za-z0-9_.-]+$/;
 const SEARCH_LINE_PATTERN = /^(.*?):(\d+):(.*)$/;
+const SEARCH_LINE_SEPARATOR_PATTERN = /:(?=\d+:)/g;
 const DIFF_FILE_HEADER_PATTERN = /^diff --git a\/(.*) b\/(.*)$/;
 const STAT_LINE_PATTERN = /^\s*(.+?)\s+\|\s+(?:\d+|Bin)/;
 const RENAME_BRACES_PATTERN = /\{([^{}]*?) => ([^{}]*?)\}/;
@@ -104,6 +107,28 @@ export function isDeniedRepoPath(path: string): boolean {
   return CODE_RESEARCH_DENIED_PATH_PATTERNS.some((pattern) =>
     pattern.test(path)
   );
+}
+
+/**
+ * Every deny pattern matches on the final path segment, so only that segment
+ * of each candidate is checked. Real paths stay within PATH_MAX and NAME_MAX,
+ * which keeps the work per line bounded however many separators it has.
+ */
+function hasDeniedCandidatePath(line: string): boolean {
+  for (const match of line.matchAll(SEARCH_LINE_SEPARATOR_PATTERN)) {
+    const end = match.index;
+    if (end > CODE_RESEARCH_PATH_MAX_LENGTH) {
+      return false;
+    }
+    const start = line.lastIndexOf("/", end - 1) + 1;
+    if (
+      end - start <= CODE_RESEARCH_FILENAME_MAX_LENGTH &&
+      isDeniedRepoPath(line.slice(start, end))
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function assertReadableRepoPath(path: string): void {
@@ -437,6 +462,105 @@ function globToRegExp(glob: string): RegExp {
   return new RegExp(`^${pattern}$`);
 }
 
+const GLOB_LITERAL = 0;
+const GLOB_CHAR = 1;
+const GLOB_STAR = 2;
+const GLOB_GLOBSTAR = 3;
+const GLOB_GLOBSTAR_SLASH = 4;
+const SLASH_CODE = 47;
+
+/**
+ * Matches a glob by simulating all token positions at once: a single star is
+ * [^/]*, `?` is [^/], a double star is .*, and a double star followed by a
+ * slash is an optional run ending in a slash. Work is bounded by tokens times
+ * path length, unlike a backtracking RegExp, where a model-chosen glob with
+ * many stars can take seconds per filename.
+ */
+function createGlobMatcher(glob: string) {
+  const kinds: number[] = [];
+  const chars: number[] = [];
+  const source = glob.trim().replace(/^\/+/, "");
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index] ?? "";
+    if (char === "*" && source[index + 1] === "*") {
+      const followedBySlash = source[index + 2] === "/";
+      kinds.push(followedBySlash ? GLOB_GLOBSTAR_SLASH : GLOB_GLOBSTAR);
+      index += followedBySlash ? 2 : 1;
+    } else if (char === "*") {
+      kinds.push(GLOB_STAR);
+    } else if (char === "?") {
+      kinds.push(GLOB_CHAR);
+    } else {
+      kinds.push(GLOB_LITERAL);
+    }
+    chars.push(char.charCodeAt(0));
+  }
+  const count = kinds.length;
+  // matched[j]: the first j tokens match the input so far.
+  // inside[j]: token j is a double star with slash, mid-way through its run.
+  let matched = new Uint8Array(count + 1);
+  let inside = new Uint8Array(count);
+  let nextMatched = new Uint8Array(count + 1);
+  let nextInside = new Uint8Array(count);
+  const close = (states: Uint8Array, runs: Uint8Array) => {
+    let alive = states[0] === 1;
+    for (let j = 0; j < count; j += 1) {
+      const kind = kinds[j] ?? GLOB_LITERAL;
+      if (states[j] && kind >= GLOB_STAR) {
+        states[j + 1] = 1;
+        if (kind === GLOB_GLOBSTAR_SLASH) {
+          runs[j] = 1;
+        }
+      }
+      alive ||= states[j + 1] === 1 || runs[j] === 1;
+    }
+    return alive;
+  };
+  return (path: string) => {
+    matched.fill(0);
+    inside.fill(0);
+    matched[0] = 1;
+    close(matched, inside);
+    for (let index = 0; index < path.length; index += 1) {
+      const code = path.charCodeAt(index);
+      nextMatched.fill(0);
+      nextInside.fill(0);
+      for (let j = 0; j < count; j += 1) {
+        const kind = kinds[j];
+        if (kind === GLOB_LITERAL) {
+          if (matched[j] && code === chars[j]) {
+            nextMatched[j + 1] = 1;
+          }
+        } else if (kind === GLOB_CHAR) {
+          if (matched[j] && code !== SLASH_CODE) {
+            nextMatched[j + 1] = 1;
+          }
+        } else if (kind === GLOB_STAR) {
+          if (matched[j + 1] && code !== SLASH_CODE) {
+            nextMatched[j + 1] = 1;
+          }
+        } else if (kind === GLOB_GLOBSTAR) {
+          if (matched[j + 1]) {
+            nextMatched[j + 1] = 1;
+          }
+        } else if (inside[j]) {
+          nextInside[j] = 1;
+          if (code === SLASH_CODE) {
+            nextMatched[j + 1] = 1;
+          }
+        }
+      }
+      const alive = close(nextMatched, nextInside);
+      [matched, nextMatched] = [nextMatched, matched];
+      [inside, nextInside] = [nextInside, inside];
+      if (!alive) {
+        return false;
+      }
+    }
+    return matched[count] === 1;
+  };
+}
+
 export function parseListFiles(
   output: string,
   basePath: string,
@@ -446,14 +570,12 @@ export function parseListFiles(
   const lines = output.split("\n").filter(Boolean);
   const scanTruncated = lines.length > CODE_RESEARCH_LIST_SCAN_LIMIT;
   const prefix = basePath ? `${basePath}/` : "";
-  const matcher = glob?.trim() ? globToRegExp(glob) : null;
+  const matches = glob?.trim() ? createGlobMatcher(glob) : null;
   const allFiles = lines
     .slice(0, CODE_RESEARCH_LIST_SCAN_LIMIT)
     .filter((file) =>
-      matcher
-        ? matcher.test(
-            file.startsWith(prefix) ? file.slice(prefix.length) : file
-          )
+      matches
+        ? matches(file.startsWith(prefix) ? file.slice(prefix.length) : file)
         : true
     );
   const totalFiles = allFiles.length;
@@ -547,7 +669,9 @@ export function parseSearchMatches(
       continue;
     }
     const [, path = "", lineNumber = "0", text = ""] = parsed;
-    if (isDeniedRepoPath(path)) {
+    // A filename may itself contain ":<digits>:", so every possible split is
+    // checked; any denied candidate path hides the line.
+    if (hasDeniedCandidatePath(line)) {
       hidden.add(path);
       continue;
     }

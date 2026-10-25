@@ -10,6 +10,7 @@ import {
   isDeniedRepoPath,
   normalizeRepoPath,
   parseCommitLines,
+  parseListFiles,
   parseSearchMatches,
   parseShowChange,
   redactSecrets,
@@ -118,6 +119,30 @@ describe("redactSecrets", () => {
   });
 });
 
+describe("parseListFiles", () => {
+  test("filters by glob", () => {
+    const output = ["src/a.tsx", "src/lib/b.tsx", "src/c.ts"].join("\n");
+    expect(parseListFiles(output, "src", 10, "**/*.tsx").files).toEqual([
+      "src/a.tsx",
+      "src/lib/b.tsx",
+    ]);
+    expect(parseListFiles(output, "src", 10, "*.ts?").files).toEqual([
+      "src/a.tsx",
+    ]);
+  });
+
+  test("many-star globs do not backtrack", () => {
+    const output = Array.from(
+      { length: 2000 },
+      (_, index) => `${"a".repeat(200)}${index}`
+    ).join("\n");
+    const startedAt = performance.now();
+    const listed = parseListFiles(output, "", 10, "*a*a*a*a*a*a*a*a*a*a*b");
+    expect(listed.totalFiles).toBe(0);
+    expect(performance.now() - startedAt).toBeLessThan(1000);
+  });
+});
+
 describe("parseSearchMatches", () => {
   test("hides denied files, redacts, and caps", () => {
     const output = [
@@ -137,6 +162,15 @@ describe("parseSearchMatches", () => {
 });
 
 describe("secret handling in results", () => {
+  test("hides denied files whose path contains a line-number-like segment", () => {
+    const parsed = parseSearchMatches(
+      "a:1:b/.env:5:API_KEY=abcdefghijklmnopqrstuvwxyz",
+      5
+    );
+    expect(parsed.matches).toEqual([]);
+    expect(parsed.hiddenPaths).toBe(1);
+  });
+
   test("redacts a long secret before clipping the search line", () => {
     const token = `ghp_${"a".repeat(40)}`;
     const line = `src/a.ts:1:${"x".repeat(280)} ${token}`;

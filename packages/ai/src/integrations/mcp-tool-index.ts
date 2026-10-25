@@ -1,5 +1,5 @@
 import { createMCPClient, type MCPClient } from "@ai-sdk/mcp";
-import { logError } from "@notra/ai/utils/server-log";
+import { logError, logWarn } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import {
   mcpServerIntegrations,
@@ -27,7 +27,10 @@ import { customAlphabet } from "nanoid";
 
 import {
   MCP_ACTIVATE_BATCH_LIMIT,
+  MCP_INDEX_MAX_PAGES,
+  MCP_INDEX_MAX_TOOLS,
   MCP_INDEX_TIMEOUT_MS,
+  MCP_INDEX_TOTAL_TIMEOUT_MS,
   MCP_SEARCH_LIMIT_DEFAULT,
   MCP_SEARCH_LIMIT_MAX,
   MCP_SESSION_ACTIVE_TOOL_LIMIT,
@@ -784,6 +787,8 @@ async function listMcpToolsForIndex(
   organizationId: string,
   requestAuth: McpRequestAuth
 ) {
+  // One deadline bounds initialization and every page.
+  const deadline = AbortSignal.timeout(MCP_INDEX_TOTAL_TIMEOUT_MS);
   const client = await createMCPClient({
     clientName: "notra",
     version: "0.0.1",
@@ -793,6 +798,12 @@ async function listMcpToolsForIndex(
       headers: requestAuth.headers,
       fetch: publicMcpRuntimeFetch,
       redirect: "error",
+    },
+    initializationOptions: {
+      signal: AbortSignal.any([
+        AbortSignal.timeout(MCP_INDEX_TIMEOUT_MS),
+        deadline,
+      ]),
     },
     onUncaughtError: (error) => {
       logError("[MCP Tool Index] Uncaught client error", error, {
@@ -804,16 +815,48 @@ async function listMcpToolsForIndex(
 
   try {
     const definitions: McpToolDefinition[] = [];
+    const seenCursors = new Set<string>();
     let cursor: string | undefined;
+    let pages = 0;
     do {
+      // Past the total deadline the listing throws and the existing index is
+      // kept; a partial list would mark the unlisted tools stale.
       const result = await client.listTools({
         params: cursor ? { cursor } : undefined,
         options: {
-          signal: AbortSignal.timeout(MCP_INDEX_TIMEOUT_MS),
+          signal: AbortSignal.any([
+            AbortSignal.timeout(MCP_INDEX_TIMEOUT_MS),
+            deadline,
+          ]),
         },
       });
-      definitions.push(...result.tools);
+      pages += 1;
+      for (const tool of result.tools.slice(
+        0,
+        MCP_INDEX_MAX_TOOLS - definitions.length
+      )) {
+        definitions.push(tool);
+      }
+      if (cursor) {
+        seenCursors.add(cursor);
+      }
       cursor = result.nextCursor;
+      // Index what fits instead of failing the whole sync on huge or looping
+      // servers; tools beyond the cap are treated as missing.
+      if (
+        cursor &&
+        (seenCursors.has(cursor) ||
+          pages >= MCP_INDEX_MAX_PAGES ||
+          definitions.length >= MCP_INDEX_MAX_TOOLS)
+      ) {
+        logWarn("[MCP Tool Index] Tool listing truncated", {
+          integrationId,
+          organizationId,
+          pages,
+          tools: definitions.length,
+        });
+        break;
+      }
     } while (cursor);
     return { client, definitions };
   } catch (error) {

@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import type { CachedWrapper } from "@notra/ai/types/tools";
 import { Cache, Effect, Equal, Exit, Hash } from "effect";
 
@@ -84,10 +86,22 @@ function normalizeKeyPart(value: string) {
 export function getAICachedTools(options: {
   organizationId?: string;
   namespace: string;
+  /** Access policy of the tool instance (allowlists, selection filters).
+   * Entries are partitioned by it, because authorization and filtering run
+   * inside the cached call and must not be skipped by another instance's hit.
+   */
+  scope?: unknown;
 }) {
   const orgPart = normalizeKeyPart(options.organizationId ?? "anonymous");
   const namespacePart = normalizeKeyPart(options.namespace);
-  const keyPrefix = `${DEFAULT_KEY_PREFIX}${namespacePart}:${orgPart}:`;
+  const scopePart =
+    options.scope === undefined
+      ? ""
+      : `scope=${createHash("sha256")
+          .update(JSON.stringify(options.scope))
+          .digest("hex")
+          .slice(0, 32)}:`;
+  const keyPrefix = `${DEFAULT_KEY_PREFIX}${namespacePart}:${orgPart}:${scopePart}`;
 
   const debug = process.env.NODE_ENV === "development";
 

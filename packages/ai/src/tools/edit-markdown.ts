@@ -20,7 +20,27 @@ function getOperationLineNumber(op: EditOperation) {
   return 0;
 }
 
+function assertLineInRange(value: number, min: number, max: number) {
+  if (!Number.isInteger(value) || value < min || value > max) {
+    throw new Error(
+      `Line ${value} is out of range; the document has ${max} lines.`
+    );
+  }
+}
+
+function assertOperationInRange(lines: string[], op: EditOperation) {
+  if (op.op === "replaceLine" || op.op === "deleteLine") {
+    assertLineInRange(op.line, 1, lines.length);
+  } else if (op.op === "replaceRange" || op.op === "deleteRange") {
+    assertLineInRange(op.startLine, 1, lines.length);
+    assertLineInRange(op.endLine, op.startLine, lines.length);
+  } else if (op.op === "insert") {
+    assertLineInRange(op.afterLine, 0, lines.length);
+  }
+}
+
 function applyOperation(lines: string[], op: EditOperation) {
+  assertOperationInRange(lines, op);
   if (op.op === "replaceLine") {
     lines[op.line - 1] = op.content;
   } else if (op.op === "replaceRange") {
@@ -69,8 +89,13 @@ export function createMarkdownTools(context: EditMarkdownContext): {
           (a, b) => getOperationLineNumber(b) - getOperationLineNumber(a)
         );
 
+        const nextLines = [...currentLines];
         for (const op of sortedOps) {
-          applyOperation(currentLines, op);
+          applyOperation(nextLines, op);
+        }
+        currentLines.length = 0;
+        for (const line of nextLines) {
+          currentLines.push(line);
         }
 
         const updatedMarkdown = currentLines.join("\n");

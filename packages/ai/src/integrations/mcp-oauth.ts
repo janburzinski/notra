@@ -28,6 +28,8 @@ import {
 import type {
   BeginMcpOAuthAuthorizationParams,
   CompleteMcpOAuthAuthorizationParams,
+  McpOAuthServerConfiguration,
+  McpOAuthStoredAuthorizationServer,
 } from "../types/mcp-oauth";
 import {
   createMcpOAuthClientMetadata,
@@ -59,6 +61,22 @@ import { getStoredMcpOAuthCredential } from "./mcp-oauth-refresh";
 const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 16);
 function hashOAuthState(state: string) {
   return createHash("sha256").update(state).digest("hex");
+}
+
+function isSameMcpOAuthAuthorizationServer(
+  stored: McpOAuthStoredAuthorizationServer | undefined,
+  discovered: McpOAuthServerConfiguration["authorizationServerMetadata"]
+) {
+  if (!stored) {
+    return false;
+  }
+  if ("issuer" in stored) {
+    return (
+      stored.issuer === discovered.issuer &&
+      stored.token_endpoint === discovered.token_endpoint
+    );
+  }
+  return stored.tokenEndpoint === discovered.token_endpoint;
 }
 
 async function assertOrganizationMember(
@@ -158,7 +176,15 @@ async function beginMcpOAuthAuthorizationPromise(
           );
     if (
       clientInformation &&
-      isMcpOAuthClientRegistrationExpired(clientInformation)
+      (isMcpOAuthClientRegistrationExpired(clientInformation) ||
+        !isSameMcpOAuthAuthorizationServer(
+          decryptMcpOAuthSecret(
+            existingCredential?.credential
+              .encryptedAuthorizationServerInformation,
+            mcpOAuthStoredAuthorizationServerSchema
+          ),
+          configuration.authorizationServerMetadata
+        ))
     ) {
       clientInformation = undefined;
     }

@@ -115,3 +115,6 @@ export const CODE_RESEARCH_TOOL_DESCRIPTIONS = {
   show_repository_change:
     "Shows a change as a commit message, a file stat, and a unified diff (lockfiles and generated files are left out, long diffs are truncated). Pass ref for a single commit, or omit it after open_repository with a branch or pull request to see everything that branch changed.",
 } as const;
+/** Linux PATH_MAX and NAME_MAX; longer candidates can't be repository paths. */
+export const CODE_RESEARCH_PATH_MAX_LENGTH = 4096;
+export const CODE_RESEARCH_FILENAME_MAX_LENGTH = 255;
