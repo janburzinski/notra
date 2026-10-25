@@ -243,6 +243,18 @@ const onSlackInteraction: NonNullable<
   }
 };
 
+const onSlackInputResponse: NonNullable<
+  SlackChannelConfig["onInputResponse"]
+> = async (ctx) => {
+  const installation = ctx.slack.installationTeamId
+    ? await resolveSlackInstallation(ctx.slack.installationTeamId)
+    : null;
+  if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
+    return null;
+  }
+  return { auth: ctx.defaultAuth };
+};
+
 const onSlackEvent: NonNullable<SlackChannelConfig["onEvent"]> = async (
   ctx,
   event
@@ -459,6 +471,7 @@ export default slackChannel({
   onAppMention: onSlackMessage,
   onDirectMessage: onSlackMessage,
   onEvent: onSlackEvent,
+  onInputResponse: onSlackInputResponse,
   onInteraction: onSlackInteraction,
   onMessage: onSlackThreadReply,
   threadContext: { since: "last-agent-reply" },

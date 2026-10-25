@@ -68,11 +68,7 @@ async function loadInstallation(
       organizationSlug: await getOrganizationSlug(integration.organizationId),
       teamId: integration.slackTeamId,
       botToken: getSlackIntegrationBotToken(integration),
-      allowedChannelIds:
-        integration.allowedChannelIds &&
-        integration.allowedChannelIds.length > 0
-          ? integration.allowedChannelIds
-          : null,
+      allowedChannelIds: integration.allowedChannelIds ?? null,
     };
   }
 
