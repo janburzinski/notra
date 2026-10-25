@@ -1,0 +1,22 @@
+apps/web/src/components/halloween/scene.ts
+  s_86bb5ed3906c2e::t_c278345f84e9b0 727,758,875-878
+apps/web/src/components/halloween/halloween.tsx
+  s_86bb5ed3906c2e::t_4d3dca4c961eae 60-61,64-66,68
+  s_86bb5ed3906c2e::t_c278345f84e9b0 1,40-45,72-73,107,124-126,139-141,149-151,163-164,169-175,227-228,231-235,240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5727fb345fb23e1f541ee7024904e8b7c7daa204",
+  "prompts": {},
+  "sessions": {
+    "s_86bb5ed3906c2e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "99dfbc7a-6787-4152-bdcc-a81b4d2c15d7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
