@@ -23,7 +23,7 @@ const radius = {
 };
 
 export const consentTheme = {
-  colors,
+  colors: { ...colors, primary: "var(--primary-hover)" },
   dark: colors,
   typography: {
     fontFamily: "var(--font-inter)",

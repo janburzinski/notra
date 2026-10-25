@@ -3,6 +3,7 @@ import { Toaster } from "@notra/ui/components/ui/sonner";
 import {
   createRootRoute,
   HeadContent,
+  lazyRouteComponent,
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
@@ -22,7 +23,6 @@ import {
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import type { ReactNode } from "react";
 
-import NotFound from "@/components/not-found-page";
 import { ThemeProvider } from "@/components/theme-provider";
 import { consentScripts } from "@/consent-scripts";
 import { DUB_CLEAR_ON_REVOCATION } from "@/constants/dub";
@@ -78,7 +78,9 @@ export const Route = createRootRoute({
   }),
   component: Outlet,
   shellComponent: RootDocument,
-  notFoundComponent: NotFound,
+  notFoundComponent: lazyRouteComponent(
+    () => import("@/components/not-found-page")
+  ),
 });
 
 function RootDocument({ children }: { children: ReactNode }) {

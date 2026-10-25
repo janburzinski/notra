@@ -100,8 +100,8 @@ export const ANSWER_EXAMPLE_POSITION_MID = 4;
 
 export const ANSWER_EXAMPLE_POSITION_CLASS: Record<AnswerPositionTone, string> =
   {
-    top: "border-geo-up/40 bg-geo-up/10 text-geo-up",
-    mid: "border-geo-mid/40 bg-geo-mid/10 text-geo-mid",
+    top: "border-geo-up/40 bg-geo-up/10 text-[color-mix(in_oklab,var(--color-geo-up)_80%,black)] dark:text-geo-up",
+    mid: "border-geo-mid/40 bg-geo-mid/10 text-[color-mix(in_oklab,var(--color-geo-mid)_80%,black)] dark:text-geo-mid",
     low: "border-border bg-muted text-muted-foreground",
   };
 

@@ -74,7 +74,7 @@ function FaqRow({
         id={panelId}
       >
         <div className="overflow-hidden">
-          <p className="pt-3.5 font-sans text-base leading-6 tracking-[-0.01em] whitespace-pre-wrap text-[#1E1E1E99] dark:text-white/60">
+          <p className="pt-3.5 font-sans text-base leading-6 tracking-[-0.01em] whitespace-pre-wrap text-[#1E1E1EB3] dark:text-white/60">
             {item.answer}
           </p>
         </div>

@@ -82,7 +82,7 @@ function PricingBillingToggle({
 function TrackedEnginesRow() {
   return (
     <div className="flex flex-col items-center gap-5">
-      <p className="text-center font-sans text-sm font-medium tracking-[-0.01em] text-[#1E1E1E99] dark:text-white/50">
+      <p className="text-center font-sans text-sm font-medium tracking-[-0.01em] text-[#1E1E1EB3] dark:text-white/50">
         {TRACKED_ENGINES_CAPTION}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-x-9 gap-y-5">
@@ -158,8 +158,8 @@ function PricingCardHeader({ plan, billingPeriod }: PricingCardProps) {
               className={cn(
                 "flex items-center gap-0.75 overflow-clip rounded-full py-1 pr-2 pl-1.25 font-sans text-[0.8125rem] leading-[1.125rem] font-medium outline -outline-offset-1 [backdrop-filter:blur(0.15rem)]",
                 isFeatured
-                  ? "bg-white/20 text-white outline-[#F6F8FA80]"
-                  : "bg-[#8B5CF6BF] text-white outline-[#1E1E1E0D]"
+                  ? "bg-white/10 text-white outline-[#F6F8FA80]"
+                  : "bg-[#6D28D9] text-white outline-[#1E1E1E0D]"
               )}
               exit={{ y: "-0.75rem", opacity: 0 }}
               initial={{ y: "-0.75rem", opacity: 0 }}
@@ -174,7 +174,7 @@ function PricingCardHeader({ plan, billingPeriod }: PricingCardProps) {
       <p
         className={cn(
           "font-sans text-[0.9375rem] leading-[1.125rem] font-normal tracking-[-0.015em]",
-          isFeatured ? "text-white/70" : "text-[#6B6B6B] dark:text-white/60"
+          isFeatured ? "text-white/90" : "text-[#6B6B6B] dark:text-white/60"
         )}
       >
         {plan.description}
@@ -209,7 +209,7 @@ function PricingCardPrice({ plan, billingPeriod }: PricingCardProps) {
             className={cn(
               "font-sans text-sm leading-[1.125rem] font-normal tracking-[-0.015em]",
               isFeatured
-                ? "text-white/70"
+                ? "text-white/90"
                 : "text-[#1E1E1EB3] dark:text-white/60"
             )}
           >
@@ -236,7 +236,7 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
       className={cn(
         "relative flex h-184 w-full flex-col overflow-clip rounded-3xl lg:order-none",
         isFeatured
-          ? "order-first bg-[#8B5CF6]"
+          ? "order-first bg-[#6D28D9]"
           : "bg-[#F7F7F7] dark:bg-white/[0.04]"
       )}
     >
@@ -302,7 +302,7 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
                           "font-sans text-xs leading-4 font-normal",
                           isFeatured
                             ? "text-white/90"
-                            : "text-[#1E1E1E99] dark:text-white/50"
+                            : "text-[#1E1E1EB3] dark:text-white/50"
                         )}
                       >
                         {feature.subtitle}

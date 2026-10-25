@@ -1,4 +1,5 @@
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
+import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { Link } from "@tanstack/react-router";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
   HERO_BOOK_A_CALL_HREF,
   HERO_HEADLINE_CYCLE,
+  HERO_HEADLINE_CYCLE_MOBILE,
   HERO_HEADLINE_CYCLE_MS,
   HERO_SIGNUP_SOURCE,
   HERO_SUBHEAD,
@@ -20,15 +22,18 @@ const CTA_BUTTON_CLASSNAME =
 
 export function HeroSection() {
   const reduceMotion = useReducedMotion();
+  const cycle = useIsMobile()
+    ? HERO_HEADLINE_CYCLE_MOBILE
+    : HERO_HEADLINE_CYCLE;
   const [index, setIndex] = useState(0);
-  const word = HERO_HEADLINE_CYCLE[index] ?? HERO_HEADLINE_CYCLE[0];
+  const word = cycle[index % cycle.length] ?? cycle[0];
 
   useEffect(() => {
     if (reduceMotion !== false) {
       return;
     }
     const interval = window.setInterval(() => {
-      setIndex((current) => (current + 1) % HERO_HEADLINE_CYCLE.length);
+      setIndex((current) => current + 1);
     }, HERO_HEADLINE_CYCLE_MS);
     return () => window.clearInterval(interval);
   }, [reduceMotion]);

@@ -1,5 +1,6 @@
 import {
   DITHER_FINE_POINTER_QUERY,
+  DITHER_INTERACTION_EVENTS,
   DITHER_MOBILE_QUERY,
 } from "@/constants/dithering";
 
@@ -21,6 +22,32 @@ export function subscribeToFinePointer(onChange: () => void) {
 
 export function getFinePointerSnapshot() {
   return window.matchMedia(DITHER_FINE_POINTER_QUERY).matches;
+}
+
+let hasUserInteracted = false;
+
+export function subscribeToFirstInteraction(onChange: () => void) {
+  if (hasUserInteracted) {
+    return () => {};
+  }
+  const stop = () => {
+    for (const event of DITHER_INTERACTION_EVENTS) {
+      window.removeEventListener(event, handle);
+    }
+  };
+  const handle = () => {
+    hasUserInteracted = true;
+    stop();
+    onChange();
+  };
+  for (const event of DITHER_INTERACTION_EVENTS) {
+    window.addEventListener(event, handle, { passive: true });
+  }
+  return stop;
+}
+
+export function getFirstInteractionSnapshot() {
+  return hasUserInteracted;
 }
 
 export function subscribeToPageVisibility(onChange: () => void) {

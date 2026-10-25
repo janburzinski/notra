@@ -15,6 +15,10 @@ export const HERO_HEADLINE_CYCLE: HeroCycleWord[] = [
   { text: "Kimi", engine: "kimi" },
 ];
 
+export const HERO_HEADLINE_CYCLE_MOBILE = HERO_HEADLINE_CYCLE.filter(
+  (word) => word.text.length <= 7
+);
+
 export const HERO_HEADLINE_CYCLE_MS = 2600;
 
 export const HERO_SUBHEAD =

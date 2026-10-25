@@ -121,7 +121,7 @@ const MOBILE_FIELD =
 const GROUP_LABEL =
   "font-sans text-[0.9375rem] font-medium tracking-[-0.015em] text-[#1E1E1E] dark:text-white";
 const GROUP_META =
-  "font-sans text-sm tracking-[-0.015em] text-[#1E1E1E99] tabular-nums dark:text-white/50";
+  "font-sans text-sm tracking-[-0.015em] text-[#1E1E1EB3] tabular-nums dark:text-white/50";
 
 function noop() {}
 
@@ -190,7 +190,7 @@ function PromptsPanel({ value, onChange }: PromptCalculatorPanelProps) {
           className="col-span-2 row-start-2 sm:col-span-1 sm:col-start-1"
         >
           <StaggeredCaption
-            className="min-h-[4.5rem] font-sans text-[0.9375rem] leading-6 tracking-[-0.015em] text-pretty text-[#1E1E1E80] min-[25rem]:min-h-12 dark:text-white/50"
+            className="min-h-[4.5rem] font-sans text-[0.9375rem] leading-6 tracking-[-0.015em] text-pretty text-[#1E1E1EB3] min-[25rem]:min-h-12 dark:text-white/50"
             id={milestone.prompts}
             lead={milestone.name}
             leadClassName="font-medium text-[#1E1E1E] dark:text-white"
@@ -474,7 +474,7 @@ function ExactModels({
       <button
         aria-controls={exactPanelId}
         aria-expanded={showExact}
-        className="focus-visible:ring-primary flex cursor-pointer items-center gap-1 rounded-md font-sans text-sm tracking-[-0.01em] text-[#1E1E1E99] transition-colors duration-100 outline-none hover:text-[#1E1E1E] focus-visible:ring-2 dark:text-white/50 dark:hover:text-white"
+        className="focus-visible:ring-primary flex cursor-pointer items-center gap-1 rounded-md font-sans text-sm tracking-[-0.01em] text-[#1E1E1EB3] transition-colors duration-100 outline-none hover:text-[#1E1E1E] focus-visible:ring-2 dark:text-white/50 dark:hover:text-white"
         onClick={() => setShowExact((current) => !current)}
         type="button"
       >
@@ -688,12 +688,12 @@ function EstimatePrice({ plan }: { plan: PricingPlan }) {
           )}
         </span>
         {plan.priceSuffix ? (
-          <span className="font-sans text-sm leading-[1.125rem] tracking-[-0.015em] text-white/70">
+          <span className="font-sans text-sm leading-[1.125rem] tracking-[-0.015em] text-white/90">
             {plan.priceSuffix.monthly}
           </span>
         ) : null}
       </div>
-      <span className="-mt-2 font-sans text-xs leading-4 text-white/70 tabular-nums">
+      <span className="-mt-2 font-sans text-xs leading-4 text-white/90 tabular-nums">
         <FadeText
           text={
             isCustom
@@ -791,7 +791,7 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
   }
 
   return (
-    <article className="relative flex flex-col overflow-clip rounded-3xl bg-[#8B5CF6]">
+    <article className="relative flex flex-col overflow-clip rounded-3xl bg-[#6D28D9]">
       <div className="pointer-events-none absolute inset-0 -scale-y-100 opacity-60">
         <PricingProShader />
       </div>
@@ -805,11 +805,11 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
             >
               <FadeText text={plan.name} />
             </h3>
-            <span className="rounded-full bg-white/20 px-2 py-1 font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-white outline -outline-offset-1 outline-[#F6F8FA80]">
+            <span className="rounded-full bg-white/10 px-2 py-1 font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-white outline -outline-offset-1 outline-[#F6F8FA80]">
               Recommended
             </span>
           </div>
-          <p className="line-clamp-2 min-h-[2.25rem] font-sans text-[0.9375rem] leading-[1.125rem] tracking-[-0.015em] text-white/70">
+          <p className="line-clamp-2 min-h-[2.25rem] font-sans text-[0.9375rem] leading-[1.125rem] tracking-[-0.015em] text-white/90">
             <FadeText text={plan.description} wrap />
           </p>
         </div>
@@ -831,7 +831,7 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
               ) : null}
             </CtaButton>
             <button
-              className="-mt-1 flex h-8 cursor-pointer items-center justify-center gap-1.5 self-center rounded-full px-3 font-sans text-sm text-white/80 transition-[color,scale] duration-100 outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 active:scale-[0.96]"
+              className="-mt-1 flex h-8 cursor-pointer items-center justify-center gap-1.5 self-center rounded-full px-3 font-sans text-sm text-white/90 transition-[color,scale] duration-100 outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 active:scale-[0.96]"
               onClick={copyLink}
               type="button"
             >

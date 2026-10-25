@@ -561,3 +561,7 @@
   animation-duration: 420ms;
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
+
+.landing-tables [data-slot="table-head"] {
+  color: color-mix(in oklab, var(--muted-foreground) 75%, var(--foreground));
+}
