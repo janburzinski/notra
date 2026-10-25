@@ -92,6 +92,14 @@ export const CONTRIBUTORS_DATA: ContributorsData = {
       type: "User",
     },
     {
+      login: "lassejlv",
+      id: 77295879,
+      avatar_url: "https://avatars.githubusercontent.com/u/77295879?v=4",
+      html_url: "https://github.com/lassejlv",
+      contributions: 2,
+      type: "User",
+    },
+    {
       login: "swsarancodes",
       id: 219304396,
       avatar_url: "https://avatars.githubusercontent.com/u/219304396?v=4",
