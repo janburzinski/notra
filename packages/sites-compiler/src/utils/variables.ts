@@ -6,6 +6,7 @@ import {
   VARIABLE_REFERENCE,
   YAML_SAFE_VALUE,
 } from "../constants/variables";
+import type { SourceRange } from "../types/estree";
 import type {
   SettingSubstitution,
   TextSegment,
@@ -19,6 +20,39 @@ function lookup(
   name: string
 ): string | undefined {
   return Object.hasOwn(variables, name) ? variables[name] : undefined;
+}
+
+function mergeRanges(ranges: SourceRange[]): SourceRange[] {
+  const merged: SourceRange[] = [];
+  for (const range of [...ranges].sort((a, b) => a.start - b.start)) {
+    const last = merged.at(-1);
+    if (last && range.start <= last.end) {
+      last.end = Math.max(last.end, range.end);
+    } else {
+      merged.push({ start: range.start, end: range.end });
+    }
+  }
+  return merged;
+}
+
+function inRanges(ranges: SourceRange[], offset: number): boolean {
+  let low = 0;
+  let high = ranges.length - 1;
+  while (low <= high) {
+    const middle = (low + high) >>> 1;
+    const range = ranges[middle];
+    if (!range) {
+      return false;
+    }
+    if (offset < range.start) {
+      high = middle - 1;
+    } else if (offset >= range.end) {
+      low = middle + 1;
+    } else {
+      return true;
+    }
+  }
+  return false;
 }
 
 function splitFencedCode(source: string, start: number): TextSegment[] {
@@ -68,7 +102,7 @@ export function substituteVariables(
   );
   unknown.push(...frontmatter.unknown);
   const codeRanges = isMdx
-    ? mdxVariableCodeRanges(source.slice(bodyStart))
+    ? mergeRanges(mdxVariableCodeRanges(source.slice(bodyStart)))
     : [];
   const parts = [frontmatter.text];
   for (const segment of splitFencedCode(source, bodyStart)) {
@@ -90,11 +124,7 @@ export function substituteVariables(
             return match;
           }
           const bodyOffset = segment.start + offset - bodyStart;
-          if (
-            codeRanges.some(
-              ({ start, end }) => bodyOffset >= start && bodyOffset < end
-            )
-          ) {
+          if (inRanges(codeRanges, bodyOffset)) {
             return match;
           }
           const value = lookup(variables, name);

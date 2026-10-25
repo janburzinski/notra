@@ -8,7 +8,9 @@ export function safePreviewNextPath(next: string | null | undefined): string {
     if (resolved.origin !== base) {
       return "/";
     }
-    return `${resolved.pathname}${resolved.search}${resolved.hash}`;
+    const path = `${resolved.pathname}${resolved.search}${resolved.hash}`;
+    // Dot segments can normalize to "//host", which Location treats as a host.
+    return path.startsWith("//") ? "/" : path;
   } catch {
     return "/";
   }

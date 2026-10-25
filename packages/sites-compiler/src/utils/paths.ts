@@ -58,17 +58,38 @@ export function resolveSiteImport(
   return { ok: false, message: `Cannot import "${source}": file not found` };
 }
 
+let cachedSource: string | undefined;
+let cachedLineBreaks: number[] = [];
+
+function lineBreaks(source: string): number[] {
+  if (source !== cachedSource) {
+    const breaks: number[] = [];
+    for (let index = 0; index < source.length; index += 1) {
+      if (source.charCodeAt(index) === 10) {
+        breaks.push(index);
+      }
+    }
+    cachedSource = source;
+    cachedLineBreaks = breaks;
+  }
+  return cachedLineBreaks;
+}
+
 export function offsetToLineColumn(source: string, offset: number): LineColumn {
-  let line = 1;
-  let lastBreak = -1;
+  const breaks = lineBreaks(source);
   const end = Math.min(offset, source.length);
-  for (let index = 0; index < end; index += 1) {
-    if (source.charCodeAt(index) === 10) {
-      line += 1;
-      lastBreak = index;
+  let low = 0;
+  let high = breaks.length;
+  while (low < high) {
+    const middle = (low + high) >>> 1;
+    if ((breaks[middle] ?? end) < end) {
+      low = middle + 1;
+    } else {
+      high = middle;
     }
   }
-  return { line, column: offset - lastBreak };
+  const lastBreak = low > 0 ? (breaks[low - 1] ?? -1) : -1;
+  return { line: low + 1, column: offset - lastBreak };
 }
 
 export function isTextSourceFile(path: string): boolean {

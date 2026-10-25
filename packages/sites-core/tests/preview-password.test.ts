@@ -58,6 +58,8 @@ describe("safePreviewNextPath", () => {
       "blog",
       "//evil.example.com",
       "/\\evil.example.com",
+      "/..//evil.example.com",
+      "/a/%2e%2e//evil.example.com",
       "https://evil.example.com/",
       "data:text/html,hi",
     ]) {

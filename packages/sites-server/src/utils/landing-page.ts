@@ -137,6 +137,8 @@ export function extractLandingPage(
   };
   let baseUrl = pageUrl;
   const stack: LandingPageFrame[] = [];
+  // Open-element counts by name, so unmatched closing tags skip the stack scan.
+  const openCounts = new Map<string, number>();
   const icons: IconCandidate[] = [];
   const anchors: CapturedAnchor[] = [];
   let anchor: OpenAnchor | null = null;
@@ -167,9 +169,15 @@ export function extractLandingPage(
     }
 
     if (token.kind === "close") {
+      if (!openCounts.get(token.name)) {
+        continue;
+      }
       const index = stack.findLastIndex((frame) => frame.name === token.name);
       if (index === -1) {
         continue;
+      }
+      for (const frame of stack.slice(index)) {
+        openCounts.set(frame.name, (openCounts.get(frame.name) ?? 1) - 1);
       }
       stack.length = index;
       if (token.name === "title" && titleText) {
@@ -254,6 +262,7 @@ export function extractLandingPage(
       continue;
     }
     stack.push({ name, hidden });
+    openCounts.set(name, (openCounts.get(name) ?? 0) + 1);
 
     if (name === "title" && svgDepth !== null) {
       svgTitleDepth = stack.length - 1;

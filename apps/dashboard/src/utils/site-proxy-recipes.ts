@@ -115,7 +115,11 @@ export default {
     headers.delete("authorization");
     // Lets site analytics see the visitor, not Cloudflare.
     headers.set("x-forwarded-for", request.headers.get("cf-connecting-ip") ?? "");
-    return fetch(new URL(url.pathname + url.search, SITE_ORIGIN), {
+    // Assign the path instead of resolving it, so "//other.host" stays on SITE_ORIGIN.
+    const target = new URL(SITE_ORIGIN);
+    target.pathname = url.pathname;
+    target.search = url.search;
+    return fetch(target, {
       method: request.method,
       headers,
       body: request.body,

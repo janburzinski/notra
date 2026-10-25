@@ -43,16 +43,90 @@ function parseAttributes(source: string): Map<string, string> {
   return attrs;
 }
 
-export function* tokenizeHtml(html: string): Generator<HtmlToken> {
-  const tag = new RegExp(TAG.source, "g");
-  let lowerHtml: string | undefined;
-  let last = 0;
-  let match = tag.exec(html);
-  while (match) {
-    if (match.index > last) {
-      yield { kind: "text", text: html.slice(last, match.index) };
+function openTagEnd(html: string, start: number): number {
+  let index = start + 1;
+  while (index < html.length) {
+    const char = html[index];
+    if (char === ">") {
+      return index + 1;
     }
-    last = tag.lastIndex;
+    if (char === "=") {
+      let next = index + 1;
+      while (next < html.length && /\s/.test(html[next] ?? "")) {
+        next += 1;
+      }
+      const quote = html[next];
+      if (quote === '"' || quote === "'") {
+        const close = html.indexOf(quote, next + 1);
+        index = close === -1 ? next + 1 : close + 1;
+        continue;
+      }
+    }
+    index += 1;
+  }
+  return -1;
+}
+
+// Each candidate tag is matched against a slice that ends at its own
+// terminator, so malformed markup cannot make the regex rescan the rest of
+// the document from every "<" (quadratic on attacker-chosen pages).
+function tagCandidateEnd(
+  html: string,
+  start: number,
+  lastCommentClose: number
+): number {
+  const next = html[start + 1] ?? "";
+  if (html.startsWith("<!--", start) && lastCommentClose >= start + 4) {
+    return html.indexOf("-->", start + 4) + 3;
+  }
+  if (next === "!") {
+    const close = html.indexOf(">", start);
+    return close === -1 ? -1 : close + 1;
+  }
+  return /[a-zA-Z]/.test(next) ? openTagEnd(html, start) : start;
+}
+
+export function* tokenizeHtml(html: string): Generator<HtmlToken> {
+  const tag = new RegExp(TAG.source, "y");
+  let lowerHtml: string | undefined;
+  const lastCommentClose = html.lastIndexOf("-->");
+  let last = 0;
+  let cursor = 0;
+  while (cursor < html.length) {
+    const start = html.indexOf("<", cursor);
+    if (start === -1) {
+      break;
+    }
+    let match: RegExpExecArray | null = null;
+    if (html[start + 1] === "/") {
+      // Closing tags fail within their name and trailing whitespace.
+      tag.lastIndex = start;
+      match = tag.exec(html);
+      if (!match) {
+        cursor = start + 1;
+        continue;
+      }
+    } else {
+      const end = tagCandidateEnd(html, start, lastCommentClose);
+      if (end === -1) {
+        break;
+      }
+      if (end === start) {
+        cursor = start + 1;
+        continue;
+      }
+      tag.lastIndex = 0;
+      match = tag.exec(html.slice(start, end));
+      if (!match) {
+        cursor = end;
+        continue;
+      }
+    }
+    if (start > last) {
+      yield { kind: "text", text: html.slice(last, start) };
+    }
+    last = start + match[0].length;
+    cursor = last;
     const [, closeName, openName, rawAttrs, selfClosing] = match;
     if (closeName) {
       yield { kind: "close", name: closeName.toLowerCase() };
@@ -67,13 +141,12 @@ export function* tokenizeHtml(html: string): Generator<HtmlToken> {
       };
       if (HTML_RAW_TEXT_ELEMENTS.has(name) && !isVoid) {
         lowerHtml ??= html.toLowerCase();
-        const end = lowerHtml.indexOf(`</${name}`, last);
-        const resume = end === -1 ? html.length : end;
+        const close = lowerHtml.indexOf(`</${name}`, last);
+        const resume = close === -1 ? html.length : close;
         last = resume;
-        tag.lastIndex = resume;
+        cursor = resume;
       }
     }
-    match = tag.exec(html);
   }
   if (last < html.length) {
     yield { kind: "text", text: html.slice(last) };

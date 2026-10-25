@@ -623,7 +623,8 @@ async function listConfigDirectories(
     }
   );
   const directories: string[] = [];
-  const contentCounts: Record<string, RepositoryContentCount> = {};
+  // A Map, so a "__proto__" directory cannot reach Object.prototype.
+  const contentCounts = new Map<string, RepositoryContentCount>();
   for (const entry of data.tree) {
     if (entry.type !== "blob") {
       continue;
@@ -636,9 +637,9 @@ async function listConfigDirectories(
         (section === "blog" || section === "changelog") &&
         !isSkippedDirectory(directory)
       ) {
-        const count = contentCounts[directory] ?? { blog: 0, changelog: 0 };
+        const count = contentCounts.get(directory) ?? { blog: 0, changelog: 0 };
         count[section] += 1;
-        contentCounts[directory] = count;
+        contentCounts.set(directory, count);
       }
       continue;
     }
@@ -656,7 +657,11 @@ async function listConfigDirectories(
     }
   }
   directories.sort((a, b) => a.length - b.length || a.localeCompare(b));
-  return { directories, contentCounts, truncated: data.truncated };
+  return {
+    directories,
+    contentCounts: Object.fromEntries(contentCounts),
+    truncated: data.truncated,
+  };
 }
 
 export async function getRepositorySuggestions(
