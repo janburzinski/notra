@@ -1,0 +1,65 @@
+apps/api/src/constants/feedback.ts
+  s_ce7055b7518d19::t_966476d20ea53b 15-16
+apps/api/src/routes/feedback.ts
+  s_ce7055b7518d19::t_6e64d9bb459559 18
+  s_ce7055b7518d19::t_966476d20ea53b 96,119
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/relay-approval/route.ts
+  ai_agent 79
+apps/dashboard/src/lib/content/scheduled-publication-destinations.ts
+  s_ce7055b7518d19::t_f65dbfac359972 21,227-253,256-258,350-364
+  s_ce7055b7518d19::t_a86bca26d31bde 254-255
+apps/dashboard/src/lib/chat/history.ts
+  ai_agent 34
+apps/api/src/errors/feedback.ts
+  s_ce7055b7518d19::t_966476d20ea53b 18-22
+packages/webhooks/tests/webhooks.test.ts
+  s_ce7055b7518d19::t_a86bca26d31bde 552
+  s_ce7055b7518d19::t_5fc0e18043c327 17-20
+  s_ce7055b7518d19::t_34f8d090ca8823 548-551,553-565
+packages/ai/src/utils/agent-proxy.ts
+  s_ce7055b7518d19::t_cb08cec3bdf6fb 17,150-153,156-157,160-168
+packages/webhooks/src/programs/endpoints.ts
+  s_ce7055b7518d19::t_8ee408bdc64f5f 3,32,34-41,44-46
+  s_ce7055b7518d19::t_de28574588ebca 31
+apps/api/src/routes/webhooks.ts
+  ai_agent 32-36,40
+apps/api/src/utils/webhooks.ts
+  s_ce7055b7518d19::t_a86bca26d31bde 1
+apps/api/src/types/feedback.ts
+  s_ce7055b7518d19::t_6e64d9bb459559 11
+  s_ce7055b7518d19::t_966476d20ea53b 27
+packages/webhooks/src/constants/delivery.ts
+  s_ce7055b7518d19::t_8ee408bdc64f5f 12-13
+apps/dashboard/src/lib/orpc/routers/api-keys.ts
+  s_ce7055b7518d19::t_a86bca26d31bde 145-146
+  s_ce7055b7518d19::t_5ca187654d470d 14,130-144,147-155,290-293,347-351
+apps/api/src/programs/feedback.ts
+  s_ce7055b7518d19::t_966476d20ea53b 10,183-198,214,295
+apps/dashboard/src/lib/slack/relay.ts
+  ai_agent 34-42,45-47,54-58,71-74,120-121,124,214,216-219
+apps/api/tests/feedback-program.test.ts
+  s_ce7055b7518d19::t_43e2d088b0c3c9 6-9,73,87-119
+apps/api/src/routes/agent-chats.ts
+  s_ce7055b7518d19::t_25dd033d314bcc 143,151
+apps/dashboard/src/lib/upload/server.ts
+  s_ce7055b7518d19::t_c46ea1b8dc586f 318-319,359-360,366-367,369-371
+  s_ce7055b7518d19::t_83e38556307ce5 328-350
+apps/dashboard/src/lib/orpc/routers/automation.ts
+  s_ce7055b7518d19::t_a90179a969e8f6 543-548
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "814621492ccc76c0b73baa73c8dd6f49caa3921d",
+  "prompts": {},
+  "sessions": {
+    "s_ce7055b7518d19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21e8c896-059f-447f-942a-2627be2504f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
