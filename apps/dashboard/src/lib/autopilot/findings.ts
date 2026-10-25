@@ -52,6 +52,7 @@ import type {
   FindingClaim,
 } from "@/types/autopilot-runtime";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
+import { autopilotReactionAcknowledgment } from "@/utils/autopilot-feedback";
 
 /** Drafts closed as stale once their cooldown is over. */
 function isExpiredPastCooldown(now: Date) {
@@ -454,6 +455,7 @@ export async function syncOfferReactionFeedback(
           if (!sourceUrl) {
             return false;
           }
+          let status = finding.status;
           if (votes.some((vote) => vote.content === "-1")) {
             const rows = await tx
               .update(autopilotFindings)
@@ -470,6 +472,7 @@ export async function syncOfferReactionFeedback(
               )
               .returning({ id: autopilotFindings.id });
             if (rows.length) {
+              status = "dismissed";
               dismissed.push(finding.title);
             }
           }
@@ -496,16 +499,19 @@ export async function syncOfferReactionFeedback(
             "GET /repos/{owner}/{repo}/issues/comments/{comment_id}",
             { owner, repo, comment_id: offer.id }
           );
-          const body = (comment.body ?? "").split(
-            "\n\n<!-- autopilot-feedback -->"
-          )[0];
+          const body =
+            (comment.body ?? "").split("\n\n<!-- autopilot-feedback -->")[0] ??
+            "";
+          const acknowledgment = autopilotReactionAcknowledgment(votes, status);
           await octokit.request(
             "PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}",
             {
               owner,
               repo,
               comment_id: offer.id,
-              body: `${body}\n\n<!-- autopilot-feedback -->\nFeedback noted: ${votes.filter((vote) => vote.content === "+1").length} 👍, ${votes.filter((vote) => vote.content === "-1").length} 👎. ${votes.some((vote) => vote.content === "-1") ? "Only an unwritten suggestion is dismissed; existing drafts are unchanged." : "This does not authorize a draft or reopen a dismissed suggestion."} Reply with \`@notra\` and your reasoning to help me learn.`,
+              body: acknowledgment
+                ? `${body}\n\n<!-- autopilot-feedback -->\n${acknowledgment}`
+                : body,
             }
           );
           await tx

@@ -1567,7 +1567,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ]);
     expect(feedback).toHaveLength(2);
     expect(feedbackAcknowledgments).toHaveLength(2);
-    expect(feedbackAcknowledgments.at(-1)).toContain("0 👍, 0 👎");
+    expect(feedbackAcknowledgments.at(-1)).toBe("Offer");
     expect(opened).toHaveLength(0);
   });
 
