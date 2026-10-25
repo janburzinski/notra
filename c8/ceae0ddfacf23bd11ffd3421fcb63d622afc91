@@ -1,0 +1,437 @@
+apps/dashboard/messages/en.json
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 946,5687,5707-5721,5811,8001-8002,8758
+apps/sites-builder/compiler/types/og-images.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 67-70
+packages/ai/src/tools/tool-cache.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-2,89-93,97-104
+packages/ai/src/tools/github.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 127,232,371,385-401,439-453,508-510
+packages/sites-server/src/repositories.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5
+apps/sites/wrangler.jsonc
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17-21,46-49
+packages/sites-server/src/domain-connect.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 22
+packages/sites-server/tests/github-source.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17,19
+packages/ai/src/tools/linear.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 57,127,213
+packages/sites-server/src/activation.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17
+apps/dashboard/src/components/sites/site-workspace-error.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 23,31
+packages/ai/src/utils/code-research-commands.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12,19,45,112-133,465-563,573,577-578,672-674
+apps/dashboard/src/lib/auth/webhook-sync.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 100-135,137,185-222
+apps/api/src/routes/webhooks.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 32-36,40
+apps/dashboard/src/lib/auth/mfa-cookies.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 29-30,52-76,92-94,103,110,128,132
+apps/console/src/lib/geo-reports/site-text.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 37-39
+apps/web/src/components/landing/pricing-icons.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 41-49
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 241-242
+packages/sites-server/src/constants/site-draft-codec.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1
+packages/sites-server/src/errors/sandbox.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-14
+apps/dashboard/src/lib/upload/server.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 318-319,328-350,359-360,366-367,369-371
+apps/dashboard/src/components/billing/free-plan-card.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-116
+apps/sites/src/types/worker.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 22,38
+apps/web/src/utils/site-markdown.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 66-69
+apps/sites/src/constants/responses.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5-8
+packages/sites-server/tests/r2-effect.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 22-23
+apps/sites/src/utils/errors.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-3
+apps/agent/agent/lib/utils/slack-auth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 9-16,22-26
+apps/sites/src/preview-auth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 28-29,69,181-206,215-216,267-287,289-290
+apps/sites-builder/compiler/components/og-author-card.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5-6,45,49-54,107,109-113
+packages/ai/src/schemas/code-research-tools.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 19
+packages/sites-core/src/types/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-4,7
+packages/sites-core/src/constants/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 35-60,203
+apps/dashboard/src/app/api/internal/sites/admin/route.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17,83
+apps/dashboard/src/utils/local-dev-auth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 142-158
+apps/dashboard/src/lib/orpc/routers/automation.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 543-548
+apps/sites-builder/compiler/og-images.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 26
+packages/sites-server/tests/cloudflare-effect.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 14
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 55
+apps/dashboard/src/middleware/auth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 16,61-67
+packages/ai/src/utils/remove-html-comments.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3-5,10-11,16-20
+packages/sites-server/src/env.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1
+packages/sites-server/src/constants/domains.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 20-21
+packages/sites-server/src/deployments.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12
+apps/dashboard/messages/de.json
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 946,5687,5707-5721,5811,8001-8002,8758
+packages/ai/src/utils/github-mention-published-file.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 8-11
+apps/sites/src/responses/analytics-rejected.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-6
+packages/sites-server/src/utils/site-edit-branch.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 7
+apps/sites/src/serve-file.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 7,17,44,47,50-63
+apps/api/src/errors/feedback.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 18-22
+packages/sites-server/tests/integration-config.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3
+apps/dashboard/src/components/sites/site-publish-review.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 10,101-103
+packages/sites-server/src/webhooks.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 30
+packages/db/migrations/meta/0134_snapshot.json
+  ai_agent 1-15596
+apps/dashboard/src/app/api/organizations/[organizationId]/chat/[chatId]/relay-approval/route.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 79
+apps/dashboard/src/components/sites/site-design-preview.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5-10,52,66,88-91,98
+packages/sites-server/tests/state-effect.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12
+apps/dashboard/tests/sites-get-read-only.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 71
+packages/sites-server/src/errors/provider.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-18
+apps/dashboard/src/components/sites/site-settings-danger-zone.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 47,78,98-109
+apps/onboarding-agent/agent/channels/eve.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 93-101,105-107
+apps/sites/src/pipeline/serve-deployment.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 4,7
+packages/sites-server/src/utils/root-directory.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 2
+apps/api/src/programs/feedback.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 10,183-198,214,295
+packages/sites-server/src/constants/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 13-14
+scripts/benchmarks/README.md
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 95
+apps/web/src/components/navbar.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 396,409-414,429,431,794
+packages/sites-server/PRIVATE_BETA.md
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 119
+apps/agent/agent/lib/utils/slack-installation.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 71
+apps/sites/src/routes/analytics-endpoints.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6,11,18-25,42-50
+packages/sites-server/src/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 9,17,19,28,34,39,62,77-81,91,99,109-121,150,157-161,174-209,237-238,241-266,516-537
+apps/sites/src/routes/markdown-file.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3
+apps/sites/src/utils/client-ip.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-35
+apps/sites/src/loaders.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 20
+apps/sites/src/routes/markdown-not-found.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6
+packages/sites-core/tests/preview-password.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 61-62
+packages/sites-server/src/errors/r2.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-8
+packages/sites-server/tests/tar.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 14-15,85-99
+apps/api/src/routes/agent-chats.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 23,74-85,143,151,232,312,353-354
+packages/sites-server/tests/github-archive-effect.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 10
+packages/webhooks/src/programs/endpoints.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3,7,28-39,41-51,53-55
+apps/api/src/types/feedback.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 11,27
+apps/dashboard/src/utils/site-proxy-recipes.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 118-122
+packages/sites-server/src/branches.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 21
+packages/sites-core/src/utils/hosts.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 15,50,54,58-65
+packages/sites-server/src/inth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 22,32,39,121-123,143-145
+apps/sites/src/index.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 23
+packages/ai/src/tools/granola.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 87,157,210
+packages/sites-server/src/domains.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3,10,30,33,179-191
+packages/sites-server/src/publish.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 20
+packages/sites-server/src/utils/site-branch-lock.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 4
+apps/dashboard/src/lib/social-connect/connect.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3,242-258
+apps/sites/src/routes/html-not-found.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 4
+packages/sites-server/src/utils/site-integration-config.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 4
+packages/ai/src/tools/edit-markdown.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 23-41,43,92,94-98
+apps/api/src/constants/feedback.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 15-16
+packages/ui/src/components/ui/chart.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 99-101
+packages/ai/src/agents/background-gen.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 167-169
+apps/web/src/types/navbar.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 70
+packages/webhooks/src/constants/delivery.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12-13
+packages/sites-server/src/utils/html.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 46-88,90,92,94-126,128-129,144-145,147
+apps/web/src/types/landing/pricing.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6,54-57
+apps/dashboard/src/constants/site-create.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 109
+packages/webhooks/tests/webhooks.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17-20,548-562
+apps/dashboard/src/components/content/editor/markdown-transformers.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 176-178,293-295,307-309
+packages/sites-server/src/vercel-dns.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 18
+apps/sites/src/utils/verified-body.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-39
+apps/sites/tests/preview-access.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 14,77,79,153-158,170,177,186,200,204-206,212,474-493,527-550
+packages/ai/src/tools/post.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 194-195,234-240
+apps/dashboard/src/lib/sites/serialize.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 39
+apps/sites/tests/serve-file.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5,21-24,28,114-141
+packages/ai/src/utils/mcp-oauth-fetch.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 2,9-12
+packages/sites-server/src/utils/landing-page.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 140-141,172-174,179-181,265
+packages/sites-server/tests/box-build-runtime.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 29
+apps/sites-builder/compiler/constants/og-images.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 35-40
+packages/ui/src/constants/message-table.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 10-14
+packages/ai/src/utils/code-research-commands.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 13,122-145,165-173
+packages/sites-server/src/state.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 33-36
+apps/web/src/constants/landing/pricing-icons.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3,19
+packages/sites-server/tests/vercel-dns-effect.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6
+apps/web/src/components/halloween/halloween.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-5,30-31,257-276,278-296
+apps/web/src/components/landing/pricing-section.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 23,323-371,414-416
+apps/dashboard/src/lib/organizations/workos-sync.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 182-184,220-230,250-255,281-289
+apps/api/src/routes/feedback.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 18,96,119,211-212
+packages/sites-server/src/types/inth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 44-55
+apps/dashboard/src/lib/orpc/routers/api-keys.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 14,130-155,290-293,347-351
+apps/dashboard/src/utils/autopilot-commit-filters.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 40-47,50,53-58,61-67,69-76,78,80,95
+apps/web/src/constants/landing/pricing.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 4,45,50-67,88-89,124-125,160-161
+apps/web/src/routes/_site/pricing.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 28,36-49
+packages/ai/src/tools/mcp-lazy.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 363-371
+packages/sites-core/src/utils/preview-path.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 11-13
+packages/sites-server/src/editor.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 33-37,40,62,604-632,667-685
+apps/dashboard/src/lib/content/scheduled-publication-destinations.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 21,227-258,350-364
+apps/dashboard/src/components/settings/panes/billing-pane.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 14,351-352
+apps/dashboard/src/app/api/webhooks/workos/route.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 9,16
+packages/sites-server/README.md
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 191
+packages/sites-server/tests/host-reclaim.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 49
+apps/dashboard/src/lib/slack/relay.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 34-42,45-47,54-58,71-74,120-121,124,214,216-219
+packages/sites-server/src/utils/read-tar-gz.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3-5,72,128-133
+packages/sites-server/src/types/editor.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12-16
+packages/ai/src/utils/agent-proxy.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17,150-153,156-157,160-168
+packages/ai/src/integrations/mcp-oauth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 31-32,66-81,179-187
+apps/dashboard/src/lib/sites/orpc-errors.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 9
+packages/sites-server/src/constants/image-type.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-2
+packages/sites-server/src/runner.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 13-14
+packages/kiwi/src/constants/svg-clip.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6-9
+packages/sites-server/src/errors/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-2
+apps/sites/tests/handler.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 10,148,493-505,708-745,993,1025,1039,1050
+packages/db/src/schema.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 9,4004,4052-4055,4277-4281
+apps/sites/src/utils/routing.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 80-85
+apps/web/src/components/landing/hero-section.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 53
+packages/sites-server/src/r2.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 14-15
+apps/web/src/utils/navbar-presentation.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 22,52,55-56,103
+packages/sites-server/src/utils/site-draft-codec.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5-6
+apps/dashboard/src/lib/chat/history.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 34
+apps/agent/agent/channels/slack.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 246-257,474
+apps/dashboard/src/lib/organizations/actions.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 50,60,63,85,183-185,768-777,883-891
+apps/api/tests/feedback-program.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6-9,73,87-119
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 29,45
+apps/dashboard/src/constants/site-design.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-5,109-131
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 110,169,181,219,271-289,769-787,853-854
+apps/sites/src/constants/preview-auth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 2-5
+apps/sites/src/utils/cookies.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1-23,26,28,32-35,38
+apps/sites-builder/compiler/components/og-article-card.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5-6,22-23,25,96,100,104
+packages/ai/src/constants/mcp-tool-index.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6-8
+packages/ai/src/integrations/mcp-tool-index.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 2,30-31,33,790-791,802-807,818,820,822-823,827-830,833-842,844-859
+packages/ai/src/constants/code-research.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 118-120
+packages/sites-server/src/cloudflare-saas.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 9
+apps/sites/src/analytics.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 21-38
+apps/dashboard/src/constants/site-branches.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12-15
+packages/sites-compiler/src/utils/variables.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 9,25-57,105,127
+packages/sites-server/src/github-source.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 19-20
+packages/sites-server/src/utils/image-type.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3
+packages/sites-server/src/utils/site-branch-writable.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 8
+apps/api/src/utils/webhooks.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1,8,11,13,51-85
+packages/ai/src/utils/parse-github-mention-content.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 126-127,187-191
+packages/kiwi/src/codecs/kiwi.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 122-124
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 22
+packages/sites-server/src/moderation.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 11-12,37,40-46
+apps/web/src/utils/constants.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 43-53,64-67,87-90,110-113,130,169-184
+apps/sites/src/routes/markdown-twin.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3
+packages/sites-server/src/utils/move-site-branch-drafts.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5
+packages/sites-server/src/image-drafts.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 14
+apps/docs/sites/domains/cloudflare.mdx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 43-47
+packages/sites-server/src/utils/verified-host-claim.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 8
+apps/dashboard/src/components/sites/site-import-list.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 35-38,111
+apps/dashboard/src/lib/workflows/internal-auth.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12,66-68
+packages/sites-server/src/utils/sandbox-transport.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17-18
+packages/sites-server/src/box-build.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 26
+packages/sites-server/src/starter.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 25
+packages/sites-server/src/utils/site-host-lock.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 5
+packages/db/migrations/0134_sites_suspension_slug_retirement.sql
+  ai_agent 1-8
+apps/dashboard/src/constants/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 232-238
+packages/sites-server/src/utils/bind-custom-hostname.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 12
+apps/dashboard/src/types/components/sites.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1,768-773
+packages/sites-server/src/deploy.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3
+packages/ai/src/utils/github-mention-content-policy.test.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 408-432
+packages/ai/src/constants/github-mention-content-policy.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 7
+packages/sites-server/src/previews.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 19
+apps/dashboard/src/constants/site-publish.ts
+  s_dfbe5ceb0c88a0::t_96a2c153eabeea 1-8
+packages/sites-server/src/constants/editor.ts
+  ai_agent 5-11,15,31-33
+packages/sites-server/src/repository.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 6
+apps/dashboard/src/components/sites/branches/site-branch-dialog.tsx
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 17-20,93
+apps/console/src/constants/site-deployments.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 4-5,7
+apps/web/src/utils/social-links.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 4
+packages/sites-compiler/src/utils/paths.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 61-77,79,81-88,91-92
+apps/sites/src/routes/static-file.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 3
+apps/dashboard/src/utils/site-create.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 1,47
+packages/sites-server/src/github.ts
+  s_dfbe5ceb0c88a0::t_975ae0521f7a9d 31-32,626-627,640,642,660-664
+packages/db/migrations/meta/_journal.json
+  ai_agent 942-948
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c8ceae0ddfacf23bd11ffd3421fcb63d622afc91",
+  "prompts": {},
+  "sessions": {
+    "s_dfbe5ceb0c88a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b8ea2b19-d810-4423-9ff7-d768969fc018",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
