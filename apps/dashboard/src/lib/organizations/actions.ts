@@ -47,6 +47,7 @@ import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { readWorkOSError } from "@/lib/auth/workos-error";
 import { getTranslations } from "@/lib/i18n/server";
 import { failWithOrganizationMessage } from "@/lib/organizations/action-messages";
+import type { WorkOSSyncError } from "@/lib/organizations/errors";
 import {
   requireManagerMembership,
   requireMembership,
@@ -56,8 +57,10 @@ import {
 import {
   ensureWorkOSOrganizationWithMembers,
   removeMembershipFromWorkOS,
+  removeMembershipFromWorkOSStrict,
   syncOrganizationNameToWorkOS,
   updateMembershipRoleInWorkOS,
+  updateMembershipRoleInWorkOSStrict,
 } from "@/lib/organizations/workos-sync";
 import { revokeSitePreviewAccess } from "@/lib/sites/preview-revocation";
 import type {
@@ -79,6 +82,7 @@ import type {
   UpdateOrganizationInput,
 } from "@/types/organizations/actions";
 import type { OrganizationTrackingInput } from "@/types/organizations/analytics";
+import { isLocalDevAuthEnabled } from "@/utils/local-dev-auth";
 import { validateOnboardingWebsite } from "@/utils/website-url";
 
 const enforceTeamMembersLimit = Effect.fn(
@@ -175,6 +179,9 @@ const mapMemberRows = (
       },
     ];
   });
+
+const toWorkOSSyncActionFailure = (error: WorkOSSyncError) =>
+  new ActionFailure({ message: error.message, cause: error.cause });
 
 const tryWorkOS = <T>(run: () => Promise<T>, fallbackMessage: string) =>
   isDemoMode()
@@ -758,6 +765,16 @@ export async function updateMemberRole(
         );
       }
 
+      // WorkOS first: login sync re-imports WorkOS roles, so a local-only
+      // demotion would be undone on the member's next sign-in.
+      yield* (
+        isLocalDevAuthEnabled()
+          ? updateMembershipRoleInWorkOS
+          : updateMembershipRoleInWorkOSStrict
+      )(member.organizationId, member.userId, input.role).pipe(
+        Effect.mapError(toWorkOSSyncActionFailure)
+      );
+
       yield* tryAction(
         () =>
           db
@@ -765,12 +782,6 @@ export async function updateMemberRole(
             .set({ role: input.role })
             .where(eq(members.id, input.memberId)),
         "Failed to update member role"
-      );
-
-      yield* updateMembershipRoleInWorkOS(
-        member.organizationId,
-        member.userId,
-        input.role
       );
 
       const memberCount = yield* countOrganizationMembers(
@@ -869,6 +880,16 @@ export async function removeMember(
         );
       }
 
+      // WorkOS first: login sync re-imports WorkOS memberships, so a
+      // local-only removal would be undone on the member's next sign-in.
+      yield* (
+        isLocalDevAuthEnabled()
+          ? removeMembershipFromWorkOS
+          : removeMembershipFromWorkOSStrict
+      )(organizationId, member.userId).pipe(
+        Effect.mapError(toWorkOSSyncActionFailure)
+      );
+
       yield* tryAction(
         () => db.delete(members).where(eq(members.id, member.id)),
         "Failed to remove member"
@@ -876,8 +897,6 @@ export async function removeMember(
       yield* Effect.promise(() =>
         revokeSitePreviewAccess(organizationId, member.userId)
       );
-
-      yield* removeMembershipFromWorkOS(organizationId, member.userId);
 
       const memberCount = yield* countOrganizationMembers(organizationId);
       yield* trackOrganizationEvent({

@@ -179,8 +179,9 @@ const createWorkOSMembership = Effect.fn(
   });
 });
 
-export const updateMembershipRoleInWorkOS = Effect.fn(
-  "organizations.sync.updateWorkOSMembershipRole"
+/** Fails instead of logging; see removeMembershipFromWorkOSStrict. */
+export const updateMembershipRoleInWorkOSStrict = Effect.fn(
+  "organizations.sync.updateWorkOSMembershipRoleStrict"
 )(function* (organizationId: string, userId: string, roleSlug: string) {
   yield* Effect.tryPromise({
     try: async () => {
@@ -216,7 +217,17 @@ export const updateMembershipRoleInWorkOS = Effect.fn(
         message: "Failed to update WorkOS membership role",
         cause,
       }),
-  }).pipe(logSyncFailure({ organizationId, userId }), skipInDemo);
+  }).pipe(skipInDemo);
+});
+
+export const updateMembershipRoleInWorkOS = Effect.fn(
+  "organizations.sync.updateWorkOSMembershipRole"
+)(function* (organizationId: string, userId: string, roleSlug: string) {
+  yield* updateMembershipRoleInWorkOSStrict(
+    organizationId,
+    userId,
+    roleSlug
+  ).pipe(logSyncFailure({ organizationId, userId }));
 });
 
 export const deleteOrganizationFromWorkOS = Effect.fn(
@@ -236,8 +247,12 @@ export const deleteOrganizationFromWorkOS = Effect.fn(
   }).pipe(logSyncFailure({ workosOrgId }), skipInDemo);
 });
 
-export const removeMembershipFromWorkOS = Effect.fn(
-  "organizations.sync.removeWorkOSMembership"
+/**
+ * Fails instead of logging so access revocations can run remote-first: a local
+ * removal that WorkOS never saw would be restored by the next login sync.
+ */
+export const removeMembershipFromWorkOSStrict = Effect.fn(
+  "organizations.sync.removeWorkOSMembershipStrict"
 )(function* (organizationId: string, userId: string) {
   yield* Effect.tryPromise({
     try: async () => {
@@ -263,5 +278,13 @@ export const removeMembershipFromWorkOS = Effect.fn(
         message: "Failed to remove WorkOS membership",
         cause,
       }),
-  }).pipe(logSyncFailure({ organizationId, userId }), skipInDemo);
+  }).pipe(skipInDemo);
+});
+
+export const removeMembershipFromWorkOS = Effect.fn(
+  "organizations.sync.removeWorkOSMembership"
+)(function* (organizationId: string, userId: string) {
+  yield* removeMembershipFromWorkOSStrict(organizationId, userId).pipe(
+    logSyncFailure({ organizationId, userId })
+  );
 });

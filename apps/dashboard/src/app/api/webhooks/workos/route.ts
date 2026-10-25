@@ -6,14 +6,14 @@ import { Effect } from "effect";
 
 import {
   removeMembershipFromWebhook,
-  upsertMembershipFromWebhook,
+  syncMembershipFromWebhook,
 } from "@/lib/auth/webhook-sync";
 
 function handleMembershipEvent(event: WorkOSEvent) {
   switch (event.event) {
     case "organization_membership.created":
     case "organization_membership.updated":
-      return upsertMembershipFromWebhook(event.data);
+      return syncMembershipFromWebhook(event.data);
     case "organization_membership.deleted":
       return removeMembershipFromWebhook(event.data);
     default:

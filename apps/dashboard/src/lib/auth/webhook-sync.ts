@@ -97,35 +97,44 @@ const resolveUserIdByExternalId = Effect.fn(
   });
 });
 
-export const upsertMembershipFromWebhook = Effect.fn(
-  "auth.webhook.upsertMembership"
-)(function* (membership: OrganizationMembership) {
-  const { organizationId, userId } = yield* resolveLocalIds(membership);
+const upsertMembershipFromWebhook = Effect.fn("auth.webhook.upsertMembership")(
+  function* (membership: OrganizationMembership) {
+    // Only active memberships grant access: an inactive one is a revocation, a
+    // pending one (unaccepted invitation) must not grant access yet.
+    if (membership.status === "inactive") {
+      return yield* removeMembershipFromWebhook(membership);
+    }
+    if (membership.status !== "active") {
+      return;
+    }
 
-  if (!(organizationId && userId)) {
-    yield* Effect.logInfo("Skipping membership webhook - unmapped ids").pipe(
-      Effect.annotateLogs({
-        workosOrgId: membership.organizationId,
-        workosUserId: membership.userId,
-      })
-    );
-    return;
+    const { organizationId, userId } = yield* resolveLocalIds(membership);
+
+    if (!(organizationId && userId)) {
+      yield* Effect.logInfo("Skipping membership webhook - unmapped ids").pipe(
+        Effect.annotateLogs({
+          workosOrgId: membership.organizationId,
+          workosUserId: membership.userId,
+        })
+      );
+      return;
+    }
+
+    const role = membership.role.slug || "member";
+
+    yield* Effect.tryPromise({
+      try: () =>
+        upsertMembership({
+          organizationId,
+          userId,
+          role,
+          createdAt: new Date(membership.createdAt),
+        }),
+      catch: (cause) =>
+        new WebhookSyncError({ message: "Failed to upsert membership", cause }),
+    });
   }
-
-  const role = membership.role.slug || "member";
-
-  yield* Effect.tryPromise({
-    try: () =>
-      upsertMembership({
-        organizationId,
-        userId,
-        role,
-        createdAt: new Date(membership.createdAt),
-      }),
-    catch: (cause) =>
-      new WebhookSyncError({ message: "Failed to upsert membership", cause }),
-  });
-});
+);
 
 export const removeMembershipFromWebhook = Effect.fn(
   "auth.webhook.removeMembership"
@@ -172,4 +181,43 @@ export const removeMembershipFromWebhook = Effect.fn(
       await import("@/lib/sites/preview-revocation");
     await revokeSitePreviewAccess(organizationId, userId);
   });
+});
+
+/**
+ * Deliveries can arrive out of order, so a created/updated payload is only a
+ * hint: the current WorkOS membership decides, and a missing one means
+ * removal. Deletions are applied directly, since removing is the safe side.
+ */
+export const syncMembershipFromWebhook = Effect.fn(
+  "auth.webhook.syncMembership"
+)(function* (membership: OrganizationMembership) {
+  const current = yield* Effect.tryPromise({
+    try: async () => {
+      const byId = await getWorkOS()
+        .userManagement.getOrganizationMembership(membership.id)
+        .catch(nullIfWorkOSNotFound);
+      if (byId) {
+        return byId;
+      }
+      // The old membership may have been replaced by a new one for the same
+      // user and organization; removing would revoke the new access.
+      const { data } =
+        await getWorkOS().userManagement.listOrganizationMemberships({
+          userId: membership.userId,
+          organizationId: membership.organizationId,
+          statuses: ["active"],
+          limit: 1,
+        });
+      return data[0] ?? null;
+    },
+    catch: (cause) =>
+      new WebhookSyncError({
+        message: "Failed to load membership from WorkOS",
+        cause,
+      }),
+  });
+  if (!current) {
+    return yield* removeMembershipFromWebhook(membership);
+  }
+  return yield* upsertMembershipFromWebhook(current);
 });

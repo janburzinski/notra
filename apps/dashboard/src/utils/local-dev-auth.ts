@@ -139,3 +139,20 @@ export function localDevAuthBlockedMessage(
   }
   return "Local-dev auth is limited to loopback. Unset DEV_AUTH_ENABLED before exposing this server.";
 }
+
+/**
+ * Loopback-only auth has no cookie for SameSite to protect, so any page in the
+ * developer's browser could send requests. Sec-Fetch-Site is missing for
+ * untrustworthy origins such as http://0.0.0.0, so Origin is the fallback.
+ */
+export function isCrossOriginBrowserRequest(request: Request): boolean {
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if (fetchSite) {
+    return fetchSite !== "same-origin" && fetchSite !== "none";
+  }
+  const origin = request.headers.get("origin");
+  if (!origin) {
+    return false;
+  }
+  return origin !== new URL(request.url).origin;
+}

@@ -1,6 +1,6 @@
 import { redis } from "@notra/ai/utils/redis";
 import { db } from "@notra/db/drizzle";
-import { connectedSocialAccounts } from "@notra/db/schema";
+import { connectedSocialAccounts, members } from "@notra/db/schema";
 import {
   type SocialConnectOAuthState,
   type SocialConnectPlatform,
@@ -236,6 +236,26 @@ export const completeSocialConnect = Effect.fn("completeSocialConnect")(
     if (!params.userId || params.userId !== oauthState.userId) {
       return yield* Effect.fail(
         new SocialConnectCallbackError({ code: "state_mismatch" })
+      );
+    }
+
+    // The state only proves membership when the connect started; the user may
+    // have been removed from the organization since.
+    const membership = yield* Effect.tryPromise({
+      try: () =>
+        db.query.members.findFirst({
+          where: and(
+            eq(members.organizationId, oauthState.organizationId),
+            eq(members.userId, oauthState.userId)
+          ),
+          columns: { id: true },
+        }),
+      catch: (cause) =>
+        new SocialConnectCallbackError({ code: "callback_failed", cause }),
+    });
+    if (!membership) {
+      return yield* Effect.fail(
+        new SocialConnectCallbackError({ code: "invalid_callback" })
       );
     }
 

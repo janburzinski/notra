@@ -13,6 +13,7 @@ import { wasAuthSessionCleared } from "@/lib/auth/session-cookie";
 import { demoProxy } from "@/utils/demo-proxy";
 import {
   evaluateLocalDevAuth,
+  isCrossOriginBrowserRequest,
   isLocalDevAuthEnabled,
   localDevAuthBlockedMessage,
 } from "@/utils/local-dev-auth";
@@ -54,6 +55,16 @@ export const dashboardAuthMiddleware = createMiddleware().server(
       const gate = evaluateLocalDevAuth(request.headers);
       if (gate.kind === "blocked") {
         return new Response(localDevAuthBlockedMessage(gate.reason), {
+          status: 403,
+        });
+      }
+      // Impersonation needs no cookie, so SameSite cannot stop another site
+      // from sending writes to the loopback server as the dev user.
+      if (
+        !["GET", "HEAD", "OPTIONS"].includes(request.method) &&
+        isCrossOriginBrowserRequest(request)
+      ) {
+        return new Response("Cross-site requests are blocked in local dev", {
           status: 403,
         });
       }
