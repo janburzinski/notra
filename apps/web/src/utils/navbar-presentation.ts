@@ -21,6 +21,18 @@ interface NavbarVariantSpec {
   expandedMaxWidth: string;
 }
 
+const LANDING_SPEC: NavbarVariantSpec = {
+  positionClass: "fixed inset-x-4 sm:inset-x-6",
+  overlayLayout: "hero",
+  tracksScroll: true,
+  pinnedChrome: false,
+  canFloat: true,
+  floatsShell: true,
+  floatingPadding: "px-7 sm:px-5 lg:px-6 min-[87rem]:px-0",
+  floatingTop: "2.5rem",
+  expandedMaxWidth: "80.9375rem",
+};
+
 const NAVBAR_VARIANT_SPEC: Record<NavbarVariant, NavbarVariantSpec> = {
   island: {
     positionClass: "w-full sticky top-4",
@@ -33,16 +45,11 @@ const NAVBAR_VARIANT_SPEC: Record<NavbarVariant, NavbarVariantSpec> = {
     floatingTop: "1rem",
     expandedMaxWidth: "80rem",
   },
-  landing: {
-    positionClass: "fixed inset-x-4 sm:inset-x-6",
-    overlayLayout: "hero",
-    tracksScroll: true,
-    pinnedChrome: false,
-    canFloat: true,
-    floatsShell: true,
-    floatingPadding: "px-7 sm:px-5 lg:px-6 min-[87rem]:px-0",
-    floatingTop: "2.5rem",
-    expandedMaxWidth: "80.9375rem",
+  landing: LANDING_SPEC,
+  announcement: {
+    ...LANDING_SPEC,
+    overlayLayout: "announcement",
+    floatingTop: "5rem",
   },
   page: {
     positionClass: "fixed inset-x-3 sm:inset-x-4",

@@ -1,5 +1,6 @@
 import { cn } from "@notra/ui/lib/utils";
 
+import { AnnouncementBanner } from "@/components/landing/announcement-banner";
 import { AnswerExampleSection } from "@/components/landing/answer-example-section";
 import { CtaBanner } from "@/components/landing/cta-banner";
 import { FaqSection } from "@/components/landing/faq-section";
@@ -148,6 +149,7 @@ export function LandingPage() {
   return (
     <div className="dark:bg-background flex w-full flex-col items-stretch justify-start overflow-x-clip bg-white">
       <LandingPageJsonLd />
+      <AnnouncementBanner />
       <main className="landing-tables flex w-full flex-col items-stretch justify-start">
         <HeroSection />
         <p className="sr-only" id="agent-readable-summary">

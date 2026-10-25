@@ -3,9 +3,15 @@ import type { ReactNode } from "react";
 
 import type { MarketingNavGroup } from "@/utils/navigation";
 
-export type NavbarVariant = "island" | "landing" | "page" | "pinned" | "static";
+export type NavbarVariant =
+  | "announcement"
+  | "island"
+  | "landing"
+  | "page"
+  | "pinned"
+  | "static";
 
-export type NavbarMobileOverlayLayout = "compact" | "hero";
+export type NavbarMobileOverlayLayout = "announcement" | "compact" | "hero";
 
 export interface NavbarProps {
   variant?: NavbarVariant;
