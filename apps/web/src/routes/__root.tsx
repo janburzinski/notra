@@ -23,6 +23,7 @@ import {
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import type { ReactNode } from "react";
 
+import { AppLinkTracking } from "@/components/app-link-tracking";
 import { ThemeProvider } from "@/components/theme-provider";
 import { consentScripts } from "@/consent-scripts";
 import { DUB_CLEAR_ON_REVOCATION } from "@/constants/dub";
@@ -135,6 +136,7 @@ function RootDocument({ children }: { children: ReactNode }) {
               <NuqsAdapter>{children}</NuqsAdapter>
             </FlagsProvider>
           </ConsentRoot>
+          <AppLinkTracking />
           <Toaster position="bottom-right" />
         </ThemeProvider>
         <Scripts />

@@ -34,6 +34,7 @@ import type {
   PricingBillingToggleProps,
   PricingCardProps,
 } from "@/types/landing/pricing";
+import { pricingPlanHref } from "@/utils/signup";
 
 function PricingBillingToggle({
   value,
@@ -227,7 +228,10 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
 
   const ctaLink =
     plan.cta.kind === "signup" ? (
-      <TrackedSignupLink href={plan.cta.href} source={plan.cta.source} />
+      <TrackedSignupLink
+        href={pricingPlanHref(plan.cta.href, plan.id, billingPeriod)}
+        source={plan.cta.source}
+      />
     ) : (
       <Link to={plan.cta.href} />
     );

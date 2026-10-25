@@ -57,7 +57,9 @@ export function normalizeDatabuddyEventPath(event: DatabuddyFilterEvent) {
 }
 
 export function getDatabuddyPaymentMetadata(): Record<string, string> {
-  const { anonId, sessionId } = getTrackingIds();
+  const { anonId, sessionId } = getTrackingIds(
+    new URLSearchParams(window.location.search)
+  );
   const metadata: Record<string, string> = {};
   if (DATABUDDY_DASHBOARD_WEBSITE_ID) {
     metadata.databuddy_client_id = DATABUDDY_DASHBOARD_WEBSITE_ID;

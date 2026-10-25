@@ -28,7 +28,7 @@ import {
 } from "./-entry-loaders";
 import { loadInvitation } from "./-invitation-loaders";
 import { loadSharedChat } from "./-share-loaders";
-import { createUiRoute } from "./-ui-route";
+import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
 const Signup = lazyPage(() => import("@/app/(auth)/signup/page"));
 const ForgotPassword = lazyPage(
@@ -49,7 +49,9 @@ export function createEntryUiRoutes(parent: AnyRoute) {
   const guest = createRoute({
     getParentRoute: () => parent,
     id: "guest",
-    beforeLoad: () => loadGuestAccess(),
+    validateSearch: uiRouteSearch,
+    beforeLoad: ({ search }) =>
+      loadGuestAccess({ data: { params: {}, searchParams: search } }),
     component: () => (
       <AuthSplitShell>
         <Suspense fallback={<LoginFormSkeleton />}>

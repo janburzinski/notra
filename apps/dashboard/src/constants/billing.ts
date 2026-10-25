@@ -144,3 +144,5 @@ export const AUTUMN_READ_ROUTES: ReadonlySet<string> = new Set([
   "listEvents",
   "listPlans",
 ]);
+
+export const CHECKOUT_PLAN_PARAM = "plan";

@@ -77,6 +77,7 @@ import {
   promptsToStopRatio,
   scansPerMonth,
 } from "@/utils/prompt-calculator";
+import { pricingPlanHref } from "@/utils/signup";
 import { SITE_URL } from "@/utils/urls";
 
 const numberFormat = new Intl.NumberFormat("en-US");
@@ -776,7 +777,7 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
   const ctaLink =
     plan.cta.kind === "signup" ? (
       <TrackedSignupLink
-        href={plan.cta.href}
+        href={pricingPlanHref(plan.cta.href, plan.id, "monthly")}
         source={`pricing_calculator_${plan.id}`}
       />
     ) : (

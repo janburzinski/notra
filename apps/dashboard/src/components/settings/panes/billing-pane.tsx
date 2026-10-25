@@ -7,7 +7,8 @@ import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
 import { useListPlans } from "autumn-js/react";
-import { useEffect, useState } from "react";
+import { useQueryState } from "nuqs";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -21,6 +22,7 @@ import { SettingsPane } from "@/components/settings/settings-pane";
 import { PLAN_SURFACES } from "@/constants/analytics-events";
 import {
   BILLING_INVOICE_SKELETON_ROWS,
+  CHECKOUT_PLAN_PARAM,
   INVOICE_SKELETON_COLUMN_WIDTHS,
   BILLING_PLAN_FEATURE_SKELETON_KEYS,
   BILLING_PLAN_SKELETON_KEYS,
@@ -35,9 +37,11 @@ import { trackEvent } from "@/lib/analytics/posthog-client";
 import { attachPlanWithAddons } from "@/lib/billing/attach-plan";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
 import { useHasZdrEntitlement } from "@/lib/hooks/use-plan";
+import { useResumeCheckoutPlan } from "@/lib/hooks/use-resume-checkout-plan";
 import { useRouter } from "@/lib/navigation";
 import type { BillingPlanGroup, PlanCardButton } from "@/types/billing/plan";
 import {
+  checkoutPlanId,
   findZdrAddonPlan,
   getPricingButtonText,
   getProductFeatures,
@@ -47,6 +51,7 @@ import {
   isPlanInGroup,
   planGroupDescription,
   planRenewalTerms,
+  requestedYearly,
   selectPlanVariant,
   zdrAddonToggle,
 } from "@/utils/billing-plans";
@@ -106,7 +111,11 @@ export function BillingSettingsPane() {
   });
   const [loading, setLoading] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
-  const [isYearly, setIsYearly] = useState(false);
+  const [checkoutPlanParam, setCheckoutPlanParam] =
+    useQueryState(CHECKOUT_PLAN_PARAM);
+  const [yearlyChoice, setIsYearly] = useState(() =>
+    requestedYearly(checkoutPlanParam)
+  );
   const [includeZdr, setIncludeZdr] = useState(false);
   const { hasZdr } = useHasZdrEntitlement();
   const [now] = useState(() => Date.now());
@@ -119,11 +128,7 @@ export function BillingSettingsPane() {
   const activePlanId =
     activeSubscription?.plan?.id ?? activeSubscription?.planId;
 
-  useEffect(() => {
-    if (activePlanId) {
-      setIsYearly(isAnnualPlanId(activePlanId));
-    }
-  }, [activePlanId]);
+  const isYearly = yearlyChoice ?? isAnnualPlanId(activePlanId);
 
   const isTrialing =
     activeSubscription?.trialEndsAt != null &&
@@ -146,14 +151,13 @@ export function BillingSettingsPane() {
     setIncludeZdr(checked);
   }
 
-  async function handleCheckout(planId: string) {
-    setLoading(planId);
+  async function checkout(planId: string, yearly: boolean) {
     trackEvent(
       POSTHOG_EVENTS.PLAN_SELECTED,
       planSelectedProperties({
         plans,
         planId,
-        isYearly,
+        isYearly: yearly,
         includeZdr,
         surface: PLAN_SURFACES.BILLING_PAGE,
       })
@@ -189,8 +193,23 @@ export function BillingSettingsPane() {
           : tCommon("messages.couldNotUpdateBillingPlease")
       );
     }
+  }
+
+  async function handleCheckout(planId: string) {
+    setLoading(planId);
+    await checkout(planId, isYearly);
     setLoading(null);
   }
+
+  const pendingPlanId = useResumeCheckoutPlan({
+    planParam: checkoutPlanParam,
+    clearPlanParam: () => setCheckoutPlanParam(null),
+    loading: plansLoading || customerLoading,
+    customer,
+    activePlanId,
+    busyPlanId: loading,
+    checkout,
+  });
 
   async function handleManageSubscription() {
     setPortalLoading(true);
@@ -260,10 +279,10 @@ export function BillingSettingsPane() {
     }
     return {
       label:
-        loading === plan.id
+        pendingPlanId === plan.id
           ? tCommon("states.loading")
           : getPricingButtonText(plan, tBilling),
-      disabled: loading !== null,
+      disabled: pendingPlanId !== null,
       variant,
       onClick: () => handleCheckout(plan.id),
     };

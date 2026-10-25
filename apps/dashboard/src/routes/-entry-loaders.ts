@@ -8,6 +8,7 @@ import { Effect } from "effect";
 import { createLoader, createSerializer } from "nuqs/server";
 
 import { CALLBACK_DESTINATIONS } from "@/constants/analytics-events";
+import { CHECKOUT_PLAN_PARAM } from "@/constants/billing";
 import { LAST_VISITED_ORGANIZATION_COOKIE } from "@/constants/cookies";
 import { DEMO_THEME_PARAM } from "@/constants/demo";
 import { ORGANIZATION_COOKIE_SLUG_PATTERN } from "@/constants/framework";
@@ -20,6 +21,7 @@ import {
 import { getLastActiveOrganization, getSession } from "@/lib/auth/actions";
 import { isSessionBanned } from "@/lib/auth/banned";
 import { readPendingMfaFlow } from "@/lib/auth/mfa-cookies";
+import { rememberCheckoutPlan } from "@/lib/billing/checkout-plan-cookie";
 import { demoThemeParser, serializeDemoTheme } from "@/lib/demo/theme-param";
 import { getTranslations } from "@/lib/i18n/server";
 import { resolveIntegrationConnectDeeplink } from "@/lib/integrations/deeplink-resolution";
@@ -32,6 +34,7 @@ import {
   marketingAttributionServerSearchParams,
   marketingAttributionServerUrlKeys,
 } from "@/utils/marketing-attribution.server";
+import { withTrackingParams } from "@/utils/tracking-params";
 
 export const loadAppEntry = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput) => data)
@@ -62,20 +65,24 @@ export const loadAppEntry = createServerFn({ method: "GET" })
     });
   });
 
-export const loadGuestAccess = createServerFn({ method: "GET" }).handler(
-  async () => {
+export const loadGuestAccess = createServerFn({ method: "GET" })
+  .validator((data: UiRouteInput) => data)
+  .handler(async ({ data: { searchParams } }) => {
+    rememberCheckoutPlan(searchParams[CHECKOUT_PLAN_PARAM]);
     const session = await getSession();
     if (!session?.user) {
       return null;
     }
     const organization = await getLastActiveOrganization();
     throw redirect({
-      href: organization
-        ? withGeoProject(`/${organization.slug}`, organization.projectId)
-        : "/onboarding",
+      href: withTrackingParams(
+        organization
+          ? withGeoProject(`/${organization.slug}`, organization.projectId)
+          : "/onboarding",
+        searchParams
+      ),
     });
-  }
-);
+  });
 
 export const loadLogin = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput) => data)
@@ -216,19 +223,28 @@ export const loadAuthCallback = createServerFn({ method: "GET" })
         returnTo = searchParams.returnTo;
       }
       if (typeof returnTo === "string" && isSameOriginPath(returnTo)) {
-        trackRouted(CALLBACK_DESTINATIONS.RETURN_TO);
-        throw redirect({ href: returnTo });
+        const href = withTrackingParams(returnTo, searchParams);
+        if (isSameOriginPath(href)) {
+          trackRouted(CALLBACK_DESTINATIONS.RETURN_TO);
+          throw redirect({ href });
+        }
       }
     }
     const organization = await getLastActiveOrganization();
     if (!organization) {
       trackRouted(CALLBACK_DESTINATIONS.ONBOARDING);
       throw redirect({
-        href: serializeAttribution("/onboarding", attribution),
+        href: withTrackingParams(
+          serializeAttribution("/onboarding", attribution),
+          searchParams
+        ),
       });
     }
     trackRouted(CALLBACK_DESTINATIONS.DASHBOARD);
     throw redirect({
-      href: withGeoProject(`/${organization.slug}`, organization.projectId),
+      href: withTrackingParams(
+        withGeoProject(`/${organization.slug}`, organization.projectId),
+        searchParams
+      ),
     });
   });

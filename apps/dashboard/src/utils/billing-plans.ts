@@ -28,6 +28,17 @@ import { formatDollars } from "@/utils/format";
 
 const MONTHS_PER_YEAR = 12;
 
+export function checkoutPlanId(value: unknown): string | null {
+  return typeof value === "string" && ACTIVE_PAID_PLAN_IDS.has(value)
+    ? value
+    : null;
+}
+
+export function requestedYearly(planParam: unknown): boolean | null {
+  const planId = checkoutPlanId(planParam);
+  return planId ? isAnnualPlanId(planId) : null;
+}
+
 export function isAnnualPlanId(planId: string | undefined): boolean {
   if (!planId) {
     return false;

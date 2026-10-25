@@ -10,3 +10,5 @@ export const ONBOARDING_BANNER_DISMISSED_COOKIE_PREFIX =
 export const ONBOARDING_BANNER_DISMISSED_COOKIE_MAX_AGE = 365 * 86_400;
 export const LOCALE_COOKIE = "notra_locale";
 export const LOCALE_COOKIE_MAX_AGE = 365 * 86_400;
+export const CHECKOUT_PLAN_COOKIE = "notra_checkout_plan";
+export const CHECKOUT_PLAN_COOKIE_MAX_AGE = 86_400;

@@ -8,9 +8,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestHeaders } from "@tanstack/react-start/server";
 import { Effect } from "effect";
 
+import { CHECKOUT_PLAN_PARAM } from "@/constants/billing";
 import { DEMO_BANNER_COOKIE, DEMO_BANNER_OFF } from "@/constants/demo";
 import { SIDEBAR_WIDTH_COOKIE_NAME } from "@/constants/nav";
 import { validateOrganizationAccess } from "@/lib/auth/actions";
+import { takeCheckoutPlan } from "@/lib/billing/checkout-plan-cookie";
 import { resolveInitialGeoProjectId } from "@/lib/geo/initial-project.server";
 import { getTranslations } from "@/lib/i18n/server";
 import { redirectOrgRootToStoredMode } from "@/lib/nav/org-root-redirect";
@@ -23,17 +25,28 @@ import {
 } from "@/utils/geo-hydration";
 import { resolveOnboardingAgentRunState } from "@/utils/onboarding-agent-run";
 import { toOrganizationSummary } from "@/utils/organization-summary";
+import { settingsPath } from "@/utils/settings-path";
 import { getSidebarWidthFromCookie } from "@/utils/sidebar-width";
+import { trackingParams } from "@/utils/tracking-params";
 
 export const loadOrganizationShell = createServerFn({
   method: "GET",
   strict: { output: false },
 })
   .validator((data: UiRouteInput) => data)
-  .handler(async ({ data: { params } }) => {
+  .handler(async ({ data: { params, searchParams } }) => {
     const { organization, user, member } = await validateOrganizationAccess(
       params.slug ?? ""
     );
+    const checkoutPlan = takeCheckoutPlan();
+    if (checkoutPlan) {
+      throw redirect({
+        href: settingsPath(organization.slug, "billing", {
+          ...trackingParams(searchParams),
+          [CHECKOUT_PLAN_PARAM]: checkoutPlan,
+        }),
+      });
+    }
     const { dehydrateOrganizationShellQueries } =
       await import("@/utils/organization-shell-prefetch.server");
     const state = await dehydrateOrganizationShellQueries(
