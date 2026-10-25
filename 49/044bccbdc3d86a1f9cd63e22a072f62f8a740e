@@ -1,0 +1,39 @@
+apps/dashboard/src/components/content/editor/markdown-transformers.ts
+  s_ce7055b7518d19::t_116501779091fc 293-295
+apps/console/src/constants/site-deployments.ts
+  s_ce7055b7518d19::t_7efc84e1cb9c40 4-5,7
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_ce7055b7518d19::t_afbbec42045206 241-242
+apps/dashboard/src/utils/autopilot-commit-filters.ts
+  s_ce7055b7518d19::t_5183d1f2684bac 40-47,50,53-55,57-58,61-67,69-76,78,80,95
+  s_ce7055b7518d19::t_e84ba26eb5c65a 56
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_ce7055b7518d19::t_afbbec42045206 22
+packages/kiwi/src/codecs/kiwi.ts
+  s_ce7055b7518d19::t_981aae94a9a112 122-124
+apps/console/src/lib/geo-reports/site-text.ts
+  s_ce7055b7518d19::t_f6fc6b1542a68c 37-39
+packages/ui/src/components/ui/chart.tsx
+  s_ce7055b7518d19::t_7730c2e27d4648 99-101
+packages/ui/src/constants/message-table.ts
+  s_ce7055b7518d19::t_77caaa25f3a22c 10-14
+packages/kiwi/src/constants/svg-clip.ts
+  s_ce7055b7518d19::t_e84ba26eb5c65a 6-7
+  s_ce7055b7518d19::t_7cf5d1ec95f369 8-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "49044bccbdc3d86a1f9cd63e22a072f62f8a740e",
+  "prompts": {},
+  "sessions": {
+    "s_ce7055b7518d19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21e8c896-059f-447f-942a-2627be2504f7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
