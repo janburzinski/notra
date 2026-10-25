@@ -1,3 +1,8 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@notra/ui/components/ui/tooltip";
 import { useReducedMotion } from "motion/react";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
@@ -22,8 +27,8 @@ const MAX_PUMPKINS = 60;
 // Share of placed pumpkins that come out cited
 const CITED_CHANCE = 0.1;
 const ENGINES = ["ChatGPT", "Claude", "Gemini", "Perplexity", "Grok"];
-// Gap between a pumpkin's stem and its tag, in CSS px
-const TAG_GAP = 28;
+// Gap between a pumpkin's stem and its tooltip, in CSS px
+const TAG_GAP = 8;
 const INTERACTIVE =
   "a, button, input, select, textarea, label, [role='button']";
 
@@ -249,27 +254,46 @@ export function PixelScene() {
         ref={canvasRef}
       />
       {cited.map((p) => (
-        <span
-          className="absolute hidden -translate-x-1/2 bg-white px-1.5 py-0.5 font-mono text-xs leading-none whitespace-nowrap text-[#1E1E1E] lg:block"
-          key={`${p.fx}:${p.fy}`}
-          style={{
-            // Keep tags near the edges inside the hero
-            left: `clamp(4.5rem, ${p.fx * 100}%, calc(100% - 4.5rem))`,
-            top: `calc(${p.fy * 100}% - ${pumpkinBox(p, 1, 1).sh * PIXEL + TAG_GAP}px)`,
-          }}
-        >
-          cited by {p.cited}
-        </span>
+        <Tooltip key={`${p.fx}:${p.fy}`} open>
+          <TooltipTrigger
+            render={
+              <span
+                className="absolute size-0"
+                style={{
+                  // Keep tooltips near the edges inside the hero
+                  left: `clamp(4.5rem, ${p.fx * 100}%, calc(100% - 4.5rem))`,
+                  top: `calc(${p.fy * 100}% - ${pumpkinBox(p, 1, 1).sh * PIXEL}px)`,
+                }}
+              />
+            }
+          />
+          <TooltipContent
+            className="pointer-events-none hidden whitespace-nowrap lg:block"
+            sideOffset={TAG_GAP}
+          >
+            cited by {p.cited}
+          </TooltipContent>
+        </Tooltip>
       ))}
-      <span
-        className="absolute hidden -translate-x-1/2 bg-[#0E0920] px-1.5 py-0.5 font-mono text-xs leading-none whitespace-nowrap text-white lg:block dark:bg-[#55467F]"
-        style={{
-          left: `${GHOST_AT.fx * 100}%`,
-          top: `calc(${GHOST_AT.fy * 100}% - 6rem)`,
-        }}
-      >
-        not cited
-      </span>
+      <Tooltip open>
+        <TooltipTrigger
+          render={
+            <span
+              className="absolute size-0"
+              style={{
+                left: `${GHOST_AT.fx * 100}%`,
+                top: `calc(${GHOST_AT.fy * 100}% - 4.5rem)`,
+              }}
+            />
+          }
+        />
+        <TooltipContent
+          className="pointer-events-none hidden whitespace-nowrap lg:block"
+          sideOffset={TAG_GAP}
+        >
+          not cited
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 }

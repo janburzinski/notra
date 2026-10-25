@@ -3,6 +3,7 @@ import type { ComponentType, SVGProps } from "react";
 export type PricingIconKey =
   | "tracking"
   | "traffic"
+  | "feedback"
   | "images"
   | "content"
   | "social"
@@ -46,6 +47,14 @@ export interface PricingPlan {
   priceSuffix?: Record<BillingPeriod, string>;
   variant: "default" | "featured";
   hasAnnualBadge?: boolean;
+  cta: PricingCta;
+  features: PricingFeature[];
+}
+
+export interface PricingFreePlan {
+  name: string;
+  description: string;
+  price: string;
   cta: PricingCta;
   features: PricingFeature[];
 }

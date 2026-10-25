@@ -50,7 +50,7 @@ export function HeroSection() {
         </div>
 
         <div className="relative flex h-full w-full flex-col items-center">
-          <div className="flex flex-col items-center gap-8 px-6 pt-20 pb-2 sm:gap-10 sm:pt-24 lg:pt-[7.5rem]">
+          <div className="flex flex-col items-center gap-8 px-6 pt-24 pb-2 sm:gap-10 sm:pt-28 lg:pt-[7.5rem]">
             <div className="flex flex-col items-center gap-7">
               <HeroHeadline word={word} />
               <p className="max-w-[42.875rem] text-center font-sans text-[1.0625rem] leading-[1.14] font-medium tracking-[-0.005em] text-pretty text-[#1E1E1EBF] sm:text-[1.25rem] dark:text-white/70">

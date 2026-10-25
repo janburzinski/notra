@@ -67,6 +67,7 @@ export interface NavbarHrefProps {
 
 export interface NavbarChromePresentation {
   chrome: boolean;
+  boxed: boolean;
   innerPaddingClass: string;
   overlayLayout: NavbarMobileOverlayLayout;
   positionClass: string;

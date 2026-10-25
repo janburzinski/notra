@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useLocale, useTranslations } from "use-intl";
 
+import { FreePlanCard } from "@/components/billing/free-plan-card";
 import { InvoicesTable } from "@/components/billing/invoices-table";
 import { PlanCard } from "@/components/billing/plan-card";
 import { ZdrAddonCard } from "@/components/billing/zdr-addon-card";
@@ -347,6 +348,8 @@ export function BillingSettingsPane() {
               ))
             : planGroups.map(renderPlanCard)}
         </div>
+
+        {isBillingLoading ? null : <FreePlanCard />}
       </div>
 
       <div className="space-y-3">

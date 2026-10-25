@@ -38,6 +38,15 @@ export function TrafficIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function FeedbackIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M4 5h16v11H9l-5 4z" />
+      <path d="M8 9.5h8M8 12.5h5" />
+    </IconBase>
+  );
+}
+
 export function ImagesIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <IconBase {...props}>

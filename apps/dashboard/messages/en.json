@@ -5683,7 +5683,7 @@
       "features": {
         "aiAnswers": "{count, number} AI answers tracked / mo",
         "aiTrafficEvents": "{count, number} AI traffic events / mo",
-        "aiTrafficEventsDetail": "Free AI traffic analytics and agent feedback",
+        "aiTrafficEventsDetail": "Includes agent feedback",
         "imageGenerations": "{count, number} image generations / mo",
         "longFormPosts": "{count, number} long-form posts / mo",
         "unlimitedSocialPosts": "Unlimited social posts",
@@ -5703,6 +5703,21 @@
       "invoiceSubscription": "Subscription",
       "invoiceCreditsTopUp": "AI credits top-up",
       "addonPrice": "+{price}/{interval, select, month {month} year {year} other {{interval}}}"
+    },
+    "freePlan": {
+      "heading": "Free",
+      "description": "Keep agent feedback and 1M AI traffic events a month. Your plan's included allowances end, and AI credits you bought stay available.",
+      "periodEnd": "Your paid plan stays active until {date, date, long}.",
+      "scheduled": "Your plan switches to Free on {date, date, long}.",
+      "scheduledNoDate": "Your plan switches to Free at the end of this billing cycle.",
+      "scheduledBadge": "Scheduled",
+      "downgrade": "Downgrade to Free",
+      "confirmTitle": "Downgrade to Free?",
+      "confirmBody": "Your paid plan ends at the end of this billing cycle. After that you keep agent feedback and 1M AI traffic events a month, and AI credits you bought stay available. Your plan's included allowances end.",
+      "confirm": "Downgrade",
+      "cancel": "Keep my plan",
+      "success": "Your plan will switch to Free at the end of this billing cycle.",
+      "failed": "Could not downgrade your plan. Please try again."
     }
   },
   "logs": {
@@ -5792,7 +5807,7 @@
     },
     "upgrade": {
       "upgradeNow": "Upgrade now",
-      "freeDescription": "Feedback is free. Upgrade for AI content and visibility tracking.",
+      "freeDescription": "Your free plan includes agent feedback and 1M AI traffic events a month. Upgrade for AI content, visibility tracking and higher event limits.",
       "freeHeading": "Get more from Notra",
       "upgradeToPlan": "Upgrade to {plan}",
       "paidDescription": "Get more AI answers, projects and higher usage limits."

@@ -20,6 +20,7 @@ import {
   PRICING_ANNUAL_BADGE,
   PRICING_BILLING_OPTIONS,
   PRICING_DEFAULT_BILLING,
+  PRICING_FREE_PLAN,
   PRICING_HEADING,
   PRICING_PLANS,
   PRICING_SUBHEADING,
@@ -319,6 +320,55 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
   );
 }
 
+function PricingFreeTier() {
+  const plan = PRICING_FREE_PLAN;
+
+  return (
+    <article className="flex w-full flex-col gap-6 rounded-3xl bg-[#F7F7F7] p-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8 dark:bg-white/[0.04]">
+      <div className="flex flex-col gap-2 lg:max-w-[26rem] lg:flex-1">
+        <div className="flex items-baseline gap-3">
+          <h3 className="font-display text-[1.375rem] leading-7 font-medium tracking-[0.01em] text-black dark:text-white">
+            {plan.name}
+          </h3>
+          <span className="font-display text-[1.375rem] leading-7 font-normal tracking-[-0.01em] text-[#1E1E1EB3] dark:text-white/60">
+            {plan.price}
+          </span>
+        </div>
+        <p className="font-sans text-[0.9375rem] leading-[1.125rem] font-normal tracking-[-0.015em] text-[#6B6B6B] dark:text-white/60">
+          {plan.description}
+        </p>
+      </div>
+
+      <ul className="flex flex-col gap-3 sm:flex-row sm:gap-8 lg:flex-1 lg:justify-center">
+        {plan.features.map((feature) => {
+          const Icon = PRICING_ICONS[feature.icon];
+
+          return (
+            <li className="flex items-center gap-2" key={feature.label}>
+              <Icon className="size-6 shrink-0 text-[#1E1E1EBF] dark:text-white/60" />
+              <span className="font-sans text-sm leading-[1.125rem] font-normal text-[#1E1E1EBF] dark:text-white/70">
+                {feature.label}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+
+      <CtaButton
+        className="w-full lg:w-auto lg:min-w-48"
+        nativeButton={false}
+        render={
+          <TrackedSignupLink href={plan.cta.href} source={plan.cta.source} />
+        }
+        variant="primary"
+      >
+        <span>{plan.cta.label}</span>
+        <HugeiconsIcon className="size-4" icon={ArrowRight02Icon} />
+      </CtaButton>
+    </article>
+  );
+}
+
 export function LandingPricingSection({
   showHeader = true,
 }: LandingPricingSectionProps) {
@@ -360,6 +410,10 @@ export function LandingPricingSection({
                 plan={plan}
               />
             ))}
+          </div>
+
+          <div className="w-full max-w-96 lg:max-w-[80rem]">
+            <PricingFreeTier />
           </div>
         </div>
 

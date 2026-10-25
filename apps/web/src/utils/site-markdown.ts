@@ -63,6 +63,10 @@ function renderPlanPrice(
     return "Contact us";
   }
 
+  if (plan.pricing.monthly === 0) {
+    return "Free";
+  }
+
   return `$${plan.pricing.monthly}/month`;
 }
 

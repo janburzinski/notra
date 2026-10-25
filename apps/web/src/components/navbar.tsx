@@ -393,6 +393,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
   const {
     chrome,
     innerPaddingClass,
+    boxed,
     overlayLayout,
     positionClass,
     rowHeightClass,
@@ -425,9 +426,9 @@ export function Navbar({ variant }: NavbarProps = {}) {
         transition={shellTransition}
       >
         <m.header
-          animate={{ borderRadius: chrome ? "1rem" : "0rem" }}
+          animate={{ borderRadius: chrome || boxed ? "1rem" : "0rem" }}
           className={`duration-slow relative z-50 transition-[background-color,box-shadow] ease-out ${
-            chrome ? ISLAND_CHROME : "bg-transparent"
+            chrome || boxed ? ISLAND_CHROME : "bg-transparent"
           }`}
           initial={false}
           transition={shellTransition}

@@ -40,6 +40,17 @@ export const HTML_ENTITY_MAP: Record<string, string> = {
 };
 
 export const PRICING_PLANS = {
+  free: {
+    name: "Free",
+    description:
+      "Track which AI crawlers and assistants visit your site and collect feedback from the agents that use it.",
+    pricing: { monthly: 0, annually: 0 },
+    cta: {
+      label: "Start for free",
+      href: "https://app.usenotra.com/signup",
+    },
+    features: ["1M AI traffic events / mo", "Agent feedback"],
+  },
   starter: {
     name: "Starter",
     description: "For founders shipping their first content engine.",
@@ -50,6 +61,10 @@ export const PRICING_PLANS = {
     },
     features: [
       "2,000 AI answers tracked / mo",
+      {
+        label: "5M AI traffic events / mo",
+        subtitle: "includes agent feedback",
+      },
       "8 image generations / mo",
       "10 long-form posts / mo",
       "Unlimited social posts",
@@ -69,6 +84,10 @@ export const PRICING_PLANS = {
     },
     features: [
       "6,000 AI answers tracked / mo",
+      {
+        label: "15M AI traffic events / mo",
+        subtitle: "includes agent feedback",
+      },
       "20 image generations / mo",
       "25 long-form posts / mo",
       "Unlimited social posts",
@@ -88,6 +107,10 @@ export const PRICING_PLANS = {
     },
     features: [
       "12,000 AI answers tracked / mo",
+      {
+        label: "30M AI traffic events / mo",
+        subtitle: "includes agent feedback",
+      },
       "45 image generations / mo",
       "50 long-form posts / mo",
       "Unlimited social posts",
@@ -104,6 +127,7 @@ export const PRICING_PLANS = {
     cta: { label: "Contact us", href: "mailto:hello@usenotra.com" },
     features: [
       "Unlimited AI answers tracked",
+      "Unlimited AI traffic events",
       "Unlimited image generations",
       "Unlimited long-form posts",
       "Unlimited social posts",
@@ -139,6 +163,25 @@ const FEATURES_TABLE = [
         growth: "All major",
         scale: "All major",
         enterprise: "All major",
+      },
+    ],
+  },
+  {
+    category: "AI traffic analytics",
+    items: [
+      {
+        name: "AI traffic events / mo",
+        starter: "5M",
+        growth: "15M",
+        scale: "30M",
+        enterprise: "Unlimited",
+      },
+      {
+        name: "Agent feedback",
+        starter: "Included",
+        growth: "Included",
+        scale: "Included",
+        enterprise: "Included",
       },
     ],
   },

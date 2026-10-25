@@ -5683,7 +5683,7 @@
       "features": {
         "aiAnswers": "{count, number} getrackte KI-Antworten / Monat",
         "aiTrafficEvents": "{count, number} KI-Traffic-Events / Monat",
-        "aiTrafficEventsDetail": "Kostenlose KI-Traffic-Analyse und Agent-Feedback",
+        "aiTrafficEventsDetail": "Inklusive Agent-Feedback",
         "imageGenerations": "{count, number} Bildgenerierungen / Monat",
         "longFormPosts": "{count, number} Langform-Beiträge / Monat",
         "unlimitedSocialPosts": "Unbegrenzte Social-Beiträge",
@@ -5703,6 +5703,21 @@
       "invoiceSubscription": "Abonnement",
       "invoiceCreditsTopUp": "KI-Credits-Aufladung",
       "addonPrice": "+{price}/{interval, select, month {Monat} year {Jahr} other {{interval}}}"
+    },
+    "freePlan": {
+      "heading": "Free",
+      "description": "Du behältst Agent-Feedback und 1 Mio. KI-Traffic-Events pro Monat. Die im Plan enthaltenen Kontingente enden, gekaufte KI-Credits bleiben verfügbar.",
+      "periodEnd": "Dein bezahlter Plan bleibt bis zum {date, date, long} aktiv.",
+      "scheduled": "Dein Plan wechselt am {date, date, long} zu Free.",
+      "scheduledNoDate": "Dein Plan wechselt am Ende dieses Abrechnungszeitraums zu Free.",
+      "scheduledBadge": "Geplant",
+      "downgrade": "Zu Free wechseln",
+      "confirmTitle": "Zu Free wechseln?",
+      "confirmBody": "Dein bezahlter Plan endet mit diesem Abrechnungszeitraum. Danach behältst du Agent-Feedback und 1 Mio. KI-Traffic-Events pro Monat, und gekaufte KI-Credits bleiben verfügbar. Die im Plan enthaltenen Kontingente enden.",
+      "confirm": "Wechseln",
+      "cancel": "Plan behalten",
+      "success": "Dein Plan wechselt am Ende dieses Abrechnungszeitraums zu Free.",
+      "failed": "Dein Plan konnte nicht geändert werden. Bitte versuche es erneut."
     }
   },
   "logs": {
@@ -5792,7 +5807,7 @@
     },
     "upgrade": {
       "upgradeNow": "Jetzt upgraden",
-      "freeDescription": "Feedback ist kostenlos. Upgrade für KI-Inhalte und Sichtbarkeits-Tracking.",
+      "freeDescription": "Dein Free-Plan enthält Agent-Feedback und 1 Mio. KI-Traffic-Events pro Monat. Upgrade für KI-Inhalte, Sichtbarkeits-Tracking und höhere Event-Limits.",
       "freeHeading": "Hol mehr aus Notra raus",
       "upgradeToPlan": "Upgrade auf {plan}",
       "paidDescription": "Mehr KI-Antworten, Projekte und höhere Nutzungslimits."
