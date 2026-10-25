@@ -21,8 +21,12 @@ export function commitFingerprint(
   return `commits:${pull.repository}#${pull.number}`;
 }
 
+const WHITESPACE = /\s+/g;
+const INLINE_WHITESPACE = /[^\S\n]+/g;
+const BLANK_LINES = /\s*\n\s*\n\s*/g;
+
 export function describePullRequest(pull: MergedPullRequest) {
-  return `${pull.repository}#${pull.number} ${pull.title}: ${pull.body}`;
+  return `${pull.repository}#${pull.number} ${pull.title}: ${pull.body.replace(WHITESPACE, " ")}`;
 }
 
 export function pullRequestLabel(pull: MergedPullRequest) {
@@ -97,7 +101,12 @@ export function toMergedPullRequest(
     number: pull.number,
     title: pull.title,
     url: pull.url,
-    body: (pull.body ?? "").replace(/\s+/g, " ").slice(0, 600),
+    // Line breaks stay so the idea page can show headings and lists.
+    body: (pull.body ?? "")
+      .replace(INLINE_WHITESPACE, " ")
+      .replace(BLANK_LINES, "\n\n")
+      .trim()
+      .slice(0, 600),
     author: pull.author,
   };
 }

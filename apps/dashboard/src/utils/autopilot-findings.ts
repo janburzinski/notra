@@ -2,13 +2,27 @@ import {
   AUTOPILOT_IDEA_AUTO_WRITE_DAYS,
   AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE,
 } from "@/constants/autopilot";
-import type { AutopilotFindingView } from "@/types/autopilot";
+import type {
+  AutopilotFindingView,
+  AutopilotInlineSegment,
+  AutopilotSourceBlock,
+} from "@/types/autopilot";
 import { formatAutopilotPercent as percent } from "@/utils/autopilot-events";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const BLOG_TITLE_PREFIX = /^Blog post(?: for |: )/i;
 const WRAPPING_QUOTES = /^"(.*)"$/;
+const BRIEF_SOURCE_LINE = /^Based on [^\n]*\n+/;
+const HTML_COMMENT = /<!--[\s\S]*?-->/g;
+const MARKDOWN_IMAGE = /!\[[^\]]*\]\([^)]*\)/g;
+const GENERATED_FOOTER = /(?:🤖\s*)?Generated with \[[^\]]*\]\([^)]*\)/g;
+const EXTRA_BLANK_LINES = /\n{3,}/g;
+const MARKDOWN_HEADING = /^#{1,6}\s+(.*)$/;
+const MARKDOWN_BULLET = /^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ x]\]\s+)?(.*)$/i;
+const MARKDOWN_FENCE = /^\s*(```|~~~)/;
+const MARKDOWN_BOLD = /\*\*|__/g;
+const MARKDOWN_LINK = /\[([^\]]+)\]\([^)]*\)/g;
 
 /** The title without the "Blog post:" prefix the table and Slack already imply. */
 export function findingDisplayTitle(
@@ -79,4 +93,105 @@ export function describeFindingReason(
     return `Above the ${percent(threshold)} confidence threshold for a pull request.`;
   }
   return "Written on request from an idea.";
+}
+
+/**
+ * The source text an idea's post is written from, without the "Based on"
+ * line, template comments, images and agent footers.
+ */
+export function ideaSourceExcerpt(finding: AutopilotFindingView) {
+  const text = finding.evidence.brief?.evidence;
+  if (!text) {
+    return null;
+  }
+  const excerpt = text
+    .replace(BRIEF_SOURCE_LINE, "")
+    .replace(HTML_COMMENT, "")
+    .replace(MARKDOWN_IMAGE, "")
+    .replace(GENERATED_FOOTER, "")
+    .replace(MARKDOWN_BOLD, "")
+    .replace(MARKDOWN_LINK, "$1")
+    .replace(EXTRA_BLANK_LINES, "\n\n")
+    .trim();
+  return excerpt && excerpt !== finding.evidence.detail ? excerpt : null;
+}
+
+/**
+ * A pull request body as headings, paragraphs and lists, so the idea page can
+ * lay it out without rendering untrusted markdown as HTML.
+ */
+export function parseSourceBlocks(text: string): AutopilotSourceBlock[] {
+  const blocks: AutopilotSourceBlock[] = [];
+  let paragraph: { line: number; lines: string[] } | null = null;
+  let fence: { line: number; marker: string; lines: string[] } | null = null;
+  const flush = () => {
+    if (paragraph) {
+      blocks.push({
+        type: "paragraph",
+        line: paragraph.line,
+        text: paragraph.lines.join(" "),
+      });
+      paragraph = null;
+    }
+  };
+  for (const [line, raw] of text.split("\n").entries()) {
+    const marker = raw.match(MARKDOWN_FENCE)?.[1];
+    if (fence) {
+      if (marker === fence.marker) {
+        blocks.push({
+          type: "code",
+          line: fence.line,
+          text: fence.lines.join("\n"),
+        });
+        fence = null;
+      } else {
+        fence.lines.push(raw);
+      }
+      continue;
+    }
+    if (marker) {
+      flush();
+      fence = { line, marker, lines: [] };
+      continue;
+    }
+    const heading = raw.match(MARKDOWN_HEADING)?.[1]?.trim();
+    const bullet = raw.match(MARKDOWN_BULLET)?.[1]?.trim();
+    if (heading) {
+      flush();
+      blocks.push({ type: "heading", line, text: heading });
+    } else if (bullet) {
+      flush();
+      const last = blocks.at(-1);
+      if (last?.type === "list") {
+        last.items.push({ line, text: bullet });
+      } else {
+        blocks.push({ type: "list", line, items: [{ line, text: bullet }] });
+      }
+    } else if (raw.trim()) {
+      paragraph ??= { line, lines: [] };
+      paragraph.lines.push(raw.trim());
+    } else {
+      flush();
+    }
+  }
+  flush();
+  // A fence the 600-character cut left open still shows as code.
+  if (fence?.lines.length) {
+    blocks.push({
+      type: "code",
+      line: fence.line,
+      text: fence.lines.join("\n"),
+    });
+  }
+  return blocks;
+}
+
+/** Splits on backticks so code spans can be styled without HTML. */
+export function splitInlineCode(text: string): AutopilotInlineSegment[] {
+  let offset = 0;
+  return text.split("`").map((part, index) => {
+    const segment = { offset, text: part, code: index % 2 === 1 };
+    offset += part.length + 1;
+    return segment;
+  });
 }

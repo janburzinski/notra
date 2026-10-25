@@ -208,6 +208,47 @@ export interface AutopilotFindingPageProps {
   finding: AutopilotFindingView;
 }
 
+export interface AutopilotFindingSourceProps {
+  finding: AutopilotFindingView;
+}
+
+export interface AutopilotFindingSourceRowProps {
+  icon: IconSvgElement;
+  title: string;
+  /** Joined with dots; nulls are left out. */
+  meta: (string | null)[];
+  href?: string;
+}
+
+export interface AutopilotFindingSourceBlockProps {
+  label: string;
+  children: ReactNode;
+}
+
+/** One piece of a pull request body on the idea page. */
+/** `line` is where it starts in the source text and doubles as its key. */
+export type AutopilotSourceBlock =
+  | { type: "heading"; line: number; text: string }
+  | { type: "paragraph"; line: number; text: string }
+  | { type: "code"; line: number; text: string }
+  | { type: "list"; line: number; items: { line: number; text: string }[] };
+
+/** A run of text, or of code between backticks, at `offset` in its line. */
+export interface AutopilotInlineSegment {
+  offset: number;
+  text: string;
+  code: boolean;
+}
+
+export interface AutopilotSourceDescriptionProps {
+  label: string;
+  text: string;
+}
+
+export interface AutopilotSourceTextProps {
+  text: string;
+}
+
 export interface AutopilotFindingCandidate {
   title: string;
   share: number;

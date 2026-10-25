@@ -16,6 +16,7 @@ import { useFormatter } from "use-intl";
 import { AutopilotBackLink } from "@/components/autopilot/autopilot-back-link";
 import { AutopilotFact } from "@/components/autopilot/autopilot-fact";
 import { AutopilotFindingConfirmDialog } from "@/components/autopilot/autopilot-finding-confirm-dialog";
+import { AutopilotFindingSource } from "@/components/autopilot/autopilot-finding-source";
 import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding-status";
 import { AutopilotFindingTranscript } from "@/components/autopilot/autopilot-finding-transcript";
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
@@ -25,6 +26,7 @@ import { EmptyState } from "@/components/empty-state";
 import Link from "@/components/framework/link";
 import {
   AUTOPILOT_FROM_PARAM,
+  AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE,
   AUTOPILOT_NAV_LINK,
 } from "@/constants/autopilot";
 import { AUTOPILOT_KIND_META } from "@/constants/autopilot-ui";
@@ -38,8 +40,14 @@ import type {
   AutopilotFindingPageProps,
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
-import { runEventsRefetchInterval } from "@/utils/autopilot-events";
-import { describeFindingReason } from "@/utils/autopilot-findings";
+import {
+  formatAutopilotPercent,
+  runEventsRefetchInterval,
+} from "@/utils/autopilot-events";
+import {
+  describeFindingReason,
+  ideaAutoWriteAt,
+} from "@/utils/autopilot-findings";
 import { describeImpact } from "@/utils/autopilot-impact";
 import { tableHeightFor } from "@/utils/table";
 
@@ -110,6 +118,8 @@ function FindingPage({
   const considered: AutopilotFindingCandidate[] = (
     evidence.decision?.considered ?? []
   ).map((row, index) => ({ ...row, picked: index === 0 }));
+  const idea = finding.status === "suggested";
+  const factCount = 2 + Number(Boolean(impact)) + Number(idea);
   const canAct =
     overview.canManage &&
     !(writeSuggestion.isPending && writeSuggestion.variables === finding.id);
@@ -146,7 +156,9 @@ function FindingPage({
       <p className="text-foreground">
         {describeFindingReason(finding, formatDate)}
       </p>
-      <p>{evidence.detail ?? finding.summary}</p>
+      {evidence.pullRequests?.length ? null : (
+        <p>{evidence.detail ?? finding.summary}</p>
+      )}
       {evidence.updatePage ? (
         <p>
           Rewrites the existing page{" "}
@@ -213,7 +225,7 @@ function FindingPage({
           className={cn(
             TABLE_BODY_CLASS,
             "grid gap-x-8 gap-y-5 p-5",
-            impact ? "sm:grid-cols-3" : "sm:grid-cols-2"
+            factCount >= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
           )}
         >
           <AutopilotFact label="Status">
@@ -223,7 +235,22 @@ function FindingPage({
             {typeof evidence.confidence === "number"
               ? `${Math.round(evidence.confidence * 100)}%`
               : "Asked for"}
+            {idea ? (
+              <span className="text-muted-foreground">
+                {" "}
+                · pull requests need{" "}
+                {formatAutopilotPercent(
+                  evidence.decision?.threshold ??
+                    AUTOPILOT_JEV_AUTO_PROPOSE_CONFIDENCE
+                )}
+              </span>
+            ) : null}
           </AutopilotFact>
+          {idea ? (
+            <AutopilotFact label="Writes itself">
+              After {formatDate(ideaAutoWriteAt(finding))}
+            </AutopilotFact>
+          ) : null}
           {impact ? (
             <AutopilotFact label="Before → now">
               {describeImpact(impact, finding.status === "merged").text}
@@ -231,6 +258,8 @@ function FindingPage({
           ) : null}
         </dl>
       </div>
+
+      <AutopilotFindingSource finding={finding} />
 
       {finding.runId ? (
         <section aria-labelledby="finding-run" className="space-y-4">
