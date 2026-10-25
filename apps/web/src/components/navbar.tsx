@@ -406,7 +406,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
     shellTransition,
   } = getNavbarMotion(Boolean(reduceMotion), instantMenuMotion);
   const mutedNavClass =
-    "text-[#1E1E1EA6] hover:text-[#1E1E1E] dark:text-neutral-400 dark:hover:text-white";
+    "-mx-3 rounded-full px-3 py-1.5 text-[#1E1E1EA6] hover:bg-[#1E1E1E1F] hover:text-[#1E1E1E] dark:text-neutral-400 dark:hover:bg-white/14 dark:hover:text-white";
 
   return (
     <LazyMotion features={domAnimation}>
@@ -525,7 +525,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                   if (entry.type === "link") {
                     return (
                       <Link
-                        className={`duration-fast font-sans text-base leading-5 tracking-[-0.02em] transition-colors ease-out ${mutedNavClass}`}
+                        className={`duration-fast font-sans text-base leading-5 tracking-[-0.02em] transition-[color,background-color] ease-out ${mutedNavClass}`}
                         data-slot="navbar-entry"
                         to={entry.href}
                         key={entry.href}
@@ -550,7 +550,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                       }
                       aria-haspopup="menu"
                       data-slot="navbar-entry"
-                      className={`duration-fast inline-flex cursor-pointer items-center gap-1 font-sans text-base leading-5 tracking-[-0.02em] transition-colors ease-out aria-expanded:text-[#1E1E1E] dark:aria-expanded:text-white ${mutedNavClass}`}
+                      className={`duration-fast inline-flex cursor-pointer items-center gap-1 font-sans text-base leading-5 tracking-[-0.02em] transition-colors ease-out aria-expanded:bg-[#1E1E1E1F] aria-expanded:text-[#1E1E1E] dark:aria-expanded:bg-white/14 dark:aria-expanded:text-white ${mutedNavClass}`}
                       key={entry.label}
                       onClick={(event) => {
                         setKeyboardNavigation(event.detail === 0);
