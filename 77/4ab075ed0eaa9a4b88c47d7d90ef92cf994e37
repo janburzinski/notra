@@ -1,0 +1,21 @@
+apps/sites-e2e/scripts/constants/mutations.ts
+  s_44cf84a7c2985f::t_3a09783e3de20f 112
+apps/sites-e2e/scripts/mutation-check.ts
+  s_44cf84a7c2985f::t_3a09783e3de20f 148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "774ab075ed0eaa9a4b88c47d7d90ef92cf994e37",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
