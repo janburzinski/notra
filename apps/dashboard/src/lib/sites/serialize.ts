@@ -36,6 +36,7 @@ export function serializeSite(
     slug: site.slug,
     status: site.status,
     suspendedReason: site.suspendedReason,
+    suspendedBy: site.suspendedBy,
     repository:
       site.repositoryOwner && site.repositoryName
         ? {

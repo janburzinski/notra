@@ -943,6 +943,7 @@
     }
   },
   "errors": {
+    "tooManySitePreviews": "Too many site previews. Please try again shortly.",
     "notFound": {
       "title": "Page not found",
       "description": "Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.",
@@ -8002,6 +8003,8 @@
         "restoreDescription": "Serves the last live deployment again.",
         "restore": "Bring back online",
         "restored": "Site is back online",
+        "notraTitle": "Suspended by Notra",
+        "notraDescription": "This site was suspended by the Notra team. Contact support to bring it back online.",
         "failed": "Couldn't change the site status"
       },
       "analytics": {

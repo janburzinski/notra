@@ -6,6 +6,7 @@ import {
   SITE_DOMAIN_STATUSES,
   SITE_PREVIEW_VISIBILITIES,
   SITE_STATUSES,
+  SITE_SUSPENDERS,
 } from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteBuildMetrics } from "@notra/sites-core/types/build-metrics";
@@ -4000,6 +4001,7 @@ export const sites = pgTable(
     previewPassword: jsonb("preview_password").$type<SitePreviewPassword>(),
     status: text("status", { enum: SITE_STATUSES }).notNull().default("active"),
     suspendedReason: text("suspended_reason"),
+    suspendedBy: text("suspended_by", { enum: SITE_SUSPENDERS }),
     lastGeneration: integer("last_generation").notNull().default(0),
     activeProductionDeploymentId: text(
       "active_production_deployment_id"
@@ -4047,6 +4049,10 @@ export const sites = pgTable(
       sql`${table.previewVisibility} IN ('public', 'protected')`
     ),
     check("sites_lastGeneration_check", sql`${table.lastGeneration} >= 0`),
+    check(
+      "sites_suspendedBy_check",
+      sql`${table.suspendedBy} IN ('owner', 'notra')`
+    ),
   ]
 );
 
@@ -4268,9 +4274,11 @@ export const siteJobs = pgTable(
 
 export const siteSlugGrants = pgTable("site_slug_grants", {
   slug: text("slug").primaryKey(),
-  organizationId: text("organization_id")
-    .notNull()
-    .references(() => organizations.id, { onDelete: "cascade" }),
+  // Null keeps the slug blocked for everyone, e.g. after the owning
+  // organization is deleted, so proxies still pointing at it can't be taken.
+  organizationId: text("organization_id").references(() => organizations.id, {
+    onDelete: "set null",
+  }),
   note: text("note"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

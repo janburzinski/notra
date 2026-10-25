@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 
-import { SITE_PREVIEW_COOKIE } from "@notra/sites-core/constants/sites";
 import type {
   SiteManifest,
   SiteServingState,
@@ -8,6 +7,7 @@ import type {
 import { signSitePreviewToken } from "@notra/sites-core/utils/preview-token";
 
 import { LOOKUP_CACHE_LIMIT } from "../src/constants/cache";
+import { PREVIEW_SECURE_COOKIE } from "../src/constants/preview-auth";
 import { handleSiteRequest } from "../src/handler";
 import {
   loadHost,
@@ -145,6 +145,7 @@ function setup(
     previewSecret: SECRET,
     devHostOverrideToken: null,
     passwordAttemptLimiter: null,
+    sitePasswordAttemptLimiter: null,
     trafficIngestUrl: "https://ingest.example.com/api/geo/ingest",
     fetch: async (url, init) => {
       reports.push({ url, init });
@@ -489,6 +490,19 @@ describe("production serving", () => {
       301,
       "/blog/2024/post",
     ]);
+    const encodedCases: [string, string][] = [
+      ["%0d%0a", "/blog/%0D%0A"],
+      ["%E2%82%AC/a%20b", "/blog/%E2%82%AC/a%20b"],
+    ];
+    for (const [remainder, location] of encodedCases) {
+      const encoded = await request(
+        `https://acme.notra.site/blog/archive/${remainder}`
+      );
+      expect([encoded.status, encoded.headers.get("Location")]).toEqual([
+        301,
+        location,
+      ]);
+    }
   });
 
   test("path traversal and unknown hosts never reach the bucket", async () => {
@@ -689,6 +703,44 @@ describe("production serving", () => {
     );
     await settle();
     expect(reports).toHaveLength(0);
+  });
+
+  test("beacons from other sites are rejected, proxied origins are not", async () => {
+    const { deps, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    const beacon = (headers: Record<string, string>) =>
+      handleSiteRequest(
+        new Request("https://blog.acme.com/blog/_notra/e", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            v: "a1b2c3d4e5f6a7b8c9d0e1f2",
+            p: "/blog/post",
+            ms: 5,
+            sd: 0,
+          }),
+        }),
+        deps
+      );
+    const forged: Record<string, string>[] = [
+      { "Sec-Fetch-Site": "cross-site" },
+      { "Sec-Fetch-Site": "same-site" },
+      { Origin: "https://evil.notra.site" },
+    ];
+    for (const headers of forged) {
+      expect((await beacon(headers)).status).toBe(403);
+    }
+    await settle();
+    expect(reports).toHaveLength(0);
+    for (const origin of ["https://blog.acme.com", "https://acme.com"]) {
+      expect(
+        (await beacon({ Origin: origin, "Sec-Fetch-Site": "same-origin" }))
+          .status
+      ).toBe(204);
+    }
+    await settle();
+    expect(reports).toHaveLength(2);
   });
 
   test("the bare hosting domain names an abuse contact", async () => {
@@ -938,7 +990,7 @@ describe("previews", () => {
       const response = await handleSiteRequest(
         new Request("https://pr-7--acme.notra.site/blog/404.md", {
           method,
-          headers: { Cookie: `${SITE_PREVIEW_COOKIE}=${token}` },
+          headers: { Cookie: `${PREVIEW_SECURE_COOKIE}=${token}` },
         }),
         deps
       );
@@ -970,7 +1022,7 @@ describe("previews", () => {
     expect(login.headers.get("Set-Cookie")).toContain("HttpOnly");
 
     const page = await request("https://pr-7--acme.notra.site/blog/post", {
-      Cookie: `${SITE_PREVIEW_COOKIE}=${token}`,
+      Cookie: `${PREVIEW_SECURE_COOKIE}=${token}`,
     });
     expect(page.status).toBe(200);
     expect(await page.text()).toBe("dep_pr:/blog/post/index.html");
@@ -984,7 +1036,7 @@ describe("previews", () => {
     expect(
       (
         await request("https://pr-7--acme.notra.site/blog", {
-          Cookie: `${SITE_PREVIEW_COOKIE}=${otherPreview}`,
+          Cookie: `${PREVIEW_SECURE_COOKIE}=${otherPreview}`,
         })
       ).status
     ).toBe(401);
@@ -995,7 +1047,7 @@ describe("previews", () => {
     expect(
       (
         await request("https://pr-7--acme.notra.site/blog", {
-          Cookie: `${SITE_PREVIEW_COOKIE}=${expired}`,
+          Cookie: `${PREVIEW_SECURE_COOKIE}=${expired}`,
         })
       ).status
     ).toBe(401);

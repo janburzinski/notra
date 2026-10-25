@@ -116,7 +116,7 @@ certify remote permissions, edge settings or matching worker/dashboard secrets.
    Verify job delivery/retry, the minute redispatch cron and daily cleanup cron.
 5. Securely set worker `PREVIEW_SECRET` to the same strong secret as dashboard
    `SITES_PREVIEW_SECRET`. Secret-list output proves names only, not equality.
-6. Deploy the worker with the R2 and `PREVIEW_PASSWORD_LIMITER` bindings. Confirm
+6. Deploy the worker with the R2, `PREVIEW_PASSWORD_LIMITER` and `PREVIEW_PASSWORD_SITE_LIMITER` bindings. Confirm
    production has no `DEV_HOST_OVERRIDE_TOKEN`; never copy localhost/dev settings.
 7. Verify aliases, preview aliases, custom DNS/TLS and Worker routing. Protected
    responses must never be externally cached ahead of the worker auth fence.

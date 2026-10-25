@@ -69,6 +69,7 @@ export function readTarGz(
       TAR_BLOCK_SIZE * 4,
   });
   const files: ArchiveFile[] = [];
+  const seenPaths = new Set<string>();
   let offset = 0;
   let totalBytes = 0;
   let longName: string | null = null;
@@ -124,6 +125,12 @@ export function readTarGz(
         `Archive entry ${rawPath} escapes the output directory`
       );
     }
+    // Two entries for one path (`./a` and `a`) would race to the same R2 key
+    // while the manifest records both hashes.
+    if (seenPaths.has(path)) {
+      throw new UnsafeArchiveError(`Archive contains ${path} more than once`);
+    }
+    seenPaths.add(path);
     if (size > limits.maxFileBytes) {
       throw new UnsafeArchiveError(`${path} is larger than the per-file limit`);
     }

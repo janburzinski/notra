@@ -9,6 +9,11 @@ export interface SiteSourceEntry {
   size: number;
 }
 
+export interface SiteValidationDraftBudget {
+  count: number;
+  bytes: number;
+}
+
 export interface SiteSourceListing {
   commitSha: string;
   files: SiteSourceEntry[];

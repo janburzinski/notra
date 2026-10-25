@@ -19,6 +19,7 @@ export interface SitesEnv {
   PREVIEW_SECRET: string;
   DEV_HOST_OVERRIDE_TOKEN?: string;
   PREVIEW_PASSWORD_LIMITER?: RateLimit;
+  PREVIEW_PASSWORD_SITE_LIMITER?: RateLimit;
   TRAFFIC_INGEST_URL?: string;
 }
 
@@ -34,6 +35,7 @@ export interface SitesDeps {
   previewSecret: string;
   devHostOverrideToken: string | null;
   passwordAttemptLimiter: PasswordAttemptLimiter | null;
+  sitePasswordAttemptLimiter: PasswordAttemptLimiter | null;
   trafficIngestUrl: string | null;
   fetch: (url: string, init: RequestInit) => Promise<Response>;
   waitUntil: (promise: Promise<unknown>) => void;

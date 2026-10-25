@@ -12,6 +12,7 @@ import {
   SITE_PREVIEW_HOST_SEPARATOR,
   SITE_PREVIEW_KEY_MAX_LENGTH,
   SITE_RESERVED_SLUGS,
+  SITE_UNAVAILABLE_SLUGS,
   SITE_SLUG_MAX_LENGTH,
   SITE_SLUG_MIN_LENGTH,
 } from "@notra/sites-core/constants/sites";
@@ -46,12 +47,22 @@ export function isValidSiteSlug(slug: string): boolean {
     slug.length <= SITE_SLUG_MAX_LENGTH &&
     SLUG.test(slug) &&
     !slug.includes(SITE_PREVIEW_HOST_SEPARATOR) &&
-    !isReservedSiteSlug(slug)
+    !isHostReservedSlug(slug)
   );
 }
 
-export function isReservedSiteSlug(slug: string): boolean {
+function isHostReservedSlug(slug: string): boolean {
   return SITE_RESERVED_SLUGS.has(slug);
+}
+
+/** Whether a new site may not use this address. */
+export function isReservedSiteSlug(slug: string): boolean {
+  return SITE_RESERVED_SLUGS.has(slug) || SITE_UNAVAILABLE_SLUGS.has(slug);
+}
+
+/** A valid address that a new site may claim. */
+export function isAvailableSiteSlug(slug: string): boolean {
+  return isValidSiteSlug(slug) && !SITE_UNAVAILABLE_SLUGS.has(slug);
 }
 
 export function slugifySiteName(name: string): string {

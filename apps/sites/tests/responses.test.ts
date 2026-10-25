@@ -18,10 +18,14 @@ const deps = {
   waitUntil: () => undefined,
 } as unknown as SitesDeps;
 
+// sha256("body")
+const BODY_SHA256 =
+  "230d8358dc8e8890b4c58deeb62912ee2f20357ae92a5cc861b98e68fe31acb5";
+
 const file = (path: string, contentType: string): SiteManifestFile => ({
   path,
   size: 4,
-  sha256: "0".repeat(64),
+  sha256: BODY_SHA256,
   contentType,
 });
 
@@ -106,5 +110,33 @@ describe("caching", () => {
     await Promise.all(pending);
     expect(await request("dep_b", "/changelog/images/a.webp")).toBe("body");
     expect(reads).toBe(1);
+  });
+
+  test("bodies that don't match the manifest hash are served but not cached", async () => {
+    const stored = new Map<string, Response>();
+    const pending: Promise<unknown>[] = [];
+    const response = await serveFile({
+      deps: {
+        bucket: {
+          get: async () => ({ body: new Response("evil").body }),
+        },
+        cache: {
+          match: async () => undefined,
+          put: async (key: string, value: Response) => {
+            stored.set(key, value);
+          },
+        },
+        waitUntil: (promise: Promise<unknown>) => pending.push(promise),
+      } as unknown as SitesDeps,
+      request: new Request("https://acme.notra.site/blog/index.html"),
+      siteId: "site_a",
+      deploymentId: "dep_a",
+      file: file("/blog/index.html", "text/html"),
+      status: 200,
+      isPreview: false,
+    });
+    expect(await response.text()).toBe("evil");
+    await Promise.all(pending);
+    expect(stored.size).toBe(0);
   });
 });

@@ -166,6 +166,7 @@ import {
   SITE_DEPLOYMENTS_PAGE_LIMIT,
 } from "@/constants/sites";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
+import { assertActiveSubscription } from "@/lib/billing/subscription";
 import { afterResponse } from "@/lib/framework/after-response";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { getTranslations } from "@/lib/i18n/server";
@@ -177,6 +178,7 @@ import {
   forbidden,
   notFound,
   serviceUnavailable,
+  tooManyRequests,
 } from "@/lib/orpc/utils/errors";
 import { toGeoOrpcError } from "@/lib/orpc/utils/geo-errors";
 import { assertSitesAccess } from "@/lib/sites/access";
@@ -214,6 +216,7 @@ import {
   prepareSiteImage,
   SiteImageInputError,
 } from "@/utils/prepare-site-image";
+import { ratelimit } from "@/utils/ratelimit";
 import {
   canUndoSiteRollback,
   siteDeploymentActions,
@@ -262,6 +265,25 @@ async function deployPublishedCommit(
       sitesPublish: { siteId: site.id, commitSha, deployPending: true },
     });
     return true;
+  }
+}
+
+// Same budget as agent previews: every post preview starts a site build.
+async function assertPostPreviewRateLimit(organizationId: string) {
+  if (
+    !(
+      process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    )
+  ) {
+    return;
+  }
+  const { success } = await ratelimit.githubPublish.limit(
+    `agent-preview:${organizationId}`
+  );
+  if (!success) {
+    throw tooManyRequests(
+      (await getTranslations("errors"))("tooManySitePreviews")
+    );
   }
 }
 
@@ -744,7 +766,25 @@ export const sitesRouter = {
       .input(siteDeploymentInputSchema)
       .handler(async ({ context, input }) => {
         assertNotDemo();
-        const { site, userId } = await requireSite(context, input);
+        const { site, userId, canManageDeployments } = await requireSite(
+          context,
+          input
+        );
+        // Rebuilding production from before the live deployment is a
+        // rollback, which is admin-only. Retrying newer builds stays open.
+        if (!canManageDeployments && site.activeProductionDeploymentId) {
+          const [target, active] = await Promise.all([
+            getDeployment(input.deploymentId),
+            getDeployment(site.activeProductionDeploymentId),
+          ]);
+          if (
+            target?.kind === "production" &&
+            active &&
+            target.generation < active.generation
+          ) {
+            throw forbidden("Only owners and admins can do this");
+          }
+        }
         dispatchLater([await redeploy(site, input.deploymentId, userId)]);
         return { ok: true };
       }),
@@ -810,6 +850,8 @@ export const sitesRouter = {
       .handler(async ({ context, input }) => {
         assertNotDemo();
         const { site, userId } = await requireSite(context, input);
+        await assertActiveSubscription(input.organizationId);
+        await assertPostPreviewRateLimit(input.organizationId);
         const result = await previewPostOnSite({
           site,
           postId: input.postId,

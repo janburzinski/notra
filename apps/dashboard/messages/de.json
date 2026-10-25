@@ -943,6 +943,7 @@
     }
   },
   "errors": {
+    "tooManySitePreviews": "Zu viele Website-Vorschauen. Bitte versuch es gleich nochmal.",
     "notFound": {
       "title": "Seite nicht gefunden",
       "description": "Die gesuchte Seite konnte leider nicht gefunden werden. Möglicherweise wurde sie verschoben oder gelöscht.",
@@ -8002,6 +8003,8 @@
         "restoreDescription": "Liefert das letzte Live-Deployment wieder aus.",
         "restore": "Wieder online nehmen",
         "restored": "Seite ist wieder online",
+        "notraTitle": "Von Notra gesperrt",
+        "notraDescription": "Diese Website wurde vom Notra-Team gesperrt. Wende dich an den Support, um sie wieder online zu bringen.",
         "failed": "Status der Seite konnte nicht geändert werden"
       },
       "analytics": {

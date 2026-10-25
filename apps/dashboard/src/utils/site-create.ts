@@ -1,4 +1,4 @@
-import { isValidSiteSlug } from "@notra/sites-core/utils/hosts";
+import { isAvailableSiteSlug } from "@notra/sites-core/utils/hosts";
 import type { RepositoryContentCount } from "@notra/sites-server/types/github";
 import type { SiteInputField } from "@notra/sites-server/types/sites";
 import { ORPCError } from "@orpc/client";
@@ -44,7 +44,7 @@ export function siteCreateInput(
 /** An empty slug is fine: the server derives one from the name. */
 export function isSiteSlugInvalid(slug: string): boolean {
   const normalized = slug.trim().toLowerCase();
-  return normalized.length > 0 && !isValidSiteSlug(normalized);
+  return normalized.length > 0 && !isAvailableSiteSlug(normalized);
 }
 
 export function isSiteCreateSlugInvalid(form: SiteCreateFormValues): boolean {

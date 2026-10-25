@@ -11,6 +11,7 @@ import { hashPreviewPassword } from "@notra/sites-core/utils/preview-password";
 import { revokePreviewSessionsInState } from "@notra/sites-core/utils/preview-revocation";
 import { signSitePreviewToken } from "@notra/sites-core/utils/preview-token";
 
+import { PREVIEW_SECURE_COOKIE } from "../src/constants/preview-auth";
 import { handleSiteRequest } from "../src/handler";
 import { resetCachesForTests } from "../src/loaders";
 import type { SitesDeps } from "../src/types/worker";
@@ -73,7 +74,9 @@ function previewManifest(): SiteManifest {
 function setup(previewPassword: SitePreviewPassword | null = password) {
   const objects = new Map<string, string>();
   const limiterKeys: string[] = [];
+  const siteLimiterKeys: string[] = [];
   let allowedAttempts = Number.POSITIVE_INFINITY;
+  let allowedSiteAttempts = Number.POSITIVE_INFINITY;
   const state: SiteServingState = {
     version: 1,
     siteId: SITE,
@@ -147,6 +150,12 @@ function setup(previewPassword: SitePreviewPassword | null = password) {
         return { success: limiterKeys.length <= allowedAttempts };
       },
     },
+    sitePasswordAttemptLimiter: {
+      limit: async ({ key }) => {
+        siteLimiterKeys.push(key);
+        return { success: siteLimiterKeys.length <= allowedSiteAttempts };
+      },
+    },
     waitUntil: () => undefined,
     now: () => NOW,
   };
@@ -158,14 +167,14 @@ function setup(previewPassword: SitePreviewPassword | null = password) {
     handleSiteRequest(
       new Request(url, {
         headers: cookie
-          ? { ...headers, Cookie: `${SITE_PREVIEW_COOKIE}=${cookie}` }
+          ? { ...headers, Cookie: `${PREVIEW_SECURE_COOKIE}=${cookie}` }
           : headers,
       }),
       deps
     );
   const submit = (
     fields: Record<string, string>,
-    options: { origin?: string; host?: string } = {}
+    options: { origin?: string; host?: string; ip?: string } = {}
   ) => {
     const host = options.host ?? PREVIEW;
     return handleSiteRequest(
@@ -174,7 +183,7 @@ function setup(previewPassword: SitePreviewPassword | null = password) {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           Origin: options.origin ?? host,
-          "CF-Connecting-IP": "203.0.113.9",
+          "CF-Connecting-IP": options.ip ?? "203.0.113.9",
         },
         body: new URLSearchParams(fields).toString(),
       }),
@@ -188,15 +197,19 @@ function setup(previewPassword: SitePreviewPassword | null = password) {
     get,
     submit,
     limiterKeys,
+    siteLimiterKeys,
     limitTo: (attempts: number) => {
       allowedAttempts = attempts;
+    },
+    limitSiteTo: (attempts: number) => {
+      allowedSiteAttempts = attempts;
     },
   };
 }
 
 function cookieValue(response: Response): string {
   const header = response.headers.get("Set-Cookie") ?? "";
-  const match = new RegExp(`${SITE_PREVIEW_COOKIE}=([^;]*)`).exec(header);
+  const match = new RegExp(`${PREVIEW_SECURE_COOKIE}=([^;]*)`).exec(header);
   return match?.[1] ?? "";
 }
 
@@ -458,6 +471,26 @@ describe("preview password", () => {
     expect(await blocked.text()).toContain("Too many attempts");
     expect(limiterKeys[0]).toBe(`${SITE}:pr-7:203.0.113.9`);
   });
+
+  test("IPv6 clients are limited per /64 and the whole site has a cap", async () => {
+    const { submit, limiterKeys, siteLimiterKeys, limitSiteTo } = setup();
+    limitSiteTo(2);
+    for (const ip of ["2001:db8:0:1::1", "2001:DB8::1:abcd:0:0:2"]) {
+      expect((await submit({ password: "a", next: "/" }, { ip })).status).toBe(
+        401
+      );
+    }
+    expect(limiterKeys).toEqual([
+      `${SITE}:pr-7:2001:db8:0:1::/64`,
+      `${SITE}:pr-7:2001:db8:0:1::/64`,
+    ]);
+    const blocked = await submit(
+      { password: PASSWORD, next: "/" },
+      { ip: "198.51.100.4" }
+    );
+    expect(blocked.status).toBe(429);
+    expect(siteLimiterKeys).toEqual([SITE, SITE, SITE]);
+  });
 });
 
 describe("preview login and lifecycle", () => {
@@ -491,6 +524,30 @@ describe("preview login and lifecycle", () => {
       `http://pr-7--acme.notra.site/_notra/auth?token=${token}&next=/blog`
     );
     expect(login.headers.get("Set-Cookie")).not.toContain("Secure");
+    expect(login.headers.get("Set-Cookie")).toStartWith(
+      `${SITE_PREVIEW_COOKIE}=`
+    );
+  });
+
+  test("https sessions use a __Host- cookie that a planted one can't shadow", async () => {
+    const { get } = setup();
+    const token = await signSitePreviewToken(memberClaims(), SECRET);
+    const login = await get(`${PREVIEW}/_notra/auth?token=${token}&next=/blog`);
+    expect(login.headers.get("Set-Cookie")).toStartWith(
+      `${PREVIEW_SECURE_COOKIE}=${token}; Path=/;`
+    );
+    const planted = await signSitePreviewToken(
+      { ...memberClaims(), previewKey: "pr-8" },
+      SECRET
+    );
+    const page = await get(`${PREVIEW}/blog`, undefined, {
+      Cookie: `${PREVIEW_SECURE_COOKIE}=${planted}; ${PREVIEW_SECURE_COOKIE}=${token}`,
+    });
+    expect(page.status).toBe(200);
+    const legacy = await get(`${PREVIEW}/blog`, undefined, {
+      Cookie: `${SITE_PREVIEW_COOKIE}=${token}`,
+    });
+    expect(legacy.status).toBe(401);
   });
 
   test("a non-member coming back from the dashboard sees why, not a loop", async () => {

@@ -32,6 +32,32 @@ export const SITE_RESERVED_SLUGS = new Set([
   "static",
   "status",
 ]);
+/**
+ * Blocked for new sites only. Host parsing keeps using SITE_RESERVED_SLUGS so
+ * a live site that already has one of these addresses keeps resolving.
+ */
+export const SITE_UNAVAILABLE_SLUGS = new Set([
+  "abuse",
+  "account",
+  "accounts",
+  "auth",
+  "autoconfig",
+  "autodiscover",
+  "billing",
+  "cname",
+  "console",
+  "dashboard",
+  "fallback",
+  "help",
+  "ingest",
+  "login",
+  "mta-sts",
+  "origin",
+  "security",
+  "signin",
+  "sites",
+  "support",
+]);
 export const SITE_MOUNT_MAX_SEGMENTS = 3;
 export const SITE_MAX_REMOVED_PREVIEWS = 200;
 
@@ -174,6 +200,7 @@ export const SITE_DEPLOYMENT_TRIGGERS = [
 
 export const SITE_PREVIEW_VISIBILITIES = ["public", "protected"] as const;
 export const SITE_STATUSES = ["active", "suspended"] as const;
+export const SITE_SUSPENDERS = ["owner", "notra"] as const;
 export const SITE_DOMAIN_KINDS = ["subdomain", "proxy"] as const;
 export const SITE_DOMAIN_STATUSES = [
   "pending",

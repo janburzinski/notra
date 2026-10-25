@@ -4,6 +4,7 @@ import type { SiteManifestFile } from "@notra/sites-core/types/deployment";
 import { injectAnalyticsScript } from "./analytics";
 import {
   ASSET_SEGMENT,
+  EDGE_CACHE_MAX_FILE_BYTES,
   EDGE_CACHE_ORIGIN,
   IMMUTABLE_CACHE_CONTROL,
   PREVIEW_CACHE_CONTROL,
@@ -13,6 +14,7 @@ import { serviceErrorPage } from "./pages";
 import type { ServeFileParams } from "./types/serving";
 import type { SitesDeps } from "./types/worker";
 import { html } from "./utils/responses";
+import { readVerifiedBody } from "./utils/verified-body";
 
 function fileCacheControl(file: SiteManifestFile, isPreview: boolean): string {
   if (isPreview) {
@@ -39,20 +41,26 @@ async function readFileBody(
   const object = await deps.bucket.get(
     SITE_R2_KEYS.file(siteId, deploymentId, file.path)
   );
-  if (!(object?.body && deps.cache)) {
+  if (!(object?.body && deps.cache) || file.size > EDGE_CACHE_MAX_FILE_BYTES) {
     return object?.body ?? null;
   }
+  const { cache } = deps;
   const [forClient, forCache] = object.body.tee();
   deps.waitUntil(
-    deps.cache.put(
-      cacheKey,
-      new Response(forCache, {
-        headers: {
-          "Content-Type": file.contentType,
-          "Cache-Control": IMMUTABLE_CACHE_CONTROL,
-        },
-      })
-    )
+    readVerifiedBody(forCache, file).then(async (verified) => {
+      if (!verified) {
+        return;
+      }
+      await cache.put(
+        cacheKey,
+        new Response(verified, {
+          headers: {
+            "Content-Type": file.contentType,
+            "Cache-Control": IMMUTABLE_CACHE_CONTROL,
+          },
+        })
+      );
+    })
   );
   return forClient;
 }

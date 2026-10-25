@@ -8,6 +8,7 @@ import {
   SITE_PROTECTED_SLUG_WORDS,
   SITE_RESERVED_BRAND_SLUGS,
 } from "./constants/moderation";
+import { SITE_SLUG_RETIRED_NOTE } from "./constants/sites";
 import { SiteInputError } from "./errors";
 import type { SiteNameRejection, SiteNameRejectionParams } from "./types/sites";
 import { reservedSlugMessage } from "./utils/moderation";
@@ -33,13 +34,16 @@ async function siteNameRejection(
   const { slug } = params;
   if (slug) {
     const grant = await db.query.siteSlugGrants.findFirst({
-      columns: { organizationId: true },
+      columns: { organizationId: true, note: true },
       where: eq(siteSlugGrants.slug, slug),
     });
-    if (grant) {
-      return grant.organizationId === params.organizationId
-        ? null
-        : { message: SITE_NAME_REJECTION_MESSAGES.granted, field: "slug" };
+    if (grant && grant.organizationId !== params.organizationId) {
+      return { message: SITE_NAME_REJECTION_MESSAGES.granted, field: "slug" };
+    }
+    // Staff grants are trusted outright. A slug kept after deleting a site
+    // only keeps other organizations out; it gets every check a free slug gets.
+    if (grant && grant.note !== SITE_SLUG_RETIRED_NOTE) {
+      return null;
     }
     if (slug.split("-").some((word) => SITE_PROTECTED_SLUG_WORDS.has(word))) {
       return {

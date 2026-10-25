@@ -6,6 +6,7 @@ import {
   siteBranchDrafts,
   siteDrafts,
   siteJobs,
+  siteSlugGrants,
   sites,
 } from "@notra/db/schema";
 import {
@@ -13,8 +14,9 @@ import {
   SITE_PREVIEW_PASSWORD_MIN_LENGTH,
 } from "@notra/sites-core/constants/sites";
 import type { SiteMounts } from "@notra/sites-core/types/deployment";
+import type { SiteSuspender } from "@notra/sites-core/types/sites";
 import {
-  isValidSiteSlug,
+  isAvailableSiteSlug,
   siteAliasHost,
   slugifySiteName,
 } from "@notra/sites-core/utils/hosts";
@@ -23,11 +25,13 @@ import { hashPreviewPassword } from "@notra/sites-core/utils/preview-password";
 import { and, eq, inArray, sql, or, isNull } from "drizzle-orm";
 
 import { deleteCustomHostnameQuietly } from "./cloudflare-saas";
+import { SITE_NAME_REJECTION_MESSAGES } from "./constants/moderation";
 import {
   DEFAULT_SITE_MOUNTS,
   SITE_SLUG_ATTEMPTS,
   SITE_SLUG_FALLBACK_MAX_LENGTH,
   SITE_SLUG_RETRY_ROOT_MAX_LENGTH,
+  SITE_SLUG_RETIRED_NOTE,
   SITE_SLUG_RETRY_SUFFIX_LENGTH,
 } from "./constants/sites";
 import { deployBranchHead } from "./deploy";
@@ -55,7 +59,7 @@ import { errorMessage } from "./utils/errors";
 import { prefixedId } from "./utils/ids";
 import { invalidateSiteIngestCaches } from "./utils/ingest-cache";
 import { parseRootDirectory } from "./utils/root-directory";
-import { acquireSiteHostLock } from "./utils/site-host-lock";
+import { acquireSiteHostLock, withSiteHostLock } from "./utils/site-host-lock";
 import { siteAliasOrigin } from "./utils/urls";
 
 function siteAliasHostname(slug: string): string {
@@ -70,8 +74,11 @@ function parseMounts(mounts: SiteMounts): SiteMounts {
   }
 }
 
-async function uniqueSlug(base: string): Promise<string> {
-  const root = isValidSiteSlug(base)
+async function uniqueSlug(
+  base: string,
+  organizationId: string
+): Promise<string> {
+  const root = isAvailableSiteSlug(base)
     ? base
     : `site-${base}`.slice(0, SITE_SLUG_FALLBACK_MAX_LENGTH).replace(/-$/, "");
   for (let attempt = 0; attempt < SITE_SLUG_ATTEMPTS; attempt += 1) {
@@ -81,7 +88,7 @@ async function uniqueSlug(base: string): Promise<string> {
         : `${root.slice(0, SITE_SLUG_RETRY_ROOT_MAX_LENGTH)}-${Math.random()
             .toString(36)
             .slice(2, 2 + SITE_SLUG_RETRY_SUFFIX_LENGTH)}`;
-    if (!isValidSiteSlug(candidate)) {
+    if (!isAvailableSiteSlug(candidate)) {
       continue;
     }
     const [taken] = await db
@@ -89,7 +96,7 @@ async function uniqueSlug(base: string): Promise<string> {
       .from(sites)
       .where(eq(sites.slug, candidate))
       .limit(1);
-    if (!taken) {
+    if (!(taken || (await isSlugHeldForOther(candidate, organizationId)))) {
       return candidate;
     }
   }
@@ -97,6 +104,19 @@ async function uniqueSlug(base: string): Promise<string> {
     "Could not find a free site address; pick a different name",
     { field: "name" }
   );
+}
+
+async function isSlugHeldForOther(
+  slug: string,
+  organizationId: string,
+  executor: SiteStorageTransaction | typeof db = db
+): Promise<boolean> {
+  const [grant] = await executor
+    .select({ organizationId: siteSlugGrants.organizationId })
+    .from(siteSlugGrants)
+    .where(eq(siteSlugGrants.slug, slug))
+    .limit(1);
+  return grant !== undefined && grant.organizationId !== organizationId;
 }
 
 export async function createSite(
@@ -127,14 +147,18 @@ export async function createSite(
   const rootDirectory = parseRootDirectory(input.rootDirectory ?? "");
   const mounts = parseMounts(input.mounts ?? DEFAULT_SITE_MOUNTS);
   const requestedSlug = input.slug?.trim().toLowerCase();
-  if (requestedSlug && !isValidSiteSlug(requestedSlug)) {
+  if (requestedSlug && !isAvailableSiteSlug(requestedSlug)) {
     throw new SiteInputError(
       "Use 3-40 lowercase letters, digits and single dashes for the address",
       { field: "slug" }
     );
   }
   const slug =
-    requestedSlug ?? (await uniqueSlug(slugifySiteName(input.name) || "site"));
+    requestedSlug ??
+    (await uniqueSlug(
+      slugifySiteName(input.name) || "site",
+      input.organizationId
+    ));
   const siteId = prefixedId("site");
   const aliasHost = siteAliasHostname(slug);
   await assertSiteNameAllowed({
@@ -145,32 +169,44 @@ export async function createSite(
     slug,
   });
 
-  await claimHostRecord(aliasHost, { siteId, kind: "alias" });
   let site: Site | undefined;
   try {
-    [site] = await db
-      .insert(sites)
-      .values({
-        id: siteId,
-        organizationId: input.organizationId,
-        projectId: project.id,
-        name: input.name.trim(),
-        slug,
-        repositoryId: integration.id,
-        githubInstallationId: repository.installationId,
-        githubRepositoryId: integration.githubRepositoryId,
-        repositoryOwner: repository.owner,
-        repositoryName: repository.repo,
-        productionBranch:
-          input.productionBranch?.trim() || integration.defaultBranch || "main",
-        rootDirectory,
-        publicOrigin: siteAliasOrigin(slug),
-        mounts,
-        previewVisibility: input.previewVisibility ?? "protected",
-        previewsEnabled: input.previewsEnabled ?? true,
-        createdByUserId: input.userId,
-      })
-      .returning();
+    // Deletion retires the slug while holding this lock, so the grant is
+    // rechecked under it before the alias is claimed.
+    site = await withSiteHostLock(aliasHost, async (tx) => {
+      if (await isSlugHeldForOther(slug, input.organizationId, tx)) {
+        throw new SiteInputError(SITE_NAME_REJECTION_MESSAGES.granted, {
+          field: "slug",
+        });
+      }
+      await claimHostRecord(aliasHost, { siteId, kind: "alias" });
+      const [inserted] = await tx
+        .insert(sites)
+        .values({
+          id: siteId,
+          organizationId: input.organizationId,
+          projectId: project.id,
+          name: input.name.trim(),
+          slug,
+          repositoryId: integration.id,
+          githubInstallationId: repository.installationId,
+          githubRepositoryId: integration.githubRepositoryId,
+          repositoryOwner: repository.owner,
+          repositoryName: repository.repo,
+          productionBranch:
+            input.productionBranch?.trim() ||
+            integration.defaultBranch ||
+            "main",
+          rootDirectory,
+          publicOrigin: siteAliasOrigin(slug),
+          mounts,
+          previewVisibility: input.previewVisibility ?? "protected",
+          previewsEnabled: input.previewsEnabled ?? true,
+          createdByUserId: input.userId,
+        })
+        .returning();
+      return inserted;
+    });
   } catch (error) {
     await releaseHostRecord(aliasHost, siteId);
     throw error;
@@ -198,14 +234,36 @@ export async function createSite(
 export async function setSiteSuspended(
   site: Site,
   suspended: boolean,
-  reason?: string
+  reason?: string,
+  by: SiteSuspender = "owner"
 ): Promise<void> {
   const status = suspended ? "suspended" : "active";
-  await setServingStatus(site, status);
-  await db
-    .update(sites)
-    .set({ status, suspendedReason: suspended ? (reason ?? null) : null })
-    .where(eq(sites.id, site.id));
+  await db.transaction(async (tx) => {
+    // Re-read under lock so an owner request can't overwrite a Notra
+    // suspension that landed after the caller loaded the site.
+    const [current] = await tx
+      .select({ suspendedBy: sites.suspendedBy })
+      .from(sites)
+      .where(eq(sites.id, site.id))
+      .for("update");
+    if (!current) {
+      throw new SiteInputError("Site not found");
+    }
+    if (by === "owner" && current.suspendedBy === "notra") {
+      throw new SiteInputError(
+        "Notra suspended this site. Contact support to restore it."
+      );
+    }
+    await setServingStatus(site, status, tx);
+    await tx
+      .update(sites)
+      .set({
+        status,
+        suspendedReason: suspended ? (reason ?? null) : null,
+        suspendedBy: suspended ? by : null,
+      })
+      .where(eq(sites.id, site.id));
+  });
   await invalidateSiteIngestCaches(site);
 }
 
@@ -455,6 +513,28 @@ export async function deleteSite(
     .where(
       and(eq(siteDomains.siteId, site.id), eq(siteDomains.kind, "subdomain"))
     );
+  // Proxies elsewhere may still point at the alias, so the slug stays with
+  // this organization; a Notra suspension keeps it blocked for everyone.
+  // Locked reread: a Notra suspension committed after the caller's read must
+  // still block the slug for everyone.
+  const [lockedSite] = await tx
+    .select({ suspendedBy: sites.suspendedBy })
+    .from(sites)
+    .where(eq(sites.id, site.id))
+    .for("update");
+  const slugOwner =
+    lockedSite?.suspendedBy === "notra" ? null : site.organizationId;
+  const retiredSlug = tx.insert(siteSlugGrants).values({
+    slug: site.slug,
+    organizationId: slugOwner,
+    note: SITE_SLUG_RETIRED_NOTE,
+  });
+  await (slugOwner === null
+    ? retiredSlug.onConflictDoUpdate({
+        target: siteSlugGrants.slug,
+        set: { organizationId: null },
+      })
+    : retiredSlug.onConflictDoNothing({ target: siteSlugGrants.slug }));
   await releaseHostRecord(siteAliasHostname(site.slug), site.id, tx);
   for (const domain of subdomains) {
     await releaseHostRecord(domain.hostname, site.id, tx);

@@ -17,3 +17,5 @@ export const DOMAIN_OWNERSHIP_RECORD_PREFIX = "_notra.";
 export const DOMAIN_OWNERSHIP_DNS_SERVERS = ["1.1.1.1", "1.0.0.1"];
 export const DOMAIN_OWNERSHIP_MAX_RECORDS = 32;
 export const DOMAIN_OWNERSHIP_MAX_BYTES = 8192;
+/** Every subdomain becomes a billable Cloudflare custom hostname. */
+export const SITE_MAX_DOMAINS = 20;

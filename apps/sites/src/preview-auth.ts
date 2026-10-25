@@ -1,5 +1,4 @@
 import {
-  SITE_PREVIEW_COOKIE,
   SITE_PREVIEW_MEMBER_RENEW_SECONDS,
   SITE_PREVIEW_PASSWORD_MAX_LENGTH,
   SITE_PREVIEW_SESSION_SECONDS,
@@ -26,7 +25,8 @@ import type {
   PreviewRequestContext,
 } from "./types/preview-auth";
 import type { SitesDeps } from "./types/worker";
-import { readCookie } from "./utils/cookies";
+import { rateLimitClientKey } from "./utils/client-ip";
+import { previewCookieName, readCookies } from "./utils/cookies";
 import { html } from "./utils/responses";
 
 function nowSeconds(deps: SitesDeps): number {
@@ -66,7 +66,7 @@ function previewGate(
 
 function sessionCookie(url: URL, value: string, maxAge: number): string {
   const secure = url.protocol === "https:" ? "; Secure" : "";
-  return `${SITE_PREVIEW_COOKIE}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly${secure}; SameSite=Lax`;
+  return `${previewCookieName(url)}=${value}; Path=/; Max-Age=${maxAge}; HttpOnly${secure}; SameSite=Lax`;
 }
 
 function previewSessionAllows(
@@ -178,6 +178,32 @@ function isCrossOrigin(request: Request, origin: string): boolean {
   return requestOrigin !== null && requestOrigin !== origin;
 }
 
+async function passwordAttemptAllowed(
+  context: PreviewRequestContext
+): Promise<boolean> {
+  const { deps, request, siteId, previewKey } = context;
+  if (deps.passwordAttemptLimiter) {
+    const client = rateLimitClientKey(
+      request.headers.get("CF-Connecting-IP") ?? "unknown"
+    );
+    const { success } = await deps.passwordAttemptLimiter.limit({
+      key: `${siteId}:${previewKey}:${client}`,
+    });
+    if (!success) {
+      return false;
+    }
+  }
+  // Caps the whole site, so rotating IPs or preview keys can't multiply the
+  // guesses an attacker gets.
+  if (deps.sitePasswordAttemptLimiter) {
+    const { success } = await deps.sitePasswordAttemptLimiter.limit({
+      key: siteId,
+    });
+    return success;
+  }
+  return true;
+}
+
 async function acceptPassword(
   context: PreviewRequestContext
 ): Promise<Response> {
@@ -186,14 +212,8 @@ async function acceptPassword(
   if (!stored || isCrossOrigin(request, origin)) {
     return previewGate(context, "/", 403);
   }
-  if (deps.passwordAttemptLimiter) {
-    const client = request.headers.get("CF-Connecting-IP") ?? "unknown";
-    const { success } = await deps.passwordAttemptLimiter.limit({
-      key: `${siteId}:${previewKey}:${client}`,
-    });
-    if (!success) {
-      return previewGate(context, "/", 429, "too_many_attempts");
-    }
+  if (!(await passwordAttemptAllowed(context))) {
+    return previewGate(context, "/", 429, "too_many_attempts");
   }
   const form = await readPasswordForm(request);
   if (!form) {
@@ -244,22 +264,30 @@ export async function previewAccessDenied(
   context: PreviewRequestContext
 ): Promise<Response | null> {
   const { deps, request, url, state, siteId, previewKey } = context;
-  const cookie = readCookie(request, SITE_PREVIEW_COOKIE);
-  const session = cookie
-    ? await readSitePreviewToken(cookie, deps.previewSecret, nowSeconds(deps))
-    : null;
-  const allowed =
-    session !== null &&
-    previewSessionAllows(session.claims, state, siteId, previewKey);
-  const next = `${url.pathname}${url.search}`;
-  if (allowed && !session.expired) {
-    return null;
+  // Any valid value wins: a cookie someone else planted under the same name
+  // must not shadow the visitor's own session.
+  let expiredMember = false;
+  for (const cookie of readCookies(request, previewCookieName(url))) {
+    const session = await readSitePreviewToken(
+      cookie,
+      deps.previewSecret,
+      nowSeconds(deps)
+    );
+    if (
+      !(
+        session &&
+        previewSessionAllows(session.claims, state, siteId, previewKey)
+      )
+    ) {
+      continue;
+    }
+    if (!session.expired) {
+      return null;
+    }
+    expiredMember ||= session.claims.kind === "member";
   }
-  if (
-    allowed &&
-    session.claims.kind === "member" &&
-    isPageNavigation(request)
-  ) {
+  const next = `${url.pathname}${url.search}`;
+  if (expiredMember && isPageNavigation(request)) {
     return noStoreRedirect(
       previewSignInUrl(deps, siteId, previewKey, next),
       302

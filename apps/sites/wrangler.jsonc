@@ -14,6 +14,11 @@
       "namespace_id": "4101",
       "simple": { "limit": 10, "period": 60 },
     },
+    {
+      "name": "PREVIEW_PASSWORD_SITE_LIMITER",
+      "namespace_id": "4103",
+      "simple": { "limit": 60, "period": 60 },
+    },
   ],
   "vars": {
     "HOSTING_DOMAIN": "notra.site",
@@ -37,6 +42,11 @@
           "name": "PREVIEW_PASSWORD_LIMITER",
           "namespace_id": "4102",
           "simple": { "limit": 10, "period": 60 },
+        },
+        {
+          "name": "PREVIEW_PASSWORD_SITE_LIMITER",
+          "namespace_id": "4104",
+          "simple": { "limit": 60, "period": 60 },
         },
       ],
       "vars": {

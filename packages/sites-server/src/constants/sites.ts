@@ -10,3 +10,5 @@ export const SITE_SLUG_FALLBACK_MAX_LENGTH = 32;
 /** Retries append "-" and a random suffix, staying within the slug limit. */
 export const SITE_SLUG_RETRY_ROOT_MAX_LENGTH = 34;
 export const SITE_SLUG_RETRY_SUFFIX_LENGTH = 4;
+/** Marks slug grants written when a site is deleted, unlike staff grants. */
+export const SITE_SLUG_RETIRED_NOTE = "Retired when the site was deleted";

@@ -1,13 +1,13 @@
 import { fetchPublicUrl } from "@notra/ai/utils/public-fetch";
 import { db } from "@notra/db/drizzle";
-import { siteDomains } from "@notra/db/schema";
+import { siteDomains, sites } from "@notra/db/schema";
 import type { SiteDomainVerificationRecord } from "@notra/db/types/sites";
 import { normalizeHostname } from "@notra/sites-core/utils/hosts";
 import {
   joinMountPath,
   listMountedAreas,
 } from "@notra/sites-core/utils/mounts";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 
 import {
   cloudflareSaasConfig,
@@ -27,6 +27,7 @@ import {
   PROBE_SITE_MARKER,
   PROBE_TIMEOUT_MS,
   PROBE_USER_AGENT,
+  SITE_MAX_DOMAINS,
 } from "./constants/domains";
 import { getSitesHostingDomain, siteCnameTarget } from "./env";
 import { SiteHostConflictError, SiteInputError } from "./errors";
@@ -173,6 +174,21 @@ export async function addSiteDomain(
         if (claims.some((claim) => claim.status === "active")) {
           throw new SiteInputError(
             "This domain is already connected to another site"
+          );
+        }
+        // Hostname locks differ per domain, so the site row serializes the cap.
+        await tx
+          .select({ id: sites.id })
+          .from(sites)
+          .where(eq(sites.id, site.id))
+          .for("update");
+        const [{ domainCount } = { domainCount: 0 }] = await tx
+          .select({ domainCount: count() })
+          .from(siteDomains)
+          .where(eq(siteDomains.siteId, site.id));
+        if (domainCount >= SITE_MAX_DOMAINS) {
+          throw new SiteInputError(
+            `A site can have up to ${SITE_MAX_DOMAINS} domains`
           );
         }
 

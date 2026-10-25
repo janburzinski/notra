@@ -77,7 +77,12 @@ export function matchRedirect(
     if (rule.source.endsWith("/*")) {
       const prefix = rule.source.slice(0, -2);
       if (bare === prefix || bare.startsWith(`${prefix}/`)) {
-        const rest = bare.slice(prefix.length);
+        // `path` is decoded; re-encode so the remainder is a valid header value.
+        const rest = bare
+          .slice(prefix.length)
+          .split("/")
+          .map(encodeURIComponent)
+          .join("/");
         const destination = rule.destination.endsWith("/*")
           ? `${rule.destination.slice(0, -2)}${rest}`
           : rule.destination;

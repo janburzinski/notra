@@ -1,8 +1,16 @@
 export const MAX_DRAFT_BYTES = 512 * 1024;
 export const SITE_EDITOR_READ_CONCURRENCY = 4;
+/**
+ * Validation fetches and parses source files in the dashboard process, and
+ * nested Markdown parses super-linearly, so it gets a fixed budget.
+ */
+export const SITE_VALIDATE_MAX_FILES = 2000;
+export const SITE_VALIDATE_MAX_FILE_BYTES = 1024 * 1024;
+export const SITE_VALIDATE_MAX_TOTAL_BYTES = 20 * 1024 * 1024;
 export const EDITABLE_TEXT_FILE = /\.(?:mdx?|jsx?|json|css)$/i;
 export const EDITABLE_PATH_SEGMENT = /^[A-Za-z0-9._@()+ -]+$/;
 export const VALIDATED_SOURCE_FILE = /\.(?:mdx?|jsx?)$/i;
+export const VALIDATED_MARKDOWN_FILE = /\.mdx?$/i;
 export const MAX_PUBLISH_HEADLINE_LENGTH = 200;
 export const DEFAULT_PUBLISH_HEADLINE = "Update site content";
 export const PULL_REQUEST_RULE_TYPES: ReadonlySet<string> = new Set([

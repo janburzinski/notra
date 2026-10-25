@@ -80,7 +80,7 @@ export async function POST(request: Request) {
         return Response.json({ ok: true });
       }
       case "setSuspended": {
-        await setSiteSuspended(site, input.suspended, input.reason);
+        await setSiteSuspended(site, input.suspended, input.reason, "notra");
         return Response.json({ ok: true });
       }
       case "analytics": {

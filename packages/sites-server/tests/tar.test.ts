@@ -82,6 +82,23 @@ describe("sandbox output archive", () => {
     );
   });
 
+  test("rejects entries that normalize to the same path", () => {
+    const blocks = ["./index.html", "index.html"].flatMap((name, index) => {
+      const data = Buffer.from(`page ${index}`);
+      const header = Buffer.alloc(512);
+      header.write(name);
+      header.write(`${data.length.toString(8).padStart(11, "0")}\0`, 124);
+      header[156] = "0".charCodeAt(0);
+      return [header, data, Buffer.alloc(512 - data.length)];
+    });
+    expect(() =>
+      readTarGz(
+        gzipSync(Buffer.concat([...blocks, Buffer.alloc(1024)])),
+        limits
+      )
+    ).toThrow(UnsafeArchiveError);
+  });
+
   test("rejects links and oversized output", () => {
     const withLink = archive((dir) => {
       writeFileSync(join(dir, "a.html"), "x");

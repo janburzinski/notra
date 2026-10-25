@@ -44,6 +44,7 @@ export function SiteSettingsDangerZone({
   const [offlineOpen, setOfflineOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const suspended = site.status === "suspended";
+  const suspendedByNotra = suspended && site.suspendedBy === "notra";
 
   const suspendMutation = useMutation({
     mutationFn: (next: boolean) =>
@@ -74,7 +75,7 @@ export function SiteSettingsDangerZone({
         <div className="divide-border divide-y">
           <DangerZoneRow
             action={
-              suspended ? (
+              suspendedByNotra ? null : suspended ? (
                 <Button
                   loading={suspendMutation.isPending}
                   onClick={() => suspendMutation.mutate(false)}
@@ -94,11 +95,19 @@ export function SiteSettingsDangerZone({
               )
             }
             description={
-              suspended
-                ? t("offline.restoreDescription")
-                : t("offline.description")
+              suspendedByNotra
+                ? t("offline.notraDescription")
+                : suspended
+                  ? t("offline.restoreDescription")
+                  : t("offline.description")
             }
-            title={suspended ? t("offline.restoreTitle") : t("offline.title")}
+            title={
+              suspendedByNotra
+                ? t("offline.notraTitle")
+                : suspended
+                  ? t("offline.restoreTitle")
+                  : t("offline.title")
+            }
           />
           <DangerZoneRow
             action={

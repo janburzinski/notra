@@ -26,6 +26,10 @@ import {
   MAX_PUBLISH_BYTES,
   MAX_PUBLISH_HEADLINE_LENGTH,
   SITE_EDITOR_READ_CONCURRENCY,
+  SITE_VALIDATE_MAX_FILE_BYTES,
+  SITE_VALIDATE_MAX_FILES,
+  SITE_VALIDATE_MAX_TOTAL_BYTES,
+  VALIDATED_MARKDOWN_FILE,
   VALIDATED_SOURCE_FILE,
 } from "./constants/editor";
 import { SiteInputError, SitePublishConflictError } from "./errors";
@@ -50,6 +54,7 @@ import type {
   SiteDraft,
   SiteDraftSummary,
   SiteSourceEntry,
+  SiteValidationDraftBudget,
   SitePublishedFile,
   SiteSourceFileContent,
   SiteSourceListing,
@@ -591,6 +596,35 @@ export async function discardSiteDraft(
   });
 }
 
+/**
+ * Markdown parses super-linearly, so oversized Markdown stays unread (the build
+ * still checks it). Scripts are always read, since pages import their exports.
+ * Drafts count toward the same total.
+ */
+function withinValidationBudget(
+  entries: readonly SiteSourceEntry[],
+  drafts: SiteValidationDraftBudget
+) {
+  const readable = entries.filter(
+    (entry) =>
+      entry.size <= SITE_VALIDATE_MAX_FILE_BYTES ||
+      !VALIDATED_MARKDOWN_FILE.test(entry.path)
+  );
+  const totalBytes = readable.reduce(
+    (sum, entry) => sum + entry.size,
+    drafts.bytes
+  );
+  if (
+    readable.length + drafts.count > SITE_VALIDATE_MAX_FILES ||
+    totalBytes > SITE_VALIDATE_MAX_TOTAL_BYTES
+  ) {
+    throw new SiteInputError(
+      "This site has too much content to check in the editor."
+    );
+  }
+  return readable;
+}
+
 async function validateWithDrafts(
   site: Site,
   drafts: SiteDraft[],
@@ -625,12 +659,25 @@ async function validateWithDrafts(
     files.set(SITE_IGNORE_FILENAME, ignoreFile?.content ?? null);
   }
   const isIgnored = createSiteIgnore(files.get(SITE_IGNORE_FILENAME) ?? "");
-  const needsContent = tree.filter(
-    (entry) =>
-      (VALIDATED_SOURCE_FILE.test(entry.path) ||
-        entry.path === SITE_CONFIG_FILENAME) &&
-      !draftPaths.has(entry.path) &&
-      !isIgnored(entry.path)
+  const validatedDrafts = drafts.filter(
+    (draft) => !draft.deleted && VALIDATED_SOURCE_FILE.test(draft.path)
+  );
+  const draftBudget = {
+    count: validatedDrafts.length,
+    bytes: validatedDrafts.reduce(
+      (sum, draft) => sum + Buffer.byteLength(draft.content, "utf8"),
+      0
+    ),
+  };
+  const needsContent = withinValidationBudget(
+    tree.filter(
+      (entry) =>
+        (VALIDATED_SOURCE_FILE.test(entry.path) ||
+          entry.path === SITE_CONFIG_FILENAME) &&
+        !draftPaths.has(entry.path) &&
+        !isIgnored(entry.path)
+    ),
+    draftBudget
   );
   const contents = await mapWithConcurrency(
     needsContent,

@@ -18,6 +18,24 @@ export function isAnalyticsEventPath(pathname: string): boolean {
   return pathname.endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`);
 }
 
+/**
+ * Beacons come from the site's own pages: the worker host, or the customer's
+ * origin when the site is reverse-proxied. Anything else is a forged report.
+ */
+export function isForeignAnalyticsPost(
+  request: Request,
+  origins: string[]
+): boolean {
+  // The beacon endpoint is relative, so a real page always posts same-origin;
+  // proxied hosts like www vs apex make the Origin list a fallback only.
+  const fetchSite = request.headers.get("Sec-Fetch-Site");
+  if (fetchSite !== null) {
+    return fetchSite !== "same-origin";
+  }
+  const origin = request.headers.get("Origin");
+  return origin !== null && !origins.includes(origin);
+}
+
 export function analyticsScriptResponse(): Response {
   return new Response(ANALYTICS_SCRIPT, {
     headers: {
