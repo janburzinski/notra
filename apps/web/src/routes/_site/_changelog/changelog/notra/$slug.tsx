@@ -84,6 +84,7 @@ const notraChangelogContent =
 
 export const Route = createFileRoute("/_site/_changelog/changelog/notra/$slug")(
   {
+    codeSplitGroupings: [["loader", "component"]],
     loader: async ({ params }) => {
       const data = await getNotraChangelogEntry({
         data: { slug: params.slug },

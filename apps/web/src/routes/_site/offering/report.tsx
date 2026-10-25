@@ -2,15 +2,14 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { OfferingReport } from "@/components/offering-check/offering-report";
 import { OFFERING_CHECK_PATH } from "@/constants/offering-check";
-import {
-  offeringCheckRequestSchema,
-  offeringReportSearchSchema,
-} from "@/schemas/offering-check";
 import { buildHead } from "@/utils/head";
+import { parseOfferingReportSearch } from "@/utils/search-params";
 
 export const Route = createFileRoute("/_site/offering/report")({
-  validateSearch: offeringReportSearchSchema,
-  beforeLoad: ({ search }) => {
+  validateSearch: parseOfferingReportSearch,
+  beforeLoad: async ({ search }) => {
+    const { offeringCheckRequestSchema } =
+      await import("@/schemas/offering-check");
     const parsed = offeringCheckRequestSchema.safeParse(search);
     if (!parsed.success) {
       throw redirect({ to: OFFERING_CHECK_PATH });

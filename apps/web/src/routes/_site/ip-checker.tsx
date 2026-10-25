@@ -12,7 +12,6 @@ import {
 } from "@/constants/ip-checker";
 import { DYNAMIC_PAGE_CACHE_CONTROL } from "@/constants/proxy";
 import { getIpCheckerData } from "@/lib/ip-checker/functions";
-import { ipCheckerSearchSchema } from "@/schemas/ip-checker";
 import type { Metadata } from "@/types/metadata";
 import { buildHead } from "@/utils/head";
 import { buildBreadcrumbJsonLd, serializeJsonLd } from "@/utils/jsonld";
@@ -21,6 +20,7 @@ import {
   pageAlternates,
   TWITTER_HANDLE,
 } from "@/utils/metadata";
+import { parseIpCheckerSearch } from "@/utils/search-params";
 import { SITE_URL } from "@/utils/urls";
 
 const title = IP_CHECKER_TITLE;
@@ -75,10 +75,10 @@ const bodyClass =
   "font-sans text-[0.9375rem]/6 text-pretty text-[#1E1E1EBF] dark:text-white/70";
 
 export const Route = createFileRoute("/_site/ip-checker")({
-  validateSearch: ipCheckerSearchSchema,
+  validateSearch: parseIpCheckerSearch,
   staleTime: Number.POSITIVE_INFINITY,
   loader: async ({ location }) => {
-    const { ip } = ipCheckerSearchSchema.parse(location.search);
+    const { ip } = parseIpCheckerSearch(location.search);
     const data = await getIpCheckerData({ data: { ip } });
     return { ...data, initialIp: ip };
   },

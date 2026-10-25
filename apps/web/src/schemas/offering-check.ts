@@ -173,23 +173,6 @@ export const offeringStreamEventSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("error") }),
 ]);
 
-// The router parses `?feature=42` or `?feature=true` as JSON, so values come
-// back as numbers, booleans or arrays. They are all plain text here.
-const searchTextSchema = z.preprocess(
-  (value) =>
-    value === undefined || typeof value === "string"
-      ? value
-      : JSON.stringify(value),
-  z.string().optional().catch(undefined)
-);
-
-export const offeringReportSearchSchema = z.object({
-  domain: searchTextSchema,
-  feature: searchTextSchema,
-  problem: searchTextSchema,
-  webSearch: z.boolean().optional().catch(undefined),
-});
-
 export const offeringFormParsers = {
   domain: parseAsString.withDefault(""),
   feature: parseAsString.withDefault(""),

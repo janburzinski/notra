@@ -19,26 +19,31 @@ const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 
 export const Route = createFileRoute("/_site/notra-vs-{$slug}/")({
+  codeSplitGroupings: [["loader", "component"]],
   loader: ({ params }) => {
     const competitor = findCompareCompetitor(params.slug);
     if (!competitor) {
       throw notFound();
     }
-    return competitor;
+    return {
+      competitor,
+      title: getCompareMetaTitle(competitor),
+      imageAlt: getCompareTitle(competitor),
+      url: `${SITE_URL}${getCompareHref(competitor)}`,
+    };
   },
-  head: ({ loaderData: competitor }) => {
-    if (!competitor) {
+  head: ({ loaderData }) => {
+    if (!loaderData) {
       return buildHead({ title: "Comparison not found" });
     }
 
-    const title = getCompareMetaTitle(competitor);
-    const description = competitor.metaDescription;
-    const url = `${SITE_URL}${getCompareHref(competitor)}`;
+    const { title, url } = loaderData;
+    const description = loaderData.competitor.metaDescription;
     const image = {
       url: `${url}/opengraph-image`,
       width: OG_IMAGE_WIDTH,
       height: OG_IMAGE_HEIGHT,
-      alt: getCompareTitle(competitor),
+      alt: loaderData.imageAlt,
     };
 
     return buildHead({
@@ -67,7 +72,7 @@ export const Route = createFileRoute("/_site/notra-vs-{$slug}/")({
 });
 
 function CompareDetailPage() {
-  const competitor = Route.useLoaderData();
+  const { competitor } = Route.useLoaderData();
 
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Home", url: SITE_URL },

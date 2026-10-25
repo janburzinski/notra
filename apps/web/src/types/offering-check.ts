@@ -278,3 +278,10 @@ export interface OfferingSourceSummary {
   pages: number;
   ownSite: string;
 }
+
+export interface OfferingReportSearch {
+  domain?: string;
+  feature?: string;
+  problem?: string;
+  webSearch?: boolean;
+}

@@ -134,6 +134,7 @@ const blogContent = browserCollections.blog.createClientLoader({
 });
 
 export const Route = createFileRoute("/_site/_blog/blog/$slug/")({
+  codeSplitGroupings: [["loader", "component"]],
   loader: async ({ params }) => {
     const data = await getBlogPost({ data: { slug: params.slug } });
     await blogContent.preload(data.path);
