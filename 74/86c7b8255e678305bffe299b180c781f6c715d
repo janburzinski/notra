@@ -1,0 +1,21 @@
+apps/dashboard/src/utils/autopilot-findings.ts
+  s_65d85bb68d939b::t_7853c1604feb46 19
+apps/dashboard/src/utils/autopilot-github.ts
+  s_65d85bb68d939b::t_7853c1604feb46 24-27,29,104-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7486c7b8255e678305bffe299b180c781f6c715d",
+  "prompts": {},
+  "sessions": {
+    "s_65d85bb68d939b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e14e60a4-b081-46d7-a485-c77e18bf39d0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
