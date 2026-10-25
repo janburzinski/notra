@@ -21,7 +21,7 @@ export const PROMPTWATCH: CompareCompetitor = {
     "You want to pick the exact model version",
     "You want crawler logs and content on the first paid plan",
     "You want to scan weekly or monthly to cover more prompts per dollar",
-    "You want multi-turn conversations, open source code and zero data retention",
+    "You want multi-turn conversations and zero data retention",
   ],
   chooseCompetitor: [
     "You need Copilot or Alexa tracked",
@@ -108,7 +108,6 @@ export const PROMPTWATCH: CompareCompetitor = {
     commerce: true,
     api: true,
     mcp: true,
-    openSource: false,
     zdr: "Not listed",
     soc2: "Not listed",
     startingPrice: "Free, then $95/mo",

@@ -22,7 +22,7 @@ export const PROFOUND: CompareCompetitor = {
     "You want the gap, the draft and the rescan in one place",
     "You want to see the full answer, sources and searches behind every number",
     "You want multi-turn conversations alongside buyer personas",
-    "Your team cares about open source code and zero data retention",
+    "Your team cares about zero data retention",
   ],
   chooseCompetitor: [
     "You need Copilot or ChatGPT Shopping tracked",
@@ -47,9 +47,9 @@ export const PROFOUND: CompareCompetitor = {
         "Each check keeps the raw answer, the searches the engine ran, the sources it cited, your position and sentiment. You can check every number yourself.",
     },
     {
-      title: "Open source and zero retention",
+      title: "Zero data retention",
       description:
-        "Notra's code is public under AGPL-3.0, so you can read how each number is computed. A zero data retention add-on keeps your prompts out of model provider logs.",
+        "A zero data retention add-on keeps your prompts out of model provider logs.",
     },
   ],
   strengths: [
@@ -109,7 +109,6 @@ export const PROFOUND: CompareCompetitor = {
     commerce: true,
     api: "Enterprise",
     mcp: "Enterprise",
-    openSource: false,
     zdr: "Not listed",
     soc2: true,
     startingPrice: "Custom",

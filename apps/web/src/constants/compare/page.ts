@@ -230,7 +230,6 @@ export const COMPARE_ROW_GROUPS: CompareRowGroup[] = [
     rows: [
       { id: "api", label: "REST API", notra: true },
       { id: "mcp", label: "MCP server", notra: true },
-      { id: "openSource", label: "Open source", notra: true },
       { id: "zdr", label: "Zero data retention", notra: "Add-on" },
       { id: "soc2", label: "SOC 2 report", notra: false },
       { id: "startingPrice", label: "Starting price", notra: "$100/mo" },

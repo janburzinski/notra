@@ -104,7 +104,6 @@ export const PEEC: CompareCompetitor = {
     commerce: true,
     api: true,
     mcp: true,
-    openSource: false,
     zdr: "Not listed",
     soc2: false,
     startingPrice: "$95/mo",

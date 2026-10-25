@@ -34,8 +34,7 @@ await writeFile(
       license: "AGPL-3.0-only",
       repository: {
         type: "git",
-        url: "git+https://github.com/usenotra/notra.git",
-        directory: "apps/sites-builder",
+        url: "https://github.com/usenotra",
       },
       bin: { "notra-sites": "./dist/cli.mjs" },
       files: ["astro.config.mjs", "src", "dist", "LICENSE", "README.md"],

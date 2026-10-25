@@ -40,7 +40,7 @@ export const ATHENA: CompareCompetitor = {
     {
       title: "Open method",
       description:
-        "Athena does not say how it collects answers. Notra documents its method and keeps the raw answer, searches and sources behind every number. The code is open source.",
+        "Athena does not say how it collects answers. Notra documents its method and keeps the raw answer, searches and sources behind every number.",
     },
   ],
   strengths: [
@@ -100,7 +100,6 @@ export const ATHENA: CompareCompetitor = {
     commerce: true,
     api: "Add-on",
     mcp: true,
-    openSource: false,
     zdr: "Not listed",
     soc2: true,
     startingPrice: "Free, then $295/mo",
@@ -128,7 +127,7 @@ export const ATHENA: CompareCompetitor = {
     {
       question: "Is Notra an AthenaHQ alternative?",
       answer:
-        "Yes. Both track brand visibility in AI answers and help you act on it. Athena covers more engines. Notra offers predictable plans, crawler logs below Enterprise and open source code.",
+        "Yes. Both track brand visibility in AI answers and help you act on it. Athena covers more engines. Notra offers predictable plans, crawler logs below Enterprise and the raw answer behind every number.",
     },
     {
       question: "How do Athena credits compare to Notra?",

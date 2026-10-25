@@ -18,7 +18,7 @@ export const SCRUNCH: CompareCompetitor = {
     "You want a writer that turns gaps into posts",
     "You want to scan daily for as long as you like",
     "You want multi-turn conversations alongside buyer personas",
-    "You want open source code and zero data retention",
+    "You want zero data retention",
   ],
   chooseCompetitor: [
     "You need Microsoft Copilot tracked",
@@ -94,7 +94,6 @@ export const SCRUNCH: CompareCompetitor = {
     commerce: false,
     api: true,
     mcp: "Not listed",
-    openSource: false,
     zdr: "Not listed",
     soc2: true,
     startingPrice: "$300/mo",

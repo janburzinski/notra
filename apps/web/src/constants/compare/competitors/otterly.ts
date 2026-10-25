@@ -92,7 +92,6 @@ export const OTTERLY: CompareCompetitor = {
     commerce: true,
     api: "Standard plan",
     mcp: "Standard plan",
-    openSource: false,
     zdr: "Not listed",
     soc2: "Not listed",
     startingPrice: "$29/mo",
