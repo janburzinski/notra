@@ -34,6 +34,11 @@ export const GITHUB_MENTION_SANDBOX_TIMEOUT_MS = 180_000;
 
 export const GITHUB_MENTION_FILE_CONTENT_MAX_BYTES = 512_000;
 
+/** Generated OG images are committed as PNG; a 1200x630 render stays well below this. */
+export const GITHUB_MENTION_IMAGE_MAX_BYTES = 5_000_000;
+
+export const GITHUB_MENTION_IMAGE_PATH_PATTERN = /\.png$/i;
+
 export const GITHUB_MENTION_REPOSITORY_READ_LIMITS = {
   directoryDefault: 30,
   directoryMax: 50,

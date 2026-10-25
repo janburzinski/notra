@@ -92,6 +92,8 @@ export interface GitHubMentionContext {
 
 /** Brand voice fields the mention agent writes in. */
 export interface GitHubMentionVoice {
+  /** Brand identity id, also used for the brand's OG image template. */
+  id: string;
   name: string;
   companyName: string | null;
   companyDescription: string | null;

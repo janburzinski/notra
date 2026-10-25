@@ -153,6 +153,22 @@ export const githubMentionFileReadSchema = z.object({
     ),
 });
 
+export const githubMentionOgImageSchema = z.strictObject({
+  title: z
+    .string()
+    .trim()
+    .min(1)
+    .max(240)
+    .describe("Headline shown on the image, usually the post title"),
+  imagePath: z
+    .string()
+    .min(1)
+    .describe(
+      "Repository-relative .png path, following where the site keeps the OG images of other posts"
+    ),
+  headline: z.string().trim().min(1).describe("Commit headline"),
+});
+
 export const githubMentionMoveSchema = z.strictObject({
   fromPath: z.string().min(1).describe("Existing content file to move"),
   toPath: z

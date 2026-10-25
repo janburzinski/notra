@@ -3,7 +3,10 @@ import {
   GITHUB_CREATE_COMMIT_ON_BRANCH_MUTATION,
   GITHUB_API_VERSION_HEADERS,
 } from "@notra/ai/constants/github";
-import { GITHUB_MENTION_FILE_CONTENT_MAX_BYTES } from "@notra/ai/constants/github-mention";
+import {
+  GITHUB_MENTION_FILE_CONTENT_MAX_BYTES,
+  GITHUB_MENTION_IMAGE_MAX_BYTES,
+} from "@notra/ai/constants/github-mention";
 import { getGitHubAppBotLogin } from "@notra/ai/integrations/github";
 import type {
   CommitFilesToPullRequestParams,
@@ -64,9 +67,13 @@ export async function commitFilesToPullRequest(
 
   for (const file of params.files) {
     const bytes = fileBytes(file).length;
-    if (bytes > GITHUB_MENTION_FILE_CONTENT_MAX_BYTES) {
+    const limit =
+      file.encoding === "base64"
+        ? GITHUB_MENTION_IMAGE_MAX_BYTES
+        : GITHUB_MENTION_FILE_CONTENT_MAX_BYTES;
+    if (bytes > limit) {
       throw new Error(
-        `File ${file.path} is ${bytes} bytes and exceeds the ${GITHUB_MENTION_FILE_CONTENT_MAX_BYTES} byte limit`
+        `File ${file.path} is ${bytes} bytes and exceeds the ${limit} byte limit`
       );
     }
   }

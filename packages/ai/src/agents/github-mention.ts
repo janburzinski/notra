@@ -115,6 +115,7 @@ export async function runGitHubMentionAgent(params: {
       octokit: params.octokit,
       context: params.context,
       state,
+      brandIdentityId: voice?.id,
       scheduleRepair: params.scheduleRepair,
     }),
     instructions: getGitHubMentionInstructions({

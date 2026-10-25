@@ -135,6 +135,8 @@ Notra never commits to the repository's default branch, so ask for a separate pu
 
 Mentions edit content rather than code, so Notra commits Markdown, MDX and text files plus the JSON, YAML, TOML or CSV data that sits next to them, such as a docs navigation file. Whatever the comment asks for, Notra never commits code, scripts, dot files and folders like `.github` or build and tool configuration such as `package.json` or `vercel.json`. If you ask for one of those, Notra tells you it needs a regular commit.
 
+The one binary file a mention can add is an Open Graph image. Ask for one, for example `@notra make an OG image for this post`, and Notra renders a 1200×630 PNG from your brand identity's OG template, commits it where the site keeps the images of other posts and points the post's frontmatter at it. If your site renders OG images itself, Notra says so instead of adding a file.
+
 The same goes for active content inside Markdown and MDX. A mention can reword a page with unchanged standalone imports, but files containing exports or complex imports require a regular commit. It can't add new `import` or `export` lines, MDX expressions such as `{props.value}` (plain literals like `width={600}` are fine), `<script>` tags, iframes, `javascript:` links or inline event handlers. Code samples in fenced blocks are fine, but if the sandbox blocks any change, Notra rejects the entire patch. Mentions can't delete a linked publication.
 
 If someone pushed to the pull request after Notra's last commit, Notra continues from the file on the pull request, so edits made by hand are kept and flow back into the Notra post with the next change.
