@@ -245,6 +245,9 @@ export function Navbar({ variant }: NavbarProps = {}) {
   const [panelSizes, setPanelSizes] = useState<Map<string, NavbarPanelSize>>(
     new Map()
   );
+  // The outgoing panel overflows the shrinking shell mid-morph, which would
+  // flash a scrollbar and shift the layout, so scrolling waits for it to settle.
+  const [isPanelMorphing, setIsPanelMorphing] = useState(false);
   const triggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const panelRef = useRef<HTMLDivElement>(null);
   const measureRefs = useRef(new Map<string, HTMLDivElement>());
@@ -618,7 +621,9 @@ export function Navbar({ variant }: NavbarProps = {}) {
                   </div>
                 )}
 
-                <AnimatePresence>
+                <AnimatePresence
+                  onExitComplete={() => setIsPanelMorphing(false)}
+                >
                   {activeGroupData && (
                     <m.div
                       animate={{ ...NAVBAR_PANEL_REST, x: panelX }}
@@ -648,6 +653,8 @@ export function Navbar({ variant }: NavbarProps = {}) {
                           height: activeSize?.height,
                         }}
                         className="relative max-h-[calc(100dvh-7.5rem)]"
+                        onAnimationComplete={() => setIsPanelMorphing(false)}
+                        onAnimationStart={() => setIsPanelMorphing(true)}
                         initial={{
                           width: activeSize?.width,
                           height: activeSize?.height,
@@ -659,8 +666,9 @@ export function Navbar({ variant }: NavbarProps = {}) {
                       >
                         <div
                           className={cn(
-                            "relative h-full w-full overflow-x-hidden overflow-y-auto overscroll-contain rounded-[1.375rem] bg-[linear-gradient(180deg,#FFFFFF_0%,#F3F3F3_100%)] shadow-[0_0.125rem_2.0625rem_#1E1E1E1A,0_0_0_0.0625rem_#ECECEC,0_0.0625rem_0.125rem_#28282814] ring-1 ring-[#1E1E1E0D] dark:bg-neutral-950 dark:bg-none dark:shadow-black/50 dark:ring-white/10",
-                            compactPanel && "bg-popover rounded-2xl bg-none"
+                            "relative h-full w-full overflow-hidden overscroll-contain rounded-[1.375rem] bg-[linear-gradient(180deg,#FFFFFF_0%,#F3F3F3_100%)] shadow-[0_0.125rem_2.0625rem_#1E1E1E1A,0_0_0_0.0625rem_#ECECEC,0_0.0625rem_0.125rem_#28282814] ring-1 ring-[#1E1E1E0D] dark:bg-neutral-950 dark:bg-none dark:shadow-black/50 dark:ring-white/10",
+                            compactPanel && "bg-popover rounded-2xl bg-none",
+                            !isPanelMorphing && "overflow-y-auto"
                           )}
                           ref={panelRef}
                         >
