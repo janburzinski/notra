@@ -8742,8 +8742,7 @@
       "deleteFor": "Delete branch {branch}",
       "search": "Find a branch…",
       "reviewIssues": "Review issues",
-      "branchNotFound": "Branch not found, switched to {branch}",
-      "published": "Published"
+      "branchNotFound": "Branch not found, switched to {branch}"
     },
     "drafts": {
       "saveFailed": "Couldn't save the draft",

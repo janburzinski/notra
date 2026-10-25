@@ -37,7 +37,6 @@ export function SiteHeaderActions() {
       <SiteHeaderMenu branch={queries.current} branchesRequired={required} />
       <div className="shrink-0" title={error ? t("publishError") : undefined}>
         <SiteBranchPrimaryAction
-          showPublished
           error={error}
           {...controller.props}
           feature={queries.feature}

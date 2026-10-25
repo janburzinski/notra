@@ -8742,8 +8742,7 @@
       "deleteFor": "Branch {branch} löschen",
       "search": "Branch suchen…",
       "reviewIssues": "Probleme ansehen",
-      "branchNotFound": "Branch nicht gefunden, zu {branch} gewechselt",
-      "published": "Veröffentlicht"
+      "branchNotFound": "Branch nicht gefunden, zu {branch} gewechselt"
     },
     "drafts": {
       "saveFailed": "Entwurf konnte nicht gespeichert werden",

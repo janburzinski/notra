@@ -1,41 +1,11 @@
 "use client";
 
-import { Tick02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import type { SiteBranchPrimaryActionProps } from "@/types/site-branches";
 import { siteBranchPrimaryState } from "@/utils/site-branch-primary-state";
-
-/** Production with nothing left to publish says so instead of a dead button. */
-function showsPublished(
-  props: SiteBranchPrimaryActionProps,
-  action: ReturnType<typeof siteBranchPrimaryState>["action"]
-) {
-  return Boolean(
-    props.showPublished &&
-    action === "publish" &&
-    props.status?.canPublishDirect &&
-    props.draftCount === 0 &&
-    !(props.unsaved || props.busy || props.checking || props.error)
-  );
-}
-
-function PublishedButton() {
-  const t = useTranslations("sites.branches");
-  return (
-    <Button disabled size="sm" variant="secondary">
-      <HugeiconsIcon
-        aria-hidden="true"
-        data-icon="inline-start"
-        icon={Tick02Icon}
-      />
-      {t("published")}
-    </Button>
-  );
-}
 
 export function SiteBranchPrimaryAction(props: SiteBranchPrimaryActionProps) {
   const t = useTranslations("sites.branches");
@@ -47,9 +17,6 @@ export function SiteBranchPrimaryAction(props: SiteBranchPrimaryActionProps) {
     requestReview: () => props.onReview(false),
     merge: () => props.onReview(true),
   };
-  if (showsPublished(props, state.action)) {
-    return <PublishedButton />;
-  }
   return (
     <>
       <Button

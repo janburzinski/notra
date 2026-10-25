@@ -86,8 +86,6 @@ export interface SiteWorkingBranchProps {
 
 export interface SiteBranchPrimaryActionProps {
   checking?: boolean;
-  /** Show a quiet "Published" instead of a disabled Publish when nothing is pending. */
-  showPublished?: boolean;
   error?: boolean;
   describedBy?: string;
   feature: boolean;
