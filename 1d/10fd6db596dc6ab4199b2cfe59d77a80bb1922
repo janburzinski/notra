@@ -1,0 +1,19 @@
+apps/sites-e2e/emulators/browser/providers/ga4.ts
+  s_44cf84a7c2985f::t_e6911c5129f0e3 17,19,21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1d10fd6db596dc6ab4199b2cfe59d77a80bb1922",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
