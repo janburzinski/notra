@@ -1,0 +1,33 @@
+apps/dashboard/src/utils/persona-activity.ts
+  s_5090bb38124f61::t_34d7fbefc311eb 77
+  s_5090bb38124f61::t_a3de490e72b5e7 10,60-65,67,70-74,85-88,92-101,103-108,115-163
+  s_5090bb38124f61::t_c219a5f98b9574 23
+apps/dashboard/src/components/geo/persona-activity-card.tsx
+  s_5090bb38124f61::t_a3de490e72b5e7 15-16,33,106-110,140-151,158,203-205
+  s_5090bb38124f61::t_34d7fbefc311eb 3,66,157,181,184-185,193,195-197
+  s_5090bb38124f61::t_ea485355ba45f4 62-64
+apps/dashboard/messages/de.json
+  s_5090bb38124f61::t_a3de490e72b5e7 3157-3158
+apps/docs/geo/personas.mdx
+  s_5090bb38124f61::t_2580792371e3b0 33
+apps/dashboard/src/constants/geo-personas.ts
+  s_5090bb38124f61::t_a3de490e72b5e7 11
+apps/dashboard/messages/en.json
+  s_5090bb38124f61::t_a3de490e72b5e7 3157-3158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "33c5a85953c30fa6b248740734acf3d077103ce7",
+  "prompts": {},
+  "sessions": {
+    "s_5090bb38124f61": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb50a9a7-bf76-4298-996e-b6df505506d3",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
