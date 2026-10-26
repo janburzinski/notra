@@ -9,6 +9,13 @@ export function geoDashboardPath(
   return withGeoProject(base, projectId);
 }
 
+export function geoTrafficPath(
+  organizationSlug: string,
+  projectId?: string
+): string {
+  return withGeoProject(`/${organizationSlug}/geo/traffic`, projectId);
+}
+
 export function withGeoProject(path: string, projectId?: string): string {
   if (!projectId) {
     return path;

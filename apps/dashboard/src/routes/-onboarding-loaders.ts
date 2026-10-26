@@ -27,7 +27,10 @@ import {
   getSession,
   validateOrganizationAccess,
 } from "@/lib/auth/actions";
-import { hasPaidSubscriptionHistory } from "@/lib/billing/subscription";
+import {
+  hasPaidSubscriptionHistory,
+  resolveGeoEntitlement,
+} from "@/lib/billing/subscription";
 import { redirectIfAnyOrganizationHasPaidHistory } from "@/lib/onboarding/billing-gate";
 import { redirectIfOnboardingDismissed } from "@/lib/onboarding/dismissal";
 import { resolveOnboardingVariant } from "@/lib/onboarding/experiment";
@@ -38,6 +41,7 @@ import {
   geoOnboardingCompetitorsPath,
   geoOnboardingPath,
   geoOnboardingWorkspacePath,
+  geoTrafficPath,
   withGeoProject,
 } from "@/utils/geo-paths";
 import { onboardingProgressHrefs } from "@/utils/onboarding-progress";
@@ -55,6 +59,20 @@ async function onboardingContext({ searchParams }: UiRouteInput) {
   const replay =
     process.env.NODE_ENV === "development" && searchParams.replay === "1";
   return { organization, projectId, replay, userId: session.user.id };
+}
+
+/** Plans without GEO can't open the overview, so they land on AI traffic. */
+async function onboardingExitHref(
+  organizationId: string,
+  organizationSlug: string,
+  projectId?: string
+) {
+  const geo = await resolveGeoEntitlement(organizationId).catch(
+    () => "entitled" as const
+  );
+  return geo === "denied"
+    ? geoTrafficPath(organizationSlug, projectId)
+    : geoDashboardPath(organizationSlug, projectId);
 }
 
 async function onboardingBrandContext(input: UiRouteInput) {
@@ -206,9 +224,10 @@ export const loadOnboardingVisibility = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { organization, projectId, replay, brand } =
       await onboardingBrandContext(data);
-    const [{ stage, languages }, paid] = await Promise.all([
+    const [{ stage, languages }, paid, skipHref] = await Promise.all([
       getGeoOnboardingSnapshot(organization.id, projectId),
       hasPaidSubscriptionHistory(organization.id),
+      onboardingExitHref(organization.id, organization.slug, projectId),
     ]);
     const inOnboardingFlow = replay || !paid;
     return {
@@ -229,10 +248,7 @@ export const loadOnboardingVisibility = createServerFn({ method: "GET" })
         stage,
       }),
       projectId,
-      skipHref:
-        inOnboardingFlow && !replay
-          ? withGeoProject(`/${organization.slug}`, projectId)
-          : geoDashboardPath(organization.slug, projectId),
+      skipHref,
       websiteUrl: brand.websiteUrl,
     };
   });
@@ -242,9 +258,10 @@ export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { organization, projectId, replay, brand } =
       await onboardingBrandContext(data);
-    const [stage, paid] = await Promise.all([
+    const [stage, paid, nextHref] = await Promise.all([
       getGeoOnboardingStage(organization.id, projectId),
       hasPaidSubscriptionHistory(organization.id),
+      onboardingExitHref(organization.id, organization.slug, projectId),
     ]);
     const inOnboardingFlow = replay || !paid;
     if (!replay && stage === "brand") {
@@ -254,10 +271,7 @@ export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
       companyName: brand.companyName ?? "",
       domain: normalizeCompetitorDomain(brand.websiteUrl),
       inOnboardingFlow,
-      nextHref:
-        inOnboardingFlow && !replay
-          ? withGeoProject(`/${organization.slug}`, projectId)
-          : geoDashboardPath(organization.slug, projectId),
+      nextHref,
       organizationId: organization.id,
       progressHrefs: onboardingProgressHrefs({
         current: ONBOARDING_STEP_COMPETITORS,
