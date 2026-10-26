@@ -1,0 +1,23 @@
+apps/dashboard/src/types/geo.ts
+  s_677bcce567202f::t_e1c261d92c051a 1631-1632
+apps/dashboard/src/components/geo/competitor-lost-prompts-table.tsx
+  s_677bcce567202f::t_e1c261d92c051a 4,29,38-52,124
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/page-client.tsx
+  s_677bcce567202f::t_e1c261d92c051a 199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "387a0b4ed773a837d7f1a0b59edda30b876a402d",
+  "prompts": {},
+  "sessions": {
+    "s_677bcce567202f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5d1389c-2218-4a20-ac79-55e67065b6a4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
