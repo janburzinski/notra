@@ -41,6 +41,7 @@ export const GEO_OLOSTEP_ENGINES: Readonly<Record<string, GeoOlostepEngine>> = {
     url: (query) =>
       `https://www.google.com/aimode?q=${encodeURIComponent(query)}`,
     conversational: true,
+    panelSourcesCited: true,
   },
   "microsoft/copilot": {
     parser: "@olostep/microsoft-copilot-results",

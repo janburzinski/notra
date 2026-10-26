@@ -115,18 +115,21 @@ export function geoOlostepSurfaces(
  * lists searched but uncited pages there). Grounding keeps the same cited
  * list: every reader of `grounding.sources` shows it as the answer's sources,
  * so uncited search candidates would read as citations. The search queries
- * remain as the search evidence.
+ * remain as the search evidence. Google AI Mode marks every panel source
+ * `cited: false` and has no inline references; for such engines
+ * (`panelSourcesCited`) the panel is what the answer cites.
  *
  * Google showing no AI Overview is a miss to store, not an engine failure.
  */
 export function geoOlostepAnswer(
-  payload: GeoOlostepAnswerPayload
+  payload: GeoOlostepAnswerPayload,
+  { panelSourcesCited = false }: { panelSourcesCited?: boolean } = {}
 ): GeoEngineAnswer {
   const inline = payload.inline_references ?? [];
   const drawer = payload.sources ?? [];
   const cited = uniqueSources([
     ...inline,
-    ...drawer.filter((source) => source.cited !== false),
+    ...drawer.filter((source) => panelSourcesCited || source.cited !== false),
   ]);
   const queries = [
     ...new Set(

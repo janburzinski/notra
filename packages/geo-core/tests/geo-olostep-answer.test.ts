@@ -38,6 +38,34 @@ describe("Olostep AI Overview answers", () => {
   });
 });
 
+describe("Olostep sources", () => {
+  const panel = {
+    answer_markdown: "Rally and Collectable sell card shares.",
+    sources: [
+      { url: "https://rallyrd.com/", title: "Rally", cited: false },
+      { url: "https://www.si.com/collectibles", title: "SI", cited: false },
+    ],
+  };
+
+  test("uncited search candidates are dropped by default", () => {
+    expect(answerOf(panel).sources).toEqual([]);
+  });
+
+  test("an engine whose panel is its citations keeps every panel source", () => {
+    const answer = geoOlostepAnswer(geoOlostepAnswerSchema.parse(panel), {
+      panelSourcesCited: true,
+    });
+    expect(answer.sources).toEqual([
+      { title: "Rally", url: "https://rallyrd.com/" },
+      { title: "SI", url: "https://www.si.com/collectibles" },
+    ]);
+    expect(answer.grounding.sources.map(({ domain }) => domain)).toEqual([
+      "rallyrd.com",
+      "si.com",
+    ]);
+  });
+});
+
 describe("Olostep commercial surfaces", () => {
   test("keeps advertisers, products and the model from a ChatGPT result", () => {
     const answer = answerOf({

@@ -11,6 +11,12 @@ export interface GeoOlostepEngine {
    * a SERP engine only answers tracked prompts.
    */
   conversational: boolean;
+  /**
+   * The parser marks every source `cited: false` and returns no inline
+   * references, so its sources panel is the only record of what the answer
+   * used. Without this flag such an engine would store no sources at all.
+   */
+  panelSourcesCited?: boolean;
 }
 
 export type GeoOlostepAnswerPayload = output<typeof geoOlostepAnswerSchema>;

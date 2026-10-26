@@ -5,6 +5,7 @@ import type { output, ZodType } from "zod";
 import {
   GEO_OLOSTEP_API_KEY_ENV,
   GEO_OLOSTEP_BASE_URL,
+  GEO_OLOSTEP_ENGINES,
   GEO_OLOSTEP_ITEMS_PAGE_LIMIT,
   GEO_OLOSTEP_REQUEST_TIMEOUT_MS,
   GEO_OLOSTEP_TERMINAL_BATCH_STATUSES,
@@ -222,6 +223,7 @@ export const collectGeoOlostepResults = Effect.fn("geo.collectOlostepResults")(
 );
 
 const fetchGeoOlostepAnswer = Effect.fn("geo.fetchOlostepAnswer")(function* (
+  engine: string,
   retrieveId: string
 ) {
   const retrieved = yield* olostepRequest(
@@ -237,7 +239,9 @@ const fetchGeoOlostepAnswer = Effect.fn("geo.fetchOlostepAnswer")(function* (
         cause,
       }),
   });
-  return geoOlostepAnswer(payload);
+  return geoOlostepAnswer(payload, {
+    panelSourcesCited: GEO_OLOSTEP_ENGINES[engine]?.panelSourcesCited === true,
+  });
 });
 
 /**
@@ -255,7 +259,7 @@ export const askGeoOlostepAnswer = Effect.fn("geo.askOlostepAnswer")(function* (
       })
     );
   }
-  return yield* fetchGeoOlostepAnswer(retrieveId).pipe(
+  return yield* fetchGeoOlostepAnswer(engine, retrieveId).pipe(
     Effect.mapError(
       (cause) =>
         new GeoScanError({
