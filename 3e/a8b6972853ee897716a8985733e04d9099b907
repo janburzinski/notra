@@ -1,0 +1,23 @@
+apps/dashboard/src/components/dashboard/sidebar-project-switcher.tsx
+  s_df98dea1105557::t_bea7bc539af4ba 225-227,271
+apps/dashboard/src/lib/hooks/use-sites.ts
+  s_df98dea1105557::t_bea7bc539af4ba 74-76,81,90-99
+apps/dashboard/src/routes/-sites-ui.tsx
+  s_df98dea1105557::t_bea7bc539af4ba 98-106,109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3ea8b6972853ee897716a8985733e04d9099b907",
+  "prompts": {},
+  "sessions": {
+    "s_df98dea1105557": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba2f9e48-50e9-4389-9964-788ec950d8a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
