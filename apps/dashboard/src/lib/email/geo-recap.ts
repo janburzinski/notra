@@ -60,6 +60,7 @@ import {
   getDropAlertWindow,
   getPreviousWeekWindow,
   isNewsworthyShift,
+  recapOwnBrandName,
   sharePoints,
   shouldSendQuietWeek,
   truncatePrompt,
@@ -187,6 +188,22 @@ async function loadProjectNames(pairs: readonly GeoRecapPair[]) {
   return new Map(rows.map((row) => [row.id, row.name]));
 }
 
+async function loadOwnBrandName(
+  organizationId: string,
+  pairs: readonly GeoRecapPair[]
+) {
+  const projectIds = [...new Set(pairs.map((pair) => pair.projectId))];
+  const rows = await db.query.projects.findMany({
+    where: and(
+      eq(projects.organizationId, organizationId),
+      inArray(projects.id, projectIds)
+    ),
+    columns: { name: true },
+    with: { geoSettings: { columns: { companyName: true } } },
+  });
+  return recapOwnBrandName(rows);
+}
+
 function toRecapItem(
   change: GeoRecapPairChange,
   projectNames: ReadonlyMap<string, string>
@@ -276,8 +293,9 @@ async function sendWeeklyRecap({
     return "quiet";
   }
 
-  const [projectNames, action] = await Promise.all([
+  const [projectNames, ownName, action] = await Promise.all([
     loadProjectNames(pairs),
+    loadOwnBrandName(organizationId, pairs),
     quiet
       ? Promise.resolve(undefined)
       : pickAction(recipients.slug, pairs, changes),
@@ -285,7 +303,7 @@ async function sendWeeklyRecap({
   const items = changes.map((change) => toRecapItem(change, projectNames));
   const visibleItems = items.slice(0, GEO_RECAP_MAX_ITEMS);
   const competitors = buildCompetitorRows({
-    ownName: recipients.name,
+    ownName,
     ownPrevious: rates.previous.rate,
     ownCurrent: rates.current.rate,
     shares,

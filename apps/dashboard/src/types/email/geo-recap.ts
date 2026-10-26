@@ -2,6 +2,11 @@ import type { GeoCheckPeriodInput } from "@notra/db/types/geo-checks";
 
 export type GeoRecapWindow = Omit<GeoCheckPeriodInput, "organizationId">;
 
+export interface GeoRecapProjectBrand {
+  name: string;
+  geoSettings: { companyName: string } | null;
+}
+
 export interface GeoRecapPeriodStats {
   checks: number;
   mentions: number;

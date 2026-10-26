@@ -22,9 +22,22 @@ import type {
   GeoRecapPair,
   GeoRecapPairChange,
   GeoRecapPeriodStats,
+  GeoRecapProjectBrand,
   GeoRecapRate,
   GeoRecapWindow,
 } from "@/types/email/geo-recap";
+
+export function recapOwnBrandName(projects: readonly GeoRecapProjectBrand[]) {
+  if (projects.length > 1) {
+    return "Your products";
+  }
+  const project = projects[0];
+  return (
+    project?.geoSettings?.companyName.trim() ||
+    project?.name.trim() ||
+    "Your brand"
+  );
+}
 
 function startOfUtcDay(date: Date) {
   return new Date(
