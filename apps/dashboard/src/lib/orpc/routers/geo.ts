@@ -291,6 +291,7 @@ import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import {
   assertActiveSubscription,
   assertGeoEntitlement,
+  resolveGeoEntitlement,
 } from "@/lib/billing/subscription";
 import { afterResponse } from "@/lib/framework/after-response";
 import {
@@ -334,6 +335,7 @@ import type { AuthenticatedUser } from "@/types/auth/organization";
 import type {
   GeoBrandSearchHandlerInput,
   GeoCompetitorSuggestionsHandlerInput,
+  GeoProjectCreateHandlerInput,
   GeoPromptSuggestionsResponse,
 } from "@/types/geo";
 import type { GeoDashboardRuntime } from "@/types/geo-runtime";
@@ -1685,9 +1687,15 @@ export const geoRouter = {
     .handler(geoOpenHandler((input) => listGeoProjects(input.organizationId))),
   projectsCreate: authorizedProcedure
     .input(geoProjectCreateInputSchema)
-    .handler(
-      geoHandler(
-        (input) =>
+    .handler(async (options) => {
+      await assertOrganizationAccess(accessParams(options));
+      const scanEnabled =
+        (await resolveGeoEntitlement(
+          options.input.organizationId,
+          options.context.headers
+        )) !== "denied";
+      return geoOpenHandler(
+        (input: GeoProjectCreateHandlerInput) =>
           requireBrandIdentity(
             input.organizationId,
             input.brandSettingsId
@@ -1698,6 +1706,7 @@ export const geoRouter = {
                 input.name,
                 input.brandSettingsId,
                 identity.websiteUrl,
+                scanEnabled,
                 input.languages
               )
             )
@@ -1725,8 +1734,8 @@ export const geoRouter = {
             properties: { is_sample: false, project_count: projectCount },
           });
         }
-      )
-    ),
+      )(options);
+    }),
   projectsUpdate: authorizedProcedure
     .input(geoProjectUpdateInputSchema)
     .handler(

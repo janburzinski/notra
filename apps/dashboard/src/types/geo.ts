@@ -1,6 +1,7 @@
 import type { ToneProfile } from "@notra/ai/schemas/tone";
 import type { GeoWriterBrief } from "@notra/ai/types/geo-writer";
 import type { GeoWriterSourceKind } from "@notra/db/types/geo-writer";
+import type { geoProjectCreateInputSchema } from "@notra/geo-core/schemas/geo";
 import type {
   AiTrafficResponse,
   WebAnalyticsOutcome,
@@ -74,6 +75,7 @@ import type {
   ReactNode,
 } from "react";
 import type { useTranslations } from "use-intl";
+import type { z } from "zod";
 
 import type { Button } from "@/components/button";
 import type { GeoPromptDetailSurface } from "@/types/analytics/geo-events";
@@ -453,6 +455,10 @@ export type GeoCompetitorSuggestionsHandlerInput = GeoScopeInput &
   GeoCompetitorSuggestionsInput;
 
 export type GeoBrandSearchHandlerInput = GeoScopeInput & GeoBrandSearchInput;
+
+export type GeoProjectCreateHandlerInput = z.infer<
+  typeof geoProjectCreateInputSchema
+>;
 
 /** Visitors when the site sends human page views, agents for AI traffic only. */
 export type TrafficPageLayout = "visitors" | "agents";

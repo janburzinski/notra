@@ -503,6 +503,7 @@ export const createGeoProjectFromWebsite = Effect.fn(
   name: string,
   brandSettingsId: string,
   url: string,
+  scanEnabled: boolean,
   languages?: readonly string[]
 ) {
   const seedLanguages = languages?.length
@@ -568,6 +569,10 @@ export const createGeoProjectFromWebsite = Effect.fn(
   yield* Effect.promise(() =>
     invalidateGeoIngestHostsCache(organizationId, project.id)
   );
-  yield* startGeoScanAfterWebsiteGeneration(organizationId, project.id, true);
+  yield* startGeoScanAfterWebsiteGeneration(
+    organizationId,
+    project.id,
+    scanEnabled
+  );
   return project;
 });

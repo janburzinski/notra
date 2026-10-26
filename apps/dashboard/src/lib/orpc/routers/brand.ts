@@ -165,7 +165,6 @@ async function getGuidelineIdForVoice(voiceId: string) {
 }
 
 async function getEditableGuidelineId(organizationId: string, voiceId: string) {
-  await assertActiveSubscription(organizationId);
   await verifyVoiceOwnership(organizationId, voiceId);
   return getGuidelineIdForVoice(voiceId);
 }
@@ -304,7 +303,6 @@ export const brandRouter = {
       .use(withOrganizationAccess)
       .handler(async ({ context, input }) => {
         const { auth } = context;
-        await assertActiveSubscription(input.organizationId);
 
         const name =
           typeof input.name === "string" && input.name.trim()
@@ -370,8 +368,6 @@ export const brandRouter = {
       .input(voiceUpdateInputSchema)
       .use(withOrganizationAccess)
       .handler(async ({ input }) => {
-        await assertActiveSubscription(input.organizationId);
-
         const voice = await verifyVoiceOwnership(
           input.organizationId,
           input.voiceId
@@ -507,7 +503,6 @@ export const brandRouter = {
       .use(withOrganizationAccess)
       .handler(async ({ context, input }) => {
         const { auth } = context;
-        await assertActiveSubscription(input.organizationId);
 
         await verifyVoiceOwnership(input.organizationId, input.voiceId);
 
@@ -596,7 +591,6 @@ export const brandRouter = {
       .use(withOrganizationAccess)
       .handler(async ({ context, input }) => {
         const { auth } = context;
-        await assertActiveSubscription(input.organizationId);
 
         const url = await validateWebsiteUrl(input.url);
         await startBrandAnalysisRun({
@@ -635,7 +629,6 @@ export const brandRouter = {
       .use(withOrganizationAccess)
       .handler(async ({ context, input }) => {
         const { auth } = context;
-        await assertActiveSubscription(input.organizationId);
 
         const voice = await verifyVoiceOwnership(
           input.organizationId,
@@ -942,7 +935,6 @@ export const brandRouter = {
       .input(voiceInputSchema.and(attachGuidelineSourcePdfSchema))
       .use(withOrganizationAccess)
       .handler(async ({ input }) => {
-        await assertActiveSubscription(input.organizationId);
         await verifyVoiceOwnership(input.organizationId, input.voiceId);
 
         try {
@@ -969,7 +961,6 @@ export const brandRouter = {
       .input(voiceInputSchema)
       .use(withOrganizationAccess)
       .handler(async ({ input }) => {
-        await assertActiveSubscription(input.organizationId);
         await verifyVoiceOwnership(input.organizationId, input.voiceId);
         return removeBrandGuidelineSourcePdf(input.voiceId);
       }),
