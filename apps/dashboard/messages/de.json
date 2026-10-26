@@ -3154,11 +3154,10 @@
       "eyebrow": "Sichtbarkeitsaktivität"
     },
     "personaActivityCard": {
-      "forecastLabel": "{name} (Prognose)",
+      "rollingNote": "Linien zeigen die Rate der letzten {days} Tage",
+      "changeLabel": "Veränderung von {name} gegenüber der ersten Hälfte des Zeitraums",
       "eyebrow": "Persona-Sichtbarkeit",
       "loadFailed": "Persona-Aktivität konnte nicht geladen werden.",
-      "actual": "Ist",
-      "forecast": "Prognose",
       "runScan": "Starte einen Scan, um deine Sichtbarkeit nach Persona zu sehen"
     },
     "personaAddDialog": {

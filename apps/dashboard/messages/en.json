@@ -3154,11 +3154,10 @@
       "eyebrow": "Visibility activity"
     },
     "personaActivityCard": {
-      "forecastLabel": "{name} (forecast)",
+      "rollingNote": "Lines show the rolling rate over the last {days} days",
+      "changeLabel": "{name} change vs. first half of the range",
       "eyebrow": "Persona visibility",
       "loadFailed": "Could not load persona activity.",
-      "actual": "Actual",
-      "forecast": "Forecast",
       "runScan": "Run a scan to see your visibility by persona"
     },
     "personaAddDialog": {

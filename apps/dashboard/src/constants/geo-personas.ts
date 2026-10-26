@@ -8,8 +8,7 @@ import type { PersonaDialogView } from "@/types/geo-personas-ui";
 export const GEO_PERSONA_RESULTS_POLL_MS = 15_000;
 
 export const GEO_PERSONA_DETAIL_QUERY_KEY = "persona";
-export const GEO_PERSONA_FORECAST_DAYS = 7;
-export const GEO_PERSONA_FORECAST_SAMPLE_DAYS = 7;
+export const GEO_PERSONA_ROLLING_DAYS = 7;
 export const GEO_PERSONA_CHART_MIN_MAX = 20;
 export const GEO_PERSONA_CHART_MAX_STEP = 10;
 export const GEO_PERSONA_DIALOG_VIEWS = [
