@@ -1,0 +1,24 @@
+apps/sites-builder/scripts/export-cli.ts
+  s_191b4b96384b9a::t_18e6d758d061fa 19-25,29,35-47,60-64
+apps/sites-builder/release.md
+  s_191b4b96384b9a::t_18e6d758d061fa 24
+  s_191b4b96384b9a::t_9971811338ae67 25-26
+apps/sites-builder/tests/packaged-dev.test.ts
+  s_191b4b96384b9a::t_18e6d758d061fa 85-86,100-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ba7e2ad24e982e101d3580b0cd8d36f4b2dd94cd",
+  "prompts": {},
+  "sessions": {
+    "s_191b4b96384b9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c694fadb-e746-4cd0-81f8-e2f5fcf1e83f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
