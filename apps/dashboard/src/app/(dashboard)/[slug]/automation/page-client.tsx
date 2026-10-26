@@ -59,6 +59,7 @@ import { useAutomationMutations } from "@/lib/hooks/use-automation-mutations";
 import { useAutomationRowName } from "@/lib/hooks/use-automation-row-name";
 import { useAutomationRows } from "@/lib/hooks/use-automation-rows";
 import { useLatestAutomationRuns } from "@/lib/hooks/use-automation-runs";
+import { useOnboardingSuggestions } from "@/lib/hooks/use-onboarding";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useRouter } from "@/lib/navigation";
 import type {
@@ -121,6 +122,12 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     refetch,
   } = useAutomationRows(organizationId);
   const latestRuns = useLatestAutomationRuns(organizationId);
+  // Hold the sections below the table until suggestions are known, otherwise
+  // templates render first and get pushed down when suggestions arrive.
+  const suggestionsLoading = useOnboardingSuggestions(
+    organizationId ?? ""
+  ).isLoading;
+  const showSections = !isPending && !suggestionsLoading;
   const lastRuns = new Map(Object.entries(latestRuns.data?.lastRunAt ?? {}));
   const visibleRows = rows.filter((row) => matchesFilter(row, filter));
   const counts = Object.fromEntries(
@@ -265,34 +272,39 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
           </div>
         )}
 
-        {organizationId ? (
-          <OnboardingSuggestions
-            onCreate={(suggestionId, type) => {
-              const kind = type === "event_automation" ? "event" : "schedule";
-              goToNew(`?type=${kind}&suggestion=${suggestionId}`);
-            }}
-            organizationId={organizationId}
-          />
-        ) : null}
+        {showSections ? (
+          <>
+            {organizationId ? (
+              <OnboardingSuggestions
+                onCreate={(suggestionId, type) => {
+                  const kind =
+                    type === "event_automation" ? "event" : "schedule";
+                  goToNew(`?type=${kind}&suggestion=${suggestionId}`);
+                }}
+                organizationId={organizationId}
+              />
+            ) : null}
 
-        <InstrumentSection
-          action={
-            <Link
-              className="text-muted-foreground hover:text-foreground duration-fast text-sm transition-colors"
-              href={`${basePath}/templates`}
+            <InstrumentSection
+              action={
+                <Link
+                  className="text-muted-foreground hover:text-foreground duration-fast text-sm transition-colors"
+                  href={`${basePath}/templates`}
+                >
+                  {t("more")}
+                </Link>
+              }
+              eyebrow={t("templatesTitle")}
             >
-              {t("more")}
-            </Link>
-          }
-          eyebrow={t("templatesTitle")}
-        >
-          <AutomationTemplateGrid
-            alerts={alertsReady ? alertList : undefined}
-            onOpenWebhooks={() => openSettings("webhooks")}
-            organizationSlug={organizationSlug}
-            templates={featuredTemplates}
-          />
-        </InstrumentSection>
+              <AutomationTemplateGrid
+                alerts={alertsReady ? alertList : undefined}
+                onOpenWebhooks={() => openSettings("webhooks")}
+                organizationSlug={organizationSlug}
+                templates={featuredTemplates}
+              />
+            </InstrumentSection>
+          </>
+        ) : null}
       </div>
 
       <ConfirmDialog
