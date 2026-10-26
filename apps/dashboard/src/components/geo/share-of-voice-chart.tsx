@@ -316,7 +316,7 @@ export function ShareOfVoiceChart(props: ShareOfVoiceChartProps) {
                   innerRadius="76%"
                   outerRadius="88%"
                   cornerRadius={12}
-                  paddingAngle={4}
+                  paddingAngle={2.5}
                 />
                 <EChartsPieChart.Tooltip
                   roundness="xl"

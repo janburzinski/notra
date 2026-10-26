@@ -92,18 +92,12 @@ const SELECTED_OFFSET = 12;
 
 const DIMMED_OPACITY = 0.15;
 
-function gapBorderWidth(paddingAngle: number): number {
-  return Math.max(paddingAngle, 0);
-}
-
 function sectorBorder(
   paddingAngle: number,
   background: string
 ): { borderColor: string; borderWidth: number } | null {
   if (paddingAngle < 0)
     return { borderColor: background, borderWidth: OVERLAP_BORDER_WIDTH };
-  const width = gapBorderWidth(paddingAngle);
-  if (width > 0) return { borderColor: background, borderWidth: width };
   return null;
 }
 
@@ -769,7 +763,7 @@ function buildPieSeries(ctx: OptionBuildContext): PieSeriesOption[] {
       startAngle: pie.startAngle,
       endAngle: pie.endAngle,
       clockwise: false,
-      padAngle: Math.min(pie.paddingAngle, 0),
+      padAngle: data.length > 1 ? pie.paddingAngle : 0,
       cursor: pie.isClickable ? "pointer" : "default",
       emphasis: { scale: false },
       selectedMode: pie.isClickable ? "single" : false,
@@ -830,7 +824,7 @@ function buildLoadingOption(ctx: OptionBuildContext): EChartsOption {
         startAngle,
         endAngle,
         clockwise: false,
-        padAngle: Math.min(paddingAngle, 0),
+        padAngle: paddingAngle,
         silent: true,
         emphasis: { scale: false },
         label: { show: false },

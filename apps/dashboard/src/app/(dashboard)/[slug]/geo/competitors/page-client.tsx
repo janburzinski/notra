@@ -13,6 +13,7 @@ import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import { CompetitorEditDialog } from "@/components/geo/competitor-edit-dialog";
+import { CompetitorLostPromptsTable } from "@/components/geo/competitor-lost-prompts-table";
 import { CompetitorSuggestionsTable } from "@/components/geo/competitor-suggestions-table";
 import { CompetitorsTable } from "@/components/geo/competitors-table";
 import { CompetitorsCsvImportDialog } from "@/components/geo/geo-csv-import-dialog";
@@ -26,6 +27,7 @@ import {
 } from "@/constants/empty-state";
 import {
   useGeoCompetitorShare,
+  useGeoPromptResults,
   useGeoSettings,
   useIsGeoScanning,
   usePrefetchGeoCompetitorEngineMatrix,
@@ -89,6 +91,8 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   const { data: competitorShare, isPending: isSharePending } =
     useGeoCompetitorShare(organizationId, geoRange.query);
   usePrefetchGeoCompetitorEngineMatrix(organizationId, geoRange.query);
+  const { data: promptResults, isPlaceholderData: isPromptResultsStale } =
+    useGeoPromptResults(organizationId, geoRange.query);
   const { competitors } = useGeoCompetitorsDb(organizationId);
   const { domain: ownDomain } = useGeoActiveProject(organizationId);
   const isScanning = useIsGeoScanning(organizationId);
@@ -186,6 +190,12 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
           organizationSlug={organizationSlug}
           range={geoRange.query}
           trackedEngines={settings.engines}
+        />
+        <CompetitorLostPromptsTable
+          competitors={competitors}
+          organizationSlug={organizationSlug}
+          rangeParam={geoRange.param}
+          results={isPromptResultsStale ? [] : (promptResults?.results ?? [])}
         />
         <CompetitorsTable
           aliases={settings.aliases}

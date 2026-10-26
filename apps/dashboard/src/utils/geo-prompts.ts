@@ -12,6 +12,7 @@ import { GEO_PROMPT_FILTER_ALL } from "@notra/schemas/constants/dashboard/geo-pr
 
 import type {
   EngineFamilyPromptHit,
+  GeoLostPromptRow,
   GeoPromptBrandCount,
   GeoPromptCoverage,
   GeoPromptTableFilters,
@@ -303,4 +304,46 @@ export function promptMentionedInstead(
   return [...counts]
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+/**
+ * Prompts where an answer named a competitor but not you, most lost answers
+ * first.
+ */
+export function buildLostPromptRows(
+  results: readonly GeoPromptResultSummary[]
+): GeoLostPromptRow[] {
+  const byPrompt = new Map<string, GeoPromptResultSummary[]>();
+  for (const result of results) {
+    const group = byPrompt.get(result.promptId) ?? [];
+    group.push(result);
+    byPrompt.set(result.promptId, group);
+  }
+  const rows: GeoLostPromptRow[] = [];
+  for (const [promptId, group] of byPrompt) {
+    const lostResults = group.filter(
+      (result) =>
+        !result.mentioned &&
+        uniquePromptBrandNames(result.competitors).length > 0
+    );
+    if (lostResults.length === 0) {
+      continue;
+    }
+    rows.push({
+      promptId,
+      prompt: group[0]?.prompt ?? "",
+      answers: group.length,
+      lost: lostResults.length,
+      lostEngines: [
+        ...new Set(lostResults.map((result) => engineFamilyOf(result.engine))),
+      ],
+      brands: promptMentionedInstead(lostResults),
+    });
+  }
+  return rows.sort(
+    (a, b) =>
+      b.lost - a.lost ||
+      b.lost / b.answers - a.lost / a.answers ||
+      a.prompt.localeCompare(b.prompt)
+  );
 }

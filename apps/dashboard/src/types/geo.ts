@@ -1615,6 +1615,23 @@ export interface CompetitorSheetProps {
   children: ReactNode;
 }
 
+export interface GeoLostPromptRow {
+  promptId: string;
+  prompt: string;
+  answers: number;
+  lost: number;
+  lostEngines: string[];
+  brands: GeoPromptBrandCount[];
+}
+
+export interface CompetitorLostPromptsTableProps {
+  results: readonly GeoPromptResultSummary[];
+  competitors: GeoCompetitor[];
+  organizationSlug: string;
+  /** Current `range` query value, carried into the prompt link. */
+  rangeParam: string | null;
+}
+
 export interface CompetitorSuggestionsTableProps {
   suggestions: readonly GeoCompetitorSuggestion[];
   competitors: GeoCompetitor[];

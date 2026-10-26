@@ -4192,6 +4192,13 @@
     "trafficExport": {
       "label": "Als CSV exportieren"
     },
+    "competitorLostPrompts": {
+      "title": "Wo du verlierst",
+      "hint": "Prompts, bei denen KI-Assistenten einen Wettbewerber nennen, aber nicht dich.",
+      "prompt": "Prompt",
+      "missingIn": "Fehlt in",
+      "answers": "{lost}/{total}"
+    },
     "competitorSuggestions": {
       "title": "Vorgeschlagene Wettbewerber",
       "hint": "Marken, die KI-Assistenten in mindestens zwei Antworten genannt haben und die du noch nicht trackst.",
