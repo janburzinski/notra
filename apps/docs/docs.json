@@ -244,6 +244,7 @@
                   "sites/domains/tanstack-start",
                   "sites/domains/astro",
                   "sites/domains/netlify",
+                  "sites/domains/framer",
                   "sites/domains/cloudflare",
                   "sites/domains/nginx"
                 ]
