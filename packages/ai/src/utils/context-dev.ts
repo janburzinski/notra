@@ -749,6 +749,7 @@ export async function searchWeb(
         },
       }),
       method: "POST",
+      signal: input.abortSignal,
     }
   );
 

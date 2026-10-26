@@ -4,6 +4,7 @@ export interface ContextDevErrorResponse {
 }
 
 export interface ContextDevWebSearchInput {
+  abortSignal?: AbortSignal;
   query: string;
   limit?: number;
   includeDomains?: string[];

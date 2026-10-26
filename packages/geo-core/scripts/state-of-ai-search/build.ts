@@ -20,14 +20,11 @@ import {
   type ReportBrand,
   type ReportCategory,
 } from "./categories";
-import {
-  ENGINE_MODELS,
-  RAW_ROOT,
-  REPORT_EDITION,
-  type RawAnswer,
-} from "./shared";
+import { RAW_ROOT, REPORT_EDITION, type RawAnswer } from "./shared";
 import { brandMatchers, firstMention } from "./utils/brand-matching";
+import { reportAnswerModel } from "./utils/collection";
 import { resolveGroundedSources } from "./utils/grounded-sources";
+import { reportOverviewFallback } from "./utils/overview";
 
 const OUTPUT_ROOT = join(
   import.meta.dir,
@@ -462,6 +459,9 @@ function collectOverviewBlocks(
 function buildOverview(
   answer: RawAnswer | undefined
 ): StateOfAiSearchOverview | null {
+  if (answer?.present && !answer.overview && answer.text.trim()) {
+    return reportOverviewFallback(answer, cleanAnswer(answer.text));
+  }
   if (
     !answer?.present ||
     !answer.overview ||
@@ -651,7 +651,9 @@ async function buildReport(
       {
         id: engine,
         label: ENGINE_LABELS[engine],
-        model: ENGINE_MODELS[engine],
+        model: reportAnswerModel(
+          raw.filter((answer) => answer.engine === engine)
+        ),
         answers: list.length,
         brandsPerAnswer: average((answer) => answer.mentioned.length),
         sourcesPerAnswer: average((answer) => answer.raw.sources.length),

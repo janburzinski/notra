@@ -9,11 +9,12 @@ export type ReportEngine =
   | "ai-overview";
 
 /** Monthly edition slug; the report is dated by `REPORT_TODAY`. */
-export const REPORT_EDITION = process.env.SOAS_EDITION ?? "2026-10";
+export const REPORT_EDITION =
+  process.env.SOAS_EDITION ?? new Date().toISOString().slice(0, 7);
 export const REPORT_TODAY =
   process.env.SOAS_TODAY ?? new Date().toISOString().slice(0, 10);
 
-/** Consumer assistants, with models pinned for within-edition comparability. */
+/** Legacy/API model IDs; new consumer captures record their surface ID instead. */
 export const ENGINE_MODELS: Record<ReportEngine, string> = {
   chatgpt: "openai/gpt-5.6-sol",
   claude: "anthropic/claude-opus-5.5",
@@ -31,7 +32,9 @@ export const SAMPLES_PER_ENGINE: Record<ReportEngine, number> = {
   "ai-overview": 1,
 };
 
-export const RAW_ROOT = join(homedir(), ".notra-state-of-ai-search", "raw");
+export const RAW_ROOT =
+  process.env.SOAS_RAW_ROOT ??
+  join(homedir(), ".notra-state-of-ai-search", "raw");
 
 export function rawAnswerPath(
   category: string,
@@ -55,6 +58,8 @@ export interface RawSource {
 }
 
 export interface RawAnswer {
+  /** Collector version distinguishes consumer captures from historical model API samples. */
+  captureMethod?: string;
   category: string;
   promptIndex: number;
   prompt: string;
