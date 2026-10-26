@@ -1,0 +1,28 @@
+packages/analytics/src/tinybird/pipes/web.ts
+  s_11f758ce3d3eb9::t_adce5977912f64 447,453-470
+apps/dashboard/src/utils/web-analytics.ts
+  s_11f758ce3d3eb9::t_75f2042dc6dcbe 112-116
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_11f758ce3d3eb9::t_1a68cdb87ae0b0 264-269
+  s_11f758ce3d3eb9::t_75f2042dc6dcbe 67,120,237-241,248-263,270-271,274,276-280,326,372-374
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/loading.tsx
+  s_11f758ce3d3eb9::t_1a68cdb87ae0b0 1-2,7-8,10-16
+apps/dashboard/src/components/geo/traffic-domain-select.tsx
+  s_11f758ce3d3eb9::t_75f2042dc6dcbe 35-37,40,71,95-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "af0c4b33a9b60629434b9d3618fa5b8efc7a12f8",
+  "prompts": {},
+  "sessions": {
+    "s_11f758ce3d3eb9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6dd22f88-7255-42da-b981-f4804f39587d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
