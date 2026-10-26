@@ -1,0 +1,33 @@
+apps/dashboard/src/components/skills/skill-card.tsx
+  s_310c00cd760ef5::t_b784b133f7b07f 3-4,62-70,75-78,90-94
+  s_310c00cd760ef5::t_167966176925b0 71-74
+apps/dashboard/src/components/content/diff-view.tsx
+  s_310c00cd760ef5::t_3589458ca3540f 16,24
+  s_310c00cd760ef5::t_ccc3d11798777c 46
+apps/dashboard/messages/de.json
+  s_310c00cd760ef5::t_188876d48284e6 1861,1863,1871-1872
+apps/dashboard/messages/en.json
+  s_310c00cd760ef5::t_188876d48284e6 1861,1863,1871-1872
+apps/console/src/components/skills/system-skill-editor-client.tsx
+  s_310c00cd760ef5::t_22f887f975bfb5 3,6-11,180-185,208-231
+  s_310c00cd760ef5::t_3589458ca3540f 141
+apps/dashboard/src/components/skills/skill-update-notice.tsx
+  s_310c00cd760ef5::t_188876d48284e6 3-4,14-19,43-59,65,73-77
+  s_310c00cd760ef5::t_3589458ca3540f 84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "27073be8d85d44ce52acbf315420ed1ee11ad9ad",
+  "prompts": {},
+  "sessions": {
+    "s_310c00cd760ef5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "57197665-3dbb-4aae-b2fe-63eecdce7ef5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
