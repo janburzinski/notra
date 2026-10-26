@@ -2942,7 +2942,7 @@
       "method": "Install method",
       "methods": {
         "sdk": "Package",
-        "vercel": "Vercel log drain",
+        "vercel": "Vercel Log Drain",
         "cloudflare": "Cloudflare Logpush"
       },
       "drains": {

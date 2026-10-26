@@ -1,5 +1,7 @@
 "use client";
 
+import { PackageIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   GEO_DRAIN_PROVIDERS,
   GEO_INGEST_DEFAULT_FRAMEWORK,
@@ -11,6 +13,8 @@ import {
   GEO_INGEST_TOKEN_ENV,
 } from "@notra/geo-core/constants/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
+import { Cloudflare } from "@notra/ui/components/ui/svgs/cloudflare";
+import { Vercel } from "@notra/ui/components/ui/svgs/vercel";
 import {
   Tabs,
   TabsContent,
@@ -48,6 +52,12 @@ const PACKAGE_MANAGER_TABS = GEO_INGEST_PACKAGE_MANAGER_OPTIONS.map(
     icon: <GeoPackageManagerIcon manager={option.value} />,
   })
 );
+
+const METHOD_ICONS = {
+  sdk: <HugeiconsIcon aria-hidden="true" icon={PackageIcon} />,
+  vercel: <Vercel aria-hidden="true" className="size-3.5" />,
+  cloudflare: <Cloudflare aria-hidden="true" />,
+};
 
 export function GeoIngestSetup({ setup, className }: GeoIngestSetupPanelProps) {
   const t = useTranslations("geo.geoIngestSetup");
@@ -101,6 +111,7 @@ export function GeoIngestSetup({ setup, className }: GeoIngestSetupPanelProps) {
         <TabsList aria-label={t("method")} className="w-full">
           {GEO_INGEST_METHODS.map((option) => (
             <TabsTrigger key={option} value={option}>
+              {METHOD_ICONS[option]}
               {t(`methods.${option}`)}
             </TabsTrigger>
           ))}
