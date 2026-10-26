@@ -1,0 +1,29 @@
+apps/sites-builder/scripts/export-cli.ts
+  s_191b4b96384b9a::t_f48138cc6f54e4 4-9,11-13,15-19,30-40,42
+apps/sites-builder/package.json
+  s_191b4b96384b9a::t_f48138cc6f54e4 12
+apps/sites-builder/release.md
+  s_191b4b96384b9a::t_2a6b0f97747126 1,3-6,8-10,12,14-15,17-20,22-25
+apps/sites-builder/README.md
+  s_191b4b96384b9a::t_2a6b0f97747126 3-5,38,41,44-47,49,52-53
+apps/sites-builder/tests/packaged-dev.test.ts
+  s_191b4b96384b9a::t_88c19493c14554 1,10-15,18-26,31-57,61,64,66,69,71-74,76-79
+.github/workflows/sites-renderer.yml
+  s_191b4b96384b9a::t_899409888e1029 1,6,19,34,69-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "aabe3ead838ba26b10aa1fe0ca5a2c092f0f729d",
+  "prompts": {},
+  "sessions": {
+    "s_191b4b96384b9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c694fadb-e746-4cd0-81f8-e2f5fcf1e83f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
