@@ -1,0 +1,100 @@
+apps/console/src/components/skills/line-diff.tsx
+  s_310c00cd760ef5::t_8615fbbaec146c 27,31,42
+packages/tools/src/skill-editor/get-skill.ts
+  s_310c00cd760ef5::t_74812e8aa5dff7 1,17
+apps/dashboard/src/app/(dashboard)/[slug]/skills/[name]/page-client.tsx
+  s_310c00cd760ef5::t_02a544fbbd88ae 14,153,214-219
+  s_310c00cd760ef5::t_355bd32b41f801 16,143-151,232
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_310c00cd760ef5::t_9f405f7a5d85c1 271,273-274,276,279-282,296
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_310c00cd760ef5::t_9f405f7a5d85c1 73-74
+apps/dashboard/src/types/skills/page.ts
+  s_310c00cd760ef5::t_9eb1b05691c407 93
+  s_310c00cd760ef5::t_02a544fbbd88ae 100-113
+apps/console/src/utils/line-diff.test.ts
+  s_310c00cd760ef5::t_8615fbbaec146c 7-9,21-32
+packages/tools/src/skill-editor/update-skill.ts
+  s_310c00cd760ef5::t_74812e8aa5dff7 1,17
+apps/dashboard/src/lib/hooks/use-skill-update-sync.ts
+  s_310c00cd760ef5::t_355bd32b41f801 1-13,15-43,45-46
+  s_310c00cd760ef5::t_02a544fbbd88ae 14,44
+apps/console/src/components/skills/system-skill-editor-client.tsx
+  s_310c00cd760ef5::t_9a9e577645f9a1 29,163-170,194
+  s_310c00cd760ef5::t_f689b30b8a8a58 23,33,95-99
+  s_310c00cd760ef5::t_d08f8c4b25e540 28,30-31,39,110-123,126-134,184-190,195
+apps/console/src/components/skills/system-skill-code-alert.tsx
+  s_310c00cd760ef5::t_d08f8c4b25e540 21-34
+  s_310c00cd760ef5::t_f99490d58792bc 1-20,35-36
+packages/ai/src/skills/registry.ts
+  s_310c00cd760ef5::t_35326b000b6646 13-14,263-273,277,279-281,284,286-312
+apps/console/src/app/(console)/[slug]/skills/[name]/page.tsx
+  s_310c00cd760ef5::t_80a67e88a24fa3 8,20-24
+apps/console/src/utils/line-diff.ts
+  s_310c00cd760ef5::t_d08f8c4b25e540 16
+  s_310c00cd760ef5::t_8615fbbaec146c 1-4,7-15,17-23,43,51,54,61-85,88-89,100-112,114-115,117,120
+packages/ai/src/skills/registry.test.ts
+  s_310c00cd760ef5::t_0dfeb396cabe59 176-177,179-180,182-185,187,189-190,192-194,200-228
+apps/dashboard/messages/de.json
+  s_310c00cd760ef5::t_634b8dc7e9ef99 1874-1875
+  s_310c00cd760ef5::t_9eb1b05691c407 1873
+  s_310c00cd760ef5::t_9f405f7a5d85c1 1118-1119
+apps/console/src/components/skills/system-skill-content-field.tsx
+  s_310c00cd760ef5::t_9a9e577645f9a1 1-62
+packages/ai/src/skills/functions/service.ts
+  s_310c00cd760ef5::t_74812e8aa5dff7 76
+apps/console/src/utils/skills.ts
+  s_310c00cd760ef5::t_80a67e88a24fa3 3-4,17-26
+  s_310c00cd760ef5::t_cb6da583cb1a7c 5
+  s_310c00cd760ef5::t_d08f8c4b25e540 1-2,27-34
+packages/ai/src/skills/types.ts
+  s_310c00cd760ef5::t_35326b000b6646 64-77
+apps/dashboard/src/components/skills/skill-update-notice.tsx
+  s_310c00cd760ef5::t_9eb1b05691c407 31,83-95
+  s_310c00cd760ef5::t_634b8dc7e9ef99 96-98
+apps/console/src/types/skills.ts
+  s_310c00cd760ef5::t_8615fbbaec146c 28,31-33
+  s_310c00cd760ef5::t_d08f8c4b25e540 44,46-65
+  s_310c00cd760ef5::t_cb6da583cb1a7c 45
+  s_310c00cd760ef5::t_9a9e577645f9a1 73-81
+  s_310c00cd760ef5::t_f689b30b8a8a58 66-72
+apps/console/src/hooks/use-publish-system-skill.ts
+  s_310c00cd760ef5::t_f689b30b8a8a58 1-46
+apps/api/src/programs/skills.ts
+  s_310c00cd760ef5::t_74812e8aa5dff7 1,31-32,46,67,115,157
+packages/tools/src/skill-editor/list-skills.ts
+  s_310c00cd760ef5::t_74812e8aa5dff7 1,17
+apps/dashboard/messages/en.json
+  s_310c00cd760ef5::t_9eb1b05691c407 1873
+  s_310c00cd760ef5::t_634b8dc7e9ef99 1874-1875
+  s_310c00cd760ef5::t_9f405f7a5d85c1 1118-1119
+apps/console/src/components/skills/system-skill-versions.tsx
+  s_310c00cd760ef5::t_d08f8c4b25e540 1-88
+apps/dashboard/src/types/hooks/skill-update-sync.ts
+  s_310c00cd760ef5::t_355bd32b41f801 1-11,13
+  s_310c00cd760ef5::t_02a544fbbd88ae 12
+apps/console/src/constants/skills.ts
+  s_310c00cd760ef5::t_8615fbbaec146c 8-9
+apps/dashboard/src/components/skills/skill-update-section.tsx
+  s_310c00cd760ef5::t_02a544fbbd88ae 1-28
+apps/console/src/components/skills/system-skill-header.tsx
+  s_310c00cd760ef5::t_f99490d58792bc 1-54,57-72,74-78
+  s_310c00cd760ef5::t_d08f8c4b25e540 55-56
+  s_310c00cd760ef5::t_9a9e577645f9a1 73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8b1488caf532e3c533a543a171fd96aed2b8f84f",
+  "prompts": {},
+  "sessions": {
+    "s_310c00cd760ef5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "57197665-3dbb-4aae-b2fe-63eecdce7ef5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
