@@ -1,0 +1,60 @@
+apps/console/src/types/ai-trends.ts
+  s_3ec3deb7cdb2f9::t_9774f90c01fb3e 1
+  s_3ec3deb7cdb2f9::t_cb1982be127b35 212-215
+  s_3ec3deb7cdb2f9::t_72d338cca91388 219,221-222,227
+  s_3ec3deb7cdb2f9::t_c8063941805c34 119-120
+apps/console/src/constants/ai-trends.ts
+  s_3ec3deb7cdb2f9::t_d8459bc86b32b3 35-36
+  s_3ec3deb7cdb2f9::t_72d338cca91388 19-21
+apps/console/src/utils/ai-trends.ts
+  s_3ec3deb7cdb2f9::t_d8459bc86b32b3 20,208-212,228,346
+  s_3ec3deb7cdb2f9::t_ba56998980b940 91-95
+  s_3ec3deb7cdb2f9::t_22d6d6ba16a5ff 10,651-670
+apps/console/src/utils/ai-trends-traffic.test.ts
+  s_3ec3deb7cdb2f9::t_35286dcf1b0b9f 11,18,22-25,54,63-79
+apps/console/src/components/ai-trends/ai-trends-top-domains.tsx
+  s_3ec3deb7cdb2f9::t_c8063941805c34 55,60-61,64-65
+packages/analytics/src/tinybird/pipes/geo-traffic-trends.ts
+  s_3ec3deb7cdb2f9::t_0356c18741e732 122,140-144,147-149,157-158
+apps/console/src/utils/ai-trends-traffic.ts
+  s_3ec3deb7cdb2f9::t_35286dcf1b0b9f 68-73
+  s_3ec3deb7cdb2f9::t_125be44d407267 21
+  s_3ec3deb7cdb2f9::t_d8459bc86b32b3 133
+  s_3ec3deb7cdb2f9::t_cb1982be127b35 4,35-41,53,62,64-67,78,81-83,85,88-97,100,108,111-114,120-121
+  s_3ec3deb7cdb2f9::t_9774f90c01fb3e 98-99
+packages/schemas/src/schemas/api/ai-trends-traffic.ts
+  s_3ec3deb7cdb2f9::t_0356c18741e732 7-9,33-35
+apps/console/src/components/ai-trends/ai-trends-engine-metrics.tsx
+  s_3ec3deb7cdb2f9::t_07121136ff1bc6 20,91
+apps/console/src/components/ai-trends/ai-trends-anomaly-card.tsx
+  s_3ec3deb7cdb2f9::t_22d6d6ba16a5ff 18,86
+apps/console/src/lib/ai-trends/queries.ts
+  s_3ec3deb7cdb2f9::t_0a665a26a13aa6 192-194
+  s_3ec3deb7cdb2f9::t_d8459bc86b32b3 513-517,527-531,534-539
+  s_3ec3deb7cdb2f9::t_22d6d6ba16a5ff 325
+  s_3ec3deb7cdb2f9::t_cab42ced85ad85 584-585
+  s_3ec3deb7cdb2f9::t_c8063941805c34 66-69,428-437,440-443,454-459,467-470,481-488
+apps/console/src/utils/ai-trends-share.ts
+  s_3ec3deb7cdb2f9::t_ba56998980b940 34-35,133-137,141-142,144-147,151,155
+  s_3ec3deb7cdb2f9::t_22d6d6ba16a5ff 24,94-97
+apps/console/src/lib/ai-trends/traffic.ts
+  s_3ec3deb7cdb2f9::t_cb1982be127b35 23,43
+  s_3ec3deb7cdb2f9::t_72d338cca91388 10,22,41-42,44-61,64-69,103
+  s_3ec3deb7cdb2f9::t_2ce66784db4197 62-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e9dc0aedb5ee46dfb2c3d69c318e801d817834ea",
+  "prompts": {},
+  "sessions": {
+    "s_3ec3deb7cdb2f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "736bbb8d-09a8-4f6d-b5dd-00c90b8b8236",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
