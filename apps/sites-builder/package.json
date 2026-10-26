@@ -8,8 +8,8 @@
   },
   "type": "module",
   "scripts": {
-    "bundle": "bun build compiler/cli.ts --target=node --format=esm --outfile=dist/cli.mjs --external astro --external satori --external @resvg/resvg-js",
-    "package:cli": "bun run bundle && bun scripts/package-cli.ts",
+    "bundle": "bun scripts/bundle.ts",
+    "export:cli": "bun run bundle && bun scripts/export-cli.ts",
     "dev": "bun compiler/cli.ts dev --source fixtures/demo",
     "check-types": "tsc --noEmit",
     "test": "bun test tests",
@@ -31,9 +31,13 @@
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "0.5.20",
     "@tailwindcss/vite": "4.3.3",
+    "acorn": "8.18.0",
+    "acorn-jsx": "5.3.2",
     "astro": "7.3.5",
+    "estree-util-visit": "2.0.0",
     "hast-util-from-html": "2.0.3",
     "hast-util-to-mdast": "10.1.2",
+    "ignore": "7.0.12",
     "mdast-util-from-markdown": "2.1.0",
     "mdast-util-gfm": "3.1.0",
     "mdast-util-mdx": "3.0.0",
@@ -45,7 +49,9 @@
     "react-dom": "19.3.1",
     "satori": "^0.26.0",
     "tailwindcss": "4.3.3",
-    "unist-util-visit": "5.1.0"
+    "unist-util-visit": "5.1.0",
+    "yaml": "2.9.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@notra/sites-compiler": "workspace:*",
@@ -56,7 +62,6 @@
     "@types/react": "^19.3.0",
     "@upstash/box": "^0.5.5",
     "bun-types": "1.4.0",
-    "typescript": "7.0.2",
-    "zod": "^4.6.7"
+    "typescript": "7.0.2"
   }
 }

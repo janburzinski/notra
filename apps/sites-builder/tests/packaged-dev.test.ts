@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { afterAll, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,70 +7,128 @@ import { fileURLToPath } from "node:url";
 import { findFreePort } from "../compiler/dev-server";
 
 const toolchain = fileURLToPath(new URL("..", import.meta.url));
-const { version } = JSON.parse(
+const exported = await mkdtemp(join(tmpdir(), "notra-sites-export-"));
+const cliPackage = join(exported, "cli");
+await mkdir(cliPackage);
+const { dependencies: renderer } = JSON.parse(
   await readFile(join(toolchain, "package.json"), "utf8")
 );
-// CI uploads and publishes this exact file, so nothing may rebuild it later.
-const archive = join(toolchain, ".notra", `usenotra-sites-dev-${version}.tgz`);
+// Mirrors notra-cli: its own files list, plus one dependency it shares.
+await writeFile(
+  join(cliPackage, "package.json"),
+  `${JSON.stringify({ name: "notra-export-test", version: "0.0.0", files: ["dist"], dependencies: { chalk: "^5.3.0", react: renderer.react } })}\n`
+);
 
-const packed = Bun.spawnSync([process.execPath, "run", "package:cli"], {
-  cwd: toolchain,
+const result = Bun.spawnSync(
+  [process.execPath, "run", "export:cli", cliPackage],
+  { cwd: toolchain, stdout: "pipe", stderr: "pipe" }
+);
+if (result.exitCode !== 0) {
+  throw new Error(`export:cli failed:\n${result.stderr.toString()}`);
+}
+const packed = Bun.spawnSync(["npm", "pack", "--pack-destination", exported], {
+  cwd: cliPackage,
   stdout: "pipe",
   stderr: "pipe",
 });
 if (packed.exitCode !== 0) {
-  throw new Error(`package:cli failed:\n${packed.stderr.toString()}`);
+  throw new Error(`npm pack failed:\n${packed.stderr.toString()}`);
+}
+const archive = join(exported, "notra-export-test-0.0.0.tgz");
+
+afterAll(() => rm(exported, { recursive: true, force: true }));
+
+// The CLI runs the exported renderer with whichever runtime started it.
+async function installedRuntime(root: string) {
+  const consumer = join(root, "consumer");
+  await mkdir(consumer);
+  await writeFile(join(consumer, "package.json"), '{"private":true}\n');
+  const installed = Bun.spawnSync(
+    [
+      "npm",
+      "install",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund",
+      "--package-lock=false",
+      archive,
+    ],
+    { cwd: consumer, stdout: "pipe", stderr: "pipe" }
+  );
+  if (installed.exitCode !== 0) {
+    throw new Error(`npm install failed:\n${installed.stderr.toString()}`);
+  }
+  return join(consumer, "node_modules/notra-export-test/sites/dist/cli.mjs");
 }
 
-// Both run the tarball installed outside the checkout. Node runs the CLI
-// directly because the npx wrapper does not forward SIGINT on Linux.
 const launchers = {
-  bun: async () => [
+  bun: async (root: string) => [
     process.execPath,
-    "x",
     "--bun",
-    "--package",
-    archive,
-    "notra-sites",
+    await installedRuntime(root),
   ],
-  node: async (root: string) => {
-    const consumer = join(root, "consumer");
-    await mkdir(consumer);
-    await writeFile(join(consumer, "package.json"), '{"private":true}\n');
-    const installed = Bun.spawnSync(
-      [
-        "npm",
-        "install",
-        "--ignore-scripts",
-        "--no-audit",
-        "--no-fund",
-        "--package-lock=false",
-        archive,
-      ],
-      { cwd: consumer, stdout: "pipe", stderr: "pipe" }
-    );
-    if (installed.exitCode !== 0) {
-      throw new Error(`npm install failed:\n${installed.stderr.toString()}`);
-    }
-    return [
-      "node",
-      join(consumer, "node_modules/@usenotra/sites-dev/dist/cli.mjs"),
-    ];
-  },
+  node: async (root: string) => ["node", await installedRuntime(root)],
 };
 
-test("the packed manifest is publishable", async () => {
+test("the export ships the renderer and keeps the CLI's own dependencies", async () => {
   const manifest = JSON.parse(
-    await readFile(join(toolchain, ".notra", "package", "package.json"), "utf8")
+    await readFile(join(cliPackage, "package.json"), "utf8")
   );
-  expect(manifest.name).toBe("@usenotra/sites-dev");
-  expect(manifest.license).toBe("AGPL-3.0-only");
-  expect(manifest.private).toBeUndefined();
-  expect(manifest.bin["notra-sites"]).toBe("./dist/cli.mjs");
-  expect(manifest.publishConfig.access).toBe("public");
+  expect(manifest.files).toEqual(["dist", "sites"]);
+  expect(manifest.dependencies).toEqual({ ...renderer, chalk: "^5.3.0" });
   for (const range of Object.values<string>(manifest.dependencies)) {
     expect(range).not.toMatch(/^(workspace|file|link):/);
   }
+  const { added } = JSON.parse(
+    await readFile(join(cliPackage, "sites", "manifest.json"), "utf8")
+  );
+  expect(added.astro).toBe(renderer.astro);
+  expect(added.react).toBeUndefined();
+  const listing = Bun.spawnSync(["tar", "tzf", archive]).stdout.toString();
+  expect(listing).toContain("package/sites/dist/cli.mjs");
+
+  const again = Bun.spawnSync(
+    [process.execPath, "scripts/export-cli.ts", cliPackage],
+    { cwd: toolchain, stdout: "pipe", stderr: "pipe" }
+  );
+  expect(again.exitCode).toBe(0);
+  expect(
+    JSON.parse(await readFile(join(cliPackage, "package.json"), "utf8"))
+  ).toEqual(manifest);
+});
+
+test("the export rejects a CLI edit to a range it added", async () => {
+  const edited = join(exported, "edited");
+  await mkdir(join(edited, "sites"), { recursive: true });
+  await writeFile(
+    join(edited, "package.json"),
+    JSON.stringify({ name: "edited", dependencies: { astro: "^99.0.0" } })
+  );
+  await writeFile(
+    join(edited, "sites", "manifest.json"),
+    JSON.stringify({ added: { astro: renderer.astro } })
+  );
+  const run = Bun.spawnSync(
+    [process.execPath, "scripts/export-cli.ts", edited],
+    { cwd: toolchain, stdout: "pipe", stderr: "pipe" }
+  );
+  expect(run.exitCode).not.toBe(0);
+  expect(run.stderr.toString()).toContain("astro (^99.0.0, exported");
+});
+
+test("the export rejects a CLI range that differs from the renderer's", async () => {
+  const conflicting = join(exported, "conflicting");
+  await mkdir(conflicting);
+  await writeFile(
+    join(conflicting, "package.json"),
+    JSON.stringify({ name: "conflicting", dependencies: { astro: "^1.0.0" } })
+  );
+  const run = Bun.spawnSync(
+    [process.execPath, "scripts/export-cli.ts", conflicting],
+    { cwd: toolchain, stdout: "pipe", stderr: "pipe" }
+  );
+  expect(run.exitCode).not.toBe(0);
+  expect(run.stderr.toString()).toContain("astro (^1.0.0 vs");
 });
 
 test.each(Object.keys(launchers) as (keyof typeof launchers)[])(

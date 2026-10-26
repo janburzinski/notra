@@ -1,9 +1,8 @@
 # Notra Sites local development
 
-The `@usenotra/sites-dev` package contains the same compiler and Astro theme as
-hosted Notra Sites. The Notra CLI downloads it on the first `notra dev` run and
-reuses npm's or Bun's package cache afterward. Local previews need no login or
-API key. Node.js 22.12 or newer can run the CLI without Bun; Bun can also run it
+The Notra CLI ships the same compiler and Astro theme as hosted Notra Sites in
+its `sites/` folder, exported from this workspace. Local previews need no login
+or API key. Node.js 22.12 or newer can run the CLI without Bun; Bun can also run it
 directly.
 
 From a site folder containing `blog.json`, `blog/`, or `changelog/`:
@@ -36,21 +35,20 @@ bun compiler/cli.ts dev --source /path/to/site --port 4400
 `bun dev` uses the demo fixture. The Worker in `apps/sites` is the production
 delivery layer, not the content preview server.
 
-## Build and test the distributable
+## Ship it in the CLI
 
 ```bash
-bun run package:cli
+bun run export:cli /path/to/notra-cli
 ```
 
-This writes `.notra/usenotra-sites-dev-<version>.tgz`, with the compiled CLI,
-Astro theme, and declared runtime dependencies. It does not publish anything.
-Workspace-only compiler dependencies are bundled into the CLI.
+This bundles the compiler, copies it with the Astro theme into the CLI's
+`sites/` folder, and syncs the renderer's runtime dependencies into the CLI's
+`package.json`. Workspace-only compiler dependencies are bundled into
+`sites/dist/cli.mjs`. See `release.md` for the release steps.
 
-To exercise an unreleased tarball with the Notra CLI:
+To run the Notra CLI against an unreleased renderer without exporting:
 
 ```bash
-NOTRA_SITES_DEV_PACKAGE=/absolute/path/to/usenotra-sites-dev-0.1.0.tgz notra dev
+bun run bundle
+NOTRA_SITES_RUNTIME=/absolute/path/to/apps/sites-builder/dist/cli.mjs notra dev
 ```
-
-Release the runtime package before the corresponding Notra CLI version. Its
-default runtime version is pinned in the CLI's `src/constants/sites-dev.ts`.
