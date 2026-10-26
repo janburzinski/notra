@@ -53,6 +53,8 @@ import { nanoid } from "nanoid";
 import { parseAsString, useQueryState } from "nuqs";
 import {
   Children,
+  type ComponentProps,
+  isValidElement,
   type ReactElement,
   type ReactNode,
   useCallback,
@@ -3110,6 +3112,13 @@ function StandaloneChatPageClient({
                                       : undefined
                                   }
                                   isLoading={isGenerating}
+                                  isStandalonePartVisible={(content) =>
+                                    !isValidElement<
+                                      ComponentProps<typeof CompletedToolTimer>
+                                    >(content) ||
+                                    content.type !== CompletedToolTimer ||
+                                    content.props.children != null
+                                  }
                                   isStandaloneTool={(part) =>
                                     isContentEditorStandaloneTool(part) ||
                                     (isToolUIPart(part) &&

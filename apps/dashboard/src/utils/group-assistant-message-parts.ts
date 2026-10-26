@@ -75,6 +75,10 @@ export function groupAssistantMessageParts(
       activity.push({ part, index });
       return;
     }
+    // Metadata and hidden tool updates must not split a visible work log.
+    if (options.isStandalonePartVisible?.(part, index) === false) {
+      return;
+    }
     flushActivity();
     segments.push({
       kind: "standalone",

@@ -47,6 +47,8 @@ export interface ChatAssistantPartsProps {
   elapsedSeconds?: number;
   isLoading: boolean;
   isStandaloneTool?: (part: UIMessage["parts"][number]) => boolean;
+  /** Identifies effect-only tool elements that mount without splitting activity. */
+  isStandalonePartVisible?: (content: ReactNode) => boolean;
   messageId: string;
   parts: UIMessage["parts"];
   renderStandalone: (
