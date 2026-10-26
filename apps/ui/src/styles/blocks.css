@@ -826,3 +826,13 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
 }
+
+@keyframes workflow-dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+@theme inline {
+  --animate-workflow-dash: workflow-dash 0.8s linear infinite;
+}

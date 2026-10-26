@@ -11,13 +11,16 @@ export type LandingPreview =
   | "duotone-tooltip"
   | "gemini"
   | "icon-tabs"
+  | "listicle-outreach"
   | "marketing-button"
   | "opencode"
   | "perplexity"
   | "shimmer"
   | "sonner"
   | "step-slider"
-  | "tooltip";
+  | "tooltip"
+  | "workflow-builder"
+  | "workflow-node";
 
 export interface LandingComponentLink {
   description: string;

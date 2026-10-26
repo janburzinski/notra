@@ -176,4 +176,32 @@ export const LANDING_SECTIONS: LandingSection[] = [
       "Coding agents in the terminal, from the welcome banner to the prompt.",
     title: "Terminal Apps",
   },
+  {
+    items: [
+      {
+        description:
+          "A playable GEO workflow builder with a block palette, branching, a run log and a node sheet.",
+        href: "/blocks/geo-workflow-builder",
+        preview: "workflow-builder",
+        title: "GEO Workflow Builder",
+      },
+      {
+        description:
+          "Steps with brand logos, multi-port handles, live status and a timer per step.",
+        href: "/components/workflow/node",
+        preview: "workflow-node",
+        title: "Workflow Node",
+      },
+      {
+        description:
+          "Track the listicles AI answers cite and pitch their owners from an email modal.",
+        href: "/blocks/listicle-outreach",
+        preview: "listicle-outreach",
+        title: "Listicle Outreach",
+      },
+    ],
+    description:
+      "Workflow and outreach building blocks for GEO and SEO automation.",
+    title: "Workflows",
+  },
 ];

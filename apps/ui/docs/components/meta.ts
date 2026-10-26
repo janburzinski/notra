@@ -22,6 +22,7 @@ export default defineMeta({
     "ai-search",
     "ai-chat",
     "coding-agents",
+    "workflows",
   ],
   title: "Components",
 });

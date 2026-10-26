@@ -150,6 +150,12 @@ body > [data-base-ui-portal] {
 }
 
 @layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border, currentColor);
+  }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
