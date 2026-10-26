@@ -8,6 +8,7 @@ import { isAnimatedPng } from "@notra/sites-core/utils/is-animated-png";
 import {
   SITE_IMAGE_MAX_INPUT_PIXELS,
   SITE_IMAGE_PREUPLOAD_WEBP_QUALITY,
+  SITE_IMAGE_SHRINK_TYPES,
 } from "@/constants/site-image-upload";
 
 const SCALABLE = new Set([
@@ -16,6 +17,22 @@ const SCALABLE = new Set([
   "image/webp",
   "image/avif",
 ]);
+
+/** Whether any pixel on the canvas isn't fully opaque. */
+function hasTransparency(context: CanvasRenderingContext2D) {
+  const { data } = context.getImageData(
+    0,
+    0,
+    context.canvas.width,
+    context.canvas.height
+  );
+  for (let index = 3; index < data.length; index += 4) {
+    if (data[index] !== 255) {
+      return true;
+    }
+  }
+  return false;
+}
 
 function encode(canvas: HTMLCanvasElement, type: string) {
   return new Promise<Blob | null>((resolve) =>
@@ -72,14 +89,17 @@ export async function shrinkSiteImage(
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const context = canvas.getContext("2d");
+  context?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   bitmap.close();
-  // Logos stay lossless for share images. Safari can't encode WebP and hands
-  // back PNG, which is too large for photos, so backgrounds fall back to JPEG.
-  let blob = await encode(
-    canvas,
-    kind === "background" ? "image/webp" : "image/png"
-  );
+  // JPEG drops transparency, so transparent share images stay PNG.
+  const type =
+    kind === "share" && context && hasTransparency(context)
+      ? "image/png"
+      : SITE_IMAGE_SHRINK_TYPES[kind];
+  // Safari can't encode WebP and hands back PNG, which is too large for
+  // photos, so backgrounds fall back to JPEG.
+  let blob = await encode(canvas, type);
   if (kind === "background" && blob?.type !== "image/webp") {
     blob = await encode(canvas, "image/jpeg");
   }

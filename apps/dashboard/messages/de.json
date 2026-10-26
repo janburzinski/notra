@@ -8516,7 +8516,12 @@
         "logoHrefHint": "Wohin das Logo führt. Standard ist die Startseite deiner Site.",
         "favicon": "Favicon",
         "faviconHint": "SVG, PNG oder ICO, erscheint in Browser-Tabs.",
-        "separateFavicons": "Getrennte Favicons für Hell und Dunkel"
+        "separateFavicons": "Getrennte Favicons für Hell und Dunkel",
+        "shareImage": "Vorschaubild",
+        "shareImageHint": "Für geteilte Seiten ohne eigenes Bild, etwa deine Startseite. 1200×630 als PNG oder JPEG. Ohne Bild erzeugt Notra eines.",
+        "shareImageAlt": "Beschreibung des Vorschaubilds",
+        "shareImageAltHint": "Beschreibt das Vorschaubild für Screenreader.",
+        "shareImageAltPlaceholder": "Das Acme-Logo auf dunklem Hintergrund"
       },
       "styling": {
         "primary": "Primärfarbe",
@@ -8706,7 +8711,7 @@
         "hints": {
           "general": "Name und Beschreibung für deine Leser.",
           "styling": "Farben, Hintergründe und Code-Designs.",
-          "branding": "Deine Logos, dein Favicon und der Logo-Link.",
+          "branding": "Deine Logos, dein Favicon, der Logo-Link und das Vorschaubild.",
           "typography": "Schriften für Überschriften und Fließtext.",
           "navbar": "Links und Aktionen in der Seitennavigation.",
           "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",

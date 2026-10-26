@@ -1,4 +1,5 @@
 import { hasErrors } from "@notra/sites-compiler/utils/diagnostics";
+import { listMountedAreas } from "@notra/sites-core/utils/mounts";
 
 import type { DevRefreshOptions } from "../types/dev-refresh";
 import { consentScriptDiagnostics, siteConsent } from "./consent";
@@ -62,6 +63,7 @@ export function createDevRefresh(options: DevRefreshOptions) {
       publicFiles: prepared.publicFiles,
       includeDrafts: options.params.includeDrafts,
       publicOrigin: options.params.publicOrigin,
+      areas: listMountedAreas(options.params.mounts).map(({ area }) => area),
     });
     if (closed || current !== revision) {
       return;

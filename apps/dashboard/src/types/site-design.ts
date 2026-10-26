@@ -54,6 +54,8 @@ export interface SiteDesignForm {
   separateFavicons: boolean;
   faviconLight: string;
   faviconDark: string;
+  shareImage: string;
+  shareImageAlt: string;
   primary: string;
   darkModeAccent: string;
   button: string;

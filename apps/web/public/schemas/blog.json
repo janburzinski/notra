@@ -1101,6 +1101,15 @@
           "type": "string",
           "enum": ["navigable", "all"]
         },
+        "image": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "imageAlt": {
+          "type": "string",
+          "maxLength": 200
+        },
         "organization": {
           "type": "object",
           "properties": {

@@ -43,7 +43,18 @@ Every site comes with sitemaps, RSS feeds, canonical URLs, Open Graph tags and s
 
 ## Share images
 
-Posts and entries without an `image` get a generated 1200×630 share image with your site name, the section, the title and your brand color.
+Posts and entries without an `image` get a generated 1200×630 share image with your site name, the section, the title and your brand color. The blog and changelog home pages get one too, with the section title, and their tag and author pages reuse it.
+
+To use your own image for those pages instead, set `seo.image`:
+
+```json blog.json
+"seo": { "image": "/images/share.png", "imageAlt": "The Acme logo on a dark background" }
+```
+
+- `image` is a path in `public/` or an `https://` URL. Use a 1200×630 PNG or JPEG, because not every link preview reads WebP, AVIF or SVG.
+- `imageAlt` describes it for screen readers.
+- Posts keep their own `image` or generated share image.
+- You can also set it in the dashboard under **Design → Branding → Share image**.
 
 ```json blog.json
 "thumbnails": { "appearance": "dark", "background": "/images/og-background.png" }
@@ -51,7 +62,7 @@ Posts and entries without an `image` get a generated 1200×630 share image with 
 
 - `appearance` is `light` (default) or `dark`.
 - `background` is a PNG, JPEG or SVG in `public/` behind the text.
-- `"enabled": false` turns them off, and pages without an image then use your logo.
+- `"enabled": false` turns them off, and pages without an image then use `seo.image`, or else your logo.
 
 ### Author layout
 

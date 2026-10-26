@@ -151,6 +151,8 @@ export const siteSeoSchema = z
       .record(z.string().regex(/^[a-z][a-z0-9:_.-]*$/i), z.string().max(500))
       .default({}),
     indexing: z.enum(["navigable", "all"]).default("navigable"),
+    image: sitePathSchema.optional(),
+    imageAlt: z.string().trim().max(200).optional(),
     organization: z
       .object({
         name: z.string().trim().min(1).max(120),

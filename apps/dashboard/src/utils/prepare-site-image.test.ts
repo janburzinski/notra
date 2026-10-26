@@ -64,7 +64,7 @@ test("small WebP logos still become PNG for share images", async () => {
   expect(metadata.format).toBe("png");
 });
 
-test("GIF and animated logos become a still PNG; ICO logos are rejected", async () => {
+test("GIF and animated logos and share images become stills; ICO logos are rejected", async () => {
   // 1×1 GIF with a black and a white frame.
   const animated = Buffer.from(
     "R0lGODlhAQABAIAAAAAAAP///yH/C05FVFNDQVBFMi4wAwEAAAAh+QQACgAAACwAAAAAAQABAAACAkQBACH5BAAKAAAALAAAAAABAAEAAAICTAEAOw==",
@@ -77,6 +77,11 @@ test("GIF and animated logos become a still PNG; ICO logos are rejected", async 
   expect(metadata.format).toBe("png");
   expect(metadata.pages ?? 1).toBe(1);
   expect(metadata.height).toBe(1);
+  const share = await sharp(
+    await prepareSiteImage(animated, "share")
+  ).metadata();
+  expect(["png", "jpeg"]).toContain(share.format);
+  expect(share.pages ?? 1).toBe(1);
   expect(await prepareSiteImage(animated, "background")).toBe(animated);
   const icon = Buffer.from([0, 0, 1, 0, 1, 0, 16, 16]);
   expect(prepareSiteImage(icon, "logo")).rejects.toBeInstanceOf(
@@ -84,7 +89,7 @@ test("GIF and animated logos become a still PNG; ICO logos are rejected", async 
   );
 });
 
-test("APNG backgrounds and favicons keep their frames; logos become still PNGs", async () => {
+test("APNG backgrounds and favicons keep their frames; logos and share images become stills", async () => {
   const animated = Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACGFjVEwAAAACAAAAAPONk3AAAAAaZmNUTAAAAAAAAAABAAAAAQAAAAAAAAAAAAEACgAAWn8w0AAAAA1JREFUeJxj+M/A8B8ABQAB/4mZPR0AAAAaZmNUTAAAAAEAAAABAAAAAQAAAAAAAAAAAAEACgAAwQzaBAAAABFmZEFUAAAAAnicY/jPwPAfAAUAAf+alZNkAAAAAElFTkSuQmCC",
     "base64"
@@ -94,6 +99,8 @@ test("APNG backgrounds and favicons keep their frames; logos become still PNGs",
   const logo = await prepareSiteImage(animated, "logo");
   expect((await sharp(logo).metadata()).format).toBe("png");
   expect(Buffer.from(logo).includes(Buffer.from("acTL"))).toBe(false);
+  const share = await prepareSiteImage(animated, "share");
+  expect(Buffer.from(share).includes(Buffer.from("acTL"))).toBe(false);
 });
 
 test("metadata such as GPS never survives, even when nothing shrinks", async () => {
@@ -115,4 +122,30 @@ test("images over 40 megapixels are rejected with a readable error", async () =>
   await expect(prepareSiteImage(huge, "background")).rejects.toBeInstanceOf(
     SiteImageInputError
   );
+});
+
+test("share images become JPEG or PNG at 1200px; SVG and ICO are rejected", async () => {
+  const photo = await sharp(await gradient(2400, 1260))
+    .webp({ quality: 90 })
+    .toBuffer();
+  const output = await sharp(await prepareSiteImage(photo, "share")).metadata();
+  expect(output.format).toBe("jpeg");
+  expect(output.width).toBe(1200);
+  const png = await prepareSiteImage(await gradient(2400, 1260), "share");
+  expect((await sharp(png).metadata()).format).toBe("png");
+  const transparent = await sharp(await gradient(800, 420, true))
+    .webp({ quality: 90 })
+    .toBuffer();
+  const kept = await sharp(
+    await prepareSiteImage(transparent, "share")
+  ).metadata();
+  expect(kept.format).toBe("png");
+  expect(kept.hasAlpha).toBe(true);
+  const svg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const icon = Buffer.from([0, 0, 1, 0, 1, 0, 16, 16]);
+  for (const input of [svg, icon]) {
+    await expect(prepareSiteImage(input, "share")).rejects.toBeInstanceOf(
+      SiteImageInputError
+    );
+  }
 });

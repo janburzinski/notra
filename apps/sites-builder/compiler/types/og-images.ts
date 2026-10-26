@@ -1,5 +1,6 @@
 import type { SiteEntry } from "@notra/sites-compiler/types/entries";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
+import type { SiteArea } from "@notra/sites-core/types/deployment";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type satori from "satori";
 
@@ -10,6 +11,8 @@ export interface WriteOgImagesParams {
   publicFiles: readonly string[];
   includeDrafts: boolean;
   publicOrigin: string;
+  /** Mounted sections, which each get a share image for their index. */
+  areas: readonly SiteArea[];
 }
 
 export type OgManifest = Record<string, string>;
@@ -23,6 +26,15 @@ export interface OgImagesResult {
 export interface OgBackgroundResult {
   dataUri?: string;
   diagnostic?: SiteDiagnostic;
+}
+
+/** What every card of a site shares. */
+export interface OgCardStyle {
+  appearance: "light" | "dark";
+  accent: string;
+  logo?: string;
+  domain: string;
+  background?: string;
 }
 
 export interface OgCardContent {

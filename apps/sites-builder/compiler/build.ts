@@ -137,6 +137,7 @@ export async function buildSite(
     publicFiles: prepared.publicFiles,
     includeDrafts: options.target.includeDrafts,
     publicOrigin: options.target.publicOrigin,
+    areas: listMountedAreas(mounts).map(({ area }) => area),
   });
   diagnostics.push(...ogImages.diagnostics);
   const ogImagePaths = Object.values(ogImages.manifest);

@@ -15,6 +15,8 @@ const SCALABLE_FORMATS = new Set(["png", "jpeg", "webp", "heif"]);
 
 const loadSharp = () => import("sharp").then((module) => module.default);
 
+const SHARE_IMAGE_FORMATS = "Share images can be PNG, JPEG, WebP or GIF";
+
 /** The upload is an image this server won't process; safe to show the user. */
 export class SiteImageInputError extends Error {}
 
@@ -30,6 +32,10 @@ export async function prepareSiteImage(
   if (sniffSiteImageExtension(bytes) !== ".svg") {
     return await optimizeSiteImage(bytes, kind);
   }
+  // Link previews don't render SVG.
+  if (kind === "share") {
+    throw new SiteImageInputError(SHARE_IMAGE_FORMATS);
+  }
   const svg = await sanitizeSvg(Buffer.from(bytes).toString("utf8"));
   return Buffer.from(svg, "utf8");
 }
@@ -38,8 +44,10 @@ export async function prepareSiteImage(
  * Scales an upload to the size it's shown at and re-encodes it. Backgrounds
  * become WebP; logos and favicons become PNG or JPEG because share images are
  * rendered from logos and the renderer only reads those. Logos are therefore
- * always converted, animated ones to their first frame. Otherwise SVG, ICO,
- * GIF and animated images pass through unchanged.
+ * always converted, animated ones to their first frame. Share images are too,
+ * because not every link preview reads WebP, AVIF or animations; they become
+ * JPEG unless they're PNG or transparent. Otherwise SVG, ICO, GIF and
+ * animated images pass through unchanged.
  */
 async function optimizeSiteImage(
   bytes: Uint8Array,
@@ -47,8 +55,10 @@ async function optimizeSiteImage(
 ): Promise<Uint8Array> {
   const animatedPng =
     sniffSiteImageExtension(bytes) === ".png" && isAnimatedPng(bytes);
-  // sharp doesn't report APNG frames. Keep them intact outside the still logo.
-  if (kind !== "logo" && animatedPng) {
+  // Logos and share images are stills.
+  const still = kind === "logo" || kind === "share";
+  // sharp doesn't report APNG frames. Keep them intact outside the stills.
+  if (!still && animatedPng) {
     return bytes;
   }
   const sharp = await loadSharp();
@@ -61,10 +71,16 @@ async function optimizeSiteImage(
   if (!metadata && logo) {
     throw new SiteImageInputError("Logos can be PNG, JPEG, SVG, WebP or GIF");
   }
+  if (!metadata && kind === "share") {
+    throw new SiteImageInputError(SHARE_IMAGE_FORMATS);
+  }
   if (
     !metadata ||
-    !(format && (SCALABLE_FORMATS.has(format) || (logo && format === "gif"))) ||
-    (!logo && (metadata.pages ?? 1) > 1)
+    !(
+      format &&
+      (SCALABLE_FORMATS.has(format) || (still && format === "gif"))
+    ) ||
+    (!still && (metadata.pages ?? 1) > 1)
   ) {
     return bytes;
   }
@@ -86,7 +102,10 @@ async function optimizeSiteImage(
   let output = image.png({ compressionLevel: 9, effort: 10 });
   if (kind === "background") {
     output = image.webp({ quality: SITE_BACKGROUND_WEBP_QUALITY, effort: 4 });
-  } else if (format === "jpeg") {
+  } else if (
+    format === "jpeg" ||
+    (kind === "share" && format !== "png" && !metadata.hasAlpha)
+  ) {
     output = image.jpeg({ mozjpeg: true, quality: 85 });
   }
   const encoded = await output.toBuffer().catch(() => {

@@ -16,7 +16,11 @@ export const SITE_DESIGN_SECTIONS = [
     icon: PaintBoardIcon,
     paths: ["colors", "appearance", "background", "styling.codeblocks"],
   },
-  { id: "branding", icon: Image01Icon, paths: ["logo", "favicon"] },
+  {
+    id: "branding",
+    icon: Image01Icon,
+    paths: ["logo", "favicon", "seo.image", "seo.imageAlt"],
+  },
   { id: "typography", icon: TextFontIcon, paths: ["fonts"] },
   { id: "navbar", icon: LayoutTopIcon, paths: ["navbar"] },
   { id: "banner", icon: Megaphone01Icon, paths: ["banner"] },

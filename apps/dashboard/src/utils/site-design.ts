@@ -43,6 +43,10 @@ const FAVICON_KEYS: readonly SiteDesignKey[] = [
   "faviconLight",
   "faviconDark",
 ];
+const SHARE_IMAGE_KEYS: readonly SiteDesignKey[] = [
+  "shareImage",
+  "shareImageAlt",
+];
 const COLOR_KEYS: readonly SiteDesignKey[] = [
   "primary",
   "darkModeAccent",
@@ -265,6 +269,7 @@ function readCodeMode(codeblocks: unknown): SiteDesignForm["codeMode"] {
 export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
   const logo = byMode(config.logo);
   const favicon = byMode(config.favicon);
+  const seo = record(config.seo);
   const colors = record(config.colors);
   const appearance = config.appearance;
   const appearanceRecord = record(appearance);
@@ -295,6 +300,8 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
     separateFavicons: hasSeparateModes(config.favicon),
     faviconLight: favicon.light,
     faviconDark: hasSeparateModes(config.favicon) ? favicon.dark : "",
+    shareImage: text(seo.image),
+    shareImageAlt: text(seo.imageAlt),
     primary: text(colors.primary) || SITE_DEFAULT_PRIMARY_COLOR,
     darkModeAccent: text(colors.light),
     button: text(colors.dark),
@@ -364,6 +371,15 @@ function patchAppearance(config: SiteRawConfig, form: SiteDesignForm) {
   } else {
     config.appearance = form.appearance;
   }
+}
+
+/** The alt text only describes an image, so it goes when the image does. */
+function patchShareImage(config: SiteRawConfig, form: SiteDesignForm) {
+  const seo: SiteRawConfig = { ...record(config.seo) };
+  const image = form.shareImage.trim();
+  assign(seo, "image", image || undefined);
+  assign(seo, "imageAlt", (image && form.shareImageAlt.trim()) || undefined);
+  assignObject(config, "seo", seo);
 }
 
 function patchBackground(config: SiteRawConfig, form: SiteDesignForm) {
@@ -564,6 +580,9 @@ export function patchDesign(
       "favicon",
       writeByMode(form.separateFavicons, form.faviconLight, form.faviconDark)
     );
+  }
+  if (changed(form, initial, SHARE_IMAGE_KEYS)) {
+    patchShareImage(config, form);
   }
   if (changed(form, initial, COLOR_KEYS)) {
     const colors: SiteRawConfig = {

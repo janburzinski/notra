@@ -1,9 +1,14 @@
 "use client";
 
-import { LinkSquare02Icon } from "@hugeicons/core-free-icons";
+import {
+  LinkSquare02Icon,
+  Share08Icon,
+  TextIcon,
+} from "@hugeicons/core-free-icons";
 import { Input } from "@notra/ui/components/ui/input";
 import { useTranslations } from "use-intl";
 
+import { SiteAssetField } from "@/components/sites/site-asset-field";
 import { SiteSeparateAssetRows } from "@/components/sites/site-separate-asset-rows";
 import { SiteSettingsItem } from "@/components/sites/site-settings-item";
 import type {
@@ -63,6 +68,41 @@ export function SiteBrandingFields({
         separateLabel={t("separateFavicons")}
         title={t("favicon")}
       />
+      <SiteSettingsItem
+        description={t("shareImageHint")}
+        icon={Share08Icon}
+        errorPath="seo.image"
+        title={t("shareImage")}
+        value={
+          <SiteAssetField
+            id="site-share-image"
+            kind="share"
+            label={t("shareImage")}
+            onChange={(value) => update("shareImage", value)}
+            placeholder="/images/share.png"
+            value={form.shareImage}
+          />
+        }
+      />
+      {form.shareImage.trim() ? (
+        <SiteSettingsItem
+          description={t("shareImageAltHint")}
+          icon={TextIcon}
+          errorPath="seo.imageAlt"
+          title={t("shareImageAlt")}
+          value={
+            <Input
+              aria-label={t("shareImageAlt")}
+              autoComplete="off"
+              className="w-full sm:w-80"
+              maxLength={200}
+              onChange={(event) => update("shareImageAlt", event.target.value)}
+              placeholder={t("shareImageAltPlaceholder")}
+              value={form.shareImageAlt}
+            />
+          }
+        />
+      ) : null}
     </>
   );
 }

@@ -5,10 +5,12 @@ import { extname, join } from "node:path";
 import { parseEntryFrontmatter } from "@notra/sites-compiler/frontmatter";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
+import type { SiteArea } from "@notra/sites-core/types/deployment";
 import { Resvg } from "@resvg/resvg-js";
 import type { ReactElement } from "react";
 import satori from "satori";
 
+import { AREA_DEFAULT_TITLES } from "../src/constants/areas";
 import { OG_MANIFEST_FILE } from "../src/constants/og";
 import { configuredAreaTitle, withSiteName } from "../src/utils/area-titles";
 import { OgArticleCard } from "./components/og-article-card";
@@ -25,6 +27,7 @@ import {
 import type {
   FrontmatterAuthor,
   OgAuthor,
+  OgCardStyle,
   OgBackgroundResult,
   OgImagesResult,
   OgManifest,
@@ -185,6 +188,48 @@ async function renderPng(
     .asPng();
 }
 
+/** The share image of a section's index, also used by its tag and author pages. */
+function areaCard(
+  params: WriteOgImagesParams,
+  area: SiteArea,
+  style: OgCardStyle
+): ReactElement {
+  const { config } = params;
+  const title = configuredAreaTitle(config, area);
+  const section = config.thumbnails.label ?? AREA_DEFAULT_TITLES[area];
+  if (config.thumbnails.layout === "article") {
+    return OgArticleCard({
+      ...style,
+      date: config.name,
+      category: section === title ? "" : section,
+      title,
+      description: config[area]?.description ?? config.description,
+      authors: [],
+    });
+  }
+  if (config.thumbnails.layout === "author") {
+    return OgAuthorCard({ ...style, label: section, title });
+  }
+  return OgCard({
+    ...style,
+    eyebrow: config.name,
+    title,
+    footer: style.domain,
+  });
+}
+
+async function writeCard(
+  params: WriteOgImagesParams,
+  card: ReactElement,
+  fonts: SatoriFont[],
+  urlPath: string
+): Promise<void> {
+  await writeFileEnsured(
+    join(params.workDir, "site", "public", urlPath),
+    await renderPng(card, fonts)
+  );
+}
+
 export async function writeOgImages(
   params: WriteOgImagesParams
 ): Promise<OgImagesResult> {
@@ -192,7 +237,7 @@ export async function writeOgImages(
   const manifest: OgManifest = {};
   const diagnostics: SiteDiagnostic[] = [];
   const { config } = params;
-  if (config.thumbnails.enabled && params.entries.length > 0) {
+  if (config.thumbnails.enabled) {
     const [fonts, background] = await Promise.all([
       loadFonts(),
       loadBackground(params),
@@ -201,13 +246,27 @@ export async function writeOgImages(
       diagnostics.push(background.diagnostic);
     }
     const appearance = config.thumbnails.appearance;
-    const logo = await publicImage(params, siteLogo(config));
-    const accent =
-      appearance === "dark"
-        ? (config.colors.light ?? config.colors.primary)
-        : config.colors.primary;
-    const domain = new URL(params.publicOrigin).hostname.replace(/^www\./, "");
+    const style: OgCardStyle = {
+      appearance,
+      accent:
+        appearance === "dark"
+          ? (config.colors.light ?? config.colors.primary)
+          : config.colors.primary,
+      logo: await publicImage(params, siteLogo(config)),
+      domain: new URL(params.publicOrigin).hostname.replace(/^www\./, ""),
+      background: background.dataUri,
+    };
+    const { accent, logo, domain } = style;
     const now = new Date();
+    // seo.image replaces the generated section cards; posts keep their own.
+    const areas = config.seo.image ? [] : params.areas;
+    await Promise.all(
+      areas.map(async (area) => {
+        const urlPath = `/${OG_IMAGES_DIR}/${area}.png`;
+        await writeCard(params, areaCard(params, area, style), fonts, urlPath);
+        manifest[area] = urlPath;
+      })
+    );
     await Promise.all(
       params.entries.map(async (entry) => {
         const source = await readFile(
@@ -265,12 +324,8 @@ export async function writeOgImages(
             background: background.dataUri,
           });
         }
-        const png = await renderPng(card, fonts);
         const urlPath = `/${OG_IMAGES_DIR}/${entry.area}/${entry.slug}.png`;
-        await writeFileEnsured(
-          join(params.workDir, "site", "public", urlPath),
-          png
-        );
+        await writeCard(params, card, fonts, urlPath);
         manifest[`${entry.area}/${entry.slug}`] = urlPath;
       })
     );

@@ -17,12 +17,14 @@ export const SITE_IMAGE_UPLOAD_KINDS = [
   "background",
   "logo",
   "favicon",
+  "share",
 ] as const;
 /** Longest edge in pixels an upload of each kind is scaled down to. */
 export const SITE_IMAGE_UPLOAD_MAX_EDGE = {
   background: 2560,
   logo: 512,
   favicon: 256,
+  share: 1200,
 } as const;
 /** Largest file the browser accepts before scaling it down for upload. */
 export const SITE_IMAGE_UPLOAD_INPUT_MAX_BYTES = 40 * 1024 * 1024;
