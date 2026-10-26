@@ -16,6 +16,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
 
+import { ONBOARDING_FLOW_VARIANTS } from "@/constants/analytics-events";
 import {
   ONBOARDING_STEP_COMPETITORS,
   ONBOARDING_STEP_VISIBILITY,
@@ -29,6 +30,7 @@ import {
 import { hasPaidSubscriptionHistory } from "@/lib/billing/subscription";
 import { redirectIfAnyOrganizationHasPaidHistory } from "@/lib/onboarding/billing-gate";
 import { redirectIfOnboardingDismissed } from "@/lib/onboarding/dismissal";
+import { resolveOnboardingVariant } from "@/lib/onboarding/experiment";
 import type { OnboardingLayoutContext } from "@/types/onboarding-layout";
 import type { UiRouteInput } from "@/types/ui-route";
 import {
@@ -78,13 +80,24 @@ async function onboardingBrandContext(input: UiRouteInput) {
 
 export const loadOnboardingLayout = createServerFn({ method: "GET" }).handler(
   async (): Promise<OnboardingLayoutContext> => {
-    const organization = await getLastActiveOrganization();
-    const member = organization
-      ? (await validateOrganizationAccess(organization.slug)).member
-      : null;
+    const [session, organization] = await Promise.all([
+      getSession(),
+      getLastActiveOrganization(),
+    ]);
+    const [member, onboardingVariant] = await Promise.all([
+      organization
+        ? validateOrganizationAccess(organization.slug).then(
+            (access) => access.member
+          )
+        : null,
+      session?.user
+        ? resolveOnboardingVariant(session.user.id)
+        : ONBOARDING_FLOW_VARIANTS.CONTROL,
+    ]);
     return {
       organizationSlug: organization?.slug ?? null,
       canSkip: member?.role === "owner" || member?.role === "admin",
+      onboardingVariant,
     };
   }
 );

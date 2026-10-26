@@ -1,3 +1,5 @@
+import { POSTHOG_EVENTS } from "@notra/posthog/events";
+
 export const PAYWALL_KINDS = {
   GEO_LOCKED: "geo_locked",
   STUDIO_LOCKED: "studio_locked",
@@ -115,4 +117,18 @@ export const ONBOARDING_BRAND_ANALYSIS_FAILURE_REASONS = {
 
 export const CHECKOUT_SURFACES = {
   SUCCESS_PAGE: "success_page",
+} as const;
+
+export const DATABUDDY_ONBOARDING_EVENTS: ReadonlySet<string> = new Set([
+  POSTHOG_EVENTS.ONBOARDING_STEP_VIEWED,
+  POSTHOG_EVENTS.ONBOARDING_STEP_SKIPPED,
+  POSTHOG_EVENTS.ONBOARDING_BRAND_SAVED,
+  POSTHOG_EVENTS.ONBOARDING_COMPETITORS_SUBMITTED,
+]);
+
+export const ONBOARDING_FLOW_FLAG_KEY = "onboarding-flow";
+
+export const ONBOARDING_FLOW_VARIANTS = {
+  CONTROL: "control",
+  NO_PREVIEW: "no-preview",
 } as const;

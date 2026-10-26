@@ -17,7 +17,7 @@ const clientId = process.env.NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID ?? "";
 
 let cachedManager: ServerFlagsManager | null = null;
 
-function getFlagsManager(): ServerFlagsManager | null {
+export function getFlagsManager(): ServerFlagsManager | null {
   if (clientId.length === 0) {
     return null;
   }

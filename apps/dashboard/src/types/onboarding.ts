@@ -2,11 +2,14 @@ import type {
   GeoAudienceType,
   GeoBrandSearchResult,
   GeoCompetitor,
+  GeoCompetitorSuggestionsResponse,
   GeoDiscoveredPrompt,
   GeoOnboardingStage,
   GeoWebsiteDiscovery,
 } from "@notra/geo-core/types/geo";
 import type { onboardingWorkspaceSchema } from "@notra/schemas/dashboard/onboarding/workspace";
+import type { OnboardingHeardAboutNotraSource } from "@notra/schemas/types/dashboard/onboarding";
+import type { UseQueryResult } from "@tanstack/react-query";
 import type * as z from "zod";
 
 import type { OnboardingStep } from "@/types/analytics/events";
@@ -46,6 +49,42 @@ export interface WorkspaceFormProps {
 export interface WorkspaceSlugCheck {
   slug: string;
   status: "checking" | "available" | "unavailable" | "error";
+}
+
+export interface WebsiteDiscoveryStatusProps {
+  host: string;
+  isReading: boolean;
+  failed: boolean;
+  onRetry: (websiteUrl: string) => void;
+}
+
+export interface PrefixedInputFieldProps {
+  id: string;
+  label: string;
+  prefix: string;
+  error: string | null;
+  preview?: OnboardingPreviewFocus;
+  inputClassName?: string;
+  inputProps: Omit<
+    React.ComponentProps<"input">,
+    "id" | "className" | "type" | "aria-describedby" | "aria-invalid"
+  >;
+  children?: React.ReactNode;
+}
+
+export interface SlugStatusIndicatorProps {
+  status: WorkspaceSlugCheck["status"] | null;
+}
+
+export interface HeardAboutNotraFieldProps {
+  source: string;
+  other: string;
+  sourceError: string | null;
+  otherError: string | null;
+  disabled: boolean;
+  onSourceChange: (value: OnboardingHeardAboutNotraSource) => void;
+  onOtherChange: (value: string) => void;
+  onOtherBlur: () => void;
 }
 
 export interface OnboardingSplitLayoutProps {
@@ -99,6 +138,8 @@ export interface VisibilityReviewProps {
   languages: readonly string[];
   nextHref: string;
   skipHref: string;
+  previewFocus: OnboardingPreviewFocus | null;
+  previewWebsite: string;
 }
 
 export interface CompetitorsFormProps {
@@ -127,6 +168,24 @@ export interface CompetitorChoiceRowProps {
   onToggle: () => void;
 }
 
+export interface SelectedCompetitorsProps {
+  competitors: readonly GeoCompetitor[];
+  disabled: boolean;
+  onRemove: (competitor: GeoCompetitor) => void;
+}
+
+export interface CompetitorSuggestionsProps {
+  domain: string;
+  suggestions: UseQueryResult<GeoCompetitorSuggestionsResponse>;
+  competitors: readonly GeoCompetitor[];
+  remainingCount: number;
+  busy: boolean;
+  atLimit: boolean;
+  onAdd: (name: string, domain: string | null) => void;
+  onRemove: (competitor: GeoCompetitor) => void;
+  onAddAll: () => void;
+}
+
 export interface PromptChoiceRowProps {
   prompt: string;
   selected: boolean;
@@ -136,7 +195,7 @@ export interface PromptChoiceRowProps {
 
 export type CompetitorsPickerProps = Omit<
   CompetitorsFormProps,
-  "projectId" | "inOnboardingFlow" | "companyName"
+  "projectId" | "inOnboardingFlow"
 >;
 
 export interface CompetitorSearchProps {
@@ -220,6 +279,11 @@ export interface SubmitWorkspaceFormArgs {
   value: OnboardingWorkspaceFormValues;
 }
 
+export interface SubmitWorkspaceStepArgs extends SubmitWorkspaceFormArgs {
+  setSubmitting: (submitting: boolean) => void;
+  onError: (error: unknown) => void;
+}
+
 export type SaveOnboardingAttributionInput = Pick<
   OnboardingWorkspaceInput,
   "heardAboutNotraOther" | "heardAboutNotraSource"
@@ -257,3 +321,81 @@ export type WorkspaceFormField =
   | "websiteUrl"
   | "heardAboutNotraSource"
   | "heardAboutNotraOther";
+
+export type OnboardingPreviewFocus =
+  | "name"
+  | "website"
+  | "brand"
+  | "prompts"
+  | "competitors";
+
+export interface OnboardingPreviewZoom {
+  scale?: number;
+  page?: OnboardingPreviewPage;
+}
+
+export interface OnboardingDashboardPreviewProps {
+  focus: OnboardingPreviewFocus | null;
+  name?: string;
+  slug?: string;
+  logoUrl?: string | null;
+  logoDomain?: string | null;
+  logoName?: string;
+  website?: string;
+  prompts?: readonly string[];
+  competitors?: readonly { id: string; name: string; domain: string | null }[];
+  defaultPage?: OnboardingPreviewPage;
+}
+
+export type OnboardingPreviewPage = "overview" | "prompts" | "competitors";
+
+export interface OnboardingPreviewOverviewPageProps {
+  companyName: string;
+}
+
+export interface OnboardingPreviewPromptsPageProps {
+  prompts: readonly string[];
+}
+
+export interface OnboardingPreviewCompetitorsPageProps {
+  competitors: readonly { id: string; name: string; domain: string | null }[];
+}
+
+export interface OnboardingPreviewLens {
+  transform: string;
+  width: number;
+  height: number;
+}
+
+export interface OnboardingPreviewLensState extends OnboardingPreviewLens {
+  focus: OnboardingPreviewFocus | null;
+  glide: boolean;
+}
+
+export interface UseOnboardingPreviewLensInput {
+  viewport: HTMLDivElement | null;
+  lensContent: HTMLDivElement | null;
+  focus: OnboardingPreviewFocus | null;
+  scale: number | undefined;
+  page: OnboardingPreviewPage;
+}
+
+export interface OnboardingPreviewAddressBarProps {
+  slug: string;
+  page: OnboardingPreviewPage;
+}
+
+export interface OnboardingPreviewMainProps {
+  page: OnboardingPreviewPage;
+  companyName: string;
+  prompts: readonly string[];
+  competitors: readonly { id: string; name: string; domain: string | null }[];
+}
+
+export interface OnboardingPreviewNavProps {
+  page: OnboardingPreviewPage;
+}
+
+export interface OnboardingPreviewSkeletonChipProps {
+  className: string;
+}

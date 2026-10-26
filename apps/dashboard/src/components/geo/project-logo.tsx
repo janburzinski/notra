@@ -57,9 +57,10 @@ export function ProjectLogo({
   domain,
   className,
   fallbackClassName,
+  logo: knownLogo,
 }: GeoProjectLogoProps) {
   const engine = brandEngineIconKey(name);
-  const { data } = useCompanyLogo(engine ? null : domain);
+  const { data } = useCompanyLogo(engine || knownLogo ? null : domain);
   if (engine) {
     return (
       <EngineIcon
@@ -69,7 +70,7 @@ export function ProjectLogo({
     );
   }
 
-  const logo = data?.url ?? null;
+  const logo = knownLogo ?? data?.url ?? null;
   return (
     <ProjectLogoInner
       className={className}

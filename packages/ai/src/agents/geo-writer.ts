@@ -519,11 +519,13 @@ function gateGeoWriterSave(
   return { didResearch: () => state.researched };
 }
 
+const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en", {
+  month: "long",
+  year: "numeric",
+});
+
 function formatMonthYear(date: Date): string {
-  return new Intl.DateTimeFormat("en", {
-    month: "long",
-    year: "numeric",
-  }).format(date);
+  return MONTH_YEAR_FORMAT.format(date);
 }
 
 export async function runGeoWriter(

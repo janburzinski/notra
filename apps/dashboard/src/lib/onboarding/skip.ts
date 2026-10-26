@@ -16,6 +16,7 @@ import { and, eq } from "drizzle-orm";
 import { trackServerEvent } from "@/lib/analytics/posthog-server";
 import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { getSession, validateOrganizationAccess } from "@/lib/auth/actions";
+import { resolveOnboardingVariant } from "@/lib/onboarding/experiment";
 import { validatedOnboardingProjectId } from "@/lib/onboarding/project";
 import type { OnboardingStep } from "@/types/analytics/events";
 import { withGeoProject } from "@/utils/geo-paths";
@@ -52,12 +53,17 @@ async function skipOnboardingImpl(slug: string, step: OnboardingStep) {
     )
     .returning({ id: organizations.id });
   if (updated) {
+    const onboardingVariant = await resolveOnboardingVariant(session.user.id);
     trackServerEvent({
       event: POSTHOG_EVENTS.ONBOARDING_STEP_SKIPPED,
       headers: requestHeaders,
       organizationId: organization.id,
       projectId,
-      properties: { step, scope: "onboarding" },
+      properties: {
+        step,
+        scope: "onboarding",
+        onboarding_variant: onboardingVariant,
+      },
       userId: session.user.id,
     });
   }

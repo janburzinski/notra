@@ -94,9 +94,11 @@ if (values.help) {
     })
   );
 } else {
-  const { createCliRenderer } = await import("@opentui/core");
-  const { createRoot } = await import("@opentui/react");
-  const { App } = await import("./ui/app");
+  const [{ createCliRenderer }, { createRoot }, { App }] = await Promise.all([
+    import("@opentui/core"),
+    import("@opentui/react"),
+    import("./ui/app"),
+  ]);
   const demo = values.demo || !process.env.AI_GATEWAY_API_KEY;
   const renderer = await createCliRenderer({
     exitOnCtrlC: false,

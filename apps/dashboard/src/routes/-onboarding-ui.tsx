@@ -10,6 +10,7 @@ import OnboardingLayout from "@/app/onboarding/layout";
 import { OnboardingSplitLayout } from "@/components/onboarding/split-layout";
 import { OnboardingSplitLayoutContext } from "@/components/onboarding/split-layout-context";
 import { ONBOARDING_STEPS } from "@/constants/analytics-events";
+import { setOnboardingVariant } from "@/lib/analytics/onboarding-funnel";
 import { lazyPage } from "@/utils/lazy-page";
 
 import {
@@ -40,6 +41,7 @@ const Competitors = lazyPage(() =>
 export function createOnboardingUiRoutes(parent: AnyRoute) {
   function OnboardingRouteLayout() {
     const context = onboarding.useLoaderData<Router<typeof onboarding>>();
+    setOnboardingVariant(context.onboardingVariant);
     return (
       <OnboardingSplitLayoutContext value={context}>
         <OnboardingLayout>

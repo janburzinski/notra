@@ -151,6 +151,8 @@ export interface GeoProjectLogoProps {
   className?: string;
   /** Applied only while the generated placeholder avatar is shown. */
   fallbackClassName?: string;
+  /** Known logo URL; skips the company logo lookup. */
+  logo?: string | null;
 }
 
 export interface GeoPageClientProps {

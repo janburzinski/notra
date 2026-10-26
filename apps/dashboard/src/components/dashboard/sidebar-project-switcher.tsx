@@ -59,10 +59,13 @@ import {
 
 const GEO_SETTINGS_ITEM = resolveNavItems([GEO_SETTINGS_NAV_LINK]).at(0);
 
-function ProjectSwitcherTrigger({
+export function ProjectSwitcherTrigger({
   project,
   domain,
   isLoading,
+  logo,
+  logoDomain,
+  logoName,
   ...props
 }: ProjectSwitcherTriggerProps) {
   const t = useTranslations("nav.orgSelector");
@@ -113,9 +116,10 @@ function ProjectSwitcherTrigger({
     >
       <ProjectLogo
         className="size-7 rounded-lg"
-        domain={domain}
+        domain={logoDomain === undefined ? domain : logoDomain}
         fallbackClassName="bg-sidebar-accent rounded-lg"
-        name={project.name}
+        logo={logo}
+        name={logoName ?? project.name}
       />
       <div className="grid min-w-0 flex-1 leading-tight">
         <SidebarLabel className="truncate text-sm font-medium">

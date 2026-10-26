@@ -5,9 +5,12 @@ export interface SwitcherProject {
 }
 
 export interface ProjectSwitcherTriggerProps {
-  project: SwitcherProject | undefined;
+  project: Pick<SwitcherProject, "name"> | undefined;
   domain: string | null;
   isLoading: boolean;
+  logo?: string | null;
+  logoDomain?: string | null;
+  logoName?: string;
 }
 
 export interface ProjectMenuListProps {

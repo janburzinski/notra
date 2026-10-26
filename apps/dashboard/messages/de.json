@@ -1301,7 +1301,7 @@
       "description": "Notra ist ein modernes GEO-Tool, das ChatGPT, Claude und Gemini die Fragen deiner Käufer stellt. Sieh, ob du in den Antworten vorkommst, wer stattdessen genannt wird und wie du das ändern kannst.",
       "title": "Sieh, was KI über dich sagt",
       "reading": "{host} wird gelesen. Das dauert etwa 20 Sekunden.",
-      "readFailed": "{host} konnte nicht gelesen werden. Prüfe die Adresse oder gib unten einfach deinen Markennamen ein.",
+      "readFailed": "{host} konnte nicht gelesen werden. Prüfe die Adresse und versuche es erneut oder gib unten einfach deinen Markennamen ein.",
       "languagesHint": "Fragen werden auf {language} geschrieben. Weitere Sprachen übersetzen wir beim Scan."
     },
     "workspace": {
@@ -1331,6 +1331,10 @@
     },
     "shared": {
       "skipOnboarding": "Onboarding überspringen"
+    },
+    "preview": {
+      "placeholderName": "Acme",
+      "placeholderSlug": "acme"
     }
   },
   "shared": {
