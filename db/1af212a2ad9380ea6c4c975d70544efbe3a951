@@ -1,0 +1,25 @@
+apps/console/src/schemas/ai-trends.ts
+  s_b89dbd8984a543::t_1f28e522b148f1 56-57
+apps/console/src/lib/ai-trends/share-card.tsx
+  s_b89dbd8984a543::t_20f2ccd37035cf 479,499,501,523-529
+  s_b89dbd8984a543::t_dd2a1cd34e73fc 44-46,459-478,480-498,500,502-512,515,563,567,698,704-705,713-722,738-747,764
+  s_b89dbd8984a543::t_08df1a3fd1ca6b 730-733
+apps/console/src/utils/ai-trends-share.ts
+  s_b89dbd8984a543::t_1f28e522b148f1 87,154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "db1af212a2ad9380ea6c4c975d70544efbe3a951",
+  "prompts": {},
+  "sessions": {
+    "s_b89dbd8984a543": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "44586514-a0e7-42fa-9f66-6f8266c25aef",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
