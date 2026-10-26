@@ -30,6 +30,8 @@ import type {
   GeoTrafficPagesParams,
   GeoTrafficPagesRow,
   GeoTrafficTimeseriesRow,
+  GeoTrafficTrendsDailyRow,
+  GeoTrafficTrendsProjectsRow,
   NotraAdoptionRow,
   PostingPerformanceParams,
   PostingPerformanceRow,
@@ -76,6 +78,10 @@ import {
   geoTrafficTimeseries,
 } from "./pipes/geo-traffic";
 import {
+  geoTrafficTrendsDaily,
+  geoTrafficTrendsProjects,
+} from "./pipes/geo-traffic-trends";
+import {
   accountLeaderboard,
   engagementTimeseries,
   followerGrowth,
@@ -110,14 +116,19 @@ export function isTinybirdConfigured(): boolean {
   return hasTinybirdToken() || isDemoMode();
 }
 
+function tinybirdBaseUrl(): string {
+  return (
+    process.env.TINYBIRD_BASE_URL ??
+    process.env.TINYBIRD_URL ??
+    "https://api.tinybird.co"
+  );
+}
+
 function createTinybirdClient(fetch?: typeof globalThis.fetch) {
   return new Tinybird({
     fetch,
     token: process.env.TINYBIRD_TOKEN,
-    baseUrl:
-      process.env.TINYBIRD_BASE_URL ??
-      process.env.TINYBIRD_URL ??
-      "https://api.tinybird.co",
+    baseUrl: tinybirdBaseUrl(),
     devMode: false,
     datasources: {
       socialAccounts,
@@ -146,6 +157,8 @@ function createTinybirdClient(fetch?: typeof globalThis.fetch) {
       geoJourneySources,
       geoJourneyPages,
       geoJourneyDetail,
+      geoTrafficTrendsDaily,
+      geoTrafficTrendsProjects,
       webOverview,
       webTimeseries,
       webPages,
@@ -496,6 +509,61 @@ export function queryGeoJourneyDetail(
     params,
     params.organization_id,
     (client) => client.geoJourneyDetail.query(params)
+  );
+}
+
+/**
+ * Queries an endpoint with its params in a POST body. The SDK sends them in
+ * the URL, which a long id list pushes past the server's limit (HTTP 414).
+ */
+async function postPipeQuery<TRow>(
+  pipe: string,
+  params: Record<string, unknown>
+): Promise<QueryResult<TRow>> {
+  const response = await createTimeoutFetch(TINYBIRD_REQUEST_TIMEOUT_MS)(
+    new URL(`/v0/pipes/${pipe}.json`, tinybirdBaseUrl()),
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.TINYBIRD_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(params),
+    }
+  );
+  if (!response.ok) {
+    throw new Error(`Tinybird ${pipe} query failed (${response.status})`);
+  }
+  return (await response.json()) as QueryResult<TRow>;
+}
+
+/** Cross-organization AI traffic for the admin console, cached globally. */
+export function queryGeoTrafficTrendsDaily(
+  params: InferParams<typeof geoTrafficTrendsDaily>
+): Promise<QueryResult<GeoTrafficTrendsDailyRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "geo_traffic_trends_daily",
+    params,
+    null,
+    // Every sample, demo and deleted project id rides along to be excluded.
+    () =>
+      postPipeQuery<GeoTrafficTrendsDailyRow>(
+        "geo_traffic_trends_daily",
+        params
+      )
+  );
+}
+
+export function queryGeoTrafficTrendsProjects(
+  params: InferParams<typeof geoTrafficTrendsProjects>
+): Promise<QueryResult<GeoTrafficTrendsProjectsRow> | null> {
+  return cachedPipeQuery(
+    "geo",
+    "geo_traffic_trends_projects",
+    params,
+    null,
+    (client) => client.geoTrafficTrendsProjects.query(params)
   );
 }
 

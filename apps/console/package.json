@@ -18,6 +18,7 @@
     "@neoconfetti/react": "^1.0.0",
     "@notra/ai": "workspace:*",
     "@notra/db": "workspace:*",
+    "@notra/geo-core": "workspace:*",
     "@notra/schemas": "workspace:*",
     "@notra/sites-core": "workspace:*",
     "@notra/ui": "workspace:*",

@@ -70,6 +70,21 @@ const SIGNATURE_AGENT_NAMES: Record<string, string> = Object.fromEntries(
   ])
 );
 
+const SIGNATURE_VENDORS: Record<string, string> = Object.fromEntries(
+  AI_AGENT_SIGNATURES.map((signature) => [
+    signature.agent.toLowerCase(),
+    signature.vendor,
+  ])
+);
+
+/** Company running a bot, e.g. "GPTBot" → "OpenAI"; null for unknown bots. */
+export function geoAgentVendor(agent: string): string | null {
+  const key = agent.trim().toLowerCase();
+  return Object.hasOwn(SIGNATURE_VENDORS, key)
+    ? (SIGNATURE_VENDORS[key] ?? null)
+    : null;
+}
+
 /** Bot name as its vendor writes it, e.g. "meta-externalagent" → "Meta-ExternalAgent". */
 export function formatGeoAgent(agent: string): string {
   const trimmed = agent.trim();

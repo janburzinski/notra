@@ -9,6 +9,7 @@ import type {
 import type {
   GeoCheckGrounding,
   GeoCheckSourceItem,
+  GeoCheckSurfaces,
   GeoCheckWrite,
 } from "@notra/db/types/geo-checks";
 import type { GeoPersonaSnapshotV2 } from "@notra/db/types/geo-personas";
@@ -207,6 +208,8 @@ export interface GeoEngineAnswer {
    * (for example Google did not show an AI Overview for the query).
    */
   absent?: boolean;
+  /** Ads, shopping and model info a consumer-app scrape reported. */
+  surfaces?: GeoCheckSurfaces | null;
 }
 
 export interface GeoGroundedAnswer extends GeoEngineAnswer {

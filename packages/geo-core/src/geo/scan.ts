@@ -481,6 +481,7 @@ const runGeoCheck = Effect.fn("geo.runCheck")(function* (
     zdrEnforced: answer.zdrEnforced,
     language: task.language,
     sources: answer.sources,
+    surfaces: answer.surfaces ?? null,
   };
   if (answer.absent) {
     const durationMs = Math.round(performance.now() - startedMs);
@@ -1905,6 +1906,7 @@ const runGeoOpenCodeSequenceCheck = Effect.fn("geo.runOpenCodeSequenceCheck")(
         zdrEnforced: answer.zdrEnforced,
         language: sequence.language,
         sources: answer.sources,
+        surfaces: answer.surfaces ?? null,
       });
     }
 

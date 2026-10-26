@@ -399,6 +399,7 @@ export async function insertGeoMentionChecksWithSummary(
       grounding: row.grounding,
       language: row.language,
       sources: row.sources ?? [],
+      surfaces: row.surfaces ?? null,
       finishReason: row.finishReason,
       promptTokens: row.promptTokens,
       outputTokens: row.outputTokens,

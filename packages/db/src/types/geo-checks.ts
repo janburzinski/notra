@@ -34,6 +34,35 @@ export interface GeoCheckGrounding {
   };
 }
 
+export interface GeoCheckSurfaceAd {
+  brand: string | null;
+  domain: string | null;
+  cards: number;
+}
+
+export interface GeoCheckSurfaceProduct {
+  title: string;
+  price: number | null;
+  currency: string | null;
+  vendors: string[];
+}
+
+/**
+ * What a consumer app rendered around its answer, as its scraper reported it.
+ * A module is null when the scraper didn't report it, so "no ads shown" ([])
+ * stays distinct from "this engine can't tell".
+ */
+export interface GeoCheckSurfaces {
+  provider: "olostep";
+  /** Model the app said it used, e.g. ChatGPT's `model_slug`. */
+  model: string | null;
+  webSearched: boolean | null;
+  ads: GeoCheckSurfaceAd[] | null;
+  products: GeoCheckSurfaceProduct[] | null;
+  shoppingCards: number | null;
+  relatedQueries: string[];
+}
+
 export interface GeoCheckWrite {
   id?: string;
   organizationId: string;
@@ -56,6 +85,7 @@ export interface GeoCheckWrite {
   grounding: GeoCheckGrounding;
   language: string;
   sources?: GeoCheckSourceItem[];
+  surfaces?: GeoCheckSurfaces | null;
   finishReason: string | null;
   promptTokens: number | null;
   outputTokens: number | null;

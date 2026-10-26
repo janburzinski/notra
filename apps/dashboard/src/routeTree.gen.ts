@@ -65,6 +65,7 @@ import { Route as ApiIntegrationsLinearAuthorizeRouteImport } from './routes/api
 import { Route as ApiIntegrationsLinearCallbackRouteImport } from './routes/api.integrations.linear.callback'
 import { Route as ApiIntegrationsSlackAuthorizeRouteImport } from './routes/api.integrations.slack.authorize'
 import { Route as ApiIntegrationsSlackCallbackRouteImport } from './routes/api.integrations.slack.callback'
+import { Route as ApiInternalAiTrendsTrafficRouteImport } from './routes/api.internal.ai-trends.traffic'
 import { Route as ApiInternalAutopilotAdminRouteImport } from './routes/api.internal.autopilot.admin'
 import { Route as ApiInternalContentDraftPullRequestRouteImport } from './routes/api.internal.content.draft-pull-request'
 import { Route as ApiInternalContentPreviewRouteImport } from './routes/api.internal.content.preview'
@@ -393,6 +394,12 @@ const ApiIntegrationsSlackCallbackRoute =
     path: '/api/integrations/slack/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalAiTrendsTrafficRoute =
+  ApiInternalAiTrendsTrafficRouteImport.update({
+    id: '/api/internal/ai-trends/traffic',
+    path: '/api/internal/ai-trends/traffic',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalAutopilotAdminRoute =
   ApiInternalAutopilotAdminRouteImport.update({
     id: '/api/internal/autopilot/admin',
@@ -630,6 +637,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
+  '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -718,6 +726,7 @@ export interface FileRoutesByTo {
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
+  '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -807,6 +816,7 @@ export interface FileRoutesById {
   '/api/integrations/linear/callback': typeof ApiIntegrationsLinearCallbackRoute
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
+  '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -897,6 +907,7 @@ export interface FileRouteTypes {
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
+    | '/api/internal/ai-trends/traffic'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -985,6 +996,7 @@ export interface FileRouteTypes {
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
+    | '/api/internal/ai-trends/traffic'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1073,6 +1085,7 @@ export interface FileRouteTypes {
     | '/api/integrations/linear/callback'
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
+    | '/api/internal/ai-trends/traffic'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1156,6 +1169,7 @@ export interface RootRouteChildren {
   ApiIntegrationsLinearCallbackRoute: typeof ApiIntegrationsLinearCallbackRoute
   ApiIntegrationsSlackAuthorizeRoute: typeof ApiIntegrationsSlackAuthorizeRoute
   ApiIntegrationsSlackCallbackRoute: typeof ApiIntegrationsSlackCallbackRoute
+  ApiInternalAiTrendsTrafficRoute: typeof ApiInternalAiTrendsTrafficRoute
   ApiInternalAutopilotAdminRoute: typeof ApiInternalAutopilotAdminRoute
   ApiInternalContentDraftPullRequestRoute: typeof ApiInternalContentDraftPullRequestRoute
   ApiInternalContentPreviewRoute: typeof ApiInternalContentPreviewRoute
@@ -1575,6 +1589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIntegrationsSlackCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/ai-trends/traffic': {
+      id: '/api/internal/ai-trends/traffic'
+      path: '/api/internal/ai-trends/traffic'
+      fullPath: '/api/internal/ai-trends/traffic'
+      preLoaderRoute: typeof ApiInternalAiTrendsTrafficRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/autopilot/admin': {
       id: '/api/internal/autopilot/admin'
       path: '/api/internal/autopilot/admin'
@@ -1945,6 +1966,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIntegrationsLinearCallbackRoute: ApiIntegrationsLinearCallbackRoute,
   ApiIntegrationsSlackAuthorizeRoute: ApiIntegrationsSlackAuthorizeRoute,
   ApiIntegrationsSlackCallbackRoute: ApiIntegrationsSlackCallbackRoute,
+  ApiInternalAiTrendsTrafficRoute: ApiInternalAiTrendsTrafficRoute,
   ApiInternalAutopilotAdminRoute: ApiInternalAutopilotAdminRoute,
   ApiInternalContentDraftPullRequestRoute:
     ApiInternalContentDraftPullRequestRoute,

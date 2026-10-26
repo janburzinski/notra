@@ -2,6 +2,7 @@
 
 import {
   AiSearch02Icon,
+  ChartLineData01Icon,
   GlobeIcon,
   Logout01Icon,
   PlugSocketIcon,
@@ -189,6 +190,11 @@ function ConsoleNavigation({
             href: `/${slug}/geo-reports`,
             label: "GEO Reports",
             icon: AiSearch02Icon,
+          },
+          {
+            href: `/${slug}/ai-trends`,
+            label: "AI Search Trends",
+            icon: ChartLineData01Icon,
           },
           {
             href: `/${slug}/sites`,

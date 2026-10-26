@@ -11,6 +11,10 @@ import type {
   geoTrafficTimeseries,
 } from "../tinybird/pipes/geo-traffic";
 import type {
+  geoTrafficTrendsDaily,
+  geoTrafficTrendsProjects,
+} from "../tinybird/pipes/geo-traffic-trends";
+import type {
   accountLeaderboard,
   engagementTimeseries,
   followerGrowth,
@@ -71,3 +75,9 @@ export type WebAudienceRow = InferOutputRow<typeof webAudience>;
 export type WebHostsRow = InferOutputRow<typeof webHosts>;
 export type WebAiOutcomesRow = InferOutputRow<typeof webAiOutcomes>;
 export type WebEngagementRow = InferOutputRow<typeof webEngagement>;
+export type GeoTrafficTrendsDailyRow = InferOutputRow<
+  typeof geoTrafficTrendsDaily
+>;
+export type GeoTrafficTrendsProjectsRow = InferOutputRow<
+  typeof geoTrafficTrendsProjects
+>;

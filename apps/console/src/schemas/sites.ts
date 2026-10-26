@@ -44,5 +44,3 @@ export const siteServingStateSchema = z.object({
     )
     .default({}),
 });
-
-export const siteAdminErrorSchema = z.object({ error: z.string() });

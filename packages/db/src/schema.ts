@@ -87,7 +87,7 @@ import type {
 import type { SharedChatMessage } from "./types/chat-shares";
 import type { DemoAffectedEntity, DemoPersonalization } from "./types/demo";
 import type { DiscussionCommentAnchor } from "./types/discussion-comments";
-import type { GeoCheckGrounding } from "./types/geo-checks";
+import type { GeoCheckGrounding, GeoCheckSurfaces } from "./types/geo-checks";
 import type {
   GeoPersonaProfile,
   GeoPersonaSnapshot,
@@ -2091,6 +2091,8 @@ export const geoMentionChecks = pgTable(
       .$type<{ url: string; title: string | null }[]>()
       .notNull()
       .default(sql`'[]'::jsonb`),
+    /** Ads, shopping and model info from consumer-app scrapes; null for APIs. */
+    surfaces: jsonb("surfaces").$type<GeoCheckSurfaces>(),
     finishReason: text("finish_reason"),
     promptTokens: integer("prompt_tokens"),
     outputTokens: integer("output_tokens"),

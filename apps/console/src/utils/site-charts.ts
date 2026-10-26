@@ -30,17 +30,22 @@ export function formatChartDateTime(date: Date | string): string {
   return DATE_TIME_FORMAT.format(new Date(date));
 }
 
-/** Median duration of the successful builds, or null when there are none. */
-export function medianBuildMs(builds: SiteRecentBuild[]): number | null {
-  const sorted = builds
-    .filter((build) => build.status === "ready")
-    .map((build) => build.durationMs)
-    .sort((a, b) => a - b);
-  if (sorted.length === 0) {
+export function median(values: readonly number[]): number | null {
+  if (values.length === 0) {
     return null;
   }
+  const sorted = values.toSorted((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
   return sorted.length % 2 === 0
     ? ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2
     : (sorted[middle] ?? 0);
+}
+
+/** Median duration of the successful builds, or null when there are none. */
+export function medianBuildMs(builds: SiteRecentBuild[]): number | null {
+  return median(
+    builds
+      .filter((build) => build.status === "ready")
+      .map((build) => build.durationMs)
+  );
 }

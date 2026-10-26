@@ -163,6 +163,7 @@ export const runGeoConversation = Effect.fn("geo.runConversation")(function* (
         zdrEnforced: answer.zdrEnforced,
         language,
         sources: answer.sources,
+        surfaces: answer.surfaces ?? null,
       });
     }
   });

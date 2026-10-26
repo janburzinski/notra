@@ -252,6 +252,13 @@ export default defineConfig({
       },
     },
     {
+      // Satori (next/og) only reads inline styles; there are no classes to use.
+      files: ["apps/console/src/lib/ai-trends/share-card.tsx"],
+      rules: {
+        "shadcn/no-inline-styles": "off",
+      },
+    },
+    {
       files: ["apps/dashboard/src/**"],
       rules: {
         "no-restricted-imports": [
