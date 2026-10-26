@@ -37,7 +37,7 @@ import { useBrandSettings } from "@/lib/hooks/use-brand-analysis";
 import { useGeoProjectsDb } from "@/lib/hooks/use-geo-db";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
-import { useSiteDetail } from "@/lib/hooks/use-sites";
+import { useLoadedSiteProjectId } from "@/lib/hooks/use-sites";
 import { usePathname, useRouter } from "@/lib/navigation";
 import type {
   ProjectMenuListProps,
@@ -200,7 +200,7 @@ export function SidebarProjectSwitcher() {
   const slug = activeOrganization?.slug ?? "";
   const [projectParam, setProjectParam] = useGeoProjectQueryState();
   const siteId = siteIdFromPath(pathname);
-  const siteDetail = useSiteDetail(organizationId, siteId);
+  const siteProjectId = useLoadedSiteProjectId(organizationId, siteId);
   const activeScope = useActiveProject();
   const switchProject = (projectId: string) => {
     if (siteId) {
@@ -223,7 +223,7 @@ export function SidebarProjectSwitcher() {
   const projects = loadedProjects;
   const voices = brandData?.voices ?? [];
   const selectedProjectId = siteId
-    ? siteDetail.data?.site.projectId
+    ? (siteProjectId ?? undefined)
     : activeScope.projectId;
   const activeProject = projects.find(
     (project) => project.id === selectedProjectId
@@ -268,7 +268,7 @@ export function SidebarProjectSwitcher() {
   const isProjectLoading = Boolean(
     organizationId &&
     !activeScope.isError &&
-    (!activeScope.isResolved || (siteId && siteDetail.isPending))
+    (!activeScope.isResolved || (siteId && siteProjectId === undefined))
   );
 
   const activeDomain = activeProject

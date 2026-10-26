@@ -3,6 +3,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { useCallback, useSyncExternalStore } from "react";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
@@ -67,6 +68,36 @@ export function useSiteDetail(organizationId: string, siteId: string) {
       refetchIntervalInBackground: false,
     })
   );
+}
+
+/**
+ * The project of the site the open site page loads, `null` once that load
+ * failed. Reads the cache without adding an entry, so the page's loader data
+ * still hydrates during render.
+ */
+export function useLoadedSiteProjectId(
+  organizationId: string,
+  siteId: string
+): string | null | undefined {
+  const queryClient = useQueryClient();
+  const queryKey = dashboardOrpc.sites.get.queryKey({
+    input: { organizationId, siteId },
+  });
+  const subscribe = useCallback(
+    (onChange: () => void) => queryClient.getQueryCache().subscribe(onChange),
+    [queryClient]
+  );
+  const read = () => {
+    if (!siteId) {
+      return undefined;
+    }
+    const state = queryClient.getQueryState(queryKey);
+    if (state?.data) {
+      return state.data.site.projectId;
+    }
+    return state?.status === "error" ? null : undefined;
+  };
+  return useSyncExternalStore(subscribe, read, read);
 }
 
 export function useSiteAnalytics(

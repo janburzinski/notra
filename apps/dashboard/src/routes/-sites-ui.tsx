@@ -1,10 +1,13 @@
+import { HydrationBoundary } from "@tanstack/react-query";
 import {
   type AnyRoute,
   createRoute,
   notFound,
   Outlet,
   redirect,
+  type Router,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import { NewSitePageSkeleton as NewSiteLoading } from "@/app/(dashboard)/[slug]/sites/new/skeleton";
 import { SitesPageSkeleton as SitesLoading } from "@/app/(dashboard)/[slug]/sites/skeleton";
@@ -18,8 +21,8 @@ import { SITE_SECTION_PAGES } from "@/constants/site-ui-pages";
 import { lazyPage } from "@/utils/lazy-page";
 import { siteHref, sitePreviewDeploymentsHref } from "@/utils/site-links";
 
-import { loadSitesEnabled } from "./-sites-loaders";
-import { createUiRoute } from "./-ui-route";
+import { loadSite, loadSitesEnabled } from "./-sites-loaders";
+import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
 const SiteLayout = lazyPage(() =>
   import("@/components/sites/site-layout").then((module) => ({
@@ -43,9 +46,16 @@ const DeploymentDetail = lazyPage(() =>
   )
 );
 
+// Organizations whose Sites gate passed in this tab. The API checks access on
+// every call, so tab clicks and search updates skip the extra round trip.
+let clientSitesEnabledSlug: string | undefined;
+
 export function createSitesUiRoutes(organization: AnyRoute) {
   function SitesRouteLayout() {
     const { slug } = organization.useParams();
+    useEffect(() => {
+      clientSitesEnabledSlug = slug;
+    }, [slug]);
     return (
       <SitesLiveProvider organizationSlug={slug}>
         <Outlet />
@@ -57,6 +67,9 @@ export function createSitesUiRoutes(organization: AnyRoute) {
     getParentRoute: () => organization,
     path: "sites",
     beforeLoad: async ({ params, search }) => {
+      if (clientSitesEnabledSlug === params.slug) {
+        return;
+      }
       const enabled = await loadSitesEnabled({
         data: { params, searchParams: search },
       });
@@ -68,10 +81,13 @@ export function createSitesUiRoutes(organization: AnyRoute) {
   });
   function SiteRouteLayout() {
     const { slug, siteId } = site.useParams();
+    const { state } = site.useLoaderData<Router<typeof site>>();
     return (
-      <SiteLayout organizationSlug={slug} siteId={siteId}>
-        <Outlet />
-      </SiteLayout>
+      <HydrationBoundary state={state}>
+        <SiteLayout organizationSlug={slug} siteId={siteId}>
+          <Outlet />
+        </SiteLayout>
+      </HydrationBoundary>
     );
   }
   SiteRouteLayout.preload = SiteLayout.preload;
@@ -79,6 +95,18 @@ export function createSitesUiRoutes(organization: AnyRoute) {
   const site = createRoute({
     getParentRoute: () => sites,
     path: "$siteId",
+    // Queries keep the site fresh once it renders; the loader only seeds them,
+    // so tab clicks inside the site don't run it again. The first document
+    // skips it: waiting on R2 there delays the whole page, while the client
+    // fetches the same queries right after hydration.
+    loaderDeps: ({ search }) => ({
+      branch: uiRouteSearch(search as Record<string, unknown>).branch,
+    }),
+    shouldReload: ({ cause }) => (cause === "stay" ? false : undefined),
+    loader: ({ params, deps }) =>
+      import.meta.env.SSR
+        ? { state: undefined }
+        : loadSite({ data: { params, searchParams: deps } }),
     pendingComponent: SiteLoading,
     component: SiteRouteLayout,
   });
