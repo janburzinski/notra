@@ -1,0 +1,50 @@
+apps/dashboard/messages/de.json
+  s_310c00cd760ef5::t_db54e39f16b627 1868
+  s_310c00cd760ef5::t_e7620c36e655a4 1862-1863
+apps/dashboard/src/app/(dashboard)/[slug]/skills/[name]/page-client.tsx
+  s_310c00cd760ef5::t_339b3ef1443315 224,226
+  s_310c00cd760ef5::t_db54e39f16b627 14,218-220
+  s_310c00cd760ef5::t_d7358114c438c1 22,60-61,217,221-223,225,227-229
+apps/dashboard/src/utils/skills.ts
+  s_310c00cd760ef5::t_c5d9379765e56e 118-121
+apps/dashboard/src/components/skills/skill-editor-form.tsx
+  s_310c00cd760ef5::t_db54e39f16b627 59,76-77
+packages/ui/src/lib/line-diff.ts
+  s_310c00cd760ef5::t_62ca79c7d60644 2-5,17,92-93
+packages/ui/src/constants/line-diff.ts
+  s_310c00cd760ef5::t_62ca79c7d60644 1-3
+apps/dashboard/messages/en.json
+  s_310c00cd760ef5::t_e7620c36e655a4 1862-1863
+  s_310c00cd760ef5::t_db54e39f16b627 1868
+apps/console/src/components/skills/system-skill-versions.tsx
+  s_310c00cd760ef5::t_adc617a98e4009 3
+apps/console/src/components/skills/system-skill-content-field.tsx
+  s_310c00cd760ef5::t_adc617a98e4009 3
+apps/console/src/utils/line-diff.test.ts
+  s_310c00cd760ef5::t_dab9df9ec9cee4 3
+apps/dashboard/src/components/skills/skill-update-card.tsx
+  s_310c00cd760ef5::t_c5d9379765e56e 3,5,10-11,13,20-21,26-42,45,47,49,51-83
+packages/ui/src/components/shared/line-diff.tsx
+  s_310c00cd760ef5::t_4de80b04c078f4 5-7,9,11-21,30,36-41,45,48,53-55,62,69-74
+apps/dashboard/src/types/skills/page.ts
+  s_310c00cd760ef5::t_db54e39f16b627 90
+  s_310c00cd760ef5::t_339b3ef1443315 97
+packages/ui/src/types/line-diff.ts
+  s_310c00cd760ef5::t_62ca79c7d60644 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "37fd920123cc8200f8375dff299533cfa504e3dc",
+  "prompts": {},
+  "sessions": {
+    "s_310c00cd760ef5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "57197665-3dbb-4aae-b2fe-63eecdce7ef5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
