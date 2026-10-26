@@ -68,14 +68,16 @@ export function createGeoUiRoutes(parent: AnyRoute) {
       path: "traffic",
       title: { namespace: "geo.pages.traffic", key: "metaTitle" },
       pendingComponent: TrafficLoading,
-      loaderSearchKeys: ["project", "range", "host"],
+      // The page's hooks refetch on project, range and host changes; rerunning
+      // the server prefetch as well would query Tinybird twice.
+      loaderSearchKeys: [],
       loader: (input) => loadGeoPage({ data: { ...input, kind: "traffic" } }),
       gate: (input) => gateGeoPage({ data: { ...input, kind: "traffic" } }),
       stream: "ssr",
       preload: Traffic.preload,
       component: ({ data, params }) => (
         <HydrationBoundary state={data.state}>
-          <Traffic organizationSlug={params.slug} />
+          <Traffic layout={data.trafficLayout} organizationSlug={params.slug} />
         </HydrationBoundary>
       ),
     }),

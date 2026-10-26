@@ -2,6 +2,7 @@ import {
   GEO_DEFAULT_RANGE,
   GEO_DEFAULT_TAB,
   GEO_TRAFFIC_HOST_PARAM,
+  GEO_TRAFFIC_SITES_PARAM,
 } from "@notra/geo-core/constants/geo";
 
 import { TRAFFIC_PATH_PARAM } from "@/constants/traffic-path";
@@ -10,11 +11,10 @@ import {
   geoOverviewQueryInput,
   geoSettingsQueryInput,
   geoTrafficJourneysQueryInput,
-  geoTrafficLogQueryInput,
-  geoTrafficPagesQueryInput,
 } from "@/utils/geo-query-input";
 import { parseGeoRangeParam } from "@/utils/geo-range";
 import { toGeoTab } from "@/utils/geo-tabs";
+import { toTrafficSitesMode } from "@/utils/traffic-sites";
 
 function firstSearchParam(
   value: string | string[] | undefined
@@ -120,18 +120,14 @@ export function geoTrafficHydrationInputs(
   const window = { from: range.dateFrom, to: range.dateTo };
   const host = firstSearchParam(search[GEO_TRAFFIC_HOST_PARAM]);
   const path = firstSearchParam(search[TRAFFIC_PATH_PARAM]);
+  const sites = toTrafficSitesMode(
+    firstSearchParam(search[GEO_TRAFFIC_SITES_PARAM])
+  );
 
   return {
     settings: geoSettingsQueryInput(scope),
-    aiTraffic: geoHostQueryInput(scope, window, host, path),
-    webAnalytics: geoHostQueryInput(scope, window, host, path),
-    trafficPages: geoTrafficPagesQueryInput(scope, window, host, path),
-    trafficLog: geoTrafficLogQueryInput(
-      scope,
-      { visitorTypes: [], categories: [] },
-      host,
-      path
-    ),
+    aiTraffic: geoHostQueryInput(scope, window, host, path, sites),
+    webAnalytics: geoHostQueryInput(scope, window, host, path, sites),
     ingestSetup: geoSettingsQueryInput(scope),
   };
 }

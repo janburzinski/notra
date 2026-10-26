@@ -9,8 +9,6 @@ import {
 
 import {
   GEO_CAPTURED_COMPARISON_WINDOW_SQL,
-  GEO_CAPTURED_CURRENT_CONDITION,
-  GEO_CAPTURED_PREVIOUS_CONDITION,
   GEO_CAPTURED_WINDOW_SQL,
   GEO_DAY_COMPARISON_WINDOW_SQL,
   GEO_DAY_CURRENT_CONDITION,
@@ -115,11 +113,22 @@ export const geoTrafficPagesByHostDailyBackfill = defineCopyPipe(
   }
 );
 
+/** Distinct page counts only when asked for; merging the exact sets dominates the query. */
+function geoOverviewPathsSql(expression: string): string {
+  return `{% if Int32(with_paths, 1) == 1 %}${expression}{% else %}toUInt64(0){% end %}`;
+}
+
 export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
   description:
     "Captured site visits grouped by traffic source and visitor type over the trailing window",
   params: {
     organization_id: p.string().describe("Organization id"),
+    with_paths: p
+      .int32()
+      .optional(1)
+      .describe(
+        "Set to 0 to skip the distinct page counts, the slowest part of the query"
+      ),
     ...GEO_PROJECT_SCOPE_PARAMS,
     ...GEO_SITE_SCOPE_PARAMS,
     ...GEO_EXCLUDED_SOURCES_PARAMS,
@@ -140,10 +149,10 @@ export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
           countMergeIf(visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS visits,
           countMergeIf(visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_visits,
           countIfMergeIf(markdown_visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS markdown_visits,
-          uniqExactMergeIf(paths_state, (${GEO_DAY_CURRENT_CONDITION})) AS paths,
+          ${geoOverviewPathsSql(`uniqExactMergeIf(paths_state, (${GEO_DAY_CURRENT_CONDITION}))`)} AS paths,
           maxMergeIf(last_seen_state, (${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at,
           countIfMergeIf(markdown_visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_markdown_visits,
-          uniqExactMergeIf(paths_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_paths
+          ${geoOverviewPathsSql(`uniqExactMergeIf(paths_state, (${GEO_DAY_PREVIOUS_CONDITION}))`)} AS previous_paths
         FROM geo_traffic_daily
         WHERE organization_id = {{String(organization_id)}}
           ${GEO_PROJECT_SCOPE_SQL}
@@ -175,9 +184,9 @@ export const geoTrafficOverview = defineEndpoint("geo_traffic_overview", {
             visitor_type,
             countMergeIf(visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS visits,
             countMergeIf(visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_visits,
-            uniqExactIf(path, (${GEO_DAY_CURRENT_CONDITION})) AS paths,
+            ${geoOverviewPathsSql(`uniqExactIf(path, (${GEO_DAY_CURRENT_CONDITION}))`)} AS paths,
             maxMergeIf(last_seen_state, (${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at,
-            uniqExactIf(path, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_paths
+            ${geoOverviewPathsSql(`uniqExactIf(path, (${GEO_DAY_PREVIOUS_CONDITION}))`)} AS previous_paths
           FROM geo_traffic_pages_by_host_daily
           WHERE ${GEO_PAGE_FILTER_SET}
             AND organization_id = {{String(organization_id)}}
@@ -306,17 +315,17 @@ export const geoTrafficPages = defineEndpoint("geo_traffic_pages", {
           path,
           source,
           visitor_type,
-          countIf(${GEO_CAPTURED_CURRENT_CONDITION}) AS visits,
-          countIf(${GEO_CAPTURED_PREVIOUS_CONDITION}) AS previous_visits,
-          maxIf(captured_at, (${GEO_CAPTURED_CURRENT_CONDITION})) AS last_seen_at
-        FROM geo_traffic_events
+          countMergeIf(visits_state, (${GEO_DAY_CURRENT_CONDITION})) AS visits,
+          countMergeIf(visits_state, (${GEO_DAY_PREVIOUS_CONDITION})) AS previous_visits,
+          maxMergeIf(last_seen_state, (${GEO_DAY_CURRENT_CONDITION})) AS last_seen_at
+        FROM geo_traffic_pages_by_host_daily
         WHERE organization_id = {{String(organization_id)}}
           ${GEO_PROJECT_SCOPE_SQL}
           ${GEO_SITE_SCOPE_SQL}
           ${GEO_EXCLUDED_SOURCES_SQL}
           AND visitor_type IN ('crawler', 'ai_referral')
           AND ({{String(visitor, '')}} = '' OR visitor_type = {{String(visitor, '')}})
-          AND ((${GEO_CAPTURED_CURRENT_CONDITION}) OR (${GEO_CAPTURED_PREVIOUS_CONDITION}))
+          ${GEO_DAY_COMPARISON_WINDOW_SQL}
           ${GEO_HOST_FILTER_SQL}
           ${GEO_HOSTS_SQL}
           ${GEO_PATH_SQL}
@@ -354,6 +363,46 @@ const GEO_TRAFFIC_LOG_FILTER_SQL = `WHERE organization_id = {{String(organizatio
           ${GEO_HOST_FILTER_SQL}
           ${GEO_PATH_SQL}`;
 
+/**
+ * Oldest day the newest `limit` log rows can come from, read off the daily
+ * rollup so the raw scan covers hours instead of 90 days. The rollup has no
+ * host, path or category, so those filters keep the full window.
+ */
+const GEO_TRAFFIC_LOG_CUTOFF_SQL = `
+        SELECT if(
+          {{String(category, '')}} != '' OR {{String(host, '')}} != '' OR {{String(path, '')}} != '',
+          toDate(now() - toIntervalDay(90)),
+          ifNull(
+            (
+              SELECT day
+              FROM (
+                SELECT
+                  day,
+                  sum(visits) OVER (ORDER BY day DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running
+                FROM (
+                  SELECT day, countMerge(visits_state) AS visits
+                  FROM geo_traffic_daily
+                  WHERE organization_id = {{String(organization_id)}}
+                    ${GEO_PROJECT_SCOPE_SQL}
+                    ${GEO_SITE_SCOPE_SQL}
+                    ${GEO_EXCLUDED_SOURCES_SQL}
+                    AND (
+                      ({{String(visitor_type, '')}} = '' AND visitor_type IN ('crawler', 'ai_referral'))
+                      OR has(splitByChar(',', {{String(visitor_type, '')}}), visitor_type)
+                    )
+                    AND day >= toDate(now() - toIntervalDay(90))
+                  GROUP BY day
+                )
+              )
+              WHERE running >= {{Int32(limit, 50)}}
+              ORDER BY day DESC
+              LIMIT 1
+            ),
+            toDate(now() - toIntervalDay(90))
+          )
+        ) AS cutoff_day
+      `;
+
 export const geoTrafficLog = defineEndpoint("geo_traffic_log", {
   description: "Most recent captured AI visits, newest first",
   params: {
@@ -378,6 +427,7 @@ export const geoTrafficLog = defineEndpoint("geo_traffic_log", {
     ...GEO_PATH_PARAMS,
   },
   nodes: [
+    node({ name: "cutoff", sql: GEO_TRAFFIC_LOG_CUTOFF_SQL }),
     node({
       name: "recent",
       sql: `
@@ -396,12 +446,14 @@ export const geoTrafficLog = defineEndpoint("geo_traffic_log", {
           substring(ua, 1, 180) AS ua_snippet
         FROM geo_traffic_events
         ${GEO_TRAFFIC_LOG_FILTER_SQL}
+          AND captured_at >= (SELECT toDateTime(cutoff_day) FROM cutoff)
           AND captured_at >= (
             SELECT min(captured_at)
             FROM (
               SELECT captured_at
               FROM geo_traffic_events
               ${GEO_TRAFFIC_LOG_FILTER_SQL}
+                AND captured_at >= (SELECT toDateTime(cutoff_day) FROM cutoff)
               ORDER BY captured_at DESC
               LIMIT {{Int32(limit, 50)}}
             )

@@ -136,14 +136,14 @@ test("AI site predicates isolate sibling mounts and retain old-origin facts", ()
     `);
     const predicate = GEO_SITE_SCOPE_SQL.replaceAll(
       "{{String(site_id, '')}}",
-      "?"
-    );
+      "$site"
+    ).replaceAll("{{String(sites, '')}}", "$sites");
     const query = database.prepare(
       `SELECT sum(visits) AS visits FROM facts WHERE organization_id = 'org' ${predicate}`
     );
-    expect(query.get("site-a", "site-a")).toEqual({ visits: 6 });
-    expect(query.get("site-b", "site-b")).toEqual({ visits: 3 });
-    expect(query.get("", "")).toEqual({ visits: 30 });
+    expect(query.get({ site: "site-a", sites: "" })).toEqual({ visits: 6 });
+    expect(query.get({ site: "site-b", sites: "" })).toEqual({ visits: 3 });
+    expect(query.get({ site: "", sites: "" })).toEqual({ visits: 30 });
     const projectPredicate = GEO_PROJECT_SCOPE_SQL.replaceAll(
       "{{String(project_id, '')}}",
       "$project"

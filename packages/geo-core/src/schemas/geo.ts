@@ -44,6 +44,7 @@ import {
   GEO_SCAN_MAX_INTERVAL_HOURS,
   GEO_SCAN_MIN_INTERVAL_HOURS,
   GEO_SHORT_FIELD_MAX_LENGTH,
+  GEO_TRAFFIC_SITES_MODES,
   GEO_SEQUENCE_MAX_TURNS,
   GEO_WRITER_TOPIC_MAX_LENGTH,
   GEO_WRITER_TOPIC_MIN_LENGTH,
@@ -77,6 +78,7 @@ const MAX_GEO_FIELD_LENGTH = 1024;
 const MAX_GEO_URL_LENGTH = 2048;
 /** Exact page path filter for traffic reads, empty for every page. */
 const geoTrafficPathField = string().trim().max(MAX_GEO_URL_LENGTH).optional();
+const geoTrafficSitesField = enumType(GEO_TRAFFIC_SITES_MODES).optional();
 const MAX_GEO_METHOD_LENGTH = 16;
 const MIN_PROMPT_LENGTH = GEO_PROMPT_MIN_LENGTH;
 const MAX_PROMPT_LENGTH = GEO_PROMPT_MAX_LENGTH;
@@ -468,12 +470,14 @@ export const aiTrafficInputSchema = geoOrganizationInputSchema.extend({
   limit: number().int().min(1).max(MAX_AI_TRAFFIC_LOG_LIMIT).optional(),
   host: string().trim().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
   path: geoTrafficPathField,
+  sites: geoTrafficSitesField,
 });
 
 export const webAnalyticsInputSchema = geoOrganizationInputSchema.extend({
   ...geoWindowFields,
   host: string().trim().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
   path: geoTrafficPathField,
+  sites: geoTrafficSitesField,
 });
 
 export const geoTrafficLogInputSchema = geoOrganizationInputSchema.extend({
@@ -488,6 +492,7 @@ export const geoTrafficLogInputSchema = geoOrganizationInputSchema.extend({
     .optional(),
   host: string().trim().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
   path: geoTrafficPathField,
+  sites: geoTrafficSitesField,
 });
 
 export const geoRequestPayloadSchema = object({
@@ -547,6 +552,7 @@ export const geoTrafficPagesInputSchema = geoOrganizationInputSchema.extend({
   visitorType: enumType(["crawler", "ai_referral"]).optional(),
   host: string().trim().max(GEO_SHORT_FIELD_MAX_LENGTH).optional(),
   path: geoTrafficPathField,
+  sites: geoTrafficSitesField,
 });
 
 export const geoWriterPlanInputSchema = geoOrganizationInputSchema.extend({

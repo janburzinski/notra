@@ -1,6 +1,7 @@
 import { p } from "@tinybirdco/sdk";
 
 import {
+  GEO_SITES_MODE_PARAM,
   GEO_HOSTS_PARAMS,
   GEO_HOSTS_SQL,
   GEO_PROJECT_SCOPE_PARAMS,
@@ -14,6 +15,7 @@ const WEB_SCOPE_PARAMS = {
     .string()
     .optional("")
     .describe("Notra Site id, empty for every site and SDK host"),
+  ...GEO_SITES_MODE_PARAM,
   ...GEO_HOSTS_PARAMS,
 };
 

@@ -40,6 +40,8 @@ import type {
   GeoTrafficLogFilters,
   GeoTrafficLogResponse,
   GeoTrafficPagesResponse,
+  GeoTrafficSitesMode,
+  AiTrafficSourcesResponse,
 } from "@notra/geo-core/types/geo";
 import type {
   GeoCompetitorImportRow,
@@ -970,7 +972,8 @@ export function useAiTraffic(
   organizationId: string,
   range?: GeoRangeQuery,
   host?: string,
-  path?: string
+  path?: string,
+  sites?: GeoTrafficSitesMode
 ) {
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
@@ -981,7 +984,8 @@ export function useAiTraffic(
         { organizationId, projectId },
         range,
         host,
-        path
+        path,
+        sites
       ),
     }),
     enabled: !!organizationId,
@@ -992,11 +996,41 @@ export function useAiTraffic(
   });
 }
 
+/** Per-source page counts; slower than useAiTraffic, so the table fills them in. */
+export function useAiTrafficSources(
+  organizationId: string,
+  range?: GeoRangeQuery,
+  host?: string,
+  path?: string,
+  sites?: GeoTrafficSitesMode
+) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const trafficPollInterval = useGeoTrafficPollInterval();
+  return useQuery<AiTrafficSourcesResponse>({
+    ...dashboardOrpc.geo.aiTrafficSources.queryOptions({
+      input: geoHostQueryInput(
+        { organizationId, projectId },
+        range,
+        host,
+        path,
+        sites
+      ),
+    }),
+    enabled: !!organizationId,
+    placeholderData: useScopedPreviousData<AiTrafficSourcesResponse>(projectId),
+    refetchInterval: trafficPollInterval,
+    refetchIntervalInBackground: false,
+    meta: { errorMessage: tToast("loadAITrafficFailed") },
+  });
+}
+
 export function useWebAnalytics(
   organizationId: string,
   range?: GeoRangeQuery,
   host?: string,
-  path?: string
+  path?: string,
+  sites?: GeoTrafficSitesMode
 ) {
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
@@ -1007,7 +1041,37 @@ export function useWebAnalytics(
         { organizationId, projectId },
         range,
         host,
-        path
+        path,
+        sites
+      ),
+    }),
+    enabled: !!organizationId,
+    placeholderData: useScopedPreviousData<WebAnalyticsResponse>(projectId),
+    refetchInterval: trafficPollInterval,
+    refetchIntervalInBackground: false,
+    meta: { errorMessage: tToast("loadVisitorsFailed") },
+  });
+}
+
+/** Breakdown tables for useWebAnalytics; slower, so they fill in after the summary. */
+export function useWebAnalyticsBreakdowns(
+  organizationId: string,
+  range?: GeoRangeQuery,
+  host?: string,
+  path?: string,
+  sites?: GeoTrafficSitesMode
+) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const trafficPollInterval = useGeoTrafficPollInterval();
+  return useQuery<WebAnalyticsResponse>({
+    ...dashboardOrpc.geo.webAnalyticsBreakdowns.queryOptions({
+      input: geoHostQueryInput(
+        { organizationId, projectId },
+        range,
+        host,
+        path,
+        sites
       ),
     }),
     enabled: !!organizationId,
@@ -1032,7 +1096,8 @@ export function useGeoTrafficLog(
         { organizationId, projectId },
         filters,
         options?.host,
-        options?.path
+        options?.path,
+        options?.sites
       ),
     }),
     enabled: !!organizationId,
@@ -1047,7 +1112,8 @@ export function useGeoTrafficPages(
   organizationId: string,
   range?: GeoRangeQuery,
   host?: string,
-  path?: string
+  path?: string,
+  sites?: GeoTrafficSitesMode
 ) {
   const tToast = useTranslations("geo.toasts");
   const { projectId } = useGeoProjectScope();
@@ -1058,7 +1124,8 @@ export function useGeoTrafficPages(
         { organizationId, projectId },
         range,
         host,
-        path
+        path,
+        sites
       ),
     }),
     enabled: !!organizationId,

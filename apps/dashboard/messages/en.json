@@ -3656,6 +3656,13 @@
       "filterPlaceholder": "Filter by path…",
       "noMatch": "No pages match this filter"
     },
+    "trafficSites": {
+      "sites": "Notra Sites",
+      "allTraffic": "All traffic",
+      "withoutSites": "Without Notra Sites",
+      "yourDomains": "Your domains",
+      "hiddenHint": "Traffic from your Notra Sites is hidden here."
+    },
     "trafficProviderLegend": {
       "ariaLabel": "Traffic providers, {visible} of {total} shown",
       "providers": "Providers",

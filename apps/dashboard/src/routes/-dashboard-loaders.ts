@@ -16,8 +16,12 @@ import { takeCheckoutPlan } from "@/lib/billing/checkout-plan-cookie";
 import { resolveInitialGeoProjectId } from "@/lib/geo/initial-project.server";
 import { getTranslations } from "@/lib/i18n/server";
 import { redirectOrgRootToStoredMode } from "@/lib/nav/org-root-redirect";
+import type { TrafficPageLayout } from "@/types/geo";
 import type { UiRouteInput } from "@/types/ui-route";
-import { onboardingBannerDismissedCookie } from "@/utils/cookies";
+import {
+  getTrafficLayoutFromCookies,
+  onboardingBannerDismissedCookie,
+} from "@/utils/cookies";
 import { getGreetingPeriod } from "@/utils/dashboard-greeting-period";
 import {
   geoProjectRepairPath,
@@ -25,6 +29,7 @@ import {
 } from "@/utils/geo-hydration";
 import { resolveOnboardingAgentRunState } from "@/utils/onboarding-agent-run";
 import { toOrganizationSummary } from "@/utils/organization-summary";
+import { readServerCookies } from "@/utils/server-cookies";
 import { settingsPath } from "@/utils/settings-path";
 import { getSidebarWidthFromCookie } from "@/utils/sidebar-width";
 import { trackingParams } from "@/utils/tracking-params";
@@ -322,6 +327,7 @@ export const loadGeoPage = createServerFn({
       );
     }
     let state: DehydratedState | undefined;
+    let trafficLayout: TrafficPageLayout | null = null;
     if (kind === "overview") {
       const { dehydrateGeoOverviewQueries } =
         await import("@/utils/geo-prefetch.server");
@@ -340,8 +346,9 @@ export const loadGeoPage = createServerFn({
         searchParams,
         getRequestHeaders()
       );
+      trafficLayout = getTrafficLayoutFromCookies(readServerCookies());
     }
-    return { projectId, state };
+    return { projectId, state, trafficLayout };
   });
 
 export const loadIntegrationConnect = createServerFn({ method: "GET" })

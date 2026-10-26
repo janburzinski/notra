@@ -18,6 +18,7 @@ import type { GeoContentBriefStatus } from "@notra/db/types/geo-writer";
 import type { FinishReason, LanguageModel, ToolSet } from "ai";
 import type { z } from "zod";
 
+import type { GEO_TRAFFIC_SITES_MODES } from "../constants/geo";
 import type { GEO_AUDIENCE_TYPES } from "../constants/geo-model-catalog";
 import type {
   geoCompetitorSuggestionsResponseSchema,
@@ -1104,6 +1105,9 @@ export interface GeoTrafficLogPurposeOption {
   value: GeoTrafficLogPurposeFilter;
 }
 
+/** Notra Sites traffic filter; undefined keeps sites and SDK hosts together. */
+export type GeoTrafficSitesMode = (typeof GEO_TRAFFIC_SITES_MODES)[number];
+
 export interface GeoTrafficLogFilters {
   visitorTypes: GeoTrafficLogVisitorFilter[];
   categories: GeoTrafficLogPurposeFilter[];
@@ -1221,6 +1225,11 @@ export interface AiTrafficResponse {
   previousConversions: number | null;
   sources: GeoTrafficSource[];
   points: GeoTrafficPoint[];
+}
+
+export interface AiTrafficSourcesResponse {
+  configured: boolean;
+  sources: GeoTrafficSource[];
 }
 
 export interface GeoTrafficPage {
@@ -2115,6 +2124,12 @@ interface WebAnalyticsHost {
   siteId: string;
   views: number;
 }
+
+/**
+ * Which queries a web analytics read runs: the summary (totals, trend, hosts)
+ * gates the page, the breakdown tables fill in after it.
+ */
+export type WebAnalyticsPart = "all" | "summary" | "breakdowns";
 
 export interface WebAnalyticsResponse {
   configured: boolean;

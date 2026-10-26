@@ -65,6 +65,7 @@ import type {
   ShareOfVoiceRow,
   GeoPromptTranslationLanguagePlan,
   GeoPromptTranslationEntry,
+  GeoTrafficSitesMode,
 } from "@notra/geo-core/types/geo";
 import type { TableColumn } from "@notra/ui/components/ui/data-table";
 import type {
@@ -159,6 +160,11 @@ export interface GeoPageClientProps {
   organizationSlug: string;
 }
 
+export interface TrafficPageClientProps extends GeoPageClientProps {
+  /** Layout the last visit ended in, from a cookie; picks the skeleton. */
+  layout?: TrafficPageLayout | null;
+}
+
 export interface TrafficPageViewProps {
   organizationId: string;
   organizationSlug: string;
@@ -175,10 +181,21 @@ export interface TrafficPageViewProps {
   trafficPages: readonly GeoTrafficPage[];
   ingestSetup: GeoIngestSetupResponse | undefined;
   web: WebAnalyticsResponse | undefined;
+  sourcePaths: readonly GeoTrafficSource[] | undefined;
+  siteHosts: readonly string[];
+  sitesHidden: boolean;
+  webBreakdownsPending: boolean;
 }
 
 export interface GeoTrafficSkeletonProps {
   geoRange?: GeoRangeControl;
+  layout?: TrafficPageLayout | null;
+}
+
+export interface WebBreakdownSkeletonProps {
+  title: string;
+  nameHeader: string;
+  valueHeader: string;
 }
 
 export interface TrafficTableSkeletonProps {
@@ -437,9 +454,13 @@ export type GeoCompetitorSuggestionsHandlerInput = GeoScopeInput &
 
 export type GeoBrandSearchHandlerInput = GeoScopeInput & GeoBrandSearchInput;
 
+/** Visitors when the site sends human page views, agents for AI traffic only. */
+export type TrafficPageLayout = "visitors" | "agents";
+
 export interface GeoTrafficLogQueryOptions {
   host?: string;
   path?: string;
+  sites?: GeoTrafficSitesMode;
 }
 
 export interface GeoJourneyPathNode {
@@ -691,6 +712,8 @@ export interface GeoScanFrequencySelectProps {
 
 export interface AiTrafficCardProps {
   traffic: AiTrafficResponse | undefined;
+  /** Sources with distinct page counts; undefined while they load. */
+  sourcePaths?: readonly GeoTrafficSource[];
   range?: GeoRangeQuery;
   /** Top pages across every host, for the source drawer. */
   pages: readonly GeoTrafficPage[];
@@ -1916,6 +1939,8 @@ export interface WebVisitorsSectionProps {
   range?: GeoRangeQuery;
   /** Notra Sites only: visible time per view, replaces the AI-referred metric. */
   engagement?: WebEngagement;
+  /** Breakdown tables still loading; the hero renders from the summary. */
+  breakdownsPending?: boolean;
 }
 
 export interface WebMetricProps {
@@ -1928,6 +1953,7 @@ export interface WebMetricProps {
 
 export interface WebOutcomesTableProps {
   outcomes: readonly WebAnalyticsOutcome[];
+  loading?: boolean;
 }
 
 export interface WebReferrerIconProps {
@@ -1953,10 +1979,13 @@ export interface WebBreakdownTableProps {
   height?: number;
   showFromAi?: boolean;
   showAvgTime?: boolean;
+  loading?: boolean;
 }
 
 export interface TrafficDomainSelectProps {
   hosts: readonly string[];
+  /** Hosts served by Notra Sites; listed in their own group. */
+  siteHosts?: readonly string[];
 }
 
 export interface TrafficPathEmptyProps {

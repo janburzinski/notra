@@ -74,6 +74,7 @@ import {
   importGeoPrompts,
   listGeoPrompts,
   loadAiTraffic,
+  loadAiTrafficSources,
   loadGeoChanges,
   loadGeoCompetitorDetail,
   loadGeoCompetitorEngineMatrix,
@@ -1155,7 +1156,22 @@ export const geoRouter = {
           geoWindow(input),
           webHostFilter(input.host),
           "",
-          input.path
+          input.path,
+          input.sites,
+          false
+        )
+      )
+    ),
+  aiTrafficSources: authorizedProcedure
+    .input(aiTrafficInputSchema)
+    .handler(
+      geoOpenHandler((input) =>
+        loadAiTrafficSources(
+          input,
+          geoWindow(input),
+          webHostFilter(input.host),
+          input.path,
+          input.sites
         )
       )
     ),
@@ -1163,7 +1179,28 @@ export const geoRouter = {
     .input(webAnalyticsInputSchema)
     .handler(
       geoOpenHandler((input) =>
-        loadWebAnalytics(input, geoWindow(input), input.host, input.path)
+        loadWebAnalytics(
+          input,
+          geoWindow(input),
+          input.host,
+          input.path,
+          input.sites,
+          "summary"
+        )
+      )
+    ),
+  webAnalyticsBreakdowns: authorizedProcedure
+    .input(webAnalyticsInputSchema)
+    .handler(
+      geoOpenHandler((input) =>
+        loadWebAnalytics(
+          input,
+          geoWindow(input),
+          input.host,
+          input.path,
+          input.sites,
+          "breakdowns"
+        )
       )
     ),
   trafficLog: authorizedProcedure
@@ -1176,7 +1213,8 @@ export const geoRouter = {
           input.visitorTypes,
           input.categories,
           input.host,
-          input.path
+          input.path,
+          input.sites
         )
       )
     ),
@@ -1209,7 +1247,8 @@ export const geoRouter = {
           input.limit,
           input.visitorType,
           input.host,
-          input.path
+          input.path,
+          input.sites
         )
       )
     ),

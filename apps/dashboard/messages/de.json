@@ -3656,6 +3656,13 @@
       "filterPlaceholder": "Nach Pfad filtern…",
       "noMatch": "Keine Seiten entsprechen diesem Filter"
     },
+    "trafficSites": {
+      "sites": "Notra Sites",
+      "allTraffic": "Gesamter Traffic",
+      "withoutSites": "Ohne Notra Sites",
+      "yourDomains": "Deine Domains",
+      "hiddenHint": "Traffic deiner Notra Sites ist hier ausgeblendet."
+    },
     "trafficProviderLegend": {
       "ariaLabel": "Traffic-Anbieter, {visible} von {total} angezeigt",
       "providers": "Anbieter",

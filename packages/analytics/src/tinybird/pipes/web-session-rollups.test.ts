@@ -101,7 +101,11 @@ test("404 then two successful views agree across session rollups and raw outcome
         "countIf(pages >= 2)",
         "sum(CASE WHEN pages >= 2 THEN 1 ELSE 0 END)"
       )
-      .replaceAll("greatest(count(*), 1)", "max(count(*), 1)");
+      .replaceAll("greatest(count(*), 1)", "max(count(*), 1)")
+      .replace(
+        "FROM outcome_sessions\n        ARRAY JOIN if(landing_group = 'ai', ['', landing_source], ['']) AS source",
+        "FROM (SELECT '' AS source, pages FROM outcome_sessions UNION ALL SELECT landing_source AS source, pages FROM outcome_sessions WHERE landing_group = 'ai')"
+      );
     expect(database.prepare(outcomeTotals).all()).toEqual([
       { source: "openai", sessions: 1, pages_per_session: 2, engaged_rate: 1 },
       { source: "", sessions: 1, pages_per_session: 2, engaged_rate: 1 },

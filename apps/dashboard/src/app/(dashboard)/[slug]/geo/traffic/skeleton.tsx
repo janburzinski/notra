@@ -44,11 +44,17 @@ import {
   TRAFFIC_SOURCE_COLUMN_MIN_WIDTH,
 } from "@/constants/geo-traffic-sources";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
+import {
+  WEB_LIST_LIMIT,
+  WEB_OUTCOMES_SKELETON_ROWS,
+  WEB_TABLE_ROW_HEIGHT,
+} from "@/constants/web-analytics";
 import { cn } from "@/lib/utils";
 import type {
   GeoTrafficSkeletonProps,
   TrafficSourceBandSkeletonProps,
   TrafficTableSkeletonProps,
+  WebBreakdownSkeletonProps,
 } from "@/types/geo";
 import { paginatedTableHeightFor } from "@/utils/table";
 
@@ -253,14 +259,161 @@ function TrafficLogSkeleton() {
   );
 }
 
-export function GeoTrafficSkeleton({ geoRange }: GeoTrafficSkeletonProps) {
-  const t = useTranslations("geo.pages.traffic");
+function WebBreakdownSkeleton({
+  title,
+  nameHeader,
+  valueHeader,
+}: WebBreakdownSkeletonProps) {
+  const columns: TableColumn<unknown>[] = [
+    { key: "name", header: nameHeader, width: "1fr" },
+    {
+      key: "value",
+      header: valueHeader,
+      width: GEO_COUNT_COLUMN_WIDTH,
+      align: "right",
+    },
+  ];
+  return (
+    <InstrumentSection eyebrow={title}>
+      <TrafficTableSkeleton
+        columns={columns}
+        rowHeight={WEB_TABLE_ROW_HEIGHT}
+        rows={WEB_LIST_LIMIT}
+      />
+    </InstrumentSection>
+  );
+}
+
+/** Mirrors WebVisitorsSection: hero with four metrics and the trend, then the breakdowns. */
+function WebVisitorsSkeleton() {
+  const t = useTranslations("geo.webVisitors");
+  return (
+    <section className="flex flex-col gap-6">
+      <div className={TRAFFIC_HERO_FRAME_CLASS}>
+        <div
+          className={cn(
+            TRAFFIC_HERO_METRICS_GRID_CLASS,
+            TRAFFIC_HERO_METRICS_SURFACE_CLASS
+          )}
+        >
+          {[t("visitors"), t("views"), t("fromAi"), t("agents")].map(
+            (label) => (
+              <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={label}>
+                <p className="text-foreground/75 text-sm leading-5 font-semibold tracking-tight">
+                  {label}
+                </p>
+                <div className="flex min-w-0 flex-wrap items-center gap-3">
+                  <Skeleton className="h-6 w-14 @4xl/hero:h-8 @4xl/hero:w-16" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+              </div>
+            )
+          )}
+        </div>
+        <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
+          <Skeleton className="h-52 w-full rounded-xl @md/hero:h-64" />
+          <div className="mt-3 flex gap-2">
+            <Skeleton className="h-6 w-28 rounded-md" />
+            <Skeleton className="h-6 w-28 rounded-md" />
+          </div>
+        </div>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <WebBreakdownSkeleton
+          nameHeader={t("page")}
+          title={t("topPages")}
+          valueHeader={t("columnViews")}
+        />
+        <WebBreakdownSkeleton
+          nameHeader={t("columnSource")}
+          title={t("referrers")}
+          valueHeader={t("sessions")}
+        />
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <WebBreakdownSkeleton
+          nameHeader={t("columnCountry")}
+          title={t("countries")}
+          valueHeader={t("visitors")}
+        />
+        <WebBreakdownSkeleton
+          nameHeader={t("columnDevice")}
+          title={t("devices")}
+          valueHeader={t("visitors")}
+        />
+      </div>
+      <InstrumentSection eyebrow={t("outcomesTitle")}>
+        <TrafficTableSkeleton
+          columns={[
+            { key: "source", header: t("columnSource"), width: "1fr" },
+            {
+              key: "pages",
+              header: t("pagesPerSession"),
+              width: "10rem",
+              align: "right",
+            },
+            {
+              key: "engaged",
+              header: t("engagedRate"),
+              width: "8rem",
+              align: "right",
+            },
+          ]}
+          rowHeight={WEB_TABLE_ROW_HEIGHT}
+          rows={WEB_OUTCOMES_SKELETON_ROWS}
+        />
+      </InstrumentSection>
+    </section>
+  );
+}
+
+function AgentsHeroSkeleton() {
   const tHero = useTranslations("geo.trafficHero");
+  return (
+    <div className={TRAFFIC_HERO_FRAME_CLASS}>
+      <div
+        className={cn(
+          TRAFFIC_HERO_METRICS_GRID_CLASS,
+          TRAFFIC_HERO_METRICS_SURFACE_CLASS
+        )}
+      >
+        {GEO_TRAFFIC_FUNNEL_STAGES.map((stage) => (
+          <div className={TRAFFIC_HERO_METRIC_CELL_CLASS} key={stage.key}>
+            <Skeleton className="h-5 w-28" />
+            <div className="flex min-w-0 flex-wrap items-center gap-3">
+              <Skeleton className="h-6 w-14 @4xl/hero:h-8 @4xl/hero:w-16" />
+              <Skeleton className="h-5 w-16 rounded-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
+        <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
+          <h2 className="text-sm font-medium">{tHero("activity")}</h2>
+          <Skeleton className="h-7 w-24 rounded-lg" />
+        </div>
+        <Skeleton className="h-52 w-full rounded-xl @md/hero:h-72" />
+      </div>
+    </div>
+  );
+}
+
+export function GeoTrafficSkeleton({
+  geoRange,
+  layout,
+}: GeoTrafficSkeletonProps) {
+  const t = useTranslations("geo.pages.traffic");
   const tCommon = useTranslations("common");
+  const withVisitors = layout === "visitors";
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full min-w-0 space-y-6 px-4 lg:px-6">
-        <PageHeading description={t("description")} title={t("title")}>
+        <PageHeading
+          description={
+            withVisitors ? t("descriptionWithVisitors") : t("description")
+          }
+          title={withVisitors ? t("titleWithVisitors") : t("title")}
+        >
           {geoRange ? (
             <GeoRangePicker control={geoRange} />
           ) : (
@@ -273,34 +426,7 @@ export function GeoTrafficSkeleton({ geoRange }: GeoTrafficSkeletonProps) {
             <Skeleton className="h-7 w-20 rounded-lg" />
           </div>
           <div className="flex flex-col gap-6">
-            <div className={TRAFFIC_HERO_FRAME_CLASS}>
-              <div
-                className={cn(
-                  TRAFFIC_HERO_METRICS_GRID_CLASS,
-                  TRAFFIC_HERO_METRICS_SURFACE_CLASS
-                )}
-              >
-                {GEO_TRAFFIC_FUNNEL_STAGES.map((stage) => (
-                  <div
-                    className={TRAFFIC_HERO_METRIC_CELL_CLASS}
-                    key={stage.key}
-                  >
-                    <Skeleton className="h-5 w-28" />
-                    <div className="flex min-w-0 flex-wrap items-center gap-3">
-                      <Skeleton className="h-6 w-14 @4xl/hero:h-8 @4xl/hero:w-16" />
-                      <Skeleton className="h-5 w-16 rounded-full" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className={TRAFFIC_HERO_CHART_SURFACE_CLASS}>
-                <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
-                  <h2 className="text-sm font-medium">{tHero("activity")}</h2>
-                  <Skeleton className="h-7 w-24 rounded-lg" />
-                </div>
-                <Skeleton className="h-52 w-full rounded-xl @md/hero:h-72" />
-              </div>
-            </div>
+            {withVisitors ? <WebVisitorsSkeleton /> : <AgentsHeroSkeleton />}
             <InstrumentSection eyebrow={tCommon("labels.sources")}>
               <TrafficSourcesSkeleton />
             </InstrumentSection>

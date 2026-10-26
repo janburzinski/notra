@@ -38,6 +38,7 @@ export const WEB_DEVICE_ICONS: Record<string, typeof ComputerIcon> = {
 };
 
 export const WEB_LIST_LIMIT = 8;
+export const WEB_OUTCOMES_SKELETON_ROWS = 3;
 
 export const WEB_TABLE_ROW_HEIGHT = 44;
 export const WEB_TABLE_MIN_ROWS = 3;

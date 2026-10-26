@@ -12,11 +12,17 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { WebAnalyticsEmpty } from "@/components/geo/web-analytics-empty";
-import { WEB_TABLE_ROW_HEIGHT } from "@/constants/web-analytics";
+import {
+  WEB_OUTCOMES_SKELETON_ROWS,
+  WEB_TABLE_ROW_HEIGHT,
+} from "@/constants/web-analytics";
 import type { WebOutcomesTableProps } from "@/types/geo";
 import { webTableHeight } from "@/utils/web-analytics";
 
-export function WebOutcomesTable({ outcomes }: WebOutcomesTableProps) {
+export function WebOutcomesTable({
+  outcomes,
+  loading = false,
+}: WebOutcomesTableProps) {
   const t = useTranslations("geo.webVisitors");
   const locale = useLocale();
   const rows = outcomes.filter((row) => row.sessions > 0);
@@ -76,7 +82,10 @@ export function WebOutcomesTable({ outcomes }: WebOutcomesTableProps) {
         data={rows}
         emptyState={<WebAnalyticsEmpty />}
         getRowId={(row) => row.source || "all"}
-        height={webTableHeight(rows.length)}
+        height={webTableHeight(
+          loading ? WEB_OUTCOMES_SKELETON_ROWS : rows.length
+        )}
+        loading={loading}
         rowHeight={WEB_TABLE_ROW_HEIGHT}
         scrollFade={false}
       />

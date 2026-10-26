@@ -91,6 +91,29 @@ export function webHostsForSelect(
   return [...hosts];
 }
 
+/** Summary response with the breakdown tables filled in once they load. */
+export function withWebBreakdowns(
+  summary: WebAnalyticsResponse | undefined,
+  breakdowns: WebAnalyticsResponse | undefined
+): WebAnalyticsResponse | undefined {
+  if (!(summary && breakdowns)) {
+    return summary;
+  }
+  return {
+    ...summary,
+    pages: breakdowns.pages,
+    sources: breakdowns.sources,
+    countries: breakdowns.countries,
+    devices: breakdowns.devices,
+    outcomes: breakdowns.outcomes,
+  };
+}
+
+/** Hosts with human views; Sites with only AI traffic are listed with 0. */
+export function hasWebHosts(web: WebAnalyticsResponse | undefined): boolean {
+  return (web?.hosts ?? []).some((row) => row.views > 0);
+}
+
 export function hasWebAnalytics(
   web: WebAnalyticsResponse | undefined
 ): boolean {

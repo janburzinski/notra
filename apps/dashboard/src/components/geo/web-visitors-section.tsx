@@ -81,6 +81,7 @@ export function WebVisitorsSection({
   traffic,
   range,
   engagement,
+  breakdownsPending = false,
 }: WebVisitorsSectionProps) {
   const t = useTranslations("geo.webVisitors");
   const locale = useLocale();
@@ -179,10 +180,14 @@ export function WebVisitorsSection({
     };
   });
 
-  const pairHeight = (first: number, second: number) =>
-    sideBySide
+  const pairHeight = (first: number, second: number) => {
+    if (breakdownsPending) {
+      return webTableHeight(WEB_LIST_LIMIT);
+    }
+    return sideBySide
       ? Math.max(webTableHeight(first), webTableHeight(second))
       : undefined;
+  };
   const topHeight = pairHeight(pageRows.length, sourceRows.length);
   const audienceHeight = pairHeight(countryRows.length, deviceRows.length);
 
@@ -231,6 +236,7 @@ export function WebVisitorsSection({
           rows={pageRows}
           showFromAi
           title={t("topPages")}
+          loading={breakdownsPending}
           valueHeader={t("columnViews")}
         />
         <WebBreakdownTable
@@ -238,6 +244,7 @@ export function WebVisitorsSection({
           nameHeader={t("columnSource")}
           rows={sourceRows}
           title={t("referrers")}
+          loading={breakdownsPending}
           valueHeader={t("sessions")}
         />
       </div>
@@ -247,6 +254,7 @@ export function WebVisitorsSection({
           nameHeader={t("columnCountry")}
           rows={countryRows}
           title={t("countries")}
+          loading={breakdownsPending}
           valueHeader={t("visitors")}
         />
         <WebBreakdownTable
@@ -254,10 +262,11 @@ export function WebVisitorsSection({
           nameHeader={t("columnDevice")}
           rows={deviceRows}
           title={t("devices")}
+          loading={breakdownsPending}
           valueHeader={t("visitors")}
         />
       </div>
-      <WebOutcomesTable outcomes={web.outcomes} />
+      <WebOutcomesTable loading={breakdownsPending} outcomes={web.outcomes} />
     </section>
   );
 }

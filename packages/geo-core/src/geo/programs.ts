@@ -10,6 +10,7 @@ import {
   queryGeoTrafficPages,
   queryGeoTrafficTimeseries,
 } from "@notra/analytics/tinybird/client";
+import type { GeoTrafficOverviewRow } from "@notra/analytics/types/tinybird-endpoints";
 import { db } from "@notra/db/drizzle";
 import {
   brandSettings,
@@ -103,6 +104,8 @@ import type {
   GeoTrafficJourneysResponse,
   GeoTrafficLogResponse,
   GeoTrafficPagesResponse,
+  AiTrafficSourcesResponse,
+  GeoTrafficSitesMode,
   GeoTrafficSource,
   GeoWindowInput,
 } from "../types/geo";
@@ -1317,12 +1320,42 @@ export const loadGeoCompetitorDetail = Effect.fn("geo.competitorDetail")(
   }
 );
 
-export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
+function toGeoTrafficSources(
+  rows: readonly GeoTrafficOverviewRow[] | undefined
+): GeoTrafficSource[] {
+  return (rows ?? []).map((row) => ({
+    source: row.source,
+    visitorType: toGeoVisitorType(row.visitor_type),
+    agent: row.agent,
+    category: row.category,
+    confidence: row.confidence,
+    visits: Number(row.visits),
+    ...(row.previous_visits == null
+      ? {}
+      : { previousVisits: Number(row.previous_visits) }),
+    markdownVisits: Number(row.markdown_visits),
+    ...(row.previous_markdown_visits == null
+      ? {}
+      : { previousMarkdownVisits: Number(row.previous_markdown_visits) }),
+    paths: Number(row.paths),
+    ...(row.previous_paths == null
+      ? {}
+      : { previousPaths: Number(row.previous_paths) }),
+    lastSeenAt: row.last_seen_at,
+  }));
+}
+
+function isAiVisitorSource(row: GeoTrafficSource): boolean {
+  return row.visitorType === "crawler" || row.visitorType === "ai_referral";
+}
+
+const aiTrafficParams = Effect.fn("geo.aiTrafficParams")(function* (
   input: GeoScopeInput,
   window: GeoWindowInput,
-  hosts: readonly string[] = [],
-  siteId = "",
-  path = ""
+  hosts: readonly string[],
+  siteId: string,
+  path: string,
+  sites: GeoTrafficSitesMode | undefined
 ) {
   const scope = yield* resolveGeoScope(input);
   const params = {
@@ -1331,10 +1364,36 @@ export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
     ...geoTrafficWindowParams(window, AI_TRAFFIC_DEFAULT_DAYS),
     hosts: hosts.join(","),
     path,
+    sites: sites ?? "",
     ...(siteId
       ? { site_id: siteId, project_id: "", include_unassigned: 0 }
       : {}),
   };
+  return { scope, params };
+});
+
+/**
+ * Totals, chart points and per-source visits. `withPaths: false` skips the
+ * distinct page counts, which cost far more than the rest of the query; read
+ * them separately with loadAiTrafficSources.
+ */
+export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
+  input: GeoScopeInput,
+  window: GeoWindowInput,
+  hosts: readonly string[] = [],
+  siteId = "",
+  path = "",
+  sites: GeoTrafficSitesMode | undefined = undefined,
+  withPaths = true
+) {
+  const { scope, params } = yield* aiTrafficParams(
+    input,
+    window,
+    hosts,
+    siteId,
+    path,
+    sites
+  );
   const settingsRow = yield* loadScopeSettingsRow(scope.projectId);
   const conversionPaths = settingsRow?.conversionPaths ?? [];
   const query = siteId && isTinybirdConfigured() ? geoRequiredQuery : geoQuery;
@@ -1342,7 +1401,7 @@ export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
   const [overview, timeseries, conversionPages] = yield* Effect.all(
     [
       query("traffic overview query failed", () =>
-        queryGeoTrafficOverview(params)
+        queryGeoTrafficOverview({ ...params, with_paths: withPaths ? 1 : 0 })
       ),
       query("traffic timeseries query failed", () =>
         queryGeoTrafficTimeseries(params)
@@ -1373,35 +1432,13 @@ export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
           conversionPaths
         );
 
-  const sources: GeoTrafficSource[] = (overview?.data ?? []).map((row) => ({
-    source: row.source,
-    visitorType: toGeoVisitorType(row.visitor_type),
-    agent: row.agent,
-    category: row.category,
-    confidence: row.confidence,
-    visits: Number(row.visits),
-    ...(row.previous_visits == null
-      ? {}
-      : { previousVisits: Number(row.previous_visits) }),
-    markdownVisits: Number(row.markdown_visits),
-    ...(row.previous_markdown_visits == null
-      ? {}
-      : { previousMarkdownVisits: Number(row.previous_markdown_visits) }),
-    paths: Number(row.paths),
-    ...(row.previous_paths == null
-      ? {}
-      : { previousPaths: Number(row.previous_paths) }),
-    lastSeenAt: row.last_seen_at,
-  }));
+  const sources = toGeoTrafficSources(overview?.data);
 
   const response: AiTrafficResponse = {
     configured: isTinybirdConfigured(),
     totals: toGeoTrafficTotals(sources, conversionTotals?.conversions ?? null),
     previousConversions: conversionTotals?.previousConversions ?? null,
-    sources: sources.filter(
-      (row) =>
-        row.visitorType === "crawler" || row.visitorType === "ai_referral"
-    ),
+    sources: sources.filter(isAiVisitorSource),
     points: (timeseries?.data ?? []).map((row) => ({
       day: row.day,
       visitorType: toGeoVisitorType(row.visitor_type),
@@ -1412,13 +1449,42 @@ export const loadAiTraffic = Effect.fn("geo.aiTraffic")(function* (
   return response;
 });
 
+/** Per-source visits with distinct page counts, for the sources table. */
+export const loadAiTrafficSources = Effect.fn("geo.aiTrafficSources")(
+  function* (
+    input: GeoScopeInput,
+    window: GeoWindowInput,
+    hosts: readonly string[] = [],
+    path = "",
+    sites: GeoTrafficSitesMode | undefined = undefined
+  ) {
+    const { params } = yield* aiTrafficParams(
+      input,
+      window,
+      hosts,
+      "",
+      path,
+      sites
+    );
+    const overview = yield* geoQuery("traffic sources query failed", () =>
+      queryGeoTrafficOverview({ ...params, with_paths: 1 })
+    );
+    const response: AiTrafficSourcesResponse = {
+      configured: isTinybirdConfigured(),
+      sources: toGeoTrafficSources(overview?.data).filter(isAiVisitorSource),
+    };
+    return response;
+  }
+);
+
 export const loadGeoTrafficLog = Effect.fn("geo.trafficLog")(function* (
   input: GeoScopeInput,
   limit: number | undefined,
   visitorTypes: readonly string[] | undefined,
   categories: readonly string[] | undefined,
   host: string | undefined,
-  path = ""
+  path = "",
+  sites: GeoTrafficSitesMode | undefined = undefined
 ) {
   const scope = yield* resolveGeoScope(input);
   const rows = yield* geoQuery("traffic log query failed", () =>
@@ -1430,6 +1496,7 @@ export const loadGeoTrafficLog = Effect.fn("geo.trafficLog")(function* (
       category: categories?.join(",") ?? "",
       host: trafficLogHostFilter(host),
       path,
+      sites: sites ?? "",
     })
   );
   const log = (rows?.data ?? []).map(toGeoTrafficLogEntry);
@@ -1582,7 +1649,8 @@ export const loadGeoTrafficPages = Effect.fn("geo.trafficPages")(function* (
   limit: number | undefined,
   visitorType: string | undefined,
   host: string | undefined,
-  path = ""
+  path = "",
+  sites: GeoTrafficSitesMode | undefined = undefined
 ) {
   const scope = yield* resolveGeoScope(input);
   const pages = yield* geoQuery("traffic pages query failed", () =>
@@ -1594,6 +1662,7 @@ export const loadGeoTrafficPages = Effect.fn("geo.trafficPages")(function* (
       visitor: visitorType ?? "",
       host: trafficLogHostFilter(host),
       path,
+      sites: sites ?? "",
     })
   );
 

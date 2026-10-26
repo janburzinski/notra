@@ -444,19 +444,30 @@ export const webAudience = defineEndpoint("web_audience", {
 
 export const webHosts = defineEndpoint("web_hosts", {
   description:
-    "Hosts and sites with human views in the window, for the domain selector",
+    "Hosts and sites with human views in the window, plus Sites with only AI traffic (0 views), for the domain selector",
   params: WEB_QUERY_PARAMS,
   nodes: [
     node({
       name: "hosts",
       sql: `
-        SELECT
-          host,
-          site_id,
-          countMerge(views_state) AS views
-        FROM web_pages_daily
-        ${WEB_PAGES_WHERE}
-          ${GEO_DAY_WINDOW_SQL}
+        SELECT host, site_id, sum(views) AS views
+        FROM (
+          SELECT
+            host,
+            site_id,
+            countMerge(views_state) AS views
+          FROM web_pages_daily
+          ${WEB_PAGES_WHERE}
+            ${GEO_DAY_WINDOW_SQL}
+          GROUP BY host, site_id
+          UNION ALL
+          SELECT host, site_id, toUInt64(0) AS views
+          FROM geo_traffic_pages_by_host_daily
+          ${WEB_PAGES_WHERE}
+            AND site_id != ''
+            ${GEO_DAY_WINDOW_SQL}
+          GROUP BY host, site_id
+        )
         GROUP BY host, site_id
         ORDER BY views DESC, host ASC
       `,
@@ -498,20 +509,14 @@ export const webAiOutcomes = defineEndpoint("web_ai_outcomes", {
       name: "outcomes",
       sql: `
         SELECT
-          landing_source AS source,
-          count() AS sessions,
-          avg(pages) AS pages_per_session,
-          countIf(pages >= 2) / count() AS engaged_rate
-        FROM outcome_sessions
-        WHERE landing_group = 'ai'
-        GROUP BY landing_source
-        UNION ALL
-        SELECT
-          '' AS source,
+          source,
           count() AS sessions,
           avg(pages) AS pages_per_session,
           countIf(pages >= 2) / greatest(count(), 1) AS engaged_rate
         FROM outcome_sessions
+        ARRAY JOIN if(landing_group = 'ai', ['', landing_source], ['']) AS source
+        GROUP BY source
+        ORDER BY source = '' ASC, sessions DESC
       `,
     }),
   ],

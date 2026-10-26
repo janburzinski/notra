@@ -127,9 +127,11 @@ async function dehydrateGeoOverview(
 }
 
 /**
- * Same non-blocking prefetch for the GEO traffic page: settings, the AI
- * traffic overview, top pages, the live log and the ingest setup all start on
- * the server so the page hydrates instead of cascading skeletons.
+ * Prefetch for the GEO traffic page, limited to what the first paint needs:
+ * settings, the AI traffic summary, the web analytics summary and the ingest
+ * setup. The streamed document stays open until every dehydrated query
+ * settles and hydration waits for it, so the slower tables (top pages, log,
+ * per-source page counts, web breakdowns) load from the client instead.
  */
 export function dehydrateGeoTrafficQueries(
   ...args: Parameters<typeof dehydrateGeoTraffic>
@@ -165,16 +167,6 @@ async function dehydrateGeoTraffic(
       input: input.webAnalytics,
     }),
     queryFn: () => client.geo.webAnalytics(input.webAnalytics),
-  });
-  void queryClient.prefetchQuery({
-    ...dashboardOrpc.geo.trafficPages.queryOptions({
-      input: input.trafficPages,
-    }),
-    queryFn: () => client.geo.trafficPages(input.trafficPages),
-  });
-  void queryClient.prefetchQuery({
-    ...dashboardOrpc.geo.trafficLog.queryOptions({ input: input.trafficLog }),
-    queryFn: () => client.geo.trafficLog(input.trafficLog),
   });
   void queryClient.prefetchQuery({
     ...dashboardOrpc.geo.ingestSetup.queryOptions({ input: input.ingestSetup }),

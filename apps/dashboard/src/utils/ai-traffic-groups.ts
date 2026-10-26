@@ -282,3 +282,32 @@ export function trafficGroupPathsDelta(
   }
   return previousMembers > 1 ? null : trafficVisitDelta(group.paths, previous);
 }
+
+/**
+ * Copies distinct page counts from the slower sources query onto the fast
+ * one, so rows render before their counts arrive.
+ */
+export function withSourcePaths(
+  sources: readonly GeoTrafficSource[],
+  withPaths: readonly GeoTrafficSource[] | undefined
+): readonly GeoTrafficSource[] {
+  if (!withPaths) {
+    return sources;
+  }
+  const byKey = new Map(
+    withPaths.map((row) => [`${row.visitorType}:${row.source}`, row])
+  );
+  return sources.map((row) => {
+    const match = byKey.get(`${row.visitorType}:${row.source}`);
+    if (!match) {
+      return row;
+    }
+    return {
+      ...row,
+      paths: match.paths,
+      ...(match.previousPaths === undefined
+        ? {}
+        : { previousPaths: match.previousPaths }),
+    };
+  });
+}

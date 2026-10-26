@@ -26,6 +26,7 @@ import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { EVE_BANNER_HEIGHT } from "@/constants/onboarding-agent";
 import { RIGHT_PANEL_PORTAL_ID } from "@/constants/right-panel";
+import { useDashboardRootMarker } from "@/lib/hooks/use-dashboard-root-marker";
 import { useDemoBannerVisible } from "@/lib/hooks/use-demo-banner-visible";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
 import {
@@ -252,6 +253,7 @@ export function DashboardShell({
     sidebarWidth,
     startSidebarResize,
   } = useSidebarWidth(initialSidebarWidth);
+  useDashboardRootMarker();
 
   useEffect(() => {
     setDismissingOrganizationId(null);

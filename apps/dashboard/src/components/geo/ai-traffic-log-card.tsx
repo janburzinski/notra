@@ -35,6 +35,7 @@ import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useGeoTrafficLog } from "@/lib/hooks/use-geo";
 import { useGeoTrafficHostQuery } from "@/lib/hooks/use-geo-traffic-host";
 import { useTrafficPathQuery } from "@/lib/hooks/use-traffic-path";
+import { useTrafficSitesMode } from "@/lib/hooks/use-traffic-sites";
 import type { AiTrafficLogCardProps } from "@/types/geo";
 import { tableHeightFor } from "@/utils/table";
 
@@ -50,12 +51,14 @@ export function AiTrafficLogCard({ organizationId }: AiTrafficLogCardProps) {
   });
   const [hostQuery] = useGeoTrafficHostQuery();
   const [pathQuery] = useTrafficPathQuery();
+  const sites = useTrafficSitesMode();
   const { data, isPending, isPlaceholderData } = useGeoTrafficLog(
     organizationId,
     filters,
     {
       host: hostQuery,
       path: pathQuery,
+      sites,
     }
   );
   const log = data?.log ?? [];
@@ -74,7 +77,7 @@ export function AiTrafficLogCard({ organizationId }: AiTrafficLogCardProps) {
         liveKey={
           isPlaceholderData
             ? undefined
-            : JSON.stringify([filters, hostQuery, pathQuery])
+            : JSON.stringify([filters, hostQuery, pathQuery, sites])
         }
         loading={isPending || isPlaceholderData}
       />

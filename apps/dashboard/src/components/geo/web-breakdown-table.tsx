@@ -23,6 +23,7 @@ export function WebBreakdownTable({
   height,
   showFromAi = false,
   showAvgTime = false,
+  loading = false,
 }: WebBreakdownTableProps) {
   const t = useTranslations("geo.webVisitors");
   const tCommon = useTranslations("common");
@@ -103,6 +104,7 @@ export function WebBreakdownTable({
         emptyState={<WebAnalyticsEmpty />}
         getRowId={(row) => row.key}
         height={tableHeight}
+        loading={loading}
         minHeight={tableHeight}
         rowHeight={WEB_TABLE_ROW_HEIGHT}
         scrollFade={false}

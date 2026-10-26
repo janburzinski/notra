@@ -14,6 +14,7 @@ import {
   InstrumentEmpty,
   InstrumentSection,
 } from "@notra/ui/components/instrument/instrument-module";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { memo, useCallback, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -31,6 +32,7 @@ import {
   groupTrafficSources,
   trafficGroupKey,
   trafficGroupPathsAreLowerBound,
+  withSourcePaths,
 } from "@/utils/ai-traffic-groups";
 
 const MemoTrafficHero = memo(TrafficHero);
@@ -38,6 +40,7 @@ const MemoTrafficSourcesStack = memo(TrafficSourcesStack);
 
 export function AiTrafficCard({
   traffic,
+  sourcePaths,
   pages,
   range,
   settingsHref,
@@ -47,8 +50,17 @@ export function AiTrafficCard({
   const tCommon = useTranslations("common");
   const tShared = useTranslations("geo.shared");
   const locale = useLocale();
-  const { sources, totals, points, previousConversions } =
-    traffic ?? GEO_EMPTY_TRAFFIC_RESPONSE;
+  const {
+    sources: fastSources,
+    totals,
+    points,
+    previousConversions,
+  } = traffic ?? GEO_EMPTY_TRAFFIC_RESPONSE;
+  const sources = useMemo(
+    () => withSourcePaths(fastSources, sourcePaths),
+    [fastSources, sourcePaths]
+  );
+  const pathsPending = sourcePaths === undefined;
   const previousTotals = useMemo(
     () => toGeoTrafficPreviousTotals(sources, previousConversions),
     [sources, previousConversions]
@@ -123,16 +135,19 @@ export function AiTrafficCard({
         column.key === "paths"
           ? {
               ...column,
-              cell: (row: GeoTrafficSourceGroup) => (
-                <span className="text-sm tabular-nums">
-                  {trafficGroupPathsAreLowerBound(row) ? "≥ " : null}
-                  <AnimatedNumber locale={locale} value={row.paths} />
-                </span>
-              ),
+              cell: (row: GeoTrafficSourceGroup) =>
+                pathsPending ? (
+                  <Skeleton className="ml-auto h-3 w-8" />
+                ) : (
+                  <span className="text-sm tabular-nums">
+                    {trafficGroupPathsAreLowerBound(row) ? "≥ " : null}
+                    <AnimatedNumber locale={locale} value={row.paths} />
+                  </span>
+                ),
             }
           : column
       ),
-    [sourceColumns, locale]
+    [sourceColumns, locale, pathsPending]
   );
 
   if (groups.length === 0) {
