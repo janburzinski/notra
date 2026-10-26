@@ -1,0 +1,37 @@
+apps/dashboard/src/utils/geo-prompts.ts
+  s_677bcce567202f::t_f20398ea2c5d56 337-339
+  s_677bcce567202f::t_627681ce91a420 308-336,340-349
+  s_677bcce567202f::t_a840a3ab49f982 15
+apps/dashboard/messages/en.json
+  s_677bcce567202f::t_f20398ea2c5d56 4200
+  s_677bcce567202f::t_7c75ed5b2fd2cd 4195-4199,4201
+apps/dashboard/src/components/evilcharts/charts/echarts-pie-chart.tsx
+  s_677bcce567202f::t_86322741462104 766,827
+apps/dashboard/src/components/geo/share-of-voice-chart.tsx
+  s_677bcce567202f::t_45ea4f9c5c6f3a 319
+apps/dashboard/src/types/geo.ts
+  s_677bcce567202f::t_627681ce91a420 1618-1632
+apps/dashboard/src/app/(dashboard)/[slug]/geo/competitors/page-client.tsx
+  s_677bcce567202f::t_7c75ed5b2fd2cd 16,30,94-97,196-199
+apps/dashboard/messages/de.json
+  s_677bcce567202f::t_f20398ea2c5d56 4200
+  s_677bcce567202f::t_7c75ed5b2fd2cd 4195-4199,4201
+apps/dashboard/src/components/geo/competitor-lost-prompts-table.tsx
+  s_677bcce567202f::t_44958a9ca0aa0e 1-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ed3419430b4f07f50862e2bebf264428b475c752",
+  "prompts": {},
+  "sessions": {
+    "s_677bcce567202f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5d1389c-2218-4a20-ac79-55e67065b6a4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
