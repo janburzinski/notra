@@ -1,0 +1,20 @@
+apps/docs/sites/domains/framer.mdx
+  s_82476e499057dc::t_bf0b866688ff83 21,25-32,34,47-48,51,55,57-62
+  s_82476e499057dc::t_16e122d172eded 41-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4ba2c3b43557cc97cd10d85d22211d37bd179bc6",
+  "prompts": {},
+  "sessions": {
+    "s_82476e499057dc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d3b179c-d108-4978-a9c7-3dbeedb3d033",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
