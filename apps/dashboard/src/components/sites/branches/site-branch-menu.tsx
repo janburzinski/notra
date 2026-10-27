@@ -45,7 +45,7 @@ export function SiteBranchMenu(props: SiteBranchMenuProps) {
           <Button
             variant="secondary"
             disabled={props.disabled}
-            className="h-8 max-w-full min-w-0 justify-start gap-2 px-2.5 text-sm font-normal active:scale-100"
+            className="h-7 max-w-full min-w-0 justify-start gap-2 px-2.5 text-sm font-normal active:scale-100"
           />
         }
       >

@@ -21,3 +21,11 @@ export interface SitePreviewPasswordFieldProps {
   showPassword: boolean;
   onToggleShowPassword: () => void;
 }
+
+export interface SitePreviewPasswordDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  passwordSetAt: Date | string | null;
+  pending: boolean;
+  onSubmit: (password: string) => void;
+}

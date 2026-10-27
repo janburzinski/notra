@@ -198,7 +198,7 @@ export interface SiteOptionSelectProps<T extends string> {
   options: readonly { value: T; label: string }[];
   onChange: (value: T) => void;
   className?: string;
-  /** Skeleton of an option, shown beside the open list for the highlighted one. */
+  /** Preview of an option, shown beside the open list for the highlighted one; null hides it. */
   preview?: (value: T) => ReactNode;
   /** One-line explanation under the preview. */
   describe?: (value: T) => string;
@@ -239,7 +239,6 @@ export interface SiteDesignPreviewColors {
 export interface SiteMiniPageProps {
   colors: SiteDesignPreviewColors;
   tone: SiteDesignPreviewTone;
-  decoration?: SiteBackgroundDecoration;
   code?: SiteDesignPreviewTone | "accent";
   className?: string;
 }

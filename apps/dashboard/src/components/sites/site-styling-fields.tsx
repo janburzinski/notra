@@ -13,7 +13,6 @@ import { useTranslations } from "use-intl";
 
 import { SiteColorInput } from "@/components/sites/site-color-input";
 import {
-  SiteAppearancePreview,
   SiteCodeModePreview,
   SiteDecorationPreview,
 } from "@/components/sites/site-design-preview";
@@ -164,12 +163,14 @@ export function SiteStylingFields({
                 value,
                 label: t(`decorations.${value}`),
               }))}
-              preview={(value) => (
-                <SiteDecorationPreview
-                  colors={previewColors}
-                  decoration={value}
-                />
-              )}
+              preview={(value) =>
+                value === "none" ? null : (
+                  <SiteDecorationPreview
+                    colors={previewColors}
+                    decoration={value}
+                  />
+                )
+              }
               value={form.decoration}
             />
           }
@@ -183,19 +184,12 @@ export function SiteStylingFields({
           title={t("appearance")}
           value={
             <SiteOptionSelect
-              describe={(value) => t(`previews.appearances.${value}`)}
               label={t("appearance")}
               onChange={(value) => update("appearance", value)}
               options={SITE_APPEARANCE_MODES.map((value) => ({
                 value,
                 label: tModes(value),
               }))}
-              preview={(value) => (
-                <SiteAppearancePreview
-                  appearance={value}
-                  colors={previewColors}
-                />
-              )}
               value={form.appearance}
             />
           }

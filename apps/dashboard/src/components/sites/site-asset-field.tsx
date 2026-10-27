@@ -10,6 +10,11 @@ import {
   InputGroupInput,
 } from "@notra/ui/components/ui/input-group";
 import { Spinner } from "@notra/ui/components/ui/spinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@notra/ui/components/ui/tooltip";
 import { cn } from "@notra/ui/lib/utils";
 import { useRef, useState } from "react";
 import { useTranslations } from "use-intl";
@@ -32,6 +37,36 @@ export function SiteAssetField({
   const inputRef = useRef<HTMLInputElement>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const showImage = src !== null && failed !== src;
+  let uploadHint = value ? t("replace") : t("uploadHint");
+  if (upload.uploading) {
+    uploadHint = t("uploading");
+  }
+  let thumbnail = (
+    <HugeiconsIcon
+      aria-hidden="true"
+      className="text-muted-foreground size-3"
+      icon={Image01Icon}
+    />
+  );
+  if (showImage) {
+    thumbnail = (
+      <img
+        alt=""
+        className="size-full object-contain"
+        onError={() => setFailed(src)}
+        src={src}
+      />
+    );
+  } else if (upload.enabled) {
+    thumbnail = (
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="size-3.5"
+        icon={Upload04Icon}
+        strokeWidth={1.8}
+      />
+    );
+  }
 
   return (
     <div
@@ -43,22 +78,60 @@ export function SiteAssetField({
     >
       <InputGroup className="w-full">
         <InputGroupAddon>
-          <span className="bg-muted/60 ring-foreground/10 flex size-5 items-center justify-center overflow-hidden rounded-[5px] ring-1">
-            {showImage ? (
-              <img
-                alt=""
-                className="size-full object-contain"
-                onError={() => setFailed(src)}
-                src={src}
-              />
-            ) : (
-              <HugeiconsIcon
+          {upload.enabled ? (
+            <>
+              <input
+                accept={SITE_IMAGE_UPLOAD_ACCEPT}
                 aria-hidden="true"
-                className="text-muted-foreground size-3"
-                icon={Image01Icon}
+                className="sr-only"
+                onChange={(event) => {
+                  void upload.upload(event.target.files?.[0]);
+                  event.target.value = "";
+                }}
+                ref={inputRef}
+                tabIndex={-1}
+                type="file"
               />
-            )}
-          </span>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <InputGroupButton
+                      aria-busy={upload.uploading}
+                      aria-label={t("uploadLabel", { label })}
+                      className="group/thumb relative overflow-hidden"
+                      disabled={upload.uploading}
+                      onClick={() => inputRef.current?.click()}
+                      size="icon-xs"
+                      variant="outline"
+                    />
+                  }
+                >
+                  {upload.uploading ? (
+                    <Spinner className="size-3" />
+                  ) : (
+                    <>
+                      {thumbnail}
+                      {showImage ? (
+                        <span className="bg-background/80 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover/thumb:opacity-100 group-focus-visible/thumb:opacity-100">
+                          <HugeiconsIcon
+                            aria-hidden="true"
+                            className="size-3.5"
+                            icon={Upload04Icon}
+                            strokeWidth={1.8}
+                          />
+                        </span>
+                      ) : null}
+                    </>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>{uploadHint}</TooltipContent>
+              </Tooltip>
+            </>
+          ) : (
+            <span className="bg-muted/60 ring-foreground/10 flex size-5 items-center justify-center overflow-hidden rounded-[5px] ring-1">
+              {thumbnail}
+            </span>
+          )}
         </InputGroupAddon>
         <InputGroupInput
           aria-label={label}
@@ -72,40 +145,6 @@ export function SiteAssetField({
           spellCheck={false}
           value={value}
         />
-        {upload.enabled ? (
-          <InputGroupAddon align="inline-end">
-            <input
-              accept={SITE_IMAGE_UPLOAD_ACCEPT}
-              aria-hidden="true"
-              className="sr-only"
-              onChange={(event) => {
-                void upload.upload(event.target.files?.[0]);
-                event.target.value = "";
-              }}
-              ref={inputRef}
-              tabIndex={-1}
-              type="file"
-            />
-            <InputGroupButton
-              aria-label={t("uploadLabel", { label })}
-              disabled={upload.uploading}
-              onClick={() => inputRef.current?.click()}
-              size="xs"
-            >
-              {upload.uploading ? (
-                <Spinner className="size-3" />
-              ) : (
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="size-3.5"
-                  icon={Upload04Icon}
-                  strokeWidth={1.8}
-                />
-              )}
-              {upload.uploading ? t("uploading") : t("upload")}
-            </InputGroupButton>
-          </InputGroupAddon>
-        ) : null}
       </InputGroup>
     </div>
   );

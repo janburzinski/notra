@@ -751,13 +751,18 @@ export interface SiteInthProjectSettingsProps {
 }
 
 export interface SiteChangesStripProps {
-  tone: "info" | "warning" | "destructive";
+  tone: "warning" | "destructive";
   title: ReactNode;
   description: ReactNode;
   children?: ReactNode;
 }
 export interface SiteChangesStripStateProps {
   state: SiteWorkspaceValue;
+}
+
+export interface SiteDiscardChangesButtonProps {
+  state: SiteWorkspaceValue;
+  variant?: "secondary" | "ghost";
 }
 
 export interface SiteHeaderMenuProps {

@@ -177,8 +177,7 @@ export type SiteSettingsRowKey =
   | "branch"
   | "rootDirectory"
   | "sections"
-  | "variables"
-  | "previewAccess";
+  | "variables";
 
 export type SiteSettingsToggleField =
   | "previewCommentsEnabled"

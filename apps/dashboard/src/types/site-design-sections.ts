@@ -1,5 +1,9 @@
 import type { SITE_DESIGN_SECTIONS } from "@/constants/site-design-sections";
-import type { SiteRawConfig } from "@/types/site-design";
+import type {
+  SiteDesignFieldsProps,
+  SiteDesignForm,
+  SiteRawConfig,
+} from "@/types/site-design";
 
 export type SiteDesignSection = (typeof SITE_DESIGN_SECTIONS)[number]["id"];
 export interface SiteDesignIssue {
@@ -43,4 +47,9 @@ export interface SiteDesignErrorProps {
 
 export interface SiteDesignAppearanceProps {
   section: string;
+}
+export interface SiteDesignBrandingProps {
+  form: SiteDesignForm;
+  update: SiteDesignFieldsProps<SiteDesignForm>["update"];
+  change: (next: SiteDesignForm) => void;
 }

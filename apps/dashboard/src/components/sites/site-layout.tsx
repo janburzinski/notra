@@ -32,6 +32,7 @@ import {
   SiteDeploymentSkeleton,
   SiteSectionSkeleton,
 } from "./site-page-skeleton";
+import { SitePublishConfetti } from "./site-publish-confetti";
 import { SiteMobileNav, SiteSidebar } from "./site-sidebar";
 import { SiteWorkspace } from "./site-workspace";
 import { SitesPageShell } from "./sites-page-shell";
@@ -97,6 +98,7 @@ export function SiteLayout({
               liveDeployment,
             }}
           >
+            <SitePublishConfetti />
             <SiteWorkspace>
               <div className="flex flex-1 flex-col" data-site-frame="">
                 <SiteHeader

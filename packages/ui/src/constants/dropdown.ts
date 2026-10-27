@@ -1,5 +1,5 @@
 export const SELECT_COLLISION_AVOIDANCE = {
-  side: "none",
+  side: "flip",
   align: "shift",
 } as const;
 

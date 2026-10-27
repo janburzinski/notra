@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Alert02Icon,
-  Delete02Icon,
-  InformationCircleIcon,
-} from "@hugeicons/core-free-icons";
+import { Alert02Icon, Delete02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import {
@@ -16,6 +12,11 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from "@notra/ui/components/shared/responsive-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@notra/ui/components/ui/tooltip";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -32,6 +33,7 @@ import { cn } from "@/lib/utils";
 import type {
   SiteChangesStripProps,
   SiteChangesStripStateProps,
+  SiteDiscardChangesButtonProps,
 } from "@/types/components/sites";
 import type { SiteWorkspaceValue } from "@/types/site-workspace";
 import { siteBranchLabel } from "@/utils/site-branch-label";
@@ -44,12 +46,12 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
         "bg-background z-10 flex flex-wrap items-center gap-x-3 gap-y-2 border-b bg-linear-to-b px-4 py-2.5 sm:sticky sm:top-12 lg:px-5",
         SITE_CHANGES_STRIP_TONES[tone]
       )}
-      role={tone === "info" ? "status" : "alert"}
+      role="alert"
     >
       <HugeiconsIcon
         aria-hidden="true"
         className="mt-0.5 size-4 shrink-0 self-start"
-        icon={tone === "info" ? InformationCircleIcon : Alert02Icon}
+        icon={Alert02Icon}
         strokeWidth={2}
       />
       <div className="min-w-0 flex-1 text-sm">
@@ -65,7 +67,7 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   );
 }
 
-/** Unpublished edits, save failures and conflicts, shown once above the page content. Publish lives in the site header. */
+/** Save failures, invalid config and conflicts, shown once above the page content. Unpublished edits live in the site header. */
 export function SiteChangesBanner() {
   const state = useSiteWorkspace();
   const load = useSiteWorkspaceLoad();
@@ -105,81 +107,8 @@ function SiteLoadFailedStrip() {
 function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
   const t = useTranslations("sites.design.workspace");
   const banner = useTranslations("sites.design.workspace.banner");
-  const unpublished = useUnpublishedSummary(state);
-  const common = useTranslations("common");
-  const branches = useTranslations("sites.branches");
-  const { discardOpen, setDiscardOpen } = state;
-  const [discardError, setDiscardError] = useState(false);
-  const busy =
-    state.readOnly ||
-    state.uploading ||
-    state.saves.state.status === "saving" ||
-    state.controller.props.commitStatus === "pending";
-  const discard = (
-    <ResponsiveDialog
-      open={discardOpen}
-      onOpenChange={(open) => {
-        if (!state.readOnly) {
-          setDiscardOpen(open);
-          setDiscardError(false);
-        }
-      }}
-    >
-      <ResponsiveDialogTrigger
-        render={<Button disabled={busy} size="sm" variant="secondary" />}
-      >
-        <HugeiconsIcon
-          aria-hidden="true"
-          data-icon="inline-start"
-          icon={Delete02Icon}
-          strokeWidth={2}
-        />
-        {branches("discard")}
-      </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent>
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>
-            {banner("discardTitle")}
-          </ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>
-            {banner("discardDescription")}
-          </ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
-        {discardError ? <p role="alert">{banner("discardFailed")}</p> : null}
-        <ResponsiveDialogFooter>
-          <Button
-            variant="outline"
-            disabled={state.readOnly}
-            onClick={() => setDiscardOpen(false)}
-          >
-            {common("actions.cancel")}
-          </Button>
-          <Button
-            variant="destructive"
-            loading={state.readOnly}
-            disabled={busy}
-            onClick={async () => {
-              setDiscardError(false);
-              try {
-                await state.discardChanges();
-                setDiscardOpen(false);
-              } catch {
-                setDiscardError(true);
-              }
-            }}
-          >
-            <HugeiconsIcon
-              aria-hidden="true"
-              data-icon="inline-start"
-              icon={Delete02Icon}
-              strokeWidth={2}
-            />
-            {banner("discardAction")}
-          </Button>
-        </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
-  );
+  const busy = discardBusy(state);
+  const discard = <SiteDiscardChangesButton state={state} />;
   if (state.conflicts.length > 0) {
     return (
       <Strip
@@ -239,11 +168,146 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
       </Strip>
     );
   }
-  return unpublished ? (
-    <Strip tone="info" {...unpublished}>
-      {state.files.drafts.length > 0 || state.unsaved ? discard : null}
-    </Strip>
-  ) : null;
+  return null;
+}
+
+function discardBusy(state: SiteWorkspaceValue) {
+  return (
+    state.readOnly ||
+    state.uploading ||
+    state.saves.state.status === "saving" ||
+    state.controller.props.commitStatus === "pending"
+  );
+}
+
+/** Unpublished edits sit in the header next to Publish, so the page never shifts. */
+export function SiteUnpublishedChanges() {
+  const state = useSiteWorkspace();
+  if (
+    !state ||
+    state.malformed ||
+    state.conflicts.length > 0 ||
+    state.saves.state.status === "error" ||
+    state.invalid
+  ) {
+    return null;
+  }
+  return <SiteUnpublishedIndicator state={state} />;
+}
+
+function SiteUnpublishedIndicator({ state }: SiteChangesStripStateProps) {
+  const banner = useTranslations("sites.design.workspace.banner");
+  const unpublished = useUnpublishedSummary(state);
+  if (!unpublished) {
+    return null;
+  }
+  return (
+    <div className="animate-in fade-in-0 flex min-w-0 items-center gap-1 duration-200 motion-reduce:animate-none">
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <span
+              className="text-muted-foreground flex min-w-0 items-center gap-2 px-1.5 text-sm"
+              role="status"
+            />
+          }
+        >
+          <span
+            aria-hidden="true"
+            className="bg-info size-1.5 shrink-0 rounded-full"
+          />
+          <span aria-hidden="true" className="md:hidden">
+            {banner("unpublishedShort")}
+          </span>
+          <span className="truncate max-md:sr-only">{unpublished.title}</span>
+          <span className="sr-only">{unpublished.description}</span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-64">
+          {unpublished.description}
+        </TooltipContent>
+      </Tooltip>
+      {state.files.drafts.length > 0 || state.unsaved ? (
+        <SiteDiscardChangesButton state={state} variant="ghost" />
+      ) : null}
+    </div>
+  );
+}
+
+function SiteDiscardChangesButton({
+  state,
+  variant = "secondary",
+}: SiteDiscardChangesButtonProps) {
+  const banner = useTranslations("sites.design.workspace.banner");
+  const common = useTranslations("common");
+  const branches = useTranslations("sites.branches");
+  const { discardOpen, setDiscardOpen } = state;
+  const [discardError, setDiscardError] = useState(false);
+  const busy = discardBusy(state);
+  return (
+    <ResponsiveDialog
+      open={discardOpen}
+      onOpenChange={(open) => {
+        if (!state.readOnly) {
+          setDiscardOpen(open);
+          setDiscardError(false);
+        }
+      }}
+    >
+      <ResponsiveDialogTrigger
+        render={<Button disabled={busy} size="sm" variant={variant} />}
+      >
+        <HugeiconsIcon
+          aria-hidden="true"
+          data-icon="inline-start"
+          icon={Delete02Icon}
+          strokeWidth={2}
+        />
+        {branches("discard")}
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>
+            {banner("discardTitle")}
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            {banner("discardDescription")}
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+        {discardError ? <p role="alert">{banner("discardFailed")}</p> : null}
+        <ResponsiveDialogFooter>
+          <Button
+            variant="outline"
+            disabled={state.readOnly}
+            onClick={() => setDiscardOpen(false)}
+          >
+            {common("actions.cancel")}
+          </Button>
+          <Button
+            variant="destructive"
+            loading={state.readOnly}
+            disabled={busy}
+            onClick={async () => {
+              setDiscardError(false);
+              try {
+                await state.discardChanges();
+                setDiscardOpen(false);
+              } catch {
+                setDiscardError(true);
+              }
+            }}
+          >
+            <HugeiconsIcon
+              aria-hidden="true"
+              data-icon="inline-start"
+              icon={Delete02Icon}
+              strokeWidth={2}
+            />
+            {banner("discardAction")}
+          </Button>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
 }
 
 function useUnpublishedSummary(state: SiteWorkspaceValue) {

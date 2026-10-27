@@ -8441,7 +8441,13 @@
       "hidePassword": "Passwort verbergen",
       "save": "Speichern",
       "saved": "Zugriff auf Vorschauen aktualisiert",
-      "saveFailed": "Zugriff konnte nicht aktualisiert werden"
+      "saveFailed": "Zugriff konnte nicht aktualisiert werden",
+      "setDialogTitle": "Passwort für Vorschauen festlegen",
+      "changeDialogTitle": "Passwort für Vorschauen ändern",
+      "passwordDialogDescription": "Dein Team öffnet Vorschauen wie gewohnt. Alle anderen öffnen sie mit diesem Passwort.",
+      "offConfirmTitle": "Vorschauen ausschalten?",
+      "offConfirmDescription": "{count, plural, one {Die offene Vorschau wird} other {Alle # offenen Vorschauen werden}} geschlossen. Schaltest du Vorschauen wieder ein, baut der nächste Push sie neu.",
+      "offConfirmAction": "Vorschauen ausschalten"
     },
     "analyticsPage": {
       "title": "Analytics",
@@ -8481,12 +8487,14 @@
       "publishMessage": "Site-Design aktualisieren",
       "noDrafts": "Es gibt noch nichts zu veröffentlichen.",
       "preparePublishFailed": "Deine Änderungen konnten nicht geladen werden. Versuche es erneut.",
+      "brandTitle": "Brand Identity",
       "brandHint": "Logo, Farben und Schriften aus der Brand Identity dieses Projekts übernehmen.",
       "applyBrand": "Brand Identity übernehmen",
       "pickColor": "Farbe für {name} wählen",
       "asset": {
-        "upload": "Hochladen",
         "uploadLabel": "{label} hochladen",
+        "uploadHint": "Bild hochladen",
+        "replace": "Bild ersetzen",
         "uploading": "Wird hochgeladen…",
         "tooLarge": "Bilder dürfen höchstens {size} MB groß sein.",
         "notImage": "Wähle ein PNG-, JPEG-, WebP-, AVIF-, GIF-, SVG- oder ICO-Bild.",
@@ -8583,11 +8591,6 @@
             "grid": "Feine Linien in einem quadratischen Raster hinter dem Inhalt.",
             "dots": "Ein ruhiges Feld kleiner Punkte hinter dem Inhalt.",
             "gradient": "Ein sanfter Schimmer in deiner Primärfarbe oben auf der Seite."
-          },
-          "appearances": {
-            "system": "Folgt der Geräteeinstellung jedes Besuchers.",
-            "light": "Startet hell, bis Besucher umschalten.",
-            "dark": "Startet dunkel, bis Besucher umschalten."
           },
           "codeModes": {
             "system": "Helle Codeblöcke im hellen Modus, dunkle im dunklen Modus.",
@@ -8722,6 +8725,7 @@
       },
       "workspace": {
         "banner": {
+          "unpublishedShort": "Unveröffentlicht",
           "unpublishedTitle": "{count, plural, one {Unveröffentlichte Änderungen in # Bereich} other {Unveröffentlichte Änderungen in # Bereichen}}",
           "unpublishedFilesTitle": "{count, plural, one {Unveröffentlichte Änderungen in # Datei} other {Unveröffentlichte Änderungen in # Dateien}}",
           "unpublished": "Änderungen an {sections} erscheinen erst nach dem Veröffentlichen auf deiner Seite.",

@@ -232,7 +232,9 @@ export const SITES_LIVE_INVALIDATE_THROTTLE_MS = 1000;
 
 // Tints sit on an opaque base because the strip sticks over scrolling content.
 export const SITE_CHANGES_STRIP_TONES = {
-  info: "from-info/10 to-info/10 text-info",
   warning: "from-warning/10 to-warning/10 text-warning",
   destructive: "from-destructive/10 to-destructive/10 text-destructive",
 } as const;
+
+/** Window event fired after a site goes live; the site layout answers with confetti. */
+export const SITE_PUBLISHED_EVENT = "notra:site-published";

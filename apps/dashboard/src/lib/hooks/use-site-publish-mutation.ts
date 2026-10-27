@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { SITE_PUBLISHED_EVENT } from "@/constants/sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SitePublishDialogProps } from "@/types/components/sites";
 import { toErrorMessage } from "@/utils/error-message";
@@ -38,6 +39,7 @@ export function useSitePublishMutation(props: SitePublishDialogProps) {
       });
       props.onOpenChange(false);
       props.onPublished();
+      window.dispatchEvent(new Event(SITE_PUBLISHED_EVENT));
       toast.success(result.deployPending ? t("deployPending") : t("committed"));
     },
     onError: (error) => {

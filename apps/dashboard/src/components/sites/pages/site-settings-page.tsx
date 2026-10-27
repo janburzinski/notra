@@ -36,7 +36,7 @@ import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useSite } from "@/components/sites/site-context";
 import { SiteImportList } from "@/components/sites/site-import-list";
-import { SitePreviewAccessForm } from "@/components/sites/site-preview-access-control";
+import { SitePreviewAccessRows } from "@/components/sites/site-preview-access-select";
 import { SiteSettingsDangerZone } from "@/components/sites/site-settings-danger-zone";
 import { SiteSettingsEditor } from "@/components/sites/site-settings-editor";
 import {
@@ -48,7 +48,10 @@ import {
   SiteSettingsValue,
 } from "@/components/sites/site-settings-item";
 import { SiteSuggestInput } from "@/components/sites/site-suggest-input";
-import { SiteVariablesSettings } from "@/components/sites/site-variables-settings";
+import {
+  SiteVariablesCount,
+  SiteVariablesSettings,
+} from "@/components/sites/site-variables-settings";
 import { SITE_NAME_MAX_LENGTH } from "@/constants/sites-form";
 import {
   useGitHubCallbackErrorToast,
@@ -75,7 +78,6 @@ import type {
 } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 import { githubRepositoryUrl, siteHref } from "@/utils/site-links";
-import { sitePreviewAccessMode } from "@/utils/site-preview-access";
 
 export function SiteSettingsPage() {
   const { organizationId, organizationSlug, siteId } = useSite();
@@ -94,7 +96,6 @@ function SiteSettingsContent() {
   const tNew = useTranslations("sites.new");
   const tVariables = useTranslations("sites.variables");
   const tSections = useTranslations("sites.sections");
-  const tPreview = useTranslations("sites.previewAccess");
   const [openRow, setOpenRow] = useState<SiteSettingsRowKey | null>(null);
   const { site } = detail;
 
@@ -104,9 +105,6 @@ function SiteSettingsContent() {
   });
   const closeRow = (key: SiteSettingsRowKey) => () =>
     setOpenRow((current) => (current === key ? null : current));
-  const previewMode = site.previewsEnabled
-    ? sitePreviewAccessMode(site)
-    : "off";
 
   return (
     <div className="space-y-8">
@@ -237,33 +235,21 @@ function SiteSettingsContent() {
               )}
             </SiteSettingsEditor>
           </SiteSettingsItem>
+          <SiteSettingsItem
+            {...row("variables")}
+            description={t("variablesHint")}
+            icon={CodeIcon}
+            title={tVariables("title")}
+            value={<SiteVariablesCount />}
+          >
+            <SiteVariablesSettings />
+          </SiteSettingsItem>
         </SiteSettingsList>
-      </SiteSettingsGroup>
-
-      <SiteSettingsGroup icon={CodeIcon} title={tVariables("title")}>
-        <p className="text-muted-foreground px-1 text-sm">
-          {tVariables("hint")}
-        </p>
-        <SiteVariablesSettings />
       </SiteSettingsGroup>
 
       <SiteSettingsGroup icon={ViewIcon} title={t("previews")}>
         <SiteSettingsList>
-          <SiteSettingsItem
-            {...row("previewAccess")}
-            description={t("previewsEnabledHint")}
-            icon={ViewIcon}
-            title={t("previewBuilds")}
-            value={
-              <SiteSettingsValue>
-                {tPreview(`trigger.${previewMode}`)}
-              </SiteSettingsValue>
-            }
-          >
-            <div className="max-w-xl">
-              <SitePreviewAccessForm onDone={closeRow("previewAccess")} />
-            </div>
-          </SiteSettingsItem>
+          <SitePreviewAccessRows />
           <SiteSettingsToggle
             description={t("previewCommentsHint")}
             field="previewCommentsEnabled"

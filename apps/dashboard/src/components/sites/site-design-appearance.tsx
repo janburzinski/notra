@@ -1,5 +1,6 @@
 "use client";
 
+import { SparklesIcon } from "@hugeicons/core-free-icons";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
@@ -12,7 +13,10 @@ import { SiteFooterFields } from "@/components/sites/site-footer-fields";
 import { SiteGeneralFields } from "@/components/sites/site-general-fields";
 import { SiteNavbarFields } from "@/components/sites/site-navbar-fields";
 import { SiteSeoFields } from "@/components/sites/site-seo-fields";
-import { SiteSettingsList } from "@/components/sites/site-settings-item";
+import {
+  SiteSettingsItem,
+  SiteSettingsList,
+} from "@/components/sites/site-settings-item";
 import { SiteStylingFields } from "@/components/sites/site-styling-fields";
 import { SiteTypographyFields } from "@/components/sites/site-typography-fields";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
@@ -21,7 +25,10 @@ import type {
   SiteDesignFieldsProps,
   SiteDesignForm,
 } from "@/types/site-design";
-import type { SiteDesignAppearanceProps } from "@/types/site-design-sections";
+import type {
+  SiteDesignAppearanceProps,
+  SiteDesignBrandingProps,
+} from "@/types/site-design-sections";
 import {
   applyBrandToDesign,
   describeBrandForDesign,
@@ -35,8 +42,6 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
   const [form, setForm] = useState(() => readDesignForm(state.config));
   const [snapshot, setSnapshot] = useState(state.document);
   const [written, setWritten] = useState(state.config);
-  const [brandOpen, setBrandOpen] = useState(false);
-  const brand = useSiteBrandDefaults();
   const t = useTranslations("sites.design");
   if (snapshot !== state.document && !state.unsaved) {
     setSnapshot(state.document);
@@ -60,35 +65,7 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
     return <SiteStylingFields form={form} update={update} />;
   }
   if (section === "branding") {
-    return (
-      <>
-        {brand ? (
-          <div className="flex justify-end pb-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setBrandOpen(true)}
-            >
-              {t("applyBrand")}
-            </Button>
-          </div>
-        ) : null}
-        <SiteSettingsList>
-          <SiteBrandingFields form={form} update={update} />
-        </SiteSettingsList>
-        {brand ? (
-          <SiteBrandDialog
-            open={brandOpen}
-            onOpenChange={setBrandOpen}
-            changes={describeBrandForDesign(brand, form)}
-            onConfirm={() => {
-              change(applyBrandToDesign(brand, form));
-              setBrandOpen(false);
-            }}
-          />
-        ) : null}
-      </>
-    );
+    return <SiteDesignBranding change={change} form={form} update={update} />;
   }
   if (section === "typography") {
     return (
@@ -157,5 +134,48 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
     <SiteSettingsList>
       <SiteGeneralFields form={form} update={update} />
     </SiteSettingsList>
+  );
+}
+
+function SiteDesignBranding({ form, update, change }: SiteDesignBrandingProps) {
+  const t = useTranslations("sites.design");
+  const [brandOpen, setBrandOpen] = useState(false);
+  const brand = useSiteBrandDefaults();
+  const brandChanges = brand ? describeBrandForDesign(brand, form) : [];
+  return (
+    <div className="space-y-4">
+      {brandChanges.length > 0 ? (
+        <SiteSettingsList>
+          <SiteSettingsItem
+            description={t("brandHint")}
+            icon={SparklesIcon}
+            title={t("brandTitle")}
+            value={
+              <Button
+                onClick={() => setBrandOpen(true)}
+                size="sm"
+                variant="outline"
+              >
+                {t("applyBrand")}
+              </Button>
+            }
+          />
+        </SiteSettingsList>
+      ) : null}
+      <SiteSettingsList>
+        <SiteBrandingFields form={form} update={update} />
+      </SiteSettingsList>
+      {brand ? (
+        <SiteBrandDialog
+          open={brandOpen}
+          onOpenChange={setBrandOpen}
+          changes={brandChanges}
+          onConfirm={() => {
+            change(applyBrandToDesign(brand, form));
+            setBrandOpen(false);
+          }}
+        />
+      ) : null}
+    </div>
   );
 }

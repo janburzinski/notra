@@ -8441,7 +8441,13 @@
       "hidePassword": "Hide password",
       "save": "Save",
       "saved": "Preview access updated",
-      "saveFailed": "Couldn't update preview access"
+      "saveFailed": "Couldn't update preview access",
+      "setDialogTitle": "Set a preview password",
+      "changeDialogTitle": "Change preview password",
+      "passwordDialogDescription": "Your team opens previews as usual. Anyone else can open them with this password.",
+      "offConfirmTitle": "Turn off previews?",
+      "offConfirmDescription": "{count, plural, one {The open preview closes} other {All # open previews close}}. Turn previews back on and the next push builds them again.",
+      "offConfirmAction": "Turn off previews"
     },
     "analyticsPage": {
       "title": "Analytics",
@@ -8481,12 +8487,14 @@
       "publishMessage": "Update site design",
       "noDrafts": "There's nothing to publish yet.",
       "preparePublishFailed": "Unable to load your changes. Try again.",
+      "brandTitle": "Brand identity",
       "brandHint": "Use the logo, colors and fonts from this project's brand identity.",
       "applyBrand": "Use brand identity",
       "pickColor": "Pick a color for {name}",
       "asset": {
-        "upload": "Upload",
         "uploadLabel": "Upload {label}",
+        "uploadHint": "Upload an image",
+        "replace": "Replace image",
         "uploading": "Uploading…",
         "tooLarge": "Images can be at most {size} MB.",
         "notImage": "Choose a PNG, JPEG, WebP, AVIF, GIF, SVG or ICO image.",
@@ -8583,11 +8591,6 @@
             "grid": "Thin lines in a square grid behind the content.",
             "dots": "A quiet field of small dots behind the content.",
             "gradient": "A soft glow in your primary color at the top of the page."
-          },
-          "appearances": {
-            "system": "Follows each visitor's device setting.",
-            "light": "Opens in light mode until a visitor switches.",
-            "dark": "Opens in dark mode until a visitor switches."
           },
           "codeModes": {
             "system": "Light code blocks in light mode, dark ones in dark mode.",
@@ -8722,6 +8725,7 @@
       },
       "workspace": {
         "banner": {
+          "unpublishedShort": "Unpublished",
           "unpublishedTitle": "{count, plural, one {Unpublished changes in # section} other {Unpublished changes in # sections}}",
           "unpublishedFilesTitle": "{count, plural, one {Unpublished changes in # file} other {Unpublished changes in # files}}",
           "unpublished": "Edits to {sections} reach your live site only after you publish.",

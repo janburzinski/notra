@@ -24,7 +24,7 @@ import {
   sitePreviewAccessPlan,
 } from "@/utils/site-preview-access";
 
-export function SitePreviewAccessForm({ onDone }: SitePreviewAccessFormProps) {
+function SitePreviewAccessForm({ onDone }: SitePreviewAccessFormProps) {
   const t = useTranslations("sites.previewAccess");
   const tCommon = useTranslations("common");
   const id = useId();

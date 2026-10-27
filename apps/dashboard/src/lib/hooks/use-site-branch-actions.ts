@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
+import { SITE_PUBLISHED_EVENT } from "@/constants/sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
   SiteBranchControlsProps,
@@ -108,6 +109,7 @@ export function useSiteBranchActions(
         const result =
           await dashboardOrpc.sites.branches.mergeAndPublish.call(scope);
         await onSwitch(result.branch);
+        window.dispatchEvent(new Event(SITE_PUBLISHED_EVENT));
         if (result.deployPending) {
           toast.success(t("deployPending"));
         }

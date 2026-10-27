@@ -10,7 +10,6 @@ import {
 } from "@/constants/site-design";
 import { cn } from "@/lib/utils";
 import type {
-  SiteAppearanceMode,
   SiteBackgroundDecoration,
   SiteCodeThemeMode,
   SiteDesignPreviewColors,
@@ -72,13 +71,7 @@ function CodeLines({ tone }: { tone: NonNullable<SiteMiniPageProps["code"]> }) {
 }
 
 /** A tiny site page in one mode: navbar, heading, text, optional code block. */
-function MiniPage({
-  colors,
-  tone,
-  decoration = "none",
-  code,
-  className,
-}: SiteMiniPageProps) {
+function MiniPage({ colors, tone, code, className }: SiteMiniPageProps) {
   const background =
     tone === "light"
       ? colors.backgroundLight || "#FFFFFF"
@@ -95,7 +88,6 @@ function MiniPage({
     <div
       className={cn(
         "flex min-w-0 flex-col gap-1.5 bg-(--mini-bg) p-2.5",
-        SITE_DESIGN_PREVIEW_DECORATION_CLASS_NAMES[decoration],
         className
       )}
       style={style}
@@ -141,6 +133,7 @@ function PreviewFrame({
   );
 }
 
+/** Just the pattern on the page background; a fake page would hide it. */
 export function SiteDecorationPreview({
   colors,
   decoration,
@@ -148,32 +141,19 @@ export function SiteDecorationPreview({
   colors: SiteDesignPreviewColors;
   decoration: SiteBackgroundDecoration;
 }) {
+  const style = {
+    "--mini-bg": colors.backgroundLight || "#FFFFFF",
+    "--mini-fg": SITE_DESIGN_PREVIEW_LIGHT_FOREGROUND,
+    "--mini-accent": colors.primary || "#6366F1",
+  } as CSSProperties;
   return (
-    <PreviewFrame>
-      <MiniPage colors={colors} decoration={decoration} tone="light" />
-    </PreviewFrame>
-  );
-}
-
-export function SiteAppearancePreview({
-  colors,
-  appearance,
-}: {
-  colors: SiteDesignPreviewColors;
-  appearance: SiteAppearanceMode;
-}) {
-  if (appearance === "system") {
-    return (
-      <PreviewFrame split>
-        <MiniPage colors={colors} tone="light" />
-        <MiniPage colors={colors} tone="dark" />
-      </PreviewFrame>
-    );
-  }
-  return (
-    <PreviewFrame>
-      <MiniPage colors={colors} tone={appearance} />
-    </PreviewFrame>
+    <div
+      className={cn(
+        "h-28 bg-(--mini-bg)",
+        SITE_DESIGN_PREVIEW_DECORATION_CLASS_NAMES[decoration]
+      )}
+      style={style}
+    />
   );
 }
 
