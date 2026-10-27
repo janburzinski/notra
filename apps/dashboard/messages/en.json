@@ -6608,7 +6608,7 @@
       },
       "password": "Password",
       "passwordHint": "Visitors enter it before they see the post. Your team gets in without it.",
-      "passwordPlaceholder": "At least {min} characters",
+      "passwordPlaceholder": "Enter a password",
       "savePassword": "Save",
       "create": "Create preview",
       "update": "Update preview",
@@ -6626,7 +6626,11 @@
       "failed": "The preview build failed",
       "loading": "Loading…",
       "noSite": "Add a Notra site with a blog or changelog to preview posts on it.",
-      "newPasswordPlaceholder": "Enter a new password"
+      "newPasswordPlaceholder": "Enter a new password",
+      "passwordMinLength": "At least {min} characters",
+      "passwordSet": "A password is set. Enter a new one to replace it.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
     },
     "githubPublish": {
       "trigger": "Create GitHub PR",

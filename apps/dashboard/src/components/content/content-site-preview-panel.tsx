@@ -6,15 +6,24 @@ import {
   LinkSquare02Icon,
   Rocket01Icon,
   ViewIcon,
+  ViewOffIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { SITE_PREVIEW_PASSWORD_MIN_LENGTH } from "@notra/sites-core/constants/sites";
+import {
+  SITE_PREVIEW_PASSWORD_MAX_LENGTH,
+  SITE_PREVIEW_PASSWORD_MIN_LENGTH,
+} from "@notra/sites-core/constants/sites";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
   Collapsible,
   CollapsibleContent,
 } from "@notra/ui/components/ui/collapsible";
-import { Input } from "@notra/ui/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@notra/ui/components/ui/input-group";
 import {
   Select,
   SelectContent,
@@ -25,7 +34,7 @@ import {
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { TooltipProvider } from "@notra/ui/components/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import { type ReactNode, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useFormatter, useTranslations } from "use-intl";
 
@@ -267,6 +276,14 @@ function PreviewAccessFields({ model }: PostSitePreviewSectionProps) {
   const t = useTranslations("content.sitePreview");
   const { preview, live, updateAccess, hasPassword, password } = model;
   const loading = model.loading || model.statusLoading;
+  const hintId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const tooShort = password.length > 0 && !model.passwordValid;
+  const savingPassword =
+    updateAccess.isPending &&
+    updateAccess.variables !== undefined &&
+    "password" in updateAccess.variables;
   return (
     <>
       <OverviewField hint={t("validForHint")} label={t("validFor")}>
@@ -312,40 +329,83 @@ function PreviewAccessFields({ model }: PostSitePreviewSectionProps) {
             label={t("password")}
             onCheckedChange={(checked) => {
               model.setPasswordOn(checked);
+              if (checked) {
+                requestAnimationFrame(() => inputRef.current?.focus());
+              }
               if (!checked && live && preview?.hasPassword) {
                 updateAccess.mutate({ password: null });
               }
             }}
           />
         </LoadingMask>
-        <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-[height,opacity] duration-200 ease-out data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0 motion-reduce:transition-none">
-          <div className="flex gap-2 pt-2">
-            <Input
-              aria-label={t("password")}
-              autoComplete="new-password"
-              disabled={model.deleting}
-              onChange={(event) => model.setPassword(event.target.value)}
-              placeholder={
-                preview?.hasPassword
-                  ? t("newPasswordPlaceholder")
-                  : t("passwordPlaceholder", {
-                      min: SITE_PREVIEW_PASSWORD_MIN_LENGTH,
-                    })
+        <CollapsibleContent className="-mx-1 -mb-1 h-(--collapsible-panel-height) overflow-hidden transition-[height,opacity] duration-200 ease-out data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0 motion-reduce:transition-none">
+          <form
+            className="space-y-1.5 px-1 pt-2 pb-1"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (live && model.passwordValid) {
+                updateAccess.mutate({ password });
               }
-              type="password"
-              value={password}
-            />
-            {live ? (
-              <Button
-                disabled={model.deleting || !model.passwordValid}
-                loading={updateAccess.isPending}
-                onClick={() => updateAccess.mutate({ password })}
-                variant="outline"
-              >
-                {t("savePassword")}
-              </Button>
-            ) : null}
-          </div>
+            }}
+          >
+            <div className="flex gap-2">
+              <InputGroup>
+                <InputGroupInput
+                  aria-describedby={hintId}
+                  aria-invalid={tooShort}
+                  aria-label={t("password")}
+                  autoComplete="new-password"
+                  disabled={model.deleting}
+                  maxLength={SITE_PREVIEW_PASSWORD_MAX_LENGTH}
+                  onChange={(event) => model.setPassword(event.target.value)}
+                  placeholder={
+                    preview?.hasPassword
+                      ? t("newPasswordPlaceholder")
+                      : t("passwordPlaceholder")
+                  }
+                  ref={inputRef}
+                  spellCheck={false}
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    aria-label={
+                      showPassword ? t("hidePassword") : t("showPassword")
+                    }
+                    onClick={() => setShowPassword(!showPassword)}
+                    size="icon-xs"
+                  >
+                    <HugeiconsIcon
+                      aria-hidden="true"
+                      icon={showPassword ? ViewOffIcon : ViewIcon}
+                      strokeWidth={1.5}
+                    />
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+              {live ? (
+                <Button
+                  disabled={model.deleting || !model.passwordValid}
+                  loading={savingPassword}
+                  type="submit"
+                  variant="outline"
+                >
+                  {t("savePassword")}
+                </Button>
+              ) : null}
+            </div>
+            <p
+              className={`text-xs text-pretty ${tooShort ? "text-destructive" : "text-muted-foreground"}`}
+              id={hintId}
+            >
+              {preview?.hasPassword && password.length === 0
+                ? t("passwordSet")
+                : t("passwordMinLength", {
+                    min: SITE_PREVIEW_PASSWORD_MIN_LENGTH,
+                  })}
+            </p>
+          </form>
         </CollapsibleContent>
       </Collapsible>
     </>

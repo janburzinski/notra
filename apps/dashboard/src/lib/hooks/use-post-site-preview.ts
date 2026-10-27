@@ -130,7 +130,13 @@ export function usePostSitePreview({
         resetPassword();
       }
     },
-    onError: (error) => toast.error(toErrorMessage(error, t("saveFailed"))),
+    onError: (error, input) => {
+      toast.error(toErrorMessage(error, t("saveFailed")));
+      // Removing failed, so the stored password still guards the link.
+      if ("password" in input && input.password === null) {
+        setPasswordOn(null);
+      }
+    },
   });
 
   const remove = useMutation({

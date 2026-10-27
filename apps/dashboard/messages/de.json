@@ -6608,7 +6608,7 @@
       },
       "password": "Passwort",
       "passwordHint": "Besucher geben es ein, bevor sie den Beitrag sehen. Dein Team kommt ohne rein.",
-      "passwordPlaceholder": "Mindestens {min} Zeichen",
+      "passwordPlaceholder": "Passwort eingeben",
       "savePassword": "Speichern",
       "create": "Vorschau erstellen",
       "update": "Vorschau aktualisieren",
@@ -6626,7 +6626,11 @@
       "failed": "Der Vorschau-Build ist fehlgeschlagen",
       "loading": "Lädt…",
       "noSite": "Füge eine Notra-Seite mit Blog oder Changelog hinzu, um Beiträge darauf anzusehen.",
-      "newPasswordPlaceholder": "Neues Passwort eingeben"
+      "newPasswordPlaceholder": "Neues Passwort eingeben",
+      "passwordMinLength": "Mindestens {min} Zeichen",
+      "passwordSet": "Ein Passwort ist gesetzt. Gib ein neues ein, um es zu ersetzen.",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort ausblenden"
     },
     "githubPublish": {
       "trigger": "GitHub-PR erstellen",
