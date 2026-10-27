@@ -54,69 +54,67 @@ export function SystemSkillsClient({ slug }: SystemSkillsPageProps) {
         </div>
       ) : null}
       {query.data ? (
-        <div className="overflow-x-auto rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Skill</TableHead>
-                <TableHead className="text-right">Version</TableHead>
-                <TableHead className="text-right">Workspaces</TableHead>
-                <TableHead className="text-right">On latest</TableHead>
-                <TableHead className="text-right">Customized</TableHead>
-                <TableHead>Published</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Skill</TableHead>
+              <TableHead className="text-right">Version</TableHead>
+              <TableHead className="text-right">Workspaces</TableHead>
+              <TableHead className="text-right">On latest</TableHead>
+              <TableHead className="text-right">Customized</TableHead>
+              <TableHead>Published</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {query.data.map((skill) => (
+              <TableRow className="relative" key={skill.id}>
+                <TableCell className="max-w-md">
+                  <Link
+                    className="focus-visible:after:ring-ring font-mono text-sm font-medium after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset"
+                    href={`/${slug}/skills/${skill.name}`}
+                  >
+                    {skill.name}
+                  </Link>
+                  <p className="text-muted-foreground truncate text-xs">
+                    {skill.description}
+                  </p>
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  v{skill.version}
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    "text-right tabular-nums",
+                    skill.adoption.copies === 0 && "text-muted-foreground"
+                  )}
+                >
+                  {skill.adoption.copies}
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    "text-right tabular-nums",
+                    skill.adoption.onLatest === 0 && "text-muted-foreground"
+                  )}
+                >
+                  {skill.adoption.onLatest}
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    "text-right tabular-nums",
+                    skill.adoption.customized === 0 && "text-muted-foreground"
+                  )}
+                >
+                  {skill.adoption.customized}
+                </TableCell>
+                <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
+                  <time dateTime={skill.updatedAt} suppressHydrationWarning>
+                    {formatSkillDate(skill.updatedAt)}
+                  </time>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {query.data.map((skill) => (
-                <TableRow className="hover:bg-muted/40 relative" key={skill.id}>
-                  <TableCell className="max-w-md">
-                    <Link
-                      className="focus-visible:after:ring-ring font-mono text-sm font-medium after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset"
-                      href={`/${slug}/skills/${skill.name}`}
-                    >
-                      {skill.name}
-                    </Link>
-                    <p className="text-muted-foreground truncate text-xs">
-                      {skill.description}
-                    </p>
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    v{skill.version}
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "text-right tabular-nums",
-                      skill.adoption.copies === 0 && "text-muted-foreground"
-                    )}
-                  >
-                    {skill.adoption.copies}
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "text-right tabular-nums",
-                      skill.adoption.onLatest === 0 && "text-muted-foreground"
-                    )}
-                  >
-                    {skill.adoption.onLatest}
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "text-right tabular-nums",
-                      skill.adoption.customized === 0 && "text-muted-foreground"
-                    )}
-                  >
-                    {skill.adoption.customized}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
-                    <time dateTime={skill.updatedAt} suppressHydrationWarning>
-                      {formatSkillDate(skill.updatedAt)}
-                    </time>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
       ) : null}
     </main>
   );
