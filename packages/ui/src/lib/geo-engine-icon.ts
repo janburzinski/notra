@@ -108,6 +108,11 @@ const ENGINE_ICON_RULES: readonly EngineIconRule[] = [
     exact: ["exa"],
   },
   {
+    key: "parallel",
+    patterns: ["shapbot", "shap-user"],
+    exact: ["parallel"],
+  },
+  {
     key: "commoncrawl",
     patterns: ["ccbot", "common crawl", "commoncrawl"],
   },

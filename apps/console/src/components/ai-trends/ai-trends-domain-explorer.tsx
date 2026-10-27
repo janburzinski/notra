@@ -56,6 +56,7 @@ export function AiTrendsDomainExplorer({
   engine,
   engineOrder,
   suggestions,
+  initialShare,
   onDomainChange,
   onEngineChange,
 }: AiTrendsDomainExplorerProps) {
@@ -70,6 +71,7 @@ export function AiTrendsDomainExplorer({
     ...consoleOrpc.aiTrends.domainShare.queryOptions({
       input: { days, domain },
     }),
+    initialData: initialShare?.domain === domain ? initialShare : undefined,
     staleTime: AI_TRENDS_STALE_MS,
   });
   const data = shareQuery.data;

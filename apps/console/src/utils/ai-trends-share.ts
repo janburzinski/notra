@@ -84,7 +84,7 @@ export function anomalyShareCard(
   const label = anomaly.traffic ? anomaly.subject : anomaly.engineLabel;
   return {
     eyebrow: anomaly.engineLabel,
-    title: anomalyTitle(anomaly),
+    title: { ...anomalyTitle(anomaly), domain: anomaly.domain ?? undefined },
     description: `${anomalyDescription(anomaly, label)} ${formatWindow(window, true)}.`,
     icons: [{ kind: "engine", engine: anomaly.engine }],
     stats: [
@@ -151,6 +151,7 @@ export function domainShareCard({
       before: `${name}'s `,
       highlight,
       after: ` in ${engineLabel ?? "AI answers"}`,
+      domain: name === domain ? domain : undefined,
     },
     description: `${name}'s daily share of all citations in ${engineLabel ?? "AI engine"} answers across tracked prompts, ${formatWindow(window, true)}.`,
     icons: [

@@ -41,6 +41,12 @@ const CLASS_ATTRIBUTE = / class="[^"]*"/g;
 /** Roughly what fits on one line at 22px across the card; room is reserved per line. */
 const DESCRIPTION_LINE_CHARS = 120;
 const DESCRIPTION_LINE_HEIGHT = 32;
+/** Space between the eyebrow and the headline, and above the stats. */
+const TITLE_GAP = 24;
+const STATS_GAP = 36;
+/** Geist Bold's average advance in em, slightly generous so wrapping never overflows. */
+const TITLE_CHAR_WIDTH = 0.5;
+const CONTENT_WIDTH = AI_TRENDS_CARD_WIDTH - SHELL_PAD * 2 - CARD_PAD * 2;
 
 function svgDataUri(svg: string): string {
   const withNamespace = svg.includes("xmlns=")
@@ -453,9 +459,63 @@ function TrendPill({ change, theme }: { change: number; theme: Theme }) {
   );
 }
 
+/**
+ * One headline word, or the domain the headline names drawn after its
+ * favicon. Words keep trailing punctuation like "'s" attached.
+ */
+function TitleWord({
+  word,
+  domain,
+  favicon,
+  size,
+  theme,
+}: {
+  word: string;
+  domain: string | undefined;
+  favicon: string | null;
+  size: number;
+  theme: Theme;
+}) {
+  if (!(domain && favicon && word.startsWith(domain))) {
+    return <span>{word}</span>;
+  }
+  const tile = Math.round(size * 0.86);
+  return (
+    <span style={{ display: "flex", alignItems: "center" }}>
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: tile,
+          height: tile,
+          marginRight: Math.round(size * 0.2),
+          borderRadius: Math.round(tile * 0.26),
+          // Favicons are drawn for light surfaces, so their tile stays light.
+          background: "#FFFFFF",
+          border: `1.5px solid ${theme.cardBorder}`,
+        }}
+      >
+        {/* biome-ignore lint/performance/noImgElement: satori draws plain img */}
+        <img
+          alt=""
+          height={Math.round(tile * 0.68)}
+          src={favicon}
+          width={Math.round(tile * 0.68)}
+        />
+      </span>
+      {word}
+    </span>
+  );
+}
+
+function titleWords(text: string): string[] {
+  return text.split(" ").filter((word) => word.length > 0);
+}
+
 export async function renderShareCard(card: AiTrendsShareCard) {
   const theme = AI_TRENDS_CARD_THEMES[card.theme];
-  const [body, bold, icons] = await Promise.all([
+  const [body, bold, icons, favicon] = await Promise.all([
     loadRenderFont("Inter"),
     loadRenderFont("Geist:wght@700"),
     Promise.all(
@@ -463,6 +523,13 @@ export async function renderShareCard(card: AiTrendsShareCard) {
         icon.kind === "engine" ? engineLogo(icon.svg) : domainLogo(icon.value)
       )
     ),
+    // The eyebrow already shows the domain's logo when the card is about it.
+    card.title.domain &&
+    !card.icons.some(
+      (icon) => icon.kind === "domain" && icon.value === card.title.domain
+    )
+      ? domainLogo(card.title.domain)
+      : null,
   ]);
   const logos = icons.filter((icon) => icon !== null);
   const seriesLogos = card.series.map((item) =>
@@ -487,6 +554,11 @@ export async function renderShareCard(card: AiTrendsShareCard) {
   } else if (titleLength > 40) {
     titleSize = 50;
   }
+  // The headline wraps between words, so reserve every line it takes.
+  const titleLines = Math.max(
+    1,
+    Math.ceil((titleLength * titleSize * TITLE_CHAR_WIDTH) / CONTENT_WIDTH)
+  );
   const descriptionLines = Math.min(
     2,
     Math.max(1, Math.ceil(card.description.length / DESCRIPTION_LINE_CHARS))
@@ -496,11 +568,11 @@ export async function renderShareCard(card: AiTrendsShareCard) {
     cardHeight -
     CARD_PAD * 2 -
     44 -
-    16 -
-    Math.round(titleSize * 1.15) -
+    TITLE_GAP -
+    titleLines * Math.round(titleSize * 1.15) -
     16 -
     descriptionLines * DESCRIPTION_LINE_HEIGHT -
-    (card.stats.length > 0 ? 28 + 92 : 0) -
+    (card.stats.length > 0 ? STATS_GAP + 92 : 0) -
     28 -
     (legend ? 52 : 0);
 
@@ -631,12 +703,14 @@ export async function renderShareCard(card: AiTrendsShareCard) {
             <TrendPill change={lead.change} theme={theme} />
           ) : null}
         </div>
+        {/* Word by word, so every gap is one space wide and lines break between words. */}
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
-            marginTop: 16,
+            columnGap: Math.round(titleSize * 0.24),
+            marginTop: TITLE_GAP,
             fontFamily: "Geist",
             fontWeight: 700,
             fontSize: titleSize,
@@ -644,9 +718,16 @@ export async function renderShareCard(card: AiTrendsShareCard) {
             lineHeight: 1.15,
           }}
         >
-          {card.title.before ? (
-            <span style={{ whiteSpace: "pre" }}>{card.title.before}</span>
-          ) : null}
+          {titleWords(card.title.before).map((word, index) => (
+            <TitleWord
+              domain={card.title.domain}
+              favicon={favicon}
+              key={`before-${index.toString()}`}
+              size={titleSize}
+              theme={theme}
+              word={word}
+            />
+          ))}
           <span
             style={{
               whiteSpace: "pre",
@@ -654,14 +735,24 @@ export async function renderShareCard(card: AiTrendsShareCard) {
               background: theme.marker,
               borderRadius: 14,
               padding: "0 12px",
-              margin: "0 2px",
+              // Pulls the neighbouring words in so the pill's padding doesn't
+              // double the gap, but never past the card's text edge.
+              marginLeft: card.title.before.trim() ? -4 : 0,
+              marginRight: card.title.after.trim() ? -4 : 0,
             }}
           >
             {card.title.highlight}
           </span>
-          {card.title.after ? (
-            <span style={{ whiteSpace: "pre" }}>{card.title.after}</span>
-          ) : null}
+          {titleWords(card.title.after).map((word, index) => (
+            <TitleWord
+              domain={card.title.domain}
+              favicon={favicon}
+              key={`after-${index.toString()}`}
+              size={titleSize}
+              theme={theme}
+              word={word}
+            />
+          ))}
         </div>
         <div
           style={{
@@ -678,7 +769,7 @@ export async function renderShareCard(card: AiTrendsShareCard) {
           {card.description}
         </div>
         {card.stats.length > 0 ? (
-          <div style={{ display: "flex", marginTop: 28, height: 92 }}>
+          <div style={{ display: "flex", marginTop: STATS_GAP, height: 92 }}>
             {card.stats.map((stat, index) => (
               <div
                 key={stat.label}
@@ -727,7 +818,7 @@ export async function renderShareCard(card: AiTrendsShareCard) {
           height={chartHeight}
           series={series}
           theme={theme}
-          width={AI_TRENDS_CARD_WIDTH - SHELL_PAD * 2 - CARD_PAD * 2}
+          width={CONTENT_WIDTH}
         />
         {legend ? (
           <div

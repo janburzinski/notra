@@ -3,13 +3,14 @@ import {
   GEO_ENGINE_LABELS,
 } from "@notra/geo-core/constants/geo";
 import { engineModelOf } from "@notra/geo-core/utils/geo-engine-family";
+import { formatModelSlug } from "@notra/geo-core/utils/geo-model-label";
 import type { ChartConfig } from "@notra/ui/components/ui/chart";
 
 import {
   AI_TRENDS_AGENT_PROVIDERS,
   AI_TRENDS_BASELINE_DAYS,
   AI_TRENDS_CERTAIN_SCORE,
-  AI_TRENDS_HOST_PREFIX_PATTERN,
+  AI_TRENDS_HOST_PREFIXES,
   AI_TRENDS_ENGINE_COLORS,
   AI_TRENDS_MAX_ANOMALIES,
   AI_TRENDS_MAX_ANOMALIES_PER_ENGINE,
@@ -69,14 +70,13 @@ export function aiTrendsEngineName(engine: string): {
     ? ownLabel(GEO_BRAND_LABELS, provider)
     : undefined;
   if (agent) {
-    return { name: agent, surface: label ?? model };
+    return { name: agent, surface: label ?? formatModelSlug(model) };
   }
-  if (!label) {
-    return { name: engine, surface: null };
-  }
+  const base = engineModelOf(engine);
   return {
-    name: label,
-    surface: engineModelOf(engine) === engine ? null : "Web search",
+    // Models newer than the catalog read like the catalog's labels.
+    name: label ?? formatModelSlug(base.slice(base.indexOf("/") + 1)),
+    surface: base === engine ? null : "Web search",
   };
 }
 
@@ -106,7 +106,7 @@ export function formatCountTick(value: number): string {
 
 const URL_SCHEME = /^[a-z][a-z0-9+.-]*:\/\//;
 const URL_TAIL = /[/:?#].*$/;
-const HOST_PREFIX = new RegExp(AI_TRENDS_HOST_PREFIX_PATTERN);
+const HOST_PREFIX = new RegExp(`^(${AI_TRENDS_HOST_PREFIXES.join("|")})\\.`);
 
 /** A typed domain or pasted URL as citation domains are stored: bare host, no `www.`. */
 export function normalizeTrendsDomain(value: string): string {

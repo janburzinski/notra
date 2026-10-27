@@ -7,7 +7,7 @@ import {
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
-import { useQuery } from "@tanstack/react-query";
+import { usePrefetchQuery, useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 
 import { AiTrendsAdvertisers } from "@/components/ai-trends/ai-trends-advertisers";
@@ -50,6 +50,13 @@ export function AiTrendsClient() {
 
   const overviewQuery = useQuery({
     ...consoleOrpc.aiTrends.overview.queryOptions({ input: { days } }),
+    staleTime: AI_TRENDS_STALE_MS,
+  });
+  // The traffic section mounts once the overview is in; start its request
+  // now so it loads alongside the overview instead of after it. The overview
+  // carries the explorer's opening chart itself.
+  usePrefetchQuery({
+    ...consoleOrpc.aiTrends.traffic.queryOptions({ input: { days } }),
     staleTime: AI_TRENDS_STALE_MS,
   });
   const overview = overviewQuery.data;
@@ -115,6 +122,7 @@ export function AiTrendsClient() {
             domain={domain}
             engine={engine}
             engineOrder={engineOrder}
+            initialShare={overview.defaultDomainShare}
             onDomainChange={(next) => {
               setDomain(next);
               setEngine(null);

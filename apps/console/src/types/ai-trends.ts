@@ -140,6 +140,8 @@ export interface AiTrendsOverview {
   advertisers: AiTrendsAdvertiser[];
   answers: number;
   citations: number;
+  /** The domain explorer's opening chart, read alongside everything else. */
+  defaultDomainShare: AiTrendsDomainShare;
 }
 
 export interface AiTrendsDomainDay {
@@ -315,6 +317,8 @@ export interface AiTrendsDomainExplorerProps {
   engine: string | null;
   engineOrder: readonly string[];
   suggestions: string[];
+  /** The overview's share of `domain`, so the explorer doesn't fetch it again. */
+  initialShare?: AiTrendsDomainShare;
   onDomainChange: (domain: string) => void;
   onEngineChange: (engine: string | null) => void;
 }

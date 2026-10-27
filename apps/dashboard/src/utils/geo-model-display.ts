@@ -3,11 +3,10 @@ import {
   engineFamilyLabel,
   engineModelOf,
 } from "@notra/geo-core/utils/geo-engine-family";
+import { formatModelSlug } from "@notra/geo-core/utils/geo-model-label";
 import { isGroundedEngine } from "@notra/geo-core/utils/geo-presence";
 
 import {
-  MODEL_HYPHEN_PREFIXES,
-  MODEL_TOKEN_LABELS,
   MODELS_DEV_LOGO_ALIASES,
   MODELS_DEV_LOGO_BASE,
 } from "@/constants/geo-models";
@@ -15,10 +14,6 @@ import type { ParsedModelId } from "@/types/geo";
 
 const CHART_DIRECT_LABEL_SUFFIX = " (direct)";
 const CHART_GROUNDED_LABEL_SUFFIX = " (grounded)";
-
-const VERSION_TOKEN = /^v?\d/i;
-const ALPHA_TOKEN = /^[a-z]+$/i;
-const ALPHA_PREFIX_WITH_DIGITS = /^([a-z]+)(\d.*)$/i;
 
 export function splitModelId(modelId: string): ParsedModelId | null {
   const trimmed = modelId.trim();
@@ -119,48 +114,4 @@ export function formatChartEngineRankLabel(
   return isGroundedEngine(resolveChartEngineId(label))
     ? name
     : formatWithoutSearch(name);
-}
-
-function formatModelSlug(slug: string): string {
-  const parts = slug.split("-").filter((part) => part.length > 0);
-  if (parts.length === 0) {
-    return slug;
-  }
-
-  const labels = parts.map(formatModelToken);
-  let result = labels[0] ?? slug;
-  for (let index = 1; index < labels.length; index++) {
-    const previous = parts[index - 1]?.toLowerCase() ?? "";
-    const current = parts[index]?.toLowerCase() ?? "";
-    const label = labels[index];
-    if (!label) {
-      continue;
-    }
-    if (MODEL_HYPHEN_PREFIXES.has(previous) && VERSION_TOKEN.test(current)) {
-      result += `-${label}`;
-      continue;
-    }
-    result += ` ${label}`;
-  }
-  return result;
-}
-
-function formatModelToken(token: string): string {
-  const lower = token.toLowerCase();
-  const known = ownCatalogLabel(MODEL_TOKEN_LABELS, lower);
-  if (known) {
-    return known;
-  }
-  if (ALPHA_TOKEN.test(token)) {
-    return `${token.charAt(0).toUpperCase()}${token.slice(1).toLowerCase()}`;
-  }
-  const match = ALPHA_PREFIX_WITH_DIGITS.exec(lower);
-  if (match) {
-    const [, prefix = "", rest = ""] = match;
-    const prefixLabel = ownCatalogLabel(MODEL_TOKEN_LABELS, prefix);
-    if (prefixLabel) {
-      return `${prefixLabel}${rest}`;
-    }
-  }
-  return lower;
 }

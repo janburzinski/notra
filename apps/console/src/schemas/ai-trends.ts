@@ -53,6 +53,8 @@ export const aiTrendsShareCardSchema = z.object({
     before: z.string().max(80),
     highlight: z.string().min(1).max(60),
     after: z.string().max(80),
+    /** A domain the title names, drawn with its favicon. */
+    domain: z.string().max(MAX_DOMAIN).regex(DOMAIN_PATTERN).optional(),
   }),
   description: z.string().max(280),
   icons: z.array(shareCardIconSchema).max(3),

@@ -66,7 +66,13 @@ export const AI_TRENDS_AGENT_PROVIDERS = [
 export const AI_TRENDS_NEUTRAL_CHANGE = 0.01;
 
 /** Mobile and legacy hosts collapse into the site they belong to. */
-export const AI_TRENDS_HOST_PREFIX_PATTERN = "^(www|m|old|new|amp)\\.";
+export const AI_TRENDS_HOST_PREFIXES = [
+  "www",
+  "m",
+  "old",
+  "new",
+  "amp",
+] as const;
 
 /**
  * The dashboard's chart colors: primary violet, secondary teal and referral
