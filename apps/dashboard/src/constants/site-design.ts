@@ -38,6 +38,8 @@ export const SITE_TYPOGRAPHY_MODES = ["single", "pair"] as const;
 
 export const SITE_BANNER_TYPES = ["info", "warning", "critical"] as const;
 
+export const SITE_SEO_INDEXING_MODES = ["navigable", "all"] as const;
+
 /** Hex approximations of the sites-builder banner presets, for swatches. */
 export const SITE_BANNER_PRESET_COLORS = {
   warning: { light: "#9A5505", dark: "#864900" },

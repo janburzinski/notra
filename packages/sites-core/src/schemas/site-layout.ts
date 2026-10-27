@@ -2,6 +2,7 @@ import {
   SITE_HEX_COLOR,
   SITE_ICON_NAME,
   SITE_LINK_HREF,
+  SITE_META_TAG_NAME,
 } from "@notra/sites-core/constants/site-config";
 import {
   SITE_CONTEXTUAL_OPTIONS,
@@ -148,7 +149,7 @@ export const siteContextualSchema = z
 export const siteSeoSchema = z
   .object({
     metatags: z
-      .record(z.string().regex(/^[a-z][a-z0-9:_.-]*$/i), z.string().max(500))
+      .record(z.string().regex(SITE_META_TAG_NAME), z.string().max(500))
       .default({}),
     indexing: z.enum(["navigable", "all"]).default("navigable"),
     image: sitePathSchema.optional(),

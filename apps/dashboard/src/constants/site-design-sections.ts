@@ -6,6 +6,7 @@ import {
   Megaphone01Icon,
   PaintBoardIcon,
   Plug01Icon,
+  SeoIcon,
   TextFontIcon,
 } from "@hugeicons/core-free-icons";
 
@@ -27,6 +28,7 @@ export const SITE_DESIGN_SECTIONS = [
   { id: "banner", icon: Megaphone01Icon, paths: ["banner"] },
   { id: "footer", icon: LayoutBottomIcon, paths: ["footer"] },
   { id: "integrations", icon: Plug01Icon, paths: ["integrations"] },
+  { id: "seo", icon: SeoIcon, paths: ["seo.metatags", "seo.indexing"] },
 ] as const;
 
 /** Labelled groups of Design sections in the site sidebar. */
@@ -36,5 +38,5 @@ export const SITE_DESIGN_GROUPS = [
     sections: ["general", "styling", "branding", "typography"],
   },
   { id: "layout", sections: ["navbar", "banner", "footer"] },
-  { id: "configuration", sections: ["integrations"] },
+  { id: "configuration", sections: ["integrations", "seo"] },
 ] as const;

@@ -12,6 +12,8 @@ import {
   applyBrandToDesign,
   brandDefaultsFromGuidelines,
   describeBrandForDesign,
+  invalidMetaTagIds,
+  keepMetaTagRows,
   keepUnsavedFooterRows,
   newFooterColumn,
   patchDesign,
@@ -719,6 +721,157 @@ describe("site design form", () => {
       dark: "#5B21B6",
     });
     expect(siteConfigIssue(config)).toBeNull();
+  });
+
+  test("meta tags and indexing keep the share image and drop empty rows", () => {
+    const source = {
+      ...SOURCE,
+      seo: { image: "/og.png", metatags: { "twitter:site": "@acme" } },
+    };
+    const initial = readDesignForm(source);
+    expect(
+      initial.metaTags.map(({ name, content }) => [name, content])
+    ).toEqual([["twitter:site", "@acme"]]);
+    expect(initial.seoIndexing).toBe("navigable");
+    const config = patchDesign(
+      source,
+      {
+        ...initial,
+        metaTags: [
+          ...initial.metaTags,
+          { id: "a", name: " og:locale ", content: " de_DE " },
+          { id: "b", name: "", content: "" },
+        ],
+        seoIndexing: "all",
+      },
+      initial
+    );
+    expect(config.seo).toEqual({
+      image: "/og.png",
+      metatags: { "twitter:site": "@acme", "og:locale": "de_DE" },
+      indexing: "all",
+    });
+    expect(siteConfigIssue(config)).toBeNull();
+    const cleared = patchDesign(
+      config,
+      { ...readDesignForm(config), metaTags: [], seoIndexing: "navigable" },
+      readDesignForm(config)
+    );
+    expect(cleared.seo).toEqual({ image: "/og.png" });
+  });
+
+  test("changing indexing leaves the saved meta tags as written", () => {
+    const source = {
+      ...SOURCE,
+      seo: { metatags: { "twitter:site": "  @acme  " } },
+    };
+    const initial = readDesignForm(source);
+    const config = patchDesign(
+      source,
+      { ...initial, seoIndexing: "all" },
+      initial
+    );
+    expect(config.seo).toEqual({
+      metatags: { "twitter:site": "  @acme  " },
+      indexing: "all",
+    });
+  });
+
+  test("a meta tag value without a valid name is flagged", () => {
+    const initial = readDesignForm(SOURCE);
+    const config = patchDesign(
+      SOURCE,
+      { ...initial, metaTags: [{ id: "a", name: "", content: "x" }] },
+      initial
+    );
+    expect(siteConfigIssue(config)).toStartWith("seo.metatags");
+  });
+
+  test("meta tag rows the schema would reject are marked", () => {
+    expect([
+      ...invalidMetaTagIds([
+        { id: "ok", name: "og:locale", content: "de_DE" },
+        { id: "empty", name: "", content: "" },
+        { id: "nameless", name: "", content: "x" },
+        { id: "space", name: "my tag", content: "x" },
+        { id: "digit", name: "1tag", content: "" },
+        { id: "proto", name: "__proto__", content: "x" },
+      ]),
+    ]).toEqual(["nameless", "space", "digit", "proto"]);
+  });
+
+  test("meta tags sharing a name leave the saved tags alone", () => {
+    const source = {
+      ...SOURCE,
+      seo: { metatags: { "twitter:site": "@acme" } },
+    };
+    const initial = readDesignForm(source);
+    const config = patchDesign(
+      source,
+      {
+        ...initial,
+        metaTags: [
+          ...initial.metaTags,
+          { id: "a", name: "Twitter:site ", content: "" },
+        ],
+        seoIndexing: "all",
+      },
+      initial
+    );
+    expect(config.seo).toEqual({
+      metatags: { "twitter:site": "@acme" },
+      indexing: "all",
+    });
+  });
+
+  test("a save read-back keeps new and empty meta tag rows", () => {
+    const initial = readDesignForm(SOURCE);
+    const editing: SiteDesignForm = {
+      ...initial,
+      metaTags: [
+        { id: "uuid-1", name: "og:locale", content: "" },
+        { id: "uuid-2", name: "", content: "" },
+      ],
+    };
+    const written = patchDesign(SOURCE, editing, initial);
+    const read = structuredClone(written);
+    const saved = readDesignForm(read);
+    expect(saved.metaTags.map((tag) => tag.id)).toEqual(["tag-0"]);
+    expect(keepMetaTagRows(saved, editing, read, written).metaTags).toBe(
+      editing.metaTags
+    );
+    const elsewhere = { ...SOURCE, seo: { metatags: { robots: "noindex" } } };
+    expect(
+      keepMetaTagRows(readDesignForm(elsewhere), editing, elsewhere, written)
+        .metaTags
+    ).toEqual(readDesignForm(elsewhere).metaTags);
+  });
+
+  test("duplicate meta tag rows survive their own saves only", () => {
+    const source = {
+      ...SOURCE,
+      seo: { metatags: { "twitter:site": "@acme" } },
+    };
+    const initial = readDesignForm(source);
+    const typing = (name: string): SiteDesignForm => ({
+      ...initial,
+      metaTags: [...initial.metaTags, { id: "uuid-1", name, content: "" }],
+    });
+    const partial = patchDesign(source, typing("twitter:sit"), initial);
+    const editing = typing("twitter:site");
+    const written = patchDesign(partial, editing, typing("twitter:sit"));
+    const read = structuredClone(written);
+    expect(
+      keepMetaTagRows(readDesignForm(read), editing, read, written).metaTags
+    ).toBe(editing.metaTags);
+    const elsewhere = {
+      ...SOURCE,
+      seo: { metatags: { "twitter:site": "@notra" } },
+    };
+    expect(
+      keepMetaTagRows(readDesignForm(elsewhere), editing, elsewhere, written)
+        .metaTags
+    ).toEqual(readDesignForm(elsewhere).metaTags);
   });
 
   test("an untouched form writes the source back unchanged", () => {

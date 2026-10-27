@@ -8668,6 +8668,24 @@
         "darkColorHint": "Hintergrund im dunklen Modus.",
         "sameAsLight": "Wie im hellen Modus"
       },
+      "seo": {
+        "metaTags": "Meta-Tags",
+        "metaTagsHint": "Werden jeder Seite hinzugefügt. Ein Tag mit dem Namen eines eingebauten Tags, z. B. og:image, ersetzt es. Ein eigener robots-Tag gilt nur auf Seiten, die Suchmaschinen indexieren dürfen.",
+        "tagName": "Name von Meta-Tag {number}",
+        "tagNamePlaceholder": "Name",
+        "tagContent": "Wert von Meta-Tag {number}",
+        "tagContentPlaceholder": "Wert",
+        "removeTag": "Meta-Tag {number} entfernen",
+        "addTag": "Meta-Tag hinzufügen",
+        "duplicateTag": "Zwei Meta-Tags heißen {name}. Benenne einen um oder entferne ihn, um zu speichern.",
+        "invalidTag": "Jedes Meta-Tag braucht einen Namen. Namen beginnen mit einem Buchstaben und enthalten nur Buchstaben, Ziffern, Doppelpunkte, Unterstriche, Punkte und Bindestriche.",
+        "indexing": "Indexierung",
+        "indexingHint": "Navigierbar indexiert deine Beiträge und Bereichsseiten. Alle Seiten indexiert zusätzlich Tag- und Autorenseiten.",
+        "indexingModes": {
+          "navigable": "Navigierbar",
+          "all": "Alle Seiten"
+        }
+      },
       "footer": {
         "socials": "Social Links",
         "socialsHint": "Profile, die im Footer als Icons erscheinen. Website-Links zeigen das Favicon der Seite.",
@@ -8745,7 +8763,8 @@
           "navbar": "Navigation",
           "banner": "Banner",
           "integrations": "Integrationen",
-          "footer": "Footer"
+          "footer": "Footer",
+          "seo": "SEO"
         },
         "hints": {
           "general": "Name und Beschreibung für deine Leser.",
@@ -8755,7 +8774,8 @@
           "navbar": "Links und Aktionen in der Seitennavigation.",
           "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",
           "integrations": "Analytics und Cookie-Banner für diese Seite.",
-          "footer": "Social Links und Link-Spalten unten auf jeder Seite."
+          "footer": "Social Links und Link-Spalten unten auf jeder Seite.",
+          "seo": "Meta-Tags und welche Seiten Suchmaschinen indexieren."
         }
       },
       "errors": {

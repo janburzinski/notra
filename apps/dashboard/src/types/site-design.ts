@@ -13,6 +13,7 @@ import type {
   SITE_CODE_THEME_MODES,
   SITE_FONT_FORMATS,
   SITE_FONT_WEIGHTS,
+  SITE_SEO_INDEXING_MODES,
   SITE_TYPOGRAPHY_MODES,
 } from "@/constants/site-design";
 
@@ -24,6 +25,7 @@ export type SiteFontWeight = (typeof SITE_FONT_WEIGHTS)[number];
 export type SiteFontFormat = (typeof SITE_FONT_FORMATS)[number];
 export type SiteTypographyMode = (typeof SITE_TYPOGRAPHY_MODES)[number];
 export type SiteBannerType = (typeof SITE_BANNER_TYPES)[number];
+export type SiteSeoIndexing = (typeof SITE_SEO_INDEXING_MODES)[number];
 export type SiteSocialPlatform = (typeof SITE_SOCIAL_PLATFORMS)[number];
 export type SiteNavbarButton =
   | "none"
@@ -47,6 +49,12 @@ export interface SiteNavbarLinkForm {
   id: string;
   label: string;
   href: string;
+}
+
+export interface SiteMetaTagForm {
+  id: string;
+  name: string;
+  content: string;
 }
 
 export interface SiteFooterSocialForm {
@@ -107,6 +115,8 @@ export interface SiteDesignForm {
   bannerType: SiteBannerType;
   bannerLight: string;
   bannerDark: string;
+  metaTags: SiteMetaTagForm[];
+  seoIndexing: SiteSeoIndexing;
   footerSocials: SiteFooterSocialForm[];
   footerColumnsEnabled: boolean;
   footerColumns: SiteFooterColumnForm[];

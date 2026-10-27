@@ -2,6 +2,7 @@ import {
   SITE_DEFAULT_APPEARANCE_STORAGE_KEY,
   SITE_DEFAULT_PRIMARY_COLOR,
   SITE_HEX_COLOR,
+  SITE_META_TAG_NAME,
 } from "@notra/sites-core/constants/site-config";
 import {
   SITE_NAVBAR_LINK_TYPES,
@@ -17,6 +18,7 @@ import {
   SITE_DEFAULT_CODE_DARK_THEME,
   SITE_DEFAULT_CODE_LIGHT_THEME,
   SITE_FONT_FORMATS,
+  SITE_SEO_INDEXING_MODES,
   SITE_SOCIAL_LINKS,
 } from "@/constants/site-design";
 import type { BrandGuidelinesResponse } from "@/types/hooks/brand-guidelines";
@@ -28,6 +30,7 @@ import type {
   SiteDesignForm,
   SiteFontFormat,
   SiteFontSpecForm,
+  SiteMetaTagForm,
   SiteFooterColumnForm,
   SiteFooterLinkForm,
   SiteFooterSocialForm,
@@ -102,6 +105,7 @@ const BANNER_KEYS: readonly SiteDesignKey[] = [
   "bannerDark",
 ];
 
+const SEO_KEYS: readonly SiteDesignKey[] = ["metaTags", "seoIndexing"];
 const FOOTER_SOCIAL_KEYS: readonly SiteDesignKey[] = ["footerSocials"];
 const FOOTER_COLUMN_KEYS: readonly SiteDesignKey[] = [
   "footerColumnsEnabled",
@@ -404,6 +408,16 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
       SITE_BANNER_TYPES.find((item) => item === banner.type) ?? "info",
     bannerLight: bannerColor.light,
     bannerDark: hasSeparateModes(banner.color) ? bannerColor.dark : "",
+    metaTags: Object.entries(record(seo.metatags)).map(
+      ([name, content], index) => ({
+        id: `tag-${index}`,
+        name,
+        content: text(content),
+      })
+    ),
+    seoIndexing:
+      SITE_SEO_INDEXING_MODES.find((item) => item === seo.indexing) ??
+      "navigable",
     footerSocials: readFooterSocials(footer),
     footerColumnsEnabled: footerColumns.length > 0,
     footerColumns,
@@ -441,6 +455,79 @@ function patchShareImage(config: SiteRawConfig, form: SiteDesignForm) {
   const image = form.shareImage.trim();
   assign(seo, "image", image || undefined);
   assign(seo, "imageAlt", (image && form.shareImageAlt.trim()) || undefined);
+  assignObject(config, "seo", seo);
+}
+
+/** Lowercased names that more than one meta tag row uses. */
+export function duplicateMetaTagNames(
+  tags: readonly SiteMetaTagForm[]
+): Set<string> {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  for (const tag of tags) {
+    const name = tag.name.trim().toLowerCase();
+    if (name && seen.has(name)) {
+      duplicates.add(name);
+    }
+    seen.add(name);
+  }
+  return duplicates;
+}
+
+/** Rows blog.json would reject: a name the schema refuses, or a value without a name. */
+export function invalidMetaTagIds(
+  tags: readonly SiteMetaTagForm[]
+): Set<string> {
+  return new Set(
+    tags
+      .filter((tag) => {
+        const name = tag.name.trim();
+        return (
+          (name || tag.content.trim()) !== "" && !SITE_META_TAG_NAME.test(name)
+        );
+      })
+      .map((tag) => tag.id)
+  );
+}
+
+/** Empty rows are dropped; a value without a name stays so the schema flags it. */
+function metaTagRecord(tags: readonly SiteMetaTagForm[]): SiteRawConfig {
+  const metatags: SiteRawConfig = {};
+  for (const tag of tags) {
+    const name = tag.name.trim();
+    const content = tag.content.trim();
+    if (name || content) {
+      metatags[name] = content;
+    }
+  }
+  return metatags;
+}
+
+/** Rows sharing a name would overwrite each other, so they leave the saved tags alone. */
+function patchSeo(
+  config: SiteRawConfig,
+  form: SiteDesignForm,
+  initial: SiteDesignForm
+) {
+  const seo: SiteRawConfig = { ...record(config.seo) };
+  if (
+    changed(form, initial, ["metaTags"]) &&
+    duplicateMetaTagNames(form.metaTags).size === 0
+  ) {
+    const metatags = metaTagRecord(form.metaTags);
+    assign(
+      seo,
+      "metatags",
+      Object.keys(metatags).length > 0 ? metatags : undefined
+    );
+  }
+  if (changed(form, initial, ["seoIndexing"])) {
+    assign(
+      seo,
+      "indexing",
+      form.seoIndexing === "navigable" ? undefined : form.seoIndexing
+    );
+  }
   assignObject(config, "seo", seo);
 }
 
@@ -736,6 +823,9 @@ export function patchDesign(
   if (changed(form, initial, BANNER_KEYS)) {
     patchBanner(config, form);
   }
+  if (changed(form, initial, SEO_KEYS)) {
+    patchSeo(config, form, initial);
+  }
   if (changed(form, initial, [...FOOTER_SOCIAL_KEYS, ...FOOTER_COLUMN_KEYS])) {
     patchFooter(config, form, initial);
   }
@@ -744,6 +834,29 @@ export function patchDesign(
 
 export function newNavbarLink(): SiteNavbarLinkForm {
   return { id: crypto.randomUUID(), label: "", href: "" };
+}
+
+export function newMetaTag(): SiteMetaTagForm {
+  return { id: crypto.randomUUID(), name: "", content: "" };
+}
+
+/**
+ * Keeps the rows being edited when the document read back holds the tags
+ * last written from them, so row ids (and focus), unfinished rows and rows
+ * sharing a name (which aren't written) survive autosave. Tags changed
+ * elsewhere replace the rows.
+ */
+export function keepMetaTagRows(
+  next: SiteDesignForm,
+  current: SiteDesignForm,
+  read: SiteRawConfig,
+  written: SiteRawConfig
+): SiteDesignForm {
+  const tags = (config: SiteRawConfig) =>
+    JSON.stringify(record(config.seo).metatags ?? null);
+  return tags(read) === tags(written)
+    ? { ...next, metaTags: current.metaTags }
+    : next;
 }
 
 export function newFooterLink(): SiteFooterLinkForm {
@@ -792,6 +905,36 @@ export function keepUnsavedFooterRows(
             : next.footerFlatLinks,
         }
       : {}),
+  };
+}
+
+/**
+ * The form after a save is read back from blog.json (`read`), keeping what
+ * blog.json can't hold yet: unsaved footer and meta tag rows, and the
+ * settings of a banner whose text is still empty.
+ */
+export function readBackDesignForm(
+  read: SiteRawConfig,
+  form: SiteDesignForm,
+  written: SiteRawConfig
+): SiteDesignForm {
+  const next = keepMetaTagRows(
+    keepUnsavedFooterRows(readDesignForm(read), form),
+    form,
+    read,
+    written
+  );
+  // An empty banner isn't saved, so keep its settings while the text is empty.
+  if (!form.bannerEnabled || form.bannerContent.trim()) {
+    return next;
+  }
+  return {
+    ...next,
+    bannerEnabled: true,
+    bannerDismissible: form.bannerDismissible,
+    bannerType: form.bannerType,
+    bannerLight: form.bannerLight,
+    bannerDark: form.bannerDark,
   };
 }
 

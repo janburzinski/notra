@@ -8668,6 +8668,24 @@
         "darkColorHint": "Background in dark mode.",
         "sameAsLight": "Same as light mode"
       },
+      "seo": {
+        "metaTags": "Meta tags",
+        "metaTagsHint": "Added to every page. A tag with the same name as a built-in one, like og:image, replaces it. A custom robots tag only applies to pages search engines may index.",
+        "tagName": "Name of meta tag {number}",
+        "tagNamePlaceholder": "Name",
+        "tagContent": "Value of meta tag {number}",
+        "tagContentPlaceholder": "Value",
+        "removeTag": "Remove meta tag {number}",
+        "addTag": "Add meta tag",
+        "duplicateTag": "Two meta tags are named {name}. Rename or remove one to save.",
+        "invalidTag": "Every meta tag needs a name. Names start with a letter and can only contain letters, numbers, colons, underscores, dots and dashes.",
+        "indexing": "Indexing",
+        "indexingHint": "Navigable indexes your posts and section pages. All pages also indexes tag and author pages.",
+        "indexingModes": {
+          "navigable": "Navigable",
+          "all": "All pages"
+        }
+      },
       "footer": {
         "socials": "Social links",
         "socialsHint": "Profiles shown as icons in the footer. Website links show that site's favicon.",
@@ -8745,7 +8763,8 @@
           "navbar": "Navbar",
           "banner": "Banner",
           "integrations": "Integrations",
-          "footer": "Footer"
+          "footer": "Footer",
+          "seo": "SEO"
         },
         "hints": {
           "general": "The name and description readers see.",
@@ -8755,7 +8774,8 @@
           "navbar": "Links and actions in the site navigation.",
           "banner": "An announcement bar at the top of every page.",
           "integrations": "Analytics and the cookie banner for this site.",
-          "footer": "Social links and link columns at the bottom of every page."
+          "footer": "Social links and link columns at the bottom of every page.",
+          "seo": "Meta tags and which pages search engines index."
         }
       },
       "errors": {

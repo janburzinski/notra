@@ -11,6 +11,7 @@ import { SiteBrandingFields } from "@/components/sites/site-branding-fields";
 import { SiteFooterFields } from "@/components/sites/site-footer-fields";
 import { SiteGeneralFields } from "@/components/sites/site-general-fields";
 import { SiteNavbarFields } from "@/components/sites/site-navbar-fields";
+import { SiteSeoFields } from "@/components/sites/site-seo-fields";
 import { SiteSettingsList } from "@/components/sites/site-settings-item";
 import { SiteStylingFields } from "@/components/sites/site-styling-fields";
 import { SiteTypographyFields } from "@/components/sites/site-typography-fields";
@@ -24,8 +25,8 @@ import type { SiteDesignAppearanceProps } from "@/types/site-design-sections";
 import {
   applyBrandToDesign,
   describeBrandForDesign,
-  keepUnsavedFooterRows,
   patchDesign,
+  readBackDesignForm,
   readDesignForm,
 } from "@/utils/site-design";
 
@@ -33,32 +34,22 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
   const state = useSiteWorkspace()!;
   const [form, setForm] = useState(() => readDesignForm(state.config));
   const [snapshot, setSnapshot] = useState(state.document);
+  const [written, setWritten] = useState(state.config);
   const [brandOpen, setBrandOpen] = useState(false);
   const brand = useSiteBrandDefaults();
   const t = useTranslations("sites.design");
   if (snapshot !== state.document && !state.unsaved) {
     setSnapshot(state.document);
-    const next = keepUnsavedFooterRows(readDesignForm(state.config), form);
-    // An empty banner isn't saved, so keep its settings while the text is empty.
-    const emptyBanner = form.bannerEnabled && !form.bannerContent.trim();
-    setForm(
-      emptyBanner
-        ? {
-            ...next,
-            bannerEnabled: true,
-            bannerDismissible: form.bannerDismissible,
-            bannerType: form.bannerType,
-            bannerLight: form.bannerLight,
-            bannerDark: form.bannerDark,
-          }
-        : next
-    );
+    setWritten(state.config);
+    setForm(readBackDesignForm(state.config, form, written));
   }
   const change = (next: SiteDesignForm) => {
     if (state.readOnly) {
       return;
     }
-    state.update(patchDesign(state.config, next, form));
+    const config = patchDesign(state.config, next, form);
+    state.update(config);
+    setWritten(config);
     setForm(next);
   };
   const update: SiteDesignFieldsProps<SiteDesignForm>["update"] = (
@@ -134,6 +125,13 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
     return (
       <SiteSettingsList>
         <SiteBannerFields form={form} update={update} />
+      </SiteSettingsList>
+    );
+  }
+  if (section === "seo") {
+    return (
+      <SiteSettingsList>
+        <SiteSeoFields form={form} update={update} />
       </SiteSettingsList>
     );
   }
