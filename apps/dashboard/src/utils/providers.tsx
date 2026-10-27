@@ -24,12 +24,6 @@ import { useUiLabelsTranslations } from "@/lib/i18n/ui-labels";
 import { configureZodLocale } from "@/lib/i18n/zod";
 import dynamic from "@/utils/lazy-component";
 
-const DatabuddyAnalytics = dynamic(() =>
-  import("@/components/providers/databuddy-analytics").then(
-    (module) => module.DatabuddyAnalytics
-  )
-);
-
 const ReactQueryDevtools =
   process.env.NODE_ENV === "development"
     ? dynamic(() =>
@@ -118,9 +112,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 ) : null}
               </NuqsAdapter>
               <Toaster position="bottom-right" />
-              <Suspense fallback={null}>
-                {isClient ? <DatabuddyAnalytics /> : null}
-              </Suspense>
             </TooltipProvider>
           </UiLabelsProvider>
         </ThemeProvider>

@@ -39,7 +39,7 @@ export function PostHogIdentity() {
     return subscribeWhenPostHogReady((posthog) => {
       const identifiedUserId = posthog.get_property("$user_id");
 
-      if (!userId) {
+      if (!(userId && measurementGranted)) {
         if (identifiedUserId) {
           clearPostHogIdentity(posthog);
           reapplyPostHogMeasurementConsent(posthog);
@@ -60,7 +60,7 @@ export function PostHogIdentity() {
   }, [email, hidePersonalData, isPending, measurementGranted, name, userId]);
 
   useEffect(() => {
-    if (!POSTHOG_PROJECT_TOKEN || isPending || !userId) {
+    if (!POSTHOG_PROJECT_TOKEN || isPending || !userId || !measurementGranted) {
       return;
     }
 

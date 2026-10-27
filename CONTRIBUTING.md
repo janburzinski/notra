@@ -656,8 +656,8 @@ for CORS and `NOTRA_DEMO_API_URL=https://demo-api.usenotra.com`. Its current
 startup validation also requires `AUTUMN_SECRET_KEY` and `QSTASH_TOKEN`; use
 demo/test credentials, not production credentials. Keep any optional services
 the demo uses (for example logging, object storage, QStash signing keys) scoped
-to demo as well. The dashboard's optional
-`NEXT_PUBLIC_DATABUDDY_DEMO_DASHBOARD_WEBSITE_ID` is a public build value.
+to demo as well. The demo has no consent banner, so it loads no Databuddy
+analytics.
 
 Unkey provides these variables at build time via its BuildKit secret mount.
 The dashboard Dockerfile declares `UNKEY_SECRETS_ID` and sources that file in

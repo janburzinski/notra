@@ -31,9 +31,18 @@ import {
   loadCatalog,
 } from "@/lib/i18n/catalog";
 import { getLocale } from "@/lib/i18n/server";
+import dynamic from "@/utils/lazy-component";
 import { Providers } from "@/utils/providers";
 
 import styles from "@/styles/globals.css?url";
+
+const DatabuddyAnalytics = dynamic(
+  () =>
+    import("@/components/providers/databuddy-analytics").then(
+      (module) => module.DatabuddyAnalytics
+    ),
+  { ssr: false }
+);
 
 const loadRootState = createServerFn({ method: "GET" }).handler(async () => {
   const locale = await getLocale();
@@ -113,6 +122,7 @@ function Root() {
               state={consent}
             >
               {app}
+              <DatabuddyAnalytics />
               <ConsentBanner />
               <ConsentDialog />
             </ConsentRoot>
