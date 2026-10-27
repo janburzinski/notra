@@ -38,6 +38,12 @@ Explicit requirements and this repo's conventions take precedence. Companion
 - The pre-commit hook formats staged supported files and runs Knip. Do not
   overwrite unrelated or partially staged changes to make it pass.
 - Never use production credentials or customer data for verification.
+- Before adding or swapping any third-party SDK, external API, hosting
+  provider, AI model or provider, analytics or logging tool, or a new external
+  env var, and before editing the legal pages, data retention, deletion or AI
+  privacy flags, read and apply `.agents/skills/dpa-check/SKILL.md`. It is a
+  hard gate: a new sub-processor must be listed at `/subprocessors` at least 14
+  days before it receives customer data. No exceptions.
 - The Sites E2E suite (`apps/sites-e2e`) gates every production deploy. When a
   change to `apps/sites`, `apps/sites-builder`, `packages/sites-*` or the Sites
   dashboard code changes user-facing behaviour, update or extend its tests in

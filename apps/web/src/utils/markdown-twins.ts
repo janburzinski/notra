@@ -95,6 +95,16 @@ const LEGAL_PAGES = [
     title: "Legal Notice",
     filename: "legal.mdx",
   },
+  {
+    pattern: "/dpa",
+    title: "Data Processing Agreement",
+    filename: "dpa.mdx",
+  },
+  {
+    pattern: "/subprocessors",
+    title: "Sub-processors",
+    filename: "subprocessors.mdx",
+  },
 ] as const;
 
 const STATIC_MARKDOWN_PAGES = [

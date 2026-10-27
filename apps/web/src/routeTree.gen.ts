@@ -62,9 +62,11 @@ import { Route as V1IndexRouteImport } from './routes/v1/index'
 import { Route as V1StatusRouteImport } from './routes/v1/status'
 import { Route as DotwellKnownMcpIndexRouteImport } from './routes/[.]well-known/mcp/index'
 import { Route as DotwellKnownMcpServerCardDotjsonRouteImport } from './routes/[.]well-known/mcp/server-card[.]json'
+import { Route as SiteLegalDpaRouteImport } from './routes/_site/_legal/dpa'
 import { Route as SiteLegalLegalRouteImport } from './routes/_site/_legal/legal'
 import { Route as SiteLegalPartnerTermsRouteImport } from './routes/_site/_legal/partner-terms'
 import { Route as SiteLegalPrivacyRouteImport } from './routes/_site/_legal/privacy'
+import { Route as SiteLegalSubprocessorsRouteImport } from './routes/_site/_legal/subprocessors'
 import { Route as SiteLegalTermsRouteImport } from './routes/_site/_legal/terms'
 import { Route as SiteCompareIndexRouteImport } from './routes/_site/compare/index'
 import { Route as SiteContributorsIndexRouteImport } from './routes/_site/contributors/index'
@@ -382,6 +384,11 @@ const DotwellKnownMcpServerCardDotjsonRoute =
     path: '/.well-known/mcp/server-card.json',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SiteLegalDpaRoute = SiteLegalDpaRouteImport.update({
+  id: '/dpa',
+  path: '/dpa',
+  getParentRoute: () => SiteLegalRoute,
+} as any)
 const SiteLegalLegalRoute = SiteLegalLegalRouteImport.update({
   id: '/legal',
   path: '/legal',
@@ -395,6 +402,11 @@ const SiteLegalPartnerTermsRoute = SiteLegalPartnerTermsRouteImport.update({
 const SiteLegalPrivacyRoute = SiteLegalPrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => SiteLegalRoute,
+} as any)
+const SiteLegalSubprocessorsRoute = SiteLegalSubprocessorsRouteImport.update({
+  id: '/subprocessors',
+  path: '/subprocessors',
   getParentRoute: () => SiteLegalRoute,
 } as any)
 const SiteLegalTermsRoute = SiteLegalTermsRouteImport.update({
@@ -713,9 +725,11 @@ export interface FileRoutesByFullPath {
   '/api/': typeof ApiIndexRoute
   '/v1/': typeof V1IndexRoute
   '/.well-known/mcp/server-card.json': typeof DotwellKnownMcpServerCardDotjsonRoute
+  '/dpa': typeof SiteLegalDpaRoute
   '/legal': typeof SiteLegalLegalRoute
   '/partner-terms': typeof SiteLegalPartnerTermsRoute
   '/privacy': typeof SiteLegalPrivacyRoute
+  '/subprocessors': typeof SiteLegalSubprocessorsRoute
   '/terms': typeof SiteLegalTermsRoute
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
@@ -815,9 +829,11 @@ export interface FileRoutesByTo {
   '/api': typeof ApiIndexRoute
   '/v1': typeof V1IndexRoute
   '/.well-known/mcp/server-card.json': typeof DotwellKnownMcpServerCardDotjsonRoute
+  '/dpa': typeof SiteLegalDpaRoute
   '/legal': typeof SiteLegalLegalRoute
   '/partner-terms': typeof SiteLegalPartnerTermsRoute
   '/privacy': typeof SiteLegalPrivacyRoute
+  '/subprocessors': typeof SiteLegalSubprocessorsRoute
   '/terms': typeof SiteLegalTermsRoute
   '/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
   '/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
@@ -923,9 +939,11 @@ export interface FileRoutesById {
   '/api/': typeof ApiIndexRoute
   '/v1/': typeof V1IndexRoute
   '/.well-known/mcp/server-card.json': typeof DotwellKnownMcpServerCardDotjsonRoute
+  '/_site/_legal/dpa': typeof SiteLegalDpaRoute
   '/_site/_legal/legal': typeof SiteLegalLegalRoute
   '/_site/_legal/partner-terms': typeof SiteLegalPartnerTermsRoute
   '/_site/_legal/privacy': typeof SiteLegalPrivacyRoute
+  '/_site/_legal/subprocessors': typeof SiteLegalSubprocessorsRoute
   '/_site/_legal/terms': typeof SiteLegalTermsRoute
   '/_site/contributors/opengraph-image': typeof SiteContributorsOpengraphImageRoute
   '/_site/features/ai-crawler-logs': typeof SiteFeaturesAiCrawlerLogsRoute
@@ -1027,9 +1045,11 @@ export interface FileRouteTypes {
     | '/api/'
     | '/v1/'
     | '/.well-known/mcp/server-card.json'
+    | '/dpa'
     | '/legal'
     | '/partner-terms'
     | '/privacy'
+    | '/subprocessors'
     | '/terms'
     | '/contributors/opengraph-image'
     | '/features/ai-crawler-logs'
@@ -1129,9 +1149,11 @@ export interface FileRouteTypes {
     | '/api'
     | '/v1'
     | '/.well-known/mcp/server-card.json'
+    | '/dpa'
     | '/legal'
     | '/partner-terms'
     | '/privacy'
+    | '/subprocessors'
     | '/terms'
     | '/contributors/opengraph-image'
     | '/features/ai-crawler-logs'
@@ -1236,9 +1258,11 @@ export interface FileRouteTypes {
     | '/api/'
     | '/v1/'
     | '/.well-known/mcp/server-card.json'
+    | '/_site/_legal/dpa'
     | '/_site/_legal/legal'
     | '/_site/_legal/partner-terms'
     | '/_site/_legal/privacy'
+    | '/_site/_legal/subprocessors'
     | '/_site/_legal/terms'
     | '/_site/contributors/opengraph-image'
     | '/_site/features/ai-crawler-logs'
@@ -1713,6 +1737,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotwellKnownMcpServerCardDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_site/_legal/dpa': {
+      id: '/_site/_legal/dpa'
+      path: '/dpa'
+      fullPath: '/dpa'
+      preLoaderRoute: typeof SiteLegalDpaRouteImport
+      parentRoute: typeof SiteLegalRoute
+    }
     '/_site/_legal/legal': {
       id: '/_site/_legal/legal'
       path: '/legal'
@@ -1732,6 +1763,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof SiteLegalPrivacyRouteImport
+      parentRoute: typeof SiteLegalRoute
+    }
+    '/_site/_legal/subprocessors': {
+      id: '/_site/_legal/subprocessors'
+      path: '/subprocessors'
+      fullPath: '/subprocessors'
+      preLoaderRoute: typeof SiteLegalSubprocessorsRouteImport
       parentRoute: typeof SiteLegalRoute
     }
     '/_site/_legal/terms': {
@@ -2137,16 +2175,20 @@ const SiteChangelogRouteWithChildren = SiteChangelogRoute._addFileChildren(
 )
 
 interface SiteLegalRouteChildren {
+  SiteLegalDpaRoute: typeof SiteLegalDpaRoute
   SiteLegalLegalRoute: typeof SiteLegalLegalRoute
   SiteLegalPartnerTermsRoute: typeof SiteLegalPartnerTermsRoute
   SiteLegalPrivacyRoute: typeof SiteLegalPrivacyRoute
+  SiteLegalSubprocessorsRoute: typeof SiteLegalSubprocessorsRoute
   SiteLegalTermsRoute: typeof SiteLegalTermsRoute
 }
 
 const SiteLegalRouteChildren: SiteLegalRouteChildren = {
+  SiteLegalDpaRoute: SiteLegalDpaRoute,
   SiteLegalLegalRoute: SiteLegalLegalRoute,
   SiteLegalPartnerTermsRoute: SiteLegalPartnerTermsRoute,
   SiteLegalPrivacyRoute: SiteLegalPrivacyRoute,
+  SiteLegalSubprocessorsRoute: SiteLegalSubprocessorsRoute,
   SiteLegalTermsRoute: SiteLegalTermsRoute,
 }
 
