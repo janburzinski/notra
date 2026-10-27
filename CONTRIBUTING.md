@@ -145,13 +145,13 @@ creating a workspace. Existing signed demo sessions do not need another check.
 Reset/customize still require a signed session and retain their shared reset
 budget; they do not grant a new anonymous session.
 
-Before deploying this protection, configure the Railway **dashboard** service in
-**notra-demo / production**:
+Before deploying this protection, configure the Unkey demo dashboard app's
+production environment:
 
 | Variable | Value |
 | --- | --- |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | The existing website widget's public site key, or a dedicated demo widget's key |
-| `TURNSTILE_SECRET` | The matching widget secret; keep it in Railway's secret configuration |
+| `TURNSTILE_SECRET` | The matching widget secret; keep it write-only in Unkey |
 | `TURNSTILE_HOSTNAMES` | `demo.usenotra.com` (exact hostnames, comma-separated if needed) |
 
 In Cloudflare **Turnstile**, reuse the website widget if its hostname list already
@@ -678,8 +678,14 @@ bun run db:migrate
 Alternatively, run `/migrate/run.sh` as an entrypoint override on the built
 dashboard image with `MIGRATION_DATABASE_URL` set to a direct demo connection.
 Do not run migrations during image builds or on every replica's startup.
-The scheduled release does not run demo migrations; apply new compatible
-migrations before releasing changes that need them. Sandbox seeding and
+The scheduled release migrates the demo database itself: before the first
+demo build, it runs the committed migrations with the GitHub Actions secret
+`DEMO_MIGRATION_DATABASE_URL` (a direct `neondb_owner` connection to the demo
+database, not the pooler). Without that secret, both demo apps are skipped and
+keep their current build; a failed migration stops both demo builds. After
+the demo deploys, the release calls `/api/healthcheck?deep=1` on the demo,
+which selects every column of every table through the app's own database role
+(no rows) and fails with the first missing table or column. Sandbox seeding and
 pool cleanup happen on visitor requests, not through a Railway/Vercel cron.
 
 ### First deployment and cutover
@@ -703,10 +709,9 @@ pool cleanup happen on visitor requests, not through a Railway/Vercel cron.
    entry, seeded GEO data, sandbox reset, a generated demo API key, a real
    request from the API console, request-log updates, and one streaming chat
    or content-generation run. A green liveness probe alone is not sufficient.
-5. Keep Railway available for rollback until those checks pass. Configuring the
-   shared deployment key removes its two demo services from the Railway release;
-   it does **not** delete them or modify DNS. Disable any old independent deployment triggers
-   and update the private infra repository before eventually retiring them.
+5. The release no longer deploys the demo to Railway. The old Railway demo
+   services are not deleted and DNS is not changed; retire them in the private
+   infra repository.
 
 For scheduled releases, use the existing GitHub Actions secret `UNKEY_DEPLOY_ROOT_KEY`
 with read access to every enabled Unkey app, its production environment, domains and
@@ -718,7 +723,7 @@ run **Production deploy** with `dry_run` checked. Then disable production
 release. The script checks all targets before any builds, deploys demo API
 before dashboard, and verifies the exact checked commit is current. The shared
 `UNKEY_DEPLOY_ROOT_KEY` enables all four Unkey releases; no additional flags are
-needed. Without the key, the legacy Railway release path remains in use.
+needed. Without the key, the demo apps are not released.
 Inaccessible Unkey targets fail closed, without permission-error fallback.
 Provider rollback requires an explicit release-routing change; it
 does not switch DNS, move data, or roll back a running deployment. Restore and
@@ -801,14 +806,14 @@ project's successful deployment.
 Deployment creation is not automatically retried, since a timed-out request may
 already have started a build.
 
-Without `UNKEY_DEPLOY_ROOT_KEY`, the same release deploys Railway's demo dashboard
-and demo API (project notra-demo), and `ai-traffic-ingest` (project notra-prod).
-With the shared key configured, all three deploy to Unkey instead.
+Without `UNKEY_DEPLOY_ROOT_KEY`, the same release deploys `ai-traffic-ingest`
+(project notra-prod) to Railway. With the shared key configured, it deploys to
+Unkey instead.
 Their main-branch deployment triggers are removed, so
 pushes to `main` no longer deploy them; keep the GitHub repository connected so
 the API can build the pinned commit. Add a GitHub Actions secret named
 `RAILWAY_TOKEN` containing a Railway workspace token for the Notra workspace
-(railway.com/account/tokens); a project token cannot reach both projects.
+(railway.com/account/tokens).
 Without it, the whole release fails, including the Vercel builds.
 
 Railway services use the same history and change checks, compared with each
@@ -887,7 +892,7 @@ apps, environments, domains and deployments and deployment-create access to all
 targets. Permission failures stop the release without fallback. Keep this CI-only
 key separate from runtime keys; it needs no Turbo environment declaration or
 runtime `.env` addition. Configuring the key selects Unkey for API, ingest and both
-demo services, removing the latter three from Railway preflight and deployment.
+demo services, removing ingest from Railway preflight and deployment.
 
 Preflight runs before CI's local builds, again before provider builds, and each
 Unkey target is rechecked immediately before its deployment. A failed Unkey

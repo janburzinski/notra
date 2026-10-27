@@ -49,20 +49,6 @@ const projects = [
 ];
 const railwayServices = [
   {
-    name: "demo-dashboard",
-    directory: "apps/dashboard",
-    projectId: "48abcb3c-19e1-4c81-a7d3-e2c697c86832",
-    environmentId: "2c9756ae-90db-4606-b420-470fd23151a3",
-    serviceId: "9cb261a4-7d94-446f-8523-84a4b75cbb3d",
-  },
-  {
-    name: "demo-api",
-    directory: "apps/api",
-    projectId: "48abcb3c-19e1-4c81-a7d3-e2c697c86832",
-    environmentId: "2c9756ae-90db-4606-b420-470fd23151a3",
-    serviceId: "17ba5ec0-ec2e-412d-aa2c-61b23f37b40a",
-  },
-  {
     name: "ai-traffic-ingest",
     directory: "apps/ai-traffic-ingest",
     projectId: "557ca18d-9de8-40ad-9fca-cf3d165f3c44",
@@ -81,15 +67,19 @@ const unkeyServices = [
     domain: "ingest.usenotra.com",
     directory: "apps/ai-traffic-ingest",
   },
+  // The demo apps share their own database. Unkey has no pre-deploy hook, so
+  // the release migrates it before the first demo build.
   {
     name: "demo-api",
     domain: "demo-api.usenotra.com",
     directory: "apps/api",
+    demoDatabase: true,
   },
   {
     name: "demo-dashboard",
     domain: "demo.usenotra.com",
     directory: "apps/dashboard",
+    demoDatabase: true,
   },
 ];
 // Site builds run the toolchain baked into an Upstash Box snapshot, not the
@@ -703,6 +693,8 @@ export async function release({
     throw new Error(failures.join("\n"));
   }
 
+  let demoDatabaseMigrated = false;
+  const unkeyDeployed = new Set();
   for (const initialPlan of unkeyPlans) {
     const { service } = initialPlan;
     let plan = initialPlan;
@@ -723,9 +715,35 @@ export async function release({
       await report(
         `unkey: skipped, no ${service.name} build changes since production`
       );
+    } else if (service.demoDatabase && !env.DEMO_MIGRATION_DATABASE_URL) {
+      // Demo code must never run ahead of its schema; the live demo keeps
+      // its current build until the secret exists.
+      await report(
+        `unkey: skipped ${service.name}, configure DEMO_MIGRATION_DATABASE_URL to migrate the demo database`
+      );
     } else if (env.DRY_RUN === "true") {
-      await report(`unkey: would deploy ${service.name} at ${sha}`);
+      await report(
+        `unkey: would ${service.demoDatabase ? "migrate the demo database and " : ""}deploy ${service.name} at ${sha}`
+      );
     } else {
+      if (service.demoDatabase && !demoDatabaseMigrated) {
+        execFile(
+          "bun",
+          ["packages/db/src/scripts/migrate.ts", "packages/db/migrations"],
+          {
+            cwd: env.RELEASE_DIR,
+            env: {
+              PATH: env.PATH,
+              HOME: env.HOME,
+              MIGRATION_DATABASE_URL: env.DEMO_MIGRATION_DATABASE_URL,
+            },
+            stdio: "inherit",
+            timeout: 5 * 60_000,
+          }
+        );
+        demoDatabaseMigrated = true;
+        await report(`unkey: demo database migrated to ${sha}`);
+      }
       const deployment = await unkey("v3/deployments.createDeployment", {
         ...plan.target,
         git: { branch: "main", commitSha: sha },
@@ -760,6 +778,7 @@ export async function release({
           }
           if (status.isCurrent === true) {
             await report(`unkey: ${service.name} ready and current at ${sha}`);
+            unkeyDeployed.add(service.name);
             completed = true;
             break;
           }
@@ -779,6 +798,43 @@ export async function release({
         );
       }
     }
+  }
+
+  // Unkey's probe only proves the dashboard boots. Visitors also need the
+  // migrated schema to be readable through the demo's own database role.
+  // Unchanged demo builds are checked too, so a retry cannot skip a failure.
+  if (
+    env.DRY_RUN !== "true" &&
+    unkeyPlans.some((plan) => plan.service.demoDatabase)
+  ) {
+    const expectedSha = unkeyDeployed.has("demo-dashboard") ? sha : null;
+    // A shallow response (demo mode off) has no table count.
+    const passed = (health) =>
+      health.ok === true &&
+      health.tables > 0 &&
+      (!expectedSha || health.commitSha === expectedSha);
+    let health;
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      try {
+        const response = await fetchImpl(
+          "https://demo.usenotra.com/api/healthcheck?deep=1",
+          { signal: AbortSignal.timeout(30_000) }
+        );
+        health = await response.json();
+      } catch (error) {
+        health = { ok: false, error: error.message };
+      }
+      if (passed(health) || attempt === 5) {
+        break;
+      }
+      await sleep(10_000);
+    }
+    if (!passed(health)) {
+      throw new Error(
+        `demo: database check failed (${health.error ?? (health.tables > 0 ? `serving ${health.commitSha}` : "no deep check, is demo mode on?")})`
+      );
+    }
+    await report(`demo: database check passed (${health.tables} tables)`);
   }
 
   const started = [];

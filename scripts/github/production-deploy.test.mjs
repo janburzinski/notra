@@ -37,7 +37,12 @@ function fixture({
     UPSTASH_BOX_API_KEY: "test-box",
     CLOUDFLARE_API_TOKEN: "test-cloudflare",
     CLOUDFLARE_ACCOUNT_ID: "test-account",
-    ...(api || demo || ingest ? { UNKEY_DEPLOY_ROOT_KEY: "test-unkey" } : {}),
+    ...(api || demo || ingest
+      ? {
+          UNKEY_DEPLOY_ROOT_KEY: "test-unkey",
+          DEMO_MIGRATION_DATABASE_URL: "postgresql://demo-owner@demo/neondb",
+        }
+      : {}),
     ...envOverrides,
   };
   const fetchImpl = async (input, options) => {
@@ -108,6 +113,8 @@ function fixture({
             url: "production.vercel.app",
           };
         }
+      } else if (url.hostname === "demo.usenotra.com") {
+        data = { ok: true, commitSha: sha, tables: 92 };
       } else if (url.hostname === "api.unkey.com") {
         let demoApp;
         if (body.search === "demo.usenotra.com") {
@@ -312,11 +319,11 @@ test("failed toolchain env update prevents every build", async () => {
   assert.equal(builds(calls).length, 0);
 });
 
-test("all six Vercel projects and three Railway services deploy the pinned SHA", async () => {
+test("all six Vercel projects and the Railway ingest service deploy the pinned SHA", async () => {
   const { run, calls, sha, directories } = fixture();
   await run();
   const started = builds(calls);
-  assert.equal(started.length, 9);
+  assert.equal(started.length, 7);
   assert.deepEqual(
     started
       .filter(({ url }) => url.hostname === "api.vercel.com")
@@ -353,7 +360,7 @@ test("dry run validates every target without creating any builds", async () => {
   });
   await run();
   assert.equal(builds(calls).length, 0);
-  assert.equal(directories.length, 9);
+  assert.equal(directories.length, 7);
   assert.equal(toolchainBuilds.length, 0);
 });
 

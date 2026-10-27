@@ -132,10 +132,11 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: Install sites toolchain and worker
+      # @notra/db carries the migrator the release runs against the demo database.
+      - name: Install sites toolchain, worker and demo migrator
         if: ${{ !inputs.dry_run }}
         working-directory: ${{ runner.temp }}/release
-        run: bun install --frozen-lockfile --filter '@notra/sites-builder...' --filter '@notra/sites...'
+        run: bun install --frozen-lockfile --filter '@notra/sites-builder...' --filter '@notra/sites...' --filter '@notra/db'
 
       - name: Deploy checked main commit
         run: node scripts/github/production-deploy.mjs
@@ -149,6 +150,7 @@ jobs:
           VERCEL_TEAM_ID: team_J0UtPqQdb8AdDMRkyvJuR8kM
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           UNKEY_DEPLOY_ROOT_KEY: ${{ secrets.UNKEY_DEPLOY_ROOT_KEY }}
+          DEMO_MIGRATION_DATABASE_URL: ${{ secrets.DEMO_MIGRATION_DATABASE_URL }}
           DRY_RUN: ${{ inputs.dry_run || false }}
           RELEASE_SHA: ${{ needs.release.outputs.sha }}
 
