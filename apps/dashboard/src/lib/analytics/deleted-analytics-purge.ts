@@ -21,11 +21,6 @@ export function runDeletedAnalyticsPurge({
     : purgeDeletedOrganizationAnalytics({ organizationId });
 }
 
-/**
- * Purges right away, then queues a second purge after the ingest flush window
- * so rows buffered at deletion time are removed too. QStash retries the
- * queued purge, which also covers an immediate purge that failed.
- */
 export async function purgeDeletedAnalytics(
   input: DeletedAnalyticsPurgeInput
 ): Promise<void> {
