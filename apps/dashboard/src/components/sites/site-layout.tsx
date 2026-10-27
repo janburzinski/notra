@@ -49,8 +49,13 @@ export function SiteLayout({
   const [projectParam, setProjectParam] = useGeoProjectQueryState();
   const owningProjectId = detailQuery.data?.site.projectId;
   const hydrated = useIsClient();
+  // Links inside the site (deployment rows, "View logs") carry no ?project;
+  // the effect below adds it. Only another project's param hides the layout,
+  // otherwise every such click would remount it behind a skeleton.
   const ready =
-    hydrated && Boolean(detailQuery.data) && projectParam === owningProjectId;
+    hydrated &&
+    Boolean(detailQuery.data) &&
+    (projectParam === null || projectParam === owningProjectId);
   const { deploymentId } = useParams<{ deploymentId?: string }>();
 
   useEffect(() => {
