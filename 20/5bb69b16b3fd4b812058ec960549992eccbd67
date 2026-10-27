@@ -1,0 +1,85 @@
+apps/dashboard/src/components/sites/site-design-preview.tsx
+  s_2988f89a00bf0e::t_654b17fe982cb7 136,144-148,150-156
+  s_2988f89a00bf0e::t_87c0f1935fd5a0 74
+apps/dashboard/src/constants/sites.ts
+  s_2988f89a00bf0e::t_79eb148461f0a2 238-240
+apps/dashboard/src/components/sites/site-preview-access-control.tsx
+  ai_agent 27
+apps/dashboard/src/components/sites/branches/site-branch-menu.tsx
+  s_2988f89a00bf0e::t_171e8e2786f8b9 48
+apps/dashboard/src/types/site-design.ts
+  s_2988f89a00bf0e::t_654b17fe982cb7 163
+apps/dashboard/src/types/components/site-preview-access.ts
+  s_2988f89a00bf0e::t_5f55b3b2c9c304 24-31
+apps/dashboard/src/components/sites/site-option-select.tsx
+  s_2988f89a00bf0e::t_654b17fe982cb7 27,53,55
+apps/dashboard/src/components/sites/pages/site-settings-page.tsx
+  s_2988f89a00bf0e::t_f0aac6618cec6e 51-54,238-245
+  s_2988f89a00bf0e::t_262cce3d59d3f6 39,252
+apps/dashboard/src/lib/hooks/use-site-publish-mutation.ts
+  s_2988f89a00bf0e::t_79eb148461f0a2 5,42
+apps/dashboard/src/components/sites/site-variables-settings.tsx
+  s_2988f89a00bf0e::t_53aa447f1459f7 10-13,16-22,26-27,34,42,46-69,71-84,86-101,108,120
+  s_2988f89a00bf0e::t_d3ac91317b7272 23-25
+apps/dashboard/src/types/sites.ts
+  s_2988f89a00bf0e::t_08ce7f89a3054e 180
+apps/dashboard/messages/en.json
+  s_2988f89a00bf0e::t_61d726b7577784 8496-8497
+  s_2988f89a00bf0e::t_262cce3d59d3f6 8444-8450
+  s_2988f89a00bf0e::t_420eaf9fcd40d0 8490
+apps/ui/components/constants/dropdown.ts
+  s_2988f89a00bf0e::t_125b46140e421f 2
+packages/ui/src/constants/dropdown.ts
+  s_2988f89a00bf0e::t_125b46140e421f 2
+apps/dashboard/src/components/sites/site-layout.tsx
+  s_2988f89a00bf0e::t_e6eb394f891ace 35
+  s_2988f89a00bf0e::t_79eb148461f0a2 101
+apps/dashboard/src/components/sites/site-preview-access-select.tsx
+  s_2988f89a00bf0e::t_5f55b3b2c9c304 1-2,4-77,79-98,100-232
+  s_2988f89a00bf0e::t_08ce7f89a3054e 99
+  s_2988f89a00bf0e::t_262cce3d59d3f6 3,78
+apps/dashboard/src/components/sites/site-design-appearance.tsx
+  s_2988f89a00bf0e::t_420eaf9fcd40d0 3,14-17,74,76-93,102,109
+apps/dashboard/src/components/sites/site-header-actions.tsx
+  s_2988f89a00bf0e::t_4007a02ba763ec 7,35
+apps/dashboard/src/components/sites/site-publish-confetti.tsx
+  s_2988f89a00bf0e::t_79eb148461f0a2 1-42
+apps/dashboard/src/components/sites/site-asset-field.tsx
+  s_2988f89a00bf0e::t_1b86a5f077a5f0 40-43,127
+  s_2988f89a00bf0e::t_61d726b7577784 13-17,44-69,81-84,86-93,95-126,128-134
+apps/dashboard/messages/de.json
+  s_2988f89a00bf0e::t_262cce3d59d3f6 8444-8450
+  s_2988f89a00bf0e::t_3f1b858d219a69 8496-8497
+  s_2988f89a00bf0e::t_420eaf9fcd40d0 8490
+apps/dashboard/src/lib/hooks/use-site-branch-actions.ts
+  s_2988f89a00bf0e::t_e6eb394f891ace 5
+  s_2988f89a00bf0e::t_79eb148461f0a2 112
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_2988f89a00bf0e::t_4007a02ba763ec 15-19,36,70,110-198,200-236,241-242,253
+  s_2988f89a00bf0e::t_27e4c7f712c191 49,54
+  s_2988f89a00bf0e::t_a624d22f17a412 3
+apps/dashboard/src/components/sites/site-styling-fields.tsx
+  s_2988f89a00bf0e::t_654b17fe982cb7 166-173
+packages/ui/src/components/ui/select.tsx
+  s_2988f89a00bf0e::t_654b17fe982cb7 107,128-129,131-133
+  s_2988f89a00bf0e::t_3b45d5ee2c7fd2 108-109,130
+apps/dashboard/src/types/components/sites.ts
+  s_2988f89a00bf0e::t_27e4c7f712c191 754
+  s_2988f89a00bf0e::t_4007a02ba763ec 763-767
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "205bb69b16b3fd4b812058ec960549992eccbd67",
+  "prompts": {},
+  "sessions": {
+    "s_2988f89a00bf0e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "429ce2d2-df6b-4f8a-a9e8-4b9d0643cfb0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
