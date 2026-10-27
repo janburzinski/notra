@@ -29,7 +29,7 @@ import type { CallbackDestination } from "@/types/analytics/events";
 import type { LoginPageStart } from "@/types/auth/login-page";
 import type { UiRouteInput } from "@/types/ui-route";
 import { demoHomePath, safeDemoReturnTo } from "@/utils/demo-return-to";
-import { withGeoProject } from "@/utils/geo-paths";
+import { geoDashboardPath, withGeoProject } from "@/utils/geo-paths";
 import {
   marketingAttributionServerSearchParams,
   marketingAttributionServerUrlKeys,
@@ -49,7 +49,7 @@ export const loadAppEntry = createServerFn({ method: "GET" })
     }
     if (!isDemoMode()) {
       throw redirect({
-        href: withGeoProject(`/${organization.slug}`, organization.projectId),
+        href: geoDashboardPath(organization.slug, organization.projectId),
       });
     }
     const home = withGeoProject(
@@ -77,7 +77,7 @@ export const loadGuestAccess = createServerFn({ method: "GET" })
     throw redirect({
       href: withTrackingParams(
         organization
-          ? withGeoProject(`/${organization.slug}`, organization.projectId)
+          ? geoDashboardPath(organization.slug, organization.projectId)
           : "/onboarding",
         searchParams
       ),
@@ -243,7 +243,7 @@ export const loadAuthCallback = createServerFn({ method: "GET" })
     trackRouted(CALLBACK_DESTINATIONS.DASHBOARD);
     throw redirect({
       href: withTrackingParams(
-        withGeoProject(`/${organization.slug}`, organization.projectId),
+        geoDashboardPath(organization.slug, organization.projectId),
         searchParams
       ),
     });
