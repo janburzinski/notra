@@ -64,7 +64,7 @@ export const ContentActivityCard = () => {
             legend: { less: t("legendLess"), more: tCommon("labels.more") },
           }}
         >
-          <TooltipProvider>
+          <TooltipProvider closeDelay={150}>
             <ContributionGraphCalendar>
               {({ activity, dayIndex, weekIndex }) => {
                 const entry = activity as unknown as ContentActivityEntry;
