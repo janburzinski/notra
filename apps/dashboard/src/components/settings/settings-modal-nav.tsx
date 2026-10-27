@@ -286,10 +286,10 @@ function SettingsNavButton({
         isSearching
           ? "w-full whitespace-normal"
           : "w-auto shrink-0 whitespace-nowrap",
-        "hover:bg-muted/80",
+        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         isActive || isFocused
-          ? "bg-muted text-foreground"
-          : "text-muted-foreground hover:text-foreground",
+          ? "bg-sidebar-accent text-foreground font-medium"
+          : "text-sidebar-foreground",
         isSearching && "items-start"
       )}
       id={id}
