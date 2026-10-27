@@ -1,0 +1,98 @@
+apps/sites-builder/compiler/dev-server.ts
+  s_6d4a65b8409eaa::t_08358d65d5c99a 36
+  s_6d4a65b8409eaa::t_8ef22d3252e372 19-22,322-327
+packages/sites-core/src/schemas/site-layout.ts
+  s_6d4a65b8409eaa::t_f396419b3a85a0 106
+apps/dashboard/src/components/sites/site-design-appearance.tsx
+  s_6d4a65b8409eaa::t_cc1adb0ee2279c 11,140-147
+  s_6d4a65b8409eaa::t_c0acc4ea2f57f5 27,41
+packages/sites-server/src/publish.ts
+  s_6d4a65b8409eaa::t_f396419b3a85a0 87
+apps/sites-builder/src/utils/favicons.ts
+  s_6d4a65b8409eaa::t_5a5b2f21e5b422 1-2,4-15,22-23,28
+  s_6d4a65b8409eaa::t_85820fe76ea5da 3,16,21,24-27
+  s_6d4a65b8409eaa::t_af1418c319eacb 17-20
+apps/sites/src/constants/favicons.ts
+  s_6d4a65b8409eaa::t_cb8f0e21208d9a 1-3,6-7
+  s_6d4a65b8409eaa::t_95e4fdddd81bac 4-5
+apps/sites/tests/handler.test.ts
+  s_6d4a65b8409eaa::t_6ff54969c36348 1123,1127,1131-1137,1146-1147,1155,1159-1160,1162,1164-1172,1174,1178
+  s_6d4a65b8409eaa::t_580bef8defa8f8 1121-1122,1124-1126,1128-1130,1138-1145,1148-1154,1156-1158,1161,1163,1173,1175-1177,1179-1185
+apps/dashboard/src/utils/site-design.ts
+  s_6d4a65b8409eaa::t_8eac08b6d245d4 289-299,308-310,410-413,626-634,637-639,645,667-670,747-760,763-789,821-824
+  s_6d4a65b8409eaa::t_a0cd5acc1de102 6-9,20,31-33,37,105-110,276-288,300-307,311-314,346-347,407-409,615-625,635-636,640-644,646-666,671-674,735-737,745,761-762,790-820,825-826
+apps/dashboard/tests/site-design.test.ts
+  s_6d4a65b8409eaa::t_a9ad83c26fea77 352-355,360
+  s_6d4a65b8409eaa::t_812ab937921f79 20-21,184-216,269-275,286,296,299-302,323-351,356-359,361-384,397-410
+  s_6d4a65b8409eaa::t_05c80b6b4b6fbb 15-16,268,276-285,287-295,297-298,303-322,385-396
+apps/sites-builder/src/lib/navigation.ts
+  s_6d4a65b8409eaa::t_5a5b2f21e5b422 1,10,90-106
+apps/sites/src/constants/routes.ts
+  s_6d4a65b8409eaa::t_24fdea6d8d94e5 2,43
+apps/sites-builder/tests/favicons.test.ts
+  s_6d4a65b8409eaa::t_85820fe76ea5da 10,27,29,35
+  s_6d4a65b8409eaa::t_b08c0691ef0a01 1-9,11-26,28,30-34,36
+  s_6d4a65b8409eaa::t_95e4fdddd81bac 37-38,43-50
+  s_6d4a65b8409eaa::t_af1418c319eacb 39-42
+packages/sites-core/src/constants/sites.ts
+  s_6d4a65b8409eaa::t_792baaf7ec56ba 231-234
+apps/sites/src/routes/favicon.ts
+  s_6d4a65b8409eaa::t_95e4fdddd81bac 5,12,21-25,29,35-39,42,44-47,50,58-76,101-102
+  s_6d4a65b8409eaa::t_24fdea6d8d94e5 1-4,6-11,13-20,26-28,30-34,40-41,43,48-49,51-52,77-100,103-106
+  s_6d4a65b8409eaa::t_08358d65d5c99a 53-57
+apps/dashboard/src/constants/site-design.ts
+  s_6d4a65b8409eaa::t_08358d65d5c99a 193-197
+  s_6d4a65b8409eaa::t_f0027cc03536d7 1-18,22-23,152-192,198-216
+apps/sites/package.json
+  s_6d4a65b8409eaa::t_95e4fdddd81bac 17
+packages/sites-core/src/schemas/build.ts
+  s_6d4a65b8409eaa::t_f396419b3a85a0 1,59-60
+apps/web/public/schemas/blog.json
+  s_6d4a65b8409eaa::t_1253de827858cc 743
+apps/sites-builder/compiler/constants/cli.ts
+  s_6d4a65b8409eaa::t_8ef22d3252e372 22
+packages/sites-core/src/schemas/deployment.ts
+  s_6d4a65b8409eaa::t_ed0dad6a2175e7 4
+  s_6d4a65b8409eaa::t_f396419b3a85a0 72-73
+apps/dashboard/src/components/sites/site-footer-fields.tsx
+  s_6d4a65b8409eaa::t_08358d65d5c99a 173-175,186-189,199-202
+  s_6d4a65b8409eaa::t_a2393034de1797 47,263-267,336,347
+  s_6d4a65b8409eaa::t_d5761de7e0c970 23,91-93,100,114-115,142,248
+  s_6d4a65b8409eaa::t_cc1adb0ee2279c 41,256-257,333-335,337-338,357-365
+  s_6d4a65b8409eaa::t_4faae11fb967b1 1-22,24-40,42-46,48-90,94-99,101-113,116-141,143-172,176-185,190-198,203-247,249-255,258-262,268-332,339-346,348-356,366-389
+apps/dashboard/src/types/site-design.ts
+  s_6d4a65b8409eaa::t_8eac08b6d245d4 113-114,262-263
+  s_6d4a65b8409eaa::t_08358d65d5c99a 1,248
+  s_6d4a65b8409eaa::t_7bdd70b60ba418 2-5,27,52-69,110-112,238-247,253-261,264-266
+  s_6d4a65b8409eaa::t_cc1adb0ee2279c 249-252
+apps/sites-builder/src/components/LinkIcon.astro
+  s_6d4a65b8409eaa::t_5a5b2f21e5b422 12
+apps/sites-builder/compiler/build.ts
+  s_6d4a65b8409eaa::t_85820fe76ea5da 24,302
+apps/dashboard/messages/en.json
+  s_6d4a65b8409eaa::t_17c781d6109af2 8671-8690,8747-8748,8757-8758
+apps/sites-builder/src/types/icons.ts
+  s_6d4a65b8409eaa::t_5a5b2f21e5b422 8-9
+apps/sites-builder/src/constants/favicons.ts
+  s_6d4a65b8409eaa::t_5a5b2f21e5b422 1-4
+apps/dashboard/src/constants/site-design-sections.ts
+  s_6d4a65b8409eaa::t_cc1adb0ee2279c 4,28,38
+apps/dashboard/messages/de.json
+  s_6d4a65b8409eaa::t_17c781d6109af2 8671-8690,8747-8748,8757-8758
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b399976b9955c763b094a47093449bc2fe199bc7",
+  "prompts": {},
+  "sessions": {
+    "s_6d4a65b8409eaa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "95354687-09ce-4ca1-b5c3-290a6eccd0b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
