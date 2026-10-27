@@ -1,0 +1,30 @@
+apps/sites-builder/tests/box-toolchain.test.ts
+  s_44cf84a7c2985f::t_1e055fd24d6a9f 105
+scripts/testing/railway/utils/cleanup.mjs
+  s_44cf84a7c2985f::t_1e055fd24d6a9f 1-5,36,47
+apps/sites-e2e/emulators/core/http-server.ts
+  s_44cf84a7c2985f::t_1e055fd24d6a9f 25-39
+scripts/testing/railway/constants/cleanup.mjs
+  s_44cf84a7c2985f::t_86fccf1c3800b2 4
+scripts/testing/railway/cleanup.test.mjs
+  s_44cf84a7c2985f::t_33c9b2f2748bbc 104-124
+scripts/testing/cloud/run.ts
+  s_44cf84a7c2985f::t_1e055fd24d6a9f 147-155
+  s_44cf84a7c2985f::t_c5a9dd6c2657ab 720
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c3a17f885d5b6b92cfc58a2d3b9cee184ac95372",
+  "prompts": {},
+  "sessions": {
+    "s_44cf84a7c2985f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7369f024-3389-49d4-ad32-cf5f47956db1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
