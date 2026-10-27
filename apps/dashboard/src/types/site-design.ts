@@ -1,4 +1,8 @@
-import type { SITE_NAVBAR_LINK_TYPES } from "@notra/sites-core/constants/site-layout";
+import type { IconSvgElement } from "@hugeicons/react";
+import type {
+  SITE_NAVBAR_LINK_TYPES,
+  SITE_SOCIAL_PLATFORMS,
+} from "@notra/sites-core/constants/site-layout";
 import type { SiteImageUploadKind } from "@notra/sites-core/types/uploads";
 import type { ReactNode } from "react";
 
@@ -20,6 +24,7 @@ export type SiteFontWeight = (typeof SITE_FONT_WEIGHTS)[number];
 export type SiteFontFormat = (typeof SITE_FONT_FORMATS)[number];
 export type SiteTypographyMode = (typeof SITE_TYPOGRAPHY_MODES)[number];
 export type SiteBannerType = (typeof SITE_BANNER_TYPES)[number];
+export type SiteSocialPlatform = (typeof SITE_SOCIAL_PLATFORMS)[number];
 export type SiteNavbarButton =
   | "none"
   | "button"
@@ -42,6 +47,24 @@ export interface SiteNavbarLinkForm {
   id: string;
   label: string;
   href: string;
+}
+
+export interface SiteFooterSocialForm {
+  id: string;
+  platform: SiteSocialPlatform;
+  /** Full profile URL; prefixed platforms edit only the handle after it. */
+  url: string;
+}
+
+export interface SiteFooterLinkForm extends SiteNavbarLinkForm {
+  /** Lucide icon from blog.json, kept but not editable here. */
+  icon?: string;
+}
+
+export interface SiteFooterColumnForm {
+  id: string;
+  header: string;
+  links: SiteFooterLinkForm[];
 }
 
 export interface SiteDesignForm {
@@ -84,6 +107,11 @@ export interface SiteDesignForm {
   bannerType: SiteBannerType;
   bannerLight: string;
   bannerDark: string;
+  footerSocials: SiteFooterSocialForm[];
+  footerColumnsEnabled: boolean;
+  footerColumns: SiteFooterColumnForm[];
+  /** Links blog.json lists without columns, restored when columns are switched off. */
+  footerFlatLinks: SiteRawConfig[];
 }
 
 type SiteDesignFormUpdate<T> = <K extends keyof T>(key: K, value: T[K]) => void;
@@ -207,3 +235,32 @@ export interface SiteMiniPageProps {
 }
 
 export type SiteDesignPreviewTone = "light" | "dark";
+
+export interface SiteSocialLinkMeta {
+  label: string;
+  icon: IconSvgElement;
+  /** Profile URL the handle is appended to; without one the field takes a full URL. */
+  prefix?: string;
+  /** Handles on this platform keep their leading "@" in the URL. */
+  keepsAt?: boolean;
+}
+
+export interface SiteFooterFieldsProps extends SiteDesignFieldsProps<SiteDesignForm> {
+  /** Sets several fields at once, e.g. the columns switch with its first column. */
+  patch: (patch: Partial<SiteDesignForm>) => void;
+}
+
+export interface SiteFooterSocialRowProps {
+  social: SiteFooterSocialForm;
+  onChange: (url: string) => void;
+  onRemove: () => void;
+}
+
+export interface SiteFooterColumnFieldsProps {
+  column: SiteFooterColumnForm;
+  index: number;
+  /** Where blog.json validation reports this column; blank columns aren't saved. */
+  errorPath?: string;
+  onChange: (column: SiteFooterColumnForm) => void;
+  onRemove: () => void;
+}

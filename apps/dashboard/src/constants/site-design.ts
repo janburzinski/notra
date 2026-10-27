@@ -1,6 +1,26 @@
+import {
+  BlueskyIcon,
+  DiscordIcon,
+  Facebook01Icon,
+  GithubIcon,
+  Globe02Icon,
+  InstagramIcon,
+  Linkedin01Icon,
+  MediumIcon,
+  NewTwitterIcon,
+  News01Icon,
+  RedditIcon,
+  SlackIcon,
+  TelegramIcon,
+  ThreadsIcon,
+  YoutubeIcon,
+} from "@hugeicons/core-free-icons";
+
 import type {
   SiteBackgroundDecoration,
   SiteMiniPageProps,
+  SiteSocialLinkMeta,
+  SiteSocialPlatform,
 } from "@/types/site-design";
 
 export const SITE_APPEARANCE_MODES = ["system", "light", "dark"] as const;
@@ -129,3 +149,68 @@ export const SITE_DESIGN_PREVIEW_NEUTRAL_CODE_CLASS_NAMES: Record<
   dark: "bg-white/30",
   accent: "bg-[color-mix(in_oklab,var(--mini-fg)_25%,transparent)]",
 };
+
+/** Footer social platforms; prefixed ones take a handle, the rest a full URL. */
+export const SITE_SOCIAL_LINKS: Record<SiteSocialPlatform, SiteSocialLinkMeta> =
+  {
+    github: {
+      label: "GitHub",
+      icon: GithubIcon,
+      prefix: "https://github.com/",
+    },
+    x: { label: "X", icon: NewTwitterIcon, prefix: "https://x.com/" },
+    discord: { label: "Discord", icon: DiscordIcon },
+    linkedin: {
+      label: "LinkedIn",
+      icon: Linkedin01Icon,
+      prefix: "https://www.linkedin.com/",
+    },
+    youtube: {
+      label: "YouTube",
+      icon: YoutubeIcon,
+      prefix: "https://www.youtube.com/",
+      keepsAt: true,
+    },
+    facebook: {
+      label: "Facebook",
+      icon: Facebook01Icon,
+      prefix: "https://www.facebook.com/",
+    },
+    website: { label: "Website", icon: Globe02Icon },
+    slack: { label: "Slack", icon: SlackIcon },
+    instagram: {
+      label: "Instagram",
+      icon: InstagramIcon,
+      prefix: "https://www.instagram.com/",
+    },
+    "hacker-news": { label: "Hacker News", icon: News01Icon },
+    medium: {
+      label: "Medium",
+      icon: MediumIcon,
+      prefix: "https://medium.com/",
+      keepsAt: true,
+    },
+    telegram: {
+      label: "Telegram",
+      icon: TelegramIcon,
+      prefix: "https://t.me/",
+    },
+    bluesky: {
+      label: "Bluesky",
+      icon: BlueskyIcon,
+      prefix: "https://bsky.app/profile/",
+    },
+    threads: {
+      label: "Threads",
+      icon: ThreadsIcon,
+      prefix: "https://www.threads.net/@",
+    },
+    reddit: {
+      label: "Reddit",
+      icon: RedditIcon,
+      prefix: "https://www.reddit.com/",
+    },
+  };
+
+export const SITE_FOOTER_COLUMN_LIMIT = 6;
+export const SITE_FOOTER_COLUMN_LINK_LIMIT = 12;

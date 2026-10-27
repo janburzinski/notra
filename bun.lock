@@ -384,6 +384,7 @@
       "dependencies": {
         "@c15t/core": "3.0.0",
         "@notra/sites-core": "workspace:*",
+        "@notra/utils": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {

@@ -1118,3 +1118,68 @@ describe("previews", () => {
     ).toBe(200);
   });
 });
+
+describe("footer favicons", () => {
+  function withFaviconHost(host: string) {
+    const context = setup();
+    const key = `deployments/${SITE}/dep_live/manifest.json`;
+    const current = JSON.parse(context.objects.get(key) ?? "{}");
+    context.put(key, { ...current, faviconHost: host });
+    const upstream: string[] = [];
+    context.deps.fetch = async (url) => {
+      upstream.push(url);
+      if (url.includes("domain=acme.com")) {
+        return new Response(new Uint8Array([137, 80, 78, 71]), {
+          headers: { "Content-Type": "image/png" },
+        });
+      }
+      return url.includes("domain=down.dev")
+        ? new Response("unavailable", { status: 503 })
+        : new Response("missing", {
+            status: 404,
+            headers: { "Content-Type": "image/png" },
+          });
+    };
+    return { ...context, upstream };
+  }
+
+  test("serves the favicon of the host the footer links to", async () => {
+    const { request, upstream } = withFaviconHost("acme.com");
+    const response = await request(
+      "https://acme.notra.site/blog/_notra/favicon/acme.com"
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Type")).toBe("image/png");
+    expect(response.headers.get("Cache-Control")).toContain("max-age=86400");
+    expect(upstream).toEqual([
+      "https://www.google.com/s2/favicons?domain=acme.com&sz=128",
+    ]);
+  });
+
+  test("a host without a favicon gets a globe for a day", async () => {
+    const { request } = withFaviconHost("unknown.dev");
+    const response = await request(
+      "https://acme.notra.site/blog/_notra/favicon/unknown.dev"
+    );
+    expect(response.headers.get("Content-Type")).toBe("image/svg+xml");
+    expect(response.headers.get("Cache-Control")).toContain("max-age=86400");
+  });
+
+  test("a failed lookup is retried soon instead of cached for a day", async () => {
+    const { request } = withFaviconHost("down.dev");
+    const response = await request(
+      "https://acme.notra.site/blog/_notra/favicon/down.dev"
+    );
+    expect(response.headers.get("Content-Type")).toBe("image/svg+xml");
+    expect(response.headers.get("Cache-Control")).toBe("public, max-age=300");
+  });
+
+  test("does not proxy hosts the deployment never linked", async () => {
+    const { request, upstream } = withFaviconHost("acme.com");
+    const response = await request(
+      "https://acme.notra.site/blog/_notra/favicon/evil.example"
+    );
+    expect(response.status).toBe(404);
+    expect(upstream).toEqual([]);
+  });
+});

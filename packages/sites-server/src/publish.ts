@@ -84,6 +84,7 @@ export const publishDeploymentFilesEffect = Effect.fn(
     contentSecurityPolicy: params.result.contentSecurityPolicy ?? undefined,
     analyticsConsent: params.result.analyticsConsent || undefined,
     consentBackendURL: params.result.consentBackendURL,
+    faviconHost: params.result.faviconHost,
   };
   yield* r2PutEffect(
     SITE_R2_KEYS.manifest(site.id, deployment.id),

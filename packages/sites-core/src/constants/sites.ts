@@ -228,6 +228,10 @@ export const SITE_R2_KEYS = {
 /** Files below each mount that the worker answers for the analytics script. */
 export const SITE_ANALYTICS_SCRIPT_FILE = "_notra/insights.js";
 export const SITE_ANALYTICS_EVENT_FILE = "_notra/e";
+/** Below each mount, `<dir>/<host>` answers with that host's favicon. */
+export const SITE_FAVICON_DIR = "_notra/favicon";
+/** Lowercase ASCII hostnames; `new URL()` already punycodes the rest. */
+export const SITE_FAVICON_HOST = /^(?=.{1,253}$)[a-z0-9-]+(?:\.[a-z0-9-]+)+$/;
 /** Longer visible times are capped: a tab left open overnight is not reading. */
 export const SITE_ENGAGEMENT_MAX_VISIBLE_MS = 30 * 60 * 1000;
 export const SITE_ENGAGEMENT_VIEW_ID_PATTERN = /^[a-z0-9]{16,32}$/;

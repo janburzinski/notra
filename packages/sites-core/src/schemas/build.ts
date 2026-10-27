@@ -1,3 +1,4 @@
+import { SITE_FAVICON_HOST } from "@notra/sites-core/constants/sites";
 import {
   siteAreaSchema,
   siteContentSecurityPolicySchema,
@@ -55,4 +56,6 @@ export const siteBuildResultSchema = z.object({
     .default(null),
   analyticsConsent: z.boolean().optional(),
   consentBackendURL: z.url().optional(),
+  /** Host the footer links a favicon for, the only one the worker serves. */
+  faviconHost: z.string().regex(SITE_FAVICON_HOST).optional(),
 });

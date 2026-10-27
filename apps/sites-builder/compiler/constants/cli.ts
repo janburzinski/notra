@@ -21,3 +21,4 @@ export const DEV_PROXY_RETRY_ERRORS = new Set([
   "ETIMEDOUT",
 ]);
 export const DEV_HOSTNAMES = new Set(["localhost", "127.0.0.1", "[::1]"]);
+export const DEV_FAVICON_URL = "https://www.google.com/s2/favicons";

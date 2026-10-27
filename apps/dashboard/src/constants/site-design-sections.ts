@@ -1,6 +1,7 @@
 import {
   Globe02Icon,
   Image01Icon,
+  LayoutBottomIcon,
   LayoutTopIcon,
   Megaphone01Icon,
   PaintBoardIcon,
@@ -24,6 +25,7 @@ export const SITE_DESIGN_SECTIONS = [
   { id: "typography", icon: TextFontIcon, paths: ["fonts"] },
   { id: "navbar", icon: LayoutTopIcon, paths: ["navbar"] },
   { id: "banner", icon: Megaphone01Icon, paths: ["banner"] },
+  { id: "footer", icon: LayoutBottomIcon, paths: ["footer"] },
   { id: "integrations", icon: Plug01Icon, paths: ["integrations"] },
 ] as const;
 
@@ -33,6 +35,6 @@ export const SITE_DESIGN_GROUPS = [
     id: "appearance",
     sections: ["general", "styling", "branding", "typography"],
   },
-  { id: "layout", sections: ["navbar", "banner"] },
+  { id: "layout", sections: ["navbar", "banner", "footer"] },
   { id: "configuration", sections: ["integrations"] },
 ] as const;

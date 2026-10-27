@@ -3,7 +3,10 @@ import {
   SITE_DEFAULT_PRIMARY_COLOR,
   SITE_HEX_COLOR,
 } from "@notra/sites-core/constants/site-config";
-import { SITE_NAVBAR_LINK_TYPES } from "@notra/sites-core/constants/site-layout";
+import {
+  SITE_NAVBAR_LINK_TYPES,
+  SITE_SOCIAL_PLATFORMS,
+} from "@notra/sites-core/constants/site-layout";
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 
 import {
@@ -14,6 +17,7 @@ import {
   SITE_DEFAULT_CODE_DARK_THEME,
   SITE_DEFAULT_CODE_LIGHT_THEME,
   SITE_FONT_FORMATS,
+  SITE_SOCIAL_LINKS,
 } from "@/constants/site-design";
 import type { BrandGuidelinesResponse } from "@/types/hooks/brand-guidelines";
 import type {
@@ -24,9 +28,13 @@ import type {
   SiteDesignForm,
   SiteFontFormat,
   SiteFontSpecForm,
+  SiteFooterColumnForm,
+  SiteFooterLinkForm,
+  SiteFooterSocialForm,
   SiteNavbarButton,
   SiteNavbarLinkForm,
   SiteRawConfig,
+  SiteSocialPlatform,
 } from "@/types/site-design";
 
 type SiteDesignKey = keyof SiteDesignForm;
@@ -92,6 +100,12 @@ const BANNER_KEYS: readonly SiteDesignKey[] = [
   "bannerType",
   "bannerLight",
   "bannerDark",
+];
+
+const FOOTER_SOCIAL_KEYS: readonly SiteDesignKey[] = ["footerSocials"];
+const FOOTER_COLUMN_KEYS: readonly SiteDesignKey[] = [
+  "footerColumnsEnabled",
+  "footerColumns",
 ];
 
 const EMPTY_FONT: SiteFontSpecForm = {
@@ -259,6 +273,45 @@ function isPlainNavbarLink(entry: unknown): boolean {
   );
 }
 
+function isFooterColumn(entry: unknown): boolean {
+  return Array.isArray(record(entry).items);
+}
+
+function readFooterSocials(footer: SiteRawConfig): SiteFooterSocialForm[] {
+  return Object.entries(record(footer.socials)).flatMap(([key, url]) => {
+    const platform = SITE_SOCIAL_PLATFORMS.find((item) => item === key);
+    return platform && typeof url === "string"
+      ? [{ id: `social-${platform}`, platform, url }]
+      : [];
+  });
+}
+
+function readFooterLink(entry: unknown, id: string): SiteFooterLinkForm {
+  const link = record(entry);
+  const icon = text(link.icon);
+  return {
+    id,
+    label: text(link.label),
+    href: text(link.href),
+    ...(icon ? { icon } : {}),
+  };
+}
+
+function readFooterColumns(footer: SiteRawConfig): SiteFooterColumnForm[] {
+  const links = Array.isArray(footer.links) ? footer.links : [];
+  return links.filter(isFooterColumn).map((entry, index) => {
+    const column = record(entry);
+    const items = column.items as unknown[];
+    return {
+      id: `column-${index}`,
+      header: text(column.header),
+      links: items.map((item, itemIndex) =>
+        readFooterLink(item, `link-${itemIndex}`)
+      ),
+    };
+  });
+}
+
 function readCodeMode(codeblocks: unknown): SiteDesignForm["codeMode"] {
   if (codeblocks === undefined || codeblocks === "system") {
     return "system";
@@ -290,6 +343,8 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
   const links = Array.isArray(navbar.links) ? navbar.links : [];
   const banner = record(config.banner);
   const bannerColor = byMode(banner.color);
+  const footer = record(config.footer);
+  const footerColumns = readFooterColumns(footer);
   return {
     name: text(config.name),
     description: text(config.description),
@@ -349,6 +404,13 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
       SITE_BANNER_TYPES.find((item) => item === banner.type) ?? "info",
     bannerLight: bannerColor.light,
     bannerDark: hasSeparateModes(banner.color) ? bannerColor.dark : "",
+    footerSocials: readFooterSocials(footer),
+    footerColumnsEnabled: footerColumns.length > 0,
+    footerColumns,
+    footerFlatLinks: (Array.isArray(footer.links) ? footer.links : []).filter(
+      (entry): entry is SiteRawConfig =>
+        isRecord(entry) && !isFooterColumn(entry)
+    ),
   };
 }
 
@@ -550,6 +612,70 @@ function patchBanner(config: SiteRawConfig, form: SiteDesignForm) {
   config.banner = banner;
 }
 
+function writeFooterLink(link: SiteFooterLinkForm): SiteRawConfig | null {
+  const label = link.label.trim();
+  const href = link.href.trim();
+  if (!(label || href)) {
+    return null;
+  }
+  const next: SiteRawConfig = { label, href };
+  assign(next, "icon", link.icon);
+  return next;
+}
+
+function writeFooterSocials(socials: SiteFooterSocialForm[]): SiteRawConfig {
+  const written: SiteRawConfig = {};
+  for (const social of socials) {
+    assign(written, social.platform, social.url.trim() || undefined);
+  }
+  return written;
+}
+
+/** A column with nothing typed in, which isn't saved. */
+export function isBlankFooterColumn(column: SiteFooterColumnForm): boolean {
+  return (
+    !column.header.trim() &&
+    column.links.every((link) => !(link.label.trim() || link.href.trim()))
+  );
+}
+
+/** Blank columns are dropped; half-filled ones fail validation. */
+function writeFooterColumns(columns: SiteFooterColumnForm[]): SiteRawConfig[] {
+  return columns.flatMap((column) => {
+    if (isBlankFooterColumn(column)) {
+      return [];
+    }
+    const items = column.links.flatMap((link) => {
+      const next = writeFooterLink(link);
+      return next ? [next] : [];
+    });
+    const next: SiteRawConfig = { items };
+    assign(next, "header", column.header.trim() || undefined);
+    return [next];
+  });
+}
+
+function patchFooter(
+  config: SiteRawConfig,
+  form: SiteDesignForm,
+  initial: SiteDesignForm
+) {
+  const footer: SiteRawConfig = { ...record(config.footer) };
+  if (changed(form, initial, FOOTER_SOCIAL_KEYS)) {
+    assignObject(footer, "socials", writeFooterSocials(form.footerSocials));
+  }
+  if (changed(form, initial, FOOTER_COLUMN_KEYS)) {
+    const columns = form.footerColumnsEnabled
+      ? writeFooterColumns(form.footerColumns)
+      : [];
+    // blog.json holds either columns or flat links; the form remembers the
+    // flat ones, so switching columns off brings them back.
+    const links = columns.length > 0 ? columns : form.footerFlatLinks;
+    assign(footer, "links", links.length > 0 ? links : undefined);
+  }
+  assignObject(config, "footer", footer);
+}
+
 /** Writes only the sections the form changed, so untouched JSON stays as is. */
 export function patchDesign(
   source: SiteRawConfig,
@@ -610,11 +736,100 @@ export function patchDesign(
   if (changed(form, initial, BANNER_KEYS)) {
     patchBanner(config, form);
   }
+  if (changed(form, initial, [...FOOTER_SOCIAL_KEYS, ...FOOTER_COLUMN_KEYS])) {
+    patchFooter(config, form, initial);
+  }
   return config;
 }
 
 export function newNavbarLink(): SiteNavbarLinkForm {
   return { id: crypto.randomUUID(), label: "", href: "" };
+}
+
+export function newFooterLink(): SiteFooterLinkForm {
+  return { id: crypto.randomUUID(), label: "", href: "" };
+}
+
+/** The first column starts with the footer's flat links, so turning columns on loses none. */
+export function newFooterColumn(
+  flatLinks: SiteRawConfig[] = []
+): SiteFooterColumnForm {
+  const links = flatLinks.map((link) =>
+    readFooterLink(link, crypto.randomUUID())
+  );
+  return {
+    id: crypto.randomUUID(),
+    header: "",
+    links: links.length > 0 ? links : [newFooterLink()],
+  };
+}
+
+/**
+ * After a save the form is read back from blog.json, which drops blank rows,
+ * renumbers row ids and loses the flat-link backup. When the saved footer is
+ * exactly what the form wrote, keep the form's rows instead.
+ */
+export function keepUnsavedFooterRows(
+  next: SiteDesignForm,
+  form: SiteDesignForm
+): SiteDesignForm {
+  const sameSocials =
+    JSON.stringify(writeFooterSocials(next.footerSocials)) ===
+    JSON.stringify(writeFooterSocials(form.footerSocials));
+  const sameColumns = form.footerColumnsEnabled
+    ? JSON.stringify(writeFooterColumns(next.footerColumns)) ===
+      JSON.stringify(writeFooterColumns(form.footerColumns))
+    : !next.footerColumnsEnabled;
+  return {
+    ...next,
+    ...(sameSocials ? { footerSocials: form.footerSocials } : {}),
+    ...(sameColumns
+      ? {
+          footerColumnsEnabled: form.footerColumnsEnabled,
+          footerColumns: form.footerColumns,
+          footerFlatLinks: next.footerColumnsEnabled
+            ? form.footerFlatLinks
+            : next.footerFlatLinks,
+        }
+      : {}),
+  };
+}
+
+export function newFooterSocial(
+  platform: SiteSocialPlatform
+): SiteFooterSocialForm {
+  return { id: crypto.randomUUID(), platform, url: "" };
+}
+
+/** What the social field shows: the handle after the platform's prefix, else the URL. */
+export function socialHandle(social: SiteFooterSocialForm): {
+  prefix: string | null;
+  value: string;
+} {
+  const { prefix } = SITE_SOCIAL_LINKS[social.platform];
+  if (!prefix) {
+    return { prefix: null, value: social.url };
+  }
+  if (!social.url) {
+    return { prefix, value: "" };
+  }
+  return social.url.startsWith(prefix)
+    ? { prefix, value: social.url.slice(prefix.length) }
+    : { prefix: null, value: social.url };
+}
+
+/** URL for what was typed: pasted URLs stay as they are, handles get the prefix. */
+export function socialUrl(platform: SiteSocialPlatform, input: string): string {
+  const { prefix, keepsAt } = SITE_SOCIAL_LINKS[platform];
+  const value = input.trim();
+  if (!(prefix && value) || /^https?:\/\//i.test(value)) {
+    return value;
+  }
+  // "github.com/acme" is a URL without its scheme, not a handle.
+  if (/^[^/\s]+\.[^/\s]+\//.test(value)) {
+    return `https://${value}`;
+  }
+  return `${prefix}${keepsAt ? value : value.replace(/^@/, "")}`;
 }
 
 /** URL of a logo or favicon path as the live site serves it. */

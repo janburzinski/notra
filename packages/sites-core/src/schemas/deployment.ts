@@ -1,6 +1,7 @@
 import { SITE_CSP_MAX_LENGTH } from "@notra/sites-core/constants/security";
 import {
   SITE_AREAS,
+  SITE_FAVICON_HOST,
   SITE_PREVIEW_PASSWORD_ALGORITHM,
   SITE_PREVIEW_VISIBILITIES,
   SITE_STATUSES,
@@ -68,6 +69,8 @@ export const siteManifestSchema = z.object({
   contentSecurityPolicy: siteContentSecurityPolicySchema.optional(),
   analyticsConsent: z.boolean().optional(),
   consentBackendURL: z.url().optional(),
+  /** Host the footer links a favicon for, the only one the worker serves. */
+  faviconHost: z.string().regex(SITE_FAVICON_HOST).optional(),
 });
 
 export const siteServingPointerSchema = z.object({

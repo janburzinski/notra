@@ -21,6 +21,7 @@ import {
 } from "@notra/sites-core/utils/mounts";
 
 import type { BuildParams } from "../src/types/build-params";
+import { footerFaviconHost } from "../src/utils/favicons";
 import { rewritePublicAssetUrls } from "../src/utils/public-assets";
 import { normalizeAgentInstructions, writeAgentFiles } from "./agent-files";
 import { AREA_PAGES_FILE } from "./constants/build";
@@ -298,6 +299,7 @@ export async function buildSite(
     contentSecurityPolicy,
     analyticsConsent: analyticsGatedByConsent(config.integrations),
     consentBackendURL: config.integrations.c15t?.backendURL,
+    faviconHost: footerFaviconHost(config),
   };
 }
 

@@ -1,4 +1,5 @@
 import { analyticsEndpointsRoute } from "../routes/analytics-endpoints";
+import { faviconRoute } from "../routes/favicon";
 import { hostingApexRoute } from "../routes/hosting-apex";
 import { htmlNotFoundRoute } from "../routes/html-not-found";
 import { manifestRedirectsRoute } from "../routes/manifest-redirects";
@@ -39,6 +40,7 @@ export const PREVIEW_ROUTES: readonly SiteRoute<PreviewRouteContext>[] = [
 
 export const DEPLOYMENT_ROUTES: readonly SiteRoute<DeploymentRouteContext>[] = [
   analyticsEndpointsRoute,
+  faviconRoute,
 ];
 
 export const MANIFEST_ROUTES: readonly SiteRoute<ManifestRouteContext>[] = [

@@ -103,7 +103,7 @@ export const siteFooterSchema = z
       ])
       .default([]),
     socials: z
-      .partialRecord(z.enum(SITE_SOCIAL_PLATFORMS), z.url())
+      .partialRecord(z.enum(SITE_SOCIAL_PLATFORMS), platformHref)
       .default({}),
   })
   .default({ links: [], socials: {} });

@@ -16,6 +16,10 @@ import { pipeline } from "node:stream";
 import type { Duplex } from "node:stream";
 import { setTimeout as delay } from "node:timers/promises";
 
+import {
+  SITE_FAVICON_DIR,
+  SITE_FAVICON_HOST,
+} from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteMounts } from "@notra/sites-core/types/deployment";
 import type { SiteHeadScript } from "@notra/sites-core/types/site-integrations";
@@ -31,6 +35,7 @@ import {
   ASTRO_READY_SCAN_CHARS,
   ASTRO_READY_URL,
   DEV_ERRORS_PATH,
+  DEV_FAVICON_URL,
   DEV_HMR_GENERATION_EVENT,
   DEV_PORT_SEARCH_RANGE,
   DEV_PROXY_MAX_ATTEMPTS,
@@ -374,6 +379,15 @@ export function startDevProxy(
       )
     ) {
       outgoing.writeHead(404);
+      outgoing.end();
+      return;
+    }
+    // The worker proxies favicons; locally the browser may ask Google directly.
+    const faviconHost = pathname.split(`/${SITE_FAVICON_DIR}/`)[1];
+    if (faviconHost && SITE_FAVICON_HOST.test(faviconHost)) {
+      outgoing.writeHead(302, {
+        location: `${DEV_FAVICON_URL}?domain=${faviconHost}&sz=64`,
+      });
       outgoing.end();
       return;
     }

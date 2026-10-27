@@ -8668,6 +8668,26 @@
         "darkColorHint": "Background in dark mode.",
         "sameAsLight": "Same as light mode"
       },
+      "footer": {
+        "socials": "Social links",
+        "socialsHint": "Profiles shown as icons in the footer. Website links show that site's favicon.",
+        "addSocial": "Add social link",
+        "removeSocial": "Remove {platform}",
+        "handlePlaceholder": "username",
+        "columns": "Show footer columns",
+        "columnsHint": "Columns of links above the footer bar.",
+        "column": "Column {number}",
+        "columnHeader": "Header of column {number}",
+        "columnHeaderPlaceholder": "Column header",
+        "removeColumn": "Remove column {number}",
+        "linkLabel": "Label of link {number} in column {column}",
+        "linkHref": "URL of link {number} in column {column}",
+        "removeLink": "Remove link {number} from column {column}",
+        "linkLabelPlaceholder": "Label",
+        "linkHrefPlaceholder": "/path or https://example.com/path",
+        "addLink": "Add link",
+        "addColumn": "Add column"
+      },
       "brandDialog": {
         "title": "Use brand identity?",
         "description": "These fields will be filled from this project's brand identity. Nothing is saved until you save the draft.",
@@ -8724,7 +8744,8 @@
           "typography": "Typography",
           "navbar": "Navbar",
           "banner": "Banner",
-          "integrations": "Integrations"
+          "integrations": "Integrations",
+          "footer": "Footer"
         },
         "hints": {
           "general": "The name and description readers see.",
@@ -8733,7 +8754,8 @@
           "typography": "Fonts for headings and body text.",
           "navbar": "Links and actions in the site navigation.",
           "banner": "An announcement bar at the top of every page.",
-          "integrations": "Analytics and the cookie banner for this site."
+          "integrations": "Analytics and the cookie banner for this site.",
+          "footer": "Social links and link columns at the bottom of every page."
         }
       },
       "errors": {

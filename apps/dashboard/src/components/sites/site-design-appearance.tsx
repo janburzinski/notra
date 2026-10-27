@@ -8,6 +8,7 @@ import { Button } from "@/components/button";
 import { SiteBannerFields } from "@/components/sites/site-banner-fields";
 import { SiteBrandDialog } from "@/components/sites/site-brand-dialog";
 import { SiteBrandingFields } from "@/components/sites/site-branding-fields";
+import { SiteFooterFields } from "@/components/sites/site-footer-fields";
 import { SiteGeneralFields } from "@/components/sites/site-general-fields";
 import { SiteNavbarFields } from "@/components/sites/site-navbar-fields";
 import { SiteSettingsList } from "@/components/sites/site-settings-item";
@@ -23,6 +24,7 @@ import type { SiteDesignAppearanceProps } from "@/types/site-design-sections";
 import {
   applyBrandToDesign,
   describeBrandForDesign,
+  keepUnsavedFooterRows,
   patchDesign,
   readDesignForm,
 } from "@/utils/site-design";
@@ -36,7 +38,7 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
   const t = useTranslations("sites.design");
   if (snapshot !== state.document && !state.unsaved) {
     setSnapshot(state.document);
-    const next = readDesignForm(state.config);
+    const next = keepUnsavedFooterRows(readDesignForm(state.config), form);
     // An empty banner isn't saved, so keep its settings while the text is empty.
     const emptyBanner = form.bannerEnabled && !form.bannerContent.trim();
     setForm(
@@ -132,6 +134,17 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
     return (
       <SiteSettingsList>
         <SiteBannerFields form={form} update={update} />
+      </SiteSettingsList>
+    );
+  }
+  if (section === "footer") {
+    return (
+      <SiteSettingsList>
+        <SiteFooterFields
+          form={form}
+          patch={(patch) => change({ ...form, ...patch })}
+          update={update}
+        />
       </SiteSettingsList>
     );
   }

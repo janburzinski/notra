@@ -12,9 +12,13 @@ import {
   applyBrandToDesign,
   brandDefaultsFromGuidelines,
   describeBrandForDesign,
+  keepUnsavedFooterRows,
+  newFooterColumn,
   patchDesign,
   readDesignForm,
   siteConfigIssue,
+  socialHandle,
+  socialUrl,
 } from "../src/utils/site-design";
 
 const SOURCE: SiteRawConfig = {
@@ -177,6 +181,39 @@ const VARIANTS: [string, FormPatch][] = [
     },
   ],
   ["banner switched off", { bannerEnabled: false, bannerContent: "Hidden" }],
+  [
+    "footer socials",
+    {
+      footerSocials: [
+        {
+          id: "social-github",
+          platform: "github",
+          url: "https://github.com/acme",
+        },
+        { id: "social-website", platform: "website", url: "https://acme.com" },
+      ],
+    },
+  ],
+  [
+    "footer columns",
+    {
+      footerColumnsEnabled: true,
+      footerColumns: [
+        {
+          id: "column-0",
+          header: "Product",
+          links: [{ id: "link-0", label: "Pricing", href: "/pricing" }],
+        },
+        {
+          id: "column-1",
+          header: "",
+          links: [
+            { id: "link-0", label: "Docs", href: "https://acme.com/docs" },
+          ],
+        },
+      ],
+    },
+  ],
 ];
 
 /** Hidden fields keep their old values in the form but aren't written. */
@@ -226,6 +263,205 @@ describe("site design form", () => {
     expect((config.styling as SiteRawConfig).future).toBe("kept");
     expect((config.background as SiteRawConfig).future).toBe("kept");
     expect((config.appearance as SiteRawConfig).storageKey).toBe("acme-theme");
+  });
+
+  test("flat footer links survive switching columns on and off while typing", () => {
+    const source: SiteRawConfig = {
+      ...SOURCE,
+      footer: {
+        links: [{ label: "Status", href: "https://status.acme.com" }],
+        socials: { x: "https://x.com/acme" },
+      },
+    };
+    // The page patches the current config against the previous form each keystroke.
+    let config = source;
+    let form = readDesignForm(source);
+    const edit = (patch: FormPatch) => {
+      const next = { ...form, ...patch };
+      config = patchDesign(config, next, form);
+      form = next;
+    };
+    expect(form.footerColumnsEnabled).toBe(false);
+    edit({
+      footerColumnsEnabled: true,
+      footerColumns: [newFooterColumn(form.footerFlatLinks)],
+    });
+    const [column] = form.footerColumns;
+    if (!column) {
+      throw new Error("expected a seeded column");
+    }
+    edit({ footerColumns: [{ ...column, header: "C" }] });
+    expect(config.footer).toEqual({
+      links: [
+        {
+          header: "C",
+          items: [{ label: "Status", href: "https://status.acme.com" }],
+        },
+      ],
+      socials: { x: "https://x.com/acme" },
+    });
+    edit({ footerColumnsEnabled: false });
+    expect(config.footer).toEqual(source.footer);
+  });
+
+  test("saving and reloading between edits keeps rows, ids and the flat-link backup", () => {
+    const source: SiteRawConfig = {
+      ...SOURCE,
+      footer: { links: [{ label: "Status", href: "https://status.acme.com" }] },
+    };
+    let config = source;
+    let form = readDesignForm(source);
+    const edit = (patch: FormPatch) => {
+      const next = { ...form, ...patch };
+      config = patchDesign(config, next, form);
+      form = next;
+    };
+    // What the page does after an autosave: read blog.json back into the form.
+    const reload = () => {
+      form = keepUnsavedFooterRows(readDesignForm(config), form);
+    };
+    edit({
+      footerColumnsEnabled: true,
+      footerColumns: [newFooterColumn(form.footerFlatLinks)],
+      footerSocials: [{ id: "typed", platform: "github", url: "" }],
+    });
+    reload();
+    const [column] = form.footerColumns;
+    if (!column) {
+      throw new Error("expected the seeded column");
+    }
+    const ids = form.footerColumns.map((item) => item.id);
+    edit({
+      footerColumns: [
+        {
+          ...column,
+          links: [...column.links, { id: "blank", label: "", href: "" }],
+        },
+        { id: "blank-column", header: "", links: [] },
+      ],
+      footerSocials: [
+        { id: "typed", platform: "github", url: "https://github.com/acme" },
+      ],
+    });
+    reload();
+    expect(form.footerColumns.map((item) => item.id)).toEqual([
+      ...ids,
+      "blank-column",
+    ]);
+    expect(form.footerColumns[0]?.links.at(-1)?.id).toBe("blank");
+    expect(form.footerSocials.map((item) => item.id)).toEqual(["typed"]);
+    edit({ footerColumnsEnabled: false });
+    reload();
+    expect(config.footer).toEqual({
+      links: [{ label: "Status", href: "https://status.acme.com" }],
+      socials: { github: "https://github.com/acme" },
+    });
+  });
+
+  test("blank columns are not saved but survive the reload after saving", () => {
+    const initial = readDesignForm(SOURCE);
+    const form: SiteDesignForm = {
+      ...initial,
+      footerColumnsEnabled: true,
+      footerColumns: [
+        { id: "blank", header: "", links: [{ id: "a", label: "", href: "" }] },
+      ],
+      footerSocials: [{ id: "s", platform: "github", url: "" }],
+    };
+    const config = patchDesign(SOURCE, form, initial);
+    expect(config).not.toHaveProperty("footer");
+    const reloaded = keepUnsavedFooterRows(readDesignForm(config), form);
+    expect(reloaded.footerColumnsEnabled).toBe(true);
+    expect(reloaded.footerColumns).toEqual(form.footerColumns);
+    expect(reloaded.footerSocials).toEqual(form.footerSocials);
+  });
+
+  test("removing every social link drops the footer key it no longer needs", () => {
+    const source: SiteRawConfig = {
+      ...SOURCE,
+      footer: { socials: { github: "https://github.com/acme" } },
+    };
+    const initial = readDesignForm(source);
+    const config = patchDesign(
+      source,
+      { ...initial, footerSocials: [] },
+      initial
+    );
+    expect(config).not.toHaveProperty("footer");
+  });
+
+  test("footer column links keep their blog.json icons", () => {
+    const source: SiteRawConfig = {
+      ...SOURCE,
+      footer: {
+        links: [
+          {
+            header: "Docs",
+            items: [{ label: "Guide", href: "/guide", icon: "book-open" }],
+          },
+        ],
+      },
+    };
+    const initial = readDesignForm(source);
+    const column = initial.footerColumns[0];
+    if (!column) {
+      throw new Error("expected the column from blog.json");
+    }
+    const config = patchDesign(
+      source,
+      {
+        ...initial,
+        footerColumns: [{ ...column, header: "Learn" }],
+      },
+      initial
+    );
+    expect(config.footer).toEqual({
+      links: [
+        {
+          header: "Learn",
+          items: [{ label: "Guide", href: "/guide", icon: "book-open" }],
+        },
+      ],
+    });
+  });
+
+  test("social handles get the platform prefix and pasted URLs stay as typed", () => {
+    expect(socialUrl("github", "acme")).toBe("https://github.com/acme");
+    expect(socialUrl("x", "@acme")).toBe("https://x.com/acme");
+    expect(socialUrl("youtube", "@acme")).toBe("https://www.youtube.com/@acme");
+    expect(socialUrl("github", "https://github.com/acme")).toBe(
+      "https://github.com/acme"
+    );
+    expect(socialUrl("discord", "https://acme.com/discord")).toBe(
+      "https://acme.com/discord"
+    );
+    expect(socialUrl("github", "  ")).toBe("");
+    expect(socialUrl("github", "github.com/acme")).toBe(
+      "https://github.com/acme"
+    );
+    expect(socialUrl("linkedin", "www.linkedin.com/company/acme")).toBe(
+      "https://www.linkedin.com/company/acme"
+    );
+    expect(socialUrl("linkedin", "company/acme")).toBe(
+      "https://www.linkedin.com/company/acme"
+    );
+    expect(socialUrl("bluesky", "acme.bsky.social")).toBe(
+      "https://bsky.app/profile/acme.bsky.social"
+    );
+    expect(
+      socialHandle({
+        id: "a",
+        platform: "github",
+        url: "https://github.com/acme",
+      })
+    ).toEqual({ prefix: "https://github.com/", value: "acme" });
+    expect(
+      socialHandle({ id: "a", platform: "x", url: "https://twitter.com/acme" })
+    ).toEqual({ prefix: null, value: "https://twitter.com/acme" });
+    expect(socialHandle({ id: "a", platform: "x", url: "" })).toEqual({
+      prefix: "https://x.com/",
+      value: "",
+    });
   });
 
   test("a self-hosted font gets its format from the file name", () => {

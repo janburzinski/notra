@@ -8668,6 +8668,26 @@
         "darkColorHint": "Hintergrund im dunklen Modus.",
         "sameAsLight": "Wie im hellen Modus"
       },
+      "footer": {
+        "socials": "Social Links",
+        "socialsHint": "Profile, die im Footer als Icons erscheinen. Website-Links zeigen das Favicon der Seite.",
+        "addSocial": "Social Link hinzufügen",
+        "removeSocial": "{platform} entfernen",
+        "handlePlaceholder": "nutzername",
+        "columns": "Footer-Spalten anzeigen",
+        "columnsHint": "Spalten mit Links über der Footer-Leiste.",
+        "column": "Spalte {number}",
+        "columnHeader": "Überschrift von Spalte {number}",
+        "columnHeaderPlaceholder": "Spaltenüberschrift",
+        "removeColumn": "Spalte {number} entfernen",
+        "linkLabel": "Bezeichnung von Link {number} in Spalte {column}",
+        "linkHref": "URL von Link {number} in Spalte {column}",
+        "removeLink": "Link {number} aus Spalte {column} entfernen",
+        "linkLabelPlaceholder": "Bezeichnung",
+        "linkHrefPlaceholder": "/pfad oder https://example.com/pfad",
+        "addLink": "Link hinzufügen",
+        "addColumn": "Spalte hinzufügen"
+      },
       "brandDialog": {
         "title": "Brand Identity übernehmen?",
         "description": "Diese Felder werden aus der Brand Identity dieses Projekts gefüllt. Gespeichert wird erst, wenn du den Entwurf speicherst.",
@@ -8724,7 +8744,8 @@
           "typography": "Typografie",
           "navbar": "Navigation",
           "banner": "Banner",
-          "integrations": "Integrationen"
+          "integrations": "Integrationen",
+          "footer": "Footer"
         },
         "hints": {
           "general": "Name und Beschreibung für deine Leser.",
@@ -8733,7 +8754,8 @@
           "typography": "Schriften für Überschriften und Fließtext.",
           "navbar": "Links und Aktionen in der Seitennavigation.",
           "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",
-          "integrations": "Analytics und Cookie-Banner für diese Seite."
+          "integrations": "Analytics und Cookie-Banner für diese Seite.",
+          "footer": "Social Links und Link-Spalten unten auf jeder Seite."
         }
       },
       "errors": {
