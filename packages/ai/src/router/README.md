@@ -86,11 +86,14 @@ If no compliant route is available, strict requests fail closed.
 
 Callers that accept best-effort privacy pass `zdr: "preferred"`. The router
 tries a compliant route first. If providers reject the privacy requirements
-and no compliant fallback exists, it retries with ZDR and no-training defaults
-relaxed. This includes Muse Spark's "No providers that disallow prompt training"
-error. The result is logged as `ai.router.zdr_bypassed` with `zdrEnforced: false`.
+and no compliant fallback exists, it retries with the ZDR default relaxed.
+No-training is never relaxed, so a model without a provider that disallows
+prompt training (such as Muse Spark's "No providers that disallow prompt
+training" error) fails closed without that retry. The result is logged as `ai.router.zdr_bypassed`
+with `zdrEnforced: false`.
 
-Requests with `zdr: "none"` relax both defaults immediately. These modes work
+Requests with `zdr: "none"` relax the ZDR default immediately and keep
+no-training on. These modes work
 outside development and do not depend on the development-only `allowNonZdr`
 policy. Explicit caller no-training restrictions remain in effect.
 

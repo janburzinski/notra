@@ -200,8 +200,8 @@ export interface BuildProviderOptionsInput {
   /** When true privacy flags may be relaxed by the caller (dev only). */
   allowNonZdr: boolean;
   /**
-   * Relax privacy defaults for `zdr: "none"` or an accepted best-effort
-   * fallback from `zdr: "preferred"`. Explicit no-training options remain.
+   * Relax the ZDR default for `zdr: "none"` or an accepted best-effort
+   * fallback from `zdr: "preferred"`. No-training always stays on.
    */
   relaxZdr?: boolean;
 }

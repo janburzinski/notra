@@ -10,6 +10,7 @@ import type {
 import {
   DAILY_LIMIT_ERROR_PATTERN,
   HTTP_TOO_MANY_REQUESTS,
+  NO_TRAINING_PROVIDER_ERROR_PATTERN,
   ROUTED_MODEL_PROVIDER,
   ROUTER_METADATA_KEY,
 } from "@notra/ai/constants/router";
@@ -488,7 +489,11 @@ export class RoutedLanguageModel implements LanguageModelV4 {
     if (crossGateway) {
       return crossGateway;
     }
-    if (reason === "non-compliant" && this.canRelaxZdr(route)) {
+    if (
+      reason === "non-compliant" &&
+      this.canRelaxZdr(route) &&
+      !NO_TRAINING_PROVIDER_ERROR_PATTERN.test(readMessage(error))
+    ) {
       return this.relaxZdr(route, error, toolIds);
     }
     if (marked) {

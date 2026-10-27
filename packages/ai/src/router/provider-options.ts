@@ -147,7 +147,7 @@ export function buildVercelProviderOptions(
   const zeroDataRetention = resolveZdrFlag(relaxZdr, allowNonZdr, privacy.zdr);
   const disallowPromptTraining =
     privacy.noTraining ||
-    (!relaxZdr && !(allowNonZdr && existing.disallowPromptTraining === false));
+    !(allowNonZdr && existing.disallowPromptTraining === false);
 
   const { zeroDataRetention: _ignoredZdr, ...existingWithoutZdr } = existing;
   const gatewayOptions: Record<string, unknown> = {
@@ -218,8 +218,8 @@ export function buildOpenRouterProviderOptions(
   const zdr = resolveZdrFlag(relaxZdr, allowNonZdr, privacy.zdr);
   const dataCollection =
     !privacy.noTraining &&
-    ((relaxZdr && existingProvider.data_collection !== "deny") ||
-      (allowNonZdr && existingProvider.data_collection === "allow"))
+    allowNonZdr &&
+    existingProvider.data_collection === "allow"
       ? "allow"
       : "deny";
 

@@ -849,7 +849,7 @@ describe("development ZDR bypass", () => {
       [
         { data_collection: "deny" },
         { zdr: true, data_collection: "deny" },
-        { zdr: false, data_collection: "allow" },
+        { zdr: false, data_collection: "deny" },
       ]
     );
   });
@@ -943,7 +943,7 @@ describe("zdr: preferred", () => {
     );
     assert.equal(
       vercel.calls[0]?.options.providerOptions?.gateway?.disallowPromptTraining,
-      false
+      true
     );
     assert.equal(vercel.calls.length, 1);
     assert.equal(openrouter.calls.length, 0);
@@ -981,7 +981,7 @@ describe("zdr: preferred", () => {
       vercel.calls.map(
         (call) => call.options.providerOptions?.gateway?.disallowPromptTraining
       ),
-      [true, false, false]
+      [true, true, true]
     );
     await assert.rejects(
       async () =>
@@ -1024,7 +1024,7 @@ describe("zdr: preferred", () => {
 });
 
 describe("non-enforced workspace privacy", () => {
-  test("none relaxes both gateways with the production policy", async () => {
+  test("none relaxes ZDR but keeps no-training on both gateways", async () => {
     const { router, vercel, openrouter } = createTestRouter({ plans });
     for (const gateway of ["vercel", "openrouter"] as const) {
       await router
@@ -1038,18 +1038,18 @@ describe("non-enforced workspace privacy", () => {
     assert.equal(
       vercel?.calls[0]?.options.providerOptions?.gateway
         ?.disallowPromptTraining,
-      false
+      true
     );
     assert.deepEqual(
       openrouter?.calls[0]?.options.providerOptions?.openrouter?.provider,
       {
         zdr: false,
-        data_collection: "allow",
+        data_collection: "deny",
       }
     );
   });
 
-  test("preferred recovers from the Muse Spark rejection but required stays strict", async () => {
+  test("the Muse Spark no-training rejection fails closed without a doomed retry", async () => {
     const vercel = createFakeAdapter({
       id: "vercel",
       onCall: (call) => {
@@ -1062,39 +1062,30 @@ describe("non-enforced workspace privacy", () => {
       },
     });
     const { router } = createTestRouter({ plans, vercel, openrouter: null });
-    await router
-      .model(MODEL, {
-        organizationId: PAID_ORG,
-        gateway: "vercel",
-        zdr: "preferred",
-      })
-      .doGenerate(callOptions());
-    assert.deepEqual(
-      vercel.calls.map(
-        (call) => call.options.providerOptions?.gateway?.disallowPromptTraining
-      ),
-      [true, false]
-    );
     await assert.rejects(
       async () =>
         await router
           .model(MODEL, {
             organizationId: PAID_ORG,
             gateway: "vercel",
-            zdr: "required",
+            zdr: "preferred",
           })
-          .doGenerate(callOptions()),
-      NoCompliantRouteError
+          .doGenerate(callOptions())
+    );
+    assert.equal(vercel.calls.length, 1);
+    assert.equal(
+      vercel.calls[0]?.options.providerOptions?.gateway?.disallowPromptTraining,
+      true
     );
   });
 });
 
-test("relaxed OpenRouter calls override provider and model privacy defaults on the wire", async () => {
+test("relaxed OpenRouter calls drop ZDR but keep data collection denied on the wire", async () => {
   const adapter = createOpenRouterAdapter({
     apiKey: "test-key",
     fetch: async (_url, init) => {
       const body = JSON.parse(String(init?.body));
-      assert.deepEqual(body.provider, { zdr: false, data_collection: "allow" });
+      assert.deepEqual(body.provider, { zdr: false, data_collection: "deny" });
       return Response.json({
         id: "test",
         created: 0,
