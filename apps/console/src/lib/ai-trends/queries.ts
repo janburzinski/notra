@@ -133,11 +133,12 @@ const checkDomains = sql`
   select domain from (
     select ${hostWithoutPrefix} as domain
     from (
-      select lower(
+      -- rtrim folds example.com. into example.com.
+      select rtrim(lower(
         split_part(split_part(split_part(split_part(
           split_part(url, '://', 2), '/', 1), '?', 1), '#', 1), ':', 1)
         collate "default"
-      ) collate "C" as host
+      ) collate "C", '.') as host
       from (
         select distinct url from (
           select value->>'url' collate "C" as url
@@ -157,6 +158,10 @@ const checkDomains = sql`
     offset 0
   ) domains
   where domain <> '' and domain <> all(${ignoredDomains})
+    -- Loopback, LAN names and raw IPs, which getReferenceDomain drops
+    -- for new checks. Older checks still store them.
+    and domain like '%.%'
+    and domain !~ '^[0-9.]+$|[.](localhost|localdomain|local|internal|test|invalid|onion|home[.]arpa)$'
 `;
 
 /**

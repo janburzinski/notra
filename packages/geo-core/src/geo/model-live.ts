@@ -40,6 +40,7 @@ import {
   toMentionEvaluation,
 } from "../utils/geo-check-evaluation";
 import { engineModelOf } from "../utils/geo-engine-family";
+import { getReferenceDomain } from "../utils/reference-display";
 import { addLanguageModelTokenUsage } from "../utils/token-usage";
 import { buildGroundedInvocation } from "./engines";
 import { GeoJudgeError, GeoScanError, GeoTranslationError } from "./errors";
@@ -351,7 +352,11 @@ function collectSources(
 ) {
   const seen = new Set<string>();
   return sources.flatMap((source) => {
-    if (source.sourceType !== "url" || seen.has(source.url)) {
+    if (
+      source.sourceType !== "url" ||
+      seen.has(source.url) ||
+      !getReferenceDomain(source.url)
+    ) {
       return [];
     }
     seen.add(source.url);

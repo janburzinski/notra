@@ -124,6 +124,7 @@ import {
   geoScanPlanSummary,
   geoScanSequenceTasks,
 } from "../utils/geo-scan-plan";
+import { withPublicUrls } from "../utils/reference-display";
 import {
   addAgentTokenUsage as addTokenUsage,
   agentTokenUsageFrom,
@@ -262,7 +263,7 @@ function toBoxEngineAnswer(result: GeoBoxAnswer): GeoEngineAnswer {
       ...result,
       sources: [...result.groundingSources, ...result.sources],
     }),
-    sources: result.sources,
+    sources: withPublicUrls(result.sources),
     finishReason: "stop",
     usage: result.usage,
     zdrEnforced: false,
