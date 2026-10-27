@@ -22,7 +22,7 @@ Notra is a Bun + Turborepo monorepo.
 ```text
 /
 |- apps/
-|  |- ai-traffic-ingest/ # Bun collector (Unkey Compute ready; Railway transition)
+|  |- ai-traffic-ingest/ # Bun collector (Unkey Compute)
 |  |- api/         # Hono API (Cloudflare Worker)
 |  |- dashboard/   # Main Notra product app (TanStack Start)
 |  |- console/     # Companion/admin app (Next.js, port 3003)
@@ -686,7 +686,7 @@ keep their current build; a failed migration stops both demo builds. After
 the demo deploys, the release calls `/api/healthcheck?deep=1` on the demo,
 which selects every column of every table through the app's own database role
 (no rows) and fails with the first missing table or column. Sandbox seeding and
-pool cleanup happen on visitor requests, not through a Railway/Vercel cron.
+pool cleanup happen on visitor requests, not through a cron.
 
 ### First deployment and cutover
 
@@ -709,9 +709,6 @@ pool cleanup happen on visitor requests, not through a Railway/Vercel cron.
    entry, seeded GEO data, sandbox reset, a generated demo API key, a real
    request from the API console, request-log updates, and one streaming chat
    or content-generation run. A green liveness probe alone is not sufficient.
-5. The release no longer deploys the demo to Railway. The old Railway demo
-   services are not deleted and DNS is not changed; retire them in the private
-   infra repository.
 
 For scheduled releases, use the existing GitHub Actions secret `UNKEY_DEPLOY_ROOT_KEY`
 with read access to every enabled Unkey app, its production environment, domains and
@@ -797,37 +794,13 @@ every project. Each project's existing build command, environment, migrations,
 and build cache remain in use. The workflow waits for `READY`, verifies the built
 SHA and that the production alias points to the new deployment, and reports
 failures in the Actions summary. Polling is limited to ten minutes
-per project. Each enabled Unkey service has a 20-minute polling limit, followed
-by a 20-minute Railway phase. All phases, preflight and local builds share the
+per project. Each enabled Unkey service has a 20-minute polling limit. All phases, preflight and local builds share the
 workflow's 120-minute job limit; that limit can expire before every provider's
 individual polling allowance is exhausted when multiple Unkey services are enabled.
 Projects deploy independently; a failed project does not roll back another
 project's successful deployment.
 Deployment creation is not automatically retried, since a timed-out request may
 already have started a build.
-
-Without `UNKEY_DEPLOY_ROOT_KEY`, the same release deploys `ai-traffic-ingest`
-(project notra-prod) to Railway. With the shared key configured, it deploys to
-Unkey instead.
-Their main-branch deployment triggers are removed, so
-pushes to `main` no longer deploy them; keep the GitHub repository connected so
-the API can build the pinned commit. Add a GitHub Actions secret named
-`RAILWAY_TOKEN` containing a Railway workspace token for the Notra workspace
-(railway.com/account/tokens).
-Without it, the whole release fails, including the Vercel builds.
-
-Railway services use the same history and change checks, compared with each
-service's latest successful deployment, and an active Railway deployment blocks
-the release before any builds start. They deploy only after every Vercel build
-succeeded, so a failed Vercel release leaves them on the previous commit. The
-builds run in parallel, polling is limited to 20 minutes, and the release fails
-unless each deployment reaches `SUCCESS` with the release SHA. Railway watch
-patterns must stay unset: a deployment skipped by them would leave a service
-behind production and fails the release.
-
-Railway service settings for ingest, legacy demo services and the monitoring stack live as
-infrastructure as code in the private `usenotra/infra` repository. It does not
-apply on merge or replace this release workflow.
 
 The production API at `api.usenotra.com` is hosted on Unkey Compute, not the
 demo API. Its scheduled release is opt-in: add the GitHub Actions
@@ -864,8 +837,7 @@ workflow rechecks the API's production configuration, active deployments and liv
 commit before creating its build. An intervening newer release, rollback, or domain
 target change blocks the API deployment; an intervening release of the selected
 commit skips the duplicate build. It then polls for up to 20 minutes until that deployment is
-`ready`, has the expected target and commit, and is current in production. An API
-failure prevents Railway deployments. Deployment creation is not retried, and no
+`ready`, has the expected target and commit, and is current in production. Deployment creation is not retried, and no
 provider settings are changed by the workflow. The release is not atomic: an API
 failure does not roll back Vercel projects that have already published.
 
@@ -885,27 +857,24 @@ connected repository/main/production environment, rollback and active-deployment
 state, current live commit and history, then pins the selected SHA in a v3
 deployment request. The target is rechecked after Vercel and the workflow waits
 for that deployment to be ready and current on the expected target and SHA.
-Inaccessible or invalid configuration fails closed, without falling back to Railway.
+Inaccessible or invalid configuration fails closed.
 
 Grant the shared Compute-workspace deployment root key read access to all four
 apps, environments, domains and deployments and deployment-create access to all
 targets. Permission failures stop the release without fallback. Keep this CI-only
 key separate from runtime keys; it needs no Turbo environment declaration or
-runtime `.env` addition. Configuring the key selects Unkey for API, ingest and both
-demo services, removing ingest from Railway preflight and deployment.
+runtime `.env` addition. Configuring the key enables the API, ingest and both demo
+services.
 
 Preflight runs before CI's local builds, again before provider builds, and each
 Unkey target is rechecked immediately before its deployment. A failed Unkey
-preflight prevents all builds. A later Unkey failure prevents Railway releases
+preflight prevents all builds. A later Unkey failure fails the release
 but cannot undo already published Vercel or Unkey deployments. To activate ingest,
 first complete the initial app deployment and domain verification, then configure
 the shared key and run a read-only `dry_run` while its existing trigger
 remains enabled; only when that succeeds and the replacement schedule is ready, disable ingest's
-production **Auto deploy** and verify a manual real workflow run. Keep Railway
-alive for domain rollback during the transition. Restoring Railway ingest
-scheduling requires an explicit release-routing change; it does not change DNS
-or move traffic. Removing the shared key disables all four Unkey releases, not
-just ingest.
+production **Auto deploy** and verify a manual real workflow run. Removing the
+shared key disables all four Unkey releases, not just ingest.
 
 For an urgent release, open **Actions → Production deploy → Run workflow**, select
 `main`, and leave `dry_run` unchecked. This uses the same CI and change checks.

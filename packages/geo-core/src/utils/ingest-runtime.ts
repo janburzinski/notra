@@ -4,9 +4,6 @@ export function getGeoIngestRuntime(): GeoIngestRuntime {
   if (process.env.UNKEY_DEPLOYMENT_ID) {
     return "unkey";
   }
-  if (process.env.RAILWAY_SERVICE_ID) {
-    return "railway";
-  }
   if (process.env.VERCEL) {
     return "vercel";
   }
@@ -14,9 +11,5 @@ export function getGeoIngestRuntime(): GeoIngestRuntime {
 }
 
 export function getGeoIngestRegion(): string | undefined {
-  return (
-    process.env.UNKEY_REGION ??
-    process.env.RAILWAY_REPLICA_REGION ??
-    process.env.VERCEL_REGION
-  );
+  return process.env.UNKEY_REGION ?? process.env.VERCEL_REGION;
 }

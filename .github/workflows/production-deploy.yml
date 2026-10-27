@@ -61,7 +61,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_TEAM_ID: team_J0UtPqQdb8AdDMRkyvJuR8kM
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           UNKEY_DEPLOY_ROOT_KEY: ${{ secrets.UNKEY_DEPLOY_ROOT_KEY }}
           DRY_RUN: ${{ inputs.dry_run || false }}
           RELEASE_SHA: ${{ steps.release.outputs.sha }}
@@ -148,7 +147,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_TEAM_ID: team_J0UtPqQdb8AdDMRkyvJuR8kM
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           UNKEY_DEPLOY_ROOT_KEY: ${{ secrets.UNKEY_DEPLOY_ROOT_KEY }}
           DEMO_MIGRATION_DATABASE_URL: ${{ secrets.DEMO_MIGRATION_DATABASE_URL }}
           DRY_RUN: ${{ inputs.dry_run || false }}

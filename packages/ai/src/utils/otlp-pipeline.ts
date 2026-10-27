@@ -18,10 +18,7 @@ export function createOTLPPipeline() {
       url.password ||
       url.search ||
       url.hash ||
-      (url.protocol !== "https:" &&
-        !(
-          url.protocol === "http:" && url.hostname.endsWith(".railway.internal")
-        ))
+      url.protocol !== "https:"
     ) {
       throw new Error("invalid endpoint");
     }
@@ -38,10 +35,7 @@ export function createOTLPPipeline() {
           headers: { Authorization: `Bearer ${token}` },
           serviceName: process.env.NOTRA_TELEMETRY_SERVICE_NAME,
           environmentName:
-            process.env.VERCEL_ENV ??
-            process.env.RAILWAY_ENVIRONMENT_NAME ??
-            process.env.NODE_ENV ??
-            "unknown",
+            process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown",
         }
       ),
     {

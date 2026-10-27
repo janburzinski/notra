@@ -1,8 +1,6 @@
 # AI traffic ingestion
 
-Hono HTTP service on Bun for `POST /api/geo/ingest`. This runbook prepares
-hosting on Unkey Compute; the existing Railway service remains the transition
-and rollback target until an operator completes and verifies the cutover.
+Hono HTTP service on Bun for `POST /api/geo/ingest`, hosted on Unkey Compute.
 Hono handles routing and HTTP responses. The Effect processing pipeline lives
 in `packages/geo-core/src/ingest` and is also used by the dashboard's
 compatibility handler. `Effect.runPromise` is the boundary between Hono and
@@ -17,7 +15,7 @@ the pipeline; typed failures are mapped to HTTP responses via `Effect.result`.
   installation snippets, and traffic queries.
 - Both use the same Postgres, Redis, Tinybird workspace and signing secret.
   Shared Redis keys preserve cache invalidation and the per-organization limit
-  across replicas and during the migration.
+  across replicas.
 
 Tracked events receive `202` once queued in the bounded in-memory batcher, or
 after Tinybird accepts a direct write when the batcher is full. Dropped
@@ -103,8 +101,7 @@ and termination grace for this app with an isolated test deployment. Shutdown
 allows 35 seconds for active/background work, then stops the three independent
 batchers concurrently with a 12-second deadline each, then allows 2 seconds to
 close Postgres and 10 seconds to flush logs: a nominal 59-second budget plus
-runtime overhead. Do not assume Unkey provides Railway's configured 60-second
-grace. Confirm adequate host grace and test replacement/shutdown under load.
+runtime overhead. Confirm adequate host grace and test replacement/shutdown under load.
 Deadlines do not make queued events durable; forced termination or failed writes
 can lose buffered events. Do not cut over if the host's grace is inadequate.
 
@@ -125,10 +122,10 @@ Expect liveness `200`, readiness `503`, and ingestion `503` with missing
 configuration. The worker tests use synthetic localhost-only dependency URLs
 to verify configured readiness and token rejection without contacting production.
 
-## Cut over to Unkey Compute
+## Set up a new Unkey Compute app
 
-1. Keep Railway running with its current configuration. Create and **initially
-   deploy the Unkey app manually**, before enabling scheduled domain discovery.
+1. Create and **initially deploy the Unkey app manually**, before enabling
+   scheduled domain discovery.
    A new app without a verified domain and current deployment cannot pass CI's
    preflight. Auto deploy may remain enabled during this setup.
 2. First test a dedicated Unkey origin with isolated test Postgres, Redis,
@@ -156,75 +153,20 @@ to verify configured readiness and token rejection without contacting production
    needed. Run **Production deploy** with `dry_run` checked. Only after a successful
    dry-run and when scheduled releases are ready, disable production **Auto deploy**
    for ingest, preserving the GitHub connection, and verify a manual real workflow
-   run. No additional release flags are needed: the shared key selects Unkey for
-   API, ingest and both demo apps. Ingest and both demo services leave Railway's
-   release/preflight list. A permission failure or other Unkey error never falls
-   back to Railway. Without the shared key, the legacy Railway schedule remains
-   in use. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
+   run. No additional release flags are needed: the shared key enables API,
+   ingest and both demo apps. A permission failure or other Unkey error fails
+   the release. Without the shared key, ingest is not released.
+   See [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 Manual Unkey deployments remain available if scheduled ingest releases are not
 enabled. Do not disable the current deployment trigger before its replacement
-is ready. This preparation does not establish that a live migration occurred.
+is ready.
 
-### Roll back the provider cutover
-
-Keep the Railway service alive throughout the observation window. If needed,
-route `ingest.usenotra.com` back to the retained Railway service using the
-operator's reviewed domain/DNS configuration, and verify TLS, readiness and
-tracked event delivery after DNS propagation. Keeping the same public domain
-avoids customer endpoint changes; DNS caches can temporarily send traffic to
-both providers, so keep their shared signer, Redis and data configuration aligned.
-Restoring Railway ingest to the scheduled workflow requires an explicit
-release-routing change before running it again. Removing the shared deployment
-key disables all four Unkey releases, not just ingest. Scheduling changes do not
-change DNS or traffic routing. Check the live Railway commit and history first; provider
-rollback does not bypass the release history guard.
-
-Removing `GEO_INGEST_URL` is a different rollback: it restores the dashboard's
+Removing `GEO_INGEST_URL` is a rollback: it restores the dashboard's
 local compatibility handler but does not redirect SDK clients using the stable
 ingest domain. Use the legacy fallback procedure below only when that is intended.
 
-## Transitional Railway configuration
-
-The existing `notra-prod` / `production` service is described in
-`.railway/ai-traffic.ts` in the private
-[`usenotra/infra`](https://github.com/usenotra/infra/blob/main/.railway/ai-traffic.ts)
-repository. Reuse that service,
-its two Virginia replicas, and the existing shared database, Upstash, and Tinybird
-configuration; do not provision replacements. See the
-[Railway IaC guide](https://github.com/usenotra/infra/blob/main/.railway/README.md)
-for plans and applies.
-The repository's scheduled release owns deployments and keeps watch patterns
-unset; the manual setup below is for a new standalone installation.
-
-For a new installation, create an `ai-traffic-ingest` service in your own Railway
-project. Keep the build root at `/`, since the app imports workspace packages.
-Configure the service with:
-
-| Setting | Value |
-| --- | --- |
-| Builder | Dockerfile |
-| Dockerfile path | `apps/ai-traffic-ingest/Dockerfile` |
-| Healthcheck | `/readyz` |
-| Region | US East (Virginia), next to Postgres and Upstash |
-| Replicas | 2 in the same region |
-| Healthcheck timeout | 60 seconds |
-| Public target port | 3000 |
-| Restart policy | On failure, maximum 5 retries |
-| App sleeping | Disabled |
-
-Set `PORT=3000` to match the public target port, and
-`RAILWAY_DEPLOYMENT_DRAINING_SECONDS=60` so Railway allows in-flight work to
-finish when replacing a deployment. The healthcheck uses `/readyz` so a deploy
-with missing credentials is never promoted. Every tracked hit reads Postgres and
-Upstash before the SDK's 2 second timeout, so run the service in one region next
-to them rather than in several distant ones.
-
-Keep watch patterns unset and the GitHub repository connected without main-branch
-deployment triggers. The scheduled production release builds the checked commit
-after Vercel succeeds; see [CONTRIBUTING.md](../../CONTRIBUTING.md). IaC changes
-need a separately reviewed `railway config apply`; deployments do not read the
-TypeScript configuration automatically.
+## Docker image
 
 The Docker image contains only Bun and the built bundle. No Next.js server,
 build-time credentials, or database migration is required. Build locally with:
@@ -269,14 +211,14 @@ Readiness checks configuration only, not external connectivity or credential
 validity. Check a real AI request and its appearance in the dashboard before
 switching production traffic.
 
-## Legacy standalone Railway installation
+## Point the dashboard at the service
 
-1. Add the shared credentials in Railway, redeploy, and verify `/readyz`.
+1. Add the shared credentials to the service, redeploy, and verify `/readyz`.
 2. Send an AI request through a site with a valid project token and confirm
    that Tinybird and the dashboard receive it.
 3. Set `GEO_INGEST_URL` to the service's public HTTPS origin in the dashboard
    and public API environments, then redeploy those apps.
-4. New setup snippets point directly to Railway. The dashboard uses Nitro
+4. New setup snippets point directly to the service. The dashboard uses Nitro
    `routeRules` proxies to forward existing `/api/geo/ingest` and drain
    installs to the service without invoking its local handler or asking
    customers to rotate tokens.
@@ -286,7 +228,7 @@ serves `/api/geo/ingest` with the shared credentials before publishing an SDK
 release that uses it. Self-hosted SDK installations must configure `endpoint`
 explicitly; they do not inherit the dashboard's `GEO_INGEST_URL`.
 
-Leave `GEO_INGEST_URL` unset until Railway is ready. The existing dashboard
+Leave `GEO_INGEST_URL` unset until the service is ready. The existing dashboard
 endpoint continues using the shared pipeline locally.
 
 ### Dashboard fallback (legacy)
@@ -309,8 +251,8 @@ The standalone worker also emits `geo.ingest.runtime` once per minute with
 process RSS, JS heap and external memory (bytes), active requests, background
 tasks, buffered events, and total/idle/waiting database connections. Use these
 counters to distinguish retained process memory from growing queues; RSS alone
-does not establish a JS memory leak. Unkey instance/deployment IDs or Railway
-replica/deployment IDs separate processes and restarts. These events contain no
+does not establish a JS memory leak. Unkey instance and deployment IDs separate
+processes and restarts. These events contain no
 request payloads.
 
 ```kusto
@@ -320,11 +262,11 @@ request payloads.
     by bin(_time, 1m), tostring(replicaId), tostring(deploymentId)
 ```
 
-Every ingest request, on Unkey, Railway and the dashboard fallback, emits one
+Every ingest request, on Unkey and the dashboard fallback, emits one
 `geo.ingest` event to the `notra-geo-scan` dataset with `outcome`
 (`ingested`, `dropped`, `rejected`, `failed`), `reason`, `status`,
 `durationMs`, `ingestMs` (Tinybird write), `visitorType`, `source`, `agent`,
-`organizationId`, `projectId`, `runtime` (`unkey`, `railway`, `vercel`, `local`),
+`organizationId`, `projectId`, `runtime` (`unkey`, `vercel`, `local`),
 `region` and `weight`. Dropped human traffic is sampled at 5%, so always count
 with `sum(weight)` instead of `count()`.
 

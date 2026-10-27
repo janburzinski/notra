@@ -200,7 +200,7 @@ test("a token can allocate at most one workspace when Siteverify rejects reuse",
 });
 
 test.each(["x-forwarded-host", "host"])(
-  "Railway's internal URL uses the public %s for token binding",
+  "the internal URL uses the public %s for token binding",
   async (header) => {
     const request = new Request("http://0.0.0.0:8080/api/demo/sandbox", {
       method: "POST",

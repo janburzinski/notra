@@ -47,15 +47,6 @@ const projects = [
     productionAlias: "notra-onboarding-agent-notra.vercel.app",
   },
 ];
-const railwayServices = [
-  {
-    name: "ai-traffic-ingest",
-    directory: "apps/ai-traffic-ingest",
-    projectId: "557ca18d-9de8-40ad-9fca-cf3d165f3c44",
-    environmentId: "276f8b24-ccd7-4bf3-a6b6-1dbe9f7fe5c6",
-    serviceId: "2d259982-cccc-488d-b2ba-77b12fd3e854",
-  },
-];
 const unkeyServices = [
   {
     name: "API",
@@ -91,14 +82,6 @@ const sitesToolchain = {
   snapshotKey: "SITES_BUILDER_SNAPSHOT_ID",
   versionKey: "SITES_BUILDER_TOOLCHAIN_VERSION",
 };
-const railwayActiveStates = [
-  "WAITING",
-  "QUEUED",
-  "INITIALIZING",
-  "BUILDING",
-  "DEPLOYING",
-];
-const railwayLiveStates = ["SUCCESS", "SLEEPING"];
 const activeStates = new Set(["QUEUED", "INITIALIZING", "BUILDING"]);
 
 function deploymentSha(deployment) {
@@ -160,7 +143,6 @@ export async function release({
     "GH_TOKEN",
     "VERCEL_TOKEN",
     "VERCEL_TEAM_ID",
-    "RAILWAY_TOKEN",
     "GITHUB_SHA",
     "GITHUB_REPOSITORY_ID",
   ]) {
@@ -222,48 +204,6 @@ export async function release({
       throw new Error(`${provider} ${url.pathname}: HTTP ${response.status}`);
     }
     return response.json();
-  };
-  const railway = async (query, variables) => {
-    const response = await fetchImpl(
-      "https://backboard.railway.com/graphql/v2",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.RAILWAY_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query, variables }),
-        signal: AbortSignal.timeout(30_000),
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`railway: HTTP ${response.status}`);
-    }
-    const result = await response.json();
-    if (result.errors?.length) {
-      throw new Error(
-        `railway: ${result.errors.map((error) => error.message).join(", ")}`
-      );
-    }
-    return result.data;
-  };
-  const latestRailwayDeployment = async (service, states) => {
-    const data = await railway(
-      `query ($input: DeploymentListInput!) {
-        deployments(input: $input, first: 1) {
-          edges { node { id status meta } }
-        }
-      }`,
-      {
-        input: {
-          projectId: service.projectId,
-          environmentId: service.environmentId,
-          serviceId: service.serviceId,
-          status: { in: states },
-        },
-      }
-    );
-    return data.deployments.edges[0]?.node;
   };
   const assertAheadOf = async (name, previousSha) => {
     if (previousSha === sha) {
@@ -467,28 +407,6 @@ export async function release({
     plans.push({ ...project, changed });
   }
 
-  const railwayPlans = [];
-  for (const service of railwayServices) {
-    if (unkeyPlans.some((plan) => plan.service.name === service.name)) {
-      continue;
-    }
-    if (await latestRailwayDeployment(service, railwayActiveStates)) {
-      throw new Error(
-        `${service.name} already has an active Railway deployment`
-      );
-    }
-    const live = await latestRailwayDeployment(service, railwayLiveStates);
-    const previousSha = live?.meta?.commitHash;
-    if (!previousSha) {
-      throw new Error(
-        `${service.name}: cannot identify the current Railway commit; no builds started`
-      );
-    }
-    await assertAheadOf(service.name, previousSha);
-    const changed = buildChanged(service.directory, previousSha, sha);
-    railwayPlans.push({ ...service, changed });
-  }
-
   if (preflightOnly) {
     await report("Production preflight passed; no builds started");
     return;
@@ -689,7 +607,6 @@ export async function release({
     }
   }
   if (failures.length > 0) {
-    await report("Railway: skipped, a Vercel production deployment failed");
     throw new Error(failures.join("\n"));
   }
 
@@ -835,83 +752,6 @@ export async function release({
       );
     }
     await report(`demo: database check passed (${health.tables} tables)`);
-  }
-
-  const started = [];
-  for (const service of railwayPlans) {
-    if (!service.changed) {
-      await report(
-        `${service.name}: skipped, no build changes since production`
-      );
-      continue;
-    }
-    if (env.DRY_RUN === "true") {
-      await report(`${service.name}: would deploy ${sha}`);
-      continue;
-    }
-    try {
-      const data = await railway(
-        `mutation ($serviceId: String!, $environmentId: String!, $commitSha: String!) {
-          serviceInstanceDeployV2(serviceId: $serviceId, environmentId: $environmentId, commitSha: $commitSha)
-        }`,
-        {
-          serviceId: service.serviceId,
-          environmentId: service.environmentId,
-          commitSha: sha,
-        }
-      );
-      const deploymentId = data.serviceInstanceDeployV2;
-      if (!deploymentId) {
-        throw new Error(`${service.name}: deployment creation returned no ID`);
-      }
-      await report(
-        `${service.name}: started Railway deployment ${deploymentId}`
-      );
-      started.push({ ...service, deploymentId });
-    } catch (error) {
-      failures.push(error.message);
-      await report(error.message);
-    }
-  }
-
-  const deadline = Date.now() + 20 * 60_000;
-  let pending = started;
-  while (pending.length > 0) {
-    const stillPending = [];
-    for (const service of pending) {
-      try {
-        const { deployment } = await railway(
-          `query ($id: String!) { deployment(id: $id) { status meta } }`,
-          { id: service.deploymentId }
-        );
-        if (railwayLiveStates.includes(deployment.status)) {
-          if (deployment.meta?.commitHash !== sha) {
-            throw new Error(`${service.name}: built a different commit`);
-          }
-          await report(`${service.name}: ${deployment.status}`);
-        } else if (!railwayActiveStates.includes(deployment.status)) {
-          throw new Error(
-            `${service.name}: deployment ended ${deployment.status}`
-          );
-        } else if (Date.now() >= deadline) {
-          throw new Error(
-            `${service.name}: deployment did not finish in 20 minutes`
-          );
-        } else {
-          stillPending.push(service);
-        }
-      } catch (error) {
-        failures.push(error.message);
-        await report(error.message);
-      }
-    }
-    pending = stillPending;
-    if (pending.length > 0) {
-      await sleep(Math.min(15_000, Math.max(0, deadline - Date.now())));
-    }
-  }
-  if (failures.length > 0) {
-    throw new Error(failures.join("\n"));
   }
 }
 

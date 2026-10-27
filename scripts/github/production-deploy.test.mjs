@@ -27,7 +27,6 @@ function fixture({
     GH_TOKEN: "test",
     VERCEL_TOKEN: "test",
     VERCEL_TEAM_ID: "test-team",
-    RAILWAY_TOKEN: "test",
     GITHUB_SHA: sha,
     GITHUB_REPOSITORY_ID: "123",
     GITHUB_REPOSITORY: "usenotra/notra",
@@ -189,23 +188,7 @@ function fixture({
             assert.fail(`Unexpected Unkey endpoint: ${url.pathname}`);
         }
       } else {
-        assert.equal(url.hostname, "backboard.railway.com");
-        if (body.query.includes("serviceInstanceDeployV2")) {
-          data = { serviceInstanceDeployV2: `new-${body.variables.serviceId}` };
-        } else if (body.query.includes("deployment(id:")) {
-          data = {
-            deployment: { status: "SUCCESS", meta: { commitHash: sha } },
-          };
-        } else {
-          data = {
-            deployments: {
-              edges: body.variables.input.status.in.includes("SUCCESS")
-                ? [{ node: { id: "live", meta: { commitHash: previousSha } } }]
-                : [],
-            },
-          };
-        }
-        data = { data };
+        assert.fail(`Unexpected host: ${url.hostname}`);
       }
     }
     const status =
@@ -319,15 +302,13 @@ test("failed toolchain env update prevents every build", async () => {
   assert.equal(builds(calls).length, 0);
 });
 
-test("all six Vercel projects and the Railway ingest service deploy the pinned SHA", async () => {
+test("all six Vercel projects deploy the pinned SHA", async () => {
   const { run, calls, sha, directories } = fixture();
   await run();
   const started = builds(calls);
-  assert.equal(started.length, 7);
+  assert.equal(started.length, 6);
   assert.deepEqual(
-    started
-      .filter(({ url }) => url.hostname === "api.vercel.com")
-      .map(({ body }) => body.project),
+    started.map(({ body }) => body.project),
     [
       "notra",
       "notra-web",
@@ -337,18 +318,14 @@ test("all six Vercel projects and the Railway ingest service deploy the pinned S
       "notra-onboarding-agent",
     ]
   );
-  for (const { url, body } of started) {
-    if (url.hostname === "api.vercel.com") {
-      assert.deepEqual(body.gitSource, {
-        type: "github",
-        repoId: 123,
-        ref: "main",
-        sha,
-      });
-      assert.equal(body.target, "production");
-    } else {
-      assert.equal(body.variables.commitSha, sha);
-    }
+  for (const { body } of started) {
+    assert.deepEqual(body.gitSource, {
+      type: "github",
+      repoId: 123,
+      ref: "main",
+      sha,
+    });
+    assert.equal(body.target, "production");
   }
   assert.ok(directories.includes("apps/agent"));
   assert.ok(directories.includes("apps/onboarding-agent"));
@@ -360,7 +337,7 @@ test("dry run validates every target without creating any builds", async () => {
   });
   await run();
   assert.equal(builds(calls).length, 0);
-  assert.equal(directories.length, 7);
+  assert.equal(directories.length, 6);
   assert.equal(toolchainBuilds.length, 0);
 });
 
@@ -429,7 +406,7 @@ test("failed CI prevents all provider requests", async () => {
   assert.ok(calls.every(({ url }) => url.hostname === "api.github.com"));
 });
 
-test("failed agent deployment prevents Railway builds", async () => {
+test("failed agent deployment stops the release", async () => {
   const { run, calls } = fixture({
     override: ({ url }) =>
       url.pathname === "/v13/deployments/new-notra-agent"
@@ -608,7 +585,7 @@ test("Unkey is opt-in and does not call its API without a deployment key", async
   assert.ok(calls.every(({ url }) => url.hostname !== "api.unkey.com"));
 });
 
-test("demo apps deploy to Unkey, never Railway, with the shared deployment key", async () => {
+test("demo apps deploy to Unkey with the shared deployment key", async () => {
   const { run, calls, sha } = fixture({ demo: true });
   await run();
   const deployments = builds(calls).filter(
@@ -621,10 +598,6 @@ test("demo apps deploy to Unkey, never Railway, with the shared deployment key",
   for (const { body } of deployments) {
     assert.deepEqual(body.git, { branch: "main", commitSha: sha });
   }
-  const railwayCalls = calls.filter(
-    ({ url }) => url.hostname === "backboard.railway.com"
-  );
-  assert.equal(railwayCalls.length, 0);
   assert.ok(calls.indexOf(deployments[0]) < calls.indexOf(deployments[1]));
   assert.ok(calls.indexOf(deployments[1]) < calls.indexOf(deployments[2]));
 });
@@ -657,7 +630,6 @@ test("demo preflight checks both targets before local builds and never falls bac
   await assert.rejects(run(), /unkey v2\/domains.listDomains: HTTP 403/);
   assert.equal(builds(calls).length, 0);
   assert.equal(toolchainBuilds.length, 0);
-  assert.ok(calls.every(({ url }) => url.hostname !== "backboard.railway.com"));
 });
 
 test("unchanged demo apps do not create Unkey deployments", async () => {
@@ -712,9 +684,6 @@ for (const app of ["demo-api", "demo-dashboard"]) {
           : undefined,
     });
     await assert.rejects(run(), new RegExp(`${app} deployment ended failed`));
-    assert.ok(
-      builds(calls).every(({ url }) => url.hostname !== "backboard.railway.com")
-    );
     if (app === "demo-api") {
       assert.ok(
         builds(calls).every(({ body }) => body.app !== "app_demo-dashboard")
@@ -740,7 +709,6 @@ test("Unkey discovers the verified production domain and deploys the pinned comm
     directories.filter((directory) => directory === "apps/api").length,
     4
   );
-  assert.ok(calls.every(({ url }) => url.hostname !== "backboard.railway.com"));
 });
 
 test("Unkey dry run can inspect auto-deploy configuration without creating builds", async () => {
@@ -863,7 +831,7 @@ test("diverged Unkey production history prevents all builds", async () => {
   assert.equal(builds(calls).length, 0);
 });
 
-test("Unkey creation failure is not retried and prevents Railway builds", async () => {
+test("Unkey creation failure is not retried", async () => {
   const { run, calls } = fixture({
     api: true,
     apiStatus: ({ url }) =>
@@ -878,9 +846,6 @@ test("Unkey creation failure is not retried and prevents Railway builds", async 
       ({ url }) => url.pathname === "/v3/deployments.createDeployment"
     ).length,
     1
-  );
-  assert.ok(
-    builds(calls).every(({ url }) => url.hostname !== "backboard.railway.com")
   );
 });
 
@@ -1012,7 +977,7 @@ for (const [name, update] of [
   ["wrong target", { app: "other" }],
   ["never current", { isCurrent: false }],
 ]) {
-  test(`Unkey deployment ${name} blocks Railway releases`, async () => {
+  test(`Unkey deployment ${name} fails the release`, async () => {
     const { run, calls } = fixture({
       api: true,
       override: ({ url, body }) =>
@@ -1031,9 +996,6 @@ for (const [name, update] of [
           : undefined,
     });
     await assert.rejects(run(), /unkey/);
-    assert.ok(
-      builds(calls).every(({ url }) => url.hostname !== "backboard.railway.com")
-    );
     assert.equal(
       calls.filter(
         ({ url }) => url.pathname === "/v3/deployments.createDeployment"

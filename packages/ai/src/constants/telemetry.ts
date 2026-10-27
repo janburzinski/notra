@@ -249,7 +249,7 @@ export const TELEMETRY_GEO_INGEST_REASONS = new Set([
   "consent",
 ]);
 
-const GEO_INGEST_RUNTIMES = new Set(["railway", "vercel", "local"]);
+const GEO_INGEST_RUNTIMES = new Set(["unkey", "vercel", "local"]);
 export const TELEMETRY_EVENT_ENUM_FIELDS: Readonly<
   Record<string, Readonly<Record<string, ReadonlySet<string>>>>
 > = {

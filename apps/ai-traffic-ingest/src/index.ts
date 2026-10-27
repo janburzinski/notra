@@ -95,9 +95,8 @@ const runtimeLogTimer = setInterval(() => {
     event: "geo.ingest.runtime",
     runtime: getGeoIngestRuntime(),
     region: getGeoIngestRegion(),
-    replicaId: process.env.UNKEY_INSTANCE_ID ?? process.env.RAILWAY_REPLICA_ID,
-    deploymentId:
-      process.env.UNKEY_DEPLOYMENT_ID ?? process.env.RAILWAY_DEPLOYMENT_ID,
+    replicaId: process.env.UNKEY_INSTANCE_ID,
+    deploymentId: process.env.UNKEY_DEPLOYMENT_ID,
     uptimeSeconds: Math.round(process.uptime()),
     rssBytes: memory.rss,
     heapUsedBytes: memory.heapUsed,

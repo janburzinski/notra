@@ -1,4 +1,4 @@
-/** Railway terminates public requests before forwarding to the bind address. */
+/** Unkey terminates public requests before forwarding to the bind address. */
 export function getDemoRequestHostname(request: Request): string {
   const host =
     request.headers.get("x-forwarded-host") ?? request.headers.get("host");

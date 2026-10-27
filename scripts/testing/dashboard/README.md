@@ -274,7 +274,7 @@ does not test Databuddy. Without this explicit override, empty
 `NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID` disables Sites; a valid Databuddy
 client ID and an enabled `sites` flag targeted at the organization are required.
 Cloud creation/deployment also needs the separately configured GitHub,
-Box, Railway, and R2 services. A successful status check is not a full UI E2E pass.
+Box and R2 services. A successful status check is not a full UI E2E pass.
 
 `sitesRuntimeConfigured` uses the actual Sites runtime readiness check. Its
 required variables are `SITES_R2_ACCOUNT_ID`, `SITES_R2_ACCESS_KEY_ID`,

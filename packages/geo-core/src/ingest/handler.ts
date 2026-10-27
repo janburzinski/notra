@@ -129,7 +129,7 @@ async function handleLogged<A>(
 /**
  * Runs one ingest request and emits exactly one `geo.ingest` event for it,
  * whatever the outcome, so Axiom can chart throughput, status mix and latency
- * for the dashboard route and the Railway service alike.
+ * for the dashboard route and the ingest service alike.
  */
 export function handleGeoIngestRequest(
   request: Request,

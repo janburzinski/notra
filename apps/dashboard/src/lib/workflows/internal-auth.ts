@@ -59,7 +59,7 @@ export async function verifyInternalWorkflowRequest(
 
   // eve's localDev() trusts the request hostname, which comes from the Host
   // header, so it is only safe on a local dev server. Every deployed runtime
-  // (Vercel, Unkey, Railway) must authenticate with the secret or OIDC.
+  // (Vercel, Unkey) must authenticate with the secret or OIDC.
   if (process.env.NODE_ENV !== "development") {
     return false;
   }

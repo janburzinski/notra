@@ -23,10 +23,7 @@ export async function alertGatewayLimit(event: WideEvent): Promise<void> {
     return;
   }
   const environment =
-    process.env.VERCEL_ENV ??
-    process.env.RAILWAY_ENVIRONMENT_NAME ??
-    process.env.NODE_ENV ??
-    "unknown";
+    process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown";
   const key = `ai:gateway-limit-alert:${environment}:${event.gateway}:${event.status}:${event.limitType ?? "unknown"}`;
   // SET GET EX atomically returns the previous marker and refreshes its expiry.
   const previous = await redis.set(key, "sent", {
