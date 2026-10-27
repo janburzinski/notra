@@ -1,0 +1,757 @@
+apps/dashboard/src/app/api/healthcheck/route.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-31
+apps/console/src/lib/ai-trends/queries.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 136-137,141,161-164
+apps/sites-builder/src/components/DevReload.astro
+  s_985d322a22a6f8::t_64773daa4a8cab 4,9,15-33
+scripts/testing/cloud/utils/ownership.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-108
+scripts/testing/dashboard/constants/database-regressions.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-16
+packages/db/migrations/meta/0137_snapshot.json
+  ai_agent 1-16517
+apps/dashboard/src/lib/hooks/use-site-branch-actions.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 5,112
+packages/geo-core/src/utils/reference-display.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2-5,29-33,39-56
+packages/ai/src/utils/gateway-limit-alert.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 26
+apps/dashboard/src/components/autopilot/autopilot-pull-requests-table.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 118
+packages/sites-server/src/github.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 3,184
+packages/sites-server/tests/smart-deployments-postgres.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 30,47-48
+packages/ai/src/utils/octokit.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 6,77
+apps/dashboard/src/app/__tests/sites/route.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-61
+apps/sites-e2e/tests/processes.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-106
+apps/sites-e2e/src/worker.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-973
+packages/db/migrations/0136_system_skill_registry.sql
+  ai_agent 1-29
+apps/dashboard/src/constants/avatar.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-3
+packages/sites-server/src/vercel-dns.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 36,139-140,221
+apps/sites-e2e/src/constants/fixtures.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-17
+apps/sites-builder/compiler/utils/dev-generated-assets.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 43-48
+scripts/testing/cloud/prepared-bucket.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-65
+packages/geo-core/src/ingest/pipeline.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 397-402
+apps/dashboard/src/lib/hooks/use-site-publish-mutation.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 5,42
+scripts/testing/dashboard/tests/postgres-cleanup.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-65
+packages/sites-server/src/r2.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 17,27
+apps/sites-e2e/emulators/github/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-613
+apps/api/src/routes/chats.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 56
+scripts/testing/dashboard/types/database-regressions.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-10
+apps/dashboard/src/components/sites/site-option-select.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 27,29-33,35-41,43-46,48-96
+apps/dashboard/src/components/geo/project-logo.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 14,24-28
+apps/dashboard/src/lib/orpc/routers/sites.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 168,689-692
+apps/sites-e2e/emulators/core/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-39
+packages/ai/src/router/lazy-model.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 13,492-496
+packages/ai/src/skills/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 24-77
+packages/ui/src/constants/line-diff.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-3
+packages/db/tests/build-telemetry-postgres.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 8,24,31-32,74-78,97
+apps/dashboard/src/components/sites/site-footer-fields.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-399
+apps/console/src/components/skills/diff-section.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-12
+apps/console/src/utils/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-35
+apps/dashboard/src/components/sites/site-design-appearance.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 3,12,15-19,28-31,36,44,48-49,55-57,68,108-125,139-179
+apps/sites-e2e/emulators/browser/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-232
+apps/sites-e2e/fixtures/site/blog/components.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-57
+apps/web/public/schemas/blog.json
+  s_985d322a22a6f8::t_64773daa4a8cab 743
+apps/web/src/lib/sitemap/entries.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 246-252
+packages/ai/src/skills/registry.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-322
+packages/geo-core/src/types/ingest.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 116-117,138
+scripts/testing/dashboard/run.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-587
+apps/dashboard/src/components/settings/delete-account-dialog.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 42,191,278
+apps/dashboard/src/app/design-system/page-client.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 264,1809,1818,1822,1885
+apps/sites/src/constants/favicons.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-7
+apps/sites-e2e/tests/types/lifecycle-webhooks.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-9
+packages/ui/src/components/ui/svgs/youtube.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 7-8,10
+apps/docs/sites/previews.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 43-45,50-51
+packages/sites-core/src/schemas/build.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1,59-60
+packages/ui/src/components/ui/svgs/facebook.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+apps/sites-e2e/fixtures/site/script.js
+  s_985d322a22a6f8::t_64773daa4a8cab 1-2
+apps/dashboard/src/types/skills/page.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 21-35,42,89-97
+apps/dashboard/src/components/content/editors/twitter-editor.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 16,55
+packages/ui/src/components/ui/svgs/threads.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+packages/ai/src/utils/github-api-url.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+apps/sites-builder/tests/dev-staging.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 141,189-195,197-200,250-252
+scripts/testing/github-app/utils/config.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 1-88
+apps/dashboard/src/components/content/editors/linkedin-editor.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 16,55
+apps/dashboard/src/constants/deleted-analytics-purge.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-6
+scripts/testing/cloud/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 1-104
+scripts/testing/dashboard/bootstrap-github-cli.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-119
+apps/sites-builder/src/utils/favicons.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-28
+apps/sites-e2e/fixtures/databuddy.js
+  s_985d322a22a6f8::t_64773daa4a8cab 1-16
+apps/sites-e2e/tests/types/lifecycle-journal.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-31
+apps/dashboard/src/types/deleted-analytics-purge.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-6
+apps/sites-builder/compiler/constants/cli.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 13-14,24
+apps/sites-e2e/emulators/box/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-269
+packages/geo-core/src/geo/model-live.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 43,355-359
+apps/dashboard/src/constants/site-design-sections.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 4,9,29,31,40-41
+packages/sites-core/src/constants/site-config.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 4
+apps/dashboard/src/lib/sites/flag.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-2,10-24,38-45
+apps/dashboard/src/types/components/site-preview-access.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 24-31
+scripts/testing/dashboard/constants/fixtures.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-18
+scripts/testing/dashboard/postgres.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-166
+apps/dashboard/src/middleware/auth.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 20,25-30
+scripts/testing/cloud/run.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-912
+packages/ai/src/router/provider-options.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 150,221-222
+packages/utils/src/client-ip.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 135-138
+apps/sites-e2e/emulators/browser/providers/plausible.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-39
+apps/sites-e2e/fixtures/plausible.js
+  s_985d322a22a6f8::t_64773daa4a8cab 1-8
+apps/console/src/constants/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-5
+packages/sites-server/src/github-source.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2,53
+scripts/testing/dashboard/types/redis-rest.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-11
+apps/dashboard/src/routes/__root.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 34,39-46,125
+packages/ai/src/schemas/chat.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 45-49
+packages/ui/src/components/ui/svgs/bluesky.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+apps/dashboard/src/utils/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 5,112-120
+apps/sites-builder/compiler/dev-server.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 19-23,37-38,49,102-126,195,197,273-284,323-324,354-373,385-390
+apps/dashboard/src/utils/sites-test-access.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-53
+packages/ai/src/constants/github.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 16-17
+apps/dashboard/src/lib/orpc/routers/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-6,16,76-90,95,103,106-114,121-133,262-296
+packages/geo-core/tests/web-page-view.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 12-13
+packages/schemas/src/schemas/dashboard/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 68-75
+apps/sites-e2e/scripts/seed-r2.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 1-35
+packages/sites-server/tests/organization-teardown.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 29,43-44
+packages/geo-core/src/utils/ingest-runtime.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 14
+packages/schemas/src/schemas/api/chats.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 108,123-124,133-134
+apps/dashboard/src/lib/utils.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 3-4,8
+packages/sites-server/src/utils/sandbox-transport.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 20,60
+apps/sites-e2e/scripts/constants/mutations.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-127
+apps/sites-builder/src/lib/navigation.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1,10,90-106
+apps/sites-e2e/src/utils/ingest.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-16
+packages/ai/src/skills/functions/service.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 6-7,30,58,76,84-86,90-92
+packages/geo-core/src/ingest/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 19,47,61-63
+packages/ui/src/lib/line-diff.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-122
+apps/sites-e2e/emulators/cloudflare/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-22
+apps/dashboard/src/lib/hooks/use-geo-db.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 28,49,229,231-246,248,250,252-254
+apps/sites-builder/compiler/build.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 24,302
+scripts/testing/dashboard/utils/database.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-22
+apps/sites-e2e/fixtures/umami.js
+  s_985d322a22a6f8::t_64773daa4a8cab 1-17
+.github/workflows/sites-e2e.yml
+  s_985d322a22a6f8::t_64773daa4a8cab 1-262
+apps/dashboard/src/constants/sites.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 238-240
+apps/sites-e2e/tests/constants/analytics.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-58
+scripts/testing/cloud/account.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-65
+scripts/testing/cloud/types/resources.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-31
+scripts/testing/dashboard/redis-rest.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-107
+scripts/testing/github-app/schemas/conversion.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 1-27
+apps/dashboard/src/components/providers/databuddy-analytics.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 4,6,13-15,21-22
+apps/dashboard/src/components/sites/site-seo-fields.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-145
+apps/dashboard/src/constants/site-design.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-15,19-20,38-39,151-215
+apps/dashboard/src/components/skills/skill-update-card.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-85
+apps/sites-e2e/emulators/browser/providers/databuddy.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-56
+apps/sites-e2e/emulators/r2/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-345
+scripts/testing/dashboard/tests/github-bootstrap-guard.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-37
+scripts/testing/github-app/constants/manifest.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 1-16
+scripts/testing/dashboard/utils/box-snapshot.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-111
+apps/web/src/routeTree.gen.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 65,69,387-391,407-411,728,732,832,836,942,946,1048,1052,1152,1156,1261,1265,1740-1746,1768-1774,2178,2182,2187,2191
+apps/dashboard/src/types/site-design.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-4,6,15,27-28,53-76,117-123,200,246-275
+apps/sites-e2e/emulators/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-106
+packages/tools/src/skill-editor/get-skill.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1,17,38
+scripts/github/production-deploy.test.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 39-44,115-116,191,305,309,311,321-328,340,409,588,834,980
+scripts/testing/github-app/utils/output.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 1-52
+packages/tools/src/skill-editor/list-skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1,17
+apps/web/src/routes/_site/_legal/dpa.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-59
+CONTRIBUTING.md
+  s_985d322a22a6f8::t_64773daa4a8cab 25,148-149,154,659-660,681-689,723,797,840,860,866-867,871,876-877
+packages/sites-core/src/schemas/site-layout.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 5,107,152
+packages/sites-server/src/utils/dns.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 4,7-12
+packages/ui/src/components/ui/select.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 107-109,128-133
+scripts/testing/dashboard/utils/redis-rest.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-221
+packages/analytics/src/types/purge.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 11-19
+packages/sites-core/tests/serving-state.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 81-107
+packages/ui/src/components/ui/svgs/hackerNews.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+apps/sites-builder/tests/dev-startup.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 84-175
+apps/sites-e2e/emulators/browser/providers/umami.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-43
+apps/sites-e2e/emulators/core/summary.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-21
+apps/console/src/schemas/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-19
+apps/dashboard/src/components/providers/posthog-identity.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 42,63
+packages/geo-core/tests/web-session.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 13-14
+apps/dashboard/src/components/command-palette/command-palette.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 95,999
+apps/sites-e2e/fixtures/posthog.js
+  s_985d322a22a6f8::t_64773daa4a8cab 1-17
+apps/dashboard/src/lib/workflows/internal-auth.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 62
+apps/sites/package.json
+  s_985d322a22a6f8::t_64773daa4a8cab 17
+apps/dashboard/src/utils/demo-request-hostname.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1
+apps/console/src/app/(console)/[slug]/skills/new/page.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-20
+packages/geo-core/src/geo/logo.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 6,25,28-31
+packages/sites-server/tests/host-reclaim.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 29,42-43
+packages/ui/src/components/ui/svgs/telegram.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-15
+packages/ui/src/types/line-diff.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-17
+packages/ai/src/router/router.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 852,946,984,1027,1041,1047,1052,1071,1073-1078,1083,1088
+apps/sites-e2e/emulators/vercel/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-133
+apps/dashboard/src/lib/orpc/routers/user.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 16,52
+apps/dashboard/src/routes/api.workflows.deleted-analytics-purge.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-19
+packages/geo-core/tests/web-session-fallback.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 9-10
+apps/dashboard/src/utils/site-design.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 5,7-10,21-22,33-36,40,108-114,280-318,350-351,411-427,461-533,702-765,826-831,839-975
+apps/dashboard/src/components/skills/skill-card.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 3-4,11-15,28,62-78
+packages/sites-server/src/utils/provider-urls.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-39
+apps/web/src/content/legal/dpa.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-282
+scripts/testing/dashboard/tests/redis-rest.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-402
+apps/dashboard/src/lib/hooks/use-skill-update-sync.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-46
+apps/sites-builder/src/components/LinkIcon.astro
+  s_985d322a22a6f8::t_64773daa4a8cab 12
+apps/dashboard/src/components/sites/site-publish-confetti.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-42
+apps/dashboard/src/components/sites/pages/site-settings-page.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 39,51-54,238-246,252
+apps/sites-e2e/fixtures/site/changelog/2026-10-01-components.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-9
+apps/console/src/components/skills/system-skill-editor-client.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-204
+apps/sites-e2e/src/utils/sites-worker.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-202
+apps/dashboard/src/lib/hooks/use-post-site-preview.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 133-139
+apps/sites-e2e/emulators/cloudflare/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-149
+apps/console/src/types/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-66
+apps/ui/components/constants/dropdown.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2
+apps/sites-e2e/emulators/vercel/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-15
+apps/dashboard/src/types/components/sites.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 754,763-765
+apps/web/src/content/legal/terms.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 5,105-106,176
+package.json
+  s_985d322a22a6f8::t_64773daa4a8cab 52-54,77
+apps/ai-traffic-ingest/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 3,18,104,125,127-128,156-159,163-165,169,214,216,221,231,254-255,265,269
+apps/ai-traffic-ingest/src/index.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 98-99
+apps/dashboard/src/components/sites/site-preview-access-select.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-232
+apps/dashboard/src/lib/db/geo-collections.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 78-79
+packages/schemas/src/schemas/dashboard/workflows/deleted-analytics-purge.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-9
+.agents/skills/dpa-check/SKILL.md
+  s_985d322a22a6f8::t_64773daa4a8cab 1-69
+packages/sites-core/src/constants/sites.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 231-234
+packages/ui/src/components/ui/svgs/medium.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+packages/ai/src/skills/seed.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2,5,10-13,17-28,31
+apps/sites-e2e/tsconfig.lifecycle.json
+  s_985d322a22a6f8::t_64773daa4a8cab 1-14
+packages/sites-server/tests/production-projection.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 22,35-36
+apps/dashboard/src/components/dashboard/sidebar-org-menu.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 37,58
+apps/dashboard/src/utils/sites-test-access.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-131
+scripts/testing/dashboard/constants/redis-rest.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+apps/console/src/components/skills/system-skill-header.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-78
+apps/web/src/content/legal/subprocessors.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-94
+apps/sites-e2e/emulators/dns/zone.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-58
+apps/sites-e2e/fixtures/ga4.js
+  s_985d322a22a6f8::t_64773daa4a8cab 1-21
+packages/sites-core/src/schemas/deployment.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 4,72-73
+scripts/testing/dashboard/verify.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-52
+.claude/skills/dpa-check
+  ai_agent 1
+apps/sites-builder/scripts/create-box-snapshot.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2,4,7,10,19-20,33-45,47-48,50-80,90,105,121-127
+apps/sites-e2e/emulators/core/http-server.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-54
+apps/sites-e2e/src/types/harness.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-19
+packages/ai/src/utils/otlp-pipeline.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 21,38
+packages/ui/src/components/geo/geo-bar.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 19
+apps/dashboard/src/components/sites/site-variables-settings.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 10-13,16-27,34,42,46-69,71-84,86-101,108,120
+apps/dashboard/src/types/hooks/skill-update-sync.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-2,6-12
+apps/console/src/lib/orpc/router.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 6,14
+apps/sites-builder/compiler/constants/build.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 7-8
+apps/dashboard/src/components/ai/twitter-preview.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 38,88
+apps/sites-e2e/scripts/mutation-check.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-200
+apps/sites-builder/scripts/constants/box-snapshot.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2
+apps/sites/src/constants/routes.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2,43
+apps/console/src/components/skills/system-skills-client.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-121
+apps/sites-builder/tests/favicons.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-50
+apps/sites-e2e/src/utils/compiler.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-123
+apps/dashboard/src/components/skills/skill-editor-form.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 59,76-77
+apps/sites-builder/src/types/icons.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 8-9
+apps/sites-e2e/src/constants/processes.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-9
+packages/geo-core/tests/site-project-delete.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 17,30-31
+apps/sites-e2e/tests/analytics.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-216
+packages/sites-server/tests/github-consent.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 22,35-36
+apps/console/src/hooks/use-publish-system-skill.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-46
+apps/dashboard/src/utils/avatar.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-18,24-40
+apps/sites-e2e/src/utils/processes.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-201
+apps/dashboard/tests/site-design.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 15-18,22-23,186-218,270-468,726-874
+apps/sites-e2e/tests/csp.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-48
+apps/sites-builder/tests/box-toolchain.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-194
+packages/ai/src/skills/registry-admin.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-116
+apps/sites-e2e/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 1-209
+scripts/testing/cloud/utils/cloudflare-account.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-20
+scripts/testing/github-app/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 1-52
+packages/sites-server/tests/postgres-lifecycle.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 31,44-45
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 3,15-19,36,49,54,70,109-198,201-240,245-246,257
+packages/ai/src/types/router.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 203-204
+apps/dashboard/src/app/api/workflows/deleted-analytics-purge/route.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-42
+scripts/testing/dashboard/fixtures.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-102
+apps/console/src/app/(console)/[slug]/skills/[name]/page.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-25
+apps/sites-e2e/package.json
+  s_985d322a22a6f8::t_64773daa4a8cab 1-26
+apps/console/src/components/layout/console-shell.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 9,206-210
+scripts/testing/cloud/utils/redaction.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-22
+apps/sites-e2e/emulators/box/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-21
+apps/sites-e2e/emulators/browser/utils.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-25
+apps/dashboard/tests/fixtures/demo-admission.fixture.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 203
+apps/sites-e2e/emulators/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 1-54
+scripts/testing/github-app/server.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 1-235
+apps/dashboard/src/components/sites/branches/site-branch-menu.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 48
+apps/sites-builder/src/constants/favicons.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-4
+apps/dashboard/src/app/(dashboard)/[slug]/skills/[name]/page-client.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 14,16,22,60-61,146-158,217-230,242
+apps/dashboard/src/components/sites/site-asset-field.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 13-17,40-69,81-84,86-93,95-134
+scripts/testing/cloud/cleanup.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-201
+apps/web/src/content/legal/privacy.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 5,81,83,90,98,118
+packages/ui/src/components/shared/line-diff.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-88
+apps/console/src/components/skills/system-skill-content-field.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-62
+apps/dashboard/tests/sites-test-status.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-87
+packages/sites-server/tests/draft-cas-postgres.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 39,52-53
+apps/sites-e2e/emulators/core/service.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-105
+scripts/github/production-deploy.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 61-62,67,73,613-614,635-640,642-644,646-663,698,720-734,736-738,740,742-745,747,749-752,754
+apps/dashboard/src/components/sites/site-design-preview.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 74,136,144-148,150-156
+packages/ui/src/components/ui/svgs/instagramMono.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+apps/sites-e2e/emulators/browser/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-37
+packages/sites-server/src/publish.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 87
+packages/geo-core/src/ingest/event.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 65-68
+apps/dashboard/messages/de.json
+  s_985d322a22a6f8::t_64773daa4a8cab 1118-1119,1859-1868,3274,6611,6629-6633,8447-8453,8493,8499-8500,8677-8714,8731,8772-8774,8783-8785
+apps/sites-builder/compiler/utils/dev-error-page.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1,3,5,7-12,15-17,19-22,25-28,30-42,45-97
+apps/sites/src/routes/favicon.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-106
+apps/sites-e2e/src/utils/csp.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-31
+packages/geo-core/src/ingest/handler.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 132
+apps/web/src/utils/markdown-twins.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 98-107
+apps/dashboard/src/constants/sites-testing.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-4
+apps/sites-e2e/tests/connected-lifecycle-postgres.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-1298
+scripts/testing/dashboard/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 1-316
+apps/sites-builder/astro.config.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 102
+apps/console/AGENTS.md
+  s_985d322a22a6f8::t_64773daa4a8cab 18-20,24-33
+apps/sites/tests/handler.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1121-1185
+apps/sites-e2e/emulators/dns/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-9
+apps/sites-e2e/src/types/worker-runtime.d.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-11
+packages/sites-server/tests/deployment-admission.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 29,43-44
+apps/dashboard/src/routeTree.gen.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 13,47,108-113,282-287,599,633,690,724,782,816,875,909,966,1000,1057,1091,1149,1183,1235-1241,1473-1479,1959,1993-1994
+packages/sites-server/src/constants/domains.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1
+apps/console/src/lib/orpc/routers/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-62
+AGENTS.md
+  s_985d322a22a6f8::t_64773daa4a8cab 41-56
+turbo.json
+  s_985d322a22a6f8::t_64773daa4a8cab 55-60
+apps/console/src/components/skills/system-skill-code-alert.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-36
+scripts/testing/github-app/server.test.mjs
+  s_985d322a22a6f8::t_64773daa4a8cab 1-400
+apps/console/src/app/(console)/[slug]/skills/page.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-20
+apps/sites-e2e/scripts/types/mutations.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-25
+apps/dashboard/src/components/ai/linkedin-preview.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 38,88
+apps/docs/sites/quickstart.mdx
+  s_985d322a22a6f8::t_64773daa4a8cab 42-43
+apps/dashboard/src/lib/analytics/deleted-analytics-purge.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-49
+apps/dashboard/src/components/sites/site-preview-access-control.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 27
+packages/db/src/schema.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2826-2862,2874-2877,2886,3726-3729,3732-3749
+packages/ai/src/skills/system-skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 7
+apps/api/src/programs/skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1,4,22-24,31-32,46,67,74,80,99,115,147,157
+apps/dashboard/messages/en.json
+  s_985d322a22a6f8::t_64773daa4a8cab 1118-1119,1859-1868,3274,6611,6629-6633,8447-8453,8493,8499-8500,8677-8714,8731,8772-8774,8783-8785
+apps/sites-e2e/emulators/browser/providers/posthog.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-71
+apps/dashboard/src/routes/[__tests].sites.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-18
+apps/sites-e2e/src/utils/content.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-165
+packages/ai/src/utils/repo-image-skills.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 25,138-141
+packages/analytics/src/tinybird/purge.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 9-10,146,151-165,167-172,223-243
+apps/sites-e2e/tests/cleanup.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-87
+packages/ai/src/chat/history.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 6,76,535
+apps/sites-e2e/tsconfig.json
+  s_985d322a22a6f8::t_64773daa4a8cab 1-23
+packages/ai/src/skills/errors.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+packages/geo-core/src/geo/scan.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 127,266
+scripts/testing/cloud/utils/prepared-bucket.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-44
+apps/dashboard/src/components/content/diff-view.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 4,7-10,14-16,19-25,46-47,50
+apps/console/src/utils/line-diff.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-34
+apps/dashboard/src/types/site-design-sections.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2-6,51-54
+bun.lock
+  ai_agent 8,388,451-469,2000-2001,5344,5346,6596-6597,7136-7137,7800-7801,8352-8354
+scripts/testing/github-app/ui.html
+  s_985d322a22a6f8::t_64773daa4a8cab 1-116
+apps/sites-e2e/src/run.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-252
+apps/sites-e2e/tests/utils/lifecycle-journal.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-108
+apps/dashboard/src/components/settings/organizations-section.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 30,226
+apps/dashboard/src/components/invitation/invitation-confirm.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 30,40
+apps/sites-builder/fixtures/demo/blog.json
+  s_985d322a22a6f8::t_64773daa4a8cab 3,24-32
+packages/sites-server/src/cloudflare-saas.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 14,49
+apps/sites-builder/compiler/cli.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 24,140-145,148-153,186,213-218,269,280-288,295-296,298,300-304,306-308
+packages/sites-server/src/utils/domain-ownership.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 15,39
+scripts/benchmarks/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 94
+apps/dashboard/src/components/sites/site-layout.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 35,52-54,56-58,106
+apps/dashboard/src/lib/demo/schema-check.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-32
+apps/web/src/routes/_site/_legal/subprocessors.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-59
+packages/ai/src/skills/registry.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 5-6,11,20-22,25,28-49,52,57-58,63,66-79,81-85,87,90-118,121-133,135-156,159-172,175-193,195-238,240-242,244-245,247-261
+packages/geo-core/src/ingest/web.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 42-46,165-167
+scripts/testing/dashboard/tests/box-snapshot.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-51
+apps/dashboard/src/components/settings/organization-details-card.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 28,214
+apps/sites-e2e/fixtures/site/style.css
+  s_985d322a22a6f8::t_64773daa4a8cab 1-4
+packages/ui/src/components/ui/svgs/slackMono.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-13
+packages/db/migrations/meta/0136_snapshot.json
+  ai_agent 2,14005-14008,14054-14065,14102-14116,14132-14144,14583-14754
+apps/dashboard/src/components/content/content-detail-main-document.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 13,223
+apps/sites-e2e/emulators/r2/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-14
+packages/db/migrations/meta/_journal.json
+  ai_agent 960-968
+apps/sites-e2e/emulators/dns/server.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-114
+apps/dashboard/src/components/content/content-site-preview-panel.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 9,12-15,21-26,37,279-286,332-334,341-347,349-408
+apps/sites-e2e/scripts/summary.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-220
+scripts/testing/dashboard/migrate.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-26
+packages/ai/src/constants/telemetry.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 249,252
+apps/dashboard/src/lib/hooks/use-workspace-logo.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 16,25
+scripts/testing/cloud/utils/owned-box-fetch.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-71
+apps/sites-e2e/emulators/github/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-47
+packages/ai/src/router/README.md
+  s_985d322a22a6f8::t_64773daa4a8cab 89-96
+scripts/testing/cloud/tsconfig.json
+  s_985d322a22a6f8::t_64773daa4a8cab 1-16
+apps/dashboard/src/lib/auth/middleware.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 14-15,49-67
+apps/console/src/components/skills/system-skill-versions.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 1-88
+.github/workflows/production-deploy.yml
+  s_985d322a22a6f8::t_64773daa4a8cab 13-16,27,30-32,34,53,68-97,107,134-135,138,151,153-194
+apps/sites-e2e/tests/compiler-isolation.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-45
+packages/ui/src/constants/dropdown.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 2
+apps/sites-e2e/emulators/types.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-12
+apps/dashboard/src/types/sites.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 180
+scripts/testing/dashboard/utils/database.test.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-34
+apps/dashboard/src/components/settings/settings-modal-nav.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 289,291-292
+apps/dashboard/src/components/sites/site-header-actions.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 7,35
+apps/dashboard/src/app/(dashboard)/[slug]/chat/page-client.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 161,2712,2738
+apps/sites-builder/scripts/utils/stage-box-toolchain.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-59
+apps/sites-e2e/emulators/browser/providers/ga4.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-41
+apps/dashboard/src/components/sites/site-styling-fields.tsx
+  s_985d322a22a6f8::t_64773daa4a8cab 166-173
+apps/sites-e2e/src/utils/tenants.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-125
+packages/tools/src/skill-editor/update-skill.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1,17
+scripts/testing/dashboard/associate-repository.ts
+  s_985d322a22a6f8::t_64773daa4a8cab 1-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1164b50a8089821b9a11069b9ef417a370ba1b1a",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
