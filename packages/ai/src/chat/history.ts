@@ -3,7 +3,7 @@ import { db } from "@notra/db/drizzle";
 import { chatSessions } from "@notra/db/schema";
 import { projectScopeFilter } from "@notra/db/utils/projects";
 import { generateText, type UIMessage } from "ai";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 
 import {
   CHAT_ABORT_FLAG_TTL_SECONDS,
@@ -73,7 +73,7 @@ function toExternalChannelId(
     return null;
   }
   if (source === "dashboard" || source === "agent") {
-    return { source };
+    return id ? { source, id } : { source };
   }
   if ((source === "discord" || source === "slack") && id) {
     return { source, id };
@@ -532,6 +532,7 @@ export async function getChatSessionByExternalChannel(
         isNull(chatSessions.deletedAt)
       )
     )
+    .orderBy(desc(chatSessions.updatedAt))
     .limit(1)
     .then((rows) => rows[0]);
 

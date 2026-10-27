@@ -42,7 +42,11 @@ export const externalChannelSourceSchema = z.enum([
   "agent",
 ]);
 
-export const externalChannelLookupSourceSchema = z.enum(["discord", "slack"]);
+export const externalChannelLookupSourceSchema = z.enum([
+  "discord",
+  "slack",
+  "dashboard",
+]);
 
 export const externalChannelIdSchema = z
   .object({

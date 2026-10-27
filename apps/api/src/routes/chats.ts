@@ -53,7 +53,7 @@ const getChatByExternalRoute = createRoute({
   operationId: "getChatByExternalChannel",
   summary: "Get a chat by external channel id",
   description:
-    "Looks up the chat session linked to a Discord or Slack channel. Link a chat by passing externalChannelId when you create it.",
+    "Looks up the chat session linked to a Discord or Slack channel, or tagged with a dashboard id. Link a chat by passing externalChannelId when you create it.",
   request: { query: getChatByExternalQuerySchema },
   responses: {
     200: {
