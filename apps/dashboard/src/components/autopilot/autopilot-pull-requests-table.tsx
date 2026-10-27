@@ -115,7 +115,7 @@ export function AutopilotPullRequestsTable({
       ? {
           key: "ideaStatus",
           header: "Status",
-          width: "8rem",
+          width: "9.5rem",
           collapsePriority: 2,
           cell: (finding) => {
             if (finding.status !== "suggested") {
