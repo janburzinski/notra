@@ -632,7 +632,6 @@ DATABASE_URL=postgresql://...demo-only-database...
 UPSTASH_REDIS_REST_URL=https://...demo-only-redis...
 UPSTASH_REDIS_REST_TOKEN=...
 UNKEY_ROOT_KEY=...demo-api-management-root-key...
-UNKEY_API_ID=...demo-keyspace-id...
 INTEGRATION_ENCRYPTION_KEY=...demo-only-key...
 WORKFLOW_BASE_URL=https://demo.usenotra.com
 ```
@@ -641,7 +640,7 @@ The dashboard also needs:
 
 ```dotenv
 NEXT_PUBLIC_NOTRA_DEMO_MODE=true
-NEXT_PUBLIC_NOTRA_DEMO_API_URL=https://demo-api.usenotra.com
+UNKEY_API_ID=...demo-keyspace-id...
 APP_URL=https://demo.usenotra.com
 NEXT_PUBLIC_APP_URL=https://demo.usenotra.com
 NEXT_PUBLIC_SITE_URL=https://www.usenotra.com
@@ -652,12 +651,19 @@ TURNSTILE_HOSTNAMES=demo.usenotra.com
 ```
 
 The API also needs `NOTRA_DEMO_DASHBOARD_ORIGIN=https://demo.usenotra.com`
-for CORS and `NOTRA_DEMO_API_URL=https://demo-api.usenotra.com`. Its current
-startup validation also requires `AUTUMN_SECRET_KEY` and `QSTASH_TOKEN`; use
-demo/test credentials, not production credentials. Keep any optional services
-the demo uses (for example logging, object storage, QStash signing keys) scoped
-to demo as well. The demo has no consent banner, so it loads no Databuddy
-analytics.
+for CORS. Both apps use `NOTRA_DEMO_API_URL` to override the default
+`https://demo-api.usenotra.com` (for example before the custom-domain cutover).
+The dashboard returns this runtime value to its API console through the sandbox
+info endpoint; `NEXT_PUBLIC_NOTRA_DEMO_API_URL` is no longer used. Move any
+custom value to `NOTRA_DEMO_API_URL` when upgrading.
+
+Leave `AUTUMN_SECRET_KEY`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY` and
+`QSTASH_NEXT_SIGNING_KEY` unset: the demo bypasses billing without an Autumn
+key and simulates queue operations without sending messages. Normal production
+API deployments still require both Autumn and QStash credentials. The API does
+not need `UNKEY_API_ID`; only the dashboard creates sandbox keys. Keep optional
+services the demo uses (for example logging or object storage) scoped to demo
+as well. The demo has no consent banner, so it loads no Databuddy analytics.
 
 Unkey provides these variables at build time via its BuildKit secret mount.
 The dashboard Dockerfile declares `UNKEY_SECRETS_ID` and sources that file in

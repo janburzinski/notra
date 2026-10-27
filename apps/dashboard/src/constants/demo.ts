@@ -54,8 +54,6 @@ export const DEMO_SANDBOX_TIME_ZONE_WINDOW = "1 h";
 
 export const DEMO_START_PATH = "/auth/demo";
 export const DEMO_SIGNUP_URL = "https://app.usenotra.com/signup";
-export const DEMO_API_BASE_URL =
-  process.env.NEXT_PUBLIC_NOTRA_DEMO_API_URL ?? "https://demo-api.usenotra.com";
 
 export const DEMO_API_KEY_PREFIX = "notra_demo";
 export const DEMO_API_KEY_RATE_LIMIT = { limit: 60, durationMs: 60_000 };

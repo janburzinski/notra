@@ -1,3 +1,4 @@
+import { getAppUrl } from "@notra/ai/utils/url";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";
@@ -10,11 +11,7 @@ function getBaseUrl() {
     return window.location.origin;
   }
 
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.APP_URL ??
-    "http://localhost:3000"
-  );
+  return getAppUrl() ?? "http://localhost:3000";
 }
 
 const link = new RPCLink({

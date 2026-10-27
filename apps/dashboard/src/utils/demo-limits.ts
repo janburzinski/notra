@@ -4,7 +4,7 @@ import {
 } from "@/constants/demo";
 
 function envInteger(name: string, min: number, fallback: number): number {
-  const configured = Number(process.env[name]);
+  const configured = Number(process.env[name]?.trim() || Number.NaN);
   return Number.isInteger(configured) && configured >= min
     ? configured
     : fallback;
