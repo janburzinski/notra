@@ -31,7 +31,7 @@ export const TRACKED_ENGINES: TrackedEngine[] = [
 
 export const PRICING_ANNUAL_BADGE = "2 months free";
 
-export const PRICING_DEFAULT_BILLING: BillingPeriod = "yearly";
+export const PRICING_DEFAULT_BILLING: BillingPeriod = "monthly";
 
 export const PRICING_BILLING_OPTIONS: BillingToggleOption[] = [
   { value: "monthly", label: "Monthly" },
