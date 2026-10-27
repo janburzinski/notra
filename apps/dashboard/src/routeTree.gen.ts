@@ -44,6 +44,7 @@ import { Route as ApiSocialAccountsCallbackRouteImport } from './routes/api.soci
 import { Route as ApiUploadsContentImageRouteImport } from './routes/api.uploads.content-image'
 import { Route as ApiUploadsConvertHeicRouteImport } from './routes/api.uploads.convert-heic'
 import { Route as ApiWebhooksWorkosRouteImport } from './routes/api.webhooks.workos'
+import { Route as ApiWorkflowsDeletedAnalyticsPurgeRouteImport } from './routes/api.workflows.deleted-analytics-purge'
 import { Route as ApiWorkflowsGscSyncRouteImport } from './routes/api.workflows.gsc-sync'
 import { Route as ApiWorkflowsScheduleRouteImport } from './routes/api.workflows.schedule'
 import { Route as ApiWorkflowsScheduledPublicationWakeRouteImport } from './routes/api.workflows.scheduled-publication-wake'
@@ -278,6 +279,12 @@ const ApiWebhooksWorkosRoute = ApiWebhooksWorkosRouteImport.update({
   path: '/api/webhooks/workos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWorkflowsDeletedAnalyticsPurgeRoute =
+  ApiWorkflowsDeletedAnalyticsPurgeRouteImport.update({
+    id: '/api/workflows/deleted-analytics-purge',
+    path: '/api/workflows/deleted-analytics-purge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiWorkflowsGscSyncRoute = ApiWorkflowsGscSyncRouteImport.update({
   id: '/api/workflows/gsc-sync',
   path: '/api/workflows/gsc-sync',
@@ -623,6 +630,7 @@ export interface FileRoutesByFullPath {
   '/api/uploads/content-image': typeof ApiUploadsContentImageRoute
   '/api/uploads/convert-heic': typeof ApiUploadsConvertHeicRoute
   '/api/webhooks/workos': typeof ApiWebhooksWorkosRoute
+  '/api/workflows/deleted-analytics-purge': typeof ApiWorkflowsDeletedAnalyticsPurgeRoute
   '/api/workflows/gsc-sync': typeof ApiWorkflowsGscSyncRoute
   '/api/workflows/schedule': typeof ApiWorkflowsScheduleRoute
   '/api/workflows/scheduled-publication-wake': typeof ApiWorkflowsScheduledPublicationWakeRoute
@@ -713,6 +721,7 @@ export interface FileRoutesByTo {
   '/api/uploads/content-image': typeof ApiUploadsContentImageRoute
   '/api/uploads/convert-heic': typeof ApiUploadsConvertHeicRoute
   '/api/webhooks/workos': typeof ApiWebhooksWorkosRoute
+  '/api/workflows/deleted-analytics-purge': typeof ApiWorkflowsDeletedAnalyticsPurgeRoute
   '/api/workflows/gsc-sync': typeof ApiWorkflowsGscSyncRoute
   '/api/workflows/schedule': typeof ApiWorkflowsScheduleRoute
   '/api/workflows/scheduled-publication-wake': typeof ApiWorkflowsScheduledPublicationWakeRoute
@@ -804,6 +813,7 @@ export interface FileRoutesById {
   '/api/uploads/content-image': typeof ApiUploadsContentImageRoute
   '/api/uploads/convert-heic': typeof ApiUploadsConvertHeicRoute
   '/api/webhooks/workos': typeof ApiWebhooksWorkosRoute
+  '/api/workflows/deleted-analytics-purge': typeof ApiWorkflowsDeletedAnalyticsPurgeRoute
   '/api/workflows/gsc-sync': typeof ApiWorkflowsGscSyncRoute
   '/api/workflows/schedule': typeof ApiWorkflowsScheduleRoute
   '/api/workflows/scheduled-publication-wake': typeof ApiWorkflowsScheduledPublicationWakeRoute
@@ -896,6 +906,7 @@ export interface FileRouteTypes {
     | '/api/uploads/content-image'
     | '/api/uploads/convert-heic'
     | '/api/webhooks/workos'
+    | '/api/workflows/deleted-analytics-purge'
     | '/api/workflows/gsc-sync'
     | '/api/workflows/schedule'
     | '/api/workflows/scheduled-publication-wake'
@@ -986,6 +997,7 @@ export interface FileRouteTypes {
     | '/api/uploads/content-image'
     | '/api/uploads/convert-heic'
     | '/api/webhooks/workos'
+    | '/api/workflows/deleted-analytics-purge'
     | '/api/workflows/gsc-sync'
     | '/api/workflows/schedule'
     | '/api/workflows/scheduled-publication-wake'
@@ -1076,6 +1088,7 @@ export interface FileRouteTypes {
     | '/api/uploads/content-image'
     | '/api/uploads/convert-heic'
     | '/api/webhooks/workos'
+    | '/api/workflows/deleted-analytics-purge'
     | '/api/workflows/gsc-sync'
     | '/api/workflows/schedule'
     | '/api/workflows/scheduled-publication-wake'
@@ -1167,6 +1180,7 @@ export interface RootRouteChildren {
   ApiUploadsContentImageRoute: typeof ApiUploadsContentImageRoute
   ApiUploadsConvertHeicRoute: typeof ApiUploadsConvertHeicRoute
   ApiWebhooksWorkosRoute: typeof ApiWebhooksWorkosRoute
+  ApiWorkflowsDeletedAnalyticsPurgeRoute: typeof ApiWorkflowsDeletedAnalyticsPurgeRoute
   ApiWorkflowsGscSyncRoute: typeof ApiWorkflowsGscSyncRoute
   ApiWorkflowsScheduleRoute: typeof ApiWorkflowsScheduleRoute
   ApiWorkflowsScheduledPublicationWakeRoute: typeof ApiWorkflowsScheduledPublicationWakeRoute
@@ -1454,6 +1468,13 @@ declare module '@tanstack/react-router' {
       path: '/api/webhooks/workos'
       fullPath: '/api/webhooks/workos'
       preLoaderRoute: typeof ApiWebhooksWorkosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/workflows/deleted-analytics-purge': {
+      id: '/api/workflows/deleted-analytics-purge'
+      path: '/api/workflows/deleted-analytics-purge'
+      fullPath: '/api/workflows/deleted-analytics-purge'
+      preLoaderRoute: typeof ApiWorkflowsDeletedAnalyticsPurgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/workflows/gsc-sync': {
@@ -1969,6 +1990,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiUploadsContentImageRoute: ApiUploadsContentImageRoute,
   ApiUploadsConvertHeicRoute: ApiUploadsConvertHeicRoute,
   ApiWebhooksWorkosRoute: ApiWebhooksWorkosRoute,
+  ApiWorkflowsDeletedAnalyticsPurgeRoute:
+    ApiWorkflowsDeletedAnalyticsPurgeRoute,
   ApiWorkflowsGscSyncRoute: ApiWorkflowsGscSyncRoute,
   ApiWorkflowsScheduleRoute: ApiWorkflowsScheduleRoute,
   ApiWorkflowsScheduledPublicationWakeRoute:

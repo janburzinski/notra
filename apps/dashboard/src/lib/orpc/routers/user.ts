@@ -13,6 +13,7 @@ import { deleteOrganizationSites } from "@notra/sites-server/organization";
 import { and, count, eq, inArray, ne } from "drizzle-orm";
 import { Effect } from "effect";
 
+import { purgeDeletedAnalytics } from "@/lib/analytics/deleted-analytics-purge";
 import { deleteAutumnCustomer } from "@/lib/billing/delete-autumn-customer";
 import { getTranslations } from "@/lib/i18n/server";
 import {
@@ -48,6 +49,7 @@ async function cleanupDeletedOrganization(organizationId: string) {
         organizationId,
       });
     }),
+    purgeDeletedAnalytics({ organizationId }),
     deleteAutumnCustomer(organizationId).catch((error) => {
       logError("[Delete Org] Failed to cancel Autumn subscription", error, {
         organizationId,

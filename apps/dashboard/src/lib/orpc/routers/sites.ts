@@ -165,6 +165,7 @@ import {
   SITE_ADMIN_ROLES,
   SITE_DEPLOYMENTS_PAGE_LIMIT,
 } from "@/constants/sites";
+import { purgeDeletedAnalytics } from "@/lib/analytics/deleted-analytics-purge";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { assertActiveSubscription } from "@/lib/billing/subscription";
 import { afterResponse } from "@/lib/framework/after-response";
@@ -685,6 +686,10 @@ export const sitesRouter = {
       assertNotDemo();
       const { site } = await requireSite(context, input, { admin: true });
       await deleteSite(site);
+      await purgeDeletedAnalytics({
+        organizationId: site.organizationId,
+        siteId: site.id,
+      });
       return { ok: true };
     }),
 

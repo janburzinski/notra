@@ -6,6 +6,8 @@ import {
 } from "../cache/query-cache";
 import type {
   PurgeGeoProjectInput,
+  PurgeOrganizationInput,
+  PurgeSiteInput,
   PurgeSocialAccountInput,
 } from "../types/purge";
 
@@ -141,17 +143,33 @@ async function submitDelete(
 
 function deleteFromDatasource(
   datasource: string,
-  condition: string,
-  waitForCompletion = true
+  condition: string
 ): Effect.Effect<void, Error> {
   return Effect.tryPromise({
     try: () => submitDelete(datasource, condition),
     catch: toError,
-  }).pipe(
-    Effect.flatMap((jobId) =>
-      jobId && waitForCompletion ? waitForJob(jobId) : Effect.void
-    )
+  }).pipe(Effect.flatMap((jobId) => (jobId ? waitForJob(jobId) : Effect.void)));
+}
+
+async function submitDeletes(
+  datasources: string[],
+  condition: string
+): Promise<void> {
+  if (!process.env.TINYBIRD_TOKEN) {
+    return;
+  }
+  const results = await Promise.allSettled(
+    datasources.map((datasource) => submitDelete(datasource, condition))
   );
+  const errors = results.flatMap((result) =>
+    result.status === "rejected" ? [result.reason] : []
+  );
+  if (errors.length > 0) {
+    throw new AggregateError(
+      errors,
+      `Tinybird delete failed on ${errors.length} of ${datasources.length} datasources`
+    );
+  }
 }
 
 export function purgeSocialAccountData(
@@ -202,15 +220,26 @@ export function purgeGeoProjectData(
 export function purgeDeletedProjectAnalytics(
   input: PurgeGeoProjectInput
 ): Promise<void> {
-  if (!process.env.TINYBIRD_TOKEN) {
-    return Promise.resolve();
-  }
-  const condition = `organization_id = '${sanitize(input.organizationId)}' AND project_id = '${sanitize(input.projectId)}'`;
-  return Effect.runPromise(
-    Effect.forEach(
-      [...GEO_DATASOURCES, ...WEB_DATASOURCES],
-      (datasource) => deleteFromDatasource(datasource, condition, false),
-      { discard: true }
-    )
+  return submitDeletes(
+    [...GEO_DATASOURCES, ...WEB_DATASOURCES],
+    `organization_id = '${sanitize(input.organizationId)}' AND project_id = '${sanitize(input.projectId)}'`
+  );
+}
+
+export function purgeDeletedOrganizationAnalytics(
+  input: PurgeOrganizationInput
+): Promise<void> {
+  return submitDeletes(
+    [...ACCOUNT_SCOPED_DATASOURCES, ...GEO_DATASOURCES, ...WEB_DATASOURCES],
+    `organization_id = '${sanitize(input.organizationId)}'`
+  );
+}
+
+export function purgeDeletedSiteAnalytics(
+  input: PurgeSiteInput
+): Promise<void> {
+  return submitDeletes(
+    [...GEO_DATASOURCES, ...WEB_DATASOURCES],
+    `organization_id = '${sanitize(input.organizationId)}' AND site_id = '${sanitize(input.siteId)}'`
   );
 }
