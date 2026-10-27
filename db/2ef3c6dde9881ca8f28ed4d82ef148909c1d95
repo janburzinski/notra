@@ -1,0 +1,31 @@
+scripts/github/production-deploy.test.mjs
+  s_247d39af288407::t_82c98e9ddf2693 322,326,363
+  s_247d39af288407::t_09196ca93d57ee 116-117,230
+apps/dashboard/src/app/api/healthcheck/route.ts
+  s_247d39af288407::t_f8ba0ccc1cebec 1-31
+CONTRIBUTING.md
+  s_247d39af288407::t_2259b91850adfe 685-688
+  s_247d39af288407::t_278ffc1b2844d3 712-714,726,809-811,895
+  s_247d39af288407::t_8e05aee12eda7a 148-149,154,816
+scripts/github/production-deploy.mjs
+  s_247d39af288407::t_14957a838fc531 697,781,803-830
+apps/dashboard/src/lib/demo/schema-check.ts
+  s_247d39af288407::t_cd28849c5590ba 1-2,4-5,13-26,28-32
+  s_247d39af288407::t_6153ff7dac6ad2 3,6-12,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "db2ef3c6dde9881ca8f28ed4d82ef148909c1d95",
+  "prompts": {},
+  "sessions": {
+    "s_247d39af288407": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43ec8a77-c61e-4596-8c31-df1f1b05a7c0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
