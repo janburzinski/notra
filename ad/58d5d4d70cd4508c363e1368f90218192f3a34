@@ -1,0 +1,21 @@
+apps/sites-builder/compiler/dev-server.ts
+  s_bb222c89064ca0::t_f5e324cbc20b34 97-121
+apps/sites-builder/compiler/cli.ts
+  s_bb222c89064ca0::t_f5e324cbc20b34 24,148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ad58d5d4d70cd4508c363e1368f90218192f3a34",
+  "prompts": {},
+  "sessions": {
+    "s_bb222c89064ca0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a3e81f7-08fa-4ea7-91a2-f410be997279",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
