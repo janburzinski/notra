@@ -1,11 +1,11 @@
 import { googleFaviconUrl } from "@notra/utils/google-favicon";
 import { createFileRoute } from "@tanstack/react-router";
-import { ImageResponse } from "@vercel/og";
 
 import ditherDataUrl from "@/../public/blog/og-dither.png?inline";
 import logoSvg from "@/../public/notra-mark.svg?raw";
 import { STATE_OF_AI_SEARCH_TITLE } from "@/constants/state-of-ai-search";
 import { findSummary } from "@/lib/state-of-ai-search/reports";
+import { ImageResponse } from "@/utils/image-response";
 import { loadImageAsDataUrl, loadInterFont } from "@/utils/og";
 
 const size = { width: 1200, height: 630 };

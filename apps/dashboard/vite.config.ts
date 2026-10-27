@@ -84,7 +84,7 @@ export default defineConfig(({ mode }) => {
       }),
       tanstackStart(),
       react({ compiler: true }),
-      nitro(),
+      nitro({ traceDeps: ["harfbuzzjs*", "satori"] }),
     ],
     ssr: {
       // React is external too (as in apps/web), so the bundle and external
@@ -97,6 +97,7 @@ export default defineConfig(({ mode }) => {
         "@cursor/sdk",
         "@ai-sdk/code-mode",
         "run",
+        "satori",
         "sharp",
         "wawoff2",
       ],

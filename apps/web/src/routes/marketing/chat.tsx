@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ImageResponse } from "@vercel/og";
 
 import bgDataUrl from "@/../public/marketing/chat-bg.jpg?inline";
 import notraSvg from "@/../public/notra-mark.svg?raw";
@@ -9,6 +8,7 @@ import type {
   ChatOgComposerProps,
   ChatOgHeadlineProps,
 } from "@/types/marketing-chat";
+import { ImageResponse } from "@/utils/image-response";
 import { loadInterFont } from "@/utils/og";
 
 const SIZE = { width: 1200, height: 630 };

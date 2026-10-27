@@ -16,6 +16,8 @@ import { buildSecurityHeaders } from "./src/utils/security-headers";
 const SERVER_ONLY_PACKAGES = [
   "@remotion/bundler",
   "@remotion/renderer",
+  "@resvg/resvg-js",
+  "satori",
   "sharp",
 ];
 
@@ -95,7 +97,14 @@ export default defineConfig(({ command }) => ({
     nitro({
       compressPublicAssets:
         process.env.VERCEL === "1" ? false : { gzip: true, brotli: true },
-      traceDeps: ["sharp", "react", "react-dom"],
+      traceDeps: [
+        "@resvg/resvg-js",
+        "harfbuzzjs*",
+        "satori",
+        "sharp",
+        "react",
+        "react-dom",
+      ],
       rolldownConfig: {
         external: ["@remotion/bundler", "@remotion/renderer"],
       },

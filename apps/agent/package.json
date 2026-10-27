@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "node --max-old-space-size=2048 node_modules/.bin/eve build",
+    "build": "node --max-old-space-size=2048 node_modules/.bin/eve build && node scripts/copy-hb-wasm.mjs",
     "dev": "dotenv -e ../../.env -- eve dev --port 3200",
     "agent:dev": "dotenv -e ../../.env -- eve dev",
     "agent:build": "bun run build",

@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ImageResponse } from "@vercel/og";
 
 import ditherDataUrl from "@/../public/blog/og-dither.png?inline";
 import logoSvg from "@/../public/notra-mark.svg?raw";
 import { getNotraBlogPostBySlug } from "@/utils/blog";
+import { ImageResponse } from "@/utils/image-response";
 import { loadInterFont, loadImageAsDataUrl } from "@/utils/og";
 
 const size = { width: 1200, height: 630 };
