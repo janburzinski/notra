@@ -16,6 +16,7 @@ import { pipeline } from "node:stream";
 import type { Duplex } from "node:stream";
 import { setTimeout as delay } from "node:timers/promises";
 
+import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteMounts } from "@notra/sites-core/types/deployment";
 import type { SiteHeadScript } from "@notra/sites-core/types/site-integrations";
 import {
@@ -29,6 +30,7 @@ import { AREA_PAGES_FILE } from "./constants/build";
 import {
   ASTRO_READY_SCAN_CHARS,
   ASTRO_READY_URL,
+  DEV_ERRORS_PATH,
   DEV_HMR_GENERATION_EVENT,
   DEV_PORT_SEARCH_RANGE,
   DEV_PROXY_MAX_ATTEMPTS,
@@ -39,6 +41,7 @@ import {
 } from "./constants/cli";
 import type { DevAreaServer, RunningDevArea } from "./types/dev-server";
 import { createAstroLogFilter } from "./utils/astro-log";
+import { devErrorPage, devErrorsKey } from "./utils/dev-error-page";
 import { isLocalDevHost } from "./utils/dev-host";
 import { devMarkdown } from "./utils/dev-markdown";
 
@@ -83,6 +86,31 @@ export async function findFreePort(from: number): Promise<number> {
       probe.listen(port, "127.0.0.1", () => probe.close(() => resolve(true)));
     });
     if (free) {
+      return port;
+    }
+  }
+  throw new Error(
+    `No free port between ${from} and ${from + DEV_PORT_SEARCH_RANGE}`
+  );
+}
+
+// Connects instead of listening: a listen probe would briefly accept
+// connections on the port the browser and the user's tools are pointed at.
+export async function findUnusedPort(from: number): Promise<number> {
+  for (
+    let port = from;
+    port < from + DEV_PORT_SEARCH_RANGE && port <= 65535;
+    port++
+  ) {
+    const answered = await new Promise<boolean>((resolve) => {
+      const socket = connect(port, "127.0.0.1");
+      socket.once("connect", () => {
+        socket.destroy();
+        resolve(true);
+      });
+      socket.once("error", () => resolve(false));
+    });
+    if (!answered) {
       return port;
     }
   }
@@ -159,7 +187,9 @@ export async function startAstroDev(
           NOTRA_DEV_HMR_TOKEN: `${area.hmrToken}.${area.hmrGeneration}`,
           NOTRA_DEV_DOCUMENT_TOKEN: area.documentToken,
           NOTRA_DEV_HMR_EVENT: DEV_HMR_GENERATION_EVENT,
+          NOTRA_DEV_ERRORS_PATH: DEV_ERRORS_PATH,
           ASTRO_TELEMETRY_DISABLED: "1",
+          ASTRO_DISABLE_UPDATE_CHECK: "true",
         },
         stdio: ["ignore", "pipe", "pipe"],
       }
@@ -235,6 +265,18 @@ export async function stopAstroDev(running: RunningDevArea): Promise<void> {
   });
 }
 
+function isDocumentRequest(incoming: IncomingMessage): boolean {
+  if (incoming.method !== "GET") {
+    return false;
+  }
+  const destination = incoming.headers["sec-fetch-dest"];
+  return destination
+    ? destination === "document" ||
+        destination === "iframe" ||
+        destination === "frame"
+    : (incoming.headers.accept ?? "").includes("text/html");
+}
+
 function pathnameOf(incoming: IncomingMessage): string | null {
   try {
     return decodeURIComponent(
@@ -273,7 +315,8 @@ export function startDevProxy(
   port: number,
   mounts: SiteMounts,
   areas: DevAreaServer[],
-  waitForReady: () => Promise<void>
+  waitForReady: () => Promise<void>,
+  siteErrors: () => SiteDiagnostic[] = () => []
 ): Promise<Server> {
   const [fallback] = areas;
   const targetFor = (pathname: string) => {
@@ -301,6 +344,26 @@ export function startDevProxy(
     if (pathname === null) {
       outgoing.writeHead(400);
       outgoing.end();
+      return;
+    }
+    if (pathname === DEV_ERRORS_PATH) {
+      outgoing.writeHead(200, {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+      });
+      const errors = siteErrors();
+      outgoing.end(
+        JSON.stringify({ count: errors.length, key: devErrorsKey(errors) })
+      );
+      return;
+    }
+    const errors = siteErrors();
+    if (errors.length > 0 && isDocumentRequest(incoming)) {
+      outgoing.writeHead(500, {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+      });
+      outgoing.end(devErrorPage(errors));
       return;
     }
     if (

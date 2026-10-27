@@ -21,6 +21,7 @@ import { buildSite, readBuildTarget, writeBuildParams } from "./build";
 import { USAGE } from "./constants/cli";
 import {
   findFreePort,
+  findUnusedPort,
   paramsForArea,
   startDevProxy,
   stopAstroDev,
@@ -136,9 +137,19 @@ async function main() {
       target?.mounts ?? { blog: "/blog", changelog: "/changelog" }
     );
     const defaultConfig = localDefaultConfig(siteRoot, target);
-    const port = Number(values.port ?? "4321");
-    if (!Number.isInteger(port) || port < 1 || port > 65533) {
+    const requestedPort = Number(values.port ?? "4321");
+    if (
+      !Number.isInteger(requestedPort) ||
+      requestedPort < 1 ||
+      requestedPort > 65533
+    ) {
       throw new Error("--port must be an integer between 1 and 65533");
+    }
+    const port = await findUnusedPort(requestedPort);
+    if (port !== requestedPort) {
+      process.stderr.write(
+        `Port ${requestedPort} is in use, using ${port} instead.\n`
+      );
     }
     if (values.area && values.area !== "blog" && values.area !== "changelog") {
       throw new Error("--area must be blog or changelog");
@@ -172,6 +183,7 @@ async function main() {
     const documentSession = randomBytes(18).toString("base64url");
     let documentGeneration = 0;
     let running: RunningDevArea[] = [];
+    let siteErrors: SiteDiagnostic[] = [];
     const stopAreas = async () => {
       const stopping = running;
       running = [];
@@ -198,7 +210,12 @@ async function main() {
           defaultConfig,
         }),
       writeOgImages,
-      printDiagnostics,
+      printDiagnostics: (diagnostics) => {
+        siteErrors = diagnostics.filter(
+          (diagnostic) => diagnostic.severity === "error"
+        );
+        printDiagnostics(diagnostics);
+      },
       reportError: (error) => process.stderr.write(`${String(error)}\n`),
       publish: async (params, isCurrent) => {
         for (const area of areas) {
@@ -249,6 +266,7 @@ async function main() {
     };
     process.on("SIGINT", onSignal);
     process.on("SIGTERM", onSignal);
+    process.on("SIGHUP", onSignal);
     try {
       watcher = watch(siteRoot, { recursive: true }, () => {
         const requested = refresh.refresh(150);
@@ -259,21 +277,35 @@ async function main() {
           );
         }
       });
-      proxy = await startDevProxy(port, mounts, ordered, async () => {
-        await watchedRefresh;
-      });
+      proxy = await startDevProxy(
+        port,
+        mounts,
+        ordered,
+        async () => {
+          await watchedRefresh;
+        },
+        () => siteErrors
+      );
       if (interrupted) {
         proxy.close();
         await stop();
         process.exit(0);
       }
       watchedRefresh = refresh.refresh();
-      if (!(await watchedRefresh)) {
+      const started = await watchedRefresh;
+      if (interrupted) {
         await stop();
-        process.exit(interrupted ? 0 : 1);
+        process.exit(0);
       }
+      const urls = areas
+        .map((area) => `${area.area} at http://localhost:${port}${area.mount}`)
+        .join(" and ");
+      // Errors at startup keep the server up: the next save that fixes them
+      // starts the preview, like any later edit.
       process.stderr.write(
-        `Previewing ${areas.map((area) => `${area.area} at http://localhost:${port}${area.mount}`).join(" and ")}\n`
+        started
+          ? `Previewing ${urls}\n`
+          : `Fix the errors above to preview ${urls}. Waiting for changes...\n`
       );
       await new Promise(() => undefined);
     } catch (error) {

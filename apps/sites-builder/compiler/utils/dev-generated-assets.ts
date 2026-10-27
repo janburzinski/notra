@@ -40,10 +40,12 @@ export async function cleanDevGeneratedAssets(
             /^[a-f0-9]{64}\//.test(
               name.slice(`${SITE_ASSETS_DIR}/fonts/`.length)
             )) ||
-          (SITE_AREAS.some((area) =>
-            name.startsWith(`${OG_IMAGES_DIR}/${area}/`)
-          ) &&
-            name.endsWith(".png"))
+          SITE_AREAS.some(
+            (area) =>
+              name === `${OG_IMAGES_DIR}/${area}.png` ||
+              (name.startsWith(`${OG_IMAGES_DIR}/${area}/`) &&
+                name.endsWith(".png"))
+          )
         );
       })
       .map((path) => rm(path, { force: true }))

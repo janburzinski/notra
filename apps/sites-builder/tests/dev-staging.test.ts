@@ -138,6 +138,7 @@ test("successful refreshes prune obsolete generated assets without touching curr
     `/_notra/assets/fonts/${String(version).repeat(64)}/license.txt`,
   ];
   const ogPath = (version: number) => `/_notra/og/blog/post-${version}.png`;
+  const sectionOgPath = "/_notra/og/blog.png";
   const owner = createDevRefresh({
     params: {
       area: "blog",
@@ -185,8 +186,18 @@ test("successful refreshes prune obsolete generated assets without touching curr
         join(publicDir, ogPath(version)),
         "Current OG image"
       );
+      // Section cards stop once seo.image is set; model that after the first.
+      if (version === 1) {
+        await writeFileEnsured(
+          join(publicDir, sectionOgPath),
+          "Current section image"
+        );
+      }
       return {
-        manifest: { "blog/hello": ogPath(version) },
+        manifest: {
+          "blog/hello": ogPath(version),
+          ...(version === 1 ? { blog: sectionOgPath } : {}),
+        },
         diagnostics: [],
         durationMs: 0,
       };
@@ -236,6 +247,9 @@ test("successful refreshes prune obsolete generated assets without touching curr
     expect(await owner.refresh()).toBe(true);
     expect(await stat(originalScript).catch(() => null)).toBeNull();
     expect(await stat(join(publicDir, ogPath(1))).catch(() => null)).toBeNull();
+    expect(
+      await stat(join(publicDir, sectionOgPath)).catch(() => null)
+    ).toBeNull();
     for (const path of fontPaths(1)) {
       expect(await stat(join(publicDir, path)).catch(() => null)).toBeNull();
     }

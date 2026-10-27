@@ -40,12 +40,15 @@ notra dev
 
 Open `http://localhost:4321`. Both `/blog` and `/changelog` are available, and `/`
 redirects to `/blog`. Content, components, CSS, assets and configuration reload
-when you edit them. Drafts are included, and analytics integrations are disabled.
+when you edit them. If a file has an error, the browser shows it in place of the
+page and reloads once you fix it. Drafts are included, and analytics integrations
+are disabled.
 No login, API key or deployment is required. The first run downloads the Sites
 renderer; later runs reuse npm's or Bun's package cache, depending on the
 selected runtime. Node users do not need Bun. Stop the server with Ctrl+C.
 
-For a site in a subfolder or a different local port:
+If port 4321 is taken, the next free port is used and printed. For a site in a
+subfolder or a different local port:
 
 ```bash
 notra dev --source ./hosted-site --port 4400
