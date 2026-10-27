@@ -1,0 +1,23 @@
+apps/dashboard/tests/site-design.test.ts
+  s_6d4a65b8409eaa::t_c351d880bcb24d 307-360
+apps/dashboard/src/utils/site-design.ts
+  s_6d4a65b8409eaa::t_a713595d8f01e9 626-633,665,768-770,776-795
+apps/dashboard/src/components/sites/site-footer-fields.tsx
+  s_6d4a65b8409eaa::t_a713595d8f01e9 264-271
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "458fae1eb6a999898de7c21830bd59424f434bdc",
+  "prompts": {},
+  "sessions": {
+    "s_6d4a65b8409eaa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "95354687-09ce-4ca1-b5c3-290a6eccd0b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
