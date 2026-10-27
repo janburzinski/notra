@@ -21,5 +21,14 @@
   "blog": {
     "title": "Demo Blog",
     "description": "Bring your own buttons."
+  },
+  "logo": {
+    "light": "https://media.brand.dev/dd94a82e-c6c3-4a60-876b-ab30ed68a583.svg",
+    "dark": "https://media.brand.dev/22cdc864-7770-4d53-ace2-922fcd806986.png"
+  },
+  "fonts": {
+    "heading": {
+      "family": "Instrument Serif"
+    }
   }
 }
