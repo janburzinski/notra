@@ -74,8 +74,6 @@ export type AutomationRow =
   | { kind: "event"; id: string; trigger: Trigger }
   | { kind: "alert"; id: string; alert: GeoAlertAutomation };
 
-export type AutomationFilter = "all" | "content" | "alerts" | "paused";
-
 export interface GeoAlertPreset {
   signal: GeoAlertSignal;
   actions?: Partial<GeoAlertActions>;

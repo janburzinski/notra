@@ -15,7 +15,6 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import type {
-  AutomationFilter,
   AutomationTemplate,
   AutomationTemplateCategory,
   AutomationTemplateId,
@@ -23,13 +22,6 @@ import type {
 
 export const AUTOMATION_TEMPLATE_CATEGORIES: readonly AutomationTemplateCategory[] =
   ["geo", "content", "webhooks"];
-
-export const AUTOMATION_FILTERS: readonly AutomationFilter[] = [
-  "all",
-  "content",
-  "alerts",
-  "paused",
-];
 
 export const AUTOMATION_TEMPLATES: readonly AutomationTemplate[] = [
   {

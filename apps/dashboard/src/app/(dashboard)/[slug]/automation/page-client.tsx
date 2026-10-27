@@ -5,14 +5,10 @@ import {
   AiBrowserIcon,
   Clock01Icon,
   GithubIcon,
-  ListViewIcon,
-  News01Icon,
-  PauseIcon,
   Task01Icon,
   ZapIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { IconSvgElement } from "@hugeicons/react";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
@@ -29,13 +25,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
-import {
-  IconTabsList,
-  IconTabsTrigger,
-} from "@notra/ui/components/ui/icon-tabs";
 import { Kbd } from "@notra/ui/components/ui/kbd";
-import { Tabs } from "@notra/ui/components/ui/tabs";
-import { cn } from "@notra/ui/lib/utils";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useState } from "react";
 import { InstrumentSection } from "ui/card";
@@ -49,9 +39,7 @@ import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { TabCount } from "@/components/tab-count";
 import {
-  AUTOMATION_FILTERS,
   AUTOMATION_TEMPLATES,
   FEATURED_AUTOMATION_TEMPLATE_IDS,
 } from "@/constants/automation-templates";
@@ -62,36 +50,12 @@ import { useLatestAutomationRuns } from "@/lib/hooks/use-automation-runs";
 import { useOnboardingSuggestions } from "@/lib/hooks/use-onboarding";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useRouter } from "@/lib/navigation";
-import type {
-  AutomationFilter,
-  AutomationRow,
-} from "@/types/automation/automations";
-import { rowEnabled } from "@/utils/automation-rows";
+import type { AutomationRow } from "@/types/automation/automations";
 
 import { AutomationPageSkeleton } from "./skeleton";
 
 interface PageClientProps {
   organizationSlug: string;
-}
-
-const FILTER_ICONS: Record<AutomationFilter, IconSvgElement> = {
-  all: ListViewIcon,
-  content: News01Icon,
-  alerts: AiBrowserIcon,
-  paused: PauseIcon,
-};
-
-function matchesFilter(row: AutomationRow, filter: AutomationFilter) {
-  switch (filter) {
-    case "content":
-      return row.kind !== "alert";
-    case "alerts":
-      return row.kind === "alert";
-    case "paused":
-      return !rowEnabled(row);
-    default:
-      return true;
-  }
 }
 
 export default function PageClient({ organizationSlug }: PageClientProps) {
@@ -105,7 +69,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     useAutomationMutations(organizationId);
 
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
-  const [filter, setFilter] = useState<AutomationFilter>("all");
   const [deleteRow, setDeleteRow] = useState<AutomationRow | null>(null);
 
   useHotkey("C", () => setCreateMenuOpen(true), {
@@ -129,13 +92,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   ).isLoading;
   const showSections = !isPending && !suggestionsLoading;
   const lastRuns = new Map(Object.entries(latestRuns.data?.lastRunAt ?? {}));
-  const visibleRows = rows.filter((row) => matchesFilter(row, filter));
-  const counts = Object.fromEntries(
-    AUTOMATION_FILTERS.map((item) => [
-      item,
-      rows.filter((row) => matchesFilter(row, item)).length,
-    ])
-  ) as Record<AutomationFilter, number>;
 
   const basePath = `/${organizationSlug}/automation`;
   const goToNew = (query = "") => router.push(`${basePath}/new${query}`);
@@ -153,37 +109,49 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-8 px-4 lg:px-6">
         <PageHeading description={t("description")} title={t("title")}>
-          <DropdownMenu onOpenChange={setCreateMenuOpen} open={createMenuOpen}>
-            <DropdownMenuTrigger
-              render={
-                <Button className="gap-1.5">
-                  <HugeiconsIcon className="size-4" icon={Add01Icon} />
-                  {t("create")}
-                  <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="end" className="w-64">
-              <CreateMenuItem
-                description={t("createMenu.alertHint")}
-                icon={AiBrowserIcon}
-                label={t("createMenu.alert")}
-                onClick={() => goToNew("?type=alert")}
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <Link
+              className={buttonVariants({ variant: "outline" })}
+              href={`${basePath}/runs`}
+            >
+              <HugeiconsIcon className="size-4" icon={Task01Icon} />
+              {t("viewRuns")}
+            </Link>
+            <DropdownMenu
+              onOpenChange={setCreateMenuOpen}
+              open={createMenuOpen}
+            >
+              <DropdownMenuTrigger
+                render={
+                  <Button className="gap-1.5">
+                    <HugeiconsIcon className="size-4" icon={Add01Icon} />
+                    {t("create")}
+                    <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
+                  </Button>
+                }
               />
-              <CreateMenuItem
-                description={t("createMenu.scheduleHint")}
-                icon={Clock01Icon}
-                label={t("createMenu.schedule")}
-                onClick={() => goToNew("?type=schedule")}
-              />
-              <CreateMenuItem
-                description={t("createMenu.eventHint")}
-                icon={GithubIcon}
-                label={t("createMenu.event")}
-                onClick={() => goToNew("?type=event")}
-              />
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenuContent align="end" className="w-64">
+                <CreateMenuItem
+                  description={t("createMenu.alertHint")}
+                  icon={AiBrowserIcon}
+                  label={t("createMenu.alert")}
+                  onClick={() => goToNew("?type=alert")}
+                />
+                <CreateMenuItem
+                  description={t("createMenu.scheduleHint")}
+                  icon={Clock01Icon}
+                  label={t("createMenu.schedule")}
+                  onClick={() => goToNew("?type=schedule")}
+                />
+                <CreateMenuItem
+                  description={t("createMenu.eventHint")}
+                  icon={GithubIcon}
+                  label={t("createMenu.event")}
+                  onClick={() => goToNew("?type=event")}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </PageHeading>
 
         {isPending ? <AutomationPageSkeleton /> : null}
@@ -197,79 +165,36 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
         ) : null}
 
         {isPending || isError ? null : (
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              {rows.length === 0 ? null : (
-                <Tabs
-                  onValueChange={(value) =>
-                    setFilter(value as AutomationFilter)
-                  }
-                  value={filter}
-                >
-                  <IconTabsList aria-label={t("filterLabel")} value={filter}>
-                    {AUTOMATION_FILTERS.map((item) => (
-                      <IconTabsTrigger
-                        icon={
-                          <HugeiconsIcon icon={FILTER_ICONS[item]} size={15} />
-                        }
-                        key={item}
-                        value={item}
-                      >
-                        {t(`filters.${item}`)}
-                        <TabCount count={counts[item]} />
-                      </IconTabsTrigger>
-                    ))}
-                  </IconTabsList>
-                </Tabs>
-              )}
-              <Link
-                className={cn(
-                  buttonVariants({ size: "sm", variant: "outline" }),
-                  "ml-auto"
-                )}
-                href={`${basePath}/runs`}
-              >
-                <HugeiconsIcon className="size-4" icon={Task01Icon} />
-                {t("viewRuns")}
-              </Link>
-            </div>
-            <AutomationsTable
-              busyId={busyId}
-              lastRuns={lastRuns}
-              emptyState={
-                rows.length === 0 ? (
-                  <Empty className="py-0 md:py-0">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <HugeiconsIcon icon={ZapIcon} />
-                      </EmptyMedia>
-                      <EmptyTitle>{t("empty.title")}</EmptyTitle>
-                      <EmptyDescription>
-                        {t("empty.description")}
-                      </EmptyDescription>
-                    </EmptyHeader>
-                    <EmptyContent>
-                      <Button onClick={() => goToNew()} size="sm">
-                        <HugeiconsIcon className="size-4" icon={Add01Icon} />
-                        {t("create")}
-                      </Button>
-                    </EmptyContent>
-                  </Empty>
-                ) : (
-                  t("emptyFilter")
-                )
-              }
-              onDelete={setDeleteRow}
-              onEdit={(row) => router.push(`${basePath}/${row.id}`)}
-              onRunNow={(row) => runNow.mutate(row.id)}
-              onSendTest={(row) => sendTest.mutate(row.id)}
-              onToggle={(row, next) => toggle.mutate({ row, enabled: next })}
-              onViewRuns={(row) =>
-                router.push(`${basePath}/runs?automation=${row.id}`)
-              }
-              rows={visibleRows}
-            />
-          </div>
+          <AutomationsTable
+            busyId={busyId}
+            lastRuns={lastRuns}
+            emptyState={
+              <Empty className="py-0 md:py-0">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <HugeiconsIcon icon={ZapIcon} />
+                  </EmptyMedia>
+                  <EmptyTitle>{t("empty.title")}</EmptyTitle>
+                  <EmptyDescription>{t("empty.description")}</EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                  <Button onClick={() => goToNew()} size="sm">
+                    <HugeiconsIcon className="size-4" icon={Add01Icon} />
+                    {t("create")}
+                  </Button>
+                </EmptyContent>
+              </Empty>
+            }
+            onDelete={setDeleteRow}
+            onEdit={(row) => router.push(`${basePath}/${row.id}`)}
+            onRunNow={(row) => runNow.mutate(row.id)}
+            onSendTest={(row) => sendTest.mutate(row.id)}
+            onToggle={(row, next) => toggle.mutate({ row, enabled: next })}
+            onViewRuns={(row) =>
+              router.push(`${basePath}/runs?automation=${row.id}`)
+            }
+            rows={rows}
+          />
         )}
 
         {showSections ? (
