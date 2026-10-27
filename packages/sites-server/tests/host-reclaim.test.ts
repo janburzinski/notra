@@ -26,7 +26,7 @@ if (!databaseUrl) {
     ]).toContain(url.pathname);
     const result = spawnSync(
       process.execPath,
-      ["test", fileURLToPath(import.meta.url)],
+      ["--no-env-file", "test", fileURLToPath(import.meta.url)],
       {
         env: {
           ...process.env,
@@ -39,6 +39,8 @@ if (!databaseUrl) {
       }
     );
     expect(result.status, result.stderr?.toString()).toBe(0);
+    process.stdout.write(result.stdout);
+    process.stderr.write(result.stderr);
   });
 } else {
   const { db } = await import("@notra/db/drizzle");

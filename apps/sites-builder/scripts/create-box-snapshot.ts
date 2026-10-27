@@ -1,23 +1,14 @@
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
-import {
-  cpSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
-import { Box } from "@upstash/box";
+import { EphemeralBox } from "@upstash/box";
 
 import { WORKDIR } from "./constants/box-snapshot";
+import { stageBoxToolchain } from "./utils/stage-box-toolchain";
 
-const ROOT = resolve(import.meta.dir, "..");
 const { values } = parseArgs({
   options: {
     "write-env": { type: "string" },
@@ -25,6 +16,8 @@ const { values } = parseArgs({
     // report { version, snapshotId } as JSON instead of parsing stdout.
     "skip-version": { type: "string" },
     "result-file": { type: "string" },
+    // E2E runs name their snapshot apart from release snapshots.
+    "name-prefix": { type: "string", default: "notra-sites-toolchain" },
   },
 });
 
@@ -37,52 +30,54 @@ function writeResult(version: string, snapshotId: string | null) {
   }
 }
 
-function listFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name);
-    return statSync(path).isDirectory() ? listFiles(path) : [path];
-  });
+let work: string | undefined;
+let box: EphemeralBox | undefined;
+// A cancelled release or E2E run sends SIGTERM; delete the Box instead of
+// leaving it to its TTL.
+async function abort() {
+  try {
+    await box?.delete();
+  } finally {
+    if (work) {
+      rmSync(work, { recursive: true, force: true });
+    }
+    process.exit(130);
+  }
 }
-
-execFileSync("bun", ["run", "bundle"], { cwd: ROOT, stdio: "inherit" });
-
-const stage = mkdtempSync(join(tmpdir(), "notra-sites-toolchain-"));
-for (const entry of ["astro.config.mjs", "src", "dist"]) {
-  cpSync(join(ROOT, entry), join(stage, entry), { recursive: true });
-}
-const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as {
-  dependencies: Record<string, string>;
-};
-writeFileSync(
-  join(stage, "package.json"),
-  `${JSON.stringify({ name: "notra-sites-toolchain", private: true, type: "module", dependencies: pkg.dependencies }, null, 2)}\n`
-);
-const hash = createHash("sha256");
-for (const file of listFiles(stage).sort()) {
-  hash.update(relative(stage, file));
-  hash.update(readFileSync(file));
-}
-const version = hash.digest("hex").slice(0, 12);
-if (version === values["skip-version"]) {
-  console.log(`toolchain ${version} unchanged, keeping the current snapshot`);
-  writeResult(version, null);
-  rmSync(stage, { recursive: true, force: true });
-  process.exit(0);
-}
-writeFileSync(join(stage, "VERSION"), `${version}\n`);
-const archive = join(stage, "..", `toolchain-${version}.tgz`);
-execFileSync("tar", ["--no-xattrs", "-czf", archive, "-C", stage, "."], {
-  env: { ...process.env, COPYFILE_DISABLE: "1" },
-});
-console.log(`toolchain ${version}`);
-
-const box = await Box.create({
-  runtime: "node",
-  size: "medium",
-  networkPolicy: { mode: "allow-all" },
-  timeout: 600_000,
-});
+process.once("SIGINT", abort);
+process.once("SIGTERM", abort);
 try {
+  work = mkdtempSync(join(tmpdir(), "notra-sites-toolchain-"));
+  const stage = join(work, "toolchain");
+  const version = await stageBoxToolchain(stage);
+  if (version === values["skip-version"]) {
+    console.log(`toolchain ${version} unchanged, keeping the current snapshot`);
+    writeResult(version, null);
+    rmSync(work, { recursive: true, force: true });
+    process.exit(0);
+  }
+  const archive = join(work, "toolchain.tgz");
+  execFileSync("tar", ["--no-xattrs", "-czf", archive, "-C", stage, "."], {
+    env: { PATH: process.env.PATH, COPYFILE_DISABLE: "1" },
+  });
+  console.log(`toolchain ${version}`);
+  const name = `${values["name-prefix"]}-${version}`;
+  box = await EphemeralBox.create({
+    name,
+    runtime: "node",
+    size: "medium",
+    ttl: 600,
+    env: {},
+    networkPolicy: { mode: "allow-all" },
+  });
+  const audit = await box.exec.command(
+    "node -e 'if(Object.keys(process.env).some(k=>/SECRET|TOKEN|API_KEY|DATABASE_URL|ACCESS_KEY|PASSWORD/i.test(k)))process.exit(1)' "
+  );
+  if (audit.exitCode !== 0) {
+    throw new Error(
+      "Refusing to snapshot secret-like inherited Box environment variables"
+    );
+  }
   await box.files.upload([
     { path: archive, destination: `${WORKDIR}/toolchain.tgz` },
   ]);
@@ -92,7 +87,7 @@ try {
       "rm -rf toolchain && mkdir toolchain",
       "tar xzf toolchain.tgz -C toolchain && rm toolchain.tgz",
       "cd toolchain",
-      "npm install --omit=dev --no-audit --no-fund --loglevel=error > npm.log 2>&1",
+      `env -i PATH="$PATH" HOME="${WORKDIR}" ASTRO_TELEMETRY_DISABLED=1 npm install --omit=dev --no-audit --no-fund --loglevel=error > npm.log 2>&1`,
     ].join(" && ")
   );
   const installedVersion = (
@@ -107,9 +102,7 @@ try {
       .catch(() => "");
     throw new Error(`Toolchain install failed:\n${log}`);
   }
-  const snapshot = await box.snapshot({
-    name: `notra-sites-toolchain-${version}`,
-  });
+  const snapshot = await box.snapshot({ name });
   console.log(`SITES_BUILDER_SNAPSHOT_ID=${snapshot.id}`);
   writeResult(version, snapshot.id);
   if (values["write-env"]) {
@@ -125,7 +118,11 @@ try {
     console.log(`updated ${envPath}`);
   }
 } finally {
-  await box.delete().catch(() => undefined);
-  rmSync(stage, { recursive: true, force: true });
-  rmSync(archive, { force: true });
+  try {
+    await box?.delete();
+  } finally {
+    if (work) {
+      rmSync(work, { recursive: true, force: true });
+    }
+  }
 }

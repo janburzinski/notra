@@ -11,6 +11,8 @@ afterEach(() => {
     "DEV_AUTH_EMAIL",
     "WORKOS_API_KEY",
     "NOTRA_DEMO_MODE",
+    "SITES_TEST_ENABLED",
+    "DATABASE_URL",
   ]) {
     const value = originalEnvironment[name];
     if (value === undefined) {
@@ -44,6 +46,25 @@ async function invokeMiddleware(path: string, headers?: HeadersInit) {
 }
 
 describe("dashboard authentication middleware", () => {
+  test("hides test routes before authentication outside isolated development", async () => {
+    process.env.SITES_TEST_ENABLED = "true";
+    process.env.DATABASE_URL =
+      "postgresql://postgres@127.0.0.1:5432/notra_server_audit";
+    Reflect.set(process.env, "NODE_ENV", "production");
+    expect((await invokeMiddleware("/__tests/sites")).status).toBe(404);
+    Reflect.set(process.env, "NODE_ENV", "development");
+    delete process.env.SITES_TEST_ENABLED;
+    expect((await invokeMiddleware("/__tests/sites")).status).toBe(404);
+    process.env.SITES_TEST_ENABLED = "true";
+    expect(
+      (
+        await invokeMiddleware("/__tests/sites", {
+          host: "public.example.test",
+        })
+      ).status
+    ).toBe(404);
+  });
+
   test("keeps design-system routes unavailable in production", async () => {
     Reflect.set(process.env, "NODE_ENV", "production");
     expect((await invokeMiddleware("/design-system/auth-flow")).status).toBe(

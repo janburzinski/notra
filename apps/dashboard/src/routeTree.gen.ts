@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DotwellKnownOauthAuthorizationServerRouteImport } from './routes/[.]well-known.oauth-authorization-server'
+import { Route as Char91__testsChar93SitesRouteImport } from './routes/[__tests].sites'
 import { Route as ApiHealthcheckRouteImport } from './routes/api.healthcheck'
 import { Route as ApiImageRouteImport } from './routes/api.image'
 import { Route as ApiRealtimeRouteImport } from './routes/api.realtime'
@@ -101,6 +102,12 @@ const DotwellKnownOauthAuthorizationServerRoute =
   DotwellKnownOauthAuthorizationServerRouteImport.update({
     id: '/.well-known/oauth-authorization-server',
     path: '/.well-known/oauth-authorization-server',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91__testsChar93SitesRoute =
+  Char91__testsChar93SitesRouteImport.update({
+    id: '/__tests/sites',
+    path: '/__tests/sites',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiHealthcheckRoute = ApiHealthcheckRouteImport.update({
@@ -582,6 +589,7 @@ const ApiOrganizationsOrganizationIdContentContentIdChatChatIdRoute =
 
 export interface FileRoutesByFullPath {
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
+  '/__tests/sites': typeof Char91__testsChar93SitesRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
   '/api/image': typeof ApiImageRoute
   '/api/realtime': typeof ApiRealtimeRoute
@@ -671,6 +679,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
+  '/__tests/sites': typeof Char91__testsChar93SitesRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
   '/api/image': typeof ApiImageRoute
   '/api/realtime': typeof ApiRealtimeRoute
@@ -761,6 +770,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
+  '/__tests/sites': typeof Char91__testsChar93SitesRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
   '/api/image': typeof ApiImageRoute
   '/api/realtime': typeof ApiRealtimeRoute
@@ -852,6 +862,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/.well-known/oauth-authorization-server'
+    | '/__tests/sites'
     | '/api/healthcheck'
     | '/api/image'
     | '/api/realtime'
@@ -941,6 +952,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/.well-known/oauth-authorization-server'
+    | '/__tests/sites'
     | '/api/healthcheck'
     | '/api/image'
     | '/api/realtime'
@@ -1030,6 +1042,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/.well-known/oauth-authorization-server'
+    | '/__tests/sites'
     | '/api/healthcheck'
     | '/api/image'
     | '/api/realtime'
@@ -1120,6 +1133,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   DotwellKnownOauthAuthorizationServerRoute: typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
+  Char91__testsChar93SitesRoute: typeof Char91__testsChar93SitesRoute
   ApiHealthcheckRoute: typeof ApiHealthcheckRoute
   ApiImageRoute: typeof ApiImageRoute
   ApiRealtimeRoute: typeof ApiRealtimeRoute
@@ -1202,6 +1216,13 @@ declare module '@tanstack/react-router' {
       path: '/.well-known/oauth-authorization-server'
       fullPath: '/.well-known/oauth-authorization-server'
       preLoaderRoute: typeof DotwellKnownOauthAuthorizationServerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/__tests/sites': {
+      id: '/__tests/sites'
+      path: '/__tests/sites'
+      fullPath: '/__tests/sites'
+      preLoaderRoute: typeof Char91__testsChar93SitesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/healthcheck': {
@@ -1914,6 +1935,7 @@ const ApiOrganizationsOrganizationIdContentContentIdChatRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   DotwellKnownOauthAuthorizationServerRoute:
     DotwellKnownOauthAuthorizationServerRouteWithChildren,
+  Char91__testsChar93SitesRoute: Char91__testsChar93SitesRoute,
   ApiHealthcheckRoute: ApiHealthcheckRoute,
   ApiImageRoute: ApiImageRoute,
   ApiRealtimeRoute: ApiRealtimeRoute,

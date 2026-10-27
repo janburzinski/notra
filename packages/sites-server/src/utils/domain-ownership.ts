@@ -12,6 +12,7 @@ import {
 } from "../constants/domains";
 import { getSitesPreviewSecret } from "../env";
 import { createDnsResolver } from "./dns";
+import { dnsServersOverride } from "./provider-urls";
 
 export function domainOwnershipRecord(
   siteId: string,
@@ -35,7 +36,7 @@ export async function verifyDomainOwnership(
 ): Promise<boolean> {
   const expected = domainOwnershipRecord(siteId, hostname);
   const resolver = createDnsResolver();
-  resolver.setServers(DOMAIN_OWNERSHIP_DNS_SERVERS);
+  resolver.setServers(dnsServersOverride() ?? DOMAIN_OWNERSHIP_DNS_SERVERS);
   try {
     const records = await resolver.resolveTxt(expected.name);
     if (records.length > DOMAIN_OWNERSHIP_MAX_RECORDS) {

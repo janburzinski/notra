@@ -1,9 +1,15 @@
 import { Resolver } from "node:dns/promises";
 
 import { DNS_RESOLVER_TIMEOUT_MS } from "../constants/domains";
+import { dnsServersOverride } from "./provider-urls";
 
 export function createDnsResolver(): Resolver {
-  return new Resolver({ timeout: DNS_RESOLVER_TIMEOUT_MS, tries: 2 });
+  const resolver = new Resolver({ timeout: DNS_RESOLVER_TIMEOUT_MS, tries: 2 });
+  const servers = dnsServersOverride();
+  if (servers) {
+    resolver.setServers(servers);
+  }
+  return resolver;
 }
 
 export function normalizeDnsName(name: string): string {

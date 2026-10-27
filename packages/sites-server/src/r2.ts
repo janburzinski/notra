@@ -14,6 +14,7 @@ import { getSitesR2Env } from "./env";
 import { R2DeleteFailedError } from "./errors/r2";
 import { R2PreconditionFailedError } from "./errors/sites";
 import type { R2PutOptions, R2TextObject } from "./types/r2";
+import { r2Endpoint } from "./utils/provider-urls";
 import { runSitesEffect } from "./utils/run-sites-effect";
 
 let client: S3Client | undefined;
@@ -23,7 +24,7 @@ function getClient(): S3Client {
     const env = getSitesR2Env();
     client = new S3Client({
       region: "auto",
-      endpoint: `https://${env.accountId}.r2.cloudflarestorage.com`,
+      endpoint: r2Endpoint(env.accountId),
       credentials: {
         accessKeyId: env.accessKeyId,
         secretAccessKey: env.secretAccessKey,

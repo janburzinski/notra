@@ -17,10 +17,17 @@ import {
   isLocalDevAuthEnabled,
   localDevAuthBlockedMessage,
 } from "@/utils/local-dev-auth";
+import { isSitesTestRequestAllowed } from "@/utils/sites-test-access";
 
 export const dashboardAuthMiddleware = createMiddleware().server(
   async (args) => {
     const { request, pathname, next } = args;
+    if (
+      /^\/__tests(?:\/|$)/.test(pathname) &&
+      !isSitesTestRequestAllowed(request)
+    ) {
+      return new Response(null, { status: 404 });
+    }
     if (
       process.env.NODE_ENV === "production" &&
       /^\/design-system(?:\/|$)/.test(pathname)

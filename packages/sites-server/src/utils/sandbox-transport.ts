@@ -1,4 +1,3 @@
-import { BOX_BASE_URL } from "@notra/ai/constants/repo-image";
 import { Cause, Clock, Effect, Exit, Schema } from "effect";
 import {
   FetchHttpClient,
@@ -18,6 +17,7 @@ import { SandboxRequestError } from "../errors/sandbox";
 import { sandboxAllocationSchema } from "../schemas/sandbox";
 import { boundBuildLog } from "./bound-build-log";
 import { redactBuildLog } from "./build-log";
+import { boxApiUrl } from "./provider-urls";
 import { readBodyUpToEffect } from "./read-body";
 
 export const sandboxRequestEffect = Effect.fn("Sites.Sandbox.request")(
@@ -57,7 +57,7 @@ export const sandboxRequestEffect = Effect.fn("Sites.Sandbox.request")(
       })
     );
     let request = HttpClientRequest.make(method)(
-      `${BOX_BASE_URL}/v2/box/${path}`
+      `${boxApiUrl()}/v2/box/${path}`
     ).pipe(HttpClientRequest.setHeader("X-Box-Api-Key", apiKey));
     if (typeof body === "string") {
       request = HttpClientRequest.bodyText(request, body, "application/json");

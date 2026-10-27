@@ -1,0 +1,4 @@
+/* Proves global stylesheets reach every page. */
+:root {
+  --e2e-global-style: loaded;
+}

@@ -1,5 +1,4 @@
-export const CLOUDFLARE_ZONES_API =
-  "https://api.cloudflare.com/client/v4/zones";
+export const CLOUDFLARE_API_URL = "https://api.cloudflare.com";
 /** Written below every mount by the sites builder; it names the site. */
 export const PROBE_FILE = "_notra/probe.txt";
 export const PROBE_SITE_MARKER = "notra-site=";

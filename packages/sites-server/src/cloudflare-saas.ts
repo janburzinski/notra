@@ -5,13 +5,13 @@ import {
   CLOUDFLARE_MAX_RESPONSE_BYTES,
   CLOUDFLARE_REQUEST_TIMEOUT_MS,
 } from "./constants/cloudflare-saas";
-import { CLOUDFLARE_ZONES_API } from "./constants/domains";
 import { SiteProviderRequestError } from "./errors/provider";
 import {
   cloudflareApiResponseSchema,
   cloudflareCustomHostnameSchema,
 } from "./schemas/cloudflare-saas";
 import type { CloudflareSaasConfig } from "./types/cloudflare-saas";
+import { cloudflareZonesApi } from "./utils/provider-urls";
 import { readBodyUpToEffect } from "./utils/read-body";
 import { runSitesEffect } from "./utils/run-sites-effect";
 
@@ -46,7 +46,7 @@ const requestEffect = Effect.fn("Sites.Cloudflare.request")(
       })
     );
     let request = HttpClientRequest.make(method)(
-      `${CLOUDFLARE_ZONES_API}/${encodeURIComponent(config.zoneId)}${path}`
+      `${cloudflareZonesApi()}/${encodeURIComponent(config.zoneId)}${path}`
     ).pipe(
       HttpClientRequest.setHeaders({
         Authorization: `Bearer ${config.apiToken}`,

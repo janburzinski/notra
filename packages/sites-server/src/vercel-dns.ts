@@ -6,7 +6,6 @@ import type * as HttpClientResponse from "effect/http/HttpClientResponse";
 
 import { DNS_RESOLVER_TIMEOUT_MS } from "./constants/domains";
 import {
-  VERCEL_API_URL,
   VERCEL_DNS_CALLBACK_PATH,
   VERCEL_DNS_HTTP_TIMEOUT_MS,
   VERCEL_DNS_RECORD_COMMENT,
@@ -34,6 +33,7 @@ import {
   signDomainConnectCallback,
   verifyDomainConnectCallback,
 } from "./utils/domain-connect-callback";
+import { vercelApiUrl } from "./utils/provider-urls";
 import { readBodyUpToEffect } from "./utils/read-body";
 import { runSitesEffect } from "./utils/run-sites-effect";
 
@@ -136,8 +136,8 @@ export function verifyVercelDnsState(
 
 function withTeam(path: string, teamId: string | null): string {
   return teamId
-    ? `${VERCEL_API_URL}${path}?teamId=${encodeURIComponent(teamId)}`
-    : `${VERCEL_API_URL}${path}`;
+    ? `${vercelApiUrl()}${path}?teamId=${encodeURIComponent(teamId)}`
+    : `${vercelApiUrl()}${path}`;
 }
 
 const vercelRequest = Effect.fn("VercelDns.request")(function* <A>(
@@ -218,7 +218,7 @@ export const exchangeVercelCodeEffect = Effect.fn("VercelDns.exchangeCode")(
     deps: Pick<VercelDnsDeps, "fetch"> = defaultDeps()
   ) {
     const request = HttpClientRequest.post(
-      `${VERCEL_API_URL}/v2/oauth/access_token`
+      `${vercelApiUrl()}/v2/oauth/access_token`
     ).pipe(
       HttpClientRequest.bodyUrlParams({
         client_id: config.clientId,

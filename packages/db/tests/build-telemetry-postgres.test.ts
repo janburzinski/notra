@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { SITE_BUILD_LIMITS } from "@notra/sites-core/constants/sites";
 import type { SiteBuildMetrics } from "@notra/sites-core/types/build-metrics";
+import { Effect } from "effect";
 
 const databaseUrl = process.env.SITES_TEST_DATABASE_URL;
 if (!databaseUrl) {
@@ -20,13 +21,15 @@ if (!databaseUrl) {
     ]).toContain(url.pathname);
     const result = spawnSync(
       process.execPath,
-      ["test", fileURLToPath(import.meta.url)],
+      ["--no-env-file", "test", fileURLToPath(import.meta.url)],
       {
         env: { ...process.env, NOTRA_BUILD_TELEMETRY_TEST_WORKER: "1" },
         timeout: 30_000,
       }
     );
     expect(result.status, result.stderr?.toString()).toBe(0);
+    process.stdout.write(result.stdout);
+    process.stderr.write(result.stderr);
   }, 35_000);
 } else {
   test("upsert, artifact cleanup, missing row and deployment/site/organization cascades", async () => {
@@ -68,6 +71,11 @@ if (!databaseUrl) {
       r2ListPrefixes: async (root: string) =>
         [...artifacts].filter((key) => key.startsWith(root)),
       r2DeletePrefix: async (prefix: string) => artifacts.delete(prefix),
+      r2DeleteKey: async () => {},
+      r2GetText: async () => null,
+      r2GetTextEffect: () => Effect.succeed(null),
+      r2Put: async () => "fixture-etag",
+      r2PutEffect: () => Effect.succeed("fixture-etag"),
     }));
     const state = await import("../../sites-server/src/state");
     mock.module("../../sites-server/src/state", () => ({
@@ -86,6 +94,7 @@ if (!databaseUrl) {
         "../migrations/0113_site_preview_comments.sql",
         "../migrations/0114_site_smart_deployments.sql",
         "../migrations/0127_site_deployment_repository.sql",
+        "../migrations/0134_sites_suspension_slug_retirement.sql",
         "fixtures/sites-tenant-integrity-seed.sql",
       ]) {
         await pool.query(

@@ -78,6 +78,33 @@ describe("generation ordering", () => {
     ).toBe("activated");
   });
 
+  test("a rollback older than the active production is superseded", () => {
+    const newer = activateProductionInState(
+      initial,
+      { deploymentId: "d3", generation: 3 },
+      now
+    );
+    const state = newer.outcome === "activated" ? newer.state : initial;
+    // A rollback allocated before the newer activation landed must not
+    // replace it.
+    expect(
+      activateProductionInState(
+        state,
+        { deploymentId: "d1", generation: 2 },
+        now,
+        true
+      ).outcome
+    ).toBe("superseded");
+    expect(
+      activateProductionInState(
+        state,
+        { deploymentId: "d1", generation: 4 },
+        now,
+        true
+      ).outcome
+    ).toBe("activated");
+  });
+
   test("previews are ordered per key and protected from cleanup", () => {
     const pointer = { visibility: "protected" as const, expiresAt: null };
     const a = activatePreviewInState(

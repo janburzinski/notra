@@ -38,6 +38,16 @@ Explicit requirements and this repo's conventions take precedence. Companion
 - The pre-commit hook formats staged supported files and runs Knip. Do not
   overwrite unrelated or partially staged changes to make it pass.
 - Never use production credentials or customer data for verification.
+- The Sites E2E suite (`apps/sites-e2e`) gates every production deploy. When a
+  change to `apps/sites`, `apps/sites-builder`, `packages/sites-*` or the Sites
+  dashboard code changes user-facing behaviour, update or extend its tests in
+  the same PR; a pure visual change must not need test edits. Follow
+  `apps/sites-e2e/README.md#keeping-the-suite-green`. It runs only before a
+  production deploy (real Box builds), not on pull requests: run it locally
+  or with `gh workflow run sites-e2e.yml --ref <branch>` before merging a
+  Sites change. A new external
+  service the Sites backend calls gets an emulator in `apps/sites-e2e/emulators`
+  and an override in `packages/sites-server/src/utils/provider-urls.ts`.
 
 <!-- BEGIN:turborepo-agent-rules -->
 

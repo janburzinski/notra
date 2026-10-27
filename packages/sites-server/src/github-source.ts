@@ -1,4 +1,5 @@
 import { GITHUB_API_VERSION_HEADERS } from "@notra/ai/constants/github";
+import { githubApiUrl } from "@notra/ai/utils/github-api-url";
 import { SITE_BUILD_LIMITS } from "@notra/sites-core/constants/sites";
 import {
   SITE_IGNORE_FILENAME,
@@ -49,7 +50,7 @@ const githubSourceBytes = Effect.fn("Sites.GitHub.sourceBytes")(
     const response = yield* Effect.tryPromise({
       try: async (signal) => {
         const result = await fetch(
-          `https://api.github.com/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/git/${path}`,
+          `${githubApiUrl()}/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/git/${path}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

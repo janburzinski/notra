@@ -1,5 +1,6 @@
 import { GITHUB_API_VERSION_HEADERS } from "@notra/ai/constants/github";
 import { createScopedGitHubAppInstallationToken } from "@notra/ai/integrations/github";
+import { githubApiUrl } from "@notra/ai/utils/github-api-url";
 import {
   createOctokit,
   GITHUB_INTERACTIVE_READ_TIMEOUT_MS,
@@ -180,7 +181,7 @@ export const downloadRepositoryTarballEffect = Effect.fn(
     const response = yield* Effect.tryPromise({
       try: async (signal) => {
         const result = await fetch(
-          `https://api.github.com/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/tarball/${encodeURIComponent(commitSha)}`,
+          `${githubApiUrl()}/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/tarball/${encodeURIComponent(commitSha)}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

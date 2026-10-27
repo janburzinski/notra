@@ -3,6 +3,7 @@ import { createTimeoutFetch } from "@notra/utils/timeout-fetch";
 import { Octokit } from "@octokit/core";
 
 import { demoGitHubFetch } from "./demo-github";
+import { githubApiUrl } from "./github-api-url";
 
 /**
  * Interactive GitHub requests use this budget. Bulk transfers may omit it.
@@ -73,7 +74,7 @@ export function createOctokit(
   const fetch = requestFetch(options);
   const octokit = new Octokit({
     auth,
-    baseUrl: options?.baseUrl,
+    baseUrl: options?.baseUrl ?? githubApiUrl(),
     ...(fetch ? { request: { fetch } } : {}),
   });
   if (options?.retryReads) {
