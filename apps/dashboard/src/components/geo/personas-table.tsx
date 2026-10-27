@@ -12,10 +12,6 @@ import type {
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -23,6 +19,7 @@ import {
 import { useMutationState } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { GeoRemoveDialog } from "@/components/geo/geo-remove-dialog";

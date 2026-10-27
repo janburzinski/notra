@@ -3,16 +3,13 @@
 import { Add01Icon, WorkflowSquare03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
+import { DataTable, type TableColumn } from "ui/table";
 
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";

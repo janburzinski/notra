@@ -3,10 +3,6 @@
 import { MinusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Table,
   TableBody,
   TableCell,
@@ -17,6 +13,7 @@ import {
 } from "@notra/ui/components/ui/table";
 import { cn } from "@notra/ui/lib/utils";
 import { type ReactNode, useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 
 import { DesignSystemFrame } from "@/components/design-system/design-system-frame";
 import { EngineIcon } from "@/components/geo/engine-icon";

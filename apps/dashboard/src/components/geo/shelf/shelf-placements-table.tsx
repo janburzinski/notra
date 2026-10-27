@@ -4,10 +4,6 @@ import { Link04Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_SHELF_PLACEMENT_STATUSES } from "@notra/schemas/constants/dashboard/geo-shelf";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -15,6 +11,7 @@ import {
   SelectValue,
 } from "@notra/ui/components/ui/select";
 import { useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import {

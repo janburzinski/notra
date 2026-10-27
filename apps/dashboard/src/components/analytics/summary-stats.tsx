@@ -1,8 +1,8 @@
 "use client";
 
-import { InstrumentGrid } from "@notra/ui/components/instrument/instrument-grid";
 import { Card, CardContent } from "@notra/ui/components/ui/card";
 import { useMemo } from "react";
+import { InstrumentGrid } from "ui/card/grid";
 import { useLocale, useTranslations } from "use-intl";
 
 import type { AnalyticsStatTile, SummaryStatsProps } from "@/types/analytics";

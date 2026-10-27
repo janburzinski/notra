@@ -9,8 +9,8 @@ import type {
   GeoPromptResult,
 } from "@notra/geo-core/types/geo";
 import { PerplexityFavicon } from "@notra/ui/components/ai-skins/perplexity/perplexity-favicon";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { type ReactNode, useState } from "react";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

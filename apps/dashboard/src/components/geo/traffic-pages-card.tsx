@@ -8,17 +8,11 @@ import {
   formatTrafficLocation,
   trafficLogHostFilter,
 } from "@notra/geo-core/utils/geo-project-domains";
-import {
-  InstrumentEmpty,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Input } from "@notra/ui/components/ui/input";
 import { parseAsString, useQueryState } from "nuqs";
+import { InstrumentEmpty, InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { GeoCountCell } from "@/components/geo/geo-count-cell";

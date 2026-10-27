@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../../dropdown-menu/components/dropdown-menu";
 import {
   SidebarLabel,
   SidebarMenu,
@@ -19,8 +19,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarMenuSubPanel,
-} from "@/components/ui/sidebar";
-
+} from "../../sidebar/components/sidebar";
 import { SIDEBAR_NAV_BADGE_CLASS_NAME } from "../constants/app-sidebar";
 import { useSidebarCollapseSettled } from "../hooks/use-sidebar-settled";
 import type {

@@ -13,9 +13,9 @@ import {
   groupAgentReadinessIssues,
 } from "@notra/geo-core/utils/agent-readiness";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
 import { TrendBadge } from "@notra/ui/components/trend-badge";
 import type { CSSProperties, ReactNode } from "react";
+import { InstrumentModule } from "ui/card";
 import { useFormatter, useNow, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

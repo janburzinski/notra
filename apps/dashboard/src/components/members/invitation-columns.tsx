@@ -4,7 +4,7 @@ import { Mail01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Badge } from "@notra/ui/components/ui/badge";
-import type { TableColumn } from "@notra/ui/components/ui/data-table";
+import type { TableColumn } from "ui/table";
 import { useLocale, useNow, useTranslations } from "use-intl";
 
 import { cn } from "@/lib/utils";

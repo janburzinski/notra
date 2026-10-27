@@ -2,17 +2,11 @@
 
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { formatDayLabel, todayIsoDate } from "@notra/geo-core/utils/day-label";
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import type { CSSProperties } from "react";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale } from "use-intl";
 
 import { AutopilotRunsTable } from "@/components/autopilot/autopilot-runs-table";

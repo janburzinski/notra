@@ -4,7 +4,7 @@ import { PROMPTS_TABLE_ROW_HEIGHT } from "@notra/geo-core/constants/geo";
 import { CompetitorLogo } from "@notra/ui/components/geo/competitor-logo";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { DataTable } from "@notra/ui/components/ui/data-table";
+import { DataTable } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { PromptPresenceBadge } from "@/components/geo/prompt-badges";

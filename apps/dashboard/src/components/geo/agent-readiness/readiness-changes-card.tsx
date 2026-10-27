@@ -2,15 +2,9 @@
 
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  InstrumentEmpty,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { InstrumentEmpty, InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useTranslations } from "use-intl";
 
 import {

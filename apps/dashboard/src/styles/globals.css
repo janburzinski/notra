@@ -2,6 +2,7 @@
 
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
+@source "../../../ui/registry/notra/{card,shimmer,table}/components";
 
 @property --ec-tooltip-scale-x {
   syntax: "<number>";
@@ -18,6 +19,16 @@
 @theme inline {
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --animate-shimmer: shimmer var(--shimmer-duration, 1.7s) linear infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0% 0;
+    }
+  }
 }
 
 :root {

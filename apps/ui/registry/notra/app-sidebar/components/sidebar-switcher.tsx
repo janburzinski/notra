@@ -12,15 +12,14 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../../dropdown-menu/components/dropdown-menu";
 import {
   SidebarLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-
+} from "../../sidebar/components/sidebar";
 import type { SidebarSwitcherProps } from "../types/app-sidebar";
 
 /**

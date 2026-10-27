@@ -12,6 +12,7 @@
     "declaration": false,
     "declarationMap": false,
     "paths": {
+      "@/components/ui/*": ["../../packages/ui/src/components/ui/*"],
       "@/*": ["./src/*"]
     },
     "types": ["node", "bun-types/test", "react", "react-dom", "vite/client"]

@@ -2,7 +2,6 @@
 
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { Badge } from "@notra/ui/components/ui/badge";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { TitleCard } from "@notra/ui/components/ui/title-card";
@@ -10,6 +9,7 @@ import { useListPlans } from "autumn-js/react";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DataTableSkeleton } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { FreePlanCard } from "@/components/billing/free-plan-card";

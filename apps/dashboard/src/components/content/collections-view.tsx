@@ -5,10 +5,6 @@ import { LogoStack } from "@notra/ui/components/geo/logo-stack";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Badge } from "@notra/ui/components/ui/badge";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import {
   Tooltip,
@@ -20,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNowStrict } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DataTable, type TableColumn } from "ui/table";
 import { useNow, useTranslations } from "use-intl";
 
 import {

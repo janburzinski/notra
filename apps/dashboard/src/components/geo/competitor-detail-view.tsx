@@ -19,11 +19,6 @@ import type {
 } from "@notra/geo-core/types/geo";
 import { formatAiTrafficTimestamp } from "@notra/geo-core/utils/ai-traffic";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
   Tooltip,
@@ -31,6 +26,8 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { InstrumentModule } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

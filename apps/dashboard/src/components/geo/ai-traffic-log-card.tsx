@@ -10,10 +10,6 @@ import {
 import type { GeoTrafficLogFilters } from "@notra/geo-core/types/geo";
 import { toggleGeoTrafficFilterValue } from "@notra/geo-core/utils/ai-traffic";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import {
-  InstrumentEmpty,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import { Button } from "@notra/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { type ReactNode, useState } from "react";
+import { InstrumentEmpty, InstrumentSection } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { CitationsTable } from "@/components/geo/citations-table";

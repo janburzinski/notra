@@ -1,11 +1,8 @@
 "use client";
 
 import { LogoStack } from "@notra/ui/components/geo/logo-stack";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 
 import { Button } from "@/components/button";
 import { SearchGapDetailSheet } from "@/components/geo/search-gap-detail";

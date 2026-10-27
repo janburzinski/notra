@@ -1,5 +1,5 @@
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 
 import { cn } from "@/lib/utils";
 import type { AutopilotStatStripProps } from "@/types/autopilot";

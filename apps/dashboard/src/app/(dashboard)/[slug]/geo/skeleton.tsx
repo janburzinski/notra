@@ -7,16 +7,13 @@ import {
   GEO_VISIBILITY_TABLE_ROWS,
 } from "@notra/geo-core/constants/geo";
 import {
-  InstrumentModule,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
-import {
   PermissionRow,
   PermissionOption,
 } from "@notra/ui/components/ui/permission-selector";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
+import { InstrumentModule, InstrumentSection } from "ui/card";
+import { DataTableSkeleton } from "ui/table";
+import type { DataTableSkeletonColumn } from "ui/table/types";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

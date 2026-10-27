@@ -92,7 +92,7 @@ export const LANDING_SECTIONS: LandingSection[] = [
       {
         description:
           "A sortable, paged table in the grey shell, with an infinite-scroll variant.",
-        href: "/components/data-table",
+        href: "/components/table",
         preview: "data-table",
         title: "Data Table",
       },

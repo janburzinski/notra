@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
+import { InstrumentModule } from "ui/card";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { EChartsBarChart } from "@/components/evilcharts/charts/echarts-bar-chart";

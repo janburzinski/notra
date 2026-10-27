@@ -7,12 +7,9 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import { type RefObject, useRef, useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

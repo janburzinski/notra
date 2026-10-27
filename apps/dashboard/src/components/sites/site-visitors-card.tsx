@@ -4,8 +4,8 @@ import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { trafficVisitDelta } from "@notra/geo-core/utils/ai-traffic";
 import { AnimatedNumber } from "@notra/ui/components/animated-number";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
+import { InstrumentSection } from "ui/card";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useTranslations } from "use-intl";
 
 import { buttonVariants } from "@/components/button";

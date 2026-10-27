@@ -10,15 +10,8 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_SCAN_RESULTS_PAGE_SIZE } from "@notra/geo-core/constants/geo-scan-history";
 import type { GeoScanResultSummary } from "@notra/geo-core/types/geo-scan-history";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { StatusBadge } from "@notra/ui/components/status-badge";
-import {
-  DataTableSkeleton,
-  DataTable,
-  type DataTablePagination,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import {
   Empty,
   EmptyContent,
@@ -42,6 +35,13 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { type ReactNode, useState } from "react";
+import { InstrumentSection } from "ui/card";
+import {
+  DataTableSkeleton,
+  DataTable,
+  type DataTablePagination,
+  type TableColumn,
+} from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

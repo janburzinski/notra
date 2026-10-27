@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
+import { TABLE_FRAME_CLASS } from "ui/table/constants";
 
 import { SiteSettingsList } from "@/components/sites/site-settings-item";
 import { SitesPageShell } from "@/components/sites/sites-page-shell";

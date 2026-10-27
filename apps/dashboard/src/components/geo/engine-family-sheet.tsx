@@ -15,12 +15,7 @@ import type {
 import { formatAiTrafficTimestamp } from "@notra/geo-core/utils/ai-traffic";
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import {
   Sheet,
   SheetContent,
@@ -29,6 +24,8 @@ import {
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
+import { InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

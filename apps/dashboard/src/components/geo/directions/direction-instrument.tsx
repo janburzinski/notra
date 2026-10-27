@@ -1,8 +1,8 @@
 "use client";
 
-import { InstrumentGrid } from "@notra/ui/components/instrument/instrument-grid";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { Card, CardContent } from "@notra/ui/components/ui/card";
+import { InstrumentSection } from "ui/card";
+import { InstrumentGrid } from "ui/card/grid";
 import { useFormatter, useTranslations } from "use-intl";
 
 import { DirectionDelta } from "@/components/geo/directions/direction-delta";

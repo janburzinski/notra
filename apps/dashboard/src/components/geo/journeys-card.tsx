@@ -7,16 +7,9 @@ import {
   formatAiTrafficTimestamp,
   formatGeoSource,
 } from "@notra/geo-core/utils/ai-traffic";
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
-import {
-  InfiniteDataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { useState } from "react";
+import { InstrumentEmpty, InstrumentModule, InstrumentSection } from "ui/card";
+import { InfiniteDataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

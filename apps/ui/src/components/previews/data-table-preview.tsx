@@ -5,7 +5,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/registry/notra/table/components/table";
 
 const VISITS = [
   { bot: "GPTBot", provider: "openai", path: "/pricing" },

@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
 import { TrendBadge } from "@notra/ui/components/trend-badge";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useFormatter, useTranslations } from "use-intl";
 
 import { ChartSparkline } from "@/components/charts/chart-sparkline";

@@ -1,8 +1,8 @@
 "use client";
 
 import { Card, CardHeader } from "@notra/ui/components/ui/card";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { useId } from "react";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 
 import {
   EMPTY_STATE_CARD_COUNT,

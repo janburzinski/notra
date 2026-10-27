@@ -3,19 +3,11 @@
 import { Cancel01Icon, SearchIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  InstrumentEmpty,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
-import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@notra/ui/components/ui/avatar";
 import { Button } from "@notra/ui/components/ui/button";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Input } from "@notra/ui/components/ui/input";
 import {
   Tooltip,
@@ -24,6 +16,8 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
+import { InstrumentEmpty, InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { PlatformTabs } from "@/components/analytics/platform-tabs";

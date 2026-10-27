@@ -5,7 +5,6 @@ import {
   WebhookIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { DataTable } from "@notra/ui/components/ui/data-table";
 import {
   Empty,
   EmptyContent,
@@ -22,6 +21,7 @@ import {
   SelectValue,
 } from "@notra/ui/components/ui/select";
 import type { ReactNode } from "react";
+import { DataTable } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

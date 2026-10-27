@@ -2,12 +2,12 @@
 
 import { GEO_EMPTY_COMPETITOR_SHARE_TIMESERIES } from "@notra/geo-core/constants/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { InstrumentGrid } from "@notra/ui/components/instrument/instrument-grid";
 import {
   PermissionOption,
   PermissionRow,
 } from "@notra/ui/components/ui/permission-selector";
 import { Activity, type ReactNode } from "react";
+import { InstrumentGrid } from "ui/card/grid";
 import { useTranslations } from "use-intl";
 
 import { BrandSentimentCard } from "@/components/geo/brand-sentiment-card";

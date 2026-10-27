@@ -1,8 +1,8 @@
 "use client";
 
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { DataTableSkeleton } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { PageContainer } from "@/components/layout/container";

@@ -2,11 +2,8 @@
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { useSite } from "@/components/sites/site-context";

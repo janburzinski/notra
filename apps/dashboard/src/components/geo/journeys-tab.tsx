@@ -4,11 +4,11 @@ import { GEO_JOURNEY_OVERVIEW_ROWS } from "@notra/geo-core/constants/geo";
 import type { GeoJourney } from "@notra/geo-core/types/geo";
 import { trafficSparklineDays } from "@notra/geo-core/utils/ai-traffic";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { InstrumentGrid } from "@notra/ui/components/instrument/instrument-grid";
-import { InstrumentEmpty } from "@notra/ui/components/instrument/instrument-module";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useMemo, useState } from "react";
+import { InstrumentEmpty } from "ui/card";
+import { InstrumentGrid } from "ui/card/grid";
+import { DataTableSkeleton } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { JourneyDetailSheet } from "@/components/geo/journey-detail-sheet";

@@ -8,13 +8,13 @@ import {
   getAgentReadinessIssueChanges,
   groupAgentReadinessIssues,
 } from "@notra/geo-core/utils/agent-readiness";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
+import { InstrumentModule } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { AgentReadinessChangeBadge } from "@/components/geo/agent-readiness/readiness-change-badge";

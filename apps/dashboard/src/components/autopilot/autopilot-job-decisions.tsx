@@ -3,11 +3,8 @@
 import { WorkflowSquare03Icon } from "@hugeicons/core-free-icons";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { StatusBadge } from "@notra/ui/components/status-badge";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { useQuery } from "@tanstack/react-query";
+import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter } from "use-intl";
 
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";

@@ -1,6 +1,6 @@
 "use client";
 
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
+import { DataTableSkeleton } from "ui/table";
 
 import {
   COLLECTION_TABLE_ROW_HEIGHT,

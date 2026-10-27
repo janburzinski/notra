@@ -9,8 +9,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-
+} from "../../select/components/select";
 import { FREQUENCY_OPTIONS } from "../constants/select";
 
 export default function SelectDemo() {

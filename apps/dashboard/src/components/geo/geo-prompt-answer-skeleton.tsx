@@ -1,7 +1,7 @@
 "use client";
 
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { DataTableSkeleton } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import type { GeoPromptAnswerSkeletonProps } from "@/types/geo-prompt-detail";

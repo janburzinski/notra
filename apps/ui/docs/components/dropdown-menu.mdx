@@ -13,12 +13,12 @@ Built on shadcn's Base UI Dropdown Menu composition, with Notra styling. Base UI
 
 <RegistryInstall name="notra-dropdown-menu" />
 
-This replaces `components/ui/dropdown-menu.tsx` and installs the shared dropdown styles. Use a shadcn project on Base UI and Tailwind CSS v4. The example uses the [Notra Button](/components/button) as its trigger.
+This installs `components/dropdown-menu/components/dropdown-menu.tsx`, which wraps shadcn's Dropdown Menu and adds the shared dropdown styles. Your `components/ui/dropdown-menu.tsx` stays as it is. Use a shadcn project on Base UI and Tailwind CSS v4. The example uses the [Notra Button](/components/button) as its trigger.
 
 ## Usage
 
 ```tsx
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/button/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/dropdown-menu/components/dropdown-menu";
 
 <DropdownMenu>
   <DropdownMenuTrigger render={<Button variant="outline" />}>

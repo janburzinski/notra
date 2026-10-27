@@ -4,11 +4,8 @@ import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { StatusBadge } from "@notra/ui/components/status-badge";
-import {
-  InfiniteDataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import type { ReactNode } from "react";
+import { InfiniteDataTable, type TableColumn } from "ui/table";
 import { useFormatter, useNow, useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";

@@ -1,15 +1,12 @@
 "use client";
 
 import { FEATURES } from "@notra/ai/billing/features";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import { normalizePageSize } from "@notra/ui/lib/data-table";
 import { cn } from "@notra/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useAutumnClient } from "autumn-js/react";
 import { parseAsInteger, useQueryState } from "nuqs";
+import { DataTable, type TableColumn } from "ui/table";
+import { normalizePageSize } from "ui/table/lib";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";

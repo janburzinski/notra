@@ -7,21 +7,18 @@ import {
   GEO_PURPOSE_COLUMN_WIDTH,
   GEO_TRAFFIC_FUNNEL_STAGES,
 } from "@notra/geo-core/constants/geo";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { useIsMobile } from "@notra/ui/hooks/use-mobile";
+import type { CSSProperties } from "react";
+import { InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import {
   DEFAULT_MIN_COLUMN_WIDTH,
   TABLE_FRAME_INSET,
-} from "@notra/ui/constants/table";
-import { useCollapsibleColumns } from "@notra/ui/hooks/use-collapsible-columns";
-import { useIsMobile } from "@notra/ui/hooks/use-mobile";
-import { tableMinWidthCss } from "@notra/ui/lib/data-table";
-import type { CSSProperties } from "react";
+} from "ui/table/constants";
+import { useCollapsibleColumns } from "ui/table/hooks/use-collapsible-columns";
+import { tableMinWidthCss } from "ui/table/lib";
 import { useTranslations } from "use-intl";
 
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";

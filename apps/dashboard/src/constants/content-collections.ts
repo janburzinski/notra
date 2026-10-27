@@ -1,4 +1,4 @@
-import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
+import type { DataTableSkeletonColumn } from "ui/table/types";
 
 export const COLLECTIONS_PAGE_SIZE = 20;
 export const COLLECTION_TABLE_ROW_HEIGHT = 56;

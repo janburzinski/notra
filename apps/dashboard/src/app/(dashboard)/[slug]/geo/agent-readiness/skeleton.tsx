@@ -1,11 +1,11 @@
 "use client";
 
 import { AGENT_READINESS_SKELETON_ROW_KEYS } from "@notra/geo-core/constants/agent-readiness";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
+import { InstrumentModule } from "ui/card";
+import { DataTableSkeleton } from "ui/table";
+import type { DataTableSkeletonColumn } from "ui/table/types";
 import { useTranslations } from "use-intl";
 
 import { PageContainer } from "@/components/layout/container";

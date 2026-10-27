@@ -2,6 +2,19 @@
   "name": "ui",
   "private": true,
   "type": "module",
+  "exports": {
+    "./table": "./registry/notra/table/components/data-table.tsx",
+    "./table/constants": "./registry/notra/table/constants/data-table.ts",
+    "./table/labels": "./registry/notra/table/components/data-table-labels.tsx",
+    "./table/lib": "./registry/notra/table/lib/data-table.ts",
+    "./table/types": "./registry/notra/table/types/data-table.ts",
+    "./table/hooks/*": "./registry/notra/table/hooks/*.ts",
+    "./card": "./registry/notra/card/components/instrument-module.tsx",
+    "./card/grid": "./registry/notra/card/components/instrument-grid.tsx",
+    "./card/labels": "./registry/notra/card/components/card-labels.tsx",
+    "./card/reveal": "./registry/notra/card/components/instrument-reveal.tsx",
+    "./card/types": "./registry/notra/card/types/card.ts"
+  },
   "scripts": {
     "dev": "blume dev --port 3006",
     "build": "bun run registry:build && blume build",
@@ -12,6 +25,8 @@
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
+    "@hugeicons/core-free-icons": "catalog:",
+    "@hugeicons/react": "catalog:",
     "@notra/ui": "workspace:*",
     "@paper-design/shaders": "0.0.81",
     "@rexa-developer/tiks": "^0.3.0",

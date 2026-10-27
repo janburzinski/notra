@@ -7,6 +7,7 @@ import {
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -22,7 +23,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../../dropdown-menu/components/dropdown-menu";
 
 export default function DropdownMenuDemo() {
   const [showActivity, setShowActivity] = useState(true);

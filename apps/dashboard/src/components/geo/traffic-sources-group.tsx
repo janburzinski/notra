@@ -2,16 +2,13 @@
 
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { DataTable, type TableColumn } from "ui/table";
 import {
   DEFAULT_MIN_COLUMN_WIDTH,
   TABLE_FRAME_INSET,
-} from "@notra/ui/constants/table";
-import { useCollapsibleColumns } from "@notra/ui/hooks/use-collapsible-columns";
-import { tableMinWidthCss } from "@notra/ui/lib/data-table";
+} from "ui/table/constants";
+import { useCollapsibleColumns } from "ui/table/hooks/use-collapsible-columns";
+import { tableMinWidthCss } from "ui/table/lib";
 import { useTranslations } from "use-intl";
 
 import {

@@ -1,6 +1,4 @@
 import { HugeiconsIcon } from "@hugeicons/react";
-import { DataTable } from "@notra/ui/components/ui/data-table";
-import type { TableColumn } from "@notra/ui/components/ui/data-table";
 import {
   Sheet,
   SheetContent,
@@ -11,6 +9,8 @@ import {
 import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
 import { useMemo, useRef, useState } from "react";
+import { DataTable } from "ui/table";
+import type { TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";

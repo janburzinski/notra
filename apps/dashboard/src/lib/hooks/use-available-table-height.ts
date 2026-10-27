@@ -1,7 +1,7 @@
 "use client";
 
-import { TABLE_FRAME_INSET_PX } from "@notra/ui/constants/table";
 import { useLayoutEffect, useRef, useState } from "react";
+import { TABLE_FRAME_INSET_PX } from "ui/table/constants";
 
 /**
  * Height to pass as a table's `height` so the whole table, frame included,

@@ -13,7 +13,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { IconSvgElement } from "@hugeicons/react";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
@@ -39,6 +38,7 @@ import { Tabs } from "@notra/ui/components/ui/tabs";
 import { cn } from "@notra/ui/lib/utils";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useState } from "react";
+import { InstrumentSection } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { AutomationLoadError } from "@/components/automation/automation-load-error";

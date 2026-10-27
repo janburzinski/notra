@@ -4,6 +4,7 @@ import { cn } from "cn";
 import { MailIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -11,8 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-
+} from "../../table/components/table";
 import { OUTREACH_MAX_COMPETITORS } from "../constants/outreach";
 import type { OutreachProspectTableProps } from "../types/outreach";
 import { OutreachCitations, OutreachStatusBadge } from "./outreach-status";

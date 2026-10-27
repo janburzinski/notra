@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@notra/ui/components/ui/button";
-import { normalizePageSize } from "@notra/ui/lib/data-table";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useMemo } from "react";
+import { normalizePageSize } from "ui/table/lib";
 import { useTranslations } from "use-intl";
 
 import { CollectionsPageSkeleton } from "@/app/(dashboard)/[slug]/content/skeleton";

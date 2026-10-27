@@ -5,8 +5,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { useQuery } from "@tanstack/react-query";
+import { TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useFormatter } from "use-intl";
 
 import { AutopilotBackLink } from "@/components/autopilot/autopilot-back-link";

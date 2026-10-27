@@ -3,13 +3,10 @@
 import { Delete02Icon, SearchIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { COMPETITORS_TABLE_ROW_HEIGHT } from "@notra/geo-core/constants/geo";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Input } from "@notra/ui/components/ui/input";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

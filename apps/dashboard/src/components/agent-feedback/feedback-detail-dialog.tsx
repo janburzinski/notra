@@ -6,10 +6,6 @@ import { AGENT_FEEDBACK_STATUSES } from "@notra/db/constants/agent-feedback";
 import type { AgentFeedbackStatus } from "@notra/db/types/agent-feedback";
 import { CopyButton } from "@notra/ui/components/ui/copy-button";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -24,6 +20,7 @@ import {
   SheetScrollArea,
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { AgentFeedbackAgent } from "@/components/agent-feedback/feedback-agent-icon";

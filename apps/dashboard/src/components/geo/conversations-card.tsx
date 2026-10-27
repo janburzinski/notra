@@ -13,10 +13,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { GEO_MAX_SEQUENCES } from "@notra/geo-core/constants/geo";
 import type { GeoPromptSequence } from "@notra/geo-core/types/geo";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -40,6 +36,7 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { type ReactNode, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

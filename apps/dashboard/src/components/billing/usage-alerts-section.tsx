@@ -4,15 +4,12 @@ import { Add01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MAX_USAGE_ALERTS } from "@notra/schemas/constants/usage-alerts";
 import { Badge } from "@notra/ui/components/ui/badge";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { UsageAlertForm } from "@/components/billing/usage-alert-form";

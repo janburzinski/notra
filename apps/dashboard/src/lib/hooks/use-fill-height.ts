@@ -1,7 +1,7 @@
 "use client";
 
-import { TABLE_FRAME_INSET_PX } from "@notra/ui/constants/table";
 import { useLayoutEffect, useRef, useState } from "react";
+import { TABLE_FRAME_INSET_PX } from "ui/table/constants";
 
 function remainingTableHeight(element: HTMLElement): number {
   const elementTop = element.getBoundingClientRect().top;

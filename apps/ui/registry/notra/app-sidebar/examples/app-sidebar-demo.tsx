@@ -2,10 +2,11 @@ import { LogOutIcon, PlusIcon, SettingsIcon, SparklesIcon } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+} from "../../dropdown-menu/components/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -17,8 +18,7 @@ import {
   SidebarRail,
   SidebarTrigger,
   useSidebar,
-} from "@/components/ui/sidebar";
-
+} from "../../sidebar/components/sidebar";
 import { SidebarNav } from "../components/sidebar-nav";
 import { SidebarSearch } from "../components/sidebar-search";
 import {

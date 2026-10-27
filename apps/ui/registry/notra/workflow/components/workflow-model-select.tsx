@@ -8,8 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-
+} from "../../select/components/select";
 import { WORKFLOW_MODELS } from "../constants/workflow";
 import type { WorkflowModelSelectProps } from "../types/workflow";
 import { WorkflowLogo } from "./workflow-logo";

@@ -3,13 +3,13 @@
 import { SearchIcon } from "lucide-react";
 
 import { Kbd } from "@/components/ui/kbd";
+
 import {
   SidebarLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-
+} from "../../sidebar/components/sidebar";
 import type { SidebarSearchProps } from "../types/app-sidebar";
 
 /**

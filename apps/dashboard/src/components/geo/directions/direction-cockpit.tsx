@@ -1,17 +1,11 @@
 "use client";
 
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
-import {
-  InstrumentModule,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Card, CardContent } from "@notra/ui/components/ui/card";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { useMemo } from "react";
+import { InstrumentModule, InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

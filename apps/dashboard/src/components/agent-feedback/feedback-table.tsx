@@ -11,11 +11,7 @@ import {
   ContextMenuRadioItem,
   ContextMenuSeparator,
 } from "@notra/ui/components/ui/context-menu";
-import {
-  DataTable,
-  InfiniteDataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { DataTable, InfiniteDataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { AgentFeedbackAgent } from "@/components/agent-feedback/feedback-agent-icon";

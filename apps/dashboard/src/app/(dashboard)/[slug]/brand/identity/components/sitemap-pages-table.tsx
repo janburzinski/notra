@@ -4,10 +4,6 @@ import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -15,6 +11,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useNow, useTranslations } from "use-intl";
 
 import { TABLE_ROW_HEIGHT } from "@/constants/table";

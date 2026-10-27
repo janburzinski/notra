@@ -3,7 +3,7 @@
 import { GEO_EMPTY_COMPETITOR_SHARE_TIMESERIES } from "@notra/geo-core/constants/geo";
 import type { ShareOfVoiceRow } from "@notra/geo-core/types/geo";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
+import { InstrumentSection } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { ShareOfVoiceTable } from "@/components/geo/share-of-voice-table";

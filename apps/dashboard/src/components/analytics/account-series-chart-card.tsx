@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 
 import { ChartSeriesLegend } from "@/components/analytics/chart-legend";
 import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";

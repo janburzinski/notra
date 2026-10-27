@@ -4,13 +4,6 @@ import { Trash2Icon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -20,6 +13,13 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../select/components/select";
 import { WORKFLOW_KINDS } from "../constants/workflow";
 import { WORKFLOW_SECTION_TITLE_CLASS } from "../constants/workflow-ui";
 import {

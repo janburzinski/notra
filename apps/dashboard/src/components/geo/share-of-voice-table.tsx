@@ -6,12 +6,9 @@ import {
 } from "@notra/geo-core/constants/geo";
 import type { ShareOfVoiceRow } from "@notra/geo-core/types/geo";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
-import { InstrumentEmpty } from "@notra/ui/components/instrument/instrument-module";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { useMemo } from "react";
+import { InstrumentEmpty } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";

@@ -1,6 +1,6 @@
 "use client";
 
-import { DataTable } from "@notra/ui/components/ui/data-table";
+import { DataTable } from "ui/table";
 
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { tableHeightFor } from "@/utils/table";

@@ -13,6 +13,8 @@ import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
 import { Suspense, useState } from "react";
 import { toast } from "sonner";
+import { CardLabelsProvider } from "ui/card/labels";
+import { DataTableLabelsProvider } from "ui/table/labels";
 import { useLocale, useTranslations } from "use-intl";
 
 import Image from "@/components/framework/image";
@@ -102,17 +104,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
         </Suspense>
         <ThemeProvider attribute="class" disableTransitionOnChange enableSystem>
           <UiLabelsProvider labels={uiLabels}>
-            <TooltipProvider delay={500} glide={false}>
-              <NuqsAdapter>
-                {children}
-                {POSTHOG_PROJECT_TOKEN ? (
-                  <Suspense fallback={null}>
-                    <PostHogIdentity />
-                  </Suspense>
-                ) : null}
-              </NuqsAdapter>
-              <Toaster position="bottom-right" />
-            </TooltipProvider>
+            <DataTableLabelsProvider labels={uiLabels}>
+              <CardLabelsProvider labels={uiLabels}>
+                <TooltipProvider delay={500} glide={false}>
+                  <NuqsAdapter>
+                    {children}
+                    {POSTHOG_PROJECT_TOKEN ? (
+                      <Suspense fallback={null}>
+                        <PostHogIdentity />
+                      </Suspense>
+                    ) : null}
+                  </NuqsAdapter>
+                  <Toaster position="bottom-right" />
+                </TooltipProvider>
+              </CardLabelsProvider>
+            </DataTableLabelsProvider>
           </UiLabelsProvider>
         </ThemeProvider>
       </QueryClientProvider>

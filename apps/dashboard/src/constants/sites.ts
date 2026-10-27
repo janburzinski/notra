@@ -15,7 +15,7 @@ import {
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
-import { TABLE_BODY_CLASS } from "@notra/ui/constants/table";
+import { TABLE_BODY_CLASS } from "ui/table/constants";
 
 import type {
   SiteDeploymentFilters,

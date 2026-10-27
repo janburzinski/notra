@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
 import { useMemo } from "react";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { ChartColorScope } from "@/components/charts/chart-color-scope";

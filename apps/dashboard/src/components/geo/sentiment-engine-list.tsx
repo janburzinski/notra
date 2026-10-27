@@ -1,9 +1,9 @@
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
+import { InstrumentModule } from "ui/card";
 import { useFormatter, useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";

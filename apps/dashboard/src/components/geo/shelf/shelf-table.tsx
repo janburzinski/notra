@@ -5,10 +5,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { LogoStack } from "@notra/ui/components/geo/logo-stack";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import {
-  InfiniteDataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   HoverCard,
   HoverCardTrigger,
 } from "@notra/ui/components/ui/hover-card";
@@ -17,8 +13,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
-import { TABLE_FRAME_INSET_PX } from "@notra/ui/constants/table";
 import { useIsMobile } from "@notra/ui/hooks/use-mobile";
+import { InfiniteDataTable, type TableColumn } from "ui/table";
+import { TABLE_FRAME_INSET_PX } from "ui/table/constants";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

@@ -2,7 +2,7 @@
 
 import { AnalyticsUpIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { DataTable } from "@notra/ui/components/ui/data-table";
+import { DataTable } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { EmptyState } from "@/components/empty-state";

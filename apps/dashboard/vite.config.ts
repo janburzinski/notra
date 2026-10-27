@@ -61,6 +61,12 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: [
         {
+          find: /^@\/components\/ui\//,
+          replacement: fileURLToPath(
+            new URL("../../packages/ui/src/components/ui/", import.meta.url)
+          ),
+        },
+        {
           find: "@",
           replacement: fileURLToPath(new URL("src", import.meta.url)),
         },

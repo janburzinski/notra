@@ -37,10 +37,6 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Alert, AlertDescription } from "@notra/ui/components/ui/alert";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -90,6 +86,7 @@ import {
   useReducer,
 } from "react";
 import { toast } from "sonner";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 import * as z from "zod";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
+import { InstrumentModule } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

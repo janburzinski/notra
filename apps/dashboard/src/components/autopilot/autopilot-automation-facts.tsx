@@ -8,8 +8,8 @@ import {
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { Fragment } from "react";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 
 import { AUTOPILOT_HOUR_OPTIONS } from "@/constants/autopilot";
 import { AUTOPILOT_AUTOMATIONS } from "@/constants/autopilot-ui";

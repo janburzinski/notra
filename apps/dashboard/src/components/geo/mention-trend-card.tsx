@@ -7,11 +7,8 @@ import {
 import type { MentionTrendRow } from "@notra/geo-core/types/geo";
 import { todayIsoDate } from "@notra/geo-core/utils/day-label";
 import { engineFamilyLabel } from "@notra/geo-core/utils/geo-engine-family";
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
 import { useState } from "react";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EmptyStateTrendPreview } from "@/components/empty-state-preview";

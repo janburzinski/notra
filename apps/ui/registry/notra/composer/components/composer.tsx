@@ -14,15 +14,15 @@ import {
 import type { ComponentProps, ReactNode } from "react";
 import { useLayoutEffect, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+
+import { Button } from "../../button/components/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-
+} from "../../tooltip/components/tooltip";
 import {
   COMPOSER_CHIP_ACTION,
   COMPOSER_INPUT,

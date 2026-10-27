@@ -16,7 +16,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { TRANSITION } from "@notra/ui/lib/motion";
 import {
   AnimatePresence,
@@ -26,6 +25,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { useState } from "react";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useFormatter } from "use-intl";
 
 import { SearchFavicon } from "@/components/ai/chat-activity-group";

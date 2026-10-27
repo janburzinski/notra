@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@notra/ui/components/ui/badge";
-import { DataTable } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
   Tabs,
@@ -11,6 +10,7 @@ import {
 } from "@notra/ui/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { DataTable } from "ui/table";
 import { useFormatter, useTranslations } from "use-intl";
 
 import { useMemberColumns } from "@/components/members/columns";

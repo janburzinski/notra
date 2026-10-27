@@ -28,10 +28,6 @@ import {
   ContextMenuSeparator,
 } from "@notra/ui/components/ui/context-menu";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Empty,
   EmptyContent,
   EmptyDescription,
@@ -50,6 +46,7 @@ import {
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

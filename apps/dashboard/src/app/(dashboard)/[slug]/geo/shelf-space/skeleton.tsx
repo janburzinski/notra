@@ -3,11 +3,11 @@
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Kbd } from "@notra/ui/components/ui/kbd";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useIsMobile } from "@notra/ui/hooks/use-mobile";
-import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
+import { DataTableSkeleton } from "ui/table";
+import type { DataTableSkeletonColumn } from "ui/table/types";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

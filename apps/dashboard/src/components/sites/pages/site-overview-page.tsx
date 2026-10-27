@@ -7,8 +7,8 @@ import {
   RefreshIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
+import { InstrumentSection } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { Button, buttonVariants } from "@/components/button";

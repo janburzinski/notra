@@ -1,7 +1,7 @@
 "use client";
 
-import { TABLE_FRAME_INSET_PX } from "@notra/ui/constants/table";
 import { Activity, useLayoutEffect, useRef, useState } from "react";
+import { TABLE_FRAME_INSET_PX } from "ui/table/constants";
 
 import { ShelfBoard } from "@/components/geo/shelf/shelf-board";
 import { ShelfTable } from "@/components/geo/shelf/shelf-table";

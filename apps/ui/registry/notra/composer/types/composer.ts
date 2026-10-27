@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 
-import type { Button } from "@/components/ui/button";
+import type { Button } from "../../button/components/button";
 
 export interface ComposerFrameProps {
   children: ReactNode;

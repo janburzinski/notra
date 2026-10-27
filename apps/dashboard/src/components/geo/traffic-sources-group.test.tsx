@@ -2,8 +2,8 @@ import { expect, test } from "bun:test";
 
 import { GEO_JOURNEY_BROWSE_CATEGORY } from "@notra/geo-core/constants/geo";
 import type { GeoTrafficSource } from "@notra/geo-core/types/geo";
-import type { TableColumn } from "@notra/ui/components/ui/data-table";
 import { renderToStaticMarkup } from "react-dom/server";
+import type { TableColumn } from "ui/table";
 import { IntlProvider } from "use-intl";
 
 import type { GeoTrafficSourceGroup } from "@/types/geo";

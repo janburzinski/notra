@@ -31,10 +31,6 @@ import {
 } from "@notra/ui/components/shared/responsive-dialog";
 import { Alert, AlertDescription } from "@notra/ui/components/ui/alert";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -62,6 +58,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { ApiKeyPermissionBadge } from "@/components/api-keys/api-key-permission-badge";

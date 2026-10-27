@@ -10,12 +10,9 @@ import {
   trafficSparklineDays,
 } from "@notra/geo-core/utils/ai-traffic";
 import { AnimatedNumber } from "@notra/ui/components/animated-number";
-import {
-  InstrumentEmpty,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { memo, useCallback, useMemo, useState } from "react";
+import { InstrumentEmpty, InstrumentSection } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { TrafficHero } from "@/components/geo/traffic-hero";

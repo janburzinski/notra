@@ -3,7 +3,6 @@
 import { GEO_SEARCH_GAP_ACTION_CLASS } from "@notra/geo-core/constants/geo";
 import { engineFamilyLabel } from "@notra/geo-core/utils/geo-engine-family";
 import { Badge } from "@notra/ui/components/ui/badge";
-import { DataTable } from "@notra/ui/components/ui/data-table";
 import {
   Sheet,
   SheetContent,
@@ -15,6 +14,7 @@ import {
 } from "@notra/ui/components/ui/sheet";
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
 import { useMemo } from "react";
+import { DataTable } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { GEO_SEARCH_GAP_ACTION_LABEL_KEYS } from "@/constants/geo-gaps";

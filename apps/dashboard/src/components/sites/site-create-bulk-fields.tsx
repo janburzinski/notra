@@ -4,10 +4,6 @@ import { GitBranchIcon } from "@hugeicons/core-free-icons";
 import { SITE_BULK_IMPORT_MAX_SITES } from "@notra/schemas/constants/dashboard/sites";
 import { Checkbox } from "@notra/ui/components/ui/checkbox";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Field,
   FieldContent,
   FieldDescription,
@@ -18,6 +14,7 @@ import { Input } from "@notra/ui/components/ui/input";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { m } from "motion/react";
 import { useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { SiteAddressInput } from "@/components/sites/site-address-input";

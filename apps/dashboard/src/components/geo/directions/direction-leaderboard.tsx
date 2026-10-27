@@ -8,10 +8,7 @@ import {
   formatGeoSource,
 } from "@notra/geo-core/utils/ai-traffic";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { ChartSparkline } from "@/components/charts/chart-sparkline";

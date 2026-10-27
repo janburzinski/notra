@@ -1,5 +1,5 @@
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { Spinner } from "@notra/ui/components/ui/spinner";
+import { InstrumentSection } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

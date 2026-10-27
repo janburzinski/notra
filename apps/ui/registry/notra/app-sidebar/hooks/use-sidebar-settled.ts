@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useSidebar } from "@/components/ui/sidebar";
-
+import { useSidebar } from "../../sidebar/components/sidebar";
 import { SIDEBAR_COLLAPSE_MS } from "../constants/app-sidebar";
 
 /**

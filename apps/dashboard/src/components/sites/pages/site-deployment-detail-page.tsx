@@ -8,9 +8,9 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
 import { ORPCError } from "@orpc/client";
 import { useEffect, useRef, useState } from "react";
+import { TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useTranslations } from "use-intl";
 
 import { Button, buttonVariants } from "@/components/button";

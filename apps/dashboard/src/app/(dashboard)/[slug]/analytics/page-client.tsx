@@ -1,9 +1,9 @@
 "use client";
 
-import { InstrumentGrid } from "@notra/ui/components/instrument/instrument-grid";
-import { InstrumentReveal } from "@notra/ui/components/instrument/instrument-reveal";
 import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { InstrumentGrid } from "ui/card/grid";
+import { InstrumentReveal } from "ui/card/reveal";
 import { useLocale, useTranslations } from "use-intl";
 
 import { AccountSeriesChartCard } from "@/components/analytics/account-series-chart-card";

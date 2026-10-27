@@ -2,7 +2,7 @@
 
 import { Github01Icon, HourglassIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
+import { TABLE_BODY_CLASS, TABLE_FRAME_CLASS } from "ui/table/constants";
 
 import { AutopilotMergeMenu } from "@/components/autopilot/autopilot-merge-menu";
 import { Button } from "@/components/button";

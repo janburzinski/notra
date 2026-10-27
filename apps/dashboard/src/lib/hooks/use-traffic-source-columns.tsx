@@ -9,9 +9,9 @@ import {
   sparklineTrend,
 } from "@notra/geo-core/utils/ai-traffic";
 import { AnimatedNumber } from "@notra/ui/components/animated-number";
-import type { TableColumn } from "@notra/ui/components/ui/data-table";
 import { useIsMobile } from "@notra/ui/hooks/use-mobile";
 import { useMemo } from "react";
+import type { TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { GeoRateSparkline } from "@/components/geo/geo-rate-sparkline";

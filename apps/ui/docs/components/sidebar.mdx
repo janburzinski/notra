@@ -11,7 +11,7 @@ The sidebar keeps the shadcn API (`SidebarProvider`, `Sidebar`, `SidebarMenuButt
 
 <RegistryInstall name="app-sidebar" />
 
-This installs the `notra-sidebar` primitives into `components/ui/sidebar.tsx` and the dashboard parts (switcher, search, grouped navigation and user menu) into `components/app-sidebar/`. It pulls in [Button](/components/button), [Tooltip](/components/tooltip) and [Dropdown Menu](/components/dropdown-menu), plus shadcn's Avatar, Collapsible, Input, Kbd, Separator, Sheet and Skeleton.
+This installs the Notra sidebar into `components/sidebar/components/sidebar.tsx`, next to shadcn's own sidebar rather than over it, and the dashboard parts (switcher, search, grouped navigation and user menu) into `components/app-sidebar/`. It pulls in [Button](/components/button), [Tooltip](/components/tooltip) and [Dropdown Menu](/components/dropdown-menu), plus shadcn's Avatar, Collapsible, Input, Kbd, Separator, Sheet and Skeleton.
 
 To install only the primitives, run `bunx shadcn@latest add @notra/notra-sidebar`. Both need a shadcn project on Base UI and Tailwind CSS v4.
 
@@ -31,7 +31,7 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@/components/sidebar/components/sidebar";
 
 const groups = [
   {

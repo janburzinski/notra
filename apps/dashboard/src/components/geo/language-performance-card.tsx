@@ -13,12 +13,7 @@ import {
   trackedGeoLanguages,
 } from "@notra/geo-core/utils/geo-language-rows";
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { Spinner } from "@notra/ui/components/ui/spinner";
 import {
   Tooltip,
@@ -27,6 +22,8 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

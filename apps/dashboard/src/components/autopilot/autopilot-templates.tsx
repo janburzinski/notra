@@ -2,7 +2,6 @@
 
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
 import { cn } from "@notra/ui/lib/utils";
@@ -13,6 +12,7 @@ import {
   m,
   useReducedMotion,
 } from "motion/react";
+import { InstrumentSection } from "ui/card";
 
 import { Button } from "@/components/button";
 import {

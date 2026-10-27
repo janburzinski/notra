@@ -10,7 +10,7 @@ import {
   Link04Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
+import { InstrumentModule } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import Link from "@/components/framework/link";

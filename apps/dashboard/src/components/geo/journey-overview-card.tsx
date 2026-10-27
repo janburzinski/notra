@@ -2,11 +2,8 @@
 
 import type { GeoJourneySourceStats } from "@notra/geo-core/types/geo";
 import { formatGeoSource } from "@notra/geo-core/utils/ai-traffic";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { InstrumentSection } from "ui/card";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";

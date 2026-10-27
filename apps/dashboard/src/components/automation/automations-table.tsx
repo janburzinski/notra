@@ -17,10 +17,6 @@ import { GEO_ALERT_DEFAULT_THRESHOLDS } from "@notra/schemas/dashboard/automatio
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -36,6 +32,7 @@ import {
 } from "@notra/ui/components/ui/tooltip";
 import { cn } from "@notra/ui/lib/utils";
 import type { ReactNode } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useNow, useTranslations } from "use-intl";
 
 import { AutomationActionIcon } from "@/components/automation/action-icon";

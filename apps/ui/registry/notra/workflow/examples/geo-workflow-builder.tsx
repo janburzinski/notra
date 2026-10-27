@@ -4,15 +4,15 @@ import { MapIcon } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+} from "../../select/components/select";
 import { WorkflowCanvas } from "../components/workflow-canvas";
 import { WorkflowNodePalette } from "../components/workflow-node-palette";
 import { WorkflowNodeSheet } from "../components/workflow-node-sheet";

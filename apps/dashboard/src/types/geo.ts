@@ -68,12 +68,12 @@ import type {
   GeoPromptTranslationEntry,
   GeoTrafficSitesMode,
 } from "@notra/geo-core/types/geo";
-import type { TableColumn } from "@notra/ui/components/ui/data-table";
 import type {
   ComponentProps,
   ComponentPropsWithoutRef,
   ReactNode,
 } from "react";
+import type { TableColumn } from "ui/table";
 import type { useTranslations } from "use-intl";
 import type { z } from "zod";
 

@@ -5,7 +5,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import Counter from "@notra/ui/components/shared/counter";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import {
   Empty,
   EmptyContent,
@@ -15,6 +14,7 @@ import {
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
 import { useReducedMotion } from "motion/react";
+import { DataTableSkeleton } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

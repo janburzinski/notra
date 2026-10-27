@@ -1,7 +1,4 @@
-import type {
-  TableColumn,
-  SortState,
-} from "@notra/ui/components/ui/data-table";
+import type { TableColumn, SortState } from "ui/table";
 
 import type {
   LogSourceFilter,

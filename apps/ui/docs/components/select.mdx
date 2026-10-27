@@ -11,7 +11,7 @@ The trigger uses the same surface as the outline button. The list opens below it
 
 <RegistryInstall name="notra-select" />
 
-This replaces `components/ui/select.tsx` and installs the Notra button and shared dropdown styles. Use a shadcn project on Base UI and Tailwind CSS v4.
+This installs `components/select/components/select.tsx`, which wraps shadcn's Select with a Notra button trigger and the shared dropdown styles. Your `components/ui/select.tsx` stays as it is. Use a shadcn project on Base UI and Tailwind CSS v4.
 
 ## Usage
 
@@ -24,7 +24,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/select/components/select";
 
 <Select
   defaultValue="weekly"

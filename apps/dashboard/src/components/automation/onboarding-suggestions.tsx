@@ -7,7 +7,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
-import { InstrumentSection } from "@notra/ui/components/instrument/instrument-module";
 import {
   Tooltip,
   TooltipContent,
@@ -15,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { toast } from "sonner";
+import { InstrumentSection } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { AutomationCard } from "@/components/automation/automation-template-gallery";

@@ -2,12 +2,9 @@
 
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { type CSSProperties, type PointerEvent, useState } from "react";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useTranslations } from "use-intl";
 
 import { CursorTooltip } from "@/components/analytics/cursor-tooltip";

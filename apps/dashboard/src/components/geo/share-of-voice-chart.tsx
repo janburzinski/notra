@@ -11,7 +11,6 @@ import {
   GEO_MENTION_ROW_HEIGHT_REM,
   GEO_MENTION_SUMMARY_VISIBLE,
 } from "@notra/geo-core/constants/geo";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
 import { DetailCardContent } from "@notra/ui/components/ui/detail-card";
 import {
   Empty,
@@ -26,6 +25,7 @@ import {
   HoverCardTrigger,
 } from "@notra/ui/components/ui/hover-card";
 import { type CSSProperties, useState } from "react";
+import { InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

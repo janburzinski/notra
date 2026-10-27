@@ -11,10 +11,6 @@ import { resolveEngineIconKey } from "@notra/geo-core/utils/geo-engine-icon";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -22,6 +18,7 @@ import {
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
 import { memo, useMemo } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { TrafficSheetHero } from "@/components/geo/traffic-sheet-hero";

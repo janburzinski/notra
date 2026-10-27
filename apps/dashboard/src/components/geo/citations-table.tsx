@@ -10,16 +10,13 @@ import type { GeoTrafficLogEntry } from "@notra/geo-core/types/geo";
 import { formatTrafficLocation } from "@notra/geo-core/utils/geo-project-domains";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { Badge } from "@notra/ui/components/ui/badge";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { DetailCardContent } from "@notra/ui/components/ui/detail-card";
 import {
   HoverCard,
   HoverCardTrigger,
 } from "@notra/ui/components/ui/hover-card";
 import { useEffect, useMemo, useState } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations, useNow } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";

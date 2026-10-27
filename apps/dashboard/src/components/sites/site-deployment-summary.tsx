@@ -7,7 +7,7 @@ import {
   GitPullRequestIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { TABLE_FRAME_CLASS } from "@notra/ui/constants/table";
+import { TABLE_FRAME_CLASS } from "ui/table/constants";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SiteEnvironmentBadge } from "@/components/sites/site-environment-badge";

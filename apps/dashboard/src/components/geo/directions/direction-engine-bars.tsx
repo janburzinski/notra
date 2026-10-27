@@ -1,11 +1,8 @@
 "use client";
 
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
 import { useMemo } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { EngineIcon } from "@/components/geo/engine-icon";

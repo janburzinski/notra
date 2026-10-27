@@ -1,11 +1,5 @@
 "use client";
 
-import { InstrumentGrid } from "@notra/ui/components/instrument/instrument-grid";
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-  InstrumentSection,
-} from "@notra/ui/components/instrument/instrument-module";
 import {
   Card,
   CardContent,
@@ -14,6 +8,8 @@ import {
   CardTitle,
 } from "@notra/ui/components/ui/card";
 import type { CSSProperties } from "react";
+import { InstrumentEmpty, InstrumentModule, InstrumentSection } from "ui/card";
+import { InstrumentGrid } from "ui/card/grid";
 
 import { Button } from "@/components/button";
 import { DesignSystemSectionHeader } from "@/components/design-system/design-system-section-header";

@@ -2,10 +2,10 @@
 
 import { GEO_GAPS_TABLE_HEIGHT } from "@notra/geo-core/constants/geo";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
-import { DATA_TABLE_ROW_HEIGHT } from "@notra/ui/constants/table";
-import type { DataTableSkeletonColumn } from "@notra/ui/types/data-table";
+import { DataTableSkeleton } from "ui/table";
+import { DATA_TABLE_ROW_HEIGHT } from "ui/table/constants";
+import type { DataTableSkeletonColumn } from "ui/table/types";
 import { useTranslations } from "use-intl";
 
 import { PageContainer } from "@/components/layout/container";

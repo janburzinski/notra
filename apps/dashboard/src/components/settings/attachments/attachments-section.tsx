@@ -7,7 +7,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { AttachmentFilter } from "@notra/schemas/dashboard/attachments";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
-import { DataTable } from "@notra/ui/components/ui/data-table";
 import {
   Select,
   SelectContent,
@@ -23,6 +22,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DataTable } from "ui/table";
 import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

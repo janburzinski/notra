@@ -4,8 +4,6 @@ import { HelpCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GSC_SYNC_LOOKBACK_DAYS } from "@notra/geo-core/constants/google-search-console";
 import { isQuestionQuery } from "@notra/geo-core/utils/gsc-question";
-import { InstrumentModule } from "@notra/ui/components/instrument/instrument-module";
-import { DataTable } from "@notra/ui/components/ui/data-table";
 import {
   Sheet,
   SheetContent,
@@ -17,6 +15,8 @@ import {
 } from "@notra/ui/components/ui/sheet";
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
 import { useMemo } from "react";
+import { InstrumentModule } from "ui/card";
+import { DataTable } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import type {

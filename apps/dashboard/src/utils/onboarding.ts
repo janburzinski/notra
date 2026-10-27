@@ -3,7 +3,7 @@ import { ONBOARDING_WEBSITE_PREFIX_REGEX } from "@notra/geo-core/constants/websi
 import { ONBOARDING_HEARD_ABOUT_NOTRA_SOURCES } from "@notra/schemas/constants/dashboard/onboarding";
 import { slugSchema } from "@notra/schemas/dashboard/organization";
 import type { OnboardingHeardAboutNotraSource } from "@notra/schemas/types/dashboard/onboarding";
-import { DATA_TABLE_HEADER_HEIGHT } from "@notra/ui/constants/table";
+import { DATA_TABLE_HEADER_HEIGHT } from "ui/table/constants";
 
 import {
   ONBOARDING_PREVIEW_EMPTY_TABLE_ROWS,

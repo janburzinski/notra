@@ -18,10 +18,6 @@ import {
 import { resolveGeoZdrMode } from "@notra/geo-core/utils/geo-engines";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { FadeSwap } from "@notra/ui/components/fade-swap";
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
 import { DetailCardContent } from "@notra/ui/components/ui/detail-card";
 import {
   HoverCard,
@@ -37,6 +33,7 @@ import { FADE_SWAP_TRANSITION } from "@notra/ui/constants/fade-swap";
 import { LazyMotion, m, useReducedMotion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";

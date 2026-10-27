@@ -1,7 +1,7 @@
 "use client";
 
-import { DataTableSkeleton } from "@notra/ui/components/ui/data-table";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
+import { DataTableSkeleton } from "ui/table";
 
 export function AutomationPageSkeleton() {
   return (

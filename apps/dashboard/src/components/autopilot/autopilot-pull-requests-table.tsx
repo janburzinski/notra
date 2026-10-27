@@ -8,10 +8,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
 import { StatusBadge } from "@notra/ui/components/status-badge";
-import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
+import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter } from "use-intl";
 
 import { AutopilotFindingStatus } from "@/components/autopilot/autopilot-finding-status";

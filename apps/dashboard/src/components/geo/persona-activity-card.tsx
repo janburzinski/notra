@@ -1,12 +1,9 @@
 "use client";
 
 import { formatDayLabel } from "@notra/geo-core/utils/day-label";
-import {
-  InstrumentEmpty,
-  InstrumentModule,
-} from "@notra/ui/components/instrument/instrument-module";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useState } from "react";
+import { InstrumentEmpty, InstrumentModule } from "ui/card";
 import { useLocale, useTranslations } from "use-intl";
 
 import { EmptyStateTrendPreview } from "@/components/empty-state-preview";

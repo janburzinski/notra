@@ -10,10 +10,6 @@ import {
 } from "@notra/geo-core/utils/ai-traffic";
 import { Badge } from "@notra/ui/components/ui/badge";
 import {
-  DataTable,
-  type TableColumn,
-} from "@notra/ui/components/ui/data-table";
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -23,6 +19,7 @@ import {
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
 import { useMemo } from "react";
+import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
