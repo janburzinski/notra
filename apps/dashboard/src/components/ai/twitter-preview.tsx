@@ -35,6 +35,7 @@ import type {
   PreviewEffectiveState,
   SocialPreviewProps,
 } from "@/types/content/ai-preview";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { OutputTypeIcon } from "@/utils/output-types";
 import { socialPreviewReducer } from "@/utils/social-preview-reducer";
 import { twitterAuthorFromAccount } from "@/utils/twitter";
@@ -84,7 +85,7 @@ export function TwitterPreview({
     ? twitterAuthorFromAccount(selectedAccount)
     : {
         name: organization?.name ?? tCommon("labels.yourName"),
-        avatar: organization?.logo ?? undefined,
+        avatar: resolveOrganizationLogo(organization?.logo),
         handle: (organization?.name ?? "yourname")
           .toLowerCase()
           .replace(/\s+/g, ""),

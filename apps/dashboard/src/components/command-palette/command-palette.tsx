@@ -92,6 +92,7 @@ import type {
   EntityHitsBySection,
 } from "@/types/components/command-palette";
 import type { CommonTranslator } from "@/types/i18n";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { getWebsiteDomain } from "@/utils/brand";
 import {
   commandPaletteEntityPath,
@@ -995,7 +996,7 @@ function CommandPaletteWorkspacesPage({
             label={org.name}
             leading={
               <Avatar className="size-5 rounded-md after:rounded-md">
-                <AvatarImage src={org.logo || undefined} />
+                <AvatarImage src={resolveOrganizationLogo(org.logo)} />
                 <AvatarFallback className="rounded-md text-[10px]">
                   {nameInitials(org.name)}
                 </AvatarFallback>

@@ -35,6 +35,7 @@ import type {
   PreviewEffectiveState,
   SocialPreviewProps,
 } from "@/types/content/ai-preview";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { linkedInAuthorFromAccount } from "@/utils/linkedin";
 import { OutputTypeIcon } from "@/utils/output-types";
 import { socialPreviewReducer } from "@/utils/social-preview-reducer";
@@ -84,7 +85,7 @@ export function LinkedInPreview({
     ? linkedInAuthorFromAccount(selectedAccount)
     : {
         name: organization?.name ?? tCommon("labels.yourName"),
-        avatar: organization?.logo ?? undefined,
+        avatar: resolveOrganizationLogo(organization?.logo),
       };
 
   const effectiveState: PreviewEffectiveState = (() => {

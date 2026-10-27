@@ -13,6 +13,7 @@ import {
   validateLogoFile,
 } from "@/lib/onboarding/logo-file";
 import type { OnboardingExistingOrg } from "@/types/onboarding";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { getGoogleFaviconUrl } from "@/utils/brand";
 
 export function useWorkspaceLogo(
@@ -21,7 +22,7 @@ export function useWorkspaceLogo(
   const t = useTranslations("onboarding.workspace");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(
-    existingOrg?.logo ?? null
+    resolveOrganizationLogo(existingOrg?.logo) ?? null
   );
   const [websiteValue, setWebsiteValue] = useState(
     existingOrg?.websiteUrl ?? ""

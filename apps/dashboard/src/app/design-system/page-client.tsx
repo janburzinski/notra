@@ -261,6 +261,7 @@ import { AgentLoader } from "@/components/icons/agent-loader";
 import { IntegrationCard } from "@/components/integrations/integration-card";
 import { LinkedInPost } from "@/components/linkedin-post";
 import { cn } from "@/lib/utils";
+import { personaAvatarDataUri } from "@/utils/geo-personas";
 
 import { DesignSystemButtonStatesDemo } from "./button-states-demo";
 import { DesignSystemWriteDialogDemo } from "./write-dialog-demo";
@@ -1805,7 +1806,7 @@ export default function DesignSystemClientPage() {
               </CardHeader>
               <CardContent className="flex flex-wrap items-center gap-4">
                 <Avatar>
-                  <AvatarImage src="https://api.dicebear.com/9.x/micah/svg?seed=AJ" />
+                  <AvatarImage src={personaAvatarDataUri("AJ")} />
                   <AvatarFallback>AJ</AvatarFallback>
                   <AvatarBadge />
                 </Avatar>
@@ -1814,11 +1815,11 @@ export default function DesignSystemClientPage() {
                 </Avatar>
                 <AvatarGroup>
                   <Avatar>
-                    <AvatarImage src="https://api.dicebear.com/9.x/micah/svg?seed=SA" />
+                    <AvatarImage src={personaAvatarDataUri("SA")} />
                     <AvatarFallback>SA</AvatarFallback>
                   </Avatar>
                   <Avatar>
-                    <AvatarImage src="https://api.dicebear.com/9.x/micah/svg?seed=KM" />
+                    <AvatarImage src={personaAvatarDataUri("KM")} />
                     <AvatarFallback>KM</AvatarFallback>
                   </Avatar>
                   <AvatarGroupCount>+3</AvatarGroupCount>
@@ -1881,7 +1882,7 @@ export default function DesignSystemClientPage() {
             <LinkedInPost
               author={{
                 name: "Avery Lane",
-                avatar: "https://api.dicebear.com/9.x/micah/svg?seed=Avery",
+                avatar: personaAvatarDataUri("Avery"),
                 headline: "77,350 followers",
               }}
               comments={42}

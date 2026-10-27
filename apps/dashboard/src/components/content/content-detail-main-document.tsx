@@ -10,6 +10,7 @@ import { ContentEditorSwitch } from "@/components/content/editors";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import type { ContentDetailDocument } from "@/lib/hooks/use-content-detail-document";
 import type { ContentApiResponse } from "@/types/hooks/content";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 
 interface ContentDetailMainDocumentProps {
   contentId: string;
@@ -219,7 +220,7 @@ export function ContentDetailMainDocument({
       imageExportRef={imageExportRef}
       organization={{
         name: activeOrganization?.name ?? t("yourOrganization"),
-        logo: activeOrganization?.logo ?? null,
+        logo: resolveOrganizationLogo(activeOrganization?.logo) ?? null,
       }}
       organizationId={organizationId}
       readOnly={false}

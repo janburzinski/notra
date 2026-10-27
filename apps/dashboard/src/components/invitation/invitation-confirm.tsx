@@ -27,6 +27,7 @@ import type {
   InvitationPageData,
   PendingInvitation,
 } from "@/types/invitation";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { nameInitials } from "@/utils/name-initials";
 
 function OrganizationAvatar({
@@ -36,7 +37,7 @@ function OrganizationAvatar({
 }) {
   return (
     <Avatar className="size-16" shape="squircle">
-      <AvatarImage alt="" src={organization.logo ?? undefined} />
+      <AvatarImage alt="" src={resolveOrganizationLogo(organization.logo)} />
       <AvatarFallback>{nameInitials(organization.name)}</AvatarFallback>
     </Avatar>
   );

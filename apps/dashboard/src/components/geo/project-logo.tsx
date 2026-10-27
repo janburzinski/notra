@@ -11,6 +11,7 @@ import Image from "@/components/framework/image";
 import { EngineIcon } from "@/components/geo/engine-icon";
 import { useCompanyLogo } from "@/lib/hooks/use-onboarding";
 import type { GeoProjectLogoProps } from "@/types/geo";
+import { avatarDataUri } from "@/utils/avatar";
 
 function ProjectLogoInner({
   name,
@@ -20,7 +21,11 @@ function ProjectLogoInner({
   fallbackClassName,
 }: GeoProjectLogoProps & { logo: string | null }) {
   const tCommon = useTranslations("common");
-  const sources = projectLogoSources(domain, name.toLowerCase(), logo);
+  const sources = projectLogoSources(
+    domain,
+    avatarDataUri(name.toLowerCase()),
+    logo
+  );
   const [sourceIndex, setSourceIndex] = useState(0);
   const activeIndex = Math.min(sourceIndex, sources.length - 1);
   const src = sources[activeIndex] ?? sources.at(-1) ?? "";

@@ -34,6 +34,7 @@ import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useSettingsModal } from "@/lib/hooks/use-settings-modal";
 import { useSwitchOrganization } from "@/lib/hooks/use-switch-organization";
 import { cn } from "@/lib/utils";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { planDisplayName } from "@/utils/billing-plans";
 import dynamic from "@/utils/lazy-component";
 import { nameInitials } from "@/utils/name-initials";
@@ -54,7 +55,7 @@ const ORG_MENU_ITEM_CLASS = "cursor-pointer py-1.5";
 function OrgAvatar({ organization }: { organization: Organization }) {
   return (
     <Avatar className="size-5 rounded-md after:rounded-md">
-      <AvatarImage src={organization.logo || undefined} />
+      <AvatarImage src={resolveOrganizationLogo(organization.logo)} />
       <AvatarFallback className="rounded-md text-[10px]">
         {nameInitials(organization.name, 1)}
       </AvatarFallback>

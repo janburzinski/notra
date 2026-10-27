@@ -25,6 +25,7 @@ import { useRouter } from "@/lib/navigation";
 import { uploadFile } from "@/lib/upload/client";
 import { errorMessageOr } from "@/lib/utils";
 import type { OrganizationDetailsCardProps } from "@/types/settings/general";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { setLastVisitedOrganization } from "@/utils/cookies";
 import { QUERY_KEYS } from "@/utils/query-keys";
 
@@ -210,7 +211,7 @@ export function OrganizationDetailsCard({
               <AvatarImage
                 alt={organization.name}
                 className="rounded-lg"
-                src={organization.logo ?? undefined}
+                src={resolveOrganizationLogo(organization.logo)}
               />
               <AvatarFallback className="rounded-lg text-xl">
                 {organization.name.charAt(0).toUpperCase()}

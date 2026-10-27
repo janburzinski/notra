@@ -27,6 +27,7 @@ import { useRouter } from "@/lib/navigation";
 import { getOrganizationMembershipAction } from "@/lib/organizations/membership-action";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { errorMessageOr } from "@/lib/utils";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { setLastVisitedOrganization } from "@/utils/cookies";
 import { isHeardAboutNotraSource } from "@/utils/onboarding";
 import { QUERY_KEYS } from "@/utils/query-keys";
@@ -222,7 +223,7 @@ export function OrganizationsSection() {
                     <AvatarImage
                       alt={org.name}
                       className="rounded-lg"
-                      src={org.logo ?? undefined}
+                      src={resolveOrganizationLogo(org.logo)}
                     />
                     <AvatarFallback className="rounded-lg">
                       {org.name.charAt(0).toUpperCase()}

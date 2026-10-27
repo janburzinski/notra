@@ -158,6 +158,7 @@ import type {
   UserImageGridProps,
 } from "@/types/components/chat-page";
 import type { PublishedSocialPost } from "@/types/content/post-social";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 import { getChatActivity, hasVisibleChatContent } from "@/utils/chat-activity";
 import {
   parseChatAnnotations,
@@ -2708,7 +2709,7 @@ function StandaloneChatPageClient({
                 onRegenerate={handleRegenerate}
                 organization={{
                   name: organization?.name ?? tCommon("labels.yourName"),
-                  logo: organization?.logo ?? null,
+                  logo: resolveOrganizationLogo(organization?.logo) ?? null,
                 }}
                 organizationId={organizationId}
                 persistedStatus={persistedStatus}
@@ -2734,7 +2735,7 @@ function StandaloneChatPageClient({
                 onRegenerate={handleRegenerate}
                 organization={{
                   name: organization?.name ?? tCommon("labels.yourName"),
-                  logo: organization?.logo ?? null,
+                  logo: resolveOrganizationLogo(organization?.logo) ?? null,
                 }}
                 organizationId={organizationId}
                 persistedStatus={persistedStatus}

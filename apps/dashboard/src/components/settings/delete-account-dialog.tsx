@@ -39,6 +39,7 @@ import type {
   OwnedOrganization,
   TransferDecision,
 } from "@/types/settings/delete-account";
+import { resolveOrganizationLogo } from "@/utils/avatar";
 
 export function DeleteAccountDialog({
   trigger,
@@ -187,7 +188,7 @@ export function DeleteAccountDialog({
                           <AvatarImage
                             alt={org.name}
                             className="rounded-lg"
-                            src={org.logo ?? undefined}
+                            src={resolveOrganizationLogo(org.logo)}
                           />
                           <AvatarFallback className="rounded-lg text-sm">
                             {org.name.charAt(0).toUpperCase()}
@@ -274,7 +275,7 @@ export function DeleteAccountDialog({
                         <AvatarImage
                           alt={org.name}
                           className="rounded"
-                          src={org.logo ?? undefined}
+                          src={resolveOrganizationLogo(org.logo)}
                         />
                         <AvatarFallback className="rounded text-xs">
                           {org.name.charAt(0).toUpperCase()}

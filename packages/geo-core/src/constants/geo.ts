@@ -1047,8 +1047,6 @@ export const GEO_CHAT_SKIN_SURFACE: Record<GeoChatSkin, string> = {
 /** Served by the dashboard app; stands in for fictional `.example` brands. */
 export const GEO_NOTRA_LOGO_PATH = "/icon0.svg";
 
-export const GEO_AVATAR_FALLBACK_BASE =
-  "https://api.dicebear.com/9.x/glass/svg";
 export const GEO_LOGO_SIZE_PX = 40;
 
 export const GEO_COMPETITOR_DETAIL_DAYS = 30;
