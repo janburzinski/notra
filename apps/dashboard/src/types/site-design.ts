@@ -1,10 +1,9 @@
-import type { IconSvgElement } from "@hugeicons/react";
 import type {
   SITE_NAVBAR_LINK_TYPES,
   SITE_SOCIAL_PLATFORMS,
 } from "@notra/sites-core/constants/site-layout";
 import type { SiteImageUploadKind } from "@notra/sites-core/types/uploads";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 
 import type {
   SITE_APPEARANCE_MODES,
@@ -247,7 +246,8 @@ export type SiteDesignPreviewTone = "light" | "dark";
 
 export interface SiteSocialLinkMeta {
   label: string;
-  icon: IconSvgElement;
+  /** Brand mark; without one the editor shows a globe or the site's favicon. */
+  logo?: ComponentType<SVGProps<SVGSVGElement>>;
   /** Profile URL the handle is appended to; without one the field takes a full URL. */
   prefix?: string;
   /** Handles on this platform keep their leading "@" in the URL. */

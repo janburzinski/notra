@@ -1,20 +1,17 @@
-import {
-  BlueskyIcon,
-  DiscordIcon,
-  Facebook01Icon,
-  GithubIcon,
-  Globe02Icon,
-  InstagramIcon,
-  Linkedin01Icon,
-  MediumIcon,
-  NewTwitterIcon,
-  News01Icon,
-  RedditIcon,
-  SlackIcon,
-  TelegramIcon,
-  ThreadsIcon,
-  YoutubeIcon,
-} from "@hugeicons/core-free-icons";
+import { Bluesky } from "@notra/ui/components/ui/svgs/bluesky";
+import { Discord } from "@notra/ui/components/ui/svgs/discord";
+import { Facebook } from "@notra/ui/components/ui/svgs/facebook";
+import { Github } from "@notra/ui/components/ui/svgs/github";
+import { HackerNews } from "@notra/ui/components/ui/svgs/hackerNews";
+import { InstagramMono } from "@notra/ui/components/ui/svgs/instagramMono";
+import { Linkedin } from "@notra/ui/components/ui/svgs/linkedin";
+import { Medium } from "@notra/ui/components/ui/svgs/medium";
+import { Reddit } from "@notra/ui/components/ui/svgs/reddit";
+import { SlackMono } from "@notra/ui/components/ui/svgs/slackMono";
+import { Telegram } from "@notra/ui/components/ui/svgs/telegram";
+import { Threads } from "@notra/ui/components/ui/svgs/threads";
+import { XTwitter } from "@notra/ui/components/ui/svgs/twitter";
+import { Youtube } from "@notra/ui/components/ui/svgs/youtube";
 
 import type {
   SiteBackgroundDecoration,
@@ -157,59 +154,59 @@ export const SITE_SOCIAL_LINKS: Record<SiteSocialPlatform, SiteSocialLinkMeta> =
   {
     github: {
       label: "GitHub",
-      icon: GithubIcon,
+      logo: Github,
       prefix: "https://github.com/",
     },
-    x: { label: "X", icon: NewTwitterIcon, prefix: "https://x.com/" },
-    discord: { label: "Discord", icon: DiscordIcon },
+    x: { label: "X", logo: XTwitter, prefix: "https://x.com/" },
+    discord: { label: "Discord", logo: Discord },
     linkedin: {
       label: "LinkedIn",
-      icon: Linkedin01Icon,
+      logo: Linkedin,
       prefix: "https://www.linkedin.com/",
     },
     youtube: {
       label: "YouTube",
-      icon: YoutubeIcon,
+      logo: Youtube,
       prefix: "https://www.youtube.com/",
       keepsAt: true,
     },
     facebook: {
       label: "Facebook",
-      icon: Facebook01Icon,
+      logo: Facebook,
       prefix: "https://www.facebook.com/",
     },
-    website: { label: "Website", icon: Globe02Icon },
-    slack: { label: "Slack", icon: SlackIcon },
+    website: { label: "Website" },
+    slack: { label: "Slack", logo: SlackMono },
     instagram: {
       label: "Instagram",
-      icon: InstagramIcon,
+      logo: InstagramMono,
       prefix: "https://www.instagram.com/",
     },
-    "hacker-news": { label: "Hacker News", icon: News01Icon },
+    "hacker-news": { label: "Hacker News", logo: HackerNews },
     medium: {
       label: "Medium",
-      icon: MediumIcon,
+      logo: Medium,
       prefix: "https://medium.com/",
       keepsAt: true,
     },
     telegram: {
       label: "Telegram",
-      icon: TelegramIcon,
+      logo: Telegram,
       prefix: "https://t.me/",
     },
     bluesky: {
       label: "Bluesky",
-      icon: BlueskyIcon,
+      logo: Bluesky,
       prefix: "https://bsky.app/profile/",
     },
     threads: {
       label: "Threads",
-      icon: ThreadsIcon,
+      logo: Threads,
       prefix: "https://www.threads.net/@",
     },
     reddit: {
       label: "Reddit",
-      icon: RedditIcon,
+      logo: Reddit,
       prefix: "https://www.reddit.com/",
     },
   };

@@ -3,6 +3,7 @@
 import {
   Add01Icon,
   Cancel01Icon,
+  Globe02Icon,
   LayoutThreeColumnIcon,
   Share08Icon,
 } from "@hugeicons/core-free-icons";
@@ -73,11 +74,15 @@ function SocialIcon({ platform, url }: { platform: string; url?: string }) {
       />
     );
   }
+  const Logo = meta.logo;
+  if (Logo) {
+    return <Logo aria-hidden="true" className="size-4 shrink-0" />;
+  }
   return (
     <HugeiconsIcon
       aria-hidden="true"
       className="size-4 shrink-0"
-      icon={meta.icon}
+      icon={Globe02Icon}
       strokeWidth={1.75}
     />
   );
