@@ -3271,7 +3271,7 @@
       "willCreateUnnamed": "Creates a brand identity from this website."
     },
     "projectCreateDialog": {
-      "description": "We'll find competitors, write prompts and run the first scan.",
+      "description": "We'll find competitors and write prompts. Paid plans also run the first scan right away.",
       "nameLabel": "Project name",
       "invalidInput": "Enter a valid website and a project name.",
       "chooseIdentity": "Choose a brand identity for this website before continuing.",
@@ -4158,7 +4158,6 @@
       "undo": "Undo",
       "personaGenerationFailed": "Persona generation failed. Try again.",
       "personaScanned": "Persona scanned across {count, plural, one {# engine} other {# engines}}",
-      "resolveCreatedProjectFailed": "Failed to resolve created project",
       "connectingProperty": "Connecting {property}…",
       "connectingPropertyDescription": "Reading your search queries. This can take a minute, keep working in the meantime.",
       "updateCompetitorFailed": "Couldn't update the competitor suggestion."

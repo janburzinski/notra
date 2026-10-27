@@ -25,10 +25,7 @@ import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
-import {
-  GEO_PROJECT_CREATE_TIMEOUT_MS,
-  GeoProjectCreateTimeoutError,
-} from "@/constants/geo-projects";
+import { GEO_PROJECT_CREATE_TIMEOUT_MS } from "@/constants/geo-projects";
 import {
   geoCollectionId,
   geoDbQueryKey,
@@ -37,10 +34,6 @@ import {
   geoPromptsCollection,
   geoSequencesCollection,
 } from "@/lib/db/geo-collections";
-import {
-  abandonProjectCreateHandoff,
-  waitForProjectCreateHandoff,
-} from "@/lib/db/geo-project-create-handoff";
 import {
   clearPendingDeleteSnapshot,
   getPendingDeleteSnapshots,
@@ -53,6 +46,7 @@ import {
   markRowPending,
   subscribeToPendingRows,
 } from "@/lib/db/pending-rows";
+import { dashboardOrpc } from "@/lib/orpc/query";
 import type { GeoProjectCreateInput } from "@/types/geo";
 import { toErrorMessage } from "@/utils/error-message";
 import { sortGeoProjectsOldestFirst } from "@/utils/geo-projects";
@@ -232,61 +226,32 @@ export function useGeoProjectsDb(
     return sortGeoProjectsOldestFirst([...merged.values()]);
   }, [data, pendingDeleteSnapshots]);
 
-  const createProject = async (
-    input: GeoProjectCreateInput
-  ): Promise<GeoProject> => {
-    const trimmedName = input.name.trim();
-    const tempId = crypto.randomUUID();
+  const createProject = (input: GeoProjectCreateInput): Promise<GeoProject> => {
     setIsCreating(true);
-    const transaction = collection.insert({
-      id: tempId,
-      name: trimmedName,
-      brandSettingsId: input.brandSettingsId,
-      createdAt: new Date().toISOString(),
-      languages: input.languages,
-    });
-    const createdPromise = waitForProjectCreateHandoff(transaction.id);
-    void createdPromise.catch(() => undefined);
-    track(tempId, transaction, tCommon("labels.failedToCreateProject"));
-
-    let persistError: unknown;
-    await Promise.race([
-      transaction.isPersisted.promise,
-      new Promise<never>((_, reject) => {
-        setTimeout(
-          () => reject(new GeoProjectCreateTimeoutError()),
-          GEO_PROJECT_CREATE_TIMEOUT_MS
-        );
-      }),
-    ])
-      .catch((error: unknown) => {
-        persistError = error;
+    return dashboardOrpc.geo.projectsCreate
+      .call(
+        {
+          organizationId,
+          name: input.name.trim(),
+          brandSettingsId: input.brandSettingsId,
+          languages: input.languages,
+        },
+        { signal: AbortSignal.timeout(GEO_PROJECT_CREATE_TIMEOUT_MS) }
+      )
+      .then(async (created) => {
+        await queryClient.refetchQueries({
+          queryKey: geoDbQueryKey("projects", scope),
+        });
+        toast.success(tToast("projectCreated"));
+        return created;
       })
-      .finally(() => {
-        abandonProjectCreateHandoff(transaction.id);
-        setIsCreating(false);
-      });
-
-    if (persistError) {
-      if (persistError instanceof GeoProjectCreateTimeoutError) {
+      .catch((error: unknown) => {
         toast.error(
-          toErrorMessage(persistError, tCommon("labels.failedToCreateProject"))
+          toErrorMessage(error, tCommon("labels.failedToCreateProject"))
         );
-      }
-      throw persistError;
-    }
-
-    const created = await createdPromise.catch(() => null);
-    if (!created) {
-      const error = new Error(tToast("resolveCreatedProjectFailed"));
-      toast.error(
-        toErrorMessage(error, tCommon("labels.failedToCreateProject"))
-      );
-      throw error;
-    }
-
-    toast.success(tToast("projectCreated"));
-    return created;
+        throw error;
+      })
+      .finally(() => setIsCreating(false));
   };
 
   const updateProjectBrand = (projectId: string, brandSettingsId: string) => {

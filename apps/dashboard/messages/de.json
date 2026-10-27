@@ -3271,7 +3271,7 @@
       "willCreateUnnamed": "Erstellt eine Markenidentität aus dieser Website."
     },
     "projectCreateDialog": {
-      "description": "Wir finden Wettbewerber, erstellen Prompts und starten den ersten Scan.",
+      "description": "Wir finden Wettbewerber und erstellen Prompts. Mit einem bezahlten Plan starten wir auch direkt den ersten Scan.",
       "nameLabel": "Projektname",
       "invalidInput": "Gib eine gültige Website und einen Projektnamen ein.",
       "chooseIdentity": "Wähle eine Markenidentität für diese Website, bevor du fortfährst.",
@@ -4158,7 +4158,6 @@
       "undo": "Rückgängig",
       "personaGenerationFailed": "Persona-Erstellung fehlgeschlagen. Versuch es nochmal.",
       "personaScanned": "Persona mit {count, plural, one {# KI-Engine} other {# KI-Engines}} gescannt",
-      "resolveCreatedProjectFailed": "Erstelltes Projekt konnte nicht gefunden werden",
       "connectingProperty": "{property} wird verbunden…",
       "connectingPropertyDescription": "Deine Suchanfragen werden gelesen. Das kann eine Minute dauern, du kannst solange weiterarbeiten.",
       "updateCompetitorFailed": "Wettbewerber-Vorschlag konnte nicht aktualisiert werden."
