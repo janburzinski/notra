@@ -2,7 +2,6 @@ import { UTILITY_MODEL_ID } from "@notra/ai/constants/models";
 import { getEvaluationClient } from "@notra/ai/evaluation/client";
 import { listGitHubAppRepositoriesEffect } from "@notra/ai/integrations/github";
 import type { AgentTokenUsage } from "@notra/ai/types/agents";
-import type { EvaluationInput } from "@notra/ai/types/evaluation";
 import type { AutopilotFindingDecision } from "@notra/db/types/autopilot";
 import { loadGeoContentGaps } from "@notra/geo-core/geo/gaps";
 import { Effect } from "effect";
@@ -17,9 +16,9 @@ import {
   AUTOPILOT_CONTEXT_FILE_MAX_CHARS,
   AUTOPILOT_FINDING_MAX_FAILURES,
   AUTOPILOT_MAX_OBSERVATIONS,
-  AUTOPILOT_JEV_MIN_CONFIDENCE,
   AUTOPILOT_JEV_MODEL_ID,
   AUTOPILOT_JEV_NONE_CHOICE,
+  AUTOPILOT_JEV_WORTH_CHOICE,
   AUTOPILOT_MARKDOWN_FILE as MARKDOWN_FILE,
   AUTOPILOT_LOG_DROPPED_MAX,
   AUTOPILOT_REACTION_LOOKBACK_DAYS,
@@ -100,6 +99,7 @@ import {
   pullRequestLabel,
   isNotraPullRequest,
   isPostCandidateTitle,
+  parseCommitFingerprint,
   toMergedPullRequest,
 } from "@/utils/autopilot-github";
 import { findPagePath, isSafeRepositoryPath } from "@/utils/autopilot-paths";
@@ -563,20 +563,17 @@ export async function proposeBlog(params: {
 }
 
 async function sourcePullRequestAllowsPost(claim: FindingClaim) {
-  const source = /^commits:([^/]+)\/([^#]+)#(\d+)$/.exec(
-    claim.finding.fingerprint
-  );
+  const source = parseCommitFingerprint(claim.finding.fingerprint);
   if (!source) {
     return true;
   }
-  const [, owner = "", repo = "", number] = source;
   const octokit = await getRepositoryOctokit(claim.finding.organizationId, {
-    owner,
-    name: repo,
+    owner: source.owner,
+    name: source.repo,
   });
   const { data: pull } = await octokit.request(
     "GET /repos/{owner}/{repo}/pulls/{pull_number}",
-    { owner, repo, pull_number: Number(number) }
+    { owner: source.owner, repo: source.repo, pull_number: source.pullNumber }
   );
   if (pull.state === "open" || pull.merged_at) {
     return true;
@@ -668,123 +665,6 @@ export async function writeFindingPost(params: {
     }
     return { status: "failed" as const, error: message };
   }
-}
-
-/**
- * One Jev choice over the candidates plus "none". The index is null when Jev
- * is unsure or says none is worth a post; the result is null when Jev is down.
- */
-async function pickWithJev(params: {
-  ctx: AutopilotRunContext;
-  log: AutopilotLogger;
-  feature: string;
-  instructions: string;
-  none: string;
-  state: EvaluationInput;
-  options: string[];
-  /** Short names for the options, used in the log and on the finding. */
-  labels: string[];
-  minConfidence?: number;
-}): Promise<{
-  index: number | null;
-  confidence: number;
-  probabilities: Record<string, number>;
-  considered: { title: string; share: number }[];
-} | null> {
-  const minConfidence = params.minConfidence ?? AUTOPILOT_JEV_MIN_CONFIDENCE;
-  const criteria: Record<string, string> = Object.fromEntries(
-    params.options.map((option, index) => [`option_${index}`, option])
-  );
-  criteria[AUTOPILOT_JEV_NONE_CHOICE] = params.none;
-  const startedAt = Date.now();
-  const result = await getEvaluationClient().tryEvaluate({
-    feature: params.feature,
-    organizationId: params.ctx.organizationId,
-    modelId: AUTOPILOT_JEV_MODEL_ID,
-    state: params.state,
-    questions: {
-      pick: {
-        type: "choice",
-        instructions: `${params.instructions} The team's rules in the state always win: pick none rather than an option a rule excludes. Treat recently dismissed topics as examples of what the team does not want.`,
-        criteria,
-      },
-    },
-  });
-  const durationMs = Date.now() - startedAt;
-  if (!result) {
-    await params.log.error("Jev was unavailable, nothing proposed", {
-      model: AUTOPILOT_JEV_MODEL_ID,
-      durationMs,
-    });
-    return null;
-  }
-  const { choice, probabilities } = result.answers.pick;
-  // The confidence is the picked option's own probability, never 1 - P(none):
-  // that only says some option is interesting, not that this one is.
-  const ranked = params.options
-    .map((_, optionIndex) => ({
-      index: optionIndex,
-      share: probabilities?.[`option_${optionIndex}`] ?? 0,
-    }))
-    .sort((a, b) => b.share - a.share);
-  const fallbackIndex = Number(choice.replace("option_", ""));
-  const index = probabilities ? (ranked[0]?.index ?? -1) : fallbackIndex;
-  let confidence = result.confidence.pick ?? 0;
-  if (probabilities) {
-    confidence = ranked[0]?.share ?? 0;
-  } else if (choice === AUTOPILOT_JEV_NONE_CHOICE) {
-    confidence = 0;
-  }
-  const picked =
-    confidence >= minConfidence &&
-    Number.isInteger(index) &&
-    index >= 0 &&
-    index < params.options.length;
-  const label = (optionIndex: number) =>
-    params.labels[optionIndex] ?? `Option ${optionIndex + 1}`;
-  const considered = probabilities
-    ? ranked.map((option) => ({
-        title: label(option.index),
-        share: option.share,
-      }))
-    : [];
-  const percent = Math.round(confidence * 100);
-  const needed = Math.round(minConfidence * 100);
-  let message = `Picked "${label(index)}": ${percent}% sure it is worth a post`;
-  if (!picked) {
-    message =
-      params.options.length === 1
-        ? `Not worth a post: only ${percent}% sure (needs ${needed}%)`
-        : `Wrote nothing: only ${percent}% sure any of the ${params.options.length} is worth a post (needs ${needed}%)`;
-  }
-  await params.log.decision(
-    message,
-    {
-      model: AUTOPILOT_JEV_MODEL_ID,
-      choice: picked ? label(index) : "none",
-      confidence,
-      // Keyed by name so the log reads "Pricing page 41%", not "option_2 41%".
-      ranking: Object.fromEntries([
-        ...considered.map((option) => [option.title, option.share]),
-        ["Nothing", probabilities?.[AUTOPILOT_JEV_NONE_CHOICE] ?? 0],
-      ]),
-      durationMs,
-    },
-    {
-      feature: params.feature,
-      instructions: params.instructions,
-      criteria,
-      state: params.state,
-      answers: result.answers,
-      minConfidence,
-    }
-  );
-  return {
-    index: picked ? index : null,
-    confidence,
-    probabilities: probabilities ?? {},
-    considered,
-  };
 }
 
 /**
@@ -1225,24 +1105,73 @@ export async function assessPullRequestForPost(params: {
   pull: MergedPullRequest;
   minConfidence: number;
 }) {
-  const picked = await pickWithJev({
-    ctx: params.ctx,
-    log: params.log,
+  const { ctx, log, pull, minConfidence } = params;
+  const label = pullRequestLabel(pull);
+  const criteria = {
+    [AUTOPILOT_JEV_WORTH_CHOICE]: describePullRequest(pull),
+    [AUTOPILOT_JEV_NONE_CHOICE]: AUTOPILOT_COMMITS_JEV_NONE,
+  };
+  const state = await decisionState(ctx);
+  const startedAt = Date.now();
+  const result = await getEvaluationClient().tryEvaluate({
     feature: "autopilot-commits",
-    instructions: AUTOPILOT_COMMITS_JEV_INSTRUCTIONS,
-    none: AUTOPILOT_COMMITS_JEV_NONE,
-    state: await decisionState(params.ctx),
-    options: [describePullRequest(params.pull)],
-    labels: [pullRequestLabel(params.pull)],
-    minConfidence: params.minConfidence,
+    organizationId: ctx.organizationId,
+    modelId: AUTOPILOT_JEV_MODEL_ID,
+    state,
+    questions: {
+      pick: {
+        type: "choice",
+        instructions: `${AUTOPILOT_COMMITS_JEV_INSTRUCTIONS} The team's rules in the state always win: pick none rather than an option a rule excludes. Treat recently dismissed topics as examples of what the team does not want.`,
+        criteria,
+      },
+    },
   });
-  return picked
-    ? {
-        worth: picked.index === 0,
-        confidence: picked.confidence,
-        probabilities: picked.probabilities,
-      }
-    : null;
+  const durationMs = Date.now() - startedAt;
+  if (!result) {
+    await log.error("Jev was unavailable, nothing proposed", {
+      model: AUTOPILOT_JEV_MODEL_ID,
+      durationMs,
+    });
+    return null;
+  }
+  const { choice, probabilities } = result.answers.pick;
+  let confidence = result.confidence.pick ?? 0;
+  if (probabilities) {
+    confidence = probabilities[AUTOPILOT_JEV_WORTH_CHOICE] ?? 0;
+  } else if (choice === AUTOPILOT_JEV_NONE_CHOICE) {
+    confidence = 0;
+  }
+  const worth =
+    confidence >= minConfidence &&
+    (Boolean(probabilities) || choice === AUTOPILOT_JEV_WORTH_CHOICE);
+  const percent = Math.round(confidence * 100);
+  await log.decision(
+    worth
+      ? `Picked "${label}": ${percent}% sure it is worth a post`
+      : `Not worth a post: only ${percent}% sure (needs ${Math.round(minConfidence * 100)}%)`,
+    {
+      model: AUTOPILOT_JEV_MODEL_ID,
+      choice: worth ? label : "none",
+      confidence,
+      // Keyed by name so the log reads "acme/app#12 Exports 91%".
+      ranking: {
+        ...(probabilities
+          ? { [label]: probabilities[AUTOPILOT_JEV_WORTH_CHOICE] ?? 0 }
+          : {}),
+        Nothing: probabilities?.[AUTOPILOT_JEV_NONE_CHOICE] ?? 0,
+      },
+      durationMs,
+    },
+    {
+      feature: "autopilot-commits",
+      instructions: AUTOPILOT_COMMITS_JEV_INSTRUCTIONS,
+      criteria,
+      state,
+      answers: result.answers,
+      minConfidence,
+    }
+  );
+  return { worth, confidence, probabilities: probabilities ?? {} };
 }
 
 /** Drafts a post about one merged pull request into the website repository. */

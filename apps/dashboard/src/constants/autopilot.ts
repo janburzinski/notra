@@ -58,8 +58,17 @@ export const AUTOPILOT_READINESS_SCAN_POLL_MS = 5000;
  * then it counts as settled so the next run doesn't reopen the same thing.
  */
 export const AUTOPILOT_EXPIRED_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
-/** Pages of 100 pull request events read before assuming a draft was closed once. */
-export const AUTOPILOT_PULL_REQUEST_EVENT_PAGES = 10;
+/**
+ * Pages of 100 read from a pull request's events, reviews, comments or
+ * commits. Past it the draft counts as closed once and as worked on.
+ */
+export const AUTOPILOT_PULL_REQUEST_LIST_PAGES = 10;
+/**
+ * Pull request events that are a person's decision about a draft. Mentions,
+ * subscriptions and review requests are not: Autopilot causes those itself.
+ */
+export const AUTOPILOT_PERSON_PULL_REQUEST_EVENTS: ReadonlySet<string> =
+  new Set(["ready_for_review", "converted_to_draft", "reopened"]);
 export const AUTOPILOT_STALE_PULL_REQUEST_DAY_OPTIONS = [7, 14, 30] as const;
 export const AUTOPILOT_DEFAULT_STALE_PULL_REQUEST_DAYS = 14;
 
@@ -80,6 +89,8 @@ export const AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS = 1500;
 
 export const AUTOPILOT_COMMITS_LOOKBACK_DAYS = 7;
 export const AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS = 30;
+/** "commits:owner/repo#123", the fingerprint of a post about one pull request. */
+export const AUTOPILOT_COMMIT_FINGERPRINT = /^commits:([^/]+)\/([^#]+)#(\d+)$/;
 export const AUTOPILOT_COMMITS_MAX_REPOSITORIES = 5;
 export const AUTOPILOT_COMMITS_MAX_PULL_REQUESTS = 30;
 /**
@@ -160,6 +171,8 @@ export const AUTOPILOT_MAX_OBSERVATIONS = 8;
 /** Dropped candidates listed in the run log; the admin trace keeps all of them. */
 export const AUTOPILOT_LOG_DROPPED_MAX = 12;
 export const AUTOPILOT_JEV_NONE_CHOICE = "none";
+/** Jev's choice key for "this pull request is worth a post". */
+export const AUTOPILOT_JEV_WORTH_CHOICE = "option_0";
 
 /** Admin trace strings (prompts, model outputs) are clipped to this length. */
 export const AUTOPILOT_TRACE_TEXT_MAX_CHARS = 16_000;

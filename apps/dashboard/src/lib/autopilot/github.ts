@@ -20,7 +20,7 @@ import {
 import type { AutopilotRepository } from "@/types/autopilot";
 import type { AutopilotOctokit } from "@/types/autopilot-runtime";
 
-class AutopilotRepositoryAccessError extends Error {
+export class AutopilotRepositoryAccessError extends Error {
   override name = "AutopilotRepositoryAccessError";
 }
 

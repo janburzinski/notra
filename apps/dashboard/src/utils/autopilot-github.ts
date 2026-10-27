@@ -2,6 +2,7 @@ import { GITHUB_MENTION_TRUSTED_AUTHOR_ASSOCIATIONS } from "@notra/ai/constants/
 import { getGitHubMentionAppHandles } from "@notra/ai/utils/github-mention";
 
 import {
+  AUTOPILOT_COMMIT_FINGERPRINT,
   AUTOPILOT_COMMITS_SKIP_TITLE,
   AUTOPILOT_MAX_REVIEWERS,
 } from "@/constants/autopilot";
@@ -19,6 +20,16 @@ export function commitFingerprint(
   pull: Pick<MergedPullRequest, "repository" | "number">
 ) {
   return `commits:${pull.repository}#${pull.number}`;
+}
+
+/** The pull request a post about shipped work is about, or null for other findings. */
+export function parseCommitFingerprint(fingerprint: string) {
+  const match = AUTOPILOT_COMMIT_FINGERPRINT.exec(fingerprint);
+  if (!match) {
+    return null;
+  }
+  const [, owner = "", repo = "", number] = match;
+  return { owner, repo, pullNumber: Number(number) };
 }
 
 const WHITESPACE = /\s+/g;

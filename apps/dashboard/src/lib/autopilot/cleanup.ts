@@ -1,16 +1,21 @@
+import { githubStatus } from "@notra/ai/utils/github-pr-commit";
 import { db } from "@notra/db/drizzle";
 import { autopilotFindings } from "@notra/db/schema";
-import { and, eq, gt, lt } from "drizzle-orm";
+import { and, eq, gt, isNull, lt, or } from "drizzle-orm";
 
 import {
   AUTOPILOT_EXPIRED_COOLDOWN_MS,
-  AUTOPILOT_PULL_REQUEST_EVENT_PAGES,
+  AUTOPILOT_PERSON_PULL_REQUEST_EVENTS,
+  AUTOPILOT_PULL_REQUEST_LIST_PAGES,
 } from "@/constants/autopilot";
 import {
   deleteAutopilotBranch,
   pullRequestRef,
 } from "@/lib/autopilot/findings";
-import { getRepositoryOctokit } from "@/lib/autopilot/github";
+import {
+  AutopilotRepositoryAccessError,
+  getRepositoryOctokit,
+} from "@/lib/autopilot/github";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import type { AutopilotRunContext } from "@/types/autopilot";
 import type {
@@ -19,6 +24,7 @@ import type {
   AutopilotFindingRow as FindingRow,
   AutopilotPullRequestRef as PullRequestRef,
 } from "@/types/autopilot-runtime";
+import { parseCommitFingerprint } from "@/utils/autopilot-github";
 import { toErrorMessage } from "@/utils/error-message";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -26,84 +32,183 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const isPerson = (user: { type?: string } | null | undefined) =>
   user?.type !== "Bot";
 
+/** Every item of a GitHub list up to the page limit; truncated past it. */
+async function listPages<T>(
+  fetchPage: (page: number) => Promise<{ data: T[] }>
+) {
+  const items: T[] = [];
+  for (let page = 1; page <= AUTOPILOT_PULL_REQUEST_LIST_PAGES; page += 1) {
+    const { data } = await fetchPage(page);
+    items.push(...data);
+    if (data.length < 100) {
+      return { items, truncated: false };
+    }
+  }
+  return { items, truncated: true };
+}
+
+async function listPullRequestEvents(
+  octokit: AutopilotOctokit,
+  ref: PullRequestRef
+) {
+  const { items, truncated } = await listPages((page) =>
+    octokit.request("GET /repos/{owner}/{repo}/issues/{issue_number}/events", {
+      owner: ref.owner,
+      repo: ref.repo,
+      issue_number: ref.pullNumber,
+      per_page: 100,
+      page,
+    })
+  );
+  return { events: items, truncated };
+}
+
+type PullRequestEvents = Awaited<ReturnType<typeof listPullRequestEvents>>;
+
+/** Past the page limit it counts as closed, so a long history never gets a reopened draft closed again. */
+function wasEverClosed({ events, truncated }: PullRequestEvents) {
+  return truncated || events.some((event) => event.event === "closed");
+}
+
 /**
- * Whether anyone besides bots worked on the pull request: marked it ready,
- * reviewed, commented or pushed. Commits without a GitHub author count as a
- * person, so an unknown author never gets a draft closed.
+ * Whether a person works on the pull request: reviewed, commented, pushed or
+ * moved it in or out of draft since a moment, or took it over for good by
+ * approving it or taking it out of draft. Autopilot leaves draft itself when
+ * a post's feature merges, so a bot doing that counts for nothing. Missing
+ * authors and dates count as a person's recent work, so unknown data never
+ * gets a draft closed.
  */
-async function wasTouched(octokit: AutopilotOctokit, ref: PullRequestRef) {
-  const params = {
+async function personWorksOn(params: {
+  octokit: AutopilotOctokit;
+  ref: PullRequestRef;
+  draft: boolean;
+  events: PullRequestEvents;
+  since: Date;
+}) {
+  const { octokit, ref, events, since } = params;
+  const recent = (date: string | null | undefined) =>
+    !date || new Date(date) >= since;
+  const pullParams = {
     owner: ref.owner,
     repo: ref.repo,
     pull_number: ref.pullNumber,
     per_page: 100,
   };
-  const { data: pull } = await octokit.request(
-    "GET /repos/{owner}/{repo}/pulls/{pull_number}",
-    params
-  );
-  if (pull.state !== "open") {
-    return { open: false, touched: true };
+  if (
+    events.truncated ||
+    events.events.some(
+      (event) =>
+        AUTOPILOT_PERSON_PULL_REQUEST_EVENTS.has(event.event) &&
+        isPerson(event.actor) &&
+        (recent(event.created_at) ||
+          (!params.draft && event.event === "ready_for_review"))
+    )
+  ) {
+    return true;
   }
-  if (!pull.draft) {
-    return { open: true, touched: true };
-  }
+  const sinceIso = since.toISOString();
   const [reviews, comments, reviewComments, commits] = await Promise.all([
-    octokit.request(
-      "GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews",
-      params
+    listPages((page) =>
+      octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews", {
+        ...pullParams,
+        page,
+      })
     ),
-    octokit.request(
-      "GET /repos/{owner}/{repo}/issues/{issue_number}/comments",
-      {
-        owner: ref.owner,
-        repo: ref.repo,
-        issue_number: ref.pullNumber,
-        per_page: 100,
-      }
+    listPages((page) =>
+      octokit.request(
+        "GET /repos/{owner}/{repo}/issues/{issue_number}/comments",
+        {
+          owner: ref.owner,
+          repo: ref.repo,
+          issue_number: ref.pullNumber,
+          since: sinceIso,
+          per_page: 100,
+          page,
+        }
+      )
     ),
-    octokit.request(
-      "GET /repos/{owner}/{repo}/pulls/{pull_number}/comments",
-      params
+    listPages((page) =>
+      octokit.request(
+        "GET /repos/{owner}/{repo}/pulls/{pull_number}/comments",
+        {
+          ...pullParams,
+          since: sinceIso,
+          page,
+        }
+      )
     ),
-    octokit.request(
-      "GET /repos/{owner}/{repo}/pulls/{pull_number}/commits",
-      params
+    listPages((page) =>
+      octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}/commits", {
+        ...pullParams,
+        page,
+      })
     ),
   ]);
-  const touched =
-    reviews.data.some((review) => isPerson(review.user)) ||
-    comments.data.some((comment) => isPerson(comment.user)) ||
-    reviewComments.data.some((comment) => isPerson(comment.user)) ||
-    commits.data.some((commit) => isPerson(commit.author));
-  return { open: true, touched };
+  // Unread pages may hold recent work. GitHub lists at most 250 commits.
+  if (
+    [reviews, comments, reviewComments, commits].some(
+      ({ truncated }) => truncated
+    ) ||
+    commits.items.length >= 250
+  ) {
+    return true;
+  }
+  return (
+    reviews.items.some(
+      (review) =>
+        isPerson(review.user) &&
+        (recent(review.submitted_at) || review.state === "APPROVED")
+    ) ||
+    comments.items.some((comment) => isPerson(comment.user)) ||
+    reviewComments.items.some((comment) => isPerson(comment.user)) ||
+    commits.items.some(
+      (commit) =>
+        isPerson(commit.author) && recent(commit.commit.committer?.date)
+    )
+  );
 }
 
 /**
- * Whether the pull request was closed at some point, reading every page of
- * its events. Past the page limit it counts as closed, so a long history
- * never gets a reopened draft closed again.
+ * When a draft became something to review. A post about shipped work waits
+ * for its feature: while the feature pull request is open and someone works
+ * on it, then from its merge. An abandoned or unreadable feature no longer
+ * holds the post, which then ages from its own opening.
  */
-async function wasEverClosed(octokit: AutopilotOctokit, ref: PullRequestRef) {
-  for (let page = 1; page <= AUTOPILOT_PULL_REQUEST_EVENT_PAGES; page += 1) {
-    const { data } = await octokit.request(
-      "GET /repos/{owner}/{repo}/issues/{issue_number}/events",
-      {
-        owner: ref.owner,
-        repo: ref.repo,
-        issue_number: ref.pullNumber,
-        per_page: 100,
-        page,
-      }
-    );
-    if (data.some((event) => event.event === "closed")) {
-      return true;
-    }
-    if (data.length < 100) {
-      return false;
-    }
+async function reviewableSince(organizationId: string, finding: FindingRow) {
+  const openedAt = finding.openedAt ?? finding.updatedAt;
+  const source = parseCommitFingerprint(finding.fingerprint);
+  if (!source) {
+    return { since: openedAt, featureOpen: false };
   }
-  return true;
+  const feature = await getRepositoryOctokit(organizationId, {
+    owner: source.owner,
+    name: source.repo,
+  })
+    .then((octokit) =>
+      octokit.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+        owner: source.owner,
+        repo: source.repo,
+        pull_number: source.pullNumber,
+      })
+    )
+    .then(({ data }) => data)
+    .catch((error: unknown) => {
+      // Only a feature Autopilot can't reach is let go; a GitHub hiccup
+      // leaves the post for the next run instead of closing it early.
+      if (
+        error instanceof AutopilotRepositoryAccessError ||
+        [404, 422].includes(githubStatus(error) ?? 0)
+      ) {
+        return null;
+      }
+      throw error;
+    });
+  const moved =
+    feature?.merged_at ??
+    (feature?.state === "open" ? feature.updated_at : null);
+  const since =
+    moved && new Date(moved) > openedAt ? new Date(moved) : openedAt;
+  return { since, featureOpen: feature?.state === "open" };
 }
 
 /** Back to a live proposal, for drafts that are still or again open on GitHub. */
@@ -202,13 +307,23 @@ async function reconcileExpired(
       }
       // Never closed means the run stopped before closing it. It is closed
       // now unless someone started working on it in the meantime.
-      if (
-        days &&
-        !(await wasEverClosed(octokit, ref)) &&
-        !(await wasTouched(octokit, ref)).touched
-      ) {
-        await closeDraft({ octokit, ref, finding, days, log });
-        continue;
+      if (days) {
+        const events = await listPullRequestEvents(octokit, ref);
+        if (
+          !(
+            wasEverClosed(events) ||
+            (await personWorksOn({
+              octokit,
+              ref,
+              draft: Boolean(pull.draft),
+              events,
+              since: finding.dismissedAt ?? new Date(0),
+            }))
+          )
+        ) {
+          await closeDraft({ octokit, ref, finding, days, log });
+          continue;
+        }
       }
       await reviveExpired(finding.id);
       await log.action(
@@ -237,12 +352,18 @@ export async function closeStalePullRequests(ctx: AutopilotRunContext) {
     return 0;
   }
   const cutoff = new Date(Date.now() - days * DAY_MS);
-  // updatedAt moves when the pull request is opened, so it is the draft's age.
+  // updatedAt also moves when the brief mentions a draft, so it is no age.
   const candidates = await db.query.autopilotFindings.findMany({
     where: and(
       eq(autopilotFindings.organizationId, ctx.organizationId),
       eq(autopilotFindings.status, "proposed"),
-      lt(autopilotFindings.updatedAt, cutoff)
+      or(
+        lt(autopilotFindings.openedAt, cutoff),
+        and(
+          isNull(autopilotFindings.openedAt),
+          lt(autopilotFindings.updatedAt, cutoff)
+        )
+      )
     ),
   });
   let closed = 0;
@@ -256,14 +377,36 @@ export async function closeStalePullRequests(ctx: AutopilotRunContext) {
         owner: ref.owner,
         name: ref.repo,
       });
-      const state = await wasTouched(octokit, ref);
-      if (!state.open) {
+      const { data: pull } = await octokit.request(
+        "GET /repos/{owner}/{repo}/pulls/{pull_number}",
+        { owner: ref.owner, repo: ref.repo, pull_number: ref.pullNumber }
+      );
+      if (pull.state !== "open") {
         // Merged or closed on GitHub; the regular sync records which.
         continue;
       }
-      if (state.touched) {
+      const reviewable = await reviewableSince(ctx.organizationId, finding);
+      if (reviewable.since > cutoff) {
+        if (reviewable.featureOpen) {
+          await log.decision(
+            `Kept #${ref.pullNumber} open: its feature pull request is still in progress`,
+            { url: finding.pullRequestUrl }
+          );
+        }
+        continue;
+      }
+      const events = await listPullRequestEvents(octokit, ref);
+      if (
+        await personWorksOn({
+          octokit,
+          ref,
+          draft: Boolean(pull.draft),
+          events,
+          since: cutoff,
+        })
+      ) {
         await log.decision(
-          `Kept #${ref.pullNumber} open past ${days} days: someone commented on it or pushed to it`,
+          `Kept #${ref.pullNumber} open: someone worked on it in the last ${days} days`,
           { url: finding.pullRequestUrl }
         );
         continue;
