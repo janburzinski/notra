@@ -1,6 +1,6 @@
 {
   "$schema": "https://usenotra.com/schemas/blog.json",
-  "name": "Demo",
+  "name": "Demo 12",
   "description": "Custom navbar and content buttons from the site CSS.",
   "navbar": {
     "links": [
