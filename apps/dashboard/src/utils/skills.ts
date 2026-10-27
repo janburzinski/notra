@@ -2,6 +2,7 @@ import type {
   SkillListItem,
   SkillSortKey,
   SkillSortState,
+  SkillUpstreamStatus,
 } from "@/types/skills/page";
 
 const RELATIVE_UNITS: { unit: Intl.RelativeTimeFormatUnit; ms: number }[] = [
@@ -107,4 +108,14 @@ export function toggleSkillSort(
     return { key, direction: key === "updatedAt" ? "desc" : "asc" };
   }
   return { key, direction: current.direction === "asc" ? "desc" : "asc" };
+}
+
+export function hasSkillUpdate(
+  upstream: SkillUpstreamStatus | null | undefined
+): boolean {
+  return Boolean(upstream && upstream.latestVersion > upstream.version);
+}
+
+export function skillDocument(description: string, content: string): string {
+  return `---\ndescription: ${description}\n---\n\n${content}`;
 }

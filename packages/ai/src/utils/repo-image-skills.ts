@@ -22,6 +22,7 @@ import {
   SCREENSHOT_FILENAME_PREFIX,
   URL_QUERY_OR_HASH_REGEX,
 } from "@notra/ai/constants/repo-image-skills";
+import { ensureSystemSkillRegistry } from "@notra/ai/skills/registry";
 import { db } from "@notra/db/drizzle";
 import {
   brandGuidelineAssets,
@@ -134,6 +135,10 @@ const injectBrandIdentitySkillEffect = Effect.fn("injectBrandIdentitySkill")(
 
 const injectHumanizerSkillEffect = Effect.fn("injectHumanizerSkill")(
   function* (params: { box: RepoImageBox; organizationId: string }) {
+    yield* Effect.tryPromise({
+      try: () => ensureSystemSkillRegistry(),
+      catch: toSkillInjectionError("prepare system skills"),
+    });
     const skill = yield* Effect.tryPromise({
       try: () =>
         db.query.skills.findFirst({

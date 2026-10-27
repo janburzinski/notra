@@ -56,10 +56,7 @@ export function SkillEditorForm({
           )}
         </Field>
         <Field>
-          <FieldLabel>
-            {tCommon("labels.description")}
-            <span className="text-destructive">*</span>
-          </FieldLabel>
+          <FieldLabel>{tCommon("labels.description")}</FieldLabel>
           <Textarea
             className="max-h-32 min-h-20 resize-none overflow-y-auto leading-relaxed"
             disabled={savePending}
@@ -76,11 +73,8 @@ export function SkillEditorForm({
           value={view}
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <FieldLabel>
-              {tCommon("labels.contentSingular")}
-              <span className="text-destructive">*</span>
-            </FieldLabel>
-            <TabsList variant="line">
+            <FieldLabel>{tCommon("labels.contentSingular")}</FieldLabel>
+            <TabsList>
               <TabsTrigger value={SKILL_EDITOR_VIEWS[0]}>
                 {tCommon("actions.edit")}
               </TabsTrigger>

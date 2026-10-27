@@ -2816,6 +2816,43 @@ export const contentPublications = pgTable(
   ]
 );
 
+export const systemSkills = pgTable("system_skills", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description").notNull(),
+  content: text("content").notNull(),
+  version: integer("version").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const systemSkillVersions = pgTable(
+  "system_skill_versions",
+  {
+    id: text("id").primaryKey(),
+    systemSkillId: text("system_skill_id")
+      .notNull()
+      .references(() => systemSkills.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    description: text("description").notNull(),
+    content: text("content").notNull(),
+    note: text("note"),
+    publishedByUserId: text("published_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("system_skill_versions_skill_version_uidx").on(
+      table.systemSkillId,
+      table.version
+    ),
+  ]
+);
+
 export const skills = pgTable(
   "skills",
   {
@@ -2827,6 +2864,10 @@ export const skills = pgTable(
     description: text("description").notNull(),
     content: text("content").notNull(),
     isSystem: boolean("is_system").default(false).notNull(),
+    systemSkillId: text("system_skill_id").references(() => systemSkills.id, {
+      onDelete: "set null",
+    }),
+    systemSkillVersion: integer("system_skill_version"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -2835,6 +2876,7 @@ export const skills = pgTable(
   },
   (table) => [
     uniqueIndex("skills_org_name_uidx").on(table.organizationId, table.name),
+    index("skills_system_skill_idx").on(table.systemSkillId),
   ]
 );
 
@@ -3674,7 +3716,30 @@ export const skillsRelations = relations(skills, ({ one }) => ({
     fields: [skills.organizationId],
     references: [organizations.id],
   }),
+  systemSkill: one(systemSkills, {
+    fields: [skills.systemSkillId],
+    references: [systemSkills.id],
+  }),
 }));
+
+export const systemSkillsRelations = relations(systemSkills, ({ many }) => ({
+  versions: many(systemSkillVersions),
+  copies: many(skills),
+}));
+
+export const systemSkillVersionsRelations = relations(
+  systemSkillVersions,
+  ({ one }) => ({
+    systemSkill: one(systemSkills, {
+      fields: [systemSkillVersions.systemSkillId],
+      references: [systemSkills.id],
+    }),
+    publishedBy: one(users, {
+      fields: [systemSkillVersions.publishedByUserId],
+      references: [users.id],
+    }),
+  })
+);
 
 export const geoProspectReportsRelations = relations(
   geoProspectReports,

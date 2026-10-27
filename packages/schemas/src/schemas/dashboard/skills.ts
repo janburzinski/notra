@@ -65,3 +65,11 @@ export const deleteSkillInputSchema = z.object({
 export const importSkillFromUrlInputSchema = z.object({
   url: skillImportUrlSchema,
 });
+
+export const syncSystemSkillInputSchema = z.object({
+  organizationId: organizationIdSchema,
+  name: skillNameSchema,
+  keepCustomizations: z.boolean(),
+  reviewedVersion: z.number().int().positive(),
+  reviewedUpdatedAt: z.coerce.date(),
+});

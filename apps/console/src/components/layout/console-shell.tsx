@@ -6,6 +6,7 @@ import {
   GlobeIcon,
   Logout01Icon,
   PlugSocketIcon,
+  MagicWand01Icon,
   Robot01Icon,
   SecurityCheckIcon,
   Tick02Icon,
@@ -202,6 +203,11 @@ function ConsoleNavigation({
             icon: GlobeIcon,
           },
           { href: `/${slug}/autopilot`, label: "Autopilot", icon: Robot01Icon },
+          {
+            href: `/${slug}/skills`,
+            label: "System Skills",
+            icon: MagicWand01Icon,
+          },
         ]
       : []),
   ];

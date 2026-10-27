@@ -1115,7 +1115,8 @@
       "systemSkillDelete": "System skills cannot be deleted",
       "invalidUrl": "Invalid URL",
       "urlNotSkill": "URL must point to a specific skill",
-      "noImportableFiles": "Skill has no importable files"
+      "noImportableFiles": "Skill has no importable files",
+      "updateStale": "This skill changed since you opened the update. Review it again."
     },
     "upload": {
       "svgInvalid": "This SVG file is empty or not a valid SVG",
@@ -1855,6 +1856,16 @@
     },
     "shared": {
       "createSkill": "Create skill"
+    },
+    "update": {
+      "badge": "Update available",
+      "review": "Review",
+      "title": "Version {version} is available",
+      "keep": "Keep my copy",
+      "apply": "Use version {version}",
+      "applied": "Skill updated to version {version}",
+      "kept": "Kept your copy",
+      "unchanged": "{count, plural, one {# unchanged line} other {# unchanged lines}}"
     }
   },
   "common": {

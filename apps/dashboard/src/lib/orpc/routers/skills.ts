@@ -1,5 +1,9 @@
-import { currentSkillContent } from "@notra/ai/skills/functions/current-content";
-import { ensureUnslopSkill } from "@notra/ai/skills/seed";
+import {
+  ensureSystemSkillRegistry,
+  getSkillUpstream,
+  listSkillUpstreamStatuses,
+  syncSkillToLatest,
+} from "@notra/ai/skills/registry";
 import { db } from "@notra/db/drizzle";
 import { skills } from "@notra/db/schema";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
@@ -9,6 +13,7 @@ import {
   getSkillInputSchema,
   importSkillFromUrlInputSchema,
   listSkillsInputSchema,
+  syncSystemSkillInputSchema,
   updateSkillInputSchema,
 } from "@notra/schemas/dashboard/skills";
 import { and, asc, eq } from "drizzle-orm";
@@ -68,22 +73,26 @@ export const skillsRouter = {
     .input(listSkillsInputSchema)
     .use(withOrganizationAccess)
     .handler(async ({ input }) => {
-      await ensureUnslopSkill(input.organizationId);
-      const rows = await db
-        .select({
-          id: skills.id,
-          name: skills.name,
-          description: skills.description,
-          isSystem: skills.isSystem,
-          updatedAt: skills.updatedAt,
-        })
-        .from(skills)
-        .where(eq(skills.organizationId, input.organizationId))
-        .orderBy(asc(skills.name));
+      await ensureSystemSkillRegistry();
+      const [rows, upstream] = await Promise.all([
+        db
+          .select({
+            id: skills.id,
+            name: skills.name,
+            description: skills.description,
+            isSystem: skills.isSystem,
+            updatedAt: skills.updatedAt,
+          })
+          .from(skills)
+          .where(eq(skills.organizationId, input.organizationId))
+          .orderBy(asc(skills.name)),
+        listSkillUpstreamStatuses(input.organizationId),
+      ]);
 
       return rows.map((row) => ({
         ...row,
         updatedAt: row.updatedAt.toISOString(),
+        upstream: upstream.get(row.id) ?? null,
       }));
     }),
 
@@ -91,18 +100,37 @@ export const skillsRouter = {
     .input(getSkillInputSchema)
     .use(withOrganizationAccess)
     .handler(async ({ input }) => {
-      if (input.name === "unslop") {
-        await ensureUnslopSkill(input.organizationId);
-      }
+      await ensureSystemSkillRegistry();
       const row = await db.query.skills.findFirst({
         where: skillByName(input.organizationId, input.name),
+        columns: {
+          id: true,
+          name: true,
+          description: true,
+          content: true,
+          isSystem: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       });
 
       if (!row) {
         throw notFound("Skill not found");
       }
 
-      return { ...row, content: currentSkillContent(row) };
+      const upstream = row.isSystem
+        ? await getSkillUpstream(input.organizationId, row.id)
+        : null;
+      return {
+        ...row,
+        upstream: upstream && {
+          ...upstream,
+          latest: {
+            ...upstream.latest,
+            publishedAt: upstream.latest.publishedAt.toISOString(),
+          },
+        },
+      };
     }),
 
   create: authorizedProcedure
@@ -229,6 +257,43 @@ export const skillsRouter = {
       });
 
       return { success: true as const };
+    }),
+
+  syncSystemSkill: authorizedProcedure
+    .input(syncSystemSkillInputSchema)
+    .use(withOrganizationAccess)
+    .handler(async ({ context, input }) => {
+      const row = await findSkillAccess(input.organizationId, input.name);
+      if (!row?.isSystem) {
+        throw notFound("Skill not found");
+      }
+
+      const result = await syncSkillToLatest(input.organizationId, row.id, {
+        keepCustomizations: input.keepCustomizations,
+        reviewedVersion: input.reviewedVersion,
+        reviewedUpdatedAt: input.reviewedUpdatedAt,
+      });
+      if (result.status === "not_found") {
+        throw notFound("Skill not found");
+      }
+      if (result.status === "conflict") {
+        const tErrors = await getTranslations("errors.skills");
+        throw conflict(tErrors("updateStale"));
+      }
+
+      trackServerEvent({
+        event: POSTHOG_EVENTS.SKILL_UPDATED,
+        headers: context.headers,
+        userId: context.user.id,
+        organizationId: input.organizationId,
+        properties: {
+          is_rename: false,
+          is_system: true,
+          system_update: input.keepCustomizations ? "kept" : "applied",
+        },
+      });
+
+      return result.skill;
     }),
 
   importFromUrl: authorizedProcedure
