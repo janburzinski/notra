@@ -42,6 +42,7 @@ import {
   applyContentChatToolOutputEffect,
   collectContentChatToolOutputEffects,
 } from "@/lib/content/apply-content-chat-tool-output";
+import { useChatModelEffort } from "@/lib/hooks/use-chat-model-effort";
 import { useContentDetailChatLabels } from "@/lib/hooks/use-content-detail-chat-labels";
 import type { ContentDetailDocument } from "@/lib/hooks/use-content-detail-document";
 import type { ContentChatInputHandle } from "@/types/components/chat-input";
@@ -97,6 +98,8 @@ export function useContentDetailChat({
     content,
     isGeoWriterPlanReviewableNow
   );
+  const modelEffort = useChatModelEffort();
+  const { model, thinkingLevel } = modelEffort;
   const { state: sidebarState } = useSidebar();
   const queryClient = useQueryClient();
   const { active, openPanel, closePanel } = useRightPanel();
@@ -522,6 +525,8 @@ export function useContentDetailChat({
         documentMode: isGeoWriterPlanReviewableNow ? "plan" : undefined,
         selection: nextSelection,
         context: nextContext,
+        model,
+        thinkingLevel,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
       if (files.length > 0) {
@@ -551,6 +556,8 @@ export function useContentDetailChat({
       content?.markdown,
       editedMarkdown,
       isGeoWriterPlanReviewableNow,
+      model,
+      thinkingLevel,
     ]
   );
 
@@ -835,6 +842,7 @@ export function useContentDetailChat({
     onValueChange: setChatInputValue,
     organizationId,
     organizationSlug,
+    modelEffort,
     queuedMessages,
     selection,
     value: chatInputValue,

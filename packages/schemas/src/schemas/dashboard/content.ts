@@ -1,6 +1,8 @@
 import "zod/compile";
 import {
   chatIdSchema,
+  chatModelSchema,
+  thinkingLevelSchema,
   UI_MESSAGES_MAX,
   uiMessageSchema,
 } from "@notra/ai/schemas/chat";
@@ -353,6 +355,8 @@ export const chatRequestSchema = z.object({
   documentMode: z.enum(["plan"]).optional(),
   selection: textSelectionSchema.optional(),
   context: z.array(contextItemSchema).max(50).optional(),
+  model: chatModelSchema.optional(),
+  thinkingLevel: thinkingLevelSchema.optional(),
   timezone: z.string().min(1).max(100).optional(),
 });
 

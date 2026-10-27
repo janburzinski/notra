@@ -145,6 +145,8 @@ export interface OrchestrateInput {
   imageContext?: ContentImageContext;
   selection?: TextSelection;
   context?: ContextItem[];
+  requestedModel?: string;
+  thinkingLevel?: "off" | "low" | "medium" | "high";
   maxSteps?: number;
   abortSignal?: AbortSignal;
   log?: AILogTarget;

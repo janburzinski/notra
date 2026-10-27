@@ -33,6 +33,7 @@ import {
 } from "@/lib/content-panel-tab";
 import type {
   ChatInputEditingTarget,
+  ChatInputProps,
   ContentChatInputHandle,
 } from "@/types/components/chat-input";
 
@@ -59,6 +60,7 @@ export interface ContentDetailChatComposerProps {
   organizationSlug: string;
   placeholder?: string;
   editingTarget?: ChatInputEditingTarget;
+  modelEffort: ChatInputProps["modelEffort"];
   queuedMessages: QueuedMessage[];
   selection: TextSelection | null;
   value: string;

@@ -48,6 +48,8 @@ export async function orchestrateChat(
     timezone,
     telemetryMetadata,
     documentMode,
+    requestedModel,
+    thinkingLevel = "low",
   } = input;
 
   const log = deps?.log ?? inputLog;
@@ -63,10 +65,12 @@ export async function orchestrateChat(
 
   const routingDecision = await resolveConversationRoute(
     messages,
-    undefined,
+    requestedModel,
     () =>
-      routeAutoModel(messages, hasGitHub || hasLinear, log, telemetryMetadata)
+      routeAutoModel(messages, hasGitHub || hasLinear, log, telemetryMetadata),
+    input.thinkingLevel
   );
+  routingDecision.thinkingLevel ??= thinkingLevel;
 
   const model = createModel(organizationId, routingDecision.model, log);
 
@@ -110,7 +114,7 @@ export async function orchestrateChat(
   const thinkingProviderOptions = getThinkingProviderOptions(
     routingDecision.model,
     true,
-    routingDecision.thinkingLevel ?? "low"
+    routingDecision.thinkingLevel
   );
   const stream = streamText({
     model,

@@ -148,6 +148,8 @@ export const POST = withEvlog(async function POST(
       documentMode,
       selection,
       context,
+      model,
+      thinkingLevel,
       timezone,
     } = parseResult.data;
 
@@ -216,6 +218,8 @@ export const POST = withEvlog(async function POST(
         imageContext,
         selection,
         context,
+        requestedModel: model,
+        thinkingLevel,
         maxSteps: 50,
         abortSignal: request.signal,
         log,

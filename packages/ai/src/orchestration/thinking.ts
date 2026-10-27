@@ -9,7 +9,9 @@ export function getThinkingProviderOptions(
   thinkingLevel: AutoThinkingLevel
 ): StreamProviderOptions | undefined {
   if (!enableThinking || thinkingLevel === "off") {
-    return undefined;
+    return modelId.startsWith("openai/")
+      ? { openai: { reasoningEffort: "none" } }
+      : undefined;
   }
 
   if (modelId.startsWith("anthropic/")) {

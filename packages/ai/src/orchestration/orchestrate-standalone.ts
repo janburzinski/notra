@@ -114,9 +114,12 @@ export async function orchestrateStandaloneChat(
         hasGitHub || hasLinear || hasMcp,
         log,
         telemetryMetadata
-      )
+      ),
+    input.thinkingLevel
   );
-  const autoThinkingLevel = routingDecision.thinkingLevel;
+  routingDecision.thinkingLevel = enableThinking
+    ? (routingDecision.thinkingLevel ?? thinkingLevel)
+    : "off";
 
   const model = createModel(organizationId, routingDecision.model, log);
 
@@ -205,16 +208,12 @@ export async function orchestrateStandaloneChat(
     workspace,
   });
 
-  const effectiveThinkingLevel = autoThinkingLevel ?? thinkingLevel;
-  const effectiveEnableThinking =
-    enableThinking && (autoThinkingLevel ? autoThinkingLevel !== "off" : true);
-
   const providerOptions = withRouterDefaults(
     {
       ...getThinkingProviderOptions(
         routingDecision.model,
-        effectiveEnableThinking,
-        effectiveThinkingLevel
+        enableThinking,
+        routingDecision.thinkingLevel
       ),
       gateway: { tags: ["standalone-chat"] },
     },

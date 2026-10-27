@@ -2,12 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { uiMessageSchema } from "@notra/ai/schemas/chat";
-import type {
-  ChatAttachment,
-  ChatModel,
-  ChatSessionSummary,
-  ThinkingLevel,
-} from "@notra/ai/types/chat";
+import type { ChatAttachment, ChatSessionSummary } from "@notra/ai/types/chat";
 import {
   dashboardAgentChatHistoryQueryKey,
   dashboardAgentChatSessionsQueryKey,
@@ -41,17 +36,12 @@ import { ChatSuggestions } from "@/components/chat/chat-suggestions";
 import { ContentChatActivityPanel } from "@/components/content/content-chat-activity-panel";
 import { useRightPanel } from "@/components/dashboard/right-panel-context";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import {
-  AVAILABLE_MODELS,
-  ZDR_AVAILABLE_MODELS,
-} from "@/constants/chat-models";
 import { DASHBOARD_AGENT_SUGGESTIONS } from "@/constants/chat-suggestions";
 import { localStorageKeys } from "@/constants/storage";
 import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
+import { useChatModelEffort } from "@/lib/hooks/use-chat-model-effort";
 import { useDesktopBreakpoint } from "@/lib/hooks/use-desktop-breakpoint";
-import { useHasZdrEntitlement } from "@/lib/hooks/use-plan";
-import { useStoredChatPreferences } from "@/lib/hooks/use-stored-chat-preferences";
 import { usePathname, useRouter } from "@/lib/navigation";
 import { dashboardOrpcClient } from "@/lib/orpc/client";
 import type { ContentChatInputHandle } from "@/types/components/chat-input";
@@ -95,17 +85,8 @@ function DashboardAgentChat({
   const closeAfterNavigationRef = useRef(false);
   const { projectId: activeProjectId, isResolved: isProjectResolved } =
     useActiveProject();
-  const { canUseNonZdr } = useHasZdrEntitlement();
-  const availableModels = canUseNonZdr
-    ? AVAILABLE_MODELS
-    : ZDR_AVAILABLE_MODELS;
-  const { preferences, update: updatePreferences } = useStoredChatPreferences();
-  const { thinkingLevel } = preferences;
-  const effectiveModel = availableModels.some(
-    (option) => option.id === preferences.model
-  )
-    ? preferences.model
-    : "auto";
+  const modelEffort = useChatModelEffort();
+  const { model: effectiveModel, thinkingLevel } = modelEffort;
   const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
   const queuedMessagesRef = useRef<QueuedMessage[]>([]);
   const steerAfterStopRef = useRef<QueuedMessage | null>(null);
@@ -565,14 +546,6 @@ function DashboardAgentChat({
     drainQueueRef.current();
   };
 
-  const handleModelChange = (model: ChatModel) => {
-    updatePreferences({ model });
-  };
-
-  const handleThinkingLevelChange = (level: ThinkingLevel) => {
-    updatePreferences({ thinkingLevel: level });
-  };
-
   const handleSuggestionSelect = (prompt: string) => {
     setChatInputValue(prompt);
   };
@@ -649,13 +622,7 @@ function DashboardAgentChat({
               disabled={isChatDisabled}
               error={chatError}
               isLoading={isAgentBusy}
-              modelEffort={{
-                availableModels,
-                model: effectiveModel,
-                onModelChange: handleModelChange,
-                onThinkingLevelChange: handleThinkingLevelChange,
-                thinkingLevel,
-              }}
+              modelEffort={modelEffort}
               onClearError={() => setChatError(null)}
               onEditQueued={handleEditQueued}
               onRemoveQueued={handleRemoveQueued}
