@@ -1,0 +1,31 @@
+packages/workflows/src/runtime/scheduler.ts
+  s_985d322a22a6f8::t_f5be63f0b0c1ed 101-108
+packages/workflows/tests/interpreter.test.ts
+  s_985d322a22a6f8::t_2025c4c55ed5c8 110-157
+packages/workflows/src/runtime/interpreter.ts
+  s_985d322a22a6f8::t_02fadd51f71b35 190-197
+apps/ai-traffic-ingest/Dockerfile
+  s_985d322a22a6f8::t_89b3fa162574a1 31,36
+apps/api/Dockerfile
+  s_985d322a22a6f8::t_89b3fa162574a1 39,50
+apps/dashboard/src/lib/autopilot/start.ts
+  s_985d322a22a6f8::t_641563391f89b8 1
+  s_985d322a22a6f8::t_891ad11cb512a3 31,42
+  s_985d322a22a6f8::t_16eff7b0006fe7 60-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "802477ec9523d39f6bcf2542b60b64be920976ca",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
