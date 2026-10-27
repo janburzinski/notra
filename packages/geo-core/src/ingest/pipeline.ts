@@ -394,6 +394,12 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
   if (!(isAi || countsVisitors)) {
     return droppedResult(identity, classification.visitorType, "visitor_type");
   }
+  if (
+    classification.visitorType === "ai_referral" &&
+    payload.visitorConsent === false
+  ) {
+    return droppedResult(identity, classification.visitorType, "consent");
+  }
 
   if (isAi) {
     yield* enforceRateLimit(

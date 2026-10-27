@@ -6,6 +6,8 @@ import {
   testInIsolatedProcess,
 } from "./utils/isolated-process";
 
+process.env.GEO_INGEST_SECRET = "test-secret";
+
 mock.module("@notra/ai/utils/redis", () => ({ redis: null }));
 if (!isIsolatedTestWorker(import.meta.url)) {
   testInIsolatedProcess(

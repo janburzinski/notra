@@ -62,7 +62,10 @@ export function buildGeoTrafficEvent(
     host: url.hostname,
     method: payload.method.toUpperCase(),
     referer: sanitizeGeoReferer(payload.referer),
-    ua: (payload.userAgent ?? "").slice(0, GEO_MAX_STORED_UA_LENGTH),
+    ua:
+      classification.visitorType === "ai_referral"
+        ? ""
+        : (payload.userAgent ?? "").slice(0, GEO_MAX_STORED_UA_LENGTH),
     country: payload.geo?.country ?? "",
     language: toLanguage(payload.acceptLanguage),
     request_id: payload.requestId ?? "",

@@ -44,7 +44,7 @@ Customers serving Markdown to agents rewrite internal links with `?ntr=<id>` (`t
 
 ### `f_<hash>` — fingerprint (fuzzy fallback)
 
-For untagged traffic, computed ONLY for `crawler`-classified events (humans are never fingerprinted):
+For untagged traffic, computed ONLY for `crawler`-classified events (no journey fingerprint is computed for humans):
 
 ```
 HMAC-SHA256(secret + "|" + utcDay, source + "|" + ipKey + "|" + timeBucket)[:16]
@@ -58,7 +58,9 @@ HMAC-SHA256(secret + "|" + utcDay, source + "|" + ipKey + "|" + timeBucket)[:16]
 
 ## Privacy posture (why legal is fine with this)
 
-Server-side observation only (no device access, so no consent banner under ePrivacy), legitimate-interest basis, raw IP transient, fingerprints salted + rotating + crawler-only, identifiers expire in minutes. See `~/Documents/notra-dpa-briefing.md` for the DPA context.
+Server-side observation only (no device access, so no consent banner under ePrivacy), legitimate-interest basis, raw IP transient, journey fingerprints salted + rotating + crawler-only, identifiers expire in minutes.
+
+Human visitors on Sites are counted with a visitor id of `HMAC-SHA256(secret + "|web|" + utcDay, scope + "|" + ip + "|" + userAgent)`: salted with the ingest secret and rotated daily, so it cannot link a visitor across days or sites. No visitor id is computed and no web page view is stored when the ingest secret is unset. Visits sent with `visitorConsent: false` are not counted, and AI referral clicks from those visitors are dropped. AI referral rows in `geo_traffic_events` never store the user agent.
 
 ## Where data lands
 

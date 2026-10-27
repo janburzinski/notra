@@ -39,8 +39,11 @@ export function webVisitorId(
   ip: string | undefined,
   userAgent: string | undefined,
   capturedAt: Date
-): string {
-  const secret = getGeoIngestSecret() ?? "";
+): string | null {
+  const secret = getGeoIngestSecret();
+  if (!secret) {
+    return null;
+  }
   const day = capturedAt.toISOString().slice(0, ISO_DATE_LENGTH);
   return createHmac("sha256", `${secret}|web|${day}`)
     .update(`${scope}|${ip ?? ""}|${userAgent ?? ""}`)
@@ -159,6 +162,9 @@ export async function buildWebPageView(
     payload.userAgent,
     capturedAt
   );
+  if (!visitorId) {
+    return null;
+  }
   const referrer = classifyWebReferrer(
     payload.referer,
     url.hostname.toLowerCase(),

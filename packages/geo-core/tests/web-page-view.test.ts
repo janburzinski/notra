@@ -9,6 +9,8 @@ import type { WebPageViewInput } from "../src/types/ingest";
 import { isHumanPageView } from "../src/utils/web-page-view";
 import { CHROME } from "./constants/web-page-view";
 
+process.env.GEO_INGEST_SECRET = "test-secret";
+
 function input(overrides: Partial<WebPageViewInput> = {}): WebPageViewInput {
   return {
     identity: { organizationId: "org", projectId: "prj", generation: 1 },

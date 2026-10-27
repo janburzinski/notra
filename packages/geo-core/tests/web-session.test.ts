@@ -10,6 +10,8 @@ import {
   testInIsolatedProcess,
 } from "./utils/isolated-process";
 
+process.env.GEO_INGEST_SECRET = "test-secret";
+
 function view(path: string, referer?: string): WebPageViewInput {
   const url = new URL(`https://acme.com${path}`);
   return {
