@@ -282,7 +282,7 @@ export function SiteFooterFields({
         icon={Share08Icon}
         title={t("socials")}
       >
-        <div className="space-y-4">
+        <div className="grid gap-4">
           {form.footerSocials.map((social) => (
             <SocialRow
               key={social.id}
@@ -306,6 +306,7 @@ export function SiteFooterFields({
           {available.length > 0 ? (
             <DropdownMenu>
               <DropdownMenuTrigger
+                className="w-fit"
                 render={<Button size="sm" type="button" variant="outline" />}
               >
                 <HugeiconsIcon
