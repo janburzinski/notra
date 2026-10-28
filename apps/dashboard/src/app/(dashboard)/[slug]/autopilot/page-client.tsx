@@ -8,7 +8,6 @@ import {
   WorkflowSquare03Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AUTOPILOT_SCHEDULED_TRIGGERS } from "@notra/db/constants/autopilot";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   IconTabsList,
@@ -57,6 +56,7 @@ import type {
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
+import { isScheduledRunInProgress } from "@/utils/autopilot-automations";
 import { isListedPullRequest } from "@/utils/autopilot-findings";
 
 export default function PageClient({
@@ -125,11 +125,7 @@ function AutopilotOverviewPage({
     void setLink(null);
   }, [canManage, findings, link, setLink, setTab]);
 
-  const isRunning = runs.some(
-    (run) =>
-      run.status === "running" &&
-      (AUTOPILOT_SCHEDULED_TRIGGERS as readonly string[]).includes(run.trigger)
-  );
+  const isRunning = isScheduledRunInProgress(runs);
 
   if (!settings.enabled) {
     return (
@@ -257,7 +253,10 @@ function AutopilotOverviewPage({
             onOpenAutomation={(kind) =>
               router.push(`${basePath}/${AUTOPILOT_AUTOMATION_SLUGS[kind]}`)
             }
+            onRunAutomation={(kind) => runNow.mutate(kind)}
             organizationId={organizationId}
+            runDisabled={isRunning || runNow.isPending}
+            runningKind={runNow.isPending ? (runNow.variables ?? null) : null}
           />
           <AutopilotTemplatesSection
             {...templateActions}

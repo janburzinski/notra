@@ -47,6 +47,10 @@ export interface AutopilotAutomationsOverviewProps {
   addingKind: AutopilotAutomationKind | null;
   onOpenAutomation: (kind: AutopilotAutomationKind) => void;
   onAddAutomation: (kind: AutopilotAutomationKind) => void;
+  onRunAutomation: (kind: AutopilotAutomationKind) => void;
+  /** The automation being started right now, if any. */
+  runningKind: AutopilotAutomationKind | null;
+  runDisabled: boolean;
 }
 
 export interface AutopilotPeriodSelectProps {

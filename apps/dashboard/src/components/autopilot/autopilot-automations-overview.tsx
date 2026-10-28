@@ -1,6 +1,10 @@
 "use client";
 
-import { Add01Icon, WorkflowSquare03Icon } from "@hugeicons/core-free-icons";
+import {
+  Add01Icon,
+  PlayIcon,
+  WorkflowSquare03Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DropdownMenu,
@@ -44,6 +48,9 @@ export function AutopilotAutomationsOverview({
   addingKind,
   onOpenAutomation,
   onAddAutomation,
+  onRunAutomation,
+  runningKind,
+  runDisabled,
 }: AutopilotAutomationsOverviewProps) {
   const query = useQuery({
     ...dashboardOrpc.autopilot.metrics.queryOptions({
@@ -115,6 +122,29 @@ export function AutopilotAutomationsOverview({
         <span className="tabular-nums">{formatNumber(row.creditsPerRun)}</span>
       ),
     },
+    ...(canManage
+      ? [
+          {
+            key: "actions",
+            header: <span className="sr-only">Actions</span>,
+            width: "6rem",
+            align: "right",
+            cell: (row) => (
+              <Button
+                aria-label={`Run ${AUTOPILOT_AUTOMATIONS[row.kind].name}`}
+                disabled={runDisabled}
+                loading={runningKind === row.kind}
+                onClick={() => onRunAutomation(row.kind)}
+                size="xs"
+                variant="outline"
+              >
+                <HugeiconsIcon icon={PlayIcon} size={14} />
+                Run
+              </Button>
+            ),
+          } satisfies TableColumn<AutopilotAutomationRow>,
+        ]
+      : []),
   ];
 
   const addMenu =

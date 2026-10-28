@@ -19,13 +19,16 @@ export async function autopilotWorkflow(
 ): Promise<AutopilotWorkflowResult> {
   "use workflow";
 
-  const { organizationId, runId, previousRunAt } = payload;
+  const { organizationId, runId, previousRunAt, kind } = payload;
+  const scheduled = !kind;
   const results: AutopilotJobResult[] = [];
   try {
     // First, so closed drafts free up the open pull request limit for today.
-    await closeStalePullRequestsStep(organizationId, runId);
-    for (const kind of AUTOPILOT_JOB_KINDS) {
-      results.push(await runAutopilotJobStep(organizationId, runId, kind));
+    if (scheduled) {
+      await closeStalePullRequestsStep(organizationId, runId);
+    }
+    for (const job of kind ? [kind] : AUTOPILOT_JOB_KINDS) {
+      results.push(await runAutopilotJobStep(organizationId, runId, job));
     }
     // Keywords and commits only observe; one planning step links and acts.
     results.push(
@@ -46,6 +49,7 @@ export async function autopilotWorkflow(
       runId,
       results,
       slackMessageTs,
+      scheduled,
     });
     return {
       status: "completed",
@@ -60,6 +64,7 @@ export async function autopilotWorkflow(
       results,
       slackMessageTs: null,
       error: message,
+      scheduled,
     });
     return { status: "failed", runId, error: message };
   }

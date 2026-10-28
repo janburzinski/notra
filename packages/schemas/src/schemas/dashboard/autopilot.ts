@@ -185,4 +185,6 @@ export const autopilotJobDecisionsInputSchema =
 export const autopilotRunNowInputSchema =
   autopilotOrganizationInputSchema.extend({
     trigger: z.enum(["manual", "onboarding"]).default("manual"),
+    /** Runs only this job instead of every job. */
+    kind: z.enum(AUTOPILOT_JOB_KINDS).optional(),
   });

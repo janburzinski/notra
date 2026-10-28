@@ -52,13 +52,18 @@ export function useAutopilotActions(organizationId: string) {
     queryClient.invalidateQueries({ queryKey: dashboardOrpc.autopilot.key() });
 
   const runNow = useMutation({
-    mutationFn: () => dashboardOrpc.autopilot.runNow.call({ organizationId }),
-    onSuccess: (result) => {
-      toast.success(
-        result.alreadyRunning
-          ? "Autopilot is already running"
-          : "Autopilot is checking your site now"
-      );
+    mutationFn: (kind?: AutopilotAutomationKind) =>
+      dashboardOrpc.autopilot.runNow.call({ organizationId, kind }),
+    onSuccess: (result, kind) => {
+      if (result.alreadyRunning) {
+        toast.success("Autopilot is already running");
+      } else {
+        toast.success(
+          kind
+            ? `${AUTOPILOT_AUTOMATIONS[kind].name} is running now`
+            : "Autopilot is checking your site now"
+        );
+      }
       invalidate();
     },
     onError: (error) =>

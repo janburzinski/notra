@@ -1,5 +1,6 @@
 import { db } from "@notra/db/drizzle";
 import { autopilotRuns, autopilotSettings } from "@notra/db/schema";
+import type { AutopilotJobKind } from "@notra/db/types/autopilot";
 import { and, eq } from "drizzle-orm";
 
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
@@ -9,7 +10,8 @@ import type { AutopilotRunTrigger } from "@/types/autopilot-runtime";
 
 export async function startAutopilot(
   organizationId: string,
-  trigger: AutopilotRunTrigger
+  trigger: AutopilotRunTrigger,
+  kind?: AutopilotJobKind
 ): Promise<{ runId: string; alreadyRunning: boolean }> {
   // Every run starts here, so a workspace without the flag never runs one.
   if (!(await isAutopilotEnabledForOrganization(organizationId))) {
@@ -30,7 +32,8 @@ export async function startAutopilot(
     await startAutopilotWorkflowRun({
       organizationId,
       runId: claim.runId,
-      previousRunAt: settings?.lastRunAt?.toISOString() ?? null,
+      kind,
+      previousRunAt: kind ? null : (settings.lastRunAt?.toISOString() ?? null),
     });
   } catch (error) {
     await db

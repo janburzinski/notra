@@ -64,6 +64,7 @@ export async function finishAutopilotRunStep(params: {
   results: AutopilotJobResult[];
   slackMessageTs: string | null;
   error?: string;
+  scheduled?: boolean;
 }): Promise<void> {
   "use step";
   await finishAutopilotRun(params);

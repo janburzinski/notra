@@ -92,6 +92,8 @@ export interface AutopilotRunObservation extends AutopilotObservation {
 export interface AutopilotWorkflowPayload {
   organizationId: string;
   runId: string;
+  /** Runs only this job; omitted for a full run. */
+  kind?: AutopilotJobKind;
 }
 
 export interface AutopilotSuggestionWorkflowPayload {

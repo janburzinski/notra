@@ -1,5 +1,7 @@
 "use client";
 
+import { PlayIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +17,7 @@ import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell"
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTrend } from "@/components/autopilot/autopilot-trend";
+import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import {
   AUTOPILOT_FROM_PARAM,
@@ -33,7 +36,10 @@ import type {
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
-import { automationKindFromSlug } from "@/utils/autopilot-automations";
+import {
+  automationKindFromSlug,
+  isScheduledRunInProgress,
+} from "@/utils/autopilot-automations";
 
 export default function PageClient({
   organizationSlug,
@@ -72,7 +78,7 @@ function AutomationPage({
 }: AutopilotAutomationPageProps) {
   const automation = AUTOPILOT_AUTOMATIONS[kind];
   const router = useRouter();
-  const { setJob, writeSuggestion, merge } =
+  const { runNow, setJob, writeSuggestion, merge } =
     useAutopilotActions(organizationId);
   const [pending, setPending] = useState<AutopilotPendingFindingAction | null>(
     null
@@ -91,6 +97,7 @@ function AutomationPage({
   );
   const findings = overview.findings.filter((finding) => finding.kind === kind);
   const enabled = overview.settings.jobs[kind];
+  const isRunning = isScheduledRunInProgress(overview.runs);
   const stats = [
     {
       label: "Pull requests opened",
@@ -127,16 +134,30 @@ function AutomationPage({
       <div className="space-y-4">
         <AutopilotBackLink slug={organizationSlug} />
         <PageHeading title={automation.name}>
-          <label className="flex items-center gap-2 text-sm font-medium">
-            {enabled ? "On" : "Off"}
-            <Switch
-              checked={enabled}
-              disabled={!overview.canManage || setJob.isPending}
-              onCheckedChange={(checked) =>
-                setJob.mutate({ kind, enabled: checked })
-              }
-            />
-          </label>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-sm font-medium">
+              {enabled ? "On" : "Off"}
+              <Switch
+                checked={enabled}
+                disabled={!overview.canManage || setJob.isPending}
+                onCheckedChange={(checked) =>
+                  setJob.mutate({ kind, enabled: checked })
+                }
+              />
+            </label>
+            {overview.canManage ? (
+              <Button
+                disabled={!(enabled && overview.settings.enabled) || isRunning}
+                loading={runNow.isPending || isRunning}
+                onClick={() => runNow.mutate(kind)}
+                size="sm"
+                variant="outline"
+              >
+                <HugeiconsIcon icon={PlayIcon} size={16} />
+                Run now
+              </Button>
+            ) : null}
+          </div>
         </PageHeading>
       </div>
       <AutopilotAutomationStatus

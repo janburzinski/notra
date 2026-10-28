@@ -41,9 +41,14 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
 } else {
   const sandbox = await createAutopilotSandbox();
   const db = sandbox.db;
-  const startup = { finishBeforeError: false, flag: true };
+  const startup = {
+    finishBeforeError: false,
+    flag: true,
+    launched: null as Record<string, unknown> | null,
+  };
   mock.module("@/lib/workflows/start", () => ({
     startAutopilotWorkflowRun: async (input: { runId: string }) => {
+      startup.launched = input;
       if (startup.finishBeforeError) {
         await db
           .update(autopilotRuns)
@@ -58,15 +63,23 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     isAutopilotEnabledForOrganization: async () => startup.flag,
   }));
   const emptyJob = async () => ({ findingIds: [], insights: [] });
+  const ranJobs: string[] = [];
+  const recordedJob = (kind: string) => () => {
+    ranJobs.push(kind);
+    return emptyJob();
+  };
   mock.module("@/lib/autopilot/blog", () => ({
-    runCommitsJob: emptyJob,
-    runKeywordsJob: emptyJob,
-    runCompetitorsJob: emptyJob,
+    runCommitsJob: recordedJob("commits"),
+    runKeywordsJob: recordedJob("keywords"),
+    runCompetitorsJob: recordedJob("competitors"),
   }));
   mock.module("@/lib/autopilot/readiness", () => ({
-    runReadinessJob: emptyJob,
+    runReadinessJob: recordedJob("readiness"),
   }));
-  mock.module("@/lib/autopilot/prompts", () => ({ runPromptsJob: emptyJob }));
+  mock.module("@/lib/autopilot/prompts", () => ({
+    runPromptsJob: recordedJob("prompts"),
+  }));
+  mock.module("@/workflows/runtime", () => ({}));
   // Planning is covered by autopilot-flow; here the jobs observe nothing.
   mock.module("@/lib/autopilot/planner", () => ({
     runAutopilotPlanner: emptyJob,
@@ -75,6 +88,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     resolveGitHubMentionAuth: async () => null,
   }));
   mock.module("@/lib/autopilot/github", () => ({
+    AutopilotRepositoryAccessError: class extends Error {},
     getRepositoryOctokit: async () => {
       throw new Error("Network is forbidden in the sandbox");
     },
@@ -102,6 +116,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   const { postAutopilotBrief, buildAutopilotBrief } =
     await import("../src/lib/autopilot/brief");
   const { startAutopilot } = await import("../src/lib/autopilot/start");
+  const { autopilotWorkflow } = await import("../src/workflows/autopilot");
   const {
     renewAutopilotFindingLease,
     renewAutopilotRunLease,
@@ -153,6 +168,8 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
   beforeEach(async () => {
     startup.finishBeforeError = false;
     startup.flag = true;
+    startup.launched = null;
+    ranJobs.length = 0;
     await sandbox.postgres.exec(
       'TRUNCATE "autopilot_runs" CASCADE; TRUNCATE "autopilot_settings" CASCADE;'
     );
@@ -571,6 +588,65 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
         where: eq(autopilotRuns.trigger, "manual"),
       })
     ).toHaveLength(0);
+  });
+
+  test("Run now on one automation runs only that job and keeps the daily schedule", async () => {
+    await db
+      .insert(autopilotSettings)
+      .values({ organizationId: "sandbox-org", enabled: true, lastRunAt: old });
+    const { runId } = await startAutopilot("sandbox-org", "manual", "keywords");
+    expect(startup.launched).toEqual({
+      organizationId: "sandbox-org",
+      runId,
+      kind: "keywords",
+      previousRunAt: null,
+    });
+    const result = await autopilotWorkflow({
+      organizationId: "sandbox-org",
+      runId,
+      kind: "keywords",
+      previousRunAt: null,
+    });
+    expect(result.status).toBe("completed");
+    expect(ranJobs).toEqual(["keywords"]);
+    expect(
+      (
+        await db.query.autopilotRuns.findFirst({
+          where: eq(autopilotRuns.id, runId),
+        })
+      )?.status
+    ).toBe("completed");
+    expect(
+      (await db.query.autopilotSettings.findFirst())?.lastRunAt?.getTime()
+    ).toBe(old.getTime());
+  });
+
+  test("a full Run now still runs every job and advances the daily schedule", async () => {
+    await db
+      .insert(autopilotSettings)
+      .values({ organizationId: "sandbox-org", enabled: true, lastRunAt: old });
+    const { runId } = await startAutopilot("sandbox-org", "manual");
+    expect(startup.launched).toEqual({
+      organizationId: "sandbox-org",
+      runId,
+      previousRunAt: old.toISOString(),
+    });
+    const result = await autopilotWorkflow({
+      organizationId: "sandbox-org",
+      runId,
+      previousRunAt: old.toISOString(),
+    });
+    expect(result.status).toBe("completed");
+    expect(ranJobs).toEqual([
+      "readiness",
+      "keywords",
+      "commits",
+      "prompts",
+      "competitors",
+    ]);
+    expect(
+      (await db.query.autopilotSettings.findFirst())?.lastRunAt?.getTime()
+    ).toBeGreaterThan(old.getTime());
   });
 
   test("dead suggestions recover without touching other workspaces or merged history", async () => {

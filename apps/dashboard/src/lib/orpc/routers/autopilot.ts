@@ -400,7 +400,11 @@ export const autopilotRouter = {
     .handler(async ({ input, context }) => {
       assertCanManageAutopilot(context);
       try {
-        return await startAutopilot(input.organizationId, input.trigger);
+        return await startAutopilot(
+          input.organizationId,
+          input.trigger,
+          input.kind
+        );
       } catch (error) {
         throw badRequest(errorMessage(error));
       }
