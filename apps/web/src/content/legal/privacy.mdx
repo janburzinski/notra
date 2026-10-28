@@ -2,7 +2,7 @@
 title: Privacy Policy
 ---
 
-**Last updated: October 27, 2026**
+**Last updated: October 28, 2026**
 
 ## 1. Privacy Statement
 
@@ -30,7 +30,11 @@ The Service is not intended for individuals under the age of 13. If you are unde
 
 We use functional and session cookies for authentication and session management. Analytics tools may also use cookies or browser storage to recognize a browser or session and associate usage events.
 
-For analytics, we use [databuddy](https://databuddy.cc), a cookie-free, GDPR-compliant analytics service. databuddy does not use cookies. For general website analytics through databuddy, we do not send direct identifiers such as your name or email address. To measure signup conversion and onboarding performance, we may send limited pseudonymous event data such as internal user ID, organization ID, signup method, selected plan, and experiment variant. We do not use databuddy for advertising profiles or third-party ad targeting. This cookie-free description applies to databuddy, not to every analytics tool used by Notra.
+For analytics, we use [databuddy](https://databuddy.cc), a cookie-free, GDPR-compliant analytics service. databuddy does not use cookies. For general website analytics through databuddy, we do not send direct identifiers such as your name or email address. To measure signup conversion and onboarding performance, we may send limited pseudonymous event data such as internal user ID, organization ID, signup method, selected plan and experiment variant.
+
+**A/B testing and revenue attribution:** We sometimes show different versions of our website to different visitors to learn which one works better. databuddy assigns each browser a random pseudonymous visitor ID, stored in your browser's local storage, and uses it to keep showing you the same version. When you follow a signup link from our website to the Notra app, we pass this visitor ID and the version you saw in the link so we can connect the visit to a signup. When you start a paid subscription, we attach the visitor ID, session ID and version to the subscription record in Stripe. Stripe then shares the payment amount, currency, plan and refund status with databuddy so we can measure which version of our website leads to paid subscriptions. databuddy does not receive your card details, name or email address for this purpose.
+
+We do not use databuddy for advertising profiles or third-party ad targeting. This cookie-free description applies to databuddy, not to every analytics tool used by Notra.
 
 **PostHog analytics:** We use [PostHog](https://posthog.com/privacy) for product analytics, page views, feature and workflow usage, error tracking, and troubleshooting. Data can include browser and device information, page paths, interaction and error events, timestamps, session identifiers, and internal user, workspace, and project identifiers. Server-side usage events can also include AI model identifiers, token counts, credit usage, and costs. Events can be associated with your signed-in account. The dashboard identifies signed-in users by internal user ID. It also sends your name and email to PostHog when your Hide Personal Data setting is turned off. PostHog may use cookies and browser storage to maintain analytics identifiers.
 
@@ -81,8 +85,8 @@ We use the following third-party services to operate and improve the Service:
 - **Cloudflare** — DNS, CDN and network proxy for our domains, hosting for Notra Sites and file storage
 - **Upstash** — Redis database and message queues
 - **Tinybird** — Storage and analysis of AI traffic logs, Notra Sites visitor analytics and social media analytics
-- **[Autumn](https://useautumn.com)** — Subscription billing (powered by Stripe)
-- **[databuddy](https://databuddy.cc)** — Cookie-free, GDPR-compliant analytics and signup attribution
+- **[Autumn](https://useautumn.com)** — Subscription billing (powered by Stripe), including the pseudonymous attribution data described above
+- **[databuddy](https://databuddy.cc)** — Cookie-free, GDPR-compliant analytics, A/B testing, signup attribution and revenue attribution
 - **[Dub](https://dub.co/legal/privacy)** — Partner referral attribution and commission tracking
 - **GitHub** — OAuth authentication and repository integration
 - **Google** — OAuth authentication

@@ -19,6 +19,8 @@ export interface MarketingAttribution {
   landingPageH1Copy?: string;
   signupMethod?: "email" | "google" | "github";
   signupCompletedTracked?: boolean;
+  anonId?: string;
+  sessionId?: string;
 }
 
 interface MarketingAttributionValues {
@@ -69,6 +71,8 @@ export function readMarketingAttributionFromStorage(): MarketingAttribution {
       landingPageH1Copy: parsed.landingPageH1Copy,
       signupMethod: normalizeSignupMethod(parsed.signupMethod),
       signupCompletedTracked: parsed.signupCompletedTracked === true,
+      anonId: parsed.anonId,
+      sessionId: parsed.sessionId,
     };
   } catch {
     return {};
@@ -82,8 +86,12 @@ export function persistMarketingAttribution(
     return updates;
   }
 
+  const stored = readMarketingAttributionFromStorage();
+  const searchParams = new URLSearchParams(window.location.search);
   const nextValue = {
-    ...readMarketingAttributionFromStorage(),
+    ...stored,
+    anonId: searchParams.get("anonId") ?? stored.anonId,
+    sessionId: searchParams.get("sessionId") ?? stored.sessionId,
     ...updates,
   };
 

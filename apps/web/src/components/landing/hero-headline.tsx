@@ -11,13 +11,10 @@ import {
 import { createElement, useSyncExternalStore, type ReactNode } from "react";
 
 import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
-import {
-  HERO_HEADLINE_LINE_ONE,
-  HERO_HEADLINE_LINE_TWO_PREFIX,
-  HERO_HEADLINE_SUFFIX,
-} from "@/constants/landing/hero";
+import { HERO_HEADLINE_SUFFIX } from "@/constants/landing/hero";
 import type {
   CycleMarkProps,
+  HeroHeadlineBrand,
   HeroCycleWord,
   HeroHeadlineProps,
 } from "@/types/landing/hero";
@@ -88,9 +85,11 @@ export function HeadlineFlow({
 
 function HeadlineLineTwo({
   word,
+  prefix,
   animated,
 }: {
   word: HeroCycleWord;
+  prefix: string;
   animated: boolean;
 }) {
   const morph = useIsClient();
@@ -107,7 +106,7 @@ function HeadlineLineTwo({
   );
   const line = (
     <>
-      {HERO_HEADLINE_LINE_TWO_PREFIX}
+      {prefix}
       <EngineMark animated={animated} engine={word.engine} />
       {name}
       {HERO_HEADLINE_SUFFIX}
@@ -129,16 +128,42 @@ function HeadlineLineTwo({
   );
 }
 
-export function HeroHeadline({ word }: HeroHeadlineProps) {
+function HeadlineLineOne({ line }: { line: string | HeroHeadlineBrand }) {
+  if (typeof line === "string") {
+    return line;
+  }
+
+  const Icon = line.icon;
+
+  return (
+    <>
+      {line.before}
+      <CycleMark animated={false} markKey={line.name}>
+        <Icon aria-hidden="true" className="size-full" />
+      </CycleMark>
+      <span className="ml-[0.16em]">{line.name}</span> {line.after}
+    </>
+  );
+}
+
+export function HeroHeadline({
+  word,
+  lineOne,
+  lineTwoPrefix,
+}: HeroHeadlineProps) {
   const animated = useReducedMotion() === false;
 
   return (
     <LazyMotion features={domAnimation}>
       <h1 className="font-display -mx-3 w-fit max-w-none text-center text-[clamp(1.625rem,calc(11.2vw_-_0.5rem),2.5rem)] leading-[1.08] font-medium tracking-[-0.015em] text-[#1E1E1E] sm:mx-auto sm:max-w-[56.875rem] sm:text-[clamp(3.25rem,7.3vw,4rem)] sm:font-semibold lg:text-[4.75rem] lg:leading-[1.12] dark:text-white">
         <span className="block whitespace-nowrap">
-          {HERO_HEADLINE_LINE_ONE}
+          <HeadlineLineOne line={lineOne} />
         </span>
-        <HeadlineLineTwo animated={animated} word={word} />
+        <HeadlineLineTwo
+          animated={animated}
+          prefix={lineTwoPrefix}
+          word={word}
+        />
       </h1>
     </LazyMotion>
   );
