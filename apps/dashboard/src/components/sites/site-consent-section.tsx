@@ -1,10 +1,15 @@
 "use client";
 
+import { CookieIcon } from "@hugeicons/core-free-icons";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { SiteIntegrationRow } from "@/components/sites/site-integration-row";
 import { SiteInthDialog } from "@/components/sites/site-inth-dialog";
+import {
+  SiteSettingsGroup,
+  SiteSettingsList,
+} from "@/components/sites/site-settings-item";
 import { INTH_PROVIDER } from "@/constants/site-consent";
 import { useSearchParams } from "@/lib/navigation";
 import type { SiteConsentSectionProps } from "@/types/components/sites";
@@ -24,12 +29,11 @@ export function SiteConsentSection({
   );
 
   return (
-    <section className="space-y-3" aria-labelledby="site-consent-heading">
-      <h2 className="font-medium" id="site-consent-heading">
-        {t("title")}
-      </h2>
-      <div className="grid grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2">
+    <SiteSettingsGroup icon={CookieIcon} title={t("title")}>
+      <SiteSettingsList>
         <SiteIntegrationRow
+          addAriaLabel={t("connect")}
+          addLabel={t("connectShort")}
           description={t("description")}
           disabled={disabled}
           isSetUp={isSetUp}
@@ -37,7 +41,7 @@ export function SiteConsentSection({
           onOpen={() => setOpen(true)}
           provider={INTH_PROVIDER}
         />
-      </div>
+      </SiteSettingsList>
       <SiteInthDialog
         branch={branch}
         isSetUp={isSetUp}
@@ -45,6 +49,6 @@ export function SiteConsentSection({
         onOpenChange={setOpen}
         open={open}
       />
-    </section>
+    </SiteSettingsGroup>
   );
 }

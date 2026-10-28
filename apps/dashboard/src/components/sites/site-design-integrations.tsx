@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert02Icon } from "@hugeicons/core-free-icons";
+import { Alert02Icon, Analytics01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   c15tSchema,
@@ -20,6 +20,10 @@ import { Button } from "@/components/button";
 import { SiteConsentSection } from "@/components/sites/site-consent-section";
 import { SiteIntegrationDialog } from "@/components/sites/site-integration-dialog";
 import { SiteIntegrationRow } from "@/components/sites/site-integration-row";
+import {
+  SiteSettingsGroup,
+  SiteSettingsList,
+} from "@/components/sites/site-settings-item";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
 import { SITE_INTEGRATION_PROVIDERS } from "@/constants/site-integrations";
 import {
@@ -86,11 +90,8 @@ export function SiteDesignIntegrations() {
         </Alert>
       ) : null}
 
-      <section className="space-y-3" aria-labelledby="site-analytics-heading">
-        <h2 className="text-sm font-medium" id="site-analytics-heading">
-          {t("analyticsTitle")}
-        </h2>
-        <div className="grid grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2">
+      <SiteSettingsGroup icon={Analytics01Icon} title={t("analyticsTitle")}>
+        <SiteSettingsList>
           {SITE_INTEGRATION_PROVIDERS.map((provider) => (
             <SiteIntegrationRow
               description={t(`providers.${provider.id}`)}
@@ -119,8 +120,8 @@ export function SiteDesignIntegrations() {
               provider={provider}
             />
           ))}
-        </div>
-      </section>
+        </SiteSettingsList>
+      </SiteSettingsGroup>
 
       <SiteConsentSection
         branch={scope.branch}

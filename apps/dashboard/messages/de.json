@@ -8894,6 +8894,8 @@
         }
       },
       "add": "{provider} hinzufügen",
+      "addShort": "Hinzufügen",
+      "active": "Aktiv",
       "more": "{provider}-Optionen",
       "edit": "Bearbeiten",
       "configExample": "Konfiguration in blog.json",
@@ -8959,6 +8961,7 @@
         "title": "Cookie-Banner",
         "description": "Cookie-Banner und Einwilligungsnachweise, auf Basis von c15t.",
         "connect": "Inth-Konto verbinden",
+        "connectShort": "Verbinden",
         "reconnect": "Inth neu verbinden",
         "reauthTitle": "Melde dich erneut bei Inth an",
         "reauthDescription": "Notra kann deine Inth-Projekte erst wieder erreichen, wenn du neu verbindest.",

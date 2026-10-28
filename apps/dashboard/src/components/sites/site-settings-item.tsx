@@ -87,7 +87,7 @@ export function SiteSettingsGroup({
   return (
     <section className="space-y-3">
       <div className="flex min-h-8 items-center justify-between gap-3 px-1">
-        <h2 className="flex items-center gap-2.5 text-sm font-medium">
+        <h2 className="flex items-center gap-1.5 text-sm font-medium">
           <HugeiconsIcon
             aria-hidden="true"
             className="text-muted-foreground size-4"

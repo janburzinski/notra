@@ -8894,6 +8894,8 @@
         }
       },
       "add": "Add {provider}",
+      "addShort": "Add",
+      "active": "Active",
       "more": "{provider} options",
       "edit": "Edit",
       "configExample": "Configuration in blog.json",
@@ -8959,6 +8961,7 @@
         "title": "Cookie banner",
         "description": "Cookie banner and consent records, built on c15t.",
         "connect": "Connect Inth account",
+        "connectShort": "Connect",
         "reconnect": "Reconnect Inth",
         "reauthTitle": "Inth needs you to sign in again",
         "reauthDescription": "Notra can't reach your Inth projects until you reconnect.",

@@ -1,10 +1,18 @@
+import { Tick02Icon } from "@hugeicons/core-free-icons";
 import { Databuddy } from "@notra/ui/components/ui/svgs/databuddy";
 import { GoogleAnalytics } from "@notra/ui/components/ui/svgs/googleAnalytics";
 import { Plausible } from "@notra/ui/components/ui/svgs/plausible";
 import { PostHog } from "@notra/ui/components/ui/svgs/posthog";
 import { Umami } from "@notra/ui/components/ui/svgs/umami";
 
+import type { StatusBadgeAppearance } from "@/types/components/status-badge";
 import type { SiteIntegrationProvider } from "@/types/site-integrations";
+
+export const SITE_INTEGRATION_ACTIVE_BADGE: StatusBadgeAppearance = {
+  variant: "success",
+  icon: Tick02Icon,
+  square: true,
+};
 
 export const SITE_INTEGRATION_AUTOSAVE_DELAY_MS = 600;
 

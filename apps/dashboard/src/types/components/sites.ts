@@ -596,6 +596,10 @@ export interface SiteIntegrationLogoProps {
 export interface SiteIntegrationRowProps {
   provider: SiteIntegrationBrand;
   description: string;
+  /** Visible label of the set-up button; defaults to "Add". */
+  addLabel?: string;
+  /** Accessible name of the set-up button; defaults to "Add {provider}". */
+  addAriaLabel?: string;
   isSetUp: boolean;
   loading?: boolean;
   disabled: boolean;
