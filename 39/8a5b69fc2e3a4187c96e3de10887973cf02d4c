@@ -1,0 +1,11 @@
+apps/web/src/content/pages/features/sites.md
+  ai_agent 81
+apps/web/src/constants/feature-pages/sites.ts
+  ai_agent 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "398a5b69fc2e3a4187c96e3de10887973cf02d4c",
+  "prompts": {}
+}
