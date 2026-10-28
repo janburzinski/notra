@@ -13,10 +13,10 @@ permissions:
 
 jobs:
   links:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 5
     steps:
-      - uses: useblacksmith/checkout@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - run: node scripts/github/check-blog-links.mjs

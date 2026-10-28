@@ -26,13 +26,13 @@ concurrency:
 jobs:
   release:
     if: github.ref == 'refs/heads/main' && github.repository == 'usenotra/notra'
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 20
     outputs:
       sha: ${{ steps.release.outputs.sha }}
     steps:
       - name: Checkout main
-        uses: useblacksmith/checkout@v1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -80,11 +80,11 @@ jobs:
     if: >-
       ${{ !cancelled() && needs.release.result == 'success' &&
       (needs.sites-e2e.result == 'success' || needs.sites-e2e.result == 'skipped') }}
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 120
     steps:
       - name: Checkout release commit
-        uses: useblacksmith/checkout@v1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -155,7 +155,7 @@ jobs:
   notify:
     needs: [release, sites-e2e, deploy]
     if: ${{ failure() }}
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 5
     steps:
       - name: Alert Slack

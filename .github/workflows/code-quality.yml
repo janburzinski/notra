@@ -16,14 +16,14 @@ jobs:
   # PRs only run the checks their diff can affect; main pushes run everything
   # because they gate production releases.
   changes:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 5
     outputs:
       checks: ${{ steps.plan.outputs.checks }}
       infrastructure: ${{ steps.plan.outputs.infrastructure }}
     steps:
       - name: Checkout
-        uses: useblacksmith/checkout@v1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -65,7 +65,7 @@ jobs:
   checks:
     name: Quality (${{ matrix.check }})
     needs: changes
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -73,7 +73,7 @@ jobs:
         check: ${{ fromJSON(needs.changes.outputs.checks) }}
     steps:
       - name: Checkout
-        uses: useblacksmith/checkout@v1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -187,7 +187,7 @@ jobs:
   infrastructure:
     needs: changes
     if: needs.changes.outputs.infrastructure == 'true'
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 10
     services:
       postgres:
@@ -205,7 +205,7 @@ jobs:
           --health-retries 10
     steps:
       - name: Checkout
-        uses: useblacksmith/checkout@v1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -259,7 +259,7 @@ jobs:
   quality:
     if: always()
     needs: [changes, checks, infrastructure]
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 1
     steps:
       - name: Require all quality checks

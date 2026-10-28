@@ -36,7 +36,7 @@ concurrency:
 
 jobs:
   verify:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: boat-small
     timeout-minutes: 20
     steps:
       - name: Checkout
