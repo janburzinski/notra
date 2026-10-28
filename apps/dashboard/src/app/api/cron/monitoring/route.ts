@@ -48,7 +48,7 @@ export async function GET(request: Request) {
       errorName: error instanceof Error ? error.name : "UnknownError",
     });
   }
-  if (!telemetry.aiDrain && !telemetry.otlpDrain) {
+  if (!telemetry.aiDrain) {
     scheduleRequestErrorTelemetry(flushLogs);
     return Response.json({ skipped: "telemetry_not_configured" });
   }

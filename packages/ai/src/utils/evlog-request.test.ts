@@ -128,20 +128,13 @@ test("request intake replaces unsafe IDs before the logger and final destination
   }
 });
 
-test("validated parent IDs and nested streams share one safe ID in rich and operational sinks", async () => {
+test("validated parent IDs and nested streams share one safe ID in the rich sink", async () => {
   const rich: WideEvent[] = [];
-  const operational: Record<string, unknown>[] = [];
   mock.module("@notra/ai/utils/evlog-runtime", () => ({
     getEvlogRuntime: () => ({
       aiDrain: Object.assign(
         ({ event }: DrainContext) => {
           rich.push(event);
-        },
-        { flush: async () => {} }
-      ),
-      otlpDrain: Object.assign(
-        ({ event }: DrainContext) => {
-          operational.push(telemetryEvent(event));
         },
         { flush: async () => {} }
       ),
@@ -157,7 +150,6 @@ test("validated parent IDs and nested streams share one safe ID in rich and oper
       "request:header.payload.signature:1",
     ]) {
       rich.length = 0;
-      operational.length = 0;
       let id: unknown;
       const nested = withEvlog(() => {
         assert.equal(useRequestLogger().getContext().requestId, id);
@@ -176,9 +168,7 @@ test("validated parent IDs and nested streams share one safe ID in rich and oper
       );
       await response.text();
       assert.equal(rich.length, 1);
-      assert.equal(operational.length, 1);
       assert.equal(rich[0]?.requestId, id);
-      assert.equal(operational[0]?.requestId, id);
       if (telemetryValue("requestId", parentId)) {
         assert.equal(id, parentId);
       } else {

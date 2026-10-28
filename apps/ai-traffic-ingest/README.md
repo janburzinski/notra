@@ -200,8 +200,6 @@ admins to rotate, which needs `BREW_API_KEY` (and `BREW_BRAND_ID` when used).
 Optional telemetry variables are `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`,
 `NEXT_PUBLIC_POSTHOG_HOST`, `AXIOM_TOKEN`, and `AXIOM_ORG_ID`. Logs go to the
 `notra-geo-scan` dataset by default; set `AXIOM_GEO_DATASET` only to override it.
-Optional OTLP telemetry uses `NOTRA_OTLP_ENDPOINT`, `NOTRA_OTLP_TOKEN`, and
-`NOTRA_TELEMETRY_SERVICE_NAME` when used by the existing shared logger.
 Set `PORT=3000` on the host to match the configured public target port.
 
 Without required configuration, the process starts but rejects ingestion with

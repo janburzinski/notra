@@ -36,11 +36,7 @@ export async function flushLogs(): Promise<void> {
     ...(runtime.pendingAIUsage ?? []),
     ...(runtime.pendingAlerts ?? []),
   ]);
-  await Promise.all([
-    runtime.aiDrain?.flush(),
-    runtime.geoDrain?.flush(),
-    runtime.otlpDrain?.flush(),
-  ]);
+  await Promise.all([runtime.aiDrain?.flush(), runtime.geoDrain?.flush()]);
 }
 
 function routeDrain(ctx: DrainContext) {
@@ -53,7 +49,6 @@ function routeDrain(ctx: DrainContext) {
     pending.add(alert);
     void alert.finally(() => pending.delete(alert));
   }
-  runtime.otlpDrain?.(ctx);
   if (isGeoLogEvent(ctx.event)) {
     runtime.geoDrain?.(ctx);
   } else {
@@ -67,10 +62,7 @@ function routeDrain(ctx: DrainContext) {
 }
 
 const drain: EvlogDrain | undefined =
-  runtime.aiDrain ||
-  runtime.geoDrain ||
-  runtime.otlpDrain ||
-  process.env.GEO_SCAN_ALERT_WEBHOOK_URL
+  runtime.aiDrain || runtime.geoDrain || process.env.GEO_SCAN_ALERT_WEBHOOK_URL
     ? routeDrain
     : undefined;
 

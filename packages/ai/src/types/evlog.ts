@@ -35,7 +35,6 @@ export interface CheckpointLogPipeline extends LogPipeline {
 }
 
 export interface EvlogRuntimeState {
-  otlpDrain?: LogPipeline;
   aiDrain?: LogPipeline;
   geoDrain?: LogPipeline;
   flushScheduler?: LogFlushScheduler;

@@ -162,8 +162,7 @@ Anthropic thinking / OpenAI reasoning settings are mapped to
   limit types still alert independently, so a rate-limit alert does not hide a
   daily-cap alert. Full logs and model fallback are unaffected. Messages include
   the cause, reported timing and a recovery action, without claiming fallback succeeded.
-  Alerts run in the background and are awaited by `flushLogs`, independently of
-  OTLP delivery.
+  Alerts run in the background and are awaited by `flushLogs`.
   Failed deliveries release the deduplication key so the next limit hit can retry;
   delivery failures never affect model calls. No prompt or response body is sent.
 - evlog events: `ai.router.route`, `ai.router.fallback`,

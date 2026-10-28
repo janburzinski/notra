@@ -4,7 +4,6 @@ import {
 } from "@notra/ai/constants/evlog";
 import type { EvlogGlobal, EvlogRuntimeState } from "@notra/ai/types/evlog";
 import { createAxiomPipeline } from "@notra/ai/utils/axiom-pipeline";
-import { createOTLPPipeline } from "@notra/ai/utils/otlp-pipeline";
 
 function createDatasetDrain(dataset: string | undefined) {
   if (!process.env.AXIOM_TOKEN || !dataset) {
@@ -20,7 +19,6 @@ function createDatasetDrain(dataset: string | undefined) {
 export function getEvlogRuntime(): EvlogRuntimeState {
   const host = globalThis as EvlogGlobal;
   host.__notraEvlogRuntime ??= {
-    otlpDrain: createOTLPPipeline(),
     aiDrain: createDatasetDrain(
       process.env.AXIOM_AI_DATASET || DEFAULT_AXIOM_AI_DATASET
     ),

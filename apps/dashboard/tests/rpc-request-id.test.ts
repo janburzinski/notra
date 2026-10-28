@@ -22,19 +22,11 @@ if (process.env.NOTRA_RPC_REQUEST_ID_TEST !== "1") {
   }, 25_000);
 } else {
   const rich: WideEvent[] = [];
-  const operational: Record<string, unknown>[] = [];
-  const { telemetryEvent } = await import("@notra/ai/utils/telemetry-event");
   mock.module("@notra/ai/utils/evlog-runtime", () => ({
     getEvlogRuntime: () => ({
       aiDrain: Object.assign(
         ({ event }: DrainContext) => {
           rich.push(event);
-        },
-        { flush: async () => {} }
-      ),
-      otlpDrain: Object.assign(
-        ({ event }: DrainContext) => {
-          operational.push(telemetryEvent(event));
         },
         { flush: async () => {} }
       ),
@@ -69,7 +61,6 @@ if (process.env.NOTRA_RPC_REQUEST_ID_TEST !== "1") {
     ]) {
       capture.mockClear();
       rich.length = 0;
-      operational.length = 0;
       pending.length = 0;
       const response = await GET(
         new Request("https://fixture.invalid/rpc/missing", {
@@ -83,7 +74,6 @@ if (process.env.NOTRA_RPC_REQUEST_ID_TEST !== "1") {
       const id = rich[0]?.requestId;
       expect(telemetryValue("requestId", id)).toBe(true);
       expect(rich).toHaveLength(1);
-      expect(operational[0]?.requestId).toBe(id);
       expect(capture.mock.calls[0]?.[0]).toMatchObject({
         properties: { request_id: id },
       });
