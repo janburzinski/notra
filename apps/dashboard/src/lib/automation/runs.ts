@@ -1,12 +1,12 @@
+import {
+  AUTOMATION_RUN_STALE_AFTER_MS,
+  AUTOMATION_RUN_STALE_MESSAGE,
+} from "@notra/db/constants/automation-runs";
 import { db } from "@notra/db/drizzle";
 import { automationRuns } from "@notra/db/schema";
 import type { AutomationRunStatus } from "@notra/schemas/dashboard/automation/runs";
 import { and, desc, eq, gte, lt, max, or, sql, type SQL } from "drizzle-orm";
 
-import {
-  AUTOMATION_RUN_STALE_AFTER_MS,
-  AUTOMATION_RUN_STALE_MESSAGE,
-} from "@/constants/automation-runs";
 import type {
   AutomationRun,
   AutomationRunsPage,

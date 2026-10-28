@@ -4,7 +4,10 @@ import {
   deleteScheduleResponseSchema,
   getSchedulesQuerySchema,
   getSchedulesResponseSchema,
+  listScheduleRunsQuerySchema,
+  listScheduleRunsResponseSchema,
   patchScheduleRequestSchema,
+  runScheduleResponseSchema,
   scheduleParamsSchema,
   scheduleResponseSchema,
 } from "@notra/schemas/api/schedules";
@@ -12,9 +15,12 @@ import {
 import {
   createSchedule,
   deleteSchedule,
+  listScheduleRuns,
   listSchedules,
   patchSchedule,
+  runSchedule,
 } from "../programs/schedules";
+import { isOAuthAuth } from "../types/auth";
 import { createOpenApiApp } from "../utils/openapi-app";
 import { errorResponse } from "../utils/openapi-responses";
 import { resolveRequestOrganization } from "../utils/organizations";
@@ -178,6 +184,66 @@ const deleteScheduleRoute = createRoute({
   },
 });
 
+const runScheduleRoute = createRoute({
+  method: "post",
+  path: "/schedules/{scheduleId}/run",
+  tags: ["Schedules"],
+  operationId: "runSchedule",
+  summary: "Run a schedule now",
+  description:
+    "Starts one run of an enabled schedule right away, outside its cron timing, as the dashboard's Run now does. Returns 202 with the run's ID; follow it with `GET /v1/schedules/{scheduleId}/runs` until its status leaves `running`. Disabled schedules return 400.",
+  request: {
+    params: scheduleParamsSchema,
+  },
+  responses: {
+    202: {
+      description: "Schedule run started",
+      content: {
+        "application/json": {
+          schema: runScheduleResponseSchema,
+        },
+      },
+    },
+    400: errorResponse("Schedule is disabled"),
+    401: errorResponse("Missing or invalid API key"),
+    403: errorResponse("Forbidden"),
+    404: errorResponse("Schedule not found"),
+    500: errorResponse("Internal server error"),
+    502: errorResponse("Failed to start the schedule run"),
+    503: errorResponse("Authentication service unavailable"),
+  },
+});
+
+const listScheduleRunsRoute = createRoute({
+  method: "get",
+  path: "/schedules/{scheduleId}/runs",
+  tags: ["Schedules"],
+  operationId: "listScheduleRuns",
+  summary: "List a schedule's runs",
+  description:
+    "Returns the schedule's most recent runs, newest first, with their status and the draft post each run created.",
+  request: {
+    params: scheduleParamsSchema,
+    query: listScheduleRunsQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Schedule runs fetched successfully",
+      content: {
+        "application/json": {
+          schema: listScheduleRunsResponseSchema,
+        },
+      },
+    },
+    400: errorResponse("Invalid query params"),
+    401: errorResponse("Missing or invalid API key"),
+    403: errorResponse("Forbidden"),
+    404: errorResponse("Schedule not found"),
+    500: errorResponse("Failed to list schedule runs"),
+    503: errorResponse("Authentication service unavailable"),
+  },
+});
+
 schedulesRoutes.openapi(getSchedulesRoute, async (c) => {
   const scope = await resolveRequestOrganization(c);
   if (scope.response) {
@@ -306,4 +372,66 @@ schedulesRoutes.openapi(deleteScheduleRoute, async (c) => {
   }
 
   return c.json({ id: result.success, organization }, 200);
+});
+
+schedulesRoutes.openapi(runScheduleRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const { orgId, organization } = scope;
+  const { scheduleId } = c.req.valid("param");
+  const auth = c.get("auth");
+
+  const result = await runScheduleProgram(
+    runSchedule({
+      db: c.get("db"),
+      organizationId: orgId,
+      scheduleId,
+      actorId: isOAuthAuth(auth) ? auth.userId : `api-key:${auth.keyId}`,
+      env: c.env ?? {},
+    })
+  );
+
+  if (result._tag === "Failure") {
+    const failure = result.failure;
+    if (failure._tag === "ScheduleNotFoundError") {
+      return c.json({ error: "Schedule not found" }, 404);
+    }
+    if (failure._tag === "ScheduleDisabledError") {
+      return c.json({ error: "Cannot run a disabled schedule" }, 400);
+    }
+    c.get("log").error(
+      failure.cause instanceof Error ? failure.cause : String(failure.cause),
+      { errorCode: "schedule_run_start_failed", scheduleId }
+    );
+    return c.json({ error: "Failed to start the schedule run" }, 502);
+  }
+
+  return c.json({ runId: result.success, organization }, 202);
+});
+
+schedulesRoutes.openapi(listScheduleRunsRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const { orgId, organization } = scope;
+  const { scheduleId } = c.req.valid("param");
+  const { limit } = c.req.valid("query");
+
+  const result = await runScheduleProgram(
+    listScheduleRuns({
+      db: c.get("db"),
+      organizationId: orgId,
+      scheduleId,
+      limit,
+    })
+  );
+
+  if (result._tag === "Failure") {
+    return c.json({ error: "Schedule not found" }, 404);
+  }
+
+  return c.json({ runs: result.success, organization }, 200);
 });

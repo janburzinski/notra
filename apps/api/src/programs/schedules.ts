@@ -2,6 +2,11 @@ import crypto from "node:crypto";
 
 import { scheduleDedupeHashes } from "@notra/ai/utils/trigger-hash";
 import {
+  AUTOMATION_RUN_STALE_AFTER_MS,
+  AUTOMATION_RUN_STALE_MESSAGE,
+} from "@notra/db/constants/automation-runs";
+import {
+  automationRuns,
   contentTriggerLookbackWindows,
   contentTriggers,
 } from "@notra/db/schema";
@@ -12,10 +17,12 @@ import { Effect } from "effect";
 
 import {
   ScheduleDatabaseError,
+  ScheduleDisabledError,
   ScheduleDuplicateError,
   ScheduleMissingTargetsError,
   ScheduleNotFoundError,
   ScheduleQstashError,
+  ScheduleRunStartError,
 } from "../errors/schedules";
 import {
   deleteQstashWithRetry,
@@ -29,9 +36,12 @@ import type {
   DeleteScheduleProgramInput,
   ListSchedulesProgramInput,
   PatchScheduleProgramInput,
+  RunScheduleProgramInput,
+  ScheduleRunsProgramInput,
 } from "../types/schedules";
 import { logError } from "../utils/logging";
 import { buildCronExpression, createQstashSchedule } from "../utils/qstash";
+import { startScheduleRun } from "../utils/schedule-run";
 import {
   DEFAULT_SCHEDULE_NAME,
   filterSchedulesByRepositoryIds,
@@ -677,5 +687,82 @@ export const patchSchedule = Effect.fn("schedules.patch")(function* ({
 
       return new ScheduleDatabaseError({ cause });
     },
+  });
+});
+
+const findSchedule = Effect.fn("schedules.find")(function* (
+  db: DbClient,
+  organizationId: string,
+  scheduleId: string
+) {
+  const schedule = yield* database(() =>
+    db.query.contentTriggers.findFirst({
+      columns: { id: true, enabled: true },
+      where: and(
+        eq(contentTriggers.id, scheduleId),
+        eq(contentTriggers.organizationId, organizationId),
+        eq(contentTriggers.sourceType, "cron")
+      ),
+    })
+  );
+  if (!schedule) {
+    return yield* new ScheduleNotFoundError();
+  }
+  return schedule;
+});
+
+export const runSchedule = Effect.fn("schedules.run")(function* ({
+  db,
+  organizationId,
+  scheduleId,
+  actorId,
+  env,
+}: RunScheduleProgramInput) {
+  const schedule = yield* findSchedule(db, organizationId, scheduleId);
+  if (!schedule.enabled) {
+    return yield* new ScheduleDisabledError();
+  }
+  const { runId } = yield* Effect.tryPromise({
+    try: () => startScheduleRun(env, organizationId, scheduleId, actorId),
+    catch: (cause) => new ScheduleRunStartError({ cause }),
+  });
+  return runId;
+});
+
+export const listScheduleRuns = Effect.fn("schedules.runs")(function* ({
+  db,
+  organizationId,
+  scheduleId,
+  limit,
+}: ScheduleRunsProgramInput) {
+  yield* findSchedule(db, organizationId, scheduleId);
+  const rows = yield* database(() =>
+    db
+      .select()
+      .from(automationRuns)
+      .where(
+        and(
+          eq(automationRuns.organizationId, organizationId),
+          eq(automationRuns.automationId, scheduleId)
+        )
+      )
+      .orderBy(desc(automationRuns.startedAt), desc(automationRuns.id))
+      .limit(limit)
+  );
+
+  // Matches the dashboard's run history: a run that never reported back failed.
+  const staleBefore = new Date(Date.now() - AUTOMATION_RUN_STALE_AFTER_MS);
+  return rows.map((row) => {
+    const stale = row.status === "running" && row.startedAt < staleBefore;
+    return {
+      id: row.id,
+      status: stale ? "failed" : row.status,
+      title: row.title,
+      postId: row.postId,
+      errorMessage: stale ? AUTOMATION_RUN_STALE_MESSAGE : row.errorMessage,
+      manual: row.manual,
+      startedAt: row.startedAt.toISOString(),
+      finishedAt: row.finishedAt?.toISOString() ?? null,
+    };
   });
 });

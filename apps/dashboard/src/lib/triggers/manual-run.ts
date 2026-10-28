@@ -229,6 +229,7 @@ export async function triggerManualAutomationRun({
 
   return {
     kind,
+    runId: executionId,
     workflowRunId,
   };
 }

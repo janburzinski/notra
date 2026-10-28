@@ -68,6 +68,7 @@ import { Route as ApiIntegrationsLinearCallbackRouteImport } from './routes/api.
 import { Route as ApiIntegrationsSlackAuthorizeRouteImport } from './routes/api.integrations.slack.authorize'
 import { Route as ApiIntegrationsSlackCallbackRouteImport } from './routes/api.integrations.slack.callback'
 import { Route as ApiInternalAiTrendsTrafficRouteImport } from './routes/api.internal.ai-trends.traffic'
+import { Route as ApiInternalAutomationScheduleRunRouteImport } from './routes/api.internal.automation.schedule-run'
 import { Route as ApiInternalAutopilotAdminRouteImport } from './routes/api.internal.autopilot.admin'
 import { Route as ApiInternalContentDraftPullRequestRouteImport } from './routes/api.internal.content.draft-pull-request'
 import { Route as ApiInternalContentPreviewRouteImport } from './routes/api.internal.content.preview'
@@ -414,6 +415,12 @@ const ApiInternalAiTrendsTrafficRoute =
     path: '/api/internal/ai-trends/traffic',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalAutomationScheduleRunRoute =
+  ApiInternalAutomationScheduleRunRouteImport.update({
+    id: '/api/internal/automation/schedule-run',
+    path: '/api/internal/automation/schedule-run',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalAutopilotAdminRoute =
   ApiInternalAutopilotAdminRouteImport.update({
     id: '/api/internal/autopilot/admin',
@@ -654,6 +661,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
+  '/api/internal/automation/schedule-run': typeof ApiInternalAutomationScheduleRunRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -745,6 +753,7 @@ export interface FileRoutesByTo {
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
+  '/api/internal/automation/schedule-run': typeof ApiInternalAutomationScheduleRunRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -837,6 +846,7 @@ export interface FileRoutesById {
   '/api/integrations/slack/authorize': typeof ApiIntegrationsSlackAuthorizeRoute
   '/api/integrations/slack/callback': typeof ApiIntegrationsSlackCallbackRoute
   '/api/internal/ai-trends/traffic': typeof ApiInternalAiTrendsTrafficRoute
+  '/api/internal/automation/schedule-run': typeof ApiInternalAutomationScheduleRunRoute
   '/api/internal/autopilot/admin': typeof ApiInternalAutopilotAdminRoute
   '/api/internal/content/draft-pull-request': typeof ApiInternalContentDraftPullRequestRoute
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
@@ -930,6 +940,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
     | '/api/internal/ai-trends/traffic'
+    | '/api/internal/automation/schedule-run'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1021,6 +1032,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
     | '/api/internal/ai-trends/traffic'
+    | '/api/internal/automation/schedule-run'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1112,6 +1124,7 @@ export interface FileRouteTypes {
     | '/api/integrations/slack/authorize'
     | '/api/integrations/slack/callback'
     | '/api/internal/ai-trends/traffic'
+    | '/api/internal/automation/schedule-run'
     | '/api/internal/autopilot/admin'
     | '/api/internal/content/draft-pull-request'
     | '/api/internal/content/preview'
@@ -1198,6 +1211,7 @@ export interface RootRouteChildren {
   ApiIntegrationsSlackAuthorizeRoute: typeof ApiIntegrationsSlackAuthorizeRoute
   ApiIntegrationsSlackCallbackRoute: typeof ApiIntegrationsSlackCallbackRoute
   ApiInternalAiTrendsTrafficRoute: typeof ApiInternalAiTrendsTrafficRoute
+  ApiInternalAutomationScheduleRunRoute: typeof ApiInternalAutomationScheduleRunRoute
   ApiInternalAutopilotAdminRoute: typeof ApiInternalAutopilotAdminRoute
   ApiInternalContentDraftPullRequestRoute: typeof ApiInternalContentDraftPullRequestRoute
   ApiInternalContentPreviewRoute: typeof ApiInternalContentPreviewRoute
@@ -1638,6 +1652,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalAiTrendsTrafficRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/automation/schedule-run': {
+      id: '/api/internal/automation/schedule-run'
+      path: '/api/internal/automation/schedule-run'
+      fullPath: '/api/internal/automation/schedule-run'
+      preLoaderRoute: typeof ApiInternalAutomationScheduleRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/autopilot/admin': {
       id: '/api/internal/autopilot/admin'
       path: '/api/internal/autopilot/admin'
@@ -2012,6 +2033,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIntegrationsSlackAuthorizeRoute: ApiIntegrationsSlackAuthorizeRoute,
   ApiIntegrationsSlackCallbackRoute: ApiIntegrationsSlackCallbackRoute,
   ApiInternalAiTrendsTrafficRoute: ApiInternalAiTrendsTrafficRoute,
+  ApiInternalAutomationScheduleRunRoute: ApiInternalAutomationScheduleRunRoute,
   ApiInternalAutopilotAdminRoute: ApiInternalAutopilotAdminRoute,
   ApiInternalContentDraftPullRequestRoute:
     ApiInternalContentDraftPullRequestRoute,
