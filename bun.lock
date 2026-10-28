@@ -295,6 +295,7 @@
         "recharts": "2.15.4",
         "remend": "^1.4.0",
         "sanitize-html": "catalog:",
+        "satori": "catalog:",
         "sharp": "^0.35.5",
         "shiki": "4.4.3",
         "sonner": "catalog:",

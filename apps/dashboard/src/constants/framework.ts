@@ -19,6 +19,7 @@ export const WORKFLOW_ESBUILD_IDLE_STOP_MS = 5000;
 export const WORKFLOW_EXTERNAL_PACKAGES = [
   "@resvg/resvg-js",
   "@cursor/sdk",
+  "satori",
   "sharp",
   "wawoff2",
 ];

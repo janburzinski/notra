@@ -7,7 +7,7 @@ import { test } from "node:test";
 
 import { WORKFLOW_EXTERNAL_PACKAGES } from "../src/constants/framework.ts";
 
-test("standalone workflow function loads CommonJS externals and native bindings", (t) => {
+test("standalone workflow function loads its bundle, CommonJS externals and native bindings", (t) => {
   const directory = mkdtempSync(join(tmpdir(), "notra-workflow-production-"));
   t.after(() => rmSync(directory, { recursive: true, force: true }));
   cpSync(
@@ -28,6 +28,7 @@ test("standalone workflow function loads CommonJS externals and native bindings"
         for (const name of ${JSON.stringify(WORKFLOW_EXTERNAL_PACKAGES)}) {
           require(name);
         }
+        require("./index.js");
         const sharp = require("sharp");
         sharp({ create: { width: 1, height: 1, channels: 3, background: "white" } })
           .png().toBuffer()
