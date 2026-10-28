@@ -132,6 +132,23 @@ export const contentGapsResponseSchema = z
   })
   .openapi("GeoContentGapsResponse");
 
+export const updateGapRequestSchema = z
+  .object({
+    ignored: z.boolean().openapi({
+      description:
+        "true hides the prompt gap from content gaps and brief planning; false brings it back.",
+    }),
+  })
+  .openapi("UpdateGeoContentGapRequest");
+
+export const updateGapResponseSchema = z
+  .object({
+    promptId: z.string(),
+    ignored: z.boolean(),
+    organization: organizationResponseSchema,
+  })
+  .openapi("UpdateGeoContentGapResponse");
+
 export const briefParamsSchema = projectParamsSchema.extend({
   briefId: resourceIdSchema("briefId").openapi({
     param: { name: "briefId", in: "path" },

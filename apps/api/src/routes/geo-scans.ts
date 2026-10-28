@@ -1,8 +1,12 @@
 import { createRoute } from "@hono/zod-openapi";
-import { startGeoScan } from "@notra/geo-core/geo/programs";
+import {
+  startGeoPromptRescan,
+  startGeoScan,
+} from "@notra/geo-core/geo/programs";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   projectParamsSchema,
+  promptParamsSchema,
   scanParamsSchema,
 } from "@notra/schemas/api/geo-params";
 import {
@@ -11,6 +15,7 @@ import {
   listScansResponseSchema,
   scanResponseSchema,
 } from "@notra/schemas/api/geo-scans";
+import type { Context } from "hono";
 
 import { API_TRIGGER_SOURCE } from "../constants/analytics";
 import {
@@ -19,6 +24,8 @@ import {
 } from "../constants/geo-openapi";
 import { getGeoScanForProject, listGeoScansForProject } from "../programs/geo";
 import { runGeoEffect } from "../runtime/geo";
+import type { ApiEnv } from "../types/env";
+import type { GeoOutcome } from "../types/geo";
 import { trackApiEvent } from "../utils/analytics";
 import {
   attachGeoOrganization,
@@ -40,6 +47,34 @@ const createScanRoute = createRoute({
   description:
     "Queues a scan with the Notra dashboard, which owns the model credentials and billing gates. The public API never calls an answer engine itself. The scan record is created before the hand-off, so `scanId` is immediately readable via `GET /v1/projects/{projectId}/geo/scans/{scanId}`. Poll `statusUrl` (also returned as the `Location` header) until `status` leaves `running`. Returns 409 while a scan for this project is still in flight, and 402 when the plan or AI credits cannot cover a scan.",
   request: { params: projectParamsSchema },
+  responses: {
+    202: {
+      description: "Scan accepted",
+      headers: {
+        Location: {
+          description: "Relative path of the scan created for this trigger.",
+          schema: { type: "string" as const },
+        },
+      },
+      content: { "application/json": { schema: createScanResponseSchema } },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+    429: rateLimitResponse(
+      RATE_LIMITS.scanTrigger.requests,
+      RATE_LIMITS.scanTrigger.window
+    ),
+  },
+});
+
+const createPromptScanRoute = createRoute({
+  method: "post",
+  path: "/projects/{projectId}/geo/scans/prompts/{promptId}",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "createGeoPromptScan",
+  summary: "Rescan a single GEO prompt",
+  description:
+    "Queues a scan of one enabled tracked prompt across the project's engines, for example to check a prompt again after publishing content for it. Only that prompt's checks run, so it costs less than a full scan. Otherwise it behaves like `POST /v1/projects/{projectId}/geo/scans`: poll `statusUrl` until `status` leaves `running`, 409 while another scan is in flight, 402 when the plan or AI credits cannot cover it, and it shares that route's rate limit. Returns 404 for a prompt that is unknown or disabled.",
+  request: { params: promptParamsSchema },
   responses: {
     202: {
       description: "Scan accepted",
@@ -95,6 +130,34 @@ const getScanRoute = createRoute({
   },
 });
 
+function scanStartedResponse(
+  c: Context<ApiEnv>,
+  projectId: string,
+  outcome: GeoOutcome<{ scanId: string }>
+) {
+  if (!outcome.ok) {
+    return geoErrorResponse(c, outcome.failure);
+  }
+
+  const base = c.get("geo");
+  const { scanId } = outcome.value;
+  const statusUrl = `/v1/projects/${projectId}/geo/scans/${scanId}`;
+  trackApiEvent(c, {
+    event: POSTHOG_EVENTS.GEO_SCAN_STARTED,
+    organizationId: base.organizationId,
+    projectId,
+    properties: { trigger: API_TRIGGER_SOURCE, scan_id: scanId },
+  });
+
+  return c.json(
+    attachGeoOrganization(base.organization, { scanId, statusUrl }),
+    202,
+    {
+      Location: statusUrl,
+    }
+  );
+}
+
 geoScansRoutes.openapi(createScanRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
@@ -112,26 +175,31 @@ geoScansRoutes.openapi(createScanRoute, async (c) => {
     "startScan",
     startGeoScan({ organizationId: base.organizationId, projectId })
   );
-  if (!outcome.ok) {
-    return geoErrorResponse(c, outcome.failure);
+  return scanStartedResponse(c, projectId, outcome);
+});
+
+geoScansRoutes.openapi(createPromptScanRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId, promptId } = c.req.valid("param");
+
+  const rateLimited = await enforceRatelimit(
+    c,
+    ratelimit.scanTrigger,
+    "organization"
+  );
+  if (rateLimited) {
+    return rateLimited;
   }
 
-  const { scanId } = outcome.value;
-  const statusUrl = `/v1/projects/${projectId}/geo/scans/${scanId}`;
-  trackApiEvent(c, {
-    event: POSTHOG_EVENTS.GEO_SCAN_STARTED,
-    organizationId: base.organizationId,
-    projectId,
-    properties: { trigger: API_TRIGGER_SOURCE, scan_id: scanId },
-  });
-
-  return c.json(
-    attachGeoOrganization(base.organization, { scanId, statusUrl }),
-    202,
-    {
-      Location: statusUrl,
-    }
+  const outcome = await runGeoEffect(
+    "startPromptScan",
+    startGeoPromptRescan({
+      organizationId: base.organizationId,
+      projectId,
+      promptId,
+    })
   );
+  return scanStartedResponse(c, projectId, outcome);
 });
 
 geoScansRoutes.openapi(listScansRoute, async (c) => {

@@ -7,7 +7,13 @@ import {
   listGeoPrompts,
   updateGeoPrompt,
 } from "@notra/geo-core/geo/programs";
+import {
+  acceptSuggestion,
+  dismissSuggestion,
+  listSuggestions,
+} from "@notra/geo-core/geo/suggestions";
 import type { GeoPromptImportRow } from "@notra/geo-core/types/geo-import";
+import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
   projectParamsSchema,
   promptParamsSchema,
@@ -15,19 +21,24 @@ import {
 import {
   createPromptRequestSchema,
   deletePromptResponseSchema,
+  dismissPromptSuggestionResponseSchema,
   importPromptsRequestSchema,
   importPromptsResponseSchema,
   listPromptsResponseSchema,
+  listPromptSuggestionsResponseSchema,
   patchPromptRequestSchema,
   promptResponseSchema,
+  promptSuggestionParamsSchema,
 } from "@notra/schemas/api/geo-prompts";
 import { Effect } from "effect";
 
+import { API_TRIGGER_SOURCE } from "../constants/analytics";
 import {
   GEO_COMMON_ERROR_RESPONSES,
   GEO_OPENAPI_TAG,
 } from "../constants/geo-openapi";
 import { runGeoEffect } from "../runtime/geo";
+import { trackApiEvent } from "../utils/analytics";
 import { geoOutcomeResponse, refreshGeoGapsAfter } from "../utils/geo";
 import { createOpenApiApp } from "../utils/openapi-app";
 import { rateLimitResponse } from "../utils/openapi-responses";
@@ -143,6 +154,64 @@ const importPromptsRoute = createRoute({
   },
 });
 
+const listSuggestionsRoute = createRoute({
+  method: "get",
+  path: "/projects/{projectId}/geo/prompts/suggestions",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "listGeoPromptSuggestions",
+  summary: "List prompt suggestions",
+  description:
+    "Pending prompts Notra suggests tracking, derived from the project's Google Search Console queries. Empty until Search Console is connected and synced in the dashboard.",
+  request: { params: projectParamsSchema },
+  responses: {
+    200: {
+      description: "Prompt suggestions fetched successfully",
+      content: {
+        "application/json": { schema: listPromptSuggestionsResponseSchema },
+      },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
+const acceptSuggestionRoute = createRoute({
+  method: "post",
+  path: "/projects/{projectId}/geo/prompts/suggestions/{suggestionId}/accept",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "acceptGeoPromptSuggestion",
+  summary: "Accept a prompt suggestion",
+  description:
+    "Tracks the suggested prompt and returns it. When the project already tracks the same prompt, that prompt is returned instead of a duplicate. Returns 404 once the suggestion is no longer pending.",
+  request: { params: promptSuggestionParamsSchema },
+  responses: {
+    200: {
+      description: "Prompt suggestion accepted successfully",
+      content: { "application/json": { schema: promptResponseSchema } },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
+const dismissSuggestionRoute = createRoute({
+  method: "post",
+  path: "/projects/{projectId}/geo/prompts/suggestions/{suggestionId}/dismiss",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "dismissGeoPromptSuggestion",
+  summary: "Dismiss a prompt suggestion",
+  description:
+    "Removes the suggestion from the pending list without tracking it. Returns 404 once the suggestion is no longer pending.",
+  request: { params: promptSuggestionParamsSchema },
+  responses: {
+    200: {
+      description: "Prompt suggestion dismissed successfully",
+      content: {
+        "application/json": { schema: dismissPromptSuggestionResponseSchema },
+      },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
 geoPromptsRoutes.openapi(listPromptsRoute, async (c) => {
   const base = c.get("geo");
   const { projectId } = c.req.valid("param");
@@ -243,5 +312,72 @@ geoPromptsRoutes.openapi(importPromptsRoute, async (c) => {
       }))
     )
   );
+  return geoOutcomeResponse(c, outcome, 200);
+});
+
+geoPromptsRoutes.openapi(listSuggestionsRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId } = c.req.valid("param");
+  const outcome = await runGeoEffect(
+    "suggestionsList",
+    listSuggestions({ organizationId: base.organizationId, projectId })
+  );
+  return geoOutcomeResponse(c, outcome, 200);
+});
+
+geoPromptsRoutes.openapi(acceptSuggestionRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId, suggestionId } = c.req.valid("param");
+  const scope = { organizationId: base.organizationId, projectId };
+  const outcome = await runGeoEffect(
+    "suggestionAccept",
+    acceptSuggestion({ ...scope, suggestionId }).pipe(
+      refreshGeoGapsAfter(scope)
+    )
+  );
+  if (outcome.ok) {
+    const { suggestion } = outcome.value;
+    trackApiEvent(c, {
+      event: POSTHOG_EVENTS.GEO_SUGGESTION_ACCEPTED,
+      organizationId: base.organizationId,
+      projectId,
+      properties: {
+        count: 1,
+        suggestion_id: suggestion.id,
+        source: suggestion.source,
+        action: suggestion.action,
+        trigger: API_TRIGGER_SOURCE,
+      },
+    });
+  }
+  return geoOutcomeResponse(c, outcome, 200, ({ prompt }) => ({ prompt }));
+});
+
+geoPromptsRoutes.openapi(dismissSuggestionRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId, suggestionId } = c.req.valid("param");
+  const scope = { organizationId: base.organizationId, projectId };
+  const outcome = await runGeoEffect(
+    "suggestionDismiss",
+    dismissSuggestion({ ...scope, suggestionId }).pipe(
+      refreshGeoGapsAfter(scope),
+      Effect.map((result) => ({
+        id: result.suggestionId,
+        dismissed: result.dismissed,
+      }))
+    )
+  );
+  if (outcome.ok) {
+    trackApiEvent(c, {
+      event: POSTHOG_EVENTS.GEO_SUGGESTION_DISMISSED,
+      organizationId: base.organizationId,
+      projectId,
+      properties: {
+        count: 1,
+        suggestion_id: suggestionId,
+        trigger: API_TRIGGER_SOURCE,
+      },
+    });
+  }
   return geoOutcomeResponse(c, outcome, 200);
 });

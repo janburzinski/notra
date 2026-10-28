@@ -3,6 +3,7 @@ import { GeoWriterPlanError } from "@notra/geo-core/geo/errors";
 import {
   loadGeoContentGaps,
   refreshGeoContentGapsBestEffort,
+  setGeoPromptGapIgnored,
 } from "@notra/geo-core/geo/gaps";
 import {
   approveAndStartGeoWriter,
@@ -24,8 +25,13 @@ import {
   planBriefRequestSchema,
   planBriefResponseSchema,
   updateBriefRequestSchema,
+  updateGapRequestSchema,
+  updateGapResponseSchema,
 } from "@notra/schemas/api/geo-content";
-import { projectParamsSchema } from "@notra/schemas/api/geo-params";
+import {
+  projectParamsSchema,
+  promptParamsSchema,
+} from "@notra/schemas/api/geo-params";
 import { Effect } from "effect";
 
 import { API_TRIGGER_SOURCE } from "../constants/analytics";
@@ -63,6 +69,30 @@ const listGapsRoute = createRoute({
     200: {
       description: "Gaps fetched successfully",
       content: { "application/json": { schema: contentGapsResponseSchema } },
+    },
+    ...GEO_COMMON_ERROR_RESPONSES,
+  },
+});
+
+const updateGapRoute = createRoute({
+  method: "patch",
+  path: "/projects/{projectId}/geo/gaps/{promptId}",
+  tags: [GEO_OPENAPI_TAG],
+  operationId: "updateGeoContentGap",
+  summary: "Ignore or restore a content gap",
+  description:
+    "Hides a prompt gap from `GET /v1/projects/{projectId}/geo/gaps` and from brief planning, or brings it back. `promptId` is the `id` of a row in `promptGaps`. Ignored gaps are not listed, so keep the id to restore one later. The id is not checked against the gap list.",
+  request: {
+    params: promptParamsSchema,
+    body: {
+      required: true,
+      content: { "application/json": { schema: updateGapRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "Content gap updated successfully",
+      content: { "application/json": { schema: updateGapResponseSchema } },
     },
     ...GEO_COMMON_ERROR_RESPONSES,
   },
@@ -185,6 +215,29 @@ geoBriefsRoutes.openapi(listGapsRoute, async (c) => {
     "contentGaps",
     loadGeoContentGaps({ organizationId: base.organizationId, projectId })
   );
+  return geoOutcomeResponse(c, outcome, 200);
+});
+
+geoBriefsRoutes.openapi(updateGapRoute, async (c) => {
+  const base = c.get("geo");
+  const { projectId, promptId } = c.req.valid("param");
+  const { ignored } = c.req.valid("json");
+  const scope = { organizationId: base.organizationId, projectId };
+
+  const outcome = await runGeoEffect(
+    "gapIgnore",
+    setGeoPromptGapIgnored({ ...scope, promptId, ignored }).pipe(
+      refreshGeoGapsAfter(scope)
+    )
+  );
+  if (outcome.ok) {
+    trackApiEvent(c, {
+      event: POSTHOG_EVENTS.GEO_GAP_IGNORED,
+      organizationId: base.organizationId,
+      projectId,
+      properties: { ignored, trigger: API_TRIGGER_SOURCE },
+    });
+  }
   return geoOutcomeResponse(c, outcome, 200);
 });
 
