@@ -1,6 +1,7 @@
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 
 import { CompareCard } from "@/components/compare/compare-card";
+import { CompareHeroDuel } from "@/components/compare/compare-hero-duel";
 import { CtaBanner } from "@/components/landing/cta-banner";
 import { MarketingHeroWash } from "@/components/marketing-hero-wash";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
@@ -16,6 +17,7 @@ export function CompareIndexView({ competitors }: CompareIndexViewProps) {
   return (
     <div className="flex w-full flex-col items-center gap-16 pb-14 antialiased [font-synthesis:none] lg:gap-20">
       <MarketingHeroWash
+        backdrop={<CompareHeroDuel />}
         subtitle={COMPARE_INDEX_SUBTITLE}
         title="Notra vs the rest"
       >
