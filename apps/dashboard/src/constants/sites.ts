@@ -232,6 +232,7 @@ export const SITES_LIVE_INVALIDATE_THROTTLE_MS = 1000;
 
 // Tints sit on an opaque base because the strip sticks over scrolling content.
 export const SITE_CHANGES_STRIP_TONES = {
+  info: "from-info/8 to-info/8",
   warning: "from-warning/10 to-warning/10 text-warning",
   destructive: "from-destructive/10 to-destructive/10 text-destructive",
 } as const;

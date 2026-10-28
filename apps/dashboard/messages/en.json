@@ -8728,7 +8728,6 @@
       },
       "workspace": {
         "banner": {
-          "unpublishedShort": "Unpublished",
           "unpublishedTitle": "{count, plural, one {Unpublished changes in # section} other {Unpublished changes in # sections}}",
           "unpublishedFilesTitle": "{count, plural, one {Unpublished changes in # file} other {Unpublished changes in # files}}",
           "unpublished": "Edits to {sections} reach your live site only after you publish.",

@@ -755,7 +755,7 @@ export interface SiteInthProjectSettingsProps {
 }
 
 export interface SiteChangesStripProps {
-  tone: "warning" | "destructive";
+  tone: "info" | "warning" | "destructive";
   title: ReactNode;
   description: ReactNode;
   children?: ReactNode;

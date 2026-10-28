@@ -8728,7 +8728,6 @@
       },
       "workspace": {
         "banner": {
-          "unpublishedShort": "Unveröffentlicht",
           "unpublishedTitle": "{count, plural, one {Unveröffentlichte Änderungen in # Bereich} other {Unveröffentlichte Änderungen in # Bereichen}}",
           "unpublishedFilesTitle": "{count, plural, one {Unveröffentlichte Änderungen in # Datei} other {Unveröffentlichte Änderungen in # Dateien}}",
           "unpublished": "Änderungen an {sections} erscheinen erst nach dem Veröffentlichen auf deiner Seite.",

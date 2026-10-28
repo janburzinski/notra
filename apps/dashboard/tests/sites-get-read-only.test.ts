@@ -35,6 +35,9 @@ if (process.env.NOTRA_SITES_GET_READ_ONLY_TEST_WORKER !== "1") {
     expect(result.status, result.stderr?.toString()).toBe(0);
   }, 35_000);
 } else {
+  // @vercel/oidc require()s jose's ESM build. Bun 1.4.0 rejects that when
+  // another importer has jose mid-load, so load it before the router graph.
+  await import("@vercel/oidc");
   const now = new Date("2026-10-07T10:00:00Z");
   const site: Site = {
     id: "site_readonly",

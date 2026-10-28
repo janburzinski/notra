@@ -4,7 +4,6 @@ import { useTranslations } from "use-intl";
 
 import { SiteBranchSwitcher } from "@/components/sites/branches/site-branch-controls";
 import { SiteBranchPrimaryAction } from "@/components/sites/branches/site-branch-primary-action";
-import { SiteUnpublishedChanges } from "@/components/sites/site-changes-banner";
 import { SiteHeaderMenu } from "@/components/sites/site-header-menu";
 import { useSiteWorkspace } from "@/components/sites/site-workspace-context";
 import { useSiteBranchVisibility } from "@/lib/hooks/use-site-branch-visibility";
@@ -32,7 +31,6 @@ export function SiteHeaderActions() {
       className="ms-auto flex items-center gap-2 self-center py-2 max-sm:w-full max-sm:justify-end"
       data-site-actions
     >
-      <SiteUnpublishedChanges />
       {required || visibility.show ? (
         <SiteBranchSwitcher controller={controller} menuActive />
       ) : null}

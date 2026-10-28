@@ -1,6 +1,10 @@
 "use client";
 
-import { Alert02Icon, Delete02Icon } from "@hugeicons/core-free-icons";
+import {
+  Alert02Icon,
+  Delete02Icon,
+  InformationCircleIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
 import {
@@ -12,11 +16,6 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from "@notra/ui/components/shared/responsive-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@notra/ui/components/ui/tooltip";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -43,23 +42,26 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   return (
     <div
       className={cn(
-        "bg-background z-10 flex flex-wrap items-center gap-x-3 gap-y-2 border-b bg-linear-to-b px-4 py-2.5 sm:sticky sm:top-12 lg:px-5",
+        "bg-background animate-in fade-in-0 slide-in-from-top-1 z-10 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b bg-linear-to-b px-4 py-2 duration-200 motion-reduce:animate-none sm:sticky sm:top-12 lg:px-5",
         SITE_CHANGES_STRIP_TONES[tone]
       )}
-      role="alert"
+      role={tone === "info" ? "status" : "alert"}
     >
       <HugeiconsIcon
         aria-hidden="true"
-        className="mt-0.5 size-4 shrink-0 self-start"
-        icon={Alert02Icon}
+        className={cn(
+          "size-4 shrink-0 max-sm:mt-0.5 max-sm:self-start",
+          tone === "info" && "text-info"
+        )}
+        icon={tone === "info" ? InformationCircleIcon : Alert02Icon}
         strokeWidth={2}
       />
-      <div className="min-w-0 flex-1 text-sm">
+      <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 text-sm">
         <p className="font-medium">{title}</p>
-        <p className="opacity-90">{description}</p>
+        <p className="opacity-80">{description}</p>
       </div>
       {children ? (
-        <div className="flex w-full shrink-0 items-center justify-end gap-2 pl-7 sm:w-auto sm:pl-0">
+        <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:w-auto">
           {children}
         </div>
       ) : null}
@@ -67,7 +69,7 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   );
 }
 
-/** Save failures, invalid config and conflicts, shown once above the page content. Unpublished edits live in the site header. */
+/** Unpublished edits, save failures, invalid config and conflicts, shown once above the page content. Publish lives in the site header. */
 export function SiteChangesBanner() {
   const state = useSiteWorkspace();
   const load = useSiteWorkspaceLoad();
@@ -168,7 +170,7 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
       </Strip>
     );
   }
-  return null;
+  return <SiteUnpublishedStrip state={state} />;
 }
 
 function discardBusy(state: SiteWorkspaceValue) {
@@ -180,56 +182,17 @@ function discardBusy(state: SiteWorkspaceValue) {
   );
 }
 
-/** Unpublished edits sit in the header next to Publish, so the page never shifts. */
-export function SiteUnpublishedChanges() {
-  const state = useSiteWorkspace();
-  if (
-    !state ||
-    state.malformed ||
-    state.conflicts.length > 0 ||
-    state.saves.state.status === "error" ||
-    state.invalid
-  ) {
-    return null;
-  }
-  return <SiteUnpublishedIndicator state={state} />;
-}
-
-function SiteUnpublishedIndicator({ state }: SiteChangesStripStateProps) {
-  const banner = useTranslations("sites.design.workspace.banner");
+function SiteUnpublishedStrip({ state }: SiteChangesStripStateProps) {
   const unpublished = useUnpublishedSummary(state);
   if (!unpublished) {
     return null;
   }
   return (
-    <div className="animate-in fade-in-0 flex min-w-0 items-center gap-1 duration-200 motion-reduce:animate-none">
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <span
-              className="text-muted-foreground flex min-w-0 items-center gap-2 px-1.5 text-sm"
-              role="status"
-            />
-          }
-        >
-          <span
-            aria-hidden="true"
-            className="bg-info size-1.5 shrink-0 rounded-full"
-          />
-          <span aria-hidden="true" className="md:hidden">
-            {banner("unpublishedShort")}
-          </span>
-          <span className="truncate max-md:sr-only">{unpublished.title}</span>
-          <span className="sr-only">{unpublished.description}</span>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-64">
-          {unpublished.description}
-        </TooltipContent>
-      </Tooltip>
+    <Strip tone="info" {...unpublished}>
       {state.files.drafts.length > 0 || state.unsaved ? (
         <SiteDiscardChangesButton state={state} variant="ghost" />
       ) : null}
-    </div>
+    </Strip>
   );
 }
 
