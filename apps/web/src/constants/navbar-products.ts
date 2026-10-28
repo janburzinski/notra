@@ -1,3 +1,8 @@
+import {
+  AiSearch02Icon,
+  BrowserIcon,
+  Robot01Icon,
+} from "@hugeicons/core-free-icons";
 import { Framer } from "@notra/ui/components/ui/svgs/framer";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Granola } from "@notra/ui/components/ui/svgs/granola";
@@ -7,8 +12,8 @@ import { Slack } from "@notra/ui/components/ui/svgs/slack";
 
 import { NAVBAR_BENTO_TINTS } from "@/constants/navbar-bento";
 import type {
-  NavbarBentoFeatureStyle,
   NavbarBentoLogo,
+  NavbarProductsCard,
   NavbarProductsCrawlerRow,
   NavbarProductsIntegrationLogo,
   NavbarProductsLinkTile,
@@ -19,23 +24,52 @@ import type {
   NavbarProductsTurn,
 } from "@/types/navbar-bento";
 
-export const NAVBAR_PRODUCTS_FEATURE_STYLES: Record<
-  string,
-  NavbarBentoFeatureStyle<NavbarProductsMock>
-> = {
-  "/features/personas": {
+export const NAVBAR_PRODUCTS_CLASSES = {
+  panel: "w-[min(66rem,calc(100vw-3rem))]",
+  cards: "grid grid-cols-3 gap-3",
+  card: "group relative flex h-80 flex-col overflow-clip rounded-2xl border border-[#1E1E1E14] bg-linear-to-b to-transparent to-60% transition-colors duration-normal ease-out hover:border-[#1E1E1E29] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8B5CF6] dark:border-white/10 dark:hover:border-white/20",
+  copy: "flex shrink-0 flex-col p-6 pb-4",
+  icon: "flex size-6 items-center justify-center rounded-md",
+  title:
+    "text-foreground mt-4 font-sans text-base/6 font-medium tracking-[-0.01em]",
+  description: "text-muted-foreground mt-1 font-sans text-sm/5 text-pretty",
+  mockArea: "pointer-events-none relative grow",
+  mockStage:
+    "absolute top-0 left-6 flex origin-top-left scale-75 transition-transform duration-slow ease-out group-hover:-translate-y-1.5",
+  mockFade:
+    "absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-white to-transparent dark:from-neutral-950",
+} as const;
+
+export const NAVBAR_PRODUCTS_CARDS: readonly NavbarProductsCard[] = [
+  {
+    href: "/features",
+    label: "AI Search",
+    description:
+      "See where you stand when buyers ask ChatGPT, Claude and Perplexity.",
+    icon: AiSearch02Icon,
     iconClassName: NAVBAR_BENTO_TINTS.violet,
-    mock: "personas",
-  },
-  "/features/conversations": {
-    iconClassName: NAVBAR_BENTO_TINTS.indigo,
+    tintClassName: "from-[#8B5CF6]/10",
     mock: "conversations",
   },
-  "/features/ai-crawler-logs": {
+  {
+    href: "/features/ai-crawler-logs",
+    label: "AI Crawler Logs",
+    description: "See every AI bot that reads your site, and why it came.",
+    icon: Robot01Icon,
     iconClassName: NAVBAR_BENTO_TINTS.amber,
+    tintClassName: "from-[#E8833A]/10",
     mock: "crawler",
   },
-};
+  {
+    href: "/features/sites",
+    label: "Sites",
+    description: "Host your blog and changelog from GitHub.",
+    icon: BrowserIcon,
+    iconClassName: NAVBAR_BENTO_TINTS.green,
+    tintClassName: "from-[#16A34A]/10",
+    mock: "sites",
+  },
+];
 
 export const NAVBAR_PRODUCTS_LINK_TILES: readonly NavbarProductsLinkTile[] = [
   {
@@ -196,3 +230,8 @@ export const NAVBAR_PRODUCTS_TERMINAL_LINES = [
   "$ notra geo projects list",
   "$ notra geo scans start proj_123 --wait",
 ] as const;
+
+export const NAVBAR_PRODUCTS_SITE = {
+  domain: "usenotra.com/blog",
+  deployed: "Deployed 21 s ago",
+} as const;

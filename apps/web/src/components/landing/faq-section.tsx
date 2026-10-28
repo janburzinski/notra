@@ -88,14 +88,22 @@ function getInitialOpenId(items: FaqItem[]) {
   return defaultItem ? defaultItem.id : null;
 }
 
-export function FaqSection({ content = FAQ_CONTENT }: FaqSectionProps) {
+export function FaqSection({
+  content = FAQ_CONTENT,
+  className,
+}: FaqSectionProps) {
   const { heading, subcopy, items } = content;
   const [openId, setOpenId] = useState<string | null>(() =>
     getInitialOpenId(items)
   );
 
   return (
-    <section className="flex flex-col items-center px-6 pt-20 pb-16 antialiased sm:px-12 lg:px-20 lg:pt-35 lg:pb-24">
+    <section
+      className={cn(
+        "flex flex-col items-center px-6 pt-20 pb-16 antialiased sm:px-12 lg:px-20 lg:pt-35 lg:pb-24",
+        className
+      )}
+    >
       <div className="flex w-full flex-col items-center gap-14 lg:gap-18">
         <div className="flex w-full max-w-[51.5625rem] flex-col items-center gap-4">
           <h2 className="font-display text-center text-[2rem] leading-[1.1] font-medium tracking-[-0.02em] text-balance text-black sm:text-[2.75rem] lg:text-[3.0625rem] lg:leading-[3.5rem] dark:text-white">

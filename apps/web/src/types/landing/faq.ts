@@ -13,4 +13,5 @@ export type FaqContent = {
 
 export type FaqSectionProps = {
   content?: FaqContent;
+  className?: string;
 };

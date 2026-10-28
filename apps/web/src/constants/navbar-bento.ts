@@ -44,6 +44,7 @@ export const NAVBAR_BENTO_TINTS = {
   violet: "bg-[#8B5CF6]",
   indigo: "bg-[#5B5BD6]",
   amber: "bg-[#E8833A]",
+  green: "bg-[#16A34A]",
 } as const;
 
 export const NAVBAR_BENTO_WINDOW_DOTS = ["close", "minimize", "zoom"] as const;

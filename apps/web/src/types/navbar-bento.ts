@@ -109,8 +109,15 @@ export type NavbarProductsMock =
   | "personas"
   | "conversations"
   | "crawler"
+  | "sites"
   | "integrations"
   | "terminal";
+
+export interface NavbarProductsCard extends MarketingNavCard {
+  iconClassName: string;
+  tintClassName: string;
+  mock: NavbarProductsMock;
+}
 
 export interface NavbarProductsLinkTile
   extends NavbarBentoLink, NavbarBentoLinkStyle<NavbarProductsMock> {}

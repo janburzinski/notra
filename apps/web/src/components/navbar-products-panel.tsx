@@ -1,31 +1,42 @@
 import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { StatusBadge } from "@notra/ui/components/status-badge";
+import { Badge } from "@notra/ui/components/ui/badge";
+import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { cn } from "@notra/ui/lib/utils";
 
 import { RankBadge } from "@/components/feature-pages/rank-badge";
 import {
-  NavbarBentoFeatureTile,
   NavbarBentoLinkTile,
   NavbarBentoMockHeader,
   NavbarBentoWindow,
 } from "@/components/navbar-bento";
 import { NavbarEngineLogo } from "@/components/navbar-engine-logo";
+import { NavbarHref } from "@/components/navbar-href";
+import {
+  SITES_STAGE_BADGES,
+  SITES_STAGE_POSTS,
+  SITES_STAGE_PUSH,
+} from "@/constants/feature-pages/sites";
 import { NAVBAR_BENTO_CLASSES as CLASSES } from "@/constants/navbar-bento";
 import {
+  NAVBAR_PRODUCTS_CARDS,
+  NAVBAR_PRODUCTS_CLASSES as PRODUCTS,
   NAVBAR_PRODUCTS_CRAWLER_ROWS,
-  NAVBAR_PRODUCTS_FEATURE_STYLES,
   NAVBAR_PRODUCTS_LINK_TILES,
   NAVBAR_PRODUCTS_LOGO_ROWS,
   NAVBAR_PRODUCTS_LOGOS,
   NAVBAR_PRODUCTS_PERSONAS,
   NAVBAR_PRODUCTS_PURPOSES,
+  NAVBAR_PRODUCTS_SITE,
   NAVBAR_PRODUCTS_TERMINAL_LINES,
   NAVBAR_PRODUCTS_TURNS,
 } from "@/constants/navbar-products";
 import type {
   NavbarBentoMockProps,
   NavbarBentoPanelProps,
+  NavbarProductsCard,
   NavbarProductsMock,
 } from "@/types/navbar-bento";
 
@@ -169,6 +180,61 @@ function CrawlerMock() {
   );
 }
 
+function SitesMock() {
+  return (
+    <span className={CLASSES.mockSlot}>
+      <span className={cn(CLASSES.mockCard, "w-128")}>
+        <NavbarBentoMockHeader
+          meta={NAVBAR_PRODUCTS_SITE.deployed}
+          title={NAVBAR_PRODUCTS_SITE.domain}
+        >
+          <Github aria-hidden="true" className="size-3.5 shrink-0" />
+          <span className={CLASSES.mockPillLabel}>
+            {SITES_STAGE_PUSH.branch}
+          </span>
+        </NavbarBentoMockHeader>
+        <span className="flex flex-col pt-1.5 pb-2">
+          {SITES_STAGE_POSTS.map((post) => (
+            <span
+              className={cn(
+                "flex items-center gap-3 px-5 py-3",
+                post.fresh && "bg-[#F6F2FE] dark:bg-white/5"
+              )}
+              key={post.path}
+            >
+              <img
+                alt=""
+                className="size-8 shrink-0 rounded-full"
+                height={32}
+                src={post.avatar}
+                width={32}
+              />
+              <span className="flex min-w-0 grow flex-col gap-0.5">
+                <span className={cn(CLASSES.mockTitle, "truncate")}>
+                  {post.title}
+                </span>
+                <span className={CLASSES.mockMeta}>{post.date}</span>
+              </span>
+              <span className="shrink-0">
+                {post.fresh ? (
+                  <StatusBadge
+                    appearance={SITES_STAGE_BADGES.publishedAppearance}
+                    label={SITES_STAGE_BADGES.published}
+                  />
+                ) : (
+                  <Badge shape="rounded" size="md" variant="success">
+                    {SITES_STAGE_BADGES.live}
+                  </Badge>
+                )}
+              </span>
+            </span>
+          ))}
+        </span>
+      </span>
+    </span>
+  );
+}
+
 function IntegrationsMock() {
   return (
     <span className="absolute -top-6 left-0 flex flex-col gap-2.5">
@@ -213,33 +279,58 @@ function ProductMock({ mock }: NavbarBentoMockProps<NavbarProductsMock>) {
   if (mock === "crawler") {
     return <CrawlerMock />;
   }
+  if (mock === "sites") {
+    return <SitesMock />;
+  }
   if (mock === "integrations") {
     return <IntegrationsMock />;
   }
   return <TerminalMock />;
 }
 
-export function NavbarProductsPanel({
-  group,
+function ProductCard({
+  card,
   onSelect,
-}: NavbarBentoPanelProps) {
+}: {
+  card: NavbarProductsCard;
+  onSelect: () => void;
+}) {
   return (
-    <div className={CLASSES.panel}>
-      <div className={CLASSES.row}>
-        {group.cards.map((card) => {
-          const style = NAVBAR_PRODUCTS_FEATURE_STYLES[card.href];
-          return (
-            <NavbarBentoFeatureTile
-              card={card}
-              className="h-68"
-              iconClassName={style?.iconClassName}
-              key={card.href}
-              onSelect={onSelect}
-            >
-              {style ? <ProductMock mock={style.mock} /> : null}
-            </NavbarBentoFeatureTile>
-          );
-        })}
+    <NavbarHref
+      className={cn(PRODUCTS.card, card.tintClassName)}
+      href={card.href}
+      onClick={onSelect}
+      role="menuitem"
+    >
+      <span className="sr-only">{`${card.label}. ${card.description}`}</span>
+      <span aria-hidden="true" className={PRODUCTS.copy}>
+        <span className={cn(PRODUCTS.icon, card.iconClassName)}>
+          <HugeiconsIcon
+            className="size-3.5 text-white"
+            icon={card.icon}
+            strokeWidth={2.4}
+          />
+        </span>
+        <span className={PRODUCTS.title}>{card.label}</span>
+        <span className={PRODUCTS.description}>{card.description}</span>
+      </span>
+      <span aria-hidden="true" className={PRODUCTS.mockArea}>
+        <span className={PRODUCTS.mockStage}>
+          <ProductMock mock={card.mock} />
+        </span>
+        <span className={PRODUCTS.mockFade} />
+      </span>
+    </NavbarHref>
+  );
+}
+
+export function NavbarProductsPanel({ onSelect }: NavbarBentoPanelProps) {
+  return (
+    <div className={cn(CLASSES.panel, PRODUCTS.panel)}>
+      <div className={PRODUCTS.cards}>
+        {NAVBAR_PRODUCTS_CARDS.map((card) => (
+          <ProductCard card={card} key={card.href} onSelect={onSelect} />
+        ))}
       </div>
       <div className={CLASSES.row}>
         {NAVBAR_PRODUCTS_LINK_TILES.map((tile) => (

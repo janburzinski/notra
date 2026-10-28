@@ -72,6 +72,7 @@
 @source "../../../../packages/ui/src/components/shared/responsive-dialog.tsx";
 @source "../../../../packages/ui/src/components/shared/table-pagination.tsx";
 @source "../../../../packages/ui/src/components/shared/ui-labels-provider.tsx";
+@source "../../../../packages/ui/src/components/status-badge.tsx";
 @source "../../../../packages/ui/src/components/ui/avatar.tsx";
 @source "../../../../packages/ui/src/components/ui/badge.tsx";
 @source "../../../../packages/ui/src/components/ui/button-content.tsx";
@@ -249,6 +250,7 @@
 @source "../../../../packages/ui/src/types/message-table.ts";
 @source "../../../../packages/ui/src/types/opencode-skin.ts";
 @source "../../../../packages/ui/src/types/perplexity.ts";
+@source "../../../../packages/ui/src/types/status-badge.ts";
 @source "../../../../packages/ui/src/types/step-slider.ts";
 @source "../../../../packages/ui/src/types/table-pagination.ts";
 @source "../../../../packages/ui/src/types/ui-labels.ts";
