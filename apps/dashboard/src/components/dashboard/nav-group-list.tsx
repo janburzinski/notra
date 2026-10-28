@@ -30,7 +30,6 @@ import type {
 } from "@/types/components/nav";
 import { geoNavHref, isGeoPaywalledPath } from "@/utils/geo-paths";
 import {
-  promoteFreeNavItem,
   resolveNavGroupRow,
   resolveNavItems,
   sidebarRouteFromPathname,
@@ -92,10 +91,7 @@ function NavGroupRow({
   const { isLocked: geoLocked } = useHasGeoFeature();
   const collapseSettled = useSidebarCollapseSettled();
   const homeLinkProps = useHomeLinkProps();
-  const [first, ...rest] = promoteFreeNavItem(
-    resolveNavItems(group.links, visibility),
-    geoLocked
-  );
+  const [first, ...rest] = resolveNavItems(group.links, visibility);
   if (!first) {
     return null;
   }

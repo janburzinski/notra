@@ -4,7 +4,6 @@ import {
   DEFAULT_NAV_VISIBILITY,
   GEO_OVERVIEW_NAV_LINK,
   GEO_ROUTE_SECTIONS,
-  HOME_NAV_LINK,
   NAV_GEO_IMPROVE_LINKS,
   NAV_MAIN_ITEMS,
   SHARED_ROUTE_PREFIXES,
@@ -21,7 +20,7 @@ import type {
 } from "@/types/components/nav";
 import type { SettingsUrlSearchParams } from "@/types/settings/modal";
 
-import { geoNavHref, isGeoPaywalledPath } from "./geo-paths";
+import { geoNavHref } from "./geo-paths";
 
 const NAV_ITEMS_BY_LINK = new Map(
   NAV_MAIN_ITEMS.map((item) => [item.link, item])
@@ -128,20 +127,6 @@ export function resolveNavItems(
   return visibility.autopilot
     ? withSites
     : withSites.filter((item) => item.link !== AUTOPILOT_NAV_LINK);
-}
-
-export function promoteFreeNavItem(
-  items: NavMainItem[],
-  geoLocked: boolean
-): NavMainItem[] {
-  const [first] = items;
-  if (!(geoLocked && first && isGeoPaywalledPath(first.link))) {
-    return items;
-  }
-  const free = items.find(
-    (item) => item.link !== HOME_NAV_LINK && !isGeoPaywalledPath(item.link)
-  );
-  return free ? [free, ...items.filter((item) => item !== free)] : items;
 }
 
 export function resolveActiveNavLink(
