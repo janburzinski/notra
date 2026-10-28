@@ -22,6 +22,7 @@ import {
   ONBOARDING_STEP_VISIBILITY,
   ONBOARDING_STEP_WORKSPACE,
 } from "@/constants/onboarding";
+import { WELCOME_TOUR_SEARCH_PARAM } from "@/constants/welcome-tour";
 import {
   getLastActiveOrganization,
   getSession,
@@ -271,7 +272,9 @@ export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
       companyName: brand.companyName ?? "",
       domain: normalizeCompetitorDomain(brand.websiteUrl),
       inOnboardingFlow,
-      nextHref,
+      nextHref: inOnboardingFlow
+        ? `${nextHref}${nextHref.includes("?") ? "&" : "?"}${WELCOME_TOUR_SEARCH_PARAM}=1`
+        : nextHref,
       organizationId: organization.id,
       progressHrefs: onboardingProgressHrefs({
         current: ONBOARDING_STEP_COMPETITORS,

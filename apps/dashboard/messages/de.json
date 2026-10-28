@@ -7267,7 +7267,43 @@
       "dismiss": "Banner zur Workspace-Einrichtung schließen",
       "startFailed": "Der Einrichtungs-Agent konnte nicht gestartet werden. Versuch es später nochmal."
     },
-    "metaTitle": "Dashboard"
+    "metaTitle": "Dashboard",
+    "welcomeTour": {
+      "progress": "Schritt {current} von {total}",
+      "skip": "Tour überspringen",
+      "finish": "Los geht's",
+      "steps": {
+        "ask": {
+          "title": "Notra fragt KI, was deine Käufer fragen",
+          "description": "Wir stellen ChatGPT, Claude, Gemini und Perplexity die Fragen deiner Käufer, genau wie ein echter Kunde."
+        },
+        "rank": {
+          "title": "Sieh, wer empfohlen wird",
+          "description": "Verfolge, wie oft die Antworten dich nennen, wo du rankst und welche Wettbewerber stattdessen auftauchen."
+        },
+        "gaps": {
+          "title": "Hol dir die Antworten, die dir fehlen",
+          "description": "Notra findet die Prompts, bei denen Wettbewerber gewinnen, und entwirft den Content, mit dem du reinkommst."
+        }
+      },
+      "scenes": {
+        "ask": {
+          "prompt": "Welches Tool passt am besten zu uns?"
+        },
+        "rank": {
+          "label": "In KI-Antworten genannt",
+          "you": "Deine Marke",
+          "competitorA": "Wettbewerber A",
+          "competitorB": "Wettbewerber B"
+        },
+        "gaps": {
+          "gap": "Wettbewerber A wird empfohlen",
+          "prompt": "Beste Alternative zu Wettbewerber A?",
+          "draft": "Neuer Entwurf",
+          "ready": "Fertig"
+        }
+      }
+    }
   },
   "home": {
     "greeting": "{period, select, morning {Guten Morgen} afternoon {Guten Tag} other {Guten Abend}}!",

@@ -7267,7 +7267,43 @@
       "dismiss": "Dismiss workspace setup banner",
       "startFailed": "Couldn't start the setup agent. Try again later."
     },
-    "metaTitle": "Dashboard"
+    "metaTitle": "Dashboard",
+    "welcomeTour": {
+      "progress": "Step {current} of {total}",
+      "skip": "Skip tour",
+      "finish": "Get started",
+      "steps": {
+        "ask": {
+          "title": "Notra asks AI what your buyers ask",
+          "description": "We send your buyers' questions to ChatGPT, Claude, Gemini and Perplexity, just like a real customer would."
+        },
+        "rank": {
+          "title": "See who gets recommended",
+          "description": "Track how often the answers mention you, where you rank and which competitors show up instead."
+        },
+        "gaps": {
+          "title": "Win the answers you're missing",
+          "description": "Notra finds the prompts where competitors win and drafts the content that gets you in."
+        }
+      },
+      "scenes": {
+        "ask": {
+          "prompt": "What's the best tool for our team?"
+        },
+        "rank": {
+          "label": "Mentioned in AI answers",
+          "you": "Your brand",
+          "competitorA": "Competitor A",
+          "competitorB": "Competitor B"
+        },
+        "gaps": {
+          "gap": "Competitor A is recommended",
+          "prompt": "Best alternative to Competitor A?",
+          "draft": "New draft",
+          "ready": "Ready"
+        }
+      }
+    }
   },
   "home": {
     "greeting": "{period, select, morning {Good morning} afternoon {Good afternoon} other {Good evening}}!",

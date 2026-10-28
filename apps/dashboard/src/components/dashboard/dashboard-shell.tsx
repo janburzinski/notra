@@ -35,6 +35,7 @@ import {
   useRunOnboardingAgent,
 } from "@/lib/hooks/use-onboarding";
 import { useSidebarWidth } from "@/lib/hooks/use-sidebar-width";
+import { useWelcomeTour } from "@/lib/hooks/use-welcome-tour";
 import { usePathname } from "@/lib/navigation";
 import type {
   DashboardOnboardingBannerProps,
@@ -58,6 +59,12 @@ const DemoPlaygroundProvider = dynamic(() =>
 const OnboardingAgentBanner = dynamic(() =>
   import("@/components/dashboard/onboarding-agent-banner").then(
     (module) => module.OnboardingAgentBanner
+  )
+);
+
+const WelcomeTour = dynamic(() =>
+  import("@/components/dashboard/welcome-tour").then(
+    (module) => module.WelcomeTour
   )
 );
 
@@ -245,6 +252,7 @@ export function DashboardShell({
     runAgent.isPending && runAgent.variables?.organizationId === organizationId;
   const demo = isDemoModeClient();
   const showDemoBanner = useDemoBannerVisible(demoBannerHidden);
+  const welcomeTour = useWelcomeTour();
   const shellStyle = dashboardShellStyle(showDemoBanner, visible);
   const {
     finishSidebarResize,
@@ -352,6 +360,12 @@ export function DashboardShell({
         <DashboardAgentSlot />
       </SidebarProvider>
       <DashboardGlobalActions />
+      {welcomeTour.open ? (
+        <WelcomeTour
+          brandName={activeOrganization?.name}
+          onClose={welcomeTour.close}
+        />
+      ) : null}
     </div>
   );
 

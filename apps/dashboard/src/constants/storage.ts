@@ -26,6 +26,7 @@ export const localStorageKeys = {
     `notra:command-palette-recents:v1:${organizationId}`,
   githubPublishRepository: (organizationId: string) =>
     `notra:github-publish-repository:v1:${organizationId}`,
+  welcomeTourSeen: "notra:welcome-tour-seen",
 } as const;
 
 export const sessionStorageKeys = {
