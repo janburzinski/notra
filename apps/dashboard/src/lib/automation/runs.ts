@@ -1,7 +1,7 @@
 import { db } from "@notra/db/drizzle";
 import { automationRuns } from "@notra/db/schema";
 import type { AutomationRunStatus } from "@notra/schemas/dashboard/automation/runs";
-import { and, desc, eq, gte, lt, or, type SQL } from "drizzle-orm";
+import { and, desc, eq, gte, lt, max, or, sql, type SQL } from "drizzle-orm";
 
 import {
   AUTOMATION_RUN_STALE_AFTER_MS,
@@ -119,13 +119,7 @@ export async function listAutomationRuns(
           : undefined,
         input.status ? statusCondition(input.status, cutoff) : undefined,
         cursor
-          ? or(
-              lt(automationRuns.startedAt, cursor.startedAt),
-              and(
-                eq(automationRuns.startedAt, cursor.startedAt),
-                lt(automationRuns.id, cursor.id)
-              )
-            )
+          ? sql`(${automationRuns.startedAt}, ${automationRuns.id}) < (${sql.param(cursor.startedAt, automationRuns.startedAt)}, ${sql.param(cursor.id, automationRuns.id)})`
           : undefined
       )
     )
@@ -148,13 +142,16 @@ export async function listLatestAutomationRuns(
   organizationId: string
 ): Promise<Record<string, string>> {
   const rows = await db
-    .selectDistinctOn([automationRuns.automationId], {
+    .select({
       automationId: automationRuns.automationId,
-      startedAt: automationRuns.startedAt,
+      startedAt: max(automationRuns.startedAt).mapWith(
+        automationRuns.startedAt
+      ),
     })
     .from(automationRuns)
     .where(eq(automationRuns.organizationId, organizationId))
-    .orderBy(automationRuns.automationId, desc(automationRuns.startedAt));
+    .groupBy(automationRuns.automationId)
+    .orderBy(automationRuns.automationId);
   return Object.fromEntries(
     rows.map((row) => [row.automationId, row.startedAt.toISOString()])
   );

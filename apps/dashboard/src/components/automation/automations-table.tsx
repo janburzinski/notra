@@ -3,13 +3,8 @@
 import {
   AiBrowserIcon,
   Clock01Icon,
-  Delete02Icon,
-  Edit02Icon,
   GithubIcon,
   MoreVerticalIcon,
-  PlayCircleIcon,
-  SentIcon,
-  Task01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { CUSTOM_SCHEDULE_DEFAULT_INTERVAL_DAYS } from "@notra/ai/constants/schedule-interval";
@@ -19,8 +14,6 @@ import { Badge } from "@notra/ui/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { Spinner } from "@notra/ui/components/ui/spinner";
@@ -31,11 +24,11 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { cn } from "@notra/ui/lib/utils";
-import type { ReactNode } from "react";
 import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useNow, useTranslations } from "use-intl";
 
 import { AutomationActionIcon } from "@/components/automation/action-icon";
+import { AutomationMenuItems } from "@/components/automation/automation-menu-items";
 import { Button } from "@/components/button";
 import {
   AUTOMATION_EMPTY_TABLE_HEIGHT,
@@ -44,25 +37,14 @@ import {
 import { useAutomationRowName } from "@/lib/hooks/use-automation-row-name";
 import { useOutputTypeLabel } from "@/lib/hooks/use-output-type-label";
 import { useScheduleFrequencyLabel } from "@/lib/hooks/use-schedule-frequency-label";
-import type { AutomationRow } from "@/types/automation/automations";
+import type {
+  AutomationRow,
+  AutomationsTableProps,
+} from "@/types/automation/automations";
 import { rowEnabled } from "@/utils/automation-rows";
 import { latest } from "@/utils/latest-date";
 import { OutputTypeIcon } from "@/utils/output-types";
 import { tableHeightFor } from "@/utils/table";
-
-interface AutomationsTableProps {
-  rows: AutomationRow[];
-  busyId?: string;
-  emptyState: ReactNode;
-  onEdit: (row: AutomationRow) => void;
-  onToggle: (row: AutomationRow, enabled: boolean) => void;
-  onDelete: (row: AutomationRow) => void;
-  onRunNow: (row: AutomationRow) => void;
-  onSendTest: (row: AutomationRow) => void;
-  onViewRuns: (row: AutomationRow) => void;
-  /** Newest run per automation ID. */
-  lastRuns: Map<string, string>;
-}
 
 const KIND_ICONS: Record<AutomationRow["kind"], IconSvgElement> = {
   alert: AiBrowserIcon,
@@ -300,36 +282,16 @@ export function AutomationsTable({
             }
           />
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(row)}>
-              <HugeiconsIcon className="size-4" icon={Edit02Icon} />
-              {tCommon("actions.edit")}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onViewRuns(row)}>
-              <HugeiconsIcon className="size-4" icon={Task01Icon} />
-              {t("viewRuns")}
-            </DropdownMenuItem>
-            {row.kind === "alert" ? (
-              <DropdownMenuItem onClick={() => onSendTest(row)}>
-                <HugeiconsIcon className="size-4" icon={SentIcon} />
-                {tAlerts("dialog.sendTest")}
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                disabled={!rowEnabled(row)}
-                onClick={() => onRunNow(row)}
-              >
-                <HugeiconsIcon className="size-4" icon={PlayCircleIcon} />
-                {tCommon("labels.runNow")}
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => onDelete(row)}
-              variant="destructive"
-            >
-              <HugeiconsIcon className="size-4" icon={Delete02Icon} />
-              {tCommon("actions.delete")}
-            </DropdownMenuItem>
+            <AutomationMenuItems
+              row={row}
+              busy={busyId === row.id}
+              variant="dropdown"
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onRunNow={onRunNow}
+              onSendTest={onSendTest}
+              onViewRuns={onViewRuns}
+            />
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -343,6 +305,18 @@ export function AutomationsTable({
       emptyState={emptyState}
       getRowId={(row) => row.id}
       onRowClick={onEdit}
+      renderRowContextMenu={(row) => (
+        <AutomationMenuItems
+          row={row}
+          busy={busyId === row.id}
+          variant="context"
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onRunNow={onRunNow}
+          onSendTest={onSendTest}
+          onViewRuns={onViewRuns}
+        />
+      )}
       // The name button already opens the row from the keyboard.
       rowKeyboardActivation={false}
       height={

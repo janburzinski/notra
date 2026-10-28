@@ -4,6 +4,7 @@ import type {
   GeoAlertActions,
   GeoAlertSignal,
 } from "@notra/schemas/dashboard/automation/geo-alerts";
+import type { ReactNode } from "react";
 
 import type { GeoAlertAutomation } from "@/types/automation/geo-alerts";
 import type { SchedulePresetId } from "@/types/automation/schedule";
@@ -73,6 +74,28 @@ export type AutomationRow =
   | { kind: "schedule"; id: string; trigger: Trigger }
   | { kind: "event"; id: string; trigger: Trigger }
   | { kind: "alert"; id: string; alert: GeoAlertAutomation };
+
+export interface AutomationsTableProps {
+  rows: AutomationRow[];
+  busyId?: string;
+  emptyState: ReactNode;
+  onEdit: (row: AutomationRow) => void;
+  onToggle: (row: AutomationRow, enabled: boolean) => void;
+  onDelete: (row: AutomationRow) => void;
+  onRunNow: (row: AutomationRow) => void;
+  onSendTest: (row: AutomationRow) => void;
+  onViewRuns: (row: AutomationRow) => void;
+  lastRuns: Map<string, string>;
+}
+
+export interface AutomationMenuItemsProps extends Pick<
+  AutomationsTableProps,
+  "onEdit" | "onDelete" | "onRunNow" | "onSendTest" | "onViewRuns"
+> {
+  row: AutomationRow;
+  busy: boolean;
+  variant: "context" | "dropdown";
+}
 
 export interface GeoAlertPreset {
   signal: GeoAlertSignal;

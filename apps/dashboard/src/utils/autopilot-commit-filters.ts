@@ -44,10 +44,11 @@ export function repositoryPathFilter(
  * * stays inside one folder and ? is one character other than /.
  */
 function matchesGlob(path: string, pattern: string) {
-  let reachable = Array.from({ length: path.length + 1 }, (_, i) => i === 0);
+  let reachable = new Array<boolean>(path.length + 1).fill(false);
+  reachable[0] = true;
   for (let index = 0; index < pattern.length; index++) {
     const character = pattern[index] ?? "";
-    const next = Array.from({ length: path.length + 1 }, () => false);
+    const next = new Array<boolean>(path.length + 1).fill(false);
     if (character === "*" && pattern[index + 1] === "*") {
       const slash = pattern[index + 2] === "/";
       let seen = false;
