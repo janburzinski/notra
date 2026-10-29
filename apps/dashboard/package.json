@@ -93,7 +93,7 @@
     "@zumer/snapdom": "^3.3.6",
     "ai": "catalog:",
     "autumn-js": "catalog:",
-    "c15t": "3.0.0",
+    "c15t": "3.2.0",
     "cmdk": "^1.1.1",
     "cnfast": "~0.0.8",
     "color": "^5.0.3",

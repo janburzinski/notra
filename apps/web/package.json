@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "4.0.85",
-    "@c15t/integrations": "3.0.0",
+    "@c15t/integrations": "3.2.0",
     "@databuddy/sdk": "catalog:",
     "@dnd-kit/core": "catalog:",
     "@dnd-kit/sortable": "catalog:",
@@ -55,7 +55,7 @@
     "@upstash/redis": "catalog:",
     "@usenotra/geo": "npm:@usenotra/geo@^0.6.2",
     "ai": "catalog:",
-    "c15t": "3.0.0",
+    "c15t": "3.2.0",
     "dompurify": "^3.4.17",
     "effect": "catalog:",
     "fumadocs-core": "^16.17.3",

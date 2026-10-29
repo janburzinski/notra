@@ -37,14 +37,14 @@ async function consentIntegrations() {
   if (!consent) {
     return [];
   }
-  const { default: c15t, hosted, offline } = await import("@c15t/astro");
+  const { default: c15t, hosted, local } = await import("@c15t/astro");
   const assets = `${params.mount.replace(/\/$/, "")}/_notra/assets`;
   return [
     c15t({
       ...consent.options,
       mode: consent.backendURL
         ? hosted({ backendURL: consent.backendURL })
-        : offline(),
+        : local(),
       scripts: consent.scripts.map((script) => ({
         id: `notra-script-${script.fileName}`,
         src: `${assets}/${script.fileName}`,

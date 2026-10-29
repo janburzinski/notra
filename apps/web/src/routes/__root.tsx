@@ -14,7 +14,7 @@ import {
   ConsentDialog,
   ConsentRoot,
   ConsentTheme,
-  offline,
+  local,
 } from "c15t/tanstack-start";
 import {
   consentLoaderOptions,
@@ -122,7 +122,7 @@ function RootDocument({ children }: { children: ReactNode }) {
               theme: consentTheme,
               components: consentComponents,
               ...(process.env.NODE_ENV !== "production"
-                ? { mode: offline() }
+                ? { mode: local() }
                 : {}),
             }}
           >

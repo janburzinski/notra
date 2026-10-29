@@ -11,7 +11,7 @@ import {
   ConsentDialog,
   ConsentRoot,
   ConsentTheme,
-  offline,
+  local,
 } from "c15t/tanstack-start";
 import { use } from "react";
 import { IntlProvider } from "use-intl";
@@ -115,7 +115,7 @@ function Root() {
                 components: consentComponents,
                 ...(process.env.NODE_ENV === "production"
                   ? {}
-                  : { mode: offline() }),
+                  : { mode: local() }),
               }}
               clearOnRevocation={DUB_CLEAR_ON_REVOCATION}
               scripts={DUB_ANALYTICS_SCRIPTS}
