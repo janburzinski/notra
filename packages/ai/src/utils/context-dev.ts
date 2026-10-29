@@ -9,6 +9,7 @@ import type {
   ContextDevFetchWebpageInput,
   ContextDevFetchWebpageResponse,
   ContextDevParseResponse,
+  ContextDevRequestInit,
   ContextDevScrapingResult,
   ContextDevScreenshotInput,
   ContextDevScreenshotResponse,
@@ -21,6 +22,11 @@ import type {
 import type { OperationalLogEvent } from "@notra/ai/types/operational-log";
 import { logError } from "@notra/ai/utils/server-log";
 import { isDemoMode } from "@notra/utils/demo-mode";
+import { Effect } from "effect";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
+import * as HttpClient from "effect/http/HttpClient";
+import { isHttpClientError } from "effect/http/HttpClientError";
+import * as HttpClientRequest from "effect/http/HttpClientRequest";
 
 import {
   BRAND_ANALYSIS_EXCLUDED_PATH_PARTS,
@@ -39,6 +45,7 @@ import {
 import { demoContextDevResponse } from "./demo-context-dev";
 import { httpErrorKind } from "./http-error-kind";
 import { logOperationalEvent } from "./operational-log";
+import { withRateLimitRetry } from "./rate-limit-retry";
 import { websiteLogUrl } from "./website-log-url";
 
 const CONTEXT_DEV_API_BASE_URL = "https://api.context.dev/v1";
@@ -88,21 +95,42 @@ function getContextDevErrorMessage(
   return `Website data request failed with status ${status}`;
 }
 
-async function parseContextDevError(response: Response): Promise<never> {
-  const payload = (await response.json().catch(() => undefined)) as
-    | ContextDevErrorResponse
-    | undefined;
+function toContextDevRequest(
+  path: string,
+  init: ContextDevRequestInit,
+  apiKey: string
+) {
+  const request = HttpClientRequest.make(init.method)(
+    `${CONTEXT_DEV_API_BASE_URL}${path}`
+  ).pipe(HttpClientRequest.acceptJson, HttpClientRequest.bearerToken(apiKey));
+  const contentType = init.contentType ?? "application/json";
+  if (typeof init.body === "string") {
+    return HttpClientRequest.bodyText(request, init.body, contentType);
+  }
+  if (init.body !== undefined) {
+    return HttpClientRequest.bodyUint8Array(request, init.body, contentType);
+  }
+  return request;
+}
 
-  throw new ContextDevApiError(
-    getContextDevErrorMessage(payload, response.status),
-    response.status,
-    payload?.error_code
-  );
+function withCallerSignal(signal: AbortSignal | undefined): typeof fetch {
+  const transport = (
+    input: Parameters<typeof fetch>[0],
+    requestInit?: Parameters<typeof fetch>[1]
+  ) =>
+    globalThis.fetch(input, {
+      ...requestInit,
+      signal:
+        signal && requestInit?.signal
+          ? AbortSignal.any([requestInit.signal, signal])
+          : (requestInit?.signal ?? signal),
+    });
+  return Object.assign(transport, globalThis.fetch);
 }
 
 async function requestContextDev<TResponse>(
   path: string,
-  init: RequestInit
+  init: ContextDevRequestInit
 ): Promise<TResponse> {
   const startedAt = performance.now();
   let status: number | undefined;
@@ -121,28 +149,45 @@ async function requestContextDev<TResponse>(
     }
     const apiKey = getContextDevApiKey();
     errorKind = "transport_error";
-    const response = await fetch(`${CONTEXT_DEV_API_BASE_URL}${path}`, {
-      ...init,
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        ...init.headers,
-      },
+    const program = Effect.gen(function* () {
+      const client = withRateLimitRetry(yield* HttpClient.HttpClient);
+      const response = yield* client.execute(
+        toContextDevRequest(path, init, apiKey)
+      );
+      status = response.status;
+      errorKind = httpErrorKind(status) ?? "operation_error";
+      if (status < 200 || status >= 300) {
+        const payload = (yield* Effect.orElseSucceed(
+          response.json,
+          () => undefined
+        )) as ContextDevErrorResponse | undefined;
+        return yield* Effect.fail(
+          new ContextDevApiError(
+            getContextDevErrorMessage(payload, status),
+            status,
+            payload?.error_code
+          )
+        );
+      }
+      errorKind = "transport_error";
+      return (yield* response.json) as TResponse;
+    }).pipe(
+      Effect.provide(FetchHttpClient.layer),
+      Effect.provideService(
+        FetchHttpClient.Fetch,
+        withCallerSignal(init.signal)
+      )
+    );
+    const payload = await Effect.runPromise(program, {
+      signal: init.signal,
+    }).catch((error: unknown) => {
+      init.signal?.throwIfAborted();
+      throw error;
     });
-    status = response.status;
-    errorKind = httpErrorKind(status) ?? "operation_error";
-    if (!response.ok) {
-      return await parseContextDevError(response);
-    }
-    // Fetch resolves at headers; body reads can still fail. Keep the native
-    // JSON decoder and distinguish its SyntaxError from a transport failure.
-    errorKind = "transport_error";
-    const payload = (await response.json()) as TResponse;
     outcome = "success";
     return payload;
   } catch (error) {
-    if (error instanceof SyntaxError) {
+    if (isHttpClientError(error) && error.reason._tag === "DecodeError") {
       errorKind = "operation_error";
     }
     errorName = error instanceof Error ? error.name : "UnknownError";
@@ -161,7 +206,7 @@ async function requestContextDev<TResponse>(
       surface: "context-dev",
       provider: "context.dev",
       routeId: path.split("?")[0] ?? path,
-      method: init.method ?? "GET",
+      method: init.method,
       durationMs: Math.round(performance.now() - startedAt),
       status,
       outcome,
@@ -634,7 +679,7 @@ export async function parsePdfDocument(
     "/parse?extension=pdf",
     {
       body: bytes,
-      headers: { "Content-Type": "application/pdf" },
+      contentType: "application/pdf",
       method: "POST",
       signal: AbortSignal.timeout(CONTEXT_DEV_PARSE_TIMEOUT_MS),
     }

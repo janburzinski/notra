@@ -206,3 +206,10 @@ export interface ContextDevWebSearchResponse {
 export type ContextDevScrapingResult =
   | { success: true; content: string }
   | { success: false; error: string; fatal: boolean };
+
+export interface ContextDevRequestInit {
+  method: "GET" | "POST";
+  body?: string | Uint8Array<ArrayBuffer>;
+  contentType?: string;
+  signal?: AbortSignal;
+}
