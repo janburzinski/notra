@@ -26,6 +26,8 @@ export interface ScheduledContentCreatedDigestEvent extends ContentEmailDigestBa
   contentType: string;
   contentOverviewLink: string;
   subject?: string;
+  /** The automation's Then notify step asked for this email. */
+  automationEmail?: boolean;
 }
 
 export interface ScheduledContentFailedDigestEvent extends ContentEmailDigestBaseEvent {

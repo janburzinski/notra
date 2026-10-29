@@ -11,6 +11,7 @@ import { lookbackWindowEnum } from "@notra/db/schema";
 
 import { splitCommaSeparatedValues } from "../../utils/query-params";
 import {
+  automationNotifySchema,
   cronAnchorDateSchema,
   cronFrequencySchema,
   cronIntervalDaysSchema,
@@ -149,6 +150,11 @@ export const scheduleOutputConfigSchema = z
         example:
           "Write a tutorial-style post that walks through one feature shipped in this window, with code samples.",
       }),
+    notify: automationNotifySchema.optional().openapi({
+      description:
+        "Where to announce new content after a successful run: Slack posts to the organization's notification channel, email goes to the workspace owners.",
+      example: { slack: true, email: false },
+    }),
   })
   .optional();
 

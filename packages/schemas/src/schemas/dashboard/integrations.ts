@@ -12,6 +12,7 @@ import {
   GITHUB_URL_PATTERNS,
 } from "../../constants/dashboard/github";
 import {
+  automationNotifySchema,
   cronAnchorDateSchema as sharedCronAnchorDateSchema,
   cronFrequencySchema,
   cronIntervalDaysSchema as sharedCronIntervalDaysSchema,
@@ -444,6 +445,7 @@ export const triggerOutputConfigSchema = z
       .min(1)
       .max(MAX_SCHEDULE_INSTRUCTIONS_LENGTH)
       .optional(),
+    notify: automationNotifySchema.optional(),
   })
   .optional();
 

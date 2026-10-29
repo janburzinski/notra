@@ -34,6 +34,7 @@ export interface TriggerOutputConfig {
   publishDestination?: "webflow" | "framer" | "custom";
   brandVoiceId?: string;
   instructions?: string;
+  notify?: { slack: boolean; email: boolean };
 }
 
 export interface Trigger {

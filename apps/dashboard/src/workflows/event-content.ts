@@ -7,6 +7,7 @@ import { eventWorkflowPayloadSchema } from "@notra/schemas/dashboard/workflows";
 import { flattenError } from "zod";
 
 import { WORKFLOW_ANALYTICS_NAMES } from "@/constants/workflow-analytics";
+import { parseTriggerOutputConfig } from "@/lib/workflows/shared/parsing";
 import type { EventContentWorkflowResult } from "@/types/workflows/event-generation";
 import { resolveContentLimitPauseReason } from "@/utils/content-billing";
 
@@ -29,6 +30,7 @@ import {
   finalizeContentBilling,
   finishGeneration,
   gateContentBilling,
+  notifyContentCreatedInSlack,
   notifyContentLimitReached,
   recordWorkflowPause,
   startGenerationTracking,
@@ -377,6 +379,14 @@ export async function eventContentWorkflow(payload: {
     });
 
     try {
+      const notify = parseTriggerOutputConfig(trigger.outputConfig)?.notify;
+      if (notify?.slack) {
+        await notifyContentCreatedInSlack({
+          organizationId: trigger.organizationId,
+          automationName,
+          posts: createdPosts.map(({ postId, title }) => ({ postId, title })),
+        });
+      }
       await appendAutomationLog({
         organizationId: trigger.organizationId,
         integrationId: triggerId,
@@ -405,6 +415,7 @@ export async function eventContentWorkflow(payload: {
       const notificationData = await fetchNotificationData({
         organizationId: trigger.organizationId,
         setting: "scheduledContentCreation",
+        force: notify?.email,
       });
       if (notificationData.enabled && notificationData.ownerEmails.length > 0) {
         const baseUrl = process.env.APP_URL ?? "https://app.usenotra.com";
@@ -423,7 +434,8 @@ export async function eventContentWorkflow(payload: {
             })),
             contentType: trigger.outputType,
             contentOverviewLink,
-            subject: `New content created from ${eventType} event`,
+            automationEmail: notify?.email === true,
+            subject: `New content created from ${automationName}`,
           },
           logPrefix: LOG_PREFIX,
         });

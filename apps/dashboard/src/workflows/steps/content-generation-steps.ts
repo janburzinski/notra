@@ -27,6 +27,7 @@ import {
   trackContentOutcomeAndFlush,
   trackWorkflowOutcomeAndFlush,
 } from "@/lib/analytics/workflow-lifecycle";
+import { postContentCreatedToSlack } from "@/lib/automation/content-notifications";
 import { checkLogRetention } from "@/lib/billing/check-log-retention";
 import {
   trackScheduledContentCreated,
@@ -54,6 +55,7 @@ import type { LogRetentionDays } from "@/types/webhooks/webhooks";
 import type {
   AppendAutomationLogInput,
   ClaimWorkflowExecutionInput,
+  ContentCreatedSlackInput,
   CreateGenerationCollectionInput,
   EnqueueDigestInput,
   FinalizeContentBillingInput,
@@ -542,6 +544,7 @@ export async function trackContentOutcome(
 export async function fetchNotificationData(input: {
   organizationId: string;
   setting: NotificationSettingKey;
+  force?: boolean;
 }): Promise<NotificationData> {
   "use step";
   return getNotificationData(input);
@@ -550,6 +553,13 @@ export async function fetchNotificationData(input: {
 export async function enqueueDigest(input: EnqueueDigestInput): Promise<void> {
   "use step";
   await enqueueContentEmailDigest(input);
+}
+
+export async function notifyContentCreatedInSlack(
+  input: ContentCreatedSlackInput
+): Promise<void> {
+  "use step";
+  await postContentCreatedToSlack(input);
 }
 
 export async function cleanupEmptyCollection(input: {

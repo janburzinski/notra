@@ -2,6 +2,7 @@ import { CUSTOM_SCHEDULE_DEFAULT_INTERVAL_DAYS } from "@notra/ai/constants/sched
 import { toUtcDateString } from "@notra/ai/utils/schedule-interval";
 import type { ScheduleOutputType } from "@notra/schemas/dashboard/integrations";
 
+import { NO_AUTOMATION_NOTIFY } from "@/constants/automation-notify";
 import { DEFAULT_SCHEDULE } from "@/constants/schedule";
 import { SCHEDULE_PRESETS } from "@/constants/schedule-presets";
 import type {
@@ -73,6 +74,7 @@ export function getDefaultScheduleValues(
           ? editTrigger.outputConfig.brandVoiceId
           : "",
       autoPublish: editTrigger.autoPublish ?? false,
+      notify: editTrigger.outputConfig?.notify ?? NO_AUTOMATION_NOTIFY,
     };
   }
   const preset = presetId ? getPresetScheduleValues(presetId) : undefined;
@@ -85,6 +87,7 @@ export function getDefaultScheduleValues(
     lookbackWindow: preset?.lookbackWindow ?? "last_7_days",
     brandVoiceId: "",
     autoPublish: false,
+    notify: NO_AUTOMATION_NOTIFY,
     ...overrides,
   };
 }

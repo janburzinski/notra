@@ -78,6 +78,7 @@ if (process.env.NOTRA_CONTENT_BILLING_CONFIRMATION_TEST !== "1") {
       organizationName: "Example",
       organizationSlug: "example",
     }),
+    notifyContentCreatedInSlack: async () => undefined,
     startGenerationTracking: async () => undefined,
     createGenerationCollection: async () => undefined,
     notifyContentLimitReached: async () => undefined,

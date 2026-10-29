@@ -279,6 +279,7 @@ async function sendDigest(
         createdContent,
         contentType: firstCreatedEvent.contentType,
         contentOverviewLink: firstCreatedEvent.contentOverviewLink,
+        automationEmail: createdEvents.every((event) => event.automationEmail),
         subject:
           createdEvents.length > 1
             ? "Your Notra automations created new content"

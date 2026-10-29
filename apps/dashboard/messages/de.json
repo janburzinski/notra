@@ -5056,7 +5056,11 @@
       "failedToUpdateSchedule": "Zeitplan konnte nicht aktualisiert werden",
       "activeCount": "Aktiv ({count})",
       "pausedCount": "Pausiert ({count})",
-      "failedToUpdateTrigger": "Trigger konnte nicht aktualisiert werden"
+      "failedToUpdateTrigger": "Trigger konnte nicht aktualisiert werden",
+      "notify": {
+        "label": "Danach benachrichtigen",
+        "hint": "Kündigt neue Inhalte an, sobald ein Lauf fertig ist."
+      }
     },
     "brandVoice": {
       "noIdentity": "Keine Identität",

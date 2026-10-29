@@ -5056,7 +5056,11 @@
       "failedToUpdateSchedule": "Failed to update schedule",
       "activeCount": "Active ({count})",
       "pausedCount": "Paused ({count})",
-      "failedToUpdateTrigger": "Failed to update trigger"
+      "failedToUpdateTrigger": "Failed to update trigger",
+      "notify": {
+        "label": "Then notify",
+        "hint": "Announce new content once a run finishes."
+      }
     },
     "brandVoice": {
       "noIdentity": "No identity",

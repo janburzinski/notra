@@ -88,6 +88,12 @@ export interface NotificationData {
   organizationSlug: string;
 }
 
+export interface ContentCreatedSlackInput {
+  organizationId: string;
+  automationName: string;
+  posts: Array<{ postId: string; title: string }>;
+}
+
 export interface EnqueueDigestInput {
   organizationId: string;
   recipientEmails: string[];

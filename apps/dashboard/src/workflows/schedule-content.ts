@@ -15,6 +15,7 @@ import {
   SCHEDULE_RATE_LIMIT_MAX_ATTEMPTS,
 } from "@/constants/workflows";
 import type { ContentGenerationResult } from "@/lib/workflows/schedule/types";
+import { parseTriggerOutputConfig } from "@/lib/workflows/shared/parsing";
 import type { ScheduleContentWorkflowResult } from "@/types/workflows/schedule-generation";
 import { resolveContentLimitPauseReason } from "@/utils/content-billing";
 import { parseCustomIntervalCron } from "@/utils/schedule-interval";
@@ -38,6 +39,7 @@ import {
   finalizeContentBilling,
   finishGeneration,
   gateContentBilling,
+  notifyContentCreatedInSlack,
   notifyContentLimitReached,
   recordWorkflowPause,
   startGenerationTracking,
@@ -443,6 +445,14 @@ export async function scheduleContentWorkflow(payload: {
     });
 
     try {
+      const notify = parseTriggerOutputConfig(trigger.outputConfig)?.notify;
+      if (notify?.slack) {
+        await notifyContentCreatedInSlack({
+          organizationId: trigger.organizationId,
+          automationName,
+          posts: createdPosts.map(({ postId, title }) => ({ postId, title })),
+        });
+      }
       await appendAutomationLog({
         organizationId: trigger.organizationId,
         integrationId: triggerId,
@@ -470,6 +480,7 @@ export async function scheduleContentWorkflow(payload: {
       const notificationData = await fetchNotificationData({
         organizationId: trigger.organizationId,
         setting: "scheduledContentCreation",
+        force: notify?.email,
       });
       if (notificationData.enabled && notificationData.ownerEmails.length > 0) {
         const baseUrl = process.env.APP_URL ?? "https://app.usenotra.com";
@@ -488,6 +499,7 @@ export async function scheduleContentWorkflow(payload: {
             })),
             contentType: trigger.outputType,
             contentOverviewLink,
+            automationEmail: notify?.email === true,
             subject: manual
               ? `New content created from ${automationName}`
               : `Your ${automationName} schedule created new content`,

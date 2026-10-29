@@ -28,6 +28,7 @@ export const ScheduledContentCreatedEmail = ({
   contentType = "changelog",
   organizationSlug = "acme",
   contentOverviewLink = `https://app.usenotra.com/${organizationSlug}/content`,
+  automationEmail = false,
 }: ScheduledContentCreatedEmailProps) => {
   const contentCount = createdContent.length;
   const primaryContent = createdContent[0];
@@ -43,7 +44,7 @@ export const ScheduledContentCreatedEmail = ({
 
   return (
     <EmailLayout
-      heading="New scheduled content is ready"
+      heading="New content is ready"
       preview={
         contentCount === 1 && primaryContent
           ? `${primaryContent.title}, ready to review in ${organizationName}`
@@ -51,8 +52,8 @@ export const ScheduledContentCreatedEmail = ({
       }
       subtext={
         <>
-          Your <strong>{scheduleName}</strong> schedule in{" "}
-          <strong>{organizationName}</strong> {summary}
+          <strong>{scheduleName}</strong> in <strong>{organizationName}</strong>{" "}
+          {summary}
         </>
       }
     >
@@ -88,6 +89,7 @@ export const ScheduledContentCreatedEmail = ({
       </EmailCtaButton>
       <EmailButtonFallbackLink href={reviewLink} />
       <EmailNotificationSettingsNote
+        automationNames={automationEmail ? scheduleName : undefined}
         organizationName={organizationName}
         organizationSlug={organizationSlug}
       />

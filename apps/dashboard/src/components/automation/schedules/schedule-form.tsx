@@ -32,6 +32,7 @@ import {
   PICKER_CHIP_CLASS,
   PickerSelect,
 } from "@/components/automation/editor/editor-parts";
+import { AutomationNotifySection } from "@/components/automation/editor/notify-section";
 import { SourcePicker } from "@/components/automation/editor/source-picker";
 import { TriggerSwitchRow } from "@/components/automation/events/trigger-switch-row";
 import { Button } from "@/components/button";
@@ -120,6 +121,7 @@ export function ScheduleForm({
           outputConfig: {
             ...(value.brandVoiceId ? { brandVoiceId: value.brandVoiceId } : {}),
             ...(instructions ? { instructions } : {}),
+            notify: value.notify,
           },
           enabled,
           autoPublish: supportsAutoPublish(value.outputType)
@@ -521,6 +523,16 @@ export function ScheduleForm({
             )}
           </EditorBox>
         </EditorSection>
+
+        <form.Field name="notify">
+          {(field) => (
+            <AutomationNotifySection
+              onChange={field.handleChange}
+              organizationId={organizationId}
+              value={field.state.value}
+            />
+          )}
+        </form.Field>
 
         <EditorFooter
           status={

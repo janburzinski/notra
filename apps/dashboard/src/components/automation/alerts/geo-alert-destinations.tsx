@@ -130,7 +130,7 @@ export function GeoAlertDestinationsSection({
   );
 }
 
-function DestinationRow({
+export function DestinationRow({
   checked,
   disabled,
   hint,

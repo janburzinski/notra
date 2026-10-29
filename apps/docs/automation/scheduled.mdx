@@ -303,6 +303,7 @@ If a schedule's repository integration was removed, you cannot re-enable the sch
 
 * **Content** shows every generated post, and Notra groups posts from a schedule into one collection per run.
 * **Settings > Notifications** can email you when Notra creates scheduled content, when generation fails and when Notra skips a run because there was nothing worth writing about.
+* **Then notify** in the automation editor announces new content from that automation once a run succeeds. Slack posts to the notification channel picked under **Integrations > Slack**, and email goes to the workspace owners even when the Notifications setting is off.
 * If the run hits GitHub's API rate limit, Notra waits 30 minutes and retries up to three attempts before marking the run as failed.
 * If your plan quota for the format is used up and no AI credits are available, the run stops and workspace owners receive an email.
 

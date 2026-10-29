@@ -4,6 +4,7 @@ import type {
   GeoAlertActions,
   GeoAlertSignal,
 } from "@notra/schemas/dashboard/automation/geo-alerts";
+import type { AutomationNotify } from "@notra/schemas/shared/automation";
 import type { ReactNode } from "react";
 
 import type { GeoAlertAutomation } from "@/types/automation/geo-alerts";
@@ -100,4 +101,10 @@ export interface AutomationMenuItemsProps extends Pick<
 export interface GeoAlertPreset {
   signal: GeoAlertSignal;
   actions?: Partial<GeoAlertActions>;
+}
+
+export interface AutomationNotifySectionProps {
+  organizationId: string;
+  value: AutomationNotify;
+  onChange: (value: AutomationNotify) => void;
 }

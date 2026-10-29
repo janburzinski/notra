@@ -59,6 +59,7 @@ export function useEventTriggerForm({
         outputType: value.outputType,
         outputConfig: {
           ...(value.brandVoiceId ? { brandVoiceId: value.brandVoiceId } : {}),
+          notify: value.notify,
         },
         enabled,
         autoPublish: supportsAutoPublish(value.outputType)

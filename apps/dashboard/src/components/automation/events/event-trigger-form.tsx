@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useTranslations } from "use-intl";
 
 import { EditorHeader } from "@/components/automation/editor/editor-parts";
+import { AutomationNotifySection } from "@/components/automation/editor/notify-section";
 import { useEventTriggerForm } from "@/lib/hooks/use-event-trigger-form";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { EventTriggerFormProps } from "@/types/automation/event-trigger";
@@ -135,6 +136,15 @@ export function EventTriggerForm({
           options={integrationOptions}
         />
         <EventTriggerRulesSection brandVoices={brandVoices} form={form} />
+        <form.Field name="notify">
+          {(field) => (
+            <AutomationNotifySection
+              onChange={field.handleChange}
+              organizationId={organizationId}
+              value={field.state.value}
+            />
+          )}
+        </form.Field>
         <EventTriggerDialogFooter
           errorMessage={formError}
           isEditMode={isEditMode}

@@ -14,10 +14,12 @@ import type {
 /**
  * Whether an organization wants one kind of notification, and its owners'
  * addresses. No settings row means off, like the settings page shows it.
+ * `force` skips the setting, for an automation that asked to email itself.
  */
 export async function getNotificationData(input: {
   organizationId: string;
   setting: NotificationSettingKey;
+  force?: boolean;
 }): Promise<NotificationData> {
   const notificationSettings =
     await db.query.organizationNotificationSettings.findFirst({
@@ -27,7 +29,7 @@ export async function getNotificationData(input: {
       ),
     });
 
-  if (!notificationSettings?.[input.setting]) {
+  if (!(input.force || notificationSettings?.[input.setting])) {
     return {
       enabled: false,
       ownerEmails: [],

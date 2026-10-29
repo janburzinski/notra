@@ -80,6 +80,7 @@ export interface SendScheduledContentCreatedEmailProps extends DigestEmailProps 
   contentType: string;
   contentOverviewLink: string;
   subject?: string;
+  automationEmail?: boolean;
 }
 
 export interface SendWeeklySummaryEmailProps extends WeeklySummaryEmailProps {

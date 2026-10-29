@@ -214,6 +214,7 @@ export async function sendScheduledContentCreatedEmail({
   contentOverviewLink,
   organizationSlug,
   subject,
+  automationEmail,
 }: SendScheduledContentCreatedEmailProps) {
   return sendBrewEmail({
     category: "schedule-content-created",
@@ -226,6 +227,7 @@ export async function sendScheduledContentCreatedEmail({
       createdContent,
       contentType,
       contentOverviewLink,
+      automationEmail,
     }),
     idempotencyKey: digestBatchKey,
   });
