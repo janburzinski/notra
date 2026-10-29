@@ -1,8 +1,9 @@
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 
+import { billingInterval } from "@/lib/analytics/billing-events";
 import { flushTrackEvent } from "@/lib/analytics/posthog-client";
 import type { AttachPlanParams, AttachPlanResult } from "@/types/billing/plan";
-import { zdrAddonPlanId } from "@/utils/billing-plans";
+import { isAnnualPlanId, zdrAddonPlanId } from "@/utils/billing-plans";
 import { getDatabuddyPaymentMetadata } from "@/utils/databuddy";
 
 export async function attachPlanWithAddons({
@@ -11,9 +12,15 @@ export async function attachPlanWithAddons({
   planId,
   includeZdr,
   successUrl,
+  analytics,
 }: AttachPlanParams): Promise<AttachPlanResult> {
   const zdrPlanId = includeZdr ? zdrAddonPlanId(planId) : null;
   const metadata = getDatabuddyPaymentMetadata();
+  const checkoutProperties = {
+    ...analytics,
+    plan_id: planId,
+    interval: billingInterval(isAnnualPlanId(planId)),
+  };
 
   if (zdrPlanId) {
     const result = await multiAttach({
@@ -24,7 +31,7 @@ export async function attachPlanWithAddons({
     });
     if (result.paymentUrl) {
       await flushTrackEvent(POSTHOG_EVENTS.CHECKOUT_REDIRECTED, {
-        plan_id: planId,
+        ...checkoutProperties,
         zdr: true,
       });
     }
@@ -39,7 +46,7 @@ export async function attachPlanWithAddons({
   });
   if (result.paymentUrl) {
     await flushTrackEvent(POSTHOG_EVENTS.CHECKOUT_REDIRECTED, {
-      plan_id: planId,
+      ...checkoutProperties,
       zdr: false,
     });
   }

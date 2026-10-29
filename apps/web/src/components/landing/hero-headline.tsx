@@ -139,18 +139,17 @@ function HeadlineLineOne({ line }: { line: string | HeroHeadlineBrand }) {
     <>
       {line.before}
       <CycleMark animated={false} markKey={line.name}>
-        <Icon aria-hidden="true" className="size-full" />
+        <Icon
+          aria-hidden="true"
+          className={cn("size-full", line.iconClassName)}
+        />
       </CycleMark>
       <span className="ml-[0.16em]">{line.name}</span> {line.after}
     </>
   );
 }
 
-export function HeroHeadline({
-  word,
-  lineOne,
-  lineTwoPrefix,
-}: HeroHeadlineProps) {
+export function HeroHeadline({ word, lineOne, lineTwo }: HeroHeadlineProps) {
   const animated = useReducedMotion() === false;
 
   return (
@@ -159,11 +158,18 @@ export function HeroHeadline({
         <span className="block whitespace-nowrap">
           <HeadlineLineOne line={lineOne} />
         </span>
-        <HeadlineLineTwo
-          animated={animated}
-          prefix={lineTwoPrefix}
-          word={word}
-        />
+        {"headlineLineTwo" in lineTwo ? (
+          <span className="block text-[0.9em] whitespace-nowrap sm:text-[1em]">
+            {lineTwo.headlineLineTwo}
+            {HERO_HEADLINE_SUFFIX}
+          </span>
+        ) : (
+          <HeadlineLineTwo
+            animated={animated}
+            prefix={lineTwo.headlineLineTwoPrefix}
+            word={word}
+          />
+        )}
       </h1>
     </LazyMotion>
   );

@@ -1,4 +1,5 @@
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
+import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { Slack } from "@notra/ui/components/ui/svgs/slack";
 
 import type { HeroCycleWord, HeroVariantCopy } from "@/types/landing/hero";
@@ -30,6 +31,9 @@ export const HERO_SUBHEAD =
 const HERO_BOOK_A_CALL_HREF = "/contact";
 
 const HERO_CLAUDE_CONNECTOR_HREF = "https://claude.ai/directory/notra";
+
+const HERO_CHATGPT_APP_HREF =
+  "https://chatgpt.com/plugins/plugin_asdk_app_6ad054bf08248191a320ed1334e3ffde";
 
 export const HERO_EXPERIMENT_FLAG = "landing-hero";
 
@@ -80,6 +84,50 @@ export const HERO_VARIANTS: Record<string, HeroVariantCopy> = {
     cta: "Start for free",
     secondaryLabel: "Add to Claude",
     secondaryHref: HERO_CLAUDE_CONNECTOR_HREF,
+  },
+  "claude-expert": {
+    headlineLineOne: {
+      before: "Turn",
+      icon: ClaudeAiIcon,
+      name: "Claude",
+      after: "into an",
+    },
+    headlineLineTwo: "SEO & GEO expert",
+    subhead:
+      "Connect Notra to Claude and ask how your brand shows up in ChatGPT, Claude and Gemini. Claude finds the prompts you lose and drafts the pages that win them back.",
+    cta: "Start for free",
+    secondaryLabel: "Add to Claude",
+    secondaryHref: HERO_CLAUDE_CONNECTOR_HREF,
+  },
+  chatgpt: {
+    headlineLineOne: {
+      before: "Ask",
+      icon: Openai,
+      iconClassName: "dark:fill-white",
+      name: "ChatGPT",
+      after: "if buyers",
+    },
+    headlineLineTwoPrefix: "find you in",
+    subhead:
+      "Notra is a ChatGPT app. Ask ChatGPT where your brand appears in AI answers, who shows up instead and what to publish next, all from the chat you already use.",
+    cta: "Start for free",
+    secondaryLabel: "Add to ChatGPT",
+    secondaryHref: HERO_CHATGPT_APP_HREF,
+  },
+  "chatgpt-expert": {
+    headlineLineOne: {
+      before: "Turn",
+      icon: Openai,
+      iconClassName: "dark:fill-white",
+      name: "ChatGPT",
+      after: "into an",
+    },
+    headlineLineTwo: "SEO & GEO expert",
+    subhead:
+      "Connect Notra to ChatGPT and ask how your brand shows up in ChatGPT, Claude and Gemini. ChatGPT finds the prompts you lose and drafts the pages that win them back.",
+    cta: "Start for free",
+    secondaryLabel: "Add to ChatGPT",
+    secondaryHref: HERO_CHATGPT_APP_HREF,
   },
 };
 

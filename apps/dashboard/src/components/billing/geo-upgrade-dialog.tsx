@@ -26,6 +26,7 @@ import {
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { attachPlanWithAddons } from "@/lib/billing/attach-plan";
 import { useBillingCustomer } from "@/lib/hooks/use-billing-customer";
+import { usePaywallVariant } from "@/lib/hooks/use-paywall-variant";
 import { useRouter } from "@/lib/navigation";
 import type { BillingPlanGroup } from "@/types/billing/plan";
 import type { GeoUpgradeDialogProps } from "@/types/components/geo";
@@ -59,6 +60,7 @@ export function GeoUpgradeDialog({
     queryOptions: { enabled: open },
   });
   const { attach, multiAttach, refetch } = useBillingCustomer();
+  const paywall = usePaywallVariant();
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [includeZdr, setIncludeZdr] = useState(false);
@@ -99,22 +101,23 @@ export function GeoUpgradeDialog({
 
   async function handleSelectPlan(planId: string) {
     setLoading(planId);
-    trackEvent(
-      POSTHOG_EVENTS.PLAN_SELECTED,
-      planSelectedProperties({
+    trackEvent(POSTHOG_EVENTS.PLAN_SELECTED, {
+      ...planSelectedProperties({
         plans,
         planId,
         isYearly,
         includeZdr,
         surface,
-      })
-    );
+      }),
+      paywall_variant: paywall.variant,
+    });
     try {
       const result = await attachPlanWithAddons({
         attach,
         multiAttach,
         planId,
         includeZdr,
+        analytics: { surface, paywall_variant: paywall.variant },
         successUrl: upgradeFlow
           ? `${window.location.origin}/${slug}/settings/billing/success`
           : `${window.location.origin}/${slug}/geo`,

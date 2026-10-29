@@ -1,5 +1,6 @@
 "use client";
 
+import { clear } from "@databuddy/sdk";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
@@ -87,6 +88,7 @@ function useSignOut() {
       await queryClient.cancelQueries({ queryKey: QUERY_KEYS.AUTH.session });
       queryClient.setQueryData(QUERY_KEYS.AUTH.session, null);
       resetPostHogIdentity();
+      clear();
       toast.success(t("common.labels.signedOutSuccessfully"), { id: toastId });
       allowUnloadAfterSignOut();
       window.location.replace(destination);

@@ -1,4 +1,4 @@
-import { track } from "@databuddy/sdk/react";
+import { flush, track } from "@databuddy/sdk/react";
 
 import { AUTH_SIGNUP_URL } from "@/constants/auth";
 import type { BillingPeriod } from "@/types/landing/pricing";
@@ -62,6 +62,7 @@ export function trackSignupStarted(
     source,
     variant,
   });
+  flush();
   return destination;
 }
 

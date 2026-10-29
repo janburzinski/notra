@@ -18,7 +18,7 @@ export interface MarketingAttribution {
   landingPageH1Variant?: string;
   landingPageH1Copy?: string;
   signupMethod?: "email" | "google" | "github";
-  signupCompletedTracked?: boolean;
+  signupCompletedUserId?: string;
   anonId?: string;
   sessionId?: string;
 }
@@ -70,7 +70,7 @@ export function readMarketingAttributionFromStorage(): MarketingAttribution {
       landingPageH1Variant: parsed.landingPageH1Variant,
       landingPageH1Copy: parsed.landingPageH1Copy,
       signupMethod: normalizeSignupMethod(parsed.signupMethod),
-      signupCompletedTracked: parsed.signupCompletedTracked === true,
+      signupCompletedUserId: parsed.signupCompletedUserId,
       anonId: parsed.anonId,
       sessionId: parsed.sessionId,
     };

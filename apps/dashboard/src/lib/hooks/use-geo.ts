@@ -71,6 +71,10 @@ import { useTranslations } from "use-intl";
 import { useGeoLive } from "@/components/providers/geo-live-provider";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { GEO_COMPETITOR_DETAIL_QUERY_KEY } from "@/constants/geo-competitors";
+import {
+  trackFirstScanCompleted,
+  trackFirstScanStarted,
+} from "@/lib/analytics/first-scan";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { geoDbOrgQueryKey, geoDbQueryKey } from "@/lib/db/geo-collections";
 import { usePathname, useRouter, useSearchParams } from "@/lib/navigation";
@@ -192,6 +196,7 @@ export function useGeoSettings(organizationId: string) {
   const queryClient = useQueryClient();
   const live = useGeoLive();
   const wasScanningRef = useRef<boolean | null>(null);
+  const firstScanRunningRef = useRef(false);
   const scanPollInterval = live
     ? GEO_LIVE_SCAN_FALLBACK_INTERVAL_MS
     : GEO_SCAN_POLL_INTERVAL_MS;
@@ -208,17 +213,25 @@ export function useGeoSettings(organizationId: string) {
   });
 
   const isScanning = query.data?.settings?.isScanning ?? false;
+  const lastScanAt = query.data?.settings?.lastScanAt ?? null;
 
   useEffect(() => {
     const wasScanning = wasScanningRef.current;
     wasScanningRef.current = isScanning;
+    if (isScanning && lastScanAt === null) {
+      firstScanRunningRef.current = true;
+    }
     if (wasScanning === true && !isScanning) {
       invalidateGeoScanResultQueries(queryClient, {
         organizationId,
         projectId,
       }).catch(() => undefined);
+      if (firstScanRunningRef.current && lastScanAt !== null) {
+        trackFirstScanCompleted(projectId ?? organizationId);
+      }
+      firstScanRunningRef.current = false;
     }
-  }, [isScanning, organizationId, projectId, queryClient]);
+  }, [isScanning, lastScanAt, organizationId, projectId, queryClient]);
 
   return query;
 }
@@ -851,7 +864,24 @@ export function useGeoStartScan(organizationId: string) {
         engines: payload.engines,
       });
     },
-    onSuccess: async () => {
+    onMutate: (input) => {
+      const trigger = typeof input === "string" ? input : input?.trigger;
+      const cached = queryClient.getQueryData<GeoSettingsResponse>(
+        dashboardOrpc.geo.settings.queryKey({
+          input: geoSettingsQueryInput({ organizationId, projectId }),
+        })
+      );
+      return {
+        trigger,
+        firstScan:
+          trigger === "onboarding" ||
+          (cached !== undefined && !cached.settings?.lastScanAt),
+      };
+    },
+    onSuccess: async (_output, _input, context) => {
+      if (context?.firstScan) {
+        trackFirstScanStarted(context.trigger);
+      }
       await queryClient.invalidateQueries({
         queryKey: dashboardOrpc.geo.scanRun.key({
           input: { organizationId, projectId },

@@ -1,3 +1,4 @@
+import type { PostHogProperties } from "@notra/posthog/types/posthog";
 import type { useCustomer, useListPlans } from "autumn-js/react";
 import type { ReactNode } from "react";
 import type { useTranslations } from "use-intl";
@@ -63,6 +64,7 @@ export interface AttachPlanParams {
   planId: string;
   includeZdr: boolean;
   successUrl?: string;
+  analytics?: PostHogProperties;
 }
 
 export interface AttachPlanResult {

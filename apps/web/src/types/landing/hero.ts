@@ -12,12 +12,13 @@ export interface HeroHeadlineBrand {
   name: string;
   after: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
+  iconClassName?: string;
 }
 
 export interface HeroHeadlineProps {
   word: HeroCycleWord;
   lineOne: string | HeroHeadlineBrand;
-  lineTwoPrefix: string;
+  lineTwo: HeroHeadlineLineTwo;
 }
 
 export interface CycleMarkProps {
@@ -27,11 +28,14 @@ export interface CycleMarkProps {
   children: ReactNode;
 }
 
-export interface HeroVariantCopy {
+type HeroHeadlineLineTwo =
+  | { headlineLineTwoPrefix: string }
+  | { headlineLineTwo: string };
+
+export type HeroVariantCopy = HeroHeadlineLineTwo & {
   headlineLineOne: string | HeroHeadlineBrand;
-  headlineLineTwoPrefix: string;
   subhead: string;
   cta: string;
   secondaryLabel: string;
   secondaryHref: string;
-}
+};

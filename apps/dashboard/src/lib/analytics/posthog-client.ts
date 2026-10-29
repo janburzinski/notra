@@ -1,9 +1,10 @@
 "use client";
 
+import { flush } from "@databuddy/sdk";
 import type { PostHogEventName } from "@notra/posthog/events";
 import type { PostHogProperties } from "@notra/posthog/types/posthog";
 
-import { DATABUDDY_ONBOARDING_EVENTS } from "@/constants/analytics-events";
+import { DATABUDDY_FUNNEL_EVENTS } from "@/constants/analytics-events";
 import { trackOnboardingFunnelEvent } from "@/lib/analytics/onboarding-funnel";
 import {
   abandonPendingPostHogInit,
@@ -20,7 +21,7 @@ export function trackEvent(
   properties?: PostHogProperties
 ): void {
   void withPostHog((posthog) => posthog.capture(event, properties));
-  if (DATABUDDY_ONBOARDING_EVENTS.has(event)) {
+  if (DATABUDDY_FUNNEL_EVENTS.has(event)) {
     trackOnboardingFunnelEvent(event, properties);
   }
 }
@@ -37,6 +38,11 @@ export async function flushTrackEvent(
 ): Promise<void> {
   if (globalThis.window === undefined) {
     return;
+  }
+
+  if (DATABUDDY_FUNNEL_EVENTS.has(event)) {
+    trackOnboardingFunnelEvent(event, properties);
+    flush();
   }
 
   const capture = withPostHog((posthog) =>

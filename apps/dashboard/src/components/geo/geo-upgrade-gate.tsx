@@ -13,9 +13,11 @@ import { EmptyStateAnalyticsPreview } from "@/components/empty-state-preview";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { PAYWALL_KINDS } from "@/constants/analytics-events";
+import { FEATURED_PLAN_TIER } from "@/constants/billing";
 import { localStorageKeys } from "@/constants/storage";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { toAnalyticsRoute } from "@/lib/analytics/route";
+import { usePaywallVariant } from "@/lib/hooks/use-paywall-variant";
 import { useHasGeoFeature } from "@/lib/hooks/use-plan";
 import { pickSidebarMode } from "@/lib/hooks/use-sidebar-mode";
 import { usePathname, useRouter } from "@/lib/navigation";
@@ -46,6 +48,7 @@ export function GeoUpgradeGate({
   const { isLocked, isLoading, isUnavailable, isFetching, refetch } =
     useHasGeoFeature();
   const route = toAnalyticsRoute(pathname, slug);
+  const paywall = usePaywallVariant();
   const [dismissedOrganizationId, setDismissedOrganizationId] = useState<
     string | null
   >(null);
@@ -84,8 +87,10 @@ export function GeoUpgradeGate({
     trackEvent(POSTHOG_EVENTS.PAYWALL_SHOWN, {
       kind: PAYWALL_KINDS.GEO_LOCKED,
       route,
+      plan_shown: FEATURED_PLAN_TIER,
+      paywall_variant: paywall.variant,
     });
-  }, [dialogOpen, organizationId, route]);
+  }, [dialogOpen, organizationId, paywall.variant, route]);
 
   if (isLoading) {
     return entitled ? children : (fallback ?? <GeoPageSkeleton />);

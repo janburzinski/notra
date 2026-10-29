@@ -28,6 +28,11 @@ export type AnalyticsAuthMethod =
 export type SuggestionOutcome =
   (typeof SUGGESTION_OUTCOMES)[keyof typeof SUGGESTION_OUTCOMES];
 
+export interface PendingFunnelEvent {
+  event: string;
+  properties: Record<string, unknown>;
+}
+
 export interface OnboardingStepViewTrackerProps {
   step: OnboardingStep;
   isResuming?: boolean;

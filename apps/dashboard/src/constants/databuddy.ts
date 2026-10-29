@@ -16,3 +16,8 @@ export const DATABUDDY_TRACKING_PARAMS = [
   "li_fat_id",
   "msclkid",
 ] as const;
+
+export const DATABUDDY_FUNNEL_EVENT_NAMES = {
+  FIRST_SCAN_STARTED: "first_scan_started",
+  FIRST_SCAN_COMPLETED: "first_scan_completed",
+} as const;

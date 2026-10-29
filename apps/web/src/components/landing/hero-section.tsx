@@ -78,6 +78,18 @@ export function HeroSection() {
     return () => window.clearInterval(interval);
   }, [reduceMotion]);
 
+  function trackPrimaryClick() {
+    if (previewVariant || !copy) {
+      return;
+    }
+    track(DATABUDDY_HERO_CTA_CLICKED_EVENT, {
+      flag_key: HERO_EXPERIMENT_FLAG,
+      variant: experiment.loading ? null : variant,
+      cta: "primary",
+      label: copy.cta,
+    });
+  }
+
   function trackSecondaryClick() {
     if (previewVariant || !copy) {
       return;
@@ -108,7 +120,7 @@ export function HeroSection() {
             <div className="flex flex-col items-center gap-7">
               <HeroHeadline
                 lineOne={copy.headlineLineOne}
-                lineTwoPrefix={copy.headlineLineTwoPrefix}
+                lineTwo={copy}
                 word={word}
               />
               <p className="max-w-[42.875rem] text-center font-sans text-[1.0625rem] leading-[1.14] font-medium tracking-[-0.005em] text-pretty text-[#1E1E1EBF] sm:text-[1.25rem] dark:text-white/70">
@@ -120,7 +132,12 @@ export function HeroSection() {
               <CtaButton
                 className={CTA_BUTTON_CLASSNAME}
                 nativeButton={false}
-                render={<TrackedSignupLink source={HERO_SIGNUP_SOURCE} />}
+                render={
+                  <TrackedSignupLink
+                    onClick={trackPrimaryClick}
+                    source={HERO_SIGNUP_SOURCE}
+                  />
+                }
                 variant="primary"
               >
                 {copy.cta}
