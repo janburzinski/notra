@@ -53,6 +53,7 @@ import { useFeedback } from "@/components/dashboard/feedback-context";
 import { ProjectLogo } from "@/components/geo/project-logo";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
+  COMMAND_PALETTE_PUMPKIN_EASTER_EGG,
   COMMAND_PALETTE_ENTITY_ICONS,
   COMMAND_PALETTE_SEARCH_MIN_LENGTH,
   COMMAND_PALETTE_SUGGESTED_ROUTES,
@@ -109,6 +110,7 @@ import {
   CommandPaletteGroup,
   CommandPaletteItem,
 } from "./command-palette-item";
+import { PumpkinRain } from "./pumpkin-rain";
 
 const GEO_PROJECT_PARAM_PATTERN = /[?&]project=/;
 
@@ -325,7 +327,15 @@ export function CommandPalette() {
     setPage(null);
   };
 
+  const isPumpkin = (value: string) =>
+    value.trim().toLowerCase() === COMMAND_PALETTE_PUMPKIN_EASTER_EGG.query;
+
   const changeQuery = (value: string) => {
+    if (isPumpkin(value) && !isPumpkin(query)) {
+      const audio = new Audio(COMMAND_PALETTE_PUMPKIN_EASTER_EGG.sound);
+      audio.volume = COMMAND_PALETTE_PUMPKIN_EASTER_EGG.volume;
+      audio.play().catch(() => undefined);
+    }
     setQuery(value);
     if (aiState.status !== "idle") {
       resetAi();
@@ -386,6 +396,20 @@ export function CommandPalette() {
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <CommandPaletteBody controller={controller} />
+        {isPumpkin(query) ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+          >
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-15"
+              style={{
+                backgroundImage: `url(${COMMAND_PALETTE_PUMPKIN_EASTER_EGG.image})`,
+              }}
+            />
+            <PumpkinRain />
+          </div>
+        ) : null}
       </DialogContent>
     </Dialog>
   );

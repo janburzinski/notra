@@ -427,3 +427,12 @@
 tr:has(> [data-own-mention]) > * {
   background-color: color-mix(in oklab, var(--geo-up) 10%, transparent);
 }
+
+@keyframes pumpkin-rain {
+  from {
+    transform: translateY(0) rotate(0deg);
+  }
+  to {
+    transform: translateY(34rem) rotate(200deg);
+  }
+}

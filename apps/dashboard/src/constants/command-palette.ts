@@ -466,3 +466,48 @@ export const COMMAND_PALETTE_SEARCH_DEBOUNCE_MS = 300;
 export const COMMAND_PALETTE_SEARCH_MIN_LENGTH = 2;
 
 export const COMMAND_PALETTE_REFERENCE_SNIPPET_MAX = 80;
+
+export const COMMAND_PALETTE_PUMPKIN_EASTER_EGG = {
+  query: "pumpkin",
+  sound: "/easter-eggs/pumpkin.mp3",
+  volume: 0.3,
+  image: "/easter-eggs/dominik.jpg",
+} as const;
+
+const PUMPKIN_PIXEL_COLORS: Record<string, string> = {
+  S: "#3f6212",
+  d: "#c2410c",
+  O: "#f97316",
+  F: "#431407",
+};
+
+const PUMPKIN_PIXEL_ROWS = [
+  "....SS....",
+  "...SS.....",
+  ".dOOdOOOd.",
+  "dOOOdOOOOd",
+  "dOFFdOFFOd",
+  "dOOOdOOOOd",
+  "dFOFFFFOFd",
+  "dOFFOFFOOd",
+  ".dOOdOOOd.",
+];
+
+export const PUMPKIN_PIXEL_SIZE = {
+  width: Math.max(...PUMPKIN_PIXEL_ROWS.map((row) => row.length)),
+  height: PUMPKIN_PIXEL_ROWS.length,
+};
+
+export const PUMPKIN_PIXELS = PUMPKIN_PIXEL_ROWS.flatMap((row, y) =>
+  [...row].flatMap((cell, x) => {
+    const fill = PUMPKIN_PIXEL_COLORS[cell];
+    return fill ? [{ x, y, fill }] : [];
+  })
+);
+
+export const PUMPKIN_RAIN_DROPS = Array.from({ length: 16 }, (_, index) => ({
+  left: (index * 61.8) % 96,
+  delay: (index * 0.37) % 2.4,
+  duration: 2.4 + ((index * 0.53) % 1.6),
+  size: 20 + (index % 3) * 10,
+}));
