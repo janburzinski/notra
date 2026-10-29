@@ -33,7 +33,7 @@ export function useSiteWorkspaceState({
   onDraftChange,
   onRefresh,
 }: SiteWorkspaceReadyProps) {
-  const { organizationId, siteId, detail } = useSite();
+  const { organizationId, organizationSlug, siteId, detail } = useSite();
   const scope = { organizationId, siteId, branch };
   const [conflicts, setConflicts] = useState<string[]>([]);
   const [recovering, setRecovering] = useState(false);
@@ -85,7 +85,20 @@ export function useSiteWorkspaceState({
   useBlocker({
     disabled: !unsaved && !recovering,
     enableBeforeUnload: false,
-    shouldBlockFn: async () => {
+    shouldBlockFn: async ({ next }) => {
+      const sitePath = `/${organizationSlug}/sites/${siteId}`;
+      const search = next.search as { branch?: unknown; project?: unknown };
+      if (
+        !uploading &&
+        (next.pathname === sitePath ||
+          next.pathname.startsWith(`${sitePath}/`)) &&
+        (search.branch == null ? undefined : String(search.branch)) ===
+          branch &&
+        (search.project == null ||
+          String(search.project) === detail.site.projectId)
+      ) {
+        return false;
+      }
       if (invalid || uploading || conflicts.length > 0 || readOnly) {
         return true;
       }

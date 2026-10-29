@@ -10,5 +10,7 @@ export interface WorkspaceFixtureRecord {
 
 export interface WorkspaceFixtureBlocker {
   disabled: boolean;
-  shouldBlockFn: () => Promise<boolean>;
+  shouldBlockFn: (args: {
+    next: { pathname: string; search: Record<string, unknown> };
+  }) => Promise<boolean>;
 }

@@ -88,6 +88,51 @@ test("changing organization replaces the workspace even with the same site and b
   expect(await page.getByTestId("owner").textContent()).not.toBe(owner);
 });
 
+test("invalid fields survive moving between pages of the same site", async () => {
+  const page = await browser.newPage();
+  await page.goto(baseUrl);
+  const name = page.getByRole("textbox", { name: "Name", exact: true });
+  const navigation = page.getByTestId("navigation");
+  const go = (label: string) =>
+    page.getByRole("button", { name: label, exact: true }).click();
+  await name.fill("");
+  await browserExpect(page.getByRole("alert").first()).toContainText(
+    "Some fields need fixing"
+  );
+  await go("Open Styling");
+  await browserExpect(navigation).toHaveText("Styling");
+  await browserExpect(name).toHaveCount(0);
+  await go("Open Settings page");
+  await browserExpect(navigation).toHaveText("Settings page");
+  await browserExpect(page.locator("[data-site-design]")).toHaveCount(0);
+  await go("Open General");
+  await browserExpect(navigation).toHaveText("General");
+  await browserExpect(name).toHaveValue("");
+  for (const label of [
+    "Navigate away",
+    "Open another branch",
+    "Open another project",
+  ]) {
+    await go(label);
+    await browserExpect(navigation).toHaveText("blocked");
+  }
+  await browserExpect(name).toHaveValue("");
+});
+
+test("image uploads keep pages of the same site blocked until they finish", async () => {
+  const page = await browser.newPage();
+  await page.goto(baseUrl);
+  const name = page.getByRole("textbox", { name: "Name", exact: true });
+  await browserExpect(name).toHaveValue("site-a");
+  await page.getByRole("button", { name: "Start upload" }).click();
+  await page.getByRole("button", { name: "Open Styling" }).click();
+  await browserExpect(page.getByTestId("navigation")).toHaveText("blocked");
+  await browserExpect(name).toHaveValue("site-a");
+  await page.getByRole("button", { name: "Finish upload" }).click();
+  await page.getByRole("button", { name: "Open Styling" }).click();
+  await browserExpect(page.getByTestId("navigation")).toHaveText("Styling");
+});
+
 test("a cold Settings variables form loads quietly before workspace queries finish", async () => {
   const page = await browser.newPage();
   const errors: string[] = [];

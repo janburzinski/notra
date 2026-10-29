@@ -46,7 +46,30 @@ let readGate = cold
   : Promise.resolve();
 let rebaseGate = Promise.resolve();
 let failedRead: string | null = null;
-let blockNavigation = async () => false;
+let blockNavigation: WorkspaceFixtureBlocker["shouldBlockFn"] = async () =>
+  false;
+let activeSection: (typeof SITE_DESIGN_SECTIONS)[number] =
+  SITE_DESIGN_SECTIONS[0];
+let finishUpload = () => {};
+const SITE_PATH = "/synthetic/sites/site-a";
+const NAVIGATIONS = [
+  ["Navigate away", "/synthetic/projects", {}, "left"],
+  ["Open Styling", `${SITE_PATH}/design`, { section: "styling" }, "Styling"],
+  ["Open General", `${SITE_PATH}/design`, { section: "general" }, "General"],
+  ["Open Settings page", `${SITE_PATH}/settings`, {}, "Settings page"],
+  [
+    "Open another branch",
+    `${SITE_PATH}/design`,
+    { branch: "feature" },
+    "Branch",
+  ],
+  [
+    "Open another project",
+    `${SITE_PATH}/design`,
+    { project: "other" },
+    "Project",
+  ],
+] as const;
 
 function record(scope: SiteScope) {
   const key = JSON.stringify([scope.organizationId, scope.siteId]);
@@ -173,7 +196,7 @@ export function useBlocker(options: WorkspaceFixtureBlocker) {
     : options.shouldBlockFn;
 }
 export function useSiteDesignSection() {
-  return { active: SITE_DESIGN_SECTIONS[0], select: () => {} };
+  return { active: activeSection, select: () => {} };
 }
 export function useSiteNavSection() {
   return { current: "design", section: "design", branch: null } as const;
@@ -218,6 +241,7 @@ function WorkspaceFields() {
   const state = useSiteWorkspace();
   const [owner] = useState(() => crypto.randomUUID());
   const [navigation, setNavigation] = useState("");
+  const [designOpen, setDesignOpen] = useState(true);
   return (
     <>
       <nav aria-label="Site pages">
@@ -236,14 +260,29 @@ function WorkspaceFields() {
           </button>
         ))}
       </nav>
-      <button
-        type="button"
-        onClick={async () =>
-          setNavigation((await blockNavigation()) ? "blocked" : "left")
-        }
-      >
-        Navigate away
-      </button>
+      {NAVIGATIONS.map(([label, pathname, search, result]) => (
+        <button
+          type="button"
+          key={label}
+          onClick={async () => {
+            setNavigation("");
+            if (await blockNavigation({ next: { pathname, search } })) {
+              setNavigation("blocked");
+              return;
+            }
+            const section = SITE_DESIGN_SECTIONS.find(
+              (item) => "section" in search && item.id === search.section
+            );
+            activeSection = section ?? activeSection;
+            if (pathname.startsWith(SITE_PATH)) {
+              setDesignOpen(pathname.endsWith("/design"));
+            }
+            setNavigation(result);
+          }}
+        >
+          {label}
+        </button>
+      ))}
       <output data-testid="navigation">{navigation}</output>
       <output data-testid="owner">{owner}</output>
       <output data-testid="config">{JSON.stringify(state?.config)}</output>
@@ -255,7 +294,7 @@ function WorkspaceFields() {
       {state ? (
         <>
           <SiteChangesBanner />
-          <SiteDesignPage />
+          {designOpen ? <SiteDesignPage /> : null}
           <button
             type="button"
             onClick={() => {
@@ -275,6 +314,17 @@ function WorkspaceFields() {
             }}
           >
             Attempt edits
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              finishUpload = state.beginImageUpload();
+            }}
+          >
+            Start upload
+          </button>
+          <button type="button" onClick={() => finishUpload()}>
+            Finish upload
           </button>
           <button
             type="button"
