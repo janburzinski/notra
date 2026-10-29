@@ -180,10 +180,10 @@ export const LANDING_SECTIONS: LandingSection[] = [
     items: [
       {
         description:
-          "A playable GEO workflow builder with a block palette, branching, a run log and a node sheet.",
-        href: "/blocks/geo-workflow-builder",
+          "A playable workflow builder with a block palette, branching, a run log and a node sheet.",
+        href: "/blocks/workflow-builder",
         preview: "workflow-builder",
-        title: "GEO Workflow Builder",
+        title: "Workflow Builder",
       },
       {
         description:
@@ -200,8 +200,7 @@ export const LANDING_SECTIONS: LandingSection[] = [
         title: "Listicle Outreach",
       },
     ],
-    description:
-      "Workflow and outreach building blocks for GEO and SEO automation.",
+    description: "Workflow and outreach building blocks for automation.",
     title: "Workflows",
   },
 ];

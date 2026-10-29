@@ -41,7 +41,7 @@ import {
 } from "../lib/workflow";
 import type { WorkflowBlock, WorkflowPoint } from "../types/workflow";
 
-export default function GeoWorkflowBuilder() {
+export default function WorkflowBuilder() {
   const [templateId, setTemplateId] = useState(LISTICLE_OUTREACH_WORKFLOW.id);
   const graph = useWorkflowGraph(LISTICLE_OUTREACH_WORKFLOW);
   const run = useWorkflowRun(graph.nodes, graph.edges);

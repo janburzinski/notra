@@ -1,5 +1,6 @@
 import {
   EdgeLabelRenderer,
+  useStore,
   type ConnectionLineComponentProps,
   type EdgeProps,
 } from "@xyflow/react";
@@ -11,7 +12,7 @@ import {
   WORKFLOW_EDGE_DASH,
   WORKFLOW_EDGE_REVERSE_STYLE,
 } from "../constants/workflow-ui";
-import { getFlowEdgePath } from "../lib/workflow";
+import { getEdgeLaneOffset, getFlowEdgePath } from "../lib/workflow";
 import type {
   WorkflowEdgeProps,
   WorkflowFlowEdge as WorkflowFlowEdgeType,
@@ -83,6 +84,7 @@ export const WorkflowEdgeLabel = ({
 
 export const WorkflowFlowEdge = ({
   data,
+  id,
   sourcePosition,
   sourceX,
   sourceY,
@@ -91,10 +93,12 @@ export const WorkflowFlowEdge = ({
   targetY,
 }: EdgeProps<WorkflowFlowEdgeType>) => {
   const reverse = Boolean(data?.reverse);
+  const offset = useStore((state) => getEdgeLaneOffset(state, id));
   const [path, labelX, labelY] = getFlowEdgePath(
     { position: sourcePosition, x: sourceX, y: sourceY },
     { position: targetPosition, x: targetX, y: targetY },
-    reverse
+    reverse,
+    offset
   );
 
   return (

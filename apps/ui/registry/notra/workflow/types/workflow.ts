@@ -112,6 +112,13 @@ export interface WorkflowEdgeData {
   animated?: boolean;
 }
 
+export interface WorkflowEdgeLane {
+  id: string;
+  down: boolean;
+  from: WorkflowPoint;
+  to: WorkflowPoint;
+}
+
 export interface WorkflowGraph {
   edges: WorkflowEdgeData[];
   nodes: WorkflowNodeData[];

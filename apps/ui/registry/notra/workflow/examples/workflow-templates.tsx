@@ -33,7 +33,7 @@ export default function WorkflowTemplates() {
         <div className="flex flex-col gap-0.5">
           <h2 className="text-base font-semibold">Start from a template</h2>
           <p className="text-muted-foreground text-sm">
-            GEO workflows you can run as they are or change step by step.
+            Workflows you can run as they are or change step by step.
           </p>
         </div>
         <Tabs

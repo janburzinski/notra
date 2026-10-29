@@ -1,4 +1,5 @@
 import { getSmoothStepPath } from "@xyflow/react";
+import type { ReactFlowState } from "@xyflow/react";
 
 import {
   WORKFLOW_DEFAULT_DURATION_MS,
@@ -9,6 +10,7 @@ import {
   WORKFLOW_OUT_PORT,
 } from "../constants/workflow";
 import {
+  WORKFLOW_EDGE_LANE_GAP,
   WORKFLOW_EDGE_RADIUS,
   WORKFLOW_EDGE_STEP_OPTIONS,
 } from "../constants/workflow-ui";
@@ -16,6 +18,7 @@ import type {
   WorkflowAnchor,
   WorkflowBlock,
   WorkflowEdgeData,
+  WorkflowEdgeLane,
   WorkflowEdgeStatus,
   WorkflowLogEntry,
   WorkflowNodeData,
@@ -258,15 +261,31 @@ export const getRunLog = (
   return entries.sort((a, b) => a.at - b.at);
 };
 
+const getEdgeMidX = (
+  from: WorkflowPoint,
+  to: WorkflowPoint,
+  radius: number,
+  offset: number
+) => {
+  const room = Math.max(0, Math.abs(to.x - from.x) / 2 - radius * 2);
+  return (from.x + to.x) / 2 + Math.max(-room, Math.min(room, offset));
+};
+
 export const getEdgePath = (
   from: WorkflowPoint,
   to: WorkflowPoint,
-  radius = WORKFLOW_EDGE_RADIUS
+  radius = WORKFLOW_EDGE_RADIUS,
+  offset = 0
 ) => {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
-  const midX = from.x + dx / 2;
-  const r = Math.min(radius, Math.abs(dy) / 2, Math.abs(dx) / 2);
+  const midX = getEdgeMidX(from, to, radius, offset);
+  const r = Math.min(
+    radius,
+    Math.abs(dy) / 2,
+    Math.abs(midX - from.x),
+    Math.abs(to.x - midX)
+  );
   if (r < 0.5) {
     return `M ${from.x} ${from.y} L ${to.x} ${to.y}`;
   }
@@ -286,13 +305,14 @@ export const getEdgePath = (
 export const getFlowEdgePath = (
   source: WorkflowAnchor,
   target: WorkflowAnchor,
-  reverse = false
+  reverse = false,
+  offset = 0
 ): [string, number, number] => {
   const [from, to] = reverse ? [target, source] : [source, target];
   if (target.x > source.x) {
     return [
-      getEdgePath(from, to),
-      (source.x + target.x) / 2,
+      getEdgePath(from, to, WORKFLOW_EDGE_RADIUS, offset),
+      getEdgeMidX(from, to, WORKFLOW_EDGE_RADIUS, offset),
       (source.y + target.y) / 2,
     ];
   }
@@ -306,6 +326,61 @@ export const getFlowEdgePath = (
     targetY: to.y,
   });
   return [path, labelX, labelY];
+};
+
+const getHandleAnchor = (
+  state: ReactFlowState,
+  nodeId: string,
+  type: "source" | "target",
+  handleId?: string | null
+) => {
+  const node = state.nodeLookup.get(nodeId);
+  const handle = node?.internals.handleBounds?.[type]?.find(
+    (item) => item.id === handleId
+  );
+  if (!(node && handle)) {
+    return;
+  }
+  const { x, y } = node.internals.positionAbsolute;
+  return {
+    x: x + handle.x + (type === "source" ? handle.width : 0),
+    y: y + handle.y + handle.height / 2,
+  };
+};
+
+export const getEdgeLaneOffset = (state: ReactFlowState, edgeId: string) => {
+  const edge = state.edgeLookup.get(edgeId);
+  if (!edge) {
+    return 0;
+  }
+  const lanes: WorkflowEdgeLane[] = [];
+  for (const item of state.edges) {
+    if (item.target !== edge.target) {
+      continue;
+    }
+    const from = getHandleAnchor(
+      state,
+      item.source,
+      "source",
+      item.sourceHandle
+    );
+    const to = getHandleAnchor(state, item.target, "target", item.targetHandle);
+    if (from && to && to.x > from.x && to.y !== from.y) {
+      lanes.push({ down: to.y > from.y, from, id: item.id, to });
+    }
+  }
+  const own = lanes.find((lane) => lane.id === edgeId);
+  if (!own) {
+    return 0;
+  }
+  const sign = own.down ? 1 : -1;
+  const group = lanes
+    .filter((lane) => lane.down === own.down)
+    .toSorted(
+      (a, b) => sign * (a.to.y - b.to.y) || sign * (a.from.y - b.from.y)
+    );
+  const rank = group.findIndex((lane) => lane.id === edgeId);
+  return ((group.length - 1) / 2 - rank) * WORKFLOW_EDGE_LANE_GAP;
 };
 
 export const createNodeFromBlock = (

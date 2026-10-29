@@ -84,6 +84,8 @@ export const WORKFLOW_EDGE_STEP_OPTIONS = { borderRadius: 24, offset: 24 };
 
 export const WORKFLOW_EDGE_RADIUS = 24;
 
+export const WORKFLOW_EDGE_LANE_GAP = 16;
+
 export const WORKFLOW_RUN_LABELS: Record<WorkflowRunPhase, string> = {
   done: "Run again",
   idle: "Run workflow",
