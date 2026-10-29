@@ -1,0 +1,9 @@
+apps/web/src/content/legal/subprocessors.mdx
+  ai_agent 66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cf2a5cd18300ee95cb48654e94b8bb7258e53960",
+  "prompts": {}
+}
