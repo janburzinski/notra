@@ -1,14 +1,11 @@
 "use client";
 
-import { AiMagicIcon, Tick02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { AiMagicIcon } from "@hugeicons/core-free-icons";
 import { CopyButton } from "@notra/ui/components/ui/copy-button";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
-import { useCopyToClipboard } from "@notra/ui/hooks/use-copy-to-clipboard";
 import { highlight } from "sugar-high";
 import { useTranslations } from "use-intl";
 
-import { Button } from "@/components/button";
 import { cn } from "@/lib/utils";
 import type {
   CodeSnippetProps,
@@ -92,54 +89,20 @@ export function CopyPromptButton({
   className,
 }: CopyPromptButtonProps) {
   const tCommon = useTranslations("common");
-  const { copiedText, copy } = useCopyToClipboard({
-    onError: toastCopyError,
-  });
-  const copied = copiedText === prompt;
-  const fade =
-    "col-start-1 row-start-1 transition-[opacity,filter,translate,scale] duration-normal ease-emphasized motion-reduce:transition-none";
-  const hidden = "opacity-0 blur-[2px]";
 
   return (
-    <Button
-      className={cn("gap-2", className)}
+    <CopyButton
+      className={className}
+      copiedLabel={tCommon("labels.promptCopied")}
       disabled={disabled}
-      onClick={async () => {
-        if (await copy(prompt)) {
-          onCopy?.();
-        }
-      }}
-      size="sm"
-      type="button"
+      icon={AiMagicIcon}
+      onCopy={onCopy}
+      onCopyError={toastCopyError}
+      value={prompt}
       variant="outline"
     >
-      <span aria-hidden="true" className="grid size-3.5 place-items-center">
-        <HugeiconsIcon
-          className={cn(fade, copied && `${hidden} scale-50`)}
-          icon={AiMagicIcon}
-          size={14}
-        />
-        <HugeiconsIcon
-          className={cn(fade, "text-success", !copied && `${hidden} scale-50`)}
-          icon={Tick02Icon}
-          size={14}
-        />
-      </span>
-      <span className="grid">
-        <span
-          aria-hidden={copied}
-          className={cn(fade, copied && `${hidden} -translate-y-1`)}
-        >
-          {tCommon("labels.copyAgentPrompt")}
-        </span>
-        <span
-          aria-hidden={!copied}
-          className={cn(fade, !copied && `${hidden} translate-y-1`)}
-        >
-          {tCommon("labels.promptCopied")}
-        </span>
-      </span>
-    </Button>
+      {tCommon("labels.copyAgentPrompt")}
+    </CopyButton>
   );
 }
 

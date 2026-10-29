@@ -79,7 +79,14 @@ export interface AgentFeedbackSetupResponse {
 export interface AgentFeedbackSetupPanelProps {
   setup: AgentFeedbackSetupResponse | undefined;
   className?: string;
-  showPromptAction?: boolean;
+}
+
+export interface AgentFeedbackSetupStepProps {
+  step: number;
+  title: string;
+  description?: string;
+  last?: boolean;
+  children: ReactNode;
 }
 
 export interface AgentFeedbackEmptyProps {

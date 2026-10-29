@@ -9,11 +9,7 @@ import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
-import {
-  CodeSnippet,
-  CodeSnippetTabs,
-  CopyPromptButton,
-} from "@/components/geo/code-snippet";
+import { CodeSnippet, CodeSnippetTabs } from "@/components/geo/code-snippet";
 import { GeoPackageManagerIcon } from "@/components/geo/package-manager-icon";
 import {
   AGENT_FEEDBACK_DEFAULT_SNIPPET_TAB,
@@ -23,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import type {
   AgentFeedbackSetupPanelProps,
+  AgentFeedbackSetupStepProps,
   AgentFeedbackSnippetKey,
 } from "@/types/agent-feedback";
 import { isAgentFeedbackSnippetKey } from "@/utils/agent-feedback";
@@ -35,10 +32,45 @@ const PACKAGE_MANAGER_TABS = GEO_INGEST_PACKAGE_MANAGER_OPTIONS.map(
   })
 );
 
+function SetupStep({
+  step,
+  title,
+  description,
+  last = false,
+  children,
+}: AgentFeedbackSetupStepProps) {
+  return (
+    <li className="relative grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-3">
+      <span
+        aria-hidden
+        className="border-border bg-muted text-foreground relative z-10 flex size-6 items-center justify-center rounded-full border font-mono text-xs font-medium tabular-nums"
+      >
+        {step}
+      </span>
+      {last ? null : (
+        <span
+          aria-hidden
+          className="bg-border absolute start-3 top-7 -bottom-5 w-px"
+        />
+      )}
+      <div className="min-w-0 space-y-2">
+        <div className="space-y-0.5">
+          <h3 className="text-sm leading-6 font-medium">{title}</h3>
+          {description ? (
+            <p className="text-muted-foreground text-xs text-pretty">
+              {description}
+            </p>
+          ) : null}
+        </div>
+        {children}
+      </div>
+    </li>
+  );
+}
+
 export function AgentFeedbackSetup({
   setup,
   className,
-  showPromptAction = true,
 }: AgentFeedbackSetupPanelProps) {
   const t = useTranslations("feedback.setup");
   const tCommon = useTranslations("common");
@@ -54,11 +86,8 @@ export function AgentFeedbackSetup({
     )?.command ?? GEO_INGEST_PACKAGE_MANAGER_OPTIONS[0].command;
 
   return (
-    <div className={cn("space-y-5", className)}>
-      <section className="space-y-2">
-        <h3 className="text-sm font-medium">
-          {tCommon("labels.installThePackage")}
-        </h3>
+    <ol className={cn("space-y-6", className)}>
+      <SetupStep step={1} title={tCommon("labels.installThePackage")}>
         <CodeSnippet
           code={installCommand}
           tabs={
@@ -74,12 +103,12 @@ export function AgentFeedbackSetup({
             />
           }
         />
-      </section>
-      <section className="space-y-2">
-        <h3 className="text-sm font-medium">{t("feedbackUrl")}</h3>
-        <p className="text-muted-foreground text-xs">
-          {t("feedbackUrlDescription")}
-        </p>
+      </SetupStep>
+      <SetupStep
+        description={t("feedbackUrlDescription")}
+        step={2}
+        title={t("feedbackUrl")}
+      >
         {setup ? (
           <CodeSnippet
             code={setup.apiUrl}
@@ -89,9 +118,8 @@ export function AgentFeedbackSetup({
         ) : (
           <Skeleton className="h-9 w-full rounded-lg" />
         )}
-      </section>
-      <section className="space-y-2">
-        <h3 className="text-sm font-medium">{t("addTool")}</h3>
+      </SetupStep>
+      <SetupStep last step={3} title={t("addTool")}>
         {setup ? (
           <CodeSnippet
             code={setup.snippets[snippetKey]}
@@ -115,23 +143,7 @@ export function AgentFeedbackSetup({
         ) : (
           <Skeleton className="h-44 w-full rounded-lg" />
         )}
-      </section>
-      {showPromptAction ? (
-        <div className="space-y-2">
-          <div aria-hidden className="flex items-center gap-3 py-1">
-            <span className="bg-border/80 h-px flex-1" />
-            <span className="text-muted-foreground text-xs">
-              {tCommon("labels.or")}
-            </span>
-            <span className="bg-border/80 h-px flex-1" />
-          </div>
-          <CopyPromptButton
-            className="mx-auto flex w-fit"
-            disabled={!setup}
-            prompt={setup?.prompt ?? ""}
-          />
-        </div>
-      ) : null}
-    </div>
+      </SetupStep>
+    </ol>
   );
 }

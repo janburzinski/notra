@@ -1,3 +1,4 @@
+import type { IconSvgElement } from "@hugeicons/react";
 import type { ButtonProps } from "@notra/ui/components/ui/button";
 import type { ReactNode } from "react";
 
@@ -21,6 +22,8 @@ export interface UseCopyToClipboardResult {
 
 export interface CopyStateIconProps {
   copied: boolean;
+  /** Shown until copied. Defaults to the copy icon. */
+  icon?: IconSvgElement;
   className?: string;
   /** Applied to both icons, e.g. `size-3` to override the icon size. */
   iconClassName?: string;
@@ -42,6 +45,8 @@ export type CopyButtonProps = Omit<ButtonProps, "value" | "onCopy"> & {
   copiedAriaLabel?: string;
   /** Applied to both icons, e.g. `size-3.5` to override the icon size. */
   iconClassName?: string;
+  /** Shown until copied. Defaults to the copy icon. */
+  icon?: IconSvgElement;
 };
 
 export type CopyButtonClickHandler = NonNullable<ButtonProps["onClick"]>;
