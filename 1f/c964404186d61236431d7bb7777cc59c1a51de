@@ -1,0 +1,21 @@
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_985d322a22a6f8::t_ee9f83bc006d2b 439
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  s_985d322a22a6f8::t_ee9f83bc006d2b 94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1fc964404186d61236431d7bb7777cc59c1a51de",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
