@@ -59,6 +59,7 @@ export function PixelScene() {
     let layout = buildLayout(1, 1);
     let buf = new Uint8Array(1);
     let image = ctx.createImageData(1, 1);
+    let pixels = new Uint32Array(image.data.buffer);
     let visible = true;
     let raf = 0;
     let last = 0;
@@ -188,13 +189,8 @@ export function PixelScene() {
     const draw = (now: number) => {
       const t = reduceMotion ? 4 : (now - started) / 1000;
       renderFrame(buf, layout, palette, t, input);
-      const data = image.data;
       for (let i = 0; i < buf.length; i += 1) {
-        const rgb = table[buf[i] ?? 0] ?? [0, 0, 0];
-        data[i * 4] = rgb[0];
-        data[i * 4 + 1] = rgb[1];
-        data[i * 4 + 2] = rgb[2];
-        data[i * 4 + 3] = 255;
+        pixels[i] = table[buf[i] ?? 0] ?? 0;
       }
       ctx.putImageData(image, 0, 0);
     };
@@ -207,6 +203,7 @@ export function PixelScene() {
       layout = buildLayout(w, h);
       buf = new Uint8Array(w * h);
       image = ctx.createImageData(w, h);
+      pixels = new Uint32Array(image.data.buffer);
       draw(performance.now());
     };
 

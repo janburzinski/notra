@@ -426,15 +426,18 @@ function hexToRgb(hex: string): [number, number, number] {
   return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
 }
 
+// Palette slots packed as little-endian RGBA, ready for a Uint32 image view
 export function paletteTable(palette: ScenePalette) {
-  const table: [number, number, number][] = [];
-  palette.ramp.forEach((color, index) => {
-    table[index] = hexToRgb(color);
-  });
+  const table = new Uint32Array(256);
+  const put = (slot: number, hex: string) => {
+    const [r, g, b] = hexToRgb(hex);
+    table[slot] = (255 << 24) | (b << 16) | (g << 8) | r;
+  };
+  palette.ramp.forEach((color, index) => put(index, color));
   for (const [slot, color] of Object.entries(ACCENTS)) {
-    table[Number(slot)] = hexToRgb(color);
+    put(Number(slot), color);
   }
-  table[A_GLOW] = hexToRgb(palette.glow);
+  put(A_GLOW, palette.glow);
   return table;
 }
 
@@ -479,17 +482,20 @@ function stamp(
   });
 }
 
-export function renderFrame(
-  buf: Uint8Array,
-  layout: Layout,
-  palette: ScenePalette,
-  t: number,
-  input: SceneInput
-) {
-  const { w, h, horizon, mask, moon } = layout;
-  const top = palette.ramp.length - 1;
+// The sky gradient and moon glow never move, so they are drawn once
+const skyCache = new WeakMap<
+  Layout,
+  { palette: ScenePalette; sky: Uint8Array }
+>();
 
-  // Sky
+function skyFor(layout: Layout, palette: ScenePalette) {
+  const cached = skyCache.get(layout);
+  if (cached?.palette === palette) {
+    return cached.sky;
+  }
+  const { w, horizon, moon } = layout;
+  const top = palette.ramp.length - 1;
+  const buf = new Uint8Array(w * horizon);
   for (let y = 0; y < horizon; y += 1) {
     const g = y / horizon;
     const base =
@@ -504,6 +510,22 @@ export function renderFrame(
       buf[y * w + x] = Math.min(top, Math.max(0, Math.floor(v * top + b)));
     }
   }
+  skyCache.set(layout, { palette, sky: buf });
+  return buf;
+}
+
+export function renderFrame(
+  buf: Uint8Array,
+  layout: Layout,
+  palette: ScenePalette,
+  t: number,
+  input: SceneInput
+) {
+  const { w, h, horizon, mask, moon } = layout;
+  const top = palette.ramp.length - 1;
+
+  // Sky, static per layout and palette
+  buf.set(skyFor(layout, palette));
 
   for (const s of layout.skyStreaks) {
     const start = Math.floor((s.x + t * s.speed) % (w + s.len)) - s.len;
