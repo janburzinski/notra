@@ -103,7 +103,10 @@ export function SiteDeleteDialog({
             })}
           </div>
           <Input
-            aria-labelledby={`${id}-confirm-label`}
+            aria-label={t.markup("confirmLabel", {
+              name: siteName,
+              code: (chunks) => chunks,
+            })}
             autoComplete="off"
             id={`${id}-confirm`}
             onChange={(event) => setConfirmation(event.target.value)}

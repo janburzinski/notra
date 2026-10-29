@@ -100,6 +100,78 @@ test("foreign-host Markdown and upgrades are rejected before readiness or upstre
   }
 });
 
+test("blog.json redirects apply before the area servers, like the worker", async () => {
+  let upstreamCalls = 0;
+  const upstream = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    fetch: () => {
+      upstreamCalls += 1;
+      return new Response("Page");
+    },
+  });
+  if (upstream.port === undefined) {
+    throw new Error("The upstream server did not allocate a TCP port");
+  }
+  const proxy = await startDevProxy(
+    0,
+    { blog: "/blog" },
+    [
+      {
+        area: "blog",
+        mount: "/blog",
+        port: upstream.port,
+        paramsPath: "unused",
+      },
+    ],
+    async () => undefined,
+    () => [],
+    () => [
+      {
+        source: "/blog/old-launch",
+        destination: "/blog/2026/launch",
+        status: 308,
+      },
+      {
+        source: "/docs/*",
+        destination: "https://docs.example.com/*",
+        status: 307,
+      },
+    ]
+  );
+  const address = proxy.address();
+  if (!address || typeof address === "string") {
+    throw new Error("The proxy did not allocate a TCP port");
+  }
+  try {
+    const exact = await fetch(
+      `http://127.0.0.1:${address.port}/blog/old-launch/`,
+      {
+        redirect: "manual",
+      }
+    );
+    expect(exact.status).toBe(308);
+    expect(exact.headers.get("location")).toBe("/blog/2026/launch");
+    expect(exact.headers.get("cache-control")).toBe("no-store");
+    const wildcard = await fetch(
+      `http://127.0.0.1:${address.port}/docs/getting started`,
+      { redirect: "manual" }
+    );
+    expect(wildcard.status).toBe(307);
+    expect(wildcard.headers.get("location")).toBe(
+      "https://docs.example.com/getting%20started"
+    );
+    expect(upstreamCalls).toBe(0);
+    const page = await fetch(
+      `http://127.0.0.1:${address.port}/blog/2026/launch`
+    );
+    expect(await page.text()).toBe("Page");
+  } finally {
+    proxy.close();
+    upstream.stop(true);
+  }
+});
+
 test("document requests wait for the current refresh instead of loading an old or restarting page", async () => {
   let html = "Old snapshot";
   const upstream = Bun.serve({

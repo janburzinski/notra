@@ -32,6 +32,7 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
+import { SadCapybara } from "@/components/sad-capybara";
 import {
   SITE_IMPORT_SCROLL_END_TOLERANCE_PX,
   SITE_IMPORT_SKELETON_KEYS,
@@ -65,6 +66,8 @@ export function SiteImportList({
   repositories,
   installed,
   isLoading,
+  loadFailed,
+  onRetry,
   importingId,
   onImport,
   callbackPath,
@@ -131,6 +134,22 @@ export function SiteImportList({
       );
     }
   };
+
+  if (loadFailed && !installed) {
+    return (
+      <EmptyState
+        action={
+          <Button onClick={onRetry} variant="secondary">
+            {t("repositoriesRetry")}
+          </Button>
+        }
+        className="min-h-0 py-12"
+        description={t("repositoriesLoadFailedDescription")}
+        illustration={<SadCapybara />}
+        title={t("repositoriesLoadFailedTitle")}
+      />
+    );
+  }
 
   if (!(isLoading || installed)) {
     return (

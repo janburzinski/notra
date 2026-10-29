@@ -21,12 +21,16 @@ import {
   SITE_FAVICON_HOST,
 } from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
-import type { SiteMounts } from "@notra/sites-core/types/deployment";
+import type {
+  SiteMounts,
+  SiteRedirectRule,
+} from "@notra/sites-core/types/deployment";
 import type { SiteHeadScript } from "@notra/sites-core/types/site-integrations";
 import {
   joinMountPath,
   resolveAreaForPath,
 } from "@notra/sites-core/utils/mounts";
+import { matchRedirect } from "@notra/sites-core/utils/redirects";
 
 import type { BuildParams } from "../src/types/build-params";
 import { astroBin } from "./build";
@@ -133,6 +137,14 @@ export async function startAstroDev(
   area.hmrGeneration = (area.hmrGeneration ?? 0) + 1;
   mkdirSync(root, { recursive: true });
   cpSync(join(toolchainRoot, "src"), join(root, "src"), { recursive: true });
+  const tailwindSources = join(root, ".notra", "work");
+  mkdirSync(tailwindSources, { recursive: true });
+  for (const dir of ["site", "entries"]) {
+    const link = join(tailwindSources, dir);
+    if (!existsSync(link)) {
+      symlinkSync(join(dirname(area.paramsPath), dir), link, "junction");
+    }
+  }
   const modules = join(dirname(area.paramsPath), "node_modules");
   if (!existsSync(modules)) {
     let dependencyRoot = toolchainRoot;
@@ -321,7 +333,8 @@ export function startDevProxy(
   mounts: SiteMounts,
   areas: DevAreaServer[],
   waitForReady: () => Promise<void>,
-  siteErrors: () => SiteDiagnostic[] = () => []
+  siteErrors: () => SiteDiagnostic[] = () => [],
+  redirects: () => readonly SiteRedirectRule[] = () => []
 ): Promise<Server> {
   const [fallback] = areas;
   const targetFor = (pathname: string) => {
@@ -360,6 +373,15 @@ export function startDevProxy(
       outgoing.end(
         JSON.stringify({ count: errors.length, key: devErrorsKey(errors) })
       );
+      return;
+    }
+    const redirect = matchRedirect(redirects(), pathname);
+    if (redirect) {
+      outgoing.writeHead(redirect.status, {
+        location: redirect.location,
+        "Cache-Control": "no-store",
+      });
+      outgoing.end();
       return;
     }
     const errors = siteErrors();

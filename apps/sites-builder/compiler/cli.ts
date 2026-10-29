@@ -12,10 +12,12 @@ import { parseArgs } from "node:util";
 import { hasErrors } from "@notra/sites-compiler/utils/diagnostics";
 import { validateSite } from "@notra/sites-compiler/validate";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
+import type { SiteRedirectRule } from "@notra/sites-core/types/deployment";
 import {
   listMountedAreas,
   normalizeSiteMounts,
 } from "@notra/sites-core/utils/mounts";
+import { siteRedirectRules } from "@notra/sites-core/utils/redirects";
 
 import { buildSite, readBuildTarget, writeBuildParams } from "./build";
 import { USAGE } from "./constants/cli";
@@ -184,6 +186,7 @@ async function main() {
     let documentGeneration = 0;
     let running: RunningDevArea[] = [];
     let siteErrors: SiteDiagnostic[] = [];
+    let redirects: SiteRedirectRule[] = [];
     const stopAreas = async () => {
       const stopping = running;
       running = [];
@@ -226,6 +229,7 @@ async function main() {
           }
           renameSync(temporaryPath, area.paramsPath);
         }
+        redirects = siteRedirectRules(params.config.redirects);
         return true;
       },
       runAstro: async (astroCommand) => {
@@ -284,7 +288,8 @@ async function main() {
         async () => {
           await watchedRefresh;
         },
-        () => siteErrors
+        () => siteErrors,
+        () => redirects
       );
       if (interrupted) {
         proxy.close();

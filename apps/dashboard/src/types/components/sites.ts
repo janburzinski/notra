@@ -636,6 +636,8 @@ export interface SiteImportListProps {
   repositories: SiteImportableRepository[];
   installed: boolean;
   isLoading: boolean;
+  loadFailed: boolean;
+  onRetry: () => void;
   importingId: string | null;
   onImport: (repository: SiteImportableRepository) => void;
   callbackPath?: string;

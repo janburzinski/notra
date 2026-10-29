@@ -8,6 +8,7 @@ import type {
   SiteManifestFile,
 } from "@notra/sites-core/types/deployment";
 import { sha256Hex } from "@notra/sites-core/utils/hash";
+import { siteRedirectRules } from "@notra/sites-core/utils/redirects";
 import { Clock, Effect } from "effect";
 
 import { UPLOAD_CONCURRENCY } from "./constants/build";
@@ -76,11 +77,7 @@ export const publishDeploymentFilesEffect = Effect.fn(
     createdAt: new Date(createdAt).toISOString(),
     totalBytes: manifestFiles.reduce((sum, file) => sum + file.size, 0),
     files: manifestFiles.sort((a, b) => a.path.localeCompare(b.path)),
-    redirects: params.result.redirects.map((rule) => ({
-      source: rule.source,
-      destination: rule.destination,
-      status: rule.permanent ? 308 : 307,
-    })),
+    redirects: siteRedirectRules(params.result.redirects),
     contentSecurityPolicy: params.result.contentSecurityPolicy ?? undefined,
     analyticsConsent: params.result.analyticsConsent || undefined,
     consentBackendURL: params.result.consentBackendURL,

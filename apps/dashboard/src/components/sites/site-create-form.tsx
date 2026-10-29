@@ -356,7 +356,9 @@ export function SiteCreateForm({
               importingId={importingId}
               installed={importable.data?.installed ?? false}
               isLoading={importable.isPending}
+              loadFailed={importable.isError}
               onImport={importRepository}
+              onRetry={() => importable.refetch()}
               organizationId={organizationId}
               organizationSlug={organizationSlug}
               repositories={importable.data?.repositories ?? []}

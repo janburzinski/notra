@@ -5,7 +5,6 @@ import type {
 import { joinMountPath } from "@notra/sites-core/utils/mounts";
 
 import { HTML_TYPES, LLMS_LINKS, MARKDOWN_TYPES } from "../constants/routing";
-import type { RedirectMatch } from "../types/serving";
 
 export function normalizeRequestPath(pathname: string): string | null {
   let decoded: string;
@@ -66,33 +65,6 @@ export function trailingSlashPagePath(
     return null;
   }
   return bare.split("/").map(encodeURIComponent).join("/");
-}
-
-export function matchRedirect(
-  manifest: SiteManifest,
-  path: string
-): RedirectMatch | null {
-  const bare = path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
-  for (const rule of manifest.redirects) {
-    if (rule.source.endsWith("/*")) {
-      const prefix = rule.source.slice(0, -2);
-      if (bare === prefix || bare.startsWith(`${prefix}/`)) {
-        // `path` is decoded; re-encode so the remainder is a valid header value.
-        const rest = bare
-          .slice(prefix.length)
-          .split("/")
-          .map(encodeURIComponent)
-          .join("/");
-        const destination = rule.destination.endsWith("/*")
-          ? `${rule.destination.slice(0, -2)}${rest}`
-          : rule.destination;
-        return { location: destination, status: rule.status };
-      }
-    } else if (rule.source === bare) {
-      return { location: rule.destination, status: rule.status };
-    }
-  }
-  return null;
 }
 
 export function resolveMarkdownFile(
