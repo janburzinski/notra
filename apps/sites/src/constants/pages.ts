@@ -1,12 +1,16 @@
 import type { PreviewGateError } from "../types/pages";
 
 export const NOTRA_MARK_SVG =
-  '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 800 800" fill="none"><path d="M572.881 462.223c-12.712 43.22-290.678 105.932-394.068 83.898l-48.305-10.169 48.305-78.814 68.644-104.237 73.729-106.78 251.695-127.119 78.814-22.881 17.796 17.796h10.17c17.796 35.593 3.945 147.458-12.712 195.763-25.424 73.729-124.576 96.61-177.966 114.407-4.064 1.355 96.61-5.085 83.898 38.136Z" fill="#c8b2ee" stroke="currentColor" stroke-width="35" stroke-linecap="round"/><path d="M700 96.111c-162.712-4.237-510.508 111.356-600 607.627" stroke="currentColor" stroke-width="75" stroke-linecap="round"/></svg>';
+  '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 800 800" fill="none"><path d="M572.881 462.223c-12.712 43.22-290.678 105.932-394.068 83.898l-48.305-10.169 48.305-78.814 68.644-104.237 73.729-106.78 251.695-127.119 78.814-22.881 17.796 17.796h10.17c17.796 35.593 3.945 147.458-12.712 195.763-25.424 73.729-124.576 96.61-177.966 114.407-4.064 1.355 96.61-5.085 83.898 38.136Z" fill="#c8b2ee" stroke="#1e1e1e" stroke-width="35" stroke-linecap="round"/><path d="M700 96.111c-162.712-4.237-510.508 111.356-600 607.627" stroke="#1e1e1e" stroke-width="75" stroke-linecap="round"/></svg>';
 
 export const NOTRA_MARK_CHIP_SVG = NOTRA_MARK_SVG.replace(
   'width="22" height="22"',
   'width="14" height="14"'
 );
+
+export const SYSTEM_PAGE_FAVICON = `data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><rect width="30" height="30" rx="6" fill="#f6f3f1"/>${NOTRA_MARK_SVG.replace("<svg ", '<svg x="4" y="4" ')}</svg>`
+)}`;
 
 export const GLOBE_ICON_SVG =
   '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12c0 6 4 10 4 10s4-4 4-10-4-10-4-10-4 4-4 10Z"/><path d="M21 15H3M21 9H3"/></svg>';
@@ -22,7 +26,8 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 header{padding:20px 24px}
 .brand{display:inline-flex;align-items:center;gap:8px;color:var(--fg);text-decoration:none;font-weight:600;font-size:15px;letter-spacing:-.01em;border-radius:6px}
-.brand svg{display:block}
+.brand svg{display:block;width:30px;height:30px;padding:4px;border-radius:6px}
+@media (prefers-color-scheme:dark){.brand svg{background:#f6f3f1}}
 main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 24px 15vh}
 .panel{width:100%;max-width:360px;text-align:center}
 .icon{display:inline-grid;place-items:center;width:44px;height:44px;margin-bottom:20px;border-radius:12px;background:var(--tile);color:var(--fg);box-shadow:inset 0 0 0 1px var(--border)}

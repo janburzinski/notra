@@ -14,6 +14,7 @@ import {
   SITES_ABUSE_EMAIL,
   SITES_SECURITY_EMAIL,
   SYSTEM_PAGE_CSS,
+  SYSTEM_PAGE_FAVICON,
 } from "./constants/pages";
 import type {
   PreviewGateError,
@@ -23,7 +24,7 @@ import type {
 import { escapeHtml } from "./utils/html";
 
 function page({ title, body }: SystemPageContent): string {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="referrer" content="same-origin"><title>${escapeHtml(title)}</title><style>${SYSTEM_PAGE_CSS}</style></head><body><header><a class="brand" href="${NOTRA_HOME_URL}" aria-label="Notra">${NOTRA_MARK_SVG}<span>Notra</span></a></header><main><div class="panel">${body}</div></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="referrer" content="same-origin"><title>${escapeHtml(title)}</title><link rel="icon" type="image/svg+xml" sizes="any" href="${SYSTEM_PAGE_FAVICON}"><style>${SYSTEM_PAGE_CSS}</style></head><body><header><a class="brand" href="${NOTRA_HOME_URL}" aria-label="Notra">${NOTRA_MARK_SVG}<span>Notra</span></a></header><main><div class="panel">${body}</div></main></body></html>`;
 }
 
 function statusPage(code: string, heading: string, text: string): string {
