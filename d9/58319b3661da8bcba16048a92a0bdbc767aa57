@@ -1,0 +1,33 @@
+packages/db/migrations/meta/_journal.json
+  ai_agent 963-969
+packages/ai/src/integrations/github.ts
+  s_e97a5ffa0def08::t_9db9a69ce50dc4 426,431,435-444,521,525
+scripts/testing/dashboard/README.md
+  s_e97a5ffa0def08::t_fee1e53da47a90 173,178-180
+packages/db/migrations/meta/0137_snapshot.json
+  ai_agent 1-15812
+packages/db/migrations/0137_encrypt_social_connection_tokens.sql
+  ai_agent 1-6
+scripts/testing/dashboard/bootstrap-github-cli.ts
+  s_e97a5ffa0def08::t_fee1e53da47a90 19-20,22-25,86,94,101
+packages/db/src/schema.ts
+  s_e97a5ffa0def08::t_9db9a69ce50dc4 355
+apps/dashboard/src/lib/auth/sync.ts
+  s_e97a5ffa0def08::t_9db9a69ce50dc4 1,125-134,137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d958319b3661da8bcba16048a92a0bdbc767aa57",
+  "prompts": {},
+  "sessions": {
+    "s_e97a5ffa0def08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32a270ce-f745-4769-a1ff-3851c17b56b7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
