@@ -1,8 +1,10 @@
 import {
+  CLOUDFLARE_WORKER_SUBREQUEST_IP,
   TRAFFIC_CONTENT_TYPES,
   TRAFFIC_TRACING_HEADERS,
 } from "./constants/traffic";
 import type { TrafficPayload, TrafficReport } from "./types/traffic";
+import { forwardedClientIp } from "./utils/client-ip";
 import { postToIngest } from "./utils/ingest";
 
 function header(headers: Headers, name: string): string | undefined {
@@ -85,29 +87,23 @@ function buildPayload(report: TrafficReport): TrafficPayload {
   const { request, publicUrl, proxied, status } = report;
   const { headers } = request;
   const cf = (request as { cf?: IncomingRequestCfProperties }).cf;
-  const ip = proxied
-    ? headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    : header(headers, "cf-connecting-ip");
-  const geo = proxied
-    ? {
-        country:
-          header(headers, "x-vercel-ip-country") ??
-          header(headers, "cf-ipcountry"),
-      }
-    : {
-        country: cf?.country ?? header(headers, "cf-ipcountry"),
-        region: cf?.regionCode,
-        city: cf?.city,
-        timezone: cf?.timezone,
-        latitude: cf?.latitude,
-        longitude: cf?.longitude,
-      };
+  const connectingIp = header(headers, "cf-connecting-ip");
+  const forwardedIp = proxied
+    ? forwardedClientIp(headers.get("x-forwarded-for"), connectingIp)
+    : undefined;
+  // Cloudflare locates the address that connected to it, which behind a
+  // proxy is the proxy's server, except for a Cloudflare Worker's request.
+  const country =
+    !forwardedIp || connectingIp === CLOUDFLARE_WORKER_SUBREQUEST_IP
+      ? (cf?.country ?? header(headers, "cf-ipcountry"))
+      : header(headers, "x-vercel-ip-country");
+  const ip = forwardedIp ?? connectingIp;
   return {
     timestamp: new Date().toISOString(),
     method: report.method,
     url: publicUrl,
     ip: ip || undefined,
-    geo,
+    geo: { country },
     referer: publicReferer(report.referer, request, publicUrl),
     userAgent: header(headers, "user-agent"),
     accept: header(headers, "accept"),

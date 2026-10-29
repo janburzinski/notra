@@ -3,14 +3,7 @@ export interface TrafficPayload {
   method: string;
   url: string;
   ip?: string;
-  geo?: {
-    country?: string;
-    region?: string;
-    city?: string;
-    timezone?: string;
-    latitude?: string;
-    longitude?: string;
-  };
+  geo?: { country?: string };
   referer?: string;
   userAgent?: string;
   accept?: string;

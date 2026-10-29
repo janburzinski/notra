@@ -95,7 +95,7 @@ Every platform guide meets these rules, so if you write your own proxy, check it
 | Don't redirect `/blog` to `/blog/` | The check fails on any redirect, so turn off trailing-slash redirects for these paths |
 | Leave Notra's response headers alone | Notra sends caching, `Content-Security-Policy` and `Vary` headers that fit each file, so don't add `noindex` and don't cache HTML longer than Notra says |
 
-Notra doesn't need cookies or `Authorization` headers, so don't forward them where your platform lets you, which keeps your visitors' sessions on your domain. Keep `User-Agent` and `Referer`, and send the visitor's IP in `X-Forwarded-For`, so [site analytics](/sites/agents#ai-traffic-analytics) can tell visitors and countries apart. The nginx and Cloudflare guides set it explicitly.
+Notra doesn't need cookies or `Authorization` headers, so don't forward them where your platform lets you, which keeps your visitors' sessions on your domain. Keep `User-Agent` and `Referer`, and send the visitor's IP in `X-Forwarded-For`, so [site analytics](/sites/agents#ai-traffic-analytics) can tell visitors apart. Notra uses the last public address your proxy adds, so a value the visitor sends can't stand in for it, and the nginx and Cloudflare guides set it explicitly. Countries come from Cloudflare's location data with the Cloudflare Worker setup, and from Vercel's `X-Vercel-IP-Country` header when your proxy sends it. Behind other proxies Notra would only see where your server is, so site analytics show those visits without a country.
 
 ## How the check works
 

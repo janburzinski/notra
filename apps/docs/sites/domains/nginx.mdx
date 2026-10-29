@@ -33,6 +33,7 @@ proxy_pass https://acme.notra.site;
 proxy_set_header Host acme.notra.site;
 proxy_ssl_server_name on;
 proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Vercel-IP-Country "";
 proxy_set_header Cookie "";
 proxy_set_header Authorization "";
 ```
@@ -41,6 +42,7 @@ proxy_set_header Authorization "";
 - `proxy_set_header Host` matters because many configs set `proxy_set_header Host $host;` at the `server` or `http` level, and without the override Notra gets your domain and answers with a 404.
 - `proxy_ssl_server_name on` sends the right TLS server name, and without it the connection may get the wrong certificate or be refused.
 - `X-Forwarded-For $remote_addr` replaces any value the visitor sends, so site analytics can't be fed a fake IP. Behind a CDN or load balancer, restore the visitor's address first with nginx's `realip` module.
+- `X-Vercel-IP-Country ""` drops that header if a visitor sends it, because Notra reads the visitor's country from it.
 - nginx passes redirects and the `Accept` header through by default.
 - nginx looks up `acme.notra.site` when it starts or reloads, so if the name doesn't resolve at that moment, nginx refuses to start.
 

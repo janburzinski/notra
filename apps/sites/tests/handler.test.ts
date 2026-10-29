@@ -593,6 +593,120 @@ describe("production serving", () => {
     expect(payload.ip).toBe("203.0.113.9");
   });
 
+  test("visitor address and country behind each kind of proxy", async () => {
+    const { put, deps, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    const berlin = { country: "DE", city: "Berlin", latitude: "52.52" };
+    const cases: {
+      name: string;
+      url: string;
+      headers: Record<string, string>;
+      cf: Record<string, string>;
+      ip: string;
+      geo: Record<string, string | undefined>;
+    }[] = [
+      {
+        name: "nginx overwriting X-Forwarded-For, server in Germany",
+        url: "https://acme.notra.site/blog/post",
+        headers: {
+          "x-forwarded-for": "198.51.100.7, 192.0.2.10",
+          "cf-connecting-ip": "192.0.2.10",
+          "cf-ipcountry": "DE",
+        },
+        cf: berlin,
+        ip: "198.51.100.7",
+        geo: { country: undefined },
+      },
+      {
+        name: "appending proxy, visitor sent a fake address",
+        url: "https://acme.notra.site/blog/post",
+        headers: {
+          "x-forwarded-for": "1.1.1.1, 198.51.100.7, 192.0.2.10",
+          "cf-connecting-ip": "192.0.2.10",
+        },
+        cf: berlin,
+        ip: "198.51.100.7",
+        geo: { country: undefined },
+      },
+      {
+        name: "proxy with internal hops",
+        url: "https://acme.notra.site/blog/post",
+        headers: {
+          "x-forwarded-for": "198.51.100.7, 100.64.0.12, 192.0.2.10",
+          "cf-connecting-ip": "192.0.2.10",
+        },
+        cf: berlin,
+        ip: "198.51.100.7",
+        geo: { country: undefined },
+      },
+      {
+        name: "Vercel rewrite",
+        url: "https://acme.notra.site/blog/post",
+        headers: {
+          "x-forwarded-for": "198.51.100.7, 192.0.2.20",
+          "cf-connecting-ip": "192.0.2.20",
+          "x-vercel-ip-country": "FR",
+        },
+        cf: { country: "US", city: "Ashburn" },
+        ip: "198.51.100.7",
+        geo: { country: "FR" },
+      },
+      {
+        name: "Cloudflare Worker on the customer's zone",
+        url: "https://acme.notra.site/blog/post",
+        headers: {
+          "x-forwarded-for": "198.51.100.7, 2a06:98c0:3600::103",
+          "cf-connecting-ip": "2a06:98c0:3600::103",
+        },
+        cf: berlin,
+        ip: "198.51.100.7",
+        geo: { country: "DE" },
+      },
+      {
+        name: "visitor opening the Notra address directly",
+        url: "https://acme.notra.site/blog/post",
+        headers: {
+          "x-forwarded-for": "198.51.100.7",
+          "cf-connecting-ip": "198.51.100.7",
+          "x-vercel-ip-country": "FR",
+        },
+        cf: { country: "JP" },
+        ip: "198.51.100.7",
+        geo: { country: "JP" },
+      },
+      {
+        name: "visitor on the public domain sending X-Forwarded-For",
+        url: "https://acme.com/blog/post",
+        headers: {
+          "x-forwarded-for": "1.1.1.1, 198.51.100.7",
+          "cf-connecting-ip": "198.51.100.7",
+          "x-vercel-ip-country": "FR",
+        },
+        cf: { country: "JP" },
+        ip: "198.51.100.7",
+        geo: { country: "JP" },
+      },
+    ];
+    put("hosts/acme.com.json", { version: 1, siteId: SITE, kind: "custom" });
+    for (const { url, headers, cf } of cases) {
+      const response = await handleSiteRequest(
+        Object.assign(new Request(url, { headers }), { cf }),
+        deps
+      );
+      expect(response.status).toBe(200);
+    }
+    await settle();
+    const payloads = reports.map((report) =>
+      JSON.parse(String(report.init.body))
+    );
+    expect(payloads).toHaveLength(cases.length);
+    for (const [index, { name, ip, geo }] of cases.entries()) {
+      expect({ name, ip: payloads[index].ip }).toEqual({ name, ip });
+      expect({ name, ...payloads[index].geo }).toEqual({ name, ...geo });
+    }
+  });
+
   test("the dashboard's own preview frame is not a visit", async () => {
     const { request, reports, settle } = setup({
       trafficToken: "nst.site_a.sig",

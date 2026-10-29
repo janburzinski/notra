@@ -135,6 +135,8 @@ function nginxRecipe(origin: string, mounts: string[]): string {
   const proxy = `    proxy_pass ${origin};
     proxy_set_header Host ${host};
     proxy_ssl_server_name on;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Vercel-IP-Country "";
     proxy_set_header Cookie "";
     proxy_set_header Authorization "";`;
   return `${mounts
