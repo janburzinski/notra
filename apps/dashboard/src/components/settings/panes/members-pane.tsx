@@ -1,5 +1,6 @@
 "use client";
 
+import { Mail01Icon } from "@hugeicons/core-free-icons";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import {
@@ -18,6 +19,8 @@ import { useInvitationColumns } from "@/components/members/invitation-columns";
 import { InviteMemberPopover } from "@/components/members/invite-member-popover";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { SettingsPane } from "@/components/settings/settings-pane";
+import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
+import { SETTINGS_TABLE_EMPTY_HEIGHT } from "@/constants/settings";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { authClient } from "@/lib/auth/client";
 import { tableHeightFor } from "@/utils/table";
@@ -74,6 +77,9 @@ export function MembersSettingsPane() {
   const pendingInvitations = invitations?.filter(
     (inv) => inv.status === "pending"
   );
+  const pendingRowCount = invitationsLoading
+    ? 3
+    : (pendingInvitations?.length ?? 0);
 
   if (!organization) {
     return (
@@ -124,11 +130,19 @@ export function MembersSettingsPane() {
           <DataTable
             columns={invitationColumns}
             data={pendingInvitations ?? []}
-            emptyState={t("noPending")}
+            emptyState={
+              <SettingsTableEmpty
+                description={t("noPendingDescription")}
+                icon={Mail01Icon}
+                title={t("noPending")}
+              />
+            }
             getRowId={(invitation) => invitation.id}
-            height={tableHeightFor(
-              invitationsLoading ? 3 : (pendingInvitations?.length ?? 0)
-            )}
+            height={
+              pendingRowCount > 0
+                ? tableHeightFor(pendingRowCount)
+                : SETTINGS_TABLE_EMPTY_HEIGHT
+            }
             loading={invitationsLoading}
             rowHeight={TABLE_ROW_HEIGHT}
           />

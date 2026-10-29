@@ -53,7 +53,8 @@ function RepositoryList({
           {t("repositoriesSection.emptyTitle")}
         </h3>
         <Button
-          className="mt-5 gap-1.5"
+          className="mt-5"
+          variant="outline"
           onClick={
             isConnected ? () => handleOpenRepositories() : handleOpenConnect
           }

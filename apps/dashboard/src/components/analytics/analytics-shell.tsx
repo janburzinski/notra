@@ -2,6 +2,7 @@
 
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
+import { Alert, AlertDescription } from "@notra/ui/components/ui/alert";
 import { type ReactNode, useEffect, useRef } from "react";
 import { useTranslations } from "use-intl";
 
@@ -119,9 +120,9 @@ export function AnalyticsShell({ children }: { children: ReactNode }) {
         </header>
 
         {!configured && (
-          <p className="border-border text-muted-foreground rounded-md border px-3 py-2 font-mono text-[0.6875rem]">
-            {t("notConfigured")}
-          </p>
+          <Alert>
+            <AlertDescription>{t("notConfigured")}</AlertDescription>
+          </Alert>
         )}
 
         <SummaryStats

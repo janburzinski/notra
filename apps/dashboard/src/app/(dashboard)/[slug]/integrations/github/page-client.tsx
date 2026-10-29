@@ -32,19 +32,19 @@ export default function PageClient({
     isLoading,
     isLoadingLegacyIntegrations,
   } = settings;
+  const actionsDisabled = isLoading || isLoadingLegacyIntegrations;
   const showGitHubAppSection =
-    isLoading ||
-    isLoadingLegacyIntegrations ||
+    actionsDisabled ||
     isConnected ||
     githubIntegrations.length > 0 ||
     (githubAppQuery.isError && !githubAppQuery.data);
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full space-y-10 px-4 lg:px-6">
-        <PageHeading title="GitHub">
+      <div className="w-full space-y-6 px-4 lg:px-6">
+        <PageHeading description={t("description")} title="GitHub">
           <div className="flex max-w-full flex-wrap items-center gap-2">
             <Button
-              disabled={isLoading || isLoadingLegacyIntegrations}
+              disabled={actionsDisabled}
               onClick={
                 isConnected ? () => handleOpenRepositories() : handleOpenConnect
               }
@@ -55,13 +55,15 @@ export default function PageClient({
                 : tIntegrationsShared("connectGithub")}
               <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
             </Button>
-            <Button
-              disabled={isLoading || isLoadingLegacyIntegrations}
-              onClick={() => settings.setLegacyOpen(true)}
-              variant="outline"
-            >
-              {tApp("connectWithToken")}
-            </Button>
+            {showGitHubAppSection ? null : (
+              <Button
+                disabled={actionsDisabled}
+                onClick={() => settings.setLegacyOpen(true)}
+                variant="outline"
+              >
+                {tApp("connectWithToken")}
+              </Button>
+            )}
           </div>
         </PageHeading>
         {showGitHubAppSection ? <GitHubAppSection {...settings} /> : null}

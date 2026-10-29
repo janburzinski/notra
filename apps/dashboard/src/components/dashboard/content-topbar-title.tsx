@@ -46,11 +46,11 @@ export function ContentTopbarCollection({
 
   return (
     <>
-      <BreadcrumbItem className="min-w-0 max-sm:hidden">
+      <BreadcrumbItem className="min-w-0">
         <BreadcrumbLink
           render={
             <Link
-              className="block max-w-40 truncate"
+              className="block max-w-24 truncate sm:max-w-40"
               href={`/${activeOrganization.slug}/collection/${collection.id}`}
             >
               {collection.name}
@@ -58,7 +58,7 @@ export function ContentTopbarCollection({
           }
         />
       </BreadcrumbItem>
-      <BreadcrumbSeparator className="max-sm:hidden">
+      <BreadcrumbSeparator>
         <HugeiconsIcon icon={ArrowRight01Icon} />
       </BreadcrumbSeparator>
     </>

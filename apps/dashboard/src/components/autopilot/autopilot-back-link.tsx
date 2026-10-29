@@ -1,10 +1,8 @@
 "use client";
 
-import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { useQueryState } from "nuqs";
 
-import Link from "@/components/framework/link";
+import { BackLink } from "@/components/layout/back-link";
 import {
   AUTOPILOT_FROM_PARAM,
   AUTOPILOT_NAV_LINK,
@@ -29,12 +27,8 @@ export function AutopilotBackLink({ slug, tab }: AutopilotBackLinkProps) {
     href = `${base}/${AUTOPILOT_AUTOMATION_SLUGS[kind]}`;
   }
   return (
-    <Link
-      className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
-      href={href}
-    >
-      <HugeiconsIcon className="size-4" icon={ArrowLeft02Icon} />
+    <BackLink href={href}>
       {kind ? AUTOPILOT_AUTOMATIONS[kind].name : "Autopilot"}
-    </Link>
+    </BackLink>
   );
 }

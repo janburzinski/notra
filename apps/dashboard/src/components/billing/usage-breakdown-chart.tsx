@@ -67,7 +67,7 @@ export function UsageBreakdownChart({
         </Select>
       }
       className="min-w-0"
-      heading={<span className="text-base">{t("title")}</span>}
+      heading={t("title")}
       headingAs="h2"
     >
       <UsageBreakdownChartBody data={data} loading={loading} />

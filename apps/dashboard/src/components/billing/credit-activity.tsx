@@ -1,5 +1,6 @@
 "use client";
 
+import { Wallet01Icon } from "@hugeicons/core-free-icons";
 import { FEATURES } from "@notra/ai/billing/features";
 import { cn } from "@notra/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +11,9 @@ import { normalizePageSize } from "ui/table/lib";
 import { useFormatter, useLocale, useTranslations } from "use-intl";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
 import { CREDIT_EVENTS_PAGE_SIZE } from "@/constants/billing-credits";
+import { SETTINGS_TABLE_EMPTY_HEIGHT } from "@/constants/settings";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { authClient } from "@/lib/auth/client";
 import { useOutputTypeLabel } from "@/lib/hooks/use-output-type-label";
@@ -112,6 +115,8 @@ export function CreditActivity() {
   const hasMore = hasMorePaginatedResults(eventsData, pageSize);
   const visibleEvents =
     eventsData?.list.filter((event) => event.value !== 0) ?? [];
+  const activityRowCount =
+    isPending && visibleEvents.length === 0 ? 5 : visibleEvents.length;
 
   return (
     <div className="space-y-4">
@@ -119,7 +124,13 @@ export function CreditActivity() {
       <DataTable
         columns={eventColumns}
         data={visibleEvents}
-        emptyState={t("empty")}
+        emptyState={
+          <SettingsTableEmpty
+            description={t("emptyDescription")}
+            icon={Wallet01Icon}
+            title={t("empty")}
+          />
+        }
         pagination={{
           mode: "cursor",
           page,
@@ -130,9 +141,11 @@ export function CreditActivity() {
           itemLabel: t("itemLabel"),
         }}
         getRowId={(event) => event.id}
-        height={paginatedTableHeightFor(
-          isPending && visibleEvents.length === 0 ? 5 : visibleEvents.length
-        )}
+        height={
+          activityRowCount > 0
+            ? paginatedTableHeightFor(activityRowCount)
+            : SETTINGS_TABLE_EMPTY_HEIGHT
+        }
         loading={isPending || isPlaceholderData}
         rowHeight={TABLE_ROW_HEIGHT}
       />

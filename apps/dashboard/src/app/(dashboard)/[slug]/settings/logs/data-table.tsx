@@ -1,11 +1,9 @@
 "use client";
 
-import { AnalyticsUpIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { DataTable } from "ui/table";
 import { useTranslations } from "use-intl";
 
-import { EmptyState } from "@/components/empty-state";
+import { SETTINGS_TABLE_EMPTY_HEIGHT } from "@/constants/settings";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import type { DataTableProps as LogsDataTableProps } from "@/types/logs/data-table";
 import { paginatedTableHeightFor } from "@/utils/table";
@@ -28,29 +26,11 @@ export function LogsDataTable<TData>({
   totalCount,
 }: LogsDataTableProps<TData>) {
   const t = useTranslations("settings.logs");
-  const skeletonHeight =
-    isLoading && data.length === 0
+  let height: number | undefined;
+  if (data.length === 0) {
+    height = isLoading
       ? paginatedTableHeightFor(LOGS_SKELETON_ROW_COUNT, TABLE_ROW_HEIGHT)
-      : undefined;
-
-  if (data.length === 0 && !isLoading && emptyState) {
-    return (
-      <EmptyState
-        actionLabel={emptyState.actionLabel}
-        actionVariant="outline"
-        className="min-h-64"
-        description={emptyState.description ?? ""}
-        onActionClick={emptyState.onActionClick}
-        title={emptyState.title}
-        titleIcon={
-          <HugeiconsIcon
-            aria-hidden="true"
-            className="text-muted-foreground size-5"
-            icon={AnalyticsUpIcon}
-          />
-        }
-      />
-    );
+      : SETTINGS_TABLE_EMPTY_HEIGHT;
   }
 
   return (
@@ -58,7 +38,7 @@ export function LogsDataTable<TData>({
       columns={columns}
       data={data}
       defaultSort={{ key: "createdAt", direction: "desc" }}
-      emptyState={t("noResults")}
+      emptyState={emptyState}
       pagination={{
         mode: "server",
         page,
@@ -69,7 +49,7 @@ export function LogsDataTable<TData>({
         itemLabel: t("itemLabel"),
       }}
       getRowId={getRowId}
-      height={skeletonHeight}
+      height={height}
       loading={isLoading}
       onRowClick={onRowClick}
       onSortChange={onSortChange}

@@ -57,7 +57,7 @@ export const GEO_SHELF_TABLE_COLUMN = {
   citations: { width: "10rem" },
   own: { width: "9rem" },
   competitors: { width: "7.5rem" },
-  ticket: { width: "7rem" },
+  ticket: { width: "8.5rem" },
 } as const;
 export const GEO_SHELF_HOVER_DELAY_MS = 150;
 export const GEO_SHELF_ENGINE_STACK_LIMIT = 3;

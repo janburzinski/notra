@@ -113,7 +113,7 @@ function RunPage({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
+      <div className="space-y-3">
         <AutopilotBackLink slug={organizationSlug} tab="analytics" />
         <PageHeading
           description={[

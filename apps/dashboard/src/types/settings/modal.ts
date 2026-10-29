@@ -84,6 +84,13 @@ export interface SettingsPaneProps {
   titleAccessory?: ReactNode;
 }
 
+export interface SettingsTableEmptyProps {
+  icon: IconSvgElement;
+  title: ReactNode;
+  description?: ReactNode;
+  children?: ReactNode;
+}
+
 export interface SettingsModalSessionProps {
   closeSettings: () => void;
   descriptionId: string;

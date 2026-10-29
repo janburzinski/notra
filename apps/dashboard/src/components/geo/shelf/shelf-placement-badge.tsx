@@ -98,11 +98,7 @@ export function ShelfPlacementBadge({
   const sourceHint = sourceHintKey ? t(sourceHintKey) : null;
   const badge = (
     <Badge
-      className={cn(
-        "gap-1 rounded-sm text-[0.6875rem] whitespace-nowrap",
-        PLACEMENT_BADGE[resolved],
-        className
-      )}
+      className={cn("whitespace-nowrap", PLACEMENT_BADGE[resolved], className)}
       variant="outline"
     >
       <HugeiconsIcon

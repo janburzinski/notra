@@ -1,7 +1,5 @@
 "use client";
 
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { AUTOMATION_RUN_STATUSES } from "@notra/db/constants/automation-runs";
 import type { AutomationRunStatus } from "@notra/schemas/dashboard/automation/runs";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
@@ -18,7 +16,7 @@ import { useTranslations } from "use-intl";
 import { AutomationLoadError } from "@/components/automation/automation-load-error";
 import { AutomationRunsTable } from "@/components/automation/runs/automation-runs-table";
 import { RunsEmpty } from "@/components/automation/runs/runs-empty";
-import Link from "@/components/framework/link";
+import { BackLink } from "@/components/layout/back-link";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { useAutomationRowName } from "@/lib/hooks/use-automation-row-name";
@@ -87,13 +85,9 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         <div className="space-y-3">
-          <Link
-            className="text-muted-foreground hover:text-foreground duration-fast inline-flex items-center gap-1 text-sm transition-colors"
-            href={`/${organizationSlug}/automation`}
-          >
-            <HugeiconsIcon className="size-4" icon={ArrowLeft01Icon} />
+          <BackLink href={`/${organizationSlug}/automation`}>
             {tEditor("back")}
-          </Link>
+          </BackLink>
           <PageHeading description={t("description")} title={t("title")} />
         </div>
 

@@ -6,6 +6,7 @@ import {
   GEO_CHANGES_SKELETON_ROWS,
   GEO_VISIBILITY_TABLE_ROWS,
 } from "@notra/geo-core/constants/geo";
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   PermissionRow,
   PermissionOption,
@@ -44,20 +45,16 @@ export function GeoPageSkeleton() {
       className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6"
     >
       <div className="w-full space-y-6 px-4 lg:px-6">
-        <header className="space-y-1">
-          <div className="flex flex-col items-start justify-between gap-3 @min-[24rem]/main:flex-row @min-[24rem]/main:items-center">
-            <h1 className="text-3xl font-bold tracking-tight">GEO</h1>
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <Skeleton className="h-8 w-[8.625rem] rounded-md" />
-              <Button className="w-fit gap-2" disabled size="sm">
-                <HugeiconsIcon icon={PlayIcon} size={14} />
-                {tGeoShared("runScan")}
-                <HugeiconsIcon icon={ArrowDown01Icon} size={14} />
-              </Button>
-            </div>
+        <PageHeading description={t("descriptionFallback")} title="GEO">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Skeleton className="h-8 w-[8.625rem] rounded-md" />
+            <Button className="w-fit gap-2" disabled size="sm">
+              <HugeiconsIcon icon={PlayIcon} size={14} />
+              {tGeoShared("runScan")}
+              <HugeiconsIcon icon={ArrowDown01Icon} size={14} />
+            </Button>
           </div>
-          <p className="text-muted-foreground">{t("descriptionFallback")}</p>
-        </header>
+        </PageHeading>
         <div className="flex min-w-0 flex-col">
           <PermissionRow
             className="w-fit shrink-0"

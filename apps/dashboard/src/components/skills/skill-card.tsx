@@ -82,7 +82,7 @@ export function SkillCard({ skill, slug }: SkillCardProps) {
               </p>
             ) : null}
           </div>
-          <p className="text-muted-foreground line-clamp-3 px-3 pt-1 pb-3 text-sm wrap-anywhere">
+          <p className="text-muted-foreground mx-3 mt-1 mb-3 line-clamp-3 text-sm wrap-anywhere">
             {skill.description}
           </p>
         </div>

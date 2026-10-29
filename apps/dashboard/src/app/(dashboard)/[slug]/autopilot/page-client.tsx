@@ -37,6 +37,7 @@ import {
 } from "@/components/autopilot/autopilot-templates";
 import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
+import { BackLink } from "@/components/layout/back-link";
 import { TabCount } from "@/components/tab-count";
 import {
   AUTOPILOT_AUTOMATION_KINDS,
@@ -162,12 +163,10 @@ function AutopilotOverviewPage({
 
   if (templatesView) {
     return (
-      <AutopilotTemplatesPage
-        {...templateActions}
-        onBack={() => {
-          void setTemplatesView(null);
-        }}
-      />
+      <div className="space-y-3">
+        <BackLink href={basePath}>Autopilot</BackLink>
+        <AutopilotTemplatesPage {...templateActions} />
+      </div>
     );
   }
 

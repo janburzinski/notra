@@ -2,6 +2,7 @@
 
 import {
   ArrowReloadHorizontalIcon,
+  MoreHorizontalIcon,
   PlusSignIcon,
   Search01Icon,
   Tick02Icon,
@@ -537,27 +538,17 @@ function SlackIntegrationCard({
               <DropdownMenuTrigger
                 render={
                   <Button
+                    aria-label={tIntegrationsShared("moreOptions")}
                     disabled={
                       toggleMutation.isPending || deleteMutation.isPending
                     }
                     size="icon-sm"
                     variant="ghost"
                   >
-                    <svg
-                      aria-label={tIntegrationsShared("moreOptions")}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <title>{tIntegrationsShared("moreOptions")}</title>
-                      <circle cx="12" cy="12" r="1" />
-                      <circle cx="12" cy="5" r="1" />
-                      <circle cx="12" cy="19" r="1" />
-                    </svg>
+                    <HugeiconsIcon
+                      className="size-4"
+                      icon={MoreHorizontalIcon}
+                    />
                   </Button>
                 }
               />
@@ -648,11 +639,8 @@ export default function PageClient({
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
-        <PageHeading
-          description={t("description")}
-          title={tIntegrationsShared("slackIntegration")}
-        >
-          <Button className="gap-1.5" onClick={() => setDialogOpen(true)}>
+        <PageHeading description={t("description")} title="Slack">
+          <Button onClick={() => setDialogOpen(true)}>
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
             {tIntegrationsShared("addToSlack")}
             <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
@@ -665,11 +653,8 @@ export default function PageClient({
           {!showLoading && (!integrations || integrations.length === 0) ? (
             <EmptyState
               action={
-                <Button
-                  onClick={() => setDialogOpen(true)}
-                  size="sm"
-                  variant="outline"
-                >
+                <Button onClick={() => setDialogOpen(true)} variant="outline">
+                  <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
                   {tIntegrationsShared("addToSlack")}
                 </Button>
               }

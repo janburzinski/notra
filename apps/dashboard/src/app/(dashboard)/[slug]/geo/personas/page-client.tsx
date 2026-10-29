@@ -1,6 +1,10 @@
 "use client";
 
-import { Loading03Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import {
+  Loading03Icon,
+  PlusSignIcon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import Counter from "@notra/ui/components/shared/counter";
@@ -35,6 +39,7 @@ import { GEO_PERSONA_SKELETON_ROW_COUNT } from "@/constants/geo-personas";
 import { useGeoSettings } from "@/lib/hooks/use-geo";
 import { useGeoPersonas } from "@/lib/hooks/use-geo-personas";
 import { usePersonaAddFlow } from "@/lib/hooks/use-persona-add-flow";
+import { cn } from "@/lib/utils";
 import type { GeoPageClientProps } from "@/types/geo";
 import type {
   GeneratePersonasButtonProps,
@@ -91,14 +96,14 @@ function GeneratePersonasButton({
       </span>
       <Button
         aria-label={progress ? progressLabel : label}
-        className="h-9 gap-2 px-3"
+        className="gap-1.5"
         disabled={isGenerating}
         onClick={onClick}
+        size="sm"
       >
         <HugeiconsIcon
-          className={isGenerating ? "motion-safe:animate-spin" : undefined}
-          icon={isGenerating ? Loading03Icon : UserGroupIcon}
-          size={16}
+          className={cn("size-4", isGenerating && "motion-safe:animate-spin")}
+          icon={isGenerating ? Loading03Icon : PlusSignIcon}
         />
         {progress ? (
           <span className="inline-flex items-center gap-1.5 leading-none">

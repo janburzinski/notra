@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { TableColumn, SortState } from "ui/table";
 
 import type {
@@ -14,13 +15,6 @@ export interface LogPageOptions {
   sort: SortState | null;
 }
 
-export interface DataTableEmptyState {
-  title: string;
-  description?: string;
-  actionLabel?: string;
-  onActionClick?: () => void;
-}
-
 export interface DataTableProps<TData> {
   columns: TableColumn<TData>[];
   data: TData[];
@@ -30,7 +24,7 @@ export interface DataTableProps<TData> {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   isLoading?: boolean;
-  emptyState?: DataTableEmptyState;
+  emptyState: ReactNode;
   onRowClick?: (row: TData) => void;
   sort?: SortState | null;
   onSortChange?: (sort: SortState | null) => void;

@@ -3,6 +3,7 @@
 import {
   Link04Icon,
   PlusSignIcon,
+  Refresh03Icon,
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -16,6 +17,13 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@notra/ui/components/shared/responsive-dialog";
+import {
+  Empty,
+  EmptyContent,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@notra/ui/components/ui/empty";
 import { Field, FieldLabel } from "@notra/ui/components/ui/field";
 import { Input } from "@notra/ui/components/ui/input";
 import {
@@ -256,14 +264,13 @@ function SkillsPageBody({
 
   if (isError) {
     return (
-      <div className="flex flex-col items-start gap-3">
-        <p className="text-muted-foreground text-sm">
-          {tCommon("errors.generic")}
-        </p>
-        <Button onClick={onRetry} variant="outline">
-          {tCommon("actions.retry")}
-        </Button>
-      </div>
+      <EmptyState
+        actionIcon={<HugeiconsIcon className="size-4" icon={Refresh03Icon} />}
+        actionLabel={tCommon("actions.retry")}
+        description={t("loadError.description")}
+        onActionClick={onRetry}
+        title={t("loadError.title")}
+      />
     );
   }
 
@@ -323,9 +330,23 @@ function SkillsPageBody({
         </div>
       </div>
       {visibleSkills.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          {t("table.noSearchResults")}
-        </p>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={Search01Icon} />
+            </EmptyMedia>
+            <EmptyTitle>{t("table.noSearchResults")}</EmptyTitle>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button
+              onClick={() => onSearchChange("")}
+              size="sm"
+              variant="outline"
+            >
+              {tCommon("actions.clear")}
+            </Button>
+          </EmptyContent>
+        </Empty>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {visibleSkills.map((skill) => (

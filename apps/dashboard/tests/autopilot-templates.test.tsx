@@ -19,9 +19,7 @@ const actions: AutopilotTemplateActions = {
 
 describe("Autopilot templates", () => {
   test("shows the complete gallery without prototype controls or fake workspace data", () => {
-    const html = renderToStaticMarkup(
-      <AutopilotTemplatesPage {...actions} onBack={() => undefined} />
-    );
+    const html = renderToStaticMarkup(<AutopilotTemplatesPage {...actions} />);
     expect(html.match(/<article/g)).toHaveLength(3);
     expect(html).not.toContain("Not yet available");
     expect(html.match(/>Enable template<\/button>/g)).toHaveLength(3);
@@ -32,11 +30,7 @@ describe("Autopilot templates", () => {
 
   test("members can browse but cannot enable inactive templates", () => {
     const html = renderToStaticMarkup(
-      <AutopilotTemplatesPage
-        {...actions}
-        canManage={false}
-        onBack={() => undefined}
-      />
+      <AutopilotTemplatesPage {...actions} canManage={false} />
     );
     expect(html.match(/<article/g)).toHaveLength(3);
     expect(html.match(/<button[^>]*disabled=""/g)).toHaveLength(3);
@@ -50,14 +44,13 @@ describe("Autopilot templates", () => {
         canManage={false}
         isAdding
         jobs={{ readiness: true }}
-        onBack={() => undefined}
       />
     );
     expect(html.match(/<button[^>]*disabled=""/g)).toHaveLength(2);
     expect(html).toContain("Open automation");
     expect(html).toContain("Active");
     const pending = renderToStaticMarkup(
-      <AutopilotTemplatesPage {...actions} isAdding onBack={() => undefined} />
+      <AutopilotTemplatesPage {...actions} isAdding />
     );
     expect(pending.match(/<button[^>]*disabled=""/g)).toHaveLength(3);
   });

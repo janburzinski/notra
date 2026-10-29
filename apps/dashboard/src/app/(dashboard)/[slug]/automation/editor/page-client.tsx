@@ -1,7 +1,5 @@
 "use client";
 
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
@@ -18,7 +16,7 @@ import { EventTriggerForm } from "@/components/automation/events/event-trigger-f
 import { AutomationRunsTable } from "@/components/automation/runs/automation-runs-table";
 import { RunsEmpty } from "@/components/automation/runs/runs-empty";
 import { ScheduleForm } from "@/components/automation/schedules/schedule-form";
-import Link from "@/components/framework/link";
+import { BackLink } from "@/components/layout/back-link";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { AUTOMATION_TEMPLATES } from "@/constants/automation-templates";
@@ -224,13 +222,7 @@ export default function PageClient({
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="mx-auto w-full max-w-4xl space-y-5 px-4 lg:px-6">
         <div className="flex min-h-8 items-center justify-between gap-4">
-          <Link
-            className="text-muted-foreground hover:text-foreground duration-fast inline-flex items-center gap-1 text-sm transition-colors"
-            href={backHref}
-          >
-            <HugeiconsIcon className="size-4" icon={ArrowLeft01Icon} />
-            {t("back")}
-          </Link>
+          <BackLink href={backHref}>{t("back")}</BackLink>
           {triggerId && !editMissing ? (
             <Tabs
               onValueChange={(value) => setTab(value as "settings" | "runs")}

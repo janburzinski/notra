@@ -1,6 +1,10 @@
 "use client";
 
-import { Add01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
+import {
+  Add01Icon,
+  Alert02Icon,
+  Delete02Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MAX_USAGE_ALERTS } from "@notra/schemas/constants/usage-alerts";
 import { Badge } from "@notra/ui/components/ui/badge";
@@ -16,6 +20,8 @@ import { UsageAlertForm } from "@/components/billing/usage-alert-form";
 import { Button } from "@/components/button";
 import { SidebarSwap } from "@/components/dashboard/sidebar-swap";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
+import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
+import { SETTINGS_TABLE_EMPTY_HEIGHT } from "@/constants/settings";
 import { TABLE_ROW_HEIGHT } from "@/constants/table";
 import { authClient } from "@/lib/auth/client";
 import { useUsageFeatureName } from "@/lib/hooks/use-usage-feature-name";
@@ -133,12 +139,6 @@ export function UsageAlertsSection({
 
   if (loading) {
     alertsContent = <Skeleton className="h-20 w-full rounded-xl" />;
-  } else if (alerts.length === 0) {
-    alertsContent = (
-      <div className="text-muted-foreground flex min-h-20 items-center justify-center rounded-xl border border-dashed px-4 text-center text-sm">
-        {t("empty")}
-      </div>
-    );
   } else {
     const rows = alerts.map((alert, index) => {
       const configuredFeature = alert.featureId
@@ -243,13 +243,21 @@ export function UsageAlertsSection({
       <DataTable
         columns={columns}
         data={rows}
+        emptyState={
+          <SettingsTableEmpty
+            description={t("emptyDescription")}
+            icon={Alert02Icon}
+            title={t("empty")}
+          />
+        }
         getRowId={({ alert }) =>
           `${alert.featureId ?? "all"}-${alert.name ?? "unnamed"}-${alert.thresholdType}-${alert.threshold}`
         }
         onRowClick={
           controlsDisabled ? undefined : ({ alert }) => showEditForm(alert)
         }
-        autoHeight
+        autoHeight={rows.length > 0}
+        height={rows.length > 0 ? undefined : SETTINGS_TABLE_EMPTY_HEIGHT}
         rowHeight={TABLE_ROW_HEIGHT}
         rowSizing="content"
       />
@@ -265,15 +273,10 @@ export function UsageAlertsSection({
           side: "left",
           children: (
             <section className="space-y-4">
-              <div className="flex items-end justify-between gap-4">
-                <div className="space-y-1">
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    {tCommon("labels.usageAlerts")}
-                  </h2>
-                  <p className="text-muted-foreground max-w-prose text-sm text-pretty">
-                    {t("description")}
-                  </p>
-                </div>
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-muted-foreground max-w-prose text-sm text-pretty">
+                  {t("description")}
+                </p>
                 <Button
                   className="shrink-0"
                   disabled={controlsDisabled || atAlertLimit}

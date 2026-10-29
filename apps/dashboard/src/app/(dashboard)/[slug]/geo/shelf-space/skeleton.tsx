@@ -43,7 +43,7 @@ export function GeoShelfSkeleton() {
           description={t("description")}
           title={tCommon("labels.shelfSpace")}
         >
-          <Button className="gap-1.5" disabled>
+          <Button className="gap-1.5" disabled size="sm">
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
             {tGeoShared("addShelf")}
             <Kbd className="ml-1 hidden sm:inline-flex">
@@ -54,7 +54,7 @@ export function GeoShelfSkeleton() {
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Skeleton className="h-7 w-48 rounded-md" />
+              <Skeleton className="h-8 w-72 rounded-lg" />
               <Skeleton className="h-7 w-[6.5rem] rounded-md" />
               <Skeleton className="h-7 w-32 rounded-md" />
             </div>

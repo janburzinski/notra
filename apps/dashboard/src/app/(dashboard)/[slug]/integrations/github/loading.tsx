@@ -15,23 +15,18 @@ import {
 } from "./skeleton";
 
 export default function Loading() {
+  const t = useTranslations("integrations.github.page");
   const tIntegrationsShared = useTranslations("integrations.shared");
-  const tApp = useTranslations("integrations.github.appSection");
 
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="w-full space-y-10 px-4 lg:px-6">
-        <PageHeading title="GitHub">
-          <div className="flex max-w-full flex-wrap items-center gap-2">
-            <Button disabled>
-              <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
-              {tIntegrationsShared("connectGithub")}
-              <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
-            </Button>
-            <Button disabled variant="outline">
-              {tApp("connectWithToken")}
-            </Button>
-          </div>
+      <div className="w-full space-y-6 px-4 lg:px-6">
+        <PageHeading description={t("description")} title="GitHub">
+          <Button disabled>
+            <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
+            {tIntegrationsShared("connectGithub")}
+            <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
+          </Button>
         </PageHeading>
         <TitleCard
           contentClassName="p-0"

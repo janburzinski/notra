@@ -175,7 +175,7 @@ function FindingPage({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
+      <div className="space-y-3">
         <AutopilotBackLink slug={organizationSlug} tab="pull-requests" />
         <PageHeading
           description={`${AUTOPILOT_KIND_META[finding.kind].label} · ${formatDate(new Date(finding.createdAt))}`}

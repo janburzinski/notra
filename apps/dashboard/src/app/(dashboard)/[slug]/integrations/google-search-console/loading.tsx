@@ -17,7 +17,7 @@ export default function Loading() {
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
         <PageHeading description={t("description")} title={t("title")}>
-          <Button className="gap-1.5" disabled>
+          <Button disabled>
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
             {tCommon("labels.connectSearchConsole")}
             <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>

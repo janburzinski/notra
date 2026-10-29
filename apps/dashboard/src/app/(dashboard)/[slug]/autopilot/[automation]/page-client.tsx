@@ -131,7 +131,7 @@ function AutomationPage({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-3">
         <AutopilotBackLink slug={organizationSlug} />
         <PageHeading title={automation.name}>
           <div className="flex items-center gap-3">

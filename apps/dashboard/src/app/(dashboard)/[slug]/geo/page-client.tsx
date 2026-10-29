@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { useTranslations } from "use-intl";
 
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
@@ -35,23 +36,18 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
 
 function GeoOverviewLoaded({ page }: GeoOverviewLoadedProps) {
   const t = useTranslations("geo.pages.overview");
-  const headingRef = useNukeEasterEgg<HTMLHeadingElement>();
+  const headingRef = useNukeEasterEgg<HTMLSpanElement>();
   return (
     <div className="w-full space-y-6 px-4 lg:px-6">
-      <header className="space-y-1">
-        <div className="flex flex-col items-start justify-between gap-3 @min-[24rem]/main:flex-row @min-[24rem]/main:items-center">
-          <h1 className="text-3xl font-bold tracking-tight" ref={headingRef}>
-            GEO
-          </h1>
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <GeoRangePicker control={page.geoRange} />
-            <ScanModelMenu {...page.scanMenu} />
-          </div>
+      <PageHeading
+        description={t("description", { companyName: page.companyName })}
+        title={<span ref={headingRef}>GEO</span>}
+      >
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <GeoRangePicker control={page.geoRange} />
+          <ScanModelMenu {...page.scanMenu} />
         </div>
-        <p className="text-muted-foreground">
-          {t("description", { companyName: page.companyName })}
-        </p>
-      </header>
+      </PageHeading>
 
       <GeoTabs {...page.tabs} />
     </div>

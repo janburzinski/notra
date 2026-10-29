@@ -8,6 +8,7 @@ import {
   GithubIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   Command,
   CommandEmpty,
@@ -106,14 +107,14 @@ export function EditorHeader({
       {onNameChange ? (
         <input
           aria-label={t("name")}
-          className="placeholder:text-muted-foreground/60 w-full bg-transparent px-1 text-2xl font-semibold tracking-tight outline-none"
+          className="placeholder:text-muted-foreground/60 w-full bg-transparent px-1 text-2xl font-bold tracking-tight outline-none @min-[40rem]/main:text-3xl"
           maxLength={maxLength}
           onChange={(event) => onNameChange(event.target.value)}
           placeholder={placeholder}
           value={name ?? ""}
         />
       ) : (
-        <h1 className="px-1 text-2xl font-semibold tracking-tight">{title}</h1>
+        <PageHeading className="px-1" title={title} />
       )}
       <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-sm">
         <label className="flex items-center gap-2">

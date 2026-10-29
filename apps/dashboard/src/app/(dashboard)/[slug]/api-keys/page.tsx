@@ -233,7 +233,6 @@ function ApiKeysHeader({
   const tCommon2 = useTranslations("common");
   return (
     <PageHeading
-      className="@min-[40rem]/main:items-center"
       description={t("description")}
       title={tCommon2("labels.apiKeys")}
     >

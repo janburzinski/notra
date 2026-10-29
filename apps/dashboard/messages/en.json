@@ -123,7 +123,8 @@
       "members": {
         "listsLabel": "Member lists",
         "noMembers": "No members found.",
-        "noPending": "No pending invitations."
+        "noPending": "No pending invitations",
+        "noPendingDescription": "Invitations you send appear here until they're accepted."
       },
       "notifications": {
         "updated": "Notification settings updated",
@@ -260,7 +261,6 @@
       "actionsFor": "Actions for {title}",
       "referenceCopied": "Reference ID copied",
       "copyReference": "Copy reference ID",
-      "noResults": "No results.",
       "itemLabel": "logs"
     },
     "billingSuccess": {
@@ -445,6 +445,7 @@
       "deleteSelected": "Delete {count} selected",
       "loadFailed": "Couldn't load attachments",
       "empty": "No attachments yet",
+      "emptyDescription": "Files you upload in chat appear here.",
       "confirmTitle": "{count, plural, one {Delete this attachment?} other {Delete # attachments?}}",
       "confirmDescription": "The file will be removed from storage and from any threads that reference it. This cannot be undone.",
       "columns": {
@@ -522,7 +523,7 @@
     }
   },
   "apiKeys": {
-    "description": "Manage API keys for programmatic access to your organization",
+    "description": "Manage API keys for programmatic access to your organization.",
     "createKey": "Create API key",
     "viewDocs": "View API documentation",
     "columns": {
@@ -1368,13 +1369,13 @@
   "brand": {
     "identity": {
       "form": {
-        "audienceHeading": "Target Audience",
+        "audienceHeading": "Target audience",
         "audienceLabel": "Who are you writing for?",
         "audiencePlaceholder": "Describe your target audience: their interests, pain points and what matters to them",
-        "companyProfileHeading": "Company Profile",
+        "companyProfileHeading": "Company profile",
         "companyNamePlaceholder": "Your company name",
         "descriptionPlaceholder": "A short overview of your company",
-        "toneLanguageHeading": "Tone & Language",
+        "toneLanguageHeading": "Tone & language",
         "toneLabel": "Tone",
         "toneModePreset": "Preset",
         "toneModeCustom": "Custom",
@@ -1443,11 +1444,11 @@
       },
       "modal": {
         "analyzing": {
-          "title": "Analyzing Website",
+          "title": "Analyzing website",
           "description": "Extracting your brand information"
         },
         "failed": {
-          "title": "Analysis Failed"
+          "title": "Analysis failed"
         },
         "idle": {
           "title": "Add your brand",
@@ -1495,7 +1496,7 @@
         "generationFailedDescription": "Something went wrong while generating guidelines.",
         "loadErrorTitle": "Guidelines unavailable",
         "loadErrorDescription": "We couldn't load this brand identity's guidelines.",
-        "generate": "Generate Guidelines",
+        "generate": "Generate guidelines",
         "emptyTitle": "No guidelines yet",
         "emptyDescription": "Brand guidelines haven't been generated yet. Generate them to pull logos, colors, typography and landing page screenshots from your website.",
         "generatingGuidelines": "Generating guidelines…",
@@ -1519,7 +1520,7 @@
         "remove": "Remove {filename}"
       },
       "tokens": {
-        "title": "UI Tokens"
+        "title": "UI tokens"
       },
       "typography": {
         "title": "Typography",
@@ -1532,20 +1533,20 @@
         "title": "Colors"
       },
       "assets": {
-        "title": "Logo Assets",
+        "title": "Logo assets",
         "slots": {
           "logo": {
-            "light": "Light Logo",
-            "dark": "Dark Logo"
+            "light": "Light logo",
+            "dark": "Dark logo"
           },
           "wordmark": {
-            "light": "Light Wordmark",
-            "dark": "Dark Wordmark"
+            "light": "Light wordmark",
+            "dark": "Dark wordmark"
           }
         }
       },
       "screenshots": {
-        "title": "Desktop Screenshots",
+        "title": "Desktop screenshots",
         "desktopSlice": "Desktop {index}",
         "fullPage": "Full page"
       },
@@ -1567,9 +1568,9 @@
         "component": "Component"
       },
       "screenshotKinds": {
-        "desktop_hero": "Desktop Hero",
+        "desktop_hero": "Desktop hero",
         "desktop_full_page": "Desktop full page",
-        "mobile_hero": "Mobile Hero"
+        "mobile_hero": "Mobile hero"
       },
       "assetKinds": {
         "wordmark": "Wordmark"
@@ -1659,7 +1660,7 @@
         "removeTitle": "Remove sitemap?",
         "removeDescriptionNamed": "This removes {label} and its crawled pages from this brand identity.",
         "removeDescription": "This removes this sitemap and its crawled pages from this brand identity.",
-        "removeConfirm": "Remove Sitemap"
+        "removeConfirm": "Remove sitemap"
       },
       "pages": {
         "columns": {
@@ -1734,7 +1735,7 @@
         },
         "tweet": {
           "addFailed": "Failed to add tweet",
-          "title": "Add Tweet",
+          "title": "Add tweet",
           "description": "Paste a tweet URL to add it as a writing style reference."
         },
         "importX": {
@@ -1759,15 +1760,15 @@
           "sourceUrlLabel": "Source URL (optional)",
           "noteLabel": "Note (optional)",
           "notePlaceholder": "When should the AI use this as reference?",
-          "submit": "Save Reference"
+          "submit": "Save reference"
         }
       }
     },
     "shared": {
-      "createIdentity": "Create Identity",
-      "addReference": "Add Reference",
-      "addSitemap": "Add Sitemap",
-      "refreshGuidelines": "Refresh Guidelines",
+      "createIdentity": "Create identity",
+      "addReference": "Add reference",
+      "addSitemap": "Add sitemap",
+      "refreshGuidelines": "Refresh guidelines",
       "addColor": "Add color",
       "addAsset": "Add asset",
       "importFromX": "Import from X",
@@ -1789,8 +1790,12 @@
   },
   "skills": {
     "description": "Reusable instructions your agents load when generating content.",
-    "createSkill": "Create Skill",
+    "createSkill": "Create skill",
     "installed": "Installed skills",
+    "loadError": {
+      "title": "Couldn't load skills",
+      "description": "Your skills are still there. Try loading them again."
+    },
     "count": "({total})",
     "countFiltered": "({visible} of {total})",
     "search": {
@@ -1846,7 +1851,7 @@
       }
     },
     "table": {
-      "noSearchResults": "No skills match your search."
+      "noSearchResults": "No skills match your search"
     },
     "sort": {
       "label": "Sort skills",
@@ -2003,7 +2008,7 @@
       "sending": "Sending…",
       "send": "Send",
       "updating": "Updating…",
-      "apiKeys": "API Keys",
+      "apiKeys": "API keys",
       "createdAt": "Created at",
       "never": "Never",
       "actionsForName": "Actions for {name}",
@@ -2062,7 +2067,7 @@
       "noData": "No data",
       "selected": "Selected",
       "brandIdentity": "Brand identity",
-      "companyInfo": "Company Info",
+      "companyInfo": "Company info",
       "references": "References",
       "sitemap": "Sitemap",
       "analyze": "Analyze",
@@ -2141,11 +2146,11 @@
       "link": "Link",
       "copyUrl": "Copy URL",
       "table": "Table",
-      "agentReadiness": "Agent Readiness",
+      "agentReadiness": "Agent readiness",
       "leaderboard": "Leaderboard",
-      "contentGaps": "Content Gaps",
+      "contentGaps": "Content gaps",
       "personas": "Personas",
-      "shelfSpace": "Shelf Space",
+      "shelfSpace": "Shelf space",
       "autopilot": "Autopilot",
       "repository": "Repository",
       "repositories": "Repositories",
@@ -2243,7 +2248,7 @@
       "generalSettings": "General Settings",
       "navigation": "Navigation",
       "noActiveOrganization": "No active organization",
-      "brandIdentityTitle": "Brand Identity",
+      "brandIdentityTitle": "Brand identity",
       "contentSingular": "Content",
       "customOwn": "Custom",
       "loadingLabel": "Loading",
@@ -2847,8 +2852,8 @@
       "gapType": "Gap type",
       "openSearchGap": "Open details for {query}",
       "tabs": {
-        "prompt": "Prompt Gaps",
-        "search": "Search Gaps"
+        "prompt": "Prompt gaps",
+        "search": "Search gaps"
       },
       "filterLabel": "Filter content gaps",
       "filterPlaceholder": "Filter gaps…",
@@ -4026,7 +4031,7 @@
       },
       "traffic": {
         "metaTitle": "GEO Traffic",
-        "title": "AI Traffic",
+        "title": "AI traffic",
         "description": "AI crawlers and referrals visiting your site",
         "setupDescription": "Set up GEO tracking first, then watch AI crawlers and referrals as they arrive.",
         "titleWithVisitors": "Traffic",
@@ -4239,14 +4244,14 @@
   },
   "integrations": {
     "shared": {
-      "addRepository": "Add Repository",
-      "addIntegration": "Add Integration",
+      "addRepository": "Add repository",
+      "addIntegration": "Add integration",
       "addToSlack": "Add to Slack",
       "reconnect": "Reconnect",
-      "editIntegration": "Edit Integration",
-      "enableIntegration": "Enable Integration",
+      "editIntegration": "Edit integration",
+      "enableIntegration": "Enable integration",
       "whenDisabledNoOutputsWill": "When disabled, no outputs will be generated",
-      "displayName": "Display Name",
+      "displayName": "Display name",
       "integrationUpdatedSuccessfully": "Integration updated successfully",
       "moreOptions": "More options",
       "connectGithub": "Connect GitHub",
@@ -4261,12 +4266,8 @@
       "connectName": "Connect {name}",
       "reauthorize": "Reauthorize",
       "refreshTools": "Refresh tools",
-      "mcpServers": "MCP Servers",
       "couldNotRestartOauth": "Could not restart OAuth",
-      "linearIntegrations": "Linear Integrations",
       "noIntegrationsYet": "No integrations yet",
-      "granolaIntegrations": "Granola Integrations",
-      "slackIntegration": "Slack Integration",
       "addAtLeastOneAuthentication": "Add at least one authentication header",
       "apiKey": "API key",
       "displayNameIsRequired": "Display name is required",
@@ -4313,7 +4314,6 @@
       "permanentNote": "Deletion is permanent and cannot be undone.",
       "confirm": "Delete integration"
     },
-    "backLink": "Back to integrations",
     "linearDialog": {
       "title": "Add Linear integration",
       "description": "Connect a Linear workspace to generate changelogs, blog posts and tweets.",
@@ -4344,7 +4344,7 @@
     },
     "editLinearDialog": {
       "description": "Update your Linear integration settings",
-      "displayNamePlaceholder": "My Linear Integration"
+      "displayNamePlaceholder": "My Linear integration"
     },
     "card": {
       "noCredentials": "No saved credentials. Connect the GitHub App to publish.",
@@ -4363,11 +4363,11 @@
     },
     "editDialog": {
       "description": "Update your GitHub integration settings",
-      "displayNamePlaceholder": "My GitHub Integration",
+      "displayNamePlaceholder": "My GitHub integration",
       "owner": "Owner",
       "ownerPlaceholder": "owner",
       "repositoryPlaceholder": "repo",
-      "publishingBranch": "Publishing Branch"
+      "publishingBranch": "Publishing branch"
     },
     "legacy": {
       "editToken": {
@@ -4376,7 +4376,7 @@
         "description": "Replace the GitHub token used for this integration.",
         "label": "GitHub personal access token",
         "help": "<link>Generate a token on GitHub</link> with <code>repo</code> scope.",
-        "save": "Save Token",
+        "save": "Save token",
         "updated": "Personal access token updated"
       },
       "add": {
@@ -4384,10 +4384,10 @@
         "description": "Connect a GitHub repository to generate changelogs, blog posts and tweets.",
         "invalidUrl": "Invalid GitHub repository URL",
         "added": "GitHub integration added successfully",
-        "repository": "GitHub Repository",
+        "repository": "GitHub repository",
         "repositoryPlaceholder": "https://github.com/facebook/react or facebook/react",
         "viewOnGitHub": "View on GitHub",
-        "defaultBranch": "Default Branch",
+        "defaultBranch": "Default branch",
         "detecting": "Detecting…",
         "token": "Personal access token",
         "privateWarning": "This repository appears to be private or not found. A token is required to access it.",
@@ -4398,7 +4398,7 @@
     },
     "github": {
       "page": {
-        "metaTitle": "GitHub Integrations",
+        "description": "Connect repositories to generate changelogs, blog posts and draft pull requests",
         "addRepositories": "Add repositories"
       },
       "skeleton": {
@@ -4634,7 +4634,6 @@
       "goToApiKeys": "Go to API Keys"
     },
     "raycast": {
-      "metaTitle": "Raycast Extension",
       "title": "Raycast setup",
       "description": "Access your Notra content from Raycast",
       "linkLabel": "View on Raycast Store",
@@ -4658,7 +4657,6 @@
       }
     },
     "framer": {
-      "metaTitle": "Framer Integration",
       "title": "Framer setup",
       "description": "Get your Notra content into Framer",
       "linkLabel": "View on Framer Marketplace",
@@ -4692,7 +4690,7 @@
         "tooManyHeaders": "You can add up to {max} headers",
         "headerPairRequired": "Header name and value are required together",
         "serverUrl": "Server URL",
-        "namePlaceholder": "My Custom Server",
+        "namePlaceholder": "My custom server",
         "urlDescription": "The HTTPS endpoint where your MCP server is reachable.",
         "useCase": "Use case description",
         "useCasePlaceholder": "What tools or context should Notra use this server for?",
@@ -4707,10 +4705,10 @@
         "oauthDescription": "You will be redirected to the server to approve access. Notra stores an encrypted refresh token and renews access automatically."
       },
       "footer": {
-        "connectAndAuthorize": "Connect & Authorize",
-        "addServer": "Add Server",
+        "connectAndAuthorize": "Connect & authorize",
+        "addServer": "Add server",
         "testing": "Testing…",
-        "testConnection": "Test Connection"
+        "testConnection": "Test connection"
       },
       "testStatus": {
         "testing": "Testing connection…",
@@ -4725,10 +4723,10 @@
         "added": "MCP server added",
         "defaultName": "MCP server",
         "defaultIntegrationName": "integration",
-        "title": "Add MCP Server",
+        "title": "Add MCP server",
         "storeDescription": "This catalog integration has a preset server URL and authentication method. For your own configuration, add a custom server under MCP Servers.",
         "description": "Connect a custom Model Context Protocol server to extend Notra with your own tools and context.",
-        "testHint": "Test Connection checks server reachability and lists available tools. It does not run tools or verify access to your account.",
+        "testHint": "Test connection checks server reachability and lists available tools. It does not run tools or verify access to your account.",
         "testSucceeded": "Server reachable. Discovered {count, plural, one {# tool} other {# tools}}. Tool execution and account access have not been tested.",
         "testFailed": "Could not reach the MCP server. Check the URL and headers."
       },
@@ -4751,7 +4749,7 @@
       },
       "page": {
         "description": "Connect custom Model Context Protocol servers to bring your own tools and context into Notra",
-        "connect": "Connect MCP Server",
+        "connect": "Connect MCP server",
         "emptyTitle": "No custom servers yet",
         "emptyDescription": "Connect a custom MCP server to extend Notra with tools and data from your own systems.",
         "enabled": "MCP server enabled",
@@ -4766,7 +4764,7 @@
       "tabs": {
         "extension": "Extensions"
       },
-      "setupGuide": "Setup Guide",
+      "setupGuide": "Setup guide",
       "catalog": {
         "github": "Connect GitHub repositories for changelogs, blog posts and draft pull requests",
         "linear": "Sync issues and updates from Linear for automated content",
@@ -4817,7 +4815,6 @@
       "notFoundTitle": "Integration not found",
       "notFoundDescription": "This integration may have been deleted or you don't have access to it.",
       "linearSubtitle": "Configure your Linear integration settings",
-      "editIcon": "Edit icon",
       "details": "Details",
       "team": "Team"
     },
@@ -4897,7 +4894,7 @@
     },
     "webhookSetup": {
       "copied": "{label} copied to clipboard",
-      "title": "Setup Webhook",
+      "title": "Set up webhook",
       "description": "Add these values in your <link>GitHub webhook settings</link>, then confirm once saved.",
       "loadFailed": "Failed to load webhook configuration",
       "skip": "Skip for now",
@@ -4977,7 +4974,7 @@
       }
     },
     "shell": {
-      "description": "How your X and LinkedIn accounts are performing",
+      "description": "How your X and LinkedIn accounts are performing.",
       "emptyDescription": "Connect an X or LinkedIn account to start tracking followers, impressions and engagement.",
       "emptyTitle": "No connected accounts",
       "notConfigured": "Analytics ingestion is not configured yet. Connected accounts are shown, but stats will appear once the analytics backend is set up."
@@ -5601,7 +5598,8 @@
     },
     "invoices": {
       "statusValue": "{status, select, paid {Paid} open {Open} draft {Draft} void {Void} uncollectible {Uncollectible} pending {Pending} other {{status}}}",
-      "empty": "No invoices yet"
+      "empty": "No invoices yet",
+      "emptyDescription": "Invoices appear here after your first payment."
     },
     "zdrConsent": {
       "title": "Enable zero data retention?",
@@ -5628,6 +5626,7 @@
       "aiChat": "AI chat",
       "title": "Recent activity",
       "empty": "No usage events yet",
+      "emptyDescription": "AI credit usage shows up here as it happens.",
       "itemLabel": "events"
     },
     "creditUsage": {
@@ -5681,7 +5680,8 @@
       "updateFailed": "Failed to update usage alerts",
       "limitToast": "You can configure up to {max} usage alerts.",
       "changed": "This usage alert changed. Go back and try again.",
-      "empty": "No usage alerts configured.",
+      "empty": "No usage alerts yet",
+      "emptyDescription": "Add an alert to get a heads-up before a balance runs out.",
       "columns": {
         "alert": "Alert"
       },
@@ -6212,7 +6212,7 @@
       "loadingContent": "Loading content",
       "pullRequestUpdated": "Pull request updated",
       "renameCollection": "Rename collection",
-      "createContent": "Create Content",
+      "createContent": "Create content",
       "faq": "FAQ"
     },
     "socialPost": {
@@ -6284,10 +6284,10 @@
         "PR": "PR"
       },
       "lookback": {
-        "current_day": "Current Day",
-        "last_7_days": "Last 7 Days",
-        "last_14_days": "Last 14 Days",
-        "last_30_days": "Last 30 Days"
+        "current_day": "Current day",
+        "last_7_days": "Last 7 days",
+        "last_14_days": "Last 14 days",
+        "last_30_days": "Last 30 days"
       },
       "stepFormats": {
         "title": "What do you want to create?",
@@ -6299,7 +6299,7 @@
         "selectTimeframe": "Select timeframe",
         "dataPoints": {
           "pullRequests": {
-            "label": "Pull Requests",
+            "label": "Pull requests",
             "description": "Merged PR metadata"
           },
           "commits": {
@@ -6553,8 +6553,7 @@
       "metaTitle": "Content Detail",
       "metaDescription": "View the details of a specific content item.",
       "loadingArticle": "Loading article",
-      "backToCollection": "Back to collection",
-      "backToContent": "Back to Content",
+      "backToContent": "Back to content",
       "notFoundTitle": "Content not found",
       "notFoundDescription": "This content may have been deleted or you don't have access to it.",
       "yourOrganization": "Your Organization",

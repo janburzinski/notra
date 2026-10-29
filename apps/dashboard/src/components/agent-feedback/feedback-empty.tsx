@@ -33,10 +33,10 @@ export function AgentFeedbackEmpty({
       </div>
       <div className="relative z-10 mx-auto w-full max-w-2xl px-6 py-12 md:py-16">
         <div className="mb-6 text-center">
-          <h3 className="text-xl font-semibold text-balance">
+          <h3 className="text-lg font-semibold text-balance">
             {t("empty.title")}
           </h3>
-          <p className="text-muted-foreground mx-auto mt-1 max-w-sm text-sm text-pretty">
+          <p className="text-muted-foreground mx-auto mt-1.5 max-w-sm text-sm leading-relaxed text-pretty">
             {t("empty.description")}
           </p>
         </div>

@@ -1,15 +1,7 @@
 "use client";
 
-import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import type { TextSelection } from "@notra/ai/types/chat";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@notra/ui/components/ui/tooltip";
 import { type ReactNode, useRef } from "react";
-import { useTranslations } from "use-intl";
 
 import { ContentDetailMainDocument } from "@/components/content/content-detail-main-document";
 import { ContentDetailToolbar } from "@/components/content/content-detail-toolbar";
@@ -22,11 +14,9 @@ import { ContentCommentsProvider } from "@/components/content/inline-comments/co
 import { ContentDetachedComments } from "@/components/content/inline-comments/content-detached-comments";
 import { RecommendationsSection } from "@/components/content/recommendations-section";
 import { HeaderActionsPortal } from "@/components/dashboard/header-actions-portal";
-import Link from "@/components/framework/link";
 import { WriterExecute } from "@/components/geo/writer/writer-execute";
 import type { ContentDetailDocument } from "@/lib/hooks/use-content-detail-document";
 import { useContentDocumentTab } from "@/lib/hooks/use-content-document-tab";
-import { useSearchParams } from "@/lib/navigation";
 import type { ContentApiResponse } from "@/types/hooks/content";
 
 interface ContentDetailLoadedViewProps {
@@ -50,18 +40,9 @@ export function ContentDetailLoadedView({
   selectedExcerpt,
   chatInputSection,
 }: ContentDetailLoadedViewProps) {
-  const t = useTranslations("content.detail");
   const content = data.content;
   const isLongForm = ["blog_post", "changelog"].includes(content.contentType);
   const editorViewport = useRef<HTMLDivElement>(null);
-  const collection = data.collection;
-  const searchParams = useSearchParams();
-  const fromCollection =
-    collection && searchParams.get("fromCollection") === collection.id;
-  const backHref = fromCollection
-    ? `/${organizationSlug}/collection/${collection.id}`
-    : `/${organizationSlug}/content`;
-  const backLabel = fromCollection ? t("backToCollection") : t("backToContent");
   const { outline, tab, setTab, visibleOutline } =
     useContentDocumentTab(document);
 
@@ -102,23 +83,6 @@ export function ContentDetailLoadedView({
                 className="bg-secondary pointer-events-none absolute inset-x-0 top-full h-4"
               >
                 <div className="bg-background h-full rounded-t-2xl" />
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Link
-                        aria-label={backLabel}
-                        className="text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-ring inline-flex min-h-8 shrink-0 items-center gap-2 rounded-md px-2 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
-                        href={backHref}
-                      />
-                    }
-                  >
-                    <HugeiconsIcon className="size-4" icon={ArrowLeft02Icon} />
-                    {backLabel}
-                  </TooltipTrigger>
-                  <TooltipContent>{backLabel}</TooltipContent>
-                </Tooltip>
               </div>
               <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                 <ContentDetailToolbar

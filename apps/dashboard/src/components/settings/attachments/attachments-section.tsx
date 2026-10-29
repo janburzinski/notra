@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  AlertCircleIcon,
+  Attachment01Icon,
   Delete02Icon,
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
@@ -30,6 +32,7 @@ import { AttachmentPreviewDialog } from "@/components/chat/attachment-preview";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { createAttachmentColumns } from "@/components/settings/attachments/attachment-columns";
 import { SettingsPane } from "@/components/settings/settings-pane";
+import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
 import {
   ATTACHMENT_FILTERS,
   ATTACHMENT_TABLE_ROW_HEIGHT,
@@ -190,7 +193,20 @@ export function AttachmentsSection() {
       <DataTable
         columns={columns}
         data={attachments}
-        emptyState={isError ? t("loadFailed") : t("empty")}
+        emptyState={
+          isError ? (
+            <SettingsTableEmpty
+              icon={AlertCircleIcon}
+              title={t("loadFailed")}
+            />
+          ) : (
+            <SettingsTableEmpty
+              description={t("emptyDescription")}
+              icon={Attachment01Icon}
+              title={t("empty")}
+            />
+          )
+        }
         getRowId={(row) => row.key}
         height={tableHeightFor(tableRowCount, ATTACHMENT_TABLE_ROW_HEIGHT)}
         loading={isLoading}

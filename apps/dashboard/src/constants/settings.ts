@@ -315,3 +315,5 @@ export const LOGS_SETTINGS_SEARCH_KEYS = [
 ] as const;
 
 export const LEGACY_BILLING_TAB_VALUES = ["billing", "usage"] as const;
+
+export const SETTINGS_TABLE_EMPTY_HEIGHT = 280;

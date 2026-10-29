@@ -26,7 +26,7 @@ import {
   TooltipTrigger,
 } from "@notra/ui/components/ui/tooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { InstrumentModule } from "ui/card";
+import { InstrumentModule, InstrumentSection } from "ui/card";
 import { DataTable, type TableColumn } from "ui/table";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -217,15 +217,10 @@ function CompetitorPromptAppearances({
 }: CompetitorPromptAppearancesProps) {
   const t = useTranslations("geo.competitorDetailView");
   return (
-    <div className="space-y-2">
-      <div className="space-y-0.5">
-        <h2 className="text-base font-semibold text-pretty wrap-anywhere">
-          {t("whereShowsUp", { competitor })}
-        </h2>
-        <p className="text-muted-foreground text-xs wrap-anywhere">
-          {t("whereShowsUpDescription", { competitor })}
-        </p>
-      </div>
+    <InstrumentSection
+      description={t("whereShowsUpDescription", { competitor })}
+      eyebrow={t("whereShowsUp", { competitor })}
+    >
       <DataTable
         columns={columns}
         data={prompts}
@@ -242,7 +237,7 @@ function CompetitorPromptAppearances({
         onRowClick={onRowClick}
         rowHeight={COMPETITORS_TABLE_ROW_HEIGHT}
       />
-    </div>
+    </InstrumentSection>
   );
 }
 

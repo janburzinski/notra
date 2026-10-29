@@ -131,11 +131,8 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
-        <PageHeading
-          description={t("description")}
-          title={tIntegrationsShared("mcpServers")}
-        >
-          <Button className="gap-1.5" onClick={() => setDialogOpen(true)}>
+        <PageHeading description={t("description")} title="MCP">
+          <Button onClick={() => setDialogOpen(true)}>
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
             {t("connect")}
             <Kbd className="ml-1 hidden sm:inline-flex">C</Kbd>
@@ -148,11 +145,8 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
           {!showLoading && servers.length === 0 ? (
             <EmptyState
               action={
-                <Button
-                  onClick={() => setDialogOpen(true)}
-                  size="sm"
-                  variant="outline"
-                >
+                <Button onClick={() => setDialogOpen(true)} variant="outline">
+                  <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
                   {t("connect")}
                 </Button>
               }

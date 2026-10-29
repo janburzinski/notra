@@ -18,7 +18,7 @@ export function GeoPersonasSkeleton() {
           description={t("description")}
           title={tCommon("labels.personas")}
         >
-          <Skeleton className="h-9 w-44 rounded-lg" />
+          <Skeleton className="h-7 w-32 rounded-md" />
         </PageHeading>
         <DataTableSkeleton rows={GEO_PERSONA_SKELETON_ROW_COUNT} />
       </div>

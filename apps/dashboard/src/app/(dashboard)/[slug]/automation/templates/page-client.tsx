@@ -1,13 +1,12 @@
 "use client";
 
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "use-intl";
 
 import { AutomationLoadError } from "@/components/automation/automation-load-error";
 import { AutomationTemplateGrid } from "@/components/automation/automation-template-gallery";
-import Link from "@/components/framework/link";
+import { BackLink } from "@/components/layout/back-link";
 import { PageContainer } from "@/components/layout/container";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
@@ -37,22 +36,11 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-8 px-4 lg:px-6">
-        <div className="space-y-4">
-          <Link
-            className="text-muted-foreground hover:text-foreground duration-fast inline-flex items-center gap-1 text-sm transition-colors"
-            href={`/${organizationSlug}/automation`}
-          >
-            <HugeiconsIcon className="size-4" icon={ArrowLeft01Icon} />
+        <div className="space-y-3">
+          <BackLink href={`/${organizationSlug}/automation`}>
             {tEditor("back")}
-          </Link>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {t("title")}
-            </h1>
-            <p className="text-muted-foreground text-sm text-pretty">
-              {t("description")}
-            </p>
-          </div>
+          </BackLink>
+          <PageHeading description={t("description")} title={t("title")} />
         </div>
         {alerts.isError ? (
           <AutomationLoadError

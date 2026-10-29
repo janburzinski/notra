@@ -3,7 +3,7 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { TruncateWithTooltip } from "@notra/ui/components/shared/truncate-with-tooltip";
-import { InstrumentEmpty, InstrumentSection } from "ui/card";
+import { InstrumentSection } from "ui/card";
 import { DataTable, type TableColumn } from "ui/table";
 import { useFormatter, useTranslations } from "use-intl";
 
@@ -146,21 +146,15 @@ export function AgentReadinessChangesCard({
       }
       eyebrow={t("changes.eyebrow")}
     >
-      {rows.length > 0 ? (
-        <DataTable
-          columns={columns}
-          data={rows}
-          defaultSort={AGENT_READINESS_CHANGES_DEFAULT_SORT}
-          getRowId={(row) => `${row.kind}-${row.check.id}`}
-          height={tableHeightFor(rows.length)}
-          rowHeight={TABLE_ROW_HEIGHT}
-        />
-      ) : (
-        <InstrumentEmpty
-          className="h-40 min-h-40 rounded-2xl border"
-          message={comparison ? t("changes.noChanges") : t("changes.empty")}
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={rows}
+        defaultSort={AGENT_READINESS_CHANGES_DEFAULT_SORT}
+        emptyState={comparison ? t("changes.noChanges") : t("changes.empty")}
+        getRowId={(row) => `${row.kind}-${row.check.id}`}
+        height={tableHeightFor(rows.length > 0 ? rows.length : 2)}
+        rowHeight={TABLE_ROW_HEIGHT}
+      />
     </InstrumentSection>
   );
 }

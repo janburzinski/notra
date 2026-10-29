@@ -6,8 +6,11 @@ import {
 import type { OgTemplate, OgVariableFont } from "@notra/ai/types/og-image";
 import { fetchOgResource } from "@notra/ai/utils/og-fetch";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
-import { Font, parse } from "opentype.js";
+import * as opentype from "opentype.js";
 import { decompress } from "wawoff2";
+
+const { Font, parse } =
+  (opentype as unknown as { default?: typeof opentype }).default ?? opentype;
 
 /** Flatten variable glyph outlines: Satori's font parser cannot apply axes. */
 export async function prepareOgFont(

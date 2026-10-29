@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   Card,
   CardContent,
@@ -52,14 +53,11 @@ export function EmptyBrandIdentityState({
       <div className="w-full px-4 lg:px-6">
         <div className="relative min-h-125">
           <div className="pointer-events-none blur-sm">
-            <div className="mb-6 space-y-1">
-              <h1 className="text-3xl font-bold tracking-tight">
-                {tCommon("labels.brandIdentity")}
-              </h1>
-              <p className="text-muted-foreground">
-                {t("header.tabs.identity.description")}
-              </p>
-            </div>
+            <PageHeading
+              className="mb-6"
+              description={t("header.tabs.identity.description")}
+              title={tCommon("labels.brandIdentity")}
+            />
             <div className="space-y-8">
               <div className="bg-muted/20 h-16 w-80 rounded-lg border" />
               <div className="bg-muted/20 h-16 w-80 rounded-lg border" />

@@ -43,15 +43,15 @@ export function ShelfToolbar({
   const ticketFilterLabels = useGeoShelfTicketFilterLabels();
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="relative min-w-0 flex-1 basis-full sm:max-w-60 sm:basis-auto">
+      <div className="relative min-w-0 flex-1 basis-full sm:max-w-72 sm:basis-auto">
         <HugeiconsIcon
-          className="text-muted-foreground absolute top-1/2 left-2.5 -translate-y-1/2"
+          className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"
           icon={SearchIcon}
-          size={14}
+          size={15}
         />
         <Input
           aria-label={t("filterShelves")}
-          className="h-7 pl-8 text-xs placeholder:truncate md:text-xs"
+          className="pl-9 placeholder:truncate"
           maxLength={GEO_SHELF_SEARCH_MAX_LENGTH}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder={t("filterPlaceholder")}
@@ -65,7 +65,7 @@ export function ShelfToolbar({
         value={filters.shelf}
       >
         <SelectTrigger
-          className="min-w-0 flex-1 text-xs sm:w-auto sm:flex-none"
+          className="min-w-0 flex-1 sm:w-auto sm:flex-none"
           size="sm"
         >
           <SelectValue>
@@ -102,7 +102,7 @@ export function ShelfToolbar({
         value={filters.ticket}
       >
         <SelectTrigger
-          className="min-w-0 flex-1 text-xs sm:w-auto sm:flex-none"
+          className="min-w-0 flex-1 sm:w-auto sm:flex-none"
           size="sm"
         >
           <SelectValue>{ticketFilterLabels[filters.ticket]}</SelectValue>

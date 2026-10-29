@@ -3,7 +3,6 @@
 import { LinkSquare02Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
-import { Raycast } from "@notra/ui/components/ui/svgs/raycast";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -44,11 +43,7 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="w-full space-y-6 px-4 lg:px-6">
-        <PageHeading
-          description={t("description")}
-          icon={<Raycast className="h-8 w-8 shrink-0" />}
-          title={t("title")}
-        />
+        <PageHeading description={t("description")} title="Raycast" />
 
         <div className="max-w-xl space-y-1">
           {STEPS.map((step, index) => {

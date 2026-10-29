@@ -123,7 +123,8 @@
       "members": {
         "listsLabel": "Mitgliederlisten",
         "noMembers": "Keine Mitglieder gefunden.",
-        "noPending": "Keine ausstehenden Einladungen."
+        "noPending": "Keine ausstehenden Einladungen",
+        "noPendingDescription": "Gesendete Einladungen erscheinen hier, bis sie angenommen werden."
       },
       "notifications": {
         "updated": "Benachrichtigungseinstellungen aktualisiert",
@@ -260,7 +261,6 @@
       "actionsFor": "Aktionen für {title}",
       "referenceCopied": "Referenz-ID kopiert",
       "copyReference": "Referenz-ID kopieren",
-      "noResults": "Keine Ergebnisse.",
       "itemLabel": "Logs"
     },
     "billingSuccess": {
@@ -445,6 +445,7 @@
       "deleteSelected": "{count} ausgewählte löschen",
       "loadFailed": "Anhänge konnten nicht geladen werden",
       "empty": "Noch keine Anhänge",
+      "emptyDescription": "Dateien, die du im Chat hochlädst, erscheinen hier.",
       "confirmTitle": "{count, plural, one {Diesen Anhang löschen?} other {# Anhänge löschen?}}",
       "confirmDescription": "Die Datei wird aus dem Speicher und aus allen Threads entfernt, die auf sie verweisen. Das kann nicht rückgängig gemacht werden.",
       "columns": {
@@ -522,7 +523,7 @@
     }
   },
   "apiKeys": {
-    "description": "Verwalte API-Schlüssel für den programmatischen Zugriff auf deine Organisation",
+    "description": "Verwalte API-Schlüssel für den programmatischen Zugriff auf deine Organisation.",
     "createKey": "API-Schlüssel erstellen",
     "viewDocs": "API-Dokumentation ansehen",
     "columns": {
@@ -1791,6 +1792,10 @@
     "description": "Wiederverwendbare Anweisungen, die deine Agenten beim Erstellen von Inhalten laden.",
     "createSkill": "Skill erstellen",
     "installed": "Installierte Skills",
+    "loadError": {
+      "title": "Skills konnten nicht geladen werden",
+      "description": "Deine Skills sind noch da. Versuch es noch einmal."
+    },
     "count": "({total})",
     "countFiltered": "({visible} von {total})",
     "search": {
@@ -1846,7 +1851,7 @@
       }
     },
     "table": {
-      "noSearchResults": "Keine Skills passen zu deiner Suche."
+      "noSearchResults": "Keine Skills passen zu deiner Suche"
     },
     "sort": {
       "label": "Skills sortieren",
@@ -4261,12 +4266,8 @@
       "connectName": "{name} verbinden",
       "reauthorize": "Neu autorisieren",
       "refreshTools": "Tools aktualisieren",
-      "mcpServers": "MCP-Server",
       "couldNotRestartOauth": "OAuth konnte nicht neu gestartet werden",
-      "linearIntegrations": "Linear-Integrationen",
       "noIntegrationsYet": "Noch keine Integrationen",
-      "granolaIntegrations": "Granola-Integrationen",
-      "slackIntegration": "Slack-Integration",
       "addAtLeastOneAuthentication": "Füge mindestens einen Authentifizierungs-Header hinzu",
       "apiKey": "API-Schlüssel",
       "displayNameIsRequired": "Anzeigename ist erforderlich",
@@ -4313,7 +4314,6 @@
       "permanentNote": "Das Löschen ist dauerhaft und kann nicht rückgängig gemacht werden.",
       "confirm": "Integration löschen"
     },
-    "backLink": "Zurück zu den Integrationen",
     "linearDialog": {
       "title": "Linear-Integration hinzufügen",
       "description": "Verbinde einen Linear-Workspace, um Changelogs, Blogbeiträge und Tweets zu erstellen.",
@@ -4398,7 +4398,7 @@
     },
     "github": {
       "page": {
-        "metaTitle": "GitHub-Integrationen",
+        "description": "Verbinde Repositories, um Changelogs, Blogposts und Pull-Request-Entwürfe zu erstellen",
         "addRepositories": "Repositories hinzufügen"
       },
       "skeleton": {
@@ -4634,7 +4634,6 @@
       "goToApiKeys": "Zu den API-Schlüsseln"
     },
     "raycast": {
-      "metaTitle": "Raycast-Erweiterung",
       "title": "Raycast einrichten",
       "description": "Greif direkt aus Raycast auf deine Notra-Inhalte zu",
       "linkLabel": "Im Raycast Store ansehen",
@@ -4658,7 +4657,6 @@
       }
     },
     "framer": {
-      "metaTitle": "Framer-Integration",
       "title": "Framer einrichten",
       "description": "Bring deine Notra-Inhalte in Framer",
       "linkLabel": "Im Framer Marketplace ansehen",
@@ -4817,7 +4815,6 @@
       "notFoundTitle": "Integration nicht gefunden",
       "notFoundDescription": "Diese Integration wurde möglicherweise gelöscht oder du hast keinen Zugriff darauf.",
       "linearSubtitle": "Konfiguriere die Einstellungen deiner Linear-Integration",
-      "editIcon": "Bearbeiten-Symbol",
       "details": "Details",
       "team": "Team"
     },
@@ -4977,7 +4974,7 @@
       }
     },
     "shell": {
-      "description": "So performen deine X- und LinkedIn-Konten",
+      "description": "So performen deine X- und LinkedIn-Konten.",
       "emptyDescription": "Verbinde ein X- oder LinkedIn-Konto, um Follower, Impressionen und Engagement zu tracken.",
       "emptyTitle": "Keine verbundenen Konten",
       "notConfigured": "Die Analytics-Erfassung ist noch nicht eingerichtet. Verbundene Konten werden angezeigt, Statistiken erscheinen, sobald das Analytics-Backend eingerichtet ist."
@@ -5601,7 +5598,8 @@
     },
     "invoices": {
       "statusValue": "{status, select, paid {Bezahlt} open {Offen} draft {Entwurf} void {Storniert} uncollectible {Uneinbringlich} pending {Ausstehend} other {{status}}}",
-      "empty": "Noch keine Rechnungen"
+      "empty": "Noch keine Rechnungen",
+      "emptyDescription": "Rechnungen erscheinen hier nach deiner ersten Zahlung."
     },
     "zdrConsent": {
       "title": "Zero Data Retention aktivieren?",
@@ -5628,6 +5626,7 @@
       "aiChat": "KI-Chat",
       "title": "Letzte Aktivität",
       "empty": "Noch keine Nutzungsereignisse",
+      "emptyDescription": "Die Nutzung deiner KI-Credits erscheint hier, sobald sie anfällt.",
       "itemLabel": "Ereignisse"
     },
     "creditUsage": {
@@ -5681,7 +5680,8 @@
       "updateFailed": "Nutzungsalarme konnten nicht aktualisiert werden",
       "limitToast": "Du kannst bis zu {max} Nutzungsalarme einrichten.",
       "changed": "Dieser Nutzungsalarm wurde geändert. Geh zurück und versuch es nochmal.",
-      "empty": "Keine Nutzungsalarme eingerichtet.",
+      "empty": "Noch keine Nutzungsalarme",
+      "emptyDescription": "Füge einen Alarm hinzu, damit du gewarnt wirst, bevor ein Guthaben aufgebraucht ist.",
       "columns": {
         "alert": "Alarm"
       },
@@ -6553,8 +6553,7 @@
       "metaTitle": "Inhaltsdetails",
       "metaDescription": "Sieh dir die Details eines bestimmten Inhalts an.",
       "loadingArticle": "Artikel wird geladen",
-      "backToCollection": "Zurück zur Sammlung",
-      "backToContent": "Zurück zu Inhalte",
+      "backToContent": "Zurück zu den Inhalten",
       "notFoundTitle": "Inhalt nicht gefunden",
       "notFoundDescription": "Dieser Inhalt wurde möglicherweise gelöscht oder du hast keinen Zugriff darauf.",
       "yourOrganization": "Deine Organisation",

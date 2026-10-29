@@ -91,21 +91,21 @@ export function createIntegrationUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "framer",
-      title: { namespace: "integrations.framer", key: "metaTitle" },
+      title: { title: "Framer" },
       pendingComponent: Loading,
       component: FramerPage,
     }),
     createUiRoute({
       parent,
       path: "raycast",
-      title: { namespace: "integrations.raycast", key: "metaTitle" },
+      title: { title: "Raycast" },
       pendingComponent: Loading,
       component: RaycastPage,
     }),
     createUiRoute({
       parent,
       path: "github",
-      title: { namespace: "integrations.github.page", key: "metaTitle" },
+      title: { title: "GitHub" },
       pendingComponent: GithubLoading,
       preload: Github.preload,
       component: ({ params }) => <Github organizationSlug={params.slug} />,
@@ -145,7 +145,7 @@ export function createIntegrationUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "granola",
-      title: { namespace: "integrations.shared", key: "granolaIntegration" },
+      title: { title: "Granola" },
       pendingComponent: Loading,
       preload: Granola.preload,
       component: ({ params }) => <Granola organizationSlug={params.slug} />,
@@ -153,7 +153,7 @@ export function createIntegrationUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "linear",
-      title: { namespace: "integrations.shared", key: "linearIntegrations" },
+      title: { title: "Linear" },
       pendingComponent: Loading,
       preload: Linear.preload,
       component: ({ params }) => <Linear organizationSlug={params.slug} />,
@@ -170,7 +170,7 @@ export function createIntegrationUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "mcp",
-      title: { namespace: "integrations.shared", key: "mcpServers" },
+      title: { title: "MCP" },
       pendingComponent: Loading,
       preload: Mcp.preload,
       component: ({ params }) => <Mcp organizationSlug={params.slug} />,
@@ -178,7 +178,7 @@ export function createIntegrationUiRoutes(parent: AnyRoute) {
     createUiRoute({
       parent,
       path: "slack",
-      title: { namespace: "integrations.shared", key: "slackIntegration" },
+      title: { title: "Slack" },
       pendingComponent: Loading,
       preload: Slack.preload,
       component: ({ params }) => <Slack organizationSlug={params.slug} />,

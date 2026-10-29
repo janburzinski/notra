@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  AnalyticsUpIcon,
+  FilterHorizontalIcon,
+} from "@hugeicons/core-free-icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   parseAsInteger,
@@ -21,6 +25,7 @@ import { LogFilters } from "@/components/logs/log-filters";
 import { LogRetentionHint } from "@/components/logs/log-retention-hint";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { SettingsPane } from "@/components/settings/settings-pane";
+import { SettingsTableEmpty } from "@/components/settings/settings-table-empty";
 import {
   SOURCE_VALUES,
   STATUS_VALUES,
@@ -133,17 +138,23 @@ export function LogsSettingsPane() {
             resetPage();
           }}
           emptyState={
-            filtersActive
-              ? {
-                  title: t("noMatchTitle"),
-                  description: t("noMatchDescription"),
-                  actionLabel: t("resetFilters"),
-                  onActionClick: resetFilters,
-                }
-              : {
-                  title: t("emptyTitle"),
-                  description: t("emptyDescription"),
-                }
+            filtersActive ? (
+              <SettingsTableEmpty
+                description={t("noMatchDescription")}
+                icon={FilterHorizontalIcon}
+                title={t("noMatchTitle")}
+              >
+                <Button onClick={resetFilters} size="sm" variant="outline">
+                  {t("resetFilters")}
+                </Button>
+              </SettingsTableEmpty>
+            ) : (
+              <SettingsTableEmpty
+                description={t("emptyDescription")}
+                icon={AnalyticsUpIcon}
+                title={t("emptyTitle")}
+              />
+            )
           }
           onPageChange={setPage}
           onRowClick={(log) => setSelection({ organizationId, log })}

@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { StatusBadge } from "@notra/ui/components/status-badge";
@@ -74,21 +73,14 @@ export function AutopilotTemplatesSection({
   );
 }
 
-export function AutopilotTemplatesPage({
-  onBack,
-  ...actions
-}: AutopilotTemplateActions & { onBack: () => void }) {
+export function AutopilotTemplatesPage(actions: AutopilotTemplateActions) {
   return (
     <div className="w-full space-y-8">
-      <div className="space-y-4">
-        <Button onClick={onBack} size="sm" variant="ghost">
-          <HugeiconsIcon aria-hidden="true" icon={ArrowLeft01Icon} size={16} />
-          Back to Autopilot
-        </Button>
-        <PageHeading title="Templates" />
-        <p className="text-muted-foreground text-sm text-pretty">
-          Enable a template to include it in Autopilot runs.
-        </p>
+      <div className="space-y-3">
+        <PageHeading
+          description="Enable a template to include it in Autopilot runs."
+          title="Templates"
+        />
         {!actions.canManage ? (
           <p className="text-muted-foreground text-sm">
             Ask a workspace admin to enable templates.

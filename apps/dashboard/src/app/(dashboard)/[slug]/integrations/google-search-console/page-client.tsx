@@ -278,7 +278,7 @@ function AddedSuggestions({
     return (
       <EmptyState
         action={
-          <Button onClick={onRetry} size="sm" variant="outline">
+          <Button onClick={onRetry} variant="outline">
             {tCommon("actions.retry")}
           </Button>
         }
@@ -358,11 +358,7 @@ function LastSyncPanel({
     return (
       <EmptyState
         action={
-          <Button
-            onClick={() => keywords.refetch()}
-            size="sm"
-            variant="outline"
-          >
+          <Button onClick={() => keywords.refetch()} variant="outline">
             {tCommon("actions.retry")}
           </Button>
         }
@@ -686,7 +682,7 @@ function GoogleSearchConsolePageBody({
     return (
       <EmptyState
         action={
-          <Button onClick={onRetry} size="sm" variant="outline">
+          <Button onClick={onRetry} variant="outline">
             {tCommon("actions.retry")}
           </Button>
         }
@@ -701,7 +697,8 @@ function GoogleSearchConsolePageBody({
       <EmptyState
         action={
           unconfigured ? null : (
-            <Button onClick={onConnect} size="sm" variant="outline">
+            <Button onClick={onConnect} variant="outline">
+              <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
               {tCommon("labels.connectSearchConsole")}
             </Button>
           )
@@ -773,7 +770,7 @@ export default function PageClient({
       <div className="w-full space-y-6 px-4 lg:px-6">
         <PageHeading description={t("description")} title={t("title")}>
           {canConnect ? (
-            <Button className="gap-1.5" onClick={() => setDialogOpen(true)}>
+            <Button onClick={() => setDialogOpen(true)}>
               <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
               {needsReconnect
                 ? tIntegrationsShared("reconnect")

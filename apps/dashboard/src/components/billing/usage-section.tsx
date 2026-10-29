@@ -297,7 +297,7 @@ function UsageLimitsCard({
         ) : null
       }
       contentClassName="p-0"
-      heading={<span className="text-base">{t("thisCycle")}</span>}
+      heading={t("thisCycle")}
       headingAs="h2"
     >
       <div className="divide-y">

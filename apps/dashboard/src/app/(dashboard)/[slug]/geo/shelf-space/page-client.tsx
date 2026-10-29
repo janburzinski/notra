@@ -110,6 +110,7 @@ function GeoShelfLoaded({ page }: GeoShelfLoadedProps) {
           <Button
             className="gap-1.5"
             onClick={() => page.onAddOpenChange(true)}
+            size="sm"
           >
             <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
             {tGeoShared("addShelf")}
