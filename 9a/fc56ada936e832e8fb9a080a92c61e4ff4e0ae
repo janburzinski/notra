@@ -1,0 +1,20 @@
+apps/sites-e2e/src/worker.ts
+  s_0cc452189e07d0::t_3ae707abb3b947 450
+  s_0cc452189e07d0::t_a9ad027b259218 307-325,327
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9afc56ada936e832e8fb9a080a92c61e4ff4e0ae",
+  "prompts": {},
+  "sessions": {
+    "s_0cc452189e07d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0d380d44-1189-4fa6-aa8d-11b96297533e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
