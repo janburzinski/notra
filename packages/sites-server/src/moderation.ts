@@ -7,11 +7,12 @@ import {
   SITE_NAME_REJECTION_MESSAGES,
   SITE_PROTECTED_SLUG_WORDS,
   SITE_RESERVED_BRAND_SLUGS,
+  SITE_SIGN_IN_SLUG_WORDS,
 } from "./constants/moderation";
 import { SITE_SLUG_RETIRED_NOTE } from "./constants/sites";
 import { SiteInputError } from "./errors/sites";
 import type { SiteNameRejection, SiteNameRejectionParams } from "./types/sites";
-import { reservedSlugMessage } from "./utils/moderation";
+import { reservedSlugMessage, slugContainsWord } from "./utils/moderation";
 
 async function ownsReservedDomain(
   userId: string,
@@ -45,9 +46,15 @@ async function siteNameRejection(
     if (grant && grant.note !== SITE_SLUG_RETIRED_NOTE) {
       return null;
     }
-    if (slug.split("-").some((word) => SITE_PROTECTED_SLUG_WORDS.has(word))) {
+    if (slugContainsWord(slug, SITE_PROTECTED_SLUG_WORDS)) {
       return {
         message: SITE_NAME_REJECTION_MESSAGES.protected,
+        field: "slug",
+      };
+    }
+    if (slugContainsWord(slug, SITE_SIGN_IN_SLUG_WORDS)) {
+      return {
+        message: SITE_NAME_REJECTION_MESSAGES.signIn,
         field: "slug",
       };
     }
