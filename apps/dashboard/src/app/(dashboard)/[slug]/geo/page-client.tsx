@@ -7,6 +7,7 @@ import { GeoSetupEmpty } from "@/components/geo/geo-setup-empty";
 import { ScanModelMenu } from "@/components/geo/scan-model-menu";
 import { PageContainer } from "@/components/layout/container";
 import { useGeoOverviewPage } from "@/lib/hooks/use-geo-overview-page";
+import { useNukeEasterEgg } from "@/lib/hooks/use-nuke-easter-egg";
 import type { GeoOverviewLoadedProps, GeoPageClientProps } from "@/types/geo";
 
 import { GeoTabs } from "./components/geo-tabs";
@@ -34,11 +35,14 @@ export default function PageClient({ organizationSlug }: GeoPageClientProps) {
 
 function GeoOverviewLoaded({ page }: GeoOverviewLoadedProps) {
   const t = useTranslations("geo.pages.overview");
+  const headingRef = useNukeEasterEgg<HTMLHeadingElement>();
   return (
     <div className="w-full space-y-6 px-4 lg:px-6">
       <header className="space-y-1">
         <div className="flex flex-col items-start justify-between gap-3 @min-[24rem]/main:flex-row @min-[24rem]/main:items-center">
-          <h1 className="text-3xl font-bold tracking-tight">GEO</h1>
+          <h1 className="text-3xl font-bold tracking-tight" ref={headingRef}>
+            GEO
+          </h1>
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <GeoRangePicker control={page.geoRange} />
             <ScanModelMenu {...page.scanMenu} />

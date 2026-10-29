@@ -90,6 +90,7 @@
     "@workos-inc/node": "^10.14.0",
     "@workos/authkit-session": "0.7.1",
     "@workos/authkit-tanstack-react-start": "0.11.1",
+    "@zumer/snapdom": "^3.3.6",
     "ai": "catalog:",
     "autumn-js": "catalog:",
     "c15t": "3.0.0",
