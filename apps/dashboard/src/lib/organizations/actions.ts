@@ -63,6 +63,7 @@ import {
   updateMembershipRoleInWorkOSStrict,
 } from "@/lib/organizations/workos-sync";
 import { revokeSitePreviewAccess } from "@/lib/sites/preview-revocation";
+import { notifyInfoChannel } from "@/lib/slack/info-channel";
 import type {
   ActionResult,
   CreateOrganizationInput,
@@ -428,6 +429,14 @@ export async function createOrganization(
             name: input.name,
             slug,
             created_at: now.toISOString(),
+          },
+        });
+        notifyInfoChannel({
+          emoji: ":office:",
+          title: "Workspace created",
+          fields: {
+            Workspace: `${input.name} (${slug})`,
+            "Created by": session.user.email,
           },
         });
       });

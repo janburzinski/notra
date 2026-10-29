@@ -17,6 +17,7 @@ import { readRequestHeaders } from "@/lib/analytics/request-headers";
 import { SocialConnectionError, UserSyncError } from "@/lib/auth/errors";
 import { upsertMembership } from "@/lib/auth/membership-upsert";
 import { isWorkOSNotFound } from "@/lib/auth/workos-error";
+import { notifyInfoChannel } from "@/lib/slack/info-channel";
 import type {
   OAuthProviderTokens,
   SyncAuthenticatedUserInput,
@@ -303,6 +304,15 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
         setOnce: {
           signup_method: signupMethod,
           signed_up_at: created.createdAt.toISOString(),
+        },
+      });
+      notifyInfoChannel({
+        emoji: ":wave:",
+        title: "New signup",
+        fields: {
+          Name: created.name,
+          Email: created.email,
+          Method: signupMethod,
         },
       });
     });

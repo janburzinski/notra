@@ -30,6 +30,7 @@ import { clearLocaleCookie, writeLocaleCookie } from "@/lib/i18n/locale-cookie";
 import { failWithOrganizationMessage } from "@/lib/organizations/action-messages";
 import { requireSession } from "@/lib/organizations/guards";
 import { revokeSitePreviewSessions } from "@/lib/sites/preview-revocation";
+import { notifyInfoChannel } from "@/lib/slack/info-channel";
 import type { SessionUser } from "@/types/auth/session";
 import type {
   SignOutActionOptions,
@@ -215,11 +216,16 @@ export async function deleteUser(): Promise<
         () => db.delete(users).where(eq(users.id, session.user.id)),
         "Failed to delete user"
       );
-      yield* Effect.sync(() =>
+      yield* Effect.sync(() => {
         runAfterResponse("[BrewContacts] Delete failed", () =>
           deleteBrewContact(session.user.email)
-        )
-      );
+        );
+        notifyInfoChannel({
+          emoji: ":door:",
+          title: "Account deleted",
+          fields: { "User ID": session.user.id },
+        });
+      });
 
       yield* tryAction(clearAuthSessionCookie, "Failed to clear session");
       yield* Effect.promise(clearLocaleCookie);

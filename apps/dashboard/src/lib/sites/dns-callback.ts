@@ -8,6 +8,7 @@ import { SITE_ADMIN_ROLES, SITE_DOMAIN_CONNECT_PARAM } from "@/constants/sites";
 import { assertOrganizationAccess } from "@/lib/auth/organization";
 import { afterResponse } from "@/lib/framework/after-response";
 import { dispatchSiteJobs } from "@/lib/sites/dispatch";
+import { notifyDomainConnected } from "@/lib/sites/info-channel";
 import type { SiteAccess, FinishDnsCallbackParams } from "@/types/sites-server";
 
 export async function loadDnsCallbackSite(
@@ -43,7 +44,14 @@ export async function finishDnsCallback({
 }: FinishDnsCallbackParams): Promise<Response> {
   if (outcome === "success") {
     try {
-      const { rebuildJobId } = await refreshSiteDomain(site, domainId, userId);
+      const { domain, newlyVerified, rebuildJobId } = await refreshSiteDomain(
+        site,
+        domainId,
+        userId
+      );
+      if (newlyVerified) {
+        notifyDomainConnected(site, domain.hostname);
+      }
       if (rebuildJobId) {
         afterResponse(() => dispatchSiteJobs([rebuildJobId]));
       }

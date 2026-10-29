@@ -18,6 +18,8 @@ export interface DomainCheck {
 
 export interface RefreshSiteDomainResult {
   domain: SiteDomain;
+  /** True only on the check that first verified this domain. */
+  newlyVerified: boolean;
   rebuildJobId: string | null;
 }
 

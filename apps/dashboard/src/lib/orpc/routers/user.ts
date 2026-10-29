@@ -23,6 +23,7 @@ import {
 } from "@/lib/organizations/workos-sync";
 import { authorizedProcedure } from "@/lib/orpc/base";
 import { revokeSitePreviewAccess } from "@/lib/sites/preview-revocation";
+import { notifyInfoChannel } from "@/lib/slack/info-channel";
 import {
   deleteOrganizationChatFiles,
   deleteOrganizationFiles,
@@ -207,7 +208,7 @@ export const userRouter = {
             }
 
             const organization = await tx.query.organizations.findFirst({
-              columns: { workosOrgId: true },
+              columns: { name: true, slug: true, workosOrgId: true },
               where: eq(organizations.id, input.organizationId),
             });
 
@@ -226,6 +227,9 @@ export const userRouter = {
               action: "delete" as const,
               success: true,
               workosOrgId: organization?.workosOrgId ?? null,
+              workspace: organization
+                ? `${organization.name} (${organization.slug})`
+                : input.organizationId,
             };
           }
 
@@ -254,6 +258,14 @@ export const userRouter = {
             deleteOrganizationFromWorkOS(result.workosOrgId)
           );
           await cleanupDeletedOrganization(input.organizationId);
+          notifyInfoChannel({
+            emoji: ":wastebasket:",
+            title: "Workspace deleted",
+            fields: {
+              Workspace: result.workspace,
+              "Deleted by": context.user.email,
+            },
+          });
         } else {
           await Effect.runPromise(
             removeMembershipFromWorkOS(input.organizationId, context.user.id)
@@ -335,7 +347,7 @@ export const userRouter = {
           }
 
           const existingOrganization = await tx.query.organizations.findFirst({
-            columns: { id: true, workosOrgId: true },
+            columns: { name: true, slug: true, workosOrgId: true },
             where: eq(organizations.id, transfer.orgId),
           });
 
@@ -359,6 +371,7 @@ export const userRouter = {
           return {
             kind: "delete" as const,
             workosOrgId: existingOrganization.workosOrgId,
+            workspace: `${existingOrganization.name} (${existingOrganization.slug})`,
           };
         });
 
@@ -378,6 +391,14 @@ export const userRouter = {
           await Effect.runPromise(
             deleteOrganizationFromWorkOS(outcome.workosOrgId)
           );
+          notifyInfoChannel({
+            emoji: ":wastebasket:",
+            title: "Workspace deleted",
+            fields: {
+              Workspace: outcome.workspace,
+              "Deleted by": context.user.email,
+            },
+          });
         }
       }
 

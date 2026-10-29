@@ -458,7 +458,11 @@ export async function refreshSiteDomain(
           ],
         };
 
-  const { domain: updated, verified } = await withSiteHostLock(
+  const {
+    domain: updated,
+    verified,
+    newlyVerified,
+  } = await withSiteHostLock(
     domain.hostname,
     async (tx) => {
       const claims = await tx
@@ -507,7 +511,11 @@ export async function refreshSiteDomain(
       if (verified && domain.kind === "subdomain") {
         await claimVerifiedHost(updated, tx);
       }
-      return { domain: updated, verified };
+      return {
+        domain: updated,
+        verified,
+        newlyVerified: verified && !current.verifiedAt,
+      };
     },
     { organizationId: site.organizationId }
   );
@@ -515,7 +523,7 @@ export async function refreshSiteDomain(
     verified && site.publicOrigin !== origin
       ? await setSitePublicOrigin(site, origin, userId)
       : null;
-  return { domain: updated, rebuildJobId };
+  return { domain: updated, newlyVerified, rebuildJobId };
 }
 
 export async function removeSiteDomain(

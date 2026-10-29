@@ -189,6 +189,10 @@ import {
   isSitesEnabledForOrganization,
 } from "@/lib/sites/flag";
 import {
+  notifyDomainConnected,
+  notifySitesCreated,
+} from "@/lib/sites/info-channel";
+import {
   bulkImportErrorMessage,
   toSitesOrpcError,
 } from "@/lib/sites/orpc-errors";
@@ -601,6 +605,7 @@ export const sitesRouter = {
         previewVisibility: input.previewVisibility,
       });
       dispatchLater([result.jobId]);
+      notifySitesCreated([result.site], access.user.email);
       return {
         site: serializeSite(result.site, null),
         deploymentQueued: Boolean(result.jobId),
@@ -620,6 +625,7 @@ export const sitesRouter = {
       }
       const results: CreateSitesResult[] = [];
       const jobIds: Array<string | null> = [];
+      const createdSites: Site[] = [];
       for (const entry of input.sites) {
         try {
           const result = await createSite({
@@ -635,6 +641,7 @@ export const sitesRouter = {
             mounts: entry.mounts,
           });
           jobIds.push(result.jobId);
+          createdSites.push(result.site);
           results.push({
             rootDirectory: entry.rootDirectory ?? "",
             site: serializeSite(result.site, null),
@@ -648,6 +655,7 @@ export const sitesRouter = {
         }
       }
       dispatchLater(jobIds);
+      notifySitesCreated(createdSites, access.user.email);
       return { results };
     }),
 
@@ -954,6 +962,9 @@ export const sitesRouter = {
         });
         const result = await refreshSiteDomain(site, input.domainId, userId);
         dispatchLater([result.rebuildJobId]);
+        if (result.newlyVerified) {
+          notifyDomainConnected(site, result.domain.hostname);
+        }
         return {
           status: result.domain.status,
           lastError: result.domain.lastError,
