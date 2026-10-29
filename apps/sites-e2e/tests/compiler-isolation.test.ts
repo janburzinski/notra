@@ -3,6 +3,8 @@ import { mkdir, mkdtemp, realpath, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+import { analyticsIntegrations } from "../emulators/browser";
+import { SITE_ID } from "../src/constants/fixtures";
 import { compileFixtures } from "../src/utils/compiler";
 
 test("parallel fixture builds keep their Vite caches inside their own work directories", async () => {
@@ -17,8 +19,22 @@ test("parallel fixture builds keep their Vite caches inside their own work direc
         const compiled = await compileFixtures(
           resolve(import.meta.dirname, "../../.."),
           directory,
-          `http://live-${index}.localhost:4321`,
-          `http://preview-${index}.localhost:4321`,
+          [
+            {
+              siteId: SITE_ID,
+              deploymentId: "dep_live",
+              publicOrigin: `http://live-${index}.localhost:4321`,
+              preview: false,
+              integrations: analyticsIntegrations(),
+            },
+            {
+              siteId: SITE_ID,
+              deploymentId: "dep_preview",
+              publicOrigin: `http://preview-${index}.localhost:4321`,
+              preview: true,
+              integrations: analyticsIntegrations(),
+            },
+          ],
           []
         );
         expect(compiled.manifests).toHaveLength(2);

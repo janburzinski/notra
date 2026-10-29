@@ -72,7 +72,9 @@ export async function serveFile(params: ServeFileParams): Promise<Response> {
     status === 200 && file.contentType.startsWith("text/html")
       ? (params.analytics ?? null)
       : null;
-  const etag = analytics ? `"${file.sha256}-a"` : `"${file.sha256}"`;
+  const etag = analytics
+    ? `"${file.sha256}-a${analytics.reportsView ? "v" : ""}"`
+    : `"${file.sha256}"`;
   const headers = new Headers({
     "Content-Type": file.contentType,
     "Cache-Control": fileCacheControl(file, isPreview),

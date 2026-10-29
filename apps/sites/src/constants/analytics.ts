@@ -1,4 +1,4 @@
-export const ANALYTICS_EVENT_MAX_BYTES = 1024;
+export const ANALYTICS_EVENT_MAX_BYTES = 4096;
 
 export const ANALYTICS_SCRIPT_CACHE_CONTROL = "public, max-age=3600";
 
@@ -6,6 +6,12 @@ export const ANALYTICS_SCRIPT = `(() => {
   const script = document.currentScript;
   const endpoint = script && script.dataset.endpoint;
   if (!endpoint || window.top !== window || !navigator.sendBeacon) return;
+  if ("view" in script.dataset) {
+    navigator.sendBeacon(
+      endpoint,
+      JSON.stringify({ k: "view", p: location.pathname + location.search, r: document.referrer })
+    );
+  }
   const id = Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) =>
     b.toString(16).padStart(2, "0")
   ).join("");

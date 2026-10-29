@@ -31,6 +31,7 @@ export interface SiteConsentOptions {
   legalLinks?: SiteC15t["legalLinks"];
   i18n?: { locale: NonNullable<SiteC15t["locale"]>; detectLanguage: false };
   storageConfig: { crossSubdomain?: boolean; defaultExpiryDays?: number };
+  consentCategories?: string[];
   disableAnimation?: boolean;
   theme: {
     colors: Record<string, string>;

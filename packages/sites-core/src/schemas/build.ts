@@ -55,7 +55,6 @@ export const siteBuildResultSchema = z.object({
     .nullable()
     .default(null),
   analyticsConsent: z.boolean().optional(),
-  consentBackendURL: z.url().optional(),
   /** Host the footer links a favicon for, the only one the worker serves. */
   faviconHost: z.string().regex(SITE_FAVICON_HOST).optional(),
 });

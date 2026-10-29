@@ -53,7 +53,8 @@ export function injectAnalyticsScript(
   const consent = analytics.consent
     ? ` type="text/plain" data-c15t-category="${C15T_ANALYTICS_CATEGORY}"`
     : "";
-  const tag = `<script${consent} src="${escapeHtml(analytics.scriptSrc)}" data-endpoint="${escapeHtml(analytics.eventPath)}" defer></script>`;
+  const view = analytics.reportsView ? " data-view" : "";
+  const tag = `<script${consent} src="${escapeHtml(analytics.scriptSrc)}" data-endpoint="${escapeHtml(analytics.eventPath)}"${view} defer></script>`;
   return new HTMLRewriter()
     .on("body", {
       element(element) {
@@ -73,12 +74,18 @@ function parseAnalyticsEvent(text: string): AnalyticsEvent | null {
   if (typeof body !== "object" || body === null) {
     return null;
   }
-  const { v, p, ms, sd } = body as Record<string, unknown>;
+  const { k, r, v, p, ms, sd } = body as Record<string, unknown>;
+  if (typeof p !== "string" || !p.startsWith("/")) {
+    return null;
+  }
+  if (k === "view") {
+    return typeof r === "string"
+      ? { kind: "view", path: p, referrer: r }
+      : null;
+  }
   if (
     typeof v !== "string" ||
     !SITE_ENGAGEMENT_VIEW_ID_PATTERN.test(v) ||
-    typeof p !== "string" ||
-    !p.startsWith("/") ||
     typeof ms !== "number" ||
     !Number.isFinite(ms) ||
     ms < 0 ||
@@ -88,6 +95,7 @@ function parseAnalyticsEvent(text: string): AnalyticsEvent | null {
     return null;
   }
   return {
+    kind: "engagement",
     viewId: v,
     path: p,
     visibleMs: Math.round(ms),

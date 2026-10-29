@@ -379,6 +379,62 @@ describe("runGeoIngest ordering", () => {
     });
   });
 
+  test("a site visitor counts only with measurement consent, AI crawlers always", async () => {
+    const declined = { ...SITE_PAGE, visitorConsent: false };
+    expect(await run(ingestRequest(declined, SITE_TOKEN))).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "dropped", reason: "visitor_type" },
+    });
+    expect(
+      await run(
+        ingestRequest(
+          { ...declined, referer: "https://chatgpt.com/" },
+          SITE_TOKEN
+        )
+      )
+    ).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "dropped", reason: "consent" },
+    });
+    expect(ingestWebPageViews).not.toHaveBeenCalled();
+    expect(ingestGeoTrafficEvents).not.toHaveBeenCalled();
+
+    expect(
+      await run(ingestRequest({ ...declined, userAgent: "GPTBot" }, SITE_TOKEN))
+    ).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "ingested", visitorType: "crawler" },
+    });
+    expect(ingestWebPageViews).not.toHaveBeenCalled();
+
+    const consentedBeacon = {
+      ...SITE_PAGE,
+      accept: "*/*",
+      referer: "https://www.google.com/",
+      signals: {
+        clientHints: true,
+        fetchMode: "no-cors",
+        tracing: false,
+        prefetch: false,
+      },
+      visitorConsent: true,
+    };
+    expect(await run(ingestRequest(consentedBeacon, SITE_TOKEN))).toMatchObject(
+      {
+        _tag: "Success",
+        success: { outcome: "ingested", visitorType: "human" },
+      }
+    );
+    const [rows] = ingestWebPageViews.mock.calls[0] as unknown as [
+      Record<string, unknown>[],
+    ];
+    expect(rows[0]).toMatchObject({
+      path: "/blog/a",
+      referrer_group: "search",
+      referrer_source: "google",
+    });
+  });
+
   test("the SDK never counts people, only AI traffic", async () => {
     const outcome = await run(
       ingestRequest({

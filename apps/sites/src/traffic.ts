@@ -4,7 +4,6 @@ import {
 } from "./constants/traffic";
 import type { TrafficPayload, TrafficReport } from "./types/traffic";
 import { postToIngest } from "./utils/ingest";
-import { countsHumanVisitor } from "./utils/visitor-consent";
 
 function header(headers: Headers, name: string): string | undefined {
   return headers.get(name) ?? undefined;
@@ -16,30 +15,39 @@ function isPrefetch(headers: Headers): boolean {
 }
 
 function isReportableResponse(response: Response): boolean {
-  if (response.status >= 300 && response.status < 400) {
+  if (
+    response.status >= 300 &&
+    response.status < 400 &&
+    response.status !== 304
+  ) {
     return false;
   }
   const contentType = response.headers.get("content-type") ?? "";
   return TRAFFIC_CONTENT_TYPES.some((type) => contentType.startsWith(type));
 }
 
+export function isDashboardReferer(
+  referer: string | null,
+  dashboardUrl: string
+): boolean {
+  return (
+    referer !== null &&
+    URL.canParse(referer) &&
+    new URL(referer).origin === new URL(dashboardUrl).origin
+  );
+}
+
 function isDashboardPreview(request: Request, dashboardUrl: string): boolean {
   const referer = request.headers.get("referer");
-  if (!referer) {
-    return false;
+  if (isDashboardReferer(referer, dashboardUrl)) {
+    return true;
   }
-  try {
-    const from = new URL(referer);
-    if (from.origin === new URL(dashboardUrl).origin) {
-      return true;
-    }
-    return (
-      request.headers.get("sec-fetch-dest") === "iframe" &&
-      from.host === new URL(request.url).host
-    );
-  } catch {
-    return false;
-  }
+  return (
+    referer !== null &&
+    URL.canParse(referer) &&
+    request.headers.get("sec-fetch-dest") === "iframe" &&
+    new URL(referer).host === new URL(request.url).host
+  );
 }
 
 export function isReportablePageView(
@@ -55,10 +63,10 @@ export function isReportablePageView(
 }
 
 function publicReferer(
+  referer: string | null,
   request: Request,
   publicUrl: string
 ): string | undefined {
-  const referer = request.headers.get("referer") ?? undefined;
   if (!referer) {
     return undefined;
   }
@@ -96,41 +104,32 @@ function buildPayload(report: TrafficReport): TrafficPayload {
       };
   return {
     timestamp: new Date().toISOString(),
-    method: request.method,
+    method: report.method,
     url: publicUrl,
     ip: ip || undefined,
     geo,
-    referer: publicReferer(request, publicUrl),
+    referer: publicReferer(report.referer, request, publicUrl),
     userAgent: header(headers, "user-agent"),
     accept: header(headers, "accept"),
     acceptLanguage: header(headers, "accept-language"),
     requestId: header(headers, "cf-ray"),
-    status,
+    status: status === 304 ? 200 : status,
     signals: {
       clientHints: headers.has("sec-ch-ua"),
       fetchMode: headers.get("sec-fetch-mode"),
       tracing: TRAFFIC_TRACING_HEADERS.some((name) => headers.has(name)),
       prefetch: isPrefetch(headers),
     },
+    visitorConsent: report.visitorConsent,
   };
 }
 
 export async function reportTraffic(report: TrafficReport): Promise<void> {
-  const payload = buildPayload(report);
-  const visitorConsent = report.consentBackendURL
-    ? await countsHumanVisitor({
-        fetch: report.fetch,
-        backendURL: report.consentBackendURL,
-        headers: report.request.headers,
-        country: payload.geo?.country,
-        region: payload.geo?.region,
-      })
-    : undefined;
   await postToIngest({
     fetch: report.fetch,
     ingestUrl: report.ingestUrl,
     token: report.token,
     kind: "traffic",
-    buildBody: () => ({ ...payload, visitorConsent }),
+    buildBody: () => buildPayload(report),
   });
 }

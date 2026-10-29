@@ -298,7 +298,6 @@ export async function buildSite(
     redirects: config.redirects,
     contentSecurityPolicy,
     analyticsConsent: analyticsGatedByConsent(config.integrations),
-    consentBackendURL: config.integrations.c15t?.backendURL,
     faviconHost: footerFaviconHost(config),
   };
 }

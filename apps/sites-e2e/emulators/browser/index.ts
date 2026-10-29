@@ -5,6 +5,7 @@ import { gunzipSync } from "node:zlib";
 
 import type { BrowserContext, Request } from "playwright";
 
+import { answerConsentBackend, CONSENT_BACKEND_URL } from "./consent";
 import { databuddy } from "./providers/databuddy";
 import { ga4 } from "./providers/ga4";
 import { plausible } from "./providers/plausible";
@@ -87,6 +88,7 @@ export async function routeThirdParty(
   }
 ) {
   const events: CollectedEvent[] = [];
+  const consent: CollectedEvent[] = [];
   const scripts: { url: string; at: number }[] = [];
   const unexpected: string[] = [];
   const live = options.vendorScripts === "live";
@@ -95,6 +97,10 @@ export async function routeThirdParty(
     async (route) => {
       const request = route.request();
       const url = new URL(request.url());
+      if (url.origin === CONSENT_BACKEND_URL) {
+        await answerConsentBackend(route, options.root, consent);
+        return;
+      }
       const script = ANALYTICS_PROVIDERS.find(
         (provider) => provider.script === request.url()
       );
@@ -175,7 +181,7 @@ export async function routeThirdParty(
       await route.abort("blockedbyclient");
     }
   );
-  return { events, scripts, unexpected };
+  return { events, consent, scripts, unexpected };
 }
 
 function isLivePageViewOf(

@@ -21,7 +21,7 @@ import { runRoutes } from "../utils/run-routes";
 export const serveManifest = Effect.fn("Sites.serveManifest")(function* (
   context: DeploymentRouteContext
 ) {
-  const { deps, request, url, resolved, loaded } = context;
+  const { deps, request, url, resolved, loaded, visitorConsent } = context;
   const path = normalizeRequestPath(url.pathname);
   if (path === null) {
     return html(notFoundPage(), 400);
@@ -45,7 +45,7 @@ export const serveManifest = Effect.fn("Sites.serveManifest")(function* (
       contentSecurityPolicy: loaded.manifest.contentSecurityPolicy,
       analytics: resolved.isPreview
         ? null
-        : analyticsScriptTag(resolved, loaded, url.pathname),
+        : analyticsScriptTag(resolved, loaded, url.pathname, visitorConsent),
       status: 200,
     },
   });

@@ -32,6 +32,7 @@ export interface PreviewRouteContext extends PreviewRequestContext {
 export interface DeploymentRouteContext extends SiteRequestContext {
   resolved: ResolvedDeployment;
   loaded: LoadedManifest;
+  visitorConsent: boolean | undefined;
 }
 
 export type ManifestFileParams = Omit<ServeFileParams, "file" | "extraHeaders">;

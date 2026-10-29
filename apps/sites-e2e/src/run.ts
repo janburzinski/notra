@@ -22,6 +22,7 @@ import {
   signalGroup,
   syntheticEnvironment,
 } from "./utils/processes";
+import { fixtureToolchain } from "./utils/toolchain";
 
 const { values } = parseArgs({
   options: {
@@ -56,6 +57,8 @@ if (executable) {
   await access(executable);
 }
 const temp = await realpath(await mkdtemp(join(tmpdir(), "notra-sites-e2e-")));
+const root = resolve(import.meta.dir, "../../..");
+const toolchain = fixtureToolchain(root, temp);
 let mode = "test";
 if (values["failure-probe"]) {
   mode = "fail";
@@ -75,7 +78,7 @@ const child = spawn(
     values["vendor-scripts"] ?? "emulated",
   ],
   {
-    cwd: resolve(import.meta.dir, "../../.."),
+    cwd: root,
     env: syntheticEnvironment(temp),
     detached: true,
     stdio: ["ignore", "pipe", "pipe"],
@@ -214,7 +217,10 @@ try {
     cleanupErrors.push(String(error));
   }
   try {
+    // An interrupted worker exits before its compiler cleans up.
+    await rm(toolchain, { recursive: true, force: true });
     await rm(temp, { recursive: true, force: true });
+    assert.equal(existsSync(toolchain), false);
     assert.equal(existsSync(temp), false);
   } catch (error) {
     cleanupErrors.push(String(error));
@@ -226,12 +232,12 @@ report.cleanup = {
   passed: cleanupErrors.length === 0,
   errors: cleanupErrors,
   processGroup: pid,
-  tempRemoved: !existsSync(temp),
+  tempRemoved: !(existsSync(temp) || existsSync(toolchain)),
   checks: [
     "worker/compiler process group exited",
     "no browser/profile-scoped processes survived",
     "HTTP port refuses connections",
-    "temporary build outputs/profile removed",
+    "temporary build outputs/toolchain/profile removed",
   ],
 };
 if (cleanupErrors.length) {

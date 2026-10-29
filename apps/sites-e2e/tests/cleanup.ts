@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { groupExists, scopedProcesses } from "../src/utils/processes";
+import { fixtureToolchain } from "../src/utils/toolchain";
 
 const runner = resolve(import.meta.dir, "../src/run.ts");
 for (const [name, flags, signal, marker, expectedCode, expectedStatus] of [
@@ -79,6 +80,11 @@ for (const [name, flags, signal, marker, expectedCode, expectedStatus] of [
   assert.ok(start);
   const { pid, temp } = JSON.parse(start[1]);
   assert.equal(existsSync(temp), false);
+  assert.equal(
+    existsSync(fixtureToolchain(resolve(import.meta.dir, "../../.."), temp)),
+    false,
+    `${name} left its builder toolchain behind`
+  );
   assert.equal(groupExists(pid), false);
   assert.deepEqual(scopedProcesses(temp), []);
   process.stdout.write(

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { cp, readFile, symlink, writeFile } from "node:fs/promises";
+import { cp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { siteBuildRequestSchema } from "@notra/sites-core/schemas/build";
@@ -9,19 +9,32 @@ import { siteManifestSchema } from "@notra/sites-core/schemas/deployment";
 import { contentTypeForPath } from "../../../../packages/sites-server/src/utils/content-types";
 import { buildSite } from "../../../sites-builder/compiler/build";
 import { listFiles } from "../../../sites-builder/compiler/utils/fs";
-import { analyticsIntegrations } from "../../emulators/browser";
-import { SITE_ID } from "../constants/fixtures";
-import type { Measurement } from "../types/harness";
+import type { FixtureBuild, Measurement } from "../types/harness";
+import { fixtureToolchain } from "./toolchain";
 
 export async function compileFixtures(
   root: string,
   temp: string,
-  origin: string,
-  previewOrigin: string,
+  builds: FixtureBuild[],
   measurements: Measurement[]
 ) {
   const builder = join(root, "apps/sites-builder");
-  const toolchain = join(temp, "toolchain");
+  const toolchain = fixtureToolchain(root, temp);
+  try {
+    return await compileWith(root, temp, toolchain, builds, measurements);
+  } finally {
+    await rm(toolchain, { recursive: true, force: true });
+  }
+}
+
+async function compileWith(
+  root: string,
+  temp: string,
+  toolchain: string,
+  builds: FixtureBuild[],
+  measurements: Measurement[]
+) {
+  const builder = join(root, "apps/sites-builder");
   for (const path of [
     "src",
     "compiler",
@@ -36,27 +49,30 @@ export async function compileFixtures(
     join(toolchain, "node_modules"),
     "dir"
   );
-  const source = join(temp, "source");
-  await cp(join(builder, "fixtures/acme"), source, { recursive: true });
-  // E2E-only content (every built-in, global CSS/JS) on top of Acme.
-  await cp(join(root, "apps/sites-e2e/fixtures/site"), source, {
-    recursive: true,
-  });
-  const configPath = join(source, "blog.json");
-  const config = JSON.parse(await readFile(configPath, "utf8"));
-  config.integrations = analyticsIntegrations();
-  await writeFile(configPath, JSON.stringify(config));
   const objects = new Map<string, Uint8Array>();
   const manifests = [];
-  for (const [deploymentId, publicOrigin, preview] of [
-    ["dep_live", origin, false],
-    ["dep_preview", previewOrigin, true],
-  ] as const) {
+  for (const {
+    siteId,
+    deploymentId,
+    publicOrigin,
+    preview,
+    integrations,
+  } of builds) {
+    const source = join(temp, "source", deploymentId);
+    await cp(join(builder, "fixtures/acme"), source, { recursive: true });
+    // E2E-only content (every built-in, global CSS/JS) on top of Acme.
+    await cp(join(root, "apps/sites-e2e/fixtures/site"), source, {
+      recursive: true,
+    });
+    const configPath = join(source, "blog.json");
+    const config = JSON.parse(await readFile(configPath, "utf8"));
+    config.integrations = integrations;
+    await writeFile(configPath, JSON.stringify(config));
     const target = siteBuildRequestSchema.parse({
       ...JSON.parse(
         await readFile(join(builder, "fixtures/acme.target.json"), "utf8")
       ),
-      siteId: SITE_ID,
+      siteId,
       deploymentId,
       publicOrigin,
       analytics: !preview,
@@ -82,7 +98,7 @@ export async function compileFixtures(
     for (const file of await listFiles(outDir)) {
       const path = file.slice(outDir.length);
       const body = new Uint8Array(await readFile(file));
-      objects.set(`deployments/${SITE_ID}/${deploymentId}/files${path}`, body);
+      objects.set(`deployments/${siteId}/${deploymentId}/files${path}`, body);
       files.push({
         path,
         size: body.byteLength,
@@ -92,7 +108,7 @@ export async function compileFixtures(
     }
     const manifest = siteManifestSchema.parse({
       version: 1,
-      siteId: SITE_ID,
+      siteId,
       deploymentId,
       commitSha: target.commitSha,
       toolchainVersion: JSON.parse(
@@ -112,9 +128,10 @@ export async function compileFixtures(
       ...(result.contentSecurityPolicy
         ? { contentSecurityPolicy: result.contentSecurityPolicy }
         : {}),
+      ...(result.analyticsConsent ? { analyticsConsent: true } : {}),
     });
     objects.set(
-      `deployments/${SITE_ID}/${deploymentId}/manifest.json`,
+      `deployments/${siteId}/${deploymentId}/manifest.json`,
       new TextEncoder().encode(JSON.stringify(manifest))
     );
     manifests.push(manifest);

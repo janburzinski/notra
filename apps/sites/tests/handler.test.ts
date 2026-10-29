@@ -162,6 +162,30 @@ function setup(
   return { objects, put, deps, request, reports, settle };
 }
 
+function withConsentBanner(
+  objects: Map<string, string>,
+  put: (key: string, value: unknown) => void
+) {
+  const key = `deployments/${SITE}/dep_live/manifest.json`;
+  put(key, { ...JSON.parse(objects.get(key) ?? "{}"), analyticsConsent: true });
+  put(
+    `deployments/${SITE}/dep_live/files/blog/post/index.html`,
+    "<html><body><p>Hi</p></body></html>"
+  );
+}
+
+function consentCookie(measurement: boolean): string {
+  return `c15t=${encodeURIComponent(
+    JSON.stringify({
+      consents: { necessary: true, measurement },
+      consentInfo: {
+        time: Date.now(),
+        type: measurement ? "all" : "necessary",
+      },
+    })
+  )}`;
+}
+
 beforeEach(() => resetCachesForTests());
 
 describe("AI resource discovery", () => {
@@ -741,6 +765,120 @@ describe("production serving", () => {
     }
     await settle();
     expect(reports).toHaveLength(2);
+  });
+
+  test("consent banner: the server counts only a stored grant, other visits are left to the page", async () => {
+    const { objects, put, request, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    withConsentBanner(objects, put);
+    const views = [
+      [consentCookie(true), false, '-a"'],
+      [consentCookie(false), true, '-av"'],
+      [null, true, '-av"'],
+    ] as const;
+    for (const [cookie, reportsView, etag] of views) {
+      const page = await request(
+        "https://blog.acme.com/blog/post",
+        cookie ? { cookie } : {}
+      );
+      expect(page.headers.get("etag")).toEndWith(etag);
+      expect((await page.text()).includes(" data-view ")).toBe(reportsView);
+    }
+    await settle();
+    expect(
+      reports.map(
+        (report) => JSON.parse(String(report.init.body)).visitorConsent
+      )
+    ).toEqual([true, false, false]);
+  });
+
+  test("consent banner: the page's view beacon counts with its landing referrer", async () => {
+    const { objects, put, deps, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    withConsentBanner(objects, put);
+    const view = (referrer: string) =>
+      handleSiteRequest(
+        new Request("https://blog.acme.com/blog/_notra/e", {
+          method: "POST",
+          headers: {
+            "sec-fetch-site": "same-origin",
+            "user-agent": "Mozilla/5.0 Chrome/141.0",
+            "x-forwarded-for": "203.0.113.9",
+            referer: "https://blog.acme.com/blog/post?utm_source=news",
+          },
+          body: JSON.stringify({
+            k: "view",
+            p: "/blog/post?utm_source=news",
+            r: referrer,
+          }),
+        }),
+        deps
+      );
+    for (const referrer of [
+      "https://www.google.com/",
+      "https://blog.acme.com/blog/",
+      "",
+      "https://app.example.com/acme/sites/site_a",
+    ]) {
+      expect((await view(referrer)).status).toBe(204);
+    }
+    await settle();
+    const payloads = reports.map((report) =>
+      JSON.parse(String(report.init.body))
+    );
+    expect(payloads.map((payload) => payload.referer)).toEqual([
+      "https://www.google.com/",
+      "https://acme.com/blog/",
+      undefined,
+    ]);
+    for (const payload of payloads) {
+      expect(payload).toMatchObject({
+        method: "GET",
+        url: "https://acme.com/blog/post?utm_source=news",
+        status: 200,
+        ip: "203.0.113.9",
+        visitorConsent: true,
+      });
+    }
+  });
+
+  test("view beacons are ignored without a consent banner", async () => {
+    const { deps, request, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    const page = await request("https://blog.acme.com/blog/post");
+    expect(await page.text()).not.toContain("data-view");
+    const post = (body: unknown) =>
+      handleSiteRequest(
+        new Request("https://blog.acme.com/blog/_notra/e", {
+          method: "POST",
+          body: JSON.stringify(body),
+        }),
+        deps
+      );
+    expect((await post({ k: "view", p: "/blog/", r: "" })).status).toBe(204);
+    await settle();
+    expect(reports).toHaveLength(1);
+    expect(JSON.parse(String(reports[0]?.init.body)).visitorConsent).toBe(
+      undefined
+    );
+  });
+
+  test("a page revalidated from the browser cache still counts as a view", async () => {
+    const { request, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    const page = await request("https://acme.notra.site/blog");
+    const revalidated = await request("https://acme.notra.site/blog", {
+      "If-None-Match": page.headers.get("ETag") ?? "",
+    });
+    expect(revalidated.status).toBe(304);
+    await settle();
+    expect(
+      reports.map((report) => JSON.parse(String(report.init.body)).status)
+    ).toEqual([200, 200]);
   });
 
   test("the bare hosting domain names an abuse contact", async () => {

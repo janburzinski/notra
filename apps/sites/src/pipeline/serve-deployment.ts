@@ -6,6 +6,7 @@ import { isReportablePageView, reportTraffic } from "../traffic";
 import type { ResolvedDeployment, SiteRequestContext } from "../types/serving";
 import { StateUnavailableError } from "../utils/errors";
 import { runRoutes } from "../utils/run-routes";
+import { visitorConsent } from "../utils/visitor-consent";
 import { serveManifest } from "./serve-manifest";
 
 export const serveDeployment = Effect.fn("Sites.serveDeployment")(function* (
@@ -24,7 +25,13 @@ export const serveDeployment = Effect.fn("Sites.serveDeployment")(function* (
       )
     );
   }
-  const deploymentContext = { ...context, resolved, loaded };
+  const consent = visitorConsent(loaded.manifest, request.headers);
+  const deploymentContext = {
+    ...context,
+    resolved,
+    loaded,
+    visitorConsent: consent,
+  };
   const answered = yield* runRoutes(DEPLOYMENT_ROUTES, deploymentContext);
   if (Option.isSome(answered)) {
     return answered.value;
@@ -42,10 +49,12 @@ export const serveDeployment = Effect.fn("Sites.serveDeployment")(function* (
         ingestUrl: deps.trafficIngestUrl,
         token: trafficToken,
         request,
+        method: request.method,
+        referer: request.headers.get("referer"),
         publicUrl: new URL(`${url.pathname}${url.search}`, publicOrigin).href,
         proxied: new URL(publicOrigin).hostname !== host,
         status: response.status,
-        consentBackendURL: loaded.manifest.consentBackendURL,
+        visitorConsent: consent,
       })
     );
   }

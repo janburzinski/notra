@@ -7,5 +7,3 @@ export const TRAFFIC_CONTENT_TYPES = [
 export const TRAFFIC_REPORT_TIMEOUT_MS = 2000;
 
 export const TRAFFIC_TRACING_HEADERS = ["traceparent", "b3", "x-b3-traceid"];
-
-export const CONSENT_POLICY_CACHE_TTL_MS = 60 * 60 * 1000;

@@ -28,7 +28,8 @@ function analyticsMount(
 export function analyticsScriptTag(
   resolved: ResolvedDeployment,
   loaded: LoadedManifest,
-  pathname: string
+  pathname: string,
+  visitorConsent: boolean | undefined
 ): AnalyticsScriptTag | null {
   const mount = resolved.trafficToken ? analyticsMount(loaded, pathname) : null;
   return mount === null
@@ -36,6 +37,7 @@ export function analyticsScriptTag(
     : {
         scriptSrc: joinMountPath(mount, SITE_ANALYTICS_SCRIPT_FILE),
         eventPath: joinMountPath(mount, SITE_ANALYTICS_EVENT_FILE),
-        consent: loaded.manifest.analyticsConsent === true,
+        consent: visitorConsent !== undefined,
+        reportsView: visitorConsent === false,
       };
 }

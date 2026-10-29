@@ -4,6 +4,14 @@ export interface Measurement {
   durationMs: number;
 }
 
+export interface FixtureBuild {
+  siteId: string;
+  deploymentId: string;
+  publicOrigin: string;
+  preview: boolean;
+  integrations: Record<string, unknown>;
+}
+
 export interface ProviderRequest {
   provider: string;
   url: string;

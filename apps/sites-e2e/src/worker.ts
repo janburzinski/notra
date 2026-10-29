@@ -23,13 +23,17 @@ import {
 
 import {
   ANALYTICS_PROVIDERS,
+  analyticsIntegrations,
   assertProviderEvents,
   providersReported,
   routeThirdParty,
 } from "../emulators/browser";
+import { consentIntegrations } from "../emulators/browser/consent";
 import type { VendorScripts } from "../emulators/browser/types";
 import {
   ACME_TEXT,
+  CONSENT_HOST,
+  CONSENT_SITE_ID,
   HOSTING_DOMAIN,
   LIVE_HOST,
   OTHER_CUSTOM_HOST,
@@ -44,6 +48,7 @@ import {
 } from "./constants/fixtures";
 import type { Measurement } from "./types/harness";
 import { compileFixtures } from "./utils/compiler";
+import { assertConsentVisits } from "./utils/consent";
 import { assertContentFeatures } from "./utils/content";
 import { cspAllowsOrigin } from "./utils/csp";
 import { countByUrl, isEngagement } from "./utils/ingest";
@@ -68,6 +73,7 @@ await writeFile(join(temp, "server.json"), JSON.stringify({ port }));
 let sites: Awaited<ReturnType<typeof startSitesWorker>> | undefined;
 const origin = `http://${LIVE_HOST}:${port}`;
 const previewOrigin = `http://${PREVIEW_HOST}:${port}`;
+const consentOrigin = `http://${CONSENT_HOST}:${port}`;
 let browser:
   | Awaited<ReturnType<typeof chromium.launchPersistentContext>>
   | undefined;
@@ -110,8 +116,29 @@ try {
   const compiled = await compileFixtures(
     root,
     temp,
-    origin,
-    previewOrigin,
+    [
+      {
+        siteId: SITE_ID,
+        deploymentId: "dep_live",
+        publicOrigin: origin,
+        preview: false,
+        integrations: analyticsIntegrations(),
+      },
+      {
+        siteId: SITE_ID,
+        deploymentId: "dep_preview",
+        publicOrigin: previewOrigin,
+        preview: true,
+        integrations: analyticsIntegrations(),
+      },
+      {
+        siteId: CONSENT_SITE_ID,
+        deploymentId: "dep_consent",
+        publicOrigin: consentOrigin,
+        preview: false,
+        integrations: consentIntegrations(),
+      },
+    ],
     measurements
   );
   for (const [key, value] of compiled.objects) {
@@ -149,6 +176,33 @@ try {
   objects.set(
     `sites/${SITE_ID}/state.json`,
     new TextEncoder().encode(JSON.stringify(state))
+  );
+  objects.set(
+    `hosts/${CONSENT_HOST}.json`,
+    new TextEncoder().encode(
+      JSON.stringify({ version: 1, siteId: CONSENT_SITE_ID, kind: "alias" })
+    )
+  );
+  objects.set(
+    `sites/${CONSENT_SITE_ID}/state.json`,
+    new TextEncoder().encode(
+      JSON.stringify(
+        siteServingStateSchema.parse({
+          version: 1,
+          siteId: CONSENT_SITE_ID,
+          slug: "consent",
+          status: "active",
+          production: {
+            deploymentId: "dep_consent",
+            generation: 1,
+            activatedAt: new Date().toISOString(),
+          },
+          previews: {},
+          trafficToken: TRAFFIC_TOKEN,
+          updatedAt: new Date().toISOString(),
+        })
+      )
+    )
   );
   const [liveManifest, previewManifest] = compiled.manifests;
   const previewDraft = previewManifest.files.find(
@@ -190,7 +244,7 @@ try {
       `--host-resolver-rules=MAP *.${HOSTING_DOMAIN} 127.0.0.1`,
       // Plain HTTP on a real domain is not a secure context; localhost was.
       // Keep parity (crypto.randomUUID, cookies) for both site origins.
-      `--unsafely-treat-insecure-origin-as-secure=${origin},${previewOrigin}`,
+      `--unsafely-treat-insecure-origin-as-secure=${origin},${previewOrigin},${consentOrigin}`,
       "--disable-background-networking",
       // Real vendor scripts drop events from automated browsers
       // (navigator.webdriver, HeadlessChrome); live mode looks like a visitor.
@@ -210,7 +264,7 @@ try {
     root,
     vendorScripts,
     isSite: (url) =>
-      (url.hostname === LIVE_HOST || url.hostname === PREVIEW_HOST) &&
+      [LIVE_HOST, PREVIEW_HOST, CONSENT_HOST].includes(url.hostname) &&
       url.port === String(port),
   });
   // Vendors may batch; wait until every provider reported this page.
@@ -245,7 +299,7 @@ try {
   const isSiteSubresource = (request: PlaywrightRequest) => {
     const url = new URL(request.url());
     return (
-      (url.hostname === LIVE_HOST || url.hostname === PREVIEW_HOST) &&
+      [LIVE_HOST, PREVIEW_HOST, CONSENT_HOST].includes(url.hostname) &&
       url.port === String(port) &&
       !(request.isNavigationRequest() && request.frame() === page.mainFrame())
     );
@@ -562,7 +616,7 @@ try {
   const requested = ingest.slice(ingestBeforeRequests);
   const reported = countByUrl(requested);
   for (const [path, count, status] of [
-    ["/blog/hello-world", 2, 200],
+    ["/blog/hello-world", 3, 200],
     ["/blog/hello-world.md", 1, 200],
     ["/blog/draft-idea", 1, 404],
     ["/blog/missing", 1, 404],
@@ -859,6 +913,23 @@ try {
   checks.push(
     "second tenant: alias and custom-domain hosts serve only their own files on shared paths and content hashes; stale alias and unknown host get the 404 page"
   );
+  checks.push(
+    await assertConsentVisits({
+      page,
+      context: browser,
+      origin: consentOrigin,
+      ingest,
+      settle: () => sites?.settle() ?? Promise.resolve(),
+    })
+  );
+  assert.ok(
+    network.consent.some((event) => new URL(event.url).pathname === "/init"),
+    "the banner resolved its policy from the c15t backend"
+  );
+  assert.deepEqual(network.unexpected, []);
+  assert.deepEqual(pageErrors, []);
+  assert.deepEqual(requestFailures, [], "same-origin subresources must load");
+  assert.deepEqual(sites.errors(), []);
   const report = {
     schemaVersion: 1,
     status: "passed",

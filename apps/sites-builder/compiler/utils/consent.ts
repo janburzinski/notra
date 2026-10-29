@@ -1,4 +1,7 @@
-import { POSTHOG_DEFAULT_API_HOST } from "@notra/sites-core/constants/integrations";
+import {
+  C15T_ANALYTICS_CATEGORY,
+  POSTHOG_DEFAULT_API_HOST,
+} from "@notra/sites-core/constants/integrations";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type { SiteIntegrations } from "@notra/sites-core/types/site-integrations";
@@ -81,6 +84,7 @@ export function siteConsent(
     options: {
       ui: "react",
       colorScheme: "none",
+      consentCategories: analytics ? [C15T_ANALYTICS_CATEGORY] : undefined,
       presentation: { prompt: c15t.prompt, preferences: c15t.preferences },
       legalLinks: c15t.legalLinks,
       i18n: c15t.locale

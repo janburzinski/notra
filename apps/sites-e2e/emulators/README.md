@@ -14,7 +14,7 @@ through the overrides in
 | `cloudflare/` | Cloudflare for SaaS custom hostnames | A hostname turns active once the shared DNS zone has its CNAME to the SaaS target and Cloudflare's ownership TXT |
 | `vercel/` | Vercel DNS integration | OAuth code exchange (checks client, secret, redirect URI), DNS records written into the shared zone, installation removal |
 | `dns/` | UDP DNS (A, CNAME, NS, TXT) | Answers from the shared zone; reached through `SITES_DNS_SERVERS` |
-| `browser/` | Analytics scripts, embeds | Provider registry: stand-in scripts with exact payload checks, or the vendors' real scripts with `--vendor-scripts live` |
+| `browser/` | Analytics scripts, embeds, c15t consent backend | Provider registry: stand-in scripts with exact payload checks, or the vendors' real scripts with `--vendor-scripts live`. The consent backend answers `/init` with c15t's EU opt-in policy and records every saved choice |
 
 `startSitesEmulators()` (`index.ts`) starts the server-side ones, returns the
 environment that points the backend at them and `summaries()`: the routes each
