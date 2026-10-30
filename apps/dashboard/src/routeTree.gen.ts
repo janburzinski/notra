@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as DotwellKnownOauthAuthorizationServerRouteImport } from './routes/[.]well-known.oauth-authorization-server'
 import { Route as Char91__testsChar93SitesRouteImport } from './routes/[__tests].sites'
 import { Route as ApiHealthcheckRouteImport } from './routes/api.healthcheck'
@@ -100,6 +101,11 @@ import { Route as ApiOrganizationsOrganizationIdDashboardAgentChatChatIdRouteImp
 import { Route as ApiWebhooksProviderOrganizationIdIntegrationIdRepositoryIdRouteImport } from './routes/api.webhooks.$provider.$organizationId.$integrationId.$repositoryId'
 import { Route as ApiOrganizationsOrganizationIdContentContentIdChatChatIdRouteImport } from './routes/api.organizations.$organizationId.content.$contentId.chat.$chatId'
 
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotwellKnownOauthAuthorizationServerRoute =
   DotwellKnownOauthAuthorizationServerRouteImport.update({
     id: '/.well-known/oauth-authorization-server',
@@ -602,6 +608,7 @@ const ApiOrganizationsOrganizationIdContentContentIdChatChatIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/robots.txt': typeof RobotsDottxtRoute
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   '/__tests/sites': typeof Char91__testsChar93SitesRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
@@ -694,6 +701,7 @@ export interface FileRoutesByFullPath {
   '/api/organizations/$organizationId/content/$contentId/chat/$chatId': typeof ApiOrganizationsOrganizationIdContentContentIdChatChatIdRoute
 }
 export interface FileRoutesByTo {
+  '/robots.txt': typeof RobotsDottxtRoute
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   '/__tests/sites': typeof Char91__testsChar93SitesRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
@@ -787,6 +795,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/robots.txt': typeof RobotsDottxtRoute
   '/.well-known/oauth-authorization-server': typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   '/__tests/sites': typeof Char91__testsChar93SitesRoute
   '/api/healthcheck': typeof ApiHealthcheckRoute
@@ -881,6 +890,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/robots.txt'
     | '/.well-known/oauth-authorization-server'
     | '/__tests/sites'
     | '/api/healthcheck'
@@ -973,6 +983,7 @@ export interface FileRouteTypes {
     | '/api/organizations/$organizationId/content/$contentId/chat/$chatId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/robots.txt'
     | '/.well-known/oauth-authorization-server'
     | '/__tests/sites'
     | '/api/healthcheck'
@@ -1065,6 +1076,7 @@ export interface FileRouteTypes {
     | '/api/organizations/$organizationId/content/$contentId/chat/$chatId'
   id:
     | '__root__'
+    | '/robots.txt'
     | '/.well-known/oauth-authorization-server'
     | '/__tests/sites'
     | '/api/healthcheck'
@@ -1158,6 +1170,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   DotwellKnownOauthAuthorizationServerRoute: typeof DotwellKnownOauthAuthorizationServerRouteWithChildren
   Char91__testsChar93SitesRoute: typeof Char91__testsChar93SitesRoute
   ApiHealthcheckRoute: typeof ApiHealthcheckRoute
@@ -1239,6 +1252,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.well-known/oauth-authorization-server': {
       id: '/.well-known/oauth-authorization-server'
       path: '/.well-known/oauth-authorization-server'
@@ -1975,6 +1995,7 @@ const ApiOrganizationsOrganizationIdContentContentIdChatRouteWithChildren =
   )
 
 const rootRouteChildren: RootRouteChildren = {
+  RobotsDottxtRoute: RobotsDottxtRoute,
   DotwellKnownOauthAuthorizationServerRoute:
     DotwellKnownOauthAuthorizationServerRouteWithChildren,
   Char91__testsChar93SitesRoute: Char91__testsChar93SitesRoute,
