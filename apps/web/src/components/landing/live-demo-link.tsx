@@ -14,6 +14,7 @@ export function LiveDemoLink() {
         className="group border-border bg-background relative block size-full overflow-hidden rounded-2xl border lg:rounded-b-none lg:border-b-0"
         aria-label={LIVE_DEMO_OPEN_LABEL}
         href={LIVE_DEMO_URL}
+        rel="nofollow"
       >
         <LiveDemoPreview />
         <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30 group-focus-visible:bg-black/30">
