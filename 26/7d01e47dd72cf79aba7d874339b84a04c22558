@@ -1,0 +1,247 @@
+apps/sites-builder/compiler/utils/consent.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 33
+apps/web/scripts/fonts/measurements.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-4325
+packages/ai/src/utils/github-social-token.test.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-61
+packages/db/src/schema.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 360,1754-1783
+apps/dashboard/src/utils/traffic-export.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 9,12-13,71-84
+packages/sites-core/src/utils/data-attributes.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 8-10
+apps/web/scripts/fonts/verify.mjs
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-513
+apps/dashboard/src/utils/traffic-embed-name.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-10
+packages/db/migrations/meta/_journal.json
+  ai_agent 967-982
+apps/dashboard/messages/en.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 4218-4268,8837-8840
+apps/dashboard/src/lib/framework/runtime.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 12-13,23-28,30-37
+apps/dashboard/src/lib/geo/traffic-embeds.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-360
+packages/db/migrations/meta/0137_snapshot.json
+  ai_agent 2,14005-14008,14360-14361
+packages/ui/src/components/ui/context-menu.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 124,156,205,241
+apps/dashboard/src/types/geo.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1790-1793,1804-1805,2015-2017
+packages/db/migrations/0138_geo_traffic_embeds.sql
+  ai_agent 1,4-10,14-17
+packages/db/migrations/0137_encrypt_social_connection_tokens.sql
+  ai_agent 1-5
+apps/dashboard/browser-tests/site-workspace.test.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 122-151
+apps/dashboard/src/lib/auth/sync.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1,126-133,136,138
+apps/dashboard/src/components/command-palette/command-palette-item.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 44
+apps/dashboard/src/components/autopilot/autopilot-rules-section.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 3-7,9-13,19,22,31-37,41,44,59-67,69-169
+apps/dashboard/public/embed.js
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-31
+apps/docs/sites/domains/subpath.mdx
+  s_985d322a22a6f8::t_fd37951feb0e1b 49-51,57
+apps/web/scripts/fonts/requirements.txt
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-3
+packages/ai/src/integrations/github.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 58,427,433,437-448,525,530
+apps/dashboard/src/lib/hooks/use-site-workspace-state.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 21,62-65,216-230,362-363
+scripts/testing/dashboard/README.md
+  s_985d322a22a6f8::t_fd37951feb0e1b 170-172,175-177,182-183,245
+packages/ui/src/constants/dropdown.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 10
+apps/dashboard/src/components/geo/traffic-export-menu.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-71
+apps/dashboard/browser-tests/fixtures/site-workspace.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 42,83-92
+apps/dashboard/src/components/geo/traffic-hero.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 28,33,70-74,79-85,102-112,138-139,156,159-160,172-174,254-274,277-280
+apps/web/scripts/fonts/README.md
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-141
+packages/ui/src/components/ui/command.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 164,187
+apps/web/public/fonts/Inter-OFL.txt
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-93
+bunfig.toml
+  s_985d322a22a6f8::t_fd37951feb0e1b 6
+apps/dashboard/browser-tests/fixtures/menu-highlight.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-48
+apps/sites-e2e/scripts/constants/mutations.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 103,105
+apps/dashboard/src/lib/orpc/router.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 56-60
+apps/sites-builder/src/c15t.client.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 19
+apps/web/src/components/landing/hero-headline.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 109-114,119,123,138-148,158-159,163
+packages/ui/src/components/ui/combobox.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 157
+apps/dashboard/tests/site-design-sections.test.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 8,109-165
+apps/web/scripts/fonts/inventory.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-578
+packages/sites-core/src/types/site-integrations.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 13,34
+apps/web/scripts/fonts/subset.py
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-159
+apps/dashboard/src/types/traffic-embed.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-36
+packages/sites-core/src/utils/integrations.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 3,34,44-61,127-133
+apps/dashboard/src/middleware/auth.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 38
+apps/dashboard/src/utils/autopilot-rules.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-16
+apps/docs/ai-traffic/embed.mdx
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-132
+packages/ai/src/utils/github-social-token.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-17
+packages/db/migrations/meta/0139_snapshot.json
+  ai_agent 1-16332
+apps/dashboard/src/lib/i18n/server.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 24-30
+packages/db/migrations/meta/0138_snapshot.json
+  ai_agent 1-15955
+apps/dashboard/tests/autopilot-rule-text.test.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-23
+apps/dashboard/src/utils/providers.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 24,92-101,115-123,130
+apps/dashboard/src/utils/traffic-embed.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-178
+packages/sites-core/src/constants/integrations.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 13
+scripts/testing/dashboard/bootstrap-github-cli.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 19-20,22-25,86,94,101-103
+apps/dashboard/src/components/autopilot/autopilot-settings-panel.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 303-326
+apps/web/src/styles/fonts.css
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-76
+bun.lock
+  ai_agent 841,1042,1456
+apps/sites-builder/src/types/build-params.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 6,15
+apps/dashboard/src/components/content/github-publish-dialog-footer.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 99,101
+apps/dashboard/src/components/sites/site-header-actions.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 18-19,50-52
+apps/docs/sites/integrations/analytics/databuddy.mdx
+  s_985d322a22a6f8::t_fd37951feb0e1b 3,74,80-101
+apps/dashboard/src/constants/geo-traffic-hero.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 17-23
+apps/dashboard/src/app/(dashboard)/[slug]/geo/traffic/page-client.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 21,144-155,157-171,184-185
+apps/dashboard/knip.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 17
+apps/docs/sites/domains/cloudfront.mdx
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-84
+packages/ui/src/styles/menu-highlight.css
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-14
+apps/web/public/fonts/InstrumentSerif-OFL.txt
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-93
+apps/web/knip.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 8,11-13
+packages/sites-core/src/schemas/site-integrations.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 388-406
+apps/web/src/routes/__root.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 30,54-60
+packages/sites-server/tests/domain-requests.test.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 256-275
+packages/ai/src/utils/public-fetch.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 89,95,98-101
+apps/docs/sites/reference/blog-json.mdx
+  s_985d322a22a6f8::t_fd37951feb0e1b 211
+apps/dashboard/src/utils/traffic-embed-prompt.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-24
+apps/dashboard/src/components/sites/site-changes-banner.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 162-183,187-191,202-219
+apps/dashboard/src/constants/autopilot.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 152-153
+apps/dashboard/src/routes/-entry-ui.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 20,43-47,174-191
+apps/dashboard/src/utils/traffic-embed.test.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-65
+apps/dashboard/src/components/geo/traffic-embed-dialog.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-500
+apps/dashboard/src/routes/__root.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 33,36,48-59,63-68,70-74,107,109,112-117,127,129-139
+packages/ui/src/styles/globals.css
+  s_985d322a22a6f8::t_fd37951feb0e1b 7
+apps/dashboard/src/routes/-embed-loaders.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-24
+apps/dashboard/src/components/autopilot/autopilot-release-filters-section.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 43,118-137,139-156,158-166,168-173,175-203,205-220,222-230,233-248,250-260,263
+apps/web/public/schemas/blog.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 1414-1440
+apps/dashboard/src/lib/geo/traffic-embed-headers.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-42
+apps/dashboard/src/components/geo/ai-traffic-embed.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-111
+packages/ui/src/components/ui/dropdown-menu.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 101,129
+packages/sites-core/src/utils/content-security-policy.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 34-36
+apps/dashboard/browser-tests/menu-highlight.test.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-156
+apps/dashboard/src/lib/analytics/client-init.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 3,7-12
+apps/dashboard/src/components/geo/traffic-export-button.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 9,25-27
+package.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 14
+packages/schemas/src/schemas/dashboard/traffic-embed.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-42
+apps/dashboard/src/lib/orpc/routers/traffic-embeds.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-101
+apps/dashboard/src/constants/traffic-embed.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-62
+apps/web/src/components/landing/hero-section.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 119-120
+packages/ui/src/components/ui/autocomplete.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 85
+packages/sites-core/package.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 22
+apps/docs/docs.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 249,337-338
+apps/sites-builder/compiler/constants/consent.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 35
+apps/dashboard/messages/de.json
+  s_985d322a22a6f8::t_fd37951feb0e1b 4218-4268,8836-8839
+apps/web/src/styles/globals.css
+  s_985d322a22a6f8::t_fd37951feb0e1b 4,8
+apps/dashboard/src/utils/framework-request.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 22-32
+apps/dashboard/browser-tests/constants/menu-highlight.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-5
+packages/sites-server/src/domains.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 289
+apps/docs/sites/integrations/consent/c15t.mdx
+  s_985d322a22a6f8::t_fd37951feb0e1b 75
+apps/web/scripts/fonts/REPORT.md
+  s_985d322a22a6f8::t_fd37951feb0e1b 1-205
+apps/dashboard/src/utils/framework-header-routing.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 3,12-15,19-21,30-37
+apps/dashboard/src/utils/site-design-sections.ts
+  s_985d322a22a6f8::t_fd37951feb0e1b 31-103
+apps/web/src/routes/_site/brand.tsx
+  s_985d322a22a6f8::t_fd37951feb0e1b 7,57-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "267d01e47dd72cf79aba7d874339b84a04c22558",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
