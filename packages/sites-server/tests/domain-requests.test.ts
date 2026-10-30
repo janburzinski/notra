@@ -253,6 +253,26 @@ if (process.env.NOTRA_SITES_DOMAIN_REQUEST_TEST_WORKER !== "1") {
     expect(requests).toHaveLength(1);
   });
 
+  test("proxy verification reports a redirecting mount instead of failing the fetch", async () => {
+    proxyDomain = { ...proxyDomain, hostname: "blog.acme.com" };
+    respond = (url) =>
+      url.endsWith("probe.txt")
+        ? new Response("notra-site=site1\n")
+        : new Response(null, {
+            status: 308,
+            headers: { location: "https://blog.acme.com/blog/" },
+          });
+    const result = await refreshSiteDomain(
+      { id: "site1", mounts: { blog: "/blog" } } as Site,
+      domain.id,
+      null
+    );
+    expect(result.domain.lastError).toBe(
+      "https://blog.acme.com/blog redirects to https://blog.acme.com/blog/; proxy it instead of redirecting."
+    );
+    expect(requests).toHaveLength(2);
+  });
+
   test("proxy verification discards the landing page body after reading headers", async () => {
     let cancelled = false;
     proxyDomain = { ...proxyDomain, hostname: "blog.acme.com" };

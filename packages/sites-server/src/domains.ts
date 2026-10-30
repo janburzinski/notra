@@ -286,6 +286,7 @@ async function fetchWithTimeout(url: string): Promise<Response> {
   return await fetchPublicUrl(url, {
     signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
     headers: { "User-Agent": PROBE_USER_AGENT },
+    redirect: "manual",
   });
 }
 

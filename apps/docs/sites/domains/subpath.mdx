@@ -46,10 +46,15 @@ Visitor ──► acme.com/blog/launch ──► your host ──► https://acm
   <Card title="Cloudflare" icon="cloudflare" href="/sites/domains/cloudflare">
     A Worker on your zone
   </Card>
+  <Card title="AWS CloudFront" icon="aws" href="/sites/domains/cloudfront">
+    Cache behaviors, plus Route 53
+  </Card>
   <Card title="nginx" icon="server" href="/sites/domains/nginx">
     `proxy_pass`, plus Caddy
   </Card>
 </Columns>
+
+Site builders like Webflow, Squarespace and Wix can't forward paths, so put [Cloudflare](/sites/domains/cloudflare) or [CloudFront](/sites/domains/cloudfront) in front of them.
 
 <Tip>
   Click the domain on the **Domains** page. **Manual setup** shows the exact code for your platform, already filled in with your address and section paths, and **Copy agent prompt** copies an instruction you can paste into Claude Code, Cursor or Codex to make the change for you.

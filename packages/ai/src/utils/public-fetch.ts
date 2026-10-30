@@ -86,15 +86,19 @@ export async function fetchPublicUrl(
   let request = new Request(input, init);
   const signal = createPublicFetchSignal(request.signal, options.timeoutMs);
   const maxRedirects = options.maxRedirects ?? 0;
+  const returnRedirects = request.redirect === "manual";
 
   for (let redirectCount = 0; ; redirectCount += 1) {
     const response = await fetchPublicRequest(
       request,
       signal,
-      maxRedirects > 0 ? "manual" : "error"
+      returnRedirects || maxRedirects > 0 ? "manual" : "error"
     );
     const location = response.headers.get("location");
-    if (!(REDIRECT_STATUSES.has(response.status) && location)) {
+    if (
+      returnRedirects ||
+      !(REDIRECT_STATUSES.has(response.status) && location)
+    ) {
       return response;
     }
     if (redirectCount >= maxRedirects) {
