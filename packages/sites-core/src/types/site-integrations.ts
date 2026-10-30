@@ -10,6 +10,7 @@ import type { z } from "zod";
 export type SiteIntegrations = z.infer<typeof siteIntegrationsSchema>;
 export type SiteIntegrationName = keyof typeof siteIntegrationSchemas;
 export type SiteC15t = NonNullable<SiteIntegrations["c15t"]>;
+export type SiteDatabuddy = NonNullable<SiteIntegrations["databuddy"]>;
 export type SiteIntegrationUpdate = z.infer<typeof siteIntegrationUpdateSchema>;
 type SiteSecurity = z.infer<typeof siteSecuritySchema>;
 
@@ -30,7 +31,7 @@ export interface SiteContentSecurityPolicyParams {
 
 type DatabuddyScriptOptions = Omit<
   DatabuddyConfig,
-  "debug" | "disabled" | "filter" | "sdk" | "sdkVersion"
+  "debug" | "disabled" | "filter" | "scriptIntegrity" | "sdk" | "sdkVersion"
 >;
 
 export type DatabuddySchemaShape = {

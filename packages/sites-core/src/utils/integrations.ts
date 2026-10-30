@@ -1,5 +1,6 @@
 import {
   DATABUDDY_API_URL,
+  DATABUDDY_REPLAY_SCRIPT_URL,
   DATABUDDY_SCRIPT_URL,
   GOOGLE_ANALYTICS_CONNECT_ORIGINS,
   GOOGLE_TAG_ORIGIN,
@@ -30,7 +31,7 @@ export function integrationHeadScripts(
   const scripts: SiteHeadScript[] = [];
   const { databuddy, ga4, plausible, posthog, umami } = integrations;
   if (databuddy) {
-    const { scriptUrl, ...options } = databuddy;
+    const { scriptUrl, replay, ...options } = databuddy;
     scripts.push({
       kind: "external",
       src: scriptUrl ?? DATABUDDY_SCRIPT_URL,
@@ -40,6 +41,24 @@ export function integrationHeadScripts(
         ...dataAttributes(options),
       },
     });
+    if (replay) {
+      const { scriptUrl: replayScriptUrl, ...replayOptions } =
+        replay === true ? {} : replay;
+      scripts.push({
+        kind: "external",
+        src: replayScriptUrl ?? DATABUDDY_REPLAY_SCRIPT_URL,
+        attributes: {
+          async: true,
+          crossorigin: "anonymous",
+          ...dataAttributes({
+            clientId: options.clientId,
+            apiUrl: options.apiUrl,
+            maskPatterns: options.maskPatterns,
+            ...replayOptions,
+          }),
+        },
+      });
+    }
   }
   if (ga4) {
     scripts.push(
@@ -105,6 +124,13 @@ export function integrationCspSources(
   if (databuddy) {
     scriptSrc.push(new URL(databuddy.scriptUrl ?? DATABUDDY_SCRIPT_URL).origin);
     connectSrc.push(new URL(databuddy.apiUrl ?? DATABUDDY_API_URL).origin);
+    if (databuddy.replay) {
+      const replayScriptUrl =
+        databuddy.replay === true ? undefined : databuddy.replay.scriptUrl;
+      scriptSrc.push(
+        new URL(replayScriptUrl ?? DATABUDDY_REPLAY_SCRIPT_URL).origin
+      );
+    }
   }
   if (ga4) {
     scriptSrc.push(GOOGLE_TAG_ORIGIN);

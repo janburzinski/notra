@@ -72,7 +72,7 @@ After you publish the change and the production deployment finishes, open your l
 
 ## Analytics and consent
 
-With the banner on, Databuddy, Google Analytics, Plausible, PostHog and Umami load through c15t's official integrations, only after a visitor allows the measurement category, and they stay off for visitors who reject it. Each provider also appears as its own vendor, so a visitor can allow measurement and still turn off one provider. Google Analytics receives Consent Mode v2 signals, so it knows about a separate choice for marketing too. PostHog never falls back to cookieless capture after a rejection, and Databuddy keeps all its tracking options and stays disabled whenever measurement is withdrawn. When a visitor withdraws consent later, the page reloads so that no analytics code keeps running.
+With the banner on, Databuddy, Google Analytics, Plausible, PostHog and Umami load through c15t's official integrations, only after a visitor allows the measurement category, and they stay off for visitors who reject it. Each provider also appears as its own vendor, so a visitor can allow measurement and still turn off one provider. Google Analytics receives Consent Mode v2 signals, so it knows about a separate choice for marketing too. PostHog never falls back to cookieless capture after a rejection, and Databuddy keeps all its tracking options and stays disabled whenever measurement is withdrawn, and its session replay recorder stops with it. When a visitor withdraws consent later, the page reloads so that no analytics code keeps running.
 
 Notra's own analytics follow the same choice:
 

@@ -1,6 +1,6 @@
 ---
 title: "Databuddy"
-description: "Send visits, web vitals, errors and custom events on your Notra site to Databuddy, with every tracker option available in blog.json."
+description: "Send visits, web vitals, errors, custom events and session replays on your Notra site to Databuddy, with every tracker option available in blog.json."
 authors:
   - handle: jan
 
@@ -71,10 +71,34 @@ The dashboard covers the Client ID and the four most common tracking switches. E
 | `enableRetries` | | Retries failed requests. Defaults to `true` |
 | `maxRetries` | | Retries per failed request, up to `10`. Defaults to `3` |
 | `initialRetryDelay` | | Milliseconds before the first retry. Defaults to `500` |
+| `replay` | | Records [session replays](#session-replay). Set it to `true` or to an object with `maskText`, `recordIframes` and `scriptUrl`. Defaults to `false` |
 | `scriptUrl` | | Full HTTPS tracker script URL for a self-hosted or proxied script. Defaults to `https://cdn.databuddy.cc/databuddy.js` |
 | `apiUrl` | | HTTPS ingestion URL for a self-hosted or proxied endpoint. Defaults to `https://basket.databuddy.cc` |
 
 Notra adds the origins of `scriptUrl` and `apiUrl` to the [Content-Security-Policy](/sites/custom-scripts#content-security-policy) automatically.
+
+## Session replay
+
+With `replay` on, Notra loads Databuddy's recorder next to the tracker on every live page. Turn session replay on for your website in Databuddy as well, or no recordings are stored. Page text is masked by default and typed input is always masked, so a recording shows the layout and visitor actions without what was on screen.
+
+```json blog.json
+{
+  "integrations": {
+    "databuddy": {
+      "clientId": "3ed1fce1-5a56-4cbc-a917-66864f6d18e3",
+      "replay": { "maskText": true }
+    }
+  }
+}
+```
+
+| Setting | Description |
+| --- | --- |
+| `replay.maskText` | Masks page text in recordings. Set it to `false` only when your pages show no personal data. Typed input stays masked either way. Defaults to `true` |
+| `replay.recordIframes` | Records your own embedded pages into the parent page's recording. Set it on the framed page too. Defaults to `false` |
+| `replay.scriptUrl` | Full HTTPS recorder script URL for a self-hosted or proxied script. Defaults to `https://cdn.databuddy.cc/replay.js` |
+
+The recorder sends to the same `apiUrl` as the tracker and uses your `maskPatterns`. Notra adds the recorder's origin to the Content-Security-Policy and allows the `blob:` worker it compresses recordings in. With the [c15t cookie banner](/sites/integrations/consent/c15t) on, the recorder starts only after a visitor allows measurement and stops as soon as they withdraw it.
 
 ## Custom events
 

@@ -30,6 +30,7 @@ function consentAnalytics({
     clientId: databuddy.clientId,
     scriptUrl: databuddy.scriptUrl,
     apiUrl: databuddy.apiUrl,
+    replay: databuddy.replay,
     options: Object.fromEntries(
       Object.entries(databuddy).filter(
         ([key]) => !DATABUDDY_CONNECTION_KEYS.has(key)

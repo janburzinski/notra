@@ -385,6 +385,25 @@ const databuddySchema = z.strictObject({
   initialRetryDelay: databuddyDelaySchema
     .optional()
     .describe("Milliseconds before the first retry (default: 500)."),
+  replay: z
+    .union([
+      z.boolean(),
+      z.strictObject({
+        maskText: optionalBooleanSchema.describe(
+          "Mask page text in recordings (default: true). Set false only on pages that show no personal data; typed input stays masked."
+        ),
+        recordIframes: optionalBooleanSchema.describe(
+          "Record your own embedded pages into the parent page's recording. Set it on the framed page too (default: false)."
+        ),
+        scriptUrl: httpsScriptUrlSchema.describe(
+          "Recorder script URL. Defaults to https://cdn.databuddy.cc/replay.js; set it for a self-hosted or proxied script."
+        ),
+      }),
+    ])
+    .optional()
+    .describe(
+      "Record session replays with Databuddy's recorder (default: false). Turn session replay on for the website in Databuddy too."
+    ),
 } satisfies DatabuddySchemaShape);
 
 export const siteIntegrationSchemas = {

@@ -100,9 +100,9 @@ export const MUTATIONS: Mutation[] = [
     id: "databuddy-client-id",
     bug: "The site renders a wrong Databuddy client ID",
     file: "packages/sites-core/src/utils/integrations.ts",
-    find: "        ...dataAttributes(options),\n      },\n    });\n  }\n  if (ga4) {",
+    find: "        ...dataAttributes(options),\n      },\n    });\n    if (replay) {",
     replace:
-      "        ...dataAttributes({ ...options, clientId: options.clientId.slice(1) }),\n      },\n    });\n  }\n  if (ga4) {",
+      "        ...dataAttributes({ ...options, clientId: options.clientId.slice(1) }),\n      },\n    });\n    if (replay) {",
     suites: ["lifecycle", "browser"],
     caughtBy: "held build and promote / every live page",
   },

@@ -5,6 +5,9 @@ export function dataAttributes(
 ): Record<string, string> {
   const attributes: Record<string, string> = {};
   for (const [key, value] of Object.entries(options)) {
+    if (value === undefined) {
+      continue;
+    }
     const name = key.replace(
       CAMEL_CASE_BOUNDARY,
       (letter) => `-${letter.toLowerCase()}`

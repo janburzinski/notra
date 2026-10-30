@@ -31,8 +31,9 @@ export function buildSiteContentSecurityPolicy(
   return [
     `script-src ${scriptSrc.join(" ")}`,
     `connect-src ${connectSrc.join(" ")}`,
-    ...(params.integrations.posthog &&
-    params.integrations.posthog.sessionRecording !== false
+    ...((params.integrations.posthog &&
+      params.integrations.posthog.sessionRecording !== false) ||
+    params.integrations.databuddy?.replay
       ? [
           `worker-src 'self' blob: data: ${sortedUnique(scriptOrigins).join(" ")}`,
         ]

@@ -16,6 +16,7 @@ export default {
               clientId: analytics.databuddy.clientId,
               scriptUrl: analytics.databuddy.scriptUrl,
               apiUrl: analytics.databuddy.apiUrl,
+              replay: analytics.databuddy.replay,
               configWhenGranted: {
                 ...analytics.databuddy.options,
                 disabled: false,

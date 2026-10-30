@@ -3,6 +3,7 @@ linkWorkspacePackages = false
 minimumReleaseAge = 604800
 minimumReleaseAgeExcludes = [
   "@usenotra/geo",
+  "@databuddy/sdk",
   "effect",
   "c15t",
   "@c15t/astro",

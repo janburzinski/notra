@@ -10,6 +10,7 @@ export const GOOGLE_ANALYTICS_CONNECT_ORIGINS = [
 export const GA4_MEASUREMENT_ID = /^G-[A-Z0-9]{4,16}$/;
 
 export const DATABUDDY_SCRIPT_URL = "https://cdn.databuddy.cc/databuddy.js";
+export const DATABUDDY_REPLAY_SCRIPT_URL = "https://cdn.databuddy.cc/replay.js";
 export const DATABUDDY_API_URL = "https://basket.databuddy.cc";
 export const DATABUDDY_CLIENT_ID = /^[A-Za-z0-9_-]{8,64}$/;
 export const DATABUDDY_CLIENT_ID_MESSAGE =

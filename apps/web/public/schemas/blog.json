@@ -1411,6 +1411,33 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 60000
+            },
+            "replay": {
+              "description": "Record session replays with Databuddy's recorder (default: false). Turn session replay on for the website in Databuddy too.",
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "maskText": {
+                      "description": "Mask page text in recordings (default: true). Set false only on pages that show no personal data; typed input stays masked.",
+                      "type": "boolean"
+                    },
+                    "recordIframes": {
+                      "description": "Record your own embedded pages into the parent page's recording. Set it on the framed page too (default: false).",
+                      "type": "boolean"
+                    },
+                    "scriptUrl": {
+                      "description": "Recorder script URL. Defaults to https://cdn.databuddy.cc/replay.js; set it for a self-hosted or proxied script.",
+                      "type": "string",
+                      "pattern": "^https:\\/\\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(?::(?:\\d{1,4}|[0-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))?(?:\\/(?!\\.{1,2}(?:\\/|$))[A-Za-z0-9._~-]+)+$"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
             }
           },
           "required": ["clientId"],

@@ -3,6 +3,7 @@ import type { SiteMounts } from "@notra/sites-core/types/deployment";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type {
   SiteC15t,
+  SiteDatabuddy,
   SiteHeadScript,
 } from "@notra/sites-core/types/site-integrations";
 
@@ -11,6 +12,7 @@ export interface SiteConsentAnalytics {
     clientId: string;
     scriptUrl?: string;
     apiUrl?: string;
+    replay?: SiteDatabuddy["replay"];
     options: Record<string, unknown>;
   };
   gtag?: { id: string };

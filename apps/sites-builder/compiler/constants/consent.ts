@@ -32,4 +32,5 @@ export const DATABUDDY_CONNECTION_KEYS = new Set([
   "clientId",
   "scriptUrl",
   "apiUrl",
+  "replay",
 ]);
