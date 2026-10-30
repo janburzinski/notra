@@ -209,19 +209,3 @@ export interface GeoDrainSummary {
   ingested: number;
   duplicates: number;
 }
-
-export interface GeoIngestLegacySecretOutcome {
-  outcome:
-    | "emailed"
-    | "already_emailed"
-    | "revoked"
-    | "no_recipients"
-    | "brew_not_configured"
-    | "failed";
-  recipients?: number;
-  failed?: number;
-  errorMessage?: string;
-  status?: number;
-  activeGeneration?: number | null;
-  generation?: number;
-}

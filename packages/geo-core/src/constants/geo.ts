@@ -617,8 +617,6 @@ export const GEO_INGEST_FRAMEWORK_OPTIONS = [
   file: string;
 }[];
 export const GEO_INGEST_SECRET_ENV = "GEO_INGEST_SECRET";
-export const GEO_INGEST_SECRET_FALLBACK_ENV = "BEACON_INGEST_SECRET";
-export const GEO_INGEST_SECRET_PREVIOUS_ENV = "GEO_INGEST_SECRET_PREVIOUS";
 export const GEO_INGEST_TOKEN_SEPARATOR = ".";
 export const GEO_INGEST_SITE_TOKEN_PREFIX = "nst.";
 export const GEO_INGEST_SITE_TOKEN_SIGNING_DOMAIN = "notra-sites-traffic:";

@@ -115,7 +115,6 @@ const EMAIL_SENDERS: Record<BrewEmailCategory, SenderRole> = {
   "schedule-content-failed": "notifications",
   "schedule-content-skipped": "notifications",
   "daily-summary": "notifications",
-  "geo-token-rotation": "notifications",
 };
 
 const NAME_PREFIX = "Notra · ";

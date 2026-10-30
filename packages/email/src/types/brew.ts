@@ -13,8 +13,7 @@ export type BrewEmailCategory =
   | "schedule-content-created"
   | "schedule-content-failed"
   | "schedule-content-skipped"
-  | "daily-summary"
-  | "geo-token-rotation";
+  | "daily-summary";
 
 export interface SendBrewEmailOptions {
   category: BrewEmailCategory;

@@ -94,9 +94,6 @@ mock.module("../src/ingest/analytics", () => ({
 mock.module("../src/ingest/journey", () => ({
   resolveJourneyId,
 }));
-mock.module("../src/ingest/legacy-secret", () => ({
-  notifyGeoIngestLegacySecret: async () => undefined,
-}));
 mock.module("../src/ingest/ratelimit", () => ({
   geoIngestRatelimit: { limit: ratelimitLimit },
   webIngestRatelimit: { limit: webRatelimitLimit },
