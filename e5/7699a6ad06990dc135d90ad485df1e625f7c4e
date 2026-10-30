@@ -1,0 +1,19 @@
+apps/dashboard/src/constants/traffic-embed.ts
+  s_e97a5ffa0def08::t_71e794788474af 25-31,36,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e57699a6ad06990dc135d90ad485df1e625f7c4e",
+  "prompts": {},
+  "sessions": {
+    "s_e97a5ffa0def08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32a270ce-f745-4769-a1ff-3851c17b56b7",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
