@@ -96,10 +96,9 @@ export function GitHubPublishDialogFooter(
       ) : null}
       {canSubmit ? (
         <Button
-          disabled={
-            isPublishing || !hasSelectedRepository || !selectedPublishingEnabled
-          }
+          disabled={!hasSelectedRepository || !selectedPublishingEnabled}
           data-dialog-confirm
+          loading={isPublishing}
           onClick={onPublish}
           type="button"
         >
