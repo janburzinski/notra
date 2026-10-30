@@ -116,8 +116,8 @@ export function HeroSection() {
         </div>
 
         <div className="relative flex h-full w-full flex-col items-center">
-          <div className="flex flex-col items-center gap-8 px-6 pt-24 pb-2 sm:gap-10 sm:pt-28 lg:pt-[7.5rem]">
-            <div className="flex flex-col items-center gap-7">
+          <div className="flex w-full min-w-0 flex-col items-center gap-8 px-6 pt-24 pb-2 sm:gap-10 sm:pt-28 lg:pt-[7.5rem]">
+            <div className="flex w-full min-w-0 flex-col items-center gap-7">
               <HeroHeadline
                 lineOne={copy.headlineLineOne}
                 lineTwo={copy}
