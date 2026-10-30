@@ -1,0 +1,24 @@
+apps/dashboard/src/utils/providers.tsx
+  s_8e3f5cf6d3dd2a::t_9a2090be877756 113
+  s_8e3f5cf6d3dd2a::t_a45e1dd2faf313 7
+apps/dashboard/src/components/providers/onboarding-runtime-providers.tsx
+  s_8e3f5cf6d3dd2a::t_9a2090be877756 3-4,17
+apps/dashboard/src/components/providers/dashboard-runtime-providers.tsx
+  s_8e3f5cf6d3dd2a::t_9a2090be877756 3,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7749a822d247971ef99d4599a535a20c0fb8767d",
+  "prompts": {},
+  "sessions": {
+    "s_8e3f5cf6d3dd2a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "79bf8e30-2c0d-4f6d-be78-58c2664d0707",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
