@@ -1,0 +1,21 @@
+packages/workflows/tests/composition.test.ts
+  s_985d322a22a6f8::t_e5687198a67e87 383-385
+packages/workflows/src/runtime/bundle.ts
+  s_985d322a22a6f8::t_e5687198a67e87 103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5e2c1457424faacee7a317eeb39c48ce83d48c4b",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
