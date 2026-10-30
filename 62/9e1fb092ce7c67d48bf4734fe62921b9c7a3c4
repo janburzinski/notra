@@ -1,0 +1,26 @@
+packages/workflows/tests/interpreter.test.ts
+  s_985d322a22a6f8::t_72037c645bdbf1 1,327,336-375
+packages/workflows/src/runtime/interpreter.ts
+  s_985d322a22a6f8::t_28fad8df6f39cb 30-31,75-76,106,123-130,151,174-179,184,201-203,206-212
+  s_985d322a22a6f8::t_94ae5161c6ca57 34-38,77
+apps/dashboard/src/lib/workflow-engine/store.ts
+  s_985d322a22a6f8::t_28fad8df6f39cb 199-200
+packages/workflows/src/runtime/scheduler.ts
+  s_985d322a22a6f8::t_94ae5161c6ca57 11,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "629e1fb092ce7c67d48bf4734fe62921b9c7a3c4",
+  "prompts": {},
+  "sessions": {
+    "s_985d322a22a6f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efce3ecd-755b-429d-9b5c-035b1f703d5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
