@@ -25,10 +25,8 @@ export function getFlagsManager(): ServerFlagsManager | null {
   if (!cachedManager) {
     cachedManager = createServerFlagsManager({
       clientId,
-      autoFetch: false,
       cacheTtl: GEO_FLAG_CACHE_TTL_MS,
       staleTime: GEO_FLAG_STALE_TIME_MS,
-      skipStorage: true,
     });
   }
 

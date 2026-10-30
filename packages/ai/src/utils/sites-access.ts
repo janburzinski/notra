@@ -31,10 +31,8 @@ export function isSitesEnabledForOrganization(
           cachedManager ??
           createServerFlagsManager({
             clientId,
-            autoFetch: false,
             cacheTtl: SITES_FLAG_CACHE_TTL_MS,
             staleTime: SITES_FLAG_STALE_TIME_MS,
-            skipStorage: true,
           }),
         catch: () => new SitesAccessError(),
       });
