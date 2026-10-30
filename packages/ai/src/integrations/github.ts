@@ -55,6 +55,7 @@ import type {
 } from "../types/integrations";
 import type { GitHubToolRepositoryContext } from "../types/tools";
 import { githubAppInstallationCanPublishContent } from "../utils/github-app-publish-access";
+import { resolveGitHubSocialToken } from "../utils/github-social-token";
 import {
   createOctokit,
   GITHUB_INTERACTIVE_READ_TIMEOUT_MS,
@@ -423,16 +424,28 @@ async function assertGitHubInstallationAdmin(params: {
     ),
     columns: {
       providerAccountId: true,
+      encryptedAccessToken: true,
       accessToken: true,
       scope: true,
     },
   });
 
-  if (!githubAccount?.accessToken) {
+  if (!githubAccount) {
     throw new GitHubAccountRequiredError();
   }
 
-  const octokit = createOctokit(githubAccount.accessToken);
+  let accessToken: string | null;
+  try {
+    accessToken = resolveGitHubSocialToken(githubAccount);
+  } catch {
+    throw new GitHubReauthorizationRequiredError();
+  }
+
+  if (!accessToken) {
+    throw new GitHubAccountRequiredError();
+  }
+
+  const octokit = createOctokit(accessToken);
   const userResponse = await octokit
     .request("GET /user", {
       headers: GITHUB_API_VERSION_HEADERS,
@@ -509,11 +522,12 @@ export async function isGitHubAccountConnectionRequired(userId: string) {
       eq(socialConnections.provider, "github")
     ),
     columns: {
+      encryptedAccessToken: true,
       accessToken: true,
     },
   });
 
-  return !githubAccount?.accessToken;
+  return !(githubAccount?.encryptedAccessToken || githubAccount?.accessToken);
 }
 
 function toRepositoryRecord(integration: {

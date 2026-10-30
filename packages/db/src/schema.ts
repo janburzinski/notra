@@ -352,6 +352,7 @@ export const socialConnections = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     provider: text("provider").notNull(),
     providerAccountId: text("provider_account_id").notNull(),
+    encryptedAccessToken: text("encrypted_access_token"),
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     scope: text("scope"),

@@ -167,16 +167,20 @@ of the other tenant. No GitHub installation, deployment, domain, or cloud state
 is fabricated.
 
 For a real GitHub publisher run with local fixture authentication, bootstrap the
-pinned owner's GitHub connection from an already authenticated CLI:
+pinned owner's GitHub connection from an already authenticated CLI. The token
+is stored encrypted, so generate a synthetic test key first; the Dashboard
+launch command below passes the same key so it can read the token:
 
 ```sh
-bun --no-env-file scripts/testing/dashboard/bootstrap-github-cli.ts <github-user>/notra-sites-e2e-<nonce>
+export SITES_TEST_INTEGRATION_ENCRYPTION_KEY="$(openssl rand -base64 32)"
+INTEGRATION_ENCRYPTION_KEY="$SITES_TEST_INTEGRATION_ENCRYPTION_KEY" \
+  bun --no-env-file scripts/testing/dashboard/bootstrap-github-cli.ts <github-user>/notra-sites-e2e-<nonce>
 bun --no-env-file scripts/testing/dashboard/tests/github-bootstrap-guard.ts
 ```
 
 The bootstrap verifies the CLI identity and administration of the explicitly
-named private disposable repository, then stores its existing access token only
-in the isolated test database. Fixture cleanup removes that credential row.
+named private disposable repository, then stores its existing access token,
+encrypted with that synthetic key, only in the isolated test database. Fixture cleanup removes that credential row.
 This is an authenticated CLI credential fixture, not a WorkOS or GitHub OAuth
 login test. It does not create a GitHub App installation or grant repository
 consent. Continue through the Dashboard's normal GitHub install-state and
@@ -238,6 +242,7 @@ env -i PATH="$PATH" HOME="$HOME" NODE_ENV=development \
   NODE_OPTIONS=--max-old-space-size=6144 \
   DATABASE_URL="$SITES_TEST_DATABASE_URL" SITES_TEST_ENABLED=true \
   SITES_TEST_FIXTURE_FLAGS_ENABLED=true \
+  INTEGRATION_ENCRYPTION_KEY="$SITES_TEST_INTEGRATION_ENCRYPTION_KEY" \
   DEV_AUTH_ENABLED=true DEV_AUTH_EMAIL=sites-e2e-owner@example.test \
   APP_URL=http://127.0.0.1:33173 \
   NEXT_PUBLIC_APP_URL=http://127.0.0.1:33173 \

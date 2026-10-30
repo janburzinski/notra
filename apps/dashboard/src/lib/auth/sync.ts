@@ -1,3 +1,4 @@
+import { encryptToken } from "@notra/ai/crypto/token-encryption";
 import { db } from "@notra/db/drizzle";
 import { organizations, socialConnections, users } from "@notra/db/schema";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
@@ -122,10 +123,19 @@ const persistSocialConnection = Effect.fn("auth.sync.persistSocialConnection")(
       provider === "github"
         ? yield* fetchGitHubAccountId(tokens.accessToken)
         : "";
+    const encryptedAccessToken = yield* Effect.try({
+      try: () => encryptToken(tokens.accessToken),
+      catch: (cause) =>
+        new SocialConnectionError({
+          message: "Failed to encrypt social connection token",
+          cause,
+        }),
+    });
     const connection = {
       providerAccountId,
+      encryptedAccessToken,
       accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken ?? null,
+      refreshToken: null,
       scope: tokens.scopes?.join(" ") ?? null,
       accessTokenExpiresAt: tokens.expiresAt
         ? new Date(tokens.expiresAt * 1000)

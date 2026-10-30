@@ -1,0 +1,17 @@
+import type { socialConnections } from "@notra/db/schema";
+
+import { decryptToken } from "../crypto/token-encryption";
+
+export function resolveGitHubSocialToken(
+  connection: Pick<
+    typeof socialConnections.$inferSelect,
+    "accessToken" | "encryptedAccessToken"
+  >
+) {
+  if (connection.accessToken) {
+    return connection.accessToken;
+  }
+  return connection.encryptedAccessToken
+    ? decryptToken(connection.encryptedAccessToken)
+    : null;
+}

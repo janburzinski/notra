@@ -16,7 +16,13 @@ process.env.UPSTASH_REDIS_REST_TOKEN = "";
 const { createDb } = await import("../../../packages/db/src/drizzle");
 const { users, socialConnections } =
   await import("../../../packages/db/src/schema");
+const { decodeIntegrationEncryptionKey, encryptIntegrationSecret } =
+  await import("../../../packages/db/src/utils/integration-encryption");
 const { eq } = await import("drizzle-orm");
+// The Dashboard under test decrypts the token, so it needs its key.
+const encryptionKey = decodeIntegrationEncryptionKey(
+  process.env.INTEGRATION_ENCRYPTION_KEY
+);
 const db = createDb(databaseUrl, 1);
 let token = "";
 try {
@@ -77,6 +83,7 @@ try {
       "The disposable private repository must belong to the authenticated CLI user"
     );
   }
+  const encryptedAccessToken = encryptIntegrationSecret(token, encryptionKey);
   await db
     .insert(socialConnections)
     .values({
@@ -84,14 +91,16 @@ try {
       userId: fixture.userId,
       provider: "github",
       providerAccountId: String(user.id),
-      accessToken: token,
+      encryptedAccessToken,
       scope: userResponse.headers.get("x-oauth-scopes"),
     })
     .onConflictDoUpdate({
       target: [socialConnections.userId, socialConnections.provider],
       set: {
         providerAccountId: String(user.id),
-        accessToken: token,
+        encryptedAccessToken,
+        accessToken: null,
+        refreshToken: null,
         scope: userResponse.headers.get("x-oauth-scopes"),
       },
     });

@@ -14,7 +14,6 @@ export const GET = handleCallbackRoute({
           oauthTokens && typeof oauthTokens.accessToken === "string"
             ? {
                 accessToken: oauthTokens.accessToken,
-                refreshToken: oauthTokens.refreshToken,
                 expiresAt: oauthTokens.expiresAt,
                 scopes: oauthTokens.scopes,
               }
