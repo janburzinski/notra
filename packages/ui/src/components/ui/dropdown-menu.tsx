@@ -98,7 +98,7 @@ function DropdownMenuItem({
       aria-current={active || undefined}
       className={cn(
         DROPDOWN_ITEM_CLASS_NAME,
-        "group/dropdown-menu-item data-[active]:bg-foreground/[0.05] data-[active]:text-foreground data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/10 data-[variant=destructive]:data-highlighted:text-destructive data-[variant=destructive]:*:[svg]:text-destructive dark:data-[active]:bg-foreground/[0.07]",
+        "group/dropdown-menu-item data-[active]:bg-menu-highlight data-[active]:text-foreground data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/10 data-[variant=destructive]:data-highlighted:text-destructive data-[variant=destructive]:*:[svg]:text-destructive",
         className
       )}
       data-active={active || undefined}
@@ -126,7 +126,7 @@ function DropdownMenuSubTrigger({
     <MenuPrimitive.SubmenuTrigger
       className={cn(
         DROPDOWN_ITEM_CLASS_NAME,
-        "data-[inset]:pl-8 data-popup-open:bg-foreground/[0.05] dark:data-popup-open:bg-foreground/[0.07]",
+        "data-[inset]:pl-8 data-popup-open:bg-menu-highlight",
         className
       )}
       data-inset={inset || undefined}

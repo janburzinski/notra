@@ -41,6 +41,7 @@ export function CommandPaletteItem({
       className={cn(
         "group/item relative flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors outline-none select-none",
         "data-[selected=true]:bg-muted data-[selected=true]:text-foreground",
+        "dark:data-[selected=true]:bg-menu-highlight dark:data-[selected=true]:shadow-menu-highlight",
         "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
       )}
       disabled={disabled}
