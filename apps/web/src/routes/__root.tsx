@@ -27,6 +27,7 @@ import { AppLinkTracking } from "@/components/app-link-tracking";
 import { ThemeProvider } from "@/components/theme-provider";
 import { consentScripts } from "@/consent-scripts";
 import { DUB_CLEAR_ON_REVOCATION } from "@/constants/dub";
+import interCore from "@/fonts/subsets/inter-core.woff2?url";
 import { consentComponents, consentTheme } from "@/lib/consent-manager/theme";
 import { RSS_FEED_PATH, RSS_FEED_TITLE } from "@/utils/constants";
 import { buildNavbarSessionScript } from "@/utils/navbar-session";
@@ -50,6 +51,13 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: globalsCss },
+      {
+        rel: "preload",
+        href: interCore,
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
       { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
       {
         rel: "icon",

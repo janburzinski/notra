@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BrandAssetCard } from "@/components/brand-asset-card";
 import { BrandColorSwatch } from "@/components/brand-color-swatch";
 import { MarketingHeroWash } from "@/components/marketing-hero-wash";
+import instrumentCore from "@/fonts/subsets/instrument-core.woff2?url";
 import {
   BRAND_ASSETS,
   BRAND_COLORS,
@@ -53,7 +54,22 @@ const metadata: Metadata = {
 };
 
 export const Route = createFileRoute("/_site/brand")({
-  head: () => buildHead(metadata),
+  head: () => {
+    const head = buildHead(metadata);
+    return {
+      ...head,
+      links: [
+        ...(head.links ?? []),
+        {
+          rel: "preload",
+          href: instrumentCore,
+          as: "font",
+          type: "font/woff2",
+          crossOrigin: "anonymous",
+        },
+      ],
+    };
+  },
   component: BrandPage,
 });
 

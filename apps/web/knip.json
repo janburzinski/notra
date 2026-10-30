@@ -5,7 +5,12 @@
     "remotion.config.ts",
     "src/router.tsx",
     "src/start.ts",
+    "scripts/fonts/verify.mjs",
     "src/routes/**/*.{ts,tsx}"
+  ],
+  "ignoreDependencies": [
+    "@fontsource-variable/inter",
+    "@fontsource/instrument-serif"
   ],
   "ignoreIssues": {
     "source.config.ts": ["files", "exports"],
