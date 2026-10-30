@@ -159,6 +159,8 @@ export const AUTOPILOT_RULES_MAX = 50;
 export const AUTOPILOT_RULE_MAX_CHARS = 300;
 export const AUTOPILOT_FEEDBACK_TITLE_MAX_CHARS = 120;
 export const AUTOPILOT_RULE_TRAILING_PUNCTUATION = /[.\s]+$/;
+/** What a topic typed in the settings is saved under. */
+export const AUTOPILOT_RULE_PREFIX = "Never suggest posts about";
 /** The intro line of rules.md and feedback.md in code.storage. */
 export const AUTOPILOT_RULES_INTRO =
   "Standing rules for Autopilot. Every decision reads all of them and they always win. Only people change this file: an @notra reply on GitHub or the Autopilot settings.";

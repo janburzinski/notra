@@ -300,16 +300,30 @@ export function AutopilotSettingsPanel({
           </SettingsRow>
         </div>
       </div>
-      <AutopilotReleaseFiltersSection
-        filters={settings.commitFilters}
-        githubConnected={githubConnected}
-        organizationId={organizationId}
-        repositories={repositories}
-      />
-      <AutopilotRulesSection
-        organizationId={organizationId}
-        rules={overview.rules}
-      />
+      <section
+        aria-labelledby="autopilot-ignores"
+        className="flex flex-col gap-3"
+      >
+        <div className="flex flex-col gap-0.5 px-1">
+          <h3 className="text-sm font-medium" id="autopilot-ignores">
+            What Autopilot ignores
+          </h3>
+          <p className="text-muted-foreground text-xs text-pretty">
+            Autopilot never suggests posts for these. Asking @notra on a pull
+            request still works.
+          </p>
+        </div>
+        <AutopilotReleaseFiltersSection
+          filters={settings.commitFilters}
+          githubConnected={githubConnected}
+          organizationId={organizationId}
+          repositories={repositories}
+        />
+        <AutopilotRulesSection
+          organizationId={organizationId}
+          rules={overview.rules}
+        />
+      </section>
     </div>
   );
 }

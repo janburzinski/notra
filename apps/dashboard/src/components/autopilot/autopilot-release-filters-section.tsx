@@ -40,7 +40,7 @@ function parsePath(value: string) {
   return parsed.success ? parsed.data : null;
 }
 
-/** Which pull requests "Write about releases" reads; saves on every change. */
+/** Which authors and paths Autopilot ignores; saves on every change. */
 export function AutopilotReleaseFiltersSection({
   organizationId,
   filters: saved,
@@ -115,168 +115,151 @@ export function AutopilotReleaseFiltersSection({
   );
 
   return (
-    <section
-      aria-labelledby="autopilot-release-filters"
-      className="flex flex-col gap-3"
-    >
-      <div className="flex flex-col gap-0.5 px-1">
-        <h3 className="text-sm font-medium" id="autopilot-release-filters">
-          Write about releases
-        </h3>
-        <p className="text-muted-foreground text-xs">
-          Autopilot skips pull requests outside these filters. Asking @notra on
-          a pull request still works.
-        </p>
-      </div>
-      <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
-        <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
-          <div className="flex gap-3 px-4 py-3">
-            <HugeiconsIcon
-              aria-hidden="true"
-              className="text-muted-foreground mt-0.5 size-4 shrink-0"
-              icon={UserBlock01Icon}
-              strokeWidth={1.75}
-            />
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <div>
-                <label
-                  className="text-sm font-medium"
-                  htmlFor="autopilot-excluded-authors"
-                >
-                  Skip authors
-                </label>
-                <p className="text-muted-foreground text-xs text-pretty">
-                  GitHub users and bots whose pull requests never get a post.
-                </p>
-              </div>
-              <AutopilotTagInput
-                id="autopilot-excluded-authors"
-                label="Skip authors"
-                onChange={(excludedAuthors) =>
-                  update({ ...filters, excludedAuthors })
-                }
-                parse={parseLogin}
-                placeholder="GitHub login, e.g. octocat"
-                suggestions={authors.map((author) => author.login)}
-                values={filters.excludedAuthors}
-              />
-              {presets.length > 0 ? (
-                <ul
-                  aria-label="Suggested authors"
-                  className="flex flex-wrap items-center gap-1.5"
-                >
-                  {presets.map((login) => (
-                    <li key={login}>
-                      <Button
-                        aria-label={`Skip ${login}`}
-                        onClick={() =>
-                          update({
-                            ...filters,
-                            excludedAuthors: [
-                              ...filters.excludedAuthors,
-                              login,
-                            ],
-                          })
-                        }
-                        size="xs"
-                        variant="outline"
-                      >
-                        <HugeiconsIcon
-                          aria-hidden="true"
-                          icon={Add01Icon}
-                          strokeWidth={2}
-                        />
-                        <span className="font-mono">{login}</span>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          </div>
-          {rows.map((repository) => {
-            const name = displayName(repository);
-            const inputId = `autopilot-paths-${repository.replace(/[^a-z0-9]/g, "-")}`;
-            return (
-              <div className="flex gap-3 px-4 py-3" key={repository}>
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  className="text-muted-foreground mt-0.5 size-4 shrink-0"
-                  icon={FolderCodeIcon}
-                  strokeWidth={1.75}
-                />
-                <div className="flex min-w-0 flex-1 flex-col gap-2">
-                  <div className="flex items-start gap-3">
-                    <div className="min-w-0 flex-1">
-                      <label
-                        className="truncate text-sm font-medium"
-                        htmlFor={inputId}
-                      >
-                        {name}
-                      </label>
-                      <p className="text-muted-foreground text-xs text-pretty">
-                        Only changes under these paths count.
-                      </p>
-                    </div>
-                    <Button
-                      aria-label={`Remove the path filter for ${name}`}
-                      className="text-muted-foreground -mt-1 -mr-2"
-                      onClick={() => {
-                        if (repository === addedRepository) {
-                          setAddedRepository(null);
-                        }
-                        if (filters.paths[repository]) {
-                          setPaths(repository, []);
-                        }
-                      }}
-                      size="icon-sm"
-                      variant="ghost"
-                    >
-                      <HugeiconsIcon icon={Delete02Icon} size={14} />
-                    </Button>
-                  </div>
-                  <AutopilotTagInput
-                    id={inputId}
-                    label={`Paths in ${name}`}
-                    onChange={(paths) => setPaths(repository, paths)}
-                    parse={parsePath}
-                    separator={AUTOPILOT_PATH_SEPARATOR}
-                    placeholder="apps/web or docs/**"
-                    values={filters.paths[repository] ?? []}
-                  />
-                </div>
-              </div>
-            );
-          })}
-          <div className="flex min-h-14 items-center gap-3 px-4 py-2.5">
-            <HugeiconsIcon
-              aria-hidden="true"
-              className="text-muted-foreground size-4 shrink-0"
-              icon={FolderCodeIcon}
-              strokeWidth={1.75}
-            />
-            <div className="min-w-0 flex-1">
+    <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
+      <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
+        <div className="flex gap-3 px-4 py-3">
+          <HugeiconsIcon
+            aria-hidden="true"
+            className="text-muted-foreground mt-0.5 size-4 shrink-0"
+            icon={UserBlock01Icon}
+            strokeWidth={1.75}
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div>
               <label
                 className="text-sm font-medium"
-                htmlFor="autopilot-path-repository"
+                htmlFor="autopilot-excluded-authors"
               >
-                Limit a repository to paths
+                Skip authors
               </label>
+              <p className="text-muted-foreground text-xs text-pretty">
+                GitHub users and bots whose pull requests never get a post.
+              </p>
             </div>
-            <AutopilotRepositoryPicker
-              className="w-56"
-              id="autopilot-path-repository"
-              label="Repository to limit"
-              onChange={(repository) =>
-                setAddedRepository(repository.fullName.toLowerCase())
+            <AutopilotTagInput
+              id="autopilot-excluded-authors"
+              label="Skip authors"
+              onChange={(excludedAuthors) =>
+                update({ ...filters, excludedAuthors })
               }
-              placeholder="Choose a repository"
-              repositories={addable}
-              value={null}
+              parse={parseLogin}
+              placeholder="GitHub login, e.g. octocat"
+              suggestions={authors.map((author) => author.login)}
+              values={filters.excludedAuthors}
             />
+            {presets.length > 0 ? (
+              <ul
+                aria-label="Suggested authors"
+                className="flex flex-wrap items-center gap-1.5"
+              >
+                {presets.map((login) => (
+                  <li key={login}>
+                    <Button
+                      aria-label={`Skip ${login}`}
+                      onClick={() =>
+                        update({
+                          ...filters,
+                          excludedAuthors: [...filters.excludedAuthors, login],
+                        })
+                      }
+                      size="xs"
+                      variant="outline"
+                    >
+                      <HugeiconsIcon
+                        aria-hidden="true"
+                        icon={Add01Icon}
+                        strokeWidth={2}
+                      />
+                      <span className="font-mono">{login}</span>
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </div>
+        {rows.map((repository) => {
+          const name = displayName(repository);
+          const inputId = `autopilot-paths-${repository.replace(/[^a-z0-9]/g, "-")}`;
+          return (
+            <div className="flex gap-3 px-4 py-3" key={repository}>
+              <HugeiconsIcon
+                aria-hidden="true"
+                className="text-muted-foreground mt-0.5 size-4 shrink-0"
+                icon={FolderCodeIcon}
+                strokeWidth={1.75}
+              />
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <label
+                      className="truncate text-sm font-medium"
+                      htmlFor={inputId}
+                    >
+                      {name}
+                    </label>
+                    <p className="text-muted-foreground text-xs text-pretty">
+                      Only changes under these paths count.
+                    </p>
+                  </div>
+                  <Button
+                    aria-label={`Remove the path filter for ${name}`}
+                    className="text-muted-foreground -mt-1 -mr-2"
+                    onClick={() => {
+                      if (repository === addedRepository) {
+                        setAddedRepository(null);
+                      }
+                      if (filters.paths[repository]) {
+                        setPaths(repository, []);
+                      }
+                    }}
+                    size="icon-sm"
+                    variant="ghost"
+                  >
+                    <HugeiconsIcon icon={Delete02Icon} size={14} />
+                  </Button>
+                </div>
+                <AutopilotTagInput
+                  id={inputId}
+                  label={`Paths in ${name}`}
+                  onChange={(paths) => setPaths(repository, paths)}
+                  parse={parsePath}
+                  separator={AUTOPILOT_PATH_SEPARATOR}
+                  placeholder="apps/web or docs/**"
+                  values={filters.paths[repository] ?? []}
+                />
+              </div>
+            </div>
+          );
+        })}
+        <div className="flex min-h-14 items-center gap-3 px-4 py-2.5">
+          <HugeiconsIcon
+            aria-hidden="true"
+            className="text-muted-foreground size-4 shrink-0"
+            icon={FolderCodeIcon}
+            strokeWidth={1.75}
+          />
+          <div className="min-w-0 flex-1">
+            <label
+              className="text-sm font-medium"
+              htmlFor="autopilot-path-repository"
+            >
+              Limit a repository to paths
+            </label>
+          </div>
+          <AutopilotRepositoryPicker
+            className="w-56"
+            id="autopilot-path-repository"
+            label="Repository to limit"
+            onChange={(repository) =>
+              setAddedRepository(repository.fullName.toLowerCase())
+            }
+            placeholder="Choose a repository"
+            repositories={addable}
+            value={null}
+          />
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
