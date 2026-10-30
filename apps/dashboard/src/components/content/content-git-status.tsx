@@ -1,7 +1,15 @@
-import { Badge } from "@notra/ui/components/ui/badge";
+import {
+  GitPullRequestIcon,
+  LinkSquare02Icon,
+} from "@hugeicons/core-free-icons";
+import { StatusBadge } from "@notra/ui/components/status-badge";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "use-intl";
 
+import {
+  CONTENT_PULL_REQUEST_BADGES,
+  CONTENT_STATUS_BADGES,
+} from "@/constants/content-overview";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { ContentGitStatusProps } from "@/types/content/git-publishing";
 
@@ -19,38 +27,48 @@ export function ContentGitStatus({
     refetchInterval: 10_000,
   });
   const live = githubPublish.direct || data?.status === "merged";
+  const liveLabel = t("live", {
+    target:
+      data?.siteName ??
+      githubPublish.baseBranch ??
+      `${githubPublish.owner}/${githubPublish.repo}`,
+  });
   return (
-    <div className="flex flex-wrap items-center gap-2 text-xs">
+    <div className="flex flex-wrap items-center gap-1.5">
       {live ? (
-        <Badge variant="success">
-          {t("live", {
-            target:
-              data?.siteName ??
-              githubPublish.baseBranch ??
-              githubPublish.branchName,
-          })}
-        </Badge>
+        <span className="max-w-full overflow-hidden" title={liveLabel}>
+          <StatusBadge
+            appearance={CONTENT_STATUS_BADGES.published}
+            label={liveLabel}
+          />
+        </span>
       ) : null}
       {githubPublish.pullRequestUrl ? (
         <a
-          className="text-muted-foreground underline underline-offset-4"
           href={githubPublish.pullRequestUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {data?.status
-            ? header(`pullRequestState.${data.status}`)
-            : `#${githubPublish.pullRequestNumber}`}
+          <StatusBadge
+            appearance={
+              data?.status
+                ? CONTENT_PULL_REQUEST_BADGES[data.status]
+                : { variant: "secondary", icon: GitPullRequestIcon }
+            }
+            label={
+              data?.status
+                ? header(`pullRequestState.${data.status}`)
+                : `#${githubPublish.pullRequestNumber}`
+            }
+          />
         </a>
       ) : null}
       {data?.previewUrl ? (
-        <a
-          className="underline underline-offset-4"
-          href={data.previewUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {t("preview")}
+        <a href={data.previewUrl} target="_blank" rel="noopener noreferrer">
+          <StatusBadge
+            appearance={{ variant: "secondary", icon: LinkSquare02Icon }}
+            label={t("preview")}
+          />
         </a>
       ) : null}
     </div>

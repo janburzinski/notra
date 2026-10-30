@@ -90,6 +90,7 @@ export function ContentDetailDocumentActions(props: ContentDetailToolbarProps) {
         </Button>
       ) : null}
       <Button
+        className="w-full justify-start"
         variant="ghost"
         size="sm"
         disabled={blocked}

@@ -18,6 +18,8 @@ const badgeVariants = cva(
           "bg-success/10 text-badge-success focus-visible:ring-success/20 dark:bg-success/20 dark:focus-visible:ring-success/40 [a]:hover:bg-success/20",
         warning:
           "bg-warning/10 text-badge-warning focus-visible:ring-warning/20 dark:bg-warning/20 dark:focus-visible:ring-warning/40 [a]:hover:bg-warning/20",
+        merged:
+          "bg-merged/10 text-badge-merged focus-visible:ring-merged/20 dark:bg-merged/20 dark:focus-visible:ring-merged/40 [a]:hover:bg-merged/20",
         info: "bg-info/10 text-badge-info focus-visible:ring-info/20 dark:bg-info/20 dark:focus-visible:ring-info/40 [a]:hover:bg-info/20",
         outline:
           "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",

@@ -43,6 +43,16 @@ export const CONTENT_PULL_REQUEST_STATES = {
   closed: { icon: GitPullRequestClosedIcon, className: "text-destructive" },
 } as const;
 
+export const CONTENT_PULL_REQUEST_BADGES = {
+  open: { variant: "success", icon: GitPullRequestIcon },
+  draft: { variant: "secondary", icon: GitPullRequestDraftIcon },
+  merged: { variant: "merged", icon: GitMergeIcon },
+  closed: { variant: "destructive", icon: GitPullRequestClosedIcon },
+} as const satisfies Record<
+  keyof typeof CONTENT_PULL_REQUEST_STATES,
+  SiteStatusBadgeConfig
+>;
+
 export const CONTENT_PANEL_TABS = [
   { id: "overview" },
   { id: "agent" },
