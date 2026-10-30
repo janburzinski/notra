@@ -13,7 +13,7 @@ import type { BrewEmailCategory } from "../src/types/brew";
 
 export const EMAIL_SAMPLES: Record<BrewEmailCategory, [string, ReactElement]> =
   {
-    welcome: ["Welcome to Notra", WelcomeEmail()],
+    welcome: ["Welcome to Notra", WelcomeEmail({ slackInvited: true })],
     feedback: ["🙂 New feedback from Jane Doe", FeedbackEmail({} as never)],
     contact: [
       "New contact message from Jane Doe",

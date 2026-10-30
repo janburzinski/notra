@@ -99,3 +99,8 @@ export interface SendGeoAlertEmailProps extends GeoAlertEmailProps {
   /** Dedupes the send, e.g. automation and scan. */
   alertKey: string;
 }
+
+export interface SendWelcomeEmailProps {
+  userEmail: string;
+  slackInvited: boolean;
+}

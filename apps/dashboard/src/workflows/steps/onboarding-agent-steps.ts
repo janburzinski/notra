@@ -4,17 +4,8 @@ import "@/workflows/runtime";
 import {
   getOnboardingAgentState,
   releaseOnboardingAgentReservation,
-  sendOnboardingSlackInvite,
   startOnboardingAgentSession,
 } from "@/lib/onboarding-agent";
-
-export async function sendOnboardingSlackInviteStep(input: {
-  email: string;
-  organizationName: string;
-}): Promise<{ invited: boolean }> {
-  "use step";
-  return await sendOnboardingSlackInvite(input);
-}
 
 export async function startOnboardingAgentSessionStep(input: {
   domain: string;

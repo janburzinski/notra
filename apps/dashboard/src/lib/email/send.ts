@@ -23,6 +23,7 @@ import type {
   SendScheduledContentFailedEmailProps,
   SendScheduledContentSkippedEmailProps,
   SendScheduledPublicationFailedEmailProps,
+  SendWelcomeEmailProps,
   SendWorkflowPausedEmailProps,
 } from "@/types/email/send";
 
@@ -34,12 +35,15 @@ function getSchedulesLink(organizationSlug: string) {
   return `${getAppUrl()}/${organizationSlug}/automation`;
 }
 
-export async function sendWelcomeEmail({ userEmail }: { userEmail: string }) {
+export async function sendWelcomeEmail({
+  userEmail,
+  slackInvited,
+}: SendWelcomeEmailProps) {
   return sendBrewEmail({
     category: "welcome",
     to: userEmail,
     subject: "Welcome to Notra",
-    react: WelcomeEmail(),
+    react: WelcomeEmail({ slackInvited }),
     idempotencyKey: userEmail,
   });
 }

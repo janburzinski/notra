@@ -282,8 +282,18 @@ export const ensureLocalUser = Effect.fn("auth.sync.ensureLocalUser")(
     yield* linkWorkOSExternalId(workosUser.id, created.id);
     yield* Effect.sync(() => {
       runAfterResponse("[Signup] Welcome email failed", async () => {
-        const { sendWelcomeEmail } = await import("@/lib/email/send");
-        const { error } = await sendWelcomeEmail({ userEmail: created.email });
+        const [{ sendWelcomeEmail }, { sendOnboardingSlackInvite }] =
+          await Promise.all([
+            import("@/lib/email/send"),
+            import("@/lib/onboarding-agent"),
+          ]);
+        const { invited } = await sendOnboardingSlackInvite({
+          email: created.email,
+        });
+        const { error } = await sendWelcomeEmail({
+          userEmail: created.email,
+          slackInvited: invited,
+        });
         if (error) {
           throw new Error(`${error.name}: ${error.message}`);
         }

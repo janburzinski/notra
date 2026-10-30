@@ -184,10 +184,11 @@ export async function startOnboardingAgentSession({
 
 export async function sendOnboardingSlackInvite({
   email,
-  organizationName,
 }: OnboardingSlackInviteInput): Promise<OnboardingSlackInviteResult> {
   const normalizedEmail = email.trim().toLowerCase();
+  const domain = normalizedEmail.split("@").at(-1);
   if (
+    !domain ||
     !hasSlackConnectConfigured() ||
     isFreeEmail(normalizedEmail) ||
     isEduEmail(normalizedEmail)
@@ -196,17 +197,14 @@ export async function sendOnboardingSlackInvite({
   }
 
   try {
-    const channelName = buildExternalChannelName(organizationName);
     const result = await createSlackConnectChannelWithInvite({
-      channelName,
-      email,
+      channelName: buildExternalChannelName(domain),
+      email: normalizedEmail,
       externalLimited: false,
     });
     return { channelId: result.channelId, invited: true };
   } catch (error) {
-    logError("[Onboarding Agent] Slack Connect invite failed", error, {
-      organizationName,
-    });
+    logError("[Onboarding] Slack Connect invite failed", error, { domain });
     return { invited: false };
   }
 }

@@ -180,7 +180,6 @@ async function tryAcquireBrandAnalysisLock(organizationId: string) {
 
 async function runOnboardingAgentSetup({
   domain,
-  email,
   organizationId,
 }: OnboardingAgentSetupTaskInput) {
   const websiteUrl = await resolveReachableWebsiteUrl(domain);
@@ -216,12 +215,7 @@ async function runOnboardingAgentSetup({
 
   await Effect.runPromise(
     launchReservedOnboardingAgent({
-      payload: {
-        domain,
-        email,
-        organizationId,
-        organizationName: organization.name,
-      },
+      payload: { domain, organizationId },
       reservedAt,
     })
   );
@@ -401,7 +395,6 @@ async function triggerOnboardingAgentSetupImpl(
 
   const taskInput: OnboardingAgentSetupTaskInput = {
     domain: resolution.domain,
-    email: session.user.email,
     organizationId: input.organizationId,
   };
 
