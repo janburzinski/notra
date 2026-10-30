@@ -10,6 +10,7 @@ import { useSite } from "@/components/sites/site-context";
 import { SiteDeploymentMenu } from "@/components/sites/site-deployment-menu";
 import { SiteEnvironmentBadge } from "@/components/sites/site-environment-badge";
 import { SitePreviewDeleteDialog } from "@/components/sites/site-preview-delete-dialog";
+import { SitePromoteDialog } from "@/components/sites/site-promote-dialog";
 import { SiteRelativeTime } from "@/components/sites/site-relative-time";
 import { SiteRollbackDialog } from "@/components/sites/site-rollback-dialog";
 import { SiteStatusBadge } from "@/components/sites/site-status-badge";
@@ -19,10 +20,7 @@ import {
   SITE_TABLE_EMPTY_HEIGHT,
 } from "@/constants/sites";
 import { useNow } from "@/lib/hooks/use-now";
-import {
-  usePromoteDeployment,
-  useRedeployDeployment,
-} from "@/lib/hooks/use-site-deployments";
+import { useRedeployDeployment } from "@/lib/hooks/use-site-deployments";
 import { useSitePreviewLinks } from "@/lib/hooks/use-site-preview-links";
 import { useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
@@ -56,11 +54,12 @@ export function SiteDeploymentsTable({
   const t = useTranslations("sites.deploymentsPage");
   const tTriggers = useTranslations("sites.triggers");
   const tDeployments = useTranslations("sites.deployments");
+  const tDeployment = useTranslations("sites.deployment");
   const router = useRouter();
   const scope = { organizationId, siteId };
   const { detail } = useSite();
   const redeploy = useRedeployDeployment(scope);
-  const promote = usePromoteDeployment(scope);
+  const [promoteOpen, setPromoteOpen] = useState(false);
   const { openPreview, copyShareLink } = useSitePreviewLinks(scope);
   const [deleteTarget, setDeleteTarget] = useState<SitePreviewRow | null>(null);
   const now = useNow(hasDeploymentInProgress(deployments));
@@ -103,7 +102,8 @@ export function SiteDeploymentsTable({
               )}
               title={title ?? undefined}
             >
-              {title ?? tDeployments("noCommitMessage")}
+              {title ??
+                tDeployment("title", { sha: shortSha(deployment.commitSha) })}
             </span>
             <span className="text-muted-foreground flex min-w-0 items-center gap-1.5 text-xs">
               <span className="shrink-0 font-mono">
@@ -235,8 +235,7 @@ export function SiteDeploymentsTable({
               detailHref={href(deployment)}
               onRedeploy={() => redeploy.mutate(deployment.id)}
               onRollback={() => setRollbackTarget(deployment)}
-              onPromote={() => promote.mutate()}
-              promotePending={promote.isPending}
+              onPromote={() => setPromoteOpen(true)}
               redeployPending={redeploy.isPending}
               preview={preview}
               onOpenPreview={preview ? () => openPreview(preview) : undefined}
@@ -305,6 +304,14 @@ export function SiteDeploymentsTable({
               setRollbackTarget(null);
             }
           }}
+          organizationId={organizationId}
+          siteId={siteId}
+        />
+      ) : null}
+      {withActions ? (
+        <SitePromoteDialog
+          onOpenChange={setPromoteOpen}
+          open={promoteOpen}
           organizationId={organizationId}
           siteId={siteId}
         />

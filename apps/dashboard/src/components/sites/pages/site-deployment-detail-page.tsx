@@ -24,13 +24,13 @@ import { SiteDeploymentTimeline } from "@/components/sites/site-deployment-timel
 import { SiteDeploymentSkeleton } from "@/components/sites/site-page-skeleton";
 import { SitePreviewDeleteDialog } from "@/components/sites/site-preview-delete-dialog";
 import { SitePreviewRowMenu } from "@/components/sites/site-preview-row-menu";
+import { SitePromoteDialog } from "@/components/sites/site-promote-dialog";
 import { SiteRelativeTime } from "@/components/sites/site-relative-time";
 import { SiteRollbackDialog } from "@/components/sites/site-rollback-dialog";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
 import { SITE_DEPLOYMENT_LOG_SURFACE_CLASS } from "@/constants/sites";
 import {
   useRedeployDeployment,
-  usePromoteDeployment,
   useSiteDeployment,
 } from "@/lib/hooks/use-site-deployments";
 import { useSitePreviewLinks } from "@/lib/hooks/use-site-preview-links";
@@ -222,7 +222,7 @@ function DeploymentActions({
   const t = useTranslations("sites.deployments.actions");
   const tPage = useTranslations("sites.deploymentPage");
   const redeploy = useRedeployDeployment({ organizationId, siteId });
-  const promote = usePromoteDeployment({ organizationId, siteId });
+  const [promoteOpen, setPromoteOpen] = useState(false);
   const { detail, organizationSlug } = useSite();
   const router = useRouter();
   const { openPreview, copyShareLink } = useSitePreviewLinks({
@@ -249,11 +249,7 @@ function DeploymentActions({
         </Button>
       ) : null}
       {deployment.canPromote || deployment.canUndoRollback ? (
-        <Button
-          loading={promote.isPending}
-          onClick={() => promote.mutate()}
-          variant="outline"
-        >
+        <Button onClick={() => setPromoteOpen(true)} variant="outline">
           {t(deployment.canUndoRollback ? "undoRollback" : "promote")}
         </Button>
       ) : null}
@@ -319,6 +315,12 @@ function DeploymentActions({
         }}
         organizationId={organizationId}
         preview={deleteTarget}
+        siteId={siteId}
+      />
+      <SitePromoteDialog
+        onOpenChange={setPromoteOpen}
+        open={promoteOpen}
+        organizationId={organizationId}
         siteId={siteId}
       />
     </div>

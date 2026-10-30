@@ -64,7 +64,12 @@ browser profile. The dependency installation occurs only in the current worktree
   simulation: exactly one traffic and one engagement event per page view,
   for that page's URL; 404s are reported with their status, while assets,
   redirects, 304s and HEAD requests are not. Same-origin subresources must
-  load (only the beacon aborted by the next navigation is allowed). The analytics integrations (Databuddy, GA4, Plausible, PostHog,
+  load (only the beacon aborted by the next navigation is allowed). The harness
+  waits for requested site subresources, including lazy images and deferred
+  island chunks, to finish and remain idle for 500 ms before navigating away.
+  This wait ignores analytics beacons and unrelated vendor traffic and is
+  outside the navigation and beacon measurements. The analytics
+  integrations (Databuddy, GA4, Plausible, PostHog,
   Umami) come from the provider registry in `emulators/browser/`; their
   stand-in scripts' requests are asserted against synthetic IDs, `data-*`
   options, current URLs and event payloads, and every script and endpoint

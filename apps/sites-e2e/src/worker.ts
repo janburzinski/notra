@@ -52,6 +52,7 @@ import { assertConsentVisits } from "./utils/consent";
 import { assertContentFeatures } from "./utils/content";
 import { cspAllowsOrigin } from "./utils/csp";
 import { countByUrl, isEngagement } from "./utils/ingest";
+import { createSiteResourceWaiter } from "./utils/resources";
 import { freePort, startSitesWorker } from "./utils/sites-worker";
 import { seedOtherTenant } from "./utils/tenants";
 
@@ -304,31 +305,8 @@ try {
       !(request.isNavigationRequest() && request.frame() === page.mainFrame())
     );
   };
-  // Lazy images (post covers) and island chunks can still be loading after
-  // `load`; leaving the page then aborts them, which would read as a broken
-  // subresource. Analytics beacons are expected to outlive the page.
-  const pendingSubresources = new Set<PlaywrightRequest>();
-  page.on("request", (request) => {
-    if (
-      isSiteSubresource(request) &&
-      !new URL(request.url()).pathname.endsWith(`/${SITE_ANALYTICS_EVENT_FILE}`)
-    ) {
-      pendingSubresources.add(request);
-    }
-  });
-  page.on("requestfinished", (request) => pendingSubresources.delete(request));
-  const waitForSubresources = async (pageUrl: string) => {
-    const deadline = performance.now() + 10_000;
-    while (pendingSubresources.size > 0) {
-      assert.ok(
-        performance.now() < deadline,
-        `subresources still loading on ${pageUrl}: ${[...pendingSubresources].map((request) => request.url()).join(", ")}`
-      );
-      await page.waitForTimeout(25);
-    }
-  };
+  const waitForResources = createSiteResourceWaiter(page, isSiteSubresource);
   page.on("requestfailed", (request) => {
-    pendingSubresources.delete(request);
     if (!isSiteSubresource(request)) {
       console.error("Browser request failed", request.url(), request.failure());
       return;
@@ -387,7 +365,7 @@ try {
       const fromScript = network.scripts.length;
       const started = performance.now();
       const response = await page.goto(`${origin}${path}`, {
-        waitUntil: "load",
+        waitUntil: "domcontentloaded",
       });
       await waitForProviders(fromEvent, `${origin}${path}`);
       assert.equal(response?.status(), 200);
@@ -467,7 +445,7 @@ try {
         durationMs: performance.now() - beaconStarted,
       });
       // Idle/visible islands and lazy images can start during the beacon wait.
-      await waitForSubresources(`${origin}${path}`);
+      await waitForResources();
       checks.push(
         `live ${path} repetition ${repetition}: render, CSP, ${ANALYTICS_PROVIDERS.length} ${providerLabel} provider payloads, actual Notra beacon after synthetic pagehide`
       );
@@ -670,7 +648,7 @@ try {
   for (const check of await assertContentFeatures(
     page,
     origin,
-    waitForSubresources
+    waitForResources
   )) {
     checks.push(`content: ${check}`);
   }
@@ -793,7 +771,7 @@ try {
   );
   assert.ok(cookie?.httpOnly);
   assert.equal(cookie.sameSite, "Lax");
-  await waitForSubresources(page.url());
+  await waitForResources();
   for (const path of [
     "/blog",
     "/changelog",

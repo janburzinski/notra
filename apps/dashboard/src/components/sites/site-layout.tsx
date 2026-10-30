@@ -18,7 +18,6 @@ import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useSiteDetail, useSitesOrganizationId } from "@/lib/hooks/use-sites";
-import { useParams } from "@/lib/navigation";
 import type {
   SiteLayoutProps,
   SiteLoadErrorProps,
@@ -28,11 +27,8 @@ import { siteHref } from "@/utils/site-links";
 import { SiteChangesBanner } from "./site-changes-banner";
 import { SiteContext } from "./site-context";
 import { SiteHeader } from "./site-header";
-import {
-  SiteDeploymentSkeleton,
-  SiteSectionSkeleton,
-} from "./site-page-skeleton";
 import { SitePublishConfetti } from "./site-publish-confetti";
+import { SitePageSkeleton } from "./site-route-skeleton";
 import { SiteMobileNav, SiteSidebar } from "./site-sidebar";
 import { SiteWorkspace } from "./site-workspace";
 import { SitesPageShell } from "./sites-page-shell";
@@ -56,7 +52,6 @@ export function SiteLayout({
     hydrated &&
     Boolean(detailQuery.data) &&
     (projectParam === null || projectParam === owningProjectId);
-  const { deploymentId } = useParams<{ deploymentId?: string }>();
 
   useEffect(() => {
     if (owningProjectId && projectParam !== owningProjectId) {
@@ -83,15 +78,7 @@ export function SiteLayout({
     <>
       <SkeletonCrossfade
         loading={!ready || !detail}
-        skeleton={
-          <SitesPageShell>
-            {deploymentId ? (
-              <SiteDeploymentSkeleton />
-            ) : (
-              <SiteSectionSkeleton />
-            )}
-          </SitesPageShell>
-        }
+        skeleton={<SitePageSkeleton />}
       >
         {ready && detail ? (
           <SiteContext

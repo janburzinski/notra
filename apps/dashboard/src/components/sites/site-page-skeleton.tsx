@@ -4,7 +4,6 @@ import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { TABLE_FRAME_CLASS } from "ui/table/constants";
 
 import { SiteSettingsList } from "@/components/sites/site-settings-item";
-import { SitesPageShell } from "@/components/sites/sites-page-shell";
 import {
   SITE_DEPLOYMENT_LOG_SURFACE_CLASS,
   SITE_DEPLOYMENT_SUMMARY_SURFACE_CLASS,
@@ -93,13 +92,5 @@ export function SiteDeploymentSkeleton() {
         </div>
       </div>
     </div>
-  );
-}
-
-export function SitePageSkeleton() {
-  return (
-    <SitesPageShell>
-      <SiteSectionSkeleton />
-    </SitesPageShell>
   );
 }

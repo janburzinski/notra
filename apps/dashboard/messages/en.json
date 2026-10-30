@@ -8042,7 +8042,6 @@
       "empty": "No deployments yet",
       "current": "Currently live",
       "live": "Live",
-      "noCommitMessage": "No commit message",
       "redeployQueued": "Redeploy queued",
       "redeployFailed": "Couldn't redeploy",
       "columns": {
@@ -8067,6 +8066,9 @@
       "pausedDescription": "New builds continue, but aren't live. Undo rollback to publish the latest successful build and resume automatic publishing.",
       "promoted": "Latest successful deployment is live. Automatic publishing resumed.",
       "promoteFailed": "Couldn't promote the latest successful deployment",
+      "promoteTitle": "Publish the latest successful build?",
+      "promoteDescription": "It goes live immediately and automatic publishing resumes.",
+      "promoteConfirm": "Publish latest build",
       "noCommitMessage": "No commit message",
       "confirm": "Roll back",
       "done": "Rolled back. Automatic publishing paused.",

@@ -10,6 +10,7 @@ export function SiteCreateDeployHeading({
   headline,
   tone,
 }: SiteCreateDeployHeadingProps) {
+  const announced = tone !== "pending";
   return (
     <span
       className={cn(
@@ -28,13 +29,14 @@ export function SiteCreateDeployHeading({
         icon={SITE_CREATE_DEPLOY_TONE_ICONS[tone]}
         strokeWidth={1.75}
       />
-      {tone === "error" ? (
-        <span className="text-foreground">{headline}</span>
-      ) : (
-        headline
-      )}
+      <span
+        aria-hidden={announced || undefined}
+        className={cn(tone === "error" && "text-foreground")}
+      >
+        {headline}
+      </span>
       <span aria-live="polite" className="sr-only">
-        {tone === "pending" ? "" : headline}
+        {announced ? headline : ""}
       </span>
     </span>
   );

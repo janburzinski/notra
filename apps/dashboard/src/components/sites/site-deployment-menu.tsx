@@ -39,7 +39,6 @@ export function SiteDeploymentMenu({
   redeployPending,
   onRedeploy,
   onRollback,
-  promotePending,
   onPromote,
   preview,
   onOpenPreview,
@@ -124,7 +123,6 @@ export function SiteDeploymentMenu({
           canUndoRollback={canUndoRollback}
           onRollback={onRollback}
           onPromote={onPromote}
-          promotePending={promotePending}
         />
         {preview?.served && onDeletePreview ? (
           <>
@@ -146,7 +144,6 @@ function ProductionActions({
   canUndoRollback,
   onRollback,
   onPromote,
-  promotePending,
 }: SiteDeploymentProductionActionsProps) {
   const t = useTranslations("sites.deployments.actions");
   return (
@@ -162,7 +159,7 @@ function ProductionActions({
         </DropdownMenuItem>
       ) : null}
       {canPromote || canUndoRollback ? (
-        <DropdownMenuItem disabled={promotePending} onClick={onPromote}>
+        <DropdownMenuItem onClick={onPromote}>
           <HugeiconsIcon
             icon={ArrowTurnBackwardIcon}
             size={14}

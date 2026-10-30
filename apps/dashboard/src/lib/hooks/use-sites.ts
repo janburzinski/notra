@@ -83,9 +83,15 @@ export function useLoadedSiteProjectId(
   const queryKey = dashboardOrpc.sites.get.queryKey({
     input: { organizationId, siteId },
   });
+  const { queryHash } = queryClient.defaultQueryOptions({ queryKey });
   const subscribe = useCallback(
-    (onChange: () => void) => queryClient.getQueryCache().subscribe(onChange),
-    [queryClient]
+    (onChange: () => void) =>
+      queryClient.getQueryCache().subscribe((event) => {
+        if (event.query.queryHash === queryHash) {
+          onChange();
+        }
+      }),
+    [queryClient, queryHash]
   );
   const read = () => {
     if (!siteId) {

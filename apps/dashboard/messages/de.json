@@ -8042,7 +8042,6 @@
       "empty": "Noch keine Deployments",
       "current": "Aktuell live",
       "live": "Live",
-      "noCommitMessage": "Keine Commit-Nachricht",
       "redeployQueued": "Redeploy eingereiht",
       "redeployFailed": "Redeploy fehlgeschlagen",
       "columns": {
@@ -8067,6 +8066,9 @@
       "pausedDescription": "Neue Builds laufen weiter, sind aber nicht live. Mache den Rollback rückgängig, um den neuesten erfolgreichen Build zu veröffentlichen und automatisches Veröffentlichen fortzusetzen.",
       "promoted": "Das neueste erfolgreiche Deployment ist live. Automatisches Veröffentlichen fortgesetzt.",
       "promoteFailed": "Das neueste erfolgreiche Deployment konnte nicht promotet werden",
+      "promoteTitle": "Neuesten erfolgreichen Build veröffentlichen?",
+      "promoteDescription": "Er geht sofort live und automatisches Veröffentlichen wird fortgesetzt.",
+      "promoteConfirm": "Neuesten Build veröffentlichen",
       "noCommitMessage": "Keine Commit-Nachricht",
       "confirm": "Zurückrollen",
       "done": "Rollback abgeschlossen. Automatisches Veröffentlichen pausiert.",

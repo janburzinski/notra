@@ -48,15 +48,13 @@ import { Button } from "@/components/button";
 import { useSite } from "@/components/sites/site-context";
 import { SiteDeploymentPreviewControls } from "@/components/sites/site-deployment-preview-controls";
 import { SiteDeploymentsTable } from "@/components/sites/site-deployments-table";
+import { SitePromoteDialog } from "@/components/sites/site-promote-dialog";
 import {
   SITE_DEPLOYMENTS_PAGE_SIZE,
   SITE_DEPLOYMENT_ENVIRONMENT_FILTERS,
   SITE_DEPLOYMENT_STATUS_FILTERS,
 } from "@/constants/sites";
-import {
-  useDeployLatest,
-  usePromoteDeployment,
-} from "@/lib/hooks/use-site-deployments";
+import { useDeployLatest } from "@/lib/hooks/use-site-deployments";
 import { useRouter, useSearchParams } from "@/lib/navigation";
 import type {
   SiteDeployment,
@@ -81,7 +79,7 @@ export function SiteDeploymentsPage() {
   const tActions = useTranslations("sites.deployments.actions");
   const scope = { organizationId, siteId };
   const deployLatest = useDeployLatest(scope);
-  const promote = usePromoteDeployment(scope);
+  const [promoteOpen, setPromoteOpen] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const environment = searchParams.get("environment");
@@ -215,8 +213,7 @@ export function SiteDeploymentsPage() {
           {detail.canUndoRollback ? (
             <Button
               className="ml-8.5 sm:ml-0"
-              loading={promote.isPending}
-              onClick={() => promote.mutate()}
+              onClick={() => setPromoteOpen(true)}
               size="sm"
               variant="outline"
             >
@@ -225,6 +222,12 @@ export function SiteDeploymentsPage() {
           ) : null}
         </div>
       ) : null}
+      <SitePromoteDialog
+        onOpenChange={setPromoteOpen}
+        open={promoteOpen}
+        organizationId={organizationId}
+        siteId={siteId}
+      />
 
       <SiteDeploymentPreviewControls />
 

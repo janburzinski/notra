@@ -13,10 +13,10 @@ import { NewSitePageSkeleton as NewSiteLoading } from "@/app/(dashboard)/[slug]/
 import { SitesPageSkeleton as SitesLoading } from "@/app/(dashboard)/[slug]/sites/skeleton";
 import { SitesLiveProvider } from "@/components/providers/sites-live-provider";
 import {
-  SitePageSkeleton as SiteLoading,
   SiteSectionSkeleton as SiteSectionLoading,
   SiteDeploymentSkeleton as SiteDeploymentLoading,
 } from "@/components/sites/site-page-skeleton";
+import { SitePageSkeleton as SiteLoading } from "@/components/sites/site-route-skeleton";
 import { SITE_SECTION_PAGES } from "@/constants/site-ui-pages";
 import { lazyPage } from "@/utils/lazy-page";
 import { siteHref, sitePreviewDeploymentsHref } from "@/utils/site-links";

@@ -20,12 +20,6 @@ import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Field, FieldError, FieldLabel } from "@notra/ui/components/ui/field";
 import { Input } from "@notra/ui/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@notra/ui/components/ui/input-group";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
@@ -36,6 +30,7 @@ import { Button, buttonVariants } from "@/components/button";
 import Link from "@/components/framework/link";
 import { useSite } from "@/components/sites/site-context";
 import { SiteImportList } from "@/components/sites/site-import-list";
+import { SiteNameField } from "@/components/sites/site-name-field";
 import { SitePreviewAccessRows } from "@/components/sites/site-preview-access-select";
 import { SiteSettingsDangerZone } from "@/components/sites/site-settings-danger-zone";
 import { SiteSettingsEditor } from "@/components/sites/site-settings-editor";
@@ -52,7 +47,6 @@ import {
   SiteVariablesCount,
   SiteVariablesSettings,
 } from "@/components/sites/site-variables-settings";
-import { SITE_NAME_MAX_LENGTH } from "@/constants/sites-form";
 import {
   useGitHubCallbackErrorToast,
   useResumeGitHubInstall,
@@ -430,56 +424,6 @@ function RootDirectoryField({
       />
       <SiteSettingsHint>{t("rootDirectoryFieldHint")}</SiteSettingsHint>
     </Field>
-  );
-}
-
-function SiteNameField() {
-  const tNew = useTranslations("sites.new");
-  const tCommon = useTranslations("common");
-  const { site } = useSite().detail;
-  const [draft, setDraft] = useState(site.name);
-  const save = useUpdateSiteSettings();
-  const next = draft.trim();
-  const dirty = next.length > 0 && next !== site.name;
-  return (
-    <form
-      className="w-full sm:w-64 sm:shrink-0"
-      action={() => {
-        if (dirty && !save.isPending) {
-          save.mutate({ name: next });
-        }
-      }}
-    >
-      <InputGroup>
-        <InputGroupInput
-          aria-label={tNew("name")}
-          readOnly={save.isPending}
-          maxLength={SITE_NAME_MAX_LENGTH}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              setDraft(site.name);
-            }
-          }}
-          value={draft}
-        />
-        {dirty || save.isPending ? (
-          <InputGroupAddon align="inline-end">
-            <InputGroupButton
-              loading={save.isPending}
-              onClick={() => {
-                if (!save.isPending) {
-                  save.mutate({ name: next });
-                }
-              }}
-              variant="secondary"
-            >
-              {tCommon("actions.save")}
-            </InputGroupButton>
-          </InputGroupAddon>
-        ) : null}
-      </InputGroup>
-    </form>
   );
 }
 

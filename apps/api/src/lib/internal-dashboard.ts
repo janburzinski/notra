@@ -4,7 +4,6 @@ import {
   InternalDashboardTimeoutError,
 } from "@notra/schemas/api/internal-dashboard";
 import { internalWorkflowErrorResponseSchema } from "@notra/schemas/api/internal-workflow";
-import { getVercelOidcToken } from "@vercel/oidc";
 import { Config, Context, Effect, Layer, Redacted } from "effect";
 
 import type {
@@ -114,8 +113,9 @@ export const internalDashboardLive = internalDashboardLayer({
     if (secret.trim()) {
       return secret.trim();
     }
-    return yield* Effect.tryPromise(() => getVercelOidcToken()).pipe(
-      Effect.orElseSucceed(() => null)
-    );
+    return yield* Effect.tryPromise(async () => {
+      const { getVercelOidcToken } = await import("@vercel/oidc");
+      return getVercelOidcToken();
+    }).pipe(Effect.orElseSucceed(() => null));
   }),
 });

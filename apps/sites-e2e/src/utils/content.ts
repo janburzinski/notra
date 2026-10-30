@@ -10,14 +10,14 @@ import { cspAllowsOrigin } from "./csp";
 export async function assertContentFeatures(
   page: Page,
   origin: string,
-  waitForSubresources: (pageUrl: string) => Promise<void>
+  waitForResources: () => Promise<void>
 ) {
   const checks: string[] = [];
   const components = await page.goto(`${origin}/blog/components`, {
-    waitUntil: "load",
+    waitUntil: "domcontentloaded",
   });
+  await waitForResources();
   assert.equal(components?.status(), 200);
-  await waitForSubresources(page.url());
 
   for (const [title, body] of [
     ["Info callout", "Info body text."],
@@ -122,8 +122,10 @@ export async function assertContentFeatures(
   );
   checks.push("global style.css and script.js apply under the CSP");
 
-  await page.goto(`${origin}/blog/hello-world`, { waitUntil: "load" });
-  await waitForSubresources(page.url());
+  await page.goto(`${origin}/blog/hello-world`, {
+    waitUntil: "domcontentloaded",
+  });
+  await waitForResources();
   const post = await page.locator("body").innerText();
   for (const text of [
     "Built with Acme Cloud",
@@ -144,21 +146,25 @@ export async function assertContentFeatures(
     ["/blog/tags/components", "Every built-in component"],
     ["/changelog/tags/feature", "Component updates"],
   ]) {
-    const response = await page.goto(`${origin}${path}`);
-    await waitForSubresources(page.url());
+    const response = await page.goto(`${origin}${path}`, {
+      waitUntil: "domcontentloaded",
+    });
+    await waitForResources();
     assert.equal(response?.status(), 200, path);
     assert.ok((await page.locator("body").innerText()).includes(text), path);
   }
-  await page.goto(`${origin}/changelog`, { waitUntil: "load" });
-  await waitForSubresources(page.url());
+  await page.goto(`${origin}/changelog`, { waitUntil: "domcontentloaded" });
+  await waitForResources();
   const update = page.locator("#october-2026");
   assert.ok(
     (await update.innerText()).includes("The update body for October.")
   );
   checks.push("tag pages for blog and changelog, changelog Update entry");
 
-  await page.goto(`${origin}/blog/2026/launch`);
-  await waitForSubresources(page.url());
+  await page.goto(`${origin}/blog/2026/launch`, {
+    waitUntil: "domcontentloaded",
+  });
+  await waitForResources();
   const ogImage = await page
     .locator('meta[property="og:image"]')
     .getAttribute("content");
@@ -167,7 +173,7 @@ export async function assertContentFeatures(
     `OG image on the site: ${ogImage}`
   );
   const image = await page.goto(ogImage);
-  await waitForSubresources(page.url());
+  await waitForResources();
   assert.equal(image?.status(), 200);
   assert.match(image?.headers()["content-type"] ?? "", /^image\//);
   checks.push("generated OG image is served");

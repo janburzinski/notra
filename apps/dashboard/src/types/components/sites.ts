@@ -344,7 +344,6 @@ export interface SiteDeploymentMenuProps {
   redeployPending: boolean;
   onRedeploy: () => void;
   onRollback: () => void;
-  promotePending: boolean;
   onPromote: () => void;
   preview?: SitePreviewRow;
   onOpenPreview?: () => void;
@@ -369,12 +368,7 @@ export interface SiteDeploymentsTableProps {
 
 export type SiteDeploymentProductionActionsProps = Pick<
   SiteDeploymentMenuProps,
-  | "canRollback"
-  | "canPromote"
-  | "canUndoRollback"
-  | "onRollback"
-  | "onPromote"
-  | "promotePending"
+  "canRollback" | "canPromote" | "canUndoRollback" | "onRollback" | "onPromote"
 >;
 
 export interface SiteDeploymentDetailPageProps {
@@ -445,6 +439,11 @@ export interface SiteDeploymentFailureProps extends SiteDeploymentRecordProps {
 
 export interface SiteRollbackDialogProps extends SiteScope {
   deployment: SiteDeployment | null;
+  onOpenChange: (open: boolean) => void;
+}
+
+export interface SitePromoteDialogProps extends SiteScope {
+  open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
