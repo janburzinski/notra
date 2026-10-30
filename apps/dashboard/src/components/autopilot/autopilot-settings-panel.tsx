@@ -134,7 +134,7 @@ export function AutopilotSettingsPanel({
     : null;
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
+    <div className="flex w-full flex-col gap-8">
       <div className="border-shell-border bg-shell rounded-2xl border p-0.5">
         <div className="divide-table-row-border shadow-table-card bg-table-card border-table-card-border divide-y overflow-hidden rounded-[14px] border">
           <SettingsRow
