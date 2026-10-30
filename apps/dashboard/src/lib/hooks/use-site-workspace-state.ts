@@ -18,6 +18,7 @@ import { serializeSiteConfig } from "@/utils/site-design";
 import {
   parseDesignSource,
   designIssues,
+  repairSiteConfig,
   validDesignSource,
 } from "@/utils/site-design-sections";
 import { siteDraftVersion } from "@/utils/site-draft-version";
@@ -58,7 +59,10 @@ export function useSiteWorkspaceState({
   const malformed = !validDesignSource(document.content);
   const config = buffer ?? parseDesignSource(document.content);
   const issues = designIssues(config);
-  const invalid = issues.length > 0 || variableError !== null;
+  const brokenSource =
+    buffer === null && variableError === null && issues.length > 0;
+  const invalid =
+    (issues.length > 0 && !brokenSource) || variableError !== null;
   const unsaved = saves.unsaved || invalid || uploading;
   /** Edits autosave will still push; Publish flushes them instead of waiting. */
   const saving =
@@ -209,6 +213,21 @@ export function useSiteWorkspaceState({
       update({ ...config, variables: result.variables });
     }
   };
+  const repair = () => {
+    const next = repairSiteConfig(config, detail.site.name);
+    if (!next) {
+      return;
+    }
+    setVariableRows(
+      Object.entries(next.variables ?? {}).map(([name, value]) => ({
+        id: name,
+        name,
+        value: String(value),
+      }))
+    );
+    setVariableError(null);
+    update(next);
+  };
   const resolveConflict = async (keep: boolean) => {
     if (readOnly || saves.state.status === "saving" || (keep && invalid)) {
       return;
@@ -340,6 +359,8 @@ export function useSiteWorkspaceState({
       comparisonContent ?? document.published ?? document.content
     ),
     issues,
+    brokenSource,
+    repair,
     update,
     saves,
     unsaved,

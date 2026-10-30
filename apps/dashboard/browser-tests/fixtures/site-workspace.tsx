@@ -39,6 +39,7 @@ const sourceContext = {
 let releaseRead = () => {};
 let releaseRebase = () => {};
 const cold = new URLSearchParams(location.search).has("cold");
+const broken = new URLSearchParams(location.search).has("broken");
 let readGate = cold
   ? new Promise<void>((resolve) => {
       releaseRead = resolve;
@@ -79,6 +80,16 @@ function record(scope: SiteScope) {
       name: scope.siteId,
       description: `${scope.siteId} description`,
       variables: { product_name: scope.siteId },
+      ...(broken
+        ? {
+            colors: { primary: "#8B5CF6FF" },
+            footer: { socials: { x: "twitter.com/acme" } },
+            redirects: [
+              { source: "/old", destination: "/new" },
+              { source: "missing-slash", destination: "/new" },
+            ],
+          }
+        : {}),
     });
     value = {
       document: {

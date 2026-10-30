@@ -119,6 +119,36 @@ test("invalid fields survive moving between pages of the same site", async () =>
   await browserExpect(name).toHaveValue("");
 });
 
+test("an invalid config from the repository names its fields, never blocks leaving, and repairs into a draft", async () => {
+  const page = await browser.newPage();
+  await page.goto(`${baseUrl}?broken`);
+  const alert = page.getByRole("alert").first();
+  await browserExpect(alert).toContainText(
+    "blog.json in your repository has errors"
+  );
+  await browserExpect(alert).toContainText("footer.socials.x");
+  await page
+    .getByRole("button", { name: "Navigate away", exact: true })
+    .click();
+  await browserExpect(page.getByTestId("navigation")).toHaveText("left");
+  await page.getByRole("button", { name: "Repair", exact: true }).click();
+  await browserExpect(
+    page.getByText("blog.json in your repository has errors")
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Flush", exact: true }).click();
+  await browserExpect(page.getByTestId("status")).toHaveText(/^(idle|saved)$/);
+  expect(
+    JSON.parse((await page.getByTestId("persisted").textContent()) ?? "{}")
+  ).toEqual({
+    name: "site-a",
+    description: "site-a description",
+    variables: { product_name: "site-a" },
+    colors: {},
+    footer: { socials: {} },
+    redirects: [{ source: "/old", destination: "/new" }],
+  });
+});
+
 test("image uploads keep pages of the same site blocked until they finish", async () => {
   const page = await browser.newPage();
   await page.goto(baseUrl);

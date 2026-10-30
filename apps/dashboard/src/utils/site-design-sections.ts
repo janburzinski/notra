@@ -28,6 +28,79 @@ export function designIssues(config: SiteRawConfig): SiteDesignIssue[] {
         message: issue.message,
       }));
 }
+/**
+ * Drop the values the schema rejects so their defaults apply, keeping the rest of the config.
+ * Returns null when the config cannot be made valid this way.
+ */
+export function repairSiteConfig(
+  config: SiteRawConfig,
+  name: string
+): SiteRawConfig | null {
+  const next = structuredClone(config);
+  const at = (keys: string[]) =>
+    keys.reduce<unknown>(
+      (value, key) =>
+        typeof value === "object" && value !== null
+          ? (value as SiteRawConfig)[key]
+          : undefined,
+      next
+    );
+  for (;;) {
+    const result = siteConfigSchema.safeParse(next);
+    if (result.success) {
+      return next;
+    }
+    const issue = result.error.issues[0]!;
+    const keys = issue.path.map(String);
+    const target = at(keys);
+    if (issue.code === "unrecognized_keys" && typeof target === "object") {
+      for (const key of issue.keys) {
+        delete (target as SiteRawConfig)[key];
+      }
+      continue;
+    }
+    if (
+      issue.code === "too_big" &&
+      issue.origin === "array" &&
+      Array.isArray(target)
+    ) {
+      target.length = Number(issue.maximum);
+      continue;
+    }
+    if (keys.length === 0 || (keys.length === 1 && keys[0] === "name")) {
+      const fallback = name.trim().slice(0, 80) || "Site";
+      if (next.name === fallback) {
+        return null;
+      }
+      next.name = fallback;
+      continue;
+    }
+    while (keys.length > 0) {
+      const key = keys.at(-1)!;
+      const holder = at(keys.slice(0, -1));
+      if (Array.isArray(holder) && Number(key) < holder.length) {
+        holder.splice(Number(key), 1);
+        break;
+      }
+      if (
+        typeof holder === "object" &&
+        holder !== null &&
+        Object.hasOwn(holder, key)
+      ) {
+        if (keys.length === 2 && keys[0] === "integrations" && key === "c15t") {
+          delete next.integrations;
+        } else {
+          delete (holder as SiteRawConfig)[key];
+        }
+        break;
+      }
+      keys.pop();
+    }
+    if (keys.length === 0) {
+      return null;
+    }
+  }
+}
 export function configValue(config: unknown, path: string): unknown {
   let value = config;
   for (const key of path.split(".")) {

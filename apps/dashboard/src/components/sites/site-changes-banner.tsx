@@ -159,10 +159,36 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
       </Strip>
     );
   }
+  if (state.brokenSource) {
+    return (
+      <Strip
+        description={
+          <>
+            {banner("brokenSource")} <SiteConfigIssues state={state} />
+          </>
+        }
+        title={banner("brokenSourceTitle")}
+        tone="warning"
+      >
+        <Button
+          disabled={busy}
+          size="sm"
+          variant="outline"
+          onClick={state.repair}
+        >
+          {banner("repair")}
+        </Button>
+      </Strip>
+    );
+  }
   if (state.invalid) {
     return (
       <Strip
-        description={banner("invalid")}
+        description={
+          <>
+            {banner("invalid")} <SiteConfigIssues state={state} />
+          </>
+        }
         title={banner("invalidTitle")}
         tone="warning"
       >
@@ -171,6 +197,26 @@ function SiteChangesStrip({ state }: SiteChangesStripStateProps) {
     );
   }
   return <SiteUnpublishedStrip state={state} />;
+}
+
+function SiteConfigIssues({ state }: SiteChangesStripStateProps) {
+  const banner = useTranslations("sites.design.workspace.banner");
+  const paths = [
+    ...new Set(state.issues.map((issue) => issue.path || SITE_CONFIG_FILENAME)),
+  ];
+  return (
+    <>
+      {paths.slice(0, 3).map((path, index) => (
+        <span key={path}>
+          {index > 0 ? ", " : null}
+          <code className="font-mono text-xs">{path}</code>
+        </span>
+      ))}
+      {paths.length > 3
+        ? ` ${banner("moreIssues", { count: paths.length - 3 })}`
+        : null}
+    </>
+  );
 }
 
 function discardBusy(state: SiteWorkspaceValue) {

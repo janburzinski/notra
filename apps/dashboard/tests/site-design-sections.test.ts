@@ -5,6 +5,7 @@ import {
   configValue,
   patchConfigValue,
   designIssues,
+  repairSiteConfig,
   configSectionChanged,
 } from "../src/utils/site-design-sections";
 import { validateVariableRows } from "../src/utils/site-variables";
@@ -104,4 +105,62 @@ test("integration fields share the config validation gate and remove whole optio
     false
   );
   expect(designIssues(removed)).toEqual([]);
+});
+test("repairing a config drops only the rejected values and keeps the rest", () => {
+  const repaired = repairSiteConfig(
+    {
+      name: "",
+      description: "Kept",
+      navbar: {
+        links: [
+          { label: "Docs", href: "/docs" },
+          { label: "", href: "nope" },
+          { label: "Menu", items: [] },
+        ],
+      },
+      authors: { "Bad Id": { name: "Jan" }, jan: { name: "Jan", url: "x" } },
+      future: { kept: true },
+    },
+    "Acme"
+  );
+  expect(designIssues(repaired ?? {})).toEqual([]);
+  expect(repaired).toEqual({
+    name: "Acme",
+    description: "Kept",
+    navbar: { links: [{ label: "Docs", href: "/docs" }] },
+    authors: { jan: { name: "Jan" } },
+    future: { kept: true },
+  });
+});
+test("repair removes only rejected keys, trims oversized lists, and never keeps analytics without consent", () => {
+  const redirects = Array.from({ length: 501 }, (_, index) => ({
+    source: `/old-${index}`,
+    destination: "/new",
+  }));
+  expect(
+    repairSiteConfig(
+      {
+        name: "Acme",
+        authors: { jan: { name: "Jan", custom: true } },
+        redirects,
+        integrations: {
+          plausible: { domain: "acme.test" },
+          c15t: { backendURL: "not a url" },
+        },
+      },
+      "Acme"
+    )
+  ).toEqual({
+    name: "Acme",
+    authors: { jan: { name: "Jan" } },
+    redirects: redirects.slice(0, 500),
+  });
+  const many = Array.from({ length: 300 }, () => ({
+    source: "missing-slash",
+    destination: "/new",
+  }));
+  expect(repairSiteConfig({ name: "Acme", redirects: many }, "Acme")).toEqual({
+    name: "Acme",
+    redirects: [],
+  });
 });

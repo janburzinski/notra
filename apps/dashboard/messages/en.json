@@ -8784,6 +8784,10 @@
           "saveFailed": "They stay in this tab until saving works again.",
           "invalidTitle": "Some fields need fixing",
           "invalid": "Changes save once every field has a valid value.",
+          "brokenSourceTitle": "blog.json in your repository has errors",
+          "brokenSource": "Repair removes the invalid values, or the whole list entry or setting that contains them, so defaults apply, and saves a draft:",
+          "repair": "Repair",
+          "moreIssues": "{count, plural, one {and # more} other {and # more}}",
           "conflictTitle": "This site changed while you were editing",
           "conflict": "Keep your changes to replace the latest version, or discard them to load it.",
           "retry": "Retry"
