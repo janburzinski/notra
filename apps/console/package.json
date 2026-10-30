@@ -59,7 +59,7 @@
     "@types/react-dom": "catalog:",
     "bun-types": "catalog:",
     "knip": "^6.12.2",
-    "postcss": "^8.5.30",
+    "postcss": "^8.5.31",
     "typescript": "catalog:"
   },
   "engines": {
