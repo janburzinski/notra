@@ -17,6 +17,7 @@ import { InvitationConfirm } from "@/components/invitation/invitation-confirm";
 import { lazyPage } from "@/utils/lazy-page";
 
 import { createDevelopmentUiRoutes } from "./-development-ui";
+import { loadTrafficEmbed } from "./-embed-loaders";
 import {
   loadAppEntry,
   loadAuthCallback,
@@ -39,6 +40,11 @@ const ResetPassword = lazyPage(
 );
 const Banned = lazyPage(() => import("@/app/auth/banned/page"));
 const Linkedin = lazyPage(() => import("@/app/connect/linkedin/page"));
+const TrafficEmbed = lazyPage(() =>
+  import("@/components/geo/ai-traffic-embed").then((module) => ({
+    default: module.AiTrafficEmbed,
+  }))
+);
 const SharedChat = lazyPage(() =>
   import("@/components/chat/shared-chat-page").then((module) => ({
     default: module.SharedChatPage,
@@ -164,6 +170,25 @@ export function createEntryUiRoutes(parent: AnyRoute) {
       loader: (input) => loadSharedChat({ data: input }),
       pageTitle: (data) => data.title,
       component: ({ data }) => <SharedChat share={data} />,
+    }),
+    createUiRoute({
+      parent,
+      path: "embed/ai-traffic/$id",
+      noindex: true,
+      preload: TrafficEmbed.preload,
+      loader: (input) => loadTrafficEmbed({ data: input }),
+      loaderSearchKeys: ["range"],
+      component: ({ data, params, searchParams }) => (
+        <TrafficEmbed
+          embed={data}
+          embedId={params.id}
+          parts={
+            typeof searchParams.parts === "string"
+              ? searchParams.parts
+              : undefined
+          }
+        />
+      ),
     }),
     createUiRoute({
       parent,

@@ -1787,7 +1787,10 @@ export interface TrafficHeroProps {
   days: readonly string[];
   groups: readonly GeoTrafficSourceGroup[];
   points: readonly GeoTrafficPoint[];
-  settingsHref: string;
+  /** Omitted on public embeds, which have no settings to link to. */
+  settingsHref?: string;
+  showMetrics?: boolean;
+  showChart?: boolean;
 }
 
 export interface TrafficZoomChipProps {
@@ -1798,7 +1801,8 @@ export interface TrafficZoomChipProps {
 
 export interface TrafficHeroMetricProps {
   metric: TrafficTrendMetric;
-  settingsHref: string;
+  settingsHref?: string;
+  threeUp?: boolean;
 }
 
 export interface TrafficTrendProvider {
@@ -2007,4 +2011,8 @@ export interface TrafficExportButtonProps {
   web: WebAnalyticsResponse | undefined;
   range: GeoRangeQuery;
   path: string;
+}
+
+export interface TrafficExportMenuProps extends TrafficExportButtonProps {
+  organizationId: string;
 }

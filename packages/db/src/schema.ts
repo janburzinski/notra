@@ -1746,6 +1746,39 @@ export const geoSettings = pgTable(
   ]
 );
 
+/**
+ * Public, read-only AI traffic charts that customers embed in an iframe. The
+ * id is the publishable key in the embed URL; `allowedOrigins` become the
+ * page's `frame-ancestors`, so only those sites can frame it.
+ */
+export const geoTrafficEmbeds = pgTable(
+  "geo_traffic_embeds",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    projectId: text("project_id").references(() => projects.id, {
+      onDelete: "cascade",
+    }),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    name: text("name").notNull(),
+    host: text("host"),
+    allowedOrigins: text("allowed_origins").array().notNull(),
+    revokedAt: timestamp("revoked_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("geoTrafficEmbeds_organizationId_idx").on(table.organizationId),
+  ]
+);
+
 export const geoContentGapSnapshots = pgTable("geo_content_gap_snapshots", {
   projectId: text("project_id")
     .primaryKey()

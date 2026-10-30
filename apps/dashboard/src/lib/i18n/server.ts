@@ -21,6 +21,13 @@ export async function getLocale() {
   return negotiateDashboardLocale(getRequestHeader("accept-language") ?? null);
 }
 
+/** Public embeds: the `locale` URL param, else the visitor's browser. */
+export function getEmbedLocale(param: unknown): DashboardLocale {
+  return isDashboardLocale(param)
+    ? param
+    : negotiateDashboardLocale(getRequestHeader("accept-language") ?? null);
+}
+
 async function getMessages(locale: DashboardLocale) {
   return locale === "de"
     ? (await import("../../../messages/de.json")).default

@@ -334,7 +334,8 @@
               "ai-traffic/overview",
               "ai-traffic/crawlers",
               "ai-traffic/journeys",
-              "ai-traffic/referrals"
+              "ai-traffic/referrals",
+              "ai-traffic/embed"
             ]
           },
           {

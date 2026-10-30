@@ -4215,7 +4215,57 @@
       "noMatches": "Keine passenden Seiten"
     },
     "trafficExport": {
-      "label": "Als CSV exportieren"
+      "label": "Als CSV exportieren",
+      "menu": "Exportieren",
+      "csv": "CSV herunterladen",
+      "embed": "Auf deiner Website einbetten"
+    },
+    "trafficEmbed": {
+      "title": "KI-Traffic-Chart einbetten",
+      "description": "Zeig diesen Chart auf deiner eigenen Website. Nur die Domains, die du hier einträgst, können ihn anzeigen.",
+      "embedLabel": "Embed",
+      "new": "Neues Embed",
+      "cancelNew": "Zurück zu den Embeds",
+      "domainsLabel": "Erlaubte Domains",
+      "domainsHint": "Drück nach jeder Domain Enter. Mit *.example.com sind alle Subdomains erlaubt.",
+      "domainsRequired": "Mindestens eine Domain muss bleiben. Lösch das Embed, um den Chart zu entfernen.",
+      "scopeHost": "Zeigt den KI-Traffic von {host} in diesem Projekt.",
+      "scopeAll": "Zeigt den KI-Traffic aller Websites in diesem Projekt.",
+      "create": "Embed erstellen",
+      "created": "Embed erstellt",
+      "createFailed": "Embed konnte nicht erstellt werden",
+      "saved": "Domains gespeichert. Änderungen gelten nach spätestens einer Minute.",
+      "saveFailed": "Domains konnten nicht gespeichert werden",
+      "revoke": "Embed löschen",
+      "revoked": "Embed gelöscht. Seiten, die es nutzen, zeigen jetzt nichts mehr an.",
+      "revokeFailed": "Embed konnte nicht gelöscht werden",
+      "revokeTitle": "Dieses Embed löschen?",
+      "revokeDescription": "Seiten, die diesen Chart zeigen, bleiben innerhalb einer Minute leer. Das lässt sich nicht rückgängig machen.",
+      "rangeLabel": "Zeitraum",
+      "ranges": {
+        "7d": "Letzte 7 Tage",
+        "14d": "Letzte 14 Tage",
+        "30d": "Letzte 30 Tage",
+        "90d": "Letzte 90 Tage"
+      },
+      "themeLabel": "Design",
+      "themes": {
+        "auto": "Wie System",
+        "light": "Hell",
+        "dark": "Dunkel"
+      },
+      "layoutLabel": "Anzeigen",
+      "layouts": {
+        "full": "Zahlen und Chart",
+        "chart": "Nur Chart",
+        "metrics": "Nur Zahlen"
+      },
+      "previewTitle": "Embed-Vorschau",
+      "frameTitle": "KI-Traffic",
+      "empty": "In diesem Zeitraum gab es noch keinen KI-Traffic.",
+      "snippetLabel": "Embed-Code",
+      "done": "Fertig",
+      "poweredBy": "KI-Traffic von Notra"
     },
     "competitorLostPrompts": {
       "title": "Wo du verlierst",

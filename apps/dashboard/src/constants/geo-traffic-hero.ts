@@ -14,6 +14,13 @@ export const TRAFFIC_HERO_CHART_SURFACE_CLASS =
 export const TRAFFIC_HERO_METRIC_CELL_CLASS =
   "border-border flex min-w-0 flex-col gap-2 overflow-hidden border-b px-4 py-4 last:border-b-0 @sm/hero:px-5 @sm/hero:odd:border-r @sm/hero:nth-[n+3]:border-b-0 @3xl/hero:border-r @3xl/hero:border-b-0 @3xl/hero:px-6 @3xl/hero:last:border-r-0";
 
+/** Public embeds drop the unconfigured conversions stage: one row of three. */
+export const TRAFFIC_HERO_METRICS_THREE_UP_GRID_CLASS =
+  "grid grid-cols-1 @sm/hero:grid-cols-3";
+
+export const TRAFFIC_HERO_METRIC_CELL_THREE_UP_CLASS =
+  "border-border flex min-w-0 flex-col gap-2 overflow-hidden border-b px-4 py-4 last:border-b-0 @sm/hero:border-r @sm/hero:border-b-0 @sm/hero:px-5 @sm/hero:last:border-r-0 @3xl/hero:px-6";
+
 export const TRAFFIC_HERO_METRIC_VALUE_CLASS =
   "min-w-0 text-2xl leading-none font-semibold tracking-tight tabular-nums @4xl/hero:text-3xl";
 

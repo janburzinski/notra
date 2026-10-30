@@ -18,7 +18,7 @@ import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { GeoSetupButton } from "@/components/geo/geo-setup-button";
 import { TrafficDomainSelect } from "@/components/geo/traffic-domain-select";
 import { TrafficEmpty } from "@/components/geo/traffic-empty";
-import { TrafficExportButton } from "@/components/geo/traffic-export-button";
+import { TrafficExportMenu } from "@/components/geo/traffic-export-menu";
 import { TrafficPagesCard } from "@/components/geo/traffic-pages-card";
 import { TrafficPathEmpty } from "@/components/geo/traffic-path-empty";
 import { TrafficPathFilter } from "@/components/geo/traffic-path-filter";
@@ -141,25 +141,34 @@ function TrafficPageView({
       <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
         <div className="flex w-full min-w-0 flex-col gap-6 px-4 lg:px-6">
           {header}
-          {pathQuery ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-end">
-                <TrafficPathFilter paths={knownPaths} />
-              </div>
-              <TrafficPathEmpty geoRange={geoRange} />
+          <div className="flex flex-col gap-2">
+            {/* Existing embeds stay reachable, since an embed picks its own
+                period. */}
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {pathQuery ? <TrafficPathFilter paths={knownPaths} /> : null}
+              <TrafficExportMenu
+                organizationId={organizationId}
+                path={pathQuery}
+                range={geoRange.query}
+                traffic={traffic}
+                web={web}
+              />
             </div>
-          ) : null}
-          {!pathQuery && (hasPreviousTraffic || sitesHidden) ? (
-            <EmptyState
-              description={
-                sitesHidden ? tSites("hiddenHint") : t("emptyRangeDescription")
-              }
-              title={t("emptyRangeTitle")}
-            />
-          ) : null}
-          {pathQuery || hasPreviousTraffic || sitesHidden ? null : (
-            <TrafficEmpty setup={ingestSetup} />
-          )}
+            {pathQuery ? <TrafficPathEmpty geoRange={geoRange} /> : null}
+            {!pathQuery && (hasPreviousTraffic || sitesHidden) ? (
+              <EmptyState
+                description={
+                  sitesHidden
+                    ? tSites("hiddenHint")
+                    : t("emptyRangeDescription")
+                }
+                title={t("emptyRangeTitle")}
+              />
+            ) : null}
+            {pathQuery || hasPreviousTraffic || sitesHidden ? null : (
+              <TrafficEmpty setup={ingestSetup} />
+            )}
+          </div>
         </div>
       </PageContainer>
     );
@@ -172,7 +181,8 @@ function TrafficPageView({
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-end gap-2">
             <TrafficPathFilter paths={knownPaths} />
-            <TrafficExportButton
+            <TrafficExportMenu
+              organizationId={organizationId}
               path={pathQuery}
               range={geoRange.query}
               traffic={traffic}

@@ -19,6 +19,17 @@ export function getDashboardSecurityHeaders(demoMode = isDemoMode()) {
   };
 }
 
+/**
+ * Embed pages are framed by the sites their owner allowed, so they drop
+ * X-Frame-Options (DENY would win over the allow list in older browsers).
+ */
+export function getTrafficEmbedSecurityHeaders(frameAncestors: string) {
+  return {
+    ...DASHBOARD_SECURITY_HEADERS,
+    "Content-Security-Policy": `frame-ancestors ${frameAncestors}`,
+  };
+}
+
 export function getDashboardRedirect(request: Request): Response | undefined {
   const url = new URL(request.url);
   const segments = url.pathname.split("/").filter(Boolean);

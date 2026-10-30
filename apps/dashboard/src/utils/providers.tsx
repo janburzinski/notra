@@ -21,6 +21,7 @@ import Image from "@/components/framework/image";
 import Link from "@/components/framework/link";
 import { PostHogIdentity } from "@/components/providers/posthog-identity";
 import { POSTHOG_PROJECT_TOKEN } from "@/constants/posthog";
+import { TRAFFIC_EMBED_THEME_STORAGE_KEY } from "@/constants/traffic-embed";
 import { useIsClient } from "@/lib/hooks/use-is-client";
 import { useUiLabelsTranslations } from "@/lib/i18n/ui-labels";
 import { configureZodLocale } from "@/lib/i18n/zod";
@@ -88,7 +89,16 @@ function createProviderClients() {
   return queryClient;
 }
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  embed = false,
+  forcedTheme,
+}: {
+  children: React.ReactNode;
+  /** Public embeds skip the visitor's session and PostHog identity. */
+  embed?: boolean;
+  forcedTheme?: string;
+}) {
   const [queryClient] = useState(createProviderClients);
   configureZodLocale(useLocale());
   const uiLabels = useUiLabelsTranslations();
@@ -102,14 +112,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <ReactQueryDevtools initialIsOpen={false} />
           ) : null}
         </Suspense>
-        <ThemeProvider attribute="class" disableTransitionOnChange enableSystem>
+        <ThemeProvider
+          attribute="class"
+          disableTransitionOnChange
+          enableSystem
+          forcedTheme={forcedTheme}
+          // Embeds never read the visitor's dashboard theme, so "auto"
+          // follows their system.
+          storageKey={embed ? TRAFFIC_EMBED_THEME_STORAGE_KEY : undefined}
+        >
           <UiLabelsProvider labels={uiLabels}>
             <DataTableLabelsProvider labels={uiLabels}>
               <CardLabelsProvider labels={uiLabels}>
                 <TooltipProvider delay={500} glide={false}>
                   <NuqsAdapter>
                     {children}
-                    {POSTHOG_PROJECT_TOKEN ? (
+                    {POSTHOG_PROJECT_TOKEN && !embed ? (
                       <Suspense fallback={null}>
                         <PostHogIdentity />
                       </Suspense>

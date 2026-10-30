@@ -25,10 +25,12 @@ import {
   TRAFFIC_HERO_CHART_SURFACE_CLASS,
   TRAFFIC_HERO_FRAME_CLASS,
   TRAFFIC_HERO_METRIC_CELL_CLASS,
+  TRAFFIC_HERO_METRIC_CELL_THREE_UP_CLASS,
   TRAFFIC_HERO_METRIC_VALUE_CLASS,
   TRAFFIC_HERO_METRICS_GRID_CLASS,
   TRAFFIC_HERO_METRICS_STANDALONE_CLASS,
   TRAFFIC_HERO_METRICS_SURFACE_CLASS,
+  TRAFFIC_HERO_METRICS_THREE_UP_GRID_CLASS,
 } from "@/constants/geo-traffic-hero";
 import { useTrafficZoom } from "@/hooks/use-traffic-zoom";
 import { cn } from "@/lib/utils";
@@ -65,12 +67,22 @@ function metricDelta(
   return trafficVisitDelta(current, previous);
 }
 
-function TrafficHeroMetric({ metric, settingsHref }: TrafficHeroMetricProps) {
+function TrafficHeroMetric({
+  metric,
+  settingsHref,
+  threeUp = false,
+}: TrafficHeroMetricProps) {
   const t = useTranslations("geo.trafficHero");
   const tCommon = useTranslations("common");
   const tGeoShared = useTranslations("geo.shared");
   return (
-    <div className={TRAFFIC_HERO_METRIC_CELL_CLASS}>
+    <div
+      className={
+        threeUp
+          ? TRAFFIC_HERO_METRIC_CELL_THREE_UP_CLASS
+          : TRAFFIC_HERO_METRIC_CELL_CLASS
+      }
+    >
       <p className="text-foreground/75 text-sm leading-5 font-semibold tracking-tight text-pretty">
         {metric.label}
       </p>
@@ -87,15 +99,17 @@ function TrafficHeroMetric({ metric, settingsHref }: TrafficHeroMetricProps) {
             —
           </span>
           <span className="sr-only">{t("notConfigured")}</span>
-          <Button
-            nativeButton={false}
-            render={<Link href={settingsHref} />}
-            size="sm"
-            title={t("setUpTitle")}
-            variant="outline"
-          >
-            {tCommon("labels.setUp")}
-          </Button>
+          {settingsHref ? (
+            <Button
+              nativeButton={false}
+              render={<Link href={settingsHref} />}
+              size="sm"
+              title={t("setUpTitle")}
+              variant="outline"
+            >
+              {tCommon("labels.setUp")}
+            </Button>
+          ) : null}
         </div>
       ) : (
         <div className="flex max-w-full min-w-0 flex-wrap items-center gap-x-3 gap-y-2 self-start">
@@ -121,6 +135,8 @@ export function TrafficHero({
   groups,
   points,
   settingsHref,
+  showMetrics = true,
+  showChart = true,
 }: TrafficHeroProps) {
   const t = useTranslations("geo.trafficHero");
   const tShared = useTranslations("geo.shared");
@@ -137,9 +153,11 @@ export function TrafficHero({
   const [hiddenKeys, setHiddenKeys] = useState<ReadonlySet<string>>(
     () => new Set()
   );
-  const showTrend = days.length > 0;
+  const showTrend = showChart && days.length > 0;
   const singleDay = days.length === 1;
 
+  // Without a settings link (public embeds) an unconfigured stage has no
+  // action to offer, so it is left out instead of shown as a dash.
   const metrics: TrafficTrendMetric[] = GEO_TRAFFIC_FUNNEL_STAGES.map(
     (stage) => ({
       key: stage.key,
@@ -151,7 +169,9 @@ export function TrafficHero({
         previousTotals === null ? null : previousTotals[stage.key]
       ),
     })
-  );
+  ).filter((metric) => settingsHref !== undefined || metric.value !== null);
+
+  const threeUp = metrics.length === 3;
 
   const providers = buildTrafficTrendProviders(
     groups.flatMap((group) => group.members)
@@ -231,25 +251,33 @@ export function TrafficHero({
 
   return (
     <div className={TRAFFIC_HERO_FRAME_CLASS}>
-      <div
-        className={cn(
-          TRAFFIC_HERO_METRICS_GRID_CLASS,
-          showTrend
-            ? TRAFFIC_HERO_METRICS_SURFACE_CLASS
-            : TRAFFIC_HERO_METRICS_STANDALONE_CLASS
-        )}
-      >
-        {metrics.map((metric) => (
-          <TrafficHeroMetric
-            key={metric.key}
-            metric={metric}
-            settingsHref={settingsHref}
-          />
-        ))}
-      </div>
+      {showMetrics ? (
+        <div
+          className={cn(
+            threeUp
+              ? TRAFFIC_HERO_METRICS_THREE_UP_GRID_CLASS
+              : TRAFFIC_HERO_METRICS_GRID_CLASS,
+            showTrend
+              ? TRAFFIC_HERO_METRICS_SURFACE_CLASS
+              : TRAFFIC_HERO_METRICS_STANDALONE_CLASS
+          )}
+        >
+          {metrics.map((metric) => (
+            <TrafficHeroMetric
+              key={metric.key}
+              metric={metric}
+              settingsHref={settingsHref}
+              threeUp={threeUp}
+            />
+          ))}
+        </div>
+      ) : null}
       {showTrend ? (
         <div
-          className={TRAFFIC_HERO_CHART_SURFACE_CLASS}
+          className={cn(
+            TRAFFIC_HERO_CHART_SURFACE_CLASS,
+            !showMetrics && "mt-0.5"
+          )}
           data-chart-title={tInstrument("aiTraffic")}
         >
           <div className="mb-3 flex min-w-0 items-center justify-between gap-3">

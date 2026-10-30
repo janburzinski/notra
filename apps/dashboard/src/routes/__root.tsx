@@ -30,9 +30,10 @@ import {
   getCatalog,
   loadCatalog,
 } from "@/lib/i18n/catalog";
-import { getLocale } from "@/lib/i18n/server";
+import { getEmbedLocale, getLocale } from "@/lib/i18n/server";
 import dynamic from "@/utils/lazy-component";
 import { Providers } from "@/utils/providers";
+import { isTrafficEmbedPath, trafficEmbedTheme } from "@/utils/traffic-embed";
 
 import styles from "@/styles/globals.css?url";
 
@@ -44,18 +45,33 @@ const DatabuddyAnalytics = dynamic(
   { ssr: false }
 );
 
-const loadRootState = createServerFn({ method: "GET" }).handler(async () => {
-  const locale = await getLocale();
-  const consent = await resolveDashboardConsent(locale);
-  return { locale, consent };
-});
+const loadRootState = createServerFn({ method: "GET" })
+  .validator((data: { embedLocale?: unknown } | undefined) => data)
+  .handler(async ({ data }) => {
+    // Embeds render on other companies' sites: their visitors get no consent
+    // banner and no analytics, and the language comes from the embed URL.
+    if (data) {
+      return { locale: getEmbedLocale(data.embedLocale), consent: null };
+    }
+    const locale = await getLocale();
+    const consent = await resolveDashboardConsent(locale);
+    return { locale, consent };
+  });
 
 export const Route = createRootRoute({
   validateSearch: (search: Record<string, unknown>) => search,
-  loader: async () => {
-    const { locale, consent } = await loadRootState();
+  loader: async ({ location }) => {
+    const embed = isTrafficEmbedPath(location.pathname);
+    const search = location.search as Record<string, unknown>;
+    const { locale, consent } = await loadRootState({
+      data: embed ? { embedLocale: search.locale } : undefined,
+    });
     await loadCatalog(locale);
-    return { locale, consent };
+    return {
+      locale,
+      consent,
+      embedTheme: embed ? trafficEmbedTheme(search.theme) : null,
+    };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -88,11 +104,17 @@ export const Route = createRootRoute({
 });
 
 function Root() {
-  const { locale, consent } = Route.useLoaderData();
+  const { locale, consent, embedTheme } = Route.useLoaderData();
   const messages = getCatalog(locale) ?? use(loadCatalog(locale));
+  const embed = embedTheme !== null;
   const app = (
     <IntlProvider locale={locale} messages={messages} timeZone="UTC">
-      <Providers>
+      <Providers
+        embed={embed}
+        forcedTheme={
+          embedTheme === null || embedTheme === "auto" ? undefined : embedTheme
+        }
+      >
         <Outlet />
       </Providers>
     </IntlProvider>
@@ -102,7 +124,7 @@ function Root() {
       <head>
         <HeadContent />
       </head>
-      <body className="antialiased">
+      <body className={embed ? "bg-transparent antialiased" : "antialiased"}>
         {consent === null ? (
           app
         ) : (

@@ -967,6 +967,13 @@
       "when": 1793303482632,
       "tag": "0137_encrypt_social_connection_tokens",
       "breakpoints": true
+    },
+    {
+      "idx": 138,
+      "version": "7",
+      "when": 1793303482633,
+      "tag": "0138_geo_traffic_embeds",
+      "breakpoints": true
     }
   ]
 }

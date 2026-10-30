@@ -6,9 +6,11 @@ import {
   trafficDayKey,
   trafficSparklineDays,
 } from "@notra/geo-core/utils/ai-traffic";
+import { tableDataToCsv } from "@notra/ui/lib/message-table";
 import type { MessageTableData } from "@notra/ui/types/message-table";
 
-import { sanitizeDownloadFilename } from "@/utils/download";
+import type { GeoRangeQuery } from "@/types/geo";
+import { downloadBlob, sanitizeDownloadFilename } from "@/utils/download";
 
 /** One row per day: human views and visitors, AI agent and AI referral visits. */
 export function trafficCsvTable(
@@ -65,4 +67,19 @@ export function trafficCsvFilename(from?: string, to?: string, path = "") {
   const page = path.replaceAll("/", " ").trim().replaceAll(" ", "-");
   const parts = ["traffic", from, to, page].filter(Boolean);
   return `${sanitizeDownloadFilename(parts.join("-")) || "traffic"}.csv`;
+}
+
+export function downloadTrafficCsv(
+  traffic: AiTrafficResponse,
+  web: WebAnalyticsResponse,
+  range: GeoRangeQuery,
+  path: string
+) {
+  const csv = tableDataToCsv(
+    trafficCsvTable(web, traffic, range.from, range.to)
+  );
+  downloadBlob(
+    new Blob([csv], { type: "text/csv;charset=utf-8" }),
+    trafficCsvFilename(range.from, range.to, path)
+  );
 }

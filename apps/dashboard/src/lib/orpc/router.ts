@@ -53,6 +53,11 @@ export const dashboardRouter = {
   geo: lazy(() =>
     import("./routers/geo").then((m) => ({ default: m.geoRouter }))
   ),
+  trafficEmbeds: lazy(() =>
+    import("./routers/traffic-embeds").then((m) => ({
+      default: m.trafficEmbedsRouter,
+    }))
+  ),
   github: lazy(() =>
     import("./routers/github").then((m) => ({ default: m.githubRouter }))
   ),

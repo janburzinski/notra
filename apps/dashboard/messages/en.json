@@ -4215,7 +4215,57 @@
       "noMatches": "No matching pages"
     },
     "trafficExport": {
-      "label": "Export to CSV"
+      "label": "Export to CSV",
+      "menu": "Export",
+      "csv": "Download CSV",
+      "embed": "Embed on your site"
+    },
+    "trafficEmbed": {
+      "title": "Embed AI traffic chart",
+      "description": "Show this chart on your own site. Only the domains you list here can display it.",
+      "embedLabel": "Embed",
+      "new": "New embed",
+      "cancelNew": "Back to embeds",
+      "domainsLabel": "Allowed domains",
+      "domainsHint": "Press Enter after each domain. *.example.com allows all subdomains.",
+      "domainsRequired": "Keep at least one domain. To take the chart down, delete the embed.",
+      "scopeHost": "Shows AI traffic for {host} in this project.",
+      "scopeAll": "Shows AI traffic for all sites in this project.",
+      "create": "Create embed",
+      "created": "Embed created",
+      "createFailed": "Couldn't create the embed",
+      "saved": "Domains saved. Changes apply within a minute.",
+      "saveFailed": "Couldn't save the domains",
+      "revoke": "Delete embed",
+      "revoked": "Embed deleted. Pages using it now show nothing.",
+      "revokeFailed": "Couldn't delete the embed",
+      "revokeTitle": "Delete this embed?",
+      "revokeDescription": "Pages that show this chart go blank within a minute. You can't undo this.",
+      "rangeLabel": "Period",
+      "ranges": {
+        "7d": "Last 7 days",
+        "14d": "Last 14 days",
+        "30d": "Last 30 days",
+        "90d": "Last 90 days"
+      },
+      "themeLabel": "Theme",
+      "themes": {
+        "auto": "Match system",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "layoutLabel": "Show",
+      "layouts": {
+        "full": "Numbers and chart",
+        "chart": "Chart only",
+        "metrics": "Numbers only"
+      },
+      "previewTitle": "Embed preview",
+      "frameTitle": "AI traffic",
+      "empty": "No AI traffic in this period yet.",
+      "snippetLabel": "Embed code",
+      "done": "Done",
+      "poweredBy": "AI traffic by Notra"
     },
     "competitorLostPrompts": {
       "title": "Where you lose",
