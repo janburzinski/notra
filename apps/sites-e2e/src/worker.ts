@@ -667,7 +667,11 @@ try {
   checks.push(
     "assets + integrity, root/manifest/slash redirects, HTML/Markdown/HEAD 404s and noindex meta, Markdown twins, SEO feeds/maps/canonical/OG/JSON-LD, ETag"
   );
-  for (const check of await assertContentFeatures(page, origin)) {
+  for (const check of await assertContentFeatures(
+    page,
+    origin,
+    waitForSubresources
+  )) {
     checks.push(`content: ${check}`);
   }
 
