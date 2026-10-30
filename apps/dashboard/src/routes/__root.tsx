@@ -126,7 +126,17 @@ function Root() {
       </head>
       <body className={embed ? "bg-transparent antialiased" : "antialiased"}>
         {consent === null ? (
-          app
+          // The demo has no consent backend, banner or analytics, but
+          // components still read consent through c15t hooks.
+          <ConsentRoot
+            options={{
+              consentCategories: ["necessary", "measurement"],
+              mode: local({ acknowledgeNoRecords: true }),
+            }}
+            state={{}}
+          >
+            {app}
+          </ConsentRoot>
         ) : (
           <>
             <ConsentTheme theme={consentTheme} />
