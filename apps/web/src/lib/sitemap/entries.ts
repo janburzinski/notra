@@ -206,6 +206,10 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },
     {
+      url: `${SITE_URL}/utm-builder`,
+      lastModified: STATIC_PAGE_LAST_MODIFIED,
+    },
+    {
       url: STATE_OF_AI_SEARCH_URL,
       lastModified: new Date(
         listSummaries()

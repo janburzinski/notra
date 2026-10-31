@@ -129,6 +129,7 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
           { label: "GitHub Star Video Generator", href: "/repo-star-video" },
           { label: "AI Crawler IP Checker", href: "/ip-checker" },
           { label: "AI Feature Check", href: "/offering" },
+          { label: "UTM Builder", href: "/utm-builder" },
         ],
       },
     ],

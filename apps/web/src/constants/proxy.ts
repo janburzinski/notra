@@ -25,6 +25,7 @@ export const DUALMARK_SKIP_PATHS = [
   "/rss.xml",
   "/sitemap.xml",
   "/testimonials",
+  "/utm-builder.md",
   "/video",
   "/web-app-manifest-192x192.png",
   "/web-app-manifest-512x512.png",

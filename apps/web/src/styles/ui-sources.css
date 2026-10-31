@@ -85,6 +85,7 @@
 @source "../../../../packages/ui/src/components/ui/collapsible.tsx";
 @source "../../../../packages/ui/src/components/ui/command-tabs.tsx";
 @source "../../../../packages/ui/src/components/ui/context-menu.tsx";
+@source "../../../../packages/ui/src/components/ui/copy-button.tsx";
 @source "../../../../packages/ui/src/components/ui/data-table.tsx";
 @source "../../../../packages/ui/src/components/ui/detail-sheet.tsx";
 @source "../../../../packages/ui/src/components/ui/dialog.tsx";
@@ -209,6 +210,7 @@
 @source "../../../../packages/ui/src/hooks/use-collapsible-columns.ts";
 @source "../../../../packages/ui/src/hooks/use-column-resize.ts";
 @source "../../../../packages/ui/src/hooks/use-column-sort.ts";
+@source "../../../../packages/ui/src/hooks/use-copy-to-clipboard.ts";
 @source "../../../../packages/ui/src/hooks/use-mobile.tsx";
 @source "../../../../packages/ui/src/hooks/use-opencode-frame.ts";
 @source "../../../../packages/ui/src/hooks/use-retained-value.ts";
@@ -240,6 +242,7 @@
 @source "../../../../packages/ui/src/types/chatgpt.ts";
 @source "../../../../packages/ui/src/types/claude-chat.ts";
 @source "../../../../packages/ui/src/types/codex-skin.ts";
+@source "../../../../packages/ui/src/types/copy-button.ts";
 @source "../../../../packages/ui/src/types/data-table.ts";
 @source "../../../../packages/ui/src/types/framework.ts";
 @source "../../../../packages/ui/src/types/gemini.ts";

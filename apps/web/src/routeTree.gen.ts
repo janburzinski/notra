@@ -22,6 +22,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as SchemaMapDotxmlRouteImport } from './routes/schema-map[.]xml'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as UtmBuilderDotmdRouteImport } from './routes/utm-builder[.]md'
 import { Route as DotwellKnownAgentCardDotjsonRouteImport } from './routes/[.]well-known/agent-card[.]json'
 import { Route as DotwellKnownAgentDotjsonRouteImport } from './routes/[.]well-known/agent[.]json'
 import { Route as DotwellKnownApiCatalogRouteImport } from './routes/[.]well-known/api-catalog'
@@ -47,6 +48,7 @@ import { Route as SiteOssProgramRouteImport } from './routes/_site/oss-program'
 import { Route as SitePricingRouteImport } from './routes/_site/pricing'
 import { Route as SiteRepoStarVideoRouteImport } from './routes/_site/repo-star-video'
 import { Route as SiteTwitterThreadCreatorRouteImport } from './routes/_site/twitter-thread-creator'
+import { Route as SiteUtmBuilderRouteImport } from './routes/_site/utm-builder'
 import { Route as ApiIndexRouteImport } from './routes/api/index'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as ApiIpCheckerRouteImport } from './routes/api/ip-checker'
@@ -181,6 +183,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UtmBuilderDotmdRoute = UtmBuilderDotmdRouteImport.update({
+  id: '/utm-builder.md',
+  path: '/utm-builder.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotwellKnownAgentCardDotjsonRoute =
   DotwellKnownAgentCardDotjsonRouteImport.update({
     id: '/.well-known/agent-card.json',
@@ -309,6 +316,11 @@ const SiteTwitterThreadCreatorRoute =
     path: '/twitter-thread-creator',
     getParentRoute: () => SiteRoute,
   } as any)
+const SiteUtmBuilderRoute = SiteUtmBuilderRouteImport.update({
+  id: '/utm-builder',
+  path: '/utm-builder',
+  getParentRoute: () => SiteRoute,
+} as any)
 const ApiIndexRoute = ApiIndexRouteImport.update({
   id: '/api/',
   path: '/api/',
@@ -696,6 +708,7 @@ export interface FileRoutesByFullPath {
   '/rss.xml': typeof RssDotxmlRoute
   '/schema-map.xml': typeof SchemaMapDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/utm-builder.md': typeof UtmBuilderDotmdRoute
   '/.well-known/agent-card.json': typeof DotwellKnownAgentCardDotjsonRoute
   '/.well-known/agent.json': typeof DotwellKnownAgentDotjsonRoute
   '/.well-known/api-catalog': typeof DotwellKnownApiCatalogRoute
@@ -717,6 +730,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof SitePricingRoute
   '/repo-star-video': typeof SiteRepoStarVideoRoute
   '/twitter-thread-creator': typeof SiteTwitterThreadCreatorRoute
+  '/utm-builder': typeof SiteUtmBuilderRoute
   '/api/contact': typeof ApiContactRoute
   '/api/ip-checker': typeof ApiIpCheckerRoute
   '/api/llms.txt': typeof ApiLlmsDottxtRoute
@@ -801,6 +815,7 @@ export interface FileRoutesByTo {
   '/rss.xml': typeof RssDotxmlRoute
   '/schema-map.xml': typeof SchemaMapDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/utm-builder.md': typeof UtmBuilderDotmdRoute
   '/.well-known/agent-card.json': typeof DotwellKnownAgentCardDotjsonRoute
   '/.well-known/agent.json': typeof DotwellKnownAgentDotjsonRoute
   '/.well-known/api-catalog': typeof DotwellKnownApiCatalogRoute
@@ -822,6 +837,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof SitePricingRoute
   '/repo-star-video': typeof SiteRepoStarVideoRoute
   '/twitter-thread-creator': typeof SiteTwitterThreadCreatorRoute
+  '/utm-builder': typeof SiteUtmBuilderRoute
   '/api/contact': typeof ApiContactRoute
   '/api/ip-checker': typeof ApiIpCheckerRoute
   '/api/llms.txt': typeof ApiLlmsDottxtRoute
@@ -908,6 +924,7 @@ export interface FileRoutesById {
   '/rss.xml': typeof RssDotxmlRoute
   '/schema-map.xml': typeof SchemaMapDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/utm-builder.md': typeof UtmBuilderDotmdRoute
   '/.well-known/agent-card.json': typeof DotwellKnownAgentCardDotjsonRoute
   '/.well-known/agent.json': typeof DotwellKnownAgentDotjsonRoute
   '/.well-known/api-catalog': typeof DotwellKnownApiCatalogRoute
@@ -932,6 +949,7 @@ export interface FileRoutesById {
   '/_site/pricing': typeof SitePricingRoute
   '/_site/repo-star-video': typeof SiteRepoStarVideoRoute
   '/_site/twitter-thread-creator': typeof SiteTwitterThreadCreatorRoute
+  '/_site/utm-builder': typeof SiteUtmBuilderRoute
   '/api/contact': typeof ApiContactRoute
   '/api/ip-checker': typeof ApiIpCheckerRoute
   '/api/llms.txt': typeof ApiLlmsDottxtRoute
@@ -1019,6 +1037,7 @@ export interface FileRouteTypes {
     | '/rss.xml'
     | '/schema-map.xml'
     | '/sitemap.xml'
+    | '/utm-builder.md'
     | '/.well-known/agent-card.json'
     | '/.well-known/agent.json'
     | '/.well-known/api-catalog'
@@ -1040,6 +1059,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/repo-star-video'
     | '/twitter-thread-creator'
+    | '/utm-builder'
     | '/api/contact'
     | '/api/ip-checker'
     | '/api/llms.txt'
@@ -1124,6 +1144,7 @@ export interface FileRouteTypes {
     | '/rss.xml'
     | '/schema-map.xml'
     | '/sitemap.xml'
+    | '/utm-builder.md'
     | '/.well-known/agent-card.json'
     | '/.well-known/agent.json'
     | '/.well-known/api-catalog'
@@ -1145,6 +1166,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/repo-star-video'
     | '/twitter-thread-creator'
+    | '/utm-builder'
     | '/api/contact'
     | '/api/ip-checker'
     | '/api/llms.txt'
@@ -1230,6 +1252,7 @@ export interface FileRouteTypes {
     | '/rss.xml'
     | '/schema-map.xml'
     | '/sitemap.xml'
+    | '/utm-builder.md'
     | '/.well-known/agent-card.json'
     | '/.well-known/agent.json'
     | '/.well-known/api-catalog'
@@ -1254,6 +1277,7 @@ export interface FileRouteTypes {
     | '/_site/pricing'
     | '/_site/repo-star-video'
     | '/_site/twitter-thread-creator'
+    | '/_site/utm-builder'
     | '/api/contact'
     | '/api/ip-checker'
     | '/api/llms.txt'
@@ -1341,6 +1365,7 @@ export interface RootRouteChildren {
   RssDotxmlRoute: typeof RssDotxmlRoute
   SchemaMapDotxmlRoute: typeof SchemaMapDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  UtmBuilderDotmdRoute: typeof UtmBuilderDotmdRoute
   DotwellKnownAgentCardDotjsonRoute: typeof DotwellKnownAgentCardDotjsonRoute
   DotwellKnownAgentDotjsonRoute: typeof DotwellKnownAgentDotjsonRoute
   DotwellKnownApiCatalogRoute: typeof DotwellKnownApiCatalogRoute
@@ -1467,6 +1492,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/utm-builder.md': {
+      id: '/utm-builder.md'
+      path: '/utm-builder.md'
+      fullPath: '/utm-builder.md'
+      preLoaderRoute: typeof UtmBuilderDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/agent-card.json': {
@@ -1642,6 +1674,13 @@ declare module '@tanstack/react-router' {
       path: '/twitter-thread-creator'
       fullPath: '/twitter-thread-creator'
       preLoaderRoute: typeof SiteTwitterThreadCreatorRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/utm-builder': {
+      id: '/_site/utm-builder'
+      path: '/utm-builder'
+      fullPath: '/utm-builder'
+      preLoaderRoute: typeof SiteUtmBuilderRouteImport
       parentRoute: typeof SiteRoute
     }
     '/api/': {
@@ -2232,6 +2271,7 @@ interface SiteRouteChildren {
   SitePricingRoute: typeof SitePricingRoute
   SiteRepoStarVideoRoute: typeof SiteRepoStarVideoRoute
   SiteTwitterThreadCreatorRoute: typeof SiteTwitterThreadCreatorRoute
+  SiteUtmBuilderRoute: typeof SiteUtmBuilderRoute
   SiteContributorsOpengraphImageRoute: typeof SiteContributorsOpengraphImageRoute
   SiteFeaturesAiCrawlerLogsRoute: typeof SiteFeaturesAiCrawlerLogsRoute
   SiteFeaturesConversationsRoute: typeof SiteFeaturesConversationsRoute
@@ -2278,6 +2318,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SitePricingRoute: SitePricingRoute,
   SiteRepoStarVideoRoute: SiteRepoStarVideoRoute,
   SiteTwitterThreadCreatorRoute: SiteTwitterThreadCreatorRoute,
+  SiteUtmBuilderRoute: SiteUtmBuilderRoute,
   SiteContributorsOpengraphImageRoute: SiteContributorsOpengraphImageRoute,
   SiteFeaturesAiCrawlerLogsRoute: SiteFeaturesAiCrawlerLogsRoute,
   SiteFeaturesConversationsRoute: SiteFeaturesConversationsRoute,
@@ -2328,6 +2369,7 @@ const rootRouteChildren: RootRouteChildren = {
   RssDotxmlRoute: RssDotxmlRoute,
   SchemaMapDotxmlRoute: SchemaMapDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  UtmBuilderDotmdRoute: UtmBuilderDotmdRoute,
   DotwellKnownAgentCardDotjsonRoute: DotwellKnownAgentCardDotjsonRoute,
   DotwellKnownAgentDotjsonRoute: DotwellKnownAgentDotjsonRoute,
   DotwellKnownApiCatalogRoute: DotwellKnownApiCatalogRoute,

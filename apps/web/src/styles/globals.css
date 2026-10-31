@@ -10,6 +10,7 @@
 @import "../../../../packages/ui/src/styles/status.css";
 @import "../../../../packages/ui/src/styles/text-shimmer.css";
 
+@source "../../../ui/registry/notra/table/components";
 @source "../../../../node_modules/streamdown/dist";
 
 @plugin "@toolwind/corner-shape";

@@ -73,6 +73,7 @@
     "shiki": "^4.5.0",
     "sonner": "catalog:",
     "tw-animate-css": "catalog:",
+    "ui": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

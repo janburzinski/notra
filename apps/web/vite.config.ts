@@ -44,11 +44,20 @@ export default defineConfig(({ command }) => ({
   envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   resolve: {
     tsconfigPaths: true,
-    alias: {
-      "next/image": fileURLToPath(
-        new URL("src/lib/shims/next-image.tsx", import.meta.url)
-      ),
-    },
+    alias: [
+      {
+        find: /^@\/components\/ui\//,
+        replacement: fileURLToPath(
+          new URL("../../packages/ui/src/components/ui/", import.meta.url)
+        ),
+      },
+      {
+        find: "next/image",
+        replacement: fileURLToPath(
+          new URL("src/lib/shims/next-image.tsx", import.meta.url)
+        ),
+      },
+    ],
   },
   server: {
     port: 3001,

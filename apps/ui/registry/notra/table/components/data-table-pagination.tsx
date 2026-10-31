@@ -103,7 +103,7 @@ function PageSizeSelect({
   const locale = labels.locale ?? "en-US";
   return (
     <Select
-      onValueChange={(value) => {
+      onValueChange={(value: string | null) => {
         if (value) {
           onPageSizeChange(Number(value));
         }

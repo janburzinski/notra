@@ -1,7 +1,9 @@
 import { detectAIBot, negotiateFormat, toMarkdownPath } from "@dualmark/core";
 
 import { DUALMARK_SKIP_PATHS, MARKDOWN_NAMESPACE } from "@/constants/proxy";
+import { UTM_BUILDER_PATH } from "@/constants/utm-builder";
 import { serveMarkdownTwin } from "@/lib/markdown/handler";
+import { serveUtmBuilderMarkdown } from "@/lib/utm-builder/markdown";
 
 const MARKDOWN_EXTENSION_REGEX = /\.md$/;
 const TRAILING_SLASHES_REGEX = /\/+$/;
@@ -69,10 +71,10 @@ export async function negotiateMarkdown(
   const format = negotiateFormat(accept);
 
   if (detectAIBot(userAgent).isBot || format === "markdown") {
-    const response = await serveMarkdownTwin(
-      request,
-      toMarkdownTwinPath(pathname)
-    );
+    const response =
+      pathname.replace(TRAILING_SLASHES_REGEX, "") === UTM_BUILDER_PATH
+        ? serveUtmBuilderMarkdown(request)
+        : await serveMarkdownTwin(request, toMarkdownTwinPath(pathname));
     appendNegotiationVary(response.headers);
     return response;
   }
