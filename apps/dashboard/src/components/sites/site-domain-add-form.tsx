@@ -1,12 +1,13 @@
 "use client";
 
-import {
-  Globe02Icon,
-  Link04Icon,
-  Route01Icon,
-  ServerStack01Icon,
-} from "@hugeicons/core-free-icons";
+import { Globe02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+} from "@notra/ui/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
@@ -17,7 +18,6 @@ import { useId, useState } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
-import { Button } from "@/components/button";
 import { SITE_DOMAIN_URL_SCHEME_PATTERN } from "@/constants/sites";
 import { useInvalidateSites } from "@/lib/hooks/use-sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
@@ -78,102 +78,79 @@ export function SiteDomainAddForm({
         }
       }}
     >
-      <InputGroup>
-        <InputGroupAddon>
-          <HugeiconsIcon
-            aria-hidden="true"
-            icon={Globe02Icon}
-            size={15}
-            strokeWidth={1.5}
+      <Field>
+        <FieldContent>
+          <FieldLabel htmlFor={`${id}-input`}>{t("label")}</FieldLabel>
+          <FieldDescription id={`${id}-hint`}>{t("hint")}</FieldDescription>
+        </FieldContent>
+        <InputGroup>
+          <InputGroupAddon>
+            <HugeiconsIcon
+              aria-hidden="true"
+              icon={Globe02Icon}
+              size={15}
+              strokeWidth={1.5}
+            />
+          </InputGroupAddon>
+          <InputGroupInput
+            aria-describedby={`${id}-hint ${id}-connection`}
+            autoCapitalize="none"
+            autoComplete="off"
+            autoFocus={autoFocus}
+            id={`${id}-input`}
+            inputMode="url"
+            onChange={(event) => {
+              const next = event.target.value.replace(
+                SITE_DOMAIN_URL_SCHEME_PATTERN,
+                ""
+              );
+              if (detectSiteDomainKind(next) !== detected) {
+                setOverride(null);
+              }
+              setValue(next);
+            }}
+            placeholder={t("placeholder")}
+            spellCheck={false}
+            value={value}
           />
-        </InputGroupAddon>
-        <InputGroupInput
-          aria-describedby={`${id}-connection`}
-          aria-label={t("label")}
-          autoCapitalize="none"
-          autoComplete="off"
-          autoFocus={autoFocus}
-          inputMode="url"
-          onChange={(event) => {
-            const next = event.target.value.replace(
-              SITE_DOMAIN_URL_SCHEME_PATTERN,
-              ""
-            );
-            if (detectSiteDomainKind(next) !== detected) {
-              setOverride(null);
-            }
-            setValue(next);
-          }}
-          placeholder={t("placeholder")}
-          spellCheck={false}
-          value={value}
-        />
-      </InputGroup>
+        </InputGroup>
+      </Field>
       <div
         aria-live="polite"
-        className="rounded-lg border p-3"
+        className="bg-muted/50 rounded-lg px-3.5 py-3 text-sm empty:hidden"
         id={`${id}-connection`}
       >
         {kind ? (
           <div
-            className="animate-in fade-in duration-normal ease-emphasized space-y-3"
+            className="animate-in fade-in duration-normal ease-emphasized space-y-2"
             key={kind}
           >
-            <div className="space-y-1.5">
+            <div className="space-y-0.5">
               <p className="text-muted-foreground text-xs">{t("liveAt")}</p>
-              <ul className="space-y-1">
+              <ul>
                 {urls.map((url) => (
-                  <li
-                    className="flex items-center gap-2 font-mono text-sm"
-                    key={url}
-                  >
-                    <HugeiconsIcon
-                      aria-hidden="true"
-                      className="text-muted-foreground shrink-0"
-                      icon={Link04Icon}
-                      size={13}
-                      strokeWidth={1.5}
-                    />
-                    <span className="truncate">{url}</span>
+                  <li className="truncate font-medium" key={url}>
+                    {url}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="border-border/60 flex items-start gap-2.5 border-t pt-3">
-              <HugeiconsIcon
-                aria-hidden="true"
-                className="text-muted-foreground mt-0.5 shrink-0"
-                icon={kind === "subdomain" ? ServerStack01Icon : Route01Icon}
-                size={15}
-                strokeWidth={1.5}
-              />
-              <div className="min-w-0 flex-1 space-y-1 text-sm">
-                <p className="text-muted-foreground text-pretty">
-                  {kind === "subdomain"
-                    ? t("subdomainExplain", { hostname })
-                    : t("proxyExplain", { hostname })}
-                </p>
-                <Button
-                  className="h-auto min-h-7 max-w-full"
-                  onClick={() =>
-                    setOverride(kind === "subdomain" ? "proxy" : "subdomain")
-                  }
-                  type="button"
-                  size="sm"
-                  variant="link"
-                >
-                  <span className="text-left whitespace-normal">
-                    {kind === "subdomain" ? t("useProxy") : t("useDns")}
-                  </span>
-                </Button>
-              </div>
-            </div>
+            <p className="text-muted-foreground text-pretty">
+              {kind === "subdomain"
+                ? t("subdomainExplain", { hostname })
+                : t("proxyExplain", { hostname })}{" "}
+              <button
+                className="text-primary focus-visible:ring-ring/50 rounded-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-2"
+                onClick={() =>
+                  setOverride(kind === "subdomain" ? "proxy" : "subdomain")
+                }
+                type="button"
+              >
+                {kind === "subdomain" ? t("useProxy") : t("useDns")}
+              </button>
+            </p>
           </div>
-        ) : (
-          <p className="text-muted-foreground text-sm text-pretty">
-            {t("hint")}
-          </p>
-        )}
+        ) : null}
       </div>
       {renderActions({
         canSubmit: kind !== null,

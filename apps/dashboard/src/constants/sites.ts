@@ -67,6 +67,7 @@ export const SITE_NAV_SECTIONS: ReadonlySet<SiteSection> = new Set([
   "overview",
   "design",
   "analytics",
+  "domains",
   "settings",
 ]);
 

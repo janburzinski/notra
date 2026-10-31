@@ -8470,7 +8470,7 @@
         "added": "Domain hinzugefügt",
         "addFailed": "Domain konnte nicht hinzugefügt werden",
         "label": "Domain",
-        "placeholder": "blog.acme.com oder acme.com/blog",
+        "placeholder": "blog.acme.com",
         "hint": "Gib eine Subdomain wie blog.acme.com ein oder deine eigene Seite wie acme.com/blog.",
         "useProxy": "Stattdessen meine Website behalten und Pfade weiterleiten",
         "useDns": "Stattdessen die ganze Domain auf Notra zeigen lassen",
