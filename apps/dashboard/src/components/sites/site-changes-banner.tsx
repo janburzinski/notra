@@ -42,7 +42,7 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   return (
     <div
       className={cn(
-        "bg-background animate-in fade-in-0 slide-in-from-top-1 z-10 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b bg-linear-to-b px-4 py-2 duration-200 motion-reduce:animate-none sm:sticky sm:top-12 lg:px-5",
+        "bg-background animate-in fade-in-0 slide-in-from-top-1 z-10 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b bg-linear-to-b px-4 py-2 duration-200 motion-reduce:animate-none sm:sticky sm:top-0 lg:px-5",
         SITE_CHANGES_STRIP_TONES[tone]
       )}
       role={tone === "info" ? "status" : "alert"}

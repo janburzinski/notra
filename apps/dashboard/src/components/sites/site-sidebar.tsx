@@ -103,7 +103,7 @@ export function SiteSidebar() {
       aria-label={tabs("label")}
       className="bg-sidebar text-sidebar-foreground hidden w-60 shrink-0 border-e md:block"
     >
-      <div className="sticky top-12 flex h-full max-h-[calc(100svh-3rem)] flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         <nav
           aria-label={tabs("label")}
           className="min-h-0 flex-1 overflow-y-auto py-1"

@@ -21,7 +21,7 @@ export function SkeletonCrossfade({
 
   return (
     <div
-      className="relative isolate flex min-w-0 flex-1 flex-col"
+      className="relative isolate flex min-h-0 min-w-0 flex-1 flex-col"
       data-skeleton-transition={loading ? "loading" : "content"}
     >
       {loading ? skeleton : children}

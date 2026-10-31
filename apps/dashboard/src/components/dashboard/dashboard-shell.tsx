@@ -207,7 +207,7 @@ function DashboardPageViewport({
   return (
     <div
       className={cn(
-        "@container/main flex min-h-0 min-w-0 flex-1 flex-col gap-2 overscroll-contain pointer-fine:overscroll-none",
+        "@container/main flex min-h-0 min-w-0 flex-1 flex-col gap-2 overscroll-contain has-[[data-site-frame]]:overflow-hidden pointer-fine:overscroll-none",
         pageOwnsScroll
           ? "overflow-hidden"
           : "scrollbar-stable scrollbar-thin overflow-x-hidden overflow-y-auto"

@@ -92,15 +92,18 @@ export function SiteLayout({
           >
             <SitePublishConfetti />
             <SiteWorkspace>
-              <div className="flex flex-1 flex-col" data-site-frame="">
+              <div
+                className="flex min-h-0 flex-1 flex-col overflow-hidden"
+                data-site-frame=""
+              >
                 <SiteHeader
                   organizationId={organizationId}
                   site={detail.site}
                   slug={organizationSlug}
                 />
-                <div className="flex flex-1">
+                <div className="flex min-h-0 flex-1">
                   <SiteSidebar />
-                  <div className="flex min-w-0 flex-1 flex-col">
+                  <div className="scrollbar-stable flex min-h-0 min-w-0 flex-1 scrollbar-thin flex-col overflow-x-hidden overflow-y-auto">
                     <SiteMobileNav />
                     <SiteChangesBanner />
                     <SitesPageShell>

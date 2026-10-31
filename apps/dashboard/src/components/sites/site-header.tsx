@@ -111,7 +111,7 @@ function SiteSwitcher({
 export function SiteHeader({ slug, organizationId, site }: SiteHeaderProps) {
   const { section } = useSiteNavSection(slug, site.id);
   return (
-    <div className="bg-background sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-x-3 border-b px-4 lg:px-5">
+    <div className="bg-background sticky top-0 z-20 flex min-h-12 shrink-0 flex-wrap items-center gap-x-3 border-b px-4 lg:px-5">
       <SiteSwitcher
         organizationId={organizationId}
         section={section}
