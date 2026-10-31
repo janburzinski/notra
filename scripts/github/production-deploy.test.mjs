@@ -14,6 +14,7 @@ function fixture({
   envOverrides = {},
   apiStatus = 200,
   liveToolchain = "toolchain-1",
+  readBody = () => {},
   toolchain = { version: "toolchain-1", snapshotId: null },
 } = {}) {
   const sha = "a".repeat(40);
@@ -196,7 +197,10 @@ function fixture({
     return {
       ok: url.hostname !== "api.unkey.com" || (status >= 200 && status < 300),
       status,
-      json: async () => (url.hostname === "api.unkey.com" ? { data } : data),
+      json: async () => {
+        readBody(call);
+        return url.hostname === "api.unkey.com" ? { data } : data;
+      },
     };
   };
   return {
@@ -564,6 +568,112 @@ test("Vercel creation errors are not retried", async () => {
     1
   );
 });
+
+test("transient provider read timeouts are retried", async () => {
+  let failures = 0;
+  const { run, calls } = fixture({
+    api: true,
+    preflightOnly: true,
+    override: ({ url }) => {
+      if (
+        (url.pathname === "/v9/projects/notra" ||
+          url.pathname === "/v2/domains.listDomains") &&
+        failures++ % 2 === 0
+      ) {
+        throw new DOMException("The operation timed out.", "TimeoutError");
+      }
+    },
+  });
+  await run();
+  assert.equal(
+    calls.filter(({ url }) => url.pathname === "/v9/projects/notra").length,
+    2
+  );
+});
+
+test("persistent read timeouts name the failing request and start no builds", async () => {
+  const { run, calls } = fixture({
+    api: true,
+    override: ({ url }) => {
+      if (url.pathname === "/v2/domains.listDomains") {
+        throw new DOMException("The operation timed out.", "TimeoutError");
+      }
+    },
+  });
+  await assert.rejects(run(), {
+    message: "unkey v2/domains.listDomains: The operation timed out.",
+  });
+  assert.equal(
+    calls.filter(({ url }) => url.pathname === "/v2/domains.listDomains")
+      .length,
+    3
+  );
+  assert.equal(builds(calls).length, 0);
+});
+
+test("Unkey 5xx reads are retried", async () => {
+  let failed = false;
+  const { run } = fixture({
+    api: true,
+    preflightOnly: true,
+    apiStatus: ({ url }) => {
+      if (url.pathname === "/v2/apps.getApp" && !failed) {
+        failed = true;
+        return 503;
+      }
+      return 200;
+    },
+  });
+  await run();
+  assert.ok(failed);
+});
+
+for (const path of ["/v9/projects/notra", "/v2/apps.getApp"]) {
+  for (const name of ["TimeoutError", "AbortError", "TypeError"]) {
+    test(`${path} retries ${name} while reading JSON`, async () => {
+      let reads = 0;
+      const { run } = fixture({
+        api: true,
+        preflightOnly: true,
+        readBody: ({ url }) => {
+          if (url.pathname === path && ++reads === 1) {
+            throw name === "TypeError"
+              ? new TypeError("terminated")
+              : new DOMException("body read failed", name);
+          }
+        },
+      });
+      await run();
+      assert.ok(reads > 1);
+    });
+  }
+}
+
+for (const [path, error, attempts] of [
+  ["/v9/projects/notra", new DOMException("body timeout", "TimeoutError"), 3],
+  ["/v9/projects/notra", new SyntaxError("malformed JSON"), 1],
+  ["/v13/deployments", new TypeError("terminated"), 1],
+  ["/v3/deployments.createDeployment", new TypeError("terminated"), 1],
+]) {
+  test(`${path} labels ${error.name} body errors after ${attempts} attempt(s)`, async () => {
+    let reads = 0;
+    const { run } = fixture({
+      api: true,
+      readBody: ({ url }) => {
+        if (url.pathname === path) {
+          reads += 1;
+          throw error;
+        }
+      },
+    });
+    await assert.rejects(run(), (failure) => {
+      assert.ok(failure.message.includes(path.replace(/^\//, "")));
+      assert.ok(failure.message.includes(error.message));
+      return true;
+    });
+    assert.equal(reads, path === "/v13/deployments" ? 6 : attempts);
+  });
+}
 
 test("Vercel cancellation is not retried even with an OOM error code", async () => {
   const { run, calls } = fixture({

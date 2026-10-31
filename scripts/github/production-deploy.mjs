@@ -180,7 +180,37 @@ export async function release({
       await appendFile(env.GITHUB_STEP_SUMMARY, `${message}\n\n`);
     }
   };
-  const request = async (provider, path, body) => {
+  // Reads are retried so a slow or flaky provider cannot fail a release;
+  // creations run once so a lost response cannot start a second build.
+  const send = async (label, url, init, { retry }) => {
+    for (let attempt = 1; ; attempt += 1) {
+      const canRetry = retry && attempt < 3;
+      let response;
+      try {
+        response = await fetchImpl(url, {
+          ...init,
+          signal: AbortSignal.timeout(30_000),
+        });
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch (error) {
+        if (!canRetry || error instanceof SyntaxError) {
+          throw new Error(`${label}: ${error.message}`);
+        }
+        await report(`${label}: ${error.message}; retrying`);
+        await sleep(5000 * attempt);
+        continue;
+      }
+      if (canRetry && (response.status === 429 || response.status >= 500)) {
+        await report(`${label}: HTTP ${response.status}; retrying`);
+        await sleep(5000 * attempt);
+        continue;
+      }
+      throw new Error(`${label}: HTTP ${response.status}`);
+    }
+  };
+  const request = (provider, path, body) => {
     const github = provider === "github";
     const url = new URL(
       path,
@@ -189,21 +219,21 @@ export async function release({
     if (!github) {
       url.searchParams.set("teamId", env.VERCEL_TEAM_ID);
     }
-    const response = await fetchImpl(url, {
-      method: body ? "POST" : "GET",
-      headers: {
-        Authorization: `Bearer ${github ? env.GH_TOKEN : env.VERCEL_TOKEN}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        ...(github ? { "X-GitHub-Api-Version": "2022-11-28" } : {}),
+    return send(
+      `${provider} ${url.pathname}`,
+      url,
+      {
+        method: body ? "POST" : "GET",
+        headers: {
+          Authorization: `Bearer ${github ? env.GH_TOKEN : env.VERCEL_TOKEN}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...(github ? { "X-GitHub-Api-Version": "2022-11-28" } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
       },
-      body: body ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(30_000),
-    });
-    if (!response.ok) {
-      throw new Error(`${provider} ${url.pathname}: HTTP ${response.status}`);
-    }
-    return response.json();
+      { retry: !body }
+    );
   };
   const assertAheadOf = async (name, previousSha) => {
     if (previousSha === sha) {
@@ -224,19 +254,19 @@ export async function release({
   await report(`Release commit: \`${sha}\``);
 
   const unkey = async (path, body) => {
-    const response = await fetchImpl(`https://api.unkey.com/${path}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.UNKEY_DEPLOY_ROOT_KEY}`,
-        "Content-Type": "application/json",
+    const result = await send(
+      `unkey ${path}`,
+      `https://api.unkey.com/${path}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.UNKEY_DEPLOY_ROOT_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
       },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(30_000),
-    });
-    if (!response.ok) {
-      throw new Error(`unkey ${path}: HTTP ${response.status}`);
-    }
-    const result = await response.json();
+      { retry: path !== "v3/deployments.createDeployment" }
+    );
     if (result.error || result.data === undefined) {
       throw new Error(`unkey ${path}: invalid response`);
     }
