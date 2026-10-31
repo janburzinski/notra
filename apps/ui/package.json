@@ -13,7 +13,11 @@
     "./card/grid": "./registry/notra/card/components/instrument-grid.tsx",
     "./card/labels": "./registry/notra/card/components/card-labels.tsx",
     "./card/reveal": "./registry/notra/card/components/instrument-reveal.tsx",
-    "./card/types": "./registry/notra/card/types/card.ts"
+    "./card/types": "./registry/notra/card/types/card.ts",
+    "./workflow/canvas": "./registry/notra/workflow/components/workflow-canvas.tsx",
+    "./workflow/logo": "./registry/notra/workflow/components/workflow-logo.tsx",
+    "./workflow/node-sheet": "./registry/notra/workflow/components/workflow-node-sheet.tsx",
+    "./workflow/types": "./registry/notra/workflow/types/workflow.ts"
   },
   "scripts": {
     "dev": "blume dev --port 3006",

@@ -388,7 +388,9 @@ export const createNodeFromBlock = (
   position: WorkflowPoint
 ): WorkflowNodeData => ({
   branch:
-    block.outputs && block.outputs.length > 1 ? block.outputs[0].id : undefined,
+    block.outputs && block.outputs.length > 1
+      ? block.outputs[0]?.id
+      : undefined,
   description: block.description,
   durationMs: block.durationMs,
   id: `${block.id}-${Date.now().toString(36)}`,

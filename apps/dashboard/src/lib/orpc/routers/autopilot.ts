@@ -46,7 +46,10 @@ import {
   mergeFinding,
   syncFindingPullRequests,
 } from "@/lib/autopilot/findings";
-import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
+import {
+  isAutopilotEnabledForOrganization,
+  isAutopilotWorkflowGraphEnabled,
+} from "@/lib/autopilot/flag";
 import { loadFindingImpacts } from "@/lib/autopilot/impact";
 import {
   describeItemRuns,
@@ -73,6 +76,7 @@ import { loadSuggestedPost } from "@/lib/autopilot/suggestions";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { badRequest, forbidden } from "@/lib/orpc/utils/errors";
 import { workflowDefinitions } from "@/lib/workflow-engine/definitions/autopilot";
+import { getWorkflowRunViews } from "@/lib/workflow-engine/run-view";
 import { startAutopilotSuggestionWorkflowRun } from "@/lib/workflows/start";
 import type { ORPCContext } from "@/types/orpc/context";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
@@ -449,6 +453,19 @@ export const autopilotRouter = {
     .use(withOrganizationAccess)
     .use(withAutopilotFlag)
     .handler(({ input }) => listRunEvents(input.organizationId, input.runId)),
+
+  runGraph: authorizedProcedure
+    .input(autopilotRunInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input }) => {
+      if (!(await isAutopilotWorkflowGraphEnabled(input.organizationId))) {
+        throw forbidden(
+          "The workflow view is not available for this workspace."
+        );
+      }
+      return await getWorkflowRunViews(input.organizationId, input.runId);
+    }),
 
   sync: authorizedProcedure
     .input(autopilotOrganizationInputSchema)

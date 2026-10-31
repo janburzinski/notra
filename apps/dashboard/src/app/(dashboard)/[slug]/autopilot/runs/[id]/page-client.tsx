@@ -1,5 +1,6 @@
 "use client";
 
+import { useFlag } from "@databuddy/sdk/react";
 import { GitPullRequestIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
@@ -17,6 +18,7 @@ import {
 } from "@/components/autopilot/autopilot-run-panel";
 import { AutopilotRunTimeline } from "@/components/autopilot/autopilot-run-timeline";
 import { AutopilotStopButton } from "@/components/autopilot/autopilot-stop-button";
+import { AutopilotWorkflowGraph } from "@/components/autopilot/autopilot-workflow-graph";
 import { EmptyState } from "@/components/empty-state";
 import { SiteBuildLogs } from "@/components/sites/site-build-logs";
 import {
@@ -25,6 +27,7 @@ import {
   AUTOPILOT_RUN_SECTIONS,
   AUTOPILOT_RUN_STATUS_BADGES,
   AUTOPILOT_RUN_TRIGGER_LABELS,
+  AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY,
 } from "@/constants/autopilot";
 import { AUTOPILOT_RUN_RESULT_CLASS } from "@/constants/autopilot-ui";
 import { SITE_DEPLOYMENT_LOG_SURFACE_CLASS } from "@/constants/sites";
@@ -216,6 +219,10 @@ function RunPage({
   run,
 }: AutopilotRunPageProps) {
   const format = useFormatter();
+  const graphFlag = useFlag(AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY);
+  const showGraph =
+    Boolean(run.workflowKey) &&
+    (graphFlag.on || process.env.NODE_ENV === "development");
   const running = run.status === "running";
   const query = useQuery(
     dashboardOrpc.autopilot.runEvents.queryOptions({
@@ -276,6 +283,15 @@ function RunPage({
       </div>
 
       <RunEndNotice run={run} />
+
+      {showGraph ? (
+        <section aria-labelledby="run-workflow" className="space-y-3">
+          <h2 className="text-sm font-medium" id="run-workflow">
+            Workflow
+          </h2>
+          <AutopilotWorkflowGraph organizationId={organizationId} run={run} />
+        </section>
+      ) : null}
 
       <section aria-labelledby="run-activity" className="space-y-3">
         <h2 className="text-sm font-medium" id="run-activity">

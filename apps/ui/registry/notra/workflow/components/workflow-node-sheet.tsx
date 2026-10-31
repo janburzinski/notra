@@ -78,7 +78,7 @@ const WorkflowBranchSelect = ({
             onBranchChange(node.id, branch);
           }
         }}
-        value={node.branch ?? outputs[0].id}
+        value={node.branch ?? outputs[0]?.id}
       >
         <SelectTrigger className="w-full" id={`${node.id}-branch`}>
           <SelectValue>
@@ -112,7 +112,7 @@ const WorkflowNodeSettings = ({
       {node.description && (
         <p className="text-muted-foreground text-sm">{node.description}</p>
       )}
-      {node.kind === "ai" && (
+      {node.kind === "ai" && onModelChange && (
         <div className="flex flex-col gap-1.5">
           <label
             className="text-sm leading-none font-medium"
@@ -122,7 +122,7 @@ const WorkflowNodeSettings = ({
           </label>
           <WorkflowModelSelect
             id={`${node.id}-model`}
-            onValueChange={(model) => onModelChange?.(node.id, model)}
+            onValueChange={(model) => onModelChange(node.id, model)}
             value={node.model}
           />
           <p className="text-muted-foreground text-xs">

@@ -76,6 +76,7 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
   }));
   mock.module("@/lib/autopilot/flag", () => ({
     isAutopilotEnabledForOrganization: async () => state.flag,
+    isAutopilotWorkflowGraphEnabled: async () => state.flag,
   }));
   const findings = await import("@/lib/autopilot/findings");
   mock.module("@/lib/autopilot/findings", () => ({

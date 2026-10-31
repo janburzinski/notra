@@ -18,6 +18,7 @@ import type { DashboardRouter } from "@/lib/orpc/router";
 import type { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
 import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
 import type { GitHubMergeMethod } from "@/types/integrations/github";
+import type { WorkflowRunView } from "@/types/workflow-engine";
 
 export interface AutopilotRepository {
   owner: string;
@@ -311,6 +312,17 @@ export interface AutopilotRunEndNoticeProps {
 export interface AutopilotRunSummaryProps {
   events: AutopilotRunEventView[];
   run: AutopilotRunView;
+}
+
+export interface AutopilotWorkflowGraphProps {
+  organizationId: string;
+  run: AutopilotRunView;
+}
+
+export interface WorkflowRunCanvasProps {
+  run: WorkflowRunView;
+  calledFrom: string | null;
+  now: number;
 }
 
 export interface AutopilotRunPageProps {

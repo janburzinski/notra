@@ -266,9 +266,9 @@ export const WorkflowNodeCard = ({
   const status = state?.status ?? "idle";
   const inputs = getInputPorts(node);
   const outputs = getOutputPorts(node);
-  const [singleInput] = inputs.length === 1 && !inputs[0].label ? inputs : [];
+  const [singleInput] = inputs.length === 1 && !inputs[0]?.label ? inputs : [];
   const [singleOutput] =
-    outputs.length === 1 && !outputs[0].label ? outputs : [];
+    outputs.length === 1 && !outputs[0]?.label ? outputs : [];
   const labeledInputs = singleInput ? [] : inputs;
   const labeledOutputs = singleOutput ? [] : outputs;
   const isLive = status === "running" || status === "waiting";

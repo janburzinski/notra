@@ -2,6 +2,7 @@ import { WORKFLOW_ERROR_PORT } from "../constants/graph";
 import type {
   CompiledWorkflowGraph as WorkflowGraph,
   CompiledWorkflowNode as WorkflowNode,
+  WorkflowEdge,
 } from "../types/graph";
 import type { WorkflowNodeSettlement } from "../types/interpreter";
 import type {
@@ -65,6 +66,48 @@ export function markNodeStarted(state: WorkflowRunState, nodeId: string) {
   state.nodes[nodeId] = { status: "running" };
 }
 
+export function isEdgeTaken(
+  edge: WorkflowEdge,
+  node: WorkflowNode,
+  port: string | null | false
+) {
+  const edgePort = edgeSourcePort(edge, node);
+  return (
+    port !== false &&
+    (port === null ? edgePort !== WORKFLOW_ERROR_PORT : edgePort === port)
+  );
+}
+
+function errorPort(
+  graph: WorkflowGraph,
+  node: WorkflowNode
+): string | null | false {
+  const policy = node.onError ?? "fail";
+  if (
+    policy === "route" &&
+    outgoing(graph, node.id).some(
+      (edge) => edgeSourcePort(edge, node) === WORKFLOW_ERROR_PORT
+    )
+  ) {
+    return WORKFLOW_ERROR_PORT;
+  }
+  if (policy === "continue") {
+    return isBranching(node) ? (getOutputPorts(node)[0]?.id ?? null) : null;
+  }
+  return false;
+}
+
+export function settledPort(
+  graph: WorkflowGraph,
+  node: WorkflowNode,
+  settled: { status: string; port?: string | null }
+): string | null | false {
+  if (settled.status === "success") {
+    return settled.port ?? null;
+  }
+  return settled.status === "error" ? errorPort(graph, node) : false;
+}
+
 function settleEdges(
   graph: WorkflowGraph,
   state: WorkflowRunState,
@@ -72,11 +115,7 @@ function settleEdges(
   port: string | null | false
 ) {
   for (const edge of outgoing(graph, node.id)) {
-    const edgePort = edgeSourcePort(edge, node);
-    const taken =
-      port !== false &&
-      (port === null ? edgePort !== WORKFLOW_ERROR_PORT : edgePort === port);
-    state.edges[edge.id] = taken ? "taken" : "skipped";
+    state.edges[edge.id] = isEdgeTaken(edge, node, port) ? "taken" : "skipped";
   }
 }
 
@@ -118,18 +157,9 @@ export function completeNode(
   }
   const settled = { status: "error" as const, error: outcome.error };
   state.nodes[nodeId] = settled;
-  const policy = node.onError ?? "fail";
-  if (
-    policy === "route" &&
-    outgoing(graph, nodeId).some(
-      (edge) => edgeSourcePort(edge, node) === WORKFLOW_ERROR_PORT
-    )
-  ) {
-    settleEdges(graph, state, node, WORKFLOW_ERROR_PORT);
-  } else if (policy === "continue") {
-    settleEdges(graph, state, node, isBranching(node) ? firstPort : null);
-  } else {
-    settleEdges(graph, state, node, false);
+  const port = errorPort(graph, node);
+  settleEdges(graph, state, node, port);
+  if (port === false) {
     state.failure ??= { nodeId, error: outcome.error };
   }
   return settled;

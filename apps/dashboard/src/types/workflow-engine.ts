@@ -1,8 +1,12 @@
+import type { WORKFLOW_RUN_NODE_STATUSES } from "@notra/db/constants/workflows";
 import type { db } from "@notra/db/drizzle";
+import type { WorkflowRunNodeStep } from "@notra/db/types/workflows";
 import type {
   CompiledWorkflowBundle,
   CompiledWorkflowGraph,
   CompiledWorkflowNode,
+  WorkflowEdge,
+  WorkflowPort,
 } from "@notra/workflows/types/graph";
 import type {
   WorkflowBlockCall,
@@ -48,4 +52,43 @@ export interface WorkflowRunFinish {
   output?: unknown;
   error?: string;
   failedNodeId?: string | null;
+}
+
+export interface WorkflowRunViewStep {
+  id: string;
+  title: string;
+  status: WorkflowRunNodeStep["status"] | null;
+  attempts: number;
+  error: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+}
+
+export interface WorkflowRunViewNode extends Omit<
+  CompiledWorkflowNode,
+  "config" | "outputs"
+> {
+  logo: string | null;
+  outputs: WorkflowPort[];
+  status: (typeof WORKFLOW_RUN_NODE_STATUSES)[number] | null;
+  port: string | null;
+  output: unknown;
+  error: string | null;
+  reason: string | null;
+  startedAt: Date | null;
+  finishedAt: Date | null;
+  steps: WorkflowRunViewStep[];
+}
+
+export interface WorkflowRunViewEdge extends WorkflowEdge {
+  taken: boolean | null;
+}
+
+export interface WorkflowRunView {
+  id: string;
+  title: string;
+  parentRunId: string | null;
+  startedAt: Date | null;
+  nodes: WorkflowRunViewNode[];
+  edges: WorkflowRunViewEdge[];
 }

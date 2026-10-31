@@ -10,6 +10,7 @@ import type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";
 import type { AutopilotOutcomeKey } from "@/types/autopilot-metrics";
 
 export const AUTOPILOT_FLAG_KEY = "autopilot";
+export const AUTOPILOT_WORKFLOW_GRAPH_FLAG_KEY = "autopilot-workflow-graph";
 export const AUTOPILOT_GITHUB_DELIVERY_PREFIX = "autopilot:";
 
 export const AUTOPILOT_NAV_LINK = "/autopilot";
