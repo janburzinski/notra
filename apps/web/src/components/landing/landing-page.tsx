@@ -23,14 +23,14 @@ import { SITE_URL } from "@/utils/urls";
 
 const DEFERRED_SECTION_CLASS = {
   features:
-    "[content-visibility:auto] [contain-intrinsic-size:auto_186rem] lg:[contain-intrinsic-size:auto_96rem]",
+    "[content-visibility:auto] [contain-intrinsic-size:auto_137rem] lg:[contain-intrinsic-size:auto_96rem]",
   answers:
-    "[content-visibility:auto] [contain-intrinsic-size:auto_105rem] lg:[contain-intrinsic-size:auto_62rem]",
+    "[content-visibility:auto] [contain-intrinsic-size:auto_88rem] lg:[contain-intrinsic-size:auto_62rem]",
   testimonials: "[content-visibility:auto] [contain-intrinsic-size:auto_50rem]",
   pricing:
-    "[content-visibility:auto] [contain-intrinsic-size:auto_236rem] lg:[contain-intrinsic-size:auto_85rem]",
-  faq: "[content-visibility:auto] [contain-intrinsic-size:auto_77rem] lg:[contain-intrinsic-size:auto_71rem]",
-  cta: "[content-visibility:auto] [contain-intrinsic-size:auto_33rem] lg:[contain-intrinsic-size:auto_27rem]",
+    "[content-visibility:auto] [contain-intrinsic-size:auto_107rem] lg:[contain-intrinsic-size:auto_85rem]",
+  faq: "[content-visibility:auto] [contain-intrinsic-size:auto_57rem] lg:[contain-intrinsic-size:auto_71rem]",
+  cta: "[content-visibility:auto] [contain-intrinsic-size:auto_34rem] lg:[contain-intrinsic-size:auto_27rem]",
 };
 
 const softwareJsonLd = {
@@ -178,7 +178,7 @@ export function LandingPage() {
         </section>
         <section
           className={cn(
-            "px-6 pt-27.5 pb-27.5 lg:px-20",
+            "px-6 pt-16 pb-16 sm:pt-27.5 sm:pb-27.5 lg:px-20",
             DEFERRED_SECTION_CLASS.cta
           )}
           id="cta"

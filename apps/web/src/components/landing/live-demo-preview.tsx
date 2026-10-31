@@ -27,7 +27,7 @@ export function LiveDemoPreview() {
           decoding="async"
           loading={resolvedTheme ? "eager" : "lazy"}
           alt={LIVE_DEMO_PREVIEW_ALT}
-          className="pointer-events-none absolute inset-0 size-full object-cover object-top-left"
+          className="pointer-events-none absolute top-0 left-0 h-auto w-[320%] max-w-none -translate-x-[19%] -translate-y-[7%] sm:inset-0 sm:size-full sm:translate-0 sm:object-cover sm:object-top-left"
           fetchPriority="high"
           height={1250}
           src={LIVE_DEMO_PREVIEW_SRC}

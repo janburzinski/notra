@@ -349,9 +349,18 @@ export function buildLayout(w: number, h: number): Layout {
     }
   };
 
+  const treeScale = w > 220 ? 1 : 0.55;
   const left = Math.round(w * 0.22);
   shore(-10, left, 0, 9);
-  deadTree(mask, w, h, Math.round(w * 0.045), horizon - 6, 38, 3);
+  deadTree(
+    mask,
+    w,
+    h,
+    Math.round(w * 0.045),
+    horizon - 6,
+    Math.round(38 * treeScale),
+    3
+  );
   for (const [i, gx] of [0.1, 0.135, 0.165, 0.19].entries()) {
     gravestone(
       mask,
@@ -368,7 +377,15 @@ export function buildLayout(w: number, h: number): Layout {
   if (w > 220) {
     hauntedHouse(mask, w, h, Math.round(w * 0.86), horizon - 8);
   }
-  deadTree(mask, w, h, Math.round(w * 0.975), horizon - 7, 30, 9);
+  deadTree(
+    mask,
+    w,
+    h,
+    Math.round(w * 0.975),
+    horizon - 7,
+    Math.round(30 * treeScale),
+    9
+  );
 
   if (w > 220) {
     shore(Math.round(w * 0.55), Math.round(w * 0.63), 0, 4);

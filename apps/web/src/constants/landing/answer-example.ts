@@ -17,6 +17,8 @@ export const ANSWER_EXAMPLE_DEFAULT_ENGINE: EngineId = "chatgpt";
 
 export const ANSWER_EXAMPLE_TIMESTAMP = "Aug 26, 9:41 AM";
 
+export const ANSWER_EXAMPLE_EXPAND_LABEL = "Read the full answer";
+
 export const ANSWER_EXAMPLE_RESULTS_TITLE = "Across engines";
 
 export const ANSWER_EXAMPLE_RESULT_HEADERS = {

@@ -453,6 +453,7 @@ export function GeoPromptAnswerThread({
   result,
   timestamp,
   labels,
+  fitContentBelowLg = false,
 }: GeoPromptAnswerThreadProps) {
   const skin = geoChatSkin(result.engine);
   const excerpt = result.excerpt.trim();
@@ -467,12 +468,22 @@ export function GeoPromptAnswerThread({
     <div
       className={cn(
         "relative flex h-full min-h-0 flex-1 flex-col overflow-hidden",
+        fitContentBelowLg &&
+          "max-lg:h-auto max-lg:flex-none max-lg:overflow-visible",
         SKIN_SURFACE[skin]
       )}
     >
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div
+        className={cn(
+          "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+          fitContentBelowLg && "max-lg:flex-none max-lg:overflow-visible"
+        )}
+      >
         <div
-          className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 pt-8"
+          className={cn(
+            "mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 pt-8",
+            fitContentBelowLg && "max-lg:gap-8 max-lg:px-5 max-lg:pt-6 max-lg:pb-6!"
+          )}
           style={{ paddingBottom: composerHeight + THREAD_COMPOSER_GAP_PX }}
         >
           <ThreadMessages
@@ -484,8 +495,19 @@ export function GeoPromptAnswerThread({
           />
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0">
-        <div className="mx-auto w-full max-w-3xl px-6 pb-4" ref={composerRef}>
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0",
+          fitContentBelowLg && "max-lg:static"
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto w-full max-w-3xl px-6 pb-4",
+            fitContentBelowLg && "max-lg:px-4"
+          )}
+          ref={composerRef}
+        >
           <div className="pointer-events-auto">
             <SkinComposer
               engine={result.engine}

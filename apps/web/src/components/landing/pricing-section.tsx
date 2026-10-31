@@ -11,7 +11,7 @@ import {
   m,
   useReducedMotion,
 } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { PricingGiftIcon } from "@/components/landing/pricing-icons";
 import { PricingProShader } from "@/components/landing/pricing-pro-shader";
@@ -19,11 +19,14 @@ import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
   PRICING_ANNUAL_BADGE,
   PRICING_BILLING_OPTIONS,
+  PRICING_CAROUSEL_LABEL,
+  PRICING_CAROUSEL_PLANS,
   PRICING_DEFAULT_BILLING,
   PRICING_FREE_PLAN,
   PRICING_HEADING,
   PRICING_PLANS,
   PRICING_SUBHEADING,
+  pricingCarouselDotLabel,
   TRACKED_ENGINES,
   TRACKED_ENGINES_CAPTION,
 } from "@/constants/landing/pricing";
@@ -34,6 +37,7 @@ import type {
   PricingBillingToggleProps,
   PricingCardProps,
 } from "@/types/landing/pricing";
+import { activeSnapIndex, scrollToSnapIndex } from "@/utils/scroll-snap";
 import { pricingPlanHref } from "@/utils/signup";
 
 function PricingBillingToggle({
@@ -136,7 +140,7 @@ function PricingCardHeader({ plan, billingPeriod }: PricingCardProps) {
   return (
     <div
       className={cn(
-        "m-1.75 flex h-34 flex-col gap-2 rounded-2xl px-4.25 py-8.25",
+        "m-1.75 flex flex-col gap-2 rounded-2xl px-4.25 py-5 lg:h-34 lg:py-8.25",
         isFeatured
           ? "border border-white/5 bg-white/10 shadow-[inset_0_0_1.29375rem_#FFFFFF1A]"
           : "bg-white shadow-[0_0.125rem_0.3125rem_#00000008] dark:bg-white/[0.04]"
@@ -239,7 +243,7 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
   return (
     <article
       className={cn(
-        "relative flex h-184 w-full flex-col overflow-clip rounded-3xl lg:order-none",
+        "relative flex w-[82%] max-w-[22rem] shrink-0 snap-start flex-col overflow-clip rounded-3xl sm:w-full sm:max-w-none lg:order-none lg:h-184",
         isFeatured
           ? "order-first bg-[#6D28D9]"
           : "bg-[#F7F7F7] dark:bg-white/[0.04]"
@@ -250,7 +254,7 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
       <div className="relative z-10 flex h-full flex-col">
         <PricingCardHeader billingPeriod={billingPeriod} plan={plan} />
 
-        <div className="flex flex-1 flex-col px-6 pt-4.5">
+        <div className="flex flex-1 flex-col px-6 pt-4.5 pb-7 lg:pb-0">
           <div className="flex flex-col items-start gap-3.25">
             <PricingCardPrice billingPeriod={billingPeriod} plan={plan} />
 
@@ -269,12 +273,12 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
 
           <div
             className={cn(
-              "mt-8 h-px w-full",
+              "mt-6 h-px w-full lg:mt-8",
               isFeatured ? "bg-white/20" : "bg-black/20 dark:bg-white/15"
             )}
           />
 
-          <ul className="mt-10.5 flex flex-col gap-3">
+          <ul className="mt-6 flex flex-col gap-3 lg:mt-10.5">
             {plan.features.map((feature) => {
               const Icon = PRICING_ICONS[feature.icon];
 
@@ -379,22 +383,30 @@ export function LandingPricingSection({
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>(
     PRICING_DEFAULT_BILLING
   );
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activePlan, setActivePlan] = useState(0);
+
+  function handleCarouselScroll() {
+    if (carouselRef.current) {
+      setActivePlan(activeSnapIndex(carouselRef.current));
+    }
+  }
 
   return (
     <LazyMotion features={domMax}>
       <section
         className={cn(
-          "flex w-full flex-col items-center gap-13.5 px-6 pb-24",
-          showHeader ? "pt-24" : "pt-6"
+          "flex w-full flex-col items-center gap-10 px-6 pb-20 sm:gap-13.5 sm:pb-24",
+          showHeader ? "pt-20 sm:pt-24" : "pt-6"
         )}
         id="pricing"
       >
         {showHeader ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
             <h2 className="font-display max-w-[59rem] text-center text-[2rem] leading-[1.12] font-medium tracking-[-0.02em] text-balance text-[#1E1E1E] sm:text-[2.875rem] sm:leading-13 dark:text-white">
               {PRICING_HEADING}
             </h2>
-            <p className="max-w-[43rem] text-center font-sans text-lg leading-7 font-medium text-balance text-[#1E1E1EBF] sm:text-xl dark:text-white/70">
+            <p className="max-w-[43rem] text-center font-sans text-base/6 font-medium text-balance text-[#1E1E1EBF] sm:text-xl/7 dark:text-white/70">
               {PRICING_SUBHEADING}
             </p>
           </div>
@@ -406,17 +418,43 @@ export function LandingPricingSection({
             value={billingPeriod}
           />
 
-          <div className="grid w-full max-w-96 grid-cols-1 gap-4 lg:max-w-[80rem] lg:grid-cols-4">
-            {PRICING_PLANS.map((plan) => (
-              <PricingCard
-                billingPeriod={billingPeriod}
-                key={plan.id}
-                plan={plan}
-              />
-            ))}
+          <div className="flex w-full flex-col items-center gap-4">
+            <div
+              aria-label={PRICING_CAROUSEL_LABEL}
+              className="relative -mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory scroll-px-6 [scrollbar-width:none] gap-3 overflow-x-auto overscroll-x-contain px-6 sm:mx-0 sm:grid sm:w-full sm:max-w-[48rem] sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 lg:max-w-[80rem] lg:grid-cols-4 [&::-webkit-scrollbar]:hidden"
+              onScroll={handleCarouselScroll}
+              ref={carouselRef}
+              role="region"
+            >
+              {PRICING_PLANS.map((plan) => (
+                <PricingCard
+                  billingPeriod={billingPeriod}
+                  key={plan.id}
+                  plan={plan}
+                />
+              ))}
+            </div>
+            <div className="flex items-center sm:hidden">
+              {PRICING_CAROUSEL_PLANS.map((plan, index) => (
+                <button
+                  aria-current={index === activePlan}
+                  aria-label={pricingCarouselDotLabel(plan.name)}
+                  className="group flex size-6 cursor-pointer items-center justify-center"
+                  key={plan.id}
+                  onClick={() => {
+                    if (carouselRef.current) {
+                      scrollToSnapIndex(carouselRef.current, index);
+                    }
+                  }}
+                  type="button"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#1E1E1E33] transition-[width,background-color] duration-200 ease-out group-aria-current:w-4 group-aria-current:bg-[#1E1E1E] dark:bg-white/25 dark:group-aria-current:bg-white" />
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="w-full max-w-96 lg:max-w-[80rem]">
+          <div className="w-full sm:max-w-[48rem] lg:max-w-[80rem]">
             <PricingFreeTier />
           </div>
         </div>

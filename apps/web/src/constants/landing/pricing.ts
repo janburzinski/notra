@@ -65,6 +65,12 @@ export const PRICING_FREE_PLAN: PricingFreePlan = {
   ],
 };
 
+export const PRICING_CAROUSEL_LABEL = "Plans";
+
+export function pricingCarouselDotLabel(planName: string) {
+  return `Show the ${planName} plan`;
+}
+
 export const PRICING_PLANS: PricingPlan[] = [
   {
     id: "starter",
@@ -200,4 +206,9 @@ export const PRICING_PLANS: PricingPlan[] = [
       { label: "ZDR included", icon: "zdr" },
     ],
   },
+];
+
+export const PRICING_CAROUSEL_PLANS: PricingPlan[] = [
+  ...PRICING_PLANS.filter((plan) => plan.variant === "featured"),
+  ...PRICING_PLANS.filter((plan) => plan.variant !== "featured"),
 ];

@@ -129,6 +129,8 @@ export interface GeoPromptAnswerThreadProps {
   result: GeoAnswerResult;
   timestamp: string;
   labels?: Partial<GeoAnswerThreadLabels>;
+  /** Below the lg breakpoint, grow with the answer instead of scrolling inside a fixed-height frame. */
+  fitContentBelowLg?: boolean;
 }
 
 export interface PromptEngineSwitcherItem {

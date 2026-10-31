@@ -31,7 +31,7 @@ export function FeaturesCardTraffic() {
       subhead={FEATURES_TRAFFIC_FRAME.subhead}
     >
       <StatTiles
-        className="border-border border-b"
+        className="border-border grid-cols-3 divide-x divide-y-0 border-b max-sm:[&_span]:text-xl max-sm:[&>div]:px-3 max-sm:[&>div]:py-3"
         tiles={FEATURES_TRAFFIC_KPIS.map((kpi) => ({
           key: kpi.id,
           label: kpi.label,

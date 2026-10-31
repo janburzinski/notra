@@ -1,6 +1,7 @@
 import { track, useFlag } from "@databuddy/sdk/react";
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { useIsMobile } from "@notra/ui/hooks/use-mobile";
+import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { useReducedMotion } from "motion/react";
 import { parseAsString, useQueryState } from "nuqs";
@@ -116,19 +117,19 @@ export function HeroSection() {
         </div>
 
         <div className="relative flex h-full w-full flex-col items-center">
-          <div className="flex w-full min-w-0 flex-col items-center gap-8 px-6 pt-24 pb-2 sm:gap-10 sm:pt-28 lg:pt-[7.5rem]">
-            <div className="flex w-full min-w-0 flex-col items-center gap-7">
+          <div className="flex w-full min-w-0 flex-col items-center gap-7 px-3 pt-22 pb-2 sm:gap-10 sm:px-6 sm:pt-28 lg:pt-[7.5rem]">
+            <div className="flex w-full min-w-0 flex-col items-center gap-5 sm:gap-7">
               <HeroHeadline
                 lineOne={copy.headlineLineOne}
                 lineTwo={copy}
                 word={word}
               />
-              <p className="max-w-[42.875rem] text-center font-sans text-[1.0625rem] leading-[1.14] font-medium tracking-[-0.005em] text-pretty text-[#1E1E1EBF] sm:text-[1.25rem] dark:text-white/70">
+              <p className="max-w-[42.875rem] text-center font-sans text-[0.9375rem]/[1.45] font-medium tracking-[-0.005em] text-pretty text-[#1E1E1EBF] sm:text-[1.25rem]/[1.14] dark:text-white/70">
                 {copy.subhead}
               </p>
             </div>
 
-            <div className="flex flex-row flex-wrap items-center justify-center gap-4 sm:gap-7">
+            <div className="flex flex-row items-center justify-center gap-4 sm:gap-7">
               <CtaButton
                 className={CTA_BUTTON_CLASSNAME}
                 nativeButton={false}
@@ -143,7 +144,7 @@ export function HeroSection() {
                 {copy.cta}
               </CtaButton>
               <CtaButton
-                className={CTA_BUTTON_CLASSNAME}
+                className={cn(CTA_BUTTON_CLASSNAME, "max-sm:hidden")}
                 nativeButton={false}
                 render={
                   copy.secondaryHref.startsWith("https://") ? (
@@ -167,7 +168,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="mt-9 flex w-full flex-1 flex-col items-center overflow-clip py-3.75 sm:mt-16.25 lg:pb-0">
+          <div className="mt-8 flex w-full flex-1 flex-col items-center overflow-clip py-3.75 sm:mt-16.25 lg:pb-0">
             <div className="flex w-full flex-1 flex-col items-center px-3">
               <LiveDemoLink />
             </div>

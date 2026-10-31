@@ -155,8 +155,8 @@ export function HeroHeadline({ word, lineOne, lineTwo }: HeroHeadlineProps) {
 
   return (
     <LazyMotion features={domAnimation}>
-      <h1 className="font-display w-full max-w-[56.875rem] text-center text-[clamp(1.625rem,calc(11.2vw_-_0.5rem),2.5rem)] leading-[1.08] font-medium tracking-[-0.015em] text-[#1E1E1E] sm:mx-auto sm:text-[clamp(3.25rem,7.3vw,4rem)] sm:font-semibold lg:text-[4.75rem] lg:leading-[1.12] dark:text-white">
-        <span className="block">
+      <h1 className="font-display w-full max-w-[56.875rem] text-center text-[clamp(1.625rem,calc(10.6vw_-_0.5rem),2.5rem)] leading-[1.08] font-medium tracking-[-0.015em] text-[#1E1E1E] sm:mx-auto sm:text-[clamp(3.25rem,7.3vw,4rem)] sm:font-semibold lg:text-[4.75rem] lg:leading-[1.12] dark:text-white">
+        <span className="block text-balance">
           <HeadlineLineOne line={lineOne} />
         </span>
         {"headlineLineTwo" in lineTwo ? (

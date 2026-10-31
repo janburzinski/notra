@@ -17,19 +17,18 @@ import { FeaturesCardTraffic } from "./features-card-traffic";
 
 export function FeaturesSection() {
   return (
-    <section className="mx-auto flex w-full max-w-360 flex-col items-center px-6 pt-20 antialiased [font-synthesis:none] sm:px-12 lg:px-20 lg:pt-35">
-      <div className="flex w-full flex-col items-center gap-13.5">
-        <header className="flex flex-col items-center gap-4">
+    <section className="mx-auto flex w-full max-w-360 flex-col items-center px-6 pt-16 antialiased [font-synthesis:none] sm:px-12 sm:pt-20 lg:px-20 lg:pt-35">
+      <div className="flex w-full flex-col items-center gap-10 sm:gap-13.5">
+        <header className="flex flex-col items-center gap-3 sm:gap-4">
           <h2 className="font-display text-center text-[2rem] leading-[1.15] font-medium tracking-[-0.02em] text-black sm:text-[2.25rem] lg:text-[3.0625rem]/14 dark:text-white">
             {FEATURES_HEADING}
           </h2>
-          <p className="font-display w-full max-w-206.25 text-center text-lg/7 font-medium tracking-[-0.01em] text-balance text-[#1E1E1EBF] sm:text-xl/7.5 dark:text-white/70">
-            {FEATURES_SUBCOPY_LINE_ONE}
-            <br />
+          <p className="font-display w-full max-w-206.25 text-center text-base/6 font-medium tracking-[-0.01em] text-balance text-[#1E1E1EBF] sm:text-xl/7.5 dark:text-white/70">
+            {FEATURES_SUBCOPY_LINE_ONE} <br className="max-sm:hidden" />
             {FEATURES_SUBCOPY_LINE_TWO}
           </p>
         </header>
-        <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+        <div className="grid w-full grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-2">
           <FeaturesCard copy={FEATURES_ENGINES_COPY}>
             <FeaturesCardEngines />
           </FeaturesCard>
