@@ -84,3 +84,8 @@ export const WORKSPACE_FIELD_INPUT_IDS = [
   ["heardAboutNotraSource", "heard-about-notra"],
   ["heardAboutNotraOther", "heard-about-notra-other"],
 ] as const;
+
+export const NOTRA_MCP_DOCS_URL = "https://www.usenotra.com/docs/devtools/mcp";
+export const NOTRA_CHATGPT_APP_URL =
+  "https://chatgpt.com/plugins/plugin_asdk_app_6ad054bf08248191a320ed1334e3ffde";
+export const NOTRA_CLAUDE_DIRECTORY_URL = "https://claude.ai/directory/notra";

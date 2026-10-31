@@ -42,6 +42,7 @@ export const ONBOARDING_STEPS = {
   WORKSPACE: "workspace",
   VISIBILITY: "visibility",
   COMPETITORS: "competitors",
+  CONNECT: "connect",
   PRICING: "pricing",
 } as const;
 
@@ -124,6 +125,7 @@ export const DATABUDDY_FUNNEL_EVENTS: ReadonlySet<string> = new Set([
   POSTHOG_EVENTS.ONBOARDING_STEP_SKIPPED,
   POSTHOG_EVENTS.ONBOARDING_BRAND_SAVED,
   POSTHOG_EVENTS.ONBOARDING_COMPETITORS_SUBMITTED,
+  POSTHOG_EVENTS.ONBOARDING_MCP_CONNECT_CLICKED,
   POSTHOG_EVENTS.PAYWALL_SHOWN,
   POSTHOG_EVENTS.PLAN_SELECTED,
   POSTHOG_EVENTS.CHECKOUT_REDIRECTED,
@@ -135,6 +137,7 @@ export const ONBOARDING_FLOW_FLAG_KEY = "onboarding-flow";
 export const ONBOARDING_FLOW_VARIANTS = {
   CONTROL: "control",
   NO_PREVIEW: "no-preview",
+  NO_EXTRA_STEPS: "no-extra-steps",
 } as const;
 
 export const PAYWALL_EXPERIMENT_FLAG_KEY = "paywall-experiment";

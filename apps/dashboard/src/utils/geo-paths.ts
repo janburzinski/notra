@@ -62,6 +62,13 @@ export function geoOnboardingCompetitorsPath(
   return onboardingPath(base, projectId, replay);
 }
 
+export function geoOnboardingConnectPath(
+  projectId?: string,
+  replay = false
+): string {
+  return onboardingPath("/onboarding/connect", projectId, replay);
+}
+
 function onboardingPath(
   base: string,
   projectId: string | undefined,

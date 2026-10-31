@@ -15,6 +15,7 @@ import { lazyPage } from "@/utils/lazy-page";
 
 import {
   loadOnboardingCompetitors,
+  loadOnboardingConnect,
   loadOnboardingEntry,
   loadOnboardingLayout,
   loadOnboardingVisibility,
@@ -30,6 +31,11 @@ const Workspace = lazyPage(() =>
 const Visibility = lazyPage(() =>
   import("@/app/onboarding/visibility/visibility-form").then((module) => ({
     default: module.VisibilityForm,
+  }))
+);
+const Connect = lazyPage(() =>
+  import("@/app/onboarding/connect/connect-step").then((module) => ({
+    default: module.ConnectStep,
   }))
 );
 const Competitors = lazyPage(() =>
@@ -99,6 +105,18 @@ export function createOnboardingUiRoutes(parent: AnyRoute) {
         component: ({ data }) => (
           <OnboardingSplitLayout step={ONBOARDING_STEPS.COMPETITORS}>
             <Competitors {...data} />
+          </OnboardingSplitLayout>
+        ),
+      }),
+      createUiRoute({
+        parent: onboarding,
+        path: "connect",
+        title: { namespace: "onboarding.connect", key: "metaTitle" },
+        loader: (input) => loadOnboardingConnect({ data: input }),
+        preload: Connect.preload,
+        component: ({ data }) => (
+          <OnboardingSplitLayout step={ONBOARDING_STEPS.CONNECT}>
+            <Connect {...data} />
           </OnboardingSplitLayout>
         ),
       }),

@@ -1,8 +1,10 @@
 @import "@notra/ui/globals.css";
+@import "ui/styles/chatgpt.css";
+@import "ui/styles/claude.css";
 
 @source "../../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
-@source "../../../ui/registry/notra/{card,shimmer,table}/components";
+@source "../../../ui/registry/notra/{card,chatgpt,claude,dropdown-menu,shimmer,table}/components";
 @source "../../../ui/registry/notra/workflow/{components,constants,lib}";
 
 @property --ec-tooltip-scale-x {

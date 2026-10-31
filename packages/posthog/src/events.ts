@@ -30,6 +30,7 @@ export const POSTHOG_EVENTS = {
   ONBOARDING_BRAND_SAVED: "onboarding_brand_saved",
   COMPETITOR_SUGGESTIONS_LOADED: "competitor_suggestions_loaded",
   ONBOARDING_COMPETITORS_SUBMITTED: "onboarding_competitors_submitted",
+  ONBOARDING_MCP_CONNECT_CLICKED: "onboarding_mcp_connect_clicked",
   ONBOARDING_SUGGESTION_USED: "onboarding_suggestion_used",
   ONBOARDING_SUGGESTION_DISMISSED: "onboarding_suggestion_dismissed",
   PRICING_VIEWED: "pricing_viewed",

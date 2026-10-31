@@ -40,6 +40,7 @@ import type { UiRouteInput } from "@/types/ui-route";
 import {
   geoDashboardPath,
   geoOnboardingCompetitorsPath,
+  geoOnboardingConnectPath,
   geoOnboardingPath,
   geoOnboardingWorkspacePath,
   geoTrafficPath,
@@ -76,8 +77,22 @@ async function onboardingExitHref(
     : geoDashboardPath(organizationSlug, projectId);
 }
 
+async function onboardingFinishHref(
+  organizationId: string,
+  organizationSlug: string,
+  projectId?: string
+) {
+  const href = await onboardingExitHref(
+    organizationId,
+    organizationSlug,
+    projectId
+  );
+  return `${href}${href.includes("?") ? "&" : "?"}${WELCOME_TOUR_SEARCH_PARAM}=1`;
+}
+
 async function onboardingBrandContext(input: UiRouteInput) {
-  const { organization, projectId, replay } = await onboardingContext(input);
+  const { organization, projectId, replay, userId } =
+    await onboardingContext(input);
   if (!organization) {
     throw redirect({ href: "/onboarding/workspace" });
   }
@@ -94,7 +109,7 @@ async function onboardingBrandContext(input: UiRouteInput) {
     projectId,
     replay
   );
-  return { organization, projectId, replay, brand };
+  return { organization, projectId, replay, brand, userId };
 }
 
 export const loadOnboardingLayout = createServerFn({ method: "GET" }).handler(
@@ -257,24 +272,31 @@ export const loadOnboardingVisibility = createServerFn({ method: "GET" })
 export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
   .validator((data: UiRouteInput) => data)
   .handler(async ({ data }) => {
-    const { organization, projectId, replay, brand } =
+    const { organization, projectId, replay, brand, userId } =
       await onboardingBrandContext(data);
-    const [stage, paid, nextHref] = await Promise.all([
+    const [stage, paid, exitHref, finishHref, variant] = await Promise.all([
       getGeoOnboardingStage(organization.id, projectId),
       hasPaidSubscriptionHistory(organization.id),
       onboardingExitHref(organization.id, organization.slug, projectId),
+      onboardingFinishHref(organization.id, organization.slug, projectId),
+      resolveOnboardingVariant(userId),
     ]);
     const inOnboardingFlow = replay || !paid;
     if (!replay && stage === "brand") {
       throw redirect({ href: geoOnboardingPath(projectId) });
     }
+    let nextHref = exitHref;
+    if (inOnboardingFlow) {
+      nextHref =
+        variant === ONBOARDING_FLOW_VARIANTS.NO_EXTRA_STEPS
+          ? finishHref
+          : geoOnboardingConnectPath(projectId, replay);
+    }
     return {
       companyName: brand.companyName ?? "",
       domain: normalizeCompetitorDomain(brand.websiteUrl),
       inOnboardingFlow,
-      nextHref: inOnboardingFlow
-        ? `${nextHref}${nextHref.includes("?") ? "&" : "?"}${WELCOME_TOUR_SEARCH_PARAM}=1`
-        : nextHref,
+      nextHref,
       organizationId: organization.id,
       progressHrefs: onboardingProgressHrefs({
         current: ONBOARDING_STEP_COMPETITORS,
@@ -285,5 +307,20 @@ export const loadOnboardingCompetitors = createServerFn({ method: "GET" })
         stage,
       }),
       projectId,
+    };
+  });
+
+export const loadOnboardingConnect = createServerFn({ method: "GET" })
+  .validator((data: UiRouteInput) => data)
+  .handler(async ({ data }) => {
+    const { organization, projectId, brand } =
+      await onboardingBrandContext(data);
+    return {
+      companyName: brand.companyName ?? "",
+      nextHref: await onboardingFinishHref(
+        organization.id,
+        organization.slug,
+        projectId
+      ),
     };
   });

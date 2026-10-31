@@ -399,3 +399,15 @@ export interface OnboardingPreviewNavProps {
 export interface OnboardingPreviewSkeletonChipProps {
   className: string;
 }
+
+export type OnboardingConnectClient = "chatgpt" | "claude";
+
+export interface ConnectStepProps {
+  companyName: string;
+  nextHref: string;
+}
+
+export interface OnboardingConnectPreviewProps {
+  client: OnboardingConnectClient;
+  companyName: string;
+}

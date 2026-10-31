@@ -1337,6 +1337,28 @@
     "preview": {
       "placeholderName": "Acme",
       "placeholderSlug": "acme"
+    },
+    "connect": {
+      "metaTitle": "Verbinde deine KI-Tools",
+      "title": "Nutze Notra in deinen KI-Tools",
+      "description": "Frag direkt dort, wo du ohnehin arbeitest, nach deiner KI-Sichtbarkeit, deinen Wettbewerbern und Inhalten.",
+      "chatgpt": {
+        "title": "ChatGPT",
+        "description": "Füg die Notra-App hinzu und melde dich an"
+      },
+      "claude": {
+        "title": "Claude",
+        "description": "Füg den Notra-Connector hinzu und melde dich an"
+      },
+      "preview": {
+        "fallbackName": "deine Marke",
+        "question": "Wie sichtbar ist <b>{companyName}</b> diese Woche in KI-Antworten?",
+        "answer": "<b>{companyName}</b> tauchte diese Woche in 42 % der KI-Antworten auf, 6 Punkte mehr als zuvor. ChatGPT erwähnt dich am häufigsten, Perplexity empfiehlt noch zuerst Wettbewerber.",
+        "composer": "Frag irgendwas",
+        "used": "Notra verwendet",
+        "usedVerb": "Verwendet"
+      },
+      "mcp": "Anderer Client? Verbinde den MCP-Server"
     }
   },
   "shared": {

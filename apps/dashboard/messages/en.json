@@ -1337,6 +1337,28 @@
     "preview": {
       "placeholderName": "Acme",
       "placeholderSlug": "acme"
+    },
+    "connect": {
+      "metaTitle": "Connect your AI tools",
+      "title": "Use Notra from your AI tools",
+      "description": "Ask about your AI visibility, competitors and content right where you already work.",
+      "chatgpt": {
+        "title": "ChatGPT",
+        "description": "Add the Notra app, then sign in"
+      },
+      "claude": {
+        "title": "Claude",
+        "description": "Add the Notra connector, then sign in"
+      },
+      "preview": {
+        "fallbackName": "your brand",
+        "question": "How visible is <b>{companyName}</b> in AI answers this week?",
+        "answer": "<b>{companyName}</b> showed up in 42% of AI answers this week, up 6 points. ChatGPT mentions you most, while Perplexity still recommends competitors first.",
+        "composer": "Ask anything",
+        "used": "Used Notra",
+        "usedVerb": "Used"
+      },
+      "mcp": "Using another client? Connect the MCP server"
     }
   },
   "shared": {
