@@ -180,12 +180,24 @@ export function ScheduleForm({
   });
 
   const previousAutoNameRef = useRef("");
+  const lastResetKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (open) {
-      form.reset(getDefaultScheduleValues(editTrigger, presetId, presetValues));
-      previousAutoNameRef.current = "";
+    if (!open) {
+      lastResetKeyRef.current = null;
+      return;
     }
+
+    const resetKey =
+      editTrigger?.id ??
+      `create:${presetId ?? ""}:${JSON.stringify(presetValues ?? {})}`;
+    if (lastResetKeyRef.current === resetKey) {
+      return;
+    }
+
+    form.reset(getDefaultScheduleValues(editTrigger, presetId, presetValues));
+    previousAutoNameRef.current = "";
+    lastResetKeyRef.current = resetKey;
   }, [open, editTrigger, presetId, presetValues, form]);
 
   const outputType = useStore(form.store, (s) => s.values.outputType);

@@ -101,12 +101,18 @@ export default function PageClient({
   // After a save, wait for the lists to refresh so the page we land on
   // doesn't flash its old (possibly empty) state.
   const refreshed = useRef<Promise<unknown> | undefined>(undefined);
+  const stayAfterSave = useRef(false);
   const close = async () => {
+    if (stayAfterSave.current) {
+      stayAfterSave.current = false;
+      return;
+    }
     await refreshed.current;
     router.push(backHref);
   };
   const onSaved = () => {
     refreshed.current = invalidate();
+    stayAfterSave.current = !!triggerId;
     if (organizationId && suggestionId) {
       dismissSuggestion({ organizationId, suggestionId });
     }
