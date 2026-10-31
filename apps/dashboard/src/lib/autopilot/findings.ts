@@ -114,10 +114,24 @@ function heldBy(claim: FindingClaim) {
 export async function claimFinding(
   organizationId: string,
   runId: string,
-  proposal: AutopilotProposal
+  proposal: AutopilotProposal,
+  claimToken?: string
 ): Promise<FindingClaim | null> {
-  const token = nanoid();
+  const token = claimToken ?? nanoid();
   const now = new Date();
+  if (claimToken) {
+    const held = await db.query.autopilotFindings.findFirst({
+      where: and(
+        eq(autopilotFindings.organizationId, organizationId),
+        eq(autopilotFindings.fingerprint, proposal.fingerprint),
+        eq(autopilotFindings.claimToken, claimToken),
+        eq(autopilotFindings.status, "open")
+      ),
+    });
+    if (held) {
+      return { finding: held, token };
+    }
+  }
   const [inserted] = await db
     .insert(autopilotFindings)
     .values({

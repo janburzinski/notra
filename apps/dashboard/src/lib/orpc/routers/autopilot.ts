@@ -37,6 +37,7 @@ import {
   AUTOPILOT_IMPACT_MAX_FINDINGS,
   AUTOPILOT_RUNS_PAGE_SIZE,
 } from "@/constants/autopilot";
+import { AUTOPILOT_DAILY_WORKFLOW_KEY } from "@/constants/workflow-engine";
 import { loadAutopilotAnalytics } from "@/lib/autopilot/analytics";
 import { listRecentPullRequestAuthors } from "@/lib/autopilot/authors";
 import {
@@ -67,9 +68,11 @@ import {
   finishAutopilotRun,
 } from "@/lib/autopilot/run";
 import { startAutopilot } from "@/lib/autopilot/start";
+import { stopAutopilotRun } from "@/lib/autopilot/stop";
 import { loadSuggestedPost } from "@/lib/autopilot/suggestions";
 import { authorizedProcedure, withOrganizationAccess } from "@/lib/orpc/base";
 import { badRequest, forbidden } from "@/lib/orpc/utils/errors";
+import { workflowDefinitions } from "@/lib/workflow-engine/definitions/autopilot";
 import { startAutopilotSuggestionWorkflowRun } from "@/lib/workflows/start";
 import type { ORPCContext } from "@/types/orpc/context";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
@@ -99,6 +102,14 @@ function assertCanManageAutopilot(context: {
   if (!canManageAutopilot(context.auth.membership.role)) {
     throw forbidden("Only workspace admins can change Autopilot.");
   }
+}
+
+function templateTitle(workflowKey: string | null) {
+  return workflowKey &&
+    workflowKey !== AUTOPILOT_DAILY_WORKFLOW_KEY &&
+    Object.hasOwn(workflowDefinitions, workflowKey)
+    ? (workflowDefinitions[workflowKey]?.title ?? null)
+    : null;
 }
 
 function errorMessage(error: unknown) {
@@ -230,7 +241,8 @@ export const autopilotRouter = {
         findings,
         runs: runs.map((run) => ({
           ...run,
-          headline: described.get(run.id)?.headline ?? null,
+          headline:
+            described.get(run.id)?.headline ?? templateTitle(run.workflowKey),
           outcome: described.get(run.id)?.outcome ?? null,
         })),
         rules,
@@ -408,6 +420,22 @@ export const autopilotRouter = {
       } catch (error) {
         throw badRequest(errorMessage(error));
       }
+    }),
+
+  stop: authorizedProcedure
+    .input(autopilotRunInputSchema)
+    .use(withOrganizationAccess)
+    .use(withAutopilotFlag)
+    .handler(async ({ input, context }) => {
+      assertCanManageAutopilot(context);
+      const stopped = await stopAutopilotRun({
+        organizationId: input.organizationId,
+        runId: input.runId,
+      });
+      if (!stopped) {
+        throw badRequest("This run isn't running anymore.");
+      }
+      return { success: true as const };
     }),
 
   jobDecisions: authorizedProcedure

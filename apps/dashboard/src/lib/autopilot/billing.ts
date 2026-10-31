@@ -49,17 +49,11 @@ export async function settleAutopilotBilling(params: {
   }
 }
 
-/**
- * Runs one draft under its own credit hold. Refuses when nothing is left and charges only when a
- * pull request was opened: a run that found nothing worth changing is free.
- */
-export async function withAutopilotDraftBilling<T>(params: {
+export async function reserveAutopilotDraftCredits(params: {
   claim: FindingClaim;
   onReservationFailure: "fail" | "suggest";
   log: AutopilotLogger;
-  opened: (value: T) => boolean;
-  run: (onUsage: (usage: AgentTokenUsage) => void) => Promise<T>;
-}): Promise<{ allowed: false } | { allowed: true; value: T }> {
+}) {
   const reservation = await reserveGitHubMentionBilling({
     organizationId: params.claim.finding.organizationId,
     // Replaying this claim is idempotent; a new attempt needs a fresh balance check.
@@ -77,6 +71,36 @@ export async function withAutopilotDraftBilling<T>(params: {
     await params.log.skip("No credits left to write this", {
       reason: reservation.reason ?? null,
     });
+    return null;
+  }
+  return reservation;
+}
+
+export function sumAutopilotUsage(
+  usages: (AgentTokenUsage | null | undefined)[]
+) {
+  const collector = createGitHubMentionUsageCollector();
+  for (const usage of usages) {
+    if (usage) {
+      collector.add(usage);
+    }
+  }
+  return collector.get();
+}
+
+/**
+ * Runs one draft under its own credit hold. Refuses when nothing is left and charges only when a
+ * pull request was opened: a run that found nothing worth changing is free.
+ */
+export async function withAutopilotDraftBilling<T>(params: {
+  claim: FindingClaim;
+  onReservationFailure: "fail" | "suggest";
+  log: AutopilotLogger;
+  opened: (value: T) => boolean;
+  run: (onUsage: (usage: AgentTokenUsage) => void) => Promise<T>;
+}): Promise<{ allowed: false } | { allowed: true; value: T }> {
+  const reservation = await reserveAutopilotDraftCredits(params);
+  if (!reservation) {
     return { allowed: false };
   }
   const usage = createGitHubMentionUsageCollector();

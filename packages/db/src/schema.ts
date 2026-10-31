@@ -71,6 +71,10 @@ import {
   SCHEDULED_PUBLICATION_STATUSES,
 } from "./constants/scheduled-publications";
 import { SITE_JOB_KINDS, SITE_JOB_STATUSES } from "./constants/sites";
+import {
+  WORKFLOW_RUN_NODE_STATUSES,
+  WORKFLOW_RUN_STATUSES,
+} from "./constants/workflows";
 import type { AgentFeedbackMetadata } from "./types/agent-feedback";
 import type {
   AgentReadinessIssue,
@@ -115,6 +119,7 @@ import type {
   SiteDomainVerificationRecord,
   SiteJobPayload,
 } from "./types/sites";
+import type { WorkflowRunNodeStep } from "./types/workflows";
 
 export const lookbackWindowEnum = pgEnum("lookback_window", [
   "current_day",
@@ -4567,6 +4572,7 @@ export const autopilotRuns = pgTable(
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
     trigger: text("trigger", { enum: AUTOPILOT_RUN_TRIGGERS }).notNull(),
+    workflowKey: text("workflow_key"),
     status: text("status", { enum: AUTOPILOT_RUN_STATUSES })
       .notNull()
       .default("running"),
@@ -4680,6 +4686,87 @@ export const autopilotRunEvents = pgTable(
     index("autopilotRunEvents_organizationId_createdAt_idx").on(
       table.organizationId,
       table.createdAt
+    ),
+  ]
+);
+
+export const workflowRuns = pgTable(
+  "workflow_runs",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    workflowKey: text("workflow_key").notNull(),
+    parentRunId: text("parent_run_id").references(
+      (): AnyPgColumn => workflowRuns.id,
+      { onDelete: "cascade" }
+    ),
+    rootRunId: text("root_run_id"),
+    parentNodeId: text("parent_node_id"),
+    graph: jsonb("graph").$type<Record<string, unknown>>().notNull(),
+    runtimeRunId: text("runtime_run_id"),
+    trigger: text("trigger").notNull(),
+    status: text("status", { enum: WORKFLOW_RUN_STATUSES })
+      .notNull()
+      .default("queued"),
+    input: jsonb("input").$type<unknown>(),
+    output: jsonb("output").$type<unknown>(),
+    errorMessage: text("error_message"),
+    failedNodeId: text("failed_node_id"),
+    startedAt: timestamp("started_at"),
+    finishedAt: timestamp("finished_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("workflowRuns_organizationId_createdAt_idx").on(
+      table.organizationId,
+      table.createdAt
+    ),
+    index("workflowRuns_organizationId_workflowKey_createdAt_idx").on(
+      table.organizationId,
+      table.workflowKey,
+      table.createdAt
+    ),
+    index("workflowRuns_rootRunId_idx").on(table.rootRunId),
+    uniqueIndex("workflowRuns_parentRunId_parentNodeId_uidx").on(
+      table.parentRunId,
+      table.parentNodeId
+    ),
+  ]
+);
+
+export const workflowRunNodes = pgTable(
+  "workflow_run_nodes",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    runId: text("run_id")
+      .notNull()
+      .references(() => workflowRuns.id, { onDelete: "cascade" }),
+    nodeId: text("node_id").notNull(),
+    status: text("status", { enum: WORKFLOW_RUN_NODE_STATUSES }).notNull(),
+    steps: jsonb("steps")
+      .$type<Record<string, WorkflowRunNodeStep>>()
+      .notNull()
+      .default({}),
+    port: text("port"),
+    output: jsonb("output").$type<unknown>(),
+    errorMessage: text("error_message"),
+    reason: text("reason"),
+    startedAt: timestamp("started_at"),
+    finishedAt: timestamp("finished_at"),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("workflowRunNodes_runId_nodeId_uidx").on(
+      table.runId,
+      table.nodeId
     ),
   ]
 );

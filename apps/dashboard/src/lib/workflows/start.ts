@@ -30,16 +30,15 @@ import {
 import { trackWorkflowStarted } from "@/lib/analytics/workflow-lifecycle";
 import { autopilotPullRequestEventSchema } from "@/schemas/autopilot-github";
 import type {
-  AutopilotWorkflowPayload,
   AutopilotSuggestionWorkflowPayload,
   AutopilotPullRequestWorkflowPayload,
 } from "@/types/autopilot";
 import type { BrandAnalysisPayload } from "@/types/brand-analysis";
 import type { ScheduledPublicationWorkflowInput } from "@/types/content/scheduled-publications";
 import type { SiteJobRunHandle } from "@/types/sites-server";
+import type { WorkflowGraphRunPayload } from "@/types/workflow-engine";
 import { autopilotPullRequestMoment } from "@/utils/autopilot-github";
 import { agentReadinessWorkflow } from "@/workflows/agent-readiness";
-import { autopilotWorkflow } from "@/workflows/autopilot";
 import { autopilotPullRequestWorkflow } from "@/workflows/autopilot-pull-request";
 import { autopilotSuggestionWorkflow } from "@/workflows/autopilot-suggestion";
 import {
@@ -61,6 +60,7 @@ import { scheduleContentWorkflow } from "@/workflows/schedule-content";
 import { scheduledPublicationWorkflow } from "@/workflows/scheduled-publication";
 import { siteJobWorkflow } from "@/workflows/site-job";
 import { socialAnalyticsSyncWorkflow } from "@/workflows/social-analytics-sync";
+import { workflowGraphWorkflow } from "@/workflows/workflow-graph";
 
 export async function startSiteJobRun(
   jobId: string
@@ -266,15 +266,16 @@ export async function startAgentReadinessRun(
   return { runId: run.runId };
 }
 
-export async function startAutopilotWorkflowRun(
-  payload: AutopilotWorkflowPayload & { previousRunAt: string | null }
+export async function startWorkflowGraphRun(
+  payload: WorkflowGraphRunPayload,
+  trigger: string
 ): Promise<{ runId: string }> {
-  const run = await start(autopilotWorkflow, [payload]);
+  const run = await start(workflowGraphWorkflow, [payload]);
   trackWorkflowStarted({
-    workflow: WORKFLOW_ANALYTICS_NAMES.AUTOPILOT,
+    workflow: WORKFLOW_ANALYTICS_NAMES.WORKFLOW_GRAPH,
     runId: run.runId,
     organizationId: payload.organizationId,
-    properties: { autopilot_run_id: payload.runId },
+    properties: { workflow_run_id: payload.runId, trigger },
   });
   return { runId: run.runId };
 }

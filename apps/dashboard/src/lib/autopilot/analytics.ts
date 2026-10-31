@@ -1,3 +1,4 @@
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
@@ -7,7 +8,6 @@ import {
 import { and, count, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
 
 import {
-  AUTOPILOT_AUTOMATION_KINDS,
   AUTOPILOT_CREDITS_CHARGED_EVENT,
   AUTOPILOT_OUTCOME_BY_STATUS,
 } from "@/constants/autopilot";

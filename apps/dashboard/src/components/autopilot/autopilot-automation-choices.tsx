@@ -1,10 +1,10 @@
 "use client";
 
 import { HugeiconsIcon } from "@hugeicons/react";
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useId } from "react";
 
-import { AUTOPILOT_AUTOMATION_KINDS } from "@/constants/autopilot";
 import {
   AUTOPILOT_AUTOMATIONS,
   AUTOPILOT_KIND_META,

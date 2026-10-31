@@ -89,13 +89,6 @@ export interface AutopilotRunObservation extends AutopilotObservation {
   brief: NonNullable<AutopilotFindingEvidence["brief"]>;
 }
 
-export interface AutopilotWorkflowPayload {
-  organizationId: string;
-  runId: string;
-  /** Runs only this job; omitted for a full run. */
-  kind?: AutopilotJobKind;
-}
-
 export interface AutopilotSuggestionWorkflowPayload {
   organizationId: string;
   findingId: string;
@@ -107,11 +100,6 @@ export interface AutopilotPullRequestWorkflowPayload {
   deliveryId: string;
   rawBody: string;
 }
-
-export type AutopilotWorkflowResult =
-  | { status: "completed"; runId: string; findings: number }
-  | { status: "skipped"; reason: string }
-  | { status: "failed"; runId: string; error: string };
 
 type AutopilotOverview =
   InferRouterOutputs<DashboardRouter>["autopilot"]["get"];
@@ -301,7 +289,32 @@ export interface AutopilotRunPageClientProps {
   runId: string;
 }
 
+export interface AutopilotStopButtonProps {
+  organizationId: string;
+  runId: string;
+}
+
+export interface AutopilotRunTurnResultProps {
+  events: AutopilotRunEventView[];
+}
+
+export interface AutopilotRunLogProps {
+  events: AutopilotRunEventView[];
+  pending: boolean;
+  run: AutopilotRunView;
+}
+
+export interface AutopilotRunEndNoticeProps {
+  run: AutopilotRunView;
+}
+
+export interface AutopilotRunSummaryProps {
+  events: AutopilotRunEventView[];
+  run: AutopilotRunView;
+}
+
 export interface AutopilotRunPageProps {
+  canManage: boolean;
   organizationId: string;
   organizationSlug: string;
   run: AutopilotRunView;

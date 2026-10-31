@@ -16,6 +16,7 @@ import {
   AutopilotRunSection,
 } from "@/components/autopilot/autopilot-run-panel";
 import { AutopilotRunTimeline } from "@/components/autopilot/autopilot-run-timeline";
+import { AutopilotStopButton } from "@/components/autopilot/autopilot-stop-button";
 import { EmptyState } from "@/components/empty-state";
 import { SiteBuildLogs } from "@/components/sites/site-build-logs";
 import {
@@ -30,8 +31,12 @@ import { SITE_DEPLOYMENT_LOG_SURFACE_CLASS } from "@/constants/sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { cn } from "@/lib/utils";
 import type {
+  AutopilotRunEndNoticeProps,
+  AutopilotRunLogProps,
   AutopilotRunPageClientProps,
   AutopilotRunPageProps,
+  AutopilotRunSummaryProps,
+  AutopilotRunTurnResultProps,
 } from "@/types/autopilot";
 import {
   formatDuration,
@@ -50,6 +55,7 @@ export default function PageClient({
         const run = overview.runs.find((row) => row.id === runId);
         return run ? (
           <RunPage
+            canManage={overview.canManage}
             organizationId={organizationId}
             organizationSlug={organizationSlug}
             run={run}
@@ -68,7 +74,143 @@ export default function PageClient({
   );
 }
 
+function RunSummary({ events, run }: AutopilotRunSummaryProps) {
+  const format = useFormatter();
+  const tokens = sumEventTokens(events);
+  const credits = events.reduce(
+    (total, event) =>
+      event.data?.event === AUTOPILOT_CREDITS_CHARGED_EVENT &&
+      typeof event.data.credits === "number"
+        ? total + event.data.credits
+        : total,
+    0
+  );
+  const startedAt = new Date(run.startedAt);
+  const status = AUTOPILOT_RUN_STATUS_BADGES[run.status];
+  const proposed = run.summary?.proposed ?? 0;
+
+  return (
+    <ul
+      aria-label="Run summary"
+      className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm tabular-nums"
+    >
+      <li>
+        <StatusBadge appearance={status.appearance} label={status.label} />
+      </li>
+      {run.finishedAt ? (
+        <li>
+          Took{" "}
+          {formatDuration(
+            new Date(run.finishedAt).getTime() - startedAt.getTime()
+          )}
+        </li>
+      ) : null}
+      <li>
+        {proposed} pull request{proposed === 1 ? "" : "s"}
+      </li>
+      <li>{format.number(tokens, { notation: "compact" })} tokens</li>
+      <li>
+        {credits} credit{credits === 1 ? "" : "s"}
+      </li>
+    </ul>
+  );
+}
+
+function RunEndNotice({ run }: AutopilotRunEndNoticeProps) {
+  if (!run.errorMessage) {
+    return null;
+  }
+  return (
+    <p
+      className={cn(
+        "rounded-xl border px-4 py-3 text-sm",
+        run.status === "stopped"
+          ? "text-muted-foreground bg-muted/40"
+          : "text-destructive bg-destructive/5"
+      )}
+    >
+      {run.errorMessage}
+    </p>
+  );
+}
+
+function RunTurnResult({ events }: AutopilotRunTurnResultProps) {
+  const opened = events.findLast(
+    (event) => event.level === "action" && typeof event.data?.url === "string"
+  );
+  const url = opened?.data?.url;
+  if (!(opened && typeof url === "string")) {
+    return null;
+  }
+  const title = opened.data?.title;
+  return (
+    <a
+      className={cn(
+        AUTOPILOT_RUN_RESULT_CLASS,
+        "hover:bg-muted/70 transition-colors"
+      )}
+      href={url}
+      rel="noreferrer"
+      target="_blank"
+    >
+      <HugeiconsIcon
+        aria-hidden="true"
+        className="text-muted-foreground size-4 shrink-0"
+        icon={GitPullRequestIcon}
+        strokeWidth={1.5}
+      />
+      <span className="min-w-0 flex-1 truncate text-sm font-medium">
+        {typeof title === "string" ? title : opened.message}
+      </span>
+      <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+        {opened.message.replace("Opened pull request ", "")}
+      </span>
+    </a>
+  );
+}
+
+function RunLog({ events, pending, run }: AutopilotRunLogProps) {
+  const running = run.status === "running";
+  return (
+    <section aria-labelledby="run-log" className="space-y-3">
+      <h2 className="text-sm font-medium" id="run-log">
+        Log
+      </h2>
+      <div className={TABLE_FRAME_CLASS}>
+        <div className={SITE_DEPLOYMENT_LOG_SURFACE_CLASS}>
+          {events.length > 0 ? (
+            <div className="p-4">
+              <AutopilotRunTimeline events={events} run={run} />
+            </div>
+          ) : null}
+          <div className={events.length > 0 ? "border-t p-4" : "p-4"}>
+            {pending ? <Skeleton className="h-48 rounded-lg" /> : null}
+            {!pending && events.length === 0 && !running ? (
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                No steps were recorded for this run.
+              </p>
+            ) : null}
+            {pending || (events.length === 0 && !running) ? null : (
+              <SiteBuildLogs
+                inProgress={running}
+                log={
+                  events.length > 0
+                    ? formatRunLog(events, AUTOPILOT_RUN_LOG_TAGS)
+                    : null
+                }
+                queued={false}
+                title="Log"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function RunPage({
+  canManage,
   organizationId,
   organizationSlug,
   run,
@@ -92,24 +234,17 @@ function RunPage({
             label: section.label,
             events: own,
             startedAt: first.createdAt,
+            lastAt: new Date(
+              own.at(-1)?.createdAt ?? first.createdAt
+            ).getTime(),
           },
         ]
       : [];
   }).sort(
     (a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
   );
-  const tokens = sumEventTokens(events);
-  const credits = events.reduce(
-    (total, event) =>
-      event.data?.event === AUTOPILOT_CREDITS_CHARGED_EVENT &&
-      typeof event.data.credits === "number"
-        ? total + event.data.credits
-        : total,
-    0
-  );
+  const latest = Math.max(...turns.map((turn) => turn.lastAt));
   const startedAt = new Date(run.startedAt);
-  const status = AUTOPILOT_RUN_STATUS_BADGES[run.status];
-  const proposed = run.summary?.proposed ?? 0;
 
   return (
     <div className="space-y-6">
@@ -129,37 +264,18 @@ function RunPage({
             .filter(Boolean)
             .join(" · ")}
           title={run.headline ?? AUTOPILOT_RUN_TRIGGER_LABELS[run.trigger]}
-        />
-        <ul
-          aria-label="Run summary"
-          className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm tabular-nums"
         >
-          <li>
-            <StatusBadge appearance={status.appearance} label={status.label} />
-          </li>
-          {run.finishedAt ? (
-            <li>
-              Took{" "}
-              {formatDuration(
-                new Date(run.finishedAt).getTime() - startedAt.getTime()
-              )}
-            </li>
+          {canManage && running && run.workflowKey ? (
+            <AutopilotStopButton
+              organizationId={organizationId}
+              runId={run.id}
+            />
           ) : null}
-          <li>
-            {proposed} pull request{proposed === 1 ? "" : "s"}
-          </li>
-          <li>{format.number(tokens, { notation: "compact" })} tokens</li>
-          <li>
-            {credits} credit{credits === 1 ? "" : "s"}
-          </li>
-        </ul>
+        </PageHeading>
+        <RunSummary events={events} run={run} />
       </div>
 
-      {run.errorMessage ? (
-        <p className="text-destructive bg-destructive/5 rounded-xl border px-4 py-3 text-sm">
-          {run.errorMessage}
-        </p>
-      ) : null}
+      <RunEndNotice run={run} />
 
       <section aria-labelledby="run-activity" className="space-y-3">
         <h2 className="text-sm font-medium" id="run-activity">
@@ -176,90 +292,21 @@ function RunPage({
                 live
               />
             ) : null}
-            {turns.map((turn, index) => {
-              const opened = turn.events.findLast(
-                (event) =>
-                  event.level === "action" &&
-                  typeof event.data?.url === "string"
-              );
-              const url = opened?.data?.url;
-              const title = opened?.data?.title;
-              return (
-                <AutopilotRunSection
-                  events={turn.events}
-                  id={`${run.id}-${turn.job ?? "run"}`}
-                  key={turn.job ?? "run"}
-                  label={turn.label}
-                  live={running && index === turns.length - 1}
-                  result={
-                    opened && typeof url === "string" ? (
-                      <a
-                        className={cn(
-                          AUTOPILOT_RUN_RESULT_CLASS,
-                          "hover:bg-muted/70 transition-colors"
-                        )}
-                        href={url}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        <HugeiconsIcon
-                          aria-hidden="true"
-                          className="text-muted-foreground size-4 shrink-0"
-                          icon={GitPullRequestIcon}
-                          strokeWidth={1.5}
-                        />
-                        <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                          {typeof title === "string" ? title : opened.message}
-                        </span>
-                        <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
-                          {opened.message.replace("Opened pull request ", "")}
-                        </span>
-                      </a>
-                    ) : null
-                  }
-                />
-              );
-            })}
+            {turns.map((turn) => (
+              <AutopilotRunSection
+                events={turn.events}
+                id={`${run.id}-${turn.job ?? "run"}`}
+                key={turn.job ?? "run"}
+                label={turn.label}
+                live={running && turn.lastAt === latest}
+                result={<RunTurnResult events={turn.events} />}
+              />
+            ))}
           </AutopilotRunPanel>
         )}
       </section>
 
-      <section aria-labelledby="run-log" className="space-y-3">
-        <h2 className="text-sm font-medium" id="run-log">
-          Log
-        </h2>
-        <div className={TABLE_FRAME_CLASS}>
-          <div className={SITE_DEPLOYMENT_LOG_SURFACE_CLASS}>
-            {events.length > 0 ? (
-              <div className="p-4">
-                <AutopilotRunTimeline events={events} run={run} />
-              </div>
-            ) : null}
-            <div className={events.length > 0 ? "border-t p-4" : "p-4"}>
-              {query.isPending ? (
-                <Skeleton className="h-48 rounded-lg" />
-              ) : null}
-              {!query.isPending && events.length === 0 && !running ? (
-                <p className="text-muted-foreground py-8 text-center text-sm">
-                  No steps were recorded for this run.
-                </p>
-              ) : null}
-              {query.isPending || (events.length === 0 && !running) ? null : (
-                <SiteBuildLogs
-                  inProgress={running}
-                  log={
-                    events.length > 0
-                      ? formatRunLog(events, AUTOPILOT_RUN_LOG_TAGS)
-                      : null
-                  }
-                  queued={false}
-                  title="Log"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+      <RunLog events={events} pending={query.isPending} run={run} />
     </div>
   );
 }

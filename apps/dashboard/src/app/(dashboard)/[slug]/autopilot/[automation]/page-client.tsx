@@ -36,10 +36,11 @@ import type {
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
+import { automationKindFromSlug } from "@/utils/autopilot-automations";
 import {
-  automationKindFromSlug,
-  isScheduledRunInProgress,
-} from "@/utils/autopilot-automations";
+  autopilotRunKind,
+  findActiveAutopilotRun,
+} from "@/utils/autopilot-events";
 
 export default function PageClient({
   organizationSlug,
@@ -97,7 +98,7 @@ function AutomationPage({
   );
   const findings = overview.findings.filter((finding) => finding.kind === kind);
   const enabled = overview.settings.jobs[kind];
-  const isRunning = isScheduledRunInProgress(overview.runs);
+  const activeRun = findActiveAutopilotRun(overview.runs);
   const stats = [
     {
       label: "Pull requests opened",
@@ -147,8 +148,12 @@ function AutomationPage({
             </label>
             {overview.canManage ? (
               <Button
-                disabled={!(enabled && overview.settings.enabled) || isRunning}
-                loading={runNow.isPending || isRunning}
+                disabled={
+                  !(enabled && overview.settings.enabled) || Boolean(activeRun)
+                }
+                loading={
+                  runNow.isPending || autopilotRunKind(activeRun) === kind
+                }
                 onClick={() => runNow.mutate(kind)}
                 size="sm"
                 variant="outline"

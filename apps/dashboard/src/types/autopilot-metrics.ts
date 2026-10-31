@@ -1,9 +1,11 @@
-import type { AUTOPILOT_RUN_TRIGGERS } from "@notra/db/constants/autopilot";
+import type {
+  AUTOPILOT_RUN_TRIGGERS,
+  AUTOPILOT_AUTOMATION_KINDS,
+} from "@notra/db/constants/autopilot";
 import type { AutopilotJobKind } from "@notra/db/types/autopilot";
 import type { autopilotMetricsDaysSchema } from "@notra/schemas/dashboard/autopilot";
 import type * as z from "zod";
 
-import type { AUTOPILOT_AUTOMATION_KINDS } from "@/constants/autopilot";
 import type { AutopilotRunView } from "@/types/autopilot";
 
 export type AutopilotMetricsDays = z.infer<typeof autopilotMetricsDaysSchema>;

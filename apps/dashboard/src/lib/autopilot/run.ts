@@ -9,12 +9,12 @@ import {
   projects,
 } from "@notra/db/schema";
 import type { AutopilotJobKind } from "@notra/db/types/autopilot";
-import { and, asc, eq, gte, inArray, lt, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, lt, or, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 import {
   AUTOPILOT_DEFAULT_JOBS,
-  AUTOPILOT_PULL_REQUEST_JOBS,
+  AUTOPILOT_RUN_EXPIRED_MESSAGE,
   AUTOPILOT_RUN_LEASE_MS,
 } from "@/constants/autopilot";
 import {
@@ -23,45 +23,44 @@ import {
   runKeywordsJob,
 } from "@/lib/autopilot/blog";
 import { buildAutopilotBrief, postAutopilotBrief } from "@/lib/autopilot/brief";
-import {
-  countOpenPullRequests,
-  syncFindingPullRequests,
-} from "@/lib/autopilot/findings";
+import { syncFindingPullRequests } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import {
   withAutopilotRunLease,
   renewAutopilotRunLease,
 } from "@/lib/autopilot/leases";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
-import { runAutopilotPlanner } from "@/lib/autopilot/planner";
 import { runPromptsJob } from "@/lib/autopilot/prompts";
-import { runReadinessJob } from "@/lib/autopilot/readiness";
+import { failWorkflowRunTrees } from "@/lib/workflow-engine/store";
 import type {
   AutopilotJobResult,
   AutopilotRunContext,
-  AutopilotRunObservation,
 } from "@/types/autopilot";
-import type { AutopilotRunTrigger } from "@/types/autopilot-runtime";
+import type {
+  AutopilotObservationJob,
+  AutopilotRunTrigger,
+} from "@/types/autopilot-runtime";
 import { toAutopilotCommitFilters } from "@/utils/autopilot-commit-filters";
 import { toErrorMessage } from "@/utils/error-message";
 
-class AutopilotNotConfiguredError extends Error {
-  override name = "AutopilotNotConfiguredError";
+export class AutopilotUnavailableError extends Error {
+  override name = "AutopilotUnavailableError";
 }
 
 /** Creates the run row; a run already in progress is returned instead of a new one. */
 export async function claimAutopilotRun(
   organizationId: string,
-  trigger: AutopilotRunTrigger
+  trigger: AutopilotRunTrigger,
+  workflowKey: string
 ): Promise<{ runId: string; alreadyRunning: boolean }> {
   // A launch that died before the workflow started leaves a running row behind;
   // past the lease it is marked failed so it stops blocking new runs.
-  await db
+  const expired = await db
     .update(autopilotRuns)
     .set({
       status: "failed",
       finishedAt: new Date(),
-      errorMessage: "Run did not finish in time",
+      errorMessage: AUTOPILOT_RUN_EXPIRED_MESSAGE,
     })
     .where(
       and(
@@ -72,7 +71,13 @@ export async function claimAutopilotRun(
           new Date(Date.now() - AUTOPILOT_RUN_LEASE_MS)
         )
       )
-    );
+    )
+    .returning({ id: autopilotRuns.id });
+  await failWorkflowRunTrees(
+    organizationId,
+    expired.map((run) => run.id),
+    AUTOPILOT_RUN_EXPIRED_MESSAGE
+  );
   const runId = nanoid();
   const inserted = await db
     .insert(autopilotRuns)
@@ -81,6 +86,7 @@ export async function claimAutopilotRun(
       id: runId,
       organizationId,
       trigger,
+      workflowKey,
       startedAt: new Date(),
       heartbeatAt: new Date(),
     })
@@ -142,7 +148,9 @@ export async function buildAutopilotRunContext(
   runId: string
 ): Promise<AutopilotRunContext> {
   if (!(await isAutopilotEnabledForOrganization(organizationId))) {
-    throw new Error("Autopilot is not available for this workspace.");
+    throw new AutopilotUnavailableError(
+      "Autopilot is not available for this workspace."
+    );
   }
   const [settings, organization] = await Promise.all([
     db.query.autopilotSettings.findFirst({
@@ -154,10 +162,12 @@ export async function buildAutopilotRunContext(
     }),
   ]);
   if (!(settings && organization)) {
-    throw new AutopilotNotConfiguredError("Autopilot is not set up");
+    throw new AutopilotUnavailableError("Autopilot is not set up");
   }
   if (!settings.enabled) {
-    throw new Error("Autopilot is turned off for this workspace.");
+    throw new AutopilotUnavailableError(
+      "Autopilot is turned off for this workspace."
+    );
   }
   const project = await findAutopilotProject(
     organizationId,
@@ -203,20 +213,21 @@ export async function buildAutopilotRunContext(
   };
 }
 
-const JOB_RUNNERS: Record<
-  AutopilotJobKind,
-  (ctx: AutopilotRunContext) => Promise<AutopilotJobResult>
-> = {
-  readiness: runReadinessJob,
+const OBSERVATION_JOBS = {
   keywords: runKeywordsJob,
   commits: runCommitsJob,
   prompts: runPromptsJob,
   competitors: runCompetitorsJob,
-};
+} satisfies Partial<
+  Record<
+    AutopilotJobKind,
+    (ctx: AutopilotRunContext) => Promise<AutopilotJobResult>
+  >
+>;
 
 export async function runAutopilotJob(
   ctx: AutopilotRunContext,
-  kind: AutopilotJobKind
+  kind: AutopilotObservationJob
 ): Promise<AutopilotJobResult> {
   const empty: AutopilotJobResult = { findingIds: [], insights: [] };
   const log = createAutopilotLogger(ctx, kind);
@@ -229,86 +240,15 @@ export async function runAutopilotJob(
     await log.skip("Turned off in settings");
     return empty;
   }
-  if (AUTOPILOT_PULL_REQUEST_JOBS.has(kind)) {
-    // A replayed step returns what it already proposed instead of picking another candidate.
-    const claimed = await db
-      .select({ id: autopilotFindings.id })
-      .from(autopilotFindings)
-      .where(
-        and(
-          eq(autopilotFindings.organizationId, ctx.organizationId),
-          eq(autopilotFindings.runId, ctx.runId),
-          eq(autopilotFindings.kind, kind)
-        )
-      );
-    if (claimed.length > 0) {
-      // The step died after claiming; whatever it left mid-write is retried
-      // tomorrow instead of being counted as done.
-      await db
-        .update(autopilotFindings)
-        .set({
-          status: "failed",
-          claimToken: null,
-          errorMessage: "Interrupted before the pull request was opened",
-        })
-        .where(
-          and(
-            eq(autopilotFindings.runId, ctx.runId),
-            eq(autopilotFindings.kind, kind),
-            eq(autopilotFindings.status, "open")
-          )
-        );
-      return { ...empty, findingIds: claimed.map((row) => row.id) };
-    }
-    // PRs merged or closed on GitHub since the last run free up the budget.
-    await syncFindingPullRequests(ctx.organizationId);
-    const open = await countOpenPullRequests(ctx.organizationId);
-    if (open >= ctx.maxOpenPullRequests) {
-      await log.skip(
-        `${open} of ${ctx.maxOpenPullRequests} pull requests are still open`
-      );
-      return empty;
-    }
-  }
-  try {
-    return await withAutopilotRunLease(ctx, () => JOB_RUNNERS[kind](ctx));
-  } catch (error) {
-    await log.error("Job failed", {
-      error: toErrorMessage(error, String(error)),
-    });
-    return empty;
-  }
-}
-
-/** Plans on what this run observed; a failure only skips today's action. */
-export async function planAutopilot(
-  ctx: AutopilotRunContext,
-  observations: AutopilotRunObservation[]
-): Promise<AutopilotJobResult> {
-  const empty: AutopilotJobResult = { findingIds: [], insights: [] };
-  const log = createAutopilotLogger(ctx, null);
-  if (!(await renewAutopilotRunLease(ctx))) {
-    await log.skip("This run no longer owns its lease");
-    return empty;
-  }
-  try {
-    return await withAutopilotRunLease(ctx, () =>
-      runAutopilotPlanner(ctx, observations)
-    );
-  } catch (error) {
-    await log.error("Planning failed", {
-      error: toErrorMessage(error, String(error)),
-    });
-    return empty;
-  }
+  return await withAutopilotRunLease(ctx, () => OBSERVATION_JOBS[kind](ctx));
 }
 
 export async function deliverAutopilotBrief(params: {
   ctx: AutopilotRunContext;
-  results: AutopilotJobResult[];
+  insights: string[];
   previousRunAt: Date | null;
 }) {
-  const { ctx, results } = params;
+  const { ctx } = params;
   const recorded = await db.query.autopilotRuns.findFirst({
     columns: { slackMessageTs: true },
     where: and(
@@ -348,7 +288,7 @@ export async function deliverAutopilotBrief(params: {
     proposed: findings.filter((finding) => finding.status === "proposed"),
     suggested: findings.filter((finding) => finding.status === "suggested"),
     merged,
-    insights: results.flatMap((result) => result.insights),
+    insights: params.insights,
   });
   const log = createAutopilotLogger(ctx, null);
   if (!brief) {
@@ -423,18 +363,20 @@ export async function finishAutopilotRun(params: {
   scheduled?: boolean;
 }) {
   const findingIds = params.results.flatMap((result) => result.findingIds);
-  const findings =
-    findingIds.length > 0
-      ? await db
-          .select({ status: autopilotFindings.status })
-          .from(autopilotFindings)
-          .where(
-            and(
-              eq(autopilotFindings.organizationId, params.organizationId),
+  const findings = await db
+    .select({ status: autopilotFindings.status })
+    .from(autopilotFindings)
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, params.organizationId),
+        findingIds.length > 0
+          ? or(
+              eq(autopilotFindings.runId, params.runId),
               inArray(autopilotFindings.id, findingIds)
             )
-          )
-      : [];
+          : eq(autopilotFindings.runId, params.runId)
+      )
+    );
   const finishedAt = new Date();
   const completed = await db
     .update(autopilotRuns)

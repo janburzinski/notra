@@ -1,3 +1,4 @@
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import { db } from "@notra/db/drizzle";
 import {
   autopilotFindings,
@@ -17,7 +18,6 @@ import {
 } from "drizzle-orm";
 
 import {
-  AUTOPILOT_AUTOMATION_KINDS,
   AUTOPILOT_CREDITS_CHARGED_EVENT,
   AUTOPILOT_LEGACY_PR_CREATED_MESSAGE_PATTERN,
   AUTOPILOT_PULL_REQUEST_CREATED_EVENT,

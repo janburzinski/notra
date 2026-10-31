@@ -15,6 +15,7 @@ export const WORKFLOW_ANALYTICS_NAMES = {
   GSC_SYNC: "gsc-sync",
   ON_DEMAND_CONTENT: "on-demand-content",
   CONTENT_EMAIL_DIGEST: "content-email-digest",
+  WORKFLOW_GRAPH: "workflow-graph",
 } as const;
 
 export const WORKFLOW_TRIGGERS = {

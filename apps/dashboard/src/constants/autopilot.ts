@@ -12,16 +12,6 @@ import type { AutopilotOutcomeKey } from "@/types/autopilot-metrics";
 export const AUTOPILOT_FLAG_KEY = "autopilot";
 export const AUTOPILOT_GITHUB_DELIVERY_PREFIX = "autopilot:";
 
-/**
- * The automations the dashboard lists: the jobs that open pull requests.
- * prompts suggests pauses on the Prompts page and competitors is a line in
- * the brief, so neither has pull requests or merges to count.
- */
-export const AUTOPILOT_AUTOMATION_KINDS = [
-  "readiness",
-  "keywords",
-  "commits",
-] as const satisfies readonly AutopilotJobKind[];
 export const AUTOPILOT_NAV_LINK = "/autopilot";
 
 /** The Analytics tab's outcome bucket for each finding status. */
@@ -82,6 +72,8 @@ export const AUTOPILOT_FINDING_CLAIM_LEASE_MS = 30 * 60 * 1000;
 
 /** A run still marked running after this long is treated as abandoned. */
 export const AUTOPILOT_RUN_LEASE_MS = 2 * 60 * 60 * 1000;
+export const AUTOPILOT_RUN_EXPIRED_MESSAGE = "Run did not finish in time";
+export const AUTOPILOT_RUN_STOPPED_MESSAGE = "Stopped manually";
 export const AUTOPILOT_LEASE_RENEW_INTERVAL_MS = 60_000;
 export const AUTOPILOT_TRACE_DETAIL_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 /** How often a page polls the steps of a run that is still going, so they read as live. */
@@ -340,6 +332,7 @@ export const AUTOPILOT_RUN_STATUS_BADGES: Record<
   running: { label: "Running", appearance: { variant: "secondary" } },
   completed: { label: "Completed", appearance: { variant: "success" } },
   failed: { label: "Failed", appearance: { variant: "destructive" } },
+  stopped: { label: "Stopped", appearance: { variant: "secondary" } },
 };
 
 export const AUTOPILOT_RUN_TRIGGER_LABELS = {
@@ -427,10 +420,3 @@ export const AUTOPILOT_IMAGE_FRONTMATTER_KEYS = [
   "featuredImage",
   "thumbnail",
 ] as const;
-
-/**
- * Pull-request producing jobs stop once the open pull request budget is used
- * up. Keywords and commits only observe; the planner checks the budget itself.
- */
-export const AUTOPILOT_PULL_REQUEST_JOBS: ReadonlySet<AutopilotJobKind> =
-  new Set(["readiness"]);

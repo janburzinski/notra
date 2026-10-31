@@ -70,6 +70,17 @@ export function useAutopilotActions(organizationId: string) {
       toast.error(toErrorMessage(error, "Could not start Autopilot")),
   });
 
+  const stop = useMutation({
+    mutationFn: (runId: string) =>
+      dashboardOrpc.autopilot.stop.call({ organizationId, runId }),
+    onSuccess: () => {
+      toast.success("Stopped. Steps already underway finish first.");
+      invalidate();
+    },
+    onError: (error) =>
+      toast.error(toErrorMessage(error, "Could not stop the run")),
+  });
+
   const writeSuggestion = useMutation({
     mutationFn: (findingId: string) =>
       dashboardOrpc.autopilot.writeSuggestion.call({
@@ -107,5 +118,5 @@ export function useAutopilotActions(organizationId: string) {
     onError: (error) => toast.error(toErrorMessage(error, "Could not merge")),
   });
 
-  return { runNow, writeSuggestion, setJob, merge };
+  return { runNow, stop, writeSuggestion, setJob, merge };
 }

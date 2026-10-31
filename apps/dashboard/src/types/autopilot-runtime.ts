@@ -1,11 +1,15 @@
+import type { AgentTokenUsage } from "@notra/ai/types/agents";
+import type { AutopilotPlannerState } from "@notra/ai/types/autopilot-planner";
 import type { createOctokit } from "@notra/ai/utils/octokit";
 import type { autopilotFindings, autopilotRuns } from "@notra/db/schema";
+import type { AgentReadinessIssue } from "@notra/db/types/agent-readiness";
 import type {
   AutopilotEventLevel,
   AutopilotFindingEvidence,
   AutopilotImpactTarget,
   AutopilotRunEventData,
   AutopilotTraceDetail,
+  AutopilotJobKind,
 } from "@notra/db/types/autopilot";
 import type { AgentReadinessReportView } from "@notra/geo-core/types/agent-readiness";
 import type * as z from "zod";
@@ -14,7 +18,7 @@ import type {
   blogFileSchema,
   readinessAgentOutputSchema,
 } from "@/schemas/autopilot";
-import type { MergedPullRequest } from "@/types/autopilot";
+import type { AutopilotProposal, MergedPullRequest } from "@/types/autopilot";
 
 export type AutopilotOctokit = ReturnType<typeof createOctokit>;
 export type AutopilotFindingRow = typeof autopilotFindings.$inferSelect;
@@ -28,6 +32,11 @@ export type AutopilotReadinessReport = AgentReadinessReportView & {
 };
 export type AutopilotRunTrigger =
   (typeof autopilotRuns.$inferInsert)["trigger"];
+
+export interface AutopilotStopRunInput {
+  organizationId: string;
+  runId: string;
+}
 export type BlogFile = z.infer<typeof blogFileSchema>;
 export type ReadinessAgentOutput = z.infer<typeof readinessAgentOutputSchema>;
 export type AutopilotPullRequestMoment = "ready" | "merged" | "closed";
@@ -56,7 +65,51 @@ export interface FindingClaim {
   token: string;
 }
 
+export type AutopilotProposeMode =
+  | { suggestOnly: true }
+  | { onUsage: (usage: AgentTokenUsage) => void };
+
 export type AutopilotPostBrief = NonNullable<AutopilotFindingEvidence["brief"]>;
+
+export type AutopilotObservationJob = Exclude<AutopilotJobKind, "readiness">;
+
+export type AutopilotBlogDraft =
+  | { kind: "update"; baseSha: string; post: BlogFile; existingPath: string }
+  | {
+      kind: "new";
+      baseSha: string;
+      post: BlogFile;
+      path: string;
+      sample: string | null;
+      imageLocation: { path: string; url: string };
+    };
+
+export type AutopilotReadinessCheck =
+  | { ready: false; reason: string }
+  | {
+      ready: true;
+      targetUrl: string;
+      report: AutopilotReadinessReport;
+      issues: AgentReadinessIssue[];
+    };
+
+export type AutopilotPlanDecision =
+  | { outcome: "skip"; memory: null }
+  | { outcome: "wait"; memory: AutopilotPlannerState }
+  | {
+      outcome: "open" | "suggest";
+      memory: AutopilotPlannerState;
+      topicSlug: string;
+      confidence: number | null;
+      proposal: AutopilotProposal;
+      brief: AutopilotPostBrief;
+    };
+
+export interface AutopilotPlanActed {
+  findingId: string;
+  status: "ready" | "in_progress";
+  pullRequestUrl: string | null;
+}
 
 export interface AutopilotSchedule {
   briefHour: number;

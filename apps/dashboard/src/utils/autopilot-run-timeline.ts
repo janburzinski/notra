@@ -14,7 +14,8 @@ export interface AutopilotRunPhase {
 
 /**
  * One phase per job that logged anything, in run order. A phase lasts until
- * the next one starts (or the run ends), so the bars add up to the run.
+ * the next one starts (or the run ends), so the bars add up to the run. Jobs
+ * can run side by side, so the active one is the one that logged last.
  */
 export function runTimelinePhases(
   events: {
@@ -42,13 +43,14 @@ export function runTimelinePhases(
     ];
   }).sort((a, b) => a.startedAt - b.startedAt);
   const runEnd = run.finishedAt ? new Date(run.finishedAt).getTime() : now;
+  const latest = Math.max(...sections.map((section) => section.lastAt));
   return sections.map((section, index) => {
     const next = sections[index + 1];
     const end = next ? next.startedAt : Math.max(runEnd, section.lastAt);
     let state: PhaseState = "complete";
     if (section.failed) {
       state = "failed";
-    } else if (!next && run.status === "running") {
+    } else if (run.status === "running" && section.lastAt === latest) {
       state = "active";
     }
     return {

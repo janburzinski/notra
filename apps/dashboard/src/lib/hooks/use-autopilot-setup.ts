@@ -1,11 +1,11 @@
 "use client";
 
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { parseAsArrayOf, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { AUTOPILOT_AUTOMATION_KINDS } from "@/constants/autopilot";
 import { useAutopilotConnections } from "@/lib/hooks/use-autopilot-connections";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { AutopilotSetupFormProps } from "@/types/autopilot";

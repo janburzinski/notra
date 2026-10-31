@@ -6,6 +6,7 @@ import {
   WorkflowSquare03Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,10 +19,7 @@ import { DataTable, type TableColumn } from "ui/table";
 import { AutopilotStatStrip } from "@/components/autopilot/autopilot-stat-strip";
 import { AutopilotTableEmpty } from "@/components/autopilot/autopilot-table-empty";
 import { Button } from "@/components/button";
-import {
-  AUTOPILOT_AUTOMATION_KINDS,
-  AUTOPILOT_POLL_INTERVAL_MS,
-} from "@/constants/autopilot";
+import { AUTOPILOT_POLL_INTERVAL_MS } from "@/constants/autopilot";
 import {
   AUTOPILOT_AUTOMATIONS,
   AUTOPILOT_EMPTY_TABLE_HEIGHT,

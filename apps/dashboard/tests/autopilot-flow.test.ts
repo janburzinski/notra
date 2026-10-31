@@ -25,10 +25,14 @@ import { MEMORY_PATHS } from "@notra/memory/constants/memory";
 import { setMemoryStore } from "@notra/memory/memory";
 import { createInMemoryStore } from "@notra/memory/stores/in-memory";
 import { renderRecords } from "@notra/memory/utils/records";
+import { resolveReferences } from "@notra/workflows/utils/references";
 import { and, eq, sql } from "drizzle-orm";
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 
+import type { AutopilotRunObservation } from "../src/types/autopilot";
+import type { AutopilotPlanDecision } from "../src/types/autopilot-runtime";
 import { createAutopilotSandbox } from "./utils/autopilot-sandbox";
+import { createWorkflowGraphRunner } from "./utils/workflow-graph-runner";
 
 if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   test("Autopilot sandbox: webhook → writer → PR → Slack, retries and credits", () => {
@@ -284,7 +288,13 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       ]),
   }));
   mock.module("@/workflows/runtime", () => ({}));
-  mock.module("@/lib/geo/configure", () => ({ geoCoreDashboardLayer: {} }));
+  mock.module("@/lib/geo/configure", () => ({
+    geoCoreDashboardLayer: Layer.empty,
+  }));
+  mock.module("@notra/geo-core/geo/gaps", () => ({
+    loadGeoContentGaps: () =>
+      Effect.succeed({ promptGaps: [], searchGaps: [] }),
+  }));
   mock.module("@notra/ai/evaluation/client", () => ({
     getEvaluationClient: () => ({
       tryEvaluate: async (input: { feature?: string }) => {
@@ -426,6 +436,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     },
   }));
   mock.module("@/lib/autopilot/github", () => ({
+    AutopilotRepositoryAccessError: class extends Error {},
     getRepositoryOctokit: async () => ({ request: githubRequest }),
     getInstallationOctokit: async () => ({ request: githubRequest }),
     getBaseBranchSha: async () => "base-sha",
@@ -531,12 +542,15 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await import("../src/lib/autopilot/mentions");
   const { applyFeedbackInOrder } =
     await import("../src/lib/autopilot/feedback");
-  const {
-    buildAutopilotRunContext,
-    deliverAutopilotBrief,
-    planAutopilot,
-    runAutopilotJob,
-  } = await import("../src/lib/autopilot/run");
+  const { buildAutopilotRunContext, deliverAutopilotBrief, runAutopilotJob } =
+    await import("../src/lib/autopilot/run");
+  const runGraph = await createWorkflowGraphRunner();
+  const { AUTOPILOT_DAILY_WORKFLOW, workflowDefinitions } =
+    await import("../src/lib/workflow-engine/definitions/autopilot");
+  const { workflowBlockRegistry } =
+    await import("../src/lib/workflow-engine/blocks");
+  const { decideAutopilotPlan, rememberAutopilotPlan } =
+    await import("../src/lib/autopilot/planner");
   const {
     syncOfferReactionFeedback,
     claimFinding,
@@ -590,6 +604,13 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     repositoryBranch: "main",
     slackIntegrationId: "sandbox-slack",
     slackChannelId: "C_SANDBOX",
+    jobs: {
+      readiness: false,
+      keywords: false,
+      commits: true,
+      prompts: false,
+      competitors: true,
+    },
   });
   afterAll(() => sandbox.postgres.close());
   beforeEach(async () => {
@@ -839,12 +860,30 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await db
       .insert(autopilotRuns)
       .values({ id, organizationId: "sandbox-org", trigger: "cron" });
-    const ctx = await buildAutopilotRunContext("sandbox-org", id);
-    const observations =
-      (await runAutopilotJob(ctx, "commits")).observations ?? [];
-    state.plan = output(observations.map((observation) => observation.id));
-    const result = await planAutopilot(ctx, observations);
-    return { ctx, observations, result };
+    let observations: AutopilotRunObservation[] = [];
+    const run = await runGraph({
+      organizationId: "sandbox-org",
+      definition: AUTOPILOT_DAILY_WORKFLOW,
+      definitions: Object.values(workflowDefinitions),
+      input: { autopilotRunId: id, previousRunAt: null },
+      onBlock: (request) => {
+        if (request.node.id === "plan") {
+          observations = (request.config.observations as unknown[])
+            .flat()
+            .filter(Boolean) as AutopilotRunObservation[];
+          state.plan = output(
+            observations.map((observation) => observation.id)
+          );
+        }
+      },
+    });
+    const findingIds = ["write", "idea"].flatMap((nodeId) => {
+      const findingId = (
+        run.state.nodes[nodeId]?.output as { findingId?: string } | undefined
+      )?.findingId;
+      return findingId ? [findingId] : [];
+    });
+    return { run, observations, result: { findingIds } };
   };
   const plannerState = async () =>
     parsePlannerState(await readMemory(MEMORY_PATHS.planner));
@@ -1256,7 +1295,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
         .insert(autopilotRuns)
         .values({ id, organizationId: "sandbox-org", trigger: "manual" });
       const ctx = await buildAutopilotRunContext("sandbox-org", id);
-      return deliverAutopilotBrief({ ctx, results: [], previousRunAt: null });
+      return deliverAutopilotBrief({ ctx, insights: [], previousRunAt: null });
     };
     await db
       .update(autopilotSettings)
@@ -1662,17 +1701,45 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ).toBe("suggested");
   });
 
-  test("a replayed planner step opens no second PR and writes no second commit", async () => {
+  const replayBlock = async (
+    run: Awaited<ReturnType<typeof dailyRun>>["run"],
+    nodeId: string
+  ) => {
+    const node = Object.values(workflowDefinitions)
+      .flatMap((definition) => definition.graph.nodes)
+      .find((candidate) => candidate.id === nodeId);
+    const block = node ? workflowBlockRegistry.get(node.type) : undefined;
+    if (!(node && block)) {
+      throw new Error(`No step ${nodeId}`);
+    }
+    return block.runStep(0, {
+      organizationId: "sandbox-org",
+      runId: run.runId,
+      node: { ...node, kind: block.kind },
+      config: resolveReferences(node.config ?? {}, run.scope),
+      lastAttempt: false,
+      idempotencyKey: `${run.runId}:${nodeId}`,
+      state: {},
+    });
+  };
+
+  test("replayed planning steps open no second PR and write no second commit", async () => {
     await seedTopic("exports", "Exports", 40);
-    const { ctx, observations } = await dailyRun("planner-replay", [
+    const { run, observations } = await dailyRun("planner-replay", [
       exportsPull,
     ]);
     expect(opened).toHaveLength(1);
     const commits = memory.commits("sandbox-org").length;
-    const replayed = await planAutopilot(ctx, observations);
+    const ctx = await buildAutopilotRunContext("sandbox-org", "planner-replay");
+    const plan = run.state.nodes.plan?.output as AutopilotPlanDecision;
+    expect(plan.outcome).toBe("open");
+    expect((await decideAutopilotPlan(ctx, observations)).outcome).toBe("skip");
+    expect((await replayBlock(run, "write")).status).toBe("halted");
+    expect(
+      await rememberAutopilotPlan({ ctx, decision: plan, acted: null })
+    ).toBe(false);
     expect(opened).toHaveLength(1);
     expect(holds).toHaveLength(1);
-    expect(replayed.findingIds).toHaveLength(1);
     expect(memory.commits("sandbox-org")).toHaveLength(commits);
 
     // A run that decided to wait is replay-safe through its planner state.
@@ -1683,8 +1750,18 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       [importsPull],
       (ids) => plannerOutput(ids, { slug: "imports", title: "Imports" })
     );
+    expect(waiting.run.state.nodes.plan?.output).toMatchObject({
+      outcome: "wait",
+    });
+    expect(waiting.run.state.nodes.route?.port).toBe("otherwise");
     const afterWait = memory.commits("sandbox-org").length;
-    await planAutopilot(waiting.ctx, waiting.observations);
+    const waitingCtx = await buildAutopilotRunContext(
+      "sandbox-org",
+      "planner-replay-wait"
+    );
+    expect(
+      (await decideAutopilotPlan(waitingCtx, waiting.observations)).outcome
+    ).toBe("skip");
     expect(memory.commits("sandbox-org")).toHaveLength(afterWait);
     expect(actionEvaluations).toHaveLength(2);
     expect(await runMessages("planner-replay-wait")).toContainEqual(
@@ -1696,16 +1773,14 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     await seedTopic("exports", "Exports", 40);
     const before = await readMemory(MEMORY_PATHS.planner);
     state.memoryCommitFailure = true;
-    const { ctx, observations } = await dailyRun("planner-lost-notes", [
-      exportsPull,
-    ]);
+    const { run } = await dailyRun("planner-lost-notes", [exportsPull]);
     expect(opened).toHaveLength(1);
     expect(await runMessages("planner-lost-notes")).toContainEqual(
       "error: Could not update the workspace memory"
     );
     expect(await readMemory(MEMORY_PATHS.planner)).toBe(before);
+    expect(run.state.nodes.brief?.status).toBe("success");
     state.memoryCommitFailure = false;
-    await planAutopilot(ctx, observations);
     expect(opened).toHaveLength(1);
     expect(charges).toHaveLength(1);
     // The next day the stale notes still think the topic is waiting. Another
@@ -1734,7 +1809,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     expect(opened).toHaveLength(0);
     expect(release).not.toHaveBeenCalled();
     expect(await runMessages("planner-billing-down")).toContainEqual(
-      "error: Planning failed"
+      "error: Could not check the credit balance"
     );
     const firstHold = holds.at(-1);
     state.billingCrash = false;
@@ -2108,7 +2183,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     const ctx = await buildAutopilotRunContext("sandbox-org", "slack-retry");
     state.slackFailure = true;
     expect(
-      await deliverAutopilotBrief({ ctx, results: [], previousRunAt: null })
+      await deliverAutopilotBrief({ ctx, insights: [], previousRunAt: null })
     ).toBeNull();
     expect(
       (await db.query.autopilotFindings.findFirst())?.evidence.briefed ?? []
@@ -2122,7 +2197,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     ).toBeNull();
     state.slackFailure = false;
     expect(
-      await deliverAutopilotBrief({ ctx, results: [], previousRunAt: null })
+      await deliverAutopilotBrief({ ctx, insights: [], previousRunAt: null })
     ).not.toBeNull();
     expect(
       (await db.query.autopilotFindings.findFirst())?.evidence.briefed
@@ -2140,11 +2215,7 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       .insert(autopilotRuns)
       .values({ id: "daily", organizationId: "sandbox-org", trigger: "cron" });
     const ctx = await buildAutopilotRunContext("sandbox-org", "daily");
-    const input = {
-      ctx,
-      results: [{ findingIds: [finding.id], insights: [] }],
-      previousRunAt: null,
-    };
+    const input = { ctx, insights: [], previousRunAt: null };
     expect(await deliverAutopilotBrief(input)).toBe("1234567890.000001");
     expect(await deliverAutopilotBrief(input)).toBe("1234567890.000001");
     expect(deliveries).toHaveLength(1);

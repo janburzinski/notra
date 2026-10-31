@@ -47,7 +47,7 @@ if (process.env.NOTRA_AUTOPILOT_ROUTER_TEST !== "1") {
   }));
   mock.module("@/lib/workflows/start", () => ({
     startAutopilotSuggestionWorkflowRun: enqueueSuggestion,
-    startAutopilotWorkflowRun: async () => ({ runId: "workflow-1" }),
+    startWorkflowGraphRun: async () => ({ runId: "workflow-1" }),
   }));
 
   mock.module("@notra/db/drizzle", () => ({

@@ -8,6 +8,7 @@ import {
   WorkflowSquare03Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { AUTOPILOT_AUTOMATION_KINDS } from "@notra/db/constants/autopilot";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import {
   IconTabsList,
@@ -31,6 +32,7 @@ import { AutopilotPageShell } from "@/components/autopilot/autopilot-page-shell"
 import { AutopilotPeriodSelect } from "@/components/autopilot/autopilot-period-select";
 import { AutopilotSettingsPanel } from "@/components/autopilot/autopilot-settings-panel";
 import { AutopilotSetupFlow } from "@/components/autopilot/autopilot-setup-flow";
+import { AutopilotStopButton } from "@/components/autopilot/autopilot-stop-button";
 import {
   AutopilotTemplatesPage,
   AutopilotTemplatesSection,
@@ -39,10 +41,7 @@ import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { BackLink } from "@/components/layout/back-link";
 import { TabCount } from "@/components/tab-count";
-import {
-  AUTOPILOT_AUTOMATION_KINDS,
-  AUTOPILOT_NAV_LINK,
-} from "@/constants/autopilot";
+import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import {
   AUTOPILOT_AUTOMATION_SLUGS,
   AUTOPILOT_LINK_ACTIONS,
@@ -57,7 +56,10 @@ import type {
   AutopilotPendingFindingAction,
 } from "@/types/autopilot";
 import type { AutopilotMetricsDays } from "@/types/autopilot-metrics";
-import { isScheduledRunInProgress } from "@/utils/autopilot-automations";
+import {
+  autopilotRunKind,
+  findActiveAutopilotRun,
+} from "@/utils/autopilot-events";
 import { isListedPullRequest } from "@/utils/autopilot-findings";
 
 export default function PageClient({
@@ -126,7 +128,8 @@ function AutopilotOverviewPage({
     void setLink(null);
   }, [canManage, findings, link, setLink, setTab]);
 
-  const isRunning = isScheduledRunInProgress(runs);
+  const activeRun = findActiveAutopilotRun(runs);
+  const isRunning = Boolean(activeRun);
 
   if (!settings.enabled) {
     return (
@@ -135,7 +138,7 @@ function AutopilotOverviewPage({
         {canManage ? (
           <AutopilotSetupFlow
             callbackPath={basePath}
-            onSaved={() => runNow.mutate()}
+            onSaved={() => runNow.mutate(undefined)}
             organizationId={organizationId}
             overview={overview}
             projectId={projectId}
@@ -173,17 +176,25 @@ function AutopilotOverviewPage({
   return (
     <>
       <PageHeading title="Autopilot">
-        {canManage ? (
-          <Button
-            disabled={isRunning}
-            loading={runNow.isPending || isRunning}
-            onClick={() => runNow.mutate()}
-            size="sm"
-          >
-            <HugeiconsIcon icon={PlayIcon} size={16} />
-            Run now
-          </Button>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {canManage && activeRun?.workflowKey ? (
+            <AutopilotStopButton
+              organizationId={organizationId}
+              runId={activeRun.id}
+            />
+          ) : null}
+          {canManage ? (
+            <Button
+              disabled={isRunning}
+              loading={runNow.isPending || isRunning}
+              onClick={() => runNow.mutate(undefined)}
+              size="sm"
+            >
+              <HugeiconsIcon icon={PlayIcon} size={16} />
+              Run now
+            </Button>
+          ) : null}
+        </div>
       </PageHeading>
 
       <Tabs
@@ -255,7 +266,11 @@ function AutopilotOverviewPage({
             onRunAutomation={(kind) => runNow.mutate(kind)}
             organizationId={organizationId}
             runDisabled={isRunning || runNow.isPending}
-            runningKind={runNow.isPending ? (runNow.variables ?? null) : null}
+            runningKind={
+              runNow.isPending
+                ? (runNow.variables ?? null)
+                : autopilotRunKind(activeRun)
+            }
           />
           <AutopilotTemplatesSection
             {...templateActions}

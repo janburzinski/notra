@@ -24,13 +24,10 @@ import {
   resolveAutopilotOutcome,
   topicHasActiveWork,
 } from "@notra/ai/utils/autopilot-planner";
-import { db } from "@notra/db/drizzle";
-import { autopilotFindings } from "@notra/db/schema";
 import { MEMORY_PATHS } from "@notra/memory/constants/memory";
 import { openMemorySnapshot, updateMemory } from "@notra/memory/memory";
-import { and, eq, inArray } from "drizzle-orm";
 
-import { listBlogPostPaths, proposeBlog } from "@/lib/autopilot/blog";
+import { listBlogPostPaths } from "@/lib/autopilot/blog";
 import {
   countAutonomousProposals,
   countOpenPullRequests,
@@ -42,11 +39,14 @@ import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import type {
-  AutopilotJobResult,
   AutopilotRunContext,
   AutopilotRunObservation,
 } from "@/types/autopilot";
-import type { AutopilotLogger } from "@/types/autopilot-runtime";
+import type {
+  AutopilotLogger,
+  AutopilotPlanActed,
+  AutopilotPlanDecision,
+} from "@/types/autopilot-runtime";
 import { toErrorMessage } from "@/utils/error-message";
 
 function describeChecks(checks: AutopilotGateResult["checks"]) {
@@ -150,34 +150,14 @@ async function writePlannerMemory(params: {
   }
 }
 
-/**
- * Links what keywords and commits noticed into topics, acts on at most one
- * and writes the notes back. A replayed step finds its run id in the planner
- * state, or the finding it claimed, and stops.
- */
-export async function runAutopilotPlanner(
+export async function decideAutopilotPlan(
   ctx: AutopilotRunContext,
   observations: AutopilotRunObservation[]
-): Promise<AutopilotJobResult> {
-  const result: AutopilotJobResult = { findingIds: [], insights: [] };
+): Promise<AutopilotPlanDecision> {
   const log = createAutopilotLogger(ctx, null);
   if (!ctx.repository) {
-    return result;
+    return { outcome: "skip", memory: null };
   }
-  const claimed = await db
-    .select({ id: autopilotFindings.id })
-    .from(autopilotFindings)
-    .where(
-      and(
-        eq(autopilotFindings.organizationId, ctx.organizationId),
-        eq(autopilotFindings.runId, ctx.runId),
-        inArray(autopilotFindings.kind, ["keywords", "commits"])
-      )
-    );
-  if (claimed.length > 0) {
-    return { ...result, findingIds: claimed.map((row) => row.id) };
-  }
-
   const snapshot = await openMemorySnapshot(ctx.organizationId);
   const [decisionMemory, plannerFile] = await Promise.all([
     loadDecisionMemory(ctx.organizationId),
@@ -186,26 +166,24 @@ export async function runAutopilotPlanner(
   const stored = parsePlannerState(plannerFile);
   if (stored.lastRunId === ctx.runId) {
     await log.skip("This run already planned");
-    return result;
+    return { outcome: "skip", memory: null };
   }
   if (observations.length === 0 && stored.topics.length === 0) {
     await log.skip("Nothing observed and no open topics to plan");
-    return result;
+    return { outcome: "skip", memory: null };
   }
   await syncFindingPullRequests(ctx.organizationId);
   // Acting needs something seen this run, so without observations the model
   // has nothing to decide: only follow the findings the topics point at.
   if (observations.length === 0) {
     await log.skip("Nothing observed this run");
-    await writePlannerMemory({
-      ctx,
-      log,
-      state: {
+    return {
+      outcome: "wait",
+      memory: {
         ...(await syncTopicsWithFindings(ctx.organizationId, stored)),
         lastRunId: ctx.runId,
       },
-    });
-    return result;
+    };
   }
   const [synced, existingPosts, activeWork, openPullRequests, autonomous] =
     await Promise.all([
@@ -306,12 +284,13 @@ export async function runAutopilotPlanner(
   const observation = plan.topic
     ? primaryObservation(plan.topic, observations, plan.action.type)
     : null;
-  let state = plan.state;
   if (plan.action.type === "none" || !plan.topic) {
     await log.decision(`Waiting: ${plan.action.reason}`, {
       reason: plan.action.reason,
     });
-  } else if (!(outcome && observation)) {
+    return { outcome: "wait", memory: plan.state };
+  }
+  if (!(outcome && observation)) {
     // resolveAutopilotOutcome and primaryObservation agree: no outcome
     // without a usable observation from this run.
     await log.decision(`Not acting on "${plan.topic.title}" yet`, {
@@ -329,63 +308,73 @@ export async function runAutopilotPlanner(
           }
         : {}),
     });
-  } else {
-    const { topic, action } = plan;
-    await log.decision(
-      outcome === "open"
-        ? `Writing "${action.brief?.topic ?? topic.title}"`
-        : `Saved "${action.brief?.topic ?? topic.title}" as an idea: no room for an automatic pull request`,
-      {
-        reason: action.reason,
-        confidence: plan.actionConfidence,
-        checks: describeChecks(gate.checks),
-      }
-    );
-    const evidence = topic.signals
-      .map((signal) => `- ${signal.detail}`)
-      .join("\n");
-    const proposed = await proposeBlog({
-      ctx,
-      log,
-      result,
-      confidence: plan.actionConfidence,
-      suggestOnly: outcome === "suggest",
-      proposal: {
-        ...observation.proposal,
-        // A post is named after the planner's brief, not the observation
-        // that triggered it; an update keeps the page it names.
-        title:
-          action.type === "write_post"
-            ? `Blog post: ${action.brief?.topic ?? topic.title}`
-            : observation.proposal.title,
-        evidence: {
-          ...observation.proposal.evidence,
-          ...(action.type === "update_page" ? {} : { updatePage: null }),
-          topic: {
-            slug: topic.slug,
-            title: topic.title,
-            signals: countIndependentSignals(topic),
-          },
-          gate: gate.checks,
-        },
-      },
-      brief: {
-        topic: action.brief?.topic ?? observation.brief.topic,
-        angle: action.brief?.angle ?? observation.brief.angle,
-        evidence: `${observation.brief.evidence}\n\nRelated signals:\n${evidence}`,
-      },
-    });
-    // "settled" means this fingerprint already has a finding in some state;
-    // the topic stays as the planner left it instead of guessing which.
-    if ("findingId" in proposed && proposed.findingId) {
-      state = markTopicActed(state, topic.slug, {
-        findingId: proposed.findingId,
-        status: proposed.status === "suggested" ? "ready" : "in_progress",
-        pullRequestUrl: "url" in proposed ? (proposed.url ?? null) : null,
-      });
-    }
+    return { outcome: "wait", memory: plan.state };
   }
+  const { topic, action } = plan;
+  await log.decision(
+    outcome === "open"
+      ? `Writing "${action.brief?.topic ?? topic.title}"`
+      : `Saved "${action.brief?.topic ?? topic.title}" as an idea: no room for an automatic pull request`,
+    {
+      reason: action.reason,
+      confidence: plan.actionConfidence,
+      checks: describeChecks(gate.checks),
+    }
+  );
+  const evidence = topic.signals
+    .map((signal) => `- ${signal.detail}`)
+    .join("\n");
+  return {
+    outcome,
+    memory: plan.state,
+    topicSlug: topic.slug,
+    confidence: plan.actionConfidence,
+    proposal: {
+      ...observation.proposal,
+      // A post is named after the planner's brief, not the observation
+      // that triggered it; an update keeps the page it names.
+      title:
+        action.type === "write_post"
+          ? `Blog post: ${action.brief?.topic ?? topic.title}`
+          : observation.proposal.title,
+      evidence: {
+        ...observation.proposal.evidence,
+        ...(action.type === "update_page" ? {} : { updatePage: null }),
+        topic: {
+          slug: topic.slug,
+          title: topic.title,
+          signals: countIndependentSignals(topic),
+        },
+        gate: gate.checks,
+      },
+    },
+    brief: {
+      topic: action.brief?.topic ?? observation.brief.topic,
+      angle: action.brief?.angle ?? observation.brief.angle,
+      evidence: `${observation.brief.evidence}\n\nRelated signals:\n${evidence}`,
+    },
+  };
+}
 
+export async function rememberAutopilotPlan(params: {
+  ctx: AutopilotRunContext;
+  decision: AutopilotPlanDecision;
+  acted: AutopilotPlanActed | null;
+}) {
+  const { ctx, decision } = params;
+  if (!decision.memory) {
+    return false;
+  }
+  const log = createAutopilotLogger(ctx, null);
+  const snapshot = await openMemorySnapshot(ctx.organizationId);
+  const stored = parsePlannerState(await snapshot.read(MEMORY_PATHS.planner));
+  if (stored.lastRunId === ctx.runId) {
+    return false;
+  }
+  const state =
+    params.acted && "topicSlug" in decision
+      ? markTopicActed(decision.memory, decision.topicSlug, params.acted)
+      : decision.memory;
   await writePlannerMemory({ ctx, log, state });
-  return result;
+  return true;
 }

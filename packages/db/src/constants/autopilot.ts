@@ -7,6 +7,17 @@ export const AUTOPILOT_JOB_KINDS = [
 ] as const;
 
 /**
+ * The automations the dashboard lists: the jobs that open pull requests.
+ * prompts suggests pauses on the Prompts page and competitors is a line in
+ * the brief, so neither has pull requests or merges to count.
+ */
+export const AUTOPILOT_AUTOMATION_KINDS = [
+  "readiness",
+  "keywords",
+  "commits",
+] as const satisfies readonly (typeof AUTOPILOT_JOB_KINDS)[number][];
+
+/**
  * manual, cron and onboarding run every job and never overlap. github (a
  * `@notra` mention or a merge) and suggestion (writing a dashboard
  * suggestion) handle one item and may run next to them.
@@ -30,6 +41,7 @@ export const AUTOPILOT_RUN_STATUSES = [
   "running",
   "completed",
   "failed",
+  "stopped",
 ] as const;
 
 /**

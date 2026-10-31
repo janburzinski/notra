@@ -1,3 +1,7 @@
+import {
+  AUTOPILOT_AUTOMATION_KINDS,
+  AUTOPILOT_SCHEDULED_TRIGGERS,
+} from "@notra/db/constants/autopilot";
 import type {
   AutopilotEventLevel,
   AutopilotJobKind,
@@ -8,6 +12,7 @@ import {
   AUTOPILOT_EVENT_DATA_LABELS,
   AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS,
 } from "@/constants/autopilot";
+import { AUTOPILOT_TEMPLATE_WORKFLOW_KEYS } from "@/constants/workflow-engine";
 import type {
   AutopilotRunResult,
   AutopilotRunSectionState,
@@ -15,6 +20,28 @@ import type {
   AutopilotTranscript,
   AutopilotTranscriptStepKind,
 } from "@/types/autopilot";
+import type { AutopilotAutomationKind } from "@/types/autopilot-metrics";
+
+export function findActiveAutopilotRun<
+  Run extends Pick<AutopilotRunView, "status" | "trigger">,
+>(runs: Run[]) {
+  return runs.find(
+    (run) =>
+      run.status === "running" &&
+      (AUTOPILOT_SCHEDULED_TRIGGERS as readonly string[]).includes(run.trigger)
+  );
+}
+
+/** The automation a single-automation run belongs to; null for the daily run. */
+export function autopilotRunKind(
+  run: Pick<AutopilotRunView, "workflowKey"> | undefined
+): AutopilotAutomationKind | null {
+  return (
+    AUTOPILOT_AUTOMATION_KINDS.find(
+      (kind) => AUTOPILOT_TEMPLATE_WORKFLOW_KEYS[kind] === run?.workflowKey
+    ) ?? null
+  );
+}
 
 const CAMEL_BOUNDARY = /([a-z])([A-Z])/g;
 const READ_STEP = /^Read (\S+)$/;
@@ -25,6 +52,8 @@ const OPENED_PULL_REQUEST_STEP = /^Opened pull request #/;
 const WWW_PREFIX = /^www\./;
 /** Server and browser clocks drift; poll this long past the run's end. */
 const RUN_EVENTS_SETTLE_MS = 5000;
+
+const RUN_EVENTS_STOPPED_SETTLE_MS = 3 * 60_000;
 const LOG_INLINE_LIST_MAX = 100;
 
 export function formatAutopilotPercent(value: number) {
@@ -300,7 +329,11 @@ export function runEventsRefetchInterval(
     if (run.status === "running" || !run.finishedAt) {
       return AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS;
     }
-    const settledAt = new Date(run.finishedAt).getTime() + RUN_EVENTS_SETTLE_MS;
+    const settledAt =
+      new Date(run.finishedAt).getTime() +
+      (run.status === "stopped"
+        ? RUN_EVENTS_STOPPED_SETTLE_MS
+        : RUN_EVENTS_SETTLE_MS);
     return query.state.dataUpdatedAt < settledAt
       ? AUTOPILOT_RUN_EVENTS_LIVE_REFETCH_MS
       : false;
@@ -345,6 +378,9 @@ export function describeRunResult(run: AutopilotRunView): AutopilotRunResult {
   }
   if (run.status === "failed") {
     return { tone: "failed", text: run.errorMessage ?? "Failed" };
+  }
+  if (run.status === "stopped") {
+    return { tone: "quiet", text: run.errorMessage ?? "Stopped" };
   }
   // Item runs (a mention, a pull request event) are decided by one log line.
   if (run.outcome) {
