@@ -7,8 +7,10 @@ export async function GET(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const cleanup = await cleanupAutopilotNamespaces();
-  const result = await runDueAutopilots();
+  const [cleanup, result] = await Promise.all([
+    cleanupAutopilotNamespaces(),
+    runDueAutopilots(),
+  ]);
   return Response.json(
     { ...result, cleanup },
     {

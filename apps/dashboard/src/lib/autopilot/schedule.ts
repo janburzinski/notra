@@ -1,8 +1,12 @@
 import { db } from "@notra/db/drizzle";
 import { autopilotSettings } from "@notra/db/schema";
+import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
 import { eq } from "drizzle-orm";
 
-import { AUTOPILOT_REACTION_LOOKBACK_DAYS } from "@/constants/autopilot";
+import {
+  AUTOPILOT_CRON_CONCURRENCY,
+  AUTOPILOT_REACTION_LOOKBACK_DAYS,
+} from "@/constants/autopilot";
 import { syncOfferReactionFeedback } from "@/lib/autopilot/findings";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { purgeExpiredAutopilotTraceDetails } from "@/lib/autopilot/log";
@@ -11,16 +15,18 @@ import { isAutopilotDue } from "@/utils/autopilot-schedule";
 
 export async function runDueAutopilots() {
   const now = new Date();
-  await purgeExpiredAutopilotTraceDetails(now);
-  const rows = await db.query.autopilotSettings.findMany({
-    where: eq(autopilotSettings.enabled, true),
-  });
+  const [, rows] = await Promise.all([
+    purgeExpiredAutopilotTraceDetails(now),
+    db.query.autopilotSettings.findMany({
+      where: eq(autopilotSettings.enabled, true),
+    }),
+  ]);
   let started = 0;
   let failed = 0;
-  for (const row of rows) {
+  await mapWithConcurrency(rows, AUTOPILOT_CRON_CONCURRENCY, async (row) => {
     try {
       if (!(await isAutopilotEnabledForOrganization(row.organizationId))) {
-        continue;
+        return;
       }
       try {
         await syncOfferReactionFeedback(
@@ -32,7 +38,7 @@ export async function runDueAutopilots() {
         failed += 1;
       }
       if (!isAutopilotDue(row, now)) {
-        continue;
+        return;
       }
       const claim = await startAutopilot(row.organizationId, "cron");
       if (!claim.alreadyRunning) {
@@ -41,6 +47,6 @@ export async function runDueAutopilots() {
     } catch {
       failed += 1;
     }
-  }
+  });
   return { checked: rows.length, started, failed };
 }
