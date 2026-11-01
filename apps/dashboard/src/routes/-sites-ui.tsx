@@ -18,10 +18,11 @@ import {
 } from "@/components/sites/site-page-skeleton";
 import { SitePageSkeleton as SiteLoading } from "@/components/sites/site-route-skeleton";
 import { SITE_SECTION_PAGES } from "@/constants/site-ui-pages";
+import type { UiRouteMatch } from "@/types/ui-route";
 import { lazyPage } from "@/utils/lazy-page";
 import { siteHref, sitePreviewDeploymentsHref } from "@/utils/site-links";
 
-import { loadSite, loadSitesEnabled } from "./-sites-loaders";
+import { loadSite, loadSiteName, loadSitesEnabled } from "./-sites-loaders";
 import { createUiRoute, uiRouteSearch } from "./-ui-route";
 
 const SiteLayout = lazyPage(() =>
@@ -103,13 +104,23 @@ export function createSitesUiRoutes(organization: AnyRoute) {
       branch: uiRouteSearch(search as Record<string, unknown>).branch,
     }),
     shouldReload: ({ cause }) => (cause === "stay" ? false : undefined),
-    loader: ({ params, deps }) =>
+    loader: async ({ params, deps }) =>
       import.meta.env.SSR
-        ? { state: undefined }
+        ? {
+            state: undefined,
+            name: await loadSiteName({
+              data: { params, searchParams: {} },
+            }).catch(() => null),
+          }
         : loadSite({ data: { params, searchParams: deps } }),
     pendingComponent: SiteLoading,
     component: SiteRouteLayout,
   });
+  const siteName = (matches: readonly UiRouteMatch[]) => {
+    const data = matches.find((match) => match.routeId === site.id)
+      ?.loaderData as { name?: string | null } | undefined;
+    return data?.name;
+  };
 
   const siteRoutes = [
     createRoute({
@@ -165,6 +176,7 @@ export function createSitesUiRoutes(organization: AnyRoute) {
       parent: site,
       path: "/",
       title: { namespace: "sites.detail.tabs", key: "overview" },
+      titleSuffix: siteName,
       pendingComponent: SiteSectionLoading,
       preload: Overview.preload,
       component: () => <Overview />,
@@ -174,6 +186,7 @@ export function createSitesUiRoutes(organization: AnyRoute) {
         parent: site,
         path: section,
         title: { namespace: "sites.detail.tabs", key: section },
+        titleSuffix: siteName,
         pendingComponent: skeleton ?? SiteSectionLoading,
         preload: Page.preload,
         component: () => <Page />,
@@ -183,6 +196,7 @@ export function createSitesUiRoutes(organization: AnyRoute) {
       parent: site,
       path: "deployments/$deploymentId",
       title: { namespace: "sites.deploymentPage", key: "title" },
+      titleSuffix: siteName,
       pendingComponent: SiteDeploymentLoading,
       preload: DeploymentDetail.preload,
       component: ({ params }) => (

@@ -79,6 +79,7 @@ export function createUiRoute<T = undefined>({
   pendingComponent,
   title,
   pageTitle,
+  titleSuffix,
   noindex,
   stream,
   gate,
@@ -127,9 +128,12 @@ export function createUiRoute<T = undefined>({
         loaderData?.data !== undefined && pageTitle
           ? pageTitle(loaderData.data as T)
           : metadata?.title;
+      const suffix = titleSuffix?.(matches);
+      const heading =
+        pageHeading && suffix ? `${pageHeading} · ${suffix}` : pageHeading;
       return {
         meta: [
-          ...(pageHeading ? [{ title: `${pageHeading} - Notra` }] : []),
+          ...(heading ? [{ title: `${heading} - Notra` }] : []),
           ...(metadata?.description
             ? [
                 {

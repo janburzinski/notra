@@ -31,6 +31,11 @@ export interface UiPageProps<T> {
   data: T;
 }
 
+export interface UiRouteMatch {
+  routeId: string;
+  loaderData?: unknown;
+}
+
 export interface UiRouteTitle {
   namespace?: string;
   key?: string;
@@ -45,6 +50,8 @@ export interface UiRouteOptions<T> {
   pendingComponent?: RouteComponent;
   title?: UiRouteTitle;
   pageTitle?: (data: T) => string;
+  /** Appended to the title, e.g. the name of the site a page belongs to. */
+  titleSuffix?: (matches: readonly UiRouteMatch[]) => string | null | undefined;
   /** Keeps the page out of search indexes, for unlisted public pages. */
   noindex?: boolean;
   /**

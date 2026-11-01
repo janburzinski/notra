@@ -111,7 +111,15 @@ function CopiedLabelSwap({
           data-icon="inline-start"
           icon={icon}
         />
-        {children}
+        <span className="grid justify-items-center">
+          <span className="col-start-1 row-start-1">{children}</span>
+          <span
+            aria-hidden="true"
+            className="invisible col-start-1 row-start-1"
+          >
+            {copiedLabel}
+          </span>
+        </span>
       </span>
       {copied || isSwapping ? (
         <span

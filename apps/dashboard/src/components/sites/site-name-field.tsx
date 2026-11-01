@@ -12,6 +12,7 @@ import { useTranslations } from "use-intl";
 import { useSite } from "@/components/sites/site-context";
 import { SITE_NAME_MAX_LENGTH } from "@/constants/sites-form";
 import { useUpdateSiteSettings } from "@/lib/hooks/use-update-site-settings";
+import { useRouter } from "@/lib/navigation";
 
 export function SiteNameField() {
   const tNew = useTranslations("sites.new");
@@ -19,12 +20,22 @@ export function SiteNameField() {
   const { site } = useSite().detail;
   const [edited, setEdited] = useState<string | null>(null);
   const draft = edited ?? site.name;
+  const router = useRouter();
   const save = useUpdateSiteSettings();
   const next = draft.trim();
   const dirty = next.length > 0 && next !== site.name;
   const submit = () => {
     if (dirty && !save.isPending) {
-      save.mutate({ name: next }, { onSuccess: () => setEdited(null) });
+      save.mutate(
+        { name: next },
+        {
+          onSuccess: () => {
+            setEdited(null);
+            // Re-runs the site loader so the tab title shows the new name.
+            return router.refresh();
+          },
+        }
+      );
     }
   };
   return (

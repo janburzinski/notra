@@ -41,10 +41,14 @@ export async function dehydrateSiteQueries(
     ...dashboardOrpc.sites.editor.files.queryOptions({ input: filesInput }),
     queryFn: () => client.sites.editor.files(filesInput),
   });
+  const detailOptions = dashboardOrpc.sites.get.queryOptions({ input: scope });
   await queryClient.prefetchQuery({
-    ...dashboardOrpc.sites.get.queryOptions({ input: scope }),
+    ...detailOptions,
     queryFn: () => client.sites.get(scope),
   });
 
-  return dehydrate(queryClient);
+  return {
+    state: dehydrate(queryClient),
+    name: queryClient.getQueryData(detailOptions.queryKey)?.site.name ?? null,
+  };
 }
