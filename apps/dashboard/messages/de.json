@@ -354,7 +354,7 @@
     "privacy": {
       "heading": "Datenschutz",
       "hidePersonalData": "Persönliche Daten ausblenden",
-      "hidePersonalDataDescription": "Verwischt deine E-Mail und deinen Namen in der Seitenleiste. Praktisch, wenn du deinen Bildschirm teilst.",
+      "hidePersonalDataDescription": "Verwischt deine E-Mail und deinen Namen in der Seitenleiste und sendet sie nicht mehr an unsere Produktanalyse. Praktisch, wenn du deinen Bildschirm teilst.",
       "cookies": "Cookie-Einstellungen",
       "cookiesDescription": "Lege fest, ob Notra Analyse-Cookies und Sitzungsaufzeichnungen nutzen darf, um das Produkt zu verbessern.",
       "manageCookies": "Verwalten"
