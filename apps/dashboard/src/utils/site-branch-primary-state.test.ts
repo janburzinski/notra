@@ -17,6 +17,7 @@ test("zero file drafts still permits review/merge only with an eligible PR", () 
     canMerge: false,
     protected: false,
     hasFeatureBranches: true,
+    changedFiles: 0,
     pullRequest: null,
   };
   const props: SiteBranchPrimaryActionProps = {
@@ -58,4 +59,40 @@ test("zero file drafts still permits review/merge only with an eligible PR", () 
   expect(siteBranchPrimaryState({ ...props, invalid: true }).disabled).toBe(
     true
   );
+});
+
+test("review stays available for branch changes without a pull request", () => {
+  const status: SiteBranchStatus = {
+    branch: `${SITE_EDIT_BRANCH_PREFIX}test`,
+    canPublishDirect: false,
+    canEdit: true,
+    canMerge: false,
+    protected: false,
+    hasFeatureBranches: true,
+    changedFiles: 2,
+    pullRequest: null,
+  };
+  const props: SiteBranchPrimaryActionProps = {
+    feature: true,
+    status,
+    busy: false,
+    invalid: false,
+    draftCount: 0,
+    unsaved: false,
+    onCreate: () => {},
+    onPublish: () => {},
+    onReview: () => {},
+    onFlush: () => {},
+  };
+  expect(siteBranchPrimaryState(props)).toMatchObject({
+    action: "requestReview",
+    disabled: false,
+  });
+  expect(
+    siteBranchPrimaryState({
+      ...props,
+      status: { ...status, changedFiles: 0 },
+      draftCount: 1,
+    })
+  ).toMatchObject({ action: "requestReview", disabled: false });
 });

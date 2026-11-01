@@ -20,7 +20,10 @@ import {
 } from "./editor";
 import { SiteInputError } from "./errors/sites";
 import { getBranchHead, siteRepositoryAccess } from "./github";
-import { createRepositoryBranch } from "./repository";
+import {
+  createRepositoryBranch,
+  openRepositoryPullRequest,
+} from "./repository";
 import type {
   BranchProtectionCacheEntry,
   CreateSiteBranchInput,
@@ -80,7 +83,16 @@ export async function siteBranchStatus(
     : branchPullRequest(repository, token, branch, site.productionBranch);
   const editable = production ? true : siteBranchWritable(site, access, branch);
   const featureRefs = octokitFeatureRefs(repository, token);
-  for (const pending of [productionCheck, pullRequest, editable, featureRefs]) {
+  const changedFiles = production
+    ? 0
+    : branchChangedFiles(repository, token, site.productionBranch, branch);
+  for (const pending of [
+    productionCheck,
+    pullRequest,
+    editable,
+    featureRefs,
+    changedFiles,
+  ]) {
     if (pending instanceof Promise) {
       pending.catch(() => undefined);
     }
@@ -101,6 +113,7 @@ export async function siteBranchStatus(
       pullRequest: null,
       canMerge: false,
       hasFeatureBranches: false,
+      changedFiles: 0,
     };
   }
   const allowed =
@@ -123,6 +136,7 @@ export async function siteBranchStatus(
     pullRequest: pr,
     canMerge: canMergeBranch(pr),
     hasFeatureBranches: (await featureRefs).length > 0,
+    changedFiles: await changedFiles,
   };
 }
 
@@ -486,10 +500,23 @@ export async function requestSiteBranchReview(site: Site, branch: string) {
     branch,
     site.productionBranch
   );
-  if (!pr || pr.state !== "OPEN" || !pr.isDraft) {
-    throw new SiteInputError("This branch has no draft pull request");
+  if (pr?.state === "OPEN") {
+    if (!pr.isDraft) {
+      throw new SiteInputError("This branch is already ready for review");
+    }
+    await createOctokit(token).graphql(READY_FOR_REVIEW_MUTATION, {
+      id: pr.id,
+    });
+    return;
   }
-  await createOctokit(token).graphql(READY_FOR_REVIEW_MUTATION, { id: pr.id });
+  // A branch can hold committed changes without a pull request, for example
+  // one created from a branch whose edits were already saved.
+  await openRepositoryPullRequest(repository, token, {
+    title: "Update site content",
+    head: branch,
+    base: site.productionBranch,
+    body: "Edited in Notra.",
+  });
 }
 
 export async function mergeSiteBranch(site: Site, branch: string) {
@@ -587,6 +614,25 @@ async function octokitFeatureRefs(repository: SiteRepository, token: string) {
     }
   );
   return data;
+}
+
+/** Files that differ between the deployment branch and `branch`. */
+async function branchChangedFiles(
+  repository: SiteRepository,
+  token: string,
+  base: string,
+  branch: string
+) {
+  const { data } = await createOctokit(token).request(
+    "GET /repos/{owner}/{repo}/compare/{basehead}",
+    {
+      owner: repository.owner,
+      repo: repository.repo,
+      basehead: `${base}...${branch}`,
+      headers: GITHUB_API_VERSION_HEADERS,
+    }
+  );
+  return data.ahead_by > 0 ? (data.files?.length ?? 0) : 0;
 }
 
 export async function discardDeletedSiteBranchDrafts(

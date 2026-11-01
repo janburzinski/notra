@@ -29,7 +29,7 @@ export function useSiteBranchControls(props: SiteBranchControlsProps) {
   const switchTo = (next: string) => {
     setSwitching(true);
     void props
-      .onFlush()
+      .onSave()
       .then(onSwitch.bind(null, next))
       .catch((error: unknown) =>
         toast.error(toErrorMessage(error, t("saveFailed")))

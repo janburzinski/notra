@@ -69,6 +69,9 @@ export function useSiteWorkingBranch({
       }
     },
     switchBranch: async (next: string) => {
+      // Commit what the branch being left still holds without making the
+      // switch wait for GitHub.
+      autoCommit.commitInBackground();
       autoCommit.suppressLeave();
       // Mark the data stale without refetching the branch being left; the
       // next branch loads its own queries as it mounts.

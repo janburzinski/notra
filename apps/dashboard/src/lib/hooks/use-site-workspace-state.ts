@@ -112,6 +112,11 @@ export function useSiteWorkspaceState({
       );
     },
   });
+  const assertSavable = () => {
+    if (invalid || uploading || conflicts.length > 0 || (readOnly && unsaved)) {
+      throw new Error("Invalid site configuration");
+    }
+  };
   const controller = useSiteBranchControls({
     ...scope,
     productionBranch: detail.site.productionBranch,
@@ -122,16 +127,15 @@ export function useSiteWorkspaceState({
     commitStatus: branchState.commitStatus,
     onSwitch: branchState.switchBranch,
     onFlush: async () => {
-      if (
-        invalid ||
-        uploading ||
-        conflicts.length > 0 ||
-        (readOnly && unsaved)
-      ) {
-        throw new Error("Invalid site configuration");
-      }
+      assertSavable();
       if (!readOnly) {
         await branchState.flush();
+      }
+    },
+    onSave: async () => {
+      assertSavable();
+      if (!readOnly) {
+        await saves.flush();
       }
     },
     onPublish: () => setPublishOpen(true),

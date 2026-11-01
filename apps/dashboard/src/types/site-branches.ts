@@ -21,6 +21,8 @@ export interface SiteBranchControlsProps extends SiteScope {
   onSwitch: (branch: string) => Promise<void>;
   onPublish: () => void;
   onFlush: () => Promise<void>;
+  /** Persists unsaved edits as drafts without committing them. */
+  onSave: () => Promise<void>;
 }
 
 export type SiteBranchController = ReturnType<

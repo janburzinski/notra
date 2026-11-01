@@ -35,12 +35,23 @@ export function siteBranchPrimaryState({
       showSave: false,
     };
   }
-  const pr = status?.pullRequest;
-  const canReview = pr?.state === "OPEN" && pr.isDraft;
+  const pr = status.pullRequest;
+  const open = pr?.state === "OPEN";
+  if (open && !pr.isDraft) {
+    return {
+      action: "merge",
+      disabled: busy || invalid || draftCount > 0 || !status.canMerge,
+      showSave: draftCount > 0,
+    };
+  }
+  // Request review saves pending drafts first, and opens the pull request
+  // when the branch has changes but none yet.
   return {
-    action: !pr || pr.state !== "OPEN" || canReview ? "requestReview" : "merge",
+    action: "requestReview",
     disabled:
-      busy || invalid || draftCount > 0 || !(canReview || status?.canMerge),
+      busy ||
+      invalid ||
+      !(open || draftCount > 0 || Boolean(saving) || status.changedFiles > 0),
     showSave: draftCount > 0,
   };
 }

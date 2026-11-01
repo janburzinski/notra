@@ -108,6 +108,23 @@ export function useSiteBranchAutosave(
   }, [t]);
   return {
     ...mutation,
+    commitInBackground: () => {
+      if (!(enabled && pending.current && scope.branch)) {
+        return;
+      }
+      if (!mutation.isPending) {
+        mutation.mutate();
+        return;
+      }
+      // The running commit only covers its own revision; the server queues
+      // this flush behind it so newer drafts still reach GitHub.
+      void dashboardOrpc.sites.branches.flush
+        .call({ ...scope, branch: scope.branch })
+        .then(() => invalidateSiteBranch(client, scope))
+        .catch((error: unknown) =>
+          toast.error(toErrorMessage(error, t("saveFailed")))
+        );
+    },
     suppressLeave: () => {
       pending.current = false;
     },

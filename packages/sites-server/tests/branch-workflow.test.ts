@@ -332,6 +332,31 @@ if (!databaseUrl) {
     expect(fake.state.prs).toHaveLength(1);
     expect(await editor.listSiteDrafts(site.id, "main")).toHaveLength(1);
   });
+  test("a branch created from committed changes reports them and opens a ready PR on review", async () => {
+    const { branch: source } = await branches.createSiteBranch(site, {
+      title: "Source",
+      bringChanges: false,
+      userId,
+    });
+    await save(source);
+    await flush(source);
+    const { branch } = await branches.createSiteBranch(site, {
+      branch: source,
+      title: "Copy",
+      bringChanges: true,
+      userId,
+    });
+    expect(await editor.listSiteDrafts(site.id, branch)).toHaveLength(0);
+    const status = await branches.siteBranchStatus(site, branch);
+    expect(status.pullRequest).toBeNull();
+    expect(status.changedFiles).toBe(1);
+    await branches.requestSiteBranchReview(site, branch);
+    const pr = fake.state.prs.find((entry) => entry.head.ref === branch);
+    expect(pr?.draft).toBe(false);
+    await expect(
+      branches.requestSiteBranchReview(site, branch)
+    ).rejects.toThrow("already ready");
+  });
   test("a failed draft move rolls back every row and creates no branch", async () => {
     const original = await save();
     const post = await editor.saveSiteDraft(site, {

@@ -340,11 +340,15 @@ function useUnpublishedSummary(state: SiteWorkspaceValue) {
   const otherDrafts = state.files.drafts.some(
     (draft) => draft.path !== SITE_CONFIG_FILENAME
   );
-  if (!configChanged && state.files.drafts.length === 0) {
-    return null;
-  }
   const branch = state.scope.branch;
   const feature = Boolean(branch && branch !== detail.site.productionBranch);
+  // Committed branch edits outside the config leave no drafts behind.
+  const branchFiles = feature
+    ? (state.controller.queries.status.data?.changedFiles ?? 0)
+    : 0;
+  if (!configChanged && state.files.drafts.length === 0 && branchFiles === 0) {
+    return null;
+  }
   const branchName = siteBranchLabel(branch ?? "", locale, (date) =>
     branches("draftFrom", { date })
   );
@@ -359,7 +363,7 @@ function useUnpublishedSummary(state: SiteWorkspaceValue) {
   }
   return {
     title: banner("unpublishedFilesTitle", {
-      count: Math.max(state.files.drafts.length, 1),
+      count: Math.max(state.files.drafts.length, branchFiles, 1),
     }),
     description: feature
       ? banner("unpublishedBranchFiles", { branch: branchName })

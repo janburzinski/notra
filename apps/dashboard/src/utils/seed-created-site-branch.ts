@@ -32,6 +32,7 @@ export function seedCreatedSiteBranch(
       pullRequest: null,
       canMerge: false,
       hasFeatureBranches: true,
+      changedFiles: source?.changedFiles ?? 0,
     }
   );
   client.setQueryData(
