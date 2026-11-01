@@ -448,7 +448,14 @@
           {
             "group": "Developer Tools",
             "icon": "terminal",
-            "pages": ["devtools/cli", "devtools/mcp", "devtools/raycast"]
+            "pages": [
+              "devtools/cli",
+              "devtools/mcp",
+              "devtools/claude",
+              "devtools/chatgpt",
+              "devtools/composio",
+              "devtools/raycast"
+            ]
           },
           {
             "group": "Guides",
