@@ -88,7 +88,7 @@ Logpush is available on every Cloudflare plan with usage-based pricing. Pushing 
     In the dashboard, go to **Analytics & Logs**, then **Logpush**, and create a job. Choose **HTTP destination** and paste the destination URL, then pick the **HTTP requests** dataset and select these fields:
 
     ```text
-    ClientCity, ClientCountry, ClientIP, ClientLatitude, ClientLongitude, ClientRegionCode, ClientRequestHost, ClientRequestMethod, ClientRequestReferer, ClientRequestScheme, ClientRequestSource, ClientRequestURI, ClientRequestUserAgent, EdgeResponseStatus, EdgeStartTimestamp, RayID, RequestHeaders
+    ClientCountry, ClientIP, ClientRegionCode, ClientRequestHost, ClientRequestMethod, ClientRequestReferer, ClientRequestScheme, ClientRequestSource, ClientRequestURI, ClientRequestUserAgent, EdgeResponseStatus, EdgeStartTimestamp, RayID, RequestHeaders
     ```
 
     Set the timestamp format to RFC 3339 and, if the form offers filters, keep only requests where `ClientRequestMethod` equals `GET` and `ClientRequestSource` equals `eyeball`.
@@ -104,7 +104,7 @@ Logpush is available on every Cloudflare plan with usage-based pricing. Pushing 
       "dataset": "http_requests",
       "destination_conf": "https://ingest.usenotra.com/api/geo/drains/cloudflare?header_Authorization=Bearer%20$NOTRA_GEO_TOKEN",
       "output_options": {
-        "field_names": ["ClientCity", "ClientCountry", "ClientIP", "ClientLatitude", "ClientLongitude", "ClientRegionCode", "ClientRequestHost", "ClientRequestMethod", "ClientRequestReferer", "ClientRequestScheme", "ClientRequestSource", "ClientRequestURI", "ClientRequestUserAgent", "EdgeResponseStatus", "EdgeStartTimestamp", "RayID", "RequestHeaders"],
+        "field_names": ["ClientCountry", "ClientIP", "ClientRegionCode", "ClientRequestHost", "ClientRequestMethod", "ClientRequestReferer", "ClientRequestScheme", "ClientRequestSource", "ClientRequestURI", "ClientRequestUserAgent", "EdgeResponseStatus", "EdgeStartTimestamp", "RayID", "RequestHeaders"],
         "timestamp_format": "rfc3339"
       },
       "filter": "{\"where\":{\"and\":[{\"key\":\"ClientRequestMethod\",\"operator\":\"eq\",\"value\":\"GET\"},{\"key\":\"ClientRequestSource\",\"operator\":\"eq\",\"value\":\"eyeball\"}]}}",

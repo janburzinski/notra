@@ -562,11 +562,8 @@ export const GEO_INGEST_METHODS = [
   "cloudflare",
 ] as const satisfies readonly GeoIngestMethod[];
 export const GEO_CLOUDFLARE_LOGPUSH_FIELDS = [
-  "ClientCity",
   "ClientCountry",
   "ClientIP",
-  "ClientLatitude",
-  "ClientLongitude",
   "ClientRegionCode",
   "ClientRequestHost",
   "ClientRequestMethod",

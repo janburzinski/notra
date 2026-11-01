@@ -152,9 +152,6 @@ function fromCloudflareLogpushRecord(
   const geo = {
     country: present(record.ClientCountry)?.toUpperCase(),
     region: present(record.ClientRegionCode),
-    city: present(record.ClientCity),
-    latitude: present(record.ClientLatitude),
-    longitude: present(record.ClientLongitude),
   };
   return {
     timestamp: toDrainTimestamp(record.EdgeStartTimestamp),
