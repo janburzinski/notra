@@ -55,6 +55,11 @@ export interface CompiledWorkflowNode extends WorkflowNode {
 
 export type CompiledWorkflowGraph = WorkflowGraph<CompiledWorkflowNode>;
 
+export type StoredWorkflowNode = WorkflowNode &
+  Partial<Pick<CompiledWorkflowNode, "kind" | "outputs">>;
+
+export type StoredWorkflowGraph = WorkflowGraph<StoredWorkflowNode>;
+
 export interface WorkflowDefinition {
   key: string;
   title: string;

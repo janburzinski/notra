@@ -3,7 +3,6 @@ import { workflowRunNodes, workflowRuns } from "@notra/db/schema";
 import type { WorkflowRunNodeStep } from "@notra/db/types/workflows";
 import { getConnectablePorts } from "@notra/workflows/runtime/ports";
 import { isEdgeTaken, settledPort } from "@notra/workflows/runtime/scheduler";
-import type { CompiledWorkflowGraph } from "@notra/workflows/types/graph";
 import { and, asc, eq, inArray } from "drizzle-orm";
 
 import { workflowBlockRegistry } from "@/lib/workflow-engine/blocks";
@@ -82,7 +81,7 @@ export async function getWorkflowRunViews(
   );
 
   return runs.map((run) => {
-    const graph = run.graph as unknown as CompiledWorkflowGraph;
+    const { graph } = run;
     const own = new Map(
       rows.filter((row) => row.runId === run.id).map((row) => [row.nodeId, row])
     );

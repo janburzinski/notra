@@ -2,6 +2,8 @@ import { WORKFLOW_ERROR_PORT } from "../constants/graph";
 import type {
   CompiledWorkflowGraph as WorkflowGraph,
   CompiledWorkflowNode as WorkflowNode,
+  StoredWorkflowGraph,
+  StoredWorkflowNode,
   WorkflowEdge,
 } from "../types/graph";
 import type { WorkflowNodeSettlement } from "../types/interpreter";
@@ -36,7 +38,7 @@ function incoming(graph: WorkflowGraph, nodeId: string) {
   return graph.edges.filter((edge) => edge.target === nodeId);
 }
 
-function outgoing(graph: WorkflowGraph, nodeId: string) {
+function outgoing(graph: StoredWorkflowGraph, nodeId: string) {
   return graph.edges.filter((edge) => edge.source === nodeId);
 }
 
@@ -68,7 +70,7 @@ export function markNodeStarted(state: WorkflowRunState, nodeId: string) {
 
 export function isEdgeTaken(
   edge: WorkflowEdge,
-  node: WorkflowNode,
+  node: StoredWorkflowNode,
   port: string | null | false
 ) {
   const edgePort = edgeSourcePort(edge, node);
@@ -79,8 +81,8 @@ export function isEdgeTaken(
 }
 
 function errorPort(
-  graph: WorkflowGraph,
-  node: WorkflowNode
+  graph: StoredWorkflowGraph,
+  node: StoredWorkflowNode
 ): string | null | false {
   const policy = node.onError ?? "fail";
   if (
@@ -98,8 +100,8 @@ function errorPort(
 }
 
 export function settledPort(
-  graph: WorkflowGraph,
-  node: WorkflowNode,
+  graph: StoredWorkflowGraph,
+  node: StoredWorkflowNode,
   settled: { status: string; port?: string | null }
 ): string | null | false {
   if (settled.status === "success") {

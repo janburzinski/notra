@@ -22,11 +22,12 @@ import {
   trackIntegrationConnectFailed,
 } from "@/lib/integrations/connect-events";
 import { linearOAuthErrorParam } from "@/lib/integrations/linear/oauth-errors";
-import type {
-  LinearOAuthState,
-  LinearOrganizationResponse,
-  LinearTokenResponse,
-} from "@/types/linear-oauth";
+import {
+  linearOAuthStateSchema,
+  linearOrganizationQuerySchema,
+  linearTokenResponseSchema,
+} from "@/schemas/linear-oauth";
+import type { LinearOAuthState } from "@/types/linear-oauth";
 
 export async function GET(request: Request) {
   const baseUrl = getAppUrl() ?? "";
@@ -89,8 +90,11 @@ export async function GET(request: Request) {
       }
     };
 
-    const oauthState: LinearOAuthState =
-      typeof raw === "string" ? JSON.parse(raw) : raw;
+    const parsedState = linearOAuthStateSchema.safeParse(raw);
+    if (!parsedState.success) {
+      return redirectResponse(`${baseUrl}/?error=expired_state`);
+    }
+    const oauthState = parsedState.data;
 
     const { session, user } = await getServerSession({
       headers: request.headers,
@@ -147,7 +151,16 @@ export async function GET(request: Request) {
       return redirectResponse(`${baseUrl}/?error=token_exchange_failed`);
     }
 
-    const tokens: LinearTokenResponse = await tokenRes.json();
+    const parsedTokens = linearTokenResponseSchema.safeParse(
+      await tokenRes.json().catch(() => null)
+    );
+    if (!parsedTokens.success) {
+      logError("Linear token response was malformed", parsedTokens.error);
+      await restoreOAuthState();
+      trackFailed("token_exchange_failed", oauthState);
+      return redirectResponse(`${baseUrl}/?error=token_exchange_failed`);
+    }
+    const tokens = parsedTokens.data;
 
     const orgRes = await fetch("https://api.linear.app/graphql", {
       method: "POST",
@@ -174,10 +187,15 @@ export async function GET(request: Request) {
       return redirectResponse(`${baseUrl}/?error=org_fetch_failed`);
     }
 
-    const orgData = (await orgRes.json()) as {
-      data: { organization: LinearOrganizationResponse };
-    };
-    const linearOrg = orgData.data.organization;
+    const orgData = linearOrganizationQuerySchema.safeParse(
+      await orgRes.json().catch(() => null)
+    );
+    if (!orgData.success) {
+      logError("Linear organization response was malformed", orgData.error);
+      await restoreOAuthState();
+      return redirectResponse(`${baseUrl}/?error=org_fetch_failed`);
+    }
+    const linearOrg = orgData.data.data.organization;
 
     const existingIntegrations = await getLinearIntegrationsByOrganization(
       oauthState.organizationId

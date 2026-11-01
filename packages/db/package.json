@@ -23,6 +23,7 @@
     "@neondatabase/serverless": "^1.2.0",
     "@notra/memory": "workspace:*",
     "@notra/sites-core": "workspace:*",
+    "@notra/workflows": "workspace:*",
     "@upstash/redis": "catalog:",
     "@vercel/functions": "^3.10.1",
     "drizzle-orm": "catalog:",

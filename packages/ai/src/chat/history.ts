@@ -489,7 +489,7 @@ export async function claimChatSessionForExternalChannel(
       id: newChatId,
       organizationId,
       title: "New chat",
-      messages: [] as unknown as Record<string, unknown>,
+      messages: [],
       externalChannelSource: source,
       externalChannelId: id,
     })
@@ -849,7 +849,7 @@ export async function deleteChatSession(
     .update(chatSessions)
     .set({
       deletedAt: new Date(),
-      messages: [] as unknown as Record<string, unknown>,
+      messages: [],
     })
     .where(
       and(

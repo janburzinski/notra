@@ -5,6 +5,7 @@ import type {
   CompiledWorkflowBundle,
   CompiledWorkflowGraph,
   CompiledWorkflowNode,
+  StoredWorkflowNode,
   WorkflowEdge,
   WorkflowPort,
 } from "@notra/workflows/types/graph";
@@ -65,7 +66,7 @@ export interface WorkflowRunViewStep {
 }
 
 export interface WorkflowRunViewNode extends Omit<
-  CompiledWorkflowNode,
+  StoredWorkflowNode,
   "config" | "outputs"
 > {
   logo: string | null;

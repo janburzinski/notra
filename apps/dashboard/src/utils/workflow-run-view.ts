@@ -47,7 +47,9 @@ function isLogo(logo: string | null): logo is WorkflowLogoName {
 }
 
 function nodeKind(node: WorkflowRunViewNode): WorkflowNodeKind {
-  return node.kind === "workflow" ? "task" : node.kind;
+  return node.kind === undefined || node.kind === "workflow"
+    ? "task"
+    : node.kind;
 }
 
 function stepLine(step: WorkflowRunViewStep) {

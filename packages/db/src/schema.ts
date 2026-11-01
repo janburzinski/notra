@@ -16,6 +16,7 @@ import type {
   SitePreviewPassword,
 } from "@notra/sites-core/types/deployment";
 import type { SmartDeploymentEvaluation } from "@notra/sites-core/types/smart-deployments";
+import type { StoredWorkflowGraph } from "@notra/workflows/types/graph";
 import { relations, sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
@@ -4704,7 +4705,7 @@ export const workflowRuns = pgTable(
     ),
     rootRunId: text("root_run_id"),
     parentNodeId: text("parent_node_id"),
-    graph: jsonb("graph").$type<Record<string, unknown>>().notNull(),
+    graph: jsonb("graph").$type<StoredWorkflowGraph>().notNull(),
     runtimeRunId: text("runtime_run_id"),
     trigger: text("trigger").notNull(),
     status: text("status", { enum: WORKFLOW_RUN_STATUSES })

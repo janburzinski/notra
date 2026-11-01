@@ -8,14 +8,16 @@ import type {
   WorkflowPort,
 } from "../types/graph";
 
-export function getOutputPorts(node: CompiledWorkflowNode): WorkflowPort[] {
+export function getOutputPorts(
+  node: Pick<CompiledWorkflowNode, "outputs">
+): WorkflowPort[] {
   return node.outputs?.length
     ? node.outputs
     : [{ id: WORKFLOW_DEFAULT_OUTPUT_PORT }];
 }
 
 export function getConnectablePorts(
-  node: CompiledWorkflowNode
+  node: Pick<CompiledWorkflowNode, "outputs" | "onError">
 ): WorkflowPort[] {
   const ports = getOutputPorts(node);
   return node.onError === "route"
@@ -25,7 +27,7 @@ export function getConnectablePorts(
 
 export function edgeSourcePort(
   edge: WorkflowEdge,
-  source: CompiledWorkflowNode
+  source: Pick<CompiledWorkflowNode, "outputs">
 ) {
   return (
     edge.sourcePort ??
@@ -34,6 +36,6 @@ export function edgeSourcePort(
   );
 }
 
-export function isBranching(node: CompiledWorkflowNode) {
+export function isBranching(node: Pick<CompiledWorkflowNode, "outputs">) {
   return getOutputPorts(node).length > 1;
 }
