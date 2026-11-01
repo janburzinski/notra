@@ -1,3 +1,4 @@
+import { SiteProviderRequestError } from "@notra/sites-server/errors/provider";
 import {
   InthError,
   SiteHostConflictError,
@@ -51,6 +52,14 @@ export function toSitesOrpcError(error: unknown): unknown {
       default:
         return conflict(error.message, { code: error.code });
     }
+  }
+  if (
+    error instanceof SiteProviderRequestError &&
+    error.provider === "cloudflare"
+  ) {
+    return badGateway(
+      `Couldn't register the domain with Cloudflare. ${error.message}. Try again in a few minutes.`
+    );
   }
   if (error instanceof SitesNotConfiguredError) {
     return serviceUnavailable(

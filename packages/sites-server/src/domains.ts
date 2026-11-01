@@ -18,6 +18,7 @@ import {
   getCustomHostname,
 } from "./cloudflare-saas";
 import {
+  CLOUDFLARE_RETRYABLE_STATUSES,
   CLOUDFLARE_SAAS_MISSING_MESSAGE,
   DOMAIN_INPUT_PATH,
   DOMAIN_INPUT_SCHEME,
@@ -30,6 +31,7 @@ import {
   SITE_MAX_DOMAINS,
 } from "./constants/domains";
 import { getSitesHostingDomain, siteCnameTarget } from "./env";
+import { SiteProviderRequestError } from "./errors/provider";
 import { SiteHostConflictError, SiteInputError } from "./errors/sites";
 import { setSitePublicOrigin } from "./sites";
 import { releaseHostRecord } from "./state";
@@ -135,8 +137,19 @@ async function claimCustomHostname(
   try {
     return await createCustomHostname(config, hostname);
   } catch (error) {
-    const stale = await findCustomHostname(config, hostname);
-    if (!stale) {
+    const status =
+      error instanceof SiteProviderRequestError ? error.status : null;
+    console.warn("sites.custom_hostname_create_failed", {
+      hostname,
+      status,
+      error: errorMessage(error),
+    });
+    if (
+      status !== null &&
+      status >= 400 &&
+      status < 500 &&
+      !CLOUDFLARE_RETRYABLE_STATUSES.has(status)
+    ) {
       throw error;
     }
     return null;

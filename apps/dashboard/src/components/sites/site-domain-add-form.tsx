@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe02Icon } from "@hugeicons/core-free-icons";
+import { Globe02Icon, Link01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Field,
@@ -117,25 +117,37 @@ export function SiteDomainAddForm({
       </Field>
       <div
         aria-live="polite"
-        className="bg-muted/50 rounded-lg px-3.5 py-3 text-sm empty:hidden"
+        className="border-border bg-background/60 rounded-lg border text-sm empty:hidden"
         id={`${id}-connection`}
       >
         {kind ? (
           <div
-            className="animate-in fade-in duration-normal ease-emphasized space-y-2"
+            className="animate-in fade-in duration-normal ease-emphasized divide-border divide-y"
             key={kind}
           >
-            <div className="space-y-0.5">
-              <p className="text-muted-foreground text-xs">{t("liveAt")}</p>
-              <ul>
+            <div className="space-y-1.5 px-3.5 py-3">
+              <p className="text-muted-foreground text-xs font-medium">
+                {t("liveAt")}
+              </p>
+              <ul className="space-y-1">
                 {urls.map((url) => (
-                  <li className="truncate font-medium" key={url}>
-                    {url}
+                  <li className="flex min-w-0 items-center gap-2" key={url}>
+                    <HugeiconsIcon
+                      aria-hidden="true"
+                      className="text-muted-foreground shrink-0"
+                      icon={Link01Icon}
+                      size={14}
+                      strokeWidth={1.5}
+                    />
+                    <span className="truncate font-mono text-sm">
+                      <span className="text-muted-foreground">https://</span>
+                      {url}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
-            <p className="text-muted-foreground text-pretty">
+            <p className="text-muted-foreground px-3.5 py-3 text-pretty">
               {kind === "subdomain"
                 ? t("subdomainExplain", { hostname })
                 : t("proxyExplain", { hostname })}{" "}
