@@ -242,7 +242,7 @@ function SettingsModalBody({
           <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
         </Button>
       </header>
-      <div className="scrollbar-floating min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-sm md:px-5 md:pb-4 [&_.text-3xl]:text-2xl [&_.text-lg]:text-sm">
+      <div className="scrollbar-floating min-h-0 min-w-0 flex-1 [scrollbar-gutter:stable_both-edges] overflow-y-auto overscroll-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-sm md:px-5 md:pb-4 [&_.text-3xl]:text-2xl [&_.text-lg]:text-sm">
         {isOpen && section ? (
           <SettingsSectionContent key={activeSection} section={activeSection} />
         ) : null}
