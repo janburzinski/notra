@@ -18,6 +18,7 @@ import { Route as IpCheckerDotmdRouteImport } from './routes/ip-checker[.]md'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
+import { Route as QrCodeGeneratorDotmdRouteImport } from './routes/qr-code-generator[.]md'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as SchemaMapDotxmlRouteImport } from './routes/schema-map[.]xml'
@@ -46,6 +47,7 @@ import { Route as SiteHtmlToPaperRouteImport } from './routes/_site/html-to-pape
 import { Route as SiteIpCheckerRouteImport } from './routes/_site/ip-checker'
 import { Route as SiteOssProgramRouteImport } from './routes/_site/oss-program'
 import { Route as SitePricingRouteImport } from './routes/_site/pricing'
+import { Route as SiteQrCodeGeneratorRouteImport } from './routes/_site/qr-code-generator'
 import { Route as SiteRepoStarVideoRouteImport } from './routes/_site/repo-star-video'
 import { Route as SiteTwitterThreadCreatorRouteImport } from './routes/_site/twitter-thread-creator'
 import { Route as SiteUtmBuilderRouteImport } from './routes/_site/utm-builder'
@@ -54,6 +56,7 @@ import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as ApiIpCheckerRouteImport } from './routes/api/ip-checker'
 import { Route as ApiLlmsDottxtRouteImport } from './routes/api/llms[.]txt'
 import { Route as ApiOssProgramRouteImport } from './routes/api/oss-program'
+import { Route as ApiQrCodeRouteImport } from './routes/api/qr-code'
 import { Route as ApiStatusRouteImport } from './routes/api/status'
 import { Route as ApiV1RouteImport } from './routes/api/v1'
 import { Route as DevelopersLlmsDottxtRouteImport } from './routes/developers/llms[.]txt'
@@ -161,6 +164,11 @@ const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
 const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
   id: '/manifest.json',
   path: '/manifest.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QrCodeGeneratorDotmdRoute = QrCodeGeneratorDotmdRouteImport.update({
+  id: '/qr-code-generator.md',
+  path: '/qr-code-generator.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -305,6 +313,11 @@ const SitePricingRoute = SitePricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteQrCodeGeneratorRoute = SiteQrCodeGeneratorRouteImport.update({
+  id: '/qr-code-generator',
+  path: '/qr-code-generator',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteRepoStarVideoRoute = SiteRepoStarVideoRouteImport.update({
   id: '/repo-star-video',
   path: '/repo-star-video',
@@ -344,6 +357,11 @@ const ApiLlmsDottxtRoute = ApiLlmsDottxtRouteImport.update({
 const ApiOssProgramRoute = ApiOssProgramRouteImport.update({
   id: '/api/oss-program',
   path: '/api/oss-program',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiQrCodeRoute = ApiQrCodeRouteImport.update({
+  id: '/api/qr-code',
+  path: '/api/qr-code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStatusRoute = ApiStatusRouteImport.update({
@@ -704,6 +722,7 @@ export interface FileRoutesByFullPath {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/qr-code-generator.md': typeof QrCodeGeneratorDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/schema-map.xml': typeof SchemaMapDotxmlRoute
@@ -728,6 +747,7 @@ export interface FileRoutesByFullPath {
   '/ip-checker': typeof SiteIpCheckerRoute
   '/oss-program': typeof SiteOssProgramRoute
   '/pricing': typeof SitePricingRoute
+  '/qr-code-generator': typeof SiteQrCodeGeneratorRoute
   '/repo-star-video': typeof SiteRepoStarVideoRoute
   '/twitter-thread-creator': typeof SiteTwitterThreadCreatorRoute
   '/utm-builder': typeof SiteUtmBuilderRoute
@@ -735,6 +755,7 @@ export interface FileRoutesByFullPath {
   '/api/ip-checker': typeof ApiIpCheckerRoute
   '/api/llms.txt': typeof ApiLlmsDottxtRoute
   '/api/oss-program': typeof ApiOssProgramRoute
+  '/api/qr-code': typeof ApiQrCodeRoute
   '/api/status': typeof ApiStatusRoute
   '/api/v1': typeof ApiV1Route
   '/developers/llms.txt': typeof DevelopersLlmsDottxtRoute
@@ -811,6 +832,7 @@ export interface FileRoutesByTo {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/qr-code-generator.md': typeof QrCodeGeneratorDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/schema-map.xml': typeof SchemaMapDotxmlRoute
@@ -835,6 +857,7 @@ export interface FileRoutesByTo {
   '/ip-checker': typeof SiteIpCheckerRoute
   '/oss-program': typeof SiteOssProgramRoute
   '/pricing': typeof SitePricingRoute
+  '/qr-code-generator': typeof SiteQrCodeGeneratorRoute
   '/repo-star-video': typeof SiteRepoStarVideoRoute
   '/twitter-thread-creator': typeof SiteTwitterThreadCreatorRoute
   '/utm-builder': typeof SiteUtmBuilderRoute
@@ -842,6 +865,7 @@ export interface FileRoutesByTo {
   '/api/ip-checker': typeof ApiIpCheckerRoute
   '/api/llms.txt': typeof ApiLlmsDottxtRoute
   '/api/oss-program': typeof ApiOssProgramRoute
+  '/api/qr-code': typeof ApiQrCodeRoute
   '/api/status': typeof ApiStatusRoute
   '/api/v1': typeof ApiV1Route
   '/developers/llms.txt': typeof DevelopersLlmsDottxtRoute
@@ -920,6 +944,7 @@ export interface FileRoutesById {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/qr-code-generator.md': typeof QrCodeGeneratorDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/schema-map.xml': typeof SchemaMapDotxmlRoute
@@ -947,6 +972,7 @@ export interface FileRoutesById {
   '/_site/ip-checker': typeof SiteIpCheckerRoute
   '/_site/oss-program': typeof SiteOssProgramRoute
   '/_site/pricing': typeof SitePricingRoute
+  '/_site/qr-code-generator': typeof SiteQrCodeGeneratorRoute
   '/_site/repo-star-video': typeof SiteRepoStarVideoRoute
   '/_site/twitter-thread-creator': typeof SiteTwitterThreadCreatorRoute
   '/_site/utm-builder': typeof SiteUtmBuilderRoute
@@ -954,6 +980,7 @@ export interface FileRoutesById {
   '/api/ip-checker': typeof ApiIpCheckerRoute
   '/api/llms.txt': typeof ApiLlmsDottxtRoute
   '/api/oss-program': typeof ApiOssProgramRoute
+  '/api/qr-code': typeof ApiQrCodeRoute
   '/api/status': typeof ApiStatusRoute
   '/api/v1': typeof ApiV1Route
   '/developers/llms.txt': typeof DevelopersLlmsDottxtRoute
@@ -1033,6 +1060,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.json'
+    | '/qr-code-generator.md'
     | '/robots.txt'
     | '/rss.xml'
     | '/schema-map.xml'
@@ -1057,6 +1085,7 @@ export interface FileRouteTypes {
     | '/ip-checker'
     | '/oss-program'
     | '/pricing'
+    | '/qr-code-generator'
     | '/repo-star-video'
     | '/twitter-thread-creator'
     | '/utm-builder'
@@ -1064,6 +1093,7 @@ export interface FileRouteTypes {
     | '/api/ip-checker'
     | '/api/llms.txt'
     | '/api/oss-program'
+    | '/api/qr-code'
     | '/api/status'
     | '/api/v1'
     | '/developers/llms.txt'
@@ -1140,6 +1170,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.json'
+    | '/qr-code-generator.md'
     | '/robots.txt'
     | '/rss.xml'
     | '/schema-map.xml'
@@ -1164,6 +1195,7 @@ export interface FileRouteTypes {
     | '/ip-checker'
     | '/oss-program'
     | '/pricing'
+    | '/qr-code-generator'
     | '/repo-star-video'
     | '/twitter-thread-creator'
     | '/utm-builder'
@@ -1171,6 +1203,7 @@ export interface FileRouteTypes {
     | '/api/ip-checker'
     | '/api/llms.txt'
     | '/api/oss-program'
+    | '/api/qr-code'
     | '/api/status'
     | '/api/v1'
     | '/developers/llms.txt'
@@ -1248,6 +1281,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.json'
+    | '/qr-code-generator.md'
     | '/robots.txt'
     | '/rss.xml'
     | '/schema-map.xml'
@@ -1275,6 +1309,7 @@ export interface FileRouteTypes {
     | '/_site/ip-checker'
     | '/_site/oss-program'
     | '/_site/pricing'
+    | '/_site/qr-code-generator'
     | '/_site/repo-star-video'
     | '/_site/twitter-thread-creator'
     | '/_site/utm-builder'
@@ -1282,6 +1317,7 @@ export interface FileRouteTypes {
     | '/api/ip-checker'
     | '/api/llms.txt'
     | '/api/oss-program'
+    | '/api/qr-code'
     | '/api/status'
     | '/api/v1'
     | '/developers/llms.txt'
@@ -1361,6 +1397,7 @@ export interface RootRouteChildren {
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
+  QrCodeGeneratorDotmdRoute: typeof QrCodeGeneratorDotmdRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
   SchemaMapDotxmlRoute: typeof SchemaMapDotxmlRoute
@@ -1376,6 +1413,7 @@ export interface RootRouteChildren {
   ApiIpCheckerRoute: typeof ApiIpCheckerRoute
   ApiLlmsDottxtRoute: typeof ApiLlmsDottxtRoute
   ApiOssProgramRoute: typeof ApiOssProgramRoute
+  ApiQrCodeRoute: typeof ApiQrCodeRoute
   ApiStatusRoute: typeof ApiStatusRoute
   ApiV1Route: typeof ApiV1Route
   DevelopersLlmsDottxtRoute: typeof DevelopersLlmsDottxtRoute
@@ -1464,6 +1502,13 @@ declare module '@tanstack/react-router' {
       path: '/manifest.json'
       fullPath: '/manifest.json'
       preLoaderRoute: typeof ManifestDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qr-code-generator.md': {
+      id: '/qr-code-generator.md'
+      path: '/qr-code-generator.md'
+      fullPath: '/qr-code-generator.md'
+      preLoaderRoute: typeof QrCodeGeneratorDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -1662,6 +1707,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitePricingRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/qr-code-generator': {
+      id: '/_site/qr-code-generator'
+      path: '/qr-code-generator'
+      fullPath: '/qr-code-generator'
+      preLoaderRoute: typeof SiteQrCodeGeneratorRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/repo-star-video': {
       id: '/_site/repo-star-video'
       path: '/repo-star-video'
@@ -1716,6 +1768,13 @@ declare module '@tanstack/react-router' {
       path: '/api/oss-program'
       fullPath: '/api/oss-program'
       preLoaderRoute: typeof ApiOssProgramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/qr-code': {
+      id: '/api/qr-code'
+      path: '/api/qr-code'
+      fullPath: '/api/qr-code'
+      preLoaderRoute: typeof ApiQrCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status': {
@@ -2269,6 +2328,7 @@ interface SiteRouteChildren {
   SiteIpCheckerRoute: typeof SiteIpCheckerRoute
   SiteOssProgramRoute: typeof SiteOssProgramRoute
   SitePricingRoute: typeof SitePricingRoute
+  SiteQrCodeGeneratorRoute: typeof SiteQrCodeGeneratorRoute
   SiteRepoStarVideoRoute: typeof SiteRepoStarVideoRoute
   SiteTwitterThreadCreatorRoute: typeof SiteTwitterThreadCreatorRoute
   SiteUtmBuilderRoute: typeof SiteUtmBuilderRoute
@@ -2316,6 +2376,7 @@ const SiteRouteChildren: SiteRouteChildren = {
   SiteIpCheckerRoute: SiteIpCheckerRoute,
   SiteOssProgramRoute: SiteOssProgramRoute,
   SitePricingRoute: SitePricingRoute,
+  SiteQrCodeGeneratorRoute: SiteQrCodeGeneratorRoute,
   SiteRepoStarVideoRoute: SiteRepoStarVideoRoute,
   SiteTwitterThreadCreatorRoute: SiteTwitterThreadCreatorRoute,
   SiteUtmBuilderRoute: SiteUtmBuilderRoute,
@@ -2365,6 +2426,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
+  QrCodeGeneratorDotmdRoute: QrCodeGeneratorDotmdRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   RssDotxmlRoute: RssDotxmlRoute,
   SchemaMapDotxmlRoute: SchemaMapDotxmlRoute,
@@ -2382,6 +2444,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIpCheckerRoute: ApiIpCheckerRoute,
   ApiLlmsDottxtRoute: ApiLlmsDottxtRoute,
   ApiOssProgramRoute: ApiOssProgramRoute,
+  ApiQrCodeRoute: ApiQrCodeRoute,
   ApiStatusRoute: ApiStatusRoute,
   ApiV1Route: ApiV1Route,
   DevelopersLlmsDottxtRoute: DevelopersLlmsDottxtRoute,

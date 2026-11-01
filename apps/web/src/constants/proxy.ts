@@ -21,6 +21,7 @@ export const DUALMARK_SKIP_PATHS = [
   "/notra-mark.svg",
   "/og",
   "/og-image.png",
+  "/qr-code-generator.md",
   "/robots.txt",
   "/rss.xml",
   "/sitemap.xml",

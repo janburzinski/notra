@@ -1,12 +1,18 @@
 import { detectAIBot, negotiateFormat, toMarkdownPath } from "@dualmark/core";
 
 import { DUALMARK_SKIP_PATHS, MARKDOWN_NAMESPACE } from "@/constants/proxy";
+import { QR_CODE_PATH } from "@/constants/qr-code";
 import { UTM_BUILDER_PATH } from "@/constants/utm-builder";
 import { serveMarkdownTwin } from "@/lib/markdown/handler";
+import { serveQrCodeMarkdown } from "@/lib/qr-code/markdown";
 import { serveUtmBuilderMarkdown } from "@/lib/utm-builder/markdown";
 
 const MARKDOWN_EXTENSION_REGEX = /\.md$/;
 const TRAILING_SLASHES_REGEX = /\/+$/;
+const TOOL_MARKDOWN = new Map([
+  [UTM_BUILDER_PATH, serveUtmBuilderMarkdown],
+  [QR_CODE_PATH, serveQrCodeMarkdown],
+]);
 
 function shouldSkip(pathname: string) {
   if (pathname === "/llms.txt" || pathname === "/favicon.ico") {
@@ -71,10 +77,12 @@ export async function negotiateMarkdown(
   const format = negotiateFormat(accept);
 
   if (detectAIBot(userAgent).isBot || format === "markdown") {
-    const response =
-      pathname.replace(TRAILING_SLASHES_REGEX, "") === UTM_BUILDER_PATH
-        ? serveUtmBuilderMarkdown(request)
-        : await serveMarkdownTwin(request, toMarkdownTwinPath(pathname));
+    const serveTool = TOOL_MARKDOWN.get(
+      pathname.replace(TRAILING_SLASHES_REGEX, "")
+    );
+    const response = serveTool
+      ? serveTool(request)
+      : await serveMarkdownTwin(request, toMarkdownTwinPath(pathname));
     appendNegotiationVary(response.headers);
     return response;
   }

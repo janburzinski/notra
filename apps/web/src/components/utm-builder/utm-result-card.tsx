@@ -2,6 +2,8 @@ import { ArrowUpRight01Icon, Share08Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CopyButton } from "@notra/ui/components/ui/copy-button";
 
+import { QR_CODE_PATH } from "@/constants/qr-code";
+import { serializeQrCode } from "@/schemas/qr-code";
 import type { UtmResultCardProps } from "@/types/utm-builder";
 import { uniqueKeys } from "@/utils/unique-keys";
 
@@ -53,6 +55,13 @@ export function UtmResultCard({
               target="_blank"
             >
               Test link
+              <HugeiconsIcon className="size-3.5" icon={ArrowUpRight01Icon} />
+            </a>
+            <a
+              className={linkClass}
+              href={serializeQrCode(QR_CODE_PATH, { text: result.url })}
+            >
+              QR code
               <HugeiconsIcon className="size-3.5" icon={ArrowUpRight01Icon} />
             </a>
             <a className={linkClass} href={markdownHref}>
