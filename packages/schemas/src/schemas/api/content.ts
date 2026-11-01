@@ -819,6 +819,66 @@ export const getBrandIdentityResponseSchema = z.object({
   organization: organizationResponseSchema,
 });
 
+export const GITHUB_ACTIVITY_TYPES = [
+  "pull_requests",
+  "commits",
+  "releases",
+] as const;
+
+export const getGitHubActivityQuerySchema = z
+  .object({
+    type: z.enum(GITHUB_ACTIVITY_TYPES).default("pull_requests").openapi({
+      description:
+        "Activity to list: pull requests merged into the default branch, commits on the default branch, or releases published in the repository.",
+      example: "pull_requests",
+    }),
+    since: z.iso.datetime({ offset: true }).optional().openapi({
+      description: "Start of the window (ISO 8601). Defaults to 7 days ago.",
+      example: "2026-10-23T00:00:00Z",
+    }),
+    until: z.iso.datetime({ offset: true }).optional().openapi({
+      description: "End of the window (ISO 8601). Defaults to now.",
+      example: "2026-10-30T00:00:00Z",
+    }),
+    page: z.coerce.number().int().min(1).default(1).openapi({
+      description: "Page number",
+      example: 1,
+    }),
+  })
+  .refine(
+    ({ since, until }) =>
+      !since || Date.parse(since) < (until ? Date.parse(until) : Date.now()),
+    { message: "since must be before until", path: ["since"] }
+  );
+
+const githubActivityItemSchema = z.object({
+  ref: z.string().openapi({
+    description:
+      "Pull request number, commit SHA or release tag, depending on type.",
+    example: "482",
+  }),
+  title: z.string(),
+  body: z.string().nullable(),
+  author: z.string().nullable(),
+  url: z.string(),
+  occurredAt: z.string().openapi({
+    description: "Merge, commit or publish time (ISO 8601).",
+  }),
+});
+
+export const getGitHubActivityResponseSchema = z.object({
+  integration: githubIntegrationResponseSchema,
+  type: z.enum(GITHUB_ACTIVITY_TYPES),
+  since: z.string(),
+  until: z.string(),
+  items: z.array(githubActivityItemSchema),
+  pagination: z.object({
+    page: z.number().int(),
+    nextPage: z.number().int().nullable(),
+  }),
+  organization: organizationResponseSchema,
+});
+
 export const getIntegrationsResponseSchema = z.object({
   github: z.array(githubIntegrationResponseSchema).openapi({
     description:

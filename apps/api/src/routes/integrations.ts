@@ -3,6 +3,8 @@ import {
   createGitHubIntegrationRequestSchema,
   createGitHubIntegrationResponseSchema,
   deleteIntegrationResponseSchema,
+  getGitHubActivityQuerySchema,
+  getGitHubActivityResponseSchema,
   getIntegrationParamsSchema,
   getIntegrationsResponseSchema,
 } from "@notra/schemas/api/content";
@@ -11,6 +13,7 @@ import {
   assertNoGitHubIntegrationDuplicate,
   createGitHubIntegration,
   deleteIntegration,
+  getGitHubActivity,
   listIntegrations,
 } from "../programs/integrations";
 import {
@@ -89,6 +92,35 @@ const createGitHubIntegrationRoute = createRoute({
       "API key"
     ),
     503: errorResponse("Authentication or integration service unavailable"),
+  },
+});
+
+const getGitHubActivityRoute = createRoute({
+  method: "get",
+  path: "/integrations/github/{integrationId}/activity",
+  tags: ["Content"],
+  operationId: "getGitHubActivity",
+  summary: "List recent GitHub activity",
+  description:
+    "Lists pull requests merged into the default branch, commits on the default branch, or releases published in a connected repository within a time window, so you can decide what to write about before calling create_post or generate_post. Reads GitHub live; pagination follows GitHub's pages, so a page can hold fewer items than the page size while nextPage is still set.",
+  request: {
+    params: getIntegrationParamsSchema,
+    query: getGitHubActivityQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Activity fetched successfully",
+      content: {
+        "application/json": {
+          schema: getGitHubActivityResponseSchema,
+        },
+      },
+    },
+    400: errorResponse("Invalid request or repository no longer readable"),
+    401: errorResponse("Missing or invalid API key"),
+    403: errorResponse("Forbidden"),
+    404: errorResponse("GitHub integration not found"),
+    503: errorResponse("GitHub unavailable or rate limited"),
   },
 });
 
@@ -193,6 +225,37 @@ integrationsRoutes.openapi(createGitHubIntegrationRoute, async (c) => {
   }
 
   return c.json({ github: result.success, organization }, 201);
+});
+
+integrationsRoutes.openapi(getGitHubActivityRoute, async (c) => {
+  const scope = await resolveRequestOrganization(c);
+  if (scope.response) {
+    return scope.response;
+  }
+  const { orgId, organization } = scope;
+
+  const result = await runIntegrationProgram(
+    getGitHubActivity({
+      db: c.get("db"),
+      organizationId: orgId,
+      integrationId: c.req.valid("param").integrationId,
+      query: c.req.valid("query"),
+    })
+  );
+
+  if (result._tag === "Failure") {
+    const { failure } = result;
+    if (failure._tag === "IntegrationNotFoundError") {
+      return c.json({ error: "GitHub integration not found" }, 404);
+    }
+    if (failure._tag === "GitHubAccessError") {
+      return c.json({ error: failure.message }, 400);
+    }
+    logError("Failed to read GitHub activity", failure.cause);
+    return c.json({ error: "GitHub is unavailable or rate limited" }, 503);
+  }
+
+  return c.json({ ...result.success, organization }, 200);
 });
 
 integrationsRoutes.openapi(deleteIntegrationRoute, async (c) => {

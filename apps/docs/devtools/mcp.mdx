@@ -26,7 +26,7 @@ docolin:
   next: ./raycast.mdx
 ---
 
-Notra runs a hosted MCP server at `https://mcp.usenotra.com/mcp` (streamable HTTP) so AI agents can work with your workspace. Connected agents can manage brand identities, generate and edit content, connect integrations and manage schedules, chats and skills. They can also use every GEO feature: projects, prompts, competitors, scans, visibility, content briefs, agent readiness and AI traffic.
+Notra runs a hosted MCP server at `https://mcp.usenotra.com/mcp` (streamable HTTP) so AI agents can work with your workspace. Connected agents can manage brand identities, generate, edit, schedule and publish content, connect integrations and manage schedules, event triggers, webhooks and skills. They can also use every GEO feature: projects, prompts, competitors, scans, visibility, content briefs, agent readiness and AI traffic.
 
 This page covers two things:
 
@@ -186,14 +186,23 @@ The hosted server gets updates first and the npm package can lag behind it, so p
 
 Tool names match exactly what the server registers, although some clients prefix them with the server name.
 
+**Workspace**
+
+- `whoami`
+- `list_workspaces` (only on connections that can reach several workspaces)
+
 **Posts**
 
 - `list_posts`
 - `get_post`
+- `create_post`
 - `update_post`
 - `delete_post`
 - `generate_post`
 - `get_post_generation_status`
+- `get_post_schedule`
+- `schedule_post`
+- `cancel_post_schedule`
 
 When `update_post` changes the title, slug or markdown of a blog post or changelog with a linked GitHub pull request, Notra saves the article and updates that PR using the same publishing logic as the dashboard, without creating a new PR. Status-only changes do not trigger a GitHub update.
 
@@ -207,27 +216,41 @@ If the PR update fails, the tool returns an error stating that Notra saved the p
 - `delete_brand_identity`
 - `generate_brand_identity`
 - `get_brand_identity_generation_status`
+- `list_brand_colors`
+- `create_brand_color`
+- `update_brand_color`
+- `delete_brand_color`
 
 **Integrations**
 
 - `list_integrations`
+- `list_github_activity`
 - `create_github_integration`
 - `delete_integration`
 
-**Schedules**
+**Schedules and event triggers**
 
 - `list_schedules`
 - `create_schedule`
 - `update_schedule`
 - `delete_schedule`
+- `run_schedule`
+- `list_schedule_runs`
+- `list_event_triggers`
+- `get_event_trigger`
+- `create_event_trigger`
+- `update_event_trigger`
+- `delete_event_trigger`
 
-**Chats**
+**Webhooks**
 
-- `list_chats`
-- `get_chat`
-- `get_chat_by_external_channel`
-- `create_chat`
-- `post_chat_message`
+- `list_webhook_endpoints`
+- `delete_webhook_endpoint`
+- `list_webhook_deliveries`
+- `get_webhook_delivery`
+- `retry_webhook_delivery`
+
+Create webhook endpoints in the dashboard, because each endpoint gets a signing secret.
 
 **Skills**
 
@@ -248,6 +271,18 @@ If the PR update fails, the tool returns an error stating that Notra saved the p
 - `list_geo_engines`
 - `update_geo_settings`
 
+**GEO diagnostics**
+
+- `get_geo_snapshot`
+- `get_geo_changes`
+- `get_geo_prompt_history`
+- `get_geo_sentiment`
+- `get_geo_sentiment_analysis`
+- `list_geo_sentiment_evidence`
+- `list_geo_shelf_sources`
+
+Start with `get_geo_snapshot`. It returns a compact diagnosis of a project and the recommended next actions.
+
 **GEO prompts and sequences**
 
 - `list_geo_prompts`
@@ -255,6 +290,9 @@ If the PR update fails, the tool returns an error stating that Notra saved the p
 - `update_geo_prompt`
 - `delete_geo_prompt`
 - `import_geo_prompts`
+- `list_geo_prompt_suggestions`
+- `accept_geo_prompt_suggestion`
+- `dismiss_geo_prompt_suggestion`
 - `list_geo_sequences`
 - `create_geo_sequence`
 - `update_geo_sequence`
@@ -272,11 +310,13 @@ If the PR update fails, the tool returns an error stating that Notra saved the p
 **GEO scans and visibility**
 
 - `create_geo_scan`
+- `rescan_geo_prompt`
 - `list_geo_scans`
 - `get_geo_scan`
 - `get_geo_visibility_overview`
 - `get_geo_visibility_timeseries`
-- `get_geo_prompt_results`
+- `list_geo_prompt_result_summaries`
+- `get_geo_prompt_result_detail`
 - `get_geo_competitor_share`
 - `get_geo_language_share`
 - `get_geo_competitor_detail`
@@ -284,9 +324,11 @@ If the PR update fails, the tool returns an error stating that Notra saved the p
 **GEO content gaps and briefs**
 
 - `list_geo_content_gaps`
+- `update_geo_content_gap`
 - `list_geo_content_briefs`
 - `plan_geo_content_brief`
 - `get_geo_content_brief`
+- `update_geo_content_brief`
 - `approve_geo_content_brief`
 
 **Agent readiness**
@@ -302,15 +344,16 @@ If the PR update fails, the tool returns an error stating that Notra saved the p
 - `get_geo_traffic_journey`
 - `list_geo_traffic_pages`
 - `get_geo_ingest_setup`
-- `issue_geo_ingest_token`
-- `rotate_geo_ingest_token`
+
+Issue and rotate ingest tokens in the dashboard.
 
 **Feedback**
 
+- `list_feedback`, `get_feedback` and `update_feedback` work with the feedback your own users send you.
 - `submit_feedback` sends a bug report, feature request, question or praise to the Notra team and needs no credentials. See [Agent feedback](/feedback/send-feedback).
 
 <Warning>
-  `create_geo_scan`, `run_geo_sequence` and `plan_geo_content_brief` use billed AI credits and can take minutes, so the server instructs agents to confirm with you before starting them.
+  `create_geo_scan`, `rescan_geo_prompt`, `run_geo_sequence` and `plan_geo_content_brief` use billed AI credits and can take minutes, so the server instructs agents to confirm with you before starting them.
 </Warning>
 
 ## Connect external MCP servers to Notra
