@@ -16,7 +16,7 @@ import type { SkillSlashOption } from "@/types/skills/slash";
 
 export type ChatModelProvider = "anthropic" | "openai" | "auto";
 
-export type ChatModelDescriptionKey =
+type ChatModelDescriptionKey =
   | "auto"
   | "latestOpus"
   | "everyday"
@@ -28,7 +28,7 @@ export type ChatModelDescriptionKey =
   | "previousSonnet"
   | "previousOpenai";
 
-export interface ChatModelPricing {
+interface ChatModelPricing {
   input: string;
   output: string;
 }
@@ -104,7 +104,7 @@ export interface ChatInputContextRowProps {
   onClearSelection?: () => void;
 }
 
-export type ChatContextOptionKind = "github" | "linear" | "mcp";
+type ChatContextOptionKind = "github" | "linear" | "mcp";
 
 export interface ChatContextOption {
   id: string;
@@ -117,7 +117,7 @@ export interface ChatContextOption {
   logoDarkUrl?: string | null;
 }
 
-export interface ChatPostMentionOption {
+interface ChatPostMentionOption {
   id: string;
   kind: "post";
   label: string;

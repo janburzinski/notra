@@ -22,7 +22,7 @@ export type MarketingOptInSource = "onboarding" | "settings";
 
 export type NotificationToggleKey = keyof NotificationSettings;
 
-export interface NotificationToggleConfig {
+interface NotificationToggleConfig {
   /** Organization settings, plus the user's own marketing opt-in. */
   key: NotificationToggleKey | "marketingEmails";
   label: string;
@@ -31,7 +31,7 @@ export interface NotificationToggleConfig {
   icon: IconSvgElement;
 }
 
-export type NotificationToggleDefinition = Omit<
+type NotificationToggleDefinition = Omit<
   NotificationToggleConfig,
   "label" | "description" | "key"
 > & { key: NotificationToggleKey };

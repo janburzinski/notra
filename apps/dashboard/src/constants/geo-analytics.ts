@@ -23,12 +23,6 @@ export const GEO_PROMPT_DETAIL_SURFACES = {
   OVERVIEW: "overview",
   COMPETITOR_DETAIL: "competitor_detail",
 } as const;
-
-export const GEO_COMPETITOR_DETAIL_SURFACES = {
-  PAGE: "page",
-  MODAL: "modal",
-} as const;
-
 export const GEO_WRITE_DIALOG_ENTRIES = {
   GAP: "gap",
   ENGINE_SHEET: "engine_sheet",
@@ -72,12 +66,6 @@ export const TRAFFIC_LOG_FILTER_KINDS = {
   VISITOR_TYPE: "visitor_type",
   PURPOSE: "purpose",
 } as const;
-
-export const GEO_SCAN_FAILURE_REASONS = {
-  RETRY_NO_SUCCESSFUL_CHECKS: "retry_no_successful_checks",
-  UNKNOWN: "unknown",
-} as const;
-
 export const GEO_RANGE_PRESET_LABEL_KEYS = {
   today: "today",
   yesterday: "yesterday",

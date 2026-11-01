@@ -36,7 +36,7 @@ export function isShelfOpportunitySource(source: GeoShelfSource): boolean {
   );
 }
 
-export function matchesShelfSourceFilter(
+function matchesShelfSourceFilter(
   source: GeoShelfSource,
   shelf: GeoShelfFilterState["shelf"]
 ): boolean {
@@ -63,7 +63,7 @@ export function matchesShelfSourceFilter(
   }
 }
 
-export function matchesTicketSourceFilter(
+function matchesTicketSourceFilter(
   source: GeoShelfSource,
   ticket: GeoShelfFilterState["ticket"],
   currentMemberId: string | null
@@ -101,7 +101,7 @@ function competitorNameById(
   );
 }
 
-export function matchesSourceSearch(
+function matchesSourceSearch(
   source: GeoShelfSource,
   search: string,
   members: readonly GeoShelfMember[],

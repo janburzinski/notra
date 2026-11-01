@@ -13,7 +13,7 @@ export interface ConnectedAccountsGroupProps {
   isConnecting: boolean;
 }
 
-export interface OrganizationDetails {
+interface OrganizationDetails {
   id: string;
   logo?: string | null;
   name: string;

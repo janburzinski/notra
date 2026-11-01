@@ -87,7 +87,7 @@ export interface WriteOptionCardProps {
   disabled?: boolean;
 }
 
-export interface WriteDialogBaseline {
+interface WriteDialogBaseline {
   mentionedEngines: number;
   totalEngines: number;
 }

@@ -34,9 +34,7 @@ function pairKey(check: Pick<GeoScanCheckSnapshot, "promptId" | "engine">) {
  * that added or dropped prompts can't fake a swing. `null` below the noise
  * floor.
  */
-export function pairedVisibility(
-  diff: Pick<GeoScanDiff, "previous" | "current">
-) {
+function pairedVisibility(diff: Pick<GeoScanDiff, "previous" | "current">) {
   const previousByKey = new Map(
     diff.previous.map((check) => [pairKey(check), check] as const)
   );
@@ -79,7 +77,7 @@ function joinNames(names: readonly string[]) {
   return `${names.slice(0, 2).join(", ")} and ${names.length - 2} more`;
 }
 
-export function describeGeoChange(event: GeoChangeEvent): string {
+function describeGeoChange(event: GeoChangeEvent): string {
   const names = joinNames(event.competitors);
   switch (event.kind) {
     case "lost_mention":

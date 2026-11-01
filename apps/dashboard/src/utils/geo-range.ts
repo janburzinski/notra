@@ -50,7 +50,7 @@ export function geoPresetRange(preset: GeoRangePreset): GeoDateRange {
   }
 }
 
-export function isGeoRangePreset(value: string): value is GeoRangePreset {
+function isGeoRangePreset(value: string): value is GeoRangePreset {
   return GEO_RANGE_PRESETS.some((preset) => preset.value === value);
 }
 

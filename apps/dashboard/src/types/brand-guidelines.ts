@@ -93,7 +93,7 @@ export interface NormalizedScreenshot {
   sortOrder: number;
 }
 
-export interface StoredBrandGuidelineAsset {
+interface StoredBrandGuidelineAsset {
   id: string;
   guidelineId: string;
   kind: BrandGuidelineAssetKind;
@@ -110,7 +110,7 @@ export interface StoredBrandGuidelineAsset {
   sortOrder: number;
 }
 
-export interface StoredBrandGuidelineColor {
+interface StoredBrandGuidelineColor {
   id: string;
   guidelineId: string;
   role: BrandGuidelineColorRole;
@@ -121,7 +121,7 @@ export interface StoredBrandGuidelineColor {
   sortOrder: number;
 }
 
-export interface StoredBrandGuidelineFont {
+interface StoredBrandGuidelineFont {
   id: string;
   guidelineId: string;
   role: BrandGuidelineFontRole;
@@ -133,7 +133,7 @@ export interface StoredBrandGuidelineFont {
   sortOrder: number;
 }
 
-export interface StoredBrandGuidelineScreenshot {
+interface StoredBrandGuidelineScreenshot {
   id: string;
   guidelineId: string;
   kind: BrandGuidelineScreenshotKind;
@@ -148,7 +148,7 @@ export interface StoredBrandGuidelineScreenshot {
   sortOrder: number;
 }
 
-export interface StoredBrandGuidelineToken {
+interface StoredBrandGuidelineToken {
   id: string;
   guidelineId: string;
   type: BrandGuidelineTokenType;

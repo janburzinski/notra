@@ -1,4 +1,4 @@
-export interface SwitcherProject {
+interface SwitcherProject {
   id: string;
   name: string;
   brandSettingsId: string;

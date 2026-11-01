@@ -61,7 +61,7 @@ function getR2Env() {
   return { ...storage, publicUrl };
 }
 
-export function getR2Client() {
+function getR2Client() {
   if (cachedR2Client) {
     return cachedR2Client;
   }

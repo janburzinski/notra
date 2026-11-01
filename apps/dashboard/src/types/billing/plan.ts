@@ -55,8 +55,8 @@ export interface InvoicesTableProps {
   plans: BillingPlan[] | undefined;
 }
 
-export type AttachPlanFn = ReturnType<typeof useCustomer>["attach"];
-export type MultiAttachPlanFn = ReturnType<typeof useCustomer>["multiAttach"];
+type AttachPlanFn = ReturnType<typeof useCustomer>["attach"];
+type MultiAttachPlanFn = ReturnType<typeof useCustomer>["multiAttach"];
 
 export interface AttachPlanParams {
   attach: AttachPlanFn;

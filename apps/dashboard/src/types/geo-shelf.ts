@@ -9,8 +9,6 @@ import type {
   geoShelfBoardCountsSchema,
   geoShelfCitationSummarySchema,
   geoShelfCreateInputSchema,
-  geoShelfFetchStatusSchema,
-  geoShelfListInputSchema,
   geoShelfListResponseSchema,
   geoShelfMemberSchema,
   geoShelfMembersResponseSchema,
@@ -19,7 +17,6 @@ import type {
   geoShelfPreviewResponseSchema,
   geoShelfOpportunityStatusSchema,
   geoShelfOpportunityWriteSchema,
-  geoShelfOriginSchema,
   geoShelfOwnershipSchema,
   geoShelfPlacementSchema,
   geoShelfPlacementStatusSchema,
@@ -36,8 +33,6 @@ import type { GEO_SHELF_VIEWS } from "@/constants/geo-shelf";
 
 export type GeoShelfSourceKind = z.infer<typeof geoShelfSourceKindSchema>;
 export type GeoShelfOwnership = z.infer<typeof geoShelfOwnershipSchema>;
-export type GeoShelfOrigin = z.infer<typeof geoShelfOriginSchema>;
-export type GeoShelfFetchStatus = z.infer<typeof geoShelfFetchStatusSchema>;
 export type GeoShelfPlacementStatus = z.infer<
   typeof geoShelfPlacementStatusSchema
 >;
@@ -97,13 +92,12 @@ export type GeoShelfUrlCheckResponse = z.infer<
 
 export type GeoShelfShelfFilter = (typeof GEO_SHELF_SHELF_FILTERS)[number];
 export type GeoShelfTicketFilter = (typeof GEO_SHELF_TICKET_FILTERS)[number];
-export type GeoShelfSortKey = (typeof GEO_SHELF_SORT_KEYS)[number];
-export type GeoShelfSortDirection = (typeof GEO_SHELF_SORT_DIRECTIONS)[number];
+type GeoShelfSortKey = (typeof GEO_SHELF_SORT_KEYS)[number];
+type GeoShelfSortDirection = (typeof GEO_SHELF_SORT_DIRECTIONS)[number];
 export type GeoShelfView = (typeof GEO_SHELF_VIEWS)[number];
 export type GeoShelfBoardColumnId = GeoShelfOpportunityStatus | "untracked";
 export type GeoShelfBoardItems = Record<GeoShelfBoardColumnId, string[]>;
 export type GeoShelfBoardCounts = z.infer<typeof geoShelfBoardCountsSchema>;
-export type GeoShelfListInput = z.input<typeof geoShelfListInputSchema>;
 
 export interface GeoShelfSortState {
   key: GeoShelfSortKey;
@@ -248,7 +242,7 @@ export interface GeoShelfPageControlsProps extends GeoShelfToolbarProps {
 }
 
 /** Paging state shared by the table and the board. */
-export interface GeoShelfPagingProps {
+interface GeoShelfPagingProps {
   filteredCount: number;
   hasNextPage: boolean;
   isFetching: boolean;

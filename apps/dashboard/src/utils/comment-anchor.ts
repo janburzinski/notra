@@ -97,7 +97,7 @@ export function commentTextOffset(
   return visit(root) ? total : null;
 }
 
-export function commentSelectionOffsets(
+function commentSelectionOffsets(
   root: CommentAnchorTextNode,
   anchor: { node: CommentAnchorTextNode; offset: number },
   focus: { node: CommentAnchorTextNode; offset: number }
@@ -113,7 +113,7 @@ export function commentSelectionOffsets(
   };
 }
 
-export function commentTextPoint<T extends CommentAnchorTextNode>(
+function commentTextPoint<T extends CommentAnchorTextNode>(
   nodes: T[],
   offset: number,
   edge: "start" | "end"
@@ -133,7 +133,7 @@ export function commentTextPoint<T extends CommentAnchorTextNode>(
   return null;
 }
 
-export function captureCommentAnchor(
+function captureCommentAnchor(
   text: string,
   from: number,
   to: number
@@ -182,10 +182,7 @@ export function captureCommentAnchor(
   return malformed ? null : quote;
 }
 
-export function isCommentAnchorCurrent(
-  text: string,
-  quote: CommentAnchorQuote
-) {
+function isCommentAnchorCurrent(text: string, quote: CommentAnchorQuote) {
   return (
     quote.start >= quote.prefix.length &&
     quote.end - quote.start === quote.exact.length &&

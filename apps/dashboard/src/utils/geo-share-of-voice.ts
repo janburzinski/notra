@@ -56,7 +56,7 @@ function sumWindow(
  * half of the settled days in range, matching `mentionCountDelta`. Works on
  * daily mention counts, not on the daily share fractions in `row.trend`.
  */
-export function shareOfVoiceOwnTrends(
+function shareOfVoiceOwnTrends(
   rows: readonly ShareOfVoiceRow[],
   own: ShareOfVoiceRow | null,
   mentionSparklines: ReadonlyMap<string, GeoSparklinePoint[]>,

@@ -38,21 +38,16 @@ import {
   engineModelOf,
 } from "@notra/geo-core/utils/geo-engine-family";
 import { geoEngineUsedWebSearch } from "@notra/geo-core/utils/geo-engines";
-import { hasGroundedVariant } from "@notra/geo-core/utils/geo-grounded-engines";
 import { isGroundedEngine } from "@notra/geo-core/utils/geo-presence";
 import { sumGeoSparklinePoints } from "@notra/geo-core/utils/geo-sparkline";
 
 import {
-  CHART_MIN_BAR_PERCENT,
   SHARE_OF_VOICE_AGGREGATE_ID,
   SHARE_OF_VOICE_AGGREGATE_LABEL,
   CHART_PERCENT_SCALE,
 } from "@/constants/charts";
 import type { GeoStatDeltaLabels } from "@/types/geo";
-import type {
-  GeoEngineAnswerMode,
-  GeoMentionTrendEmptyState,
-} from "@/types/geo-shared";
+import type { GeoMentionTrendEmptyState } from "@/types/geo-shared";
 
 import { chartKey } from "./chart-keys";
 import {
@@ -166,13 +161,6 @@ export function formatUsageShare(share: number): string {
     return `<${MIN_SHARE_PERCENT}%`;
   }
   return `${Math.round(percent * SHARE_DECIMALS) / SHARE_DECIMALS}%`;
-}
-
-export function barWidthPercent(value: number, max: number): number {
-  if (max <= 0 || value <= 0) {
-    return 0;
-  }
-  return Math.max((value / max) * CHART_PERCENT_SCALE, CHART_MIN_BAR_PERCENT);
 }
 
 export function fitMentionTrendLine(
@@ -358,26 +346,6 @@ export function formatEngineFamily(engine: string): string {
     GEO_ENGINE_LABELS[`${model}-grounded`] ??
     formatModelLabel(model)
   );
-}
-
-export function engineAnswerMode(engine: string): GeoEngineAnswerMode | null {
-  if (isGroundedEngine(engine)) {
-    return null;
-  }
-  return hasGroundedVariant(engine) ? "withoutSearch" : null;
-}
-
-export function sharedEngineAnswerMode(
-  engines: readonly string[]
-): GeoEngineAnswerMode | null {
-  const first = engines[0];
-  if (!first) {
-    return null;
-  }
-  const mode = engineAnswerMode(first);
-  return engines.every((engine) => engineAnswerMode(engine) === mode)
-    ? mode
-    : null;
 }
 
 export function engineFamilySources(

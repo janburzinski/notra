@@ -3,10 +3,7 @@ import type { PostStatus } from "@notra/schemas/dashboard/content";
 import type { ReactNode } from "react";
 
 export type SidebarMode = "geo" | "studio";
-
-export type NavGroupKey = "visibility" | "improve" | "automation" | "utility";
-
-export type NavItemLabelKey =
+type NavItemLabelKey =
   | "home"
   | "chat"
   | "content"
@@ -29,9 +26,9 @@ export type NavItemLabelKey =
   | "skills"
   | "apiKeys";
 
-export type NavBadgeKey = "beta";
+type NavBadgeKey = "beta";
 
-export type NavGroupLabelKey =
+type NavGroupLabelKey =
   | "autopilot"
   | "overview"
   | "prompts"
@@ -67,7 +64,7 @@ export interface NavGroupRowState {
   showOwnBadge: boolean;
 }
 
-export interface NavItem {
+interface NavItem {
   link: string;
   icon: IconSvgElement;
   labelKey: NavItemLabelKey;

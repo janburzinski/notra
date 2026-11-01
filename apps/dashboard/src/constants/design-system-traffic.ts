@@ -115,7 +115,7 @@ const TRAFFIC_POINTS: GeoTrafficPoint[] = Array.from(
   }
 ).flat();
 
-export const DESIGN_SYSTEM_TRAFFIC_SOURCES: GeoTrafficSource[] = [
+const DESIGN_SYSTEM_TRAFFIC_SOURCES: GeoTrafficSource[] = [
   ...CRAWLER_MIX.map((mix) =>
     trafficSource(
       mix.source,

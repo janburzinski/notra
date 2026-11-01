@@ -37,13 +37,10 @@ export const ACCOUNT_SERIES_COLORS: readonly ChartColorPair[] = [
   SERIES_GOLD,
   { light: "#6B6B75", dark: "#9A9AA4" },
 ];
-
-export const CHART_OTHER_SLICE_LABEL = "Other";
 export const SHARE_OF_VOICE_AGGREGATE_ID = "aggregate:other";
 export const SHARE_OF_VOICE_AGGREGATE_LABEL = "Other brands";
 export const SHARE_OF_VOICE_RANKING_LIMIT = 4;
 export const CHART_PERCENT_SCALE = 100;
-export const CHART_MIN_BAR_PERCENT = 2;
 export const CHART_SCRUB_POSITION_LERP = 0.35;
 export const SPARKLINE_SERIES_KEY = "value";
 

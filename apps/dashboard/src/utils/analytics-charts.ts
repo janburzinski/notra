@@ -116,7 +116,7 @@ function markerLabelForDate(
   return index === -1 ? null : formatDayLabel(day, locale);
 }
 
-export function sumMetric(
+function sumMetric(
   accounts: SocialOverviewAccount[],
   metric: (account: SocialOverviewAccount) => number | null
 ): number | null {

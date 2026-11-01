@@ -1,4 +1,1 @@
-export type {
-  StatusBadgeAppearance,
-  StatusBadgeProps,
-} from "@notra/ui/types/status-badge";
+export type { StatusBadgeAppearance } from "@notra/ui/types/status-badge";

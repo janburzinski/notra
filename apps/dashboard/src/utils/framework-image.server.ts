@@ -22,7 +22,7 @@ import {
 import type { CachedImage, ImageSource } from "../types/framework-image";
 import { isAllowedImageUrl, negotiateImageFormat } from "./framework-image";
 
-export function imageCacheMaxAge(cacheControl?: string) {
+function imageCacheMaxAge(cacheControl?: string) {
   const directives = new Map(
     (cacheControl ?? "")
       .toLowerCase()
@@ -45,7 +45,7 @@ export function imageCacheMaxAge(cacheControl?: string) {
   );
 }
 
-export class FrameworkImageCache {
+class FrameworkImageCache {
   private entries = new Map<string, CachedImage>();
   private bytes = 0;
   private maxBytes: number;

@@ -24,7 +24,7 @@ export interface SkillUpstreamStatus {
   customized: boolean;
 }
 
-export interface SkillUpstreamDetail extends SkillUpstreamStatus {
+interface SkillUpstreamDetail extends SkillUpstreamStatus {
   latest: {
     description: string;
     content: string;
@@ -44,7 +44,7 @@ export interface SkillListItem {
 
 export type SkillSortKey = (typeof SKILL_SORT_KEYS)[number];
 
-export type SkillSortDirection = "asc" | "desc";
+type SkillSortDirection = "asc" | "desc";
 
 export interface SkillSortState {
   key: SkillSortKey;

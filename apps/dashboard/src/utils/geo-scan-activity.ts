@@ -12,12 +12,6 @@ export function geoRunProgress(run: GeoScanRunSummary) {
   return total ? Math.min(100, (run.checks / total) * 100) : null;
 }
 
-export function geoRunMissingAnswers(run: GeoScanRunSummary) {
-  return run.status === "running" || run.plan === null
-    ? 0
-    : Math.max(0, run.plan.totalChecks - run.checks);
-}
-
 export function scanRunDetailView(
   input: ScanRunDetailViewInput
 ): ScanRunDetailView {

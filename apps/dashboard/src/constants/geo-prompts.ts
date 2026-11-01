@@ -1,9 +1,6 @@
 import {
   AiBrain01Icon,
-  NeutralIcon,
-  Sad01Icon,
   SearchIcon,
-  SmileIcon,
   ViewOffSlashIcon,
 } from "@hugeicons/core-free-icons";
 import type { GeoPresenceStatus } from "@notra/geo-core/types/geo";
@@ -17,7 +14,6 @@ export const GEO_PROMPT_DEFAULT_FILTERS: GeoPromptTableFilters = {
   tag: GEO_PROMPT_FILTER_ALL,
   source: GEO_PROMPT_FILTER_ALL,
 };
-export const GEO_PROMPT_TAGS_VISIBLE_COUNT = 3;
 export const GEO_PROMPT_FILTER_SELECT_CLASS = "w-36";
 
 export const GEO_PROMPT_LABEL_PILL_CLASS =
@@ -39,22 +35,6 @@ export const GEO_PROMPT_PRESENCE_PILL_CLASS: Record<GeoPresenceStatus, string> =
     invisible:
       "border-border bg-muted/50 text-muted-foreground dark:bg-muted/30",
   };
-
-export const GEO_LABEL_PILL_CLASS =
-  "inline-flex h-6 items-center gap-1.5 rounded-full border px-2 text-xs font-medium";
-
-export const GEO_SENTIMENT_ICONS = {
-  positive: SmileIcon,
-  neutral: NeutralIcon,
-  negative: Sad01Icon,
-} as const;
-
-export const GEO_SENTIMENT_PILL_CLASS = {
-  positive: "border-geo-up/25 bg-geo-up/10 text-geo-up",
-  neutral: "border-border bg-muted/50 text-muted-foreground dark:bg-muted/30",
-  negative: "border-geo-down/25 bg-geo-down/10 text-geo-down",
-} as const;
-
 export const GEO_PROMPT_OUTCOME_LABEL_KEYS = {
   mentionedAndCited: "mentionedAndCited",
   mentioned: "mentioned",

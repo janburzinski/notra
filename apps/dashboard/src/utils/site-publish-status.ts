@@ -3,7 +3,7 @@ import type {
   SitePullRequestTone,
 } from "@/types/site-branches";
 
-export function sitePublishChecksMessage(status: SiteBranchStatus) {
+function sitePublishChecksMessage(status: SiteBranchStatus) {
   const pr = status.pullRequest;
   if (pr?.mergeable === "CONFLICTING") {
     return "checksConflict" as const;
@@ -27,7 +27,7 @@ export function sitePublishChecksMessage(status: SiteBranchStatus) {
   }
 }
 
-export function sitePublishReviewMessage(status: SiteBranchStatus) {
+function sitePublishReviewMessage(status: SiteBranchStatus) {
   switch (status.pullRequest?.reviewDecision) {
     case "APPROVED":
       return "reviewApproved" as const;

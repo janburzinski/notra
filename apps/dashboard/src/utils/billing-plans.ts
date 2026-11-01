@@ -314,21 +314,6 @@ export function isPlanInGroup(
   return group.monthly?.id === planId || group.annual?.id === planId;
 }
 
-export function nextPlanGroup(
-  groups: BillingPlanGroup[],
-  activePlanId: string | undefined
-): BillingPlanGroup | null {
-  if (!activePlanId) {
-    return groups[0] ?? null;
-  }
-  const tier = planTierId(activePlanId);
-  const index = groups.findIndex((group) => group.id === tier);
-  if (index === -1) {
-    return null;
-  }
-  return groups[index + 1] ?? null;
-}
-
 export function planCardClassName(
   highlighted: boolean,
   featured: boolean
@@ -382,7 +367,7 @@ export function zdrAddonPlanId(
   return isAnnualPlanId(activePlanId) ? `${base}${ANNUAL_ADDON_SUFFIX}` : base;
 }
 
-export function isZdrAddonPlanId(planId: string | undefined): boolean {
+function isZdrAddonPlanId(planId: string | undefined): boolean {
   return Boolean(planId?.startsWith(ZDR_ADDON_PREFIX));
 }
 

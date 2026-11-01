@@ -6,10 +6,3 @@ export const SPRING_PRESS = {
   damping: 30,
   mass: 0.6,
 } as const;
-
-export const SPRING_PANEL = {
-  type: "spring",
-  stiffness: 420,
-  damping: 40,
-  mass: 0.5,
-} as const;

@@ -1,9 +1,9 @@
-export interface DesignSystemCatalogLink {
+interface DesignSystemCatalogLink {
   id: string;
   label: string;
 }
 
-export interface DesignSystemCatalogItem extends DesignSystemCatalogLink {
+interface DesignSystemCatalogItem extends DesignSystemCatalogLink {
   children?: DesignSystemCatalogLink[];
 }
 

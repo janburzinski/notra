@@ -4,7 +4,7 @@ import type { MutableRefObject } from "react";
 import type { useContentHistory } from "@/lib/hooks/use-content-history";
 import type { ContentDetailToolbarProps } from "@/types/components/content-detail-toolbar";
 
-export type ContentDocumentProps = Pick<
+type ContentDocumentProps = Pick<
   ContentDetailToolbarProps,
   "content" | "contentId" | "document" | "organizationId"
 >;
@@ -15,7 +15,7 @@ export type ContentCollaborationProps = ContentDocumentProps & {
 };
 
 /** Restore recovery state; owned by the dialog so closing History keeps the retry. */
-export interface ContentHistoryRecovery {
+interface ContentHistoryRecovery {
   restoredRevision: MutableRefObject<number | null>;
   needsRefresh: boolean;
   setNeedsRefresh: (needsRefresh: boolean) => void;

@@ -582,7 +582,7 @@ export interface SiteSuggestInputProps {
   disabled?: boolean;
 }
 
-export type SiteIntegrationBrand = Pick<
+type SiteIntegrationBrand = Pick<
   SiteIntegrationProvider,
   "logo" | "name" | "recommended"
 > & { fill?: boolean };

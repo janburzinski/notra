@@ -11,9 +11,9 @@ export const POSTHOG_PROJECT_TOKEN = isDemoModeClient()
   ? undefined
   : process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
 
-export const POSTHOG_INGEST_PATH = "/ingest";
+const POSTHOG_INGEST_PATH = "/ingest";
 
-export const POSTHOG_UPSTREAM_HOST =
+const POSTHOG_UPSTREAM_HOST =
   process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
 export const POSTHOG_CONFIG = {

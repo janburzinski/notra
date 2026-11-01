@@ -59,7 +59,7 @@ export const SITE_CREATE_STEP_IDS = [
 
 export const SITE_CREATE_DEPLOY_POLL_MS = 1500;
 
-export const SITE_IMPORT_SKELETON_ROWS = 5;
+const SITE_IMPORT_SKELETON_ROWS = 5;
 export const SITE_IMPORT_SKELETON_KEYS = Array.from(
   { length: SITE_IMPORT_SKELETON_ROWS },
   (_, index) => `skeleton-${index}`
@@ -82,10 +82,6 @@ export const SITE_CREATE_STAGE_EDGE_PX = 24;
 export const SITE_CREATE_SCROLL_FADE_REM = 1.5;
 
 export const SITE_CREATE_STARTER_DEBOUNCE_MS = 400;
-export const SITE_CONFIG_MISSING_DIAGNOSTIC = "config_missing";
-export const SITE_CONFIG_DOCS_URL =
-  "https://www.usenotra.com/docs/sites/reference/blog-json";
-
 export const SITE_CREATE_DEPLOY_PHASE_TONES: Record<
   SiteCreateDeployPhase,
   SiteCreateDeployHeadingProps["tone"]

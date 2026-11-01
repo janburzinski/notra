@@ -81,9 +81,6 @@ export const AGENT_FEEDBACK_SNIPPET_FILENAMES: Record<
   fetch: "server.ts",
   curl: "terminal",
 };
-
-export const AGENT_FEEDBACK_UNSPECIFIED_LABEL = "Unspecified";
-
 export const AGENT_FEEDBACK_STATUS_ICON_CLASS: Record<
   AgentFeedbackStatus,
   string

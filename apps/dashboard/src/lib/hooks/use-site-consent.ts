@@ -7,7 +7,7 @@ import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SiteScope } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
 
-export function useInthConsentStatus(scope: SiteScope) {
+function useInthConsentStatus(scope: SiteScope) {
   return useQuery(
     dashboardOrpc.sites.integrations.inth.status.queryOptions({
       input: scope,
@@ -16,7 +16,7 @@ export function useInthConsentStatus(scope: SiteScope) {
   );
 }
 
-export function useInthProjects(scope: SiteScope, enabled: boolean) {
+function useInthProjects(scope: SiteScope, enabled: boolean) {
   return useQuery(
     dashboardOrpc.sites.integrations.inth.projects.queryOptions({
       input: { organizationId: scope.organizationId, siteId: scope.siteId },
@@ -25,7 +25,7 @@ export function useInthProjects(scope: SiteScope, enabled: boolean) {
   );
 }
 
-export function useConnectInthProject(scope: SiteScope) {
+function useConnectInthProject(scope: SiteScope) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (projectId: string) =>
@@ -41,7 +41,7 @@ export function useConnectInthProject(scope: SiteScope) {
   });
 }
 
-export function useDisconnectInth(scope: SiteScope) {
+function useDisconnectInth(scope: SiteScope) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () =>

@@ -41,11 +41,11 @@ export function isAllowedImageUrl(url: URL): boolean {
   }
 }
 
-export function imageOptimizerUrl(src: string, width: number, quality = 75) {
+function imageOptimizerUrl(src: string, width: number, quality = 75) {
   return `/api/image?${new URLSearchParams({ url: src, w: String(width), q: String(quality) })}`;
 }
 
-export function getImageWidths(width?: number, sizes?: string) {
+function getImageWidths(width?: number, sizes?: string) {
   if (sizes || !width) {
     return { widths: sizes ? IMAGE_WIDTHS : IMAGE_DEVICE_WIDTHS, kind: "w" };
   }

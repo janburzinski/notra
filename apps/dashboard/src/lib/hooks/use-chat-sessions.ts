@@ -49,7 +49,7 @@ function createPendingChatSession(chatId: string): ChatSessionSummary {
 const EMPTY_PENDING_CHAT_SESSIONS: ChatSessionSummary[] = [];
 const EMPTY_GENERATING_TITLE_IDS: string[] = [];
 
-export function markChatTitleReady(
+function markChatTitleReady(
   queryClient: QueryClient,
   organizationId: string | undefined,
   projectId: string | null | undefined,

@@ -24,7 +24,7 @@ export interface GeoRecapPair {
   current: GeoRecapPeriodStats;
 }
 
-export type GeoRecapChangeKind = "gained" | "lost" | "rank_up" | "rank_down";
+type GeoRecapChangeKind = "gained" | "lost" | "rank_up" | "rank_down";
 
 export interface GeoRecapPairChange {
   pair: GeoRecapPair;

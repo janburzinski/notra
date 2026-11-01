@@ -14,9 +14,7 @@ import type * as z from "zod";
 
 import type { OnboardingStep } from "@/types/analytics/events";
 
-export type OnboardingWorkspaceInput = z.infer<
-  typeof onboardingWorkspaceSchema
->;
+type OnboardingWorkspaceInput = z.infer<typeof onboardingWorkspaceSchema>;
 
 /** Response of `onboarding.companyLogo`, also the cached representation. */
 export interface CompanyLogoResult {
@@ -87,7 +85,7 @@ export interface HeardAboutNotraFieldProps {
   onOtherBlur: () => void;
 }
 
-export interface OnboardingSplitLayoutProps {
+interface OnboardingSplitLayoutProps {
   children: React.ReactNode;
 }
 
@@ -261,7 +259,7 @@ export interface OrgLogoFieldProps {
   previewUrl: string | null;
 }
 
-export interface OnboardingWorkspaceFormValues {
+interface OnboardingWorkspaceFormValues {
   heardAboutNotraOther: string;
   heardAboutNotraSource: string;
   name: string;

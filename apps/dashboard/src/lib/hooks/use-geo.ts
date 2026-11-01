@@ -616,7 +616,7 @@ export function useGeoCompetitorPromptSummary(
   });
 }
 
-export function usePrefetchGeoCompetitorDetail(organizationId: string) {
+function usePrefetchGeoCompetitorDetail(organizationId: string) {
   const queryClient = useQueryClient();
   const { projectId } = useGeoProjectScope();
 

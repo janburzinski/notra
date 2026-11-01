@@ -15,7 +15,7 @@ export interface SiteSettingsListProps {
   children: ReactNode;
 }
 
-export interface SiteSettingsItemBaseProps {
+interface SiteSettingsItemBaseProps {
   errorPath?: string;
   icon: IconSvgElement;
   title: ReactNode;
@@ -67,7 +67,7 @@ export interface SiteSettingsEditorFooterProps {
   onCancel: () => void;
 }
 
-export interface SiteSettingsTextFieldProps {
+interface SiteSettingsTextFieldProps {
   value: string;
   onChange: (value: string) => void;
 }

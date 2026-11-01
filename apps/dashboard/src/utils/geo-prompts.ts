@@ -1,4 +1,3 @@
-import { GEO_PROMPT_FUNNEL_TOP_POSITION } from "@notra/geo-core/constants/geo";
 import { trackedPromptScanId } from "@notra/geo-core/geo/prompts";
 import type {
   GeoPresenceStatus,
@@ -20,53 +19,6 @@ import type {
 } from "@/types/geo";
 import { bestFuzzyScore, fuzzyMatches } from "@/utils/fuzzy";
 import { uniquePromptBrandNames } from "@/utils/geo-prompt-brands";
-
-function promptMentionSets(results: readonly GeoPromptResultSummary[]): {
-  mentioned: Set<string>;
-  topRanked: Set<string>;
-} {
-  const mentioned = new Set<string>();
-  const topRanked = new Set<string>();
-  for (const result of results) {
-    if (!result.mentioned) {
-      continue;
-    }
-    mentioned.add(result.promptId);
-    if (
-      result.position !== null &&
-      result.position <= GEO_PROMPT_FUNNEL_TOP_POSITION
-    ) {
-      topRanked.add(result.promptId);
-    }
-  }
-  return { mentioned, topRanked };
-}
-
-export function promptCoverage(
-  promptCount: number,
-  results: readonly GeoPromptResultSummary[]
-): GeoPromptCoverage {
-  const { mentioned } = promptMentionSets(results);
-  if (promptCount <= 0) {
-    return { mentioned: mentioned.size, total: 0, rate: null };
-  }
-  return {
-    mentioned: mentioned.size,
-    total: promptCount,
-    rate: mentioned.size / promptCount,
-  };
-}
-
-export function promptCoverageInsight(coverage: GeoPromptCoverage): string {
-  if (coverage.rate === null) {
-    return "add prompts to scan";
-  }
-  if (coverage.mentioned === 0) {
-    return "no tracked prompts mentioned yet";
-  }
-  return `${coverage.mentioned} of ${coverage.total} tracked prompts`;
-}
-
 const PRESENCE_SORT_VALUE: Record<GeoPresenceStatus, number> = {
   "training-data": 3,
   "retrieval-only": 2,
@@ -153,7 +105,7 @@ export function buildPromptTableRows(
     .map((entry) => entry.row);
 }
 
-export function bestMentionedResult(
+function bestMentionedResult(
   results: readonly GeoPromptResultSummary[]
 ): GeoPromptResultSummary | null {
   let best: GeoPromptResultSummary | null = null;

@@ -13,7 +13,7 @@ import { NO_AUTOMATION_NOTIFY } from "@/constants/automation-notify";
 import type { EventTriggerFormValues } from "@/types/automation/event-trigger";
 import type { Trigger } from "@/types/triggers/triggers";
 
-export const DEFAULT_EVENT_TRIGGER_VALUES: EventTriggerFormValues = {
+const DEFAULT_EVENT_TRIGGER_VALUES: EventTriggerFormValues = {
   eventType: "release",
   outputType: "changelog",
   repositoryIds: [],

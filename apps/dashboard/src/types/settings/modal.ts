@@ -26,14 +26,14 @@ export type StandardSettingsSectionId = Exclude<
   "geo" | "geo-brand" | "geo-languages" | "geo-models"
 >;
 
-export type SettingsNavGroupId =
+type SettingsNavGroupId =
   | "account"
   | "organization"
   | "billing"
   | "geo"
   | "dev";
 
-export interface SettingsSectionLabels {
+interface SettingsSectionLabels {
   label: string;
   description: string;
   modalDescription: string;
@@ -59,10 +59,7 @@ export interface SettingsNavGroup {
   items: readonly SettingsNavItem[];
 }
 
-export type SettingsNavItemConfig = Omit<
-  SettingsNavItem,
-  "label" | "description"
->;
+type SettingsNavItemConfig = Omit<SettingsNavItem, "label" | "description">;
 
 export interface SettingsNavGroupConfig {
   id: SettingsNavGroupId;
@@ -109,10 +106,6 @@ export interface SettingsModalBodyProps {
   isOpen: boolean;
   section: SettingsSectionId | null;
   titleId: string;
-}
-
-export interface LogsRetentionHintProps {
-  days: number;
 }
 
 export interface SettingsHeaderContextValue {

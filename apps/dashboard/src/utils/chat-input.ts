@@ -134,7 +134,7 @@ export function getContentChatInputChrome({
   };
 }
 
-export function getComposerSendChrome(
+function getComposerSendChrome(
   showStop: boolean,
   canQueue: boolean,
   labels: ContentChatInputChromeLabels
@@ -177,7 +177,7 @@ export function getSelectionPreview(selection: TextSelection) {
     : selection.text;
 }
 
-export function toGithubContextItem(repo: EnabledRepo): ContextItem {
+function toGithubContextItem(repo: EnabledRepo): ContextItem {
   return {
     type: "github-repo",
     owner: repo.owner,

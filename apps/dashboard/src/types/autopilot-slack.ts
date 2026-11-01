@@ -1,4 +1,4 @@
-export type SlackBlockValue =
+type SlackBlockValue =
   | string
   | number
   | boolean

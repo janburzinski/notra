@@ -25,7 +25,7 @@ export interface OrganizationAuthDependencies {
   hasDatabaseUrl: () => boolean;
 }
 
-export interface OrganizationContext {
+interface OrganizationContext {
   user: User;
   organizationId: string;
   membership: {
@@ -34,12 +34,12 @@ export interface OrganizationContext {
   };
 }
 
-export interface OrganizationAuthResult {
+interface OrganizationAuthResult {
   success: true;
   context: OrganizationContext;
 }
 
-export interface OrganizationAuthError {
+interface OrganizationAuthError {
   success: false;
   response: Response;
 }

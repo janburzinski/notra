@@ -11,7 +11,6 @@ import {
 import {
   API_READ_SCOPES,
   API_SCOPE_RESOURCES,
-  API_WRITE_SCOPES,
   getApiScopeId,
   LEGACY_API_SCOPES,
 } from "@notra/utils/api-scopes";
@@ -22,11 +21,6 @@ import type { StatusBadgeAppearance } from "@/types/components/status-badge";
 export const API_KEY_PERMISSIONS = LEGACY_API_SCOPES;
 
 export const API_KEY_GRANULAR_READ_PERMISSIONS = API_READ_SCOPES;
-
-export const API_KEY_GRANULAR_WRITE_PERMISSIONS = API_WRITE_SCOPES;
-
-export const API_KEY_LEGACY_PERMISSIONS = LEGACY_API_SCOPES;
-
 export const API_KEY_GEO_SCOPES = API_SCOPE_RESOURCES.flatMap((resource) =>
   resource.openApiTag === "GEO"
     ? [getApiScopeId(resource.id, "read"), getApiScopeId(resource.id, "write")]

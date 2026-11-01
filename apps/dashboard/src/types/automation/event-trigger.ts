@@ -44,13 +44,7 @@ export interface UseEventTriggerFormProps {
   onClose: () => void;
 }
 
-export type EventTriggerFormApi = ReturnType<
-  typeof useEventTriggerForm
->["form"];
-
-export interface EventTriggerFormSectionProps {
-  form: EventTriggerFormApi;
-}
+type EventTriggerFormApi = ReturnType<typeof useEventTriggerForm>["form"];
 
 export interface EventTriggerSectionProps {
   form: EventTriggerFormApi;

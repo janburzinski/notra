@@ -39,7 +39,7 @@ export function slugifyWhileTyping(value: string): string {
   return slug && /[-\s]$/.test(value) ? `${slug}-` : slug;
 }
 
-export function isOnboardingPreviewFocus(
+function isOnboardingPreviewFocus(
   value: string | undefined
 ): value is OnboardingPreviewFocus {
   return value !== undefined && Object.hasOwn(ONBOARDING_PREVIEW_ZOOM, value);

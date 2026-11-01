@@ -132,7 +132,7 @@ export function summarizePostSchedule(
   };
 }
 
-export function getCalendarEntryState(
+function getCalendarEntryState(
   entry: ContentCalendarEntryView
 ): CalendarEntryState {
   if (entry.kind === "published") {

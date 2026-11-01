@@ -63,7 +63,7 @@ export type AiResult =
   | { action: "navigate"; path: string; reason: string }
   | { action: "chat"; path: null; reason: string };
 
-export interface CommandPaletteNavigationTarget {
+interface CommandPaletteNavigationTarget {
   label: string;
   path: string;
 }
@@ -102,7 +102,7 @@ export interface CommandPaletteEntityTarget {
   name: string;
 }
 
-export type CommandPaletteMode = "geo" | "studio";
+type CommandPaletteMode = "geo" | "studio";
 
 export type CommandPalettePage = "projects" | "workspaces";
 
@@ -216,7 +216,7 @@ export type CommandPaletteTranslator = ReturnType<
   typeof useTranslations<"commandPalette">
 >;
 
-export type CommandPaletteNavigatingLabelKey = "opening" | "openingChat";
+type CommandPaletteNavigatingLabelKey = "opening" | "openingChat";
 
 export type EntityHitsBySection = Record<EntityHitSection, EntityHit[]>;
 

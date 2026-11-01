@@ -53,7 +53,7 @@ export function parseGeoWriterDraft(sourceMetadata: unknown): {
   };
 }
 
-export function isGeoWriterPlanReviewable(status: string | undefined): boolean {
+function isGeoWriterPlanReviewable(status: string | undefined): boolean {
   return status === "draft" || status === "failed";
 }
 

@@ -105,18 +105,6 @@ export function deploymentElapsedMs(
   return end - new Date(start).getTime();
 }
 
-export function isDeploymentLive(
-  deployment: SiteDeploymentRecord,
-  detail: SiteDetail
-): boolean {
-  if (deployment.kind === "production") {
-    return detail.site.liveDeploymentId === deployment.id;
-  }
-  return detail.previews.some(
-    (preview) => preview.deploymentId === deployment.id
-  );
-}
-
 export function pendingProductionDeployment(
   detail: SiteDetail,
   liveDeployment: SiteDeployment | null

@@ -81,7 +81,7 @@ export interface WorkflowRunViewNode extends Omit<
   steps: WorkflowRunViewStep[];
 }
 
-export interface WorkflowRunViewEdge extends WorkflowEdge {
+interface WorkflowRunViewEdge extends WorkflowEdge {
   taken: boolean | null;
 }
 

@@ -149,7 +149,7 @@ const LOG_LEVEL_MARKS: Record<string, string> = {
 const LOG_HIDDEN_FIELDS = new Set(["event"]);
 
 /** Decision details show the work, while the run keeps model and token details. */
-export function findingStepLabel(message: string) {
+function findingStepLabel(message: string) {
   if (/^Called .+ \(blog-draft\)$/.test(message)) {
     return "Generated a draft";
   }

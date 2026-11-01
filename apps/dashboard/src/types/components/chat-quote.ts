@@ -14,7 +14,7 @@ export interface ChatQuotePreviewProps {
   disabled?: boolean;
 }
 
-export interface ChatQuotePost {
+interface ChatQuotePost {
   postId: string;
   title: string;
 }

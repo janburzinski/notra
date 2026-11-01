@@ -9,10 +9,10 @@ import type { StoredChatPreferences } from "@notra/ai/types/chat";
 
 import { localStorageKeys } from "@/constants/storage";
 
-export const CHAT_PREFERENCES_STORAGE_KEY = localStorageKeys.chatPreferences;
+const CHAT_PREFERENCES_STORAGE_KEY = localStorageKeys.chatPreferences;
 
 /** Same-document writes don't fire `storage`, so mounted composers listen for this too. */
-export const CHAT_PREFERENCES_CHANGE_EVENT = "notra:chat-preferences-change";
+const CHAT_PREFERENCES_CHANGE_EVENT = "notra:chat-preferences-change";
 
 export const DEFAULT_CHAT_PREFERENCES: StoredChatPreferences = {
   model: "auto",

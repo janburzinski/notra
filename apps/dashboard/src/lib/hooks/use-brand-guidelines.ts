@@ -69,10 +69,7 @@ export function useBrandGuidelines(organizationId: string, voiceId: string) {
   });
 }
 
-export function useRefreshBrandGuidelines(
-  organizationId: string,
-  voiceId: string
-) {
+function useRefreshBrandGuidelines(organizationId: string, voiceId: string) {
   return useGuidelineMutation({
     mutationFn: () =>
       dashboardOrpc.brand.guidelines.refresh.call({ organizationId, voiceId }),

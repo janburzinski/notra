@@ -82,7 +82,7 @@ function isDisplayLabel(label: string): boolean {
   return /[A-Z]/.test(label) || /\s/.test(label);
 }
 
-export function resolveChartEngineId(label: string): string {
+function resolveChartEngineId(label: string): string {
   return chartLabelToEngineId(label.trim());
 }
 

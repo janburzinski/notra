@@ -62,17 +62,6 @@ function loadCopyAsPaper(): Promise<CopyAsPaper> {
   return copyAsPaperPromise;
 }
 
-/** True when the Figma/Paper chunk is already in memory for a click handler. */
-export function isImageExportCopyReady(target: ImageExportTarget): boolean {
-  if (target === "figma") {
-    return copyAsFigmaFn !== null;
-  }
-  if (target === "paper") {
-    return copyAsPaperFn !== null;
-  }
-  return isDiagramExportTarget(target);
-}
-
 /** Warm the Figma/Paper chunk on hover/focus so click keeps clipboard activation. */
 export function preloadImageExportCopy(
   target: ImageExportTarget

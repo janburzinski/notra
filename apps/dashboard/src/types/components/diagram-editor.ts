@@ -1,6 +1,6 @@
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
-export interface DiagramEditorScene {
+interface DiagramEditorScene {
   elements: Record<string, unknown>[];
   appState?: { viewBackgroundColor?: string };
 }

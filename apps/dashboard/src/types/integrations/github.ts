@@ -1,6 +1,5 @@
 import type { WebhookConfig } from "@notra/ai/types/integrations";
 import type { createOctokit } from "@notra/ai/utils/octokit";
-import type { redis } from "@notra/ai/utils/redis";
 import { Data } from "effect";
 import type React from "react";
 import type { useTranslations } from "use-intl";
@@ -43,7 +42,7 @@ export interface UseGitHubWebhookActionsOptions {
   repository: GitHubRepository | undefined;
 }
 
-export type GitHubWebhookActions = ReturnType<typeof useGitHubWebhookActions>;
+type GitHubWebhookActions = ReturnType<typeof useGitHubWebhookActions>;
 
 export interface GitHubWebhookSettingsProps {
   repository: GitHubRepository;
@@ -94,7 +93,7 @@ export class GitHubAccountConnectionIncompleteError extends Data.TaggedError(
 
 export type GitHubAccountType = "User" | "Organization";
 
-export interface GitHubAppAccount {
+interface GitHubAppAccount {
   id: string;
   installationId: string;
   login: string;
@@ -114,19 +113,7 @@ export interface GitHubAppRepository {
   defaultBranch: string;
 }
 
-export interface GitHubAccountsSectionProps {
-  accounts: GitHubAppAccount[];
-  repositories: GitHubAppRepository[];
-  selectedRepositoryIds: string[];
-  isLoading: boolean;
-  isError: boolean;
-  onConnect: () => void;
-  onRetry: () => void;
-  onOpenRepositories: (accountId: string) => void;
-  onDisconnect: (accountId: string) => void;
-}
-
-export type GitHubInstallFailureReason =
+type GitHubInstallFailureReason =
   | "account-connection-incomplete"
   | "install-start-failed";
 
@@ -513,16 +500,6 @@ export interface ClearGitHubPublishFailuresParams {
   organizationId: string;
   outputType: GitHubPublishContentType;
   repositoryId: string;
-}
-
-export type GitHubPublishFailureRedis = Pick<
-  NonNullable<typeof redis>,
-  "del" | "eval"
->;
-
-export interface GitHubPublishFailureDependencies {
-  pauseOutput?: (params: GitHubPublishOutputTarget) => Promise<boolean>;
-  redisClient: GitHubPublishFailureRedis | null;
 }
 
 export type GitHubPublishRecovery = (

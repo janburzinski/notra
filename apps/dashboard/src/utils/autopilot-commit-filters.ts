@@ -85,7 +85,7 @@ function matchesGlob(path: string, pattern: string) {
  * A plain path is a prefix ("apps/web" covers everything under it); with * or
  * ? it is a glob where * stays inside one folder and ** crosses folders.
  */
-export function matchesRepositoryPath(path: string, pattern: string) {
+function matchesRepositoryPath(path: string, pattern: string) {
   const clean = pattern.replace(/^\.?\/+/, "").replace(/\/+$/, "");
   if (!clean) {
     return true;

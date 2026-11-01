@@ -48,7 +48,7 @@ export interface GuidelinesSourcePdfSectionProps extends GuidelinesPanelProps {
   guideline: BrandGuideline | null;
 }
 
-export interface GuidelinesSectionContext {
+interface GuidelinesSectionContext {
   organizationId: string;
   voiceId: string;
 }
@@ -216,7 +216,7 @@ export interface VoiceActionsMenuProps {
   voice: BrandSettings;
 }
 
-export type VoiceMenuProps = Omit<
+type VoiceMenuProps = Omit<
   VoiceActionsMenuProps,
   "nativeButton" | "render" | "triggerClassName"
 >;
@@ -261,7 +261,7 @@ export interface BrandFormProps {
   onSavingChange?: (isSaving: boolean) => void;
 }
 
-export type BrandFormApi = ReturnType<typeof useBrandForm>;
+type BrandFormApi = ReturnType<typeof useBrandForm>;
 
 export interface CompanyProfileFieldsProps {
   form: BrandFormApi;

@@ -43,7 +43,7 @@ export interface UiRouteTitle {
   descriptionKey?: string;
 }
 
-export interface UiRouteOptions<T> {
+interface UiRouteOptions<T> {
   path: string;
   component: ComponentType<UiPageProps<NoInfer<T>>>;
   loader?: (input: UiRouteInput) => Promise<T>;

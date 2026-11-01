@@ -35,7 +35,7 @@ export type StatusWithCode =
   | { label: "failed"; code: number | null }
   | { label: "skipped"; code: number | null };
 
-export type LogDirection = "incoming" | "outgoing";
+type LogDirection = "incoming" | "outgoing";
 
 export type IntegrationType =
   | "github"
@@ -118,9 +118,3 @@ export interface WebhookLogInput {
 }
 
 export type LogRetentionDays = 7 | 14 | 30;
-
-export interface LinearWebhookPayload {
-  action: string;
-  type: string;
-  data?: Record<string, unknown>;
-}

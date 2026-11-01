@@ -16,7 +16,7 @@ import type { Trigger } from "@/types/triggers/triggers";
 
 const TIME_PATTERN = /^(\d{1,2}):(\d{2})$/;
 
-export function padTimeUnit(value: number): string {
+function padTimeUnit(value: number): string {
   return value.toString().padStart(2, "0");
 }
 

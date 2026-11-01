@@ -1,9 +1,7 @@
 import { parseAsString, parseAsStringLiteral } from "nuqs";
 
 import { sessionStorageKeys } from "@/constants/storage";
-import { isAnnualPlanId, planTierId } from "@/utils/billing-plans";
-
-export const MARKETING_ATTRIBUTION_STORAGE_KEY =
+const MARKETING_ATTRIBUTION_STORAGE_KEY =
   sessionStorageKeys.marketingAttribution;
 
 export const marketingAttributionSearchParams = {
@@ -39,17 +37,6 @@ export function readMarketingAttributionFromValues(
     landingPageH1Copy: values.landingPageH1Copy ?? undefined,
     signupMethod: normalizeSignupMethod(values.signupMethod ?? undefined),
   };
-}
-
-export function readMarketingAttributionFromSearchParams(
-  searchParams: URLSearchParams
-): MarketingAttribution {
-  return readMarketingAttributionFromValues({
-    source: searchParams.get("db_source"),
-    landingPageH1Variant: searchParams.get("db_landing_page_h1_variant"),
-    landingPageH1Copy: searchParams.get("db_landing_page_h1_copy"),
-    signupMethod: searchParams.get("signup_method"),
-  });
 }
 
 export function readMarketingAttributionFromStorage(): MarketingAttribution {
@@ -103,7 +90,7 @@ export function persistMarketingAttribution(
   return nextValue;
 }
 
-export function normalizeSignupMethod(
+function normalizeSignupMethod(
   value?: string
 ): MarketingAttribution["signupMethod"] {
   if (value === "email" || value === "google" || value === "github") {
@@ -111,14 +98,4 @@ export function normalizeSignupMethod(
   }
 
   return undefined;
-}
-
-export function getPlanSelectionMetadata(planId: string): {
-  billingPeriod: "monthly" | "yearly";
-  selectedProduct: string;
-} {
-  return {
-    billingPeriod: isAnnualPlanId(planId) ? "yearly" : "monthly",
-    selectedProduct: planTierId(planId) ?? "other",
-  };
 }

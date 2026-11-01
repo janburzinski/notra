@@ -14,7 +14,7 @@ export type HeicDecoder = {
   HeifImage: new (handle: unknown) => HeicImage;
 };
 
-export type HeicContext = { $$: { ptr: number } };
+type HeicContext = { $$: { ptr: number } };
 
 export type HeicImage = {
   get_width: () => number;

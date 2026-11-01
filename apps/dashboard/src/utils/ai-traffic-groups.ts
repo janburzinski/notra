@@ -31,7 +31,7 @@ export function trafficGroupKey(
   return `${band}:${groupKey}`;
 }
 
-export function resolveTrafficSourceBand(
+function resolveTrafficSourceBand(
   source: Pick<GeoTrafficSource, "visitorType" | "category">
 ): GeoTrafficSourceBand {
   if (source.visitorType === "ai_referral") {
@@ -43,7 +43,7 @@ export function resolveTrafficSourceBand(
   return "crawler";
 }
 
-export function resolveTrafficSourceGroup(
+function resolveTrafficSourceGroup(
   source: string,
   band: GeoTrafficSourceBand
 ): GeoTrafficSourceGroupDefinition {

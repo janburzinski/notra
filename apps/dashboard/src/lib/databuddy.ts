@@ -29,7 +29,7 @@ if (!websiteId) {
   );
 }
 
-export const databuddy =
+const databuddy =
   apiKey && websiteId
     ? new Databuddy({
         websiteId,

@@ -9,13 +9,10 @@ import type { KeyResponseData } from "@unkey/api/models/components";
 
 import type {
   API_KEY_PERMISSION_SUMMARY,
-  API_KEY_PERMISSIONS,
   API_KEY_PRESET_IDS,
 } from "@/constants/api-keys";
-
-export type ApiKeyPermission = (typeof API_KEY_PERMISSIONS)[number];
 export type ApiKeyGranularScope = (typeof API_KEY_GRANULAR_PERMISSIONS)[number];
-export type ApiKeyPresetId = (typeof API_KEY_PRESET_IDS)[number];
+type ApiKeyPresetId = (typeof API_KEY_PRESET_IDS)[number];
 export type ApiKeyExpiration = (typeof API_KEY_EXPIRATION_VALUES)[number];
 export type ApiKeyAccessMode = (typeof API_KEY_ACCESS_MODE_VALUES)[number];
 export type ApiKeyStatus = "active" | "expiringSoon" | "expired" | "disabled";
@@ -32,7 +29,7 @@ export interface ApiKeyPreset {
   expiration: ApiKeyExpiration;
 }
 
-export interface ApiKeyScopeLevel {
+interface ApiKeyScopeLevel {
   value: string;
   tone: PermissionTone;
   scopes: ApiKeyGranularScope[];

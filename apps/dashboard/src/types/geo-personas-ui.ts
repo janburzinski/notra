@@ -76,7 +76,7 @@ export interface PersonaAvatarProps {
   className?: string;
 }
 
-export interface PersonaProfileProps {
+interface PersonaProfileProps {
   persona: GeoPersona;
 }
 

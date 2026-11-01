@@ -26,19 +26,10 @@ import Link from "@/components/framework/link";
 import { useBlogPostSubtypeLabels } from "@/lib/hooks/use-blog-post-subtype-labels";
 import { usePostActions } from "@/lib/hooks/use-post-actions";
 import { cn } from "@/lib/utils";
-import type { ContentCardProps, ContentCardType } from "@/types/content/card";
+import type { ContentCardProps } from "@/types/content/card";
 import { isBlogPostSubtype } from "@/utils/content-subtype";
 import { formatSnakeCaseLabel } from "@/utils/format";
 import { OutputTypeIcon } from "@/utils/output-types";
-
-const CONTENT_TYPES = [
-  "changelog",
-  "blog_post",
-  "twitter_post",
-  "linkedin_post",
-  "investor_update",
-  "image",
-] as const satisfies readonly ContentCardType[];
 
 function getContentSubtypeLabel(
   contentSubtype: string | null | undefined,
@@ -254,5 +245,4 @@ const ContentCard = memo(function ContentCard({
   );
 });
 
-export { ContentCard, CONTENT_TYPES };
-export type { ContentCardProps, ContentCardType } from "@/types/content/card";
+export { ContentCard };

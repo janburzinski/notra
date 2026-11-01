@@ -13,7 +13,7 @@ import type { GeoRangeQuery } from "@/types/geo";
 import { downloadBlob, sanitizeDownloadFilename } from "@/utils/download";
 
 /** One row per day: human views and visitors, AI agent and AI referral visits. */
-export function trafficCsvTable(
+function trafficCsvTable(
   web: WebAnalyticsResponse | undefined,
   traffic: AiTrafficResponse | undefined,
   from?: string,
@@ -63,7 +63,7 @@ export function trafficCsvTable(
   };
 }
 
-export function trafficCsvFilename(from?: string, to?: string, path = "") {
+function trafficCsvFilename(from?: string, to?: string, path = "") {
   const page = path.replaceAll("/", " ").trim().replaceAll(" ", "-");
   const parts = ["traffic", from, to, page].filter(Boolean);
   return `${sanitizeDownloadFilename(parts.join("-")) || "traffic"}.csv`;

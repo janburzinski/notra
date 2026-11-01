@@ -4,13 +4,6 @@ import type {
 } from "@/types/integrations/github";
 
 export const GITHUB_INSTALL_STATE_TTL_SECONDS = 1800;
-
-export const GITHUB_OAUTH_SCOPES = [
-  "read:user",
-  "user:email",
-  "read:org",
-] as const;
-
 export const GITHUB_CALLBACK_ERROR_MESSAGE_KEYS: Record<
   string,
   GitHubCallbackErrorMessageKey

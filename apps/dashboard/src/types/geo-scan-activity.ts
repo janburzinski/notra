@@ -99,11 +99,11 @@ export type GeoScanPendingAnswer = NonNullable<
   ReturnType<typeof useGeoScanRun>["data"]
 >["pending"][number];
 
-export type GeoScanLivePage = NonNullable<
+type GeoScanLivePage = NonNullable<
   NonNullable<ReturnType<typeof useGeoScanRun>["data"]>["live"]
 >;
 
-export type GeoScanLiveRow = GeoScanLivePage["rows"][number];
+type GeoScanLiveRow = GeoScanLivePage["rows"][number];
 
 export interface GeoScanAnswerTableRow extends GeoScanResultSummary {
   /** Same prompt as the row above, so its text steps back. */

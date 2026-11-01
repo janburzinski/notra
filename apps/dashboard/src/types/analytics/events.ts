@@ -3,15 +3,11 @@ import type {
   BILLING_INTERVALS,
   CALLBACK_DESTINATIONS,
   ONBOARDING_STEPS,
-  PAYWALL_KINDS,
   PLAN_SURFACES,
   SUGGESTION_OUTCOMES,
 } from "@/constants/analytics-events";
 import type { BillingPlan } from "@/types/billing/plan";
-
-export type PaywallKind = (typeof PAYWALL_KINDS)[keyof typeof PAYWALL_KINDS];
-
-export type PlanSurface = (typeof PLAN_SURFACES)[keyof typeof PLAN_SURFACES];
+type PlanSurface = (typeof PLAN_SURFACES)[keyof typeof PLAN_SURFACES];
 
 export type BillingInterval =
   (typeof BILLING_INTERVALS)[keyof typeof BILLING_INTERVALS];
@@ -41,11 +37,6 @@ export interface OnboardingStepViewTrackerProps {
 
 export interface LoginErrorTrackerProps {
   errorCode: string;
-}
-
-export interface PaywallShownTrackerProps {
-  kind: PaywallKind;
-  route?: string | null;
 }
 
 export interface PlanSelectedInput {

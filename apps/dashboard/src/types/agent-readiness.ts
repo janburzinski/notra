@@ -35,7 +35,7 @@ export interface AgentReadinessChangesCardProps {
   comparison: AgentReadinessComparison | null;
 }
 
-export type AgentReadinessChangeKind =
+type AgentReadinessChangeKind =
   (typeof AGENT_READINESS_CHANGE_ROW_ORDER)[number];
 
 export interface AgentReadinessChangeRow {

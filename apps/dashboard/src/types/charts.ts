@@ -5,7 +5,7 @@ export interface ChartColorPair {
   dark: string;
 }
 
-export type AtLeastOneThemeColor =
+type AtLeastOneThemeColor =
   | { light: string[]; dark?: string[] }
   | { light?: string[]; dark: string[] };
 
@@ -50,10 +50,6 @@ export interface SparklinePathInput {
 export interface ChartMarker {
   value: string;
   label: string;
-}
-
-export interface GridProps {
-  lineType?: "solid" | "dashed";
 }
 
 export type TooltipLayout = "rows" | "bars" | "activity";

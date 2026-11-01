@@ -68,9 +68,6 @@ export const INVOICE_PRODUCT_NAME_FALLBACKS: Record<string, string> = {
   [LEGACY_PLANS.PRO]: "Pro",
   [LEGACY_PLANS.PRO_YEARLY]: "Pro",
 };
-
-export const INVOICE_TABLE_COLUMN_COUNT = 4;
-
 export const BILLING_PLAN_SKELETON_KEYS = [
   PLANS.STARTER,
   PLANS.GROWTH,

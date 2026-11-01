@@ -5,9 +5,6 @@ import type {
   AgentFeedbackStatus,
 } from "@notra/db/types/agent-feedback";
 import type { ReactNode } from "react";
-
-import type { AuthenticatedUser } from "@/types/auth/organization";
-
 export type AgentFeedbackClientBrand =
   | "claude"
   | "cursor"
@@ -134,10 +131,6 @@ export interface AgentFeedbackDetailDialogProps {
   isUpdating: boolean;
 }
 
-export interface AgentFeedbackSetupCardProps {
-  organizationId: string;
-}
-
 export interface AgentFeedbackStatusBadgeProps {
   status: AgentFeedbackStatus;
   showLabel?: boolean;
@@ -168,11 +161,6 @@ export interface AgentFeedbackStatusIconProps {
 
 export interface AgentFeedbackPageClientProps {
   organizationSlug: string;
-}
-
-export interface AgentFeedbackHandlerOptions<TInput> {
-  context: { headers: Headers; user?: AuthenticatedUser };
-  input: TInput;
 }
 
 export interface AgentFeedbackUpdateStatusInput {

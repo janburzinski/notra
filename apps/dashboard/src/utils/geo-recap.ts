@@ -151,9 +151,7 @@ function rate(stats: GeoRecapPeriodStats) {
   return stats.checks === 0 ? 0 : stats.mentions / stats.checks;
 }
 
-export function classifyPairChange(
-  pair: GeoRecapPair
-): GeoRecapPairChange | null {
+function classifyPairChange(pair: GeoRecapPair): GeoRecapPairChange | null {
   const before = rate(pair.previous);
   const after = rate(pair.current);
   const swing = after - before;

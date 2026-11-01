@@ -7,7 +7,7 @@ import type { SiteScope } from "@/types/sites";
 export type SiteBranchStatus = Awaited<
   ReturnType<typeof dashboardOrpc.sites.branches.status.call>
 >;
-export type SiteBranchEntry = Awaited<
+type SiteBranchEntry = Awaited<
   ReturnType<typeof dashboardOrpc.sites.branches.list.call>
 >[number];
 
@@ -25,7 +25,7 @@ export interface SiteBranchControlsProps extends SiteScope {
   onSave: () => Promise<void>;
 }
 
-export type SiteBranchController = ReturnType<
+type SiteBranchController = ReturnType<
   typeof import("@/lib/hooks/use-site-branch-controls").useSiteBranchControls
 >;
 

@@ -30,7 +30,7 @@ export type ContentSitePreviewProps = Pick<
   "contentId" | "document" | "organizationId"
 >;
 
-export type PostSitePreviewModel = ReturnType<typeof usePostSitePreview>;
+type PostSitePreviewModel = ReturnType<typeof usePostSitePreview>;
 
 export interface PostSitePreviewSectionProps {
   model: PostSitePreviewModel;

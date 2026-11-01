@@ -1,6 +1,6 @@
 import type { WELCOME_TOUR_STEPS } from "@/constants/welcome-tour";
 
-export type WelcomeTourStep = (typeof WELCOME_TOUR_STEPS)[number];
+type WelcomeTourStep = (typeof WELCOME_TOUR_STEPS)[number];
 
 export interface WelcomeTourProps {
   brandName?: string;

@@ -4,8 +4,6 @@ import type {
   BrandGuidelineToken,
   BrandGuidelineTokenType,
 } from "@/types/hooks/brand-guidelines";
-
-const HTTP_URL_REGEX = /^https?:\/\//i;
 const HEX6_REGEX = /^#[0-9a-f]{6}$/i;
 const HEX3_REGEX = /^#[0-9a-f]{3}$/i;
 
@@ -30,17 +28,6 @@ export function formatDimensions(
     return `${width}×${height}`;
   }
   return null;
-}
-
-export function isSvgAsset(asset: {
-  format: string | null;
-  mimeType: string | null;
-}): boolean {
-  return asset.format === "svg" || asset.mimeType === "image/svg+xml";
-}
-
-export function isSafeHttpUrl(url: string): boolean {
-  return HTTP_URL_REGEX.test(url);
 }
 
 export function joinMeta(

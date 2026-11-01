@@ -17,8 +17,6 @@ import {
 import { aiSearchGroupKey } from "@notra/geo-core/utils/geo-gaps";
 
 import type {
-  GeoGapLift,
-  GeoGapLiftTone,
   GeoGapsEmptyKind,
   GeoGapsMeterTone,
   GeoGapsTab,
@@ -124,7 +122,7 @@ export function isGeoGapsTab(value: unknown): value is GeoGapsTab {
 }
 
 /** Map 0–1 intensity onto a 1–5 inspo-style meter (empty when intensity is 0). */
-export function gapMeterLevel(
+function gapMeterLevel(
   intensity: number,
   steps = GEO_GAPS_METER_STEPS
 ): number {
@@ -194,32 +192,6 @@ export function gapWriteAction(
 
 export function gapCanRescan(brief: GeoGapBriefRef | null): boolean {
   return brief?.status === "completed" && brief.postId !== null;
-}
-
-export function gapLift(row: GeoPromptGapRow): GeoGapLift | null {
-  const baseline = row.brief?.baseline;
-  if (!baseline) {
-    return null;
-  }
-  const after = row.mentionedEngines.length;
-  const total = after + row.engines.length;
-  return {
-    before: baseline.mentionedEngines,
-    baselineTotal: baseline.totalEngines,
-    after,
-    total,
-    delta: after - baseline.mentionedEngines,
-  };
-}
-
-export function gapLiftTone(delta: number): GeoGapLiftTone {
-  if (delta > 0) {
-    return "up";
-  }
-  if (delta < 0) {
-    return "down";
-  }
-  return "flat";
 }
 
 export function existingPageLabel(url: string): string {

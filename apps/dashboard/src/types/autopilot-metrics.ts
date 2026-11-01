@@ -88,7 +88,7 @@ export interface AutopilotAnalyticsSummary {
   credits: number;
 }
 
-export interface AutopilotAnalyticsDay {
+interface AutopilotAnalyticsDay {
   /** YYYY-MM-DD, UTC. */
   day: string;
   opened: number;

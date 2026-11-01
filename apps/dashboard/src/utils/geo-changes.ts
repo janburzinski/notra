@@ -13,7 +13,7 @@ export function geoChangeEngineLabel(engine: string): string {
   return engineFamilyLabel(engineFamilyOf(engine));
 }
 
-export function describeGeoChangeState(
+function describeGeoChangeState(
   state: GeoChangeCheckState | null
 ): GeoChangeStateLabel {
   if (!state) {

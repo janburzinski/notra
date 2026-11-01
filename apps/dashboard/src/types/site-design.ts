@@ -22,9 +22,9 @@ export type SiteBackgroundDecoration =
 export type SiteCodeThemeMode = (typeof SITE_CODE_THEME_MODES)[number];
 export type SiteFontWeight = (typeof SITE_FONT_WEIGHTS)[number];
 export type SiteFontFormat = (typeof SITE_FONT_FORMATS)[number];
-export type SiteTypographyMode = (typeof SITE_TYPOGRAPHY_MODES)[number];
-export type SiteBannerType = (typeof SITE_BANNER_TYPES)[number];
-export type SiteSeoIndexing = (typeof SITE_SEO_INDEXING_MODES)[number];
+type SiteTypographyMode = (typeof SITE_TYPOGRAPHY_MODES)[number];
+type SiteBannerType = (typeof SITE_BANNER_TYPES)[number];
+type SiteSeoIndexing = (typeof SITE_SEO_INDEXING_MODES)[number];
 export type SiteSocialPlatform = (typeof SITE_SOCIAL_PLATFORMS)[number];
 export type SiteNavbarButton =
   | "none"
@@ -203,12 +203,7 @@ export interface SiteOptionSelectProps<T extends string> {
   describe?: (value: T) => string;
 }
 
-export type SiteBrandField =
-  | "primary"
-  | "logoLight"
-  | "logoDark"
-  | "heading"
-  | "body";
+type SiteBrandField = "primary" | "logoLight" | "logoDark" | "heading" | "body";
 
 export interface SiteBrandChange {
   field: SiteBrandField;
@@ -242,7 +237,7 @@ export interface SiteMiniPageProps {
   className?: string;
 }
 
-export type SiteDesignPreviewTone = "light" | "dark";
+type SiteDesignPreviewTone = "light" | "dark";
 
 export interface SiteSocialLinkMeta {
   label: string;

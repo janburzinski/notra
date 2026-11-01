@@ -50,7 +50,7 @@ export const GEO_DIRECTIONS_POSITION_CLASS: Record<string, string> = {
   low: "border-border bg-muted text-muted-foreground",
 };
 
-export const GEO_DIRECTIONS_ENGINE_SCANS: readonly GeoDirectionEngineRow[] = [
+const GEO_DIRECTIONS_ENGINE_SCANS: readonly GeoDirectionEngineRow[] = [
   {
     engine: "openai/gpt-5.4-grounded",
     label: "ChatGPT",
@@ -101,7 +101,7 @@ export const GEO_DIRECTIONS_OVERVIEW_ENGINES = buildDirectionOverviewEngines(
 export const GEO_DIRECTIONS_ENGINES: readonly GeoDirectionEngineRow[] =
   groupDirectionEngineRows(GEO_DIRECTIONS_ENGINE_SCANS);
 
-export const GEO_DIRECTIONS_TREND_DAYS: readonly string[] = [
+const GEO_DIRECTIONS_TREND_DAYS: readonly string[] = [
   "2026-07-24",
   "2026-07-25",
   "2026-07-26",
@@ -120,7 +120,7 @@ export const GEO_DIRECTIONS_GROUNDED_SERIES: readonly number[] = [
   44, 47, 45, 51, 53, 50, 56, 58, 57, 61, 64, 71,
 ];
 
-export const GEO_DIRECTIONS_TRAINING_SERIES: readonly number[] = [
+const GEO_DIRECTIONS_TRAINING_SERIES: readonly number[] = [
   30, 32, 31, 35, 34, 37, 39, 38, 42, 44, 43, 48,
 ];
 
@@ -355,9 +355,3 @@ export const GEO_DIRECTIONS_JOURNEYS: readonly GeoJourney[] = [
     samplePaths: ["/blog/geo-guide", "/changelog"],
   },
 ];
-
-export const DIRECTION_TABLE_HEADER_CLASS =
-  "bg-transparent [&_th]:h-8 [&_th]:px-2 [&_th]:font-medium [&_th]:text-muted-foreground [&_th]:text-xs";
-
-export const DIRECTION_TABLE_BODY_CLASS =
-  "[&>tr>td]:bg-transparent [&>tr>td]:px-2 [&>tr>td]:py-2.5 [&_tr:first-child>td]:shadow-none [&_tr:first-child>td:first-child]:rounded-tl-none [&_tr:first-child>td:last-child]:rounded-tr-none";

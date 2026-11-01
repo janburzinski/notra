@@ -1,4 +1,4 @@
-export interface SyncedSkillText {
+interface SyncedSkillText {
   description: string;
   content: string;
 }

@@ -4,23 +4,18 @@ import type {
   WORKFLOW_ANALYTICS_NAMES,
   WORKFLOW_FAILURE_CLASSIFICATIONS,
   WORKFLOW_OUTCOMES,
-  WORKFLOW_TRIGGERS,
 } from "@/constants/workflow-analytics";
 
 export type WorkflowAnalyticsName =
   (typeof WORKFLOW_ANALYTICS_NAMES)[keyof typeof WORKFLOW_ANALYTICS_NAMES];
-
-export type WorkflowTrigger =
-  (typeof WORKFLOW_TRIGGERS)[keyof typeof WORKFLOW_TRIGGERS];
-
-export type WorkflowOutcome =
+type WorkflowOutcome =
   (typeof WORKFLOW_OUTCOMES)[keyof typeof WORKFLOW_OUTCOMES];
 
-export type WorkflowFailureClassification =
+type WorkflowFailureClassification =
   (typeof WORKFLOW_FAILURE_CLASSIFICATIONS)[keyof typeof WORKFLOW_FAILURE_CLASSIFICATIONS];
 
 /** Booleans and counts only, so diagnostics can never carry user content. */
-export type WorkflowFailureDiagnostics = Record<string, boolean | number>;
+type WorkflowFailureDiagnostics = Record<string, boolean | number>;
 
 export interface WorkflowFailureDetail {
   reason?: string;

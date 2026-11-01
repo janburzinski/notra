@@ -18,7 +18,6 @@ import type { IconSvgElement } from "@hugeicons/react";
 import { TABLE_BODY_CLASS } from "ui/table/constants";
 
 import type {
-  SiteDeploymentFilters,
   SiteDeploymentKind,
   SiteDeploymentStatus,
   SiteDeploymentTrigger,
@@ -83,9 +82,6 @@ export const POST_PREVIEW_LIFETIME_OPTIONS = ["1h", "1d", "3d", "7d"] as const;
 
 export const SITE_DEFAULT_BLOG_PATH = "/blog";
 export const SITE_DEFAULT_CHANGELOG_PATH = "/changelog";
-
-export const SITE_CONFIG_FILENAME = "blog.json";
-
 export const SITE_PROXY_RECIPES = [
   "vercel",
   "next",
@@ -210,12 +206,6 @@ export const SITE_BUILD_LOG_ROW_GRID =
 export const SITE_BUILD_LOG_FRAME_FOLD_MIN = 3;
 export const SITE_BUILD_LOG_NOISE_FOLD_MIN = 6;
 export const SITE_BUILD_LOG_NOISE_KEEP = 2;
-
-export const SITE_DEPLOYMENT_NO_FILTERS: SiteDeploymentFilters = {
-  environment: "all",
-  status: "all",
-};
-
 export const SITE_DOMAIN_URL_SCHEME_PATTERN = /^https?:\/\//i;
 
 export const SITE_CLOUDFLARE_PROVIDER_PATTERN = /cloudflare/i;

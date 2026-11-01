@@ -27,7 +27,7 @@ function subsequenceScore(haystack: string, needle: string): number {
   return FUZZY_SUBSEQUENCE_BASE * (1 - penalty) + density * 0.2;
 }
 
-export function fuzzyScore(value: string, query: string): number {
+function fuzzyScore(value: string, query: string): number {
   const haystack = value.trim().toLowerCase();
   const needle = query.trim().toLowerCase();
   if (needle.length === 0) {

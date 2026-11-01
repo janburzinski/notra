@@ -277,7 +277,7 @@ export interface AutopilotRepositoryPickerProps {
   placeholder?: string;
 }
 
-export type AutopilotSetupState = ReturnType<typeof useAutopilotSetup>;
+type AutopilotSetupState = ReturnType<typeof useAutopilotSetup>;
 
 export interface AutopilotSetupRowsProps {
   setup: AutopilotSetupState;
@@ -406,7 +406,7 @@ export type AutopilotTranscriptStepKind =
   | "other";
 
 /** One line of a run read as an agent turn; consecutive reads fold into one. */
-export type AutopilotTranscriptStep =
+type AutopilotTranscriptStep =
   | { type: "reads"; id: string; targets: string[] }
   | { type: "lookups"; id: string; queries: string[] }
   | {

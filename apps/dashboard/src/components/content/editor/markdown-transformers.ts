@@ -37,7 +37,7 @@ import {
   KiboCodeBlockNode,
 } from "./nodes/kibo-code-block-node";
 
-export const CONTENT_IMAGE: ElementTransformer = {
+const CONTENT_IMAGE: ElementTransformer = {
   dependencies: [ContentImageNode],
   export: (node) => {
     if (!$isContentImageNode(node)) {
@@ -74,7 +74,7 @@ export const CONTENT_IMAGE: ElementTransformer = {
   type: "element",
 };
 
-export const CONTENT_VIDEO: ElementTransformer = {
+const CONTENT_VIDEO: ElementTransformer = {
   dependencies: [ContentVideoNode],
   export: (node) => {
     if (!$isContentVideoNode(node)) {
@@ -104,7 +104,7 @@ export const CONTENT_VIDEO: ElementTransformer = {
   type: "element",
 };
 
-export const HORIZONTAL_RULE: ElementTransformer = {
+const HORIZONTAL_RULE: ElementTransformer = {
   dependencies: [HorizontalRuleNode],
   export: (node) => {
     return $isHorizontalRuleNode(node) ? "---" : null;
@@ -122,7 +122,7 @@ export const HORIZONTAL_RULE: ElementTransformer = {
   type: "element",
 };
 
-export const KIBO_CODE_BLOCK: MultilineElementTransformer = {
+const KIBO_CODE_BLOCK: MultilineElementTransformer = {
   dependencies: [KiboCodeBlockNode],
   export: (node) => {
     if (!$isKiboCodeBlockNode(node)) {
@@ -247,7 +247,7 @@ function buildTableNode(
   return tableNode;
 }
 
-export const TABLE_MARKDOWN: MultilineElementTransformer = {
+const TABLE_MARKDOWN: MultilineElementTransformer = {
   dependencies: [TableNode, TableRowNode, TableCellNode],
   export: (node) => {
     if (!$isTableNode(node)) {

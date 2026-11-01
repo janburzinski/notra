@@ -44,7 +44,7 @@ export interface StartSelfServeOnboardingAgentInput {
   organizationId: string;
 }
 
-export type SelfServeOnboardingAgentBlockedReason =
+type SelfServeOnboardingAgentBlockedReason =
   | "already-ran"
   | "already-running"
   | "no-company-domain"
