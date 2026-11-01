@@ -110,9 +110,9 @@ export async function getMcpOAuthRequestAuth(
       Date.now() - stored.credential.updatedAt.getTime() <
         MCP_OAUTH_REFRESH_RETRY_DELAY_MS
     ) {
-      throw new McpOAuthAuthorizationError(
-        "OAuth token refresh is temporarily unavailable."
-      );
+      throw new McpOAuthAuthorizationError({
+        message: "OAuth token refresh is temporarily unavailable.",
+      });
     }
     return refreshMcpOAuthRequestAuth({
       organizationId,
@@ -375,9 +375,9 @@ async function waitForMcpOAuthRefresh(
     }
     if (stored.credential.status !== "refreshing") {
       if (isMcpAccessTokenExpiring(stored.credential.accessTokenRefreshAt)) {
-        throw new McpOAuthAuthorizationError(
-          "OAuth token refresh did not complete."
-        );
+        throw new McpOAuthAuthorizationError({
+          message: "OAuth token refresh did not complete.",
+        });
       }
       const tokens = decryptMcpOAuthSecret(
         stored.credential.encryptedTokens,
@@ -399,7 +399,9 @@ async function waitForMcpOAuthRefresh(
       });
     }
   }
-  throw new McpOAuthAuthorizationError("OAuth token refresh timed out.");
+  throw new McpOAuthAuthorizationError({
+    message: "OAuth token refresh timed out.",
+  });
 }
 
 async function markMcpOAuthReauthorizationRequired(

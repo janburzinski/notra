@@ -84,9 +84,9 @@ async function assertOrganizationMember(
   userId: string
 ) {
   if (!(await hasOrganizationAccess(userId, organizationId))) {
-    throw new McpOAuthAuthorizationError(
-      "You do not have access to this organization."
-    );
+    throw new McpOAuthAuthorizationError({
+      message: "You do not have access to this organization.",
+    });
   }
 }
 
@@ -131,14 +131,14 @@ async function beginMcpOAuthAuthorizationPromise(
   const expiresAt = new Date(Date.now() + MCP_OAUTH_PENDING_TTL_MS);
 
   if (params.serverIntegrationId && !existingIntegration) {
-    throw new McpOAuthAuthorizationError(
-      "The MCP OAuth connection could not be found."
-    );
+    throw new McpOAuthAuthorizationError({
+      message: "The MCP OAuth connection could not be found.",
+    });
   }
   if (params.serverIntegrationId && existingIntegration?.authType !== "oauth") {
-    throw new McpOAuthAuthorizationError(
-      "This MCP integration does not use OAuth."
-    );
+    throw new McpOAuthAuthorizationError({
+      message: "This MCP integration does not use OAuth.",
+    });
   }
   if (existingName) {
     throw new McpOAuthNameConflictError();
@@ -190,9 +190,10 @@ async function beginMcpOAuthAuthorizationPromise(
     }
     if (!clientInformation) {
       if (!configuration.authorizationServerMetadata.registration_endpoint) {
-        throw new McpOAuthAuthorizationError(
-          "This MCP server does not support dynamic OAuth client registration."
-        );
+        throw new McpOAuthAuthorizationError({
+          message:
+            "This MCP server does not support dynamic OAuth client registration.",
+        });
       }
       clientInformation = await registerClient(
         configuration.authorizationServerUrl,
@@ -241,10 +242,10 @@ async function beginMcpOAuthAuthorizationPromise(
     ) {
       throw error;
     }
-    throw new McpOAuthAuthorizationError(
-      "Could not start MCP OAuth authorization.",
-      error
-    );
+    throw new McpOAuthAuthorizationError({
+      message: "Could not start MCP OAuth authorization.",
+      cause: error,
+    });
   }
 }
 
@@ -262,9 +263,10 @@ async function completeMcpOAuthAuthorizationPromise(
   });
 
   if (!pending || pending.userId !== params.userId) {
-    throw new McpOAuthAuthorizationError(
-      "This MCP OAuth authorization request is invalid or has expired."
-    );
+    throw new McpOAuthAuthorizationError({
+      message:
+        "This MCP OAuth authorization request is invalid or has expired.",
+    });
   }
 
   await assertOrganizationMember(pending.organizationId, params.userId);
@@ -280,9 +282,9 @@ async function completeMcpOAuthAuthorizationPromise(
       })
     : null;
   if (pending.storeSourceIntegrationId && !storeSourceIntegration) {
-    throw new McpOAuthAuthorizationError(
-      "This MCP store integration is no longer available."
-    );
+    throw new McpOAuthAuthorizationError({
+      message: "This MCP store integration is no longer available.",
+    });
   }
 
   const codeVerifier = decryptMcpOAuthSecret(
@@ -299,9 +301,10 @@ async function completeMcpOAuthAuthorizationPromise(
   );
 
   if (!(codeVerifier && clientInformation && storedAuthorizationServer)) {
-    throw new McpOAuthAuthorizationError(
-      "The MCP OAuth authorization request is incomplete or has expired."
-    );
+    throw new McpOAuthAuthorizationError({
+      message:
+        "The MCP OAuth authorization request is incomplete or has expired.",
+    });
   }
   const configuration = await restoreMcpOAuthServerConfiguration(
     pending.url,
@@ -421,7 +424,10 @@ function normalizeMcpOAuthEffectError(cause: unknown) {
   ) {
     return cause;
   }
-  return new McpOAuthAuthorizationError("The MCP OAuth request failed.", cause);
+  return new McpOAuthAuthorizationError({
+    message: "The MCP OAuth request failed.",
+    cause,
+  });
 }
 
 export const beginMcpOAuthAuthorization = Effect.fn(

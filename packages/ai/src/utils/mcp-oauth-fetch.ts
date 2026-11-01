@@ -8,7 +8,9 @@ export async function publicMcpOAuthFetch(
 ) {
   const url = input instanceof Request ? input.url : input.toString();
   if (URL.parse(url)?.protocol !== "https:") {
-    throw new McpOAuthAuthorizationError("OAuth endpoints must use HTTPS.");
+    throw new McpOAuthAuthorizationError({
+      message: "OAuth endpoints must use HTTPS.",
+    });
   }
   return fetchPublicMcpUrl(input, init, MCP_OAUTH_FETCH_TIMEOUT_MS);
 }
