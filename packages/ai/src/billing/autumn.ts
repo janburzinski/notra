@@ -15,7 +15,10 @@ interface AutumnClient {
   check: Autumn["check"];
   track: Autumn["track"];
   customers: Pick<Autumn["customers"], "getOrCreate" | "update" | "delete">;
-  balances: Pick<Autumn["balances"], "finalize">;
+  balances: Pick<
+    Autumn["balances"],
+    "create" | "update" | "delete" | "finalize"
+  >;
 }
 
 function createLazyAutumn(secretKey: string): AutumnClient {
@@ -36,6 +39,9 @@ function createLazyAutumn(secretKey: string): AutumnClient {
       delete: async (...args) => (await load()).customers.delete(...args),
     },
     balances: {
+      create: async (...args) => (await load()).balances.create(...args),
+      update: async (...args) => (await load()).balances.update(...args),
+      delete: async (...args) => (await load()).balances.delete(...args),
       finalize: async (...args) => (await load()).balances.finalize(...args),
     },
   };

@@ -3,6 +3,7 @@
 import {
   AiSearch02Icon,
   ChartLineData01Icon,
+  GiftIcon,
   GlobeIcon,
   Logout01Icon,
   PlugSocketIcon,
@@ -203,6 +204,11 @@ function ConsoleNavigation({
             icon: GlobeIcon,
           },
           { href: `/${slug}/autopilot`, label: "Autopilot", icon: Robot01Icon },
+          {
+            href: `/${slug}/free-scans`,
+            label: "Free Scans",
+            icon: GiftIcon,
+          },
           {
             href: `/${slug}/skills`,
             label: "System Skills",

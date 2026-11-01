@@ -315,6 +315,7 @@ import {
 } from "@/lib/geo-shelf/service";
 import { assertGeoAccess } from "@/lib/geo/access";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
+import { startFreeGeoScan } from "@/lib/geo/free-scan";
 import {
   getPersonaGeneration,
   startPersonaGeneration,
@@ -1840,6 +1841,17 @@ export const geoRouter = {
       }
     )
   ),
+  startFreeScan: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(async ({ context, input }) => {
+      await assertOrganizationAccess(accessParams({ context, input }));
+      return runOrpcEffect(
+        startFreeGeoScan(input, context.user).pipe(
+          Effect.provide(geoCoreDashboardLayer)
+        ),
+        toGeoOrpcError
+      );
+    }),
   rescanPrompt: authorizedProcedure
     .input(geoPromptRescanInputSchema)
     .handler(geoHandler((input) => startGeoPromptRescan(input))),

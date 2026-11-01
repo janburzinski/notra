@@ -115,6 +115,7 @@ export async function reserveContentBilling(
     });
 
     if (quota.duplicateLock || quota.response?.allowed) {
+      const balance = quota.response?.balance;
       return {
         allowed: true,
         mode: "plan_quota",
@@ -122,6 +123,10 @@ export async function reserveContentBilling(
         reserved: quotaLockId !== null,
         lockId: quotaLockId,
         useMarkup: false,
+        balanceRemaining:
+          balance && !balance.unlimited && !balance.overageAllowed
+            ? balance.remaining
+            : null,
       };
     }
 

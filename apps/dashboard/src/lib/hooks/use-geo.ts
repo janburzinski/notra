@@ -76,6 +76,7 @@ import {
   trackFirstScanStarted,
 } from "@/lib/analytics/first-scan";
 import { trackEvent } from "@/lib/analytics/posthog-client";
+import { emitAutumnRefresh } from "@/lib/billing/autumn-refresh";
 import { geoDbOrgQueryKey, geoDbQueryKey } from "@/lib/db/geo-collections";
 import { usePathname, useRouter, useSearchParams } from "@/lib/navigation";
 import type { GeoScanTrigger } from "@/types/analytics/geo-events";
@@ -895,6 +896,28 @@ export function useGeoStartScan(organizationId: string) {
     },
     onError: (error) => {
       toast.error(toErrorMessage(error, tToast("startScanFailed")));
+    },
+  });
+}
+
+export function useGeoStartFreeScan(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: geoStartScanMutationKey(organizationId, projectId),
+    mutationFn: () =>
+      dashboardOrpc.geo.startFreeScan.call({ organizationId, projectId }),
+    onSuccess: async (result) => {
+      if (!result.started) {
+        return;
+      }
+      trackFirstScanStarted("onboarding");
+      emitAutumnRefresh();
+      await refreshSettingsAfterScanStart(
+        queryClient,
+        organizationId,
+        projectId
+      );
     },
   });
 }

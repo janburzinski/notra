@@ -2179,7 +2179,8 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
   input: GeoScopeInput,
   promptIds?: readonly string[],
   engines?: readonly string[],
-  manual = false
+  manual = false,
+  freeScan = false
 ) {
   const scope = yield* requireGeoProject(input);
   const projectId = scope.projectId;
@@ -2231,7 +2232,8 @@ export const startGeoScanScoped = Effect.fn("geo.startScanScoped")(function* (
     claim.claimedAt,
     promptIds,
     engines,
-    manualScope
+    manualScope,
+    freeScan
   );
 });
 

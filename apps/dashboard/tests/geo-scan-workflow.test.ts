@@ -87,6 +87,7 @@ mock.module("../src/workflows/steps/geo-scan-steps", () => ({
   renewGeoScanClaimStep: renewClaim,
   finalizeGeoScanProjectStep: finalize,
   trackGeoScanRetryScheduledStep: trackRetry,
+  revokeFreeScanBalanceStep: mock(async () => undefined),
   submitGeoOlostepBatchesStep: submitOlostep,
   pendingGeoOlostepBatchesStep: pendingOlostep,
   collectGeoOlostepResultsStep: collectOlostep,

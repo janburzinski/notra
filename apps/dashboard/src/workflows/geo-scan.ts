@@ -57,6 +57,7 @@ import {
   pendingGeoOlostepBatchesStep,
   prepareGeoScanProjectStep,
   renewGeoScanClaimStep,
+  revokeFreeScanBalanceStep,
   runGeoScanPersonaBatchStep,
   runGeoScanSequenceBatchStep,
   runGeoScanTaskBatchStep,
@@ -536,6 +537,18 @@ export async function geoScanWorkflow(
 ): Promise<GeoScanResult> {
   "use workflow";
 
+  try {
+    return await runGeoScanWorkflow(payload);
+  } finally {
+    if (payload.freeScan) {
+      await revokeFreeScanBalanceStep(payload.organizationId);
+    }
+  }
+}
+
+async function runGeoScanWorkflow(
+  payload: GeoScanPayload
+): Promise<GeoScanResult> {
   const startedAt = Date.now();
   const parseResult = geoScanWorkflowPayloadSchema.safeParse(payload);
   if (!parseResult.success) {

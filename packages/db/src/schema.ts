@@ -403,6 +403,22 @@ export const organizations = pgTable("organizations", {
   workosOrgId: text("workos_org_id").unique(),
 });
 
+export const freeScanClaims = pgTable(
+  "free_scan_claims",
+  {
+    domain: text("domain").primaryKey(),
+    promptLimit: integer("prompt_limit").notNull().default(15),
+    organizationId: text("organization_id").references(() => organizations.id, {
+      onDelete: "set null",
+    }),
+    claimedAt: timestamp("claimed_at"),
+    revokedAt: timestamp("revoked_at"),
+  },
+  (table) => [
+    index("freeScanClaims_organizationId_idx").on(table.organizationId),
+  ]
+);
+
 export const members = pgTable(
   "members",
   {

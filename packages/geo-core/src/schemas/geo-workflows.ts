@@ -32,6 +32,7 @@ export const geoScanWorkflowPayloadSchema = geoOrganizationInputSchema
       .max(GEO_MAX_ENGINES)
       .optional(),
     manual: boolean().optional(),
+    freeScan: boolean().optional(),
   })
   .refine(
     (value) =>

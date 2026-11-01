@@ -427,6 +427,7 @@ export interface GeoScanPayload {
   scanId?: string;
   promptIds?: string[];
   engines?: string[];
+  freeScan?: boolean;
 }
 
 export interface GeoGenerateFromWebsiteInput {

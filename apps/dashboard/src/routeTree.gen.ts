@@ -75,6 +75,7 @@ import { Route as ApiInternalContentDraftPullRequestRouteImport } from './routes
 import { Route as ApiInternalContentPreviewRouteImport } from './routes/api.internal.content.preview'
 import { Route as ApiInternalContentScheduledPublicationAttemptRouteImport } from './routes/api.internal.content.scheduled-publication-attempt'
 import { Route as ApiInternalContentSyncGithubRouteImport } from './routes/api.internal.content.sync-github'
+import { Route as ApiInternalGeoFreeScanRouteImport } from './routes/api.internal.geo.free-scan'
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
 import { Route as ApiInternalGeoWriterPlanRouteImport } from './routes/api.internal.geo.writer-plan'
 import { Route as ApiInternalSitesAdminRouteImport } from './routes/api.internal.sites.admin'
@@ -457,6 +458,11 @@ const ApiInternalContentSyncGithubRoute =
     path: '/api/internal/content/sync-github',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalGeoFreeScanRoute = ApiInternalGeoFreeScanRouteImport.update({
+  id: '/api/internal/geo/free-scan',
+  path: '/api/internal/geo/free-scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiInternalGeoSequenceRunRoute =
   ApiInternalGeoSequenceRunRouteImport.update({
     id: '/api/internal/geo/sequence-run',
@@ -674,6 +680,7 @@ export interface FileRoutesByFullPath {
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
+  '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -767,6 +774,7 @@ export interface FileRoutesByTo {
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
+  '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -861,6 +869,7 @@ export interface FileRoutesById {
   '/api/internal/content/preview': typeof ApiInternalContentPreviewRoute
   '/api/internal/content/scheduled-publication-attempt': typeof ApiInternalContentScheduledPublicationAttemptRoute
   '/api/internal/content/sync-github': typeof ApiInternalContentSyncGithubRoute
+  '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -956,6 +965,7 @@ export interface FileRouteTypes {
     | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
+    | '/api/internal/geo/free-scan'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1049,6 +1059,7 @@ export interface FileRouteTypes {
     | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
+    | '/api/internal/geo/free-scan'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1142,6 +1153,7 @@ export interface FileRouteTypes {
     | '/api/internal/content/preview'
     | '/api/internal/content/scheduled-publication-attempt'
     | '/api/internal/content/sync-github'
+    | '/api/internal/geo/free-scan'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1230,6 +1242,7 @@ export interface RootRouteChildren {
   ApiInternalContentPreviewRoute: typeof ApiInternalContentPreviewRoute
   ApiInternalContentScheduledPublicationAttemptRoute: typeof ApiInternalContentScheduledPublicationAttemptRoute
   ApiInternalContentSyncGithubRoute: typeof ApiInternalContentSyncGithubRoute
+  ApiInternalGeoFreeScanRoute: typeof ApiInternalGeoFreeScanRoute
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
   ApiInternalGeoWriterPlanRoute: typeof ApiInternalGeoWriterPlanRoute
   ApiInternalSitesAdminRoute: typeof ApiInternalSitesAdminRoute
@@ -1714,6 +1727,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalContentSyncGithubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/geo/free-scan': {
+      id: '/api/internal/geo/free-scan'
+      path: '/api/internal/geo/free-scan'
+      fullPath: '/api/internal/geo/free-scan'
+      preLoaderRoute: typeof ApiInternalGeoFreeScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/geo/sequence-run': {
       id: '/api/internal/geo/sequence-run'
       path: '/api/internal/geo/sequence-run'
@@ -2062,6 +2082,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalContentScheduledPublicationAttemptRoute:
     ApiInternalContentScheduledPublicationAttemptRoute,
   ApiInternalContentSyncGithubRoute: ApiInternalContentSyncGithubRoute,
+  ApiInternalGeoFreeScanRoute: ApiInternalGeoFreeScanRoute,
   ApiInternalGeoSequenceRunRoute: ApiInternalGeoSequenceRunRoute,
   ApiInternalGeoWriterPlanRoute: ApiInternalGeoWriterPlanRoute,
   ApiInternalSitesAdminRoute: ApiInternalSitesAdminRoute,

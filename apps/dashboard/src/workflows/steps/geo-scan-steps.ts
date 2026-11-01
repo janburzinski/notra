@@ -37,6 +37,7 @@ import {
   trackGeoScanStepResult,
 } from "@/lib/analytics/geo-workflow-events";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
+import { revokeFreeScanBalance } from "@/lib/geo/free-scan";
 import type { GeoDashboardRuntime } from "@/types/geo-runtime";
 
 function parseClaimedAt(claimedAt?: string): Date | undefined {
@@ -299,4 +300,20 @@ export async function trackGeoScanRetryScheduledStep(
   } finally {
     await flushObservability();
   }
+}
+
+export async function revokeFreeScanBalanceStep(
+  organizationId: string
+): Promise<void> {
+  "use step";
+  await Effect.runPromise(
+    revokeFreeScanBalance(organizationId).pipe(
+      Effect.retry({ times: 2 }),
+      Effect.tapError((error) =>
+        Effect.logWarning("Failed to revoke free scan balance").pipe(
+          Effect.annotateLogs({ organizationId, error: error._tag })
+        )
+      )
+    )
+  );
 }

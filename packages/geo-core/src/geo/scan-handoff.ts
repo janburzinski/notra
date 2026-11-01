@@ -84,7 +84,8 @@ export const startClaimedGeoScanRun = Effect.fn("geo.startClaimedScanRun")(
     claimedAt: Date,
     promptIds?: readonly string[],
     engines?: readonly string[],
-    manual = false
+    manual = false,
+    freeScan = false
   ) {
     const workflows = yield* GeoWorkflowService;
     const scanId = yield* createGeoScanRow({ organizationId, projectId }).pipe(
@@ -104,6 +105,7 @@ export const startClaimedGeoScanRun = Effect.fn("geo.startClaimedScanRun")(
         ...(promptIds ? { promptIds: [...promptIds] } : {}),
         ...(engines ? { engines: [...engines] } : {}),
         ...(manual ? { manual } : {}),
+        ...(freeScan ? { freeScan } : {}),
       })
       .pipe(
         Effect.mapError(

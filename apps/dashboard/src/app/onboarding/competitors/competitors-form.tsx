@@ -25,6 +25,7 @@ import { ONBOARDING_STEP_COMPETITORS } from "@/constants/onboarding";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import {
   useGeoCompetitorSuggestions,
+  useGeoStartFreeScan,
   useGeoStartScan,
 } from "@/lib/hooks/use-geo";
 import { useGeoCompetitorsDb } from "@/lib/hooks/use-geo-db";
@@ -62,12 +63,13 @@ function CompetitorsPicker({
   const { competitors, saveCompetitor, removeCompetitor } =
     useGeoCompetitorsDb(organizationId);
   const startScan = useGeoStartScan(organizationId);
+  const startFreeScan = useGeoStartFreeScan(organizationId);
   const { isLocked: geoLocked } = useHasGeoFeature();
   const submitLabel = geoLocked
     ? tCommon("actions.continue")
     : t("startTracking");
   const [isLeaving, setIsLeaving] = useState(false);
-  const busy = startScan.isPending || isLeaving;
+  const busy = startScan.isPending || startFreeScan.isPending || isLeaving;
   const atLimit = competitors.length >= GEO_MAX_COMPETITORS;
   const suggested = suggestions.data?.competitors ?? [];
   const remainingSuggestions = suggested.filter(
@@ -121,7 +123,7 @@ function CompetitorsPicker({
       router.push(nextHref);
     };
     if (geoLocked) {
-      leave();
+      startFreeScan.mutate(undefined, { onSettled: leave });
       return;
     }
     startScan.mutate("onboarding", {

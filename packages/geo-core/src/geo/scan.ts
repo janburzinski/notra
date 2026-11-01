@@ -44,6 +44,7 @@ import {
 import { GEO_AI_OVERVIEW_ABSENT_ANSWER } from "../constants/geo-ai-overview";
 import { MAX_JUDGE_COMPETITORS } from "../constants/geo-conversations";
 import {
+  GEO_PERSONA_BILLING_MULTIPLIER,
   GEO_PERSONA_MAX_COUNT,
   GEO_PERSONA_MAX_TURNS,
   GEO_PERSONA_PROMPT_ID_PREFIX,
@@ -1159,6 +1160,30 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
       personas: personas.length,
     });
 
+    let answerBudget =
+      gate.mode === "plan_quota" && gate.balanceRemaining != null
+        ? gate.balanceRemaining
+        : Number.POSITIVE_INFINITY;
+    const withinAnswerBudget = <T>(items: T[], answers: (item: T) => number) =>
+      items.filter((item) => {
+        const cost = answers(item);
+        if (cost > answerBudget) {
+          return false;
+        }
+        answerBudget -= cost;
+        return true;
+      });
+    const plannedTasks = withinAnswerBudget(
+      interleaveGeoScanItemsByKey(tasks, (task) => task.engine),
+      () => 1
+    );
+    const plannedSequences = withinAnswerBudget(sequences, (sequence) =>
+      Math.min(sequence.steps.length, GEO_SEQUENCE_MAX_TURNS)
+    );
+    const plannedPersonas = withinAnswerBudget(
+      personas,
+      (persona) => persona.prompts.length * GEO_PERSONA_BILLING_MULTIPLIER
+    );
     const plan: GeoScanProjectPlan = {
       context: {
         organizationId,
@@ -1177,9 +1202,9 @@ const buildGeoScanProjectPlan = Effect.fn("geo.buildScanProjectPlan")(
           isPartialGeoScanEngineScope(settings.engines, scanEngines),
       },
       claimedAt: claimedAt.toISOString(),
-      tasks: interleaveGeoScanItemsByKey(tasks, (task) => task.engine),
-      sequences,
-      personas,
+      tasks: plannedTasks,
+      sequences: plannedSequences,
+      personas: plannedPersonas,
       promptCount: prompts.length,
       languages: settings.languages,
       engines,
