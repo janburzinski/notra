@@ -28,10 +28,8 @@ import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import Link from "@/components/framework/link";
-import {
-  PersonaActivityCard,
-  PersonaActivityCardSkeleton,
-} from "@/components/geo/persona-activity-card";
+import { PersonaActivityCard } from "@/components/geo/persona-activity-card";
+import { PersonaActivityCardSkeleton } from "@/components/geo/persona-activity-skeleton";
 import { PersonaAddDialog } from "@/components/geo/persona-add-dialog";
 import { PersonasTable } from "@/components/geo/personas-table";
 import { PageContainer } from "@/components/layout/container";

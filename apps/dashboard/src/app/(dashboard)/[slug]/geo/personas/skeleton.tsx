@@ -6,7 +6,7 @@ import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { DataTableSkeleton } from "ui/table";
 import { useTranslations } from "use-intl";
 
-import { PersonaActivityCardSkeleton } from "@/components/geo/persona-activity-card";
+import { PersonaActivityCardSkeleton } from "@/components/geo/persona-activity-skeleton";
 import { PageContainer } from "@/components/layout/container";
 import { GEO_PERSONA_SKELETON_ROW_COUNT } from "@/constants/geo-personas";
 
