@@ -238,7 +238,7 @@ export function LeaderboardCard({
           ) : null,
       },
     ],
-    [untrack, rows.length, t, formatMetric]
+    [untrack, rows.length, t, tCommon, tAnalyticsShared, formatMetric]
   );
 
   return (

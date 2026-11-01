@@ -55,7 +55,7 @@ export function AddGranolaIntegrationDialog({
             t("apiKeyInvalid", { prefix: GRANOLA_API_KEY_PREFIX })
           ),
       }),
-    [t]
+    [t, tIntegrationsShared]
   );
   const queryClient = useQueryClient();
   const displayNameId = useId();

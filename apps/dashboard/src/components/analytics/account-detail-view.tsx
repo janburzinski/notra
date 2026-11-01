@@ -224,7 +224,6 @@ export function AccountDetailView({
   const tAnalyticsShared = useTranslations("analytics.shared");
   const tCommon = useTranslations("common");
   const locale = useLocale();
-  const tSummary = useTranslations("analytics.summary");
   const metricLabels: Record<LeaderboardDetailMetric["labelKey"], string> = {
     followers: tAnalyticsShared("followers"),
     impressions: tCommon("labels.impressions"),
@@ -243,7 +242,7 @@ export function AccountDetailView({
         colors: seriesColors(CHART_PRIMARY_COLOR),
       },
     }),
-    [t]
+    [tAnalyticsShared]
   );
   const { getOrganization, activeOrganization } = useOrganizationsContext();
   const orgFromList = getOrganization(organizationSlug);
@@ -295,7 +294,7 @@ export function AccountDetailView({
       account
         ? leaderboardDetailMetrics(account, locale, tCommon("labels.nA"))
         : [],
-    [account, locale, tSummary]
+    [account, locale, tCommon]
   );
 
   const columns = useTopPostColumns();

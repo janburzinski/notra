@@ -252,6 +252,16 @@ export default defineConfig({
       },
     },
     {
+      // The design-token rules target the dashboard. The registry, its previews and the marketing site style freely, and emails need inline styles.
+      files: ["apps/ui/**", "apps/web/**", "packages/email/**"],
+      rules: {
+        "shadcn/no-restyle": "off",
+        "shadcn/no-arbitrary-values": "off",
+        "shadcn/no-raw-colors": "off",
+        "shadcn/no-inline-styles": "off",
+      },
+    },
+    {
       // Satori (next/og) only reads inline styles; there are no classes to use.
       files: ["apps/console/src/lib/ai-trends/share-card.tsx"],
       rules: {

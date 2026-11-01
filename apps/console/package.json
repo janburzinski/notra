@@ -60,6 +60,7 @@
     "bun-types": "catalog:",
     "knip": "^6.12.2",
     "postcss": "^8.5.31",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:"
   },
   "engines": {

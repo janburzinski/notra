@@ -236,7 +236,7 @@ export function EngineRateTable({
         },
       },
     ],
-    [filtered.length, locale, t, timeseriesPoints]
+    [filtered.length, locale, t, tGeoShared, timeseriesPoints]
   );
 
   const emptyReadout = isScanning

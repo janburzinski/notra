@@ -88,7 +88,7 @@ export function PromptResultsTable({ className }: PromptResultsTableProps) {
         })
       ),
     ],
-    [t]
+    [tGeoShared]
   );
 
   return (

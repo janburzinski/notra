@@ -1675,7 +1675,14 @@ export function ChatInputAdvanced({
       }
       return results.every(Boolean);
     },
-    [cleanupChatUpload, currentModel.label, model, t, updatePendingUploads]
+    [
+      cleanupChatUpload,
+      currentModel.label,
+      model,
+      t,
+      tCommon2,
+      updatePendingUploads,
+    ]
   );
 
   const onFileInputChange = useCallback(
@@ -2134,7 +2141,7 @@ export function ChatInputAdvanced({
         // noop
       }
     },
-    [draftStorageKey]
+    [draftStorageKey, taggedSkillsRef]
   );
 
   const schedulePersistDraft = useCallback(
@@ -2663,6 +2670,7 @@ export function ChatInputAdvanced({
     sendSnapshot,
     taggedSkillNames,
     composerPrefix,
+    quoteContext?.annotations,
   ]);
 
   useEffect(() => {

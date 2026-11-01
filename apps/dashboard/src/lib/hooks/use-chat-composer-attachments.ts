@@ -296,7 +296,7 @@ export function useChatComposerAttachments(): UseChatComposerAttachmentsResult {
       }
       return results.every(Boolean);
     },
-    [cleanupChatUpload, updatePendingUploads, tUpload]
+    [cleanupChatUpload, updatePendingUploads, tCommon, tUpload]
   );
 
   const onFileInputChange = useCallback(

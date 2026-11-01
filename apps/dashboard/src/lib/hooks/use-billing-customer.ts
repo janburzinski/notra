@@ -19,9 +19,10 @@ export function useBillingCustomer(params?: Parameters<typeof useCustomer>[0]) {
   const customer = useCustomer(billingCustomerOptions(params));
   const hydrated = useIsClient();
   const queryClient = useQueryClient();
+  const { refetch: refetchCustomer } = customer;
   const refetch = useCallback(
-    async (...args: Parameters<typeof customer.refetch>) => {
-      const result = await customer.refetch(...args);
+    async (...args: Parameters<typeof refetchCustomer>) => {
+      const result = await refetchCustomer(...args);
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: dashboardOrpc.geo.modelCatalog.key(),
@@ -32,7 +33,7 @@ export function useBillingCustomer(params?: Parameters<typeof useCustomer>[0]) {
       ]);
       return result;
     },
-    [customer.refetch, queryClient]
+    [refetchCustomer, queryClient]
   );
   if (hydrated) {
     return { ...customer, refetch };

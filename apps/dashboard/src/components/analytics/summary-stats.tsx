@@ -57,7 +57,7 @@ export function SummaryStats({
         hint: t("interactionsHint", { posts: summary.posts, range: rangeHint }),
       },
     ];
-  }, [accounts, locale, points, rangeHint, t]);
+  }, [accounts, locale, points, rangeHint, t, tCommon, tAnalyticsShared]);
 
   return (
     <InstrumentGrid className="grid-cols-2 lg:grid-cols-4">

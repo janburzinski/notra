@@ -243,7 +243,7 @@ export function LanguagePerformanceCard({
         },
       },
     ],
-    [adding, atLimit, pendingLanguage, t]
+    [adding, atLimit, pendingLanguage, t, tCommon2, tGeoShared]
   );
 
   return (

@@ -139,7 +139,15 @@ export function TopPostsCard({
         ),
       },
     ],
-    [posts.length, t, format, formatDayLabel, formatMetric]
+    [
+      posts.length,
+      t,
+      tCommon,
+      tAnalyticsShared,
+      format,
+      formatDayLabel,
+      formatMetric,
+    ]
   );
 
   return (

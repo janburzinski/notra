@@ -54,7 +54,7 @@ export function DirectionEngineBars({ className }: DirectionBlockProps) {
         ),
       },
     ],
-    [t]
+    [t, tGeoShared]
   );
 
   return (

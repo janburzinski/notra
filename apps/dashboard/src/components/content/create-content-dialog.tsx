@@ -1066,6 +1066,7 @@ export function CreateContentDialog({
     eventCounts,
     selectedBrandVoiceIds.length,
     t,
+    tCommon,
   ]);
 
   return (
