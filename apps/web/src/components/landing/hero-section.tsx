@@ -7,7 +7,7 @@ import { useReducedMotion } from "motion/react";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 
-import { PixelScene } from "@/components/halloween/halloween";
+import { HeroDither } from "@/components/landing/hero-dither";
 import { HeroHeadline, useIsClient } from "@/components/landing/hero-headline";
 import { HeroVariantSwitcher } from "@/components/landing/hero-variant-switcher";
 import { LiveDemoLink } from "@/components/landing/live-demo-link";
@@ -113,7 +113,7 @@ export function HeroSection() {
       {HERO_PREVIEW_ENABLED ? <HeroVariantSwitcher /> : null}
       <div className="relative isolate overflow-clip rounded-3xl bg-[#C8B2EE40] lg:h-[59.9375rem] dark:bg-[#2a2140]">
         <div className="pointer-events-none absolute inset-0 overflow-clip rounded-3xl">
-          <PixelScene />
+          <HeroDither eager />
         </div>
 
         <div className="relative flex h-full w-full flex-col items-center">
