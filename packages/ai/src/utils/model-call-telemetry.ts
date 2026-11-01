@@ -25,8 +25,8 @@ import {
   recordRequestAICost,
   recordRequestAIUsage,
 } from "@notra/ai/utils/request-ai-usage";
-import { nonNegativeNumber } from "@notra/ai/utils/unknown-record";
 import { getUsageAttribution } from "@notra/ai/utils/usage-attribution";
+import { nonNegativeNumber } from "@notra/utils/unknown-record";
 
 /** One lifecycle per SDK model invocation, including any router fallback. */
 export function createModelCallTelemetry({

@@ -30,6 +30,7 @@
     "./types/brew": "./src/types/brew.ts"
   },
   "dependencies": {
+    "@notra/utils": "workspace:*",
     "react": "^19.3.1",
     "react-email": "6.9.5"
   },

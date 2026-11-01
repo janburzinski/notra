@@ -1,10 +1,11 @@
 import { logWarn } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { geoTrafficEmbeds, projects } from "@notra/db/schema";
+import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import { loadAiTraffic } from "@notra/geo-core/geo/programs";
 import { webHostFilter } from "@notra/geo-core/utils/geo-project-domains";
 import { Redis } from "@upstash/redis";
-import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, isNull } from "drizzle-orm";
 import { Effect } from "effect";
 import { nanoid } from "nanoid";
 
@@ -171,9 +172,7 @@ export async function createTrafficEmbed(input: {
   // The org lock serializes count + insert, so concurrent creates can't pass
   // the cap together.
   return db.transaction(async (tx) => {
-    await tx.execute(
-      sql`select pg_advisory_xact_lock(hashtextextended(${`traffic-embed:${input.organizationId}`}, 0))`
-    );
+    await advisoryXactLock(tx, `traffic-embed:${input.organizationId}`);
     const [project, [active]] = await Promise.all([
       input.projectId === null
         ? Promise.resolve(true)

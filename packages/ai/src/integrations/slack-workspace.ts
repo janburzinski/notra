@@ -1,9 +1,12 @@
 import { db } from "@notra/db/drizzle";
 import { slackIntegrations } from "@notra/db/schema";
+import {
+  decryptToken,
+  encryptToken,
+} from "@notra/db/utils/integration-encryption";
 import { and, eq } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
-import { decryptToken, encryptToken } from "../crypto/token-encryption";
 import type {
   CreateSlackIntegrationParams,
   UpdateSlackIntegrationParams,

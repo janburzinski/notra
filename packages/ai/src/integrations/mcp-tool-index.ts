@@ -6,6 +6,7 @@ import {
   mcpSessionToolActivations,
   mcpToolIndex,
 } from "@notra/db/schema";
+import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import { isPgUniqueViolation } from "@notra/db/utils/pg-errors";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import { captureServerEvent, flushPostHogServer } from "@notra/posthog/server";
@@ -502,8 +503,9 @@ export async function activateSessionMcpTools({
   }
 
   const activated = await db.transaction(async (tx) => {
-    await tx.execute(
-      sql`SELECT pg_advisory_xact_lock(hashtextextended(${`mcp-session-tool-activation:${organizationId}:${sessionId}:${surface}`}, 0))`
+    await advisoryXactLock(
+      tx,
+      `mcp-session-tool-activation:${organizationId}:${sessionId}:${surface}`
     );
 
     const existing = await querySessionActivatedMcpTools({

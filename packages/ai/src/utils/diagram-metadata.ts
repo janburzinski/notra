@@ -1,11 +1,7 @@
 import { diagramSpecSchema } from "@notra/ai/schemas/excalidraw-diagram";
 import type { DiagramSpec } from "@notra/ai/types/excalidraw-diagram";
 import type { RepoImageFormat } from "@notra/ai/types/repo-image";
-import {
-  isRecord,
-  readNumber,
-  readString,
-} from "@notra/ai/utils/unknown-record";
+import { isRecord, readNumber, readString } from "@notra/utils/unknown-record";
 
 /** The editable spec saved on a diagram post, or null for other images. */
 export function readDiagramSpec(metadata: unknown): DiagramSpec | null {

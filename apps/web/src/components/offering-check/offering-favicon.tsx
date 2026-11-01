@@ -1,14 +1,15 @@
 import { cn } from "@notra/ui/lib/utils";
+import { googleFaviconUrl } from "@notra/utils/google-favicon";
 import { useState } from "react";
 
 import { OFFERING_CHECK_FAVICON_SIZE } from "@/constants/offering-check";
 import type { OfferingFaviconProps } from "@/types/offering-check";
-import { offeringFaviconUrl } from "@/utils/offering-domain";
 
 export function OfferingFavicon({ domain, className }: OfferingFaviconProps) {
   const [failed, setFailed] = useState(false);
+  const src = googleFaviconUrl(domain, OFFERING_CHECK_FAVICON_SIZE);
 
-  if (failed) {
+  if (failed || !src) {
     return (
       <span
         aria-hidden
@@ -31,7 +32,7 @@ export function OfferingFavicon({ domain, className }: OfferingFaviconProps) {
       height={OFFERING_CHECK_FAVICON_SIZE}
       loading="lazy"
       onError={() => setFailed(true)}
-      src={offeringFaviconUrl(domain)}
+      src={src}
       width={OFFERING_CHECK_FAVICON_SIZE}
     />
   );

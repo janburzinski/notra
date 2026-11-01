@@ -9,6 +9,7 @@ import {
   createTestRouter,
 } from "@notra/ai/router/test-helpers";
 import type { GatewayRouteMetadata } from "@notra/ai/types/router";
+import { isRecord } from "@notra/utils/unknown-record";
 import type { WideEvent } from "evlog";
 
 import {
@@ -16,7 +17,6 @@ import {
   trackRequestLoggerEmit,
 } from "./evlog-request";
 import { recordRequestAICost, recordRequestAIUsage } from "./request-ai-usage";
-import { isRecord } from "./unknown-record";
 
 test("final real request totals distinguish incomplete costs, measured zero and a stale earlier subtotal", async () => {
   for (const costs of [

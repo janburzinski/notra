@@ -9,7 +9,8 @@ import type {
   GatewayLimitDetails,
   GatewayLimitType,
 } from "@notra/ai/types/gateway-limit";
-import { isRecord } from "@notra/ai/utils/unknown-record";
+import { parseRetryAfterMs } from "@notra/utils/retry-after";
+import { isRecord } from "@notra/utils/unknown-record";
 
 function responseHeadersOf(error: unknown): Record<string, unknown> {
   // GatewayError keeps the APICallError (and its headers) in `cause`.
@@ -66,11 +67,13 @@ export function readGatewayLimitDetails(
     limitReason: GATEWAY_LIMIT_DESCRIPTIONS[limitType].reason,
   };
   const retryAfter = headers["retry-after"];
-  if (typeof retryAfter === "string") {
-    const seconds = headerNumber(headers, "retry-after");
-    const retryAt =
-      seconds === undefined ? Date.parse(retryAfter) : now + seconds * 1000;
-    if (Number.isFinite(retryAt) && retryAt >= now && retryAt <= 8.64e15) {
+  const retryAfterMs = parseRetryAfterMs(
+    typeof retryAfter === "string" ? retryAfter : undefined,
+    now
+  );
+  if (retryAfterMs !== undefined) {
+    const retryAt = now + retryAfterMs;
+    if (retryAt >= now && retryAt <= 8.64e15) {
       details.retryAt = new Date(retryAt).toISOString();
       details.retryAfterSeconds = Math.ceil((retryAt - now) / 1000);
     }

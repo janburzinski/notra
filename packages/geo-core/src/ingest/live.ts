@@ -1,3 +1,5 @@
+import { setTimeout as sleep } from "node:timers/promises";
+
 import type { GeoTrafficEventRow } from "@notra/analytics/tinybird/datasources";
 
 import {
@@ -10,12 +12,6 @@ import type { GeoIngestBuffer } from "../types/ingest";
 
 const batches = new Map<string, GeoTrafficSettleBatch>();
 const lastPublishedAt = new Map<string, number>();
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 function windowDelay(organizationId: string, minDelayMs: number): number {
   const now = Date.now();

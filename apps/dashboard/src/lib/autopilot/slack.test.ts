@@ -20,7 +20,8 @@ if (process.env.NOTRA_AUTOPILOT_SLACK_TEST !== "1") {
     expect(child.status, child.stderr.toString()).toBe(0);
   });
 } else {
-  const { encryptToken } = await import("@notra/ai/crypto/token-encryption");
+  const { encryptToken } =
+    await import("@notra/db/utils/integration-encryption");
   const { postAutopilotSlackMessage } = await import("./slack");
 
   const bodies: unknown[] = [];

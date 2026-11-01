@@ -31,8 +31,7 @@
     "./chat/*": "./src/chat/*.ts",
     "./billing/*": "./src/billing/*.ts",
     "./qstash/*": "./src/qstash/*.ts",
-    "./integrations/*": "./src/integrations/*.ts",
-    "./crypto/*": "./src/crypto/*.ts"
+    "./integrations/*": "./src/integrations/*.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",

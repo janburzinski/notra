@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 
 import { EphemeralBox } from "@upstash/box";
 
@@ -22,8 +23,6 @@ import {
 import { APP_DIR, RUNS_DIR } from "../constants/paths";
 import type { HeadlessArgs } from "../headless";
 import { getSuite, SUITES } from "../suites/registry";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** One self-contained node bundle: no install, so the box needs no registry. */
 function bundle(dir: string) {

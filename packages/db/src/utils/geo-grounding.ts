@@ -1,13 +1,11 @@
+import { isRecord } from "@notra/utils/unknown-record";
+
 import {
   EMPTY_GEO_CHECK_GROUNDING,
   GEO_CHECK_GROUNDING_MAX_QUERIES,
   GEO_CHECK_GROUNDING_MAX_SOURCES,
 } from "../constants/geo-checks";
 import type { GeoCheckGrounding, GeoCheckSource } from "../types/geo-checks";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function parseSource(value: unknown): GeoCheckSource | null {
   if (!isRecord(value)) {

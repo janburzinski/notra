@@ -4,6 +4,10 @@ import {
   onboardingWorkspaceFormFieldsSchema,
   onboardingWorkspaceFormSchema,
 } from "@notra/schemas/dashboard/onboarding/workspace";
+import {
+  slugifyOrganization,
+  slugifyOrganizationWhileTyping,
+} from "@notra/schemas/utils/dashboard/organization";
 import { AuthFormHeader } from "@notra/ui/components/shared/auth/auth-form-header";
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { Input } from "@notra/ui/components/ui/input";
@@ -38,8 +42,6 @@ import {
   focusFirstInvalidWorkspaceField,
   isHeardAboutNotraSource,
   onboardingPreviewFocusProps,
-  slugify,
-  slugifyWhileTyping,
 } from "@/utils/onboarding";
 
 const WEBSITE_PREFIX_REGEX = /^https?:\/\//i;
@@ -178,9 +180,12 @@ export function WorkspaceForm({
                     const currentSlug = form.getFieldValue("slug");
                     if (
                       !currentSlug ||
-                      currentSlug === slugify(field.state.value)
+                      currentSlug === slugifyOrganization(field.state.value)
                     ) {
-                      form.setFieldValue("slug", slugify(e.target.value));
+                      form.setFieldValue(
+                        "slug",
+                        slugifyOrganization(e.target.value)
+                      );
                     }
                   }}
                   placeholder={tCommon("labels.acmeInc")}
@@ -215,11 +220,13 @@ export function WorkspaceForm({
                 autoCorrect: "off",
                 disabled: isSubmitting || isResuming,
                 onBlur: () => {
-                  field.handleChange(slugify(field.state.value));
+                  field.handleChange(slugifyOrganization(field.state.value));
                   field.handleBlur();
                 },
                 onChange: (e) =>
-                  field.handleChange(slugifyWhileTyping(e.target.value)),
+                  field.handleChange(
+                    slugifyOrganizationWhileTyping(e.target.value)
+                  ),
                 placeholder: tCommon("labels.acmeIncSlug"),
                 spellCheck: false,
                 value: field.state.value,

@@ -1,4 +1,5 @@
 import { getAppUrl } from "@notra/ai/utils/url";
+import { escapeRegExp } from "@notra/utils/escape";
 
 import {
   GITHUB_PULL_REQUEST_BODY_MAX_LENGTH,
@@ -84,10 +85,6 @@ function renderOpenInNotraLink(params: BuildContentPullRequestBodyParams) {
 
 function joinParagraphs(parts: string[]) {
   return parts.filter((part) => part.length > 0).join("\n\n");
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function stripOpenInNotraLink(

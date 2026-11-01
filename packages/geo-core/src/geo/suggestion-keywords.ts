@@ -1,4 +1,5 @@
 import type { GscQueryRow } from "@notra/ai/types/google-search-console";
+import { escapeRegExp } from "@notra/utils/escape";
 
 import {
   GSC_QUERY_CLUSTER_CAP,
@@ -12,7 +13,6 @@ import type { GeoSuggestionKeyword } from "../types/geo";
 import { isQuestionQuery } from "../utils/gsc-question";
 
 const MIN_BRAND_TERM_LENGTH = 3;
-const REGEXP_ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
 const BRAND_TOKEN_SEPARATOR = "[-_\\s]+";
 /*
  * `\b` counts only [A-Za-z0-9_] as word characters, so a brand that starts or
@@ -33,10 +33,6 @@ const STRIKING_WEIGHT = 1;
 const WEAK_WEIGHT = 0.6;
 const DISTANT_WEIGHT = 0.25;
 const CTR_SATURATION = 0.5;
-
-function escapeRegExp(value: string): string {
-  return value.replace(REGEXP_ESCAPE_REGEX, "\\$&");
-}
 
 export function normalizeSuggestionKey(value: string): string {
   return value.trim().toLowerCase();

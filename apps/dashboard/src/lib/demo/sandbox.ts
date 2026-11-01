@@ -13,6 +13,7 @@ import {
   users,
 } from "@notra/db/schema";
 import type { DemoPersonalization } from "@notra/db/types/demo";
+import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import { normalizeTimeZone } from "@notra/utils/demo-clock";
 import {
   and,
@@ -167,12 +168,10 @@ async function createDemoOrganization(input: DemoOrganizationInput) {
 
   const created = await db.transaction(async (tx) => {
     if (input.reservation) {
-      const { rows } = await tx.execute<{ locked: boolean }>(sql`
-        select pg_try_advisory_xact_lock(
-          hashtextextended(${DEMO_STORAGE_LOCK_KEY}, 0)
-        ) as locked
-      `);
-      if (!rows[0]?.locked) {
+      const locked = await advisoryXactLock(tx, DEMO_STORAGE_LOCK_KEY, {
+        try: true,
+      });
+      if (!locked) {
         logWarn("[demo] Workspace reservation lock is busy", {
           reason: "reservation_lock_busy",
         });

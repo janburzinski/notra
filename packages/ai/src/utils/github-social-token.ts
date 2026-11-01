@@ -1,6 +1,5 @@
 import type { socialConnections } from "@notra/db/schema";
-
-import { decryptToken } from "../crypto/token-encryption";
+import { decryptToken } from "@notra/db/utils/integration-encryption";
 
 export function resolveGitHubSocialToken(
   connection: Pick<

@@ -1,7 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
 import { randomBytes } from "node:crypto";
 
-import { encryptToken } from "../crypto/token-encryption";
+import { encryptToken } from "@notra/db/utils/integration-encryption";
+
 import { resolveGitHubSocialToken } from "./github-social-token";
 
 const originalKey = process.env.INTEGRATION_ENCRYPTION_KEY;

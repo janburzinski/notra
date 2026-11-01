@@ -1,5 +1,4 @@
 import {
-  OFFERING_CHECK_FAVICON_SIZE,
   OFFERING_HOSTNAME_PATTERN,
   OFFERING_PROTOCOL_PATTERN,
   OFFERING_WWW_PATTERN,
@@ -32,8 +31,4 @@ export function domainOfUrl(url: string): string | null {
     return null;
   }
   return parsed.hostname.toLowerCase().replace(OFFERING_WWW_PATTERN, "");
-}
-
-export function offeringFaviconUrl(domain: string): string {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=${OFFERING_CHECK_FAVICON_SIZE}`;
 }

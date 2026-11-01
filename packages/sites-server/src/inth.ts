@@ -1,9 +1,12 @@
 import { createHash, randomBytes } from "node:crypto";
 
-import { decryptToken, encryptToken } from "@notra/ai/crypto/token-encryption";
 import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { inthIntegrations, siteDomains } from "@notra/db/schema";
+import {
+  decryptToken,
+  encryptToken,
+} from "@notra/db/utils/integration-encryption";
 import { siteAliasHost } from "@notra/sites-core/utils/hosts";
 import { and, eq } from "drizzle-orm";
 

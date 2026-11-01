@@ -1,10 +1,10 @@
 import crypto from "node:crypto";
 
-import { decryptToken } from "@notra/ai/crypto/token-encryption";
 import { getGitHubWebhookIntegrations } from "@notra/ai/integrations/github-webhooks";
 import { redis } from "@notra/ai/utils/redis";
 import { db } from "@notra/db/drizzle";
 import { contentTriggers } from "@notra/db/schema";
+import { decryptToken } from "@notra/db/utils/integration-encryption";
 import {
   type GitHubEventType,
   type GitHubWebhookPayload,

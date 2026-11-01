@@ -9,8 +9,8 @@ import {
 } from "@notra/ai/constants/telemetry";
 import { WORKFLOW_TELEMETRY_FIELDS } from "@notra/ai/constants/workflow-telemetry";
 import { telemetryValue } from "@notra/ai/utils/telemetry-value";
-import { isRecord } from "@notra/ai/utils/unknown-record";
 import { workflowTelemetryValue } from "@notra/ai/utils/workflow-telemetry-value";
+import { isRecord } from "@notra/utils/unknown-record";
 import type { WideEvent } from "evlog";
 
 /** A second telemetry destination gets an explicit, content-free field set. */

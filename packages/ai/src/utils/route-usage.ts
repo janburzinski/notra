@@ -11,7 +11,7 @@ import type {
   RouteUsageSummary,
 } from "@notra/ai/types/router";
 import { toAgentTokenUsage } from "@notra/ai/utils/token-usage";
-import { nonNegativeNumber } from "@notra/ai/utils/unknown-record";
+import { nonNegativeNumber } from "@notra/utils/unknown-record";
 
 function stepUsage(step: RouteUsageStep): AgentTokenUsage | undefined {
   return step.usage ? toAgentTokenUsage(step.usage) : undefined;

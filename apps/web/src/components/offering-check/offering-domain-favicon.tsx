@@ -1,12 +1,14 @@
 import { cn } from "@notra/ui/lib/utils";
+import { googleFaviconUrl } from "@notra/utils/google-favicon";
 import { useEffect, useState } from "react";
 
 import {
+  OFFERING_CHECK_FAVICON_SIZE,
   OFFERING_FAVICON_FALLBACK_SIZE,
   OFFERING_FAVICON_SETTLE_MS,
 } from "@/constants/offering-check";
 import type { OfferingDomainFaviconProps } from "@/types/offering-check";
-import { normalizeDomain, offeringFaviconUrl } from "@/utils/offering-domain";
+import { normalizeDomain } from "@/utils/offering-domain";
 
 export function OfferingDomainFavicon({ value }: OfferingDomainFaviconProps) {
   const [domain, setDomain] = useState<string | null>(null);
@@ -21,7 +23,8 @@ export function OfferingDomainFavicon({ value }: OfferingDomainFaviconProps) {
   }, [value]);
 
   useEffect(() => {
-    if (!domain) {
+    const src = googleFaviconUrl(domain, OFFERING_CHECK_FAVICON_SIZE);
+    if (!src) {
       return;
     }
     let active = true;
@@ -31,7 +34,7 @@ export function OfferingDomainFavicon({ value }: OfferingDomainFaviconProps) {
         setLoaded(domain);
       }
     };
-    image.src = offeringFaviconUrl(domain);
+    image.src = src;
     return () => {
       active = false;
     };
@@ -55,7 +58,9 @@ export function OfferingDomainFavicon({ value }: OfferingDomainFaviconProps) {
           alt=""
           className="size-7 rounded-lg"
           height={28}
-          src={offeringFaviconUrl(loaded)}
+          src={
+            googleFaviconUrl(loaded, OFFERING_CHECK_FAVICON_SIZE) ?? undefined
+          }
           width={28}
         />
       ) : null}

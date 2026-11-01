@@ -1,6 +1,6 @@
-import { encryptToken } from "@notra/ai/crypto/token-encryption";
 import { db } from "@notra/db/drizzle";
 import { organizations, socialConnections, users } from "@notra/db/schema";
+import { encryptToken } from "@notra/db/utils/integration-encryption";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import type { User } from "@workos-inc/node";
 import { getWorkOS } from "@workos/authkit-session";

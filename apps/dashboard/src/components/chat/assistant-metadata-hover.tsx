@@ -14,6 +14,7 @@ import {
 import { ClaudeAiIcon } from "@notra/ui/components/ui/svgs/claudeAiIcon";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { OpenaiDark } from "@notra/ui/components/ui/svgs/openaiDark";
+import { formatCompactNumber } from "@notra/utils/format-compact-number";
 import type { ReactNode } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -58,13 +59,6 @@ function getModelContextWindow(model: string): number | null {
   return MODEL_CONTEXT_WINDOWS[model as ChatModel] ?? null;
 }
 
-function formatCompactTokens(tokens: number, locale: string): string {
-  return new Intl.NumberFormat(locale, {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(tokens);
-}
-
 function getModelLabel(model: string): string {
   return MODEL_LABELS[model as ChatModel] ?? model;
 }
@@ -94,7 +88,7 @@ function AssistantTokenUsage({
     : null;
 
   const tokensLabel = t("tokens", {
-    value: formatCompactTokens(outputTokens, locale),
+    value: formatCompactNumber(outputTokens, locale, 1),
   });
 
   return (
@@ -124,7 +118,7 @@ function AssistantTokenUsage({
           </DetailCardRow>
           {contextWindow !== null ? (
             <DetailCardRow label={tChatShared("context")}>
-              {formatCompactTokens(contextWindow, locale)}
+              {formatCompactNumber(contextWindow, locale, 1)}
             </DetailCardRow>
           ) : null}
         </dl>

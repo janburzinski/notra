@@ -9,6 +9,10 @@ import {
   repositoryOutputs,
   socialConnections,
 } from "@notra/db/schema";
+import {
+  decryptToken,
+  encryptToken,
+} from "@notra/db/utils/integration-encryption";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { Effect, Result } from "effect";
 import { customAlphabet } from "nanoid";
@@ -17,7 +21,6 @@ import {
   GITHUB_APP_REPOSITORIES_CACHE_TTL_SECONDS,
   GITHUB_APP_REPOSITORIES_STALE_CACHE_TTL_SECONDS,
 } from "../constants/github-app";
-import { decryptToken, encryptToken } from "../crypto/token-encryption";
 import {
   decodeCachedGitHubAppRepositories,
   decodeGitHubAppInstallationResponse,

@@ -1,5 +1,6 @@
 import { db } from "@notra/db/drizzle";
 import { brandSettings, projects } from "@notra/db/schema";
+import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import {
   markEmptyShelfSync,
   readEmptyShelfSync,
@@ -18,7 +19,7 @@ import {
   canonicalizeShelfUrl,
   tryCanonicalizeShelfUrl,
 } from "@notra/schemas/utils/dashboard/shelf-url";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { Effect } from "effect";
 
 import { queryCitedShelfPages } from "@/lib/geo-shelf/citation-query";
@@ -153,9 +154,7 @@ function buildScanShelfSource(
 async function syncGeoShelfCitations(seed: GeoShelfStoreSeed): Promise<number> {
   const key = storeKey(seed);
   return await db.transaction(async (tx) => {
-    await tx.execute(
-      sql`select pg_advisory_xact_lock(hashtextextended(${`geo-shelf-sync:${key.projectId}`}, 0))`
-    );
+    await advisoryXactLock(tx, `geo-shelf-sync:${key.projectId}`);
     const cited = await queryCitedShelfPages(key, tx);
     if (cited.length === 0) {
       return 0;

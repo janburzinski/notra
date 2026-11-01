@@ -17,6 +17,7 @@ import type {
 } from "../../../types/security";
 import { Button } from "../../ui/button";
 import { useUiLabels } from "../ui-labels-provider";
+import { escapeHtml } from "@notra/utils/escape";
 
 const COPIED_RESET_MS = 2000;
 
@@ -39,12 +40,6 @@ function buildExportText(
   return `${header}${codes.join("\n")}\n`;
 }
 
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
-}
 
 export function BackupCodesPanel({
   codes,

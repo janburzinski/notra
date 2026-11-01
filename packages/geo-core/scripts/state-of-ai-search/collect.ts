@@ -1,7 +1,9 @@
 import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 
 import { searchWeb } from "@notra/ai/utils/context-dev";
+import { isRecord } from "@notra/utils/unknown-record";
 import { gateway, generateText, isStepCount, tool } from "ai";
 
 import { isGeoContextEngine } from "../../src/utils/geo-context";
@@ -47,10 +49,6 @@ const sampleLimit = Number(
   process.env.SOAS_SAMPLES ?? Number.POSITIVE_INFINITY
 );
 const limit = Number(process.env.SOAS_LIMIT ?? Number.POSITIVE_INFINITY);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -536,7 +534,7 @@ async function main() {
   for (let round = 0; round < 2 && failures.length > 0; round += 1) {
     const retry = failures.splice(0);
     console.log(`Retry round ${round + 1}: ${retry.length} failed answers`);
-    await new Promise((resolve) => setTimeout(resolve, 2000 * 2 ** round));
+    await sleep(2000 * 2 ** round);
     await runPool(
       retry.filter((job) => job.engine === "claude"),
       worker

@@ -56,10 +56,6 @@ export function withPublicUrls<T extends { url: string }>(
   return sources.filter((source) => getReferenceDomain(source.url) !== null);
 }
 
-export function getFaviconUrl(domain: string): string {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
-}
-
 export function getTwitterHandleFromUrl(
   sourceUrl: string | null | undefined
 ): string | null {

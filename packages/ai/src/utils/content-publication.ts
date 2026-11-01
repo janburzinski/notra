@@ -14,6 +14,7 @@ import {
   githubIntegrations,
   posts,
 } from "@notra/db/schema";
+import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import { and, desc, eq, gt, ne, or, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
@@ -31,9 +32,7 @@ async function lockPullRequest(
   repository: string,
   pullRequestNumber: number
 ) {
-  await tx.execute(
-    sql`select pg_advisory_xact_lock(hashtextextended(${pullRequestLockKey(repository, pullRequestNumber)}, 0))`
-  );
+  await advisoryXactLock(tx, pullRequestLockKey(repository, pullRequestNumber));
 }
 
 function toPublication(

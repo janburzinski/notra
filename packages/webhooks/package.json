@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
+    "@notra/utils": "workspace:*",
     "drizzle-orm": "catalog:",
     "effect": "catalog:",
     "ipaddr.js": "^2.5.0",

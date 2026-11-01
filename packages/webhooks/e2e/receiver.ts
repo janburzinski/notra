@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { setTimeout as sleep } from "node:timers/promises";
 
 import { RECEIVER_ORIGIN } from "./env";
 
@@ -63,8 +64,6 @@ async function verifySignature(
     new TextEncoder().encode(message)
   );
 }
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const html = await Bun.file(new URL("page.html", import.meta.url)).text();
 

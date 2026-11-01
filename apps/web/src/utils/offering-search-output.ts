@@ -1,6 +1,4 @@
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+import { isRecord } from "@notra/utils/unknown-record";
 
 export function readOfferingSearchOutput(output: unknown) {
   if (!isRecord(output)) {

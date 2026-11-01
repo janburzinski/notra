@@ -7,7 +7,7 @@ import type {
   RequestRouteCost,
 } from "@notra/ai/types/request-ai-usage";
 import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
-import { isRecord, nonNegativeNumber } from "@notra/ai/utils/unknown-record";
+import { isRecord, nonNegativeNumber } from "@notra/utils/unknown-record";
 
 const MICRO_USD = 1_000_000;
 

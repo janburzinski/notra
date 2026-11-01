@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
+import { setTimeout as sleep } from "node:timers/promises";
 
 import { Effect } from "effect";
 
@@ -88,7 +89,7 @@ export async function askReportOlostep(
         },
       };
     }
-    await new Promise((resolve) => setTimeout(resolve, OLOSTEP_REPORT_POLL_MS));
+    await sleep(OLOSTEP_REPORT_POLL_MS);
   }
   throw new Error(`Olostep timed out; batch ${batchId} is saved for resume`);
 }

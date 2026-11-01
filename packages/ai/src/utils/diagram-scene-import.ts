@@ -27,12 +27,8 @@ import {
   DiagramSpecError,
   shapeCenter,
 } from "@notra/ai/utils/excalidraw-diagram";
-import {
-  isRecord,
-  readNumber,
-  readString,
-  type UnknownRecord,
-} from "@notra/ai/utils/unknown-record";
+import type { UnknownRecord } from "@notra/utils/types/unknown-record";
+import { isRecord, readNumber, readString } from "@notra/utils/unknown-record";
 
 function isShapeType(
   type: string | undefined

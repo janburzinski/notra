@@ -7,6 +7,7 @@ import type {
   GeoCheckGrounding,
   GeoCheckSource,
 } from "@notra/db/types/geo-checks";
+import { isRecord } from "@notra/utils/unknown-record";
 
 import type { GeoGenerateTrace } from "../types/geo";
 import { perplexitySourcesFromExcerpt } from "../utils/geo-perplexity-sources";
@@ -19,10 +20,6 @@ const GROUNDING_CHUNK_URL_KEYS = [
   ["retrievedContext", "uri"],
   ["maps", "uri"],
 ] as const;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function searchQueryOf(input: Record<string, unknown>): unknown {
   return input.query ?? input.q ?? input.search_query;

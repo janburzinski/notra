@@ -1,20 +1,8 @@
 import type { ErrorWithStatus } from "@notra/ai/types/tools";
+import { parseRetryAfterMs } from "@notra/utils/retry-after";
 
 const GITHUB_PRIMARY_RATE_LIMIT_MESSAGE =
   "GitHub API rate limit reached. Please retry later.";
-
-function parseRetryAfterSeconds(value?: string | number) {
-  if (typeof value === "number" && Number.isFinite(value) && value > 0) {
-    return Math.floor(value);
-  }
-
-  if (typeof value !== "string") {
-    return undefined;
-  }
-
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-}
 
 function getHeaderCaseInsensitive(
   headers: Record<string, string | number | undefined> | undefined,
@@ -85,12 +73,17 @@ function toGitHubRateLimitError(error: unknown) {
   const remaining = getHeaderCaseInsensitive(headers, "x-ratelimit-remaining");
   const retryAfter = getHeaderCaseInsensitive(headers, "retry-after");
   const resetAt = getHeaderCaseInsensitive(headers, "x-ratelimit-reset");
-  const retryAfterSecondsFromHeader = parseRetryAfterSeconds(retryAfter);
+  const retryAfterMs = parseRetryAfterMs(
+    retryAfter === undefined ? undefined : String(retryAfter)
+  );
 
-  let retryAfterSeconds = retryAfterSecondsFromHeader;
+  let retryAfterSeconds =
+    retryAfterMs && retryAfterMs > 0
+      ? Math.ceil(retryAfterMs / 1000)
+      : undefined;
   if (!retryAfterSeconds) {
-    const resetEpochSeconds = parseRetryAfterSeconds(resetAt);
-    if (resetEpochSeconds) {
+    const resetEpochSeconds = Math.floor(Number(resetAt));
+    if (resetEpochSeconds > 0) {
       const nowEpochSeconds = Math.floor(Date.now() / 1000);
       const diff = resetEpochSeconds - nowEpochSeconds;
       retryAfterSeconds = diff > 0 ? diff : undefined;

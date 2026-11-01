@@ -169,8 +169,6 @@ export const GEO_STATUS_LABELS: Record<GeoReportStatus, string> = {
 
 export const GEO_LOGO_LINK_BASE_URL = "https://logos.context.dev/";
 
-export const GEO_FAVICON_BASE_URL = "https://www.google.com/s2/favicons";
-
 export const GEO_FAVICON_SIZE = 128;
 
 export const GEO_VISIBILITY_SCORE_MAX = 100;

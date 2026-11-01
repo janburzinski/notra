@@ -6,7 +6,7 @@ import {
   readDiagramSpec,
   readImageFormat,
 } from "@notra/ai/utils/diagram-metadata";
-import { isRecord, readString } from "@notra/ai/utils/unknown-record";
+import { isRecord, readString } from "@notra/utils/unknown-record";
 
 export function getContentImageContext(
   post: ContentImageContextSource

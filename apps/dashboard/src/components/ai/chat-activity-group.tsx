@@ -12,6 +12,7 @@ import {
   CollapsibleTrigger,
 } from "@notra/ui/components/ui/collapsible";
 import { cn } from "@notra/ui/lib/utils";
+import { googleFaviconUrl } from "@notra/utils/google-favicon";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 
@@ -187,7 +188,10 @@ export function ChatActivityGroup({
 
 export function SearchFavicon({ domain }: { domain?: string }) {
   const [failed, setFailed] = useState(false);
-  if (!isPublicSearchDomain(domain) || failed) {
+  const src = isPublicSearchDomain(domain)
+    ? googleFaviconUrl(domain, 32)
+    : null;
+  if (!src || failed) {
     return (
       <HugeiconsIcon
         className="size-3.5 shrink-0"
@@ -203,7 +207,7 @@ export function SearchFavicon({ domain }: { domain?: string }) {
       className="bg-muted size-3.5 shrink-0 rounded-full"
       height={14}
       onError={() => setFailed(true)}
-      src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`}
+      src={src}
       unoptimized
       width={14}
     />

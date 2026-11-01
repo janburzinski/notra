@@ -11,6 +11,7 @@
     "@ai-sdk/gateway": "catalog:",
     "@notra/ai": "workspace:*",
     "@notra/memory": "workspace:*",
+    "@notra/utils": "workspace:*",
     "@opentui/core": "0.5.14",
     "@opentui/react": "0.5.14",
     "@upstash/box": "~0.5.5",

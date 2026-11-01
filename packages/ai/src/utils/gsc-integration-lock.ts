@@ -1,3 +1,5 @@
+import { setTimeout as sleep } from "node:timers/promises";
+
 import {
   GSC_INTEGRATION_LOCK_KEY_PREFIX,
   GSC_INTEGRATION_LOCK_REDIS_TIMEOUT_MS,
@@ -34,10 +36,6 @@ export class GscIntegrationLockLostError extends Error {
     super("Google Search Console integration lock was lost", { cause });
     this.name = "GscIntegrationLockLostError";
   }
-}
-
-function sleep(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 /**

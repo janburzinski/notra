@@ -1,15 +1,13 @@
-import type { ReportBrand } from "../categories";
+import { escapeRegExp } from "@notra/utils/escape";
 
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import type { ReportBrand } from "../categories";
 
 export function brandMatchers(brand: ReportBrand): RegExp[] {
   const flags = brand.caseSensitive ? "gu" : "giu";
   return [brand.name, ...(brand.aliases ?? [])].map(
     (name) =>
       new RegExp(
-        `(?<![\\p{L}\\p{M}\\p{N}])${escapeRegex(name)}(?![\\p{L}\\p{M}\\p{N}])`,
+        `(?<![\\p{L}\\p{M}\\p{N}])${escapeRegExp(name)}(?![\\p{L}\\p{M}\\p{N}])`,
         flags
       )
   );

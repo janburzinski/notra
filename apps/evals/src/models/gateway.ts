@@ -4,7 +4,7 @@ import {
   ROUTE_USAGE_LOOKUP_CONCURRENCY,
 } from "@notra/ai/constants/router";
 import { createVercelAdapter } from "@notra/ai/router/adapters/vercel";
-import { isRecord } from "@notra/ai/utils/unknown-record";
+import { isRecord } from "@notra/utils/unknown-record";
 import {
   experimental_evaluate as evaluateWithModel,
   generateText,

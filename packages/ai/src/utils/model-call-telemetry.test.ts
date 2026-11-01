@@ -15,11 +15,11 @@ import {
   httpError,
   readStreamParts,
 } from "@notra/ai/router/test-helpers";
+import { isRecord } from "@notra/utils/unknown-record";
 
 import { evlogRequestIntegration } from "./evlog-request";
 import { getEvlogRuntime } from "./evlog-runtime";
 import { withGatewayAgentOptions } from "./gateway-agent-model";
-import { isRecord } from "./unknown-record";
 
 test("real OpenRouter usage survives a later error and is accounted once", async () => {
   const chunks = [

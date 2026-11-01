@@ -1,5 +1,6 @@
+import { googleFaviconUrl } from "@notra/utils/google-favicon";
+
 import {
-  GEO_FAVICON_BASE_URL,
   GEO_FAVICON_SIZE,
   GEO_LOGO_LINK_BASE_URL,
 } from "@/constants/geo-report";
@@ -42,9 +43,10 @@ export function getBrandLogoCandidates(domain: string) {
   if (logoLink) {
     candidates.push(logoLink);
   }
-  candidates.push(
-    `${GEO_FAVICON_BASE_URL}?domain=${hostname}&sz=${GEO_FAVICON_SIZE}`
-  );
+  const favicon = googleFaviconUrl(hostname, GEO_FAVICON_SIZE);
+  if (favicon) {
+    candidates.push(favicon);
+  }
   return candidates;
 }
 

@@ -7,11 +7,11 @@ import {
   organizations,
   repositoryOutputs,
 } from "@notra/db/schema";
+import { encryptToken } from "@notra/db/utils/integration-encryption";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { Effect } from "effect";
 import { customAlphabet } from "nanoid";
 
-import { encryptToken } from "../crypto/token-encryption";
 import {
   GitHubInstallationMissingError,
   GitHubPersistenceError,

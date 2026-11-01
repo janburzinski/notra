@@ -1,3 +1,5 @@
+import { escapeRegExp } from "@notra/utils/escape";
+
 import { competitorKey } from "../geo/domain";
 import type {
   GeoAnswerMentionInput,
@@ -7,12 +9,7 @@ import type {
 } from "../types/geo";
 
 const MIN_MENTION_PHRASE_LENGTH = 2;
-const REGEXP_ESCAPE_REGEX = /[.*+?^${}()|[\]\\]/g;
 const MENTION_WORD_CHAR = "[\\p{L}\\p{N}\\p{M}_]";
-
-function escapeRegExp(value: string): string {
-  return value.replace(REGEXP_ESCAPE_REGEX, "\\$&");
-}
 
 const MENTION_PATTERN_CACHE_MAX_ENTRIES = 2000;
 const FOLDED_CACHE_MAX_ENTRIES = 5000;

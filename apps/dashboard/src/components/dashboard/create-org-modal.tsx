@@ -1,6 +1,6 @@
 "use client";
 
-import { slugSchema } from "@notra/schemas/dashboard/organization";
+import { slugifyOrganization } from "@notra/schemas/utils/dashboard/organization";
 import {
   Dialog,
   DialogContent,
@@ -24,10 +24,6 @@ import { errorMessageOr, generateOrganizationAvatar } from "@/lib/utils";
 import { createOrganizationFormSchema } from "@/schemas/create-organization-form";
 import { setLastVisitedOrganization } from "@/utils/cookies";
 import { QUERY_KEYS } from "@/utils/query-keys";
-
-function slugify(value: string): string {
-  return slugSchema.safeParse(value).data ?? "";
-}
 
 interface CreateOrgModalProps {
   open: boolean;
@@ -151,9 +147,12 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps) {
                       const currentSlug = form.getFieldValue("slug");
                       if (
                         !currentSlug ||
-                        currentSlug === slugify(field.state.value)
+                        currentSlug === slugifyOrganization(field.state.value)
                       ) {
-                        form.setFieldValue("slug", slugify(e.target.value));
+                        form.setFieldValue(
+                          "slug",
+                          slugifyOrganization(e.target.value)
+                        );
                       }
                     }}
                     placeholder={tCommon2("labels.acmeInc")}

@@ -113,7 +113,7 @@ const transaction = mock(async (work: (tx: unknown) => Promise<unknown>) => {
         if (ownsReservationLock) {
           reservationLocked = true;
         }
-        return { rows: [{ locked: ownsReservationLock }] };
+        return { rows: [{ acquired: ownsReservationLock }] };
       },
       insert: (table: unknown) => ({
         values: async (input: {

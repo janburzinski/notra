@@ -18,6 +18,7 @@ import {
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
 import { useRetainedValue } from "@notra/ui/hooks/use-retained-value";
+import { escapeRegExp } from "@notra/utils/escape";
 import { Fragment, useState } from "react";
 
 import { GoogleAiOverview } from "@/components/state-of-ai-search/ai-overview-card";
@@ -180,12 +181,8 @@ export function AnswerViewer({
   );
 }
 
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function HighlightText({ text, brand }: { text: string; brand: string }) {
-  const parts = text.split(new RegExp(`(${escapeRegex(brand)})`, "i"));
+  const parts = text.split(new RegExp(`(${escapeRegExp(brand)})`, "i"));
   const keys = uniqueKeys(
     parts.map((_, index) =>
       String(parts.slice(0, index).reduce((sum, part) => sum + part.length, 0))

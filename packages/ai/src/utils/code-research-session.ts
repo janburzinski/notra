@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { setTimeout as sleep } from "node:timers/promises";
 
 import {
   CODE_RESEARCH_BOX_REUSE_MARGIN_SECONDS,
@@ -162,10 +163,6 @@ async function withLeaseHeartbeat<T>(
   } finally {
     clearInterval(timer);
   }
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function reuseWorkspace(params: {

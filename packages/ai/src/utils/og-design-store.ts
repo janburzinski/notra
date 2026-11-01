@@ -20,6 +20,7 @@ import {
   brandOgTemplates,
 } from "@notra/db/schema";
 import type { OgDesignRunStatus } from "@notra/db/types/og-image";
+import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
 import { and, desc, eq, gt, lte, sql, isNull, asc, inArray } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -31,10 +32,8 @@ export const claimOgDesign = Effect.fn("OgDesign.claim")(function* (
   return yield* Effect.tryPromise({
     try: () =>
       db.transaction(async (tx): Promise<OgDesignClaim> => {
-        const lock = await tx.execute<{ acquired: boolean }>(
-          sql`select pg_try_advisory_xact_lock(hashtextextended(${brandId}, 0)) as acquired`
-        );
-        if (!lock.rows[0]?.acquired) {
+        const acquired = await advisoryXactLock(tx, brandId, { try: true });
+        if (!acquired) {
           return {
             kind: "unavailable",
             reason: "A brand design is already being claimed",

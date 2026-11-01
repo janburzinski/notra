@@ -5,6 +5,11 @@ import {
   googleSearchConsoleIntegrations,
   projects,
 } from "@notra/db/schema";
+import { advisoryXactLock } from "@notra/db/utils/advisory-xact-lock";
+import {
+  decryptToken,
+  encryptToken,
+} from "@notra/db/utils/integration-encryption";
 import { and, eq, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
@@ -22,7 +27,6 @@ import {
   MS_PER_DAY,
   REAUTH_ERROR_CODES,
 } from "../constants/google-search-console";
-import { decryptToken, encryptToken } from "../crypto/token-encryption";
 import {
   gscSearchAnalyticsResponseSchema,
   gscSitesResponseSchema,
@@ -43,10 +47,6 @@ import type {
 } from "../types/google-search-console";
 
 const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 16);
-
-function gscIntegrationLock(organizationId: string) {
-  return sql`SELECT pg_advisory_xact_lock(hashtextextended(${`gsc-integration:${organizationId}`}, 0))`;
-}
 
 export function getGscOAuthCredentials(): GscOAuthCredentials | null {
   const clientId = process.env.GOOGLE_SEARCH_CONSOLE_CLIENT_ID?.trim();
@@ -202,7 +202,7 @@ export async function upsertGscIntegration(
   const encryptedRefreshToken = encryptToken(params.refreshToken);
 
   const { integrationToRevoke, row } = await db.transaction(async (tx) => {
-    await tx.execute(gscIntegrationLock(params.organizationId));
+    await advisoryXactLock(tx, `gsc-integration:${params.organizationId}`);
     await assertLockOwned?.();
     signal?.throwIfAborted();
     const existing = await tx.query.googleSearchConsoleIntegrations.findFirst({
@@ -328,7 +328,7 @@ export async function claimOrConfirmGscSchedule(
   assertLockOwned?: () => Promise<void>
 ): Promise<GscIntegrationRow | null> {
   return await db.transaction(async (tx) => {
-    await tx.execute(gscIntegrationLock(integration.organizationId));
+    await advisoryXactLock(tx, `gsc-integration:${integration.organizationId}`);
     await assertLockOwned?.();
     signal?.throwIfAborted();
     const [row] = await tx
@@ -424,7 +424,7 @@ export async function beginGscIntegrationDisconnect(
   assertLockOwned?: () => Promise<void>
 ): Promise<GscIntegrationRow | null> {
   return await db.transaction(async (tx) => {
-    await tx.execute(gscIntegrationLock(organizationId));
+    await advisoryXactLock(tx, `gsc-integration:${organizationId}`);
     await assertLockOwned?.();
     signal?.throwIfAborted();
     const [row] = await tx
@@ -448,7 +448,7 @@ export async function deleteGscIntegration(
     return null;
   }
   return await db.transaction(async (tx) => {
-    await tx.execute(gscIntegrationLock(integration.organizationId));
+    await advisoryXactLock(tx, `gsc-integration:${integration.organizationId}`);
     await assertLockOwned?.();
     signal?.throwIfAborted();
     const [row] = await tx

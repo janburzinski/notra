@@ -11,16 +11,13 @@ import type {
   GatewayId,
   RouterProviderOptions,
 } from "@notra/ai/types/router";
+import { isRecord } from "@notra/utils/unknown-record";
 
 import { NoCompliantRouteError } from "./errors";
 import { toOpenRouterModelId, toVercelModelId } from "./model-ids";
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function asObject(value: unknown): Record<string, unknown> {
-  return isObject(value) ? value : {};
+  return isRecord(value) ? value : {};
 }
 
 function isStringArray(value: unknown): value is string[] {
@@ -236,7 +233,7 @@ export function buildOpenRouterProviderOptions(
     toOpenRouterModelId
   );
 
-  const reasoning = isObject(existing.reasoning)
+  const reasoning = isRecord(existing.reasoning)
     ? existing.reasoning
     : deriveOpenRouterReasoning(router, providerOptions);
 

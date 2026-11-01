@@ -343,6 +343,7 @@
         "@ai-sdk/gateway": "catalog:",
         "@notra/ai": "workspace:*",
         "@notra/memory": "workspace:*",
+        "@notra/utils": "workspace:*",
         "@opentui/core": "0.5.14",
         "@opentui/react": "0.5.14",
         "@upstash/box": "~0.5.5",
@@ -685,6 +686,7 @@
         "@neondatabase/serverless": "^1.2.0",
         "@notra/memory": "workspace:*",
         "@notra/sites-core": "workspace:*",
+        "@notra/utils": "workspace:*",
         "@notra/workflows": "workspace:*",
         "@upstash/redis": "catalog:",
         "@vercel/functions": "^3.10.1",
@@ -705,6 +707,7 @@
       "name": "@notra/email",
       "version": "0.0.0",
       "dependencies": {
+        "@notra/utils": "workspace:*",
         "react": "^19.3.1",
         "react-email": "6.9.5",
       },
@@ -968,6 +971,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@neondatabase/serverless": "^1.2.0",
+        "@notra/utils": "workspace:*",
         "drizzle-orm": "catalog:",
         "effect": "catalog:",
         "ipaddr.js": "^2.5.0",

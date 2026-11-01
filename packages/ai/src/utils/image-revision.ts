@@ -17,9 +17,9 @@ import {
   trackImageGenerationUsage,
 } from "@notra/ai/utils/image-post-service";
 import { logError } from "@notra/ai/utils/server-log";
-import { isRecord, readString } from "@notra/ai/utils/unknown-record";
 import { db } from "@notra/db/drizzle";
 import { posts } from "@notra/db/schema";
+import { isRecord, readString } from "@notra/utils/unknown-record";
 import { and, eq } from "drizzle-orm";
 
 interface ReviseImagePostParams {

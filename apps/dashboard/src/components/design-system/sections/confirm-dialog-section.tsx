@@ -2,18 +2,13 @@
 
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { Card, CardContent } from "@notra/ui/components/ui/card";
+import { sleep } from "@notra/utils/sleep";
 import { useState } from "react";
 
 import { Button } from "@/components/button";
 import { DesignSystemSectionHeader } from "@/components/design-system/design-system-section-header";
 
 const FAKE_REQUEST_MS = 1500;
-
-function wait(ms: number) {
-  return new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 function DefaultConfirmDemo() {
   const [open, setOpen] = useState(false);
@@ -56,7 +51,7 @@ function AsyncConfirmDemo() {
       confirmLabel="Remove"
       description="Remove Ada Lovelace from Acme? She loses access right away."
       onConfirm={async () => {
-        await wait(FAKE_REQUEST_MS);
+        await sleep(FAKE_REQUEST_MS);
         setOpen(false);
       }}
       onOpenChange={setOpen}

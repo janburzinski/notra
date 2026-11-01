@@ -11,9 +11,9 @@ import {
   uploadGeneratedImageAsset,
 } from "@notra/ai/utils/image-assets";
 import { trackImageGenerationUsage } from "@notra/ai/utils/image-post-service";
-import { isRecord } from "@notra/ai/utils/unknown-record";
 import { db } from "@notra/db/drizzle";
 import { posts } from "@notra/db/schema";
+import { isRecord } from "@notra/utils/unknown-record";
 import { and, eq, sql } from "drizzle-orm";
 
 /** Thrown when the diagram changed between reading and saving it. */

@@ -21,6 +21,7 @@ import {
   overflowTooltipPosition,
 } from "@/utils/chart-tooltip-position";
 import { echartsDatumValue } from "@/utils/echarts-datum";
+import { escapeHtml } from "@notra/utils/escape";
 
 
 export type TooltipVariant = "default" | "frosted-glass";
@@ -32,21 +33,6 @@ export const TOOLTIP_BAR_MOTION_STYLE = `transition:width ${TOOLTIP_MOVE_DURATIO
 export const TOOLTIP_VALUE_MOTION_STYLE =
   "transition:opacity 0.24s ease,transform 0.24s ease";
 
-const HTML_ESCAPE_PATTERN = /[&<>"']/g;
-const HTML_ESCAPES: Record<string, string> = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-};
-
-// Tooltip markup is injected as an HTML string by ECharts, so every
-// user-derived string (series labels, axis labels, formatted values) must be
-// escaped before interpolation — competitor names etc. come from user/LLM input.
-export function escapeHtml(value: string): string {
-  return value.replace(HTML_ESCAPE_PATTERN, (char) => HTML_ESCAPES[char] ?? char);
-}
 
 export const roundnessClass: Record<TooltipRoundness, string> = {
   sm: "rounded-sm",

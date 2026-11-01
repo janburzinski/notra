@@ -1,9 +1,12 @@
 import { db } from "@notra/db/drizzle";
 import { linearIntegrations } from "@notra/db/schema";
+import {
+  decryptToken,
+  encryptToken,
+} from "@notra/db/utils/integration-encryption";
 import { and, eq } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 
-import { decryptToken, encryptToken } from "../crypto/token-encryption";
 import type { CreateLinearIntegrationParams } from "../types/integrations";
 import type { LinearToolContext } from "../types/tools";
 import { hasOrganizationAccess } from "../utils/organization-access";

@@ -2,7 +2,7 @@ import { promisify } from "node:util";
 import { gzip } from "node:zlib";
 
 import { LOG_TRANSPORT_TIMEOUT_MS } from "@notra/ai/constants/evlog";
-import { isRecord } from "@notra/ai/utils/unknown-record";
+import { isRecord } from "@notra/utils/unknown-record";
 import type { WideEvent } from "evlog";
 import type { AxiomConfig } from "evlog/axiom";
 

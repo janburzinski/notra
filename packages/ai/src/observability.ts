@@ -1,7 +1,7 @@
 import { REQUEST_AI_USAGE_FIELDS } from "@notra/ai/constants/evlog";
 import { ROUTED_MODEL_PROVIDER } from "@notra/ai/constants/router";
 import { getOpenRequestLogger } from "@notra/ai/utils/evlog-request";
-import { isRecord } from "@notra/ai/utils/unknown-record";
+import { isRecord } from "@notra/utils/unknown-record";
 import { createAILogger } from "evlog/ai";
 
 export type AILogTarget = Parameters<typeof createAILogger>[0];

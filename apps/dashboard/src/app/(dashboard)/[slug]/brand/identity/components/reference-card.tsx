@@ -12,7 +12,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  getFaviconUrl,
   getMetadataString,
   getReferenceDomain,
   getTwitterAvatarUrl,
@@ -40,6 +39,8 @@ import {
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
 import { Label } from "@notra/ui/components/ui/label";
+import { formatCompactNumber } from "@notra/utils/format-compact-number";
+import { googleFaviconUrl } from "@notra/utils/google-favicon";
 import { useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -53,13 +54,6 @@ import { formatTweetContent } from "@/utils/format-tweet-content";
 import { getSafeReferenceSourceUrl } from "@/utils/reference-source-url";
 
 const PLATFORM_OPTIONS = ["all", "twitter", "linkedin", "blog"] as const;
-
-function formatCompactNumber(num: number, locale: string): string {
-  return new Intl.NumberFormat(locale, {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(num);
-}
 
 function formatRelativeDate(
   dateStr: string,
@@ -381,7 +375,7 @@ function TwitterReferenceStats({
           key={stat.label}
         >
           <HugeiconsIcon className="size-3.5" icon={stat.icon} />
-          {formatCompactNumber(stat.count, locale)}
+          {formatCompactNumber(stat.count, locale, 1)}
         </span>
       ))}
     </div>
@@ -521,7 +515,10 @@ function BlogReferenceCard({
               size="sm"
             >
               {domain && (
-                <AvatarImage className="p-2" src={getFaviconUrl(domain)} />
+                <AvatarImage
+                  className="p-2"
+                  src={googleFaviconUrl(domain, 64) ?? undefined}
+                />
               )}
               <AvatarFallback>
                 {(domain ?? "??").slice(0, 2).toUpperCase()}

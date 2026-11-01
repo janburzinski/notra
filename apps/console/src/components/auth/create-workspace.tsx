@@ -1,5 +1,6 @@
 "use client";
 
+import { slugifyOrganization } from "@notra/schemas/utils/dashboard/organization";
 import { Button } from "@notra/ui/components/ui/button";
 import {
   Card,
@@ -15,17 +16,9 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-// biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
-import * as z from "zod";
 
 import { authClient } from "@/lib/auth/client";
 import { createOrganizationSchema } from "@/schemas/organization";
-
-const slugSchema = z.string().slugify();
-
-function slugify(value: string): string {
-  return slugSchema.safeParse(value).data ?? "";
-}
 
 export function CreateWorkspace() {
   const router = useRouter();
@@ -94,7 +87,7 @@ export function CreateWorkspace() {
                   const nextName = event.target.value;
                   setName(nextName);
                   if (!slugEditedRef.current) {
-                    setSlug(slugify(nextName));
+                    setSlug(slugifyOrganization(nextName));
                   }
                 }}
                 placeholder="Acme Inc"
@@ -108,7 +101,7 @@ export function CreateWorkspace() {
                 id="workspace-slug"
                 onChange={(event) => {
                   slugEditedRef.current = true;
-                  setSlug(slugify(event.target.value));
+                  setSlug(slugifyOrganization(event.target.value));
                 }}
                 placeholder="acme-inc"
                 value={slug}

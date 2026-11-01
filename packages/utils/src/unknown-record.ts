@@ -1,4 +1,4 @@
-export type UnknownRecord = Record<string, unknown>;
+import type { UnknownRecord } from "@notra/utils/types/unknown-record";
 
 export function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);

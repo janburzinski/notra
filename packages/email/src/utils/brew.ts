@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 
+import { parseRetryAfterMs } from "@notra/utils/retry-after";
 import { render } from "react-email";
 
 import {
@@ -37,18 +38,6 @@ import type {
 import { logDevEmail } from "./dev";
 
 const BODY_REGEX = /<body([^>]*)>([\s\S]*)<\/body>/i;
-
-/** Retry-After is either delay-seconds or an HTTP-date (RFC 9110 10.2.3). */
-function parseRetryAfterMs(header: string | null): number | undefined {
-  if (!header) {
-    return undefined;
-  }
-  const seconds = Number(header);
-  const delayMs = Number.isFinite(seconds)
-    ? seconds * 1000
-    : Date.parse(header) - Date.now();
-  return delayMs > 0 ? delayMs : undefined;
-}
 
 export function isBrewConfigured(): boolean {
   return Boolean(process.env.BREW_API_KEY);
@@ -94,7 +83,8 @@ async function brewFetch<T>(
   if (!response.ok) {
     const { error } = (json ?? {}) as BrewErrorBody;
     const code = error?.code ?? `http_${response.status}`;
-    const retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After"));
+    const delayMs = parseRetryAfterMs(response.headers.get("Retry-After"));
+    const retryAfterMs = delayMs && delayMs > 0 ? delayMs : undefined;
 
     return {
       ok: false,
