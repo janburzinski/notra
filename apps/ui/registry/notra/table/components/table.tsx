@@ -16,7 +16,7 @@ import {
 
 const TABLE_CARD_CELLS_CLASS = [
   "[&>tbody>tr>td]:bg-table-card [&>tbody>tr>td]:border-table-row-border [&>tbody>tr>td]:border-b [&>tbody>tr>td]:transition-colors",
-  "[&>tbody>tr:hover>td]:bg-[color-mix(in_oklab,var(--muted)_50%,var(--table-card))]",
+  "[&>tbody>tr:hover>td]:bg-muted",
   "[&>tbody>tr:first-child>td]:border-t-table-card-border [&>tbody>tr:first-child>td]:border-t",
   "[&>tbody>tr:last-child>td]:border-b-table-card-border",
   "[&>tbody>tr>td:first-child]:border-l-table-card-border [&>tbody>tr>td:first-child]:border-l",

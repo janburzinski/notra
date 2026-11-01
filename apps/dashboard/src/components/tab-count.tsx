@@ -12,7 +12,7 @@ export function TabCount({ count }: TabCountProps) {
     return null;
   }
   return (
-    <span className="text-muted-foreground/70 text-xs font-normal tabular-nums">
+    <span className="text-muted-foreground text-xs font-normal tabular-nums">
       {formatCount(count, locale)}
     </span>
   );

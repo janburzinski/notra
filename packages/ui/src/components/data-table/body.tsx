@@ -103,7 +103,7 @@ export function DataTableBodyRow<T>({
   const tableRow = (
     <TableRow
       className={cn(
-        "group hover:bg-muted/50 data-[selected=true]:bg-primary/5 focus-visible:outline-ring focus-visible:outline-2 focus-visible:-outline-offset-2",
+        "group hover:bg-muted data-[selected=true]:bg-primary/5 focus-visible:outline-ring focus-visible:outline-2 focus-visible:-outline-offset-2",
         onRowClick && "cursor-pointer",
         className
       )}
