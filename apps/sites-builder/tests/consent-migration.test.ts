@@ -2,7 +2,10 @@ import { afterEach, expect, test } from "bun:test";
 
 import { readStoredRecords } from "@c15t/core/modules/persistence";
 
-import { migrateLegacyRefusal } from "../src/utils/consent-migration";
+import {
+  dropSharedConsentCookie,
+  migrateLegacyRefusal,
+} from "../src/utils/consent-migration";
 
 const HOST_KEY = "__Host-c15t";
 const globals = globalThis as Record<string, unknown>;
@@ -86,4 +89,18 @@ test("an existing host-only choice is left alone", () => {
   migrateLegacyRefusal(HOST_KEY);
   expect(jar).toHaveLength(2);
   expect(stored()).toBe(true);
+});
+
+test("a c15t cookie on the hosting domain is expired before c15t reads it", () => {
+  const writes: string[] = [];
+  globals.document = {
+    get cookie() {
+      return "";
+    },
+    set cookie(value: string) {
+      writes.push(value);
+    },
+  };
+  dropSharedConsentCookie("notra.site");
+  expect(writes).toEqual(["c15t=; Domain=.notra.site; Path=/; Max-Age=0"]);
 });

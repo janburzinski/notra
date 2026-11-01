@@ -932,6 +932,25 @@ describe("production serving", () => {
     ).toEqual([false, false, true]);
   });
 
+  test("consent banner: a shared consent cookie doesn't count on the site's notra.site address", async () => {
+    const { objects, put, request, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    withConsentBanner(objects, put);
+    await request("https://blog.acme.com/blog/post", {
+      cookie: consentCookie(true),
+    });
+    await request("https://acme.notra.site/blog/post", {
+      cookie: consentCookie(true),
+    });
+    await settle();
+    expect(
+      reports.map(
+        (report) => JSON.parse(String(report.init.body)).visitorConsent
+      )
+    ).toEqual([true, false]);
+  });
+
   test("consent banner: the page's view beacon counts with its landing referrer", async () => {
     const { objects, put, deps, reports, settle } = setup({
       trafficToken: "nst.site_a.sig",

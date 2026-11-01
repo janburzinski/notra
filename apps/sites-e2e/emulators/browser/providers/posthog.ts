@@ -66,6 +66,7 @@ export const posthog: AnalyticsProvider = {
     assert.deepEqual(body.fixture_options, {
       api_host: "https://us.i.posthog.com",
       disable_session_recording: true,
+      cross_subdomain_cookie: false,
     });
   },
 };

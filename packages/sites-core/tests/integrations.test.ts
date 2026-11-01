@@ -286,6 +286,88 @@ describe("head scripts", () => {
     });
   });
 
+  const hostingHosts = [
+    ["acme.notra.site", true],
+    ["pr-1--acme.notra.site", true],
+    ["notra.site", true],
+    ["blog.acme.com", false],
+    ["evilnotra.site", false],
+  ] as const;
+
+  test.each(hostingHosts)(
+    "GA4 keeps its cookies host-only on the hosting domain (%s: %p)",
+    (hostname, hostOnly) => {
+      const window: { dataLayer?: unknown[] } = {};
+      const scripts = integrationHeadScripts(
+        { ga4: { measurementId: "G-ABC123XYZ9" } },
+        "notra.site"
+      );
+      for (const script of scripts) {
+        if (script.kind === "inline") {
+          new Script(script.code).runInNewContext({
+            window,
+            Date,
+            location: { hostname },
+            get dataLayer() {
+              return window.dataLayer;
+            },
+          });
+        }
+      }
+      expect(
+        window.dataLayer?.map((args) => Array.from(args as unknown[]))
+      ).toEqual([
+        ["js", expect.any(Date)],
+        ["config", "G-ABC123XYZ9", hostOnly ? { cookie_domain: "none" } : {}],
+      ]);
+    }
+  );
+
+  test.each(hostingHosts)(
+    "PostHog keeps its cookie host-only on the hosting domain (%s: %p)",
+    (hostname, hostOnly) => {
+      const window: { posthog?: { _i: unknown[][] } } = {};
+      const document = {
+        createElement: () => ({}),
+        getElementsByTagName: () => [
+          { parentNode: { insertBefore: () => {} } },
+        ],
+      };
+      const scripts = integrationHeadScripts(
+        { posthog: { apiKey: "phc_abcdefghijklmnopqrstuvwxyz0123" } },
+        "notra.site"
+      );
+      for (const script of scripts) {
+        if (script.kind === "inline") {
+          new Script(script.code).runInNewContext({
+            window,
+            document,
+            location: { hostname },
+            get posthog() {
+              return window.posthog;
+            },
+          });
+        }
+      }
+      expect(window.posthog?._i[0]?.[1]).toEqual({
+        api_host: "https://us.i.posthog.com",
+        disable_session_recording: false,
+        ...(hostOnly && { cross_subdomain_cookie: false }),
+      });
+    }
+  );
+
+  test("without a hosting domain GA4 and PostHog keep the vendors' cookie defaults", () => {
+    const code = integrationHeadScripts({
+      ga4: { measurementId: "G-ABC123XYZ9" },
+      posthog: { apiKey: "phc_abcdefghijklmnopqrstuvwxyz0123" },
+    })
+      .map((script) => (script.kind === "inline" ? script.code : ""))
+      .join("");
+    expect(code).not.toContain("location");
+    expect(code).not.toContain("cookie");
+  });
+
   test("Umami Cloud uses its public Website ID and permits the collection gateway", () => {
     const integrations = {
       umami: { websiteId: "94db1cb1-74f4-4a40-ad6c-962362670409" },

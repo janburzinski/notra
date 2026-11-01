@@ -28,6 +28,10 @@ export const siteBuildRequestSchema = z.object({
   analytics: z.boolean().default(false),
   branding: z.boolean().default(true),
   defaultConfig: siteConfigSchema.optional(),
+  hostingDomain: z
+    .string()
+    .regex(/^[a-z0-9.-]+$/)
+    .optional(),
 });
 
 const siteBuildRedirectSchema = z.object({

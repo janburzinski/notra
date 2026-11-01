@@ -2,7 +2,7 @@ import { hasErrors } from "@notra/sites-compiler/utils/diagnostics";
 import { listMountedAreas } from "@notra/sites-core/utils/mounts";
 
 import type { DevRefreshOptions } from "../types/dev-refresh";
-import { consentScriptDiagnostics, siteConsent } from "./consent";
+import { consentDiagnostics, siteConsent } from "./consent";
 import { cleanDevGeneratedAssets } from "./dev-generated-assets";
 import { siteHeadScripts } from "./head-scripts";
 import { hasReactComponents } from "./react";
@@ -68,17 +68,19 @@ export function createDevRefresh(options: DevRefreshOptions) {
     if (closed || current !== revision) {
       return;
     }
-    const consentDiagnostics = consentScriptDiagnostics(
+    const consentChecks = consentDiagnostics(
       config,
-      prepared.customScripts
+      prepared.customScripts,
+      options.params.publicOrigin,
+      options.params.hostingDomain
     );
     options.printDiagnostics([
       ...prepared.collectDiagnostics,
       ...prepared.validation.diagnostics,
       ...ogImages.diagnostics,
-      ...consentDiagnostics,
+      ...consentChecks,
     ]);
-    if (hasErrors(consentDiagnostics)) {
+    if (hasErrors(consentChecks)) {
       return;
     }
     const params = {
@@ -96,14 +98,16 @@ export function createDevRefresh(options: DevRefreshOptions) {
         config,
         options.params.mount,
         prepared.customScripts,
-        false
+        false,
+        options.params.hostingDomain
       ),
       consent: siteConsent(
         config,
         prepared.customScripts,
         false,
         true,
-        options.params.publicOrigin
+        options.params.publicOrigin,
+        options.params.hostingDomain
       ),
     };
     const snapshot = JSON.stringify(params);

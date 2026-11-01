@@ -190,7 +190,7 @@ To give the banner its own look, set `theme`. Each color is a hex value, and any
 | `legalLinks.cookiePolicy` | `{ href, label? }` | | Same as above |
 | `legalLinks.termsOfService` | `{ href, label? }` | | Same as above |
 | `locale` | Language code | Visitor's browser language | Force one language: `bg`, `cs`, `cy`, `da`, `de`, `el`, `en`, `es`, `et`, `fi`, `fr`, `ga`, `gu`, `he`, `hi`, `hr`, `hu`, `id`, `is`, `it`, `lb`, `lt`, `lv`, `mt`, `nb`, `nl`, `nn`, `pl`, `pt`, `rm`, `ro`, `sk`, `sl`, `sv` or `zh` |
-| `crossSubdomain` | boolean | `false` | Share the consent cookie with every subdomain, so a choice on `blog.acme.com` also applies on `acme.com`. Use it only on your own domain: on a `notra.site` address it would share the choice with other Notra sites |
+| `crossSubdomain` | boolean | `false` | Share the consent cookie with every subdomain, so a choice on `blog.acme.com` also applies on `acme.com`. It only applies on your own domain: on a `notra.site` address Notra ignores it and shows a build warning, so other Notra sites can't read or change the choice. If your site also has a `notra.site` address, the choice made there stays in that browser for that address only |
 | `expiryDays` | 1 to 730 | `365` | Days until the stored choice expires and the banner shows again |
 | `disableAnimation` | boolean | `false` | Show the banner and dialog without animations |
 | `theme` | object | Your site's theme | Colors and corner rounding, see [Colors and corners](#colors-and-corners) |

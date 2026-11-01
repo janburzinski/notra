@@ -60,18 +60,28 @@ function consentAnalytics({
   };
 }
 
+function onHostingDomain(publicOrigin: string, hostingDomain?: string) {
+  return (
+    hostingDomain !== undefined &&
+    `.${new URL(publicOrigin).hostname}`.endsWith(`.${hostingDomain}`)
+  );
+}
+
 export function siteConsent(
   config: SiteConfig,
   customScripts: readonly PreparedCustomScript[],
   analytics: boolean,
   dev: boolean,
-  publicOrigin: string
+  publicOrigin: string,
+  hostingDomain?: string
 ): SiteConsentParams | null {
   const { c15t } = config.integrations;
   if (!c15t) {
     return null;
   }
   const gated = c15t.scripts ?? {};
+  const crossSubdomain =
+    c15t.crossSubdomain && !onHostingDomain(publicOrigin, hostingDomain);
   return {
     backendURL: analytics ? c15t.backendURL : null,
     devTools: dev && c15t.devTools,
@@ -94,10 +104,12 @@ export function siteConsent(
         ? { locale: c15t.locale, detectLanguage: false }
         : undefined,
       storageConfig: {
-        crossSubdomain: c15t.crossSubdomain,
+        defaultDomain: crossSubdomain
+          ? `.${new URL(publicOrigin).hostname.split(".").slice(-2).join(".")}`
+          : undefined,
         defaultExpiryDays: c15t.expiryDays,
         storageKey:
-          c15t.crossSubdomain || !publicOrigin.startsWith("https:")
+          crossSubdomain || !publicOrigin.startsWith("https:")
             ? undefined
             : C15T_HOST_STORAGE_KEY,
       },
@@ -113,17 +125,31 @@ export function siteConsent(
   };
 }
 
-export function consentScriptDiagnostics(
+export function consentDiagnostics(
   config: SiteConfig,
-  customScripts: readonly PreparedCustomScript[]
+  customScripts: readonly PreparedCustomScript[],
+  publicOrigin: string,
+  hostingDomain?: string
 ): SiteDiagnostic[] {
   const paths = new Set(customScripts.map((script) => script.path));
-  return Object.keys(config.integrations.c15t?.scripts ?? {})
+  const diagnostics = Object.keys(config.integrations.c15t?.scripts ?? {})
     .filter((path) => !paths.has(path))
-    .map((path) => ({
+    .map((path): SiteDiagnostic => ({
       severity: "error",
       file: "blog.json",
       code: "consent_script_missing",
       message: `integrations.c15t.scripts lists ${path}, but there is no custom script at that path.`,
     }));
+  if (
+    config.integrations.c15t?.crossSubdomain &&
+    onHostingDomain(publicOrigin, hostingDomain)
+  ) {
+    diagnostics.push({
+      severity: "warning",
+      file: "blog.json",
+      code: "consent_cross_subdomain_ignored",
+      message: `integrations.c15t.crossSubdomain only applies on your own domain. On ${hostingDomain} the consent choice stays on this site's host, so other sites there can't read or change it.`,
+    });
+  }
+  return diagnostics;
 }

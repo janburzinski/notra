@@ -10,6 +10,7 @@
       dl: location.href,
       dt: document.title,
       fixture_script_id: new URL(loaded).searchParams.get("id"),
+      fixture_cookie_domain: config[2]?.cookie_domain ?? "",
     });
     fetch(url, { method: "POST", body: "", mode: "cors" });
   };

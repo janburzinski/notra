@@ -26,7 +26,11 @@ if (process.env.NOTRA_SITES_TIMELINE_TEST_WORKER !== "1") {
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],
       {
-        env: { ...process.env, NOTRA_SITES_TIMELINE_TEST_WORKER: "1" },
+        env: {
+          ...process.env,
+          NOTRA_SITES_TIMELINE_TEST_WORKER: "1",
+          SITES_HOSTING_DOMAIN: "notra.site",
+        },
       }
     );
     expect(result.status, result.stderr?.toString()).toBe(0);

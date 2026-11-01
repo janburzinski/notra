@@ -25,7 +25,12 @@ export const serveDeployment = Effect.fn("Sites.serveDeployment")(function* (
       )
     );
   }
-  const consent = visitorConsent(loaded.manifest, request.headers);
+  const consent = visitorConsent(
+    loaded.manifest,
+    request.headers,
+    host,
+    deps.hostingDomain
+  );
   const deploymentContext = {
     ...context,
     resolved,

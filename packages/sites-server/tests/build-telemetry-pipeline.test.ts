@@ -30,6 +30,7 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
         env: {
           ...process.env,
           NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER: "1",
+          SITES_HOSTING_DOMAIN: "Notra.site",
           UPSTASH_BOX_API_KEY: "synthetic-box-secret",
         },
         timeout: 30_000,
@@ -451,6 +452,7 @@ if (process.env.NOTRA_BUILD_TELEMETRY_PIPELINE_WORKER !== "1") {
       });
       expect(buildTargets).toHaveLength(1);
       expect(buildTargets[0]?.analytics).toBe(kind === "production");
+      expect(buildTargets[0]?.hostingDomain).toBe("notra.site");
     }
   );
   test("final metrics include source, sandbox and publication while logs survive R2 failure", async () => {

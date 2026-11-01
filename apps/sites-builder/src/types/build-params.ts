@@ -36,7 +36,7 @@ export interface SiteConsentOptions {
   legalLinks?: SiteC15t["legalLinks"];
   i18n?: { locale: NonNullable<SiteC15t["locale"]>; detectLanguage: false };
   storageConfig: {
-    crossSubdomain?: boolean;
+    defaultDomain?: string;
     defaultExpiryDays?: number;
     storageKey?: typeof C15T_HOST_STORAGE_KEY;
   };
@@ -64,6 +64,7 @@ export interface BuildParams {
   area: "blog" | "changelog";
   mount: string;
   publicOrigin: string;
+  hostingDomain?: string;
   siteId: string;
   deploymentId: string;
   noindex: boolean;

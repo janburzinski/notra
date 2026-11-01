@@ -107,6 +107,16 @@ export const MUTATIONS: Mutation[] = [
     caughtBy: "held build and promote / every live page",
   },
   {
+    id: "ga4-shared-cookie",
+    bug: "GA4 sets its _ga cookies on the hosting domain, shared with every other site",
+    file: "packages/sites-core/src/utils/integrations.ts",
+    find: '?{cookie_domain:"none"}:{}',
+    replace: "?{}:{}",
+    suites: ["unit", "browser"],
+    caughtBy:
+      "integrations: GA4 keeps its cookies host-only on the hosting domain / every live page",
+  },
+  {
     id: "preview-noindex",
     bug: "Protected previews are served without X-Robots-Tag: noindex",
     file: "apps/sites/src/serve-file.ts",

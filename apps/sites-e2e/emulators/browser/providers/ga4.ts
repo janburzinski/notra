@@ -36,6 +36,7 @@ export const ga4: AnalyticsProvider = {
     assert.equal(query.get("v"), "2");
     assert.equal(query.get("tid"), settings.measurementId);
     assert.equal(query.get("fixture_script_id"), settings.measurementId);
+    assert.equal(query.get("fixture_cookie_domain"), "none");
     assert.equal(query.get("en"), "page_view");
     assert.equal(query.get("dl"), pageUrl);
     assert.ok(query.get("dt"));

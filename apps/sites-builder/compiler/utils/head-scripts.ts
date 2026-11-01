@@ -13,12 +13,13 @@ export function siteHeadScripts(
   config: SiteConfig,
   mount: string,
   customScripts: readonly PreparedCustomScript[],
-  analytics: boolean
+  analytics: boolean,
+  hostingDomain?: string
 ): SiteHeadScript[] {
   const gated = config.integrations.c15t?.scripts ?? {};
   return [
     ...(analytics && !analyticsGatedByConsent(config.integrations)
-      ? integrationHeadScripts(config.integrations)
+      ? integrationHeadScripts(config.integrations, hostingDomain)
       : []),
     ...customScripts
       .filter((script) => !gated[script.path])

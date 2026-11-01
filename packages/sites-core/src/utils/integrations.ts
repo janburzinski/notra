@@ -26,9 +26,13 @@ export function inlineScriptLiteral(value: unknown): string {
 }
 
 export function integrationHeadScripts(
-  integrations: SiteIntegrations
+  integrations: SiteIntegrations,
+  hostingDomain?: string
 ): SiteHeadScript[] {
   const scripts: SiteHeadScript[] = [];
+  const onHostingDomain =
+    hostingDomain &&
+    `("."+location.hostname).endsWith(${inlineScriptLiteral(`.${hostingDomain}`)})`;
   const { databuddy, ga4, plausible, posthog, umami } = integrations;
   if (databuddy) {
     const { scriptUrl, replay, ...options } = databuddy;
@@ -69,7 +73,7 @@ export function integrationHeadScripts(
       },
       {
         kind: "inline",
-        code: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config",${inlineScriptLiteral(ga4.measurementId)});`,
+        code: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config",${inlineScriptLiteral(ga4.measurementId)}${onHostingDomain ? `,${onHostingDomain}?{cookie_domain:"none"}:{}` : ""});`,
       }
     );
   }
@@ -89,7 +93,7 @@ export function integrationHeadScripts(
     };
     scripts.push({
       kind: "inline",
-      code: `${POSTHOG_LOADER}posthog.init(${inlineScriptLiteral(posthog.apiKey)},${inlineScriptLiteral(options)});`,
+      code: `${POSTHOG_LOADER}posthog.init(${inlineScriptLiteral(posthog.apiKey)},${onHostingDomain ? `Object.assign(${inlineScriptLiteral(options)},${onHostingDomain}?{cross_subdomain_cookie:false}:{})` : inlineScriptLiteral(options)});`,
     });
   }
   if (umami) {

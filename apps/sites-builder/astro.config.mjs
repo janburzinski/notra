@@ -164,6 +164,7 @@ export default defineConfig({
     ssr: { noExternal: ["@astrojs/react"] },
     define: {
       __NOTRA_CONSENT_ANALYTICS__: JSON.stringify(consent?.analytics ?? {}),
+      __NOTRA_HOSTING_DOMAIN__: JSON.stringify(params.hostingDomain ?? null),
       __NOTRA_CONSENT_STORAGE_KEY__: JSON.stringify(
         consent?.options.storageConfig.storageKey ?? null
       ),

@@ -9,6 +9,7 @@ import { siteManifestSchema } from "@notra/sites-core/schemas/deployment";
 import { contentTypeForPath } from "../../../../packages/sites-server/src/utils/content-types";
 import { buildSite } from "../../../sites-builder/compiler/build";
 import { listFiles } from "../../../sites-builder/compiler/utils/fs";
+import { HOSTING_DOMAIN } from "../constants/fixtures";
 import type { FixtureBuild, Measurement } from "../types/harness";
 import { fixtureToolchain } from "./toolchain";
 
@@ -75,6 +76,7 @@ async function compileWith(
       siteId,
       deploymentId,
       publicOrigin,
+      hostingDomain: HOSTING_DOMAIN,
       analytics: !preview,
       noindex: preview,
       includeDrafts: preview,

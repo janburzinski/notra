@@ -18,6 +18,7 @@ import {
   startDeploymentBuild,
   transitionDeployment,
 } from "./deployments";
+import { getSitesHostingDomain } from "./env";
 import {
   changedPathsBetween,
   getBranchHead,
@@ -291,6 +292,7 @@ const buildAndPublish = Effect.fn("Sites.buildAndPublish")(function* (
         analytics: deployment.kind === "production",
         branding: deployment.target.branding !== false,
         defaultConfig: deployment.target.defaultConfig,
+        hostingDomain: getSitesHostingDomain(),
       },
       onLog: (log) =>
         Effect.gen(function* () {

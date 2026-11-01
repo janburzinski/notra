@@ -197,6 +197,7 @@ async function main() {
         area: selected.area,
         mount: selected.mount,
         publicOrigin: `http://localhost:${port}`,
+        hostingDomain: target?.hostingDomain,
         siteId: "local",
         deploymentId: "local",
         noindex: true,

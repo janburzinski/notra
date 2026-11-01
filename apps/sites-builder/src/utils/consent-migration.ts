@@ -60,3 +60,13 @@ export function migrateLegacyRefusal(storageKey: string | null): void {
   };
   document.cookie = `${storageKey}=${encodeURIComponent(JSON.stringify(record))}; Path=/; Max-Age=${MIGRATED_MAX_AGE_SECONDS}; Secure; SameSite=Lax`;
 }
+
+/**
+ * A site that shares its consent choice across its own subdomains pins the
+ * `c15t` cookie to its own domain, so on its hosting-domain address c15t keeps
+ * the choice in this origin's localStorage. Any other site there can still set
+ * `c15t` on the hosting domain, so that cookie is expired before c15t reads it.
+ */
+export function dropSharedConsentCookie(hostingDomain: string): void {
+  document.cookie = `${LEGACY_KEY}=; Domain=.${hostingDomain}; Path=/; Max-Age=0`;
+}

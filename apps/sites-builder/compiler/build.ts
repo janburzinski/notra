@@ -30,7 +30,7 @@ import { prepareSite } from "./prepare";
 import type { AreaPages } from "./types/agent-files";
 import type { AstroPackageJson, BuildSiteOptions } from "./types/build";
 import { createAstroLogFilter } from "./utils/astro-log";
-import { consentScriptDiagnostics, siteConsent } from "./utils/consent";
+import { consentDiagnostics, siteConsent } from "./utils/consent";
 import { listFiles } from "./utils/fs";
 import { siteHeadScripts } from "./utils/head-scripts";
 import { inlineScriptHashes } from "./utils/inline-scripts";
@@ -122,9 +122,16 @@ export async function buildSite(
     ...prepared.validation.diagnostics,
   ];
   const config = prepared.validation.config;
+  const publicOrigin = new URL(options.target.publicOrigin).origin;
+  const { hostingDomain } = options.target;
   if (config) {
     diagnostics.push(
-      ...consentScriptDiagnostics(config, prepared.customScripts)
+      ...consentDiagnostics(
+        config,
+        prepared.customScripts,
+        publicOrigin,
+        hostingDomain
+      )
     );
   }
   if (hasErrors(diagnostics) || !(prepared.validation.ok && config)) {
@@ -154,7 +161,6 @@ export async function buildSite(
   await rm(options.outDir, { recursive: true, force: true });
   await mkdir(options.outDir, { recursive: true });
 
-  const publicOrigin = new URL(options.target.publicOrigin).origin;
   const publicFiles = new Set(publicFileList);
   const areas: SiteBuildResult["areas"] = [];
   const areaPages: AreaPages[] = [];
@@ -163,7 +169,8 @@ export async function buildSite(
     prepared.customScripts,
     options.target.analytics,
     false,
-    publicOrigin
+    publicOrigin,
+    hostingDomain
   );
   const pageHtml = new Map<string, string>();
   for (const { area, mount } of listMountedAreas(mounts)) {
@@ -172,6 +179,7 @@ export async function buildSite(
       area,
       mount,
       publicOrigin,
+      hostingDomain,
       siteId: options.target.siteId,
       deploymentId: options.target.deploymentId,
       noindex: options.target.noindex,
@@ -187,7 +195,8 @@ export async function buildSite(
         config,
         mount,
         prepared.customScripts,
-        options.target.analytics
+        options.target.analytics,
+        hostingDomain
       ),
       consent,
     });

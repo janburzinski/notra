@@ -499,6 +499,16 @@ try {
     }
   }
   await sites.settle();
+  assert.deepEqual(
+    (await browser.cookies())
+      .filter((cookie) => cookie.domain === `.${HOSTING_DOMAIN}`)
+      .map((cookie) => cookie.name),
+    [],
+    `no cookie is shared with every site on .${HOSTING_DOMAIN}`
+  );
+  checks.push(
+    `every cookie the sites and their ${providerLabel} analytics set stays on its own host, none on .${HOSTING_DOMAIN}`
+  );
   const expectedPerPage = Object.fromEntries(
     livePages
       .map(([path]) => [`${origin}${path}`, repetitions] as const)
