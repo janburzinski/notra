@@ -3,17 +3,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { loadRenderFont } from "@notra/ai/utils/render-font";
-import { Resvg } from "@resvg/resvg-js";
-import * as echarts from "echarts";
 
 import { chartInputSchema } from "../schemas/chart";
 import type { ChartInput } from "../types/chart";
 
 export async function renderChart(input: ChartInput): Promise<Buffer> {
   const chart = chartInputSchema.parse(input);
-  const [regular, bold] = await Promise.all([
+  const [regular, bold, { Resvg }, echarts] = await Promise.all([
     loadRenderFont("Inter"),
     loadRenderFont("Inter:wght@700"),
+    import("@resvg/resvg-js"),
+    import("echarts"),
   ]);
   const renderer = echarts.init(null, null, {
     renderer: "svg",

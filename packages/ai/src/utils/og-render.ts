@@ -13,9 +13,7 @@ import type {
 import { validateOgGlyphCoverage } from "@notra/ai/utils/og-font";
 import { parseOgWebsiteUrl } from "@notra/ai/utils/og-website";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
-import { Resvg } from "@resvg/resvg-js";
 import { createElement as h } from "react";
-import satori from "satori";
 
 export function validateOgLayout(template: OgTemplate) {
   const { title } = template;
@@ -101,6 +99,10 @@ export async function renderOgImage(
       : []
   );
   validateOgGlyphCoverage(font, fallbackFont, [title, ...labels].join(" "));
+  const [{ default: satori }, { Resvg }] = await Promise.all([
+    import("satori"),
+    import("@resvg/resvg-js"),
+  ]);
   const renderAt = async (size: number, decorations: boolean) => {
     let titleBounds: OgRenderBounds | undefined;
     let labelOverflow = false;

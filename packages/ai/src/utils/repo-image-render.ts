@@ -10,10 +10,7 @@ import {
 import type { VNode } from "@notra/ai/types/repo-image-render";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
 import { logWarn } from "@notra/ai/utils/server-log";
-import { Resvg } from "@resvg/resvg-js";
 import { createElement, Fragment, type ReactNode } from "react";
-import satori from "satori";
-import { html as parseHtml } from "satori-html";
 
 async function loadAllFonts() {
   const results = await Promise.allSettled(
@@ -143,6 +140,7 @@ function toReactNode(value: unknown): ReactNode {
 }
 
 export async function renderHtmlToImages(htmlSource: string) {
+  const { html: parseHtml } = await import("satori-html");
   const safeHtml = injectDisplayFlexInHtml(htmlSource);
   const rawTree = parseHtml(safeHtml);
   enforceSatoriDisplay(rawTree);
@@ -151,7 +149,11 @@ export async function renderHtmlToImages(htmlSource: string) {
 
 /** Renders a ready element tree (fixed templates), skipping the HTML parser. */
 export async function renderElementToImages(tree: ReactNode) {
-  const fonts = await loadAllFonts();
+  const [{ default: satori }, { Resvg }, fonts] = await Promise.all([
+    import("satori"),
+    import("@resvg/resvg-js"),
+    loadAllFonts(),
+  ]);
 
   const svg = await satori(tree, {
     width: REPO_IMAGE_WIDTH,

@@ -8,6 +8,7 @@
     "agent:dev": "dotenv -e ../../.env -- eve dev",
     "agent:build": "bun run build",
     "agent:start": "eve start",
+    "test": "bun test tests && node --test scripts/copy-hb-wasm.test.mjs",
     "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
     "agent:dev:devtools": "AI_SDK_DEVTOOLS=true dotenv -e ../../.env -- eve dev",
     "devtools": "bun x @ai-sdk/devtools"

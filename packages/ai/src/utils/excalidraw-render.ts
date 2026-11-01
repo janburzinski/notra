@@ -27,7 +27,6 @@ import {
   rotatedBox,
 } from "@notra/ai/utils/excalidraw-diagram";
 import { loadRenderFont } from "@notra/ai/utils/render-font";
-import { Resvg } from "@resvg/resvg-js";
 // biome-ignore lint/performance/noNamespaceImport: opentype.js is UMD; see parseFont
 import * as opentype from "opentype.js";
 import type { Font, PathCommand } from "opentype.js";
@@ -447,7 +446,10 @@ export function renderDiagramSpec(rawSpec: string): Promise<RenderedDiagram> {
 export async function renderDiagram(
   spec: DiagramSpec
 ): Promise<RenderedDiagram> {
-  const font = await loadDiagramFont();
+  const [font, { Resvg }] = await Promise.all([
+    loadDiagramFont(),
+    import("@resvg/resvg-js"),
+  ]);
   const scene = buildExcalidrawScene(spec, createMeasurer(font));
   const svg = renderExcalidrawSceneToSvg(scene, font);
   const png = new Resvg(svg, {
