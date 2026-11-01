@@ -14,12 +14,14 @@ export const ga4: AnalyticsProvider = {
   isLiveAsset: (url) =>
     url.hostname === "www.googletagmanager.com" && url.pathname === "/gtag/js",
   // gtag also reports to www.google.com/g/collect (Google signals), seen
-  // from EU runners, and sends tag diagnostics to googletagmanager.com/td.
+  // from EU runners, and sends tag diagnostics to googletagmanager.com/td
+  // and /a.
   isLiveCollect: (url) =>
     ((url.hostname.endsWith("google-analytics.com") ||
       url.hostname === "www.google.com") &&
       url.pathname.endsWith("/g/collect")) ||
-    (url.hostname === "www.googletagmanager.com" && url.pathname === "/td"),
+    (url.hostname === "www.googletagmanager.com" &&
+      ["/td", "/a"].includes(url.pathname)),
   identifier: settings.measurementId,
   isLivePageView: (event, page) => {
     const query = new URL(event.url).searchParams;
