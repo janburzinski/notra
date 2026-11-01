@@ -99,8 +99,6 @@ try {
       set: {
         providerAccountId: String(user.id),
         encryptedAccessToken,
-        accessToken: null,
-        refreshToken: null,
         scope: userResponse.headers.get("x-oauth-scopes"),
       },
     });

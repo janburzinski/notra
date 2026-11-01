@@ -428,7 +428,6 @@ async function assertGitHubInstallationAdmin(params: {
     columns: {
       providerAccountId: true,
       encryptedAccessToken: true,
-      accessToken: true,
       scope: true,
     },
   });
@@ -526,11 +525,10 @@ export async function isGitHubAccountConnectionRequired(userId: string) {
     ),
     columns: {
       encryptedAccessToken: true,
-      accessToken: true,
     },
   });
 
-  return !(githubAccount?.encryptedAccessToken || githubAccount?.accessToken);
+  return !githubAccount?.encryptedAccessToken;
 }
 
 function toRepositoryRecord(integration: {

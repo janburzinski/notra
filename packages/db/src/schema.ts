@@ -359,8 +359,6 @@ export const socialConnections = pgTable(
     provider: text("provider").notNull(),
     providerAccountId: text("provider_account_id").notNull(),
     encryptedAccessToken: text("encrypted_access_token"),
-    accessToken: text("access_token"),
-    refreshToken: text("refresh_token"),
     scope: text("scope"),
     accessTokenExpiresAt: timestamp("access_token_expires_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

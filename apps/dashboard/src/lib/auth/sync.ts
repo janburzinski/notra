@@ -134,8 +134,6 @@ const persistSocialConnection = Effect.fn("auth.sync.persistSocialConnection")(
     const connection = {
       providerAccountId,
       encryptedAccessToken,
-      accessToken: tokens.accessToken,
-      refreshToken: null,
       scope: tokens.scopes?.join(" ") ?? null,
       accessTokenExpiresAt: tokens.expiresAt
         ? new Date(tokens.expiresAt * 1000)
