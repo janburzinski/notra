@@ -1,8 +1,8 @@
+import { DELETED_ANALYTICS_PURGE_ROUTE_PATH } from "@notra/ai/constants/deleted-analytics-purge";
 import { logError } from "@notra/ai/utils/server-log";
 import { deletedAnalyticsPurgeSchema } from "@notra/schemas/dashboard/workflows/deleted-analytics-purge";
 import { flattenError } from "zod";
 
-import { DELETED_ANALYTICS_PURGE_ROUTE_PATH } from "@/constants/deleted-analytics-purge";
 import { runDeletedAnalyticsPurge } from "@/lib/analytics/deleted-analytics-purge";
 import { verifyQstashSignature } from "@/lib/workflows/qstash-verify";
 
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await runDeletedAnalyticsPurge(parsed.data);
+    await runDeletedAnalyticsPurge(parsed.data, true);
   } catch (error) {
     logError("[Analytics Purge] Delayed purge failed", error, parsed.data);
     return new Response("Purge failed", { status: 500 });

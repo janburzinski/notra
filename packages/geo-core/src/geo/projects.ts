@@ -1,3 +1,4 @@
+import { scheduleDeletedAnalyticsPurge } from "@notra/ai/utils/deleted-analytics-purge";
 import { purgeDeletedProjectAnalytics } from "@notra/analytics/tinybird/purge";
 import { db } from "@notra/db/drizzle";
 import { brandSettings, geoSettings, projects, sites } from "@notra/db/schema";
@@ -328,11 +329,14 @@ export const deleteGeoProject = Effect.fn("geo.projectDelete")(function* (
     yield* Effect.promise(() =>
       invalidateGeoIngestHostsCache(organizationId, projectId)
     );
-    // The project row is gone either way; a failed purge only leaves orphaned
-    // analytics behind, so it must not fail the delete.
+    // The project row is gone either way, so a failed purge must not fail the
+    // delete. The queued second purge retries until the rows are gone.
     yield* Effect.tryPromise(() =>
       purgeDeletedProjectAnalytics({ organizationId, projectId })
     ).pipe(geoSkip("project analytics purge failed", { projectId }));
+    yield* Effect.tryPromise(() =>
+      scheduleDeletedAnalyticsPurge({ organizationId, projectId })
+    ).pipe(geoSkip("project analytics purge queueing failed", { projectId }));
   }
 
   return { id: projectId, success: true as const };

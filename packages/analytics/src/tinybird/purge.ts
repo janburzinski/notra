@@ -1,3 +1,4 @@
+import { isDemoMode } from "@notra/utils/demo-mode";
 import { Duration, Effect, Schedule } from "effect";
 
 import {
@@ -151,15 +152,27 @@ function deleteFromDatasource(
   }).pipe(Effect.flatMap((jobId) => (jobId ? waitForJob(jobId) : Effect.void)));
 }
 
+/**
+ * Deletes matching rows from every datasource. `waitForJobs` also waits for
+ * each Tinybird job so a failed job fails the purge and its caller can retry.
+ */
 async function submitDeletes(
   datasources: string[],
-  condition: string
+  condition: string,
+  waitForJobs: boolean
 ): Promise<void> {
   if (!process.env.TINYBIRD_TOKEN) {
+    if (process.env.NODE_ENV === "production" && !isDemoMode()) {
+      throw new Error("TINYBIRD_TOKEN is not set, deleted analytics remain");
+    }
     return;
   }
   const results = await Promise.allSettled(
-    datasources.map((datasource) => submitDelete(datasource, condition))
+    datasources.map((datasource) =>
+      waitForJobs
+        ? Effect.runPromise(deleteFromDatasource(datasource, condition))
+        : submitDelete(datasource, condition)
+    )
   );
   const errors = results.flatMap((result) =>
     result.status === "rejected" ? [result.reason] : []
@@ -213,33 +226,39 @@ export function purgeGeoProjectData(
 }
 
 /**
- * Removes every GEO and web analytics row of a deleted project. Only submits
- * the delete jobs: nothing reads a deleted project, so the request does not
- * wait for Tinybird to finish.
+ * Removes every GEO and web analytics row of a deleted project. The immediate
+ * purge only submits the delete jobs: nothing reads a deleted project, so the
+ * request does not wait for Tinybird. The delayed purge waits for them.
  */
 export function purgeDeletedProjectAnalytics(
-  input: PurgeGeoProjectInput
+  input: PurgeGeoProjectInput,
+  waitForJobs = false
 ): Promise<void> {
   return submitDeletes(
     [...GEO_DATASOURCES, ...WEB_DATASOURCES],
-    `organization_id = '${sanitize(input.organizationId)}' AND project_id = '${sanitize(input.projectId)}'`
+    `organization_id = '${sanitize(input.organizationId)}' AND project_id = '${sanitize(input.projectId)}'`,
+    waitForJobs
   );
 }
 
 export function purgeDeletedOrganizationAnalytics(
-  input: PurgeOrganizationInput
+  input: PurgeOrganizationInput,
+  waitForJobs = false
 ): Promise<void> {
   return submitDeletes(
     [...ACCOUNT_SCOPED_DATASOURCES, ...GEO_DATASOURCES, ...WEB_DATASOURCES],
-    `organization_id = '${sanitize(input.organizationId)}'`
+    `organization_id = '${sanitize(input.organizationId)}'`,
+    waitForJobs
   );
 }
 
 export function purgeDeletedSiteAnalytics(
-  input: PurgeSiteInput
+  input: PurgeSiteInput,
+  waitForJobs = false
 ): Promise<void> {
   return submitDeletes(
     [...GEO_DATASOURCES, ...WEB_DATASOURCES],
-    `organization_id = '${sanitize(input.organizationId)}' AND site_id = '${sanitize(input.siteId)}'`
+    `organization_id = '${sanitize(input.organizationId)}' AND site_id = '${sanitize(input.siteId)}'`,
+    waitForJobs
   );
 }

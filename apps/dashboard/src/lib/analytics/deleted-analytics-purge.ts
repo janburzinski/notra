@@ -1,24 +1,27 @@
-import { publishQstashRouteMessage } from "@notra/ai/qstash/triggers";
+import { scheduleDeletedAnalyticsPurge } from "@notra/ai/utils/deleted-analytics-purge";
 import { logError } from "@notra/ai/utils/server-log";
 import {
   purgeDeletedOrganizationAnalytics,
+  purgeDeletedProjectAnalytics,
   purgeDeletedSiteAnalytics,
 } from "@notra/analytics/tinybird/purge";
-import { isDemoMode } from "@notra/utils/demo-mode";
 
-import {
-  DELETED_ANALYTICS_PURGE_DELAY_MS,
-  DELETED_ANALYTICS_PURGE_ROUTE_PATH,
-} from "@/constants/deleted-analytics-purge";
 import type { DeletedAnalyticsPurgeInput } from "@/types/deleted-analytics-purge";
 
-export function runDeletedAnalyticsPurge({
-  organizationId,
-  siteId,
-}: DeletedAnalyticsPurgeInput): Promise<void> {
-  return siteId
-    ? purgeDeletedSiteAnalytics({ organizationId, siteId })
-    : purgeDeletedOrganizationAnalytics({ organizationId });
+export function runDeletedAnalyticsPurge(
+  { organizationId, siteId, projectId }: DeletedAnalyticsPurgeInput,
+  waitForJobs = false
+): Promise<void> {
+  if (siteId) {
+    return purgeDeletedSiteAnalytics({ organizationId, siteId }, waitForJobs);
+  }
+  if (projectId) {
+    return purgeDeletedProjectAnalytics(
+      { organizationId, projectId },
+      waitForJobs
+    );
+  }
+  return purgeDeletedOrganizationAnalytics({ organizationId }, waitForJobs);
 }
 
 export async function purgeDeletedAnalytics(
@@ -32,18 +35,4 @@ export async function purgeDeletedAnalytics(
       logError("[Analytics Purge] Failed to queue delayed purge", error, input);
     }),
   ]);
-}
-
-async function scheduleDeletedAnalyticsPurge(
-  input: DeletedAnalyticsPurgeInput
-): Promise<void> {
-  if (isDemoMode() || !process.env.QSTASH_TOKEN) {
-    return;
-  }
-  await publishQstashRouteMessage({
-    path: DELETED_ANALYTICS_PURGE_ROUTE_PATH,
-    body: input,
-    notBefore: new Date(Date.now() + DELETED_ANALYTICS_PURGE_DELAY_MS),
-    deduplicationId: `analytics-purge-${input.organizationId}-${input.siteId ?? "org"}`,
-  });
 }
