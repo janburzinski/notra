@@ -16,7 +16,6 @@ import {
   OnboardingAgentCompensationError,
   OnboardingAgentTriggerError,
 } from "@notra/schemas/dashboard/onboarding-agent";
-import { getVercelOidcToken } from "@vercel/oidc";
 import { and, eq, isNull, lt, or } from "drizzle-orm";
 import { Effect } from "effect";
 import { Client } from "eve/client";
@@ -67,6 +66,7 @@ async function createEveAgentClient(
     redirect: "error" as const,
   };
 
+  const { getVercelOidcToken } = await import("@vercel/oidc");
   const token = await getVercelOidcToken().catch(() => null);
   if (token) {
     return new Client({

@@ -25,7 +25,6 @@ import {
   AgentTaskFailedError,
   AgentTaskTimeoutError,
 } from "@notra/schemas/dashboard/agent";
-import { getVercelOidcToken } from "@vercel/oidc";
 import { eq } from "drizzle-orm";
 import { Client } from "eve/client";
 
@@ -113,6 +112,7 @@ export async function createNotraAgentClient(
     redirect: "error" as const,
   };
 
+  const { getVercelOidcToken } = await import("@vercel/oidc");
   const token = await getVercelOidcToken().catch(() => null);
   if (token) {
     return new Client({ ...clientOptions, auth: { vercelOidc: { token } } });
