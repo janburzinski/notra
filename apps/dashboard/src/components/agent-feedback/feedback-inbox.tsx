@@ -22,7 +22,6 @@ import { useReducedMotion } from "motion/react";
 import { type ReactNode, useState } from "react";
 import { useTranslations } from "use-intl";
 
-import { AgentFeedbackDetailDialog } from "@/components/agent-feedback/feedback-detail-dialog";
 import { AgentFeedbackEmpty } from "@/components/agent-feedback/feedback-empty";
 import { AgentFeedbackStatusIcon } from "@/components/agent-feedback/feedback-status-icon";
 import { AgentFeedbackTable } from "@/components/agent-feedback/feedback-table";
@@ -45,6 +44,13 @@ import type {
   AgentFeedbackStatusFilter,
 } from "@/types/agent-feedback";
 import { isAgentFeedbackStatusFilter } from "@/utils/agent-feedback";
+import lazyComponent from "@/utils/lazy-component";
+
+const AgentFeedbackDetailDialog = lazyComponent(() =>
+  import("@/components/agent-feedback/feedback-detail-dialog").then(
+    (module) => module.AgentFeedbackDetailDialog
+  )
+);
 
 const FEEDBACK_CONFETTI_COLORS = [
   "var(--primary)",
@@ -66,6 +72,7 @@ export function AgentFeedbackInbox({
     AGENT_FEEDBACK_DEFAULT_STATUS_FILTER
   );
   const [selected, setSelected] = useState<AgentFeedbackItem | null>(null);
+  const [hasOpenedDetail, setHasOpenedDetail] = useState(false);
   const [deleteCandidate, setDeleteCandidate] =
     useState<AgentFeedbackItem | null>(null);
   const [resolvedCelebration, setResolvedCelebration] = useState(0);
@@ -155,7 +162,10 @@ export function AgentFeedbackInbox({
           hasNextPage={list.hasNextPage}
           onDelete={setDeleteCandidate}
           onLoadMore={() => list.fetchNextPage()}
-          onSelect={setSelected}
+          onSelect={(item) => {
+            setSelected(item);
+            setHasOpenedDetail(true);
+          }}
           onStatusChange={handleStatusChange}
           onStatusFilterChange={setStatusFilter}
           organizationId={organizationId}
@@ -169,26 +179,28 @@ export function AgentFeedbackInbox({
         )}
       </div>
 
-      <AgentFeedbackDetailDialog
-        isUpdating={updateStatus.isPending}
-        item={selectedItem}
-        onDelete={() => {
-          if (selectedItem) {
-            setDeleteCandidate(selectedItem);
-          }
-        }}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelected(null);
-          }
-        }}
-        onStatusChange={(status) => {
-          if (selectedItem) {
-            handleStatusChange(selectedItem, status);
-          }
-        }}
-        open={selectedItem !== null}
-      />
+      {hasOpenedDetail ? (
+        <AgentFeedbackDetailDialog
+          isUpdating={updateStatus.isPending}
+          item={selectedItem}
+          onDelete={() => {
+            if (selectedItem) {
+              setDeleteCandidate(selectedItem);
+            }
+          }}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelected(null);
+            }
+          }}
+          onStatusChange={(status) => {
+            if (selectedItem) {
+              handleStatusChange(selectedItem, status);
+            }
+          }}
+          open={selectedItem !== null}
+        />
+      ) : null}
 
       <FeedbackDeleteDialog
         deleteCandidate={deleteCandidate}
