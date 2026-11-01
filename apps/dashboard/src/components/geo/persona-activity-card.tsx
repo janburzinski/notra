@@ -10,7 +10,10 @@ import { EmptyStateTrendPreview } from "@/components/empty-state-preview";
 import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
 import { GeoRangePicker } from "@/components/geo/geo-range-picker";
 import { GeoStatDelta } from "@/components/geo/geo-stat-delta";
-import { GEO_PERSONA_ROLLING_DAYS } from "@/constants/geo-personas";
+import {
+  GEO_PERSONA_CHART_FILL_ALPHA,
+  GEO_PERSONA_ROLLING_DAYS,
+} from "@/constants/geo-personas";
 import { useIsGeoScanning } from "@/lib/hooks/use-geo";
 import { useGeoPersonaActivity } from "@/lib/hooks/use-geo-personas";
 import { useGeoRange } from "@/lib/hooks/use-geo-range";
@@ -31,6 +34,43 @@ import {
   personaMentionRate,
   personaMentionRateDelta,
 } from "@/utils/persona-activity";
+
+function PersonaActivityBodySkeleton({ count }: { count: number }) {
+  return (
+    <>
+      <div className="mb-6 grid grid-cols-2 gap-x-4 gap-y-5 pt-3 sm:grid-cols-3 lg:grid-cols-5">
+        {Array.from({ length: count }, (_, index) => (
+          <div className="min-w-0 space-y-1" key={index}>
+            <div className="flex min-h-6 items-center">
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <div className="flex h-7 items-center">
+              <Skeleton className="h-6 w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <Skeleton className="h-64 w-full" />
+      <div className="mt-2 flex h-4 justify-end">
+        <Skeleton className="h-3 w-40" />
+      </div>
+    </>
+  );
+}
+
+export function PersonaActivityCardSkeleton({ count }: { count: number }) {
+  const t = useTranslations("geo.personaActivityCard");
+  return (
+    <InstrumentModule
+      eyebrow={t("eyebrow")}
+      action={<Skeleton className="h-7 w-[8.625rem] rounded-md" />}
+      variant="table"
+      bodyClassName="px-4 pb-4 pt-2"
+    >
+      <PersonaActivityBodySkeleton count={count} />
+    </InstrumentModule>
+  );
+}
 
 export function PersonaActivityCard({
   organizationId,
@@ -84,7 +124,9 @@ export function PersonaActivityCard({
       variant="table"
       bodyClassName="px-4 pb-4 pt-2"
     >
-      {isPending ? <Skeleton className="h-64 w-full" /> : null}
+      {isPending ? (
+        <PersonaActivityBodySkeleton count={personas.length} />
+      ) : null}
       {isError ? (
         <div className="flex h-64 flex-col items-center justify-center gap-3 text-sm">
           <p>{t("loadFailed")}</p>
@@ -174,19 +216,18 @@ export function PersonaActivityCard({
             <EChartsAreaChart.XAxis
               dataKey="day"
               tickFormatter={(day: string) => formatDayLabel(day, locale)}
-              hideDots
             />
             <EChartsAreaChart.YAxis
               min={0}
               max={axisMax}
-              hideDots
               tickFormatter={(value) => `${value}%`}
             />
             {series.map((item) => (
               <EChartsAreaChart.Area
                 key={item.dataKey}
                 dataKey={item.dataKey}
-                variant="none"
+                fillAlpha={GEO_PERSONA_CHART_FILL_ALPHA}
+                variant={item.isCurrent ? "gradient" : "none"}
                 visible={!hiddenPersonaIds.has(item.personaId)}
                 strokeVariant={item.isCurrent ? "solid" : "dashed"}
                 connectNulls
@@ -199,6 +240,7 @@ export function PersonaActivityCard({
             <EChartsAreaChart.Tooltip
               confine={false}
               labelFormatter={(day: string) => formatFullDayLabel(day, locale)}
+              layout="activity"
               position="fixed"
               roundness="xl"
               scrub={rows.length > 1}

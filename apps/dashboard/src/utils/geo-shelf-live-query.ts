@@ -1,6 +1,9 @@
 import type { GeoCompetitor } from "@notra/geo-core/types/geo";
 
-import { GEO_SHELF_EMPTY_BOARD_COUNTS } from "@/constants/geo-shelf";
+import {
+  GEO_SHELF_EMPTY_BOARD_COUNTS,
+  GEO_SHELF_RELEVANT_MIN_CITATIONS,
+} from "@/constants/geo-shelf";
 import type {
   GeoShelfBoardCounts,
   GeoShelfFilterState,
@@ -38,6 +41,12 @@ export function matchesShelfSourceFilter(
   shelf: GeoShelfFilterState["shelf"]
 ): boolean {
   switch (shelf) {
+    case "relevant":
+      return (
+        source.origin === "manual" ||
+        source.opportunity !== null ||
+        source.citations.windowCount >= GEO_SHELF_RELEVANT_MIN_CITATIONS
+      );
     case "opportunities":
       return isShelfOpportunitySource(source);
     case "on_shelf":

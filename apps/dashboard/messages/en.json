@@ -3950,6 +3950,10 @@
         "filterShelves": "Filter shelves",
         "filterPlaceholder": "Filter shelves…",
         "shelfFilter": {
+          "relevant": {
+            "label": "Relevant",
+            "description": "Cited at least twice in the last 30 days, with a ticket, or added by you"
+          },
           "all": {
             "label": "All shelves",
             "description": "Every page engines cite for your prompts"

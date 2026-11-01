@@ -37,7 +37,6 @@ import { PageContainer } from "@/components/layout/container";
 import { useGeoProjectScope } from "@/components/providers/geo-project-provider";
 import { GeoScanControlsProvider } from "@/components/providers/geo-scan-controls-provider";
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
-import { TabCount } from "@/components/tab-count";
 import {
   EMPTY_STATE_TABLE_COLUMNS,
   EMPTY_STATE_TABLE_ROWS,
@@ -49,10 +48,9 @@ import {
 import {
   useGeoPromptResults,
   useGeoSettings,
-  useGeoSuggestions,
   useIsGeoScanning,
 } from "@/lib/hooks/use-geo";
-import { useGeoPromptsDb, useGeoSequencesDb } from "@/lib/hooks/use-geo-db";
+import { useGeoPromptsDb } from "@/lib/hooks/use-geo-db";
 import { useGeoRange } from "@/lib/hooks/use-geo-range";
 import { usePrefetchGeoLatestScanRun } from "@/lib/hooks/use-geo-scan-history";
 import { useRouter } from "@/lib/navigation";
@@ -89,8 +87,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
   );
   const isScanning = useIsGeoScanning(organizationId);
   const prefetchAnswers = usePrefetchGeoLatestScanRun(organizationId);
-  const { sequences } = useGeoSequencesDb(organizationId);
-  const { data: suggestionsData } = useGeoSuggestions(organizationId);
   const [tab, setTab] = useQueryState(
     "tab",
     parseAsStringLiteral(GEO_PROMPTS_PAGE_TABS)
@@ -176,7 +172,6 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                     value="prompts"
                   >
                     {tCommon("labels.prompts")}
-                    <TabCount count={prompts.length} />
                   </IconTabsTrigger>
                   <IconTabsTrigger
                     icon={
@@ -185,14 +180,12 @@ export default function PageClient({ organizationSlug }: PageClientProps) {
                     value="conversations"
                   >
                     {tGeoShared("conversations")}
-                    <TabCount count={sequences.length} />
                   </IconTabsTrigger>
                   <IconTabsTrigger
                     icon={<Google className="size-3.5" />}
                     value="suggestions"
                   >
                     {t("tabs.suggestions")}
-                    <TabCount count={suggestionsData?.suggestions.length} />
                   </IconTabsTrigger>
                   <IconTabsTrigger
                     icon={

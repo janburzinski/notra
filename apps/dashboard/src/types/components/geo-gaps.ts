@@ -126,8 +126,6 @@ export interface GeoGapsEmptyProps {
 
 export interface GeoGapsTabsProps {
   tab: GeoGapsTab;
-  onTabChange: (tab: GeoGapsTab) => void;
-  counts: Record<GeoGapsTab, number>;
 }
 
 export interface GeoGapEngineLogosProps {

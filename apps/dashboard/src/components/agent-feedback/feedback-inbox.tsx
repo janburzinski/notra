@@ -1,5 +1,7 @@
 "use client";
 
+import { InboxIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { AgentFeedbackStatus } from "@notra/db/types/agent-feedback";
 import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import {
@@ -11,9 +13,10 @@ import {
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
 import {
-  PermissionOption,
-  PermissionRow,
-} from "@notra/ui/components/ui/permission-selector";
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import { cn } from "@notra/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
 import { type ReactNode, useState } from "react";
@@ -41,10 +44,7 @@ import type {
   AgentFeedbackInboxProps,
   AgentFeedbackStatusFilter,
 } from "@/types/agent-feedback";
-import {
-  agentFeedbackFilterStatuses,
-  isAgentFeedbackStatusFilter,
-} from "@/utils/agent-feedback";
+import { isAgentFeedbackStatusFilter } from "@/utils/agent-feedback";
 
 const FEEDBACK_CONFETTI_COLORS = [
   "var(--primary)",
@@ -126,16 +126,6 @@ export function AgentFeedbackInbox({
     });
   };
 
-  const countFor = (filter: AgentFeedbackStatusFilter) => {
-    if (!counts) {
-      return null;
-    }
-    const statuses = agentFeedbackFilterStatuses(filter);
-    return statuses
-      ? statuses.reduce((sum, status) => sum + counts[status], 0)
-      : totalCount;
-  };
-
   return (
     <PageContainer
       className={cn(
@@ -155,7 +145,6 @@ export function AgentFeedbackInbox({
         {heading(showEmptyState)}
 
         <FeedbackList
-          countFor={countFor}
           emptyState={emptyState}
           isDeleting={deleteFeedback.isPending}
           isFetchingNextPage={list.isFetchingNextPage}
@@ -216,7 +205,6 @@ export function AgentFeedbackInbox({
 }
 
 function FeedbackList({
-  countFor,
   emptyState,
   hasNextPage,
   isDeleting,
@@ -236,7 +224,6 @@ function FeedbackList({
   statusFilter,
   tableGrows,
 }: {
-  countFor: (filter: AgentFeedbackStatusFilter) => number | null;
   emptyState?: ReactNode;
   hasNextPage: boolean;
   isDeleting: boolean;
@@ -266,32 +253,44 @@ function FeedbackList({
   }
 
   return (
-    <>
-      <PermissionRow
-        className="w-fit shrink-0"
-        label={tCommon("labels.filterByStatus")}
-        layout="compact"
-        onValueChange={(value) => {
-          if (isAgentFeedbackStatusFilter(value)) {
-            onStatusFilterChange(value);
-          }
-        }}
+    <Tabs
+      className={cn("min-h-0 gap-6", tableGrows ? "flex-1" : "flex-initial")}
+      onValueChange={(value) => {
+        if (isAgentFeedbackStatusFilter(value)) {
+          onStatusFilterChange(value);
+        }
+      }}
+      value={statusFilter}
+    >
+      <div className="w-fit max-w-full shrink-0 overflow-x-auto">
+        <IconTabsList
+          aria-label={tCommon("labels.filterByStatus")}
+          value={statusFilter}
+        >
+          {AGENT_FEEDBACK_STATUS_FILTERS.map((filter) => (
+            <IconTabsTrigger
+              icon={
+                filter.value === "all" ? (
+                  <HugeiconsIcon icon={InboxIcon} size={15} />
+                ) : (
+                  <AgentFeedbackStatusIcon
+                    status={filter.value === "open" ? "new" : filter.value}
+                  />
+                )
+              }
+              key={filter.value}
+              value={filter.value}
+            >
+              {filterLabels[filter.value]}
+            </IconTabsTrigger>
+          ))}
+        </IconTabsList>
+      </div>
+
+      <TabsContent
+        className={cn("min-h-0", tableGrows ? "flex-1" : "flex-initial")}
         value={statusFilter}
       >
-        {AGENT_FEEDBACK_STATUS_FILTERS.map((filter) => {
-          const count = countFor(filter.value);
-          return (
-            <PermissionOption key={filter.value} value={filter.value}>
-              {filterLabels[filter.value]}
-              {count !== null ? (
-                <span className="text-xs tabular-nums opacity-70">{count}</span>
-              ) : null}
-            </PermissionOption>
-          );
-        })}
-      </PermissionRow>
-
-      <div className={tableGrows ? "min-h-0 flex-1" : "min-h-0 flex-initial"}>
         <AgentFeedbackTable
           isDeleting={isDeleting}
           emptyState={
@@ -312,8 +311,8 @@ function FeedbackList({
           onStatusChange={onStatusChange}
           selectedId={selectedId}
         />
-      </div>
-    </>
+      </TabsContent>
+    </Tabs>
   );
 }
 

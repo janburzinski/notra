@@ -89,6 +89,7 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
           : target;
       boxRef.current = box;
       applyIndicatorBox(element, box);
+      element.dataset.ready = "";
       if (progress < 1) {
         frame = requestAnimationFrame(tick);
       }
@@ -116,7 +117,7 @@ function IconTabsIndicator({ value }: IconTabsIndicatorProps) {
   return (
     <span
       aria-hidden="true"
-      className="bg-background dark:bg-foreground/10 pointer-events-none absolute top-0 left-0 z-0 rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
+      className="peer/indicator bg-background dark:bg-foreground/10 pointer-events-none absolute top-0 left-0 z-0 rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
       ref={ref}
     />
   );
@@ -141,7 +142,13 @@ function IconTabsTrigger({
   ...props
 }: IconTabsTriggerProps) {
   return (
-    <TabsTrigger className={cn("group/tab", className)} {...props}>
+    <TabsTrigger
+      className={cn(
+        "group/tab peer-not-data-ready/indicator:data-active:bg-background dark:peer-not-data-ready/indicator:data-active:bg-foreground/10 peer-not-data-ready/indicator:data-active:shadow-[0_1px_2px_rgba(0,0,0,0.08)]",
+        className
+      )}
+      {...props}
+    >
       <SlideInTabIcon pinned={iconPinned}>{icon}</SlideInTabIcon>
       {children}
     </TabsTrigger>

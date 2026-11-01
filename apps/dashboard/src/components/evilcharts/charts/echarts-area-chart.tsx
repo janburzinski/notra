@@ -1568,7 +1568,7 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         smooth: curve.smooth,
         smoothMonotone: curve.smoothMonotone,
         step: curve.step,
-        connectNulls: false,
+        connectNulls: area.connectNulls,
         silent: true,
         showSymbol: area.dotIndices !== undefined && restingVisible,
         symbol: "circle",

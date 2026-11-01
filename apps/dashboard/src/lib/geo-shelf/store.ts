@@ -4,7 +4,10 @@ import { geoShelfSources } from "@notra/db/schema";
 import { geoShelfSourceSchema } from "@notra/schemas/dashboard/geo-shelf";
 import { and, asc, desc, eq, inArray, type SQL, sql } from "drizzle-orm";
 
-import { GEO_SHELF_CITATION_INSERT_CHUNK } from "@/constants/geo-shelf";
+import {
+  GEO_SHELF_CITATION_INSERT_CHUNK,
+  GEO_SHELF_RELEVANT_MIN_CITATIONS,
+} from "@/constants/geo-shelf";
 
 import type {
   GeoShelfCitationState,
@@ -88,6 +91,8 @@ const COMPETITOR_PRESENT = sql`jsonb_path_exists(${placements}, '$[*] ? (@.compe
 
 function shelfFilterWhere(shelf: GeoShelfPageQuery["shelf"]): SQL | undefined {
   switch (shelf) {
+    case "relevant":
+      return sql`(${geoShelfSources.origin} = 'manual' or ${opportunityStatus} is not null or coalesce((${geoShelfSources.citations}->>'windowCount')::int, 0) >= ${GEO_SHELF_RELEVANT_MIN_CITATIONS})`;
     case "opportunities":
       return sql`(${geoShelfSources.ownership} = 'third_party' and not ${OWN_PRESENT} and ${COMPETITOR_PRESENT})`;
     case "on_shelf":

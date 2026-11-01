@@ -6,6 +6,7 @@ import {
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { GEO_PERSONA_MAX_COUNT } from "@notra/geo-core/constants/geo-personas";
 import { Shimmer } from "@notra/ui/components/ai-elements/shimmer";
 import Counter from "@notra/ui/components/shared/counter";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
@@ -17,7 +18,9 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@notra/ui/components/ui/empty";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { useReducedMotion } from "motion/react";
+import type { ReactNode } from "react";
 import { DataTableSkeleton } from "ui/table";
 import { useTranslations } from "use-intl";
 
@@ -25,7 +28,10 @@ import { Button } from "@/components/button";
 import { EmptyState } from "@/components/empty-state";
 import { EmptyStateTablePreview } from "@/components/empty-state-preview";
 import Link from "@/components/framework/link";
-import { PersonaActivityCard } from "@/components/geo/persona-activity-card";
+import {
+  PersonaActivityCard,
+  PersonaActivityCardSkeleton,
+} from "@/components/geo/persona-activity-card";
 import { PersonaAddDialog } from "@/components/geo/persona-add-dialog";
 import { PersonasTable } from "@/components/geo/personas-table";
 import { PageContainer } from "@/components/layout/container";
@@ -204,14 +210,18 @@ function GeoPersonasPageContent({ organizationSlug }: GeoPageClientProps) {
 
   const isLoadingPersonas = isPersonasPending && !hasStoredPersonas;
   const showEmptyState = !(isLoadingPersonas || hasStoredPersonas);
-  const headerAction =
-    showEmptyState || isLoadingPersonas ? null : (
+  let headerAction: ReactNode = null;
+  if (isLoadingPersonas) {
+    headerAction = <Skeleton className="h-7 w-32 rounded-md" />;
+  } else if (!showEmptyState) {
+    headerAction = (
       <GeneratePersonasButton
         hasPersonas={hasPersonas}
         onClick={onGenerateClick}
         progress={progress}
       />
     );
+  }
 
   return (
     <PageContainer className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -224,7 +234,10 @@ function GeoPersonasPageContent({ organizationSlug }: GeoPageClientProps) {
         </PageHeading>
 
         {isLoadingPersonas ? (
-          <DataTableSkeleton rows={GEO_PERSONA_SKELETON_ROW_COUNT} />
+          <>
+            <PersonaActivityCardSkeleton count={GEO_PERSONA_MAX_COUNT} />
+            <DataTableSkeleton rows={GEO_PERSONA_SKELETON_ROW_COUNT} />
+          </>
         ) : null}
 
         {hasPersonas ? (

@@ -42,7 +42,7 @@ export function GeoPromptsSkeleton() {
           </div>
         </PageHeading>
         <div className="flex items-center justify-between gap-3">
-          <Skeleton className="h-8 w-[27.25rem] max-w-full rounded-lg" />
+          <Skeleton className="h-8 w-[22rem] max-w-full rounded-lg" />
           <Skeleton className="h-7 w-[8.625rem] rounded-md" />
         </div>
         <div className="space-y-3">

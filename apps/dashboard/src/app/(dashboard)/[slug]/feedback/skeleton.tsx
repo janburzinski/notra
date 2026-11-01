@@ -15,11 +15,7 @@ export function AgentFeedbackPageSkeleton() {
           description={t("description")}
           title={tCommon("labels.feedback")}
         />
-        <div className="bg-muted/40 flex w-fit shrink-0 items-center gap-0.5 rounded-lg border p-0.5">
-          {Array.from({ length: 5 }, (_, index) => (
-            <Skeleton className="h-7 w-16 rounded-md" key={index} />
-          ))}
-        </div>
+        <Skeleton className="h-8 w-72 max-w-full shrink-0 rounded-lg" />
         <div className="min-h-0 flex-1">
           <AgentFeedbackTableSkeleton />
         </div>

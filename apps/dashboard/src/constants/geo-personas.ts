@@ -11,6 +11,7 @@ export const GEO_PERSONA_DETAIL_QUERY_KEY = "persona";
 export const GEO_PERSONA_ROLLING_DAYS = 7;
 export const GEO_PERSONA_CHART_MIN_MAX = 20;
 export const GEO_PERSONA_CHART_MAX_STEP = 10;
+export const GEO_PERSONA_CHART_FILL_ALPHA = 0.12;
 export const GEO_PERSONA_DIALOG_VIEWS = [
   "conversation",
   "prompts",

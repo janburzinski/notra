@@ -96,7 +96,7 @@ export function useGeoShelfPage(organizationSlug: string): GeoShelfPageModel {
   const [shelfFilter, setShelfFilter] = useQueryState(
     "shelf",
     parseAsStringLiteral(GEO_SHELF_SHELF_FILTERS)
-      .withDefault("all")
+      .withDefault("relevant")
       .withOptions({ clearOnDefault: true })
   );
   const [ticketFilter, setTicketFilter] = useQueryState(

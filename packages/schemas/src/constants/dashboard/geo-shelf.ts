@@ -34,6 +34,7 @@ export const GEO_SHELF_OPPORTUNITY_STATUSES = [
 ] as const;
 export const GEO_SHELF_PRIORITIES = ["low", "medium", "high"] as const;
 export const GEO_SHELF_SHELF_FILTERS = [
+  "relevant",
   "all",
   "opportunities",
   "on_shelf",

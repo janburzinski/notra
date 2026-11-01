@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BubbleChatQuestionIcon,
   File02Icon,
   MoreHorizontalIcon,
   Refresh03Icon,
@@ -32,11 +33,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@notra/ui/components/ui/dropdown-menu";
-import { Input } from "@notra/ui/components/ui/input";
 import {
-  PermissionOption,
-  PermissionRow,
-} from "@notra/ui/components/ui/permission-selector";
+  IconTabsList,
+  IconTabsTrigger,
+} from "@notra/ui/components/ui/icon-tabs";
+import { Input } from "@notra/ui/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -45,6 +46,8 @@ import {
   SelectValue,
 } from "@notra/ui/components/ui/select";
 import { Spinner } from "@notra/ui/components/ui/spinner";
+import { Google } from "@notra/ui/components/ui/svgs/google";
+import { Tabs, TabsContent } from "@notra/ui/components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -67,10 +70,7 @@ import {
   EMPTY_STATE_TABLE_COLUMNS,
   EMPTY_STATE_TABLE_ROWS,
 } from "@/constants/empty-state";
-import {
-  GEO_GAPS_EMPTY_MESSAGE_KEYS,
-  GEO_GAPS_TABS,
-} from "@/constants/geo-gaps";
+import { GEO_GAPS_EMPTY_MESSAGE_KEYS } from "@/constants/geo-gaps";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { useFillHeight } from "@/lib/hooks/use-fill-height";
 import { useLogoStackLabels } from "@/lib/i18n/use-logo-stack-labels";
@@ -592,30 +592,22 @@ function GapsEmpty({ kind, isScanning, onRunScan }: GeoGapsEmptyProps) {
   );
 }
 
-function GapsTabs({ tab, onTabChange, counts }: GeoGapsTabsProps) {
+function GapsTabs({ tab }: GeoGapsTabsProps) {
   const t = useTranslations("geo.gapsTable");
-  const locale = useLocale();
   return (
-    <PermissionRow
-      className="w-fit shrink-0"
-      label={t("gapType")}
-      layout="compact"
-      onValueChange={(value) => {
-        if (isGeoGapsTab(value)) {
-          onTabChange(value);
-        }
-      }}
-      value={tab}
-    >
-      {GEO_GAPS_TABS.map((option) => (
-        <PermissionOption key={option.value} value={option.value}>
-          {t(`tabs.${option.value}`)}
-          <span className="text-xs tabular-nums opacity-70">
-            {counts[option.value].toLocaleString(locale)}
-          </span>
-        </PermissionOption>
-      ))}
-    </PermissionRow>
+    <div className="max-w-full overflow-x-auto">
+      <IconTabsList aria-label={t("gapType")} value={tab}>
+        <IconTabsTrigger
+          icon={<HugeiconsIcon icon={BubbleChatQuestionIcon} size={15} />}
+          value="prompt"
+        >
+          {t("tabs.prompt")}
+        </IconTabsTrigger>
+        <IconTabsTrigger icon={<Google className="size-3.5" />} value="search">
+          {t("tabs.search")}
+        </IconTabsTrigger>
+      </IconTabsList>
+    </div>
   );
 }
 
@@ -1214,16 +1206,17 @@ export function GeoGapsTable({
     : null;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <Tabs
+      className="min-h-0 flex-1 gap-3"
+      onValueChange={(value) => {
+        if (isGeoGapsTab(value)) {
+          setTab(value);
+        }
+      }}
+      value={tab}
+    >
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
-        <GapsTabs
-          onTabChange={setTab}
-          counts={{
-            prompt: filteredPromptGaps.length,
-            search: filteredSearchRows.length,
-          }}
-          tab={tab}
-        />
+        <GapsTabs tab={tab} />
         <GapsFilters
           engine={engine}
           engineFamilies={engineFamilies}
@@ -1234,7 +1227,7 @@ export function GeoGapsTable({
         />
       </div>
 
-      <div className="min-h-0 flex-1" ref={tableRef}>
+      <TabsContent className="min-h-0 flex-1" ref={tableRef} value={tab}>
         {emptyKind !== null ? (
           <GapsEmpty
             isScanning={isScanning}
@@ -1244,7 +1237,7 @@ export function GeoGapsTable({
         ) : (
           table
         )}
-      </div>
+      </TabsContent>
       <GapDetailSheet
         actions={sheetActions}
         isScanning={isScanning}
@@ -1269,6 +1262,6 @@ export function GeoGapsTable({
         }}
         row={selectedSearchGap}
       />
-    </div>
+    </Tabs>
   );
 }

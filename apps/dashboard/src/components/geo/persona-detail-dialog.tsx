@@ -32,6 +32,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@notra/ui/components/ui/sheet";
+import { Skeleton } from "@notra/ui/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import {
   Tooltip,
@@ -94,6 +95,7 @@ function PersonaDetailHeader({
   scans,
   selectedScanId,
   view,
+  isLoading,
   isRunning,
   runDisabled,
   onRun,
@@ -160,6 +162,9 @@ function PersonaDetailHeader({
               {formatAiTrafficTimestamp(latestCheck, locale)}
             </SheetDescription>
           ) : null}
+          {!latestCheck && isLoading ? (
+            <Skeleton className="my-0.5 h-3.5 w-28" />
+          ) : null}
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -222,6 +227,12 @@ function PersonaDetailHeader({
               </SelectContent>
             </Select>
           ) : null}
+        </div>
+      ) : null}
+      {view === "conversation" && !active && isLoading ? (
+        <div className="flex items-center justify-between gap-2">
+          <Skeleton className="h-8 w-60 max-w-full rounded-lg" />
+          <Skeleton className="h-8 w-44 rounded-lg" />
         </div>
       ) : null}
     </SheetHeader>
@@ -403,6 +414,7 @@ export function PersonaDetailDialog({
       >
         <PersonaDetailHeader
           active={active}
+          isLoading={showConversationLoading}
           isRunning={runPersona.isPending}
           runDisabled={runBlocked}
           onEngineChange={setEngine}

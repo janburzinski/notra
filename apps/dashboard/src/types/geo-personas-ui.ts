@@ -59,6 +59,7 @@ export interface PersonaDetailHeaderProps {
   scans: GeoPersonaScanSummary[];
   selectedScanId: string | null;
   view: PersonaDialogView;
+  isLoading: boolean;
   isRunning: boolean;
   runDisabled: boolean;
   onRun: () => void;

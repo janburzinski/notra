@@ -3950,6 +3950,10 @@
         "filterShelves": "Shelves filtern",
         "filterPlaceholder": "Shelves filtern…",
         "shelfFilter": {
+          "relevant": {
+            "label": "Relevant",
+            "description": "In den letzten 30 Tagen mindestens zweimal zitiert, mit Ticket oder von dir hinzugefügt"
+          },
           "all": {
             "label": "Alle Shelves",
             "description": "Jede Seite, die KI-Engines für deine Prompts zitieren"
