@@ -6,32 +6,26 @@ export const CONTACT_RATE_LIMITS = {
   verificationIpMinute: {
     requests: 10,
     window: "1m",
-    windowMs: 60 * 1000,
   },
   verificationGlobalMinute: {
     requests: 100,
     window: "1m",
-    windowMs: 60 * 1000,
   },
   ipHourly: {
     requests: 2,
     window: "1h",
-    windowMs: 60 * 60 * 1000,
   },
   ipDaily: {
     requests: 5,
     window: "1d",
-    windowMs: 24 * 60 * 60 * 1000,
   },
   emailDaily: {
     requests: 2,
     window: "1d",
-    windowMs: 24 * 60 * 60 * 1000,
   },
   globalHourly: {
     requests: 20,
     window: "1h",
-    windowMs: 60 * 60 * 1000,
   },
 } as const;
 

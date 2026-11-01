@@ -18,7 +18,7 @@ import type {
   VerifyTotpEnrollmentResult,
 } from "@notra/schemas/types/dashboard/auth";
 import { normalizeBackupCode } from "@notra/schemas/utils/auth";
-import type { Ratelimit } from "@upstash/ratelimit";
+import type { Limiter } from "@notra/utils/types/ratelimit";
 import { getWorkOS } from "@workos/authkit-session";
 import { Effect } from "effect";
 
@@ -89,7 +89,7 @@ const attemptDb = <T>(run: () => Promise<T>) =>
     )
   );
 
-const enforceRateLimit = (limiter: Ratelimit, key: string) =>
+const enforceRateLimit = (limiter: Limiter, key: string) =>
   Effect.promise(() => isAccountRateLimited(limiter, key)).pipe(
     Effect.andThen((limited) =>
       limited

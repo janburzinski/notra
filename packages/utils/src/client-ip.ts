@@ -131,23 +131,52 @@ export function ipNetworkKey(ip: ParsedIp): string {
   return `${hextets.join(":")}::/64`;
 }
 
+function trustedIp(value: string | null | undefined): string | null {
+  const address = value?.trim();
+  return address && parseIp(address) ? address : null;
+}
+
+let warnedNoTrustedSource = false;
+
 /**
- * The visitor's address behind Unkey. Unkey replaces `X-Forwarded-For` with
- * one client IP; only trust it when the runtime sets UNKEY_DEPLOYMENT_ID.
- * Elsewhere the fronting proxy's `X-Real-IP` is used. `cf-connecting-ip`
- * only counts when that peer is a Cloudflare edge.
+ * The visitor's address, read only from a header the deployment says its
+ * edge sets, so a client cannot spoof it:
+ * 1. On Vercel (`VERCEL=1`), the first `x-vercel-forwarded-for` entry.
+ * 2. Behind Unkey (`UNKEY_DEPLOYMENT_ID` set), `x-forwarded-for`, which Unkey
+ *    replaces with one client IP.
+ * 3. Elsewhere, only the header named by `TRUSTED_PROXY_HEADER` (for example
+ *    `x-real-ip`), which must hold exactly one address. Unset, nothing is
+ *    trusted, because a directly exposed server would accept any value.
+ * Under 2 and 3, `cf-connecting-ip` replaces that peer only when the peer is
+ * a Cloudflare edge. Returns the address as the header carries it, or null
+ * when no header is trusted or it is missing or malformed.
  */
-export function getProxyClientIp(headers: Headers): ParsedIp | null {
-  const peer = parseIp(
-    headers.get(
-      process.env.UNKEY_DEPLOYMENT_ID ? "x-forwarded-for" : "x-real-ip"
-    ) ?? ""
-  );
-  if (!peer) {
+export function getClientIp(headers: Headers): string | null {
+  if (process.env.VERCEL === "1") {
+    return trustedIp(headers.get("x-vercel-forwarded-for")?.split(",")[0]);
+  }
+  const header = process.env.UNKEY_DEPLOYMENT_ID
+    ? "x-forwarded-for"
+    : process.env.TRUSTED_PROXY_HEADER?.trim();
+  if (!header) {
+    if (process.env.NODE_ENV === "production" && !warnedNoTrustedSource) {
+      warnedNoTrustedSource = true;
+      console.warn(
+        "No trusted client IP header: set TRUSTED_PROXY_HEADER to the header your proxy overwrites. IP rate limits share one bucket until then."
+      );
+    }
     return null;
   }
-  if (isCloudflareIp(peer)) {
-    return parseIp(headers.get("cf-connecting-ip") ?? "") ?? peer;
+  const peer = trustedIp(headers.get(header));
+  const parsedPeer = peer ? parseIp(peer) : null;
+  if (!(parsedPeer && isCloudflareIp(parsedPeer))) {
+    return peer;
   }
-  return peer;
+  return trustedIp(headers.get("cf-connecting-ip")) ?? peer;
+}
+
+/** {@link getClientIp}, grouped with {@link ipNetworkKey}. */
+export function getClientNetworkKey(headers: Headers): string | null {
+  const ip = parseIp(getClientIp(headers) ?? "");
+  return ip ? ipNetworkKey(ip) : null;
 }

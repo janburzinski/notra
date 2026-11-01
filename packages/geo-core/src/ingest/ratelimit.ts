@@ -1,4 +1,4 @@
-import { Ratelimit } from "@upstash/ratelimit";
+import { createLimiter } from "@notra/utils/ratelimit";
 import { Redis } from "@upstash/redis";
 
 import {
@@ -17,26 +17,26 @@ export const geoIngestRedis = Redis.fromEnv({
 // Redis is a hard dependency: the pipeline rejects on transport errors and
 // timeouts. Fail fast so an outage answers 502 quickly instead of holding
 // requests through the default 5 retries and 5 s limiter timeout.
-export const geoIngestRatelimit = new Ratelimit({
+export const geoIngestRatelimit = createLimiter({
   redis: geoIngestRedis,
   prefix: "ratelimit:geo-ingest",
-  limiter: Ratelimit.slidingWindow(1000, "1m"),
+  requests: 1000,
+  window: "1m",
   timeout: GEO_INGEST_RATELIMIT_TIMEOUT_MS,
 });
 
-export const geoIngestAdmissionRatelimit = new Ratelimit({
+export const geoIngestAdmissionRatelimit = createLimiter({
   redis: geoIngestRedis,
   prefix: GEO_INGEST_ADMISSION_RATELIMIT_PREFIX,
-  limiter: Ratelimit.slidingWindow(
-    GEO_INGEST_ADMISSION_RATELIMIT_MAX_REQUESTS,
-    "1m"
-  ),
+  requests: GEO_INGEST_ADMISSION_RATELIMIT_MAX_REQUESTS,
+  window: "1m",
   timeout: GEO_INGEST_RATELIMIT_TIMEOUT_MS,
 });
 
-export const webIngestRatelimit = new Ratelimit({
+export const webIngestRatelimit = createLimiter({
   redis: geoIngestRedis,
   prefix: WEB_INGEST_RATELIMIT_PREFIX,
-  limiter: Ratelimit.slidingWindow(WEB_INGEST_RATELIMIT_MAX_REQUESTS, "1m"),
+  requests: WEB_INGEST_RATELIMIT_MAX_REQUESTS,
+  window: "1m",
   timeout: GEO_INGEST_RATELIMIT_TIMEOUT_MS,
 });

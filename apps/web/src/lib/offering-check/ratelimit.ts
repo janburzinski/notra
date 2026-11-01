@@ -13,7 +13,7 @@ import type {
   OfferingRateLimitCheck,
   OfferingRateLimitScope,
 } from "@/types/offering-check";
-import { getClientIp } from "@/utils/client-ip";
+import { getClientIpHash } from "@/utils/client-ip";
 import { getOfferingCheckBrandFeatureIdentity } from "@/utils/offering-identity";
 
 import { getOfferingCheckRedis } from "./redis";
@@ -49,7 +49,7 @@ function scanLimitChecks(
   request: Request,
   input: OfferingCheckInput
 ): OfferingRateLimitCheck[] {
-  const ip = sha256(getClientIp(request));
+  const ip = getClientIpHash(request);
   return [
     limitCheck("perIpHour", ip),
     limitCheck("perIpDay", ip),
@@ -137,7 +137,7 @@ export const enforceOfferingCheckPreflightRateLimit = Effect.fn(
   "enforceOfferingCheckPreflightRateLimit"
 )(function* (request: Request) {
   yield* checkOfferingCheckRateLimit(
-    [limitCheck("preflightPerIpMinute", sha256(getClientIp(request)))],
+    [limitCheck("preflightPerIpMinute", getClientIpHash(request))],
     true
   );
 });

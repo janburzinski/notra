@@ -4,6 +4,7 @@ import { getDemoClientIp } from "./demo-ip-hash";
 
 const originalDeployment = process.env.UNKEY_DEPLOYMENT_ID;
 const originalVercel = process.env.VERCEL;
+const originalProxyHeader = process.env.TRUSTED_PROXY_HEADER;
 
 afterEach(() => {
   if (originalDeployment === undefined) {
@@ -15,6 +16,11 @@ afterEach(() => {
     delete process.env.VERCEL;
   } else {
     process.env.VERCEL = originalVercel;
+  }
+  if (originalProxyHeader === undefined) {
+    delete process.env.TRUSTED_PROXY_HEADER;
+  } else {
+    process.env.TRUSTED_PROXY_HEADER = originalProxyHeader;
   }
 });
 
@@ -49,6 +55,7 @@ test("Unkey trusts Cloudflare's client header only behind a Cloudflare peer", ()
 test("forwarded IP is not trusted merely because a request claims to be from Unkey", () => {
   delete process.env.UNKEY_DEPLOYMENT_ID;
   delete process.env.VERCEL;
+  process.env.TRUSTED_PROXY_HEADER = "x-real-ip";
   expect(
     getDemoClientIp(
       new Headers({

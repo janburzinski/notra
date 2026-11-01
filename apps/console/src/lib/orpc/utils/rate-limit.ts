@@ -1,5 +1,6 @@
 import { redis } from "@notra/ai/utils/redis";
-import { Ratelimit } from "@upstash/ratelimit";
+import { createLimiter } from "@notra/utils/ratelimit";
+import type { Limiter } from "@notra/utils/types/ratelimit";
 
 import { internalServerError, tooManyRequests } from "./errors";
 
@@ -11,7 +12,7 @@ export const BRANDING_UPLOAD_RATE_LIMIT = {
   limit: 20,
   windowSeconds: 60,
 } as const;
-const limiters = new Map<string, Ratelimit>();
+const limiters = new Map<string, Limiter>();
 const developmentHits = new Map<string, number[]>();
 
 export async function assertRateLimit(params: {
@@ -25,13 +26,11 @@ export async function assertRateLimit(params: {
     const policy = `${params.limit}:${params.windowSeconds}`;
     let limiter = limiters.get(policy);
     if (!limiter) {
-      limiter = new Ratelimit({
+      limiter = createLimiter({
         redis,
         prefix: `console:rate-limit:${policy}`,
-        limiter: Ratelimit.slidingWindow(
-          params.limit,
-          `${params.windowSeconds} s`
-        ),
+        requests: params.limit,
+        window: `${params.windowSeconds} s`,
       });
       limiters.set(policy, limiter);
     }

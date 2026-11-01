@@ -29,7 +29,6 @@
     "@paper-design/shaders-react": "^0.0.80",
     "@tanstack/react-hotkeys": "^0.3.3",
     "@tanstack/react-query": "^5.104.3",
-    "@upstash/ratelimit": "catalog:",
     "@upstash/redis": "catalog:",
     "@workos-inc/authkit-nextjs": "^4.4.0",
     "@workos-inc/node": "^10.14.0",

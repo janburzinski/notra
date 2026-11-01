@@ -100,7 +100,6 @@
         "@opentelemetry/sdk-node": "^0.220.0",
         "@resvg/resvg-js": "^2.6.2",
         "@unkey/api": "^2.5.4",
-        "@upstash/ratelimit": "catalog:",
         "@upstash/redis": "catalog:",
         "@vercel/oidc": "catalog:",
         "@workos-inc/node": "^10.14.0",
@@ -150,7 +149,6 @@
         "@paper-design/shaders-react": "^0.0.80",
         "@tanstack/react-hotkeys": "^0.3.3",
         "@tanstack/react-query": "^5.104.3",
-        "@upstash/ratelimit": "catalog:",
         "@upstash/redis": "catalog:",
         "@workos-inc/authkit-nextjs": "^4.4.0",
         "@workos-inc/node": "^10.14.0",
@@ -540,7 +538,6 @@
         "@tanstack/react-router": "^1.170.44",
         "@tanstack/react-start": "^1.169.2",
         "@toolwind/corner-shape": "^0.0.8-3",
-        "@upstash/ratelimit": "catalog:",
         "@upstash/redis": "catalog:",
         "@usenotra/geo": "npm:@usenotra/geo@^0.6.2",
         "ai": "catalog:",
@@ -960,6 +957,10 @@
     "packages/utils": {
       "name": "@notra/utils",
       "version": "0.0.1",
+      "dependencies": {
+        "@upstash/ratelimit": "catalog:",
+        "@upstash/redis": "catalog:",
+      },
       "devDependencies": {
         "@notra/typescript-config": "workspace:*",
         "@types/node": "^22.20.5",

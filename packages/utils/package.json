@@ -34,10 +34,16 @@
     "./constants/escape": "./src/constants/escape.ts",
     "./constants/favicon": "./src/constants/favicon.ts",
     "./account-api-key": "./src/account-api-key.ts",
-    "./constants/account-api-key": "./src/constants/account-api-key.ts"
+    "./constants/account-api-key": "./src/constants/account-api-key.ts",
+    "./ratelimit": "./src/ratelimit.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo"
+    "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
+    "test": "bun test tests"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "catalog:",
+    "@upstash/redis": "catalog:"
   },
   "devDependencies": {
     "@notra/typescript-config": "workspace:*",

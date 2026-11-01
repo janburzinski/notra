@@ -26,7 +26,6 @@
     "@opentelemetry/sdk-node": "^0.220.0",
     "@resvg/resvg-js": "^2.6.2",
     "@unkey/api": "^2.5.4",
-    "@upstash/ratelimit": "catalog:",
     "@upstash/redis": "catalog:",
     "@vercel/oidc": "catalog:",
     "@workos-inc/node": "^10.14.0",

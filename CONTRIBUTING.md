@@ -591,6 +591,24 @@ GEO's OpenCode, Claude Code, Codex, and FX engines require both `UPSTASH_BOX_API
 sandbox access and `AI_GATEWAY_API_KEY` for model calls through Vercel AI
 Gateway. They do not use Upstash's managed LLM key or its spending allowance.
 
+## Client IP and rate limits
+
+IP rate limits read the client address from `getClientIp` in
+`@notra/utils/client-ip`, which trusts only a header the deployment's edge sets:
+
+1. On Vercel (`VERCEL=1`), the first `x-vercel-forwarded-for` entry.
+2. On Unkey (`UNKEY_DEPLOYMENT_ID` set by the runtime), `x-forwarded-for`,
+   which Unkey replaces with one client IP.
+3. Anywhere else, only the header named in `TRUSTED_PROXY_HEADER`.
+
+Under 2 and 3, `cf-connecting-ip` is used only when that peer is a Cloudflare
+edge. When you self-host behind a reverse proxy, set `TRUSTED_PROXY_HEADER` to
+a header the proxy overwrites with exactly one client IP (nginx:
+`proxy_set_header X-Real-IP $remote_addr;` with `TRUSTED_PROXY_HEADER=x-real-ip`).
+Never set it on a server that clients reach directly: they could then send
+any address and dodge the limits. Without a trusted header, every client
+shares one `unknown` bucket per limit, and production logs a warning once.
+
 ## Demo deployments on Unkey Compute
 
 The demo has two **separate** Unkey Compute apps. Both use this monorepo as

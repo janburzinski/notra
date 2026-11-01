@@ -7,16 +7,14 @@ import {
   AGENT_FEEDBACK_RATE_LIMIT_PER_IP,
   AGENT_FEEDBACK_RATE_LIMIT_PER_ORGANIZATION,
 } from "@notra/db/constants/agent-feedback";
-import { getProxyClientIp, ipNetworkKey } from "@notra/utils/client-ip";
+import { getClientIp, getClientNetworkKey } from "@notra/utils/client-ip";
 import { isDemoMode } from "@notra/utils/demo-mode";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { createLimiter, getRateLimitHeaders } from "@notra/utils/ratelimit";
+import type { Limiter } from "@notra/utils/types/ratelimit";
 import type { Context } from "hono";
 
 import { trackApiRateLimited } from "./analytics";
 import { getOrganizationId } from "./auth";
-
-const redis = Redis.fromEnv();
 
 export const RATE_LIMITS = {
   postGeneration: { requests: 10, window: "1 minute" },
@@ -48,132 +46,106 @@ export const RATE_LIMITS = {
 } as const;
 
 export const ratelimit = {
-  postGeneration: new Ratelimit({
-    redis,
+  postGeneration: createLimiter({
     prefix: "ratelimit:api:post-generation",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.postGeneration.requests, "1m"),
+    requests: RATE_LIMITS.postGeneration.requests,
+    window: "1m",
   }),
-  brandGeneration: new Ratelimit({
-    redis,
+  brandGeneration: createLimiter({
     prefix: "ratelimit:api:brand-generation",
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.brandGeneration.requests,
-      "1m"
-    ),
+    requests: RATE_LIMITS.brandGeneration.requests,
+    window: "1m",
   }),
-  chatGeneration: new Ratelimit({
-    redis,
+  chatGeneration: createLimiter({
     prefix: "ratelimit:chat-generation",
-    limiter: Ratelimit.slidingWindow(
-      CHAT_GENERATION_RATE_LIMIT.requests,
-      CHAT_GENERATION_RATE_LIMIT.window
-    ),
+    requests: CHAT_GENERATION_RATE_LIMIT.requests,
+    window: CHAT_GENERATION_RATE_LIMIT.window,
   }),
-  integrationCreate: new Ratelimit({
-    redis,
+  integrationCreate: createLimiter({
     prefix: "ratelimit:api:integration-create",
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.integrationCreate.requests,
-      "1m"
-    ),
+    requests: RATE_LIMITS.integrationCreate.requests,
+    window: "1m",
   }),
-  postUpdate: new Ratelimit({
-    redis,
+  postUpdate: createLimiter({
     prefix: "ratelimit:api:post-update",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.postUpdate.requests, "1m"),
+    requests: RATE_LIMITS.postUpdate.requests,
+    window: "1m",
   }),
-  feedbackIngest: new Ratelimit({
-    redis,
+  feedbackIngest: createLimiter({
     prefix: "ratelimit:api:feedback-ingest",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.feedbackIngest.requests, "1m"),
+    requests: RATE_LIMITS.feedbackIngest.requests,
+    window: "1m",
   }),
-  feedbackIngestIp: new Ratelimit({
-    redis,
+  feedbackIngestIp: createLimiter({
     prefix: "ratelimit:api:feedback-ingest-ip",
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.feedbackIngestIp.requests,
-      `${AGENT_FEEDBACK_RATE_LIMIT_IP_WINDOW_MINUTES}m`
-    ),
+    requests: RATE_LIMITS.feedbackIngestIp.requests,
+    window: `${AGENT_FEEDBACK_RATE_LIMIT_IP_WINDOW_MINUTES}m`,
   }),
-  feedbackIngestOrganization: new Ratelimit({
-    redis,
+  feedbackIngestOrganization: createLimiter({
     prefix: "ratelimit:api:feedback-ingest-organization",
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.feedbackIngestOrganization.requests,
-      `${AGENT_FEEDBACK_RATE_LIMIT_ORGANIZATION_WINDOW_MINUTES}m`
-    ),
+    requests: RATE_LIMITS.feedbackIngestOrganization.requests,
+    window: `${AGENT_FEEDBACK_RATE_LIMIT_ORGANIZATION_WINDOW_MINUTES}m`,
   }),
-  scanTrigger: new Ratelimit({
-    redis,
+  scanTrigger: createLimiter({
     prefix: "ratelimit:api:geo-scan-trigger",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.scanTrigger.requests, "1h"),
+    requests: RATE_LIMITS.scanTrigger.requests,
+    window: "1h",
   }),
-  sequenceRun: new Ratelimit({
-    redis,
+  sequenceRun: createLimiter({
     prefix: "ratelimit:api:geo-sequence-run",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.sequenceRun.requests, "10m"),
+    requests: RATE_LIMITS.sequenceRun.requests,
+    window: "10m",
   }),
-  promptImport: new Ratelimit({
-    redis,
+  promptImport: createLimiter({
     prefix: "ratelimit:api:geo-prompt-import",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.promptImport.requests, "10m"),
+    requests: RATE_LIMITS.promptImport.requests,
+    window: "10m",
   }),
-  competitorImport: new Ratelimit({
-    redis,
+  competitorImport: createLimiter({
     prefix: "ratelimit:api:geo-competitor-import",
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.competitorImport.requests,
-      "10m"
-    ),
+    requests: RATE_LIMITS.competitorImport.requests,
+    window: "10m",
   }),
-  competitorSuggestions: new Ratelimit({
-    redis,
+  competitorSuggestions: createLimiter({
     prefix: "ratelimit:api:geo-competitor-suggestions",
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.competitorSuggestions.requests,
-      "10m"
-    ),
+    requests: RATE_LIMITS.competitorSuggestions.requests,
+    window: "10m",
   }),
-  writerPlan: new Ratelimit({
-    redis,
+  writerPlan: createLimiter({
     prefix: "ratelimit:api:geo-writer-plan",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.writerPlan.requests, "10m"),
+    requests: RATE_LIMITS.writerPlan.requests,
+    window: "10m",
   }),
-  writerApprove: new Ratelimit({
-    redis,
+  writerApprove: createLimiter({
     prefix: "ratelimit:api:geo-writer-approve",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.writerApprove.requests, "10m"),
+    requests: RATE_LIMITS.writerApprove.requests,
+    window: "10m",
   }),
-  agentReadinessScan: new Ratelimit({
-    redis,
+  agentReadinessScan: createLimiter({
     prefix: "ratelimit:api:geo-agent-readiness-scan",
-    limiter: Ratelimit.slidingWindow(
-      RATE_LIMITS.agentReadinessScan.requests,
-      "1h"
-    ),
+    requests: RATE_LIMITS.agentReadinessScan.requests,
+    window: "1h",
   }),
-  publicStatus: new Ratelimit({
-    redis,
+  publicStatus: createLimiter({
     prefix: "ratelimit:api:public-status",
-    limiter: Ratelimit.slidingWindow(RATE_LIMITS.publicStatus.requests, "1m"),
+    requests: RATE_LIMITS.publicStatus.requests,
+    window: "1m",
   }),
 };
 
 type RatelimitScope = "credential" | "organization" | "ip";
 
-function getClientIp(c: Context): string {
-  if (isDemoMode()) {
-    const ip = getProxyClientIp(c.req.raw.headers);
-    return ip ? ipNetworkKey(ip) : "unknown";
-  }
-  const forwardedFor = c.req.header("x-forwarded-for");
-  const ip = forwardedFor?.split(",")[0]?.trim() || c.req.header("x-real-ip");
-  return ip || "unknown";
+function getClientIpKey(c: Context): string {
+  const headers = c.req.raw.headers;
+  return (
+    (isDemoMode() ? getClientNetworkKey(headers) : getClientIp(headers)) ??
+    "unknown"
+  );
 }
 
 function getRatelimitKey(c: Context, scope: RatelimitScope): string {
   if (scope === "ip") {
-    return getClientIp(c);
+    return getClientIpKey(c);
   }
 
   const auth = c.get("auth");
@@ -190,31 +162,22 @@ function getRatelimitKey(c: Context, scope: RatelimitScope): string {
     }
   }
 
-  return getClientIp(c);
+  return getClientIpKey(c);
 }
 
 export function setRatelimitHeaders(
   c: Context,
   result: { limit: number; remaining: number; reset: number }
 ) {
-  const resetSeconds = Math.max(
-    0,
-    Math.ceil((result.reset - Date.now()) / 1000)
-  );
-
-  c.header("RateLimit-Limit", String(result.limit));
-  c.header("RateLimit-Remaining", String(Math.max(0, result.remaining)));
-  c.header("RateLimit-Reset", String(resetSeconds));
-  c.header("X-RateLimit-Limit", String(result.limit));
-  c.header("X-RateLimit-Remaining", String(Math.max(0, result.remaining)));
-  c.header("X-RateLimit-Reset", String(Math.ceil(result.reset / 1000)));
-
-  return resetSeconds;
+  for (const [name, value] of getRateLimitHeaders(result)) {
+    c.header(name, value);
+  }
+  return Math.max(0, Math.ceil((result.reset - Date.now()) / 1000));
 }
 
 export async function enforceRatelimitForKey(
   c: Context,
-  limiter: Ratelimit,
+  limiter: Limiter,
   key: string
 ) {
   const result = await limiter.limit(key);
@@ -240,7 +203,7 @@ export async function enforceRatelimitForKey(
 
 export function enforceRatelimit(
   c: Context,
-  limiter: Ratelimit,
+  limiter: Limiter,
   scope: RatelimitScope = "credential"
 ) {
   return enforceRatelimitForKey(c, limiter, getRatelimitKey(c, scope));
