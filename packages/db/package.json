@@ -14,6 +14,7 @@
   "scripts": {
     "check:migrations": "bun run src/scripts/check-migrations.ts",
     "check-types": "tsc --noEmit --incremental --tsBuildInfoFile .cache/typecheck.tsbuildinfo",
+    "encrypt:social-tokens": "bun run src/scripts/encrypt-social-tokens.ts",
     "test": "bun test tests",
     "seed:brand-identity": "bun run src/scripts/seed-brand-identity.ts",
     "seed:chat-attachments": "bun run src/scripts/seed-chat-attachments.ts",
