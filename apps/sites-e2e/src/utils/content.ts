@@ -122,6 +122,16 @@ export async function assertContentFeatures(
   );
   checks.push("global style.css and script.js apply under the CSP");
 
+  const badge = page.getByRole("link", { name: "Powered by Notra" });
+  assert.equal(await badge.count(), 1);
+  assert.equal(await badge.isVisible(), true);
+  const badgeBox = await badge.boundingBox();
+  assert.ok(
+    badgeBox && badgeBox.width > 0 && badgeBox.height > 0,
+    "the Notra badge keeps its size under site CSS"
+  );
+  checks.push("Powered by Notra badge stays visible under site CSS hiding it");
+
   await page.goto(`${origin}/blog/hello-world`, {
     waitUntil: "domcontentloaded",
   });

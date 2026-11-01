@@ -181,6 +181,7 @@ export function SiteSettingsSwitchItem({
   checked,
   onCheckedChange,
   disabled,
+  action,
 }: SiteSettingsSwitchItemProps) {
   const id = useId();
   return (
@@ -189,7 +190,8 @@ export function SiteSettingsSwitchItem({
       <label className="min-w-0 flex-1" htmlFor={id}>
         <ItemText description={description} title={title} />
       </label>
-      <div className="col-start-2 flex justify-end sm:col-start-auto">
+      <div className="col-start-2 flex items-center justify-end gap-3 sm:col-start-auto">
+        {action}
         <Switch
           checked={checked}
           disabled={disabled}

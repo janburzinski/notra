@@ -11,6 +11,7 @@ import { and, desc, eq, gt, inArray, lte, ne, or, sql } from "drizzle-orm";
 import { ROLLBACK_HISTORY } from "./constants/deployments";
 import { SiteNotBuildableError } from "./errors/sites";
 import { publishSiteDeploymentChange } from "./live";
+import { enforceSitePlanBranding } from "./plan-limits";
 import type {
   DeploymentExecutor,
   DeploymentTransitionValues,
@@ -124,6 +125,7 @@ export async function enqueueSiteDeployment(
   input: EnqueueDeploymentInput,
   assertCurrentHead?: () => Promise<void>
 ): Promise<EnqueuedDeployment> {
+  await enforceSitePlanBranding(input.siteId);
   const enqueued = await db.transaction(async (tx) => {
     const organizationId = await lockSiteOrganization(tx, input.siteId);
     if (!organizationId) {
@@ -371,6 +373,7 @@ export async function enqueueSettingsDeployment(
   input: EnqueueDeploymentInput,
   attempt: SettingsJobAttempt
 ): Promise<string | null> {
+  await enforceSitePlanBranding(input.siteId);
   const enqueued = await db.transaction(async (tx) => {
     const organizationId = await lockSiteOrganization(tx, input.siteId);
     if (!organizationId) {

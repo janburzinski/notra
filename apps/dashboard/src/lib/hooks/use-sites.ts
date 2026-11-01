@@ -3,7 +3,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 
 import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import {
@@ -36,6 +36,44 @@ export function useSitesStatus(organizationId: string) {
       staleTime: Number.POSITIVE_INFINITY,
     })
   );
+}
+
+export function useSitePlanUsage(organizationId: string, enabled = true) {
+  return useQuery(
+    dashboardOrpc.sites.planUsage.queryOptions({
+      input: { organizationId },
+      enabled: enabled && organizationId.length > 0,
+    })
+  );
+}
+
+export function useSitePlanLimitReached(
+  organizationId: string,
+  kind: "sites" | "domains"
+) {
+  const usage = useSitePlanUsage(organizationId).data?.[kind];
+  return usage?.limit != null && usage.used >= usage.limit;
+}
+
+/**
+ * Free plan site limit for the new-site page: `blocked` is set while creation
+ * is not allowed. Once creation is allowed it stays allowed for the visit, so
+ * creating the site does not send the user away mid-deployment.
+ */
+export function useSiteCreationLimit(organizationId: string, enabled: boolean) {
+  const planQuery = useSitePlanUsage(organizationId, enabled);
+  const [allowed, setAllowed] = useState(false);
+  const sites = planQuery.data?.sites;
+  const blocked = sites?.limit != null && sites.used >= sites.limit;
+  if (!allowed && sites && !blocked) {
+    setAllowed(true);
+  }
+  return {
+    settled: Boolean(sites),
+    failed: !sites && planQuery.isError,
+    retry: planQuery.refetch,
+    blocked: !allowed && blocked,
+  };
 }
 
 export function useSitesList(organizationId: string, projectId: string) {

@@ -24,6 +24,7 @@ import {
   SITE_TABLE_COMPACT_EMPTY_HEIGHT,
 } from "@/constants/sites";
 import { useDeployLatest } from "@/lib/hooks/use-site-deployments";
+import { useSitePlanLimitReached } from "@/lib/hooks/use-sites";
 import type { SiteViewAllLinkProps } from "@/types/components/sites";
 import { siteHref, sitePreviewDeploymentsHref } from "@/utils/site-links";
 import { sitePreviewRows } from "@/utils/site-previews";
@@ -54,6 +55,7 @@ export function SiteOverviewPage() {
     useSite();
   const { site, deployments } = detail;
   const suspended = site.status === "suspended";
+  const siteLimitReached = useSitePlanLimitReached(organizationId, "sites");
   const deployLatest = useDeployLatest({ organizationId, siteId });
   const previews = sitePreviewRows(detail);
   const latestProduction =
@@ -79,18 +81,20 @@ export function SiteOverviewPage() {
               />
             </a>
           ) : null}
-          <Link
-            className={buttonVariants()}
-            href={`/${organizationSlug}/sites/new?project=${encodeURIComponent(site.projectId)}`}
-          >
-            <HugeiconsIcon
-              aria-hidden="true"
-              data-icon="inline-start"
-              icon={PlusSignIcon}
-              strokeWidth={1.5}
-            />
-            {tSites("newSite")}
-          </Link>
+          {siteLimitReached ? null : (
+            <Link
+              className={buttonVariants()}
+              href={`/${organizationSlug}/sites/new?project=${encodeURIComponent(site.projectId)}`}
+            >
+              <HugeiconsIcon
+                aria-hidden="true"
+                data-icon="inline-start"
+                icon={PlusSignIcon}
+                strokeWidth={1.5}
+              />
+              {tSites("newSite")}
+            </Link>
+          )}
         </div>
       </PageHeading>
       <span aria-live="polite" className="sr-only">

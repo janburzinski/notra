@@ -1,4 +1,6 @@
+import { SITE_PLAN_LIMIT_MESSAGES } from "../constants/plan-limits";
 import type { InthErrorCode } from "../types/inth";
+import type { SitePlanLimit } from "../types/plan-limits";
 import type { SiteInputField } from "../types/sites";
 
 export class SitesNotConfiguredError extends Error {
@@ -12,6 +14,16 @@ export class SiteInputError extends Error {
   constructor(message: string, options?: { field?: SiteInputField }) {
     super(message);
     this.field = options?.field ?? null;
+  }
+}
+
+export class SitePlanLimitError extends Error {
+  readonly name = "SitePlanLimitError";
+  readonly limit: SitePlanLimit;
+
+  constructor(limit: SitePlanLimit) {
+    super(SITE_PLAN_LIMIT_MESSAGES[limit]);
+    this.limit = limit;
   }
 }
 

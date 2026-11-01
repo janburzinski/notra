@@ -38,6 +38,8 @@ export interface SiteSettingsSwitchItemProps extends SiteSettingsItemBaseProps {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
+  /** Shown beside the switch, e.g. an upgrade button when the plan locks it. */
+  action?: ReactNode;
 }
 
 export interface SiteSettingsToggleProps extends SiteSettingsItemBaseProps {

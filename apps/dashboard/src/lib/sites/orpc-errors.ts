@@ -5,6 +5,7 @@ import {
   SiteInputError,
   SiteNotBuildableError,
   SitePermanentBuildError,
+  SitePlanLimitError,
   SitePublishConflictError,
   SitesNotConfiguredError,
 } from "@notra/sites-server/errors/sites";
@@ -14,10 +15,14 @@ import {
   badRequest,
   conflict,
   notFound,
+  paymentRequired,
   serviceUnavailable,
 } from "@/lib/orpc/utils/errors";
 
 export function toSitesOrpcError(error: unknown): unknown {
+  if (error instanceof SitePlanLimitError) {
+    return paymentRequired(error.message, { limit: error.limit });
+  }
   if (error instanceof SiteInputError) {
     if (error.message === "Branch not found") {
       return notFound(error.message);
@@ -73,7 +78,8 @@ export function toSitesOrpcError(error: unknown): unknown {
 export function bulkImportErrorMessage(error: unknown): string {
   if (
     error instanceof SiteInputError ||
-    error instanceof SiteHostConflictError
+    error instanceof SiteHostConflictError ||
+    error instanceof SitePlanLimitError
   ) {
     return error.message;
   }

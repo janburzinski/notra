@@ -1,6 +1,10 @@
 import { SITE_SECTIONS } from "@/constants/sites";
 import type { SiteRepositoryRef, SiteSection } from "@/types/sites";
 
+export function sitesHref(organizationSlug: string): string {
+  return `/${organizationSlug}/sites`;
+}
+
 export function siteHref(
   organizationSlug: string,
   siteId: string,

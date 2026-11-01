@@ -204,7 +204,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
     siteDrafts,
     sites,
   } = await import("@notra/db/schema");
-  const { SiteHostConflictError } =
+  const { SiteHostConflictError, SitePlanLimitError } =
     await import("../../../packages/sites-server/src/errors/sites");
   const { eq, inArray } = await import("drizzle-orm");
   const { getGitHubAppWebhookSecret } =
@@ -318,8 +318,10 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
   };
   test("create → publish → failed push → fix with retry → redeploy → rollback → protected preview → settings → post preview → stale build → Databuddy via pull request, direct publish and push webhook → promote → delete", async () => {
     const organizationId = `journey-${crypto.randomUUID()}`;
+    const freeOrganizationId = `${organizationId}-free`;
     const userId = `${organizationId}-user`;
     let siteId: string | null = null;
+    let freeSiteId: string | null = null;
     const request = (url: string, headers?: HeadersInit) => {
       resetCachesForTests();
       return handleSiteRequest(new Request(url, { headers }), {
@@ -408,6 +410,8 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         slug: organizationId,
         createdAt: new Date(),
       });
+      // The journey runs on a paid plan: no workspace caps on sites or domains.
+      emulators.autumn.setPlan(organizationId, "growth");
       const projectId = await seedSiteProject(organizationId);
       await db.insert(githubAppInstallations).values({
         id: `${organizationId}-installation`,
@@ -1192,12 +1196,123 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       expect((await request(`${aliasOrigin}/blog`)).status).toBe(404);
       expect((await request(`${attachedOrigin}/blog`)).status).toBe(404);
       await expect(deleteSite(site)).rejects.toThrow("Site not found");
+      await phase("Free plan: one site, one custom domain, badge forced");
+      // A workspace Autumn has only on its auto-enabled free plan.
+      await db.insert(organizations).values({
+        id: freeOrganizationId,
+        name: "Free fixture",
+        slug: freeOrganizationId,
+        createdAt: new Date(),
+      });
+      const freeProjectId = await seedSiteProject(freeOrganizationId);
+      await db.insert(githubAppInstallations).values({
+        id: `${freeOrganizationId}-installation`,
+        organizationId: freeOrganizationId,
+        createdByUserId: userId,
+        installationId: "535353",
+        accountId: "fixture-account",
+        accountLogin: "fixture",
+        accountAvatarUrl: "https://example.test/avatar",
+        accountType: "User",
+      });
+      await db.insert(githubIntegrations).values({
+        id: `${freeOrganizationId}-repository`,
+        organizationId: freeOrganizationId,
+        createdByUserId: userId,
+        displayName: "Fixture repository",
+        githubAppInstallationId: `${freeOrganizationId}-installation`,
+        githubRepositoryId: String(github.repositoryId),
+        owner: "fixture",
+        repo: "acme",
+        defaultBranch: "main",
+      });
+      const freeInput = {
+        organizationId: freeOrganizationId,
+        userId,
+        projectId: freeProjectId,
+        name: "Acme free",
+        slug: `free-${crypto.randomUUID().slice(0, 8)}`,
+        repositoryId: `${freeOrganizationId}-repository`,
+        mounts: { blog: "/blog", changelog: "/changelog" },
+      };
+      const freeSite = (await createSite(freeInput)).site;
+      freeSiteId = freeSite.id;
+      const secondSite = await createSite({
+        ...freeInput,
+        name: "Acme free two",
+        slug: `free-${crypto.randomUUID().slice(0, 8)}`,
+      }).catch((error: unknown) => error);
+      expect(secondSite).toBeInstanceOf(SitePlanLimitError);
+      expect(secondSite).toMatchObject({ limit: "sites" });
+      expect(
+        await db
+          .select({ id: sites.id })
+          .from(sites)
+          .where(eq(sites.organizationId, freeOrganizationId))
+      ).toEqual([{ id: freeSite.id }]);
+      await addSiteDomain(freeSite, {
+        kind: "proxy",
+        value: `free-blog.${CUSTOM_DOMAIN_ZONE}`,
+      });
+      const secondDomain = await addSiteDomain(freeSite, {
+        kind: "proxy",
+        value: `free-docs.${CUSTOM_DOMAIN_ZONE}`,
+      }).catch((error: unknown) => error);
+      expect(secondDomain).toBeInstanceOf(SitePlanLimitError);
+      expect(secondDomain).toMatchObject({ limit: "domains" });
+      expect(
+        await db
+          .select({ hostname: siteDomains.hostname })
+          .from(siteDomains)
+          .where(eq(siteDomains.siteId, freeSite.id))
+      ).toEqual([{ hostname: `free-blog.${CUSTOM_DOMAIN_ZONE}` }]);
+      const hiddenBadge = await updateSiteSettings(
+        freeSite,
+        { showBranding: false },
+        userId
+      ).catch((error: unknown) => error);
+      expect(hiddenBadge).toBeInstanceOf(SitePlanLimitError);
+      expect(hiddenBadge).toMatchObject({ limit: "branding" });
+      // A setting stored before the limit, or under a paid plan the
+      // workspace dropped, can't hide the badge either: the build forces it.
+      await db
+        .update(sites)
+        .set({ showBranding: false })
+        .where(eq(sites.id, freeSite.id));
+      const forcedJobId = await deployBranchHead(
+        { ...freeSite, showBranding: false },
+        { trigger: "manual", userId }
+      );
+      expect(await runSiteJob(forcedJobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      expect((await deploymentFor(forcedJobId)).target.branding).toBe(true);
+      expect((await getSite(freeSite.id))?.showBranding).toBe(true);
+      const freeHtml = await (
+        await request(`${freeSite.publicOrigin}/blog`)
+      ).text();
+      expect(freeHtml).toContain("Notes on building calm software");
+      expect(freeHtml).toContain("data-notra-badge");
+      expect(freeHtml).toContain("Powered by <b>Notra</b>");
+      // Upgrading lifts the caps without touching what already exists.
+      emulators.autumn.setPlan(freeOrganizationId, "starter");
+      await addSiteDomain(freeSite, {
+        kind: "proxy",
+        value: `free-docs.${CUSTOM_DOMAIN_ZONE}`,
+      });
+      const paidBadge = await updateSiteSettings(
+        freeSite,
+        { showBranding: false },
+        userId
+      );
+      expect(paidBadge.site.showBranding).toBe(false);
       await phase("build and emulator accounting");
       // Every outbound call hit an emulated route.
       expect(
         emulators.summaries().flatMap((summary) => summary.unhandled)
       ).toEqual([]);
-      expect(builds).toBe(13);
+      expect(builds).toBe(14);
       expect(boxBuilds).toHaveLength(builds);
       if (emulators.box) {
         expectNoLiveBoxes();
@@ -1242,7 +1357,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
           );
         }
       }
-      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(11);
+      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(12);
       console.log(
         JSON.stringify({
           scope: "connected-postgres-compiler-publisher-worker-lifecycle",
@@ -1269,14 +1384,22 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       } finally {
         try {
           try {
-            if (siteId) {
-              await db.delete(sites).where(eq(sites.id, siteId));
+            const createdSiteIds = [siteId, freeSiteId].filter(
+              (id): id is string => id !== null
+            );
+            if (createdSiteIds.length > 0) {
+              await db.delete(sites).where(inArray(sites.id, createdSiteIds));
             }
           } finally {
             try {
               await db
                 .delete(organizations)
-                .where(eq(organizations.id, organizationId));
+                .where(
+                  inArray(organizations.id, [
+                    organizationId,
+                    freeOrganizationId,
+                  ])
+                );
             } finally {
               await db.delete(users).where(eq(users.id, userId));
             }

@@ -33,6 +33,7 @@ import {
 import { getSitesHostingDomain, siteCnameTarget } from "./env";
 import { SiteProviderRequestError } from "./errors/provider";
 import { SiteHostConflictError, SiteInputError } from "./errors/sites";
+import { assertSitePlanAllows, resolveSitePlan } from "./plan-limits";
 import { setSitePublicOrigin } from "./sites";
 import { releaseHostRecord } from "./state";
 import type {
@@ -170,6 +171,7 @@ export async function addSiteDomain(
     throw new SiteInputError("Enter a domain like blog.acme.com");
   }
   assertPublicHostname(hostname);
+  const plan = await resolveSitePlan(site.organizationId);
   let createdId: string | null = null;
   let config: CloudflareSaasConfig | null = null;
   let prepared = false;
@@ -204,6 +206,7 @@ export async function addSiteDomain(
             `A site can have up to ${SITE_MAX_DOMAINS} domains`
           );
         }
+        await assertSitePlanAllows(tx, site.organizationId, plan, "domains");
 
         const isSubdomain = input.kind === "subdomain";
         const initialRecords = isSubdomain

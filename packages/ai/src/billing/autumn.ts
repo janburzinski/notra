@@ -3,6 +3,8 @@ import type { Autumn } from "autumn-js";
 import { shouldBypassAutumnInDevelopment } from "../utils/autumn-development";
 
 const AUTUMN_SECRET_KEY = process.env.AUTUMN_SECRET_KEY;
+// Points the client at the Sites E2E Autumn emulator; production leaves it unset.
+const AUTUMN_API_URL = process.env.AUTUMN_API_URL?.trim() || undefined;
 
 /**
  * Per-request deadline for read-only billing lookups. Pass it as the request
@@ -25,7 +27,8 @@ function createLazyAutumn(secretKey: string): AutumnClient {
   let client: Promise<Autumn> | undefined;
   const load = () => {
     client ??= import("autumn-js").then(
-      ({ Autumn: AutumnSdk }) => new AutumnSdk({ secretKey })
+      ({ Autumn: AutumnSdk }) =>
+        new AutumnSdk({ secretKey, serverURL: AUTUMN_API_URL })
     );
     return client;
   };

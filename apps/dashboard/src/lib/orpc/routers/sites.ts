@@ -127,6 +127,7 @@ import {
   getInthConsentStatus,
   listInthProjects,
 } from "@notra/sites-server/inth";
+import { getSitePlanUsage } from "@notra/sites-server/plan-limits";
 import {
   previewAccessUrl,
   setSitePreviewPassword,
@@ -364,6 +365,10 @@ export const sitesRouter = {
         : null;
       return { configured, hostingDomain };
     }),
+
+  planUsage: sitesProcedure
+    .input(organizationIdInputSchema)
+    .handler(async ({ input }) => await getSitePlanUsage(input.organizationId)),
 
   list: sitesAccessProcedure
     .input(listSitesInputSchema)

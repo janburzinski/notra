@@ -9125,6 +9125,12 @@
         "domainsTrusted": "All trusted"
       },
       "analyticsTitle": "Analytics"
+    },
+    "planLimits": {
+      "domainsHint": "The Free plan includes 1 custom domain per workspace, and it's already in use. Your connected domain keeps working.",
+      "unavailableTitle": "Couldn't check your plan",
+      "unavailableDescription": "We couldn't load your workspace's Sites plan. Try again in a moment.",
+      "brandingRequired": "The Free plan always shows the \"Powered by Notra\" badge. Upgrade to remove it."
     }
   }
 }

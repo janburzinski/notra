@@ -5,7 +5,9 @@ import { VERCEL_API_URL } from "../constants/vercel-dns";
 
 // Every external service the Sites backend calls. Each has an override the
 // end-to-end suite points at its emulator (apps/sites-e2e/emulators);
-// production leaves them unset and uses the real endpoint.
+// production leaves them unset and uses the real endpoint. Autumn (plan
+// limits) goes through the shared client in packages/ai, overridden by
+// AUTUMN_API_URL.
 function override(name: string): string | undefined {
   return process.env[name]?.trim().replace(/\/+$/, "") || undefined;
 }

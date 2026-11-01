@@ -1,3 +1,4 @@
+import { startAutumnEmulator } from "./autumn";
 import { startBoxEmulator } from "./box";
 import { startCloudflareEmulator } from "./cloudflare";
 import { summarizeRequests } from "./core/summary";
@@ -60,6 +61,9 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
         zone
       )
     );
+    const autumn = await track(
+      startAutumnEmulator({ secretKey: "emulated-autumn-secret" })
+    );
     const box = options.box
       ? await track(
           startBoxEmulator({
@@ -68,7 +72,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
           })
         )
       : null;
-    const services = [github, r2, box, cloudflare, vercel, dns].filter(
+    const services = [github, r2, box, cloudflare, vercel, autumn, dns].filter(
       (service) => service !== null
     );
     return {
@@ -78,6 +82,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
       r2,
       cloudflare,
       vercel,
+      autumn,
       box,
       env: {
         ...dns.env,
@@ -85,6 +90,7 @@ export async function startSitesEmulators(options: SitesEmulatorsOptions) {
         ...r2.env,
         ...cloudflare.env,
         ...vercel.env,
+        ...autumn.env,
         ...(box?.env ?? {}),
       },
       summaries: (): EmulatorSummary[] =>

@@ -51,6 +51,10 @@ if (!process.env.NOTRA_SITE_OVERVIEW_NAVIGATION_WORKER) {
   mock.module("../src/lib/hooks/use-site-deployments", () => ({
     useDeployLatest: () => ({ isPending: false, mutate: () => undefined }),
   }));
+  mock.module("../src/lib/hooks/use-sites", () => ({
+    useInvalidateSites: () => () => undefined,
+    useSitePlanLimitReached: () => false,
+  }));
   mock.module("../src/components/sites/site-overview-hero", () => ({
     SiteOverviewHero: () => null,
   }));

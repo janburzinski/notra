@@ -7,6 +7,7 @@ export const PAYWALL_KINDS = {
   UPGRADE_CARD: "upgrade_card",
   NAV_LOCK: "nav_lock",
   ONBOARDING_PRICING: "onboarding_pricing",
+  SITES_LIMIT: "sites_limit",
 } as const;
 
 export const PLAN_SURFACES = {
@@ -16,6 +17,7 @@ export const PLAN_SURFACES = {
   SIDEBAR_TRIAL_EXPIRED: "sidebar_trial_expired",
   GEO_PAYWALL: "geo_paywall",
   STUDIO_PAYWALL: "studio_paywall",
+  SITES_PAYWALL: "sites_paywall",
 } as const;
 
 export const UPGRADE_DIALOG_EVENTS = {
@@ -30,6 +32,10 @@ export const UPGRADE_DIALOG_EVENTS = {
   studio: {
     kind: PAYWALL_KINDS.STUDIO_LOCKED,
     surface: PLAN_SURFACES.STUDIO_PAYWALL,
+  },
+  sites: {
+    kind: PAYWALL_KINDS.SITES_LIMIT,
+    surface: PLAN_SURFACES.SITES_PAYWALL,
   },
 } as const;
 

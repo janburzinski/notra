@@ -90,6 +90,12 @@ export interface SiteLayoutProps {
   children: ReactNode;
 }
 
+export interface SiteUpgradeDialogProps {
+  organizationSlug: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
 export interface SitesListProps {
   organizationId: string;
   organizationSlug: string;

@@ -226,7 +226,9 @@ export function createSitesUiRoutes(organization: AnyRoute) {
         title: { namespace: "sites.new", key: "title" },
         pendingComponent: NewSiteLoading,
         preload: NewSite.preload,
-        component: ({ params }) => <NewSite organizationSlug={params.slug} />,
+        component: ({ params }) => (
+          <NewSite key={params.slug} organizationSlug={params.slug} />
+        ),
       }),
       site.addChildren(siteRoutes),
     ]),

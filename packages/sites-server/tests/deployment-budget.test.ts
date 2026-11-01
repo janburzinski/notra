@@ -147,6 +147,11 @@ if (process.env.NOTRA_SITES_BUDGET_TEST_WORKER !== "1") {
       },
     },
   }));
+  // Badge enforcement reads the site outside the admission transaction; the
+  // budget is what this adapter models.
+  mock.module("../src/plan-limits", () => ({
+    enforceSitePlanBranding: async () => {},
+  }));
   const { enqueueSiteDeployment } = await import("../src/deployments");
 
   test("different-site transactions share the organization budget and accept only its last slot", async () => {

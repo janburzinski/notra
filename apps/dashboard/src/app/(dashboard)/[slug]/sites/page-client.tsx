@@ -18,7 +18,11 @@ import {
   EMPTY_STATE_TABLE_ROWS,
 } from "@/constants/empty-state";
 import { useActiveProject } from "@/lib/hooks/use-active-project";
-import { useSitesList, useSitesOrganizationId } from "@/lib/hooks/use-sites";
+import {
+  useSitePlanLimitReached,
+  useSitesList,
+  useSitesOrganizationId,
+} from "@/lib/hooks/use-sites";
 import { cn } from "@/lib/utils";
 import type { ProjectSitesListProps } from "@/types/components/sites";
 import type { SitesPageClientProps } from "@/types/sites";
@@ -73,6 +77,7 @@ function ProjectSitesList({
 }: ProjectSitesListProps) {
   const t = useTranslations("sites");
   const listQuery = useSitesList(organizationId, projectId);
+  const siteLimitReached = useSitePlanLimitReached(organizationId, "sites");
   const newSiteHref = `/${organizationSlug}/sites/new?project=${encodeURIComponent(projectId)}`;
 
   if (!listQuery.data) {
@@ -101,7 +106,7 @@ function ProjectSitesList({
       />
     );
   }
-  const newSiteButton = (
+  const newSiteButton = siteLimitReached ? null : (
     <Link
       className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
       href={newSiteHref}
@@ -128,10 +133,12 @@ function ProjectSitesList({
       {sites.length === 0 ? (
         <EmptyState
           action={
-            <Link className={buttonVariants()} href={newSiteHref}>
-              <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
-              {t("newSite")}
-            </Link>
+            siteLimitReached ? null : (
+              <Link className={buttonVariants()} href={newSiteHref}>
+                <HugeiconsIcon className="size-4" icon={PlusSignIcon} />
+                {t("newSite")}
+              </Link>
+            )
           }
           description={t("empty.description")}
           preview={

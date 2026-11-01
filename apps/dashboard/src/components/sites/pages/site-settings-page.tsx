@@ -43,6 +43,7 @@ import {
   SiteSettingsValue,
 } from "@/components/sites/site-settings-item";
 import { SiteSuggestInput } from "@/components/sites/site-suggest-input";
+import { SiteUpgradeDialog } from "@/components/sites/site-upgrade-dialog";
 import {
   SiteVariablesCount,
   SiteVariablesSettings,
@@ -56,7 +57,7 @@ import {
   useImportableRepositories,
 } from "@/lib/hooks/use-importable-repositories";
 import { useRepositorySuggestions } from "@/lib/hooks/use-repository-suggestions";
-import { useInvalidateSites } from "@/lib/hooks/use-sites";
+import { useInvalidateSites, useSitePlanUsage } from "@/lib/hooks/use-sites";
 import { useUpdateSiteSettings } from "@/lib/hooks/use-update-site-settings";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type {
@@ -256,12 +257,7 @@ function SiteSettingsContent() {
       <SiteSettingsGroup icon={Analytics01Icon} title={t("visitors")}>
         <SiteSettingsList>
           <SiteAnalyticsToggle />
-          <SiteSettingsToggle
-            description={tPage("brandingHint")}
-            field="showBranding"
-            icon={SparklesIcon}
-            title={tPage("brandingLabel")}
-          />
+          <SiteBrandingToggle />
         </SiteSettingsList>
       </SiteSettingsGroup>
 
@@ -476,6 +472,53 @@ function SiteSettingsToggle({
       onCheckedChange={(checked) => save.mutate({ [field]: checked })}
       title={title}
     />
+  );
+}
+
+function SiteBrandingToggle() {
+  const tPage = useTranslations("sites.settingsPage");
+  const tLimits = useTranslations("sites.planLimits");
+  const tCommon = useTranslations("common");
+  const { organizationId, organizationSlug } = useSite();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const brandingRequired =
+    useSitePlanUsage(organizationId).data?.brandingRequired === true;
+  if (!brandingRequired) {
+    return (
+      <SiteSettingsToggle
+        description={tPage("brandingHint")}
+        field="showBranding"
+        icon={SparklesIcon}
+        title={tPage("brandingLabel")}
+      />
+    );
+  }
+  return (
+    <>
+      <SiteSettingsSwitchItem
+        action={
+          <Button
+            onClick={() => setUpgradeOpen(true)}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            {tCommon("actions.upgrade")}
+          </Button>
+        }
+        checked
+        description={tLimits("brandingRequired")}
+        disabled
+        icon={SparklesIcon}
+        onCheckedChange={() => undefined}
+        title={tPage("brandingLabel")}
+      />
+      <SiteUpgradeDialog
+        onOpenChange={setUpgradeOpen}
+        open={upgradeOpen}
+        organizationSlug={organizationSlug}
+      />
+    </>
   );
 }
 

@@ -16,7 +16,10 @@ import { SiteDomainAddDialog } from "@/components/sites/site-domain-add-dialog";
 import { SiteDomainAddForm } from "@/components/sites/site-domain-add-form";
 import { SiteDomainCard } from "@/components/sites/site-domain-card";
 import { useDomainConnectOutcomeToast } from "@/lib/hooks/use-domain-connect-outcome-toast";
-import { useInvalidateSites } from "@/lib/hooks/use-sites";
+import {
+  useInvalidateSites,
+  useSitePlanLimitReached,
+} from "@/lib/hooks/use-sites";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import type { SiteDomainRemoveDialogProps } from "@/types/components/sites";
 import type { SiteDomain } from "@/types/sites";
@@ -78,15 +81,17 @@ function RemoveDomainDialog({
 export function SiteDomainsPage() {
   const { organizationId, siteId, detail } = useSite();
   const t = useTranslations("sites.domainsPage");
+  const tLimits = useTranslations("sites.planLimits");
   const [addOpen, setAddOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<SiteDomain | null>(null);
   const { site, domains } = detail;
+  const domainLimitReached = useSitePlanLimitReached(organizationId, "domains");
   useDomainConnectOutcomeToast();
 
   return (
     <div className="space-y-6">
       <PageHeading description={t("description")} title={t("title")}>
-        {domains.length > 0 ? (
+        {domains.length > 0 && !domainLimitReached ? (
           <Button onClick={() => setAddOpen(true)}>
             <HugeiconsIcon
               aria-hidden="true"
@@ -99,7 +104,13 @@ export function SiteDomainsPage() {
         ) : null}
       </PageHeading>
 
-      {domains.length === 0 ? (
+      {domains.length === 0 && domainLimitReached ? (
+        <p className="text-muted-foreground text-sm text-pretty">
+          {tLimits("domainsHint")}
+        </p>
+      ) : null}
+
+      {domains.length === 0 && !domainLimitReached ? (
         <TitleCard as="section" heading={t("connectTitle")} headingAs="h2">
           <SiteDomainAddForm
             mounts={site.mounts}
@@ -114,19 +125,18 @@ export function SiteDomainsPage() {
             siteId={siteId}
           />
         </TitleCard>
-      ) : (
-        domains.map((domain) => (
-          <SiteDomainCard
-            aliasOrigin={site.aliasOrigin}
-            domain={domain}
-            key={domain.id}
-            mounts={site.mounts}
-            onRemove={setRemoveTarget}
-            organizationId={organizationId}
-            siteId={siteId}
-          />
-        ))
-      )}
+      ) : null}
+      {domains.map((domain) => (
+        <SiteDomainCard
+          aliasOrigin={site.aliasOrigin}
+          domain={domain}
+          key={domain.id}
+          mounts={site.mounts}
+          onRemove={setRemoveTarget}
+          organizationId={organizationId}
+          siteId={siteId}
+        />
+      ))}
 
       <SiteDomainAddDialog
         mounts={site.mounts}

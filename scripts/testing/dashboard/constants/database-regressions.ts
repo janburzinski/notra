@@ -10,6 +10,7 @@ export const DATABASE_REGRESSION_FILES = [
   "packages/sites-server/tests/production-projection.test.ts",
   "packages/sites-server/tests/host-reclaim.test.ts",
   "packages/sites-server/tests/organization-teardown.test.ts",
+  "packages/sites-server/tests/plan-limits-postgres.test.ts",
   "apps/sites-e2e/tests/connected-lifecycle-postgres.test.ts",
   "packages/geo-core/tests/site-project-delete.test.ts",
   "apps/dashboard/tests/sites-test-status.test.ts",

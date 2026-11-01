@@ -36,8 +36,9 @@ import {
 } from "./constants/sites";
 import { deployBranchHead } from "./deploy";
 import { getSitesHostingDomain } from "./env";
-import { SiteInputError } from "./errors/sites";
+import { SiteInputError, SitePlanLimitError } from "./errors/sites";
 import { assertSiteNameAllowed } from "./moderation";
+import { assertSitePlanAllows, resolveSitePlan } from "./plan-limits";
 import { r2DeletePrefix } from "./r2";
 import { requireOrganizationRepository } from "./repositories";
 import {
@@ -159,6 +160,7 @@ export async function createSite(
       slugifySiteName(input.name) || "site",
       input.organizationId
     ));
+  const plan = await resolveSitePlan(input.organizationId);
   const siteId = prefixedId("site");
   const aliasHost = siteAliasHostname(slug);
   await assertSiteNameAllowed({
@@ -179,6 +181,7 @@ export async function createSite(
           field: "slug",
         });
       }
+      await assertSitePlanAllows(tx, input.organizationId, plan, "sites");
       await claimHostRecord(aliasHost, { siteId, kind: "alias" });
       const [inserted] = await tx
         .insert(sites)
@@ -281,6 +284,12 @@ export async function updateSiteSettings(
     throw new SiteInputError(
       `The password needs ${SITE_PREVIEW_PASSWORD_MIN_LENGTH} to ${SITE_PREVIEW_PASSWORD_MAX_LENGTH} characters`
     );
+  }
+  if (
+    patch.showBranding === false &&
+    (await resolveSitePlan(site.organizationId)) === "free"
+  ) {
+    throw new SitePlanLimitError("branding");
   }
   const values: SiteUpdateValues = {
     productionBranch: patch.productionBranch?.trim(),

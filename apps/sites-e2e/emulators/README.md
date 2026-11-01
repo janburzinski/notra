@@ -12,6 +12,7 @@ through the overrides in
 | `r2/` | R2's S3 API (path style) | Conditional writes (412), ListObjectsV2 pages (25 per page to exercise pagination), DeleteObjects, `aws-chunked` bodies; `binding()` is the Worker's R2 view of the same objects |
 | `box/` | Upstash Box API | The snapshot is this checkout's staged builder toolchain; a box is a local directory for `/workspace/home`; `exec` runs the guest build there. `boxes` keeps every box with its `deleted` flag; `failNext` makes the next creations answer an error status (503 by default). Network isolation is not emulated |
 | `cloudflare/` | Cloudflare for SaaS custom hostnames | A hostname turns active once the shared DNS zone has its CNAME to the SaaS target and Cloudflare's ownership TXT |
+| `autumn/` | Autumn customer API | `customers.get_or_create` with the secret key checked; a new customer is on the `free` plan until the test attaches another with `setPlan`. Reached through `AUTUMN_API_URL` (the shared Autumn client in `packages/ai`) |
 | `vercel/` | Vercel DNS integration | OAuth code exchange (checks client, secret, redirect URI), DNS records written into the shared zone, installation removal |
 | `dns/` | UDP DNS (A, CNAME, NS, TXT) | Answers from the shared zone; reached through `SITES_DNS_SERVERS` |
 | `browser/` | Analytics scripts, embeds, c15t consent backend | Provider registry: stand-in scripts with exact payload checks, or the vendors' real scripts with `--vendor-scripts live`. The consent backend answers `/init` with c15t's EU opt-in policy and records every saved choice |
