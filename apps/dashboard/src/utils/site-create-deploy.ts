@@ -1,3 +1,5 @@
+import { stripAnsi } from "@notra/sites-core/utils/build-log";
+
 import { MS_PER_SECOND } from "@/constants/site-deployments";
 import type { SiteCreateDeployPhase } from "@/types/components/sites";
 import type {
@@ -11,7 +13,6 @@ import {
   deploymentElapsedMs,
   formatBuildDuration,
   isDeploymentInProgress,
-  stripAnsi,
 } from "@/utils/site-deployments";
 
 export function siteCreateDeployState({

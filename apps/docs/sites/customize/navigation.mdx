@@ -47,7 +47,7 @@ docolin:
 | Setting | What it does |
 | --- | --- |
 | `links` | Up to 8 links or dropdowns; link labels hold up to 60 characters and `href` accepts a path, `https://` or `mailto:` URL |
-| `links[].icon` | Any [Lucide](https://lucide.dev/icons) icon name, like `book-open` |
+| `links[].icon` | A [Lucide](https://lucide.dev/icons) icon name from the [bundled set](/sites/reference/blog-json#icons), like `book-open` |
 | `links[].type` | `github`, `discord`, `x`, `linkedin`, `youtube` or `slack`, which shows the platform's icon, and `label` adds text next to it |
 | `primary` | A secondary button with a platform icon and name, like "GitHub", that takes `type` and `href` |
 | `cta` | The main button on the right, which takes `label` and `href` |
@@ -155,7 +155,7 @@ To show the same actions on individual changelog entries, opt in with:
 - The built-in options are `copy`, `view` (the Markdown version), `chatgpt`, `claude`, `t3chat`, `perplexity` and `grok`. All of them except `t3chat` show by default.
 - **Copy page** copies the generated Markdown, not the rendered HTML or raw MDX. Copying requires HTTPS (or localhost) and clipboard permission. If it fails, a message includes a **View as Markdown** link so you can copy manually, even when `view` is not in your configured options. The button keeps keyboard focus during copying so you can retry without finding it again.
 - AI links open a new tab with a prefilled prompt containing the page title and canonical Markdown URL, not the full article. The provider must be able to fetch the URL; protected previews and local sites are not publicly accessible. You may need to sign in or submit the prompt. No AI request is sent just by viewing the Notra page.
-- Your own options take a `title` and an `href`, plus an optional `description` and Lucide `icon`. Notra replaces `{url}` and `{markdownUrl}` in the `href` with the page's canonical HTML and Markdown addresses, URL-encoding them when used inside a link.
+- Your own options take a `title` and an `href`, plus an optional `description` and [Lucide `icon`](/sites/reference/blog-json#icons). Notra replaces `{url}` and `{markdownUrl}` in the `href` with the page's canonical HTML and Markdown addresses, URL-encoding them when used inside a link.
 - The menu holds up to 12 options. **Copy page** stays in the main button; the other options appear in their configured order in the dropdown. `"options": []` or `"display": "none"` hides all actions.
 
 To keep only the Markdown actions, use:

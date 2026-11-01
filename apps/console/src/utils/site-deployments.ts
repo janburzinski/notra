@@ -1,7 +1,6 @@
 import { SITE_DEPLOYMENT_IN_PROGRESS_STATUSES } from "@notra/sites-core/constants/sites";
 
 import {
-  ANSI_SEQUENCE,
   MS_PER_SECOND,
   SECONDS_PER_MINUTE,
 } from "@/constants/site-deployments";
@@ -14,10 +13,6 @@ const IN_PROGRESS: ReadonlySet<SiteDeploymentStatus> = new Set(
 
 export function isDeploymentInProgress(status: SiteDeploymentStatus): boolean {
   return IN_PROGRESS.has(status);
-}
-
-export function stripAnsi(text: string): string {
-  return text.replace(ANSI_SEQUENCE, "");
 }
 
 export function shortSha(sha: string): string {

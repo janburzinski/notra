@@ -203,9 +203,6 @@ export const SITE_OVERVIEW_LINK_CLASS =
 export const SITE_BUILD_LOG_ROW_GRID =
   "grid grid-cols-[2rem_0.875rem_minmax(0,1fr)] gap-x-2 px-3 sm:grid-cols-[2.5rem_0.875rem_minmax(0,1fr)] group-data-[timestamps=false]/log:grid-cols-[0.875rem_minmax(0,1fr)]";
 
-export const SITE_BUILD_LOG_FRAME_FOLD_MIN = 3;
-export const SITE_BUILD_LOG_NOISE_FOLD_MIN = 6;
-export const SITE_BUILD_LOG_NOISE_KEEP = 2;
 export const SITE_DOMAIN_URL_SCHEME_PATTERN = /^https?:\/\//i;
 
 export const SITE_CLOUDFLARE_PROVIDER_PATTERN = /cloudflare/i;

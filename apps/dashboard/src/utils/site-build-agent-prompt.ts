@@ -1,5 +1,6 @@
+import { stripAnsi } from "@notra/sites-core/utils/build-log";
+
 import type { SiteBuildAgentPromptInput } from "@/types/sites";
-import { stripAnsi } from "@/utils/site-deployments";
 import { siteDiagnosticLocation } from "@/utils/site-diagnostics";
 
 export function buildSiteBuildAgentPrompt({

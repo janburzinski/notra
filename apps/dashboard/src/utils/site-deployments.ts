@@ -1,7 +1,5 @@
 import {
   MS_PER_SECOND,
-  ESCAPE,
-  ANSI_SEQUENCE,
   SECONDS_PER_MINUTE,
 } from "@/constants/site-deployments";
 import {
@@ -62,10 +60,6 @@ export function isPinnedLiveDeployment(
     }
   }
   return newestReady?.id !== deployment.id;
-}
-
-export function stripAnsi(text: string): string {
-  return text.replace(ANSI_SEQUENCE, "");
 }
 
 export function shortSha(sha: string): string {

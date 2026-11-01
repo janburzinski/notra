@@ -1,6 +1,8 @@
-import { SITE_DEPLOYMENT_PHASES } from "@notra/sites-core/constants/deployment-timeline";
+import {
+  SITE_DEPLOYMENT_PHASE_MARKER,
+  SITE_DEPLOYMENT_PHASES,
+} from "@notra/sites-core/constants/deployment-timeline";
 
-import { SITE_DEPLOYMENT_PHASE_MARKER } from "@/constants/site-deployment-timeline";
 import type {
   SiteDeploymentPhaseId,
   SiteDeploymentPhaseState,

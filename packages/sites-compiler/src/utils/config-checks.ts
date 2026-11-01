@@ -5,24 +5,7 @@ import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import { tagSlug } from "@notra/sites-core/utils/tags";
 
 import type { SiteEntry } from "../types/entries";
-
-function distance(a: string, b: string): number {
-  const row = Array.from({ length: b.length + 1 }, (_, index) => index);
-  for (let i = 1; i <= a.length; i += 1) {
-    let previous = row[0] ?? 0;
-    row[0] = i;
-    for (let j = 1; j <= b.length; j += 1) {
-      const current = row[j] ?? 0;
-      row[j] = Math.min(
-        current + 1,
-        (row[j - 1] ?? 0) + 1,
-        previous + (a[i - 1] === b[j - 1] ? 0 : 1)
-      );
-      previous = current;
-    }
-  }
-  return row[b.length] ?? 0;
-}
+import { closestName } from "./closest-name";
 
 export function unknownConfigKeyWarnings(raw: unknown): SiteDiagnostic[] {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
@@ -32,16 +15,8 @@ export function unknownConfigKeyWarnings(raw: unknown): SiteDiagnostic[] {
   return Object.keys(raw)
     .filter((key) => !known.includes(key))
     .map((key) => {
-      const suggestion = known
-        .map((candidate) => ({
-          candidate,
-          score: distance(key.toLowerCase(), candidate.toLowerCase()),
-        }))
-        .sort((a, b) => a.score - b.score)[0];
-      const hint =
-        suggestion && suggestion.score <= 2
-          ? ` Did you mean "${suggestion.candidate}"?`
-          : "";
+      const suggestion = closestName(key, known);
+      const hint = suggestion ? ` Did you mean "${suggestion}"?` : "";
       return {
         severity: "warning" as const,
         file: SITE_CONFIG_FILENAME,

@@ -1,32 +1,33 @@
 import {
-  TIMESTAMP_PREFIX,
-  ERROR_LINE,
-  WARNING_LINE,
-  SUCCESS_LINE,
+  ANSI_SEQUENCE,
+  CLOCK,
   CONTINUATION_LINE,
+  ERROR_LINE,
   LINE_BREAK,
   NOISE_LINE,
-  TAG_PREFIX,
-  CLOCK,
-  SECONDS_PER_MINUTE,
-  SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
-  STACK_FRAME,
-} from "@/constants/site-build-log";
-import { SITE_DEPLOYMENT_PHASE_MARKER } from "@/constants/site-deployment-timeline";
-import {
+  SECONDS_PER_HOUR,
+  SECONDS_PER_MINUTE,
   SITE_BUILD_LOG_FRAME_FOLD_MIN,
   SITE_BUILD_LOG_NOISE_FOLD_MIN,
   SITE_BUILD_LOG_NOISE_KEEP,
-} from "@/constants/sites";
+  STACK_FRAME,
+  SUCCESS_LINE,
+  TAG_PREFIX,
+  TIMESTAMP_PREFIX,
+  WARNING_LINE,
+} from "@notra/sites-core/constants/build-log";
+import { SITE_DEPLOYMENT_PHASE_MARKER } from "@notra/sites-core/constants/deployment-timeline";
 import type {
   SiteBuildLogEntry,
   SiteBuildLogLine,
   SiteBuildLogTagParts,
   SiteBuildLogTone,
-} from "@/types/sites";
-import { stripAnsi } from "@/utils/site-deployments";
+} from "@notra/sites-core/types/build-log";
 
+export function stripAnsi(text: string): string {
+  return text.replace(ANSI_SEQUENCE, "");
+}
 function toneOf(text: string): SiteBuildLogTone {
   if (ERROR_LINE.test(text)) {
     return "error";

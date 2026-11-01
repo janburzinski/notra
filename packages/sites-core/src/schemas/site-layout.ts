@@ -85,7 +85,12 @@ export const siteNavbarSchema = z
       .default([]),
     cta: siteLinkSchema.optional(),
     primary: z
-      .object({ type: z.enum(SITE_NAVBAR_LINK_TYPES), href: platformHref })
+      .object({
+        type: z.enum(SITE_NAVBAR_LINK_TYPES, {
+          error: `Use one of ${SITE_NAVBAR_LINK_TYPES.join(", ")}. For a button with your own label, use navbar.cta`,
+        }),
+        href: platformHref,
+      })
       .optional(),
   })
   .default({ links: [] });

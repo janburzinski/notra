@@ -10,6 +10,14 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  findMatches,
+  groupBuildLog,
+  logOffsets,
+  matchOffsets,
+  parseBuildLog,
+  stripAnsi,
+} from "@notra/sites-core/utils/build-log";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -28,14 +36,6 @@ import type {
   SiteBuildLogEmptyProps,
   SiteBuildLogsProps,
 } from "@/types/sites";
-import {
-  findMatches,
-  groupBuildLog,
-  logOffsets,
-  matchOffsets,
-  parseBuildLog,
-} from "@/utils/site-build-log";
-import { stripAnsi } from "@/utils/site-deployments";
 
 const COPIED_RESET_MS = 1500;
 const ICON_SWAP_TRANSITION = {

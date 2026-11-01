@@ -2,6 +2,7 @@ import { beforeEach, expect, mock, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import { findMatches, parseBuildLog } from "@notra/sites-core/utils/build-log";
 import type { ComponentProps, SetStateAction } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { IntlProvider } from "use-intl";
@@ -16,7 +17,6 @@ import type {
   SiteScope,
 } from "../src/types/sites";
 import { buildSiteBuildAgentPrompt } from "../src/utils/site-build-agent-prompt";
-import { findMatches, parseBuildLog } from "../src/utils/site-build-log";
 
 if (!process.env.NOTRA_DEPLOY_SURFACE_TEST_WORKER) {
   test("creation deployment log surface", () => {

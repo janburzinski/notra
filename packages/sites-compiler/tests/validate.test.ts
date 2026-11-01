@@ -529,6 +529,40 @@ describe("content safety and config checks", () => {
     expect(result.ok).toBe(true);
   });
 
+  test("suggests the closest built-in for a misspelled component", () => {
+    const result = validateSite({
+      files: new Map([
+        ["blog.json", config],
+        ["blog/a.mdx", post("<Youtube />\n\n<Tooltip />")],
+      ]),
+    });
+    const messages = result.diagnostics
+      .filter((d) => d.code === "unknown_component")
+      .map((d) => d.message);
+    expect(messages).toEqual([
+      "Unknown component <Youtube>. Did you mean <YouTube>?",
+      "Unknown component <Tooltip>. Import it from a snippet or use a built-in component.",
+    ]);
+  });
+
+  test("points a custom navbar.primary button to navbar.cta", () => {
+    const result = validateSite({
+      files: new Map([
+        [
+          "blog.json",
+          JSON.stringify({
+            name: "Acme",
+            navbar: { primary: { type: "button", href: "https://acme.com" } },
+          }),
+        ],
+        ["blog/a.md", post("Hi")],
+      ]),
+    });
+    const error = result.diagnostics.find((d) => d.code === "config_invalid");
+    expect(error?.message).toContain("navbar.primary.type");
+    expect(error?.message).toContain("use navbar.cta");
+  });
+
   test("warns about featured slugs without a post", () => {
     const result = validateSite({
       files: new Map([

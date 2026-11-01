@@ -47,7 +47,6 @@ export const CSP_ORIGIN = new RegExp(
 export const POSTHOG_API_KEY = /^phc_[A-Za-z0-9]{20,64}$/;
 
 export const C15T_ANALYTICS_CATEGORY = "measurement";
-export const C15T_OPT_IN_MODEL = "opt-in";
 export const C15T_SCRIPT_CATEGORIES = [
   "measurement",
   "marketing",

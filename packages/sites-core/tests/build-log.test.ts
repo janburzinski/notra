@@ -1,6 +1,10 @@
 import { expect, test } from "bun:test";
 
-import { countLogLines, parseBuildLog } from "@/utils/site-build-log";
+import {
+  countLogLines,
+  parseBuildLog,
+  stripAnsi,
+} from "@notra/sites-core/utils/build-log";
 
 test("phase telemetry stays out of displayed build output", () => {
   const lines = parseBuildLog(
@@ -49,4 +53,43 @@ test.each([
   const lines = parseBuildLog(log);
   expect(lines[0]?.tone).toBe("error");
   expect(countLogLines(lines, "error")).toBe(1);
+});
+
+const ESC = "\u001b";
+const BEL = "\u0007";
+
+test.each([
+  ["colored text", `${ESC}[1;31mfailed${ESC}[0m`, "failed"],
+  [
+    "sgr0 with a character-set designation",
+    `${ESC}[33mwarn${ESC}(B${ESC}[m`,
+    "warn",
+  ],
+  [
+    "a hyperlink ending in BEL",
+    `see ${ESC}]8;;https://usenotra.com/docs${BEL}the docs${ESC}]8;;${BEL} now`,
+    "see the docs now",
+  ],
+  [
+    "a hyperlink ending in ESC backslash",
+    `see ${ESC}]8;;https://usenotra.com/docs${ESC}\\the docs${ESC}]8;;${ESC}\\ now`,
+    "see the docs now",
+  ],
+])("stripAnsi removes %s and keeps the visible text", (_name, raw, text) => {
+  expect(stripAnsi(raw)).toBe(text);
+});
+
+test("parseBuildLog strips escapes before reading tone and timestamps", () => {
+  const lines = parseBuildLog(
+    [
+      `12:00:05 ${ESC}[31m✖ ${ESC}]8;;file:///site/blog/a.mdx${BEL}blog/a.mdx${ESC}]8;;${BEL}${ESC}[0m broken`,
+      `12:00:06 ${ESC}[32m✔ ${ESC}]8;;https://acme.com${ESC}\\Built${ESC}]8;;${ESC}\\${ESC}(B${ESC}[m`,
+    ].join("\n")
+  );
+  expect(
+    lines.map(({ timestamp, text, tone }) => ({ timestamp, text, tone }))
+  ).toEqual([
+    { timestamp: "12:00:05", text: "✖ blog/a.mdx broken", tone: "error" },
+    { timestamp: "12:00:06", text: "✔ Built", tone: "success" },
+  ]);
 });

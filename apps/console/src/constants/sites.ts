@@ -113,10 +113,5 @@ export const SITE_IDLE_REFETCH_MS = 30_000;
 export const SITE_BUILD_LOG_FOLLOW_THRESHOLD = 32;
 export const SITE_BUILD_LOG_ROW_GRID =
   "grid grid-cols-[2rem_0.875rem_minmax(0,1fr)] gap-x-2 px-3 sm:grid-cols-[2.5rem_0.875rem_minmax(0,1fr)] group-data-[timestamps=false]/log:grid-cols-[0.875rem_minmax(0,1fr)]";
-export const SITE_BUILD_LOG_FRAME_FOLD_MIN = 3;
-export const SITE_BUILD_LOG_NOISE_FOLD_MIN = 6;
-export const SITE_BUILD_LOG_NOISE_KEEP = 2;
 
-export const SITE_DEPLOYMENT_PHASE_MARKER =
-  /^\[deployment:(preparing|building|deploying)\] (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)$/;
 export const SITE_MAX_SUSPENSION_REASON_LENGTH = 500;

@@ -2,10 +2,11 @@
 
 import { Alert02Icon, CancelCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { LOG_STATUS_PREFIX } from "@notra/sites-core/constants/build-log";
+import { findMatches, splitLogTag } from "@notra/sites-core/utils/build-log";
 import { cn } from "@notra/ui/lib/utils";
 import { type ReactNode, useState } from "react";
 
-import { LOG_STATUS_PREFIX } from "@/constants/site-build-log";
 import { SITE_BUILD_LOG_ROW_GRID } from "@/constants/sites";
 import type {
   SiteBuildLogFoldRowProps,
@@ -15,7 +16,6 @@ import type {
   SiteBuildLogPlainProps,
   SiteBuildLogRowsProps,
 } from "@/types/sites";
-import { findMatches, splitLogTag } from "@/utils/site-build-log";
 
 function Plain({ text, offset, muted }: SiteBuildLogPlainProps) {
   if (!muted) {

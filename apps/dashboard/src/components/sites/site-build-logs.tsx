@@ -2,6 +2,14 @@
 
 import { ArrowDown01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  findMatches,
+  groupBuildLog,
+  logOffsets,
+  matchOffsets,
+  parseBuildLog,
+  stripAnsi,
+} from "@notra/sites-core/utils/build-log";
 import { CopyButton } from "@notra/ui/components/ui/copy-button";
 import {
   Tooltip,
@@ -22,14 +30,6 @@ import type {
   SiteBuildLogsProps,
 } from "@/types/components/sites";
 import { toastCopyError } from "@/utils/copy-to-clipboard";
-import {
-  findMatches,
-  groupBuildLog,
-  logOffsets,
-  matchOffsets,
-  parseBuildLog,
-} from "@/utils/site-build-log";
-import { stripAnsi } from "@/utils/site-deployments";
 
 function BuildLogEmpty({
   inProgress,

@@ -18,12 +18,6 @@ export const MAX_PUBLISH_HEADLINE_LENGTH = 200;
 export const MAX_GENERATED_HEADLINE_FILES = 4;
 /** One budget for reading the previous files and asking the model. */
 export const GENERATED_HEADLINE_DEADLINE_MS = 6000;
-export const PULL_REQUEST_RULE_TYPES: ReadonlySet<string> = new Set([
-  "pull_request",
-  "required_status_checks",
-  "non_fast_forward",
-  "update",
-]);
 /** Markdown plus images for one post; matches the GitHub publish asset budget. */
 export const MAX_POST_PREVIEW_BYTES = 12 * 1024 * 1024;
 /** GitHub's createCommitOnBranch rejects payloads around 20 MB. */

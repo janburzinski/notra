@@ -7,6 +7,7 @@ import { visit } from "unist-util-visit";
 
 import {
   BUILTIN_COMPONENT_NAMES,
+  BUILTIN_COMPONENTS,
   BUILTINS_IMPORT_SOURCE,
   COMPONENT_NAME,
   INJECTED_HOOK_NAMES,
@@ -28,6 +29,7 @@ import type {
   TextEdit,
 } from "./types/mdx";
 import { analyzeStaticDirectives } from "./utils/client-directives";
+import { closestName } from "./utils/closest-name";
 import { hasErrors } from "./utils/diagnostics";
 import {
   errorMessage,
@@ -332,10 +334,13 @@ function walkContent(pass: MdxPass, tree: Root, scan: ModuleScan): Set<string> {
     } else if (BUILTIN_COMPONENT_NAMES.has(root) && !localNames.has(root)) {
       usedBuiltins.add(root);
     } else if (!(localNames.has(root) || scan.contentComponents.has(root))) {
+      const suggestion = closestName(root, BUILTIN_COMPONENTS);
       report(
         pass,
         "unknown_component",
-        `Unknown component <${name}>. Import it from a snippet or use a built-in component.`,
+        suggestion
+          ? `Unknown component <${name}>. Did you mean <${suggestion}>?`
+          : `Unknown component <${name}>. Import it from a snippet or use a built-in component.`,
         start
       );
     }

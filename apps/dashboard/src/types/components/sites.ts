@@ -1,5 +1,10 @@
 import type { AlertCircleIcon } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
+import type {
+  SiteBuildLogEntry,
+  SiteBuildLogFold,
+  SiteBuildLogLine,
+} from "@notra/sites-core/types/build-log";
 import type { ReactElement, ReactNode } from "react";
 
 import type {
@@ -18,9 +23,6 @@ import type {
   SiteBulkRow,
   SiteBulkRowEdit,
   SiteBulkSlugIssue,
-  SiteBuildLogEntry,
-  SiteBuildLogFold,
-  SiteBuildLogLine,
   SiteCreateFieldErrors,
   SiteCreateFormValues,
   SiteCreateSectionPlan,
