@@ -190,12 +190,14 @@ To give the banner its own look, set `theme`. Each color is a hex value, and any
 | `legalLinks.cookiePolicy` | `{ href, label? }` | | Same as above |
 | `legalLinks.termsOfService` | `{ href, label? }` | | Same as above |
 | `locale` | Language code | Visitor's browser language | Force one language: `bg`, `cs`, `cy`, `da`, `de`, `el`, `en`, `es`, `et`, `fi`, `fr`, `ga`, `gu`, `he`, `hi`, `hr`, `hu`, `id`, `is`, `it`, `lb`, `lt`, `lv`, `mt`, `nb`, `nl`, `nn`, `pl`, `pt`, `rm`, `ro`, `sk`, `sl`, `sv` or `zh` |
-| `crossSubdomain` | boolean | `false` | Share the consent cookie with every subdomain, so a choice on `blog.acme.com` also applies on `acme.com` |
+| `crossSubdomain` | boolean | `false` | Share the consent cookie with every subdomain, so a choice on `blog.acme.com` also applies on `acme.com`. Use it only on your own domain: on a `notra.site` address it would share the choice with other Notra sites |
 | `expiryDays` | 1 to 730 | `365` | Days until the stored choice expires and the banner shows again |
 | `disableAnimation` | boolean | `false` | Show the banner and dialog without animations |
 | `theme` | object | Your site's theme | Colors and corner rounding, see [Colors and corners](#colors-and-corners) |
 | `hideBranding` | boolean | `false` | Hide the "Secured by c15t" badge on the banner |
 | `devTools` | boolean | `true` | Show the c15t DevTools panel during `notra dev`. Never included in previews or the live site |
+
+The choice is stored in a cookie named `__Host-c15t`, which only your site's own address can set. With `crossSubdomain` on, c15t uses its default `c15t` cookie instead, because a `__Host-` cookie can't be shared across subdomains. A refusal saved earlier under the `c15t` name still applies. An earlier acceptance doesn't carry over, so those visitors see the banner once more.
 
 The [`blog.json` schema](https://usenotra.com/schemas/blog.json) checks every option, so your editor autocompletes the values above and flags a position that doesn't fit the variant.
 

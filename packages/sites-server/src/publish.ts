@@ -80,6 +80,7 @@ export const publishDeploymentFilesEffect = Effect.fn(
     redirects: siteRedirectRules(params.result.redirects),
     contentSecurityPolicy: params.result.contentSecurityPolicy ?? undefined,
     analyticsConsent: params.result.analyticsConsent || undefined,
+    consentStorageKey: params.result.consentStorageKey,
     faviconHost: params.result.faviconHost,
   };
   yield* r2PutEffect(

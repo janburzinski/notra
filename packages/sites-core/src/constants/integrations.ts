@@ -47,6 +47,12 @@ export const CSP_ORIGIN = new RegExp(
 export const POSTHOG_API_KEY = /^phc_[A-Za-z0-9]{20,64}$/;
 
 export const C15T_ANALYTICS_CATEGORY = "measurement";
+/**
+ * Consent cookie name on HTTPS. Every site shares the hosting domain, so a
+ * plain name can be set for all of them by another site's script; browsers
+ * reject `__Host-` cookies that carry a Domain attribute.
+ */
+export const C15T_HOST_STORAGE_KEY = "__Host-c15t";
 export const C15T_SCRIPT_CATEGORIES = [
   "measurement",
   "marketing",

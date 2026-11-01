@@ -15,5 +15,7 @@ export const OTHER_CUSTOM_HOST = "docs.globex.example";
 export const STALE_ALIAS_HOST = `globex-old.${HOSTING_DOMAIN}`;
 export const CONSENT_SITE_ID = "site_e2e_consent";
 export const CONSENT_HOST = `consent.${HOSTING_DOMAIN}`;
+export const CONSENT_TLS_SITE_ID = "site_e2e_consent_tls";
+export const CONSENT_TLS_HOST = `consent-tls.${HOSTING_DOMAIN}`;
 export const UNKNOWN_HOST = `nobody.${HOSTING_DOMAIN}`;
 export const ACME_TEXT = ["Acme", "A draft idea", "Hello world"];

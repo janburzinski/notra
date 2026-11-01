@@ -119,3 +119,134 @@ export async function assertConsentVisits(options: {
   );
   return "consent banner: without a stored grant the page reports its own view; accept counts the landing view once with its search referrer and later pages server-side; reject sends no view or engagement and every server report carries no consent";
 }
+
+// The same banner served over HTTPS, as in production: the choice lives in a
+// host-only `__Host-c15t` cookie, so a `c15t` cookie another site sets on the
+// shared hosting domain neither grants consent nor counts the visit.
+export async function assertHostOnlyConsent(options: {
+  page: Page;
+  context: BrowserContext;
+  origin: string;
+  ingest: IngestRequest[];
+  settle: () => Promise<void>;
+}) {
+  const { page, context, origin, ingest, settle } = options;
+  const { hostname } = new URL(origin);
+  const parentDomain = hostname.slice(hostname.indexOf("."));
+  const landing = `${origin}/blog/hello-world`;
+  const next = `${origin}/blog`;
+  const views = (from: number) =>
+    ingest
+      .slice(from)
+      .filter((event) => !isEngagement(event))
+      .map((event) => [event.body.url, event.body.visitorConsent]);
+
+  await context.clearCookies();
+  await page.goto(landing);
+  await page
+    .getByRole("button", { name: /accept/i })
+    .first()
+    .click();
+  await page.waitForFunction(() => document.cookie.includes("__Host-c15t="));
+  const cookies = await context.cookies(origin);
+  const stored = cookies.find((cookie) => cookie.name === "__Host-c15t");
+  assert.ok(stored, "c15t stores the choice in __Host-c15t over HTTPS");
+  assert.equal(stored.domain, hostname, "the consent cookie is host-only");
+  assert.equal(stored.secure, true);
+  assert.equal(stored.path, "/");
+  assert.ok(!cookies.some((cookie) => cookie.name === "c15t"));
+
+  let from = ingest.length;
+  const granted = await page.goto(next);
+  assert.ok(!((await granted?.text()) ?? "").includes(" data-view "));
+  await settle();
+  assert.deepEqual(
+    views(from).filter(([url]) => url === next),
+    [[next, true]],
+    "the Worker reads the grant"
+  );
+
+  await page.evaluate((domain) => {
+    document.cookie = `__Host-c15t=forged; Domain=${domain}; Path=/; Secure`;
+  }, parentDomain);
+  assert.ok(
+    !(await context.cookies(origin)).some(
+      (cookie) => cookie.name === "__Host-c15t" && cookie.domain.startsWith(".")
+    ),
+    "the browser refuses a __Host- consent cookie for the shared domain"
+  );
+
+  await context.clearCookies();
+  await page.evaluate(() => localStorage.clear());
+  await context.addCookies([
+    { name: "c15t", value: stored.value, domain: parentDomain, path: "/" },
+  ]);
+  from = ingest.length;
+  const forged = await page.goto(next);
+  assert.match(
+    (await forged?.text()) ?? "",
+    / data-view /,
+    "a grant another site set on the shared domain is not the visitor's"
+  );
+  await page
+    .getByRole("button", { name: /accept/i })
+    .first()
+    .waitFor({ state: "visible" });
+  await settle();
+  assert.deepEqual(views(from), [[next, false]]);
+
+  // A refusal stored before the switch, under the old name, still holds.
+  await context.clearCookies();
+  await page.evaluate(() => localStorage.clear());
+  const refusal = encodeURIComponent(
+    JSON.stringify({
+      consents: { necessary: true, measurement: false },
+      consentInfo: { time: Date.now(), type: "necessary" },
+    })
+  );
+  await context.addCookies([
+    { name: "c15t", value: refusal, domain: parentDomain, path: "/" },
+  ]);
+  let beacons = 0;
+  const countBeacon = (request: {
+    url: () => string;
+    method: () => string;
+    postData: () => string | null;
+  }) => {
+    if (isViewBeacon(request.url(), request.method(), request.postData())) {
+      beacons += 1;
+    }
+  };
+  page.on("request", countBeacon);
+  from = ingest.length;
+  await page.goto(landing);
+  await page.waitForLoadState("networkidle");
+  const migrated = (await context.cookies(origin)).find(
+    (cookie) => cookie.name === "__Host-c15t"
+  );
+  assert.ok(migrated, "the old refusal moves to __Host-c15t");
+  assert.equal(migrated.domain, hostname);
+  assert.equal(
+    await page.getByRole("button", { name: /accept/i }).count(),
+    0,
+    "a carried-over refusal does not ask again"
+  );
+  await page.goto(next);
+  await page.waitForLoadState("networkidle");
+  page.off("request", countBeacon);
+  await settle();
+  assert.deepEqual(views(from), [
+    [landing, false],
+    [next, false],
+  ]);
+  assert.equal(beacons, 0, "a carried-over refusal sends no view");
+  assert.equal(
+    await page
+      .locator(`${INSIGHTS_SCRIPT}[data-c15t-activated="true"]`)
+      .count(),
+    0
+  );
+  await context.clearCookies();
+  await page.evaluate(() => localStorage.clear());
+  return "consent banner over HTTPS: the choice is a host-only Secure __Host-c15t cookie the Worker reads; the browser refuses a shared-domain __Host- cookie; a c15t grant set on the shared domain neither counts the visit nor skips the banner, while a refusal under the old name is carried over and still holds";
+}

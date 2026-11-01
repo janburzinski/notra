@@ -1,3 +1,4 @@
+import { C15T_HOST_STORAGE_KEY } from "@notra/sites-core/constants/integrations";
 import { SITE_CSP_MAX_LENGTH } from "@notra/sites-core/constants/security";
 import {
   SITE_AREAS,
@@ -68,6 +69,7 @@ export const siteManifestSchema = z.object({
   redirects: z.array(siteRedirectRuleSchema),
   contentSecurityPolicy: siteContentSecurityPolicySchema.optional(),
   analyticsConsent: z.boolean().optional(),
+  consentStorageKey: z.literal(C15T_HOST_STORAGE_KEY).optional(),
   /** Host the footer links a favicon for, the only one the worker serves. */
   faviconHost: z.string().regex(SITE_FAVICON_HOST).optional(),
 });

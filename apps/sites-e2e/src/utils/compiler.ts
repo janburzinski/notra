@@ -129,6 +129,9 @@ async function compileWith(
         ? { contentSecurityPolicy: result.contentSecurityPolicy }
         : {}),
       ...(result.analyticsConsent ? { analyticsConsent: true } : {}),
+      ...(result.consentStorageKey
+        ? { consentStorageKey: result.consentStorageKey }
+        : {}),
     });
     objects.set(
       `deployments/${siteId}/${deploymentId}/manifest.json`,

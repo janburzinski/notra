@@ -164,18 +164,23 @@ function setup(
 
 function withConsentBanner(
   objects: Map<string, string>,
-  put: (key: string, value: unknown) => void
+  put: (key: string, value: unknown) => void,
+  manifest: Record<string, unknown> = {}
 ) {
   const key = `deployments/${SITE}/dep_live/manifest.json`;
-  put(key, { ...JSON.parse(objects.get(key) ?? "{}"), analyticsConsent: true });
+  put(key, {
+    ...JSON.parse(objects.get(key) ?? "{}"),
+    analyticsConsent: true,
+    ...manifest,
+  });
   put(
     `deployments/${SITE}/dep_live/files/blog/post/index.html`,
     "<html><body><p>Hi</p></body></html>"
   );
 }
 
-function consentCookie(measurement: boolean): string {
-  return `c15t=${encodeURIComponent(
+function consentCookie(measurement: boolean, name = "c15t"): string {
+  return `${name}=${encodeURIComponent(
     JSON.stringify({
       consents: { necessary: true, measurement },
       consentInfo: {
@@ -905,6 +910,26 @@ describe("production serving", () => {
         (report) => JSON.parse(String(report.init.body)).visitorConsent
       )
     ).toEqual([true, false, false]);
+  });
+
+  test("consent banner: a host-only consent cookie ignores one another site set on the shared domain", async () => {
+    const { objects, put, request, reports, settle } = setup({
+      trafficToken: "nst.site_a.sig",
+    });
+    withConsentBanner(objects, put, { consentStorageKey: "__Host-c15t" });
+    for (const cookie of [
+      consentCookie(true),
+      `${consentCookie(true)}; ${consentCookie(false, "__Host-c15t")}`,
+      consentCookie(true, "__Host-c15t"),
+    ]) {
+      await request("https://acme.notra.site/blog/post", { cookie });
+    }
+    await settle();
+    expect(
+      reports.map(
+        (report) => JSON.parse(String(report.init.body)).visitorConsent
+      )
+    ).toEqual([false, false, true]);
   });
 
   test("consent banner: the page's view beacon counts with its landing referrer", async () => {

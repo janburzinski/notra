@@ -162,7 +162,8 @@ export async function buildSite(
     config,
     prepared.customScripts,
     options.target.analytics,
-    false
+    false,
+    publicOrigin
   );
   const pageHtml = new Map<string, string>();
   for (const { area, mount } of listMountedAreas(mounts)) {
@@ -298,6 +299,7 @@ export async function buildSite(
     redirects: config.redirects,
     contentSecurityPolicy,
     analyticsConsent: analyticsGatedByConsent(config.integrations),
+    consentStorageKey: consent?.options.storageConfig.storageKey,
     faviconHost: footerFaviconHost(config),
   };
 }

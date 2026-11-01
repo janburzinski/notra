@@ -12,6 +12,7 @@ export function visitorConsent(
   const { state } = readRequestConsent({
     adapter: "@notra/sites",
     request: { headers },
+    storage: { storageKey: manifest.consentStorageKey },
   });
   return (
     state.initialRecords?.choice?.categories[C15T_ANALYTICS_CATEGORY]?.value ===

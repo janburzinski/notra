@@ -34,6 +34,8 @@ import {
   ACME_TEXT,
   CONSENT_HOST,
   CONSENT_SITE_ID,
+  CONSENT_TLS_HOST,
+  CONSENT_TLS_SITE_ID,
   HOSTING_DOMAIN,
   LIVE_HOST,
   OTHER_CUSTOM_HOST,
@@ -48,13 +50,14 @@ import {
 } from "./constants/fixtures";
 import type { Measurement } from "./types/harness";
 import { compileFixtures } from "./utils/compiler";
-import { assertConsentVisits } from "./utils/consent";
+import { assertConsentVisits, assertHostOnlyConsent } from "./utils/consent";
 import { assertContentFeatures } from "./utils/content";
 import { cspAllowsOrigin } from "./utils/csp";
 import { countByUrl, isEngagement } from "./utils/ingest";
 import { createSiteResourceWaiter } from "./utils/resources";
 import { freePort, startSitesWorker } from "./utils/sites-worker";
 import { seedOtherTenant } from "./utils/tenants";
+import { startTlsProxy } from "./utils/tls-proxy";
 
 const [temp, repetitionsText, executablePath, mode, vendorScriptsText] =
   process.argv.slice(2);
@@ -75,6 +78,8 @@ let sites: Awaited<ReturnType<typeof startSitesWorker>> | undefined;
 const origin = `http://${LIVE_HOST}:${port}`;
 const previewOrigin = `http://${PREVIEW_HOST}:${port}`;
 const consentOrigin = `http://${CONSENT_HOST}:${port}`;
+const tls = await startTlsProxy(temp, port);
+const consentTlsOrigin = `https://${CONSENT_TLS_HOST}:${tls.port}`;
 let browser:
   | Awaited<ReturnType<typeof chromium.launchPersistentContext>>
   | undefined;
@@ -87,7 +92,11 @@ const cleanup = async () => {
   }
   stopping = true;
   const errors: string[] = [];
-  for (const close of [() => browser?.close(), () => sites?.stop()]) {
+  for (const close of [
+    () => browser?.close(),
+    () => sites?.stop(),
+    () => tls.stop(),
+  ]) {
     try {
       await close();
     } catch (error) {
@@ -136,6 +145,13 @@ try {
         siteId: CONSENT_SITE_ID,
         deploymentId: "dep_consent",
         publicOrigin: consentOrigin,
+        preview: false,
+        integrations: consentIntegrations(),
+      },
+      {
+        siteId: CONSENT_TLS_SITE_ID,
+        deploymentId: "dep_consent_tls",
+        publicOrigin: consentTlsOrigin,
         preview: false,
         integrations: consentIntegrations(),
       },
@@ -205,6 +221,33 @@ try {
       )
     )
   );
+  objects.set(
+    `hosts/${CONSENT_TLS_HOST}.json`,
+    new TextEncoder().encode(
+      JSON.stringify({ version: 1, siteId: CONSENT_TLS_SITE_ID, kind: "alias" })
+    )
+  );
+  objects.set(
+    `sites/${CONSENT_TLS_SITE_ID}/state.json`,
+    new TextEncoder().encode(
+      JSON.stringify(
+        siteServingStateSchema.parse({
+          version: 1,
+          siteId: CONSENT_TLS_SITE_ID,
+          slug: "consent-tls",
+          status: "active",
+          production: {
+            deploymentId: "dep_consent_tls",
+            generation: 1,
+            activatedAt: new Date().toISOString(),
+          },
+          previews: {},
+          trafficToken: TRAFFIC_TOKEN,
+          updatedAt: new Date().toISOString(),
+        })
+      )
+    )
+  );
   const [liveManifest, previewManifest] = compiled.manifests;
   const previewDraft = previewManifest.files.find(
     (file) => file.path === "/blog/draft-idea/index.html"
@@ -259,14 +302,17 @@ try {
     locale: "en-US",
     viewport: { width: 1440, height: 1000 },
     serviceWorkers: "block",
+    // The HTTPS consent site uses a throwaway self-signed certificate.
+    ignoreHTTPSErrors: true,
     env: { PATH: process.env.PATH ?? "", HOME: temp, TMPDIR: temp },
   });
   const network = await routeThirdParty(browser, {
     root,
     vendorScripts,
     isSite: (url) =>
-      [LIVE_HOST, PREVIEW_HOST, CONSENT_HOST].includes(url.hostname) &&
-      url.port === String(port),
+      ([LIVE_HOST, PREVIEW_HOST, CONSENT_HOST].includes(url.hostname) &&
+        url.port === String(port)) ||
+      (url.hostname === CONSENT_TLS_HOST && url.port === String(tls.port)),
   });
   // Vendors may batch; wait until every provider reported this page.
   const waitForProviders = async (from: number, pageUrl: string) => {
@@ -300,8 +346,9 @@ try {
   const isSiteSubresource = (request: PlaywrightRequest) => {
     const url = new URL(request.url());
     return (
-      [LIVE_HOST, PREVIEW_HOST, CONSENT_HOST].includes(url.hostname) &&
-      url.port === String(port) &&
+      (([LIVE_HOST, PREVIEW_HOST, CONSENT_HOST].includes(url.hostname) &&
+        url.port === String(port)) ||
+        (url.hostname === CONSENT_TLS_HOST && url.port === String(tls.port))) &&
       !(request.isNavigationRequest() && request.frame() === page.mainFrame())
     );
   };
@@ -927,6 +974,15 @@ try {
       page,
       context: browser,
       origin: consentOrigin,
+      ingest,
+      settle: () => sites?.settle() ?? Promise.resolve(),
+    })
+  );
+  checks.push(
+    await assertHostOnlyConsent({
+      page,
+      context: browser,
+      origin: consentTlsOrigin,
       ingest,
       settle: () => sites?.settle() ?? Promise.resolve(),
     })

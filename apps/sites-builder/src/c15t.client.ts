@@ -5,6 +5,10 @@ import { plausibleAnalytics } from "@c15t/integrations/plausible-analytics";
 import { posthog } from "@c15t/integrations/posthog";
 import { umamiAnalytics } from "@c15t/integrations/umami-analytics";
 
+import { migrateLegacyRefusal } from "./utils/consent-migration";
+
+migrateLegacyRefusal(__NOTRA_CONSENT_STORAGE_KEY__);
+
 const analytics = __NOTRA_CONSENT_ANALYTICS__;
 
 export default {

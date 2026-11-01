@@ -98,7 +98,13 @@ export function createDevRefresh(options: DevRefreshOptions) {
         prepared.customScripts,
         false
       ),
-      consent: siteConsent(config, prepared.customScripts, false, true),
+      consent: siteConsent(
+        config,
+        prepared.customScripts,
+        false,
+        true,
+        options.params.publicOrigin
+      ),
     };
     const snapshot = JSON.stringify(params);
     if (snapshot === published && active) {

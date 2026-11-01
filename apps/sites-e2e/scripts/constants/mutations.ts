@@ -116,6 +116,15 @@ export const MUTATIONS: Mutation[] = [
     caughtBy: "protected preview",
   },
   {
+    id: "consent-host-cookie",
+    bug: "The Worker reads consent from the shared-domain c15t cookie another site can set",
+    file: "apps/sites/src/utils/visitor-consent.ts",
+    find: "    storage: { storageKey: manifest.consentStorageKey },\n",
+    replace: "",
+    suites: ["browser"],
+    caughtBy: "consent banner over HTTPS",
+  },
+  {
     id: "password-rate-limit",
     bug: "Preview passwords can be guessed without a rate limit",
     file: "apps/sites/src/preview-auth.ts",

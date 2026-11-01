@@ -1,5 +1,6 @@
 import {
   C15T_ANALYTICS_CATEGORY,
+  C15T_HOST_STORAGE_KEY,
   POSTHOG_DEFAULT_API_HOST,
 } from "@notra/sites-core/constants/integrations";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
@@ -63,7 +64,8 @@ export function siteConsent(
   config: SiteConfig,
   customScripts: readonly PreparedCustomScript[],
   analytics: boolean,
-  dev: boolean
+  dev: boolean,
+  publicOrigin: string
 ): SiteConsentParams | null {
   const { c15t } = config.integrations;
   if (!c15t) {
@@ -94,6 +96,10 @@ export function siteConsent(
       storageConfig: {
         crossSubdomain: c15t.crossSubdomain,
         defaultExpiryDays: c15t.expiryDays,
+        storageKey:
+          c15t.crossSubdomain || !publicOrigin.startsWith("https:")
+            ? undefined
+            : C15T_HOST_STORAGE_KEY,
       },
       disableAnimation: c15t.disableAnimation,
       theme: {

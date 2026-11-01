@@ -1,4 +1,7 @@
-import type { C15T_SCRIPT_CATEGORIES } from "@notra/sites-core/constants/integrations";
+import type {
+  C15T_HOST_STORAGE_KEY,
+  C15T_SCRIPT_CATEGORIES,
+} from "@notra/sites-core/constants/integrations";
 import type { SiteMounts } from "@notra/sites-core/types/deployment";
 import type { SiteConfig } from "@notra/sites-core/types/site-config";
 import type {
@@ -32,7 +35,11 @@ export interface SiteConsentOptions {
   presentation: Pick<SiteC15t, "prompt" | "preferences">;
   legalLinks?: SiteC15t["legalLinks"];
   i18n?: { locale: NonNullable<SiteC15t["locale"]>; detectLanguage: false };
-  storageConfig: { crossSubdomain?: boolean; defaultExpiryDays?: number };
+  storageConfig: {
+    crossSubdomain?: boolean;
+    defaultExpiryDays?: number;
+    storageKey?: typeof C15T_HOST_STORAGE_KEY;
+  };
   consentCategories?: string[];
   disableAnimation?: boolean;
   theme: {

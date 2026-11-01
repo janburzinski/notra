@@ -1,3 +1,4 @@
+import { C15T_HOST_STORAGE_KEY } from "@notra/sites-core/constants/integrations";
 import { SITE_FAVICON_HOST } from "@notra/sites-core/constants/sites";
 import {
   siteAreaSchema,
@@ -55,6 +56,7 @@ export const siteBuildResultSchema = z.object({
     .nullable()
     .default(null),
   analyticsConsent: z.boolean().optional(),
+  consentStorageKey: z.literal(C15T_HOST_STORAGE_KEY).optional(),
   /** Host the footer links a favicon for, the only one the worker serves. */
   faviconHost: z.string().regex(SITE_FAVICON_HOST).optional(),
 });
