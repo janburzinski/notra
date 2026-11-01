@@ -157,7 +157,7 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
     const { slug } = organization.useParams<Router<typeof organization>>();
     const { organizationShell } =
       organization.useRouteContext<Router<typeof organization>>();
-    const { projectId, geoEntitled } = geo.useLoaderData<Router<typeof geo>>();
+    const { projectId, geoAccess } = geo.useLoaderData<Router<typeof geo>>();
     return (
       <>
         <GeoCatalogWarmer organizationSlug={slug} />
@@ -165,7 +165,10 @@ export function createDashboardUiRoutes(parent: AnyRoute) {
           <GeoLiveProvider
             organizationId={organizationShell.initialActiveOrganization.id}
           >
-            <GeoPageGate entitled={geoEntitled} fallback={<DashboardLoading />}>
+            <GeoPageGate
+              fallback={<DashboardLoading />}
+              initialAccess={geoAccess}
+            >
               <UiModalProvider>
                 <Outlet />
                 <GeoCompetitorSheetHost organizationSlug={slug} />

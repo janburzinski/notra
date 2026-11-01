@@ -314,6 +314,7 @@ import {
   resolveGeoShelfSearch,
 } from "@/lib/geo-shelf/service";
 import { assertGeoAccess } from "@/lib/geo/access";
+import { hasGeoData } from "@/lib/geo/access-level.server";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { startFreeGeoScan } from "@/lib/geo/free-scan";
 import {
@@ -382,7 +383,7 @@ function createGeoHandler(
     };
 }
 
-/** Membership only, without the GEO entitlement check. */
+/** Membership only: reads stay open without a GEO plan, writes do not. */
 const geoOpenHandler = createGeoHandler(assertOrganizationAccess);
 const geoHandler = createGeoHandler(assertGeoAccess);
 
@@ -668,7 +669,7 @@ async function loadGeoShelfSeed(
   input: { organizationId: string; projectId?: string },
   options: { withMembers: boolean }
 ) {
-  await assertGeoAccess(accessParams({ context, input }));
+  await assertOrganizationAccess(accessParams({ context, input }));
   const [shelfContext, members] = await Promise.all([
     runOrpcEffect(
       loadGeoShelfContext(input).pipe(Effect.provide(geoCoreDashboardLayer)),
@@ -752,7 +753,7 @@ export const geoRouter = {
   shelfMembers: authorizedProcedure
     .input(geoShelfMembersInputSchema)
     .handler(async ({ context, input }) => {
-      await assertGeoAccess(accessParams({ context, input }));
+      await assertOrganizationAccess(accessParams({ context, input }));
       const members = await listGeoShelfMembers(
         input.organizationId,
         context.headers
@@ -850,7 +851,7 @@ export const geoRouter = {
   shelfPreview: authorizedProcedure
     .input(geoShelfPreviewInputSchema)
     .handler(async ({ context, input }) => {
-      await assertGeoAccess(accessParams({ context, input }));
+      await assertOrganizationAccess(accessParams({ context, input }));
       const rate = await ratelimit.geoShelfPreview.limit(
         `${input.organizationId}:${GEO_SHELF_PREVIEW_RATE_LIMIT_SCOPE}`
       );
@@ -889,6 +890,14 @@ export const geoRouter = {
           Effect.provide(geoCoreDashboardLayer)
         )
       );
+    }),
+  dataStatus: authorizedProcedure
+    .input(geoOrganizationInputSchema)
+    .handler(async ({ context, input }) => {
+      await assertOrganizationAccess(accessParams({ context, input }));
+      return {
+        hasData: await Effect.runPromise(hasGeoData(input.organizationId)),
+      };
     }),
   settings: authorizedProcedure
     .input(geoOrganizationInputSchema)
@@ -929,18 +938,24 @@ export const geoRouter = {
   languageShare: authorizedProcedure
     .input(geoTimeseriesInputSchema)
     .handler(
-      geoHandler((input) => loadGeoLanguageShare(input, geoWindow(input)))
+      geoOpenHandler((input) => loadGeoLanguageShare(input, geoWindow(input)))
     ),
   overview: authorizedProcedure
     .input(geoTimeseriesInputSchema)
-    .handler(geoHandler((input) => loadGeoOverview(input, geoWindow(input)))),
+    .handler(
+      geoOpenHandler((input) => loadGeoOverview(input, geoWindow(input)))
+    ),
   sentiment: authorizedProcedure
     .input(sentimentPeriodInputSchema)
-    .handler(geoHandler((input) => loadGeoSentiment(input, geoWindow(input)))),
+    .handler(
+      geoOpenHandler((input) => loadGeoSentiment(input, geoWindow(input)))
+    ),
   sentimentAnalysis: authorizedProcedure
     .input(sentimentPeriodInputSchema)
     .handler(
-      geoHandler((input) => loadGeoSentimentAnalysis(input, geoWindow(input)))
+      geoOpenHandler((input) =>
+        loadGeoSentimentAnalysis(input, geoWindow(input))
+      )
     ),
   analyzeSentiment: authorizedProcedure
     .route({ method: "POST" })
@@ -961,27 +976,31 @@ export const geoRouter = {
   sentimentEvidence: authorizedProcedure
     .input(geoSentimentEvidenceInputSchema)
     .handler(
-      geoHandler((input) => loadGeoSentimentEvidence(input, geoWindow(input)))
+      geoOpenHandler((input) =>
+        loadGeoSentimentEvidence(input, geoWindow(input))
+      )
     ),
   timeseries: authorizedProcedure
     .input(geoTimeseriesInputSchema)
-    .handler(geoHandler((input) => loadGeoTimeseries(input, geoWindow(input)))),
+    .handler(
+      geoOpenHandler((input) => loadGeoTimeseries(input, geoWindow(input)))
+    ),
   promptResultSummaries: authorizedProcedure
     .input(geoTimeseriesInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadGeoPromptResultSummaries(input, geoWindow(input))
       )
     ),
   promptResultDetail: authorizedProcedure
     .input(geoPromptResultDetailInputSchema)
-    .handler(geoHandler((input) => loadGeoPromptResultDetail(input))),
+    .handler(geoOpenHandler((input) => loadGeoPromptResultDetail(input))),
   changes: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(geoHandler((input) => loadGeoChanges(input))),
+    .handler(geoOpenHandler((input) => loadGeoChanges(input))),
   promptHistory: authorizedProcedure
     .input(geoPromptHistoryInputSchema)
-    .handler(geoHandler((input) => loadGeoPromptHistory(input))),
+    .handler(geoOpenHandler((input) => loadGeoPromptHistory(input))),
   competitorShare: authorizedProcedure
     .input(geoCompetitorShareInputSchema)
     .handler(
@@ -1088,7 +1107,7 @@ export const geoRouter = {
   competitorDetail: authorizedProcedure
     .input(geoCompetitorDetailInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadGeoCompetitorDetail(
           input,
           input.brand,
@@ -1100,7 +1119,7 @@ export const geoRouter = {
   agentReadiness: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }): Promise<AgentReadinessResponse> => {
-      await assertGeoAccess(accessParams({ context, input }));
+      await assertOrganizationAccess(accessParams({ context, input }));
       const scope = await runOrpcEffect(
         requireGeoProject(input),
         toGeoOrpcError
@@ -1294,7 +1313,7 @@ export const geoRouter = {
     }),
   promptsList: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(geoHandler((input) => listGeoPrompts(input))),
+    .handler(geoOpenHandler((input) => listGeoPrompts(input))),
   promptsCreate: authorizedProcedure.input(geoPromptCreateInputSchema).handler(
     geoHandler(
       (input) =>
@@ -1400,7 +1419,7 @@ export const geoRouter = {
   ),
   sequencesList: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(geoHandler((input) => listGeoSequences(input))),
+    .handler(geoOpenHandler((input) => listGeoSequences(input))),
   sequencesCreate: authorizedProcedure
     .input(geoSequenceCreateInputSchema)
     .handler(
@@ -1476,7 +1495,7 @@ export const geoRouter = {
   sequenceResults: authorizedProcedure
     .input(geoSequenceResultsInputSchema)
     .handler(
-      geoHandler((input) => loadGeoSequenceResults(input, input.sequenceId))
+      geoOpenHandler((input) => loadGeoSequenceResults(input, input.sequenceId))
     ),
   sequenceRun: authorizedProcedure
     .input(geoSequenceRunInputSchema)
@@ -1537,10 +1556,10 @@ export const geoRouter = {
     }),
   personasList: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(geoHandler((input) => listGeoPersonas(input))),
+    .handler(geoOpenHandler((input) => listGeoPersonas(input))),
   personasActivity: authorizedProcedure
     .input(geoTimeseriesInputSchema)
-    .handler(geoHandler((input) => loadGeoPersonaActivity(input))),
+    .handler(geoOpenHandler((input) => loadGeoPersonaActivity(input))),
   personasGenerate: authorizedProcedure
     .input(geoPersonasGenerateInputSchema)
     .handler(async ({ context, input }) => {
@@ -1574,7 +1593,7 @@ export const geoRouter = {
   personasGenerationStatus: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }) => {
-      await assertGeoAccess(accessParams({ context, input }));
+      await assertOrganizationAccess(accessParams({ context, input }));
       const scope = await runOrpcEffect(
         requireGeoProject(input).pipe(Effect.provide(geoCoreDashboardLayer)),
         toGeoOrpcError
@@ -1628,7 +1647,7 @@ export const geoRouter = {
   personaResults: authorizedProcedure
     .input(geoPersonaResultsInputSchema)
     .handler(
-      geoHandler((input) =>
+      geoOpenHandler((input) =>
         loadGeoPersonaResults(input, input.personaId, input.scanId)
       )
     ),
@@ -1857,16 +1876,16 @@ export const geoRouter = {
     .handler(geoHandler((input) => startGeoPromptRescan(input))),
   scanStatus: authorizedProcedure
     .input(geoScanStatusInputSchema)
-    .handler(geoHandler((input) => loadGeoScanStatus(input, input.scanId))),
+    .handler(geoOpenHandler((input) => loadGeoScanStatus(input, input.scanId))),
   scanRuns: authorizedProcedure
     .input(geoScanRunsInputSchema)
-    .handler(geoHandler((input) => loadGeoScanRuns(input))),
+    .handler(geoOpenHandler((input) => loadGeoScanRuns(input))),
   scanRun: authorizedProcedure
     .input(geoScanRunInputSchema)
-    .handler(geoHandler((input) => loadGeoScanRun(input))),
+    .handler(geoOpenHandler((input) => loadGeoScanRun(input))),
   writerGaps: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(geoHandler((input) => loadGeoContentGaps(input))),
+    .handler(geoOpenHandler((input) => loadGeoContentGaps(input))),
   writerGapIgnore: authorizedProcedure
     .input(geoPromptGapIgnoreInputSchema)
     .handler(
@@ -1887,10 +1906,12 @@ export const geoRouter = {
     ),
   writerBriefsList: authorizedProcedure
     .input(geoOrganizationInputSchema)
-    .handler(geoHandler((input) => listGeoContentBriefs(input))),
+    .handler(geoOpenHandler((input) => listGeoContentBriefs(input))),
   writerBrief: authorizedProcedure
     .input(geoWriterBriefIdInputSchema)
-    .handler(geoHandler((input) => getGeoContentBrief(input, input.briefId))),
+    .handler(
+      geoOpenHandler((input) => getGeoContentBrief(input, input.briefId))
+    ),
   writerPlan: authorizedProcedure
     .input(geoWriterPlanInputSchema)
     .handler(async ({ context, input }) => {
@@ -2012,7 +2033,7 @@ export const geoRouter = {
   searchConsoleStatus: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }): Promise<GeoSearchConsoleStatus> => {
-      await assertGeoAccess(accessParams({ context, input }));
+      await assertOrganizationAccess(accessParams({ context, input }));
 
       const configured = getGscOAuthCredentials() !== null;
       const [integration, scope] = await Promise.all([
@@ -2307,7 +2328,7 @@ export const geoRouter = {
     .input(geoOrganizationInputSchema)
     .handler(
       async ({ context, input }): Promise<GeoPromptSuggestionsResponse> => {
-        await assertGeoAccess(accessParams({ context, input }));
+        await assertOrganizationAccess(accessParams({ context, input }));
 
         return await runOrpcEffect(listSuggestions(input), toGeoOrpcError);
       }
@@ -2315,7 +2336,7 @@ export const geoRouter = {
   autopilotPromptSuggestionsList: authorizedProcedure
     .input(geoOrganizationInputSchema)
     .handler(async ({ context, input }) => {
-      await assertGeoAccess(accessParams({ context, input }));
+      await assertOrganizationAccess(accessParams({ context, input }));
       const result = await runOrpcEffect(
         listAutopilotPromptSuggestions(input),
         toGeoOrpcError

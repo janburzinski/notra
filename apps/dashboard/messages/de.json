@@ -3116,6 +3116,7 @@
     },
     "geoUpgradeGate": {
       "title": "GEO ist in deinem aktuellen Tarif gesperrt",
+      "readOnly": "Deine GEO-Daten bleiben sichtbar, für Scans und Änderungen brauchst du aber einen Tarif.",
       "verifyFailed": "Dein GEO-Zugang konnte nicht überprüft werden. Versuch es noch einmal."
     },
     "journeyDetailSheet": {

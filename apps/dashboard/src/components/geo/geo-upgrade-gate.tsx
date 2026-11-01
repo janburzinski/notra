@@ -17,8 +17,8 @@ import { FEATURED_PLAN_TIER } from "@/constants/billing";
 import { localStorageKeys } from "@/constants/storage";
 import { trackEvent } from "@/lib/analytics/posthog-client";
 import { toAnalyticsRoute } from "@/lib/analytics/route";
+import { useGeoAccess } from "@/lib/hooks/use-geo-access";
 import { usePaywallVariant } from "@/lib/hooks/use-paywall-variant";
-import { useHasGeoFeature } from "@/lib/hooks/use-plan";
 import { pickSidebarMode } from "@/lib/hooks/use-sidebar-mode";
 import { usePathname, useRouter } from "@/lib/navigation";
 import type { GeoUpgradeGateProps } from "@/types/components/geo";
@@ -32,7 +32,7 @@ function subscribeToStorage(callback: () => void) {
 export function GeoUpgradeGate({
   slug,
   children,
-  entitled = false,
+  initialAccess,
   fallback,
 }: GeoUpgradeGateProps) {
   const t = useTranslations("geo.geoUpgradeGate");
@@ -45,8 +45,9 @@ export function GeoUpgradeGate({
       ? activeOrganization
       : getOrganization(slug)
     )?.id ?? "";
-  const { isLocked, isLoading, isUnavailable, isFetching, refetch } =
-    useHasGeoFeature();
+  const { level, isLoading, isUnavailable, isFetching, refetch } =
+    useGeoAccess(organizationId);
+  const isLocked = level === "locked";
   const route = toAnalyticsRoute(pathname, slug);
   const paywall = usePaywallVariant();
   const [dismissedOrganizationId, setDismissedOrganizationId] = useState<
@@ -72,10 +73,11 @@ export function GeoUpgradeGate({
     () => true
   );
   const dialogOpen =
-    isLocked &&
     Boolean(organizationId) &&
     (reopenedOrganizationId === organizationId ||
-      (dismissedOrganizationId !== organizationId && !dismissedInStorage));
+      (isLocked &&
+        dismissedOrganizationId !== organizationId &&
+        !dismissedInStorage));
   const shownForOrganizationRef = useRef<string | null>(null);
   const navigateAfterCloseRef = useRef(false);
 
@@ -93,7 +95,9 @@ export function GeoUpgradeGate({
   }, [dialogOpen, organizationId, paywall.variant, route]);
 
   if (isLoading) {
-    return entitled ? children : (fallback ?? <GeoPageSkeleton />);
+    return initialAccess && initialAccess !== "locked"
+      ? children
+      : (fallback ?? <GeoPageSkeleton />);
   }
 
   if (isUnavailable) {
@@ -119,7 +123,7 @@ export function GeoUpgradeGate({
     );
   }
 
-  if (!isLocked) {
+  if (level === "full") {
     return children;
   }
 
@@ -141,6 +145,51 @@ export function GeoUpgradeGate({
     }
     pickSidebarMode("studio", sidebarRouteFromPathname(pathname));
     navigateAfterCloseRef.current = true;
+  }
+
+  const dialog = (
+    <GeoUpgradeDialog
+      onOpenChangeComplete={(open) => {
+        if (!open && navigateAfterCloseRef.current) {
+          navigateAfterCloseRef.current = false;
+          router.push(`/${slug}`);
+        }
+      }}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleDismiss();
+        }
+      }}
+      open={dialogOpen}
+      slug={slug}
+    />
+  );
+
+  if (level === "readOnly") {
+    return (
+      <>
+        <div className="px-4 pt-4 lg:px-6">
+          <div className="flex items-center gap-3 rounded-lg border px-3 py-2">
+            <HugeiconsIcon
+              className="text-muted-foreground size-4 shrink-0"
+              icon={SquareLock02Icon}
+            />
+            <p className="text-muted-foreground flex-1 text-sm text-pretty">
+              {t("readOnly")}
+            </p>
+            <Button
+              onClick={() => setReopenedOrganizationId(organizationId)}
+              size="sm"
+              type="button"
+            >
+              {tCommon("actions.upgrade")}
+            </Button>
+          </div>
+        </div>
+        {children}
+        {dialog}
+      </>
+    );
   }
 
   return (
@@ -174,21 +223,7 @@ export function GeoUpgradeGate({
           </Button>
         </div>
       </div>
-      <GeoUpgradeDialog
-        onOpenChangeComplete={(open) => {
-          if (!open && navigateAfterCloseRef.current) {
-            navigateAfterCloseRef.current = false;
-            router.push(`/${slug}`);
-          }
-        }}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleDismiss();
-          }
-        }}
-        open={dialogOpen}
-        slug={slug}
-      />
+      {dialog}
     </PageContainer>
   );
 }

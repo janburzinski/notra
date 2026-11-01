@@ -8,6 +8,7 @@ import type { GeoSearchConsoleStatus } from "@notra/geo-core/types/google-search
 import type { ReactNode } from "react";
 
 import type { GeoPromptSuggestion } from "@/types/geo";
+import type { GeoAccessLevel } from "@/types/geo-access";
 
 export interface PromptSuggestionsProps {
   organizationId: string;
@@ -125,14 +126,14 @@ export interface GeoUpgradeGateProps {
   slug: string;
   children: ReactNode;
   fallback?: ReactNode;
-  /** The server found the GEO entitlement: render while billing loads. */
-  entitled?: boolean;
+  /** The server's access level: render the page while billing loads. */
+  initialAccess?: GeoAccessLevel;
 }
 
 export interface GeoPageGateProps {
   children: ReactNode;
   fallback: ReactNode;
-  entitled?: boolean;
+  initialAccess?: GeoAccessLevel;
 }
 
 export interface GeoUpgradeDialogProps {

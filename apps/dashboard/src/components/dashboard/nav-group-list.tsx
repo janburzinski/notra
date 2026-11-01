@@ -18,8 +18,9 @@ import {
 } from "@notra/ui/components/ui/sidebar";
 import { useTranslations } from "use-intl";
 
+import { useOrganizationsContext } from "@/components/providers/organization-provider";
 import { HOME_NAV_LINK } from "@/constants/nav";
-import { useHasGeoFeature } from "@/lib/hooks/use-plan";
+import { useGeoAccess } from "@/lib/hooks/use-geo-access";
 import { useSidebarCollapseSettled } from "@/lib/hooks/use-sidebar-collapse-settled";
 import { pickSidebarMode } from "@/lib/hooks/use-sidebar-mode";
 import { usePathname } from "@/lib/navigation";
@@ -88,7 +89,9 @@ function NavGroupRow({
 }: Omit<NavGroupListProps, "groups"> & { group: NavGroup }) {
   const t = useTranslations("nav");
   const tLabels = useTranslations("common.labels");
-  const { isLocked: geoLocked } = useHasGeoFeature();
+  const { getOrganization } = useOrganizationsContext();
+  const geoLocked =
+    useGeoAccess(getOrganization(slug)?.id ?? "").level === "locked";
   const collapseSettled = useSidebarCollapseSettled();
   const homeLinkProps = useHomeLinkProps();
   const [first, ...rest] = resolveNavItems(group.links, visibility);

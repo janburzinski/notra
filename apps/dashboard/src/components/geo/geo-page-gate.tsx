@@ -7,7 +7,7 @@ import { isGeoPaywalledPath } from "@/utils/geo-paths";
 
 export function GeoPageGate({
   children,
-  entitled,
+  initialAccess,
   fallback,
 }: GeoPageGateProps) {
   const { slug } = useParams<{ slug: string }>();
@@ -18,7 +18,11 @@ export function GeoPageGate({
   }
 
   return (
-    <GeoUpgradeGate entitled={entitled} fallback={fallback} slug={slug}>
+    <GeoUpgradeGate
+      fallback={fallback}
+      initialAccess={initialAccess}
+      slug={slug}
+    >
       {children}
     </GeoUpgradeGate>
   );

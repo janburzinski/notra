@@ -1,5 +1,6 @@
 const GEO_DASHBOARD_PATH_PATTERN = /(?:^|\/)geo(?:\/|\?|$)/;
-const GEO_TRAFFIC_PATH_PATTERN = /(?:^|\/)geo\/traffic(?:\/|\?|$)/;
+const GEO_UNGATED_PATH_PATTERN =
+  /(?:^|\/)geo\/(?:traffic|shelf-space)(?:\/|\?|$)/;
 
 export function geoDashboardPath(
   organizationSlug: string,
@@ -30,7 +31,7 @@ export function isGeoDashboardPath(path: string): boolean {
 }
 
 export function isGeoPaywalledPath(path: string): boolean {
-  return isGeoDashboardPath(path) && !GEO_TRAFFIC_PATH_PATTERN.test(path);
+  return isGeoDashboardPath(path) && !GEO_UNGATED_PATH_PATTERN.test(path);
 }
 
 export function geoNavHref(

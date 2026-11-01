@@ -1,10 +1,8 @@
-import { logWarn } from "@notra/ai/utils/server-log";
 import { runWithGeoRequestMemo } from "@notra/geo-core/utils/request-memo";
 import { createRouterClient } from "@orpc/server";
 import { dehydrate } from "@tanstack/react-query";
 
 import { assertOrganizationAccess } from "@/lib/auth/organization";
-import { resolveGeoEntitlement } from "@/lib/billing/subscription";
 import { createORPCContext } from "@/lib/orpc/context";
 import { dashboardOrpc } from "@/lib/orpc/query";
 import { contentRecentsProcedure } from "@/lib/orpc/routers/content-recents";
@@ -15,20 +13,6 @@ import {
   geoTrafficHydrationInputs,
 } from "@/utils/geo-hydration";
 import { getGeoServerQueryClient } from "@/utils/geo-query-client.server";
-
-async function canPrefetchGeoQueries(organizationId: string, headers: Headers) {
-  await createORPCContext({ headers });
-  await assertOrganizationAccess({ organizationId, headers });
-  try {
-    return (await resolveGeoEntitlement(organizationId, headers)) !== "denied";
-  } catch (error) {
-    logWarn("[geo] Skipping prefetch: entitlement lookup unavailable", {
-      organizationId,
-      error: error instanceof Error ? error.name : "UnknownError",
-    });
-    return false;
-  }
-}
 
 /**
  * Starts the GEO overview queries on the server and returns the dehydrated
@@ -47,9 +31,8 @@ async function dehydrateGeoOverview(
   search: Record<string, string | string[] | undefined>,
   requestHeaders: Headers
 ) {
-  if (!(await canPrefetchGeoQueries(organizationId, requestHeaders))) {
-    return dehydrate(getGeoServerQueryClient());
-  }
+  await createORPCContext({ headers: requestHeaders });
+  await assertOrganizationAccess({ organizationId, headers: requestHeaders });
   const input = geoHydrationInputs(organizationId, projectId, search);
   const client = createRouterClient(
     { content: { recents: contentRecentsProcedure }, geo: geoRouter },

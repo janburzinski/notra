@@ -15,6 +15,7 @@ import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
+import { Effect } from "effect";
 
 import { ONBOARDING_FLOW_VARIANTS } from "@/constants/analytics-events";
 import {
@@ -28,10 +29,8 @@ import {
   getSession,
   validateOrganizationAccess,
 } from "@/lib/auth/actions";
-import {
-  hasPaidSubscriptionHistory,
-  resolveGeoEntitlement,
-} from "@/lib/billing/subscription";
+import { hasPaidSubscriptionHistory } from "@/lib/billing/subscription";
+import { resolveGeoAccessLevel } from "@/lib/geo/access-level.server";
 import { redirectIfAnyOrganizationHasPaidHistory } from "@/lib/onboarding/billing-gate";
 import { redirectIfOnboardingDismissed } from "@/lib/onboarding/dismissal";
 import { resolveOnboardingVariant } from "@/lib/onboarding/experiment";
@@ -63,16 +62,14 @@ async function onboardingContext({ searchParams }: UiRouteInput) {
   return { organization, projectId, replay, userId: session.user.id };
 }
 
-/** Plans without GEO can't open the overview, so they land on AI traffic. */
+/** Only workspaces with nothing to show in GEO land on AI traffic. */
 async function onboardingExitHref(
   organizationId: string,
   organizationSlug: string,
   projectId?: string
 ) {
-  const geo = await resolveGeoEntitlement(organizationId).catch(
-    () => "entitled" as const
-  );
-  return geo === "denied"
+  const access = await Effect.runPromise(resolveGeoAccessLevel(organizationId));
+  return access === "locked"
     ? geoTrafficPath(organizationSlug, projectId)
     : geoDashboardPath(organizationSlug, projectId);
 }

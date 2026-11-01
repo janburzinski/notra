@@ -250,15 +250,14 @@ export const loadGeoScope = createServerFn({ method: "GET" })
   .handler(async ({ data: { params } }) => {
     const slug = params.slug ?? "";
     const { organization } = await validateOrganizationAccess(slug);
-    const [projectId, entitlement] = await Promise.all([
+    const [projectId, geoAccess] = await Promise.all([
       resolveInitialGeoProjectId(organization.id, slug, undefined),
-      import("@/lib/billing/subscription")
-        .then(({ resolveGeoEntitlement }) =>
-          resolveGeoEntitlement(organization.id)
-        )
-        .catch(() => "unknown" as const),
+      import("@/lib/geo/access-level.server").then(
+        ({ resolveGeoAccessLevel }) =>
+          Effect.runPromise(resolveGeoAccessLevel(organization.id))
+      ),
     ]);
-    return { projectId, geoEntitled: entitlement !== "denied" };
+    return { projectId, geoAccess };
   });
 
 type GeoPageKind = "overview" | "traffic" | "gsc";

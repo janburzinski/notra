@@ -3116,6 +3116,7 @@
     },
     "geoUpgradeGate": {
       "title": "GEO is locked on your current plan",
+      "readOnly": "Your GEO data stays visible, but scans and changes need a plan.",
       "verifyFailed": "Could not verify your GEO access. Try again."
     },
     "journeyDetailSheet": {
