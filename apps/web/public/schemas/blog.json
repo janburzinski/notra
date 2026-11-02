@@ -1039,6 +1039,10 @@
         "pageActions": {
           "default": false,
           "type": "boolean"
+        },
+        "minimap": {
+          "default": true,
+          "type": "boolean"
         }
       }
     },

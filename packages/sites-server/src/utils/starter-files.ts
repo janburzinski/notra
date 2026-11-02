@@ -179,8 +179,13 @@ export function buildStarterConfig(input: StarterBrandInput) {
   return description ? { name, description } : { name };
 }
 
-function renderLink(link: StarterLink, indent: string): string {
-  return `${indent}<a href="${link.href}" className="${STARTER_LINK_CLASS}">${escapeMdxText(link.label)}</a>`;
+// The header adds `site-nav-link`, the class of the theme's own navbar links.
+function renderLink(
+  link: StarterLink,
+  indent: string,
+  className = STARTER_LINK_CLASS
+): string {
+  return `${indent}<a href="${link.href}" className="${className}">${escapeMdxText(link.label)}</a>`;
 }
 
 function renderLogo(input: StarterBrandInput, name: string): string[] {
@@ -210,7 +215,7 @@ function buildStarterHeader(input: StarterBrandInput): string {
   const links = input.landing?.navLinks ?? [];
   const cta = input.landing?.cta ?? null;
   const lines = [
-    `<header className="border-b border-border">`,
+    "<header>",
     `  <div className="site-container flex h-14 items-center gap-6">`,
     `    <a href="${home}" className="flex items-center gap-2.5 text-[0.9375rem] font-semibold tracking-tight">`,
     ...renderLogo(input, name),
@@ -220,13 +225,15 @@ function buildStarterHeader(input: StarterBrandInput): string {
   if (links.length > 0) {
     lines.push(
       `    <nav aria-label="Main" className="ml-auto hidden items-center gap-5 text-sm md:flex">`,
-      ...links.map((link) => renderLink(link, "      ")),
+      ...links.map((link) =>
+        renderLink(link, "      ", `site-nav-link ${STARTER_LINK_CLASS}`)
+      ),
       "    </nav>"
     );
   }
   if (cta) {
     lines.push(
-      `    <a href="${cta.href}" className="${links.length > 0 ? "" : "ml-auto "}rounded-full bg-primary-button px-3.5 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">${escapeMdxText(cta.label)}</a>`
+      `    <a href="${cta.href}" className="${links.length > 0 ? "max-md:ml-auto " : "ml-auto "}btn btn-primary btn-sm">${escapeMdxText(cta.label)}</a>`
     );
   }
   lines.push(

@@ -306,6 +306,7 @@ export const siteChangelogSchema = z.object({
   layout: z.enum(["timeline", "cards", "compact"]).default("timeline"),
   hero: blogHeroSchema,
   pageActions: z.boolean().default(false),
+  minimap: z.boolean().default(true),
 });
 
 export const siteMetadataSchema = z

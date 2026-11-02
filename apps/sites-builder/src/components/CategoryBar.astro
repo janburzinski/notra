@@ -91,7 +91,8 @@ const options = categories.length > 0 ? [{ name: "All", slug: "" }, ...categorie
       visible.at(-1)?.setAttribute("data-last-shown", "");
       const shown = visible.length + (unfiltered ? (featured?.children.length ?? 0) : 0);
       if (featured) {
-        featured.hidden = Boolean(query);
+        // Any filter shows pinned posts inline (their data-pinned copies), so the list above would repeat them.
+        featured.hidden = !unfiltered;
       }
       if (status) {
         status.textContent = `${shown} ${shown === 1 ? "post" : "posts"} found`;

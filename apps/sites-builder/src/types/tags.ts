@@ -19,6 +19,11 @@ export interface TagListProps {
   overlay?: boolean;
 }
 
+export interface TagLinksProps {
+  tags: TagLink[];
+  class?: string;
+}
+
 export type AreaTag = SiteTag<BlogEntry | ChangelogEntry>;
 
 export type TagPageProps =

@@ -85,7 +85,7 @@ See [Design and CSS](/sites/customize/design).
 | `fonts.weight` | 100 to 900 | `400` | Body text weight |
 | `fonts.source` | Path | | Your own font file |
 | `fonts.format` | `"woff2" \| "woff"` | `"woff2"` | Format of `source` |
-| `fonts.heading`, `fonts.body` | `{ family, weight?, source?, format? }` | | A separate font for headings or body text, where `heading.weight` sets heading weight (default `600`) |
+| `fonts.heading`, `fonts.body` | `{ family, weight?, source?, format? }` | | A separate font for headings or body text, where `heading.weight` sets heading weight (default `500`) |
 | `background.decoration` | `"none" \| "grid" \| "dots" \| "gradient"` | `"none"` | Page decoration |
 | `background.color` | `{ light?, dark? }` Colors | | Page color per mode |
 | `background.image` | Path, or `{ light, dark }` | | Page background image |
@@ -129,7 +129,7 @@ See [Layouts](/sites/customize/layouts#blog).
 | `blog.featured` | `"latest" \| "none"` or up to 6 post paths | `"none"` | Posts pinned on top. With `"none"`, posts with `featured: true` |
 | `blog.categories` | `boolean` or up to 12 tag names | `false` | [Category bar](/sites/customize/layouts#category-bar) above the posts: `true` for every tag, a list for these tags in this order |
 | `blog.search` | boolean | `false` | Search post titles, summaries and tags; combines with the category filter |
-| `blog.card.image` | `boolean \| "auto"` | `"auto"` | Cover image on cards. `"auto"` shows covers when a post on the page has one |
+| `blog.card.image` | `boolean \| "auto"` | `"auto"` | Cover image on cards. `"auto"` shows covers, with placeholders for the rest, when a post on the page has one |
 | `blog.card.excerpt` | boolean | `true` | Summary on cards |
 | `blog.card.author` | boolean | `true` | First author on cards |
 | `blog.card.date` | boolean | `true` | Date on cards |
@@ -152,6 +152,7 @@ See [Layouts](/sites/customize/layouts#blog).
 | `changelog.layout` | `"timeline" \| "cards" \| "compact"` | `"timeline"` | Index layout |
 | `changelog.hero` | Same as `blog.hero` | `"plain"` | Index hero |
 | `changelog.pageActions` | boolean | `false` | Show the shared page-actions menu on individual changelog entries; uses `contextual` options |
+| `changelog.minimap` | boolean | `true` | Show the entry minimap on the left of the `timeline` changelog on wide screens |
 
 ## Authors
 

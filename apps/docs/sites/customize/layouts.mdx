@@ -72,7 +72,7 @@ A `cards` card shows the title, up to three lines of excerpt, and the first auth
 
 | Setting | Shows | Default |
 | --- | --- | --- |
-| `card.image` | The post's `image` as a cover (not in `list`). `"auto"` shows covers when at least one post on the page has one. `true` always leaves room for a cover and shows a placeholder for posts without one | `"auto"` |
+| `card.image` | The post's `image` as a cover (not in `list`). `"auto"` shows covers when at least one post on the page has one, with a placeholder for posts without one. `true` always leaves room for a cover and shows a placeholder for posts without one | `"auto"` |
 | `card.excerpt` | The `description`, or the start of the first paragraph | `true` |
 | `card.author` | The first author | `true` |
 | `card.date` | The date | `true` |
@@ -129,6 +129,7 @@ The compact header always has a sidebar, so it ignores `post.width`.
 | `description` | The line under it | The site's `description` |
 | `layout` | `timeline`: entries stacked with date, a large title, the description as subtitle and the cover image. `cards`: one card per entry. `compact`: title, date, version and summary only | `timeline` |
 | `hero` | Works like the blog's | `plain` |
+| `minimap` | `true` shows one line per entry on the left of the `timeline` changelog on wide screens; hover a line to preview the entry, click to jump to it. `false` hides it | `true` |
 
 ## Your own hero
 
