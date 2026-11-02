@@ -61,6 +61,12 @@ export function lifecycleJournal(builder: LifecycleJournalReport["builder"]) {
         ok: build.result?.ok ?? false,
         durationMs: Math.round(build.durationMs),
         sandboxId: build.metrics?.sandboxId ?? null,
+        phases: Object.fromEntries(
+          Object.entries(build.metrics?.phases ?? {}).map(([name, ms]) => [
+            name,
+            Math.round(ms ?? 0),
+          ])
+        ),
         error: build.result?.ok
           ? null
           : (build.crash ??

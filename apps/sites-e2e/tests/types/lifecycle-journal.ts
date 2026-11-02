@@ -1,3 +1,4 @@
+import type { SandboxBuildResult } from "../../../../packages/sites-server/src/types/build";
 import type { EmulatorSummary } from "../../emulators/core/types";
 
 export interface LifecyclePhase {
@@ -12,6 +13,8 @@ export interface LifecycleBuild {
   ok: boolean;
   durationMs: number;
   sandboxId: string | null;
+  /** Where the build spent its time (sandbox startup, upload, execution…), in ms. */
+  phases?: NonNullable<SandboxBuildResult["metrics"]>["phases"];
   /** First build error or crash; null for a successful build. */
   error: string | null;
 }

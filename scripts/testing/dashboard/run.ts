@@ -98,6 +98,7 @@ const report = {
   workosLoginTested: false,
   temporaryDirectory: directory,
   durationMs: 0,
+  timings: {} as Record<string, number>,
   checks: null as unknown,
   databaseRegressions: [] as DatabaseRegressionResult[],
   lifecycle: null as LifecycleJournalReport | null,
@@ -105,26 +106,44 @@ const report = {
 };
 let postgresContainer: string | undefined;
 let stopped = false;
+// Set when cleanup starts, so steps still in flight start nothing new.
+let finishing = false;
 let childFailed = false;
 let redisAllocated = false;
-// Set while a regression suite runs, so cancellation can stop its group.
-let cancelActive: (() => void) | undefined;
+// One entry per running owned step (the snapshot build runs alongside the
+// suites), so cancellation can stop every group.
+const cancellers = new Set<() => void>();
 const stop = () => {
   stopped = true;
-  cancelActive?.();
+  for (const cancel of cancellers) {
+    cancel();
+  }
 };
 process.on("SIGINT", stop);
 process.on("SIGTERM", stop);
 
-function execute(command: string, args: string[]) {
-  const result = spawnSync(command, args, {
+// Async so the Box snapshot keeps building while setup and the suites run.
+async function execute(command: string, args: string[]) {
+  const child = spawn(command, args, {
     cwd: root,
     env: environment,
-    encoding: "utf8",
-    timeout: 90_000,
-    maxBuffer: 4 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
   });
-  if (result.status !== 0) {
+  const result = { stdout: "", stderr: "" };
+  const collect = (key: keyof typeof result) => (chunk: Buffer) => {
+    if (result[key].length < 4 * 1024 * 1024) {
+      result[key] += chunk.toString();
+    }
+  };
+  child.stdout.on("data", collect("stdout"));
+  child.stderr.on("data", collect("stderr"));
+  const timer = setTimeout(() => child.kill("SIGKILL"), 90_000);
+  const status = await new Promise<number | null>((resolveClose) => {
+    child.once("close", (code) => resolveClose(code));
+    child.once("error", () => resolveClose(null));
+  });
+  clearTimeout(timer);
+  if (status !== 0) {
     const output = (result.stdout + result.stderr)
       .replaceAll(redisToken, "[redacted]")
       .replaceAll(environment.WORKOS_COOKIE_PASSWORD ?? "", "[redacted]");
@@ -260,7 +279,7 @@ async function runOwned(
   });
   const timer = setTimeout(killGroup, timeoutMs);
   let grace: ReturnType<typeof setTimeout> | undefined;
-  cancelActive = () => {
+  const cancel = () => {
     try {
       if (child.pid) {
         process.kill(-child.pid, "SIGTERM");
@@ -270,13 +289,14 @@ async function runOwned(
     }
     grace = setTimeout(killGroup, 5000);
   };
+  cancellers.add(cancel);
   const status = await new Promise<number | null>((resolveExit) => {
     child.once("exit", (code) => resolveExit(code));
     child.once("error", () => resolveExit(null));
   });
   clearTimeout(timer);
   clearTimeout(grace);
-  cancelActive = undefined;
+  cancellers.delete(cancel);
   // Leftover descendants keep the output pipes open; stop them, then drain.
   killGroup();
   await closed;
@@ -286,7 +306,7 @@ async function runOwned(
 async function waitUntilReady(url: string, redis = false) {
   const deadline = performance.now() + 180_000;
   while (performance.now() < deadline) {
-    if (stopped || childFailed) {
+    if (stopped || finishing || childFailed) {
       break;
     }
     try {
@@ -307,7 +327,7 @@ async function waitUntilReady(url: string, redis = false) {
         return;
       }
     } catch {
-      if (stopped || childFailed) {
+      if (stopped || finishing || childFailed) {
         break;
       }
     }
@@ -316,120 +336,90 @@ async function waitUntilReady(url: string, redis = false) {
   throw new Error("Owned service readiness failed or the run was interrupted");
 }
 
-try {
-  const allocated = JSON.parse(
-    execute(process.execPath, [
-      "--no-env-file",
-      "scripts/testing/dashboard/postgres.ts",
-      "up",
-      ...(values["database-regressions"] ? [DATABASE_REGRESSION_PORT] : []),
-    ])
-  );
-  postgresContainer = allocated.container;
-  environment.SITES_TEST_DATABASE_URL = allocated.databaseUrl;
-  environment.DATABASE_URL = allocated.databaseUrl;
-  execute(process.execPath, [
-    "--no-env-file",
-    "scripts/testing/dashboard/migrate.ts",
-  ]);
-  execute(process.execPath, [
-    "--no-env-file",
-    "scripts/testing/dashboard/fixtures.ts",
-    "seed",
-  ]);
-  if (values["database-regressions"]) {
-    if (values.box && boxApiKey) {
-      report.staleBoxSnapshotsRemoved =
-        await sweepStaleTestSnapshots(boxApiKey);
-      if (stopped) {
-        throw new Error("Interrupted before the Box snapshot was created");
-      }
-      report.boxSnapshot = {
-        ...(await createTestSnapshot(root, directory, boxApiKey, runOwned)),
-        deleted: false,
-      };
-    }
-    for (const file of DATABASE_REGRESSION_FILES) {
-      if (stopped) {
-        throw new Error("Database regressions interrupted");
-      }
-      const suiteStarted = performance.now();
-      const lifecycleSuite = file === BOX_LIFECYCLE_FILE;
-      // A journal left by an earlier run in the same --report directory must
-      // not stand in for this run's.
-      if (lifecycleSuite) {
-        rmSync(join(logDirectory, LIFECYCLE_REPORT), { force: true });
-      }
-      const boxSuite = report.boxSnapshot && lifecycleSuite;
-      const result = await runOwned(
-        // The suites wrap a 30 s child run in Bun's 5 s default test timeout.
-        ["--no-env-file", "test", "--timeout=60000", file],
-        {
-          ...environment,
-          ...(lifecycleSuite
-            ? {
-                SITES_E2E_LIFECYCLE_REPORT: join(
-                  logDirectory,
-                  LIFECYCLE_REPORT
-                ),
-              }
-            : {}),
-          ...(boxSuite
-            ? {
-                SITES_E2E_BOX: "1",
-                UPSTASH_BOX_API_KEY: boxApiKey,
-                SITES_BUILDER_SNAPSHOT_ID: report.boxSnapshot?.snapshotId,
-                SITES_E2E_BOX_TOOLCHAIN_VERSION: report.boxSnapshot?.version,
-              }
-            : {}),
-        },
-        boxSuite ? 960_000 : 270_000
-      );
-      const output = result.output
-        .replaceAll(boxApiKey || redisToken, "[redacted]")
-        .replaceAll(redisToken, "[redacted]")
-        .replaceAll(environment.WORKOS_COOKIE_PASSWORD ?? "", "[redacted]");
-      const passed =
-        result.status === 0 &&
-        !/\(skip\)|(?:^|\n)\s*[1-9]\d* skip(?:\s|$)/.test(output);
-      const log = join(logDirectory, `${file.replaceAll("/", "_")}.log`);
-      writeFileSync(log, output, { mode: 0o600 });
-      const outcome = parseTestOutput(output);
-      report.databaseRegressions.push({
-        file,
-        passed,
-        durationMs: +(performance.now() - suiteStarted).toFixed(2),
-        ...outcome,
-        log: relative(logDirectory, log),
-      });
-      if (lifecycleSuite) {
-        report.lifecycle = readLifecycleJournal();
-      }
-      if (!passed) {
-        const journal = lifecycleSuite ? report.lifecycle : null;
-        let detail =
-          outcome.failedTests.join("; ") ||
-          (result.status === null ? "timed out or was stopped" : "");
-        if (journal?.failedPhase) {
-          detail = `phase "${journal.failedPhase}": ${journal.error?.split("\n")[0]}`;
-        } else if (journal?.runningPhase) {
-          detail = `stopped during phase "${journal.runningPhase}"`;
-        }
-        report.errors.push(
-          `Database regression failed or skipped: ${file}${detail ? ` (${detail})` : ""}`
-        );
-        // The CI log shows where it broke without downloading the artifact.
-        console.error(
-          `--- ${file} (last 60 lines) ---\n${output.split("\n").slice(-60).join("\n")}`
-        );
-      }
-      if (stopped) {
-        throw new Error("Database regressions interrupted");
-      }
-    }
+// When each step finished, in seconds since start.
+const mark = (step: string) => {
+  report.timings[step] = +((performance.now() - started) / 1000).toFixed(1);
+};
+
+async function runSuite(file: string) {
+  if (stopped) {
+    throw new Error("Database regressions interrupted");
   }
+  const suiteStarted = performance.now();
+  const lifecycleSuite = file === BOX_LIFECYCLE_FILE;
+  // A journal left by an earlier run in the same --report directory must
+  // not stand in for this run's.
+  if (lifecycleSuite) {
+    rmSync(join(logDirectory, LIFECYCLE_REPORT), { force: true });
+  }
+  const boxSuite = report.boxSnapshot && lifecycleSuite;
+  const result = await runOwned(
+    // The suites wrap a 30 s child run in Bun's 5 s default test timeout.
+    ["--no-env-file", "test", "--timeout=60000", file],
+    {
+      ...environment,
+      ...(lifecycleSuite
+        ? {
+            SITES_E2E_LIFECYCLE_REPORT: join(logDirectory, LIFECYCLE_REPORT),
+          }
+        : {}),
+      ...(boxSuite
+        ? {
+            SITES_E2E_BOX: "1",
+            UPSTASH_BOX_API_KEY: boxApiKey,
+            SITES_BUILDER_SNAPSHOT_ID: report.boxSnapshot?.snapshotId,
+            SITES_E2E_BOX_TOOLCHAIN_VERSION: report.boxSnapshot?.version,
+          }
+        : {}),
+    },
+    boxSuite ? 960_000 : 270_000
+  );
+  const output = result.output
+    .replaceAll(boxApiKey || redisToken, "[redacted]")
+    .replaceAll(redisToken, "[redacted]")
+    .replaceAll(environment.WORKOS_COOKIE_PASSWORD ?? "", "[redacted]");
+  const passed =
+    result.status === 0 &&
+    !/\(skip\)|(?:^|\n)\s*[1-9]\d* skip(?:\s|$)/.test(output);
+  const log = join(logDirectory, `${file.replaceAll("/", "_")}.log`);
+  writeFileSync(log, output, { mode: 0o600 });
+  const outcome = parseTestOutput(output);
+  report.databaseRegressions.push({
+    file,
+    passed,
+    durationMs: +(performance.now() - suiteStarted).toFixed(2),
+    ...outcome,
+    log: relative(logDirectory, log),
+  });
+  if (lifecycleSuite) {
+    report.lifecycle = readLifecycleJournal();
+  }
+  if (!passed) {
+    const journal = lifecycleSuite ? report.lifecycle : null;
+    let detail =
+      outcome.failedTests.join("; ") ||
+      (result.status === null ? "timed out or was stopped" : "");
+    if (journal?.failedPhase) {
+      detail = `phase "${journal.failedPhase}": ${journal.error?.split("\n")[0]}`;
+    } else if (journal?.runningPhase) {
+      detail = `stopped during phase "${journal.runningPhase}"`;
+    }
+    report.errors.push(
+      `Database regression failed or skipped: ${file}${detail ? ` (${detail})` : ""}`
+    );
+    // The CI log shows where it broke without downloading the artifact.
+    console.error(
+      `--- ${file} (last 60 lines) ---\n${output.split("\n").slice(-60).join("\n")}`
+    );
+  }
+  if (stopped) {
+    throw new Error("Database regressions interrupted");
+  }
+}
+
+async function startDashboard() {
   redisAllocated = true;
-  execute("docker", [
+  await execute("docker", [
     "run",
     "--detach",
     "--name",
@@ -451,6 +441,9 @@ try {
   environment.SITES_TEST_REDIS_REST_PORT = String(redisPort);
   environment.UPSTASH_REDIS_REST_URL = `http://127.0.0.1:${redisPort}`;
   environment.UPSTASH_REDIS_REST_TOKEN = redisToken;
+  if (finishing) {
+    throw new Error("Run finished before the dashboard started");
+  }
   start("redis-rest", ["scripts/testing/dashboard/redis-rest.ts"]);
   await waitUntilReady(environment.UPSTASH_REDIS_REST_URL, true);
   const port = await freePort();
@@ -460,6 +453,9 @@ try {
   environment.NEXT_PUBLIC_SITE_URL = origin;
   environment.WORKOS_REDIRECT_URI = `${origin}/auth/callback`;
   environment.WORKFLOW_LOCAL_BASE_URL = origin;
+  if (finishing) {
+    throw new Error("Run finished before the dashboard started");
+  }
   start(
     "dashboard",
     [
@@ -474,13 +470,78 @@ try {
     join(root, "apps/dashboard")
   );
   await waitUntilReady(`${origin}/__tests/sites`);
+  mark("dashboard");
+  return origin;
+}
+
+// The snapshot only needs the builder sources, so it builds while PostgreSQL
+// starts and the suites that do not use it run.
+const snapshotReady = (async () => {
+  if (!values["database-regressions"] || !values.box || !boxApiKey) {
+    return;
+  }
+  report.staleBoxSnapshotsRemoved = await sweepStaleTestSnapshots(boxApiKey);
+  if (stopped || finishing) {
+    throw new Error("Interrupted before the Box snapshot was created");
+  }
+  report.boxSnapshot = {
+    ...(await createTestSnapshot(root, directory, boxApiKey, runOwned)),
+    deleted: false,
+  };
+  mark("snapshot");
+})();
+// Awaited before the lifecycle or during cleanup; never left unhandled.
+snapshotReady.catch(() => {});
+let dashboardReady: Promise<string> | undefined;
+
+try {
+  const allocated = JSON.parse(
+    await execute(process.execPath, [
+      "--no-env-file",
+      "scripts/testing/dashboard/postgres.ts",
+      "up",
+      ...(values["database-regressions"] ? [DATABASE_REGRESSION_PORT] : []),
+    ])
+  );
+  postgresContainer = allocated.container;
+  environment.SITES_TEST_DATABASE_URL = allocated.databaseUrl;
+  environment.DATABASE_URL = allocated.databaseUrl;
+  await execute(process.execPath, [
+    "--no-env-file",
+    "scripts/testing/dashboard/migrate.ts",
+  ]);
+  await execute(process.execPath, [
+    "--no-env-file",
+    "scripts/testing/dashboard/fixtures.ts",
+    "seed",
+  ]);
+  mark("setup");
+  if (values["database-regressions"]) {
+    for (const file of DATABASE_REGRESSION_FILES) {
+      if (file !== BOX_LIFECYCLE_FILE) {
+        await runSuite(file);
+      }
+    }
+    mark("suites");
+    await snapshotReady;
+    // The suite copies the environment when it spawns, before the dashboard
+    // adds its own variables. The dashboard only answers requests, so it boots
+    // while the Box builds run; verify still waits for every suite.
+    const lifecycle = runSuite(BOX_LIFECYCLE_FILE);
+    dashboardReady = startDashboard();
+    dashboardReady.catch(() => {});
+    await lifecycle;
+    mark("lifecycle");
+  }
+  const origin = await (dashboardReady ?? startDashboard());
   report.checks = JSON.parse(
-    execute(process.execPath, [
+    await execute(process.execPath, [
       "--no-env-file",
       "scripts/testing/dashboard/verify.ts",
       origin,
     ])
   );
+  mark("verify");
   assert.equal(stopped, false);
   assert.equal(childFailed, false);
   report.passed = report.errors.length === 0;
@@ -489,6 +550,7 @@ try {
     error instanceof Error ? error.message : "Dashboard smoke failed"
   );
 } finally {
+  finishing = true;
   const failuresBeforeCleanup = report.errors.length;
   // Every child leads its own process group (detached). Signal the group even
   // when the leader already exited: descendants such as Vite workers outlive it.
@@ -517,6 +579,9 @@ try {
       report.errors.push(`Owned process group ${pid} survived SIGKILL`);
     }
   }
+  // A failed setup can leave the snapshot or dashboard step in flight; let it
+  // settle so whatever it created is cleaned up below.
+  await Promise.allSettled([snapshotReady, dashboardReady]);
   for (const container of [
     postgresContainer,
     redisAllocated ? redisContainer : undefined,
@@ -526,7 +591,7 @@ try {
     }
     try {
       if (container === postgresContainer) {
-        execute(process.execPath, [
+        await execute(process.execPath, [
           "--no-env-file",
           "scripts/testing/dashboard/postgres.ts",
           "down",
@@ -545,7 +610,7 @@ try {
         );
         if (inspected.status === 0) {
           assert.equal(inspected.stdout.trim(), REDIS_TEST_LABEL_VALUE);
-          execute("docker", ["rm", "-fv", container]);
+          await execute("docker", ["rm", "-fv", container]);
         }
       }
       assert.notEqual(
