@@ -1,21 +1,19 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import { spawnAsync } from "@notra/ai/utils/spawn-async";
+
 if (process.env.NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER !== "1") {
-  test("scheduled publication lifecycle (PGlite)", () => {
-    const result = spawnSync(
+  test("scheduled publication lifecycle (PGlite)", async () => {
+    const result = await spawnAsync(
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],
       {
         env: { ...process.env, NOTRA_SCHEDULED_PUBLICATIONS_SQL_WORKER: "1" },
-        timeout: 60_000,
+        timeoutMs: 60_000,
       }
     );
-    expect(
-      result.status,
-      `${result.stdout.toString()}\n${result.stderr.toString()}`
-    ).toBe(0);
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
   }, 70_000);
 } else {
   const { PGlite } = await import("@electric-sql/pglite");

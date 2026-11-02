@@ -1,20 +1,20 @@
 import { expect, mock, test } from "bun:test";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import type { GitHubMentionContext } from "@notra/ai/types/github-mention";
+import { spawnAsync } from "@notra/ai/utils/spawn-async";
 
 if (process.env.NOTRA_MENTION_PROCESS_BILLING_TEST !== "1") {
-  test("mention process settles billing correctly in an isolated module registry", () => {
-    const result = spawnSync(
+  test("mention process settles billing correctly in an isolated module registry", async () => {
+    const result = await spawnAsync(
       process.execPath,
       ["test", fileURLToPath(import.meta.url)],
       {
         env: { ...process.env, NOTRA_MENTION_PROCESS_BILLING_TEST: "1" },
-        timeout: 15_000,
+        timeoutMs: 15_000,
       }
     );
-    expect(result.status, result.stderr?.toString()).toBe(0);
+    expect(result.status, result.stderr).toBe(0);
   }, 20_000);
 } else {
   const confirm = mock(async (_params: unknown) => undefined);

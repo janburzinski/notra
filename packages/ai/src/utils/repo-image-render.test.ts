@@ -1,14 +1,15 @@
 import { expect, test } from "bun:test";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-test("importing shared renderers does not initialize image dependencies", () => {
+import { spawnAsync } from "@notra/ai/utils/spawn-async";
+
+test("importing shared renderers does not initialize image dependencies", async () => {
   const moduleUrls = [
     "repo-image-render.ts",
     "og-render.ts",
     "excalidraw-render.ts",
   ].map((path) => new URL(path, import.meta.url).href);
-  const result = spawnSync(
+  const result = await spawnAsync(
     process.execPath,
     [
       "--no-env-file",
@@ -23,13 +24,13 @@ test("importing shared renderers does not initialize image dependencies", () => 
         }
       `,
     ],
-    { encoding: "utf8", timeout: 15_000 }
+    { timeoutMs: 15_000 }
   );
   expect(result.status, result.stderr).toBe(0);
-});
+}, 20_000);
 
-test("deferred dependencies still render element trees and HTML to PNG", () => {
-  const bundle = spawnSync(
+test("deferred dependencies still render element trees and HTML to PNG", async () => {
+  const bundle = await spawnAsync(
     process.execPath,
     [
       "build",
@@ -39,14 +40,13 @@ test("deferred dependencies still render element trees and HTML to PNG", () => {
         (dependency) => `--external=${dependency}`
       ),
     ],
-    { encoding: "utf8", timeout: 15_000, maxBuffer: 16 * 1024 * 1024 }
+    { timeoutMs: 15_000 }
   );
   expect(bundle.status, bundle.stderr).toBe(0);
   // The deployed renderer runs on Node; satori-html's selector parser fails on Bun.
-  const result = spawnSync("node", ["--input-type=module"], {
+  const result = await spawnAsync("node", ["--input-type=module"], {
     cwd: new URL("../..", import.meta.url),
-    encoding: "utf8",
-    timeout: 15_000,
+    timeoutMs: 15_000,
     input: `${bundle.stdout}
       const { default: assert } = await import("node:assert/strict");
       const { createElement: element } = await import("react");
@@ -60,4 +60,4 @@ test("deferred dependencies still render element trees and HTML to PNG", () => {
     `,
   });
   expect(result.status, result.stderr).toBe(0);
-});
+}, 35_000);
