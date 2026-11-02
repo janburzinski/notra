@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM oven/bun:1.4.0-slim AS bun
+FROM oven/bun:1.4.4-slim AS bun
 
 FROM node:24.11.1-bookworm-slim AS base
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun

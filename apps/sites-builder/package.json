@@ -62,7 +62,7 @@
     "@types/mdast": "4.0.4",
     "@types/react": "^19.3.0",
     "@upstash/box": "^0.5.5",
-    "bun-types": "1.4.0",
+    "bun-types": "1.4.4",
     "typescript": "7.0.2"
   }
 }

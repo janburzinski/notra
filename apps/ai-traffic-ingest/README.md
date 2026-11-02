@@ -77,7 +77,7 @@ environment manually; this repository does not provision it or change DNS.
 | Replicas | 2 in the same region, near the existing Postgres and Upstash |
 | Start command | Keep the image CMD: `bun dist/index.js` |
 
-Use the existing Dockerfile and its pinned Bun 1.4.0 image. It builds shared
+Use the existing Dockerfile and its pinned Bun 1.4.4 image. It builds shared
 workspace packages from the root and needs no build-time credentials or database
 migration. Do not replace its CMD with a development server.
 

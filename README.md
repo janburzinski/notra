@@ -63,7 +63,7 @@ Notra is a Bun and Turborepo monorepo, built with TypeScript, React, Hono, Postg
 
 ## Local development
 
-Use **Bun 1.4.0**, **Node.js 24.11.1**, and a PostgreSQL database.
+Use **Bun 1.4.4**, **Node.js 24.11.1**, and a PostgreSQL database.
 
 ```bash
 bun install
@@ -100,7 +100,7 @@ Effect-aware linting covers `packages/tools/src` and `packages/geo-core/src`. Ru
 to check for floating Effects, missing `yield*` in Effect generators, and
 outdated Effect APIs. It also runs before Ultracite in `bun run check`. The
 install hook patches Oxlint for these type-aware rules without changing the
-TypeScript compiler; use Bun 1.4.0 to install the pinned, compatible versions.
+TypeScript compiler; use Bun 1.4.4 to install the pinned, compatible versions.
 
 ## Contributing
 
