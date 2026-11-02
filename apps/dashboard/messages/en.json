@@ -7385,6 +7385,11 @@
       }
     }
   },
+  "connectAgent": {
+    "label": "Connect agent",
+    "toast": "Copied. Paste it into your agent.",
+    "dismiss": "Hide Connect agent"
+  },
   "home": {
     "greeting": "{period, select, morning {Good morning} afternoon {Good afternoon} other {Good evening}}!",
     "greetingWithName": "{period, select, morning {Good morning} afternoon {Good afternoon} other {Good evening}}, {name}!",

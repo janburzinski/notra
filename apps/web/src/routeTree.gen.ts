@@ -18,6 +18,7 @@ import { Route as IpCheckerDotmdRouteImport } from './routes/ip-checker[.]md'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
+import { Route as OnboardDotmdRouteImport } from './routes/onboard[.]md'
 import { Route as QrCodeGeneratorDotmdRouteImport } from './routes/qr-code-generator[.]md'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
@@ -164,6 +165,11 @@ const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
 const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
   id: '/manifest.json',
   path: '/manifest.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardDotmdRoute = OnboardDotmdRouteImport.update({
+  id: '/onboard.md',
+  path: '/onboard.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QrCodeGeneratorDotmdRoute = QrCodeGeneratorDotmdRouteImport.update({
@@ -722,6 +728,7 @@ export interface FileRoutesByFullPath {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/onboard.md': typeof OnboardDotmdRoute
   '/qr-code-generator.md': typeof QrCodeGeneratorDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -832,6 +839,7 @@ export interface FileRoutesByTo {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/onboard.md': typeof OnboardDotmdRoute
   '/qr-code-generator.md': typeof QrCodeGeneratorDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -944,6 +952,7 @@ export interface FileRoutesById {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.json': typeof ManifestDotjsonRoute
+  '/onboard.md': typeof OnboardDotmdRoute
   '/qr-code-generator.md': typeof QrCodeGeneratorDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -1060,6 +1069,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.json'
+    | '/onboard.md'
     | '/qr-code-generator.md'
     | '/robots.txt'
     | '/rss.xml'
@@ -1170,6 +1180,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.json'
+    | '/onboard.md'
     | '/qr-code-generator.md'
     | '/robots.txt'
     | '/rss.xml'
@@ -1281,6 +1292,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.json'
+    | '/onboard.md'
     | '/qr-code-generator.md'
     | '/robots.txt'
     | '/rss.xml'
@@ -1397,6 +1409,7 @@ export interface RootRouteChildren {
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
+  OnboardDotmdRoute: typeof OnboardDotmdRoute
   QrCodeGeneratorDotmdRoute: typeof QrCodeGeneratorDotmdRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
@@ -1502,6 +1515,13 @@ declare module '@tanstack/react-router' {
       path: '/manifest.json'
       fullPath: '/manifest.json'
       preLoaderRoute: typeof ManifestDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboard.md': {
+      id: '/onboard.md'
+      path: '/onboard.md'
+      fullPath: '/onboard.md'
+      preLoaderRoute: typeof OnboardDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qr-code-generator.md': {
@@ -2426,6 +2446,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
+  OnboardDotmdRoute: OnboardDotmdRoute,
   QrCodeGeneratorDotmdRoute: QrCodeGeneratorDotmdRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   RssDotxmlRoute: RssDotxmlRoute,

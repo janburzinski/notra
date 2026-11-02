@@ -16,7 +16,7 @@ export const MCP_CLIENTS: McpClient[] = [
     label: "Codex",
     iconSrc: "/mcp/codex.svg",
     invertInDark: true,
-    command: `codex mcp add notra -- npx -y mcp-remote ${MCP_URL}`,
+    command: `codex mcp add notra --url ${MCP_URL}`,
   },
   {
     id: "cursor",

@@ -27,6 +27,7 @@ export const localStorageKeys = {
   githubPublishRepository: (organizationId: string) =>
     `notra:github-publish-repository:v1:${organizationId}`,
   welcomeTourSeen: "notra:welcome-tour-seen",
+  connectAgentDismissed: "notra:connect-agent-dismissed:v1",
 } as const;
 
 export const sessionStorageKeys = {

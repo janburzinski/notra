@@ -119,6 +119,8 @@ export const POSTHOG_EVENTS = {
   AGENT_READINESS_SCAN_FAILED: "agent_readiness_scan_failed",
   AGENT_READINESS_FIX_COPIED: "agent_readiness_fix_copied",
   AGENT_READINESS_REPORT_OPENED: "agent_readiness_report_opened",
+  AGENT_ONBOARD_PROMPT_COPIED: "agent_onboard_prompt_copied",
+  AGENT_ONBOARD_PROMPT_DISMISSED: "agent_onboard_prompt_dismissed",
 
   CONTENT_CREATE_DIALOG_OPENED: "content_create_dialog_opened",
   CONTENT_CREATE_STEP_COMPLETED: "content_create_step_completed",

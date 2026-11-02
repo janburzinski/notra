@@ -7385,6 +7385,11 @@
       }
     }
   },
+  "connectAgent": {
+    "label": "Agent verbinden",
+    "toast": "Kopiert. Füge es in deinen Agent ein.",
+    "dismiss": "„Agent verbinden“ ausblenden"
+  },
   "home": {
     "greeting": "{period, select, morning {Guten Morgen} afternoon {Guten Tag} other {Guten Abend}}!",
     "greetingWithName": "{period, select, morning {Guten Morgen} afternoon {Guten Tag} other {Guten Abend}}, {name}!",
