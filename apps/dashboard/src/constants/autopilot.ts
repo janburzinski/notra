@@ -85,7 +85,13 @@ export const AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS = 30;
 /** "commits:owner/repo#123", the fingerprint of a post about one pull request. */
 export const AUTOPILOT_COMMIT_FINGERPRINT = /^commits:([^/]+)\/([^#]+)#(\d+)$/;
 export const AUTOPILOT_COMMITS_MAX_REPOSITORIES = 5;
+/** Closed pull requests read per page; pages stop once the lookback window is covered. */
+export const AUTOPILOT_COMMITS_PAGE_SIZE = 100;
+export const AUTOPILOT_COMMITS_MAX_PAGES = 5;
+/** Pull requests per repository that pass the filters and go on, best ranked first. */
 export const AUTOPILOT_COMMITS_MAX_PULL_REQUESTS = 30;
+/** Ranked pull requests per repository a path filter may check; each costs a changed-file read. */
+export const AUTOPILOT_COMMITS_MAX_FILTER_CHECKS = 90;
 /**
  * Changed files read per pull request for a path filter, at 100 a page. A
  * bigger pull request with no match in what was read is kept: unknown is not
@@ -124,6 +130,13 @@ export const AUTOPILOT_AUTHOR_PRESETS_SHOWN = 8;
  */
 export const AUTOPILOT_COMMITS_SKIP_TITLE =
   /^(?:(?:chore|ci|build|test|tests|style|deps|revert)(?:\([^)]*\))?!?:|bump |merge |release )/i;
+/**
+ * A busy repository merges more in a week than the planner sees in a run, so
+ * features go first. Titles without a conventional prefix rank with fixes.
+ */
+export const AUTOPILOT_COMMITS_FEATURE_TITLE = /^feat(?:\([^)]*\))?!?:/i;
+export const AUTOPILOT_COMMITS_MINOR_TITLE =
+  /^(?:refactor|docs|doc)(?:\([^)]*\))?!?:/i;
 
 /**
  * "User-facing" alone let redesigns and setup-flow PRs through at 96%: the bar

@@ -11,7 +11,10 @@ import {
   AUTOPILOT_COMMITS_JEV_NONE,
   AUTOPILOT_COMMITS_LOOKBACK_DAYS,
   AUTOPILOT_COMMITS_MAX_LOOKBACK_DAYS,
+  AUTOPILOT_COMMITS_MAX_FILTER_CHECKS,
+  AUTOPILOT_COMMITS_MAX_PAGES,
   AUTOPILOT_COMMITS_MAX_PULL_REQUESTS,
+  AUTOPILOT_COMMITS_PAGE_SIZE,
   AUTOPILOT_COMMITS_MAX_REPOSITORIES,
   AUTOPILOT_CONTEXT_FILE_MAX_CHARS,
   AUTOPILOT_FINDING_MAX_FAILURES,
@@ -55,6 +58,7 @@ import {
 } from "@/lib/autopilot/leases";
 import { generateAutopilotObject } from "@/lib/autopilot/llm";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
+import { listReadyTopicObservationIds } from "@/lib/autopilot/memory";
 import { loadDecisionMemory } from "@/lib/autopilot/rules";
 import { writeBlogPost } from "@/lib/autopilot/writer";
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
@@ -88,6 +92,7 @@ import {
   searchGapDropReason,
 } from "@/utils/autopilot-blog";
 import { autopilotDraftBranchSlug } from "@/utils/autopilot-branches";
+import { excludedAuthorReason } from "@/utils/autopilot-commit-filters";
 import {
   heroImageLocation,
   imageFrontmatterFields,
@@ -100,6 +105,7 @@ import {
   pullRequestLabel,
   isNotraPullRequest,
   isPostCandidateTitle,
+  pullRequestTitleRank,
   parseCommitFingerprint,
   toMergedPullRequest,
 } from "@/utils/autopilot-github";
@@ -918,10 +924,46 @@ async function commitsLookbackDays(ctx: AutopilotRunContext) {
   );
 }
 
+/**
+ * Closed pull requests, most recently updated first, until the page reaches
+ * past `since`: a merge in the window was updated in it too.
+ */
+async function listClosedPullRequestsSince(
+  octokit: AutopilotOctokit,
+  repository: { owner: string; name: string },
+  since: number
+) {
+  const pulls = [];
+  for (let page = 1; page <= AUTOPILOT_COMMITS_MAX_PAGES; page++) {
+    const { data } = await octokit.request("GET /repos/{owner}/{repo}/pulls", {
+      owner: repository.owner,
+      repo: repository.name,
+      state: "closed",
+      sort: "updated",
+      direction: "desc",
+      per_page: AUTOPILOT_COMMITS_PAGE_SIZE,
+      page,
+    });
+    pulls.push(...data);
+    const last = data.at(-1);
+    if (
+      data.length < AUTOPILOT_COMMITS_PAGE_SIZE ||
+      !last ||
+      new Date(last.updated_at).getTime() < since
+    ) {
+      break;
+    }
+  }
+  return pulls;
+}
+
 async function listRecentMergedPullRequests(
   ctx: AutopilotRunContext,
   lookbackDays: number,
-  handled: Set<string>
+  handled: Set<string>,
+  rank: (
+    pull: Pick<MergedPullRequest, "repository" | "number" | "title">
+  ) => number
 ) {
   const repositories = await Effect.runPromise(
     listGitHubAppRepositoriesEffect(ctx.organizationId)
@@ -949,16 +991,10 @@ async function listRecentMergedPullRequests(
       if (!octokit) {
         return null;
       }
-      const { data } = await octokit.request(
-        "GET /repos/{owner}/{repo}/pulls",
-        {
-          owner: repository.owner,
-          repo: repository.name,
-          state: "closed",
-          sort: "updated",
-          direction: "desc",
-          per_page: AUTOPILOT_COMMITS_MAX_PULL_REQUESTS,
-        }
+      const data = await listClosedPullRequestsSince(
+        octokit,
+        repository,
+        since
       );
       const recent = data.filter(
         (pull) => pull.merged_at && new Date(pull.merged_at).getTime() >= since
@@ -971,40 +1007,95 @@ async function listRecentMergedPullRequests(
             login: pull.user?.login ?? null,
           })
       );
-      const titled = authored
-        .filter((pull) => isPostCandidateTitle(pull.title))
-        .map((pull) =>
-          toMergedPullRequest(repository.fullName, {
+      const candidates = authored.filter((pull) =>
+        isPostCandidateTitle(pull.title)
+      );
+      // Settled pull requests and excluded authors drop out without a file
+      // read, so they must not take a slot in the ranked cut.
+      const isOut = (pull: (typeof candidates)[number]) =>
+        handled.has(
+          commitFingerprint({
+            repository: repository.fullName,
+            number: pull.number,
+          })
+        ) ||
+        excludedAuthorReason(ctx.commitFilters, pull.user?.login ?? null) !==
+          null;
+      const toPull = (pull: (typeof candidates)[number]) =>
+        toMergedPullRequest(repository.fullName, {
+          number: pull.number,
+          title: pull.title,
+          url: pull.html_url,
+          body: pull.body ?? null,
+          author: pull.user?.login ?? null,
+        });
+      const eligible = candidates
+        .filter((pull) => !isOut(pull))
+        .map((pull, index) => ({
+          pull,
+          index,
+          rank: rank({
+            repository: repository.fullName,
             number: pull.number,
             title: pull.title,
-            url: pull.html_url,
-            body: pull.body ?? null,
-            author: pull.user?.login ?? null,
-          })
-        );
+          }),
+        }))
+        .sort((a, b) => a.rank - b.rank || a.index - b.index)
+        .map(({ pull }) => toPull(pull));
+      const pulls: MergedPullRequest[] = [];
+      const filtered: { pull: MergedPullRequest; reason: string }[] = [];
       // Settled ones drop out later anyway, so they cost no file read.
-      const skipReasons = await Promise.all(
-        titled.map((pull) =>
-          handled.has(commitFingerprint(pull))
-            ? null
-            : commitFilterSkipReason({
-                filters: ctx.commitFilters,
-                repository,
-                pull,
-                getOctokit: async () => octokit,
-              })
-        )
-      );
-      const pulls = titled.filter((_, index) => !skipReasons[index]);
-      const filtered = titled.flatMap((pull, index) => {
-        const reason = skipReasons[index];
-        return reason ? [{ pull, reason }] : [];
-      });
+      const sort = async (batch: MergedPullRequest[]) => {
+        const reasons = await Promise.all(
+          batch.map((pull) =>
+            handled.has(commitFingerprint(pull))
+              ? null
+              : commitFilterSkipReason({
+                  filters: ctx.commitFilters,
+                  repository,
+                  pull,
+                  getOctokit: async () => octokit,
+                })
+          )
+        );
+        let passed = 0;
+        for (const [index, pull] of batch.entries()) {
+          const reason = reasons[index];
+          if (reason) {
+            filtered.push({ pull, reason });
+          } else {
+            pulls.push(pull);
+            passed += 1;
+          }
+        }
+        return passed;
+      };
+      await sort(candidates.filter(isOut).map(toPull));
+      // A path filter can reject a whole batch, so keep reading down the
+      // ranking until enough pass or the file-read budget is spent.
+      let kept = 0;
+      let checked = 0;
+      while (
+        kept < AUTOPILOT_COMMITS_MAX_PULL_REQUESTS &&
+        checked < Math.min(eligible.length, AUTOPILOT_COMMITS_MAX_FILTER_CHECKS)
+      ) {
+        const batch = eligible.slice(
+          checked,
+          Math.min(
+            checked + AUTOPILOT_COMMITS_MAX_PULL_REQUESTS - kept,
+            AUTOPILOT_COMMITS_MAX_FILTER_CHECKS
+          )
+        );
+        checked += batch.length;
+        kept += await sort(batch);
+      }
       const label = (pull: { number: number; title: string }) =>
         `${repository.fullName}#${pull.number} ${pull.title}`;
+      const recentSet = new Set(recent);
+      const authoredSet = new Set(authored);
       const dropped = [
         ...data
-          .filter((pull) => !recent.includes(pull))
+          .filter((pull) => !recentSet.has(pull))
           .map((pull) => ({
             pullRequest: label(pull),
             reason: pull.merged_at
@@ -1012,7 +1103,7 @@ async function listRecentMergedPullRequests(
               : "Closed without merging",
           })),
         ...recent
-          .filter((pull) => !authored.includes(pull))
+          .filter((pull) => !authoredSet.has(pull))
           .map((pull) => ({
             pullRequest: label(pull),
             reason: "Opened by Autopilot",
@@ -1023,6 +1114,10 @@ async function listRecentMergedPullRequests(
             pullRequest: label(pull),
             reason: "Title marks it as CI, tests, a bump or a merge",
           })),
+        ...eligible.slice(checked).map((pull) => ({
+          pullRequest: label(pull),
+          reason: `Ranked below the ${AUTOPILOT_COMMITS_MAX_PULL_REQUESTS} kept for this repository`,
+        })),
         ...filtered.map((row) => ({
           pullRequest: label(row.pull),
           reason: `Filtered out: ${row.reason}`,
@@ -1035,7 +1130,7 @@ async function listRecentMergedPullRequests(
         closed: data.length,
         mergedRecently: recent.length,
         byAutopilot: recent.length - authored.length,
-        choreTitles: authored.length - titled.length,
+        choreTitles: authored.length - candidates.length,
         byFilters: filtered.length,
       };
     })
@@ -1104,14 +1199,28 @@ export async function runCommitsJob(
       { posts: dismissedOffers }
     );
   }
-  const [lookbackDays, settled] = await Promise.all([
+  const [lookbackDays, settled, ready] = await Promise.all([
     commitsLookbackDays(ctx),
     listSettledFingerprints(ctx.organizationId, "commits"),
+    listReadyTopicObservationIds(ctx.organizationId),
   ]);
-  const merged = await listRecentMergedPullRequests(ctx, lookbackDays, settled);
-  const fresh = merged.pullRequests.filter(
-    (pull) => !settled.has(commitFingerprint(pull))
+  // Evidence of topics that are ready to act on first, then features.
+  const rank = (
+    pull: Pick<MergedPullRequest, "repository" | "number" | "title">
+  ) =>
+    ready.has(commitFingerprint(pull)) ? -1 : pullRequestTitleRank(pull.title);
+  const merged = await listRecentMergedPullRequests(
+    ctx,
+    lookbackDays,
+    settled,
+    rank
   );
+  // Each repository's list is ranked already; this ranks across repositories.
+  const fresh = merged.pullRequests
+    .filter((pull) => !settled.has(commitFingerprint(pull)))
+    .map((pull, index) => ({ pull, index }))
+    .sort((a, b) => rank(a.pull) - rank(b.pull) || a.index - b.index)
+    .map(({ pull }) => pull);
   const pullRequests = fresh.slice(0, AUTOPILOT_MAX_OBSERVATIONS);
   await log.trace("Commit filter: every pull request and why it was dropped", {
     dropped: [

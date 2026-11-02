@@ -2,6 +2,7 @@ import {
   AUTOPILOT_ACTION_JEV_MODEL_ID,
   AUTOPILOT_DAY_MS,
   AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS,
+  AUTOPILOT_PLANNER_RETRY_REASONING,
 } from "@notra/ai/constants/autopilot-planner";
 import { planAutopilotRun } from "@notra/ai/jobs/autopilot-planner";
 import type {
@@ -34,6 +35,7 @@ import {
   recordId,
   renderRecords,
 } from "@notra/memory/utils/records";
+import { NoObjectGeneratedError } from "ai";
 
 import {
   EVAL_AUTOPILOT_ACTED_BY_OUTCOME,
@@ -43,7 +45,12 @@ import {
   SCENARIO_BRAND,
   SCENARIO_START,
 } from "../fixtures/autopilot-scenarios";
-import { callJev, callObject } from "../models/gateway";
+import {
+  callJev,
+  callObject,
+  runCostDetails,
+  toUsage,
+} from "../models/gateway";
 import type {
   AutopilotScenarioExpected,
   AutopilotScenarioInput,
@@ -294,14 +301,35 @@ export async function runPlannerScenario(
       runId: runIdAt(index),
       now: runDate(index),
       generate: async (call) => {
-        const result = await callObject({
-          modelId: ctx.contender.modelId,
-          feature: "autopilot-planner",
-          schema: call.schema,
-          system: call.instructions,
-          prompt: call.prompt,
-          maxOutputTokens: AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS,
-          abortSignal: ctx.abortSignal,
+        const generate = (reasoning?: "low" | "medium") =>
+          callObject({
+            modelId: ctx.contender.modelId,
+            feature: "autopilot-planner",
+            schema: call.schema,
+            system: call.instructions,
+            prompt: call.prompt,
+            maxOutputTokens: AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS,
+            reasoning,
+            abortSignal: ctx.abortSignal,
+          });
+        // Same retry as the dashboard's generateAutopilotObject.
+        const result = await generate().catch(async (error: unknown) => {
+          if (!NoObjectGeneratedError.isInstance(error)) {
+            throw error;
+          }
+          // The failed attempt was billed too.
+          const failed = toUsage(error.usage);
+          addUsage(usage, failed);
+          costs.push(
+            await runCostDetails(ctx.contender.modelId, failed, [
+              { usage: error.usage },
+            ])
+          );
+          return generate(
+            error.finishReason === "length"
+              ? AUTOPILOT_PLANNER_RETRY_REASONING
+              : undefined
+          );
         });
         addUsage(usage, result.usage);
         costs.push(result);

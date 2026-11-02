@@ -4,8 +4,16 @@
  * tied to the agent default: Sonnet 5 passed 91% of scenarios, Luna 77%.
  */
 export const AUTOPILOT_PLANNER_MODEL_ID = "anthropic/claude-sonnet-5";
-/** Room for thinking (~1.5k) and the plan (~2.5k); a degenerate loop still stops fast. */
-export const AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS = 8000;
+/**
+ * Thinking takes most of it: a busy week of merges measured 6.6k to 9.5k
+ * output tokens, so 8k cut real plans off.
+ */
+export const AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS = 16_000;
+/**
+ * A plan that still runs out of tokens is asked again with less thinking.
+ * Not the default: medium and low passed fewer eval scenarios.
+ */
+export const AUTOPILOT_PLANNER_RETRY_REASONING = "medium";
 
 /** Jev rates the concrete action, not whether any candidate is interesting. */
 export const AUTOPILOT_ACTION_JEV_MODEL_ID = "typesafe-ai/jev-1.14.0";

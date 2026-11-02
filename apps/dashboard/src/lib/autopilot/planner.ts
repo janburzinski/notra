@@ -4,6 +4,7 @@ import {
   AUTOPILOT_DAY_MS,
   AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS,
   AUTOPILOT_PLANNER_MODEL_ID,
+  AUTOPILOT_PLANNER_RETRY_REASONING,
 } from "@notra/ai/constants/autopilot-planner";
 import { getEvaluationClient } from "@notra/ai/evaluation/client";
 import { planAutopilotRun } from "@notra/ai/jobs/autopilot-planner";
@@ -237,6 +238,7 @@ export async function decideAutopilotPlan(
         instructions: call.instructions,
         prompt: call.prompt,
         maxOutputTokens: AUTOPILOT_PLANNER_MAX_OUTPUT_TOKENS,
+        retryReasoning: AUTOPILOT_PLANNER_RETRY_REASONING,
       }),
     evaluate: async (evaluation) => {
       const verdict = await getEvaluationClient().tryEvaluate({

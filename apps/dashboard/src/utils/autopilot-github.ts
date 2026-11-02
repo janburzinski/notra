@@ -3,6 +3,8 @@ import { getGitHubMentionAppHandles } from "@notra/ai/utils/github-mention";
 
 import {
   AUTOPILOT_COMMIT_FINGERPRINT,
+  AUTOPILOT_COMMITS_FEATURE_TITLE,
+  AUTOPILOT_COMMITS_MINOR_TITLE,
   AUTOPILOT_COMMITS_SKIP_TITLE,
   AUTOPILOT_MAX_REVIEWERS,
 } from "@/constants/autopilot";
@@ -63,6 +65,14 @@ export function isBotAuthor(user: { type?: string | null; login: string }) {
 
 export function isPostCandidateTitle(title: string) {
   return !AUTOPILOT_COMMITS_SKIP_TITLE.test(title);
+}
+
+/** Lower ranks first: features, then fixes and unprefixed titles, then refactors and docs. */
+export function pullRequestTitleRank(title: string) {
+  if (AUTOPILOT_COMMITS_FEATURE_TITLE.test(title)) {
+    return 0;
+  }
+  return AUTOPILOT_COMMITS_MINOR_TITLE.test(title) ? 2 : 1;
 }
 
 /** Unknown or public source visibility must not reveal a private destination. */

@@ -16,18 +16,21 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
   instructions: string;
   prompt: string;
   maxOutputTokens?: number;
+  /** Reasoning for the retry when the first answer ran out of tokens. */
+  retryReasoning?: "low" | "medium";
   log: AutopilotLogger;
   /** Reports what the call cost, e.g. to bill an @notra request. */
   onUsage?: (usage: AgentTokenUsage) => void;
 }): Promise<z.infer<T>> {
   const startedAt = Date.now();
-  const generate = () =>
+  const generate = (reasoning?: "low" | "medium") =>
     generateText({
       model: gateway(params.modelId, { organizationId: params.organizationId }),
       output: Output.object({ schema: params.schema }),
       instructions: params.instructions,
       prompt: params.prompt,
       maxOutputTokens: params.maxOutputTokens,
+      reasoning,
       providerOptions: withRouterDefaults(
         { gateway: { tags: ["autopilot", params.tag] } },
         { modelId: params.modelId }
@@ -51,11 +54,17 @@ export async function generateAutopilotObject<T extends z.ZodType>(params: {
         modelId: params.modelId,
       });
     }
+    const reasoning =
+      error.finishReason === "length" ? params.retryReasoning : undefined;
     await params.log.action(`Retrying ${params.modelId} (${params.tag})`, {
-      reason: "The response was not valid JSON",
+      reason:
+        error.finishReason === "length"
+          ? "The response ran out of tokens"
+          : "The response was not valid JSON",
       outputTokens: error.usage?.outputTokens ?? null,
+      reasoning: reasoning ?? null,
     });
-    return generate();
+    return generate(reasoning);
   });
   params.onUsage?.({ ...toAgentTokenUsage(usage), modelId: params.modelId });
   await params.log.action(
