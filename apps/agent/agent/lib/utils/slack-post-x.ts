@@ -293,10 +293,10 @@ export function getPostToXCompletionMessage(
   turnId: string
 ): string {
   if (!outcome || outcome.turnId !== turnId) {
-    return "Nice, glad that worked. Want me to save this as a reference?";
+    return "Nothing was published from Notra. If you posted it from X's composer, want me to save it as a reference?";
   }
   if (outcome.failed) {
-    return "Posting to X failed. The draft card above is still active, so you can try again or save it as a draft.";
+    return "Posting to X failed or couldn't be confirmed. Check the X account before retrying from the tweet card, so it isn't posted twice.";
   }
   if (!outcome.confirmed) {
     return "The post was sent to X, but confirmation timed out. Check the account before retrying to avoid a duplicate.";

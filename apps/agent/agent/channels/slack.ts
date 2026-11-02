@@ -10,7 +10,13 @@ import {
   slackChannel,
 } from "eve/channels/slack";
 
-import { CREATE_POST_TOOL_NAMES } from "../lib/constants/slack";
+import {
+  CREATE_POST_TOOL_NAMES,
+  POST_TO_X_NOT_PENDING_MESSAGE,
+  SLACK_PERMISSION_ERROR_PATTERN,
+  SLACK_SESSION_FAILED_MESSAGE,
+  SLACK_TURN_FAILED_MESSAGE,
+} from "../lib/constants/slack";
 import {
   SLACK_LEAVE_ACTION_ID,
   SLACK_STOP_ACTION_ID,
@@ -62,6 +68,11 @@ import {
   switchPendingPostToXAccount,
 } from "../lib/utils/slack-post-x";
 import { parseSlackDashboardRelay } from "../lib/utils/slack-relay";
+import {
+  getErrorId,
+  postSlackReply,
+  withErrorId,
+} from "../lib/utils/slack-reply";
 import { getNotraSlackState } from "../lib/utils/slack-state";
 import { isPostToXRejection } from "../lib/utils/slack-tool-results";
 import { firstNonEmptyLine } from "../lib/utils/text";
@@ -170,26 +181,40 @@ const onSlackInteraction: NonNullable<
     if (!installation || !isChannelAllowed(installation, ctx.slack.channelId)) {
       return;
     }
-    const pending = await readPendingPostToXForOrganization(
-      parsed.callId,
-      installation.organizationId
-    );
-    if (!pending) {
-      return;
-    }
-    const accounts = await getLinkedTwitterAccounts(
-      installation.organizationId
-    );
-    await runWithSlackInstallation(installation, () =>
-      ctx.thread.post(
-        buildPostToXConfirmCard({
-          requestId: parsed.requestId,
+    await runWithSlackInstallation(installation, async () => {
+      const pending = await readPendingPostToXForOrganization(
+        parsed.callId,
+        installation.organizationId
+      );
+      if (!pending) {
+        await ctx.thread.postEphemeral(
+          action.user.id,
+          POST_TO_X_NOT_PENDING_MESSAGE
+        );
+        return;
+      }
+      try {
+        const accounts = await getLinkedTwitterAccounts(
+          installation.organizationId
+        );
+        await ctx.thread.post(
+          buildPostToXConfirmCard({
+            requestId: parsed.requestId,
+            callId: parsed.callId,
+            username: pending.username,
+            accounts,
+          })
+        );
+      } catch (error) {
+        logError("Slack Post to X confirm failed", error, {
           callId: parsed.callId,
-          username: pending.username,
-          accounts,
-        })
-      )
-    );
+        });
+        await ctx.thread.postEphemeral(
+          action.user.id,
+          "I couldn't load your linked X accounts. Please try again in a moment."
+        );
+      }
+    });
     return;
   }
 
@@ -205,19 +230,21 @@ const onSlackInteraction: NonNullable<
     ) {
       return;
     }
-    if (
-      !(await readPendingPostToXForOrganization(
+    await runWithSlackInstallation(installation, async () => {
+      const pending = await readPendingPostToXForOrganization(
         callId,
         installation.organizationId
-      ))
-    ) {
-      return;
-    }
-    await runWithSlackInstallation(installation, async () => {
-      const outcome = await publishPendingPostToX(callId, callId);
-      if (outcome) {
-        await ctx.thread.post(getPostToXCompletionMessage(outcome, callId));
-      }
+      );
+      const outcome = pending
+        ? await publishPendingPostToX(callId, callId)
+        : undefined;
+      // No outcome means the post expired or another click already claimed it.
+      await (outcome
+        ? ctx.thread.post(getPostToXCompletionMessage(outcome, callId))
+        : ctx.thread.postEphemeral(
+            action.user.id,
+            POST_TO_X_NOT_PENDING_MESSAGE
+          ));
     });
     return;
   }
@@ -350,6 +377,8 @@ export default slackChannel({
             sessionId: ctx.session.id,
           });
           state.notraChartFailureTurnId = data.turnId;
+          state.notraChartFailureIsPermission =
+            SLACK_PERMISSION_ERROR_PATTERN.test(String(error));
         }
         return;
       }
@@ -409,8 +438,11 @@ export default slackChannel({
         if (state.notraChartFailureTurnId === data.turnId) {
           state.notraChartFailureTurnId = undefined;
           await channel.thread.post(
-            "I couldn't render or upload the chart. Check that the Slack app has files:write permission, then try again."
+            state.notraChartFailureIsPermission
+              ? "I couldn't upload the chart because the Slack app is missing a permission. Reinstall Notra in Slack so it can post files, then try again."
+              : "I couldn't render or upload the chart. Try again, or ask for the numbers as a table instead."
           );
+          state.notraChartFailureIsPermission = undefined;
         }
         const completion = state.notraDraftCompletion;
         const hasContentPullRequestResult =
@@ -456,10 +488,39 @@ export default slackChannel({
         }
 
         if (data.message) {
-          await channel.thread.post(data.message);
+          await postSlackReply(channel, data.message);
         } else {
           await channel.thread.startTyping();
         }
+      }),
+    "turn.failed": (data, channel, ctx) =>
+      runWithSlackTeam(channel.state.installationTeamId, async () => {
+        const errorId = getErrorId(data.details);
+        logError("Slack agent turn failed", data.message, {
+          sessionId: ctx.session.id,
+          code: data.code,
+          errorId,
+        });
+        await mirrorSessionStatus(ctx, "idle");
+        await channel.thread.post(
+          withErrorId(SLACK_TURN_FAILED_MESSAGE, errorId)
+        );
+      }),
+    "turn.cancelled": (_data, channel, ctx) =>
+      runWithSlackTeam(channel.state.installationTeamId, () =>
+        mirrorSessionStatus(ctx, "idle")
+      ),
+    "session.failed": (data, channel) =>
+      runWithSlackTeam(channel.state.installationTeamId, async () => {
+        const errorId = getErrorId(data.details);
+        logError("Slack agent session failed", data.message, {
+          code: data.code,
+          sessionId: data.sessionId,
+          errorId,
+        });
+        await channel.thread.post(
+          withErrorId(SLACK_SESSION_FAILED_MESSAGE, errorId)
+        );
       }),
     "reasoning.appended": () => undefined,
     "turn.started": (_data, channel, ctx) =>

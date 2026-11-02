@@ -41,6 +41,7 @@ export interface PostToXOutcome {
 
 export interface NotraSlackStateExtras {
   notraChartFailureTurnId?: string;
+  notraChartFailureIsPermission?: boolean;
   notraDraftCompletion?: DraftCompletionState;
   notraContentPullRequestTurnIds?: string[];
   notraPostToXTurnId?: string;
