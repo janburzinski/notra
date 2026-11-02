@@ -6,6 +6,17 @@ export const CREATE_POST_TOOL_NAMES = new Set([
   "create_twitter_post",
 ]);
 
+export const AUTOPILOT_VOTE_REACTIONS: Record<string, "up" | "down"> = {
+  "+1": "up",
+  thumbsup: "up",
+  "-1": "down",
+  thumbsdown: "down",
+};
+
+export const SLACK_SKIN_TONE_SUFFIX = /::skin-tone-\d$/;
+
+export const AUTOPILOT_SLACK_ACTION_TIMEOUT_MS = 60_000;
+
 /** Slack's limit for the `markdown_text` field eve uses to post replies. */
 export const SLACK_MARKDOWN_TEXT_MAX_LENGTH = 12_000;
 

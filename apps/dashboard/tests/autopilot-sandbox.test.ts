@@ -187,7 +187,7 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     expect(
       await postAutopilotBrief(
         "sandbox-org",
-        { text: "Must not send", blocks: [] },
+        { text: "Must not send", blocks: [], items: [] },
         "item-run"
       )
     ).toBeNull();
@@ -213,11 +213,15 @@ if (process.env.NOTRA_AUTOPILOT_SANDBOX_TEST !== "1") {
     if (!brief) {
       throw new Error("Expected a brief");
     }
-    expect(brief.blocks.length).toBeLessThanOrEqual(50);
-    const serialized = JSON.stringify(brief.blocks);
+    expect(brief.items).toHaveLength(5);
+    const blocks = [brief, ...brief.items].flatMap((message) => {
+      expect(message.blocks.length).toBeLessThanOrEqual(50);
+      return message.blocks;
+    });
+    const serialized = JSON.stringify(blocks);
     expect(serialized).not.toContain("<!channel>");
     expect(serialized).not.toContain("<!here>");
-    for (const block of brief.blocks) {
+    for (const block of blocks) {
       const text = block.text as { text?: string } | undefined;
       if (text?.text) {
         expect(text.text.length).toBeLessThanOrEqual(3000);

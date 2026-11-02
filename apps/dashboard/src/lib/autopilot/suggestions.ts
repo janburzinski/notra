@@ -1,9 +1,11 @@
+import { logError } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import { autopilotFindings, autopilotSettings } from "@notra/db/schema";
 import { and, eq } from "drizzle-orm";
 
 import { withAutopilotDraftBilling } from "@/lib/autopilot/billing";
 import { writeFindingPost } from "@/lib/autopilot/blog";
+import { reportAutopilotWriteInSlack } from "@/lib/autopilot/brief";
 import {
   claimSuggestedFinding,
   returnFindingToSuggested,
@@ -71,6 +73,8 @@ export async function writeSuggestedPost(
   const runId =
     queuedRunId ?? (await createItemAutopilotRun(organizationId, "suggestion"));
   let error: string | undefined;
+  // Not a failure of the run, but the person who asked still needs to hear why.
+  let skipped: string | undefined;
   let claim: FindingClaim | null = null;
   try {
     const { finding, brief } = await loadSuggestedPost(
@@ -126,6 +130,10 @@ export async function writeSuggestedPost(
     if (billed.value.status === "failed") {
       throw new AutopilotSuggestionError(billed.value.error);
     }
+    if (billed.value.status === "suggested") {
+      skipped =
+        "the workspace's Autopilot rules don't allow this post, so it stays an idea.";
+    }
   } catch (failure) {
     error = toErrorMessage(failure, String(failure));
     if (claim) {
@@ -141,5 +149,18 @@ export async function writeSuggestedPost(
       scheduled: false,
       error,
     });
+    // Only the run that got to write answers; a duplicate request stays quiet.
+    if (claim) {
+      await reportAutopilotWriteInSlack(
+        organizationId,
+        findingId,
+        error ?? skipped
+      ).catch((failure) =>
+        logError("Autopilot Slack write report failed", failure, {
+          organizationId,
+          findingId,
+        })
+      );
+    }
   }
 }

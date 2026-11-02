@@ -299,12 +299,16 @@ export async function deliverAutopilotBrief(params: {
     if (!(await renewAutopilotRunLease(ctx))) {
       throw new Error("The run no longer owns its delivery lease");
     }
-    const ts = await postAutopilotBrief(ctx.organizationId, brief, ctx.runId);
-    if (ts) {
+    const delivery = await postAutopilotBrief(
+      ctx.organizationId,
+      brief,
+      ctx.runId
+    );
+    if (delivery) {
       await db.transaction(async (tx) => {
         const recorded = await tx
           .update(autopilotRuns)
-          .set({ slackMessageTs: ts })
+          .set({ slackMessageTs: delivery.ts })
           .where(
             and(
               eq(autopilotRuns.id, ctx.runId),
@@ -316,14 +320,10 @@ export async function deliverAutopilotBrief(params: {
         if (!recorded.length) {
           throw new Error("The run lost its delivery lease");
         }
-        const visibleFindingIds = new Set(brief.findingIds);
         for (const status of ["suggested", "proposed"] as const) {
-          const ids = findings
-            .filter(
-              (finding) =>
-                finding.status === status && visibleFindingIds.has(finding.id)
-            )
-            .map((finding) => finding.id);
+          const ids = delivery.items
+            .filter((item) => item.status === status)
+            .map((item) => item.findingId);
           if (!ids.length) {
             continue;
           }
@@ -344,7 +344,7 @@ export async function deliverAutopilotBrief(params: {
     } else {
       await log.skip("No brief sent: Slack is not connected");
     }
-    return ts;
+    return delivery?.ts ?? null;
   } catch (error) {
     await log.error("Could not post the brief", {
       error: toErrorMessage(error, String(error)),

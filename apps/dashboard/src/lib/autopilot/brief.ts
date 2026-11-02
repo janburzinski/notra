@@ -1,87 +1,102 @@
+import { logError } from "@notra/ai/utils/server-log";
 import { getAppUrl } from "@notra/ai/utils/url";
 import { db } from "@notra/db/drizzle";
-import { autopilotSettings, slackIntegrations } from "@notra/db/schema";
-import { and, eq } from "drizzle-orm";
+import {
+  autopilotFindings,
+  autopilotSettings,
+  organizations,
+  slackIntegrations,
+} from "@notra/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 
 import { AUTOPILOT_NAV_LINK } from "@/constants/autopilot";
 import { AUTOPILOT_SLACK_KIND_LABELS } from "@/constants/autopilot-slack";
 import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { createAutopilotLogger } from "@/lib/autopilot/log";
-import { postAutopilotSlackMessage } from "@/lib/autopilot/slack";
+import {
+  callAutopilotSlack,
+  postAutopilotSlackMessage,
+} from "@/lib/autopilot/slack";
 import type { AutopilotFindingRow as FindingRow } from "@/types/autopilot-runtime";
-import type { SlackBlock } from "@/types/autopilot-slack";
+import type {
+  AutopilotBrief,
+  AutopilotBriefDelivery,
+  AutopilotFindingMessage,
+  SlackBlock,
+} from "@/types/autopilot-slack";
 import { autopilotSlackMessageId } from "@/utils/autopilot-delivery";
 import { findingDisplayTitle } from "@/utils/autopilot-findings";
-import { compactSlackText } from "@/utils/autopilot-slack";
+import { compactSlackText, slackMrkdwn } from "@/utils/autopilot-slack";
 
-function findingUrl(slug: string, findingId: string, action?: string) {
-  const base = `${getAppUrl() ?? ""}/${slug}${AUTOPILOT_NAV_LINK}`;
-  const params = new URLSearchParams({ finding: findingId });
-  if (action) {
-    params.set("action", action);
+function bulletList(title: string, items: string[]) {
+  if (items.length === 0) {
+    return null;
   }
-  return `${base}?${params.toString()}`;
+  const more = items.length > 3 ? `\n+${items.length - 3} more in Notra` : "";
+  return `*${title}*\n${items
+    .slice(0, 3)
+    .map((item) => `• ${item}`)
+    .join("\n")}${more}`;
 }
 
-function findingBlocks(slug: string, finding: FindingRow): SlackBlock[] {
-  const buttons: SlackBlock[] = [
-    {
-      type: "button",
-      style: "primary",
-      text: {
-        type: "plain_text",
-        text: finding.status === "suggested" ? "Review idea" : "Merge",
-      },
-      url:
-        finding.status === "suggested"
-          ? `${getAppUrl() ?? ""}/${slug}${AUTOPILOT_NAV_LINK}/findings/${finding.id}`
-          : findingUrl(slug, finding.id, "merge"),
-      action_id: `autopilot_merge_${finding.id}`,
-    },
-  ];
-  if (finding.pullRequestUrl) {
-    buttons.push({
-      type: "button",
-      text: { type: "plain_text", text: "View diff" },
-      url: `${finding.pullRequestUrl}/files`,
-      action_id: `autopilot_diff_${finding.id}`,
-    });
-  }
-  buttons.push({
-    type: "button",
-    text: { type: "plain_text", text: "Dismiss" },
-    url: findingUrl(slug, finding.id, "dismiss"),
-    action_id: `autopilot_dismiss_${finding.id}`,
-  });
-  const title = compactSlackText(findingDisplayTitle(finding), 100);
+function findingSummary(finding: FindingRow) {
   const target = finding.evidence.target;
-  const summary = compactSlackText(
-    target?.kind === "prompt"
-      ? `Your brand appears in ${Math.round(target.before * 100)}% of AI answers for this question.${finding.evidence.competitors?.length ? ` Competing with ${finding.evidence.competitors.slice(0, 3).join(", ")}.` : ""}`
-      : finding.kind === "commits"
-        ? "A blog post based on your recently shipped changes."
-        : finding.summary,
-    180
-  );
-  return [
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `*${title}*\n${summary}`,
-      },
-    },
-    {
-      type: "context",
-      elements: [
-        {
-          type: "mrkdwn",
-          text: `${AUTOPILOT_SLACK_KIND_LABELS[finding.kind]}${finding.pullRequestUrl ? ` · <${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>` : ""}${finding.status === "suggested" ? " · Waiting for you" : ""}`,
+  if (target?.kind === "prompt") {
+    const competitors = finding.evidence.competitors?.slice(0, 3) ?? [];
+    return `Your brand appears in ${Math.round(target.before * 100)}% of AI answers for this question.${competitors.length ? ` Competing with ${competitors.join(", ")}.` : ""}`;
+  }
+  if (finding.kind === "commits") {
+    return "A blog post based on your recently shipped changes.";
+  }
+  return finding.summary;
+}
+
+function findingMessage(
+  slug: string,
+  finding: FindingRow
+): AutopilotFindingMessage {
+  const isIdea = finding.status === "suggested";
+  const title = compactSlackText(findingDisplayTitle(finding), 100);
+  const meta = [
+    isIdea ? "Idea" : "Ready to merge",
+    AUTOPILOT_SLACK_KIND_LABELS[finding.kind],
+    finding.pullRequestUrl
+      ? `<${finding.pullRequestUrl}|PR #${finding.pullRequestNumber}>`
+      : null,
+    finding.pullRequestUrl
+      ? `<${finding.pullRequestUrl}/files|View diff>`
+      : null,
+  ].filter(Boolean);
+  return {
+    findingId: finding.id,
+    status: isIdea ? "suggested" : "proposed",
+    text: title,
+    blocks: [
+      {
+        type: "section",
+        text: slackMrkdwn(
+          `*${title}*\n${compactSlackText(findingSummary(finding), 180)}`
+        ),
+        accessory: {
+          type: "button",
+          text: { type: "plain_text", text: "Open" },
+          url: `${getAppUrl() ?? ""}/${slug}${AUTOPILOT_NAV_LINK}/findings/${finding.id}`,
+          action_id: `autopilot_open_${finding.id}`,
         },
-      ],
-    },
-    { type: "actions", elements: buttons },
-  ];
+      },
+      { type: "context", elements: [slackMrkdwn(meta.join("  ·  "))] },
+      {
+        type: "context",
+        elements: [
+          slackMrkdwn(
+            isIdea
+              ? "React 👍 to write it or 👎 if you don't want it"
+              : "React 👍 to merge or 👎 to close it"
+          ),
+        ],
+      },
+    ],
+  };
 }
 
 export function buildAutopilotBrief(params: {
@@ -90,7 +105,7 @@ export function buildAutopilotBrief(params: {
   suggested?: FindingRow[];
   merged: FindingRow[];
   insights: string[];
-}): { text: string; blocks: SlackBlock[]; findingIds: string[] } | null {
+}): AutopilotBrief | null {
   const {
     organizationSlug,
     proposed,
@@ -106,7 +121,8 @@ export function buildAutopilotBrief(params: {
   ) {
     return null;
   }
-  const headline = `Autopilot · ${
+  const autopilotUrl = `${getAppUrl() ?? ""}/${organizationSlug}${AUTOPILOT_NAV_LINK}`;
+  const summary =
     [
       proposed.length > 0 ? `${proposed.length} ready to merge` : null,
       suggested.length > 0
@@ -115,92 +131,56 @@ export function buildAutopilotBrief(params: {
       merged.length > 0 ? `${merged.length} merged` : null,
     ]
       .filter(Boolean)
-      .join(" · ") || "Daily insights"
-  }`;
-  const blocks: SlackBlock[] = [
-    {
-      type: "header",
-      text: { type: "plain_text", text: "Autopilot daily brief" },
-    },
-    { type: "context", elements: [{ type: "mrkdwn", text: headline }] },
-  ];
+      .join(" · ") || "Nothing to review today";
   // Keep the digest short; the dashboard lists the rest.
   const visible = [...proposed, ...suggested].slice(0, 5);
-  for (const [index, finding] of visible.entries()) {
-    if (index === 0 || finding.status !== visible[index - 1]?.status) {
-      blocks.push(
-        { type: "divider" },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text:
-              finding.status === "suggested"
-                ? "*Ideas for your next post*"
-                : "*Ready to merge*",
-          },
-        }
-      );
-    } else {
-      blocks.push({ type: "divider" });
-    }
-    blocks.push(...findingBlocks(organizationSlug, finding));
-  }
-  const footer = [
-    ...(merged.length > 0
-      ? [
-          `*Merged since your last brief*\n${merged
-            .slice(0, 3)
-            .map((finding) => `• ${compactSlackText(finding.title, 100)}`)
-            .join(
-              "\n"
-            )}${merged.length > 3 ? `\n+${merged.length - 3} more in Notra` : ""}`,
-        ]
-      : []),
-    ...(insights.length > 0
-      ? [
-          `*Insights*\n${insights
-            .slice(0, 3)
-            .map((insight) => `• ${compactSlackText(insight, 180)}`)
-            .join(
-              "\n"
-            )}${insights.length > 3 ? `\n+${insights.length - 3} more in Notra` : ""}`,
-        ]
-      : []),
-  ];
-  if (footer.length > 0) {
-    blocks.push(
-      { type: "divider" },
-      {
-        type: "context",
-        // A context block permits at most ten elements and 3,000 chars per text.
-        elements: footer.map((text) => ({ type: "mrkdwn", text })),
-      }
-    );
-  }
   const remaining = proposed.length + suggested.length - visible.length;
-  blocks.push({
-    type: "context",
-    elements: [
-      {
-        type: "mrkdwn",
-        text: `${remaining > 0 ? `+${remaining} more ${remaining === 1 ? "item" : "items"} · ` : ""}<${getAppUrl() ?? ""}/${organizationSlug}${AUTOPILOT_NAV_LINK}|Open Autopilot in Notra>`,
+  const blocks: SlackBlock[] = [
+    {
+      type: "section",
+      text: slackMrkdwn(`*Autopilot daily brief*\n${summary}`),
+      accessory: {
+        type: "button",
+        text: { type: "plain_text", text: "Open Autopilot" },
+        url: autopilotUrl,
+        action_id: "autopilot_open",
       },
-    ],
-  });
+    },
+  ];
+  if (visible.length > 0) {
+    blocks.push({
+      type: "context",
+      elements: [
+        slackMrkdwn(
+          `Each item is in the thread. React 👍 or 👎 on it.${remaining > 0 ? ` <${autopilotUrl}|+${remaining} more in Notra>` : ""}`
+        ),
+      ],
+    });
+  }
+  const notes = [
+    bulletList(
+      "Merged since your last brief",
+      merged.map((finding) =>
+        compactSlackText(findingDisplayTitle(finding), 100)
+      )
+    ),
+    bulletList(
+      "Worth knowing",
+      insights.map((insight) => compactSlackText(insight, 180))
+    ),
+  ].filter(Boolean);
+  if (notes.length > 0) {
+    blocks.push({ type: "section", text: slackMrkdwn(notes.join("\n\n")) });
+  }
   return {
-    text: headline,
+    text: `Autopilot: ${summary}`,
     blocks,
-    findingIds: visible.map((finding) => finding.id),
+    items: visible.map((finding) => findingMessage(organizationSlug, finding)),
   };
 }
 
-/** Posts to the Slack channel picked for Autopilot; returns null when none is set. */
-export async function postAutopilotBrief(
-  organizationId: string,
-  brief: { text: string; blocks: SlackBlock[] },
-  runId?: string
-) {
+/** The Autopilot channel and bot token, or null when Slack is off for Autopilot. */
+async function loadSlackDestination(organizationId: string) {
   if (!(await isAutopilotEnabledForOrganization(organizationId))) {
     return null;
   }
@@ -228,17 +208,114 @@ export async function postAutopilotBrief(
   if (!destination?.channelId) {
     return null;
   }
-  const delivered = await postAutopilotSlackMessage({
+  return {
     organizationId,
     encryptedBotToken: destination.encryptedBotToken,
     destination: {
       teamId: destination.teamId,
       channelId: destination.channelId,
     },
+  };
+}
+
+type SlackDestination = NonNullable<
+  Awaited<ReturnType<typeof loadSlackDestination>>
+>;
+
+/**
+ * Posts one votable item into a thread. Its address is saved before the
+ * reactions go on, so an early 👍 already finds the item.
+ */
+async function postFindingReply(
+  send: SlackDestination,
+  item: AutopilotFindingMessage,
+  threadTs: string,
+  clientMessageId?: string
+) {
+  const reply = await postAutopilotSlackMessage({
+    ...send,
+    text: item.text,
+    blocks: item.blocks,
+    threadTs,
+    clientMessageId,
+  });
+  const slackMessage = JSON.stringify({
+    channel: reply.channel,
+    ts: reply.ts,
+    threadTs,
+    status: item.status,
+  });
+  const saved = await db
+    .update(autopilotFindings)
+    .set({
+      evidence: sql`(${autopilotFindings.evidence} - 'slackActingAt') || jsonb_build_object('slackMessage', ${slackMessage}::jsonb)`,
+    })
+    .where(
+      and(
+        eq(autopilotFindings.organizationId, send.organizationId),
+        eq(autopilotFindings.id, item.findingId),
+        // A slow, older reply must not replace the address of a newer one or
+        // of a finding that has moved on (e.g. an idea that is now a PR).
+        eq(autopilotFindings.status, item.status),
+        sql`coalesce((${autopilotFindings.evidence}->'slackMessage'->>'ts')::numeric, 0) < ${reply.ts}::numeric`
+      )
+    )
+    .returning({ id: autopilotFindings.id });
+  if (saved.length === 0) {
+    // Votes on this reply could never be matched, so it must not stay up.
+    await callAutopilotSlack({
+      ...send,
+      method: "chat.delete",
+      body: { channel: reply.channel, ts: reply.ts },
+    }).catch(() => undefined);
+    throw new Error("The item changed while its Slack reply was posted");
+  }
+  // Pre-filled votes make it one tap; in order, so 👍 comes first. Older installs lack reactions:write.
+  for (const name of ["+1", "-1"]) {
+    await callAutopilotSlack({
+      ...send,
+      method: "reactions.add",
+      body: { channel: reply.channel, timestamp: reply.ts, name },
+    }).catch(() => undefined);
+  }
+}
+
+/** Posts to the Slack channel picked for Autopilot; returns null when none is set. */
+export async function postAutopilotBrief(
+  organizationId: string,
+  brief: AutopilotBrief,
+  runId?: string
+): Promise<AutopilotBriefDelivery | null> {
+  const send = await loadSlackDestination(organizationId);
+  if (!send) {
+    return null;
+  }
+  const delivered = await postAutopilotSlackMessage({
+    ...send,
     text: brief.text,
     blocks: brief.blocks,
     clientMessageId: runId ? autopilotSlackMessageId(runId) : undefined,
   });
+  const items: AutopilotBriefDelivery["items"] = [];
+  // One at a time so the thread keeps the brief's order.
+  for (const item of brief.items) {
+    try {
+      await postFindingReply(
+        send,
+        item,
+        delivered.ts,
+        runId
+          ? autopilotSlackMessageId(`${runId}:${item.findingId}`)
+          : undefined
+      );
+      items.push({ findingId: item.findingId, status: item.status });
+    } catch (error) {
+      logError("Autopilot brief reply failed", error, {
+        organizationId,
+        findingId: item.findingId,
+      });
+    }
+  }
   if (runId) {
     await createAutopilotLogger({ organizationId, runId }, null).action(
       "Delivered the Slack message",
@@ -247,5 +324,65 @@ export async function postAutopilotBrief(
       }
     );
   }
-  return delivered.ts;
+  return { channel: delivered.channel, ts: delivered.ts, items };
+}
+
+/**
+ * After a write someone asked for from Slack, answers in that item's thread:
+ * the new pull request as a votable reply, or why nothing was written (a
+ * failure, or rules that kept it an idea).
+ */
+export async function reportAutopilotWriteInSlack(
+  organizationId: string,
+  findingId: string,
+  reason?: string
+) {
+  const finding = await db.query.autopilotFindings.findFirst({
+    where: and(
+      eq(autopilotFindings.organizationId, organizationId),
+      eq(autopilotFindings.id, findingId)
+    ),
+  });
+  const thread = finding?.evidence.slackMessage;
+  if (!(finding && thread)) {
+    return;
+  }
+  const send = await loadSlackDestination(organizationId);
+  if (send?.destination.channelId !== thread.channel) {
+    return;
+  }
+  if (finding.status === "proposed") {
+    const organization = await db.query.organizations.findFirst({
+      columns: { slug: true },
+      where: eq(organizations.id, organizationId),
+    });
+    if (organization) {
+      await postFindingReply(
+        send,
+        findingMessage(organization.slug, finding),
+        thread.threadTs
+      );
+      // Announced here, so the next brief does not post the same PR again.
+      await db
+        .update(autopilotFindings)
+        .set({
+          evidence: sql`jsonb_set(${autopilotFindings.evidence}, '{briefed}', coalesce(${autopilotFindings.evidence}->'briefed', '[]'::jsonb) || '["proposed"]'::jsonb)`,
+        })
+        .where(eq(autopilotFindings.id, finding.id));
+    }
+    return;
+  }
+  await db
+    .update(autopilotFindings)
+    .set({ evidence: sql`${autopilotFindings.evidence} - 'slackActingAt'` })
+    .where(eq(autopilotFindings.id, finding.id));
+  if (reason) {
+    const text = `Couldn't write this one: ${compactSlackText(reason, 200)}`;
+    await postAutopilotSlackMessage({
+      ...send,
+      threadTs: thread.threadTs,
+      text,
+      blocks: [{ type: "section", text: slackMrkdwn(text) }],
+    });
+  }
 }

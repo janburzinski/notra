@@ -28,6 +28,10 @@ import {
   POST_TO_X_PUBLISH_ACTION_PREFIX,
 } from "../lib/constants/slack-post-x";
 import {
+  forwardAutopilotSlackAction,
+  parseAutopilotReaction,
+} from "../lib/utils/autopilot-slack";
+import {
   mirrorAssistantDelta,
   mirrorSessionStatus,
   mirrorToolApprovals,
@@ -292,6 +296,12 @@ const onSlackEvent: NonNullable<SlackChannelConfig["onEvent"]> = async (
   ) {
     await disableSlackIntegrationByTeamId(ctx.envelope.team_id);
     evictSlackInstallation(ctx.envelope.team_id);
+    return;
+  }
+
+  const reaction = parseAutopilotReaction(ctx.envelope, event);
+  if (reaction) {
+    await forwardAutopilotSlackAction(reaction);
     return;
   }
 

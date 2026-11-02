@@ -72,6 +72,18 @@ export interface AutopilotFindingEvidence {
   draftSlot?: string;
   /** States successfully announced in a Slack brief. */
   briefed?: ("suggested" | "proposed")[];
+  /**
+   * The thread reply for this finding; 👍/👎 on it act on the finding while it
+   * is still in the status the reply offered.
+   */
+  slackMessage?: {
+    channel: string;
+    ts: string;
+    threadTs: string;
+    status: "suggested" | "proposed";
+  } | null;
+  /** When a 👍 action started; another 👍 waits until it settles or goes stale. */
+  slackActingAt?: string;
 }
 
 export interface AutopilotFindingDecision {

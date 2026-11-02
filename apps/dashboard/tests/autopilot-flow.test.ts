@@ -100,6 +100,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
   const threadComments: GitHubMentionThreadComment[] = [];
   const deliveries: string[] = [];
   const slackMessages: string[] = [];
+  const slackReplies: string[] = [];
+  const slackCalls: { method: string; body: unknown }[] = [];
   const opened: string[] = [];
   const writtenFiles: { path: string; contents?: string }[][] = [];
   const closed: number[] = [];
@@ -522,19 +524,30 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     postAutopilotSlackMessage: (input: {
       clientMessageId?: string;
       destination?: { channelId: string };
+      threadTs?: string;
     }) => {
       if (state.slackFailure) {
         throw new Error("Fixture Slack unavailable");
       }
       expect(input.destination?.channelId).toBe("C_SANDBOX");
-      expect(input.clientMessageId).toMatch(/^[0-9a-f-]{36}$/);
-      deliveries.push(input.clientMessageId ?? "missing");
-      slackMessages.push(JSON.stringify(input));
+      if (input.threadTs) {
+        slackReplies.push(JSON.stringify(input));
+      } else {
+        expect(input.clientMessageId).toMatch(/^[0-9a-f-]{36}$/);
+        deliveries.push(input.clientMessageId ?? "missing");
+        slackMessages.push(JSON.stringify(input));
+      }
       return Promise.resolve({
-        ts: "1234567890.000001",
+        ts: input.threadTs
+          ? `1234567890.1${String(slackReplies.length).padStart(5, "0")}`
+          : "1234567890.000001",
         channel: "C_SANDBOX",
         teamId: "T_SANDBOX",
       });
+    },
+    callAutopilotSlack: (input: { method: string; body: unknown }) => {
+      slackCalls.push(input);
+      return Promise.resolve();
     },
   }));
   const { handleAutopilotPullRequestEvent } =
@@ -661,6 +674,8 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
     comments.length = 0;
     deliveries.length = 0;
     slackMessages.length = 0;
+    slackReplies.length = 0;
+    slackCalls.length = 0;
     opened.length = 0;
     closed.length = 0;
     charges.length = 0;
@@ -1315,13 +1330,22 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       .set({ slackChannelId: "C_SANDBOX" })
       .where(eq(autopilotSettings.organizationId, "sandbox-org"));
     expect(await daily("brief-one")).not.toBeNull();
-    expect(slackMessages[0]).toContain("Review idea");
-    expect(slackMessages[0]).toContain("Merge");
+    expect(slackMessages[0]).toContain("1 ready to merge · 1 idea");
+    expect(slackReplies).toHaveLength(2);
+    expect(slackReplies.join()).toContain("React 👍 to merge");
+    expect(slackReplies.join()).toContain("React 👍 to write it");
+    expect(
+      slackCalls.filter((call) => call.method === "reactions.add")
+    ).toHaveLength(4);
     for (const finding of await db.query.autopilotFindings.findMany()) {
       if (finding.status !== "suggested" && finding.status !== "proposed") {
         throw new Error("Expected an announced state");
       }
       expect(finding.evidence.briefed).toEqual([finding.status]);
+      expect(finding.evidence.slackMessage).toMatchObject({
+        channel: "C_SANDBOX",
+        threadTs: "1234567890.000001",
+      });
     }
     await db
       .update(autopilotRuns)
@@ -1337,8 +1361,10 @@ if (process.env.NOTRA_AUTOPILOT_FLOW_TEST !== "1") {
       organizationId: "sandbox-org",
       findingId: idea.id,
     });
-    expect(await daily("brief-three")).not.toBeNull();
-    expect(deliveries).toHaveLength(2);
+    // The written PR is announced in the idea's thread, not in a new brief.
+    expect(slackReplies.at(-1)).toContain("React 👍 to merge");
+    expect(await daily("brief-three")).toBeNull();
+    expect(deliveries).toHaveLength(1);
     const written = await db.query.autopilotFindings.findFirst({
       where: eq(autopilotFindings.id, idea.id),
     });

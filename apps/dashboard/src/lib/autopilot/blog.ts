@@ -1418,7 +1418,7 @@ export async function runCompetitorsJob(
     await log.skip("No competitor wins a prompt you lose");
     return result;
   }
-  const insight = `${top.map(([name, count]) => `${name} shows up in ${count} prompts you lose`).join(", ")}.`;
+  const insight = `Competitors in the prompts you lose: ${top.map(([name, count]) => `${name} (${count})`).join(", ")}.`;
   result.insights.push(insight);
   await log.decision(insight);
   return result;

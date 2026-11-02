@@ -1,5 +1,10 @@
 import * as z from "zod";
 
+export const slackApiResponseSchema = z.object({
+  ok: z.boolean(),
+  error: z.string().optional(),
+});
+
 /** A delivery only counts when Slack confirms it with a channel and a ts. */
 export const slackPostMessageResponseSchema = z.discriminatedUnion("ok", [
   z.object({

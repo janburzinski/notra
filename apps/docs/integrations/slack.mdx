@@ -76,6 +76,15 @@ When setting up Autopilot, choose an existing channel or select **Create a chann
 
 Existing Slack connections may need to reconnect to grant the `channels:manage` permission. If your workspace restricts channel creation, ask a Slack admin or choose an existing channel and invite Notra to it.
 
+Each brief is one short summary message. Every pull request and idea is a reply in its thread, and you can react to it:
+
+| Item | 👍 | 👎 |
+| ---- | -- | -- |
+| Pull request | Merges the pull request right away | Dismisses the item and closes the pull request |
+| Idea | Autopilot writes it (charging credits as usual) and posts the pull request in the same thread, ready for 👍 | Dismisses the idea |
+
+Anyone in the Autopilot channel can react, so pick a channel only your team can join. Slack connections made before reactions were supported need to reconnect to grant `reactions:read` and `reactions:write`.
+
 ### Enable, disable, delete
 
 From the workspace card menu you can disable the integration (the agent stops responding), re-enable it or delete it. Deleting removes the stored bot token from Notra, so to revoke access in Slack you also need to remove the app there.
@@ -95,8 +104,9 @@ The Slack app requests these bot scopes:
 | `files:read`                       | Read attachments shared with the agent                                         |
 | `files:write`                      | Upload chart images to the conversation                                        |
 | `assistant:write`                  | Enable Slack's assistant experience for the app                                |
+| `reactions:read`, `reactions:write` | Act on 👍 and 👎 on Autopilot items, and add those reactions for one-tap voting |
 
-The agent only reads a thread once it is mentioned or messaged in it. It does not scan channels for keywords or emoji reactions, and it does not read other threads. Notra does not mirror private-channel or DM conversations into the dashboard.
+The agent only reads a thread once it is mentioned or messaged in it. It does not scan channels for keywords, and it does not read other threads. The only reactions it acts on are 👍 and 👎 on its own Autopilot items. Notra does not mirror private-channel or DM conversations into the dashboard.
 
 ## Limits
 
