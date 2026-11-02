@@ -17,6 +17,7 @@ import {
   siteInputSchema,
   siteSuspendInputSchema,
 } from "@/schemas/sites";
+import type { SiteAdminSuspendResponse } from "@/types/moderation";
 import type { SiteAnalytics } from "@/types/sites";
 
 import { notFound } from "../utils/errors";
@@ -125,13 +126,13 @@ export const sitesRouter = {
     .input(siteSuspendInputSchema)
     .handler(async ({ context, input }) => {
       const { user } = await assertAdmin({ headers: context.headers });
-      await callSiteAdmin({
+      return (await callSiteAdmin({
         action: "setSuspended",
         siteId: input.siteId,
         actorId: user.id,
         suspended: input.suspended,
         reason: input.reason,
-      });
-      return { ok: true };
+        category: input.category,
+      })) as SiteAdminSuspendResponse;
     }),
 };

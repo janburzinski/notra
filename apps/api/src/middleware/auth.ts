@@ -28,12 +28,17 @@ import {
 import { API_AUTH_KINDS } from "../constants/analytics";
 import type { ApiAuthKind } from "../types/analytics";
 import type { AccountApiKeyAuthData, AuthData } from "../types/auth";
+import { accountStandingFailure } from "../utils/account-standing";
 import {
   API_URL,
   AUTH_GUIDE_URL,
   RESOURCE_METADATA_URL,
 } from "../utils/agent-discovery";
-import { trackApiKeyRejected, trackApiKeyVerified } from "../utils/analytics";
+import {
+  resolveAuthKind,
+  trackApiKeyRejected,
+  trackApiKeyVerified,
+} from "../utils/analytics";
 import { isFeedbackToken, verifyFeedbackToken } from "../utils/feedback-token";
 import { unkeyPermissions } from "../utils/unkey-permissions";
 
@@ -93,6 +98,7 @@ type AuthResult =
       status: AuthFailureStatus;
       kind?: ApiAuthKind;
       code?: string;
+      recovery?: string;
     };
 
 const UNKEY_AUTH_FAILURES: Record<
@@ -682,9 +688,31 @@ async function verifyRequestAuth(
   }
 }
 
+async function verifyAuthAndStanding(
+  c: Context,
+  options: AuthOptions
+): Promise<AuthResult> {
+  const result = await verifyRequestAuth(c, options);
+  if (!result.success) {
+    return result;
+  }
+  const kind = resolveAuthKind(result.auth);
+  try {
+    const failure = await accountStandingFailure(c.get("db"), result.auth);
+    return failure ? { success: false, status: 403, kind, ...failure } : result;
+  } catch {
+    return {
+      success: false,
+      error: "Service unavailable",
+      status: 503,
+      kind,
+    };
+  }
+}
+
 export function authMiddleware(options: AuthOptions = {}) {
   return async (c: Context, next: Next) => {
-    const authResult = await verifyRequestAuth(c, options);
+    const authResult = await verifyAuthAndStanding(c, options);
     if (!authResult.success) {
       trackApiKeyRejected(c, {
         authKind: authResult.kind,
@@ -703,7 +731,7 @@ export function authMiddleware(options: AuthOptions = {}) {
         {
           error: authResult.error,
           code: authResult.error.toUpperCase().replace(/[^A-Z0-9]+/g, "_"),
-          recovery: getRecovery(authResult.status),
+          recovery: authResult.recovery ?? getRecovery(authResult.status),
         },
         authResult.status
       );

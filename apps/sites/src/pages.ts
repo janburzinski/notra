@@ -1,7 +1,14 @@
 import {
+  SITE_ABUSE_EMAIL,
   SITE_PREVIEW_AUTH_PATH,
   SITE_PREVIEW_PASSWORD_MAX_LENGTH,
+  SITE_SUSPENSION_CATEGORY_LABELS,
 } from "@notra/sites-core/constants/sites";
+import type { SiteServingState } from "@notra/sites-core/types/deployment";
+import {
+  siteAbuseReportHref,
+  siteSuspensionAppealHref,
+} from "@notra/sites-core/utils/abuse";
 
 import {
   GATE_ERROR_MESSAGES,
@@ -11,7 +18,6 @@ import {
   NOTRA_MARK_CHIP_SVG,
   NOTRA_MARK_SVG,
   SECURITY_TXT_LIFETIME_DAYS,
-  SITES_ABUSE_EMAIL,
   SITES_SECURITY_EMAIL,
   SYSTEM_PAGE_CSS,
   SYSTEM_PAGE_FAVICON,
@@ -50,12 +56,26 @@ export function notDeployedPage(): string {
   );
 }
 
-export function unavailablePage(): string {
-  return statusPage(
-    "410",
-    "This site is unavailable",
-    "It has been taken offline."
-  );
+export function unavailablePage(
+  url: URL,
+  suspension: SiteServingState["suspension"]
+): string {
+  // Abuse and appeal links belong only on a Notra takedown, not on a site its
+  // owner took offline.
+  if (!suspension) {
+    return statusPage(
+      "410",
+      "This site is unavailable",
+      "It has been taken offline."
+    );
+  }
+  const lead =
+    "Notra suspended this site for a suspected violation of Notra's Terms of Service.";
+  const reason = `<p class="notice" role="status">Reason: ${SITE_SUSPENSION_CATEGORY_LABELS[suspension.category]}</p>`;
+  return page({
+    title: "This site is unavailable",
+    body: `<p class="code">410</p><h1>This site is unavailable</h1><p>${lead}</p>${reason}<div class="frame"><div class="rows"><div class="row"><span>Seen abuse on this site?</span><a href="${escapeHtml(siteAbuseReportHref(url.href))}">Report abuse</a></div><div class="row"><span>Is this your site?</span><a href="${escapeHtml(siteSuspensionAppealHref(url.href))}">Request a review</a></div></div><p class="frame-foot">Both go to ${SITE_ABUSE_EMAIL}.</p></div>`,
+  });
 }
 
 export function previewClosedPage(): string {
@@ -108,7 +128,7 @@ export function hostingApexPage(hostingDomain: string): string {
   const domain = escapeHtml(hostingDomain);
   return page({
     title: `${hostingDomain} · Notra Sites`,
-    body: `<div class="icon">${GLOBE_ICON_SVG}</div><h1>${domain}</h1><p>Blogs and changelogs published with <a href="${NOTRA_HOME_URL}">Notra</a>. Every subdomain belongs to a Notra customer.</p><div class="frame"><div class="rows"><div class="row"><span>Abuse, phishing or malware</span><a href="mailto:${SITES_ABUSE_EMAIL}">${SITES_ABUSE_EMAIL}</a></div><div class="row"><span>Security issues</span><a href="mailto:${SITES_SECURITY_EMAIL}">${SITES_SECURITY_EMAIL}</a></div></div><p class="frame-foot">Include the full address of the site you are reporting.</p></div>`,
+    body: `<div class="icon">${GLOBE_ICON_SVG}</div><h1>${domain}</h1><p>Blogs and changelogs published with <a href="${NOTRA_HOME_URL}">Notra</a>. Every subdomain belongs to a Notra customer.</p><div class="frame"><div class="rows"><div class="row"><span>Abuse, phishing or malware</span><a href="mailto:${SITE_ABUSE_EMAIL}">${SITE_ABUSE_EMAIL}</a></div><div class="row"><span>Security issues</span><a href="mailto:${SITES_SECURITY_EMAIL}">${SITES_SECURITY_EMAIL}</a></div></div><p class="frame-foot">Include the full address of the site you are reporting.</p></div>`,
   });
 }
 
@@ -118,7 +138,7 @@ export function securityTxt(origin: string, now: Date): string {
   );
   return [
     `Contact: mailto:${SITES_SECURITY_EMAIL}`,
-    `Contact: mailto:${SITES_ABUSE_EMAIL}`,
+    `Contact: mailto:${SITE_ABUSE_EMAIL}`,
     `Expires: ${expires.toISOString()}`,
     `Canonical: ${origin}/.well-known/security.txt`,
     "Preferred-Languages: en, de",

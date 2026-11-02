@@ -301,18 +301,24 @@ export async function removePreviewDeployment(
 export async function setServingStatus(
   site: ServingSiteRef,
   status: SiteServingState["status"],
-  tx?: SiteStorageTransaction
+  tx?: SiteStorageTransaction,
+  suspension: SiteServingState["suspension"] = null
 ) {
   await mutateServingState(
     site,
     (state) => {
-      if (state.status === status && state.slug === site.slug) {
+      if (
+        state.status === status &&
+        state.slug === site.slug &&
+        state.suspension?.category === suspension?.category
+      ) {
         return { skip: true, result: undefined };
       }
       return {
         write: {
           ...state,
           status,
+          suspension,
           slug: site.slug,
           updatedAt: new Date().toISOString(),
         },

@@ -7,10 +7,10 @@ import { cookies } from "next/headers";
 import { unstable_rethrow } from "next/navigation";
 
 import { LAST_VISITED_ORGANIZATION_COOKIE } from "@/constants/cookies";
-import { isUserBanned } from "@/lib/auth/banned";
 import { AuthSessionError } from "@/lib/auth/errors";
 import { ensureLocalUser } from "@/lib/auth/sync";
 import type { AuthSessionData } from "@/types/auth";
+import { isUserBanned } from "@/utils/ban";
 
 const readLastVisitedOrganizationSlug = Effect.fn(
   "auth.session.readLastVisitedSlug"

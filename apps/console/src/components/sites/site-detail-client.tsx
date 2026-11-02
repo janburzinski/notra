@@ -4,7 +4,6 @@ import {
   ArrowLeft01Icon,
   GitBranchIcon,
   LinkSquare02Icon,
-  Rocket01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@notra/ui/components/ui/badge";
@@ -16,8 +15,8 @@ import Link from "next/link";
 import { Button } from "@/components/button";
 import { SiteAnalyticsCard } from "@/components/sites/site-analytics-card";
 import { SiteDeploymentsTable } from "@/components/sites/site-deployments-table";
+import { SiteModerationActions } from "@/components/sites/site-moderation-actions";
 import { SiteRelativeTime } from "@/components/sites/site-relative-time";
-import { SiteSuspendDialog } from "@/components/sites/site-suspend-dialog";
 import { StatusBadge } from "@/components/status-badge";
 import {
   SITE_ACTIVE_REFETCH_MS,
@@ -25,7 +24,6 @@ import {
   SITE_DOMAIN_STATUS_LABELS,
   SITE_IDLE_REFETCH_MS,
 } from "@/constants/sites";
-import { useSiteActions } from "@/hooks/use-site-actions";
 import { consoleOrpc } from "@/lib/orpc/query";
 import type { SiteDetailClientProps } from "@/types/sites";
 import { isDeploymentInProgress, displayUrl } from "@/utils/site-deployments";
@@ -42,8 +40,11 @@ function SectionHeading({ children }: { children: string }) {
   return <h2 className="text-base font-medium">{children}</h2>;
 }
 
-export function SiteDetailClient({ slug, siteId }: SiteDetailClientProps) {
-  const { deployLatest } = useSiteActions();
+export function SiteDetailClient({
+  slug,
+  siteId,
+  action,
+}: SiteDetailClientProps) {
   const siteQuery = useQuery({
     ...consoleOrpc.sites.get.queryOptions({ input: { siteId } }),
     refetchInterval: (query) =>
@@ -115,7 +116,10 @@ export function SiteDetailClient({ slug, siteId }: SiteDetailClientProps) {
               ) : null}
             </div>
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span>{site.organization.name}</span>
+              <span>
+                {site.organization.name}
+                {site.organization.suspendedAt ? " (workspace suspended)" : ""}
+              </span>
               <a
                 className="hover:text-foreground inline-flex items-center gap-1"
                 href={site.liveUrl}
@@ -153,21 +157,11 @@ export function SiteDetailClient({ slug, siteId }: SiteDetailClientProps) {
               </p>
             ) : null}
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <SiteSuspendDialog
-              siteId={site.id}
-              siteName={site.name}
-              suspended={site.status === "suspended"}
-            />
-            <Button
-              disabled={!repository || deployLatest.isPending}
-              onClick={() => deployLatest.mutate({ siteId: site.id })}
-              size="sm"
-            >
-              <HugeiconsIcon icon={Rocket01Icon} />
-              Deploy latest
-            </Button>
-          </div>
+          <SiteModerationActions
+            action={action}
+            canDeploy={repository !== null}
+            site={site}
+          />
         </div>
       </div>
 

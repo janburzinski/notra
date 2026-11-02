@@ -45,7 +45,8 @@ export type BrewResponse<T> =
   | { ok: false; error: BrewEmailError };
 
 export interface EmailResult {
-  data: { id: string } | null;
+  /** `skipped` is set when Brew suppressed the recipient and sent nothing. */
+  data: { id: string; skipped?: boolean } | null;
   error: BrewEmailError | null;
 }
 

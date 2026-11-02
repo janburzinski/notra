@@ -28,6 +28,33 @@ function formatInfoChannelMessage(
 }
 
 /**
+ * The webhook body: plain text, plus Block Kit link buttons when the event
+ * has links. The incoming webhook has no interactivity, so a button only
+ * opens its URL and every action is confirmed in the console.
+ */
+function infoChannelPayload(event: SlackInfoChannelEvent, environment: string) {
+  const text = formatInfoChannelMessage(event, environment);
+  if (!event.links?.length) {
+    return { text };
+  }
+  return {
+    text,
+    blocks: [
+      { type: "section", text: { type: "mrkdwn", text } },
+      {
+        type: "actions",
+        elements: event.links.map((link) => ({
+          type: "button",
+          text: { type: "plain_text", text: link.label },
+          url: link.url,
+          ...(link.danger ? { style: "danger" } : {}),
+        })),
+      },
+    ],
+  };
+}
+
+/**
  * Posts a product event (signup, new site, ...) to the team's Slack info
  * channel after the response is sent. A no-op without SLACK_INFO_WEBHOOK_URL;
  * never throws or delays the request. Pass a loader when building the message
@@ -46,12 +73,12 @@ export function notifyInfoChannel(
     const response = await fetch(webhook, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        text: formatInfoChannelMessage(
+      body: JSON.stringify(
+        infoChannelPayload(
           typeof event === "function" ? await event() : event,
           environment
-        ),
-      }),
+        )
+      ),
       signal: AbortSignal.timeout(SLACK_INFO_CHANNEL_TIMEOUT_MS),
     });
     if (!response.ok) {

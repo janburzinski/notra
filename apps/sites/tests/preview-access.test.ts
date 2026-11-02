@@ -82,6 +82,7 @@ function setup(previewPassword: SitePreviewPassword | null = password) {
     siteId: SITE,
     slug: "acme",
     status: "active",
+    suspension: null,
     production: null,
     productionRollback: false,
     trafficToken: null,

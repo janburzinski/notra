@@ -4,14 +4,7 @@ import { withAuth } from "@workos-inc/authkit-nextjs";
 import { eq } from "drizzle-orm";
 import { unstable_rethrow } from "next/navigation";
 
-import type { BannedStatusUser } from "@/types/auth";
-
-export function isUserBanned(user: BannedStatusUser) {
-  if (!user.banned) {
-    return false;
-  }
-  return !user.banExpires || user.banExpires > new Date();
-}
+import { isUserBanned } from "@/utils/ban";
 
 export async function isSessionBanned(): Promise<boolean> {
   try {

@@ -245,6 +245,31 @@ export const SITE_DEPLOYMENT_TRIGGERS = [
 export const SITE_PREVIEW_VISIBILITIES = ["public", "protected"] as const;
 export const SITE_STATUSES = ["active", "suspended"] as const;
 export const SITE_SUSPENDERS = ["owner", "notra"] as const;
+export const SITE_ABUSE_EMAIL = "abuse@usenotra.com";
+/** Dialogs a console deep link (e.g. from the Slack info channel) opens. */
+export const SITE_CONSOLE_ACTIONS = [
+  "suspend-site",
+  "suspend-workspace",
+  "ban-owner",
+] as const;
+export const SITE_SUSPENSION_CATEGORIES = [
+  "phishing",
+  "malware",
+  "deceptive_redirects",
+  "spam",
+  "terms",
+] as const;
+/** Neutral wording shown to visitors on the 410 page and in owner emails. */
+export const SITE_SUSPENSION_CATEGORY_LABELS = {
+  phishing: "Phishing or credential harvesting",
+  malware: "Malware or unwanted software",
+  deceptive_redirects: "Deceptive redirects",
+  spam: "Spam or scams",
+  terms: "Terms of Service violation",
+} as const satisfies Record<
+  (typeof SITE_SUSPENSION_CATEGORIES)[number],
+  string
+>;
 export const SITE_DOMAIN_KINDS = ["subdomain", "proxy"] as const;
 export const SITE_DOMAIN_STATUSES = [
   "pending",

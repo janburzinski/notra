@@ -21,6 +21,10 @@ import {
   SITE_FAILED_JOBS_LIMIT,
   SITE_OVERVIEW_WINDOW_MS,
 } from "@/constants/sites";
+import {
+  getWorkspaceOwner,
+  getWorkspaceSiteCounts,
+} from "@/lib/moderation/queries";
 import { readLiveBuildLog, readServingState } from "@/lib/sites/r2";
 import type {
   SiteAdminDeployment,
@@ -163,7 +167,9 @@ export async function listAdminSites(): Promise<SiteAdminListItem[]> {
   const rows = await db.query.sites.findMany({
     orderBy: [desc(sites.createdAt)],
     with: {
-      organization: { columns: { id: true, name: true, slug: true } },
+      organization: {
+        columns: { id: true, name: true, slug: true },
+      },
       domains: { columns: { status: true } },
       deployments: {
         orderBy: [desc(siteDeployments.createdAt)],
@@ -214,7 +220,9 @@ export async function getAdminSite(
   const site = await db.query.sites.findFirst({
     where: eq(sites.id, siteId),
     with: {
-      organization: { columns: { id: true, name: true, slug: true } },
+      organization: {
+        columns: { id: true, name: true, slug: true, suspendedAt: true },
+      },
       domains: true,
       deployments: {
         orderBy: [desc(siteDeployments.createdAt)],
@@ -226,8 +234,10 @@ export async function getAdminSite(
     return null;
   }
 
-  const [state, failedJobs] = await Promise.all([
+  const [state, owner, siteCounts, failedJobs] = await Promise.all([
     readServingState(site.id).catch(() => null),
+    getWorkspaceOwner(site.organizationId, site.createdByUserId),
+    getWorkspaceSiteCounts(site.organizationId),
     db
       .select({
         id: siteJobs.id,
@@ -257,7 +267,10 @@ export async function getAdminSite(
       slug: site.slug,
       status: site.status,
       suspendedReason: site.suspendedReason,
-      organization: site.organization,
+      suspendedBy: site.suspendedBy,
+      suspendedWithOrganization: site.suspendedWithOrganization,
+      organization: { ...site.organization, ...siteCounts },
+      owner,
       repository:
         site.repositoryOwner && site.repositoryName
           ? { owner: site.repositoryOwner, name: site.repositoryName }

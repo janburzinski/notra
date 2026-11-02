@@ -55,7 +55,9 @@ function readAuth(c: Context): AuthData | undefined {
   return auth;
 }
 
-function resolveAuthKind(auth: AuthData | undefined): ApiAuthKind | undefined {
+export function resolveAuthKind(
+  auth: AuthData | undefined
+): ApiAuthKind | undefined {
   if (!auth) {
     return undefined;
   }

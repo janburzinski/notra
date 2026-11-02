@@ -1,6 +1,10 @@
 import type { sites } from "@notra/db/schema";
 import type { POST_PREVIEW_LIFETIMES } from "@notra/sites-core/constants/sites";
 import type { SiteMounts } from "@notra/sites-core/types/deployment";
+import type {
+  SiteSuspender,
+  SiteSuspensionCategory,
+} from "@notra/sites-core/types/sites";
 import type { z } from "zod";
 
 import type { postPreviewSourceSchema } from "../schemas/post-preview";
@@ -122,4 +126,49 @@ export interface UpdatePostPreviewAccessInput {
   lifetime?: PostPreviewLifetime;
   /** Undefined keeps the current password. */
   password?: string | null;
+}
+
+export interface SetSiteSuspendedOptions {
+  by?: SiteSuspender;
+  reason?: string;
+  /** Shown to visitors on the 410 page; only for Notra suspensions. */
+  category?: SiteSuspensionCategory;
+  actorUserId?: string | null;
+  withOrganization?: boolean;
+}
+
+export interface SetOrganizationSuspendedInput {
+  organizationId: string;
+  suspended: boolean;
+  reason: string;
+  category?: SiteSuspensionCategory;
+  actorUserId: string;
+}
+
+interface SuspensionNotice {
+  /** Keys the owner email, so a retry re-sends only notices that failed. */
+  key: string;
+  category: SiteSuspensionCategory;
+  reason: string;
+}
+
+/** What a site suspension or lift did. */
+export interface SiteTransitionResult {
+  changed: boolean;
+  /** The site was already in the requested state. */
+  retry: boolean;
+  /** The owner notice of a Notra suspension, stable across retries. */
+  notice: SuspensionNotice | null;
+}
+
+export interface SetOrganizationSuspendedResult {
+  organization: { id: string; name: string; slug: string };
+  /** The workspace was already in the requested state; this finished it. */
+  retry: boolean;
+  /** Sites this action took offline or restored. */
+  sites: Site[];
+  /** Sites that failed and kept their state; repeating the action finishes them. */
+  failed: number;
+  /** The owner notice for a suspension, stable across retries. */
+  notice: (SuspensionNotice & { siteNames: string[] }) | null;
 }

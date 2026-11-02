@@ -8156,7 +8156,7 @@
         "restore": "Bring back online",
         "restored": "Site is back online",
         "notraTitle": "Suspended by Notra",
-        "notraDescription": "This site was suspended by the Notra team. Contact support to bring it back online.",
+        "notraDescription": "This site was suspended by the Notra team. Contact abuse@usenotra.com to ask for a review.",
         "failed": "Couldn't change the site status"
       },
       "analytics": {

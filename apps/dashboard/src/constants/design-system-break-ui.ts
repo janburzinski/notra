@@ -203,6 +203,9 @@ function organization(
     onboardingAgentRan: true,
     onboardingAgentStartedAt: null,
     workosOrgId: null,
+    suspendedAt: null,
+    suspendedReason: null,
+    suspendedCategory: null,
   };
 }
 

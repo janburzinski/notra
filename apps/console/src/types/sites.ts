@@ -16,6 +16,11 @@ import type {
   SiteBuildLogLine,
 } from "@notra/sites-core/types/build-log";
 import type { SiteBuildMetrics } from "@notra/sites-core/types/build-metrics";
+import type {
+  SiteConsoleAction,
+  SiteSuspender,
+  SiteSuspensionCategory,
+} from "@notra/sites-core/types/sites";
 import type { ChartConfig } from "@notra/ui/components/ui/chart";
 import type { ReactNode } from "react";
 import type { TooltipProps } from "recharts";
@@ -23,6 +28,7 @@ import type { TooltipProps } from "recharts";
 import type * as z from "zod";
 
 import type { siteServingStateSchema } from "@/schemas/sites";
+import type { ModerationUser, WorkspaceSiteCounts } from "@/types/moderation";
 
 export type SiteDeploymentKind = (typeof SITE_DEPLOYMENT_KINDS)[number];
 
@@ -138,7 +144,13 @@ export interface SiteAdminDetail {
     slug: string;
     status: SiteStatus;
     suspendedReason: string | null;
-    organization: SiteOrganizationRef;
+    suspendedBy: SiteSuspender | null;
+    /** Taken offline by a workspace suspension rather than on its own. */
+    suspendedWithOrganization: boolean;
+    organization: SiteOrganizationRef &
+      WorkspaceSiteCounts & { suspendedAt: Date | null };
+    /** The workspace owner the "Ban owner" action targets. */
+    owner: ModerationUser | null;
     repository: { owner: string; name: string } | null;
     productionBranch: string;
     rootDirectory: string;
@@ -208,11 +220,20 @@ export type SiteAdminRequest =
       actorId: string;
     }
   | {
+      action: "setOrganizationSuspended";
+      organizationId: string;
+      actorId: string;
+      suspended: boolean;
+      reason: string;
+      category?: SiteSuspensionCategory;
+    }
+  | {
       action: "setSuspended";
       siteId: string;
       actorId: string;
       suspended: boolean;
-      reason?: string;
+      reason: string;
+      category?: SiteSuspensionCategory;
     }
   | { action: "analytics"; siteId: string; actorId: string; days?: number };
 
@@ -346,6 +367,14 @@ export interface SitesPageProps {
 export interface SiteDetailClientProps {
   slug: string;
   siteId: string;
+  /** Opens this moderation dialog on load, e.g. from a Slack link. */
+  action?: SiteConsoleAction;
+}
+
+export interface SiteModerationActionsProps {
+  site: SiteAdminDetail["site"];
+  action?: SiteConsoleAction;
+  canDeploy: boolean;
 }
 
 export interface SiteDeploymentClientProps {
@@ -394,5 +423,9 @@ export interface SiteTrafficChartProps {
 export interface SiteSuspendDialogProps {
   siteId: string;
   siteName: string;
-  suspended: boolean;
+  /** Offer to reactivate instead of to suspend. */
+  reactivates: boolean;
+  /** Disables the action and says why, e.g. while the workspace is suspended. */
+  disabledReason?: string;
+  defaultOpen?: boolean;
 }

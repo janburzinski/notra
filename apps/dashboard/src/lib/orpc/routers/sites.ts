@@ -689,7 +689,7 @@ export const sitesRouter = {
     .handler(async ({ context, input }) => {
       assertNotDemo();
       const { site } = await requireSite(context, input, { admin: true });
-      await setSiteSuspended(site, input.suspended, input.reason);
+      await setSiteSuspended(site, input.suspended, { reason: input.reason });
       return { ok: true };
     }),
 

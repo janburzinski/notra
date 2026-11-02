@@ -15,22 +15,27 @@ import {
   SiteNotBuildableError,
   SitePermanentBuildError,
 } from "@notra/sites-server/errors/sites";
-import { setSiteSuspended } from "@notra/sites-server/sites";
+import {
+  setOrganizationSuspended,
+  setSiteSuspended,
+} from "@notra/sites-server/sites";
 import { Effect } from "effect";
 
 import { geoCoreDashboardLayer } from "@/lib/geo/configure";
 import { dispatchSiteJobs } from "@/lib/sites/dispatch";
+import { notifySuspension } from "@/lib/sites/suspension-notice";
 import { verifyInternalWorkflowRequest } from "@/lib/workflows/internal-auth";
 
 /**
  * Site operations for the Notra admin console.
  *
  * Enqueueing a build and starting its Vercel Workflow run, restoring a
- * deployment, suspending a site and reading Tinybird analytics all depend on
- * `@notra/sites-server` and the dashboard's workflow and GEO layers. The
- * console calls this route instead of reimplementing them. The caller is
- * already a verified Notra admin, so there is no organization membership
- * check; `actorId` is recorded on the deployments it requests.
+ * deployment, suspending a site or a whole workspace (with the owner email)
+ * and reading Tinybird analytics all depend on `@notra/sites-server` and the
+ * dashboard's workflow and GEO layers. The console calls this route instead
+ * of reimplementing them. The caller is already a verified Notra admin, so
+ * there is no organization membership check; `actorId` is recorded on the
+ * deployments it requests and on the abuse audit rows.
  */
 export async function POST(request: Request) {
   if (!(await verifyInternalWorkflowRequest(request))) {
@@ -44,6 +49,50 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+  // A workspace suspension checks its category in setOrganizationSuspended,
+  // because a retry keeps the one the workspace was suspended with.
+  if (input.action === "setSuspended" && input.suspended && !input.category) {
+    return Response.json(
+      { error: "A suspension needs a category" },
+      { status: 400 }
+    );
+  }
+  if (input.action === "setOrganizationSuspended") {
+    try {
+      const result = await setOrganizationSuspended({
+        organizationId: input.organizationId,
+        suspended: input.suspended,
+        reason: input.reason,
+        category: input.category,
+        actorUserId: input.actorId,
+      });
+      const noticeSent = result.notice
+        ? await notifySuspension({
+            organizationId: input.organizationId,
+            scope: "workspace",
+            ...result.notice,
+          })
+        : null;
+      return Response.json({
+        ok: true,
+        retry: result.retry,
+        sites: result.sites.length,
+        failed: result.failed,
+        noticeSent,
+      });
+    } catch (error) {
+      if (error instanceof SiteInputError) {
+        return Response.json({ error: error.message }, { status: 400 });
+      }
+      logError("Organization suspension failed", error, {
+        organizationId: input.organizationId,
+      });
+      return Response.json(
+        { error: "Organization suspension failed" },
+        { status: 500 }
+      );
+    }
+  }
   // Only builds need the full builder setup. Suspending or restoring a site
   // must remain possible when builder credentials are unavailable.
   if (
@@ -80,8 +129,26 @@ export async function POST(request: Request) {
         return Response.json({ ok: true });
       }
       case "setSuspended": {
-        await setSiteSuspended(site, input.suspended, input.reason, "notra");
-        return Response.json({ ok: true });
+        const transition = await setSiteSuspended(site, input.suspended, {
+          by: "notra",
+          reason: input.reason,
+          category: input.category,
+          actorUserId: input.actorId,
+        });
+        const noticeSent = transition.notice
+          ? await notifySuspension({
+              organizationId: site.organizationId,
+              scope: "site",
+              siteNames: [site.name],
+              ...transition.notice,
+            })
+          : null;
+        return Response.json({
+          ok: true,
+          retry: transition.retry,
+          failed: 0,
+          noticeSent,
+        });
       }
       case "analytics": {
         const analytics = await Effect.runPromise(

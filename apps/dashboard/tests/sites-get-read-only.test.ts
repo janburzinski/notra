@@ -72,6 +72,7 @@ if (process.env.NOTRA_SITES_GET_READ_ONLY_TEST_WORKER !== "1") {
     status: "active",
     suspendedReason: null,
     suspendedBy: null,
+    suspendedWithOrganization: false,
     lastGeneration: 110,
     createdByUserId: "user-readonly",
     createdAt: now,

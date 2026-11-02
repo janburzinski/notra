@@ -8,7 +8,7 @@ export async function assertAdmin({ headers }: { headers: Headers }) {
 
   if (!hasAdminRole(user.role)) {
     throw new ORPCError("FORBIDDEN", {
-      message: "You do not have access to integration reviews",
+      message: "Only Notra admins can do this",
     });
   }
 

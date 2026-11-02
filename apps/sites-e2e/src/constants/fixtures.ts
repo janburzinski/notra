@@ -18,4 +18,6 @@ export const CONSENT_HOST = `consent.${HOSTING_DOMAIN}`;
 export const CONSENT_TLS_SITE_ID = "site_e2e_consent_tls";
 export const CONSENT_TLS_HOST = `consent-tls.${HOSTING_DOMAIN}`;
 export const UNKNOWN_HOST = `nobody.${HOSTING_DOMAIN}`;
+export const SUSPENDED_SITE_ID = "site_e2e_suspended";
+export const SUSPENDED_HOST = `suspended.${HOSTING_DOMAIN}`;
 export const ACME_TEXT = ["Acme", "A draft idea", "Hello world"];

@@ -16,10 +16,10 @@ import {
   CONSOLE_AUTH_TTL_SECONDS,
   CONSOLE_PENDING_AUTH_COOKIE,
 } from "@/constants/auth";
-import { isUserBanned } from "@/lib/auth/banned";
 import { ensureLocalUser } from "@/lib/auth/sync";
 import { assertRateLimit } from "@/lib/orpc/utils/rate-limit";
 import type { ConsolePendingAuthContext } from "@/types/auth";
+import { isUserBanned } from "@/utils/ban";
 
 export function consoleAppUrl() {
   return process.env.CONSOLE_APP_URL ?? "http://localhost:3003";

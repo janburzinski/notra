@@ -7,6 +7,7 @@ import {
   SITE_PREVIEW_VISIBILITIES,
   SITE_STATUSES,
   SITE_SUSPENDERS,
+  SITE_SUSPENSION_CATEGORIES,
 } from "@notra/sites-core/constants/sites";
 import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { SiteBuildMetrics } from "@notra/sites-core/types/build-metrics";
@@ -37,6 +38,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+import { ABUSE_ACTIONS, ABUSE_SUBJECT_TYPES } from "./constants/abuse";
 import {
   AGENT_FEEDBACK_KINDS,
   AGENT_FEEDBACK_SENTIMENTS,
@@ -379,27 +381,48 @@ export const socialConnections = pgTable(
   ]
 );
 
-export const organizations = pgTable("organizations", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  logo: text("logo"),
-  createdAt: timestamp("created_at").notNull(),
-  metadata: text("metadata"),
-  heardAboutNotraSource: text("heard_about_notra_source"),
-  heardAboutNotraOther: text("heard_about_notra_other"),
-  geoIngestTokenGeneration: integer("geo_ingest_token_generation")
-    .notNull()
-    .default(1),
-  feedbackIngestTokenGeneration: integer("feedback_ingest_token_generation")
-    .notNull()
-    .default(1),
-  onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
-  onboardingDismissed: boolean("onboarding_dismissed").default(false).notNull(),
-  onboardingAgentRan: boolean("onboarding_agent_ran").default(false).notNull(),
-  onboardingAgentStartedAt: timestamp("onboarding_agent_started_at"),
-  workosOrgId: text("workos_org_id").unique(),
-});
+export const organizations = pgTable(
+  "organizations",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    logo: text("logo"),
+    createdAt: timestamp("created_at").notNull(),
+    metadata: text("metadata"),
+    heardAboutNotraSource: text("heard_about_notra_source"),
+    heardAboutNotraOther: text("heard_about_notra_other"),
+    geoIngestTokenGeneration: integer("geo_ingest_token_generation")
+      .notNull()
+      .default(1),
+    feedbackIngestTokenGeneration: integer("feedback_ingest_token_generation")
+      .notNull()
+      .default(1),
+    onboardingCompleted: boolean("onboarding_completed")
+      .default(false)
+      .notNull(),
+    onboardingDismissed: boolean("onboarding_dismissed")
+      .default(false)
+      .notNull(),
+    onboardingAgentRan: boolean("onboarding_agent_ran")
+      .default(false)
+      .notNull(),
+    onboardingAgentStartedAt: timestamp("onboarding_agent_started_at"),
+    workosOrgId: text("workos_org_id").unique(),
+    /** Set while Notra has suspended the workspace for abuse. */
+    suspendedAt: timestamp("suspended_at"),
+    suspendedReason: text("suspended_reason"),
+    suspendedCategory: text("suspended_category", {
+      enum: SITE_SUSPENSION_CATEGORIES,
+    }),
+  },
+  (table) => [
+    check(
+      "organizations_suspendedCategory_check",
+      sql`${table.suspendedCategory} IN ('phishing', 'malware', 'deceptive_redirects', 'spam', 'terms')`
+    ),
+  ]
+);
 
 export const freeScanClaims = pgTable(
   "free_scan_claims",
@@ -414,6 +437,45 @@ export const freeScanClaims = pgTable(
   },
   (table) => [
     index("freeScanClaims_organizationId_idx").on(table.organizationId),
+  ]
+);
+
+/** Append-only record of every suspension and ban, by whom and why. */
+export const abuseActions = pgTable(
+  "abuse_actions",
+  {
+    id: text("id").primaryKey(),
+    subjectType: text("subject_type", { enum: ABUSE_SUBJECT_TYPES }).notNull(),
+    subjectId: text("subject_id").notNull(),
+    action: text("action", { enum: ABUSE_ACTIONS }).notNull(),
+    category: text("category", { enum: SITE_SUSPENSION_CATEGORIES }),
+    reason: text("reason"),
+    /** A repeat that finished an earlier action instead of starting one. */
+    retry: boolean("retry").default(false).notNull(),
+    actorUserId: text("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("abuse_actions_subject_idx").on(
+      table.subjectType,
+      table.subjectId,
+      table.createdAt
+    ),
+    index("abuse_actions_createdAt_idx").on(table.createdAt),
+    check(
+      "abuse_actions_subjectType_check",
+      sql`${table.subjectType} IN ('site', 'organization', 'user')`
+    ),
+    check(
+      "abuse_actions_action_check",
+      sql`${table.action} IN ('suspend', 'unsuspend', 'ban', 'unban')`
+    ),
+    check(
+      "abuse_actions_category_check",
+      sql`${table.category} IN ('phishing', 'malware', 'deceptive_redirects', 'spam', 'terms')`
+    ),
   ]
 );
 
@@ -4121,6 +4183,10 @@ export const sites = pgTable(
     status: text("status", { enum: SITE_STATUSES }).notNull().default("active"),
     suspendedReason: text("suspended_reason"),
     suspendedBy: text("suspended_by", { enum: SITE_SUSPENDERS }),
+    /** Suspended by an organization suspension; lifted with it. */
+    suspendedWithOrganization: boolean("suspended_with_organization")
+      .notNull()
+      .default(false),
     lastGeneration: integer("last_generation").notNull().default(0),
     activeProductionDeploymentId: text(
       "active_production_deployment_id"

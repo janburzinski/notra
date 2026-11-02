@@ -1,3 +1,4 @@
+import { SITE_CONSOLE_ACTIONS } from "@notra/sites-core/constants/sites";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -11,15 +12,26 @@ export const metadata: Metadata = {
 
 export default async function SiteDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string; siteId: string }>;
+  searchParams: Promise<{ action?: string | string[] }>;
 }) {
-  const { slug, siteId } = await params;
+  const [{ slug, siteId }, { action }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const { user } = await validateOrganizationAccess(slug);
 
   if (!hasAdminRole(user.role)) {
     notFound();
   }
 
-  return <SiteDetailClient siteId={siteId} slug={slug} />;
+  return (
+    <SiteDetailClient
+      action={SITE_CONSOLE_ACTIONS.find((value) => value === action)}
+      siteId={siteId}
+      slug={slug}
+    />
+  );
 }

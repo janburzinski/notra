@@ -70,7 +70,6 @@ a:focus-visible,.button:focus-visible{outline:2px solid var(--primary);outline-o
 
 export const NOTRA_HOME_URL = "https://usenotra.com";
 
-export const SITES_ABUSE_EMAIL = "abuse@usenotra.com";
 export const SITES_SECURITY_EMAIL = "security@usenotra.com";
 export const SECURITY_TXT_LIFETIME_DAYS = 180;
 

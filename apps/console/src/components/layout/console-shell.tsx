@@ -10,6 +10,7 @@ import {
   MagicWand01Icon,
   Robot01Icon,
   SecurityCheckIcon,
+  Shield01Icon,
   Tick02Icon,
   UnfoldMoreIcon,
   UserSwitchIcon,
@@ -202,6 +203,11 @@ function ConsoleNavigation({
             href: `/${slug}/sites`,
             label: "Sites",
             icon: GlobeIcon,
+          },
+          {
+            href: `/${slug}/moderation`,
+            label: "Moderation",
+            icon: Shield01Icon,
           },
           { href: `/${slug}/autopilot`, label: "Autopilot", icon: Robot01Icon },
           {

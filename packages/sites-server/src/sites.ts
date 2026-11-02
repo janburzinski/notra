@@ -1,5 +1,6 @@
 import { db } from "@notra/db/drizzle";
 import {
+  abuseActions,
   organizations,
   projects,
   siteDomains,
@@ -10,11 +11,11 @@ import {
   sites,
 } from "@notra/db/schema";
 import {
+  SITE_ABUSE_EMAIL,
   SITE_PREVIEW_PASSWORD_MAX_LENGTH,
   SITE_PREVIEW_PASSWORD_MIN_LENGTH,
 } from "@notra/sites-core/constants/sites";
 import type { SiteMounts } from "@notra/sites-core/types/deployment";
-import type { SiteSuspender } from "@notra/sites-core/types/sites";
 import {
   isAvailableSiteSlug,
   siteAliasHost,
@@ -22,7 +23,7 @@ import {
 } from "@notra/sites-core/utils/hosts";
 import { normalizeSiteMounts } from "@notra/sites-core/utils/mounts";
 import { hashPreviewPassword } from "@notra/sites-core/utils/preview-password";
-import { and, eq, inArray, sql, or, isNull } from "drizzle-orm";
+import { and, desc, eq, inArray, sql, or, isNull } from "drizzle-orm";
 
 import { deleteCustomHostnameQuietly } from "./cloudflare-saas";
 import { SITE_NAME_REJECTION_MESSAGES } from "./constants/moderation";
@@ -51,6 +52,10 @@ import type { SiteStorageTransaction } from "./types/deployments";
 import type {
   CreateSiteInput,
   CreateSiteResult,
+  SetOrganizationSuspendedInput,
+  SetOrganizationSuspendedResult,
+  SetSiteSuspendedOptions,
+  SiteTransitionResult,
   Site,
   SiteSettingsPatch,
   SiteUpdateValues,
@@ -120,9 +125,31 @@ async function isSlugHeldForOther(
   return grant !== undefined && grant.organizationId !== organizationId;
 }
 
+/**
+ * Rejects work for a workspace Notra suspended. Inside a transaction the share
+ * lock, taken before any host lock, makes a concurrent workspace suspension
+ * wait for the caller to commit, so a site created meanwhile is taken down too.
+ */
+async function assertWorkspaceNotSuspended(
+  organizationId: string,
+  executor: Pick<typeof db, "select">
+): Promise<void> {
+  const [organization] = await executor
+    .select({ suspendedAt: organizations.suspendedAt })
+    .from(organizations)
+    .where(eq(organizations.id, organizationId))
+    .for("share");
+  if (organization?.suspendedAt) {
+    throw new SiteInputError(
+      `Notra suspended this workspace. Contact ${SITE_ABUSE_EMAIL} to restore it.`
+    );
+  }
+}
+
 export async function createSite(
   input: CreateSiteInput
 ): Promise<CreateSiteResult> {
+  await assertWorkspaceNotSuspended(input.organizationId, db);
   const project = input.projectId
     ? await db.query.projects.findFirst({
         columns: { id: true },
@@ -175,40 +202,47 @@ export async function createSite(
   try {
     // Deletion retires the slug while holding this lock, so the grant is
     // rechecked under it before the alias is claimed.
-    site = await withSiteHostLock(aliasHost, async (tx) => {
-      if (await isSlugHeldForOther(slug, input.organizationId, tx)) {
-        throw new SiteInputError(SITE_NAME_REJECTION_MESSAGES.granted, {
-          field: "slug",
-        });
-      }
-      await assertSitePlanAllows(tx, input.organizationId, plan, "sites");
-      await claimHostRecord(aliasHost, { siteId, kind: "alias" });
-      const [inserted] = await tx
-        .insert(sites)
-        .values({
-          id: siteId,
-          organizationId: input.organizationId,
-          projectId: project.id,
-          name: input.name.trim(),
-          slug,
-          repositoryId: integration.id,
-          githubInstallationId: repository.installationId,
-          githubRepositoryId: integration.githubRepositoryId,
-          repositoryOwner: repository.owner,
-          repositoryName: repository.repo,
-          productionBranch:
-            input.productionBranch?.trim() ||
-            integration.defaultBranch ||
-            "main",
-          rootDirectory,
-          publicOrigin: siteAliasOrigin(slug),
-          mounts,
-          previewVisibility: input.previewVisibility ?? "protected",
-          previewsEnabled: input.previewsEnabled ?? true,
-          createdByUserId: input.userId,
-        })
-        .returning();
-      return inserted;
+    site = await db.transaction(async (outer) => {
+      await assertWorkspaceNotSuspended(input.organizationId, outer);
+      return await withSiteHostLock(
+        aliasHost,
+        async (tx) => {
+          if (await isSlugHeldForOther(slug, input.organizationId, tx)) {
+            throw new SiteInputError(SITE_NAME_REJECTION_MESSAGES.granted, {
+              field: "slug",
+            });
+          }
+          await assertSitePlanAllows(tx, input.organizationId, plan, "sites");
+          await claimHostRecord(aliasHost, { siteId, kind: "alias" });
+          const [inserted] = await tx
+            .insert(sites)
+            .values({
+              id: siteId,
+              organizationId: input.organizationId,
+              projectId: project.id,
+              name: input.name.trim(),
+              slug,
+              repositoryId: integration.id,
+              githubInstallationId: repository.installationId,
+              githubRepositoryId: integration.githubRepositoryId,
+              repositoryOwner: repository.owner,
+              repositoryName: repository.repo,
+              productionBranch:
+                input.productionBranch?.trim() ||
+                integration.defaultBranch ||
+                "main",
+              rootDirectory,
+              publicOrigin: siteAliasOrigin(slug),
+              mounts,
+              previewVisibility: input.previewVisibility ?? "protected",
+              previewsEnabled: input.previewsEnabled ?? true,
+              createdByUserId: input.userId,
+            })
+            .returning();
+          return inserted;
+        },
+        { tx: outer }
+      );
     });
   } catch (error) {
     await releaseHostRecord(aliasHost, siteId);
@@ -234,40 +268,277 @@ export async function createSite(
   return { site, jobId };
 }
 
-export async function setSiteSuspended(
+/**
+ * Moves one site in or out of suspension inside the caller's transaction. The
+ * workspace row is locked before the site row, the same order workspace
+ * actions and deletion use, so a workspace action and a site change never
+ * interleave. Repeating an action the site is already in changes nothing and
+ * is audited as a retry, keyed to the original suspension for its notice.
+ */
+async function transitionSite(
+  tx: SiteStorageTransaction,
   site: Site,
   suspended: boolean,
-  reason?: string,
-  by: SiteSuspender = "owner"
-): Promise<void> {
-  const status = suspended ? "suspended" : "active";
-  await db.transaction(async (tx) => {
-    // Re-read under lock so an owner request can't overwrite a Notra
-    // suspension that landed after the caller loaded the site.
-    const [current] = await tx
-      .select({ suspendedBy: sites.suspendedBy })
-      .from(sites)
-      .where(eq(sites.id, site.id))
-      .for("update");
-    if (!current) {
-      throw new SiteInputError("Site not found");
-    }
-    if (by === "owner" && current.suspendedBy === "notra") {
-      throw new SiteInputError(
-        "Notra suspended this site. Contact support to restore it."
-      );
-    }
-    await setServingStatus(site, status, tx);
+  {
+    by = "owner",
+    reason,
+    category,
+    actorUserId = null,
+    withOrganization = false,
+  }: SetSiteSuspendedOptions
+): Promise<SiteTransitionResult> {
+  const [organization] = await tx
+    .select({ suspendedAt: organizations.suspendedAt })
+    .from(organizations)
+    .where(eq(organizations.id, site.organizationId))
+    .for("share");
+  // Re-read under lock so an owner request can't overwrite a Notra
+  // suspension that landed after the caller loaded the site.
+  const [current] = await tx
+    .select({
+      status: sites.status,
+      suspendedBy: sites.suspendedBy,
+      suspendedWithOrganization: sites.suspendedWithOrganization,
+    })
+    .from(sites)
+    .where(eq(sites.id, site.id))
+    .for("update");
+  if (!current) {
+    throw new SiteInputError("Site not found");
+  }
+  // A workspace change only touches sites still in the state it selected,
+  // so it never adopts or lifts a takedown made on its own.
+  if (
+    withOrganization &&
+    (suspended
+      ? current.status !== "active"
+      : !current.suspendedWithOrganization)
+  ) {
+    return { changed: false, retry: false, notice: null };
+  }
+  const retry = suspended
+    ? current.status === "suspended" &&
+      current.suspendedBy === by &&
+      current.suspendedWithOrganization === withOrganization
+    : current.status === "active";
+  // The workspace comes first, so a site taken down with it names the
+  // workspace as the reason it can't come back.
+  if (!(suspended || retry) && organization?.suspendedAt) {
+    throw new SiteInputError(
+      by === "owner"
+        ? `Notra suspended this workspace. Contact ${SITE_ABUSE_EMAIL} to restore it.`
+        : "Lift the workspace suspension first"
+    );
+  }
+  if (by === "owner" && current.suspendedBy === "notra") {
+    throw new SiteInputError(
+      `Notra suspended this site. Contact ${SITE_ABUSE_EMAIL} to restore it.`
+    );
+  }
+  const notice = suspended && by === "notra" && category ? { category } : null;
+  if (!retry) {
+    const status = suspended ? "suspended" : "active";
+    await setServingStatus(site, status, tx, notice);
     await tx
       .update(sites)
       .set({
         status,
         suspendedReason: suspended ? (reason ?? null) : null,
         suspendedBy: suspended ? by : null,
+        suspendedWithOrganization: suspended && withOrganization,
       })
       .where(eq(sites.id, site.id));
+  }
+  // Owner pauses aren't moderation, so only Notra actions are audited.
+  if (by === "owner") {
+    return { changed: !retry, retry, notice: null };
+  }
+  // A repeated suspension keeps the original category, reason and notice key.
+  const [original] =
+    suspended && retry
+      ? await tx
+          .select({
+            id: abuseActions.id,
+            category: abuseActions.category,
+            reason: abuseActions.reason,
+          })
+          .from(abuseActions)
+          .where(
+            and(
+              eq(abuseActions.subjectType, "site"),
+              eq(abuseActions.subjectId, site.id),
+              eq(abuseActions.action, "suspend"),
+              eq(abuseActions.retry, false)
+            )
+          )
+          .orderBy(desc(abuseActions.createdAt))
+          .limit(1)
+      : [];
+  const actionId = prefixedId("abuse");
+  const noticeCategory = original
+    ? original.category
+    : (notice?.category ?? null);
+  await tx.insert(abuseActions).values({
+    id: actionId,
+    subjectType: "site",
+    subjectId: site.id,
+    action: suspended ? "suspend" : "unsuspend",
+    category: noticeCategory,
+    reason: reason ?? null,
+    retry,
+    actorUserId,
   });
-  await invalidateSiteIngestCaches(site);
+  return {
+    changed: !retry,
+    retry,
+    notice:
+      suspended && noticeCategory
+        ? {
+            key: original?.id ?? actionId,
+            category: noticeCategory,
+            reason: (original ? original.reason : reason) ?? "",
+          }
+        : null,
+  };
+}
+
+export async function setSiteSuspended(
+  site: Site,
+  suspended: boolean,
+  options: SetSiteSuspendedOptions = {}
+): Promise<SiteTransitionResult> {
+  const result = await db.transaction((tx) =>
+    transitionSite(tx, site, suspended, options)
+  );
+  if (result.changed) {
+    await invalidateSiteIngestCaches(site);
+  }
+  return result;
+}
+
+/**
+ * Suspends or lifts a workspace with every site it covers: suspending takes
+ * its active sites offline and blocks new sites, builds and API keys;
+ * lifting restores only the sites the suspension took down. The whole action
+ * holds the workspace row, so overlapping workspace and site changes apply in
+ * order. A site that fails is rolled back on its own and counted. Repeating
+ * the action the workspace is already in is a retry: it keeps the original
+ * time, reason and notice key and only finishes the sites left over.
+ */
+export async function setOrganizationSuspended(
+  input: SetOrganizationSuspendedInput
+): Promise<SetOrganizationSuspendedResult> {
+  const { organizationId, suspended, reason, actorUserId } = input;
+  const result = await db.transaction(async (tx) => {
+    const [current] = await tx
+      .select({
+        id: organizations.id,
+        name: organizations.name,
+        slug: organizations.slug,
+        suspendedAt: organizations.suspendedAt,
+        suspendedReason: organizations.suspendedReason,
+        suspendedCategory: organizations.suspendedCategory,
+      })
+      .from(organizations)
+      .where(eq(organizations.id, organizationId))
+      .for("update");
+    if (!current) {
+      throw new SiteInputError("Organization not found");
+    }
+    const retry = suspended === (current.suspendedAt !== null);
+    const category = retry
+      ? (current.suspendedCategory ?? undefined)
+      : input.category;
+    if (suspended && !category) {
+      throw new SiteInputError("A suspension needs a category");
+    }
+    const suspendedAt = suspended ? (current.suspendedAt ?? new Date()) : null;
+    if (!retry) {
+      await tx
+        .update(organizations)
+        .set({
+          suspendedAt,
+          suspendedReason: suspended ? reason : null,
+          suspendedCategory: suspended ? (category ?? null) : null,
+        })
+        .where(eq(organizations.id, organizationId));
+    }
+    await tx.insert(abuseActions).values({
+      id: prefixedId("abuse"),
+      subjectType: "organization",
+      subjectId: organizationId,
+      action: suspended ? "suspend" : "unsuspend",
+      category: suspended ? (category ?? null) : null,
+      reason,
+      retry,
+      actorUserId,
+    });
+    const affected = await tx
+      .select()
+      .from(sites)
+      .where(
+        and(
+          eq(sites.organizationId, organizationId),
+          suspended
+            ? eq(sites.status, "active")
+            : eq(sites.suspendedWithOrganization, true)
+        )
+      );
+    const changed: Site[] = [];
+    let failed = 0;
+    for (const site of affected) {
+      try {
+        const transition = await tx.transaction((savepoint) =>
+          transitionSite(savepoint, site, suspended, {
+            by: "notra",
+            reason,
+            category,
+            actorUserId,
+            withOrganization: true,
+          })
+        );
+        if (transition.changed) {
+          changed.push(site);
+        }
+      } catch (error) {
+        failed += 1;
+        console.error("sites.organization_suspension_site_failed", {
+          siteId: site.id,
+          error: errorMessage(error),
+        });
+      }
+    }
+    const notice =
+      suspendedAt && category
+        ? {
+            key: `organization:${organizationId}:${suspendedAt.toISOString()}`,
+            category,
+            reason: retry ? (current.suspendedReason ?? reason) : reason,
+            siteNames: (
+              await tx
+                .select({ name: sites.name })
+                .from(sites)
+                .where(
+                  and(
+                    eq(sites.organizationId, organizationId),
+                    eq(sites.suspendedWithOrganization, true)
+                  )
+                )
+            ).map((row) => row.name),
+          }
+        : null;
+    return {
+      organization: { id: current.id, name: current.name, slug: current.slug },
+      retry,
+      sites: changed,
+      failed,
+      notice,
+    };
+  });
+  await Promise.all(
+    result.sites.map((site) => invalidateSiteIngestCaches(site))
+  );
+  return result;
 }
 
 export async function updateSiteSettings(

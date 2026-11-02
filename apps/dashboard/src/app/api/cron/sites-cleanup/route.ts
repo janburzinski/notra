@@ -1,5 +1,6 @@
+import { ABUSE_ACTION_RETENTION_DAYS } from "@notra/db/constants/abuse";
 import { db } from "@notra/db/drizzle";
-import { sites, siteWebhookDeliveries } from "@notra/db/schema";
+import { abuseActions, sites, siteWebhookDeliveries } from "@notra/db/schema";
 import { cleanupSiteDeployments } from "@notra/sites-server/cleanup";
 import { mapWithConcurrency } from "@notra/sites-server/utils/concurrency";
 import { isDemoMode } from "@notra/utils/demo-mode";
@@ -39,6 +40,14 @@ export async function GET(request: Request) {
     .delete(siteWebhookDeliveries)
     .where(
       lt(siteWebhookDeliveries.receivedAt, sql`now() - interval '14 days'`)
+    );
+  await db
+    .delete(abuseActions)
+    .where(
+      lt(
+        abuseActions.createdAt,
+        sql`now() - make_interval(days => ${ABUSE_ACTION_RETENTION_DAYS})`
+      )
     );
   return Response.json(
     { deleted, failed },

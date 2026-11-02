@@ -6,6 +6,7 @@ import {
   SITE_PREVIEW_PASSWORD_ALGORITHM,
   SITE_PREVIEW_VISIBILITIES,
   SITE_STATUSES,
+  SITE_SUSPENSION_CATEGORIES,
 } from "@notra/sites-core/constants/sites";
 import { siteConfigSchema } from "@notra/sites-core/schemas/site-config";
 import { z } from "zod";
@@ -107,6 +108,10 @@ export const siteServingStateSchema = z.object({
   siteId: z.string(),
   slug: z.string(),
   status: z.enum(SITE_STATUSES),
+  suspension: z
+    .object({ category: z.enum(SITE_SUSPENSION_CATEGORIES) })
+    .nullable()
+    .default(null),
   production: siteServingPointerSchema.nullable(),
   productionRollback: z.boolean().default(false),
   previews: z.record(z.string(), sitePreviewPointerSchema),

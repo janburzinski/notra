@@ -1,5 +1,5 @@
 import { db } from "@notra/db/drizzle";
-import { socialConnections, users } from "@notra/db/schema";
+import { abuseActions, socialConnections, users } from "@notra/db/schema";
 import { deleteBrewContact } from "@notra/email/utils/brew";
 import { POSTHOG_EVENTS } from "@notra/posthog/events";
 import {
@@ -213,7 +213,20 @@ export async function deleteUser(): Promise<
       });
 
       yield* tryAction(
-        () => db.delete(users).where(eq(users.id, session.user.id)),
+        () =>
+          db.transaction(async (tx) => {
+            // Moderation records about the account go with it; its id can't
+            // match a new sign-up, so keeping them would protect nothing.
+            await tx
+              .delete(abuseActions)
+              .where(
+                and(
+                  eq(abuseActions.subjectType, "user"),
+                  eq(abuseActions.subjectId, session.user.id)
+                )
+              );
+            await tx.delete(users).where(eq(users.id, session.user.id));
+          }),
         "Failed to delete user"
       );
       yield* Effect.sync(() => {

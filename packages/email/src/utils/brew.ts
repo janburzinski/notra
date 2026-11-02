@@ -217,12 +217,13 @@ export async function sendBrewEmail(
     };
   }
 
-  if ((fired?.counts?.skipped ?? 0) > 0) {
+  const skipped = (fired?.counts?.skipped ?? 0) > 0;
+  if (skipped) {
     console.warn(`[Brew] ${category} email skipped, recipient is suppressed`);
   }
 
   return {
-    data: { id: fired?.triggerInstanceId ?? "unknown" },
+    data: { id: fired?.triggerInstanceId ?? "unknown", skipped },
     error: null,
   };
 }

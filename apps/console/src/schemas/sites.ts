@@ -1,3 +1,4 @@
+import { SITE_SUSPENSION_CATEGORIES } from "@notra/sites-core/constants/sites";
 // biome-ignore lint/performance/noNamespaceImport: Zod recommended way to import
 import * as z from "zod";
 
@@ -27,10 +28,24 @@ export const siteBuildActivityInputSchema = z.object({
   days: z.number().int().min(1).max(MAX_DAYS).default(SITE_ACTIVITY_DAYS),
 });
 
-export const siteSuspendInputSchema = siteInputSchema.extend({
-  suspended: z.boolean(),
-  reason: z.string().trim().max(SITE_MAX_SUSPENSION_REASON_LENGTH).optional(),
-});
+export const suspensionReasonSchema = z
+  .string()
+  .trim()
+  .min(1, "A reason is required")
+  .max(SITE_MAX_SUSPENSION_REASON_LENGTH);
+
+export const suspensionCategorySchema = z.enum(SITE_SUSPENSION_CATEGORIES);
+
+export const siteSuspendInputSchema = siteInputSchema
+  .extend({
+    suspended: z.boolean(),
+    reason: suspensionReasonSchema,
+    category: suspensionCategorySchema.optional(),
+  })
+  .refine((input) => !input.suspended || input.category, {
+    message: "Pick a category for the suspension",
+    path: ["category"],
+  });
 
 /** The parts of `sites/{id}/state.json` in R2 the console reads. */
 export const siteServingStateSchema = z.object({

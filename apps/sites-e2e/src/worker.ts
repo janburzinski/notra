@@ -6,6 +6,7 @@ import { cpus, platform, release } from "node:os";
 import { join, resolve } from "node:path";
 
 import {
+  SITE_ABUSE_EMAIL,
   SITE_ANALYTICS_EVENT_FILE,
   SITE_ANALYTICS_SCRIPT_FILE,
   SITE_PREVIEW_AUTH_PATH,
@@ -45,6 +46,7 @@ import {
   PREVIEW_SECRET,
   SITE_ID,
   STALE_ALIAS_HOST,
+  SUSPENDED_HOST,
   TRAFFIC_TOKEN,
   UNKNOWN_HOST,
 } from "./constants/fixtures";
@@ -56,7 +58,7 @@ import { cspAllowsOrigin } from "./utils/csp";
 import { countByUrl, isEngagement } from "./utils/ingest";
 import { createSiteResourceWaiter } from "./utils/resources";
 import { freePort, startSitesWorker } from "./utils/sites-worker";
-import { seedOtherTenant } from "./utils/tenants";
+import { seedOtherTenant, seedSuspendedTenant } from "./utils/tenants";
 import { startTlsProxy } from "./utils/tls-proxy";
 
 const [temp, repetitionsText, executablePath, mode, vendorScriptsText] =
@@ -258,6 +260,7 @@ try {
     acmeFiles: liveManifest.files,
     borrowed: previewDraft,
   });
+  seedSuspendedTenant(objects);
   sites = await startSitesWorker({
     root,
     temp,
@@ -473,6 +476,20 @@ try {
         assert.equal(
           await page.getByTestId("inline-toggle").textContent(),
           "Inline toggle: on"
+        );
+        const report = page.getByRole("link", {
+          name: "Report abuse",
+          exact: true,
+        });
+        assert.equal(await report.count(), 1, "the footer links to a report");
+        const reportHref = (await report.getAttribute("href")) ?? "";
+        assert.ok(
+          reportHref.startsWith(`mailto:${SITE_ABUSE_EMAIL}?subject=`),
+          reportHref
+        );
+        assert.ok(
+          reportHref.includes(encodeURIComponent(`${origin}${path}`)),
+          `the report names the page: ${reportHref}`
         );
         await page.screenshot({ path: join(temp, "live.png"), fullPage: true });
       }
@@ -978,6 +995,29 @@ try {
   }
   checks.push(
     "second tenant: alias and custom-domain hosts serve only their own files on shared paths and content hashes; stale alias and unknown host get the 404 page"
+  );
+  for (const path of ["/blog", "/blog/hello-world.md"]) {
+    const response = await request(path, {}, SUSPENDED_HOST);
+    const body = await response.text();
+    assert.equal(response.status, 410, `${SUSPENDED_HOST}${path} is suspended`);
+    assert.ok(body.includes("Reason: Phishing or credential harvesting"), body);
+    assert.ok(
+      body.includes(
+        `mailto:${SITE_ABUSE_EMAIL}?subject=${encodeURIComponent(`Abuse report: ${SUSPENDED_HOST}:${port}`)}`
+      ),
+      "the 410 page links to a prefilled abuse report"
+    );
+    assert.ok(body.includes(">Report abuse<"), body);
+    assert.ok(body.includes(">Request a review<"), body);
+    for (const text of [...ACME_TEXT, "Globex"]) {
+      assert.ok(
+        !body.includes(text),
+        `${SUSPENDED_HOST}${path} leaks "${text}"`
+      );
+    }
+  }
+  checks.push(
+    "suspended tenant: 410 page with the neutral reason, a prefilled abuse report and an appeal link, no site content"
   );
   checks.push(
     await assertConsentVisits({

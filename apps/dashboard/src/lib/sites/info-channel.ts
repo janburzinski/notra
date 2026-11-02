@@ -4,6 +4,7 @@ import type { Site } from "@notra/sites-server/types/sites";
 import { eq } from "drizzle-orm";
 
 import { notifyInfoChannel } from "@/lib/slack/info-channel";
+import { consoleSiteUrl } from "@/utils/console-links";
 
 async function workspaceLabel(organizationId: string): Promise<string> {
   const [organization] = await db
@@ -38,6 +39,28 @@ export function notifySitesCreated(sites: Site[], createdBy: string): void {
       ].join(", "),
       "Created by": createdBy,
     },
+    links: [
+      ...(sites.length === 1
+        ? [
+            {
+              label: "Suspend site",
+              url: consoleSiteUrl(first.id, "suspend-site"),
+              danger: true,
+            },
+          ]
+        : []),
+      {
+        label: "Suspend workspace",
+        url: consoleSiteUrl(first.id, "suspend-workspace"),
+        danger: true,
+      },
+      {
+        label: "Ban owner",
+        url: consoleSiteUrl(first.id, "ban-owner"),
+        danger: true,
+      },
+      { label: "Open in console", url: consoleSiteUrl(first.id) },
+    ],
   }));
 }
 

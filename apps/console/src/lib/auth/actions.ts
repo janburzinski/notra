@@ -7,14 +7,17 @@ import { cache } from "react";
 import { isSessionBanned } from "@/lib/auth/banned";
 import { getRequestSession } from "@/lib/auth/session";
 
-export async function requireAuth() {
+/** Signs the visitor in first, coming back to returnTo when it is given. */
+export async function requireAuth(returnTo?: string) {
   const { session, user } = await getRequestSession();
 
   if (!(session && user)) {
     if (await isSessionBanned()) {
       redirect("/auth/banned");
     }
-    redirect("/login");
+    redirect(
+      returnTo ? `/login?returnTo=${encodeURIComponent(returnTo)}` : "/login"
+    );
   }
 
   return {

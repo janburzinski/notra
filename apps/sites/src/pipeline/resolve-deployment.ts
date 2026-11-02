@@ -30,7 +30,7 @@ export const resolveDeployment = Effect.fn("Sites.resolveDeployment")(
       return html(notFoundPage(), 404);
     }
     if (state.status !== "active") {
-      return html(unavailablePage(), 410);
+      return html(unavailablePage(context.url, state.suspension), 410);
     }
     if (parsedHost.kind === "preview") {
       return yield* resolvePreview(

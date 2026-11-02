@@ -5,6 +5,7 @@ import { ScheduledContentCreatedEmail } from "@notra/email/emails/schedule-conte
 import { ScheduledContentFailedEmail } from "@notra/email/emails/schedule-content-failed";
 import { ScheduledContentSkippedEmail } from "@notra/email/emails/schedule-content-skipped";
 import { ScheduledPublicationFailedEmail } from "@notra/email/emails/scheduled-publication-failed";
+import { SiteSuspendedEmail } from "@notra/email/emails/site-suspended";
 import { VisibilityDropEmail } from "@notra/email/emails/visibility-drop";
 import { WeeklySummaryEmail } from "@notra/email/emails/weekly-summary";
 import { WelcomeEmail } from "@notra/email/emails/welcome";
@@ -23,6 +24,7 @@ import type {
   SendScheduledContentFailedEmailProps,
   SendScheduledContentSkippedEmailProps,
   SendScheduledPublicationFailedEmailProps,
+  SendSiteSuspendedEmailProps,
   SendWelcomeEmailProps,
   SendWorkflowPausedEmailProps,
 } from "@/types/email/send";
@@ -276,5 +278,23 @@ export async function sendGeoAlertEmail({
     subject: props.headline,
     react: GeoAlertEmail(props),
     idempotencyKey: `${recipientEmail}:${props.organizationSlug}:alert:${alertKey}`,
+  });
+}
+
+export async function sendSiteSuspendedEmail({
+  recipientEmail,
+  abuseActionKey,
+  ...props
+}: SendSiteSuspendedEmailProps) {
+  return sendBrewEmail({
+    // No dedicated Brew trigger yet; this shares the account-notice one.
+    category: "workflow-paused",
+    to: recipientEmail,
+    subject:
+      props.scope === "workspace"
+        ? `Your Notra workspace ${props.organizationName} was suspended`
+        : `Your Notra site ${props.siteNames[0] ?? ""} was suspended`,
+    react: SiteSuspendedEmail(props),
+    idempotencyKey: `site-suspended:${abuseActionKey}:${recipientEmail}`,
   });
 }

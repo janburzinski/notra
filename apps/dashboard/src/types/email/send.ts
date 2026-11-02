@@ -5,6 +5,7 @@ import type {
   WeeklySummaryEmailProps,
 } from "@notra/email/types/geo-recap";
 import type { ScheduledPublicationFailedEmailProps } from "@notra/email/types/scheduled-publication-failed";
+import type { SiteSuspendedEmailProps } from "@notra/email/types/site-suspended";
 import type { WorkflowPausedReason } from "@notra/email/types/workflow-paused";
 
 interface DigestEmailProps {
@@ -103,4 +104,10 @@ export interface SendGeoAlertEmailProps extends GeoAlertEmailProps {
 export interface SendWelcomeEmailProps {
   userEmail: string;
   slackInvited: boolean;
+}
+
+export interface SendSiteSuspendedEmailProps extends SiteSuspendedEmailProps {
+  recipientEmail: string;
+  /** Dedupes the send per suspension: the audit row id for a site, the workspace id and suspension time for a workspace. */
+  abuseActionKey: string;
 }

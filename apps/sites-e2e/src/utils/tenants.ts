@@ -14,6 +14,8 @@ import {
   OTHER_SITE_ID,
   OTHER_SITE_SLUG,
   STALE_ALIAS_HOST,
+  SUSPENDED_HOST,
+  SUSPENDED_SITE_ID,
 } from "../constants/fixtures";
 
 const DEPLOYMENT_ID = "dep_globex";
@@ -121,5 +123,33 @@ export function seedOtherTenant(
       ["/blog/hello-world.md", "/blog/hello-world/index.md"],
       ["/blog/carry-over", "/blog/carry-over/index.html"],
     ].map(([path, file]) => [path, pages.get(file) ?? ""])
+  );
+}
+
+/** A site Notra suspended for phishing; it still has a live deployment. */
+export function seedSuspendedTenant(objects: Map<string, Uint8Array>) {
+  const state = siteServingStateSchema.parse({
+    version: 1,
+    siteId: SUSPENDED_SITE_ID,
+    slug: "suspended",
+    status: "suspended",
+    suspension: { category: "phishing" },
+    production: {
+      deploymentId: DEPLOYMENT_ID,
+      generation: 1,
+      activatedAt: new Date().toISOString(),
+    },
+    previews: {},
+    updatedAt: new Date().toISOString(),
+  });
+  objects.set(
+    `sites/${SUSPENDED_SITE_ID}/state.json`,
+    new TextEncoder().encode(JSON.stringify(state))
+  );
+  objects.set(
+    `hosts/${SUSPENDED_HOST}.json`,
+    new TextEncoder().encode(
+      JSON.stringify({ version: 1, siteId: SUSPENDED_SITE_ID, kind: "alias" })
+    )
   );
 }

@@ -192,6 +192,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
   };
   const { db } = await import("@notra/db/drizzle");
   const {
+    abuseActions,
     users,
     organizations,
     githubAppInstallations,
@@ -209,8 +210,13 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
   const { eq, inArray } = await import("drizzle-orm");
   const { getGitHubAppWebhookSecret } =
     await import("@notra/ai/utils/github-mention-ingest");
-  const { createSite, updateSiteSettings, deleteSite, setSiteSuspended } =
-    await import("../../../packages/sites-server/src/sites");
+  const {
+    createSite,
+    updateSiteSettings,
+    deleteSite,
+    setOrganizationSuspended,
+    setSiteSuspended,
+  } = await import("../../../packages/sites-server/src/sites");
   const { getSite, getDeployment } =
     await import("../../../packages/sites-server/src/deployments");
   const {
@@ -754,6 +760,431 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
       const resumed = await getSite(site.id);
       assert.ok(resumed);
       site = resumed;
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(200);
+      await phase("Notra suspension: reason page, audit, owner can't lift");
+      await setSiteSuspended(site, true, {
+        by: "notra",
+        reason: "Lifecycle phishing report",
+        category: "phishing",
+        actorUserId: userId,
+      });
+      const takenDown = await request(`${site.publicOrigin}/blog`);
+      expect(takenDown.status).toBe(410);
+      const takenDownHtml = await takenDown.text();
+      expect(takenDownHtml).toContain(
+        "Reason: Phishing or credential harvesting"
+      );
+      expect(takenDownHtml).toContain(
+        `mailto:abuse@usenotra.com?subject=${encodeURIComponent(`Abuse report: ${new URL(site.publicOrigin).host}`)}`
+      );
+      expect(takenDownHtml).not.toContain("Lifecycle phishing report");
+      const notraSuspended = await getSite(site.id);
+      assert.ok(notraSuspended);
+      await expect(setSiteSuspended(notraSuspended, false)).rejects.toThrow(
+        "Notra suspended this site"
+      );
+      await setSiteSuspended(notraSuspended, false, {
+        by: "notra",
+        reason: "Lifecycle appeal accepted",
+        actorUserId: userId,
+      });
+      const reinstated = await getSite(site.id);
+      assert.ok(reinstated);
+      site = reinstated;
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(200);
+      await phase("workspace suspension: sites, builds and new sites blocked");
+      const workspace = await setOrganizationSuspended({
+        organizationId,
+        suspended: true,
+        reason: "Lifecycle repeat abuse",
+        category: "malware",
+        actorUserId: userId,
+      });
+      expect(workspace.sites.map((entry) => entry.id)).toEqual([site.id]);
+      const workspacePage = await request(`${site.publicOrigin}/blog`);
+      expect(workspacePage.status).toBe(410);
+      expect(await workspacePage.text()).toContain(
+        "Reason: Malware or unwanted software"
+      );
+      await expect(
+        deployBranchHead(site, { trigger: "manual", userId })
+      ).rejects.toThrow("This site is suspended");
+      const blockedPush = await github.push(
+        [
+          {
+            path: "notes/suspended.txt",
+            content: new TextEncoder().encode("blocked"),
+          },
+        ],
+        "Push while the workspace is suspended"
+      );
+      const blockedDelivery = await deliveryFor(blockedPush);
+      expect(blockedDelivery.jobIds).toEqual([]);
+      await expect(
+        createSite({ ...input, name: "Second site", slug: undefined })
+      ).rejects.toThrow("Notra suspended this workspace");
+      const workspaceSite = await getSite(site.id);
+      assert.ok(workspaceSite);
+      await expect(
+        setSiteSuspended(workspaceSite, false, {
+          by: "notra",
+          reason: "Too early",
+          actorUserId: userId,
+        })
+      ).rejects.toThrow("Lift the workspace suspension first");
+      await expect(setSiteSuspended(workspaceSite, false)).rejects.toThrow(
+        "Notra suspended this"
+      );
+      const lifted = await setOrganizationSuspended({
+        organizationId,
+        suspended: false,
+        reason: "Lifecycle appeal accepted",
+        actorUserId: userId,
+      });
+      expect(lifted.sites.map((entry) => entry.id)).toEqual([site.id]);
+      const workspaceRestored = await getSite(site.id);
+      assert.ok(workspaceRestored);
+      expect(workspaceRestored).toMatchObject({
+        status: "active",
+        suspendedBy: null,
+        suspendedWithOrganization: false,
+      });
+      site = workspaceRestored;
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(200);
+      const audit = await db
+        .select({
+          subjectType: abuseActions.subjectType,
+          action: abuseActions.action,
+          category: abuseActions.category,
+          actorUserId: abuseActions.actorUserId,
+        })
+        .from(abuseActions)
+        .where(inArray(abuseActions.subjectId, [site.id, organizationId]))
+        // A workspace action writes its own row and its sites' rows in one
+        // transaction, so they share a timestamp; the workspace row sorts first.
+        .orderBy(abuseActions.createdAt, abuseActions.subjectType);
+      // The owner's own suspend and resume above are not moderation, so
+      // they leave no audit rows.
+      expect(audit).toEqual([
+        {
+          subjectType: "site",
+          action: "suspend",
+          category: "phishing",
+          actorUserId: userId,
+        },
+        {
+          subjectType: "site",
+          action: "unsuspend",
+          category: null,
+          actorUserId: userId,
+        },
+        {
+          subjectType: "organization",
+          action: "suspend",
+          category: "malware",
+          actorUserId: userId,
+        },
+        {
+          subjectType: "site",
+          action: "suspend",
+          category: "malware",
+          actorUserId: userId,
+        },
+        {
+          subjectType: "organization",
+          action: "unsuspend",
+          category: null,
+          actorUserId: userId,
+        },
+        {
+          subjectType: "site",
+          action: "unsuspend",
+          category: null,
+          actorUserId: userId,
+        },
+      ]);
+      await phase("workspace actions serialize with each other and the owner");
+      // Holds the workspace row while the given actions start one after
+      // another, so each queues behind it and they run in that order.
+      const queuedBehindWorkspaceLock = async (
+        starts: (() => Promise<unknown>)[]
+      ) => {
+        let release = () => {};
+        const released = new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        let locked = () => {};
+        const holding = new Promise<void>((resolve) => {
+          locked = resolve;
+        });
+        const holder = db.transaction(async (tx) => {
+          await tx
+            .select({ id: organizations.id })
+            .from(organizations)
+            .where(eq(organizations.id, organizationId))
+            .for("update");
+          locked();
+          await released;
+        });
+        await holding;
+        const runs: Promise<unknown>[] = [];
+        for (const start of starts) {
+          runs.push(start());
+          await delay(200);
+        }
+        release();
+        await holder;
+        return await Promise.allSettled(runs);
+      };
+      const workspaceState = async () => {
+        const [row] = await db
+          .select({ suspendedAt: organizations.suspendedAt })
+          .from(organizations)
+          .where(eq(organizations.id, organizationId));
+        return {
+          suspended: row?.suspendedAt != null,
+          site: await getSite(site.id),
+        };
+      };
+      const [raceSuspend, raceLift] = await queuedBehindWorkspaceLock([
+        () =>
+          setOrganizationSuspended({
+            organizationId,
+            suspended: true,
+            reason: "Lifecycle race suspend",
+            category: "spam",
+            actorUserId: userId,
+          }),
+        () =>
+          setOrganizationSuspended({
+            organizationId,
+            suspended: false,
+            reason: "Lifecycle race lift",
+            actorUserId: userId,
+          }),
+      ]);
+      expect(raceSuspend?.status).toBe("fulfilled");
+      expect(raceLift?.status).toBe("fulfilled");
+      const afterLift = await workspaceState();
+      expect(afterLift.suspended).toBe(false);
+      expect(afterLift.site).toMatchObject({
+        status: "active",
+        suspendedWithOrganization: false,
+      });
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(200);
+      const ownerPaused = await getSite(site.id);
+      assert.ok(ownerPaused);
+      await setSiteSuspended(ownerPaused, true);
+      const [raceTakedown, raceReactivate] = await queuedBehindWorkspaceLock([
+        () =>
+          setOrganizationSuspended({
+            organizationId,
+            suspended: true,
+            reason: "Lifecycle race takedown",
+            category: "spam",
+            actorUserId: userId,
+          }),
+        () => setSiteSuspended(ownerPaused, false),
+      ]);
+      expect(raceTakedown?.status).toBe("fulfilled");
+      expect(raceReactivate?.status).toBe("rejected");
+      expect(
+        String((raceReactivate as PromiseRejectedResult).reason)
+      ).toContain("Notra suspended this workspace");
+      const afterTakedown = await workspaceState();
+      expect(afterTakedown.suspended).toBe(true);
+      expect(afterTakedown.site?.status).toBe("suspended");
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(410);
+      const raceRestored = await setOrganizationSuspended({
+        organizationId,
+        suspended: false,
+        reason: "Lifecycle race restore",
+        actorUserId: userId,
+      });
+      expect(raceRestored.sites).toEqual([]);
+      const ownerResumed = await getSite(site.id);
+      assert.ok(ownerResumed);
+      expect(ownerResumed).toMatchObject({
+        status: "suspended",
+        suspendedBy: "owner",
+      });
+      await setSiteSuspended(ownerResumed, false);
+      const raceDone = await getSite(site.id);
+      assert.ok(raceDone);
+      site = raceDone;
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(200);
+      await phase(
+        "workspace state machine: repeats, partial failures, retries"
+      );
+      const { CAS_ATTEMPTS } =
+        await import("../../../packages/sites-server/src/constants/state");
+      const machineStateKey = SITE_R2_KEYS.state(site.id);
+      // Every serving-state write of this site to the given status loses its
+      // compare-and-set until the retries run out, so that site update fails.
+      const failStatusWrites = (status: string) => {
+        for (let attempt = 0; attempt < CAS_ATTEMPTS; attempt += 1) {
+          r2.raceNextConditionalWrite(
+            (key, incoming) =>
+              key === machineStateKey &&
+              incoming.includes(`"status":"${status}"`),
+            (text) => `${text} `
+          );
+        }
+      };
+      const workspaceRow = async () =>
+        (
+          await db
+            .select({
+              suspendedAt: organizations.suspendedAt,
+              suspendedReason: organizations.suspendedReason,
+              suspendedCategory: organizations.suspendedCategory,
+            })
+            .from(organizations)
+            .where(eq(organizations.id, organizationId))
+        )[0];
+      const suspendWorkspace = {
+        organizationId,
+        suspended: true,
+        reason: "Lifecycle state machine",
+        category: "phishing" as const,
+        actorUserId: userId,
+      };
+      const liftWorkspace = {
+        organizationId,
+        suspended: false,
+        reason: "Lifecycle state machine lift",
+        actorUserId: userId,
+      };
+      await expect(
+        setOrganizationSuspended({ ...suspendWorkspace, category: undefined })
+      ).rejects.toThrow("A suspension needs a category");
+
+      failStatusWrites("suspended");
+      const partialSuspend = await setOrganizationSuspended(suspendWorkspace);
+      expect(partialSuspend).toMatchObject({
+        retry: false,
+        failed: 1,
+        sites: [],
+      });
+      expect(r2.pendingRaces()).toBe(0);
+      const suspendedRow = await workspaceRow();
+      expect(suspendedRow?.suspendedAt).not.toBeNull();
+      expect((await getSite(site.id))?.status).toBe("active");
+
+      const finishSuspend = await setOrganizationSuspended({
+        ...suspendWorkspace,
+        reason: "Finish the takedown",
+        category: undefined,
+      });
+      expect(finishSuspend).toMatchObject({ retry: true, failed: 0 });
+      expect(finishSuspend.sites.map((entry) => entry.id)).toEqual([site.id]);
+      assert.ok(partialSuspend.notice);
+      expect(finishSuspend.notice).toEqual({
+        key: partialSuspend.notice.key,
+        category: "phishing",
+        reason: "Lifecycle state machine",
+        siteNames: [site.name],
+      });
+      expect(await workspaceRow()).toEqual(suspendedRow);
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(410);
+      const repeatSuspend = await setOrganizationSuspended(suspendWorkspace);
+      expect(repeatSuspend).toMatchObject({
+        retry: true,
+        failed: 0,
+        sites: [],
+      });
+      expect(repeatSuspend.notice?.key).toBe(partialSuspend.notice?.key);
+      expect(await workspaceRow()).toEqual(suspendedRow);
+
+      failStatusWrites("active");
+      const partialLift = await setOrganizationSuspended(liftWorkspace);
+      expect(partialLift).toMatchObject({
+        retry: false,
+        failed: 1,
+        sites: [],
+        notice: null,
+      });
+      expect(r2.pendingRaces()).toBe(0);
+      expect((await workspaceRow())?.suspendedAt).toBeNull();
+      expect(await getSite(site.id)).toMatchObject({
+        status: "suspended",
+        suspendedWithOrganization: true,
+      });
+      const finishLift = await setOrganizationSuspended(liftWorkspace);
+      expect(finishLift).toMatchObject({ retry: true, failed: 0 });
+      expect(finishLift.sites.map((entry) => entry.id)).toEqual([site.id]);
+      expect((await request(`${site.publicOrigin}/blog`)).status).toBe(200);
+      const repeatLift = await setOrganizationSuspended(liftWorkspace);
+      expect(repeatLift).toMatchObject({ retry: true, failed: 0, sites: [] });
+
+      const machineSite = await getSite(site.id);
+      assert.ok(machineSite);
+      const notraTakedown = {
+        by: "notra" as const,
+        reason: "Lifecycle site repeat",
+        category: "spam" as const,
+        actorUserId: userId,
+      };
+      const siteSuspend = await setSiteSuspended(
+        machineSite,
+        true,
+        notraTakedown
+      );
+      expect(siteSuspend).toMatchObject({
+        changed: true,
+        retry: false,
+        notice: { category: "spam", reason: "Lifecycle site repeat" },
+      });
+      // A repeat keeps the original notice, whatever the retry says.
+      expect(
+        await setSiteSuspended(machineSite, true, {
+          ...notraTakedown,
+          reason: "Lifecycle site repeat, second report",
+          category: "malware",
+        })
+      ).toEqual({
+        changed: false,
+        retry: true,
+        notice: siteSuspend.notice,
+      });
+      const notraRestore = {
+        by: "notra" as const,
+        reason: "Lifecycle site restore",
+        actorUserId: userId,
+      };
+      expect(await setSiteSuspended(machineSite, false, notraRestore)).toEqual({
+        changed: true,
+        retry: false,
+        notice: null,
+      });
+      expect(await setSiteSuspended(machineSite, false, notraRestore)).toEqual({
+        changed: false,
+        retry: true,
+        notice: null,
+      });
+      const machineAudit = await db
+        .select({
+          subjectType: abuseActions.subjectType,
+          retry: abuseActions.retry,
+        })
+        .from(abuseActions)
+        .where(inArray(abuseActions.subjectId, [site.id, organizationId]));
+      expect(
+        machineAudit
+          .filter((row) => row.retry)
+          .map((row) => row.subjectType)
+          .sort()
+      ).toEqual([
+        "organization",
+        "organization",
+        "organization",
+        "organization",
+        "site",
+        "site",
+      ]);
+      const machineDone = await getSite(site.id);
+      assert.ok(machineDone);
+      site = machineDone;
       expect((await request(`${site.publicOrigin}/blog`)).status).toBe(200);
       await phase("stale push during compile");
       // A push that lands while the previous build is still compiling makes
@@ -1307,12 +1738,27 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
         userId
       );
       expect(paidBadge.site.showBranding).toBe(false);
+      // A paid site can hide the badge, but visitors can still report abuse.
+      const unbrandedJobId = await deployBranchHead(paidBadge.site, {
+        trigger: "manual",
+        userId,
+      });
+      expect(await runSiteJob(unbrandedJobId)).toMatchObject({
+        status: "done",
+        outcome: "live",
+      });
+      expect((await deploymentFor(unbrandedJobId)).target.branding).toBe(false);
+      const unbrandedHtml = await (
+        await request(`${freeSite.publicOrigin}/blog`)
+      ).text();
+      expect(unbrandedHtml).not.toContain("data-notra-badge");
+      expect(unbrandedHtml).toContain(">Report abuse<");
       await phase("build and emulator accounting");
       // Every outbound call hit an emulated route.
       expect(
         emulators.summaries().flatMap((summary) => summary.unhandled)
       ).toEqual([]);
-      expect(builds).toBe(14);
+      expect(builds).toBe(15);
       expect(boxBuilds).toHaveLength(builds);
       if (emulators.box) {
         expectNoLiveBoxes();
@@ -1357,7 +1803,7 @@ if (!process.env.SITES_TEST_DATABASE_URL) {
           );
         }
       }
-      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(12);
+      expect(boxBuilds.filter((build) => build.result?.ok)).toHaveLength(13);
       console.log(
         JSON.stringify({
           scope: "connected-postgres-compiler-publisher-worker-lifecycle",

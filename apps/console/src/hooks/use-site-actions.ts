@@ -1,9 +1,12 @@
 "use client";
 
+import type { SiteSuspensionCategory } from "@notra/sites-core/types/sites";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { reportModerationOutcome } from "@/lib/moderation/report-outcome";
 import { consoleOrpc } from "@/lib/orpc/query";
+import { suspensionOutcome } from "@/utils/moderation-outcome";
 
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -51,10 +54,14 @@ export function useSiteActions() {
     mutationFn: (input: {
       siteId: string;
       suspended: boolean;
-      reason?: string;
+      reason: string;
+      category?: SiteSuspensionCategory;
     }) => consoleOrpc.sites.setSuspended.call(input),
-    onSuccess: async (_data, input) => {
-      toast.success(input.suspended ? "Site suspended" : "Site reactivated");
+    onSuccess: async (result, input) => {
+      reportModerationOutcome(
+        input.suspended ? "Site suspended" : "Site reactivated",
+        suspensionOutcome(result)
+      );
       await refresh();
     },
     onError: (error) =>

@@ -19,6 +19,7 @@ export function createInitialServingState(
     siteId: params.siteId,
     slug: params.slug,
     status: "active",
+    suspension: null,
     production: null,
     productionRollback: false,
     previews: {},
