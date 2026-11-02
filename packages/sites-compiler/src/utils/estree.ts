@@ -129,6 +129,7 @@ export function referencedIdentifiers(root: EstreeNode): IdentifierReference[] {
     if (
       jsx.type === "JSXIdentifier" &&
       key === "name" &&
+      (parent?.type as string | undefined) === "JSXOpeningElement" &&
       jsx.name &&
       COMPONENT_NAME.test(jsx.name)
     ) {

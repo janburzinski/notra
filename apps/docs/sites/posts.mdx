@@ -75,7 +75,7 @@ tags: [Feature]
 | `draft` | boolean | | `true` hides the entry on the live site, while it still shows in previews |
 | `hidden` | boolean | | Defaults to `false`. `true` keeps the published HTML and Markdown URLs reachable, but removes the entry from discovery and forces `noindex` |
 
-`author`, `updated`, `featured` and `noindex` only apply to blog posts, and Notra ignores unknown fields. When the frontmatter is missing or wrong, the build stops and names the file and the field.
+`author`, `updated`, `featured` and `noindex` only apply to blog posts, and Notra ignores unknown fields with a warning, like Mintlify's `sidebarTitle` or `icon`. When the frontmatter is missing or wrong, the build stops and names the file and the field.
 
 ## Authors
 

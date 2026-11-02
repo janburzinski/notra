@@ -260,8 +260,13 @@ function readNavbarButton(navbar: SiteRawConfig): {
   if (type) {
     return { button: type, label: "", href: text(primary.href) };
   }
-  if (text(cta.label)) {
-    return { button: "button", label: text(cta.label), href: text(cta.href) };
+  const button = !text(cta.label) && primary.type === "button" ? primary : cta;
+  if (text(button.label)) {
+    return {
+      button: "button",
+      label: text(button.label),
+      href: text(button.href),
+    };
   }
   return { button: "none", label: "", href: "" };
 }
@@ -598,9 +603,16 @@ function patchNavbar(
 ) {
   const navbar: SiteRawConfig = { ...record(config.navbar) };
   if (changed(form, initial, NAVBAR_BUTTON_KEYS)) {
-    const previousCta = record(navbar.cta);
+    const { type: _type, ...primaryButton } = record(navbar.primary);
+    const previousCta =
+      navbar.cta === undefined && _type === "button"
+        ? primaryButton
+        : record(navbar.cta);
     if (initial.navbarButton === "button") {
       delete navbar.cta;
+      if (record(navbar.primary).type === "button") {
+        delete navbar.primary;
+      }
     } else if (initial.navbarButton !== "none") {
       delete navbar.primary;
     }

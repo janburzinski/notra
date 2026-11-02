@@ -1,3 +1,5 @@
+import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
+import type { SiteDiagnostic } from "@notra/sites-core/types/build";
 import type { ImportDeclaration, Program } from "estree";
 import type { Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
@@ -7,6 +9,7 @@ import { visit } from "unist-util-visit";
 
 import {
   BUILTIN_COMPONENT_NAMES,
+  BUILTIN_COMPONENT_PROPS,
   BUILTIN_COMPONENTS,
   BUILTINS_IMPORT_SOURCE,
   COMPONENT_NAME,
@@ -19,11 +22,13 @@ import {
   BLOCKED_ELEMENT_HINT,
   BLOCKED_HTML_ELEMENTS,
 } from "./constants/elements";
+import type { IdentifierReference } from "./types/estree";
 import type {
   EsmNode,
   InlineModule,
   MdxAnalysis,
   MdxAnalysisContext,
+  MdxJsxElement,
   MdxPass,
   ModuleScan,
   TextEdit,
@@ -54,9 +59,15 @@ import {
 import { offsetToLineColumn, resolveSiteImport } from "./utils/paths";
 import { applyEdits, blankFrontmatter } from "./utils/text-edits";
 
-function report(pass: MdxPass, code: string, message: string, offset: number) {
+function report(
+  pass: MdxPass,
+  code: string,
+  message: string,
+  offset: number,
+  severity: SiteDiagnostic["severity"] = "error"
+) {
   pass.diagnostics.push({
-    severity: "error",
+    severity,
     code,
     message,
     file: pass.path,
@@ -248,28 +259,44 @@ function checkInlineComponents(pass: MdxPass, scan: ModuleScan) {
   }
 }
 
-function snippetPropEdits(
+function unresolvedReferences(
   program: Program,
   localNames: ReadonlySet<string>
-): TextEdit[] {
+): IdentifierReference[] {
   const declared = declaredNames(program);
-  return referencedIdentifiers(program)
-    .filter(
-      (reference) =>
-        reference.start >= 0 &&
-        !localNames.has(reference.name) &&
-        !declared.has(reference.name) &&
-        !KNOWN_GLOBALS.has(reference.name) &&
-        !BUILTIN_COMPONENT_NAMES.has(reference.name) &&
-        !INJECTED_HOOK_NAMES.has(reference.name) &&
-        !COMPONENT_NAME.test(reference.name) &&
-        !(reference.name in globalThis)
-    )
-    .map((reference) => ({
-      start: reference.start,
-      end: reference.start,
-      text: reference.shorthand ? `${reference.name}: props.` : "props.",
-    }));
+  return referencedIdentifiers(program).filter(
+    (reference) =>
+      reference.start >= 0 &&
+      !localNames.has(reference.name) &&
+      !declared.has(reference.name) &&
+      !KNOWN_GLOBALS.has(reference.name) &&
+      !BUILTIN_COMPONENT_NAMES.has(reference.name) &&
+      !INJECTED_HOOK_NAMES.has(reference.name) &&
+      !(reference.name in globalThis)
+  );
+}
+
+function checkBuiltinProps(pass: MdxPass, element: MdxJsxElement) {
+  const name = element.name as keyof typeof BUILTIN_COMPONENT_PROPS;
+  const props = BUILTIN_COMPONENT_PROPS[name];
+  for (const attribute of element.attributes) {
+    if (
+      attribute.type !== "mdxJsxAttribute" ||
+      attribute.name.startsWith("client:") ||
+      props.includes(attribute.name)
+    ) {
+      continue;
+    }
+    report(
+      pass,
+      "unknown_prop",
+      props.length > 0
+        ? `<${name}> has no "${attribute.name}" prop, so it is ignored. Its props are ${props.join(", ")}.`
+        : `<${name}> takes no props, so "${attribute.name}" is ignored.`,
+      attribute.position?.start.offset ?? element.position?.start.offset ?? 0,
+      "warning"
+    );
+  }
 }
 
 function walkContent(pass: MdxPass, tree: Root, scan: ModuleScan): Set<string> {
@@ -302,9 +329,20 @@ function walkContent(pass: MdxPass, tree: Root, scan: ModuleScan): Set<string> {
     pass.edits.push(...edits);
     for (const program of programs) {
       checkForbidden(pass, program);
-      if (!pass.context.isEntry) {
-        for (const edit of snippetPropEdits(program, localNames)) {
-          propEdits.set(edit.start, edit);
+      for (const reference of unresolvedReferences(program, localNames)) {
+        if (pass.context.isEntry) {
+          report(
+            pass,
+            "expression_undefined",
+            `"${reference.name}" is not defined, so this page would fail to build. To show the braces as text, escape them: \\{${reference.name}\\}. To insert a site variable, write {{ ${reference.name} }} and add "${reference.name}" to variables in ${SITE_CONFIG_FILENAME}.`,
+            reference.start
+          );
+        } else if (!COMPONENT_NAME.test(reference.name)) {
+          propEdits.set(reference.start, {
+            start: reference.start,
+            end: reference.start,
+            text: reference.shorthand ? `${reference.name}: props.` : "props.",
+          });
         }
       }
     }
@@ -333,6 +371,9 @@ function walkContent(pass: MdxPass, tree: Root, scan: ModuleScan): Set<string> {
       }
     } else if (BUILTIN_COMPONENT_NAMES.has(root) && !localNames.has(root)) {
       usedBuiltins.add(root);
+      if (name === root) {
+        checkBuiltinProps(pass, node);
+      }
     } else if (!(localNames.has(root) || scan.contentComponents.has(root))) {
       const suggestion = closestName(root, BUILTIN_COMPONENTS);
       report(

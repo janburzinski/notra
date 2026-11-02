@@ -50,7 +50,7 @@ docolin:
 | `links[].icon` | A [Lucide](https://lucide.dev/icons) icon name from the [bundled set](/sites/reference/blog-json#icons), like `book-open` |
 | `links[].type` | `github`, `discord`, `x`, `linkedin`, `youtube` or `slack`, which shows the platform's icon, and `label` adds text next to it |
 | `primary` | A secondary button with a platform icon and name, like "GitHub", that takes `type` and `href` |
-| `cta` | The main button on the right, which takes `label` and `href` |
+| `cta` | The main button on the right, which takes `label` and `href`. A Mintlify-style `"primary": { "type": "button", "label", "href" }` is read as `cta` with a warning, so rename it to `cta` when you can |
 
 On phones, the links move into a menu.
 

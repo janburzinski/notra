@@ -42,3 +42,8 @@ export interface ImportCycleFrame {
   imports: readonly string[];
   index: number;
 }
+
+export interface IconSetting {
+  name: string;
+  setting: string;
+}

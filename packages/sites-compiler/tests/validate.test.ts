@@ -545,20 +545,56 @@ describe("content safety and config checks", () => {
     ]);
   });
 
-  test("points a custom navbar.primary button to navbar.cta", () => {
-    const result = validateSite({
-      files: new Map([
-        [
-          "blog.json",
-          JSON.stringify({
-            name: "Acme",
-            navbar: { primary: { type: "button", href: "https://acme.com" } },
-          }),
-        ],
-        ["blog/a.md", post("Hi")],
-      ]),
+  test("reads a Mintlify navbar.primary button as navbar.cta, with a warning", () => {
+    const withNavbar = (navbar: object) =>
+      validateSite({
+        files: new Map([
+          ["blog.json", JSON.stringify({ name: "Acme", navbar })],
+          ["blog/a.md", post("Hi")],
+        ]),
+      });
+    const button = {
+      type: "button",
+      label: "Get started",
+      href: "https://polar.sh/signup",
+    };
+    const alias = withNavbar({ primary: button });
+    expect(alias.ok).toBe(true);
+    expect(alias.config?.navbar).toEqual({
+      links: [],
+      cta: { label: "Get started", href: "https://polar.sh/signup" },
     });
-    const error = result.diagnostics.find((d) => d.code === "config_invalid");
+    expect(
+      alias.diagnostics.filter((d) => d.code === "navbar_primary_button")
+    ).toEqual([
+      {
+        severity: "warning",
+        file: "blog.json",
+        code: "navbar_primary_button",
+        message:
+          'navbar.primary with type "button" is used as navbar.cta. Rename it to "cta" and drop "type"; navbar.primary is for platform buttons like github.',
+      },
+    ]);
+
+    const both = withNavbar({
+      primary: button,
+      cta: { label: "Sign up", href: "/signup" },
+    });
+    expect(both.config?.navbar.cta?.label).toBe("Sign up");
+    expect(
+      both.diagnostics.find((d) => d.code === "navbar_primary_button")?.message
+    ).toContain("is ignored because navbar.cta is set");
+
+    expect(
+      withNavbar({ primary: { ...button, icon: "robot" } }).diagnostics.find(
+        (d) => d.code === "icon_unknown"
+      )?.message
+    ).toContain('Icon "robot" (navbar.primary.icon)');
+
+    const unknown = withNavbar({
+      primary: { type: "discourse", href: "https://acme.com" },
+    });
+    const error = unknown.diagnostics.find((d) => d.code === "config_invalid");
     expect(error?.message).toContain("navbar.primary.type");
     expect(error?.message).toContain("use navbar.cta");
   });
@@ -579,5 +615,99 @@ describe("content safety and config checks", () => {
     expect(
       result.diagnostics.filter((d) => d.code === "featured_unknown")
     ).toHaveLength(1);
+  });
+});
+
+describe("content ported from Mintlify", () => {
+  test("a missing date names the file, the key and an example", () => {
+    const result = run({
+      "blog/introduction.mdx": post("Welcome.", "title: Introduction"),
+      "changelog/untitled.mdx": post("Fixes.", "date: 2026-10-01"),
+      "blog/bad-date.mdx": post("x", "title: A\ndate: next week"),
+    });
+    expect(
+      result.diagnostics
+        .filter((d) => d.code === "frontmatter_invalid")
+        .map((d) => `${d.file}:${d.line} ${d.message}`)
+    ).toEqual([
+      'blog/introduction.mdx:1 blog/introduction.mdx is missing "date" in its frontmatter. Add a line like date: 2026-11-01 between the --- lines.',
+      'changelog/untitled.mdx:1 changelog/untitled.mdx is missing "title" in its frontmatter. Add a line like title: Launch week recap between the --- lines.',
+      "blog/bad-date.mdx:1 Frontmatter date: Use a date in YYYY-MM-DD format, like 2026-11-01",
+    ]);
+  });
+
+  test("undefined expressions fail validation with file, line and a hint", () => {
+    const result = run({
+      "blog/products.mdx": post(
+        "Create a {product} in the dashboard.\n\nCall GET /surveys/{surveyId} to fetch one.\n\n<Card title={heading} href={'/x/' + slug} />\n\nVersion {API_VERSION}"
+      ),
+      "blog/fine.mdx": post(
+        'export const plan = "Pro";\n\n{plan} costs {Math.round(9.5)}. {[1, 2].map((n) => n * 2)} {frontmatter.title} \\{escaped\\} `{inCode}`'
+      ),
+    });
+    expect(errors(result)).toEqual([
+      "blog/products.mdx:6 expression_undefined",
+      "blog/products.mdx:8 expression_undefined",
+      "blog/products.mdx:10 expression_undefined",
+      "blog/products.mdx:10 expression_undefined",
+      "blog/products.mdx:12 expression_undefined",
+    ]);
+    expect(result.diagnostics[0]).toEqual({
+      severity: "error",
+      file: "blog/products.mdx",
+      line: 6,
+      column: 11,
+      code: "expression_undefined",
+      message:
+        '"product" is not defined, so this page would fail to build. To show the braces as text, escape them: \\{product\\}. To insert a site variable, write {{ product }} and add "product" to variables in blog.json.',
+    });
+  });
+
+  test("unknown props, frontmatter keys and icons are warnings, collapsed per site", () => {
+    const page = (name: string) =>
+      post(
+        '<Card title="Quickstart" icon="rocket" horizontal href="/start">Go</Card>\n\n<Tabs sync>\n<Tab title="npm">x</Tab>\n</Tabs>',
+        `title: ${name}\n"sidebarTitle" : Short\ndate: 2026-10-01\ndescripton: typo`
+      );
+    const result = validateSite({
+      files: new Map([
+        [
+          "blog.json",
+          JSON.stringify(
+            {
+              name: "Acme",
+              navbar: {
+                links: [
+                  { label: "Docs", href: "/docs", icon: "book-text" },
+                  { label: "API", href: "/api", icon: "book-text" },
+                ],
+              },
+              contextual: {
+                options: [{ title: "Ask", href: "/ask", icon: "robot" }],
+              },
+            },
+            null,
+            2
+          ),
+        ],
+        ["blog/a.mdx", page("A")],
+        ["blog/b.mdx", page("B")],
+        ["blog/c.mdx", page("C")],
+      ]),
+    });
+    expect(result.ok).toBe(true);
+    expect(
+      result.diagnostics.map(
+        (d) => `${d.file}:${d.line ?? ""} ${d.code} ${d.message}`
+      )
+    ).toEqual([
+      'blog.json:8 icon_unknown Icon "book-text" (navbar.links.0.icon, navbar.links.1.icon) is not bundled with Notra and is skipped. See the icon list in the blog.json reference.',
+      'blog.json:22 icon_unknown Icon "robot" (contextual.options.0.icon) is not bundled with Notra and is skipped. See the icon list in the blog.json reference.',
+      'blog/a.mdx:8 unknown_prop <Card> has no "icon" prop, so it is ignored. Its props are title, href, img, cta. Also in 2 more places: blog/b.mdx:8, blog/c.mdx:8.',
+      'blog/a.mdx:8 unknown_prop <Card> has no "horizontal" prop, so it is ignored. Its props are title, href, img, cta. Also in 2 more places: blog/b.mdx:8, blog/c.mdx:8.',
+      'blog/a.mdx:10 unknown_prop <Tabs> takes no props, so "sync" is ignored. Also in 2 more places: blog/b.mdx:10, blog/c.mdx:10.',
+      'blog/a.mdx:3 frontmatter_unknown_key Frontmatter key "sidebarTitle" is not supported in blog entries and is ignored. Also in 2 more places: blog/b.mdx:3, blog/c.mdx:3.',
+      'blog/a.mdx:5 frontmatter_unknown_key Frontmatter key "descripton" is not supported in blog entries and is ignored. Did you mean "description"? Also in 2 more places: blog/b.mdx:5, blog/c.mdx:5.',
+    ]);
   });
 });

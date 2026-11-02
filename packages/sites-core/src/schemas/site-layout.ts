@@ -85,13 +85,27 @@ export const siteNavbarSchema = z
       .default([]),
     cta: siteLinkSchema.optional(),
     primary: z
-      .object({
-        type: z.enum(SITE_NAVBAR_LINK_TYPES, {
+      .discriminatedUnion(
+        "type",
+        [
+          z.object({
+            type: z.enum(SITE_NAVBAR_LINK_TYPES),
+            href: platformHref,
+          }),
+          siteLinkSchema.extend({ type: z.literal("button") }),
+        ],
+        {
           error: `Use one of ${SITE_NAVBAR_LINK_TYPES.join(", ")}. For a button with your own label, use navbar.cta`,
-        }),
-        href: platformHref,
-      })
+        }
+      )
       .optional(),
+  })
+  .transform(({ primary, ...navbar }) => {
+    if (primary?.type !== "button") {
+      return primary ? { ...navbar, primary } : { ...navbar };
+    }
+    const { type: _type, ...button } = primary;
+    return { ...navbar, cta: navbar.cta ?? button };
   })
   .default({ links: [] });
 

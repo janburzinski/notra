@@ -101,7 +101,7 @@ See [Logo, navigation and banner](/sites/customize/navigation).
 | --- | --- | --- | --- |
 | `navbar.areas` | Up to 2 of `{ area: "blog" \| "changelog", label? }`, each area once | Automatic | Choose area link order and labels; omitted areas are hidden, `[]` hides both, and unmounted areas are skipped |
 | `navbar.links` | Up to 8 of `{ label, href, icon? }`, `{ type, href, label? }` or `{ label, icon?, items }` | `[]` | Header links or dropdowns with 1–8 non-nested links; `type` is `github`, `discord`, `x`, `linkedin`, `youtube` or `slack`; internal links show their active state |
-| `navbar.primary` | `{ type, href }` | | Secondary button with a platform icon |
+| `navbar.primary` | `{ type, href }` | | Secondary button with a platform icon. Mintlify's `{ type: "button", label, href }` is read as `navbar.cta` with a warning |
 | `navbar.cta` | `{ label, href }` | | Main call to action |
 | `footer.links` | Up to 16 links, or up to 6 `{ header?, items }` columns with 1 to 12 links | `[]` | Footer links |
 | `footer.socials` | Object of platform → URL | `{}` | `x`, `github`, `linkedin`, `youtube`, `discord`, `slack`, `instagram`, `facebook`, `bluesky`, `threads`, `reddit`, `medium`, `telegram`, `hacker-news`, `website` |

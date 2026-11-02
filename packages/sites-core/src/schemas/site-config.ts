@@ -223,6 +223,10 @@ export const frontmatterAuthorSchema = z.object({
   youtube: frontmatterLinkSchema.optional(),
 });
 
+const frontmatterDate = z.coerce.date({
+  error: "Use a date in YYYY-MM-DD format, like 2026-11-01",
+});
+
 const frontmatterAuthorRefSchema = z.union([
   z.string(),
   frontmatterAuthorSchema,
@@ -231,8 +235,8 @@ const frontmatterAuthorRefSchema = z.union([
 export const blogFrontmatterSchema = z.object({
   title: z.string().trim().min(1),
   description: z.string().trim().optional(),
-  date: z.coerce.date(),
-  updated: z.coerce.date().optional(),
+  date: frontmatterDate,
+  updated: frontmatterDate.optional(),
   author: z
     .union([frontmatterAuthorRefSchema, z.array(frontmatterAuthorRefSchema)])
     .optional(),
@@ -248,7 +252,7 @@ export const blogFrontmatterSchema = z.object({
 export const changelogFrontmatterSchema = z.object({
   title: z.string().trim().min(1),
   description: z.string().trim().optional(),
-  date: z.coerce.date(),
+  date: frontmatterDate,
   version: z.string().trim().optional(),
   tags: z.array(z.string()).default([]),
   image: z.string().optional(),

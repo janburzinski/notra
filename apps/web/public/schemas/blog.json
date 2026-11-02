@@ -350,9 +350,6 @@
       "required": ["content"]
     },
     "navbar": {
-      "default": {
-        "links": []
-      },
       "type": "object",
       "properties": {
         "areas": {
@@ -626,18 +623,52 @@
           "required": ["label", "href"]
         },
         "primary": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": ["github", "discord", "x", "linkedin", "youtube", "slack"]
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "github",
+                    "discord",
+                    "x",
+                    "linkedin",
+                    "youtube",
+                    "slack"
+                  ]
+                },
+                "href": {
+                  "type": "string",
+                  "pattern": "^https?:\\/\\/"
+                }
+              },
+              "required": ["type", "href"]
             },
-            "href": {
-              "type": "string",
-              "pattern": "^https?:\\/\\/"
+            {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "href": {
+                  "type": "string",
+                  "pattern": "^(?:\\/(?!\\/)|https?:\\/\\/|mailto:)"
+                },
+                "icon": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "type": {
+                  "type": "string",
+                  "const": "button"
+                }
+              },
+              "required": ["label", "href", "type"]
             }
-          },
-          "required": ["type", "href"]
+          ]
         }
       }
     },

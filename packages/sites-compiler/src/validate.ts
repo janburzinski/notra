@@ -43,9 +43,11 @@ import type {
 import {
   categoryWarnings,
   featuredSlugWarnings,
+  navbarPrimaryButtonWarnings,
   unknownConfigKeyWarnings,
+  unknownIconWarnings,
 } from "./utils/config-checks";
-import { hasErrors } from "./utils/diagnostics";
+import { collapseRepeatedWarnings, hasErrors } from "./utils/diagnostics";
 import { acornSyntaxError, errorMessage } from "./utils/errors";
 import { importCycleDiagnostics } from "./utils/import-cycles";
 import { blockedMarkdownHtml } from "./utils/markdown-html";
@@ -218,7 +220,10 @@ function parseSiteConfig(raw: string | null | undefined): ParsedSiteConfig {
       ],
     };
   }
-  const diagnostics = unknownConfigKeyWarnings(json);
+  const diagnostics = [
+    ...unknownConfigKeyWarnings(json),
+    ...navbarPrimaryButtonWarnings(json),
+  ];
   const parsed = siteConfigSchema.safeParse(json);
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
@@ -231,6 +236,7 @@ function parseSiteConfig(raw: string | null | undefined): ParsedSiteConfig {
     }
     return { config: null, diagnostics };
   }
+  diagnostics.push(...unknownIconWarnings(parsed.data, raw));
   const settings = substituteSettingVariables(parsed.data);
   diagnostics.push(...settings.diagnostics);
   return {
@@ -473,7 +479,7 @@ export function validateSite(input: SiteValidationInput): SiteValidationResult {
   }
   entries.sort((a, b) => a.path.localeCompare(b.path));
   return {
-    diagnostics,
+    diagnostics: collapseRepeatedWarnings(diagnostics),
     config,
     entries,
     outputs,

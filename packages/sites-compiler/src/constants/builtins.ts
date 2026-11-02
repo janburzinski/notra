@@ -28,6 +28,37 @@ export const BUILTIN_COMPONENTS = [
   "PrivacySettings",
 ] as const;
 
+export const BUILTIN_COMPONENT_PROPS: Record<
+  (typeof BUILTIN_COMPONENTS)[number],
+  readonly string[]
+> = {
+  Note: ["title"],
+  Tip: ["title"],
+  Info: ["title"],
+  Warning: ["title"],
+  Check: ["title"],
+  Danger: ["title"],
+  Callout: ["variant", "title"],
+  Card: ["title", "href", "img", "cta"],
+  CardGroup: ["cols"],
+  Columns: ["cols"],
+  Tabs: [],
+  Tab: ["title"],
+  Accordion: ["title", "defaultOpen"],
+  AccordionGroup: [],
+  Steps: [],
+  Step: ["title"],
+  CodeGroup: [],
+  Frame: ["caption"],
+  Badge: [],
+  Update: ["label", "description"],
+  Video: ["src", "poster", "title"],
+  YouTube: ["id", "title"],
+  ThemeToggle: [],
+  SiteAreas: ["sections"],
+  PrivacySettings: ["class", "className"],
+};
+
 export const BUILTIN_COMPONENT_NAMES = new Set<string>(BUILTIN_COMPONENTS);
 export const INJECTED_HOOK_NAMES = new Set<string>(SITE_INJECTED_REACT_HOOKS);
 

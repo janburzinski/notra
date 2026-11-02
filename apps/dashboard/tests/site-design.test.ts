@@ -688,6 +688,36 @@ describe("site design form", () => {
     }
   );
 
+  test("a Mintlify navbar.primary button edits and saves as navbar.cta", () => {
+    const source = {
+      ...SOURCE,
+      navbar: {
+        links: [],
+        primary: {
+          type: "button",
+          label: "Start",
+          href: "https://acme.com",
+          icon: "rocket",
+        },
+      },
+    };
+    const initial = readDesignForm(source);
+    expect(initial).toMatchObject({
+      navbarButton: "button",
+      navbarButtonLabel: "Start",
+      navbarButtonHref: "https://acme.com",
+    });
+    const config = patchDesign(
+      source,
+      { ...initial, navbarButtonLabel: "Get started" },
+      initial
+    );
+    expect(config.navbar).toEqual({
+      links: [],
+      cta: { label: "Get started", href: "https://acme.com", icon: "rocket" },
+    });
+  });
+
   test("switching off an existing banner removes it", () => {
     const source = {
       ...SOURCE,
