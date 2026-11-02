@@ -17,6 +17,8 @@ const projects = [
     // a workspace dependency (registry components and Tailwind sources).
     alsoBuilds: ["apps/sites-builder", "apps/ui"],
     productionAlias: "notra-notra.vercel.app",
+    // apps/dashboard/scripts/vercel-build.sh runs db:migrate in production.
+    migratesDatabase: true,
   },
   {
     name: "notra-web",
@@ -535,17 +537,19 @@ export async function release({
   }
 
   const failures = [];
+  const builds = [];
   for (const project of plans) {
     if (!project.changed) {
       await report(
         `${project.name}: skipped, no build changes since production`
       );
-      continue;
-    }
-    if (env.DRY_RUN === "true") {
+    } else if (env.DRY_RUN === "true") {
       await report(`${project.name}: would deploy ${sha}`);
-      continue;
+    } else {
+      builds.push(project);
     }
+  }
+  const deployVercel = async (project) => {
     try {
       for (let buildAttempt = 0; buildAttempt < 2; buildAttempt += 1) {
         const deployment = await request(
@@ -640,14 +644,10 @@ export async function release({
       failures.push(error.message);
       await report(error.message);
     }
-  }
-  if (failures.length > 0) {
-    throw new Error(failures.join("\n"));
-  }
-
+  };
   let demoDatabaseMigrated = false;
   const unkeyDeployed = new Set();
-  for (const initialPlan of unkeyPlans) {
+  const deployUnkey = async (initialPlan) => {
     const { service } = initialPlan;
     let plan = initialPlan;
     if (env.DRY_RUN !== "true") {
@@ -750,43 +750,87 @@ export async function release({
         );
       }
     }
+  };
+  // The demo apps share a database and ship in order; the others are independent.
+  const unkeyGroups = [
+    ...unkeyPlans
+      .filter((plan) => !plan.service.demoDatabase)
+      .map((plan) => [plan]),
+    unkeyPlans.filter((plan) => plan.service.demoDatabase),
+  ];
+  const releaseUnkey = () =>
+    Promise.all(
+      unkeyGroups.map(async (group) => {
+        try {
+          for (const plan of group) {
+            await deployUnkey(plan);
+          }
+        } catch (error) {
+          failures.push(error.message);
+          await report(error.message);
+        }
+      })
+    );
+
+  // The dashboard build migrates the production database, so everything else,
+  // Unkey included, starts only once it is live; the rest then ships together.
+  await Promise.all(
+    builds.filter((project) => project.migratesDatabase).map(deployVercel)
+  );
+  const migrated = failures.length === 0;
+  if (!migrated && unkeyPlans.length > 0) {
+    await report("unkey: skipped, the dashboard deployment failed");
   }
+  await Promise.all([
+    ...builds.filter((project) => !project.migratesDatabase).map(deployVercel),
+    ...(migrated ? [releaseUnkey()] : []),
+  ]);
 
   // Unkey's probe only proves the dashboard boots. Visitors also need the
   // migrated schema to be readable through the demo's own database role.
-  // Unchanged demo builds are checked too, so a retry cannot skip a failure.
+  // Unchanged demo builds are checked too, so a retry cannot skip a failure,
+  // and an unrelated failed deployment does not hide one.
   if (
+    migrated &&
     env.DRY_RUN !== "true" &&
     unkeyPlans.some((plan) => plan.service.demoDatabase)
   ) {
-    const expectedSha = unkeyDeployed.has("demo-dashboard") ? sha : null;
-    // A shallow response (demo mode off) has no table count.
-    const passed = (health) =>
-      health.ok === true &&
-      health.tables > 0 &&
-      (!expectedSha || health.commitSha === expectedSha);
-    let health;
-    for (let attempt = 0; attempt < 6; attempt += 1) {
-      try {
-        const response = await fetchImpl(
-          "https://demo.usenotra.com/api/healthcheck?deep=1",
-          { signal: AbortSignal.timeout(30_000) }
+    try {
+      const expectedSha = unkeyDeployed.has("demo-dashboard") ? sha : null;
+      // A shallow response (demo mode off) has no table count.
+      const passed = (health) =>
+        health.ok === true &&
+        health.tables > 0 &&
+        (!expectedSha || health.commitSha === expectedSha);
+      let health;
+      for (let attempt = 0; attempt < 6; attempt += 1) {
+        try {
+          const response = await fetchImpl(
+            "https://demo.usenotra.com/api/healthcheck?deep=1",
+            { signal: AbortSignal.timeout(30_000) }
+          );
+          health = await response.json();
+        } catch (error) {
+          health = { ok: false, error: error.message };
+        }
+        if (passed(health) || attempt === 5) {
+          break;
+        }
+        await sleep(10_000);
+      }
+      if (!passed(health)) {
+        throw new Error(
+          `demo: database check failed (${health.error ?? (health.tables > 0 ? `serving ${health.commitSha}` : "no deep check, is demo mode on?")})`
         );
-        health = await response.json();
-      } catch (error) {
-        health = { ok: false, error: error.message };
       }
-      if (passed(health) || attempt === 5) {
-        break;
-      }
-      await sleep(10_000);
+      await report(`demo: database check passed (${health.tables} tables)`);
+    } catch (error) {
+      failures.push(error.message);
+      await report(error.message);
     }
-    if (!passed(health)) {
-      throw new Error(
-        `demo: database check failed (${health.error ?? (health.tables > 0 ? `serving ${health.commitSha}` : "no deep check, is demo mode on?")})`
-      );
-    }
-    await report(`demo: database check passed (${health.tables} tables)`);
+  }
+  if (failures.length > 0) {
+    throw new Error(failures.join("\n"));
   }
 }
 

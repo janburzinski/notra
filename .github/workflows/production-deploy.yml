@@ -75,20 +75,18 @@ jobs:
       ref: ${{ needs.release.outputs.sha }}
     secrets: inherit
 
-  deploy:
-    needs: [release, sites-e2e]
-    if: >-
-      ${{ !cancelled() && needs.release.result == 'success' &&
-      (needs.sites-e2e.result == 'success' || needs.sites-e2e.result == 'skipped') }}
+  # Runs alongside the Sites E2E gate; it only proves the agents boot.
+  agents:
+    needs: release
+    if: ${{ !inputs.dry_run }}
     runs-on: depot-ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 15
     steps:
       - name: Checkout release commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
           persist-credentials: false
-          ref: ${{ github.sha }}
+          ref: ${{ needs.release.outputs.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
@@ -96,18 +94,12 @@ jobs:
           node-version: 24
 
       - name: Setup Bun
-        if: ${{ !inputs.dry_run }}
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
         with:
           bun-version: 1.4.0
 
       - name: Build and boot agents
-        if: ${{ !inputs.dry_run }}
-        env:
-          RELEASE_SHA: ${{ needs.release.outputs.sha }}
         run: |
-          git worktree add --detach "$RUNNER_TEMP/release" "$RELEASE_SHA"
-          cd "$RUNNER_TEMP/release"
           for app in agent onboarding-agent; do
             echo "::group::Build and boot $app"
             (
@@ -131,11 +123,42 @@ jobs:
             echo "::endgroup::"
           done
 
+  deploy:
+    needs: [release, sites-e2e, agents]
+    if: >-
+      ${{ !cancelled() && needs.release.result == 'success' &&
+      (needs.sites-e2e.result == 'success' || needs.sites-e2e.result == 'skipped') &&
+      (needs.agents.result == 'success' || needs.agents.result == 'skipped') }}
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+
+      - name: Setup Bun
+        if: ${{ !inputs.dry_run }}
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: 1.4.0
+
       # @notra/db carries the migrator the release runs against the demo database.
       - name: Install sites toolchain, worker and demo migrator
         if: ${{ !inputs.dry_run }}
-        working-directory: ${{ runner.temp }}/release
-        run: bun install --frozen-lockfile --filter '@notra/sites-builder...' --filter '@notra/sites...' --filter '@notra/db'
+        env:
+          RELEASE_SHA: ${{ needs.release.outputs.sha }}
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/release" "$RELEASE_SHA"
+          cd "$RUNNER_TEMP/release"
+          bun install --frozen-lockfile --filter '@notra/sites-builder...' --filter '@notra/sites...' --filter '@notra/db'
 
       - name: Deploy checked main commit
         run: node scripts/github/production-deploy.mjs
@@ -153,7 +176,7 @@ jobs:
           RELEASE_SHA: ${{ needs.release.outputs.sha }}
 
   notify:
-    needs: [release, sites-e2e, deploy]
+    needs: [release, sites-e2e, agents, deploy]
     if: ${{ failure() }}
     runs-on: depot-ubuntu-24.04
     timeout-minutes: 5
@@ -163,6 +186,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.GEO_SCAN_ALERT_WEBHOOK_URL || secrets.SLACK_DEPLOY_WEBHOOK_URL }}
           RELEASE: ${{ needs.release.result }}
           SITES_E2E: ${{ needs.sites-e2e.result }}
+          AGENTS: ${{ needs.agents.result }}
           LIFECYCLE_FAILURES: ${{ needs.sites-e2e.outputs.lifecycle-failures }}
           BROWSER_FAILURES: ${{ needs.sites-e2e.outputs.browser-failures }}
           SHA: ${{ needs.release.outputs.sha }}
@@ -174,6 +198,8 @@ jobs:
           fi
           if [ "$SITES_E2E" = "failure" ]; then
             headline=":rotating_light: Production deploy blocked: Sites E2E failed"
+          elif [ "$AGENTS" = "failure" ]; then
+            headline=":rotating_light: Production deploy blocked: an agent did not build or boot"
           elif [ "$RELEASE" = "failure" ]; then
             headline=":warning: Production deploy skipped: no green release commit"
           else

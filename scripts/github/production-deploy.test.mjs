@@ -349,6 +349,88 @@ test("all six Vercel projects deploy the pinned SHA", async () => {
   assert.ok(directories.includes("apps/onboarding-agent"));
 });
 
+test("the dashboard migrates first, then the other projects build together", async () => {
+  const { run, calls } = fixture();
+  await run();
+  const index = (pathname, from = 0) =>
+    calls.findIndex((call, i) => i >= from && call.url.pathname === pathname);
+  const created = builds(calls).map((call) => calls.indexOf(call));
+  const dashboardLive = index(
+    "/v4/aliases/notra-notra.vercel.app",
+    index("/v13/deployments/new-notra")
+  );
+  assert.ok(dashboardLive > created[0]);
+  assert.ok(created.slice(1).every((i) => i > dashboardLive));
+  assert.ok(
+    created.at(-1) < index("/v13/deployments/new-notra-web"),
+    "every other project starts before the first one is polled"
+  );
+});
+
+test("Unkey waits for the dashboard migration, then ships alongside slower Vercel builds", async () => {
+  let agentPolls = 0;
+  const { run, calls } = fixture({
+    api: true,
+    override: ({ url }) =>
+      url.pathname === "/v13/deployments/new-notra-agent" && ++agentPolls < 20
+        ? { readyState: "BUILDING" }
+        : undefined,
+  });
+  await run();
+  // Aliases are also read while planning; only reads after a build count.
+  const after = (pathname, from) =>
+    calls.findIndex((call, i) => i > from && call.url.pathname === pathname);
+  const firstUnkey = after("/v3/deployments.createDeployment", -1);
+  const dashboardLive = after(
+    "/v4/aliases/notra-notra.vercel.app",
+    after("/v13/deployments/new-notra", -1)
+  );
+  const agentLive = after(
+    "/v4/aliases/notra-agent-notra.vercel.app",
+    calls.findIndex(({ body }) => body?.project === "notra-agent")
+  );
+  assert.ok(firstUnkey > dashboardLive);
+  assert.ok(firstUnkey < agentLive, "Unkey must not wait for the agent build");
+});
+
+test("an unrelated failed deployment still runs the demo database check", async () => {
+  const { run, calls } = fixture({
+    demo: true,
+    override: ({ url }) => {
+      if (url.pathname === "/v13/deployments/new-notra-agent") {
+        return { readyState: "ERROR", errorCode: "BUILD_FAILED" };
+      }
+      if (url.hostname === "demo.usenotra.com") {
+        return { ok: false, error: "permission denied for table sites" };
+      }
+    },
+  });
+  await assert.rejects(run(), (error) => {
+    assert.match(error.message, /notra-agent: deployment ended ERROR/);
+    assert.match(
+      error.message,
+      /demo: database check failed \(permission denied/
+    );
+    return true;
+  });
+  assert.ok(calls.some(({ url }) => url.hostname === "demo.usenotra.com"));
+});
+
+test("a failed dashboard deployment starts no Unkey deployment", async () => {
+  const { run, calls } = fixture({
+    api: true,
+    override: ({ url }) =>
+      url.pathname === "/v13/deployments/new-notra"
+        ? { readyState: "ERROR", errorCode: "BUILD_FAILED" }
+        : undefined,
+  });
+  await assert.rejects(run(), /notra: deployment ended ERROR/);
+  assert.ok(
+    builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
+  );
+  assert.equal(builds(calls).length, 6);
+});
+
 test("dry run validates every target without creating any builds", async () => {
   const { run, calls, directories, toolchainBuilds } = fixture({
     dryRun: true,
@@ -462,7 +544,7 @@ test("Vercel failures include the provider's error code and reason without retry
   );
 });
 
-test("Vercel OOM retries only the failed project at the pinned SHA before downstream releases", async () => {
+test("Vercel OOM retries only the failed project at the pinned SHA", async () => {
   const { run, calls, sha } = fixture({
     api: true,
     override: ({ url }) =>
@@ -489,11 +571,6 @@ test("Vercel OOM retries only the failed project at the pinned SHA before downst
       url.pathname === "/v4/aliases/notra-agent-notra.vercel.app"
   );
   assert.ok(retryAlias > retryReady);
-  assert.ok(
-    calls.findIndex(
-      ({ url }) => url.pathname === "/v3/deployments.createDeployment"
-    ) > retryAlias
-  );
 });
 
 for (const failure of ["oom", "build error", "wrong commit", "canceled"]) {
@@ -524,7 +601,8 @@ for (const failure of ["oom", "build error", "wrong commit", "canceled"]) {
       2
     );
     assert.ok(
-      builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
+      builds(calls).some(({ url }) => url.hostname === "api.unkey.com"),
+      "Unkey ships once the dashboard is live, whatever the agent does"
     );
   });
 }
@@ -560,7 +638,8 @@ for (const waiting of ["build", "alias"]) {
       2
     );
     assert.ok(
-      builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
+      builds(calls).some(({ url }) => url.hostname === "api.unkey.com"),
+      "Unkey ships once the dashboard is live, whatever the agent does"
     );
   });
 }
@@ -685,7 +764,13 @@ for (const [path, error, attempts] of [
       assert.ok(failure.message.includes(error.message));
       return true;
     });
-    assert.equal(reads, path === "/v13/deployments" ? 6 : attempts);
+    // Creations run once per target: six Vercel projects and three
+    // independent Unkey groups (the failed demo-api stops demo-dashboard).
+    const creations = {
+      "/v13/deployments": 6,
+      "/v3/deployments.createDeployment": 3,
+    };
+    assert.equal(reads, creations[path] ?? attempts);
   });
 }
 
@@ -965,11 +1050,12 @@ test("Unkey creation failure is not retried", async () => {
     run(),
     /unkey v3\/deployments.createDeployment: HTTP 500/
   );
-  assert.equal(
-    calls.filter(
-      ({ url }) => url.pathname === "/v3/deployments.createDeployment"
-    ).length,
-    1
+  assert.deepEqual(
+    calls
+      .filter(({ url }) => url.pathname === "/v3/deployments.createDeployment")
+      .map(({ body }) => body.app)
+      .sort(),
+    ["app_ai-traffic-ingest", "app_demo-api", "app_test"]
   );
 });
 
@@ -1002,7 +1088,7 @@ for (const [name, path, data] of [
     },
   ],
 ]) {
-  test(`Unkey intervening ${name} blocks API creation after Vercel`, async () => {
+  test(`Unkey intervening ${name} blocks API creation after the dashboard`, async () => {
     let reads = 0;
     const { run, calls } = fixture({
       api: true,
@@ -1021,9 +1107,7 @@ for (const [name, path, data] of [
       calls.filter(({ url }) => url.pathname === "/v13/deployments").length,
       6
     );
-    assert.ok(
-      builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
-    );
+    assert.ok(builds(calls).every(({ body }) => body.app !== "app_test"));
   });
 }
 
@@ -1053,9 +1137,7 @@ test("Unkey intervening newer commit cannot be overwritten by the scheduled rele
     },
   });
   await assert.rejects(run(), /unkey API: release commit is not ahead/);
-  assert.ok(
-    builds(calls).every(({ url }) => url.hostname === "api.vercel.com")
-  );
+  assert.ok(builds(calls).every(({ body }) => body.app !== "app_test"));
 });
 
 test("Unkey intervening release of the selected SHA skips duplicate API creation", async () => {
@@ -1122,7 +1204,9 @@ for (const [name, update] of [
     await assert.rejects(run(), /unkey/);
     assert.equal(
       calls.filter(
-        ({ url }) => url.pathname === "/v3/deployments.createDeployment"
+        ({ url, body }) =>
+          url.pathname === "/v3/deployments.createDeployment" &&
+          body.app === "app_test"
       ).length,
       1
     );

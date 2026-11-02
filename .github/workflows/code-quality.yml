@@ -40,7 +40,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ "$GITHUB_EVENT_NAME" != pull_request ] || git diff --name-only "$BASE_SHA"...HEAD | grep -q '^\.github/workflows/code-quality\.yml$'; then
-            echo 'checks=["lint","tests","build-api","build-web","build-dashboard","build-console","typecheck"]' >> "$GITHUB_OUTPUT"
+            echo 'checks=["lint","tests","tests-sites-builder","browser","build-api","build-web","build-dashboard","build-console","typecheck"]' >> "$GITHUB_OUTPUT"
             echo infrastructure=true >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -50,6 +50,9 @@ jobs:
           has() { jq -e --arg p "$1" 'index($p) != null' <<< "$affected" > /dev/null; }
           checks='["lint"'
           if [ "$affected" != "[]" ] || grep -qE '^scripts/github/' <<< "$files"; then checks="$checks,\"tests\""; fi
+          has @notra/sites-builder && checks="$checks,\"tests-sites-builder\""
+          # menu-highlight builds both the dashboard and the web stylesheet.
+          if has dashboard || has web; then checks="$checks,\"browser\""; fi
           has api && checks="$checks,\"build-api\""
           has web && checks="$checks,\"build-web\""
           has dashboard && checks="$checks,\"build-dashboard\""
@@ -125,24 +128,31 @@ jobs:
 
       # PRs test only packages their diff affects (plus dependents); main
       # pushes still run everything because they gate production releases.
+      # Sites builder runs its real builds in its own job: it alone takes as
+      # long as every other package together.
       - name: Run unit and integration tests
         if: matrix.check == 'tests'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-            TURBO_SCM_BASE="$BASE_SHA" bun run test --force --log-order=stream --affected --concurrency=2
+            TURBO_SCM_BASE="$BASE_SHA" bun run test --force --log-order=stream --affected --concurrency=2 --filter='!@notra/sites-builder'
           else
-            bun run test --force --log-order=stream --concurrency=2
+            bun run test --force --log-order=stream --concurrency=2 --filter='!@notra/sites-builder'
           fi
 
+      - name: Run sites builder tests
+        if: matrix.check == 'tests-sites-builder'
+        working-directory: apps/sites-builder
+        run: bun run test
+
       - name: Install browser test runtime
-        if: matrix.check == 'tests'
+        if: matrix.check == 'browser'
         working-directory: apps/dashboard
         run: bunx --no-install playwright install --with-deps --only-shell chromium
 
       - name: Run dashboard browser regressions
-        if: matrix.check == 'tests'
+        if: matrix.check == 'browser'
         working-directory: apps/dashboard
         run: bun run test:browser
 
