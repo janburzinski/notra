@@ -16,7 +16,7 @@ export const ASSISTANT_MODEL_TIERS: readonly string[] = [
 export const ASSISTANT_AUTO_MODEL_OPTIONS = {
   [ASSISTANT_FAST_MODEL_ID]: {
     description:
-      "Short, routine turns the assistant answers from general knowledge alone: greetings, acknowledgements, and quick factual or conceptual questions about marketing, writing or software in general. Never pick this when the turn is about the user's own posts, metrics, GEO results, repositories or issues, however short the question is",
+      "Short, routine turns the assistant answers from general knowledge alone: greetings, acknowledgements, and quick factual or conceptual questions about marketing, writing or software in general. Never pick this when the turn is about the user's own posts, metrics, GEO results, website traffic, repositories or issues, however short the question is",
     reasoning: "low",
   },
   [ASSISTANT_MODEL_ID]: {
