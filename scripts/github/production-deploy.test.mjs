@@ -294,6 +294,20 @@ test("sites-builder changes redeploy the dashboard until it is live with them", 
   );
 });
 
+test("apps/ui changes redeploy every app that depends on it", async () => {
+  const { calls, run } = fixture({
+    demo: true,
+    changed: (directory) => directory === "apps/ui",
+  });
+  await run();
+  assert.deepEqual(
+    builds(calls).map(({ url, body }) =>
+      url.hostname === "api.unkey.com" ? body.app : body.project
+    ),
+    ["notra", "notra-web", "notra-ui", "app_demo-dashboard"]
+  );
+});
+
 test("failed toolchain env update prevents every build", async () => {
   const { calls, run } = fixture({
     toolchain: { version: "toolchain-2", snapshotId: "snap-2" },

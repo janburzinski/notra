@@ -13,13 +13,15 @@ const projects = [
     name: "notra",
     directory: "apps/dashboard",
     // Site builds use the snapshot env this deployment pins, so builder
-    // changes redeploy the dashboard until it is live with them.
-    alsoBuilds: ["apps/sites-builder"],
+    // changes redeploy the dashboard until it is live with them. apps/ui is
+    // a workspace dependency (registry components and Tailwind sources).
+    alsoBuilds: ["apps/sites-builder", "apps/ui"],
     productionAlias: "notra-notra.vercel.app",
   },
   {
     name: "notra-web",
     directory: "apps/web",
+    alsoBuilds: ["apps/ui"],
     productionAlias: "notra-web-notra.vercel.app",
   },
   {
@@ -70,6 +72,7 @@ const unkeyServices = [
     name: "demo-dashboard",
     domain: "demo.usenotra.com",
     directory: "apps/dashboard",
+    alsoBuilds: ["apps/ui"],
     demoDatabase: true,
   },
 ];
@@ -363,7 +366,9 @@ export async function release({
       live,
       changed:
         live.git.commitSha !== sha &&
-        buildChanged(service.directory, live.git.commitSha, sha),
+        [service.directory, ...(service.alsoBuilds ?? [])].some((directory) =>
+          buildChanged(directory, live.git.commitSha, sha)
+        ),
     };
   };
   const unkeyPlans = [];
