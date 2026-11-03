@@ -1,0 +1,5 @@
+html.dark
+  [data-component-part="card-icon"]
+  img[src*="/images/integrations/posthog.svg"] {
+  content: url("/images/integrations/posthog-dark.svg");
+}
