@@ -263,21 +263,24 @@ export const listGeoScansForProject = Effect.fn("geo.scans.list")(function* (
     eq(geoScans.organizationId, input.organizationId)
   );
 
-  const [totals, rows] = yield* Effect.all([
-    geoDb("list geo scans count", () =>
-      db.select({ value: count() }).from(geoScans).where(scope)
-    ),
-    geoDb("list geo scans", () =>
-      db.query.geoScans.findMany({
-        where: scope,
-        columns: GEO_SCAN_READ_COLUMNS,
-        extras: { planSummary: geoScanPlanSummarySelection() },
-        orderBy: [desc(geoScans.startedAt)],
-        limit: input.limit,
-        offset: (input.page - 1) * input.limit,
-      })
-    ),
-  ]);
+  const [totals, rows] = yield* Effect.all(
+    [
+      geoDb("list geo scans count", () =>
+        db.select({ value: count() }).from(geoScans).where(scope)
+      ),
+      geoDb("list geo scans", () =>
+        db.query.geoScans.findMany({
+          where: scope,
+          columns: GEO_SCAN_READ_COLUMNS,
+          extras: { planSummary: geoScanPlanSummarySelection() },
+          orderBy: [desc(geoScans.startedAt)],
+          limit: input.limit,
+          offset: (input.page - 1) * input.limit,
+        })
+      ),
+    ],
+    { concurrency: "unbounded" }
+  );
 
   const totalItems = totals.at(0)?.value ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / input.limit));

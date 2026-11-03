@@ -187,56 +187,62 @@ function scoreGap(
 const loadMentionGapInputs = Effect.fn("geo.mentionGapInputs")(function* (
   projectId: string
 ) {
-  const [checks, prompts, settingsRow] = yield* Effect.all([
-    geoDb("mention checks lookup failed", () =>
-      db
-        .selectDistinctOn(
-          [geoMentionChecks.promptId, geoMentionChecks.engine],
-          {
-            promptId: geoMentionChecks.promptId,
-            engine: geoMentionChecks.engine,
-            prompt: geoMentionChecks.prompt,
-            mentioned: geoMentionChecks.mentioned,
-            ownedSourceCited: geoMentionChecks.ownedSourceCited,
-            competitors: geoMentionChecks.competitors,
-            grounding: geoMentionChecks.grounding,
-          }
-        )
-        .from(geoMentionChecks)
-        .where(recentFirstTurnChecks(projectId))
-        .orderBy(
-          geoMentionChecks.promptId,
-          geoMentionChecks.engine,
-          desc(geoMentionChecks.capturedAt)
-        )
-        .limit(GEO_GAPS_MAX_CHECKS)
-    ),
-    geoDb("prompts lookup failed", () =>
-      db
-        .select({
-          id: geoPrompts.id,
-          prompt: geoPrompts.prompt,
-          title: geoPrompts.title,
+  const [checks, prompts, settingsRow] = yield* Effect.all(
+    [
+      geoDb("mention checks lookup failed", () =>
+        db
+          .selectDistinctOn(
+            [geoMentionChecks.promptId, geoMentionChecks.engine],
+            {
+              promptId: geoMentionChecks.promptId,
+              engine: geoMentionChecks.engine,
+              prompt: geoMentionChecks.prompt,
+              mentioned: geoMentionChecks.mentioned,
+              ownedSourceCited: geoMentionChecks.ownedSourceCited,
+              competitors: geoMentionChecks.competitors,
+              grounding: geoMentionChecks.grounding,
+            }
+          )
+          .from(geoMentionChecks)
+          .where(recentFirstTurnChecks(projectId))
+          .orderBy(
+            geoMentionChecks.promptId,
+            geoMentionChecks.engine,
+            desc(geoMentionChecks.capturedAt)
+          )
+          .limit(GEO_GAPS_MAX_CHECKS)
+      ),
+      geoDb("prompts lookup failed", () =>
+        db
+          .select({
+            id: geoPrompts.id,
+            prompt: geoPrompts.prompt,
+            title: geoPrompts.title,
+          })
+          .from(geoPrompts)
+          .where(
+            and(
+              eq(geoPrompts.projectId, projectId),
+              eq(geoPrompts.enabled, true)
+            )
+          )
+          .orderBy(desc(geoPrompts.createdAt))
+      ),
+      geoDb("settings lookup failed", () =>
+        db.query.geoSettings.findFirst({
+          columns: {
+            companyName: true,
+            aliases: true,
+            removedAutoPromptIds: true,
+            ignoredGapPromptIds: true,
+            competitors: true,
+          },
+          where: eq(geoSettings.projectId, projectId),
         })
-        .from(geoPrompts)
-        .where(
-          and(eq(geoPrompts.projectId, projectId), eq(geoPrompts.enabled, true))
-        )
-        .orderBy(desc(geoPrompts.createdAt))
-    ),
-    geoDb("settings lookup failed", () =>
-      db.query.geoSettings.findFirst({
-        columns: {
-          companyName: true,
-          aliases: true,
-          removedAutoPromptIds: true,
-          ignoredGapPromptIds: true,
-          competitors: true,
-        },
-        where: eq(geoSettings.projectId, projectId),
-      })
-    ),
-  ]);
+      ),
+    ],
+    { concurrency: "unbounded" }
+  );
   return {
     checks,
     prompts,
@@ -513,39 +519,42 @@ export const loadPlannerGapPrompts = Effect.fn("geo.plannerGaps")(function* (
 
 const loadCollisionCandidates = Effect.fn("geo.gaps.collisionCandidates")(
   function* (scope: { organizationId: string; brandSettingsId: string }) {
-    const [latestSitemap, postRows] = yield* Effect.all([
-      geoDb("latest sitemap lookup failed", () =>
-        db
-          .select({ id: brandSitemaps.id })
-          .from(brandSitemaps)
-          .where(
-            and(
-              eq(brandSitemaps.brandSettingsId, scope.brandSettingsId),
-              eq(brandSitemaps.status, "ready")
+    const [latestSitemap, postRows] = yield* Effect.all(
+      [
+        geoDb("latest sitemap lookup failed", () =>
+          db
+            .select({ id: brandSitemaps.id })
+            .from(brandSitemaps)
+            .where(
+              and(
+                eq(brandSitemaps.brandSettingsId, scope.brandSettingsId),
+                eq(brandSitemaps.status, "ready")
+              )
             )
-          )
-          .orderBy(desc(brandSitemaps.updatedAt))
-          .limit(1)
-      ),
-      geoDb("posts lookup failed", () =>
-        db
-          .select({
-            id: posts.id,
-            title: posts.title,
-            slug: posts.slug,
-            htmlUrl: posts.htmlUrl,
-          })
-          .from(posts)
-          .where(
-            and(
-              eq(posts.organizationId, scope.organizationId),
-              eq(posts.contentType, GEO_COLLISION_POST_CONTENT_TYPE)
+            .orderBy(desc(brandSitemaps.updatedAt))
+            .limit(1)
+        ),
+        geoDb("posts lookup failed", () =>
+          db
+            .select({
+              id: posts.id,
+              title: posts.title,
+              slug: posts.slug,
+              htmlUrl: posts.htmlUrl,
+            })
+            .from(posts)
+            .where(
+              and(
+                eq(posts.organizationId, scope.organizationId),
+                eq(posts.contentType, GEO_COLLISION_POST_CONTENT_TYPE)
+              )
             )
-          )
-          .orderBy(desc(posts.updatedAt))
-          .limit(GEO_COLLISION_POST_LIMIT)
-      ),
-    ]);
+            .orderBy(desc(posts.updatedAt))
+            .limit(GEO_COLLISION_POST_LIMIT)
+        ),
+      ],
+      { concurrency: "unbounded" }
+    );
     const sitemapId = latestSitemap[0]?.id;
     const pageRows = sitemapId
       ? yield* geoDb("sitemap pages lookup failed", () =>
@@ -624,82 +633,87 @@ const computeGeoContentGaps = Effect.fn("geo.gaps.compute")(function* (
     briefs,
     competitorRows,
     collisionCandidates,
-  ] = yield* Effect.all([
-    loadMentionGapInputs(projectId).pipe(
-      Effect.flatMap((inputs) =>
-        loadAiSearchQueries(
-          projectId,
-          inputs.prompts.flatMap((prompt) => gapScanIds(prompt.id)),
-          [...inputs.removedAutoPromptIds]
-        ).pipe(Effect.map((checks) => ({ ...inputs, aiSearchChecks: checks })))
-      )
-    ),
-    geoDb("prompt suggestions lookup failed", () =>
-      db
-        .select({
-          id: geoPromptSuggestions.id,
-          prompt: geoPromptSuggestions.prompt,
-          title: geoPromptSuggestions.title,
-          sourceKeywords: geoPromptSuggestions.sourceKeywords,
-        })
-        .from(geoPromptSuggestions)
-        .where(
-          and(
-            eq(geoPromptSuggestions.organizationId, scope.organizationId),
-            eq(geoPromptSuggestions.projectId, projectId),
-            eq(geoPromptSuggestions.status, "pending"),
-            // Autopilot's pause suggestions are not writing opportunities.
-            eq(geoPromptSuggestions.source, "search_console")
+  ] = yield* Effect.all(
+    [
+      loadMentionGapInputs(projectId).pipe(
+        Effect.flatMap((inputs) =>
+          loadAiSearchQueries(
+            projectId,
+            inputs.prompts.flatMap((prompt) => gapScanIds(prompt.id)),
+            [...inputs.removedAutoPromptIds]
+          ).pipe(
+            Effect.map((checks) => ({ ...inputs, aiSearchChecks: checks }))
           )
         )
-        .orderBy(desc(geoPromptSuggestions.createdAt))
-        .limit(GEO_GAPS_SEARCH_LIMIT)
-    ),
-    geoDb("briefs lookup failed", () =>
-      db
-        .selectDistinctOn(
-          [geoContentBriefs.sourceKind, geoContentBriefs.sourceId],
-          {
-            id: geoContentBriefs.id,
-            status: geoContentBriefs.status,
-            postId: geoContentBriefs.postId,
-            sourceKind: geoContentBriefs.sourceKind,
-            sourceId: geoContentBriefs.sourceId,
-            workingTitle: sql<string>`${geoContentBriefs.brief}->>'workingTitle'`,
-            baseline: sql<unknown>`${geoContentBriefs.brief}->'baseline'`,
-            publishedAt: geoContentBriefs.publishedAt,
-            rescanScanId: geoContentBriefs.rescanScanId,
-          }
-        )
-        .from(geoContentBriefs)
-        .where(
-          and(
-            eq(geoContentBriefs.projectId, projectId),
-            inArray(geoContentBriefs.sourceKind, [
-              "gap",
-              "search_console",
-              "ai_search",
-            ]),
-            isNotNull(geoContentBriefs.sourceId)
+      ),
+      geoDb("prompt suggestions lookup failed", () =>
+        db
+          .select({
+            id: geoPromptSuggestions.id,
+            prompt: geoPromptSuggestions.prompt,
+            title: geoPromptSuggestions.title,
+            sourceKeywords: geoPromptSuggestions.sourceKeywords,
+          })
+          .from(geoPromptSuggestions)
+          .where(
+            and(
+              eq(geoPromptSuggestions.organizationId, scope.organizationId),
+              eq(geoPromptSuggestions.projectId, projectId),
+              eq(geoPromptSuggestions.status, "pending"),
+              // Autopilot's pause suggestions are not writing opportunities.
+              eq(geoPromptSuggestions.source, "search_console")
+            )
           )
-        )
-        .orderBy(
-          geoContentBriefs.sourceKind,
-          geoContentBriefs.sourceId,
-          desc(geoContentBriefs.updatedAt)
-        )
-    ),
-    geoDb("competitors lookup failed", () =>
-      db
-        .select({
-          name: geoCompetitors.name,
-          synonyms: geoCompetitors.synonyms,
-        })
-        .from(geoCompetitors)
-        .where(eq(geoCompetitors.projectId, projectId))
-    ),
-    loadCollisionCandidates(scope),
-  ]);
+          .orderBy(desc(geoPromptSuggestions.createdAt))
+          .limit(GEO_GAPS_SEARCH_LIMIT)
+      ),
+      geoDb("briefs lookup failed", () =>
+        db
+          .selectDistinctOn(
+            [geoContentBriefs.sourceKind, geoContentBriefs.sourceId],
+            {
+              id: geoContentBriefs.id,
+              status: geoContentBriefs.status,
+              postId: geoContentBriefs.postId,
+              sourceKind: geoContentBriefs.sourceKind,
+              sourceId: geoContentBriefs.sourceId,
+              workingTitle: sql<string>`${geoContentBriefs.brief}->>'workingTitle'`,
+              baseline: sql<unknown>`${geoContentBriefs.brief}->'baseline'`,
+              publishedAt: geoContentBriefs.publishedAt,
+              rescanScanId: geoContentBriefs.rescanScanId,
+            }
+          )
+          .from(geoContentBriefs)
+          .where(
+            and(
+              eq(geoContentBriefs.projectId, projectId),
+              inArray(geoContentBriefs.sourceKind, [
+                "gap",
+                "search_console",
+                "ai_search",
+              ]),
+              isNotNull(geoContentBriefs.sourceId)
+            )
+          )
+          .orderBy(
+            geoContentBriefs.sourceKind,
+            geoContentBriefs.sourceId,
+            desc(geoContentBriefs.updatedAt)
+          )
+      ),
+      geoDb("competitors lookup failed", () =>
+        db
+          .select({
+            name: geoCompetitors.name,
+            synonyms: geoCompetitors.synonyms,
+          })
+          .from(geoCompetitors)
+          .where(eq(geoCompetitors.projectId, projectId))
+      ),
+      loadCollisionCandidates(scope),
+    ],
+    { concurrency: "unbounded" }
+  );
   const {
     checks,
     prompts,
