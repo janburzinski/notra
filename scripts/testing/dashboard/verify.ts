@@ -23,8 +23,6 @@ const status = await response.json();
 assert.equal(status.organization.id, "sites-e2e-acme");
 assert.equal(status.sites.length, 1);
 assert.equal(status.sites[0].id, "sites-e2e-acme-site");
-assert.equal(status.sitesEnabled, true);
-assert.equal(status.sitesFlagSource, "simulated-fixture");
 for (const headers of [
   new Headers({ "x-forwarded-for": "203.0.113.1" }),
   new Headers({ "x-forwarded-host": "staging.example.test" }),
@@ -44,9 +42,6 @@ console.log(
     command: "verify",
     durationMs: +(performance.now() - started).toFixed(2),
     status,
-    sitesUiGateReady: status.sitesEnabled,
-    sitesRuntimeReady: status.sitesEnabled && status.sitesRuntimeConfigured,
-    realDatabuddyFlagVerified:
-      status.sitesFlagSource === "databuddy" && status.databuddyConfigured,
+    sitesRuntimeReady: status.sitesRuntimeConfigured,
   })
 );

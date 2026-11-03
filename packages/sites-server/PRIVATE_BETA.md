@@ -4,10 +4,9 @@ This is a deployment runbook, not evidence that the beta has been deployed.
 
 ## Application and security gates
 
-Databuddy flag `sites`, targeted by `organizationId`, gates management navigation,
-command-palette/AI discovery, dashboard URLs and all Sites RPCs. Missing flags,
-errors, timeout and demo mode fail closed. Published sites and cleanup jobs remain
-independent of that flag.
+Sites is available to every workspace; there is no feature flag. Demo mode hides
+management navigation, command-palette/AI discovery and dashboard URLs, and rejects
+all Sites RPCs. Bulk import stays behind the Databuddy `sites-bulk-import` flag.
 
 Defaults-first creation snapshots normalized configuration in the deployment
 target. The builder uses it only when `blog.json` is absent; valid repository
@@ -122,7 +121,6 @@ certify remote permissions, edge settings or matching worker/dashboard secrets.
    responses must never be externally cached ahead of the worker auth fence.
 8. Validate browser cookie/Origin isolation between sibling tenants; review Public
    Suffix List handling of the hosting domain before broadening the beta.
-9. Enable the `sites` flag for one internal organization, not globally.
 
 Safe packaging checks:
 
@@ -188,7 +186,6 @@ preview access, secret/permission revocation, concurrent preview disable/redeplo
 domain verification/removal, origin-change rebuild, rollback and cleanup. Inspect
 job outcomes and serving state, not only dashboard toasts.
 
-To withdraw management, disable the workspace flag; existing sites stay online.
 Use the explicit offline action when a site must stop serving. For bad application
 code, restore the previous Worker/dashboard release; for bad customer content,
 restore an eligible production deployment. Retain private artifacts and DB history

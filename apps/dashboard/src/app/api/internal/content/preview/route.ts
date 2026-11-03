@@ -6,13 +6,13 @@ import { logError } from "@notra/ai/utils/server-log";
 import { getSite } from "@notra/sites-server/deployments";
 import { isSitesConfigured } from "@notra/sites-server/env";
 import { sitePreviewOrigin } from "@notra/sites-server/utils/urls";
+import { isDemoMode } from "@notra/utils/demo-mode";
 import { ORPCError } from "@orpc/server";
 
 import { assertActiveSubscription } from "@/lib/billing/subscription";
 import { afterResponse } from "@/lib/framework/after-response";
 import { assertNotDemo } from "@/lib/orpc/utils/errors";
 import { dispatchSiteJobs } from "@/lib/sites/dispatch";
-import { isSitesEnabledForOrganization } from "@/lib/sites/flag";
 import { toSitesOrpcError } from "@/lib/sites/orpc-errors";
 import {
   listPostPreviewSites,
@@ -35,12 +35,7 @@ export async function POST(request: Request) {
   const input = parsed.data;
   const { organizationId, postId, operation } = input;
   try {
-    if (
-      !(
-        isSitesConfigured() &&
-        (await isSitesEnabledForOrganization(organizationId))
-      )
-    ) {
+    if (!isSitesConfigured() || isDemoMode()) {
       return Response.json(
         { error: "Notra Sites is not available" },
         { status: 403 }

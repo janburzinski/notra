@@ -13,10 +13,10 @@ import {
   sites,
 } from "@notra/db/schema";
 import { projectScopedCollectionIds } from "@notra/db/utils/projects";
+import { isDemoMode } from "@notra/utils/demo-mode";
 import { and, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 
 import { WORKSPACE_SEARCH_COLUMNS } from "@/constants/workspace-search";
-import { isSitesEnabledForOrganization } from "@/lib/sites/flag";
 import type { WorkspaceSearchParams } from "@/types/search";
 import { workspaceSearchJsonRows } from "@/utils/workspace-search-json-rows";
 
@@ -241,29 +241,27 @@ export async function searchWorkspace(params: WorkspaceSearchParams) {
         ),
       })
       .from(sql`(select 1) as search_batch`),
-    isSitesEnabledForOrganization(params.organizationId).then((enabled) =>
-      enabled
-        ? db
-            .select({
-              id: sites.id,
-              name: sites.name,
-              publicOrigin: sites.publicOrigin,
-            })
-            .from(sites)
-            .where(
-              and(
-                eq(sites.organizationId, params.organizationId),
-                or(
-                  ilike(sites.name, pattern),
-                  ilike(sites.slug, pattern),
-                  ilike(sites.publicOrigin, pattern)
-                )
+    isDemoMode()
+      ? []
+      : db
+          .select({
+            id: sites.id,
+            name: sites.name,
+            publicOrigin: sites.publicOrigin,
+          })
+          .from(sites)
+          .where(
+            and(
+              eq(sites.organizationId, params.organizationId),
+              or(
+                ilike(sites.name, pattern),
+                ilike(sites.slug, pattern),
+                ilike(sites.publicOrigin, pattern)
               )
             )
-            .orderBy(desc(sites.updatedAt))
-            .limit(params.limit)
-        : []
-    ),
+          )
+          .orderBy(desc(sites.updatedAt))
+          .limit(params.limit),
   ]);
 
   const batch = batchRows[0];

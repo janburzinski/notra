@@ -1,6 +1,6 @@
-import { isSitesEnabledForOrganization } from "@notra/ai/utils/sites-access";
 import { db } from "@notra/db/drizzle";
 import { sites } from "@notra/db/schema";
+import { isDemoMode } from "@notra/utils/demo-mode";
 import { and, asc, eq, isNotNull } from "drizzle-orm";
 import { defineTool } from "eve/tools";
 
@@ -16,8 +16,8 @@ export function createGetSitesTool() {
     inputSchema: getSitesInputSchema,
     async execute({ projectId, limit, offset }, ctx) {
       const organizationId = requireOrganizationId(ctx);
-      if (!(await isSitesEnabledForOrganization(organizationId))) {
-        return { success: false, error: "Notra Sites is not enabled" };
+      if (isDemoMode()) {
+        return { success: false, error: "Notra Sites is not available" };
       }
       const rows = await db.query.sites.findMany({
         columns: PUBLIC_SITE_COLUMNS,

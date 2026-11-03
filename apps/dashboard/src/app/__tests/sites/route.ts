@@ -4,10 +4,6 @@ import { isSitesConfigured } from "@notra/sites-server/env";
 import { and, eq } from "drizzle-orm";
 
 import { getAuthSession } from "@/lib/auth/server";
-import {
-  isSitesEnabledForOrganization,
-  isSitesFixtureFlagEnabled,
-} from "@/lib/sites/flag";
 import { isSitesTestRequestAllowed } from "@/utils/sites-test-access";
 
 export async function GET(request: Request): Promise<Response> {
@@ -32,7 +28,7 @@ export async function GET(request: Request): Promise<Response> {
   if (!membership) {
     return new Response(null, { status: 403 });
   }
-  const [organization, associatedSites, sitesEnabled] = await Promise.all([
+  const [organization, associatedSites] = await Promise.all([
     db.query.organizations.findFirst({
       where: eq(organizations.id, organizationId),
       columns: { id: true, slug: true },
@@ -41,20 +37,12 @@ export async function GET(request: Request): Promise<Response> {
       where: eq(sites.organizationId, organizationId),
       columns: { id: true, projectId: true, name: true, slug: true },
     }),
-    isSitesEnabledForOrganization(organizationId),
   ]);
   return Response.json(
     {
       organization,
       sites: associatedSites,
-      sitesEnabled,
       sitesRuntimeConfigured: isSitesConfigured(),
-      sitesFlagSource: isSitesFixtureFlagEnabled(organizationId)
-        ? "simulated-fixture"
-        : "databuddy",
-      databuddyConfigured: Boolean(
-        process.env.NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID
-      ),
     },
     { headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } }
   );

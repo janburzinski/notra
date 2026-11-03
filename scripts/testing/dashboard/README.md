@@ -241,7 +241,6 @@ cd apps/dashboard
 env -i PATH="$PATH" HOME="$HOME" NODE_ENV=development \
   NODE_OPTIONS=--max-old-space-size=6144 \
   DATABASE_URL="$SITES_TEST_DATABASE_URL" SITES_TEST_ENABLED=true \
-  SITES_TEST_FIXTURE_FLAGS_ENABLED=true \
   INTEGRATION_ENCRYPTION_KEY="$SITES_TEST_INTEGRATION_ENCRYPTION_KEY" \
   DEV_AUTH_ENABLED=true DEV_AUTH_EMAIL=sites-e2e-owner@example.test \
   APP_URL=http://127.0.0.1:33173 \
@@ -270,14 +269,6 @@ with 404 in production, when disabled, for a nonloopback/forwarded request, or
 when the app uses a different database. Vite can reject a public Host header
 itself with 403 before application routing. There is no reset or seeding API.
 
-The status labels the local override `sitesFlagSource: "simulated-fixture"`.
-`SITES_TEST_FIXTURE_FLAGS_ENABLED=true` enables only the `sites` flag for the two
-pinned synthetic organization IDs, only when the same test-route guard passes
-and the existing local-dev auth gate allows the request. It cannot activate
-with a real WorkOS key, without local-dev auth, remotely, or in production. This
-does not test Databuddy. Without this explicit override, empty
-`NEXT_PUBLIC_DATABUDDY_DASHBOARD_WEBSITE_ID` disables Sites; a valid Databuddy
-client ID and an enabled `sites` flag targeted at the organization are required.
 Cloud creation/deployment also needs the separately configured GitHub,
 Box and R2 services. A successful status check is not a full UI E2E pass.
 
@@ -285,9 +276,9 @@ Box and R2 services. A successful status check is not a full UI E2E pass.
 required variables are `SITES_R2_ACCOUNT_ID`, `SITES_R2_ACCESS_KEY_ID`,
 `SITES_R2_SECRET_ACCESS_KEY`, `SITES_R2_BUCKET`, `SITES_HOSTING_DOMAIN`,
 `SITES_PREVIEW_SECRET`, `SITES_BUILDER_SNAPSHOT_ID`, and `UPSTASH_BOX_API_KEY`.
-Without them the browser shows the genuine “Sites isn't available here” state,
-even with the local simulated flag. Do not fill in fake keys just to pass this
-check; the list/detail flow subsequently reads real serving state from R2.
+Without them the browser shows the genuine “Sites isn't available here” state.
+Do not fill in fake keys just to pass this check; the list/detail flow
+subsequently reads real serving state from R2.
 
 Use the repository's declared Node 24 runtime where available. The explicit
 test-only heap budget above avoids the default V8 heap-limit failure observed

@@ -59,7 +59,6 @@ const context: ORPCContext = {
     authorizedOrganizationIds: new Set(),
     shelfMembersByOrganization: new Map(),
     analyticsEnabledByOrganization: new Map(),
-    sitesEnabledByOrganization: new Map(),
     geoEntitlementByOrganization: new Map(),
     membershipByUserOrganization: new Map(),
   },

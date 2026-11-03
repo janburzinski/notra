@@ -136,7 +136,7 @@ if (kind === "lifecycle") {
   if (report.checks) {
     lines.push(
       "",
-      `${mark(true)} Dashboard HTTP checks: test-status route, flag source \`${report.checks.status?.sitesFlagSource}\`, header spoofing blocked, dev session.`
+      `${mark(true)} Dashboard HTTP checks: test-status route, header spoofing blocked, dev session.`
     );
   }
   lines.push("", "Logs for every suite are in the job artifact under `logs/`.");

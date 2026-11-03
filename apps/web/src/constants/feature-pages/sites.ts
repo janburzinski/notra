@@ -65,7 +65,7 @@ export const SITES_PAGE: FeatureDetailCopy = {
   cta: {
     heading: "Ship your blog like you ship code",
     subcopy:
-      "Sites is in private beta. Ask us to turn it on, then import a repository and your first post is live in minutes.",
+      "Import a repository from your dashboard and your first post is live in minutes.",
   },
 };
 
@@ -83,7 +83,7 @@ export const SITES_FAQ: FaqContent = {
       id: "sites-access",
       question: "Can I use Notra Sites today?",
       answer:
-        "Sites is in private beta. Email hello@usenotra.com or ask on Discord and we'll turn it on for your workspace.",
+        "Yes. Sites is available in every workspace. Open Sites in the dashboard and import a repository to get started.",
       defaultOpen: true,
     },
     {

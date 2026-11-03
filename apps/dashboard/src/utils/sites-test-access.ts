@@ -1,6 +1,4 @@
-import { SITES_TEST_ORGANIZATION_IDS } from "@/constants/sites-testing";
 import {
-  evaluateLocalDevAuth,
   hostnameFromHostHeader,
   requestLooksPubliclyExposed,
 } from "@/utils/local-dev-auth";
@@ -38,16 +36,4 @@ export function isSitesTestRequestAllowed(
   } catch {
     return false;
   }
-}
-
-export function isSitesFixtureFlagRequestAllowed(
-  request: Pick<Request, "headers">,
-  organizationId: string
-): boolean {
-  return (
-    process.env.SITES_TEST_FIXTURE_FLAGS_ENABLED === "true" &&
-    SITES_TEST_ORGANIZATION_IDS.has(organizationId) &&
-    isSitesTestRequestAllowed(request) &&
-    evaluateLocalDevAuth(request.headers).kind === "allowed"
-  );
 }

@@ -10,7 +10,6 @@ export interface ORPCRequestMemo {
   readonly authorizedOrganizationIds: Set<string>;
   readonly shelfMembersByOrganization: Map<string, Promise<GeoShelfMember[]>>;
   readonly analyticsEnabledByOrganization: Map<string, Promise<boolean>>;
-  readonly sitesEnabledByOrganization: Map<string, Promise<boolean>>;
   readonly geoEntitlementByOrganization: Map<
     string,
     Promise<"entitled" | "denied" | "skipped">

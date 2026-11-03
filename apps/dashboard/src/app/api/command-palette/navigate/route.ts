@@ -8,6 +8,7 @@ import {
   commandPaletteNavigateRequestSchema,
   commandPaletteNavigateResultSchema,
 } from "@notra/schemas/dashboard/command-palette";
+import { isDemoMode } from "@notra/utils/demo-mode";
 import { generateText, Output } from "ai";
 import { and, eq } from "drizzle-orm";
 import { createRequestLogger } from "evlog";
@@ -18,7 +19,6 @@ import { isAutopilotEnabledForOrganization } from "@/lib/autopilot/flag";
 import { hasAiCreditsGrant } from "@/lib/billing/subscription";
 import { resolveNavigationWithJev } from "@/lib/command-palette/jev-navigation";
 import { searchWorkspace } from "@/lib/search/workspace-search";
-import { isSitesEnabledForOrganization } from "@/lib/sites/flag";
 import type {
   CommandPaletteEntityTarget,
   CommandPaletteNavigationEntity,
@@ -158,24 +158,22 @@ export async function POST(request: Request) {
   }
 
   const organizationId = member.organizationId;
-  const [hasAiCredits, autopilot, analytics, sites, searchData] =
-    await Promise.all([
-      hasAiCreditsGrant(organizationId).catch(() => false),
-      isAutopilotEnabledForOrganization(organizationId),
-      isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
-      isSitesEnabledForOrganization(organizationId),
-      searchWorkspace({
-        organizationId,
-        projectId,
-        query,
-        limit: NAVIGATION_SEARCH_LIMIT,
-      }),
-    ]);
+  const [hasAiCredits, autopilot, analytics, searchData] = await Promise.all([
+    hasAiCreditsGrant(organizationId).catch(() => false),
+    isAutopilotEnabledForOrganization(organizationId),
+    isAnalyticsEnabledForOrganization(organizationId).catch(() => false),
+    searchWorkspace({
+      organizationId,
+      projectId,
+      query,
+      limit: NAVIGATION_SEARCH_LIMIT,
+    }),
+  ]);
   const entities = toNavigationEntities(slug, searchData);
   const routes = commandRoutesForAI(slug, hasAiCredits, {
     autopilot,
     analytics,
-    sites,
+    sites: !isDemoMode(),
   });
 
   const allPaths = [

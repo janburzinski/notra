@@ -54,7 +54,7 @@ curl -H "Accept: text/markdown" https://meridian-editorial.notra.site/blog/the-d
 
 ### Can I use Notra Sites today?
 
-Sites is in private beta. Email hello@usenotra.com or ask on Discord and we'll turn it on for your workspace.
+Yes. Sites is available in every workspace. Open Sites in the dashboard and import a repository to get started.
 
 ### Do I need a special repository?
 
@@ -78,4 +78,4 @@ Every page has a Markdown version, and each site ships llms.txt, sitemaps, RSS a
 
 ## Ship your blog like you ship code
 
-Sites is in private beta. Ask us to turn it on, then import a repository and your first post is live in minutes.
+Import a repository from your dashboard and your first post is live in minutes.

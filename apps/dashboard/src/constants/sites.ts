@@ -29,7 +29,6 @@ import type {
 } from "@/types/sites";
 
 export const SITES_NAV_LINK = "/sites";
-export { SITES_FLAG_KEY } from "@notra/ai/constants/sites-access";
 export const SITES_BULK_IMPORT_FLAG_KEY = "sites-bulk-import";
 export const SITES_FLAG_TIMEOUT_MS = 3000;
 

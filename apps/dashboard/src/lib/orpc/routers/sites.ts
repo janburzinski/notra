@@ -159,6 +159,7 @@ import {
   siteAliasOrigin,
   sitePreviewOrigin,
 } from "@notra/sites-server/utils/urls";
+import { isDemoMode } from "@notra/utils/demo-mode";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { Effect } from "effect";
 
@@ -185,10 +186,7 @@ import {
 import { toGeoOrpcError } from "@/lib/orpc/utils/geo-errors";
 import { assertSitesAccess } from "@/lib/sites/access";
 import { dispatchSiteJobs } from "@/lib/sites/dispatch";
-import {
-  isSitesBulkImportEnabled,
-  isSitesEnabledForOrganization,
-} from "@/lib/sites/flag";
+import { isSitesBulkImportEnabled } from "@/lib/sites/flag";
 import {
   notifyDomainConnected,
   notifySitesCreated,
@@ -852,12 +850,7 @@ export const sitesRouter = {
           headers: context.headers,
           organizationId: input.organizationId,
         });
-        if (
-          !(
-            isSitesConfigured() &&
-            (await isSitesEnabledForOrganization(input.organizationId))
-          )
-        ) {
+        if (!isSitesConfigured() || isDemoMode()) {
           return [];
         }
         return await listPostPreviewSites(input.organizationId, input.postId);

@@ -1,78 +1,17 @@
 import { afterEach, expect, test } from "bun:test";
 
-import {
-  isSitesFixtureFlagRequestAllowed,
-  isSitesTestRequestAllowed,
-} from "./sites-test-access";
+import { isSitesTestRequestAllowed } from "./sites-test-access";
 
 const original = { ...process.env };
 
 afterEach(() => {
-  for (const key of [
-    "NODE_ENV",
-    "SITES_TEST_ENABLED",
-    "SITES_TEST_FIXTURE_FLAGS_ENABLED",
-    "DATABASE_URL",
-    "DEV_AUTH_ENABLED",
-    "DEV_AUTH_EMAIL",
-    "WORKOS_API_KEY",
-  ]) {
+  for (const key of ["NODE_ENV", "SITES_TEST_ENABLED", "DATABASE_URL"]) {
     if (original[key] === undefined) {
       delete process.env[key];
     } else {
       process.env[key] = original[key];
     }
   }
-});
-
-test("simulated Sites flag never escapes pinned local development fixtures", () => {
-  process.env.NODE_ENV = "development";
-  process.env.SITES_TEST_ENABLED = "true";
-  process.env.DATABASE_URL =
-    "postgresql://postgres@127.0.0.1:5432/notra_server_audit";
-  process.env.DEV_AUTH_ENABLED = "true";
-  process.env.DEV_AUTH_EMAIL = "sites-e2e-owner@example.test";
-  delete process.env.WORKOS_API_KEY;
-  const request = new Request("http://127.0.0.1:3000/__tests/sites", {
-    headers: { host: "127.0.0.1:3000" },
-  });
-  delete process.env.SITES_TEST_FIXTURE_FLAGS_ENABLED;
-  expect(isSitesFixtureFlagRequestAllowed(request, "sites-e2e-acme")).toBe(
-    false
-  );
-  process.env.SITES_TEST_FIXTURE_FLAGS_ENABLED = "true";
-  expect(isSitesFixtureFlagRequestAllowed(request, "sites-e2e-acme")).toBe(
-    true
-  );
-  expect(isSitesFixtureFlagRequestAllowed(request, "real-organization")).toBe(
-    false
-  );
-  process.env.NODE_ENV = "production";
-  expect(isSitesFixtureFlagRequestAllowed(request, "sites-e2e-acme")).toBe(
-    false
-  );
-  process.env.NODE_ENV = "development";
-  expect(
-    isSitesFixtureFlagRequestAllowed(
-      { headers: new Headers({ host: "remote.example.test" }) },
-      "sites-e2e-acme"
-    )
-  ).toBe(false);
-  process.env.DATABASE_URL = "postgresql://postgres@127.0.0.1:5432/notra";
-  expect(isSitesFixtureFlagRequestAllowed(request, "sites-e2e-acme")).toBe(
-    false
-  );
-  process.env.DATABASE_URL =
-    "postgresql://postgres@127.0.0.1:5432/notra_server_audit";
-  process.env.WORKOS_API_KEY = `sk_${"synthetic".repeat(5)}`;
-  expect(isSitesFixtureFlagRequestAllowed(request, "sites-e2e-acme")).toBe(
-    false
-  );
-  delete process.env.WORKOS_API_KEY;
-  delete process.env.DEV_AUTH_ENABLED;
-  expect(isSitesFixtureFlagRequestAllowed(request, "sites-e2e-acme")).toBe(
-    false
-  );
 });
 
 test("Sites test status is opt-in, development-only, and isolated", () => {
