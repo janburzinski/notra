@@ -7,6 +7,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SITE_CONFIG_FILENAME } from "@notra/sites-core/constants/sites";
+import { isSiteImageDraftPath } from "@notra/sites-core/utils/image-drafts";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -16,20 +17,26 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from "@notra/ui/components/shared/responsive-dialog";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
+import Link from "@/components/framework/link";
 import { useSite } from "@/components/sites/site-context";
 import {
   useSiteWorkspace,
   useSiteWorkspaceLoad,
 } from "@/components/sites/site-workspace-context";
 import { SITE_DESIGN_SECTIONS } from "@/constants/site-design-sections";
-import { SITE_CHANGES_STRIP_TONES } from "@/constants/sites";
+import {
+  SITE_CHANGES_STRIP_TONES,
+  SITE_CHANGES_VISIBLE,
+} from "@/constants/sites";
 import { useSiteNavSection } from "@/lib/hooks/use-site-nav-section";
 import { cn } from "@/lib/utils";
 import type {
+  SiteChangeItem,
+  SiteChangeListProps,
   SiteChangesStripProps,
   SiteChangesStripStateProps,
   SiteDiscardChangesButtonProps,
@@ -37,6 +44,11 @@ import type {
 import type { SiteWorkspaceValue } from "@/types/site-workspace";
 import { siteBranchLabel } from "@/utils/site-branch-label";
 import { configSectionChanged } from "@/utils/site-design-sections";
+import { siteHref } from "@/utils/site-links";
+import {
+  siteUnpublishedTitle,
+  splitVisibleChanges,
+} from "@/utils/site-unpublished-summary";
 
 function Strip({ tone, title, description, children }: SiteChangesStripProps) {
   return (
@@ -56,12 +68,12 @@ function Strip({ tone, title, description, children }: SiteChangesStripProps) {
         icon={tone === "info" ? InformationCircleIcon : Alert02Icon}
         strokeWidth={2}
       />
-      <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 text-sm">
+      <div className="min-w-0 flex-1 space-y-0.5 text-sm">
         <p className="font-medium">{title}</p>
         <p className="opacity-80">{description}</p>
       </div>
       {children ? (
-        <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:w-auto">
+        <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
           {children}
         </div>
       ) : null}
@@ -242,6 +254,55 @@ function SiteUnpublishedStrip({ state }: SiteChangesStripStateProps) {
   );
 }
 
+const CHANGE_LINK_CLASS =
+  "decoration-current/40 hover:decoration-current focus-visible:ring-ring/50 rounded-xs underline underline-offset-4 transition-colors duration-150 outline-none focus-visible:ring-2";
+
+/** "General, Navbar and launch.mdx": each change links to where it was made. */
+function SiteChangeList({ items, more, onReview }: SiteChangeListProps) {
+  const banner = useTranslations("sites.design.workspace.banner");
+  const locale = useLocale();
+  const listFormat = useMemo(
+    () => new Intl.ListFormat(locale, { type: "conjunction" }),
+    [locale]
+  );
+  const entries: readonly SiteChangeItem[] =
+    more > 0
+      ? [
+          ...items,
+          { key: "more", label: banner("moreChanges", { count: more }) },
+        ]
+      : items;
+  const parts = listFormat.formatToParts(entries.map((entry) => entry.label));
+  const nodes: ReactNode[] = [];
+  let next = 0;
+  for (const part of parts) {
+    const entry = entries[next];
+    if (part.type === "literal" || !entry) {
+      nodes.push(<span key={`before-${entry?.key}`}>{part.value}</span>);
+      continue;
+    }
+    next += 1;
+    nodes.push(
+      entry.href ? (
+        <Link className={CHANGE_LINK_CLASS} href={entry.href} key={entry.key}>
+          {entry.label}
+        </Link>
+      ) : (
+        <button
+          className={cn(CHANGE_LINK_CLASS, "cursor-pointer")}
+          key={entry.key}
+          onClick={onReview}
+          title={entry.title}
+          type="button"
+        >
+          {entry.label}
+        </button>
+      )
+    );
+  }
+  return nodes;
+}
+
 function SiteDiscardChangesButton({
   state,
   variant = "secondary",
@@ -319,54 +380,112 @@ function SiteDiscardChangesButton({
   );
 }
 
-function useUnpublishedSummary(state: SiteWorkspaceValue) {
-  const { detail } = useSite();
+/** One entry per change: Design sections and settings link to their page, files open the review. */
+function useChangeItems(state: SiteWorkspaceValue) {
+  const { organizationSlug, detail } = useSite();
   const banner = useTranslations("sites.design.workspace.banner");
   const titles = useTranslations("sites.design.sections.titles");
-  const branches = useTranslations("sites.branches");
-  const locale = useLocale();
-  const listFormat = useMemo(
-    () => new Intl.ListFormat(locale, { type: "conjunction" }),
-    [locale]
-  );
+  const { site } = detail;
+  const href = (target: "design" | "settings", section?: string) => {
+    const url = new URL(
+      siteHref(organizationSlug, site.id, target, site.projectId),
+      "http://localhost"
+    );
+    if (section) {
+      url.searchParams.set("section", section);
+    }
+    if (state.scope.branch) {
+      url.searchParams.set("branch", state.scope.branch);
+    }
+    return `${url.pathname}${url.search}`;
+  };
   const sections = SITE_DESIGN_SECTIONS.filter((section) =>
     configSectionChanged(state.config, state.published, section.paths)
-  ).map((section) => titles(section.id));
+  ).map((section) => ({
+    key: section.id,
+    label: titles(section.id),
+    href: href("design", section.id),
+  }));
   // Variables and other keys outside the Design sections still differ from
   // production after a feature branch commits them and its drafts clear.
   const configChanged = configSectionChanged(state.config, state.published, [
     ...new Set([...Object.keys(state.config), ...Object.keys(state.published)]),
   ]);
-  const otherDrafts = state.files.drafts.some(
-    (draft) => draft.path !== SITE_CONFIG_FILENAME
-  );
+  const settings =
+    configChanged && sections.length === 0
+      ? [
+          {
+            key: "settings",
+            label: banner("siteSettings"),
+            href: href("settings"),
+          },
+        ]
+      : [];
+  // Uploaded images travel with the section that references them.
+  const files = state.files.drafts
+    .filter(
+      (draft) =>
+        draft.path !== SITE_CONFIG_FILENAME && !isSiteImageDraftPath(draft.path)
+    )
+    .map((draft) => ({
+      key: draft.path,
+      label: draft.path.split("/").at(-1) ?? draft.path,
+      title: draft.path,
+    }));
+  return { sections, settings, files, configChanged };
+}
+
+function useUnpublishedSummary(state: SiteWorkspaceValue) {
+  const { detail } = useSite();
+  const banner = useTranslations("sites.design.workspace.banner");
+  const branches = useTranslations("sites.branches");
+  const locale = useLocale();
+  const { sections, settings, files, configChanged } = useChangeItems(state);
   const branch = state.scope.branch;
   const feature = Boolean(branch && branch !== detail.site.productionBranch);
-  // Committed branch edits outside the config leave no drafts behind.
+  // Committed branch edits leave no drafts behind, so they are only counted.
   const branchFiles = feature
     ? (state.controller.queries.status.data?.changedFiles ?? 0)
     : 0;
   if (!configChanged && state.files.drafts.length === 0 && branchFiles === 0) {
     return null;
   }
+  const items: SiteChangeItem[] = [...sections, ...settings, ...files];
+  const drafts = state.files.drafts.length;
+  const heading = siteUnpublishedTitle({
+    sections: sections.length,
+    files: files.length,
+    drafts,
+    branchFiles,
+  });
+  const title = banner(heading.key, { count: heading.count });
   const branchName = siteBranchLabel(branch ?? "", locale, (date) =>
     branches("draftFrom", { date })
   );
-  if (sections.length > 0 && !otherDrafts) {
-    const list = listFormat.format(sections);
+  if (items.length === 0) {
     return {
-      title: banner("unpublishedTitle", { count: sections.length }),
+      title,
       description: feature
-        ? banner("unpublishedBranch", { sections: list, branch: branchName })
-        : banner("unpublished", { sections: list }),
+        ? banner("unpublishedBranchFiles", { branch: branchName })
+        : banner("unpublishedFiles"),
     };
   }
+  const { visible, more } = splitVisibleChanges(
+    items,
+    Math.max(0, branchFiles - drafts),
+    SITE_CHANGES_VISIBLE
+  );
+  const list = () => (
+    <SiteChangeList
+      items={visible}
+      more={more}
+      onReview={() => state.setPublishOpen(true)}
+    />
+  );
   return {
-    title: banner("unpublishedFilesTitle", {
-      count: Math.max(state.files.drafts.length, branchFiles, 1),
-    }),
+    title,
     description: feature
-      ? banner("unpublishedBranchFiles", { branch: branchName })
-      : banner("unpublishedFiles"),
+      ? banner.rich("unpublishedBranch", { list, branch: branchName })
+      : banner.rich("unpublished", { list }),
   };
 }

@@ -186,6 +186,12 @@ export interface SiteBrandDefaults {
   bodyFamily?: string;
 }
 
+export interface SiteBrandDefaultsState {
+  brand: SiteBrandDefaults | null;
+  /** The site's project has, or may still turn out to have, a brand identity. */
+  available: boolean;
+}
+
 export interface SiteDesignFieldsProps<T> {
   form: T;
   update: SiteDesignFormUpdate<T>;

@@ -82,6 +82,7 @@ export type SiteBranchFieldProps = SiteSettingsTextFieldProps;
 
 export interface SiteSectionFieldProps {
   title: string;
+  description: string;
   enabled: boolean;
   path: string;
   onEnabledChange: (enabled: boolean) => void;

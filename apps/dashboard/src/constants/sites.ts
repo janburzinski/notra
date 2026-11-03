@@ -210,6 +210,14 @@ export const SITE_PREVIEW_KEY_PATTERN = /^(?:pr|br|post)-[a-z0-9-]{1,40}$/;
 
 export const SITES_PAGE_SKELETON_ROWS = 3;
 
+/** Rows per site sidebar group: pages, Appearance, Layout, Configuration. */
+export const SITE_SIDEBAR_SKELETON_GROUPS = [
+  ["overview", "analytics", "domains", "settings"],
+  ["general", "styling", "branding", "typography"],
+  ["navbar", "banner", "footer"],
+  ["integrations", "seo"],
+] as const;
+
 export const SITE_PREVIEW_VIEWPORT_WIDTH = 1280;
 export const SITE_PREVIEW_VIEWPORT_HEIGHT = 800;
 export const SITE_PREVIEW_REACHABILITY_TIMEOUT_MS = 8000;
@@ -235,6 +243,9 @@ export const SITE_SETTINGS_PANEL_CLASSNAME =
   "h-[var(--collapsible-panel-height)] overflow-hidden outline-none transition-[height,opacity] duration-normal ease-emphasized motion-reduce:transition-none data-[ending-style]:h-0 data-[ending-style]:opacity-0 data-[starting-style]:h-0 data-[starting-style]:opacity-0";
 /** Coalesces bursts of deployment events (enqueue, start, finish) per tab. */
 export const SITES_LIVE_INVALIDATE_THROTTLE_MS = 1000;
+
+/** Changes the unpublished strip names before the rest collapse into "N more". */
+export const SITE_CHANGES_VISIBLE = 3;
 
 // Tints sit on an opaque base because the strip sticks over scrolling content.
 export const SITE_CHANGES_STRIP_TONES = {

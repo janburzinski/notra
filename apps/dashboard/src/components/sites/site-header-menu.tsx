@@ -6,6 +6,7 @@ import {
   GithubIcon,
   LinkSquare02Icon,
   MoreHorizontalIcon,
+  PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -20,7 +21,9 @@ import { useTranslations } from "use-intl";
 
 import { Button } from "@/components/button";
 import { useSite } from "@/components/sites/site-context";
+import { SITES_NAV_LINK } from "@/constants/sites";
 import { useSiteBranchVisibility } from "@/lib/hooks/use-site-branch-visibility";
+import { useRouter } from "@/lib/navigation";
 import type { SiteHeaderMenuProps } from "@/types/components/sites";
 import { copyTextToClipboard } from "@/utils/copy-to-clipboard";
 import { githubBranchUrl } from "@/utils/site-links";
@@ -33,7 +36,10 @@ export function SiteHeaderMenu({
   const t = useTranslations("sites.list.actions");
   const tBranches = useTranslations("sites.branches");
   const tCommon = useTranslations("common");
-  const { site } = useSite().detail;
+  const tSwitcher = useTranslations("sites.switcher");
+  const router = useRouter();
+  const { organizationSlug, detail } = useSite();
+  const { site } = detail;
   const visibility = useSiteBranchVisibility();
   const repositoryUrl = githubBranchUrl(site.repository, branch);
   return (
@@ -97,6 +103,19 @@ export function SiteHeaderMenu({
             {t("viewOnGitHub")}
           </DropdownMenuItem>
         ) : null}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() =>
+            router.push(`/${organizationSlug}${SITES_NAV_LINK}/new`)
+          }
+        >
+          <HugeiconsIcon
+            aria-hidden="true"
+            icon={PlusSignIcon}
+            strokeWidth={1.5}
+          />
+          {tSwitcher("newSite")}
+        </DropdownMenuItem>
         {branchesRequired ? null : (
           <>
             <DropdownMenuSeparator />

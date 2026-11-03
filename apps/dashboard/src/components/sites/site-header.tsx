@@ -26,11 +26,7 @@ import type {
   SiteHeaderProps,
   SiteSwitcherProps,
 } from "@/types/components/sites";
-import { displayUrl, siteHref } from "@/utils/site-links";
-
-function siteDomain(origin: string): string {
-  return displayUrl(origin).split("/")[0] ?? "";
-}
+import { displayUrl, hostFromOrigin, siteHref } from "@/utils/site-links";
 
 function SiteSwitcher({
   slug,
@@ -42,20 +38,33 @@ function SiteSwitcher({
   const router = useRouter();
   const { data } = useSitesList(organizationId, site.projectId);
   const sites = data?.sites ?? [site];
+  const identity = (
+    <>
+      <ProjectLogo
+        domain={hostFromOrigin(site.publicOrigin)}
+        name={site.name}
+      />
+      <span className="truncate">{site.name}</span>
+    </>
+  );
+  // Nothing to switch to: a plain label instead of a one-item menu.
+  if (sites.length < 2) {
+    return (
+      <div className="flex h-8 max-w-64 min-w-0 items-center gap-2 text-sm font-medium">
+        {identity}
+      </div>
+    );
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
           <button
             aria-label={t("label", { name: site.name })}
-            className="hover:bg-muted focus-visible:ring-ring/50 -ml-2 flex h-8 max-w-64 min-w-0 cursor-pointer items-center gap-2 rounded-lg px-2 text-sm font-medium outline-none focus-visible:ring-3"
+            className="hover:bg-sidebar-accent focus-visible:ring-ring/50 data-popup-open:bg-sidebar-accent -ml-2 flex h-8 max-w-64 min-w-0 cursor-pointer items-center gap-2 rounded-lg px-2 text-sm font-medium outline-none focus-visible:ring-3"
             type="button"
           >
-            <ProjectLogo
-              domain={siteDomain(site.publicOrigin)}
-              name={site.name}
-            />
-            <span className="truncate">{site.name}</span>
+            {identity}
             <HugeiconsIcon
               className="text-muted-foreground size-3.5 shrink-0"
               icon={UnfoldMoreIcon}
@@ -76,7 +85,7 @@ function SiteSwitcher({
               }}
             >
               <ProjectLogo
-                domain={siteDomain(item.publicOrigin)}
+                domain={hostFromOrigin(item.publicOrigin)}
                 name={item.name}
               />
               <span className="grid min-w-0 flex-1 leading-tight">
@@ -111,7 +120,7 @@ function SiteSwitcher({
 export function SiteHeader({ slug, organizationId, site }: SiteHeaderProps) {
   const { section } = useSiteNavSection(slug, site.id);
   return (
-    <div className="bg-background sticky top-0 z-20 flex min-h-12 shrink-0 flex-wrap items-center gap-x-3 border-b px-4 lg:px-5">
+    <div className="bg-sidebar text-sidebar-foreground sticky top-0 z-20 flex min-h-12 shrink-0 flex-wrap items-center gap-x-3 border-b px-4 lg:px-5">
       <SiteSwitcher
         organizationId={organizationId}
         section={section}

@@ -10,6 +10,7 @@ import {
   GitBranchIcon,
   GithubIcon,
   Layers01Icon,
+  Route01Icon,
   SparklesIcon,
   Tag01Icon,
   ViewIcon,
@@ -19,7 +20,12 @@ import { ConfirmDialog } from "@notra/ui/components/shared/confirm-dialog";
 import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { Field, FieldError, FieldLabel } from "@notra/ui/components/ui/field";
-import { Input } from "@notra/ui/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@notra/ui/components/ui/input-group";
 import { Switch } from "@notra/ui/components/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
@@ -72,7 +78,11 @@ import type {
   SiteSettingsRowKey,
 } from "@/types/sites";
 import { toErrorMessage } from "@/utils/error-message";
-import { githubRepositoryUrl, siteHref } from "@/utils/site-links";
+import {
+  githubRepositoryUrl,
+  hostFromOrigin,
+  siteHref,
+} from "@/utils/site-links";
 
 export function SiteSettingsPage() {
   const { organizationId, organizationSlug, siteId } = useSite();
@@ -189,7 +199,7 @@ function SiteSettingsContent() {
           <SiteSettingsItem
             {...row("sections")}
             description={t("sectionsRowHint")}
-            icon={Layers01Icon}
+            icon={Route01Icon}
             title={tSections("title")}
             value={
               <SiteSettingsValue mono>
@@ -205,22 +215,26 @@ function SiteSettingsContent() {
             >
               {(form, update) => (
                 <>
-                  <SiteSectionField
-                    enabled={form.blogEnabled}
-                    onEnabledChange={(value) => update("blogEnabled", value)}
-                    onPathChange={(value) => update("blogPath", value)}
-                    path={form.blogPath}
-                    title={tSections("blog")}
-                  />
-                  <SiteSectionField
-                    enabled={form.changelogEnabled}
-                    onEnabledChange={(value) =>
-                      update("changelogEnabled", value)
-                    }
-                    onPathChange={(value) => update("changelogPath", value)}
-                    path={form.changelogPath}
-                    title={tSections("changelog")}
-                  />
+                  <div className="divide-y rounded-xl border">
+                    <SiteSectionField
+                      description={tSections("blogDescription")}
+                      enabled={form.blogEnabled}
+                      onEnabledChange={(value) => update("blogEnabled", value)}
+                      onPathChange={(value) => update("blogPath", value)}
+                      path={form.blogPath}
+                      title={tSections("blog")}
+                    />
+                    <SiteSectionField
+                      description={tSections("changelogDescription")}
+                      enabled={form.changelogEnabled}
+                      onEnabledChange={(value) =>
+                        update("changelogEnabled", value)
+                      }
+                      onPathChange={(value) => update("changelogPath", value)}
+                      path={form.changelogPath}
+                      title={tSections("changelog")}
+                    />
+                  </div>
                   {form.blogEnabled || form.changelogEnabled ? (
                     <SiteSettingsHint>{tPage("sectionsHint")}</SiteSettingsHint>
                   ) : (
@@ -425,32 +439,49 @@ function RootDirectoryField({
 
 function SiteSectionField({
   title,
+  description,
   enabled,
   path,
   onEnabledChange,
   onPathChange,
 }: SiteSectionFieldProps) {
   const tSections = useTranslations("sites.sections");
+  const { site } = useSite().detail;
   const id = useId();
   return (
-    <Field>
-      <div className="flex items-center gap-2.5">
-        <Switch
-          checked={enabled}
-          id={`${id}-enabled`}
-          onCheckedChange={onEnabledChange}
-          size="sm"
-        />
-        <FieldLabel htmlFor={`${id}-enabled`}>{title}</FieldLabel>
-      </div>
-      <Input
-        aria-label={tSections("pathLabel", { section: title })}
-        disabled={!enabled}
-        onChange={(event) => onPathChange(event.target.value)}
-        placeholder="/"
-        value={path}
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 px-4 py-3.5 sm:grid-cols-[auto_minmax(0,10rem)_minmax(0,1fr)]">
+      <Switch
+        checked={enabled}
+        id={`${id}-enabled`}
+        onCheckedChange={onEnabledChange}
+        size="sm"
       />
-    </Field>
+      <label className="min-w-0 cursor-pointer" htmlFor={`${id}-enabled`}>
+        <span className="block text-sm font-medium">{title}</span>
+        <span className="text-muted-foreground block truncate text-xs">
+          {description}
+        </span>
+      </label>
+      <InputGroup
+        className="col-span-2 sm:col-span-1"
+        data-disabled={enabled ? undefined : ""}
+      >
+        <InputGroupAddon className="max-w-1/2 min-w-0">
+          <InputGroupText className="min-w-0">
+            <span className="truncate">{hostFromOrigin(site.liveUrl)}</span>
+          </InputGroupText>
+        </InputGroupAddon>
+        <InputGroupInput
+          aria-label={tSections("pathLabel", { section: title })}
+          autoComplete="off"
+          disabled={!enabled}
+          onChange={(event) => onPathChange(event.target.value)}
+          placeholder="/"
+          spellCheck={false}
+          value={path}
+        />
+      </InputGroup>
+    </div>
   );
 }
 

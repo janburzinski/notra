@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeading } from "@notra/ui/components/shared/page-heading";
 import { useTranslations } from "use-intl";
 
 import { SiteDesignAppearance } from "@/components/sites/site-design-appearance";
@@ -28,18 +29,11 @@ export function SiteDesignPage() {
     return <SiteConfigMalformed />;
   }
   return (
-    <section
-      className="mx-auto w-full max-w-3xl min-w-0 space-y-5"
-      data-site-design
-    >
-      <header className="space-y-1">
-        <h1 className="text-xl font-semibold tracking-tight">
-          {t(`titles.${active.id}`)}
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          {t(`hints.${active.id}`)}
-        </p>
-      </header>
+    <section className="w-full min-w-0 space-y-6" data-site-design>
+      <PageHeading
+        description={t(`hints.${active.id}`)}
+        title={t(`titles.${active.id}`)}
+      />
       <div inert={state.readOnly} aria-busy={state.readOnly}>
         {active.id === "integrations" ? (
           <SiteDesignIntegrations key={state.scope.branch ?? "production"} />

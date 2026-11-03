@@ -213,7 +213,10 @@ export function useSiteNavSection() {
   return { current: "design", section: "design", branch: null } as const;
 }
 export function useSiteBrandDefaults() {
-  return null;
+  return { brand: null, available: false };
+}
+export function useProjectBrandDefaults() {
+  return useSiteBrandDefaults();
 }
 export function SiteDesignIntegrations() {
   return null;

@@ -17,6 +17,7 @@ import Link from "@/components/framework/link";
 import { SkeletonCrossfade } from "@/components/skeleton-crossfade";
 import { useGeoProjectQueryState } from "@/lib/hooks/use-geo-project-query";
 import { useIsClient } from "@/lib/hooks/use-is-client";
+import { usePrefetchSiteWorkspace } from "@/lib/hooks/use-prefetch-site-workspace";
 import { useSiteDetail, useSitesOrganizationId } from "@/lib/hooks/use-sites";
 import type {
   SiteLayoutProps,
@@ -44,6 +45,7 @@ export function SiteLayout({
   const detailQuery = useSiteDetail(organizationId, siteId);
   const [projectParam, setProjectParam] = useGeoProjectQueryState();
   const owningProjectId = detailQuery.data?.site.projectId;
+  usePrefetchSiteWorkspace(organizationId, siteId, owningProjectId ?? "");
   const hydrated = useIsClient();
   // Links inside the site (deployment rows, "View logs") carry no ?project;
   // the effect below adds it. Only another project's param hides the layout,

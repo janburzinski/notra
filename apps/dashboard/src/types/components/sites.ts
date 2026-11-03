@@ -774,6 +774,26 @@ export interface SiteChangesStripProps {
   description: ReactNode;
   children?: ReactNode;
 }
+export interface SiteChangeItem {
+  key: string;
+  label: string;
+  /** Where the change was made; without one, the item opens the publish review. */
+  href?: string;
+  title?: string;
+}
+
+export interface SiteUnpublishedTitle {
+  key: "unpublishedTitle" | "unpublishedFilesTitle" | "unpublishedMixedTitle";
+  count: number;
+}
+
+export interface SiteChangeListProps {
+  items: readonly SiteChangeItem[];
+  /** Changes beyond `items`, summed up as "N more". */
+  more: number;
+  onReview: () => void;
+}
+
 export interface SiteChangesStripStateProps {
   state: SiteWorkspaceValue;
 }

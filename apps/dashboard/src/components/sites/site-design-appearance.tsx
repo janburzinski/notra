@@ -1,6 +1,10 @@
 "use client";
 
-import { SparklesIcon } from "@hugeicons/core-free-icons";
+import {
+  CheckmarkCircle02Icon,
+  SparklesIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Tabs, TabsList, TabsTrigger } from "@notra/ui/components/ui/tabs";
 import { useState } from "react";
 import { useTranslations } from "use-intl";
@@ -140,24 +144,40 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
 function SiteDesignBranding({ form, update, change }: SiteDesignBrandingProps) {
   const t = useTranslations("sites.design");
   const [brandOpen, setBrandOpen] = useState(false);
-  const brand = useSiteBrandDefaults();
+  const { brand, available } = useSiteBrandDefaults();
   const brandChanges = brand ? describeBrandForDesign(brand, form) : [];
+  const synced = Boolean(brand) && brandChanges.length === 0;
   return (
     <div className="space-y-4">
-      {brandChanges.length > 0 ? (
+      {/* Shown while the brand identity loads, so the fields below never jump. */}
+      {available ? (
         <SiteSettingsList>
           <SiteSettingsItem
             description={t("brandHint")}
             icon={SparklesIcon}
             title={t("brandTitle")}
             value={
-              <Button
-                onClick={() => setBrandOpen(true)}
-                size="sm"
-                variant="outline"
-              >
-                {t("applyBrand")}
-              </Button>
+              synced ? (
+                <span className="text-muted-foreground flex h-8 items-center justify-end gap-1.5 text-sm">
+                  <HugeiconsIcon
+                    aria-hidden="true"
+                    className="text-success size-4 shrink-0"
+                    icon={CheckmarkCircle02Icon}
+                    strokeWidth={2}
+                  />
+                  {t("brandApplied")}
+                </span>
+              ) : (
+                <Button
+                  // Stays disabled while loading or when the identity has no usable defaults.
+                  disabled={!brand}
+                  onClick={() => setBrandOpen(true)}
+                  size="sm"
+                  variant="outline"
+                >
+                  {t("applyBrand")}
+                </Button>
+              )
             }
           />
         </SiteSettingsList>

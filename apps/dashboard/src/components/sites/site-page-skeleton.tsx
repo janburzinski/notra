@@ -27,13 +27,9 @@ const DESIGN_ROW_KEYS = ["a", "b", "c", "d"] as const;
 /** Mirrors the Design page: section heading, then setting rows. */
 export function SiteDesignSkeleton() {
   return (
-    <div
-      aria-busy="true"
-      className="mx-auto w-full max-w-3xl space-y-5"
-      data-page-skeleton=""
-    >
+    <div aria-busy="true" className="w-full space-y-6" data-page-skeleton="">
       <div className="space-y-2">
-        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-9 w-40" />
         <Skeleton className="h-4 w-64 max-w-full" />
       </div>
       <SiteSettingsList>

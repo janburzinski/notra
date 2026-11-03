@@ -223,7 +223,7 @@ export function SiteMobileNav() {
   return (
     <nav
       aria-label={tabs("label")}
-      className="bg-sidebar relative flex scrollbar-none gap-1 overflow-x-auto border-b p-2 md:hidden"
+      className="bg-sidebar relative flex shrink-0 scrollbar-none gap-1 overflow-x-auto border-b p-2 md:hidden"
       ref={navRef}
     >
       {items.map((item) => (
