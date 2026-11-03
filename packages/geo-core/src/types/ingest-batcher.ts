@@ -38,3 +38,16 @@ export interface EventBatcher<R extends BatchedRow> {
 }
 
 export type GeoEventBatcher = EventBatcher<GeoTrafficEventRow>;
+
+export interface UsageBatcherOptions {
+  intervalMs: number;
+  /** Resolves false when the usage was certainly not recorded. */
+  track: (organizationId: string, value: number) => Promise<boolean>;
+}
+
+export interface UsageBatcher {
+  /** Returns false once stopped; the caller reports the usage itself. */
+  add: (organizationId: string, value: number) => boolean;
+  stop: () => Promise<void>;
+  size: () => number;
+}

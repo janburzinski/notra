@@ -1,3 +1,4 @@
+import { trackAiTrafficEvent } from "@notra/ai/billing/ai-traffic-events";
 import { flushGeoLog, geoLog } from "@notra/ai/evlog";
 import { logError } from "@notra/ai/utils/server-log";
 import { GEO_TRAFFIC_FLUSH_INTERVAL_MS } from "@notra/analytics/constants/cache";
@@ -7,12 +8,16 @@ import {
 } from "@notra/analytics/tinybird/client";
 import { db } from "@notra/db/drizzle";
 import { retainDatabaseConnections } from "@notra/db/utils/retain-database-connections";
-import { GEO_DRAIN_MAX_BODY_BYTES } from "@notra/geo-core/constants/ingest";
+import {
+  GEO_DRAIN_MAX_BODY_BYTES,
+  GEO_INGEST_USAGE_FLUSH_INTERVAL_MS,
+} from "@notra/geo-core/constants/ingest";
 import {
   createEventBatcher,
   createGeoEventBatcher,
 } from "@notra/geo-core/ingest/batcher";
 import { announceGeoTrafficRows } from "@notra/geo-core/ingest/live";
+import { createUsageBatcher } from "@notra/geo-core/ingest/usage";
 import {
   getGeoIngestRegion,
   getGeoIngestRuntime,
@@ -54,6 +59,10 @@ const engagementBatcher = createEventBatcher({
   intervalMs: GEO_TRAFFIC_FLUSH_INTERVAL_MS,
   write: ingestWebPageEngagement,
 });
+const usageBatcher = createUsageBatcher({
+  intervalMs: GEO_INGEST_USAGE_FLUSH_INTERVAL_MS,
+  track: trackAiTrafficEvent,
+});
 
 const app = createIngestApp(
   (task) => {
@@ -72,6 +81,7 @@ const app = createIngestApp(
     },
     enqueueWeb: webBatcher.enqueue,
     enqueueEngagement: engagementBatcher.enqueue,
+    trackUsage: usageBatcher.add,
   }
 );
 
@@ -106,6 +116,7 @@ const runtimeLogTimer = setInterval(() => {
     bufferedEvents: batcher.size(),
     webBufferedEvents: webBatcher.size(),
     engagementBufferedEvents: engagementBatcher.size(),
+    usageBufferedEvents: usageBatcher.size(),
     databaseConnections: databasePool?.totalCount ?? 0,
     databaseIdleConnections: databasePool?.idleCount ?? 0,
     databaseWaitingRequests: databasePool?.waitingCount ?? 0,
@@ -134,14 +145,21 @@ async function shutdown() {
     );
     server.stop(true);
   }
-  const [webFlushed, engagementFlushed, flushed] = await stopIngestBatchers(
-    [
-      () => webBatcher.stop(),
-      () => engagementBatcher.stop(),
-      () => batcher.stop(),
-    ],
-    INGEST_EVENTS_FLUSH_TIMEOUT_MS
-  );
+  const [webFlushed, engagementFlushed, flushed, usageFlushed] =
+    await stopIngestBatchers(
+      [
+        () => webBatcher.stop(),
+        () => engagementBatcher.stop(),
+        () => batcher.stop(),
+        () => usageBatcher.stop(),
+      ],
+      INGEST_EVENTS_FLUSH_TIMEOUT_MS
+    );
+  if (!usageFlushed) {
+    console.error(
+      "[geo-ingest] Usage tracking did not finish before exit; some events may not be billed"
+    );
+  }
   if (!flushed || batcher.size() > 0) {
     console.error(
       `[geo-ingest] Buffered events not written before exit (${batcher.size()} left in buffer)`

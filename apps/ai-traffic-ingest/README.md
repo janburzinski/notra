@@ -21,8 +21,16 @@ Tracked events receive `202` once queued in the bounded in-memory batcher, or
 after Tinybird accepts a direct write when the batcher is full. Dropped
 traffic also receives `202`. The batcher retries transient write failures; queued
 events are not durable across a forced process exit. Analytics run in the
-background. SIGTERM stops accepting requests and waits for active requests,
-background work and the batcher before closing the database pool and exiting.
+background. Billable events are summed per organization and reported to Autumn
+every 5 seconds, not one request per event. A sum Autumn answers with 429 or
+503 is retried at the next report; other failures may have been recorded, so
+they are logged with their event count instead of retried. SIGTERM stops accepting requests and
+waits for active requests, background work, the batchers and the pending usage
+report before closing the database pool and exiting.
+
+Concurrent requests for the same token, project or organization share one
+in-flight token-generation, host and site lookup. Nothing is kept once it
+settles, so revocation and host changes still apply on the next lookup.
 Rate-limit hits return `429`; Redis transport failures and limiter timeouts return
 `502` without writing an event. Redis availability is required for tracked ingestion.
 Token generation is still checked against Postgres and fails closed on an outage.
@@ -99,7 +107,7 @@ bodies at the gateway or service.
 Before sending production traffic, verify Unkey Compute's actual SIGTERM delivery
 and termination grace for this app with an isolated test deployment. Shutdown
 allows 35 seconds for active/background work, then stops the three independent
-batchers concurrently with a 12-second deadline each, then allows 2 seconds to
+batchers and the usage report concurrently with a 12-second deadline each, then allows 2 seconds to
 close Postgres and 10 seconds to flush logs: a nominal 59-second budget plus
 runtime overhead. Confirm adequate host grace and test replacement/shutdown under load.
 Deadlines do not make queued events durable; forced termination or failed writes
@@ -241,7 +249,8 @@ using the dedicated service until their endpoint is changed and redeployed.
 
 The standalone worker also emits `geo.ingest.runtime` once per minute with
 process RSS, JS heap and external memory (bytes), active requests, background
-tasks, buffered events, and total/idle/waiting database connections. Use these
+tasks, buffered events, events not yet reported to Autumn
+(`usageBufferedEvents`), and total/idle/waiting database connections. Use these
 counters to distinguish retained process memory from growing queues; RSS alone
 does not establish a JS memory leak. Unkey instance and deployment IDs separate
 processes and restarts. These events contain no

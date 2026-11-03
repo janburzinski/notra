@@ -50,6 +50,12 @@ export interface GeoIngestBuffer {
   enqueueEngagement?: (row: WebPageEngagementRow) => boolean;
   /** Writes an organization's buffered events now, for open live views. */
   expedite: (organizationId: string) => void;
+  /**
+   * Counts tracked events for billing. Returns false when it cannot take
+   * them, in which case the pipeline reports them to Autumn directly, as it
+   * does for every event without a usage buffer.
+   */
+  trackUsage?: (organizationId: string, value: number) => boolean;
 }
 
 export interface GeoIngestAnalyticsInput {

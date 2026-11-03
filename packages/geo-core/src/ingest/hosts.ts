@@ -8,6 +8,8 @@ import type { GeoIngestIdentity } from "@notra/geo-core/types/geo";
 import { ingestAllowedHosts } from "@notra/geo-core/utils/geo-project-domains";
 import { and, eq } from "drizzle-orm";
 
+import { coalesce } from "../utils/coalesce";
+
 function isHostList(value: unknown): value is string[] {
   return (
     Array.isArray(value) && value.every((host) => typeof host === "string")
@@ -74,21 +76,10 @@ async function lookupAllowedHosts(
   return hosts;
 }
 
-/**
- * Brand website plus extra tracked domains for this token. `null` means the
- * lookup failed and ingest should fail open; an empty array is a successful
- * lookup with nothing configured and every host is dropped.
- */
-export async function loadIngestAllowedHosts(
+async function readAllowedHosts(
+  key: string,
   identity: GeoIngestIdentity
 ): Promise<string[] | null> {
-  if (identity.site) {
-    return identity.site.hosts;
-  }
-  const key = geoIngestHostsCacheKey(
-    identity.organizationId,
-    identity.projectId
-  );
   const client = redis;
   if (client) {
     const cached = await client.get<string | string[]>(key).catch(() => null);
@@ -113,4 +104,26 @@ export async function loadIngestAllowedHosts(
       .catch(() => null);
   }
   return hosts;
+}
+
+const loadCachedAllowedHosts = coalesce(
+  (key: string, _identity: GeoIngestIdentity) => key,
+  readAllowedHosts
+);
+
+/**
+ * Brand website plus extra tracked domains for this token. `null` means the
+ * lookup failed and ingest should fail open; an empty array is a successful
+ * lookup with nothing configured and every host is dropped.
+ */
+export function loadIngestAllowedHosts(
+  identity: GeoIngestIdentity
+): Promise<string[] | null> {
+  if (identity.site) {
+    return Promise.resolve(identity.site.hosts);
+  }
+  return loadCachedAllowedHosts(
+    geoIngestHostsCacheKey(identity.organizationId, identity.projectId),
+    identity
+  );
 }

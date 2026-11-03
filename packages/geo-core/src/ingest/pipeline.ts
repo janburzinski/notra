@@ -279,6 +279,17 @@ const storeWebEngagement = Effect.fn("geoIngest.storeWebEngagement")(function* (
   );
 });
 
+function trackUsage(
+  buffer: GeoIngestBuffer | undefined,
+  organizationId: string,
+  value = 1
+): Promise<void> {
+  if (buffer?.trackUsage?.(organizationId, value)) {
+    return Promise.resolve();
+  }
+  return trackAiTrafficEvent(organizationId, value).then(() => undefined);
+}
+
 function droppedResult(
   identity: GeoIngestIdentity,
   visitorType: GeoVisitorType,
@@ -369,7 +380,8 @@ const runWebEngagementIngest = Effect.fn("geoIngest.engagement")(function* (
 const runMcpEventIngest = Effect.fn("geoIngest.mcp")(function* (
   identity: GeoIngestIdentity,
   body: unknown,
-  defer: GeoIngestDefer
+  defer: GeoIngestDefer,
+  buffer: GeoIngestBuffer | undefined
 ) {
   const parsed = mcpEventBatchSchema.safeParse(body);
   if (!parsed.success) {
@@ -400,7 +412,7 @@ const runMcpEventIngest = Effect.fn("geoIngest.mcp")(function* (
   yield* writeTinybirdRows(() => ingestMcpEvents(rows));
   const ingestMs = Date.now() - ingestStartedAt;
   yield* Effect.sync(() =>
-    defer(() => trackAiTrafficEvent(identity.organizationId, rows.length))
+    defer(() => trackUsage(buffer, identity.organizationId, rows.length))
   );
 
   return {
@@ -562,7 +574,7 @@ export const runGeoEnvelopeIngest = Effect.fn("geoIngest.envelope")(function* (
         buffered && buffer
           ? expediteForLiveViewers(buffer, event.organization_id)
           : announceGeoTrafficEvent(event.organization_id, event.project_id);
-      const tracked = trackAiTrafficEvent(event.organization_id);
+      const tracked = trackUsage(buffer, event.organization_id);
       try {
         await Effect.runPromise(trackGeoIngestAnalytics({ identity, event }));
       } catch (error) {
@@ -602,7 +614,7 @@ export const runGeoIngest = Effect.fn("geoIngest.run")(function* (
     return yield* runWebEngagementIngest(identity, body, buffer);
   }
   if (isMcpEventBody(body)) {
-    return yield* runMcpEventIngest(identity, body, defer);
+    return yield* runMcpEventIngest(identity, body, defer, buffer);
   }
   return yield* runGeoEnvelopeIngest(identity, body, defer, buffer);
 });

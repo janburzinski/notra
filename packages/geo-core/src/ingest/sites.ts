@@ -19,6 +19,8 @@ import { listMountedAreas } from "@notra/sites-core/utils/mounts";
 import { and, eq } from "drizzle-orm";
 import { Cache, Effect, Exit } from "effect";
 
+import { coalesce } from "../utils/coalesce";
+
 /**
  * In-process layer in front of Redis on the hot ingest path. Concurrent
  * misses for one site share a single lookup; the oldest entries are evicted
@@ -136,7 +138,7 @@ function lookupIngestSite(siteId: string): Promise<GeoIngestSite | null> {
   });
 }
 
-export async function loadOrganizationSitePrefixes(
+async function readOrganizationSitePrefixes(
   organizationId: string
 ): Promise<GeoIngestSitePrefix[] | null> {
   try {
@@ -179,3 +181,8 @@ export async function loadOrganizationSitePrefixes(
     return null;
   }
 }
+
+export const loadOrganizationSitePrefixes = coalesce(
+  (organizationId: string) => organizationId,
+  readOrganizationSitePrefixes
+);

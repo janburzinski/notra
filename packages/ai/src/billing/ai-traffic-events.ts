@@ -3,6 +3,7 @@ import { Cache, Effect } from "effect";
 import {
   AI_TRAFFIC_EVENTS_QUOTA_CACHE_CAPACITY,
   AI_TRAFFIC_EVENTS_QUOTA_CACHE_TTL_MS,
+  AI_TRAFFIC_EVENTS_TRACK_RETRYABLE_STATUS_CODES,
 } from "../constants/ai-traffic-events";
 import { logError, logWarn } from "../utils/server-log";
 import {
@@ -58,20 +59,40 @@ const quota = Effect.runSync(
 export const hasAiTrafficEventsQuota = (organizationId: string) =>
   Cache.get(quota, organizationId);
 
-export async function trackAiTrafficEvent(organizationId: string, value = 1) {
+function wasNotRecorded(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    "statusCode" in error &&
+    typeof error.statusCode === "number" &&
+    AI_TRAFFIC_EVENTS_TRACK_RETRYABLE_STATUS_CODES.has(error.statusCode)
+  );
+}
+
+/**
+ * Resolves false only when Autumn certainly did not record the usage, so a
+ * retry cannot bill it twice. Other failures may have been recorded; they are
+ * logged with their value and resolve true.
+ */
+export async function trackAiTrafficEvent(
+  organizationId: string,
+  value = 1
+): Promise<boolean> {
   if (!autumn) {
     warnMissingBilling();
-    return;
+    return true;
   }
-  await autumn
-    .track({
+  try {
+    await autumn.track({
       customerId: organizationId,
       featureId: FEATURES.AI_TRAFFIC_EVENTS,
       value,
-    })
-    .catch((error: unknown) => {
-      logError("AI traffic events usage tracking failed", error, {
-        organizationId,
-      });
     });
+    return true;
+  } catch (error) {
+    logError("AI traffic events usage tracking failed", error, {
+      organizationId,
+      value,
+    });
+    return !wasNotRecorded(error);
+  }
 }

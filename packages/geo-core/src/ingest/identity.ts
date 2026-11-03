@@ -2,7 +2,14 @@ import { getGeoIngestTokenGeneration } from "@notra/geo-core/geo/ingest";
 import type { GeoIngestIdentity } from "@notra/geo-core/types/geo";
 import { Effect } from "effect";
 
+import { coalesce } from "../utils/coalesce";
 import { GeoIngestFailedError, GeoIngestInvalidTokenError } from "./errors";
+
+const loadTokenGeneration = coalesce(
+  (organizationId: string, projectId: string | null) =>
+    `${organizationId}:${projectId ?? ""}`,
+  getGeoIngestTokenGeneration
+);
 
 /**
  * A valid signature is not enough: the token's generation must match the
@@ -21,8 +28,7 @@ export const assertGeoIngestIdentityActive = Effect.fn(
     siteId: identity.site?.id,
   };
   const generation = yield* Effect.tryPromise({
-    try: () =>
-      getGeoIngestTokenGeneration(identity.organizationId, identity.projectId),
+    try: () => loadTokenGeneration(identity.organizationId, identity.projectId),
     catch: (cause) =>
       new GeoIngestFailedError({
         ...context,

@@ -50,7 +50,7 @@ const ingestWebPageViews = mock(async (_rows: WebPageViewRow[]) => ({
 }));
 const webRatelimitLimit = mock(async () => ({ success: true }));
 const hasAiTrafficEventsQuota = mock(() => Effect.succeed(true));
-const trackAiTrafficEvent = mock(async (_organizationId: string) => {});
+const trackAiTrafficEvent = mock(async (_organizationId: string) => true);
 const ingestWebPageEngagement = mock(async (_rows: unknown[]) => ({
   successful_rows: 1,
   quarantined_rows: 0,
@@ -590,5 +590,53 @@ describe("runGeoIngest ordering", () => {
       _tag: "Success",
       success: { outcome: "ingested" },
     });
+  });
+
+  test("a buffer with usage tracking bills events through it, not per event", async () => {
+    const tasks: (() => Promise<void>)[] = [];
+    const trackUsage = mock((_organizationId: string, _value: number) => true);
+    const buffer = { enqueue: () => true, expedite: () => {}, trackUsage };
+    const outcome = await Effect.runPromise(
+      Effect.result(
+        runGeoIngest(
+          ingestRequest() as never,
+          (task) => {
+            tasks.push(task);
+          },
+          buffer
+        )
+      ) as never
+    );
+    await Promise.all(tasks.map((task) => task()));
+
+    expect(outcome).toMatchObject({
+      _tag: "Success",
+      success: { outcome: "ingested" },
+    });
+    expect(trackUsage).toHaveBeenCalledWith("org_1", 1);
+    expect(trackAiTrafficEvent).not.toHaveBeenCalled();
+  });
+
+  test("a usage buffer that refuses counts falls back to reporting the event", async () => {
+    const tasks: (() => Promise<void>)[] = [];
+    const buffer = {
+      enqueue: () => true,
+      expedite: () => {},
+      trackUsage: () => false,
+    };
+    await Effect.runPromise(
+      Effect.result(
+        runGeoIngest(
+          ingestRequest() as never,
+          (task) => {
+            tasks.push(task);
+          },
+          buffer
+        )
+      ) as never
+    );
+    await Promise.all(tasks.map((task) => task()));
+
+    expect(trackAiTrafficEvent).toHaveBeenCalledWith("org_1", 1);
   });
 });
