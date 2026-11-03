@@ -9020,6 +9020,16 @@
           "all": "Alle Seiten"
         }
       },
+      "notFound": {
+        "title": "Titel",
+        "titleHint": "Die Überschrift der Seite. Leer lassen für den Standardtext.",
+        "titlePlaceholder": "This page doesn't exist",
+        "description": "Beschreibung",
+        "descriptionHint": "Der Text unter der Überschrift. Unterstützt Markdown-Links, fett, kursiv und Code, z. B. [Hier starten](/blog).",
+        "descriptionPlaceholder": "It may have moved, or the link is wrong.",
+        "redirect": "Zur Startseite des Bereichs weiterleiten",
+        "redirectHint": "Schickt Leser zur Blog- oder Changelog-Startseite, statt diese Seite zu zeigen. Suchmaschinen bekommen weiterhin einen 404, damit kaputte Links nicht indexiert werden."
+      },
       "footer": {
         "socials": "Social Links",
         "socialsHint": "Profile, die im Footer als Icons erscheinen. Website-Links zeigen das Favicon der Seite.",
@@ -9105,7 +9115,8 @@
           "banner": "Banner",
           "integrations": "Integrationen",
           "footer": "Footer",
-          "seo": "SEO"
+          "seo": "SEO",
+          "notFound": "404-Seite"
         },
         "hints": {
           "general": "Name und Beschreibung für deine Leser.",
@@ -9116,7 +9127,8 @@
           "banner": "Eine Ankündigungsleiste oben auf jeder Seite.",
           "integrations": "Analytics und Cookie-Banner für diese Seite.",
           "footer": "Social Links und Link-Spalten unten auf jeder Seite.",
-          "seo": "Meta-Tags und welche Seiten Suchmaschinen indexieren."
+          "seo": "Meta-Tags und welche Seiten Suchmaschinen indexieren.",
+          "notFound": "Was Leser sehen, wenn ein Link auf eine Seite zeigt, die es nicht gibt."
         }
       },
       "errors": {

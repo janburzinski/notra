@@ -655,6 +655,17 @@ try {
       assert.ok((await seo.text()).includes(origin));
     }
   }
+  const outside = await request("/outside-every-mount", {
+    headers: { accept: "text/html" },
+  });
+  assert.equal(outside.status, 404);
+  assert.equal(
+    await outside.text(),
+    await (
+      await request("/blog/also-missing", { headers: { accept: "text/html" } })
+    ).text(),
+    "paths outside every mount get the blog's themed 404"
+  );
   const robots = await request("/robots.txt");
   assert.match(await robots.text(), /Allow: \/[\s\S]*Sitemap:/);
   const sitemap = await request("/sitemap.xml");
@@ -717,7 +728,7 @@ try {
     }
   }
   checks.push(
-    "assets + integrity, root/manifest/slash redirects, HTML/Markdown/HEAD 404s and noindex meta, Markdown twins, SEO feeds/maps/canonical/OG/JSON-LD, ETag"
+    "assets + integrity, root/manifest/slash redirects, HTML/Markdown/HEAD 404s (themed outside mounts too) and noindex meta, Markdown twins, SEO feeds/maps/canonical/OG/JSON-LD, ETag"
   );
   for (const check of await assertContentFeatures(
     page,

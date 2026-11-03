@@ -16,6 +16,7 @@ import { SiteBrandingFields } from "@/components/sites/site-branding-fields";
 import { SiteFooterFields } from "@/components/sites/site-footer-fields";
 import { SiteGeneralFields } from "@/components/sites/site-general-fields";
 import { SiteNavbarFields } from "@/components/sites/site-navbar-fields";
+import { SiteNotFoundFields } from "@/components/sites/site-not-found-fields";
 import { SiteSeoFields } from "@/components/sites/site-seo-fields";
 import {
   SiteSettingsItem,
@@ -113,6 +114,13 @@ export function SiteDesignAppearance({ section }: SiteDesignAppearanceProps) {
     return (
       <SiteSettingsList>
         <SiteSeoFields form={form} update={update} />
+      </SiteSettingsList>
+    );
+  }
+  if (section === "notFound") {
+    return (
+      <SiteSettingsList>
+        <SiteNotFoundFields form={form} update={update} />
       </SiteSettingsList>
     );
   }

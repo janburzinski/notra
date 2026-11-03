@@ -5,9 +5,9 @@ import { serveFile } from "../serve-file";
 import type { ManifestRouteContext } from "../types/routes";
 
 export const htmlNotFoundRoute = Effect.fn("Sites.route.htmlNotFound")(
-  function* ({ area, loaded, fileParams }: ManifestRouteContext) {
-    const notFound = area
-      ? loaded.files.get(joinMountPath(area.mount, "404.html"))
+  function* ({ notFoundArea, loaded, fileParams }: ManifestRouteContext) {
+    const notFound = notFoundArea
+      ? loaded.files.get(joinMountPath(notFoundArea.mount, "404.html"))
       : undefined;
     if (!notFound) {
       return Option.none<Response>();

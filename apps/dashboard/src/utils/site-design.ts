@@ -106,6 +106,11 @@ const BANNER_KEYS: readonly SiteDesignKey[] = [
 ];
 
 const SEO_KEYS: readonly SiteDesignKey[] = ["metaTags", "seoIndexing"];
+const NOT_FOUND_KEYS: readonly SiteDesignKey[] = [
+  "notFoundTitle",
+  "notFoundDescription",
+  "notFoundRedirect",
+];
 const FOOTER_SOCIAL_KEYS: readonly SiteDesignKey[] = ["footerSocials"];
 const FOOTER_COLUMN_KEYS: readonly SiteDesignKey[] = [
   "footerColumnsEnabled",
@@ -354,6 +359,7 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
   const bannerColor = byMode(banner.color);
   const footer = record(config.footer);
   const footerColumns = readFooterColumns(footer);
+  const notFound = record(record(config.errors)["404"]);
   return {
     name: text(config.name),
     description: text(config.description),
@@ -423,6 +429,9 @@ export function readDesignForm(config: SiteRawConfig): SiteDesignForm {
     seoIndexing:
       SITE_SEO_INDEXING_MODES.find((item) => item === seo.indexing) ??
       "navigable",
+    notFoundTitle: text(notFound.title),
+    notFoundDescription: text(notFound.description),
+    notFoundRedirect: notFound.redirect === true,
     footerSocials: readFooterSocials(footer),
     footerColumnsEnabled: footerColumns.length > 0,
     footerColumns,
@@ -534,6 +543,16 @@ function patchSeo(
     );
   }
   assignObject(config, "seo", seo);
+}
+
+function patchNotFound(config: SiteRawConfig, form: SiteDesignForm) {
+  const errors: SiteRawConfig = { ...record(config.errors) };
+  const notFound: SiteRawConfig = { ...record(errors["404"]) };
+  assign(notFound, "title", form.notFoundTitle.trim() || undefined);
+  assign(notFound, "description", form.notFoundDescription.trim() || undefined);
+  assign(notFound, "redirect", form.notFoundRedirect || undefined);
+  assignObject(errors, "404", notFound);
+  assignObject(config, "errors", errors);
 }
 
 function patchBackground(config: SiteRawConfig, form: SiteDesignForm) {
@@ -837,6 +856,9 @@ export function patchDesign(
   }
   if (changed(form, initial, SEO_KEYS)) {
     patchSeo(config, form, initial);
+  }
+  if (changed(form, initial, NOT_FOUND_KEYS)) {
+    patchNotFound(config, form);
   }
   if (changed(form, initial, [...FOOTER_SOCIAL_KEYS, ...FOOTER_COLUMN_KEYS])) {
     patchFooter(config, form, initial);

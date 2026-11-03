@@ -40,6 +40,7 @@ export type ManifestFileParams = Omit<ServeFileParams, "file" | "extraHeaders">;
 export interface ManifestRouteContext extends DeploymentRouteContext {
   path: string;
   area: SiteMountedArea | null;
+  notFoundArea: SiteMountedArea | null;
   markdownNotFoundPath: string;
   wantsMarkdown: boolean;
   file: SiteManifestFile | null;

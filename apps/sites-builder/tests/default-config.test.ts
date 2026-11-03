@@ -81,7 +81,7 @@ test("real fixture and empty-source builds use snapshot config without adding so
       const defaultConfig = createDefaultSiteConfig("Frozen build name");
       defaultConfig.errors[404] = {
         title: "Missing page",
-        description: "Choose an existing page.",
+        description: "Choose an [existing page](/start) or <b>search</b>.",
         redirect: true,
       };
       const snapshot = JSON.stringify(defaultConfig);
@@ -121,7 +121,11 @@ test("real fixture and empty-source builds use snapshot config without adding so
           "utf8"
         );
         expect(markdown404).toStartWith(
-          "# Missing page\n\nChoose an existing page."
+          "# Missing page\n\nChoose an [existing page](/start) or <b>search</b>."
+        );
+        const html404 = await readFile(join(outDir, area, "404.html"), "utf8");
+        expect(html404).toContain(
+          'Choose an <a href="/start">existing page</a> or &lt;b&gt;search&lt;/b&gt;.'
         );
         expect(markdown404).toContain(`(/${area}/index.md)`);
         expect(markdown404).toContain(`(/${area}/llms.txt)`);

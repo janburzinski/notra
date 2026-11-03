@@ -9,9 +9,8 @@ import type { ManifestRouteContext } from "../types/routes";
 export const markdownNotFoundRoute = Effect.fn("Sites.route.markdownNotFound")(
   function* ({
     path,
-    area,
+    notFoundArea,
     wantsMarkdown,
-    markdownNotFoundPath,
     resolved,
     loaded,
     fileParams,
@@ -19,13 +18,17 @@ export const markdownNotFoundRoute = Effect.fn("Sites.route.markdownNotFound")(
     if (!(wantsMarkdown || path.endsWith(".md"))) {
       return Option.none<Response>();
     }
-    const notFound = area ? loaded.files.get(markdownNotFoundPath) : undefined;
+    const notFound = notFoundArea
+      ? loaded.files.get(joinMountPath(notFoundArea.mount, "404.md"))
+      : undefined;
     if (!notFound) {
       return Option.some(
         markdownNotFound({
           path,
-          indexPath: area ? joinMountPath(area.mount, "index.md") : null,
-          llmsPath: joinMountPath(area?.mount ?? "/", "llms.txt"),
+          indexPath: notFoundArea
+            ? joinMountPath(notFoundArea.mount, "index.md")
+            : null,
+          llmsPath: joinMountPath(notFoundArea?.mount ?? "/", "llms.txt"),
         })
       );
     }

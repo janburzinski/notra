@@ -1,4 +1,5 @@
 import {
+  FileNotFoundIcon,
   Globe02Icon,
   Image01Icon,
   LayoutBottomIcon,
@@ -29,6 +30,7 @@ export const SITE_DESIGN_SECTIONS = [
   { id: "footer", icon: LayoutBottomIcon, paths: ["footer"] },
   { id: "integrations", icon: Plug01Icon, paths: ["integrations"] },
   { id: "seo", icon: SeoIcon, paths: ["seo.metatags", "seo.indexing"] },
+  { id: "notFound", icon: FileNotFoundIcon, paths: ["errors.404"] },
 ] as const;
 
 /** Labelled groups of Design sections in the site sidebar. */
@@ -38,5 +40,5 @@ export const SITE_DESIGN_GROUPS = [
     sections: ["general", "styling", "branding", "typography"],
   },
   { id: "layout", sections: ["navbar", "banner", "footer"] },
-  { id: "configuration", sections: ["integrations", "seo"] },
+  { id: "configuration", sections: ["integrations", "seo", "notFound"] },
 ] as const;

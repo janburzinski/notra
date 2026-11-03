@@ -93,9 +93,13 @@ To use your own image for those pages instead, set `seo.image`:
 
 ## 404 page
 
+Set the title and text of the 404 page under **Design → 404 page** in the dashboard, or in `blog.json`:
+
 ```json blog.json
-"errors": { "404": { "title": "Nothing here", "description": "The post may have moved." } }
+"errors": { "404": { "title": "Nothing here", "description": "The post may have moved. Try the [latest posts](/blog)." } }
 ```
+
+The description supports Markdown links, `**bold**`, `*italic*` and `` `code` ``. The page uses your site's header, footer, colors and fonts. A path outside every section, like `/pricing` on a site with only `/blog`, shows the blog's 404 page.
 
 With `"redirect": true`, an unknown page sends readers to the blog or changelog home instead of showing the 404 page, while search engines still get a `404` status.
 

@@ -9020,6 +9020,16 @@
           "all": "All pages"
         }
       },
+      "notFound": {
+        "title": "Title",
+        "titleHint": "The heading of the page. Leave it empty to use the default.",
+        "titlePlaceholder": "This page doesn't exist",
+        "description": "Description",
+        "descriptionHint": "The text under the heading. Supports Markdown links, bold, italic and code, like [Start here](/blog).",
+        "descriptionPlaceholder": "It may have moved, or the link is wrong.",
+        "redirect": "Redirect to the section home",
+        "redirectHint": "Sends readers to the blog or changelog home instead of showing this page. Search engines still get a 404, so broken links don't get indexed."
+      },
       "footer": {
         "socials": "Social links",
         "socialsHint": "Profiles shown as icons in the footer. Website links show that site's favicon.",
@@ -9105,7 +9115,8 @@
           "banner": "Banner",
           "integrations": "Integrations",
           "footer": "Footer",
-          "seo": "SEO"
+          "seo": "SEO",
+          "notFound": "404 page"
         },
         "hints": {
           "general": "The name and description readers see.",
@@ -9116,7 +9127,8 @@
           "banner": "An announcement bar at the top of every page.",
           "integrations": "Analytics and the cookie banner for this site.",
           "footer": "Social links and link columns at the bottom of every page.",
-          "seo": "Meta tags and which pages search engines index."
+          "seo": "Meta tags and which pages search engines index.",
+          "notFound": "What readers see when a link points to a page that doesn't exist."
         }
       },
       "errors": {

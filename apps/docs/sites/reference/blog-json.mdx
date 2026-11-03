@@ -185,7 +185,7 @@ See [SEO, share images and redirects](/sites/customize/seo).
 | `thumbnails.layout` | `"default" \| "author" \| "article"` | `"default"` | `author` shows logo, label, title, the first author and your domain, see [Share images](/sites/customize/seo#author-layout). `article` shows date, category, title, description and all authors, see [Article layout](/sites/customize/seo#article-layout) |
 | `thumbnails.label` | string, up to 40 characters | Section title | Top-right label in the `author` layout, category fallback in the `article` layout |
 | `errors.404.title` | string, up to 120 characters | "This page doesn't exist" | 404 heading |
-| `errors.404.description` | string, up to 300 characters | | 404 text |
+| `errors.404.description` | string, up to 300 characters | "It may have moved, or the link is wrong." | 404 text. Supports Markdown links, bold, italic and code |
 | `errors.404.redirect` | boolean | `false` | Send readers to the section home instead |
 | `metadata.timestamp` | boolean | `true` | Show "Updated" dates |
 | `metadata.dateFormat` | `"short" \| "long"` | `"short"` | Dates like "Oct 12, 2026" or "October 12, 2026" |

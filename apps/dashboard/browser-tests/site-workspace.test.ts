@@ -119,6 +119,44 @@ test("invalid fields survive moving between pages of the same site", async () =>
   await browserExpect(name).toHaveValue("");
 });
 
+test("the 404 page section saves its title, Markdown description and redirect into blog.json", async () => {
+  const page = await browser.newPage();
+  await page.goto(baseUrl);
+  await page
+    .getByRole("button", { name: "Open 404 page", exact: true })
+    .click();
+  await browserExpect(page.getByTestId("navigation")).toHaveText("404 page");
+  const title = page.getByRole("textbox", { name: "Title", exact: true });
+  await browserExpect(title).toHaveAttribute(
+    "placeholder",
+    "This page doesn't exist"
+  );
+  await title.fill("Nothing shipped here yet");
+  await page
+    .getByRole("textbox", { name: "Description", exact: true })
+    .fill("Try the [quickstart](/blog/quickstart).");
+  const redirect = page.getByRole("switch", {
+    name: /Redirect to the section home/,
+  });
+  // The fixture has no stylesheet, so the switch has no size to click.
+  await redirect.dispatchEvent("click");
+  await browserExpect(redirect).toHaveAttribute("aria-checked", "true");
+  await page.getByRole("button", { name: "Flush", exact: true }).click();
+  await browserExpect(page.getByTestId("status")).toHaveText(/^(idle|saved)$/);
+  expect(
+    JSON.parse((await page.getByTestId("persisted").textContent()) ?? "{}")
+  ).toMatchObject({
+    name: "site-a",
+    errors: {
+      404: {
+        title: "Nothing shipped here yet",
+        description: "Try the [quickstart](/blog/quickstart).",
+        redirect: true,
+      },
+    },
+  });
+});
+
 test("an invalid config from the repository names its fields, never blocks leaving, and repairs into a draft", async () => {
   const page = await browser.newPage();
   await page.goto(`${baseUrl}?broken`);

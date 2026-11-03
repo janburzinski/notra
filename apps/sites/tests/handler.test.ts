@@ -424,7 +424,27 @@ describe("production serving", () => {
     const missing = await request("https://acme.notra.site/blog/nope");
     expect(missing.status).toBe(404);
     expect(await missing.text()).toBe("dep_live:/blog/404.html");
-    expect((await request("https://acme.notra.site/outside")).status).toBe(404);
+    const outside = await request("https://acme.notra.site/outside");
+    expect(outside.status).toBe(404);
+    expect(await outside.text()).toBe("dep_live:/blog/404.html");
+  });
+
+  test("paths outside every mount fall back to the first area's 404", async () => {
+    const { put, request } = setup({}, true);
+    const outside = await request("https://acme.notra.site/outside", {
+      Accept: "text/markdown",
+    });
+    expect(outside.status).toBe(404);
+    expect(await outside.text()).toBe("dep_live:/blog/404.md");
+
+    put(
+      `deployments/${SITE}/dep_live/manifest.json`,
+      manifest("dep_live", "https://acme.com", ["/changelog/index.html"])
+    );
+    resetCachesForTests();
+    const bare = await request("https://acme.notra.site/outside");
+    expect(bare.status).toBe(404);
+    expect(await bare.text()).toContain("Page not found");
   });
 
   test("hashed assets are immutable, HTML revalidates, ETag gives 304", async () => {

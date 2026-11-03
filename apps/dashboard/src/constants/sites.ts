@@ -215,7 +215,7 @@ export const SITE_SIDEBAR_SKELETON_GROUPS = [
   ["overview", "analytics", "domains", "settings"],
   ["general", "styling", "branding", "typography"],
   ["navbar", "banner", "footer"],
-  ["integrations", "seo"],
+  ["integrations", "seo", "notFound"],
 ] as const;
 
 export const SITE_PREVIEW_VIEWPORT_WIDTH = 1280;

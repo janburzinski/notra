@@ -57,6 +57,7 @@ const NAVIGATIONS = [
   ["Navigate away", "/synthetic/projects", {}, "left"],
   ["Open Styling", `${SITE_PATH}/design`, { section: "styling" }, "Styling"],
   ["Open General", `${SITE_PATH}/design`, { section: "general" }, "General"],
+  ["Open 404 page", `${SITE_PATH}/design`, { section: "notFound" }, "404 page"],
   ["Open Settings page", `${SITE_PATH}/settings`, {}, "Settings page"],
   [
     "Open another branch",

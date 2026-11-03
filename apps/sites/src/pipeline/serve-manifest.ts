@@ -1,5 +1,6 @@
 import {
   joinMountPath,
+  listMountedAreas,
   resolveAreaForPath,
 } from "@notra/sites-core/utils/mounts";
 import { Effect, Option } from "effect";
@@ -26,12 +27,14 @@ export const serveManifest = Effect.fn("Sites.serveManifest")(function* (
   if (path === null) {
     return html(notFoundPage(), 400);
   }
-  const area = resolveAreaForPath(loaded.manifest.target.mounts, path);
+  const { mounts } = loaded.manifest.target;
+  const area = resolveAreaForPath(mounts, path);
   const file = resolveFile(loaded.files, path);
   const answered = yield* runRoutes(MANIFEST_ROUTES, {
     ...context,
     path,
     area,
+    notFoundArea: area ?? listMountedAreas(mounts)[0] ?? null,
     markdownNotFoundPath: joinMountPath(area?.mount ?? "/", "404.md"),
     wantsMarkdown: prefersMarkdown(request.headers.get("accept")),
     file,

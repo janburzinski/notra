@@ -184,6 +184,14 @@ const VARIANTS: [string, FormPatch][] = [
   ],
   ["banner switched off", { bannerEnabled: false, bannerContent: "Hidden" }],
   [
+    "404 page",
+    {
+      notFoundTitle: "Lost?",
+      notFoundDescription: "Try the [quickstart](/blog/quickstart).",
+      notFoundRedirect: true,
+    },
+  ],
+  [
     "footer socials",
     {
       footerSocials: [
@@ -265,6 +273,32 @@ describe("site design form", () => {
     expect((config.styling as SiteRawConfig).future).toBe("kept");
     expect((config.background as SiteRawConfig).future).toBe("kept");
     expect((config.appearance as SiteRawConfig).storageKey).toBe("acme-theme");
+  });
+
+  test("clearing the 404 page removes only what the form edits", () => {
+    const source: SiteRawConfig = {
+      ...SOURCE,
+      errors: { 404: { title: "Gone", redirect: true, future: "kept" } },
+    };
+    const initial = readDesignForm(source);
+    expect(initial).toMatchObject({
+      notFoundTitle: "Gone",
+      notFoundDescription: "",
+      notFoundRedirect: true,
+    });
+    const config = patchDesign(
+      source,
+      { ...initial, notFoundTitle: " ", notFoundRedirect: false },
+      initial
+    );
+    expect(config.errors).toEqual({ 404: { future: "kept" } });
+    expect(
+      patchDesign(
+        { ...SOURCE, errors: { 404: { title: "Gone" } } },
+        { ...initial, notFoundTitle: "", notFoundRedirect: false },
+        initial
+      )
+    ).not.toHaveProperty("errors");
   });
 
   test("flat footer links survive switching columns on and off while typing", () => {

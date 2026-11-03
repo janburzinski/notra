@@ -116,6 +116,9 @@ export interface SiteDesignForm {
   bannerDark: string;
   metaTags: SiteMetaTagForm[];
   seoIndexing: SiteSeoIndexing;
+  notFoundTitle: string;
+  notFoundDescription: string;
+  notFoundRedirect: boolean;
   footerSocials: SiteFooterSocialForm[];
   footerColumnsEnabled: boolean;
   footerColumns: SiteFooterColumnForm[];
