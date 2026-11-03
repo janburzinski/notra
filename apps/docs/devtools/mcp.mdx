@@ -22,6 +22,7 @@ docolin:
     - AI agent access
     - connect MCP server
     - custom MCP servers
+    - MCP toolsets
   prev: ./cli.mdx
   next: ./claude.mdx
 ---
@@ -181,6 +182,37 @@ claude mcp add notra -- npx -y @usenotra/mcp
 ```
 
 The hosted server gets updates first and the npm package can lag behind it, so prefer the hosted URL when your client supports remote servers.
+
+### Load only the tools you need
+
+The server exposes every tool by default. Many clients load all tool definitions into the agent's context up front, so if you only use part of Notra, pick a toolset to keep that context small:
+
+| Toolset | Tools |
+| --- | --- |
+| `content` | Posts, brand identities, integrations, schedules, event triggers, webhooks, skills and the feedback inbox |
+| `geo` | Projects and every GEO tool |
+
+Workspace tools and `submit_feedback` are always available. Add the `toolsets` query parameter to the hosted URL, or set `NOTRA_MCP_TOOLSETS` for the npm package. Separate several toolsets with commas.
+
+<CodeGroup>
+```bash Claude Code (hosted)
+claude mcp add --transport http notra "https://mcp.usenotra.com/mcp?toolsets=geo"
+```
+
+```bash Claude Code (stdio)
+claude mcp add notra -e NOTRA_MCP_TOOLSETS=geo -- npx -y @usenotra/mcp
+```
+
+```json mcp.json (Cursor)
+"notra": {
+  "url": "https://mcp.usenotra.com/mcp?toolsets=geo"
+}
+```
+</CodeGroup>
+
+If you already added `notra` to Claude Code, run `claude mcp remove notra` first, because `claude mcp add` does not replace an existing server with the same name. In Cursor, edit the existing entry.
+
+The server rejects an unknown toolset name with an error instead of silently hiding tools. OAuth sign-in works the same with the query parameter.
 
 ## Available tools
 
